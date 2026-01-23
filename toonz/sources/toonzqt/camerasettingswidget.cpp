@@ -38,21 +38,21 @@
 #include <QApplication>
 #include <QComboBox>
 #include <QMessageBox>
-#include <QList>
+// #include <QList>
 #include <QStringList>
-#include <QRegExp>
-#include <QPainter>
+#include <QRegularExpression>
+// #include <QPainter>
 #include <QTextStream>
-#include <QString>
+// #include <QString>
 
 using namespace DVGui;
 
 namespace {
-/*---小数の余分なゼロを消す---*/
+/*--- Remove trailing zeros from decimals ---*/
 QString removeZeros(QString srcStr) {
   if (!srcStr.contains('.')) return srcStr;
 
-  for (int i = srcStr.length() - 1; i >= 0; i--) {
+  for (int i = srcStr.length() - 1; i >= 0; --i) {
     if (srcStr.at(i) == '0')
       srcStr.chop(1);
     else if (srcStr.at(i) == '.') {
@@ -72,45 +72,45 @@ QMap<QString, QString> unitTrMap;
 //=============================================================================
 
 QValidator::State SimpleExpValidator::validate(QString &input, int &pos) const {
-  /*---使用可能な文字---*/
-  QString validChars("0123456789/.");
+  /*--- Allowed characters ---*/
+  static const QString validChars = QStringLiteral("0123456789/.");
 
   int slashCount = 0;
 
-  for (int i = 0; i < input.length(); i++) {
-    /*--- まず、使用不可能な文字が含まれている場合はInvalid ---*/
-    if (!validChars.contains(input.at(i))) return Invalid;
-    if (input.at(i) == '/') slashCount++;
+  for (int i = 0; i < input.length(); ++i) {
+    /*--- First, if it contains invalid characters, return Invalid ---*/
+    if (!validChars.contains(input.at(i))) return QValidator::Invalid;
+    if (input.at(i) == '/') ++slashCount;
   }
-  /*--- 中身は普通の数字。Doubleに変換可能ならOK ---*/
+
+  /*--- Content is regular numbers. If convertible to Double, OK ---*/
   if (slashCount == 0) {
     bool ok;
     double tmp = input.toDouble(&ok);
     if (ok)
-      return (tmp > 0) ? Acceptable : Intermediate;
+      return (tmp > 0) ? QValidator::Acceptable : QValidator::Intermediate;
     else
-      return Intermediate;
+      return QValidator::Intermediate;
   } else if (slashCount >= 2) {
-    return Intermediate;
+    return QValidator::Intermediate;
   } else  // slashCount == 1
   {
-    if (input.at(0) == '/' || input.at(input.length() - 1) == '/')
-      return Intermediate;
-    else {
-      QStringList strList = input.split('/');
-      /*---
-       * スラッシュの左右でDoubleに変換できるかチェック。できないとIntermediate。
-       * ---*/
-      for (int i = 0; i < strList.size(); i++) {
-        QString tmpStr = strList.at(i);
-        bool ok;
-        double tmp = tmpStr.toDouble(&ok);
-        if (!ok) return Intermediate;
-        if (ok && tmp <= 0) return Intermediate;
-      }
-      /*--- 左右でDoubleに変換できたのでOK ---*/
-      return Acceptable;
+    if (input.front() == '/' || input.back() == '/')
+      return QValidator::Intermediate;
+
+    QStringList strList = input.split('/');
+    /*---
+     * Check if convertible to Double on both sides of slash. If not,
+     * Intermediate.
+     * ---*/
+    for (const QString &tmpStr : strList) {
+      bool ok;
+      double tmp = tmpStr.toDouble(&ok);
+      if (!ok) return QValidator::Intermediate;
+      if (ok && tmp <= 0) return QValidator::Intermediate;
     }
+    /*--- Convertible to Double on both sides, so OK ---*/
+    return QValidator::Acceptable;
   }
 }
 
@@ -120,21 +120,19 @@ SimpleExpField::SimpleExpField(QWidget *parent) : QLineEdit(parent) {
   m_validator = new SimpleExpValidator(this);
   setValidator(m_validator);
 }
+
 //--------------------------------------------------------------------------
-/*--- 普通に値を入れる ---*/
-void SimpleExpField::setValue(double value) {
-  QString str;
-  str.setNum(value);
-  setText(str);
-}
+/*--- Set value normally ---*/
+void SimpleExpField::setValue(double value) { setText(QString::number(value)); }
+
 //--------------------------------------------------------------------------
-/*--- A/R用 valueがw/hに近ければ "w/h" という文字列を入れる ---*/
+/*--- For A/R: if value is close to w/h, insert "w/h" string ---*/
 void SimpleExpField::setValue(double value, int w, int h) {
   QString str;
-  if (areAlmostEqual(value, (double)w / (double)h, 1e-5))
-    str = QString().setNum(w) + "/" + QString().setNum(h);
+  if (areAlmostEqual(value, static_cast<double>(w) / h, 1e-5))
+    str = QString("%1/%2").arg(w).arg(h);
   else
-    str.setNum(value);
+    str = QString::number(value);
 
   setText(str);
 }
@@ -173,10 +171,7 @@ void SimpleExpField::focusOutEvent(QFocusEvent *event) {
 //=============================================================================
 
 CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
-    : m_forCleanup(forCleanup)
-    , m_arValue(0)
-    , m_presetListFile("")
-    , m_currentLevel(0) {
+    : m_forCleanup(forCleanup), m_arValue(0), m_currentLevel(nullptr) {
   if (unitTrMap.isEmpty()) {
     unitTrMap["cm"]    = tr("cm");
     unitTrMap["mm"]    = tr("mm");
@@ -233,7 +228,7 @@ CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
   m_yResFld->setMinimumWidth(0);
   m_yResFld->setMaximumWidth(QWIDGETSIZE_MAX);
 
-  /*--- 表示精度を4桁にする ---*/
+  /*--- Set display precision to 4 digits ---*/
   m_lxFld->setDecimals(4);
   m_lyFld->setDecimals(4);
 
@@ -272,14 +267,15 @@ CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
   m_arPrev->setObjectName("CameraSettingsRadioButton");
 
   // radio buttons groups
-  QButtonGroup *group;
-  group = new QButtonGroup;
-  group->addButton(m_xPrev);
-  group->addButton(m_yPrev);
-  group->addButton(m_arPrev);
-  group = new QButtonGroup;
-  group->addButton(m_inchPrev);
-  group->addButton(m_dotPrev);
+  auto *group1 = new QButtonGroup;
+  group1->addButton(m_xPrev);
+  group1->addButton(m_yPrev);
+  group1->addButton(m_arPrev);
+
+  auto *group2 = new QButtonGroup;
+  group2->addButton(m_inchPrev);
+  group2->addButton(m_dotPrev);
+
   m_arPrev->setChecked(true);
   m_dotPrev->setChecked(true);
 
@@ -342,45 +338,48 @@ CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
   TCamera camera;
   setFields(&camera);
 
-  // connect events
-  bool ret = true;
-  ret = ret && connect(m_lxFld, SIGNAL(editingFinished()), SLOT(onLxChanged()));
-  ret = ret && connect(m_lyFld, SIGNAL(editingFinished()), SLOT(onLyChanged()));
-  ret = ret && connect(m_arFld, SIGNAL(editingFinished()), SLOT(onArChanged()));
-  ret = ret &&
-        connect(m_xResFld, SIGNAL(editingFinished()), SLOT(onXResChanged()));
-  ret = ret &&
-        connect(m_yResFld, SIGNAL(editingFinished()), SLOT(onYResChanged()));
-  ret = ret &&
-        connect(m_xDpiFld, SIGNAL(editingFinished()), SLOT(onXDpiChanged()));
-  ret = ret &&
-        connect(m_yDpiFld, SIGNAL(editingFinished()), SLOT(onYDpiChanged()));
+  // Modernized signal-slot connections using Qt5 style
+  connect(m_lxFld, &MeasuredDoubleLineEdit::editingFinished, this,
+          &CameraSettingsWidget::onLxChanged);
+  connect(m_lyFld, &MeasuredDoubleLineEdit::editingFinished, this,
+          &CameraSettingsWidget::onLyChanged);
+  connect(m_arFld, &SimpleExpField::editingFinished, this,
+          &CameraSettingsWidget::onArChanged);
+  connect(m_xResFld, &DVGui::IntLineEdit::editingFinished, this,
+          &CameraSettingsWidget::onXResChanged);
+  connect(m_yResFld, &DVGui::IntLineEdit::editingFinished, this,
+          &CameraSettingsWidget::onYResChanged);
+  connect(m_xDpiFld, &DoubleLineEdit::editingFinished, this,
+          &CameraSettingsWidget::onXDpiChanged);
+  connect(m_yDpiFld, &DoubleLineEdit::editingFinished, this,
+          &CameraSettingsWidget::onYDpiChanged);
 
-  ret =
-      ret && connect(m_fspChk, SIGNAL(clicked(bool)), SLOT(onFspChanged(bool)));
+  connect(m_fspChk, &QPushButton::clicked, this,
+          &CameraSettingsWidget::onFspChanged);
 
-  ret =
-      ret && connect(m_xPrev, SIGNAL(toggled(bool)), SLOT(onPrevToggled(bool)));
-  ret =
-      ret && connect(m_yPrev, SIGNAL(toggled(bool)), SLOT(onPrevToggled(bool)));
-  ret = ret &&
-        connect(m_dotPrev, SIGNAL(toggled(bool)), SLOT(onPrevToggled(bool)));
-  ret = ret &&
-        connect(m_inchPrev, SIGNAL(toggled(bool)), SLOT(onPrevToggled(bool)));
+  connect(m_xPrev, &QRadioButton::toggled, this,
+          &CameraSettingsWidget::onPrevToggled);
+  connect(m_yPrev, &QRadioButton::toggled, this,
+          &CameraSettingsWidget::onPrevToggled);
+  connect(m_dotPrev, &QRadioButton::toggled, this,
+          &CameraSettingsWidget::onPrevToggled);
+  connect(m_inchPrev, &QRadioButton::toggled, this,
+          &CameraSettingsWidget::onPrevToggled);
 
-  ret = ret && connect(m_useLevelSettingsBtn, SIGNAL(clicked()), this,
-                       SLOT(useLevelSettings()));
+  connect(m_useLevelSettingsBtn, &QPushButton::clicked, this,
+          &CameraSettingsWidget::useLevelSettings);
 
-  ret = ret && connect(m_presetListOm, SIGNAL(activated(const QString &)),
-                       SLOT(onPresetSelected(const QString &)));
-  ret = ret && connect(m_addPresetBtn, SIGNAL(clicked()), SLOT(addPreset()));
-  ret = ret &&
-        connect(m_removePresetBtn, SIGNAL(clicked()), SLOT(removePreset()));
+  // Using textActivated instead of activated (deprecated in Qt 5.15)
+  connect(m_presetListOm, &QComboBox::textActivated, this,
+          &CameraSettingsWidget::onPresetSelected);
 
-  assert(ret);
+  connect(m_addPresetBtn, &QPushButton::clicked, this,
+          &CameraSettingsWidget::addPreset);
+  connect(m_removePresetBtn, &QPushButton::clicked, this,
+          &CameraSettingsWidget::removePreset);
 }
 
-CameraSettingsWidget::~CameraSettingsWidget() { setCurrentLevel(0); }
+CameraSettingsWidget::~CameraSettingsWidget() { setCurrentLevel(nullptr); }
 
 void CameraSettingsWidget::showEvent(QShowEvent *e) {
   if (Preferences::instance()->getCameraUnits() == "pixel") {
@@ -416,7 +415,7 @@ void CameraSettingsWidget::showEvent(QShowEvent *e) {
 }
 
 void CameraSettingsWidget::loadPresetList() {
-  if (m_presetListFile == "") return;
+  if (m_presetListFile.isEmpty()) return;
   m_presetListOm->clear();
   m_presetListOm->addItem(tr("<custom>"));
 
@@ -425,7 +424,7 @@ void CameraSettingsWidget::loadPresetList() {
     QTextStream in(&file);
     while (!in.atEnd()) {
       QString line = in.readLine().trimmed();
-      if (line != "") m_presetListOm->addItem(line);
+      if (!line.isEmpty()) m_presetListOm->addItem(line);
     }
   }
   m_presetListOm->setCurrentIndex(0);
@@ -436,7 +435,7 @@ void CameraSettingsWidget::savePresetList() {
   if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) return;
   QTextStream out(&file);
   int n = m_presetListOm->count();
-  for (int i = 1; i < n; i++) out << m_presetListOm->itemText(i) << "\n";
+  for (int i = 1; i < n; ++i) out << m_presetListOm->itemText(i) << "\n";
 }
 
 bool CameraSettingsWidget::parsePresetString(const QString &str, QString &name,
@@ -449,13 +448,14 @@ bool CameraSettingsWidget::parsePresetString(const QString &str, QString &name,
   b = str.lastIndexOf(",", b - 1);
   if (b <= 0) return false;
 
-  QRegExp rx(" *([0-9]+)x([0-9]+) *, *(\\d*(\\.\\d+)?|\\d+/\\d+) *");
-  if (!rx.exactMatch(str.mid(b + 1))) return false;
+  QRegularExpression rx(R"( *([0-9]+)x([0-9]+) *, *(\d*(\.\d+)?|\d+/\d+) *)");
+  QRegularExpressionMatch match = rx.match(str.mid(b + 1));
+  if (!match.hasMatch()) return false;
 
   name = b > 0 ? str.left(b).trimmed() : "";
-  xres = rx.cap(1).toInt();
-  yres = rx.cap(2).toInt();
-  ar   = rx.cap(3);
+  xres = match.captured(1).toInt();
+  yres = match.captured(2).toInt();
+  ar   = match.captured(3);
   return true;
 }
 
@@ -481,6 +481,7 @@ bool CameraSettingsWidget::parsePresetString(const QString &str, QString &name,
          tokens.count() ==
              6))) /*- with "fx x fy", xoffset and yoffset tokens -*/
     return false;
+
   /*- name -*/
   name = tokens[0];
 
@@ -493,10 +494,10 @@ bool CameraSettingsWidget::parsePresetString(const QString &str, QString &name,
   yres = values[1].toInt(&ok);
   if (!ok) return false;
 
-  if (tokens.count() >= 4) {
+  if (tokens.size() >= 4) {
     /*- fx, fy -*/
     values = tokens[2].split("x");
-    if (values.count() != 2) return false;
+    if (values.size() != 2) return false;
     fx = values[0].toDouble(&ok);
     if (!ok) return false;
     fy = values[1].toDouble(&ok);
@@ -553,13 +554,16 @@ bool CameraSettingsWidget::eventFilter(QObject *obj, QEvent *e) {
 }
 
 void CameraSettingsWidget::setCurrentLevel(TXshLevel *xshLevel) {
-  TXshSimpleLevel *sl = xshLevel ? xshLevel->getSimpleLevel() : 0;
-  if (sl && sl->getType() == PLI_XSHLEVEL) sl = 0;
+  TXshSimpleLevel *sl = xshLevel ? xshLevel->getSimpleLevel() : nullptr;
+  if (sl && sl->getType() == PLI_XSHLEVEL) sl = nullptr;
   if (sl == m_currentLevel) return;
-  if (sl) sl->addRef();
+
   if (m_currentLevel) m_currentLevel->release();
+
   m_currentLevel = sl;
-  m_useLevelSettingsBtn->setEnabled(m_currentLevel != 0);
+  if (m_currentLevel) m_currentLevel->addRef();
+
+  m_useLevelSettingsBtn->setEnabled(m_currentLevel != nullptr);
 }
 
 void CameraSettingsWidget::useLevelSettings() {
@@ -619,24 +623,21 @@ TDimensionD CameraSettingsWidget::getSize() const {
 }
 
 TDimension CameraSettingsWidget::getRes() const {
-  int xRes = (int)(m_xResFld->getValue());
-  int yRes = (int)(m_yResFld->getValue());
+  int xRes = static_cast<int>(m_xResFld->getValue());
+  int yRes = static_cast<int>(m_yResFld->getValue());
   return TDimension(xRes, yRes);
 }
 
 void CameraSettingsWidget::updatePresetListOm() {
   if (m_presetListOm->currentIndex() == 0) return;
-  bool match = false;
-  int xres, yres;
-  QString name, arStr;
 
-  double fx, fy;
-  QString xoffset, yoffset;
-  double ar;
+  int xres, yres;
+  QString name, xoffset, yoffset;
+  double fx, fy, ar;
 
   if (parsePresetString(m_presetListOm->currentText(), name, xres, yres, fx, fy,
                         xoffset, yoffset, ar, m_forCleanup)) {
-    double eps = 1.0e-6;
+    bool match = false;
     if (m_forCleanup && m_offsX && m_offsY) {
       match = xres == m_xResFld->getValue() && yres == m_yResFld->getValue() &&
               (fx < 0.0 || fx == m_lxFld->getValue()) &&
@@ -648,8 +649,8 @@ void CameraSettingsWidget::updatePresetListOm() {
               (fx < 0.0 || fx == m_lxFld->getValue()) &&
               (fy < 0.0 || fy == m_lyFld->getValue());
     }
+    if (!match) m_presetListOm->setCurrentIndex(0);
   }
-  if (!match) m_presetListOm->setCurrentIndex(0);
 }
 
 // ly,ar => lx
@@ -659,25 +660,25 @@ void CameraSettingsWidget::hComputeLx() {
 
 // lx,ar => ly
 void CameraSettingsWidget::hComputeLy() {
-  if (m_arValue == 0.0) return;  // non dovrebbe mai succedere
+  if (m_arValue == 0.0) return;  // shouldn't happen
   m_lyFld->setValue(m_lxFld->getValue() / m_arValue);
 }
 
 // lx,ly => ar
 void CameraSettingsWidget::computeAr() {
-  if (m_lyFld->getValue() == 0.0) return;  // non dovrebbe mai succedere
+  if (m_lyFld->getValue() == 0.0) return;  // shouldn't happen
   setArFld(m_lxFld->getValue() / m_lyFld->getValue());
 }
 
 // xres,xdpi => lx
 void CameraSettingsWidget::vComputeLx() {
-  if (m_xDpiFld->getValue() == 0.0) return;  // non dovrebbe mai succedere
+  if (m_xDpiFld->getValue() == 0.0) return;  // shouldn't happen
   m_lxFld->setValue(m_xResFld->getValue() / m_xDpiFld->getValue());
 }
 
 // yres,ydpi => ly
 void CameraSettingsWidget::vComputeLy() {
-  if (m_yDpiFld->getValue() == 0.0) return;  // non dovrebbe mai succedere
+  if (m_yDpiFld->getValue() == 0.0) return;  // shouldn't happen
   m_lyFld->setValue(m_yResFld->getValue() / m_yDpiFld->getValue());
 }
 
@@ -693,13 +694,13 @@ void CameraSettingsWidget::computeYRes() {
 
 // lx,xres => xdpi
 void CameraSettingsWidget::computeXDpi() {
-  if (m_lxFld->getValue() == 0.0) return;  // non dovrebbe mai succedere
+  if (m_lxFld->getValue() == 0.0) return;  // shouldn't happen
   m_xDpiFld->setValue(m_xResFld->getValue() / m_lxFld->getValue());
 }
 
 // ly,yres => ydpi
 void CameraSettingsWidget::computeYDpi() {
-  if (m_lyFld->getValue() == 0.0) return;  // non dovrebbe mai succedere
+  if (m_lyFld->getValue() == 0.0) return;  // shouldn't happen
   m_yDpiFld->setValue(m_yResFld->getValue() / m_lyFld->getValue());
 }
 
@@ -707,8 +708,9 @@ void CameraSettingsWidget::computeYDpi() {
 // the value (e.g. "4/3" instead of 1.3333333)
 void CameraSettingsWidget::setArFld(double ar) {
   m_arValue = ar;
-  /*---ピクセルサイズのW/Hの値に近かったら"W/H"と表示する---*/
-  m_arFld->setValue(ar, (int)m_xResFld->getValue(), (int)m_yResFld->getValue());
+  /*--- If close to W/H pixel size value, display "W/H" ---*/
+  m_arFld->setValue(ar, static_cast<int>(m_xResFld->getValue()),
+                    static_cast<int>(m_yResFld->getValue()));
 }
 
 // compute res or dpi according to the prevalence
@@ -719,8 +721,6 @@ void CameraSettingsWidget::computeResOrDpi() {
 
 void CameraSettingsWidget::onLxChanged() {
   assert(!m_inchPrev->isChecked());
-  // assert(!(m_fspChk->isChecked() && m_yPrev->isChecked() &&
-  // m_dotPrev->isChecked()));
   if (m_yPrev->isChecked())
     computeAr();
   else
@@ -732,8 +732,6 @@ void CameraSettingsWidget::onLxChanged() {
 
 void CameraSettingsWidget::onLyChanged() {
   assert(!m_inchPrev->isChecked());
-  // assert(!(m_fspChk->isChecked() && m_xPrev->isChecked() &&
-  // m_dotPrev->isChecked()));
   if (m_xPrev->isChecked())
     computeAr();
   else
@@ -842,15 +840,15 @@ void CameraSettingsWidget::onFspChanged(bool checked) {
 }
 
 void CameraSettingsWidget::onPrevToggled(bool checked) {
-  /*---Prevalences が変わっても ForceSquaredPixelオプションには影響しない---*/
+  /*--- Changing Prevalences does not affect ForceSquaredPixel option ---*/
 }
 
 void CameraSettingsWidget::onPresetSelected(const QString &str) {
   if (str == tr("<custom>") || str.isEmpty()) return;
-  QString name, arStr;
+
+  QString name, xoffset, yoffset;
   int xres = 0, yres = 0;
   double fx = -1.0, fy = -1.0;
-  QString xoffset = "", yoffset = "";
   double ar;
 
   if (parsePresetString(str, name, xres, yres, fx, fy, xoffset, yoffset, ar,
@@ -883,11 +881,11 @@ void CameraSettingsWidget::onPresetSelected(const QString &str) {
       m_offsY->postSetText();  // calls onEditingFinished()
     }
 
-    /*--- DPI以外はロードしたままの値を使う ---*/
+    /*--- Use loaded values except DPI ---*/
     computeXDpi();
     computeYDpi();
 
-    if (!areAlmostEqual((double)xres, m_arValue * (double)yres) &&
+    if (!areAlmostEqual(static_cast<double>(xres), m_arValue * yres) &&
         m_fspChk->isChecked())
       m_fspChk->setChecked(false);
     emit changed();
@@ -900,47 +898,51 @@ void CameraSettingsWidget::onPresetSelected(const QString &str) {
 }
 
 void CameraSettingsWidget::addPreset() {
-  int xRes  = (int)(m_xResFld->getValue());
-  int yRes  = (int)(m_yResFld->getValue());
+  int xRes  = static_cast<int>(m_xResFld->getValue());
+  int yRes  = static_cast<int>(m_yResFld->getValue());
   double lx = m_lxFld->getValue();
   double ly = m_lyFld->getValue();
   double ar = m_arFld->getValue();
 
   QString presetString;
-  /*--- Cleanupカメラの場合はオフセットも格納 ---*/
+  /*--- For Cleanup camera, also store offset ---*/
   if (m_forCleanup) {
-    QString xoffset = (m_offsX) ? m_offsX->text() : QString("0");
-    QString yoffset = (m_offsY) ? m_offsY->text() : QString("0");
+    QString xoffset = m_offsX ? m_offsX->text() : QString("0");
+    QString yoffset = m_offsY ? m_offsY->text() : QString("0");
 
-    presetString = QString::number(xRes) + "x" + QString::number(yRes) + ", " +
-                   removeZeros(QString::number(lx)) + "x" +
-                   removeZeros(QString::number(ly)) + ", " + xoffset + ", " +
-                   yoffset + ", " + aspectRatioValueToString(ar);
+    presetString = QString("%1x%2, %3x%4, %5, %6, %7")
+                       .arg(xRes)
+                       .arg(yRes)
+                       .arg(removeZeros(QString::number(lx)))
+                       .arg(removeZeros(QString::number(ly)))
+                       .arg(xoffset)
+                       .arg(yoffset)
+                       .arg(aspectRatioValueToString(ar));
   } else {
-    presetString = QString::number(xRes) + "x" + QString::number(yRes) + ", " +
-                   removeZeros(QString::number(lx)) + "x" +
-                   removeZeros(QString::number(ly)) + ", " +
-                   aspectRatioValueToString(ar);
+    presetString = QString("%1x%2, %3x%4, %5")
+                       .arg(xRes)
+                       .arg(yRes)
+                       .arg(removeZeros(QString::number(lx)))
+                       .arg(removeZeros(QString::number(ly)))
+                       .arg(aspectRatioValueToString(ar));
   }
 
   bool ok;
   QString qs;
-  while (1) {
+  while (true) {
     qs = DVGui::getText(tr("Preset name"),
                         tr("Enter the name for %1").arg(presetString), "", &ok);
 
     if (!ok) return;
 
-    if (qs.indexOf(",") != -1)
+    if (qs.contains(','))
       QMessageBox::warning(this, tr("Error : Preset Name is Invalid"),
                            tr("The preset name must not use ','(comma)."));
     else
       break;
   }
 
-  int oldn = m_presetListOm->count();
   m_presetListOm->addItem(qs + "," + presetString);
-  int newn = m_presetListOm->count();
   m_presetListOm->blockSignals(true);
   m_presetListOm->setCurrentIndex(m_presetListOm->count() - 1);
   m_presetListOm->blockSignals(false);
@@ -953,9 +955,9 @@ void CameraSettingsWidget::removePreset() {
   if (index <= 0) return;
 
   // confirmation dialog
-  int ret = DVGui::MsgBox(QObject::tr("Deleting \"%1\".\nAre you sure?")
-                              .arg(m_presetListOm->currentText()),
-                          QObject::tr("Delete"), QObject::tr("Cancel"));
+  int ret = DVGui::MsgBox(
+      tr("Deleting \"%1\".\nAre you sure?").arg(m_presetListOm->currentText()),
+      tr("Delete"), tr("Cancel"));
   if (ret == 0 || ret == 2) return;
 
   m_presetListOm->removeItem(index);
@@ -965,38 +967,39 @@ void CameraSettingsWidget::removePreset() {
 
 // A/R : value => string (e.g. '4/3' or '1.23')
 double CameraSettingsWidget::aspectRatioStringToValue(const QString &s) {
-  if (s == "") {
+  if (s.isEmpty()) {
     return 1;
   }
-  int i = s.indexOf("/");
+  int i = s.indexOf('/');
   if (i <= 0 || i + 1 >= s.length()) return s.toDouble();
   int num = s.left(i).toInt();
   int den = s.mid(i + 1).toInt();
   if (den <= 0) den = 1;
-  return (double)num / (double)den;
+  return static_cast<double>(num) / den;
 }
 
 // A/R : value => string (e.g. '4/3' or '1.23')
-/*---カメラの縦横ピクセル値を入力できるようにし、valueがX/Yの値に近かったら、"X/Y"と表示する---*/
+/*--- Allow entering camera pixel values, if value is close to X/Y, display
+ * "X/Y" ---*/
 QString CameraSettingsWidget::aspectRatioValueToString(double value, int width,
                                                        int height) {
   double v = value;
 
   if (width != 0 && height != 0) {
-    if (areAlmostEqual(value, (double)width / (double)height,
-                       1e-3)) /*-- 誤差3桁 --*/
+    if (areAlmostEqual(value, static_cast<double>(width) / height,
+                       1e-3)) /*-- 3-digit error --*/
       return QString("%1/%2").arg(width).arg(height);
   }
 
   double iv = tround(v);
   if (fabs(iv - v) > 0.01) {
-    for (int d = 2; d < 20; d++) {
+    for (int d = 2; d < 20; ++d) {
       int n = tround(v * d);
       if (fabs(n - v * d) <= 0.01)
         return QString::number(n) + "/" + QString::number(d);
     }
     return QString::number(value, 'f', 5);
   } else {
-    return QString::number((int)iv);
+    return QString::number(static_cast<int>(iv));
   }
 }

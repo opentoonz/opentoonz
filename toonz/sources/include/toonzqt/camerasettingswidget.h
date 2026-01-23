@@ -46,8 +46,8 @@ class CheckBox;
 
 class SimpleExpValidator final : public QValidator {
 public:
-  SimpleExpValidator(QObject *parent) : QValidator(parent){};
-  State validate(QString &input, int &pos) const override;
+  explicit SimpleExpValidator(QObject *parent = nullptr) : QValidator(parent) {}
+  QValidator::State validate(QString &input, int &pos) const override;
 };
 
 //---------------------------------------------------------------
@@ -57,10 +57,10 @@ class SimpleExpField final : public QLineEdit {
   QString m_previousValue;
 
 public:
-  SimpleExpField(QWidget *parent);
+  explicit SimpleExpField(QWidget *parent = nullptr);
 
-  void setValue(double);
-  void setValue(double, int, int);
+  void setValue(double value);
+  void setValue(double value, int w, int h);
   double getValue();
 
 protected:
@@ -104,6 +104,8 @@ class DVAPI CameraSettingsWidget final : public QFrame {
 
   void savePresetList();
   void loadPresetList();
+
+  // Use the version with double parameters instead
   bool parsePresetString(const QString &str, QString &name, int &xres,
                          int &yres, QString &ar);
 
@@ -112,14 +114,21 @@ class DVAPI CameraSettingsWidget final : public QFrame {
                          QString &yoffset, double &ar, bool forCleanup = false);
 
 public:
-  CameraSettingsWidget(bool forCleanup = false);
+  explicit CameraSettingsWidget(bool forCleanup = false);
   ~CameraSettingsWidget();
+
+  CameraSettingsWidget(const CameraSettingsWidget &) = delete;
+  CameraSettingsWidget &operator=(const CameraSettingsWidget &) = delete;
+
+  // Allow move semantics if needed
+  CameraSettingsWidget(CameraSettingsWidget &&) = delete;
+  CameraSettingsWidget &operator=(CameraSettingsWidget &&) = delete;
 
   void setPresetListFile(const TFilePath &fp);
 
   // Defines the level referred by the button "Use level settings".
-  // Calling setCurrentLevel(0) disables the button
-  void setCurrentLevel(TXshLevel *);
+  // Calling setCurrentLevel(nullptr) disables the button
+  void setCurrentLevel(TXshLevel *xshLevel);
 
   // camera => widget fields (i.e. initialize widget)
   void setFields(const TCamera *camera);
@@ -132,8 +141,9 @@ public:
   // The aspect ratio can be expressed as a fraction (e.g. "4/3")
   // The following methods convert code/decode the value
   static double aspectRatioStringToValue(const QString &s);
+
   /*---
-   * カメラの縦横ピクセル値を入力できるようにし、valueがX/Yの値に近かったら、"X/Y"と表示する
+   * Allow entering camera pixel values, if value is close to X/Y, display "X/Y"
    * ---*/
   static QString aspectRatioValueToString(double ar, int width = 0,
                                           int height = 0);
@@ -144,7 +154,7 @@ public:
   // the current camera resolution (in pixels)
   TDimension getRes() const;
 
-  /*--- cleanupCameraSettingsWidgetからポインタを受け取る ---*/
+  /*--- Receive pointers from cleanupCameraSettingsWidget ---*/
   void setOffsetWidgetPointers(DVGui::MeasuredDoubleLineEdit *offsX,
                                DVGui::MeasuredDoubleLineEdit *offsY) {
     m_offsX = offsX;
@@ -187,9 +197,12 @@ protected slots:
 
 signals:
   void changed();  // some value has been changed
-  void
-  levelSettingsUsed();  // the "Use level settings" button has been pressed.
-  // Note: a changed() signal is always emitted after levelSettingsUsed()
+
+  /*---
+   * the "Use level settings" button has been pressed.
+   * Note: a changed() signal is always emitted after levelSettingsUsed()
+   * ---*/
+  void levelSettingsUsed();
 };
 
 #endif
