@@ -1,3 +1,5 @@
+
+
 #include "toonzqt/hexcolornames.h"
 
 // TnzLib includes
@@ -8,7 +10,6 @@
 #include "tfiletype.h"
 #include "tsystem.h"
 #include "tcolorstyles.h"
-#include "tpalette.h"
 #include "tpixel.h"
 #include "tvectorimage.h"
 #include "trasterimage.h"
@@ -24,6 +25,9 @@
 #include <QCheckBox>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QRegularExpression>
+#include <QStringListModel>
+#include <QScopedValueRollback>
 
 using namespace DVGui;
 
@@ -31,9 +35,9 @@ using namespace DVGui;
 
 #define COLORNAMES_FILE "colornames.txt"
 
-QMap<QString, QString> HexColorNames::s_maincolornames;
-QMap<QString, QString> HexColorNames::s_usercolornames;
-QMap<QString, QString> HexColorNames::s_tempcolornames;
+QHash<QString, QString> HexColorNames::s_maincolornames;
+QHash<QString, QString> HexColorNames::s_usercolornames;
+QHash<QString, QString> HexColorNames::s_tempcolornames;
 
 HexColorNames *HexColorNames::instance() {
   static HexColorNames _instance;
@@ -42,43 +46,81 @@ HexColorNames *HexColorNames::instance() {
 
 HexColorNames::HexColorNames() {}
 
-void HexColorNames::loadColorTableXML(QMap<QString, QString> &table,
-                                    const TFilePath &fp) {
-  if (!TFileStatus(fp).doesExist()) throw TException("File not found");
+//-----------------------------------------------------------------------------
+
+bool HexColorNames::loadColorTableXML(QHash<QString, QString> &table,
+                                      const TFilePath &fp) {
+  table.clear();
+
+  if (!TFileStatus(fp).doesExist()) {
+    qWarning("Color names file not found: %s",
+             fp.getQString().toUtf8().constData());
+    return false;
+  }
 
   TIStream is(fp);
-  if (!is) throw TException("Can't read color names");
+  if (!is) {
+    qWarning("Cannot read color names file: %s",
+             fp.getQString().toUtf8().constData());
+    return false;
+  }
 
   std::string tagName;
-  if (!is.matchTag(tagName) || tagName != "colors")
-    throw TException("Not a color names file");
+  if (!is.matchTag(tagName) || tagName != "colors") {
+    qWarning("Not a valid color names file: %s",
+             fp.getQString().toUtf8().constData());
+    return false;
+  }
 
+  bool success = true;
   while (!is.matchEndTag()) {
-    if (!is.matchTag(tagName)) throw TException("Expected tag");
+    if (!is.matchTag(tagName)) {
+      qWarning("Expected tag in color names file");
+      success = false;
+      break;
+    }
+
     if (tagName == "color") {
-      QString name, hex;
-      name = QString::fromStdString(is.getTagAttribute("name"));
+      QString name = QString::fromStdString(is.getTagAttribute("name"));
       std::string hexs;
       is >> hexs;
-      hex = QString::fromStdString(hexs);
-      if (name.size() != 0 && hex.size() != 0)
+      QString hex = QString::fromStdString(hexs);
+
+      if (!name.isEmpty() && !hex.isEmpty()) {
         table.insert(name.toLower(), hex);
-      if (!is.matchEndTag()) throw TException("Expected end tag");
-    } else
-      throw TException("unexpected tag /" + tagName + "/");
+      } else {
+        qWarning("Empty name or hex value in color names file");
+        success = false;
+      }
+
+      if (!is.matchEndTag()) {
+        qWarning("Expected end tag </color> in color names file");
+        success = false;
+        break;
+      }
+    } else {
+      qWarning("Unexpected tag <%s> in color names file", tagName.c_str());
+      success = false;
+      break;
+    }
   }
+  return success;
 }
 
 //-----------------------------------------------------------------------------
 
-void HexColorNames::saveColorTableXML(QMap<QString, QString> &table,
+bool HexColorNames::saveColorTableXML(QHash<QString, QString> &table,
                                       const TFilePath &fp) {
   TOStream os(fp);
-  if (!os) throw TException("Can't write color names");
+  if (!os) {
+    qWarning("Cannot write to color names file: %s",
+             fp.getQString().toUtf8().constData());
+    return false;
+  }
 
   os.openChild("colors");
 
-  QMap<QString, QString>::const_iterator it;
+  QHash<QString, QString>::const_iterator it;
   std::map<std::string, std::string> attrs;
   for (it = table.cbegin(); it != table.cend(); ++it) {
     std::string nameStd = it.key().toStdString();
@@ -90,56 +132,52 @@ void HexColorNames::saveColorTableXML(QMap<QString, QString> &table,
   }
 
   os.closeChild();
+  return true;
 }
 
 //-----------------------------------------------------------------------------
 
-bool HexColorNames::parseHexInternal(QString text, TPixel &outPixel) {
+bool HexColorNames::parseHexInternal(const QString &text, TPixel &outPixel) {
+  static QRegularExpression validHex("^[0-9a-fA-F]+$");
+  if (!validHex.match(text).hasMatch()) return false;
+
   bool ok;
   uint parsedValue = text.toUInt(&ok, 16);
   if (!ok) return false;
 
   switch (text.length()) {
   case 8:  // #RRGGBBAA
-    outPixel.r = parsedValue >> 24;
-    outPixel.g = parsedValue >> 16;
-    outPixel.b = parsedValue >> 8;
-    outPixel.m = parsedValue;
+    outPixel.r = (parsedValue >> 24) & 0xFF;
+    outPixel.g = (parsedValue >> 16) & 0xFF;
+    outPixel.b = (parsedValue >> 8) & 0xFF;
+    outPixel.m = parsedValue & 0xFF;
     break;
   case 6:  // #RRGGBB
-    outPixel.r = parsedValue >> 16;
-    outPixel.g = parsedValue >> 8;
-    outPixel.b = parsedValue;
+    outPixel.r = (parsedValue >> 16) & 0xFF;
+    outPixel.g = (parsedValue >> 8) & 0xFF;
+    outPixel.b = parsedValue & 0xFF;
     outPixel.m = 255;
     break;
   case 4:  // #RGBA
-    outPixel.r = (parsedValue >> 12) & 15;
-    outPixel.r |= outPixel.r << 4;
-    outPixel.g = (parsedValue >> 8) & 15;
-    outPixel.g |= outPixel.g << 4;
-    outPixel.b = (parsedValue >> 4) & 15;
-    outPixel.b |= outPixel.b << 4;
-    outPixel.m = parsedValue & 15;
-    outPixel.m |= outPixel.m << 4;
+    outPixel.r = ((parsedValue >> 12) & 15) * 17;
+    outPixel.g = ((parsedValue >> 8) & 15) * 17;
+    outPixel.b = ((parsedValue >> 4) & 15) * 17;
+    outPixel.m = (parsedValue & 15) * 17;
     break;
   case 3:  // #RGB
-    outPixel.r = (parsedValue >> 8) & 15;
-    outPixel.r |= outPixel.r << 4;
-    outPixel.g = (parsedValue >> 4) & 15;
-    outPixel.g |= outPixel.g << 4;
-    outPixel.b = parsedValue & 15;
-    outPixel.b |= outPixel.b << 4;
+    outPixel.r = ((parsedValue >> 8) & 15) * 17;
+    outPixel.g = ((parsedValue >> 4) & 15) * 17;
+    outPixel.b = (parsedValue & 15) * 17;
     outPixel.m = 255;
     break;
-  case 2:  // #VV (non-standard)
-    outPixel.r = parsedValue;
+  case 2:  // #VV (non-standard grayscale)
+    outPixel.r = parsedValue & 0xFF;
     outPixel.g = outPixel.r;
     outPixel.b = outPixel.r;
     outPixel.m = 255;
     break;
-  case 1:  // #V (non-standard)
-    outPixel.r = parsedValue & 15;
-    outPixel.r |= outPixel.r << 4;
+  case 1:  // #V (non-standard grayscale)
+    outPixel.r = (parsedValue & 15) * 17;
     outPixel.g = outPixel.r;
     outPixel.b = outPixel.r;
     outPixel.m = 255;
@@ -147,6 +185,7 @@ bool HexColorNames::parseHexInternal(QString text, TPixel &outPixel) {
   default:
     return false;
   }
+
   return true;
 }
 
@@ -154,15 +193,8 @@ bool HexColorNames::parseHexInternal(QString text, TPixel &outPixel) {
 
 bool HexColorNames::loadMainFile(bool reload) {
   TFilePath mainCTFp = TEnv::getConfigDir() + COLORNAMES_FILE;
-
-  // Load main color names
-  try {
-    if (reload || s_maincolornames.size() == 0) {
-      s_maincolornames.clear();
-      loadColorTableXML(s_maincolornames, mainCTFp);
-    }
-  } catch (...) {
-    return false;
+  if (reload || s_maincolornames.isEmpty()) {
+    return loadColorTableXML(s_maincolornames, mainCTFp);
   }
   return true;
 }
@@ -178,16 +210,9 @@ bool HexColorNames::hasUserFile() {
 
 bool HexColorNames::loadUserFile(bool reload) {
   TFilePath userCTFp = ToonzFolder::getMyModuleDir() + COLORNAMES_FILE;
-
-  // Load user color names (if exists...)
   if (TFileStatus(userCTFp).doesExist()) {
-    try {
-      if (reload || s_usercolornames.size() == 0) {
-        s_usercolornames.clear();
-        loadColorTableXML(s_usercolornames, userCTFp);
-      }
-    } catch (...) {
-      return false;
+    if (reload || s_usercolornames.isEmpty()) {
+      return loadColorTableXML(s_usercolornames, userCTFp);
     }
   }
   return true;
@@ -196,39 +221,22 @@ bool HexColorNames::loadUserFile(bool reload) {
 //-----------------------------------------------------------------------------
 
 bool HexColorNames::loadTempFile(const TFilePath &fp) {
-  if (TFileStatus(fp).doesExist()) {
-    try {
-      s_tempcolornames.clear();
-      loadColorTableXML(s_tempcolornames, fp);
-    } catch (...) {
-      return false;
-    }
-  }
-  return true;
+  if (!TFileStatus(fp).doesExist()) return false;
+  s_tempcolornames.clear();
+  return loadColorTableXML(s_tempcolornames, fp);
 }
 
 //-----------------------------------------------------------------------------
 
 bool HexColorNames::saveUserFile() {
   TFilePath userCTFp = ToonzFolder::getMyModuleDir() + COLORNAMES_FILE;
-
-  try {
-    saveColorTableXML(s_usercolornames, userCTFp);
-  } catch (...) {
-    return false;
-  }
-  return true;
+  return saveColorTableXML(s_usercolornames, userCTFp);
 }
 
 //-----------------------------------------------------------------------------
 
 bool HexColorNames::saveTempFile(const TFilePath &fp) {
-  try {
-    saveColorTableXML(s_tempcolornames, fp);
-  } catch (...) {
-    return false;
-  }
-  return true;
+  return saveColorTableXML(s_tempcolornames, fp);
 }
 
 //-----------------------------------------------------------------------------
@@ -240,68 +248,76 @@ void HexColorNames::clearTempEntries() { s_tempcolornames.clear(); }
 //-----------------------------------------------------------------------------
 
 void HexColorNames::setUserEntry(const QString &name, const QString &hex) {
-  s_usercolornames.insert(name, hex);
+  if (!name.isEmpty() && !hex.isEmpty()) {
+    s_usercolornames.insert(name.toLower(), hex);
+  }
 }
 
 //-----------------------------------------------------------------------------
 
 void HexColorNames::setTempEntry(const QString &name, const QString &hex) {
-  s_tempcolornames.insert(name, hex);
+  if (!name.isEmpty() && !hex.isEmpty()) {
+    s_tempcolornames.insert(name.toLower(), hex);
+  }
 }
 
 //-----------------------------------------------------------------------------
 
-bool HexColorNames::parseText(QString text, TPixel &outPixel) {
-  static QRegExp space("\\s");
-  text.remove(space);
-  if (text.size() == 0) return false;
-  if (text[0] == "#") {
-    text.remove(0, 1);
-    return parseHexInternal(text, outPixel);
-  }
-  text = text.toLower();  // table names are lowercase
+bool HexColorNames::parseText(const QString &input, TPixel &outPixel) {
+  QString text = input;
+  text.remove(QRegularExpression("\\s"));
 
-  // Find color from tables, user takes priority
-  QMap<QString, QString>::const_iterator it;
-  it = s_usercolornames.constFind(text);
+  if (text.isEmpty()) return false;
+
+  QString lower = text.toLower();
+
+  // First, try to find it as a NAME (user + main)
+  auto it = s_usercolornames.constFind(lower);
   if (it == s_usercolornames.constEnd()) {
-    it = s_maincolornames.constFind(text);
-    if (it == s_maincolornames.constEnd()) return false;
+    it = s_maincolornames.constFind(lower);
   }
-
-  QString hexText = it.value();
-  hexText.remove(space);
-  if (hexText[0] == "#") {
-    hexText.remove(0, 1);
+  if (it != s_maincolornames.constEnd()) {
+    QString hexText = it.value();
+    hexText.remove(QRegularExpression("\\s"));
+    if (hexText.startsWith('#')) hexText.remove(0, 1);
     return parseHexInternal(hexText, outPixel);
   }
+
+  // Only then try to interpret it as a pure hexadecimal
+  if (text.startsWith('#')) {
+    text.remove(0, 1);
+  }
+  static QRegularExpression hexOnly("^[0-9a-fA-F]{1,8}$");
+  if (hexOnly.match(text).hasMatch()) {
+    return parseHexInternal(text, outPixel);
+  }
+
   return false;
 }
 
 //-----------------------------------------------------------------------------
 
-bool HexColorNames::parseHex(QString text, TPixel &outPixel) {
-  static QRegExp space("\\s");
+bool HexColorNames::parseHex(const QString &input, TPixel &outPixel) {
+  QString text = input;
+  static QRegularExpression space("\\s");
   text.remove(space);
-  if (text.size() == 0) return false;
-  if (text[0] == "#") {
-    text.remove(0, 1);
-  }
-  return parseHexInternal(text, outPixel);
+
+  if (text.startsWith(QLatin1Char('#'))) text.remove(0, 1);
+
+  return !text.isEmpty() && parseHexInternal(text, outPixel);
 }
 
 //-----------------------------------------------------------------------------
 
 QString HexColorNames::generateHex(TPixel pixel) {
   if (pixel.m == 255) {
-    // Opaque, omit alpha
-    return QString("#%1%2%3")
+    return QStringLiteral("#%1%2%3")
         .arg(pixel.r, 2, 16, QLatin1Char('0'))
         .arg(pixel.g, 2, 16, QLatin1Char('0'))
         .arg(pixel.b, 2, 16, QLatin1Char('0'))
         .toUpper();
   } else {
-    return QString("#%1%2%3%4")
+    return QStringLiteral("#%1%2%3%4")
         .arg(pixel.r, 2, 16, QLatin1Char('0'))
         .arg(pixel.g, 2, 16, QLatin1Char('0'))
         .arg(pixel.b, 2, 16, QLatin1Char('0'))
@@ -309,8 +325,6 @@ QString HexColorNames::generateHex(TPixel pixel) {
         .toUpper();
   }
 }
-
-//-----------------------------------------------------------------------------
 
 //*****************************************************************************
 //  Hex line widget
@@ -322,20 +336,17 @@ HexLineEdit::HexLineEdit(const QString &contents, QWidget *parent)
     : QLineEdit(contents, parent)
     , m_editing(false)
     , m_color(0, 0, 0)
-    , m_completer(nullptr) {
+    , m_completer(nullptr)
+    , m_completerModel(new QStringListModel(this)) {
   HexColorNames::loadMainFile(false);
   HexColorNames::loadUserFile(false);
 
   if (HexLineEditAutoComplete != 0) onAutoCompleteChanged(true);
 
-  bool ret = true;
-
-  ret = ret &&
-        connect(HexColorNames::instance(), SIGNAL(autoCompleteChanged(bool)),
-                this, SLOT(onAutoCompleteChanged(bool)));
-  ret = ret && connect(HexColorNames::instance(), SIGNAL(colorsChanged()), this,
-          SLOT(onColorsChanged()));
-  assert(ret);
+  connect(HexColorNames::instance(), &HexColorNames::autoCompleteChanged, this,
+          &HexLineEdit::onAutoCompleteChanged);
+  connect(HexColorNames::instance(), &HexColorNames::colorsChanged, this,
+          &HexLineEdit::onColorsChanged);
 }
 
 //-----------------------------------------------------------------------------
@@ -393,7 +404,6 @@ void HexLineEdit::focusOutEvent(QFocusEvent *event) {
   if (!m_editing) {
     deselect();
   }
-
   m_editing = false;
 }
 
@@ -406,40 +416,48 @@ void HexLineEdit::showEvent(QShowEvent *event) {
 
 //-----------------------------------------------------------------------------
 
-QCompleter *HexLineEdit::getCompleter() {
-  QStringList autolist;
+void HexLineEdit::updateCompleterList() {
+  QStringList wordList;
 
-  // Build words list from all color names tables
-  HexColorNames::iterator it;
-  for (it = HexColorNames::beginMain(); it != HexColorNames::endMain(); ++it) {
-    autolist.append(it.name());
-  }
-  for (it = HexColorNames::beginUser(); it != HexColorNames::endUser(); ++it) {
-    autolist.append(it.name());
-  }
+  for (auto it = HexColorNames::beginMain(); it != HexColorNames::endMain();
+       ++it)
+    wordList.append(it.key());
 
-  QCompleter *completer = new QCompleter(autolist);
-  completer->setCaseSensitivity(Qt::CaseInsensitive);
-  return completer;
+  for (auto it = HexColorNames::beginUser(); it != HexColorNames::endUser();
+       ++it)
+    wordList.append(it.key());
+
+  m_completerModel->setStringList(wordList);
 }
 
 //-----------------------------------------------------------------------------
 
 void HexLineEdit::onAutoCompleteChanged(bool enable) {
-  if (m_completer) {
-    m_completer->deleteLater();
+  if (!enable) {
+    if (m_completer) {
+      m_completer->deleteLater();
+      m_completer = nullptr;
+    }
     setCompleter(nullptr);
-    m_completer = nullptr;
+    return;
   }
-  if (enable) {
-    m_completer = getCompleter();
+
+  if (!m_completer) {
+    m_completer = new QCompleter(m_completerModel, this);
+    m_completer->setCaseSensitivity(Qt::CaseInsensitive);
     setCompleter(m_completer);
   }
+
+  updateCompleterList();
 }
 
-void HexLineEdit::onColorsChanged() { onAutoCompleteChanged(true); }
-
 //-----------------------------------------------------------------------------
+
+void HexLineEdit::onColorsChanged() {
+  if (m_completer && HexLineEditAutoComplete != 0) {
+    updateCompleterList();
+  }
+}
 
 //*****************************************************************************
 //  Hex color names editor
@@ -450,7 +468,7 @@ HexColorNamesEditor::HexColorNamesEditor(QWidget *parent)
     , m_selectedItem(nullptr)
     , m_newEntry(false) {
   setWindowTitle(tr("Hex Color Names Editor"));
-  setModal(false); // user may want to access main style editor and palettes
+  setModal(false);
 
   QPushButton *okButton    = new QPushButton(tr("OK"), this);
   QPushButton *applyButton = new QPushButton(tr("Apply"), this);
@@ -465,15 +483,14 @@ HexColorNamesEditor::HexColorNamesEditor(QWidget *parent)
 
   // Main default color names
   QGridLayout *mainLay = new QGridLayout();
-  QWidget *mainTab = new QWidget();
+  QWidget *mainTab     = new QWidget();
   mainTab->setLayout(mainLay);
 
   m_mainTreeWidget = new QTreeWidget();
   m_mainTreeWidget->setColumnCount(2);
   m_mainTreeWidget->setColumnWidth(0, 175);
   m_mainTreeWidget->setColumnWidth(1, 50);
-  m_mainTreeWidget->setHeaderLabels(QStringList() << "Name"
-                                                  << "Hex value");
+  m_mainTreeWidget->setHeaderLabels(QStringList() << "Name" << "Hex value");
   mainLay->addWidget(m_mainTreeWidget, 0, 0);
 
   // User defined color names
@@ -485,8 +502,7 @@ HexColorNamesEditor::HexColorNamesEditor(QWidget *parent)
   m_userTreeWidget->setColumnCount(2);
   m_userTreeWidget->setColumnWidth(0, 175);
   m_userTreeWidget->setColumnWidth(1, 50);
-  m_userTreeWidget->setHeaderLabels(QStringList() << "Name"
-                                                  << "Hex value");
+  m_userTreeWidget->setHeaderLabels(QStringList() << "Name" << "Hex value");
   m_colorField = new ColorField(this, true);
   userLay->addWidget(m_userTreeWidget, 0, 0, 1, 4);
   userLay->addWidget(m_unsColorButton, 1, 0);
@@ -509,7 +525,7 @@ HexColorNamesEditor::HexColorNamesEditor(QWidget *parent)
 
   // Bottom widgets
   QHBoxLayout *bottomLay = new QHBoxLayout();
-  m_autoCompleteCb  = new QCheckBox(tr("Enable Auto-Complete"));
+  m_autoCompleteCb       = new QCheckBox(tr("Enable Auto-Complete"));
   m_autoCompleteCb->setChecked(HexLineEditAutoComplete != 0);
   m_autoCompleteCb->setSizePolicy(QSizePolicy::Expanding,
                                   QSizePolicy::Preferred);
@@ -527,44 +543,35 @@ HexColorNamesEditor::HexColorNamesEditor(QWidget *parent)
 
   addButtonBarWidget(okButton, applyButton, closeButton);
 
-  bool ret = true;
+  connect(m_userEditingDelegate, &HexColorNamesEditingDelegate::editingStarted,
+          this, &HexColorNamesEditor::onEditingStarted);
+  connect(m_userEditingDelegate, &HexColorNamesEditingDelegate::editingFinished,
+          this, &HexColorNamesEditor::onEditingFinished);
+  connect(m_userEditingDelegate, &HexColorNamesEditingDelegate::editingClosed,
+          this, &HexColorNamesEditor::onEditingClosed);
 
-  ret = ret && connect(m_userEditingDelegate,
-                       SIGNAL(editingStarted(const QModelIndex &)), this,
-                       SLOT(onEditingStarted(const QModelIndex &)));
-  ret = ret && connect(m_userEditingDelegate,
-                       SIGNAL(editingFinished(const QModelIndex &)), this,
-                       SLOT(onEditingFinished(const QModelIndex &)));
-  ret = ret && connect(m_userEditingDelegate, SIGNAL(editingClosed()), this,
-                       SLOT(onEditingClosed()));
+  connect(m_userTreeWidget, &QTreeWidget::currentItemChanged, this,
+          &HexColorNamesEditor::onCurrentItemChanged);
+  connect(m_colorField, &ColorField::colorChanged, this,
+          &HexColorNamesEditor::onColorFieldChanged);
+  connect(m_hexLineEdit, &HexLineEdit::editingFinished, this,
+          &HexColorNamesEditor::onHexChanged);
 
-  ret =
-      ret &&
-      connect(m_userTreeWidget,
-              SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
-              this,
-              SLOT(onCurrentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
-  ret =
-      ret && connect(m_colorField, SIGNAL(colorChanged(const TPixel32 &, bool)),
-                     this, SLOT(onColorFieldChanged(const TPixel32 &, bool)));
-  ret = ret && connect(m_hexLineEdit, SIGNAL(editingFinished()), this,
-                       SLOT(onHexChanged()));
+  connect(m_unsColorButton, &QPushButton::pressed, this,
+          &HexColorNamesEditor::onDeselect);
+  connect(m_addColorButton, &QPushButton::pressed, this,
+          &HexColorNamesEditor::onAddColor);
+  connect(m_delColorButton, &QPushButton::pressed, this,
+          &HexColorNamesEditor::onDelColor);
+  connect(m_importButton, &QPushButton::pressed, this,
+          &HexColorNamesEditor::onImport);
+  connect(m_exportButton, &QPushButton::pressed, this,
+          &HexColorNamesEditor::onExport);
 
-  ret = ret &&
-        connect(m_unsColorButton, SIGNAL(pressed()), this, SLOT(onDeselect()));
-  ret = ret &&
-        connect(m_addColorButton, SIGNAL(pressed()), this, SLOT(onAddColor()));
-  ret = ret &&
-        connect(m_delColorButton, SIGNAL(pressed()), this, SLOT(onDelColor()));
-  ret =
-      ret && connect(m_importButton, SIGNAL(pressed()), this, SLOT(onImport()));
-  ret =
-      ret && connect(m_exportButton, SIGNAL(pressed()), this, SLOT(onExport()));
-
-  ret = ret && connect(okButton, SIGNAL(pressed()), this, SLOT(onOK()));
-  ret = ret && connect(applyButton, SIGNAL(pressed()), this, SLOT(onApply()));
-  ret = ret && connect(closeButton, SIGNAL(pressed()), this, SLOT(close()));
-  assert(ret);
+  connect(okButton, &QPushButton::pressed, this, &HexColorNamesEditor::onOK);
+  connect(applyButton, &QPushButton::pressed, this,
+          &HexColorNamesEditor::onApply);
+  connect(closeButton, &QPushButton::pressed, this, &QWidget::close);
 }
 
 //-----------------------------------------------------------------------------
@@ -573,7 +580,7 @@ QTreeWidgetItem *HexColorNamesEditor::addEntry(QTreeWidget *tree,
                                                const QString &name,
                                                const QString &hex,
                                                bool editable) {
-  TPixel pixel = TPixel(0, 0, 0);
+  TPixel pixel(0, 0, 0);
   HexColorNames::parseHex(hex, pixel);
 
   QPixmap pixm(16, 16);
@@ -583,6 +590,7 @@ QTreeWidgetItem *HexColorNamesEditor::addEntry(QTreeWidget *tree,
   treeItem->setText(0, name);
   treeItem->setIcon(1, QIcon(pixm));
   treeItem->setText(1, hex);
+
   if (!editable)
     treeItem->setFlags(treeItem->flags() & ~Qt::ItemIsSelectable);
   else
@@ -608,9 +616,11 @@ bool HexColorNamesEditor::updateUserHexEntry(QTreeWidgetItem *treeItem,
 
 //-----------------------------------------------------------------------------
 
-bool HexColorNamesEditor::nameValid(const QString& name) {
+bool HexColorNamesEditor::nameValid(const QString &name) {
   if (name.isEmpty()) return false;
-  return name.count(QRegExp("[\\\\#<>\"']")) == 0;
+
+  static QRegularExpression invalidChars("[\\\\#<>\"']");
+  return !name.contains(invalidChars);
 }
 
 //-----------------------------------------------------------------------------
@@ -622,6 +632,12 @@ bool HexColorNamesEditor::nameExists(const QString &name,
     if (item == self) continue;
     if (name.compare(item->text(0), Qt::CaseInsensitive) == 0) return true;
   }
+
+  for (auto it = HexColorNames::beginMain(); it != HexColorNames::endMain();
+       ++it) {
+    if (name.compare(it.key(), Qt::CaseInsensitive) == 0) return true;
+  }
+
   return false;
 }
 
@@ -631,6 +647,9 @@ void HexColorNamesEditor::deselectItem(bool treeFocus) {
   if (m_newEntry) return;
 
   m_userTreeWidget->setCurrentItem(nullptr);
+  m_selectedItem = nullptr;
+  m_selectedColn = 0;
+
   if (treeFocus) m_userTreeWidget->setFocus();
 }
 
@@ -640,9 +659,23 @@ void HexColorNamesEditor::deleteCurrentItem(bool deselect) {
   if (m_newEntry) return;
 
   QTreeWidgetItem *treeItem = m_userTreeWidget->currentItem();
-  if (treeItem) delete treeItem;
+  if (!treeItem) return;
+
+  int row = m_userTreeWidget->indexOfTopLevelItem(treeItem);
+  delete treeItem;
+
   m_selectedItem = nullptr;
-  if (deselect) m_userTreeWidget->setCurrentItem(nullptr);
+  m_selectedColn = 0;
+
+  if (deselect) {
+    m_userTreeWidget->clearSelection();
+
+    int count = m_userTreeWidget->topLevelItemCount();
+    if (count > 0) {
+      int newRow = (row >= count) ? count - 1 : row;
+      m_userTreeWidget->setCurrentItem(m_userTreeWidget->topLevelItem(newRow));
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -650,10 +683,11 @@ void HexColorNamesEditor::deleteCurrentItem(bool deselect) {
 void HexColorNamesEditor::populateMainList(bool reload) {
   HexColorNames::loadMainFile(reload);
 
-  HexColorNames::iterator it;
   m_mainTreeWidget->clear();
-  for (it = HexColorNames::beginMain(); it != HexColorNames::endMain(); ++it) {
-    addEntry(m_mainTreeWidget, it.name(), it.value(), false);
+
+  for (auto it = HexColorNames::beginMain(); it != HexColorNames::endMain();
+       ++it) {
+    addEntry(m_mainTreeWidget, it.key(), it.value(), false);
   }
 }
 
@@ -662,14 +696,15 @@ void HexColorNamesEditor::populateMainList(bool reload) {
 void HexColorNamesEditor::populateUserList(bool reload) {
   HexColorNames::loadUserFile(reload);
 
-  HexColorNames::iterator it;
   m_userTreeWidget->clear();
-  for (it = HexColorNames::beginUser(); it != HexColorNames::endUser(); ++it) {
-    if (!nameExists(it.name(), nullptr))
-      addEntry(m_userTreeWidget, it.name(), it.value(), true);
+
+  for (auto it = HexColorNames::beginUser(); it != HexColorNames::endUser();
+       ++it) {
+    if (!nameExists(it.key(), nullptr))
+      addEntry(m_userTreeWidget, it.key(), it.value(), true);
   }
 
-  m_userTreeWidget->sortItems(0, Qt::SortOrder::AscendingOrder);
+  m_userTreeWidget->sortItems(0, Qt::AscendingOrder);
 }
 
 //-----------------------------------------------------------------------------
@@ -717,8 +752,7 @@ void HexColorNamesEditor::focusInEvent(QFocusEvent *e) {
   qApp->installEventFilter(this);
 }
 
-//--------------------------------------------------------
-
+//-----------------------------------------------------------------------------
 void HexColorNamesEditor::focusOutEvent(QFocusEvent *e) {
   QWidget::focusOutEvent(e);
   qApp->removeEventFilter(this);
@@ -727,10 +761,9 @@ void HexColorNamesEditor::focusOutEvent(QFocusEvent *e) {
 //-----------------------------------------------------------------------------
 
 bool HexColorNamesEditor::eventFilter(QObject *obj, QEvent *e) {
-  if (e->type() == QEvent::Shortcut ||
-      e->type() == QEvent::ShortcutOverride) {
-      e->accept();
-      return true;
+  if (e->type() == QEvent::Shortcut || e->type() == QEvent::ShortcutOverride) {
+    e->accept();
+    return true;
   }
   return false;
 }
@@ -740,13 +773,14 @@ bool HexColorNamesEditor::eventFilter(QObject *obj, QEvent *e) {
 void HexColorNamesEditor::onCurrentItemChanged(QTreeWidgetItem *current,
                                                QTreeWidgetItem *previous) {
   m_selectedItem = current;
-  m_delColorButton->setEnabled(current);
-  m_unsColorButton->setEnabled(current);
+  m_delColorButton->setEnabled(current != nullptr);
+  m_unsColorButton->setEnabled(current != nullptr);
+  m_selectedColn = 0;
 
   if (!current) return;
+
   m_selectedName = current->text(0);
   m_selectedHex  = current->text(1);
-  m_selectedColn = 0;
 
   // Modify color field
   TPixel pixel(0, 0, 0);
@@ -759,14 +793,16 @@ void HexColorNamesEditor::onCurrentItemChanged(QTreeWidgetItem *current,
 //-----------------------------------------------------------------------------
 
 void HexColorNamesEditor::onEditingStarted(const QModelIndex &modelIndex) {
-  QTreeWidgetItem *item = (QTreeWidgetItem *)modelIndex.internalPointer();
-  int column            = modelIndex.column();
+  QTreeWidgetItem *item =
+      static_cast<QTreeWidgetItem *>(modelIndex.internalPointer());
+  int column = modelIndex.column();
   onItemStarted(item, column);
 }
 
 void HexColorNamesEditor::onEditingFinished(const QModelIndex &modelIndex) {
-  QTreeWidgetItem *item = (QTreeWidgetItem *)modelIndex.internalPointer();
-  int column            = modelIndex.column();
+  QTreeWidgetItem *item =
+      static_cast<QTreeWidgetItem *>(modelIndex.internalPointer());
+  int column = modelIndex.column();
   onItemFinished(item, column);
 }
 
@@ -777,57 +813,80 @@ void HexColorNamesEditor::onEditingClosed() {
 //-----------------------------------------------------------------------------
 
 void HexColorNamesEditor::onItemStarted(QTreeWidgetItem *item, int column) {
+  if (!item) return;
   m_selectedName = item->text(0);
   m_selectedHex  = item->text(1);
-  m_selectedColn = 0;
+  m_selectedColn = column;
   m_selectedItem = item;
 }
 
 //-----------------------------------------------------------------------------
 
 void HexColorNamesEditor::onItemFinished(QTreeWidgetItem *item, int column) {
+  if (m_processingItemFinished) return;
+
+  QScopedValueRollback<bool> guard(m_processingItemFinished, true);
+
   if (!m_selectedItem || !item) return;
+
   m_delColorButton->setEnabled(true);
   m_unsColorButton->setEnabled(true);
 
-  try {
-    if (m_selectedItem == item) {
-      QString text = item->text(column);
-      if (column == 0) {
-        // Edit Name
-        static QRegExp space("\\s");
-        text.remove(space);
-        text = text.toLower();
-        if (text.isEmpty()) throw "";
-        if (!nameValid(text))
-          throw "Color name is not valid.\nFollowing characters can't be used: \\ # < > \" '";
-        if (nameExists(text, item)) throw "Color name already exists.\nPlease use another name.";
-        item->setText(0, text);
-        m_userTreeWidget->sortItems(0, Qt::SortOrder::AscendingOrder);
-      } else {
-        // Edit Hex
-        TPixel pixel;
-        if (HexColorNames::parseHex(text, pixel)) {
-          m_colorField->setColor(pixel);
-          m_hexLineEdit->setColor(pixel);
-          updateUserHexEntry(item, pixel);
-        } else {
-          item->setText(1, m_selectedHex);
-        }
-      }
+  QString text = item->text(column);
+
+  if (column == 0) {
+    static QRegularExpression space("\\s");
+    text.remove(space);
+    text = text.toLower();
+
+    if (text.isEmpty()) {
+      QTreeWidget *tree = item->treeWidget();
+      int index         = tree->indexOfTopLevelItem(item);
+
+      m_selectedItem = nullptr;
+      m_newEntry     = false;
+
+      QMetaObject::invokeMethod(
+          tree,
+          [tree, index]() {
+            if (index >= 0) delete tree->takeTopLevelItem(index);
+          },
+          Qt::QueuedConnection);
+
+      return;
     }
-  } catch (const char *reason) {
-    m_selectedItem = nullptr;
-    if (m_selectedName.isEmpty()) {
-      delete item;
-    } else {
+
+    if (!nameValid(text)) {
+      DVGui::warning(
+          tr("Color name is not valid.\nThe following characters cannot be "
+             "used: \\ # < > \" '"));
       item->setText(0, m_selectedName);
+      return;
     }
-    if (strlen(reason)) DVGui::warning(tr(reason));
-  } catch (...) {
-    m_selectedItem = nullptr;
-    delete item;
+
+    if (nameExists(text, item)) {
+      DVGui::warning(
+          tr("Color name already exists.\nPlease use another name."));
+      item->setText(0, m_selectedName);
+      return;
+    }
+
+    item->setText(0, text);
+    m_userTreeWidget->sortItems(0, Qt::AscendingOrder);
+
+  } else {
+    // Edit Hex
+    TPixel pixel;
+    if (HexColorNames::parseHex(text, pixel)) {
+      m_colorField->setColor(pixel);
+      m_hexLineEdit->setColor(pixel);
+      updateUserHexEntry(item, pixel);
+    } else {
+      item->setText(1, m_selectedHex);
+      DVGui::warning(tr("Invalid hex color format."));
+    }
   }
+
   m_newEntry = false;
 }
 
@@ -839,6 +898,7 @@ void HexColorNamesEditor::onColorFieldChanged(const TPixel32 &color,
   if (updateUserHexEntry(treeItem, color)) {
     m_userTreeWidget->setCurrentItem(treeItem);
   }
+
   m_hexLineEdit->setColor(color);
 }
 
@@ -858,8 +918,8 @@ void HexColorNamesEditor::onHexChanged() {
 void HexColorNamesEditor::onAddColor() {
   if (m_newEntry) return;
 
-  TPixel pixel = m_colorField->getColor();
-  QString hex = HexColorNames::generateHex(pixel);
+  TPixel pixel              = m_colorField->getColor();
+  QString hex               = HexColorNames::generateHex(pixel);
   QTreeWidgetItem *treeItem = addEntry(m_userTreeWidget, "", hex, true);
 
   m_userTreeWidget->setCurrentItem(treeItem);
@@ -885,38 +945,59 @@ void HexColorNamesEditor::onDelColor() {
 void HexColorNamesEditor::onDeselect() { deselectItem(false); }
 
 //-----------------------------------------------------------------------------
-
 void HexColorNamesEditor::onImport() {
   QString fileName = QFileDialog::getOpenFileName(
       this, tr("Open Color Names"), QString(),
       tr("Text or XML (*.txt *.xml);;Text files (*.txt);;XML files (*.xml)"));
+
   if (fileName.isEmpty()) return;
 
   QMessageBox::StandardButton ret = QMessageBox::question(
-      this, tr("Hex Color Names Import"), tr("Do you want to merge with existing entries?"),
-      QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No |
-                                   QMessageBox::Cancel));
+      this, tr("Hex Color Names Import"),
+      tr("Do you want to merge with existing entries?"),
+      QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+
   if (ret == QMessageBox::Cancel) return;
 
-  if (!HexColorNames::loadTempFile(TFilePath(fileName))) {
-    DVGui::warning(tr("Error importing color names XML"));
+  try {
+    if (!HexColorNames::loadTempFile(TFilePath(fileName))) {
+      DVGui::warning(
+          tr("Error importing color names XML:\nFile not found or invalid "
+             "format"));
+      return;
+    }
+  } catch (const TException &e) {
+    DVGui::warning(
+        tr("Error importing color names XML:\nThe file may be corrupt or have "
+           "invalid format."));
+
+    return;
+  } catch (...) {
+    DVGui::warning(tr("An unexpected error occurred while importing colors."));
+    return;
   }
-  HexColorNames::iterator it;
-  if (ret == QMessageBox::No) m_userTreeWidget->clear();
-  for (it = HexColorNames::beginTemp(); it != HexColorNames::endTemp(); ++it) {
-    if (!nameExists(it.name(), nullptr))
-      addEntry(m_userTreeWidget, it.name(), it.value(), true);
+
+  if (ret == QMessageBox::No) {
+    m_userTreeWidget->clear();
   }
+
+  for (auto it = HexColorNames::beginTemp(); it != HexColorNames::endTemp();
+       ++it) {
+    if (!nameExists(it.key(), nullptr))
+      addEntry(m_userTreeWidget, it.key(), it.value(), true);
+  }
+
   HexColorNames::clearTempEntries();
-  m_userTreeWidget->sortItems(0, Qt::SortOrder::AscendingOrder);
+  m_userTreeWidget->sortItems(0, Qt::AscendingOrder);
 }
 
 //-----------------------------------------------------------------------------
 
 void HexColorNamesEditor::onExport() {
-  QString fileName = QFileDialog::getSaveFileName(
-      this, tr("Save Color Names"), QString(),
-      tr("XML files (*.xml);;Text files (*.txt)"));
+  QString fileName =
+      QFileDialog::getSaveFileName(this, tr("Save Color Names"), QString(),
+                                   tr("XML files (*.xml);;Text files (*.txt)"));
+
   if (fileName.isEmpty()) return;
 
   HexColorNames::clearTempEntries();
@@ -924,6 +1005,7 @@ void HexColorNamesEditor::onExport() {
     QTreeWidgetItem *item = m_userTreeWidget->topLevelItem(i);
     HexColorNames::setTempEntry(item->text(0), item->text(1));
   }
+
   if (!HexColorNames::saveTempFile(TFilePath(fileName))) {
     DVGui::warning(tr("Error exporting color names XML"));
   }
@@ -934,7 +1016,7 @@ void HexColorNamesEditor::onExport() {
 void HexColorNamesEditor::onOK() {
   onApply();
   close();
-};
+}
 
 void HexColorNamesEditor::onApply() {
   HexColorNames::clearUserEntries();
@@ -942,7 +1024,11 @@ void HexColorNamesEditor::onApply() {
     QTreeWidgetItem *item = m_userTreeWidget->topLevelItem(i);
     HexColorNames::setUserEntry(item->text(0), item->text(1));
   }
-  HexColorNames::saveUserFile();
+
+  if (!HexColorNames::saveUserFile()) {
+    DVGui::warning(tr("Failed to save user color names file."));
+  }
+
   HexColorNames::instance()->emitChanged();
 
   bool oldAutoCompState = (HexLineEditAutoComplete != 0);
@@ -951,6 +1037,4 @@ void HexColorNamesEditor::onApply() {
     HexLineEditAutoComplete = newAutoCompState ? 1 : 0;
     HexColorNames::instance()->emitAutoComplete(newAutoCompState);
   }
-};
-
-//-----------------------------------------------------------------------------
+}

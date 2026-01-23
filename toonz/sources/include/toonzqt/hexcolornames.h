@@ -20,9 +20,10 @@
 #include <QCheckBox>
 #include <QLineEdit>
 #include <QCompleter>
-#include <QMap>
+#include <QHash>
 #include <QTreeWidget>
 #include <QStyledItemDelegate>
+#include <QStringListModel>
 
 #undef DVAPI
 #undef DVVAR
@@ -38,135 +39,67 @@ namespace DVGui {
 
 //-----------------------------------------------------------------------------
 
-//! Manage all Hex and named colors conversions.
+//! Manages all Hex and named colors conversions.
 class HexColorNames final : public QObject {
   Q_OBJECT
   HexColorNames();
 
-  static QMap<QString, QString> s_maincolornames;
-  static QMap<QString, QString> s_usercolornames;
-  static QMap<QString, QString> s_tempcolornames;
+  static QHash<QString, QString> s_maincolornames;
+  static QHash<QString, QString> s_usercolornames;
+  static QHash<QString, QString> s_tempcolornames;
 
-  static void loadColorTableXML(QMap<QString, QString> &table,
+  static bool loadColorTableXML(QHash<QString, QString> &table,
                                 const TFilePath &fp);
-  static void saveColorTableXML(QMap<QString, QString> &table,
+  static bool saveColorTableXML(QHash<QString, QString> &table,
                                 const TFilePath &fp);
-  static bool parseHexInternal(QString text, TPixel &outPixel);
+  static bool parseHexInternal(const QString &text, TPixel &outPixel);
 
 public:
-
-  //! iterator for accessing user entries
-  class iterator {
-    QMap<QString, QString>::iterator m_it;
-    bool m_mutable;
-
-  public:
-    inline iterator() : m_it(nullptr), m_mutable(false) {}
-    inline iterator(iterator *it)
-        : m_it(it->m_it), m_mutable(it->m_mutable) {}
-    inline iterator(QMap<QString, QString>::iterator it, bool isMutable)
-        : m_it(it), m_mutable(isMutable) {}
-
-    inline const QString &name() const { return m_it.key(); }
-    inline const QString &value() const { return m_it.value(); }
-    inline void setValue(const QString &value) { if (m_mutable) m_it.value() = value; }
-    inline bool operator==(const iterator &o) const { return m_it == o.m_it; }
-    inline bool operator!=(const iterator &o) const { return m_it != o.m_it; }
-    inline iterator &operator++() {
-      ++m_it;
-      return *this;
-    }
-    inline iterator &operator--() {
-      --m_it;
-      return *this;
-    }
-    inline iterator operator++(int) {
-      iterator r = *this;
-      m_it++;
-      return r;
-    }
-    inline iterator operator--(int) {
-      iterator r = *this;
-      m_it--;
-      return r;
-    }
-  };
-
-  //! Load entries from main colornames.txt file
   static bool loadMainFile(bool reload);
-
-  //! Load entries from user colornames.txt file
   static bool loadUserFile(bool reload);
-
-  //! Load temporary entries from custom file
-  static bool loadTempFile(const TFilePath& fp);
-
-  //! Verify if there's personal colornames.txt file
+  static bool loadTempFile(const TFilePath &fp);
   static bool hasUserFile();
-
-  //! Save entries to user colornames.txt file
   static bool saveUserFile();
-
-  //! Load temporary entries from custom file
   static bool saveTempFile(const TFilePath &fp);
 
-  //! Clear all user entries
   static void clearUserEntries();
-
-  //! Clear all user entries
   static void clearTempEntries();
 
-  //! Set single user entry
   static void setUserEntry(const QString &name, const QString &hex);
-
-  //! Set single user entry
   static void setTempEntry(const QString &name, const QString &hex);
 
-  //! Get first main entry
-  static inline iterator beginMain() {
-    return iterator(s_maincolornames.begin(), false);
+  // Return native QHash iterators (no custom class)
+  static inline QHash<QString, QString>::const_iterator beginMain() {
+    return s_maincolornames.cbegin();
+  }
+  static inline QHash<QString, QString>::const_iterator endMain() {
+    return s_maincolornames.cend();
   }
 
-  //! Get last main entry
-  static inline iterator endMain() {
-    return iterator(s_maincolornames.end(), false);
+  static inline QHash<QString, QString>::iterator beginUser() {
+    return s_usercolornames.begin();
+  }
+  static inline QHash<QString, QString>::iterator endUser() {
+    return s_usercolornames.end();
   }
 
-  //! Get first user entry
-  static inline iterator beginUser() {
-    return iterator(s_usercolornames.begin(), true);
+  static inline QHash<QString, QString>::iterator beginTemp() {
+    return s_tempcolornames.begin();
+  }
+  static inline QHash<QString, QString>::iterator endTemp() {
+    return s_tempcolornames.end();
   }
 
-  //! Get last user entry
-  static inline iterator endUser() {
-    return iterator(s_usercolornames.end(), true);
-  }
-
-  //! Get first user entry
-  static inline iterator beginTemp() {
-    return iterator(s_tempcolornames.begin(), true);
-  }
-
-  //! Get last user entry
-  static inline iterator endTemp() {
-    return iterator(s_tempcolornames.end(), true);
-  }
-
-  //! Parse raw text into RGBA color
-  static bool parseText(QString text, TPixel &outPixel);
-
-  //! Parse hex format into RGBA color
-  static bool parseHex(QString text, TPixel &outPixel);
-
-  //! Generate hex format from RGBA color
+  static bool parseText(const QString &text, TPixel &outPixel);
+  static bool parseHex(const QString &text, TPixel &outPixel);
   static QString generateHex(TPixel pixel);
 
-  //! To access singleton for signaling
   static HexColorNames *instance();
 
-  //! Emit that user entries were changed
   inline void emitChanged() { emit colorsChanged(); }
-  inline void emitAutoComplete(bool enable) { emit autoCompleteChanged(enable); }
+  inline void emitAutoComplete(bool enable) {
+    emit autoCompleteChanged(enable);
+  }
 
 signals:
   void autoCompleteChanged(bool);
@@ -195,15 +128,15 @@ protected:
   void focusOutEvent(QFocusEvent *event) override;
   void showEvent(QShowEvent *event) override;
 
-  QCompleter *getCompleter();
-
   bool m_editing;
   TPixel m_color;
   QCompleter *m_completer;
+  QStringListModel *m_completerModel;
 
-protected slots:
+private slots:
   void onAutoCompleteChanged(bool);
   void onColorsChanged();
+  void updateCompleterList();
 };
 
 //-----------------------------------------------------------------------------
@@ -215,21 +148,20 @@ class HexColorNamesEditingDelegate : public QStyledItemDelegate {
 public:
   HexColorNamesEditingDelegate(QObject *parent = nullptr)
       : QStyledItemDelegate(parent) {
-    connect(this,
-            SIGNAL(closeEditor(QWidget *,
-                               QAbstractItemDelegate::EndEditHint)),
-            this,
-            SLOT(onCloseEditor(QWidget *, QAbstractItemDelegate::EndEditHint)));
+    // Modern Qt5 connection syntax
+    connect(this, &HexColorNamesEditingDelegate::closeEditor, this,
+            &HexColorNamesEditingDelegate::onCloseEditor);
   }
-  virtual QWidget *createEditor(QWidget *parent,
-                                const QStyleOptionViewItem &option,
-                                const QModelIndex &index) const {
+
+  QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
+                        const QModelIndex &index) const override {
     QWidget *widget = QStyledItemDelegate::createEditor(parent, option, index);
     emit editingStarted(index);
     return widget;
   }
-  virtual void setModelData(QWidget *editor, QAbstractItemModel *model,
-                            const QModelIndex &index) const {
+
+  void setModelData(QWidget *editor, QAbstractItemModel *model,
+                    const QModelIndex &index) const override {
     QStyledItemDelegate::setModelData(editor, model, index);
     emit editingFinished(index);
   }
@@ -240,8 +172,8 @@ signals:
   void editingClosed() const;
 
 private slots:
-  inline void onCloseEditor(QWidget *editor,
-                            QAbstractItemDelegate::EndEditHint hint = NoHint) {
+  void onCloseEditor(QWidget *editor,
+                     QAbstractItemDelegate::EndEditHint hint = NoHint) {
     emit editingClosed();
   }
 };
@@ -269,11 +201,12 @@ class HexColorNamesEditor final : public DVGui::Dialog {
   int m_selectedColn;
   QTreeWidgetItem *m_selectedItem;
   QString m_selectedName, m_selectedHex;
+  bool m_processingItemFinished = false;
 
   QTreeWidgetItem *addEntry(QTreeWidget *tree, const QString &name,
                             const QString &hex, bool editable);
   bool updateUserHexEntry(QTreeWidgetItem *treeItem, const TPixel32 &color);
-  bool nameValid(const QString& name);
+  bool nameValid(const QString &name);
   bool nameExists(const QString &name, QTreeWidgetItem *self);
   void deselectItem(bool treeFocus);
   void deleteCurrentItem(bool deselect);
