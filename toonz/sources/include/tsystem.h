@@ -3,7 +3,7 @@
 #ifndef TSYSTEM_INCLUDED
 #define TSYSTEM_INCLUDED
 
-//#include "texception.h"
+// #include "texception.h"
 
 #ifndef _WIN32
 #include <sys/stat.h>
@@ -23,8 +23,8 @@
 
 #include "tfilepath.h"
 
-// tutte le info ritornate da stat e access
-// piu' info 'toonzesche' : cos'e': directory, livello, immagine, testo, ecc.
+// all info returned by stat and access
+// plus 'toonz-like' info: what is it: directory, level, image, text, etc.
 
 #ifndef TNZCORE_LIGHT
 
@@ -81,11 +81,9 @@ public:
 // DVAPI ostream&operator<<(ostream&out, const TSystemException &e);
 
 namespace TSystem {
-// cambiare i nomi. Niente T (c'e' gia' in TSystem). Usiamo la convenzione
-// solita per
-// i nomi composti (maiuscole e non '_'). Facciamo tutto minuscolo con
-// l'iniziale maiuscola
-// es. MaxPathLen;
+// change names. No T (already in TSystem). Use the usual convention for
+// compound names (capitals and no '_'). Let's use lowercase with initial
+// capital e.g. MaxPathLen;
 
 extern const int MaxPathLen;      // Maximum length of full path
 extern const int MaxFNameLen;     // Maximum length of filename component
@@ -96,7 +94,7 @@ DVAPI void hasMainLoop(bool state);
 // DVAPI void enableFrameGrouping(bool on);
 // DVAPI bool isFrameGroupingEnabled();
 
-// aggiungono (in coda) a set
+// add (at the end) to set
 DVAPI void readDirectory(TFilePathSet &fpset, const QDir &dir,
                          bool groupFrames = true);
 
@@ -121,7 +119,7 @@ DVAPI void readDirectory_Dir_ReadExe(TFilePathSet &dst, const TFilePath &path);
 // return the folder item list which is readable and executable (only names)
 DVAPI void readDirectory_DirItems(QStringList &dst, const TFilePath &path);
 
-// creano un set nuovo
+// create a new set
 DVAPI TFilePathSet readDirectory(const TFilePath &path, bool groupFrames = true,
                                  bool onlyFiles      = false,
                                  bool getHiddenFiles = false);
@@ -148,8 +146,8 @@ DVAPI TFilePath getDllDir();
 /*!Returns the process id of the current process*/
 DVAPI int getProcessId();
 
-// n.b. queste possono buttare eccezioni!
-// mkdir crea anche il parent se non esiste
+// note: these can throw exceptions!
+// mkdir also creates the parent if it doesn't exist
 DVAPI void mkDir(const TFilePath &path);
 DVAPI void rmDir(const TFilePath &path);
 DVAPI void rmDirTree(const TFilePath &path);
@@ -167,8 +165,7 @@ DVAPI void moveFileToRecycleBin(const TFilePath &fp);
 
 DVAPI void copyFileOrLevel_throw(const TFilePath &dst, const TFilePath &src);
 DVAPI bool renameImageSequence(const TFilePathSet &files,
-                                     const TFilePath &levelName,
-                                     int prefixLength);
+                               const TFilePath &levelName, int prefixLength);
 DVAPI void renameFileOrLevel_throw(const TFilePath &dst, const TFilePath &src,
                                    bool renamePalette = false);
 DVAPI void removeFileOrLevel_throw(const TFilePath &fp);
@@ -184,7 +181,7 @@ DVAPI bool hideFileOrLevel(const TFilePath &fp);
 DVAPI bool moveFileOrLevelToRecycleBin(const TFilePath &fp);
 
 DVAPI void sleep(TINT64 delay);
-inline void sleep(int ms) { sleep((TINT64)ms); }
+inline void sleep(int ms) { sleep(static_cast<TINT64>(ms)); }
 
 DVAPI TFilePathSet getDisks();
 
@@ -208,7 +205,7 @@ DVAPI TINT64 getMemorySize(bool onlyPhysicalMemory);
 
 DVAPI bool memoryShortage();
 
-/*! run di un extern viewer */
+/*! run an external viewer */
 // DVAPI void showDocument(const TFilePath &dst);
 
 DVAPI int getProcessorCount();
@@ -231,16 +228,16 @@ DVAPI long getCPUExtensions();
 /*! enables/disables the CPU extensions, if available*/
 // DVAPI void enableCPUExtensions(bool on);
 
-// cosette da fare:
+// things to do:
 
-// un po' di studio sui file memory mapped
+// some study on memory mapped files
 
-// indagare
+// investigate
 DVAPI std::iostream openTemporaryFile();
-// un'altra idea e' avere un TQualcosaP che ritorna un UniqueFileName
-// e che sul distruttore cancella il file
+// another idea is to have a TQualcosaP that returns a UniqueFileName
+// and on the destructor deletes the file
 
-// pensare a:
+// think about:
 //  DVAPI void setFileProtection(const TFilePath &path, ???);
 
 void DVAPI outputDebug(std::string s);
@@ -275,10 +272,10 @@ DVAPI TFilePath getUniqueFile(QString field = "");
 
 DVAPI bool isDLLBlackListed(QString dllFile);
 
-}
+}  // namespace TSystem
 
 //
-// Esempio di lettura di una directory:
+// Example of reading a directory:
 // TFilePathSet dirContent = TSystem::readDirectory("C:\\temp");
 // for(TFilePathSet::Iterator it = dirContent.begin(); it != dirContent.end();
 // it++)
