@@ -1882,7 +1882,7 @@ TLevelWriterSvg::TLevelWriterSvg(const TFilePath &path, TPropertyGroup *winfo)
 
 static void writeRegion(TRegion *r, TPalette *plt, QTextStream &out,
                         double ly) {
-  if (r->getEdgeCount() == 0) return;
+  if (r->getEdgeCount() == 0 || !r->getStyle()) return;
   std::vector<const TQuadratic *> quadsOutline;
 
   for (int i = 0; i < (int)r->getEdgeCount(); i++) {
