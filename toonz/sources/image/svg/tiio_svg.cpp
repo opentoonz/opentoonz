@@ -2202,8 +2202,6 @@ TStroke *buildStroke(NSVGpath *path, float width, float scale) {
 //-----------------------------------------------------------------------------
 
 TImageP TImageReaderSvg::load() {
-  static int devPixRatio = QApplication::desktop()->devicePixelRatio();
-
   NSVGimage *svgImg =
       nsvgParseFromFile(m_path.getQString().toStdString().c_str());
   if (!svgImg) return TImageP();
@@ -2225,10 +2223,9 @@ TImageP TImageReaderSvg::load() {
 
     bool applyFill = shape->hasFillInfo && !shape->hasFillNone;
 
-    float strokeWidth =
-        !shape->hasStrokeNone ? shape->strokeWidth / devPixRatio : 0;
+    float strokeWidth = !shape->hasStrokeNone ? (shape->strokeWidth * 0.5) : 0;
 
-    inkIndex   = !shape->hasStrokeNone ? findColor(plt, shape->strokeColor) : 0;
+    inkIndex   = !shape->hasStrokeNone ? findColor(plt, shape->strokeColor) : 1;
     paintIndex = !shape->hasFillNone ? findColor(plt, shape->fillColor) : 0;
     if (!applyFill && !shape->hasFillNone &&
         (!shape->hasStrokeNone || !strokeWidth)) {
