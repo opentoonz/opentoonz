@@ -95,7 +95,7 @@
 // TLIBMAIN
 void initImageIo(bool lightVersion) {
   if (!lightVersion) {
-    TLevelWriter::define("pli", TLevelWriterPli::create, false);
+  	TLevelWriter::define("pli", TLevelWriterPli::create, false);
     TLevelReader::define("pli", TLevelReaderPli::create);
     TFileType::declare("pli", TFileType::VECTOR_LEVEL);
 
