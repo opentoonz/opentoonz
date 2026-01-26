@@ -20,23 +20,23 @@
 
 //-----------------------------------------------------------------------------
 /*
-  Example of using TFilePath and TFrameId classes.
+  This is an example of how to use TFilePath and TFrameId classes.
 */
 
 //!\include frameid_ex.cpp
-//! The TFrameId class describes a frame identified by a four-digit integer and
-//! optionally by a character (necessary for appended frames)
+//! The class TFrameId describes a frame identified by an integer number of four
+//! figures and, in case, by a character (necessary for added frames)
 class DVAPI TFrameId {
   int m_frame;
-  QString
-      m_letter;  // Used for "appended" frames like pippo.0001a.tzp => f=1 c='a'
+  QString m_letter;  // serve per i frame "aggiunti" del tipo pippo.0001a.tzp =>
+                     // f=1 c='a'
   int m_zeroPadding;
   char m_startSeqInd;
 
 public:
   enum {
-    EMPTY_FRAME = -1,  // e.g., pippo..tif
-    NO_FRAME    = -2   // e.g., pippo.tif
+    EMPTY_FRAME = -1,  // es. pippo..tif
+    NO_FRAME    = -2   // es. pippo.tif
   };
 
   enum FrameFormat {
@@ -53,7 +53,7 @@ public:
       : m_frame(f), m_letter(""), m_zeroPadding(4), m_startSeqInd('.') {}
   TFrameId(int f, char c, int p = 4, char s = '.')
       : m_frame(f), m_zeroPadding(p), m_startSeqInd(s) {
-    m_letter = (c == '\0') ? QString() : QString(1, QChar(c));
+    m_letter = (c == '\0') ? "" : QString(c);
   }
   TFrameId(int f, QString str, int p = 4, char s = '.')
       : m_frame(f), m_letter(str), m_zeroPadding(p), m_startSeqInd(s) {}
@@ -129,13 +129,14 @@ inline std::ostream &operator<<(std::ostream &out, const TFrameId &f) {
 
 //-----------------------------------------------------------------------------
 
-/*!The TFilePath class defines a file path. Its constructor creates a string
-   according to the platform and specific rules. For more information see the
+/*!The class TFilePath defines a file path.Its constructor creates a string
+   according
+   to the platform and to certain rules.For more information see the
    constructor.*/
 class DVAPI TFilePath {
   static bool m_underscoreFormatAllowed;
 
-  // Specifies file path condition for sequential images per project.
+  // specifies file path condition for sequential image for each project.
   // See filepathproperties.h
   static bool m_useStandard;
   static bool m_acceptNonAlphabetSuffix;
@@ -154,14 +155,15 @@ class DVAPI TFilePath {
   void setPath(std::wstring path);
 
 public:
-  /*! This static method allows correct reading of levels in the form
-   * pippo_0001.tif (always represented as pippo..tif) */
+  /*! this static method allows correct reading of levels in the form
+   * pippo_0001.tif (represented  always as pippo..tif) */
   static void setUnderscoreFormatAllowed(bool state) {
     m_underscoreFormatAllowed = state;
   }
 
-  // Called from TProjectManager::getCurrentProject() and
-  // ProjectPopup::updateProjectFromFields Returns true if something changed
+  // called from TProjectManager::getCurrentProject() and
+  // ProjectPopup::updateProjectFromFields
+  // returns true if something changed
   static bool setFilePathProperties(bool useStandard, bool acceptNonAlphaSuffix,
                                     int letterCountForSuffix) {
     if (m_useStandard == useStandard &&
@@ -176,10 +178,11 @@ public:
   static bool useStandard() { return m_useStandard; }
   static QString fidRegExpStr();
 
-  /*!This constructor creates a string by removing redundancies ('//', './',
-     etc.) and trailing slashes, correcting (redressing) "twisted" slashes.
-      Note: if the current directory is ".", it becomes "".
-      If the path is "<alpha>:", a slash will be added*/
+  /*!This constructor creates a string removing redundances ('//', './',etc.)
+and final slashes,
+      correcting (redressing) the "twisted" slashes.
+      Note that if the current directory is ".", it becomes "".
+If the path is "<alpha>:" a slash will be added*/
 
   explicit TFilePath(const char *path = "");
   explicit TFilePath(const std::string &path);
@@ -203,44 +206,43 @@ public:
   QString getQString() const;
 
   /*!Returns:
-   a.  "" if there is no file extension
-   b. "." if there is a file extension but no frame
-   c.".." if there are both a file extension and a frame */
-  std::string getDots() const;  // Returns "" (no extension), "." (extension, no
-                                // frame) or ".." (extension and frame)
+   a.  "" if there is no filename extension
+   b. "." if there is a filename extension but no frame
+   c.".." if there are both filename extension and frame */
+  std::string getDots() const;  // ritorna ""(no estensione), "."(estensione, no
+                                // frame) o ".."(estensione e frame)
 
-  /*!Returns the file extension, including the leading period (.).
-      Returns "" if there is no file extension.*/
-  std::string getDottedType()
-      const;  // Returns the extension WITH the DOT (if no extension returns "")
+  /*!Returns the filename extension, including leading period (.).
+      Returns "" if there is no filename extension.*/
+  std::string getDottedType() const;  // ritorna l'estensione con il PUNTO (se
+                                      // non c'e' estensione ritorna "")
 
-  /*!Returns the file extension, excluding the leading period (.).
-      Returns "" if there is no file extension.*/
-  std::string getUndottedType() const;  // Returns the extension WITHOUT the DOT
+  /*!Returns the filename extension, excluding leading period (.).
+      Returns "" if there is no filename extension.*/
+  std::string getUndottedType() const;  // ritorna l'estensione senza PUNTO
 
-  /*!Same as getUndottedType():
-      Returns the file extension, excluding the leading period (.).
-      Returns "" if there is no file extension.*/
+  /*!It is equal to getUndottedType():
+      Returns the filename extension, excluding leading period (.).
+      Returns "" if there is no filename extension.*/
   std::string getType() const {
     return getUndottedType();
-  }  // Returns the extension WITHOUT the DOT
+  }  // ritorna l'estensione SENZA PUNTO
 
   /*!Returns the base filename (no extension, no dots, no slash)*/
   std::string getName() const;       // noDot! noSlash!
   std::wstring getWideName() const;  // noDot! noSlash!
 
-  /*!Returns the filename (with extension, excluding the frame number if
-     present). ex.: TFilePath("/pippo/pluto.0001.gif").getLevelName() ==
-     "pluto..gif"
+  /*!Returns the filename (with extension, excluding in case the frame number).
+      ex.: TFilePath("/pippo/pluto.0001.gif").getLevelName() == "pluto..gif"
    */
   std::string getLevelName()
-      const;  // e.g., TFilePath("/pippo/pluto.0001.gif").getLevelName() ==
+      const;  // es. TFilePath("/pippo/pluto.0001.gif").getLevelName() ==
               // "pluto..gif"
   std::wstring getLevelNameW()
-      const;  // e.g., TFilePath("/pippo/pluto.0001.gif").getLevelName() ==
+      const;  // es. TFilePath("/pippo/pluto.0001.gif").getLevelName() ==
               // "pluto..gif"
 
-  /*!Returns the parent directory excluding any trailing slash.*/
+  /*!Returns the parent directory excluding the eventual final slash.*/
   TFilePath getParentDir() const;  // noSlash!;
 
   TFrameId getFrame() const;
@@ -252,24 +254,25 @@ public:
   bool isRoot() const;
   bool isEmpty() const { return m_path == L""; }
 
-  /*!Returns a TFilePath with the specified extension type.
-type is a string indicating the file extension (e.g., .bmp or bmp)*/
+  /*!Return a TFilePath with extension type.
+type is a string that indicate the filename extension(ex:. bmp or .bmp)*/
   TFilePath withType(const std::string &type) const;
-  /*!Returns a TFilePath with filename "name".*/
+  /*!Return a TFilePath with filename "name".*/
   TFilePath withName(const std::string &name) const;
-  /*!Returns a TFilePath with filename "name". Unicode*/
+  /*!Return a TFilePath with filename "name". Unicode*/
   TFilePath withName(const std::wstring &name) const;
-  /*!Returns a TFilePath with parent directory "dir".*/
+  /*!Return a TFilePath with parent directory "dir".*/
   TFilePath withParentDir(const TFilePath &dir) const;
-  /*!Returns a TFilePath without a parent directory */
+  /*!Return a TFilePath without parent directory */
   TFilePath withoutParentDir() const { return withParentDir(TFilePath()); }
-  /*!Returns a TFilePath with frame "frame".*/
+  /*!Return a TFilePath with frame "frame".*/
   TFilePath withFrame(
       const TFrameId &frame,
       TFrameId::FrameFormat format = TFrameId::USE_CURRENT_FORMAT) const;
-  /*!Returns a TFilePath with a frame identified by an integer "f".*/
+  /*!Return a TFilePath with a frame identified by an integer number "f".*/
   TFilePath withFrame(int f) const { return withFrame(TFrameId(f)); }
-  /*!Returns a TFilePath with a frame identified by an integer and a character*/
+  /*!Return a TFilePath with a frame identified by an integer and by a
+   * character*/
   TFilePath withFrame(int f, char letter) const {
     return withFrame(TFrameId(f, letter));
   }
@@ -300,12 +303,12 @@ type is a string indicating the file extension (e.g., .bmp or bmp)*/
   bool isAncestorOf(const TFilePath &) const;
 
   TFilePath operator-(
-      const TFilePath &fp) const;  // TFilePath("/a/b/c.txt") - TFilePath("/a/")
+      const TFilePath &fp) const;  // TFilePath("/a/b/c.txt")-TFilePath("/a/")
                                    // == TFilePath("b/c.txt");
-  // If fp.isAncestorOf(this) == false, returns this
+  // se fp.isAncestorOf(this) == false ritorna this
 
   bool match(const TFilePath &fp)
-      const;  // They are equal except for the number of frame digits
+      const;  // sono uguali a meno del numero di digits del frame
 
   // '/a/b/c.txt' => head='a' tail='b/c.txt'
   void split(std::wstring &head, TFilePath &tail) const;

@@ -1,19 +1,19 @@
 
 
 #ifdef _WIN32
-// #define UNICODE  // for UNC conversion functions
+// #define UNICODE  // per le funzioni di conversione da/a UNC
 #include <windows.h>
 #include <lm.h>
 
-const char slash        = '\\';
-const char auxslash     = '/';
-const wchar_t wslash    = L'\\';
-const wchar_t wauxslash = L'/';
+const char slash     = '\\';
+const char auxslash  = '/';
+const char wslash    = L'\\';
+const char wauxslash = L'/';
 #else
-const char slash        = '/';
-const char auxslash     = '\\';
-const wchar_t wslash    = L'/';
-const wchar_t wauxslash = L'\\';
+const char slash     = '/';
+const char auxslash  = '\\';
+const char wslash    = '/';
+const char wauxslash = '\\';
 #endif
 
 //=============================================================================
@@ -27,7 +27,7 @@ const wchar_t wauxslash = L'\\';
 
 // QT
 #include <QObject>
-#include <QRegularExpression>
+#include <QRegExp>
 
 bool TFilePath::m_underscoreFormatAllowed = true;
 
@@ -71,9 +71,9 @@ bool isNumbers(std::wstring str, int fromSeg, int toSeg) {
       return false;
   }
 
-  // Not the right format if we see too many letters. At the time of this
-  // logic, we only expect 1 letter.  Can expand to 2 or more later.
-
+  // Not the right format if we see too many letters.
+  // At the time of this logic, we only expect 1 letter.  Can expand to 2 or
+  // more later, if we want.
   if (numLetters > 1) return false;
 
   return true;  // We're good!
@@ -177,8 +177,9 @@ inline bool isSlash(wchar_t c) { return c == wslash || c == wauxslash; }
 
 //-----------------------------------------------------------------------------
 
-// look for the last '/' or '\'. If not found return -1
-// so that the substring starting from getLastSlash() + 1 is name.frame.type
+// cerca l'ultimo '/' o '\'. Se non c'e' ritorna -1
+// di modo che la sottostringa che parte da getLastSlash() + 1 e'
+// nome.frame.tipo
 inline int getLastSlash(const std::wstring &path) {
   int i;
   for (i = path.length() - 1; i >= 0 && !isSlash(path[i]); i--) {
@@ -192,8 +193,8 @@ inline int getLastSlash(const std::wstring &path) {
 void TFilePath::setPath(string path)
 {
 bool isUncName = false;
-  // remove '//', './' and trailing '/'; fix wrong slashes.
-  // if path starts with "<alpha>:" add a slash
+  // elimino i '//', './' e '/' finali; raddrizzo gli slash 'storti'.
+  // se il path comincia con  "<alpha>:" aggiungo uno slash
   int length =path.length();
   int pos = 0;
   if(path.length()>=2 && isalpha(path[0]) && path[1] == ':')
@@ -203,8 +204,8 @@ bool isUncName = false;
      if(path.length()==2 || !isSlash(path[pos])) m_path.append(1,slash);
     }
 #ifdef _WIN32
-  else  // if it's a UNC path it's like "\\\\MachineName"
-        // DOUBLE CHECK! IF WE HAVE IP ADDRESS IT FAILED!
+  else  //se si tratta di un path in formato UNC e' del tipo "\\\\MachineName"
+        //RICONTROLLARE! SE SI HA IP ADDRESS FALLIVA!
     if (path.length() >= 3 && path[0] == '\\' &&  path[1] == '\\' &&
 (isalpha(path[2]) || isdigit(path[2])) )
       {
@@ -239,16 +240,18 @@ bool isUncName = false;
       m_path.append(1,path[pos]);
     }
 
-    // remove trailing '/' (unless m_path == "/" or m_path == "<letter>:\"
-    // or it's UNC (Windows only) )
+    // rimuovo l'eventuale '/' finale (a meno che m_path == "/" o m_path ==
+"<letter>:\"
+    // oppure sia UNC (Windows only) )
     if(!(m_path.length()==1 && m_path[0] == slash ||
          m_path.length()==3 && isalpha(m_path[0]) && m_path[1] == ':' &&
 m_path[2] == slash)
       && m_path.length()>1 && m_path[m_path.length()-1] == slash)
       m_path.erase(m_path.length()-1, 1);
 
-  if (isUncName && m_path.find_last_of('\\') == 1) // only machine name is
-specified... m_path.append(1, slash);
+  if (isUncName && m_path.find_last_of('\\') == 1) // e' indicato solo il nome
+della macchina...
+    m_path.append(1, slash);
 }
 */
 
@@ -271,8 +274,8 @@ void append(string &out, wchar_t c)
 
 void TFilePath::setPath(std::wstring path) {
   bool isUncName = false;
-  // remove '//', './' and trailing '/'; fix wrong slashes.
-  // if path starts with "<alpha>:" add a slash
+  // elimino i '//', './' e '/' finali; raddrizzo gli slash 'storti'.
+  // se il path comincia con  "<alpha>:" aggiungo uno slash
   int length = path.length();
   int pos    = 0;
 
@@ -283,7 +286,7 @@ void TFilePath::setPath(std::wstring path) {
     pos = 2;
     if (path.length() == 2 || !isSlash(path[pos])) m_path.append(1, wslash);
   }
-  // if it's a UNC path it's like "\\\\MachineName"
+  // se si tratta di un path in formato UNC e' del tipo "\\\\MachineName"
   else if ((path.length() >= 3 && path[0] == L'\\' && path[1] == L'\\' &&
             iswalnum(path[2])) ||
            (path.length() >= 3 && path[0] == L'/' && path[1] == L'/' &&
@@ -308,7 +311,7 @@ void TFilePath::setPath(std::wstring path) {
       int firstSlashPos = pos;
       do pos++;
       while (pos < length && isSlash(path[pos]));
-      if (firstSlashPos == 0 && pos == 4)  // Case "\\\\MachineName"
+      if (firstSlashPos == 0 && pos == 4)  // Caso "\\\\MachineName"
         m_path.append(2, wslash);
       else
         m_path.append(1, wslash);
@@ -317,17 +320,18 @@ void TFilePath::setPath(std::wstring path) {
       m_path.append(1, path[pos]);
     }
 
-  // remove trailing '/' (unless m_path == "/" or m_path == "<letter>:\"
-  // or it's UNC (Windows only) )
+  // rimuovo l'eventuale '/' finale (a meno che m_path == "/" o m_path ==
+  // "<letter>:\"
+  // oppure sia UNC (Windows only) )
   if (!((m_path.length() == 1 && m_path[0] == wslash) ||
         (m_path.length() == 3 && iswalpha(m_path[0]) && m_path[1] == L':' &&
          m_path[2] == wslash)) &&
       (m_path.length() > 1 && m_path[m_path.length() - 1] == wslash))
     m_path.erase(m_path.length() - 1, 1);
 
-  if (isUncName &&
-      !(m_path.find_last_of(L'\\') > 1 ||
-        m_path.find_last_of(L'/') > 1))  // only machine name is specified...
+  if (isUncName && !(m_path.find_last_of(L'\\') > 1 ||
+                     m_path.find_last_of(L'/') >
+                         1))  // e' indicato solo il nome della macchina...
     m_path.append(1, wslash);
 }
 
@@ -382,8 +386,8 @@ bool TFilePath::operator<(const TFilePath &fp) const {
   while (i2 != -1 || j2 != -1) {
     iName = (i2 != -1) ? m_path.substr(i1, i2 - i1) : m_path;
     jName = (j2 != -1) ? fp.m_path.substr(j1, j2 - j1) : fp.m_path;
-// if the two path parts, between slashes, are equal
-// iterate the comparison process otherwise return
+// se le due parti di path, conpresi tra slash sono uguali
+// itero il processo di confronto altrimenti ritorno
 #ifdef _WIN32
     char differ;
     differ = _wcsicmp(iName.c_str(), jName.c_str());
@@ -430,23 +434,14 @@ if(i==wstring::npos) {ka = a; a = L"";}
 //-----------------------------------------------------------------------------
 
 TFilePath &TFilePath::operator+=(const TFilePath &fp) {
-  if (fp.isAbsolute()) {
-    // Log error or handle appropriately
-    qWarning("Cannot append absolute path to another path");
-    return *this;
-  }
-
+  assert(!fp.isAbsolute());
   if (fp.isEmpty())
     return *this;
   else if (isEmpty()) {
     *this = fp;
     return *this;
   } else if (m_path.length() != 1 || m_path[0] != slash) {
-    if (m_path.empty()) {
-      // Handle empty path case
-      *this = fp;
-      return *this;
-    }
+    assert(!m_path.empty());
     if (!isSlash(m_path[m_path.length() - 1])) m_path.append(1, wslash);
     m_path += fp.m_path;
     return *this;
@@ -570,8 +565,8 @@ bool TFilePath::isRoot() const {
 
 //-----------------------------------------------------------------------------
 
-// returns "" (no type, no dot), "." (file with type) or ".." (file with type
-// and frame)
+// ritorna ""(niente tipo, niente punto), "." (file con tipo) o ".." (file con
+// tipo e frame)
 std::string TFilePath::getDots() const {
   if (!TFilePath::m_useStandard) {
     TFilePathInfo info = analyzePath();
@@ -586,7 +581,7 @@ std::string TFilePath::getDots() const {
   if (isFfmpegType()) return ".";
   int i            = getLastSlash(m_path);
   std::wstring str = m_path.substr(i + 1);
-  // I could also have a.b.c.d where d is the extension
+  // potrei anche avere a.b.c.d dove d e' l'estensione
   i = str.rfind(L".");
   if (i == (int)std::wstring::npos || str == L"..") return "";
 
@@ -610,7 +605,7 @@ QChar TFilePath::getSepChar() const {
   if (isFfmpegType()) return QChar();
   int i            = getLastSlash(m_path);
   std::wstring str = m_path.substr(i + 1);
-  // I could also have a.b.c.d where d is the extension
+  // potrei anche avere a.b.c.d dove d e' l'estensione
   i = str.rfind(L".");
   if (i == (int)std::wstring::npos || str == L"..") return QChar();
 
@@ -634,7 +629,7 @@ QChar TFilePath::getSepChar() const {
 //-----------------------------------------------------------------------------
 
 std::string TFilePath::getDottedType()
-    const  // returns extension with DOT (if present)
+    const  // ritorna l'estensione con PUNTO (se c'e')
 {
   if (!TFilePath::m_useStandard) {
     QString ext = analyzePath().extension;
@@ -652,7 +647,8 @@ std::string TFilePath::getDottedType()
 
 //-----------------------------------------------------------------------------
 
-std::string TFilePath::getUndottedType() const  // returns extension without DOT
+std::string TFilePath::getUndottedType()
+    const  // ritorna l'estensione senza PUNTO
 {
   if (!TFilePath::m_useStandard) {
     QString ext = analyzePath().extension;
@@ -662,6 +658,7 @@ std::string TFilePath::getUndottedType() const  // returns extension without DOT
       return ext.toLower().toStdString();
   }
 
+  //-----
   size_t i         = getLastSlash(m_path);
   std::wstring str = m_path.substr(i + 1);
   i                = str.rfind(L".");
@@ -676,9 +673,10 @@ std::wstring TFilePath::getWideName() const  // noDot! noSlash!
   if (!TFilePath::m_useStandard) {
     return analyzePath().levelName.toStdWString();
   }
+  //-----
 
   QString type     = QString::fromStdString(getType()).toLower();
-  int i            = getLastSlash(m_path);  // look for the last slash
+  int i            = getLastSlash(m_path);  // cerco l'ultimo slash
   std::wstring str = m_path.substr(i + 1);
   i                = str.rfind(L".");
   if (i == (int)std::wstring::npos) return str;
@@ -702,13 +700,13 @@ std::string TFilePath::getName() const  // noDot! noSlash!
 }
 
 //-----------------------------------------------------------------------------
-// e.g. TFilePath("/pippo/pluto.0001.gif").getLevelName() == "pluto..gif"
+// es. TFilePath("/pippo/pluto.0001.gif").getLevelName() == "pluto..gif"
 std::string TFilePath::getLevelName() const {
   return ::to_string(getLevelNameW());
 }
 
 //-----------------------------------------------------------------------------
-// e.g. TFilePath("/pippo/pluto.0001.gif").getLevelName() == "pluto..gif"
+// es. TFilePath("/pippo/pluto.0001.gif").getLevelName() == "pluto..gif"
 
 std::wstring TFilePath::getLevelNameW() const {
   if (!TFilePath::m_useStandard) {
@@ -719,9 +717,10 @@ std::wstring TFilePath::getLevelNameW() const {
     name += "." + info.extension;
     return name.toStdWString();
   }
+  //-----
 
-  int i            = getLastSlash(m_path);  // look for the last slash
-  std::wstring str = m_path.substr(i + 1);  // str is m_path without directory
+  int i            = getLastSlash(m_path);  // cerco l'ultimo slash
+  std::wstring str = m_path.substr(i + 1);  // str e' m_path senza directory
   QString type     = QString::fromStdString(getType()).toLower();
   if (isFfmpegType()) return str;
   int j = str.rfind(L".");                       // str[j..] = ".type"
@@ -730,7 +729,7 @@ std::wstring TFilePath::getLevelNameW() const {
   if (i == (int)std::wstring::npos && m_underscoreFormatAllowed)
     i = str.substr(0, j).rfind(L'_');
 
-  if (j == i || j - i == 1)  // prova.tif or prova..tif
+  if (j == i || j - i == 1)  // prova.tif o prova..tif
     return str;
 
   if (!checkForSeqNum(type) || !isNumbers(str, i, j) ||
@@ -744,7 +743,7 @@ std::wstring TFilePath::getLevelNameW() const {
 
 TFilePath TFilePath::getParentDir() const  // noSlash!
 {
-  int i = getLastSlash(m_path);  // look for the last slash
+  int i = getLastSlash(m_path);  // cerco l'ultimo slash
   if (i < 0) {
     if (m_path.length() >= 2 &&
         ((L'a' <= m_path[0] && m_path[0] <= L'z') ||
@@ -765,12 +764,15 @@ bool TFilePath::isLevelName() const {
   if (!TFilePath::m_useStandard) {
     return analyzePath().fId.getNumber() == TFrameId::EMPTY_FRAME;
   }
+  //-----
 
   QString type = QString::fromStdString(getType()).toLower();
   if (isFfmpegType() || !checkForSeqNum(type)) return false;
   try {
     return getFrame() == TFrameId(TFrameId::EMPTY_FRAME);
-  } catch (...) {
+  }
+
+  catch (...) {
     return false;
   }
 }
@@ -781,8 +783,8 @@ TFrameId TFilePath::getFrame() const {
   }
 
   //-----
-  int i            = getLastSlash(m_path);  // look for the last slash
-  std::wstring str = m_path.substr(i + 1);  // str is the path without parentdir
+  int i            = getLastSlash(m_path);  // cerco l'ultimo slash
+  std::wstring str = m_path.substr(i + 1);  // str e' il path senza parentdir
   QString type     = QString::fromStdString(getType()).toLower();
   i                = str.rfind(L'.');
   if (i == (int)std::wstring::npos || str == L"." || str == L"..")
@@ -820,16 +822,12 @@ bool TFilePath::isUneditable() const {
 
 //-----------------------------------------------------------------------------
 TFilePath TFilePath::withType(const std::string &type) const {
-  if (type.length() >= 2 && type.substr(0, 2) == "..") {
-    qWarning("Invalid type: %s", type.c_str());
-    return *this;
-  }
-
-  int i            = getLastSlash(m_path);  // look for the last slash
-  std::wstring str = m_path.substr(i + 1);  // str is the path without parentdir
+  assert(type.length() < 2 || type.substr(0, 2) != "..");
+  int i            = getLastSlash(m_path);  // cerco l'ultimo slash
+  std::wstring str = m_path.substr(i + 1);  // str e' il path senza parentdir
   int j            = str.rfind(L'.');
   if (j == (int)std::wstring::npos || str == L"..")
-  // the original path has no type
+  // il path originale non ha tipo
   {
     if (type == "")
       return *this;
@@ -838,7 +836,7 @@ TFilePath TFilePath::withType(const std::string &type) const {
     else
       return TFilePath(m_path + ::to_wstring("." + type));
   } else
-  // the original path already has a type
+  // il path originale ha gia' il tipo
   {
     if (type == "")
       return TFilePath(m_path.substr(0, i + j + 1));
@@ -872,8 +870,8 @@ TFilePath TFilePath::withName(const std::wstring &name) const {
     return TFilePath(ret);
   }
 
-  int i            = getLastSlash(m_path);  // look for the last slash
-  std::wstring str = m_path.substr(i + 1);  // str is the path without parentdir
+  int i            = getLastSlash(m_path);  // cerco l'ultimo slash
+  std::wstring str = m_path.substr(i + 1);  // str e' il path senza parentdir
   QString type     = QString::fromStdString(getType()).toLower();
   int j;
   j = str.rfind(L'.');
@@ -903,7 +901,7 @@ TFilePath TFilePath::withName(const std::wstring &name) const {
 //-----------------------------------------------------------------------------
 
 TFilePath TFilePath::withParentDir(const TFilePath &dir) const {
-  int i = getLastSlash(m_path);  // look for the last slash
+  int i = getLastSlash(m_path);  // cerco l'ultimo slash
   return dir + TFilePath(m_path.substr(i + 1));
 }
 
@@ -938,14 +936,10 @@ TFilePath TFilePath::withFrame(const TFrameId &frame,
   //-----------------
 
   const std::wstring dot = L".", dotDot = L"..";
-  int i            = getLastSlash(m_path);  // look for the last slash
-  std::wstring str = m_path.substr(i + 1);  // str is the path without parentdir
+  int i            = getLastSlash(m_path);  // cerco l'ultimo slash
+  std::wstring str = m_path.substr(i + 1);  // str e' il path senza parentdir
   QString type     = QString::fromStdString(getType()).toLower();
-  if (str == dot || str == dotDot) {
-    qWarning("Invalid path for frame operation: %ls", str.c_str());
-    return *this;
-  }
-
+  assert(str != dot && str != dotDot);
   int j          = str.rfind(L'.');
   const char *ch = ".";
   // Override format input because it may be wrong.
@@ -1007,21 +1001,21 @@ TFilePath TFilePath::withFrame(const TFrameId &frame,
 bool TFilePath::isAncestorOf(const TFilePath &possibleDescendent) const {
   size_t len = m_path.length();
   if (len == 0) {
-    // the dot is ancestor of all non-absolute paths
+    // il punto e' antenato di tutti i path non assoluti
     return !possibleDescendent.isAbsolute();
   }
 
-  // a path is ancestor of itself
+  // un path e' antenato di se stesso
   if (m_path == possibleDescendent.m_path) return true;
 
   int possibleDescendentLen = possibleDescendent.m_path.length();
-  // otherwise the ancestor must be shorter
+  // altrimenti l'antenato deve essere piu' corto
   if ((int)len >= possibleDescendentLen) return false;
-  // and must match the first part of the descendant
+  // e deve coincidere con la prima parte del discendente
   if (toLower(m_path) != toLower(possibleDescendent.m_path.substr(0, len)))
     return false;
-  // if the ancestor does not end with slash there must be a slash in the
-  // descendant, right after
+  // se l'antenato non finisce con slash ci deve essere uno slash nel
+  // discendente, subito dopo
   if (m_path[len - 1] != wslash && possibleDescendent.m_path[len] != wslash)
     return false;
 
@@ -1092,17 +1086,7 @@ QString TFilePath::fidRegExpStr() {
 //-----------------------------------------------------------------------------
 
 TFilePath::TFilePathInfo TFilePath::analyzePath() const {
-  // analyzePath should only be called when m_useStandard is false
-  if (TFilePath::m_useStandard) {
-#ifdef QT_DEBUG
-    qWarning(
-        "analyzePath called with m_useStandard enabled - returning empty "
-        "TFilePathInfo");
-#endif
-    // Return empty structure since standard path analysis should be used
-    // instead
-    return TFilePathInfo();
-  }
+  assert(!TFilePath::m_useStandard);
 
   TFilePath::TFilePathInfo info;
 
@@ -1123,54 +1107,73 @@ TFilePath::TFilePathInfo TFilePath::analyzePath() const {
   // Extension: letters other than "._" or  \/:,;*?"<>|  or " "(space)
   const QString extensionRegExp("([^\\._ \\\\/:,;*?\"<>|]+)");
 
-  // Modern QRegularExpression implementation
-  QRegularExpression rx("^(?:" + levelNameRegExp + ")?" + sepCharRegExp +
-                        "(?:" + fIdRegExp + ")?" + "\\." + extensionRegExp +
-                        "$");
-  QRegularExpressionMatch match = rx.match(fileName);
+  // ignore frame numbers on non-sequential (i.e. movie) extension case :
+  // hoge_0001.mp4
+  // QRegExp rx_mf("^" + levelNameRegExp + "\\." + extensionRegExp + "$");
+  // if (rx_mf.indexIn(levelName) != -1) {
+  //  QString ext = rx_mf.cap(2);
+  //  if (!checkForSeqNum(ext)) {
+  //    info.levelName = rx_mf.cap(1);
+  //    info.sepChar = QChar();
+  //    info.fId = TFrameId(TFrameId::NO_FRAME, 0, 0); // initialize with NO_PAD
+  //    info.extension = ext;
+  //    return info;
+  //  }
+  //}
 
-  if (match.hasMatch()) {
-    info.levelName = match.captured(1);
-    info.sepChar =
-        match.captured(2).isEmpty() ? QChar() : match.captured(2).at(0);
-    info.extension = match.captured(5);
-
-    // ignore frame numbers on non-sequential (i.e. movie) extension case
+  // hogehoge.0001a.jpg
+  // empty frame case : hogehoge..jpg
+  // empty level name case : ..jpg   .0001a.jpg
+  QRegExp rx("^(?:" + levelNameRegExp + ")?" + sepCharRegExp +
+             "(?:" + fIdRegExp + ")?" + "\\." + extensionRegExp + "$");
+  if (rx.indexIn(fileName) != -1) {
+    assert(rx.captureCount() == 5);
+    info.levelName = rx.cap(1);
+    info.sepChar   = rx.cap(2)[0];
+    info.extension = rx.cap(5);
+    // ignore frame numbers on non-sequential (i.e. movie) extension case :
+    // hoge_0001.mp4
     if (!checkForSeqNum(info.extension)) {
-      info.levelName = match.captured(1) + match.captured(2);
-      if (!match.captured(3).isEmpty()) info.levelName += match.captured(3);
-      if (!match.captured(4).isEmpty()) info.levelName += match.captured(4);
+      info.levelName = rx.cap(1) + rx.cap(2);
+      if (!rx.cap(3).isEmpty()) info.levelName += rx.cap(3);
+      if (!rx.cap(4).isEmpty()) info.levelName += rx.cap(4);
       info.sepChar = QChar();
       info.fId = TFrameId(TFrameId::NO_FRAME, 0, 0);  // initialize with NO_PAD
     } else {
-      QString numberStr = match.captured(3);
-      if (numberStr.isEmpty()) {  // empty frame case : hogehoge..jpg
+      QString numberStr = rx.cap(3);
+      if (numberStr.isEmpty())  // empty frame case : hogehoge..jpg
         info.fId =
             TFrameId(TFrameId::EMPTY_FRAME, 0, 4, info.sepChar.toLatin1());
-      } else {
+      else {
         int number  = numberStr.toInt();
         int padding = 0;
-        if (!numberStr.isEmpty() && numberStr[0] == '0') {  // with padding
-          padding = numberStr.length();
-        }
+        if (numberStr[0] == "0")  // with padding
+          padding = numberStr.count();
         QString suffix;
-        if (!match.captured(4).isEmpty()) suffix = match.captured(4);
+        if (!rx.cap(4).isEmpty()) suffix = rx.cap(4);
         info.fId = TFrameId(number, suffix, padding, info.sepChar.toLatin1());
       }
     }
     return info;
   }
 
+  // QRegExp rx_ef("^" + levelNameRegExp + sepCharRegExp + "\\." +
+  // extensionRegExp + "$"); if (rx_ef.indexIn(levelName) != -1) {
+  //  info.levelName = rx_ef.cap(1);
+  //  info.sepChar = rx_ef.cap(2)[0];
+  //  info.fId = TFrameId(TFrameId::EMPTY_FRAME, 0, 4, info.sepChar.toLatin1());
+  //  info.extension = rx_ef.cap(3);
+  //  return info;
+  //}
+
   // no frame case : hogehoge.jpg
   // no level name case : .jpg
-  QRegularExpression rx_nf("^(?:" + levelNameRegExp + ")?\\." +
-                           extensionRegExp + "$");
-  match = rx_nf.match(fileName);
-  if (match.hasMatch()) {
-    if (!match.captured(1).isEmpty()) info.levelName = match.captured(1);
+  QRegExp rx_nf("^(?:" + levelNameRegExp + ")?\\." + extensionRegExp + "$");
+  if (rx_nf.indexIn(fileName) != -1) {
+    if (!rx_nf.cap(1).isEmpty()) info.levelName = rx_nf.cap(1);
     info.sepChar = QChar();
     info.fId = TFrameId(TFrameId::NO_FRAME, 0, 0);  // initialize with NO_PAD
-    info.extension = match.captured(2);
+    info.extension = rx_nf.cap(2);
     return info;
   }
 
