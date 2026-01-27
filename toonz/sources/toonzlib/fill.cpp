@@ -427,29 +427,20 @@ void extendInk2InkFill(const TRasterCM32P &r, const TPoint &p, bool right,
   auto checkIfClosed = [&](const extendSeed &seed) -> bool {
     // Check if leak
     int tone, oldTone;
-    if (right) {
-      tone = (r->pixels(yy - dy) + seed.xb)->getTone();
-      if (tone == TPixelCM32::getMaxTone()) return false;
+    if (right)
       for (int x = seed.xb; x > seed.xd; x--) {
-        oldTone = tone;
-        tone    = (r->pixels(yy - dy) + x)->getTone();
-        if (tone <= oldTone) continue;
-        if (tone < (r->pixels(yy) + x)->getTone()) {
-          return false;
-        }
+        tone    = (r->pixels(seed.y + dy) + x)->getTone();
+        oldTone = (r->pixels(seed.y) + x)->getTone();
+        if (oldTone == 0) continue;
+        if (tone >= oldTone) return false;
       }
-    } else {
-      tone = (r->pixels(yy - dy) + seed.xa)->getTone();
-      if (tone == TPixelCM32::getMaxTone()) return false;
-      for (int x = seed.xa; x > seed.xc; x++) {
-        oldTone = tone;
-        tone    = (r->pixels(yy - dy) + x)->getTone();
-        if (tone <= oldTone) continue;
-        if (tone < (r->pixels(yy) + x)->getTone()) {
-          return false;
-        }
+    else
+      for (int x = seed.xa; x < seed.xc; x++) {
+        tone    = (r->pixels(seed.y + dy) + x)->getTone();
+        oldTone = (r->pixels(seed.y) + x)->getTone();
+        if (oldTone == 0) continue;
+        if (tone >= oldTone) return false;
       }
-    }
     return true;
   };
 
@@ -486,9 +477,14 @@ void extendInk2InkFill(const TRasterCM32P &r, const TPoint &p, bool right,
     }
 
     if ((r->pixels(yy) + xx)->getInk() != paint) {
-      if (checkIfClosed(seed)) {
-        for (const extendSeed &s : seeds) extendAndFill(s);
-        seeds.clear();
+      while (!seeds.empty()) {
+        seed = seeds.back();
+        if (checkIfClosed(seed)) {
+          for (const extendSeed &s : seeds) extendAndFill(s);
+          seeds.clear();
+        } else {
+          seeds.pop_back();
+        }
       }
       return;
     }
@@ -503,10 +499,11 @@ bool extendNormalFill(const TRasterCM32P &r, const TPoint &p, bool right,
   struct locals {
     static bool hasValidNeighbors(const TRasterCM32P &r, const int x,
                                   const int y, const int paint) {
-      int fourCount      = 0;
-      int eightCount     = 0;
-      int purePaintCount = 0;
-      TRect bounds       = r->getBounds();
+      int fourCount  = 0;
+      int eightCount = 0;
+      int fourEmpty  = 0;
+      int eightEmpty = 0;
+      TRect bounds   = r->getBounds();
 
       const int dx4[] = {0, -1, 1, 0};
       const int dy4[] = {-1, 0, 0, 1};
@@ -523,18 +520,24 @@ bool extendNormalFill(const TRasterCM32P &r, const TPoint &p, bool right,
           int neighbortone     = neighbor->getTone();
           if (neighbortone <= selfTone || neighbor->getPaint() == paint)
             ++fourCount;
-          if (neighbortone == TPixelCM32::getMaxTone()) purePaintCount++;
+          if (neighbortone == TPixelCM32::getMaxTone()) fourEmpty++;
         }
       }
-      if (purePaintCount >= 3) return false;
-
+      if (fourEmpty >= 3) return false;
+      if (fourEmpty == 0) return true;
+      
+      // fourEmpty = 3 or 2
       for (int i = 0; i < 4; ++i) {
         int nx = x + dx8[i], ny = y + dy8[i];
         if (bounds.contains(TPoint(nx, ny))) {
           TPixelCM32 *neighbor = r->pixels(ny) + nx;
-          if (neighbor->getTone() <= selfTone) ++eightCount;
+          int neighbortone     = neighbor->getTone();
+          if (neighbortone <= selfTone) ++eightCount;
+          if (neighbortone == TPixelCM32::getMaxTone()) eightEmpty++;
         }
       }
+
+      if (eightEmpty + fourEmpty >= 4) return false;
       return (fourCount >= 3) || (fourCount == 2 && eightCount >= 3);
     }
   };
