@@ -19,9 +19,10 @@
 #include <QString>
 #include <QObject>
 #include <QMap>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QVariant>
 #include <QDataStream>
+#include <QMetaType>
 
 #undef DVAPI
 #undef DVVAR
@@ -34,12 +35,10 @@
 #endif
 
 //==============================================================
-
 //    Forward declarations
+//==============================================================
 
 class QSettings;
-
-//==============================================================
 
 //**********************************************************************************
 //    Preferences  declaration
@@ -75,16 +74,14 @@ class DVAPI Preferences final : public QObject  // singleton
 public:
   struct LevelFormat {
     QString m_name;  //!< Name displayed for the format.
-    QRegExp
-        m_pathFormat;  //!< <TT>[default: ".*"]</TT>Used to recognize levels in
-                       //!  the format. It's case <I>in</I>sensitive.
+    QRegularExpression m_pathFormat;
     LevelOptions m_options;  //!< Options associated to levels in the format.
     int m_priority;  //!< <TT>[default: 1]</TT> Priority value for the format.
     //!  Higher priority means that the format is matched first.
   public:
     LevelFormat(const QString &name = QString())
         : m_name(name)
-        , m_pathFormat(".*", Qt::CaseInsensitive)
+        , m_pathFormat(".*", QRegularExpression::CaseInsensitiveOption)
         , m_priority(1) {}
 
     bool matches(const TFilePath &fp) const;
@@ -98,7 +95,7 @@ public:
                     header)     */
   };
 
-  enum SnappingTarge { SnapStrokes, SnapGuides, SnapAll };
+  enum SnappingTarget { SnapStrokes, SnapGuides, SnapAll };
 
   enum PathAliasPriority {
     ProjectFolderAliases = 0,
@@ -190,9 +187,7 @@ public:
   PathAliasPriority getPathAliasPriority() const {
     return PathAliasPriority(getIntValue(pathAliasPriority));
   }
-  bool isLazyLoadRoomsEnabled() {
-      return getBoolValue(lazyLoadRooms);
-  }
+  bool isLazyLoadRoomsEnabled() { return getBoolValue(lazyLoadRooms); }
 
   // Interface  tab
   QStringList getStyleSheetList() const { return m_styleSheetList; }
@@ -472,7 +467,9 @@ public:
   bool previewAlwaysOpenNewFlipEnabled() const {
     return getBoolValue(previewAlwaysOpenNewFlip);
   }
-  bool fitToFlipbookEnabled() const { return getBoolValue(fitToFlipbookWhenPreview); }
+  bool fitToFlipbookEnabled() const {
+    return getBoolValue(fitToFlipbookWhenPreview);
+  }
   bool isGeneratedMovieViewEnabled() const {
     return getBoolValue(generatedMovieViewEnabled);
   }
