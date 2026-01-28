@@ -1239,6 +1239,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
            .arg(LutManager::instance()->getMonitorName())},
       {displayIn30bit, tr("30bit Display*")},
       {showIconsInMenu, tr("Show Icons In Menu*")},
+      {showRoomBindButtons, tr("Show Room Bind Buttons*")},
       {viewerIndicatorEnabled, tr("Show Viewer Indicators")},
 
       // Visualization
@@ -1797,6 +1798,7 @@ QWidget* PreferencesPopup::createInterfacePage() {
   row = lay->rowCount();
   lay->addWidget(check30bitBtn, row - 1, 2, Qt::AlignRight);
   insertUI(showIconsInMenu, lay);
+  insertUI(showRoomBindButtons, lay);
 
   lay->setRowStretch(lay->rowCount(), 1);
   insertFootNote(lay);
