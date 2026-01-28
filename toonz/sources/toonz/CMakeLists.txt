@@ -392,6 +392,7 @@ set(SOURCES
     tvpjson_io.cpp
     exportxsheetpdf.cpp
     custompanelmanager.cpp
+    toolpresetcommandmanager.cpp
     custompaneleditorpopup.cpp
     convertfolderpopup.cpp
     exportcameratrackpopup.cpp
