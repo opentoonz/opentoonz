@@ -2508,6 +2508,8 @@ void MainWindow::defineActions() {
                           "history");
   createMenuWindowsAction(MI_OpenBrushPresetPanel, QT_TR_NOOP("&Brush Presets"), "Ctrl+Shift+B",
                           "brush");
+  createMenuWindowsAction(MI_OpenToolPropertiesPanel, QT_TR_NOOP("&Tool Properties"), "Ctrl+Shift+P",
+                          "properties");
   createMenuWindowsAction(MI_AudioRecording, QT_TR_NOOP("Record Audio"),
                           "Alt+A", "recordaudio");
   createMenuWindowsAction(MI_ResetRoomLayout,

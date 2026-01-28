@@ -91,6 +91,7 @@ set(MOC_HEADERS
     sceneviewercontextmenu.h
     scriptconsolepanel.h
     brushpresetpanel.h
+    toolpropertiespanel.h
     separatecolorspopup.h
     separatecolorsswatch.h
     shortcutpopup.h
@@ -304,6 +305,7 @@ set(SOURCES
     scenesettingspopup.cpp
     scriptconsolepanel.cpp
     brushpresetpanel.cpp
+    toolpropertiespanel.cpp
     shortcutpopup.cpp
     soundtrackexport.cpp
     startuppopup.cpp

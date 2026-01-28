@@ -8,6 +8,7 @@
 #include "exportpanel.h"
 #include "scriptconsolepanel.h"
 #include "brushpresetpanel.h"
+#include "toolpropertiespanel.h"
 
 #include "floatingpanelcommand.h"
 #include "subscenecommand.h"
