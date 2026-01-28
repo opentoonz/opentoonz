@@ -1815,4 +1815,13 @@ void SceneViewer::onToolSwitched() {
 
   onLevelChanged();
   update();
+//-----------------------------------------------------------------------------
+
+void SceneViewer::mouseZoom(const TMouseEvent &e) {
+  double d = m_oldY - e.m_pos.y;
+  m_oldY   = e.m_pos.y;
+  double f = exp(-d * 0.01);
+  m_factor = f;
+  zoom(m_center, f);
+  }
 }

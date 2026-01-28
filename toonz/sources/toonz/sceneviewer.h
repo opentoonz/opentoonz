@@ -93,7 +93,9 @@ class SceneViewer final : public TToolViewer,
   bool m_rotating                        = false;
   bool m_zooming                         = false;
   bool m_panning                         = false;
-  QPointF m_firstPanPoint;
+// zoom variables
+  double m_oldY;
+  double m_factor;  QPointF m_firstPanPoint;
   QPointF m_undoPoint;
   double m_scaleFactor;    // used for zoom gesture
   double m_rotationDelta;  // used for rotate gesture

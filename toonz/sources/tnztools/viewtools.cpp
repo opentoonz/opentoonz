@@ -50,7 +50,7 @@ public:
   }
   void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override {
     double d = m_oldY - e.m_pos.y;
-    m_oldX   = e.m_pos.x;
+    m_oldY   = e.m_pos.y;
     double f = exp(-d * 0.01);
     m_factor = f;
     m_viewer->zoom(m_center, f);
