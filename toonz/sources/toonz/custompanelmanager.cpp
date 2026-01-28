@@ -3,6 +3,10 @@
 #include "menubarcommandids.h"
 #include "floatingpanelcommand.h"
 #include "pane.h"
+#include "mainwindow.h"
+#include "shortcutpopup.h"
+#include "tapp.h"
+#include "toolpresetcommandmanager.h"
 
 // ToonzLib
 #include "toonz/toonzfolders.h"
@@ -111,6 +115,17 @@ void CustomPanelManager::loadCustomPanelEntries() {
   // in order to prevent double calling of the command
   menu->addAction(
       CommandManager::instance()->getAction(MI_CustomPanelEditor)->text());
+  
+  registerCustomPanelCommands();
+  
+  // Register tool presets as commands for Custom Panels
+  ToolPresetCommandManager::instance()->registerToolPresetCommands();
+  
+  // Register universal size commands
+  ToolPresetCommandManager::instance()->registerSizeCommands();
+  
+  // Initialize signal connections for automatic checked state updates
+  ToolPresetCommandManager::instance()->initialize();
 }
 
 //-----------------------------------------------------------------------------
@@ -136,17 +151,22 @@ TPanel* CustomPanelManager::createCustomPanel(const QString panelName,
   panel->setWindowTitle(panelName);
   panel->setWidget(customWidget);
 
+  // Enable room binding feature (handled by TPanel base class)
+  panel->addRoomBindButton();
+
   return panel;
 }
 
 //-----------------------------------------------------------------------------
 
 void CustomPanelManager::initializeControl(QWidget* customWidget) {
+  // Update checked states before initializing controls
+  ToolPresetCommandManager::instance()->updateCheckedStates();
+  
   // connect buttons and commands
   QList<QAbstractButton*> allButtons =
       customWidget->findChildren<QAbstractButton*>();
   for (auto button : allButtons) {
-    std::cout << button->objectName().toStdString() << std::endl;
     QAction* action = CommandManager::instance()->getAction(
         button->objectName().toStdString().c_str());
     if (!action) continue;
@@ -157,13 +177,31 @@ void CustomPanelManager::initializeControl(QWidget* customWidget) {
     if (QToolButton* tb = dynamic_cast<QToolButton*>(button)) {
       tb->setDefaultAction(action);
       tb->setObjectName("CustomPanelButton");
+      
+      // Build stylesheet with visible checked state
+      QString styleSheet;
+      
       if (tb->toolButtonStyle() == Qt::ToolButtonTextUnderIcon) {
         int padding = (tb->height() - button->iconSize().height() -
                        tb->font().pointSize() * 1.33) /
                       3;
-        if (padding > 0)
-          tb->setStyleSheet(QString("padding-top: %1;").arg(padding));
+        if (padding > 0) {
+          styleSheet = QString("QToolButton#CustomPanelButton { padding-top: %1; }").arg(padding);
+        }
       }
+      
+      // Add checked state styles ONLY for new commands
+      // (Brush Presets and Universal Sizes)
+      std::string cmdId = button->objectName().toStdString();
+      bool isBrushPreset = (cmdId.find("MI_BrushPreset_") == 0);
+      bool isUniversalSize = (cmdId.find("MI_ToolSize_") == 0);
+      
+      // No custom stylesheet - let buttons inherit colors from the application theme
+      // This ensures proper adaptation when the user switches themes
+      if (!styleSheet.isEmpty()) {
+        tb->setStyleSheet(styleSheet);
+      }
+      
       continue;
     }
 
@@ -181,6 +219,8 @@ void CustomPanelManager::initializeControl(QWidget* customWidget) {
     if (!button->text().isEmpty()) button->setText(action->text());
 
     button->setIcon(action->icon());
+    
+    // No custom stylesheet for checked buttons - let them inherit from theme
     // button->addAction(action);
   }
 
@@ -216,6 +256,110 @@ void CustomPanelManager::initializeControl(QWidget* customWidget) {
       widget->setLayout(lay);
     }
   }
+}
+
+//-----------------------------------------------------------------------------
+
+void CustomPanelManager::registerCustomPanelCommands() {
+  TFilePath customPanelsFolder = customPaneFolderPath();
+  if (!TSystem::doesExistFileOrLevel(customPanelsFolder)) return;
+
+  TFilePathSet fileList =
+      TSystem::readDirectory(customPanelsFolder, false, true, false);
+  
+  QList<QString> currentPanels;
+  for (auto file : fileList) {
+    if (file.getType() != "ui") continue;
+    currentPanels.append(QString::fromStdString(file.getName()));
+  }
+  
+  m_registeredPanelIds.clear();
+
+  MainWindow* mainWindow = dynamic_cast<MainWindow*>(TApp::instance()->getMainWindow());
+  if (!mainWindow) return;
+
+  for (const QString& panelName : currentPanels) {
+    QString commandId = "MI_CustomPanel_" + panelName;
+    
+    QAction* existingAction = CommandManager::instance()->getAction(
+        commandId.toStdString().c_str(), false);
+    if (existingAction) {
+      m_registeredPanelIds.append(commandId);
+      continue;
+    }
+
+    // Improved display name for better searchability
+    // Replace underscores and hyphens with spaces for readability
+    QString cleanName = panelName;
+    cleanName.replace('_', ' ');
+    cleanName.replace('-', ' ');
+    
+    // Create display name with [Panel] prefix
+    QString displayName = "[Panel] " + cleanName;
+    
+    QAction* action = new DVAction(displayName, mainWindow);
+    mainWindow->addAction(action);
+    
+    // Define command with improved naming for search
+    // Add searchable keywords in the command definition
+    CommandManager::instance()->define(
+        commandId.toStdString().c_str(),
+        CustomPanelCommandType,  // Custom Panels subcategory under Windows
+        "",
+        action,
+        "");
+
+    class CustomPanelHandler : public CommandHandlerInterface {
+      QString m_panelName;
+    public:
+      CustomPanelHandler(const QString& name) : m_panelName(name) {}
+      void execute() override {
+        TMainWindow* currentRoom = TApp::instance()->getCurrentRoom();
+        if (!currentRoom) return;
+        
+        std::string panelType = ("Custom_" + m_panelName).toStdString();
+        QList<TPanel*> panels = currentRoom->findChildren<TPanel*>();
+        
+        for (TPanel* panel : panels) {
+          if (panel->getPanelType() == panelType && !panel->isHidden()) {
+            panel->close();
+            return;
+          }
+        }
+        
+        OpenFloatingPanel::getOrOpenFloatingPanel(panelType);
+      }
+    };
+    
+    CommandManager::instance()->setHandler(
+        commandId.toStdString().c_str(),
+        new CustomPanelHandler(panelName));
+
+    m_registeredPanelIds.append(commandId);
+  }
+  
+  // Notify ShortcutPopup to refresh if it's currently open
+  // This allows new custom panel commands to appear immediately without restarting
+  ShortcutPopup::refreshIfOpen();
+  
+  TFilePath shortcutsFile = ToonzFolder::getMyModuleDir() + TFilePath("shortcuts.ini");
+  if (!TFileStatus(shortcutsFile).doesExist()) return;
+  
+  QSettings settings(toQString(shortcutsFile), QSettings::IniFormat);
+  settings.beginGroup("shortcuts");
+  
+  for (const QString& commandId : m_registeredPanelIds) {
+    QString savedShortcut = settings.value(commandId, "").toString();
+    if (!savedShortcut.isEmpty()) {
+      QAction* action = CommandManager::instance()->getAction(
+          commandId.toStdString().c_str(), false);
+      if (action) {
+        action->setShortcut(QKeySequence(savedShortcut));
+      }
+    }
+  }
+  
+  settings.endGroup();
 }
 
 //-----------------------------------------------------------------------------
