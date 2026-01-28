@@ -2506,6 +2506,8 @@ void MainWindow::defineActions() {
                           "comboviewer");
   createMenuWindowsAction(MI_OpenHistoryPanel, QT_TR_NOOP("&History"), "Ctrl+H",
                           "history");
+  createMenuWindowsAction(MI_OpenBrushPresetPanel, QT_TR_NOOP("&Brush Presets"), "Ctrl+Shift+B",
+                          "brush");
   createMenuWindowsAction(MI_AudioRecording, QT_TR_NOOP("Record Audio"),
                           "Alt+A", "recordaudio");
   createMenuWindowsAction(MI_ResetRoomLayout,

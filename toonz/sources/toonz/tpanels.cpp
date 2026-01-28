@@ -7,6 +7,7 @@
 #include "viewerpane.h"
 #include "exportpanel.h"
 #include "scriptconsolepanel.h"
+#include "brushpresetpanel.h"
 
 #include "floatingpanelcommand.h"
 #include "subscenecommand.h"
@@ -1535,6 +1536,62 @@ OpenFloatingPanel openStopMotionPanelCommand(
 //-----------------------------------------------------------------------------
 
 #endif  // x64
+
+//=============================================================================
+// BrushPresetPanel - Dynamic brush preset management panel
+//-----------------------------------------------------------------------------
+
+class BrushPresetPanelFactory final : public TPanelFactory {
+public:
+  BrushPresetPanelFactory() : TPanelFactory("BrushPreset") {}
+
+  TPanel *createPanel(QWidget *parent) override {
+    BrushPresetPanel *panel = new BrushPresetPanel(parent);
+    panel->setObjectName(getPanelType());
+    panel->setWindowTitle(QObject::tr("Brush Presets"));
+    panel->setIsMaximizable(false);
+    
+    // Enable room binding feature
+    panel->addRoomBindButton();
+    
+    return panel;
+  }
+
+  void initialize(TPanel *panel) override { assert(0); }
+} brushPresetPanelFactory;
+
+//=============================================================================
+OpenFloatingPanel openBrushPresetPanelCommand(MI_OpenBrushPresetPanel, "BrushPreset",
+                                              QObject::tr("Brush Presets"));
+//-----------------------------------------------------------------------------
+
+//=============================================================================
+// Tool Properties Panel
+//-----------------------------------------------------------------------------
+
+class ToolPropertiesPanelFactory final : public TPanelFactory {
+public:
+  ToolPropertiesPanelFactory() : TPanelFactory("ToolProperties") {}
+
+  TPanel *createPanel(QWidget *parent) override {
+    ToolPropertiesPanel *panel = new ToolPropertiesPanel(parent);
+    panel->setObjectName(getPanelType());
+    panel->setWindowTitle(QObject::tr("Tool Properties"));
+    panel->setIsMaximizable(false);
+    
+    // Enable room binding feature
+    panel->addRoomBindButton();
+    
+    return panel;
+  }
+
+  void initialize(TPanel *panel) override { assert(0); }
+} toolPropertiesPanelFactory;
+
+//=============================================================================
+OpenFloatingPanel openToolPropertiesPanelCommand(MI_OpenToolPropertiesPanel, "ToolProperties",
+                                                  QObject::tr("Tool Properties"));
+//-----------------------------------------------------------------------------
 
 //=============================================================================
 // FxSettings
