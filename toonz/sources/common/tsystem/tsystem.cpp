@@ -501,7 +501,6 @@ public:
           case_compare = (a_char < b_char) ? 1 : 0;
         }
       }
-      i++;
     }
     return (case_compare == 1);
   }
