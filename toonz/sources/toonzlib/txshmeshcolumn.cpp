@@ -1,15 +1,19 @@
 
 
+#include "toonz/preferences.h"
+
+// TnzLib includes
+#include "toonz/tcolumnfx.h"
+#include "toonz/txshcell.h"
+#include "toonz/txshleveltypes.h"
+#include "toonz/txshmeshcolumn.h"
+#include "toonz/txshsimplelevel.h"
+
 // TnzCore includes
 #include "tstream.h"
 
-// TnzLib includes
-#include "toonz/txshcell.h"
-#include "toonz/tcolumnfx.h"
-#include "toonz/txshsimplelevel.h"
-#include "toonz/txshleveltypes.h"
-
-#include "toonz/txshmeshcolumn.h"
+// Qt includes
+#include <QRegularExpression>
 
 PERSIST_IDENTIFIER(TXshMeshColumn, "meshColumn")
 
@@ -18,25 +22,31 @@ PERSIST_IDENTIFIER(TXshMeshColumn, "meshColumn")
 //*******************************************************************************
 
 namespace {
-TFrameId qstringToFrameId(QString str) {
-  if (str.isEmpty() || str == "-1")
+TFrameId qstringToFrameId(const QString &str) {
+  if (str.isEmpty() || str == "-1") {
     return TFrameId::EMPTY_FRAME;
-  else if (str == "-" || str == "-2")
+  } else if (str == "-" || str == "-2") {
     return TFrameId::NO_FRAME;
+  }
 
   QString regExpStr = QString("^%1$").arg(TFilePath::fidRegExpStr());
-  QRegExp rx(regExpStr);
-  int pos = rx.indexIn(str);
-  if (pos < 0) return TFrameId();
-  if (rx.cap(2).isEmpty())
-    return TFrameId(rx.cap(1).toInt());
-  else
-    return TFrameId(rx.cap(1).toInt(), rx.cap(2));
+  QRegularExpression rx(regExpStr);
+  QRegularExpressionMatch match = rx.match(str);
+
+  if (!match.hasMatch()) {
+    return TFrameId();
+  }
+
+  if (match.captured(2).isEmpty()) {
+    return TFrameId(match.captured(1).toInt());
+  } else {
+    return TFrameId(match.captured(1).toInt(), match.captured(2));
+  }
 }
 }  // namespace
 
 //*******************************************************************************
-//    TXshMeshColumn  implementation
+//    TXshMeshColumn implementation
 //*******************************************************************************
 
 TXshMeshColumn::TXshMeshColumn() : TXshCellColumn(), m_iconVisible(false) {}
@@ -59,23 +69,32 @@ TXshColumn *TXshMeshColumn::clone() const {
 //------------------------------------------------------------------
 
 bool TXshMeshColumn::canSetCell(const TXshCell &cell) const {
+  if (cell.isEmpty()) {
+    return true;
+  }
+
   TXshSimpleLevel *sl = cell.getSimpleLevel();
-  return cell.isEmpty() || (sl && sl->getType() == MESH_XSHLEVEL);
+  return sl && sl->getType() == MESH_XSHLEVEL;
 }
 
 //------------------------------------------------------------------
 
 void TXshMeshColumn::saveData(TOStream &os) {
   os.child("status") << getStatusWord();
-  if (getOpacity() < 255) os.child("camerastand_opacity") << (int)getOpacity();
 
-  int r0, r1;
+  if (getOpacity() < 255) {
+    os.child("camerastand_opacity") << static_cast<int>(getOpacity());
+  }
+
+  int r0 = 0, r1 = 0;
   if (getRange(r0, r1)) {
     os.openChild("cells");
     {
       for (int r = r0; r <= r1; ++r) {
         TXshCell cell = getCell(r);
-        if (cell.isEmpty()) continue;
+        if (cell.isEmpty()) {
+          continue;
+        }
 
         TFrameId fid = cell.m_frameId;
         int n = 1, inc = 0, dr = fid.getNumber();
@@ -90,16 +109,21 @@ void TXshMeshColumn::saveData(TOStream &os) {
               fid2.getLetter().isEmpty()) {
             inc = cell2.m_frameId.getNumber() - dr;
             for (++n;; ++n) {
-              if (r + n > r1) break;
+              if (r + n > r1) {
+                break;
+              }
 
               cell2         = getCell(r + n);
               TFrameId fid2 = cell2.m_frameId;
 
               if (cell2.m_level.getPointer() != cell.m_level.getPointer() ||
-                  !fid2.getLetter().isEmpty())
+                  !fid2.getLetter().isEmpty()) {
                 break;
+              }
 
-              if (fid2.getNumber() != dr + n * inc) break;
+              if (fid2.getNumber() != dr + n * inc) {
+                break;
+              }
             }
           }
         }
@@ -111,7 +135,8 @@ void TXshMeshColumn::saveData(TOStream &os) {
     }
     os.closeChild();
   }
-  // cell marks
+
+  // Save cell marks
   saveCellMarks(os);
 }
 
@@ -121,25 +146,26 @@ void TXshMeshColumn::loadData(TIStream &is) {
   std::string tagName;
   while (is.openChild(tagName)) {
     if (tagName == "status") {
-      int status;
+      int status = 0;
       is >> status;
       setStatusWord(status);
-      if (status & eCamstandTransparent43) {
+
+      if ((status & eCamstandTransparent43) != 0) {
         setOpacity(128);
         status = status & ~eCamstandTransparent43;
       }
 
       is.closeChild();
     } else if (tagName == "camerastand_opacity") {
-      int opacity;
+      int opacity = 0;
       is >> opacity;
-      setOpacity((UCHAR)opacity);
+      setOpacity(static_cast<UCHAR>(opacity));
 
       is.closeChild();
     } else if (tagName == "cells") {
       while (is.openChild(tagName)) {
         if (tagName == "cell") {
-          TPersist *p = 0;
+          TPersist *p = nullptr;
           std::string str;
 
           int row = 1, rowCount = 1, increment = 0;
@@ -158,21 +184,23 @@ void TXshMeshColumn::loadData(TIStream &is) {
               TXshCell cell(xshLevel, fid);
               setCell(row++, cell);
 
-              // rowCount>1 => fid has not letter.
+              // rowCount > 1 => fid has no letter
               fidNumber += increment;
               fid = TFrameId(fidNumber);
             }
           }
 
           is.closeChild();
-        } else
+        } else {
           is.skipCurrentTag();
+        }
       }
 
       is.closeChild();
     } else if (loadCellMarks(tagName, is)) {
       is.closeChild();
-    } else
+    } else {
       is.skipCurrentTag();
+    }
   }
 }

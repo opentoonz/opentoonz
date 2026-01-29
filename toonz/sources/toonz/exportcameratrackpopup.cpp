@@ -7,11 +7,13 @@
 #include "mainwindow.h"
 #include "filebrowser.h"
 #include "menubarcommandids.h"
-//// TnzQt includes
+
+// TnzQt includes
 #include "toonzqt/colorfield.h"
 #include "toonzqt/filefield.h"
 #include "toonzqt/doublefield.h"
-//// TnzLib includes
+
+// TnzLib includes
 #include "toonz/txsheet.h"
 #include "toonz/tcamera.h"
 #include "toonz/txshlevel.h"
@@ -25,13 +27,15 @@
 #include "toonz/txsheethandle.h"
 #include "toonz/tscenehandle.h"
 #include "filebrowserpopup.h"
-//// TnzCore includes
+
+// TnzCore includes
 #include "trop.h"
 #include "tsystem.h"
 #include "tenv.h"
 #include "tropcm.h"
 #include "tpalette.h"
-//// Qt includes
+
+// Qt includes
 #include <QLabel>
 #include <QPushButton>
 #include <QImage>
@@ -47,7 +51,7 @@
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include <QGroupBox>
-#include <QRegExpValidator>
+#include <QRegularExpressionValidator>
 #include <QPolygonF>
 #include <QVector2D>
 #include <QFontMetricsF>
@@ -67,7 +71,7 @@ TEnv::IntVar CameraTrackExportLineBR("CameraTrackExportLineBR", 0);
 TEnv::IntVar CameraTrackExportGraduationInterval(
     "CameraTrackExportGraduationInterval", 1);
 TEnv::IntVar CameraTrackExportNumberAt("CameraTrackExportNumberAt",
-                                       (int)Qt::TopLeftCorner);
+                                       static_cast<int>(Qt::TopLeftCorner));
 TEnv::IntVar CameraTrackExportNumbersOnLine("CameraTrackExportNumbersOnLine",
                                             1);
 TEnv::StringVar CameraTrackExportFont("CameraTrackExportFont", "");
@@ -162,14 +166,14 @@ void CameraTrackPreviewPane::paintEvent(QPaintEvent* event) {
   QPainter painter(this);
   painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
   painter.setRenderHint(QPainter::Antialiasing, true);
-  QSize pmSize((double)m_pixmap.width() * m_scaleFactor,
-               (double)m_pixmap.height() * m_scaleFactor);
+  QSize pmSize(static_cast<double>(m_pixmap.width()) * m_scaleFactor,
+               static_cast<double>(m_pixmap.height()) * m_scaleFactor);
   painter.drawPixmap(
       0, 0,
       m_pixmap.scaled(pmSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
 
-void CameraTrackPreviewPane::setPixmap(QPixmap pm) {
+void CameraTrackPreviewPane::setPixmap(const QPixmap& pm) {
   m_pixmap = pm;
   resize(pm.size() * m_scaleFactor);
   update();
@@ -187,9 +191,10 @@ void CameraTrackPreviewPane::doZoom(double d_scale) {
 }
 
 void CameraTrackPreviewPane::fitScaleTo(QSize size) {
-  double tmp_scaleFactor =
-      std::min((double)size.width() / (double)m_pixmap.width(),
-               (double)size.height() / (double)m_pixmap.height());
+  double tmp_scaleFactor = std::min(
+      static_cast<double>(size.width()) / static_cast<double>(m_pixmap.width()),
+      static_cast<double>(size.height()) /
+          static_cast<double>(m_pixmap.height()));
 
   m_scaleFactor = tmp_scaleFactor;
   if (m_scaleFactor > 1.0)
@@ -216,7 +221,8 @@ void CameraTrackPreviewArea::mouseMoveEvent(QMouseEvent* e) {
 void CameraTrackPreviewArea::contextMenuEvent(QContextMenuEvent* event) {
   QMenu* menu        = new QMenu(this);
   QAction* fitAction = menu->addAction(tr("Fit To Window"));
-  connect(fitAction, SIGNAL(triggered()), this, SLOT(fitToWindow()));
+  connect(fitAction, &QAction::triggered, this,
+          &CameraTrackPreviewArea::fitToWindow);
   menu->exec(event->globalPos());
 }
 
@@ -225,33 +231,17 @@ void CameraTrackPreviewArea::fitToWindow() {
 }
 
 void CameraTrackPreviewArea::wheelEvent(QWheelEvent* event) {
+  QPoint numPixels  = event->pixelDelta();
+  QPoint numDegrees = event->angleDelta() / 8;
+
   int delta = 0;
-  switch (event->source()) {
-  case Qt::MouseEventNotSynthesized: {
-    delta = event->angleDelta().y();
-  }
-  case Qt::MouseEventSynthesizedBySystem: {
-    QPoint numPixels  = event->pixelDelta();
-    QPoint numDegrees = event->angleDelta() / 8;
-    if (!numPixels.isNull()) {
-      delta = event->pixelDelta().y();
-    } else if (!numDegrees.isNull()) {
-      QPoint numSteps = numDegrees / 15;
-      delta           = numSteps.y();
-    }
-    break;
-  }
 
-  default:  // Qt::MouseEventSynthesizedByQt,
-            // Qt::MouseEventSynthesizedByApplication
-  {
-    std::cout << "not supported event: Qt::MouseEventSynthesizedByQt, "
-                 "Qt::MouseEventSynthesizedByApplication"
-              << std::endl;
-    break;
+  if (!numPixels.isNull()) {
+    delta = numPixels.y();
+  } else if (!numDegrees.isNull()) {
+    QPoint numSteps = numDegrees / 15;
+    delta           = numSteps.y();
   }
-
-  }  // end switch
 
   if (delta == 0) {
     event->accept();
@@ -260,7 +250,6 @@ void CameraTrackPreviewArea::wheelEvent(QWheelEvent* event) {
 
   dynamic_cast<CameraTrackPreviewPane*>(widget())->doZoom((delta > 0) ? 0.1
                                                                       : -0.1);
-
   event->accept();
 }
 
@@ -309,16 +298,20 @@ ExportCameraTrackPopup::ExportCameraTrackPopup()
   m_bgOpacityField->setRange(0.0, 1.0);
   m_bgOpacityField->setValue(0.5);
 
-  m_cameraRectFramesEdit->setValidator(
-      new QRegExpValidator(QRegExp("^(\\d+,)*\\d+$"), this));
+  QRegularExpressionValidator* validator = new QRegularExpressionValidator(
+      QRegularExpression("^(\\d+,)*\\d+$"), this);
+  m_cameraRectFramesEdit->setValidator(validator);
   m_cameraRectFramesEdit->setToolTip(
       tr("Specify frame numbers where the camera rectangles will be drawn. "
          "Separate numbers by comma \",\" ."));
 
-  m_numberAtCombo->addItem(tr("Top Left"), (int)Qt::TopLeftCorner);
-  m_numberAtCombo->addItem(tr("Top Right"), (int)Qt::TopRightCorner);
-  m_numberAtCombo->addItem(tr("Bottom Left"), (int)Qt::BottomLeftCorner);
-  m_numberAtCombo->addItem(tr("Bottom Right"), (int)Qt::BottomRightCorner);
+  m_numberAtCombo->addItem(tr("Top Left"), static_cast<int>(Qt::TopLeftCorner));
+  m_numberAtCombo->addItem(tr("Top Right"),
+                           static_cast<int>(Qt::TopRightCorner));
+  m_numberAtCombo->addItem(tr("Bottom Left"),
+                           static_cast<int>(Qt::BottomLeftCorner));
+  m_numberAtCombo->addItem(tr("Bottom Right"),
+                           static_cast<int>(Qt::BottomRightCorner));
 
   m_graduationIntervalCombo->addItem(tr("None"), 0);
   m_graduationIntervalCombo->addItem(tr("All frames"), 1);
@@ -445,36 +438,43 @@ ExportCameraTrackPopup::ExportCameraTrackPopup()
 
   loadSettings();
 
-  connect(m_targetColumnCombo, SIGNAL(activated(int)), this,
-          SLOT(updatePreview()));
-  connect(m_bgOpacityField, SIGNAL(valueEditedByHand()), this,
-          SLOT(updatePreview()));
-  connect(m_lineColorFld, SIGNAL(colorChanged(const TPixel32&, bool)), this,
-          SLOT(updatePreview()));
-  connect(m_cameraRectOnKeysCB, SIGNAL(clicked(bool)), this,
-          SLOT(updatePreview()));
-  connect(m_cameraRectOnTagsCB, SIGNAL(clicked(bool)), this,
-          SLOT(updatePreview()));
-  connect(m_cameraRectFramesEdit, SIGNAL(editingFinished()), this,
-          SLOT(updatePreview()));
-  connect(m_lineTL_CB, SIGNAL(clicked(bool)), this, SLOT(updatePreview()));
-  connect(m_lineTR_CB, SIGNAL(clicked(bool)), this, SLOT(updatePreview()));
-  connect(m_lineCenter_CB, SIGNAL(clicked(bool)), this, SLOT(updatePreview()));
-  connect(m_lineBL_CB, SIGNAL(clicked(bool)), this, SLOT(updatePreview()));
-  connect(m_lineBR_CB, SIGNAL(clicked(bool)), this, SLOT(updatePreview()));
-  connect(m_graduationIntervalCombo, SIGNAL(activated(int)), this,
-          SLOT(updatePreview()));
+  connect(m_targetColumnCombo, QOverload<int>::of(&QComboBox::activated), this,
+          &ExportCameraTrackPopup::updatePreview);
+  connect(m_bgOpacityField, &DVGui::DoubleField::valueEditedByHand, this,
+          &ExportCameraTrackPopup::updatePreview);
+  connect(m_lineColorFld, &DVGui::ColorField::colorChanged, this,
+          &ExportCameraTrackPopup::updatePreview);
+  connect(m_cameraRectOnKeysCB, &QCheckBox::clicked, this,
+          &ExportCameraTrackPopup::updatePreview);
+  connect(m_cameraRectOnTagsCB, &QCheckBox::clicked, this,
+          &ExportCameraTrackPopup::updatePreview);
+  connect(m_cameraRectFramesEdit, &QLineEdit::editingFinished, this,
+          &ExportCameraTrackPopup::updatePreview);
+  connect(m_lineTL_CB, &QCheckBox::clicked, this,
+          &ExportCameraTrackPopup::updatePreview);
+  connect(m_lineTR_CB, &QCheckBox::clicked, this,
+          &ExportCameraTrackPopup::updatePreview);
+  connect(m_lineCenter_CB, &QCheckBox::clicked, this,
+          &ExportCameraTrackPopup::updatePreview);
+  connect(m_lineBL_CB, &QCheckBox::clicked, this,
+          &ExportCameraTrackPopup::updatePreview);
+  connect(m_lineBR_CB, &QCheckBox::clicked, this,
+          &ExportCameraTrackPopup::updatePreview);
+  connect(m_graduationIntervalCombo, QOverload<int>::of(&QComboBox::activated),
+          this, &ExportCameraTrackPopup::updatePreview);
 
-  connect(m_numberAtCombo, SIGNAL(activated(int)), this, SLOT(updatePreview()));
-  connect(m_numbersOnLineCB, SIGNAL(clicked(bool)), this,
-          SLOT(updatePreview()));
-  connect(m_fontCombo, SIGNAL(currentFontChanged(const QFont&)), this,
-          SLOT(updatePreview()));
-  connect(m_fontSizeEdit, SIGNAL(editingFinished()), this,
-          SLOT(updatePreview()));
+  connect(m_numberAtCombo, QOverload<int>::of(&QComboBox::activated), this,
+          &ExportCameraTrackPopup::updatePreview);
+  connect(m_numbersOnLineCB, &QCheckBox::clicked, this,
+          &ExportCameraTrackPopup::updatePreview);
+  connect(m_fontCombo, &QFontComboBox::currentFontChanged, this,
+          &ExportCameraTrackPopup::updatePreview);
+  connect(m_fontSizeEdit, &DVGui::IntLineEdit::editingFinished, this,
+          &ExportCameraTrackPopup::updatePreview);
 
-  connect(cancelButton, SIGNAL(clicked()), this, SLOT(close()));
-  connect(exportButton, SIGNAL(clicked()), this, SLOT(onExport()));
+  connect(cancelButton, &QPushButton::clicked, this, &QWidget::close);
+  connect(exportButton, &QPushButton::clicked, this,
+          &ExportCameraTrackPopup::onExport);
 }
 
 //--------------------------------------------------------------
@@ -516,9 +516,9 @@ void ExportCameraTrackPopup::loadSettings() {
   m_lineBR_CB->setChecked(CameraTrackExportLineBR != 0);
   m_graduationIntervalCombo->setCurrentIndex(
       m_graduationIntervalCombo->findData(
-          (int)CameraTrackExportGraduationInterval));
+          static_cast<int>(CameraTrackExportGraduationInterval)));
   m_numberAtCombo->setCurrentIndex(
-      m_numberAtCombo->findData((int)CameraTrackExportNumberAt));
+      m_numberAtCombo->findData(static_cast<int>(CameraTrackExportNumberAt)));
   m_numbersOnLineCB->setChecked(CameraTrackExportNumbersOnLine != 0);
   QString tmplFont = QString::fromStdString(CameraTrackExportFont);
   if (!tmplFont.isEmpty()) m_fontCombo->setCurrentFont(QFont(tmplFont));
@@ -546,7 +546,7 @@ void ExportCameraTrackPopup::updateTargetColumnComboItems() {
     xsh->getCellRange(col, r0, r1);
     if (r1 < 0) continue;
     for (int r = r0; r <= r1; r++)
-      if (level = xsh->getCell(r, col).m_level) {
+      if ((level = xsh->getCell(r, col).m_level)) {
         break;
       }
 
@@ -580,7 +580,7 @@ QImage ExportCameraTrackPopup::generateCameraTrackImg(
   xsh->getCellRange(info.columnId, r0, r1);
   if (r1 < 0) return QImage();
   for (int r = r0; r <= r1; r++)
-    if (level = xsh->getCell(r, info.columnId).m_level) {
+    if ((level = xsh->getCell(r, info.columnId).m_level)) {
       fId = xsh->getCell(r, info.columnId).getFrameId();
       break;
     }
@@ -615,8 +615,8 @@ QImage ExportCameraTrackPopup::generateCameraTrackImg(
 
   TPointD imgDpi = sl->getImageDpi();
   if (imgDpi != TPointD()) {
-    img.setDotsPerMeterX((int)std::round(imgDpi.x / 0.0254));
-    img.setDotsPerMeterY((int)std::round(imgDpi.y / 0.0254));
+    img.setDotsPerMeterX(static_cast<int>(std::round(imgDpi.x / 0.0254)));
+    img.setDotsPerMeterY(static_cast<int>(std::round(imgDpi.y / 0.0254)));
   }
 
   // draw
@@ -633,11 +633,15 @@ QImage ExportCameraTrackPopup::generateCameraTrackImg(
   QList<QMap<int, QPointF>>
       cornerPointsTrack;  // [ CornerId, Position ] for each frame
 
-  if (info.lineTL) trackPaths.insert((int)TopLeft, QPainterPath());
-  if (info.lineTR) trackPaths.insert((int)TopRight, QPainterPath());
-  if (info.lineCenter) trackPaths.insert((int)Center, QPainterPath());
-  if (info.lineBL) trackPaths.insert((int)BottomLeft, QPainterPath());
-  if (info.lineBR) trackPaths.insert((int)BottomRight, QPainterPath());
+  if (info.lineTL) trackPaths.insert(static_cast<int>(TopLeft), QPainterPath());
+  if (info.lineTR)
+    trackPaths.insert(static_cast<int>(TopRight), QPainterPath());
+  if (info.lineCenter)
+    trackPaths.insert(static_cast<int>(Center), QPainterPath());
+  if (info.lineBL)
+    trackPaths.insert(static_cast<int>(BottomLeft), QPainterPath());
+  if (info.lineBR)
+    trackPaths.insert(static_cast<int>(BottomRight), QPainterPath());
 
   TAffine aff;
   TAffine dpiAffInv = getDpiAffine(sl.getPointer(), fId, true).inv();
@@ -646,14 +650,14 @@ QImage ExportCameraTrackPopup::generateCameraTrackImg(
   TStageObjectId colId = TStageObjectId::ColumnId(info.columnId);
 
   QMap<int, TPointD> camCorners = {
-      {(int)TopLeft, TPointD(-camDim.lx / 2, camDim.ly / 2)},
-      {(int)TopRight, TPointD(camDim.lx / 2, camDim.ly / 2)},
-      {(int)BottomLeft, TPointD(-camDim.lx / 2, -camDim.ly / 2)},
-      {(int)BottomRight, TPointD(camDim.lx / 2, -camDim.ly / 2)},
-      {(int)Center, TPointD()}};
+      {static_cast<int>(TopLeft), TPointD(-camDim.lx / 2, camDim.ly / 2)},
+      {static_cast<int>(TopRight), TPointD(camDim.lx / 2, camDim.ly / 2)},
+      {static_cast<int>(BottomLeft), TPointD(-camDim.lx / 2, -camDim.ly / 2)},
+      {static_cast<int>(BottomRight), TPointD(camDim.lx / 2, -camDim.ly / 2)},
+      {static_cast<int>(Center), TPointD()}};
 
   for (int f = 0; f < scene->getFrameCount(); f++) {
-    getCameraPlacement(aff, xsh, (double)f, colId, cameraId);
+    getCameraPlacement(aff, xsh, static_cast<double>(f), colId, cameraId);
     TAffine affTmp = dpiAffInv * aff * camDpiAff;
     //  corner points
     QMap<int, QPointF> cornerPoints;
@@ -667,8 +671,8 @@ QImage ExportCameraTrackPopup::generateCameraTrackImg(
 
     // track paths will plot every 0.1 frames
     for (int df = 0; df < 10; df++) {
-      double tmpF = (double)f + (double)df * 0.1;
-      getCameraPlacement(aff, xsh, (double)tmpF, colId, cameraId);
+      double tmpF = static_cast<double>(f) + static_cast<double>(df) * 0.1;
+      getCameraPlacement(aff, xsh, tmpF, colId, cameraId);
       affTmp = dpiAffInv * aff * camDpiAff;
 
       for (int c = TopLeft; c <= Center; c++) {
@@ -732,9 +736,9 @@ QImage ExportCameraTrackPopup::generateCameraTrackImg(
         cornerPoints[TopLeft] * 0.49 + cornerPoints[BottomRight] * 0.51,
         cornerPoints[TopRight] * 0.51 + cornerPoints[BottomLeft] * 0.49,
         cornerPoints[TopRight] * 0.49 + cornerPoints[BottomLeft] * 0.51};
-    QPointF textPos = cornerPoints[(int)info.numberAt];
+    QPointF textPos = cornerPoints[static_cast<int>(info.numberAt)];
     int oppositeId;
-    switch ((int)info.numberAt) {
+    switch (static_cast<int>(info.numberAt)) {
     case TopLeft:
       oppositeId = TopRight;
       break;
@@ -811,7 +815,7 @@ QImage ExportCameraTrackPopup::generateCameraTrackImg(
   // track lines
   QMap<int, QPainterPath>::const_iterator itr = trackPaths.constBegin();
   while (itr != trackPaths.constEnd()) {
-    if (info.lineCenter && itr.key() != Center)
+    if (info.lineCenter && itr.key() != static_cast<int>(Center))
       p.setPen(QPen(info.lineColor, 1, Qt::DashLine));
     else
       p.setPen(QPen(info.lineColor, 1));
@@ -820,7 +824,7 @@ QImage ExportCameraTrackPopup::generateCameraTrackImg(
     p.drawPath(itr.value());
 
     if (info.graduationInterval == 0 ||
-        (info.lineCenter && itr.key() != Center)) {
+        (info.lineCenter && itr.key() != static_cast<int>(Center))) {
       ++itr;
       continue;
     }
@@ -846,7 +850,8 @@ QImage ExportCameraTrackPopup::generateCameraTrackImg(
 
       // draw frame
       if (!info.numbersOnLine) continue;
-      if (itr.key() != Center && rectFrames.contains(f)) continue;
+      if (itr.key() != static_cast<int>(Center) && rectFrames.contains(f))
+        continue;
 
       bool found = false;
 
@@ -889,7 +894,9 @@ void ExportCameraTrackPopup::getInfoFromUI(ExportCameraTrackInfo& info) {
   // appearance settimgs
   info.bgOpacity    = m_bgOpacityField->getValue();
   TPixel32 lineTCol = m_lineColorFld->getColor();
-  info.lineColor    = QColor((int)lineTCol.r, (int)lineTCol.g, (int)lineTCol.b);
+  info.lineColor =
+      QColor(static_cast<int>(lineTCol.r), static_cast<int>(lineTCol.g),
+             static_cast<int>(lineTCol.b));
   // camera rect settings
   info.cameraRectOnKeys = m_cameraRectOnKeysCB->isChecked();
   info.cameraRectOnTags = m_cameraRectOnTagsCB->isChecked();
@@ -908,10 +915,10 @@ void ExportCameraTrackPopup::getInfoFromUI(ExportCameraTrackInfo& info) {
   info.lineBR             = m_lineBR_CB->isChecked();
   info.graduationInterval = m_graduationIntervalCombo->currentData().toInt();
   // frame number settings
-  info.numberAt      = (Qt::Corner)(m_numberAtCombo->currentData().toInt());
+  info.numberAt =
+      static_cast<Qt::Corner>(m_numberAtCombo->currentData().toInt());
   info.numbersOnLine = m_numbersOnLineCB->isChecked();
-  ;
-  info.font = m_fontCombo->currentFont();
+  info.font          = m_fontCombo->currentFont();
   info.font.setPixelSize(m_fontSizeEdit->getValue());
 }
 
@@ -938,7 +945,7 @@ void ExportCameraTrackPopup::onExport() {
 
   ToonzScene* scene = TApp::instance()->getCurrentScene()->getScene();
 
-  static GenericSaveFilePopup* savePopup = 0;
+  static GenericSaveFilePopup* savePopup = nullptr;
   if (!savePopup) {
     savePopup =
         new GenericSaveFilePopup(QObject::tr("Export Camera Track Image"));
@@ -960,7 +967,7 @@ void ExportCameraTrackPopup::onExport() {
   if (fp.isEmpty()) return;
 
   std::string type = fp.getType();
-  if (type == "")
+  if (type.empty())
     fp = fp.withType("tif");
   else if (type != "jpg" && type != "jpeg" && type != "bmp" && type != "png" &&
            type != "tif") {
@@ -979,3 +986,17 @@ void ExportCameraTrackPopup::onExport() {
 
 OpenPopupCommandHandler<ExportCameraTrackPopup> ExportCameraTrackPopupCommand(
     MI_ExportCameraTrack);
+
+//--------------------------------------------------------------
+
+void ExportCameraTrackPopup::showEvent(QShowEvent* event) {
+  initialize();
+  DVGui::Dialog::showEvent(event);
+}
+
+//--------------------------------------------------------------
+
+void ExportCameraTrackPopup::closeEvent(QCloseEvent* event) {
+  saveSettings();
+  DVGui::Dialog::closeEvent(event);
+}
