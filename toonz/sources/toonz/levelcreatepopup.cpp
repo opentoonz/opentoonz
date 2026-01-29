@@ -7,6 +7,7 @@
 #include "tapp.h"
 #include "levelcommand.h"
 #include "formatsettingspopups.h"
+#include "toonz/stage.h"
 
 // TnzTools includes
 #include "tools/toolhandle.h"
@@ -56,6 +57,7 @@
 #include <QComboBox>
 #include <QPushButton>
 #include <QMainWindow>
+#include "layoutUtils.h"
 
 using namespace DVGui;
 
@@ -646,7 +648,7 @@ bool LevelCreatePopup::apply() {
       // This update should be called at least once, or it won't be rendered
       // Almost every level tool will call ToolUtils::updateSavebox() to update
       // But since fill tool tend to not update the savebox, we call it here
-      TImageInfo* info = sl->getFrameInfo(fid, true);
+      TImageInfo *info = sl->getFrameInfo(fid, true);
       ImageBuilder::setImageInfo(*info, ti.getPointer());
     } else if (lType == OVL_XSHLEVEL) {
       TRaster32P raster(xres, yres);
@@ -696,17 +698,26 @@ void LevelCreatePopup::update() {
     m_widthFld->setMeasure("level.lx");
     m_heightFld->setMeasure("level.ly");
   }
-  if (pref->isNewLevelSizeToCameraSizeEnabled()) {
-    TCamera *currCamera =
-        TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera();
-    TDimensionD camSize = currCamera->getSize();
-    m_widthFld->setValue(camSize.lx);
-    m_heightFld->setValue(camSize.ly);
-    m_dpiFld->setValue(currCamera->getDpi().x);
-  } else {
-    m_widthFld->setValue(pref->getDefLevelWidth());
-    m_heightFld->setValue(pref->getDefLevelHeight());
-    m_dpiFld->setValue(pref->getDefLevelDpi());
+  int policy = pref->getDefLevelSizePolicy();
+  if (policy == 2) {
+    TDimensionD res = layoutUtils::getLayoutSize();
+    m_widthFld->setValue(res.lx);
+    m_heightFld->setValue(res.ly);
+    m_dpiFld->setValue(Stage::standardDpi);
+  }
+  if (m_widthFld->getValue() == 0 || m_heightFld->getValue() == 0) {
+    if (policy == 1) {
+      TCamera *currCamera =
+          TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera();
+      TDimensionD camSize = currCamera->getSize();
+      m_widthFld->setValue(camSize.lx);
+      m_heightFld->setValue(camSize.ly);
+      m_dpiFld->setValue(currCamera->getDpi().x);
+    } else {
+      m_widthFld->setValue(pref->getDefLevelWidth());
+      m_heightFld->setValue(pref->getDefLevelHeight());
+      m_dpiFld->setValue(pref->getDefLevelDpi());
+    }
   }
 
   int levelType = pref->getDefLevelType();
@@ -714,16 +725,16 @@ void LevelCreatePopup::update() {
   if (index >= 0) m_levelTypeOm->setCurrentIndex(index);
 
   /*
-(old behaviour)
-TCamera* camera = scene->getCurrentCamera();
+  (old behaviour)
+  TCamera* camera = scene->getCurrentCamera();
   TDimensionD cameraSize = camera->getSize();
   m_widthFld->setValue(cameraSize.lx);
   m_heightFld->setValue(cameraSize.ly);
-if(camera->isXPrevalence())
-m_dpiFld->setValue(camera->getDpi().x);
-else
-m_dpiFld->setValue(camera->getDpi().y);
-*/
+  if(camera->isXPrevalence())
+  m_dpiFld->setValue(camera->getDpi().x);
+  else
+  m_dpiFld->setValue(camera->getDpi().y);
+  */
 }
 
 //-----------------------------------------------------------------------------

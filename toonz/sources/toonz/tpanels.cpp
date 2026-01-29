@@ -255,7 +255,7 @@ void SchematicScenePanel::onDeleteStageObjects(
     return;
 
   TApp *app = TApp::instance();
-  // Safe conversion QList â†’ std::vector (avoids std::length_error crash)
+  // Safe conversion QList ¡ú std::vector (avoids std::length_error crash)
   const QList<TStageObjectId> objList = selection->getObjects();
   std::vector<TStageObjectId> objects(objList.begin(), objList.end());
 
@@ -1127,20 +1127,20 @@ void FlipbookPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   int x         = -91;
   int iconWidth = 20;
 
-  // Safe area button
-  TPanelTitleBarButtonForSafeArea *safeAreaButton =
-      new TPanelTitleBarButtonForSafeArea(titleBar, "safearea");
-  safeAreaButton->setToolTip(tr("Safe Area (Right Click to Select)"));
-  titleBar->add(QPoint(x, 0), safeAreaButton);
-  ret = ret && connect(safeAreaButton, SIGNAL(toggled(bool)),
-                       CommandManager::instance()->getAction(MI_SafeArea),
+  // Layout Guide button
+  TPanelTitleBarButtonForLayoutGuide *layoutGuideButton =
+      new TPanelTitleBarButtonForLayoutGuide(titleBar, "layoutguide");
+  layoutGuideButton->setToolTip(tr("Layout Guide (Right Click to Select)"));
+  titleBar->add(QPoint(x, 0), layoutGuideButton);
+  ret = ret && connect(layoutGuideButton, SIGNAL(toggled(bool)),
+                       CommandManager::instance()->getAction(MI_LayoutGuide),
                        SLOT(trigger()));
-  ret = ret && connect(CommandManager::instance()->getAction(MI_SafeArea),
-                       SIGNAL(triggered(bool)), safeAreaButton,
+  ret = ret && connect(CommandManager::instance()->getAction(MI_LayoutGuide),
+                       SIGNAL(triggered(bool)), layoutGuideButton,
                        SLOT(setPressed(bool)));
   // Synchronize initial state
-  safeAreaButton->setPressed(
-      CommandManager::instance()->getAction(MI_SafeArea)->isChecked());
+  layoutGuideButton->setPressed(
+      CommandManager::instance()->getAction(MI_LayoutGuide)->isChecked());
 
   x += 28 + iconWidth;
   // Minimize button

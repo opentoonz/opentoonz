@@ -8,6 +8,8 @@
 #include "flipbook.h"
 #include "filebrowsermodel.h"
 #include "previewfxmanager.h"
+#include "layoutUtils.h"
+#include "tfxutil.h"
 
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
@@ -59,6 +61,7 @@
 namespace {
 
 #include "bravomark.h"
+#include <vector>
 
 TRaster32P loadLight() {
   static TRaster32P ras(137, 48);
@@ -153,7 +156,7 @@ public:
             isPreview ? *scene->getProperties()->getPreviewProperties()
                       : *scene->getProperties()->getOutputProperties();
         outputSettings.getRange(r0, r1, step);
-        const TRenderSettings rs    = outputSettings.getRenderSettings();
+        const TRenderSettings rs = outputSettings.getRenderSettings();
         if (r0 == 0 && r1 == -1) r0 = 0, r1 = scene->getFrameCount() - 1;
 
         double timeStretchFactor =
@@ -243,7 +246,7 @@ bool RenderCommand::init(bool isPreview) {
     m_r0 = 0;
     m_r1 = scene->getFrameCount() - 1;
   }
-  if (m_r0 < 0) m_r0                       = 0;
+  if (m_r0 < 0) m_r0 = 0;
   if (m_r1 >= scene->getFrameCount()) m_r1 = scene->getFrameCount() - 1;
   if (m_r1 < m_r0) {
     DVGui::warning(QObject::tr(
@@ -298,7 +301,7 @@ sprop->getOutputProperties()->setRenderSettings(rso);*/
       fp.getType() == "pict")  // pct e' un formato"livello" (ha i settings di
                                // quicktime) ma fatto di diversi frames
     fp = fp.withFrame(TFrameId::EMPTY_FRAME);
-  fp   = scene->decodeFilePath(fp);
+  fp = scene->decodeFilePath(fp);
   if (!TFileStatus(fp.getParentDir()).doesExist()) {
     try {
       TFilePath parent = fp.getParentDir();
@@ -388,8 +391,9 @@ public:
                  bool isPreview)
       : DVGui::ProgressDialog(
             QObject::tr("Precomputing %1 Frames", "RenderListener").arg(steps) +
-                ((isPreview) ? "" : QObject::tr(" of %1", "RenderListener")
-                                        .arg(toQString(path))),
+                ((isPreview) ? ""
+                             : QObject::tr(" of %1", "RenderListener")
+                                   .arg(toQString(path))),
             QObject::tr("Cancel"), 0, steps, TApp::instance()->getMainWindow())
       , m_renderer(renderer)
       , m_frameCounter(0)
@@ -555,6 +559,14 @@ void RenderCommand::rasterRender(bool isPreview) {
       QObject::tr("Building Schematic...", "RenderCommand"));
   buildSceneProgressBar->show();
 
+  // Append layout overlay
+  bool putLayoutImage = prop->isPutLayoutTemplate();
+  TRasterFxP layoutFxP;
+  if (putLayoutImage) {
+    layoutFxP = layoutUtils::getLayoutFx(m_numFrames);
+    if (!layoutFxP) putLayoutImage = false;
+  }
+
   for (int i = 0; i < m_numFrames; ++i, m_r += m_stepd) {
     buildSceneProgressBar->setValue(i);
 
@@ -572,6 +584,10 @@ void RenderCommand::rasterRender(bool isPreview) {
       scene->shiftCameraX(-rs.m_stereoscopicShift / 2);
     } else
       fx.m_frameB = TRasterFxP();
+
+    if (putLayoutImage)
+      fx.m_frameA = TFxUtil::makeOver(fx.m_frameA, layoutFxP->clone());
+
     /*-- movieRendererにフレーム毎のFxを登録 --*/
     movieRenderer.addFrame(m_r, fx);
   }
