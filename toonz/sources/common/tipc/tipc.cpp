@@ -85,7 +85,7 @@ int tipc::Stream::readSize() {
   if (m_socket->bytesAvailable() < sizeof(TINT32)) return -1;
 
   TINT32 msgSize = -1;
-  m_socket->peek((char *)&msgSize, sizeof(TINT32));
+  m_socket->peek(reinterpret_cast<char*>(&msgSize), sizeof(TINT32));
 
   return msgSize;
 }
@@ -99,10 +99,10 @@ bool tipc::Stream::messageReady() {
 
 //-------------------------------------------------------------
 
-bool tipc::Stream::readData(char *data, qint64 dataSize, int msecs) {
+bool tipc::Stream::readData(char* data, qint64 dataSize, int msecs) {
   tipc_debug(qDebug("tipc::Stream::readData entry"));
   qint64 r, dataRead = 0;
-  char *currData = data;
+  char* currData = data;
 
   while (dataRead < dataSize) {
     if ((m_socket->bytesAvailable() == 0) &&
@@ -124,18 +124,21 @@ bool tipc::Stream::readData(char *data, qint64 dataSize, int msecs) {
 
 //-------------------------------------------------------------
 
-bool tipc::Stream::readDataNB(char *data, qint64 dataSize, int msecs,
+bool tipc::Stream::readDataNB(char* data, qint64 dataSize, int msecs,
                               QEventLoop::ProcessEventsFlag flag) {
   tipc_debug(qDebug("tipc::Stream::readDataNB entry"));
   qint64 r, dataRead = 0;
-  char *currData = data;
+  char* currData = data;
 
   QEventLoop loop;
-  QObject::connect(m_socket, SIGNAL(readyRead()), &loop, SLOT(quit()));
-  QObject::connect(m_socket, SIGNAL(error(QLocalSocket::LocalSocketError)),
-                   &loop, SLOT(quit()));
+  QObject::connect(m_socket, &QLocalSocket::readyRead, &loop,
+                   &QEventLoop::quit);
+  QObject::connect(m_socket, &QLocalSocket::errorOccurred, &loop,
+                   &QEventLoop::quit);
 
-  if (msecs >= 0) QTimer::singleShot(msecs, &loop, SLOT(quit()));
+  if (msecs >= 0) {
+    QTimer::singleShot(msecs, &loop, &QEventLoop::quit);
+  }
 
   while (dataRead < dataSize) {
     if (m_socket->bytesAvailable() == 0) {
@@ -166,9 +169,10 @@ bool tipc::Stream::readDataNB(char *data, qint64 dataSize, int msecs,
   an inactivity timeout which can be supplied to drop the operation
   after msecs milliseconds no data has been received.
 */
-bool tipc::Stream::readMessage(Message &msg, int msecs) {
+bool tipc::Stream::readMessage(Message& msg, int msecs) {
   TINT32 msgSize = 0;
-  if (!readData((char *)&msgSize, sizeof(TINT32), msecs)) return false;
+  if (!readData(reinterpret_cast<char*>(&msgSize), sizeof(TINT32), msecs))
+    return false;
 
   msg.ba().resize(msgSize);
   if (!readData(msg.ba().data(), msgSize, msecs)) return false;
@@ -183,10 +187,12 @@ bool tipc::Stream::readMessage(Message &msg, int msecs) {
   performs event processing in a local event loop until all
   message data has been received.
 */
-bool tipc::Stream::readMessageNB(Message &msg, int msecs,
+bool tipc::Stream::readMessageNB(Message& msg, int msecs,
                                  QEventLoop::ProcessEventsFlag flag) {
   TINT32 msgSize = 0;
-  if (!readDataNB((char *)&msgSize, sizeof(TINT32), msecs, flag)) return false;
+  if (!readDataNB(reinterpret_cast<char*>(&msgSize), sizeof(TINT32), msecs,
+                  flag))
+    return false;
 
   msg.ba().resize(msgSize);
   if (!readDataNB(msg.ba().data(), msgSize, msecs, flag)) return false;
@@ -208,7 +214,10 @@ bool tipc::Stream::flush(int msecs) {
 
   while (m_socket->bytesToWrite() > 0) {
     tipc_debug(qDebug() << "bytes to write:" << m_socket->bytesToWrite());
-    bool ok = m_socket->flush();
+
+    // Use [[maybe_unused]] attribute to suppress the warning in C++17
+    [[maybe_unused]] bool ok = m_socket->flush();
+
     tipc_debug(qDebug() << "flush success:" << ok
                         << "bytes to write:" << m_socket->bytesToWrite());
     if (m_socket->bytesToWrite() > 0 && !m_socket->waitForBytesWritten(msecs))
@@ -226,22 +235,22 @@ bool tipc::Stream::flush(int msecs) {
 
 //! \warning This operation assumes that all the message is available for read.
 //! Use tipc::stream::readMessage if this cannot be ensured.
-tipc::Stream &operator>>(tipc::Stream &stream, tipc::Message &msg) {
-  QLocalSocket *socket = stream.socket();
+tipc::Stream& operator>>(tipc::Stream& stream, tipc::Message& msg) {
+  QLocalSocket* socket = stream.socket();
   msg.clear();
 
   TINT32 msgSize;
-  socket->read((char *)&msgSize, sizeof(TINT32));
+  socket->read(reinterpret_cast<char*>(&msgSize), sizeof(TINT32));
   msg.ba().resize(msgSize);
   socket->read(msg.ba().data(), msgSize);
   return stream;
 }
 
-tipc::Stream &operator<<(tipc::Stream &stream, tipc::Message &msg) {
-  QLocalSocket *socket = stream.socket();
+tipc::Stream& operator<<(tipc::Stream& stream, tipc::Message& msg) {
+  QLocalSocket* socket = stream.socket();
 
   TINT32 size = msg.ba().size();
-  socket->write((char *)&size, sizeof(TINT32));
+  socket->write(reinterpret_cast<const char*>(&size), sizeof(TINT32));
   socket->write(msg.ba().data(), size);
 
   return stream;
@@ -269,7 +278,7 @@ bool tipc::startBackgroundProcess(QString cmdlineProgram,
         "Terminating old one.");
     tipc::terminateCurrentBackgroundProcess();
   }
-  QProcess *proc = new QProcess;
+  QProcess* proc = new QProcess;
   s_processPtr   = proc;
 
   proc->start(cmdlineProgram, cmdlineArguments);
@@ -279,20 +288,24 @@ bool tipc::startBackgroundProcess(QString cmdlineProgram,
     return false;
   }
 
-  QObject::connect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), proc,
-                   SLOT(deleteLater()));
-  QObject::connect(proc, SIGNAL(error(QProcess::ProcessError)), proc,
-                   SLOT(deleteLater()));
+  // On MSVC, QProcess::finished is overloaded.
+  // Use QOverload + lambda to avoid ambiguity and safely call deleteLater().
+  QObject::connect(
+      proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), proc,
+      [proc]() { proc->deleteLater(); });
+
+  QObject::connect(proc, &QProcess::errorOccurred, proc,
+                   [proc]() { proc->deleteLater(); });
   return true;
 #else
   return QProcess::startDetached(cmdlineProgram, cmdlineArguments);
-  ;
 #endif
 }
+
 #ifdef _WIN32
 DVAPI void tipc::terminateCurrentBackgroundProcess() {
   if (s_processPtr) {
-    QProcess *proc = s_processPtr.data();
+    QProcess* proc = s_processPtr.data();
 
     if (proc->state() != QProcess::NotRunning) {
       proc->terminate();
@@ -303,6 +316,7 @@ DVAPI void tipc::terminateCurrentBackgroundProcess() {
   }
 }
 #endif
+
 //-------------------------------------------------------------
 
 /*!
@@ -327,7 +341,7 @@ bool tipc::startSlaveServer(QString srvName, QString cmdlineProgram,
 
   // Establish a dummy socket connection to provide a mean for the process
   // to tell whether the calling process exited unexpectedly.
-  QLocalSocket *dummySock = new QLocalSocket;
+  QLocalSocket* dummySock = new QLocalSocket;
   dummySock->connectToServer(mainSrvName);
 
   // Wait up to msecs until the socket is connecting. Wait a small amount of
@@ -370,8 +384,8 @@ bool tipc::startSlaveServer(QString srvName, QString cmdlineProgram,
   // If a connection error takes place, release the dummy socket.
   // Please, observe that this QObject::connect is invoked *AFTER* the
   // connection trials above...
-  QObject::connect(dummySock, SIGNAL(error(QLocalSocket::LocalSocketError)),
-                   dummySock, SLOT(deleteLater()));
+  QObject::connect(dummySock, &QLocalSocket::errorOccurred, dummySock,
+                   &QObject::deleteLater);
 
   return true;
 }
@@ -388,14 +402,14 @@ bool tipc::startSlaveServer(QString srvName, QString cmdlineProgram,
   \warning Please, observe that a correct slave server name should be
   ensured to be unique to the parent process.
 */
-bool tipc::startSlaveConnection(QLocalSocket *socket, QString srvName,
+bool tipc::startSlaveConnection(QLocalSocket* socket, QString srvName,
                                 int msecs, QString cmdlineProgram,
                                 QStringList cmdlineArguments,
                                 QString threadName) {
   QElapsedTimer time;
   time.start();
 
-  if (msecs == -1) msecs = (std::numeric_limits<int>::max)();
+  if (msecs == -1) msecs = std::numeric_limits<int>::max();
 
   QString fullSrvName(srvName + threadName);
   socket->connectToServer(fullSrvName);
@@ -447,7 +461,7 @@ connecting:
   This function returns an empty QString if the message could not be
   entirely retrieved from the stream.
 */
-QString tipc::readMessage(Stream &stream, Message &msg, int msecs) {
+QString tipc::readMessage(Stream& stream, Message& msg, int msecs) {
   msg.clear();
   stream.flush();
   if (!stream.readMessage(msg, msecs)) return QString();
@@ -462,7 +476,7 @@ QString tipc::readMessage(Stream &stream, Message &msg, int msecs) {
 /*!
   The non-blocking equivalent to tipc::readMessage.
 */
-QString tipc::readMessageNB(Stream &stream, Message &msg, int msecs,
+QString tipc::readMessageNB(Stream& stream, Message& msg, int msecs,
                             QEventLoop::ProcessEventsFlag flag) {
   msg.clear();
   if (!stream.readMessageNB(msg, msecs, flag)) return QString();
@@ -482,7 +496,7 @@ QString tipc::uniqueId() {
   static QAtomicInt count;
   count.ref();
   return QString::number(QCoreApplication::applicationPid()) + "_" +
-         QString::number((int)count);
+         QString::number(static_cast<int>(count));
 }
 
 //-------------------------------------------------------------
@@ -494,13 +508,14 @@ int tipc::shm_maxSegmentSize() {
     // Retrieve it by invoking sysctl
     size_t valSize = sizeof(TINT64);
     TINT64 val;
-    sysctlbyname("kern.sysv.shmmax", &val, &valSize, NULL, 0);
-    shm_max = std::min(val, (TINT64)(std::numeric_limits<int>::max)());
+    sysctlbyname("kern.sysv.shmmax", &val, &valSize, nullptr, 0);
+    shm_max =
+        std::min(val, static_cast<TINT64>(std::numeric_limits<int>::max()));
 #else
     // Windows case: no such limit
     // Observe that QSharedMemory accepts only an int size - so the num_lim is
     // against int.
-    shm_max = (std::numeric_limits<int>::max)();
+    shm_max = std::numeric_limits<int>::max();
 #endif
   }
 
@@ -515,11 +530,12 @@ int tipc::shm_maxSegmentCount() {
 #ifdef MACOSX
     size_t valSize = sizeof(TINT64);
     TINT64 val;
-    sysctlbyname("kern.sysv.shmseg", &val, &valSize, NULL, 0);
-    shm_seg = std::min(val, (TINT64)(std::numeric_limits<int>::max)());
+    sysctlbyname("kern.sysv.shmseg", &val, &valSize, nullptr, 0);
+    shm_seg =
+        std::min(val, static_cast<TINT64>(std::numeric_limits<int>::max()));
 #else
     // Windows case: no such limit - again, using limit against max due to Qt
-    shm_seg = (std::numeric_limits<int>::max)();
+    shm_seg = std::numeric_limits<int>::max();
 #endif
   }
 
@@ -533,10 +549,11 @@ int tipc::shm_maxSharedPages() {
 #ifdef MACOSX
     size_t valSize = sizeof(TINT64);
     TINT64 val;
-    sysctlbyname("kern.sysv.shmall", &val, &valSize, NULL, 0);
-    shm_all = std::min(val, (TINT64)(std::numeric_limits<int>::max)());
+    sysctlbyname("kern.sysv.shmall", &val, &valSize, nullptr, 0);
+    shm_all =
+        std::min(val, static_cast<TINT64>(std::numeric_limits<int>::max()));
 #else
-    shm_all = (std::numeric_limits<int>::max)();
+    shm_all = std::numeric_limits<int>::max();
 #endif
   }
 
@@ -550,10 +567,11 @@ int tipc::shm_maxSharedCount() {
 #ifdef MACOSX
     size_t valSize = sizeof(TINT64);
     TINT64 val;
-    sysctlbyname("kern.sysv.shmmni", &val, &valSize, NULL, 0);
-    shm_mni = std::min(val, (TINT64)(std::numeric_limits<int>::max)());
+    sysctlbyname("kern.sysv.shmmni", &val, &valSize, nullptr, 0);
+    shm_mni =
+        std::min(val, static_cast<TINT64>(std::numeric_limits<int>::max()));
 #else
-    shm_mni = (std::numeric_limits<int>::max)();
+    shm_mni = std::numeric_limits<int>::max();
 #endif
   }
 
@@ -576,22 +594,26 @@ void tipc::shm_set(int shmmax, int shmseg, int shmall, int shmmni) {
   int err;
   if (shmmax > 0) {
     val = shmmax;
-    err = sysctlbyname("kern.sysv.shmmax", NULL, NULL, &val, sizeof(TINT64));
+    err = sysctlbyname("kern.sysv.shmmax", nullptr, nullptr, &val,
+                       sizeof(TINT64));
     if (!err) shm_max = shmmax;
   }
   if (shmseg > 0) {
     val = shmseg;
-    err = sysctlbyname("kern.sysv.shmseg", NULL, NULL, &val, sizeof(TINT64));
+    err = sysctlbyname("kern.sysv.shmseg", nullptr, nullptr, &val,
+                       sizeof(TINT64));
     if (!err) shm_seg = shmseg;
   }
   if (shmall > 0) {
     val = shmall;
-    err = sysctlbyname("kern.sysv.shmall", NULL, NULL, &val, sizeof(TINT64));
+    err = sysctlbyname("kern.sysv.shmall", nullptr, nullptr, &val,
+                       sizeof(TINT64));
     if (!err) shm_all = shmall;
   }
   if (shmmni > 0) {
     val = shmmni;
-    err = sysctlbyname("kern.sysv.shmmni", NULL, NULL, &val, sizeof(TINT64));
+    err = sysctlbyname("kern.sysv.shmmni", nullptr, nullptr, &val,
+                       sizeof(TINT64));
     if (!err) shm_mni = shmmni;
   }
 #endif
@@ -613,10 +635,10 @@ void tipc::shm_set(int shmmax, int shmseg, int shmall, int shmmni) {
   <LI> Unlike QSharedMemory::create, this function attempts to
   reclaim an already existing memory id before creating a new one. <\LI>
 */
-int tipc::create(QSharedMemory &shmem, int size, bool strictSize) {
+int tipc::create(QSharedMemory& shmem, int size, bool strictSize) {
   bool ok, retried = false;
 
-  if (!strictSize) size = std::min(size, (int)shm_maxSegmentSize());
+  if (!strictSize) size = std::min(size, shm_maxSegmentSize());
 
   tipc_debug(qDebug() << "shMem create: size =" << size);
 
@@ -631,9 +653,9 @@ retry:
 
     // Try to recover error #AlreadyExists - supposedly, the server crashed in a
     // previous instance.
-    // As shared memory segments that happen to go this way are owned by the
-    // server process with 1
-    // reference count, detaching it now may solve the issue.
+    // These shared memory segments are owned by the server
+    // Process with 1 reference count, detaching it now may solve the issue.
+
     if (shmem.error() == QSharedMemory::AlreadyExists && !retried) {
       retried = true;  // We're trying this only once... for now it works.
       shmem.attach();
@@ -652,8 +674,8 @@ retry:
 /*!
   Writes data through a shared memory segment medium.
 */
-bool tipc::writeShMemBuffer(Stream &stream, Message &msg, int bufSize,
-                            ShMemWriter *dataWriter) {
+bool tipc::writeShMemBuffer(Stream& stream, Message& msg, int bufSize,
+                            ShMemWriter* dataWriter) {
   tipc_debug(QTime time; time.start());
   tipc_debug(qDebug("tipc::writeShMemBuffer entry"));
 
@@ -675,8 +697,9 @@ bool tipc::writeShMemBuffer(Stream &stream, Message &msg, int bufSize,
       // Write to the shared memory segment
       tipc_debug(QTime xchTime; xchTime.start());
       shmem.lock();
-      remainingData -= chunkData = dataWriter->write(
-          (char *)shmem.data(), std::min(shmem.size(), remainingData));
+      remainingData -= chunkData =
+          dataWriter->write(reinterpret_cast<char*>(shmem.data()),
+                            std::min(shmem.size(), remainingData));
       shmem.unlock();
       tipc_debug(qDebug() << "exchange time:" << xchTime.elapsed());
 
@@ -707,8 +730,8 @@ err:
 /*!
   Reads data through a shared memory segment medium.
 */
-bool tipc::readShMemBuffer(Stream &stream, Message &msg,
-                           ShMemReader *dataReader) {
+bool tipc::readShMemBuffer(Stream& stream, Message& msg,
+                           ShMemReader* dataReader) {
   tipc_debug(QTime time; time.start(););
   tipc_debug(qDebug("tipc::readShMemBuffer entry"));
 
@@ -739,7 +762,8 @@ bool tipc::readShMemBuffer(Stream &stream, Message &msg,
 
     tipc_debug(QTime xchTime; xchTime.start());
     shmem.lock();
-    remainingData -= dataReader->read((const char *)shmem.data(), chunkData);
+    remainingData -= dataReader->read(
+        reinterpret_cast<const char*>(shmem.data()), chunkData);
     shmem.unlock();
     tipc_debug(qDebug() << "exchange time:" << xchTime.elapsed());
 

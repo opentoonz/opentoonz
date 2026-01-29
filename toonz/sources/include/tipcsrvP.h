@@ -20,11 +20,14 @@ class SocketController final : public QObject {
   Q_OBJECT
 
 public:
+  // Constructor with optional parent
+  explicit SocketController(QObject *parent = nullptr)
+      : QObject(parent), m_server(nullptr), m_socket(nullptr) {}
+
   Server *m_server;
   QLocalSocket *m_socket;
 
 public Q_SLOTS:
-
   void onReadyRead();
   void onDisconnected();
 };
