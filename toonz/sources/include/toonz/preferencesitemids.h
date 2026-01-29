@@ -91,7 +91,7 @@ enum PreferencesItemId {
   DefRasterFormat,
   // scanLevelType,// deprecated
   DefLevelType,
-  newLevelSizeToCameraSizeEnabled,
+  DefLevelSizePolicy,
   DefLevelWidth,
   DefLevelHeight,
   DefLevelDpi,

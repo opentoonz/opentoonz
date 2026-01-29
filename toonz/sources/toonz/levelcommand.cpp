@@ -81,7 +81,9 @@ bool LevelCmd::removeUnusedLevelsFromCast(bool showMessage) {
 
   for (int i = 0; i < levelSet->getLevelCount(); i++) {
     TXshLevel *xl = levelSet->getLevel(i);
-    if (usedLevels.count(xl) == 0) unused.push_back(xl);
+    if (usedLevels.count(xl) == 0 &&
+        levelSet->getFolder(xl) != TFilePath("Layout"))
+      unused.push_back(xl);
   }
   if (unused.empty()) {
     if (showMessage) DVGui::error(QObject::tr("No unused levels"));

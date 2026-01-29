@@ -67,7 +67,7 @@ TEnv::IntVar FieldGuideToggleAction("FieldGuideToggleAction", 0);
 TEnv::IntVar ViewBBoxToggleAction("ViewBBoxToggleAction1", 1);
 TEnv::IntVar EditInPlaceToggleAction("EditInPlaceToggleAction", 0);
 TEnv::IntVar RasterizePliToggleAction("RasterizePliToggleAction", 0);
-TEnv::IntVar SafeAreaToggleAction("SafeAreaToggleAction", 0);
+TEnv::IntVar LayoutGuideToggleAction("LayoutGuideToggleAction", 0);
 TEnv::IntVar ViewColorcardToggleAction("ViewColorcardToggleAction", 1);
 TEnv::IntVar ViewGuideToggleAction("ViewGuideToggleAction", 1);
 TEnv::IntVar ViewRulerToggleAction("ViewRulerToggleAction", 1);
@@ -1319,8 +1319,8 @@ void MainWindow::onMenuCheckboxChanged() {
   else if (cm->getAction(MI_RasterizePli) == action) {
     if (!QGLPixelBuffer::hasOpenGLPbuffers()) isChecked = 0;
     RasterizePliToggleAction = isChecked;
-  } else if (cm->getAction(MI_SafeArea) == action)
-    SafeAreaToggleAction = isChecked;
+  } else if (cm->getAction(MI_LayoutGuide) == action)
+    LayoutGuideToggleAction = isChecked;
   else if (cm->getAction(MI_ViewColorcard) == action)
     ViewColorcardToggleAction = isChecked;
   else if (cm->getAction(MI_ViewGuide) == action)
@@ -1380,8 +1380,8 @@ void MainWindow::checkForUpdates() {
   QString updateUrl("http://opentoonz.github.io/opentoonz-version.txt");
 
   m_updateChecker = new UpdateChecker(updateUrl);
-  connect(m_updateChecker, SIGNAL(done(bool)), this,
-          SLOT(onUpdateCheckerDone(bool)));
+      connect(m_updateChecker, SIGNAL(done(bool)), this,
+              SLOT(onUpdateCheckerDone(bool)));
 }
 //-----------------------------------------------------------------------------
 
@@ -2236,8 +2236,8 @@ void MainWindow::defineActions() {
                FieldGuideToggleAction ? 1 : 0, MenuViewCommandType);
   createToggle(MI_ViewBBox, QT_TR_NOOP("&Raster Bounding Box"), "",
                ViewBBoxToggleAction ? 1 : 0, MenuViewCommandType);
-  createToggle(MI_SafeArea, QT_TR_NOOP("&Safe Area"), "",
-               SafeAreaToggleAction ? 1 : 0, MenuViewCommandType);
+  createToggle(MI_LayoutGuide, QT_TR_NOOP("&Layout Guide"), "",
+               LayoutGuideToggleAction ? 1 : 0, MenuViewCommandType);
   createToggle(MI_ViewColorcard, QT_TR_NOOP("&Camera BG Color"), "",
                ViewColorcardToggleAction ? 1 : 0, MenuViewCommandType);
   createToggle(MI_ViewGuide, QT_TR_NOOP("&Guide"), "",
