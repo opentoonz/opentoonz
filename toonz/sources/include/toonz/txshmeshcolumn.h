@@ -16,7 +16,7 @@
 #endif
 
 //*******************************************************************************
-//    TXshMeshColumn  declaration
+//    TXshMeshColumn declaration
 //*******************************************************************************
 
 class DVAPI TXshMeshColumn final : public TXshCellColumn {
@@ -25,25 +25,36 @@ class DVAPI TXshMeshColumn final : public TXshCellColumn {
   bool m_iconVisible;
 
 public:
-  bool isIconVisible() { return m_iconVisible; }
+  // Icon visibility management
+  bool isIconVisible() const { return m_iconVisible; }
   void setIconVisible(bool visible) { m_iconVisible = visible; }
 
+  // Construction
   TXshMeshColumn();
 
+  // Type information
   TXshColumn::ColumnType getColumnType() const override { return eMeshType; }
   TXshMeshColumn *getMeshColumn() override { return this; }
 
+  // Cloning
   TXshColumn *clone() const override;
 
+  // Cell validation
   bool canSetCell(const TXshCell &cell) const override;
 
+  // Serialization
   void loadData(TIStream &is) override;
-  void saveData(TOStream &is) override;
+  void saveData(TOStream &os) override;
+
+  // Disable copying and moving
+  TXshMeshColumn(const TXshMeshColumn &)            = delete;
+  TXshMeshColumn &operator=(const TXshMeshColumn &) = delete;
+
+  TXshMeshColumn(TXshMeshColumn &&)            = delete;
+  TXshMeshColumn &operator=(TXshMeshColumn &&) = delete;
 
 private:
-  // Not copiable
-  TXshMeshColumn(const TXshMeshColumn &);
-  TXshMeshColumn &operator=(const TXshMeshColumn &);
+  // Private helper methods can be added here if needed
 };
 
 //---------------------------------------------------------------
@@ -52,6 +63,7 @@ private:
 template class DVAPI TSmartPointerT<TXshMeshColumn>;
 #endif
 
+// Smart pointer typedef for TXshMeshColumn
 typedef TSmartPointerT<TXshMeshColumn> TXshMeshColumnP;
 
 #endif  // TXSHMESHCOLUMN_H

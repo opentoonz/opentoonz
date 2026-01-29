@@ -17,6 +17,7 @@
 #include "tgeometry.h"
 
 #include "tcommon.h"
+
 #undef DVAPI
 #undef DVVAR
 #ifdef TOONZLIB_EXPORTS
@@ -27,6 +28,7 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
+// Macro for standard wrapper methods
 #define WRAPPER_STD_METHODS(T)                                                 \
   static QScriptValue ctor(QScriptContext *context, QScriptEngine *engine);    \
   static QScriptValue toScriptValue(QScriptEngine *engine, T *const &in) {     \
@@ -36,11 +38,13 @@
     out = qobject_cast<T *>(object.toQObject());                               \
   }
 
+// Macro for standard constructor implementation
 #define WRAPPER_STD_CTOR_IMPL(T)                                               \
   QScriptValue T::ctor(QScriptContext *context, QScriptEngine *engine) {       \
     return engine->newQObject(new T(), QScriptEngine::AutoOwnership);          \
   }
 
+// Forward declarations
 class TAffine;
 class TLevelReader;
 class ToonzScene;
@@ -64,7 +68,7 @@ public:
   Wrapper();
   virtual ~Wrapper();
 
-  Q_PROPERTY(int id READ getId())
+  Q_PROPERTY(int id READ getId)
   int getId() const { return m_id; }
 
   void print(const QString &msg);
@@ -91,22 +95,24 @@ protected:
   }
 };
 
+// Initialize all script bindings
 void bindAll(QScriptEngine &engine);
 
-// helper functions
+// Helper functions
 
-// check the number of arguments: if it is out of range returns an error object
+// Check the number of arguments: if it is out of range returns an error object
 QScriptValue checkArgumentCount(QScriptContext *context, const QString &name,
                                 int minCount, int maxCount);
 QScriptValue checkArgumentCount(QScriptContext *context, const QString &name,
                                 int count);
 
-// check the color. if colorName is not valid then an error is returned
+// Check the color. if colorName is not valid then an error is returned
 QScriptValue checkColor(QScriptContext *context, const QString &colorName,
                         QColor &color);
 
 }  // namespace TScriptBinding
 
+// Declare meta-type for script binding
 Q_DECLARE_METATYPE(TScriptBinding::Void *)
 
-#endif
+#endif  // SCRIPTBINDING_H

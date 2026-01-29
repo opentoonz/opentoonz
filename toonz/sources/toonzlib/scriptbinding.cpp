@@ -1,6 +1,8 @@
 
 
 #include "toonz/scriptbinding.h"
+
+// TnzLib includes
 #include "toonz/scriptbinding_scene.h"
 #include "toonz/scriptbinding_image.h"
 #include "toonz/scriptbinding_level.h"
@@ -11,25 +13,28 @@
 #include "toonz/scriptbinding_rasterizer.h"
 #include "toonz/scriptbinding_toonz_raster_converter.h"
 #include "toonz/scriptbinding_image_builder.h"
-#include <QScriptEngine>
-#include "tlevel_io.h"
-#include "tlevel.h"
 #include "toonz/tcenterlinevectorizer.h"
 #include "toonz/tcamera.h"
+#include "toonz/stage.h"
+#include "toonz/txshleveltypes.h"
+#include "toonz/levelproperties.h"
+#include "toonz/toonzscene.h"
+
+// TnzBase includes
+#include "tlevel.h"
 #include "trop.h"
 #include "trasterimage.h"
 #include "ttoonzimage.h"
 #include "tvectorimage.h"
 #include "tpalette.h"
-#include "tofflinegl.h"
 #include "tvectorrenderdata.h"
 #include "tgeometry.h"
-#include "toonz/stage.h"
-#include "toonz/txshleveltypes.h"
-#include "toonz/levelproperties.h"
-#include "toonz/toonzscene.h"
 #include "tfiletype.h"
-#include <QRegExp>
+#include "tofflinegl.h"
+#include "tlevel_io.h"
+
+// Qt includes
+#include <QScriptEngine>
 #include <QColor>
 
 namespace TScriptBinding {
@@ -42,9 +47,9 @@ WRAPPER_STD_CTOR_IMPL(Void)
 
 int Wrapper::m_count = 0;
 
-Wrapper::Wrapper() { m_id = ++m_count; }
+Wrapper::Wrapper() : m_id(++m_count) {}
 
-Wrapper::~Wrapper() {}
+Wrapper::~Wrapper() = default;
 
 void Wrapper::print(const QString &msg) {
   QScriptValueList lst;
@@ -53,15 +58,19 @@ void Wrapper::print(const QString &msg) {
 }
 
 void Wrapper::print(const QScriptValueList &lst) {
-  QScriptValue print = engine()->globalObject().property("print");
-  print.call(print, lst);
+  QScriptValue printFunc = engine()->globalObject().property("print");
+  if (printFunc.isFunction()) {
+    printFunc.call(QScriptValue(), lst);
+  }
 }
 
 void Wrapper::warning(const QString &msg) {
   QScriptValueList lst;
   lst << msg;
-  QScriptValue f = engine()->globalObject().property("warning");
-  f.call(f, lst);
+  QScriptValue warningFunc = engine()->globalObject().property("warning");
+  if (warningFunc.isFunction()) {
+    warningFunc.call(QScriptValue(), lst);
+  }
 }
 
 //===========================================================================
@@ -70,15 +79,17 @@ QScriptValue checkArgumentCount(QScriptContext *context, const QString &name,
                                 int minCount, int maxCount) {
   int count = context->argumentCount();
   if (minCount <= count && count <= maxCount) return QScriptValue();
+
   QString range;
-  if (minCount != maxCount)
+  if (minCount != maxCount) {
     range = QObject::tr("%1-%2").arg(minCount).arg(maxCount);
-  else
+  } else {
     range = QObject::tr("%1").arg(minCount);
+  }
+
   return context->throwError(
       QObject::tr("Expected %1 argument(s) in %2, got %3")
-          .arg(range)
-          .arg(name)
+          .arg(range, name)
           .arg(count));
 }
 
@@ -90,13 +101,13 @@ QScriptValue checkArgumentCount(QScriptContext *context, const QString &name,
 QScriptValue checkColor(QScriptContext *context, const QString &colorName,
                         QColor &color) {
   color.setNamedColor(colorName);
-  if (!color.isValid())
+  if (!color.isValid()) {
     return context->throwError(
         QObject::tr("%1 is not a valid color (valid color names are 'red', "
-                    "'transparent', '#FF8800', ecc.)")
+                    "'transparent', '#FF8800', etc.)")
             .arg(colorName));
-  else
-    return QScriptValue();
+  }
+  return QScriptValue();
 }
 
 //=============================================================================
@@ -128,23 +139,30 @@ int qScriptRegisterQObjectMetaType(
 }
 
 template <class T, QScriptValue (T::*Method)(QScriptContext *, QScriptEngine *)>
-class Dummy {
+class StaticMethodWrapper {
 public:
-  static QScriptValue dummy(QScriptContext *context, QScriptEngine *engine) {
+  static QScriptValue wrap(QScriptContext *context, QScriptEngine *engine) {
     T *obj = qscriptvalue_cast<T *>(context->thisObject());
+    if (!obj) {
+      return engine->undefinedValue();
+    }
     return (obj->*Method)(context, engine);
   }
 };
 
-static void deffoo(QScriptEngine &engine) {
-  QScriptValue f = engine.newFunction(
-      Dummy<ToonzRasterConverter, &ToonzRasterConverter::convert>::dummy);
+static void setupStaticMethods(QScriptEngine &engine) {
+  // Setup static methods for classes if needed
+  // Example: ToonzRasterConverter::convert
+  QScriptValue convertFunc = engine.newFunction(
+      StaticMethodWrapper<ToonzRasterConverter,
+                          &ToonzRasterConverter::convert>::wrap);
   engine.globalObject()
       .property("ToonzRasterConverter")
-      .setProperty("convert", f);
+      .setProperty("convert", convertFunc);
 }
 
 void bindAll(QScriptEngine &engine) {
+  // Bind all scriptable classes
   bindClass<Image>(engine, "Image");
   bindClass<Level>(engine, "Level");
   bindClass<Scene>(engine, "Scene");
@@ -154,14 +172,20 @@ void bindAll(QScriptEngine &engine) {
   bindClass<CenterlineVectorizer>(engine, "CenterlineVectorizer");
   bindClass<Rasterizer>(engine, "Rasterizer");
   bindClass<ToonzRasterConverter>(engine, "ToonzRasterConverter");
-  deffoo(engine);
   bindClass<FilePath>(engine, "FilePath");
   bindClass<Renderer>(engine, "Renderer");
 
+  // Setup any static methods
+  setupStaticMethods(engine);
+
+  // Register meta types for script binding
   qScriptRegisterQObjectMetaType<TScriptBinding::Image *>(&engine);
 
+  // Set version information in the script environment
   engine.evaluate("ToonzVersion='7.1'");
-  // engine.evaluate("toonz={version:'7.0', }; script={version:'1.0'};");
+
+  // Additional global script setup could go here
+  // Example: engine.evaluate("toonz={version:'7.0'}; script={version:'1.0'};");
   // engine.globalObject().setProperty("dir","C:\\Users\\gmt\\GMT to
   // vectorize\\");
   // QScriptValue test = engine.evaluate("function() { print('ok');
