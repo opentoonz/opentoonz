@@ -145,9 +145,12 @@ private:
       QWidget* customWidget);  // Update widget using current entries
 
 public:
-  explicit CustomPanelEditorPopup();
-
-private slots:
+  CustomPanelEditorPopup();
+  
+protected:
+  void showEvent(QShowEvent* event) override;
+  
+protected slots:
   void onTemplateSwitched();
   void onHighlight(int id);
   void onCommandChanged(const QString& oldCmdId, const QString& newCmdId);

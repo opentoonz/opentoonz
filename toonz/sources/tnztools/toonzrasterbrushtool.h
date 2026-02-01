@@ -60,6 +60,11 @@ struct BrushData final : public TPersist {
   double m_modifierSize, m_modifierOpacity;
   bool m_modifierEraser, m_modifierLockAlpha;
   bool m_assistants;
+  
+  // MyPaint style information (for strict preset restoration)
+  bool m_hasMyPaint;          // true if preset was created with MyPaint style
+  std::string m_myPaintPath;  // path to MyPaint brush if applicable
+  int m_styleInfoVersion;     // 0 = old preset (no style info), 1 = new preset (has style info)
 
   BrushData();
   BrushData(const std::wstring &name);

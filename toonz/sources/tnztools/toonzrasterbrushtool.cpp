@@ -2,6 +2,9 @@
 
 #include "toonzrasterbrushtool.h"
 
+// Standard library
+#include <algorithm>
+
 // TnzTools includes
 #include "tools/toolhandle.h"
 #include "tools/toolutils.h"
@@ -30,6 +33,7 @@
 #include "toonz/preferences.h"
 #include "toonz/tpalettehandle.h"
 #include "toonz/mypaintbrushstyle.h"
+#include "toonz/toonzfolders.h"
 
 // TnzCore includes
 #include "tstream.h"
@@ -38,6 +42,7 @@
 #include "tenv.h"
 #include "tregion.h"
 #include "tinbetween.h"
+#include "tsystem.h"
 
 #include "tgl.h"
 #include "trop.h"
@@ -1764,6 +1769,39 @@ void ToonzRasterBrushTool::loadPreset() {
     m_maxThick = m_rasThickness.getValue().second;
 
     m_brushPad = ToolUtils::getBrushPad(preset.m_max, preset.m_hardness * 0.01);
+    
+    // CRITICAL: Restore MyPaint style from preset (strict state restoration)
+    // Only applies to NEW presets (version >= 1) that have style information
+    if (preset.m_styleInfoVersion >= 1) {
+      TApplication *app = getApplication();
+      if (app && app->getCurrentPalette()) {
+        TPalette *palette = app->getCurrentPalette()->getPalette();
+        if (palette) {
+          int styleIndex = app->getCurrentLevelStyleIndex();
+          TColorStyle *currentStyle = palette->getStyle(styleIndex);
+          
+          if (preset.m_hasMyPaint) {
+            // Preset was created WITH MyPaint: load the specific MyPaint brush
+            TFilePath myPaintPath(preset.m_myPaintPath);
+            TMyPaintBrushStyle *newStyle = new TMyPaintBrushStyle(myPaintPath);
+            if (currentStyle) {
+              newStyle->setMainColor(currentStyle->getMainColor());
+            }
+            palette->setStyle(styleIndex, newStyle);
+            app->getCurrentPalette()->notifyColorStyleChanged(false);
+          } else {
+            // Preset was created WITHOUT MyPaint: replace any existing MyPaint with solid color
+            if (dynamic_cast<TMyPaintBrushStyle*>(currentStyle)) {
+              TSolidColorStyle *newStyle = new TSolidColorStyle(
+                currentStyle ? currentStyle->getMainColor() : TPixel32::Black);
+              palette->setStyle(styleIndex, newStyle);
+              app->getCurrentPalette()->notifyColorStyleChanged(false);
+            }
+          }
+        }
+      }
+    }
+    // OLD presets (version 0): do nothing - leave the current style unchanged
   } catch (...) {
   }
 }
@@ -1785,6 +1823,22 @@ void ToonzRasterBrushTool::addPreset(QString name) {
   preset.m_modifierSize      = m_modifierSize.getValue();
   preset.m_modifierLockAlpha = m_modifierLockAlpha.getValue();
   preset.m_assistants        = m_assistants.getValue();
+  
+  // Capture MyPaint style information (CRITICAL for strict preset restoration)
+  preset.m_styleInfoVersion = 1;  // Mark as new preset with style information
+  
+  TApplication *app = getApplication();
+  if (app) {
+    TColorStyle *style = app->getCurrentLevelStyle();
+    if (TMyPaintBrushStyle *mpStyle = dynamic_cast<TMyPaintBrushStyle*>(style)) {
+      preset.m_hasMyPaint = true;
+      std::wstring wpath = mpStyle->getPath().getWideString();
+      preset.m_myPaintPath = std::string(wpath.begin(), wpath.end());
+    } else {
+      preset.m_hasMyPaint = false;
+      preset.m_myPaintPath = "";
+    }
+  }
 
   // Pass the preset to the manager
   m_presetsManager.addPreset(preset);
@@ -1945,7 +1999,10 @@ BrushData::BrushData(const std::wstring &name)
     , m_modifierOpacity(0.0)
     , m_modifierEraser(0.0)
     , m_modifierLockAlpha(0.0)
-    , m_assistants(false) {}
+    , m_assistants(false)
+    , m_hasMyPaint(false)
+    , m_myPaintPath("")
+    , m_styleInfoVersion(0) {}
 
 //----------------------------------------------------------------------------------------------------------
 
@@ -1989,6 +2046,17 @@ void BrushData::saveData(TOStream &os) {
   os.openChild("Assistants");
   os << (int)m_assistants;
   os.closeChild();
+  os.openChild("StyleInfoVersion");
+  os << 1;  // Version 1 = has style information
+  os.closeChild();
+  os.openChild("HasMyPaint");
+  os << (int)m_hasMyPaint;
+  os.closeChild();
+  if (m_hasMyPaint) {
+    os.openChild("MyPaintPath");
+    os << m_myPaintPath;
+    os.closeChild();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------
@@ -2026,9 +2094,18 @@ void BrushData::loadData(TIStream &is) {
       is >> val, m_modifierLockAlpha = val, is.matchEndTag();
     else if (tagName == "Assistants")
       is >> val, m_assistants = val, is.matchEndTag();
+    else if (tagName == "StyleInfoVersion")
+      is >> m_styleInfoVersion, is.matchEndTag();
+    else if (tagName == "HasMyPaint")
+      is >> val, m_hasMyPaint = val, is.matchEndTag();
+    else if (tagName == "MyPaintPath")
+      is >> m_myPaintPath, is.matchEndTag();
     else
       is.skipCurrentTag();
   }
+  
+  // If StyleInfoVersion is missing, this is an old preset (version 0)
+  // Old presets don't have style information, so we leave m_styleInfoVersion at 0
 }
 
 //----------------------------------------------------------------------------------------------------------

@@ -8,6 +8,7 @@
 #include "shortcutpopup.h"
 #include "custompanelmanager.h"
 #include "commandbarpopup.h"
+#include "toolpresetcommandmanager.h"
 
 // TnzQt includes
 #include "toonzqt/gutil.h"
@@ -862,6 +863,20 @@ CustomPanelEditorPopup::CustomPanelEditorPopup()
   if (!loadTemplateList()) {
     // Handle template loading failure if needed
   }
+}
+
+//-----------------------------------------------------------------------------
+
+void CustomPanelEditorPopup::showEvent(QShowEvent* event) {
+  // Refresh brush preset and size commands to ensure they're up-to-date
+  ToolPresetCommandManager::instance()->refreshPresetCommands();
+  ToolPresetCommandManager::instance()->refreshSizeCommands();
+  
+  // Refresh the command list tree to show new commands
+  m_commandListTree->refreshTree();
+  m_commandListTree->searchItems();  // Clear any search filter
+  
+  Dialog::showEvent(event);
 }
 
 //-----------------------------------------------------------------------------

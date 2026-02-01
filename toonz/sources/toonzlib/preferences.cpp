@@ -454,6 +454,7 @@ void Preferences::definePreferenceItems() {
   bool defIconsVisible = true;
 #endif
   define(showIconsInMenu, "showIconsInMenu", QMetaType::Bool, defIconsVisible);
+  define(showRoomBindButtons, "showRoomBindButtons", QMetaType::Bool, true);
 
   setCallBack(pixelsOnly, &Preferences::setPixelsOnly);
   setCallBack(linearUnits, &Preferences::setUnits);

@@ -9,6 +9,7 @@
 #include "../toonzqt/tdockwindows.h"
 
 class TPanelTitleBarButtonSet;
+class TPanelTitleBarButton;
 class Room;
 
 //! icon buttons placed on the panel titlebar (cfr. viewerpane.h)
@@ -38,11 +39,11 @@ class TPanelTitleBarButton : public QWidget {
   Q_PROPERTY(QColor FreezeColor READ getFreezeColor WRITE setFreezeColor);
   Q_PROPERTY(QColor PreviewColor READ getPreviewColor WRITE setPreviewColor);
 
-  bool m_rollover;
   TPanelTitleBarButtonSet *m_buttonSet;
   int m_id;
 
 protected:
+  bool m_rollover;
   bool m_pressed;
 
 public:
@@ -83,6 +84,24 @@ signals:
   //! emitted when the user press the button
   //! n.b. the signal is not emitted if the button is part of a buttonset
   void toggled(bool pressed);
+};
+
+//-----------------------------------------------------------------------------
+/*! specialized button for Bind to Room feature with a simple circle indicator
+ */
+
+class TPanelTitleBarButtonForBindToRoom final : public TPanelTitleBarButton {
+  Q_OBJECT
+public:
+  TPanelTitleBarButtonForBindToRoom(QWidget *parent)
+      : TPanelTitleBarButton(parent, "") {
+    // Set a small size similar to close button
+    setFixedSize(20, 18);
+    setMouseTracking(true);
+  }
+
+protected:
+  void paintEvent(QPaintEvent *) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -220,6 +239,11 @@ class TPanel : public TDockWidget {
   QList<TPanel *> m_hiddenDockWidgets;
   QByteArray m_currentRoomOldState;
 
+  // Room binding for custom panels
+  bool m_isRoomBound;
+  QString m_boundRoomName;
+  TPanelTitleBarButton *m_roomBindButton;
+
 public:
   TPanel(QWidget *parent = 0, Qt::WindowFlags flags = Qt::WindowFlags(),
          TDockWidget::Orientation orientation = TDockWidget::vertical);
@@ -248,6 +272,19 @@ public:
 
   TPanelTitleBar *getTitleBar() const { return m_panelTitleBar; }
 
+  // Room binding methods (for all panels)
+  bool isRoomBound() const { return m_isRoomBound; }
+  void setRoomBound(bool bound);
+  QString getBoundRoomName() const { return m_boundRoomName; }
+  void setBoundRoomName(const QString &roomName);
+  void setRoomBindButton(TPanelTitleBarButton *button) {
+    m_roomBindButton = button;
+  }
+  
+  // Add room binding toggle button to the title bar
+  // This enables the "Bind to Room" feature for any panel
+  void addRoomBindButton();
+
   virtual void reset() {};
 
   virtual int getViewType() { return -1; };
@@ -274,6 +311,7 @@ protected:
 protected slots:
 
   void onCloseButtonPressed();
+  void onCustomContextMenuRequested(const QPoint &pos);
   virtual void widgetFocusOnEnter() {
     // by default, focus the panel content
     if (widget()) widget()->setFocus();

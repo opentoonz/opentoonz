@@ -28,6 +28,7 @@
 #include "toonz/palettecontroller.h"
 #include "toonz/mypaintbrushstyle.h"
 #include "toonz/preferences.h"
+#include "toonz/toonzfolders.h"
 
 // TnzCore includes
 #include "tgl.h"
@@ -40,6 +41,8 @@
 #include "tstroke.h"
 #include "timagecache.h"
 #include "tpixelutils.h"
+#include "tsystem.h"
+#include "tcolorstyles.h"
 
 // Qt includes
 #include <QCoreApplication>  // Qt translation support
@@ -763,6 +766,40 @@ void FullColorBrushTool::loadPreset() {
     m_modifierEraser.setValue(preset.m_modifierEraser);
     m_modifierLockAlpha.setValue(preset.m_modifierLockAlpha);
     m_assistants.setValue(preset.m_assistants);
+    
+    // CRITICAL: Restore MyPaint style from preset (strict state restoration)
+    // Only applies to NEW presets (version >= 1) that have style information
+    if (preset.m_styleInfoVersion >= 1) {
+      if (TTool::Application *app = getApplication()) {
+        if (TPaletteHandle *paletteHandle = app->getCurrentPalette()) {
+          TPalette *palette = paletteHandle->getPalette();
+          if (palette) {
+            int styleIndex = app->getCurrentLevelStyleIndex();
+            TColorStyle *currentStyle = palette->getStyle(styleIndex);
+            
+            if (preset.m_hasMyPaint) {
+              // Preset was created WITH MyPaint: load the specific MyPaint brush
+              TFilePath myPaintPath(preset.m_myPaintPath);
+              TMyPaintBrushStyle *newStyle = new TMyPaintBrushStyle(myPaintPath);
+              if (currentStyle) {
+                newStyle->setMainColor(currentStyle->getMainColor());
+              }
+              palette->setStyle(styleIndex, newStyle);
+              paletteHandle->notifyColorStyleChanged(false);
+            } else {
+              // Preset was created WITHOUT MyPaint: replace any existing MyPaint with solid color
+              if (dynamic_cast<TMyPaintBrushStyle*>(currentStyle)) {
+                TSolidColorStyle *newStyle = new TSolidColorStyle(
+                  currentStyle ? currentStyle->getMainColor() : TPixel32::Black);
+                palette->setStyle(styleIndex, newStyle);
+                paletteHandle->notifyColorStyleChanged(false);
+              }
+            }
+          }
+        }
+      }
+    }
+    // OLD presets (version 0): do nothing - leave the current style unchanged
   } catch (...) {
   }
 }
@@ -784,6 +821,21 @@ void FullColorBrushTool::addPreset(QString name) {
   preset.m_modifierEraser    = m_modifierEraser.getValue();
   preset.m_modifierLockAlpha = m_modifierLockAlpha.getValue();
   preset.m_assistants        = m_assistants.getValue();
+  
+  // Capture MyPaint style information (CRITICAL for strict preset restoration)
+  preset.m_styleInfoVersion = 1;  // Mark as new preset with style information
+  
+  if (TTool::Application *app = getApplication()) {
+    TColorStyle *style = app->getCurrentLevelStyle();
+    if (TMyPaintBrushStyle *mpStyle = dynamic_cast<TMyPaintBrushStyle*>(style)) {
+      preset.m_hasMyPaint = true;
+      std::wstring wpath = mpStyle->getPath().getWideString();
+      preset.m_myPaintPath = std::string(wpath.begin(), wpath.end());
+    } else {
+      preset.m_hasMyPaint = false;
+      preset.m_myPaintPath = "";
+    }
+  }
 
   // Pass the preset to the manager
   m_presetsManager.addPreset(preset);

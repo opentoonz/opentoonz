@@ -38,6 +38,7 @@
 #include <QButtonGroup>
 #include <QMenu>
 #include <QListView>
+#include <QContextMenuEvent>
 
 #include "tooloptionscontrols.h"
 

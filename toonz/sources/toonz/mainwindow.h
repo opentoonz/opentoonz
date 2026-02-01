@@ -126,6 +126,9 @@ public:
 
   QString getLayoutName() { return m_layoutName; }
 
+  // Update visibility of all room-bound panels (native and custom)
+  void updatePanelVisibility();
+
 protected:
   void showEvent(QShowEvent *) override;
   void closeEvent(QCloseEvent *) override;

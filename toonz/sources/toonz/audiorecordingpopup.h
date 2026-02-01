@@ -56,14 +56,25 @@ class AudioRecordingPopup : public DVGui::Dialog {
   QLabel *m_labelDevice, *m_labelSamplerate, *m_labelSamplefmt;
   QComboBox *m_comboSamplerate, *m_comboSamplefmt;
   bool m_blockAudioSettings;
+  
+  // Room binding members
+  bool m_isRoomBound;
+  QString m_boundRoomName;
 
 public:
   AudioRecordingPopup();
   ~AudioRecordingPopup();
+  
+  // Room binding methods
+  bool isRoomBound() const { return m_isRoomBound; }
+  void setRoomBound(bool bound) { m_isRoomBound = bound; }
+  QString getBoundRoomName() const { return m_boundRoomName; }
+  void setBoundRoomName(const QString &roomName) { m_boundRoomName = roomName; }
 
 protected:
-  void showEvent(QShowEvent *event);
-  void hideEvent(QHideEvent *event);
+  void contextMenuEvent(QContextMenuEvent *event) override;
+  void showEvent(QShowEvent *event) override;
+  void hideEvent(QHideEvent *event) override;
   void makePaths();
   void resetEverything();
   void enumerateAudioDevices(const QString &deviceName);

@@ -7,6 +7,7 @@
 
 #include <QString>
 #include <QWidget>
+#include <QList>
 
 class TPanel;
 
@@ -46,10 +47,13 @@ protected:
 
 class CustomPanelManager {  // singleton
   CustomPanelManager(){};
+  
+  QList<QString> m_registeredPanelIds;
 
 public:
   static CustomPanelManager* instance();
   void loadCustomPanelEntries();
+  void registerCustomPanelCommands();
 
   TPanel* createCustomPanel(const QString panelName, QWidget* parent);
 

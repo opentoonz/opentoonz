@@ -30,6 +30,7 @@
 #include <QMimeData>
 #include <QDrag>
 #include <QMouseEvent>
+#include <QMap>
 #include <QPainter>
 #include <QApplication>
 #include <QLabel>
@@ -106,8 +107,10 @@ CommandListTree::CommandListTree(const QString& dropTargetString,
   addFolder(ShortcutTree::tr("Render"), MenuRenderCommandType,
             menuCommandFolder);
   addFolder(ShortcutTree::tr("View"), MenuViewCommandType, menuCommandFolder);
-  addFolder(ShortcutTree::tr("Windows"), MenuWindowsCommandType,
+  QTreeWidgetItem* windowsFolder = addFolder(ShortcutTree::tr("Windows"), MenuWindowsCommandType,
             menuCommandFolder);
+  addFolder(ShortcutTree::tr("Custom Panels"), CustomPanelCommandType,
+            windowsFolder);
   addFolder(ShortcutTree::tr("Help"), MenuHelpCommandType, menuCommandFolder);
   addFolder(ShortcutTree::tr("SubMenu Commands"), MenuCommandType,
             menuCommandFolder);
@@ -125,8 +128,13 @@ CommandListTree::CommandListTree(const QString& dropTargetString,
       addFolder(ShortcutTree::tr("Right-click Menu Commands"),
                 RightClickMenuCommandType, advancedFolder);
   addFolder(ShortcutTree::tr("Cell Mark"), CellMarkCommandType, rcmSubFolder);
-  addFolder(ShortcutTree::tr("Tool Modifiers"), ToolModifierCommandType,
-            advancedFolder);
+  QTreeWidgetItem* toolModifiersFolder =
+      addFolder(ShortcutTree::tr("Tool Modifiers"), ToolModifierCommandType,
+                advancedFolder);
+  addFolder(ShortcutTree::tr("Brush Presets"), BrushPresetCommandType,
+            toolModifiersFolder);
+  addFolder(ShortcutTree::tr("Brush Sizes"), BrushSizeCommandType,
+            toolModifiersFolder);
   addFolder(ShortcutTree::tr("Visualization"), VisualizationButtonCommandType,
             advancedFolder);
   addFolder(ShortcutTree::tr("Misc"), MiscCommandType, advancedFolder);
@@ -143,6 +151,88 @@ CommandListTree::CommandListTree(const QString& dropTargetString,
     sep->setToolTip(0, QObject::tr("[Drag&Drop] to copy separator to %1")
                            .arg(m_dropTargetString));
     addTopLevelItem(sep);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void CommandListTree::refreshTree() {
+  // Save expansion state
+  QMap<QString, bool> expandedState;
+  for (int i = 0; i < topLevelItemCount(); ++i) {
+    QTreeWidgetItem* item = topLevelItem(i);
+    if (item) {
+      expandedState[item->text(0)] = item->isExpanded();
+    }
+  }
+  
+  // Clear and rebuild
+  clear();
+  
+  QIcon menuFolderIcon(createQIcon("folder_project"));
+  invisibleRootItem()->setIcon(0, menuFolderIcon);
+
+  QTreeWidgetItem* menuCommandFolder = new QTreeWidgetItem(this);
+  menuCommandFolder->setFlags(Qt::ItemIsEnabled);
+  menuCommandFolder->setText(0, "1");
+  menuCommandFolder->setExpanded(true);
+  menuCommandFolder->setIcon(0, invisibleRootItem()->icon(0));
+
+  addFolder(ShortcutTree::tr("File"), MenuFileCommandType, menuCommandFolder);
+  addFolder(ShortcutTree::tr("Edit"), MenuEditCommandType, menuCommandFolder);
+  addFolder(ShortcutTree::tr("Scan & Cleanup"), MenuScanCleanupCommandType,
+            menuCommandFolder);
+  addFolder(ShortcutTree::tr("Level"), MenuLevelCommandType, menuCommandFolder);
+  addFolder(ShortcutTree::tr("Xsheet"), MenuXsheetCommandType,
+            menuCommandFolder);
+  addFolder(ShortcutTree::tr("Cells"), MenuCellsCommandType, menuCommandFolder);
+  addFolder(ShortcutTree::tr("Play"), MenuPlayCommandType, menuCommandFolder);
+  addFolder(ShortcutTree::tr("Render"), MenuRenderCommandType,
+            menuCommandFolder);
+  addFolder(ShortcutTree::tr("View"), MenuViewCommandType, menuCommandFolder);
+  QTreeWidgetItem* windowsFolder = addFolder(ShortcutTree::tr("Windows"), MenuWindowsCommandType,
+            menuCommandFolder);
+  addFolder(ShortcutTree::tr("Custom Panels"), CustomPanelCommandType,
+            windowsFolder);
+  addFolder(ShortcutTree::tr("Help"), MenuHelpCommandType, menuCommandFolder);
+  addFolder(ShortcutTree::tr("SubMenu Commands"), MenuCommandType,
+            menuCommandFolder);
+
+  QTreeWidgetItem* toolsFolder = addFolder("2", ToolCommandType);
+
+  QTreeWidgetItem* advancedFolder = new QTreeWidgetItem(this);
+  advancedFolder->setFlags(Qt::ItemIsEnabled);
+  advancedFolder->setText(0, "3");
+  advancedFolder->setIcon(0, invisibleRootItem()->icon(0));
+
+  addFolder(ShortcutTree::tr("Fill"), FillCommandType, advancedFolder);
+  QTreeWidgetItem* rcmSubFolder =
+      addFolder(ShortcutTree::tr("Right-click Menu Commands"),
+                RightClickMenuCommandType, advancedFolder);
+  addFolder(ShortcutTree::tr("Cell Mark"), CellMarkCommandType, rcmSubFolder);
+  QTreeWidgetItem* toolModifiersFolder =
+      addFolder(ShortcutTree::tr("Tool Modifiers"), ToolModifierCommandType,
+                advancedFolder);
+  addFolder(ShortcutTree::tr("Brush Presets"), BrushPresetCommandType,
+            toolModifiersFolder);
+  addFolder(ShortcutTree::tr("Brush Sizes"), BrushSizeCommandType,
+            toolModifiersFolder);
+  addFolder(ShortcutTree::tr("Visualization"), VisualizationButtonCommandType,
+            advancedFolder);
+  addFolder(ShortcutTree::tr("Misc"), MiscCommandType, advancedFolder);
+  addFolder(ShortcutTree::tr("RGBA Channels"), RGBACommandType, advancedFolder);
+
+  sortItems(0, Qt::AscendingOrder);
+  menuCommandFolder->setText(0, ShortcutTree::tr("Menu Commands"));
+  toolsFolder->setText(0, ShortcutTree::tr("Tools"));
+  advancedFolder->setText(0, ShortcutTree::tr("Advanced"));
+  
+  // Restore expansion state
+  for (int i = 0; i < topLevelItemCount(); ++i) {
+    QTreeWidgetItem* item = topLevelItem(i);
+    if (item && expandedState.contains(item->text(0))) {
+      item->setExpanded(expandedState[item->text(0)]);
+    }
   }
 }
 
