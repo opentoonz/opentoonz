@@ -1,10 +1,10 @@
 #pragma once
 
-#ifndef TTIO_PNG_INCLUDED
-#define TTIO_PNG_INCLUDED
+#ifndef TIIO_PNG_INCLUDED
+#define TIIO_PNG_INCLUDED
 
 #include "tiio.h"
-//#include "timage_io.h"
+// #include "timage_io.h"
 #include "tproperty.h"
 #include <QCoreApplication>
 
@@ -19,6 +19,7 @@ class PngWriterProperties final : public TPropertyGroup {
 public:
   // TEnumProperty m_pixelSize;
   TBoolProperty m_matte;
+  TPointerProperty m_colormap;
 
   PngWriterProperties();
   void updateTranslation() override;
@@ -29,6 +30,6 @@ public:
 Tiio::Reader *makePngReader();
 Tiio::Writer *makePngWriter();
 
-}  // namespace
+}  // namespace Tiio
 
-#endif
+#endif  // TIIO_PNG_INCLUDED

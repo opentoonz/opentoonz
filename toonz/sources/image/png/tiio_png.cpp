@@ -1,8 +1,12 @@
+
+
 #if defined(_MSC_VER) && (_MSC_VER >= 1400)
 #define _CRT_SECURE_NO_DEPRECATE 1
 #endif
 
 #include <memory>
+#include <stdexcept>
+#include <vector>
 
 #include "tmachine.h"
 #include "texception.h"
@@ -16,15 +20,14 @@
 #include "tpixel.h"
 #include "tpixelutils.h"
 
-using namespace std;
 //------------------------------------------------------------
 
 extern "C" {
-
 static void tnz_abort(jmp_buf, int) {}
 
 static void tnz_error_fun(png_structp pngPtr, png_const_charp error_message) {
-  *(int *)png_get_error_ptr(pngPtr) = 0;
+  // Jump back to the setjmp point, libpng expects this for error recovery
+  longjmp(png_jmpbuf(pngPtr), 1);
 }
 }
 
@@ -61,8 +64,8 @@ static png_byte png_get_current_pass_number(const png_structp png_ptr) {
 
 inline USHORT mySwap(USHORT val) {
 #if TNZ_LITTLE_ENDIAN
-  return ((val) |
-          ((val & 0xff) << 8));  //((val>>8)|((val&0xff)<<8)); (vecchio codice)
+  // Correct byte swapping for little-endian systems
+  return static_cast<USHORT>((val >> 8) | (val << 8));
 #else
   return val;
 #endif
@@ -80,8 +83,14 @@ class PngReader final : public Tiio::Reader {
   int m_y;
   bool m_is16bitEnabled;
   std::unique_ptr<unsigned char[]> m_rowBuffer;
-  std::unique_ptr<unsigned char[]> m_tempBuffer;  // Buffer temporaneo
   int m_canDelete;
+  int m_channels;
+  int m_rowBytes;
+  bool m_hasPalette;
+  png_colorp m_palette;
+  int m_paletteSize;
+  png_bytep m_transparency;
+  int m_transparencySize;
 
 public:
   PngReader()
@@ -97,75 +106,81 @@ public:
       , m_sig_read(0)
       , m_y(0)
       , m_is16bitEnabled(true)
-      , m_canDelete(0) {}
+      , m_canDelete(0)
+      , m_channels(0)
+      , m_rowBytes(0)
+      , m_hasPalette(false)
+      , m_palette(nullptr)
+      , m_paletteSize(0)
+      , m_transparency(nullptr)
+      , m_transparencySize(0) {}
 
   ~PngReader() {
-    if (m_canDelete == 1) {
+    if (m_png_ptr) {
       png_destroy_read_struct(&m_png_ptr, &m_info_ptr, &m_end_info_ptr);
     }
+    // Note: libpng manages palette and transparency memory internally
   }
 
   bool read16BitIsEnabled() const override { return m_is16bitEnabled; }
 
   void enable16BitRead(bool enabled) override { m_is16bitEnabled = enabled; }
 
-  void readLineInterlace(char *buffer) {
-    readLineInterlace(buffer, 0, m_info.m_lx - 1, 1);
-  }
-  void readLineInterlace(short *buffer) {
-    readLineInterlace(buffer, 0, m_info.m_lx - 1, 1);
-  }
-
   void open(FILE *file) override {
     try {
       m_chan = file;
     } catch (...) {
-      perror("uffa");
-      return;
+      throw TException("Can't open file");
     }
 
-    unsigned char signature[8];  // da 1 a 8 bytes
-    fread(signature, 1, sizeof signature, m_chan);
-    bool isPng = !png_sig_cmp(signature, 0, sizeof signature);
-    if (!isPng) return;
+    unsigned char signature[8];
+    size_t bytesRead = fread(signature, 1, sizeof(signature), m_chan);
+    if (bytesRead != sizeof(signature)) {
+      throw TException("Can't read PNG signature");
+    }
 
-    m_png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, &m_canDelete,
-                                       tnz_error_fun, 0);
-    if (!m_png_ptr) return;
+    bool isPng = !png_sig_cmp(signature, 0, sizeof(signature));
+    if (!isPng) {
+      throw TException("Not a valid PNG file");
+    }
+
+    m_png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr,
+                                       nullptr);
+    if (!m_png_ptr) {
+      throw TException("Unable to create PNG read structure");
+    }
+
+    // Set error handler
+    png_set_error_fn(m_png_ptr, nullptr, tnz_error_fun, nullptr);
 
 #if defined(PNG_LIBPNG_VER)
 #if (PNG_LIBPNG_VER >= 10527)
-    png_set_longjmp_fn(m_png_ptr, tnz_abort,
-                       sizeof(jmp_buf)); /* ignore all fatal errors */
-#endif                                   // (PNG_LIBPNG_VER >= 10527)
-#endif                                   // defined(PNG_LIBPNG_VER)
+    png_set_longjmp_fn(m_png_ptr, tnz_abort, sizeof(jmp_buf));
+#endif
+#endif
 
-    m_canDelete = 1;
-    m_info_ptr  = png_create_info_struct(m_png_ptr);
+    m_info_ptr = png_create_info_struct(m_png_ptr);
     if (!m_info_ptr) {
       png_destroy_read_struct(&m_png_ptr, (png_infopp)0, (png_infopp)0);
-      return;
+      throw TException("Unable to create PNG info structure");
     }
     m_end_info_ptr = png_create_info_struct(m_png_ptr);
     if (!m_end_info_ptr) {
       png_destroy_read_struct(&m_png_ptr, &m_info_ptr, (png_infopp)0);
-      return;
+      throw TException("Unable to create PNG end info structure");
+    }
+
+    // Set up error handling with setjmp
+    if (setjmp(png_jmpbuf(m_png_ptr))) {
+      png_destroy_read_struct(&m_png_ptr, &m_info_ptr, &m_end_info_ptr);
+      m_png_ptr      = nullptr;
+      m_info_ptr     = nullptr;
+      m_end_info_ptr = nullptr;
+      throw TException("PNG initialization failed");
     }
 
     png_init_io(m_png_ptr, m_chan);
-
-    png_set_sig_bytes(m_png_ptr, sizeof signature);
-
-#if defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR)
-    png_set_bgr(m_png_ptr);
-    png_set_swap_alpha(m_png_ptr);
-#elif defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
-    png_set_bgr(m_png_ptr);
-#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB)
-    png_set_swap_alpha(m_png_ptr);
-#elif !defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
-#error "unknown channel order"
-#endif
+    png_set_sig_bytes(m_png_ptr, sizeof(signature));
 
     png_read_info(m_png_ptr, m_info_ptr);
 
@@ -176,8 +191,6 @@ public:
       m_info.m_dpiy    = tround(ydpi * 0.0254);
     }
 
-    int rowBytes = png_get_rowbytes(m_png_ptr, m_info_ptr);
-
     png_uint_32 lx = 0, ly = 0;
     png_get_IHDR(m_png_ptr, m_info_ptr, &lx, &ly, &m_bit_depth, &m_color_type,
                  &m_interlace_type, &m_compression_type, &m_filter_type);
@@ -186,28 +199,22 @@ public:
 
     m_info.m_bitsPerSample = m_bit_depth;
 
-    int channels            = png_get_channels(m_png_ptr, m_info_ptr);
-    m_info.m_samplePerPixel = channels;
+    // Check for palette
+    if (m_color_type == PNG_COLOR_TYPE_PALETTE) {
+      m_hasPalette = true;
 
-    if (channels == 1 || channels == 2) {
-      if (m_bit_depth <
-          8)  // (m_bit_depth == 1 || m_bit_depth == 2 || m_bit_depth == 4)
-        m_rowBuffer.reset(new unsigned char[lx * 3]);
-      else
-        m_rowBuffer.reset(new unsigned char[rowBytes * 4]);
-    } else {
-      m_rowBuffer.reset(new unsigned char[rowBytes]);
+      // Get palette information
+      png_get_PLTE(m_png_ptr, m_info_ptr, &m_palette, &m_paletteSize);
+
+      // Get transparency information if available
+      if (png_get_valid(m_png_ptr, m_info_ptr, PNG_INFO_tRNS)) {
+        png_get_tRNS(m_png_ptr, m_info_ptr, &m_transparency,
+                     &m_transparencySize, nullptr);
+      }
     }
 
     if (m_color_type == PNG_COLOR_TYPE_PALETTE) {
-      m_info.m_valid = true;
       png_set_palette_to_rgb(m_png_ptr);
-
-      // treat the image as RGBA from now on
-      m_info.m_samplePerPixel =
-          4;  // there are 4 channels per pixel (R, G, B, and A)
-
-      // if there is no alpha channel, then fill it with "255" (full opacity)
       png_set_filler(m_png_ptr, 0xFF, PNG_FILLER_AFTER);
     }
 
@@ -223,554 +230,353 @@ public:
       png_set_strip_16(m_png_ptr);
     }
 
-#if defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
-    if (m_color_type == PNG_COLOR_TYPE_RGB ||
-        m_color_type == PNG_COLOR_TYPE_RGB_ALPHA) {
-      png_set_bgr(m_png_ptr);
-    }
-#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR)
-    if (m_color_type == PNG_COLOR_TYPE_RGB_ALPHA) {
-      png_set_swap_alpha(m_png_ptr);
-    }
-#elif !defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM) &&                              \
-    !defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB)
-#error "unknown channel order"
-#endif
-
     if (m_color_type == PNG_COLOR_TYPE_GRAY ||
         m_color_type == PNG_COLOR_TYPE_GRAY_ALPHA) {
       png_set_gray_to_rgb(m_png_ptr);
     }
+
+#if defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR)
+    png_set_bgr(m_png_ptr);
+    png_set_swap_alpha(m_png_ptr);
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
+    png_set_bgr(m_png_ptr);
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB)
+    png_set_swap_alpha(m_png_ptr);
+#elif !defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
+#error "unknown channel order"
+#endif
+
+    // Handle interlacing if present - let libpng handle it
+    if (m_interlace_type == PNG_INTERLACE_ADAM7) {
+      png_set_interlace_handling(m_png_ptr);
+    }
+
+    // Update info after all transformations
+    png_read_update_info(m_png_ptr, m_info_ptr);
+
+    // Refresh variables after update
+    m_channels = png_get_channels(m_png_ptr, m_info_ptr);
+    m_rowBytes = png_get_rowbytes(m_png_ptr, m_info_ptr);
+    png_get_IHDR(m_png_ptr, m_info_ptr, &lx, &ly, &m_bit_depth, &m_color_type,
+                 &m_interlace_type, &m_compression_type, &m_filter_type);
+    m_info.m_samplePerPixel = m_channels;
+
+    // Validate dimensions
+    if (m_info.m_lx <= 0 || m_info.m_ly <= 0) {
+      throw TException("Invalid PNG dimensions");
+    }
+
+    // Allocate row buffer based on updated rowBytes
+    m_rowBuffer.reset(new unsigned char[m_rowBytes]);
+    if (!m_rowBuffer) {
+      throw TException("Memory allocation failed for row buffer");
+    }
   }
 
   void readLine(char *buffer, int x0, int x1, int shrink) override {
-    int ly = m_info.m_ly;
-    if (!m_tempBuffer) {
-      int lx       = m_info.m_lx;
-      int channels = png_get_channels(m_png_ptr, m_info_ptr);
-      int rowBytes = png_get_rowbytes(m_png_ptr, m_info_ptr);
-      if (m_interlace_type == 1) {
-        if (channels == 1 || channels == 2) {
-          if (m_bit_depth < 8)
-            m_tempBuffer.reset(new unsigned char[ly * lx * 3]);
-          else
-            m_tempBuffer.reset(new unsigned char[ly * rowBytes * 4]);
+    // Validate input parameters
+    if (!buffer || x0 < 0 || x1 >= m_info.m_lx || x0 > x1) {
+      return;
+    }
+
+    if (setjmp(png_jmpbuf(m_png_ptr))) {
+      // Error while reading a PNG row.
+      // Fill the damaged area with a checkerboard pattern.
+      TPixel32 *pix = (TPixel32 *)buffer + x0;
+      for (int j = x0; j <= x1; ++j, ++pix) {
+        // 8×8 checkerboard pattern
+        bool isCheckerboard = (((j >> 3) + (m_y >> 3)) & 1) == 0;
+
+        if (isCheckerboard) {
+          pix->r = pix->g = pix->b = 120;  // dark gray
+          pix->m                   = 255;  // opaque
         } else {
-          m_tempBuffer.reset(new unsigned char[ly * rowBytes]);
+          pix->r = pix->g = pix->b = 180;  // light gray
+          pix->m                   = 255;  // opaque
         }
       }
-    }
-    int lx = m_info.m_lx;
 
-    if (m_interlace_type == 1 && lx > 4) {
-      readLineInterlace(&buffer[0], x0, x1, shrink);
       m_y++;
-      if (m_tempBuffer && m_y == ly) {
-        m_tempBuffer.reset();
-      }
-      throw TException("Unable to read file");
       return;
     }
 
-    int y = m_info.m_ly - 1 - m_y;
-    if (y < 0) {
-      throw TException("Unable to read file");
-      return;
-    }
-    m_y++;
-
-    png_bytep row_pointer = m_rowBuffer.get();
-    png_read_row(m_png_ptr, row_pointer, NULL);
-
-     if (setjmp(png_jmpbuf(m_png_ptr))) {
-      // If an error is caught in the next line, execution jumps here.
-      // We'll keep going in order to load whatever we can read.
-      return;
-    }
-
+    png_read_row(m_png_ptr, m_rowBuffer.get(), nullptr);
     writeRow(buffer, x0, x1);
-
-    if (m_tempBuffer && m_y == ly) {
-      m_tempBuffer.reset();
-    }
+    m_y++;
   }
 
   void readLine(short *buffer, int x0, int x1, int shrink) override {
-    int ly = m_info.m_ly;
-    if (!m_tempBuffer) {
-      int lx       = m_info.m_lx;
-      int channels = png_get_channels(m_png_ptr, m_info_ptr);
-      int rowBytes = png_get_rowbytes(m_png_ptr, m_info_ptr);
-      if (m_interlace_type == 1) {
-        if (channels == 1 || channels == 2) {
-          if (m_bit_depth <
-              8)  // (m_bit_depth == 1 || m_bit_depth == 2 || m_bit_depth == 4)
-            m_tempBuffer.reset(new unsigned char[ly * lx * 3]);
-          else
-            m_tempBuffer.reset(new unsigned char[ly * rowBytes * 4]);
-        } else {
-          m_tempBuffer.reset(new unsigned char[ly * rowBytes]);
-        }
-      }
-    }
-
-    if (png_get_interlace_type(m_png_ptr, m_info_ptr) == PNG_INTERLACE_ADAM7) {
-      readLineInterlace(&buffer[0], x0, x1, shrink);
-      m_y++;
-      if (m_tempBuffer && m_y == ly) {
-        m_tempBuffer.reset();
-      }
+    // Validate input parameters
+    if (!buffer || x0 < 0 || x1 >= m_info.m_lx || x0 > x1) {
       return;
     }
 
-    int y = m_info.m_ly - 1 - m_y;
-    if (y < 0) return;
-    m_y++;
+    if (setjmp(png_jmpbuf(m_png_ptr))) {
+      // Error while reading a PNG row.
+      // Fill the damaged area with a checkerboard pattern.
+      TPixel64 *pix = (TPixel64 *)buffer + x0;
+      for (int j = x0; j <= x1; ++j, ++pix) {
+        // 8×8 checkerboard pattern
+        bool isCheckerboard = (((j >> 3) + (m_y >> 3)) & 1) == 0;
 
-    png_bytep row_pointer = m_rowBuffer.get();
-    png_read_row(m_png_ptr, row_pointer, NULL);
-
-    writeRow(buffer, x0, x1);
-
-    if (m_tempBuffer && m_y == ly) {
-      m_tempBuffer.reset();
+        if (isCheckerboard) {
+          pix->r = pix->g = pix->b = 120;  // dark gray
+          pix->m                   = 255;  // opaque
+        } else {
+          pix->r = pix->g = pix->b = 180;  // light gray
+          pix->m                   = 255;  // opaque
+        }
+      }
+      m_y++;
+      return;
     }
+
+    png_read_row(m_png_ptr, m_rowBuffer.get(), nullptr);
+    writeRow(buffer, x0, x1);
+    m_y++;
   }
 
   int skipLines(int lineCount) override {
-    for (int i = 0; i < lineCount; i++) {
-      if (m_interlace_type == 1 &&
-          m_info.m_lx > 4)  // pezza. Studiare il codice
-      {
-        int channels     = png_get_channels(m_png_ptr, m_info_ptr);
-        char *lineBuffer = (char *)malloc(4 * m_info.m_lx * sizeof(char));
-        readLine(lineBuffer, 0, m_info.m_lx - 1, 1);
-        free(lineBuffer);
-      } else {
-        m_y++;
-        png_bytep row_pointer = m_rowBuffer.get();
-        png_read_row(m_png_ptr, row_pointer, NULL);
+    if (lineCount <= 0) return 0;
+
+    int skipped = 0;
+    for (int i = 0; i < lineCount; ++i) {
+      if (m_y >= m_info.m_ly) break;
+
+      if (setjmp(png_jmpbuf(m_png_ptr))) {
+        break;  // Stop on error
       }
+
+      png_read_row(m_png_ptr, m_rowBuffer.get(), nullptr);
+      m_y++;
+      skipped++;
     }
-    return lineCount;
+    return skipped;
   }
 
   Tiio::RowOrder getRowOrder() const override { return Tiio::TOP2BOTTOM; }
 
-  void writeRow(char *buffer, int x0, int x1) {
-    if (m_color_type == PNG_COLOR_TYPE_RGB_ALPHA ||
-        m_color_type == PNG_COLOR_TYPE_GRAY_ALPHA ||
-        m_color_type == PNG_COLOR_TYPE_PALETTE) {  // PNG_COLOR_TYPE_PALETTE is
-                                                   // expanded to RGBA
-      if (m_bit_depth == 16) {
-        TPixel32 *pix = (TPixel32 *)buffer;
-        int i         = -2;
-        i += x0 * 2 * 4;
-        for (int j = x0; j <= x1; j++) {
-#if defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB)
-          pix[j].m = m_rowBuffer[i = i + 2];
-          pix[j].r = m_rowBuffer[i = i + 2];
-          pix[j].g = m_rowBuffer[i = i + 2];
-          pix[j].b = m_rowBuffer[i = i + 2];
-#elif defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
-          pix[j].r = m_rowBuffer[i = i + 2];
-          pix[j].g = m_rowBuffer[i = i + 2];
-          pix[j].b = m_rowBuffer[i = i + 2];
-          pix[j].m = m_rowBuffer[i = i + 2];
-#elif defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
-          pix[j].b = m_rowBuffer[i = i + 2];
-          pix[j].g = m_rowBuffer[i = i + 2];
-          pix[j].r = m_rowBuffer[i = i + 2];
-          pix[j].m = m_rowBuffer[i = i + 2];
-#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR)
-          pix[j].m = m_rowBuffer[i = i + 2];
-          pix[j].b = m_rowBuffer[i = i + 2];
-          pix[j].g = m_rowBuffer[i = i + 2];
-          pix[j].r = m_rowBuffer[i = i + 2];
-#else
-#error "unknown channel order"
-#endif
+  // Accessor for palette information (if needed by external code)
+  bool hasPalette() const { return m_hasPalette; }
+  int getPaletteSize() const { return m_paletteSize; }
+  const png_color *getPalette() const { return m_palette; }
+  const png_byte *getTransparency() const { return m_transparency; }
+  int getTransparencySize() const { return m_transparencySize; }
 
-          // premultiply here
-          premult(pix[j]);
-        }
-      } else {
-        TPixel32 *pix = (TPixel32 *)buffer;
-        int i         = 0;
-        i += x0 * 4;
-        for (int j = x0; j <= x1; j++) {
-#if defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB)
-          pix[j].m = m_rowBuffer[i++];
-          pix[j].r = m_rowBuffer[i++];
-          pix[j].g = m_rowBuffer[i++];
-          pix[j].b = m_rowBuffer[i++];
-#elif defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
-          pix[j].r = m_rowBuffer[i++];
-          pix[j].g = m_rowBuffer[i++];
-          pix[j].b = m_rowBuffer[i++];
-          pix[j].m = m_rowBuffer[i++];
-#elif defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
-          pix[j].b = m_rowBuffer[i++];
-          pix[j].g = m_rowBuffer[i++];
-          pix[j].r = m_rowBuffer[i++];
-          pix[j].m = m_rowBuffer[i++];
-#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR)
-          pix[j].m = m_rowBuffer[i++];
-          pix[j].b = m_rowBuffer[i++];
-          pix[j].g = m_rowBuffer[i++];
-          pix[j].r = m_rowBuffer[i++];
-#else
-#error "unknown channel order"
-#endif
-          // premultiply here
-          premult(pix[j]);
-        }
+private:
+  void writeRow(char *buffer, int x0, int x1) {
+    bool hasAlpha = (m_channels == 4);
+
+    if (m_bit_depth == 16) {
+      // 16-bit not supported for char* buffer
+      TPixel32 *pix = (TPixel32 *)buffer + x0;
+      for (int j = x0; j <= x1; ++j, ++pix) {
+        pix->r = pix->g = pix->b = pix->m = 0;
       }
-    } else  // qui gestisce RGB senza alpha.
-    {       // grayscale e' gestito come RGB perche' si usa png_set_gray_to_rgb
-      if (m_bit_depth == 16) {
-        TPixel32 *pix = (TPixel32 *)buffer;
-        int i         = -2;
-        i += x0 * 2 * 3;
-        for (int j = x0; j <= x1; j++) {
-#if defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB) ||                                 \
-    defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
-          pix[j].r = m_rowBuffer[i = i + 2];
-          pix[j].g = m_rowBuffer[i = i + 2];
-          pix[j].b = m_rowBuffer[i = i + 2];
-#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR) ||                               \
-    defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
-          pix[j].b = m_rowBuffer[i = i + 2];
-          pix[j].g = m_rowBuffer[i = i + 2];
-          pix[j].r = m_rowBuffer[i = i + 2];
+      return;
+    }
+
+    TPixel32 *pix = (TPixel32 *)buffer + x0;
+    int srcIdx    = x0 * m_channels;
+
+    for (int j = x0; j <= x1; ++j, ++pix) {
+      if (srcIdx + m_channels > m_rowBytes) {
+        break;  // Prevent buffer overflow
+      }
+
+      if (hasAlpha) {
+#if defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB)
+        pix->m = m_rowBuffer[srcIdx++];
+        pix->r = m_rowBuffer[srcIdx++];
+        pix->g = m_rowBuffer[srcIdx++];
+        pix->b = m_rowBuffer[srcIdx++];
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
+        pix->r = m_rowBuffer[srcIdx++];
+        pix->g = m_rowBuffer[srcIdx++];
+        pix->b = m_rowBuffer[srcIdx++];
+        pix->m = m_rowBuffer[srcIdx++];
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
+        pix->b = m_rowBuffer[srcIdx++];
+        pix->g = m_rowBuffer[srcIdx++];
+        pix->r = m_rowBuffer[srcIdx++];
+        pix->m = m_rowBuffer[srcIdx++];
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR)
+        pix->m = m_rowBuffer[srcIdx++];
+        pix->b = m_rowBuffer[srcIdx++];
+        pix->g = m_rowBuffer[srcIdx++];
+        pix->r = m_rowBuffer[srcIdx++];
 #else
 #error "unknown channel order"
 #endif
-          pix[j].m = 255;
-        }
+        premult(*pix);
       } else {
-        TPixel32 *pix = (TPixel32 *)buffer;
-        int i         = 0;
-        i += x0 * 3;
-        for (int j = x0; j <= x1; j++) {
 #if defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB) ||                                 \
     defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
-          pix[j].r = m_rowBuffer[i++];
-          pix[j].g = m_rowBuffer[i++];
-          pix[j].b = m_rowBuffer[i++];
+        pix->r = m_rowBuffer[srcIdx++];
+        pix->g = m_rowBuffer[srcIdx++];
+        pix->b = m_rowBuffer[srcIdx++];
 #elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR) ||                               \
     defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
-          pix[j].b = m_rowBuffer[i++];
-          pix[j].g = m_rowBuffer[i++];
-          pix[j].r = m_rowBuffer[i++];
+        pix->b = m_rowBuffer[srcIdx++];
+        pix->g = m_rowBuffer[srcIdx++];
+        pix->r = m_rowBuffer[srcIdx++];
 #else
 #error "unknown channel order"
 #endif
-          pix[j].m = 255;
-        }
+        pix->m = 255;
       }
     }
   }
 
   void writeRow(short *buffer, int x0, int x1) {
-    if (m_color_type == PNG_COLOR_TYPE_RGB_ALPHA ||
-        m_color_type == PNG_COLOR_TYPE_GRAY_ALPHA ||
-        m_color_type == PNG_COLOR_TYPE_PALETTE) {  // PNG_COLOR_TYPE_PALETTE is
-                                                   // expanded to RGBA
-      TPixel64 *pix = (TPixel64 *)buffer;
-      int i         = -2;  // 0;
-      i += x0 * 2 * 4;
-      for (int j = x0; j <= x1; j++) {
+    bool hasAlpha       = (m_channels == 4);
+    int bytesPerChannel = (m_bit_depth == 16) ? 2 : 1;
+
+    TPixel64 *pix = (TPixel64 *)buffer + x0;
+    int srcIdx    = x0 * m_channels * bytesPerChannel;
+
+    for (int j = x0; j <= x1; ++j, ++pix) {
+      if (srcIdx >= m_rowBytes ||
+          srcIdx + (m_channels * bytesPerChannel) > m_rowBytes) {
+        break;  // Prevent buffer overflow
+      }
+
+      if (hasAlpha) {
+        if (m_bit_depth == 16) {
 #if defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB) ||                                 \
     defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
-        pix[j].r = mySwap(m_rowBuffer[i = i + 2]);  // i++
-        pix[j].g = mySwap(m_rowBuffer[i = i + 2]);
-        pix[j].b = mySwap(m_rowBuffer[i = i + 2]);
-        pix[j].m = mySwap(m_rowBuffer[i = i + 2]);
+          USHORT r, g, b, m;
+          memcpy(&r, m_rowBuffer.get() + srcIdx, sizeof(USHORT));
+          srcIdx += 2;
+          memcpy(&g, m_rowBuffer.get() + srcIdx, sizeof(USHORT));
+          srcIdx += 2;
+          memcpy(&b, m_rowBuffer.get() + srcIdx, sizeof(USHORT));
+          srcIdx += 2;
+          memcpy(&m, m_rowBuffer.get() + srcIdx, sizeof(USHORT));
+          srcIdx += 2;
+          pix->r = mySwap(r);
+          pix->g = mySwap(g);
+          pix->b = mySwap(b);
+          pix->m = mySwap(m);
 #elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR) ||                               \
     defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
-        pix[j].b = mySwap(m_rowBuffer[i = i + 2]);  // i++
-        pix[j].g = mySwap(m_rowBuffer[i = i + 2]);
-        pix[j].r = mySwap(m_rowBuffer[i = i + 2]);
-        pix[j].m = mySwap(m_rowBuffer[i = i + 2]);
+          USHORT b, g, r, m;
+          memcpy(&b, m_rowBuffer.get() + srcIdx, sizeof(USHORT));
+          srcIdx += 2;
+          memcpy(&g, m_rowBuffer.get() + srcIdx, sizeof(USHORT));
+          srcIdx += 2;
+          memcpy(&r, m_rowBuffer.get() + srcIdx, sizeof(USHORT));
+          srcIdx += 2;
+          memcpy(&m, m_rowBuffer.get() + srcIdx, sizeof(USHORT));
+          srcIdx += 2;
+          pix->b = mySwap(b);
+          pix->g = mySwap(g);
+          pix->r = mySwap(r);
+          pix->m = mySwap(m);
 #else
 #error "unknown channel order"
 #endif
-        // pix[j].m = 255;
-
-        // premultiply here
-        premult(pix[j]);
-      }
-    } else  // qui gestisce RGB senza alpha.
-    {       // grayscale e' gestito come RGB perche' si usa png_set_gray_to_rgb
-      TPixel64 *pix = (TPixel64 *)buffer;
-      int i         = -2;
-      i += x0 * 2 * 3;
-      for (int j = x0; j <= x1; j++) {
+        } else {
+          // 8-bit with alpha: 1 byte per channel, converted to 16-bit
+          // Layout: R(1) G(1) B(1) A(1) bytes
 #if defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB) ||                                 \
     defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
-        pix[j].r = mySwap(m_rowBuffer[i = i + 2]);
-        pix[j].g = mySwap(m_rowBuffer[i = i + 2]);
-        pix[j].b = mySwap(m_rowBuffer[i = i + 2]);
+          pix->r =
+              static_cast<USHORT>((m_rowBuffer[srcIdx++] * 65535 + 127) / 255);
+          pix->g =
+              static_cast<USHORT>((m_rowBuffer[srcIdx++] * 65535 + 127) / 255);
+          pix->b =
+              static_cast<USHORT>((m_rowBuffer[srcIdx++] * 65535 + 127) / 255);
+          pix->m =
+              static_cast<USHORT>((m_rowBuffer[srcIdx++] * 65535 + 127) / 255);
 #elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR) ||                               \
     defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
-        pix[j].b = mySwap(m_rowBuffer[i = i + 2]);
-        pix[j].g = mySwap(m_rowBuffer[i = i + 2]);
-        pix[j].r = mySwap(m_rowBuffer[i = i + 2]);
+          // Layout for 8-bit with alpha (BGR): B(1) G(1) R(1) A(1) bytes
+          pix->b =
+              static_cast<USHORT>((m_rowBuffer[srcIdx++] * 65535 + 127) / 255);
+          pix->g =
+              static_cast<USHORT>((m_rowBuffer[srcIdx++] * 65535 + 127) / 255);
+          pix->r =
+              static_cast<USHORT>((m_rowBuffer[srcIdx++] * 65535 + 127) / 255);
+          pix->m =
+              static_cast<USHORT>((m_rowBuffer[srcIdx++] * 65535 + 127) / 255);
 #else
 #error "unknown channel order"
 #endif
-        pix[j].m = mySwap(255);
-      }
-    }
-  }
-
-  void copyPixel(int count, int dstX, int dstDx, int dstY) {
-    int channels = png_get_channels(m_png_ptr, m_info_ptr);
-    int rowBytes = png_get_rowbytes(m_png_ptr, m_info_ptr);
-    int lx       = m_info.m_lx;
-
-    if ((channels == 4 || channels == 3) && m_bit_depth == 16) {
-      for (int i = 0; i < count; i += 2) {
-        for (int j = 0; j < channels * 2; j++) {
-          (m_tempBuffer.get() +
-           (dstY * rowBytes))[(i * dstDx + dstX) * channels + j] =
-              m_rowBuffer[i * channels + j];
         }
-      }
-    } else if (channels == 2 && m_bit_depth == 16) {
-      for (int i = 0; i < count; i += 2) {
-        for (int j = 0; j < 4 * 2; j++) {
-          (m_tempBuffer.get() +
-           (dstY * rowBytes * 4))[(i * dstDx + dstX) * 4 + j] =
-              m_rowBuffer[i * 4 + j];
-        }
-      }
-    } else if (channels == 1 && m_bit_depth == 16) {
-      for (int i = 0; i < count; i += 2) {
-        for (int j = 0; j < 3 * 2; j++) {
-          (m_tempBuffer.get() +
-           (dstY * rowBytes * 4))[(i * dstDx + dstX) * 3 + j] =
-              m_rowBuffer[i * 3 + j];
-        }
-      }
-    } else if (channels == 1 && m_bit_depth == 8) {
-      for (int i = 0; i < count; i++) {
-        for (int j = 0; j < 3; j++) {
-          (m_tempBuffer.get() +
-           (dstY * rowBytes * 4))[(i * dstDx + dstX) * 3 + j] =
-              m_rowBuffer[i * 3 + j];
-        }
-      }
-    } else if (channels == 2 && m_bit_depth == 8) {
-      for (int i = 0; i < count; i++) {
-        for (int j = 0; j < 4; j++) {
-          (m_tempBuffer.get() +
-           (dstY * rowBytes * 4))[(i * dstDx + dstX) * 4 + j] =
-              m_rowBuffer[i * 4 + j];
-        }
-      }
-    } else if ((channels == 1 || channels == 2) && m_bit_depth < 8) {
-      for (int i = 0; i < count; i++) {
-        for (int j = 0; j < 3; j++) {
-          (m_tempBuffer.get() + (dstY * lx * 3))[(i * dstDx + dstX) * 3 + j] =
-              m_rowBuffer[i * 3 + j];
-        }
-      }
-    } else {
-      for (int i = 0; i < count; i++) {
-        for (int j = 0; j < channels; j++) {
-          (m_tempBuffer.get() +
-           (dstY * rowBytes))[(i * dstDx + dstX) * channels + j] =
-              m_rowBuffer[i * channels + j];
-        }
-      }
-    }
-  }
-
-  void readLineInterlace(char *buffer, int x0, int x1, int shrink) {
-    // m_png_ptr->row_number è l'indice di riga che scorre quando chiamo la
-    // png_read_row
-    int rowNumber = png_get_current_row_number(m_png_ptr);
-    // numRows è il numero di righe processate in ogni passo
-    int numRows = (int)png_get_image_height(m_png_ptr, m_info_ptr) / 8;
-
-    int passPng = png_get_current_pass_number(m_png_ptr);
-
-    int passRow = 5 + (m_y & 1);  // passo desiderato per la riga corrente
-
-    int channels = png_get_channels(m_png_ptr, m_info_ptr);
-
-    int rowBytes          = png_get_rowbytes(m_png_ptr, m_info_ptr);
-    png_bytep row_pointer = m_rowBuffer.get();
-
-    int lx = m_info.m_lx;
-
-    while (passPng <= passRow &&
-           rowNumber <=
-               numRows)  // finchè il passo d'interlacciamento è minore o uguale
-    // <             //del passo desiderato effettua tante volte le lettura
-    // della riga
-    // quant'è il passo desiderato per quella riga
-    {
-      rowNumber = png_get_current_row_number(m_png_ptr);
-      png_read_row(m_png_ptr, row_pointer, NULL);
-      numRows = png_get_image_height(m_png_ptr, m_info_ptr);
-      // devo memorizzare la riga letta nel buffer di appoggio in base al passo
-      // di riga
-      // e al blocchetto di appartenenza della riga
-
-      // copio i pixel che desidero nel buffer temporaneo
-
-      // il membro di PngReader copyPixel deve tener conto della riga processata
-      // e del passo che si è effettuato ( e in base a quello so quanti pixel
-      // copiare!)
-
-      if (m_bit_depth == 16) {
-        if (passPng == 0)
-          copyPixel(lx / 4, 0, 8, rowNumber * 8);
-        else if (passPng == 1)
-          copyPixel(lx / 4, 8, 8, rowNumber * 8);
-        else if (passPng == 2)
-          copyPixel(lx / 2, 0, 4, rowNumber * 8 + 4);
-        else if (passPng == 3)
-          copyPixel(lx / 2, 4, 4, rowNumber * 4);
-        else if (passPng == 4)
-          copyPixel(lx, 0, 2, rowNumber * 4 + 2);
-        else if (passPng == 5)
-          copyPixel(lx, 2, 2, rowNumber * 2);
-        else if (passPng == 6)
-          copyPixel(2 * lx, 0, 1, rowNumber * 2 + 1);
+        premult(*pix);
       } else {
-        if (passPng == 0)
-          copyPixel((lx + 7) / 8, 0, 8, rowNumber * 8);
-        else if (passPng == 1)
-          copyPixel((lx + 3) / 8, 4, 8, rowNumber * 8);
-        else if (passPng == 2)
-          copyPixel((lx + 3) / 4, 0, 4, rowNumber * 8 + 4);
-        else if (passPng == 3)
-          copyPixel((lx + 1) / 4, 2, 4, rowNumber * 4);
-        else if (passPng == 4)
-          copyPixel((lx + 1) / 2, 0, 2, rowNumber * 4 + 2);
-        else if (passPng == 5)
-          copyPixel(lx / 2, 1, 2, rowNumber * 2);
-        else if (passPng == 6)
-          copyPixel(lx, 0, 1, rowNumber * 2 + 1);
+        if (m_bit_depth == 16) {
+#if defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB) ||                                 \
+    defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
+          // Layout for 16-bit without alpha: R(2) G(2) B(2) bytes
+          USHORT r, g, b;
+          memcpy(&r, m_rowBuffer.get() + srcIdx, sizeof(USHORT));
+          srcIdx += 2;
+          memcpy(&g, m_rowBuffer.get() + srcIdx, sizeof(USHORT));
+          srcIdx += 2;
+          memcpy(&b, m_rowBuffer.get() + srcIdx, sizeof(USHORT));
+          srcIdx += 2;
+          pix->r = mySwap(r);
+          pix->g = mySwap(g);
+          pix->b = mySwap(b);
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR) ||                               \
+    defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
+          // Layout for 16-bit without alpha (BGR): B(2) G(2) R(2) bytes
+          USHORT b, g, r;
+          memcpy(&b, m_rowBuffer.get() + srcIdx, sizeof(USHORT));
+          srcIdx += 2;
+          memcpy(&g, m_rowBuffer.get() + srcIdx, sizeof(USHORT));
+          srcIdx += 2;
+          memcpy(&r, m_rowBuffer.get() + srcIdx, sizeof(USHORT));
+          srcIdx += 2;
+          pix->b = mySwap(b);
+          pix->g = mySwap(g);
+          pix->r = mySwap(r);
+#else
+#error "unknown channel order"
+#endif
+        } else {
+          // 8-bit without alpha
+          // Layout: R(1) G(1) B(1) bytes
+#if defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB) ||                                 \
+    defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
+          pix->r =
+              static_cast<USHORT>((m_rowBuffer[srcIdx++] * 65535 + 127) / 255);
+          pix->g =
+              static_cast<USHORT>((m_rowBuffer[srcIdx++] * 65535 + 127) / 255);
+          pix->b =
+              static_cast<USHORT>((m_rowBuffer[srcIdx++] * 65535 + 127) / 255);
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR) ||                               \
+    defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
+          // Layout for 8-bit without alpha (BGR): B(1) G(1) R(1) bytes
+          pix->b =
+              static_cast<USHORT>((m_rowBuffer[srcIdx++] * 65535 + 127) / 255);
+          pix->g =
+              static_cast<USHORT>((m_rowBuffer[srcIdx++] * 65535 + 127) / 255);
+          pix->r =
+              static_cast<USHORT>((m_rowBuffer[srcIdx++] * 65535 + 127) / 255);
+#else
+#error "unknown channel order"
+#endif
+        }
+        pix->m = 65535;
       }
-
-      passPng = png_get_current_pass_number(m_png_ptr);
     }
-
-    // fase di copia
-    if (channels == 1 || channels == 2) {
-      if (m_bit_depth < 8)
-        memcpy(m_rowBuffer.get(), m_tempBuffer.get() + ((m_y)*lx * 3), lx * 3);
-      else
-        memcpy(m_rowBuffer.get(), m_tempBuffer.get() + ((m_y)*rowBytes * 4),
-               rowBytes * 4);
-    } else {
-      memcpy(m_rowBuffer.get(), m_tempBuffer.get() + ((m_y)*rowBytes),
-             rowBytes);
-    }
-
-    // fase di copia vecchia
-    // memcpy(m_rowBuffer, m_tempBuffer+((m_y)*rowBytes), rowBytes);
-
-    // tutto quello che segue lo metto in una funzione in cui scrivo il buffer
-    // di restituzione della readLine
-    // è una funzione comune alle ReadLine
-    writeRow(buffer, x0, x1);
-  }
-
-  void readLineInterlace(short *buffer, int x0, int x1, int shrink) {
-    // m_png_ptr->row_number è l'indice di riga che scorre quando chiamo la
-    // png_read_row
-    int rowNumber = png_get_current_row_number(m_png_ptr);
-    // numRows è il numero di righe processate in ogni passo
-    int numRows = png_get_image_height(m_png_ptr, m_info_ptr) / 8;
-
-    int passPng = png_get_current_pass_number(
-        m_png_ptr);  // conosco il passo d'interlacciamento
-
-    int passRow = 5 + (m_y & 1);  // passo desiderato per la riga corrente
-
-    int channels = png_get_channels(m_png_ptr, m_info_ptr);
-    int lx       = m_info.m_lx;
-
-    int rowBytes          = png_get_rowbytes(m_png_ptr, m_info_ptr);
-    png_bytep row_pointer = m_rowBuffer.get();
-
-    while (passPng <= passRow &&
-           rowNumber <
-               numRows)  // finchè il passo d'interlacciamento è minore o uguale
-    // del passo desiderato effettua tante volte le lettura della riga
-    // quant'è il passo desiderato per quella riga
-    {
-      rowNumber = png_get_current_row_number(m_png_ptr);
-      png_read_row(m_png_ptr, row_pointer, NULL);
-      numRows = png_get_image_height(m_png_ptr, m_info_ptr);
-      int lx  = m_info.m_lx;
-
-      // devo memorizzare la riga letta nel buffer di appoggio in base al passo
-      // di riga
-      // e al blocchetto di appartenenza della riga
-
-      // copio i pixel che desidero nel buffer temporaneo
-
-      // il membro di PngReader copyPixel deve tener conto della riga processata
-      // e del passo che si è effettuato ( e in base a quello so quanti pixel
-      // copiare!)
-
-      int channels = png_get_channels(m_png_ptr, m_info_ptr);
-
-      if (passPng == 0)
-        copyPixel(lx / 4, 0, 8, rowNumber * 8);
-      else if (passPng == 1)
-        copyPixel(lx / 4, 8, 8, rowNumber * 8);
-      else if (passPng == 2)
-        copyPixel(lx / 2, 0, 4, rowNumber * 8 + 4);
-      else if (passPng == 3)
-        copyPixel(lx / 2, 4, 4, rowNumber * 4);
-      else if (passPng == 4)
-        copyPixel(lx, 0, 2, rowNumber * 4 + 2);
-      else if (passPng == 5)
-        copyPixel(lx, 2, 2, rowNumber * 2);
-      else if (passPng == 6)
-        copyPixel(2 * lx, 0, 1, rowNumber * 2 + 1);
-
-      passPng = png_get_current_pass_number(m_png_ptr);
-    }
-
-    // fase di copia
-    if (channels == 1 || channels == 2) {
-      memcpy(m_rowBuffer.get(), m_tempBuffer.get() + ((m_y)*rowBytes * 4),
-             rowBytes * 4);
-    } else {
-      memcpy(m_rowBuffer.get(), m_tempBuffer.get() + ((m_y)*rowBytes),
-             rowBytes);
-    }
-
-    // fase di copia
-    // memcpy(m_rowBuffer, m_tempBuffer+((m_y)*rowBytes), rowBytes);
-
-    // tutto quello che segue lo metto in una funzione in cui scrivo il buffer
-    // di restituzione della readLine
-    // è una funzione comune alle ReadLine
-    writeRow(buffer, x0, x1);
   }
 };
 
 //=========================================================
 
 Tiio::PngWriterProperties::PngWriterProperties()
-    : m_matte("Alpha Channel", true)
-
-{
+    : m_matte("Alpha Channel", true), m_colormap("Colormap", nullptr) {
   bind(m_matte);
+  bind(m_colormap);
 }
 
 void Tiio::PngWriterProperties::updateTranslation() {
   m_matte.setQStringName(tr("Alpha Channel"));
+  m_colormap.setQStringName(tr("Colormap"));
 }
 
 //=========================================================
@@ -780,237 +586,301 @@ class PngWriter final : public Tiio::Writer {
   png_infop m_info_ptr;
   FILE *m_chan;
   bool m_matte;
-  std::vector<TPixel> *m_colormap;
+  bool m_written_end;
+  const std::vector<TPixel32> *m_colormap;
 
 public:
-  PngWriter();
-  ~PngWriter();
+  PngWriter()
+      : m_png_ptr(0)
+      , m_info_ptr(0)
+      , m_chan(nullptr)
+      , m_matte(true)
+      , m_written_end(false)
+      , m_colormap(nullptr) {}
 
-  void open(FILE *file, const TImageInfo &info) override;
-  void writeLine(char *buffer) override;
-  void writeLine(short *buffer) override;
+  ~PngWriter() {
+    // If an exception occurs in the destructor, we log the error but continue
+    // trying to release resources to avoid leaks
+    try {
+      if (m_png_ptr && !m_written_end) {
+        // Try to finalize writing if not done
+        png_write_end(m_png_ptr, m_info_ptr);
+      }
+    } catch (...) {
+      // Ignore exceptions in destructor
+    }
+
+    if (m_png_ptr) {
+      png_destroy_write_struct(&m_png_ptr, &m_info_ptr);
+      m_png_ptr  = nullptr;
+      m_info_ptr = nullptr;
+    }
+
+    if (m_properties) {
+      delete m_properties;
+      m_properties = nullptr;
+    }
+    // Note: The FILE* is owned by the caller, we should not close it here
+    // The caller is responsible for closing the file
+  }
+
+  void open(FILE *file, const TImageInfo &info) override {
+    // Null pointer check
+    if (!file) {
+      throw TException("Invalid file pointer (null)");
+    }
+    m_chan = file;
+    m_info = info;
+
+    m_png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr,
+                                        nullptr);
+    if (!m_png_ptr) {
+      throw TException("Unable to create PNG write structure");
+    }
+
+    // Set error handler
+    png_set_error_fn(m_png_ptr, nullptr, tnz_error_fun, nullptr);
+
+    m_info_ptr = png_create_info_struct(m_png_ptr);
+    if (!m_info_ptr) {
+      png_destroy_write_struct(&m_png_ptr, nullptr);
+      throw TException("Unable to create PNG info structure");
+    }
+
+    if (setjmp(png_jmpbuf(m_png_ptr))) {
+      png_destroy_write_struct(&m_png_ptr, &m_info_ptr);
+      throw TException("PNG write initialization failed");
+    }
+
+    png_init_io(m_png_ptr, m_chan);
+
+    if (!m_properties) m_properties = new Tiio::PngWriterProperties();
+
+    TBoolProperty *alphaProp = dynamic_cast<TBoolProperty *>(
+        m_properties->getProperty("Alpha Channel"));
+    m_matte = alphaProp ? alphaProp->getValue() : true;
+
+    TPointerProperty *colormapProp =
+        dynamic_cast<TPointerProperty *>(m_properties->getProperty("Colormap"));
+    m_colormap = colormapProp ? static_cast<const std::vector<TPixel32> *>(
+                                    colormapProp->getValue())
+                              : nullptr;
+
+    png_uint_32 x_pixels_per_meter = tround(m_info.m_dpix / 0.0254);
+    png_uint_32 y_pixels_per_meter = tround(m_info.m_dpiy / 0.0254);
+
+    int colorType = PNG_COLOR_TYPE_RGB;
+    int bitDepth  = info.m_bitsPerSample;
+
+    if (m_colormap) {
+      colorType = PNG_COLOR_TYPE_PALETTE;
+      bitDepth  = 8;  // Palettes are always 8-bit
+
+      // Validate palette size
+      if (m_colormap->size() > 256) {
+        throw TException("Palette too large (max 256 colors)");
+      }
+    } else if (m_matte) {
+      colorType = PNG_COLOR_TYPE_RGB_ALPHA;
+    }
+
+    png_set_IHDR(m_png_ptr, m_info_ptr, m_info.m_lx, m_info.m_ly, bitDepth,
+                 colorType, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+                 PNG_FILTER_TYPE_DEFAULT);
+
+    // Configure palette if needed
+    if (m_colormap) {
+      png_color palette[256];
+      size_t paletteSize = std::min(m_colormap->size(), (size_t)256);
+
+      for (size_t i = 0; i < paletteSize; ++i) {
+        palette[i].red   = (*m_colormap)[i].r;
+        palette[i].green = (*m_colormap)[i].g;
+        palette[i].blue  = (*m_colormap)[i].b;
+      }
+
+      png_set_PLTE(m_png_ptr, m_info_ptr, palette, (int)paletteSize);
+
+      // Add transparency information if matte is enabled
+      if (m_matte) {
+        // Create transparency array - assume index 0 is transparent if alpha is
+        // 0
+        png_byte trans = 0;
+        png_set_tRNS(m_png_ptr, m_info_ptr, &trans, 1, nullptr);
+      }
+    }
+
+#if defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR)
+    png_set_bgr(m_png_ptr);
+    png_set_swap_alpha(m_png_ptr);
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
+    png_set_bgr(m_png_ptr);
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB)
+    png_set_swap_alpha(m_png_ptr);
+#elif !defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
+#error "unknown channel order"
+#endif
+
+    png_set_pHYs(m_png_ptr, m_info_ptr, x_pixels_per_meter, y_pixels_per_meter,
+                 PNG_RESOLUTION_METER);
+
+    png_write_info(m_png_ptr, m_info_ptr);
+  }
+
+  void writeLine(char *buffer) override {
+    if (setjmp(png_jmpbuf(m_png_ptr))) {
+      throw TException("PNG write error");
+    }
+
+    if (!buffer) {
+      throw TException("Invalid buffer");
+    }
+
+    // Handle palette mode
+    if (m_colormap) {
+      // For palette mode, buffer should contain palette indices (0-255)
+      png_write_row(m_png_ptr, (unsigned char *)buffer);
+      return;
+    }
+
+    // Normal RGBA or RGB mode: std::vector used instead of manual allocation
+    std::vector<unsigned char> row(m_info.m_lx * (m_matte ? 4 : 3));
+    TPixel32 *pix = (TPixel32 *)buffer;
+    int k         = 0;
+
+    for (int j = 0; j < m_info.m_lx; ++j, ++pix) {
+      int required = k + (m_matte ? 4 : 3);
+      if (required > static_cast<int>(row.size())) {
+        break;  // Prevent buffer overflow
+      }
+
+      TPixel32 depix = *pix;
+      if (m_matte && depix.m != 0) depremult(depix);
+
+      if (m_matte) {
+#if defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB)
+        row[k++] = depix.m;
+        row[k++] = depix.r;
+        row[k++] = depix.g;
+        row[k++] = depix.b;
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
+        row[k++] = depix.r;
+        row[k++] = depix.g;
+        row[k++] = depix.b;
+        row[k++] = depix.m;
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR)
+        row[k++] = depix.m;
+        row[k++] = depix.b;
+        row[k++] = depix.g;
+        row[k++] = depix.r;
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
+        row[k++] = depix.b;
+        row[k++] = depix.g;
+        row[k++] = depix.r;
+        row[k++] = depix.m;
+#else
+#error "unknown channel order"
+#endif
+      } else {
+#if defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB) ||                                 \
+    defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
+        row[k++] = depix.r;
+        row[k++] = depix.g;
+        row[k++] = depix.b;
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR) ||                               \
+    defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
+        row[k++] = depix.b;
+        row[k++] = depix.g;
+        row[k++] = depix.r;
+#else
+#error "unknown channel order"
+#endif
+      }
+    }
+    png_write_row(m_png_ptr, row.data());
+  }
+
+  void writeLine(short *buffer) override {
+    if (m_colormap) {
+      // Palette mode doesn't support 16-bit
+      throw TException("Palette mode doesn't support 16-bit data");
+    }
+
+    if (setjmp(png_jmpbuf(m_png_ptr))) {
+      throw TException("PNG write error");
+    }
+
+    if (!buffer) {
+      throw TException("Invalid buffer");
+    }
+
+    // Using std::vector instead of manual allocation
+    std::vector<unsigned short> row(m_info.m_lx * (m_matte ? 4 : 3));
+    TPixel64 *pix = (TPixel64 *)buffer;
+    int k         = 0;
+
+    for (int j = 0; j < m_info.m_lx; ++j, ++pix) {
+      int required = k + (m_matte ? 4 : 3);
+      if (required > static_cast<int>(row.size())) {
+        break;  // Prevent buffer overflow
+      }
+
+      TPixel64 depix = *pix;
+      if (m_matte && depix.m != 0) depremult(depix);
+
+      if (m_matte) {
+#if defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB) ||                                 \
+    defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
+        row[k++] = mySwap(depix.r);
+        row[k++] = mySwap(depix.g);
+        row[k++] = mySwap(depix.b);
+        row[k++] = mySwap(depix.m);
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR) ||                               \
+    defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
+        row[k++] = mySwap(depix.b);
+        row[k++] = mySwap(depix.g);
+        row[k++] = mySwap(depix.r);
+        row[k++] = mySwap(depix.m);
+#else
+#error "unknown channel order"
+#endif
+      } else {
+#if defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB) ||                                 \
+    defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
+        row[k++] = mySwap(depix.r);
+        row[k++] = mySwap(depix.g);
+        row[k++] = mySwap(depix.b);
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR) ||                               \
+    defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
+        row[k++] = mySwap(depix.b);
+        row[k++] = mySwap(depix.g);
+        row[k++] = mySwap(depix.r);
+#else
+#error "unknown channel order"
+#endif
+      }
+    }
+    png_write_row(m_png_ptr, reinterpret_cast<unsigned char *>(row.data()));
+  }
+
+  void flush() override {
+    if (setjmp(png_jmpbuf(m_png_ptr))) {
+      throw TException("PNG write error during flush");
+    }
+    png_write_end(m_png_ptr, m_info_ptr);
+    m_written_end = true;
+
+    if (m_chan) {
+      fflush(m_chan);
+    }
+  }
 
   Tiio::RowOrder getRowOrder() const override { return Tiio::TOP2BOTTOM; }
 
-  void flush() override;
-
   bool write64bitSupported() const override { return true; }
-  // m_matte is set to "Alpha Channel" property value in the function open()
-  bool writeAlphaSupported() const override { return m_matte; };
+
+  bool writeAlphaSupported() const override { return m_matte; }
 };
-
-//---------------------------------------------------------
-
-PngWriter::PngWriter()
-    : m_png_ptr(0), m_info_ptr(0), m_matte(true), m_colormap(0) {}
-
-//---------------------------------------------------------
-
-PngWriter::~PngWriter() {
-  if (m_png_ptr) {
-    png_destroy_write_struct(&m_png_ptr, &m_info_ptr);
-  }
-  if (m_chan) {
-    fflush(m_chan);
-    m_chan = 0;
-  }
-}
-
-//---------------------------------------------------------
-
-png_color palette[256];
-png_byte alpha[1];
-
-void PngWriter::open(FILE *file, const TImageInfo &info) {
-  m_info    = info;
-  m_png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
-                                      (png_voidp)0,  // user_error_ptr,
-                                      0,             // user_error_fn,
-                                      0);            // user_warning_fn);
-  if (!m_png_ptr) return;
-  m_info_ptr = png_create_info_struct(m_png_ptr);
-  if (!m_info_ptr) {
-    png_destroy_write_struct(&m_png_ptr, (png_infopp)0);
-    return;
-  }
-
-  m_chan = file;
-  png_init_io(m_png_ptr, m_chan);
-
-  if (!m_properties) m_properties = new Tiio::PngWriterProperties();
-
-  TBoolProperty *alphaProp =
-      (TBoolProperty *)(m_properties->getProperty("Alpha Channel"));
-  TPointerProperty *colormap =
-      (TPointerProperty *)(m_properties->getProperty("Colormap"));
-  m_matte = (alphaProp && alphaProp->getValue()) ? true : false;
-  if (colormap) m_colormap = (vector<TPixel> *)colormap->getValue();
-
-  TUINT32 x_pixels_per_meter = tround(m_info.m_dpix / 0.0254);
-  TUINT32 y_pixels_per_meter = tround(m_info.m_dpiy / 0.0254);
-
-  if (!m_colormap)
-    png_set_IHDR(m_png_ptr, m_info_ptr, m_info.m_lx, m_info.m_ly,
-                 info.m_bitsPerSample,
-                 m_matte ? PNG_COLOR_TYPE_RGB_ALPHA : PNG_COLOR_TYPE_RGB,
-                 PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
-                 PNG_FILTER_TYPE_DEFAULT);
-  else {
-    png_set_IHDR(m_png_ptr, m_info_ptr, m_info.m_lx, m_info.m_ly, 8,
-                 PNG_COLOR_TYPE_PALETTE, PNG_INTERLACE_NONE,
-                 PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
-    for (unsigned int i = 0; i < m_colormap->size(); i++) {
-      /*unsigned char red = (i>>5)&0x7;
-      unsigned char green = (i>>2)&0x7;
-      unsigned char blue = i&0x3;
-      palette[i].red = (red>>1) | (red<<2) | (red<<5);
-      palette[i].green = (green>>1) | (green<<2) | (green<<5);
-      palette[i].blue = blue | (blue<<2) | (blue<<4) | (blue<<6);
-      if (red==0 && green==0) alpha[i] = 0; else if (blue==0 && green==0)
-      alpha[i] = 128; else alpha[i] = 255;*/
-      palette[i].red   = (*m_colormap)[i].r;
-      palette[i].green = (*m_colormap)[i].g;
-      palette[i].blue  = (*m_colormap)[i].b;
-    }
-
-    png_set_PLTE(m_png_ptr, m_info_ptr, palette, m_colormap->size());
-  }
-
-  // png_set_dither(m_png_ptr, palette, 256, 256, 0, 1);
-
-#if defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR)
-  png_set_bgr(m_png_ptr);
-  png_set_swap_alpha(m_png_ptr);
-#elif defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
-  png_set_bgr(m_png_ptr);
-#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB)
-  png_set_swap_alpha(m_png_ptr);
-#elif !defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
-#error "unknownchannel order"
-#endif
-
-  png_set_pHYs(m_png_ptr, m_info_ptr, x_pixels_per_meter, y_pixels_per_meter,
-               1);
-
-  if (m_colormap && m_matte) {
-    alpha[0] = 0;
-    // png_set_tRNS(m_png_ptr, m_info_ptr, alpha, 1, PNG_COLOR_TYPE_PALETTE);
-    png_color_16 bgcolor;
-    bgcolor.index = 0;
-    png_set_tRNS(m_png_ptr, m_info_ptr, alpha, 1, &bgcolor);
-  }
-
-  png_write_info(m_png_ptr, m_info_ptr);
-}
-
-//---------------------------------------------------------
-
-void PngWriter::flush() {
-  png_write_end(m_png_ptr, m_info_ptr);
-  fflush(m_chan);
-}
-
-//---------------------------------------------------------
-
-void PngWriter::writeLine(short *buffer) {
-  {
-    TPixel64 *pix = (TPixel64 *)buffer;
-    unsigned short *tmp;
-    tmp = (unsigned short *)malloc((m_info.m_lx + 1) * 3);
-    // unsigned short tmp[10000];
-    int k = 0;
-    for (int j = 0; j < m_info.m_lx; j++, pix++) {
-      // depremultiply here
-      TPixel64 depremult_pix(*pix);
-      if (m_matte && depremult_pix.m != 0) depremult(depremult_pix);
-
-#if defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB) ||                                 \
-    defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
-      tmp[k++] = mySwap(pix->r);
-      tmp[k++] = mySwap(pix->g);
-      tmp[k++] = mySwap(pix->b);
-#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR) ||                               \
-    defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
-      tmp[k++] = mySwap(pix->b);
-      tmp[k++] = mySwap(pix->g);
-      tmp[k++] = mySwap(pix->r);
-#else
-#error "unknown channel order"
-#endif
-      if (m_matte)
-        tmp[k++] = mySwap(pix->m);  // ?? does it take care MRGB or MBGR case?
-    }
-    png_write_row(m_png_ptr, (unsigned char *)tmp);
-  }
-}
-
-//=========================================================
-
-void PngWriter::writeLine(char *buffer) {
-  // TBoolProperty* alphaProp =
-  // (TBoolProperty*)(m_properties->getProperty("Alpha Channel"));
-  if (m_matte || m_colormap) {
-    unsigned char *tmp = new unsigned char[(m_info.m_lx + 1) * 4];
-    TPixel32 *pix      = (TPixel32 *)buffer;
-    int k              = 0;
-    for (int j = 0; j < m_info.m_lx; j++, pix++) {
-      // depremultiply here
-      TPixel32 depremult_pix(*pix);
-      if (depremult_pix.m != 0) depremult(depremult_pix);
-#if defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB)
-      tmp[k++] = depremult_pix.m;
-      tmp[k++] = depremult_pix.r;
-      tmp[k++] = depremult_pix.g;
-      tmp[k++] = depremult_pix.b;
-#elif defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
-      tmp[k++] = depremult_pix.r;
-      tmp[k++] = depremult_pix.g;
-      tmp[k++] = depremult_pix.b;
-      tmp[k++] = depremult_pix.m;
-#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR)
-      tmp[k++] = depremult_pix.m;
-      tmp[k++] = depremult_pix.b;
-      tmp[k++] = depremult_pix.g;
-      tmp[k++] = depremult_pix.r;
-#elif defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
-      tmp[k++] = depremult_pix.b;
-      tmp[k++] = depremult_pix.g;
-      tmp[k++] = depremult_pix.r;
-      tmp[k++] = depremult_pix.m;
-#else
-#error "unknown channel order"
-#endif
-    }
-    png_write_row(m_png_ptr, tmp);
-    delete[] tmp;
-  } else {
-    TPixel32 *pix      = (TPixel32 *)buffer;
-    unsigned char *tmp = new unsigned char[(m_info.m_lx + 1) * 3];
-
-    int k = 0;
-    for (int j = 0; j < m_info.m_lx; j++) {
-      // tmp = (pix->r&0xe0)|((pix->g&0xe0)>>3) | ((pix->b&0xc0)>>6);
-
-#if defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB) ||                                 \
-    defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
-      tmp[k++] = pix->r;
-      tmp[k++] = pix->g;
-      tmp[k++] = pix->b;
-#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR) ||                               \
-    defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
-      tmp[k++] = pix->b;
-      tmp[k++] = pix->g;
-      tmp[k++] = pix->r;
-#else
-#error "unknown channel order"
-#endif
-
-      ++pix;
-    }
-    png_write_row(m_png_ptr, tmp);
-    delete[] tmp;
-  }
-}
 
 //=========================================================
 
