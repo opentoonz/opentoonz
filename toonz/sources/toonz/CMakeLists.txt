@@ -323,6 +323,7 @@ set(SOURCES
     filmstripcommand.cpp
     iocommand.cpp
     levelcommand.cpp
+    viewercommand.cpp
     print.cpp
     subscenecommand.cpp
     svncleanupdialog.cpp

@@ -1901,6 +1901,7 @@ void MainWindow::defineActions() {
   createMenuEditAction(MI_PasteInto, QT_TR_NOOP("&Paste Into"), "",
                        "paste_into");
   createMenuEditAction(MI_Clear, QT_TR_NOOP("&Delete"), "Del", "delete");
+  createMenuEditAction(MI_ClearViewerContent, QT_TR_NOOP("&Clear Viewer Content"), "", "clear_viewer");
   createMenuEditAction(MI_Insert, QT_TR_NOOP("&Insert"), "Ins", "insert");
   createMenuEditAction(MI_InsertAbove, QT_TR_NOOP("&Insert Above/After"),
                        "Shift+Ins", "insert_above_after");
