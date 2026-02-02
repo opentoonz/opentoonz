@@ -42,8 +42,8 @@
 //=============================================================================
 // ShortcutItem
 // ------------
-// Lo ShortcutTree visualizza ShortcutItem (organizzati in folder)
-// ogni ShortcutItem rappresenta una QAction (e relativo Shortcut)
+// The ShortcutTree displays ShortcutItem (organized in folders)
+// each ShortcutItem represents a QAction (and its Shortcut)
 //-----------------------------------------------------------------------------
 
 class ShortcutItem final : public QTreeWidgetItem {
@@ -58,7 +58,8 @@ public:
   void updateText() {
     QString text = m_action->text();
     // removing accelerator key indicator
-    text = text.replace(QRegExp("&([^& ])"), "\\1");
+    QRegularExpression regex("&([^& ])");
+    text = text.replace(regex, "\\1");
     // removing doubled &s
     text = text.replace("&&", "&");
     setText(0, text);
@@ -76,7 +77,8 @@ ShortcutViewer::ShortcutViewer(QWidget *parent)
     : QKeySequenceEdit(parent), m_action(0), m_keysPressed(0) {
   setObjectName("ShortcutViewer");
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  connect(this, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
+  connect(this, &ShortcutViewer::editingFinished, this,
+          &ShortcutViewer::onEditingFinished);
 }
 
 //-----------------------------------------------------------------------------
@@ -269,11 +271,9 @@ ShortcutTree::ShortcutTree(QWidget *parent) : QTreeWidget(parent) {
 
   sortItems(0, Qt::AscendingOrder);
 
-  connect(
-      this, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
-      this, SLOT(onCurrentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
-  connect(this, SIGNAL(clicked(const QModelIndex &)), this,
-          SLOT(onItemClicked(const QModelIndex &)));
+  connect(this, &ShortcutTree::currentItemChanged, this,
+          &ShortcutTree::onCurrentItemChanged);
+  connect(this, &ShortcutTree::clicked, this, &ShortcutTree::onItemClicked);
 }
 
 //-----------------------------------------------------------------------------
@@ -485,26 +485,39 @@ ShortcutPopup::ShortcutPopup()
     // m_topLayout->addWidget(m_exportButton, 0);
   }
 
-  connect(m_list, SIGNAL(actionSelected(QAction *)), m_sViewer,
-          SLOT(setAction(QAction *)));
+  connect(m_list, &ShortcutTree::actionSelected, m_sViewer,
+          &ShortcutViewer::setAction);
 
-  connect(m_removeBtn, SIGNAL(clicked()), m_sViewer, SLOT(removeShortcut()));
+  connect(m_removeBtn, &QPushButton::clicked, m_sViewer,
+          &ShortcutViewer::removeShortcut);
 
-  connect(m_sViewer, SIGNAL(shortcutChanged()), m_list,
-          SLOT(onShortcutChanged()));
+  connect(m_sViewer, &ShortcutViewer::shortcutChanged, m_list,
+          &ShortcutTree::onShortcutChanged);
 
-  connect(m_list, SIGNAL(searched(bool)), noSearchResultLabel,
-          SLOT(setHidden(bool)));
-  connect(searchEdit, SIGNAL(textChanged(const QString &)), this,
-          SLOT(onSearchTextChanged(const QString &)));
-  connect(m_presetChoiceCB, SIGNAL(currentIndexChanged(int)),
-          SLOT(onPresetChanged()));
-  connect(m_exportButton, SIGNAL(clicked()), SLOT(onExportButton()));
-  connect(m_deletePresetButton, SIGNAL(clicked()), SLOT(onDeletePreset()));
-  connect(m_savePresetButton, SIGNAL(clicked()), SLOT(onSavePreset()));
-  connect(m_loadPresetButton, SIGNAL(clicked()), SLOT(onLoadPreset()));
-  connect(m_clearAllShortcutsButton, SIGNAL(clicked()),
-          SLOT(clearAllShortcuts()));
+  connect(m_list, &ShortcutTree::searched, noSearchResultLabel,
+          &QLabel::setHidden);
+
+  connect(searchEdit, &QLineEdit::textChanged, this,
+          &ShortcutPopup::onSearchTextChanged);
+
+  connect(m_presetChoiceCB, QOverload<int>::of(&QComboBox::currentIndexChanged),
+          this, &ShortcutPopup::onPresetChanged);
+
+  // Use a lambda to adapt the clicked() signal to the slot signature
+  connect(m_exportButton, &QPushButton::clicked, this,
+          [this]() { this->onExportButton(TFilePath()); });
+
+  connect(m_deletePresetButton, &QPushButton::clicked, this,
+          &ShortcutPopup::onDeletePreset);
+
+  connect(m_savePresetButton, &QPushButton::clicked, this,
+          &ShortcutPopup::onSavePreset);
+
+  connect(m_loadPresetButton, &QPushButton::clicked, this,
+          &ShortcutPopup::onLoadPreset);
+
+  connect(m_clearAllShortcutsButton, &QPushButton::clicked, this,
+          &ShortcutPopup::clearAllShortcuts);
 }
 
 //-----------------------------------------------------------------------------
