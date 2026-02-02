@@ -16,6 +16,8 @@
 #include "toonzqt/gutil.h"
 #include "toonzqt/icongenerator.h"
 
+#include <QRegularExpression>
+
 namespace {
 //---------------------------------------------------------------------------
 
@@ -23,12 +25,20 @@ QStringList getLevelFileNames(TFilePath path) {
   TFilePath dir = path.getParentDir();
   QDir qDir(QString::fromStdWString(dir.getWideString()));
   QString levelName =
-      QRegExp::escape(QString::fromStdWString(path.getWideName()));
+      QRegularExpression::escape(QString::fromStdWString(path.getWideName()));
   QString levelType = QString::fromStdString(path.getType());
-  QString exp(levelName + ".[0-9]{1,4}." + levelType);
-  QRegExp regExp(exp);
+  QString exp(levelName + "\\.[0-9]{1,4}\\." + levelType);  // Updated escaping
+  QRegularExpression regExp(exp);
   QStringList list = qDir.entryList(QDir::Files);
-  return list.filter(regExp);
+
+  // Updated filtering logic for QRegularExpression
+  QStringList filteredList;
+  for (const QString &fileName : list) {
+    if (regExp.match(fileName).hasMatch()) {
+      filteredList.append(fileName);
+    }
+  }
+  return filteredList;
 }
 }  // namespace
 
@@ -88,11 +98,14 @@ void FileBrowser::setupVersionControlCommand(QStringList &files, QString &path,
       QStringList levelNames = getLevelFileNames(fp);
 
       if (levelNames.isEmpty()) {
-        QString levelName =
-            QRegExp::escape(QString::fromStdWString(fp.getWideName()));
+        QString levelName = QRegularExpression::escape(
+            QString::fromStdWString(fp.getWideName()));
         QString levelType = QString::fromStdString(fp.getType());
-        QString exp(levelName + ".[0-9]{1,4}." + levelType);
-        QRegExp regExp(exp);
+        QString exp(
+            levelName +
+            "_[0-9]{3}\\.(tlv|tif|tga|png|gif|bmp|jpg|jpeg|mov|avi|mp4|tpl)$");
+        QRegularExpression regExp(exp,
+                                  QRegularExpression::CaseInsensitiveOption);
         levelNames = node->getMissingFiles(regExp);
       }
 
@@ -490,8 +503,10 @@ void FileBrowser::getRevisionHistory() {
   files.removeAt(files.indexOf(file));
 
   SVNTimeline *timelineDialog = new SVNTimeline(this, path, file, files);
-  connect(timelineDialog, SIGNAL(commandDone(const QStringList &)), this,
-          SLOT(onVersionControlCommandDone(const QStringList &)));
+
+  // Updated signal/slot connection to modern Qt5 syntax
+  connect(timelineDialog, &SVNTimeline::commandDone, this,
+          &FileBrowser::onVersionControlCommandDone);
 
   timelineDialog->show();
   timelineDialog->raise();
