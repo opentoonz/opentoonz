@@ -56,6 +56,8 @@
 #include <QComboBox>
 #include <QPushButton>
 #include <QMainWindow>
+#include <QRegularExpressionValidator>
+#include <QRegularExpression>
 
 using namespace DVGui;
 
@@ -83,66 +85,83 @@ public:
       , m_columnIndex(column)
       , m_frameCount(frameCount)
       , m_step(step)
-      , m_sl(0)
+      , m_sl(nullptr)
       , m_areColumnsShifted(areColumnsShifted) {
     TApp *app         = TApp::instance();
     ToonzScene *scene = app->getCurrentScene()->getScene();
     m_oldLevelCount   = scene->getLevelSet()->getLevelCount();
   }
-  ~CreateLevelUndo() { m_sl = 0; }
 
-  void onAdd(TXshSimpleLevelP sl) { m_sl = sl; }
+  ~CreateLevelUndo() override = default;
+
+  void onAdd(const TXshSimpleLevelP &sl) { m_sl = sl; }
 
   void undo() const override {
     TApp *app         = TApp::instance();
     ToonzScene *scene = app->getCurrentScene()->getScene();
     TXsheet *xsh      = scene->getXsheet();
-    if (m_areColumnsShifted)
-      xsh->removeColumn(m_columnIndex);
-    else if (m_frameCount > 0)
-      xsh->removeCells(m_rowIndex, m_columnIndex, m_frameCount);
 
-    TLevelSet *levelSet = scene->getLevelSet();
-    if (levelSet) {
+    if (m_areColumnsShifted) {
+      xsh->removeColumn(m_columnIndex);
+    } else if (m_frameCount > 0) {
+      xsh->removeCells(m_rowIndex, m_columnIndex, m_frameCount);
+    }
+
+    if (TLevelSet *levelSet = scene->getLevelSet()) {
       int m = levelSet->getLevelCount();
       while (m > 0 && m > m_oldLevelCount) {
         --m;
-        TXshLevel *level = levelSet->getLevel(m);
-        if (level) levelSet->removeLevel(level);
+        if (TXshLevel *level = levelSet->getLevel(m)) {
+          levelSet->removeLevel(level);
+        }
       }
     }
+
     app->getCurrentScene()->notifySceneChanged();
     app->getCurrentScene()->notifyCastChange();
     app->getCurrentXsheet()->notifyXsheetChanged();
   }
 
   void redo() const override {
-    if (!m_sl.getPointer()) return;
+    if (!m_sl) return;
+
     TApp *app         = TApp::instance();
     ToonzScene *scene = app->getCurrentScene()->getScene();
+    // Using getPointer() instead of get()
     scene->getLevelSet()->insertLevel(m_sl.getPointer());
+
     TXsheet *xsh = scene->getXsheet();
-    if (m_areColumnsShifted) xsh->insertColumn(m_columnIndex);
+    if (m_areColumnsShifted) {
+      xsh->insertColumn(m_columnIndex);
+    }
+
     std::vector<TFrameId> fids;
     m_sl->getFids(fids);
+
     int i = m_rowIndex;
     int f = 0;
     while (i < m_frameCount + m_rowIndex) {
-      TFrameId fid = (fids.size() != 0) ? fids[f] : i;
+      TFrameId fid = (!fids.empty()) ? fids[f] : TFrameId(i);
+      // Using getPointer() instead of get()
       TXshCell cell(m_sl.getPointer(), fid);
       f++;
       xsh->setCell(i, m_columnIndex, cell);
-      int appo = i++;
-      while (i < m_step + appo) xsh->setCell(i++, m_columnIndex, cell);
+      int temp = i++;
+
+      while (i < m_step + temp) {
+        xsh->setCell(i++, m_columnIndex, cell);
+      }
     }
+
     app->getCurrentScene()->notifySceneChanged();
     app->getCurrentScene()->notifyCastChange();
     app->getCurrentXsheet()->notifyXsheetChanged();
   }
 
   int getSize() const override { return sizeof *this; }
+
   QString getHistoryString() override {
-    return QObject::tr("Create Level %1  at Column %2")
+    return QObject::tr("Create Level %1 at Column %2")
         .arg(QString::fromStdWString(m_sl->getName()))
         .arg(QString::number(m_columnIndex + 1));
   }
@@ -154,10 +173,10 @@ public:
 
 //=============================================================================
 /*! \class LevelCreatePopup
-                \brief The LevelCreatePopup class provides a modal dialog to
-   create a new level.
+    \brief The LevelCreatePopup class provides a modal dialog to create a new
+   level.
 
-                Inherits \b Dialog.
+    Inherits \b Dialog.
 */
 //-----------------------------------------------------------------------------
 
@@ -172,32 +191,33 @@ LevelCreatePopup::LevelCreatePopup()
   m_incFld      = new DVGui::IntLineEdit(this);
   m_levelTypeOm = new QComboBox();
 
-  m_pathFld     = new FileField(0);
+  m_pathFld     = new FileField(nullptr);
   m_widthLabel  = new QLabel(tr("Width:"));
-  m_widthFld    = new DVGui::MeasuredDoubleLineEdit(0);
+  m_widthFld    = new DVGui::MeasuredDoubleLineEdit(nullptr);
   m_heightLabel = new QLabel(tr("Height:"));
-  m_heightFld   = new DVGui::MeasuredDoubleLineEdit(0);
+  m_heightFld   = new DVGui::MeasuredDoubleLineEdit(nullptr);
   m_dpiLabel    = new QLabel(tr("DPI:"));
-  m_dpiFld      = new DoubleLineEdit(0, 66.76);
+  m_dpiFld      = new DoubleLineEdit(nullptr, 66.76);
 
   m_rasterFormatLabel = new QLabel(tr("Format:"));
   m_rasterFormatOm    = new QComboBox();
   m_frameFormatBtn    = new QPushButton(tr("Frame Format"));
 
-  QPushButton *okBtn     = new QPushButton(tr("OK"), this);
-  QPushButton *cancelBtn = new QPushButton(tr("Cancel"), this);
-  QPushButton *applyBtn  = new QPushButton(tr("Apply"), this);
+  auto *okBtn     = new QPushButton(tr("OK"), this);
+  auto *cancelBtn = new QPushButton(tr("Cancel"), this);
+  auto *applyBtn  = new QPushButton(tr("Apply"), this);
 
-  // Exclude all character which cannot fit in a filepath (Win).
+  // Replace QRegExp with QRegularExpression
+  // Exclude all characters which cannot fit in a filepath (Windows).
   // Dots are also prohibited since they are internally managed by Toonz.
-  QRegExp rx("[^\\\\/:?*.\"<>|]+");
-  m_nameFld->setValidator(new QRegExpValidator(rx, this));
+  QRegularExpression rx(R"([^\\/:?*."<>|]+)");
+  m_nameFld->setValidator(new QRegularExpressionValidator(rx, this));
 
-  m_levelTypeOm->addItem(tr("Toonz Vector Level"), (int)PLI_XSHLEVEL);
-  m_levelTypeOm->addItem(tr("Toonz Raster Level"), (int)TZP_XSHLEVEL);
-  m_levelTypeOm->addItem(tr("Raster Level"), (int)OVL_XSHLEVEL);
-  m_levelTypeOm->addItem(tr("Scan Level"), (int)TZI_XSHLEVEL);
-  m_levelTypeOm->addItem(tr("Assistants Level"), (int)META_XSHLEVEL);
+  m_levelTypeOm->addItem(tr("Toonz Vector Level"), PLI_XSHLEVEL);
+  m_levelTypeOm->addItem(tr("Toonz Raster Level"), TZP_XSHLEVEL);
+  m_levelTypeOm->addItem(tr("Raster Level"), OVL_XSHLEVEL);
+  m_levelTypeOm->addItem(tr("Scan Level"), TZI_XSHLEVEL);
+  m_levelTypeOm->addItem(tr("Assistants Level"), META_XSHLEVEL);
 
   if (Preferences::instance()->getUnits() == "pixel") {
     m_widthFld->setMeasure("camera.lx");
@@ -207,9 +227,9 @@ LevelCreatePopup::LevelCreatePopup()
     m_heightFld->setMeasure("level.ly");
   }
 
-  m_widthFld->setRange(0.1, (std::numeric_limits<double>::max)());
-  m_heightFld->setRange(0.1, (std::numeric_limits<double>::max)());
-  m_dpiFld->setRange(0.1, (std::numeric_limits<double>::max)());
+  m_widthFld->setRange(0.1, std::numeric_limits<double>::max());
+  m_heightFld->setRange(0.1, std::numeric_limits<double>::max());
+  m_dpiFld->setRange(0.1, std::numeric_limits<double>::max());
 
   m_rasterFormatOm->addItem("tif", "tif");
   m_rasterFormatOm->addItem("png", "png");
@@ -218,70 +238,69 @@ LevelCreatePopup::LevelCreatePopup()
 
   okBtn->setDefault(true);
 
-  //--- layout
+  // Layout
   m_topLayout->setContentsMargins(0, 0, 0, 0);
   m_topLayout->setSpacing(0);
-  {
-    QGridLayout *guiLay = new QGridLayout();
-    guiLay->setContentsMargins(10, 10, 10, 10);
-    guiLay->setVerticalSpacing(10);
-    guiLay->setHorizontalSpacing(5);
-    {
-      // Name
-      guiLay->addWidget(new QLabel(tr("Name:")), 0, 0,
-                        Qt::AlignRight | Qt::AlignVCenter);
-      guiLay->addWidget(m_nameFld, 0, 1, 1, 4);
 
-      // From-To
-      guiLay->addWidget(new QLabel(tr("From:")), 1, 0,
-                        Qt::AlignRight | Qt::AlignVCenter);
-      guiLay->addWidget(m_fromFld, 1, 1);
-      guiLay->addWidget(new QLabel(tr("To:")), 1, 2,
-                        Qt::AlignRight | Qt::AlignVCenter);
-      guiLay->addWidget(m_toFld, 1, 3);
+  auto *guiLay = new QGridLayout();
+  guiLay->setContentsMargins(10, 10, 10, 10);
+  guiLay->setVerticalSpacing(10);
+  guiLay->setHorizontalSpacing(5);
 
-      // Step-Inc
-      guiLay->addWidget(new QLabel(tr("Step:")), 2, 0,
-                        Qt::AlignRight | Qt::AlignVCenter);
-      guiLay->addWidget(m_stepFld, 2, 1);
-      guiLay->addWidget(new QLabel(tr("Increment:")), 2, 2,
-                        Qt::AlignRight | Qt::AlignVCenter);
-      guiLay->addWidget(m_incFld, 2, 3);
+  // Name
+  guiLay->addWidget(new QLabel(tr("Name:")), 0, 0,
+                    Qt::AlignRight | Qt::AlignVCenter);
+  guiLay->addWidget(m_nameFld, 0, 1, 1, 4);
 
-      // Type
-      guiLay->addWidget(new QLabel(tr("Type:")), 3, 0,
-                        Qt::AlignRight | Qt::AlignVCenter);
-      guiLay->addWidget(m_levelTypeOm, 3, 1, 1, 3);
+  // From-To
+  guiLay->addWidget(new QLabel(tr("From:")), 1, 0,
+                    Qt::AlignRight | Qt::AlignVCenter);
+  guiLay->addWidget(m_fromFld, 1, 1);
+  guiLay->addWidget(new QLabel(tr("To:")), 1, 2,
+                    Qt::AlignRight | Qt::AlignVCenter);
+  guiLay->addWidget(m_toFld, 1, 3);
 
-      // Save In
-      guiLay->addWidget(new QLabel(tr("Save In:")), 4, 0,
-                        Qt::AlignRight | Qt::AlignVCenter);
-      guiLay->addWidget(m_pathFld, 4, 1, 1, 4);
+  // Step-Increment
+  guiLay->addWidget(new QLabel(tr("Step:")), 2, 0,
+                    Qt::AlignRight | Qt::AlignVCenter);
+  guiLay->addWidget(m_stepFld, 2, 1);
+  guiLay->addWidget(new QLabel(tr("Increment:")), 2, 2,
+                    Qt::AlignRight | Qt::AlignVCenter);
+  guiLay->addWidget(m_incFld, 2, 3);
 
-      // Format options (for Raster/Scan levels)
-      guiLay->addWidget(m_rasterFormatLabel, 5, 0,
-                        Qt::AlignRight | Qt::AlignVCenter);
-      guiLay->addWidget(m_rasterFormatOm, 5, 1, Qt::AlignLeft);
-      guiLay->addWidget(m_frameFormatBtn, 5, 2, 1, 2, Qt::AlignLeft);
+  // Type
+  guiLay->addWidget(new QLabel(tr("Type:")), 3, 0,
+                    Qt::AlignRight | Qt::AlignVCenter);
+  guiLay->addWidget(m_levelTypeOm, 3, 1, 1, 3);
 
-      // Width - Height
-      guiLay->addWidget(m_widthLabel, 6, 0, Qt::AlignRight | Qt::AlignVCenter);
-      guiLay->addWidget(m_widthFld, 6, 1);
-      guiLay->addWidget(m_heightLabel, 6, 2, Qt::AlignRight | Qt::AlignVCenter);
-      guiLay->addWidget(m_heightFld, 6, 3);
+  // Save In
+  guiLay->addWidget(new QLabel(tr("Save In:")), 4, 0,
+                    Qt::AlignRight | Qt::AlignVCenter);
+  guiLay->addWidget(m_pathFld, 4, 1, 1, 4);
 
-      // DPI
-      guiLay->addWidget(m_dpiLabel, 7, 0, Qt::AlignRight | Qt::AlignVCenter);
-      guiLay->addWidget(m_dpiFld, 7, 1);
-    }
-    guiLay->setColumnStretch(0, 0);
-    guiLay->setColumnStretch(1, 0);
-    guiLay->setColumnStretch(2, 0);
-    guiLay->setColumnStretch(3, 0);
-    guiLay->setColumnStretch(4, 1);
+  // Format options (for Raster/Scan levels)
+  guiLay->addWidget(m_rasterFormatLabel, 5, 0,
+                    Qt::AlignRight | Qt::AlignVCenter);
+  guiLay->addWidget(m_rasterFormatOm, 5, 1, Qt::AlignLeft);
+  guiLay->addWidget(m_frameFormatBtn, 5, 2, 1, 2, Qt::AlignLeft);
 
-    m_topLayout->addLayout(guiLay, 1);
-  }
+  // Width - Height
+  guiLay->addWidget(m_widthLabel, 6, 0, Qt::AlignRight | Qt::AlignVCenter);
+  guiLay->addWidget(m_widthFld, 6, 1);
+  guiLay->addWidget(m_heightLabel, 6, 2, Qt::AlignRight | Qt::AlignVCenter);
+  guiLay->addWidget(m_heightFld, 6, 3);
+
+  // DPI
+  guiLay->addWidget(m_dpiLabel, 7, 0, Qt::AlignRight | Qt::AlignVCenter);
+  guiLay->addWidget(m_dpiFld, 7, 1);
+
+  guiLay->setColumnStretch(0, 0);
+  guiLay->setColumnStretch(1, 0);
+  guiLay->setColumnStretch(2, 0);
+  guiLay->setColumnStretch(3, 0);
+  guiLay->setColumnStretch(4, 1);
+
+  m_topLayout->addLayout(guiLay, 1);
 
   m_buttonLayout->setContentsMargins(0, 0, 0, 0);
   m_buttonLayout->setSpacing(30);
@@ -293,16 +312,15 @@ LevelCreatePopup::LevelCreatePopup()
     m_buttonLayout->addStretch(1);
   }
 
-  //---- signal-slot connections
-  bool ret = true;
-  ret      = ret && connect(m_levelTypeOm, SIGNAL(currentIndexChanged(int)),
-                            SLOT(onLevelTypeChanged(int)));
-  ret      = ret && connect(m_frameFormatBtn, SIGNAL(clicked()), this,
-                            SLOT(onFrameFormatButton()));
-  ret      = ret && connect(okBtn, SIGNAL(clicked()), this, SLOT(onOkBtn()));
-  ret      = ret && connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
-  ret =
-      ret && connect(applyBtn, SIGNAL(clicked()), this, SLOT(onApplyButton()));
+  // Modern signal-slot connections using function pointers
+  connect(m_levelTypeOm, QOverload<int>::of(&QComboBox::currentIndexChanged),
+          this, &LevelCreatePopup::onLevelTypeChanged);
+  connect(m_frameFormatBtn, &QPushButton::clicked, this,
+          &LevelCreatePopup::onFrameFormatButton);
+  connect(okBtn, &QPushButton::clicked, this, &LevelCreatePopup::onOkBtn);
+  connect(cancelBtn, &QPushButton::clicked, this, &QDialog::reject);
+  connect(applyBtn, &QPushButton::clicked, this,
+          &LevelCreatePopup::onApplyButton);
 
   setSizeWidgetEnable(false);
   setRasterWidgetVisible(false);
@@ -312,27 +330,26 @@ LevelCreatePopup::LevelCreatePopup()
 
 void LevelCreatePopup::updatePath() {
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
-  TFilePath defaultPath;
-  defaultPath = scene->getDefaultLevelPath(getLevelType()).getParentDir();
+  TFilePath defaultPath =
+      scene->getDefaultLevelPath(getLevelType()).getParentDir();
   m_pathFld->setPath(toQString(defaultPath));
 }
 
 //-----------------------------------------------------------------------------
 
 void LevelCreatePopup::nextName() {
-  const std::unique_ptr<NameBuilder> nameBuilder(NameBuilder::getBuilder(L""));
+  const auto nameBuilder =
+      std::unique_ptr<NameBuilder>(NameBuilder::getBuilder(L""));
 
-  std::wstring levelName = L"";
+  std::wstring levelName;
 
   // Select a different unique level name in case it already exists (either in
   // scene or on disk)
-
-  for (;;) {
+  while (true) {
     levelName = nameBuilder->getNext();
-
-    if (levelExists(levelName)) continue;
-
-    break;
+    if (!levelExists(levelName)) {
+      break;
+    }
   }
 
   m_nameFld->setText(QString::fromStdWString(levelName));
@@ -340,37 +357,39 @@ void LevelCreatePopup::nextName() {
 
 //-----------------------------------------------------------------------------
 
-bool LevelCreatePopup::levelExists(std::wstring levelName) {
-  TFilePath fp;
-  TFilePath actualFp;
-  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
-  TLevelSet *levelSet =
-      TApp::instance()->getCurrentScene()->getScene()->getLevelSet();
+bool LevelCreatePopup::levelExists(const std::wstring &levelName) {
+  ToonzScene *scene   = TApp::instance()->getCurrentScene()->getScene();
+  TLevelSet *levelSet = scene->getLevelSet();
 
   TFilePath parentDir(m_pathFld->getPath().toStdWString());
-  fp = scene->getDefaultLevelPath(getLevelType(), levelName)
-           .withParentDir(parentDir);
-  actualFp = scene->decodeFilePath(fp);
+  TFilePath fp = scene->getDefaultLevelPath(getLevelType(), levelName)
+                     .withParentDir(parentDir);
+  TFilePath actualFp = scene->decodeFilePath(fp);
 
-  if (TSystem::doesExistFileOrLevel(actualFp))
+  if (TSystem::doesExistFileOrLevel(actualFp)) {
     return true;
-  else if (TXshLevel *level = levelSet->getLevel(levelName)) {
-    // even if the level exists in the scene cast, it can be replaced if it is
+  }
+
+  if (TXshLevel *level = levelSet->getLevel(levelName)) {
+    // Even if the level exists in the scene cast, it can be replaced if it is
     // unused
     if (Preferences::instance()->isAutoRemoveUnusedLevelsEnabled() &&
-        !scene->getChildStack()->getTopXsheet()->isLevelUsed(level))
+        !scene->getChildStack()->getTopXsheet()->isLevelUsed(level)) {
       return false;
-    else
-      return true;
-  } else
-    return false;
+    }
+    return true;
+  }
+
+  return false;
 }
 
 //-----------------------------------------------------------------------------
-void LevelCreatePopup::showEvent(QShowEvent *) {
+void LevelCreatePopup::showEvent(QShowEvent *event) {
+  Dialog::showEvent(event);
   update();
   nextName();
   m_nameFld->setFocus();
+
   if (Preferences::instance()->getUnits() == "pixel") {
     m_dpiFld->hide();
     m_dpiLabel->hide();
@@ -414,20 +433,16 @@ int LevelCreatePopup::getLevelType() const {
 
 void LevelCreatePopup::onLevelTypeChanged(int index) {
   int type = m_levelTypeOm->itemData(index).toInt();
-  if (type == OVL_XSHLEVEL || type == TZP_XSHLEVEL)
-    setSizeWidgetEnable(true);
-  else
-    setSizeWidgetEnable(false);
 
+  setSizeWidgetEnable(type == OVL_XSHLEVEL || type == TZP_XSHLEVEL);
   setRasterWidgetVisible(type == OVL_XSHLEVEL || type == TZI_XSHLEVEL);
 
   updatePath();
 
   std::wstring levelName = m_nameFld->text().toStdWString();
-  // check if the name already exists or if it is a 1 letter name
-  // one letter names are most likely created automatically so
-  // this makes sure that automatically created names
-  // don't skip a letter.
+  // Check if the name already exists or if it is a 1-letter name
+  // One-letter names are most likely created automatically so
+  // this ensures that automatically created names don't skip a letter.
   if (levelExists(levelName) || levelName.length() == 1) {
     nextName();
   }
@@ -437,10 +452,11 @@ void LevelCreatePopup::onLevelTypeChanged(int index) {
 //-----------------------------------------------------------------------------
 
 void LevelCreatePopup::onOkBtn() {
-  if (apply())
+  if (apply()) {
     close();
-  else
+  } else {
     m_nameFld->setFocus();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -458,6 +474,7 @@ void LevelCreatePopup::onFrameFormatButton() {
   // Tentatively use the preview output settings
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
   if (!scene) return;
+
   std::string ext = m_rasterFormatOm->currentData().toString().toStdString();
   openFormatSettingsPopup(this, ext, nullptr,
                           &scene->getProperties()->formatTemplateFIdForInput());
@@ -469,20 +486,19 @@ bool LevelCreatePopup::apply() {
   TApp *app = TApp::instance();
   int row   = app->getCurrentFrame()->getFrame();
   int col   = app->getCurrentColumn()->getColumnIndex();
-  int i, j;
 
   ToonzScene *scene = app->getCurrentScene()->getScene();
   TXsheet *xsh      = scene->getXsheet();
 
   bool validColumn = true;
-  if (xsh->getColumn(col))
-    validColumn =
-        xsh->getColumn(col)->getColumnType() == TXshColumn::eLevelType;
+  if (TXshColumn *column = xsh->getColumn(col)) {
+    validColumn = (column->getColumnType() == TXshColumn::eLevelType);
+  }
 
-  int from   = (int)m_fromFld->getValue();
-  int to     = (int)m_toFld->getValue();
-  int inc    = (int)m_incFld->getValue();
-  int step   = (int)m_stepFld->getValue();
+  int from   = static_cast<int>(m_fromFld->getValue());
+  int to     = static_cast<int>(m_toFld->getValue());
+  int inc    = static_cast<int>(m_incFld->getValue());
+  int step   = static_cast<int>(m_stepFld->getValue());
   double w   = m_widthFld->getValue();
   double h   = m_heightFld->getValue();
   double dpi = m_dpiFld->getValue();
@@ -491,23 +507,23 @@ bool LevelCreatePopup::apply() {
   int lType  = getLevelType();
 
   std::wstring levelName = m_nameFld->text().toStdWString();
-  // tolgo i blanks prima e dopo
-
-  i = levelName.find_first_not_of(L' ');
-  if (i == (int)std::wstring::npos)
-    levelName = L"";
-  else {
-    int j = levelName.find_last_not_of(L' ');
-    assert(j != (int)std::wstring::npos);
-    levelName = levelName.substr(i, j - i + 1);
+  // Remove leading and trailing whitespace
+  auto start = levelName.find_first_not_of(L' ');
+  if (start == std::wstring::npos) {
+    levelName.clear();
+  } else {
+    auto end  = levelName.find_last_not_of(L' ');
+    levelName = levelName.substr(start, end - start + 1);
   }
+
   if (levelName.empty()) {
     error(tr("No level name specified: please choose a valid level name"));
     return false;
   }
 
-  if (isReservedFileName_message(QString::fromStdWString(levelName)))
+  if (isReservedFileName_message(QString::fromStdWString(levelName))) {
     return false;
+  }
 
   if (from > to) {
     error(tr("Invalid frame range"));
@@ -526,7 +542,7 @@ bool LevelCreatePopup::apply() {
 
   TXshLevel *existingLevel = scene->getLevelSet()->getLevel(levelName);
   if (existingLevel) {
-    // check if the existing level can be removed
+    // Check if the existing level can be removed
     if (!Preferences::instance()->isAutoRemoveUnusedLevelsEnabled() ||
         scene->getChildStack()->getTopXsheet()->isLevelUsed(existingLevel)) {
       error(
@@ -535,15 +551,16 @@ bool LevelCreatePopup::apply() {
       m_nameFld->selectAll();
       return false;
     }
-    // if the exitingLevel is not null, it will be removed afterwards
+    // If existingLevel is not null, it will be removed afterwards
   }
 
   TFilePath parentDir(m_pathFld->getPath().toStdWString());
   TFilePath fp =
       scene->getDefaultLevelPath(lType, levelName).withParentDir(parentDir);
 
-  if (lType == OVL_XSHLEVEL || lType == TZI_XSHLEVEL)
+  if (lType == OVL_XSHLEVEL || lType == TZI_XSHLEVEL) {
     fp = fp.withType(m_rasterFormatOm->currentData().toString().toStdString());
+  }
 
   TFilePath actualFp = scene->decodeFilePath(fp);
   if (TSystem::doesExistFileOrLevel(actualFp)) {
@@ -553,21 +570,19 @@ bool LevelCreatePopup::apply() {
     m_nameFld->selectAll();
     return false;
   }
+
   parentDir = scene->decodeFilePath(parentDir);
   if (!TFileStatus(parentDir).doesExist()) {
-    QString question;
-    /*question = "Folder " +toQString(parentDir) +
-                                                     " doesn't exist.\nDo you
-       want to create it?";*/
-    question = tr("Folder %1 doesn't exist.\nDo you want to create it?")
-                   .arg(toQString(parentDir));
+    QString question = tr("Folder %1 doesn't exist.\nDo you want to create it?")
+                           .arg(toQString(parentDir));
     int ret = DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"));
     if (ret == 0 || ret == 2) return false;
+
     try {
       TSystem::mkDir(parentDir);
       DvDirModel::instance()->refreshFolder(parentDir.getParentDir());
     } catch (...) {
-      error(tr("Unable to create") + toQString(parentDir));
+      error(tr("Unable to create %1").arg(toQString(parentDir)));
       return false;
     }
   }
@@ -578,33 +593,33 @@ bool LevelCreatePopup::apply() {
   // the preference option AutoRemoveUnusedLevels is ON
   if (existingLevel) {
     bool ok = LevelCmd::removeLevelFromCast(existingLevel, scene, false);
-    assert(ok);
+    Q_ASSERT(ok);
     DVGui::info(QObject::tr("Removed unused level %1 from the scene cast. "
                             "(This behavior can be disabled in Preferences.)")
                     .arg(QString::fromStdWString(levelName)));
   }
 
-  /*-- これからLevelを配置しようとしているセルが空いているかどうかのチェック
-   * --*/
+  // Check if the cells where we want to place the level are empty
   bool areColumnsShifted = false;
-  TXshCell cell          = xsh->getCell(row, col);
   bool isInRange         = true;
-  if (col < 0)
+
+  if (col < 0) {
     isInRange = false;
-  else {
-    for (i = row; i < row + numFrames; i++) {
-      if (!cell.isEmpty()) {
+  } else {
+    for (int i = row; i < row + numFrames; ++i) {
+      if (!xsh->getCell(i, col).isEmpty()) {
         isInRange = false;
         break;
       }
-      cell = xsh->getCell(i, col);
     }
   }
+
   if (!validColumn) {
     isInRange = false;
   }
 
-  /*-- 別のLevelに占有されていた場合、Columnを1つ右に移動 --*/
+  // If the range is occupied by another level, shift the column one to the
+  // right
   if (!isInRange) {
     col += 1;
     TApp::instance()->getCurrentColumn()->setColumnIndex(col);
@@ -612,7 +627,7 @@ bool LevelCreatePopup::apply() {
     xsh->insertColumn(col);
   }
 
-  CreateLevelUndo *undo =
+  auto *undo =
       new CreateLevelUndo(row, col, numFrames, step, areColumnsShifted);
   TUndoManager::manager()->add(undo);
 
@@ -620,8 +635,9 @@ bool LevelCreatePopup::apply() {
       scene->createNewLevel(lType, levelName, TDimension(), 0, fp);
   TXshSimpleLevel *sl = dynamic_cast<TXshSimpleLevel *>(level);
 
-  assert(sl);
+  Q_ASSERT(sl);
   sl->setPath(fp, true);
+
   if (lType == TZP_XSHLEVEL || lType == OVL_XSHLEVEL) {
     sl->getProperties()->setDpiPolicy(LevelProperties::DP_ImageDpi);
     sl->getProperties()->setDpi(dpi);
@@ -629,13 +645,14 @@ bool LevelCreatePopup::apply() {
     sl->getProperties()->setImageRes(TDimension(xres, yres));
   }
 
-  for (i = from; i <= to; i += inc) {
+  for (int i = from; i <= to; i += inc) {
     TFrameId fid(i);
-    if (lType == PLI_XSHLEVEL)
+
+    if (lType == PLI_XSHLEVEL) {
       sl->setFrame(fid, new TVectorImage());
-    else if (lType == META_XSHLEVEL)
+    } else if (lType == META_XSHLEVEL) {
       sl->setFrame(fid, new TMetaImage());
-    else if (lType == TZP_XSHLEVEL) {
+    } else if (lType == TZP_XSHLEVEL) {
       TRasterCM32P raster(xres, yres);
       raster->fill(TPixelCM32());
       TToonzImageP ti(raster, TRect());
@@ -645,21 +662,24 @@ bool LevelCreatePopup::apply() {
 
       // This update should be called at least once, or it won't be rendered
       // Almost every level tool will call ToolUtils::updateSavebox() to update
-      // But since fill tool tend to not update the savebox, we call it here
-      TImageInfo* info = sl->getFrameInfo(fid, true);
+      // But since fill tool tends to not update the savebox, we call it here
+      TImageInfo *info = sl->getFrameInfo(fid, true);
       ImageBuilder::setImageInfo(*info, ti.getPointer());
     } else if (lType == OVL_XSHLEVEL) {
       TRaster32P raster(xres, yres);
       raster->clear();
       TRasterImageP ri(raster);
       ri->setDpi(dpi, dpi);
-      // modify frameId to be with the same frame format as existing frames
+      // Modify frameId to have the same frame format as existing frames
       TFrameId tmplFId = scene->getProperties()->formatTemplateFIdForInput();
       sl->formatFId(fid, tmplFId);
       sl->setFrame(fid, ri);
     }
+
     TXshCell cell(sl, fid);
-    for (j = 0; j < step; j++) xsh->setCell(row++, col, cell);
+    for (int j = 0; j < step; ++j) {
+      xsh->setCell(row++, col, cell);
+    }
   }
 
   if (lType == TZP_XSHLEVEL || lType == OVL_XSHLEVEL) {
@@ -668,19 +688,18 @@ bool LevelCreatePopup::apply() {
   }
 
   undo->onAdd(sl);
-
   TUndoManager::manager()->endBlock();
 
   app->getCurrentScene()->notifySceneChanged();
   app->getCurrentScene()->notifyCastChange();
   app->getCurrentXsheet()->notifyXsheetChanged();
 
-  // Cambia l'immagine corrente ma non cambiano ne' il frame ne' la colonna
-  // corrente
-  // (entrambi notificano il cambiamento dell'immagine al tool).
-  // devo verfificare che sia settato il tool giusto.
+  // Change the current image but don't change the current frame or column
+  // (both notify the image change to the tool).
+  // Need to verify that the correct tool is set.
   app->getCurrentTool()->onImageChanged(
-      (TImage::Type)app->getCurrentImageType());
+      static_cast<TImage::Type>(app->getCurrentImageType()));
+
   return true;
 }
 
@@ -688,6 +707,7 @@ bool LevelCreatePopup::apply() {
 
 void LevelCreatePopup::update() {
   updatePath();
+
   Preferences *pref = Preferences::instance();
   if (pref->getUnits() == "pixel") {
     m_widthFld->setMeasure("camera.lx");
@@ -696,6 +716,7 @@ void LevelCreatePopup::update() {
     m_widthFld->setMeasure("level.lx");
     m_heightFld->setMeasure("level.ly");
   }
+
   if (pref->isNewLevelSizeToCameraSizeEnabled()) {
     TCamera *currCamera =
         TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera();
@@ -711,19 +732,9 @@ void LevelCreatePopup::update() {
 
   int levelType = pref->getDefLevelType();
   int index     = m_levelTypeOm->findData(levelType);
-  if (index >= 0) m_levelTypeOm->setCurrentIndex(index);
-
-  /*
-(old behaviour)
-TCamera* camera = scene->getCurrentCamera();
-  TDimensionD cameraSize = camera->getSize();
-  m_widthFld->setValue(cameraSize.lx);
-  m_heightFld->setValue(cameraSize.ly);
-if(camera->isXPrevalence())
-m_dpiFld->setValue(camera->getDpi().x);
-else
-m_dpiFld->setValue(camera->getDpi().y);
-*/
+  if (index >= 0) {
+    m_levelTypeOm->setCurrentIndex(index);
+  }
 }
 
 //-----------------------------------------------------------------------------
