@@ -108,7 +108,7 @@ public slots:
 class StartupLabel : public QLabel {
   Q_OBJECT
 public:
-  explicit StartupLabel(const QString &text = "", QWidget *parent = 0,
+  explicit StartupLabel(const QString &text = "", QWidget *parent = nullptr,
                         int index = -1);
   ~StartupLabel();
   QString m_text;
