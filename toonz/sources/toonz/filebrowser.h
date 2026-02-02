@@ -27,16 +27,12 @@ class QFileSystemWatcher;
 //-----------------------------------------------------------------------------
 
 //! FrameCountReader is the class responsible for calculation of levels' frame
-//! counts
-//! in the file browser. Since on many file formats this requires to open the
-//! level file
-//! and scan each frame (MOV-like), and on some machine configurations such a
-//! task
-//! can be time consuming, we dedicate a separate thread for it - just like the
-//! icon
-//! generator does. Calculated frame counts are also stored for quick lookup
-//! once they
-//! have been calculated the first time.
+//! counts in the file browser. Since on many file formats this requires to
+//! open the level file and scan each frame (MOV-like), and on some machine
+//! configurations such a task can be time consuming, we dedicate a separate
+//! thread for it - just like the icon generator does. Calculated frame counts
+//! are also stored for quick lookup once they have been calculated the first
+//! time.
 class FrameCountReader final : public QObject {
   Q_OBJECT
 
@@ -50,7 +46,6 @@ public:
   void stopReading();
 
 signals:
-
   void calculatedFrameCount();
 };
 
@@ -79,16 +74,16 @@ public:
   QMenu *getContextMenu(QWidget *parent, int index) override;
 
   /*!
-This functions adds to the types to be filtered a new type;
-if this function is never  called, the default filter is all image
-files and scene files and palette files
-*/
+  This function adds to the types to be filtered a new type;
+  if this function is never called, the default filter is all image
+  files and scene files and palette files
+  */
   void addFilterType(const QString &type);
 
   /*!
-The setFilterTypes function directly specifies the list of file
-types to be displayed in the file browser.
-*/
+  The setFilterTypes function directly specifies the list of file
+  types to be displayed in the file browser.
+  */
   void setFilterTypes(const QStringList &types);
   const QStringList &getFilterTypes() const { return m_filter; }
   void removeFilterType(const QString &type);
@@ -108,8 +103,8 @@ types to be displayed in the file browser.
 
   static void updateItemViewerPanel();
 
-  // ritorna true se il file e' stato rinominato. dopo la chiamata fp contiene
-  // il nuovo path
+  // returns true if the file has been renamed. After the call, fp contains
+  // the new path
   static bool renameFile(TFilePath &fp, QString newName);
 
   void makeCurrentProjectVisible();
@@ -148,11 +143,9 @@ protected:
   void refreshHistoryButtons();
 
 public slots:
-
   void onTreeFolderChanged();
 
 protected slots:
-
   void refresh();
 
   void changeFolder(const QModelIndex &index);
@@ -201,7 +194,6 @@ protected slots:
   void tryToOpenScene(const TFilePath &filePath);
 
 signals:
-
   void filePathClicked(const TFilePath &);
   void filePathDoubleClicked(const TFilePath &);
   // reuse the list of TFrameId in order to skip loadInfo() when loading the
@@ -210,8 +202,8 @@ signals:
                          const std::list<std::vector<TFrameId>> &);
   void treeFolderChanged(const TFilePath &);
 
-  // for activating/deactivating the folder history buttons( back button &
-  // forward button )
+  // for activating/deactivating the folder history buttons (back button &
+  // forward button)
   void historyChanged(bool, bool);
 
 private:
