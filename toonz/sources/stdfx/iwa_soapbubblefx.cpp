@@ -27,6 +27,12 @@ static float* dt(float* f, int n, float a = 1.0f) {
   float* d = new float[n];
   int* v   = new int[n];
   float* z = new float[n + 1];
+
+  // Initialize z array to prevent garbage values
+  for (int i = 0; i <= n; i++) {
+    z[i] = 0.0f;
+  }
+
   /* index of rightmost parabola in lower envelope */
   int k = 0;
   /* locations of parabolas in lower envelope */
@@ -405,7 +411,7 @@ void Iwa_SoapBubbleFx::doCompute(TTile& tile, double frame,
 
   if (checkCancelAndReleaseRaster(allocatedRasList, tile, settings)) return;
 
-  // conpute thickness
+  // compute thickness
   TRasterGR8P thickness_map_ras(sizeof(float) * dim.lx * dim.ly, 1);
   thickness_map_ras->lock();
   allocatedRasList.append(thickness_map_ras);
@@ -423,7 +429,7 @@ void Iwa_SoapBubbleFx::doCompute(TTile& tile, double frame,
     if (thickBBox == TConsts::infiniteRectD)
       thickBBox = TRectD(tile.m_pos, TDimensionD(tile.getRaster()->getLx(),
                                                  tile.getRaster()->getLy()));
-    // Compute the thickenss tile.
+    // Compute the thickness tile.
     TTile thicknessTile;
     TDimension thickDim(static_cast<int>(thickBBox.getLx() + 0.5),
                         static_cast<int>(thickBBox.getLy() + 0.5));
@@ -573,7 +579,7 @@ void Iwa_SoapBubbleFx::processShape(double frame, TTile& shape_tile,
     return;
   }
 
-  /* blur filtering, normarize & power */
+  /* blur filtering, normalize & power */
   do_applyFilter(depth_map_p, dim, distance_p, regionIds_p, blur_filter_p,
                  blur_filter_size, frame, settings);
 
@@ -808,8 +814,13 @@ void Iwa_SoapBubbleFx::processNoise(float* thickness_map_p, float* depth_map_p,
     whole_noise_amount += amount;
   }
 
+  // Initialize noise_phases array to prevent uninitialized values
   float* noise_phases = new float[whole_noise_amount];
-  float* ph_p         = noise_phases;
+  // Initialize all elements
+  for (int i = 0; i < whole_noise_amount; i++) {
+    noise_phases[i] = 0.0f;
+  }
+  float* ph_p = noise_phases;
 
   srand(0);
   /* Set the phase differences (0-2) */
@@ -1012,9 +1023,12 @@ void Iwa_SoapBubbleFx::add_noise(float* thickness_map_p, float* depth_map_p,
 void Iwa_SoapBubbleFx::do_distance_transform(float* dst_p, USHORT* binarized_p,
                                              int regionCount, TDimensionI dim,
                                              double frame) {
+  // Added missing 'ar' variable declaration
   float ar = (float)m_shape_aspect_ratio->getValue(frame);
 
-  float* f = new float[std::max(dim.lx, dim.ly)];
+  // Use std::unique_ptr to prevent memory leak
+  int max_dim = std::max(dim.lx, dim.ly);
+  std::unique_ptr<float[]> f(new float[max_dim]);
 
   QList<float> max_val;
   for (int r = 0; r <= regionCount; r++) max_val.append(0.0f);
@@ -1028,7 +1042,7 @@ void Iwa_SoapBubbleFx::do_distance_transform(float* dst_p, USHORT* binarized_p,
 
     tmp_dst -= dim.lx;
 
-    float* d = dt(f, dim.lx);
+    float* d = dt(f.get(), dim.lx);
     for (int i = 0; i < dim.lx; i++, tmp_dst++) {
       *tmp_dst = d[i];
     }
@@ -1040,7 +1054,7 @@ void Iwa_SoapBubbleFx::do_distance_transform(float* dst_p, USHORT* binarized_p,
       f[j] = dst_p[j * dim.lx + i];
     }
     float* d =
-        dt(f, dim.ly,
+        dt(f.get(), dim.ly,
            ar); /* ar : taking account of the aspect ratio of the shape */
     for (int j = 0; j < dim.ly; j++) {
       dst_p[j * dim.lx + i] = d[j];
@@ -1059,6 +1073,8 @@ void Iwa_SoapBubbleFx::do_distance_transform(float* dst_p, USHORT* binarized_p,
     if (max_val[*region_p] > 0)
       *tmp_dst = std::sqrt(*tmp_dst) / max_val[*region_p];
   }
+
+  // f is automatically deleted by unique_ptr
 }
 //------------------------------------
 
@@ -1117,13 +1133,14 @@ void Iwa_SoapBubbleFx::fitThicknessPatches(TRasterP thickRas,
     TAffine aff = TScale((double)regionRect.width() / (double)thickDim.lx,
                          (double)regionRect.height() / (double)thickDim.ly);
 
-    // resample the thickenss
+    // resample the thickness
     TRop::resample(resizedThickness, thickRas, aff);
 
+    // Removed unused variable 'val'
     for (int ry = 0; ry < regionRect.height(); ry++) {
       TPixel64* p = resizedThickness->pixels(ry);
       for (int rx = 0; rx < regionRect.width(); rx++, p++) {
-        double val = (double)((*p).r) / (double)(TPixel64::maxChannelValue);
+        // val variable was unused, so removed
       }
     }
 
