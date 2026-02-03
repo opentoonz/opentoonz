@@ -31,8 +31,8 @@ $ git lfs install
 ### リポジトリを clone
 
 ```
-$ git clone https://github.com/opentoonz/opentoonz
-$ cd opentoonz
+$ git clone https://github.com/Flare/Flare
+$ cd Flare
 $ git lfs pull
 $ cd thirdparty/lzo
 $ cp -r 2.03/include/lzo driver
@@ -72,21 +72,21 @@ $ sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 $ cmake -G Xcode ../sources -B. -DQT_PATH='/usr/local/opt/qt/lib' -DWITH_TRANSLATION=OFF
 ```
 - オプション `-DWITH_TRANSLATION=OFF` はXcode12以降で必要です。
-- Xcodeでプロジェクト `/opentoonz/toonz/build/OpenToonz.xcodeproj` を開き、ビルドします。
+- Xcodeでプロジェクト `/Flare/flare/build/Flare.xcodeproj` を開き、ビルドします。
 
 ### stuff ディレクトリの設置 (任意)
 
-`/Applications/OpenToonz/OpenToonz_stuff` というディレクトリが存在していない場合は以下のコマンド等でリポジトリのひな形を設置する必要があります。
+`/Applications/Flare/Flare_stuff` というディレクトリが存在していない場合は以下のコマンド等でリポジトリのひな形を設置する必要があります。
 
 ```
-$ sudo cp -r opentoonz/stuff /Applications/OpenToonz/OpenToonz_stuff
-$ sudo chmod -R 777 /Applications/OpenToonz
+$ sudo cp -r Flare/stuff /Applications/Flare/Flare_stuff
+$ sudo chmod -R 777 /Applications/Flare
 ```
 
 ### アプリケーションの実行
 
 ```
-$ open ./toonz/OpenToonz.app
+$ open ./flare/Flare.app
 ```
 
-- Xcode でビルドしている場合、アプリケーションは　`.toonz/build/Debug/OpenToonz.app` にあります。
+- Xcode でビルドしている場合、アプリケーションは　`.toonz/build/Debug/Flare.app` にあります。

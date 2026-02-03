@@ -1,11 +1,11 @@
 # Testing Pull Requests (PRs)
 
-When a PR is submitted, it is compiled automatically by AppVeyor CI. The AppVeyor build creates an artifact which contains the OpenToonz executable and supporting DLLs needed to run.  You can easily download this artifact and run it to test out the PR before it is merged.
+When a PR is submitted, it is compiled automatically by AppVeyor CI. The AppVeyor build creates an artifact which contains the Flare executable and supporting DLLs needed to run.  You can easily download this artifact and run it to test out the PR before it is merged.
 
 ## Pre-Testing Notes
-- You need to have OpenToonz already installed.  Do not uninstall.
-- It is recommended that you backup your `C:\OpenToonz stuff` folder before testing a PR.
-- The AppVeyor build does not contain an updated `C:\OpenToonz stuff` folder so any PR changes to default configurations (i.e. stylesheets, FXs, brushes, etc) are not automatically included.
+- You need to have Flare already installed.  Do not uninstall.
+- It is recommended that you backup your `C:\Flare stuff` folder before testing a PR.
+- The AppVeyor build does not contain an updated `C:\Flare stuff` folder so any PR changes to default configurations (i.e. stylesheets, FXs, brushes, etc) are not automatically included.
 - It is recommended when testing to use new scenes that you can throw away.
   - If you decide to test on an existing scene, back it up first!
 
@@ -29,7 +29,7 @@ When a PR is submitted, it is compiled automatically by AppVeyor CI. The AppVeyo
 
 ![](./testing_pr_4.JPG)
 
-- Click on the OpenToonz `.zip` file to begin the download.
+- Click on the Flare `.zip` file to begin the download.
 
 ![](./testing_pr_5.JPG)
 
@@ -55,7 +55,8 @@ When a PR is submitted, it is compiled automatically by AppVeyor CI. The AppVeyo
 
 - Once download is complete, go to your Downloads folder and extract the contents of the .zip file anywhere on your computer.
  - You should extract into a separate folder. 
- - ⚠️ **Do not overwrite your current OpenToonz installation!**
-- Enter the folder you extracted everything into and double-click the OpenToonz executable to start.
+ - ⚠️ **Do not overwrite your current Flare installation!**
+- Enter the folder you extracted everything into and double-click the Flare executable to start.
 - Test away!  Report any suggestions or issues related to the change in the PR comments.
 - You can safely delete the .zip file and the folder you created when you are done.
+

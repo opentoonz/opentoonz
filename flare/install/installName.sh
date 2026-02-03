@@ -5,7 +5,7 @@
 
 # RICORDARSI PRIMA DI COPIARE LE LIBRERIE IN Toonz\ 7.1.app/Contents/Frameworks
 
-#echo /depot/angelo/toonz/main/binmacosxd
+#echo /depot/angelo/flare/main/binmacosxd
 
 #tnzcore
 
@@ -522,6 +522,7 @@ install_name_tool -change /usr/local/Trolltech/Qt-4.8.0/lib/QtOpenGL.framework/V
 
 install_name_tool -id @executable_path/../Frameworks/QtNetwork.framework/Versions/4/QtNetwork $BINROOT/bin/Toonz\ 7.1.app/Contents/Frameworks/QtNetwork.framework/Versions/4/QtNetwork
 install_name_tool -change /usr/local/Trolltech/Qt-4.8.0/lib/QtNetwork.framework/Versions/4/QtNetwork @executable_path/../Frameworks/QtNetwork.framework/Versions/4/QtNetwork $BINROOT/bin/Toonz\ 7.1.app/Contents/MacOS/tconverter
+
 
 
 

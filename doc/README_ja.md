@@ -1,14 +1,14 @@
 # Flare
 
-本プロジェクトは OpenToonz をフォークしたもので、Adobe Animate に似たワークスペースを提供し、SWF/FLA の取り込みサポートを強化しています。
+本プロジェクトは Flare をフォークしたもので、Adobe Animate に似たワークスペースを提供し、SWF/FLA の取り込みサポートを強化しています。
 
 [English](../README.md) [简体中文](./README_chs.md)
 
-[![](https://ci.appveyor.com/api/projects/status/oa5l5pc964h8fv49/branch/master?svg=true)](https://ci.appveyor.com/project/opentoonz/opentoonz)
-[![Build Windows](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_windows.yml/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_windows.yml)
-[![Build macOS](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_macos.yml/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_macos.yml)
-[![Build Linux](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_linux.yml/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_linux.yml)
-[![Translation status](https://hosted.weblate.org/widgets/opentoonz/-/svg-badge.svg)](https://hosted.weblate.org/engage/opentoonz/)
+[![](https://ci.appveyor.com/api/projects/status/oa5l5pc964h8fv49/branch/master?svg=true)](https://ci.appveyor.com/project/Flare/Flare)
+[![Build Windows](https://github.com/Flare/Flare/actions/workflows/workflow_windows.yml/badge.svg?branch=master)](https://github.com/Flare/Flare/actions/workflows/workflow_windows.yml)
+[![Build macOS](https://github.com/Flare/Flare/actions/workflows/workflow_macos.yml/badge.svg?branch=master)](https://github.com/Flare/Flare/actions/workflows/workflow_macos.yml)
+[![Build Linux](https://github.com/Flare/Flare/actions/workflows/workflow_linux.yml/badge.svg?branch=master)](https://github.com/Flare/Flare/actions/workflows/workflow_linux.yml)
+[![Translation status](https://hosted.weblate.org/widgets/Flare/-/svg-badge.svg)](https://hosted.weblate.org/engage/Flare/)
 
 ## これは何？
 
@@ -17,13 +17,13 @@
 
 ## 動作条件
 
-<https://opentoonz.github.io/> を参照してください。
+<https://Flare.github.io/> を参照してください。
 
 ## インストール
 
-<https://opentoonz.github.io/> から最新安定版のインストーラーをダウンロードしてインストールしてください。
+<https://Flare.github.io/> から最新安定版のインストーラーをダウンロードしてインストールしてください。
 
-過去のバージョンと不安定な最新版も <https://github.com/opentoonz/opentoonz/releases> から利用することができます。
+過去のバージョンと不安定な最新版も <https://github.com/Flare/Flare/releases> から利用することができます。
 
 ## ビルド方法
 

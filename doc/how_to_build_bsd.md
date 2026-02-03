@@ -2,7 +2,7 @@
 
 ## Required software
 
-Building OpenToonz from source requires the following dependencies:
+Building Flare from source requires the following dependencies:
 - Git
 - GCC or Clang
 - CMake (3.10 or newer)
@@ -28,4 +28,5 @@ Notes:
 * If your BSD operating system doesn't have the up to date packages such as gsl, you may install them by compiling from source.
 
 
-Continue the instructions as stated in [the linux guide](https://github.com/opentoonz/opentoonz/blob/master/doc/how_to_build_linux.md) to finish the compilation.
+Continue the instructions as stated in [the linux guide](https://github.com/Flare/Flare/blob/master/doc/how_to_build_linux.md) to finish the compilation.
+

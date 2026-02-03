@@ -48,13 +48,13 @@ ls -l /usr/local/lib/cmake/glew
 rm /usr/local/lib/cmake/glew
 ```
 
-### Set up OpenToonz repository
+### Set up Flare repository
 
-These steps will put the OpenToonz repository under /Users/yourlogin/Documents.
+These steps will put the Flare repository under /Users/yourlogin/Documents.
 ```sh
 cd ~/Documents   #or where you want to store the repository#
-git clone https://github.com/opentoonz/opentoonz
-cd opentoonz
+git clone https://github.com/Flare/Flare
+cd Flare
 git lfs pull
 cd thirdparty/lzo
 cp -r 2.03/include/lzo driver
@@ -69,11 +69,11 @@ mv ~/Downloads/boost_1_72_0.tar.bz2 .   #or whatever the boost filename you down
 tar xvjf boost_1_72_0.tar.bz2
 ```
 
-### Configure environment and Build OpenToonz
+### Configure environment and Build Flare
 
 1. Create the build directory with the following:
 ```sh
-cd ~/Documents/opentoonz/flare
+cd ~/Documents/Flare/flare
 mkdir build
 cd build
 ```
@@ -98,15 +98,15 @@ sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 cmake -G Xcode ../sources -B. -DQT_PATH='/opt/homebrew/opt/qt@5/lib' -DWITH_TRANSLATION=OFF   #replace QT path with your installed QT version#
 ```
 - Note that the option `-DWITH_TRANSLATION=OFF` is needed to avoid error when using XCode 12+ which does not allow to add the same source to multiple targets.
-- Open Xcode app and open project /Users/yourlogin/Documents/opentoonz/flare/build/OpenToonz.xcodeproj
-- Change `ALL_BUILD` to `OpenToonz`
+- Open Xcode app and open project /Users/yourlogin/Documents/Flare/flare/build/Flare.xcodeproj
+- Change `ALL_BUILD` to `Flare`
 - Start build with: Product -> Build
 
     - NOTE about rebuilding in Xcode: The initial build should succeed without any errors.  There after, the build will succeed but the following 3 errors can be ignored:
 
 ```
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: for: /Users/yourlogin/Documents/opentoonz/toonz/build/toonz/Debug/OpenToonz.app/Contents/MacOS/OpenToonz (for architecture x86_64) option "-add_rpath @executable_path/." would duplicate path, file already has LC_RPATH for: @executable_path/.
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: for: /Users/yourlogin/Documents/opentoonz/toonz/build/toonz/Debug/OpenToonz.app/Contents/MacOS/OpenToonz (for architecture x86_64) option "-add_rpath /usr/local/Cellar/qt/5.12.2/lib/" would duplicate path, file already has LC_RPATH for: /usr/local/Cellar/qt/5.12.2/lib/
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: for: /Users/yourlogin/Documents/Flare/flare/build/flare/Debug/Flare.app/Contents/MacOS/Flare (for architecture x86_64) option "-add_rpath @executable_path/." would duplicate path, file already has LC_RPATH for: @executable_path/.
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: for: /Users/yourlogin/Documents/Flare/flare/build/flare/Debug/Flare.app/Contents/MacOS/Flare (for architecture x86_64) option "-add_rpath /usr/local/Cellar/qt/5.12.2/lib/" would duplicate path, file already has LC_RPATH for: /usr/local/Cellar/qt/5.12.2/lib/
 Command /bin/sh emitted errors but did not return a nonzero exit code to indicate failure
 ```
 
@@ -114,25 +114,26 @@ Side note: If you want the option to build by command line and Xcode, create a s
 
 ### Create the stuff Directory
 
-If you have installed OpenToonz on the machine already, you can skip this.  Otherwise, you need to create the stuff folder with the following:
+If you have installed Flare on the machine already, you can skip this.  Otherwise, you need to create the stuff folder with the following:
 ```sh
-cd ~/Documents/opentoonz
-sudo mkdir /Applications/OpenToonz
-sudo cp -r stuff /Applications/OpenToonz/OpenToonz_stuff
-sudo chmod -R 777 /Applications/OpenToonz
+cd ~/Documents/Flare
+sudo mkdir /Applications/Flare
+sudo cp -r stuff /Applications/Flare/Flare_stuff
+sudo chmod -R 777 /Applications/Flare
 ```
 
 ### Running the build
 
 - If built using command line, run the following:
 ```sh
-open ~/Documents/opentoonz/flare/build/OpenToonz.app
+open ~/Documents/Flare/flare/build/Flare.app
 ```
 
 - If built using Xcode, do the following:
 
-    - Open Scheme editor for OpenToonz: Product -> Scheme -> Edit Scheme
+    - Open Scheme editor for Flare: Product -> Scheme -> Edit Scheme
     - Uncheck: Run -> Options -> Document Versions
     - Run in Debug mode: Product -> Run
 
-    - To open with command line or from Finder window, the application is found in `/Users/yourlogin/Documents/opentoonz/flare/build/Debug/OpenToonz.app`
+    - To open with command line or from Finder window, the application is found in `/Users/yourlogin/Documents/Flare/flare/build/Debug/Flare.app`
+

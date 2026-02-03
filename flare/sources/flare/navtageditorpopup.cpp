@@ -1,6 +1,6 @@
 #include "navtageditorpopup.h"
 
-#include "../toonz/tapp.h"
+#include "../flare/tapp.h"
 
 #include <QPushButton>
 #include <QMainWindow>
@@ -155,3 +155,4 @@ void NavTagEditorPopup::onColorChanged(int index) {
 
   m_color = color;
 }
+

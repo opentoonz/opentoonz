@@ -46,7 +46,7 @@
 // TnzCore includes
 #include "tconst.h"
 
-#include "../toonz/menubarcommandids.h"
+#include "../flare/menubarcommandids.h"
 
 // Qt includes
 #include <QAction>

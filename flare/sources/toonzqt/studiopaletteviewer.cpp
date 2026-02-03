@@ -29,7 +29,7 @@
 #include "tsystem.h"
 #include "tcolorstyles.h"
 
-#include "../toonz/menubarcommandids.h"
+#include "../flare/menubarcommandids.h"
 
 // Qt includes
 #include <QSettings>

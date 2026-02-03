@@ -1,21 +1,21 @@
 # Flare
 
-A fork of OpenToonz rebranded as Flare — focused on providing an Adobe Animate-like
+A fork of Flare rebranded as Flare — focused on providing an Adobe Animate-like
 user experience and improving interoperability with Flash assets (.swf/.fla).
 
-This repository is a fork of OpenToonz and retains the original licensing and
+This repository is a fork of Flare and retains the original licensing and
 attribution. See the Licensing section below for details.
 
 [日本語](./doc/README_ja.md) [简体中文](./doc/README_chs.md)
 
 ## What is Flare?
 
-Flare is a community-driven fork of OpenToonz that ships a revamped UI layout
+Flare is a community-driven fork of Flare that ships a revamped UI layout
 inspired by Adobe Animate and introduces native import support for SWF files
 (when FFmpeg is available) and experimental helpers for FLA projects.
 
-For the original OpenToonz project and its history, see the OpenToonz website:
-https://opentoonz.github.io/e/index.html
+For the original Flare project and its history, see the Flare website:
+https://Flare.github.io/e/index.html
 
 ## Program Requirements
 
@@ -35,7 +35,7 @@ instructions.
 
 ## Community & Contribution
 
-This fork aims to stay compatible with OpenToonz where possible while
+This fork aims to stay compatible with Flare where possible while
 introducing new features. When contributing, please keep the original project's
 licensing and attribution in mind.
 
@@ -66,3 +66,4 @@ Flash decompilers (e.g., JPEXS). Use File → Import → Import Flash (Vector vi
 External Decompiler)... to run a helper script that exports SVG/image sequences
 from Flash files for importing into Flare. See `doc/how_to_import_swf.md` for
 details.
+

@@ -25,7 +25,7 @@ This software can be built using Visual Studio 2019 and Qt 5.x
 ### boost
 - Boost 1.55.0 or later is required (tested up to 1.73.0).
 - http://www.boost.org/users/history/version_1_73_0.html
-- Download boost_1_73_0.zip from the above link. Extract all contents to the - '$opentoonz/thirdparty/boost' directory.
+- Download boost_1_73_0.zip from the above link. Extract all contents to the - '$Flare/thirdparty/boost' directory.
 
 ### OpenCV
 - v4.1.0 and later
@@ -35,7 +35,7 @@ This software can be built using Visual Studio 2019 and Qt 5.x
 ## Acquiring the Source Code
 - Note: You can also perform these next commands with Github for Desktop client.
 - Clone the base repository.
-- Throughout the explanation `$opentoonz` will represent the root for the base repository.
+- Throughout the explanation `$Flare` will represent the root for the base repository.
 
 ### lib and dll
 
@@ -48,8 +48,8 @@ This software can be built using Visual Studio 2019 and Qt 5.x
 
 ### Using CMake to Create a Visual Studio Project
 - Launch CMake
-- In `Where is the source code`, navigate to `$opentoonz/flare/sources`
-- In `Where to build the binaries`, navigate to `$opentoonz/flare/build`
+- In `Where is the source code`, navigate to `$Flare/flare/sources`
+- In `Where to build the binaries`, navigate to `$Flare/flare/build`
 - Or to wherever you usually build to.
 - If the build directory is in the git repository, be sure to add the directory to .gitignore
 - If the build directory is different from the one above, be sure to change to the specified directory where appropriate below.
@@ -61,21 +61,21 @@ This software can be built using Visual Studio 2019 and Qt 5.x
 
 ## Setting Up Libraries
 Rename the following files:
-- `$opentoonz/thirdparty/LibJPEG/jpeg-9/jconfig.vc` to `$opentoonz/thirdparty/LibJPEG/jpeg-9/jconfig.h`
-- `$opentoonz/thirdparty/tiff-4.0.3/libtiff/tif_config.vc.h` to `$opentoonz/thirdparty/tiff-4.0.3/libtiff/tif_config.h`
-- `$opentoonz/thirdparty/tiff-4.0.3/libtiff/tiffconf.vc.h to $opentoonz/thirdparty/tiff-4.0.3/libtiff/tiffconf.h`
-- `$opentoonz/thirdparty/libpng-1.6.21/scripts/pnglibconf.h.prebuilt to $opentoonz/thirdparty/libpng-1.6.21/pnglibconf.h`
+- `$Flare/thirdparty/LibJPEG/jpeg-9/jconfig.vc` to `$Flare/thirdparty/LibJPEG/jpeg-9/jconfig.h`
+- `$Flare/thirdparty/tiff-4.0.3/libtiff/tif_config.vc.h` to `$Flare/thirdparty/tiff-4.0.3/libtiff/tif_config.h`
+- `$Flare/thirdparty/tiff-4.0.3/libtiff/tiffconf.vc.h to $Flare/thirdparty/tiff-4.0.3/libtiff/tiffconf.h`
+- `$Flare/thirdparty/libpng-1.6.21/scripts/pnglibconf.h.prebuilt to $Flare/thirdparty/libpng-1.6.21/pnglibconf.h`
 - Note that the destination is a different folder for the last file.
 
 ## Building
-- Open `$opentoonz/flare/build/OpenToonz.sln` and change to `Debug` or `Release` in the top bar.
+- Open `$Flare/flare/build/Flare.sln` and change to `Debug` or `Release` in the top bar.
 - Compile the build.
-- The output will be in the corresponding folder in `$opentoonz/flare/build/`
+- The output will be in the corresponding folder in `$Flare/flare/build/`
 
 ## Building with Canon DSLR camera support
  You will need the Canon SDK. This requires applying for the Canon developer program and downloading the SDK.
 
-- Copy the Header and library folders from the Canon SDK to `$opentoonz/thirdparty/canon`
+- Copy the Header and library folders from the Canon SDK to `$Flare/thirdparty/canon`
   - Make sure that the library is the one from the EDSDK_64 folder.
 
 Check the `WITH_CANON` checkbox in CMake to build with Canon DSLR camera support.
@@ -84,10 +84,10 @@ To run the program with Canon DSLR camera support, you will need to copy the .dl
 
 ## Running the Program
 ### Setting Up the Program's Path
-1. Copy the entire contents of $opentoonz/flare/build/Release to an appropriate folder.
+1. Copy the entire contents of $Flare/flare/build/Release to an appropriate folder.
 
-2. Open a Command Prompt and navigate to `QT_DIR/msvc2015_64/bin`. Run the Qt program `windeployqt.exe` with the path for `OpenToonz.exe` as an argument. (Another way to do this is navigate to the exe that was created in your Release folder and drag and drop the Opentoonz.exe on top of the windeployqt.exe This will automatically generate the QT files and folders you will need.)
- - The necessary Qt library files should be in the same folder as `OpenToonz.exe`
+2. Open a Command Prompt and navigate to `QT_DIR/msvc2015_64/bin`. Run the Qt program `windeployqt.exe` with the path for `Flare.exe` as an argument. (Another way to do this is navigate to the exe that was created in your Release folder and drag and drop the Flare.exe on top of the windeployqt.exe This will automatically generate the QT files and folders you will need.)
+ - The necessary Qt library files should be in the same folder as `Flare.exe`
   - These include:
     - `D3Dcompiler_**.dll`
     - `Qt5Core.dll`
@@ -101,11 +101,11 @@ To run the program with Canon DSLR camera support, you will need to copy the .dl
     - `Qt5Svg.dll`
     - `Qt5Widgets.dll`
     - `Qt5Xml.dll`
-  - These files should be placed in the corresponding folders in the same directory as `OpenToonz.exe`:
+  - These files should be placed in the corresponding folders in the same directory as `Flare.exe`:
 
 ```
 .
-├── OpenToonz.exe
+├── Flare.exe
 ├── audio
 │   ├── qtaudio_wasapid.dll
 │   └── qtaudio_windowsd.dll
@@ -137,35 +137,35 @@ To run the program with Canon DSLR camera support, you will need to copy the .dl
     └── qwindowsvistastyled.dll
 ```
 
-3. Copy the following files to the same folder as `OpenToonz.exe`
-  - `$opentoonz/thirdparty/glut/3.7.6/lib/glut64.dll`
-  - `$opentoonz/thirdparty/glew/glew-1.9.0/bin/64bit/glew32.dll`
-  - `$opentoonzthirdparty/libmypaint/dist/64/*.dll`
+3. Copy the following files to the same folder as `Flare.exe`
+  - `$Flare/thirdparty/glut/3.7.6/lib/glut64.dll`
+  - `$Flare/thirdparty/glew/glew-1.9.0/bin/64bit/glew32.dll`
+  - `$Flarethirdparty/libmypaint/dist/64/*.dll`
   - `turbojpeg.dll` from libjpeg-turbo package
   - `opencv_world***.dll` from OpenCV package
 
-4. Copy the `srv` folder from the previous OpenToonz installation to the same folder as `OpenToonz.exe`
-  - If there is no `srv` folder, OpenToonz can still be used.  However, various file formats such as `mov` cannot be used.
+4. Copy the `srv` folder from the previous Flare installation to the same folder as `Flare.exe`
+  - If there is no `srv` folder, Flare can still be used.  However, various file formats such as `mov` cannot be used.
   - Creating the files for `srv` is discussed later.
 
 ### Creating the stuff Folder
-If a previous binary of OpenToonz was already installed, this step and the following about creating a registry key has already been dealt with.  So feel free to skip these parts.
+If a previous binary of Flare was already installed, this step and the following about creating a registry key has already been dealt with.  So feel free to skip these parts.
 
-1. Copy the files from `$opentoonz/stuff` to an appropriate folder.
+1. Copy the files from `$Flare/stuff` to an appropriate folder.
 
 ### Creating Registry Keys
-1. Using the registry editor, create the following key and copy the path of the `$opentoonz/stuff` folder from above to it.
-  - HKEY_LOCAL_MACHINE\SOFTWARE\OpenToonz\OpenToonz\TOONZROOT
+1. Using the registry editor, create the following key and copy the path of the `$Flare/stuff` folder from above to it.
+  - HKEY_LOCAL_MACHINE\SOFTWARE\Flare\Flare\TOONZROOT
 
 ### Running
-`OpenToonz.exe` can now be run.  Congratulations!
+`Flare.exe` can now be run.  Congratulations!
 
 ## Debugging
-1. In the Solution Explorer, select the OpenToonz project within the OpenToonz solution.
+1. In the Solution Explorer, select the Flare project within the Flare solution.
 2. In the Project menu, choose Set as StartUp Project.
 
 ## Creating the Files for the `srv` Folder
-OpenToonz utilizes the QuickTime SDK's `mov` and associated file formats.  Since the QuickTime SDK only comes in 32-bit versions, the 32-bit file `t32bitsrv.exe` from the QuickTime SDK is used in both the 64-bit and 32-bit versions of OpenToonz.  As a result, the following instructions apply to both the 32 and 64-bit versions of OpenToonz.
+Flare utilizes the QuickTime SDK's `mov` and associated file formats.  Since the QuickTime SDK only comes in 32-bit versions, the 32-bit file `t32bitsrv.exe` from the QuickTime SDK is used in both the 64-bit and 32-bit versions of Flare.  As a result, the following instructions apply to both the 32 and 64-bit versions of Flare.
 
 ### Qt
 - https://www.qt.io/download-open-source/
@@ -174,20 +174,20 @@ OpenToonz utilizes the QuickTime SDK's `mov` and associated file formats.  Since
 ### QuickTime SDK
 1. Sign in using your Apple developer ID and download `QuickTime 7.3 SDK for Windows.zip` from the following url.
   - https://developer.apple.com/downloads/?q=quicktime
-2. After installing the QuickTime SDK, copy the contents of `C:\Program Files (x86)\QuickTime SDK` to `$opentoonz/thirdparty/quicktime/QT73SDK`
+2. After installing the QuickTime SDK, copy the contents of `C:\Program Files (x86)\QuickTime SDK` to `$Flare/thirdparty/quicktime/QT73SDK`
 
 ### Using CMake to Create a Visual Studio 32-bit Project
 - Follow the same instructions as for the 64-bit version, but change the following:
-  - `$opentoonz/toonz/build` to `$opentoonz/flare/build32`
+  - `$Flare/flare/build` to `$Flare/flare/build32`
   - `Visual Studio 16 2019 x64` to `Visual Studio 16 2019 Win32`
 - Change `QT_PATH` to the path of your 32-bit version of Qt
 
 ### Building the 32-bit Version
-1. Open `$opentoonz/flare/build32/OpenToonz.sln`
+1. Open `$Flare/flare/build32/Flare.sln`
 
 ### Layout of the `srv` Folder
 - For the 64-bit version, copy the following files to the `srv` folder:
-  - From `$opentoonz/flare/build32/Release`
+  - From `$Flare/flare/build32/Release`
     - t32bitsrv.exe
     - image.dll
     - tnzbase.dll
@@ -197,7 +197,8 @@ OpenToonz utilizes the QuickTime SDK's `mov` and associated file formats.  Since
   - From the 32-bit version of Qt
     - run `windeployqt` to obtain required libraries
     - additionally, Qt5Gui.dll
-  - `$opentoonz/thirdparty/glut/3.7.6/lib/glut32.dll`
+  - `$Flare/thirdparty/glut/3.7.6/lib/glut32.dll`
 
 ## Creating Translation Files
 Qt translation files are generated first from the source code to .ts files, then from .ts files to a .qm file.  These files can be created in Visual Studio if the `translation_` project and `Build translation_??? only` (`translation_???`のみをビルド」) is used.  These files are not created in the default `Build Project Solution`.
+

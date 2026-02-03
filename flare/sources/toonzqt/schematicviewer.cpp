@@ -31,7 +31,7 @@
 #include "toonz/tscenehandle.h"
 #include "toonz/txshleveltypes.h"
 
-#include "../toonz/menubarcommandids.h"
+#include "../flare/menubarcommandids.h"
 
 #include "tools/cursormanager.h"
 #include "tools/cursors.h"
@@ -1323,3 +1323,4 @@ void SchematicViewer::deleteFxs() {
 void SchematicViewer::deleteStageObjects() {
   emit doDeleteStageObjects(m_stageScene->getStageSelection());
 }
+

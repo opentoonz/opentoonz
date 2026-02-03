@@ -5,7 +5,7 @@
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/viewcommandids.h"
 
-#include "../toonz/menubarcommandids.h"
+#include "../flare/menubarcommandids.h"
 
 #include <QPainter>
 #include <QMouseEvent>
@@ -1261,3 +1261,4 @@ void SwatchCacheManager::getResource(TCacheResourceP &resource,
     }
   }
 }
+

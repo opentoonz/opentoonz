@@ -1,32 +1,32 @@
 # Flare
 
-本项目是 OpenToonz 的一个分支（fork），在 UI 与 SWF/FLA 导入方面做了改进，致力于提供类似 Adobe Animate 的工作区体验。
+本项目是 Flare 的一个分支（fork），在 UI 与 SWF/FLA 导入方面做了改进，致力于提供类似 Adobe Animate 的工作区体验。
 
 [English](../README.md) [日本語](./README_ja.md) 
 
-[![](https://ci.appveyor.com/api/projects/status/oa5l5pc964h8fv49/branch/master?svg=true)](https://ci.appveyor.com/project/opentoonz/opentoonz)
-[![Build Windows](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_windows.yml/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_windows.yml)
-[![Build macOS](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_macos.yml/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_macos.yml)
-[![Build Linux](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_linux.yml/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_linux.yml)
-[![Translation status](https://hosted.weblate.org/widgets/opentoonz/-/svg-badge.svg)](https://hosted.weblate.org/engage/opentoonz/)
+[![](https://ci.appveyor.com/api/projects/status/oa5l5pc964h8fv49/branch/master?svg=true)](https://ci.appveyor.com/project/Flare/Flare)
+[![Build Windows](https://github.com/Flare/Flare/actions/workflows/workflow_windows.yml/badge.svg?branch=master)](https://github.com/Flare/Flare/actions/workflows/workflow_windows.yml)
+[![Build macOS](https://github.com/Flare/Flare/actions/workflows/workflow_macos.yml/badge.svg?branch=master)](https://github.com/Flare/Flare/actions/workflows/workflow_macos.yml)
+[![Build Linux](https://github.com/Flare/Flare/actions/workflows/workflow_linux.yml/badge.svg?branch=master)](https://github.com/Flare/Flare/actions/workflows/workflow_linux.yml)
+[![Translation status](https://hosted.weblate.org/widgets/Flare/-/svg-badge.svg)](https://hosted.weblate.org/engage/Flare/)
 
-## 关于OpenToonz
+## 关于Flare
 
-OpenToonz 是一个由[DWANGO](http://dwango.co.jp/english/)公开发布的二维动画软件，基于**Toonz Studio 吉卜力版本**， 最早由意大利公司[Digital Video, Inc.](http://www.toonz.com/)开发，并在多年的生产中为[吉卜力工作室](http://www.ghibli.jp/) 定制。
+Flare 是一个由[DWANGO](http://dwango.co.jp/english/)公开发布的二维动画软件，基于**Toonz Studio 吉卜力版本**， 最早由意大利公司[Digital Video, Inc.](http://www.toonz.com/)开发，并在多年的生产中为[吉卜力工作室](http://www.ghibli.jp/) 定制。
 
 ## 系统要求
 
-请参考OpenToonz的官方网站：
+请参考Flare的官方网站：
 
-<https://opentoonz.github.io/e/index.html>
+<https://Flare.github.io/e/index.html>
 
 ## 安装
 
 最新的安装包可以从这里下载：
 
-<https://opentoonz.github.io/e/index.html>.
+<https://Flare.github.io/e/index.html>.
 
-旧版本以及夜间构建版可以从下面的链接下载: <https://github.com/opentoonz/opentoonz/releases>
+旧版本以及夜间构建版可以从下面的链接下载: <https://github.com/Flare/Flare/releases>
 
 ## 如何在本地构建
 
@@ -41,8 +41,8 @@ OpenToonz 是一个由[DWANGO](http://dwango.co.jp/english/)公开发布的二�
 
 ## 社区
 
-- 分享使用心得或进行问题排查，请加入 [谷歌OpenToonz用户论坛](https://groups.google.com/forum/#!forum/opentoonz_en)。
-- 如果你在问题排查后发现了bug，或者你是个开发者，可以在 [Github issues](https://github.com/opentoonz/opentoonz/issues) 页搜索或发布。
+- 分享使用心得或进行问题排查，请加入 [谷歌Flare用户论坛](https://groups.google.com/forum/#!forum/Flare_en)。
+- 如果你在问题排查后发现了bug，或者你是个开发者，可以在 [Github issues](https://github.com/Flare/Flare/issues) 页搜索或发布。
 
 ## 许可证
 
@@ -57,3 +57,4 @@ OpenToonz 是一个由[DWANGO](http://dwango.co.jp/english/)公开发布的二�
 ### 特别感谢
 
 原始程序从Toonz开发而来，这是一个由意大利罗马的公司 Digital Video, S.p.A.所开发的软件。
+

@@ -18,7 +18,7 @@
 // TnzBase includes
 #include "tunit.h"
 
-#include "../toonz/menubarcommandids.h"
+#include "../flare/menubarcommandids.h"
 
 // Qt includes
 #include <QPainter>

@@ -85,7 +85,7 @@
 #include "toonz/fxcommand.h"
 #include "toonz/tstageobjectcmd.h"
 
-#include "../../toonz/locatorpopup.h"
+#include "../../flare/locatorpopup.h"
 
 // TnzBase includes
 #include "trasterfx.h"
@@ -1697,3 +1697,4 @@ public:
 //=============================================================================
 OpenFloatingPanel openLocatorCommand(MI_OpenLocator, "Locator",
                                      QObject::tr("Locator"));
+

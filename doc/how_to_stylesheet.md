@@ -10,7 +10,7 @@ Although any LESS compiler will work fine, here is a recommended setup.
 
 - Install [Visual Studio Code](https://code.visualstudio.com/) by Microsoft.
 - Add the [Easy LESS](https://marketplace.visualstudio.com/items?itemName=mrcrowl.easy-less) extension from the marketplace which will be used as the compiler.
-- In VSCode, navigate to your OpenToonz stuff folder and open `config/qss/Default/less`.
+- In VSCode, navigate to your Flare stuff folder and open `config/qss/Default/less`.
 
 A `settings.json` file is already included to ensure developers work to the same standards located in `.vscode`. If the file must be created manually then the following should apply.
 
@@ -53,7 +53,7 @@ themes/Light.less
 ```
 
 ### Linux
-From opentoonz source directory root execute the following commands:
+From Flare source directory root execute the following commands:
 ```
 $ lessc -x stuff/config/qss/Default/less/Default.less stuff/config/qss/Default/Default.qss
 $ lessc -x stuff/config/qss/Default/less/themes/Blue.less stuff/config/qss/Blue/Blue.qss
@@ -126,7 +126,7 @@ To call components, use the LESS extend function.
 It's possible to create custom themes.
 
 ## How To
-- Navigate to your OpenToonz stuff directory, and create a new folder in `config/qss`.
+- Navigate to your Flare stuff directory, and create a new folder in `config/qss`.
 - Create a new text file in the new folder, give it the same name as the folder and save it with the `.less` extension.
 - Open the LESS file and add the following line at the top.
 - `// out: filename.qss`
@@ -151,7 +151,7 @@ It's possible to create custom themes.
 # Notes
 ⚠️ When developing, always develop with the Default theme, then decide later if any changes need porting to alternate themes, in most cases it won't be necessary.
 
-⚠️ Layout files must never have hard-coded color values, color values **must always** be variable. Each function area of OpenToonz is split into a separate file.
+⚠️ Layout files must never have hard-coded color values, color values **must always** be variable. Each function area of Flare is split into a separate file.
 
 ### Directory Information
 **Base:** Contains generic color palettes, legacy code, mixins and functions. It's fine to place junk code here.
@@ -161,3 +161,4 @@ It's possible to create custom themes.
 **Layouts:** The core wire-frame, every window, widget and control is designed here.
 
 **Themes:** Alternate theme colors that inherit the Default theme, it is only necessary to override variable values unique to the theme.
+

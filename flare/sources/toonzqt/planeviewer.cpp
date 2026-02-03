@@ -7,7 +7,7 @@
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/viewcommandids.h"
 
-#include "../toonz/menubarcommandids.h"
+#include "../flare/menubarcommandids.h"
 
 // TnzLib includes
 #include "toonz/stage.h"
@@ -711,3 +711,4 @@ void PlaneViewer::draw(TImageP img) {
     }
   }
 }
+
