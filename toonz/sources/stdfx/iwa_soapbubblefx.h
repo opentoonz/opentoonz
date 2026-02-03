@@ -13,6 +13,15 @@ Inherits Iwa_SpectrumFx.
 
 #include "iwa_spectrumfx.h"
 
+// Forward declarations for Qt types
+class QRect;
+template <class T>
+class QList;
+class QSize;
+
+// Forward declarations for internal types
+struct float3;
+
 class Iwa_SoapBubbleFx final : public Iwa_SpectrumFx {
   FX_PLUGIN_DECLARATION(Iwa_SoapBubbleFx)
 
