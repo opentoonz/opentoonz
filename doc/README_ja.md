@@ -1,6 +1,8 @@
-# OpenToonz
+# Flare
 
-[English](../README.md)
+本プロジェクトは OpenToonz をフォークしたもので、Adobe Animate に似たワークスペースを提供し、SWF/FLA の取り込みサポートを強化しています。
+
+[English](../README.md) [简体中文](./README_chs.md)
 
 [![](https://ci.appveyor.com/api/projects/status/oa5l5pc964h8fv49/branch/master?svg=true)](https://ci.appveyor.com/project/opentoonz/opentoonz)
 [![Build Windows](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_windows.yml/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_windows.yml)

@@ -1,5 +1,3 @@
-
-
 #include "shortcutpopup.h"
 
 // Tnz6 includes
@@ -758,7 +756,7 @@ void ShortcutPopup::buildPresets() {
   // m_presetChoiceCB->addItem("RETAS PaintMan", QString("otretas"));
   m_presetChoiceCB->addItem("Toon Boom Harmony", QString("otharmony"));
   m_presetChoiceCB->addItem("Adobe Animate", QString("otanimate"));
-  m_presetChoiceCB->addItem("Adobe Flash Pro", QString("otadobe"));
+  m_presetChoiceCB->addItem("Adobe Animate (Legacy)", QString("otadobe"));
 
   TFilePath presetDir =
       ToonzFolder::getMyModuleDir() + TFilePath("shortcutpresets");

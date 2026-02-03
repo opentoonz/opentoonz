@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 message(STATUS "C++ standard: ${CMAKE_CXX_STANDARD}")
 
-project(OpenToonz LANGUAGES C CXX)
+project(Flare LANGUAGES C CXX)
 
 #-----------------------------------------------------------------------------
 # Platform Specific Defaults
@@ -628,12 +628,12 @@ elseif(BUILD_ENV_UNIXLIKE)
 
     # Mirror relative bin/lib location for installation
     # so the generated shell script works in both cases.
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/opentoonz)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/opentoonz)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/flare)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/flare)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
     if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-        set(CMAKE_INSTALL_PREFIX "/opt/opentoonz" CACHE PATH "OpenToonz install prefix" FORCE)
+        set(CMAKE_INSTALL_PREFIX "/opt/flare" CACHE PATH "Flare install prefix" FORCE)
     endif()
 endif()
 

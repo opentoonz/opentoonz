@@ -1,4 +1,3 @@
-
 #include "tnzimage.h"
 #include "tiio.h"
 #include "tfiletype.h"
@@ -221,11 +220,22 @@ void initImageIo(bool lightVersion) {
       TFileType::declare("apng", TFileType::RASTER_LEVEL);
       Tiio::defineWriterProperties("apng", new Tiio::APngWriterProperties());
     }
-    TLevelReader::define("webp", TLevelReaderFFmpeg::create);
-    TFileType::declare("webp", TFileType::RASTER_LEVEL);
-    TLevelReader::define("ffvideo", TLevelReaderFFmpeg::create);
-    TFileType::declare("ffvideo", TFileType::RASTER_LEVEL);
-  }
+
+    // Register SWF and FLA support (imported as raster levels via FFmpeg when available)
+    if (Ffmpeg::checkFormat("swf")) {
+      TLevelReader::define("swf", TLevelReaderFFmpeg::create);
+    }
+    // Always declare the file types so they appear in file dialogs
+    TFileType::declare("swf", TFileType::RASTER_LEVEL);
+
+    // FLA is a publishing/project format and may not be directly supported by FFmpeg,
+    // but declare it so it is visible; if FFmpeg supports it, register reader as well
+    if (Ffmpeg::checkFormat("fla")) {
+      TLevelReader::define("fla", TLevelReaderFFmpeg::create);
+      TFileType::declare("fla", TFileType::RASTER_LEVEL);
+    } else {
+      TFileType::declare("fla", TFileType::RASTER_LEVEL);
+    }
 #endif
   // end ffmpeg
 

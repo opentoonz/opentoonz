@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Flare
+Comment=2D animation
+Exec=opentoonz
+Icon=io.github.Flare
+Terminal=false
+Type=Application
+Categories=Graphics;RasterGraphics;2DGraphics;
+StartupWMClass=OpenToonz
+MimeType=application/x-toonz-tnz;

@@ -1,4 +1,6 @@
-# OpenToonz
+# Flare
+
+本项目是 OpenToonz 的一个分支（fork），在 UI 与 SWF/FLA 导入方面做了改进，致力于提供类似 Adobe Animate 的工作区体验。
 
 [English](../README.md) [日本語](./README_ja.md) 
 

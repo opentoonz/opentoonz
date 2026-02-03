@@ -1,8 +1,8 @@
 [Desktop Entry]
 Type=Application
-Name=OpenToonz
+Name=Flare
 Comment=2D animation
-Icon=io.github.OpenToonz
+Icon=io.github.Flare
 Exec=opentoonz
 Categories=Graphics;
 Terminal=false

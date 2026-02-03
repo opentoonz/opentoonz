@@ -1,30 +1,30 @@
-# OpenToonz
+# Flare
+
+A fork of OpenToonz rebranded as Flare — focused on providing an Adobe Animate-like
+user experience and improving interoperability with Flash assets (.swf/.fla).
+
+This repository is a fork of OpenToonz and retains the original licensing and
+attribution. See the Licensing section below for details.
 
 [日本語](./doc/README_ja.md) [简体中文](./doc/README_chs.md)
 
-[![](https://ci.appveyor.com/api/projects/status/oa5l5pc964h8fv49/branch/master?svg=true)](https://ci.appveyor.com/project/opentoonz/opentoonz)
-[![Build Windows](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_windows.yml/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_windows.yml)
-[![Build macOS](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_macos.yml/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_macos.yml)
-[![Build Linux](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_linux.yml/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_linux.yml)
-[![Translation status](https://hosted.weblate.org/widgets/opentoonz/-/svg-badge.svg)](https://hosted.weblate.org/engage/opentoonz/)
+## What is Flare?
 
-## What is OpenToonz?
+Flare is a community-driven fork of OpenToonz that ships a revamped UI layout
+inspired by Adobe Animate and introduces native import support for SWF files
+(when FFmpeg is available) and experimental helpers for FLA projects.
 
-OpenToonz is a 2D animation software published by 
-[DWANGO](http://dwango.co.jp/english/). It is based on **Toonz Studio
-Ghibli Version**, originally developed in Italy by
-[Digital Video, Inc.](http://www.toonz.com/), and customized by
-[Studio Ghibli](http://www.ghibli.jp/) over many years of production.
+For the original OpenToonz project and its history, see the OpenToonz website:
+https://opentoonz.github.io/e/index.html
 
 ## Program Requirements
 
-Please refer to the OpenToonz site at <https://opentoonz.github.io/e/index.html>.
+To enable SWF import features, install FFmpeg and ensure it is available on your PATH.
 
 ## Installation
 
-Please download and install OpenToonz from the latest installer at <https://opentoonz.github.io/e/index.html>.
-
-Older versions and unstable nightly builds are also available at <https://github.com/opentoonz/opentoonz/releases>.
+Please see the `doc/` folder for platform-specific build and installation
+instructions.
 
 ## How to Build Locally
 
@@ -33,29 +33,30 @@ Older versions and unstable nightly builds are also available at <https://github
 - [Linux](./doc/how_to_build_linux.md)
 - [BSD](./doc/how_to_build_bsd.md)
 
-For instructions on how to build stylesheets, please [see here](./doc/how_to_stylesheet.md).
+## Community & Contribution
 
-Can't develop but still want to help? Help us test individual Pull Requests before they are merged with [these steps](./doc/how_to_test_prs.md).
-
-## Community
-
-- To share tips or to troubleshoot, join the [Google OpenToonz Users forum](https://groups.google.com/forum/#!forum/opentoonz_en)
-- If you found a bug with the software after troubleshooting, or are a developer, search the [Github issues](https://github.com/opentoonz/opentoonz/issues) and post there.
-
-## Documentation
-
-- For general documentation, please [look here](https://github.com/opentoonz/opentoonz_docs).
+This fork aims to stay compatible with OpenToonz where possible while
+introducing new features. When contributing, please keep the original project's
+licensing and attribution in mind.
 
 ## Licensing
 
-- Files outside of the `thirdparty` and `stuff/library/mypaint brushes` directories are based on the Modified BSD License.
-  - [modified BSD license](./LICENSE.txt).
-  - Based on this license, this software may be used or changed freely for business or personal use.
-- For files in the `thirdparty` directory:
-  - Please consult with the licenses in the appropriate READMEs or source codes.
-- For files in the `stuff/library/mypaint brushes` directory:
-  - Please see the licenses in `stuff/library/mypaint brushes/Licenses.txt`.
+Files outside of the `thirdparty` and `stuff/library/mypaint brushes`
+directories are based on the Modified BSD License.
+- [modified BSD license](./LICENSE.txt).
 
-### Special Thanks
+Third-party components retain their original licenses. See the relevant
+documentation in `thirdparty/` and `stuff/library/mypaint brushes/Licenses.txt`.
 
-This open-source program is developed from Toonz, a software originally created by Digital Video, S.p.A., Rome, Italy
+### Adobe Animate-style Workspace & Theme
+
+Flare includes an "Adobe Animate" workspace and an Adobe-like color theme by
+default. To switch to the Adobe Animate workspace, open the Room (Workspace)
+menu and choose "Adobe Animate".
+
+### Importing SWF files
+
+Flare uses FFmpeg to import `.swf` files as raster frame sequences when
+FFmpeg supports the format on your system. Install FFmpeg and ensure it is
+available on your PATH (or configure it via Preferences) to enable SWF import
+capabilities.

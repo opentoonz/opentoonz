@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+  <id>io.github.Flare</id>
+  <launchable type="desktop-id">io.github.Flare.desktop</launchable>
+  <name>Flare</name>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>BSD-3-Clause</project_license>
+  <developer_name>Flare Community</developer_name>
+  <summary>2D animation</summary>
+  <description>
+    <p>
+      Flare is a fork of OpenToonz redesigned to provide an Adobe Animate-like
+      user interface and enhanced import support for SWF/FLA files.
+    </p>
+    <p>
+      It is based on the software "Toonz", originally developed by Digital
+      Video S.p.A. in Italy and customized by Studio Ghibli; this fork builds
+      on the OpenToonz project and adds new features.
+    </p>
+  </description>
+  <url type="homepage">https://github.com/Flare-Animate/Flare</url>
+  <url type="bugtracker">https://github.com/Flare-Animate/Flare/issues</url>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/Flare-Animate/Flare/master/screenshot1.png</image>
+    </screenshot>
+  </screenshots>
+  <content_rating type="oars-1.1" />
+  <releases>
+    <release version="0.1.0" date="2026-02-03"></release>
+  </releases>
+</component>
