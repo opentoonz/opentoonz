@@ -816,6 +816,7 @@ QMenuBar *StackedMenuBar::createInknPaintMenuBar() {
     addMenuItem(otherWindowsMenu, MI_OpenTasks);
     addMenuItem(otherWindowsMenu, MI_OpenHistoryPanel);
     addMenuItem(otherWindowsMenu, MI_OpenBrushPresetPanel);
+    addMenuItem(otherWindowsMenu, MI_OpenToolPropertiesPanel);
     addMenuItem(otherWindowsMenu, MI_OpenTMessage);
   }
 
