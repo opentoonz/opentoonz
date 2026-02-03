@@ -1,15 +1,14 @@
-
-	Toonz Shader Fxs Manual
+Flare Shader Fxs Manual
 
 ==========================================================
 
  1. Introduction
 
 
-Toonz 7.1 allows users to write new Fxs using GLSL (the
+Flare 7.1 allows users to write new Fxs using GLSL (the
 OpenGL Shading Language).
 
-Shader Fx interfaces are read once at Toonz's startup,
+Shader Fx interfaces are read once at Flare's startup,
 but the underlying fx algorithm can be modified in
 real time to ease the fx creation process.
 
@@ -54,7 +53,7 @@ typically executed in a massively parallel fashion - ie fast.
 However, since most systems only adopt one GPU, only one
 Shader fx is allowed to be rendered at the same time.
 This means that Shader Fxs do not take advantage of multiple
-rendering threads in a Toonz rendering process like common
+rendering threads in a Flare rendering process like common
 CPU-based fxs do.
 
 

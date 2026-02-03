@@ -1,0 +1,40 @@
+name: CI - Build
+
+on:
+  push:
+    branches: [ main, master, rebrand-to-flare-mass, restore-flash-9e73b8 ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        config: [Release]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup CMake
+        uses: jetbrains/setup-cmake@v4
+        with:
+          cmake-version: '3.27'
+
+      - name: Configure
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.config }}
+
+      - name: Build
+        run: |
+          cmake --build build --config ${{ matrix.config }} --parallel
+
+      - name: Archive build logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs-${{ matrix.os }}
+          path: build/
