@@ -220,7 +220,7 @@ void BaseViewerPanel::addShowHideContextMenu(QMenu *menu) {
   showHideMenu->addAction(CommandManager::instance()->getAction(MI_ViewCamera));
   showHideMenu->addAction(CommandManager::instance()->getAction(MI_ViewTable));
   showHideMenu->addAction(CommandManager::instance()->getAction(MI_FieldGuide));
-  showHideMenu->addAction(CommandManager::instance()->getAction(MI_SafeArea));
+  showHideMenu->addAction(CommandManager::instance()->getAction(MI_LayoutGuide));
   showHideMenu->addAction(CommandManager::instance()->getAction(MI_ViewBBox));
   showHideMenu->addAction(
       CommandManager::instance()->getAction(MI_ViewColorcard));
@@ -382,19 +382,19 @@ void BaseViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   TPanelTitleBarButton *button;
 
   // buttons for show / hide toggle for the field guide and the safe area
-  TPanelTitleBarButtonForSafeArea *safeAreaButton =
-      new TPanelTitleBarButtonForSafeArea(titleBar, "safearea");
-  safeAreaButton->setToolTip(tr("Safe Area (Right Click to Select)"));
-  titleBar->add(QPoint(x, 0), safeAreaButton);
-  ret = ret && connect(safeAreaButton, SIGNAL(toggled(bool)),
-                       CommandManager::instance()->getAction(MI_SafeArea),
+  TPanelTitleBarButtonForLayoutGuide *layoutGuideButton =
+      new TPanelTitleBarButtonForLayoutGuide(titleBar, "layoutguide");
+  layoutGuideButton->setToolTip(tr("Layout Guide (Right Click to Select)"));
+  titleBar->add(QPoint(x, 0), layoutGuideButton);
+  ret = ret && connect(layoutGuideButton, SIGNAL(toggled(bool)),
+                       CommandManager::instance()->getAction(MI_LayoutGuide),
                        SLOT(trigger()));
-  ret = ret && connect(CommandManager::instance()->getAction(MI_SafeArea),
-                       SIGNAL(triggered(bool)), safeAreaButton,
+  ret = ret && connect(CommandManager::instance()->getAction(MI_LayoutGuide),
+                       SIGNAL(triggered(bool)), layoutGuideButton,
                        SLOT(setPressed(bool)));
   // initialize state
-  safeAreaButton->setPressed(
-      CommandManager::instance()->getAction(MI_SafeArea)->isChecked());
+  layoutGuideButton->setPressed(
+      CommandManager::instance()->getAction(MI_LayoutGuide)->isChecked());
 
   button = new TPanelTitleBarButton(titleBar, "fieldguide");
   button->setToolTip(tr("Field Guide"));

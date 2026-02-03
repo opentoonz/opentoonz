@@ -80,6 +80,8 @@ class OutputSettingsPopup : public DVGui::Dialog {
   DVGui::CheckBox *m_addBoard;
   QPushButton *m_boardSettingsBtn;
 
+  DVGui::CheckBox *m_putLayoutImage;
+
   QScrollArea *m_scrollArea;
   AnimatedLabel *m_cameraLabel, *m_colorLabel, *m_fileLabel, *m_moreLabel;
   QFrame *m_cameraBox, *m_colorBox, *m_fileBox, *m_moreBox;
@@ -144,6 +146,8 @@ protected slots:
   // clapperboard
   void onAddBoardChecked(int state);
   void onBoardSettingsBtnClicked();
+  // putLayoutImage
+  void onPutLayoutImageChecked(int state);
 
   void onCategoryActivated(QListWidgetItem *);
 };
