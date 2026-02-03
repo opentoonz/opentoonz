@@ -1,0 +1,1 @@
+This directory is retained for backward compatibility. The project has been renamed and reorganized under the `flare/` directory. See `flare/` for the current source tree and instructions. Avoid adding new content here; it's provided only to prevent hard failures in scripts that reference a `toonz/` path.
