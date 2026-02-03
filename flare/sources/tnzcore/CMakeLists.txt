@@ -213,24 +213,24 @@ set(SOURCES
     ../common/tvrender/ttessellator.cpp
     ../common/tvrender/tvectorbrush.cpp
     ../common/tvrender/tvectorbrushstyle.cpp
-    # Restored upstream Flash renderer implementation
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../toonz/sources/common/tvrender/tflash.cpp
+    # Restored Flash renderer implementation
+    ../common/tvrender/tflash.cpp
 
     # Legacy Flash support sources (restored from upstream commit)
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../toonz/sources/common/flash/FAction.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../toonz/sources/common/flash/FCT.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../toonz/sources/common/flash/FDT.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../toonz/sources/common/flash/FDTBitmaps.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../toonz/sources/common/flash/FDTButtons.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../toonz/sources/common/flash/FDTFonts.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../toonz/sources/common/flash/FDTShapes.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../toonz/sources/common/flash/FDTSounds.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../toonz/sources/common/flash/FDTSprite.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../toonz/sources/common/flash/FDTText.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../toonz/sources/common/flash/FObj.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../toonz/sources/common/flash/FPrimitive.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../toonz/sources/common/flash/FSWFStream.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../toonz/sources/common/flash/FSound.cpp
+    ../common/flash/FAction.cpp
+    ../common/flash/FCT.cpp
+    ../common/flash/FDT.cpp
+    ../common/flash/FDTBitmaps.cpp
+    ../common/flash/FDTButtons.cpp
+    ../common/flash/FDTFonts.cpp
+    ../common/flash/FDTShapes.cpp
+    ../common/flash/FDTSounds.cpp
+    ../common/flash/FDTSprite.cpp
+    ../common/flash/FDTText.cpp
+    ../common/flash/FObj.cpp
+    ../common/flash/FPrimitive.cpp
+    ../common/flash/FSWFStream.cpp
+    ../common/flash/FSound.cpp
     ../common/psdlib/psd.cpp
     ../common/psdlib/psdutils.cpp
     ../common/trop/bbox.cpp
@@ -346,9 +346,6 @@ include_directories(
     SYSTEM
     ../common/flash
     ${SDKROOT}/Lz4/Lz4_131/lib/
-    # Include restored upstream Flash sources (kept under 'toonz' after revert)
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../toonz/sources/common/flash
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../toonz/sources/include
 )
 
 if(BUILD_TARGET_WIN)
