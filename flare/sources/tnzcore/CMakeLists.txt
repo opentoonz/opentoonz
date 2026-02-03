@@ -20,6 +20,23 @@ set(HEADERS ${MOC_HEADERS}
     ../include/trastercm.h
     ../include/trasterfx.h
     ../include/ttile.h
+    ../common/flash/F3SDK.h
+    ../common/flash/FAction.h
+    ../common/flash/FCT.h
+    ../common/flash/FDT.h
+    ../common/flash/FDTBitmaps.h
+    ../common/flash/FDTButtons.h
+    ../common/flash/FDTFonts.h
+    ../common/flash/FDTShapes.h
+    ../common/flash/FDTSounds.h
+    ../common/flash/FDTSprite.h
+    ../common/flash/FDTText.h
+    ../common/flash/FFixed.h
+    ../common/flash/FObj.h
+    ../common/flash/FPrimitive.h
+    ../common/flash/FSound.h
+    ../common/flash/FSWFStream.h
+    ../common/flash/Macromedia.h
     ../common/psdlib/psd.h
     ../common/psdlib/psdutils.h
     ../common/trop/runsmap.h
@@ -196,6 +213,24 @@ set(SOURCES
     ../common/tvrender/ttessellator.cpp
     ../common/tvrender/tvectorbrush.cpp
     ../common/tvrender/tvectorbrushstyle.cpp
+    # Restored Flash renderer implementation
+    ../common/tvrender/tflash.cpp
+
+    # Legacy Flash support sources (restored from upstream commit)
+    ../common/flash/FAction.cpp
+    ../common/flash/FCT.cpp
+    ../common/flash/FDT.cpp
+    ../common/flash/FDTBitmaps.cpp
+    ../common/flash/FDTButtons.cpp
+    ../common/flash/FDTFonts.cpp
+    ../common/flash/FDTShapes.cpp
+    ../common/flash/FDTSounds.cpp
+    ../common/flash/FDTSprite.cpp
+    ../common/flash/FDTText.cpp
+    ../common/flash/FObj.cpp
+    ../common/flash/FPrimitive.cpp
+    ../common/flash/FSWFStream.cpp
+    ../common/flash/FSound.cpp
     ../common/psdlib/psd.cpp
     ../common/psdlib/psdutils.cpp
     ../common/trop/bbox.cpp
