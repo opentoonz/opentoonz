@@ -102,13 +102,13 @@ TODO: some parts should really be installed in $prefix/ instead... and some othe
 cf. https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 Until then we just follow the Win32/OSX layout.
 
-The `~/.config/OpenToonz/` directory contains your settings, work and other files.
+The `~/.config/Flare/` directory contains your settings, work and other files.
 
 Initialize this path with the following commands:
 
 ```
-$ mkdir -p $HOME/.config/OpenToonz
-$ cp -r opentoonz/stuff $HOME/.config/OpenToonz/
+$ mkdir -p $HOME/.config/Flare
+$ cp -r flare/stuff $HOME/.config/Flare/
 ```
 
 *Currently this is required to run OpenToonz.*
@@ -125,10 +125,10 @@ $ make -j$(nproc)
 $ cd ../../
 ```
 
-### Building OpenToonz
+### Building Flare
 
 ```
-$ cd toonz
+$ cd flare
 $ mkdir build
 $ cd build
 $ cmake ../sources
@@ -160,8 +160,8 @@ If you need to debug the application, you should be able to use `cmake -DCMAKE_B
 You can now run the application:
 
 ```
-$ LD_LIBRARY_PATH=./lib/opentoonz:$LD_LIBRARY_PATH
-$ ./bin/OpenToonz
+$ LD_LIBRARY_PATH=./lib/flare:$LD_LIBRARY_PATH
+$ ./bin/Flare
 ```
 
 ### Performing a System Installation
@@ -169,13 +169,13 @@ $ ./bin/OpenToonz
 The steps above show how to run OpenToonz from the build directory,
 however you may wish to install OpenToonz onto your system.
 
-OpenToonz will install to `/opt/opentoonz` by default, to do this run:
+Flare will install to `/opt/flare` by default, to do this run:
 
 ```
 $ sudo make install
 ```
 
-Then you can launch OpenToonz by running `/opt/opentoonz/bin/opentoonz`.
+Then you can launch Flare by running `/opt/flare/bin/flare`.
 
 You can change the installation path by modifying the `CMAKE_INSTALL_PREFIX` CMake variable.
 

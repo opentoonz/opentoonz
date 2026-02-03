@@ -48,8 +48,8 @@ Visual Studio 2019构建的工程文件可以使用2022版本打开。
 
 ### 使用CMake生成VS2019项目文件
 - 启动 CMake
-- 设置源码文件夹位置为 `$opentoonz/toonz/sources`
-- 设置构建文件夹位置为`$opentoonz/toonz/build`
+- 设置源码文件夹位置为 `$opentoonz/flare/sources`
+- 设置构建文件夹位置为`$opentoonz/flare/build`
 - （或者你自己常用的位置）
 - 如果构建文件夹处于仓库文件夹内,确保将其添加到 .gitignore，避免提交到仓库内。
 - 如果不使用推荐的构建文件夹，注意在下面的步骤中替换相应的路径。
@@ -68,9 +68,9 @@ Visual Studio 2019构建的工程文件可以使用2022版本打开。
 - 注意：最后一个文件所处的文件夹和之前不一样
 
 ## 构建
-- 打开 `$opentoonz/toonz/build/OpenToonz.sln` 并在顶部切换到 `Debug` 或 `Release`。
+- 打开 `$opentoonz/flare/build/OpenToonz.sln` 并在顶部切换到 `Debug` 或 `Release`。
 - 编译。
-- 完成后结果会输出到 `$opentoonz/toonz/build/`
+- 完成后结果会输出到 `$opentoonz/flare/build/`
 
 ## 构建 Canon DSLR 相机支持
 下载 Canon SDK 需要先申请加入 Canon 开发者计划。
@@ -84,7 +84,7 @@ Visual Studio 2019构建的工程文件可以使用2022版本打开。
 
 ## 运行程序
 ### 配置程序目录
-1. 复制 $opentoonz/toonz/build/Release 内的所有内容到一个指定文件夹。
+1. 复制 $opentoonz/flare/build/Release 内的所有内容到一个指定文件夹。
 
 2. 打开命令行并进入 `QT_DIR/msvc2015_64/bin`目录。运行 `windeployqt.exe`，使用`OpenToonz.exe` 的路径作为参数。（另一种方式是先进入`OpenToonz.exe`所在的文件夹然后拖动`Opentoonz.exe`到`windeployqt.exe`的头上。这样会自动拉取所需文件。）
  - 以下Qt 库文件必须放在和`OpenToonz.exe`同一个文件夹内：
@@ -176,16 +176,16 @@ OpenToonz 使用 QuickTime SDK 提供的 MOV 及相关文件格式。由于 Quic
 
 ### 使用CMake 构建32位版本的VS2019工程
 - 替换以下内容，其余步骤与构建64位版本时相同
-  - `$opentoonz/toonz/build` to `$opentoonz/toonz/build32`
+  - `$opentoonz/toonz/build` to `$opentoonz/flare/build32`
   - `Visual Studio 16 2019 x64` to `Visual Studio 16 2019 Win32`
 - 指定 `QT_PATH` 为32位Qt的Build目录
 
 ### 构建 32位版本程序
-1. 打开 `$opentoonz/toonz/build32/OpenToonz.sln`
+1. 打开 `$opentoonz/flare/build32/OpenToonz.sln`
 
 ### 配置 `srv` 文件夹（MOV视频支持）
 - 如果是64位程序, 复制下列文件到 `srv` 文件夹：
-  - `$opentoonz/toonz/build32/Release`
+  - `$opentoonz/flare/build32/Release`
     - t32bitsrv.exe
     - image.dll
     - tnzbase.dll

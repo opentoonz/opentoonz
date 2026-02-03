@@ -49,8 +49,8 @@ Visual Studio 2019 (2015以降) と Qt 5.15 でビルドできることを確認
 
 ### CMake で Visual Studio のプロジェクトを生成する
 1. CMake を立ち上げる
-2. Where is the source code に `$opentoonz/toonz/sources` を指定する
-3. Where to build the binaries に `$opentoonz/toonz/build` を指定する
+2. Where is the source code に `$opentoonz/flare/sources` を指定する
+3. Where to build the binaries に `$opentoonz/flare/build` を指定する
   - 他の場所でも構いません
   - チェックアウトしたフォルダ内に作成する場合は、buildから開始するフォルダ名にするとgitから無視されます
   - ビルド先を変更した場合は、以下の説明を適宜読み替えてください
@@ -67,8 +67,8 @@ Visual Studio 2019 (2015以降) と Qt 5.15 でビルドできることを確認
   - `$opentoonz/thirdparty/libpng-1.6.21/scripts/pnglibconf.h.prebuilt` → `$opentoonz/thirdparty/libpng-1.6.21/pnglibconf.h`
 
 ## ビルド
-1. `$opentoonz/toonz/build/OpenToonz.sln` を開いて Release 構成を選択してビルドします
-2. `$opentoonz/toonz/build/Release` にファイルが生成されます
+1. `$opentoonz/flare/build/OpenToonz.sln` を開いて Release 構成を選択してビルドします
+2. `$opentoonz/flare/build/Release` にファイルが生成されます
 
 ## キヤノン製デジタルカメラのサポートを有効にするには
 
@@ -81,7 +81,7 @@ CMake上で、`WITH_CANON` オプションをONにします。
 
 ## 実行
 ### 実行可能ファイルなどの配置
-1. `$oepntoonz/toonz/build/Release` の中身を適当なフォルダにコピーします
+1. `$oepntoonz/flare/build/Release` の中身を適当なフォルダにコピーします
 2. `OpenToonz.exe` のパスを引数にして Qt に付属の `windeployqt.exe` を実行します
   - 必要な Qt のライブラリなどが `OpenToonz.exe` と同じフォルダに集められます
 3. 下記のファイルを `OpenToonz.exe` と同じフォルダにコピーします
@@ -119,16 +119,16 @@ OpenToonz は QuickTime SDK を用いて mov 形式などへ対応していま�
 
 ### CMake で Visual Studio の 32 ビット版のプロジェクトを生成する
 - 64 ビット版と同様の手順で、次のようにフォルダ名とターゲットを読み替えます
-  - `$opentoonz/toonz/build` → `$opentoonz/toonz/build32`
+  - `$opentoonz/flare/build` → `$opentoonz/flare/build32`
   - Visual Studio 16 2019 x64 → Visual Studio 16 2019 Win32
 - `QT_PATH` には 32 ビット版の Qt のパスを指定します
 
 ### 32 ビット版のビルド
-1. `$opentoonz/toonz/build32/OpenToonz.sln`を開いてビルドします
+1. `$opentoonz/flare/build32/OpenToonz.sln`を開いてビルドします
 
 ### `srv` フォルダの配置
 - 64 ビット版の `srv` フォルダの中に下記のファイルをコピーします
-  - `$opentoonz/toonz/build32/Release` から
+  - `$opentoonz/flare/build32/Release` から
     - t32bitsrv.exe
     - image.dll
     - tnzbase.dll

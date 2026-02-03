@@ -48,8 +48,8 @@ This software can be built using Visual Studio 2019 and Qt 5.x
 
 ### Using CMake to Create a Visual Studio Project
 - Launch CMake
-- In `Where is the source code`, navigate to `$opentoonz/toonz/sources`
-- In `Where to build the binaries`, navigate to `$opentoonz/toonz/build`
+- In `Where is the source code`, navigate to `$opentoonz/flare/sources`
+- In `Where to build the binaries`, navigate to `$opentoonz/flare/build`
 - Or to wherever you usually build to.
 - If the build directory is in the git repository, be sure to add the directory to .gitignore
 - If the build directory is different from the one above, be sure to change to the specified directory where appropriate below.
@@ -68,9 +68,9 @@ Rename the following files:
 - Note that the destination is a different folder for the last file.
 
 ## Building
-- Open `$opentoonz/toonz/build/OpenToonz.sln` and change to `Debug` or `Release` in the top bar.
+- Open `$opentoonz/flare/build/OpenToonz.sln` and change to `Debug` or `Release` in the top bar.
 - Compile the build.
-- The output will be in the corresponding folder in `$opentoonz/toonz/build/`
+- The output will be in the corresponding folder in `$opentoonz/flare/build/`
 
 ## Building with Canon DSLR camera support
  You will need the Canon SDK. This requires applying for the Canon developer program and downloading the SDK.
@@ -84,7 +84,7 @@ To run the program with Canon DSLR camera support, you will need to copy the .dl
 
 ## Running the Program
 ### Setting Up the Program's Path
-1. Copy the entire contents of $opentoonz/toonz/build/Release to an appropriate folder.
+1. Copy the entire contents of $opentoonz/flare/build/Release to an appropriate folder.
 
 2. Open a Command Prompt and navigate to `QT_DIR/msvc2015_64/bin`. Run the Qt program `windeployqt.exe` with the path for `OpenToonz.exe` as an argument. (Another way to do this is navigate to the exe that was created in your Release folder and drag and drop the Opentoonz.exe on top of the windeployqt.exe This will automatically generate the QT files and folders you will need.)
  - The necessary Qt library files should be in the same folder as `OpenToonz.exe`
@@ -178,16 +178,16 @@ OpenToonz utilizes the QuickTime SDK's `mov` and associated file formats.  Since
 
 ### Using CMake to Create a Visual Studio 32-bit Project
 - Follow the same instructions as for the 64-bit version, but change the following:
-  - `$opentoonz/toonz/build` to `$opentoonz/toonz/build32`
+  - `$opentoonz/toonz/build` to `$opentoonz/flare/build32`
   - `Visual Studio 16 2019 x64` to `Visual Studio 16 2019 Win32`
 - Change `QT_PATH` to the path of your 32-bit version of Qt
 
 ### Building the 32-bit Version
-1. Open `$opentoonz/toonz/build32/OpenToonz.sln`
+1. Open `$opentoonz/flare/build32/OpenToonz.sln`
 
 ### Layout of the `srv` Folder
 - For the 64-bit version, copy the following files to the `srv` folder:
-  - From `$opentoonz/toonz/build32/Release`
+  - From `$opentoonz/flare/build32/Release`
     - t32bitsrv.exe
     - image.dll
     - tnzbase.dll

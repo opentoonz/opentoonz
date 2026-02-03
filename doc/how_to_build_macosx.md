@@ -73,7 +73,7 @@ tar xvjf boost_1_72_0.tar.bz2
 
 1. Create the build directory with the following:
 ```sh
-cd ~/Documents/opentoonz/toonz
+cd ~/Documents/opentoonz/flare
 mkdir build
 cd build
 ```
@@ -98,7 +98,7 @@ sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 cmake -G Xcode ../sources -B. -DQT_PATH='/opt/homebrew/opt/qt@5/lib' -DWITH_TRANSLATION=OFF   #replace QT path with your installed QT version#
 ```
 - Note that the option `-DWITH_TRANSLATION=OFF` is needed to avoid error when using XCode 12+ which does not allow to add the same source to multiple targets.
-- Open Xcode app and open project /Users/yourlogin/Documents/opentoonz/toonz/build/OpenToonz.xcodeproj
+- Open Xcode app and open project /Users/yourlogin/Documents/opentoonz/flare/build/OpenToonz.xcodeproj
 - Change `ALL_BUILD` to `OpenToonz`
 - Start build with: Product -> Build
 
@@ -126,7 +126,7 @@ sudo chmod -R 777 /Applications/OpenToonz
 
 - If built using command line, run the following:
 ```sh
-open ~/Documents/opentoonz/build/toonz/OpenToonz.app
+open ~/Documents/opentoonz/flare/build/OpenToonz.app
 ```
 
 - If built using Xcode, do the following:
@@ -135,4 +135,4 @@ open ~/Documents/opentoonz/build/toonz/OpenToonz.app
     - Uncheck: Run -> Options -> Document Versions
     - Run in Debug mode: Product -> Run
 
-    - To open with command line or from Finder window, the application is found in `/Users/yourlogin/Documents/opentoonz/toonz/build/Debug/OpenToonz.app`
+    - To open with command line or from Finder window, the application is found in `/Users/yourlogin/Documents/opentoonz/flare/build/Debug/OpenToonz.app`

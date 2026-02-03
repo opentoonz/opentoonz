@@ -15,6 +15,16 @@ do
     esac
 done
 
+# Allow an alternate env var for the new repo name (FLAREREPO) as a fallback
+if [ -z "$TOONZREPO" ]; then
+  if [ -n "$FLAREREPO" ]; then
+    TOONZREPO=$FLAREREPO
+  else
+    echo "Repository path not specified. Use -t <repo_dir> or set FLAREREPO env var."
+    exit 1
+  fi
+fi
+
 mkdir -p $DIST
 pushd $DIST
 
@@ -23,9 +33,10 @@ mkdir utils
 mkdir doc
 
 cp $TOONZREPO/LICENSE.txt ./
-cp $TOONZREPO/toonz/sources/toonzqt/toonz_plugin.h core/
-cp $TOONZREPO/toonz/sources/toonzqt/toonz_hostif.h core/
-cp $TOONZREPO/toonz/sources/toonzqt/toonz_params.h core/
+# Source code has been moved into the 'flare' top-level folder; keep the original internal lib names
+cp $TOONZREPO/flare/sources/toonzqt/toonz_plugin.h core/
+cp $TOONZREPO/flare/sources/toonzqt/toonz_hostif.h core/
+cp $TOONZREPO/flare/sources/toonzqt/toonz_params.h core/
 
 cp $TOONZREPO/plugins/utils/affine.hpp utils/
 cp $TOONZREPO/plugins/utils/rect.hpp utils/
