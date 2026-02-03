@@ -444,6 +444,19 @@ set(RESOURCES toonz.qrc)
 
 if(BUILD_ENV_MSVC)
     set(RC_FILE toonz.rc)
+
+    # Generate a fallback 'flare.ico' in-source by copying the existing toonz.ico
+    # when a packager hasn't yet supplied a Flare icon. This prevents breakage
+    # when the sources reference 'flare.ico' in packaging scripts.
+    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/flare.ico" AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/toonz.ico")
+        add_custom_command(
+            OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/flare.ico"
+            COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/toonz.ico" "${CMAKE_CURRENT_SOURCE_DIR}/flare.ico"
+            COMMENT "Generating fallback flare.ico from toonz.ico"
+            VERBATIM
+        )
+        add_custom_target(gen_flare_icon ALL DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/flare.ico")
+    endif()
 endif()
 
 qt5_add_resources(SOURCES ${RESOURCES})

@@ -17,6 +17,10 @@
 #include <QFile>
 #include <QDir>
 #include <QDateTime>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QCoreApplication>
 
 using namespace DVGui;
 
@@ -228,6 +232,48 @@ void ImportFlashContainerCommand::execute() {
     QString err = QObject::tr("Import failed: %1").arg(stdErr);
     DVGui::warning(err);
     return;
+  }
+
+  // Try to read a manifest.json if the helper script emitted one and auto-load
+  // exported levels for quick access in the scene.
+  {
+    TFilePath mf = outDir + TFilePath("manifest.json");
+    if (QFile::exists(mf.getQString())) {
+      QFile f(mf.getQString());
+      if (f.open(QIODevice::ReadOnly)) {
+        QByteArray data = f.readAll();
+        f.close();
+        QJsonDocument doc = QJsonDocument::fromJson(data);
+        if (!doc.isNull() && doc.isObject()) {
+          QJsonObject obj = doc.object();
+          QJsonArray files = obj["files"].toArray();
+          int imported = 0;
+          for (const QJsonValue &v : files) {
+            QString rel = v.toString();
+            if (rel.isEmpty()) continue;
+            TFilePath fp = outDir + TFilePath(rel.toStdString());
+            // Only attempt to load common image/vector types
+            QString ext = fp.getType();
+            if (ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "svg" || ext == "xml") {
+              TXshLevel *xl = scene->loadLevel(fp);
+              if (xl) imported++;
+            }
+          }
+          if (imported > 0) {
+            QString msg = QObject::tr("Imported %1 assets into the scene (they were not placed on the xsheet).\nOpen containing folder to review and place them in your scene.").arg(imported);
+            std::vector<QString> buttons = {QObject::tr("Open containing folder"), QObject::tr("OK")};
+            int ret = DVGui::MsgBox(DVGui::INFORMATION, msg, buttons);
+            if (ret == 1) {
+              if (TSystem::isUNC(outDir))
+                QDesktopServices::openUrl(QUrl(outDir.getQString()));
+              else
+                QDesktopServices::openUrl(QUrl::fromLocalFile(outDir.getQString()));
+            }
+            return;
+          }
+        }
+      }
+    }
   }
 
   QString successMsg = QObject::tr("Container export complete. Files exported to:\n%1\n\nOpen containing folder to review and import files.").arg(outDir.getQString());

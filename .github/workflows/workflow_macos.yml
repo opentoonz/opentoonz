@@ -93,18 +93,18 @@ jobs:
       - name: Introduce Libraries and Stuff
         run: |
           cd flare/build/toonz
-          cp -pr ../../../stuff OpenToonz.app/portablestuff
-          /usr/local/opt/qt@5/bin/macdeployqt OpenToonz.app -verbose=0 -always-overwrite \
-            -executable=OpenToonz.app/Contents/MacOS/lzocompress \
-            -executable=OpenToonz.app/Contents/MacOS/lzodecompress \
-            -executable=OpenToonz.app/Contents/MacOS/tcleanup \
-            -executable=OpenToonz.app/Contents/MacOS/tcomposer \
-            -executable=OpenToonz.app/Contents/MacOS/tconverter \
-            -executable=OpenToonz.app/Contents/MacOS/tfarmcontroller \
-            -executable=OpenToonz.app/Contents/MacOS/tfarmserver
+          cp -pr ../../../stuff Flare.app/portablestuff
+          /usr/local/opt/qt@5/bin/macdeployqt Flare.app -verbose=0 -always-overwrite \
+            -executable=Flare.app/Contents/MacOS/lzocompress \
+            -executable=Flare.app/Contents/MacOS/lzodecompress \
+            -executable=Flare.app/Contents/MacOS/tcleanup \
+            -executable=Flare.app/Contents/MacOS/tcomposer \
+            -executable=Flare.app/Contents/MacOS/tconverter \
+            -executable=Flare.app/Contents/MacOS/tfarmcontroller \
+            -executable=Flare.app/Contents/MacOS/tfarmserver
       - name: Modify Library Paths
         run: |
-          cd flare/build/toonz/OpenToonz.app/Contents/Frameworks
+          cd flare/build/toonz/Flare.app/Contents/Frameworks
           for TARGETLIB in *.dylib; do
             otool -L "$TARGETLIB" | grep ".dylib" | grep -v "$TARGETLIB" | grep -v "@executable_path/../Frameworks" | awk '{print $1}' | while read -r FROMPATH; do
               LIBNAME=$(basename "$FROMPATH")
@@ -118,7 +118,7 @@ jobs:
           cd flare/build/toonz
           echo "Creating DMG..."
           ATTEMPT=1
-          until /usr/local/opt/qt@5/bin/macdeployqt OpenToonz.app -dmg -verbose=0 && [ -f OpenToonz.dmg ]; do
+          until /usr/local/opt/qt@5/bin/macdeployqt Flare.app -dmg -verbose=0 && [ -f Flare.dmg ]; do
             echo "Attempt $ATTEMPT failed to build DMG."
             if [ $ATTEMPT -eq 10 ]; then
               echo ">>> DMG file creation failed after 10 attempts. Aborting!"
@@ -132,4 +132,4 @@ jobs:
       - uses: actions/upload-artifact@v6
         with:
           name: Flare-${{ runner.os }}-${{ github.sha }}
-          path: flare/build/toonz/OpenToonz.dmg
+          path: flare/build/toonz/Flare.dmg
