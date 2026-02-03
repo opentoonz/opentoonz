@@ -104,8 +104,8 @@ struct BrushToolConfig {
 
 // List of supported brush tools
 const BrushToolConfig BRUSH_TOOLS[] = {
-  { T_Brush, TTool::ToonzImage,   "MI_BrushPreset_TnzRasterBrush_", "[Tnz Raster Brush] ", "brush" },
-  { T_Brush, TTool::VectorImage,  "MI_BrushPreset_TnzVectorBrush_", "[Vector Brush] ", "geometric" },
+  { T_Brush, TTool::ToonzImage,   "MI_BrushPreset_TnzRasterBrush_", "[Tnz Raster Brush] ", "palette" },
+  { T_Brush, TTool::VectorImage,  "MI_BrushPreset_TnzVectorBrush_", "[Vector Brush] ", "brush" },
   { T_Brush, TTool::RasterImage,  "MI_BrushPreset_RasterBrush_",    "[Raster Brush] ",     "paintbrush" }
 };
 
