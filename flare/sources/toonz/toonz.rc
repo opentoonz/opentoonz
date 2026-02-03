@@ -1,0 +1,5 @@
+// Icon
+#if defined(APSTUDIO_INVOKED)
+ICON "toonz.ico"
+#endif
+IDI_ICON1 ICON "toonz.ico"

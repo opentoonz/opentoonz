@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 10.0, SVG Export Plug-In . SVG Version: 3.0.0 Build 76)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN"    "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd" [
+	<!ENTITY ns_flows "http://ns.adobe.com/Flows/1.0/">
+	<!ENTITY ns_extend "http://ns.adobe.com/Extensibility/1.0/">
+	<!ENTITY ns_ai "http://ns.adobe.com/AdobeIllustrator/10.0/">
+	<!ENTITY ns_graphs "http://ns.adobe.com/Graphs/1.0/">
+	<!ENTITY ns_vars "http://ns.adobe.com/Variables/1.0/">
+	<!ENTITY ns_imrep "http://ns.adobe.com/ImageReplacement/1.0/">
+	<!ENTITY ns_sfw "http://ns.adobe.com/SaveForWeb/1.0/">
+	<!ENTITY ns_custom "http://ns.adobe.com/GenericCustomNamespace/1.0/">
+	<!ENTITY ns_adobe_xpath "http://ns.adobe.com/XPath/1.0/">
+	<!ENTITY ns_svg "http://www.w3.org/2000/svg">
+	<!ENTITY ns_xlink "http://www.w3.org/1999/xlink">
+]>
+<svg 
+	 xmlns:x="&ns_extend;" xmlns:i="&ns_ai;" xmlns:graph="&ns_graphs;" i:viewOrigin="377.2588 305.7461" i:rulerOrigin="0 0" i:pageBounds="0 600 800 0"
+	 xmlns="&ns_svg;" xmlns:xlink="&ns_xlink;" xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/" width="47" height="12"
+	 viewBox="0 0 47 12" overflow="visible" enable-background="new 0 0 47 12" xml:space="preserve">
+	<metadata>
+		<variableSets  xmlns="&ns_vars;">
+			<variableSet  varSetName="binding1" locked="none">
+				<variables></variables>
+				<v:sampleDataSets  xmlns="&ns_custom;" xmlns:v="&ns_vars;"></v:sampleDataSets>
+			</variableSet>
+		</variableSets>
+		<sfw  xmlns="&ns_sfw;">
+			<slices></slices>
+			<sliceSourceBounds  y="293.746" x="377.259" width="47" height="12" bottomLeftOrigin="true"></sliceSourceBounds>
+		</sfw>
+	</metadata>
+	<g id="Layer_1" i:layer="yes" i:dimmedPercent="50" i:rgbTrio="#4F008000FFFF">
+		<path i:knockout="Off" fill="none" d="M47,12H0V0h47V12z"/>
+		<path i:knockout="Off" fill="none" stroke="#404040" stroke-dasharray="2 2" d="M36.402,4.55c-0.958,2.34-3.067,4.141-5.745,4.571
+			c-2.677,0.43-5.245-0.619-6.888-2.538c-1.643-1.92-4.21-2.969-6.888-2.539c-2.677,0.43-4.787,2.231-5.745,4.569"/>
+		<path i:knockout="Off" fill="none" stroke="#404040" d="M32.232,5.195l4.875-0.938l-0.58,5.064"/>
+		<path i:knockout="Off" fill="#C8D200" stroke="#404040" d="M25.791,10.523h-5.546V2.007h5.546V10.523z"/>
+	</g>
+</svg>
