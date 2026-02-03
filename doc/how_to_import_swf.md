@@ -44,3 +44,27 @@ Notes:
 - The helper script attempts several invocation styles for JPEXS. If the
   script can’t find a decompiler on your PATH, specify the decompiler path
   manually (or run the decompiler yourself and import the exported files).
+
+Native container import (FLA / XFL / SWC / AS)
+
+- Flare also provides a "File → Import → Import Flash/XFL/SWC (Native)..."
+  action which runs `tools/flash/import_container.py`. This helper attempts to
+  extract assets from container formats and will call the decompiler helper for
+  embedded SWF files when available.
+- Supported behaviors:
+  - `.swf`: decompiled using the external decompiler (same as vector import).
+  - `.swc`: ZIP archive; the script extracts scripts and assets and decompiles
+    any embedded SWF entries.
+  - `.fla`: the script tries to unzip the file (many modern FLA files are
+    zip-backed XFL archives). If unzipping fails it will attempt to run the
+    decompiler on the package; if that also fails you will be asked to export
+    XFL from Adobe Animate or use a third-party decompiler.
+  - `.xfl`: treated as a project folder or zipped XFL; asset files are copied
+    for manual import into Flare.
+  - `.as`: ActionScript source files are copied into the export folder and
+    recorded in the manifest.
+
+- The importer writes a `manifest.json` into the output folder describing the
+  exported files; use this to review and import files into Flare.
+- ActionScript files are included as source/metadata and are not executed by
+  Flare; consider them as reference code attached to layers or symbols for now.
