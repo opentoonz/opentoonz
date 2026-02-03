@@ -95,6 +95,10 @@ void ImportFlashVectorCommand::execute() {
   args << "--input" << fp.getQString();
   args << "--output" << outDir.getQString();
 
+  // If the user configured a specific decompiler path in Preferences, pass it on
+  QString prefDecompilerPath = Preferences::instance()->getFlashDecompilerPath();
+  if (!prefDecompilerPath.isEmpty()) args << "--decompiler" << prefDecompilerPath;
+
   QProcess proc;
   proc.setProgram(python);
   proc.setArguments(args);

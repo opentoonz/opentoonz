@@ -1,5 +1,3 @@
-
-
 #include "preferencespopup.h"
 
 // Tnz6 includes
@@ -1276,6 +1274,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
        tr("Use QuickTime to decode/code .mov and .3gp (If Installed)")},
       {rhubarbPath, tr("Rhubarb Path:")},
       {rhubarbTimeout, tr("Rhubarb Timeout:")},
+      {flashDecompilerPath, tr("Flash Decompiler Path:")},
 
       // Drawing
       {DefRasterFormat, tr("Default Raster / Scan Level Format:")},
@@ -1974,6 +1973,7 @@ QWidget* PreferencesPopup::createCodecPage() {
       tr("Note: FFmpeg begins working once all images have been processed."),
       lay);
   insertUI(ffmpegTimeout, lay);
+  insertUI(flashDecompilerPath, lay);
 
   putLabel("", lay);
   putLabel(

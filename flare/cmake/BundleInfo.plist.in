@@ -5,17 +5,17 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleDisplayName</key>
-	<string>OpenToonz</string>
+	<string>Flare</string>
 	<key>CFBundleExecutable</key>
-	<string>OpenToonz</string>
+	<string>Flare</string>
 	<key>CFBundleIconFile</key>
-	<string>OpenToonz.icns</string>
+	<string>Flare.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>io.github.opentoonz.OpenToonz</string>
+	<string>io.github.Flare.Flare</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>OpenToonz</string>
+	<string>Flare</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -33,8 +33,8 @@
 	<key>NSHumanReadableCopyright</key>
 	<string>This Open Source Program is developed from Toonz, a software originally created by Digital Video, S.p.A., Rome Italy</string>
 	<key>NSCameraUsageDescription</key>
-  <string>OpenToonz needs access to the camera in order to use Camera Capture</string>
+  <string>Flare needs access to the camera in order to use Camera Capture</string>
   <key>NSMicrophoneUsageDescription</key>
-  <string>OpenToonz needs access to the microphone in order to use Record Audio</string>
+  <string>Flare needs access to the microphone in order to use Record Audio</string>
 </dict>
 </plist>

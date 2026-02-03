@@ -85,6 +85,7 @@ enum PreferencesItemId {
   quickTimeBackend,
   rhubarbPath,
   rhubarbTimeout,
+  flashDecompilerPath,
 
   //----------
   // Drawing

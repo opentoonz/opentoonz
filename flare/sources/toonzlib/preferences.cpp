@@ -1,5 +1,3 @@
-
-
 #include "toonz/preferences.h"
 
 // TnzLib includes
@@ -515,6 +513,9 @@ void Preferences::definePreferenceItems() {
   define(rhubarbPath, "rhubarbPath", QMetaType::QString, "");
   define(rhubarbTimeout, "rhubarbTimeout", QMetaType::Int, 600, 0,
          std::numeric_limits<int>::max());
+  // Path to a third-party Flash decompiler (e.g., JPEXS). Used by the
+  // "Import Flash (Vector via External Decompiler)" workflow.
+  define(flashDecompilerPath, "flashDecompilerPath", QMetaType::QString, "");
 
   // Drawing
   define(DefRasterFormat, "DefRasterFormat", QMetaType::QString, "tif");

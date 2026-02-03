@@ -289,6 +289,7 @@ public:
 
   // Import Export Tab
   QString getFfmpegPath() const { return getStringValue(ffmpegPath); }
+  QString getFlashDecompilerPath() const { return getStringValue(flashDecompilerPath); }
   int getFfmpegTimeout() { return getIntValue(ffmpegTimeout); }
   QString getFastRenderPath() const { return getStringValue(fastRenderPath); }
   bool getFfmpegMultiThread() const { return getBoolValue(ffmpegMultiThread); }

@@ -456,12 +456,12 @@ endif()
 qt5_wrap_cpp(SOURCES ${MOC_HEADERS})
 
 if(BUILD_ENV_MSVC)
-    add_executable(OpenToonz WIN32 ${HEADERS} ${SOURCES} ${OBJCSOURCES} ${RESOURCES} ${RC_FILE})
+    add_executable(Flare WIN32 ${HEADERS} ${SOURCES} ${OBJCSOURCES} ${RESOURCES} ${RC_FILE})
 else()
-    set(MACOSX_BUNDLE_ICON_FILE "OpenToonz.icns")
-    set_source_files_properties(OpenToonz.icns PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-    add_executable(OpenToonz MACOSX_BUNDLE OpenToonz.icns ${HEADERS} ${SOURCES} ${OBJCSOURCES} ${RESOURCES})
-    add_dependencies(OpenToonz tnzcore tnzbase toonzlib colorfx tnzext image sound toonzqt tnztools tnzstdfx tfarm)
+    set(MACOSX_BUNDLE_ICON_FILE "Flare.icns")
+    set_source_files_properties(Flare.icns PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+    add_executable(Flare MACOSX_BUNDLE Flare.icns ${HEADERS} ${SOURCES} ${OBJCSOURCES} ${RESOURCES})
+    add_dependencies(Flare tnzcore tnzbase toonzlib colorfx tnzext image sound toonzqt tnztools tnzstdfx tfarm)
     #add_definitions(
     #    -DTNZBASE_EXPORTS
     #    -DTPARAM_EXPORTS
@@ -518,7 +518,7 @@ endif()
 if(BUILD_ENV_MSVC)
     set(EXTRA_LIBS)
     if(CMAKE_CXX_FLAGS_DEBUG)
-        target_compile_options(OpenToonz PRIVATE /EHsc) # Enable C++ Exceptions in Debug Mode.
+        target_compile_options(Flare PRIVATE /EHsc) # Enable C++ Exceptions in Debug Mode.
     endif()
     if(PLATFORM EQUAL 64)
         set(EXTRA_LIBS ${EXTRA_LIBS} Qt5::SerialPort ${TURBOJPEG_LIB} ${OpenCV_LIBS})
@@ -526,7 +526,7 @@ if(BUILD_ENV_MSVC)
             set(EXTRA_LIBS ${EXTRA_LIBS} ${CANON_LIB})
         endif()
     endif()
-    target_link_libraries(OpenToonz
+    target_link_libraries(Flare
         Qt5::WinMain Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml
         Qt5::Script Qt5::Widgets Qt5::PrintSupport Qt5::Multimedia Qt5::UiTools
         ${GL_LIB} ${GLUT_LIB}
@@ -548,7 +548,7 @@ elseif(BUILD_ENV_APPLE)
         endif()
     endif()
 
-    target_link_libraries(OpenToonz
+    target_link_libraries(Flare
         Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml
         Qt5::Script Qt5::Widgets Qt5::PrintSupport Qt5::Multimedia Qt5::MultimediaWidgets Qt5::UiTools
         ${GL_LIB} ${GLUT_LIB}
@@ -556,16 +556,16 @@ elseif(BUILD_ENV_APPLE)
     )
 
     # ADDED/UPDATED: Expanded dependencies for all libs and utilities (ensures build order)
-    add_dependencies(OpenToonz tnzcore tnzbase toonzlib colorfx tnzext image sound toonzqt tnztools tnzstdfx tfarm tcomposer tcleanup tconverter tfarmcontroller tfarmserver)
+    add_dependencies(Flare tnzcore tnzbase toonzlib colorfx tnzext image sound toonzqt tnztools tnzstdfx tfarm tcomposer tcleanup tconverter tfarmcontroller tfarmserver)
 
     # ADDED/UPDATED: Configure Info.plist for bundle (retina support etc.)
-    set_target_properties(OpenToonz PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/../cmake/BundleInfo.plist.in)
+    set_target_properties(Flare PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/../cmake/BundleInfo.plist.in)
 
     # ADDED/UPDATED: Merged RPATH command (single one with both paths; || true for CI; COMMENT for logs)
-    add_custom_command(TARGET OpenToonz POST_BUILD
-        COMMAND ${CMAKE_INSTALL_NAME_TOOL} -add_rpath @executable_path/. "$<TARGET_FILE:OpenToonz>" || true
-        COMMAND ${CMAKE_INSTALL_NAME_TOOL} -add_rpath ${CMAKE_INSTALL_RPATH} "$<TARGET_FILE:OpenToonz>" || true
-        COMMENT "Adding RPATHs to OpenToonz executable"
+    add_custom_command(TARGET Flare POST_BUILD
+        COMMAND ${CMAKE_INSTALL_NAME_TOOL} -add_rpath @executable_path/. "$<TARGET_FILE:Flare>" || true
+        COMMAND ${CMAKE_INSTALL_NAME_TOOL} -add_rpath ${CMAKE_INSTALL_RPATH} "$<TARGET_FILE:Flare>" || true
+        COMMENT "Adding RPATHs to Flare executable"
     )
 
 elseif(BUILD_ENV_UNIXLIKE)
@@ -584,7 +584,7 @@ elseif(BUILD_ENV_UNIXLIKE)
     endif()
 
     target_link_libraries(
-        OpenToonz Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml
+        Flare Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml
         Qt5::Script Qt5::Widgets Qt5::PrintSupport Qt5::Multimedia Qt5::UiTools
         ${GL_LIB} ${GLUT_LIB} ${GLU_LIB}
         ${EXTRA_LIBS}
@@ -596,68 +596,68 @@ if(BUILD_ENV_APPLE)
     # OSX だと CMAKE_RUNTIME_OUTPUT_DIRECTORY が空だが Windows 版と同じ使い方ができるようにしておく
     # Removed: get_target_property(bin OpenToonz LOCATION)
     # Use generator expression for runtime directory
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "$<TARGET_FILE_DIR:OpenToonz>")
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "$<TARGET_FILE_DIR:Flare>")
     message("CMAKE_RUNTIME_OUTPUT_DIRECTORY:" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 endif()
 
 # copy utility executables onto the directory after build
 if(LZODRIVER_FOUND)
-    add_custom_command(TARGET OpenToonz POST_BUILD
+    add_custom_command(TARGET Flare POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:lzocompress> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
         COMMENT "Copying lzocompress to output dir"
     )
-    add_custom_command(TARGET OpenToonz POST_BUILD
+    add_custom_command(TARGET Flare POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:lzodecompress> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
         COMMENT "Copying lzodecompress to output dir"
     )
-    add_dependencies(OpenToonz lzocompress lzodecompress)  # Ensures order
+    add_dependencies(Flare lzocompress lzodecompress)  # Ensures order
 endif()
 
 if(BUILD_ENV_APPLE)
-    get_target_property(loc OpenToonz MACOSX_BUNDLE_NAME)
+    get_target_property(loc Flare MACOSX_BUNDLE_NAME)
     message(" ==> App Bundle: " ${loc})
-    message(" ==> Mach-o: " $<TARGET_FILE:OpenToonz>)  # Fixed: Use generator expression instead of ${bin}
+    message(" ==> Mach-o: " $<TARGET_FILE:Flare>)  # Fixed: Use generator expression instead of ${bin}
     foreach(lib ${EXTRA_LIBS})
         message(" copy:" ${lib} "==>" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-        add_custom_command(TARGET OpenToonz POST_BUILD
+        add_custom_command(TARGET Flare POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy ${lib} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}  # UPDATED: Use CMAKE_COMMAND for portability (instead of cp)
             COMMENT "Copying lib ${lib} to output dir"
         )
     endforeach()
     # ADDED: Already included in expanded dependencies above
 
-    add_custom_command(TARGET OpenToonz POST_BUILD
+    add_custom_command(TARGET Flare POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tcomposer> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
         COMMENT "Copying tcomposer to output dir"
     )
-    add_custom_command(TARGET OpenToonz POST_BUILD
+    add_custom_command(TARGET Flare POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tcleanup> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
         COMMENT "Copying tcleanup to output dir"
     )
-    add_custom_command(TARGET OpenToonz POST_BUILD
+    add_custom_command(TARGET Flare POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tconverter> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
         COMMENT "Copying tconverter to output dir"
     )
-    add_custom_command(TARGET OpenToonz POST_BUILD
+    add_custom_command(TARGET Flare POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tfarmcontroller> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
         COMMENT "Copying tfarmcontroller to output dir"
     )
-    add_custom_command(TARGET OpenToonz POST_BUILD
+    add_custom_command(TARGET Flare POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tfarmserver> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
         COMMENT "Copying tfarmserver to output dir"
     )
     # ADDED: Already included in expanded dependencies above
 
-    add_custom_command(TARGET OpenToonz POST_BUILD
+    add_custom_command(TARGET Flare POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/../Resources
         COMMENT "Creating Resources directory"
     )
-    add_custom_command(TARGET OpenToonz POST_BUILD
+    add_custom_command(TARGET Flare POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/../install/SystemVar.ini ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/../Resources
         COMMENT "Copying SystemVar.ini to Resources"
     )
 
-    add_custom_command(TARGET OpenToonz POST_BUILD
+    add_custom_command(TARGET Flare POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/../../../qss
         COMMENT "Creating qss directory"
     )
@@ -669,7 +669,7 @@ if(BUILD_ENV_UNIXLIKE AND BUILD_TARGET_WIN)
     # Setup files on Windows platform while cross compilation.
     install(
         TARGETS
-            OpenToonz
+            Flare
         DESTINATION bin
     )
 
@@ -723,58 +723,58 @@ elseif(BUILD_ENV_UNIXLIKE AND NOT BUILD_TARGET_WIN)
     # - /usr
     install(
         TARGETS
-            OpenToonz
+            Flare
         DESTINATION bin
     )
 
     # Shell script that copies files to the home directory as needed
     # and sets the library preload path.
-    file(WRITE ${CMAKE_BINARY_DIR}/bin/opentoonz
+    file(WRITE ${CMAKE_BINARY_DIR}/bin/flare
 "#!/bin/sh
-OPENTOONZ_BASE=\$(dirname \"\$0\")/..
+FLARE_BASE=\$(dirname \"\$0\")/..
 
-if [ ! -d \$HOME/.config/OpenToonz ]; then
-    mkdir -p \$HOME/.config/OpenToonz
+if [ ! -d \$HOME/.config/Flare ]; then
+    mkdir -p \$HOME/.config/Flare
 fi
 
-if [ ! -d \$HOME/.config/OpenToonz/stuff ]; then
-    cp -r \$OPENTOONZ_BASE/share/opentoonz/stuff \$HOME/.config/OpenToonz
+if [ ! -d \$HOME/.config/Flare/stuff ]; then
+    cp -r \$FLARE_BASE/share/flare/stuff \$HOME/.config/Flare
 fi
 
-if [ ! -d \$HOME/.config/OpenToonz/stuff/projects/library ]; then
-    mkdir -p \$HOME/.config/OpenToonz/stuff/projects/library
+if [ ! -d \$HOME/.config/Flare/stuff/projects/library ]; then
+    mkdir -p \$HOME/.config/Flare/stuff/projects/library
 fi
 
-if [ ! -d \$HOME/.config/OpenToonz/stuff/projects/fxs ]; then
-    mkdir -p \$HOME/.config/OpenToonz/stuff/projects/fxs
+if [ ! -d \$HOME/.config/Flare/stuff/projects/fxs ]; then
+    mkdir -p \$HOME/.config/Flare/stuff/projects/fxs
 fi
 
-if [ ! -e \$HOME/.config/OpenToonz/SystemVar.ini ]; then
-    cat << EOF > $HOME/.config/OpenToonz/SystemVar.ini
+if [ ! -e \$HOME/.config/Flare/SystemVar.ini ]; then
+    cat << EOF > $HOME/.config/Flare/SystemVar.ini
 [General]
-OPENTOONZROOT=\"\$HOME/.config/OpenToonz/stuff\"
-OpenToonzPROFILES=\"\$HOME/.config/OpenToonz/stuff/profiles\"
-TOONZCACHEROOT=\"\$HOME/.config/OpenToonz/stuff/cache\"
-TOONZCONFIG=\"\$HOME/.config/OpenToonz/stuff/config\"
-TOONZFXPRESETS=\"\$HOME/.config/OpenToonz/stuff/fxs\"
-TOONZLIBRARY=\"\$HOME/.config/OpenToonz/stuff/library\"
-TOONZPROFILES=\"\$HOME/.config/OpenToonz/stuff/profiles\"
-TOONZPROJECTS=\"$HOME/.config/OpenToonz/stuff/projects\"
-TOONZROOT=\"\$HOME/.config/OpenToonz/stuff\"
-TOONZSTUDIOPALETTE=\"\$HOME/.config/OpenToonz/stuff/studiopalette\"
+FLAREROOT=\"\$HOME/.config/Flare/stuff\"
+FlarePROFILES=\"\$HOME/.config/Flare/stuff/profiles\"
+TOONZCACHEROOT=\"\$HOME/.config/Flare/stuff/cache\"
+TOONZCONFIG=\"\$HOME/.config/Flare/stuff/config\"
+TOONZFXPRESETS=\"\$HOME/.config/Flare/stuff/fxs\"
+TOONZLIBRARY=\"\$HOME/.config/Flare/stuff/library\"
+TOONZPROFILES=\"\$HOME/.config/Flare/stuff/profiles\"
+TOONZPROJECTS=\"\$HOME/.config/Flare/stuff/projects\"
+TOONZROOT=\"\$HOME/.config/Flare/stuff\"
+TOONZSTUDIOPALETTE=\"\$HOME/.config/Flare/stuff/studiopalette\"
 EOF
 fi
 
-export ${PRELOAD_VARIABLE}=\${OPENTOONZ_BASE}/lib/opentoonz:\${${PRELOAD_VARIABLE}}
+export ${PRELOAD_VARIABLE}=\${FLARE_BASE}/lib/flare:\${${PRELOAD_VARIABLE}}
 
-exec \$OPENTOONZ_BASE/bin/OpenToonz \"\$@\"
+exec \$FLARE_BASE/bin/Flare \"\$@\"
 ")
     # only needed for executing without installing
-    execute_process(COMMAND chmod +x ${CMAKE_BINARY_DIR}/bin/opentoonz)
+    execute_process(COMMAND chmod +x ${CMAKE_BINARY_DIR}/bin/flare)
 
     install(
         PROGRAMS
-            ${CMAKE_BINARY_DIR}/bin/opentoonz
+            ${CMAKE_BINARY_DIR}/bin/flare
             "$<TARGET_FILE:tcleanup>"
             "$<TARGET_FILE:tcomposer>"
             "$<TARGET_FILE:tconverter>"
