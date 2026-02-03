@@ -47,9 +47,8 @@ public:
 TQOpenGLWidget::TQOpenGLWidget() {}
 
 void TQOpenGLWidget::initializeGL() {
-  QOffscreenSurface *surface = new QOffscreenSurface();
-  // context()->create();
-  // context()->makeCurrent(surface);
+  // Removed unused QOffscreenSurface creation
+  // No OpenGL initialization needed here for this widget
 }
 
 //*****************************************************************
@@ -118,12 +117,10 @@ ShadingContext::ShadingContext(QOffscreenSurface *surface) : m_imp(new Imp) {
   m_imp->m_context->create();
   m_imp->m_context->makeCurrent(m_imp->m_surface);
 
-  // m_imp->m_pixelBuffer->context()->create();
-  // m_imp->m_fbo(new QOpenGLFramebufferObject(1, 1));
   makeCurrent();
-   if( GLEW_VERSION_3_2 ) {
-       glewExperimental = GL_TRUE;
-   }
+  if (GLEW_VERSION_3_2) {
+    glewExperimental = GL_TRUE;
+  }
   glewInit();
   doneCurrent();
 }
@@ -141,10 +138,6 @@ ShadingContext::~ShadingContext() {
 //--------------------------------------------------------
 
 ShadingContext::Support ShadingContext::support() {
-  // return !QGLPixelBuffer::hasOpenGLPbuffers()
-  //           ? NO_PIXEL_BUFFER
-  //           : !QOpenGLShaderProgram::hasOpenGLShaderPrograms() ? NO_SHADERS :
-  //           OK;
   return !QOpenGLShaderProgram::hasOpenGLShaderPrograms() ? NO_SHADERS : OK;
 }
 
@@ -153,42 +146,15 @@ ShadingContext::Support ShadingContext::support() {
 bool ShadingContext::isValid() const { return m_imp->m_context->isValid(); }
 
 //--------------------------------------------------------
-/*
-QGLFormat ShadingContext::defaultFormat(int channelsSize)
-{
-  QGL::FormatOptions opts =
-    QGL::SingleBuffer     |
-    QGL::NoAccumBuffer    |
-    QGL::NoDepthBuffer    |                           // I guess it could be
-necessary to let at least
-    QGL::NoOverlay        |                           // the depth buffer
-enabled... Fragment shaders could
-    QGL::NoSampleBuffers  |                           // use it...
-    QGL::NoStencilBuffer  |
-    QGL::NoStereoBuffers;
-
-  QGLFormat fmt(opts);
-  fmt.setDirectRendering(true);                       // Just to be explicit -
-USE HARDWARE ACCELERATION
-
-  fmt.setRedBufferSize(channelsSize);
-  fmt.setGreenBufferSize(channelsSize);
-  fmt.setBlueBufferSize(channelsSize);
-  fmt.setAlphaBufferSize(channelsSize);
-
-  // TODO: 64-bit mode should be settable here
-
-  return fmt;
-}
-*/
-//--------------------------------------------------------
 
 void ShadingContext::makeCurrent() {
   m_imp->m_context->moveToThread(QThread::currentThread());
-  m_imp->m_context.reset(new QOpenGLContext());
-  QSurfaceFormat format;
-  m_imp->m_context->setFormat(format);
-  m_imp->m_context->create();
+  // FIXED: Do not create new context, use existing one
+  if (!m_imp->m_context->isValid()) {
+    QSurfaceFormat format;
+    m_imp->m_context->setFormat(format);
+    m_imp->m_context->create();
+  }
   m_imp->m_context->makeCurrent(m_imp->m_surface);
 }
 
@@ -210,11 +176,8 @@ void ShadingContext::resize(int lx, int ly,
   if (lx == 0 || ly == 0) {
     m_imp->m_fbo.reset(0);
   } else {
-    bool get                         = m_imp->m_fbo.get();
-    QOpenGLContext *currContext      = m_imp->m_context->currentContext();
-    bool yes                         = false;
-    if (currContext) bool yes        = true;
-    while (!currContext) currContext = m_imp->m_context->currentContext();
+    // FIXED: Removed unused variable 'get'
+    QOpenGLContext *currContext = QOpenGLContext::currentContext();
     m_imp->m_fbo.reset(new QOpenGLFramebufferObject(lx, ly, fmt));
     assert(m_imp->m_fbo->isValid());
 

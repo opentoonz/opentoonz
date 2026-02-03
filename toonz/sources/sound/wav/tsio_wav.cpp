@@ -1,3 +1,5 @@
+
+
 #include <memory>
 
 #include "tmachine.h"
@@ -6,24 +8,22 @@
 #include "tfilepath_io.h"
 #include "tsioutils.h"
 
-using namespace std;
-
 #if !defined(TNZ_LITTLE_ENDIAN)
 TNZ_LITTLE_ENDIAN undefined !!
 #endif
 
-//==============================================================================
+    //==============================================================================
 
-// TWAVChunk: classe base per i vari chunk WAV
+    // TWAVChunk: base class for various WAV chunks
 
-class TWAVChunk {
+    class TWAVChunk {
 public:
   static TINT32 HDR_LENGTH;
 
-  string m_name;
-  TINT32 m_length;  // lunghezza del chunk in byte
+  std::string m_name;
+  TINT32 m_length;  // chunk length in bytes
 
-  TWAVChunk(string name, TINT32 length) : m_name(name), m_length(length) {}
+  TWAVChunk(std::string name, TINT32 length) : m_name(name), m_length(length) {}
 
   virtual ~TWAVChunk() {}
 
@@ -32,9 +32,9 @@ public:
     return true;
   }
 
-  void skip(Tifstream &is) { is.seekg(m_length, ios::cur); }
+  void skip(Tifstream &is) { is.seekg(m_length, std::ios::cur); }
 
-  static bool readHeader(Tifstream &is, string &name, TINT32 &length) {
+  static bool readHeader(Tifstream &is, std::string &name, TINT32 &length) {
     char cName[5];
     TINT32 len = 0;
     memset(cName, 0, sizeof(cName));
@@ -46,11 +46,11 @@ public:
     is.read((char *)&len, sizeof(len));
     if (is.fail()) return false;
 
-    // il formato WAV memorizza i dati come little-endian
-    // se la piattaforma non e' little-endian bisogna scambiare i byte
+    // WAV format stores data as little-endian
+    // if platform is not little-endian, bytes need to be swapped
     if (!TNZ_LITTLE_ENDIAN) len = swapTINT32(len);
 
-    name   = string(cName);
+    name   = std::string(cName);
     length = len;
     return true;
   }
@@ -60,14 +60,14 @@ TINT32 TWAVChunk::HDR_LENGTH = 8;
 
 //====================================================================
 
-//  FMT Chunk: Chunk contenente le informazioni sulla traccia
+// FMT Chunk: Chunk containing track information
 
 class TFMTChunk final : public TWAVChunk {
 public:
   static TINT32 LENGTH;
 
   USHORT m_encodingType;  // PCM, ...
-  USHORT m_chans;         // numero di canali
+  USHORT m_chans;         // number of channels
   TUINT32 m_sampleRate;
   TUINT32 m_avgBytesPerSecond;
   USHORT m_bytesPerSample;
@@ -97,7 +97,7 @@ public:
     return true;
   }
 
-  bool write(ofstream &os) {
+  bool write(Tofstream &os) {
     TUINT32 length         = m_length;
     USHORT type            = m_encodingType;
     USHORT chans           = m_chans;
@@ -133,7 +133,7 @@ TINT32 TFMTChunk::LENGTH = TWAVChunk::HDR_LENGTH + 16;
 
 //====================================================================
 
-//  DATA Chunk: Chunk contenente i campioni
+// DATA Chunk: Chunk containing samples
 
 class TDATAChunk final : public TWAVChunk {
 public:
@@ -142,14 +142,14 @@ public:
   TDATAChunk(TINT32 length) : TWAVChunk("data", length) {}
 
   bool read(Tifstream &is) override {
-    // alloca il buffer dei campioni
+    // allocate sample buffer
     m_samples.reset(new UCHAR[m_length]);
     if (!m_samples) return false;
     is.read((char *)m_samples.get(), m_length);
     return true;
   }
 
-  bool write(ofstream &os) {
+  bool write(Tofstream &os) {
     TINT32 length = m_length;
 
     if (!TNZ_LITTLE_ENDIAN) {
@@ -179,59 +179,63 @@ TSoundTrackP TSoundTrackReaderWav::load() {
 
   if (!is) throw TException(m_path.getWideString() + L" : File doesn't exist");
 
-  // legge il nome del chunk
+  // read chunk name
   is.read((char *)&chunkName, sizeof(chunkName) - 1);
   chunkName[4] = '\0';
 
-  // legge la lunghezza del chunk
+  // read chunk length
   is.read((char *)&chunkLength, sizeof(chunkLength));
 
   if (!TNZ_LITTLE_ENDIAN) chunkLength = swapTINT32(chunkLength);
 
-  // legge il RIFFType
+  // read RIFFType
   is.read((char *)&RIFFType, sizeof(RIFFType) - 1);
   RIFFType[4] = '\0';
 
-  // per i .wav il RIFFType DEVE essere uguale a "WAVE"
-  if ((string(RIFFType, 4) != "WAVE"))
+  // for .wav files, RIFFType MUST be "WAVE"
+  if ((std::string(RIFFType, 4) != "WAVE"))
     throw TException("The WAV file doesn't contain the WAVE form");
 
-  TFMTChunk *fmtChunk   = 0;
-  TDATAChunk *dataChunk = 0;
+  // FIXED: Use smart pointers to prevent memory leaks
+  std::unique_ptr<TFMTChunk> fmtChunk;
+  std::unique_ptr<TDATAChunk> dataChunk;
 
   while (!is.eof()) {
-    string name   = "";
-    TINT32 length = 0;
+    std::string name = "";
+    TINT32 length    = 0;
 
     bool ret = TWAVChunk::readHeader(is, name, length);
 
     if (!ret) break;
 
-    // legge solo i chunk che ci interessano, ossia FMT e DATA
+    // only read chunks we care about, i.e., FMT and DATA
 
     if (name == "fmt ") {
-      // legge i dati del chunk FMT
-      fmtChunk = new TFMTChunk(length);
+      // read FMT chunk data
+      fmtChunk.reset(new TFMTChunk(length));
       fmtChunk->read(is);
 
-      // considera il byte di pad alla fine del chunk nel caso
-      // in cui la lunghezza di questi e' dispari
+      // consider pad byte at end of chunk if length is odd
       if (length & 1) {
         is.seekg((long)is.tellg() + 1);
       }
     } else if (name == "data") {
-      // legge i dati del chunk DATA
-      dataChunk = new TDATAChunk(length);
+      // FIXED: If we already have a data chunk, delete it before creating new
+      // one This handles the case where there might be multiple data chunks
+      if (dataChunk) {
+        dataChunk.reset();
+      }
 
+      // read DATA chunk data
+      dataChunk.reset(new TDATAChunk(length));
       dataChunk->read(is);
 
-      // considera il byte di pad alla fine del chunk nel caso
-      // in cui la lunghezza di questi e' dispari
+      // consider pad byte at end of chunk if length is odd
       if (length & 1) {
         is.seekg((long)is.tellg() + 1);
       }
     } else {
-      // spostati nello stream di un numero di byte pari a length
+      // skip to next chunk by moving forward by length bytes
       if (length & 1)
         is.seekg((long)is.tellg() + (long)length + 1);
       else
@@ -243,7 +247,7 @@ TSoundTrackP TSoundTrackReaderWav::load() {
 
   if (fmtChunk && dataChunk) {
     TINT32 sampleCount = dataChunk->m_length / fmtChunk->m_bytesPerSample;
-    int sampleType = 0;
+    int sampleType     = 0;
 
     if (fmtChunk->m_encodingType == 1)  // WAVE_FORMAT_PCM
       sampleType = (fmtChunk->m_bitPerSample == 8) ? TSound::UINT : TSound::INT;
@@ -287,8 +291,8 @@ TSoundTrackP TSoundTrackReaderWav::load() {
     }
   }
 
-  if (fmtChunk) delete fmtChunk;
-  if (dataChunk) delete dataChunk;
+  // FIXED: Smart pointers automatically clean up memory, no need for delete
+  // The destructors will be called automatically when function returns
 
   return track;
 }
