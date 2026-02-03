@@ -2,7 +2,7 @@ export = {}; -- create a new export object
 
 -- return label
 function export:label()
-	return "Toonz";
+	return "Flare";
 end
 
 -- return category
@@ -34,7 +34,7 @@ function export:run(from, to, options)
 	end
 	
 	-- write header line to file
-	fd:write("Toonz\n");
+	fd:write("Flare\n");
 	
 	-- create an array of all the poses that are being exported
 	line = "";
