@@ -79,11 +79,11 @@ jobs:
       - name: Build
         run: |
           export PKG_CONFIG_PATH="/usr/local/opt/jpeg-turbo/lib/pkgconfig:$PKG_CONFIG_PATH"
-          cd toonz
+          cd flare
           rm -rf build  
           mkdir -p build
           cd build
-          cmake ../sources -G Ninja \
+          cmake ./sources -G Ninja \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DQT_PATH=$(brew --prefix qt@5)/lib \
             -DQt5_DIR=$(brew --prefix qt@5)/lib/cmake/Qt5 \
@@ -92,7 +92,7 @@ jobs:
           ninja -j $(sysctl -n hw.ncpu)
       - name: Introduce Libraries and Stuff
         run: |
-          cd toonz/build/toonz
+          cd flare/build/toonz
           cp -pr ../../../stuff OpenToonz.app/portablestuff
           /usr/local/opt/qt@5/bin/macdeployqt OpenToonz.app -verbose=0 -always-overwrite \
             -executable=OpenToonz.app/Contents/MacOS/lzocompress \
@@ -104,7 +104,7 @@ jobs:
             -executable=OpenToonz.app/Contents/MacOS/tfarmserver
       - name: Modify Library Paths
         run: |
-          cd toonz/build/toonz/OpenToonz.app/Contents/Frameworks
+          cd flare/build/toonz/OpenToonz.app/Contents/Frameworks
           for TARGETLIB in *.dylib; do
             otool -L "$TARGETLIB" | grep ".dylib" | grep -v "$TARGETLIB" | grep -v "@executable_path/../Frameworks" | awk '{print $1}' | while read -r FROMPATH; do
               LIBNAME=$(basename "$FROMPATH")
@@ -115,7 +115,7 @@ jobs:
           done
       - name: Create Artifact
         run: |
-          cd toonz/build/toonz
+          cd flare/build/toonz
           echo "Creating DMG..."
           ATTEMPT=1
           until /usr/local/opt/qt@5/bin/macdeployqt OpenToonz.app -dmg -verbose=0 && [ -f OpenToonz.dmg ]; do
@@ -131,5 +131,5 @@ jobs:
           echo "DMG created successfully."
       - uses: actions/upload-artifact@v6
         with:
-          name: Opentoonz-${{ runner.os }}-${{ github.sha }}
-          path: toonz/build/toonz/OpenToonz.dmg
+          name: Flare-${{ runner.os }}-${{ github.sha }}
+          path: flare/build/toonz/OpenToonz.dmg
