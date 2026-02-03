@@ -2,8 +2,8 @@ version: 1.7.1.{build}
 
 environment:
   QT_PATH: "%APPVEYOR_BUILD_FOLDER%\\thirdparty\\qt\\5.15.2_wintab\\msvc2019_64"
-  OPENCV_VERSION: "4.11.0"
-  OPENCV_DLL: "C:\\Tools\\opencv\\build\\x64\\vc16\\bin\\opencv_world4110.dll"
+  OPENCV_VERSION: "4.13.0"
+  OPENCV_DLL: "C:\\Tools\\opencv\\build\\x64\\vc16\\bin\\opencv_world4130.dll"
   BOOST_ROOT: "C:\\Libraries\\boost_1_89_0"
   MSVC_VERSION: "Visual Studio 17 2022"
 
