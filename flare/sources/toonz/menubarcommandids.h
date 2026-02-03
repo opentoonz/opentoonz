@@ -40,6 +40,7 @@
 #define MI_OverwritePalette "MI_OverwritePalette"
 #define MI_LoadColorModel "MI_LoadColorModel"
 #define MI_ImportMagpieFile "MI_ImportMagpieFile"
+#define MI_ImportFlashVector "MI_ImportFlashVector"
 #define MI_NewNoteLevel "MI_NewNoteLevel"
 #define MI_RemoveEmptyColumns "MI_RemoveEmptyColumns"
 #define MI_NewProject "MI_NewProject"

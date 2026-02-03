@@ -1,5 +1,3 @@
-
-
 #include "mainwindow.h"
 
 // Tnz6 includes
@@ -1824,6 +1822,9 @@ void MainWindow::defineActions() {
   createMenuFileAction(MI_ImportMagpieFile,
                        QT_TR_NOOP("&Import Toonz Lip Sync File..."), "",
                        "dialogue_import");
+  createMenuFileAction(MI_ImportFlashVector,
+                       QT_TR_NOOP("&Import Flash (Vector via External Decompiler)..."), "",
+                       "import_flash");
   createMenuFileAction(MI_NewProject, QT_TR_NOOP("&New Project..."), "",
                        "new_project");
   createMenuFileAction(MI_ProjectSettings, QT_TR_NOOP("&Project Settings..."),
@@ -2607,7 +2608,7 @@ void MainWindow::defineActions() {
   createToolAction(T_Skeleton, "skeleton", QT_TR_NOOP("Skeleton Tool"), "V");
   createToolAction(T_Tracker, "radar", QT_TR_NOOP("Tracker Tool"), "");
   createToolAction(T_Hook, "hook", QT_TR_NOOP("Hook Tool"), "O");
-  createToolAction(T_Zoom, "zoom", QT_TR_NOOP("Zoom Tool"), "Z");
+  createToolAction(T_Zoom, "zoom", QT_TR_NOOP("Zoom Tool"), "R");
   createToolAction(T_Rotate, "rotate", QT_TR_NOOP("Rotate Tool"), "R");
   createToolAction(T_Hand, "hand", QT_TR_NOOP("Hand Tool"), "H");
   createToolAction(T_Plastic, "plastic", QT_TR_NOOP("Plastic Tool"), "X");
@@ -3019,8 +3020,8 @@ void MainWindow::defineActions() {
   createViewerAction(V_ActualPixelSize, QT_TR_NOOP("Actual Pixel Size"), "N");
   createViewerAction(V_FlipX, QT_TR_NOOP("Flip Viewer Horizontally"), "");
   createViewerAction(V_FlipY, QT_TR_NOOP("Flip Viewer Vertically"), "");
-  createViewerAction(V_RotateLeft, QT_TR_NOOP("Rotate Viewer Left"), "");
-  createViewerAction(V_RotateRight, QT_TR_NOOP("Rotate Viewer Right"), "");
+  createViewerAction(V_RotateLeft, QT_TR_NOOP("Rotate View Left"), "");
+  createViewerAction(V_RotateRight, QT_TR_NOOP("Rotate View Right"), "");
   createViewerAction(V_ShowHideFullScreen, QT_TR_NOOP("Show//Hide Full Screen"),
                      "Alt+F");
   CommandManager::instance()->setToggleTexts(V_ShowHideFullScreen,

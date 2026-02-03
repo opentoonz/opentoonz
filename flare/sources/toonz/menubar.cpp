@@ -1,5 +1,3 @@
-
-
 #include "menubar.h"
 
 // Tnz6 includes
@@ -988,8 +986,7 @@ QMenuBar *StackedMenuBar::createXsheetMenuBar() {
     addMenuItem(otherWindowsMenu, MI_OpenColorModel);
     addMenuItem(otherWindowsMenu, MI_OpenPalette);
     addMenuItem(otherWindowsMenu, MI_OpenFileBrowser2);
-    addMenuItem(otherWindowsMenu, MI_OpenStudioPalette);
-    addMenuItem(otherWindowsMenu, MI_OpenStyleControl);
+    addMenuItem(otherWindowsMenu, MI_OpenSchematic);
     addMenuItem(otherWindowsMenu, MI_OpenTasks);
     addMenuItem(otherWindowsMenu, MI_OpenToolbar);
     addMenuItem(otherWindowsMenu, MI_OpenToolOptionBar);
@@ -1134,6 +1131,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   { 
     addMenuItem(importMenu, MI_ImportMagpieFile); 
     addMenuItem(importMenu, MI_ImportOCA);
+    addMenuItem(importMenu, MI_ImportFlashVector);
   }
   QMenu *exportMenu = fileMenu->addMenu(tr("Export"));
   {

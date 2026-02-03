@@ -60,3 +60,9 @@ Flare uses FFmpeg to import `.swf` files as raster frame sequences when
 FFmpeg supports the format on your system. Install FFmpeg and ensure it is
 available on your PATH (or configure it via Preferences) to enable SWF import
 capabilities.
+
+Flare also provides a Vector Flash import workflow that leverages third-party
+Flash decompilers (e.g., JPEXS). Use File → Import → Import Flash (Vector via
+External Decompiler)... to run a helper script that exports SVG/image sequences
+from Flash files for importing into Flare. See `doc/how_to_import_swf.md` for
+details.

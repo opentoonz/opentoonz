@@ -389,6 +389,7 @@ set(SOURCES
     xdtsio.cpp
     sxfio.cpp
     ocaio.cpp
+    flashimport.cpp
     xdtsimportpopup.cpp
     expressionreferencemanager.cpp
     tooloptionsshortcutinvoker.cpp
