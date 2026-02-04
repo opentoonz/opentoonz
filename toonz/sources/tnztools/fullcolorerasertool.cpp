@@ -150,9 +150,9 @@ public:
     TRasterImageP ri = getImage();
     if (!ri) return;
 
-    if (m_eraseType == RECTERASE)
-      TRect rect = TRasterImageUtils::eraseRect(ri, m_modifyArea);
-    else if (m_eraseType == FREEHANDERASE || m_eraseType == POLYLINEERASE) {
+    if (m_eraseType == RECTERASE) {
+      TRasterImageUtils::eraseRect(ri, m_modifyArea);
+    } else if (m_eraseType == FREEHANDERASE || m_eraseType == POLYLINEERASE) {
       TPoint pos;
 
       TRaster32P image =
@@ -298,7 +298,12 @@ public:
       , m_eraseStroke(nullptr)
       , m_strokeTemp(nullptr)
       , m_clickNumber(0)
-      , m_isSingleArc(false) {}
+      , m_isSingleArc(false)
+      , m_smooth(false)
+      , m_size(0)
+      , m_isEditing(false)
+      , m_color(TPixel32::Red) {}
+
   MultiArcPrimitive(TTool *tool, bool smooth = false)
       : m_tool(tool)
       , m_stroke(0)
@@ -306,7 +311,10 @@ public:
       , m_strokeTemp(0)
       , m_clickNumber(0)
       , m_isSingleArc(false)
-      , m_smooth(smooth) {}
+      , m_smooth(smooth)
+      , m_size(0)
+      , m_isEditing(false)
+      , m_color(TPixel32::Red) {}
 
   ~MultiArcPrimitive() { delete m_stroke; }
 
@@ -339,9 +347,6 @@ public:
     m_centralPoint = centralPoint;
     m_clickNumber  = clickNumber;
   }
-
-  // Only execute touchImage when clicking the first point of the multi arc
-  // bool canTouchImageOnPreLeftClick() override { return m_clickNumber == 0; }
 };
 
 //=============================================================================
@@ -767,10 +772,9 @@ void FullColorEraserTool::leftButtonDown(const TPointD &pos,
   TRectD invalidateRect;
   TRasterP ras = ri->getRaster();
   if (m_eraseType.getValue() == NORMALERASE) {
-    TDimension dim  = ras->getSize();
-    double opacity  = m_opacity.getValue() * 0.01;
-    double hardness = m_hardness.getValue() * 0.01;
-    m_workRaster    = TRaster32P(dim);
+    TDimension dim = ras->getSize();
+    double opacity = m_opacity.getValue() * 0.01;
+    m_workRaster   = TRaster32P(dim);
     m_workRaster->clear();
     m_backUpRas = ras->clone();
 
@@ -846,7 +850,6 @@ void FullColorEraserTool::leftButtonDrag(const TPointD &pos,
   if (!ri) return;
   if (m_eraseType.getValue() == NORMALERASE) {
     double thickness  = m_size.getValue();
-    TDimension size   = m_workRaster->getSize();
     TPointD rasCenter = ri->getRaster()->getCenterD();
     TThickPoint point(pos + rasCenter, thickness);
 
@@ -941,11 +944,9 @@ void FullColorEraserTool::leftButtonUp(const TPointD &pos,
     }
 
     m_workRaster->unlock();
-    double opacity  = m_opacity.getValue() * 0.01;
-    double hardness = m_hardness.getValue() * 0.01;
-
-    m_workRaster = TRaster32P();
-    m_backUpRas  = TRaster32P();
+    double opacity = m_opacity.getValue() * 0.01;
+    m_workRaster   = TRaster32P();
+    m_backUpRas    = TRaster32P();
 
     delete m_tileSaver;
     TTool::Application *app   = TTool::getApplication();
@@ -1068,7 +1069,7 @@ void FullColorEraserTool::leftButtonUp(const TPointD &pos,
           resetMulti();
           delete stroke;
         }
-      } else  // primo frame
+      } else  // first frame
       {
         m_firstStroke  = stroke;
         m_isXsheetCell = app->getCurrentFrame()->isEditingScene();
@@ -1090,7 +1091,8 @@ void FullColorEraserTool::leftButtonUp(const TPointD &pos,
   } else if (m_eraseType.getValue() == MULTIARCERASE) {
     TStroke *stroke;
     m_multiArcPrimitive.leftButtonUp(pos, e);
-    if (stroke = m_multiArcPrimitive.getEraseStroke()) {
+    stroke = m_multiArcPrimitive.getEraseStroke();
+    if (stroke) {
       TTool::Application *app = TTool::getApplication();
       if (m_multi.getValue())  // stroke multi
       {
@@ -1114,9 +1116,10 @@ void FullColorEraserTool::leftButtonUp(const TPointD &pos,
             } else
               app->getCurrentFrame()->setFid(m_veryFirstFrameId);
             resetMulti();
-            delete stroke;
+            // Don't delete stroke here because it belongs to
+            // m_multiArcPrimitive
           }
-        } else  // primo frame
+        } else  // first frame
         {
           m_firstStroke  = stroke;
           m_isXsheetCell = app->getCurrentFrame()->isEditingScene();
@@ -1151,7 +1154,7 @@ void FullColorEraserTool::leftButtonDoubleClick(const TPointD &pos,
 
   TRasterImageP ri(getImage(true));
   if (!ri) return;
-  TStroke *stroke;
+  TStroke *stroke         = nullptr;
   TTool::Application *app = TTool::getApplication();
   if (m_eraseType.getValue() == POLYLINEERASE) {
     if (m_polyline.size() <= 1) {
@@ -1173,11 +1176,16 @@ void FullColorEraserTool::leftButtonDoubleClick(const TPointD &pos,
     assert(stroke->getPoint(0) == stroke->getPoint(1));
   } else if (m_eraseType.getValue() == MULTIARCERASE) {
     m_multiArcPrimitive.leftButtonDoubleClick(pos, e);
-    if (stroke = m_multiArcPrimitive.getEraseStroke())
-      ;
-    else
-      return;
+    stroke = m_multiArcPrimitive.getEraseStroke();
+    if (!stroke) return;
   }
+
+  std::unique_ptr<TStroke> strokePtr;
+  if (m_eraseType.getValue() == POLYLINEERASE) {
+    strokePtr.reset(stroke);
+    stroke = strokePtr.get();
+  }
+
   if (m_multi.getValue())  // stroke multi
   {
     if (m_firstFrameSelected) {
@@ -1189,7 +1197,11 @@ void FullColorEraserTool::leftButtonDoubleClick(const TPointD &pos,
         delete m_firstStroke;
         m_firstStroke = 0;
         invalidate(invalidateRect.enlarge(2));
-        m_firstStroke  = stroke;
+        if (m_eraseType.getValue() == POLYLINEERASE) {
+          m_firstStroke = strokePtr.release();
+        } else {
+          m_firstStroke = stroke;
+        }
         invalidateRect = m_firstStroke->getBBox();
         invalidate(invalidateRect.enlarge(2));
         m_firstFrameId = getFrameId();
@@ -1200,11 +1212,14 @@ void FullColorEraserTool::leftButtonDoubleClick(const TPointD &pos,
         } else
           app->getCurrentFrame()->setFid(m_veryFirstFrameId);
         resetMulti();
-        delete stroke;
       }
-    } else  // primo frame
+    } else  // first frame
     {
-      m_firstStroke  = stroke;
+      if (m_eraseType.getValue() == POLYLINEERASE) {
+        m_firstStroke = strokePtr.release();
+      } else {
+        m_firstStroke = stroke;
+      }
       m_isXsheetCell = app->getCurrentFrame()->isEditingScene();
       m_currCell     = std::pair<int, int>(getColumnIndex(), getFrame());
       invalidate(m_firstStroke->getBBox().enlarge(2));
@@ -1361,10 +1376,11 @@ void FullColorEraserTool::update(const TRasterImageP &ri, TRectD selArea,
   tileSet->add(raster, TRasterImageUtils::convertWorldToRaster(selArea, ri));
   TUndo *undo;
 
-  undo       = new RectFullColorUndo(tileSet, selArea, TStroke(),
-                                     m_eraseType.getValue(), level.getPointer(),
-                                     m_invertOption.getValue(), frameId);
-  TRect rect = TRasterImageUtils::eraseRect(ri, selArea);
+  undo = new RectFullColorUndo(tileSet, selArea, TStroke(),
+                               m_eraseType.getValue(), level.getPointer(),
+                               m_invertOption.getValue(), frameId);
+
+  TRasterImageUtils::eraseRect(ri, selArea);
 
   TUndoManager::manager()->add(undo);
 }
@@ -1400,10 +1416,10 @@ void FullColorEraserTool::onImageChanged() {
       (m_selectingRect.isEmpty() && !m_firstStroke))
     resetMulti();
   else if (m_firstFrameId == getCurrentFid())
-    m_firstFrameSelected = false;  // nel caso sono passato allo stato 1 e torno
-                                   // all'immagine iniziale, torno allo stato
-                                   // iniziale
-  else {                           // cambio stato.
+    m_firstFrameSelected =
+        false;  // if I passed to state 1 and return to the
+                // initial image, I return to the initial state
+  else {        // state change.
     m_firstFrameSelected = true;
     if (m_eraseType.getValue() != FREEHANDERASE &&
         m_eraseType.getValue() != POLYLINEERASE &&
@@ -1529,7 +1545,6 @@ void FullColorEraserTool::doMultiEraser(const TImageP &img, double t,
                                         const TFrameId &fid,
                                         const TVectorImageP &firstImage,
                                         const TVectorImageP &lastImage) {
-  int styleId = TTool::getApplication()->getCurrentLevelStyleIndex();
   if (t == 0)
     eraseStroke(img, firstImage->getStroke(0), m_eraseType.getValue(),
                 m_invertOption.getValue(), /*m_multi.getValue(),*/ m_level,

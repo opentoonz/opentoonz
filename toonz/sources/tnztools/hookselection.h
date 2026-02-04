@@ -55,6 +55,9 @@ public:
   HooksData *clone() const override;
   void storeHookPositions(const std::vector<int> &ids);
   void restoreHookPositions() const;
+
+  // Public method to check if there are stored hook positions
+  bool hasStoredHooks() const { return !m_hookPositions.empty(); }
 };
 
 //=============================================================================

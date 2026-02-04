@@ -33,11 +33,11 @@
 #include <QGuiApplication>
 #endif
 
-using namespace std;
-using namespace TCli;
+// Add memory header for smart pointers
+#include <memory>
 
-typedef ArgumentT<TFilePath> FilePathArgument;
-typedef QualifierT<TFilePath> FilePathQualifier;
+using TCli::ArgumentT;
+using TCli::QualifierT;
 
 #define RENDER_LICENSE_NOT_FOUND 888
 
@@ -48,22 +48,29 @@ namespace {
 
 //--------------------------------------------------------------------
 
+/**
+ * Check if file already exists and prompt user for replacement
+ * @param fp File path to check
+ */
 void doesExist(const TFilePath &fp) {
-  string msg;
+  std::string msg;
   TFilePath path =
       fp.getParentDir() + (fp.getName() + "." + fp.getDottedType());
+
   if (TSystem::doesExistFileOrLevel(fp) ||
       TSystem::doesExistFileOrLevel(path)) {
     msg = "File " + fp.getLevelName() + " already exists:";
-    cout << endl << msg << endl;
+    std::cout << std::endl << msg << std::endl;
+
     char answer = ' ';
     while (answer != 'Y' && answer != 'N' && answer != 'y' && answer != 'n') {
       msg = "do you want to replace it? [Y/N] ";
-      cout << msg;
-      cin >> answer;
+      std::cout << msg;
+      std::cin >> answer;
+
       if (answer == 'N' || answer == 'n') {
         msg = "Conversion aborted.";
-        cout << endl << msg << endl;
+        std::cout << std::endl << msg << std::endl;
         exit(1);
       }
     }
@@ -72,286 +79,375 @@ void doesExist(const TFilePath &fp) {
 
 //--------------------------------------------------------------------
 
-// Ritorna un vettore contenete i soli TFrameId corrispondenti al range inserito
-// dall'utente
-vector<TFrameId> getFrameIds(const RangeQualifier &range,
-                             const TLevelP &level) {
-  string msg;
+/**
+ * Get frame IDs based on user specified range
+ * @param range Range qualifier from user input
+ * @param level Input level
+ * @return Vector of frame IDs to process
+ */
+std::vector<TFrameId> getFrameIds(const TCli::RangeQualifier &range,
+                                  const TLevelP &level) {
+  std::string msg;
   TFrameId r0, r1, lastFrame;
   TLevel::Iterator begin = level->begin();
   TLevel::Iterator end   = level->end();
   end--;
   lastFrame = end->first;
-  vector<TFrameId> frames;
+
+  std::vector<TFrameId> frames;
+
   if (range.isSelected()) {
     r0 = TFrameId(range.getFrom());
     r1 = TFrameId(range.getTo());
     if (r0 > r1) {
-      TFrameId app = r0;
-      r0           = r1;
-      r1           = app;
+      std::swap(r0, r1);
     }
   } else {
     r0 = begin->first;
     r1 = end->first;
   }
-  // cerco il primo TFrameId
+
+  // Find first TFrameId
   TLevel::Iterator it = begin;
-  if (r0 <= end->first)
+  if (r0 <= end->first) {
     while (it->first < r0) ++it;
+  }
+
+  // Fill vector up to last needed TFrameId
   while (it != level->end() && r1 >= it->first) {
-    // Riempio il vettore fino all'ultimo TFrameId che mi serve
     frames.push_back(it->first);
     ++it;
   }
+
   return frames;
 }
 
 //--------------------------------------------------------------------
 
+/**
+ * Convert from colored-mask (CM) format
+ * @param lr Level reader
+ * @param plt Palette
+ * @param lw Level writer
+ * @param frames Frame IDs to convert
+ * @param aff Affine transformation
+ * @param resType Resample filter type
+ */
 void convertFromCM(const TLevelReaderP &lr, const TPaletteP &plt,
-                   const TLevelWriterP &lw, const vector<TFrameId> &frames,
+                   const TLevelWriterP &lw, const std::vector<TFrameId> &frames,
                    const TAffine &aff,
                    const TRop::ResampleFilterType &resType) {
-  TDimension dim(
-      0,
-      0);  // Serve per controllare che non ci siano frame di diverse dimensioni
-  for (int i = 0; i < (int)frames.size(); i++) {
+  TDimension dim(0, 0);  // Track dimensions to ensure consistent frame sizes
+
+  for (size_t i = 0; i < frames.size(); i++) {
     try {
       TImageReaderP ir = lr->getFrameReader(frames[i]);
       TImageP img      = ir->load();
       TToonzImageP toonzImage(img);
+
+      if (!toonzImage) continue;
+
       double xdpi, ydpi;
       toonzImage->getDpi(xdpi, ydpi);
-      assert(toonzImage);
-      if (toonzImage) {
-        TRasterCM32P rasCMImage = toonzImage->getRaster();
-        if (i == 0)
-          dim = rasCMImage->getSize();
-        else if (dim != rasCMImage->getSize()) {
-          // dimensioni diverse dei frame
-          string msg = "Cannot continue to convert: not valid level!";
-          cout << msg << endl;
-          exit(1);
-        }
-        TRaster32P ras(
-            convert(aff * convert(rasCMImage->getBounds())).getSize());
-        if (!aff.isIdentity())
-          TRop::resample(ras, rasCMImage, plt, aff, resType);
-        else
-          TRop::convert(ras, rasCMImage, plt);
-        TRasterImageP rasImage(ras);
-        rasImage->setDpi(xdpi, ydpi);
-        TImageWriterP iw = lw->getFrameWriter(frames[i]);
-        iw->save(rasImage);
+      TRasterCM32P rasCMImage = toonzImage->getRaster();
+
+      // Check frame dimensions consistency
+      if (i == 0) {
+        dim = rasCMImage->getSize();
+      } else if (dim != rasCMImage->getSize()) {
+        std::string msg = "Cannot continue to convert: not valid level!";
+        std::cout << msg << std::endl;
+        exit(1);
       }
+
+      TRaster32P ras(convert(aff * convert(rasCMImage->getBounds())).getSize());
+
+      if (!aff.isIdentity()) {
+        TRop::resample(ras, rasCMImage, plt, aff, resType);
+      } else {
+        TRop::convert(ras, rasCMImage, plt);
+      }
+
+      TRasterImageP rasImage(ras);
+      rasImage->setDpi(xdpi, ydpi);
+      TImageWriterP iw = lw->getFrameWriter(frames[i]);
+      iw->save(rasImage);
+
     } catch (...) {
-      string msg = "Frame " + std::to_string(frames[i].getNumber()) +
-                   ": conversion failed!";
-      cout << msg << endl;
+      std::string msg = "Frame " + std::to_string(frames[i].getNumber()) +
+                        ": conversion failed!";
+      std::cout << msg << std::endl;
     }
   }
 }
 
 //--------------------------------------------------------------------
 
+/**
+ * Convert from vector image (VI) format
+ * @param lr Level reader
+ * @param plt Palette
+ * @param lw Level writer
+ * @param frames Frame IDs to convert
+ * @param resType Resample filter type
+ * @param width Output width
+ */
 void convertFromVI(const TLevelReaderP &lr, const TPaletteP &plt,
-                   const TLevelWriterP &lw, const vector<TFrameId> &frames,
+                   const TLevelWriterP &lw, const std::vector<TFrameId> &frames,
                    const TRop::ResampleFilterType &resType, int width) {
-  int i;
-  vector<TVectorImageP> images;
+  std::vector<TVectorImageP> images;
   TRectD maxBbox;
   TAffine aff;
-  for (i = 0; i < (int)frames.size();
-       i++) {  // trovo la bbox che possa contenere tutte le immagini
+
+  // Find bounding box that contains all images
+  for (size_t i = 0; i < frames.size(); i++) {
     try {
       TImageReaderP ir  = lr->getFrameReader(frames[i]);
       TVectorImageP img = ir->load();
       images.push_back(img);
       maxBbox += img->getBBox();
     } catch (...) {
-      string msg = "Frame " + std::to_string(frames[i].getNumber()) +
-                   ": conversion failed!";
-      cout << msg << endl;
+      std::string msg = "Frame " + std::to_string(frames[i].getNumber()) +
+                        ": conversion failed!";
+      std::cout << msg << std::endl;
     }
   }
+
   maxBbox = maxBbox.enlarge(2);
-  if (width)  // calcolo l'affine
-    aff = TScale((double)width / maxBbox.getLx());
+
+  // Calculate affine transformation for width
+  if (width) {
+    aff = TScale(static_cast<double>(width) / maxBbox.getLx());
+  }
+
   maxBbox = aff * maxBbox;
 
-  for (i = 0; i < (int)images.size(); i++) {
+  for (size_t i = 0; i < images.size(); i++) {
     try {
       TVectorImageP vectorImage = images[i];
-      assert(vectorImage);
-      if (vectorImage) {
-        // faccio il render dell'immagine
-        vectorImage->transform(aff, true);
-        const TVectorRenderData rd(TTranslation(-maxBbox.getP00()), TRect(),
-                                   plt.getPointer(), 0, true, true);
-        TOfflineGL *glContext = new TOfflineGL(convert(maxBbox).getSize());
-        glContext->clear(TPixel32::Transparent);
-        glContext->draw(vectorImage, rd);
-        TRaster32P rasImage = (glContext->getRaster());
-        TImageWriterP iw    = lw->getFrameWriter(frames[i]);
-        iw->save(TRasterImageP(rasImage));
-      }
+      if (!vectorImage) continue;
+
+      // Apply transformation and render image
+      vectorImage->transform(aff, true);
+      const TVectorRenderData rd(TTranslation(-maxBbox.getP00()), TRect(),
+                                 plt.getPointer(), 0, true, true);
+
+      std::unique_ptr<TOfflineGL> glContext(
+          new TOfflineGL(convert(maxBbox).getSize()));
+      glContext->clear(TPixel32::Transparent);
+      glContext->draw(vectorImage, rd);
+
+      TRaster32P rasImage = glContext->getRaster();
+      TImageWriterP iw    = lw->getFrameWriter(frames[i]);
+      iw->save(TRasterImageP(rasImage));
+
     } catch (...) {
-      string msg = "Frame " + frames[i].expand() + ": conversion failed!";
-      cout << msg << endl;
+      std::string msg = "Frame " + frames[i].expand() + ": conversion failed!";
+      std::cout << msg << std::endl;
     }
   }
 }
 
 //-----------------------------------------------------------------------
 
+/**
+ * Convert from full raster format
+ * @param lr Level reader
+ * @param lw Level writer
+ * @param frames Frame IDs to convert
+ * @param aff Affine transformation
+ * @param resType Resample filter type
+ */
 void convertFromFullRaster(const TLevelReaderP &lr, const TLevelWriterP &lw,
-                           const vector<TFrameId> &frames, const TAffine &aff,
+                           const std::vector<TFrameId> &frames,
+                           const TAffine &aff,
                            const TRop::ResampleFilterType &resType) {
-  for (int i = 0; i < (int)frames.size(); i++) {
+  for (size_t i = 0; i < frames.size(); i++) {
     try {
       TImageReaderP ir  = lr->getFrameReader(frames[i]);
       TRasterImageP img = ir->load();
+
       TRaster32P raster(convert(aff * img->getBBox()).getSize());
-      if (!aff.isIdentity())
+
+      if (!aff.isIdentity()) {
         TRop::resample(raster, img->getRaster(), aff, resType);
-      else {
-        if ((TRaster32P)img->getRaster())
-          raster = img->getRaster();
-        else
+      } else {
+        if (TRaster32P ras32 = img->getRaster()) {
+          raster = ras32;
+        } else {
           TRop::convert(raster, img->getRaster());
+        }
       }
+
       TImageWriterP iw = lw->getFrameWriter(frames[i]);
       iw->save(TRasterImageP(raster));
+
     } catch (...) {
-      string msg = "Frame " + frames[i].expand() + ": conversion failed!";
-      cout << msg << endl;
+      std::string msg = "Frame " + frames[i].expand() + ": conversion failed!";
+      std::cout << msg << std::endl;
     }
   }
 }
 
 //-----------------------------------------------------------------------
 
+/**
+ * Convert from full raster to colored-mask format
+ * @param lr Level reader
+ * @param lw Level writer
+ * @param frames Frame IDs to convert
+ * @param aff Affine transformation
+ * @param resType Resample filter type
+ */
 void convertFromFullRasterToCm(const TLevelReaderP &lr, const TLevelWriterP &lw,
-                               const vector<TFrameId> &frames,
+                               const std::vector<TFrameId> &frames,
                                const TAffine &aff,
                                const TRop::ResampleFilterType &resType) {
-  TPalette *plt = new TPalette();
+  std::unique_ptr<TPalette> plt(new TPalette());
 
-  for (int i = 0; i < (int)frames.size(); i++) {
+  for (size_t i = 0; i < frames.size(); i++) {
     try {
       TImageReaderP ir  = lr->getFrameReader(frames[i]);
       TRasterImageP img = ir->load();
+
       double dpix, dpiy;
       img->getDpi(dpix, dpiy);
-      if (dpix == 0 && dpiy == 0)
+      if (dpix == 0 && dpiy == 0) {
         dpix = dpiy = Preferences::instance()->getDefLevelDpi();
+      }
+
       TRasterCM32P raster(convert(aff * img->getBBox()).getSize());
 
       if (!aff.isIdentity()) {
         TRaster32P raux(raster->getSize());
         TRop::resample(raux, img->getRaster(), aff, resType);
         TRop::convert(raster, raux);
-      } else
+      } else {
         TRop::convert(raster, img->getRaster());
+      }
 
       TImageWriterP iw = lw->getFrameWriter(frames[i]);
       TToonzImageP outimg(raster, raster->getBounds());
       outimg->setDpi(dpix, dpiy);
-      outimg->setPalette(plt);
+      outimg->setPalette(plt.get());
       iw->save(outimg);
 
     } catch (...) {
-      string msg = "Frame " + frames[i].expand() + ": conversion failed!";
-      cout << msg << endl;
+      std::string msg = "Frame " + frames[i].expand() + ": conversion failed!";
+      std::cout << msg << std::endl;
     }
   }
 
+  // Save palette to file
   TFilePath pltPath = lw->getFilePath().withNoFrame().withType("tpl");
   if (TSystem::touchParentDir(pltPath)) {
-    if (TSystem::doesExistFileOrLevel(pltPath))
+    if (TSystem::doesExistFileOrLevel(pltPath)) {
       TSystem::removeFileOrLevel(pltPath);
-    TOStream os(pltPath);
-    os << plt;
+    }
+
+    try {
+      TOStream os(pltPath);
+      os << plt.get();
+    } catch (...) {
+      std::cout << "Warning: Could not save palette file" << std::endl;
+    }
   }
 }
+
 //-----------------------------------------------------------------------
 
+/**
+ * Main conversion function
+ * @param source Source file path
+ * @param dest Destination file path
+ * @param range Frame range qualifier
+ * @param width Width qualifier
+ * @param prop Output properties
+ * @param resQuality Resample quality
+ */
 void convert(const TFilePath &source, const TFilePath &dest,
-             const RangeQualifier &range, const IntQualifier &width,
+             const TCli::RangeQualifier &range, const TCli::IntQualifier &width,
              TPropertyGroup *prop,
              const TRenderSettings::ResampleQuality &resQuality) {
-  string msg;
-  // Carico le informazione del livello
+  std::string msg;
+
+  // Load level information
   TLevelReaderP lr(source);
   TLevelP level = lr->loadInfo();
 
-  // Trovo i TFrameId corrispondenti al range
-  vector<TFrameId> frames = getFrameIds(range, level);
+  // Get frame IDs based on range
+  std::vector<TFrameId> frames = getFrameIds(range, level);
 
   doesExist(dest);
 
   msg = "Level loaded";
-  cout << msg << endl;
+  std::cout << msg << std::endl;
   msg = "Conversion in progress: wait please...";
-  cout << msg << endl;
+  std::cout << msg << std::endl;
 
   TAffine aff;
   if (width.isSelected()) {
-    // calcolo un affine per fare la resample
+    // Calculate affine for resampling
     int imgLx = lr->getImageInfo()->m_lx;
-    aff       = TScale((double)width / (double)imgLx);
+    aff       = TScale(static_cast<double>(width.getValue()) /
+                       static_cast<double>(imgLx));
   }
 
-  // setto il FilterResempleType giusto
-  TRop::ResampleFilterType resType;
-  if (resQuality == TRenderSettings::StandardResampleQuality)
-    resType = TRop::Triangle;
-  else if (resQuality == TRenderSettings::ImprovedResampleQuality)
-    resType = TRop::Hann2;
-  else if (resQuality == TRenderSettings::HighResampleQuality)
-    resType = TRop::Hamming3;
-  else if (resQuality == TRenderSettings::Triangle_FilterResampleQuality)
-    resType = TRop::Triangle;
-  else if (resQuality == TRenderSettings::Mitchell_FilterResampleQuality)
-    resType = TRop::Mitchell;
-  else if (resQuality == TRenderSettings::Cubic5_FilterResampleQuality)
-    resType = TRop::Cubic5;
-  else if (resQuality == TRenderSettings::Cubic75_FilterResampleQuality)
-    resType = TRop::Cubic75;
-  else if (resQuality == TRenderSettings::Cubic1_FilterResampleQuality)
-    resType = TRop::Cubic1;
-  else if (resQuality == TRenderSettings::Hann2_FilterResampleQuality)
-    resType = TRop::Hann2;
-  else if (resQuality == TRenderSettings::Hann3_FilterResampleQuality)
-    resType = TRop::Hann3;
-  else if (resQuality == TRenderSettings::Hamming2_FilterResampleQuality)
-    resType = TRop::Hamming2;
-  else if (resQuality == TRenderSettings::Hamming3_FilterResampleQuality)
-    resType = TRop::Hamming3;
-  else if (resQuality == TRenderSettings::Lanczos2_FilterResampleQuality)
-    resType = TRop::Lanczos2;
-  else if (resQuality == TRenderSettings::Lanczos3_FilterResampleQuality)
-    resType = TRop::Lanczos3;
-  else if (resQuality == TRenderSettings::Gauss_FilterResampleQuality)
-    resType = TRop::Gauss;
-  else if (resQuality == TRenderSettings::ClosestPixel_FilterResampleQuality)
-    resType = TRop::ClosestPixel;
-  else if (resQuality == TRenderSettings::Bilinear_FilterResampleQuality)
-    resType = TRop::Bilinear;
+  // Set resample filter type based on quality
+  TRop::ResampleFilterType resType = TRop::Triangle;  // Default
 
-  string ext = source.getType();
+  if (resQuality == TRenderSettings::StandardResampleQuality) {
+    resType = TRop::Triangle;
+  } else if (resQuality == TRenderSettings::ImprovedResampleQuality) {
+    resType = TRop::Hann2;
+  } else if (resQuality == TRenderSettings::HighResampleQuality) {
+    resType = TRop::Hamming3;
+  } else if (resQuality == TRenderSettings::Triangle_FilterResampleQuality) {
+    resType = TRop::Triangle;
+  } else if (resQuality == TRenderSettings::Mitchell_FilterResampleQuality) {
+    resType = TRop::Mitchell;
+  } else if (resQuality == TRenderSettings::Cubic5_FilterResampleQuality) {
+    resType = TRop::Cubic5;
+  } else if (resQuality == TRenderSettings::Cubic75_FilterResampleQuality) {
+    resType = TRop::Cubic75;
+  } else if (resQuality == TRenderSettings::Cubic1_FilterResampleQuality) {
+    resType = TRop::Cubic1;
+  } else if (resQuality == TRenderSettings::Hann2_FilterResampleQuality) {
+    resType = TRop::Hann2;
+  } else if (resQuality == TRenderSettings::Hann3_FilterResampleQuality) {
+    resType = TRop::Hann3;
+  } else if (resQuality == TRenderSettings::Hamming2_FilterResampleQuality) {
+    resType = TRop::Hamming2;
+  } else if (resQuality == TRenderSettings::Hamming3_FilterResampleQuality) {
+    resType = TRop::Hamming3;
+  } else if (resQuality == TRenderSettings::Lanczos2_FilterResampleQuality) {
+    resType = TRop::Lanczos2;
+  } else if (resQuality == TRenderSettings::Lanczos3_FilterResampleQuality) {
+    resType = TRop::Lanczos3;
+  } else if (resQuality == TRenderSettings::Gauss_FilterResampleQuality) {
+    resType = TRop::Gauss;
+  } else if (resQuality ==
+             TRenderSettings::ClosestPixel_FilterResampleQuality) {
+    resType = TRop::ClosestPixel;
+  } else if (resQuality == TRenderSettings::Bilinear_FilterResampleQuality) {
+    resType = TRop::Bilinear;
+  }
+
+  std::string ext = source.getType();
   TLevelWriterP lw(dest, prop);
+
   if (ext != "tlv" && ext != "pli") {
-    if (dest.getType() == "tlv")
+    if (dest.getType() == "tlv") {
       convertFromFullRasterToCm(lr, lw, frames, aff, resType);
-    else
+    } else {
       convertFromFullRaster(lr, lw, frames, aff, resType);
-  } else if (ext == "tlv")  // ToonzImage
+    }
+  } else if (ext == "tlv") {  // ToonzImage
     convertFromCM(lr, level->getPalette(), lw, frames, aff, resType);
-  else if (ext == "pli")  // VectorImage
+  } else if (ext == "pli") {  // VectorImage
     convertFromVI(lr, level->getPalette(), lw, frames, resType,
                   width.getValue());
+  }
 }
 
 }  // namespace
@@ -366,103 +462,125 @@ int main(int argc, char *argv[]) {
   TEnv::setRootVarName(rootVarName);
   TEnv::setSystemVarPrefix(systemVarPrefix);
   TEnv::setApplicationFileName(argv[0]);
-  TFilePath fp = TEnv::getStuffDir();
 
-  string msg;
-  // Inizializzo i qualificatori
+  std::string msg;
+
+  // Initialize qualifiers
   TCli::FilePathArgument srcName("srcName", "Source file");
   TCli::FilePathArgument dstName("dstName", "Target file");
-  FilePathQualifier tnzName("-s sceneName", "Scene file");
-  RangeQualifier range;
-  IntQualifier width("-w width", "Image width");
+  TCli::QualifierT<TFilePath> tnzName("-s sceneName", "Scene file");
+  TCli::RangeQualifier range;
+  TCli::IntQualifier width("-w width", "Image width");
 
-  Usage usage(argv[0]);
+  TCli::Usage usage(argv[0]);
   usage.add(srcName + dstName + width + tnzName + range);
-  if (!usage.parse(argc, argv)) exit(1);
+
+  if (!usage.parse(argc, argv)) {
+    exit(1);
+  }
 
   try {
     Tiio::defineStd();
-    // TPluginManager::instance()->loadStandardPlugins();
-
     TSystem::hasMainLoop(false);
-    TPropertyGroup *prop = 0;
+
+    TPropertyGroup *prop = nullptr;
     initImageIo();
+
     TRenderSettings::ResampleQuality resQuality =
         TRenderSettings::StandardResampleQuality;
 
     TFilePath dstFilePath = dstName.getValue();
     TFilePath srcFilePath = srcName.getValue();
+
     if (!TSystem::doesExistFileOrLevel(srcFilePath)) {
       msg = srcFilePath.getLevelName() + " level doesn't exist.";
-      cout << endl << msg << endl;
+      std::cout << std::endl << msg << std::endl;
       exit(1);
     }
-    msg = "Loading " + srcFilePath.getLevelName();
-    cout << endl << msg << endl;
 
-    string ext = dstFilePath.getType();
-    // controllo che ci sia un'estensione
-    if (ext == "") {
-      ext = ::to_string(dstFilePath);
-      if (ext == "") {
+    msg = "Loading " + srcFilePath.getLevelName();
+    std::cout << std::endl << msg << std::endl;
+
+    std::string ext = dstFilePath.getType();
+
+    // Check for valid extension
+    if (ext.empty()) {
+      ext = dstFilePath.getName();
+      if (ext.empty()) {
         msg = "Invalid extension!";
-        cout << msg << endl;
+        std::cout << msg << std::endl;
         exit(1);
       }
     }
-    if (dstFilePath.getParentDir()
-            .isEmpty())  // ho specificato solo l'estensione
+
+    // Handle destination path
+    if (dstFilePath.getParentDir().isEmpty()) {
       dstFilePath =
           srcFilePath.getParentDir() + (srcFilePath.getName() + "." + ext);
+    }
+
+    // Scene-based conversion
+    std::unique_ptr<ToonzScene> scenePtr;
     if (tnzName.isSelected()) {
-      // Devo prendermi i settaggi degli "output setting" dalla scena!
       TFilePath tnzFilePath = tnzName.getValue();
       if (tnzFilePath.getType() != "tnz") {
         msg = "Invalid scene file: conversion terminated!";
-        cout << msg << endl;
+        std::cout << msg << std::endl;
         exit(1);
       }
 
-      if (!TSystem::doesExistFileOrLevel(tnzFilePath)) return -1;
-      ToonzScene *scene = new ToonzScene();
-      try {
-        scene->loadTnzFile(tnzFilePath);
-      } catch (...) {
-        string msg;
-        msg = "There were problems loading the scene " +
-              ::to_string(srcFilePath) + ".\n Some files may be missing.";
-        cout << msg << endl;
-        // return false;
+      if (!TSystem::doesExistFileOrLevel(tnzFilePath)) {
+        return -1;
       }
 
-      if (scene) {
-        resQuality = scene->getProperties()
+      scenePtr = std::make_unique<ToonzScene>();
+      try {
+        scenePtr->loadTnzFile(tnzFilePath);
+      } catch (...) {
+        msg = "There were problems loading the scene " + srcFilePath.getName() +
+              ".\n Some files may be missing.";
+        std::cout << msg << std::endl;
+      }
+
+      if (scenePtr) {
+        resQuality = scenePtr->getProperties()
                          ->getOutputProperties()
                          ->getRenderSettings()
                          .m_quality;
-        prop = scene->getProperties()
+        prop = scenePtr->getProperties()
                    ->getOutputProperties()
                    ->getFileFormatProperties(ext);
       } else {
         msg = "Invalid scene file: conversion terminated!";
-        cout << msg << endl;
+        std::cout << msg << std::endl;
         exit(1);
       }
     }
+
+    // Perform conversion based on format
     if (ext != "3gp" && ext != "pli") {
-      // assert(ext!="3gp" && ext!="pli" && ext!="tlv");
       convert(srcFilePath, dstFilePath, range, width, prop, resQuality);
     } else {
       msg = "Cannot convert to ." + ext + " format.";
-      cout << msg << endl;
+      std::cout << msg << std::endl;
       exit(1);
     }
+
   } catch (TException &e) {
     msg = "Untrapped exception: " + ::to_string(e.getMessage());
-    cout << msg << endl;
+    std::cout << msg << std::endl;
+    return -1;
+  } catch (std::exception &e) {
+    msg = "Standard exception: " + std::string(e.what());
+    std::cout << msg << std::endl;
+    return -1;
+  } catch (...) {
+    msg = "Unknown exception occurred!";
+    std::cout << msg << std::endl;
     return -1;
   }
+
   msg = "Conversion terminated!";
-  cout << endl << msg << endl;
+  std::cout << std::endl << msg << std::endl;
   return 0;
 }
