@@ -1,4 +1,5 @@
 
+
 #include "filltool.h"
 
 #include "toonz/tframehandle.h"
@@ -198,7 +199,7 @@ public:
     if (!app) return;
 
     TVectorImageP img = m_level->getFrame(m_frameId, true);
-    assert(!!img);
+    assert(img);
     if (!img) return;
     if (m_regionFillInformation) {
       for (UINT i = 0; i < m_regionFillInformation->size(); i++) {
@@ -350,17 +351,8 @@ class RasterFillUndo final : public TRasterUndo {
   int m_column, m_row;
 
 public:
-  /*RasterFillUndo(TTileSetCM32 *tileSet, TPoint fillPoint,
-                                                           int paintId, int
-     fillDepth,
-                                                           std::wstring
-     fillType, bool isSegment,
-                                                           bool selective, bool
-     isShiftFill,
-                                                           TXshSimpleLevel* sl,
-     const TFrameId& fid)*/
   ~RasterFillUndo() {
-    if (m_tileSet) delete m_tileSet;
+    //   if (m_tileSet) delete m_tileSet;
   }
   RasterFillUndo(TTileSetCM32 *tileSet, const FillParameters &params,
                  TXshSimpleLevel *sl, const TFrameId &fid, bool saveboxOnly,
@@ -643,7 +635,7 @@ public:
     if (!app) return;
     TVectorImageP img = m_level->getFrame(m_frameId, true);
     ;
-    assert(!!img);
+    assert(img);
     if (!img) return;
     if (m_regionFillInformation) {
       for (UINT i = 0; i < m_regionFillInformation->size(); i++) {
@@ -853,8 +845,7 @@ void fillAreaWithUndo(const TImageP &img, const TRaster32P &ref,
                       bool fillAllautoPaintLines) {
   TRectD selArea = stroke ? stroke->getBBox().enlarge(1) : area;
   if (TToonzImageP ti = img) {
-    // allargo di 1 la savebox, perche cosi' il rectfill di tutta l'immagine fa
-    // una sola fillata
+    // Expand savebox by 1 so rectfill of entire image does a single fill
     TRasterCM32P ras;
     ras = ti->getRaster();
 
@@ -863,14 +854,14 @@ void fillAreaWithUndo(const TImageP &img, const TRaster32P &ref,
     TRect rasFillArea  = rasStrokeBox * rasBounds;
     if (rasFillArea.isEmpty()) return;
 
-    /*-- tileSetでFill範囲のRectをUndoに格納しておく --*/
+    /*-- Store fill area Rect in undo using tileSet --*/
     TTileSetCM32 *rasTileSet = new TTileSetCM32(ras->getSize());
     rasTileSet->add(ras, rasFillArea);
 
     // Don't use ti to get palette
     TPalette *plt = sl->getPalette();
 
-    // !autopaintLines will temporary disable autopaint line feature
+    // !autopaintLines temporarily disables autopaint line feature
     if ((plt && !hasAutoInks(plt)) || !autopaintLines) plt = 0;
 
     TPoint offs(0, 0);
@@ -913,8 +904,7 @@ void fillAreaWithUndo(const TImageP &img, const TRaster32P &ref,
           rasTileSet, stroke, rasSaveBox, auxFillArea, cs, sl, colorType,
           onlyUnfilled, fid, ref.getPointer(), plt, fillAllautoPaintLines));
 
-      // Restore original position because the stroke might be used
-      // for calculating inbetween frames
+      // Restore original position for inbetween frame calculations
       stroke->transform(TTranslation(-total));
     }
 
@@ -987,8 +977,7 @@ void drawReferImage(TRaster32P &ras, TXsheet *xsh, int col, int row,
         xsh->getStageObject(TStageObjectId::ColumnId(colIndex));
     TAffine aff = pegbar->getPlacement(row);
 
-    // The dpi might not be stored in vector level
-    // And the dpi of vector level should always be standardDpi
+    // Vector level dpi should always be standardDpi
     TPointD dpi = sl->getType() == PLI_XSHLEVEL
                       ? TPointD(Stage::standardDpi, Stage::standardDpi)
                       : sl->getDpi();
@@ -1095,7 +1084,7 @@ void doRefFill(const TImageP &img, const TRaster32P &refImg, const TPointD &pos,
     TDimension imageSize = ti->getSize();
     TPointD p(imageSize.lx % 2 ? 0.0 : 0.5, imageSize.ly % 2 ? 0.0 : 0.5);
 
-    /*-- params.m_p = convert(pos-p)では、マイナス座標でずれが生じる --*/
+    /*-- Fix for negative coordinate offset --*/
     TPointD tmp_p = pos - p;
     params.m_p = TPoint((int)floor(tmp_p.x + 0.5), (int)floor(tmp_p.y + 0.5));
 
@@ -1109,7 +1098,7 @@ void doRefFill(const TImageP &img, const TRaster32P &refImg, const TPointD &pos,
       return;
     }
 
-    // !autoPaintLines will temporary disable autopaint line feature
+    // !autoPaintLines temporarily disables autopaint line feature
     if (plt && hasAutoInks(plt) && autopaintLines) params.m_palette = plt;
     if (params.m_fillType == ALL || params.m_fillType == AREAS) {
       fill(ras, params, &tileSaver, refImg);
@@ -1137,7 +1126,7 @@ void doRefFill(const TImageP &img, const TRaster32P &refImg, const TPointD &pos,
           Preferences::instance()->getFillOnlySavebox(), refImg.getPointer()));
     }
 
-    // al posto di updateFrame:
+    // Instead of updateFrame:
 
     TXshLevel *xl = app->getCurrentLevel()->getLevel();
     if (!xl) return;
@@ -1150,8 +1139,6 @@ void doRefFill(const TImageP &img, const TRaster32P &refImg, const TPointD &pos,
   } else if (TVectorImageP vi = TImageP(img)) {
     int oldStyleId;
     QMutexLocker lock(vi->getMutex());
-    /*if(params.m_fillType==ALL || params.m_fillType==AREAS)
-vi->computeRegion(pos, params.m_styleId);*/
 
     if ((oldStyleId = vectorFill(vi, params.m_fillType, pos, params.m_styleId,
                                  params.m_emptyOnly)) != -1)
@@ -1205,7 +1192,7 @@ public:
 
 //=============================================================================
 // SequencePainter
-// da spostare in toolutils?
+// To be moved to toolutils?
 //-----------------------------------------------------------------------------
 
 class SequencePainter {
@@ -1424,7 +1411,8 @@ AreaFillTool::AreaFillTool(TTool *parent)
     , m_mousePosition()
     , m_onion(false)
     , m_isLeftButtonPressed(false)
-    , m_autopaintLines(true) {}
+    , m_autopaintLines(true)
+    , m_bckStyleId(0) {}
 
 void AreaFillTool::draw() {
   m_thick = m_parent->getPixelSize() / 2.0;
@@ -1475,7 +1463,7 @@ int AreaFillTool::pick(const TImageP &image, const TPointD &pos,
     scale2 = aff.det();
   }
   TPointD pickPos = pos;
-  // in case that the column is animated in scene-editing mode
+  // Adjust for animated columns in scene-editing mode
   if (frame > 0) {
     TPointD dpiScale = viewer->getDpiScale();
     pickPos.x *= dpiScale.x;
@@ -1485,7 +1473,7 @@ int AreaFillTool::pick(const TImageP &image, const TPointD &pos,
     pickPos.x /= dpiScale.x;
     pickPos.y /= dpiScale.y;
   }
-  // thin stroke can be picked with 10 pixel range
+  // Thin stroke pick with 10 pixel range
   return picker.pickStyleId(pickPos, 10.0, scale2, mode);
 }
 
@@ -1531,10 +1519,8 @@ void AreaFillTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e,
     m_selectingRect.x1 = pos.x + 1;
     m_selectingRect.y1 = pos.y + 1;
   } else if (m_type == FREEHAND || m_type == POLYLINE || m_type == FREEPICK) {
-    int col  = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
-    m_isPath = TTool::getApplication()
-                   ->getCurrentObject()
-                   ->isSpline();  // getApplication()->isEditingSpline();
+    int col   = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
+    m_isPath  = TTool::getApplication()->getCurrentObject()->isSpline();
     m_enabled = col >= 0 || m_isPath;
 
     if (!m_enabled) return;
@@ -1559,10 +1545,10 @@ void AreaFillTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e,
   m_isLeftButtonPressed = true;
 }
 
-/*-- PolyLineFillを閉じる時に呼ばれる --*/
+/*-- Called when closing PolyLineFill --*/
 void AreaFillTool::leftButtonDoubleClick(const TPointD &pos,
                                          const TMouseEvent &e) {
-  TStroke *stroke;
+  TStroke *stroke         = nullptr;  // Initialized as nullptr
   FillTool *fillTool      = (FillTool *)m_parent;
   auto refImgTable        = fillTool->getRefImgTable();
   auto slFidsPairs        = fillTool->getSlFidsPairs();
@@ -1578,6 +1564,7 @@ void AreaFillTool::leftButtonDoubleClick(const TPointD &pos,
   if (m_polyline.back() != pos) m_polyline.push_back(pos);
   if (m_polyline.back() != m_polyline.front())
     m_polyline.push_back(m_polyline.front());
+
   std::vector<TThickPoint> strokePoints;
   for (UINT i = 0; i < m_polyline.size() - 1; i++) {
     strokePoints.push_back(TThickPoint(m_polyline[i], 1));
@@ -1589,12 +1576,8 @@ void AreaFillTool::leftButtonDoubleClick(const TPointD &pos,
   stroke = new TStroke(strokePoints);
   assert(stroke->getPoint(0) == stroke->getPoint(1));
 
-  //    if (m_type==POLYLINE)
-  //      m_polyline.push_back(pos);
-  // drawPolyline(m_polyline);
   int styleIndex = app->getCurrentLevelStyleIndex();
-  if (m_frameRange)  // stroke multi
-  {
+  if (m_frameRange) {  // stroke multi
     if (m_firstFrameSelected && !slFidsPairs.empty()) {
       MultiAreaFiller filler(refImgTable, m_firstStroke, stroke, m_onlyUnfilled,
                              m_colorType, styleIndex, m_autopaintLines,
@@ -1616,11 +1599,9 @@ void AreaFillTool::leftButtonDoubleClick(const TPointD &pos,
           app->getCurrentFrame()->setFid(m_veryFirstFrameId);
         resetMulti();
       }
-    } else  // primo frame
-    {
+    } else {  // first frame
       m_firstFrameSelected = true;
       m_firstStroke        = stroke;
-      // if (app->getCurrentFrame()->isEditingScene())
       m_currCell =
           std::pair<int, int>(app->getCurrentColumn()->getColumnIndex(),
                               app->getCurrentFrame()->getFrame());
@@ -1631,11 +1612,14 @@ void AreaFillTool::leftButtonDoubleClick(const TPointD &pos,
       OnionSkinMask osMask = app->getCurrentOnionSkin()->getOnionSkinMask();
       doStrokeAutofill(m_parent->getImage(true), stroke, m_onlyUnfilled, osMask,
                        m_level.getPointer(), m_parent->getCurrentFid());
-    } else
+      delete stroke;  // Delete the stroke when using onion skin
+    } else {
       fillAreaWithUndo(m_parent->getImage(true), refImgTable[imgId], TRectD(),
                        stroke, m_onlyUnfilled, m_colorType,
                        m_level.getPointer(), m_parent->getCurrentFid(),
                        styleIndex, m_autopaintLines, m_paintAllAPs);
+      // fillAreaWithUndo should take on the stroke property
+    }
     TTool *t = app->getCurrentTool()->getTool();
     if (t) t->notifyImageChanged();
   }
@@ -1719,7 +1703,7 @@ void AreaFillTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
         OnionSkinMask osMask = app->getCurrentOnionSkin()->getOnionSkinMask();
         doRectAutofill(m_parent->getImage(true), m_selectingRect,
                        m_onlyUnfilled, osMask, m_level.getPointer(),
-                       m_parent->getCurrentFid());  // Do not support ReferImg
+                       m_parent->getCurrentFid());  // ReferImg not supported
       } else
         fillAreaWithUndo(m_parent->getImage(true), refImgTable[imgId],
                          m_selectingRect, 0, m_onlyUnfilled, m_colorType,
@@ -1771,7 +1755,7 @@ void AreaFillTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
           }
           resetMulti();
         }
-      } else  // primo frame
+      } else  // first frame
       {
         m_firstFrameSelected = true;
         m_firstRect          = m_selectingRect;
@@ -1818,7 +1802,7 @@ void AreaFillTool::onImageChanged() {
     resetMulti();
 }
 
-/*--Normal以外のTypeが選択された場合に呼ばれる--*/
+/*-- Called when Type other than Normal is selected --*/
 bool AreaFillTool::onPropertyChanged(bool multi, bool onlyUnfilled, bool onion,
                                      Type type, std::wstring colorType,
                                      bool autopaintLines) {
@@ -1831,7 +1815,7 @@ bool AreaFillTool::onPropertyChanged(bool multi, bool onlyUnfilled, bool onion,
 
   if (m_frameRange) resetMulti();
 
-  /*--動作中にプロパティが変わったら、現在の動作を無効にする--*/
+  /*-- Cancel current operation if property changes during action --*/
   if (m_isLeftButtonPressed) m_isLeftButtonPressed = false;
 
   if (m_type == POLYLINE && !m_polyline.empty()) m_polyline.clear();
@@ -1857,8 +1841,8 @@ bool descending(int i, int j) { return (i > j); }
 
 //=============================================================================
 /*! NormalLineFillTool
-        マウスドラッグで直線を延ばし、その直線がまたいだ点をFillLineするツール。
-        Raster - Normal - Line Fillツール（FrameRangeなし）のとき使用可能にする
+        Extend line with mouse drag and FillLine at points the line crosses.
+        Available for Raster - Normal - Line Fill tool (without FrameRange)
 */
 class NormalLineFillTool {
   TTool *m_parent;
@@ -1869,7 +1853,7 @@ public:
   NormalLineFillTool(TTool *parent)
       : m_parent(parent), m_isEditing(false), m_mousePosition() {}
 
-  /*-- FillLineツールに戻ってきたときに前の位置情報をリセットする --*/
+  /*-- Reset previous position info when returning to FillLine tool --*/
   void init() {
     m_startPosition = TPointD();
     m_mousePosition = TPointD();
@@ -1877,8 +1861,8 @@ public:
   }
 
   void leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
-    m_startPosition = pos; /*-始点-*/
-    m_mousePosition = pos; /*-終点-*/
+    m_startPosition = pos; /*-- Start point --*/
+    m_mousePosition = pos; /*-- End point --*/
 
     m_isEditing = true;
   }
@@ -1908,13 +1892,13 @@ public:
     if (!ras) return;
     int styleId = params.m_styleId;
 
-    /*--- 線分上にある全ての点でdoFillを行う ---*/
+    /*-- Perform doFill at every point on the line segment --*/
     double dx = m_mousePosition.x - m_startPosition.x;
     double dy = m_mousePosition.y - m_startPosition.y;
-    if (std::abs(dx) > std::abs(dy)) /*-- 横長の線分の場合 --*/
+    if (std::abs(dx) > std::abs(dy)) /*-- Horizontally oriented line --*/
     {
-      double k = dy / dx; /*-- 直線の傾き --*/
-      /*--- roundでは負値のときにうまく繋がらない ---*/
+      double k = dy / dx; /*-- Slope of the line --*/
+      /*-- round doesn't connect properly with negative values --*/
       int start      = std::min((int)floor(m_startPosition.x + 0.5),
                                 (int)floor(m_mousePosition.x + 0.5));
       int end        = std::max((int)floor(m_startPosition.x + 0.5),
@@ -1936,10 +1920,10 @@ public:
         doFill(img, tmpPos, params, e.isShiftPressed(), sl,
                m_parent->getCurrentFid(), true);
       }
-    } else /*-- 縦長の線分の場合 --*/
+    } else /*-- Vertically oriented line --*/
     {
-      double k = dx / dy; /*-- 直線の傾き --*/
-      /*--- roundでは負値のときにうまく繋がらない ---*/
+      double k = dx / dy; /*-- Slope of the line --*/
+      /*-- round doesn't connect properly with negative values --*/
       int start      = std::min((int)floor(m_startPosition.y + 0.5),
                                 (int)floor(m_mousePosition.y + 0.5));
       int end        = std::max((int)floor(m_startPosition.y + 0.5),
@@ -2002,7 +1986,7 @@ FillTool::FillTool(int targetType)
     , m_autopaintLines("Autopaint Lines", true)
     , m_referFill("Refer Fill", false)
     , m_extendFill("Extend Fill", true) {
-  m_areaFillTool = new AreaFillTool(this);
+  m_areaFillTool       = new AreaFillTool(this);
   m_normalLineFillTool = new NormalLineFillTool(this);
 
   bind(targetType);
@@ -2155,8 +2139,8 @@ void FillTool::computeRefImgsIfNeeded(const FillParameters &params) {
 
   // Calculate every refImg
   bool fillOnlySavebox = Preferences::instance()->getFillOnlySavebox();
-  TPointD cameraDpi =
-      app->getCurrentScene()->getScene()->getCurrentCamera()->getDpi();
+  //  TPointD cameraDpi =
+  //      app->getCurrentScene()->getScene()->getCurrentCamera()->getDpi();
   for (auto [sl, fid] : m_slFidsPairs) {
     if (sl->getType() != TXshLevelType::TZP_XSHLEVEL) continue;
 
@@ -2226,14 +2210,14 @@ FillParameters FillTool::getFillParameters() const {
   FillParameters params;
   int styleId      = TTool::getApplication()->getCurrentLevelStyleIndex();
   params.m_styleId = styleId;
-  /*---紛らわしいことに、colorTypeをfillTypeに名前を変えて保存している。間違いではない。---*/
+  /*-- Note: colorType is saved as fillType. This is not an error. --*/
   params.m_fillType  = m_colorType.getValue();
   params.m_emptyOnly = m_emptyOnly.getValue();
   params.m_segment   = m_segment.getValue();
   // RefFill is not controlled params
   params.m_minFillDepth = (int)m_fillDepth.getValue().first;
   params.m_maxFillDepth = (int)m_fillDepth.getValue().second;
-  params.m_extendFill = m_extendFill.getValue();
+  params.m_extendFill   = m_extendFill.getValue();
   return params;
 }
 
@@ -2246,8 +2230,8 @@ void FillTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
                                       !DEF_REGION_WITH_PAINT);
   m_restoreEmptyOnly = e.isShiftPressed() && m_emptyOnly.getValue();
   if (m_restoreEmptyOnly) {
-      m_emptyOnly.setValue(false);
-      onPropertyChanged(m_emptyOnly.getName(), false);
+    m_emptyOnly.setValue(false);
+    onPropertyChanged(m_emptyOnly.getName(), false);
   }
 
   m_clickPoint = pos;
@@ -2262,7 +2246,7 @@ void FillTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
     return;
   }
 
-  /*--以下、NormalFillの場合--*/
+  /*-- Below, for NormalFill --*/
   TTool::Application *app = TTool::getApplication();
   if (!app) return;
   FillParameters params = getFillParameters();
@@ -2289,7 +2273,7 @@ void FillTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
     // frame-range-filling. Calling processEvents() here to make sure to
     // consume the mouse press event in advance.
     qApp->processEvents();
-    // SECONDO CLICK
+    // SECOND CLICK
     MultiFiller filler(m_refImgTable, m_firstPoint, pos, params,
                        m_autopaintLines.getValue());
     filler.setSelectionUndo(new FillToolSelectionUndo(
@@ -2405,8 +2389,8 @@ void FillTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
     Preferences::instance()->setValue(PreferencesItemId::DefRegionWithPaint,
                                       (!DEF_REGION_WITH_PAINT));
   if (m_restoreEmptyOnly) {
-      m_emptyOnly.setValue(true);
-      onPropertyChanged(m_emptyOnly.getName(), false);
+    m_emptyOnly.setValue(true);
+    onPropertyChanged(m_emptyOnly.getName(), false);
   }
 }
 
@@ -2437,9 +2421,8 @@ void FillTool::resetMulti(bool resetAreaFiller) {
 //-----------------------------------------------------------------------------
 
 bool FillTool::onPropertyChanged(std::string propertyName, bool addToUndo) {
-  /*--- m_areaFillTool->onPropertyChangedを呼ぶかどうかのフラグ
-                  fillType, frameRange, selective,
-     colorTypeが変わったときに呼ぶ---*/
+  /*-- Flag to call m_areaFillTool->onPropertyChanged
+        Called when fillType, frameRange, selective, colorType changes --*/
   bool rectPropChangedflag = false;
 
   // Areas, Lines etc.
@@ -2447,9 +2430,9 @@ bool FillTool::onPropertyChanged(std::string propertyName, bool addToUndo) {
     FillColorType       = ::to_string(m_colorType.getValue());
     rectPropChangedflag = true;
 
-    /*--- ColorModelのCursor更新のためにSIGNALを出す ---*/
+    /*-- Emit SIGNAL to update ColorModel Cursor --*/
     TTool::getApplication()->getCurrentTool()->notifyToolChanged();
-    /*--- FillLineツールに戻ってきたときに前回の位置情報をリセットする ---*/
+    /*-- Reset previous position info when returning to FillLine tool --*/
     if (FillColorType.getValue() == "Lines") m_normalLineFillTool->init();
   }
   // Rect, Polyline etc.
@@ -2464,7 +2447,7 @@ bool FillTool::onPropertyChanged(std::string propertyName, bool addToUndo) {
   // Onion Skin
   else if (propertyName == m_onion.getName()) {
     if (m_onion.getValue()) FillType = ::to_string(m_fillType.getValue());
-    FillOnion = (int)(m_onion.getValue());
+    FillOnion           = (int)(m_onion.getValue());
     rectPropChangedflag = true;
   }
   // Frame Range
@@ -2503,7 +2486,7 @@ bool FillTool::onPropertyChanged(std::string propertyName, bool addToUndo) {
   // Gap Close Distance
   else if (propertyName == m_gapCloseDistance.getName()) {
     AutocloseDistance = m_gapCloseDistance.getValue();
-    auto st           = ToonzCheck::instance()->getAutocloseSettings();
+    //    auto st           = ToonzCheck::instance()->getAutocloseSettings();
     ToonzCheck::instance()->setAutocloseSettings(
         AutocloseDistance, AutocloseAngle, AutocloseOpacity,
         AutocloseIgnoreAutoPaint);
@@ -2515,8 +2498,7 @@ bool FillTool::onPropertyChanged(std::string propertyName, bool addToUndo) {
     FillExtend = (int)(m_extendFill.getValue());
   }
 
-  else if (!m_frameSwitched &&
-           (propertyName == m_maxGapDistance.getName())) {
+  else if (!m_frameSwitched && (propertyName == m_maxGapDistance.getName())) {
     TXshLevel *xl = TTool::getApplication()->getCurrentLevel()->getLevel();
     m_level       = xl ? xl->getSimpleLevel() : 0;
     if (TVectorImageP vi = getImage(true)) {
@@ -2550,7 +2532,7 @@ bool FillTool::onPropertyChanged(std::string propertyName, bool addToUndo) {
     }
   }
 
-  /*--- fillType, frameRange, selective, onionSkin, colorTypeが変わったとき ---*/
+  /*-- When fillType, frameRange, selective, onionSkin, colorType change --*/
   if (rectPropChangedflag && m_fillType.getValue() != NORMALFILL) {
     AreaFillTool::Type type;
     if (m_fillType.getValue() == RECTFILL)
@@ -2651,7 +2633,7 @@ int FillTool::pick(const TImageP &image, const TPointD &pos, const int frame) {
     scale2      = aff.det();
   }
   TPointD pickPos = pos;
-  // in case that the column is animated in scene-editing mode
+  // Adjust for animated columns in scene-editing mode
   if (frame > 0) {
     TPointD dpiScale = getViewer()->getDpiScale();
     pickPos.x *= dpiScale.x;
@@ -2661,7 +2643,7 @@ int FillTool::pick(const TImageP &image, const TPointD &pos, const int frame) {
     pickPos.x /= dpiScale.x;
     pickPos.y /= dpiScale.y;
   }
-  // thin stroke can be picked with 10 pixel range
+  // Thin stroke pick with 10 pixel range
   return picker.pickStyleId(pickPos, 10.0, scale2);
 }
 
@@ -2670,8 +2652,8 @@ int FillTool::pick(const TImageP &image, const TPointD &pos, const int frame) {
 int FillTool::pickOnionColor(const TPointD &pos) {
   TTool::Application *app = TTool::getApplication();
   if (!app) return 0;
-  bool filmStripEditing = !app->getCurrentObject()->isSpline();
-  OnionSkinMask osMask  = app->getCurrentOnionSkin()->getOnionSkinMask();
+  //  bool filmStripEditing = !app->getCurrentObject()->isSpline();
+  OnionSkinMask osMask = app->getCurrentOnionSkin()->getOnionSkinMask();
 
   TFrameId fid = getCurrentFid();
 
@@ -2680,7 +2662,7 @@ int FillTool::pickOnionColor(const TPointD &pos) {
 
   std::vector<int> rows;
 
-  // level editing case
+  // For level editing
   if (app->getCurrentFrame()->isEditingLevel()) {
     osMask.getAll(sl->guessIndex(fid), rows);
     int i, j;
@@ -2693,7 +2675,7 @@ int FillTool::pickOnionColor(const TPointD &pos) {
       if (onionFid != fid &&
           ((onionStyleId =
                 pick(m_level->getFrame(onionFid, ImageManager::none, 1), pos)) >
-           0))  // subsampling must be 1, otherwise onionfill does  not work
+           0))  // subsampling must be 1 for onionfill to work
         break;
     }
     if (onionStyleId == 0)
@@ -2702,11 +2684,11 @@ int FillTool::pickOnionColor(const TPointD &pos) {
         if (onionFid != fid &&
             ((onionStyleId = pick(
                   m_level->getFrame(onionFid, ImageManager::none, 1), pos)) >
-             0))  // subsampling must be 1, otherwise onionfill does  not work
+             0))  // subsampling must be 1 for onionfill to work
           break;
       }
     return onionStyleId;
-  } else {  // scene editing case
+  } else {  // For scene editing
     TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
     int colId    = app->getCurrentColumn()->getColumnIndex();
     int row      = app->getCurrentFrame()->getFrame();
@@ -2809,26 +2791,26 @@ void FillTool::onActivate() {
       }
     }
   }
-  bool ret = true;
-  ret      = ret && connect(TTool::m_application->getCurrentFrame(),
-                            SIGNAL(frameSwitched()), this, SLOT(onFrameSwitched()));
-  ret      = ret && connect(TTool::m_application->getCurrentScene(),
-                            SIGNAL(sceneSwitched()), this, SLOT(onFrameSwitched()));
-  ret      = ret &&
-        connect(TTool::m_application->getCurrentColumn(),
-                SIGNAL(columnIndexSwitched()), this, SLOT(onFrameSwitched()));
-  assert(ret);
+
+  connect(TTool::m_application->getCurrentFrame(), &TFrameHandle::frameSwitched,
+          this, &FillTool::onFrameSwitched);
+  connect(TTool::m_application->getCurrentScene(), &TSceneHandle::sceneSwitched,
+          this, &FillTool::onFrameSwitched);
+  connect(TTool::m_application->getCurrentColumn(),
+          &TColumnHandle::columnIndexSwitched, this,
+          &FillTool::onFrameSwitched);
 }
 
 //-----------------------------------------------------------------------------
 
 void FillTool::onDeactivate() {
-  disconnect(TTool::m_application->getCurrentFrame(), SIGNAL(frameSwitched()),
-             this, SLOT(onFrameSwitched()));
-  disconnect(TTool::m_application->getCurrentScene(), SIGNAL(sceneSwitched()),
-             this, SLOT(onFrameSwitched()));
+  disconnect(TTool::m_application->getCurrentFrame(),
+             &TFrameHandle::frameSwitched, this, &FillTool::onFrameSwitched);
+  disconnect(TTool::m_application->getCurrentScene(),
+             &TSceneHandle::sceneSwitched, this, &FillTool::onFrameSwitched);
   disconnect(TTool::m_application->getCurrentColumn(),
-             SIGNAL(columnIndexSwitched()), this, SLOT(onFrameSwitched()));
+             &TColumnHandle::columnIndexSwitched, this,
+             &FillTool::onFrameSwitched);
 }
 
 //-----------------------------------------------------------------------------

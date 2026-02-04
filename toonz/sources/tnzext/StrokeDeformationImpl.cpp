@@ -3,46 +3,55 @@
 /**
  * @author  Fabrizio Morciano <fabrizio.morciano@gmail.com>
  */
-#ifdef _DEBUG
-#define _STLP_DEBUG 1
-#endif
 
 #include "ext/StrokeDeformationImpl.h"
 #include "ext/StrokeDeformation.h"
 #include "ext/SquarePotential.h"
 #include "ext/StrokeParametricDeformer.h"
-//#include "ext/NotSymmetricBezierPotential.h"
+// #include "ext/NotSymmetricBezierPotential.h"
 #include "ext/ContextStatus.h"
 #include "ext/Designer.h"
-//#include "ext/TriParam.h"
+// #include "ext/TriParam.h"
 
 #include <tcurves.h>
 #include <tstrokeutil.h>
-//#include <tvectorimage.h>
+// #include <tvectorimage.h>
 #include <tmathutil.h>
 
 #include <algorithm>
 #include <iterator>
 #include <vector>
+#include <memory>  // Added for smart pointers
 
 #include "DeformationSelector.h"
 
-using namespace ToonzExt;
+namespace ToonzExt {
 
 namespace {
 
-/*
-   * Avoid to reduce curves with great zoom out.
-   * assert that pixelSize and factor > 0.0
-   */
+/**
+ * Compute reduction factor based on pixel size to avoid reducing curves with
+ * great zoom out
+ * @param pixelSize Pixel size
+ * @param factor Base factor
+ * @return Computed reduction factor
+ */
 double computeReductionFactor(double pixelSize, double factor) {
   assert(pixelSize > 0.0 && factor > 0.0);
-  if (factor <= 0.0) factor                          = 1.0;
+  if (factor <= 0.0) factor = 1.0;
   if (pixelSize <= 0.0 || pixelSize > 1.0) pixelSize = 1.0;
   return pixelSize * factor;
 }
 
 //---------------------------------------------------------------------------
+
+/**
+ * Retrieve parameter at length with offset
+ * @param stroke2change Stroke to process
+ * @param length Target length
+ * @param offset Offset parameter
+ * @return Parameter at computed length
+ */
 double retrieveParamAtLengthWithOffset(const TStroke *stroke2change,
                                        double length,  // = 0.5 * strokeLength,
                                        double offset) {
@@ -74,14 +83,22 @@ double retrieveParamAtLengthWithOffset(const TStroke *stroke2change,
 
 //---------------------------------------------------------------------------
 
+/**
+ * Rotate stroke to bring a specific parameter to position 0
+ * @param stroke2change Original stroke
+ * @param rotated Output rotated stroke
+ * @param from From parameter (input/output)
+ * @param to To parameter (input/output)
+ * @param old_w0_pos Original position of w=0
+ * @return true if rotation successful
+ */
 bool rotateStroke(const TStroke *stroke2change, TStroke *&rotated, double &from,
                   double &to, TPointD &old_w0_pos) {
   if (!stroke2change || !isValid(from) || !isValid(to)) return false;
 
   rotated = 0;
 
-  // save position of w=0 (useful to retrieve this
-  //  position after changes)
+  // save position of w=0 (useful to retrieve this position after changes)
   old_w0_pos = convert(stroke2change->getControlPoint(0));
 
   double rotateAtLength = stroke2change->getLength(to);
@@ -99,23 +116,37 @@ bool rotateStroke(const TStroke *stroke2change, TStroke *&rotated, double &from,
 
   // save some other information (style, etc..)
   ToonzExt::cloneStrokeStatus(stroke2change, rotated);
-  return true;  // rotated;
+  return true;
 }
 
 //---------------------------------------------------------------------------
 
+/**
+ * Rotate control point to bring a specific point to position 0
+ * @param stroke Stroke to rotate
+ * @param pnt Point to bring to position 0
+ * @return Rotated stroke or nullptr
+ */
 TStroke *rotateControlPointAtPoint(const TStroke *stroke, const TPointD &pnt) {
   if (!stroke || tdistance2(stroke->getPoint(0.0), pnt) < sq(TConsts::epsilon))
     return 0;
 
-  double w           = stroke->getW(pnt);
-  TPointD theSamePnt = stroke->getPoint(w);
-  double length      = stroke->getLength(w);
+  double w = stroke->getW(pnt);
+  // Removed unused variable: TPointD theSamePnt = stroke->getPoint(w);
+  double length = stroke->getLength(w);
   return ToonzExt::rotateControlPoint(stroke, ToonzExt::EvenInt(0), length);
 }
 
 //---------------------------------------------------------------------------
 
+/**
+ * Find extremes based on tool action length
+ * @param toolActionLength Length of tool action
+ * @param stroke Stroke to process
+ * @param w Parameter position
+ * @param out Output interval
+ * @return true if successful
+ */
 bool findExtremesFromActionLength(double toolActionLength,
                                   const TStroke *stroke, double w,
                                   ToonzExt::Interval &out) {
@@ -179,6 +210,12 @@ bool findExtremesFromActionLength(double toolActionLength,
 
 //---------------------------------------------------------------------------
 
+/**
+ * Check if two strokes are different
+ * @param ref1 First stroke
+ * @param ref2 Second stroke
+ * @return true if strokes are different
+ */
 bool areDifferent(const TStroke *ref1, const TStroke *ref2) {
   if (!isValid(ref1) || !isValid(ref2)) return true;
 
@@ -195,26 +232,26 @@ bool areDifferent(const TStroke *ref1, const TStroke *ref2) {
 }
 
 //---------------------------------------------------------------------------
-}
+}  // namespace
 
 //-----------------------------------------------------------------------------
 
 TStroke *StrokeDeformationImpl::copyOfLastSelectedStroke_ =
-    0;  // deep copy stroke selected previously
+    nullptr;  // deep copy stroke selected previously
 
 //-----------------------------------------------------------------------------
 
 const ContextStatus *&StrokeDeformationImpl::getImplStatus() {
   // if multi threading this datas need to be serialized
   // a ref to status
-  static const ContextStatus *contextStatus_instance;
+  static const ContextStatus *contextStatus_instance = nullptr;
   return contextStatus_instance;
 }
 
 //-----------------------------------------------------------------------------
 
 TStroke *&StrokeDeformationImpl::getLastSelectedStroke() {
-  static TStroke *lastSelectedStroke_instance;
+  static TStroke *lastSelectedStroke_instance = nullptr;
   return lastSelectedStroke_instance;
 }
 
@@ -232,7 +269,7 @@ void StrokeDeformationImpl::setLastSelectedStroke(TStroke *stroke) {
 //-----------------------------------------------------------------------------
 
 int &StrokeDeformationImpl::getLastSelectedDegree() {
-  static int lastSelectedDegree_instance;
+  static int lastSelectedDegree_instance = -1;
   return lastSelectedDegree_instance;
 }
 
@@ -258,10 +295,19 @@ ToonzExt::Intervals &StrokeDeformationImpl::getStraightsList() {
 
 //-----------------------------------------------------------------------------
 
-StrokeDeformationImpl::StrokeDeformationImpl() {
-  shortcutKey_ = ContextStatus::NONE;
-  cursorId_    = -1;
-  this->reset();
+StrokeDeformationImpl::StrokeDeformationImpl()
+    : potential_(nullptr)
+    , deformer_(nullptr)
+    , stroke2manipulate_(nullptr)
+    , old_w0_(-1)
+    , old_w0_pos_(TConsts::napd)
+    , shortcutKey_(ContextStatus::NONE)
+    , cursorId_(-1) {
+  // Direct initialization without virtual call
+  old_w0_            = -1;
+  old_w0_pos_        = TConsts::napd;
+  deformer_          = nullptr;
+  stroke2manipulate_ = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -269,11 +315,11 @@ StrokeDeformationImpl::StrokeDeformationImpl() {
 StrokeDeformationImpl::~StrokeDeformationImpl() {
   clearPointerContainer(strokes_);
   delete potential_;
-  potential_ = 0;
+  potential_ = nullptr;
   delete deformer_;
-  deformer_ = 0;
+  deformer_ = nullptr;
   delete copyOfLastSelectedStroke_;
-  copyOfLastSelectedStroke_ = 0;
+  copyOfLastSelectedStroke_ = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -287,10 +333,17 @@ bool StrokeDeformationImpl::activate_impl(const ContextStatus *status) {
 
   ToonzExt::Interval extremes = this->getExtremes();
 
-  TStroke *stroke2transform;
+  // Use unique_ptr for automatic cleanup
+  std::unique_ptr<TStroke> stroke2transformPtr;
+  TStroke *stroke2transform = nullptr;
 
-  if (!this->computeStroke2Transform(status, stroke2transform, w, extremes))
+  if (!this->computeStroke2Transform(status, stroke2transform, w, extremes)) {
+    delete stroke2transform;  // Clean up if function failed
     return false;
+  }
+
+  // Wrap in unique_ptr for automatic cleanup
+  stroke2transformPtr.reset(stroke2transform);
 
   // to avoid strange behaviour in limit's value
   if (areAlmostEqual(extremes.first, w)) w = extremes.first;
@@ -400,14 +453,15 @@ bool StrokeDeformationImpl::activate_impl(const ContextStatus *status) {
   assert(deformer_ && "Deformer is not available");
 
   if (exception) {
-    deformer_ = 0;
+    deformer_ = nullptr;
     return false;
   }
 
-  assert(getImplStatus() != 0 && "ContextStatus is null???");
+  assert(getImplStatus() != nullptr && "ContextStatus is null???");
 
   if (!getImplStatus()) {
     delete deformer_;
+    deformer_ = nullptr;
     this->reset();
     return false;
   }
@@ -470,7 +524,7 @@ void StrokeDeformationImpl::update_impl(const TPointD &delta) {
 TStroke *StrokeDeformationImpl::deactivate_impl() {
   if (!stroke2manipulate_ || !getImplStatus()) {
     this->reset();
-    return 0;
+    return nullptr;
   }
 
   // retrieve the point
@@ -484,18 +538,18 @@ TStroke *StrokeDeformationImpl::deactivate_impl() {
   const int size = stroke2manipulate_->getControlPointCount();
   std::vector<TThickPoint> pnt(size);
   for (int i = 0; i < size; ++i)
-    pnt[i]   = stroke2manipulate_->getControlPoint(i);
+    pnt[i] = stroke2manipulate_->getControlPoint(i);
 
   std::vector<TStroke *>::iterator it =
       std::find(strokes_.begin(), strokes_.end(), stroke2manipulate_);
   assert(it != strokes_.end());
 
   int pos            = std::distance(strokes_.begin(), it);
-  stroke2manipulate_ = 0;
+  stroke2manipulate_ = nullptr;
   delete strokes_[pos];
 
   TStroke *tmpStroke = new TStroke(pnt);
-  assert((tmpStroke != 0) && "Not valid stroke!");
+  assert((tmpStroke != nullptr) && "Not valid stroke!");
   strokes_[pos] = tmpStroke;
   strokes_[pos]->reduceControlPoints(reductionFactor);
 
@@ -518,7 +572,7 @@ TStroke *StrokeDeformationImpl::deactivate_impl() {
         ToonzExt::cloneStrokeStatus(getImplStatus()->stroke2change_, ref);
       else {
         delete ref;
-        ref = 0;
+        ref = nullptr;
       }
     }
   }
@@ -533,16 +587,16 @@ void StrokeDeformationImpl::reset() {
   old_w0_     = -1;
   old_w0_pos_ = TConsts::napd;
 
-  deformer_       = 0;
-  getImplStatus() = 0;
+  deformer_       = nullptr;
+  getImplStatus() = nullptr;
   this->setLastSelectedDegree(-1);
-  this->setLastSelectedStroke(0);
+  this->setLastSelectedStroke(nullptr);
   this->getSpiresList().clear();
   this->getStraightsList().clear();
 
-  stroke2manipulate_ = 0;
-  clearPointerContainer(strokes_);  // stroke2move is deleted here (it
-                                    // is in vector)
+  stroke2manipulate_ = nullptr;
+  clearPointerContainer(
+      strokes_);  // stroke2move is deleted here (it is in vector)
 }
 
 //-----------------------------------------------------------------------------
@@ -632,23 +686,48 @@ bool StrokeDeformationImpl::init(const ContextStatus *status) {
 bool StrokeDeformationImpl::computeStroke2Transform(
     const ContextStatus *status, TStroke *&stroke2transform, double &w,
     ToonzExt::Interval &extremes) {
-  if (!status || !isValid(w)) return false;
+  // Use unique_ptr for local cleanup
+  std::unique_ptr<TStroke> localStrokePtr;
 
-  stroke2transform = 0;
+  if (!status || !isValid(w)) {
+    // Clean up if stroke2transform was allocated before failure
+    delete stroke2transform;
+    stroke2transform = nullptr;
+    return false;
+  }
+
+  // Set to null initially
+  stroke2transform = nullptr;
 
   if (status->stroke2change_->isSelfLoop()) {
     if (extremes.first > extremes.second) {
       double new_w = (extremes.first + extremes.second) * 0.5;
 
       if (!rotateStroke(status->stroke2change_, stroke2transform, w, new_w,
-                        old_w0_pos_))
+                        old_w0_pos_)) {
+        // Clean up on failure
+        delete stroke2transform;
+        stroke2transform = nullptr;
         return false;
+      }
 
+      // Save current status
+      const ContextStatus *oldStatus = getImplStatus();
+
+      // Create temporary status on stack but don't store pointer in static
+      // variable
       ContextStatus tmpStatus  = *status;
       tmpStatus.stroke2change_ = stroke2transform;
       tmpStatus.w_             = w;
+
+      // Temporarily set the status for check() function
+      getImplStatus() = &tmpStatus;
       this->check(&tmpStatus);
       extremes = this->getExtremes();
+
+      // Restore original status
+      getImplStatus() = oldStatus;
+
       this->init(status);
       return true;
     } else if (extremes.first == extremes.second) {
@@ -676,35 +755,45 @@ bool StrokeDeformationImpl::computeStroke2Transform(
       // also forced mode
       default:
         assert(extremes.first != -1);
-        // if( extremes.first == -1 )
-        //  positionOfFixPoint=retrieveParamAtLengthWithOffset(status->stroke2change_,
-        //                                                     status->stroke2change_->getLength()*0.5,
-        //                                                     w);
-        // else
         positionOfFixPoint = extremes.first;
         break;
       }
 
       if (!rotateStroke(status->stroke2change_, stroke2transform, w,
-                        positionOfFixPoint, old_w0_pos_))
+                        positionOfFixPoint, old_w0_pos_)) {
+        // Clean up on failure
+        delete stroke2transform;
+        stroke2transform = nullptr;
         return false;
+      }
 
       extremes = ToonzExt::Interval(0.0, 1.0);
       return true;
     }
   }
 
-  if (!isValid(extremes.first) || !isValid(extremes.second)) return false;
+  if (!isValid(extremes.first) || !isValid(extremes.second)) {
+    // Clean up on failure
+    delete stroke2transform;
+    stroke2transform = nullptr;
+    return false;
+  }
 
   try {
-    if (!stroke2transform)
+    if (!stroke2transform) {
       stroke2transform = new TStroke(*status->stroke2change_);
+    }
   } catch (...) {
+    // Clean up on exception
+    delete stroke2transform;
+    stroke2transform = nullptr;
     return false;
   }
 
   return true;
 }
+
 //-----------------------------------------------------------------------------
 //  End Of File
 //-----------------------------------------------------------------------------
+}  // namespace ToonzExt

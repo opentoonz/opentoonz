@@ -1250,8 +1250,7 @@ void GeometricTool::mouseMove(const TPointD &p, const TMouseEvent &e) {
       m_rotateCenter      = 0.5 * (bbox.getP11() + bbox.getP00());
     }
 
-    // rotate
-    // first, rotate the stroke back to original
+    // rotate first, rotate the stroke back to original
     m_rotatedStroke->transform(TRotation(m_rotateCenter, -m_lastRotateAngle));
 
     // then, rotate it according to mouse position
@@ -1670,7 +1669,8 @@ void GeometricTool::addStroke() {
   options.m_joinStyle              = m_param.m_joinStyle.getIndex();
   options.m_miterUpper             = m_param.m_miterJoinLimit.getValue();
 
-  TImage *image = getImage(true);
+  // Use TImageP to maintain the reference
+  TImageP image = getImage(true);
   TToonzImageP ti(image);
   TVectorImageP vi(image);
   TRasterImageP ri(image);
@@ -1866,8 +1866,6 @@ GeometricTool GeometricRasterFullColorTool(TTool::RasterImage |
                                            TTool::EmptyTarget);
 
 //====================================================================================================
-//
-//-------------------------------------------------------------------------------------------------------------
 
 void Primitive::drawSnap() {
   // snapping
@@ -1890,17 +1888,22 @@ TPointD Primitive::checkGuideSnapping(TPointD pos) {
     else
       return pos;
   }
+
   if ((m_param->m_targetType & TTool::Vectors) && m_param->m_snap.getValue()) {
     int vGuideCount = 0, hGuideCount = 0;
     double guideDistance = sqrt(m_param->m_minDistance2);
     TToolViewer *viewer  = m_tool->getViewer();
+
+    // Initialize variables
+    double vGuide = 0.0, hGuide = 0.0;
+    double distanceToVGuide = -1.0, distanceToHGuide = -1.0;
+    bool useGuides = false;
+
     if (viewer) {
       vGuideCount = viewer->getVGuideCount();
       hGuideCount = viewer->getHGuideCount();
     }
-    double distanceToVGuide = -1.0, distanceToHGuide = -1.0;
-    double vGuide, hGuide;
-    bool useGuides = false;
+
     if (vGuideCount) {
       for (int j = 0; j < vGuideCount; j++) {
         double guide        = viewer->getVGuide(j);
@@ -1913,6 +1916,7 @@ TPointD Primitive::checkGuideSnapping(TPointD pos) {
         }
       }
     }
+
     if (hGuideCount) {
       for (int j = 0; j < hGuideCount; j++) {
         double guide        = viewer->getHGuide(j);
@@ -1925,36 +1929,40 @@ TPointD Primitive::checkGuideSnapping(TPointD pos) {
         }
       }
     }
+
     if (useGuides && m_param->m_foundSnap) {
       double currYDistance = std::abs(m_param->m_snapPoint.y - pos.y);
       double currXDistance = std::abs(m_param->m_snapPoint.x - pos.x);
       double hypotenuse =
           sqrt(pow(currYDistance, 2.0) + pow(currXDistance, 2.0));
+
       if ((distanceToVGuide >= 0 && distanceToVGuide < hypotenuse) ||
           (distanceToHGuide >= 0 && distanceToHGuide < hypotenuse))
         useGuides = true;
       else
         useGuides = false;
     }
+
     if (useGuides) {
       assert(distanceToHGuide >= 0 || distanceToVGuide >= 0);
       if (distanceToHGuide < 0 ||
           (distanceToVGuide <= distanceToHGuide && distanceToVGuide >= 0)) {
         m_param->m_snapPoint.y = vGuide;
         m_param->m_snapPoint.x = pos.x;
-
       } else {
         m_param->m_snapPoint.y = pos.y;
         m_param->m_snapPoint.x = hGuide;
       }
       m_param->m_foundSnap = true;
     }
+
     if (m_param->m_foundSnap)
       return m_param->m_snapPoint;
     else
       return pos;
-  } else
+  } else {
     return pos;
+  }
 }
 
 //=============================================================================
@@ -2106,7 +2114,11 @@ TStroke *RectanglePrimitive::makeStroke() const {
     points[8] = points[0];
     stroke    = new TStroke(points);
   }
-  stroke->setSelfLoop();
+
+  // Check if stroke is not null
+  if (stroke) {
+    stroke->setSelfLoop();
+  }
   return stroke;
 }
 
@@ -2318,11 +2330,10 @@ void MultiLinePrimitive::moveSpeed(const TPointD &delta) {
 //-----------------------------------------------------------------------------
 
 void MultiLinePrimitive::draw() {
-  UINT size = m_vertex.size();
-
+  // remove unused variable 'size' // UINT size = m_vertex.size();
   drawSnap();
 
-  if ((m_isEditing || m_isPrompting) && size > 0) {
+  if ((m_isEditing || m_isPrompting) && !m_vertex.empty()) {
     tglColor(m_isEditing ? m_color : TPixel32::Green);
     std::vector<TPointD> points;
     points.assign(m_vertex.begin(), m_vertex.end());
@@ -2579,8 +2590,7 @@ void MultiLinePrimitive::onImageChanged() { onActivate(); }
 //-----------------------------------------------------------------------------
 
 void LinePrimitive::draw() {
-  UINT size = m_vertex.size();
-
+  // remove unused variable 'size' // UINT size = m_vertex.size();
   drawSnap();
 
   tglColor(TPixel32::Red);
@@ -2871,7 +2881,10 @@ void MultiArcPrimitive::draw() {
 //-----------------------------------------------------------------------------
 
 TStroke *MultiArcPrimitive::makeStroke() const {
-  return new TStroke(*m_stroke);
+  if (m_stroke) {
+    return new TStroke(*m_stroke);
+  }
+  return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -2908,10 +2921,10 @@ void MultiArcPrimitive::leftButtonDrag(const TPointD &pos,
       !Preferences::instance()->isClickTwiceToCreateArcs())
     return;
 
-  TPointD newPos = calculateSnap(pos);
-  newPos         = checkGuideSnapping(pos);
-  double dist    = joinDistance * joinDistance;
-  static MultiArcPrimitiveUndo *undo;
+  TPointD newPos                     = calculateSnap(pos);
+  newPos                             = checkGuideSnapping(pos);
+  double dist                        = joinDistance * joinDistance;
+  static MultiArcPrimitiveUndo *undo = nullptr;
 
   if (m_clickNumber == 0) {
     undo = new MultiArcPrimitiveUndo(this, m_stroke, m_strokeTemp, m_startPoint,
@@ -2985,11 +2998,12 @@ void MultiArcPrimitive::leftButtonDrag(const TPointD &pos,
     break;
   }
 
-  if (m_undoCount == 0) {
+  if (m_undoCount == 0 && undo) {
     undo->setRedoData(m_stroke, m_strokeTemp, m_startPoint, m_endPoint,
                       m_centralPoint, m_clickNumber);
     TUndoManager::manager()->add(undo);
     ++m_undoCount;
+    undo = nullptr;  // Transfer ownership to undo manager
   }
 }
 
@@ -3157,13 +3171,15 @@ void MultiArcPrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
     assert(q01.getP2() == q10.getP0());
     assert(q10.getP2() == q11.getP0());
 
-    m_strokeTemp->setControlPoint(1, q00.getP1());
-    m_strokeTemp->setControlPoint(2, q00.getP2());
-    m_strokeTemp->setControlPoint(3, q01.getP1());
-    m_strokeTemp->setControlPoint(4, q01.getP2());
-    m_strokeTemp->setControlPoint(5, q10.getP1());
-    m_strokeTemp->setControlPoint(6, q10.getP2());
-    m_strokeTemp->setControlPoint(7, q11.getP1());
+    if (m_strokeTemp) {
+      m_strokeTemp->setControlPoint(1, q00.getP1());
+      m_strokeTemp->setControlPoint(2, q00.getP2());
+      m_strokeTemp->setControlPoint(3, q01.getP1());
+      m_strokeTemp->setControlPoint(4, q01.getP2());
+      m_strokeTemp->setControlPoint(5, q10.getP1());
+      m_strokeTemp->setControlPoint(6, q10.getP2());
+      m_strokeTemp->setControlPoint(7, q11.getP1());
+    }
     break;
   }
   m_tool->invalidate();
@@ -3292,7 +3308,11 @@ TStroke *PolygonPrimitive::makeStroke() const {
     }
     stroke = new TStroke(points);
   }
-  stroke->setSelfLoop();
+
+  // check if stroke is not null
+  if (stroke) {
+    stroke->setSelfLoop();
+  }
   return stroke;
 }
 
@@ -3320,13 +3340,11 @@ FullColorGeometricToolNotifier::FullColorGeometricToolNotifier(
     : m_tool(tool) {
   if (TTool::Application *app = m_tool->getApplication()) {
     if (TPaletteHandle *paletteHandle = app->getCurrentPalette()) {
-      bool ret;
-      ret = connect(paletteHandle, SIGNAL(colorStyleChanged(bool)), this,
-                    SLOT(onColorStyleChanged()));
-      assert(ret);
-      ret = connect(paletteHandle, SIGNAL(colorStyleSwitched()), this,
-                    SLOT(onColorStyleChanged()));
-      assert(ret);
+      connect(paletteHandle, &TPaletteHandle::colorStyleChanged, this,
+              [this](bool) { onColorStyleChanged(); });
+
+      connect(paletteHandle, &TPaletteHandle::colorStyleSwitched, this,
+              &FullColorGeometricToolNotifier::onColorStyleChanged);
     }
   }
 }
