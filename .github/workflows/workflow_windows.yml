@@ -36,7 +36,7 @@ jobs:
       BOOST_ROOT: C:\local\boost_1_87_0     # Path to Boost library root
       
       # OpenCV-related variables      
-      OPENCV_VERSION: "4.11.0"              # OpenCV version
+      OPENCV_VERSION: "4.13.0"              # OpenCV version
       OpenCV_DIR: C:\tools\opencv\build     # Path to OpenCV
 
     steps:
@@ -129,7 +129,7 @@ jobs:
           copy /Y ..\..\thirdparty\libmypaint\dist\64\libmypaint-1-4-0.dll Opentoonz
           
           REM Copy OpenCV DLL (IMPORTANT: Update path/filename when upgrading OpenCV version)
-          copy /Y "C:\tools\opencv\build\x64\vc16\bin\opencv_world4110.dll" Opentoonz
+          copy /Y "C:\tools\opencv\build\x64\vc16\bin\opencv_world4130.dll" Opentoonz
           
           REM Deploy Qt dependencies
           "%QT_PATH%\bin\windeployqt.exe" Opentoonz\Opentoonz.exe --opengl
