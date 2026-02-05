@@ -118,7 +118,9 @@ private:
   QWidget* createColorsPage();
   QWidget* createVersionControlPage();
   QWidget* createTouchTabletPage();
-
+#ifdef _WIN32
+  QWidget* createAddonsPage();
+#endif
   //--- callbacks ---
   // General
   void onAutoSaveChanged();

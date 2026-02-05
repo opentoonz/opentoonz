@@ -41,8 +41,10 @@ TFileType::Type TFileType::getInfo(const TFilePath &fp) {
 //--------------------------------------------------------------------------------
 
 TFileType::Type TFileType::getInfoFromExtension(const std::string &extension) {
+  std::string extLower = extension;
+  std::transform(extLower.begin(), extLower.end(), extLower.begin(), ::tolower);
   FileTypeData *data = FileTypeData::instance();
-  std::map<std::string, int>::iterator it = data->m_table.find(extension);
+  std::map<std::string, int>::iterator it = data->m_table.find(extLower);
   int type = (it == data->m_table.end()) ? TFileType::UNKNOW_FILE : it->second;
   return (TFileType::Type)type;
 }
