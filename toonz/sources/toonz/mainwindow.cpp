@@ -15,6 +15,8 @@
 #include "startuppopup.h"
 #include "tooloptionsshortcutinvoker.h"
 #include "custompanelmanager.h"
+#include "audiorecordingpopup.h"
+#include "pltgizmopopup.h"
 
 // TnzTools includes
 #include "tools/toolcommandids.h"
@@ -301,6 +303,9 @@ void Room::save() {
     TPanel *pane = static_cast<TPanel *>(layout->itemAt(i)->widget());
     settings.setValue("name", pane->objectName());
     settings.setValue("geometry", geometries[i]);  // Use passed geometry
+    // Room binding state persistence (custom panel feature)
+    settings.setValue("roomBound", pane->isRoomBound());
+    settings.setValue("boundRoomName", pane->getBoundRoomName());
     if (SaveLoadQSettings *persistent =
             dynamic_cast<SaveLoadQSettings *>(pane->widget()))
       persistent->save(settings);
@@ -381,6 +386,10 @@ void Room::load(const TFilePath &fp, RoomLoadParams &params) {
     }
 
     pane->setObjectName(paneObjectName);
+
+    // Restore room binding state (custom panel feature)
+    pane->setRoomBound(m_settings->value("roomBound", false).toBool());
+    pane->setBoundRoomName(m_settings->value("boundRoomName", "").toString());
 
     // Add panel to room
     addDockWidget(pane);
@@ -646,6 +655,11 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName) {
   params.activeRoomName = currentRoomName;
   params.forceBuildGui  = !Preferences::instance()->isLazyLoadRoomsEnabled();
 
+  // === CRITICAL FIX: Register dynamic commands BEFORE loading rooms ===
+  // Custom Panels in rooms will try to link to these commands during load.
+  // If commands don't exist yet, buttons become "empty shells".
+  CustomPanelManager::instance()->loadCustomPanelEntries();
+
   for (int i = 0; i < (int)roomPaths.size(); i++) {
     TFilePath roomPath = roomPaths[i];
     if (TFileStatus(roomPath).doesExist()) {
@@ -729,7 +743,8 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName) {
   }
 
   RecentFiles::instance()->loadRecentFiles();
-  CustomPanelManager::instance()->loadCustomPanelEntries();
+  // Note: loadCustomPanelEntries() now called BEFORE loading rooms
+  // to ensure dynamic commands exist when Custom Panels initialize
 }
 
 //-----------------------------------------------------------------------------
@@ -1213,11 +1228,53 @@ void MainWindow::onCurrentRoomChanged(int newRoomIndex) {
   Room *oldRoom = getRoom(m_oldRoomIndex);
   Room *newRoom = getRoom(newRoomIndex);
 
+  QString newRoomName = newRoom->getName();
+
+  // Handle room-bound panels (all panels with binding enabled)
+  // Use DockLayout directly instead of findChildren to avoid deep widget tree traversal
+  // which can trigger expensive operations in complex panels like FileBrowser
+  QList<TPanel *> panelsToUpdate;
+  for (int i = 0; i < m_stackedWidget->count(); i++) {
+    Room *room = getRoom(i);
+    DockLayout *layout = room->dockLayout();
+    if (!layout) continue;
+    
+    // Iterate only through docked panels (shallow traversal, not recursive)
+    for (int j = 0; j < layout->count(); j++) {
+      TPanel *panel = static_cast<TPanel *>(layout->itemAt(j)->widget());
+      if (panel && panel->isRoomBound()) {
+        panelsToUpdate.append(panel);
+      }
+    }
+  }
+
+  // Process room-bound panels (only visibility changes, no reparenting)
+  for (TPanel *panel : panelsToUpdate) {
+    QString boundRoomName = panel->getBoundRoomName();
+    
+    if (boundRoomName == newRoomName) {
+      // Show panel when entering its bound room
+      if (panel->isHidden()) {
+        panel->show();
+        panel->raise();
+      }
+    } else {
+      // Hide panel when leaving its bound room
+      if (!panel->isHidden()) {
+        panel->hide();
+      }
+    }
+  }
+
   QList<TPanel *> paneList = oldRoom->findChildren<TPanel *>();
 
-  // Change the parent of all the floating dockWidgets
+  // Change the parent of all the floating dockWidgets (non-room-bound)
   for (int i = 0; i < paneList.size(); i++) {
     TPanel *pane = paneList.at(i);
+    // Skip room-bound panels (already handled above)
+    if (pane->isRoomBound()) {
+      continue;
+    }
     if (pane->isFloating() && !pane->isHidden()) {
       // Close floating Locator panes
       if (pane->getPanelType() == "Locator") {
@@ -1237,8 +1294,83 @@ void MainWindow::onCurrentRoomChanged(int newRoomIndex) {
       pane->show();
     }
   }
+  
+  // Handle room-bound persistent popups (DVGui::Dialog-based)
+  // AudioRecordingPopup
+  AudioRecordingPopup *audioPopup = findChild<AudioRecordingPopup *>();
+  if (audioPopup && audioPopup->isRoomBound()) {
+    QString boundRoomName = audioPopup->getBoundRoomName();
+    if (boundRoomName == newRoomName) {
+      if (!audioPopup->isVisible()) {
+        audioPopup->show();
+      }
+    } else {
+      if (audioPopup->isVisible()) {
+        audioPopup->hide();
+      }
+    }
+  }
+  
+  // PltGizmoPopup
+  PltGizmoPopup *pltGizmoPopup = findChild<PltGizmoPopup *>();
+  if (pltGizmoPopup && pltGizmoPopup->isRoomBound()) {
+    QString boundRoomName = pltGizmoPopup->getBoundRoomName();
+    if (boundRoomName == newRoomName) {
+      if (!pltGizmoPopup->isVisible()) {
+        pltGizmoPopup->show();
+      }
+    } else {
+      if (pltGizmoPopup->isVisible()) {
+        pltGizmoPopup->hide();
+      }
+    }
+  }
+  
   m_oldRoomIndex = newRoomIndex;
   TSelection::setCurrent(0);
+}
+
+//-----------------------------------------------------------------------------
+
+void MainWindow::updatePanelVisibility() {
+  Room *currentRoom = getCurrentRoom();
+  if (!currentRoom) return;
+
+  QString currentRoomName = currentRoom->getName();
+
+  // Use DockLayout directly to avoid expensive findChildren() traversal
+  QList<TPanel *> panelsToUpdate;
+  for (int i = 0; i < m_stackedWidget->count(); i++) {
+    Room *room = getRoom(i);
+    DockLayout *layout = room->dockLayout();
+    if (!layout) continue;
+    
+    // Iterate only through docked panels (shallow, not recursive)
+    for (int j = 0; j < layout->count(); j++) {
+      TPanel *panel = static_cast<TPanel *>(layout->itemAt(j)->widget());
+      if (panel && panel->isRoomBound()) {
+        panelsToUpdate.append(panel);
+      }
+    }
+  }
+
+  // Update visibility of all room-bound panels
+  for (TPanel *panel : panelsToUpdate) {
+    QString boundRoomName = panel->getBoundRoomName();
+    
+    if (boundRoomName == currentRoomName) {
+      // Show panel in its bound room
+      if (panel->isHidden()) {
+        panel->show();
+        panel->raise();
+      }
+    } else {
+      // Hide panel outside its bound room
+      if (!panel->isHidden()) {
+        panel->hide();
+      }
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1293,7 +1425,35 @@ void MainWindow::deleteRoom(int index) {
 
 void MainWindow::renameRoom(int index, const QString name) {
   Room *room = getRoom(index);
+  
+  // Store the old name before renaming
+  QString oldName = room->getName();
+  
+  // Rename the room
   room->setName(name);
+  
+  // Update all room-bound panels with the new room name
+  // This ensures the panel-room link persists after renaming
+  for (int i = 0; i < m_stackedWidget->count(); i++) {
+    Room *currentRoom = getRoom(i);
+    DockLayout *layout = currentRoom->dockLayout();
+    if (!layout) continue;
+    
+    // Iterate through all docked panels
+    for (int j = 0; j < layout->count(); j++) {
+      TPanel *panel = static_cast<TPanel *>(layout->itemAt(j)->widget());
+      if (panel && 
+          panel->isRoomBound() &&
+          panel->getBoundRoomName() == oldName) {
+        // Update the bound room name to the new name
+        panel->setBoundRoomName(name);
+      }
+    }
+  }
+  
+  // Update visibility immediately to reflect the change
+  updatePanelVisibility();
+  
   if (m_saveSettingsOnQuit) room->save();
 }
 
@@ -2347,6 +2507,10 @@ void MainWindow::defineActions() {
                           "comboviewer");
   createMenuWindowsAction(MI_OpenHistoryPanel, QT_TR_NOOP("&History"), "Ctrl+H",
                           "history");
+  createMenuWindowsAction(MI_OpenBrushPresetPanel, QT_TR_NOOP("&Brush Presets"), "Ctrl+Shift+B",
+                          "brush");
+  createMenuWindowsAction(MI_OpenToolPropertiesPanel, QT_TR_NOOP("&Tool Properties"), "Ctrl+Shift+P",
+                          "properties");
   createMenuWindowsAction(MI_AudioRecording, QT_TR_NOOP("Record Audio"),
                           "Alt+A", "recordaudio");
   createMenuWindowsAction(MI_ResetRoomLayout,

@@ -15,6 +15,7 @@
 #include "toonz/preferences.h"
 #include "toonz/stage.h"
 #include "toonz/textureutils.h"
+#include "toonz/mypaintbrushstyle.h"
 #include "toonz/levelset.h"
 #include "toonz/tcamera.h"
 
@@ -35,6 +36,7 @@
 #include "timageinfo.h"
 #include "tlogger.h"
 #include "tstream.h"
+#include "tsimplecolorstyles.h"
 #include "tsystem.h"
 #include "tcontenthistory.h"
 #include "tfilepath.h"

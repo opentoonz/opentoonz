@@ -27,6 +27,7 @@
 #include <QSettings>
 #include <QToolBar>
 #include <QMap>
+#include <QMenu>
 #include <QApplication>
 #include <QFile>
 #include <qdrawutil.h>
@@ -36,7 +37,6 @@
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QScreen>
-#include <QDebug>
 
 extern TEnv::StringVar EnvSafeAreaName;
 extern TEnv::IntVar EnvViewerPreviewBehavior;
@@ -52,7 +52,10 @@ TPanel::TPanel(QWidget *parent, Qt::WindowFlags flags,
     , m_isMaximizable(true)
     , m_isMaximized(false)
     , m_panelTitleBar(0)
-    , m_multipleInstancesAllowed(true) {
+    , m_multipleInstancesAllowed(true)
+    , m_isRoomBound(false)
+    , m_boundRoomName("")
+    , m_roomBindButton(0) {
   // setFeatures(QDockWidget::DockWidgetMovable |
   // QDockWidget::DockWidgetFloatable);
   // setFloating(false);
@@ -64,6 +67,11 @@ TPanel::TPanel(QWidget *parent, Qt::WindowFlags flags,
   connect(m_panelTitleBar, SIGNAL(closeButtonPressed()), this,
           SLOT(onCloseButtonPressed()));
   setOrientation(orientation);
+  
+  // Enable context menu for room binding
+  setContextMenuPolicy(Qt::CustomContextMenu);
+  connect(this, &QWidget::customContextMenuRequested,
+          this, &TPanel::onCustomContextMenuRequested);
 }
 
 //-----------------------------------------------------------------------------
@@ -114,6 +122,45 @@ void TPanel::onCloseButtonPressed() {
 
   // Also, remove widget from its dock layout control
   if (parentLayout()) parentLayout()->removeWidget(this);
+}
+
+//-----------------------------------------------------------------------------
+
+void TPanel::onCustomContextMenuRequested(const QPoint &pos) {
+  QMenu *menu = new QMenu(this);
+  
+  // Add "Bind to Current Room" option
+  QAction *bindAction = menu->addAction(tr("Bind to Current Room"));
+  bindAction->setCheckable(true);
+  bindAction->setChecked(m_isRoomBound);
+  
+  connect(bindAction, &QAction::triggered, [this](bool checked) {
+    MainWindow *mw = dynamic_cast<MainWindow *>(
+        TApp::instance()->getMainWindow());
+    if (!mw) return;
+    
+    Room *currentRoom = mw->getCurrentRoom();
+    if (!currentRoom) return;
+    
+    // Update binding state
+    setRoomBound(checked);
+    if (checked) {
+      // Bind panel to current room
+      setBoundRoomName(currentRoom->getName());
+      // Update visibility immediately for all bound panels
+      mw->updatePanelVisibility();
+    } else {
+      // Unbind panel from room
+      setBoundRoomName("");
+      // Show panel if it was hidden
+      if (isHidden()) {
+        show();
+      }
+    }
+  });
+  
+  menu->exec(mapToGlobal(pos));
+  delete menu;
 }
 
 //-----------------------------------------------------------------------------
@@ -231,6 +278,70 @@ void TPanel::zoomContentsAndFitGeometry(bool forward) {
       newGeom.moveTop(screenGeom.top());
   }
   setGeometry(newGeom);
+}
+
+//-----------------------------------------------------------------------------
+
+void TPanel::setRoomBound(bool bound) {
+  m_isRoomBound = bound;
+  if (m_roomBindButton) {
+    m_roomBindButton->setPressed(bound);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void TPanel::setBoundRoomName(const QString &roomName) {
+  m_boundRoomName = roomName;
+}
+
+//-----------------------------------------------------------------------------
+
+void TPanel::addRoomBindButton() {
+  // Prevent adding button twice
+  if (m_roomBindButton) return;
+  
+  // Check preference to see if room bind buttons should be shown
+  Preferences *prefs = Preferences::instance();
+  if (!prefs->getBoolValue(showRoomBindButtons)) return;
+  
+  TPanelTitleBar *titleBar = getTitleBar();
+  if (!titleBar) return;
+  
+  // Create toggle button with simple circle indicator
+  m_roomBindButton = new TPanelTitleBarButtonForBindToRoom(titleBar);
+  m_roomBindButton->setToolTip(QObject::tr("Bind to Current Room"));
+  m_roomBindButton->setPressed(m_isRoomBound);  // Restore state if loaded from file
+  
+  // Position: -60 pixels from right edge (before close button)
+  titleBar->add(QPoint(-60, 0), m_roomBindButton);
+  
+  // Connect toggle signal to handle room binding state changes
+  QObject::connect(m_roomBindButton, &TPanelTitleBarButton::toggled, 
+                   [this](bool checked) {
+    MainWindow *mw = dynamic_cast<MainWindow *>(
+        TApp::instance()->getMainWindow());
+    if (!mw) return;
+    
+    Room *currentRoom = mw->getCurrentRoom();
+    if (!currentRoom) return;
+    
+    // Update binding state
+    setRoomBound(checked);
+    if (checked) {
+      // Bind panel to current room
+      setBoundRoomName(currentRoom->getName());
+      // Update visibility immediately for all bound panels
+      mw->updatePanelVisibility();
+    } else {
+      // Unbind panel from room
+      setBoundRoomName("");
+      // Show panel if it was hidden
+      if (isHidden()) {
+        show();
+      }
+    }
+  });
 }
 
 //=============================================================================
@@ -415,6 +526,39 @@ void TPanelTitleBarButton::mousePressEvent(QMouseEvent *e) {
     emit toggled(m_pressed);
     update();
   }
+}
+
+//=============================================================================
+// TPanelTitleBarButtonForBindToRoom
+//-----------------------------------------------------------------------------
+
+void TPanelTitleBarButtonForBindToRoom::paintEvent(QPaintEvent *) {
+  QPainter p(this);
+  p.setRenderHint(QPainter::Antialiasing);
+  
+  // Get title bar to access theme colors
+  TPanelTitleBar *titleBar = qobject_cast<TPanelTitleBar *>(parentWidget());
+  
+  // Determine circle color based on state
+  QColor circleColor;
+  if (m_pressed) {
+    // When bound, use active title color
+    circleColor = titleBar ? titleBar->getActiveTitleColor() : QColor(0, 150, 255);
+  } else {
+    // When not bound, use dimmed title color
+    circleColor = titleBar ? titleBar->getTitleColor() : QColor(160, 160, 160);
+    circleColor.setAlpha(m_rollover ? 200 : 120);  // Fade when not hovering
+  }
+  
+  // Draw small circle in the center of the button
+  QRect rect = this->rect();
+  int diameter = 8;  // Small circle (8px diameter)
+  int centerX = rect.center().x();
+  int centerY = rect.center().y();
+  
+  p.setPen(Qt::NoPen);
+  p.setBrush(circleColor);
+  p.drawEllipse(QPoint(centerX, centerY), diameter/2, diameter/2);
 }
 
 //=============================================================================
@@ -764,8 +908,11 @@ TPanel *TPanelFactory::createPanel(QWidget *parent, QString panelType) {
                                                                parent);
     }
 
+    // Fallback: create generic TPanel for unknown panel types
     TPanel *panel = new TPanel(parent);
     panel->setPanelType(panelType.toStdString());
+    // Enable room binding feature for generic panels
+    panel->addRoomBindButton();
     return panel;
   } else {
     TPanelFactory *factory = it.value();
@@ -782,6 +929,10 @@ TPanel *TPanelFactory::createPanel(QWidget *parent) {
   panel->setObjectName(getPanelType());
   panel->setWindowTitle(getPanelType());
   initialize(panel);
+  
+  // Enable room binding feature for all native panels
+  panel->addRoomBindButton();
+  
   return panel;
 }
 

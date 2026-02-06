@@ -54,6 +54,7 @@ public:
                            bool withSeparator = true);
 
   void searchItems(const QString& searchWord = QString());
+  void refreshTree();  // Rebuild tree with updated commands
 
 private:
   void displayAll(QTreeWidgetItem* item);

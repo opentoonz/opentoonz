@@ -82,11 +82,24 @@ class PltGizmoPopup final : public DVGui::Dialog {
   Q_OBJECT
 
   DVGui::ColorField *m_colorFld;
+  
+  // Room binding members
+  bool m_isRoomBound;
+  QString m_boundRoomName;
 
 public:
   PltGizmoPopup();
 
   ~PltGizmoPopup();
+  
+  // Room binding methods
+  bool isRoomBound() const { return m_isRoomBound; }
+  void setRoomBound(bool bound) { m_isRoomBound = bound; }
+  QString getBoundRoomName() const { return m_boundRoomName; }
+  void setBoundRoomName(const QString &roomName) { m_boundRoomName = roomName; }
+
+protected:
+  void contextMenuEvent(QContextMenuEvent *event) override;
 
 public slots:
 
