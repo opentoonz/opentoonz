@@ -442,9 +442,21 @@ int main(int argc, char *argv[]) {
 
   TEnv::setApplicationFileName(argv[0]);
 
-  // splash screen
-  QPixmap splashPixmap = QIcon(":Resources/splash.svg").pixmap(QSize(610, 344));
+// splash screen (override with local file if present)
+QString exeDir = QCoreApplication::applicationDirPath();
+QString localSplashPath = QDir(exeDir).filePath("splash.svg");
 
+QPixmap splashPixmap;
+
+if (QFileInfo(localSplashPath).exists() && QFileInfo(localSplashPath).isFile()) {
+  splashPixmap = QIcon(localSplashPath).pixmap(QSize(610, 344));
+  if (splashPixmap.isNull()) {
+    // fallback if loading fails
+    splashPixmap = QIcon(":Resources/splash.svg").pixmap(QSize(610, 344));
+  }
+} else {
+  splashPixmap = QIcon(":Resources/splash.svg").pixmap(QSize(610, 344));
+}
 #ifdef _WIN32
   QFont font("Segoe UI", -1);
 #else

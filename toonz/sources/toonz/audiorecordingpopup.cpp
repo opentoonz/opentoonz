@@ -3,6 +3,7 @@
 // Tnz6 includes
 #include "tapp.h"
 #include "menubarcommandids.h"
+#include "mainwindow.h"
 
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
@@ -50,6 +51,8 @@
 #include <QMultimedia>
 #include <QPainter>
 #include <QElapsedTimer>
+#include <QMenu>
+#include <QContextMenuEvent>
 
 #ifndef WAVE_FORMAT_PCM
 #define WAVE_FORMAT_PCM 1
@@ -61,7 +64,9 @@
 //=============================================================================
 
 AudioRecordingPopup::AudioRecordingPopup()
-    : Dialog(TApp::instance()->getMainWindow(), false, true, "AudioRecording") {
+    : Dialog(TApp::instance()->getMainWindow(), false, true, "AudioRecording")
+    , m_isRoomBound(false)
+    , m_boundRoomName("") {
   setWindowTitle(tr("Audio Recording"));
 
   m_isPlaying            = false;
@@ -274,6 +279,43 @@ AudioRecordingPopup::AudioRecordingPopup()
 //-----------------------------------------------------------------------------
 
 AudioRecordingPopup::~AudioRecordingPopup() {}
+
+//-----------------------------------------------------------------------------
+
+void AudioRecordingPopup::contextMenuEvent(QContextMenuEvent *event) {
+  QMenu *menu = new QMenu(this);
+  
+  // Add "Bind to Current Room" option
+  QAction *bindAction = menu->addAction(tr("Bind to Current Room"));
+  bindAction->setCheckable(true);
+  bindAction->setChecked(m_isRoomBound);
+  
+  connect(bindAction, &QAction::triggered, [this](bool checked) {
+    MainWindow *mw = dynamic_cast<MainWindow *>(
+        TApp::instance()->getMainWindow());
+    if (!mw) return;
+    
+    Room *currentRoom = mw->getCurrentRoom();
+    if (!currentRoom) return;
+    
+    // Update binding state
+    setRoomBound(checked);
+    if (checked) {
+      // Bind to current room
+      setBoundRoomName(currentRoom->getName());
+    } else {
+      // Unbind
+      setBoundRoomName("");
+      // Show if hidden
+      if (isHidden()) {
+        show();
+      }
+    }
+  });
+  
+  menu->exec(event->globalPos());
+  delete menu;
+}
 
 //-----------------------------------------------------------------------------
 

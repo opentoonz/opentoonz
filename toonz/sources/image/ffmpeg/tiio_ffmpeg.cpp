@@ -110,8 +110,13 @@ void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex) {
   TRaster32P raster32;
 
   if (m_bpp == 4) {
-    // Already 32-bit integer fast path
-    raster32 = raster;
+    // Already 32-bit integer fast path, clone and mirror
+    raster32 = raster->clone();
+    if (!raster32) {
+      DVGui::warning(QObject::tr("Failed to clone raster for FFmpeg"));
+      return;
+    }
+    raster32->yMirror();  // Mirror only once here
   } else {
     // FP32 or 64-bit convert safely
     raster32 = TRaster32P(m_lx, m_ly);
@@ -136,11 +141,6 @@ void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex) {
           }
         }
         rasterFloat->unlock();
-      } else {
-        // not is TPixelF
-        DVGui::warning(
-            QObject::tr("m_bpp == 16 but cast to TPixelF failed – proceeding "
-                        "without clamp"));
       }
     }
 
@@ -152,9 +152,8 @@ void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex) {
           QObject::tr("Failed to convert raster to 32-bit ARGB (after clamp)"));
       return;
     }
+    raster32->yMirror();  // Mirror only once here
   }
-
-  raster32->yMirror();
 
   QImage qi(raster32->getRawData(), m_lx, m_ly, raster32->getWrap() * 4,
             QImage::Format_ARGB32);
