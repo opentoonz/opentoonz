@@ -51,8 +51,8 @@ ShortcutPopup *ShortcutPopup::s_instance = nullptr;
 //=============================================================================
 // ShortcutItem
 // ------------
-// Lo ShortcutTree visualizza ShortcutItem (organizzati in folder)
-// ogni ShortcutItem rappresenta una QAction (e relativo Shortcut)
+// The ShortcutTree displays ShortcutItem (organized in folders)
+// each ShortcutItem represents a QAction (and its Shortcut)
 //-----------------------------------------------------------------------------
 
 class ShortcutItem final : public QTreeWidgetItem {
@@ -67,7 +67,8 @@ public:
   void updateText() {
     QString text = m_action->text();
     // removing accelerator key indicator
-    text = text.replace(QRegExp("&([^& ])"), "\\1");
+    QRegularExpression regex("&([^& ])");
+    text = text.replace(regex, "\\1");
     // removing doubled &s
     text = text.replace("&&", "&");
     setText(0, text);
@@ -85,7 +86,8 @@ ShortcutViewer::ShortcutViewer(QWidget *parent)
     : QKeySequenceEdit(parent), m_action(0), m_keysPressed(0) {
   setObjectName("ShortcutViewer");
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  connect(this, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
+  connect(this, &ShortcutViewer::editingFinished, this,
+          &ShortcutViewer::onEditingFinished);
 }
 
 //-----------------------------------------------------------------------------
