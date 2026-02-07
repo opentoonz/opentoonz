@@ -103,15 +103,27 @@ void insertPoint(TStroke *stroke, int indexA, int indexB) {
 ControlPointEditorStroke::ControlPointEditorStroke(
     const ControlPointEditorStroke &other)
     : m_controlPoints(other.m_controlPoints)
-    , m_vi(other.m_vi)
-    , m_strokeIndex(other.m_strokeIndex) {}
+    , m_strokeIndex(other.m_strokeIndex) {
+  // Clone the vector image if it exists
+  if (other.m_vi) {
+    m_vi = other.m_vi->clone();  // !Clone the image, don't share!
+  } else {
+    m_vi = TVectorImageP();  // !Use empty constructor instead of nullptr
+  }
+}
 
 ControlPointEditorStroke &ControlPointEditorStroke::operator=(
     const ControlPointEditorStroke &other) {
   if (this != &other) {
     m_controlPoints = other.m_controlPoints;
-    m_vi            = other.m_vi;
     m_strokeIndex   = other.m_strokeIndex;
+
+    // Clone the vector image if it exists
+    if (other.m_vi) {
+      m_vi = other.m_vi->clone();  // !Clone the image, don't share!
+    } else {
+      m_vi = TVectorImageP();  // !Use empty constructor instead of nullptr
+    }
   }
   return *this;
 }
@@ -119,7 +131,6 @@ ControlPointEditorStroke &ControlPointEditorStroke::operator=(
 ControlPointEditorStroke *ControlPointEditorStroke::clone() const {
   return new ControlPointEditorStroke(*this);
 }
-
 //-----------------------------------------------------------------------------
 
 int ControlPointEditorStroke::nextIndex(int index) const {
@@ -479,10 +490,20 @@ void ControlPointEditorStroke::moveSingleControlPoint(int index,
   // Directions must be recalculated in the linear cases
   if ((selfLoop || index > 0) && isSpeedInLinear(index)) {
     setLinearSpeedIn(index, true, false);
+
+    // Recalculate the previous neighbor if it's linear
+    int prevIndex = (selfLoop && index == 0) ? cpCount - 2 : index - 1;
+    if (m_controlPoints[prevIndex].m_isCusp && isSpeedOutLinear(prevIndex))
+      setLinearSpeedOut(prevIndex, true, false);
   }
 
   if ((selfLoop || index < cpCount - 1) && isSpeedOutLinear(index)) {
     setLinearSpeedOut(index, true, false);
+
+    // Recalculate the next neighbor if it's linear
+    int nextIndex = (selfLoop && index == cpCount - 2) ? 0 : index + 1;
+    if (m_controlPoints[nextIndex].m_isCusp && isSpeedInLinear(nextIndex))
+      setLinearSpeedIn(nextIndex, true, false);
   }
 }
 
