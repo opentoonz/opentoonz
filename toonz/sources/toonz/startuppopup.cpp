@@ -11,6 +11,8 @@
 #include "menubarcommandids.h"
 #include "tenv.h"
 #include "toonz/stage.h"
+#include "layoutUtils.h"
+#include "layoutPresetsEditorPopup.h"
 
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
@@ -122,6 +124,8 @@ StartupPopup::StartupPopup()
   m_fpsFld                  = new DoubleLineEdit(this, 24.0);
   m_cameraSettingsWidget    = new CameraSettingsWidget(false);
   m_presetCombo             = new QComboBox(this);
+  m_layoutCombo             = new QComboBox(this);
+  m_editLayoutBtn           = new QPushButton(tr("Edit Layout Presets"), this);
   m_unitsCB                 = new QComboBox(this);
   m_addPresetBtn            = new QPushButton(tr("Add"), this);
   m_removePresetBtn         = new QPushButton(tr("Remove"), this);
@@ -228,8 +232,23 @@ StartupPopup::StartupPopup()
       newSceneLay->addWidget(new QLabel(tr("Save In:")), 1, 0,
                              Qt::AlignRight | Qt::AlignVCenter);
       newSceneLay->addWidget(m_pathFld, 1, 1, 1, 3);
-      newSceneLay->addWidget(new QLabel(tr("Camera Size:")), 2, 0,
+
+      // Layout template
+      newSceneLay->addWidget(new QLabel(tr("Layout Template:")), 2, 0,
                              Qt::AlignRight | Qt::AlignVCenter);
+      QHBoxLayout *layListLay = new QHBoxLayout();
+      layListLay->setSpacing(2);
+      layListLay->setMargin(1);
+      {
+        layListLay->addWidget(m_layoutCombo, 1);
+        layListLay->addWidget(m_editLayoutBtn, 0);
+      }
+      newSceneLay->addLayout(layListLay, 2, 1, 1, 3, Qt::AlignLeft);
+
+      // Camera Size
+      newSceneLay->addWidget(new QLabel(tr("Camera Size:")), 3, 0,
+                             Qt::AlignRight | Qt::AlignVCenter);
+
       QHBoxLayout *resListLay = new QHBoxLayout();
       resListLay->setSpacing(3);
       resListLay->setContentsMargins(1, 1, 1, 1);
@@ -238,30 +257,31 @@ StartupPopup::StartupPopup()
         resListLay->addWidget(m_addPresetBtn, 0);
         resListLay->addWidget(m_removePresetBtn, 0);
       }
-      newSceneLay->addLayout(resListLay, 2, 1, 1, 3, Qt::AlignLeft);
+      newSceneLay->addLayout(resListLay, 3, 1, 1, 3, Qt::AlignLeft);
 
       // Width - Height
-      newSceneLay->addWidget(m_widthLabel, 3, 0,
+      newSceneLay->addWidget(m_widthLabel, 4, 0,
                              Qt::AlignRight | Qt::AlignVCenter);
-      newSceneLay->addWidget(m_widthFld, 3, 1);
-      newSceneLay->addWidget(m_heightLabel, 3, 2,
+      newSceneLay->addWidget(m_widthFld, 4, 1);
+      newSceneLay->addWidget(m_heightLabel, 4, 2,
                              Qt::AlignRight | Qt::AlignVCenter);
-      newSceneLay->addWidget(m_heightFld, 3, 3);
+      newSceneLay->addWidget(m_heightFld, 4, 3);
 
-      newSceneLay->addWidget(m_resTextLabel, 4, 0, 1, 1, Qt::AlignRight);
-      newSceneLay->addWidget(m_resXFld, 4, 1);
-      newSceneLay->addWidget(m_resXLabel, 4, 2, 1, 1, Qt::AlignCenter);
-      newSceneLay->addWidget(m_resYFld, 4, 3);
-      newSceneLay->addWidget(new QLabel(tr("Units:")), 5, 0,
+      newSceneLay->addWidget(m_resTextLabel, 5, 0, 1, 1, Qt::AlignRight);
+      newSceneLay->addWidget(m_resXFld, 5, 1);
+      newSceneLay->addWidget(m_resXLabel, 5, 2, 1, 1, Qt::AlignCenter);
+      newSceneLay->addWidget(m_resYFld, 5, 3);
+
+      newSceneLay->addWidget(new QLabel(tr("Units:")), 6, 0,
                              Qt::AlignRight | Qt::AlignVCenter);
-      newSceneLay->addWidget(m_unitsCB, 5, 1, 1, 1);
-      newSceneLay->addWidget(m_dpiLabel, 5, 2,
+      newSceneLay->addWidget(m_unitsCB, 6, 1, 1, 1);
+      newSceneLay->addWidget(m_dpiLabel, 6, 2,
                              Qt::AlignRight | Qt::AlignVCenter);
-      newSceneLay->addWidget(m_dpiFld, 5, 3, 1, 1);
-      newSceneLay->addWidget(m_fpsLabel, 6, 0,
+      newSceneLay->addWidget(m_dpiFld, 6, 3, 1, 1);
+      newSceneLay->addWidget(m_fpsLabel, 7, 0,
                              Qt::AlignRight | Qt::AlignVCenter);
-      newSceneLay->addWidget(m_fpsFld, 6, 1, 1, 1);
-      newSceneLay->addWidget(createButton, 7, 1, 1, 3, Qt::AlignLeft);
+      newSceneLay->addWidget(m_fpsFld, 7, 1, 1, 1);
+      newSceneLay->addWidget(createButton, 8, 1, 1, 3, Qt::AlignLeft);
     }
     newSceneWidget->setLayout(newSceneLay);
     m_scenesTab->addTab(newSceneWidget, tr("Create a New Scene"));
@@ -345,12 +365,15 @@ StartupPopup::StartupPopup()
           &StartupPopup::onAutoSaveTimeChanged);
   connect(m_existingList, &StartupScenesList::itemClicked, this,
           &StartupPopup::onExistingSceneClicked);
+  connect(m_editLayoutBtn, &QPushButton::clicked, this,
+          &StartupPopup::onEditLayout);
 }
 
 //-----------------------------------------------------------------------------
 
 void StartupPopup::showEvent(QShowEvent *) {
   loadPresetList();
+  loadLayoutList();
   updateProjectCB();
   m_nameFld->setFocus();
   m_pathFld->setPath(TApp::instance()
@@ -590,6 +613,14 @@ void StartupPopup::onCreateButton() {
       size);
   TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera()->setRes(
       res);
+  if (m_layoutCombo->currentIndex() != 0 && m_layoutCombo->count() > 0) {
+    TApp::instance()
+        ->getCurrentScene()
+        ->getScene()
+        ->getProperties()
+        ->setLayoutPresetName(m_layoutCombo->currentText());
+    layoutUtils::updateCacheIfNeeded();
+  }
   // Save the scene right away
   IoCmd::saveScene();
   // This makes sure the scene viewers update to the right fps
@@ -734,6 +765,20 @@ void StartupPopup::loadPresetList() {
   m_presetCombo->setCurrentIndex(0);
 }
 
+void StartupPopup::loadLayoutList() {
+  int oldIndex =
+      m_layoutCombo->count() == 0 ? 0 : m_layoutCombo->currentIndex();
+  m_layoutCombo->clear();
+  m_layoutCombo->addItem("...");
+  QList<QString> nameList;
+  layoutUtils::loadLayoutPresetList(nameList);
+  for (QString str : nameList) {
+    m_layoutCombo->addItem(str);
+  }
+  if (oldIndex < m_layoutCombo->count())
+    m_layoutCombo->setCurrentIndex(oldIndex);
+}
+
 //-----------------------------------------------------------------------------
 
 void StartupPopup::savePresetList() {
@@ -838,6 +883,15 @@ void StartupPopup::onPresetSelected(const QString &str) {
            "Possibly the preset file has been corrupted")
             .arg(str));
   }
+}
+
+void StartupPopup::onEditLayout() {
+  QWidget *parent = TApp::instance()->getMainWindow();
+
+  LayoutPresetsEditorPopup *popup = LayoutPresetsEditorPopup::instance(this);
+  popup->setWindowModality(Qt::WindowModality::ApplicationModal);
+  popup->show();
+  loadLayoutList();
 }
 
 //--------------------------------------------------------------------------
