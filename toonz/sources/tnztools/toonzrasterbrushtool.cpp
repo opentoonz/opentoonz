@@ -1511,7 +1511,7 @@ void ToonzRasterBrushTool::inputMouseMove(const TPointD &position,
   m_mousePos       = pos;
   m_windowMousePos = -e.m_pos;
   
-  invalidate(invalidateRect.enlarge(20));
+  invalidate(invalidateRect.enlarge(2));
 
   if (m_minThick == 0 && m_maxThick == 0) {
     m_minThick = m_rasThickness.getValue().first;
