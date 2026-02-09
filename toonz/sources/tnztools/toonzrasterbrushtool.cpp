@@ -1503,11 +1503,14 @@ void ToonzRasterBrushTool::inputMouseMove(const TPointD &position,
                              m_brushPos + TPointD(radius, radius));
 
   } else {
-    m_brushPos = m_mousePos = position;
+    m_brushPos = getCenteredCursorPos(pos);
 
     invalidateRect += TRectD(position - halfThick, position + halfThick);
   }
 
+  m_mousePos       = pos;
+  m_windowMousePos = -e.m_pos;
+  
   invalidate(invalidateRect.enlarge(20));
 
   if (m_minThick == 0 && m_maxThick == 0) {
