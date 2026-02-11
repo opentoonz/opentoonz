@@ -51,8 +51,8 @@ ShortcutPopup *ShortcutPopup::s_instance = nullptr;
 //=============================================================================
 // ShortcutItem
 // ------------
-// Lo ShortcutTree visualizza ShortcutItem (organizzati in folder)
-// ogni ShortcutItem rappresenta una QAction (e relativo Shortcut)
+// The ShortcutTree displays ShortcutItem (organized in folders)
+// each ShortcutItem represents a QAction (and its Shortcut)
 //-----------------------------------------------------------------------------
 
 class ShortcutItem final : public QTreeWidgetItem {
@@ -67,7 +67,8 @@ public:
   void updateText() {
     QString text = m_action->text();
     // removing accelerator key indicator
-    text = text.replace(QRegExp("&([^& ])"), "\\1");
+    QRegularExpression regex("&([^& ])");
+    text = text.replace(regex, "\\1");
     // removing doubled &s
     text = text.replace("&&", "&");
     setText(0, text);
@@ -85,7 +86,8 @@ ShortcutViewer::ShortcutViewer(QWidget *parent)
     : QKeySequenceEdit(parent), m_action(0), m_keysPressed(0) {
   setObjectName("ShortcutViewer");
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  connect(this, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
+  connect(this, &ShortcutViewer::editingFinished, this,
+          &ShortcutViewer::onEditingFinished);
 }
 
 //-----------------------------------------------------------------------------
@@ -234,8 +236,7 @@ void ShortcutViewer::leaveEvent(QEvent *event) { update(); }
 // ShortcutTree
 //-----------------------------------------------------------------------------
 
-ShortcutTree::ShortcutTree(QWidget *parent)
-    : QTreeWidget(parent) {
+ShortcutTree::ShortcutTree(QWidget *parent) : QTreeWidget(parent) {
   setObjectName("ShortcutTree");
   setIndentation(14);
   setAlternatingRowColors(true);
@@ -283,20 +284,22 @@ ShortcutTree::ShortcutTree(QWidget *parent)
   addFolder(tr("RGBA Channels"), RGBACommandType);
 
   sortItems(0, Qt::AscendingOrder);
-  
+
   restoreExpandedState();
 
-  connect(
-      this, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
-      this, SLOT(onCurrentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
-  connect(this, SIGNAL(clicked(const QModelIndex &)), this,
-          SLOT(onItemClicked(const QModelIndex &)));
-  connect(this, SIGNAL(itemCollapsed(QTreeWidgetItem *)), this,
-          SLOT(onItemCollapsed(QTreeWidgetItem *)));
-  connect(this, &QTreeWidget::itemExpanded, [this](QTreeWidgetItem *) {
+  connect(this, &ShortcutTree::currentItemChanged, this,
+          &ShortcutTree::onCurrentItemChanged);
+
+  connect(this, &ShortcutTree::clicked, this, &ShortcutTree::onItemClicked);
+
+  connect(this, &QTreeWidget::itemCollapsed, this,
+          &ShortcutTree::onItemCollapsed);
+
+  connect(this, &QTreeWidget::itemExpanded, this, [this](QTreeWidgetItem *) {
     if (m_lastSearchTerm.isEmpty()) saveExpandedState();
   });
-  connect(this, &QTreeWidget::itemCollapsed, [this](QTreeWidgetItem *) {
+
+  connect(this, &QTreeWidget::itemCollapsed, this, [this](QTreeWidgetItem *) {
     if (m_lastSearchTerm.isEmpty()) saveExpandedState();
   });
 }
@@ -310,7 +313,7 @@ ShortcutTree::~ShortcutTree() {}
 void ShortcutTree::saveExpandedState() {
   QSettings settings;
   QStringList expandedFolders = collectExpandedState();
-  
+
   settings.setValue("ShortcutPopup/expandedFolders", expandedFolders);
   settings.setValue("ShortcutPopup/expandedStateSaved", true);
 }
@@ -330,22 +333,22 @@ void ShortcutTree::restoreExpandedState() {
 
 QStringList ShortcutTree::collectExpandedState() const {
   QStringList expandedFolders;
-  
+
   // Save expanded state for all folders
-  for (QTreeWidgetItem* folder : m_folders) {
+  for (QTreeWidgetItem *folder : m_folders) {
     if (folder && folder->isExpanded()) {
       expandedFolders.append(folder->text(0));
     }
   }
-  
+
   // Save expanded state for all subfolders (with parent path)
-  for (QTreeWidgetItem* subfolder : m_subFolders) {
+  for (QTreeWidgetItem *subfolder : m_subFolders) {
     if (subfolder && subfolder->isExpanded() && subfolder->parent()) {
       QString path = subfolder->parent()->text(0) + "/" + subfolder->text(0);
       expandedFolders.append(path);
     }
   }
-  
+
   return expandedFolders;
 }
 
@@ -354,7 +357,7 @@ QStringList ShortcutTree::collectExpandedState() const {
 void ShortcutTree::applyExpandedState(const QStringList &expandedFolders,
                                       bool useDefaultIfEmpty) {
   // Restore state for top-level folders
-  for (QTreeWidgetItem* folder : m_folders) {
+  for (QTreeWidgetItem *folder : m_folders) {
     if (folder) {
       QString folderName = folder->text(0);
       if (!expandedFolders.isEmpty()) {
@@ -364,9 +367,9 @@ void ShortcutTree::applyExpandedState(const QStringList &expandedFolders,
       }
     }
   }
-  
+
   // Restore state for subfolders
-  for (QTreeWidgetItem* subfolder : m_subFolders) {
+  for (QTreeWidgetItem *subfolder : m_subFolders) {
     if (subfolder && subfolder->parent()) {
       QString path = subfolder->parent()->text(0) + "/" + subfolder->text(0);
       if (!expandedFolders.isEmpty()) {
@@ -383,28 +386,29 @@ void ShortcutTree::applyExpandedState(const QStringList &expandedFolders,
 void ShortcutTree::refreshTree() {
   // === STEP 1: Save expansion state before clearing ===
   QMap<QString, bool> expandedState;
-  
+
   // Save state for top-level folders
-  for (QTreeWidgetItem* folder : m_folders) {
+  for (QTreeWidgetItem *folder : m_folders) {
     if (folder) {
       expandedState[folder->text(0)] = folder->isExpanded();
     }
   }
-  
+
   // Save state for sub-folders
-  for (QTreeWidgetItem* subfolder : m_subFolders) {
+  for (QTreeWidgetItem *subfolder : m_subFolders) {
     if (subfolder && subfolder->parent()) {
-      QString fullPath = subfolder->parent()->text(0) + "/" + subfolder->text(0);
+      QString fullPath =
+          subfolder->parent()->text(0) + "/" + subfolder->text(0);
       expandedState[fullPath] = subfolder->isExpanded();
     }
   }
-  
+
   // === STEP 2: Clear and rebuild ===
   m_items.clear();
   m_folders.clear();
   m_subFolders.clear();
   clear();
-  
+
   // Rebuild the tree structure
   QTreeWidgetItem *menuCommandFolder = new QTreeWidgetItem(this);
   menuCommandFolder->setText(0, tr("Menu Commands"));
@@ -441,10 +445,10 @@ void ShortcutTree::refreshTree() {
   addFolder(tr("RGBA Channels"), RGBACommandType);
 
   sortItems(0, Qt::AscendingOrder);
-  
+
   // === STEP 3: Restore expansion state ===
   // Restore state for top-level folders (only if state exists)
-  for (QTreeWidgetItem* folder : m_folders) {
+  for (QTreeWidgetItem *folder : m_folders) {
     if (folder) {
       QString folderName = folder->text(0);
       if (expandedState.contains(folderName)) {
@@ -453,23 +457,24 @@ void ShortcutTree::refreshTree() {
       // No default behavior - keep folders collapsed if no state exists
     }
   }
-  
+
   // Restore state for sub-folders (only if state exists)
-  for (QTreeWidgetItem* subfolder : m_subFolders) {
+  for (QTreeWidgetItem *subfolder : m_subFolders) {
     if (subfolder && subfolder->parent()) {
-      QString fullPath = subfolder->parent()->text(0) + "/" + subfolder->text(0);
+      QString fullPath =
+          subfolder->parent()->text(0) + "/" + subfolder->text(0);
       if (expandedState.contains(fullPath)) {
         subfolder->setExpanded(expandedState[fullPath]);
       }
       // No default behavior - keep folders collapsed if no state exists
     }
   }
-  
+
   // === STEP 4: Restore search filter if one was active ===
   if (!m_lastSearchTerm.isEmpty()) {
     searchItems(m_lastSearchTerm);
   }
-  
+
   update();
 }
 
@@ -500,7 +505,7 @@ void ShortcutTree::addFolder(const QString &title, int commandType,
 
 void ShortcutTree::searchItems(const QString &searchWord) {
   m_lastSearchTerm = searchWord;
-  
+
   if (searchWord.isEmpty()) {
     // Reset: show all items
     for (int i = 0; i < (int)m_items.size(); i++) m_items[i]->setHidden(false);
@@ -513,16 +518,16 @@ void ShortcutTree::searchItems(const QString &searchWord) {
       // Open only "Menu Commands"
       m_folders[f]->setExpanded(m_folders[f]->text(0) == tr("Menu Commands"));
     }
-    
+
     // Clear user collapse tracking
     m_userCollapsedDuringSearch.clear();
-    
+
     show();
     emit searched(true);
     update();
     return;
   }
-  
+
   // Starting a new search: clear user collapse tracking
   if (m_lastSearchTerm.isEmpty()) {
     m_userCollapsedDuringSearch.clear();
@@ -531,7 +536,7 @@ void ShortcutTree::searchItems(const QString &searchWord) {
   // Multi-word search: split search term by spaces and match all words
   QStringList searchWords = searchWord.split(' ', Qt::SkipEmptyParts);
   QList<QTreeWidgetItem *> foundItems;
-  
+
   if (searchWords.isEmpty()) {
     // No valid search words after splitting
     hide();
@@ -539,15 +544,16 @@ void ShortcutTree::searchItems(const QString &searchWord) {
     update();
     return;
   }
-  
+
   // Find items that contain ALL search words (case-insensitive)
   // Search in item name AND parent folder names
   for (int i = 0; i < (int)m_items.size(); i++) {
     QTreeWidgetItem *item = m_items[i];
-    QString itemText = item->text(0);  // Get item name
-    
-    // Build full search text: item name + parent folder name + grandparent folder name
-    QString fullSearchText = itemText;
+    QString itemText      = item->text(0);  // Get item name
+
+    // Build full search text: item name + parent folder name + grandparent
+    // folder name
+    QString fullSearchText  = itemText;
     QTreeWidgetItem *parent = item->parent();
     if (parent) {
       fullSearchText += " " + parent->text(0);
@@ -556,7 +562,7 @@ void ShortcutTree::searchItems(const QString &searchWord) {
         fullSearchText += " " + grandparent->text(0);
       }
     }
-    
+
     bool matchesAllWords = true;
     for (const QString &word : searchWords) {
       if (!fullSearchText.contains(word, Qt::CaseInsensitive)) {
@@ -564,12 +570,12 @@ void ShortcutTree::searchItems(const QString &searchWord) {
         break;
       }
     }
-    
+
     if (matchesAllWords) {
       foundItems.append(item);
     }
   }
-  
+
   if (foundItems.isEmpty()) {
     hide();
     emit searched(false);
@@ -582,7 +588,8 @@ void ShortcutTree::searchItems(const QString &searchWord) {
     m_items[i]->setHidden(!foundItems.contains(m_items[i]));
 
   // hide folders which does not contain matched items
-  // show AND expand folders containing matched items (unless user manually closed them)
+  // show AND expand folders containing matched items (unless user manually
+  // closed them)
   bool found;
   for (int f = 0; f < m_subFolders.size(); f++) {
     QTreeWidgetItem *sf = m_subFolders.at(f);
@@ -594,10 +601,11 @@ void ShortcutTree::searchItems(const QString &searchWord) {
       }
     }
     sf->setHidden(!found);
-    
+
     // Expand only if: has results AND user hasn't manually closed it
     if (found) {
-      QString path = sf->parent() ? sf->parent()->text(0) + "/" + sf->text(0) : sf->text(0);
+      QString path = sf->parent() ? sf->parent()->text(0) + "/" + sf->text(0)
+                                  : sf->text(0);
       if (!m_userCollapsedDuringSearch.contains(path)) {
         sf->setExpanded(true);
       }
@@ -613,7 +621,7 @@ void ShortcutTree::searchItems(const QString &searchWord) {
       }
     }
     fol->setHidden(!found);
-    
+
     // Expand only if: has results AND user hasn't manually closed it
     if (found) {
       QString folderName = fol->text(0);
@@ -673,7 +681,7 @@ ShortcutPopup::ShortcutPopup()
     : Dialog(TApp::instance()->getMainWindow(), false, false, "Shortcut") {
   // Register this instance
   s_instance = this;
-  
+
   setWindowTitle(tr("Configure Shortcuts"));
   m_presetChoiceCB = new QComboBox(this);
   buildPresets();
@@ -764,26 +772,39 @@ ShortcutPopup::ShortcutPopup()
     // m_topLayout->addWidget(m_exportButton, 0);
   }
 
-  connect(m_list, SIGNAL(actionSelected(QAction *)), m_sViewer,
-          SLOT(setAction(QAction *)));
+  connect(m_list, &ShortcutTree::actionSelected, m_sViewer,
+          &ShortcutViewer::setAction);
 
-  connect(m_removeBtn, SIGNAL(clicked()), m_sViewer, SLOT(removeShortcut()));
+  connect(m_removeBtn, &QPushButton::clicked, m_sViewer,
+          &ShortcutViewer::removeShortcut);
 
-  connect(m_sViewer, SIGNAL(shortcutChanged()), m_list,
-          SLOT(onShortcutChanged()));
+  connect(m_sViewer, &ShortcutViewer::shortcutChanged, m_list,
+          &ShortcutTree::onShortcutChanged);
 
-  connect(m_list, SIGNAL(searched(bool)), noSearchResultLabel,
-          SLOT(setHidden(bool)));
-  connect(m_searchEdit, SIGNAL(textChanged(const QString &)), this,
-          SLOT(onSearchTextChanged(const QString &)));
-  connect(m_presetChoiceCB, SIGNAL(currentIndexChanged(int)),
-          SLOT(onPresetChanged()));
-  connect(m_exportButton, SIGNAL(clicked()), SLOT(onExportButton()));
-  connect(m_deletePresetButton, SIGNAL(clicked()), SLOT(onDeletePreset()));
-  connect(m_savePresetButton, SIGNAL(clicked()), SLOT(onSavePreset()));
-  connect(m_loadPresetButton, SIGNAL(clicked()), SLOT(onLoadPreset()));
-  connect(m_clearAllShortcutsButton, SIGNAL(clicked()),
-          SLOT(clearAllShortcuts()));
+  connect(m_list, &ShortcutTree::searched, noSearchResultLabel,
+          &QLabel::setHidden);
+
+  connect(m_searchEdit, &QLineEdit::textChanged, this,
+          &ShortcutPopup::onSearchTextChanged);
+
+  connect(m_presetChoiceCB, QOverload<int>::of(&QComboBox::currentIndexChanged),
+          this, &ShortcutPopup::onPresetChanged);
+
+  // Use a lambda to adapt the clicked() signal to the slot signature
+  connect(m_exportButton, &QPushButton::clicked, this,
+          [this]() { onExportButton(); });
+
+  connect(m_deletePresetButton, &QPushButton::clicked, this,
+          &ShortcutPopup::onDeletePreset);
+
+  connect(m_savePresetButton, &QPushButton::clicked, this,
+          &ShortcutPopup::onSavePreset);
+
+  connect(m_loadPresetButton, &QPushButton::clicked, this,
+          &ShortcutPopup::onLoadPreset);
+
+  connect(m_clearAllShortcutsButton, &QPushButton::clicked, this,
+          &ShortcutPopup::clearAllShortcuts);
 }
 
 //-----------------------------------------------------------------------------
@@ -793,7 +814,7 @@ ShortcutPopup::~ShortcutPopup() {
   if (m_list) {
     m_list->saveExpandedState();
   }
-  
+
   // Unregister this instance
   if (s_instance == this) {
     s_instance = nullptr;
@@ -1101,43 +1122,44 @@ void ShortcutPopup::onSavePreset() {
 
 //-----------------------------------------------------------------------------
 
-void ShortcutPopup::showEvent(QShowEvent *se) { 
+void ShortcutPopup::showEvent(QShowEvent *se) {
   getCurrentPresetPref();
-  
+
   // Refresh brush preset and size commands to ensure they're up-to-date
   ToolPresetCommandManager::instance()->refreshPresetCommands();
   ToolPresetCommandManager::instance()->refreshSizeCommands();
-  
+
   // Restore search term from QSettings
   QSettings settings;
-  QString lastSearchTerm = settings.value("ShortcutPopup/searchText", "").toString();
-  
+  QString lastSearchTerm =
+      settings.value("ShortcutPopup/searchText", "").toString();
+
   // Step 1: Restore search text in the field WITHOUT triggering searchItems
   {
     QSignalBlocker blocker(m_searchEdit);
     m_searchEdit->setText(lastSearchTerm);
   }
-  
+
   // Step 2: Restore folder expansion state from QSettings
   m_list->restoreExpandedState();
-  
+
   // Step 3: If there was a search, apply filtering WITHOUT changing expansion
   if (!lastSearchTerm.isEmpty()) {
     // Save current expansion state before filtering
     QStringList expandedBeforeFilter;
     for (int i = 0; i < m_list->topLevelItemCount(); i++) {
-      QTreeWidgetItem* item = m_list->topLevelItem(i);
+      QTreeWidgetItem *item = m_list->topLevelItem(i);
       if (item && item->isExpanded()) {
         expandedBeforeFilter.append(item->text(0));
       }
     }
-    
+
     // Apply search filter (this will change expansion)
     m_list->searchItems(lastSearchTerm);
-    
+
     // Restore the expansion state we had before filtering
     for (int i = 0; i < m_list->topLevelItemCount(); i++) {
-      QTreeWidgetItem* item = m_list->topLevelItem(i);
+      QTreeWidgetItem *item = m_list->topLevelItem(i);
       if (item) {
         item->setExpanded(expandedBeforeFilter.contains(item->text(0)));
       }
@@ -1152,11 +1174,11 @@ void ShortcutPopup::hideEvent(QHideEvent *he) {
   if (m_list) {
     m_list->saveExpandedState();
   }
-  
+
   // Save search text to QSettings
   QSettings settings;
   settings.setValue("ShortcutPopup/searchText", m_searchEdit->text());
-  
+
   DVGui::Dialog::hideEvent(he);
 }
 

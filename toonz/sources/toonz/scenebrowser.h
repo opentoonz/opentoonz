@@ -47,7 +47,7 @@ public:
                bool noContextMenu = false, bool multiSelectionEnabled = false);
   ~SceneBrowser();
 
-  void sortByDataModel(DataType dataType, bool isDiscendent) override;
+  void sortByDataModel(DataType dataType, bool isDescendant) override;
   void refreshData() override;
 
   int getItemCount() const override;
@@ -62,24 +62,24 @@ public:
   QMenu *getContextMenu(QWidget *parent, int index) override;
 
   /*!
-This functions adds to the types to be filtered a new type;
-if this function is never  called, the default filter is all image
-files and scene files and palette files
-*/
+   This function adds a new type to the filter list;
+   if this function is never called, the default filter includes all image
+   files, scene files, and palette files.
+   */
   void addFilterType(const QString &type);
 
   /*!
-The setFilterTypes function directly specifies the list of file
-types to be displayed in the file browser.
-*/
+   The setFilterTypes function directly specifies the list of file types
+   to be displayed in the file browser.
+   */
   void setFilterTypes(const QStringList &types);
   const QStringList &getFilterTypes() const { return m_filter; }
   void removeFilterType(const QString &type);
 
   void setFolder(const TFilePath &fp, bool expandNode = false,
                  bool forceUpdate = false);
-  // process when inputting the folder which is not regitered in the folder tree
-  // (e.g. UNC path in Windows)
+  // Process when inputting a folder that is not registered in the folder tree
+  // (e.g., a UNC path in Windows)
   void setUnregisteredFolder(const TFilePath &fp);
 
   void setHistoryDay(std::string dayDateString);
@@ -91,8 +91,8 @@ types to be displayed in the file browser.
 
   static void updateItemViewerPanel();
 
-  // ritorna true se il file e' stato rinominato. dopo la chiamata fp contiene
-  // il nuovo path
+  // Returns true if the file has been renamed. After the call, fp contains
+  // the new path.
   static bool renameFile(TFilePath &fp, QString newName);
 
   void makeCurrentProjectVisible();
@@ -103,8 +103,8 @@ types to be displayed in the file browser.
   QSplitter *getMainSplitter() const { return m_mainSplitter; }
 
   // Enable double-click to open a scene.
-  // This is not always desirable (e.g. if a user double-clicks on a file in
-  // a "Save As" dialog, they expect the file will be saved to, not opened).
+  // This is not always desirable (e.g., if a user double-clicks on a file in
+  // a "Save As" dialog, they expect the file to be saved, not opened).
   // So it is disabled by default.
   void enableDoubleClickToOpenScenes();
 
@@ -125,7 +125,7 @@ protected:
 
   // Fill the QStringList with files selected in the browser, auxiliary files
   // (palette for tlv, hooks, sceneIcons)
-  // retrieve also the path, and return also the sceneIconsCount
+  // Also retrieve the path and return the sceneIconsCount.
   void setupVersionControlCommand(QStringList &files, QString &path,
                                   int &sceneIconsCount);
   void setupVersionControlCommand(QString &file, QString &path);
@@ -188,14 +188,14 @@ signals:
 
   void filePathClicked(const TFilePath &);
   void filePathDoubleClicked(const TFilePath &);
-  // reuse the list of TFrameId in order to skip loadInfo() when loading the
-  // level with sequencial frames.
+  // Reuse the list of TFrameId to skip loadInfo() when loading a level
+  // with sequential frames.
   void filePathsSelected(const std::set<TFilePath> &,
                          const std::list<std::vector<TFrameId>> &);
   void treeFolderChanged(const TFilePath &);
 
-  // for activating/deactivating the folder history buttons( back button &
-  // forward button )
+  // For activating/deactivating the folder history buttons (back button &
+  // forward button).
   void historyChanged(bool, bool);
 
 private:
@@ -211,8 +211,8 @@ private:
 
     bool m_isFolder;
     bool m_isLink;
-    // calling loadInfo to the level with sequencial frames is time consuming.
-    // so keep the list of frameIds at the first time and try to reuse it.
+    // Calling loadInfo for a level with sequential frames is time-consuming.
+    // So keep the list of frameIds from the first time and try to reuse it.
     std::vector<TFrameId> m_frameIds;
 
     Item() : m_frameCount(0), m_validInfo(false), m_fileSize(0) {}
@@ -234,7 +234,7 @@ private:
   DvItemViewer *m_itemViewer;
   FrameCountReader m_frameCountReader;
 
-  // folder history
+  // Folder history
   QList<QModelIndex> m_indexHistoryList;
   int m_currentPosition;
   int m_currentScroll;

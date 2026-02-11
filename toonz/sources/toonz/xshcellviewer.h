@@ -72,7 +72,7 @@ protected slots:
 // CellArea
 //-----------------------------------------------------------------------------
 
-//! La classe si occupa della visualizzazione delle celle nel viewer.
+//! The class handles the display of cells in the viewer
 class CellArea final : public QWidget {
   Q_OBJECT
 
@@ -129,7 +129,7 @@ class CellArea final : public QWidget {
 
   void drawFocusCellBorder(QPainter &p);
 
-  // Restistusce true
+  // Returns true
   bool getEaseHandles(int r0, int r1, double e0, double e1, int &rh0, int &rh1);
 
   bool isKeyFrameArea(int col, int row, QPoint mouseInCell);
@@ -141,16 +141,15 @@ public:
   CellArea(XsheetViewer *parent, Qt::WindowFlags flags = Qt::WindowFlags());
   ~CellArea();
 
+  // Event handlers
   void mouseMoveEvent(QMouseEvent *event) override;
 
-  // display upper-directional smart tab only when pressing ctrl key
+  // Display upper-directional smart tab only when pressing ctrl key
   void onControlPressed(bool pressed);
   const bool isControlPressed();
 
-  // edit current cell's ID
+  // Edit current cell's ID
   void onNumberPressed(int number);
-
-  //	void keyUpDownPressed(int newRow);
 
   void showRenameField(int row, int col, bool multiColumnSelected = false) {
     m_renameCell->showInRowCol(row, col, multiColumnSelected);
@@ -170,25 +169,23 @@ protected:
   void dropEvent(QDropEvent *event) override;
   bool event(QEvent *event) override;
 
-  /*!Crea il menu' del tasto destro che si visualizza quando si clicca sulla
-cella,
-distinguendo i due casi: cella piena, cella vuota.*/
+  /*! Creates the right-click menu that appears when clicking on a cell,
+      distinguishing between the two cases: full cell, empty cell. */
   void createCellMenu(QMenu &menu, bool isCellSelected, TXshCell cell, int row,
                       int col);
-  //! Crea il menu' del tasto destro che si visualizza si clicca su un key
-  //! frame.
+  //! Creates the right-click menu that appears when clicking on a key frame
   void createKeyMenu(QMenu &menu);
-  //! Crea il menu' del tasto destro che si visualizza quando si clicca sulla
-  //! linea tre due key frame.
+  //! Creates the right-click menu that appears when clicking on the line
+  //! between two key frames
   void createKeyLineMenu(QMenu &menu, int row, int col);
-  //! Crea il menu' del tasto destro che si visualizza quando si sopra una nota.
+  //! Creates the right-click menu that appears when hovering over a note
   void createNoteMenu(QMenu &menu);
 
 protected slots:
   void openNote();
   void deleteNote();
   void onStepChanged(QAction *);
-  // replace level with another level in the cast
+  // Replace level with another level in the cast
   void onReplaceByCastedLevel(QAction *action);
   void onSetCellMark();
 };

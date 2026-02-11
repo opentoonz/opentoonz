@@ -1,5 +1,3 @@
-
-
 #include "xshcellviewer.h"
 
 // Tnz6 includes
@@ -73,6 +71,7 @@
 #include <QToolTip>
 #include <QApplication>
 #include <QClipboard>
+#include <QRegularExpression>
 
 namespace {
 
@@ -104,7 +103,7 @@ bool selectionContainTlvImage(TCellSelection *selection, TXsheet *xsheet,
   int r0, r1, c0, c1;
   selection->getSelectedCells(r0, c0, r1, c1);
 
-  // Verifico se almeno un livello della selezione e' un tlv
+  // Check if at least one level in the selection is a tlv
   int c, r;
   for (c = c0; c <= c1; c++)
     for (r = r0; r <= r1; r++) {
@@ -127,7 +126,7 @@ bool selectionContainRasterImage(TCellSelection *selection, TXsheet *xsheet,
   int r0, r1, c0, c1;
   selection->getSelectedCells(r0, c0, r1, c1);
 
-  // Verifico se almeno un livello della selezione e' un tlv
+  // Check if at least one level in the selection is a raster
   int c, r;
   for (c = c0; c <= c1; c++)
     for (r = r0; r <= r1; r++) {
@@ -148,8 +147,8 @@ bool selectionContainRasterImage(TCellSelection *selection, TXsheet *xsheet,
 bool selectionContainLevelImage(TCellSelection *selection, TXsheet *xsheet) {
   int r0, r1, c0, c1;
   selection->getSelectedCells(r0, c0, r1, c1);
-  // Verifico se almeno un livello della selezione e' un tlv, un pli o un
-  // fullcolor (!= .psd)
+  // Check if at least one level in the selection is a tlv, pli, or fullcolor
+  // (!= .psd)
   int c, r;
   for (c = c0; c <= c1; c++)
     for (r = r0; r <= r1; r++) {
@@ -173,9 +172,9 @@ bool selectionContainLevelImage(TCellSelection *selection, TXsheet *xsheet) {
 */
 void parse_with_letter(const QString &text, std::wstring &levelName,
                        TFrameId &fid) {
-  QRegExp spaces("\\t|\\s");
-  QRegExp numbers("\\d+");
-  QRegExp characters("[^\\d+]");
+  static QRegularExpression spaces("\\t|\\s");
+  static QRegularExpression numbers("\\d+");
+  static QRegularExpression characters("[^\\d+]");
   QString str = text;
 
   // remove final spaces
@@ -297,11 +296,11 @@ void parse_with_letter(const QString &text, std::wstring &levelName,
 //-----------------------------------------------------------------------------
 
 void parse(const QString &text, std::wstring &levelName, TFrameId &fid) {
-  QRegExp spaces("\\t|\\s");
-  QRegExp numbers("\\d+");
-  QRegExp characters("[^\\d+]");
-  QRegExp fidWithSuffix(TFilePath::fidRegExpStr());
-  // QRegExp fidWithSuffix("([0-9]+)([a-z]?)");
+  static QRegularExpression spaces("\\t|\\s");
+  static QRegularExpression numbers("\\d+");
+  static QRegularExpression characters("[^\\d+]");
+  static QRegularExpression fidWithSuffix(TFilePath::fidRegExpStr());
+
   QString str = text;
 
   // remove final spaces
@@ -313,18 +312,21 @@ void parse(const QString &text, std::wstring &levelName, TFrameId &fid) {
     fid       = TFrameId::NO_FRAME;
     return;
   }
+
   int lastSpaceIndex = str.lastIndexOf(spaces);
   if (lastSpaceIndex == -1) {
     if (str.contains(numbers) && !str.contains(characters)) {
       levelName = L"";
       fid       = TFrameId(str.toInt());
-    } else if (fidWithSuffix.exactMatch(str)) {
-      levelName = L"";
-      fid       = TFrameId(fidWithSuffix.cap(1).toInt(), fidWithSuffix.cap(2));
-      // fidWithSuffix.cap(2) == "" ? 0 : fidWithSuffix.cap(2).toLatin1()[0]);
-    } else if (str.contains(characters)) {
-      levelName = text.toStdWString();
-      fid       = TFrameId::NO_FRAME;
+    } else {
+      QRegularExpressionMatch match = fidWithSuffix.match(str);
+      if (match.hasMatch() && match.capturedLength(0) == str.length()) {
+        levelName = L"";
+        fid       = TFrameId(match.captured(1).toInt(), match.captured(2));
+      } else if (str.contains(characters)) {
+        levelName = text.toStdWString();
+        fid       = TFrameId::NO_FRAME;
+      }
     }
   } else {
     QString lastString = str.right(str.size() - 1 - lastSpaceIndex);
@@ -332,14 +334,16 @@ void parse(const QString &text, std::wstring &levelName, TFrameId &fid) {
       QString firstString = str.left(lastSpaceIndex);
       levelName           = firstString.toStdWString();
       fid                 = TFrameId(lastString.toInt());
-    } else if (fidWithSuffix.exactMatch(lastString)) {
-      QString firstString = str.left(lastSpaceIndex);
-      levelName           = firstString.toStdWString();
-      fid = TFrameId(fidWithSuffix.cap(1).toInt(), fidWithSuffix.cap(2));
-      // fidWithSuffix.cap(2) == "" ? 0 : fidWithSuffix.cap(2).toLatin1()[0]);
-    } else if (lastString.contains(characters)) {
-      levelName = text.toStdWString();
-      fid       = TFrameId::NO_FRAME;
+    } else {
+      QRegularExpressionMatch match = fidWithSuffix.match(lastString);
+      if (match.hasMatch() && match.capturedLength(0) == lastString.length()) {
+        QString firstString = str.left(lastSpaceIndex);
+        levelName           = firstString.toStdWString();
+        fid = TFrameId(match.captured(1).toInt(), match.captured(2));
+      } else if (lastString.contains(characters)) {
+        levelName = text.toStdWString();
+        fid       = TFrameId::NO_FRAME;
+      }
     }
   }
 }
@@ -473,7 +477,7 @@ class RenameCellUndo final : public TUndo {
   const TXshCell m_newCell;
 
 public:
-  // indices sono le colonne inserite
+  // indices are the inserted columns
   RenameCellUndo(int row, int col, TXshCell oldCell, TXshCell newCell)
       : m_row(row), m_col(col), m_oldCell(oldCell), m_newCell(newCell) {}
 
@@ -617,7 +621,9 @@ int SetCellMarkUndo::getHistoryType() { return HistoryType::Xsheet; }
 
 RenameCellField::RenameCellField(QWidget *parent, XsheetViewer *viewer)
     : QLineEdit(parent), m_viewer(viewer), m_row(-1), m_col(-1) {
-  connect(this, SIGNAL(returnPressed()), SLOT(onReturnPressed()));
+  // Modern Qt5 signal-slot syntax
+  connect(this, &QLineEdit::returnPressed, this,
+          &RenameCellField::onReturnPressed);
   setContextMenuPolicy(Qt::PreventContextMenu);
   setObjectName("RenameCellField");
   setAttribute(Qt::WA_TranslucentBackground, true);
@@ -653,7 +659,7 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
   setFont(font);
   setAlignment(Qt::AlignRight | Qt::AlignBottom);
 
-  // Se la cella non e' vuota setto il testo
+  // If the cell is not empty, set the text
   TXsheet *xsh = m_viewer->getXsheet();
 
   // adjust text position
@@ -828,7 +834,6 @@ void RenameCellField::renameSoundTextColumn(TXshSoundTextColumn *sndTextCol,
 
 void RenameCellField::renameCell() {
   QString newName = text();
-  // std::wstring newName = s.toStdWString();
 
   setText("");
 
@@ -873,8 +878,7 @@ void RenameCellField::renameCell() {
     // rename cells for each column in the selection
     for (int c = c0; c <= c1; c++) {
       // if there is no level at the current cell, take the level from the
-      // previous frames
-      // (when editing not empty column)
+      // previous frames (when editing not empty column)
       if (xsheet->isColumnEmpty(c)) {
         // find a level with name same as the column (if the preferences option
         // is set to do so)
@@ -1046,11 +1050,10 @@ bool RenameCellField::eventFilter(QObject *obj, QEvent *e) {
 
   // These are usually standard ctrl/command strokes for text editing.
   // Default to standard behavior and don't execute OT's action while renaming
-  // cell if users prefer to do so.
-  // Or, always invoke OT's commands when renaming cell even the standard
-  // command strokes for text editing.
-  // The latter option is demanded by Japanese animation industry in order to
-  // gain efficiency for inputting xsheet.
+  // cell if users prefer to do so. Or, always invoke OT's commands when
+  // renaming cell even the standard command strokes for text editing. The
+  // latter option is demanded by Japanese animation industry in order to gain
+  // efficiency for inputting xsheet.
   if (!Preferences::instance()->isShortcutCommandsWhileRenamingCellEnabled() &&
       (actionId == "MI_Undo" || actionId == "MI_Redo" ||
        actionId == "MI_Clear" || actionId == "MI_Copy" ||
@@ -1139,16 +1142,18 @@ void RenameCellField::keyPressEvent(QKeyEvent *event) {
 //-----------------------------------------------------------------------------
 
 void RenameCellField::showEvent(QShowEvent *) {
-  bool ret = connect(TApp::instance()->getCurrentXsheet(),
-                     SIGNAL(xsheetChanged()), this, SLOT(onXsheetChanged()));
-  assert(ret);
+  // Modern Qt5 signal-slot syntax
+  connect(TApp::instance()->getCurrentXsheet(), &TXsheetHandle::xsheetChanged,
+          this, &RenameCellField::onXsheetChanged);
 }
 
 //-----------------------------------------------------------------------------
 
 void RenameCellField::hideEvent(QHideEvent *) {
-  disconnect(TApp::instance()->getCurrentXsheet(), SIGNAL(xsheetChanged()),
-             this, SLOT(onXsheetChanged()));
+  // Modern Qt5 signal-slot syntax
+  disconnect(TApp::instance()->getCurrentXsheet(),
+             &TXsheetHandle::xsheetChanged, this,
+             &RenameCellField::onXsheetChanged);
 }
 
 //-----------------------------------------------------------------------------
@@ -1344,7 +1349,7 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
     }
     // check if the column is reference
     bool isReference = true;
-    if (column) {  // Verifico se la colonna e' una mask
+    if (column) {  // Check if the column is a mask
       if (column->isControl() || column->isRendered() ||
           column->getMeshColumn())
         isReference = false;
@@ -2098,17 +2103,6 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference,
                                  : m_viewer->getTextColor();
   p.setPen(penColor);
 
-  /*
-  QString fontName = Preferences::instance()->getInterfaceFont();
-  if (fontName == "") {
-#ifdef _WIN32
-    fontName = "Arial";
-#else
-    fontName = "Helvetica";
-#endif
-  }
-  static QFont font(fontName, -1, QFont::Normal);
-  */
   QFont font = p.font();
   font.setPixelSize(XSHEET_FONT_PX_SIZE);
   p.setFont(font);
@@ -3182,7 +3176,7 @@ class CycleUndo final : public TUndo {
   CellArea *m_area;
 
 public:
-  // indices sono le colonne inserite
+  // indices are the inserted columns
   CycleUndo(TStageObject *pegbar, CellArea *area)
       : m_pegbar(pegbar), m_area(area) {}
   void undo() const override {
@@ -3302,16 +3296,16 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
     // TObjectHandle *oh = TApp::instance()->getCurrentObject();
     // oh->setObjectId(m_viewer->getObjectId(col));
 
-    // gmt, 28/12/2009. Non dovrebbe essere necessario, visto che dopo
-    // verra cambiata la colonna e quindi l'oggetto corrente
-    // Inoltre, facendolo qui, c'e' un problema con il calcolo del dpi
-    // (cfr. SceneViewer::onLevelChanged()): setObjectId() chiama (in cascata)
-    // onLevelChanged(), ma la colonna corrente risulta ancora quella di prima e
-    // quindi
-    // il dpi viene calcolato male. Quando si cambia la colonna l'oggetto
-    // corrente risulta
-    // gia' aggiornato e quindi non ci sono altre chiamate a onLevelChanged()
-    // cfr bug#5235
+    // gmt, 12/28/2009. This should not be necessary, since afterwards
+    // the column will be changed and therefore the current object
+    // will be updated.
+    // Moreover, doing it here causes a problem with DPI calculation
+    // (see SceneViewer::onLevelChanged()): setObjectId() calls (in cascade)
+    // onLevelChanged(), but the current column is still the previous one, and
+    // therefore
+    // the DPI is calculated incorrectly. When the column is changed, the
+    // current object is already updated, so there are no further calls to
+    // onLevelChanged() see bug#5235
 
     TStageObject *pegbar = xsh->getStageObject(m_viewer->getObjectId(col));
 
@@ -3474,7 +3468,7 @@ void CellArea::mouseMoveEvent(QMouseEvent *event) {
   QPoint pos        = event->pos();
   QRect visibleRect = visibleRegion().boundingRect();
   if (m_isPanning) {
-    // Pan tasto centrale
+    // Middle button pan
     m_viewer->scroll(m_pos - pos);
     return;
   }
@@ -3501,7 +3495,7 @@ void CellArea::mouseMoveEvent(QMouseEvent *event) {
 
   TXsheet *xsh = m_viewer->getXsheet();
 
-  // Verifico se e' una colonna sound
+  // Check if it's a sound column
   TXshColumn *column     = xsh->getColumn(col);
   bool isSoundColumn     = false;
   bool isZeraryColumn    = false;
@@ -3612,11 +3606,11 @@ void CellArea::mouseDoubleClickEvent(QMouseEvent *event) {
   CellPosition cellPosition = m_viewer->xyToPosition(event->pos());
   int row                   = cellPosition.frame();
   int col                   = cellPosition.layer();
-  // Se la colonna e' sound non devo fare nulla
+  // If the column is sound, do nothing
   TXshColumn *column = m_viewer->getXsheet()->getColumn(col);
   if (column && column->getSoundColumn()) return;
 
-  // Se ho cliccato su una nota devo aprire il popup
+  // If I clicked on a note, open the popup
   TXshNoteSet *notes = m_viewer->getXsheet()->getNotes();
   int i;
   for (i = notes->getCount() - 1; i >= 0; i--) {
@@ -3636,8 +3630,8 @@ void CellArea::mouseDoubleClickEvent(QMouseEvent *event) {
 
   if (col == -1) return;
 
-  // in modalita' xsheet as animation sheet non deve essere possibile creare
-  // livelli con doppio click: se la cella e' vuota non bisogna fare nulla
+  // In xsheet as animation sheet mode, it should not be possible to create
+  // levels with double click: if the cell is empty, do nothing
   if ((Preferences::instance()->isAnimationSheetEnabled() &&
        m_viewer->getXsheet()->getCell(row, col).isEmpty())) {
     TXshColumn *column = m_viewer->getXsheet()->getColumn(col);
@@ -3663,7 +3657,7 @@ void CellArea::contextMenuEvent(QContextMenuEvent *event) {
 
   QMenu menu(this);
 
-  // Verifico se ho cliccato su una nota
+  // Check if I clicked on a note
   TXshNoteSet *notes = m_viewer->getXsheet()->getNotes();
   int i;
   for (i = notes->getCount() - 1; i >= 0; i--) {
@@ -3713,11 +3707,11 @@ void CellArea::contextMenuEvent(QContextMenuEvent *event) {
                     ->isLocked())  // on the line between two keyframes
       createKeyLineMenu(menu, row, col);
   } else if (m_viewer->getCellSelection()->isCellSelected(
-                 row, col) &&  // La cella e' selezionata
+                 row, col) &&  // The cell is selected
              (abs(r1 - r0) > 0 ||
               abs(c1 - c0) >
-                  0))  // Il numero di celle selezionate e' maggiore di 1
-  {                    // Sono su una selezione di celle
+                  0))  // The number of selected cells is greater than 1
+  {                    // I'm on a cell selection
     m_viewer->setCurrentColumn(col);
     int e, f;
     bool areCellsEmpty = false;
@@ -3939,8 +3933,8 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected, TXshCell cell,
             ->listLevels(levels);
         if (!levels.empty()) {
           QMenu *replaceMenu = replaceLevelMenu->addMenu(tr("Replace with"));
-          connect(replaceMenu, SIGNAL(triggered(QAction *)), this,
-                  SLOT(onReplaceByCastedLevel(QAction *)));
+          connect(replaceMenu, &QMenu::triggered, this,
+                  &CellArea::onReplaceByCastedLevel);
           for (int i = 0; i < (int)levels.size(); i++) {
             if (!levels[i]->getSimpleLevel() && !levels[i]->getChildLevel())
               continue;
@@ -4074,7 +4068,7 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected, TXshCell cell,
     markAction->setChecked(markId == -1);
     markAction->setEnabled(markId != -1);
     markAction->setData(QList<QVariant>{row, col, -1});
-    connect(markAction, SIGNAL(triggered()), this, SLOT(onSetCellMark()));
+    connect(markAction, &QAction::triggered, this, &CellArea::onSetCellMark);
     QList<TSceneProperties::CellMark> marks = TApp::instance()
                                                   ->getCurrentScene()
                                                   ->getScene()
@@ -4088,7 +4082,7 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected, TXshCell cell,
       markAction->setChecked(markId == curId);
       markAction->setEnabled(markId != curId);
       markAction->setData(QList<QVariant>{row, col, curId});
-      connect(markAction, SIGNAL(triggered()), this, SLOT(onSetCellMark()));
+      connect(markAction, &QAction::triggered, this, &CellArea::onSetCellMark);
       curId++;
     }
 
@@ -4181,7 +4175,7 @@ void CellArea::createKeyLineMenu(QMenu &menu, int row, int col) {
     menu.addAction(cmdManager->getAction(MI_SetConstantSpeed));
     menu.addSeparator();
   } else {
-    // Se le due chiavi non sono linear aggiungo il comando ResetInterpolation
+    // If the two keys are not linear, add ResetInterpolation command
     bool isR0FullK = pegbar->isFullKeyframe(r0);
     bool isR1FullK = pegbar->isFullKeyframe(r1);
     TDoubleKeyframe::Type r0Type =
@@ -4234,8 +4228,8 @@ void CellArea::createKeyLineMenu(QMenu &menu, int row, int col) {
     actionGroup->addAction(act);
     menu.addAction(act);
   }
-  connect(actionGroup, SIGNAL(triggered(QAction *)), this,
-          SLOT(onStepChanged(QAction *)));
+  connect(actionGroup, &QActionGroup::triggered, this,
+          &CellArea::onStepChanged);
 }
 
 //-----------------------------------------------------------------------------
@@ -4243,9 +4237,9 @@ void CellArea::createKeyLineMenu(QMenu &menu, int row, int col) {
 void CellArea::createNoteMenu(QMenu &menu) {
   QAction *openAct   = menu.addAction(tr("Open Memo"));
   QAction *deleteAct = menu.addAction(tr("Delete Memo"));
-  bool ret = connect(openAct, SIGNAL(triggered()), this, SLOT(openNote()));
-  ret =
-      ret && connect(deleteAct, SIGNAL(triggered()), this, SLOT(deleteNote()));
+  bool ret = connect(openAct, &QAction::triggered, this, &CellArea::openNote);
+  ret      = ret &&
+        connect(deleteAct, &QAction::triggered, this, &CellArea::deleteNote);
 }
 
 //-----------------------------------------------------------------------------

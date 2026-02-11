@@ -53,6 +53,7 @@
 #include <QObject>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QRegularExpression>  // Added to replace QRegExp
 
 //---------------------------------------------------------
 
@@ -131,8 +132,7 @@ public:
            m_fp.getType() == "gif" || m_fp.getType() == "webm")) {
         QString name = QString::fromStdString(m_fp.getName());
         int index;
-        if ((index = name.indexOf("#RENDERID")) != -1)  //! quite ugly I
-                                                        //! know....
+        if ((index = name.indexOf("#RENDERID")) != -1)
           m_fp = m_fp.withName(name.left(index).toStdWString());
 
         if (!TSystem::showDocument(m_fp)) {
@@ -153,7 +153,7 @@ public:
             isPreview ? *scene->getProperties()->getPreviewProperties()
                       : *scene->getProperties()->getOutputProperties();
         outputSettings.getRange(r0, r1, step);
-        const TRenderSettings rs    = outputSettings.getRenderSettings();
+        const TRenderSettings rs = outputSettings.getRenderSettings();
         if (r0 == 0 && r1 == -1) r0 = 0, r1 = scene->getFrameCount() - 1;
 
         double timeStretchFactor =
@@ -234,16 +234,16 @@ RenderCommand renderCommand;
 bool RenderCommand::init(bool isPreview) {
   ToonzScene *scene       = TApp::instance()->getCurrentScene()->getScene();
   TSceneProperties *sprop = scene->getProperties();
-  /*-- Preview/Renderに応じてそれぞれのSettingを取得 --*/
+  /*-- Get settings for Preview/Render respectively --*/
   TOutputProperties &outputSettings = isPreview ? *sprop->getPreviewProperties()
                                                 : *sprop->getOutputProperties();
   outputSettings.getRange(m_r0, m_r1, m_step);
-  /*-- シーン全体のレンダリングの場合、m_r1をScene長に設定 --*/
+  /*-- For whole scene rendering, set m_r1 to scene length --*/
   if (m_r0 == 0 && m_r1 == -1) {
     m_r0 = 0;
     m_r1 = scene->getFrameCount() - 1;
   }
-  if (m_r0 < 0) m_r0                       = 0;
+  if (m_r0 < 0) m_r0 = 0;
   if (m_r1 >= scene->getFrameCount()) m_r1 = scene->getFrameCount() - 1;
   if (m_r1 < m_r0) {
     DVGui::warning(QObject::tr(
@@ -267,7 +267,8 @@ sprop->getOutputProperties()->setRenderSettings(rso);*/
 
   if (isPreview) {
     /*--
-     * PreviewではTimeStretchを考慮しないので、そのままフレーム値を格納してゆく
+     * In Preview, time stretch is not considered, so store frame values as they
+     * are
      * --*/
     m_numFrames        = (int)(m_r1 - m_r0 + 1);
     m_r                = m_r0;
@@ -289,16 +290,17 @@ sprop->getOutputProperties()->setRenderSettings(rso);*/
     return false;
   }
 
-  /*-- ファイル名が指定されていない場合は、シーン名を出力ファイル名にする --*/
+  /*-- If the filename is not specified, use the scene name as the output
+   * filename --*/
   if (fp.getWideName() == L"")
     fp = fp.withName(scene->getScenePath().getName());
-  /*-- ラスタ画像の場合、ファイル名にフレーム番号を追加 --*/
+  /*-- For raster images, add frame numbers to the filename --*/
   if (TFileType::getInfo(fp) == TFileType::RASTER_IMAGE ||
       fp.getType() == "pct" || fp.getType() == "pic" ||
-      fp.getType() == "pict")  // pct e' un formato"livello" (ha i settings di
-                               // quicktime) ma fatto di diversi frames
+      fp.getType() == "pict")  // pct is a "level" format (has quicktime
+                               // settings) but consists of multiple frames
     fp = fp.withFrame(TFrameId::EMPTY_FRAME);
-  fp   = scene->decodeFilePath(fp);
+  fp = scene->decodeFilePath(fp);
   if (!TFileStatus(fp.getParentDir()).doesExist()) {
     try {
       TFilePath parent = fp.getParentDir();
@@ -388,8 +390,9 @@ public:
                  bool isPreview)
       : DVGui::ProgressDialog(
             QObject::tr("Precomputing %1 Frames", "RenderListener").arg(steps) +
-                ((isPreview) ? "" : QObject::tr(" of %1", "RenderListener")
-                                        .arg(toQString(path))),
+                ((isPreview) ? ""
+                             : QObject::tr(" of %1", "RenderListener")
+                                   .arg(toQString(path))),
             QObject::tr("Cancel"), 0, steps, TApp::instance()->getMainWindow())
       , m_renderer(renderer)
       , m_frameCounter(0)
@@ -412,7 +415,8 @@ public:
     show();
   }
 
-  /*-- 以下３つの関数はMovieRenderer::Listenerの純粋仮想関数の実装 --*/
+  /*-- The following three functions are implementations of pure virtual
+   * functions of MovieRenderer::Listener --*/
   bool onFrameCompleted(int frame) override {
     bool ret = wasCanceled();
     if (m_frameCounter + 1 < m_totalFrames)
@@ -496,7 +500,7 @@ void RenderCommand::rasterRender(bool isPreview) {
                                 : scene->getProperties()->getOutputProperties();
 
   // Build thread count
-  /*-- Dedicated CPUs のコンボボックス (Single, Half, All) --*/
+  /*-- Dedicated CPUs combo box (Single, Half, All) --*/
   int index = prop->getThreadIndex();
 
   const int procCount       = TSystem::getProcessorCount();
@@ -504,7 +508,7 @@ void RenderCommand::rasterRender(bool isPreview) {
 
   int threadCount = threadCounts[index];
 
-  /*-- MovieRendererを作る。Previewの場合はファイルパスは空 --*/
+  /*-- Create MovieRenderer. For Preview, the file path is empty --*/
   MovieRenderer movieRenderer(scene, isPreview ? TFilePath() : m_fp,
                               threadCount, isPreview);
 
@@ -520,9 +524,9 @@ void RenderCommand::rasterRender(bool isPreview) {
 
   // Build
 
-  /*-- RenderSettingsをセット --*/
+  /*-- Set RenderSettings --*/
   movieRenderer.setRenderSettings(rs);
-  /*-- カメラDPIの取得、セット --*/
+  /*-- Get and set camera DPI --*/
   TPointD cameraDpi = isPreview ? scene->getCurrentPreviewCamera()->getDpi()
                                 : scene->getCurrentCamera()->getDpi();
   movieRenderer.setDpi(cameraDpi.x, cameraDpi.y);
@@ -532,17 +536,18 @@ void RenderCommand::rasterRender(bool isPreview) {
   else
     movieRenderer.enablePrecomputing(true);
 
-  /*-- プログレス ダイアログの作成 --*/
+  /*-- Create progress dialog --*/
   RenderListener *listener =
       new RenderListener(movieRenderer.getTRenderer(), m_fp,
                          ((m_numFrames - 1) / m_step) + 1, isPreview);
-  QObject::connect(listener, SIGNAL(canceled()), &movieRenderer,
-                   SLOT(onCanceled()));
+  // Use modern syntax for connection
+  QObject::connect(listener, &RenderListener::canceled, &movieRenderer,
+                   &MovieRenderer::onCanceled);
   movieRenderer.addListener(listener);
 
   bool fieldRendering = rs.m_fieldPrevalence != TRenderSettings::NoField;
 
-  /*-- buildSceneFxの進行状況を表示するプログレスバー --*/
+  /*-- Progress bar showing buildSceneFx progress --*/
   QProgressBar *buildSceneProgressBar =
       new QProgressBar(TApp::instance()->getMainWindow());
   buildSceneProgressBar->setAttribute(Qt::WA_DeleteOnClose);
@@ -572,10 +577,10 @@ void RenderCommand::rasterRender(bool isPreview) {
       scene->shiftCameraX(-rs.m_stereoscopicShift / 2);
     } else
       fx.m_frameB = TRasterFxP();
-    /*-- movieRendererにフレーム毎のFxを登録 --*/
+    /*-- Register Fx for each frame to movieRenderer --*/
     movieRenderer.addFrame(m_r, fx);
   }
-  /*-- プログレスバーを閉じる --*/
+  /*-- Close progress bar --*/
   buildSceneProgressBar->close();
 
   // resetViewer(); //TODO cancella le immagini dell'eventuale render precedente
@@ -772,8 +777,9 @@ void RenderCommand::multimediaRender() {
 
   MultimediaProgressBar *listener =
       new MultimediaProgressBar(&multimediaRenderer);
-  QObject::connect(listener, SIGNAL(canceled()), &multimediaRenderer,
-                   SLOT(onCanceled()));
+  // Use modern syntax for connection
+  QObject::connect(listener, &MultimediaProgressBar::canceled,
+                   &multimediaRenderer, &MultimediaRenderer::onCanceled);
   multimediaRenderer.addListener(listener);
 
   multimediaRenderer.start();
@@ -822,9 +828,8 @@ void RenderCommand::onPreview() { doRender(true); }
 void RenderCommand::doRender(bool isPreview) {
   bool isWritable = true;
   bool isMultiFrame;
-  /*--
-   * 初期化処理。フレーム範囲の計算や、Renderの場合はOutputSettingsから保存先パスも作る
-   * --*/
+  /*-- Initialization. Calculate frame range and, for Render, also create output
+   * path from OutputSettings --*/
   if (!init(isPreview)) return;
   if (m_fp.getDots() == ".") {
     isMultiFrame = false;
@@ -834,13 +839,23 @@ void RenderCommand::doRender(bool isPreview) {
     isMultiFrame  = true;
     TFilePath dir = m_fp.getParentDir();
     QDir qDir(QString::fromStdWString(dir.getWideString()));
-    QString levelName =
-        QRegExp::escape(QString::fromStdWString(m_fp.getWideName()));
+    QString levelName = QString::fromStdWString(m_fp.getWideName());
     QString levelType = QString::fromStdString(m_fp.getType());
-    QString exp(levelName + ".[0-9]{1,4}." + levelType);
-    QRegExp regExp(exp);
-    QStringList list        = qDir.entryList(QDir::Files);
-    QStringList livelFrames = list.filter(regExp);
+
+    // Replace QRegExp with QRegularExpression
+    QString exp = QRegularExpression::escape(levelName) + "\\.[0-9]{1,4}\\." +
+                  QRegularExpression::escape(levelType);
+    QRegularExpression regExp(exp);
+
+    QStringList list = qDir.entryList(QDir::Files);
+    QStringList livelFrames;
+
+    // Filter with QRegularExpression
+    for (const QString &file : list) {
+      if (regExp.match(file).hasMatch()) {
+        livelFrames.append(file);
+      }
+    }
 
     int i;
     for (i = 0; i < livelFrames.size() && isWritable; i++) {
@@ -863,15 +878,15 @@ void RenderCommand::doRender(bool isPreview) {
   TCamera *camera   = 0;
 
   try {
-    /*-- Xsheetノードに繋がっている各ラインごとに計算するモード。
-            MultipleRender で Schematic Flows または Fx Schematic Terminal Nodes
-    が選択されている場合
+    /*-- Mode that calculates for each line connected to the Xsheet node.
+            When MultipleRender and Schematic Flows or Fx Schematic Terminal
+    Nodes are selected
     --*/
     if (m_multimediaRender)
       multimediaRender();
 
     else
-      /*-- 通常のRendering --*/
+      /*-- Normal rendering --*/
       rasterRender(isPreview);
   } catch (TException &e) {
     DVGui::warning(QString::fromStdString(::to_string(e.getMessage())));
