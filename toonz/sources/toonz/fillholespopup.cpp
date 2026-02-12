@@ -1,26 +1,40 @@
-#include "fillholespopup.h"
-#include "toonz/fill.h"
 
+
+#include "fillholespopup.h"
+
+// Tnz6 includes
+#include "menubarcommandids.h"
+#include "selectionutils.h"
+#include "tools/toolutils.h"
+#include "tundo.h"
+#include "ttoonzimage.h"
+
+// TnzQt includes
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/intfield.h"
 #include "toonzqt/menubarcommand.h"
-#include "menubarcommandids.h"
-#include "selectionutils.h"
+
+// TnzLib includes
+#include "toonz/fill.h"
 #include "toonz/txshlevel.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/txshleveltypes.h"
-#include "ttoonzimage.h"
-#include "tools/toolutils.h"
-#include "tundo.h"
 #include "toonz/ttileset.h"
 #include "toonz/ttilesaver.h"
 #include "toonz/txsheethandle.h"
 
+// Qt includes
 #include <QPushButton>
 #include <QProgressBar>
 
+#include <memory>
+#include <utility>  // for std::pair (kept for compatibility)
+#include <cassert>
+
 using namespace DVGui;
 using namespace ToolUtils;
+
+//-----------------------------------------------------------------------------
 
 class TFillHolesUndo final : public TRasterUndo {
   int m_size;
@@ -28,7 +42,7 @@ class TFillHolesUndo final : public TRasterUndo {
 public:
   TFillHolesUndo(TTileSetCM32* tileSet, int size, TXshSimpleLevel* sl,
                  const TFrameId& fid)
-      : TRasterUndo(tileSet, sl, fid, false, false, 0), m_size(size) {};
+      : TRasterUndo(tileSet, sl, fid, false, false, 0), m_size(size) {}
 
   void redo() const override {
     TToonzImageP image = getImage();
@@ -38,20 +52,26 @@ public:
     fillHoles(image->getRaster(), m_size);
     app->getCurrentXsheet()->notifyXsheetChanged();
     notifyImageChanged();
-  };
+  }
+
   int getSize() const override {
     return sizeof(*this) + TRasterUndo::getSize();
-  };
-  QString getToolName() override { return QString("Fill Holes"); };
+  }
+
+  QString getToolName() override { return QStringLiteral("Fill Holes"); }
 };
 
-FillHolesDialog::FillHolesDialog() : Dialog(0, true, true, "Fill Small Holes") {
+//-----------------------------------------------------------------------------
+
+FillHolesDialog::FillHolesDialog()
+    : Dialog(nullptr, true, true, "Fill Small Holes")
+    , m_progressDialog(nullptr) {
   setWindowTitle(tr("Fill Small Holes"));
   setModal(false);
   setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 
   beginVLayout();
-  m_size = new IntField(this,false);
+  m_size = new IntField(this, false);
   m_size->setRange(1, 25);
   m_size->setValue(5);
   addWidget(tr("Size"), m_size);
@@ -60,57 +80,80 @@ FillHolesDialog::FillHolesDialog() : Dialog(0, true, true, "Fill Small Holes") {
   QPushButton* okBtn = new QPushButton(tr("Apply"), this);
   okBtn->setDefault(true);
   QPushButton* cancelBtn = new QPushButton(tr("Cancel"), this);
-  bool ret = connect(okBtn, SIGNAL(clicked()), this, SLOT(apply()));
-  ret      = ret && connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
-  assert(ret);
+
+  connect(okBtn, &QPushButton::clicked, this, &FillHolesDialog::apply);
+  connect(cancelBtn, &QPushButton::clicked, this, &QDialog::reject);
 
   addButtonBarWidget(okBtn, cancelBtn);
-};
+}
+
+//-----------------------------------------------------------------------------
 
 void FillHolesDialog::apply() {
   std::set<TXshLevel*> levels;
   SelectionUtils::getSelectedLevels(levels);
-  std::vector<std::pair<TXshSimpleLevel*, TFrameId>> Frames;
-  for (const auto& level : levels) {
+
+  // Collect all frames from Toonz raster levels
+  std::vector<std::pair<TXshSimpleLevel*, TFrameId>> frames;
+  for (TXshLevel* level : levels) {
     if (level->getType() != TXshLevelType::TZP_XSHLEVEL) continue;
     TXshSimpleLevel* sl = level->getSimpleLevel();
     if (!sl) continue;
     for (const TFrameId& fid : sl->getFids()) {
-      Frames.push_back(std::make_pair(sl, fid));
+      frames.emplace_back(sl, fid);
     }
   }
-  int size = Frames.size();
-  if (size == 0) {
+
+  const int totalFrames = static_cast<int>(frames.size());
+  if (totalFrames == 0) {
     DVGui::warning(tr("No Toonz Raster Level Selected"));
     return;
-  } else {
-    m_progressDialog =
-        new ProgressDialog("Filling Holes...", QObject::tr("Cancel"), 0, size, this);
-    m_progressDialog->show();
   }
+
+  // Create progress dialog – use std::make_unique for automatic cleanup
+  m_progressDialog = std::make_unique<ProgressDialog>(
+      tr("Filling Holes..."), tr("Cancel"), 0, totalFrames, this);
+  m_progressDialog->show();
 
   int count = 0;
   TUndoManager::manager()->beginBlock();
-  for (const auto& frame : Frames) {
-    TXshSimpleLevel* sl = frame.first;
-    TFrameId fid        = frame.second;
 
-    TImageP img           = sl->getFrame(fid, true);
-    TToonzImageP ti       = TToonzImageP(img);
-    TRasterCM32P ras      = ti->getRaster();
-    TTileSetCM32* tileSet = new TTileSetCM32(ras->getSize());
-    TTileSaverCM32* saver = new TTileSaverCM32(ras, tileSet);
-    if (m_progressDialog->wasCanceled()) break;
-    fillHoles(ras, m_size->getValue(), saver);
-    if (tileSet->getTileCount() != 0)
+  for (const auto& frame : frames) {
+     const auto& [sl, fid] = frame;
+
+    TImageP img     = sl->getFrame(fid, true);
+    TToonzImageP ti = img;
+    if (!ti) continue;  // safety check
+    TRasterCM32P ras = ti->getRaster();
+
+    auto tileSet = std::make_unique<TTileSetCM32>(ras->getSize());
+    auto saver   = std::make_unique<TTileSaverCM32>(ras, tileSet.get());
+
+    if (m_progressDialog->wasCanceled()) {
+      break;
+    }
+
+    fillHoles(ras, m_size->getValue(), saver.get());
+
+    if (tileSet->getTileCount() != 0) {
+      // Transfer ownership of tileSet to the undo object
       TUndoManager::manager()->add(
-          new TFillHolesUndo(tileSet, m_size->getValue(), sl, fid));
-    count++;
+          new TFillHolesUndo(tileSet.release(), m_size->getValue(), sl, fid));
+      // saver is destroyed automatically when we leave the scope
+    }
+    // else: tileSet and saver are automatically destroyed by unique_ptr
+
+    ++count;
     m_progressDialog->setValue(count);
   }
+
+  // Progress dialog is automatically destroyed when m_progressDialog is reset
+  m_progressDialog.reset();
+
   TUndoManager::manager()->endBlock();
-  m_progressDialog->close();
   Dialog::accept();
 }
+
+//-----------------------------------------------------------------------------
 
 OpenPopupCommandHandler<FillHolesDialog> fillholesPopup(MI_FillHoles);
