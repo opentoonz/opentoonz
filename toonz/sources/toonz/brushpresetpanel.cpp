@@ -5,12 +5,19 @@
 #include "menubarcommandids.h"
 #include "toonzqt/gutil.h"
 #include "toonzqt/dvdialog.h"
+#include "toonzqt/lineedit.h"
 #include "toolpresetcommandmanager.h"
 
 // ToonzLib includes
 #include "toonz/toonzfolders.h"
 #include "toonz/preferences.h"
 #include "toonz/mypaintbrushstyle.h"
+#include "toonz/imagestyles.h"
+
+// TnzCore includes for style detection
+#include "tcolorstyles.h"
+#include "tvectorbrushstyle.h"
+#include "tsimplecolorstyles.h"
 
 // ToonzCore includes
 #include "tenv.h"
@@ -22,6 +29,10 @@
 #include "tools/toolhandle.h"
 #include "tools/toolcommandids.h"
 #include "tproperty.h"
+
+// Command-based add/remove (avoids LNK2019 - handlers are in tnztools)
+#include "toonzqt/brushpresetbridge.h"
+#include "toonzqt/menubarcommand.h"
 
 // Qt includes
 #include <QVBoxLayout>
@@ -53,6 +64,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QSet>
+#include <QFrame>
 
 //=============================================================================
 // PresetNamePopup - Popup to enter a preset name
@@ -98,7 +110,9 @@ BrushPresetItem::BrushPresetItem(const QString &presetName, const QString &toolT
     , m_isListMode(isListMode)
     , m_isSmallMode(false)
     , m_showBorders(true)
-    , m_showBackgrounds(true) {
+    , m_showBackgrounds(true)
+    , m_checkboxVisible(false)
+    , m_isMultiSelected(false) {
   
   setText(presetName);
   setCheckable(true);
@@ -187,11 +201,7 @@ void BrushPresetItem::setDefaultIcon(const QString &toolType) {
   if (toolType == "vector") {
     iconName = "brush";      // Vector brush
   } else if (toolType == "toonzraster") {
-    iconName = "palette";    // Toonz Raster brush (palette icon)
-  } else if (toolType == "mypaint") {
-    iconName = "paintbrush"; // MyPaint brush (raster)
-  } else if (toolType == "mypainttnz") {
-    iconName = "palette";    // MyPaint brush on Toonz Raster
+    iconName = "palette";    // Toonz Raster brush
   } else if (toolType == "raster") {
     iconName = "paintbrush"; // Raster brush
   }
@@ -440,6 +450,31 @@ void BrushPresetItem::paintEvent(QPaintEvent *event) {
     
     painter.drawText(textRect, Qt::AlignCenter, displayText);
   }
+  
+  // Draw checkbox overlay (top-right corner) when in checkbox mode
+  if (m_checkboxVisible) {
+    const int cbSize = 14;
+    const int cbMargin = 4;
+    QRect cbRect(width() - cbSize - cbMargin, cbMargin, cbSize, cbSize);
+    
+    // Draw checkbox background
+    painter.setPen(QPen(palette().color(QPalette::Mid), 1));
+    if (m_isMultiSelected) {
+      painter.setBrush(palette().color(QPalette::Highlight));
+    } else {
+      painter.setBrush(palette().color(QPalette::Base));
+    }
+    painter.drawRoundedRect(cbRect, 2, 2);
+    
+    // Draw checkmark if selected
+    if (m_isMultiSelected) {
+      painter.setPen(QPen(palette().color(QPalette::HighlightedText), 2));
+      painter.drawLine(cbRect.left() + 3, cbRect.center().y(),
+                       cbRect.center().x(), cbRect.bottom() - 3);
+      painter.drawLine(cbRect.center().x(), cbRect.bottom() - 3,
+                       cbRect.right() - 3, cbRect.top() + 3);
+    }
+  }
 }
 
 QSize BrushPresetItem::sizeHint() const {
@@ -459,6 +494,21 @@ QSize BrushPresetItem::minimumSizeHint() const {
 void BrushPresetItem::mousePressEvent(QMouseEvent *event) {
   if (event->button() == Qt::LeftButton) {
     m_dragStartPosition = event->pos();
+  } else if (event->button() == Qt::RightButton) {
+    // Emit right-click signal for context menu
+    // Find parent BrushPresetPanel and show context menu
+    BrushPresetPanel *panel = nullptr;
+    QWidget *p = parentWidget();
+    while (p) {
+      panel = qobject_cast<BrushPresetPanel*>(p);
+      if (panel) break;
+      p = p->parentWidget();
+    }
+    if (panel) {
+      panel->showPresetContextMenu(event->globalPos(), m_presetName);
+      event->accept();
+      return;
+    }
   }
   QToolButton::mousePressEvent(event);
 }
@@ -528,11 +578,26 @@ void BrushPresetItem::dropEvent(QDropEvent *event) {
     return;
   }
   
+  // Only accept drops if they have the correct MIME type
+  if (!event->mimeData()->hasFormat("application/x-brushpreset-tooltype")) {
+    event->ignore();
+    return;
+  }
+  
   QString fromPreset = event->mimeData()->text();
   QString toPreset = m_presetName;
   
   // Don't reorder if dropping on itself
   if (fromPreset == toPreset) {
+    event->ignore();
+    return;
+  }
+  
+  // Only accept drops from the same tool type
+  QString draggedToolType = QString::fromUtf8(
+      event->mimeData()->data("application/x-brushpreset-tooltype"));
+  
+  if (draggedToolType != m_toolType) {
     event->ignore();
     return;
   }
@@ -544,11 +609,128 @@ void BrushPresetItem::dropEvent(QDropEvent *event) {
 }
 
 //=============================================================================
+// BrushPresetTabBar implementation (modeled after PaletteTabBar)
+//=============================================================================
+
+BrushPresetTabBar::BrushPresetTabBar(QWidget *parent)
+    : QTabBar(parent)
+    , m_renameTextField(new DVGui::LineEdit(this))
+    , m_renameTabIndex(-1)
+    , m_panel(nullptr) {
+  setObjectName("BrushPresetTabBar");
+  
+  // Remove elevation effect - flat rendering like Level Palette
+  setDrawBase(false);
+  setDocumentMode(true); // CRITICAL: This removes the frame around tabs
+  setMovable(false);  // We handle movement ourselves via Ctrl+Drag
+  setExpanding(false); // Don't expand tabs to fill width
+  setIconSize(QSize(16, 16)); // Standard icon size for palette_tab icon
+  setUsesScrollButtons(true); // Show scroll buttons when many tabs
+  setElideMode(Qt::ElideNone); // Don't elide tab text
+  
+  m_renameTextField->hide();
+  
+  connect(m_renameTextField, SIGNAL(editingFinished()), this, SLOT(updateTabName()));
+}
+
+//-----------------------------------------------------------------------------
+/*! Hide rename text field and handle tab selection
+ */
+void BrushPresetTabBar::mousePressEvent(QMouseEvent *event) {
+  m_renameTextField->hide();
+  QTabBar::mousePressEvent(event);
+}
+
+//-----------------------------------------------------------------------------
+/*! If Ctrl+Left button is pressed, allow tab reordering by emitting movePage signal
+ */
+void BrushPresetTabBar::mouseMoveEvent(QMouseEvent *event) {
+  if (event->buttons() == Qt::LeftButton &&
+      event->modifiers() == Qt::ControlModifier) {
+    int srcIndex = currentIndex();
+    int dstIndex = tabAt(event->pos());
+    if (dstIndex >= 0 && dstIndex < count() && dstIndex != srcIndex) {
+      QRect rect = tabRect(srcIndex);
+      int x = event->pos().x();
+      if (x < rect.left() || x > rect.right()) {
+        emit movePage(srcIndex, dstIndex);
+      }
+    }
+  }
+  QTabBar::mouseMoveEvent(event);
+}
+
+//-----------------------------------------------------------------------------
+/*! Set a text field with focus in event position to edit tab name
+ */
+void BrushPresetTabBar::mouseDoubleClickEvent(QMouseEvent *event) {
+  int index = tabAt(event->pos());
+  if (index < 0) return;
+  
+  m_renameTabIndex = index;
+  DVGui::LineEdit *fld = m_renameTextField;
+  fld->setText(tabText(index));
+  fld->setGeometry(tabRect(index));
+  fld->setAlignment(Qt::AlignCenter);
+  fld->show();
+  fld->selectAll();
+  fld->setFocus(Qt::OtherFocusReason);
+}
+
+//-----------------------------------------------------------------------------
+/*! Update tab name from rename text field
+ */
+void BrushPresetTabBar::updateTabName() {
+  int index = m_renameTabIndex;
+  if (index < 0) return;
+  
+  m_renameTabIndex = -1;
+  if (m_renameTextField->text() != "" && m_renameTextField->text() != tabText(index)) {
+    setTabText(index, m_renameTextField->text());
+    emit tabTextChanged(index);
+  }
+  m_renameTextField->hide();
+}
+
+//-----------------------------------------------------------------------------
+/*! Show context menu for page operations (like Level Palette)
+ */
+void BrushPresetTabBar::contextMenuEvent(QContextMenuEvent *event) {
+  if (!m_panel) {
+    QTabBar::contextMenuEvent(event);
+    return;
+  }
+  
+  int tabIndex = tabAt(event->pos());
+  
+  QMenu menu(this);
+  
+  // Add New Page action (always available)
+  QAction *addPageAction = menu.addAction(tr("New Page"));
+  connect(addPageAction, &QAction::triggered, [this]() {
+    if (m_panel) m_panel->addNewPage();
+  });
+  
+  // Delete Page action (only if clicking on a tab and not the last page)
+  if (tabIndex >= 0 && count() > 1) {
+    menu.addSeparator();
+    QAction *deletePageAction = menu.addAction(tr("Delete Page"));
+    connect(deletePageAction, &QAction::triggered, [this, tabIndex]() {
+      if (m_panel) m_panel->deletePage(tabIndex);
+    });
+  }
+  
+  menu.exec(event->globalPos());
+}
+
+//=============================================================================
 // BrushPresetPanel implementation
 //=============================================================================
 
 BrushPresetPanel::BrushPresetPanel(QWidget *parent)
     : TPanel(parent)
+    , m_tabBarContainer(nullptr)
+    , m_tabBar(nullptr)
     , m_scrollArea(nullptr)
     , m_presetContainer(nullptr)
     , m_presetLayout(nullptr)
@@ -565,8 +747,11 @@ BrushPresetPanel::BrushPresetPanel(QWidget *parent)
     , m_presetNamePopup(nullptr)
     , m_viewMode(GridLarge)
     , m_currentColumns(2)
-    , m_showBorders(false)  // Borders disabled by default
-    , m_showBackgrounds(true) {  // Backgrounds enabled by default
+    , m_showBorders(false)
+    , m_showBackgrounds(true)
+    , m_currentPageIndex(0)
+    , m_checkboxMode(false)
+    , m_clipboardIsCut(false) {
   
   // Load preferences from settings FIRST (before creating UI)
   QSettings settings;
@@ -590,6 +775,9 @@ BrushPresetPanel::~BrushPresetPanel() {
     delete m_presetNamePopup;
     m_presetNamePopup = nullptr;
   }
+  
+  // Clean up all pages
+  clearPages();
 }
 
 void BrushPresetPanel::initializeUI() {
@@ -611,25 +799,45 @@ void BrushPresetPanel::initializeUI() {
   // Vertical spacing between header and button bar
   mainLayout->addSpacing(8);
   
-  // Button bar at top
+  // Button bar at top (matching Level Palette + Tool Options Bar logic)
   QHBoxLayout *buttonLayout = new QHBoxLayout();
   
-  // Use native OpenToonz icons matching ToolOptionBar design
+  // New Page button (like Level Palette - separate from presets)
+  QPushButton *newPageButton = new QPushButton(mainWidget);
+  newPageButton->setIcon(createQIcon("newpage"));
+  newPageButton->setIconSize(QSize(20, 20));
+  newPageButton->setFixedSize(24, 24);
+  newPageButton->setToolTip(tr("New Page"));
+  connect(newPageButton, SIGNAL(clicked()), this, SLOT(onAddPageClicked()));
+  
+  // Separator after page button
+  QFrame *separator1 = new QFrame(mainWidget);
+  separator1->setFrameShape(QFrame::VLine);
+  separator1->setFrameShadow(QFrame::Sunken);
+  
+  // PRESET BUTTONS (mirror of Tool Options Bar)
+  // Remove Preset button (minus icon like Tool Options Bar)
   m_removePresetButton = new QPushButton(mainWidget);
   m_removePresetButton->setIcon(createQIcon("minus"));
   m_removePresetButton->setIconSize(QSize(16, 16));
   m_removePresetButton->setFixedSize(24, 24);
-  m_removePresetButton->setToolTip(tr("Remove selected preset"));
+  m_removePresetButton->setToolTip(tr("Remove Preset"));
   m_removePresetButton->setEnabled(false);
   
+  // Add Preset button (plus icon like Tool Options Bar)
   m_addPresetButton = new QPushButton(mainWidget);
   m_addPresetButton->setIcon(createQIcon("plus"));
   m_addPresetButton->setIconSize(QSize(16, 16));
   m_addPresetButton->setFixedSize(24, 24);
-  m_addPresetButton->setToolTip(tr("Add current settings as new preset"));
+  m_addPresetButton->setToolTip(tr("Add Preset"));
   m_addPresetButton->setEnabled(false);
   
-  // Refresh button with circular arrow icon (repeat)
+  // Separator after preset buttons
+  QFrame *separator2 = new QFrame(mainWidget);
+  separator2->setFrameShape(QFrame::VLine);
+  separator2->setFrameShadow(QFrame::Sunken);
+  
+  // Refresh button
   m_refreshButton = new QPushButton(mainWidget);
   m_refreshButton->setIcon(createQIcon("repeat"));
   m_refreshButton->setIconSize(QSize(16, 16));
@@ -637,19 +845,59 @@ void BrushPresetPanel::initializeUI() {
   m_refreshButton->setToolTip(tr("Refresh preset list"));
   m_refreshButton->setEnabled(true);
   
-  // Hamburger menu for display modes - use standard OpenToonz menu icon
+  // Hamburger menu for display modes
   m_viewModeButton = new QPushButton(mainWidget);
   m_viewModeButton->setIcon(createQIcon("menu"));
-  m_viewModeButton->setFixedSize(24, 24);  // Match Level Palette button size
+  m_viewModeButton->setFixedSize(24, 24);
   m_viewModeButton->setToolTip(tr("View mode"));
   
+  // Layout order: [New Page] | [- Preset] [+ Preset] | [Refresh] ... [Menu]
+  buttonLayout->addWidget(newPageButton);
+  buttonLayout->addWidget(separator1);
   buttonLayout->addWidget(m_removePresetButton);
   buttonLayout->addWidget(m_addPresetButton);
+  buttonLayout->addWidget(separator2);
   buttonLayout->addWidget(m_refreshButton);
   buttonLayout->addStretch();
   buttonLayout->addWidget(m_viewModeButton);
   
   mainLayout->addLayout(buttonLayout);
+  
+  // Tab bar container with top+bottom separator (like PaletteViewer).
+  // TabBarContainter draws only the BOTTOM line via its paintEvent.
+  // We wrap it in a container QFrame with a top border drawn via stylesheet
+  // to ensure the top line is always visible regardless of theme.
+  QFrame *tabContainerFrame = new QFrame(mainWidget);
+  tabContainerFrame->setObjectName("BrushPresetTabContainerFrame");
+  tabContainerFrame->setStyleSheet(
+    "QFrame#BrushPresetTabContainerFrame {"
+    "  border-top: 1px solid palette(dark);"
+    "  border-left: none;"
+    "  border-right: none;"
+    "  border-bottom: none;"
+    "  padding: 0px;"
+    "  margin: 0px;"
+    "}"
+  );
+  QVBoxLayout *tabContainerLayout = new QVBoxLayout(tabContainerFrame);
+  tabContainerLayout->setContentsMargins(0, 0, 0, 0);
+  tabContainerLayout->setSpacing(0);
+  
+  m_tabBarContainer = new TabBarContainter(tabContainerFrame);
+  m_tabBar = new BrushPresetTabBar(m_tabBarContainer);
+  m_tabBar->setBrushPresetPanel(this);
+  
+  // Layout for tab bar inside container (same as PaletteViewer::m_hLayout)
+  QHBoxLayout *tabLayout = new QHBoxLayout;
+  tabLayout->setContentsMargins(0, 0, 0, 0);
+  tabLayout->setSpacing(0);
+  tabLayout->addWidget(m_tabBar, 0);
+  tabLayout->addStretch(1);
+  m_tabBarContainer->setLayout(tabLayout);
+  
+  // Add TabBarContainter into the outer frame (which draws the top border)
+  tabContainerLayout->addWidget(m_tabBarContainer);
+  mainLayout->addWidget(tabContainerFrame, 0);
   
   // Scrollable container for presets
   m_scrollArea = new QScrollArea(mainWidget);
@@ -695,6 +943,13 @@ void BrushPresetPanel::connectSignals() {
     connect(m_toolHandle, SIGNAL(toolComboBoxListChanged(std::string)), 
             this, SLOT(onToolComboBoxListChanged(std::string)));
   }
+  
+  // Tab bar signals
+  if (m_tabBar) {
+    connect(m_tabBar, SIGNAL(currentChanged(int)), this, SLOT(onTabChanged(int)));
+    connect(m_tabBar, SIGNAL(tabTextChanged(int)), this, SLOT(onTabTextChanged(int)));
+    connect(m_tabBar, SIGNAL(movePage(int, int)), this, SLOT(onTabMoved(int, int)));
+  }
 }
 
 void BrushPresetPanel::disconnectSignals() {
@@ -704,17 +959,25 @@ void BrushPresetPanel::disconnectSignals() {
     disconnect(m_toolHandle, SIGNAL(toolComboBoxListChanged(std::string)), 
                this, SLOT(onToolComboBoxListChanged(std::string)));
   }
+  
+  // Tab bar signals
+  if (m_tabBar) {
+    disconnect(m_tabBar, SIGNAL(currentChanged(int)), this, SLOT(onTabChanged(int)));
+    disconnect(m_tabBar, SIGNAL(tabTextChanged(int)), this, SLOT(onTabTextChanged(int)));
+    disconnect(m_tabBar, SIGNAL(movePage(int, int)), this, SLOT(onTabMoved(int, int)));
+  }
 }
 
 void BrushPresetPanel::showEvent(QShowEvent *e) {
   TPanel::showEvent(e);
   
   // Refresh brush preset commands to ensure they're up-to-date
-  // (same approach as ShortcutPopup and CustomPanelEditorPopup)
   ToolPresetCommandManager::instance()->refreshPresetCommands();
   
   connectSignals();
-  onToolSwitched();  // Initialize display
+  
+  // Initialize display with correct tool type detection
+  onToolSwitched();
 }
 
 void BrushPresetPanel::hideEvent(QHideEvent *e) {
@@ -724,8 +987,16 @@ void BrushPresetPanel::hideEvent(QHideEvent *e) {
 
 void BrushPresetPanel::enterEvent(QEvent *e) {
   TPanel::enterEvent(e);
-  // Refresh automatically when mouse enters panel
-  refreshPresetList();
+  
+  // Check if tool type changed (e.g., level switched while panel wasn't focused)
+  QString currentType = detectCurrentToolType();
+  if (!currentType.isEmpty() && currentType != m_currentToolType) {
+    // Tool type changed externally - full refresh
+    m_currentToolType = currentType;
+    initializeTabs();
+    refreshPresetList();
+  }
+  // No full refresh on every enter - avoids resetting page state
 }
 
 void BrushPresetPanel::reset() {
@@ -748,29 +1019,17 @@ QString BrushPresetPanel::detectCurrentToolType() {
   std::string toolName = tool->getName();
   int targetType = tool->getTargetType();
   
-  // Determine brush type based on name and target type
+  // CRITICAL: Return ONLY the LEVEL type, NOT the style/engine type.
+  // Pages are organized per level type (vector, toonzraster, raster).
+  // The active style (MyPaint, Texture, Generated, etc.) only affects
+  // the display label, NOT the page key. This ensures pages remain
+  // stable when the user changes styles on the same level.
   if (toolName == T_Brush || toolName == T_PaintBrush || toolName == T_Eraser) {
     if (targetType & TTool::VectorImage) {
       return "vector";
     } else if (targetType & TTool::ToonzImage) {
-      // Check if it's a MyPaint brush on Toonz Raster
-      TApplication *app = TApp::instance();
-      if (app) {
-        TColorStyle *style = app->getCurrentLevelStyle();
-        if (dynamic_cast<TMyPaintBrushStyle*>(style)) {
-          return "mypainttnz";
-        }
-      }
       return "toonzraster";
     } else if (targetType & TTool::RasterImage) {
-      // Check if it's a MyPaint brush on Raster
-      TApplication *app = TApp::instance();
-      if (app) {
-        TColorStyle *style = app->getCurrentLevelStyle();
-        if (dynamic_cast<TMyPaintBrushStyle*>(style)) {
-          return "mypaint";
-        }
-      }
       return "raster";
     }
   }
@@ -831,7 +1090,7 @@ QList<QString> BrushPresetPanel::loadPresetsForTool(const QString &toolType) {
           orderFileName = "brush_vector_order.txt";
         } else if (toolType == "toonzraster") {
           orderFileName = "brush_toonzraster_order.txt";
-        } else if (toolType == "raster" || toolType == "mypaint" || toolType == "mypainttnz") {
+        } else if (toolType == "raster") {
           orderFileName = "brush_raster_order.txt";
         }
         
@@ -883,7 +1142,12 @@ void BrushPresetPanel::refreshPresetList() {
   m_presetButtonGroup = new QButtonGroup(this);
   m_presetButtonGroup->setExclusive(true);  // Only one button checked at a time
   
-  QString toolType = detectCurrentToolType();
+  // Use m_currentToolType which is set by onToolSwitched/onToolChanged
+  // before calling this method. Fall back to detection if not set yet.
+  QString toolType = m_currentToolType;
+  if (toolType.isEmpty()) {
+    toolType = detectCurrentToolType();
+  }
   
   if (toolType.isEmpty()) {
     m_toolLabel->setText(tr("No brush tool selected"));
@@ -894,26 +1158,107 @@ void BrushPresetPanel::refreshPresetList() {
   
   m_currentToolType = toolType;
   
-  // Update label
+  // Update label: detect the active STYLE sub-type for display only.
+  // This does NOT affect page storage (pages are keyed by level type only).
   QString toolDisplayName;
+  TApplication *labelApp = TApp::instance();
+  TColorStyle *activeStyle = labelApp ? labelApp->getCurrentLevelStyle() : nullptr;
+  
   if (toolType == "vector") {
-    toolDisplayName = tr("Vector Brush");
+    if (dynamic_cast<TVectorBrushStyle*>(activeStyle)) {
+      toolDisplayName = tr("Custom Vector Brush");
+    } else if (dynamic_cast<TTextureStyle*>(activeStyle)) {
+      toolDisplayName = tr("Vector Texture");
+    } else if (activeStyle && !dynamic_cast<TSolidColorStyle*>(activeStyle)) {
+      std::string brushId = activeStyle->getBrushIdName();
+      if (brushId.find("VectorImagePatternStrokeStyle:") == 0 ||
+          brushId.find("RasterImagePatternStrokeStyle:") == 0) {
+        toolDisplayName = tr("Vector Trail");
+      } else {
+        toolDisplayName = tr("Vector Generated");
+      }
+    } else {
+      toolDisplayName = tr("Vector Brush");
+    }
   } else if (toolType == "toonzraster") {
-    toolDisplayName = tr("Toonz Raster Brush");
-  } else if (toolType == "mypaint") {
-    toolDisplayName = tr("MyPaint Brush");
-  } else if (toolType == "mypainttnz") {
-    toolDisplayName = tr("MyPaint Brush Tnz");
+    if (dynamic_cast<TMyPaintBrushStyle*>(activeStyle)) {
+      toolDisplayName = tr("MyPaint Brush Tnz");
+    } else if (dynamic_cast<TTextureStyle*>(activeStyle)) {
+      toolDisplayName = tr("Toonz Raster Texture");
+    } else {
+      toolDisplayName = tr("Toonz Raster Brush");
+    }
   } else if (toolType == "raster") {
-    toolDisplayName = tr("Raster Brush");
+    if (dynamic_cast<TMyPaintBrushStyle*>(activeStyle)) {
+      toolDisplayName = tr("MyPaint Brush");
+    } else {
+      toolDisplayName = tr("Raster Brush");
+    }
   }
   m_toolLabel->setText(toolDisplayName);
   
-  m_addPresetButton->setEnabled(true);
+  // Only T_Brush tool has add/remove preset; T_PaintBrush and T_Eraser do not
+  TTool *tool = getCurrentBrushTool();
+  m_addPresetButton->setEnabled(tool && tool->getName() == T_Brush);
   
-  // Load all presets for current tool
-  QList<QString> presets = loadPresetsForTool(toolType);
-  m_presetCache[toolType] = presets;
+  // Get current page
+  BrushPresetPage *currentPage = getCurrentPage();
+  QList<QString> presets;
+  
+  if (!currentPage) {
+    // No page available - shouldn't happen, but handle gracefully
+    return;
+  }
+  
+  // Load all physically existing presets
+  QList<QString> allPresets = loadPresetsForTool(toolType);
+  
+  // Show presets that belong to the current page
+  bool hasDeletedPresets = false;
+  if (currentPage->getPresetCount() > 0) {
+    // Page has assigned presets - show ONLY those that still exist on disk
+    for (const QString &presetName : currentPage->getPresetNames()) {
+      if (allPresets.contains(presetName)) {
+        presets.append(presetName);
+      } else {
+        // Preset was deleted from disk - remove from page
+        currentPage->removePreset(presetName);
+        hasDeletedPresets = true;
+      }
+    }
+  }
+  
+  if (hasDeletedPresets) {
+    savePageConfiguration();
+  }
+  
+  // ALWAYS check for orphan presets (exist on disk but not in any page).
+  // This handles two cases:
+  // 1. First launch: Page 1 is empty, all presets are orphans
+  // 2. Preset added from ToolOptionBar: new preset not in any page yet
+  // Orphans are ALWAYS added to the CURRENT page (not just Page 1).
+  QList<BrushPresetPage*> &allPages = m_pages[m_currentToolType];
+  bool hasNewOrphans = false;
+  for (const QString &presetName : allPresets) {
+    bool foundInAnyPage = false;
+    for (BrushPresetPage *page : allPages) {
+      if (page->hasPreset(presetName)) {
+        foundInAnyPage = true;
+        break;
+      }
+    }
+    
+    if (!foundInAnyPage) {
+      // Orphan preset - add to current page
+      currentPage->addPreset(presetName);
+      presets.append(presetName);
+      hasNewOrphans = true;
+    }
+  }
+  
+  if (hasNewOrphans) {
+    savePageConfiguration();
+  }
   
   // Calculate optimal number of columns based on panel width
   int panelWidth = m_scrollArea->viewport()->width();
@@ -940,8 +1285,7 @@ void BrushPresetPanel::refreshPresetList() {
   int row = 0, col = 0;
   const int numColumns = m_currentColumns;
   
-  // Get active preset
-  TTool *tool = getCurrentBrushTool();
+  // Get active preset (tool already obtained above)
   TPropertyGroup *props = tool ? tool->getProperties(0) : nullptr;
   QString currentPresetName;
   
@@ -971,10 +1315,12 @@ void BrushPresetPanel::refreshPresetList() {
     item->setMinimumSize(itemSize);
     item->setMaximumSize(QWIDGETSIZE_MAX, itemSize.height());
     
-    // Apply current border, background, and small mode states
+    // Apply current border, background, small mode, and checkbox states
     item->setShowBorders(m_showBorders);
     item->setShowBackgrounds(m_showBackgrounds);
     item->setSmallMode(isSmallMode);
+    item->setCheckboxVisible(m_checkboxMode);
+    item->setMultiSelected(m_selectedPresets.contains(presetName));
     
     // Add to button group to manage exclusivity
     m_presetButtonGroup->addButton(item);
@@ -983,7 +1329,10 @@ void BrushPresetPanel::refreshPresetList() {
     if (presetName == currentPresetName) {
       item->setChecked(true);
       m_currentPreset = presetName;
-      m_removePresetButton->setEnabled(true);
+      // Enable remove button for valid presets (not <custom>)
+      if (presetName != QString::fromStdWString(L"<custom>")) {
+        m_removePresetButton->setEnabled(true);
+      }
     }
     
     connect(item, &BrushPresetItem::presetSelected, 
@@ -1100,13 +1449,20 @@ void BrushPresetPanel::addNewPreset() {
     return;
   }
   
-  // Note: Direct call to tool's addPreset method causes linking issues
-  // because the methods are not exported from tnztools library.
-  // For now, users can add presets via the Tool Options Bar.
-  QMessageBox::information(this, tr("Add Preset"), 
-                           tr("Please use the [+] button in the Tool Options Bar to add new presets.\n\n"
-                              "The new preset will automatically appear in this panel."));
-  return;
+  // Use command (handler in tnztools) to avoid LNK2019 when linking from toonz
+  if (tool->getName() != T_Brush) return;
+  BrushPresetBridge::setPendingPresetName(name);
+  CommandManager::instance()->execute(MI_AddBrushPreset);
+  
+  // Add new preset to current page
+  BrushPresetPage *currentPage = getCurrentPage();
+  if (currentPage && !currentPage->hasPreset(name)) {
+    currentPage->addPreset(name);
+    savePageConfiguration();
+  }
+  
+  refreshPresetList();
+  ToolPresetCommandManager::instance()->refreshPresetCommands();
 }
 
 void BrushPresetPanel::removeCurrentPreset() {
@@ -1114,6 +1470,9 @@ void BrushPresetPanel::removeCurrentPreset() {
   
   TTool *tool = getCurrentBrushTool();
   if (!tool) return;
+  
+  // Don't remove <custom> preset
+  if (m_currentPreset == QString::fromStdWString(L"<custom>")) return;
   
   // Ask for confirmation
   int ret = QMessageBox::question(
@@ -1123,13 +1482,21 @@ void BrushPresetPanel::removeCurrentPreset() {
   
   if (ret != QMessageBox::Yes) return;
   
-  // Note: Direct call to tool's removePreset method causes linking issues
-  // because the methods are not exported from tnztools library.
-  // For now, users can remove presets via the Tool Options Bar.
-  QMessageBox::information(this, tr("Remove Preset"), 
-                           tr("Please use the [-] button in the Tool Options Bar to remove presets.\n\n"
-                              "The change will automatically be reflected in this panel."));
-  return;
+  // Remove from current page first
+  BrushPresetPage *currentPage = getCurrentPage();
+  if (currentPage) {
+    currentPage->removePreset(m_currentPreset);
+    savePageConfiguration();
+  }
+  
+  // Use command (handler in tnztools) to avoid LNK2019 when linking from toonz
+  if (tool->getName() != T_Brush) return;
+  CommandManager::instance()->execute(MI_RemoveBrushPreset);
+  
+  m_currentPreset = QString::fromStdWString(L"<custom>");
+  m_removePresetButton->setEnabled(false);
+  refreshPresetList();
+  ToolPresetCommandManager::instance()->refreshPresetCommands();
 }
 
 //-----------------------------------------------------------------------------
@@ -1145,9 +1512,7 @@ void BrushPresetPanel::reorderPreset(const QString &fromPreset, const QString &t
     orderFileName = "brush_vector_order.txt";
   } else if (m_currentToolType == "toonzraster") {
     orderFileName = "brush_toonzraster_order.txt";
-  } else if (m_currentToolType == "raster" || 
-             m_currentToolType == "mypaint" || 
-             m_currentToolType == "mypainttnz") {
+  } else if (m_currentToolType == "raster") {
     orderFileName = "brush_raster_order.txt";
   } else {
     return;  // Unknown tool type
@@ -1155,8 +1520,12 @@ void BrushPresetPanel::reorderPreset(const QString &fromPreset, const QString &t
   
   TFilePath orderFilePath = TEnv::getConfigDir() + orderFileName.toStdString();
   
-  // Load current preset list
-  QList<QString> presets = m_presetCache.value(m_currentToolType);
+  // Get current page
+  BrushPresetPage *currentPage = getCurrentPage();
+  if (!currentPage) return;
+  
+  // Get preset list from current page
+  QStringList presets = currentPage->getPresetNames();
   if (presets.isEmpty()) return;
   
   // Find indices
@@ -1169,18 +1538,11 @@ void BrushPresetPanel::reorderPreset(const QString &fromPreset, const QString &t
   // Reorder list
   presets.move(fromIndex, toIndex);
   
-  // Save new order to file
-  QFile file(orderFilePath.getQString());
-  if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-    QTextStream out(&file);
-    for (const QString &preset : presets) {
-      out << preset << "\n";
-    }
-    file.close();
-  }
+  // Update page
+  currentPage->setPresetNames(presets);
   
-  // Update cache
-  m_presetCache[m_currentToolType] = presets;
+  // Save configuration
+  savePageConfiguration();
   
   // Refresh UI
   refreshPresetList();
@@ -1191,12 +1553,98 @@ void BrushPresetPanel::reorderPreset(const QString &fromPreset, const QString &t
 //-----------------------------------------------------------------------------
 
 void BrushPresetPanel::onToolSwitched() {
+  // CRITICAL: Detect tool type FIRST, before initializing tabs
+  // Otherwise initializeTabs() loads pages for the OLD tool type
+  QString newToolType = detectCurrentToolType();
+  
+  // Save previous page's selection before switching tool type
+  if (!m_currentToolType.isEmpty() && !m_currentPreset.isEmpty()) {
+    BrushPresetPage *prevPage = getCurrentPage();
+    if (prevPage) {
+      prevPage->setLastSelectedPreset(m_currentPreset);
+      savePageConfiguration();
+    }
+  }
+  
+  m_currentToolType = newToolType;
+  
+  // Now initialize tabs with the CORRECT tool type
+  initializeTabs();
+  
+  // Refresh preset list for current page
   refreshPresetList();
 }
 
 void BrushPresetPanel::onToolChanged() {
-  // Update checked states (called when tool changes)
+  // CRITICAL: Check if tool type has changed (e.g., switching between
+  // vector and raster levels while keeping the same tool active).
+  // onToolSwitched() only fires when the tool itself changes,
+  // but onToolChanged() fires when the level type changes too.
+  QString newToolType = detectCurrentToolType();
+  if (!newToolType.isEmpty() && newToolType != m_currentToolType) {
+    // Tool type changed (e.g., switched from vector level to raster level)
+    // Save previous page's selection
+    if (!m_currentToolType.isEmpty() && !m_currentPreset.isEmpty()) {
+      BrushPresetPage *prevPage = getCurrentPage();
+      if (prevPage) {
+        prevPage->setLastSelectedPreset(m_currentPreset);
+        savePageConfiguration();
+      }
+    }
+    
+    m_currentToolType = newToolType;
+    initializeTabs();
+    refreshPresetList();
+    return;
+  }
+  
+  // Same tool type - update checked states and refresh display label
+  // (the style sub-type may have changed, e.g., switched from solid to MyPaint)
   updateCheckedStates();
+  
+  // Update the display label to reflect the current style sub-type
+  // without touching the pages or presets
+  if (!m_currentToolType.isEmpty()) {
+    TApplication *labelApp = TApp::instance();
+    TColorStyle *activeStyle = labelApp ? labelApp->getCurrentLevelStyle() : nullptr;
+    QString toolDisplayName;
+    
+    if (m_currentToolType == "vector") {
+      if (dynamic_cast<TVectorBrushStyle*>(activeStyle)) {
+        toolDisplayName = tr("Custom Vector Brush");
+      } else if (dynamic_cast<TTextureStyle*>(activeStyle)) {
+        toolDisplayName = tr("Vector Texture");
+      } else if (activeStyle && !dynamic_cast<TSolidColorStyle*>(activeStyle)) {
+        std::string brushId = activeStyle->getBrushIdName();
+        if (brushId.find("VectorImagePatternStrokeStyle:") == 0 ||
+            brushId.find("RasterImagePatternStrokeStyle:") == 0) {
+          toolDisplayName = tr("Vector Trail");
+        } else {
+          toolDisplayName = tr("Vector Generated");
+        }
+      } else {
+        toolDisplayName = tr("Vector Brush");
+      }
+    } else if (m_currentToolType == "toonzraster") {
+      if (dynamic_cast<TMyPaintBrushStyle*>(activeStyle)) {
+        toolDisplayName = tr("MyPaint Brush Tnz");
+      } else if (dynamic_cast<TTextureStyle*>(activeStyle)) {
+        toolDisplayName = tr("Toonz Raster Texture");
+      } else {
+        toolDisplayName = tr("Toonz Raster Brush");
+      }
+    } else if (m_currentToolType == "raster") {
+      if (dynamic_cast<TMyPaintBrushStyle*>(activeStyle)) {
+        toolDisplayName = tr("MyPaint Brush");
+      } else {
+        toolDisplayName = tr("Raster Brush");
+      }
+    }
+    
+    if (!toolDisplayName.isEmpty()) {
+      m_toolLabel->setText(toolDisplayName);
+    }
+  }
 }
 
 void BrushPresetPanel::updateCheckedStates() {
@@ -1220,6 +1668,12 @@ void BrushPresetPanel::updateCheckedStates() {
         QString newPreset = QString::fromStdWString(presetProp->getValue());
         if (newPreset != m_currentPreset) {
           m_currentPreset = newPreset;
+          // Update remove button state
+          if (newPreset == QString::fromStdWString(L"<custom>")) {
+            m_removePresetButton->setEnabled(false);
+          } else {
+            m_removePresetButton->setEnabled(true);
+          }
         }
         
         // Always update visual selection (even if m_currentPreset hasn't changed)
@@ -1244,14 +1698,29 @@ void BrushPresetPanel::updateCheckedStates() {
 }
 
 void BrushPresetPanel::onPresetItemClicked(const QString &presetName, const QString &toolType) {
+  // In checkbox mode: toggle multi-selection instead of applying
+  if (m_checkboxMode) {
+    togglePresetSelection(presetName);
+    return;
+  }
+  
   applyPreset(presetName);
+  
+  // Save this selection as the last selected preset for the current page
+  BrushPresetPage *currentPage = getCurrentPage();
+  if (currentPage) {
+    currentPage->setLastSelectedPreset(presetName);
+    savePageConfiguration();
+  }
 }
 
 void BrushPresetPanel::onAddPresetClicked() {
+  // Simple: just add new preset (no Shift modifier check)
   addNewPreset();
 }
 
 void BrushPresetPanel::onRemovePresetClicked() {
+  // Mirror of Tool Options Bar - Remove current preset
   removeCurrentPreset();
 }
 
@@ -1344,15 +1813,34 @@ void BrushPresetPanel::createViewModeMenu() {
   viewModeGroup->addAction(largeAction);
   m_viewModeMenu->addAction(largeAction);
   
-  // Connecter les actions
+  // Connect view mode actions
   connect(viewModeGroup, &QActionGroup::triggered, [this](QAction *action) {
     ViewMode mode = static_cast<ViewMode>(action->data().toInt());
     onViewModeChanged(mode);
   });
   
+  // Separator before multi-select option
+  m_viewModeMenu->addSeparator();
+  
+  // Show Checkboxes option for multi-selection
+  QAction *checkboxAction = new QAction(tr("Show Checkboxes"), this);
+  checkboxAction->setCheckable(true);
+  checkboxAction->setChecked(m_checkboxMode);
+  m_viewModeMenu->addAction(checkboxAction);
+  connect(checkboxAction, &QAction::triggered, [this, checkboxAction]() {
+    m_checkboxMode = checkboxAction->isChecked();
+    if (!m_checkboxMode) {
+      // Clear multi-selection when disabling checkbox mode
+      clearMultiSelection();
+    }
+    updateCheckboxVisibility();
+  });
+  
+  // Add Show/Hide submenu
+  addShowHideContextMenu(m_viewModeMenu);
+  
   // Connect button to show menu manually (no triangle indicator)
   connect(m_viewModeButton, &QPushButton::clicked, [this]() {
-    // Show menu below the button
     QPoint pos = m_viewModeButton->mapToGlobal(QPoint(0, m_viewModeButton->height()));
     m_viewModeMenu->exec(pos);
   });
@@ -1429,6 +1917,17 @@ void BrushPresetPanel::onViewModeChanged(ViewMode mode) {
 
 void BrushPresetPanel::contextMenuEvent(QContextMenuEvent *event) {
   QMenu *menu = new QMenu(this);
+  
+  // Paste action (available when clipboard has content, even on empty page)
+  if (!m_clipboardPresets.isEmpty()) {
+    QAction *pasteAction = menu->addAction(
+        tr("Paste (%1 preset(s))").arg(m_clipboardPresets.size()));
+    connect(pasteAction, &QAction::triggered, [this]() {
+      pastePresetsToCurrentPage();
+    });
+    menu->addSeparator();
+  }
+  
   addShowHideContextMenu(menu);
   menu->exec(event->globalPos());
   delete menu;
@@ -1514,6 +2013,680 @@ void BrushPresetPanel::reorganizeLayout(int newColumns) {
       col = 0;
       row++;
     }
+  }
+}
+
+//-----------------------------------------------------------------------------
+// Page access methods (modeled after TPalette)
+//-----------------------------------------------------------------------------
+
+BrushPresetPage* BrushPresetPanel::getCurrentPage() {
+  return getPage(m_currentPageIndex);
+}
+
+BrushPresetPage* BrushPresetPanel::getPage(int pageIndex) {
+  if (m_currentToolType.isEmpty()) return nullptr;
+  
+  QList<BrushPresetPage*> &pages = m_pages[m_currentToolType];
+  if (pageIndex >= 0 && pageIndex < pages.size()) {
+    return pages[pageIndex];
+  }
+  return nullptr;
+}
+
+int BrushPresetPanel::getPageCount() const {
+  if (m_currentToolType.isEmpty()) return 0;
+  return m_pages.value(m_currentToolType).size();
+}
+
+void BrushPresetPanel::clearPages() {
+  // Delete all pages for all tool types
+  for (auto it = m_pages.begin(); it != m_pages.end(); ++it) {
+    qDeleteAll(it.value());
+    it.value().clear();
+  }
+  m_pages.clear();
+}
+
+//-----------------------------------------------------------------------------
+// Multi-selection management
+//-----------------------------------------------------------------------------
+
+void BrushPresetPanel::togglePresetSelection(const QString &presetName) {
+  if (m_selectedPresets.contains(presetName)) {
+    m_selectedPresets.remove(presetName);
+  } else {
+    m_selectedPresets.insert(presetName);
+  }
+  
+  // Update checkbox state on the corresponding item widget
+  for (int i = 0; i < m_presetLayout->count(); ++i) {
+    QLayoutItem *item = m_presetLayout->itemAt(i);
+    if (!item || !item->widget()) continue;
+    BrushPresetItem *presetItem = qobject_cast<BrushPresetItem*>(item->widget());
+    if (presetItem && presetItem->getPresetName() == presetName) {
+      presetItem->setMultiSelected(m_selectedPresets.contains(presetName));
+      break;
+    }
+  }
+}
+
+void BrushPresetPanel::clearMultiSelection() {
+  m_selectedPresets.clear();
+  
+  // Clear all checkbox states
+  for (int i = 0; i < m_presetLayout->count(); ++i) {
+    QLayoutItem *item = m_presetLayout->itemAt(i);
+    if (!item || !item->widget()) continue;
+    BrushPresetItem *presetItem = qobject_cast<BrushPresetItem*>(item->widget());
+    if (presetItem) {
+      presetItem->setMultiSelected(false);
+    }
+  }
+}
+
+void BrushPresetPanel::updateCheckboxVisibility() {
+  for (int i = 0; i < m_presetLayout->count(); ++i) {
+    QLayoutItem *item = m_presetLayout->itemAt(i);
+    if (!item || !item->widget()) continue;
+    BrushPresetItem *presetItem = qobject_cast<BrushPresetItem*>(item->widget());
+    if (presetItem) {
+      presetItem->setCheckboxVisible(m_checkboxMode);
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+// Context menu for presets (copy/cut/paste/delete)
+//-----------------------------------------------------------------------------
+
+void BrushPresetPanel::showPresetContextMenu(const QPoint &globalPos, const QString &presetName) {
+  QMenu menu(this);
+  
+  // Determine the effective selection (if multi-select or single)
+  QStringList effectiveSelection;
+  if (m_checkboxMode && !m_selectedPresets.isEmpty()) {
+    // Use multi-selection
+    effectiveSelection = m_selectedPresets.values();
+  } else {
+    // Use the right-clicked preset
+    effectiveSelection.append(presetName);
+  }
+  
+  int selCount = effectiveSelection.size();
+  
+  // Copy
+  QAction *copyAction = menu.addAction(
+      selCount > 1 ? tr("Copy %1 Presets").arg(selCount) : tr("Copy"));
+  connect(copyAction, &QAction::triggered, [this, effectiveSelection]() {
+    m_clipboardPresets = effectiveSelection;
+    m_clipboardIsCut = false;
+  });
+  
+  // Cut
+  QAction *cutAction = menu.addAction(
+      selCount > 1 ? tr("Cut %1 Presets").arg(selCount) : tr("Cut"));
+  connect(cutAction, &QAction::triggered, [this, effectiveSelection]() {
+    m_clipboardPresets = effectiveSelection;
+    m_clipboardIsCut = true;
+  });
+  
+  // Paste (only if clipboard has content)
+  if (!m_clipboardPresets.isEmpty()) {
+    QAction *pasteAction = menu.addAction(
+        tr("Paste (%1)").arg(m_clipboardPresets.size()));
+    connect(pasteAction, &QAction::triggered, [this]() {
+      pastePresetsToCurrentPage();
+    });
+  }
+  
+  menu.addSeparator();
+  
+  // Delete
+  QAction *deleteAction = menu.addAction(
+      selCount > 1 ? tr("Delete %1 Presets").arg(selCount) : tr("Delete"));
+  connect(deleteAction, &QAction::triggered, [this, effectiveSelection]() {
+    // Confirm
+    int ret = QMessageBox::question(
+        this, tr("Delete Presets"),
+        tr("Are you sure you want to permanently delete %1 preset(s)?")
+            .arg(effectiveSelection.size()),
+        QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    if (ret != QMessageBox::Yes) return;
+    
+    // Remove from current page
+    BrushPresetPage *currentPage = getCurrentPage();
+    if (currentPage) {
+      for (const QString &name : effectiveSelection) {
+        currentPage->removePreset(name);
+      }
+      savePageConfiguration();
+    }
+    
+    // Remove from disk via batch command
+    TTool *tool = getCurrentBrushTool();
+    if (tool && tool->getName() == T_Brush) {
+      for (const QString &name : effectiveSelection) {
+        BrushPresetBridge::addPendingRemoveName(name);
+      }
+      CommandManager::instance()->execute(MI_RemoveBrushPresetByName);
+    }
+    
+    m_currentPreset = QString::fromStdWString(L"<custom>");
+    clearMultiSelection();
+    refreshPresetList();
+    ToolPresetCommandManager::instance()->refreshPresetCommands();
+  });
+  
+  // Separator before page-specific actions
+  if (getPageCount() > 1) {
+    menu.addSeparator();
+    
+    // Move to page submenu
+    QMenu *moveToMenu = menu.addMenu(tr("Move to Page"));
+    QList<BrushPresetPage*> &pages = m_pages[m_currentToolType];
+    for (int i = 0; i < pages.size(); ++i) {
+      if (i == m_currentPageIndex) continue; // Skip current page
+      QAction *pageAction = moveToMenu->addAction(pages[i]->getName());
+      connect(pageAction, &QAction::triggered, [this, effectiveSelection, i]() {
+        BrushPresetPage *srcPage = getCurrentPage();
+        BrushPresetPage *dstPage = getPage(i);
+        if (!srcPage || !dstPage) return;
+        
+        for (const QString &name : effectiveSelection) {
+          srcPage->removePreset(name);
+          if (!dstPage->hasPreset(name)) {
+            dstPage->addPreset(name);
+          }
+        }
+        savePageConfiguration();
+        clearMultiSelection();
+        refreshPresetList();
+      });
+    }
+  }
+  
+  menu.exec(globalPos);
+}
+
+void BrushPresetPanel::copySelectedPresets() {
+  if (m_checkboxMode && !m_selectedPresets.isEmpty()) {
+    m_clipboardPresets = m_selectedPresets.values();
+  } else if (!m_currentPreset.isEmpty()) {
+    m_clipboardPresets.clear();
+    m_clipboardPresets.append(m_currentPreset);
+  }
+  m_clipboardIsCut = false;
+}
+
+void BrushPresetPanel::cutSelectedPresets() {
+  copySelectedPresets();
+  m_clipboardIsCut = true;
+}
+
+void BrushPresetPanel::pastePresetsToCurrentPage() {
+  if (m_clipboardPresets.isEmpty()) return;
+  
+  BrushPresetPage *currentPage = getCurrentPage();
+  if (!currentPage) return;
+  
+  for (const QString &presetName : m_clipboardPresets) {
+    if (!currentPage->hasPreset(presetName)) {
+      currentPage->addPreset(presetName);
+    }
+  }
+  
+  // If cut mode, remove from source page
+  if (m_clipboardIsCut) {
+    // The source page is not necessarily the current page,
+    // so we need to find and remove from all pages that contain these presets
+    QList<BrushPresetPage*> &pages = m_pages[m_currentToolType];
+    for (BrushPresetPage *page : pages) {
+      if (page == currentPage) continue;
+      for (const QString &presetName : m_clipboardPresets) {
+        page->removePreset(presetName);
+      }
+    }
+    m_clipboardIsCut = false;
+  }
+  
+  m_clipboardPresets.clear();
+  savePageConfiguration();
+  refreshPresetList();
+}
+
+void BrushPresetPanel::deleteSelectedPresets() {
+  QStringList toDelete;
+  if (m_checkboxMode && !m_selectedPresets.isEmpty()) {
+    toDelete = m_selectedPresets.values();
+  } else if (!m_currentPreset.isEmpty() && 
+             m_currentPreset != QString::fromStdWString(L"<custom>")) {
+    toDelete.append(m_currentPreset);
+  }
+  
+  if (toDelete.isEmpty()) return;
+  
+  int ret = QMessageBox::question(
+      this, tr("Delete Presets"),
+      tr("Are you sure you want to permanently delete %1 preset(s)?")
+          .arg(toDelete.size()),
+      QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+  if (ret != QMessageBox::Yes) return;
+  
+  BrushPresetPage *currentPage = getCurrentPage();
+  if (currentPage) {
+    for (const QString &name : toDelete) {
+      currentPage->removePreset(name);
+    }
+    savePageConfiguration();
+  }
+  
+  TTool *tool = getCurrentBrushTool();
+  if (tool && tool->getName() == T_Brush) {
+    for (const QString &name : toDelete) {
+      BrushPresetBridge::addPendingRemoveName(name);
+    }
+    CommandManager::instance()->execute(MI_RemoveBrushPresetByName);
+  }
+  
+  m_currentPreset = QString::fromStdWString(L"<custom>");
+  clearMultiSelection();
+  refreshPresetList();
+  ToolPresetCommandManager::instance()->refreshPresetCommands();
+}
+
+//-----------------------------------------------------------------------------
+// Page/Tab management (modeled after Level Palette Editor)
+//-----------------------------------------------------------------------------
+
+void BrushPresetPanel::initializeTabs() {
+  if (!m_tabBar) return;
+  if (m_currentToolType.isEmpty()) return;
+  
+  // Block signals to avoid triggering onTabChanged during rebuild
+  m_tabBar->blockSignals(true);
+  
+  // Remove all existing tabs
+  int tabCount = m_tabBar->count();
+  for (int i = tabCount - 1; i >= 0; i--) {
+    m_tabBar->removeTab(i);
+  }
+  
+  // Load page configuration for current tool type from QSettings
+  // This populates m_pages[m_currentToolType]
+  loadPageConfiguration();
+  
+  // Get pages for current tool (create default page if none exist)
+  QList<BrushPresetPage*> &pages = m_pages[m_currentToolType];
+  if (pages.isEmpty()) {
+    BrushPresetPage *defaultPage = new BrushPresetPage(tr("Page 1"), 0);
+    pages.append(defaultPage);
+  }
+  
+  // Create tabs with palette icon (same as PaletteViewer::updateTabBar)
+  QIcon tabIcon = createQIcon("palette_tab");
+  m_tabBar->setIconSize(QSize(16, 16));
+  for (int i = 0; i < pages.size(); ++i) {
+    m_tabBar->addTab(tabIcon, pages[i]->getName());
+  }
+  
+  // Set current page (bounded to valid range)
+  if (m_currentPageIndex < 0 || m_currentPageIndex >= m_tabBar->count()) {
+    m_currentPageIndex = 0;
+  }
+  m_tabBar->setCurrentIndex(m_currentPageIndex);
+  
+  // Unblock signals
+  m_tabBar->blockSignals(false);
+}
+
+void BrushPresetPanel::updateTabBar() {
+  initializeTabs();
+}
+
+void BrushPresetPanel::switchToPage(int pageIndex) {
+  if (pageIndex < 0 || pageIndex >= m_tabBar->count()) return;
+  
+  // Avoid re-entering when setCurrentIndex triggers currentChanged
+  if (pageIndex == m_currentPageIndex && m_tabBar->currentIndex() == pageIndex) {
+    return;
+  }
+  
+  // Save last selected preset for previous page BEFORE changing index
+  BrushPresetPage *prevPage = getCurrentPage();
+  if (prevPage && !m_currentPreset.isEmpty()) {
+    prevPage->setLastSelectedPreset(m_currentPreset);
+    savePageConfiguration();
+  }
+  
+  // Change to new page index
+  m_currentPageIndex = pageIndex;
+  
+  // Block signals temporarily to avoid recursive calls via onTabChanged
+  m_tabBar->blockSignals(true);
+  m_tabBar->setCurrentIndex(pageIndex);
+  m_tabBar->blockSignals(false);
+  
+  // Restore last selected preset for new page
+  BrushPresetPage *newPage = getCurrentPage();
+  QString restoredPreset;
+  if (newPage) {
+    restoredPreset = newPage->getLastSelectedPreset();
+    if (restoredPreset.isEmpty() || !newPage->hasPreset(restoredPreset)) {
+      restoredPreset = QString();
+    }
+  }
+  
+  // CRITICAL: Force refresh preset list for current page
+  // This ensures we show only presets belonging to this page
+  refreshPresetList();
+  
+  // After refreshing, restore the selection for this page
+  // This applies the preset to the tool AND updates the visual selection
+  if (!restoredPreset.isEmpty()) {
+    applyPreset(restoredPreset);
+  } else {
+    // No saved selection for this page - deselect all
+    m_currentPreset = QString::fromStdWString(L"<custom>");
+    m_removePresetButton->setEnabled(false);
+  }
+}
+
+void BrushPresetPanel::addNewPage() {
+  if (m_currentToolType.isEmpty()) return;
+  
+  // Generate new page name
+  int pageNum = m_tabBar->count() + 1;
+  QString newPageName = tr("Page %1").arg(pageNum);
+  
+  // Create new page object
+  QList<BrushPresetPage*> &pages = m_pages[m_currentToolType];
+  BrushPresetPage *newPage = new BrushPresetPage(newPageName, pages.size());
+  pages.append(newPage);
+  
+  // Add tab with palette icon
+  QIcon tabIcon = createQIcon("palette_tab");
+  int newIndex = m_tabBar->addTab(tabIcon, newPageName);
+  
+  // Save configuration
+  savePageConfiguration();
+  
+  // Switch to new page
+  switchToPage(newIndex);
+}
+
+void BrushPresetPanel::deletePage(int pageIndex) {
+  if (pageIndex < 0 || pageIndex >= m_tabBar->count()) return;
+  if (m_currentToolType.isEmpty()) return;
+  
+  // Don't allow deleting the last page
+  if (m_tabBar->count() <= 1) {
+    QMessageBox::information(this, tr("Cannot Delete Page"),
+                            tr("Cannot delete the last page. At least one page must exist."));
+    return;
+  }
+  
+  // Get the page and its presets
+  BrushPresetPage *page = getPage(pageIndex);
+  if (!page) return;
+  
+  QStringList pagePresets = page->getPresetNames();
+  QString pageName = m_tabBar->tabText(pageIndex);
+  
+  // Confirm deletion with accurate information
+  QString message;
+  if (pagePresets.isEmpty()) {
+    message = tr("Are you sure you want to delete the page '%1'?").arg(pageName);
+  } else {
+    message = tr("Are you sure you want to delete the page '%1'?\n"
+                 "This will permanently delete %2 preset(s) contained in this page.")
+              .arg(pageName).arg(pagePresets.size());
+  }
+  
+  int ret = QMessageBox::question(this, tr("Delete Page"), message,
+      QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+  if (ret != QMessageBox::Yes) return;
+  
+  // ACTUALLY delete the presets from disk via the batch remove command.
+  // Queue all preset names and execute the batch remove command.
+  TTool *tool = getCurrentBrushTool();
+  if (tool && tool->getName() == T_Brush && !pagePresets.isEmpty()) {
+    for (const QString &presetName : pagePresets) {
+      BrushPresetBridge::addPendingRemoveName(presetName);
+    }
+    CommandManager::instance()->execute(MI_RemoveBrushPresetByName);
+  }
+  
+  // Delete page object
+  QList<BrushPresetPage*> &pages = m_pages[m_currentToolType];
+  if (pageIndex < pages.size()) {
+    delete pages[pageIndex];
+    pages.removeAt(pageIndex);
+    for (int i = 0; i < pages.size(); ++i) {
+      pages[i]->setIndex(i);
+    }
+  }
+  
+  // Remove tab
+  m_tabBar->removeTab(pageIndex);
+  savePageConfiguration();
+  
+  // Switch to appropriate page
+  if (m_currentPageIndex >= m_tabBar->count()) {
+    m_currentPageIndex = m_tabBar->count() - 1;
+  }
+  switchToPage(m_currentPageIndex);
+  
+  // Refresh commands
+  ToolPresetCommandManager::instance()->refreshPresetCommands();
+}
+
+void BrushPresetPanel::renamePage(int pageIndex, const QString &newName) {
+  if (pageIndex < 0 || pageIndex >= m_tabBar->count()) return;
+  if (m_currentToolType.isEmpty()) return;
+  if (newName.isEmpty()) return;
+  
+  // Update page object
+  BrushPresetPage *page = getPage(pageIndex);
+  if (page) {
+    page->setName(newName);
+  }
+  
+  // Update tab text (already done by tab bar, but ensure consistency)
+  m_tabBar->setTabText(pageIndex, newName);
+  
+  // Save configuration
+  savePageConfiguration();
+}
+
+void BrushPresetPanel::movePageTab(int srcIndex, int dstIndex) {
+  if (srcIndex < 0 || srcIndex >= m_tabBar->count()) return;
+  if (dstIndex < 0 || dstIndex >= m_tabBar->count()) return;
+  if (srcIndex == dstIndex) return;
+  if (m_currentToolType.isEmpty()) return;
+  
+  // Update pages list
+  QList<BrushPresetPage*> &pages = m_pages[m_currentToolType];
+  if (srcIndex < pages.size() && dstIndex < pages.size()) {
+    pages.move(srcIndex, dstIndex);
+    
+    // Update indices of all pages
+    for (int i = 0; i < pages.size(); ++i) {
+      pages[i]->setIndex(i);
+    }
+  }
+  
+  // Move tab (Qt handles the visual move)
+  m_tabBar->moveTab(srcIndex, dstIndex);
+  
+  // Update current page index if it was moved
+  if (m_currentPageIndex == srcIndex) {
+    m_currentPageIndex = dstIndex;
+  } else if (srcIndex < m_currentPageIndex && dstIndex >= m_currentPageIndex) {
+    m_currentPageIndex--;
+  } else if (srcIndex > m_currentPageIndex && dstIndex <= m_currentPageIndex) {
+    m_currentPageIndex++;
+  }
+  
+  // Save configuration
+  savePageConfiguration();
+  
+  // Refresh display
+  refreshPresetList();
+}
+
+void BrushPresetPanel::savePageConfiguration() {
+  if (m_currentToolType.isEmpty()) return;
+  
+  QSettings settings;
+  QList<BrushPresetPage*> pages = m_pages.value(m_currentToolType);
+  
+  // Clear old page data first to avoid stale data
+  int oldPageCount = settings.value(QString("BrushPresetPanel/PageCount_%1").arg(m_currentToolType), 0).toInt();
+  for (int i = 0; i < oldPageCount; ++i) {
+    QString prefix = QString("BrushPresetPanel/%1_Page%2").arg(m_currentToolType).arg(i);
+    settings.remove(prefix + "_Name");
+    settings.remove(prefix + "_Presets");
+    settings.remove(prefix + "_LastPreset");
+  }
+  
+  // Save number of pages
+  settings.setValue(QString("BrushPresetPanel/PageCount_%1").arg(m_currentToolType), pages.size());
+  
+  // Save each page configuration with explicit index
+  for (int i = 0; i < pages.size(); ++i) {
+    BrushPresetPage *page = pages[i];
+    // Ensure page index is synchronized
+    page->setIndex(i);
+    
+    QString prefix = QString("BrushPresetPanel/%1_Page%2").arg(m_currentToolType).arg(i);
+    
+    // Save page name
+    settings.setValue(prefix + "_Name", page->getName());
+    
+    // Save presets in this page (join with ||| to avoid comma conflicts)
+    settings.setValue(prefix + "_Presets", page->getPresetNames().join("|||"));
+    
+    // Save last selected preset
+    settings.setValue(prefix + "_LastPreset", page->getLastSelectedPreset());
+  }
+  
+  // Save current page index
+  settings.setValue(QString("BrushPresetPanel/CurrentPage_%1").arg(m_currentToolType),
+                   m_currentPageIndex);
+  
+  // Force sync to disk
+  settings.sync();
+}
+
+void BrushPresetPanel::loadPageConfiguration() {
+  if (m_currentToolType.isEmpty()) return;
+  
+  QSettings settings;
+  
+  // MIGRATION: Clean up obsolete engine-specific keys from previous versions.
+  // Pages are now stored per level type (vector/toonzraster/raster) only.
+  // Remove any data stored under old "mypainttnz" or "mypaint" keys
+  // and merge their presets into the correct level-type pages.
+  static bool migrationDone = false;
+  if (!migrationDone) {
+    QStringList obsoleteKeys = {"mypainttnz", "mypaint"};
+    for (const QString &oldKey : obsoleteKeys) {
+      int oldPageCount = settings.value(
+          QString("BrushPresetPanel/PageCount_%1").arg(oldKey), 0).toInt();
+      if (oldPageCount > 0) {
+        // Remove all old page data
+        for (int i = 0; i < oldPageCount; ++i) {
+          QString prefix = QString("BrushPresetPanel/%1_Page%2").arg(oldKey).arg(i);
+          settings.remove(prefix + "_Name");
+          settings.remove(prefix + "_Presets");
+          settings.remove(prefix + "_LastPreset");
+        }
+        settings.remove(QString("BrushPresetPanel/PageCount_%1").arg(oldKey));
+        settings.remove(QString("BrushPresetPanel/CurrentPage_%1").arg(oldKey));
+      }
+    }
+    migrationDone = true;
+    settings.sync();
+  }
+  
+  // Clear existing pages for this tool type
+  QList<BrushPresetPage*> &pages = m_pages[m_currentToolType];
+  qDeleteAll(pages);
+  pages.clear();
+  
+  // Load number of pages (default 0 means no user data yet - will auto-create Page 1)
+  int pageCount = settings.value(QString("BrushPresetPanel/PageCount_%1").arg(m_currentToolType), 0).toInt();
+  
+  if (pageCount <= 0) pageCount = 1;
+  
+  // Load each page
+  for (int i = 0; i < pageCount; ++i) {
+    QString prefix = QString("BrushPresetPanel/%1_Page%2").arg(m_currentToolType).arg(i);
+    
+    // Load page name
+    QString pageName = settings.value(prefix + "_Name", tr("Page %1").arg(i + 1)).toString();
+    
+    // Create page
+    BrushPresetPage *page = new BrushPresetPage(pageName, i);
+    
+    // Load presets (using ||| separator to avoid comma conflicts)
+    QString presetsStr = settings.value(prefix + "_Presets", "").toString();
+    if (!presetsStr.isEmpty()) {
+      QStringList presetNames = presetsStr.split("|||", Qt::SkipEmptyParts);
+      page->setPresetNames(presetNames);
+    }
+    
+    // Load last selected preset
+    QString lastPreset = settings.value(prefix + "_LastPreset", "").toString();
+    page->setLastSelectedPreset(lastPreset);
+    
+    pages.append(page);
+  }
+  
+  // Ensure at least one page exists
+  if (pages.isEmpty()) {
+    BrushPresetPage *defaultPage = new BrushPresetPage(tr("Page 1"), 0);
+    pages.append(defaultPage);
+  }
+  
+  // Load current page index
+  m_currentPageIndex = settings.value(QString("BrushPresetPanel/CurrentPage_%1").arg(m_currentToolType), 0).toInt();
+  
+  // Bound to valid range
+  if (m_currentPageIndex < 0 || m_currentPageIndex >= pages.size()) {
+    m_currentPageIndex = 0;
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+// Tab/Page slots
+//-----------------------------------------------------------------------------
+
+void BrushPresetPanel::onTabChanged(int index) {
+  // Only process if index actually changed (avoid recursion)
+  if (index < 0 || index == m_currentPageIndex) return;
+  switchToPage(index);
+}
+
+void BrushPresetPanel::onTabTextChanged(int index) {
+  if (index < 0 || index >= m_tabBar->count()) return;
+  QString newName = m_tabBar->tabText(index);
+  renamePage(index, newName);
+}
+
+void BrushPresetPanel::onTabMoved(int srcIndex, int dstIndex) {
+  movePageTab(srcIndex, dstIndex);
+}
+
+void BrushPresetPanel::onAddPageClicked() {
+  addNewPage();
+}
+
+void BrushPresetPanel::onDeletePageClicked() {
+  if (m_currentPageIndex >= 0 && m_currentPageIndex < m_tabBar->count()) {
+    deletePage(m_currentPageIndex);
   }
 }
 

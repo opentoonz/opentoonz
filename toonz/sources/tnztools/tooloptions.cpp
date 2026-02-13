@@ -27,6 +27,10 @@
 #include "toonzqt/dvscrollwidget.h"
 #include "toonzqt/lutcalibrator.h"
 #include "toonzqt/viewcommandids.h"
+#include "toonzqt/brushpresetbridge.h"
+
+// Tnz includes (for command ids)
+#include "../toonz/menubarcommandids.h"
 
 // TnzLib includes
 #include "toonz/tobjecthandle.h"
@@ -2060,6 +2064,12 @@ void BrushToolOptionsBox::onAddPreset() {
   }
 
   m_presetCombo->loadEntries();
+  
+  // Notify BrushPresetPanel that the preset list has changed
+  // so it can assign the new preset to the currently visible page.
+  TTool::Application *app = TTool::getApplication();
+  if (app && app->getCurrentTool())
+    app->getCurrentTool()->notifyToolComboBoxListChanged("Preset:");
 }
 
 //-----------------------------------------------------------------------------
@@ -2082,6 +2092,12 @@ void BrushToolOptionsBox::onRemovePreset() {
   }
 
   m_presetCombo->loadEntries();
+  
+  // Notify BrushPresetPanel that the preset list has changed
+  // so it can immediately refresh its view (removes deleted preset).
+  TTool::Application *app = TTool::getApplication();
+  if (app && app->getCurrentTool())
+    app->getCurrentTool()->notifyToolComboBoxListChanged("Preset:");
 }
 
 //=============================================================================
@@ -3143,3 +3159,141 @@ public:
     }
   }
 } rotateRightCHInstance("A_ToolOption_RotateRight");
+
+//***********************************************************************************
+//    Brush Preset Panel commands (called from BrushPresetPanel to avoid LNK2019)
+//***********************************************************************************
+
+class AddBrushPresetCommandHandler final : public MenuItemHandler {
+public:
+  AddBrushPresetCommandHandler() : MenuItemHandler(MI_AddBrushPreset) {}
+  void execute() override {
+    QString name = BrushPresetBridge::takePendingPresetName();
+    if (name.isEmpty()) return;
+    TTool::Application *app = TTool::getApplication();
+    if (!app) return;
+    TTool *tool = app->getCurrentTool()->getTool();
+    if (!tool || tool->getName() != T_Brush) return;
+    switch (tool->getTargetType() & TTool::CommonImages) {
+    case TTool::VectorImage: {
+      ToonzVectorBrushTool *vt = dynamic_cast<ToonzVectorBrushTool *>(tool);
+      if (vt) vt->addPreset(name);
+      break;
+    }
+    case TTool::ToonzImage: {
+      ToonzRasterBrushTool *rt = dynamic_cast<ToonzRasterBrushTool *>(tool);
+      if (rt) rt->addPreset(name);
+      break;
+    }
+    case TTool::RasterImage: {
+      FullColorBrushTool *ft = dynamic_cast<FullColorBrushTool *>(tool);
+      if (ft) ft->addPreset(name);
+      break;
+    }
+    default:
+      break;
+    }
+    // Notify panels that preset list changed (for BrushPresetPanel sync)
+    if (app->getCurrentTool())
+      app->getCurrentTool()->notifyToolComboBoxListChanged("Preset:");
+  }
+} addBrushPresetCHInstance;
+
+class RemoveBrushPresetCommandHandler final : public MenuItemHandler {
+public:
+  RemoveBrushPresetCommandHandler() : MenuItemHandler(MI_RemoveBrushPreset) {}
+  void execute() override {
+    TTool::Application *app = TTool::getApplication();
+    if (!app) return;
+    TTool *tool = app->getCurrentTool()->getTool();
+    if (!tool || tool->getName() != T_Brush) return;
+    switch (tool->getTargetType() & TTool::CommonImages) {
+    case TTool::VectorImage: {
+      ToonzVectorBrushTool *vt = dynamic_cast<ToonzVectorBrushTool *>(tool);
+      if (vt) vt->removePreset();
+      break;
+    }
+    case TTool::ToonzImage: {
+      ToonzRasterBrushTool *rt = dynamic_cast<ToonzRasterBrushTool *>(tool);
+      if (rt) rt->removePreset();
+      break;
+    }
+    case TTool::RasterImage: {
+      FullColorBrushTool *ft = dynamic_cast<FullColorBrushTool *>(tool);
+      if (ft) ft->removePreset();
+      break;
+    }
+    default:
+      break;
+    }
+    // Notify panels that preset list changed (for BrushPresetPanel sync)
+    if (app->getCurrentTool())
+      app->getCurrentTool()->notifyToolComboBoxListChanged("Preset:");
+  }
+} removeBrushPresetCHInstance;
+
+// Batch remove presets by name (used by BrushPresetPanel page deletion).
+// Uses public removePreset() after setting the internal preset property
+// via the TProperty::setValue interface.
+class RemoveBrushPresetByNameCommandHandler final : public MenuItemHandler {
+public:
+  RemoveBrushPresetByNameCommandHandler()
+      : MenuItemHandler(MI_RemoveBrushPresetByName) {}
+  void execute() override {
+    QStringList names = BrushPresetBridge::takePendingRemoveNames();
+    if (names.isEmpty()) return;
+    TTool::Application *app = TTool::getApplication();
+    if (!app) return;
+    TTool *tool = app->getCurrentTool()->getTool();
+    if (!tool || tool->getName() != T_Brush) return;
+
+    // Find the Preset property to set the value before calling removePreset
+    TPropertyGroup *props = tool->getProperties(0);
+    TEnumProperty *presetProp = nullptr;
+    if (props) {
+      for (int i = 0; i < props->getPropertyCount(); ++i) {
+        TProperty *prop = props->getProperty(i);
+        if (prop->getName() == "Preset:") {
+          presetProp = dynamic_cast<TEnumProperty *>(prop);
+          break;
+        }
+      }
+    }
+    if (!presetProp) return;
+
+    switch (tool->getTargetType() & TTool::CommonImages) {
+    case TTool::VectorImage: {
+      ToonzVectorBrushTool *vt = dynamic_cast<ToonzVectorBrushTool *>(tool);
+      if (vt) {
+        for (const QString &name : names) {
+          presetProp->setValue(name.toStdWString());
+          vt->removePreset();
+        }
+      }
+      break;
+    }
+    case TTool::ToonzImage: {
+      ToonzRasterBrushTool *rt = dynamic_cast<ToonzRasterBrushTool *>(tool);
+      if (rt) {
+        for (const QString &name : names) {
+          presetProp->setValue(name.toStdWString());
+          rt->removePreset();
+        }
+      }
+      break;
+    }
+    case TTool::RasterImage: {
+      FullColorBrushTool *ft = dynamic_cast<FullColorBrushTool *>(tool);
+      if (ft) {
+        for (const QString &name : names) {
+          presetProp->setValue(name.toStdWString());
+          ft->removePreset();
+        }
+      }
+      break;
+    }
+    default:
+      break;
+    }
+  }
+} removeBrushPresetByNameCHInstance;
