@@ -33,10 +33,15 @@
 #include "toonz/tscenehandle.h"
 #include "toonz/toonzscene.h"
 #include "toonz/tcamera.h"
+#include "toonz/tpalettehandle.h"
+#include "toonz/imagestyles.h"
 
 // TnzCore includes
 #include "tstream.h"
 #include "tcolorstyles.h"
+#include "timage_io.h"
+#include "tvectorbrushstyle.h"
+#include "tsimplecolorstyles.h"
 #include "tvectorimage.h"
 #include "tenv.h"
 #include "tregion.h"
@@ -1765,6 +1770,127 @@ void ToonzVectorBrushTool::loadPreset() {
     // Recalculate based on updated presets
     m_minThick = m_thickness.getValue().first;
     m_maxThick = m_thickness.getValue().second;
+    
+    // Restore style snapshot
+    if (preset.m_styleInfoVersion >= 1) {
+      TApplication *app = getApplication();
+      if (app && app->getCurrentPalette()) {
+        TPalette *palette = app->getCurrentPalette()->getPalette();
+        if (palette) {
+          int styleIndex = app->getCurrentLevelStyleIndex();
+          TColorStyle *currentStyle = palette->getStyle(styleIndex);
+          TPixel32 currentColor = currentStyle ? currentStyle->getMainColor() : TPixel32::Black;
+          
+          if (preset.m_hasStyleSnapshot && preset.m_styleInfoVersion >= 2) {
+            // VERSION 2+: Generic style restoration
+            TColorStyle *newStyle = nullptr;
+            
+            if (preset.m_snapshotStyleTagId == 3000) {
+              // TVectorBrushStyle: extract brush name
+              std::string brushName = preset.m_snapshotBrushIdName;
+              std::string prefix = "VectorBrushStyle:";
+              if (brushName.find(prefix) == 0)
+                brushName = brushName.substr(prefix.length());
+              newStyle = new TVectorBrushStyle(brushName);
+            } else if (preset.m_snapshotStyleTagId == 2001) {
+              // Texture style: load raster and construct
+              TFilePath texRelPath(preset.m_snapshotFilePath);
+              TFilePath fullTexPath = TEnv::getStuffDir() + "library" + "textures" + texRelPath;
+              TRaster32P textureRas;
+              try {
+                TImageReaderP reader = TImageReaderP(fullTexPath);
+                if (reader) {
+                  TImageP img = reader->load();
+                  if (TRasterImageP ri = img) textureRas = ri->getRaster();
+                }
+              } catch (...) {}
+              if (!textureRas) textureRas = TRaster32P(1, 1);
+              newStyle = new TTextureStyle(textureRas, texRelPath);
+            } else {
+              // Generated or Trail: create via brushIdName
+              newStyle = TColorStyle::create(preset.m_snapshotBrushIdName);
+            }
+            
+            if (newStyle) {
+              // GENERIC: Restore ALL numeric parameters
+              for (const auto &param : preset.m_snapshotParams) {
+                int idx = param.first;
+                double val = param.second;
+                if (idx >= newStyle->getParamCount()) continue;
+                TColorStyle::ParamType ptype = newStyle->getParamType(idx);
+                switch (ptype) {
+                  case TColorStyle::BOOL:
+                    newStyle->setParamValue(idx, (bool)(val != 0));
+                    break;
+                  case TColorStyle::INT:
+                  case TColorStyle::ENUM:
+                    newStyle->setParamValue(idx, (int)val);
+                    break;
+                  case TColorStyle::DOUBLE:
+                    newStyle->setParamValue(idx, val);
+                    break;
+                  default:
+                    break;
+                }
+              }
+              newStyle->setMainColor(currentColor);
+              palette->setStyle(styleIndex, newStyle);
+              app->getCurrentPalette()->notifyColorStyleChanged(false);
+            }
+          } else if (preset.m_hasVectorStyle) {
+            // VERSION 1 legacy: Vector/Generated/Trail
+            if (preset.m_vectorStyleTagId == 3000) {
+              std::string brushName = preset.m_vectorStyleName;
+              std::string prefix = "VectorBrushStyle:";
+              if (brushName.find(prefix) == 0)
+                brushName = brushName.substr(prefix.length());
+              TVectorBrushStyle *newStyle = new TVectorBrushStyle(brushName);
+              newStyle->setMainColor(currentColor);
+              palette->setStyle(styleIndex, newStyle);
+              app->getCurrentPalette()->notifyColorStyleChanged(false);
+            } else {
+              TColorStyle *newStyle = TColorStyle::create(preset.m_vectorStyleName);
+              if (newStyle) {
+                newStyle->setMainColor(currentColor);
+                palette->setStyle(styleIndex, newStyle);
+                app->getCurrentPalette()->notifyColorStyleChanged(false);
+              }
+            }
+          } else if (preset.m_hasTexture) {
+            // VERSION 1 legacy: Texture
+            TFilePath texRelPath(preset.m_texturePath);
+            TFilePath fullTexPath = TEnv::getStuffDir() + "library" + "textures" + texRelPath;
+            TRaster32P textureRas;
+            try {
+              TImageReaderP reader = TImageReaderP(fullTexPath);
+              if (reader) {
+                TImageP img = reader->load();
+                if (TRasterImageP ri = img) textureRas = ri->getRaster();
+              }
+            } catch (...) {}
+            if (!textureRas) textureRas = TRaster32P(1, 1);
+            TTextureStyle *newStyle = new TTextureStyle(textureRas, texRelPath);
+            newStyle->setParamValue(2, preset.m_textureScale);
+            newStyle->setParamValue(3, preset.m_textureRotation);
+            newStyle->setParamValue(4, preset.m_textureDispX);
+            newStyle->setParamValue(5, preset.m_textureDispY);
+            newStyle->setParamValue(6, preset.m_textureContrast);
+            newStyle->setParamValue(1, preset.m_textureType);
+            newStyle->setParamValue(0, preset.m_textureIsPattern);
+            newStyle->setMainColor(currentColor);
+            palette->setStyle(styleIndex, newStyle);
+            app->getCurrentPalette()->notifyColorStyleChanged(false);
+          } else if (!preset.m_hasVectorStyle && !preset.m_hasTexture && !preset.m_hasStyleSnapshot) {
+            // Plain solid color preset: replace any non-solid style
+            if (!dynamic_cast<TSolidColorStyle*>(currentStyle)) {
+              TSolidColorStyle *newStyle = new TSolidColorStyle(currentColor);
+              palette->setStyle(styleIndex, newStyle);
+              app->getCurrentPalette()->notifyColorStyleChanged(false);
+            }
+          }
+        }
+      }
+    }
   } catch (...) {
   }
 }
@@ -1786,6 +1912,77 @@ void ToonzVectorBrushTool::addPreset(QString name) {
   preset.m_cap         = m_capStyle.getIndex();
   preset.m_join        = m_joinStyle.getIndex();
   preset.m_miter       = m_miterJoinLimit.getValue();
+  
+  // Capture complete style snapshot using the GENERIC approach
+  preset.m_styleInfoVersion = 2;
+  preset.m_hasVectorStyle = false;
+  preset.m_hasTexture = false;
+  preset.m_hasStyleSnapshot = false;
+  
+  TApplication *app = getApplication();
+  if (app) {
+    TColorStyle *style = app->getCurrentLevelStyle();
+    
+    if (style && !dynamic_cast<TSolidColorStyle*>(style)) {
+      preset.m_hasStyleSnapshot = true;
+      preset.m_snapshotStyleTagId = style->getTagId();
+      preset.m_snapshotBrushIdName = style->getBrushIdName();
+      
+      // Extract primary file path and populate legacy fields
+      if (TVectorBrushStyle *vbStyle = dynamic_cast<TVectorBrushStyle*>(style)) {
+        preset.m_snapshotFilePath = "";
+        // Legacy compatibility
+        preset.m_hasVectorStyle = true;
+        preset.m_vectorStyleTagId = vbStyle->getTagId();
+        preset.m_vectorStyleName = vbStyle->getBrushIdName();
+      } else if (TTextureStyle *texStyle = dynamic_cast<TTextureStyle*>(style)) {
+        TFilePath texPath = texStyle->getParamValue(TColorStyle::TFilePath_tag(), 0);
+        std::wstring wpath = texPath.getWideString();
+        preset.m_snapshotFilePath = std::string(wpath.begin(), wpath.end());
+        // Legacy compatibility
+        preset.m_hasTexture = true;
+        preset.m_texturePath = preset.m_snapshotFilePath;
+        preset.m_textureScale = texStyle->getParamValue(TColorStyle::double_tag(), 2);
+        preset.m_textureRotation = texStyle->getParamValue(TColorStyle::double_tag(), 3);
+        preset.m_textureDispX = texStyle->getParamValue(TColorStyle::double_tag(), 4);
+        preset.m_textureDispY = texStyle->getParamValue(TColorStyle::double_tag(), 5);
+        preset.m_textureContrast = texStyle->getParamValue(TColorStyle::double_tag(), 6);
+        preset.m_textureType = texStyle->getParamValue(TColorStyle::int_tag(), 1);
+        preset.m_textureIsPattern = texStyle->getParamValue(TColorStyle::bool_tag(), 0);
+      } else {
+        // Generated or Trail styles
+        preset.m_snapshotFilePath = "";
+        // Legacy compatibility
+        preset.m_hasVectorStyle = true;
+        preset.m_vectorStyleTagId = style->getTagId();
+        preset.m_vectorStyleName = style->getBrushIdName();
+      }
+      
+      // GENERIC: Capture ALL numeric parameters of the style
+      int paramCount = style->getParamCount();
+      for (int i = 0; i < paramCount; ++i) {
+        TColorStyle::ParamType ptype = style->getParamType(i);
+        double numValue = 0.0;
+        switch (ptype) {
+          case TColorStyle::BOOL:
+            numValue = style->getParamValue(TColorStyle::bool_tag(), i) ? 1.0 : 0.0;
+            break;
+          case TColorStyle::INT:
+          case TColorStyle::ENUM:
+            numValue = (double)style->getParamValue(TColorStyle::int_tag(), i);
+            break;
+          case TColorStyle::DOUBLE:
+            numValue = style->getParamValue(TColorStyle::double_tag(), i);
+            break;
+          case TColorStyle::FILEPATH:
+            continue; // Handled via m_snapshotFilePath
+          default:
+            continue;
+        }
+        preset.m_snapshotParams.push_back({i, numValue});
+      }
+    }
+  }
 
   // Pass the preset to the manager
   m_presetsManager.addPreset(preset);
@@ -1877,7 +2074,24 @@ VectorBrushData::VectorBrushData()
     , m_pressure(false)
     , m_cap(0)
     , m_join(0)
-    , m_miter(0) {}
+    , m_miter(0)
+    , m_styleInfoVersion(0)
+    , m_hasVectorStyle(false)
+    , m_vectorStyleTagId(0)
+    , m_vectorStyleName("")
+    , m_hasTexture(false)
+    , m_texturePath("")
+    , m_textureScale(1.0)
+    , m_textureRotation(0.0)
+    , m_textureDispX(0.0)
+    , m_textureDispY(0.0)
+    , m_textureContrast(1.0)
+    , m_textureType(1)
+    , m_textureIsPattern(false)
+    , m_hasStyleSnapshot(false)
+    , m_snapshotStyleTagId(0)
+    , m_snapshotBrushIdName("")
+    , m_snapshotFilePath("") {}
 
 //----------------------------------------------------------------------------------------------------------
 
@@ -1892,7 +2106,24 @@ VectorBrushData::VectorBrushData(const std::wstring &name)
     , m_pressure(false)
     , m_cap(0)
     , m_join(0)
-    , m_miter(0) {}
+    , m_miter(0)
+    , m_styleInfoVersion(0)
+    , m_hasVectorStyle(false)
+    , m_vectorStyleTagId(0)
+    , m_vectorStyleName("")
+    , m_hasTexture(false)
+    , m_texturePath("")
+    , m_textureScale(1.0)
+    , m_textureRotation(0.0)
+    , m_textureDispX(0.0)
+    , m_textureDispY(0.0)
+    , m_textureContrast(1.0)
+    , m_textureType(1)
+    , m_textureIsPattern(false)
+    , m_hasStyleSnapshot(false)
+    , m_snapshotStyleTagId(0)
+    , m_snapshotBrushIdName("")
+    , m_snapshotFilePath("") {}
 
 //----------------------------------------------------------------------------------------------------------
 
@@ -1927,6 +2158,74 @@ void VectorBrushData::saveData(TOStream &os) {
   os.openChild("Miter");
   os << m_miter;
   os.closeChild();
+  // Style snapshot (version 2 = generic)
+  os.openChild("StyleInfoVersion");
+  os << 2;
+  os.closeChild();
+  // Legacy fields (kept for backward compatibility)
+  os.openChild("HasVectorStyle");
+  os << (int)m_hasVectorStyle;
+  os.closeChild();
+  if (m_hasVectorStyle) {
+    os.openChild("VectorStyleTagId");
+    os << m_vectorStyleTagId;
+    os.closeChild();
+    os.openChild("VectorStyleName");
+    os << m_vectorStyleName;
+    os.closeChild();
+  }
+  os.openChild("HasTexture");
+  os << (int)m_hasTexture;
+  os.closeChild();
+  if (m_hasTexture) {
+    os.openChild("TexturePath");
+    os << m_texturePath;
+    os.closeChild();
+    os.openChild("TextureScale");
+    os << m_textureScale;
+    os.closeChild();
+    os.openChild("TextureRotation");
+    os << m_textureRotation;
+    os.closeChild();
+    os.openChild("TextureDispX");
+    os << m_textureDispX;
+    os.closeChild();
+    os.openChild("TextureDispY");
+    os << m_textureDispY;
+    os.closeChild();
+    os.openChild("TextureContrast");
+    os << m_textureContrast;
+    os.closeChild();
+    os.openChild("TextureType");
+    os << m_textureType;
+    os.closeChild();
+    os.openChild("TextureIsPattern");
+    os << (int)m_textureIsPattern;
+    os.closeChild();
+  }
+  // Generic style snapshot (version >= 2)
+  os.openChild("StyleSnapshot");
+  os << (int)m_hasStyleSnapshot;
+  os.closeChild();
+  if (m_hasStyleSnapshot) {
+    os.openChild("SnapshotTagId");
+    os << m_snapshotStyleTagId;
+    os.closeChild();
+    os.openChild("SnapshotBrushId");
+    os << m_snapshotBrushIdName;
+    os.closeChild();
+    os.openChild("SnapshotFile");
+    os << m_snapshotFilePath;
+    os.closeChild();
+    os.openChild("SnapshotParamCount");
+    os << (int)m_snapshotParams.size();
+    os.closeChild();
+    for (const auto &param : m_snapshotParams) {
+      os.openChild("SNP");
+      os << param.first << param.second;
+      os.closeChild();
+    }
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------
@@ -1956,6 +2255,51 @@ void VectorBrushData::loadData(TIStream &is) {
       is >> m_join, is.matchEndTag();
     else if (tagName == "Miter")
       is >> m_miter, is.matchEndTag();
+    // Style snapshot fields
+    else if (tagName == "StyleInfoVersion")
+      is >> m_styleInfoVersion, is.matchEndTag();
+    else if (tagName == "HasVectorStyle")
+      is >> val, m_hasVectorStyle = val, is.matchEndTag();
+    else if (tagName == "VectorStyleTagId")
+      is >> m_vectorStyleTagId, is.matchEndTag();
+    else if (tagName == "VectorStyleName")
+      is >> m_vectorStyleName, is.matchEndTag();
+    else if (tagName == "HasTexture")
+      is >> val, m_hasTexture = val, is.matchEndTag();
+    else if (tagName == "TexturePath")
+      is >> m_texturePath, is.matchEndTag();
+    else if (tagName == "TextureScale")
+      is >> m_textureScale, is.matchEndTag();
+    else if (tagName == "TextureRotation")
+      is >> m_textureRotation, is.matchEndTag();
+    else if (tagName == "TextureDispX")
+      is >> m_textureDispX, is.matchEndTag();
+    else if (tagName == "TextureDispY")
+      is >> m_textureDispY, is.matchEndTag();
+    else if (tagName == "TextureContrast")
+      is >> m_textureContrast, is.matchEndTag();
+    else if (tagName == "TextureType")
+      is >> m_textureType, is.matchEndTag();
+    else if (tagName == "TextureIsPattern")
+      is >> val, m_textureIsPattern = val, is.matchEndTag();
+    // Generic style snapshot (version >= 2)
+    else if (tagName == "StyleSnapshot")
+      is >> val, m_hasStyleSnapshot = val, is.matchEndTag();
+    else if (tagName == "SnapshotTagId")
+      is >> m_snapshotStyleTagId, is.matchEndTag();
+    else if (tagName == "SnapshotBrushId")
+      is >> m_snapshotBrushIdName, is.matchEndTag();
+    else if (tagName == "SnapshotFile")
+      is >> m_snapshotFilePath, is.matchEndTag();
+    else if (tagName == "SnapshotParamCount")
+      is >> val, is.matchEndTag();
+    else if (tagName == "SNP") {
+      int idx;
+      double dval;
+      is >> idx >> dval;
+      m_snapshotParams.push_back({idx, dval});
+      is.matchEndTag();
+    }
     else
       is.skipCurrentTag();
   }
