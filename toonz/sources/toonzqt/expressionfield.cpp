@@ -16,6 +16,7 @@
 #include <QToolTip>
 #include <QListView>
 #include <QLabel>
+#include <memory>
 
 using namespace DVGui;
 using namespace TSyntax;
@@ -28,7 +29,7 @@ class ExpressionField::SyntaxHighlighter final : public QSyntaxHighlighter {
 public:
   bool m_open;
   SyntaxHighlighter(QTextDocument *parent)
-      : QSyntaxHighlighter(parent), m_grammar(0), m_open(true) {}
+      : QSyntaxHighlighter(parent), m_grammar(nullptr), m_open(true) {}
   ~SyntaxHighlighter() {}
 
   void setGrammar(const Grammar *grammar) { m_grammar = grammar; }
@@ -36,52 +37,47 @@ public:
   void highlightBlock(const QString &text) override {
     Parser parser(m_grammar);
     std::vector<SyntaxToken> tokens;
-    Parser::SyntaxStatus status =
-        parser.checkSyntax(tokens, text.toStdString());
+    parser.checkSyntax(tokens, text.toStdString());  // status not used
 
-    int nextPos = 0;
-    for (int i = 0; i < (int)tokens.size(); i++) {
+    for (size_t i = 0; i < tokens.size(); ++i) {
       QTextCharFormat fmt;
       int pos    = tokens[i].m_pos;
       int length = tokens[i].m_length;
       int type   = tokens[i].m_type;
-      nextPos    = pos + length;
       switch (type) {
       case TSyntax::Unknown:
         fmt.setForeground(Qt::black);
         break;
       case TSyntax::Number:
         fmt.setForeground(QColor(0x50, 0x7d, 0x0));
-        break;  // number
+        break;
       case TSyntax::Constant:
         fmt.setForeground(QColor(0x50, 0x7d, 0x0));
-        break;  // constant
+        break;
       case TSyntax::Variable:
         fmt.setForeground(QColor(0x0, 0x88, 0xc8));
-        break;  // var
+        break;
       case TSyntax::Operator:
         fmt.setForeground(QColor(50, 0, 255));
-        break;  // infix
+        break;
       case TSyntax::Parenthesis:
         fmt.setForeground(QColor(50, 50, 255));
-        break;  // bracket
+        break;
       case TSyntax::Function:
         fmt.setForeground(QColor(0x0, 0x50, 0x7d));
-        break;  // fname
+        break;
       case TSyntax::Comma:
         fmt.setForeground(QColor(50, 20, 255));
-        break;  // f ;
-
+        break;
       case TSyntax::UnexpectedToken:
         fmt.setForeground(QColor(0xdc, 0x0, 0x0));
-        break;  // expression not found
+        break;
       case TSyntax::Eos:
         fmt.setForeground(QColor(255, 127, 0));
-        break;  //  EOS
+        break;
       case TSyntax::Mismatch:
         fmt.setForeground(QColor(255, 0, 0));
-        break;  // token mismatch
-
+        break;
       default:
         fmt.setForeground(QColor(127, 127, 255));
         break;
@@ -106,15 +102,15 @@ public:
         "color: black;}");
     setWindowFlags(Qt::Popup);
     setMouseTracking(true);
-    m_tooltip = new QLabel(0, Qt::ToolTip);
-    // Stesso stile del popuop che lo contiene.
-    m_tooltip->hide();
-
+    m_tooltip = new QLabel(nullptr, Qt::ToolTip);
+    // Same style as the containing popup.
     m_tooltip->setObjectName("helpTooltip");
     m_tooltip->setAlignment(Qt::AlignLeft);
     m_tooltip->setIndent(1);
     m_tooltip->setWordWrap(false);
+    m_tooltip->hide();
   }
+
   void showEvent(QShowEvent *) override { showToolTip(currentIndex()); }
   void hideEvent(QHideEvent *) override { m_tooltip->hide(); }
   void currentChanged(const QModelIndex &current,
@@ -152,9 +148,9 @@ protected:
 ExpressionField::ExpressionField(QWidget *parent)
     : QTextEdit(parent)
     , m_editing(false)
-    , m_grammar(0)
-    , m_syntaxHighlighter(0)
-    , m_completerPopup(0)
+    , m_grammar(nullptr)
+    , m_syntaxHighlighter(std::make_unique<SyntaxHighlighter>(document()))
+    , m_completerPopup(nullptr)
     , m_completerStartPos(0) {
   setFrameStyle(QFrame::StyledPanel);
   setObjectName("ExpressionField");
@@ -162,28 +158,30 @@ ExpressionField::ExpressionField(QWidget *parent)
   setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   setTabChangesFocus(true);
-  // setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed));
   connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
 
 #ifdef MACOSX
   setFixedHeight(23);
 #else
-  setFixedHeight(20);  // +40);
+  setFixedHeight(20);
 #endif
 
-  m_completerPopup          = new MyListView();
-  QStandardItemModel *model = new QStandardItemModel();
-  m_completerPopup->setModel(model);
+  m_completerPopup = new MyListView();
+  // Start with an empty model
+  m_completerPopup->setModel(new QStandardItemModel());
   m_completerPopup->setFocusPolicy(Qt::NoFocus);
   m_completerPopup->setFocusProxy(this);
   m_completerPopup->installEventFilter(this);
   connect(m_completerPopup, SIGNAL(clicked(const QModelIndex &)), this,
           SLOT(insertCompletion(const QModelIndex &)));
-
-  m_syntaxHighlighter = new SyntaxHighlighter(document());
 }
 
-ExpressionField::~ExpressionField() { delete m_syntaxHighlighter; }
+ExpressionField::~ExpressionField() {
+  // Delete the popup's current model (Qt does not take ownership)
+  delete m_completerPopup->model();
+  delete m_completerPopup;
+  // m_syntaxHighlighter is automatically deleted by unique_ptr
+}
 
 void ExpressionField::showEvent(QShowEvent *e) { QTextEdit::showEvent(e); }
 
@@ -199,19 +197,16 @@ std::string ExpressionField::getExpression() const {
 
 bool ExpressionField::event(QEvent *e) {
   if (e->type() == QEvent::ToolTip) {
-    QHelpEvent *helpEvent = static_cast<QHelpEvent *>(e);
+    // QHelpEvent *helpEvent = static_cast<QHelpEvent *>(e);
     // openCompletionPopup();
-
   } else if (e->type() == QEvent::ShortcutOverride) {
     e->accept();
     return true;
   }
-  // else
   return QTextEdit::event(e);
 }
 
 void ExpressionField::keyPressEvent(QKeyEvent *e) {
-  // setStyleSheet("background-color: cyan");
   if (e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter) {
     m_editing = false;
     emit expressionChanged();
@@ -284,7 +279,6 @@ bool ExpressionField::eventFilter(QObject *obj, QEvent *e) {
 void ExpressionField::onTextChanged() {
   if (!m_editing) {
     m_editing = true;
-
     // setStyleSheet("background: rgb(250,200,200)");
   }
 }
@@ -319,28 +313,35 @@ bool ExpressionField::updateCompleterPopup() {
     return false;
   }
 
+  // Delete the previous model (Qt does not take ownership)
+  QAbstractItemModel *oldModel = m_completerPopup->model();
+  if (oldModel) delete oldModel;
+
   QStandardItemModel *model = new QStandardItemModel();
   std::string prefix        = toLower(text.substr(start, pos - start));
   int prefixLength          = prefix.length();
   int count                 = 0;
-  for (int i = 0; i < (int)m_suggestions.size(); i++) {
+  for (size_t i = 0; i < m_suggestions.size(); ++i) {
     std::string item = m_suggestions[i].first;
     if ((int)item.length() >= prefixLength &&
         toLower(item.substr(0, prefixLength)) == prefix) {
       QStandardItem *item = new QStandardItem();
       item->setData(QString::fromStdString(m_suggestions[i].first),
                     Qt::EditRole);
-      if (m_suggestions[i].second != "")
+      if (!m_suggestions[i].second.empty())
         item->setData(QString::fromStdString(m_suggestions[i].second),
                       Qt::ToolTipRole);
       model->appendRow(item);
-      count++;
+      ++count;
     }
   }
+
   if (count == 0) {
+    delete model;  // no matches, discard model
     if (m_completerPopup->isVisible()) m_completerPopup->hide();
     return false;
   }
+
   m_completerPopup->setModel(model);
   m_completerPopup->setCurrentIndex(model->index(0, 0));
 
@@ -369,15 +370,16 @@ int ExpressionField::computeSuggestions() {
   int pos          = textCursor().position();
   int start        = pos;
   if (start > 0) {
-    start--;
+    --start;
     while (start > 0) {
       char c = text[start - 1];
       if ((isascii(c) && isalpha(c)) || c == '_' ||
           (c == '.' && (start - 2 < 0 || (isascii(text[start - 2]) &&
                                           isalpha(text[start - 2]))))) {
+        // continue
       } else
         break;
-      start--;
+      --start;
     }
   }
   if (start >= (int)text.length()) return 0;
@@ -395,8 +397,6 @@ void ExpressionField::insertCompletion() {
   QString item =
       m_completerPopup->model()->data(index, Qt::EditRole).toString();
   QTextCursor tc = textCursor();
-  int pos        = tc.position();
-  // tc.movePosition(m_completionStartPos, QTextCursor::KeepAnchor);
   tc.insertText(item);
   m_completerPopup->hide();
 }
@@ -419,4 +419,4 @@ void ExpressionField::insertCompletion(const QModelIndex &index) {
 void ExpressionField::setGrammar(const Grammar *grammar) {
   m_grammar = grammar;
   m_syntaxHighlighter->setGrammar(grammar);
-};
+}

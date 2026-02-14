@@ -1,9 +1,9 @@
 #pragma once
-
 #ifndef SCRIPTBINDING_OUTLINE_VECTORIZER_H
 #define SCRIPTBINDING_OUTLINE_VECTORIZER_H
 
 #include "toonz/scriptbinding.h"
+#include <memory>
 
 class ToonzScene;
 class TXshSimpleLevel;
@@ -12,11 +12,10 @@ namespace TScriptBinding {
 
 class DVAPI OutlineVectorizer final : public Wrapper {
   Q_OBJECT
-  NewOutlineConfiguration *m_parameters;
+  std::unique_ptr<NewOutlineConfiguration> m_parameters;
 
 public:
   OutlineVectorizer();
-  ~OutlineVectorizer();
 
   Q_INVOKABLE QScriptValue toString();
   WRAPPER_STD_METHODS(OutlineVectorizer)

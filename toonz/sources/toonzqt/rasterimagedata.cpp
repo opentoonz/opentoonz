@@ -37,8 +37,7 @@ TVectorImageP vectorize(const TImageP &source, const TRectD &rect,
   TScale sc(dpiX / Stage::inch, dpiY / Stage::inch);
   TTranslation tr(rect.getP00());
 
-  int i;
-  for (i = 0; i < (int)vi->getStrokeCount(); i++) {
+  for (int i = 0; i < (int)vi->getStrokeCount(); i++) {
     TStroke *stroke = vi->getStroke(i);
     stroke->transform((sc.inv() * tr) * transform, true);
   }
@@ -56,7 +55,7 @@ RasterImageData::RasterImageData()
 
 //-------------------------------------------------------------------
 
-RasterImageData::~RasterImageData() {}
+RasterImageData::~RasterImageData() = default;
 
 //===================================================================
 // ToonzImageData
@@ -83,7 +82,7 @@ ToonzImageData::ToonzImageData(const ToonzImageData &src)
 
 //-------------------------------------------------------------------
 
-ToonzImageData::~ToonzImageData() {}
+ToonzImageData::~ToonzImageData() = default;
 
 //-------------------------------------------------------------------
 
@@ -104,7 +103,7 @@ void ToonzImageData::setData(const TRasterP &copiedRaster,
   m_originalStrokes = originalStrokes;
   m_dim             = dim;
 
-  /*-- 使用されているStyleの一覧を作る --*/
+  // Build a list of used styles
   TToonzImageP ti(m_copiedRaster, m_copiedRaster->getBounds());
   ToonzImageUtils::getUsedStyles(m_usedStyles, ti);
 }
@@ -118,29 +117,38 @@ void ToonzImageData::getData(TRasterP &copiedRaster, double &dpiX, double &dpiY,
                              TAffine &transformation,
                              TPalette *targetPalette) const {
   if (!m_copiedRaster || (m_rects.empty() && m_strokes.empty())) return;
+
   copiedRaster = m_copiedRaster->clone();
   dpiX         = m_dpiX;
   dpiY         = m_dpiY;
   assert(m_palette);
-  int i;
-  for (i = 0; i < (int)m_rects.size(); i++) rects.push_back(m_rects[i]);
-  for (i = 0; i < (int)m_strokes.size(); i++) strokes.push_back(m_strokes[i]);
-  for (i = 0; i < (int)m_originalStrokes.size(); i++)
-    originalStrokes.push_back(m_originalStrokes[i]);
+
+  rects.assign(m_rects.begin(), m_rects.end());
+  strokes.assign(m_strokes.begin(), m_strokes.end());
+  originalStrokes.assign(m_originalStrokes.begin(), m_originalStrokes.end());
 
   transformation     = m_transformation;
   TRasterCM32P cmRas = copiedRaster;
 
-  if (!targetPalette) targetPalette = new TPalette();
+  // Manage temporary palette to avoid leak on early return
+  std::unique_ptr<TPalette> tempPalette;
+  if (!targetPalette) {
+    tempPalette.reset(new TPalette());
+    targetPalette = tempPalette.get();
+  }
 
-  if (!cmRas) return;
+  if (!cmRas) return;  // tempPalette cleans up automatically
+
   std::set<int> usedStyles(m_usedStyles);
   TToonzImageP ti(cmRas, cmRas->getBounds());
-  if (usedStyles.size() == 0) ToonzImageUtils::getUsedStyles(usedStyles, ti);
+  if (usedStyles.empty()) ToonzImageUtils::getUsedStyles(usedStyles, ti);
+
   std::map<int, int> indexTable;
   mergePalette(targetPalette, indexTable, m_palette, usedStyles);
   ToonzImageUtils::scrambleStyles(ti, indexTable);
   ti->setPalette(m_palette.getPointer());
+
+  if (tempPalette) tempPalette.release();  // ownership transferred to caller
 }
 
 //-------------------------------------------------------------------
@@ -152,9 +160,10 @@ StrokesData *ToonzImageData::toStrokesData(ToonzScene *scene) const {
     rect = m_rects[0];
   else if (!m_strokes.empty())
     rect = m_strokes[0].getBBox();
-  unsigned int i;
-  for (i = 0; i < m_rects.size(); i++) rect += m_rects[i];
-  for (i = 0; i < m_strokes.size(); i++) rect += m_strokes[i].getBBox();
+
+  for (const auto &r : m_rects) rect += r;
+  for (const auto &s : m_strokes) rect += s.getBBox();
+
   TToonzImageP image(m_copiedRaster, m_copiedRaster->getBounds());
   image->setPalette(m_palette.getPointer());
   image->setDpi(m_dpiX, m_dpiY);
@@ -174,7 +183,7 @@ StrokesData *ToonzImageData::toStrokesData(ToonzScene *scene) const {
   StrokesData *sd = new StrokesData();
 
   std::set<int> indexes;
-  for (i = 0; i < vi->getStrokeCount(); i++) indexes.insert(i);
+  for (int i = 0; i < (int)vi->getStrokeCount(); i++) indexes.insert(i);
 
   sd->setImage(vi, indexes);
   return sd;
@@ -183,12 +192,11 @@ StrokesData *ToonzImageData::toStrokesData(ToonzScene *scene) const {
 //-------------------------------------------------------------------
 
 int ToonzImageData::getMemorySize() const {
-  int i, size = 0;
-  for (i = 0; i < (int)m_strokes.size(); i++)
-    size += m_strokes[i].getControlPointCount() * sizeof(TThickPoint) + 100;
-  for (i = 0; i < (int)m_originalStrokes.size(); i++)
-    size +=
-        m_originalStrokes[i].getControlPointCount() * sizeof(TThickPoint) + 100;
+  int size = 0;
+  for (const auto &s : m_strokes)
+    size += s.getControlPointCount() * sizeof(TThickPoint) + 100;
+  for (const auto &s : m_originalStrokes)
+    size += s.getControlPointCount() * sizeof(TThickPoint) + 100;
   return size + sizeof(*(m_copiedRaster.getPointer())) +
          sizeof(*(m_palette.getPointer())) + sizeof(*this);
 }
@@ -215,7 +223,7 @@ FullColorImageData::FullColorImageData(const FullColorImageData &src)
 
 //-------------------------------------------------------------------
 
-FullColorImageData::~FullColorImageData() {}
+FullColorImageData::~FullColorImageData() = default;
 
 //-------------------------------------------------------------------
 
@@ -246,32 +254,40 @@ void FullColorImageData::getData(TRasterP &copiedRaster, double &dpiX,
                                  TAffine &transformation,
                                  TPalette *targetPalette) const {
   if (!m_copiedRaster || (m_rects.empty() && m_strokes.empty())) return;
+
   copiedRaster = m_copiedRaster->clone();
   dpiX         = m_dpiX;
   dpiY         = m_dpiY;
-  int i;
-  for (i = 0; i < (int)m_rects.size(); i++) rects.push_back(m_rects[i]);
-  for (i = 0; i < (int)m_strokes.size(); i++) strokes.push_back(m_strokes[i]);
-  for (i = 0; i < (int)m_originalStrokes.size(); i++)
-    originalStrokes.push_back(m_originalStrokes[i]);
+
+  rects.assign(m_rects.begin(), m_rects.end());
+  strokes.assign(m_strokes.begin(), m_strokes.end());
+  originalStrokes.assign(m_originalStrokes.begin(), m_originalStrokes.end());
+
   transformation = m_transformation;
 
   TRasterP ras = copiedRaster;
   if (!ras) return;
   if (!m_palette) return;
-  if (!targetPalette) targetPalette = new TPalette();
+
+  std::unique_ptr<TPalette> tempPalette;
+  if (!targetPalette) {
+    tempPalette.reset(new TPalette());
+    targetPalette = tempPalette.get();
+  }
+
   std::set<int> usedStyles;
   TRasterImageP ri(ras);
 
-  for (i = 0; i < m_palette->getPageCount(); i++) {
+  for (int i = 0; i < m_palette->getPageCount(); i++) {
     TPalette::Page *page = m_palette->getPage(i);
-    int j;
-    for (j = 0; j < page->getStyleCount(); j++)
+    for (int j = 0; j < page->getStyleCount(); j++)
       usedStyles.insert(page->getStyleId(j));
   }
   std::map<int, int> indexTable;
   mergePalette(targetPalette, indexTable, m_palette, usedStyles);
   ri->setPalette(m_palette.getPointer());
+
+  if (tempPalette) tempPalette.release();  // ownership transferred to caller
 }
 
 //-------------------------------------------------------------------
@@ -283,9 +299,10 @@ StrokesData *FullColorImageData::toStrokesData(ToonzScene *scene) const {
     rect = m_rects[0];
   else if (!m_strokes.empty())
     rect = m_strokes[0].getBBox();
-  unsigned int i;
-  for (i = 0; i < m_rects.size(); i++) rect += m_rects[i];
-  for (i = 0; i < m_strokes.size(); i++) rect += m_strokes[i].getBBox();
+
+  for (const auto &r : m_rects) rect += r;
+  for (const auto &s : m_strokes) rect += s.getBBox();
+
   TRasterImageP image(m_copiedRaster);
   image->setPalette(FullColorPalette::instance()->getPalette(scene));
   image->setDpi(m_dpiX, m_dpiY);
@@ -301,7 +318,7 @@ StrokesData *FullColorImageData::toStrokesData(ToonzScene *scene) const {
   StrokesData *sd = new StrokesData();
 
   std::set<int> indexes;
-  for (i = 0; i < vi->getStrokeCount(); i++) indexes.insert(i);
+  for (int i = 0; i < (int)vi->getStrokeCount(); i++) indexes.insert(i);
 
   sd->setImage(vi, indexes);
   return sd;
@@ -310,12 +327,11 @@ StrokesData *FullColorImageData::toStrokesData(ToonzScene *scene) const {
 //-------------------------------------------------------------------
 
 int FullColorImageData::getMemorySize() const {
-  int i, size = 0;
-  for (i = 0; i < (int)m_strokes.size(); i++)
-    size += m_strokes[i].getControlPointCount() * sizeof(TThickPoint) + 100;
-  for (i = 0; i < (int)m_originalStrokes.size(); i++)
-    size +=
-        m_originalStrokes[i].getControlPointCount() * sizeof(TThickPoint) + 100;
+  int size = 0;
+  for (const auto &s : m_strokes)
+    size += s.getControlPointCount() * sizeof(TThickPoint) + 100;
+  for (const auto &s : m_originalStrokes)
+    size += s.getControlPointCount() * sizeof(TThickPoint) + 100;
   return size + sizeof(*(m_copiedRaster.getPointer())) +
          sizeof(*(m_palette.getPointer())) + sizeof(*this);
 }

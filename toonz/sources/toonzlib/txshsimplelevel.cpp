@@ -166,7 +166,7 @@ bool TXshSimpleLevel::m_fillFullColorRaster = false;
 
 TXshSimpleLevel::TXshSimpleLevel(const std::wstring& name)
     : TXshLevel(m_classCode, name)
-    , m_properties(new LevelProperties)
+    , m_properties(std::make_unique<LevelProperties>())
     , m_palette(nullptr)
     , m_idBase(std::to_string(idBaseCode++))
     , m_editableRangeUserInfo(L"")
@@ -180,11 +180,7 @@ TXshSimpleLevel::TXshSimpleLevel(const std::wstring& name)
 
 TXshSimpleLevel::~TXshSimpleLevel() {
   clearFrames();
-
-  if (m_palette) {
-    m_palette->release();
-    m_palette = nullptr;
-  }
+  // m_palette is TPaletteP – automatically releases
 }
 
 //-----------------------------------------------------------------------------
@@ -403,24 +399,12 @@ void TXshSimpleLevel::clonePropertiesFrom(const TXshSimpleLevel* oldSl) {
 
 //-----------------------------------------------------------------------------
 
-TPalette* TXshSimpleLevel::getPalette() const { return m_palette; }
+TPalette* TXshSimpleLevel::getPalette() const { return m_palette.getPointer(); }
 
 //-----------------------------------------------------------------------------
 
 void TXshSimpleLevel::setPalette(TPalette* palette) {
-  if (m_palette != palette) {
-    if (m_palette) {
-      m_palette->release();
-    }
-
-    m_palette = palette;
-    if (m_palette) {
-      m_palette->addRef();
-      if (!(getType() & FULLCOLOR_TYPE)) {
-        m_palette->setPaletteName(getName());
-      }
-    }
-  }
+  m_palette = palette;  // TPaletteP handles ref counting automatically
 }
 
 //-----------------------------------------------------------------------------
@@ -603,7 +587,7 @@ TImageP TXshSimpleLevel::getFrameIcon(const TFrameId& fid) const {
       imgId, ImageManager::dontPutInCache, &extData);
 
   if (TToonzImageP timg = img) {
-    if (m_palette) timg->setPalette(m_palette);
+    if (m_palette) timg->setPalette(m_palette.getPointer());
   }
 
   return img;
@@ -1517,13 +1501,14 @@ void TXshSimpleLevel::save(const TFilePath& fp, const TFilePath& oldFp,
         if (TSystem::doesExistFileOrLevel(*it)) TSystem::removeFileOrLevel(*it);
       }
 
-      TXshSimpleLevel* sl = new TXshSimpleLevel;
+      // Use smart pointer to manage temporary level
+      TXshSimpleLevelP sl = new TXshSimpleLevel;
       sl->setScene(getScene());
       sl->setPalette(getPalette());
       sl->setPath(getScene()->codeFilePath(app));
       sl->setType(getType());
       sl->setDirtyFlag(getDirtyFlag());
-      sl->addRef();
+      // sl->addRef();  // not needed – smart pointer handles ref
 
       for (const auto& fid : m_editableRange) {
         sl->setFrame(fid, getFrame(fid, false));
@@ -1539,7 +1524,8 @@ void TXshSimpleLevel::save(const TFilePath& fp, const TFilePath& oldFp,
       }
 
       sl->setRenumberTable();
-      sl->save(app);
+      sl->save(
+          app);  // sl will be automatically released when it goes out of scope
 
 #ifdef _WIN32
       if (TSystem::doesExistFileOrLevel(app)) TSystem::hideFileOrLevel(app);
@@ -1884,13 +1870,14 @@ void TXshSimpleLevel::initializePalette() {
   assert(scene);
 
   TFilePath fullPath;
-  TPalette* palette = new TPalette();
+  TPalette* palette = nullptr;
   int type          = getType();
   switch (type) {
   case TZP_XSHLEVEL:
     fullPath =
         scene->decodeFilePath(TFilePath("+palettes\\Toonz_Raster_Palette.tpl"));
     if (TSystem::doesExistFileOrLevel(fullPath)) {
+      palette = new TPalette();
       TIStream is(fullPath);
       is >> palette;
     } else {
@@ -1899,6 +1886,7 @@ void TXshSimpleLevel::initializePalette() {
               "\\Global Palettes\\Default "
               "Palettes\\Toonz_Raster_Palette.tpl"));
       if (TSystem::doesExistFileOrLevel(globalPath)) {
+        palette = new TPalette();
         TIStream is(globalPath);
         is >> palette;
         TSystem::copyFile(fullPath, globalPath);
@@ -1909,6 +1897,7 @@ void TXshSimpleLevel::initializePalette() {
     fullPath =
         scene->decodeFilePath(TFilePath("+palettes\\Toonz_Vector_Palette.tpl"));
     if (TSystem::doesExistFileOrLevel(fullPath)) {
+      palette = new TPalette();
       TIStream is(fullPath);
       is >> palette;
     } else {
@@ -1917,6 +1906,7 @@ void TXshSimpleLevel::initializePalette() {
               "\\Global Palettes\\Default "
               "Palettes\\Toonz_Vector_Palette.tpl"));
       if (TSystem::doesExistFileOrLevel(globalPath)) {
+        palette = new TPalette();
         TIStream is(globalPath);
         is >> palette;
         TSystem::copyFile(fullPath, globalPath);
@@ -1929,12 +1919,12 @@ void TXshSimpleLevel::initializePalette() {
     break;
   }
 
-  if (palette && type != OVL_XSHLEVEL) {
-    palette->setPaletteName(getName());
+  if (palette) {
+    if (type != OVL_XSHLEVEL) {
+      palette->setPaletteName(getName());
+    }
+    setPalette(palette);
   }
-
-  palette->setDirtyFlag(true);
-  setPalette(palette);
 }
 
 //-----------------------------------------------------------------------------
@@ -2245,8 +2235,7 @@ void TXshSimpleLevel::getFiles(const TFilePath& fp, TFilePathSet& fpset) {
 //-----------------------------------------------------------------------------
 
 void TXshSimpleLevel::setContentHistory(TContentHistory* contentHistory) {
-  if (contentHistory != m_contentHistory.get())
-    m_contentHistory.reset(contentHistory);
+  m_contentHistory.reset(contentHistory);
 }
 
 //-----------------------------------------------------------------------------

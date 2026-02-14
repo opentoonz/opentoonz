@@ -51,29 +51,27 @@ class MessageAndCheckboxDialog;
 
 void DVAPI MsgBoxInPopup(MsgType type, const QString &text);
 
-// ATTENZIONE: Valore di ritorno
-// 0 = l'utente ha chiuso la finestra (dovrebbe corrispondere ad un cancel o ad
-// un NO) - closed window
-// 1 = primo bottone da sx premuto - first button selected
-// 2 = secondo bottone da sx premuto - second button
-// 3 = terzo bottone da sx premuto - third button
-// 4 = fourth button
+// ATTENTION: Return values
+// 0 = user closed the window (should correspond to cancel or NO) - closed
+// window 1 = first button from left pressed - first button selected 2 = second
+// button from left pressed - second button 3 = third button from left pressed -
+// third button 4 = fourth button
 
 int DVAPI MsgBox(MsgType type, const QString &text,
                  const std::vector<QString> &buttons,
                  int defaultButtonIndex = 0, QWidget *parent = 0);
 
-// QUESTION: due bottoni user defined
+// QUESTION: two user-defined buttons
 int DVAPI MsgBox(const QString &text, const QString &button1,
                  const QString &button2, int defaultButtonIndex = 0,
                  QWidget *parent = 0);
 
-// QUESTION: tre bottoni user defined
+// QUESTION: three user-defined buttons
 int DVAPI MsgBox(const QString &text, const QString &button1,
                  const QString &button2, const QString &button3,
                  int defaultButtonIndex = 0, QWidget *parent = 0);
 
-// QUESTION: four botton user defined
+// QUESTION: four user-defined buttons
 int DVAPI MsgBox(const QString &text, const QString &button1,
                  const QString &button2, const QString &button3,
                  const QString &button4, int defaultButtonIndex = 0,
@@ -87,9 +85,6 @@ MessageAndCheckboxDialog DVAPI *createMsgandCheckbox(
     MsgType type, const QString &text, const QString &checkBoxText,
     const QStringList &buttons, int defaultButtonIndex,
     Qt::CheckState defaultCheckBoxState, QWidget *parent = 0);
-
-// void DVAPI error(const QString &msg);
-// void DVAPI info(const QString &msg);
 
 //-----------------------------------------------------------------------------
 
@@ -168,9 +163,6 @@ class DVAPI Dialog : public QDialog {
   bool m_hasButton;
   QString m_name;
   int m_currentScreen = -1;
-  // gmt. rendo m_buttonLayout protected per ovviare ad un problema
-  // sull'addButtonBarWidget(). cfr filebrowserpopup.cpp.
-  // Dobbiamo discutere di Dialog.
 
 protected:
   QHBoxLayout *m_buttonLayout;

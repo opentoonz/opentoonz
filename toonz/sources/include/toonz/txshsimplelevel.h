@@ -17,6 +17,7 @@
 // TnzCore includes
 #include "traster.h"
 #include "trasterimage.h"
+#include "tpalette.h"  // for TPaletteP
 
 // Qt includes
 #include <QObject>
@@ -345,7 +346,7 @@ private:
   std::unique_ptr<LevelProperties> m_properties;
   std::unique_ptr<TContentHistory> m_contentHistory;
 
-  TPalette *m_palette;
+  TPaletteP m_palette;
 
   FramesSet m_frames;
 

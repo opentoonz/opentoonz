@@ -51,8 +51,8 @@ class TFrameHandle;
 class PlaybackExecutor final : public QThread {
   Q_OBJECT
 
-  int m_fps;
-  bool m_abort;
+  int m_fps    = 25;
+  bool m_abort = false;
   QElapsedTimer m_timer;
 
 public:
@@ -103,8 +103,14 @@ class FlipSlider final : public QAbstractSlider {
   Q_PROPERTY(QColor startedColor READ getStartedColor WRITE setStartedColor)
   Q_PROPERTY(QColor finishedColor READ getFinishedColor WRITE setFinishedColor)
 
-  bool m_enabled;
-  const std::vector<UCHAR> *m_progressBarStatus;
+  bool m_enabled                                = false;
+  const std::vector<UCHAR> *m_progressBarStatus = nullptr;
+
+  // Disable copy (as the pointer is unowned)
+  FlipSlider(const FlipSlider &)            = delete;
+  FlipSlider &operator=(const FlipSlider &) = delete;
+  FlipSlider(FlipSlider &&)                 = delete;
+  FlipSlider &operator=(FlipSlider &&)      = delete;
 
 public:
   enum { PBFrameNotStarted, PBFrameStarted, PBFrameFinished };
