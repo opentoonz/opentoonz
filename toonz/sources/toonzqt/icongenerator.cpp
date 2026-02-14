@@ -902,13 +902,17 @@ public:
 TRaster32P XsheetIconRenderer::generateRaster(
     const TDimension &iconSize) const {
   ToonzScene *scene = m_xsheet->getScene();
-  TDimension res    = scene->getProperties()->getCameras().front()->getRes();
-  if (res.lx > iconSize.lx || res.ly > iconSize.ly) {
-    double sx = (double)iconSize.lx / res.lx;
-    double sy = (double)iconSize.ly / res.ly;
-    double s  = std::min(sx, sy);
-    res.lx    = tround(res.lx * s);
-    res.ly    = tround(res.ly * s);
+  TDimension res    = iconSize;
+  if (QCoreApplication::applicationName() == "ToonzPreview") {
+    res = scene->getCurrentCamera()->getRes();
+    if (res.lx > iconSize.lx || res.ly > iconSize.ly) {
+      double sx = (double)iconSize.lx / res.lx;
+      double sy = (double)iconSize.ly / res.ly;
+
+      double s  = std::min(sx, sy);
+      res.lx    = tround(res.lx * s);
+      res.ly    = tround(res.ly * s);
+    }
   }
   TRaster32P ras(res);
 
