@@ -6,6 +6,11 @@
 #include "dvitemview.h"
 #include "tfilepath.h"
 
+// Qt includes
+#include <QList>
+#include <QPointer>
+#include <memory>
+
 class InfoViewer;
 class ExportScenePopup;
 
@@ -14,16 +19,22 @@ class ExportScenePopup;
 //-----------------------------------------------------------------------------
 
 class FileSelection final : public DvItemSelection {
-  QList<InfoViewer *> m_infoViewers;
-  ExportScenePopup *m_exportScenePopup;
+  QList<QPointer<InfoViewer>> m_infoViewers;  // QPointer handles nullification
+  std::unique_ptr<ExportScenePopup> m_exportScenePopup;
 
 public:
   FileSelection();
-  ~FileSelection();
+  virtual ~FileSelection();
 
-  void getSelectedFiles(std::vector<TFilePath> &files);
+  // Prohibit copying and moving
+  FileSelection(const FileSelection&)            = delete;
+  FileSelection& operator=(const FileSelection&) = delete;
+  FileSelection(FileSelection&&)                 = delete;
+  FileSelection& operator=(FileSelection&&)      = delete;
 
-  // commands
+  void getSelectedFiles(std::vector<TFilePath>& files);
+
+  // Commands
   void enableCommands() override;
 
   void duplicateFiles();

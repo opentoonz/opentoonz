@@ -1,3 +1,5 @@
+
+
 #include "menubarpopup.h"
 
 // Tnz includes
@@ -33,13 +35,14 @@
 #include <QPainter>
 #include <QApplication>
 #include <QLabel>
+#include <QMenu>
 
 //=============================================================================
 // MenuBarSubmenuItem
 //-----------------------------------------------------------------------------
 
 class MenuBarSubmenuItem final : public QTreeWidgetItem {
-  /*- title before translation -*/
+  /*- Title before translation -*/
   QString m_orgTitle;
 
 public:
@@ -89,9 +92,7 @@ MenuBarTree::MenuBarTree(TFilePath& path, QWidget* parent)
 
   loadMenuTree(fp);
 
-  bool ret = connect(this, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this,
-                     SLOT(onItemChanged(QTreeWidgetItem*, int)));
-  assert(ret);
+  connect(this, &QTreeWidget::itemChanged, this, &MenuBarTree::onItemChanged);
 }
 
 //-----------------------------------------------------------------------------
@@ -110,16 +111,15 @@ void MenuBarTree::loadMenuTree(const TFilePath& fp) {
       while (reader.readNextStartElement()) {
         if (reader.name() == "menu") {
           QString title = reader.attributes().value("title").toString();
-          MenuBarSubmenuItem* menu = new MenuBarSubmenuItem(0, title);
+          auto* menu    = new MenuBarSubmenuItem(nullptr, title);  // use auto
           addTopLevelItem(menu);
           loadMenuRecursive(reader, menu);
         } else if (reader.name() == "command") {
           QString cmdName = reader.readElementText();
-
           QAction* action = CommandManager::instance()->getAction(
-              cmdName.toStdString().c_str());
+              cmdName.toStdString().c_str());  // keep as is
           if (action) {
-            CommandItem* item = new CommandItem(0, action);
+            auto* item = new CommandItem(nullptr, action);
             addTopLevelItem(item);
           }
         } else
@@ -141,24 +141,30 @@ void MenuBarTree::loadMenuRecursive(QXmlStreamReader& reader,
   while (reader.readNextStartElement()) {
     if (reader.name() == "menu") {
       QString title = reader.attributes().value("title").toString();
-      MenuBarSubmenuItem* subMenu = new MenuBarSubmenuItem(parentItem, title);
+      auto* subMenu = new MenuBarSubmenuItem(parentItem, title);
       loadMenuRecursive(reader, subMenu);
     } else if (reader.name() == "command") {
       QString cmdName = reader.readElementText();
       QAction* action =
           CommandManager::instance()->getAction(cmdName.toStdString().c_str());
-      if (action) CommandItem* item = new CommandItem(parentItem, action);
+      if (action) {
+        // Create the item without storing the pointer - it's automatically
+        // added to parent
+        new CommandItem(parentItem, action);
+      }
     } else if (reader.name() == "command_debug") {
 #ifndef NDEBUG
       QString cmdName = reader.readElementText();
       QAction* action =
           CommandManager::instance()->getAction(cmdName.toStdString().c_str());
-      if (action) CommandItem* item = new CommandItem(parentItem, action);
+      if (action) {
+        new CommandItem(parentItem, action);
+      }
 #else
       reader.skipCurrentElement();
 #endif
     } else if (reader.name() == "separator") {
-      SeparatorItem* sep = new SeparatorItem(parentItem);
+      new SeparatorItem(parentItem);
       reader.skipCurrentElement();
     } else
       reader.skipCurrentElement();
@@ -189,11 +195,11 @@ void MenuBarTree::saveMenuTree() {
 
 void MenuBarTree::saveMenuRecursive(QXmlStreamWriter& writer,
                                     QTreeWidgetItem* parentItem) {
-  for (int c = 0; c < parentItem->childCount(); c++) {
-    CommandItem* command = dynamic_cast<CommandItem*>(parentItem->child(c));
-    SeparatorItem* sep   = dynamic_cast<SeparatorItem*>(parentItem->child(c));
-    MenuBarSubmenuItem* subMenu =
-        dynamic_cast<MenuBarSubmenuItem*>(parentItem->child(c));
+  for (int c = 0; c < parentItem->childCount(); ++c) {
+    auto* command = dynamic_cast<CommandItem*>(parentItem->child(c));
+    auto* sep     = dynamic_cast<SeparatorItem*>(parentItem->child(c));
+    auto* subMenu = dynamic_cast<MenuBarSubmenuItem*>(parentItem->child(c));
+
     if (command)
       writer.writeTextElement(
           "command",
@@ -205,11 +211,10 @@ void MenuBarTree::saveMenuRecursive(QXmlStreamWriter& writer,
       writer.writeStartElement("menu");
       // save original title instead of translated one
       writer.writeAttribute("title", subMenu->getOrgTitle());
-
       saveMenuRecursive(writer, subMenu);
-
       writer.writeEndElement();  // menu
     } else {
+      // ignore unknown item types
     }
   }
 }
@@ -222,12 +227,12 @@ bool MenuBarTree::dropMimeData(QTreeWidgetItem* parent, int index,
     QString txt = data->text();
     QTreeWidgetItem* item;
     if (txt == "separator")
-      item = new SeparatorItem(0);
+      item = new SeparatorItem(nullptr);
     else {
       QAction* act =
           CommandManager::instance()->getAction(txt.toStdString().c_str());
       if (!act) return false;
-      item = new CommandItem(0, act);
+      item = new CommandItem(nullptr, act);
     }
 
     if (parent)
@@ -254,30 +259,32 @@ QStringList MenuBarTree::mimeTypes() const {
 void MenuBarTree::contextMenuEvent(QContextMenuEvent* event) {
   QTreeWidgetItem* item = itemAt(event->pos());
   if (item != currentItem()) setCurrentItem(item);
-  QMenu* menu = new QMenu(this);
-  QAction* action;
-  if (!item || indexOfTopLevelItem(item) >= 0)
-    action = menu->addAction(tr("Insert Menu"));
-  else
-    action = menu->addAction(tr("Insert Submenu"));
 
-  connect(action, SIGNAL(triggered()), this, SLOT(insertMenu()));
+  // --- STACK-ALLOCATED QMenu, NO MANUAL DELETE ---
+  QMenu menu(this);
+  QAction* action = nullptr;
+
+  if (!item || indexOfTopLevelItem(item) >= 0)
+    action = menu.addAction(tr("Insert Menu"));
+  else
+    action = menu.addAction(tr("Insert Submenu"));
+
+  connect(action, &QAction::triggered, this, [this] { insertMenu(); });
 
   if (item) {
-    action = menu->addAction(tr("Remove \"%1\"").arg(item->text(0)));
-    connect(action, SIGNAL(triggered()), this, SLOT(removeItem()));
+    action = menu.addAction(tr("Remove \"%1\"").arg(item->text(0)));
+    connect(action, &QAction::triggered, this, [this] { removeItem(); });
   }
 
-  menu->exec(event->globalPos());
-  delete menu;
+  menu.exec(event->globalPos());
 }
 
 //-----------------------------------------------------------------------------
 
 void MenuBarTree::insertMenu() {
-  QTreeWidgetItem* item       = currentItem();
-  QString title               = tr("New Menu");
-  MenuBarSubmenuItem* insItem = new MenuBarSubmenuItem(0, title);
+  QTreeWidgetItem* item = currentItem();
+  QString title         = tr("New Menu");
+  auto* insItem         = new MenuBarSubmenuItem(nullptr, title);
   if (!item)
     addTopLevelItem(insItem);
   else if (indexOfTopLevelItem(item) >= 0)
@@ -303,7 +310,7 @@ void MenuBarTree::removeItem() {
 //-----------------------------------------------------------------------------
 
 void MenuBarTree::onItemChanged(QTreeWidgetItem* item, int column) {
-  MenuBarSubmenuItem* submenuItem = dynamic_cast<MenuBarSubmenuItem*>(item);
+  auto* submenuItem = dynamic_cast<MenuBarSubmenuItem*>(item);
   if (!submenuItem) return;
   submenuItem->setOrgTitle(submenuItem->text(0));
 }
@@ -317,7 +324,7 @@ MenuBarPopup::MenuBarPopup(Room* room)
              "CustomizeMenuBar") {
   setWindowTitle(tr("Customize Menu Bar of Room \"%1\"").arg(room->getName()));
 
-  /*- get menubar setting file path -*/
+  /*- Get menubar setting file path -*/
   std::string mbFileName = room->getPath().getName() + "_menubar.xml";
   TFilePath mbPath       = ToonzFolder::getMyRoomsDir() + mbFileName;
 
@@ -338,7 +345,7 @@ MenuBarPopup::MenuBarPopup(Room* room)
   menuBarLabel->setFont(f);
   menuItemListLabel->setFont(f);
 
-  QLineEdit* searchEdit = new QLineEdit(this);
+  auto* searchEdit = new QLineEdit(this);
 
   QLabel* noticeLabel = new QLabel(
       tr("N.B. If you put unique title to submenu, it may not be translated to "
@@ -350,11 +357,10 @@ MenuBarPopup::MenuBarPopup(Room* room)
   noticeLabel->setFont(nf);
 
   //--- layout
-  QVBoxLayout* mainLay = new QVBoxLayout();
   m_topLayout->setContentsMargins(0, 0, 0, 0);
   m_topLayout->setSpacing(0);
   {
-    QGridLayout* mainUILay = new QGridLayout();
+    auto* mainUILay = new QGridLayout();
     mainUILay->setContentsMargins(5, 5, 5, 5);
     mainUILay->setHorizontalSpacing(8);
     mainUILay->setVerticalSpacing(5);
@@ -363,7 +369,7 @@ MenuBarPopup::MenuBarPopup(Room* room)
       mainUILay->addWidget(menuItemListLabel, 0, 1);
       mainUILay->addWidget(m_menuBarTree, 1, 0, 2, 1);
 
-      QHBoxLayout* searchLay = new QHBoxLayout();
+      auto* searchLay = new QHBoxLayout();
       searchLay->setContentsMargins(0, 0, 0, 0);
       searchLay->setSpacing(5);
       {
@@ -393,29 +399,25 @@ MenuBarPopup::MenuBarPopup(Room* room)
     m_buttonLayout->addStretch(1);
   }
 
-  //--- signal/slot connections
-
-  bool ret = connect(okBtn, SIGNAL(clicked()), this, SLOT(onOkPressed()));
-  ret      = ret && connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
-  ret = ret && connect(searchEdit, SIGNAL(textChanged(const QString&)), this,
-                       SLOT(onSearchTextChanged(const QString&)));
-  assert(ret);
+  connect(okBtn, &QPushButton::clicked, this, &MenuBarPopup::onOkPressed);
+  connect(cancelBtn, &QPushButton::clicked, this, &MenuBarPopup::reject);
+  connect(searchEdit, &QLineEdit::textChanged, this,
+          &MenuBarPopup::onSearchTextChanged);
 }
 
 //-----------------------------------------------------------------------------
 
 void MenuBarPopup::onOkPressed() {
   m_menuBarTree->saveMenuTree();
-
   accept();
 }
 
 //-----------------------------------------------------------------------------
 
 void MenuBarPopup::onSearchTextChanged(const QString& text) {
-  static bool busy = false;
-  if (busy) return;
-  busy = true;
+  // --- USE MEMBER FLAG INSTEAD OF STATIC ---
+  if (m_searchBusy) return;
+  m_searchBusy = true;
   m_commandListTree->searchItems(text);
-  busy = false;
+  m_searchBusy = false;
 }
