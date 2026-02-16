@@ -41,7 +41,7 @@ protected:
 
 public:
   RasterImageData();
-  ~RasterImageData();
+  ~RasterImageData() override;
 
   virtual void setData(const TRasterP &copiedRaster, const TPaletteP &palette,
                        double dpiX, double dpiY, const TDimension &dim,
@@ -70,7 +70,7 @@ public:
 //===================================================================
 // ToonzImageData
 //-------------------------------------------------------------------
-/*-- SelectionToolで選択した画像のデータ --*/
+/*-- Data for images selected with SelectionTool --*/
 class DVAPI ToonzImageData final : public RasterImageData {
   TRasterCM32P m_copiedRaster;
   TPaletteP m_palette;
@@ -80,7 +80,8 @@ class DVAPI ToonzImageData final : public RasterImageData {
 public:
   ToonzImageData();
   ToonzImageData(const ToonzImageData &);
-  ~ToonzImageData();
+  ~ToonzImageData() override;
+
   // data <- floating ti;
   void setData(const TRasterP &copiedRaster, const TPaletteP &palette,
                double dpiX, double dpiY, const TDimension &dim,
@@ -113,7 +114,7 @@ class DVAPI FullColorImageData final : public RasterImageData {
 public:
   FullColorImageData();
   FullColorImageData(const FullColorImageData &);
-  ~FullColorImageData();
+  ~FullColorImageData() override;
 
   // data <- floating ti;
   void setData(const TRasterP &copiedRaster, const TPaletteP &palette,

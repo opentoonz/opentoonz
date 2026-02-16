@@ -1,9 +1,9 @@
 #pragma once
-
 #ifndef XSHEET_INCLUDED
 #define XSHEET_INCLUDED
 
 #include <memory>
+#include <set>
 
 // TnzCore includes
 #include "traster.h"
@@ -16,9 +16,6 @@
 #include "toonz/txsheetcolumnchange.h"
 
 #include "cellposition.h"
-
-// STD includes
-#include <set>
 
 #undef DVAPI
 #undef DVVAR
@@ -54,6 +51,7 @@ class Orientation;
 class TXsheetColumnChangeObserver;
 class ExpressionReferenceMonitor;
 class NavigationTags;
+class TSoundOutputDevice;
 
 //=============================================================================
 
@@ -149,20 +147,17 @@ public:
   };
 
 private:
-  TSoundOutputDevice *m_player;
+  std::unique_ptr<TSoundOutputDevice>
+      m_player;  //!< Smart pointer – automatic cleanup
 
-  /*!	\struct TXsheet::TXsheetImp
-  The TXsheetImp struct provides all objects necessary to define the \b TXsheet
-  class.
-*/
   struct TXsheetImp;
   std::unique_ptr<TXsheetImp> m_imp;
-  TXshNoteSet *m_notes;
-  SoundProperties *m_soundProperties;
-  NavigationTags *m_navigationTags;
+  std::unique_ptr<TXshNoteSet> m_notes;
+  std::unique_ptr<SoundProperties> m_soundProperties;
+  std::unique_ptr<NavigationTags> m_navigationTags;
 
   int m_cameraColumnIndex;
-  TXshColumn *m_cameraColumn;
+  TXshColumnP m_cameraColumn;  //!< Smart pointer – ref‑counted
 
   TXsheetColumnChangeObserver *m_observer;
 
@@ -195,7 +190,6 @@ public:
           \sa setCell(), getCells(), setCells()
   */
   const TXshCell &getCell(int row, int col) const;
-
   const TXshCell &getCell(const CellPosition &pos) const;
 
   bool setCell(int row, int col, const TXshCell &cell);
@@ -440,9 +434,9 @@ frame duplication.
 
   // customized exposeLevel used from LoadLevel command
   int exposeLevel(int row, int col, TXshLevel *xl, std::vector<TFrameId> &fIds_,
-                  TFrameId xFrom = TFrameId(), TFrameId xTo = TFrameId(),
-                  int step = -1, int inc = -1, int frameCount = -1,
-                  bool doesFileActuallyExist = true);
+                  const TFrameId &xFrom = TFrameId(),
+                  const TFrameId &xTo = TFrameId(), int step = -1, int inc = -1,
+                  int frameCount = -1, bool doesFileActuallyExist = true);
 
   /*! Exposes level \b \e xl \b \e fids in xsheet starting from cell identified
    * by \b \e row and \b \e col.
@@ -519,7 +513,7 @@ in TXsheetImp.
 #endif
   void scrub(int frame, bool isPreview = false);
   void stopScrub();
-  void play(TSoundTrackP soundtrack, int s0, int s1, bool loop);
+  void play(const TSoundTrackP &soundtrack, int s0, int s1, bool loop);
 
   /*! Returns a pointer to object \b FxDag contained in \b TXsheetImp, this
      object
@@ -544,7 +538,7 @@ in TXsheetImp.
   */
   void setScene(ToonzScene *scene);
 
-  TXshNoteSet *getNotes() const { return m_notes; }
+  TXshNoteSet *getNotes() const { return m_notes.get(); }
 
   //! Returns true if the \b cellCandidate creates a circular reference.
   //! A circular reference is obtained when \b cellCandidate is a subXsheet cell
@@ -579,10 +573,10 @@ in TXsheetImp.
 
   void notify(const TXsheetColumnChange &change);
   void notifyFxAdded(const std::vector<TFx *> &fxs);
-  void notifyStageObjectAdded(const TStageObjectId id);
+  void notifyStageObjectAdded(const TStageObjectId &id);
   bool isReferenceManagementIgnored(TDoubleParam *);
 
-  NavigationTags *getNavigationTags() const { return m_navigationTags; }
+  NavigationTags *getNavigationTags() const { return m_navigationTags.get(); }
   bool isFrameTagged(int frame) const;
   void toggleTaggedFrame(int frame);
 
@@ -590,9 +584,9 @@ protected:
   bool checkCircularReferences(TXsheet *childCandidate);
 
 private:
-  // Not copiable
-  TXsheet(const TXsheet &);
-  TXsheet &operator=(const TXsheet &);
+  // Not copyable
+  TXsheet(const TXsheet &)            = delete;
+  TXsheet &operator=(const TXsheet &) = delete;
 
   /*! Return column in index if exists, otherwise create a new column;
 if column exist and is empty check \b isSoundColumn and return right type.

@@ -104,15 +104,12 @@ QString getMsgBoxTitle(MsgType type) {
 
 Separator::Separator(QString name, QWidget *parent, bool isHorizontal)
     : QFrame(parent), m_name(name), m_isHorizontal(isHorizontal) {
-  //	if(m_name.isEmpty())
-  //		setMinimumSize(1,1);
-  //	else
   setMinimumSize(1, 15);
 }
 
 //-----------------------------------------------------------------------------
 
-Separator::~Separator() {}
+Separator::~Separator() = default;
 
 //-----------------------------------------------------------------------------
 
@@ -135,7 +132,6 @@ void Separator::paintEvent(QPaintEvent *) {
   lineColor.setAlpha(128);
 
   p.setPen(lineColor);
-  int h = contents.height();
   if (m_isHorizontal) {
     int y     = contents.center().y();
     int space = (textWidth == 0) ? 0 : 8;
@@ -223,9 +219,9 @@ Dialog::Dialog(QWidget *parent, bool hasButton, bool hasFixedSize,
     : QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowTitleHint |
                           Qt::WindowCloseButtonHint)
     , m_hasButton(hasButton)
-    , m_mainHLayout(0)
-    , m_leftVLayout(0)
-    , m_rightVLayout(0)
+    , m_mainHLayout(nullptr)
+    , m_leftVLayout(nullptr)
+    , m_rightVLayout(nullptr)
     , m_isMainVLayout(false)
     , m_isMainHLayout(false)
     , m_layoutSpacing(5)
@@ -276,7 +272,7 @@ Dialog::Dialog(QWidget *parent, bool hasButton, bool hasFixedSize,
     mainLayout->setSizeConstraint(QLayout::SetMinimumSize);
 
   setLayout(mainLayout);
-// this->setGeometry(30, 30, 300, 300);
+
 #ifdef MACOSX
   setWindowFlags(Qt::Tool);
 #endif
@@ -289,53 +285,57 @@ Dialog::Dialog(QWidget *parent, bool hasButton, bool hasFixedSize,
 
   QSettings settings(settingsPath, QSettings::IniFormat);
 
-  if (name == QString()) return;
+  if (name.isEmpty()) return;
   m_name      = name + "DialogGeometry";
   QString geo = settings.value(m_name).toString();
-  if (geo != QString()) {
+  if (!geo.isEmpty()) {
     QStringList values = geo.split(" ");
-    assert(values.size() == 4);
-    // Ensure that the dialog is visible in the screen.
-    // The dialog opens with some offset to bottom-right direction
-    // if a flag Qt::WindowMaximizeButtonHint is set. (e.g. PencilTestPopup)
-    // Therefore, if the dialog is moved to the bottom-end of the screen,
-    // it will be got out of the screen on the next launch.
-    // The following position adjustment will also prevent such behavior.
+    // If the stored geometry is malformed, just ignore it
+    if (values.size() == 4) {
+      // Ensure that the dialog is visible in the screen.
+      // The dialog opens with some offset to bottom-right direction
+      // if a flag Qt::WindowMaximizeButtonHint is set. (e.g. PencilTestPopup)
+      // Therefore, if the dialog is moved to the bottom-end of the screen,
+      // it will be got out of the screen on the next launch.
+      // The following position adjustment will also prevent such behavior.
 
-    // try and get active screen
-    if (parent != NULL) {
-      QScreen *screen = QGuiApplication::screenAt(parent->pos());
-      m_currentScreen = screen ? QGuiApplication::screens().indexOf(screen) : 0;
+      // try and get active screen
+      if (parent != nullptr) {
+        QScreen *screen = QGuiApplication::screenAt(parent->pos());
+        m_currentScreen =
+            screen ? QGuiApplication::screens().indexOf(screen) : 0;
+      }
+      QRect screen =
+          QGuiApplication::screens().at(m_currentScreen)->availableGeometry();
+      int x = values.at(0).toInt();
+      int y = values.at(1).toInt();
+
+      // make sure that the window is visible on the screen
+      // all popups will popup on the active window the first time
+      // so popups moved to other monitors will be moved back
+      // when restarting OpenToonz.
+
+      // This may be somewhat annoying if a user REALLY wants the popup
+      // on another monitor by default, but this is better than
+      // a user thinking the program is broken because they didn't notice
+      // the popup on another monitor
+      if (x > screen.right() - 50) x = screen.right() - 50;
+      if (x < screen.left()) x = screen.left();
+      if (y > screen.bottom() - 90) y = screen.bottom() - 90;
+      if (y <= screen.top()) y = screen.top() + 50;  // pad for window title
+      setGeometry(x, y, values.at(2).toInt(), values.at(3).toInt());
+      settings.setValue(m_name,
+                        QString::number(x) + " " + QString::number(y) + " " +
+                            QString::number(values.at(2).toInt()) + " " +
+                            QString::number(values.at(3).toInt()));
     }
-    QRect screen =
-        QGuiApplication::screens().at(m_currentScreen)->availableGeometry();
-    int x = values.at(0).toInt();
-    int y = values.at(1).toInt();
-
-    // make sure that the window is visible on the screen
-    // all popups will popup on the active window the first time
-    // so popups moved to other monitors will be moved back
-    // when restarting OpenToonz.
-
-    // This may be somewhat annoying if a user REALLY wants the popup
-    // on another monitor by default, but this is better than
-    // a user thinking the program is broken because they didn't notice
-    // the popup on another monitor
-    if (x > screen.right() - 50) x = screen.right() - 50;
-    if (x < screen.left()) x = screen.left();
-    if (y > screen.bottom() - 90) y = screen.bottom() - 90;
-    if (y <= screen.top()) y = screen.top() + 50;  // pad for window title
-    setGeometry(x, y, values.at(2).toInt(), values.at(3).toInt());
-    settings.setValue(m_name, QString::number(x) + " " + QString::number(y) +
-                                  " " + QString::number(values.at(2).toInt()) +
-                                  " " + QString::number(values.at(3).toInt()));
   }
 }
 
 //-----------------------------------------------------------------------------
 
 Dialog::~Dialog() {
-  if (m_name == QString()) return;
+  if (m_name.isEmpty()) return;
 
   QRect r = geometry();
   QSettings settings(settingsPath, QSettings::IniFormat);
@@ -358,15 +358,14 @@ void Dialog::resizeEvent(QResizeEvent *e) {
 
 //! By default, QDialogs always reset position/size upon hide events. However,
 //! we want to prevent such behaviour on Toonz Dialogs - this method is
-//! reimplemented
-//! for this purpose.
+//! reimplemented for this purpose.
 void Dialog::hideEvent(QHideEvent *event) {
   int x = pos().rx();
   int y = pos().ry();
   // make sure the dialog is actually visible on a screen
   auto screens      = QGuiApplication::screens();
   int currentScreen = 0;
-  for (int i = 0; i < screens.count(); i++) {
+  for (int i = 0; i < screens.count(); ++i) {
     if (screens[i]->geometry().contains(pos())) {
       currentScreen = i;
       break;
@@ -431,8 +430,8 @@ void Dialog::endVLayout() {
 
   addLayout(layout);
 
-  m_leftVLayout  = 0;
-  m_rightVLayout = 0;
+  m_leftVLayout  = nullptr;
+  m_rightVLayout = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -453,7 +452,7 @@ void Dialog::endHLayout() {
   m_isMainHLayout = false;
   if (!m_mainHLayout) return;
   addLayout(m_mainHLayout);
-  m_mainHLayout = 0;
+  m_mainHLayout = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -464,9 +463,11 @@ void Dialog::endHLayout() {
 */
 void Dialog::addWidget(QWidget *widget, bool isRight) {
   if (m_isMainVLayout) {
-    assert(m_leftVLayout && m_rightVLayout);
-    QWidget *w = new QWidget();
-    int h      = widget->height() + m_layoutSpacing;
+    // Sanity check – these should never be null if we are in vertical layout
+    // mode
+    if (!m_leftVLayout || !m_rightVLayout) return;
+    // No need to allocate a dummy widget – we just need the height for spacing
+    int h = widget->height() + m_layoutSpacing;
     if (isRight) {
       m_leftVLayout->addSpacing(h);
       m_rightVLayout->addWidget(widget);
@@ -476,7 +477,7 @@ void Dialog::addWidget(QWidget *widget, bool isRight) {
     }
     return;
   } else if (m_isMainHLayout) {
-    assert(m_mainHLayout);
+    if (!m_mainHLayout) return;
     m_mainHLayout->addWidget(widget);
     return;
   }
@@ -497,7 +498,7 @@ layout containing
 */
 void Dialog::addWidgets(QWidget *firstW, QWidget *secondW) {
   if (m_isMainVLayout) {
-    assert(m_leftVLayout && m_rightVLayout);
+    if (!m_leftVLayout || !m_rightVLayout) return;
     m_leftVLayout->addWidget(firstW);
     m_rightVLayout->addWidget(secondW);
     return;
@@ -510,7 +511,7 @@ void Dialog::addWidgets(QWidget *firstW, QWidget *secondW) {
   pairLayout->addWidget(secondW);
 
   if (m_isMainHLayout) {
-    assert(m_mainHLayout);
+    if (!m_mainHLayout) return;
     m_mainHLayout->addLayout(pairLayout);
     return;
   }
@@ -538,7 +539,7 @@ void Dialog::addWidget(QString labelName, QWidget *widget) {
 */
 void Dialog::addLayout(QLayout *layout, bool isRight) {
   if (m_isMainVLayout) {
-    assert(m_leftVLayout && m_rightVLayout);
+    if (!m_leftVLayout || !m_rightVLayout) return;
     int h = layout->itemAt(0)->widget()->height() + m_layoutSpacing;
     if (isRight) {
       m_leftVLayout->addSpacing(h);
@@ -549,7 +550,7 @@ void Dialog::addLayout(QLayout *layout, bool isRight) {
     }
     return;
   } else if (m_isMainHLayout) {
-    assert(m_mainHLayout);
+    if (!m_mainHLayout) return;
     m_mainHLayout->addLayout(layout);
     return;
   }
@@ -575,7 +576,7 @@ void Dialog::addWidgetLayout(QWidget *widget, QLayout *layout) {
   layout->setSpacing(m_layoutSpacing);
 
   if (m_isMainVLayout) {
-    assert(m_leftVLayout && m_rightVLayout);
+    if (!m_leftVLayout || !m_rightVLayout) return;
     m_leftVLayout->addWidget(widget);
     m_rightVLayout->addLayout(layout);
     return;
@@ -589,7 +590,7 @@ void Dialog::addWidgetLayout(QWidget *widget, QLayout *layout) {
   pairLayout->addLayout(layout);
 
   if (m_isMainHLayout) {
-    assert(m_mainHLayout);
+    if (!m_mainHLayout) return;
     m_mainHLayout->addLayout(pairLayout);
     return;
   }
@@ -632,7 +633,7 @@ void Dialog::addLayouts(QLayout *firstL, QLayout *secondL) {
   secondL->setSpacing(m_layoutSpacing);
 
   if (m_isMainVLayout) {
-    assert(m_leftVLayout && m_rightVLayout);
+    if (!m_leftVLayout || !m_rightVLayout) return;
     m_leftVLayout->addLayout(firstL);
     m_rightVLayout->addLayout(secondL);
     return;
@@ -646,7 +647,7 @@ void Dialog::addLayouts(QLayout *firstL, QLayout *secondL) {
   pairLayout->addLayout(secondL);
 
   if (m_isMainHLayout) {
-    assert(m_mainHLayout);
+    if (!m_mainHLayout) return;
     m_mainHLayout->addLayout(pairLayout);
     return;
   }
@@ -659,12 +660,12 @@ void Dialog::addLayouts(QLayout *firstL, QLayout *secondL) {
  */
 void Dialog::addSpacing(int spacing) {
   if (m_isMainVLayout) {
-    assert(m_leftVLayout && m_rightVLayout);
+    if (!m_leftVLayout || !m_rightVLayout) return;
     m_leftVLayout->addSpacing(spacing);
     m_rightVLayout->addSpacing(spacing);
     return;
   } else if (m_isMainHLayout) {
-    assert(m_mainHLayout);
+    if (!m_mainHLayout) return;
     m_mainHLayout->addSpacing(spacing);
     return;
   }
@@ -679,13 +680,13 @@ void Dialog::addSpacing(int spacing) {
 void Dialog::addSeparator(QString name) {
   Separator *separator = new Separator(name);
   if (m_isMainVLayout) {
-    assert(m_leftVLayout && m_rightVLayout);
+    if (!m_leftVLayout || !m_rightVLayout) return;
     endVLayout();
     addWidget(separator);
     beginVLayout();
     return;
   } else if (m_isMainHLayout) {
-    assert(m_mainHLayout);
+    if (!m_mainHLayout) return;
     separator->setOrientation(false);
     m_mainHLayout->addWidget(separator);
     return;
@@ -750,20 +751,18 @@ void Dialog::setButtonBarSpacing(int spacing) {
 /*! Add a widget to the button part of dialog.
  */
 void Dialog::addButtonBarWidget(QWidget *widget) {
+  if (!m_hasButton) return;  // Silently ignore if the dialog has no button bar
   widget->setMinimumSize(65, 25);
-  assert(m_hasButton);
-  if (m_hasButton) {
-    m_buttonLayout->addWidget(widget);
-    m_buttonBarWidgets.push_back(widget);
-  }
+  m_buttonLayout->addWidget(widget);
+  m_buttonBarWidgets.push_back(widget);
 }
 
 //-----------------------------------------------------------------------------
 /*! Remove all widget from the button part of dialog.
  */
 void Dialog::clearButtonBar() {
-  for (int i = 0; i < (int)m_buttonBarWidgets.size(); i++) {
-    m_buttonLayout->removeWidget(m_buttonBarWidgets[i]);
+  for (auto widget : m_buttonBarWidgets) {
+    m_buttonLayout->removeWidget(widget);
   }
   m_buttonBarWidgets.clear();
 }
@@ -772,13 +771,11 @@ void Dialog::clearButtonBar() {
 /*! Add two widget to the button part of dialog.
  */
 void Dialog::addButtonBarWidget(QWidget *first, QWidget *second) {
+  if (!m_hasButton) return;
   first->setMinimumSize(65, 25);
   second->setMinimumSize(65, 25);
-  assert(m_hasButton);
-  if (m_hasButton) {
-    m_buttonLayout->addWidget(first);
-    m_buttonLayout->addWidget(second);
-  }
+  m_buttonLayout->addWidget(first);
+  m_buttonLayout->addWidget(second);
 }
 
 //-----------------------------------------------------------------------------
@@ -786,15 +783,13 @@ void Dialog::addButtonBarWidget(QWidget *first, QWidget *second) {
  */
 void Dialog::addButtonBarWidget(QWidget *first, QWidget *second,
                                 QWidget *third) {
+  if (!m_hasButton) return;
   first->setMinimumSize(65, 25);
   second->setMinimumSize(65, 25);
   third->setMinimumSize(65, 25);
-  assert(m_hasButton);
-  if (m_hasButton) {
-    m_buttonLayout->addWidget(first);
-    m_buttonLayout->addWidget(second);
-    m_buttonLayout->addWidget(third);
-  }
+  m_buttonLayout->addWidget(first);
+  m_buttonLayout->addWidget(second);
+  m_buttonLayout->addWidget(third);
 }
 
 //-----------------------------------------------------------------------------
@@ -802,16 +797,14 @@ void Dialog::addButtonBarWidget(QWidget *first, QWidget *second,
  */
 void Dialog::addButtonBarWidget(QWidget *first, QWidget *second, QWidget *third,
                                 QWidget *fourth) {
+  if (!m_hasButton) return;
   first->setMinimumSize(65, 25);
   second->setMinimumSize(65, 25);
   third->setMinimumSize(65, 25);
-  assert(m_hasButton);
-  if (m_hasButton) {
-    m_buttonLayout->addWidget(first);
-    m_buttonLayout->addWidget(second);
-    m_buttonLayout->addWidget(third);
-    m_buttonLayout->addWidget(fourth);
-  }
+  m_buttonLayout->addWidget(first);
+  m_buttonLayout->addWidget(second);
+  m_buttonLayout->addWidget(third);
+  m_buttonLayout->addWidget(fourth);
 }
 
 //=============================================================================
@@ -851,7 +844,7 @@ RadioButtonDialog::RadioButtonDialog(const QString &labelText,
 
   QButtonGroup *buttonGroup = new QButtonGroup(this);
   int i;
-  for (i = 0; i < radioButtonList.count(); i++) {
+  for (i = 0; i < radioButtonList.count(); ++i) {
     QRadioButton *radioButton = new QRadioButton(radioButtonList.at(i));
     if (i == m_result - 1) radioButton->setChecked(true);
     radioButton->setFixedHeight(WidgetHeight);
@@ -860,19 +853,20 @@ RadioButtonDialog::RadioButtonDialog(const QString &labelText,
     addWidget(radioButton);
   }
 
-  bool ret = connect(buttonGroup, SIGNAL(buttonClicked(int)),
-                     SLOT(onButtonClicked(int)));
+  // Connect buttonGroup using PMF syntax
+  connect(buttonGroup, &QButtonGroup::idClicked, this,
+          &RadioButtonDialog::onButtonClicked);
 
   endVLayout();
 
   QPushButton *applyButton = new QPushButton(QObject::tr("Apply"));
-  ret = ret && connect(applyButton, SIGNAL(clicked()), this, SLOT(onApply()));
+  connect(applyButton, &QPushButton::clicked, this,
+          &RadioButtonDialog::onApply);
   QPushButton *cancelButton = new QPushButton(QObject::tr("Cancel"));
-  ret = ret && connect(cancelButton, SIGNAL(clicked()), this, SLOT(onCancel()));
+  connect(cancelButton, &QPushButton::clicked, this,
+          &RadioButtonDialog::onCancel);
 
   addButtonBarWidget(applyButton, cancelButton);
-
-  assert(ret);
 }
 
 //-----------------------------------------------------------------------------
@@ -939,10 +933,8 @@ void ProgressDialog::setLabelText(const QString &text) {
 
 void ProgressDialog::setCancelButton(QPushButton *cancelButton) {
   m_cancelButton = cancelButton;
-  bool ret = connect(cancelButton, SIGNAL(clicked()), this, SLOT(onCancel()));
-  ret =
-      ret && connect(cancelButton, SIGNAL(clicked()), this, SIGNAL(canceled()));
-  assert(ret);
+  connect(cancelButton, &QPushButton::clicked, this, &ProgressDialog::onCancel);
+  connect(cancelButton, &QPushButton::clicked, this, &ProgressDialog::canceled);
   addButtonBarWidget(m_cancelButton);
 }
 
@@ -1020,22 +1012,18 @@ int DVGui::MsgBox(MsgType type, const QString &text,
   // ButtonGroup: is used only to retrieve the clicked button
   QButtonGroup *buttonGroup = new QButtonGroup(&dialog);
 
-  for (int i = 0; i < (int)buttons.size(); i++) {
+  for (int i = 0; i < (int)buttons.size(); ++i) {
     QPushButton *button = new QPushButton(buttons[i], &dialog);
-    if (defaultButtonIndex == i)
-      button->setDefault(true);
-    else
-      button->setDefault(false);
+    button->setDefault(defaultButtonIndex == i);
     dialog.addButtonBarWidget(button);
-
     buttonGroup->addButton(button, i + 1);
   }
 
-  QObject::connect(buttonGroup, SIGNAL(idClicked(int)), &dialog,
-                   SLOT(done(int)));
+  // Connect using PMF
+  QObject::connect(buttonGroup, &QButtonGroup::idClicked, &dialog,
+                   &QDialog::done);
 
   dialog.raise();
-
   return dialog.exec();
 }
 
@@ -1060,7 +1048,7 @@ void DVGui::MsgBoxInPopup(MsgType type, const QString &text) {
   if (popupIsOpen) return;
   popupIsOpen = true;
 
-  Dialog dialog(0, true);
+  Dialog dialog(nullptr, true);
 
   dialog.setWindowFlags(dialog.windowFlags() | Qt::WindowStaysOnTopHint);
   dialog.setAlignment(Qt::AlignLeft);
@@ -1081,8 +1069,8 @@ void DVGui::MsgBoxInPopup(MsgType type, const QString &text) {
   button->setDefault(true);
   dialog.addButtonBarWidget(button);
   buttonGroup->addButton(button, 1);
-  QObject::connect(buttonGroup, SIGNAL(idClicked(int)), &dialog,
-                   SLOT(done(int)));
+  QObject::connect(buttonGroup, &QButtonGroup::idClicked, &dialog,
+                   &QDialog::done);
 
   while (!messageQueue.empty()) {
     MsgType type1 = messageQueue.first().first;
@@ -1138,25 +1126,22 @@ int DVGui::MsgBox(const QString &text, const QString &button1Text,
   QButtonGroup *buttonGroup = new QButtonGroup(&dialog);
 
   QPushButton *button1 = new QPushButton(button1Text, &dialog);
-  button1->setDefault(false);
-  if (defaultButtonIndex == 0) button1->setDefault(true);
+  button1->setDefault(defaultButtonIndex == 0);
   dialog.addButtonBarWidget(button1);
   buttonGroup->addButton(button1, 1);
 
   QPushButton *button2 = new QPushButton(button2Text, &dialog);
-  button2->setDefault(false);
-  if (defaultButtonIndex == 1) button2->setDefault(true);
+  button2->setDefault(defaultButtonIndex == 1);
   dialog.addButtonBarWidget(button2);
   buttonGroup->addButton(button2, 2);
 
   QPushButton *button3 = new QPushButton(button3Text, &dialog);
-  button3->setDefault(false);
-  if (defaultButtonIndex == 2) button3->setDefault(true);
+  button3->setDefault(defaultButtonIndex == 2);
   dialog.addButtonBarWidget(button3);
   buttonGroup->addButton(button3, 3);
 
-  QObject::connect(buttonGroup, SIGNAL(idClicked(int)), &dialog,
-                   SLOT(done(int)));
+  QObject::connect(buttonGroup, &QButtonGroup::idClicked, &dialog,
+                   &QDialog::done);
   dialog.raise();
   return dialog.exec();
 }
@@ -1191,31 +1176,27 @@ int DVGui::MsgBox(const QString &text, const QString &button1Text,
   QButtonGroup *buttonGroup = new QButtonGroup(&dialog);
 
   QPushButton *button1 = new QPushButton(button1Text, &dialog);
-  button1->setDefault(false);
-  if (defaultButtonIndex == 0) button1->setDefault(true);
+  button1->setDefault(defaultButtonIndex == 0);
   dialog.addButtonBarWidget(button1);
   buttonGroup->addButton(button1, 1);
 
   QPushButton *button2 = new QPushButton(button2Text, &dialog);
-  button2->setDefault(false);
-  if (defaultButtonIndex == 1) button2->setDefault(true);
+  button2->setDefault(defaultButtonIndex == 1);
   dialog.addButtonBarWidget(button2);
   buttonGroup->addButton(button2, 2);
 
   QPushButton *button3 = new QPushButton(button3Text, &dialog);
-  button3->setDefault(false);
-  if (defaultButtonIndex == 2) button3->setDefault(true);
+  button3->setDefault(defaultButtonIndex == 2);
   dialog.addButtonBarWidget(button3);
   buttonGroup->addButton(button3, 3);
 
   QPushButton *button4 = new QPushButton(button4Text, &dialog);
-  button4->setDefault(false);
-  if (defaultButtonIndex == 3) button4->setDefault(true);
+  button4->setDefault(defaultButtonIndex == 3);
   dialog.addButtonBarWidget(button4);
   buttonGroup->addButton(button4, 4);
 
-  QObject::connect(buttonGroup, SIGNAL(idClicked(int)), &dialog,
-                   SLOT(done(int)));
+  QObject::connect(buttonGroup, &QButtonGroup::idClicked, &dialog,
+                   &QDialog::done);
   dialog.raise();
   return dialog.exec();
 }
@@ -1264,19 +1245,15 @@ Dialog *DVGui::createMsgBox(MsgType type, const QString &text,
   // ButtonGroup: is used only to retrieve the clicked button
   QButtonGroup *buttonGroup = new QButtonGroup(dialog);
 
-  for (int i = 0; i < (int)buttons.size(); i++) {
+  for (int i = 0; i < buttons.size(); ++i) {
     QPushButton *button = new QPushButton(buttons[i], dialog);
-    if (defaultButtonIndex == i)
-      button->setDefault(true);
-    else
-      button->setDefault(false);
+    button->setDefault(defaultButtonIndex == i);
     dialog->addButtonBarWidget(button);
-
     buttonGroup->addButton(button, i + 1);
   }
 
-  QObject::connect(buttonGroup, SIGNAL(idClicked(int)), dialog,
-                   SLOT(done(int)));
+  QObject::connect(buttonGroup, &QButtonGroup::idClicked, dialog,
+                   &QDialog::done);
 
   return dialog;
 }
@@ -1313,14 +1290,10 @@ MessageAndCheckboxDialog *DVGui::createMsgandCheckbox(
   // ButtonGroup: is used only to retrieve the clicked button
   QButtonGroup *buttonGroup = new QButtonGroup(dialog);
 
-  for (int i = 0; i < (int)buttons.size(); i++) {
+  for (int i = 0; i < buttons.size(); ++i) {
     QPushButton *button = new QPushButton(buttons[i], dialog);
-    if (defaultButtonIndex == i)
-      button->setDefault(true);
-    else
-      button->setDefault(false);
+    button->setDefault(defaultButtonIndex == i);
     dialog->addButtonBarWidget(button);
-
     buttonGroup->addButton(button, i + 1);
   }
 
@@ -1332,10 +1305,10 @@ MessageAndCheckboxDialog *DVGui::createMsgandCheckbox(
 
   dialogCheckBox->setCheckState(defaultCheckBoxState);
 
-  QObject::connect(dialogCheckBox, SIGNAL(stateChanged(int)), dialog,
-                   SLOT(onCheckboxChanged(int)));
-  QObject::connect(buttonGroup, SIGNAL(idClicked(int)), dialog,
-                   SLOT(onButtonClicked(int)));
+  QObject::connect(dialogCheckBox, &QCheckBox::stateChanged, dialog,
+                   &MessageAndCheckboxDialog::onCheckboxChanged);
+  QObject::connect(buttonGroup, &QButtonGroup::idClicked, dialog,
+                   &MessageAndCheckboxDialog::onButtonClicked);
 
   return dialog;
 }
@@ -1344,7 +1317,7 @@ MessageAndCheckboxDialog *DVGui::createMsgandCheckbox(
 
 QString DVGui::getText(const QString &title, const QString &labelText,
                        const QString &text, bool *ok) {
-  Dialog dialog(0, true);
+  Dialog dialog(nullptr, true);
 
   dialog.setWindowTitle(title);
   dialog.setWindowFlags(Qt::WindowStaysOnTopHint | Qt::WindowTitleHint |
@@ -1362,8 +1335,8 @@ QString DVGui::getText(const QString &title, const QString &labelText,
   QPushButton *okBtn = new QPushButton(QObject::tr("OK"), &dialog);
   okBtn->setDefault(true);
   QPushButton *cancelBtn = new QPushButton(QObject::tr("Cancel"), &dialog);
-  QObject::connect(okBtn, SIGNAL(clicked()), &dialog, SLOT(accept()));
-  QObject::connect(cancelBtn, SIGNAL(clicked()), &dialog, SLOT(reject()));
+  QObject::connect(okBtn, &QPushButton::clicked, &dialog, &QDialog::accept);
+  QObject::connect(cancelBtn, &QPushButton::clicked, &dialog, &QDialog::reject);
 
   dialog.addButtonBarWidget(okBtn, cancelBtn);
 
@@ -1378,12 +1351,10 @@ QString DVGui::getText(const QString &title, const QString &labelText,
 namespace {
 bool isStyleIdInPalette(int styleId, const TPalette *palette) {
   if (palette->getStyleCount() == 0) return false;
-  int i;
-  for (i = 0; i < palette->getPageCount(); i++) {
+  for (int i = 0; i < palette->getPageCount(); ++i) {
     const TPalette::Page *page = palette->getPage(i);
     if (!page) return false;  // The page should always be present
-    int j;
-    for (j = 0; j < page->getStyleCount(); j++)
+    for (int j = 0; j < page->getStyleCount(); ++j)
       if (page->getStyleId(j) == styleId) return true;
   }
   return false;
@@ -1397,12 +1368,10 @@ int DVGui::eraseStylesInDemand(TPalette *palette,
                                TPalette *newPalette) {
   // Check if the palette styles are in use: eraseStylesInDemand()
   std::vector<int> styleIds;
-  int h;
-  for (h = 0; h < palette->getPageCount(); h++) {
+  for (int h = 0; h < palette->getPageCount(); ++h) {
     TPalette::Page *page = palette->getPage(h);
     if (!page) continue;  // The page should always be present
-    int k;
-    for (k = 0; k < page->getStyleCount(); k++) {
+    for (int k = 0; k < page->getStyleCount(); ++k) {
       int styleId = page->getStyleId(k);
       bool isStyleIdInNewPalette =
           (!newPalette) ? false : isStyleIdInPalette(styleId, newPalette);
@@ -1437,8 +1406,7 @@ int DVGui::eraseStylesInDemand(TPalette *palette, std::vector<int> styleIds,
   if (!someStyleIsUsed) return 1;
 
   // At least a style is selected and present in some level - ask user if and
-  // how styles
-  // should be deleted
+  // how styles should be deleted
 
   QString question = QObject::tr(
                          "Styles you are going to delete are used to paint "
@@ -1469,8 +1437,7 @@ int DVGui::eraseStylesInDemand(TPalette *palette, std::vector<int> styleIds,
   PaletteCmd::eraseStyles(levels, styleIds);
   QApplication::restoreOverrideCursor();
 
+  // At this point ret is guaranteed to be 2 or 3
   assert(ret == 2 || ret == 3);
-  return ret == 2;  // return true if need to delete Styles     :D
+  return ret == 2;  // return true if need to delete Styles
 }
-
-//-----------------------------------------------------------------------------

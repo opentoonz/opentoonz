@@ -1,3 +1,5 @@
+
+
 #include <sstream>
 #include <string>
 #include <utility>
@@ -44,21 +46,28 @@
 
 using namespace toonz;  // plugin namespace
 
+extern "C" {
+int set_parameter_pages(toonz_node_handle_t, int num,
+                        toonz_param_page_t *params);
+int set_parameter_pages_with_error(toonz_node_handle_t, int num,
+                                   toonz_param_page_t *params, int *, void **);
+}
+
 extern std::map<std::string, PluginInformation *> plugin_dict_;
 
 /*
-  PluginLoadController が main thread queue を使うことと,
-  QThread で他スレッドの待ち合わせがしにくい(sendor thread が QThread::wait()
-  でブロックしていると emit signal が処理できずデッドロックする)ので、
-  大人しく polling にした.
- */
+  Since PluginLoadController uses the main thread queue, and waiting for other
+  threads in QThread is difficult (if the sender thread is blocked in
+  QThread::wait(), emitted signals cannot be processed, causing deadlock), we
+  stick to polling.
+*/
 bool PluginLoader::load_entries(const std::string &basepath) {
-  static PluginLoadController *aw = NULL; /* main() から一度だけ呼ばれる */
+  static PluginLoadController *aw = NULL; /* called only once from main() */
   if (!aw) {
     aw = new PluginLoadController(basepath, NULL);
   }
   bool ret = aw->wait(16 /* ms */);
-  if (ret) aw = NULL; /* deleteLater で消えるはず */
+  if (ret) aw = NULL; /* should be deleted by deleteLater */
   return ret;
 }
 
@@ -111,11 +120,11 @@ public:
     RasterFxPluginHost *fx = new RasterFxPluginHost(pi_);
     if (pi_ && pi_->handler_) {
       pi_->handler_->setup(fx);
-      /* fx は pi のラッパーとしてのみ構築されており、即座に削除される. 実
-         instance に引き継がれないので ここで createParam()
-         等を呼び出しても意味がない.
-         ここで createParamsByDesc() などを呼び出しても、 instance の parameter
-         は 0 になる.  */
+      /* The fx is built only as a wrapper for pi and is deleted immediately.
+         It is not passed to the real instance, so calling createParam() etc.
+         here has no effect.
+         Even if createParamsByDesc() etc. are called here, the instance's
+         parameters will be zero. */
     }
     delete fx;
   }
@@ -219,8 +228,7 @@ static int add_input_port(toonz_node_handle_t node, const char *name, int type,
     RasterFxPluginHost *fx = reinterpret_cast<RasterFxPluginHost *>(node);
     if (!fx) return TOONZ_ERROR_INVALID_HANDLE;
     auto p = std::make_shared<TRasterFxPort>();
-    /* TRasterFxPort は non-copyable なスマートポインタなのでポインタで引き回す
-     */
+    /* TRasterFxPort is a non-copyable smart pointer, so pass it as pointer */
     if (!fx->addInputPort(name, p)) {  // overloaded version
       printf("add_input_port: failed to add: already have\n");
       return TOONZ_ERROR_BUSY;
@@ -257,8 +265,7 @@ static int add_output_port(toonz_node_handle_t node, const char *name, int type,
     RasterFxPluginHost *fx = reinterpret_cast<RasterFxPluginHost *>(node);
     if (!fx) return TOONZ_ERROR_INVALID_HANDLE;
     p = new TRasterFxPort();
-    /* TRasterFxPort は non-copyable なスマートポインタなのでポインタで引き回す
-     */
+    /* TRasterFxPort is a non-copyable smart pointer, so pass it as pointer */
     if (fx->addOutputPort(name, p)) {  // overloaded version
       delete p;
       return TOONZ_ERROR_BUSY;
@@ -389,7 +396,7 @@ bool RasterFxPluginHost::addPortDesc(port_description_t &&desc) {
 }
 
 void RasterFxPluginHost::notify() {
-  /* 最低限必要な setup をしてから通知する */
+  /* Do the minimum required setup then notify */
   QString nm = QString::fromStdString(pi_->desc_->name_.c_str());
   setName(nm.toStdWString());
 
@@ -408,11 +415,11 @@ RasterFxPluginHost::~RasterFxPluginHost() {
 }
 
 /*
- node を click するなどの要因で頻繁に呼ばれる.
- click した場合は FxsData::setFxs から呼ばれ、新しいインスタンスは
- FxsData::m_fxs に入れられ、 FxsData
- のインスタンスと同時に(大抵の場合は)即座に消される.
- */
+  Frequently called when clicking a node, etc.
+  When clicked, it is called from FxsData::setFxs, and the new instance is
+  placed in FxsData::m_fxs and usually deleted immediately together with the
+  FxsData instance.
+*/
 TFx *RasterFxPluginHost::clone(bool recursive) const {
   RasterFxPluginHost *plugin = newInstance(pi_);
   plugin->user_data_         = user_data_;
@@ -420,9 +427,11 @@ TFx *RasterFxPluginHost::clone(bool recursive) const {
   for (auto &ip : pi_->port_mapper_) {
     if (ip.second.input_) {
 #if 0
-      /* addInputPort() 内で行われる port owner の更新は後勝ちだが,
-         clone された新しいインスタンスのほうが先に消えてしまう場合に, 無効なポインタを示す owner が port に残ってしまう. この問題が解決したら共有できるようにしたい.
-         (このため、 plugin 空間に通知される全ての handle には一貫性がない. ただし、後から一貫性がなくなるよりは遥かにいいだろう)
+      /* addInputPort() updates the port owner to the latest, but if the cloned
+         new instance is destroyed first, the port retains an invalid owner pointer.
+         We would like to share when this problem is solved.
+         (For this reason, all handles notified to the plugin space are inconsistent.
+         However, it's much better than becoming inconsistent later.)
       */
       plugin->addInputPort(getInputPortName(i), ip);
 #else
@@ -434,12 +443,11 @@ TFx *RasterFxPluginHost::clone(bool recursive) const {
 
   printf("recursive:%d params:%d\n", (int)recursive, (int)params_.size());
   // clone params before TFx::clone().
-  /* ui_pages_, param_views_ は pi に移ったが createParam
-   * の呼び出しだけはしておかないと Fx Settings 構築時に assert failed になる */
+  /* ui_pages_, param_views_ have moved to pi, but we still need to call
+     createParam() otherwise Fx Settings construction will assert failed. */
   for (auto const &param : params_) {
-    /* 古い createParam() は desc
-     * をとらず、コンストラクト時にデフォルト値を持つタイプの T*Param
-     * を再作成できない */
+    /* The old createParam() did not take a desc and cannot recreate T*Param
+       types that have default values at construction. */
     plugin->createParam(param->desc());
   }
 
@@ -476,7 +484,7 @@ void RasterFxPluginHost::setUserData(void *user_data) {
 bool RasterFxPluginHost::doGetBBox(double frame, TRectD &bbox,
                                    const TRenderSettings &info) {
   using namespace plugin::utils;
-  bool ret = true; /* 負論理 */
+  bool ret = true; /* negative logic */
   if (pi_ && pi_->handler_->do_get_bbox) {
     rendering_setting_t info_;
     copy_rendering_setting(&info_, info);
@@ -509,9 +517,8 @@ int RasterFxPluginHost::getMemoryRequirement(const TRectD &rect, double frame,
     rect_t rc;
     copy_rect(&rc, rect);
 
-    size_t ignore =
-        pi_->handler_->get_memory_requirement(this, &rs, frame, &rc);
-    return 0;
+    pi_->handler_->get_memory_requirement(this, &rs, frame, &rc);
+    // return value is ignored because it's not used in Toonz core
   }
   return 0;
 }
@@ -522,15 +529,15 @@ bool RasterFxPluginHost::canHandle(const TRenderSettings &info, double frame) {
     copy_rendering_setting(&rs, info);
     return pi_->handler_->can_handle(this, &rs, frame);
   }
-  /* 適切なデフォルト値は 'geometric' の場合とそうでない場合で異なる */
-  return isPluginZerary(); /* better-default depends on that is 'geometric' or
-                              not */
+  /* Appropriate default differs between 'geometric' and non-geometric */
+  return isPluginZerary(); /* better default depends on whether it's 'geometric'
+                            */
 }
 
 bool RasterFxPluginHost::addInputPort(const std::string &nm,
                                       std::shared_ptr<TFxPort> port) {
-  /* setOwnFx は addInputPort 内で行われている. setFx()
-   * は接続なので自分自身に呼んではダメ */
+  /* setOwnFx is done inside addInputPort. setFx() is for connection,
+     so do not call it on itself. */
   // port->setFx(this);
   bool ret = TFx::addInputPort(nm, *port.get());
   if (ret) {
@@ -598,7 +605,8 @@ Param *RasterFxPluginHost::createParam(const toonz_param_desc_t *desc) {
   TParamP p = parameter_factory(desc);
   if (!p) return nullptr;
 
-  p->setDescription(desc->note);
+  // Handle null description note
+  p->setDescription(desc->note ? desc->note : "");
   p->setUILabel(desc->base.label);
 
   bindPluginParam(this, desc->key, p);
@@ -623,8 +631,8 @@ ParamView *RasterFxPluginHost::createParamView() {
   return pi_->param_views_.back();
 }
 
-/* build で構築された GUI は plugin のインスタンスには紐づかない.
- * 通常一度だけ呼ばれ使い回される.  */
+/* The GUI built by build() is not tied to the plugin instance.
+   It is usually called once and reused. */
 void RasterFxPluginHost::build(ParamsPageSet *pages) {
   printf(">>>> RasterFxPluginHost::build: ui_pages:%d\n",
          (int)pi_->ui_pages_.size());
@@ -634,9 +642,8 @@ void RasterFxPluginHost::build(ParamsPageSet *pages) {
   auto aboutpage = pages->createParamsPage();
 
 #if 1
-  /* FIXME: fxsettings で大きさの測定のためにいろいろやっているので使える
-     layout/widget に制限がありそう.
-     しかしなぜか最後の widget しか出ない */
+  /* FIXME: fxsettings does various measurements, so the usable layout/widgets
+     may be limited. However, for some reason only the last widget appears. */
   aboutpage->beginGroup("Name");
   aboutpage->addWidget(new QLabel(pi_->desc_->name_.c_str(), aboutpage));
   aboutpage->endGroup();
@@ -699,7 +706,7 @@ static int check_base_sanity(const toonz_param_desc_t *p) {
 
 bool RasterFxPluginHost::setParamStructure(int n, toonz_param_page_t *p,
                                            int &err, void *&pos) {
-  /* 適当に現実的な最大値: あまりに大きい場合は領域の破壊を疑う */
+  /* Reasonable maximum values: if too large, suspect memory corruption */
   static const int max_pages_  = 31;
   static const int max_groups_ = 32;
   static const int max_params_ = 65535;
@@ -707,15 +714,14 @@ bool RasterFxPluginHost::setParamStructure(int n, toonz_param_page_t *p,
   pos = p;
   if (pi_) {
     if (n > max_pages_ || p == NULL) {
-      /* parameter が null
-       * でないことは上位でチェックされているはずで、ここで返せるエラーは定義していない.
+      /* parameter should be non-null as checked above; error not defined here
        */
       if (p == NULL) err |= TOONZ_PARAM_ERROR_UNKNOWN;
       err |= TOONZ_PARAM_ERROR_PAGE_NUM;
       return false;
     }
 
-    /* SAN 値チェック */
+    /* SANity value check */
     for (int k = 0; k < n; k++) {
       toonz_param_page_t *pg = &p[k];
       pos                    = pg;
@@ -889,8 +895,8 @@ void RasterFxPluginHost::createParamsByDesc() {
               "RasterFxPluginHost::createParam: add_param_field: r:0x%x v:%p "
               "p:%p\n",
               r, v, p);
-          /* set_param_range()
-           * の中で型チェックをしているので全型について呼び出してよい */
+          /* set_param_range() does type checking, so it's safe to call for all
+             types */
 
           r = bind_param(page, p, v);
 
@@ -919,7 +925,7 @@ void RasterFxPluginHost::createParamsByDesc() {
 }
 
 /*
-パラメタのキー名として適切か確認
+  Check if the parameter key name is valid
 */
 bool RasterFxPluginHost::validateKeyName(const char *name) {
   if (name[0] == '\0') return false;
@@ -928,7 +934,7 @@ bool RasterFxPluginHost::validateKeyName(const char *name) {
   for (int i = 1; name[i] != '\0'; i++)
     if (!isalnum(name[i]) && name[i] != '_') return false;
 
-  /* XMLの仕様ではXMLから始まるタグ名は認められないので、ここで弾く */
+  /* XML spec forbids tag names starting with 'xml', so reject them here */
   if (strlen(name) >= 3 && (name[0] == 'X' || name[0] == 'x') &&
       (name[1] == 'M' || name[1] == 'm') && (name[2] == 'L' || name[2] == 'l'))
     return false;
@@ -938,8 +944,9 @@ bool RasterFxPluginHost::validateKeyName(const char *name) {
 
 /*
  strict sanity check:
- 未初期化値を受け入れて互換性が崩れないよう厳しくチェックする
- */
+ Strictly check to avoid accepting uninitialized values and breaking
+ compatibility
+*/
 #define VERBOSE
 static inline bool check(const plugin_probe_t *begin,
                          const plugin_probe_t *end) {
@@ -965,14 +972,10 @@ static inline bool check(const plugin_probe_t *begin,
 
   toonz_if_version_t v = begin->ver;
   for (auto x = begin; x < end; x++, idx++) {
-    /* 異なるバージョンの構造体の混在はエラーとする.
-       しかし toonz_plugin_probe_t は reservation filed
-       を持っており、サイズが変わらない限りは混在も対応可能だが、まずは sanity
-       check で落とす.
-
-       For now we permit mixed versions. Not that we never support it since size
-       of toonz_plugin_probe_t is constant.
-    */
+    /* Mixing different versions is an error.
+       However, toonz_plugin_probe_t has reserved fields, and as long as the
+       size doesn't change, mixing might be possible, but we reject it for
+       sanity. */
     if (!(x->ver.major == v.major && x->ver.minor == v.minor)) {
 #if defined(VERBOSE)
       printf(
@@ -1005,7 +1008,7 @@ static inline bool check(const plugin_probe_t *begin,
       }
     }
 
-    // reservations are must be zero
+    // reservations must be zero
     for (int i = 0; i < 3; i++)
       if (x->reserved_ptr_[i]) {
 #if defined(VERBOSE)
@@ -1039,7 +1042,7 @@ static inline bool check(const plugin_probe_t *begin,
 #if defined(VERBOSE)
       printf("sanity check(): plugin[%d] handler is null\n", idx);
 #endif
-      return false;  // handler must be NOT null
+      return false;  // handler must NOT be null
     }
   }
 
@@ -1094,175 +1097,109 @@ static UUID uuid_param_ = {0x2E3E4A55, 0x8539, 0x4520, 0xA266, 0x15D32189EC4D};
 static UUID uuid_setup_ = {0xcfde9107, 0xc59d, 0x414c, 0xae4a, 0x3d115ba97933};
 static UUID uuid_null_  = {0, 0, 0, 0, 0};
 
-template <typename T, int major, int minor>
-T *base_interface_factory() {
-  T *t = new T;
-  memset(t, 0, sizeof(T));
-  t->ver.major = major;
-  t->ver.minor = minor;
-  return t;
-}
-
-template <typename T, uint32_t major, uint32_t minor>
-struct interface_t {
-  static T *factory() {
-    T *t = base_interface_factory<T, major, minor>();
-    return t;
-  }
-};
-
-extern "C" {
-int set_parameter_pages(toonz_node_handle_t, int num,
-                        toonz_param_page_t *params);
-int set_parameter_pages_with_error(toonz_node_handle_t, int num,
-                                   toonz_param_page_t *params, int *, void **);
-}
-
-template <uint32_t major, uint32_t minor>
-struct interface_t<setup_interface_t, major, minor> {
-  static setup_interface_t *factory() {
-    setup_interface_t *t =
-        base_interface_factory<setup_interface_t, major, minor>();
-    t->set_parameter_pages            = set_parameter_pages;
-    t->set_parameter_pages_with_error = set_parameter_pages_with_error;
-    t->add_input_port                 = setup_input_port;
-    return t;
-  }
-};
-
-/*
-template < uint32_t major, uint32_t minor >
-struct interface_t < ui_page_interface_t, major, minor > {
-        static ui_page_interface_t* factory()
-        {
-                ui_page_interface_t* t = base_interface_factory<
-ui_page_interface_t, major, minor >();
-                t->begin_group = begin_group;
-                t->end_group = end_group;
-                t->bind_param = bind_param;
-                return t;
-        }
-};
-
-template < uint32_t major, uint32_t minor >
-struct interface_t < param_view_interface_t, major, minor > {
-        static param_view_interface_t* factory()
-        {
-                param_view_interface_t* t = base_interface_factory<
-param_view_interface_t, major, minor >();
-                t->add_param_field = add_param_field;
-                t->add_custom_field = add_custom_field;
-                t->add_lineedit = add_lineedit;
-                t->add_slider = add_slider;
-                t->add_spinbox = add_spinbox;
-                t->add_checkbox = add_checkbox;
-                t->add_radiobutton = add_radiobutton;
-                t->add_combobox = add_combobox;
-                return t;
-        }
-};
-*/
-
-template <uint32_t major, uint32_t minor>
-struct interface_t<param_interface_t, major, minor> {
-  static param_interface_t *factory() {
-    param_interface_t *t =
-        base_interface_factory<param_interface_t, major, minor>();
-    t->get_type = get_type;
-    // t->hint_default_value = hint_default_value;
-    // t->hint_value_range = hint_value_range;
-    // t->hint_unit = hint_unit;
-    // t->hint_item = hint_item;
-    // t->get_value_type = get_value_type;
-    t->get_value = get_value;
-    // t->set_value = set_value;
-    t->get_string_value   = get_string_value;
-    t->get_spectrum_value = get_spectrum_value;
-    return t;
-  }
-};
-
-template <uint32_t major, uint32_t minor>
-struct interface_t<node_interface_t, major, minor> {
-  static node_interface_t *factory() {
-    node_interface_t *t =
-        base_interface_factory<node_interface_t, major, minor>();
-    // t->add_input_port = add_input_port;
-    // t->add_output_port = add_output_port;
-    t->get_input_port = get_input_port;
-    t->get_rect       = get_rect;
-    t->set_rect       = set_rect;
-    // t->add_preference = add_preference;
-    // t->add_param = add_param;
-    t->get_param = get_param;
-    // t->create_param_view = create_param_view;
-    t->set_user_data = set_user_data;
-    t->get_user_data = get_user_data;
-    return t;
-  }
-};
-
-template <uint32_t major, uint32_t minor>
-struct interface_t<toonz_tile_interface_t, major, minor> {
-  static toonz_tile_interface_t *factory() {
-    toonz_tile_interface_t *t =
-        base_interface_factory<toonz_tile_interface_t, major, minor>();
-    t->get_raw_address_unsafe = tile_interface_get_raw_address_unsafe;
-    t->get_raw_stride         = tile_interface_get_raw_stride;
-    t->get_element_type       = tile_interface_get_element_type;
-    t->copy_rect              = tile_interface_copy_rect;
-    t->create_from            = tile_interface_create_from;
-    t->create                 = tile_interface_create;
-    t->destroy                = tile_interface_destroy;
-    t->get_rectangle          = tile_interface_get_rectangle;
-    t->safen                  = tile_interface_safen;
-    return t;
-  }
-};
-
-template <uint32_t major, uint32_t minor>
-struct interface_t<port_interface_t, major, minor> {
-  static port_interface_t *factory() {
-    port_interface_t *t =
-        base_interface_factory<port_interface_t, major, minor>();
-    t->is_connected = is_connected;
-    t->get_fx       = get_fx;
-    return t;
-  }
-};
-
-template <uint32_t major, uint32_t minor>
-struct interface_t<fxnode_interface_t, major, minor> {
-  static fxnode_interface_t *factory() {
-    fxnode_interface_t *t =
-        base_interface_factory<fxnode_interface_t, major, minor>();
-    t->get_bbox             = fxnode_get_bbox;
-    t->can_handle           = fxnode_can_handle;
-    t->get_input_port_count = fxnode_get_input_port_count;
-    t->get_input_port       = fxnode_get_input_port;
-    t->compute_to_tile      = fxnode_compute_to_tile;
-    return t;
-  }
-};
-
-/*
-template <>
-template < uint32_t major, uint32_t minor >
-struct interface_t< toonz_nodal_rasterfx_interface_t >::i_< major, minor > {
-        static toonz_nodal_rasterfx_interface_t* factory()
-        {
-                printf("toonz_nodal_rasterfx_interface_t::factory\n");
-                toonz_nodal_rasterfx_interface_t* t = base_interface_factory<
-toonz_nodal_rasterfx_interface_t, major, minor >();
-                return t;
-        }
-};
-*/
+// Static global interface instances – no dynamic allocation, so release is
+// no‑op
+static toonz_node_interface_t s_node_iface_1_0;
+static toonz_port_interface_t s_port_iface_1_0;
+static toonz_tile_interface_t s_tile_iface_1_0;
+static toonz_fxnode_interface_t s_fxnode_iface_1_0;
+static toonz_param_interface_t s_param_iface_1_0;
+static toonz_setup_interface_t s_setup_iface_1_0;
 
 template <typename T, uint32_t major, uint32_t minor>
 T *interface_factory() {
-  // return interface_t< T >::i_< major, minor >().factory();
-  return interface_t<T, major, minor>::factory();
+  return nullptr;  // not used
+}
+
+template <>
+toonz_node_interface_t *interface_factory<toonz_node_interface_t, 1, 0>() {
+  if (s_node_iface_1_0.ver.major == 0) {
+    memset(&s_node_iface_1_0, 0, sizeof(s_node_iface_1_0));
+    s_node_iface_1_0.ver.major      = 1;
+    s_node_iface_1_0.ver.minor      = 0;
+    s_node_iface_1_0.get_input_port = get_input_port;
+    s_node_iface_1_0.get_rect       = get_rect;
+    s_node_iface_1_0.set_rect       = set_rect;
+    s_node_iface_1_0.get_param      = get_param;
+    s_node_iface_1_0.set_user_data  = set_user_data;
+    s_node_iface_1_0.get_user_data  = get_user_data;
+  }
+  return &s_node_iface_1_0;
+}
+
+template <>
+toonz_port_interface_t *interface_factory<toonz_port_interface_t, 1, 0>() {
+  if (s_port_iface_1_0.ver.major == 0) {
+    memset(&s_port_iface_1_0, 0, sizeof(s_port_iface_1_0));
+    s_port_iface_1_0.ver.major    = 1;
+    s_port_iface_1_0.ver.minor    = 0;
+    s_port_iface_1_0.is_connected = is_connected;
+    s_port_iface_1_0.get_fx       = get_fx;
+  }
+  return &s_port_iface_1_0;
+}
+
+template <>
+toonz_tile_interface_t *interface_factory<toonz_tile_interface_t, 1, 0>() {
+  if (s_tile_iface_1_0.ver.major == 0) {
+    memset(&s_tile_iface_1_0, 0, sizeof(s_tile_iface_1_0));
+    s_tile_iface_1_0.ver.major = 1;
+    s_tile_iface_1_0.ver.minor = 0;
+    s_tile_iface_1_0.get_raw_address_unsafe =
+        tile_interface_get_raw_address_unsafe;
+    s_tile_iface_1_0.get_raw_stride   = tile_interface_get_raw_stride;
+    s_tile_iface_1_0.get_element_type = tile_interface_get_element_type;
+    s_tile_iface_1_0.copy_rect        = tile_interface_copy_rect;
+    s_tile_iface_1_0.create_from      = tile_interface_create_from;
+    s_tile_iface_1_0.create           = tile_interface_create;
+    s_tile_iface_1_0.destroy          = tile_interface_destroy;
+    s_tile_iface_1_0.get_rectangle    = tile_interface_get_rectangle;
+    s_tile_iface_1_0.safen            = tile_interface_safen;
+  }
+  return &s_tile_iface_1_0;
+}
+
+template <>
+toonz_fxnode_interface_t *interface_factory<toonz_fxnode_interface_t, 1, 0>() {
+  if (s_fxnode_iface_1_0.ver.major == 0) {
+    memset(&s_fxnode_iface_1_0, 0, sizeof(s_fxnode_iface_1_0));
+    s_fxnode_iface_1_0.ver.major            = 1;
+    s_fxnode_iface_1_0.ver.minor            = 0;
+    s_fxnode_iface_1_0.get_bbox             = fxnode_get_bbox;
+    s_fxnode_iface_1_0.can_handle           = fxnode_can_handle;
+    s_fxnode_iface_1_0.get_input_port_count = fxnode_get_input_port_count;
+    s_fxnode_iface_1_0.get_input_port       = fxnode_get_input_port;
+    s_fxnode_iface_1_0.compute_to_tile      = fxnode_compute_to_tile;
+  }
+  return &s_fxnode_iface_1_0;
+}
+
+template <>
+toonz_param_interface_t *interface_factory<toonz_param_interface_t, 1, 0>() {
+  if (s_param_iface_1_0.ver.major == 0) {
+    memset(&s_param_iface_1_0, 0, sizeof(s_param_iface_1_0));
+    s_param_iface_1_0.ver.major          = 1;
+    s_param_iface_1_0.ver.minor          = 0;
+    s_param_iface_1_0.get_type           = get_type;
+    s_param_iface_1_0.get_value          = get_value;
+    s_param_iface_1_0.get_string_value   = get_string_value;
+    s_param_iface_1_0.get_spectrum_value = get_spectrum_value;
+  }
+  return &s_param_iface_1_0;
+}
+
+template <>
+toonz_setup_interface_t *interface_factory<toonz_setup_interface_t, 1, 0>() {
+  if (s_setup_iface_1_0.ver.major == 0) {
+    memset(&s_setup_iface_1_0, 0, sizeof(s_setup_iface_1_0));
+    s_setup_iface_1_0.ver.major           = 1;
+    s_setup_iface_1_0.ver.minor           = 0;
+    s_setup_iface_1_0.set_parameter_pages = set_parameter_pages;
+    s_setup_iface_1_0.set_parameter_pages_with_error =
+        set_parameter_pages_with_error;
+    s_setup_iface_1_0.add_input_port = setup_input_port;
+  }
+  return &s_setup_iface_1_0;
 }
 
 static int query_interface(const UUID *uuid, void **interf) {
@@ -1294,8 +1231,7 @@ static int query_interface(const UUID *uuid, void **interf) {
           break;
         // case 4:
         //	*interf = interface_factory< toonz_ui_page_interface_t, 1, 0
-        //>();
-        //	break;
+        //>(); 	break;
         case 5:
           *interf = interface_factory<toonz_fxnode_interface_t, 1, 0>();
           break;
@@ -1325,7 +1261,7 @@ static int query_interface(const UUID *uuid, void **interf) {
 }
 
 static void release_interface(void *interf) {
-  if (interf) delete interf;
+  // All interfaces are static global, nothing to delete
 }
 
 Loader::Loader() {}
@@ -1373,11 +1309,11 @@ void Loader::doLoad(const QString &file) {
   if (handle) {
     pi->library_ = library_t(handle, end_library);  // shared_ptr
                                                     /*
-probe に使う plugin 情報を探す.
-テーブルを export
-                                                    したほうが楽だが、開発者はデバッグしにくいので関数フォームも提供する.
-toonz_plugin_info で検索し、なければ toonz_plugin_probe() を呼び出す.
-*/
+                                                      Look for plugin information to probe.
+                                                      It's easier to export a table, but developers may find debugging hard,
+                                                      so we also provide a function form.
+                                                      Search for toonz_plugin_info; if not found, call toonz_plugin_probe().
+                                                    */
 #if defined(_WIN32) || defined(_CYGWIN_)
     auto ini = (int (*)(host_interface_t *))GetProcAddress(handle,
                                                            "toonz_plugin_init");
@@ -1444,9 +1380,8 @@ toonz_plugin_info で検索し、なければ toonz_plugin_probe() を呼び出�
       printf("plugin count:%d begin:%p end:%p\n", plugin_num, probinfo_begin,
              probinfo_end);
 
-      /* sanity check に失敗した場合は予期せぬアドレスを参照して toonz
-         本体ごと落ちる可能性があるので
-         致命的エラー扱いで早期に抜ける. */
+      /* If sanity check fails, it could reference unexpected addresses and
+         crash Toonz itself, so treat as fatal and exit early. */
       if (!probinfo_begin || !probinfo_end ||
           !check(probinfo_begin, probinfo_end))
         throw std::domain_error("ill-formed plugin information");
@@ -1455,18 +1390,16 @@ toonz_plugin_info で検索し、なければ toonz_plugin_probe() を呼び出�
            probinfo < probinfo_end; probinfo++) {
         pi->desc_                       = new PluginDescription(probinfo);
         nodal_rasterfx_handler_t *nodal = probinfo->handler;
-        /* probinfo は sanity check 通過済みなのでチェック不要. handler は null
-         * でないことのみが確認されている */
+        /* probinfo passed sanity check, handler only confirmed non-null */
         if (is_compatible<nodal_rasterfx_handler_t, 1, 0>(*nodal)) {
           uint32_t c = probinfo->clss & ~(TOONZ_PLUGIN_CLASS_MODIFIER_MASK);
-          uint32_t m = probinfo->clss & (TOONZ_PLUGIN_CLASS_MODIFIER_MASK);
           if (c == TOONZ_PLUGIN_CLASS_POSTPROCESS_SLAB) {
             pi->handler_ = new nodal_rasterfx_handler_t;
             if (!check_and_copy(pi->handler_, nodal))
               throw std::domain_error("ill-formed nodal interface");
           } else {
             // unknown plugin-class : gracefully end
-            /* sanity check しているので来ないはずだ */
+            /* sanity check should prevent this */
           }
         } else {
           // unknown version : gracefully end
@@ -1477,8 +1410,8 @@ toonz_plugin_info で検索し、なければ toonz_plugin_probe() を呼び出�
         if (pi) {
           try {
             if (pi->ini_) {
-              /* interface は plugin 内部で破壊されても他に影響させないため
-               * plugin instance ごとに割り当てる.  */
+              /* interface is allocated per plugin instance to avoid affecting
+                 others if destroyed inside plugin. */
               host_interface_t *host  = new host_interface_t;
               host->ver.major         = 1;
               host->ver.minor         = 0;
@@ -1493,9 +1426,8 @@ toonz_plugin_info で検索し、なければ toonz_plugin_probe() を呼び出�
               pi->host_ = host;
               pi->decl_ = new PluginDeclaration(pi);
             } else {
-              /* もっと早期にエラーを出して終了することもできるが
-                 センシティブすぎると見通しが立てにくいのである程度我慢してから出す
-                 */
+              /* Could exit earlier, but being too sensitive makes debugging
+                 hard, so tolerate to some extent. */
               throw std::domain_error("not found _toonz_plugin_init");
             }
           } catch (const std::exception &e) {
@@ -1510,7 +1442,7 @@ toonz_plugin_info で検索し、なければ toonz_plugin_probe() を呼び出�
             /* for a next plugin on the library */
             auto prev = pi->library_;
             pi        = new PluginInformation;
-            /* instance に依存しない unique なリソースは引き継ぐ必要がある */
+            /* instance‑independent unique resources need to be carried over */
             pi->library_ = prev;
             pi->ini_     = ini;
             pi->fin_     = fin;
@@ -1522,14 +1454,16 @@ toonz_plugin_info で検索し、なければ toonz_plugin_probe() を呼び出�
       delete pi;
       pi = NULL;
     }
+  } else {
+    // handle is null – plugin load failed, delete pi to avoid leak
+    delete pi;
   }
 }
 
 void RasterFxPluginHost::createPortsByDesc() {
   if (pi_) {
     for (auto pm : pi_->port_mapper_) {
-      /* TRasterFxPort は non-copyable
-       * なスマートポインタなのでポインタで引き回す */
+      /* TRasterFxPort is a non-copyable smart pointer, so pass it as pointer */
       printf("createPortsByDesc: name:%s dir:%d type:%d\n", pm.first.c_str(),
              pm.second.input_, pm.second.type_);
       if (pm.second.input_) {
@@ -1539,8 +1473,8 @@ void RasterFxPluginHost::createPortsByDesc() {
         }
       } else {
         auto p = new TRasterFxPort();
-        /* TRasterFxPort は non-copyable
-         * なスマートポインタなのでポインタで引き回す */
+        /* TRasterFxPort is a non-copyable smart pointer, so pass it as pointer
+         */
         if (addOutputPort(pm.first, p)) {  // overloaded version
           delete p;
           printf("createPortsByDesc: failed to add: already have\n");
@@ -1551,7 +1485,7 @@ void RasterFxPluginHost::createPortsByDesc() {
 }
 
 /*
- TODO: addfxcontextmenu に移したほうがいい
+ TODO: should be moved to addfxcontextmenu
  */
 PluginLoadController::PluginLoadController(const std::string &basedir,
                                            QObject *listener) {
@@ -1559,13 +1493,11 @@ PluginLoadController::PluginLoadController(const std::string &basedir,
 
   ld->moveToThread(&work_entity);
   connect(&work_entity, &QThread::finished, ld, &QObject::deleteLater);
-  /* AddFxContextMenu から呼ばれていたが、プラグインの検索が load_entries()
-     を通じて起動時に呼ばれるようにした関係で,
-     (あまりよくはないが)listener の有無によって receiver
-     を分けるようにしている. listener がいる場合は従来通り context menu
-     の構築のために AddFxContextMenu::fixup() に接続するが それ以外では
-     plugin_dict_ への追加のため PluginLoadController::finished に接続する.
-  */
+  /* Was called from AddFxContextMenu, but now plugin search is done at startup
+     via load_entries(). To keep backward compatibility, we distinguish
+     receivers based on presence of listener. If listener exists, connect to
+     AddFxContextMenu::fixup() for context menu building; otherwise connect to
+     PluginLoadController::finished() to add to plugin_dict_. */
   if (listener) {
     AddFxContextMenu *a = qobject_cast<AddFxContextMenu *>(listener);
     connect(ld, &Loader::fixup, a, &AddFxContextMenu::fixup);
@@ -1589,10 +1521,10 @@ void PluginLoadController::finished() {
 }
 
 void PluginLoadController::result(PluginInformation *pi) {
-  /* slot receives PluginInformation on the main thread たぶん */
+  /* slot receives PluginInformation on the main thread (probably) */
   printf("PluginLoadController::result() pi:%p\n", pi);
   if (pi) {
-    /* addfxcontextmenu.cpp の dict に登録する */
+    /* register in dictionary (addfxcontextmenu.cpp) */
     plugin_dict_.insert(
         std::pair<std::string, PluginInformation *>(pi->desc_->id_, pi));
   }

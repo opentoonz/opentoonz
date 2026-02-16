@@ -1,9 +1,9 @@
 #pragma once
-
 #ifndef SCRIPTBINDING_CENTERLINE_VECTORIZER_H
 #define SCRIPTBINDING_CENTERLINE_VECTORIZER_H
 
 #include "toonz/scriptbinding.h"
+#include <memory>
 
 class ToonzScene;
 class TXshSimpleLevel;
@@ -12,11 +12,10 @@ namespace TScriptBinding {
 
 class DVAPI CenterlineVectorizer final : public Wrapper {
   Q_OBJECT
-  CenterlineConfiguration *m_parameters;
+  std::unique_ptr<CenterlineConfiguration> m_parameters;
 
 public:
   CenterlineVectorizer();
-  ~CenterlineVectorizer();
 
   Q_INVOKABLE QScriptValue toString();
   WRAPPER_STD_METHODS(CenterlineVectorizer)
@@ -58,7 +57,7 @@ public:
   void setEir(bool v);
 
 private:
-  QScriptValue vectorizeImage(const TImageP &src1, TPalette *palette);
+  QScriptValue vectorizeImage(const TImageP &src, TPalette *palette);
 };
 
 }  // namespace TScriptBinding
