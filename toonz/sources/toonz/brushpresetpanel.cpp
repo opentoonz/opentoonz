@@ -1169,7 +1169,8 @@ BrushPresetPanel::BrushPresetPanel(QWidget *parent)
     , m_useSampleStrokes(false)
     , m_currentPageIndex(0)
     , m_checkboxMode(false)
-    , m_clipboardIsCut(false) {
+    , m_clipboardIsCut(false)
+    , m_suppressRefresh(false) {
   
   // Load preferences from settings FIRST (before creating UI)
   QSettings settings;
@@ -2155,6 +2156,8 @@ void BrushPresetPanel::onToolComboBoxListChanged(std::string id) {
   // Refresh list if preset combo has changed
   // This captures additions/deletions from the ToolOptionsBar
   if (id == "Preset:") {
+    // Skip if a compound operation (paste/rename) is in progress
+    if (m_suppressRefresh) return;
     // Force refresh even if we are on the same tool type
     refreshPresetList();
   }
@@ -2620,6 +2623,21 @@ void BrushPresetPanel::showPresetContextMenu(const QPoint &globalPos, const QStr
     ToolPresetCommandManager::instance()->refreshPresetCommands();
   });
   
+  // Rename (only for single selection)
+  if (selCount == 1) {
+    QAction *renameAction = menu.addAction(tr("Rename"));
+    connect(renameAction, &QAction::triggered, [this, presetName]() {
+      PresetNamePopup popup(this);
+      popup.setWindowTitle(tr("Rename Preset"));
+      if (popup.exec() == QDialog::Accepted) {
+        QString newName = popup.getName().trimmed();
+        if (!newName.isEmpty() && newName != presetName) {
+          renamePreset(presetName, newName);
+        }
+      }
+    });
+  }
+  
   // Separator before page-specific actions
   if (getPageCount() > 1) {
     menu.addSeparator();
@@ -2672,16 +2690,17 @@ void BrushPresetPanel::pastePresetsToCurrentPage() {
   BrushPresetPage *currentPage = getCurrentPage();
   if (!currentPage) return;
   
-  for (const QString &presetName : m_clipboardPresets) {
-    if (!currentPage->hasPreset(presetName)) {
-      currentPage->addPreset(presetName);
-    }
-  }
+  // Suppress intermediate refreshes triggered by MI_AddBrushPreset notifications
+  m_suppressRefresh = true;
   
-  // If cut mode, remove from source page
   if (m_clipboardIsCut) {
-    // The source page is not necessarily the current page,
-    // so we need to find and remove from all pages that contain these presets
+    // Cut mode: move presets (same name, remove from source pages)
+    for (const QString &presetName : m_clipboardPresets) {
+      if (!currentPage->hasPreset(presetName)) {
+        currentPage->addPreset(presetName);
+      }
+    }
+    // Remove from all other pages
     QList<BrushPresetPage*> &pages = m_pages[m_currentToolType];
     for (BrushPresetPage *page : pages) {
       if (page == currentPage) continue;
@@ -2690,11 +2709,160 @@ void BrushPresetPanel::pastePresetsToCurrentPage() {
       }
     }
     m_clipboardIsCut = false;
+  } else {
+    // Copy mode: create true duplicates with unique names
+    // This ensures each pasted preset is independent from the original
+    for (const QString &presetName : m_clipboardPresets) {
+      QString newName = generateUniqueCopyName(presetName);
+      if (duplicatePresetInFile(presetName, newName)) {
+        currentPage->addPreset(newName);
+      }
+    }
   }
+  
+  m_suppressRefresh = false;
   
   m_clipboardPresets.clear();
   savePageConfiguration();
   refreshPresetList();
+  ToolPresetCommandManager::instance()->refreshPresetCommands();
+}
+
+//-----------------------------------------------------------------------------
+// Generate a unique copy name (e.g., "MyBrush (Copy)", "MyBrush (Copy 2)")
+//-----------------------------------------------------------------------------
+
+QString BrushPresetPanel::generateUniqueCopyName(const QString &baseName) {
+  // Collect all known preset names from the tool's Preset: property
+  QSet<QString> existingNames;
+  TTool *tool = getCurrentBrushTool();
+  if (tool) {
+    TPropertyGroup *props = tool->getProperties(0);
+    if (props) {
+      for (int i = 0; i < props->getPropertyCount(); ++i) {
+        TProperty *prop = props->getProperty(i);
+        if (prop->getName() == "Preset:") {
+          TEnumProperty *presetProp = dynamic_cast<TEnumProperty*>(prop);
+          if (presetProp) {
+            const std::vector<std::wstring> &range = presetProp->getRange();
+            for (const std::wstring &w : range) {
+              existingNames.insert(QString::fromStdWString(w));
+            }
+          }
+          break;
+        }
+      }
+    }
+  }
+  
+  // Also check all page references (some presets may be in pages but not yet synced)
+  QList<BrushPresetPage*> &pages = m_pages[m_currentToolType];
+  for (BrushPresetPage *page : pages) {
+    const QStringList &names = page->getPresetNames();
+    for (const QString &n : names) {
+      existingNames.insert(n);
+    }
+  }
+  
+  // Generate unique name
+  QString candidate = baseName + " (Copy)";
+  if (!existingNames.contains(candidate)) return candidate;
+  
+  for (int i = 2; i < 1000; ++i) {
+    candidate = baseName + QString(" (Copy %1)").arg(i);
+    if (!existingNames.contains(candidate)) return candidate;
+  }
+  
+  return baseName + " (Copy)";  // Fallback
+}
+
+//-----------------------------------------------------------------------------
+// Duplicate a preset: apply the source, then add as new with the given name
+//-----------------------------------------------------------------------------
+
+bool BrushPresetPanel::duplicatePresetInFile(const QString &srcName, const QString &newName) {
+  TTool *tool = getCurrentBrushTool();
+  if (!tool || tool->getName() != T_Brush) return false;
+  
+  // Save current preset selection to restore later
+  QString previousPreset = m_currentPreset;
+  
+  // Step 1: Apply the source preset (loads all its settings into the tool)
+  TPropertyGroup *props = tool->getProperties(0);
+  if (!props) return false;
+  
+  TEnumProperty *presetProp = nullptr;
+  for (int i = 0; i < props->getPropertyCount(); ++i) {
+    TProperty *prop = props->getProperty(i);
+    if (prop->getName() == "Preset:") {
+      presetProp = dynamic_cast<TEnumProperty*>(prop);
+      break;
+    }
+  }
+  if (!presetProp) return false;
+  
+  // Load source preset into tool
+  presetProp->setValue(srcName.toStdWString());
+  tool->onPropertyChanged("Preset:");
+  
+  // Step 2: Add the preset with the new name (saves tool's current state)
+  BrushPresetBridge::setPendingPresetName(newName);
+  CommandManager::instance()->execute(MI_AddBrushPreset);
+  
+  // Step 3: Restore original preset
+  if (!previousPreset.isEmpty() && 
+      previousPreset != QString::fromStdWString(L"<custom>")) {
+    presetProp->setValue(previousPreset.toStdWString());
+    tool->onPropertyChanged("Preset:");
+  }
+  
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+// Rename a preset: duplicate with new name, then delete the old one
+//-----------------------------------------------------------------------------
+
+void BrushPresetPanel::renamePreset(const QString &oldName, const QString &newName) {
+  if (oldName.isEmpty() || newName.isEmpty() || oldName == newName) return;
+  
+  TTool *tool = getCurrentBrushTool();
+  if (!tool || tool->getName() != T_Brush) return;
+  
+  // Suppress intermediate refreshes during the compound operation
+  m_suppressRefresh = true;
+  
+  // Step 1: Duplicate the preset with the new name (old still exists on disk)
+  if (!duplicatePresetInFile(oldName, newName)) {
+    m_suppressRefresh = false;
+    return;
+  }
+  
+  // Step 2: Remove the old preset from disk
+  BrushPresetBridge::addPendingRemoveName(oldName);
+  CommandManager::instance()->execute(MI_RemoveBrushPresetByName);
+  
+  m_suppressRefresh = false;
+  
+  // Step 3: Update all page references in-place (preserves position)
+  QList<BrushPresetPage*> &pages = m_pages[m_currentToolType];
+  for (BrushPresetPage *page : pages) {
+    if (page->hasPreset(oldName)) {
+      page->replacePreset(oldName, newName);
+    }
+    if (page->getLastSelectedPreset() == oldName) {
+      page->setLastSelectedPreset(newName);
+    }
+  }
+  
+  // Step 4: Save, refresh, and select the renamed preset
+  m_currentPreset = newName;
+  savePageConfiguration();
+  refreshPresetList();
+  ToolPresetCommandManager::instance()->refreshPresetCommands();
+  
+  // Apply the renamed preset
+  applyPreset(newName);
 }
 
 void BrushPresetPanel::deleteSelectedPresets() {
@@ -2958,7 +3126,8 @@ void BrushPresetPanel::movePageTab(int srcIndex, int dstIndex) {
     }
   }
   
-  // Move tab (Qt handles the visual move)
+  // Block signals during tab move to prevent stale refreshes from currentChanged
+  m_tabBar->blockSignals(true);
   m_tabBar->moveTab(srcIndex, dstIndex);
   
   // Update current page index if it was moved
@@ -2970,10 +3139,14 @@ void BrushPresetPanel::movePageTab(int srcIndex, int dstIndex) {
     m_currentPageIndex++;
   }
   
+  // Sync tab bar to the updated current page index
+  m_tabBar->setCurrentIndex(m_currentPageIndex);
+  m_tabBar->blockSignals(false);
+  
   // Save configuration
   savePageConfiguration();
   
-  // Refresh display
+  // Force refresh to show correct content for the current page after swap
   refreshPresetList();
 }
 

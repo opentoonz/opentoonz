@@ -144,6 +144,13 @@ public:
   void addPreset(const QString &presetName) { m_presetNames.append(presetName); }
   void removePreset(const QString &presetName) { m_presetNames.removeAll(presetName); }
   bool hasPreset(const QString &presetName) const { return m_presetNames.contains(presetName); }
+  // Replace a preset name in-place (preserves position in the list)
+  bool replacePreset(const QString &oldName, const QString &newName) {
+    int idx = m_presetNames.indexOf(oldName);
+    if (idx < 0) return false;
+    m_presetNames[idx] = newName;
+    return true;
+  }
   int getPresetCount() const { return m_presetNames.size(); }
   
   QString getLastSelectedPreset() const { return m_lastSelectedPreset; }
@@ -245,6 +252,9 @@ private:
   QStringList m_clipboardPresets;  // Preset names in clipboard
   bool m_clipboardIsCut;           // true = cut (remove from source), false = copy
   
+  // Guard flag to suppress intermediate refreshes during compound operations
+  bool m_suppressRefresh;
+  
 public:
   BrushPresetPanel(QWidget *parent = nullptr);
   ~BrushPresetPanel();
@@ -311,6 +321,11 @@ private:
   void cutSelectedPresets();
   void pastePresetsToCurrentPage();
   void deleteSelectedPresets();
+  
+  // Preset duplication and renaming
+  QString generateUniqueCopyName(const QString &baseName);
+  bool duplicatePresetInFile(const QString &srcName, const QString &newName);
+  void renamePreset(const QString &oldName, const QString &newName);
   
   // Page/Tab management (internal methods)
   void initializeTabs();
