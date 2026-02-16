@@ -30,6 +30,25 @@ class LineEdit;
 }
 
 //=============================================================================
+// Preset Rendering Data (for dynamic fallback graphics)
+//=============================================================================
+
+// Stores essential visual properties of a preset for rendering
+struct PresetRenderData {
+  double minThickness;
+  double maxThickness;
+  double hardness;
+  double minOpacity;
+  double maxOpacity;
+  bool isPencil;
+  bool hasData;  // true if data was successfully loaded
+  
+  PresetRenderData() 
+    : minThickness(1.0), maxThickness(5.0), hardness(100.0),
+      minOpacity(100.0), maxOpacity(100.0), isPencil(false), hasData(false) {}
+};
+
+//=============================================================================
 // BrushPresetItem - A widget representing an individual preset
 //=============================================================================
 
@@ -38,6 +57,7 @@ class BrushPresetItem : public QToolButton {
   
   QString m_presetName;
   QString m_toolType;  // "vector", "toonzraster", or "raster"
+  PresetRenderData m_renderData;  // Preset visual properties for dynamic rendering
   QPixmap m_iconPixmap;
   QPixmap m_scaledIconCache;  // Scaled icon (fixed)
   bool m_hasIcon;
@@ -48,12 +68,13 @@ class BrushPresetItem : public QToolButton {
   bool m_showBackgrounds; // true = show backgrounds, false = transparent backgrounds
   bool m_checkboxVisible; // true = show checkbox for multi-select
   bool m_isMultiSelected; // true = checked in multi-select mode
+  bool m_useSampleStrokes; // true = use sample strokes for fallback, false = use generic icons
   
   // Drag & Drop state
   QPoint m_dragStartPosition;
   
 public:
-  BrushPresetItem(const QString &presetName, const QString &toolType, bool isListMode, QWidget *parent = nullptr);
+  BrushPresetItem(const QString &presetName, const QString &toolType, bool isListMode, bool useSampleStrokes, QWidget *parent = nullptr);
   
   QString getPresetName() const { return m_presetName; }
   QString getToolType() const { return m_toolType; }
@@ -86,6 +107,7 @@ protected:
   
 private:
   QString findCustomPresetIcon(const QString &presetName);
+  void drawDynamicFallback(QPainter &painter, const QRect &iconRect) const;
   
 signals:
   void presetSelected(const QString &presetName, const QString &toolType);
@@ -208,6 +230,7 @@ private:
   int m_currentColumns;  // Current number of columns (dynamic based on width)
   bool m_showBorders;     // Show or hide cell borders
   bool m_showBackgrounds; // Show or hide cell backgrounds (for cleaner appearance)
+  bool m_useSampleStrokes; // true = draw sample strokes for fallback, false = use generic icons
   int m_currentPageIndex; // Current selected page/tab index
   
   // Page/Tab management (modeled after TPalette::Page structure)

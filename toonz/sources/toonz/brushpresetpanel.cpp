@@ -1,5 +1,8 @@
 #include "brushpresetpanel.h"
 
+// Standard includes
+#include <cmath>
+
 // ToonzQt includes
 #include "tapp.h"
 #include "menubarcommandids.h"
@@ -23,6 +26,7 @@
 #include "tenv.h"
 #include "tfilepath.h"
 #include "tsystem.h"
+#include "tstream.h"
 
 // Tools includes
 #include "tools/tool.h"
@@ -44,6 +48,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QPainter>
+#include <QPainterPath>
 #include <QStyle>
 #include <QStyleOptionToolButton>
 #include <QLineEdit>
@@ -98,10 +103,103 @@ public:
 };
 
 //=============================================================================
+// Helper function to load preset render data from disk
+//=============================================================================
+
+namespace {
+PresetRenderData loadPresetRenderData(const QString &presetName, const QString &toolType) {
+  PresetRenderData data;
+  data.hasData = false;
+  
+  // Determine preset file path based on tool type
+  TFilePath presetFilePath;
+  if (toolType == "vector") {
+    presetFilePath = TEnv::getConfigDir() + "brush_vector.txt";
+  } else if (toolType == "toonzraster") {
+    presetFilePath = TEnv::getConfigDir() + "brush_toonzraster.txt";
+  } else if (toolType == "raster") {
+    presetFilePath = TEnv::getConfigDir() + "brush_raster.txt";
+  } else {
+    return data;  // Unknown tool type
+  }
+  
+  // Try to load preset file
+  try {
+    TIStream is(presetFilePath);
+    std::string tagName;
+    std::wstring wPresetName = presetName.toStdWString();
+    
+    while (is.matchTag(tagName)) {
+      if (tagName == "version") {
+        int major, minor;
+        is >> major >> minor;
+        is.matchEndTag();
+      } else if (tagName == "brushes") {
+        while (is.matchTag(tagName)) {
+          if (tagName == "brush") {
+            // Parse brush entry
+            std::wstring name;
+            double minThick = 1.0, maxThick = 5.0, hardness = 100.0;
+            double minOp = 100.0, maxOp = 100.0;
+            int pencil = 0;
+            
+            while (is.matchTag(tagName)) {
+              if (tagName == "Name") {
+                is >> name;
+                is.matchEndTag();
+              } else if (tagName == "Thickness") {
+                is >> minThick >> maxThick;
+                is.matchEndTag();
+              } else if (tagName == "Hardness") {
+                is >> hardness;
+                is.matchEndTag();
+              } else if (tagName == "Opacity") {
+                is >> minOp >> maxOp;
+                is.matchEndTag();
+              } else if (tagName == "Pencil") {
+                is >> pencil;
+                is.matchEndTag();
+              } else {
+                is.skipCurrentTag();
+              }
+            }
+            
+            // Check if this is the preset we're looking for
+            if (name == wPresetName) {
+              data.minThickness = minThick;
+              data.maxThickness = maxThick;
+              data.hardness = hardness;
+              data.minOpacity = minOp;
+              data.maxOpacity = maxOp;
+              data.isPencil = (pencil != 0);
+              data.hasData = true;
+              is.matchEndTag();
+              return data;  // Found it!
+            }
+            
+            is.matchEndTag();
+          } else {
+            is.skipCurrentTag();
+          }
+        }
+        is.matchEndTag();
+      } else {
+        is.skipCurrentTag();
+      }
+    }
+  } catch (...) {
+    // Failed to load - keep hasData = false
+  }
+  
+  return data;
+}
+}  // namespace
+
+//=============================================================================
 // BrushPresetItem implementation
 //=============================================================================
 
-BrushPresetItem::BrushPresetItem(const QString &presetName, const QString &toolType, bool isListMode, QWidget *parent)
+BrushPresetItem::BrushPresetItem(const QString &presetName, const QString &toolType, bool isListMode, bool useSampleStrokes, QWidget *parent)
     : QToolButton(parent)
     , m_presetName(presetName)
     , m_toolType(toolType)
@@ -112,7 +210,8 @@ BrushPresetItem::BrushPresetItem(const QString &presetName, const QString &toolT
     , m_showBorders(true)
     , m_showBackgrounds(true)
     , m_checkboxVisible(false)
-    , m_isMultiSelected(false) {
+    , m_isMultiSelected(false)
+    , m_useSampleStrokes(useSampleStrokes) {
   
   setText(presetName);
   setCheckable(true);
@@ -128,6 +227,31 @@ BrushPresetItem::BrushPresetItem(const QString &presetName, const QString &toolT
   } else {
     setDefaultIcon(toolType);
     m_isCustomIcon = false;  // Generated icon
+  }
+  
+  // Load preset render data for dynamic fallback graphics
+  // (only needed if no custom icon is available)
+  if (customIconPath.isEmpty()) {
+    // Check if this is a Universal Size preset (format: "[Size] NNN")
+    if (presetName.startsWith("[Size] ") || presetName.startsWith("[Size ")) {
+      // Create synthetic render data for size preset
+      QString sizeStr = presetName;
+      sizeStr.remove("[Size] ").remove("[Size ").remove("]");
+      bool ok;
+      double size = sizeStr.toDouble(&ok);
+      if (ok) {
+        m_renderData.hasData = true;
+        m_renderData.maxThickness = size;
+        m_renderData.minThickness = size;
+        m_renderData.hardness = 100.0;
+        m_renderData.minOpacity = 100.0;
+        m_renderData.maxOpacity = 100.0;
+        m_renderData.isPencil = false;
+      }
+    } else {
+      // Regular brush preset - load from file
+      m_renderData = loadPresetRenderData(presetName, toolType);
+    }
   }
   
   // Create scaled version of icon (FIXED)
@@ -303,6 +427,272 @@ void BrushPresetItem::updateScaledIcon() {
                                           Qt::SmoothTransformation);
 }
 
+//-----------------------------------------------------------------------------
+
+void BrushPresetItem::drawDynamicFallback(QPainter &painter, const QRect &iconRect) const {
+  if (!m_renderData.hasData) return;
+  
+  painter.save();
+  painter.setRenderHint(QPainter::Antialiasing, true);
+  
+  // Check if this is a size preset (pattern: [Size] NNN or [Size NNN])
+  bool isSizePreset = m_presetName.startsWith("[Size] ") || m_presetName.startsWith("[Size ");
+  
+  if (isSizePreset) {
+    // ==== SIZE PRESET: Progressive top-cropping circle + number ====
+    // Small sizes: full circle (small).
+    // As size grows, circle grows and gets progressively cropped from the TOP.
+    // Around size 200+, only the bottom half remains (half-circle).
+    QString sizeStr = m_presetName;
+    sizeStr.remove("[Size] ").remove("[Size ").remove("]");
+    double sizeVal = sizeStr.toDouble();
+    
+    // Font for the number
+    QFont numFont = font();
+    int fontSize = qMax(8, qMin(14, iconRect.height() / 4));
+    numFont.setPixelSize(fontSize);
+    numFont.setBold(true);
+    QFontMetrics fm(numFont);
+    int textH = fm.height();
+    
+    // Available space above text
+    int availH = iconRect.height() - textH - 3;
+    int maxDiam = qMin(iconRect.width() - 2, (int)(availH * 1.8));
+    maxDiam = qMax(8, maxDiam);
+    
+    // Variable circle diameter (log scale from 0.5..1000)
+    double minSz = 0.5, maxSz = 1000.0;
+    double logMin = std::log(minSz + 1.0);
+    double logMax = std::log(maxSz + 1.0);
+    double logVal = std::log(qMax(sizeVal, minSz) + 1.0);
+    double ratio = (logVal - logMin) / (logMax - logMin);
+    ratio = qMax(0.0, qMin(1.0, ratio));
+    
+    int circleDiam = (int)(maxDiam * (0.15 + 0.85 * ratio));
+    circleDiam = qMax(6, circleDiam);
+    
+    // Bottom of the circle sits at the text baseline
+    int cx = iconRect.center().x();
+    int circleBottom = iconRect.top() + availH;
+    int circleTop = circleBottom - circleDiam;
+    
+    // Clip top: if circle extends above available area, crop from top
+    int clipTop = iconRect.top();
+    
+    // Draw the circle. If it overflows the top, use a horizontal clip rect
+    // so only the top is hidden — sides remain fully intact (like a horizontal mask).
+    QRect circleRect(cx - circleDiam / 2, circleTop, circleDiam, circleDiam);
+    
+    if (circleTop < clipTop) {
+      // Circle extends above the available area: clip horizontally from the top.
+      // The clip rect spans the full width but starts at clipTop.
+      painter.setClipRect(QRect(iconRect.left(), clipTop,
+                                iconRect.width(), circleBottom - clipTop));
+    }
+    
+    painter.setPen(QPen(QColor(180, 180, 180), 1));
+    painter.setBrush(QColor(255, 255, 255));
+    painter.drawEllipse(circleRect);
+    
+    // Remove clip region so it does not affect subsequent drawing
+    if (circleTop < clipTop) {
+      painter.setClipping(false);
+    }
+    
+    // Size number below the shape
+    painter.setPen(palette().color(QPalette::Text));
+    painter.setFont(numFont);
+    QRect textRect(iconRect.left(), circleBottom + 1,
+                   iconRect.width(), textH + 2);
+    painter.drawText(textRect, Qt::AlignHCenter | Qt::AlignTop, sizeStr);
+    
+  } else {
+    // ==== BRUSH PRESET: Horizontal undulation sample stroke ====
+    // Smooth double-wave: first half rises (hump), second half dips (valley).
+    // Fills full iconRect width with tapered pointed tips.
+    // Taper shape adapts to brush type (native vs overlay).
+    // Texture varies: raster=grainy, toonzraster=light grain, vector=smooth.
+    
+    double minThick = m_renderData.minThickness;
+    double maxThick = m_renderData.maxThickness;
+    double avgThick = (minThick + maxThick) / 2.0;
+    double avgOpacity = (m_renderData.minOpacity + m_renderData.maxOpacity) / 2.0;
+    
+    // Stroke max height: proportional to thickness, capped at 50% of icon height
+    double maxH = iconRect.height() * 0.50;
+    double strokeH = qMax(3.0, qMin(maxH, avgThick * iconRect.height() / 12.0));
+    strokeH = qMax(strokeH, 5.0);
+    
+    // If opacity is 0 (tool doesn't support opacity, e.g. Toonz Raster),
+    // treat as fully opaque since the brush always paints at full intensity.
+    double alpha;
+    if (avgOpacity < 0.01)
+      alpha = 1.0;
+    else
+      alpha = qMax(0.3, qMin(1.0, avgOpacity / 100.0));
+    
+    // Hardness influences stroke brightness and crispness.
+    // High hardness (100) -> pure white, crisp edges.
+    // Low hardness (0) -> darker gray, soft/diffuse edges.
+    double hardness = m_renderData.hardness;  // 0..100
+    double hardFrac = qMax(0.0, qMin(1.0, hardness / 100.0));
+    
+    // Stroke color: interpolate from a soft gray to pure white based on hardness.
+    // Low hardness (0): gray ~140,140,140 (clearly visible as soft/diffuse)
+    // High hardness (100): pure white 255,255,255 (crisp, bright)
+    int lowVal = 140;   // Gray value at hardness=0
+    int highVal = 255;  // White at hardness=100
+    int val = lowVal + (int)((highVal - lowVal) * hardFrac);
+    QColor strokeColor(val, val, val);
+    strokeColor.setAlphaF(alpha);
+    
+    // Full width of iconRect with tiny margin for tips
+    double x0 = iconRect.left() + 1.0;
+    double x1 = iconRect.right() - 1.0;
+    double totalW = x1 - x0;
+    double cy = iconRect.center().y();
+    
+    // Wave amplitude: how much the centerline deviates up/down
+    double waveAmp = iconRect.height() * 0.14;
+    
+    // Taper style depends on whether this is a native brush (no overlay).
+    // Native brushes: taper driven by min/max thickness difference.
+    // Other (MyPaint, texture, generated): default pointed taper.
+    // Thickness ratio: how much thinner the tips are vs the body
+    double thickRatio = (maxThick > 0.01) ? (minThick / maxThick) : 0.0;
+    // Clamp to [0..1]: 0 = very tapered (big difference), 1 = uniform
+    thickRatio = qMax(0.0, qMin(1.0, thickRatio));
+    
+    // Build the stroke outline as polygon (top edge + reversed bottom edge).
+    // Centerline follows a sine wave (one full period = double undulation).
+    const int N = 80;
+    QPolygonF topEdge, botEdge;
+    
+    for (int i = 0; i <= N; ++i) {
+      double t = (double)i / N;  // 0..1 along the stroke
+      double x = x0 + totalW * t;
+      
+      // Centerline: smooth sine wave (one full period).
+      // First half: hump up. Second half: dip down.
+      double angle = t * 2.0 * 3.14159265358979;
+      double centerY = cy - std::sin(angle) * waveAmp;
+      
+      // Taper envelope: pointed tips at both ends, full thickness in middle.
+      // For native brushes, the min/max ratio controls how pointed the tips are.
+      // thickRatio=0 => very pointed; thickRatio=1 => blunt (uniform thickness).
+      double taper;
+      if (t < 0.5) {
+        double u = t * 2.0;       // 0 -> 1
+        taper = u * u;            // Quadratic ease-in
+      } else {
+        double u = (1.0 - t) * 2.0; // 1 -> 0
+        taper = u * u;            // Quadratic ease-out
+      }
+      
+      // Blend taper with thickness ratio: native brushes use min/max difference
+      // to set a floor on the taper (blunt tips when min ~ max).
+      taper = thickRatio + (1.0 - thickRatio) * taper;
+      
+      // Hardness affects taper sharpness
+      if (m_renderData.hardness < 50)
+        taper = std::pow(taper, 0.7);
+      if (m_renderData.hardness > 80)
+        taper = std::pow(taper, 1.3);
+      
+      double halfH = strokeH * taper * 0.5;
+      
+      topEdge << QPointF(x, centerY - halfH);
+      botEdge.prepend(QPointF(x, centerY + halfH));
+    }
+    
+    // Build closed polygon path from the two edges
+    QPolygonF outline = topEdge + botEdge;
+    QPainterPath path;
+    path.addPolygon(outline);
+    path.closeSubpath();
+    
+    // === Texture rendering based on brush tool type ===
+    // "raster"      : grainy/pixelated look (stipple dots along the stroke)
+    // "toonzraster" : lighter grain (fewer dots)
+    // "vector"      : perfectly smooth, no grain
+    // Default       : smooth with soft glow for soft brushes
+    
+    bool isRaster = (m_toolType == "raster");
+    bool isToonzRaster = (m_toolType == "toonzraster");
+    bool isVector = (m_toolType == "vector");
+    
+    // Main fill
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(strokeColor);
+    painter.drawPath(path);
+    
+    // Grain overlay for raster types (drawn on top of the fill).
+    // Grain diminishes with higher hardness (hard brushes are clean/crisp).
+    if ((isRaster || isToonzRaster) && hardFrac < 0.85) {
+      // Draw scattered dots inside the stroke for a grainy effect.
+      // Use a deterministic seed based on preset name for consistency.
+      unsigned int seed = 0;
+      for (int k = 0; k < m_presetName.length(); ++k)
+        seed = seed * 31 + m_presetName.at(k).unicode();
+      
+      // Scale grain intensity down as hardness increases
+      double grainScale = 1.0 - hardFrac;  // 1.0 at hard=0, 0.0 at hard=100
+      
+      QColor grainColor = strokeColor;
+      double grainAlpha = (isRaster ? 0.35 : 0.20) * grainScale;
+      grainColor.setAlphaF(alpha * grainAlpha);
+      painter.setPen(Qt::NoPen);
+      
+      // Number of grain dots: proportional to stroke area, scaled by hardness
+      int dotCount = (int)((isRaster ? 60 : 30) * grainScale);
+      double dotSize = isRaster ? 1.5 : 1.2;
+      
+      for (int d = 0; d < dotCount; ++d) {
+        // Simple pseudo-random using seed (no external lib needed)
+        seed = seed * 1103515245 + 12345;
+        double rx = ((seed >> 16) & 0x7FFF) / 32768.0;  // 0..1
+        seed = seed * 1103515245 + 12345;
+        double ry = ((seed >> 16) & 0x7FFF) / 32768.0;  // 0..1
+        
+        double px = x0 + totalW * rx;
+        double py = iconRect.top() + iconRect.height() * (0.2 + 0.6 * ry);
+        
+        // Only draw dot if it falls inside the stroke path
+        if (path.contains(QPointF(px, py))) {
+          // Alternate between dark and light grains
+          if (d % 3 == 0) {
+            QColor darkGrain = strokeColor.darker(140);
+            darkGrain.setAlphaF(alpha * grainAlpha * 0.8);
+            painter.setBrush(darkGrain);
+          } else {
+            painter.setBrush(grainColor);
+          }
+          painter.drawEllipse(QPointF(px, py), dotSize, dotSize);
+        }
+      }
+    }
+    
+    // Soft glow for soft brushes (not pencil, not vector).
+    // The softer the brush, the wider and more visible the diffuse glow.
+    if (hardFrac < 0.5 && !m_renderData.isPencil && !isVector) {
+      // Glow intensity increases as hardness decreases
+      double glowIntensity = (0.5 - hardFrac) * 2.0;  // 0..1 (0 at hard=50, 1 at hard=0)
+      double glowWidth = 1.5 + glowIntensity * 2.5;   // 1.5..4.0 px
+      double glowAlpha = alpha * (0.08 + glowIntensity * 0.15);
+      
+      QColor glow = strokeColor;
+      glow.setAlphaF(glowAlpha);
+      painter.setBrush(Qt::NoBrush);
+      painter.setPen(QPen(glow, glowWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+      painter.drawPath(path);
+    }
+  }
+  
+  painter.restore();
+}
+
+//-----------------------------------------------------------------------------
+
 void BrushPresetItem::paintEvent(QPaintEvent *event) {
   QPainter painter(this);
   painter.setRenderHint(QPainter::Antialiasing);
@@ -381,22 +771,42 @@ void BrushPresetItem::paintEvent(QPaintEvent *event) {
           iconY -= 6;
         }
         
-        painter.drawPixmap(iconX, iconY, m_scaledIconCache);
+        // For dynamic fallback in list mode, use a wider rect:
+        // Stroke can span the full icon area width (original icon height used as width basis)
+        int dynIconW = m_scaledIconCache.width();
+        int dynIconH = m_scaledIconCache.height();
         
-        // Draw text to the right of icon
-        QRect textRect(iconX + m_scaledIconCache.width() + margin, margin, 
-                       width() - iconX - m_scaledIconCache.width() - (2 * margin), 
-                       height() - (2 * margin));
-        painter.setPen(palette().color(QPalette::ButtonText));
-        painter.setFont(font());
-        
-        QString displayText = m_presetName;
-        QFontMetrics fm(font());
-        if (fm.horizontalAdvance(displayText) > textRect.width()) {
-          displayText = fm.elidedText(displayText, Qt::ElideMiddle, textRect.width());
+        // Check if we should use dynamic fallback instead of generic icon
+        if (m_useSampleStrokes && !m_isCustomIcon && m_renderData.hasData) {
+          // Give the stroke more horizontal room in list mode (~2x wider)
+          int wideW = qMin(width() / 2, dynIconW * 3);
+          QRect iconRect(iconX, iconY, wideW, dynIconH);
+          drawDynamicFallback(painter, iconRect);
+          // Text goes after the wider rect
+          QRect textRect(iconX + wideW + margin, margin,
+                         width() - iconX - wideW - (2 * margin),
+                         height() - (2 * margin));
+          painter.setPen(palette().color(QPalette::ButtonText));
+          painter.setFont(font());
+          QString displayText = m_presetName;
+          QFontMetrics fm(font());
+          if (fm.horizontalAdvance(displayText) > textRect.width())
+            displayText = fm.elidedText(displayText, Qt::ElideMiddle, textRect.width());
+          painter.drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, displayText);
+        } else {
+          painter.drawPixmap(iconX, iconY, m_scaledIconCache);
+          // Draw text to the right of icon
+          QRect textRect(iconX + m_scaledIconCache.width() + margin, margin,
+                         width() - iconX - m_scaledIconCache.width() - (2 * margin),
+                         height() - (2 * margin));
+          painter.setPen(palette().color(QPalette::ButtonText));
+          painter.setFont(font());
+          QString displayText = m_presetName;
+          QFontMetrics fm(font());
+          if (fm.horizontalAdvance(displayText) > textRect.width())
+            displayText = fm.elidedText(displayText, Qt::ElideMiddle, textRect.width());
+          painter.drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, displayText);
         }
-        
-        painter.drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, displayText);
       }
       
     } else {
@@ -411,11 +821,18 @@ void BrushPresetItem::paintEvent(QPaintEvent *event) {
         int availableWidth = width() - (2 * margin);
         int availableHeight = height() - (2 * margin) - textHeightSmall - textMargin;
         
-        // Center icon (which has a FIXED size) in available space
-        int iconX = margin + (availableWidth - m_scaledIconCache.width()) / 2;
-        int iconY = margin + (availableHeight - m_scaledIconCache.height()) / 2;
-        
-        painter.drawPixmap(iconX, iconY, m_scaledIconCache);
+        // Check if we should use dynamic fallback instead of generic icon
+        if (m_useSampleStrokes && !m_isCustomIcon && m_renderData.hasData) {
+          // Use the full available width for the stroke
+          int iconY = margin + (availableHeight - m_scaledIconCache.height()) / 2;
+          QRect iconRect(margin, iconY, availableWidth, m_scaledIconCache.height());
+          drawDynamicFallback(painter, iconRect);
+        } else {
+          // Center icon (which has a FIXED size) in available space
+          int iconX = margin + (availableWidth - m_scaledIconCache.width()) / 2;
+          int iconY = margin + (availableHeight - m_scaledIconCache.height()) / 2;
+          painter.drawPixmap(iconX, iconY, m_scaledIconCache);
+        }
       }
       
       // Draw text at BOTTOM (below icon) - LARGER
@@ -749,6 +1166,7 @@ BrushPresetPanel::BrushPresetPanel(QWidget *parent)
     , m_currentColumns(2)
     , m_showBorders(false)
     , m_showBackgrounds(true)
+    , m_useSampleStrokes(false)
     , m_currentPageIndex(0)
     , m_checkboxMode(false)
     , m_clipboardIsCut(false) {
@@ -757,6 +1175,7 @@ BrushPresetPanel::BrushPresetPanel(QWidget *parent)
   QSettings settings;
   m_showBorders = settings.value("BrushPresetPanel/showBorders", false).toBool();
   m_showBackgrounds = settings.value("BrushPresetPanel/showBackgrounds", true).toBool();
+  m_useSampleStrokes = settings.value("BrushPresetPanel/useSampleStrokes", false).toBool();
   
   // Load view mode (default: GridLarge)
   int savedViewMode = settings.value("BrushPresetPanel/viewMode", static_cast<int>(GridLarge)).toInt();
@@ -1191,6 +1610,8 @@ void BrushPresetPanel::refreshPresetList() {
   } else if (toolType == "raster") {
     if (dynamic_cast<TMyPaintBrushStyle*>(activeStyle)) {
       toolDisplayName = tr("MyPaint Brush");
+    } else if (dynamic_cast<TTextureStyle*>(activeStyle)) {
+      toolDisplayName = tr("Raster Texture");
     } else {
       toolDisplayName = tr("Raster Brush");
     }
@@ -1309,7 +1730,7 @@ void BrushPresetPanel::refreshPresetList() {
   bool isSmallMode = (m_viewMode == GridSmall);
   
   for (const QString &presetName : presets) {
-    BrushPresetItem *item = new BrushPresetItem(presetName, toolType, isListMode, m_presetContainer);
+    BrushPresetItem *item = new BrushPresetItem(presetName, toolType, isListMode, m_useSampleStrokes, m_presetContainer);
     
     // Apply size according to mode (fixed height, flexible width)
     item->setMinimumSize(itemSize);
@@ -1636,6 +2057,8 @@ void BrushPresetPanel::onToolChanged() {
     } else if (m_currentToolType == "raster") {
       if (dynamic_cast<TMyPaintBrushStyle*>(activeStyle)) {
         toolDisplayName = tr("MyPaint Brush");
+      } else if (dynamic_cast<TTextureStyle*>(activeStyle)) {
+        toolDisplayName = tr("Raster Texture");
       } else {
         toolDisplayName = tr("Raster Brush");
       }
@@ -1834,6 +2257,25 @@ void BrushPresetPanel::createViewModeMenu() {
       clearMultiSelection();
     }
     updateCheckboxVisibility();
+  });
+  
+  // Separator before dynamic rendering options
+  m_viewModeMenu->addSeparator();
+  
+  // Use Sample Strokes option (for dynamic fallback graphics)
+  QAction *sampleStrokesAction = new QAction(tr("Use Sample Strokes"), this);
+  sampleStrokesAction->setCheckable(true);
+  sampleStrokesAction->setChecked(m_useSampleStrokes);
+  m_viewModeMenu->addAction(sampleStrokesAction);
+  connect(sampleStrokesAction, &QAction::triggered, [this, sampleStrokesAction]() {
+    m_useSampleStrokes = sampleStrokesAction->isChecked();
+    // Save preference
+    QSettings settings;
+    settings.setValue("BrushPresetPanel/useSampleStrokes", m_useSampleStrokes);
+    // Refresh display in Brush Preset Panel
+    refreshPresetList();
+    // Refresh Universal Size icons in Custom Panels
+    ToolPresetCommandManager::instance()->refreshSizeCommands();
   });
   
   // Add Show/Hide submenu
