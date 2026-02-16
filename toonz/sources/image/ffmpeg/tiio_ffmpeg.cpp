@@ -163,11 +163,9 @@ void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex) {
         QObject::tr("Failed to create QImage for intermediate file"));
     return;
   }
-
   // qi = qi.copy();
   // Currently redundant,  removed for performance & clarity.
   // If raster-to-QImage sharing is needed in the future, we can revisit.
-
   QByteArray formatBa = m_intermediateFormat.toUpper().toLatin1();
   const char *format  = formatBa.constData();
 
@@ -319,16 +317,22 @@ void Ffmpeg::saveSoundTrack(TSoundTrack *soundTrack) {
 
 bool Ffmpeg::checkFilesExist() const {
   QString ffmpegCachePath = getFfmpegCache().getQString();
-  QString tempPath = ffmpegCachePath + QDir::separator() + cleanPathSymbols() +
-                     "In0001." + m_intermediateFormat;
+  // Look for the first frame (6 digits) directly in cache root
+  QString tempPath = ffmpegCachePath + QDir::separator() +
+                     QString::fromStdString(m_path.getName()) +
+                     "tempOut000001." + m_intermediateFormat;
   return TSystem::doesExistFileOrLevel(TFilePath(tempPath));
 }
 
+// ------------------------------------------------------------
+// Cached getters
+// ------------------------------------------------------------
+
 ffmpegFileInfo Ffmpeg::getInfo() const {
-  int lx           = 0;
-  int ly           = 0;
-  int frameCount   = 0;
-  double frameRate = 0.0;
+  // If already cached, return immediately
+  if (m_infoCached) {
+    return ffmpegFileInfo{m_lx, m_ly, m_frameCount, m_frameRate};
+  }
 
   QString ffmpegCachePath = getFfmpegCache().getQString();
   QString tempPath =
@@ -342,101 +346,77 @@ ffmpegFileInfo Ffmpeg::getInfo() const {
       QString text         = QString::fromUtf8(ba.constData(), ba.size());
       QStringList textlist = text.split(" ", Qt::SkipEmptyParts);
       if (textlist.size() >= 4) {
-        lx         = textlist[0].toInt();
-        ly         = textlist[1].toInt();
-        frameRate  = textlist[2].toDouble();
-        frameCount = textlist[3].toInt();
+        m_lx         = textlist[0].toInt();
+        m_ly         = textlist[1].toInt();
+        m_frameRate  = textlist[2].toDouble();
+        m_frameCount = textlist[3].toInt();
+        m_infoCached = true;
+        return ffmpegFileInfo{m_lx, m_ly, m_frameCount, m_frameRate};
       }
     }
-  } else {
-    QStringList failedOperations;
-    QString errorDetails;
-
-    try {
-      TDimension size = getSize();
-      lx              = size.lx;
-      ly              = size.ly;
-    } catch (const TImageException &e) {
-      failedOperations.append("size");
-      errorDetails += QObject::tr("Size error: %1\n")
-                          .arg(QString::fromStdWString(e.getMessage()));
-    }
-
-    try {
-      frameRate = getFrameRate();
-    } catch (const TImageException &e) {
-      failedOperations.append("frame rate");
-      errorDetails += QObject::tr("Frame rate error: %1\n")
-                          .arg(QString::fromStdWString(e.getMessage()));
-    }
-
-    try {
-      frameCount = getFrameCount();
-    } catch (const TImageException &e) {
-      failedOperations.append("frame count");
-      errorDetails += QObject::tr("Frame count error: %1\n")
-                          .arg(QString::fromStdWString(e.getMessage()));
-    }
-
-    if (!failedOperations.isEmpty()) {
-      QString operations = failedOperations.join(", ");
-      DVGui::warning(
-          QObject::tr(
-              "Failed to retrieve %1 from video via ffprobe.\n"
-              "Error details:\n%2"
-              "Using available data and fallback values where necessary.\n"
-              "Note: Zero values in dimensions, frame count or frame rate "
-              "indicate "
-              "that the information could not be retrieved.")
-              .arg(operations)
-              .arg(errorDetails));
-    }
-
-    // Always write to cache, even if we have fallback values (0)
-    QFile infoText(tempPath);
-    if (infoText.open(QIODevice::WriteOnly | QIODevice::Text)) {
-      QString infoToWrite = QString("%1 %2 %3 %4\n")
-                                .arg(lx)
-                                .arg(ly)
-                                .arg(frameRate, 0, 'f', 3)
-                                .arg(frameCount);
-      infoText.write(infoToWrite.toUtf8());
-      infoText.close();
-    }
   }
 
-  // Return the info structure
-  // Note: Zero values in any field may indicate that ffprobe failed to retrieve
-  // that particular information. Callers should handle these cases
-  // appropriately.
-  return ffmpegFileInfo{lx, ly, frameCount, frameRate};
-}
+  // Cache file missing or invalid – query ffprobe directly
+  QStringList failedOperations;
+  QString errorDetails;
 
-TRasterImageP Ffmpeg::getImage(int frameIndex) {
-  QString ffmpegCachePath = getFfmpegCache().getQString();
-  QString tempPath = ffmpegCachePath + QDir::separator() + cleanPathSymbols();
-  QString number   = QString("%1").arg(frameIndex, 4, 10, QChar('0'));
-  QString tempName = tempPath + QDir::separator() + "In" + number + ".png";
-
-  if (TSystem::doesExistFileOrLevel(TFilePath(tempName))) {
-    QImage tempImg(tempName);
-    if (!tempImg.isNull()) {
-      QImage convertedImg = tempImg.convertToFormat(QImage::Format_ARGB32);
-      const uchar *bits   = convertedImg.constBits();
-
-      TRasterPT<TPixelRGBM32> ret;
-      ret.create(m_lx, m_ly);
-      ret->lock();
-      memcpy(ret->getRawData(), bits, m_lx * m_ly * 4);
-      ret->unlock();
-      ret->yMirror();
-      return TRasterImageP(ret);
-    }
+  try {
+    TDimension size = getSize();  // will update m_lx, m_ly
+    // getSize already updated m_lx, m_ly
+  } catch (const TImageException &e) {
+    failedOperations.append("size");
+    errorDetails += QObject::tr("Size error: %1\n")
+                        .arg(QString::fromStdWString(e.getMessage()));
   }
-  return TRasterImageP();
+
+  try {
+    (void)getFrameRate();  // will update m_frameRate
+  } catch (const TImageException &e) {
+    failedOperations.append("frame rate");
+    errorDetails += QObject::tr("Frame rate error: %1\n")
+                        .arg(QString::fromStdWString(e.getMessage()));
+  }
+
+  try {
+    (void)getFrameCount();  // will update m_frameCount
+  } catch (const TImageException &e) {
+    failedOperations.append("frame count");
+    errorDetails += QObject::tr("Frame count error: %1\n")
+                        .arg(QString::fromStdWString(e.getMessage()));
+  }
+
+  if (!failedOperations.isEmpty()) {
+    QString operations = failedOperations.join(", ");
+    DVGui::warning(
+        QObject::tr(
+            "Failed to retrieve %1 from video via ffprobe.\n"
+            "Error details:\n%2"
+            "Using available data and fallback values where necessary.\n"
+            "Note: Zero values in dimensions, frame count or frame rate "
+            "indicate that the information could not be retrieved.")
+            .arg(operations)
+            .arg(errorDetails));
+  }
+
+  // Write to cache file (even if some values are zero)
+  QFile infoText(tempPath);
+  if (infoText.open(QIODevice::WriteOnly | QIODevice::Text)) {
+    QString infoToWrite = QString("%1 %2 %3 %4\n")
+                              .arg(m_lx)
+                              .arg(m_ly)
+                              .arg(m_frameRate, 0, 'f', 3)
+                              .arg(m_frameCount);
+    infoText.write(infoToWrite.toUtf8());
+    infoText.close();
+  }
+
+  m_infoCached = true;
+  return ffmpegFileInfo{m_lx, m_ly, m_frameCount, m_frameRate};
 }
 
 double Ffmpeg::getFrameRate() const {
+  if (m_frameRate > 0.0) return m_frameRate;
+
   QStringList fpsArgs;
   fpsArgs << "-v" << "error" << "-select_streams" << "v:0" << "-show_entries"
           << "stream=r_frame_rate" << "-of"
@@ -479,10 +459,13 @@ double Ffmpeg::getFrameRate() const {
     }
   }
 
-  return (fpsDen > 0) ? static_cast<double>(fpsNum) / fpsDen : 0.0;
+  m_frameRate = (fpsDen > 0) ? static_cast<double>(fpsNum) / fpsDen : 0.0;
+  return m_frameRate;
 }
 
 TDimension Ffmpeg::getSize() const {
+  if (m_lx > 0 && m_ly > 0) return TDimension(m_lx, m_ly);
+
   QStringList sizeArgs;
   sizeArgs << "-v" << "error" << "-of" << "flat=s=_" << "-select_streams"
            << "v:0" << "-show_entries" << "stream=height,width"
@@ -495,23 +478,23 @@ TDimension Ffmpeg::getSize() const {
     sizeResults = "";
   }
 
-  int lx = m_lx;
-  int ly = m_ly;
   if (!sizeResults.isEmpty()) {
     QStringList lines = sizeResults.split('\n', Qt::SkipEmptyParts);
     for (const QString &line : lines) {
       if (line.contains("width=")) {
-        lx = line.section('=', 1, 1).toInt();
+        m_lx = line.section('=', 1, 1).toInt();
       } else if (line.contains("height=")) {
-        ly = line.section('=', 1, 1).toInt();
+        m_ly = line.section('=', 1, 1).toInt();
       }
     }
   }
 
-  return TDimension(lx, ly);
+  return TDimension(m_lx, m_ly);
 }
 
 int Ffmpeg::getFrameCount() const {
+  if (m_frameCount > 0) return m_frameCount;
+
   QStringList frameCountArgs;
   frameCountArgs << "-v" << "error" << "-count_frames" << "-select_streams"
                  << "v:0" << "-show_entries" << "stream=duration" << "-of"
@@ -551,15 +534,19 @@ int Ffmpeg::getFrameCount() const {
     }
   }
 
-  return count;
+  m_frameCount = count;
+  return m_frameCount;
 }
 
+// ------------------------------------------------------------
+// Frame extraction and retrieval
+// ------------------------------------------------------------
+
 void Ffmpeg::getFramesFromMovie(int frame) {
-  // ensure frame count before using
+  // Ensure frame count is known
   if (m_frameCount <= 0) {
     m_frameCount = getFrameCount();
   }
-
   if (m_frameCount <= 0) {
     DVGui::warning(QObject::tr("Unable to determine frame count for: %1")
                        .arg(m_path.getQString()));
@@ -567,16 +554,19 @@ void Ffmpeg::getFramesFromMovie(int frame) {
   }
 
   QString ffmpegCachePath = getFfmpegCache().getQString();
-  QString tempPath = ffmpegCachePath + QDir::separator() + cleanPathSymbols();
-  QString tempName =
-      tempPath + QDir::separator() + "In%04d." + m_intermediateFormat;
+  QString tempName        = ffmpegCachePath + QDir::separator() +
+                     QString::fromStdString(m_path.getName()) + "tempOut%06d." +
+                     m_intermediateFormat;
 
   QString tempStart;
   if (frame == -1) {
-    tempStart = tempPath + QDir::separator() + "In0001." + m_intermediateFormat;
+    tempStart = ffmpegCachePath + QDir::separator() +
+                QString::fromStdString(m_path.getName()) + "tempOut000001." +
+                m_intermediateFormat;
   } else {
-    tempStart = tempPath + QDir::separator() +
-                QString("In%1.").arg(frame, 4, 10, QChar('0')) +
+    tempStart = ffmpegCachePath + QDir::separator() +
+                QString::fromStdString(m_path.getName()) +
+                QString("tempOut%1.").arg(frame, 6, 10, QChar('0')) +
                 m_intermediateFormat;
   }
 
@@ -585,7 +575,6 @@ void Ffmpeg::getFramesFromMovie(int frame) {
     probeArgs << "-v" << "error" << "-select_streams" << "v:0"
               << "-show_entries" << "stream=codec_name" << "-of"
               << "default=noprint_wrappers=1:nokey=1" << m_path.getQString();
-
     QString codecName;
     try {
       codecName = runFfprobe(probeArgs).trimmed();
@@ -607,18 +596,58 @@ void Ffmpeg::getFramesFromMovie(int frame) {
     QStringList postIFrameArgs;
     postIFrameArgs << "-y" << "-f" << "image2" << tempName;
 
-    runFfmpeg(preIFrameArgs, postIFrameArgs, true, true, true, true);
+    runFfmpeg(preIFrameArgs, postIFrameArgs, true, true, true, false);
 
+    if (!TSystem::doesExistFileOrLevel(TFilePath(tempStart))) {
+      DVGui::warning(QObject::tr("FFmpeg failed to extract frames from: "
+                                 "%1\nCheck file and codec support.")
+                         .arg(m_path.getQString()));
+      return;
+    }
+
+    // Add all extracted frames to cleanup list
     for (int i = 1; i <= m_frameCount; i++) {
-      QString frameFile = tempPath + QDir::separator() +
-                          QString("In%1.").arg(i, 4, 10, QChar('0')) +
+      QString frameFile = ffmpegCachePath + QDir::separator() +
+                          QString::fromStdString(m_path.getName()) +
+                          QString("tempOut%1.").arg(i, 6, 10, QChar('0')) +
                           m_intermediateFormat;
-      // avoid duplicates in cleanup
       if (!m_cleanUpList.contains(frameFile)) {
         m_cleanUpList.push_back(frameFile);
       }
     }
   }
+}
+
+TRasterImageP Ffmpeg::getImage(int frameIndex) {
+  QString ffmpegCachePath = getFfmpegCache().getQString();
+  QString number =
+      QString("%1").arg(frameIndex, 6, 10, QChar('0'));  // 6 digits
+  QString tempName = ffmpegCachePath + QDir::separator() +
+                     QString::fromStdString(m_path.getName()) + "tempOut" +
+                     number + ".png";
+
+  if (QFile::exists(tempName)) {
+    QImage qi;
+    if (qi.load(tempName, "PNG")) {
+      if (qi.format() != QImage::Format_ARGB32) {
+        qi = qi.convertToFormat(QImage::Format_ARGB32);
+      }
+
+      int lx = qi.width();
+      int ly = qi.height();
+
+      TRasterPT<TPixelRGBM32> ret;
+      ret.create(lx, ly);
+
+      ret->lock();
+      memcpy(ret->getRawData(), qi.constBits(), lx * ly * 4);
+      ret->unlock();
+
+      ret->yMirror();
+      return TRasterImageP(ret);
+    }
+  }
+  return TRasterImageP();
 }
 
 QString Ffmpeg::cleanPathSymbols() const {
@@ -630,11 +659,11 @@ QString Ffmpeg::cleanPathSymbols() const {
 int Ffmpeg::getGifFrameCount() {
   int frame               = 1;
   QString ffmpegCachePath = getFfmpegCache().getQString();
-  QString tempPath = ffmpegCachePath + QDir::separator() + cleanPathSymbols();
 
   while (true) {
-    QString frameFile = tempPath + QDir::separator() +
-                        QString("In%1.").arg(frame, 4, 10, QChar('0')) +
+    QString frameFile = ffmpegCachePath + QDir::separator() +
+                        QString::fromStdString(m_path.getName()) +
+                        QString("tempOut%1.").arg(frame, 6, 10, QChar('0')) +
                         m_intermediateFormat;
     if (!TSystem::doesExistFileOrLevel(TFilePath(frameFile))) {
       break;
@@ -790,7 +819,15 @@ TImageP TLevelReaderFFmpeg::load(int frameIndex) {
   if (!m_framesExtracted) {
     try {
       m_ffmpegReader->getFramesFromMovie();
-      m_framesExtracted = true;
+      // Verify that at least the first frame exists
+      QString testPath =
+          m_ffmpegReader->getFfmpegCache().getQString() + QDir::separator() +
+          QString::fromStdString(m_path.getName()) + "tempOut000001.png";
+      if (TSystem::doesExistFileOrLevel(TFilePath(testPath))) {
+        m_framesExtracted = true;
+      } else {
+        throw TImageException(m_path, "Frame extraction produced no files.");
+      }
     } catch (const TImageException &e) {
       DVGui::warning(QObject::tr("Failed to extract frames from movie: %1")
                          .arg(QString::fromStdWString(e.getMessage())));

@@ -76,7 +76,7 @@ public:
 
   static bool checkFormat(std::string format);
 
-  // Getters with const
+  // Getters with const, now use mutable caching for performance
   double getFrameRate() const;
   TDimension getSize() const;
   int getFrameCount() const;
@@ -97,12 +97,16 @@ private:
   QString m_audioFormat;
   QStringList m_audioArgs;
 
-  double m_frameRate = 0.0;
-  int m_lx           = 0;
-  int m_ly           = 0;
-  int m_bpp          = 0;
-  int m_frameCount   = 0;
-  int m_startNumber  = std::numeric_limits<int>::max();
+  // Mutable members for caching inside const functions
+  mutable double m_frameRate = 0.0;
+  mutable int m_lx           = 0;
+  mutable int m_ly           = 0;
+  mutable int m_frameCount   = 0;
+  mutable bool m_infoCached =
+      false;  // indicates whether cache has been attempted
+
+  int m_bpp         = 0;
+  int m_startNumber = std::numeric_limits<int>::max();
   int m_ffmpegTimeoutMs;  // Value comes from constructor (user config)
   int m_sampleRate    = 0;
   int m_channelCount  = 0;
