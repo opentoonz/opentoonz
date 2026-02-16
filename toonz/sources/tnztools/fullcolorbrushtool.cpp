@@ -823,10 +823,10 @@ void FullColorBrushTool::loadPreset() {
               newStyle->setMainColor(currentColor);
               palette->setStyle(styleIndex, newStyle);
               paletteHandle->notifyColorStyleChanged(false);
-            } else if (!preset.m_hasMyPaint && !preset.m_hasStyleSnapshot) {
-              // Preset was created WITHOUT any style overlay:
-              // replace any existing MyPaint with solid color
-              if (dynamic_cast<TMyPaintBrushStyle*>(currentStyle)) {
+            } else if (!preset.m_hasMyPaint && !preset.m_hasTexture && !preset.m_hasStyleSnapshot) {
+              // Preset was created with plain solid color: replace any non-solid style
+              if (dynamic_cast<TMyPaintBrushStyle*>(currentStyle) ||
+                  dynamic_cast<TTextureStyle*>(currentStyle)) {
                 TSolidColorStyle *newStyle = new TSolidColorStyle(currentColor);
                 palette->setStyle(styleIndex, newStyle);
                 paletteHandle->notifyColorStyleChanged(false);

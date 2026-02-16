@@ -1929,6 +1929,13 @@ BrushToolOptionsBox::BrushToolOptionsBox(QWidget *parent, TTool *tool,
   m_pencilMode = dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Pencil"));
   m_presetCombo = dynamic_cast<ToolOptionCombo *>(m_controls.value("Preset:"));
 
+  // Connect the Preset combo to refresh when the preset list changes
+  // (bi-directional sync: BrushPresetPanel add/remove <-> ToolOptionBar dropdown)
+  if (m_presetCombo && toolHandle) {
+    connect(toolHandle, SIGNAL(toolComboBoxListChanged(std::string)),
+            m_presetCombo, SLOT(reloadComboBoxList(std::string)));
+  }
+
   // Preset +/- buttons
   m_addPresetButton    = new QPushButton(QString("+"));
   m_removePresetButton = new QPushButton(QString("-"));
@@ -3303,5 +3310,8 @@ public:
     default:
       break;
     }
+    // Notify panels that preset list changed (sync ToolOptionBar dropdown)
+    if (app->getCurrentTool())
+      app->getCurrentTool()->notifyToolComboBoxListChanged("Preset:");
   }
 } removeBrushPresetByNameCHInstance;

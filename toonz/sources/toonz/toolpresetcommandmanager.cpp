@@ -3,6 +3,7 @@
 #include "menubarcommandids.h"
 #include "mainwindow.h"
 #include "shortcutpopup.h"
+#include "custompaneleditorpopup.h"
 #include "tapp.h"
 
 // ToonzLib
@@ -25,9 +26,15 @@
 #include "tools/toolcommandids.h"
 #include "tproperty.h"
 
+#include "tstream.h"
+
 #include <QSettings>
+#include <QPainter>
+#include <QPainterPath>
+#include <QPixmap>
+#include <QPolygonF>
 #include <algorithm>  // For std::min, std::max
-#include <cmath>      // For log, exp
+#include <cmath>      // For sin, pow, log, exp
 
 namespace {
 
@@ -137,6 +144,248 @@ QString findCustomPresetIcon(const QString& presetName) {
   
   // No custom icon found
   return QString();
+}
+
+// Helper to generate dynamic size icon for Custom Panels.
+// Progressive top-cropping: small sizes show a full circle, larger sizes
+// have the circle progressively cropped from the TOP until only the bottom
+// half remains for the biggest values. Number always below the shape.
+QPixmap generateDynamicSizeIcon(double size, int iconSize = 32) {
+  QPixmap pixmap(iconSize, iconSize);
+  pixmap.fill(Qt::transparent);
+  
+  QPainter painter(&pixmap);
+  painter.setRenderHint(QPainter::Antialiasing);
+  
+  // Format the size string (show decimal for 0.5)
+  QString sizeStr;
+  if (size == (int)size)
+    sizeStr = QString::number((int)size);
+  else
+    sizeStr = QString::number(size, 'g', 3);
+  
+  QFont numFont;
+  int fontSize = qMax(7, iconSize / 4);
+  numFont.setPixelSize(fontSize);
+  numFont.setBold(true);
+  QFontMetrics fm(numFont);
+  int textH = fm.height();
+  
+  // Available height above text
+  int availH = iconSize - textH - 2;
+  // Allow circle diameter to exceed availH (it will be cropped from top)
+  int maxDiam = qMin(iconSize - 2, (int)(availH * 1.8));
+  maxDiam = qMax(6, maxDiam);
+  
+  // Variable diameter (log scale from 0.5..1000)
+  double minSz = 0.5, maxSz = 1000.0;
+  double logMin = std::log(minSz + 1.0);
+  double logMax = std::log(maxSz + 1.0);
+  double logVal = std::log(qMax(size, minSz) + 1.0);
+  double ratio = (logVal - logMin) / (logMax - logMin);
+  ratio = qMax(0.0, qMin(1.0, ratio));
+  int circleDiam = (int)(maxDiam * (0.15 + 0.85 * ratio));
+  circleDiam = qMax(4, circleDiam);
+  
+  int cx = iconSize / 2;
+  // Circle bottom sits at the text baseline
+  int circleBottom = availH;
+  int circleTop = circleBottom - circleDiam;
+  int clipTop = 0;  // Top of the icon area
+  
+  // Draw the circle. If it overflows the top, apply a horizontal clip rect
+  // so only the top is hidden — sides stay fully intact (horizontal mask effect).
+  QRect circleRect(cx - circleDiam / 2, circleTop, circleDiam, circleDiam);
+  
+  if (circleTop < clipTop) {
+    painter.setClipRect(QRect(0, clipTop, iconSize, circleBottom - clipTop));
+  }
+  
+  painter.setPen(QPen(QColor(160, 160, 160), 1));
+  painter.setBrush(QColor(255, 255, 255));
+  painter.drawEllipse(circleRect);
+  
+  if (circleTop < clipTop) {
+    painter.setClipping(false);
+  }
+  
+  // Number below the shape
+  painter.setPen(QColor(220, 220, 220));
+  painter.setFont(numFont);
+  QRect textRect(0, circleBottom + 1, iconSize, textH + 2);
+  painter.drawText(textRect, Qt::AlignHCenter | Qt::AlignTop, sizeStr);
+  
+  return pixmap;
+}
+
+// Check if user preference is set to use sample strokes
+bool useSampleStrokesEnabled() {
+  QSettings settings;
+  return settings.value("BrushPresetPanel/useSampleStrokes", false).toBool();
+}
+
+// Helper structure to hold minimal render data for a brush preset
+struct BrushRenderInfo {
+  double minThickness = 1.0;
+  double maxThickness = 5.0;
+  double hardness = 100.0;
+  double minOpacity = 100.0;
+  double maxOpacity = 100.0;
+  bool isPencil = false;
+  bool found = false;
+};
+
+// Load render info from the preset .txt file for a given preset and tool type.
+// toolType is one of: "vector", "toonzraster", "raster"
+BrushRenderInfo loadBrushRenderInfo(const QString &presetName, const QString &toolType) {
+  BrushRenderInfo info;
+  TFilePath presetFilePath;
+  if (toolType == "vector")
+    presetFilePath = TEnv::getConfigDir() + "brush_vector.txt";
+  else if (toolType == "toonzraster")
+    presetFilePath = TEnv::getConfigDir() + "brush_toonzraster.txt";
+  else if (toolType == "raster")
+    presetFilePath = TEnv::getConfigDir() + "brush_raster.txt";
+  else
+    return info;
+  
+  try {
+    TIStream is(presetFilePath);
+    std::string tagName;
+    std::wstring wPresetName = presetName.toStdWString();
+    while (is.matchTag(tagName)) {
+      if (tagName == "brushes") {
+        while (is.matchTag(tagName)) {
+          if (tagName == "brush") {
+            std::wstring name;
+            double minT = 1.0, maxT = 5.0, h = 100.0, minO = 100.0, maxO = 100.0;
+            int pencil = 0;
+            while (is.matchTag(tagName)) {
+              if (tagName == "Name") { is >> name; is.matchEndTag(); }
+              else if (tagName == "Thickness") { is >> minT >> maxT; is.matchEndTag(); }
+              else if (tagName == "Hardness") { is >> h; is.matchEndTag(); }
+              else if (tagName == "Opacity") { is >> minO >> maxO; is.matchEndTag(); }
+              else if (tagName == "Pencil") { is >> pencil; is.matchEndTag(); }
+              else is.skipCurrentTag();
+            }
+            if (name == wPresetName) {
+              info.minThickness = minT;
+              info.maxThickness = maxT;
+              info.hardness = h;
+              info.minOpacity = minO;
+              info.maxOpacity = maxO;
+              info.isPencil = (pencil != 0);
+              info.found = true;
+              is.matchEndTag();
+              return info;
+            }
+            is.matchEndTag();
+          } else {
+            is.skipCurrentTag();
+          }
+        }
+        is.matchEndTag();
+      } else {
+        is.skipCurrentTag();
+      }
+    }
+  } catch (...) {}
+  return info;
+}
+
+// Map a command prefix to the corresponding brush tool type string
+// for loading preset render info from the correct .txt file.
+QString toolTypeFromPrefix(const QString &prefix) {
+  if (prefix.contains("TnzRasterBrush"))  return "toonzraster";
+  if (prefix.contains("TnzVectorBrush"))  return "vector";
+  if (prefix.contains("RasterBrush"))     return "raster";
+  return "";
+}
+
+// Generate a dynamic sample-stroke icon for a brush preset (Custom Panels).
+// Smooth sine-wave double undulation with quadratic-tapered pointed tips.
+// Taper adapts to min/max thickness ratio of the brush.
+QPixmap generateDynamicBrushIcon(const BrushRenderInfo &info, int iconSize = 32) {
+  QPixmap pixmap(iconSize, iconSize);
+  pixmap.fill(Qt::transparent);
+  
+  QPainter painter(&pixmap);
+  painter.setRenderHint(QPainter::Antialiasing, true);
+  
+  double avgThick = (info.minThickness + info.maxThickness) / 2.0;
+  double avgOpacity = (info.minOpacity + info.maxOpacity) / 2.0;
+  
+  double maxH = iconSize * 0.50;
+  double strokeH = qMax(3.0, qMin(maxH, avgThick * iconSize / 12.0));
+  strokeH = qMax(strokeH, 4.0);
+  
+  // Thickness ratio controls tip bluntness (0 = very pointed, 1 = uniform)
+  double thickRatio = (info.maxThickness > 0.01)
+      ? (info.minThickness / info.maxThickness) : 0.0;
+  thickRatio = qMax(0.0, qMin(1.0, thickRatio));
+  
+  // If opacity is 0 (tool doesn't support opacity, e.g. Toonz Raster),
+  // treat as fully opaque since the brush always paints at full intensity.
+  double alpha;
+  if (avgOpacity < 0.01)
+    alpha = 1.0;
+  else
+    alpha = qMax(0.35, qMin(1.0, avgOpacity / 100.0));
+  // Hardness influences stroke color: low=gray, high=white (matching brushpresetpanel)
+  double hardFrac = qMax(0.0, qMin(1.0, info.hardness / 100.0));
+  int lowVal = 140;
+  int highVal = 255;
+  int val = lowVal + (int)((highVal - lowVal) * hardFrac);
+  QColor strokeColor(val, val, val);
+  strokeColor.setAlphaF(alpha);
+  
+  double x0 = 1.0, x1 = iconSize - 1.0;
+  double totalW = x1 - x0;
+  double cy = iconSize / 2.0;
+  double waveAmp = iconSize * 0.12;
+  
+  const int N = 60;
+  QPolygonF topEdge, botEdge;
+  for (int i = 0; i <= N; ++i) {
+    double t = (double)i / N;
+    double x = x0 + totalW * t;
+    
+    // Sine wave centerline (one full period: hump up then dip down)
+    double angle = t * 2.0 * 3.14159265358979;
+    double centerY = cy - std::sin(angle) * waveAmp;
+    
+    // Quadratic taper blended with thickness ratio
+    double taper;
+    if (t < 0.5) { double u = t * 2.0; taper = u * u; }
+    else { double u = (1.0 - t) * 2.0; taper = u * u; }
+    taper = thickRatio + (1.0 - thickRatio) * taper;
+    if (info.hardness < 50) taper = std::pow(taper, 0.7);
+    if (info.hardness > 80) taper = std::pow(taper, 1.3);
+    
+    double halfH = strokeH * taper * 0.5;
+    topEdge << QPointF(x, centerY - halfH);
+    botEdge.prepend(QPointF(x, centerY + halfH));
+  }
+  
+  QPolygonF outline = topEdge + botEdge;
+  QPainterPath path;
+  path.addPolygon(outline);
+  path.closeSubpath();
+  
+  painter.setPen(Qt::NoPen);
+  painter.setBrush(strokeColor);
+  painter.drawPath(path);
+  
+  // Soft glow for soft brushes
+  if (info.hardness < 50 && !info.isPencil) {
+    QColor glow = strokeColor;
+    glow.setAlphaF(alpha * 0.12);
+    painter.setBrush(Qt::NoBrush);
+    painter.setPen(QPen(glow, 1.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    painter.drawPath(path);
+  }
+  
+  return pixmap;
 }
 
 // Helper to get presets from a tool's properties
@@ -574,14 +823,22 @@ void ToolPresetCommandManager::registerToolPresetCommands() {
       QAction* existingAction = CommandManager::instance()->getAction(
           commandId.toStdString().c_str(), false);
       if (existingAction) {
-        // Update icon - check for custom icon first, then fallback to default
+        // Update icon - check for custom icon first, then dynamic, then default
         QString customIconPath = findCustomPresetIcon(presetName);
         
         if (!customIconPath.isEmpty()) {
-          // Custom icon found - update to use it
           existingAction->setIcon(QIcon(customIconPath));
+        } else if (useSampleStrokesEnabled()) {
+          // Dynamic sample stroke icon
+          QString toolType = toolTypeFromPrefix(config.commandPrefix);
+          BrushRenderInfo rInfo = loadBrushRenderInfo(presetName, toolType);
+          if (rInfo.found) {
+            QPixmap px = generateDynamicBrushIcon(rInfo, 32);
+            existingAction->setIcon(QIcon(px));
+          } else if (config.iconName && *config.iconName) {
+            existingAction->setIcon(createQIcon(config.iconName, true));
+          }
         } else if (config.iconName && *config.iconName) {
-          // No custom icon - use default type icon
           existingAction->setIcon(createQIcon(config.iconName, true));
         }
         continue;
@@ -594,17 +851,23 @@ void ToolPresetCommandManager::registerToolPresetCommands() {
       action->setCheckable(true);
       action->setChecked(false);  // Default unchecked
       
-      // Priority 1: Try to find custom icon for this preset
+      // Priority 1: Custom icon  ->  2: Dynamic stroke  ->  3: Default icon
       QString customIconPath = findCustomPresetIcon(presetName);
       const char* iconNameToRegister = config.iconName;
       
       if (!customIconPath.isEmpty()) {
-        // Custom icon found - use it
         action->setIcon(QIcon(customIconPath));
-        // Note: We can't register the full path in CommandManager,
-        // so we register the default iconName for metadata purposes
+      } else if (useSampleStrokesEnabled()) {
+        // Generate a sample-stroke icon dynamically
+        QString toolType = toolTypeFromPrefix(config.commandPrefix);
+        BrushRenderInfo rInfo = loadBrushRenderInfo(presetName, toolType);
+        if (rInfo.found) {
+          QPixmap px = generateDynamicBrushIcon(rInfo, 32);
+          action->setIcon(QIcon(px));
+        } else if (config.iconName && *config.iconName) {
+          action->setIcon(createQIcon(config.iconName));
+        }
       } else if (config.iconName && *config.iconName) {
-        // Priority 2: Use default icon for this brush type
         action->setIcon(createQIcon(config.iconName));
       }
       
@@ -637,6 +900,9 @@ void ToolPresetCommandManager::registerToolPresetCommands() {
       // Disable the command so it can't be triggered
       CommandManager::instance()->enable(commandId.toStdString().c_str(), false);
       
+      // Hide the action so it disappears from ShortcutPopup and CustomPanelEditor trees
+      action->setVisible(false);
+      
       // Rename to indicate it's deleted
       QString oldText = action->iconText();
       if (!oldText.startsWith("(Deleted) ")) {
@@ -651,8 +917,9 @@ void ToolPresetCommandManager::registerToolPresetCommands() {
   // Update the registered set
   m_registeredPresetIds = currentPresets;
   
-  // Notify ShortcutPopup to refresh if it's currently open
+  // Notify open popups to refresh their command trees
   ShortcutPopup::refreshIfOpen();
+  CustomPanelEditorPopup::refreshCommandTreeIfOpen();
   
   // Load shortcuts if any were previously saved
   TFilePath shortcutsFile = ToonzFolder::getMyModuleDir() + TFilePath("shortcuts.ini");
@@ -717,12 +984,16 @@ void ToolPresetCommandManager::registerSizeCommands() {
     QAction* existingAction = CommandManager::instance()->getAction(
         commandId.toStdString().c_str(), false);
     if (existingAction) {
-      // Update icon if custom one is available
+      // Update icon if custom one is available, or use dynamic rendering
       QString iconName = "size_" + QString::number(size);
       QString customIconPath = findCustomPresetIcon(iconName);
       
       if (!customIconPath.isEmpty()) {
         existingAction->setIcon(QIcon(customIconPath));
+      } else if (useSampleStrokesEnabled()) {
+        // Use dynamic rendering
+        QPixmap pixmap = generateDynamicSizeIcon(size, 32);
+        existingAction->setIcon(QIcon(pixmap));
       }
       continue;
     }
@@ -740,8 +1011,12 @@ void ToolPresetCommandManager::registerSizeCommands() {
     QString customIconPath = findCustomPresetIcon(iconName);
     
     if (!customIconPath.isEmpty()) {
-      // Custom icon found
+      // Custom icon found - use it
       action->setIcon(QIcon(customIconPath));
+    } else if (useSampleStrokesEnabled()) {
+      // Use dynamic rendering (circle with number)
+      QPixmap pixmap = generateDynamicSizeIcon(size, 32);
+      action->setIcon(QIcon(pixmap));
     } else {
       // Use generic thickness icon
       action->setIcon(createQIcon("thickness"));
@@ -772,8 +1047,10 @@ void ToolPresetCommandManager::registerSizeCommands() {
 //-----------------------------------------------------------------------------
 
 void ToolPresetCommandManager::refreshSizeCommands() {
-  // Simply re-register all size commands
+  // Re-register size commands (updates icons for dynamic rendering mode)
   registerSizeCommands();
+  // Also refresh brush preset icons to match the current rendering mode
+  registerToolPresetCommands();
 }
 
 //-----------------------------------------------------------------------------
