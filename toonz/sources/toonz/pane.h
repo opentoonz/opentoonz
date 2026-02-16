@@ -107,23 +107,23 @@ protected:
 /*! specialized button for safe area which enables to choose safe area size by
  * context menu
  */
-class TPanelTitleBarButtonForSafeArea final : public TPanelTitleBarButton {
+
+class TPanelTitleBarButtonForLayoutGuide final : public TPanelTitleBarButton {
   Q_OBJECT
-  Q_DISABLE_COPY(TPanelTitleBarButtonForSafeArea)
+  Q_DISABLE_COPY(TPanelTitleBarButtonForLayoutGuide)
 
 public:
-  explicit TPanelTitleBarButtonForSafeArea(QWidget *parent,
-                                           const QString &standardPixmapName);
-  ~TPanelTitleBarButtonForSafeArea() override = default;
-
-  void getSafeAreaNameList(QList<QString> &nameList) const;
+  TPanelTitleBarButtonForLayoutGuide(QWidget *parent,
+                                     const QString &standardPixmapName);
 
 protected:
   void contextMenuEvent(QContextMenuEvent *event) override;
   void mousePressEvent(QMouseEvent *event) override;
 
 protected slots:
-  void onSetSafeArea();
+  void onSetLayout();
+  void onEditLayouts();
+  void onAddToXsheet();
 };
 
 //-----------------------------------------------------------------------------
@@ -268,7 +268,7 @@ public:
   void setRoomBindButton(TPanelTitleBarButton *button) noexcept {
     m_roomBindButton = button;
   }
-  
+
   // Add room binding toggle button to the title bar
   // This enables the "Bind to Room" feature for any panel
   void addRoomBindButton();

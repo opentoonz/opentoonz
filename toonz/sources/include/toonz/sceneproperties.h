@@ -99,6 +99,7 @@ private:
 
   bool m_columnColorFilterOnRender;
   TFilePath m_camCapSaveInPath;
+  QString m_layoutPresetName;
 
 public:
   /*!
@@ -318,6 +319,9 @@ and height.
   // templateFId in preview settings is used for "input" file format
   // such as new raster level, captured images by camera capture feature, etc.
   TFrameId &formatTemplateFIdForInput();
+
+  QString getLayoutPresetName() const { return m_layoutPresetName; };
+  void setLayoutPresetName(QString name) { m_layoutPresetName = name; };
 
 private:
   // not implemented
