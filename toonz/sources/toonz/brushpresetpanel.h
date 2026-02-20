@@ -141,7 +141,9 @@ public:
   
   const QStringList& getPresetNames() const { return m_presetNames; }
   void setPresetNames(const QStringList &names) { m_presetNames = names; }
-  void addPreset(const QString &presetName) { m_presetNames.append(presetName); }
+  void addPreset(const QString &presetName) {
+    if (!m_presetNames.contains(presetName)) m_presetNames.append(presetName);
+  }
   void removePreset(const QString &presetName) { m_presetNames.removeAll(presetName); }
   bool hasPreset(const QString &presetName) const { return m_presetNames.contains(presetName); }
   // Replace a preset name in-place (preserves position in the list)
@@ -221,6 +223,9 @@ private:
   QPushButton *m_addPresetButton;
   QPushButton *m_removePresetButton;
   QPushButton *m_refreshButton;
+  QToolButton *m_nonDestructiveToggle;
+  QToolButton *m_selectivePresetToggle;
+  QToolButton *m_plainColorButton;
   QLabel *m_toolLabel;
   QPushButton *m_viewModeButton;
   QMenu *m_viewModeMenu;
@@ -358,6 +363,11 @@ private slots:
   void onToolComboBoxListChanged(std::string id);
   void onViewModeChanged(ViewMode mode);
   void onShowHideActionTriggered();
+  
+  // Smart preset mode slots
+  void onNonDestructiveToggled(bool checked);
+  void onSelectivePresetToggled(bool checked);
+  void onPlainColorClicked();
   
   // Tab/Page management slots
   void onTabChanged(int index);

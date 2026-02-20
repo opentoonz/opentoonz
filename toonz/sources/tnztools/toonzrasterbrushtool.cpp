@@ -15,6 +15,10 @@
 // TnzQt includes
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/imageutils.h"
+#include "toonzqt/brushpresetbridge.h"
+#include "toonzqt/tselectionhandle.h"
+#include "toonzqt/styleselection.h"
+#include "tundo.h"
 
 // TnzLib includes
 #include "toonz/tobjecthandle.h"
@@ -1772,26 +1776,86 @@ void ToonzRasterBrushTool::loadPreset() {
 
     m_brushPad = ToolUtils::getBrushPad(preset.m_max, preset.m_hardness * 0.01);
     
-    // Restore style snapshot from preset (strict state restoration)
-    if (preset.m_styleInfoVersion >= 1) {
+    // Style snapshot restoration.
+    // When Selective Preset mode is ON, this entire block is skipped: only the
+    // tool parameters above (size, hardness, pressure, etc.) are injected from
+    // the preset. The user's current style in the palette remains untouched,
+    // effectively acting as a "base" that receives dynamic brush settings from
+    // any chosen preset. This is by design.
+    if (preset.m_styleInfoVersion >= 1 &&
+        !BrushPresetBridge::isSelectivePresetMode()) {
       TApplication *app = getApplication();
       if (app && app->getCurrentPalette()) {
         TPalette *palette = app->getCurrentPalette()->getPalette();
         if (palette) {
           int styleIndex = app->getCurrentLevelStyleIndex();
           TColorStyle *currentStyle = palette->getStyle(styleIndex);
-          TPixel32 currentColor = currentStyle ? currentStyle->getMainColor() : TPixel32::Black;
+          TPixel32 currentColor = TPixel32::Black;
+          if (currentStyle) {
+            // TTextureStyle::getMainColor() returns the texture's average pixel
+            // color, not the user-set color. Use getColorParamValue(0) which
+            // maps to m_patternColor — the actual user-controlled color.
+            if (dynamic_cast<TTextureStyle *>(currentStyle) &&
+                currentStyle->getColorParamCount() > 0)
+              currentColor = currentStyle->getColorParamValue(0);
+            else
+              currentColor = currentStyle->getMainColor();
+          }
+          
+          // Non-Destructive helper: protect existing strokes by creating/reusing
+          // a separate palette index instead of overwriting the current one.
+          auto commitStyle = [&](TColorStyle *newStyle) {
+            if (BrushPresetBridge::isNonDestructiveMode()) {
+              if (TSelection *sel =
+                      app->getCurrentSelection()->getSelection())
+                if (TStyleSelection *ss =
+                        dynamic_cast<TStyleSelection *>(sel))
+                  ss->selectNone();
+
+              int matchIdx =
+                  BrushPresetBridge::findMatchingStyleInPalette(palette, newStyle);
+              if (matchIdx >= 0) {
+                delete newStyle;
+                app->setCurrentLevelStyleIndex(matchIdx, true);
+              } else {
+                int newId = palette->addStyle(newStyle);
+                if (newId >= 0) {
+                  for (int p = 0; p < palette->getPageCount(); ++p) {
+                    TPalette::Page *pg = palette->getPage(p);
+                    if (!pg) continue;
+                    for (int s = 0; s < pg->getStyleCount(); ++s) {
+                      if (pg->getStyleId(s) == styleIndex) {
+                        pg->addStyle(newId);
+                        p = palette->getPageCount();
+                        break;
+                      }
+                    }
+                  }
+                  palette->setDirtyFlag(true);
+                  app->setCurrentLevelStyleIndex(newId, true);
+                  app->getPaletteController()
+                      ->getCurrentLevelPalette()
+                      ->notifyPaletteChanged();
+                }
+              }
+            } else {
+              TColorStyle *oldStyle = palette->getStyle(styleIndex);
+              TUndo *undo = BrushPresetBridge::createStyleOverwriteUndo(
+                  palette, styleIndex, oldStyle, newStyle,
+                  app->getPaletteController()->getCurrentLevelPalette());
+              palette->setStyle(styleIndex, newStyle);
+              app->getCurrentPalette()->notifyColorStyleChanged(false);
+              TUndoManager::manager()->add(undo);
+            }
+          };
           
           if (preset.m_hasStyleSnapshot && preset.m_styleInfoVersion >= 3) {
-            // VERSION 3+: Generic style restoration
             TColorStyle *newStyle = nullptr;
             
             if (preset.m_snapshotStyleTagId == 4001) {
-              // MyPaint brush: construct from brush file path
               TFilePath mpPath(preset.m_snapshotFilePath);
               newStyle = new TMyPaintBrushStyle(mpPath);
             } else if (preset.m_snapshotStyleTagId == 2001) {
-              // Texture style: load texture raster and construct
               TFilePath texRelPath(preset.m_snapshotFilePath);
               TFilePath fullTexPath = TEnv::getStuffDir() + "library" + "textures" + texRelPath;
               TRaster32P textureRas;
@@ -1805,12 +1869,10 @@ void ToonzRasterBrushTool::loadPreset() {
               if (!textureRas) textureRas = TRaster32P(1, 1);
               newStyle = new TTextureStyle(textureRas, texRelPath);
             } else {
-              // Other styles: create via brushIdName
               newStyle = TColorStyle::create(preset.m_snapshotBrushIdName);
             }
             
             if (newStyle) {
-              // GENERIC: Restore ALL numeric parameters
               for (const auto &param : preset.m_snapshotParams) {
                 int idx = param.first;
                 double val = param.second;
@@ -1832,18 +1894,14 @@ void ToonzRasterBrushTool::loadPreset() {
                 }
               }
               newStyle->setMainColor(currentColor);
-              palette->setStyle(styleIndex, newStyle);
-              app->getCurrentPalette()->notifyColorStyleChanged(false);
+              commitStyle(newStyle);
             }
           } else if (preset.m_hasMyPaint) {
-            // VERSION 1-2 legacy: MyPaint
             TFilePath myPaintPath(preset.m_myPaintPath);
             TMyPaintBrushStyle *newStyle = new TMyPaintBrushStyle(myPaintPath);
             newStyle->setMainColor(currentColor);
-            palette->setStyle(styleIndex, newStyle);
-            app->getCurrentPalette()->notifyColorStyleChanged(false);
+            commitStyle(newStyle);
           } else if (preset.m_hasTexture && preset.m_styleInfoVersion >= 2) {
-            // VERSION 2 legacy: Texture
             TFilePath texRelPath(preset.m_texturePath);
             TFilePath fullTexPath = TEnv::getStuffDir() + "library" + "textures" + texRelPath;
             TRaster32P textureRas;
@@ -1864,15 +1922,12 @@ void ToonzRasterBrushTool::loadPreset() {
             newStyle->setParamValue(1, preset.m_textureType);
             newStyle->setParamValue(0, preset.m_textureIsPattern);
             newStyle->setMainColor(currentColor);
-            palette->setStyle(styleIndex, newStyle);
-            app->getCurrentPalette()->notifyColorStyleChanged(false);
+            commitStyle(newStyle);
           } else if (!preset.m_hasMyPaint && !preset.m_hasTexture && !preset.m_hasStyleSnapshot) {
-            // Preset was created with plain solid color: replace any non-solid style
             if (dynamic_cast<TMyPaintBrushStyle*>(currentStyle) ||
                 dynamic_cast<TTextureStyle*>(currentStyle)) {
               TSolidColorStyle *newStyle = new TSolidColorStyle(currentColor);
-              palette->setStyle(styleIndex, newStyle);
-              app->getCurrentPalette()->notifyColorStyleChanged(false);
+              commitStyle(newStyle);
             }
           }
         }
