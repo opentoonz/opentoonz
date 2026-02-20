@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16" height="16" version="1.1" xmlns="http://www.w3.org/2000/svg" style="fill-rule:evenodd;clip-rule:evenodd;">
+    <rect width="16" height="16" fill-opacity="0"/>
+    <path d="M3.5 2 L12.5 2 C13.33 2 14 2.67 14 3.5 L14 12.5 C14 13.33 13.33 14 12.5 14 L3.5 14 C2.67 14 2 13.33 2 12.5 L2 3.5 C2 2.67 2.67 2 3.5 2 Z M4.25 3 C3.56 3 3 3.56 3 4.25 L3 11.75 C3 12.44 3.56 13 4.25 13 L11.75 13 C12.44 13 13 12.44 13 11.75 L13 4.25 C13 3.56 12.44 3 11.75 3 Z"/>
+    <path d="M1.6 13.6 L2.4 14.4 L14.4 2.4 L13.6 1.6 Z"/>
+</svg>

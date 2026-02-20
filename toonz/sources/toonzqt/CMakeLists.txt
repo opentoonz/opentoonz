@@ -134,6 +134,7 @@ set(SOURCES
     keyframenavigator.cpp
     lineedit.cpp
     menubarcommand.cpp
+    brushpresetbridge.cpp
     palettesscanpopup.cpp
     paletteviewer.cpp
     paletteviewergui.cpp

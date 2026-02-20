@@ -85,6 +85,9 @@ class MainWindow final : public QMainWindow {
 
   /*-- show layout name in the title bar --*/
   QString m_layoutName;
+  
+  // List of registered room shortcut command IDs
+  QList<QString> m_registeredRoomIds;
 
 public:
   MainWindow(const QString &argumentLayoutFileName, QWidget *parent = 0,
@@ -128,6 +131,15 @@ public:
 
   // Update visibility of all room-bound panels (native and custom)
   void updatePanelVisibility();
+  
+  // Register room shortcuts for all existing rooms
+  void registerRoomCommands();
+  
+  // Unregister a specific room shortcut
+  void unregisterRoomCommand(const QString &roomName);
+  
+  // Update a room shortcut when renamed
+  void updateRoomCommand(const QString &oldName, const QString &newName);
 
 protected:
   void showEvent(QShowEvent *) override;

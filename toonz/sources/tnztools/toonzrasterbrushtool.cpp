@@ -15,6 +15,10 @@
 // TnzQt includes
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/imageutils.h"
+#include "toonzqt/brushpresetbridge.h"
+#include "toonzqt/tselectionhandle.h"
+#include "toonzqt/styleselection.h"
+#include "tundo.h"
 
 // TnzLib includes
 #include "toonz/tobjecthandle.h"
@@ -33,11 +37,13 @@
 #include "toonz/preferences.h"
 #include "toonz/tpalettehandle.h"
 #include "toonz/mypaintbrushstyle.h"
+#include "toonz/imagestyles.h"
 #include "toonz/toonzfolders.h"
 
 // TnzCore includes
 #include "tstream.h"
 #include "tcolorstyles.h"
+#include "timage_io.h"
 #include "tvectorimage.h"
 #include "tenv.h"
 #include "tregion.h"
@@ -1770,38 +1776,163 @@ void ToonzRasterBrushTool::loadPreset() {
 
     m_brushPad = ToolUtils::getBrushPad(preset.m_max, preset.m_hardness * 0.01);
     
-    // CRITICAL: Restore MyPaint style from preset (strict state restoration)
-    // Only applies to NEW presets (version >= 1) that have style information
-    if (preset.m_styleInfoVersion >= 1) {
+    // Style snapshot restoration.
+    // When Selective Preset mode is ON, this entire block is skipped: only the
+    // tool parameters above (size, hardness, pressure, etc.) are injected from
+    // the preset. The user's current style in the palette remains untouched,
+    // effectively acting as a "base" that receives dynamic brush settings from
+    // any chosen preset. This is by design.
+    if (preset.m_styleInfoVersion >= 1 &&
+        !BrushPresetBridge::isSelectivePresetMode()) {
       TApplication *app = getApplication();
       if (app && app->getCurrentPalette()) {
         TPalette *palette = app->getCurrentPalette()->getPalette();
         if (palette) {
           int styleIndex = app->getCurrentLevelStyleIndex();
           TColorStyle *currentStyle = palette->getStyle(styleIndex);
+          TPixel32 currentColor = TPixel32::Black;
+          if (currentStyle) {
+            // TTextureStyle::getMainColor() returns the texture's average pixel
+            // color, not the user-set color. Use getColorParamValue(0) which
+            // maps to m_patternColor — the actual user-controlled color.
+            if (dynamic_cast<TTextureStyle *>(currentStyle) &&
+                currentStyle->getColorParamCount() > 0)
+              currentColor = currentStyle->getColorParamValue(0);
+            else
+              currentColor = currentStyle->getMainColor();
+          }
           
-          if (preset.m_hasMyPaint) {
-            // Preset was created WITH MyPaint: load the specific MyPaint brush
-            TFilePath myPaintPath(preset.m_myPaintPath);
-            TMyPaintBrushStyle *newStyle = new TMyPaintBrushStyle(myPaintPath);
-            if (currentStyle) {
-              newStyle->setMainColor(currentStyle->getMainColor());
-            }
-            palette->setStyle(styleIndex, newStyle);
-            app->getCurrentPalette()->notifyColorStyleChanged(false);
-          } else {
-            // Preset was created WITHOUT MyPaint: replace any existing MyPaint with solid color
-            if (dynamic_cast<TMyPaintBrushStyle*>(currentStyle)) {
-              TSolidColorStyle *newStyle = new TSolidColorStyle(
-                currentStyle ? currentStyle->getMainColor() : TPixel32::Black);
+          // Non-Destructive helper: protect existing strokes by creating/reusing
+          // a separate palette index instead of overwriting the current one.
+          auto commitStyle = [&](TColorStyle *newStyle) {
+            if (BrushPresetBridge::isNonDestructiveMode()) {
+              if (TSelection *sel =
+                      app->getCurrentSelection()->getSelection())
+                if (TStyleSelection *ss =
+                        dynamic_cast<TStyleSelection *>(sel))
+                  ss->selectNone();
+
+              int matchIdx =
+                  BrushPresetBridge::findMatchingStyleInPalette(palette, newStyle);
+              if (matchIdx >= 0) {
+                delete newStyle;
+                app->setCurrentLevelStyleIndex(matchIdx, true);
+              } else {
+                int newId = palette->addStyle(newStyle);
+                if (newId >= 0) {
+                  for (int p = 0; p < palette->getPageCount(); ++p) {
+                    TPalette::Page *pg = palette->getPage(p);
+                    if (!pg) continue;
+                    for (int s = 0; s < pg->getStyleCount(); ++s) {
+                      if (pg->getStyleId(s) == styleIndex) {
+                        pg->addStyle(newId);
+                        p = palette->getPageCount();
+                        break;
+                      }
+                    }
+                  }
+                  palette->setDirtyFlag(true);
+                  app->setCurrentLevelStyleIndex(newId, true);
+                  app->getPaletteController()
+                      ->getCurrentLevelPalette()
+                      ->notifyPaletteChanged();
+                }
+              }
+            } else {
+              TColorStyle *oldStyle = palette->getStyle(styleIndex);
+              TUndo *undo = BrushPresetBridge::createStyleOverwriteUndo(
+                  palette, styleIndex, oldStyle, newStyle,
+                  app->getPaletteController()->getCurrentLevelPalette());
               palette->setStyle(styleIndex, newStyle);
               app->getCurrentPalette()->notifyColorStyleChanged(false);
+              TUndoManager::manager()->add(undo);
+            }
+          };
+          
+          if (preset.m_hasStyleSnapshot && preset.m_styleInfoVersion >= 3) {
+            TColorStyle *newStyle = nullptr;
+            
+            if (preset.m_snapshotStyleTagId == 4001) {
+              TFilePath mpPath(preset.m_snapshotFilePath);
+              newStyle = new TMyPaintBrushStyle(mpPath);
+            } else if (preset.m_snapshotStyleTagId == 2001) {
+              TFilePath texRelPath(preset.m_snapshotFilePath);
+              TFilePath fullTexPath = TEnv::getStuffDir() + "library" + "textures" + texRelPath;
+              TRaster32P textureRas;
+              try {
+                TImageReaderP reader = TImageReaderP(fullTexPath);
+                if (reader) {
+                  TImageP img = reader->load();
+                  if (TRasterImageP ri = img) textureRas = ri->getRaster();
+                }
+              } catch (...) {}
+              if (!textureRas) textureRas = TRaster32P(1, 1);
+              newStyle = new TTextureStyle(textureRas, texRelPath);
+            } else {
+              newStyle = TColorStyle::create(preset.m_snapshotBrushIdName);
+            }
+            
+            if (newStyle) {
+              for (const auto &param : preset.m_snapshotParams) {
+                int idx = param.first;
+                double val = param.second;
+                if (idx >= newStyle->getParamCount()) continue;
+                TColorStyle::ParamType ptype = newStyle->getParamType(idx);
+                switch (ptype) {
+                  case TColorStyle::BOOL:
+                    newStyle->setParamValue(idx, (bool)(val != 0));
+                    break;
+                  case TColorStyle::INT:
+                  case TColorStyle::ENUM:
+                    newStyle->setParamValue(idx, (int)val);
+                    break;
+                  case TColorStyle::DOUBLE:
+                    newStyle->setParamValue(idx, val);
+                    break;
+                  default:
+                    break;
+                }
+              }
+              newStyle->setMainColor(currentColor);
+              commitStyle(newStyle);
+            }
+          } else if (preset.m_hasMyPaint) {
+            TFilePath myPaintPath(preset.m_myPaintPath);
+            TMyPaintBrushStyle *newStyle = new TMyPaintBrushStyle(myPaintPath);
+            newStyle->setMainColor(currentColor);
+            commitStyle(newStyle);
+          } else if (preset.m_hasTexture && preset.m_styleInfoVersion >= 2) {
+            TFilePath texRelPath(preset.m_texturePath);
+            TFilePath fullTexPath = TEnv::getStuffDir() + "library" + "textures" + texRelPath;
+            TRaster32P textureRas;
+            try {
+              TImageReaderP reader = TImageReaderP(fullTexPath);
+              if (reader) {
+                TImageP img = reader->load();
+                if (TRasterImageP ri = img) textureRas = ri->getRaster();
+              }
+            } catch (...) {}
+            if (!textureRas) textureRas = TRaster32P(1, 1);
+            TTextureStyle *newStyle = new TTextureStyle(textureRas, texRelPath);
+            newStyle->setParamValue(2, preset.m_textureScale);
+            newStyle->setParamValue(3, preset.m_textureRotation);
+            newStyle->setParamValue(4, preset.m_textureDispX);
+            newStyle->setParamValue(5, preset.m_textureDispY);
+            newStyle->setParamValue(6, preset.m_textureContrast);
+            newStyle->setParamValue(1, preset.m_textureType);
+            newStyle->setParamValue(0, preset.m_textureIsPattern);
+            newStyle->setMainColor(currentColor);
+            commitStyle(newStyle);
+          } else if (!preset.m_hasMyPaint && !preset.m_hasTexture && !preset.m_hasStyleSnapshot) {
+            if (dynamic_cast<TMyPaintBrushStyle*>(currentStyle) ||
+                dynamic_cast<TTextureStyle*>(currentStyle)) {
+              TSolidColorStyle *newStyle = new TSolidColorStyle(currentColor);
+              commitStyle(newStyle);
             }
           }
         }
       }
     }
-    // OLD presets (version 0): do nothing - leave the current style unchanged
   } catch (...) {
   }
 }
@@ -1824,19 +1955,69 @@ void ToonzRasterBrushTool::addPreset(QString name) {
   preset.m_modifierLockAlpha = m_modifierLockAlpha.getValue();
   preset.m_assistants        = m_assistants.getValue();
   
-  // Capture MyPaint style information (CRITICAL for strict preset restoration)
-  preset.m_styleInfoVersion = 1;  // Mark as new preset with style information
+  // Capture complete style snapshot using the GENERIC approach.
+  // This captures ALL parameters of ANY TColorStyle (MyPaint, Texture, etc.)
+  // without hardcoding individual parameters.
+  preset.m_styleInfoVersion = 3;
+  preset.m_hasMyPaint = false;
+  preset.m_hasTexture = false;
+  preset.m_hasStyleSnapshot = false;
   
   TApplication *app = getApplication();
   if (app) {
     TColorStyle *style = app->getCurrentLevelStyle();
-    if (TMyPaintBrushStyle *mpStyle = dynamic_cast<TMyPaintBrushStyle*>(style)) {
-      preset.m_hasMyPaint = true;
-      std::wstring wpath = mpStyle->getPath().getWideString();
-      preset.m_myPaintPath = std::string(wpath.begin(), wpath.end());
-    } else {
-      preset.m_hasMyPaint = false;
-      preset.m_myPaintPath = "";
+    
+    if (style && !dynamic_cast<TSolidColorStyle*>(style)) {
+      preset.m_hasStyleSnapshot = true;
+      preset.m_snapshotStyleTagId = style->getTagId();
+      preset.m_snapshotBrushIdName = style->getBrushIdName();
+      
+      // Extract primary file path based on style type
+      if (TMyPaintBrushStyle *mpStyle = dynamic_cast<TMyPaintBrushStyle*>(style)) {
+        std::wstring wpath = mpStyle->getPath().getWideString();
+        preset.m_snapshotFilePath = std::string(wpath.begin(), wpath.end());
+        // Legacy compatibility
+        preset.m_hasMyPaint = true;
+        preset.m_myPaintPath = preset.m_snapshotFilePath;
+      } else if (TTextureStyle *texStyle = dynamic_cast<TTextureStyle*>(style)) {
+        TFilePath texPath = texStyle->getParamValue(TColorStyle::TFilePath_tag(), 0);
+        std::wstring wpath = texPath.getWideString();
+        preset.m_snapshotFilePath = std::string(wpath.begin(), wpath.end());
+        // Legacy compatibility
+        preset.m_hasTexture = true;
+        preset.m_texturePath = preset.m_snapshotFilePath;
+        preset.m_textureScale = texStyle->getParamValue(TColorStyle::double_tag(), 2);
+        preset.m_textureRotation = texStyle->getParamValue(TColorStyle::double_tag(), 3);
+        preset.m_textureDispX = texStyle->getParamValue(TColorStyle::double_tag(), 4);
+        preset.m_textureDispY = texStyle->getParamValue(TColorStyle::double_tag(), 5);
+        preset.m_textureContrast = texStyle->getParamValue(TColorStyle::double_tag(), 6);
+        preset.m_textureType = texStyle->getParamValue(TColorStyle::int_tag(), 1);
+        preset.m_textureIsPattern = texStyle->getParamValue(TColorStyle::bool_tag(), 0);
+      }
+      
+      // GENERIC: Capture ALL numeric parameters of the style
+      int paramCount = style->getParamCount();
+      for (int i = 0; i < paramCount; ++i) {
+        TColorStyle::ParamType ptype = style->getParamType(i);
+        double numValue = 0.0;
+        switch (ptype) {
+          case TColorStyle::BOOL:
+            numValue = style->getParamValue(TColorStyle::bool_tag(), i) ? 1.0 : 0.0;
+            break;
+          case TColorStyle::INT:
+          case TColorStyle::ENUM:
+            numValue = (double)style->getParamValue(TColorStyle::int_tag(), i);
+            break;
+          case TColorStyle::DOUBLE:
+            numValue = style->getParamValue(TColorStyle::double_tag(), i);
+            break;
+          case TColorStyle::FILEPATH:
+            continue; // Skip filepath params (handled via m_snapshotFilePath)
+          default:
+            continue;
+        }
+        preset.m_snapshotParams.push_back({i, numValue});
+      }
     }
   }
 
@@ -1980,7 +2161,23 @@ BrushData::BrushData()
     , m_modifierOpacity(0.0)
     , m_modifierEraser(0.0)
     , m_modifierLockAlpha(0.0)
-    , m_assistants(false) {}
+    , m_assistants(false)
+    , m_styleInfoVersion(0)
+    , m_hasMyPaint(false)
+    , m_myPaintPath("")
+    , m_hasTexture(false)
+    , m_texturePath("")
+    , m_textureScale(1.0)
+    , m_textureRotation(0.0)
+    , m_textureDispX(0.0)
+    , m_textureDispY(0.0)
+    , m_textureContrast(1.0)
+    , m_textureType(1)
+    , m_textureIsPattern(false)
+    , m_hasStyleSnapshot(false)
+    , m_snapshotStyleTagId(0)
+    , m_snapshotBrushIdName("")
+    , m_snapshotFilePath("") {}
 
 //----------------------------------------------------------------------------------------------------------
 
@@ -2000,9 +2197,22 @@ BrushData::BrushData(const std::wstring &name)
     , m_modifierEraser(0.0)
     , m_modifierLockAlpha(0.0)
     , m_assistants(false)
+    , m_styleInfoVersion(0)
     , m_hasMyPaint(false)
     , m_myPaintPath("")
-    , m_styleInfoVersion(0) {}
+    , m_hasTexture(false)
+    , m_texturePath("")
+    , m_textureScale(1.0)
+    , m_textureRotation(0.0)
+    , m_textureDispX(0.0)
+    , m_textureDispY(0.0)
+    , m_textureContrast(1.0)
+    , m_textureType(1)
+    , m_textureIsPattern(false)
+    , m_hasStyleSnapshot(false)
+    , m_snapshotStyleTagId(0)
+    , m_snapshotBrushIdName("")
+    , m_snapshotFilePath("") {}
 
 //----------------------------------------------------------------------------------------------------------
 
@@ -2047,8 +2257,9 @@ void BrushData::saveData(TOStream &os) {
   os << (int)m_assistants;
   os.closeChild();
   os.openChild("StyleInfoVersion");
-  os << 1;  // Version 1 = has style information
+  os << 3;  // Version 3 = generic style snapshot (all style types)
   os.closeChild();
+  // Legacy fields (kept for backward compatibility with older OpenToonz versions)
   os.openChild("HasMyPaint");
   os << (int)m_hasMyPaint;
   os.closeChild();
@@ -2056,6 +2267,59 @@ void BrushData::saveData(TOStream &os) {
     os.openChild("MyPaintPath");
     os << m_myPaintPath;
     os.closeChild();
+  }
+  os.openChild("HasTexture");
+  os << (int)m_hasTexture;
+  os.closeChild();
+  if (m_hasTexture) {
+    os.openChild("TexturePath");
+    os << m_texturePath;
+    os.closeChild();
+    os.openChild("TextureScale");
+    os << m_textureScale;
+    os.closeChild();
+    os.openChild("TextureRotation");
+    os << m_textureRotation;
+    os.closeChild();
+    os.openChild("TextureDispX");
+    os << m_textureDispX;
+    os.closeChild();
+    os.openChild("TextureDispY");
+    os << m_textureDispY;
+    os.closeChild();
+    os.openChild("TextureContrast");
+    os << m_textureContrast;
+    os.closeChild();
+    os.openChild("TextureType");
+    os << m_textureType;
+    os.closeChild();
+    os.openChild("TextureIsPattern");
+    os << (int)m_textureIsPattern;
+    os.closeChild();
+  }
+  // Generic style snapshot (version >= 3)
+  // Captures ALL parameters of any TColorStyle in a type-agnostic way.
+  os.openChild("StyleSnapshot");
+  os << (int)m_hasStyleSnapshot;
+  os.closeChild();
+  if (m_hasStyleSnapshot) {
+    os.openChild("SnapshotTagId");
+    os << m_snapshotStyleTagId;
+    os.closeChild();
+    os.openChild("SnapshotBrushId");
+    os << m_snapshotBrushIdName;
+    os.closeChild();
+    os.openChild("SnapshotFile");
+    os << m_snapshotFilePath;
+    os.closeChild();
+    os.openChild("SnapshotParamCount");
+    os << (int)m_snapshotParams.size();
+    os.closeChild();
+    for (const auto &param : m_snapshotParams) {
+      os.openChild("SNP");
+      os << param.first << param.second;
+      os.closeChild();
+    }
   }
 }
 
@@ -2100,12 +2364,46 @@ void BrushData::loadData(TIStream &is) {
       is >> val, m_hasMyPaint = val, is.matchEndTag();
     else if (tagName == "MyPaintPath")
       is >> m_myPaintPath, is.matchEndTag();
+    // Texture style snapshot (version >= 2)
+    else if (tagName == "HasTexture")
+      is >> val, m_hasTexture = val, is.matchEndTag();
+    else if (tagName == "TexturePath")
+      is >> m_texturePath, is.matchEndTag();
+    else if (tagName == "TextureScale")
+      is >> m_textureScale, is.matchEndTag();
+    else if (tagName == "TextureRotation")
+      is >> m_textureRotation, is.matchEndTag();
+    else if (tagName == "TextureDispX")
+      is >> m_textureDispX, is.matchEndTag();
+    else if (tagName == "TextureDispY")
+      is >> m_textureDispY, is.matchEndTag();
+    else if (tagName == "TextureContrast")
+      is >> m_textureContrast, is.matchEndTag();
+    else if (tagName == "TextureType")
+      is >> m_textureType, is.matchEndTag();
+    else if (tagName == "TextureIsPattern")
+      is >> val, m_textureIsPattern = val, is.matchEndTag();
+    // Generic style snapshot (version >= 3)
+    else if (tagName == "StyleSnapshot")
+      is >> val, m_hasStyleSnapshot = val, is.matchEndTag();
+    else if (tagName == "SnapshotTagId")
+      is >> m_snapshotStyleTagId, is.matchEndTag();
+    else if (tagName == "SnapshotBrushId")
+      is >> m_snapshotBrushIdName, is.matchEndTag();
+    else if (tagName == "SnapshotFile")
+      is >> m_snapshotFilePath, is.matchEndTag();
+    else if (tagName == "SnapshotParamCount")
+      is >> val, is.matchEndTag(); // Count is informational; actual params follow
+    else if (tagName == "SNP") {
+      int idx;
+      double dval;
+      is >> idx >> dval;
+      m_snapshotParams.push_back({idx, dval});
+      is.matchEndTag();
+    }
     else
       is.skipCurrentTag();
   }
-  
-  // If StyleInfoVersion is missing, this is an old preset (version 0)
-  // Old presets don't have style information, so we leave m_styleInfoVersion at 0
 }
 
 //----------------------------------------------------------------------------------------------------------
