@@ -12,6 +12,10 @@
 // TnzQt includes
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/imageutils.h"
+#include "toonzqt/brushpresetbridge.h"
+#include "toonzqt/tselectionhandle.h"
+#include "toonzqt/styleselection.h"
+#include "tundo.h"
 
 // TnzLib includes
 #include "toonz/tobjecthandle.h"
@@ -1771,29 +1775,82 @@ void ToonzVectorBrushTool::loadPreset() {
     m_minThick = m_thickness.getValue().first;
     m_maxThick = m_thickness.getValue().second;
     
-    // Restore style snapshot
-    if (preset.m_styleInfoVersion >= 1) {
+    // Style snapshot restoration.
+    // When Selective Preset mode is ON, this entire block is skipped: only the
+    // tool parameters above are injected. The user's current style acts as a
+    // "base" that receives dynamic brush settings from any chosen preset.
+    if (preset.m_styleInfoVersion >= 1 &&
+        !BrushPresetBridge::isSelectivePresetMode()) {
       TApplication *app = getApplication();
       if (app && app->getCurrentPalette()) {
         TPalette *palette = app->getCurrentPalette()->getPalette();
         if (palette) {
           int styleIndex = app->getCurrentLevelStyleIndex();
           TColorStyle *currentStyle = palette->getStyle(styleIndex);
-          TPixel32 currentColor = currentStyle ? currentStyle->getMainColor() : TPixel32::Black;
+          TPixel32 currentColor = TPixel32::Black;
+          if (currentStyle) {
+            if (dynamic_cast<TTextureStyle *>(currentStyle) &&
+                currentStyle->getColorParamCount() > 0)
+              currentColor = currentStyle->getColorParamValue(0);
+            else
+              currentColor = currentStyle->getMainColor();
+          }
+          
+          auto commitStyle = [&](TColorStyle *newStyle) {
+            if (BrushPresetBridge::isNonDestructiveMode()) {
+              if (TSelection *sel =
+                      app->getCurrentSelection()->getSelection())
+                if (TStyleSelection *ss =
+                        dynamic_cast<TStyleSelection *>(sel))
+                  ss->selectNone();
+
+              int matchIdx =
+                  BrushPresetBridge::findMatchingStyleInPalette(palette, newStyle);
+              if (matchIdx >= 0) {
+                delete newStyle;
+                app->setCurrentLevelStyleIndex(matchIdx, true);
+              } else {
+                int newId = palette->addStyle(newStyle);
+                if (newId >= 0) {
+                  for (int p = 0; p < palette->getPageCount(); ++p) {
+                    TPalette::Page *pg = palette->getPage(p);
+                    if (!pg) continue;
+                    for (int s = 0; s < pg->getStyleCount(); ++s) {
+                      if (pg->getStyleId(s) == styleIndex) {
+                        pg->addStyle(newId);
+                        p = palette->getPageCount();
+                        break;
+                      }
+                    }
+                  }
+                  palette->setDirtyFlag(true);
+                  app->setCurrentLevelStyleIndex(newId, true);
+                  app->getPaletteController()
+                      ->getCurrentLevelPalette()
+                      ->notifyPaletteChanged();
+                }
+              }
+            } else {
+              TColorStyle *oldStyle = palette->getStyle(styleIndex);
+              TUndo *undo = BrushPresetBridge::createStyleOverwriteUndo(
+                  palette, styleIndex, oldStyle, newStyle,
+                  app->getPaletteController()->getCurrentLevelPalette());
+              palette->setStyle(styleIndex, newStyle);
+              app->getCurrentPalette()->notifyColorStyleChanged(false);
+              TUndoManager::manager()->add(undo);
+            }
+          };
           
           if (preset.m_hasStyleSnapshot && preset.m_styleInfoVersion >= 2) {
-            // VERSION 2+: Generic style restoration
             TColorStyle *newStyle = nullptr;
             
             if (preset.m_snapshotStyleTagId == 3000) {
-              // TVectorBrushStyle: extract brush name
               std::string brushName = preset.m_snapshotBrushIdName;
               std::string prefix = "VectorBrushStyle:";
               if (brushName.find(prefix) == 0)
                 brushName = brushName.substr(prefix.length());
               newStyle = new TVectorBrushStyle(brushName);
             } else if (preset.m_snapshotStyleTagId == 2001) {
-              // Texture style: load raster and construct
               TFilePath texRelPath(preset.m_snapshotFilePath);
               TFilePath fullTexPath = TEnv::getStuffDir() + "library" + "textures" + texRelPath;
               TRaster32P textureRas;
@@ -1807,12 +1864,10 @@ void ToonzVectorBrushTool::loadPreset() {
               if (!textureRas) textureRas = TRaster32P(1, 1);
               newStyle = new TTextureStyle(textureRas, texRelPath);
             } else {
-              // Generated or Trail: create via brushIdName
               newStyle = TColorStyle::create(preset.m_snapshotBrushIdName);
             }
             
             if (newStyle) {
-              // GENERIC: Restore ALL numeric parameters
               for (const auto &param : preset.m_snapshotParams) {
                 int idx = param.first;
                 double val = param.second;
@@ -1834,11 +1889,9 @@ void ToonzVectorBrushTool::loadPreset() {
                 }
               }
               newStyle->setMainColor(currentColor);
-              palette->setStyle(styleIndex, newStyle);
-              app->getCurrentPalette()->notifyColorStyleChanged(false);
+              commitStyle(newStyle);
             }
           } else if (preset.m_hasVectorStyle) {
-            // VERSION 1 legacy: Vector/Generated/Trail
             if (preset.m_vectorStyleTagId == 3000) {
               std::string brushName = preset.m_vectorStyleName;
               std::string prefix = "VectorBrushStyle:";
@@ -1846,18 +1899,15 @@ void ToonzVectorBrushTool::loadPreset() {
                 brushName = brushName.substr(prefix.length());
               TVectorBrushStyle *newStyle = new TVectorBrushStyle(brushName);
               newStyle->setMainColor(currentColor);
-              palette->setStyle(styleIndex, newStyle);
-              app->getCurrentPalette()->notifyColorStyleChanged(false);
+              commitStyle(newStyle);
             } else {
               TColorStyle *newStyle = TColorStyle::create(preset.m_vectorStyleName);
               if (newStyle) {
                 newStyle->setMainColor(currentColor);
-                palette->setStyle(styleIndex, newStyle);
-                app->getCurrentPalette()->notifyColorStyleChanged(false);
+                commitStyle(newStyle);
               }
             }
           } else if (preset.m_hasTexture) {
-            // VERSION 1 legacy: Texture
             TFilePath texRelPath(preset.m_texturePath);
             TFilePath fullTexPath = TEnv::getStuffDir() + "library" + "textures" + texRelPath;
             TRaster32P textureRas;
@@ -1878,14 +1928,11 @@ void ToonzVectorBrushTool::loadPreset() {
             newStyle->setParamValue(1, preset.m_textureType);
             newStyle->setParamValue(0, preset.m_textureIsPattern);
             newStyle->setMainColor(currentColor);
-            palette->setStyle(styleIndex, newStyle);
-            app->getCurrentPalette()->notifyColorStyleChanged(false);
+            commitStyle(newStyle);
           } else if (!preset.m_hasVectorStyle && !preset.m_hasTexture && !preset.m_hasStyleSnapshot) {
-            // Plain solid color preset: replace any non-solid style
             if (!dynamic_cast<TSolidColorStyle*>(currentStyle)) {
               TSolidColorStyle *newStyle = new TSolidColorStyle(currentColor);
-              palette->setStyle(styleIndex, newStyle);
-              app->getCurrentPalette()->notifyColorStyleChanged(false);
+              commitStyle(newStyle);
             }
           }
         }

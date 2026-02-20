@@ -20,7 +20,12 @@
 // TnzCore includes for style detection
 #include "tcolorstyles.h"
 #include "tvectorbrushstyle.h"
+#include "tundo.h"
+#include "historytypes.h"
 #include "tsimplecolorstyles.h"
+#include "tpalette.h"
+#include "toonz/palettecontroller.h"
+#include "toonz/tpalettehandle.h"
 
 // ToonzCore includes
 #include "tenv.h"
@@ -1154,6 +1159,9 @@ BrushPresetPanel::BrushPresetPanel(QWidget *parent)
     , m_addPresetButton(nullptr)
     , m_removePresetButton(nullptr)
     , m_refreshButton(nullptr)
+    , m_nonDestructiveToggle(nullptr)
+    , m_selectivePresetToggle(nullptr)
+    , m_plainColorButton(nullptr)
     , m_toolLabel(nullptr)
     , m_viewModeButton(nullptr)
     , m_viewModeMenu(nullptr)
@@ -1265,19 +1273,63 @@ void BrushPresetPanel::initializeUI() {
   m_refreshButton->setToolTip(tr("Refresh preset list"));
   m_refreshButton->setEnabled(true);
   
+  // Separator before smart preset toggles
+  QFrame *separator3 = new QFrame(mainWidget);
+  separator3->setFrameShape(QFrame::VLine);
+  separator3->setFrameShadow(QFrame::Sunken);
+  separator3->setStyleSheet("QFrame { color: rgba(128,128,128,80); }");
+  
+  // Non-Destructive toggle (protects existing strokes by not overwriting styles)
+  m_nonDestructiveToggle = new QToolButton(mainWidget);
+  m_nonDestructiveToggle->setIcon(createQIcon("lock"));
+  m_nonDestructiveToggle->setIconSize(QSize(14, 14));
+  m_nonDestructiveToggle->setFixedSize(20, 20);
+  m_nonDestructiveToggle->setCheckable(true);
+  m_nonDestructiveToggle->setToolTip(tr("Non-Destructive"));
+  
+  // Selective Preset toggle (applies only tool parameters, ignores style snapshot)
+  m_selectivePresetToggle = new QToolButton(mainWidget);
+  m_selectivePresetToggle->setIcon(createQIcon("preset"));
+  m_selectivePresetToggle->setIconSize(QSize(14, 14));
+  m_selectivePresetToggle->setFixedSize(20, 20);
+  m_selectivePresetToggle->setCheckable(true);
+  m_selectivePresetToggle->setToolTip(tr("Selective Preset"));
+  
+  // Plain Color button (removes style overlay, restores solid color)
+  m_plainColorButton = new QToolButton(mainWidget);
+  m_plainColorButton->setIcon(createQIcon("plaincolor"));
+  m_plainColorButton->setIconSize(QSize(14, 14));
+  m_plainColorButton->setFixedSize(20, 20);
+  m_plainColorButton->setToolTip(tr("Plain Color"));
+  
+  // Restore toggle states from QSettings
+  {
+    QSettings settings;
+    bool nd = settings.value("BrushPresetPanel/NonDestructive", false).toBool();
+    bool sp = settings.value("BrushPresetPanel/SelectivePreset", false).toBool();
+    m_nonDestructiveToggle->setChecked(nd);
+    m_selectivePresetToggle->setChecked(sp);
+    BrushPresetBridge::setNonDestructiveMode(nd);
+    BrushPresetBridge::setSelectivePresetMode(sp);
+  }
+  
   // Hamburger menu for display modes
   m_viewModeButton = new QPushButton(mainWidget);
   m_viewModeButton->setIcon(createQIcon("menu"));
   m_viewModeButton->setFixedSize(24, 24);
   m_viewModeButton->setToolTip(tr("View mode"));
   
-  // Layout order: [New Page] | [- Preset] [+ Preset] | [Refresh] ... [Menu]
+  // Layout: [NewPage] | [-] [+] | [Refresh] | [Lock] [Selective] [PlainColor] ... [Menu]
   buttonLayout->addWidget(newPageButton);
   buttonLayout->addWidget(separator1);
   buttonLayout->addWidget(m_removePresetButton);
   buttonLayout->addWidget(m_addPresetButton);
   buttonLayout->addWidget(separator2);
   buttonLayout->addWidget(m_refreshButton);
+  buttonLayout->addWidget(separator3);
+  buttonLayout->addWidget(m_nonDestructiveToggle);
+  buttonLayout->addWidget(m_selectivePresetToggle);
+  buttonLayout->addWidget(m_plainColorButton);
   buttonLayout->addStretch();
   buttonLayout->addWidget(m_viewModeButton);
   
@@ -1349,6 +1401,11 @@ void BrushPresetPanel::initializeUI() {
   connect(m_addPresetButton, SIGNAL(clicked()), this, SLOT(onAddPresetClicked()));
   connect(m_removePresetButton, SIGNAL(clicked()), this, SLOT(onRemovePresetClicked()));
   connect(m_refreshButton, SIGNAL(clicked()), this, SLOT(onRefreshClicked()));
+  connect(m_nonDestructiveToggle, SIGNAL(toggled(bool)),
+          this, SLOT(onNonDestructiveToggled(bool)));
+  connect(m_selectivePresetToggle, SIGNAL(toggled(bool)),
+          this, SLOT(onSelectivePresetToggled(bool)));
+  connect(m_plainColorButton, SIGNAL(clicked()), this, SLOT(onPlainColorClicked()));
 }
 
 void BrushPresetPanel::connectSignals() {
@@ -1635,15 +1692,17 @@ void BrushPresetPanel::refreshPresetList() {
   // Load all physically existing presets
   QList<QString> allPresets = loadPresetsForTool(toolType);
   
-  // Show presets that belong to the current page
+  // Show presets that belong to the current page.
+  // Take a COPY of the names list since removePreset() modifies the
+  // underlying QStringList and would invalidate the range-based iterator.
   bool hasDeletedPresets = false;
   if (currentPage->getPresetCount() > 0) {
-    // Page has assigned presets - show ONLY those that still exist on disk
-    for (const QString &presetName : currentPage->getPresetNames()) {
+    QStringList pageNames = currentPage->getPresetNames();
+    for (const QString &presetName : pageNames) {
       if (allPresets.contains(presetName)) {
-        presets.append(presetName);
+        if (!presets.contains(presetName))
+          presets.append(presetName);
       } else {
-        // Preset was deleted from disk - remove from page
         currentPage->removePreset(presetName);
         hasDeletedPresets = true;
       }
@@ -1671,9 +1730,9 @@ void BrushPresetPanel::refreshPresetList() {
     }
     
     if (!foundInAnyPage) {
-      // Orphan preset - add to current page
       currentPage->addPreset(presetName);
-      presets.append(presetName);
+      if (!presets.contains(presetName))
+        presets.append(presetName);
       hasNewOrphans = true;
     }
   }
@@ -2152,6 +2211,51 @@ void BrushPresetPanel::onRefreshClicked() {
   refreshPresetList();
 }
 
+void BrushPresetPanel::onNonDestructiveToggled(bool checked) {
+  BrushPresetBridge::setNonDestructiveMode(checked);
+  QSettings settings;
+  settings.setValue("BrushPresetPanel/NonDestructive", checked);
+}
+
+void BrushPresetPanel::onSelectivePresetToggled(bool checked) {
+  BrushPresetBridge::setSelectivePresetMode(checked);
+  QSettings settings;
+  settings.setValue("BrushPresetPanel/SelectivePreset", checked);
+}
+
+void BrushPresetPanel::onPlainColorClicked() {
+  TApplication *app = TApp::instance();
+  if (!app) return;
+  TPaletteHandle *ph =
+      app->getPaletteController()->getCurrentLevelPalette();
+  if (!ph) return;
+  TPalette *palette = ph->getPalette();
+  if (!palette) return;
+  int styleIndex = app->getCurrentLevelStyleIndex();
+  TColorStyle *currentStyle = palette->getStyle(styleIndex);
+  if (!currentStyle) return;
+  if (dynamic_cast<TSolidColorStyle *>(currentStyle)) return;
+
+  // Read user-controlled color (TTextureStyle::getMainColor returns the
+  // texture's average pixel color, not the user's drawing color).
+  TPixel32 color = TPixel32::Black;
+  if (dynamic_cast<TTextureStyle *>(currentStyle) &&
+      currentStyle->getColorParamCount() > 0)
+    color = currentStyle->getColorParamValue(0);
+  else
+    color = currentStyle->getMainColor();
+
+  TSolidColorStyle *newStyle = new TSolidColorStyle(color);
+
+  TUndo *undo = BrushPresetBridge::createStyleOverwriteUndo(
+      palette, styleIndex, currentStyle, newStyle, ph);
+
+  palette->setStyle(styleIndex, newStyle);
+  palette->setDirtyFlag(true);
+  ph->notifyColorStyleChanged(false);
+  TUndoManager::manager()->add(undo);
+}
+
 void BrushPresetPanel::onToolComboBoxListChanged(std::string id) {
   // Refresh list if preset combo has changed
   // This captures additions/deletions from the ToolOptionsBar
@@ -2372,6 +2476,22 @@ void BrushPresetPanel::contextMenuEvent(QContextMenuEvent *event) {
     });
     menu->addSeparator();
   }
+  
+  // Smart Preset toggles
+  QAction *ndAction = menu->addAction(tr("Non-Destructive"));
+  ndAction->setCheckable(true);
+  ndAction->setChecked(m_nonDestructiveToggle->isChecked());
+  connect(ndAction, &QAction::toggled, m_nonDestructiveToggle, &QToolButton::setChecked);
+  
+  QAction *spAction = menu->addAction(tr("Selective Preset"));
+  spAction->setCheckable(true);
+  spAction->setChecked(m_selectivePresetToggle->isChecked());
+  connect(spAction, &QAction::toggled, m_selectivePresetToggle, &QToolButton::setChecked);
+  
+  QAction *pcAction = menu->addAction(tr("Plain Color"));
+  connect(pcAction, &QAction::triggered, this, &BrushPresetPanel::onPlainColorClicked);
+  
+  menu->addSeparator();
   
   addShowHideContextMenu(menu);
   menu->exec(event->globalPos());
@@ -2665,6 +2785,22 @@ void BrushPresetPanel::showPresetContextMenu(const QPoint &globalPos, const QStr
       });
     }
   }
+  
+  // Smart Preset section
+  menu.addSeparator();
+  
+  QAction *ndAction2 = menu.addAction(tr("Non-Destructive"));
+  ndAction2->setCheckable(true);
+  ndAction2->setChecked(m_nonDestructiveToggle->isChecked());
+  connect(ndAction2, &QAction::toggled, m_nonDestructiveToggle, &QToolButton::setChecked);
+  
+  QAction *spAction2 = menu.addAction(tr("Selective Preset"));
+  spAction2->setCheckable(true);
+  spAction2->setChecked(m_selectivePresetToggle->isChecked());
+  connect(spAction2, &QAction::toggled, m_selectivePresetToggle, &QToolButton::setChecked);
+  
+  QAction *pcAction2 = menu.addAction(tr("Plain Color"));
+  connect(pcAction2, &QAction::triggered, this, &BrushPresetPanel::onPlainColorClicked);
   
   menu.exec(globalPos);
 }
