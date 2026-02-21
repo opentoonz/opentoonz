@@ -59,11 +59,15 @@ public:
                          //! restricted on;
   //!  if empty, clipping is assumed to be disabled.
   //!  \internal  Coordinates reference?
-  TPixel m_tCheckInk;    //!< Color to be used for <I>ink check</I> mode.
-  TPixel m_tCheckPaint;  //!< Color to be used for <I>paint check</I> mode.
-
-  int m_colorCheckIndex;   //!< Color index to be highlighted in <I>color
-                           //! check</I> mode.
+  TPixel m_tCheckInk;        //!< Color to be used for <I>ink check</I> mode.
+  TPixel m_tCheckPaint;      //!< Color to be used for <I>paint check</I> mode.
+  TPixel m_inkCheckColor;    //!< ^ <I>Ink check</I> mode.
+  TPixel m_ink1CheckColor;   //!< ^ <I>Ink1 check</I> mode.
+  TPixel m_paintCheckColor;  //!< ^ <I>Paint check</I> mode.
+  int m_colorCheckIndex;     //!< Color index to be highlighted in <I>color
+  //! check</I> mode.
+  int m_paintIndex;  //!< Color index to be highlighted in <I>paint check</I>
+                     //!< mode.
   int m_indexToHighlight;  // for guided vector drawing
 
   bool m_alphaChannel,      //!< Whether alpha channel is enabled.
@@ -100,7 +104,11 @@ public:
       , m_clippingRect(clippingRect)
       , m_tCheckInk(TPixel::Black)
       , m_tCheckPaint(TPixel(128, 128, 128))
+      , m_inkCheckColor(TPixel::Red)
+      , m_ink1CheckColor(TPixel::Red)
+      , m_paintCheckColor(TPixel::Red)
       , m_colorCheckIndex(-1)
+      , m_paintIndex(-1)
       , m_alphaChannel(
             false)  // Camera stand-like widgets have opaque background
       , m_antiAliasing(
@@ -135,6 +143,7 @@ public:
       , m_tCheckInk(TPixel::Black)
       , m_tCheckPaint(TPixel(128, 128, 128))
       , m_colorCheckIndex(-1)
+      , m_paintIndex(-1)
       , m_alphaChannel(
             true)  // No opaque background - freestanding images with alpha
       , m_antiAliasing(true)     // Jaggy-free pretty images
@@ -165,7 +174,11 @@ public:
       , m_clippingRect(clippingRect)
       , m_tCheckInk(other.m_tCheckInk)
       , m_tCheckPaint(other.m_tCheckPaint)
+      , m_inkCheckColor(other.m_inkCheckColor)
+      , m_ink1CheckColor(other.m_ink1CheckColor)
+      , m_paintCheckColor(other.m_paintCheckColor)
       , m_colorCheckIndex(other.m_colorCheckIndex)
+      , m_paintIndex(other.m_paintIndex)
       , m_alphaChannel(other.m_alphaChannel)
       , m_antiAliasing(other.m_antiAliasing)
       , m_isImagePattern(other.m_isImagePattern)
@@ -197,7 +210,11 @@ public:
       , m_clippingRect(clippingRect)
       , m_tCheckInk(TPixel::Black)
       , m_tCheckPaint(TPixel(128, 128, 128))
+      , m_inkCheckColor(TPixel::Red)
+      , m_ink1CheckColor(TPixel::Red)
+      , m_paintCheckColor(TPixel::Red)
       , m_colorCheckIndex(-1)
+      , m_paintIndex(-1)
       , m_alphaChannel(alphaChannel)
       , m_antiAliasing(antiAliasing)
       , m_isImagePattern(false)

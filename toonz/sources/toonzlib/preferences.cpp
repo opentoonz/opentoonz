@@ -676,6 +676,10 @@ void Preferences::definePreferenceItems() {
          QColor(Qt::white));
   define(transpCheckPaint, "transpCheckPaint", QMetaType::QColor,
          QColor(127, 127, 127));
+  define(inkCheckColor, "inkCheckColor", QMetaType::QColor, QColor(Qt::red));
+  define(ink1CheckColor, "ink1CheckColor", QMetaType::QColor, QColor(Qt::red));
+  define(paintCheckColor, "paintCheckColor", QMetaType::QColor,
+         QColor(Qt::red));
 
   // Version Control
   define(SVNEnabled, "SVNEnabled", QMetaType::Bool, false);

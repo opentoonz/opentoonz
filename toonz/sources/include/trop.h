@@ -184,6 +184,14 @@ public:
   bool m_inksOnly, m_transparencyCheck, m_blackBgCheck, m_isOnionSkin;
   int m_gapCheckIndex = -1;
 
+  bool m_inkCheckEnabled;
+  bool m_ink1CheckEnabled;
+  bool m_paintCheckEnabled;
+
+  TPixel m_inkCheckColor;
+  TPixel m_ink1CheckColor;
+  TPixel m_paintCheckColor;
+
   CmappedQuickputSettings()
       : m_globalColorScale(TPixel32::Black)
       , m_inksOnly(false)
@@ -192,7 +200,13 @@ public:
       , m_isOnionSkin(false)
       , m_gapCheckIndex(-1)
       , m_inkIndex(-1)
-      , m_paintIndex(-1) {}
+      , m_paintIndex(-1)
+      , m_inkCheckEnabled(false)
+      , m_ink1CheckEnabled(false)
+      , m_paintCheckEnabled(false)
+      , m_inkCheckColor(TPixel::Red)
+      , m_ink1CheckColor(TPixel::Red)
+      , m_paintCheckColor(TPixel::Red) {}
 };
 
 DVAPI void quickPut(const TRasterP &dn, const TRasterCM32P &upCM32,

@@ -1406,6 +1406,9 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {transpCheckInkOnWhite, tr("Ink Color on White BG:")},
       {transpCheckInkOnBlack, tr("Ink Color on Black BG:")},
       {transpCheckPaint, tr("Paint Color:")},
+      {inkCheckColor, tr("Ink Check Color:")},
+      {ink1CheckColor, tr("Ink#1 Check Color:")},
+      {paintCheckColor, tr("Paint Check Color:")},
 
       // Version Control
       {SVNEnabled, tr("Enable Version Control*")},
@@ -2333,6 +2336,14 @@ QWidget* PreferencesPopup::createColorsPage() {
     insertUI(transpCheckInkOnBlack, tcLay);
     insertUI(transpCheckPaint, tcLay);
   }
+
+  QGridLayout* ipcLay = insertGroupBox(tr("Ink and Paint Check"), lay);
+  {
+    insertUI(inkCheckColor, ipcLay);
+    insertUI(ink1CheckColor, ipcLay);
+    insertUI(paintCheckColor, ipcLay);
+  }
+
   lay->setRowStretch(lay->rowCount(), 1);
   widget->setLayout(lay);
 
@@ -2351,6 +2362,12 @@ QWidget* PreferencesPopup::createColorsPage() {
   m_onEditedFuncMap.insert(chessboardColor2,
                            &PreferencesPopup::onChessboardChanged);
 
+  m_onEditedFuncMap.insert(inkCheckColor,
+                           &PreferencesPopup::onTranspCheckDataChanged);
+  m_onEditedFuncMap.insert(ink1CheckColor,
+                           &PreferencesPopup::onTranspCheckDataChanged);
+  m_onEditedFuncMap.insert(paintCheckColor,
+                           &PreferencesPopup::onTranspCheckDataChanged);
   return widget;
 }
 

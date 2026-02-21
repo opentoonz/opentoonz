@@ -74,13 +74,19 @@ public:
     bool m_inksOnly;
     int m_inkIndex;
     int m_paintIndex;
+    bool m_inkCheckEnabled;
+    bool m_ink1CheckEnabled;
+    bool m_paintCheckEnabled;
 
     Settings()
         : m_transparencyCheck(false)
         , m_blackBgCheck(false)
         , m_inksOnly(false)
         , m_inkIndex(-1)
-        , m_paintIndex(-1) {}
+        , m_paintIndex(-1)
+        , m_inkCheckEnabled(false)
+        , m_ink1CheckEnabled(false)
+        , m_paintCheckEnabled(false) {}
   };
 
 public:
