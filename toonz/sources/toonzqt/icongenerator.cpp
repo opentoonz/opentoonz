@@ -95,6 +95,12 @@ bool getIcon(const std::string &iconName, QPixmap &pix,
         s.m_paintIndex        = settings.m_paintIndex;
         Preferences::instance()->getTranspCheckData(
             s.m_transpCheckBg, s.m_transpCheckInk, s.m_transpCheckPaint);
+        s.m_inkCheckEnabled   = settings.m_inkCheckEnabled;
+        s.m_ink1CheckEnabled  = settings.m_ink1CheckEnabled;
+        s.m_paintCheckEnabled = settings.m_paintCheckEnabled;
+        s.m_inkCheckColor     = Preferences::instance()->getInkCheckColor();
+        s.m_ink1CheckColor    = Preferences::instance()->getInk1CheckColor();
+        s.m_paintCheckColor   = Preferences::instance()->getPaintCheckColor();
 
         TRop::quickPut(icon, timgp->getRaster(), simpleLevel->getPalette(),
                        TAffine(), s);
@@ -209,6 +215,7 @@ void makeChessBackground(const TRaster32P &ras) {
 //------------------------------------------
 
 namespace {
+
 TRaster32P convertToIcon(TVectorImageP vimage, int frame,
                          const TDimension &iconSize,
                          const IconGenerator::Settings &settings) {
@@ -220,51 +227,63 @@ TRaster32P convertToIcon(TVectorImageP vimage, int frame,
 
   TOfflineGL *glContext = IconGenerator::instance()->getOfflineGLContext();
 
-  // The image and contained within Imagebox
-  // (add a small margin also to prevent problems with empty images)
+  // Image bounding box with a small margin to prevent issues with empty images
   TRectD imageBox;
   {
     QMutexLocker sl(vimage->getMutex());
     imageBox = vimage->getBBox().enlarge(.1);
   }
+
   TPointD imageCenter = (imageBox.getP00() + imageBox.getP11()) * 0.5;
 
-  // Calculate a transformation matrix that moves the image inside the icon.
-  // The scale factor is chosen so that the image is entirely
-  // contained in the icon (with a margin of 'margin' pixels)
+  // Calculate transformation matrix to fit the image inside the icon
   const int margin = 10;
   double scx       = (iconSize.lx - margin) / imageBox.getLx();
   double scy       = (iconSize.ly - margin) / imageBox.getLy();
   double sc        = std::min(scx, scy);
-  // Add the translation: the center point of the image is at the point
-  // middle of the pixmap.
+  //  The center point of the image is at the point middle of the pixmap.
   TPointD iconCenter(iconSize.lx * 0.5, iconSize.ly * 0.5);
   TAffine aff = TScale(sc).place(imageCenter, iconCenter);
 
-  // RenderData
+  // Initialize VectorRenderData
   TVectorRenderData rd(aff, TRect(iconSize), plt, 0, true);
 
-  rd.m_tcheckEnabled     = settings.m_transparencyCheck;
-  rd.m_blackBgEnabled    = settings.m_blackBgCheck;
-  rd.m_drawRegions       = !settings.m_inksOnly;
-  rd.m_inkCheckEnabled   = settings.m_inkIndex != -1;
-  rd.m_paintCheckEnabled = settings.m_paintIndex != -1;
-  rd.m_colorCheckIndex =
-      rd.m_inkCheckEnabled ? settings.m_inkIndex : settings.m_paintIndex;
-  rd.m_isIcon = true;
+  rd.m_tcheckEnabled  = settings.m_transparencyCheck;
+  rd.m_blackBgEnabled = settings.m_blackBgCheck;
+  rd.m_drawRegions    = !settings.m_inksOnly;
+  rd.m_isIcon         = true;
 
-  // Draw the image.
+  // Sync Check Flags
+  rd.m_inkCheckEnabled   = settings.m_inkCheckEnabled;
+  rd.m_ink1CheckEnabled  = settings.m_ink1CheckEnabled;
+  rd.m_paintCheckEnabled = settings.m_paintCheckEnabled;
+  rd.m_paintIndex        = settings.m_paintIndex;
+
+  // Define the target color index for highlighting (Priority: Ink > Paint)
+  if (rd.m_inkCheckEnabled || rd.m_ink1CheckEnabled)
+    rd.m_colorCheckIndex = settings.m_inkIndex;
+  else if (rd.m_paintCheckEnabled)
+    rd.m_colorCheckIndex = settings.m_paintIndex;
+  else
+    rd.m_colorCheckIndex = -1;
+
+  // Set check colors from Preferences
+  Preferences *pref    = Preferences::instance();
+  rd.m_inkCheckColor   = pref->getInkCheckColor();
+  rd.m_ink1CheckColor  = pref->getInk1CheckColor();
+  rd.m_paintCheckColor = pref->getPaintCheckColor();
+
+  // Draw the vector image to the offline GL context
   glContext->makeCurrent();
   glContext->clear(rd.m_blackBgEnabled ? TPixel::Black : TPixel32::White);
   glContext->draw(vimage, rd);
 
+  // Retrieve the rendered raster
   TRaster32P ras(iconSize);
   glContext->getRaster(ras);
-
   glContext->doneCurrent();
 
   delete plt;
-
   return ras;
 }
 
@@ -292,7 +311,6 @@ TRaster32P convertToIcon(TToonzImageP timage, int frame,
   else
     iconLy = tround((double(ly) * iconSize.lx) / lx);
 
-  // icon size with correct aspect ratio
   TDimension iconSize2 = TDimension(iconLx, iconLy);
 
   TRaster32P icon(iconSize2);
@@ -318,6 +336,12 @@ TRaster32P convertToIcon(TToonzImageP timage, int frame,
     s.m_paintIndex        = settings.m_paintIndex;
     Preferences::instance()->getTranspCheckData(
         s.m_transpCheckBg, s.m_transpCheckInk, s.m_transpCheckPaint);
+    s.m_inkCheckEnabled   = settings.m_inkCheckEnabled;
+    s.m_ink1CheckEnabled  = settings.m_ink1CheckEnabled;
+    s.m_paintCheckEnabled = settings.m_paintCheckEnabled;
+    s.m_inkCheckColor     = Preferences::instance()->getInkCheckColor();
+    s.m_ink1CheckColor    = Preferences::instance()->getInk1CheckColor();
+    s.m_paintCheckColor   = Preferences::instance()->getPaintCheckColor();
 
     TRop::quickPut(icon, rasCM32, timage->getPalette(), TAffine(), s);
   } else
@@ -339,11 +363,8 @@ TRaster32P convertToIcon(TToonzImageP timage, int frame,
 
 TRaster32P convertToIcon(TRasterImageP rimage, const TDimension &iconSize) {
   if (!rimage) return TRaster32P();
-
   TRasterP ras = rimage->getRaster();
-
   if (!(TRaster32P)ras && !(TRasterGR8P)ras) return TRaster32P();
-
   if (ras->getSize() == iconSize) return ras;
 
   TRaster32P icon(iconSize);
@@ -367,50 +388,33 @@ TRaster32P convertToIcon(TMeshImageP mi, int frame, const TDimension &iconSize,
   if (!mi) return TRaster32P();
 
   TOfflineGL *glContext = IconGenerator::instance()->getOfflineGLContext();
-
-  // The image and contained within Imagebox
-  // (add a small margin also to prevent problems with empty images)
-  TRectD imageBox;
-  imageBox = mi->getBBox().enlarge(.1);
-
+  TRectD imageBox       = mi->getBBox().enlarge(.1);
   TPointD imageCenter(0.5 * (imageBox.getP00() + imageBox.getP11()));
 
-  // Calculate a transformation matrix that moves the image inside the icon.
-  // The scale factor is chosen so that the image is entirely
-  // contained in the icon (with a margin of 'margin' pixels)
   const int margin = 10;
   double scx       = (iconSize.lx - margin) / imageBox.getLx();
   double scy       = (iconSize.ly - margin) / imageBox.getLy();
   double sc        = std::min(scx, scy);
 
-  // Add the translation: the center point of the image is at the point
-  // middle of the pixmap.
   TPointD iconCenter(iconSize.lx * 0.5, iconSize.ly * 0.5);
   TAffine aff = TScale(sc).place(imageCenter, iconCenter);
 
-  // Draw the image.
   glContext->makeCurrent();
   glContext->clear(settings.m_blackBgCheck ? TPixel::Black : TPixel32::White);
 
   glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT);
   glEnable(GL_BLEND);
   glEnable(GL_LINE_SMOOTH);
-
   glPushMatrix();
   tglMultMatrix(aff);
-
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
   glColor4f(0.0f, 1.0f, 0.0f, 0.7f);
   tglDrawEdges(*mi);
-
   glPopMatrix();
-
   glPopAttrib();
 
   TRaster32P ras(iconSize);
   glContext->getRaster(ras);
-
   glContext->doneCurrent();
 
   return ras;
@@ -477,15 +481,14 @@ IconRenderer::IconRenderer(const std::string &id, const TDimension &iconSize)
     , m_id(id)
     , m_started(false)
     , m_terminated(false) {
-  connect(this, SIGNAL(started(TThread::RunnableP)), IconGenerator::instance(),
-          SLOT(onStarted(TThread::RunnableP)));
-  connect(this, SIGNAL(finished(TThread::RunnableP)), IconGenerator::instance(),
-          SLOT(onFinished(TThread::RunnableP)));
-  connect(this, SIGNAL(canceled(TThread::RunnableP)), IconGenerator::instance(),
-          SLOT(onCanceled(TThread::RunnableP)), Qt::QueuedConnection);
-  connect(this, SIGNAL(terminated(TThread::RunnableP)),
-          IconGenerator::instance(), SLOT(onTerminated(TThread::RunnableP)),
-          Qt::QueuedConnection);
+  connect(this, &IconRenderer::started, IconGenerator::instance(),
+          &IconGenerator::onStarted);
+  connect(this, &IconRenderer::finished, IconGenerator::instance(),
+          &IconGenerator::onFinished);
+  connect(this, &IconRenderer::canceled, IconGenerator::instance(),
+          &IconGenerator::onCanceled, Qt::QueuedConnection);
+  connect(this, &IconRenderer::terminated, IconGenerator::instance(),
+          &IconGenerator::onTerminated, Qt::QueuedConnection);
 }
 
 //-----------------------------------------------------------------------------
@@ -909,9 +912,9 @@ TRaster32P XsheetIconRenderer::generateRaster(
       double sx = (double)iconSize.lx / res.lx;
       double sy = (double)iconSize.ly / res.ly;
 
-      double s  = std::min(sx, sy);
-      res.lx    = tround(res.lx * s);
-      res.ly    = tround(res.ly * s);
+      double s = std::min(sx, sy);
+      res.lx   = tround(res.lx * s);
+      res.ly   = tround(res.ly * s);
     }
   }
   TRaster32P ras(res);

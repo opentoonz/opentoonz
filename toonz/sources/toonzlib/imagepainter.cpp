@@ -97,6 +97,13 @@ inline void quickput(const TRasterP &rout, const TRasterP &rin,
         Preferences::instance()->getTranspCheckData(
             settings.m_transpCheckBg, settings.m_transpCheckInk,
             settings.m_transpCheckPaint);
+
+        settings.m_inkCheckColor = Preferences::instance()->getInkCheckColor();
+        settings.m_ink1CheckColor =
+            Preferences::instance()->getInk1CheckColor();
+        settings.m_paintCheckColor =
+            Preferences::instance()->getPaintCheckColor();
+
         TRop::quickPut(rout, srcCM32, palette, aff, settings);
       }
       srcCM32 = TRasterCM32P();

@@ -192,6 +192,9 @@ enum PreferencesItemId {
   transpCheckInkOnWhite,
   transpCheckInkOnBlack,
   transpCheckPaint,
+  inkCheckColor,
+  ink1CheckColor,
+  paintCheckColor,
 
   //----------
   // Version Control

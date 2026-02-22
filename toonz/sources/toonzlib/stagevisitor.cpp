@@ -628,15 +628,14 @@ void RasterPainter::flushRasterImages() {
         settings.m_blackBgCheck = tc & ToonzCheck::eBlackBg;
 
         // Highlight specific ink/paint only for current column
-        settings.m_inkIndex =
-            m_nodes[i].m_isCurrentColumn
-                ? (tc & ToonzCheck::eInk ? index
-                                         : (tc & ToonzCheck::eInk1 ? 1 : -1))
-                : -1;
+        settings.m_inkIndex = m_nodes[i].m_isCurrentColumn ? index : -1;
 
-        settings.m_paintIndex = m_nodes[i].m_isCurrentColumn
-                                    ? (tc & ToonzCheck::ePaint ? index : -1)
-                                    : -1;
+        settings.m_paintIndex        = m_nodes[i].m_isCurrentColumn
+                                           ? (tc & ToonzCheck::ePaint ? index : -1)
+                                           : -1;
+        settings.m_inkCheckEnabled   = (tc & ToonzCheck::eInk) != 0;
+        settings.m_ink1CheckEnabled  = (tc & ToonzCheck::eInk1) != 0;
+        settings.m_paintCheckEnabled = (tc & ToonzCheck::ePaint) != 0;
 
         Preferences::instance()->getTranspCheckData(
             settings.m_transpCheckBg, settings.m_transpCheckInk,
@@ -644,6 +643,12 @@ void RasterPainter::flushRasterImages() {
 
         settings.m_isOnionSkin = m_nodes[i].m_onionMode != Node::eOnionSkinNone;
         settings.m_gapCheckIndex = gapCheckIndex;
+
+        settings.m_inkCheckColor = Preferences::instance()->getInkCheckColor();
+        settings.m_ink1CheckColor =
+            Preferences::instance()->getInk1CheckColor();
+        settings.m_paintCheckColor =
+            Preferences::instance()->getPaintCheckColor();
 
         // ==============================================================
         // Transparency Check: (see helper above)
@@ -944,6 +949,10 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
   rd.m_paintCheckEnabled     = tc & ToonzCheck::ePaint;
   rd.m_blackBgEnabled        = tc & ToonzCheck::eBlackBg;
   rd.m_colorCheckIndex       = ToonzCheck::instance()->getColorIndex();
+  rd.m_paintIndex            = ToonzCheck::instance()->getColorIndex();
+  rd.m_inkCheckColor         = Preferences::instance()->getInkCheckColor();
+  rd.m_ink1CheckColor        = Preferences::instance()->getInk1CheckColor();
+  rd.m_paintCheckColor       = Preferences::instance()->getPaintCheckColor();
   rd.m_show0ThickStrokes     = prefs.getShow0ThickLines();
   rd.m_regionAntialias       = prefs.getRegionAntialias();
   rd.m_animatedGuidedDrawing = prefs.getAnimatedGuidedDrawing();

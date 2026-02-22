@@ -511,6 +511,10 @@ public:
     ink   = getColorValue(transpCheckInkOnWhite);
     paint = getColorValue(transpCheckPaint);
   }
+  // Returns the configured colors used for Ink and Paint check operations
+  TPixel getInkCheckColor() const { return getColorValue(inkCheckColor); }
+  TPixel getInk1CheckColor() const { return getColorValue(ink1CheckColor); }
+  TPixel getPaintCheckColor() const { return getColorValue(paintCheckColor); }
 
   // Version Control  tab
   bool isSVNEnabled() const { return getBoolValue(SVNEnabled); }

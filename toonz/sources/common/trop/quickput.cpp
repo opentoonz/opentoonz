@@ -10,6 +10,8 @@
 #include "tcolorstyles.h"
 #endif
 
+#include <algorithm>  // for std::max, std::min
+
 /*
 #ifndef __sgi
 #include <algorithm>
@@ -75,60 +77,59 @@ inline TPixel32 applyColorScaleCMapped(const TPixel32 &color,
 
 void doQuickPutFilter(const TRaster32P &dn, const TRaster32P &up,
                       const TAffine &aff) {
-  //  se aff e' degenere la controimmagine di up e' un segmento (o un punto)
+  // if aff is degenerate, the inverse image of up is a segment (or a point)
   if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0) return;
 
-  //  contatore bit di shift
+  // shift bit counter
   const int PADN = 16;
 
-  //  maschera del filtro bilineare
+  // bilinear filter mask
   const int MASKN = (1 << PADN) - 1;
 
-  //  max dimensioni di up gestibili (limite imposto dal numero di bit
-  //  disponibili per la parte intera di xL, yL)
+  // max manageable size of up (limit imposed by number of bits
+  // available for the integer part of xL, yL)
   assert(std::max(up->getLx(), up->getLy()) <
          (1 << (8 * sizeof(int) - PADN - 1)));
 
   TRectD boundingBoxD = TRectD(convert(dn->getSize())) *
                         (aff * TRectD(0, 0, up->getLx() - 2, up->getLy() - 2));
-  //  clipping
+  // clipping
   if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
     return;
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
-  TAffine invAff = inv(aff);  //  inversa di aff
+  TAffine invAff = inv(aff);  // inverse of aff
 
-  //  nel disegnare la y-esima scanline di dn, il passaggio al pixel successivo
-  //  comporta l'incremento (deltaXD, deltaYD) delle coordinate del pixel
-  //  corrispondente di up
+  // when drawing the y-th scanline of dn, moving to the next pixel
+  // implies incrementing (deltaXD, deltaYD) of the corresponding up pixel
+  // coordinates
   double deltaXD = invAff.a11;
   double deltaYD = invAff.a21;
 
-  //  deltaXD "TLonghizzato" (round)
+  // "long-ized" deltaXD (round)
   int deltaXL = tround(deltaXD * (1 << PADN));
 
-  //  deltaYD "TLonghizzato" (round)
+  // "long-ized" deltaYD (round)
   int deltaYL = tround(deltaYD * (1 << PADN));
 
-  //  se aff "TLonghizzata" (round) e' degenere la controimmagine di up e' un
-  // segmento (o un punto)
+  // if "long-ized" aff is degenerate, the inverse image of up is a segment
   if ((deltaXL == 0) && (deltaYL == 0)) return;
 
-  //	naturale predecessore di up->getLx() - 1
+  // natural predecessor of up->getLx() - 1
   int lxPred = (up->getLx() - 2) * (1 << PADN);
 
-  //	naturale predecessore di up->getLy() - 1
+  // natural predecessor of up->getLy() - 1
   int lyPred = (up->getLy() - 2) * (1 << PADN);
 
   int dnWrap = dn->getWrap();
@@ -138,156 +139,152 @@ void doQuickPutFilter(const TRaster32P &dn, const TRaster32P &up,
   TPixel32 *dnRow     = dn->pixels(yMin);
   TPixel32 *upBasePix = up->pixels();
 
-  //  scorre le scanline di boundingBoxD
+  // iterate over boundingBoxD scanlines
   for (int y = yMin; y <= yMax; y++, dnRow += dnWrap) {
-    //	(1)    equazione k-parametrica della y-esima
-    //               scanline di boundingBoxD:
-    //	       (xMin, y) + k*(1, 0),  k = 0, ..., (xMax - xMin)
+    // (1) parametric k-equation of the y-th scanline of boundingBoxD:
+    //       (xMin, y) + k*(1, 0),  k = 0, ..., (xMax - xMin)
 
-    //	(2)    equazione k-parametrica dell'immagine mediante
-    //               invAff di (1):
-    //	       invAff*(xMin, y) + k*(deltaXD, deltaYD),
-    //	       k = kMin, ..., kMax
-    //               con 0 <= kMin <= kMax <= (xMax - xMin)
+    // (2) parametric k-equation of the image via invAff of (1):
+    //       invAff*(xMin, y) + k*(deltaXD, deltaYD),
+    //       k = kMin, ..., kMax with 0 <= kMin <= kMax <= (xMax - xMin)
 
-    //  calcola kMin, kMax per la scanline corrente intersecando la (2)
-    //  con i lati di up
+    // compute kMin, kMax for the current scanline by intersecting (2)
+    // with the sides of up
 
-    //  il segmento [a, b] di up e' la controimmagine mediante aff
-    //  della porzione di scanline  [ (xMin, y), (xMax, y) ] di dn
+    // the segment [a, b] of up is the inverse image via aff of the portion
+    // of scanline [ (xMin, y), (xMax, y) ] of dn
 
-    //        TPointD b = invAff*TPointD(xMax, y);
+    // TPointD b = invAff*TPointD(xMax, y);
     TPointD a = invAff * TPointD(xMin, y);
 
-    //	(xL0, yL0) sono le coordinate di a in versione "TLonghizzata"
-    //	0 <= xL0 + k*deltaXL
-    //          <= (up->getLx() - 2)*(1<<PADN), 0
-    //          <= kMinX
-    //          <= kMin
-    //          <= k
-    //          <= kMax
-    //          <= kMaxX
-    //          <= (xMax - xMin)
+    // (xL0, yL0) are the coordinates of a in "long-ized" version
+    // 0 <= xL0 + k*deltaXL
+    //   <= (up->getLx() - 2)*(1<<PADN),
+    // 0 <= kMinX
+    //   <= kMin
+    //   <= k
+    //   <= kMax
+    //   <= kMaxX
+    //   <= (xMax - xMin)
     //
-    //	0 <= yL0 + k*deltaYL
-    //          <= (up->getLy() - 2)*(1<<PADN), 0
-    //          <= kMinY
-    //          <= kMin
-    //          <= k
-    //          <= kMax
-    //          <= kMaxY
-    //          <= (yMax - yMin)
-    int xL0 = tround(a.x * (1 << PADN));  //  xL0 inizializzato
-    int yL0 = tround(a.y * (1 << PADN));  //  yL0 inizializzato
+    // 0 <= yL0 + k*deltaYL
+    //   <= (up->getLy() - 2)*(1<<PADN),
+    // 0 <= kMinY
+    //   <= kMin
+    //   <= k
+    //   <= kMax
+    //   <= kMaxY
+    //   <= (xMax - xMin)
 
-    //  calcola kMinX, kMaxX, kMinY, kMaxY
-    int kMinX = 0, kMaxX = xMax - xMin;  //  clipping su dn
-    int kMinY = 0, kMaxY = yMax - yMin;  //  clipping su dn
+    int xL0 = tround(a.x * (1 << PADN));  // initialize xL0
+    int yL0 = tround(a.y * (1 << PADN));  // initialize yL0
 
-    //        0 <= xL0 + k*deltaXL <= (up->getLx() - 2)*(1<<PADN)
-    //                   <=>
-    //        0 <= xL0 + k*deltaXL <= lxPred
+    // compute kMinX, kMaxX, kMinY, kMaxY
+    int kMinX = 0, kMaxX = xMax - xMin;  // clipping on dn
+    int kMinY = 0, kMaxY = xMax - xMin;  // clipping on dn
+
+    // 0 <= xL0 + k*deltaXL <= (up->getLx() - 2)*(1<<PADN)
+    //             <=>
+    // 0 <= xL0 + k*deltaXL <= lxPred
     //
-    //
-    //	0 <= yL0 + k*deltaYL <= (up->getLy() - 2)*(1<<PADN)
-    //                   <=>
-    //        0 <= yL0 + k*deltaYL <= lyPred
+    // 0 <= yL0 + k*deltaYL <= (up->getLy() - 2)*(1<<PADN)
+    //             <=>
+    // 0 <= yL0 + k*deltaYL <= lyPred
 
-    //  calcola kMinX, kMaxX
+    // compute kMinX, kMaxX
     if (deltaXL == 0) {
-      //  [a, b] verticale esterno ad up contratto
+      // [a, b] vertical outside contracted up
       if ((xL0 < 0) || (lxPred < xL0)) continue;
-      //  altrimenti usa solo
-      //  kMinY, kMaxY ((deltaXL != 0) || (deltaYL != 0))
+      // otherwise only use
+      // kMinY, kMaxY ((deltaXL != 0) || (deltaYL != 0))
     } else if (deltaXL > 0) {
-      if (lxPred < xL0)  //  [a, b] esterno ad up+(bordo destro)
+      if (lxPred < xL0)  // [a, b] outside up+(right edge)
         continue;
 
-      kMaxX = (lxPred - xL0) / deltaXL;  //  floor
+      kMaxX = (lxPred - xL0) / deltaXL;  // floor
       if (xL0 < 0) {
-        kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  //  ceil
+        kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  // ceil
       }
-    } else  //  (deltaXL < 0)
+    } else  // (deltaXL < 0)
     {
-      if (xL0 < 0)  //  [a, b] esterno ad up contratto
+      if (xL0 < 0)  // [a, b] outside contracted up
         continue;
 
-      kMaxX = xL0 / (-deltaXL);  //  floor
+      kMaxX = xL0 / (-deltaXL);  // floor
       if (lxPred < xL0) {
-        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  //  ceil
+        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  // ceil
       }
     }
 
-    //  calcola kMinY, kMaxY
+    // compute kMinY, kMaxY
     if (deltaYL == 0) {
-      //  [a, b] orizzontale esterno ad up contratto
+      // [a, b] horizontal outside contracted up
       if ((yL0 < 0) || (lyPred < yL0)) continue;
-      //  altrimenti usa solo
-      //  kMinX, kMaxX ((deltaXL != 0) || (deltaYL != 0))
+      // otherwise only use
+      // kMinX, kMaxX ((deltaXL != 0) || (deltaYL != 0))
     } else if (deltaYL > 0) {
-      if (lyPred < yL0)  //  [a, b] esterno ad up contratto
+      if (lyPred < yL0)  // [a, b] outside contracted up
         continue;
 
-      kMaxY = (lyPred - yL0) / deltaYL;  //  floor
+      kMaxY = (lyPred - yL0) / deltaYL;  // floor
       if (yL0 < 0) {
-        kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  //  ceil
+        kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  // ceil
       }
-    } else  //  (deltaYL < 0)
+    } else  // (deltaYL < 0)
     {
-      if (yL0 < 0)  //  [a, b] esterno ad up contratto
+      if (yL0 < 0)  // [a, b] outside contracted up
         continue;
 
-      kMaxY = yL0 / (-deltaYL);  //  floor
+      kMaxY = yL0 / (-deltaYL);  // floor
       if (lyPred < yL0) {
-        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  //  ceil
+        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  // ceil
       }
     }
 
-    //  calcola kMin, kMax effettuando anche il clipping su dn
+    // compute kMin, kMax also performing clipping on dn
     int kMin = std::max({kMinX, kMinY, (int)0});
     int kMax = std::min({kMaxX, kMaxY, xMax - xMin});
 
     TPixel32 *dnPix    = dnRow + xMin + kMin;
     TPixel32 *dnEndPix = dnRow + xMin + kMax + 1;
 
-    //  (xL, yL) sono le coordinate (inizializzate per il round)
-    //  in versione "TLonghizzata"
-    //	del pixel corrente di up
-    int xL = xL0 + (kMin - 1) * deltaXL;  //  inizializza xL
-    int yL = yL0 + (kMin - 1) * deltaYL;  //  inizializza yL
+    // (xL, yL) are the coordinates (initialized for rounding)
+    // in "long-ized" version of the current up pixel
+    int xL = xL0 + (kMin - 1) * deltaXL;  // initialize xL
+    int yL = yL0 + (kMin - 1) * deltaYL;  // initialize yL
 
-    //  scorre i pixel sulla y-esima scanline di boundingBoxD
+    // iterate over pixels on the y-th scanline of boundingBoxD
     for (; dnPix < dnEndPix; ++dnPix) {
       xL += deltaXL;
       yL += deltaYL;
 
-      //  il punto di up TPointD(xL/(1<<PADN), yL/(1<<PADN))
-      //  e' approssimato con (xI, yI)
-      int xI = xL >> PADN;  //	troncato
-      int yI = yL >> PADN;  //	troncato
+      // the up point TPointD(xL/(1<<PADN), yL/(1<<PADN))
+      // is approximated with (xI, yI)
+      int xI = xL >> PADN;  // truncated
+      int yI = yL >> PADN;  // truncated
 
       assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) &&
              (yI <= up->getLy() - 1));
 
-      //  (xI, yI)
+      // (xI, yI)
       TPixel32 *upPix00 = upBasePix + (yI * upWrap + xI);
 
-      //  (xI + 1, yI)
+      // (xI + 1, yI)
       TPixel32 *upPix10 = upPix00 + 1;
 
-      //  (xI, yI + 1)
+      // (xI, yI + 1)
       TPixel32 *upPix01 = upPix00 + upWrap;
 
-      //  (xI + 1, yI + 1)
+      // (xI + 1, yI + 1)
       TPixel32 *upPix11 = upPix00 + upWrap + 1;
 
-      //  filtro bilineare 4 pixels: calcolo dei pesi
+      // bilinear filter 4 pixels: weight calculation
       int xWeight1 = (xL & MASKN);
       int xWeight0 = (1 << PADN) - xWeight1;
       int yWeight1 = (yL & MASKN);
       int yWeight0 = (1 << PADN) - yWeight1;
 
-      //  filtro bilineare 4 pixels: media pesata sui singoli canali
+      // bilinear filter 4 pixels: weighted average on each channel
       int rColDownTmp =
           (xWeight0 * (upPix00->r) + xWeight1 * ((upPix10)->r)) >> PADN;
 
@@ -340,15 +337,15 @@ void doQuickPutNoFilter(const TRaster32P &dn, const TRaster32P &up,
                         const TAffine &aff, const TPixel32 &colorScale,
                         bool doPremultiply, bool whiteTransp, bool firstColumn,
                         bool doRasterDarkenBlendedView) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  // if aff := TAffine(sx, 0, tx, 0, sy, ty) is degenerate, the inverse image
+  // of up is a segment (or a point)
   if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0) return;
 
-  //  contatore bit di shift
+  // shift bit counter
   const int PADN = 16;
 
-  //  max dimensioni di up gestibili (limite imposto dal numero di bit
-  //  disponibili per la parte intera di xL, yL)
+  // max manageable size of up (limit imposed by number of bits
+  // available for the integer part of xL, yL)
   assert(std::max(up->getLx(), up->getLy()) <
          (1 << (8 * sizeof(int) - PADN - 1)));
 
@@ -356,45 +353,44 @@ void doQuickPutNoFilter(const TRaster32P &dn, const TRaster32P &up,
       TRectD(convert(dn->getBounds())) *
       (aff * TRectD(-0.5, -0.5, up->getLx() - 0.5, up->getLy() - 0.5));
 
-  //  clipping
+  // clipping
   if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
     return;
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
-  //  inversa di aff
+  // inverse of aff
   TAffine invAff = inv(aff);
 
-  //  nel disegnare la y-esima scanline di dn, il passaggio al pixel
-  //  successivo comporta l'incremento (deltaXD, deltaYD) delle coordinate del
-  //  pixel corrispondente di up
+  // when drawing the y-th scanline of dn, moving to the next pixel
+  // implies incrementing (deltaXD, deltaYD) of the corresponding up pixel
+  // coordinates
   double deltaXD = invAff.a11;
   double deltaYD = invAff.a21;
 
-  //  deltaXD "TLonghizzato" (round)
+  // "long-ized" deltaXD (round)
   int deltaXL = tround(deltaXD * (1 << PADN));
 
-  //  deltaYD "TLonghizzato" (round)
+  // "long-ized" deltaYD (round)
   int deltaYL = tround(deltaYD * (1 << PADN));
 
-  //  se aff "TLonghizzata" (round) e' degenere la controimmagine di up e' un
-  //  segmento (o un punto)
+  // if "long-ized" aff is degenerate, the inverse image of up is a segment
   if ((deltaXL == 0) && (deltaYL == 0)) return;
 
-  //  TINT32 predecessore di up->getLx()
+  // predecessor of up->getLx()
   int lxPred = up->getLx() * (1 << PADN) - 1;
 
-  //  TINT32 predecessore di up->getLy()
+  // predecessor of up->getLy()
   int lyPred = up->getLy() * (1 << PADN) - 1;
 
   int dnWrap = dn->getWrap();
@@ -405,139 +401,139 @@ void doQuickPutNoFilter(const TRaster32P &dn, const TRaster32P &up,
   TPixel32 *dnRow     = dn->pixels(yMin);
   TPixel32 *upBasePix = up->pixels();
 
-  //  scorre le scanline di boundingBoxD
+  // iterate over boundingBoxD scanlines
   for (int y = yMin; y <= yMax; y++, dnRow += dnWrap) {
-    //  (1)  equazione k-parametrica della y-esima scanline di boundingBoxD:
+    // (1) parametric k-equation of the y-th scanline of boundingBoxD:
     //       (xMin, y) + k*(1, 0),  k = 0, ..., (xMax - xMin)
 
-    //  (2)  equazione k-parametrica dell'immagine mediante invAff di (1):
+    // (2) parametric k-equation of the image via invAff of (1):
     //       invAff*(xMin, y) + k*(deltaXD, deltaYD),
-    //       k = kMin, ..., kMax con 0 <= kMin <= kMax <= (xMax - xMin)
+    //       k = kMin, ..., kMax with 0 <= kMin <= kMax <= (xMax - xMin)
 
-    //  calcola kMin, kMax per la scanline corrente
-    //  intersecando la (2) con i lati di up
+    // compute kMin, kMax for the current scanline by intersecting (2)
+    // with the sides of up
 
-    //  il segmento [a, b] di up e' la controimmagine mediante aff della
-    //  porzione di scanline  [ (xMin, y), (xMax, y) ] di dn
+    // the segment [a, b] of up is the inverse image via aff of the portion
+    // of scanline [ (xMin, y), (xMax, y) ] of dn
 
-    //  TPointD b = invAff*TPointD(xMax, y);
+    // TPointD b = invAff*TPointD(xMax, y);
     TPointD a = invAff * TPointD(xMin, y);
 
-    //  (xL0, yL0) sono le coordinate di a (inizializzate per il round)
-    //  in versione "TLonghizzata"
-    //  0 <= xL0 + k*deltaXL
-    //    <  up->getLx()*(1<<PADN)
+    // (xL0, yL0) are the coordinates of a (initialized for rounding)
+    // in "long-ized" version
+    // 0 <= xL0 + k*deltaXL
+    //   <  up->getLx()*(1<<PADN)
     //
-    //  0 <= kMinX
-    //    <= kMin
-    //    <= k
-    //    <= kMax
-    //    <= kMaxX
-    //    <= (xMax - xMin)
+    // 0 <= kMinX
+    //   <= kMin
+    //   <= k
+    //   <= kMax
+    //   <= kMaxX
+    //   <= (xMax - xMin)
     //
-    //  0 <= yL0 + k*deltaYL
-    //    < up->getLy()*(1<<PADN)
+    // 0 <= yL0 + k*deltaYL
+    //   < up->getLy()*(1<<PADN)
 
-    //  0 <= kMinY
-    //    <= kMin
-    //    <= k
-    //    <= kMax
-    //    <= kMaxY
-    //    <= (xMax - xMin)
+    // 0 <= kMinY
+    //   <= kMin
+    //   <= k
+    //   <= kMax
+    //   <= kMaxY
+    //   <= (xMax - xMin)
 
-    //  xL0 inizializzato per il round
+    // xL0 initialized for rounding
     int xL0 = tround((a.x + 0.5) * (1 << PADN));
 
-    //  yL0 inizializzato per il round
+    // yL0 initialized for rounding
     int yL0 = tround((a.y + 0.5) * (1 << PADN));
 
-    //  calcola kMinX, kMaxX, kMinY, kMaxY
-    int kMinX = 0, kMaxX = xMax - xMin;  //  clipping su dn
-    int kMinY = 0, kMaxY = xMax - xMin;  //  clipping su dn
+    // compute kMinX, kMaxX, kMinY, kMaxY
+    int kMinX = 0, kMaxX = xMax - xMin;  // clipping on dn
+    int kMinY = 0, kMaxY = xMax - xMin;  // clipping on dn
 
-    //  0 <= xL0 + k*deltaXL
-    //    < up->getLx()*(1<<PADN)
-    //           <=>
-    //  0 <= xL0 + k*deltaXL
-    //    <= lxPred
+    // 0 <= xL0 + k*deltaXL
+    //   < up->getLx()*(1<<PADN)
+    //          <=>
+    // 0 <= xL0 + k*deltaXL
+    //   <= lxPred
     //
-    //  0 <= yL0 + k*deltaYL
-    //    < up->getLy()*(1<<PADN)
-    //           <=>
-    //  0 <= yL0 + k*deltaYL
-    //    <= lyPred
+    // 0 <= yL0 + k*deltaYL
+    //   < up->getLy()*(1<<PADN)
+    //          <=>
+    // 0 <= yL0 + k*deltaYL
+    //   <= lyPred
 
-    //  calcola kMinX, kMaxX
+    // compute kMinX, kMaxX
     if (deltaXL == 0) {
-      // [a, b] verticale esterno ad up+(bordo destro/basso)
+      // [a, b] vertical outside up+(right/bottom edge)
       if ((xL0 < 0) || (lxPred < xL0)) continue;
-      //  altrimenti usa solo
-      //  kMinY, kMaxY ((deltaXL != 0) || (deltaYL != 0))
+      // otherwise only use
+      // kMinY, kMaxY ((deltaXL != 0) || (deltaYL != 0))
     } else if (deltaXL > 0) {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (lxPred < xL0) continue;
 
-      kMaxX = (lxPred - xL0) / deltaXL;  //  floor
+      kMaxX = (lxPred - xL0) / deltaXL;  // floor
       if (xL0 < 0) {
-        kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  //  ceil
+        kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  // ceil
       }
-    } else  //  (deltaXL < 0)
+    } else  // (deltaXL < 0)
     {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (xL0 < 0) continue;
 
-      kMaxX = xL0 / (-deltaXL);  //  floor
+      kMaxX = xL0 / (-deltaXL);  // floor
       if (lxPred < xL0) {
-        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  //  ceil
+        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  // ceil
       }
     }
 
-    //  calcola kMinY, kMaxY
+    // compute kMinY, kMaxY
     if (deltaYL == 0) {
-      //  [a, b] orizzontale esterno ad up+(bordo destro/basso)
+      // [a, b] horizontal outside up+(right/bottom edge)
       if ((yL0 < 0) || (lyPred < yL0)) continue;
-      // altrimenti usa solo
+      // otherwise only use
       // kMinX, kMaxX ((deltaXL != 0) || (deltaYL != 0))
     } else if (deltaYL > 0) {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (lyPred < yL0) continue;
 
-      kMaxY = (lyPred - yL0) / deltaYL;  //  floor
+      kMaxY = (lyPred - yL0) / deltaYL;  // floor
       if (yL0 < 0) {
-        kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  //  ceil
+        kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  // ceil
       }
-    } else  //  (deltaYL < 0)
+    } else  // (deltaYL < 0)
     {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (yL0 < 0) continue;
 
-      kMaxY = yL0 / (-deltaYL);  //  floor
+      kMaxY = yL0 / (-deltaYL);  // floor
       if (lyPred < yL0) {
-        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  //  ceil
+        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  // ceil
       }
     }
 
-    //  calcola kMin, kMax effettuando anche il clippind su dn
+    // compute kMin, kMax also performing clipping on dn
     int kMin = std::max({kMinX, kMinY, (int)0});
     int kMax = std::min({kMaxX, kMaxY, xMax - xMin});
 
     TPixel32 *dnPix    = dnRow + xMin + kMin;
     TPixel32 *dnEndPix = dnRow + xMin + kMax + 1;
 
-    //  (xL, yL) sono le coordinate (inizializzate per il round)
-    //  in versione "TLonghizzata" del pixel corrente di up
-    int xL = xL0 + (kMin - 1) * deltaXL;  //  inizializza xL
-    int yL = yL0 + (kMin - 1) * deltaYL;  //  inizializza yL
+    // (xL, yL) are the coordinates (initialized for rounding)
+    // in "long-ized" version of the current up pixel
+    int xL = xL0 + (kMin - 1) * deltaXL;  // initialize xL
+    int yL = yL0 + (kMin - 1) * deltaYL;  // initialize yL
 
-    //  scorre i pixel sulla y-esima scanline di boundingBoxD
+    // iterate over pixels on the y-th scanline of boundingBoxD
     for (; dnPix < dnEndPix; ++dnPix) {
       xL += deltaXL;
       yL += deltaYL;
 
-      //  il punto di up TPointD(xL/(1<<PADN), yL/(1<<PADN)) e'
-      //  approssimato con (xI, yI)
-      int xI = xL >> PADN;  //  round
-      int yI = yL >> PADN;  //  round
+      // the up point TPointD(xL/(1<<PADN), yL/(1<<PADN))
+      // is approximated with (xI, yI)
+      int xI = xL >> PADN;  // round
+      int yI = yL >> PADN;  // round
 
       assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) &&
              (yI <= up->getLy() - 1));
@@ -573,15 +569,15 @@ void doQuickPutNoFilter(const TRaster32P &dn, const TRaster32P &up,
 void doQuickPutNoFilter(const TRaster32P &dn, const TRaster64P &up,
                         const TAffine &aff, bool doPremultiply,
                         bool firstColumn) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  // if aff := TAffine(sx, 0, tx, 0, sy, ty) is degenerate, the inverse image
+  // of up is a segment (or a point)
   if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0) return;
 
-  //  contatore bit di shift
+  // shift bit counter
   const int PADN = 16;
 
-  //  max dimensioni di up gestibili (limite imposto dal numero di bit
-  //  disponibili per la parte intera di xL, yL)
+  // max manageable size of up (limit imposed by number of bits
+  // available for the integer part of xL, yL)
   assert(std::max(up->getLx(), up->getLy()) <
          (1 << (8 * sizeof(int) - PADN - 1)));
 
@@ -589,45 +585,44 @@ void doQuickPutNoFilter(const TRaster32P &dn, const TRaster64P &up,
       TRectD(convert(dn->getBounds())) *
       (aff * TRectD(-0.5, -0.5, up->getLx() - 0.5, up->getLy() - 0.5));
 
-  //  clipping
+  // clipping
   if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
     return;
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
-  //  inversa di aff
+  // inverse of aff
   TAffine invAff = inv(aff);
 
-  //  nel disegnare la y-esima scanline di dn, il passaggio al pixel
-  //  successivo comporta l'incremento (deltaXD, deltaYD) delle coordinate del
-  //  pixel corrispondente di up
+  // when drawing the y-th scanline of dn, moving to the next pixel
+  // implies incrementing (deltaXD, deltaYD) of the corresponding up pixel
+  // coordinates
   double deltaXD = invAff.a11;
   double deltaYD = invAff.a21;
 
-  //  deltaXD "TLonghizzato" (round)
+  // "long-ized" deltaXD (round)
   int deltaXL = tround(deltaXD * (1 << PADN));
 
-  //  deltaYD "TLonghizzato" (round)
+  // "long-ized" deltaYD (round)
   int deltaYL = tround(deltaYD * (1 << PADN));
 
-  //  se aff "TLonghizzata" (round) e' degenere la controimmagine di up e' un
-  //  segmento (o un punto)
+  // if "long-ized" aff is degenerate, the inverse image of up is a segment
   if ((deltaXL == 0) && (deltaYL == 0)) return;
 
-  //  TINT32 predecessore di up->getLx()
+  // predecessor of up->getLx()
   int lxPred = up->getLx() * (1 << PADN) - 1;
 
-  //  TINT32 predecessore di up->getLy()
+  // predecessor of up->getLy()
   int lyPred = up->getLy() * (1 << PADN) - 1;
 
   int dnWrap = dn->getWrap();
@@ -638,139 +633,139 @@ void doQuickPutNoFilter(const TRaster32P &dn, const TRaster64P &up,
   TPixel32 *dnRow     = dn->pixels(yMin);
   TPixel64 *upBasePix = up->pixels();
 
-  //  scorre le scanline di boundingBoxD
+  // iterate over boundingBoxD scanlines
   for (int y = yMin; y <= yMax; y++, dnRow += dnWrap) {
-    //  (1)  equazione k-parametrica della y-esima scanline di boundingBoxD:
+    // (1) parametric k-equation of the y-th scanline of boundingBoxD:
     //       (xMin, y) + k*(1, 0),  k = 0, ..., (xMax - xMin)
 
-    //  (2)  equazione k-parametrica dell'immagine mediante invAff di (1):
+    // (2) parametric k-equation of the image via invAff of (1):
     //       invAff*(xMin, y) + k*(deltaXD, deltaYD),
-    //       k = kMin, ..., kMax con 0 <= kMin <= kMax <= (xMax - xMin)
+    //       k = kMin, ..., kMax with 0 <= kMin <= kMax <= (xMax - xMin)
 
-    //  calcola kMin, kMax per la scanline corrente
-    //  intersecando la (2) con i lati di up
+    // compute kMin, kMax for the current scanline by intersecting (2)
+    // with the sides of up
 
-    //  il segmento [a, b] di up e' la controimmagine mediante aff della
-    //  porzione di scanline  [ (xMin, y), (xMax, y) ] di dn
+    // the segment [a, b] of up is the inverse image via aff of the portion
+    // of scanline [ (xMin, y), (xMax, y) ] of dn
 
-    //  TPointD b = invAff*TPointD(xMax, y);
+    // TPointD b = invAff*TPointD(xMax, y);
     TPointD a = invAff * TPointD(xMin, y);
 
-    //  (xL0, yL0) sono le coordinate di a (inizializzate per il round)
-    //  in versione "TLonghizzata"
-    //  0 <= xL0 + k*deltaXL
-    //    <  up->getLx()*(1<<PADN)
+    // (xL0, yL0) are the coordinates of a (initialized for rounding)
+    // in "long-ized" version
+    // 0 <= xL0 + k*deltaXL
+    //   <  up->getLx()*(1<<PADN)
     //
-    //  0 <= kMinX
-    //    <= kMin
-    //    <= k
-    //    <= kMax
-    //    <= kMaxX
-    //    <= (xMax - xMin)
+    // 0 <= kMinX
+    //   <= kMin
+    //   <= k
+    //   <= kMax
+    //   <= kMaxX
+    //   <= (xMax - xMin)
     //
-    //  0 <= yL0 + k*deltaYL
-    //    < up->getLy()*(1<<PADN)
+    // 0 <= yL0 + k*deltaYL
+    //   < up->getLy()*(1<<PADN)
 
-    //  0 <= kMinY
-    //    <= kMin
-    //    <= k
-    //    <= kMax
-    //    <= kMaxY
-    //    <= (xMax - xMin)
+    // 0 <= kMinY
+    //   <= kMin
+    //   <= k
+    //   <= kMax
+    //   <= kMaxY
+    //   <= (xMax - xMin)
 
-    //  xL0 inizializzato per il round
+    // xL0 initialized for rounding
     int xL0 = tround((a.x + 0.5) * (1 << PADN));
 
-    //  yL0 inizializzato per il round
+    // yL0 initialized for rounding
     int yL0 = tround((a.y + 0.5) * (1 << PADN));
 
-    //  calcola kMinX, kMaxX, kMinY, kMaxY
-    int kMinX = 0, kMaxX = xMax - xMin;  //  clipping su dn
-    int kMinY = 0, kMaxY = xMax - xMin;  //  clipping su dn
+    // compute kMinX, kMaxX, kMinY, kMaxY
+    int kMinX = 0, kMaxX = xMax - xMin;  // clipping on dn
+    int kMinY = 0, kMaxY = xMax - xMin;  // clipping on dn
 
-    //  0 <= xL0 + k*deltaXL
-    //    < up->getLx()*(1<<PADN)
-    //           <=>
-    //  0 <= xL0 + k*deltaXL
-    //    <= lxPred
+    // 0 <= xL0 + k*deltaXL
+    //   < up->getLx()*(1<<PADN)
+    //          <=>
+    // 0 <= xL0 + k*deltaXL
+    //   <= lxPred
     //
-    //  0 <= yL0 + k*deltaYL
-    //    < up->getLy()*(1<<PADN)
-    //           <=>
-    //  0 <= yL0 + k*deltaYL
-    //    <= lyPred
+    // 0 <= yL0 + k*deltaYL
+    //   < up->getLy()*(1<<PADN)
+    //          <=>
+    // 0 <= yL0 + k*deltaYL
+    //   <= lyPred
 
-    //  calcola kMinX, kMaxX
+    // compute kMinX, kMaxX
     if (deltaXL == 0) {
-      // [a, b] verticale esterno ad up+(bordo destro/basso)
+      // [a, b] vertical outside up+(right/bottom edge)
       if ((xL0 < 0) || (lxPred < xL0)) continue;
-      //  altrimenti usa solo
-      //  kMinY, kMaxY ((deltaXL != 0) || (deltaYL != 0))
+      // otherwise only use
+      // kMinY, kMaxY ((deltaXL != 0) || (deltaYL != 0))
     } else if (deltaXL > 0) {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (lxPred < xL0) continue;
 
-      kMaxX = (lxPred - xL0) / deltaXL;  //  floor
+      kMaxX = (lxPred - xL0) / deltaXL;  // floor
       if (xL0 < 0) {
-        kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  //  ceil
+        kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  // ceil
       }
-    } else  //  (deltaXL < 0)
+    } else  // (deltaXL < 0)
     {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (xL0 < 0) continue;
 
-      kMaxX = xL0 / (-deltaXL);  //  floor
+      kMaxX = xL0 / (-deltaXL);  // floor
       if (lxPred < xL0) {
-        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  //  ceil
+        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  // ceil
       }
     }
 
-    //  calcola kMinY, kMaxY
+    // compute kMinY, kMaxY
     if (deltaYL == 0) {
-      //  [a, b] orizzontale esterno ad up+(bordo destro/basso)
+      // [a, b] horizontal outside up+(right/bottom edge)
       if ((yL0 < 0) || (lyPred < yL0)) continue;
-      // altrimenti usa solo
+      // otherwise only use
       // kMinX, kMaxX ((deltaXL != 0) || (deltaYL != 0))
     } else if (deltaYL > 0) {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (lyPred < yL0) continue;
 
-      kMaxY = (lyPred - yL0) / deltaYL;  //  floor
+      kMaxY = (lyPred - yL0) / deltaYL;  // floor
       if (yL0 < 0) {
-        kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  //  ceil
+        kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  // ceil
       }
-    } else  //  (deltaYL < 0)
+    } else  // (deltaYL < 0)
     {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (yL0 < 0) continue;
 
-      kMaxY = yL0 / (-deltaYL);  //  floor
+      kMaxY = yL0 / (-deltaYL);  // floor
       if (lyPred < yL0) {
-        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  //  ceil
+        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  // ceil
       }
     }
 
-    //  calcola kMin, kMax effettuando anche il clippind su dn
+    // compute kMin, kMax also performing clipping on dn
     int kMin = std::max({kMinX, kMinY, (int)0});
     int kMax = std::min({kMaxX, kMaxY, xMax - xMin});
 
     TPixel32 *dnPix    = dnRow + xMin + kMin;
     TPixel32 *dnEndPix = dnRow + xMin + kMax + 1;
 
-    //  (xL, yL) sono le coordinate (inizializzate per il round)
-    //  in versione "TLonghizzata" del pixel corrente di up
-    int xL = xL0 + (kMin - 1) * deltaXL;  //  inizializza xL
-    int yL = yL0 + (kMin - 1) * deltaYL;  //  inizializza yL
+    // (xL, yL) are the coordinates (initialized for rounding)
+    // in "long-ized" version of the current up pixel
+    int xL = xL0 + (kMin - 1) * deltaXL;  // initialize xL
+    int yL = yL0 + (kMin - 1) * deltaYL;  // initialize yL
 
-    //  scorre i pixel sulla y-esima scanline di boundingBoxD
+    // iterate over pixels on the y-th scanline of boundingBoxD
     for (; dnPix < dnEndPix; ++dnPix) {
       xL += deltaXL;
       yL += deltaYL;
 
-      //  il punto di up TPointD(xL/(1<<PADN), yL/(1<<PADN)) e'
-      //  approssimato con (xI, yI)
-      int xI = xL >> PADN;  //  round
-      int yI = yL >> PADN;  //  round
+      // the up point TPointD(xL/(1<<PADN), yL/(1<<PADN))
+      // is approximated with (xI, yI)
+      int xI = xL >> PADN;  // round
+      int yI = yL >> PADN;  // round
 
       assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) &&
              (yI <= up->getLy() - 1));
@@ -810,11 +805,8 @@ void doQuickPutNoFilter(const TRaster32P &dn, const TRasterGR8P &up,
     return;
 
   int yMin = std::max(tfloor(boundingBoxD.y0), 0);
-
   int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
-
   int xMin = std::max(tfloor(boundingBoxD.x0), 0);
-
   int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
   TAffine invAff = inv(aff);
@@ -823,13 +815,11 @@ void doQuickPutNoFilter(const TRaster32P &dn, const TRasterGR8P &up,
   double deltaYD = invAff.a21;
 
   int deltaXL = tround(deltaXD * (1 << PADN));
-
   int deltaYL = tround(deltaYD * (1 << PADN));
 
   if ((deltaXL == 0) && (deltaYL == 0)) return;
 
   int lxPred = up->getLx() * (1 << PADN) - 1;
-
   int lyPred = up->getLy() * (1 << PADN) - 1;
 
   int dnWrap = dn->getWrap();
@@ -844,78 +834,77 @@ void doQuickPutNoFilter(const TRaster32P &dn, const TRasterGR8P &up,
     TPointD a = invAff * TPointD(xMin, y);
 
     int xL0 = tround((a.x + 0.5) * (1 << PADN));
-
     int yL0 = tround((a.y + 0.5) * (1 << PADN));
 
-    int kMinX = 0, kMaxX = xMax - xMin;  //  clipping su dn
-    int kMinY = 0, kMaxY = xMax - xMin;  //  clipping su dn
+    int kMinX = 0, kMaxX = xMax - xMin;  // clipping on dn
+    int kMinY = 0, kMaxY = xMax - xMin;  // clipping on dn
 
     if (deltaXL == 0) {
       if ((xL0 < 0) || (lxPred < xL0)) continue;
     } else if (deltaXL > 0) {
       if (lxPred < xL0) continue;
 
-      kMaxX = (lxPred - xL0) / deltaXL;  //  floor
+      kMaxX = (lxPred - xL0) / deltaXL;  // floor
       if (xL0 < 0) {
-        kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  //  ceil
+        kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  // ceil
       }
-    } else  //  (deltaXL < 0)
+    } else  // (deltaXL < 0)
     {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (xL0 < 0) continue;
 
-      kMaxX = xL0 / (-deltaXL);  //  floor
+      kMaxX = xL0 / (-deltaXL);  // floor
       if (lxPred < xL0) {
-        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  //  ceil
+        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  // ceil
       }
     }
 
-    //  calcola kMinY, kMaxY
+    // compute kMinY, kMaxY
     if (deltaYL == 0) {
-      //  [a, b] orizzontale esterno ad up+(bordo destro/basso)
+      // [a, b] horizontal outside up+(right/bottom edge)
       if ((yL0 < 0) || (lyPred < yL0)) continue;
-      // altrimenti usa solo
+      // otherwise only use
       // kMinX, kMaxX ((deltaXL != 0) || (deltaYL != 0))
     } else if (deltaYL > 0) {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (lyPred < yL0) continue;
 
-      kMaxY = (lyPred - yL0) / deltaYL;  //  floor
+      kMaxY = (lyPred - yL0) / deltaYL;  // floor
       if (yL0 < 0) {
-        kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  //  ceil
+        kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  // ceil
       }
-    } else  //  (deltaYL < 0)
+    } else  // (deltaYL < 0)
     {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (yL0 < 0) continue;
 
-      kMaxY = yL0 / (-deltaYL);  //  floor
+      kMaxY = yL0 / (-deltaYL);  // floor
       if (lyPred < yL0) {
-        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  //  ceil
+        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  // ceil
       }
     }
 
-    //  calcola kMin, kMax effettuando anche il clippind su dn
+    // compute kMin, kMax also performing clipping on dn
     int kMin = std::max({kMinX, kMinY, (int)0});
     int kMax = std::min({kMaxX, kMaxY, xMax - xMin});
 
     TPixel32 *dnPix    = dnRow + xMin + kMin;
     TPixel32 *dnEndPix = dnRow + xMin + kMax + 1;
 
-    //  (xL, yL) sono le coordinate (inizializzate per il round)
-    //  in versione "TLonghizzata" del pixel corrente di up
-    int xL = xL0 + (kMin - 1) * deltaXL;  //  inizializza xL
-    int yL = yL0 + (kMin - 1) * deltaYL;  //  inizializza yL
+    // (xL, yL) are the coordinates (initialized for rounding)
+    // in "long-ized" version of the current up pixel
+    int xL = xL0 + (kMin - 1) * deltaXL;  // initialize xL
+    int yL = yL0 + (kMin - 1) * deltaYL;  // initialize yL
 
-    //  scorre i pixel sulla y-esima scanline di boundingBoxD
+    // iterate over pixels on the y-th scanline of boundingBoxD
     for (; dnPix < dnEndPix; ++dnPix) {
       xL += deltaXL;
       yL += deltaYL;
 
-      //  il punto di up TPointD(xL/(1<<PADN), yL/(1<<PADN)) e'
-      //  approssimato con (xI, yI)
-      int xI = xL >> PADN;  //  round
-      int yI = yL >> PADN;  //  round
+      // the up point TPointD(xL/(1<<PADN), yL/(1<<PADN))
+      // is approximated with (xI, yI)
+      int xI = xL >> PADN;  // round
+      int yI = yL >> PADN;  // round
 
       assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) &&
              (yI <= up->getLy() - 1));
@@ -949,15 +938,15 @@ void doQuickPutNoFilter(const TRaster32P &dn, const TRasterGR8P &up,
 void doQuickPutNoFilter(const TRaster64P &dn, const TRaster64P &up,
                         const TAffine &aff, bool doPremultiply,
                         bool firstColumn) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  // if aff := TAffine(sx, 0, tx, 0, sy, ty) is degenerate, the inverse image
+  // of up is a segment (or a point)
   if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0) return;
 
-  //  contatore bit di shift
+  // shift bit counter
   const int PADN = 16;
 
-  //  max dimensioni di up gestibili (limite imposto dal numero di bit
-  //  disponibili per la parte intera di xL, yL)
+  // max manageable size of up (limit imposed by number of bits
+  // available for the integer part of xL, yL)
   assert(std::max(up->getLx(), up->getLy()) <
          (1 << (8 * sizeof(int) - PADN - 1)));
 
@@ -965,45 +954,44 @@ void doQuickPutNoFilter(const TRaster64P &dn, const TRaster64P &up,
       TRectD(convert(dn->getBounds())) *
       (aff * TRectD(-0.5, -0.5, up->getLx() - 0.5, up->getLy() - 0.5));
 
-  //  clipping
+  // clipping
   if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
     return;
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
-  //  inversa di aff
+  // inverse of aff
   TAffine invAff = inv(aff);
 
-  //  nel disegnare la y-esima scanline di dn, il passaggio al pixel
-  //  successivo comporta l'incremento (deltaXD, deltaYD) delle coordinate del
-  //  pixel corrispondente di up
+  // when drawing the y-th scanline of dn, moving to the next pixel
+  // implies incrementing (deltaXD, deltaYD) of the corresponding up pixel
+  // coordinates
   double deltaXD = invAff.a11;
   double deltaYD = invAff.a21;
 
-  //  deltaXD "TLonghizzato" (round)
+  // "long-ized" deltaXD (round)
   int deltaXL = tround(deltaXD * (1 << PADN));
 
-  //  deltaYD "TLonghizzato" (round)
+  // "long-ized" deltaYD (round)
   int deltaYL = tround(deltaYD * (1 << PADN));
 
-  //  se aff "TLonghizzata" (round) e' degenere la controimmagine di up e' un
-  //  segmento (o un punto)
+  // if "long-ized" aff is degenerate, the inverse image of up is a segment
   if ((deltaXL == 0) && (deltaYL == 0)) return;
 
-  //  TINT32 predecessore di up->getLx()
+  // predecessor of up->getLx()
   int lxPred = up->getLx() * (1 << PADN) - 1;
 
-  //  TINT32 predecessore di up->getLy()
+  // predecessor of up->getLy()
   int lyPred = up->getLy() * (1 << PADN) - 1;
 
   int dnWrap = dn->getWrap();
@@ -1014,139 +1002,139 @@ void doQuickPutNoFilter(const TRaster64P &dn, const TRaster64P &up,
   TPixel64 *dnRow     = dn->pixels(yMin);
   TPixel64 *upBasePix = up->pixels();
 
-  //  scorre le scanline di boundingBoxD
+  // iterate over boundingBoxD scanlines
   for (int y = yMin; y <= yMax; y++, dnRow += dnWrap) {
-    //  (1)  equazione k-parametrica della y-esima scanline di boundingBoxD:
+    // (1) parametric k-equation of the y-th scanline of boundingBoxD:
     //       (xMin, y) + k*(1, 0),  k = 0, ..., (xMax - xMin)
 
-    //  (2)  equazione k-parametrica dell'immagine mediante invAff di (1):
+    // (2) parametric k-equation of the image via invAff of (1):
     //       invAff*(xMin, y) + k*(deltaXD, deltaYD),
-    //       k = kMin, ..., kMax con 0 <= kMin <= kMax <= (xMax - xMin)
+    //       k = kMin, ..., kMax with 0 <= kMin <= kMax <= (xMax - xMin)
 
-    //  calcola kMin, kMax per la scanline corrente
-    //  intersecando la (2) con i lati di up
+    // compute kMin, kMax for the current scanline by intersecting (2)
+    // with the sides of up
 
-    //  il segmento [a, b] di up e' la controimmagine mediante aff della
-    //  porzione di scanline  [ (xMin, y), (xMax, y) ] di dn
+    // the segment [a, b] of up is the inverse image via aff of the portion
+    // of scanline [ (xMin, y), (xMax, y) ] of dn
 
-    //  TPointD b = invAff*TPointD(xMax, y);
+    // TPointD b = invAff*TPointD(xMax, y);
     TPointD a = invAff * TPointD(xMin, y);
 
-    //  (xL0, yL0) sono le coordinate di a (inizializzate per il round)
-    //  in versione "TLonghizzata"
-    //  0 <= xL0 + k*deltaXL
-    //    <  up->getLx()*(1<<PADN)
+    // (xL0, yL0) are the coordinates of a (initialized for rounding)
+    // in "long-ized" version
+    // 0 <= xL0 + k*deltaXL
+    //   <  up->getLx()*(1<<PADN)
     //
-    //  0 <= kMinX
-    //    <= kMin
-    //    <= k
-    //    <= kMax
-    //    <= kMaxX
-    //    <= (xMax - xMin)
+    // 0 <= kMinX
+    //   <= kMin
+    //   <= k
+    //   <= kMax
+    //   <= kMaxX
+    //   <= (xMax - xMin)
     //
-    //  0 <= yL0 + k*deltaYL
-    //    < up->getLy()*(1<<PADN)
+    // 0 <= yL0 + k*deltaYL
+    //   < up->getLy()*(1<<PADN)
 
-    //  0 <= kMinY
-    //    <= kMin
-    //    <= k
-    //    <= kMax
-    //    <= kMaxY
-    //    <= (xMax - xMin)
+    // 0 <= kMinY
+    //   <= kMin
+    //   <= k
+    //   <= kMax
+    //   <= kMaxY
+    //   <= (xMax - xMin)
 
-    //  xL0 inizializzato per il round
+    // xL0 initialized for rounding
     int xL0 = tround((a.x + 0.5) * (1 << PADN));
 
-    //  yL0 inizializzato per il round
+    // yL0 initialized for rounding
     int yL0 = tround((a.y + 0.5) * (1 << PADN));
 
-    //  calcola kMinX, kMaxX, kMinY, kMaxY
-    int kMinX = 0, kMaxX = xMax - xMin;  //  clipping su dn
-    int kMinY = 0, kMaxY = xMax - xMin;  //  clipping su dn
+    // compute kMinX, kMaxX, kMinY, kMaxY
+    int kMinX = 0, kMaxX = xMax - xMin;  // clipping on dn
+    int kMinY = 0, kMaxY = xMax - xMin;  // clipping on dn
 
-    //  0 <= xL0 + k*deltaXL
-    //    < up->getLx()*(1<<PADN)
-    //           <=>
-    //  0 <= xL0 + k*deltaXL
-    //    <= lxPred
+    // 0 <= xL0 + k*deltaXL
+    //   < up->getLx()*(1<<PADN)
+    //          <=>
+    // 0 <= xL0 + k*deltaXL
+    //   <= lxPred
     //
-    //  0 <= yL0 + k*deltaYL
-    //    < up->getLy()*(1<<PADN)
-    //           <=>
-    //  0 <= yL0 + k*deltaYL
-    //    <= lyPred
+    // 0 <= yL0 + k*deltaYL
+    //   < up->getLy()*(1<<PADN)
+    //          <=>
+    // 0 <= yL0 + k*deltaYL
+    //   <= lyPred
 
-    //  calcola kMinX, kMaxX
+    // compute kMinX, kMaxX
     if (deltaXL == 0) {
-      // [a, b] verticale esterno ad up+(bordo destro/basso)
+      // [a, b] vertical outside up+(right/bottom edge)
       if ((xL0 < 0) || (lxPred < xL0)) continue;
-      //  altrimenti usa solo
-      //  kMinY, kMaxY ((deltaXL != 0) || (deltaYL != 0))
+      // otherwise only use
+      // kMinY, kMaxY ((deltaXL != 0) || (deltaYL != 0))
     } else if (deltaXL > 0) {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (lxPred < xL0) continue;
 
-      kMaxX = (lxPred - xL0) / deltaXL;  //  floor
+      kMaxX = (lxPred - xL0) / deltaXL;  // floor
       if (xL0 < 0) {
-        kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  //  ceil
+        kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  // ceil
       }
-    } else  //  (deltaXL < 0)
+    } else  // (deltaXL < 0)
     {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (xL0 < 0) continue;
 
-      kMaxX = xL0 / (-deltaXL);  //  floor
+      kMaxX = xL0 / (-deltaXL);  // floor
       if (lxPred < xL0) {
-        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  //  ceil
+        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  // ceil
       }
     }
 
-    //  calcola kMinY, kMaxY
+    // compute kMinY, kMaxY
     if (deltaYL == 0) {
-      //  [a, b] orizzontale esterno ad up+(bordo destro/basso)
+      // [a, b] horizontal outside up+(right/bottom edge)
       if ((yL0 < 0) || (lyPred < yL0)) continue;
-      // altrimenti usa solo
+      // otherwise only use
       // kMinX, kMaxX ((deltaXL != 0) || (deltaYL != 0))
     } else if (deltaYL > 0) {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (lyPred < yL0) continue;
 
-      kMaxY = (lyPred - yL0) / deltaYL;  //  floor
+      kMaxY = (lyPred - yL0) / deltaYL;  // floor
       if (yL0 < 0) {
-        kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  //  ceil
+        kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  // ceil
       }
-    } else  //  (deltaYL < 0)
+    } else  // (deltaYL < 0)
     {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (yL0 < 0) continue;
 
-      kMaxY = yL0 / (-deltaYL);  //  floor
+      kMaxY = yL0 / (-deltaYL);  // floor
       if (lyPred < yL0) {
-        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  //  ceil
+        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  // ceil
       }
     }
 
-    //  calcola kMin, kMax effettuando anche il clippind su dn
+    // compute kMin, kMax also performing clipping on dn
     int kMin = std::max({kMinX, kMinY, (int)0});
     int kMax = std::min({kMaxX, kMaxY, xMax - xMin});
 
     TPixel64 *dnPix    = dnRow + xMin + kMin;
     TPixel64 *dnEndPix = dnRow + xMin + kMax + 1;
 
-    //  (xL, yL) sono le coordinate (inizializzate per il round)
-    //  in versione "TLonghizzata" del pixel corrente di up
-    int xL = xL0 + (kMin - 1) * deltaXL;  //  inizializza xL
-    int yL = yL0 + (kMin - 1) * deltaYL;  //  inizializza yL
+    // (xL, yL) are the coordinates (initialized for rounding)
+    // in "long-ized" version of the current up pixel
+    int xL = xL0 + (kMin - 1) * deltaXL;  // initialize xL
+    int yL = yL0 + (kMin - 1) * deltaYL;  // initialize yL
 
-    //  scorre i pixel sulla y-esima scanline di boundingBoxD
+    // iterate over pixels on the y-th scanline of boundingBoxD
     for (; dnPix < dnEndPix; ++dnPix) {
       xL += deltaXL;
       yL += deltaYL;
 
-      //  il punto di up TPointD(xL/(1<<PADN), yL/(1<<PADN)) e'
-      //  approssimato con (xI, yI)
-      int xI = xL >> PADN;  //  round
-      int yI = yL >> PADN;  //  round
+      // the up point TPointD(xL/(1<<PADN), yL/(1<<PADN))
+      // is approximated with (xI, yI)
+      int xI = xL >> PADN;  // round
+      int yI = yL >> PADN;  // round
 
       assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) &&
              (yI <= up->getLy() - 1));
@@ -1173,15 +1161,15 @@ void doQuickPutNoFilter(const TRaster64P &dn, const TRaster64P &up,
 void doQuickPutNoFilter(const TRaster64P &dn, const TRasterFP &up,
                         const TAffine &aff, bool doPremultiply,
                         bool firstColumn) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  // if aff := TAffine(sx, 0, tx, 0, sy, ty) is degenerate, the inverse image
+  // of up is a segment (or a point)
   if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0) return;
 
-  //  contatore bit di shift
+  // shift bit counter
   const int PADN = 16;
 
-  //  max dimensioni di up gestibili (limite imposto dal numero di bit
-  //  disponibili per la parte intera di xL, yL)
+  // max manageable size of up (limit imposed by number of bits
+  // available for the integer part of xL, yL)
   assert(std::max(up->getLx(), up->getLy()) <
          (1 << (8 * sizeof(int) - PADN - 1)));
 
@@ -1189,45 +1177,44 @@ void doQuickPutNoFilter(const TRaster64P &dn, const TRasterFP &up,
       TRectD(convert(dn->getBounds())) *
       (aff * TRectD(-0.5, -0.5, up->getLx() - 0.5, up->getLy() - 0.5));
 
-  //  clipping
+  // clipping
   if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
     return;
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
-  //  inversa di aff
+  // inverse of aff
   TAffine invAff = inv(aff);
 
-  //  nel disegnare la y-esima scanline di dn, il passaggio al pixel
-  //  successivo comporta l'incremento (deltaXD, deltaYD) delle coordinate del
-  //  pixel corrispondente di up
+  // when drawing the y-th scanline of dn, moving to the next pixel
+  // implies incrementing (deltaXD, deltaYD) of the corresponding up pixel
+  // coordinates
   double deltaXD = invAff.a11;
   double deltaYD = invAff.a21;
 
-  //  deltaXD "TLonghizzato" (round)
+  // "long-ized" deltaXD (round)
   int deltaXL = tround(deltaXD * (1 << PADN));
 
-  //  deltaYD "TLonghizzato" (round)
+  // "long-ized" deltaYD (round)
   int deltaYL = tround(deltaYD * (1 << PADN));
 
-  //  se aff "TLonghizzata" (round) e' degenere la controimmagine di up e' un
-  //  segmento (o un punto)
+  // if "long-ized" aff is degenerate, the inverse image of up is a segment
   if ((deltaXL == 0) && (deltaYL == 0)) return;
 
-  //  TINT32 predecessore di up->getLx()
+  // predecessor of up->getLx()
   int lxPred = up->getLx() * (1 << PADN) - 1;
 
-  //  TINT32 predecessore di up->getLy()
+  // predecessor of up->getLy()
   int lyPred = up->getLy() * (1 << PADN) - 1;
 
   int dnWrap = dn->getWrap();
@@ -1238,139 +1225,139 @@ void doQuickPutNoFilter(const TRaster64P &dn, const TRasterFP &up,
   TPixel64 *dnRow    = dn->pixels(yMin);
   TPixelF *upBasePix = up->pixels();
 
-  //  scorre le scanline di boundingBoxD
+  // iterate over boundingBoxD scanlines
   for (int y = yMin; y <= yMax; y++, dnRow += dnWrap) {
-    //  (1)  equazione k-parametrica della y-esima scanline di boundingBoxD:
+    // (1) parametric k-equation of the y-th scanline of boundingBoxD:
     //       (xMin, y) + k*(1, 0),  k = 0, ..., (xMax - xMin)
 
-    //  (2)  equazione k-parametrica dell'immagine mediante invAff di (1):
+    // (2) parametric k-equation of the image via invAff of (1):
     //       invAff*(xMin, y) + k*(deltaXD, deltaYD),
-    //       k = kMin, ..., kMax con 0 <= kMin <= kMax <= (xMax - xMin)
+    //       k = kMin, ..., kMax with 0 <= kMin <= kMax <= (xMax - xMin)
 
-    //  calcola kMin, kMax per la scanline corrente
-    //  intersecando la (2) con i lati di up
+    // compute kMin, kMax for the current scanline by intersecting (2)
+    // with the sides of up
 
-    //  il segmento [a, b] di up e' la controimmagine mediante aff della
-    //  porzione di scanline  [ (xMin, y), (xMax, y) ] di dn
+    // the segment [a, b] of up is the inverse image via aff of the portion
+    // of scanline [ (xMin, y), (xMax, y) ] of dn
 
-    //  TPointD b = invAff*TPointD(xMax, y);
+    // TPointD b = invAff*TPointD(xMax, y);
     TPointD a = invAff * TPointD(xMin, y);
 
-    //  (xL0, yL0) sono le coordinate di a (inizializzate per il round)
-    //  in versione "TLonghizzata"
-    //  0 <= xL0 + k*deltaXL
-    //    <  up->getLx()*(1<<PADN)
+    // (xL0, yL0) are the coordinates of a (initialized for rounding)
+    // in "long-ized" version
+    // 0 <= xL0 + k*deltaXL
+    //   <  up->getLx()*(1<<PADN)
     //
-    //  0 <= kMinX
-    //    <= kMin
-    //    <= k
-    //    <= kMax
-    //    <= kMaxX
-    //    <= (xMax - xMin)
+    // 0 <= kMinX
+    //   <= kMin
+    //   <= k
+    //   <= kMax
+    //   <= kMaxX
+    //   <= (xMax - xMin)
     //
-    //  0 <= yL0 + k*deltaYL
-    //    < up->getLy()*(1<<PADN)
+    // 0 <= yL0 + k*deltaYL
+    //   < up->getLy()*(1<<PADN)
 
-    //  0 <= kMinY
-    //    <= kMin
-    //    <= k
-    //    <= kMax
-    //    <= kMaxY
-    //    <= (xMax - xMin)
+    // 0 <= kMinY
+    //   <= kMin
+    //   <= k
+    //   <= kMax
+    //   <= kMaxY
+    //   <= (xMax - xMin)
 
-    //  xL0 inizializzato per il round
+    // xL0 initialized for rounding
     int xL0 = tround((a.x + 0.5) * (1 << PADN));
 
-    //  yL0 inizializzato per il round
+    // yL0 initialized for rounding
     int yL0 = tround((a.y + 0.5) * (1 << PADN));
 
-    //  calcola kMinX, kMaxX, kMinY, kMaxY
-    int kMinX = 0, kMaxX = xMax - xMin;  //  clipping su dn
-    int kMinY = 0, kMaxY = xMax - xMin;  //  clipping su dn
+    // compute kMinX, kMaxX, kMinY, kMaxY
+    int kMinX = 0, kMaxX = xMax - xMin;  // clipping on dn
+    int kMinY = 0, kMaxY = xMax - xMin;  // clipping on dn
 
-    //  0 <= xL0 + k*deltaXL
-    //    < up->getLx()*(1<<PADN)
-    //           <=>
-    //  0 <= xL0 + k*deltaXL
-    //    <= lxPred
+    // 0 <= xL0 + k*deltaXL
+    //   < up->getLx()*(1<<PADN)
+    //          <=>
+    // 0 <= xL0 + k*deltaXL
+    //   <= lxPred
     //
-    //  0 <= yL0 + k*deltaYL
-    //    < up->getLy()*(1<<PADN)
-    //           <=>
-    //  0 <= yL0 + k*deltaYL
-    //    <= lyPred
+    // 0 <= yL0 + k*deltaYL
+    //   < up->getLy()*(1<<PADN)
+    //          <=>
+    // 0 <= yL0 + k*deltaYL
+    //   <= lyPred
 
-    //  calcola kMinX, kMaxX
+    // compute kMinX, kMaxX
     if (deltaXL == 0) {
-      // [a, b] verticale esterno ad up+(bordo destro/basso)
+      // [a, b] vertical outside up+(right/bottom edge)
       if ((xL0 < 0) || (lxPred < xL0)) continue;
-      //  altrimenti usa solo
-      //  kMinY, kMaxY ((deltaXL != 0) || (deltaYL != 0))
+      // otherwise only use
+      // kMinY, kMaxY ((deltaXL != 0) || (deltaYL != 0))
     } else if (deltaXL > 0) {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (lxPred < xL0) continue;
 
-      kMaxX = (lxPred - xL0) / deltaXL;  //  floor
+      kMaxX = (lxPred - xL0) / deltaXL;  // floor
       if (xL0 < 0) {
-        kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  //  ceil
+        kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  // ceil
       }
-    } else  //  (deltaXL < 0)
+    } else  // (deltaXL < 0)
     {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (xL0 < 0) continue;
 
-      kMaxX = xL0 / (-deltaXL);  //  floor
+      kMaxX = xL0 / (-deltaXL);  // floor
       if (lxPred < xL0) {
-        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  //  ceil
+        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  // ceil
       }
     }
 
-    //  calcola kMinY, kMaxY
+    // compute kMinY, kMaxY
     if (deltaYL == 0) {
-      //  [a, b] orizzontale esterno ad up+(bordo destro/basso)
+      // [a, b] horizontal outside up+(right/bottom edge)
       if ((yL0 < 0) || (lyPred < yL0)) continue;
-      // altrimenti usa solo
+      // otherwise only use
       // kMinX, kMaxX ((deltaXL != 0) || (deltaYL != 0))
     } else if (deltaYL > 0) {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (lyPred < yL0) continue;
 
-      kMaxY = (lyPred - yL0) / deltaYL;  //  floor
+      kMaxY = (lyPred - yL0) / deltaYL;  // floor
       if (yL0 < 0) {
-        kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  //  ceil
+        kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  // ceil
       }
-    } else  //  (deltaYL < 0)
+    } else  // (deltaYL < 0)
     {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (yL0 < 0) continue;
 
-      kMaxY = yL0 / (-deltaYL);  //  floor
+      kMaxY = yL0 / (-deltaYL);  // floor
       if (lyPred < yL0) {
-        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  //  ceil
+        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  // ceil
       }
     }
 
-    //  calcola kMin, kMax effettuando anche il clippind su dn
+    // compute kMin, kMax also performing clipping on dn
     int kMin = std::max({kMinX, kMinY, (int)0});
     int kMax = std::min({kMaxX, kMaxY, xMax - xMin});
 
     TPixel64 *dnPix    = dnRow + xMin + kMin;
     TPixel64 *dnEndPix = dnRow + xMin + kMax + 1;
 
-    //  (xL, yL) sono le coordinate (inizializzate per il round)
-    //  in versione "TLonghizzata" del pixel corrente di up
-    int xL = xL0 + (kMin - 1) * deltaXL;  //  inizializza xL
-    int yL = yL0 + (kMin - 1) * deltaYL;  //  inizializza yL
+    // (xL, yL) are the coordinates (initialized for rounding)
+    // in "long-ized" version of the current up pixel
+    int xL = xL0 + (kMin - 1) * deltaXL;  // initialize xL
+    int yL = yL0 + (kMin - 1) * deltaYL;  // initialize yL
 
-    //  scorre i pixel sulla y-esima scanline di boundingBoxD
+    // iterate over pixels on the y-th scanline of boundingBoxD
     for (; dnPix < dnEndPix; ++dnPix) {
       xL += deltaXL;
       yL += deltaYL;
 
-      //  il punto di up TPointD(xL/(1<<PADN), yL/(1<<PADN)) e'
-      //  approssimato con (xI, yI)
-      int xI = xL >> PADN;  //  round
-      int yI = yL >> PADN;  //  round
+      // the up point TPointD(xL/(1<<PADN), yL/(1<<PADN))
+      // is approximated with (xI, yI)
+      int xI = xL >> PADN;  // round
+      int yI = yL >> PADN;  // round
 
       assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) &&
              (yI <= up->getLy() - 1));
@@ -1398,15 +1385,15 @@ void doQuickPutNoFilter(const TRaster64P &dn, const TRasterFP &up,
 void doQuickPutNoFilter(const TRasterFP &dn, const TRasterFP &up,
                         const TAffine &aff, bool doPremultiply,
                         bool firstColumn) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  // if aff := TAffine(sx, 0, tx, 0, sy, ty) is degenerate, the inverse image
+  // of up is a segment (or a point)
   if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0) return;
 
-  //  contatore bit di shift
+  // shift bit counter
   const int PADN = 16;
 
-  //  max dimensioni di up gestibili (limite imposto dal numero di bit
-  //  disponibili per la parte intera di xL, yL)
+  // max manageable size of up (limit imposed by number of bits
+  // available for the integer part of xL, yL)
   assert(std::max(up->getLx(), up->getLy()) <
          (1 << (8 * sizeof(int) - PADN - 1)));
 
@@ -1414,45 +1401,44 @@ void doQuickPutNoFilter(const TRasterFP &dn, const TRasterFP &up,
       TRectD(convert(dn->getBounds())) *
       (aff * TRectD(-0.5, -0.5, up->getLx() - 0.5, up->getLy() - 0.5));
 
-  //  clipping
+  // clipping
   if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
     return;
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
-  //  inversa di aff
+  // inverse of aff
   TAffine invAff = inv(aff);
 
-  //  nel disegnare la y-esima scanline di dn, il passaggio al pixel
-  //  successivo comporta l'incremento (deltaXD, deltaYD) delle coordinate del
-  //  pixel corrispondente di up
+  // when drawing the y-th scanline of dn, moving to the next pixel
+  // implies incrementing (deltaXD, deltaYD) of the corresponding up pixel
+  // coordinates
   double deltaXD = invAff.a11;
   double deltaYD = invAff.a21;
 
-  //  deltaXD "TLonghizzato" (round)
+  // "long-ized" deltaXD (round)
   int deltaXL = tround(deltaXD * (1 << PADN));
 
-  //  deltaYD "TLonghizzato" (round)
+  // "long-ized" deltaYD (round)
   int deltaYL = tround(deltaYD * (1 << PADN));
 
-  //  se aff "TLonghizzata" (round) e' degenere la controimmagine di up e' un
-  //  segmento (o un punto)
+  // if "long-ized" aff is degenerate, the inverse image of up is a segment
   if ((deltaXL == 0) && (deltaYL == 0)) return;
 
-  //  TINT32 predecessore di up->getLx()
+  // predecessor of up->getLx()
   int lxPred = up->getLx() * (1 << PADN) - 1;
 
-  //  TINT32 predecessore di up->getLy()
+  // predecessor of up->getLy()
   int lyPred = up->getLy() * (1 << PADN) - 1;
 
   int dnWrap = dn->getWrap();
@@ -1463,139 +1449,139 @@ void doQuickPutNoFilter(const TRasterFP &dn, const TRasterFP &up,
   TPixelF *dnRow     = dn->pixels(yMin);
   TPixelF *upBasePix = up->pixels();
 
-  //  scorre le scanline di boundingBoxD
+  // iterate over boundingBoxD scanlines
   for (int y = yMin; y <= yMax; y++, dnRow += dnWrap) {
-    //  (1)  equazione k-parametrica della y-esima scanline di boundingBoxD:
+    // (1) parametric k-equation of the y-th scanline of boundingBoxD:
     //       (xMin, y) + k*(1, 0),  k = 0, ..., (xMax - xMin)
 
-    //  (2)  equazione k-parametrica dell'immagine mediante invAff di (1):
+    // (2) parametric k-equation of the image via invAff of (1):
     //       invAff*(xMin, y) + k*(deltaXD, deltaYD),
-    //       k = kMin, ..., kMax con 0 <= kMin <= kMax <= (xMax - xMin)
+    //       k = kMin, ..., kMax with 0 <= kMin <= kMax <= (xMax - xMin)
 
-    //  calcola kMin, kMax per la scanline corrente
-    //  intersecando la (2) con i lati di up
+    // compute kMin, kMax for the current scanline by intersecting (2)
+    // with the sides of up
 
-    //  il segmento [a, b] di up e' la controimmagine mediante aff della
-    //  porzione di scanline  [ (xMin, y), (xMax, y) ] di dn
+    // the segment [a, b] of up is the inverse image via aff of the portion
+    // of scanline [ (xMin, y), (xMax, y) ] of dn
 
-    //  TPointD b = invAff*TPointD(xMax, y);
+    // TPointD b = invAff*TPointD(xMax, y);
     TPointD a = invAff * TPointD(xMin, y);
 
-    //  (xL0, yL0) sono le coordinate di a (inizializzate per il round)
-    //  in versione "TLonghizzata"
-    //  0 <= xL0 + k*deltaXL
-    //    <  up->getLx()*(1<<PADN)
+    // (xL0, yL0) are the coordinates of a (initialized for rounding)
+    // in "long-ized" version
+    // 0 <= xL0 + k*deltaXL
+    //   <  up->getLx()*(1<<PADN)
     //
-    //  0 <= kMinX
-    //    <= kMin
-    //    <= k
-    //    <= kMax
-    //    <= kMaxX
-    //    <= (xMax - xMin)
+    // 0 <= kMinX
+    //   <= kMin
+    //   <= k
+    //   <= kMax
+    //   <= kMaxX
+    //   <= (xMax - xMin)
     //
-    //  0 <= yL0 + k*deltaYL
-    //    < up->getLy()*(1<<PADN)
+    // 0 <= yL0 + k*deltaYL
+    //   < up->getLy()*(1<<PADN)
 
-    //  0 <= kMinY
-    //    <= kMin
-    //    <= k
-    //    <= kMax
-    //    <= kMaxY
-    //    <= (xMax - xMin)
+    // 0 <= kMinY
+    //   <= kMin
+    //   <= k
+    //   <= kMax
+    //   <= kMaxY
+    //   <= (xMax - xMin)
 
-    //  xL0 inizializzato per il round
+    // xL0 initialized for rounding
     int xL0 = tround((a.x + 0.5) * (1 << PADN));
 
-    //  yL0 inizializzato per il round
+    // yL0 initialized for rounding
     int yL0 = tround((a.y + 0.5) * (1 << PADN));
 
-    //  calcola kMinX, kMaxX, kMinY, kMaxY
-    int kMinX = 0, kMaxX = xMax - xMin;  //  clipping su dn
-    int kMinY = 0, kMaxY = xMax - xMin;  //  clipping su dn
+    // compute kMinX, kMaxX, kMinY, kMaxY
+    int kMinX = 0, kMaxX = xMax - xMin;  // clipping on dn
+    int kMinY = 0, kMaxY = xMax - xMin;  // clipping on dn
 
-    //  0 <= xL0 + k*deltaXL
-    //    < up->getLx()*(1<<PADN)
-    //           <=>
-    //  0 <= xL0 + k*deltaXL
-    //    <= lxPred
+    // 0 <= xL0 + k*deltaXL
+    //   < up->getLx()*(1<<PADN)
+    //          <=>
+    // 0 <= xL0 + k*deltaXL
+    //   <= lxPred
     //
-    //  0 <= yL0 + k*deltaYL
-    //    < up->getLy()*(1<<PADN)
-    //           <=>
-    //  0 <= yL0 + k*deltaYL
-    //    <= lyPred
+    // 0 <= yL0 + k*deltaYL
+    //   < up->getLy()*(1<<PADN)
+    //          <=>
+    // 0 <= yL0 + k*deltaYL
+    //   <= lyPred
 
-    //  calcola kMinX, kMaxX
+    // compute kMinX, kMaxX
     if (deltaXL == 0) {
-      // [a, b] verticale esterno ad up+(bordo destro/basso)
+      // [a, b] vertical outside up+(right/bottom edge)
       if ((xL0 < 0) || (lxPred < xL0)) continue;
-      //  altrimenti usa solo
-      //  kMinY, kMaxY ((deltaXL != 0) || (deltaYL != 0))
+      // otherwise only use
+      // kMinY, kMaxY ((deltaXL != 0) || (deltaYL != 0))
     } else if (deltaXL > 0) {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (lxPred < xL0) continue;
 
-      kMaxX = (lxPred - xL0) / deltaXL;  //  floor
+      kMaxX = (lxPred - xL0) / deltaXL;  // floor
       if (xL0 < 0) {
-        kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  //  ceil
+        kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  // ceil
       }
-    } else  //  (deltaXL < 0)
+    } else  // (deltaXL < 0)
     {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (xL0 < 0) continue;
 
-      kMaxX = xL0 / (-deltaXL);  //  floor
+      kMaxX = xL0 / (-deltaXL);  // floor
       if (lxPred < xL0) {
-        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  //  ceil
+        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  // ceil
       }
     }
 
-    //  calcola kMinY, kMaxY
+    // compute kMinY, kMaxY
     if (deltaYL == 0) {
-      //  [a, b] orizzontale esterno ad up+(bordo destro/basso)
+      // [a, b] horizontal outside up+(right/bottom edge)
       if ((yL0 < 0) || (lyPred < yL0)) continue;
-      // altrimenti usa solo
+      // otherwise only use
       // kMinX, kMaxX ((deltaXL != 0) || (deltaYL != 0))
     } else if (deltaYL > 0) {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (lyPred < yL0) continue;
 
-      kMaxY = (lyPred - yL0) / deltaYL;  //  floor
+      kMaxY = (lyPred - yL0) / deltaYL;  // floor
       if (yL0 < 0) {
-        kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  //  ceil
+        kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  // ceil
       }
-    } else  //  (deltaYL < 0)
+    } else  // (deltaYL < 0)
     {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (yL0 < 0) continue;
 
-      kMaxY = yL0 / (-deltaYL);  //  floor
+      kMaxY = yL0 / (-deltaYL);  // floor
       if (lyPred < yL0) {
-        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  //  ceil
+        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  // ceil
       }
     }
 
-    //  calcola kMin, kMax effettuando anche il clippind su dn
+    // compute kMin, kMax also performing clipping on dn
     int kMin = std::max({kMinX, kMinY, (int)0});
     int kMax = std::min({kMaxX, kMaxY, xMax - xMin});
 
     TPixelF *dnPix    = dnRow + xMin + kMin;
     TPixelF *dnEndPix = dnRow + xMin + kMax + 1;
 
-    //  (xL, yL) sono le coordinate (inizializzate per il round)
-    //  in versione "TLonghizzata" del pixel corrente di up
-    int xL = xL0 + (kMin - 1) * deltaXL;  //  inizializza xL
-    int yL = yL0 + (kMin - 1) * deltaYL;  //  inizializza yL
+    // (xL, yL) are the coordinates (initialized for rounding)
+    // in "long-ized" version of the current up pixel
+    int xL = xL0 + (kMin - 1) * deltaXL;  // initialize xL
+    int yL = yL0 + (kMin - 1) * deltaYL;  // initialize yL
 
-    //  scorre i pixel sulla y-esima scanline di boundingBoxD
+    // iterate over pixels on the y-th scanline of boundingBoxD
     for (; dnPix < dnEndPix; ++dnPix) {
       xL += deltaXL;
       yL += deltaYL;
 
-      //  il punto di up TPointD(xL/(1<<PADN), yL/(1<<PADN)) e'
-      //  approssimato con (xI, yI)
-      int xI = xL >> PADN;  //  round
-      int yI = yL >> PADN;  //  round
+      // the up point TPointD(xL/(1<<PADN), yL/(1<<PADN))
+      // is approximated with (xI, yI)
+      int xI = xL >> PADN;  // round
+      int yI = yL >> PADN;  // round
 
       assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) &&
              (yI <= up->getLy() - 1));
@@ -1622,15 +1608,15 @@ void doQuickPutNoFilter(const TRasterFP &dn, const TRasterFP &up,
 void doQuickPutNoFilter(const TRaster64P &dn, const TRaster32P &up,
                         const TAffine &aff, bool doPremultiply,
                         bool firstColumn) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  // if aff := TAffine(sx, 0, tx, 0, sy, ty) is degenerate, the inverse image
+  // of up is a segment (or a point)
   if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0) return;
 
-  //  contatore bit di shift
+  // shift bit counter
   const int PADN = 16;
 
-  //  max dimensioni di up gestibili (limite imposto dal numero di bit
-  //  disponibili per la parte intera di xL, yL)
+  // max manageable size of up (limit imposed by number of bits
+  // available for the integer part of xL, yL)
   assert(std::max(up->getLx(), up->getLy()) <
          (1 << (8 * sizeof(int) - PADN - 1)));
 
@@ -1638,45 +1624,44 @@ void doQuickPutNoFilter(const TRaster64P &dn, const TRaster32P &up,
       TRectD(convert(dn->getBounds())) *
       (aff * TRectD(-0.5, -0.5, up->getLx() - 0.5, up->getLy() - 0.5));
 
-  //  clipping
+  // clipping
   if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
     return;
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
-  //  inversa di aff
+  // inverse of aff
   TAffine invAff = inv(aff);
 
-  //  nel disegnare la y-esima scanline di dn, il passaggio al pixel
-  //  successivo comporta l'incremento (deltaXD, deltaYD) delle coordinate del
-  //  pixel corrispondente di up
+  // when drawing the y-th scanline of dn, moving to the next pixel
+  // implies incrementing (deltaXD, deltaYD) of the corresponding up pixel
+  // coordinates
   double deltaXD = invAff.a11;
   double deltaYD = invAff.a21;
 
-  //  deltaXD "TLonghizzato" (round)
+  // "long-ized" deltaXD (round)
   int deltaXL = tround(deltaXD * (1 << PADN));
 
-  //  deltaYD "TLonghizzato" (round)
+  // "long-ized" deltaYD (round)
   int deltaYL = tround(deltaYD * (1 << PADN));
 
-  //  se aff "TLonghizzata" (round) e' degenere la controimmagine di up e' un
-  //  segmento (o un punto)
+  // if "long-ized" aff is degenerate, the inverse image of up is a segment
   if ((deltaXL == 0) && (deltaYL == 0)) return;
 
-  //  TINT32 predecessore di up->getLx()
+  // predecessor of up->getLx()
   int lxPred = up->getLx() * (1 << PADN) - 1;
 
-  //  TINT32 predecessore di up->getLy()
+  // predecessor of up->getLy()
   int lyPred = up->getLy() * (1 << PADN) - 1;
 
   int dnWrap = dn->getWrap();
@@ -1687,139 +1672,139 @@ void doQuickPutNoFilter(const TRaster64P &dn, const TRaster32P &up,
   TPixel64 *dnRow     = dn->pixels(yMin);
   TPixel32 *upBasePix = up->pixels();
 
-  //  scorre le scanline di boundingBoxD
+  // iterate over boundingBoxD scanlines
   for (int y = yMin; y <= yMax; y++, dnRow += dnWrap) {
-    //  (1)  equazione k-parametrica della y-esima scanline di boundingBoxD:
+    // (1) parametric k-equation of the y-th scanline of boundingBoxD:
     //       (xMin, y) + k*(1, 0),  k = 0, ..., (xMax - xMin)
 
-    //  (2)  equazione k-parametrica dell'immagine mediante invAff di (1):
+    // (2) parametric k-equation of the image via invAff of (1):
     //       invAff*(xMin, y) + k*(deltaXD, deltaYD),
-    //       k = kMin, ..., kMax con 0 <= kMin <= kMax <= (xMax - xMin)
+    //       k = kMin, ..., kMax with 0 <= kMin <= kMax <= (xMax - xMin)
 
-    //  calcola kMin, kMax per la scanline corrente
-    //  intersecando la (2) con i lati di up
+    // compute kMin, kMax for the current scanline by intersecting (2)
+    // with the sides of up
 
-    //  il segmento [a, b] di up e' la controimmagine mediante aff della
-    //  porzione di scanline  [ (xMin, y), (xMax, y) ] di dn
+    // the segment [a, b] of up is the inverse image via aff of the portion
+    // of scanline [ (xMin, y), (xMax, y) ] of dn
 
-    //  TPointD b = invAff*TPointD(xMax, y);
+    // TPointD b = invAff*TPointD(xMax, y);
     TPointD a = invAff * TPointD(xMin, y);
 
-    //  (xL0, yL0) sono le coordinate di a (inizializzate per il round)
-    //  in versione "TLonghizzata"
-    //  0 <= xL0 + k*deltaXL
-    //    <  up->getLx()*(1<<PADN)
+    // (xL0, yL0) are the coordinates of a (initialized for rounding)
+    // in "long-ized" version
+    // 0 <= xL0 + k*deltaXL
+    //   <  up->getLx()*(1<<PADN)
     //
-    //  0 <= kMinX
-    //    <= kMin
-    //    <= k
-    //    <= kMax
-    //    <= kMaxX
-    //    <= (xMax - xMin)
+    // 0 <= kMinX
+    //   <= kMin
+    //   <= k
+    //   <= kMax
+    //   <= kMaxX
+    //   <= (xMax - xMin)
     //
-    //  0 <= yL0 + k*deltaYL
-    //    < up->getLy()*(1<<PADN)
+    // 0 <= yL0 + k*deltaYL
+    //   < up->getLy()*(1<<PADN)
 
-    //  0 <= kMinY
-    //    <= kMin
-    //    <= k
-    //    <= kMax
-    //    <= kMaxY
-    //    <= (xMax - xMin)
+    // 0 <= kMinY
+    //   <= kMin
+    //   <= k
+    //   <= kMax
+    //   <= kMaxY
+    //   <= (xMax - xMin)
 
-    //  xL0 inizializzato per il round
+    // xL0 initialized for rounding
     int xL0 = tround((a.x + 0.5) * (1 << PADN));
 
-    //  yL0 inizializzato per il round
+    // yL0 initialized for rounding
     int yL0 = tround((a.y + 0.5) * (1 << PADN));
 
-    //  calcola kMinX, kMaxX, kMinY, kMaxY
-    int kMinX = 0, kMaxX = xMax - xMin;  //  clipping su dn
-    int kMinY = 0, kMaxY = xMax - xMin;  //  clipping su dn
+    // compute kMinX, kMaxX, kMinY, kMaxY
+    int kMinX = 0, kMaxX = xMax - xMin;  // clipping on dn
+    int kMinY = 0, kMaxY = xMax - xMin;  // clipping on dn
 
-    //  0 <= xL0 + k*deltaXL
-    //    < up->getLx()*(1<<PADN)
-    //           <=>
-    //  0 <= xL0 + k*deltaXL
-    //    <= lxPred
+    // 0 <= xL0 + k*deltaXL
+    //   < up->getLx()*(1<<PADN)
+    //          <=>
+    // 0 <= xL0 + k*deltaXL
+    //   <= lxPred
     //
-    //  0 <= yL0 + k*deltaYL
-    //    < up->getLy()*(1<<PADN)
-    //           <=>
-    //  0 <= yL0 + k*deltaYL
-    //    <= lyPred
+    // 0 <= yL0 + k*deltaYL
+    //   < up->getLy()*(1<<PADN)
+    //          <=>
+    // 0 <= yL0 + k*deltaYL
+    //   <= lyPred
 
-    //  calcola kMinX, kMaxX
+    // compute kMinX, kMaxX
     if (deltaXL == 0) {
-      // [a, b] verticale esterno ad up+(bordo destro/basso)
+      // [a, b] vertical outside up+(right/bottom edge)
       if ((xL0 < 0) || (lxPred < xL0)) continue;
-      //  altrimenti usa solo
-      //  kMinY, kMaxY ((deltaXL != 0) || (deltaYL != 0))
+      // otherwise only use
+      // kMinY, kMaxY ((deltaXL != 0) || (deltaYL != 0))
     } else if (deltaXL > 0) {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (lxPred < xL0) continue;
 
-      kMaxX = (lxPred - xL0) / deltaXL;  //  floor
+      kMaxX = (lxPred - xL0) / deltaXL;  // floor
       if (xL0 < 0) {
-        kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  //  ceil
+        kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  // ceil
       }
-    } else  //  (deltaXL < 0)
+    } else  // (deltaXL < 0)
     {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (xL0 < 0) continue;
 
-      kMaxX = xL0 / (-deltaXL);  //  floor
+      kMaxX = xL0 / (-deltaXL);  // floor
       if (lxPred < xL0) {
-        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  //  ceil
+        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  // ceil
       }
     }
 
-    //  calcola kMinY, kMaxY
+    // compute kMinY, kMaxY
     if (deltaYL == 0) {
-      //  [a, b] orizzontale esterno ad up+(bordo destro/basso)
+      // [a, b] horizontal outside up+(right/bottom edge)
       if ((yL0 < 0) || (lyPred < yL0)) continue;
-      // altrimenti usa solo
+      // otherwise only use
       // kMinX, kMaxX ((deltaXL != 0) || (deltaYL != 0))
     } else if (deltaYL > 0) {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (lyPred < yL0) continue;
 
-      kMaxY = (lyPred - yL0) / deltaYL;  //  floor
+      kMaxY = (lyPred - yL0) / deltaYL;  // floor
       if (yL0 < 0) {
-        kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  //  ceil
+        kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  // ceil
       }
-    } else  //  (deltaYL < 0)
+    } else  // (deltaYL < 0)
     {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (yL0 < 0) continue;
 
-      kMaxY = yL0 / (-deltaYL);  //  floor
+      kMaxY = yL0 / (-deltaYL);  // floor
       if (lyPred < yL0) {
-        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  //  ceil
+        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  // ceil
       }
     }
 
-    //  calcola kMin, kMax effettuando anche il clippind su dn
+    // compute kMin, kMax also performing clipping on dn
     int kMin = std::max({kMinX, kMinY, (int)0});
     int kMax = std::min({kMaxX, kMaxY, xMax - xMin});
 
     TPixel64 *dnPix    = dnRow + xMin + kMin;
     TPixel64 *dnEndPix = dnRow + xMin + kMax + 1;
 
-    //  (xL, yL) sono le coordinate (inizializzate per il round)
-    //  in versione "TLonghizzata" del pixel corrente di up
-    int xL = xL0 + (kMin - 1) * deltaXL;  //  inizializza xL
-    int yL = yL0 + (kMin - 1) * deltaYL;  //  inizializza yL
+    // (xL, yL) are the coordinates (initialized for rounding)
+    // in "long-ized" version of the current up pixel
+    int xL = xL0 + (kMin - 1) * deltaXL;  // initialize xL
+    int yL = yL0 + (kMin - 1) * deltaYL;  // initialize yL
 
-    //  scorre i pixel sulla y-esima scanline di boundingBoxD
+    // iterate over pixels on the y-th scanline of boundingBoxD
     for (; dnPix < dnEndPix; ++dnPix) {
       xL += deltaXL;
       yL += deltaYL;
 
-      //  il punto di up TPointD(xL/(1<<PADN), yL/(1<<PADN)) e'
-      //  approssimato con (xI, yI)
-      int xI = xL >> PADN;  //  round
-      int yI = yL >> PADN;  //  round
+      // the up point TPointD(xL/(1<<PADN), yL/(1<<PADN))
+      // is approximated with (xI, yI)
+      int xI = xL >> PADN;  // round
+      int yI = yL >> PADN;  // round
 
       assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) &&
              (yI <= up->getLy() - 1));
@@ -1846,171 +1831,161 @@ void doQuickPutNoFilter(const TRaster64P &dn, const TRaster32P &up,
 
 void doQuickPutFilter(const TRaster32P &dn, const TRaster32P &up, double sx,
                       double sy, double tx, double ty) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  // if aff := TAffine(sx, 0, tx, 0, sy, ty) is degenerate, the inverse image
+  // of up is a segment (or a point)
   if ((sx == 0) || (sy == 0)) return;
 
-  //  contatore bit di shift
+  // shift bit counter
   const int PADN = 16;
 
-  //  maschera del filtro bilineare
+  // bilinear filter mask
   const int MASKN = (1 << PADN) - 1;
 
+  // max manageable size of up (limit imposed by number of bits
+  // available for the integer part of xL, yL)
   assert(std::max(up->getLx(), up->getLy()) <
          (1 << (8 * sizeof(int) - PADN - 1)));
 
-  //  max dimensioni di up gestibili (limite imposto dal numero di bit
-  //  disponibili per la parte intera di xL, yL)
   TAffine aff(sx, 0, tx, 0, sy, ty);
   TRectD boundingBoxD = TRectD(convert(dn->getSize())) *
                         (aff * TRectD(0, 0, up->getLx() - 2, up->getLy() - 2));
 
-  //  clipping
+  // clipping
   if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
     return;
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
-  //  inversa di aff
+  // inverse of aff
   TAffine invAff = inv(aff);
 
-  //	nello scorrere le scanline di boundingBoxD, il passaggio alla scanline
-  //    successiva comporta l'incremento (0, deltaYD) delle coordinate dei
-  //    pixels corrispondenti di up
+  // when iterating over scanlines of boundingBoxD, moving to the next scanline
+  // implies incrementing (0, deltaYD) of the coordinates of the corresponding
+  // up pixels
 
-  //    nel disegnare la y-esima scanline di dn, il passaggio al pixel
-  //    successivo comporta l'incremento (deltaXD, 0) delle coordinate del
-  //    pixel corrispondente di up
+  // when drawing the y-th scanline of dn, moving to the next pixel
+  // implies incrementing (deltaXD, 0) of the coordinates of the corresponding
+  // up pixel
 
   double deltaXD = invAff.a11;
   double deltaYD = invAff.a22;
 
-  //  deltaXD "TLonghizzato" (round)
+  // "long-ized" deltaXD (round)
   int deltaXL = tround(deltaXD * (1 << PADN));
 
-  //  deltaYD "TLonghizzato" (round)
+  // "long-ized" deltaYD (round)
   int deltaYL = tround(deltaYD * (1 << PADN));
 
-  //  se aff "TLonghizzata" (round) e' degenere la controimmagine di up e' un
-  //  segmento (o un punto)
+  // if "long-ized" aff is degenerate, the inverse image of up is a segment
   if ((deltaXL == 0) || (deltaYL == 0)) return;
 
-  //	(1)  equazione (kX, kY)-parametrica di boundingBoxD:
-  //	       (xMin, yMin) + kX*(1, 0) + kY*(0, 1),
-  //	         kX = 0, ..., (xMax - xMin),
-  //             kY = 0, ..., (yMax - yMin)
+  // (1) parametric (kX, kY)-equation of boundingBoxD:
+  //       (xMin, yMin) + kX*(1, 0) + kY*(0, 1),
+  //         kX = 0, ..., (xMax - xMin),
+  //         kY = 0, ..., (yMax - yMin)
 
-  //	(2)  equazione (kX, kY)-parametrica dell'immagine
-  //         mediante invAff di (1):
-  //	       invAff*(xMin, yMin) + kX*(deltaXD, 0) + kY*(0, deltaYD),
-  //	         kX = kMinX, ..., kMaxX
-  //               con 0 <= kMinX <= kMaxX <= (xMax - xMin)
+  // (2) parametric (kX, kY)-equation of the image via invAff of (1):
+  //       invAff*(xMin, yMin) + kX*(deltaXD, 0) + kY*(0, deltaYD),
+  //         kX = kMinX, ..., kMaxX
+  //           with 0 <= kMinX <= kMaxX <= (xMax - xMin)
   //
-  //	         kY = kMinY, ..., kMaxY
-  //               con 0 <= kMinY <= kMaxY <= (yMax - yMin)
+  //         kY = kMinY, ..., kMaxY
+  //           with 0 <= kMinY <= kMaxY <= (yMax - yMin)
 
-  //  calcola kMinX, kMaxX, kMinY, kMaxY intersecando la (2) con i lati di up
+  // compute kMinX, kMaxX, kMinY, kMaxY by intersecting (2) with the sides of up
 
-  //  il segmento [a, b] di up (con gli estremi eventualmente invertiti) e'
-  //  la controimmagine
-  //  mediante aff della porzione di scanline  [ (xMin, yMin), (xMax, yMin) ]
-  //  di dn
+  // the segment [a, b] of up (with possibly reversed ends) is the inverse
+  // image via aff of the portion of scanline [ (xMin, yMin), (xMax, yMin) ] of
+  // dn
 
-  //  TPointD b = invAff*TPointD(xMax, yMin);
+  // TPointD b = invAff*TPointD(xMax, yMin);
   TPointD a = invAff * TPointD(xMin, yMin);
 
-  //  (xL0, yL0) sono le coordinate di a (inizializzate per il round) in
-  //  versione "TLonghizzata"
-  //
-  //    0 <= xL0 + kX*deltaXL
-  //      <= (up->getLx() - 2)*(1<<PADN),
-  //    0 <= kMinX <= kX
-  //      <= kMaxX <= (xMax - xMin)
-  //
-  //	0 <= yL0 + kY*deltaYL
-  //      <= (up->getLy() - 2)*(1<<PADN),
-  //    0 <= kMinY <= kY
-  //      <= kMaxY <= (yMax - yMin)
-  int xL0 = tround(a.x * (1 << PADN));  //  xL0 inizializzato
-  int yL0 = tround(a.y * (1 << PADN));  //  yL0 inizializzato
+  // (xL0, yL0) are the coordinates of a (initialized for rounding)
+  // in "long-ized" version
+  // 0 <= xL0 + kX*deltaXL <= (up->getLx() - 2)*(1<<PADN),
+  // 0 <= kMinX <= kX <= kMaxX <= (xMax - xMin)
+  // 0 <= yL0 + kY*deltaYL <= (up->getLy() - 2)*(1<<PADN),
+  // 0 <= kMinY <= kY <= kMaxY <= (yMax - yMin)
 
-  //  calcola kMinY, kMaxY, kMinX, kMaxX intersecando la (2) con i lati
-  //  di up
-  int kMinX = 0, kMaxX = xMax - xMin;  //  clipping su dn
-  int kMinY = 0, kMaxY = yMax - yMin;  //  clipping su dn
+  int xL0 = tround(a.x * (1 << PADN));  // initialize xL0
+  int yL0 = tround(a.y * (1 << PADN));  // initialize yL0
 
-  //  TINT32 predecessore di (up->getLx() - 1)
+  // compute kMinY, kMaxY, kMinX, kMaxX by intersecting (2) with the sides of up
+  int kMinX = 0, kMaxX = xMax - xMin;  // clipping on dn
+  int kMinY = 0, kMaxY = yMax - yMin;  // clipping on dn
+
+  // predecessor of (up->getLx() - 1)
   int lxPred = (up->getLx() - 2) * (1 << PADN);
 
-  //  TINT32 predecessore di (up->getLy() - 1)
+  // predecessor of (up->getLy() - 1)
   int lyPred = (up->getLy() - 2) * (1 << PADN);
 
-  //  0 <= xL0 + k*deltaXL
-  //    <= (up->getLx() - 2)*(1<<PADN)
-  //             <=>
-  //  0 <= xL0 + k*deltaXL <= lxPred
-  //
-  //  0 <= yL0 + k*deltaYL
-  //    <= (up->getLy() - 2)*(1<<PADN)
-  //             <=>
-  //  0 <= yL0 + k*deltaYL <= lyPred
+  // 0 <= xL0 + k*deltaXL <= (up->getLx() - 2)*(1<<PADN)
+  //               <=>
+  // 0 <= xL0 + k*deltaXL <= lxPred
 
-  //  calcola kMinY, kMaxY intersecando la (2) con
-  //  i lati (y = yMin) e (y = yMax) di up
-  if (deltaYL > 0)  //  (deltaYL != 0)
+  // 0 <= yL0 + k*deltaYL <= (up->getLy() - 2)*(1<<PADN)
+  //               <=>
+  // 0 <= yL0 + k*deltaYL <= lyPred
+
+  // compute kMinY, kMaxY by intersecting (2) with the sides
+  // (y = yMin) and (y = yMax) of up
+  if (deltaYL > 0)  // (deltaYL != 0)
   {
-    //  [a, b] interno ad up contratto
+    // [a, b] inside contracted up
     assert(yL0 <= lyPred);
-    kMaxY = (lyPred - yL0) / deltaYL;  //  floor
+
+    kMaxY = (lyPred - yL0) / deltaYL;  // floor
     if (yL0 < 0) {
-      kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  //  ceil
+      kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  // ceil
     }
-  } else  //  (deltaYL < 0)
+  } else  // (deltaYL < 0)
   {
-    //  [a, b] interno ad up contratto
+    // [a, b] inside contracted up
     assert(0 <= yL0);
 
-    kMaxY = yL0 / (-deltaYL);  //  floor
+    kMaxY = yL0 / (-deltaYL);  // floor
     if (lyPred < yL0) {
-      kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  //  ceil
+      kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  // ceil
     }
   }
-  //	calcola kMinY, kMaxY effettuando anche il clippind su dn
+  // compute kMinY, kMaxY also performing clipping on dn
   kMinY = std::max(kMinY, (int)0);
   kMaxY = std::min(kMaxY, yMax - yMin);
 
-  //  calcola kMinX, kMaxX intersecando la (2) con
-  //  i lati (x = xMin) e (x = xMax) di up
-  if (deltaXL > 0)  //  (deltaXL != 0)
+  // compute kMinX, kMaxX by intersecting (2) with the sides
+  // (x = xMin) and (x = xMax) of up
+  if (deltaXL > 0)  // (deltaXL != 0)
   {
-    //  [a, b] interno ad up contratto
+    // [a, b] inside contracted up
     assert(xL0 <= lxPred);
 
-    kMaxX = (lxPred - xL0) / deltaXL;  //  floor
+    kMaxX = (lxPred - xL0) / deltaXL;  // floor
     if (xL0 < 0) {
-      kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  //  ceil
+      kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  // ceil
     }
-  } else  //  (deltaXL < 0)
+  } else  // (deltaXL < 0)
   {
-    //  [a, b] interno ad up contratto
+    // [a, b] inside contracted up
     assert(0 <= xL0);
 
-    kMaxX = xL0 / (-deltaXL);  //  floor
+    kMaxX = xL0 / (-deltaXL);  // floor
     if (lxPred < xL0) {
-      kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  //  ceil
+      kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  // ceil
     }
   }
-  //  calcola kMinX, kMaxX effettuando anche il clippind su dn
+  // compute kMinX, kMaxX also performing clipping on dn
   kMinX = std::max(kMinX, (int)0);
   kMaxX = std::min(kMaxX, xMax - xMin);
 
@@ -2022,55 +1997,55 @@ void doQuickPutFilter(const TRaster32P &dn, const TRaster32P &up, double sx,
   TPixel32 *upBasePix = up->pixels();
   TPixel32 *dnRow     = dn->pixels(yMin + kMinY);
 
-  //  (xL, yL) sono le coordinate (inizializzate per il round)
-  //  in versione "TLonghizzata" del pixel corrente di up
+  // (xL, yL) are the coordinates (initialized for rounding)
+  // in "long-ized" version of the current up pixel
 
-  //  inizializza yL
+  // initialize yL
   int yL = yL0 + (kMinY - 1) * deltaYL;
 
-  //  scorre le scanline di boundingBoxD
+  // iterate over boundingBoxD scanlines
   for (int kY = kMinY; kY <= kMaxY; kY++, dnRow += dnWrap) {
-    //  inizializza xL
+    // initialize xL
     int xL = xL0 + (kMinX - 1) * deltaXL;
     yL += deltaYL;
-    //  il punto di up TPointD(xL/(1<<PADN), yL/(1<<PADN)) e' approssimato
-    //  con (xI, yI)
-    int yI = yL >> PADN;  //  troncato
+    // the up point TPointD(xL/(1<<PADN), yL/(1<<PADN)) is approximated
+    // with (xI, yI)
+    int yI = yL >> PADN;  // truncated
 
-    //  filtro bilineare 4 pixels: calcolo degli y-pesi
+    // bilinear filter 4 pixels: calculation of y-weights
     int yWeight1 = (yL & MASKN);
     int yWeight0 = (1 << PADN) - yWeight1;
 
     TPixel32 *dnPix    = dnRow + xMin + kMinX;
     TPixel32 *dnEndPix = dnRow + xMin + kMaxX + 1;
 
-    //  scorre i pixel sulla (yMin + kY)-esima scanline di dn
+    // iterate over pixels on the (yMin + kY)-th scanline of dn
     for (; dnPix < dnEndPix; ++dnPix) {
       xL += deltaXL;
-      //  il punto di up TPointD(xL/(1<<PADN), yL/(1<<PADN)) e'
-      //  approssimato con (xI, yI)
-      int xI = xL >> PADN;  //  troncato
+      // the up point TPointD(xL/(1<<PADN), yL/(1<<PADN)) is approximated
+      // with (xI, yI)
+      int xI = xL >> PADN;  // truncated
 
       assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) &&
              (yI <= up->getLy() - 1));
 
-      //  (xI, yI)
+      // (xI, yI)
       TPixel32 *upPix00 = upBasePix + (yI * upWrap + xI);
 
-      //  (xI + 1, yI)
+      // (xI + 1, yI)
       TPixel32 *upPix10 = upPix00 + 1;
 
-      //  (xI, yI + 1)
+      // (xI, yI + 1)
       TPixel32 *upPix01 = upPix00 + upWrap;
 
-      //  (xI + 1, yI + 1)
+      // (xI + 1, yI + 1)
       TPixel32 *upPix11 = upPix00 + upWrap + 1;
 
-      //  filtro bilineare 4 pixels: calcolo degli x-pesi
+      // bilinear filter 4 pixels: calculation of x-weights
       int xWeight1 = (xL & MASKN);
       int xWeight0 = (1 << PADN) - xWeight1;
 
-      //  filtro bilineare 4 pixels: media pesata sui singoli canali
+      // bilinear filter 4 pixels: weighted average on each channel
       int rColDownTmp =
           (xWeight0 * (upPix00->r) + xWeight1 * ((upPix10)->r)) >> PADN;
 
@@ -2122,172 +2097,170 @@ void doQuickPutNoFilter(const TRaster32P &dn, const TRaster32P &up, double sx,
                         const TPixel32 &colorScale, bool doPremultiply,
                         bool whiteTransp, bool firstColumn,
                         bool doRasterDarkenBlendedView) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  // if aff := TAffine(sx, 0, tx, 0, sy, ty) is degenerate, the inverse image
+  // of up is a segment (or a point)
   if ((sx == 0) || (sy == 0)) return;
 
-  //  contatore bit di shift
+  // shift bit counter
   const int PADN = 16;
   assert(std::max(up->getLx(), up->getLy()) <
          (1 << (8 * sizeof(int) - PADN - 1)));
-  //  max dimensioni di up gestibili (limite imposto dal numero di bit
-  // disponibili per la parte intera di xL, yL)
+  // max manageable size of up (limit imposed by number of bits
+  // available for the integer part of xL, yL)
 
   TAffine aff(sx, 0, tx, 0, sy, ty);
   TRectD boundingBoxD =
       TRectD(convert(dn->getBounds())) *
       (aff * TRectD(-0.5, -0.5, up->getLx() - 0.5, up->getLy() - 0.5));
 
-  //  clipping
+  // clipping
   if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
     return;
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
-  TAffine invAff = inv(aff);  //  inversa di aff
+  TAffine invAff = inv(aff);  // inverse of aff
 
-  //  nello scorrere le scanline di boundingBoxD, il passaggio alla scanline
-  //  successiva comporta l'incremento (0, deltaYD) delle coordinate dei
-  //  pixels corrispondenti di up
+  // when iterating over scanlines of boundingBoxD, moving to the next scanline
+  // implies incrementing (0, deltaYD) of the coordinates of the corresponding
+  // up pixels
 
-  //  nel disegnare la y-esima scanline di dn, il passaggio al pixel
-  //  successivo comporta l'incremento (deltaXD, 0) delle coordinate del
-  //  pixel corrispondente di up
+  // when drawing the y-th scanline of dn, moving to the next pixel
+  // implies incrementing (deltaXD, 0) of the coordinates of the corresponding
+  // up pixel
 
   double deltaXD = invAff.a11;
   double deltaYD = invAff.a22;
 
-  //  deltaXD "TLonghizzato" (round)
+  // "long-ized" deltaXD (round)
   int deltaXL = tround(deltaXD * (1 << PADN));
 
-  //  deltaYD "TLonghizzato" (round)
+  // "long-ized" deltaYD (round)
   int deltaYL = tround(deltaYD * (1 << PADN));
 
-  //  se aff "TLonghizzata" (round) e' degenere la controimmagine di up e' un
-  //  segmento (o un punto)
+  // if "long-ized" aff is degenerate, the inverse image of up is a segment
   if ((deltaXL == 0) || (deltaYL == 0)) return;
 
-  //	(1)  equazione (kX, kY)-parametrica di boundingBoxD:
-  //	       (xMin, yMin) + kX*(1, 0) + kY*(0, 1),
-  //	         kX = 0, ..., (xMax - xMin),
-  //             kY = 0, ..., (yMax - yMin)
+  // (1) parametric (kX, kY)-equation of boundingBoxD:
+  //       (xMin, yMin) + kX*(1, 0) + kY*(0, 1),
+  //         kX = 0, ..., (xMax - xMin),
+  //         kY = 0, ..., (yMax - yMin)
 
-  //	(2)  equazione (kX, kY)-parametrica dell'immagine
-  //         mediante invAff di (1):
-  //	       invAff*(xMin, yMin) + kX*(deltaXD, 0) + kY*(0, deltaYD),
-  //	         kX = kMinX, ..., kMaxX
-  //             con 0 <= kMinX <= kMaxX <= (xMax - xMin)
+  // (2) parametric (kX, kY)-equation of the image via invAff of (1):
+  //       invAff*(xMin, yMin) + kX*(deltaXD, 0) + kY*(0, deltaYD),
+  //         kX = kMinX, ..., kMaxX
+  //           with 0 <= kMinX <= kMaxX <= (xMax - xMin)
   //
-  //             kY = kMinY, ..., kMaxY
-  //             con 0 <= kMinY <= kMaxY <= (yMax - yMin)
+  //         kY = kMinY, ..., kMaxY
+  //           with 0 <= kMinY <= kMaxY <= (yMax - yMin)
 
-  //  calcola kMinX, kMaxX, kMinY, kMaxY intersecando la (2) con i lati di up
+  // compute kMinX, kMaxX, kMinY, kMaxY by intersecting (2) with the sides of up
 
-  //  il segmento [a, b] di up e' la controimmagine mediante aff della
-  // porzione di scanline  [ (xMin, yMin), (xMax, yMin) ] di dn
+  // the segment [a, b] of up is the inverse image via aff of the portion
+  // of scanline [ (xMin, yMin), (xMax, yMin) ] of dn
 
-  //  TPointD b = invAff*TPointD(xMax, yMin);
+  // TPointD b = invAff*TPointD(xMax, yMin);
   TPointD a = invAff * TPointD(xMin, yMin);
 
-  //  (xL0, yL0) sono le coordinate di a (inizializzate per il round)
-  // in versione "TLonghizzata"
-  //	0 <= xL0 + kX*deltaXL
-  //      < up->getLx()*(1<<PADN),
+  // (xL0, yL0) are the coordinates of a (initialized for rounding)
+  // in "long-ized" version
+  // 0 <= xL0 + kX*deltaXL
+  //   < up->getLx()*(1<<PADN),
   //
-  //    0 <= kMinX
-  //      <= kX
-  //      <= kMaxX
-  //      <= (xMax - xMin)
+  // 0 <= kMinX
+  //   <= kX
+  //   <= kMaxX
+  //   <= (xMax - xMin)
 
-  //	0 <= yL0 + kY*deltaYL
-  //      < up->getLy()*(1<<PADN),
+  // 0 <= yL0 + kY*deltaYL
+  //   < up->getLy()*(1<<PADN),
   //
-  //    0 <= kMinY
-  //      <= kY
-  //      <= kMaxY
-  //      <= (yMax - yMin)
+  // 0 <= kMinY
+  //   <= kY
+  //   <= kMaxY
+  //   <= (yMax - yMin)
 
-  //  xL0 inizializzato per il round
+  // xL0 initialized for rounding
   int xL0 = tround((a.x + 0.5) * (1 << PADN));
 
-  //  yL0 inizializzato per il round
+  // yL0 initialized for rounding
   int yL0 = tround((a.y + 0.5) * (1 << PADN));
 
-  //  calcola kMinY, kMaxY, kMinX, kMaxX intersecando la (2) con i lati di up
-  int kMinX = 0, kMaxX = xMax - xMin;  //  clipping su dn
-  int kMinY = 0, kMaxY = yMax - yMin;  //  clipping su dn
+  // compute kMinY, kMaxY, kMinX, kMaxX by intersecting (2) with the sides of up
+  int kMinX = 0, kMaxX = xMax - xMin;  // clipping on dn
+  int kMinY = 0, kMaxY = yMax - yMin;  // clipping on dn
 
-  //  TINT32 predecessore di up->getLx()
+  // predecessor of up->getLx()
   int lxPred = up->getLx() * (1 << PADN) - 1;
 
-  //  TINT32 predecessore di up->getLy()
+  // predecessor of up->getLy()
   int lyPred = up->getLy() * (1 << PADN) - 1;
 
-  //  0 <= xL0 + k*deltaXL < up->getLx()*(1<<PADN)
+  // 0 <= xL0 + k*deltaXL < up->getLx()*(1<<PADN)
   //            <=>
-  //  0 <= xL0 + k*deltaXL <= lxPred
+  // 0 <= xL0 + k*deltaXL <= lxPred
 
-  //  0 <= yL0 + k*deltaYL < up->getLy()*(1<<PADN)
+  // 0 <= yL0 + k*deltaYL < up->getLy()*(1<<PADN)
   //            <=>
-  //  0 <= yL0 + k*deltaYL <= lyPred
+  // 0 <= yL0 + k*deltaYL <= lyPred
 
-  //  calcola kMinY, kMaxY intersecando la (2) con i lati
-  //  (y = yMin) e (y = yMax) di up
-  if (deltaYL > 0)  //  (deltaYL != 0)
+  // compute kMinY, kMaxY by intersecting (2) with the sides
+  // (y = yMin) and (y = yMax) of up
+  if (deltaYL > 0)  // (deltaYL != 0)
   {
-    //  [a, b] interno ad up+(bordo destro/basso)
+    // [a, b] inside up+(right/bottom edge)
     assert(yL0 <= lyPred);
 
-    kMaxY = (lyPred - yL0) / deltaYL;  //  floor
+    kMaxY = (lyPred - yL0) / deltaYL;  // floor
     if (yL0 < 0) {
-      kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  //  ceil
+      kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  // ceil
     }
-  } else  //  (deltaYL < 0)
+  } else  // (deltaYL < 0)
   {
-    //  [a, b] interno ad up+(bordo destro/basso)
+    // [a, b] inside up+(right/bottom edge)
     assert(0 <= yL0);
 
-    kMaxY = yL0 / (-deltaYL);  //  floor
+    kMaxY = yL0 / (-deltaYL);  // floor
     if (lyPred < yL0) {
-      kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  //  ceil
+      kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  // ceil
     }
   }
-  //  calcola kMinY, kMaxY effettuando anche il clippind su dn
+  // compute kMinY, kMaxY also performing clipping on dn
   kMinY = std::max(kMinY, (int)0);
   kMaxY = std::min(kMaxY, yMax - yMin);
 
-  //  calcola kMinX, kMaxX intersecando la (2) con i lati
-  //  (x = xMin) e (x = xMax) di up
-  if (deltaXL > 0)  //  (deltaXL != 0)
+  // compute kMinX, kMaxX by intersecting (2) with the sides
+  // (x = xMin) and (x = xMax) of up
+  if (deltaXL > 0)  // (deltaXL != 0)
   {
-    //  [a, b] interno ad up+(bordo destro/basso)
+    // [a, b] inside up+(right/bottom edge)
     assert(xL0 <= lxPred);
 
-    kMaxX = (lxPred - xL0) / deltaXL;  //  floor
+    kMaxX = (lxPred - xL0) / deltaXL;  // floor
     if (xL0 < 0) {
-      kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  //  ceil
+      kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  // ceil
     }
-  } else  //  (deltaXL < 0)
+  } else  // (deltaXL < 0)
   {
-    //  [a, b] interno ad up+(bordo destro/basso)
+    // [a, b] inside up+(right/bottom edge)
     assert(0 <= xL0);
 
-    kMaxX = xL0 / (-deltaXL);  //  floor
+    kMaxX = xL0 / (-deltaXL);  // floor
     if (lxPred < xL0) {
-      kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  //  ceil
+      kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  // ceil
     }
   }
-  //  calcola kMinX, kMaxX effettuando anche il clippind su dn
+  // compute kMinX, kMaxX also performing clipping on dn
   kMinX = std::max(kMinX, (int)0);
   kMaxX = std::min(kMaxX, xMax - xMin);
 
@@ -2299,31 +2272,31 @@ void doQuickPutNoFilter(const TRaster32P &dn, const TRaster32P &up, double sx,
   TPixel32 *upBasePix = up->pixels();
   TPixel32 *dnRow     = dn->pixels(yMin + kMinY);
 
-  //  (xL, yL) sono le coordinate (inizializzate per il round)
-  //  in versione "TLonghizzata" del pixel corrente di up
+  // (xL, yL) are the coordinates (initialized for rounding)
+  // in "long-ized" version of the current up pixel
 
-  //  inizializza yL
+  // initialize yL
   int yL = yL0 + (kMinY - 1) * deltaYL;
 
-  //  scorre le scanline di boundingBoxD
+  // iterate over boundingBoxD scanlines
   for (int kY = kMinY; kY <= kMaxY; kY++, dnRow += dnWrap) {
-    //  inizializza xL
+    // initialize xL
     int xL = xL0 + (kMinX - 1) * deltaXL;
     yL += deltaYL;
 
-    //  il punto di up TPointD(xL/(1<<PADN), yL/(1<<PADN)) e' approssimato
-    //  con (xI, yI)
-    int yI = yL >> PADN;  //  round
+    // the up point TPointD(xL/(1<<PADN), yL/(1<<PADN)) is approximated
+    // with (xI, yI)
+    int yI = yL >> PADN;  // round
 
     TPixel32 *dnPix    = dnRow + xMin + kMinX;
     TPixel32 *dnEndPix = dnRow + xMin + kMaxX + 1;
 
-    //  scorre i pixel sulla (yMin + kY)-esima scanline di dn
+    // iterate over pixels on the (yMin + kY)-th scanline of dn
     for (; dnPix < dnEndPix; ++dnPix) {
       xL += deltaXL;
-      //  il punto di up TPointD(xL/(1<<PADN), yL/(1<<PADN)) e'
-      //  approssimato con (xI, yI)
-      int xI = xL >> PADN;  //	round
+      // the up point TPointD(xL/(1<<PADN), yL/(1<<PADN)) is approximated
+      // with (xI, yI)
+      int xI = xL >> PADN;  // round
 
       assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) &&
              (yI <= up->getLy() - 1));
@@ -2376,7 +2349,7 @@ void doQuickPutNoFilter(const TRaster32P &dn, const TRasterGR8P &up, double sx,
   int xMin = std::max(tfloor(boundingBoxD.x0), 0);
   int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
-  TAffine invAff = inv(aff);  //  inversa di aff
+  TAffine invAff = inv(aff);  // inverse of aff
 
   double deltaXD = invAff.a11;
   double deltaYD = invAff.a22;
@@ -2387,46 +2360,46 @@ void doQuickPutNoFilter(const TRaster32P &dn, const TRasterGR8P &up, double sx,
 
   int xL0   = tround((a.x + 0.5) * (1 << PADN));
   int yL0   = tround((a.y + 0.5) * (1 << PADN));
-  int kMinX = 0, kMaxX = xMax - xMin;  //  clipping su dn
-  int kMinY = 0, kMaxY = yMax - yMin;  //  clipping su dn
+  int kMinX = 0, kMaxX = xMax - xMin;  // clipping on dn
+  int kMinY = 0, kMaxY = yMax - yMin;  // clipping on dn
   int lxPred = up->getLx() * (1 << PADN) - 1;
   int lyPred = up->getLy() * (1 << PADN) - 1;
 
-  if (deltaYL > 0)  //  (deltaYL != 0)
+  if (deltaYL > 0)  // (deltaYL != 0)
   {
     assert(yL0 <= lyPred);
 
-    kMaxY = (lyPred - yL0) / deltaYL;  //  floor
+    kMaxY = (lyPred - yL0) / deltaYL;  // floor
     if (yL0 < 0) {
-      kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  //  ceil
+      kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  // ceil
     }
-  } else  //  (deltaYL < 0)
+  } else  // (deltaYL < 0)
   {
     assert(0 <= yL0);
 
-    kMaxY = yL0 / (-deltaYL);  //  floor
+    kMaxY = yL0 / (-deltaYL);  // floor
     if (lyPred < yL0) {
-      kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  //  ceil
+      kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  // ceil
     }
   }
   kMinY = std::max(kMinY, (int)0);
   kMaxY = std::min(kMaxY, yMax - yMin);
 
-  if (deltaXL > 0)  //  (deltaXL != 0)
+  if (deltaXL > 0)  // (deltaXL != 0)
   {
     assert(xL0 <= lxPred);
 
-    kMaxX = (lxPred - xL0) / deltaXL;  //  floor
+    kMaxX = (lxPred - xL0) / deltaXL;  // floor
     if (xL0 < 0) {
-      kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  //  ceil
+      kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  // ceil
     }
-  } else  //  (deltaXL < 0)
+  } else  // (deltaXL < 0)
   {
     assert(0 <= xL0);
 
-    kMaxX = xL0 / (-deltaXL);  //  floor
+    kMaxX = xL0 / (-deltaXL);  // floor
     if (lxPred < xL0) {
-      kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  //  ceil
+      kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  // ceil
     }
   }
   kMinX = std::max(kMinX, (int)0);
@@ -2443,21 +2416,21 @@ void doQuickPutNoFilter(const TRaster32P &dn, const TRasterGR8P &up, double sx,
   int yL = yL0 + (kMinY - 1) * deltaYL;
 
   for (int kY = kMinY; kY <= kMaxY; kY++, dnRow += dnWrap) {
-    //  inizializza xL
+    // initialize xL
     int xL = xL0 + (kMinX - 1) * deltaXL;
     yL += deltaYL;
 
-    //  il punto di up TPointD(xL/(1<<PADN), yL/(1<<PADN)) e' approssimato
-    //  con (xI, yI)
-    int yI = yL >> PADN;  //  round
+    // the up point TPointD(xL/(1<<PADN), yL/(1<<PADN)) is approximated
+    // with (xI, yI)
+    int yI = yL >> PADN;  // round
 
     TPixel32 *dnPix    = dnRow + xMin + kMinX;
     TPixel32 *dnEndPix = dnRow + xMin + kMaxX + 1;
 
-    //  scorre i pixel sulla (yMin + kY)-esima scanline di dn
+    // iterate over pixels on the (yMin + kY)-th scanline of dn
     for (; dnPix < dnEndPix; ++dnPix) {
       xL += deltaXL;
-      int xI = xL >> PADN;  //	round
+      int xI = xL >> PADN;  // round
 
       assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) &&
              (yI <= up->getLy() - 1));
@@ -2492,60 +2465,59 @@ else
 
 void doQuickResampleFilter(const TRaster32P &dn, const TRaster32P &up,
                            const TAffine &aff) {
-  //  se aff e' degenere la controimmagine di up e' un segmento (o un punto)
+  // if aff is degenerate, the inverse image of up is a segment (or a point)
   if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0) return;
 
-  //  contatore bit di shift
+  // shift bit counter
   const int PADN = 16;
 
-  //  maschera del filtro bilineare
+  // bilinear filter mask
   const int MASKN = (1 << PADN) - 1;
   assert(std::max(up->getLx(), up->getLy()) <
          (1 << (8 * sizeof(int) - PADN - 1)));
-  //  max dimensioni di up gestibili (limite imposto dal numero di bit
-  //  disponibili per la parte intera di xL, yL)
+  // max manageable size of up (limit imposed by number of bits
+  // available for the integer part of xL, yL)
 
   TRectD boundingBoxD = TRectD(convert(dn->getSize())) *
                         (aff * TRectD(0, 0, up->getLx() - 2, up->getLy() - 2));
 
-  //  clipping
+  // clipping
   if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
     return;
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
-  TAffine invAff = inv(aff);  //  inversa di aff
+  TAffine invAff = inv(aff);  // inverse of aff
 
-  //  nel disegnare la y-esima scanline di dn, il passaggio al pixel
-  //  successivo comporta l'incremento (deltaXD, deltaYD) delle coordinate
-  //  del pixel corrispondente di up
+  // when drawing the y-th scanline of dn, moving to the next pixel
+  // implies incrementing (deltaXD, deltaYD) of the corresponding up pixel
+  // coordinates
   double deltaXD = invAff.a11;
   double deltaYD = invAff.a21;
 
-  //  deltaXD "TLonghizzato" (round)
+  // "long-ized" deltaXD (round)
   int deltaXL = tround(deltaXD * (1 << PADN));
 
-  //  deltaYD "TLonghizzato" (round)
+  // "long-ized" deltaYD (round)
   int deltaYL = tround(deltaYD * (1 << PADN));
 
-  //  se aff "TLonghizzata" (round) e' degenere la controimmagine di up e' un
-  //  segmento (o un punto)
+  // if "long-ized" aff is degenerate, the inverse image of up is a segment
   if ((deltaXL == 0) && (deltaYL == 0)) return;
 
-  // naturale predecessore di up->getLx() - 1
+  // natural predecessor of up->getLx() - 1
   int lxPred = (up->getLx() - 2) * (1 << PADN);
 
-  //  naturale predecessore di up->getLy() - 1
+  // natural predecessor of up->getLy() - 1
   int lyPred = (up->getLy() - 2) * (1 << PADN);
 
   int dnWrap = dn->getWrap();
@@ -2556,155 +2528,155 @@ void doQuickResampleFilter(const TRaster32P &dn, const TRaster32P &up,
   TPixel32 *dnRow     = dn->pixels(yMin);
   TPixel32 *upBasePix = up->pixels();
 
-  //  scorre le scanline di boundingBoxD
+  // iterate over boundingBoxD scanlines
   for (int y = yMin; y <= yMax; y++, dnRow += dnWrap) {
-    //  (1)  equazione k-parametrica della y-esima scanline di boundingBoxD:
-    //         (xMin, y) + k*(1, 0),  k = 0, ..., (xMax - xMin)
+    // (1) parametric k-equation of the y-th scanline of boundingBoxD:
+    //       (xMin, y) + k*(1, 0),  k = 0, ..., (xMax - xMin)
     //
-    //  (2)  equazione k-parametrica dell'immagine mediante invAff di (1):
-    //         invAff*(xMin, y) + k*(deltaXD, deltaYD),
-    //           k = kMin, ..., kMax
-    //           con 0 <= kMin <= kMax <= (xMax - xMin)
+    // (2) parametric k-equation of the image via invAff of (1):
+    //       invAff*(xMin, y) + k*(deltaXD, deltaYD),
+    //         k = kMin, ..., kMax
+    //         with 0 <= kMin <= kMax <= (xMax - xMin)
 
-    //  calcola kMin, kMax per la scanline corrente intersecando
-    //  la (2) con i lati di up
+    // compute kMin, kMax for the current scanline by intersecting (2)
+    // with the sides of up
 
-    //  il segmento [a, b] di up e' la controimmagine mediante aff della
-    //  porzione di scanline  [ (xMin, y), (xMax, y) ] di dn
+    // the segment [a, b] of up is the inverse image via aff of the portion
+    // of scanline [ (xMin, y), (xMax, y) ] of dn
 
-    //  TPointD b = invAff*TPointD(xMax, y);
+    // TPointD b = invAff*TPointD(xMax, y);
     TPointD a = invAff * TPointD(xMin, y);
 
-    //  (xL0, yL0) sono le coordinate di a in versione "TLonghizzata"
-    //  0 <= xL0 + k*deltaXL
-    //    <= (up->getLx() - 2)*(1<<PADN),
-    //  0 <= kMinX
-    //    <= kMin
-    //    <= k
-    //    <= kMax
-    //    <= kMaxX
-    //    <= (xMax - xMin)
+    // (xL0, yL0) are the coordinates of a in "long-ized" version
+    // 0 <= xL0 + k*deltaXL
+    //   <= (up->getLx() - 2)*(1<<PADN),
+    // 0 <= kMinX
+    //   <= kMin
+    //   <= k
+    //   <= kMax
+    //   <= kMaxX
+    //   <= (xMax - xMin)
 
-    //  0 <= yL0 + k*deltaYL
-    //    <= (up->getLy() - 2)*(1<<PADN),
-    //  0 <= kMinY
-    //    <= kMin
-    //    <= k
-    //    <= kMax
-    //    <= kMaxY
-    //    <= (xMax - xMin)
+    // 0 <= yL0 + k*deltaYL
+    //   <= (up->getLy() - 2)*(1<<PADN),
+    // 0 <= kMinY
+    //   <= kMin
+    //   <= k
+    //   <= kMax
+    //   <= kMaxY
+    //   <= (xMax - xMin)
 
-    //  xL0 inizializzato
+    // xL0 initialized
     int xL0 = tround(a.x * (1 << PADN));
 
-    //  yL0 inizializzato
+    // yL0 initialized
     int yL0 = tround(a.y * (1 << PADN));
 
-    //  calcola kMinX, kMaxX, kMinY, kMaxY
-    int kMinX = 0, kMaxX = xMax - xMin;  //  clipping su dn
-    int kMinY = 0, kMaxY = xMax - xMin;  //  clipping su dn
+    // compute kMinX, kMaxX, kMinY, kMaxY
+    int kMinX = 0, kMaxX = xMax - xMin;  // clipping on dn
+    int kMinY = 0, kMaxY = xMax - xMin;  // clipping on dn
 
-    //  0 <= xL0 + k*deltaXL <= (up->getLx() - 2)*(1<<PADN)
+    // 0 <= xL0 + k*deltaXL <= (up->getLx() - 2)*(1<<PADN)
     //             <=>
-    //  0 <= xL0 + k*deltaXL <= lxPred
+    // 0 <= xL0 + k*deltaXL <= lxPred
 
-    //  0 <= yL0 + k*deltaYL <= (up->getLy() - 2)*(1<<PADN)
+    // 0 <= yL0 + k*deltaYL <= (up->getLy() - 2)*(1<<PADN)
     //             <=>
-    //  0 <= yL0 + k*deltaYL <= lyPred
+    // 0 <= yL0 + k*deltaYL <= lyPred
 
-    //  calcola kMinX, kMaxX
+    // compute kMinX, kMaxX
     if (deltaXL == 0) {
-      //  [a, b] verticale esterno ad up contratto
+      // [a, b] vertical outside contracted up
       if ((xL0 < 0) || (lxPred < xL0)) continue;
-      //  altrimenti usa solo
-      //  kMinY, kMaxY ((deltaXL != 0) || (deltaYL != 0))
+      // otherwise only use
+      // kMinY, kMaxY ((deltaXL != 0) || (deltaYL != 0))
     } else if (deltaXL > 0) {
-      //  [a, b] esterno ad up+(bordo destro)
+      // [a, b] outside up+(right edge)
       if (lxPred < xL0) continue;
 
-      kMaxX = (lxPred - xL0) / deltaXL;  //  floor
+      kMaxX = (lxPred - xL0) / deltaXL;  // floor
       if (xL0 < 0) {
-        kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  //  ceil
+        kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  // ceil
       }
-    } else  //  (deltaXL < 0)
+    } else  // (deltaXL < 0)
     {
-      //  [a, b] esterno ad up contratto
+      // [a, b] outside contracted up
       if (xL0 < 0) continue;
 
-      kMaxX = xL0 / (-deltaXL);  //  floor
+      kMaxX = xL0 / (-deltaXL);  // floor
       if (lxPred < xL0) {
-        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  //  ceil
+        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  // ceil
       }
     }
 
-    //  calcola kMinY, kMaxY
+    // compute kMinY, kMaxY
     if (deltaYL == 0) {
-      // [a, b] orizzontale esterno ad up contratto
+      // [a, b] horizontal outside contracted up
       if ((yL0 < 0) || (lyPred < yL0)) continue;
-      //  altrimenti usa solo
-      //  kMinX, kMaxX ((deltaXL != 0) || (deltaYL != 0))
+      // otherwise only use
+      // kMinX, kMaxX ((deltaXL != 0) || (deltaYL != 0))
     } else if (deltaYL > 0) {
-      //  [a, b] esterno ad up contratto
+      // [a, b] outside contracted up
       if (lyPred < yL0) continue;
 
-      kMaxY = (lyPred - yL0) / deltaYL;  //  floor
+      kMaxY = (lyPred - yL0) / deltaYL;  // floor
       if (yL0 < 0) {
-        kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  //  ceil
+        kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  // ceil
       }
-    } else  //  (deltaYL < 0)
+    } else  // (deltaYL < 0)
     {
-      //  [a, b] esterno ad up contratto
+      // [a, b] outside contracted up
       if (yL0 < 0) continue;
 
-      kMaxY = yL0 / (-deltaYL);  //  floor
+      kMaxY = yL0 / (-deltaYL);  // floor
       if (lyPred < yL0) {
-        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  //  ceil
+        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  // ceil
       }
     }
 
-    //  calcola kMin, kMax effettuando anche il clippind su dn
+    // compute kMin, kMax also performing clipping on dn
     int kMin = std::max({kMinX, kMinY, (int)0});
     int kMax = std::min({kMaxX, kMaxY, xMax - xMin});
 
     TPixel32 *dnPix    = dnRow + xMin + kMin;
     TPixel32 *dnEndPix = dnRow + xMin + kMax + 1;
 
-    //  (xL, yL) sono le coordinate (inizializzate per il round)
-    //  in versione "longhizzata" del pixel corrente di up
-    int xL = xL0 + (kMin - 1) * deltaXL;  //  inizializza xL
-    int yL = yL0 + (kMin - 1) * deltaYL;  //  inizializza yL
+    // (xL, yL) are the coordinates (initialized for rounding)
+    // in "long-ized" version of the current up pixel
+    int xL = xL0 + (kMin - 1) * deltaXL;  // initialize xL
+    int yL = yL0 + (kMin - 1) * deltaYL;  // initialize yL
 
-    //  scorre i pixel sulla y-esima scanline di boundingBoxD
+    // iterate over pixels on the y-th scanline of boundingBoxD
     for (; dnPix < dnEndPix; ++dnPix) {
       xL += deltaXL;
       yL += deltaYL;
-      //  il punto di up TPointD(xL/(1<<PADN), yL/(1<<PADN)) e'
-      //  approssimato con (xI, yI)
-      int xI = xL >> PADN;  //	troncato
-      int yI = yL >> PADN;  //	troncato
+      // the up point TPointD(xL/(1<<PADN), yL/(1<<PADN)) is approximated
+      // with (xI, yI)
+      int xI = xL >> PADN;  // truncated
+      int yI = yL >> PADN;  // truncated
 
       assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) &&
              (yI <= up->getLy() - 1));
 
-      //  (xI, yI)
+      // (xI, yI)
       TPixel32 *upPix00 = upBasePix + (yI * upWrap + xI);
 
-      //  (xI + 1, yI)
+      // (xI + 1, yI)
       TPixel32 *upPix10 = upPix00 + 1;
 
-      //  (xI, yI + 1)
+      // (xI, yI + 1)
       TPixel32 *upPix01 = upPix00 + upWrap;
 
-      //  (xI + 1, yI + 1)
+      // (xI + 1, yI + 1)
       TPixel32 *upPix11 = upPix00 + upWrap + 1;
 
-      //  filtro bilineare 4 pixels: calcolo dei pesi
+      // bilinear filter 4 pixels: weight calculation
       int xWeight1 = (xL & MASKN);
       int xWeight0 = (1 << PADN) - xWeight1;
       int yWeight1 = (yL & MASKN);
       int yWeight0 = (1 << PADN) - yWeight1;
 
-      //  filtro bilineare 4 pixels: media pesata sui singoli canali
+      // bilinear filter 4 pixels: weighted average on each channel
       int rColDownTmp =
           (xWeight0 * (upPix00->r) + xWeight1 * ((upPix10)->r)) >> PADN;
 
@@ -2763,7 +2735,7 @@ void doQuickResampleFilter(const TRaster32P &dn, const TRasterGR8P &up,
   TRectD boundingBoxD = TRectD(convert(dn->getSize())) *
                         (aff * TRectD(0, 0, up->getLx() - 2, up->getLy() - 2));
 
-  //  clipping
+  // clipping
   if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
     return;
 
@@ -2772,7 +2744,7 @@ void doQuickResampleFilter(const TRaster32P &dn, const TRasterGR8P &up,
   int xMin = std::max(tfloor(boundingBoxD.x0), 0);
   int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
-  TAffine invAff = inv(aff);  //  inversa di aff
+  TAffine invAff = inv(aff);  // inverse of aff
 
   double deltaXD = invAff.a11;
   double deltaYD = invAff.a21;
@@ -2795,24 +2767,24 @@ void doQuickResampleFilter(const TRaster32P &dn, const TRasterGR8P &up,
     TPointD a = invAff * TPointD(xMin, y);
     int xL0   = tround(a.x * (1 << PADN));
     int yL0   = tround(a.y * (1 << PADN));
-    int kMinX = 0, kMaxX = xMax - xMin;  //  clipping su dn
-    int kMinY = 0, kMaxY = xMax - xMin;  //  clipping su dn
+    int kMinX = 0, kMaxX = xMax - xMin;  // clipping on dn
+    int kMinY = 0, kMaxY = xMax - xMin;  // clipping on dn
 
     if (deltaXL == 0) {
       if ((xL0 < 0) || (lxPred < xL0)) continue;
     } else if (deltaXL > 0) {
       if (lxPred < xL0) continue;
 
-      kMaxX = (lxPred - xL0) / deltaXL;  //  floor
+      kMaxX = (lxPred - xL0) / deltaXL;  // floor
       if (xL0 < 0) {
-        kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  //  ceil
+        kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  // ceil
       }
     } else {
       if (xL0 < 0) continue;
 
-      kMaxX = xL0 / (-deltaXL);  //  floor
+      kMaxX = xL0 / (-deltaXL);  // floor
       if (lxPred < xL0) {
-        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  //  ceil
+        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  // ceil
       }
     }
 
@@ -2821,17 +2793,17 @@ void doQuickResampleFilter(const TRaster32P &dn, const TRasterGR8P &up,
     } else if (deltaYL > 0) {
       if (lyPred < yL0) continue;
 
-      kMaxY = (lyPred - yL0) / deltaYL;  //  floor
+      kMaxY = (lyPred - yL0) / deltaYL;  // floor
       if (yL0 < 0) {
-        kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  //  ceil
+        kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  // ceil
       }
-    } else  //  (deltaYL < 0)
+    } else  // (deltaYL < 0)
     {
       if (yL0 < 0) continue;
 
-      kMaxY = yL0 / (-deltaYL);  //  floor
+      kMaxY = yL0 / (-deltaYL);  // floor
       if (lyPred < yL0) {
-        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  //  ceil
+        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  // ceil
       }
     }
 
@@ -2841,38 +2813,38 @@ void doQuickResampleFilter(const TRaster32P &dn, const TRasterGR8P &up,
     TPixel32 *dnPix    = dnRow + xMin + kMin;
     TPixel32 *dnEndPix = dnRow + xMin + kMax + 1;
 
-    int xL = xL0 + (kMin - 1) * deltaXL;  //  inizializza xL
-    int yL = yL0 + (kMin - 1) * deltaYL;  //  inizializza yL
+    int xL = xL0 + (kMin - 1) * deltaXL;  // initialize xL
+    int yL = yL0 + (kMin - 1) * deltaYL;  // initialize yL
 
     for (; dnPix < dnEndPix; ++dnPix) {
       xL += deltaXL;
       yL += deltaYL;
 
-      int xI = xL >> PADN;  //	troncato
-      int yI = yL >> PADN;  //	troncato
+      int xI = xL >> PADN;  // truncated
+      int yI = yL >> PADN;  // truncated
 
       assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) &&
              (yI <= up->getLy() - 1));
 
-      //  (xI, yI)
+      // (xI, yI)
       TPixelGR8 *upPix00 = upBasePix + (yI * upWrap + xI);
 
-      //  (xI + 1, yI)
+      // (xI + 1, yI)
       TPixelGR8 *upPix10 = upPix00 + 1;
 
-      //  (xI, yI + 1)
+      // (xI, yI + 1)
       TPixelGR8 *upPix01 = upPix00 + upWrap;
 
-      //  (xI + 1, yI + 1)
+      // (xI + 1, yI + 1)
       TPixelGR8 *upPix11 = upPix00 + upWrap + 1;
 
-      //  filtro bilineare 4 pixels: calcolo dei pesi
+      // bilinear filter 4 pixels: weight calculation
       int xWeight1 = (xL & MASKN);
       int xWeight0 = (1 << PADN) - xWeight1;
       int yWeight1 = (yL & MASKN);
       int yWeight0 = (1 << PADN) - yWeight1;
 
-      //  filtro bilineare 4 pixels: media pesata sui singoli canali
+      // bilinear filter 4 pixels: weighted average on each channel
       int colDownTmp =
           (xWeight0 * (upPix00->value) + xWeight1 * ((upPix10)->value)) >> PADN;
 
@@ -2909,27 +2881,23 @@ void doQuickResampleColorFilter(const TRaster32P &dn, const TRaster32P &up,
   if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
     return;
 
-  int yMin = std::max(tfloor(boundingBoxD.y0), 0);  //  clipping y su dn
+  int yMin = std::max(tfloor(boundingBoxD.y0), 0);  // y clipping on dn
   int yMax =
-      std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);  //  clipping y su dn
-  int xMin = std::max(tfloor(boundingBoxD.x0), 0);        //  clipping x su dn
+      std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);  // y clipping on dn
+  int xMin = std::max(tfloor(boundingBoxD.x0), 0);        // x clipping on dn
   int xMax =
-      std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);  //  clipping x su dn
+      std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);  // x clipping on dn
 
-  TAffine invAff = inv(aff);  //  inversa di aff
+  TAffine invAff = inv(aff);  // inverse of aff
 
   double deltaXD = invAff.a11;
   double deltaYD = invAff.a21;
-  int deltaXL =
-      tround(deltaXD * (1 << PADN));  //  deltaXD "TLonghizzato" (round)
-  int deltaYL =
-      tround(deltaYD * (1 << PADN));  //  deltaYD "TLonghizzato" (round)
+  int deltaXL = tround(deltaXD * (1 << PADN));  // "long-ized" deltaXD (round)
+  int deltaYL = tround(deltaYD * (1 << PADN));  // "long-ized" deltaYD (round)
   if ((deltaXL == 0) && (deltaYL == 0)) return;
 
-  int lxPred =
-      up->getLx() * (1 << PADN) - 1;  //  TINT32 predecessore di up->getLx()
-  int lyPred =
-      up->getLy() * (1 << PADN) - 1;  //  TINT32 predecessore di up->getLy()
+  int lxPred = up->getLx() * (1 << PADN) - 1;  // predecessor of up->getLx()
+  int lyPred = up->getLy() * (1 << PADN) - 1;  // predecessor of up->getLy()
 
   int dnWrap = dn->getWrap();
   int upWrap = up->getWrap();
@@ -2943,48 +2911,48 @@ void doQuickResampleColorFilter(const TRaster32P &dn, const TRaster32P &up,
     TPointD a = invAff * TPointD(xMin, y);
     int xL0   = tround((a.x + 0.5) * (1 << PADN));
     int yL0   = tround((a.y + 0.5) * (1 << PADN));
-    int kMinX = 0, kMaxX = xMax - xMin;  //  clipping su dn
-    int kMinY = 0, kMaxY = xMax - xMin;  //  clipping su dn
+    int kMinX = 0, kMaxX = xMax - xMin;  // clipping on dn
+    int kMinY = 0, kMaxY = xMax - xMin;  // clipping on dn
     if (deltaXL == 0) {
       if ((xL0 < 0) || (lxPred < xL0)) continue;
     } else if (deltaXL > 0) {
       if (lxPred < xL0) continue;
 
-      kMaxX = (lxPred - xL0) / deltaXL;                       //  floor
-      if (xL0 < 0) kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  //  ceil
-    } else                                                    //  (deltaXL < 0)
+      kMaxX = (lxPred - xL0) / deltaXL;                       // floor
+      if (xL0 < 0) kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  // ceil
+    } else                                                    // (deltaXL < 0)
     {
       if (xL0 < 0) continue;
-      kMaxX = xL0 / (-deltaXL);  //  floor
+      kMaxX = xL0 / (-deltaXL);  // floor
       if (lxPred < xL0)
-        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  //  ceil
+        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  // ceil
     }
     if (deltaYL == 0) {
       if ((yL0 < 0) || (lyPred < yL0)) continue;
     } else if (deltaYL > 0) {
       if (lyPred < yL0) continue;
 
-      kMaxY = (lyPred - yL0) / deltaYL;                       //  floor
-      if (yL0 < 0) kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  //  ceil
-    } else                                                    //  (deltaYL < 0)
+      kMaxY = (lyPred - yL0) / deltaYL;                       // floor
+      if (yL0 < 0) kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  // ceil
+    } else                                                    // (deltaYL < 0)
     {
       if (yL0 < 0) continue;
 
-      kMaxY = yL0 / (-deltaYL);  //  floor
+      kMaxY = yL0 / (-deltaYL);  // floor
       if (lyPred < yL0)
-        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  //  ceil
+        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  // ceil
     }
     int kMin           = std::max({kMinX, kMinY, (int)0});
     int kMax           = std::min({kMaxX, kMaxY, xMax - xMin});
     TPixel32 *dnPix    = dnRow + xMin + kMin;
     TPixel32 *dnEndPix = dnRow + xMin + kMax + 1;
-    int xL             = xL0 + (kMin - 1) * deltaXL;  //  inizializza xL
-    int yL             = yL0 + (kMin - 1) * deltaYL;  //  inizializza yL
+    int xL             = xL0 + (kMin - 1) * deltaXL;  // initialize xL
+    int yL             = yL0 + (kMin - 1) * deltaYL;  // initialize yL
     for (; dnPix < dnEndPix; ++dnPix) {
       xL += deltaXL;
       yL += deltaYL;
-      int xI = xL >> PADN;  //  round
-      int yI = yL >> PADN;  //  round
+      int xI = xL >> PADN;  // round
+      int yI = yL >> PADN;  // round
 
       assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) &&
              (yI <= up->getLy() - 1));
@@ -3026,27 +2994,23 @@ void doQuickResampleColorFilter(const TRaster32P &dn, const TRaster64P &up,
   if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
     return;
 
-  int yMin = std::max(tfloor(boundingBoxD.y0), 0);  //  clipping y su dn
+  int yMin = std::max(tfloor(boundingBoxD.y0), 0);  // y clipping on dn
   int yMax =
-      std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);  //  clipping y su dn
-  int xMin = std::max(tfloor(boundingBoxD.x0), 0);        //  clipping x su dn
+      std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);  // y clipping on dn
+  int xMin = std::max(tfloor(boundingBoxD.x0), 0);        // x clipping on dn
   int xMax =
-      std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);  //  clipping x su dn
+      std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);  // x clipping on dn
 
-  TAffine invAff = inv(aff);  //  inversa di aff
+  TAffine invAff = inv(aff);  // inverse of aff
 
   double deltaXD = invAff.a11;
   double deltaYD = invAff.a21;
-  int deltaXL =
-      tround(deltaXD * (1 << PADN));  //  deltaXD "TLonghizzato" (round)
-  int deltaYL =
-      tround(deltaYD * (1 << PADN));  //  deltaYD "TLonghizzato" (round)
+  int deltaXL = tround(deltaXD * (1 << PADN));  // "long-ized" deltaXD (round)
+  int deltaYL = tround(deltaYD * (1 << PADN));  // "long-ized" deltaYD (round)
   if ((deltaXL == 0) && (deltaYL == 0)) return;
 
-  int lxPred =
-      up->getLx() * (1 << PADN) - 1;  //  TINT32 predecessore di up->getLx()
-  int lyPred =
-      up->getLy() * (1 << PADN) - 1;  //  TINT32 predecessore di up->getLy()
+  int lxPred = up->getLx() * (1 << PADN) - 1;  // predecessor of up->getLx()
+  int lyPred = up->getLy() * (1 << PADN) - 1;  // predecessor of up->getLy()
 
   int dnWrap = dn->getWrap();
   int upWrap = up->getWrap();
@@ -3060,48 +3024,48 @@ void doQuickResampleColorFilter(const TRaster32P &dn, const TRaster64P &up,
     TPointD a = invAff * TPointD(xMin, y);
     int xL0   = tround((a.x + 0.5) * (1 << PADN));
     int yL0   = tround((a.y + 0.5) * (1 << PADN));
-    int kMinX = 0, kMaxX = xMax - xMin;  //  clipping su dn
-    int kMinY = 0, kMaxY = xMax - xMin;  //  clipping su dn
+    int kMinX = 0, kMaxX = xMax - xMin;  // clipping on dn
+    int kMinY = 0, kMaxY = xMax - xMin;  // clipping on dn
     if (deltaXL == 0) {
       if ((xL0 < 0) || (lxPred < xL0)) continue;
     } else if (deltaXL > 0) {
       if (lxPred < xL0) continue;
 
-      kMaxX = (lxPred - xL0) / deltaXL;                       //  floor
-      if (xL0 < 0) kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  //  ceil
-    } else                                                    //  (deltaXL < 0)
+      kMaxX = (lxPred - xL0) / deltaXL;                       // floor
+      if (xL0 < 0) kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  // ceil
+    } else                                                    // (deltaXL < 0)
     {
       if (xL0 < 0) continue;
-      kMaxX = xL0 / (-deltaXL);  //  floor
+      kMaxX = xL0 / (-deltaXL);  // floor
       if (lxPred < xL0)
-        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  //  ceil
+        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  // ceil
     }
     if (deltaYL == 0) {
       if ((yL0 < 0) || (lyPred < yL0)) continue;
     } else if (deltaYL > 0) {
       if (lyPred < yL0) continue;
 
-      kMaxY = (lyPred - yL0) / deltaYL;                       //  floor
-      if (yL0 < 0) kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  //  ceil
-    } else                                                    //  (deltaYL < 0)
+      kMaxY = (lyPred - yL0) / deltaYL;                       // floor
+      if (yL0 < 0) kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  // ceil
+    } else                                                    // (deltaYL < 0)
     {
       if (yL0 < 0) continue;
 
-      kMaxY = yL0 / (-deltaYL);  //  floor
+      kMaxY = yL0 / (-deltaYL);  // floor
       if (lyPred < yL0)
-        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  //  ceil
+        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  // ceil
     }
     int kMin           = std::max({kMinX, kMinY, (int)0});
     int kMax           = std::min({kMaxX, kMaxY, xMax - xMin});
     TPixel32 *dnPix    = dnRow + xMin + kMin;
     TPixel32 *dnEndPix = dnRow + xMin + kMax + 1;
-    int xL             = xL0 + (kMin - 1) * deltaXL;  //  inizializza xL
-    int yL             = yL0 + (kMin - 1) * deltaYL;  //  inizializza yL
+    int xL             = xL0 + (kMin - 1) * deltaXL;  // initialize xL
+    int yL             = yL0 + (kMin - 1) * deltaYL;  // initialize yL
     for (; dnPix < dnEndPix; ++dnPix) {
       xL += deltaXL;
       yL += deltaYL;
-      int xI = xL >> PADN;  //  round
-      int yI = yL >> PADN;  //  round
+      int xI = xL >> PADN;  // round
+      int yI = yL >> PADN;  // round
 
       assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) &&
              (yI <= up->getLy() - 1));
@@ -3127,18 +3091,18 @@ void doQuickResampleColorFilter(const TRaster32P &dn, const TRaster64P &up,
 
 void doQuickResampleFilter(const TRaster32P &dn, const TRaster32P &up,
                            double sx, double sy, double tx, double ty) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  // if aff := TAffine(sx, 0, tx, 0, sy, ty) is degenerate, the inverse image
+  // of up is a segment (or a point)
   if ((sx == 0) || (sy == 0)) return;
 
-  //  contatore bit di shift
+  // shift bit counter
   const int PADN = 16;
 
-  //  maschera del filtro bilineare
+  // bilinear filter mask
   const int MASKN = (1 << PADN) - 1;
 
-  //  max dimensioni di up gestibili (limite imposto dal numero di bit
-  // disponibili per la parte intera di xL, yL)
+  // max manageable size of up (limit imposed by number of bits
+  // available for the integer part of xL, yL)
   assert(std::max(up->getLx(), up->getLy()) <
          (1 << (8 * sizeof(int) - PADN - 1)));
 
@@ -3147,141 +3111,138 @@ void doQuickResampleFilter(const TRaster32P &dn, const TRaster32P &up,
       TRectD(convert(dn->getSize())) *
       (aff * TRectD(0, 0, up->getLx() - /*1*/ 2, up->getLy() - /*1*/ 2));
 
-  //  clipping
+  // clipping
   if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
     return;
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
-  //  inversa di aff
+  // inverse of aff
   TAffine invAff = inv(aff);
 
-  //  nello scorrere le scanline di boundingBoxD, il passaggio alla scanline
-  //  successiva comporta l'incremento (0, deltaYD) delle coordinate dei
-  //  pixels corrispondenti di up
+  // when iterating over scanlines of boundingBoxD, moving to the next scanline
+  // implies incrementing (0, deltaYD) of the coordinates of the corresponding
+  // up pixels
 
-  //  nel disegnare la y-esima scanline di dn, il passaggio al pixel
-  //  successivo comporta l'incremento (deltaXD, 0) delle coordinate del
-  //  pixel corrispondente di up
+  // when drawing the y-th scanline of dn, moving to the next pixel
+  // implies incrementing (deltaXD, 0) of the coordinates of the corresponding
+  // up pixel
 
   double deltaXD = invAff.a11;
   double deltaYD = invAff.a22;
-  int deltaXL =
-      tround(deltaXD * (1 << PADN));  //  deltaXD "TLonghizzato" (round)
-  int deltaYL =
-      tround(deltaYD * (1 << PADN));  //  deltaYD "TLonghizzato" (round)
+  int deltaXL = tround(deltaXD * (1 << PADN));  // "long-ized" deltaXD (round)
+  int deltaYL = tround(deltaYD * (1 << PADN));  // "long-ized" deltaYD (round)
 
-  //  se aff "TLonghizzata" (round) e' degenere la controimmagine di up e'
-  //  un segmento (o un punto)
+  // if "long-ized" aff is degenerate, the inverse image of up is a segment
   if ((deltaXL == 0) || (deltaYL == 0)) return;
 
-  //  (1)  equazione (kX, kY)-parametrica di boundingBoxD:
-  //         (xMin, yMin) + kX*(1, 0) + kY*(0, 1),
-  //           kX = 0, ..., (xMax - xMin),
-  //           kY = 0, ..., (yMax - yMin)
+  // (1) parametric (kX, kY)-equation of boundingBoxD:
+  //       (xMin, yMin) + kX*(1, 0) + kY*(0, 1),
+  //         kX = 0, ..., (xMax - xMin),
+  //         kY = 0, ..., (yMax - yMin)
 
-  //  (2)  equazione (kX, kY)-parametrica dell'immagine mediante invAff di (1):
-  //         invAff*(xMin, yMin) + kX*(deltaXD, 0) + kY*(0, deltaYD),
-  //           kX = kMinX, ..., kMaxX
-  //             con 0 <= kMinX <= kMaxX <= (xMax - xMin)
+  // (2) parametric (kX, kY)-equation of the image via invAff of (1):
+  //       invAff*(xMin, yMin) + kX*(deltaXD, 0) + kY*(0, deltaYD),
+  //         kX = kMinX, ..., kMaxX
+  //           with 0 <= kMinX <= kMaxX <= (xMax - xMin)
   //
-  //           kY = kMinY, ..., kMaxY
-  //             con 0 <= kMinY <= kMaxY <= (yMax - yMin)
+  //         kY = kMinY, ..., kMaxY
+  //           with 0 <= kMinY <= kMaxY <= (yMax - yMin)
 
-  //  calcola kMinX, kMaxX, kMinY, kMaxY intersecando la (2) con i lati di up
+  // compute kMinX, kMaxX, kMinY, kMaxY by intersecting (2) with the sides of up
 
-  //  il segmento [a, b] di up (con gli estremi eventualmente invertiti) e'
-  //  la controimmagine mediante aff della porzione di scanline
-  //  [ (xMin, yMin), (xMax, yMin) ] di dn
+  // the segment [a, b] of up (with possibly reversed ends) is the inverse
+  // image via aff of the portion of scanline
+  // [ (xMin, yMin), (xMax, yMin) ] of dn
 
-  //  TPointD b = invAff*TPointD(xMax, yMin);
+  // TPointD b = invAff*TPointD(xMax, yMin);
   TPointD a = invAff * TPointD(xMin, yMin);
 
-  //  (xL0, yL0) sono le coordinate di a (inizializzate per il round)
-  //  in versione "TLonghizzata"
-  //  0 <= xL0 + kX*deltaXL <= (up->getLx() - 2)*(1<<PADN),
-  //  0 <= kMinX <= kX <= kMaxX <= (xMax - xMin)
-  //  0 <= yL0 + kY*deltaYL <= (up->getLy() - 2)*(1<<PADN),
-  //  0 <= kMinY <= kY <= kMaxY <= (yMax - yMin)
+  // (xL0, yL0) are the coordinates of a (initialized for rounding)
+  // in "long-ized" version
+  // 0 <= xL0 + kX*deltaXL <= (up->getLx() - 2)*(1<<PADN),
+  // 0 <= kMinX <= kX <= kMaxX <= (xMax - xMin)
+  // 0 <= yL0 + kY*deltaYL <= (up->getLy() - 2)*(1<<PADN),
+  // 0 <= kMinY <= kY <= kMaxY <= (yMax - yMin)
 
-  int xL0 = tround(a.x * (1 << PADN));  //  xL0 inizializzato
-  int yL0 = tround(a.y * (1 << PADN));  //  yL0 inizializzato
+  int xL0 = tround(a.x * (1 << PADN));  // initialize xL0
+  int yL0 = tround(a.y * (1 << PADN));  // initialize yL0
 
-  //  calcola kMinY, kMaxY, kMinX, kMaxX intersecando la (2) con i lati di up
-  int kMinX = 0, kMaxX = xMax - xMin;  //  clipping su dn
-  int kMinY = 0, kMaxY = yMax - yMin;  //  clipping su dn
+  // compute kMinY, kMaxY, kMinX, kMaxX by intersecting (2) with the sides of up
+  int kMinX = 0, kMaxX = xMax - xMin;  // clipping on dn
+  int kMinY = 0, kMaxY = yMax - yMin;  // clipping on dn
 
-  //  TINT32 predecessore di (up->getLx() - 1)
+  // predecessor of (up->getLx() - 1)
   int lxPred = (up->getLx() - /*1*/ 2) * (1 << PADN);
 
-  //  TINT32 predecessore di (up->getLy() - 1)
+  // predecessor of (up->getLy() - 1)
   int lyPred = (up->getLy() - /*1*/ 2) * (1 << PADN);
 
-  //  0 <= xL0 + k*deltaXL <= (up->getLx() - 2)*(1<<PADN)
+  // 0 <= xL0 + k*deltaXL <= (up->getLx() - 2)*(1<<PADN)
   //               <=>
-  //  0 <= xL0 + k*deltaXL <= lxPred
+  // 0 <= xL0 + k*deltaXL <= lxPred
 
-  //  0 <= yL0 + k*deltaYL <= (up->getLy() - 2)*(1<<PADN)
+  // 0 <= yL0 + k*deltaYL <= (up->getLy() - 2)*(1<<PADN)
   //               <=>
-  //  0 <= yL0 + k*deltaYL <= lyPred
+  // 0 <= yL0 + k*deltaYL <= lyPred
 
-  //  calcola kMinY, kMaxY intersecando la (2) con i lati
-  //  (y = yMin) e (y = yMax) di up
-  if (deltaYL > 0)  //  (deltaYL != 0)
+  // compute kMinY, kMaxY by intersecting (2) with the sides
+  // (y = yMin) and (y = yMax) of up
+  if (deltaYL > 0)  // (deltaYL != 0)
   {
-    //  [a, b] interno ad up contratto
+    // [a, b] inside contracted up
     assert(yL0 <= lyPred);
 
-    kMaxY = (lyPred - yL0) / deltaYL;  //  floor
+    kMaxY = (lyPred - yL0) / deltaYL;  // floor
     if (yL0 < 0) {
-      kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  //  ceil
+      kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  // ceil
     }
-  } else  //  (deltaYL < 0)
+  } else  // (deltaYL < 0)
   {
-    //  [a, b] interno ad up contratto
+    // [a, b] inside contracted up
     assert(0 <= yL0);
 
-    kMaxY = yL0 / (-deltaYL);  //  floor
+    kMaxY = yL0 / (-deltaYL);  // floor
     if (lyPred < yL0) {
-      kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  //  ceil
+      kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  // ceil
     }
   }
-  //  calcola kMinY, kMaxY effettuando anche il clippind su dn
+  // compute kMinY, kMaxY also performing clipping on dn
   kMinY = std::max(kMinY, (int)0);
   kMaxY = std::min(kMaxY, yMax - yMin);
 
-  //  calcola kMinX, kMaxX intersecando la (2) con i lati
-  //  (x = xMin) e (x = xMax) di up
-  if (deltaXL > 0)  //  (deltaXL != 0)
+  // compute kMinX, kMaxX by intersecting (2) with the sides
+  // (x = xMin) and (x = xMax) of up
+  if (deltaXL > 0)  // (deltaXL != 0)
   {
-    //  [a, b] interno ad up contratto
+    // [a, b] inside contracted up
     assert(xL0 <= lxPred);
 
-    kMaxX = (lxPred - xL0) / deltaXL;  //  floor
+    kMaxX = (lxPred - xL0) / deltaXL;  // floor
     if (xL0 < 0) {
-      kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  //  ceil
+      kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  // ceil
     }
-  } else  //  (deltaXL < 0)
+  } else  // (deltaXL < 0)
   {
-    //  [a, b] interno ad up contratto
+    // [a, b] inside contracted up
     assert(0 <= xL0);
 
-    kMaxX = xL0 / (-deltaXL);  //  floor
+    kMaxX = xL0 / (-deltaXL);  // floor
     if (lxPred < xL0) {
-      kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  //  ceil
+      kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  // ceil
     }
   }
-  //  calcola kMinX, kMaxX effettuando anche il clippind su dn
+  // compute kMinX, kMaxX also performing clipping on dn
   kMinX = std::max(kMinX, (int)0);
   kMaxX = std::min(kMaxX, xMax - xMin);
 
@@ -3293,53 +3254,52 @@ void doQuickResampleFilter(const TRaster32P &dn, const TRaster32P &up,
   TPixel32 *upBasePix = up->pixels();
   TPixel32 *dnRow     = dn->pixels(yMin + kMinY);
 
-  //  (xL, yL) sono le coordinate (inizializzate per il round)
-  //  in versione "TLonghizzata"
-  //  del pixel corrente di up
-  int yL = yL0 + (kMinY - 1) * deltaYL;  //  inizializza yL
+  // (xL, yL) are the coordinates (initialized for rounding)
+  // in "long-ized" version of the current up pixel
+  int yL = yL0 + (kMinY - 1) * deltaYL;  // initialize yL
 
-  //  scorre le scanline di boundingBoxD
+  // iterate over boundingBoxD scanlines
   for (int kY = kMinY; kY <= kMaxY; kY++, dnRow += dnWrap) {
-    int xL = xL0 + (kMinX - 1) * deltaXL;  //  inizializza xL
+    int xL = xL0 + (kMinX - 1) * deltaXL;  // initialize xL
     yL += deltaYL;
-    //  il punto di up TPointD(xL/(1<<PADN), yL/(1<<PADN)) e' approssimato
-    //  con (xI, yI)
-    int yI = yL >> PADN;  //  troncato
+    // the up point TPointD(xL/(1<<PADN), yL/(1<<PADN)) is approximated
+    // with (xI, yI)
+    int yI = yL >> PADN;  // truncated
 
-    //  filtro bilineare 4 pixels: calcolo degli y-pesi
+    // bilinear filter 4 pixels: calculation of y-weights
     int yWeight1 = (yL & MASKN);
     int yWeight0 = (1 << PADN) - yWeight1;
 
     TPixel32 *dnPix    = dnRow + xMin + kMinX;
     TPixel32 *dnEndPix = dnRow + xMin + kMaxX + 1;
 
-    //  scorre i pixel sulla (yMin + kY)-esima scanline di dn
+    // iterate over pixels on the (yMin + kY)-th scanline of dn
     for (; dnPix < dnEndPix; ++dnPix) {
       xL += deltaXL;
-      //  il punto di up TPointD(xL/(1<<PADN), yL/(1<<PADN)) e'
-      //  approssimato con (xI, yI)
-      int xI = xL >> PADN;  //  troncato
+      // the up point TPointD(xL/(1<<PADN), yL/(1<<PADN)) is approximated
+      // with (xI, yI)
+      int xI = xL >> PADN;  // truncated
 
       assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) &&
              (yI <= up->getLy() - 1));
 
-      //  (xI, yI)
+      // (xI, yI)
       TPixel32 *upPix00 = upBasePix + (yI * upWrap + xI);
 
-      //  (xI + 1, yI)
+      // (xI + 1, yI)
       TPixel32 *upPix10 = upPix00 + 1;
 
-      //  (xI, yI + 1)
+      // (xI, yI + 1)
       TPixel32 *upPix01 = upPix00 + upWrap;
 
-      //  (xI + 1, yI + 1)
+      // (xI + 1, yI + 1)
       TPixel32 *upPix11 = upPix00 + upWrap + 1;
 
-      //  filtro bilineare 4 pixels: calcolo degli x-pesi
+      // bilinear filter 4 pixels: calculation of x-weights
       int xWeight1 = (xL & MASKN);
       int xWeight0 = (1 << PADN) - xWeight1;
 
-      //  filtro bilineare 4 pixels: media pesata sui singoli canali
+      // bilinear filter 4 pixels: weighted average on each channel
       int rColDownTmp =
           (xWeight0 * (upPix00->r) + xWeight1 * ((upPix10)->r)) >> PADN;
 
@@ -3386,18 +3346,18 @@ void doQuickResampleFilter(const TRaster32P &dn, const TRaster32P &up,
 
 void doQuickResampleFilter(const TRaster32P &dn, const TRasterGR8P &up,
                            double sx, double sy, double tx, double ty) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  // if aff := TAffine(sx, 0, tx, 0, sy, ty) is degenerate, the inverse image
+  // of up is a segment (or a point)
   if ((sx == 0) || (sy == 0)) return;
 
-  //  contatore bit di shift
+  // shift bit counter
   const int PADN = 16;
 
-  //  maschera del filtro bilineare
+  // bilinear filter mask
   const int MASKN = (1 << PADN) - 1;
 
-  //  max dimensioni di up gestibili (limite imposto dal numero di bit
-  // disponibili per la parte intera di xL, yL)
+  // max manageable size of up (limit imposed by number of bits
+  // available for the integer part of xL, yL)
   assert(std::max(up->getLx(), up->getLy()) <
          (1 << (8 * sizeof(int) - PADN - 1)));
 
@@ -3406,141 +3366,138 @@ void doQuickResampleFilter(const TRaster32P &dn, const TRasterGR8P &up,
       TRectD(convert(dn->getSize())) *
       (aff * TRectD(0, 0, up->getLx() - /*1*/ 2, up->getLy() - /*1*/ 2));
 
-  //  clipping
+  // clipping
   if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
     return;
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
-  //  inversa di aff
+  // inverse of aff
   TAffine invAff = inv(aff);
 
-  //  nello scorrere le scanline di boundingBoxD, il passaggio alla scanline
-  //  successiva comporta l'incremento (0, deltaYD) delle coordinate dei
-  //  pixels corrispondenti di up
+  // when iterating over scanlines of boundingBoxD, moving to the next scanline
+  // implies incrementing (0, deltaYD) of the coordinates of the corresponding
+  // up pixels
 
-  //  nel disegnare la y-esima scanline di dn, il passaggio al pixel
-  //  successivo comporta l'incremento (deltaXD, 0) delle coordinate del
-  //  pixel corrispondente di up
+  // when drawing the y-th scanline of dn, moving to the next pixel
+  // implies incrementing (deltaXD, 0) of the coordinates of the corresponding
+  // up pixel
 
   double deltaXD = invAff.a11;
   double deltaYD = invAff.a22;
-  int deltaXL =
-      tround(deltaXD * (1 << PADN));  //  deltaXD "TLonghizzato" (round)
-  int deltaYL =
-      tround(deltaYD * (1 << PADN));  //  deltaYD "TLonghizzato" (round)
+  int deltaXL = tround(deltaXD * (1 << PADN));  // "long-ized" deltaXD (round)
+  int deltaYL = tround(deltaYD * (1 << PADN));  // "long-ized" deltaYD (round)
 
-  //  se aff "TLonghizzata" (round) e' degenere la controimmagine di up e'
-  //  un segmento (o un punto)
+  // if "long-ized" aff is degenerate, the inverse image of up is a segment
   if ((deltaXL == 0) || (deltaYL == 0)) return;
 
-  //  (1)  equazione (kX, kY)-parametrica di boundingBoxD:
-  //         (xMin, yMin) + kX*(1, 0) + kY*(0, 1),
-  //           kX = 0, ..., (xMax - xMin),
-  //           kY = 0, ..., (yMax - yMin)
+  // (1) parametric (kX, kY)-equation of boundingBoxD:
+  //       (xMin, yMin) + kX*(1, 0) + kY*(0, 1),
+  //         kX = 0, ..., (xMax - xMin),
+  //         kY = 0, ..., (yMax - yMin)
 
-  //  (2)  equazione (kX, kY)-parametrica dell'immagine mediante invAff di (1):
-  //         invAff*(xMin, yMin) + kX*(deltaXD, 0) + kY*(0, deltaYD),
-  //           kX = kMinX, ..., kMaxX
-  //             con 0 <= kMinX <= kMaxX <= (xMax - xMin)
+  // (2) parametric (kX, kY)-equation of the image via invAff of (1):
+  //       invAff*(xMin, yMin) + kX*(deltaXD, 0) + kY*(0, deltaYD),
+  //         kX = kMinX, ..., kMaxX
+  //           with 0 <= kMinX <= kMaxX <= (xMax - xMin)
   //
-  //           kY = kMinY, ..., kMaxY
-  //             con 0 <= kMinY <= kMaxY <= (yMax - yMin)
+  //         kY = kMinY, ..., kMaxY
+  //           with 0 <= kMinY <= kMaxY <= (yMax - yMin)
 
-  //  calcola kMinX, kMaxX, kMinY, kMaxY intersecando la (2) con i lati di up
+  // compute kMinX, kMaxX, kMinY, kMaxY by intersecting (2) with the sides of up
 
-  //  il segmento [a, b] di up (con gli estremi eventualmente invertiti) e'
-  //  la controimmagine mediante aff della porzione di scanline
-  //  [ (xMin, yMin), (xMax, yMin) ] di dn
+  // the segment [a, b] of up (with possibly reversed ends) is the inverse
+  // image via aff of the portion of scanline
+  // [ (xMin, yMin), (xMax, yMin) ] of dn
 
-  //  TPointD b = invAff*TPointD(xMax, yMin);
+  // TPointD b = invAff*TPointD(xMax, yMin);
   TPointD a = invAff * TPointD(xMin, yMin);
 
-  //  (xL0, yL0) sono le coordinate di a (inizializzate per il round)
-  //  in versione "TLonghizzata"
-  //  0 <= xL0 + kX*deltaXL <= (up->getLx() - 2)*(1<<PADN),
-  //  0 <= kMinX <= kX <= kMaxX <= (xMax - xMin)
-  //  0 <= yL0 + kY*deltaYL <= (up->getLy() - 2)*(1<<PADN),
-  //  0 <= kMinY <= kY <= kMaxY <= (yMax - yMin)
+  // (xL0, yL0) are the coordinates of a (initialized for rounding)
+  // in "long-ized" version
+  // 0 <= xL0 + kX*deltaXL <= (up->getLx() - 2)*(1<<PADN),
+  // 0 <= kMinX <= kX <= kMaxX <= (xMax - xMin)
+  // 0 <= yL0 + kY*deltaYL <= (up->getLy() - 2)*(1<<PADN),
+  // 0 <= kMinY <= kY <= kMaxY <= (yMax - yMin)
 
-  int xL0 = tround(a.x * (1 << PADN));  //  xL0 inizializzato
-  int yL0 = tround(a.y * (1 << PADN));  //  yL0 inizializzato
+  int xL0 = tround(a.x * (1 << PADN));  // initialize xL0
+  int yL0 = tround(a.y * (1 << PADN));  // initialize yL0
 
-  //  calcola kMinY, kMaxY, kMinX, kMaxX intersecando la (2) con i lati di up
-  int kMinX = 0, kMaxX = xMax - xMin;  //  clipping su dn
-  int kMinY = 0, kMaxY = yMax - yMin;  //  clipping su dn
+  // compute kMinY, kMaxY, kMinX, kMaxX by intersecting (2) with the sides of up
+  int kMinX = 0, kMaxX = xMax - xMin;  // clipping on dn
+  int kMinY = 0, kMaxY = yMax - yMin;  // clipping on dn
 
-  //  TINT32 predecessore di (up->getLx() - 1)
+  // predecessor of (up->getLx() - 1)
   int lxPred = (up->getLx() - /*1*/ 2) * (1 << PADN);
 
-  //  TINT32 predecessore di (up->getLy() - 1)
+  // predecessor of (up->getLy() - 1)
   int lyPred = (up->getLy() - /*1*/ 2) * (1 << PADN);
 
-  //  0 <= xL0 + k*deltaXL <= (up->getLx() - 2)*(1<<PADN)
+  // 0 <= xL0 + k*deltaXL <= (up->getLx() - 2)*(1<<PADN)
   //               <=>
-  //  0 <= xL0 + k*deltaXL <= lxPred
+  // 0 <= xL0 + k*deltaXL <= lxPred
 
-  //  0 <= yL0 + k*deltaYL <= (up->getLy() - 2)*(1<<PADN)
+  // 0 <= yL0 + k*deltaYL <= (up->getLy() - 2)*(1<<PADN)
   //               <=>
-  //  0 <= yL0 + k*deltaYL <= lyPred
+  // 0 <= yL0 + k*deltaYL <= lyPred
 
-  //  calcola kMinY, kMaxY intersecando la (2) con i lati
-  //  (y = yMin) e (y = yMax) di up
-  if (deltaYL > 0)  //  (deltaYL != 0)
+  // compute kMinY, kMaxY by intersecting (2) with the sides
+  // (y = yMin) and (y = yMax) of up
+  if (deltaYL > 0)  // (deltaYL != 0)
   {
-    //  [a, b] interno ad up contratto
+    // [a, b] inside contracted up
     assert(yL0 <= lyPred);
 
-    kMaxY = (lyPred - yL0) / deltaYL;  //  floor
+    kMaxY = (lyPred - yL0) / deltaYL;  // floor
     if (yL0 < 0) {
-      kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  //  ceil
+      kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  // ceil
     }
-  } else  //  (deltaYL < 0)
+  } else  // (deltaYL < 0)
   {
-    //  [a, b] interno ad up contratto
+    // [a, b] inside contracted up
     assert(0 <= yL0);
 
-    kMaxY = yL0 / (-deltaYL);  //  floor
+    kMaxY = yL0 / (-deltaYL);  // floor
     if (lyPred < yL0) {
-      kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  //  ceil
+      kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  // ceil
     }
   }
-  //  calcola kMinY, kMaxY effettuando anche il clippind su dn
+  // compute kMinY, kMaxY also performing clipping on dn
   kMinY = std::max(kMinY, (int)0);
   kMaxY = std::min(kMaxY, yMax - yMin);
 
-  //  calcola kMinX, kMaxX intersecando la (2) con i lati
-  //  (x = xMin) e (x = xMax) di up
-  if (deltaXL > 0)  //  (deltaXL != 0)
+  // compute kMinX, kMaxX by intersecting (2) with the sides
+  // (x = xMin) and (x = xMax) of up
+  if (deltaXL > 0)  // (deltaXL != 0)
   {
-    //  [a, b] interno ad up contratto
+    // [a, b] inside contracted up
     assert(xL0 <= lxPred);
 
-    kMaxX = (lxPred - xL0) / deltaXL;  //  floor
+    kMaxX = (lxPred - xL0) / deltaXL;  // floor
     if (xL0 < 0) {
-      kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  //  ceil
+      kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  // ceil
     }
-  } else  //  (deltaXL < 0)
+  } else  // (deltaXL < 0)
   {
-    //  [a, b] interno ad up contratto
+    // [a, b] inside contracted up
     assert(0 <= xL0);
 
-    kMaxX = xL0 / (-deltaXL);  //  floor
+    kMaxX = xL0 / (-deltaXL);  // floor
     if (lxPred < xL0) {
-      kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  //  ceil
+      kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  // ceil
     }
   }
-  //  calcola kMinX, kMaxX effettuando anche il clippind su dn
+  // compute kMinX, kMaxX also performing clipping on dn
   kMinX = std::max(kMinX, (int)0);
   kMaxX = std::min(kMaxX, xMax - xMin);
 
@@ -3552,53 +3509,52 @@ void doQuickResampleFilter(const TRaster32P &dn, const TRasterGR8P &up,
   TPixelGR8 *upBasePix = up->pixels();
   TPixel32 *dnRow      = dn->pixels(yMin + kMinY);
 
-  //  (xL, yL) sono le coordinate (inizializzate per il round)
-  //  in versione "TLonghizzata"
-  //  del pixel corrente di up
-  int yL = yL0 + (kMinY - 1) * deltaYL;  //  inizializza yL
+  // (xL, yL) are the coordinates (initialized for rounding)
+  // in "long-ized" version of the current up pixel
+  int yL = yL0 + (kMinY - 1) * deltaYL;  // initialize yL
 
-  //  scorre le scanline di boundingBoxD
+  // iterate over boundingBoxD scanlines
   for (int kY = kMinY; kY <= kMaxY; kY++, dnRow += dnWrap) {
-    int xL = xL0 + (kMinX - 1) * deltaXL;  //  inizializza xL
+    int xL = xL0 + (kMinX - 1) * deltaXL;  // initialize xL
     yL += deltaYL;
-    //  il punto di up TPointD(xL/(1<<PADN), yL/(1<<PADN)) e' approssimato
-    //  con (xI, yI)
-    int yI = yL >> PADN;  //  troncato
+    // the up point TPointD(xL/(1<<PADN), yL/(1<<PADN)) is approximated
+    // with (xI, yI)
+    int yI = yL >> PADN;  // truncated
 
-    //  filtro bilineare 4 pixels: calcolo degli y-pesi
+    // bilinear filter 4 pixels: calculation of y-weights
     int yWeight1 = (yL & MASKN);
     int yWeight0 = (1 << PADN) - yWeight1;
 
     TPixel32 *dnPix    = dnRow + xMin + kMinX;
     TPixel32 *dnEndPix = dnRow + xMin + kMaxX + 1;
 
-    //  scorre i pixel sulla (yMin + kY)-esima scanline di dn
+    // iterate over pixels on the (yMin + kY)-th scanline of dn
     for (; dnPix < dnEndPix; ++dnPix) {
       xL += deltaXL;
-      //  il punto di up TPointD(xL/(1<<PADN), yL/(1<<PADN)) e'
-      //  approssimato con (xI, yI)
-      int xI = xL >> PADN;  //  troncato
+      // the up point TPointD(xL/(1<<PADN), yL/(1<<PADN)) is approximated
+      // with (xI, yI)
+      int xI = xL >> PADN;  // truncated
 
       assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) &&
              (yI <= up->getLy() - 1));
 
-      //  (xI, yI)
+      // (xI, yI)
       TPixelGR8 *upPix00 = upBasePix + (yI * upWrap + xI);
 
-      //  (xI + 1, yI)
+      // (xI + 1, yI)
       TPixelGR8 *upPix10 = upPix00 + 1;
 
-      //  (xI, yI + 1)
+      // (xI, yI + 1)
       TPixelGR8 *upPix01 = upPix00 + upWrap;
 
-      //  (xI + 1, yI + 1)
+      // (xI + 1, yI + 1)
       TPixelGR8 *upPix11 = upPix00 + upWrap + 1;
 
-      //  filtro bilineare 4 pixels: calcolo degli x-pesi
+      // bilinear filter 4 pixels: calculation of x-weights
       int xWeight1 = (xL & MASKN);
       int xWeight0 = (1 << PADN) - xWeight1;
 
-      //  filtro bilineare 4 pixels: media pesata sui singoli canali
+      // bilinear filter 4 pixels: weighted average on each channel
       int colDownTmp =
           (xWeight0 * (upPix00->value) + xWeight1 * (upPix10->value)) >> PADN;
 
@@ -3621,15 +3577,15 @@ void doQuickResampleFilter(const TRaster32P &dn, const TRasterGR8P &up,
 template <typename PIX>
 void doQuickResampleNoFilter(const TRasterPT<PIX> &dn, const TRasterPT<PIX> &up,
                              double sx, double sy, double tx, double ty) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  // if aff := TAffine(sx, 0, tx, 0, sy, ty) is degenerate, the inverse image
+  // of up is a segment (or a point)
   if ((sx == 0) || (sy == 0)) return;
 
-  //  contatore bit di shift
+  // shift bit counter
   const int PADN = 16;
 
-  //  max dimensioni di up gestibili (limite imposto dal numero di bit
-  //  disponibili per la parte intera di xL, yL)
+  // max manageable size of up (limit imposed by number of bits
+  // available for the integer part of xL, yL)
   assert(std::max(up->getLx(), up->getLy()) <
          (1 << (8 * sizeof(int) - PADN - 1)));
 
@@ -3637,136 +3593,129 @@ void doQuickResampleNoFilter(const TRasterPT<PIX> &dn, const TRasterPT<PIX> &up,
   TRectD boundingBoxD =
       TRectD(convert(dn->getBounds())) *
       (aff * TRectD(-0.5, -0.5, up->getLx() - 0.5, up->getLy() - 0.5));
-  //  clipping
+  // clipping
   if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
     return;
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
-  TAffine invAff = inv(aff);  //  inversa di aff
+  TAffine invAff = inv(aff);  // inverse of aff
 
-  //  nello scorrere le scanline di boundingBoxD, il passaggio alla scanline
-  //  successiva comporta l'incremento (0, deltaYD) delle coordinate dei
-  //  pixels corrispondenti di up
+  // when iterating over scanlines of boundingBoxD, moving to the next scanline
+  // implies incrementing (0, deltaYD) of the coordinates of the corresponding
+  // up pixels
 
-  //  nel disegnare la y-esima scanline di dn, il passaggio al pixel
-  //  successivo comporta l'incremento (deltaXD, 0) delle coordinate del
-  //  pixel corrispondente di up
+  // when drawing the y-th scanline of dn, moving to the next pixel
+  // implies incrementing (deltaXD, 0) of the coordinates of the corresponding
+  // up pixel
 
   double deltaXD = invAff.a11;
   double deltaYD = invAff.a22;
-  int deltaXL =
-      tround(deltaXD * (1 << PADN));  //  deltaXD "TLonghizzato" (round)
-  int deltaYL =
-      tround(deltaYD * (1 << PADN));  //  deltaYD "TLonghizzato" (round)
+  int deltaXL = tround(deltaXD * (1 << PADN));  // "long-ized" deltaXD (round)
+  int deltaYL = tround(deltaYD * (1 << PADN));  // "long-ized" deltaYD (round)
 
-  //  se aff "TLonghizzata" (round) e' degenere la controimmagine di up e' un
-  //  segmento (o un punto)
+  // if "long-ized" aff is degenerate, the inverse image of up is a segment
   if ((deltaXL == 0) || (deltaYL == 0)) return;
 
-  //  (1)  equazione (kX, kY)-parametrica di boundingBoxD:
-  //         (xMin, yMin) + kX*(1, 0) + kY*(0, 1),
-  //           kX = 0, ..., (xMax - xMin),
-  //           kY = 0, ..., (yMax - yMin)
+  // (1) parametric (kX, kY)-equation of boundingBoxD:
+  //       (xMin, yMin) + kX*(1, 0) + kY*(0, 1),
+  //         kX = 0, ..., (xMax - xMin),
+  //         kY = 0, ..., (yMax - yMin)
 
-  //  (2)  equazione (kX, kY)-parametrica dell'immagine mediante invAff di (1):
-  //         invAff*(xMin, yMin) + kX*(deltaXD, 0) + kY*(0, deltaYD),
-  //           kX = kMinX, ..., kMaxX
-  //             con 0 <= kMinX <= kMaxX <= (xMax - xMin)
-  //           kY = kMinY, ..., kMaxY
-  //             con 0 <= kMinY <= kMaxY <= (yMax - yMin)
+  // (2) parametric (kX, kY)-equation of the image via invAff of (1):
+  //       invAff*(xMin, yMin) + kX*(deltaXD, 0) + kY*(0, deltaYD),
+  //         kX = kMinX, ..., kMaxX
+  //           with 0 <= kMinX <= kMaxX <= (xMax - xMin)
+  //         kY = kMinY, ..., kMaxY
+  //           with 0 <= kMinY <= kMaxY <= (yMax - yMin)
 
-  //  calcola kMinX, kMaxX, kMinY, kMaxY intersecando la (2) con i lati di up
+  // compute kMinX, kMaxX, kMinY, kMaxY by intersecting (2) with the sides of up
 
-  //  il segmento [a, b] di up e' la controimmagine mediante aff della
-  //  porzione di scanline  [ (xMin, yMin), (xMax, yMin) ] di dn
+  // the segment [a, b] of up is the inverse image via aff of the portion
+  // of scanline [ (xMin, yMin), (xMax, yMin) ] of dn
 
-  //  TPointD b = invAff*TPointD(xMax, yMin);
+  // TPointD b = invAff*TPointD(xMax, yMin);
   TPointD a = invAff * TPointD(xMin, yMin);
 
-  //  (xL0, yL0) sono le coordinate di a (inizializzate per il round)
-  //  in versione "TLonghizzata"
-  //  0 <= xL0 + kX*deltaXL < up->getLx()*(1<<PADN),
-  //  0 <= kMinX <= kX <= kMaxX <= (xMax - xMin)
+  // (xL0, yL0) are the coordinates of a (initialized for rounding)
+  // in "long-ized" version
+  // 0 <= xL0 + kX*deltaXL < up->getLx()*(1<<PADN),
+  // 0 <= kMinX <= kX <= kMaxX <= (xMax - xMin)
 
-  //  0 <= yL0 + kY*deltaYL < up->getLy()*(1<<PADN),
-  //  0 <= kMinY <= kY <= kMaxY <= (yMax - yMin)
-  int xL0 =
-      tround((a.x + 0.5) * (1 << PADN));  //  xL0 inizializzato per il round
-  int yL0 =
-      tround((a.y + 0.5) * (1 << PADN));  //  yL0 inizializzato per il round
+  // 0 <= yL0 + kY*deltaYL < up->getLy()*(1<<PADN),
+  // 0 <= kMinY <= kY <= kMaxY <= (yMax - yMin)
+  int xL0 = tround((a.x + 0.5) * (1 << PADN));  // xL0 initialized for rounding
+  int yL0 = tround((a.y + 0.5) * (1 << PADN));  // yL0 initialized for rounding
 
-  //  calcola kMinY, kMaxY, kMinX, kMaxX intersecando la (2) con i lati di up
-  int kMinX = 0, kMaxX = xMax - xMin;  //  clipping su dn
-  int kMinY = 0, kMaxY = yMax - yMin;  //  clipping su dn
-  int lxPred =
-      up->getLx() * (1 << PADN) - 1;  //  TINT32 predecessore di up->getLx()
-  int lyPred =
-      up->getLy() * (1 << PADN) - 1;  //  TINT32 predecessore di up->getLy()
+  // compute kMinY, kMaxY, kMinX, kMaxX by intersecting (2) with the sides of up
+  int kMinX = 0, kMaxX = xMax - xMin;          // clipping on dn
+  int kMinY = 0, kMaxY = yMax - yMin;          // clipping on dn
+  int lxPred = up->getLx() * (1 << PADN) - 1;  // predecessor of up->getLx()
+  int lyPred = up->getLy() * (1 << PADN) - 1;  // predecessor of up->getLy()
 
-  //  0 <= xL0 + k*deltaXL < up->getLx()*(1<<PADN)
+  // 0 <= xL0 + k*deltaXL < up->getLx()*(1<<PADN)
   //                  <=>
-  //  0 <= xL0 + k*deltaXL <= lxPred
+  // 0 <= xL0 + k*deltaXL <= lxPred
 
-  //  0 <= yL0 + k*deltaYL < up->getLy()*(1<<PADN)
+  // 0 <= yL0 + k*deltaYL < up->getLy()*(1<<PADN)
   //                  <=>
-  //  0 <= yL0 + k*deltaYL <= lyPred
+  // 0 <= yL0 + k*deltaYL <= lyPred
 
-  //  calcola kMinY, kMaxY  intersecando la (2) con i lati
-  //  (y = yMin) e (y = yMax) di up
-  if (deltaYL > 0)  //  (deltaYL != 0)
+  // compute kMinY, kMaxY  by intersecting (2) with the sides
+  // (y = yMin) and (y = yMax) of up
+  if (deltaYL > 0)  // (deltaYL != 0)
   {
-    assert(yL0 <= lyPred);  //  [a, b] interno ad up+(bordo destro/basso)
-    kMaxY = (lyPred - yL0) / deltaYL;  //  floor
+    assert(yL0 <= lyPred);             // [a, b] inside up+(right/bottom edge)
+    kMaxY = (lyPred - yL0) / deltaYL;  // floor
     if (yL0 < 0) {
-      kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  //  ceil
+      kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  // ceil
     }
-  } else  //  (deltaYL < 0)
+  } else  // (deltaYL < 0)
   {
-    //  [a, b] interno ad up+(bordo destro/basso)
+    // [a, b] inside up+(right/bottom edge)
     assert(0 <= yL0);
 
-    kMaxY = yL0 / (-deltaYL);  //  floor
+    kMaxY = yL0 / (-deltaYL);  // floor
     if (lyPred < yL0) {
-      kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  //  ceil
+      kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  // ceil
     }
   }
-  //	calcola kMinY, kMaxY effettuando anche il clippind su dn
+  // compute kMinY, kMaxY also performing clipping on dn
   kMinY = std::max(kMinY, (int)0);
   kMaxY = std::min(kMaxY, yMax - yMin);
 
-  //  calcola kMinX, kMaxX  intersecando la (2) con i lati
-  //  (x = xMin) e (x = xMax) di up
-  if (deltaXL > 0)  //  (deltaXL != 0)
+  // compute kMinX, kMaxX  by intersecting (2) with the sides
+  // (x = xMin) and (x = xMax) of up
+  if (deltaXL > 0)  // (deltaXL != 0)
   {
-    //  [a, b] interno ad up+(bordo destro/basso)
+    // [a, b] inside up+(right/bottom edge)
     assert(xL0 <= lxPred);
 
-    kMaxX = (lxPred - xL0) / deltaXL;  //  floor
+    kMaxX = (lxPred - xL0) / deltaXL;  // floor
     if (xL0 < 0) {
-      kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  //  ceil
+      kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  // ceil
     }
-  } else  //  (deltaXL < 0)
+  } else  // (deltaXL < 0)
   {
-    //  [a, b] interno ad up+(bordo destro/basso)
+    // [a, b] inside up+(right/bottom edge)
     assert(0 <= xL0);
 
-    kMaxX = xL0 / (-deltaXL);  //  floor
+    kMaxX = xL0 / (-deltaXL);  // floor
     if (lxPred < xL0) {
-      kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  //  ceil
+      kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  // ceil
     }
   }
-  //  calcola kMinX, kMaxX effettuando anche il clippind su dn
+  // compute kMinX, kMaxX also performing clipping on dn
   kMinX = std::max(kMinX, (int)0);
   kMaxX = std::min(kMaxX, xMax - xMin);
 
@@ -3778,27 +3727,27 @@ void doQuickResampleNoFilter(const TRasterPT<PIX> &dn, const TRasterPT<PIX> &up,
   PIX *upBasePix = up->pixels();
   PIX *dnRow     = dn->pixels(yMin + kMinY);
 
-  //  (xL, yL) sono le coordinate (inizializzate per il round)
-  //  in versione "TLonghizzata" del pixel corrente di up
-  int yL = yL0 + (kMinY - 1) * deltaYL;  //  inizializza yL
+  // (xL, yL) are the coordinates (initialized for rounding)
+  // in "long-ized" version of the current up pixel
+  int yL = yL0 + (kMinY - 1) * deltaYL;  // initialize yL
 
-  //  scorre le scanline di boundingBoxD
+  // iterate over boundingBoxD scanlines
   for (int kY = kMinY; kY <= kMaxY; kY++, dnRow += dnWrap) {
-    int xL = xL0 + (kMinX - 1) * deltaXL;  //  inizializza xL
+    int xL = xL0 + (kMinX - 1) * deltaXL;  // initialize xL
     yL += deltaYL;
-    //  il punto di up TPointD(xL/(1<<PADN), yL/(1<<PADN)) e' approssimato
-    //  con (xI, yI)
-    int yI = yL >> PADN;  //  round
+    // the up point TPointD(xL/(1<<PADN), yL/(1<<PADN)) is approximated
+    // with (xI, yI)
+    int yI = yL >> PADN;  // round
 
     PIX *dnPix    = dnRow + xMin + kMinX;
     PIX *dnEndPix = dnRow + xMin + kMaxX + 1;
 
-    //  scorre i pixel sulla (yMin + kY)-esima scanline di dn
+    // iterate over pixels on the (yMin + kY)-th scanline of dn
     for (; dnPix < dnEndPix; ++dnPix) {
       xL += deltaXL;
-      //  il punto di up TPointD(xL/(1<<PADN), yL/(1<<PADN)) e'
-      //  approssimato con (xI, yI)
-      int xI = xL >> PADN;  //  round
+      // the up point TPointD(xL/(1<<PADN), yL/(1<<PADN)) is approximated
+      // with (xI, yI)
+      int xI = xL >> PADN;  // round
 
       assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) &&
              (yI <= up->getLy() - 1));
@@ -3829,15 +3778,15 @@ void doQuickResampleNoFilter(const TRasterPT<PIX> &dn, const TRasterPT<PIX> &up,
 void doQuickPutCmapped(const TRaster32P &dn, const TRasterCM32P &up,
                        const TPaletteP &palette, const TAffine &aff,
                        const TPixel32 &globalColorScale, bool inksOnly) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  // if aff := TAffine(sx, 0, tx, 0, sy, ty) is degenerate, the inverse image
+  // of up is a segment (or a point)
   if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0) return;
 
-  //  contatore bit di shift
+  // shift bit counter
   const int PADN = 16;
 
-  //  max dimensioni di up gestibili (limite imposto dal numero di bit
-  //  disponibili per la parte intera di xL, yL)
+  // max manageable size of up (limit imposed by number of bits
+  // available for the integer part of xL, yL)
   assert(std::max(up->getLx(), up->getLy()) <
          (1 << (8 * sizeof(int) - PADN - 1)));
 
@@ -3845,52 +3794,51 @@ void doQuickPutCmapped(const TRaster32P &dn, const TRasterCM32P &up,
       TRectD(convert(dn->getBounds())) *
       (aff * TRectD(-0.5, -0.5, up->getLx() - 0.5, up->getLy() - 0.5));
 
-  //  clipping
+  // clipping
   if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
     return;
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
-  //  inversa di aff
+  // inverse of aff
   TAffine invAff = inv(aff);
 
-  //  nel disegnare la y-esima scanline di dn, il passaggio al pixel
-  //  successivo comporta l'incremento (deltaXD, deltaYD) delle coordinate del
-  //  pixel corrispondente di up
+  // when drawing the y-th scanline of dn, moving to the next pixel
+  // implies incrementing (deltaXD, deltaYD) of the corresponding up pixel
+  // coordinates
   double deltaXD = invAff.a11;
   double deltaYD = invAff.a21;
 
-  //  deltaXD "TLonghizzato" (round)
+  // "long-ized" deltaXD (round)
   int deltaXL = tround(deltaXD * (1 << PADN));
 
-  //  deltaYD "TLonghizzato" (round)
+  // "long-ized" deltaYD (round)
   int deltaYL = tround(deltaYD * (1 << PADN));
 
-  //  se aff "TLonghizzata" (round) e' degenere la controimmagine di up e' un
-  //  segmento (o un punto)
+  // if "long-ized" aff is degenerate, the inverse image of up is a segment
   if ((deltaXL == 0) && (deltaYL == 0)) return;
 
-  //  TINT32 predecessore di up->getLx()
+  // predecessor of up->getLx()
   int lxPred = up->getLx() * (1 << PADN) - 1;
 
-  //  TINT32 predecessore di up->getLy()
+  // predecessor of up->getLy()
   int lyPred = up->getLy() * (1 << PADN) - 1;
 
   int dnWrap = dn->getWrap();
   int upWrap = up->getWrap();
 
   std::vector<TPixel32> colors(palette->getStyleCount());
-  // vector<TPixel32> inks(palette->getStyleCount());
+  // std::vector<TPixel32> inks(palette->getStyleCount());
 
   if (globalColorScale != TPixel::Black)
     for (int i = 0; i < palette->getStyleCount(); i++)
@@ -3906,139 +3854,139 @@ void doQuickPutCmapped(const TRaster32P &dn, const TRasterCM32P &up,
   TPixel32 *dnRow       = dn->pixels(yMin);
   TPixelCM32 *upBasePix = up->pixels();
 
-  //  scorre le scanline di boundingBoxD
+  // iterate over boundingBoxD scanlines
   for (int y = yMin; y <= yMax; y++, dnRow += dnWrap) {
-    //  (1)  equazione k-parametrica della y-esima scanline di boundingBoxD:
+    // (1) parametric k-equation of the y-th scanline of boundingBoxD:
     //       (xMin, y) + k*(1, 0),  k = 0, ..., (xMax - xMin)
 
-    //  (2)  equazione k-parametrica dell'immagine mediante invAff di (1):
+    // (2) parametric k-equation of the image via invAff of (1):
     //       invAff*(xMin, y) + k*(deltaXD, deltaYD),
-    //       k = kMin, ..., kMax con 0 <= kMin <= kMax <= (xMax - xMin)
+    //       k = kMin, ..., kMax with 0 <= kMin <= kMax <= (xMax - xMin)
 
-    //  calcola kMin, kMax per la scanline corrente
-    //  intersecando la (2) con i lati di up
+    // compute kMin, kMax for the current scanline by intersecting (2)
+    // with the sides of up
 
-    //  il segmento [a, b] di up e' la controimmagine mediante aff della
-    //  porzione di scanline  [ (xMin, y), (xMax, y) ] di dn
+    // the segment [a, b] of up is the inverse image via aff of the portion
+    // of scanline [ (xMin, y), (xMax, y) ] of dn
 
-    //  TPointD b = invAff*TPointD(xMax, y);
+    // TPointD b = invAff*TPointD(xMax, y);
     TPointD a = invAff * TPointD(xMin, y);
 
-    //  (xL0, yL0) sono le coordinate di a (inizializzate per il round)
-    //  in versione "TLonghizzata"
-    //  0 <= xL0 + k*deltaXL
-    //    <  up->getLx()*(1<<PADN)
+    // (xL0, yL0) are the coordinates of a (initialized for rounding)
+    // in "long-ized" version
+    // 0 <= xL0 + k*deltaXL
+    //   <  up->getLx()*(1<<PADN)
     //
-    //  0 <= kMinX
-    //    <= kMin
-    //    <= k
-    //    <= kMax
-    //    <= kMaxX
-    //    <= (xMax - xMin)
+    // 0 <= kMinX
+    //   <= kMin
+    //   <= k
+    //   <= kMax
+    //   <= kMaxX
+    //   <= (xMax - xMin)
     //
-    //  0 <= yL0 + k*deltaYL
-    //    < up->getLy()*(1<<PADN)
+    // 0 <= yL0 + k*deltaYL
+    //   < up->getLy()*(1<<PADN)
 
-    //  0 <= kMinY
-    //    <= kMin
-    //    <= k
-    //    <= kMax
-    //    <= kMaxY
-    //    <= (xMax - xMin)
+    // 0 <= kMinY
+    //   <= kMin
+    //   <= k
+    //   <= kMax
+    //   <= kMaxY
+    //   <= (xMax - xMin)
 
-    //  xL0 inizializzato per il round
+    // xL0 initialized for rounding
     int xL0 = tround((a.x + 0.5) * (1 << PADN));
 
-    //  yL0 inizializzato per il round
+    // yL0 initialized for rounding
     int yL0 = tround((a.y + 0.5) * (1 << PADN));
 
-    //  calcola kMinX, kMaxX, kMinY, kMaxY
-    int kMinX = 0, kMaxX = xMax - xMin;  //  clipping su dn
-    int kMinY = 0, kMaxY = xMax - xMin;  //  clipping su dn
+    // compute kMinX, kMaxX, kMinY, kMaxY
+    int kMinX = 0, kMaxX = xMax - xMin;  // clipping on dn
+    int kMinY = 0, kMaxY = xMax - xMin;  // clipping on dn
 
-    //  0 <= xL0 + k*deltaXL
-    //    < up->getLx()*(1<<PADN)
-    //           <=>
-    //  0 <= xL0 + k*deltaXL
-    //    <= lxPred
+    // 0 <= xL0 + k*deltaXL
+    //   < up->getLx()*(1<<PADN)
+    //          <=>
+    // 0 <= xL0 + k*deltaXL
+    //   <= lxPred
     //
-    //  0 <= yL0 + k*deltaYL
-    //    < up->getLy()*(1<<PADN)
-    //           <=>
-    //  0 <= yL0 + k*deltaYL
-    //    <= lyPred
+    // 0 <= yL0 + k*deltaYL
+    //   < up->getLy()*(1<<PADN)
+    //          <=>
+    // 0 <= yL0 + k*deltaYL
+    //   <= lyPred
 
-    //  calcola kMinX, kMaxX
+    // compute kMinX, kMaxX
     if (deltaXL == 0) {
-      // [a, b] verticale esterno ad up+(bordo destro/basso)
+      // [a, b] vertical outside up+(right/bottom edge)
       if ((xL0 < 0) || (lxPred < xL0)) continue;
-      //  altrimenti usa solo
-      //  kMinY, kMaxY ((deltaXL != 0) || (deltaYL != 0))
+      // otherwise only use
+      // kMinY, kMaxY ((deltaXL != 0) || (deltaYL != 0))
     } else if (deltaXL > 0) {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (lxPred < xL0) continue;
 
-      kMaxX = (lxPred - xL0) / deltaXL;  //  floor
+      kMaxX = (lxPred - xL0) / deltaXL;  // floor
       if (xL0 < 0) {
-        kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  //  ceil
+        kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  // ceil
       }
-    } else  //  (deltaXL < 0)
+    } else  // (deltaXL < 0)
     {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (xL0 < 0) continue;
 
-      kMaxX = xL0 / (-deltaXL);  //  floor
+      kMaxX = xL0 / (-deltaXL);  // floor
       if (lxPred < xL0) {
-        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  //  ceil
+        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  // ceil
       }
     }
 
-    //  calcola kMinY, kMaxY
+    // compute kMinY, kMaxY
     if (deltaYL == 0) {
-      //  [a, b] orizzontale esterno ad up+(bordo destro/basso)
+      // [a, b] horizontal outside up+(right/bottom edge)
       if ((yL0 < 0) || (lyPred < yL0)) continue;
-      // altrimenti usa solo
+      // otherwise only use
       // kMinX, kMaxX ((deltaXL != 0) || (deltaYL != 0))
     } else if (deltaYL > 0) {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (lyPred < yL0) continue;
 
-      kMaxY = (lyPred - yL0) / deltaYL;  //  floor
+      kMaxY = (lyPred - yL0) / deltaYL;  // floor
       if (yL0 < 0) {
-        kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  //  ceil
+        kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  // ceil
       }
-    } else  //  (deltaYL < 0)
+    } else  // (deltaYL < 0)
     {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (yL0 < 0) continue;
 
-      kMaxY = yL0 / (-deltaYL);  //  floor
+      kMaxY = yL0 / (-deltaYL);  // floor
       if (lyPred < yL0) {
-        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  //  ceil
+        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  // ceil
       }
     }
 
-    //  calcola kMin, kMax effettuando anche il clippind su dn
+    // compute kMin, kMax also performing clipping on dn
     int kMin = std::max({kMinX, kMinY, (int)0});
     int kMax = std::min({kMaxX, kMaxY, xMax - xMin});
 
     TPixel32 *dnPix    = dnRow + xMin + kMin;
     TPixel32 *dnEndPix = dnRow + xMin + kMax + 1;
 
-    //  (xL, yL) sono le coordinate (inizializzate per il round)
-    //  in versione "TLonghizzata" del pixel corrente di up
-    int xL = xL0 + (kMin - 1) * deltaXL;  //  inizializza xL
-    int yL = yL0 + (kMin - 1) * deltaYL;  //  inizializza yL
+    // (xL, yL) are the coordinates (initialized for rounding)
+    // in "long-ized" version of the current up pixel
+    int xL = xL0 + (kMin - 1) * deltaXL;  // initialize xL
+    int yL = yL0 + (kMin - 1) * deltaYL;  // initialize yL
 
-    //  scorre i pixel sulla y-esima scanline di boundingBoxD
+    // iterate over pixels on the y-th scanline of boundingBoxD
     for (; dnPix < dnEndPix; ++dnPix) {
       xL += deltaXL;
       yL += deltaYL;
 
-      //  il punto di up TPointD(xL/(1<<PADN), yL/(1<<PADN)) e'
-      //  approssimato con (xI, yI)
-      int xI = xL >> PADN;  //  round
-      int yI = yL >> PADN;  //  round
+      // the up point TPointD(xL/(1<<PADN), yL/(1<<PADN)) is approximated
+      // with (xI, yI)
+      int xI = xL >> PADN;  // round
+      int yI = yL >> PADN;  // round
 
       assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) &&
              (yI <= up->getLy() - 1));
@@ -4130,13 +4078,15 @@ void doQuickPutCmapped(const TRaster32P &dn, const TRasterCM32P &up,
   int lyPred = up->getLy() * (1 << PADN) - 1;
   int dnWrap = dn->getWrap();
   int upWrap = up->getWrap();
+  // Build colour vectors from palette
   std::vector<TPixel32> paints(palette->getStyleCount());
   std::vector<TPixel32> inks(palette->getStyleCount());
 
+  // If palette has no styles, nothing can be drawn, return early
+  if (inks.empty() || paints.empty()) return;
+
   if (s.m_transparencyCheck && !s.m_isOnionSkin) {
     for (int i = 0; i < palette->getStyleCount(); i++) {
-      // if the style's autopaint flag is ON, show its original color
-      // so that users can easily find lines left unpainted.
       if (i == s.m_gapCheckIndex || palette->getStyle(i)->getFlags() != 0) {
         paints[i] = inks[i] = applyColorScaleCMapped(
             palette->getStyle(i)->getAverageColor(), s.m_globalColorScale);
@@ -4159,6 +4109,7 @@ void doQuickPutCmapped(const TRaster32P &dn, const TRasterCM32P &up,
 
   TPixel32 *dnRow       = dn->pixels(yMin);
   TPixelCM32 *upBasePix = up->pixels();
+
   for (int y = yMin; y <= yMax; y++, dnRow += dnWrap) {
     TPointD a = invAff * TPointD(xMin, y);
     int xL0   = tround((a.x + 0.5) * (1 << PADN));
@@ -4169,28 +4120,23 @@ void doQuickPutCmapped(const TRaster32P &dn, const TRasterCM32P &up,
       if ((xL0 < 0) || (lxPred < xL0)) continue;
     } else if (deltaXL > 0) {
       if (lxPred < xL0) continue;
-
-      kMaxX = (lxPred - xL0) / deltaXL;                       //  floor
-      if (xL0 < 0) kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  //  ceil
+      kMaxX = (lxPred - xL0) / deltaXL;
+      if (xL0 < 0) kMinX = ((-xL0) + deltaXL - 1) / deltaXL;
     } else {
       if (xL0 < 0) continue;
-
-      kMaxX = xL0 / (-deltaXL);  //  floor
-      if (lxPred < xL0)
-        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  //  ceil
+      kMaxX = xL0 / (-deltaXL);
+      if (lxPred < xL0) kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);
     }
     if (deltaYL == 0) {
       if ((yL0 < 0) || (lyPred < yL0)) continue;
     } else if (deltaYL > 0) {
       if (lyPred < yL0) continue;
-
       kMaxY = (lyPred - yL0) / deltaYL;
       if (yL0 < 0) kMinY = ((-yL0) + deltaYL - 1) / deltaYL;
     } else {
       if (yL0 < 0) continue;
-      kMaxY = yL0 / (-deltaYL);  //  floor
-      if (lyPred < yL0)
-        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  //  ceil
+      kMaxY = yL0 / (-deltaYL);
+      if (lyPred < yL0) kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);
     }
     int kMin = std::max({kMinX, kMinY, (int)0});
     int kMax = std::min({kMaxX, kMaxY, xMax - xMin});
@@ -4199,6 +4145,7 @@ void doQuickPutCmapped(const TRaster32P &dn, const TRasterCM32P &up,
     TPixel32 *dnEndPix = dnRow + xMin + kMax + 1;
     int xL             = xL0 + (kMin - 1) * deltaXL;
     int yL             = yL0 + (kMin - 1) * deltaYL;
+
     for (; dnPix < dnEndPix; ++dnPix) {
       xL += deltaXL;
       yL += deltaYL;
@@ -4208,33 +4155,37 @@ void doQuickPutCmapped(const TRaster32P &dn, const TRasterCM32P &up,
              (yI <= up->getLy() - 1));
       TPixelCM32 *upPix = upBasePix + (yI * upWrap + xI);
       int t             = upPix->getTone();
-      int p             = upPix->getPaint() < paints.size() ? upPix->getPaint() : -1;
+
+      // clamp out‑of‑range paint/ink indices to 0
+      int p = (upPix->getPaint() < (int)paints.size()) ? upPix->getPaint() : 0;
+      int i = (upPix->getInk() < (int)inks.size()) ? upPix->getInk() : 0;
 
       if (t == 0xff && p == 0)
         continue;
       else {
-        int i = upPix->getInk() < inks.size() ? upPix->getInk() : -1;
         TPixel32 colorUp;
         if (s.m_inksOnly) switch (t) {
           case 0:
-            colorUp = (i == s.m_inkIndex) ? TPixel::Red : inks[i];
+            if (s.m_inkCheckEnabled && i == s.m_inkIndex) {
+              colorUp = s.m_inkCheckColor;
+            } else if (s.m_ink1CheckEnabled && i == 1) {
+              colorUp = s.m_ink1CheckColor;
+            } else {
+              colorUp = inks[i];
+            }
             break;
           case 255:
             colorUp = TPixel::Transparent;
             break;
           default: {
             TPixel inkColor;
-            if (i == s.m_inkIndex) {
-              inkColor = TPixel::Red;
-              if (p == 0) {
-                t = t / 2;  // transparency check(for a bug!) darken
-                            // semitrasparent pixels; ghibli likes it, and wants
-                            // it also for ink checks...
-                // otherwise, ramps goes always from reds towards grey...
-              }
-            } else
+            if (s.m_inkCheckEnabled && i == s.m_inkIndex) {
+              inkColor = s.m_inkCheckColor;
+            } else if (s.m_ink1CheckEnabled && i == 1) {
+              inkColor = s.m_ink1CheckColor;
+            } else {
               inkColor = inks[i];
-
+            }
             colorUp = antialias(inkColor, 255 - t);
             break;
           }
@@ -4242,24 +4193,34 @@ void doQuickPutCmapped(const TRaster32P &dn, const TRasterCM32P &up,
         else
           switch (t) {
           case 0:
-            colorUp = (i == s.m_inkIndex) ? TPixel::Red : inks[i];
+            if (s.m_inkCheckEnabled && i == s.m_inkIndex) {
+              colorUp = s.m_inkCheckColor;
+            } else if (s.m_ink1CheckEnabled && i == 1) {
+              colorUp = s.m_ink1CheckColor;
+            } else {
+              colorUp = inks[i];
+            }
             break;
           case 255:
-            colorUp = (p == s.m_paintIndex) ? TPixel::Red : paints[p];
+            if (s.m_paintCheckEnabled && p == s.m_paintIndex) {
+              colorUp = s.m_paintCheckColor;
+            } else {
+              colorUp = paints[p];
+            }
             break;
           default: {
-            TPixel paintColor = (p == s.m_paintIndex) ? TPixel::Red : paints[p];
+            TPixel paintColor = (s.m_paintCheckEnabled && p == s.m_paintIndex)
+                                    ? s.m_paintCheckColor
+                                    : paints[p];
             TPixel inkColor;
-            if (i == s.m_inkIndex) {
-              inkColor = TPixel::Red;
-              if (p == 0) {
-                paintColor = TPixel::Transparent;
-              }
-            } else
+            if (s.m_inkCheckEnabled && i == s.m_inkIndex) {
+              inkColor = s.m_inkCheckColor;
+            } else if (s.m_ink1CheckEnabled && i == 1) {
+              inkColor = s.m_ink1CheckColor;
+            } else {
               inkColor = inks[i];
-
+            }
             if (s.m_transparencyCheck) t = t / 2;
-
             colorUp = blend(inkColor, paintColor, t, TPixelCM32::getMaxTone());
             break;
           }
@@ -4282,172 +4243,170 @@ void doQuickPutCmapped(const TRaster32P &dn, const TRasterCM32P &up,
                        const TPaletteP &palette, double sx, double sy,
                        double tx, double ty, const TPixel32 &globalColorScale,
                        bool inksOnly) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  // if aff := TAffine(sx, 0, tx, 0, sy, ty) is degenerate, the inverse image
+  // of up is a segment (or a point)
   if ((sx == 0) || (sy == 0)) return;
 
-  //  contatore bit di shift
+  // shift bit counter
   const int PADN = 16;
   assert(std::max(up->getLx(), up->getLy()) <
          (1 << (8 * sizeof(int) - PADN - 1)));
-  //  max dimensioni di up gestibili (limite imposto dal numero di bit
-  // disponibili per la parte intera di xL, yL)
+  // max manageable size of up (limit imposed by number of bits
+  // available for the integer part of xL, yL)
 
   TAffine aff(sx, 0, tx, 0, sy, ty);
   TRectD boundingBoxD =
       TRectD(convert(dn->getBounds())) *
       (aff * TRectD(-0.5, -0.5, up->getLx() - 0.5, up->getLy() - 0.5));
 
-  //  clipping
+  // clipping
   if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
     return;
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
-  TAffine invAff = inv(aff);  //  inversa di aff
+  TAffine invAff = inv(aff);  // inverse of aff
 
-  //  nello scorrere le scanline di boundingBoxD, il passaggio alla scanline
-  //  successiva comporta l'incremento (0, deltaYD) delle coordinate dei
-  //  pixels corrispondenti di up
+  // when iterating over scanlines of boundingBoxD, moving to the next scanline
+  // implies incrementing (0, deltaYD) of the coordinates of the corresponding
+  // up pixels
 
-  //  nel disegnare la y-esima scanline di dn, il passaggio al pixel
-  //  successivo comporta l'incremento (deltaXD, 0) delle coordinate del
-  //  pixel corrispondente di up
+  // when drawing the y-th scanline of dn, moving to the next pixel
+  // implies incrementing (deltaXD, 0) of the coordinates of the corresponding
+  // up pixel
 
   double deltaXD = invAff.a11;
   double deltaYD = invAff.a22;
 
-  //  deltaXD "TLonghizzato" (round)
+  // "long-ized" deltaXD (round)
   int deltaXL = tround(deltaXD * (1 << PADN));
 
-  //  deltaYD "TLonghizzato" (round)
+  // "long-ized" deltaYD (round)
   int deltaYL = tround(deltaYD * (1 << PADN));
 
-  //  se aff "TLonghizzata" (round) e' degenere la controimmagine di up e' un
-  //  segmento (o un punto)
+  // if "long-ized" aff is degenerate, the inverse image of up is a segment
   if ((deltaXL == 0) || (deltaYL == 0)) return;
 
-  //	(1)  equazione (kX, kY)-parametrica di boundingBoxD:
-  //	       (xMin, yMin) + kX*(1, 0) + kY*(0, 1),
-  //	         kX = 0, ..., (xMax - xMin),
-  //             kY = 0, ..., (yMax - yMin)
+  // (1) parametric (kX, kY)-equation of boundingBoxD:
+  //       (xMin, yMin) + kX*(1, 0) + kY*(0, 1),
+  //         kX = 0, ..., (xMax - xMin),
+  //         kY = 0, ..., (yMax - yMin)
 
-  //	(2)  equazione (kX, kY)-parametrica dell'immagine
-  //         mediante invAff di (1):
-  //	       invAff*(xMin, yMin) + kX*(deltaXD, 0) + kY*(0, deltaYD),
-  //	         kX = kMinX, ..., kMaxX
-  //             con 0 <= kMinX <= kMaxX <= (xMax - xMin)
+  // (2) parametric (kX, kY)-equation of the image via invAff of (1):
+  //       invAff*(xMin, yMin) + kX*(deltaXD, 0) + kY*(0, deltaYD),
+  //         kX = kMinX, ..., kMaxX
+  //           with 0 <= kMinX <= kMaxX <= (xMax - xMin)
   //
-  //             kY = kMinY, ..., kMaxY
-  //             con 0 <= kMinY <= kMaxY <= (yMax - yMin)
+  //         kY = kMinY, ..., kMaxY
+  //           with 0 <= kMinY <= kMaxY <= (yMax - yMin)
 
-  //  calcola kMinX, kMaxX, kMinY, kMaxY intersecando la (2) con i lati di up
+  // compute kMinX, kMaxX, kMinY, kMaxY by intersecting (2) with the sides of up
 
-  //  il segmento [a, b] di up e' la controimmagine mediante aff della
-  // porzione di scanline  [ (xMin, yMin), (xMax, yMin) ] di dn
+  // the segment [a, b] of up is the inverse image via aff of the portion
+  // of scanline [ (xMin, yMin), (xMax, yMin) ] of dn
 
-  //  TPointD b = invAff*TPointD(xMax, yMin);
+  // TPointD b = invAff*TPointD(xMax, yMin);
   TPointD a = invAff * TPointD(xMin, yMin);
 
-  //  (xL0, yL0) sono le coordinate di a (inizializzate per il round)
-  // in versione "TLonghizzata"
-  //	0 <= xL0 + kX*deltaXL
-  //      < up->getLx()*(1<<PADN),
+  // (xL0, yL0) are the coordinates of a (initialized for rounding)
+  // in "long-ized" version
+  // 0 <= xL0 + kX*deltaXL
+  //   < up->getLx()*(1<<PADN),
   //
-  //    0 <= kMinX
-  //      <= kX
-  //      <= kMaxX
-  //      <= (xMax - xMin)
+  // 0 <= kMinX
+  //   <= kX
+  //   <= kMaxX
+  //   <= (xMax - xMin)
 
-  //	0 <= yL0 + kY*deltaYL
-  //      < up->getLy()*(1<<PADN),
+  // 0 <= yL0 + kY*deltaYL
+  //   < up->getLy()*(1<<PADN),
   //
-  //    0 <= kMinY
-  //      <= kY
-  //      <= kMaxY
-  //      <= (yMax - yMin)
+  // 0 <= kMinY
+  //   <= kY
+  //   <= kMaxY
+  //   <= (yMax - yMin)
 
-  //  xL0 inizializzato per il round
+  // xL0 initialized for rounding
   int xL0 = tround((a.x + 0.5) * (1 << PADN));
 
-  //  yL0 inizializzato per il round
+  // yL0 initialized for rounding
   int yL0 = tround((a.y + 0.5) * (1 << PADN));
 
-  //  calcola kMinY, kMaxY, kMinX, kMaxX intersecando la (2) con i lati di up
-  int kMinX = 0, kMaxX = xMax - xMin;  //  clipping su dn
-  int kMinY = 0, kMaxY = yMax - yMin;  //  clipping su dn
+  // compute kMinY, kMaxY, kMinX, kMaxX by intersecting (2) with the sides of up
+  int kMinX = 0, kMaxX = xMax - xMin;  // clipping on dn
+  int kMinY = 0, kMaxY = yMax - yMin;  // clipping on dn
 
-  //  TINT32 predecessore di up->getLx()
+  // predecessor of up->getLx()
   int lxPred = up->getLx() * (1 << PADN) - 1;
 
-  //  TINT32 predecessore di up->getLy()
+  // predecessor of up->getLy()
   int lyPred = up->getLy() * (1 << PADN) - 1;
 
-  //  0 <= xL0 + k*deltaXL < up->getLx()*(1<<PADN)
+  // 0 <= xL0 + k*deltaXL < up->getLx()*(1<<PADN)
   //            <=>
-  //  0 <= xL0 + k*deltaXL <= lxPred
+  // 0 <= xL0 + k*deltaXL <= lxPred
 
-  //  0 <= yL0 + k*deltaYL < up->getLy()*(1<<PADN)
+  // 0 <= yL0 + k*deltaYL < up->getLy()*(1<<PADN)
   //            <=>
-  //  0 <= yL0 + k*deltaYL <= lyPred
+  // 0 <= yL0 + k*deltaYL <= lyPred
 
-  //  calcola kMinY, kMaxY intersecando la (2) con i lati
-  //  (y = yMin) e (y = yMax) di up
-  if (deltaYL > 0)  //  (deltaYL != 0)
+  // compute kMinY, kMaxY by intersecting (2) with the sides
+  // (y = yMin) and (y = yMax) of up
+  if (deltaYL > 0)  // (deltaYL != 0)
   {
-    //  [a, b] interno ad up+(bordo destro/basso)
+    // [a, b] inside up+(right/bottom edge)
     assert(yL0 <= lyPred);
 
-    kMaxY = (lyPred - yL0) / deltaYL;  //  floor
+    kMaxY = (lyPred - yL0) / deltaYL;  // floor
     if (yL0 < 0) {
-      kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  //  ceil
+      kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  // ceil
     }
-  } else  //  (deltaYL < 0)
+  } else  // (deltaYL < 0)
   {
-    //  [a, b] interno ad up+(bordo destro/basso)
+    // [a, b] inside up+(right/bottom edge)
     assert(0 <= yL0);
 
-    kMaxY = yL0 / (-deltaYL);  //  floor
+    kMaxY = yL0 / (-deltaYL);  // floor
     if (lyPred < yL0) {
-      kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  //  ceil
+      kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  // ceil
     }
   }
-  //  calcola kMinY, kMaxY effettuando anche il clippind su dn
+  // compute kMinY, kMaxY also performing clipping on dn
   kMinY = std::max(kMinY, (int)0);
   kMaxY = std::min(kMaxY, yMax - yMin);
 
-  //  calcola kMinX, kMaxX intersecando la (2) con i lati
-  //  (x = xMin) e (x = xMax) di up
-  if (deltaXL > 0)  //  (deltaXL != 0)
+  // compute kMinX, kMaxX by intersecting (2) with the sides
+  // (x = xMin) and (x = xMax) of up
+  if (deltaXL > 0)  // (deltaXL != 0)
   {
-    //  [a, b] interno ad up+(bordo destro/basso)
+    // [a, b] inside up+(right/bottom edge)
     assert(xL0 <= lxPred);
 
-    kMaxX = (lxPred - xL0) / deltaXL;  //  floor
+    kMaxX = (lxPred - xL0) / deltaXL;  // floor
     if (xL0 < 0) {
-      kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  //  ceil
+      kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  // ceil
     }
-  } else  //  (deltaXL < 0)
+  } else  // (deltaXL < 0)
   {
-    //  [a, b] interno ad up+(bordo destro/basso)
+    // [a, b] inside up+(right/bottom edge)
     assert(0 <= xL0);
 
-    kMaxX = xL0 / (-deltaXL);  //  floor
+    kMaxX = xL0 / (-deltaXL);  // floor
     if (lxPred < xL0) {
-      kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  //  ceil
+      kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  // ceil
     }
   }
-  //  calcola kMinX, kMaxX effettuando anche il clippind su dn
+  // compute kMinX, kMaxX also performing clipping on dn
   kMinX = std::max(kMinX, (int)0);
   kMaxX = std::min(kMaxX, xMax - xMin);
 
@@ -4473,31 +4432,31 @@ void doQuickPutCmapped(const TRaster32P &dn, const TRasterCM32P &up,
   TPixelCM32 *upBasePix = up->pixels();
   TPixel32 *dnRow       = dn->pixels(yMin + kMinY);
 
-  //  (xL, yL) sono le coordinate (inizializzate per il round)
-  //  in versione "TLonghizzata" del pixel corrente di up
+  // (xL, yL) are the coordinates (initialized for rounding)
+  // in "long-ized" version of the current up pixel
 
-  //  inizializza yL
+  // initialize yL
   int yL = yL0 + (kMinY - 1) * deltaYL;
 
-  //  scorre le scanline di boundingBoxD
+  // iterate over boundingBoxD scanlines
   for (int kY = kMinY; kY <= kMaxY; kY++, dnRow += dnWrap) {
-    //  inizializza xL
+    // initialize xL
     int xL = xL0 + (kMinX - 1) * deltaXL;
     yL += deltaYL;
 
-    //  il punto di up TPointD(xL/(1<<PADN), yL/(1<<PADN)) e' approssimato
-    //  con (xI, yI)
-    int yI = yL >> PADN;  //  round
+    // the up point TPointD(xL/(1<<PADN), yL/(1<<PADN)) is approximated
+    // with (xI, yI)
+    int yI = yL >> PADN;  // round
 
     TPixel32 *dnPix    = dnRow + xMin + kMinX;
     TPixel32 *dnEndPix = dnRow + xMin + kMaxX + 1;
 
-    //  scorre i pixel sulla (yMin + kY)-esima scanline di dn
+    // iterate over pixels on the (yMin + kY)-th scanline of dn
     for (; dnPix < dnEndPix; ++dnPix) {
       xL += deltaXL;
-      //  il punto di up TPointD(xL/(1<<PADN), yL/(1<<PADN)) e'
-      //  approssimato con (xI, yI)
-      int xI = xL >> PADN;  //	round
+      // the up point TPointD(xL/(1<<PADN), yL/(1<<PADN)) is approximated
+      // with (xI, yI)
+      int xI = xL >> PADN;  // round
 
       assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) &&
              (yI <= up->getLy() - 1));
@@ -4575,27 +4534,23 @@ void doQuickResampleColorFilter(const TRaster32P &dn, const TRasterCM32P &up,
   if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
     return;
 
-  int yMin = std::max(tfloor(boundingBoxD.y0), 0);  //  clipping y su dn
+  int yMin = std::max(tfloor(boundingBoxD.y0), 0);  // y clipping on dn
   int yMax =
-      std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);  //  clipping y su dn
-  int xMin = std::max(tfloor(boundingBoxD.x0), 0);        //  clipping x su dn
+      std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);  // y clipping on dn
+  int xMin = std::max(tfloor(boundingBoxD.x0), 0);        // x clipping on dn
   int xMax =
-      std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);  //  clipping x su dn
+      std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);  // x clipping on dn
 
-  TAffine invAff = inv(aff);  //  inversa di aff
+  TAffine invAff = inv(aff);  // inverse of aff
 
   double deltaXD = invAff.a11;
   double deltaYD = invAff.a21;
-  int deltaXL =
-      tround(deltaXD * (1 << PADN));  //  deltaXD "TLonghizzato" (round)
-  int deltaYL =
-      tround(deltaYD * (1 << PADN));  //  deltaYD "TLonghizzato" (round)
+  int deltaXL = tround(deltaXD * (1 << PADN));  // "long-ized" deltaXD (round)
+  int deltaYL = tround(deltaYD * (1 << PADN));  // "long-ized" deltaYD (round)
   if ((deltaXL == 0) && (deltaYL == 0)) return;
 
-  int lxPred =
-      up->getLx() * (1 << PADN) - 1;  //  TINT32 predecessore di up->getLx()
-  int lyPred =
-      up->getLy() * (1 << PADN) - 1;  //  TINT32 predecessore di up->getLy()
+  int lxPred = up->getLx() * (1 << PADN) - 1;  // predecessor of up->getLx()
+  int lyPred = up->getLy() * (1 << PADN) - 1;  // predecessor of up->getLy()
 
   int dnWrap = dn->getWrap();
   int upWrap = up->getWrap();
@@ -4609,48 +4564,48 @@ void doQuickResampleColorFilter(const TRaster32P &dn, const TRasterCM32P &up,
     TPointD a = invAff * TPointD(xMin, y);
     int xL0   = tround((a.x + 0.5) * (1 << PADN));
     int yL0   = tround((a.y + 0.5) * (1 << PADN));
-    int kMinX = 0, kMaxX = xMax - xMin;  //  clipping su dn
-    int kMinY = 0, kMaxY = xMax - xMin;  //  clipping su dn
+    int kMinX = 0, kMaxX = xMax - xMin;  // clipping on dn
+    int kMinY = 0, kMaxY = xMax - xMin;  // clipping on dn
     if (deltaXL == 0) {
       if ((xL0 < 0) || (lxPred < xL0)) continue;
     } else if (deltaXL > 0) {
       if (lxPred < xL0) continue;
 
-      kMaxX = (lxPred - xL0) / deltaXL;                       //  floor
-      if (xL0 < 0) kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  //  ceil
-    } else                                                    //  (deltaXL < 0)
+      kMaxX = (lxPred - xL0) / deltaXL;                       // floor
+      if (xL0 < 0) kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  // ceil
+    } else                                                    // (deltaXL < 0)
     {
       if (xL0 < 0) continue;
-      kMaxX = xL0 / (-deltaXL);  //  floor
+      kMaxX = xL0 / (-deltaXL);  // floor
       if (lxPred < xL0)
-        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  //  ceil
+        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  // ceil
     }
     if (deltaYL == 0) {
       if ((yL0 < 0) || (lyPred < yL0)) continue;
     } else if (deltaYL > 0) {
       if (lyPred < yL0) continue;
 
-      kMaxY = (lyPred - yL0) / deltaYL;                       //  floor
-      if (yL0 < 0) kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  //  ceil
-    } else                                                    //  (deltaYL < 0)
+      kMaxY = (lyPred - yL0) / deltaYL;                       // floor
+      if (yL0 < 0) kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  // ceil
+    } else                                                    // (deltaYL < 0)
     {
       if (yL0 < 0) continue;
 
-      kMaxY = yL0 / (-deltaYL);  //  floor
+      kMaxY = yL0 / (-deltaYL);  // floor
       if (lyPred < yL0)
-        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  //  ceil
+        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  // ceil
     }
     int kMin           = std::max({kMinX, kMinY, (int)0});
     int kMax           = std::min({kMaxX, kMaxY, xMax - xMin});
     TPixel32 *dnPix    = dnRow + xMin + kMin;
     TPixel32 *dnEndPix = dnRow + xMin + kMax + 1;
-    int xL             = xL0 + (kMin - 1) * deltaXL;  //  inizializza xL
-    int yL             = yL0 + (kMin - 1) * deltaYL;  //  inizializza yL
+    int xL             = xL0 + (kMin - 1) * deltaXL;  // initialize xL
+    int yL             = yL0 + (kMin - 1) * deltaYL;  // initialize yL
     for (; dnPix < dnEndPix; ++dnPix) {
       xL += deltaXL;
       yL += deltaYL;
-      int xI = xL >> PADN;  //  round
-      int yI = yL >> PADN;  //  round
+      int xI = xL >> PADN;  // round
+      int yI = yL >> PADN;  // round
 
       assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) &&
              (yI <= up->getLy() - 1));
@@ -4693,60 +4648,59 @@ void doQuickResampleColorFilter(const TRaster32P &dn, const TRasterCM32P &up,
 #ifdef OPTIMIZE_FOR_LP64
 void doQuickResampleFilter_optimized(const TRaster32P &dn, const TRaster32P &up,
                                      const TAffine &aff) {
-  //  se aff e' degenere la controimmagine di up e' un segmento (o un punto)
+  // if aff is degenerate, the inverse image of up is a segment (or a point)
   if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0) return;
 
-  //  contatore bit di shift
+  // shift bit counter
   const int PADN = 16;
 
-  //  maschera del filtro bilineare
+  // bilinear filter mask
   const int MASKN = (1 << PADN) - 1;
   assert(std::max(up->getLx(), up->getLy()) <
          (1 << (8 * sizeof(int) - PADN - 1)));
-  //  max dimensioni di up gestibili (limite imposto dal numero di bit
-  //  disponibili per la parte intera di xL, yL)
+  // max manageable size of up (limit imposed by number of bits
+  // available for the integer part of xL, yL)
 
   TRectD boundingBoxD = TRectD(convert(dn->getSize())) *
                         (aff * TRectD(0, 0, up->getLx() - 2, up->getLy() - 2));
 
-  //  clipping
+  // clipping
   if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
     return;
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
-  TAffine invAff = inv(aff);  //  inversa di aff
+  TAffine invAff = inv(aff);  // inverse of aff
 
-  //  nel disegnare la y-esima scanline di dn, il passaggio al pixel
-  //  successivo comporta l'incremento (deltaXD, deltaYD) delle coordinate
-  //  del pixel corrispondente di up
+  // when drawing the y-th scanline of dn, moving to the next pixel
+  // implies incrementing (deltaXD, deltaYD) of the corresponding up pixel
+  // coordinates
   double deltaXD = invAff.a11;
   double deltaYD = invAff.a21;
 
-  //  deltaXD "TLonghizzato" (round)
+  // "long-ized" deltaXD (round)
   int deltaXL = tround(deltaXD * (1 << PADN));
 
-  //  deltaYD "TLonghizzato" (round)
+  // "long-ized" deltaYD (round)
   int deltaYL = tround(deltaYD * (1 << PADN));
 
-  //  se aff "TLonghizzata" (round) e' degenere la controimmagine di up e' un
-  //  segmento (o un punto)
+  // if "long-ized" aff is degenerate, the inverse image of up is a segment
   if ((deltaXL == 0) && (deltaYL == 0)) return;
 
-  // naturale predecessore di up->getLx() - 1
+  // natural predecessor of up->getLx() - 1
   int lxPred = (up->getLx() - 2) * (1 << PADN);
 
-  //  naturale predecessore di up->getLy() - 1
+  // natural predecessor of up->getLy() - 1
   int lyPred = (up->getLy() - 2) * (1 << PADN);
 
   int dnWrap = dn->getWrap();
@@ -4812,7 +4766,7 @@ void doQuickResampleFilter_optimized(const TRaster32P &dn, const TRaster32P &up,
 
   int y = yMin;
   ++yMax;
-  //  scorre le scanline di boundingBoxD
+  // iterate over boundingBoxD scanlines
   for (; y < yMax - 32; ++y, dnRow += dnWrap) {
     EXTERNAL_LOOP_THE_FIRST_X_32
   }
@@ -4845,18 +4799,18 @@ void doQuickResampleFilter_optimized(const TRaster32P &dn, const TRaster32P &up,
 void doQuickResampleFilter_optimized(const TRaster32P &dn, const TRaster32P &up,
                                      double sx, double sy, double tx,
                                      double ty) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  // if aff := TAffine(sx, 0, tx, 0, sy, ty) is degenerate, the inverse image
+  // of up is a segment (or a point)
   if ((sx == 0) || (sy == 0)) return;
 
-  //  contatore bit di shift
+  // shift bit counter
   const int PADN = 16;
 
-  //  maschera del filtro bilineare
+  // bilinear filter mask
   const int MASKN = (1 << PADN) - 1;
 
-  //  max dimensioni di up gestibili (limite imposto dal numero di bit
-  // disponibili per la parte intera di xL, yL)
+  // max manageable size of up (limit imposed by number of bits
+  // available for the integer part of xL, yL)
   assert(std::max(up->getLx(), up->getLy()) <
          (1 << (8 * sizeof(int) - PADN - 1)));
 
@@ -4864,141 +4818,138 @@ void doQuickResampleFilter_optimized(const TRaster32P &dn, const TRaster32P &up,
   TRectD boundingBoxD = TRectD(convert(dn->getSize())) *
                         (aff * TRectD(0, 0, up->getLx() - 2, up->getLy() - 2));
 
-  //  clipping
+  // clipping
   if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
     return;
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
-  //  clipping y su dn
+  // y clipping on dn
   int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
-  //  clipping x su dn
+  // x clipping on dn
   int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
-  //  inversa di aff
+  // inverse of aff
   TAffine invAff = inv(aff);
 
-  //  nello scorrere le scanline di boundingBoxD, il passaggio alla scanline
-  //  successiva comporta l'incremento (0, deltaYD) delle coordinate dei
-  //  pixels corrispondenti di up
+  // when iterating over scanlines of boundingBoxD, moving to the next scanline
+  // implies incrementing (0, deltaYD) of the coordinates of the corresponding
+  // up pixels
 
-  //  nel disegnare la y-esima scanline di dn, il passaggio al pixel
-  //  successivo comporta l'incremento (deltaXD, 0) delle coordinate del
-  //  pixel corrispondente di up
+  // when drawing the y-th scanline of dn, moving to the next pixel
+  // implies incrementing (deltaXD, 0) of the coordinates of the corresponding
+  // up pixel
 
   double deltaXD = invAff.a11;
   double deltaYD = invAff.a22;
-  int deltaXL =
-      tround(deltaXD * (1 << PADN));  //  deltaXD "TLonghizzato" (round)
-  int deltaYL =
-      tround(deltaYD * (1 << PADN));  //  deltaYD "TLonghizzato" (round)
+  int deltaXL = tround(deltaXD * (1 << PADN));  // "long-ized" deltaXD (round)
+  int deltaYL = tround(deltaYD * (1 << PADN));  // "long-ized" deltaYD (round)
 
-  //  se aff "TLonghizzata" (round) e' degenere la controimmagine di up e'
-  //  un segmento (o un punto)
+  // if "long-ized" aff is degenerate, the inverse image of up is a segment
   if ((deltaXL == 0) || (deltaYL == 0)) return;
 
-  //  (1)  equazione (kX, kY)-parametrica di boundingBoxD:
-  //         (xMin, yMin) + kX*(1, 0) + kY*(0, 1),
-  //           kX = 0, ..., (xMax - xMin),
-  //           kY = 0, ..., (yMax - yMin)
+  // (1) parametric (kX, kY)-equation of boundingBoxD:
+  //       (xMin, yMin) + kX*(1, 0) + kY*(0, 1),
+  //         kX = 0, ..., (xMax - xMin),
+  //         kY = 0, ..., (yMax - yMin)
 
-  //  (2)  equazione (kX, kY)-parametrica dell'immagine mediante invAff di (1):
-  //         invAff*(xMin, yMin) + kX*(deltaXD, 0) + kY*(0, deltaYD),
-  //           kX = kMinX, ..., kMaxX
-  //             con 0 <= kMinX <= kMaxX <= (xMax - xMin)
+  // (2) parametric (kX, kY)-equation of the image via invAff of (1):
+  //       invAff*(xMin, yMin) + kX*(deltaXD, 0) + kY*(0, deltaYD),
+  //         kX = kMinX, ..., kMaxX
+  //           with 0 <= kMinX <= kMaxX <= (xMax - xMin)
   //
-  //           kY = kMinY, ..., kMaxY
-  //             con 0 <= kMinY <= kMaxY <= (yMax - yMin)
+  //         kY = kMinY, ..., kMaxY
+  //           with 0 <= kMinY <= kMaxY <= (yMax - yMin)
 
-  //  calcola kMinX, kMaxX, kMinY, kMaxY intersecando la (2) con i lati di up
+  // compute kMinX, kMaxX, kMinY, kMaxY by intersecting (2) with the sides of up
 
-  //  il segmento [a, b] di up (con gli estremi eventualmente invertiti) e'
-  //  la controimmagine mediante aff della porzione di scanline
-  //  [ (xMin, yMin), (xMax, yMin) ] di dn
+  // the segment [a, b] of up (with possibly reversed ends) is the inverse
+  // image via aff of the portion of scanline
+  // [ (xMin, yMin), (xMax, yMin) ] of dn
 
-  //  TPointD b = invAff*TPointD(xMax, yMin);
+  // TPointD b = invAff*TPointD(xMax, yMin);
   TPointD a = invAff * TPointD(xMin, yMin);
 
-  //  (xL0, yL0) sono le coordinate di a (inizializzate per il round)
-  //  in versione "TLonghizzata"
-  //  0 <= xL0 + kX*deltaXL <= (up->getLx() - 2)*(1<<PADN),
-  //  0 <= kMinX <= kX <= kMaxX <= (xMax - xMin)
-  //  0 <= yL0 + kY*deltaYL <= (up->getLy() - 2)*(1<<PADN),
-  //  0 <= kMinY <= kY <= kMaxY <= (yMax - yMin)
+  // (xL0, yL0) are the coordinates of a (initialized for rounding)
+  // in "long-ized" version
+  // 0 <= xL0 + kX*deltaXL <= (up->getLx() - 2)*(1<<PADN),
+  // 0 <= kMinX <= kX <= kMaxX <= (xMax - xMin)
+  // 0 <= yL0 + kY*deltaYL <= (up->getLy() - 2)*(1<<PADN),
+  // 0 <= kMinY <= kY <= kMaxY <= (yMax - yMin)
 
-  int xL0 = tround(a.x * (1 << PADN));  //  xL0 inizializzato
-  int yL0 = tround(a.y * (1 << PADN));  //  yL0 inizializzato
+  int xL0 = tround(a.x * (1 << PADN));  // initialize xL0
+  int yL0 = tround(a.y * (1 << PADN));  // initialize yL0
 
-  //  calcola kMinY, kMaxY, kMinX, kMaxX intersecando la (2) con i lati di up
-  int kMinX = 0, kMaxX = xMax - xMin;  //  clipping su dn
-  int kMinY = 0, kMaxY = yMax - yMin;  //  clipping su dn
+  // compute kMinY, kMaxY, kMinX, kMaxX by intersecting (2) with the sides of up
+  int kMinX = 0, kMaxX = xMax - xMin;  // clipping on dn
+  int kMinY = 0, kMaxY = yMax - yMin;  // clipping on dn
 
-  //  TINT32 predecessore di (up->getLx() - 1)
+  // predecessor of (up->getLx() - 1)
   int lxPred = (up->getLx() - 2) * (1 << PADN);
 
-  //  TINT32 predecessore di (up->getLy() - 1)
+  // predecessor of (up->getLy() - 1)
   int lyPred = (up->getLy() - 2) * (1 << PADN);
 
-  //  0 <= xL0 + k*deltaXL <= (up->getLx() - 2)*(1<<PADN)
+  // 0 <= xL0 + k*deltaXL <= (up->getLx() - 2)*(1<<PADN)
   //               <=>
-  //  0 <= xL0 + k*deltaXL <= lxPred
+  // 0 <= xL0 + k*deltaXL <= lxPred
 
-  //  0 <= yL0 + k*deltaYL <= (up->getLy() - 2)*(1<<PADN)
+  // 0 <= yL0 + k*deltaYL <= (up->getLy() - 2)*(1<<PADN)
   //               <=>
-  //  0 <= yL0 + k*deltaYL <= lyPred
+  // 0 <= yL0 + k*deltaYL <= lyPred
 
-  //  calcola kMinY, kMaxY intersecando la (2) con i lati
-  //  (y = yMin) e (y = yMax) di up
-  if (deltaYL > 0)  //  (deltaYL != 0)
+  // compute kMinY, kMaxY by intersecting (2) with the sides
+  // (y = yMin) and (y = yMax) of up
+  if (deltaYL > 0)  // (deltaYL != 0)
   {
-    //  [a, b] interno ad up contratto
+    // [a, b] inside contracted up
     assert(yL0 <= lyPred);
 
-    kMaxY = (lyPred - yL0) / deltaYL;  //  floor
+    kMaxY = (lyPred - yL0) / deltaYL;  // floor
     if (yL0 < 0) {
-      kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  //  ceil
+      kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  // ceil
     }
-  } else  //  (deltaYL < 0)
+  } else  // (deltaYL < 0)
   {
-    //  [a, b] interno ad up contratto
+    // [a, b] inside contracted up
     assert(0 <= yL0);
 
-    kMaxY = yL0 / (-deltaYL);  //  floor
+    kMaxY = yL0 / (-deltaYL);  // floor
     if (lyPred < yL0) {
-      kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  //  ceil
+      kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  // ceil
     }
   }
-  //  calcola kMinY, kMaxY effettuando anche il clippind su dn
+  // compute kMinY, kMaxY also performing clipping on dn
   kMinY = std::max(kMinY, (int)0);
   kMaxY = std::min(kMaxY, yMax - yMin);
 
-  //  calcola kMinX, kMaxX intersecando la (2) con i lati
-  //  (x = xMin) e (x = xMax) di up
-  if (deltaXL > 0)  //  (deltaXL != 0)
+  // compute kMinX, kMaxX by intersecting (2) with the sides
+  // (x = xMin) and (x = xMax) of up
+  if (deltaXL > 0)  // (deltaXL != 0)
   {
-    //  [a, b] interno ad up contratto
+    // [a, b] inside contracted up
     assert(xL0 <= lxPred);
 
-    kMaxX = (lxPred - xL0) / deltaXL;  //  floor
+    kMaxX = (lxPred - xL0) / deltaXL;  // floor
     if (xL0 < 0) {
-      kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  //  ceil
+      kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  // ceil
     }
-  } else  //  (deltaXL < 0)
+  } else  // (deltaXL < 0)
   {
-    //  [a, b] interno ad up contratto
+    // [a, b] inside contracted up
     assert(0 <= xL0);
 
-    kMaxX = xL0 / (-deltaXL);  //  floor
+    kMaxX = xL0 / (-deltaXL);  // floor
     if (lxPred < xL0) {
-      kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  //  ceil
+      kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  // ceil
     }
   }
-  //  calcola kMinX, kMaxX effettuando anche il clippind su dn
+  // compute kMinX, kMaxX also performing clipping on dn
   kMinX = std::max(kMinX, (int)0);
   kMaxX = std::min(kMaxX, xMax - xMin);
 
@@ -5010,10 +4961,9 @@ void doQuickResampleFilter_optimized(const TRaster32P &dn, const TRaster32P &up,
   TPixel32 *upBasePix = up->pixels();
   TPixel32 *dnRow     = dn->pixels(yMin + kMinY);
 
-  //  (xL, yL) sono le coordinate (inizializzate per il round)
-  //  in versione "TLonghizzata"
-  //  del pixel corrente di up
-  int yL = yL0 + (kMinY - 1) * deltaYL;  //  inizializza yL
+  // (xL, yL) are the coordinates (initialized for rounding)
+  // in "long-ized" version of the current up pixel
+  int yL = yL0 + (kMinY - 1) * deltaYL;  // initialize yL
 
   long c1;
   long c2;
@@ -5057,7 +5007,7 @@ void doQuickResampleFilter_optimized(const TRaster32P &dn, const TRaster32P &up,
   int kY = kMinY;
   ++kMaxY;
 
-  //  scorre le scanline di boundingBoxD
+  // iterate over boundingBoxD scanlines
   for (; kY < kMaxY - 32; kY++, dnRow += dnWrap) {
     EXTERNAL_LOOP_THE_SECOND_X_32
   }
@@ -5215,52 +5165,47 @@ void quickPut(const TRasterP &dn, const TRasterP &up, const TAffine &aff,
 template <typename PIX>
 void doQuickResampleNoFilter(const TRasterPT<PIX> &dn, const TRasterPT<PIX> &up,
                              const TAffine &aff) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  // if aff := TAffine(sx, 0, tx, 0, sy, ty) is degenerate, the inverse image
+  // of up is a segment (or a point)
   if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0) return;
 
-  //  contatore bit di shift
+  // shift bit counter
   const int PADN = 16;
 
-  //  max dimensioni di up gestibili (limite imposto dal numero di bit
-  //  disponibili per la parte intera di xL, yL)
+  // max manageable size of up (limit imposed by number of bits
+  // available for the integer part of xL, yL)
   assert(std::max(up->getLx(), up->getLy()) <
          (1 << (8 * sizeof(int) - PADN - 1)));
 
   TRectD boundingBoxD =
       TRectD(convert(dn->getBounds())) *
       (aff * TRectD(-0.5, -0.5, up->getLx() - 0.5, up->getLy() - 0.5));
-  //  clipping
+  // clipping
   if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
     return;
 
-  int yMin = std::max(tfloor(boundingBoxD.y0), 0);  //  clipping y su dn
+  int yMin = std::max(tfloor(boundingBoxD.y0), 0);  // y clipping on dn
   int yMax =
-      std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);  //  clipping y su dn
-  int xMin = std::max(tfloor(boundingBoxD.x0), 0);        //  clipping x su dn
+      std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);  // y clipping on dn
+  int xMin = std::max(tfloor(boundingBoxD.x0), 0);        // x clipping on dn
   int xMax =
-      std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);  //  clipping x su dn
+      std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);  // x clipping on dn
 
-  TAffine invAff = inv(aff);  //  inversa di aff
+  TAffine invAff = inv(aff);  // inverse of aff
 
-  //  nel disegnare la y-esima scanline di dn, il passaggio al pixel
-  //  successivo comporta l'incremento (deltaXD, deltaYD) delle coordinate
-  //  del pixel corrispondente di up
+  // when drawing the y-th scanline of dn, moving to the next pixel
+  // implies incrementing (deltaXD, deltaYD) of the corresponding up pixel
+  // coordinates
   double deltaXD = invAff.a11;
   double deltaYD = invAff.a21;
-  int deltaXL =
-      tround(deltaXD * (1 << PADN));  //  deltaXD "TLonghizzato" (round)
-  int deltaYL =
-      tround(deltaYD * (1 << PADN));  //  deltaYD "TLonghizzato" (round)
+  int deltaXL = tround(deltaXD * (1 << PADN));  // "long-ized" deltaXD (round)
+  int deltaYL = tround(deltaYD * (1 << PADN));  // "long-ized" deltaYD (round)
 
-  //  se aff "TLonghizzata" (round) e' degenere la controimmagine di up e'
-  //  un segmento (o un punto)
+  // if "long-ized" aff is degenerate, the inverse image of up is a segment
   if ((deltaXL == 0) && (deltaYL == 0)) return;
 
-  int lxPred =
-      up->getLx() * (1 << PADN) - 1;  //  TINT32 predecessore di up->getLx()
-  int lyPred =
-      up->getLy() * (1 << PADN) - 1;  //  TINT32 predecessore di up->getLy()
+  int lxPred = up->getLx() * (1 << PADN) - 1;  // predecessor of up->getLx()
+  int lyPred = up->getLy() * (1 << PADN) - 1;  // predecessor of up->getLy()
 
   int dnWrap = dn->getWrap();
   int upWrap = up->getWrap();
@@ -5270,121 +5215,121 @@ void doQuickResampleNoFilter(const TRasterPT<PIX> &dn, const TRasterPT<PIX> &up,
   PIX *dnRow     = dn->pixels(yMin);
   PIX *upBasePix = up->pixels();
 
-  //  scorre le scanline di boundingBoxD
+  // iterate over boundingBoxD scanlines
   for (int y = yMin; y <= yMax; y++, dnRow += dnWrap) {
-    //  (1)  equazione k-parametrica della y-esima scanline di boundingBoxD:
-    //         (xMin, y) + k*(1, 0),
-    //           k = 0, ..., (xMax - xMin)
+    // (1) parametric k-equation of the y-th scanline of boundingBoxD:
+    //       (xMin, y) + k*(1, 0),
+    //         k = 0, ..., (xMax - xMin)
 
-    //  (2)  equazione k-parametrica dell'immagine mediante invAff di (1):
-    //         invAff*(xMin, y) + k*(deltaXD, deltaYD),
-    //           k = kMin, ..., kMax
-    //           con 0 <= kMin <= kMax <= (xMax - xMin)
+    // (2) parametric k-equation of the image via invAff of (1):
+    //       invAff*(xMin, y) + k*(deltaXD, deltaYD),
+    //         k = kMin, ..., kMax
+    //         with 0 <= kMin <= kMax <= (xMax - xMin)
 
-    //  calcola kMin, kMax per la scanline corrente intersecando
-    //  la (2) con i lati di up
+    // compute kMin, kMax for the current scanline by intersecting (2)
+    // with the sides of up
 
-    //  il segmento [a, b] di up e' la controimmagine mediante aff della
-    //  porzione di scanline  [ (xMin, y), (xMax, y) ] di dn
+    // the segment [a, b] of up is the inverse image via aff of the portion
+    // of scanline [ (xMin, y), (xMax, y) ] of dn
 
-    //  TPointD b = invAff*TPointD(xMax, y);
+    // TPointD b = invAff*TPointD(xMax, y);
     TPointD a = invAff * TPointD(xMin, y);
 
-    //  (xL0, yL0) sono le coordinate di a (inizializzate per il round)
-    //  in versione "TLonghizzata"
-    //  0 <= xL0 + k*deltaXL < up->getLx()*(1<<PADN),
-    //  0 <= kMinX <= kMin <= k <= kMax <= kMaxX <= (xMax - xMin)
+    // (xL0, yL0) are the coordinates of a (initialized for rounding)
+    // in "long-ized" version
+    // 0 <= xL0 + k*deltaXL < up->getLx()*(1<<PADN),
+    // 0 <= kMinX <= kMin <= k <= kMax <= kMaxX <= (xMax - xMin)
 
-    //  0 <= yL0 + k*deltaYL < up->getLy()*(1<<PADN),
-    //  0 <= kMinY <= kMin <= k <= kMax <= kMaxY <= (xMax - xMin)
+    // 0 <= yL0 + k*deltaYL < up->getLy()*(1<<PADN),
+    // 0 <= kMinY <= kMin <= k <= kMax <= kMaxY <= (xMax - xMin)
 
-    //  xL0 inizializzato per il round
+    // xL0 initialized for rounding
     int xL0 = tround((a.x + 0.5) * (1 << PADN));
 
-    //  yL0 inizializzato per il round
+    // yL0 initialized for rounding
     int yL0 = tround((a.y + 0.5) * (1 << PADN));
 
-    //  calcola kMinX, kMaxX, kMinY, kMaxY
-    int kMinX = 0, kMaxX = xMax - xMin;  //  clipping su dn
-    int kMinY = 0, kMaxY = xMax - xMin;  //  clipping su dn
-    //  0 <= xL0 + k*deltaXL < up->getLx()*(1<<PADN)
+    // compute kMinX, kMaxX, kMinY, kMaxY
+    int kMinX = 0, kMaxX = xMax - xMin;  // clipping on dn
+    int kMinY = 0, kMaxY = xMax - xMin;  // clipping on dn
+    // 0 <= xL0 + k*deltaXL < up->getLx()*(1<<PADN)
     //               <=>
-    //  0 <= xL0 + k*eltaXL <= lxPred
+    // 0 <= xL0 + k*deltaXL <= lxPred
 
-    //  0 <= yL0 + k*deltaYL < up->getLy()*(1<<PADN)
+    // 0 <= yL0 + k*deltaYL < up->getLy()*(1<<PADN)
     //               <=>
-    //  0 <= yL0 + k*deltaYL <= lyPred
+    // 0 <= yL0 + k*deltaYL <= lyPred
 
-    //  calcola kMinX, kMaxX
+    // compute kMinX, kMaxX
     if (deltaXL == 0) {
-      //  [a, b] verticale esterno ad up+(bordo destro/basso)
+      // [a, b] vertical outside up+(right/bottom edge)
       if ((xL0 < 0) || (lxPred < xL0)) continue;
-      //  altrimenti usa solo
-      //  kMinY, kMaxY ((deltaXL != 0) || (deltaYL != 0))
+      // otherwise only use
+      // kMinY, kMaxY ((deltaXL != 0) || (deltaYL != 0))
     } else if (deltaXL > 0) {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (lxPred < xL0) continue;
 
-      kMaxX = (lxPred - xL0) / deltaXL;  //  floor
+      kMaxX = (lxPred - xL0) / deltaXL;  // floor
       if (xL0 < 0) {
-        kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  //  ceil
+        kMinX = ((-xL0) + deltaXL - 1) / deltaXL;  // ceil
       }
-    } else  //  (deltaXL < 0)
+    } else  // (deltaXL < 0)
     {
-      // [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (xL0 < 0) continue;
 
-      kMaxX = xL0 / (-deltaXL);  //  floor
+      kMaxX = xL0 / (-deltaXL);  // floor
       if (lxPred < xL0) {
-        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  //  ceil
+        kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL);  // ceil
       }
     }
 
-    //  calcola kMinY, kMaxY
+    // compute kMinY, kMaxY
     if (deltaYL == 0) {
-      //  [a, b] orizzontale esterno ad up+(bordo destro/basso)
+      // [a, b] horizontal outside up+(right/bottom edge)
       if ((yL0 < 0) || (lyPred < yL0)) continue;
-      //  altrimenti usa solo
-      //  kMinX, kMaxX ((deltaXL != 0) || (deltaYL != 0))
+      // otherwise only use
+      // kMinX, kMaxX ((deltaXL != 0) || (deltaYL != 0))
     } else if (deltaYL > 0) {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (lyPred < yL0) continue;
 
-      kMaxY = (lyPred - yL0) / deltaYL;  //  floor
+      kMaxY = (lyPred - yL0) / deltaYL;  // floor
       if (yL0 < 0) {
-        kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  //  ceil
+        kMinY = ((-yL0) + deltaYL - 1) / deltaYL;  // ceil
       }
-    } else  //  (deltaYL < 0)
+    } else  // (deltaYL < 0)
     {
-      //  [a, b] esterno ad up+(bordo destro/basso)
+      // [a, b] outside up+(right/bottom edge)
       if (yL0 < 0) continue;
 
-      kMaxY = yL0 / (-deltaYL);  //  floor
+      kMaxY = yL0 / (-deltaYL);  // floor
       if (lyPred < yL0) {
-        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  //  ceil
+        kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL);  // ceil
       }
     }
 
-    //  calcola kMin, kMax effettuando anche il clippind su dn
+    // compute kMin, kMax also performing clipping on dn
     int kMin = std::max({kMinX, kMinY, (int)0});
     int kMax = std::min({kMaxX, kMaxY, xMax - xMin});
 
     PIX *dnPix    = dnRow + xMin + kMin;
     PIX *dnEndPix = dnRow + xMin + kMax + 1;
 
-    //  (xL, yL) sono le coordinate (inizializzate per il round)
-    //  in versione "TLonghizzata" del pixel corrente di up
-    int xL = xL0 + (kMin - 1) * deltaXL;  //  inizializza xL
-    int yL = yL0 + (kMin - 1) * deltaYL;  //  inizializza yL
+    // (xL, yL) are the coordinates (initialized for rounding)
+    // in "long-ized" version of the current up pixel
+    int xL = xL0 + (kMin - 1) * deltaXL;  // initialize xL
+    int yL = yL0 + (kMin - 1) * deltaYL;  // initialize yL
 
-    //  scorre i pixel sulla y-esima scanline di boundingBoxD
+    // iterate over pixels on the y-th scanline of boundingBoxD
     for (; dnPix < dnEndPix; ++dnPix) {
       xL += deltaXL;
       yL += deltaYL;
-      //  il punto di up TPointD(xL/(1<<PADN), yL/(1<<PADN)) e'
-      //  approssimato con (xI, yI)
-      int xI = xL >> PADN;  //  round
-      int yI = yL >> PADN;  //  round
+      // the up point TPointD(xL/(1<<PADN), yL/(1<<PADN)) is approximated
+      // with (xI, yI)
+      int xI = xL >> PADN;  // round
+      int yI = yL >> PADN;  // round
 
       assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) &&
              (yI <= up->getLy() - 1));
