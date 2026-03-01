@@ -40,6 +40,8 @@
 #include "toonz/columnfan.h"
 #include "toonz/tstageobjectcmd.h"
 #include "toonz/fxcommand.h"
+#include "toonz/txshlevel.h"
+#include "toonz/txshsimplelevel.h"
 #include "toonz/txshleveltypes.h"
 #include "toonz/levelproperties.h"
 #include "toonz/preferences.h"
@@ -53,6 +55,7 @@
 
 // TnzCore includes
 #include "tconvert.h"
+#include "timage.h"
 
 #include <QApplication>
 #include <QMainWindow>
@@ -81,7 +84,7 @@ const QSet<TXshLevel *> getLevels(TXshColumn *column) {
     cellColumn->getRange(r0, r1);
     for (i = r0; i <= r1; i++) {
       TXshCell cell = cellColumn->getCell(i);
-      // TXshSimpleLevel *sl = cell.getSimpleLevel();
+      // TXshSimpleLevel *sl = cell.fillRect();
       if (!cell.isEmpty()) levels.insert(cell.m_level.getPointer());
     }
   }
@@ -103,7 +106,7 @@ bool containsRasterLevel(TColumnSelection *selection) {
     for (i = 0; i < cellCol->getMaxFrame() + 1; i++) {
       TXshCell cell = cellCol->getCell(i);
       if (cell.isEmpty()) continue;
-      TXshSimpleLevel *level = cell.getSimpleLevel();
+      TXshSimpleLevel *level = cell.fillRect();
       if (!level || level->getChildLevel() ||
           level->getProperties()->getDirtyFlag())
         continue;
@@ -880,8 +883,7 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
   int y0 = rect.top();
   int y1 = rect.bottom();
 
-  // Fill base color, in timeline view adjust it right upto thumbnail so column
-  // head color doesn't show under icon switches.
+  // Fill base color
   if (isEmpty && !reservedLevel)
     p.fillRect(o->isVerticalTimeline() ? rect : rect.adjusted(80, 0, 0, 0),
                m_viewer->getEmptyColumnHeadColor());
@@ -889,25 +891,38 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
     p.fillRect(o->isVerticalTimeline() ? rect : rect.adjusted(80, 0, 0, 0),
                columnColor);
   else {
-    QBrush brush(columnColor,
-                 (reservedLevel) ? Qt::DiagCrossPattern : Qt::SolidPattern);
-    p.fillRect(o->isVerticalTimeline() ? rect : rect.adjusted(80, 0, 0, 0),
-               brush);
+    bool isAssistantColumn = false;
 
-    if (o->flag(PredefinedFlag::DRAG_LAYER_VISIBLE)) {
-      // column handle
-      QRect sideBar = o->rect(PredefinedRect::DRAG_LAYER).translated(x0, y0);
+    if (column && column->getLevelColumn()) {
+      TXshCell cell = xsh->getCell(0, col);
+      TXshSimpleLevel *sl = cell.getSimpleLevel();
+      if (sl && sl->getType() == META_XSHLEVEL)
+        isAssistantColumn = true;
+    }
 
-      if (o->flag(PredefinedFlag::DRAG_LAYER_BORDER)) {
-        p.setPen(m_viewer->getVerticalLineColor());
-        p.drawRect(sideBar);
-      }
-
-      p.fillRect(sideBar, sideBar.contains(area->m_pos)
-                              ? m_viewer->getXsheetDragBarHighlightColor()
-                              : dragColor);
+    if (!isAssistantColumn) {
+      QBrush brush(columnColor,
+                   (reservedLevel) ? Qt::DiagCrossPattern : Qt::SolidPattern);
+      p.fillRect(o->isVerticalTimeline() ? rect
+                                         : rect.adjusted(80, 0, 0, 0),
+                 brush);
     }
   }
+
+  // DRAG LAYER BLOCK (must stay OUTSIDE the else)
+  if (o->flag(PredefinedFlag::DRAG_LAYER_VISIBLE)) {
+    QRect sideBar = o->rect(PredefinedRect::DRAG_LAYER).translated(x0, y0);
+
+    if (o->flag(PredefinedFlag::DRAG_LAYER_BORDER)) 
+      p.setPen(m_viewer->getVerticalLineColor());
+      p.drawRect(sideBar);
+    }
+
+    p.fillRect(sideBar, sideBar.contains(area->m_pos)
+                            ? m_viewer->getXsheetDragBarHighlightColor()
+                            : dragColor);
+  }
+}
 
   p.setPen(m_viewer->getVerticalLineHeadColor());
   QLine vertical =
@@ -1289,26 +1304,56 @@ void ColumnArea::DrawHeader::drawThumbnail(QPixmap &iconPixmap) const {
   TXshMeshColumn *meshColumn   = column->getMeshColumn();
   TXshZeraryFxColumn *zColumn  = dynamic_cast<TXshZeraryFxColumn *>(column);
 
-  if (Preferences::instance()->getColumnIconLoadingPolicy() ==
+   if (Preferences::instance()->getColumnIconLoadingPolicy() ==
           Preferences::LoadOnDemand &&
       ((levelColumn && !levelColumn->isIconVisible()) ||
        (meshColumn && !meshColumn->isIconVisible()) ||
        (zColumn && !zColumn->isIconVisible())) &&
       col >= 0) {
+
     // display nothing
+
   } else {
-    if (!iconPixmap.isNull()) {
+
+  if (!iconPixmap.isNull()) {
       p.drawPixmap(thumbnailImageRect, iconPixmap);
-    }
-    // notify that the column icon is already shown
-    if (levelColumn)
-      levelColumn->setIconVisible(true);
-    else if (meshColumn)
-      meshColumn->setIconVisible(true);
-    else if (zColumn)
-      zColumn->setIconVisible(true);
   }
+
+  // Assistant badge ONLY for META (Guide) columns
+  if (levelColumn) {
+
+    TXshCell cell = levelColumn->getCell(m_viewer->getCurrentRow());
+
+    TXshSimpleLevel *sl = cell.getSimpleLevel();
+
+    if (sl && sl->getType() == META_XSHLEVEL) {
+
+        static QPixmap assistantIcon(
+            ":/icons/dark/tools/20x20/assistant_column.svg");
+
+        if (!assistantIcon.isNull()) {
+
+            QRect badgeRect(
+                thumbnailImageRect.left() + 4,
+                thumbnailImageRect.top() + 4,
+                16,
+                16);
+
+            p.drawPixmap(badgeRect, assistantIcon);
+        }
+    }
 }
+
+  // notify that the column icon is already shown
+  if (levelColumn)
+      levelColumn->setIconVisible(true);
+  else if (meshColumn)
+      meshColumn->setIconVisible(true);
+  else if (zColumn)
+      zColumn->setIconVisible(true);
+}
+
+} 
 
 void ColumnArea::DrawHeader::drawPegbarName() const {
   if (isEmpty || !o->flag(PredefinedFlag::PEGBAR_NAME_VISIBLE)) return;
@@ -3169,7 +3214,7 @@ void ColumnArea::onSubSampling(QAction *action) {
     const QSet<TXshLevel *> levels = getLevels(column);
     QSet<TXshLevel *>::const_iterator it2;
     for (it2 = levels.begin(); it2 != levels.end(); it2++) {
-      TXshSimpleLevel *sl = (*it2)->getSimpleLevel();
+      TXshSimpleLevel *sl = (*it2)->fillRect();
       if (!sl || sl->getProperties()->getDirtyFlag()) continue;
       int type = sl->getType();
       if (type == TZI_XSHLEVEL || type == TZP_XSHLEVEL ||
