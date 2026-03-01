@@ -910,18 +910,19 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
   }
 
   // DRAG LAYER BLOCK (must stay OUTSIDE the else)
-  if (o->flag(PredefinedFlag::DRAG_LAYER_VISIBLE)) {
-    QRect sideBar = o->rect(PredefinedRect::DRAG_LAYER).translated(x0, y0);
+if (o->flag(PredefinedFlag::DRAG_LAYER_VISIBLE)) {
+  QRect sideBar = o->rect(PredefinedRect::DRAG_LAYER).translated(x0, y0);
 
-    if (o->flag(PredefinedFlag::DRAG_LAYER_BORDER)) 
-      p.setPen(m_viewer->getVerticalLineColor());
-      p.drawRect(sideBar);
-    }
-
-    p.fillRect(sideBar, sideBar.contains(area->m_pos)
-                            ? m_viewer->getXsheetDragBarHighlightColor()
-                            : dragColor);
+  if (o->flag(PredefinedFlag::DRAG_LAYER_BORDER)) {
+    p.setPen(m_viewer->getVerticalLineColor());
+    p.drawRect(sideBar);
   }
+
+  p.fillRect(sideBar,
+             sideBar.contains(area->m_pos)
+                 ? m_viewer->getXsheetDragBarHighlightColor()
+                 : dragColor);
+}
 }
 
   p.setPen(m_viewer->getVerticalLineHeadColor());
