@@ -891,30 +891,30 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
     p.fillRect(o->isVerticalTimeline() ? rect : rect.adjusted(80, 0, 0, 0),
                columnColor);
   else {
-    bool isAssistantColumn = false;
 
-TXshLevelColumn *levelColumn = column->getLevelColumn();
-if (levelColumn) {
-  int rowCount = xsh->getFrameCount();
-  for (int r = 0; r < rowCount; ++r) {
-    TXshCell cell = levelColumn->getCell(r);
-    if (!cell.isEmpty()) {
-      TXshSimpleLevel *sl = cell.getSimpleLevel();
-      if (sl && sl->getType() == META_XSHLEVEL)
-        isAssistantColumn = true;
-      break;
-    }
-  }
+    QRect fillRectArea = o->isVerticalTimeline()
+                         ? rect
+                         : rect.adjusted(80, 0, 0, 0);
+
+    // Remove thumbnail region from fill
+    QRect thumbArea;
+if (!o->isVerticalTimeline())
+    thumbArea = o->rect(PredefinedRect::THUMBNAIL_AREA)
+                    .translated(orig);
+
+    QRegion region(fillRectArea);
+
+if (!thumbArea.isNull())
+    region = region.subtracted(thumbArea);
+
+QBrush brush(columnColor,
+             (reservedLevel) ? Qt::DiagCrossPattern : Qt::SolidPattern);
+
+p.setClipRegion(region);
+p.fillRect(fillRectArea, brush);
+p.setClipRegion(QRegion());
 }
-    if (!isAssistantColumn) {
-      QBrush brush(columnColor,
-                   (reservedLevel) ? Qt::DiagCrossPattern : Qt::SolidPattern);
-      p.fillRect(o->isVerticalTimeline() ? rect
-                                         : rect.adjusted(80, 0, 0, 0),
-                 brush);
-    }
-  }
-
+    
   // DRAG LAYER BLOCK
   if (o->flag(PredefinedFlag::DRAG_LAYER_VISIBLE)) {
     QRect sideBar = o->rect(PredefinedRect::DRAG_LAYER).translated(x0, y0);
