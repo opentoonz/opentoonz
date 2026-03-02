@@ -923,23 +923,24 @@ if (o->flag(PredefinedFlag::DRAG_LAYER_VISIBLE)) {
                  ? m_viewer->getXsheetDragBarHighlightColor()
                  : dragColor);
 }
-}
 
   p.setPen(m_viewer->getVerticalLineHeadColor());
-  QLine vertical =
-      o->verticalLine(m_viewer->columnToLayerAxis(col), o->frameSide(rect));
-  if (isEmpty || o->isVerticalTimeline()) p.drawLine(vertical);
+QLine vertical =
+    o->verticalLine(m_viewer->columnToLayerAxis(col), o->frameSide(rect));
+if (isEmpty || o->isVerticalTimeline()) p.drawLine(vertical);
 
-  // highlight selection
-  bool isSelected =
-      m_viewer->getColumnSelection()->isColumnSelected(col) && !isEditingSpline;
-  bool isCameraSelected = col == -1 && isCurrent && !isEditingSpline;
+// highlight selection
+bool isCurrent = (col == m_viewer->getCurrentColumn());
+bool isSelected =
+    m_viewer->getColumnSelection()->isColumnSelected(col) && !isEditingSpline;
+bool isCameraSelected =
+    col == -1 && isCurrent && !isEditingSpline;
 
-  QColor pastelizer(m_viewer->getColumnHeadPastelizer());
+QColor pastelizer(m_viewer->getColumnHeadPastelizer());
+QColor colorSelection(m_viewer->getSelectedColumnHead());
 
-  QColor colorSelection(m_viewer->getSelectedColumnHead());
-  p.fillRect(o->isVerticalTimeline() ? rect : rect.adjusted(80, 0, 0, 0),
-             isSelected ? colorSelection : pastelizer);
+p.fillRect(o->isVerticalTimeline() ? rect : rect.adjusted(80, 0, 0, 0),
+           isSelected ? colorSelection : pastelizer);
 }
 
 void ColumnArea::DrawHeader::drawEye() const {
