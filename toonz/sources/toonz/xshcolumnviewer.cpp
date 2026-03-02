@@ -938,23 +938,6 @@ if (levelColumn) {
     p.drawLine(vertical);
 }
 
-  p.setPen(m_viewer->getVerticalLineHeadColor());
-QLine vertical =
-    o->verticalLine(m_viewer->columnToLayerAxis(col), o->frameSide(rect));
-if (isEmpty || o->isVerticalTimeline()) p.drawLine(vertical);
-
-  p.fillRect(sideBar,
-             sideBar.contains(area->m_pos)
-                 ? m_viewer->getXsheetDragBarHighlightColor()
-                 : dragColor);
-  }
-
-  p.setPen(m_viewer->getVerticalLineHeadColor());
-  QLine vertical =
-      o->verticalLine(m_viewer->columnToLayerAxis(col), o->frameSide(rect));
-  if (isEmpty || o->isVerticalTimeline()) p.drawLine(vertical);
-}
-
 void ColumnArea::DrawHeader::drawEye() const {
   if (isEmpty || !o->flag(PredefinedFlag::EYE_AREA_VISIBLE)) return;
   if (col < 0 && o->isVerticalTimeline())
