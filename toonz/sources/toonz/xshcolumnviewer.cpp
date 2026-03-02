@@ -1240,11 +1240,14 @@ void ColumnArea::DrawHeader::drawThumbnail(QPixmap &iconPixmap) const {
                                           : PredefinedRect::THUMBNAIL_AREA)
                             .translated(orig);
 
-  // Minimum layout has no thumbnail area
   if (thumbnailRect.isEmpty()) return;
 
-  p.setPen(m_viewer->getVerticalLineColor());
-  if (o->flag(PredefinedFlag::THUMBNAIL_AREA_BORDER)) p.drawRect(thumbnailRect);
+p.setPen(m_viewer->getVerticalLineColor());
+if (o->flag(PredefinedFlag::THUMBNAIL_AREA_BORDER))
+    p.drawRect(thumbnailRect);
+
+// Make thumbnail background white
+p.fillRect(thumbnailRect.adjusted(1, 1, -1, -1), Qt::white);
 
   // sound thumbnail
   if (column->getSoundColumn()) {
