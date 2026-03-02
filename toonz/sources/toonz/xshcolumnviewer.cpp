@@ -1236,24 +1236,8 @@ void ColumnArea::DrawHeader::drawColumnName() const {
 void ColumnArea::DrawHeader::drawThumbnail(QPixmap &iconPixmap) const {
   if (isEmpty) return;
 
-  QRect thumbnailRect = o->rect((col < 0) ? PredefinedRect::CAMERA_ICON_AREA
-                                          : PredefinedRect::THUMBNAIL_AREA)
-                            .translated(orig);
 
   if (thumbnailRect.isEmpty()) return;
-
-// Disable thumbnail border
-// p.setPen(m_viewer->getVerticalLineColor());
-// if (o->flag(PredefinedFlag::THUMBNAIL_AREA_BORDER))
-//     p.drawRect(thumbnailRect);
-
-// Make thumbnail background white
-QRect thumbnailImageRect = o->rect((col < 0)
-    ? PredefinedRect::CAMERA_ICON
-    : PredefinedRect::THUMBNAIL)
-    .translated(orig);
-
-p.fillRect(thumbnailImageRect, Qt::white);
 
   // sound thumbnail
   if (column->getSoundColumn()) {
