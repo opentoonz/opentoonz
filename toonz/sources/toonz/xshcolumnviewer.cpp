@@ -893,13 +893,19 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
   else {
     bool isAssistantColumn = false;
 
-    if (column && column->getLevelColumn()) {
-      TXshCell cell = xsh->getCell(0, col);
+TXshLevelColumn *levelColumn = column->getLevelColumn();
+if (levelColumn) {
+  int rowCount = xsh->getFrameCount();
+  for (int r = 0; r < rowCount; ++r) {
+    TXshCell cell = levelColumn->getCell(r);
+    if (!cell.isEmpty()) {
       TXshSimpleLevel *sl = cell.getSimpleLevel();
       if (sl && sl->getType() == META_XSHLEVEL)
         isAssistantColumn = true;
+      break;
     }
-
+  }
+}
     if (!isAssistantColumn) {
       QBrush brush(columnColor,
                    (reservedLevel) ? Qt::DiagCrossPattern : Qt::SolidPattern);
@@ -909,19 +915,27 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
     }
   }
 
-  // DRAG LAYER BLOCK (must stay OUTSIDE the else)
-if (o->flag(PredefinedFlag::DRAG_LAYER_VISIBLE)) {
-  QRect sideBar = o->rect(PredefinedRect::DRAG_LAYER).translated(x0, y0);
+  // DRAG LAYER BLOCK
+  if (o->flag(PredefinedFlag::DRAG_LAYER_VISIBLE)) {
+    QRect sideBar = o->rect(PredefinedRect::DRAG_LAYER).translated(x0, y0);
 
-  if (o->flag(PredefinedFlag::DRAG_LAYER_BORDER)) {
-    p.setPen(m_viewer->getVerticalLineColor());
-    p.drawRect(sideBar);
+    if (o->flag(PredefinedFlag::DRAG_LAYER_BORDER)) {
+      p.setPen(m_viewer->getVerticalLineColor());
+      p.drawRect(sideBar);
+    }
+
+    p.fillRect(sideBar,
+               sideBar.contains(area->m_pos)
+                   ? m_viewer->getXsheetDragBarHighlightColor()
+                   : dragColor);
   }
 
-  p.fillRect(sideBar,
-             sideBar.contains(area->m_pos)
-                 ? m_viewer->getXsheetDragBarHighlightColor()
-                 : dragColor);
+  // vertical separator line
+  p.setPen(m_viewer->getVerticalLineHeadColor());
+  QLine vertical =
+      o->verticalLine(m_viewer->columnToLayerAxis(col), o->frameSide(rect));
+  if (isEmpty || o->isVerticalTimeline())
+    p.drawLine(vertical);
 }
 
   p.setPen(m_viewer->getVerticalLineHeadColor());
@@ -929,18 +943,16 @@ QLine vertical =
     o->verticalLine(m_viewer->columnToLayerAxis(col), o->frameSide(rect));
 if (isEmpty || o->isVerticalTimeline()) p.drawLine(vertical);
 
-// highlight selection
-bool isCurrent = (col == m_viewer->getCurrentColumn());
-bool isSelected =
-    m_viewer->getColumnSelection()->isColumnSelected(col) && !isEditingSpline;
-bool isCameraSelected =
-    col == -1 && isCurrent && !isEditingSpline;
+  p.fillRect(sideBar,
+             sideBar.contains(area->m_pos)
+                 ? m_viewer->getXsheetDragBarHighlightColor()
+                 : dragColor);
+  }
 
-QColor pastelizer(m_viewer->getColumnHeadPastelizer());
-QColor colorSelection(m_viewer->getSelectedColumnHead());
-
-p.fillRect(o->isVerticalTimeline() ? rect : rect.adjusted(80, 0, 0, 0),
-           isSelected ? colorSelection : pastelizer);
+  p.setPen(m_viewer->getVerticalLineHeadColor());
+  QLine vertical =
+      o->verticalLine(m_viewer->columnToLayerAxis(col), o->frameSide(rect));
+  if (isEmpty || o->isVerticalTimeline()) p.drawLine(vertical);
 }
 
 void ColumnArea::DrawHeader::drawEye() const {
