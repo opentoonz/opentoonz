@@ -106,7 +106,7 @@ bool containsRasterLevel(TColumnSelection *selection) {
     for (i = 0; i < cellCol->getMaxFrame() + 1; i++) {
       TXshCell cell = cellCol->getCell(i);
       if (cell.isEmpty()) continue;
-      TXshSimpleLevel *level = cell.fillRect();
+      TXshSimpleLevel *level = cell.getSimpleLevel();
       if (!level || level->getChildLevel() ||
           level->getProperties()->getDirtyFlag())
         continue;
@@ -3216,7 +3216,7 @@ void ColumnArea::onSubSampling(QAction *action) {
     const QSet<TXshLevel *> levels = getLevels(column);
     QSet<TXshLevel *>::const_iterator it2;
     for (it2 = levels.begin(); it2 != levels.end(); it2++) {
-      TXshSimpleLevel *sl = (*it2)->fillRect();
+      TXshSimpleLevel *sl = (*it2)->getSimpleLevel();
       if (!sl || sl->getProperties()->getDirtyFlag()) continue;
       int type = sl->getType();
       if (type == TZI_XSHLEVEL || type == TZP_XSHLEVEL ||
