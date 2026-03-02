@@ -891,28 +891,12 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
     p.fillRect(o->isVerticalTimeline() ? rect : rect.adjusted(80, 0, 0, 0),
                columnColor);
   else {
+    QBrush brush(columnColor,
+                 (reservedLevel) ? Qt::DiagCrossPattern : Qt::SolidPattern);
 
-    QRect fillRectArea = o->isVerticalTimeline()
-                         ? rect
-                         : rect.adjusted(80, 0, 0, 0);
-
-    // Remove thumbnail region from fill
-    QRect thumbArea;
-if (!o->isVerticalTimeline())
-    thumbArea = o->rect(PredefinedRect::THUMBNAIL_AREA)
-                    .translated(orig);
-
-    QRegion region(fillRectArea);
-
-if (!thumbArea.isNull())
-    region = region.subtracted(thumbArea);
-
-QBrush brush(columnColor,
-             (reservedLevel) ? Qt::DiagCrossPattern : Qt::SolidPattern);
-
-p.setClipRegion(region);
-p.fillRect(fillRectArea, brush);
-p.setClipRegion(QRegion());
+    p.fillRect(o->isVerticalTimeline() ? rect
+                                       : rect.adjusted(80, 0, 0, 0),
+               brush);
 }
     
   // DRAG LAYER BLOCK
