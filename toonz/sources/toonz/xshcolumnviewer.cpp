@@ -1247,7 +1247,12 @@ if (o->flag(PredefinedFlag::THUMBNAIL_AREA_BORDER))
     p.drawRect(thumbnailRect);
 
 // Make thumbnail background white
-p.fillRect(thumbnailRect.adjusted(1, 1, -1, -1), Qt::white);
+QRect thumbnailImageRect = o->rect((col < 0)
+    ? PredefinedRect::CAMERA_ICON
+    : PredefinedRect::THUMBNAIL)
+    .translated(orig);
+
+p.fillRect(thumbnailImageRect, Qt::white);
 
   // sound thumbnail
   if (column->getSoundColumn()) {
