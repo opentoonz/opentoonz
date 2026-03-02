@@ -1236,6 +1236,9 @@ void ColumnArea::DrawHeader::drawColumnName() const {
 void ColumnArea::DrawHeader::drawThumbnail(QPixmap &iconPixmap) const {
   if (isEmpty) return;
 
+  QRect thumbnailRect = o->rect((col < 0) ? PredefinedRect::CAMERA_ICON_AREA
+                                        : PredefinedRect::THUMBNAIL_AREA)
+                          .translated(orig);
 
   if (thumbnailRect.isEmpty()) return;
 
@@ -1260,7 +1263,8 @@ void ColumnArea::DrawHeader::drawThumbnail(QPixmap &iconPixmap) const {
                                  .translated(orig);
 
   // Replace grey thumbnail background with white
-  p.fillRect(thumbnailImageRect, Qt::white);                               
+  if (col >= 0)
+    p.fillRect(thumbnailImageRect, Qt::white);                               
 
   // palette thumbnail
   if (column->getPaletteColumn()) {
