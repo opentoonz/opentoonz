@@ -818,51 +818,78 @@ const QPixmap &ColumnArea::Pixmaps::soundPlaying() {
 
 void ColumnArea::DrawHeader::levelColors(QColor &columnColor,
                                          QColor &dragColor) const {
+
+  // -------------------------------------------------
+  // Camera column
+  // -------------------------------------------------
   if (col < 0) {
     TStageObjectId cameraId =
-        m_viewer->getXsheet()->getStageObjectTree()->getCurrentCameraId();
+        m_viewer->getXsheet()->getStageObjectTree()
+            ->getCurrentCameraId();
+
     bool isActive =
-        cameraId.getIndex() == m_viewer->getXsheet()->getCameraColumnIndex();
-    columnColor = isActive ? m_viewer->getActiveCameraColor()
-                           : m_viewer->getOtherCameraColor();
-    dragColor   = isActive ? m_viewer->getActiveCameraColor()
-                           : m_viewer->getOtherCameraColor();
+        cameraId.getIndex() ==
+        m_viewer->getXsheet()->getCameraColumnIndex();
+
+    columnColor = isActive
+                      ? m_viewer->getActiveCameraColor()
+                      : m_viewer->getOtherCameraColor();
+
+    dragColor = columnColor;
     return;
   }
+
+  // -------------------------------------------------
+  // Normal column logic
+  // -------------------------------------------------
   enum { Normal, Reference, Control } usage = Reference;
+
   if (column) {
     if (column->isControl()) usage = Control;
-    if (column->isRendered() || column->getMeshColumn()) usage = Normal;
+    if (column->isRendered() || column->getMeshColumn())
+      usage = Normal;
   }
 
   if (reservedLevel) {
     int ltype;
-    m_viewer->getCellTypeAndColors(ltype, columnColor, dragColor,
-                                   TXshCell(reservedLevel, TFrameId()));
-  } else if (usage == Reference) {
+    m_viewer->getCellTypeAndColors(
+        ltype, columnColor, dragColor,
+        TXshCell(reservedLevel, TFrameId()));
+  }
+  else if (usage == Reference) {
     columnColor = m_viewer->getReferenceColumnColor();
     dragColor   = m_viewer->getReferenceColumnBorderColor();
-  } else
-    m_viewer->getColumnColor(columnColor, dragColor, col, xsh);
-}
-void ColumnArea::DrawHeader::soundColors(QColor &columnColor,
-                                         QColor &dragColor) const {
-  m_viewer->getColumnColor(columnColor, dragColor, col, xsh);
-}
-void ColumnArea::DrawHeader::paletteColors(QColor &columnColor,
-                                           QColor &dragColor) const {
-  enum { Normal, Reference, Control } usage = Reference;
-  if (column) {  // Check if column is a mask
-    if (column->isControl()) usage = Control;
-    if (column->isRendered()) usage = Normal;
+  }
+  else {
+    m_viewer->getColumnColor(
+        columnColor, dragColor, col, xsh);
   }
 
-  if (usage == Reference) {
-    columnColor = m_viewer->getReferenceColumnColor();
-    dragColor   = m_viewer->getReferenceColumnBorderColor();
-  } else {
-    columnColor = m_viewer->getPaletteColumnColor();
-    dragColor   = m_viewer->getPaletteColumnBorderColor();
+  // -------------------------------------------------
+  // Burnt Umber override for META (Assistant) columns
+  // -------------------------------------------------
+  TXshLevelColumn *levelColumn =
+      column ? column->getLevelColumn() : nullptr;
+
+  if (!levelColumn) return;
+
+  int maxRow = xsh->getFrameCount();
+
+  for (int r = 0; r < maxRow; ++r) {
+
+    TXshCell cell = levelColumn->getCell(r);
+
+    if (!cell.isEmpty()) {
+
+      TXshSimpleLevel *sl = cell.getSimpleLevel();
+
+      if (sl && sl->getType() == META_XSHLEVEL) {
+        columnColor = QColor(138, 51, 36);   // Burnt Umber
+        dragColor   = columnColor.darker(120);
+      }
+
+      break;
+    }
   }
 }
 
