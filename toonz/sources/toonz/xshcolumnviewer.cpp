@@ -816,94 +816,48 @@ const QPixmap &ColumnArea::Pixmaps::soundPlaying() {
 
 //-----------------------------------------------------------------------------
 
-//-----------------------------------------------------------------------------
-// levelColors()
-//-----------------------------------------------------------------------------
-
 void ColumnArea::DrawHeader::levelColors(QColor &columnColor,
                                          QColor &dragColor) const {
-
-  // -------------------------------------------------
-  // Camera column
-  // -------------------------------------------------
   if (col < 0) {
     TStageObjectId cameraId =
-        m_viewer->getXsheet()->getStageObjectTree()
-            ->getCurrentCameraId();
-
+        m_viewer->getXsheet()->getStageObjectTree()->getCurrentCameraId();
     bool isActive =
-        cameraId.getIndex() ==
-        m_viewer->getXsheet()->getCameraColumnIndex();
-
-    columnColor = isActive
-                      ? m_viewer->getActiveCameraColor()
-                      : m_viewer->getOtherCameraColor();
-
-    dragColor = columnColor;
+        cameraId.getIndex() == m_viewer->getXsheet()->getCameraColumnIndex();
+    columnColor = isActive ? m_viewer->getActiveCameraColor()
+                           : m_viewer->getOtherCameraColor();
+    dragColor   = isActive ? m_viewer->getActiveCameraColor()
+                           : m_viewer->getOtherCameraColor();
     return;
   }
-
-  // -------------------------------------------------
-  // Normal column logic
-  // -------------------------------------------------
   enum { Normal, Reference, Control } usage = Reference;
-
   if (column) {
     if (column->isControl()) usage = Control;
-    if (column->isRendered() || column->getMeshColumn())
-      usage = Normal;
+    if (column->isRendered() || column->getMeshColumn()) usage = Normal;
   }
 
   if (reservedLevel) {
     int ltype;
-    m_viewer->getCellTypeAndColors(
-        ltype, columnColor, dragColor,
-        TXshCell(reservedLevel, TFrameId()));
-  }
-  else if (usage == Reference) {
+    m_viewer->getCellTypeAndColors(ltype, columnColor, dragColor,
+                                   TXshCell(reservedLevel, TFrameId()));
+  } else if (usage == Reference) {
     columnColor = m_viewer->getReferenceColumnColor();
     dragColor   = m_viewer->getReferenceColumnBorderColor();
-  }
-  else {
-    m_viewer->getColumnColor(
-        columnColor, dragColor, col, xsh);
-  }
-
-  // -------------------------------------------------
-  // Burnt Umber override for META (Assistant) columns
-  // -------------------------------------------------
-  TXshLevelColumn *levelColumn =
-      column ? column->getLevelColumn() : nullptr;
-
-  if (!levelColumn) return;
-
-  int maxRow = xsh->getFrameCount();
-
-  for (int r = 0; r < maxRow; ++r) {
-
-    TXshCell cell = levelColumn->getCell(r);
-
-    if (!cell.isEmpty()) {
-
-      TXshSimpleLevel *sl = cell.getSimpleLevel();
-
-      if (sl && sl->getType() == META_XSHLEVEL) {
-        columnColor = QColor(138, 51, 36);   // Burnt Umber
-        dragColor   = columnColor.darker(120);
-      }
-
-      break;
-    }
-  }
+  } else
+    m_viewer->getColumnColor(columnColor, dragColor, col, xsh);
 }
-
-
-//-----------------------------------------------------------------------------
-// paletteColors()
-//-----------------------------------------------------------------------------
-
+void ColumnArea::DrawHeader::soundColors(QColor &columnColor,
+                                         QColor &dragColor) const {
+  m_viewer->getColumnColor(columnColor, dragColor, col, xsh);
+}
 void ColumnArea::DrawHeader::paletteColors(QColor &columnColor,
                                            QColor &dragColor) const {
+
+  // Assistant column override
+  if (column && column->getPaletteColumn()) {
+    columnColor = QColor(138, 51, 36);   // Burnt Umber
+    dragColor   = columnColor.darker(120);
+    return;
+  }
 
   enum { Normal, Reference, Control } usage = Reference;
 
@@ -915,8 +869,7 @@ void ColumnArea::DrawHeader::paletteColors(QColor &columnColor,
   if (usage == Reference) {
     columnColor = m_viewer->getReferenceColumnColor();
     dragColor   = m_viewer->getReferenceColumnBorderColor();
-  }
-  else {
+  } else {
     columnColor = m_viewer->getPaletteColumnColor();
     dragColor   = m_viewer->getPaletteColumnBorderColor();
   }
@@ -924,62 +877,93 @@ void ColumnArea::DrawHeader::paletteColors(QColor &columnColor,
 
 void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
                                           const QColor &dragColor) const {
-  // check if the column is reference
-  bool isEditingSpline = app->getCurrentObject()->isSpline();
+ // check if the column is reference
+bool isEditingSpline = app->getCurrentObject()->isSpline();
 
-  QRect rect = o->rect((col < 0) ? PredefinedRect::CAMERA_LAYER_HEADER
-                                 : PredefinedRect::LAYER_HEADER)
-                   .translated(orig);
+QRect rect = o->rect((col < 0) ? PredefinedRect::CAMERA_LAYER_HEADER
+                               : PredefinedRect::LAYER_HEADER)
+                 .translated(orig);
 
-  int x0 = rect.left();
-  int x1 = rect.right();
-  int y0 = rect.top();
-  int y1 = rect.bottom();
+int x0 = rect.left();
+int y0 = rect.top();
 
-  // Fill base color, in timeline view adjust it right upto thumbnail so column
-  // head color doesn't show under icon switches.
-  if (isEmpty && !reservedLevel)
-    p.fillRect(o->isVerticalTimeline() ? rect : rect.adjusted(80, 0, 0, 0),
-               m_viewer->getEmptyColumnHeadColor());
-  else if (col < 0)
-    p.fillRect(o->isVerticalTimeline() ? rect : rect.adjusted(80, 0, 0, 0),
-               columnColor);
-  else {
-    QBrush brush(columnColor,
-                 (reservedLevel) ? Qt::DiagCrossPattern : Qt::SolidPattern);
-    p.fillRect(o->isVerticalTimeline() ? rect : rect.adjusted(80, 0, 0, 0),
-               brush);
+// Define ONE fill rect and use it everywhere
+QRect fillRect = o->isVerticalTimeline()
+                     ? rect
+                     : rect.adjusted(80, 0, 0, 0);
 
-    if (o->flag(PredefinedFlag::DRAG_LAYER_VISIBLE)) {
-      // column handle
-      QRect sideBar = o->rect(PredefinedRect::DRAG_LAYER).translated(x0, y0);
+// -------------------------------------------------
+// Base Fill
+// -------------------------------------------------
+if (isEmpty && !reservedLevel)
+  p.fillRect(fillRect, m_viewer->getEmptyColumnHeadColor());
+else if (col < 0)
+  p.fillRect(fillRect, columnColor);
+else {
+  QBrush brush(columnColor,
+               (reservedLevel) ? Qt::DiagCrossPattern : Qt::SolidPattern);
 
-      if (o->flag(PredefinedFlag::DRAG_LAYER_BORDER)) {
-        p.setPen(m_viewer->getVerticalLineColor());
-        p.drawRect(sideBar);
-      }
+  p.fillRect(fillRect, brush);
 
-      p.fillRect(sideBar, sideBar.contains(area->m_pos)
-                              ? m_viewer->getXsheetDragBarHighlightColor()
-                              : dragColor);
+  if (o->flag(PredefinedFlag::DRAG_LAYER_VISIBLE)) {
+    QRect sideBar =
+        o->rect(PredefinedRect::DRAG_LAYER).translated(x0, y0);
+
+    if (o->flag(PredefinedFlag::DRAG_LAYER_BORDER)) {
+      p.setPen(m_viewer->getVerticalLineColor());
+      p.drawRect(sideBar);
     }
+
+    p.fillRect(sideBar,
+               sideBar.contains(area->m_pos)
+                   ? m_viewer->getXsheetDragBarHighlightColor()
+                   : dragColor);
   }
+}
 
-  p.setPen(m_viewer->getVerticalLineHeadColor());
-  QLine vertical =
-      o->verticalLine(m_viewer->columnToLayerAxis(col), o->frameSide(rect));
-  if (isEmpty || o->isVerticalTimeline()) p.drawLine(vertical);
+// -------------------------------------------------
+// Force Assistant column body to Burnt Umber
+// -------------------------------------------------
+if (col >= 0 && column && column->getPaletteColumn()) {
+  QColor burntUmber(138, 51, 36);
+  p.fillRect(fillRect, burntUmber);
+}
 
-  // highlight selection
-  bool isSelected =
-      m_viewer->getColumnSelection()->isColumnSelected(col) && !isEditingSpline;
-  bool isCameraSelected = col == -1 && isCurrent && !isEditingSpline;
+// -------------------------------------------------
+// Vertical separator
+// -------------------------------------------------
+p.setPen(m_viewer->getVerticalLineHeadColor());
+QLine vertical =
+    o->verticalLine(m_viewer->columnToLayerAxis(col), o->frameSide(rect));
 
-  QColor pastelizer(m_viewer->getColumnHeadPastelizer());
+if (isEmpty || o->isVerticalTimeline())
+  p.drawLine(vertical);
 
-  QColor colorSelection(m_viewer->getSelectedColumnHead());
-  p.fillRect(o->isVerticalTimeline() ? rect : rect.adjusted(80, 0, 0, 0),
-             isSelected ? colorSelection : pastelizer);
+// -------------------------------------------------
+// Selection overlay
+// -------------------------------------------------
+bool isSelected =
+    m_viewer->getColumnSelection()->isColumnSelected(col) &&
+    !isEditingSpline;
+
+if (isSelected) {
+  p.fillRect(fillRect, m_viewer->getSelectedColumnHead());
+}
+
+// -------------------------------------------------
+// Draw Assistant badge icon LAST
+// -------------------------------------------------
+if (col >= 0 && column && column->getPaletteColumn()) {
+
+  QPixmap icon = svgToPixmap(
+      ":/icons/dark/tools/assistant_column.svg",
+      QSize(28, 28),
+      Qt::KeepAspectRatio,
+      QColor());
+
+  QPoint iconPos = fillRect.topLeft() + QPoint(6, 6);
+  p.drawPixmap(iconPos, icon);
+  }
 }
 
 void ColumnArea::DrawHeader::drawEye() const {
@@ -1064,7 +1048,7 @@ void ColumnArea::DrawHeader::drawPreviewToggle(int opacity) const {
                              Qt::KeepAspectRatio, bgColor);
 
   p.drawPixmap(tableViewImgRect, icon);
-}
+  }
 
 // shows united visibility toggle, which has the same state as the camstand
 // toggle (preview toggle should synchonize with the camstand toggle)
