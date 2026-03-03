@@ -121,10 +121,17 @@ void XsheetViewer::getCellTypeAndColors(int &ltype, QColor &cellColor,
       sideColor = getMeshColumnBorderColor();
       break;
     case META_XSHLEVEL:
-      cellColor =
-          (isSelected) ? getSelectedMetaColumnColor() : getMetaColumnColor();
-      sideColor = getMetaColumnBorderColor();
-      break;
+{
+  QColor burntUmber(138, 51, 36);
+
+  if (isSelected)
+    cellColor = burntUmber.lighter(130);
+  else
+    cellColor = burntUmber;
+
+    sideColor = burntUmber.darker(120);
+}
+    break;
     case UNKNOWN_XSHLEVEL:
     case NO_XSHLEVEL:
     default:
