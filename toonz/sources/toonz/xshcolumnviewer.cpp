@@ -892,6 +892,34 @@ QRect fillRect = o->isVerticalTimeline()
                      ? rect
                      : rect.adjusted(80, 0, 0, 0);
 
+                     // Detect Assistant column (META level inside column)
+bool isAssistantColumn = false;
+
+if (col >= 0 && column) {
+
+  TXshLevelColumn* levelColumn = column->getLevelColumn();
+
+  if (levelColumn) {
+
+    int rowCount = xsh->getFrameCount();
+
+    for (int r = 0; r < rowCount; r++) {
+
+      TXshCell cell = levelColumn->getCell(r);
+
+      if (!cell.isEmpty()) {
+
+        TXshSimpleLevel* sl = cell.getSimpleLevel();
+
+        if (sl && sl->getType() == META_XSHLEVEL) {
+          isAssistantColumn = true;
+        }
+
+        break; // stop checking after first filled cell
+      }
+    }
+  }
+}
 // -------------------------------------------------
 // Base Fill
 // -------------------------------------------------
@@ -953,7 +981,7 @@ if (isSelected) {
 // -------------------------------------------------
 // Draw Assistant badge icon LAST
 // -------------------------------------------------
-if (col >= 0 && column && column->getPaletteColumn()) {
+if (isAssistantColumn) {
 
   QPixmap icon = svgToPixmap(
       ":/icons/dark/tools/assistant_column.svg",
@@ -963,7 +991,8 @@ if (col >= 0 && column && column->getPaletteColumn()) {
 
   QPoint iconPos = fillRect.topLeft() + QPoint(6, 6);
   p.drawPixmap(iconPos, icon);
-  }
+}
+
 }
 
 void ColumnArea::DrawHeader::drawEye() const {
