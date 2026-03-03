@@ -816,6 +816,10 @@ const QPixmap &ColumnArea::Pixmaps::soundPlaying() {
 
 //-----------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------
+// levelColors()
+//-----------------------------------------------------------------------------
+
 void ColumnArea::DrawHeader::levelColors(QColor &columnColor,
                                          QColor &dragColor) const {
 
@@ -890,6 +894,31 @@ void ColumnArea::DrawHeader::levelColors(QColor &columnColor,
 
       break;
     }
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+// paletteColors()
+//-----------------------------------------------------------------------------
+
+void ColumnArea::DrawHeader::paletteColors(QColor &columnColor,
+                                           QColor &dragColor) const {
+
+  enum { Normal, Reference, Control } usage = Reference;
+
+  if (column) {
+    if (column->isControl()) usage = Control;
+    if (column->isRendered()) usage = Normal;
+  }
+
+  if (usage == Reference) {
+    columnColor = m_viewer->getReferenceColumnColor();
+    dragColor   = m_viewer->getReferenceColumnBorderColor();
+  }
+  else {
+    columnColor = m_viewer->getPaletteColumnColor();
+    dragColor   = m_viewer->getPaletteColumnBorderColor();
   }
 }
 
