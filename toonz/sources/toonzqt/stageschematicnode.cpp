@@ -135,8 +135,13 @@ void ColumnPainter::paint(QPainter *painter,
   m_parent->getLevelTypeAndName(levelType, levelName);
 
   QColor nodeColor;
-  SchematicViewer *viewer = stageScene->getSchematicViewer();
-  viewer->getNodeColor(levelType, nodeColor);
+SchematicViewer *viewer = stageScene->getSchematicViewer();
+viewer->getNodeColor(levelType, nodeColor);
+
+// 🔥 Force Assistant (META) schematic node color
+if (levelType == META_XSHLEVEL) {
+    nodeColor = QColor(138, 51, 36); // Burnt Umber
+}
 
   if (m_isReference && levelType != PLT_XSHLEVEL) {
     painter->setBrush(viewer->getReferenceColumnColor());
@@ -148,29 +153,38 @@ void ColumnPainter::paint(QPainter *painter,
 
   if (levelType == PLT_XSHLEVEL)
     painter->drawRoundedRect(0, 0, m_width, m_height, 32, 99, Qt::RelativeSize);
-  else
+else
     painter->drawRect(0, 0, m_width, m_height);
 
-  // Draw palette icon for palette node
-  if (levelType == PLT_XSHLEVEL) {
-    QPixmap palettePm = QPixmap(":Resources/schematic_palette.png");
-    QRect paletteRect(-3, -1, 20, 16);
-    painter->drawPixmap(paletteRect, palettePm);
-  }
-
-  if (m_parent->isOpened()) {
-    // Draw the pixmap
+// Draw thumbnail if opened
+if (m_parent->isOpened()) {
     painter->setBrush(Qt::NoBrush);
     painter->setPen(QColor(0, 0, 0, 255));
+
     QPixmap pixmap = scalePixmapKeepingAspectRatio(
         m_parent->getPixmap(), QSize(m_width, 49), Qt::transparent);
-    if (!pixmap.isNull()) {
-      painter->drawPixmap(QPointF(0, -pixmap.height()), pixmap);
-    } else {
-      painter->setBrush(QColor(255, 255, 255, 255));
-      painter->drawRect(0, -pixmap.height(), m_width, pixmap.height());
+
+    if (!pixmap.isNull())
+        painter->drawPixmap(QPointF(0, -pixmap.height()), pixmap);
+    else {
+        painter->setBrush(QColor(255, 255, 255, 255));
+        painter->drawRect(0, -pixmap.height(), m_width, pixmap.height());
     }
-  }
+}
+
+// --------------------------------------------------------
+// Assistant badge icon (META level)
+// --------------------------------------------------------
+if (levelType == META_XSHLEVEL) {
+
+    QPixmap assistantPm(":/icons/dark/tools/20x20/assistant_column.svg");
+
+    if (!assistantPm.isNull()) {
+        QRect iconRect(4, 4, 24, 24);
+        painter->drawPixmap(iconRect, assistantPm);
+    }
+}
+
   painter->setPen(viewer->getTextColor());
   painter->setBrush(Qt::NoBrush);
 
