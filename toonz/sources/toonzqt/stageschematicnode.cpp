@@ -177,7 +177,7 @@ if (m_parent->isOpened()) {
 // --------------------------------------------------------
 if (levelType == META_XSHLEVEL) {
 
-    QPixmap assistantPm(":/icons/dark/tools/20x20/assistant_column.svg");
+    QPixmap assistantPm(":/Resources/assistant_column.svg");
 
     if (!assistantPm.isNull()) {
         QRect iconRect(4, 4, 24, 24);
