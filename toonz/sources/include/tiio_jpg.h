@@ -7,6 +7,7 @@
 #include "tproperty.h"
 
 #include <QCoreApplication>
+#include <cstdio>
 
 extern "C" {
 #define XMD_H
@@ -28,27 +29,50 @@ extern "C" {
 
 namespace Tiio {
 
+//=========================================================
+// JpgReader
+//=========================================================
+
 class DVAPI JpgReader final : public Tiio::Reader {
   struct jpeg_decompress_struct m_cinfo;
   struct jpeg_error_mgr m_jerr;
-  FILE *m_chan;
-  JSAMPARRAY m_buffer;
-  bool m_isOpen;
+  FILE *m_chan;         // file pointer
+  JSAMPARRAY m_buffer;  // temporary scanline buffer
+  bool m_isOpen;        // true if file is opened successfully
+
+  // === Added members to track decoding state ===
+  bool m_errorOccurred;      // true if an error occurred during reading
+  int m_currentLine;         // current scanline index
+  bool m_decompressCreated;  // true if jpeg_create_decompress has been called
+  // ============================================
 
 public:
   JpgReader();
   ~JpgReader();
 
+  // Returns the scanline order (top-to-bottom for JPEG)
   Tiio::RowOrder getRowOrder() const override;
 
+  // Opens a JPEG file for reading
   void open(FILE *file) override;
 
+  // Reads a scanline; fills checkerboard if invalid/corrupted
   void readLine(char *buffer, int x0, int x1, int shrink) override;
+
+  // Skips a number of scanlines
   int skipLines(int lineCount) override;
 };
 
+//=========================================================
+// Factory functions
+//=========================================================
+
 DVAPI Tiio::ReaderMaker makeJpgReader;
 DVAPI Tiio::WriterMaker makeJpgWriter;
+
+//=========================================================
+// JpgWriterProperties
+//=========================================================
 
 class DVAPI JpgWriterProperties final : public TPropertyGroup {
   Q_DECLARE_TR_FUNCTIONS(JpgWriterProperties)
@@ -68,6 +92,6 @@ public:
   void updateTranslation() override;
 };
 
-}  // namespace
+}  // namespace Tiio
 
 #endif
