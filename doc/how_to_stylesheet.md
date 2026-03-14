@@ -8,9 +8,9 @@ Stylesheets are written with [LESS](http://lesscss.org/), which is a dynamic pre
 ### Windows
 Although any LESS compiler will work fine, here is a recommended setup.
 
-- Install [Visual Studio Code](https://code.visualstudio.com/) by Microsoft.
-- Add the [Easy LESS](https://marketplace.visualstudio.com/items?itemName=mrcrowl.easy-less) extension from the marketplace which will be used as the compiler.
-- In VSCode, navigate to your OpenToonz stuff folder and open `config/qss/Default/less`.
+1. Install [Visual Studio Code](https://code.visualstudio.com/) by Microsoft.
+2. Add the [Easy LESS](https://marketplace.visualstudio.com/items?itemName=mrcrowl.easy-less) extension (by **mrcrowl**) from the marketplace which will be used as the compiler (on save).
+3. In VSCode, navigate to your OpenToonz stuff folder and open `config/qss/Default/less`.
 
 A `settings.json` file is already included to ensure developers work to the same standards located in `.vscode`. If the file must be created manually then the following should apply.
 
@@ -27,7 +27,7 @@ A `settings.json` file is already included to ensure developers work to the same
 
 ### Linux
 
-On Linux you will need a command-line compiler `lessc`.
+On Linux you can use the recommended VSCode setup or use a command-line compiler `lessc`.
 
 Ubuntu:
 
@@ -37,68 +37,80 @@ Fedora:
 
     $ dnf install nodejs-less
 
-
-
 ## How To Compile
 
 ### Windows
 
-Easy LESS uses a compile on save feature, so the theme files must be saved to generate an output.
+The Easy LESS extension uses a **compile on save** feature, so the theme files must be saved to generate an output.
 
 ```
-Default.less
-themes/Blue.less
-themes/Dark.less
-themes/Light.less
+less/themes/default/default-theme.less
+less/themes/others/default-green-theme.less
+less/themes/others/blue-theme.less
+less/themes/others/dark-theme.less
+less/themes/others/clay-theme.less
+less/themes/others/neutral-theme.less
+less/themes/others/light-theme.less
+less/themes/others/synthwave-theme.less
 ```
 
 ### Linux
 From opentoonz source directory root execute the following commands:
 ```
-$ lessc -x stuff/config/qss/Default/less/Default.less stuff/config/qss/Default/Default.qss
-$ lessc -x stuff/config/qss/Default/less/themes/Blue.less stuff/config/qss/Blue/Blue.qss
-$ lessc -x stuff/config/qss/Default/less/themes/Dark.less stuff/config/qss/Dark/Dark.qss
-$ lessc -x stuff/config/qss/Default/less/themes/Light.less stuff/config/qss/Light/Light.qss
+$ lessc -x less/themes/default/default-theme.less stuff/config/qss/Default/Default.qss
+$ lessc -x less/themes/others/default-green-theme.less stuff/config/qss/Default-Green/Default-Green.qss
+$ lessc -x less/themes/others/blue-theme.less stuff/config/qss/Blue/Blue.qss
+$ lessc -x less/themes/others/dark-theme.less stuff/config/qss/Dark/Dark.qss
+$ lessc -x less/themes/others/clay-theme.less stuff/config/qss/Clay/Clay.qss
+$ lessc -x less/themes/others/neutral-theme.less stuff/config/qss/Neutral/Neutral.qss
+$ lessc -x less/themes/others/light-theme.less stuff/config/qss/Light/Light.qss
+$ lessc -x less/themes/others/synthwave-theme.less stuff/config/qss/Synthwave/Synthwave.qss
 ```
 
 ## How They Work
-The stylesheets are designed into a component, wire-frame and palette structure similar to web design that exploits the cascade of the LESS language to generate multiple theme colors from a single layout. This method was used to prevent duplication.
+The stylesheets use LESS to separate the layout structure from theme colors. A shared base skeleton defines the component structure without hard-coded colors, while individual theme files provide color variables.
+
+Each theme is compiled with the same base layout to generate the final QSS files for different color schemes.
 
 ### Cascade Hierarchy 
-The include pathway is important as `components` need to be included before `layouts`. The cascade order is defined in the `main.less` file.
+The include pathway is important as certain parts need to be included before others so they can be overridden later. The important chain is as follows as defined in `_main.less`:
 
 ``` LESS
 // Base
-@import 'base/colors';
-@import 'base/mixins';
-
-// Components
-@import 'components/all';
+@import 'base/_styles.less';
 
 // Layouts
-@import 'layouts/all';
+@import 'layouts/_mainwindow.less'; // load mainwindow first!
+@import 'layouts/_user-controls.less';
+
+// Others (at this point any order is fine)
 ```
 
-Then import the `main.less` file into the theme file which will add values to every variable in `Default.less`.
+The `_mainwindows.less` file contains classes for ScrollBars, Tabs, and general window styles that other panels may override, so it is important this is included early.
 
-## Variable List
-There are many variables, for a full list look at `Default.less`, below is a list of the core variables.
+## Variables
+The themes use a variable-driven system where a set of base variables define the interface colors and properties. Many variables may be derived from others such as using LESS color functions like `darken()`. This allows a theme to change the entire interface appearance by overriding only a few base variables.
 
-`@bg` is the main background color for the interface, almost all other color variables use it as their base color and instead use color functions to either lighten or darken the value.
+Example:
 
-`@text-color` is the main text color for the interface.
+``` LESS
+@bg-color: black;
 
-`@accent` is used for accenting, such as borders, separators, boxes, wrappers, think of it as secondary.
+@panel-bg-color: darken(@bg-color, 5%);
+@border-color: darken(@bg-color, 15%);
+```
 
-`@hl-bg-color` changes the color for highlighted items and focused text fields, think of it as tertiary.
+If a theme overrides `@bg`, all derived colors automatically update. This keeps themes consistent and reduces the number of values that must be manually maintained.
+
+For a full list of available color variables and properties, view `themes/default/default-theme.less`.
 
 # Adding New Features
 This is an example of how to add new features into the layout files.
 
 ``` LESS
 #NewWindow {
-  background-color: @bg;
-  border: 1 solid @accent;
+  background-color: @bg-color;
+  border: 1 solid @accent-color;
   
   & QPushButton#OK {
     background-color: @button-bg-color;
@@ -112,52 +124,72 @@ This is an example of how to add new features into the layout files.
 }
 ```
 
-To call components, use the LESS extend function.
+To reuse styles from another class you can reference another class as a mixin:
 
 ``` LESS
 #NewWindow {
-  &:extend(#ComponentName all);
+  .some-style(); // import properties
 }
 ```
 
-ℹ️ [LESS Extend Docs](http://lesscss.org/features/#extend-feature)
+ℹ️ This is more stable than using `extend`, even if it produces a larger `.qss` output.
 
 # Creating New Themes
 It's possible to create custom themes.
 
 ## How To
-- Navigate to your OpenToonz stuff directory, and create a new folder in `config/qss`.
-- Create a new text file in the new folder, give it the same name as the folder and save it with the `.less` extension.
-- Open the LESS file and add the following line at the top.
-- `// out: filename.qss`
-- Which will control where Easy LESS outputs the compiled file on save.
-- Next, choose which theme you want to base from, in this example the base will be Default.
-- Add this line under the Easy LESS line but above everything else.
-- `@import '../Default/less/Default.less'`
-- Now the theme file is a clone of Default, so variables can be overridden.
+1. Make sure you have a LESS compiler setup and working before proceeding.
+2. Navigate to `stuff/config/qss/Default/less/themes/others`.
+3. You can either duplicate an existing theme and rename it (pay attention to the header section to rename the `out` path) or create a new empty `.less` theme file.
+
+If creating an empty file, make sure to include the required sections:
 
 ``` LESS
-//out: filename.qss
+// out: "../../../../Theme-Name/Theme-Name.qss"
 
-@import '../Default/less/Default.less';
+//! The above line is for EasyLESS (VSCode extension) compile output location
 
-@bg: red;
-@text-color: white;
-@hl-bg-color: yellow;
+// -----------------------------------------------------------------------------
+// THEME NAME
+// -----------------------------------------------------------------------------
 
-// etc
+// Theme to inherit/override (this inherits colors/properties)
+@import '../default/default-theme.less';
+
+// Image path relative to where this *.qss is output
+@img-url: '../Default/imgs/white';
+
+// SETTINGS --------------------------------------------------------------------
+
+@ui-contrast: 1.0; // multiplier
+
+// COLORS ----------------------------------------------------------------------
+
+@bg-color: green;
 ```
 
-# Notes
-⚠️ When developing, always develop with the Default theme, then decide later if any changes need porting to alternate themes, in most cases it won't be necessary.
+You only need to override most base variables, like `@bg-color`, if another variable referenced it using a LESS color function the updated color is automatically propgated.
 
-⚠️ Layout files must never have hard-coded color values, color values **must always** be variable. Each function area of OpenToonz is split into a separate file.
+A full list of possible color variables and properties can be found by viewing the default theme file at `themes/default/default-theme.less`.
 
-### Directory Information
-**Base:** Contains generic color palettes, legacy code, mixins and functions. It's fine to place junk code here.
+# Development Guidelines
+⚠️ Always develop using the **Default** theme first.
 
-**Components:** Anything re-usable is here, such as multiple tab structures, button styles, icon layouts, frames, wrappers and folder trees.
+Most layout changes will automatically propgate to other themes. Only adjust other themes if a variable override is required.
 
-**Layouts:** The core wire-frame, every window, widget and control is designed here.
+⚠️ Avoid hard-coded colors in layout files.
+
+Always use variables so themes remain compatible.
+
+### Folder Responsibilities
+
+**Base**
+Reusable UI structures such as buttons, tabs, icon layouts, etc.
+
+**Layouts**
+Window-level layout definitions for widgets, panels and containers.
+
+**Themes**
+Color definitions that override base variables.
 
 **Themes:** Alternate theme colors that inherit the Default theme, it is only necessary to override variable values unique to the theme.
