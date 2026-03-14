@@ -2,6 +2,13 @@
 
 [English](../README.md)
 
+## ⚠️ **重要**
+
+**公式配布元について:** OpenToonz の公式サイトは [**opentoonz.github.io**](https://opentoonz.github.io/) および [GitHub リポジトリ](https://github.com/opentoonz/opentoonz) のみです。  
+セキュリティ確保のため、これら以外のドメインから OpenToonz をダウンロードしないようお願いいたします。公式ミラーサイトや提携サイトはありません。
+
+[English](../README.md)
+
 [![](https://ci.appveyor.com/api/projects/status/oa5l5pc964h8fv49/branch/master?svg=true)](https://ci.appveyor.com/project/opentoonz/opentoonz)
 [![Build Windows](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_windows.yml/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_windows.yml)
 [![Build macOS](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_macos.yml/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_macos.yml)
