@@ -1985,7 +1985,8 @@ FillTool::FillTool(int targetType)
     , m_firstTime(true)
     , m_autopaintLines("Autopaint Lines", true)
     , m_referFill("Refer Fill", false)
-    , m_extendFill("Extend Fill", true) {
+    , m_extendFill("Extend Fill", true)
+    , m_savebox("Savebox", Preferences::instance()->getBoolValue(FillOnlysavebox)) {  
   m_areaFillTool       = new AreaFillTool(this);
   m_normalLineFillTool = new NormalLineFillTool(this);
 
@@ -2018,6 +2019,7 @@ FillTool::FillTool(int targetType)
   if (targetType == TTool::ToonzImage) {
     m_prop.bind(m_autopaintLines);
     m_prop.bind(m_extendFill);
+    m_prop.bind(m_savebox);
     m_prop.bind(m_gapCloseDistance);
   }
   m_emptyOnly.setId("EmptyOnly");
@@ -2031,6 +2033,7 @@ FillTool::FillTool(int targetType)
   m_autopaintLines.setId("AutopaintLines");
   m_gapCloseDistance.setId("GapCloseDistance");
   m_extendFill.setId("ExtendFill");
+  m_savebox.setId("Savebox");
 }
 //-----------------------------------------------------------------------------
 
@@ -2421,6 +2424,10 @@ void FillTool::resetMulti(bool resetAreaFiller) {
 //-----------------------------------------------------------------------------
 
 bool FillTool::onPropertyChanged(std::string propertyName, bool addToUndo) {
+
+  if (propertyName == "Savebox") {
+  Preferences::instance()->setValue(FillOnlysavebox, m_savebox.getValue());
+}
   /*-- Flag to call m_areaFillTool->onPropertyChanged
         Called when fillType, frameRange, selective, colorType changes --*/
   bool rectPropChangedflag = false;
