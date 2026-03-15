@@ -53,6 +53,8 @@ class StartupPopup final : public DVGui::Dialog {
   QPushButton *m_newProjectButton;
   QComboBox *m_presetCombo;
   QPushButton *m_addPresetBtn, *m_removePresetBtn;
+  QComboBox* m_layoutCombo;
+  QPushButton* m_editLayoutBtn;
   CameraSettingsWidget *m_cameraSettingsWidget;
   double m_dpi;
   int m_xRes, m_yRes;
@@ -71,6 +73,7 @@ public:
 
 protected:
   void showEvent(QShowEvent *) override;
+  void loadLayoutList();
   void loadPresetList();
   void savePresetList();
   void refreshRecentScenes();
@@ -100,6 +103,7 @@ public slots:
   void addPreset();
   void removePreset();
   void onPresetSelected(const QString &str);
+  void onEditLayout();
   void onCameraUnitChanged(int index);
   void onAutoSaveOnChanged(int index);
   void onAutoSaveTimeChanged();

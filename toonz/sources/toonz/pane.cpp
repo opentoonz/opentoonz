@@ -8,16 +8,19 @@
 #include "tenv.h"
 #include "saveloadqsettings.h"
 #include "custompanelmanager.h"
-
+#include "layoutUtils.h"
 #include "toonzqt/gutil.h"
 
 // TnzLib includes
-#include "toonz/preferences.h"
 #include "toonz/toonzfolders.h"
 #include "toonz/tscenehandle.h"
+#include "toonz/toonzscene.h"
+#include "toonz/sceneproperties.h"
+#include "layoutPresetsEditorPopup.h"
 
 // TnzCore includes
 #include "tsystem.h"
+#include "tmsgcore.h"
 
 // Qt includes
 #include <QPainter>
@@ -35,8 +38,8 @@
 #include <QGlobalStatic>
 #include <memory>
 #include <utility>
+#include <QDesktopServices>
 
-extern TEnv::StringVar EnvSafeAreaName;
 extern TEnv::IntVar EnvViewerPreviewBehavior;
 
 //=============================================================================
@@ -441,8 +444,8 @@ TPanelTitleBarButtonForBindToRoom::TPanelTitleBarButtonForBindToRoom(
     QWidget *parent)
     : TPanelTitleBarButton(parent, QStringLiteral()) {}
 
-// Constructor for SafeArea
-TPanelTitleBarButtonForSafeArea::TPanelTitleBarButtonForSafeArea(
+// Constructor for LayoutGuide
+TPanelTitleBarButtonForLayoutGuide::TPanelTitleBarButtonForLayoutGuide(
     QWidget *parent, const QString &standardPixmapName)
     : TPanelTitleBarButton(parent, standardPixmapName) {}
 
@@ -576,39 +579,12 @@ void TPanelTitleBarButtonForBindToRoom::paintEvent(QPaintEvent *) {
 }
 
 //=============================================================================
-// TPanelTitleBarButtonForSafeArea
+// TPanelTitleBarButtonForLayoutGuide
 //-----------------------------------------------------------------------------
-
-void TPanelTitleBarButtonForSafeArea::getSafeAreaNameList(
-    QList<QString> &nameList) const {
-  TFilePath fp                      = TEnv::getConfigDir();
-  const QString currentSafeAreaName = QString::fromStdString(EnvSafeAreaName);
-
-  const std::string safeAreaFileName = "safearea.ini";
-
-  while (!TFileStatus(fp + safeAreaFileName).doesExist() && !fp.isRoot() &&
-         fp.getParentDir() != TFilePath())
-    fp = fp.getParentDir();
-
-  fp = fp + safeAreaFileName;
-
-  if (TFileStatus(fp).doesExist()) {
-    QSettings settings(toQString(fp), QSettings::IniFormat);
-
-    // find the current safearea name from the list
-    const QStringList groups = settings.childGroups();
-    for (const QString &group : groups) {
-      settings.beginGroup(group);
-      nameList.push_back(
-          settings.value(QStringLiteral("name"), QString()).toString());
-      settings.endGroup();
-    }
-  }
-}
 
 //-----------------------------------------------------------------------------
 
-void TPanelTitleBarButtonForSafeArea::mousePressEvent(QMouseEvent *e) {
+void TPanelTitleBarButtonForLayoutGuide::mousePressEvent(QMouseEvent *e) {
   if (e->button() != Qt::RightButton) {
     m_pressed = !m_pressed;
     emit toggled(m_pressed);
@@ -616,37 +592,125 @@ void TPanelTitleBarButtonForSafeArea::mousePressEvent(QMouseEvent *e) {
   }
 }
 
+void TPanelTitleBarButtonForLayoutGuide::onEditLayouts() {
+  QWidget *parent = TApp::instance()->getMainWindow();
+
+  LayoutPresetsEditorPopup *popup = LayoutPresetsEditorPopup::instance(parent);
+
+  QPoint globalMousePos = QCursor::pos();
+
+  popup->showAndPosition(globalMousePos);
+
+  return;
+}
+
+void TPanelTitleBarButtonForLayoutGuide::onAddToXsheet() {
+  layoutUtils::addLayoutToXsheet();
+}
+
 //-----------------------------------------------------------------------------
 
-void TPanelTitleBarButtonForSafeArea::contextMenuEvent(QContextMenuEvent *e) {
+void TPanelTitleBarButtonForLayoutGuide::contextMenuEvent(
+    QContextMenuEvent *e) {
   QMenu menu(this);
 
-  QList<QString> safeAreaNameList;
-  getSafeAreaNameList(safeAreaNameList);
-  for (const QString &name : safeAreaNameList) {
-    QAction *action = menu.addAction(name);
-    action->setData(name);
-    connect(action, &QAction::triggered, this,
-            &TPanelTitleBarButtonForSafeArea::onSetSafeArea);
-    if (name == QString::fromStdString(EnvSafeAreaName)) {
-      action->setCheckable(true);
+  QString currentLayoutPresetName = TApp::instance()
+                                        ->getCurrentScene()
+                                        ->getScene()
+                                        ->getProperties()
+                                        ->getLayoutPresetName();
+  QList<QString> layoutNameList;
+  layoutUtils::loadLayoutPresetList(layoutNameList);
+  QActionGroup *behaviorGroup = new QActionGroup(this);
+
+  bool framesPresetFound = false;
+
+  for (int i = 0; i < layoutNameList.size(); i++) {
+    QAction *action = new QAction(layoutNameList.at(i), this);
+    action->setData(layoutNameList.at(i));
+    connect(action, SIGNAL(triggered()), this, SLOT(onSetLayout()));
+    action->setCheckable(true);
+    behaviorGroup->addAction(action);
+    menu.addAction(action);
+    if (layoutNameList.at(i) == currentLayoutPresetName) {
+      framesPresetFound = true;
       action->setChecked(true);
     }
   }
+
+  if (!framesPresetFound && !currentLayoutPresetName.isEmpty()) {
+    QString framesPresetMissingTemplate = tr("%1 (Missing)");
+    QString invalidActionText =
+        framesPresetMissingTemplate.arg(currentLayoutPresetName);
+    QAction *invalidAction = new QAction(invalidActionText, this);
+
+    QPixmap redDot(16, 16);
+    redDot.fill(Qt::transparent);
+    QPainter p(&redDot);
+    p.setRenderHint(QPainter::Antialiasing);
+    p.setBrush(QBrush(Qt::red));
+    p.setPen(Qt::NoPen);
+    p.drawEllipse(2, 2, 12, 12);
+    p.end();
+    invalidAction->setIcon(redDot);
+
+    invalidAction->setEnabled(true);
+
+    connect(invalidAction, &QAction::triggered, this,
+            &TPanelTitleBarButtonForLayoutGuide::onEditLayouts);
+
+    invalidAction->setChecked(true);
+    behaviorGroup->addAction(invalidAction);
+    menu.addAction(invalidAction);
+  }
+
+  menu.addSeparator();
+  QAction *clearAction = new QAction(tr("Clear current"), this);
+  connect(clearAction, &QAction::triggered, this, []() {
+    TApp::instance()
+        ->getCurrentScene()
+        ->getScene()
+        ->getProperties()
+        ->setLayoutPresetName(QString());
+    layoutUtils::invalidateCurrent();
+    TApp::instance()->getCurrentScene()->notifySceneChanged(true);
+  });
+  menu.addAction(clearAction);
+
+  QAction *editAction = new QAction(tr("Edit Layout Presets..."), this);
+  connect(editAction, SIGNAL(triggered()), this, SLOT(onEditLayouts()));
+  menu.addAction(editAction);
+
+  QAction *addLayoutAction = new QAction(tr("Add Layout to XSheet"), this);
+  connect(addLayoutAction, SIGNAL(triggered()), this, SLOT(onAddToXsheet()));
+  menu.addAction(addLayoutAction);
+
+  connect(&menu, SIGNAL(hovered(QAction *)), this,
+          SLOT(onMenuActionHovered(QAction *)));
+  connect(&menu, SIGNAL(aboutToHide()), this, SLOT(onMenuAboutToHide()));
 
   menu.exec(e->globalPos());
 }
 
 //-----------------------------------------------------------------------------
 
-void TPanelTitleBarButtonForSafeArea::onSetSafeArea() {
-  const QString safeAreaName =
+void TPanelTitleBarButtonForLayoutGuide::onSetLayout() {
+  QString framesPresetName =
       qobject_cast<QAction *>(sender())->data().toString();
-  // change safearea if the different one is selected
-  if (QString::fromStdString(EnvSafeAreaName) != safeAreaName) {
-    EnvSafeAreaName = safeAreaName.toStdString();
-    // emit sceneChanged without setting dirty flag
-    TApp::instance()->getCurrentScene()->notifySceneChanged(false);
+  // change framesPreset if the different one is selected
+  QString currentframesPresetName = TApp::instance()
+                                        ->getCurrentScene()
+                                        ->getScene()
+                                        ->getProperties()
+                                        ->getLayoutPresetName();
+  if (currentframesPresetName != framesPresetName) {
+    TApp::instance()
+        ->getCurrentScene()
+        ->getScene()
+        ->getProperties()
+        ->setLayoutPresetName(framesPresetName);
+    layoutUtils::invalidateCurrent();
+    TApp::instance()->getCurrentScene()->notifySceneChanged(true);
   }
 }
 
@@ -697,7 +761,7 @@ void TPanelTitleBarButtonForPreview::contextMenuEvent(QContextMenuEvent *e) {
 
 void TPanelTitleBarButtonForPreview::onSetPreviewBehavior() {
   const int behaviorId = qobject_cast<QAction *>(sender())->data().toInt();
-  // change safearea if the different one is selected
+  // change layout if the different one is selected
   if (EnvViewerPreviewBehavior != behaviorId) {
     EnvViewerPreviewBehavior = behaviorId;
     // emit sceneChanged without setting dirty flag

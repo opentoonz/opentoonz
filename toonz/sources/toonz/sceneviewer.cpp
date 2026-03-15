@@ -279,7 +279,7 @@ void ToggleCommandHandler::execute() {
 ToggleCommandHandler viewTableToggle(MI_ViewTable, false);
 ToggleCommandHandler editInPlaceToggle(MI_ToggleEditInPlace, false);
 ToggleCommandHandler fieldGuideToggle(MI_FieldGuide, false);
-ToggleCommandHandler safeAreaToggle(MI_SafeArea, false);
+ToggleCommandHandler layoutGuideToggle(MI_LayoutGuide, false);
 ToggleCommandHandler rasterizePliToggle(MI_RasterizePli, false);
 
 ToggleCommandHandler viewClcToggle("MI_ViewColorcard", false);
@@ -1550,7 +1550,13 @@ void SceneViewer::drawCameraStand() {
     tglMultMatrix(m_drawCameraAff);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    ViewerDraw::drawColorcard(m_visualSettings.m_colorMask);
+    TRectD rect = ViewerDraw::getCameraRect();
+    // Draw Layout BG only when layout visible
+    if (layoutGuideToggle.getStatus() && !is3DView()) {
+      TRectD layoutRect = ViewerDraw::getLayoutRect();
+      rect              = layoutRect + rect;
+    }
+    ViewerDraw::drawColorcard(m_visualSettings.m_colorMask, rect);
     glDisable(GL_BLEND);
     glPopMatrix();
   }
@@ -1722,6 +1728,14 @@ void SceneViewer::drawOverlay() {
       glPopMatrix();
     }
 
+    // Draw Layout Guide
+    if (layoutGuideToggle.getStatus() && !is3DView()) {
+      glPushMatrix();
+      if (!m_drawEditingLevel) tglMultMatrix(m_drawCameraAff);
+      ViewerDraw::drawLayoutGuide(this, m_drawEditingLevel);
+      glPopMatrix();
+    }
+
     // draw camera
     if (viewCameraToggle.getStatus() && m_drawEditingLevel == false) {
       unsigned long f = 0;
@@ -1775,15 +1789,6 @@ void SceneViewer::drawOverlay() {
     }
 
 #endif
-
-    // safe area
-    if (safeAreaToggle.getStatus() && m_drawEditingLevel == false &&
-        !is3DView()) {
-      glPushMatrix();
-      tglMultMatrix(m_drawCameraAff);
-      ViewerDraw::drawSafeArea();
-      glPopMatrix();
-    }
 
     // record fps (frame per second)
     if (app->getCurrentFrame()->isPlaying())
