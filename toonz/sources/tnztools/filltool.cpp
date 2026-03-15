@@ -1985,11 +1985,14 @@ FillTool::FillTool(int targetType)
     , m_firstTime(true)
     , m_autopaintLines("Autopaint Lines", true)
     , m_referFill("Refer Fill", false)
-    , m_extendFill("Extend Fill", true) {
+    , m_extendFill("Extend Fill", true)
+    , m_savebox("Savebox", Preferences::instance()->getFillOnlySavebox())
+{
   m_areaFillTool       = new AreaFillTool(this);
   m_normalLineFillTool = new NormalLineFillTool(this);
 
   bind(targetType);
+
   m_prop.bind(m_fillType);
   m_fillType.addValue(NORMALFILL);
   m_fillType.addValue(RECTFILL);
@@ -2016,10 +2019,11 @@ FillTool::FillTool(int targetType)
     m_maxGapDistance.setId("MaxGapDistance");
   }
   if (targetType == TTool::ToonzImage) {
-    m_prop.bind(m_autopaintLines);
-    m_prop.bind(m_extendFill);
-    m_prop.bind(m_gapCloseDistance);
-  }
+  m_prop.bind(m_autopaintLines);
+  m_prop.bind(m_extendFill);
+  m_prop.bind(m_savebox);   // Savebox for TLV raster fills
+  m_prop.bind(m_gapCloseDistance);
+}
   m_emptyOnly.setId("EmptyOnly");
   m_onion.setId("OnionSkin");
   m_frameRange.setId("FrameRange");
@@ -2031,6 +2035,7 @@ FillTool::FillTool(int targetType)
   m_autopaintLines.setId("AutopaintLines");
   m_gapCloseDistance.setId("GapCloseDistance");
   m_extendFill.setId("ExtendFill");
+  m_savebox.setId("Savebox");
 }
 //-----------------------------------------------------------------------------
 
@@ -2249,6 +2254,7 @@ void FillTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
   /*-- Below, for NormalFill --*/
   TTool::Application *app = TTool::getApplication();
   if (!app) return;
+  Preferences::instance()->setValue(FillOnlysavebox, m_savebox.getValue());
   FillParameters params = getFillParameters();
   if (m_onion.getValue() &&
       app->getCurrentOnionSkin()->getOnionSkinMask().isEnabled() &&
@@ -2421,20 +2427,25 @@ void FillTool::resetMulti(bool resetAreaFiller) {
 //-----------------------------------------------------------------------------
 
 bool FillTool::onPropertyChanged(std::string propertyName, bool addToUndo) {
-  /*-- Flag to call m_areaFillTool->onPropertyChanged
-        Called when fillType, frameRange, selective, colorType changes --*/
+
   bool rectPropChangedflag = false;
 
+  if (propertyName == m_savebox.getName()) {
+  Preferences::instance()->setValue(FillOnlysavebox, m_savebox.getValue());
+  notifyImageChanged();
+}
+
   // Areas, Lines etc.
-  if (propertyName == m_colorType.getName()) {
+  else if (propertyName == m_colorType.getName()) {
     FillColorType       = ::to_string(m_colorType.getValue());
     rectPropChangedflag = true;
 
-    /*-- Emit SIGNAL to update ColorModel Cursor --*/
     TTool::getApplication()->getCurrentTool()->notifyToolChanged();
-    /*-- Reset previous position info when returning to FillLine tool --*/
-    if (FillColorType.getValue() == "Lines") m_normalLineFillTool->init();
+
+    if (FillColorType.getValue() == "Lines")
+      m_normalLineFillTool->init();
   }
+
   // Rect, Polyline etc.
   else if (propertyName == m_fillType.getName()) {
     if (m_fillType.getValue() != NORMALFILL) {
@@ -2444,97 +2455,128 @@ bool FillTool::onPropertyChanged(std::string propertyName, bool addToUndo) {
     FillType            = ::to_string(m_fillType.getValue());
     rectPropChangedflag = true;
   }
+
   // Onion Skin
   else if (propertyName == m_onion.getName()) {
-    if (m_onion.getValue()) FillType = ::to_string(m_fillType.getValue());
+    if (m_onion.getValue())
+      FillType = ::to_string(m_fillType.getValue());
+
     FillOnion           = (int)(m_onion.getValue());
     rectPropChangedflag = true;
   }
+
   // Frame Range
   else if (propertyName == m_frameRange.getName()) {
     FillRange = (int)(m_frameRange.getValue());
     resetMulti();
     rectPropChangedflag = true;
   }
+
   // Empty Only
   else if (propertyName == m_emptyOnly.getName()) {
     FillSelective       = (int)m_emptyOnly.getValue();
     rectPropChangedflag = true;
   }
+
   // Fill Depth
   else if (propertyName == m_fillDepth.getName()) {
     MinFillDepth = (int)m_fillDepth.getValue().first;
     MaxFillDepth = (int)m_fillDepth.getValue().second;
   }
+
   // Segment
   else if (propertyName == m_segment.getName()) {
-    if (m_segment.getValue()) FillType = ::to_string(m_fillType.getValue());
+    if (m_segment.getValue())
+      FillType = ::to_string(m_fillType.getValue());
+
     FillSegment = (int)(m_segment.getValue());
   }
+
   // Close Gap
   else if (propertyName == m_closeGap.getName()) {
     FillCloseGap = (int)(m_closeGap.getValue());
   }
+
   // Refer Fill
   else if (propertyName == m_referFill.getName()) {
     FillReferFill = (int)(m_referFill.getValue());
   }
+
   // Autopaint
   else if (propertyName == m_autopaintLines.getName()) {
     rectPropChangedflag = true;
   }
+
   // Gap Close Distance
   else if (propertyName == m_gapCloseDistance.getName()) {
     AutocloseDistance = m_gapCloseDistance.getValue();
-    //    auto st           = ToonzCheck::instance()->getAutocloseSettings();
+
     ToonzCheck::instance()->setAutocloseSettings(
         AutocloseDistance, AutocloseAngle, AutocloseOpacity,
         AutocloseIgnoreAutoPaint);
+
     if (ToonzCheck::instance()->getChecks() & ToonzCheck::eAutoclose)
       notifyImageChanged();
   }
+
   // Extend Fill
   else if (propertyName == m_extendFill.getName()) {
     FillExtend = (int)(m_extendFill.getValue());
   }
 
-  else if (!m_frameSwitched && (propertyName == m_maxGapDistance.getName())) {
+  // Max gap (vector)
+  else if (!m_frameSwitched &&
+           propertyName == m_maxGapDistance.getName()) {
+
     TXshLevel *xl = TTool::getApplication()->getCurrentLevel()->getLevel();
     m_level       = xl ? xl->getSimpleLevel() : 0;
+
     if (TVectorImageP vi = getImage(true)) {
       if (m_changedGapOriginalValue == -1.0) {
-        ImageUtils::getFillingInformationInArea(vi, m_oldFillInformation,
-                                                vi->getBBox());
+        ImageUtils::getFillingInformationInArea(
+            vi, m_oldFillInformation, vi->getBBox());
+
         m_changedGapOriginalValue = vi->getAutocloseTolerance();
       }
+
       TFrameId fid = getCurrentFid();
       vi->setAutocloseTolerance(m_maxGapDistance.getValue());
+
       int count = vi->getStrokeCount();
       std::vector<int> v(count);
-      int i;
-      for (i = 0; i < (int)count; i++) v[i] = i;
+
+      for (int i = 0; i < count; i++)
+        v[i] = i;
+
       vi->notifyChangedStrokes(v, std::vector<TStroke *>(), false);
 
       if (m_level) {
         m_level->setDirtyFlag(true);
         TTool::getApplication()->getCurrentLevel()->notifyLevelChange();
+
         if (addToUndo && m_changedGapOriginalValue != -1.0) {
-          TUndoManager::manager()->add(new VectorGapSizeChangeUndo(
-              m_changedGapOriginalValue, m_maxGapDistance.getValue(),
-              m_level.getPointer(), fid, vi, m_oldFillInformation));
+          TUndoManager::manager()->add(
+              new VectorGapSizeChangeUndo(
+                  m_changedGapOriginalValue,
+                  m_maxGapDistance.getValue(),
+                  m_level.getPointer(), fid, vi,
+                  m_oldFillInformation));
+
           m_changedGapOriginalValue = -1.0;
           m_oldFillInformation.clear();
-          TTool::Application *app = TTool::getApplication();
-          app->getCurrentXsheet()->notifyXsheetChanged();
+
+          TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
           notifyImageChanged();
         }
       }
     }
   }
 
-  /*-- When fillType, frameRange, selective, onionSkin, colorType change --*/
+  // Area fill update
   if (rectPropChangedflag && m_fillType.getValue() != NORMALFILL) {
+
     AreaFillTool::Type type;
+
     if (m_fillType.getValue() == RECTFILL)
       type = AreaFillTool::RECT;
     else if (m_fillType.getValue() == FREEHANDFILL)
@@ -2547,8 +2589,12 @@ bool FillTool::onPropertyChanged(std::string propertyName, bool addToUndo) {
       assert(false);
 
     m_areaFillTool->onPropertyChanged(
-        m_frameRange.getValue(), m_emptyOnly.getValue(), m_onion.getValue(),
-        type, m_colorType.getValue(), m_autopaintLines.getValue());
+        m_frameRange.getValue(),
+        m_emptyOnly.getValue(),
+        m_onion.getValue(),
+        type,
+        m_colorType.getValue(),
+        m_autopaintLines.getValue());
   }
 
   return true;
@@ -2722,6 +2768,9 @@ void FillTool::onEnter() {
 //-----------------------------------------------------------------------------
 
 void FillTool::onActivate() {
+
+  m_savebox.setValue(Preferences::instance()->getFillOnlySavebox());
+
   // OnionSkinMask osMask = getApplication()->getOnionSkinMask(false);
   /*
   for (int i=0; i<osMask.getMosCount(); i++)
