@@ -17,6 +17,8 @@
 #define V_RotateReset "T_RotateReset"
 #define V_PositionReset "T_PositionReset"
 
+#define V_Scrub "T_Scrub"
+
 // following command ids are for command bar
 #define VB_ViewReset "VB_ViewReset"
 #define VB_ZoomFit "VB_ZoomFit"

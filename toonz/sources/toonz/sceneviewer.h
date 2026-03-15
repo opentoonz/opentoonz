@@ -93,6 +93,12 @@ class SceneViewer final : public TToolViewer,
   bool m_rotating                        = false;
   bool m_zooming                         = false;
   bool m_panning                         = false;
+
+  TPointD m_oldPos;
+  bool m_dragging;
+  int m_mouseScrubbing                   = 0;
+  QAction *m_keyAction;
+
   QPointF m_firstPanPoint;
   QPointF m_undoPoint;
   double m_scaleFactor;    // used for zoom gesture
@@ -366,6 +372,8 @@ protected:
 
   // center: window coordinate, pixels, topleft origin
   void zoomQt(const QPoint &center, double scaleFactor);
+
+  void mouseScrub(const TMouseEvent &e);
 
   // overridden from TToolViewer
   void pan(const TPointD &delta) override { panQt(QPointF(delta.x, delta.y)); }

@@ -715,5 +715,6 @@
 		<file>Resources/scripticon.png</file>
 		<file>Resources/savescreen.png</file>
 		<file>Resources/warning.svg</file>
+		<file>Resources/scrub.png</file>
 	</qresource>
 </RCC>

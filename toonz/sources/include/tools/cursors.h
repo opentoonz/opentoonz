@@ -51,6 +51,7 @@ enum {
   ScaleInvCursor,
   ScaleHCursor,
   ScaleVCursor,
+  ScrubCursor,
   StrokeSelectCursor,
   TapeCursor,
   TypeInCursor,

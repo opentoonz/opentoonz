@@ -282,6 +282,7 @@ ShortcutTree::ShortcutTree(QWidget *parent) : QTreeWidget(parent) {
   addFolder(tr("Visualization"), ZoomCommandType);
   addFolder(tr("Misc"), MiscCommandType);
   addFolder(tr("RGBA Channels"), RGBACommandType);
+  addFolder(tr("Special Modifier Keys"), SpecialModifierKeyType);
 
   sortItems(0, Qt::AscendingOrder);
 
@@ -443,6 +444,7 @@ void ShortcutTree::refreshTree() {
   addFolder(tr("Visualization"), ZoomCommandType);
   addFolder(tr("Misc"), MiscCommandType);
   addFolder(tr("RGBA Channels"), RGBACommandType);
+  addFolder(tr("Special Modifier Keys"), SpecialModifierKeyType);
 
   sortItems(0, Qt::AscendingOrder);
 

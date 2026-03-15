@@ -531,6 +531,25 @@ void SceneViewer::onMove(const TMouseEvent &event) {
   bool cursorSet  = false;
   m_lastMousePos  = curPos;
 
+  if (event.buttons() == Qt::LeftButton && m_mouseScrubbing > 0) {
+    if (m_mouseScrubbing == 1) {
+      m_mouseScrubbing = 2;
+      m_dragging       = true;
+      m_oldPos         = event.m_pos;
+      setToolCursor(this, ToolCursor::ScrubCursor);
+      return;
+    }
+    // panning
+    mouseScrub(event);
+    setToolCursor(this, ToolCursor::ScrubCursor);
+    return;
+  }
+
+  if (m_mouseScrubbing > 0) {
+    setToolCursor(this, ToolCursor::ScrubCursor);
+    return;
+  }
+
   if (m_editPreviewSubCamera) {
     if (!PreviewSubCameraManager::instance()->mouseMoveEvent(this, event)) {
       if (m_tabletEvent && m_tabletState == StartStroke && m_tabletMove) {
@@ -730,6 +749,18 @@ void SceneViewer::mousePressEvent(QMouseEvent *event) {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::onPress(const TMouseEvent &event) {
+  m_dragging = true;
+  if (m_mouseScrubbing > 0) {
+    m_pos           = event.mousePos() * getDevPixRatio();
+    m_mouseButton   = event.button();
+    m_buttonClicked = true;
+    if (m_tabletEvent && m_tabletState == Touched) {
+      m_tabletState = StartStroke;
+    } else if (m_mouseButton == Qt::LeftButton) {
+      m_mouseState = StartStroke;
+    }
+    return;
+  }
   if (m_mouseButton != Qt::NoButton) {
     if (event.m_isTablet && m_mouseState != None) {
       //      qDebug() << "[onPress] Switched from MousePress to TabletPress";
@@ -881,6 +912,8 @@ void SceneViewer::onRelease(const TMouseEvent &event) {
   // evita i release ripetuti
   if (!m_buttonClicked) return;
   m_buttonClicked = false;
+
+  m_dragging  = false;
 
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
   if (!tool || !tool->isEnabled()) {
@@ -1265,8 +1298,27 @@ bool SceneViewer::event(QEvent *e) {
     return true;
   }
   if (e->type() == QEvent::ShortcutOverride || e->type() == QEvent::KeyPress) {
-    if (!((QKeyEvent *)e)->isAutoRepeat()) {
+    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
+    
+    if (!keyEvent->isAutoRepeat()) {
       TApp::instance()->getCurrentTool()->storeTool();
+    }
+
+    std::string keyStr = QKeySequence(keyEvent->key() + keyEvent->modifiers())
+                             .toString()
+                             .toStdString();
+    QAction *action = CommandManager::instance()->getActionFromShortcut(keyStr);
+    std::string actionId = CommandManager::instance()->getIdFromAction(action);
+
+    if (actionId == V_Scrub) {
+      if (m_mouseScrubbing == 0) {
+        m_mouseScrubbing = 1;
+        m_keyAction      = action;
+        m_keyAction->setEnabled(false);
+        setToolCursor(this, ToolCursor::ScrubCursor);
+      }
+      e->accept();
+      return true;
     }
   }
   if (e->type() == QEvent::ShortcutOverride) {
@@ -1298,11 +1350,27 @@ bool SceneViewer::event(QEvent *e) {
     return true;
   }
   if (e->type() == QEvent::KeyRelease) {
-    if (!((QKeyEvent *)e)->isAutoRepeat()) {
+    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
+
+    if (!keyEvent->isAutoRepeat()) {
       QWidget *focusWidget = QApplication::focusWidget();
       if (focusWidget == 0 ||
           QString(focusWidget->metaObject()->className()) == "SceneViewer")
         TApp::instance()->getCurrentTool()->restoreTool();
+    }
+
+    if (m_keyAction) {
+      if (keyEvent->isAutoRepeat()) {
+        e->accept();
+        return true;
+      } else {
+        m_mouseScrubbing = 0;
+        m_keyAction->setEnabled(true);
+        m_keyAction = 0;
+        invalidateToolStatus();
+        e->accept();
+        return true;
+      }
     }
   }
 
@@ -1815,4 +1883,19 @@ void SceneViewer::onToolSwitched() {
 
   onLevelChanged();
   update();
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::mouseScrub(const TMouseEvent &e) {
+  TPointD delta = e.m_pos - m_oldPos;
+
+  if (std::abs(delta.x) < 20) return;
+
+  if (delta.x < 0)
+    CommandManager::instance()->execute(MI_PrevFrame);
+  else if (delta.x > 0)
+    CommandManager::instance()->execute(MI_NextFrame);
+
+  m_oldPos = e.m_pos;
 }

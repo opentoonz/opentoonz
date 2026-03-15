@@ -826,7 +826,8 @@ SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
     , m_toolDisableReason("")
     , m_editPreviewSubCamera(false)
     , m_isLocator(false)
-    , m_isBusyOnTabletMove(false) {
+    , m_isBusyOnTabletMove(false)
+    , m_mouseScrubbing(0) {
   m_visualSettings.m_sceneProperties =
       TApp::instance()->getCurrentScene()->getScene()->getProperties();
 #if defined(x64)
