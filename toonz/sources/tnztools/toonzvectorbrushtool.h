@@ -26,6 +26,8 @@
 
 #include <QCoreApplication>
 #include <QRadialGradient>
+#include <vector>
+#include <utility>
 
 //--------------------------------------------------------------
 
@@ -53,6 +55,34 @@ struct VectorBrushData final : public TPersist {
   int m_drawOrder;
   bool m_breakAngles, m_pressure;
   int m_cap, m_join, m_miter;
+  
+  // Style snapshot information (for strict preset restoration)
+  int m_styleInfoVersion;       // 0 = old, 1 = full snapshot
+  
+  // Vector style info: Generated, Trail, or VectorBrush
+  bool m_hasVectorStyle;        // true if non-solid style was active
+  int m_vectorStyleTagId;       // TagId of the style (e.g., 3000 for VectorBrush)
+  std::string m_vectorStyleName; // brush/pattern name for VectorBrush/Trail styles
+  
+  // Texture style info (kept for backward compatibility)
+  bool m_hasTexture;            // true if Texture style was active
+  std::string m_texturePath;    // path to texture image
+  double m_textureScale;
+  double m_textureRotation;
+  double m_textureDispX;
+  double m_textureDispY;
+  double m_textureContrast;
+  int m_textureType;            // 0=FIXED, 1=AUTOMATIC, 2=RANDOM
+  bool m_textureIsPattern;
+  
+  // Generic style snapshot (version >= 2)
+  // Replaces individual vector/texture fields for new presets.
+  // Captures ALL parameters of ANY TColorStyle generically.
+  bool m_hasStyleSnapshot;             // true if generic snapshot present
+  int m_snapshotStyleTagId;            // TColorStyle::getTagId() for recreation
+  std::string m_snapshotBrushIdName;   // TColorStyle::getBrushIdName()
+  std::string m_snapshotFilePath;      // Primary file (texture image, VectorBrush)
+  std::vector<std::pair<int, double>> m_snapshotParams; // (paramIndex, numericValue)
 
   VectorBrushData();
   VectorBrushData(const std::wstring &name);

@@ -30,6 +30,8 @@
 #include <QCoreApplication>
 #include <QRadialGradient>
 #include <QElapsedTimer>
+#include <vector>
+#include <utility>
 
 //--------------------------------------------------------------
 
@@ -61,10 +63,32 @@ struct BrushData final : public TPersist {
   bool m_modifierEraser, m_modifierLockAlpha;
   bool m_assistants;
   
-  // MyPaint style information (for strict preset restoration)
+  // Style snapshot information (for strict preset restoration)
+  int m_styleInfoVersion;     // 0 = old, 1 = MyPaint only, 2 = full snapshot
+  
+  // MyPaint style info (version >= 1)
   bool m_hasMyPaint;          // true if preset was created with MyPaint style
   std::string m_myPaintPath;  // path to MyPaint brush if applicable
-  int m_styleInfoVersion;     // 0 = old preset (no style info), 1 = new preset (has style info)
+  
+  // Texture style info (version >= 2, kept for backward compatibility)
+  bool m_hasTexture;          // true if preset was created with Texture style
+  std::string m_texturePath;  // path to the texture image
+  double m_textureScale;      // texture scale
+  double m_textureRotation;   // texture rotation
+  double m_textureDispX;      // texture displacement X
+  double m_textureDispY;      // texture displacement Y
+  double m_textureContrast;   // texture contrast
+  int m_textureType;          // 0=FIXED, 1=AUTOMATIC, 2=RANDOM
+  bool m_textureIsPattern;    // is pattern mode
+  
+  // Generic style snapshot (version >= 3)
+  // Replaces individual texture/mypaint fields for new presets.
+  // Captures ALL parameters of ANY TColorStyle generically.
+  bool m_hasStyleSnapshot;             // true if generic snapshot present
+  int m_snapshotStyleTagId;            // TColorStyle::getTagId() for recreation
+  std::string m_snapshotBrushIdName;   // TColorStyle::getBrushIdName()
+  std::string m_snapshotFilePath;      // Primary file (MyPaint brush, texture image)
+  std::vector<std::pair<int, double>> m_snapshotParams; // (paramIndex, numericValue)
 
   BrushData();
   BrushData(const std::wstring &name);

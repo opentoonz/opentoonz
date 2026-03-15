@@ -267,6 +267,7 @@ ShortcutTree::ShortcutTree(QWidget *parent) : QTreeWidget(parent) {
   addFolder(tr("Windows"), MenuWindowsCommandType, menuCommandFolder);
   QTreeWidgetItem *windowsFolder = m_subFolders.back();
   addFolder(tr("Custom Panels"), CustomPanelCommandType, windowsFolder);
+  addFolder(tr("Rooms"), RoomCommandType, windowsFolder);
   addFolder(tr("Help"), MenuHelpCommandType, menuCommandFolder);
 
   addFolder(tr("Right-click Menu Commands"), RightClickMenuCommandType);
@@ -428,6 +429,7 @@ void ShortcutTree::refreshTree() {
   addFolder(tr("Windows"), MenuWindowsCommandType, menuCommandFolder);
   QTreeWidgetItem *windowsFolder = m_subFolders.back();
   addFolder(tr("Custom Panels"), CustomPanelCommandType, windowsFolder);
+  addFolder(tr("Rooms"), RoomCommandType, windowsFolder);
   addFolder(tr("Help"), MenuHelpCommandType, menuCommandFolder);
 
   addFolder(tr("Right-click Menu Commands"), RightClickMenuCommandType);
@@ -496,6 +498,9 @@ void ShortcutTree::addFolder(const QString &title, int commandType,
   std::vector<QAction *> actions;
   CommandManager::instance()->getActions((CommandType)commandType, actions);
   for (int i = 0; i < (int)actions.size(); i++) {
+    // Skip invisible actions (used for disabled/renamed room commands)
+    if (!actions[i]->isVisible()) continue;
+    
     ShortcutItem *item = new ShortcutItem(folder, actions[i]);
     m_items.push_back(item);
   }

@@ -14,6 +14,10 @@
 
 // TnzQt includes
 #include "toonzqt/dvdialog.h"
+#include "toonzqt/brushpresetbridge.h"
+#include "toonzqt/tselectionhandle.h"
+#include "toonzqt/styleselection.h"
+#include "tundo.h"
 
 // TnzLib includes
 #include "toonz/tpalettehandle.h"
@@ -27,6 +31,7 @@
 #include "toonz/tstageobject.h"
 #include "toonz/palettecontroller.h"
 #include "toonz/mypaintbrushstyle.h"
+#include "toonz/imagestyles.h"
 #include "toonz/preferences.h"
 #include "toonz/toonzfolders.h"
 
@@ -767,39 +772,120 @@ void FullColorBrushTool::loadPreset() {
     m_modifierLockAlpha.setValue(preset.m_modifierLockAlpha);
     m_assistants.setValue(preset.m_assistants);
     
-    // CRITICAL: Restore MyPaint style from preset (strict state restoration)
-    // Only applies to NEW presets (version >= 1) that have style information
-    if (preset.m_styleInfoVersion >= 1) {
+    // Style snapshot restoration.
+    // When Selective Preset mode is ON, this entire block is skipped: only the
+    // tool parameters above are injected. The user's current style acts as a
+    // "base" that receives dynamic brush settings from any chosen preset.
+    if (preset.m_styleInfoVersion >= 1 &&
+        !BrushPresetBridge::isSelectivePresetMode()) {
       if (TTool::Application *app = getApplication()) {
-        if (TPaletteHandle *paletteHandle = app->getCurrentPalette()) {
-          TPalette *palette = paletteHandle->getPalette();
-          if (palette) {
+        TPaletteHandle *paletteHandle =
+            app->getPaletteController()->getCurrentLevelPalette();
+        TPalette *palette = paletteHandle ? paletteHandle->getPalette() : nullptr;
+        if (palette) {
             int styleIndex = app->getCurrentLevelStyleIndex();
             TColorStyle *currentStyle = palette->getStyle(styleIndex);
+            TPixel32 currentColor = TPixel32::Black;
+            if (currentStyle) {
+              if (dynamic_cast<TTextureStyle *>(currentStyle) &&
+                  currentStyle->getColorParamCount() > 0)
+                currentColor = currentStyle->getColorParamValue(0);
+              else
+                currentColor = currentStyle->getMainColor();
+            }
             
-            if (preset.m_hasMyPaint) {
-              // Preset was created WITH MyPaint: load the specific MyPaint brush
-              TFilePath myPaintPath(preset.m_myPaintPath);
-              TMyPaintBrushStyle *newStyle = new TMyPaintBrushStyle(myPaintPath);
-              if (currentStyle) {
-                newStyle->setMainColor(currentStyle->getMainColor());
-              }
-              palette->setStyle(styleIndex, newStyle);
-              paletteHandle->notifyColorStyleChanged(false);
-            } else {
-              // Preset was created WITHOUT MyPaint: replace any existing MyPaint with solid color
-              if (dynamic_cast<TMyPaintBrushStyle*>(currentStyle)) {
-                TSolidColorStyle *newStyle = new TSolidColorStyle(
-                  currentStyle ? currentStyle->getMainColor() : TPixel32::Black);
+            auto commitStyle = [&](TColorStyle *newStyle) {
+              if (BrushPresetBridge::isNonDestructiveMode()) {
+                if (TSelection *sel =
+                        app->getCurrentSelection()->getSelection())
+                  if (TStyleSelection *ss =
+                          dynamic_cast<TStyleSelection *>(sel))
+                    ss->selectNone();
+
+                int matchIdx =
+                    BrushPresetBridge::findMatchingStyleInPalette(palette, newStyle);
+                if (matchIdx >= 0) {
+                  delete newStyle;
+                  app->setCurrentLevelStyleIndex(matchIdx, true);
+                } else {
+                  int newId = palette->addStyle(newStyle);
+                  if (newId >= 0) {
+                    for (int p = 0; p < palette->getPageCount(); ++p) {
+                      TPalette::Page *pg = palette->getPage(p);
+                      if (!pg) continue;
+                      for (int s = 0; s < pg->getStyleCount(); ++s) {
+                        if (pg->getStyleId(s) == styleIndex) {
+                          pg->addStyle(newId);
+                          p = palette->getPageCount();
+                          break;
+                        }
+                      }
+                    }
+                    palette->setDirtyFlag(true);
+                    app->setCurrentLevelStyleIndex(newId, true);
+                    paletteHandle->notifyPaletteChanged();
+                  }
+                }
+              } else {
+                TColorStyle *oldStyle = palette->getStyle(styleIndex);
+                TUndo *undo = BrushPresetBridge::createStyleOverwriteUndo(
+                    palette, styleIndex, oldStyle, newStyle, paletteHandle);
                 palette->setStyle(styleIndex, newStyle);
                 paletteHandle->notifyColorStyleChanged(false);
+                TUndoManager::manager()->add(undo);
+              }
+            };
+            
+            if (preset.m_hasStyleSnapshot && preset.m_styleInfoVersion >= 3) {
+              TColorStyle *newStyle = nullptr;
+              
+              if (preset.m_snapshotStyleTagId == 4001) {
+                TFilePath mpPath(preset.m_snapshotFilePath);
+                newStyle = new TMyPaintBrushStyle(mpPath);
+              } else {
+                newStyle = TColorStyle::create(preset.m_snapshotBrushIdName);
+              }
+              
+              if (newStyle) {
+                for (const auto &param : preset.m_snapshotParams) {
+                  int idx = param.first;
+                  double val = param.second;
+                  if (idx >= newStyle->getParamCount()) continue;
+                  TColorStyle::ParamType ptype = newStyle->getParamType(idx);
+                  switch (ptype) {
+                    case TColorStyle::BOOL:
+                      newStyle->setParamValue(idx, (bool)(val != 0));
+                      break;
+                    case TColorStyle::INT:
+                    case TColorStyle::ENUM:
+                      newStyle->setParamValue(idx, (int)val);
+                      break;
+                    case TColorStyle::DOUBLE:
+                      newStyle->setParamValue(idx, val);
+                      break;
+                    default:
+                      break;
+                  }
+                }
+                newStyle->setMainColor(currentColor);
+                commitStyle(newStyle);
+              }
+            } else if (preset.m_hasMyPaint) {
+              TFilePath myPaintPath(preset.m_myPaintPath);
+              TMyPaintBrushStyle *newStyle = new TMyPaintBrushStyle(myPaintPath);
+              newStyle->setMainColor(currentColor);
+              commitStyle(newStyle);
+            } else if (!preset.m_hasMyPaint && !preset.m_hasTexture && !preset.m_hasStyleSnapshot) {
+              if (BrushPresetBridge::isNonDestructiveMode() ||
+                  dynamic_cast<TMyPaintBrushStyle*>(currentStyle) ||
+                  dynamic_cast<TTextureStyle*>(currentStyle)) {
+                TSolidColorStyle *newStyle = new TSolidColorStyle(currentColor);
+                commitStyle(newStyle);
               }
             }
           }
         }
-      }
     }
-    // OLD presets (version 0): do nothing - leave the current style unchanged
   } catch (...) {
   }
 }
@@ -822,18 +908,53 @@ void FullColorBrushTool::addPreset(QString name) {
   preset.m_modifierLockAlpha = m_modifierLockAlpha.getValue();
   preset.m_assistants        = m_assistants.getValue();
   
-  // Capture MyPaint style information (CRITICAL for strict preset restoration)
-  preset.m_styleInfoVersion = 1;  // Mark as new preset with style information
+  // Capture complete style snapshot using the GENERIC approach.
+  // This captures ALL parameters (including MyPaint's 56 params) generically.
+  preset.m_styleInfoVersion = 3;
+  preset.m_hasMyPaint = false;
+  preset.m_hasTexture = false;
+  preset.m_hasStyleSnapshot = false;
   
   if (TTool::Application *app = getApplication()) {
     TColorStyle *style = app->getCurrentLevelStyle();
-    if (TMyPaintBrushStyle *mpStyle = dynamic_cast<TMyPaintBrushStyle*>(style)) {
-      preset.m_hasMyPaint = true;
-      std::wstring wpath = mpStyle->getPath().getWideString();
-      preset.m_myPaintPath = std::string(wpath.begin(), wpath.end());
-    } else {
-      preset.m_hasMyPaint = false;
-      preset.m_myPaintPath = "";
+    
+    if (style && !dynamic_cast<TSolidColorStyle*>(style)) {
+      preset.m_hasStyleSnapshot = true;
+      preset.m_snapshotStyleTagId = style->getTagId();
+      preset.m_snapshotBrushIdName = style->getBrushIdName();
+      
+      // Extract primary file path
+      if (TMyPaintBrushStyle *mpStyle = dynamic_cast<TMyPaintBrushStyle*>(style)) {
+        std::wstring wpath = mpStyle->getPath().getWideString();
+        preset.m_snapshotFilePath = std::string(wpath.begin(), wpath.end());
+        // Legacy compatibility
+        preset.m_hasMyPaint = true;
+        preset.m_myPaintPath = preset.m_snapshotFilePath;
+      }
+      
+      // GENERIC: Capture ALL numeric parameters of the style
+      int paramCount = style->getParamCount();
+      for (int i = 0; i < paramCount; ++i) {
+        TColorStyle::ParamType ptype = style->getParamType(i);
+        double numValue = 0.0;
+        switch (ptype) {
+          case TColorStyle::BOOL:
+            numValue = style->getParamValue(TColorStyle::bool_tag(), i) ? 1.0 : 0.0;
+            break;
+          case TColorStyle::INT:
+          case TColorStyle::ENUM:
+            numValue = (double)style->getParamValue(TColorStyle::int_tag(), i);
+            break;
+          case TColorStyle::DOUBLE:
+            numValue = style->getParamValue(TColorStyle::double_tag(), i);
+            break;
+          case TColorStyle::FILEPATH:
+            continue; // Handled via m_snapshotFilePath
+          default:
+            continue;
+        }
+        preset.m_snapshotParams.push_back({i, numValue});
+      }
     }
   }
 

@@ -483,6 +483,7 @@
 
 		<!-- Palette -->
 		<file>icons/dark/actions/16x16/newstyle.svg</file>
+		<file>icons/dark/actions/16x16/plaincolor.svg</file>
 		<file>icons/dark/actions/16x16/newpage.svg</file>
 		<file>icons/dark/actions/16x16/palette.svg</file>
 		<file>icons/dark/actions/16x16/palette_tab.svg</file>
