@@ -75,6 +75,7 @@
 #include <QTextStream>
 #include <QSet>
 #include <QFrame>
+#include <QTimer>
 
 //=============================================================================
 // PresetNamePopup - Popup to enter a preset name
@@ -107,33 +108,27 @@ public:
   void removeName() { m_nameFld->setText(""); }
 };
 
-//=============================================================================
-// Helper function to load preset render data from disk
-//=============================================================================
-
 namespace {
-PresetRenderData loadPresetRenderData(const QString &presetName, const QString &toolType) {
-  PresetRenderData data;
-  data.hasData = false;
-  
-  // Determine preset file path based on tool type
+
+// Parse the preset file for toolType once and return a map of all presets.
+// This is the efficient alternative to calling loadPresetRenderData() N times
+// (which would open and linearly scan the file N times = O(N²) total work).
+QHash<QString, PresetRenderData> loadAllPresetRenderData(const QString &toolType) {
+  QHash<QString, PresetRenderData> result;
+
   TFilePath presetFilePath;
-  if (toolType == "vector") {
+  if (toolType == "vector")
     presetFilePath = TEnv::getConfigDir() + "brush_vector.txt";
-  } else if (toolType == "toonzraster") {
+  else if (toolType == "toonzraster")
     presetFilePath = TEnv::getConfigDir() + "brush_toonzraster.txt";
-  } else if (toolType == "raster") {
+  else if (toolType == "raster")
     presetFilePath = TEnv::getConfigDir() + "brush_raster.txt";
-  } else {
-    return data;  // Unknown tool type
-  }
-  
-  // Try to load preset file
+  else
+    return result;
+
   try {
     TIStream is(presetFilePath);
     std::string tagName;
-    std::wstring wPresetName = presetName.toStdWString();
-    
     while (is.matchTag(tagName)) {
       if (tagName == "version") {
         int major, minor;
@@ -142,12 +137,76 @@ PresetRenderData loadPresetRenderData(const QString &presetName, const QString &
       } else if (tagName == "brushes") {
         while (is.matchTag(tagName)) {
           if (tagName == "brush") {
-            // Parse brush entry
+            std::wstring name;
+            double minT = 1.0, maxT = 5.0, h = 100.0, minO = 100.0, maxO = 100.0;
+            int pencil = 0;
+            while (is.matchTag(tagName)) {
+              if      (tagName == "Name")      { is >> name;           is.matchEndTag(); }
+              else if (tagName == "Thickness") { is >> minT >> maxT;   is.matchEndTag(); }
+              else if (tagName == "Hardness")  { is >> h;              is.matchEndTag(); }
+              else if (tagName == "Opacity")   { is >> minO >> maxO;   is.matchEndTag(); }
+              else if (tagName == "Pencil")    { is >> pencil;         is.matchEndTag(); }
+              else                             { is.skipCurrentTag(); }
+            }
+            if (!name.empty()) {
+              PresetRenderData d;
+              d.minThickness = minT;
+              d.maxThickness = maxT;
+              d.hardness     = h;
+              d.minOpacity   = minO;
+              d.maxOpacity   = maxO;
+              d.isPencil     = (pencil != 0);
+              d.hasData      = true;
+              result.insert(QString::fromStdWString(name), d);
+            }
+            is.matchEndTag();
+          } else {
+            is.skipCurrentTag();
+          }
+        }
+        is.matchEndTag();
+      } else {
+        is.skipCurrentTag();
+      }
+    }
+  } catch (...) {}
+
+  return result;
+}
+
+PresetRenderData loadPresetRenderData(const QString &presetName, const QString &toolType) {
+  PresetRenderData data;
+  data.hasData = false;
+
+  TFilePath presetFilePath;
+  if (toolType == "vector") {
+    presetFilePath = TEnv::getConfigDir() + "brush_vector.txt";
+  } else if (toolType == "toonzraster") {
+    presetFilePath = TEnv::getConfigDir() + "brush_toonzraster.txt";
+  } else if (toolType == "raster") {
+    presetFilePath = TEnv::getConfigDir() + "brush_raster.txt";
+  } else {
+    return data;
+  }
+
+  try {
+    TIStream is(presetFilePath);
+    std::string tagName;
+    std::wstring wPresetName = presetName.toStdWString();
+
+    while (is.matchTag(tagName)) {
+      if (tagName == "version") {
+        int major, minor;
+        is >> major >> minor;
+        is.matchEndTag();
+      } else if (tagName == "brushes") {
+        while (is.matchTag(tagName)) {
+          if (tagName == "brush") {
             std::wstring name;
             double minThick = 1.0, maxThick = 5.0, hardness = 100.0;
             double minOp = 100.0, maxOp = 100.0;
             int pencil = 0;
-            
+
             while (is.matchTag(tagName)) {
               if (tagName == "Name") {
                 is >> name;
@@ -168,20 +227,19 @@ PresetRenderData loadPresetRenderData(const QString &presetName, const QString &
                 is.skipCurrentTag();
               }
             }
-            
-            // Check if this is the preset we're looking for
+
             if (name == wPresetName) {
               data.minThickness = minThick;
               data.maxThickness = maxThick;
-              data.hardness = hardness;
-              data.minOpacity = minOp;
-              data.maxOpacity = maxOp;
-              data.isPencil = (pencil != 0);
-              data.hasData = true;
+              data.hardness     = hardness;
+              data.minOpacity   = minOp;
+              data.maxOpacity   = maxOp;
+              data.isPencil     = (pencil != 0);
+              data.hasData      = true;
               is.matchEndTag();
-              return data;  // Found it!
+              return data;
             }
-            
+
             is.matchEndTag();
           } else {
             is.skipCurrentTag();
@@ -193,9 +251,8 @@ PresetRenderData loadPresetRenderData(const QString &presetName, const QString &
       }
     }
   } catch (...) {
-    // Failed to load - keep hasData = false
   }
-  
+
   return data;
 }
 }  // namespace
@@ -204,7 +261,13 @@ PresetRenderData loadPresetRenderData(const QString &presetName, const QString &
 // BrushPresetItem implementation
 //=============================================================================
 
-BrushPresetItem::BrushPresetItem(const QString &presetName, const QString &toolType, bool isListMode, bool useSampleStrokes, QWidget *parent)
+BrushPresetItem::BrushPresetItem(const QString &presetName,
+                                 const QString &toolType,
+                                 bool isListMode,
+                                 bool useSampleStrokes,
+                                 const QString &resolvedIconPath,
+                                 const PresetRenderData &preloadedData,
+                                 QWidget *parent)
     : QToolButton(parent)
     , m_presetName(presetName)
     , m_toolType(toolType)
@@ -217,59 +280,31 @@ BrushPresetItem::BrushPresetItem(const QString &presetName, const QString &toolT
     , m_checkboxVisible(false)
     , m_isMultiSelected(false)
     , m_useSampleStrokes(useSampleStrokes) {
-  
+
   setText(presetName);
   setCheckable(true);
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-  setMouseTracking(true);  // To detect hover
-  setAcceptDrops(true);    // Enable drag & drop
-  
-  // Load icon for this preset
-  QString customIconPath = findCustomPresetIcon(presetName);
-  if (!customIconPath.isEmpty()) {
-    setIconFromPath(customIconPath);
-    m_isCustomIcon = true;  // Mark as custom icon
+  setMouseTracking(true);
+  setAcceptDrops(true);
+
+  // Apply pre-resolved icon (no disk I/O here).
+  if (!resolvedIconPath.isEmpty()) {
+    setIconFromPath(resolvedIconPath);
+    m_isCustomIcon = true;
   } else {
     setDefaultIcon(toolType);
-    m_isCustomIcon = false;  // Generated icon
+    m_isCustomIcon = false;
   }
-  
-  // Load preset render data for dynamic fallback graphics
-  // (only needed if no custom icon is available)
-  if (customIconPath.isEmpty()) {
-    // Check if this is a Universal Size preset (format: "[Size] NNN")
-    if (presetName.startsWith("[Size] ") || presetName.startsWith("[Size ")) {
-      // Create synthetic render data for size preset
-      QString sizeStr = presetName;
-      sizeStr.remove("[Size] ").remove("[Size ").remove("]");
-      bool ok;
-      double size = sizeStr.toDouble(&ok);
-      if (ok) {
-        m_renderData.hasData = true;
-        m_renderData.maxThickness = size;
-        m_renderData.minThickness = size;
-        m_renderData.hardness = 100.0;
-        m_renderData.minOpacity = 100.0;
-        m_renderData.maxOpacity = 100.0;
-        m_renderData.isPencil = false;
-      }
-    } else {
-      // Regular brush preset - load from file
-      m_renderData = loadPresetRenderData(presetName, toolType);
-    }
-  }
-  
-  // Create scaled version of icon (FIXED)
+
+  // Use the pre-loaded render data (no file open here).
+  m_renderData = preloadedData;
+
   updateScaledIcon();
-  
+
   connect(this, &QPushButton::clicked, [this]() {
     emit presetSelected(m_presetName, m_toolType);
   });
-  
-  // Force repaint when checked state changes
-  connect(this, &QPushButton::toggled, [this](bool) {
-    update();
-  });
+  connect(this, &QPushButton::toggled, [this](bool) { update(); });
 }
 
 void BrushPresetItem::setListMode(bool isListMode) {
@@ -1447,14 +1482,26 @@ void BrushPresetPanel::disconnectSignals() {
 
 void BrushPresetPanel::showEvent(QShowEvent *e) {
   TPanel::showEvent(e);
-  
-  // Refresh brush preset commands to ensure they're up-to-date
+
+  // Reconnect signals immediately so the panel stays reactive.
   ToolPresetCommandManager::instance()->refreshPresetCommands();
-  
   connectSignals();
-  
-  // Initialize display with correct tool type detection
-  onToolSwitched();
+
+  // Detect the current tool type right now so that the label and tab
+  // state are correct before the first paint, but defer the heavyweight
+  // widget reconstruction (N file I/Os + N widget allocations) to the
+  // next event-loop iteration.  This keeps room switching instantaneous.
+  QString newToolType = detectCurrentToolType();
+  if (newToolType != m_currentToolType) {
+    m_currentToolType = newToolType;
+    initializeTabs();
+    // Update the tool label immediately so the panel doesn't look stale.
+    updateCheckedStates();
+  }
+
+  QTimer::singleShot(0, this, [this]() {
+    if (isVisible()) refreshPresetList();
+  });
 }
 
 void BrushPresetPanel::hideEvent(QHideEvent *e) {
@@ -1783,14 +1830,50 @@ void BrushPresetPanel::refreshPresetList() {
     }
   }
   
-  // Determine if we are in list mode
-  bool isListMode = (m_viewMode == ListView);
-  
-  // Determine if we are in GridSmall mode (for icon size adjustment)
+  bool isListMode  = (m_viewMode == ListView);
   bool isSmallMode = (m_viewMode == GridSmall);
-  
+
+  // Pre-load all preset render data with a SINGLE file open (O(N) instead of
+  // the previous O(N²) that opened and scanned the file for every preset).
+  // Only do this when sample strokes are enabled — otherwise the data is unused.
+  QHash<QString, PresetRenderData> allRenderData;
+  if (m_useSampleStrokes)
+    allRenderData = loadAllPresetRenderData(toolType);
+
+  // Pre-resolve custom icons in one batch pass (2 stat() calls per preset,
+  // done here outside the widget construction loop so it's amortised).
+  QHash<QString, QString> resolvedIcons;
+  for (const QString &presetName : presets)
+    resolvedIcons.insert(presetName, BrushPresetItem::findCustomPresetIcon(presetName));
+
   for (const QString &presetName : presets) {
-    BrushPresetItem *item = new BrushPresetItem(presetName, toolType, isListMode, m_useSampleStrokes, m_presetContainer);
+    // Retrieve pre-loaded data (no disk I/O inside the constructor).
+    const QString &iconPath = resolvedIcons.value(presetName);
+    PresetRenderData renderData;
+    if (iconPath.isEmpty()) {
+      // Size presets carry synthetic render data, not loaded from the file.
+      if (presetName.startsWith("[Size] ") || presetName.startsWith("[Size ")) {
+        QString sizeStr = presetName;
+        sizeStr.remove("[Size] ").remove("[Size ").remove("]");
+        bool ok;
+        double size = sizeStr.toDouble(&ok);
+        if (ok) {
+          renderData.hasData      = true;
+          renderData.maxThickness = size;
+          renderData.minThickness = size;
+          renderData.hardness     = 100.0;
+          renderData.minOpacity   = 100.0;
+          renderData.maxOpacity   = 100.0;
+          renderData.isPencil     = false;
+        }
+      } else {
+        renderData = allRenderData.value(presetName);
+      }
+    }
+
+    BrushPresetItem *item = new BrushPresetItem(
+        presetName, toolType, isListMode, m_useSampleStrokes,
+        iconPath, renderData, m_presetContainer);
     
     // Apply size according to mode (fixed height, flexible width)
     item->setMinimumSize(itemSize);
@@ -1943,6 +2026,7 @@ void BrushPresetPanel::addNewPreset() {
   }
   
   refreshPresetList();
+  ToolPresetCommandManager::instance()->markCommandsDirty();
   ToolPresetCommandManager::instance()->refreshPresetCommands();
 }
 
@@ -1977,6 +2061,7 @@ void BrushPresetPanel::removeCurrentPreset() {
   m_currentPreset = QString::fromStdWString(L"<custom>");
   m_removePresetButton->setEnabled(false);
   refreshPresetList();
+  ToolPresetCommandManager::instance()->markCommandsDirty();
   ToolPresetCommandManager::instance()->refreshPresetCommands();
 }
 
@@ -2034,11 +2119,9 @@ void BrushPresetPanel::reorderPreset(const QString &fromPreset, const QString &t
 //-----------------------------------------------------------------------------
 
 void BrushPresetPanel::onToolSwitched() {
-  // CRITICAL: Detect tool type FIRST, before initializing tabs
-  // Otherwise initializeTabs() loads pages for the OLD tool type
   QString newToolType = detectCurrentToolType();
-  
-  // Save previous page's selection before switching tool type
+
+  // Save previous selection before switching tool type.
   if (!m_currentToolType.isEmpty() && !m_currentPreset.isEmpty()) {
     BrushPresetPage *prevPage = getCurrentPage();
     if (prevPage) {
@@ -2046,25 +2129,24 @@ void BrushPresetPanel::onToolSwitched() {
       savePageConfiguration();
     }
   }
-  
+
   m_currentToolType = newToolType;
-  
-  // Now initialize tabs with the CORRECT tool type
+
+  // Rebuild tabs synchronously (lightweight — no file I/O).
   initializeTabs();
-  
-  // Refresh preset list for current page
-  refreshPresetList();
+
+  // Defer the heavy widget reconstruction so the level/tool switch feels instant.
+  QTimer::singleShot(0, this, [this]() {
+    if (isVisible()) refreshPresetList();
+  });
 }
 
 void BrushPresetPanel::onToolChanged() {
-  // CRITICAL: Check if tool type has changed (e.g., switching between
-  // vector and raster levels while keeping the same tool active).
-  // onToolSwitched() only fires when the tool itself changes,
-  // but onToolChanged() fires when the level type changes too.
+  // onToolChanged() fires both when the tool switches and when the level type
+  // changes (e.g., selecting a raster level while the brush tool stays active).
   QString newToolType = detectCurrentToolType();
   if (!newToolType.isEmpty() && newToolType != m_currentToolType) {
-    // Tool type changed (e.g., switched from vector level to raster level)
-    // Save previous page's selection
+    // Save the previous selection.
     if (!m_currentToolType.isEmpty() && !m_currentPreset.isEmpty()) {
       BrushPresetPage *prevPage = getCurrentPage();
       if (prevPage) {
@@ -2072,10 +2154,16 @@ void BrushPresetPanel::onToolChanged() {
         savePageConfiguration();
       }
     }
-    
+
     m_currentToolType = newToolType;
+
+    // Rebuild tabs synchronously (lightweight).
     initializeTabs();
-    refreshPresetList();
+
+    // Defer the heavy widget reconstruction so level switching feels instant.
+    QTimer::singleShot(0, this, [this]() {
+      if (isVisible()) refreshPresetList();
+    });
     return;
   }
   
@@ -2740,9 +2828,10 @@ void BrushPresetPanel::showPresetContextMenu(const QPoint &globalPos, const QStr
     m_currentPreset = QString::fromStdWString(L"<custom>");
     clearMultiSelection();
     refreshPresetList();
+    ToolPresetCommandManager::instance()->markCommandsDirty();
     ToolPresetCommandManager::instance()->refreshPresetCommands();
   });
-  
+
   // Rename (only for single selection)
   if (selCount == 1) {
     QAction *renameAction = menu.addAction(tr("Rename"));
@@ -2861,6 +2950,7 @@ void BrushPresetPanel::pastePresetsToCurrentPage() {
   m_clipboardPresets.clear();
   savePageConfiguration();
   refreshPresetList();
+  ToolPresetCommandManager::instance()->markCommandsDirty();
   ToolPresetCommandManager::instance()->refreshPresetCommands();
 }
 
@@ -2995,8 +3085,9 @@ void BrushPresetPanel::renamePreset(const QString &oldName, const QString &newNa
   m_currentPreset = newName;
   savePageConfiguration();
   refreshPresetList();
+  ToolPresetCommandManager::instance()->markCommandsDirty();
   ToolPresetCommandManager::instance()->refreshPresetCommands();
-  
+
   // Apply the renamed preset
   applyPreset(newName);
 }
@@ -3038,6 +3129,7 @@ void BrushPresetPanel::deleteSelectedPresets() {
   m_currentPreset = QString::fromStdWString(L"<custom>");
   clearMultiSelection();
   refreshPresetList();
+  ToolPresetCommandManager::instance()->markCommandsDirty();
   ToolPresetCommandManager::instance()->refreshPresetCommands();
 }
 
@@ -3223,7 +3315,7 @@ void BrushPresetPanel::deletePage(int pageIndex) {
   }
   switchToPage(m_currentPageIndex);
   
-  // Refresh commands
+  ToolPresetCommandManager::instance()->markCommandsDirty();
   ToolPresetCommandManager::instance()->refreshPresetCommands();
 }
 

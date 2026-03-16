@@ -762,11 +762,14 @@ public:
 //-----------------------------------------------------------------------------
 
 ToolPresetCommandManager::ToolPresetCommandManager()
-    : QObject(), m_initialized(false), m_presetActionGroup(nullptr), m_sizeActionGroup(nullptr) {
-  // Create action groups for mutual exclusivity
+    : QObject()
+    , m_initialized(false)
+    , m_commandsDirty(true)
+    , m_presetActionGroup(nullptr)
+    , m_sizeActionGroup(nullptr) {
   m_presetActionGroup = new QActionGroup(this);
   m_presetActionGroup->setExclusive(true);
-  
+
   m_sizeActionGroup = new QActionGroup(this);
   m_sizeActionGroup->setExclusive(true);
 }
@@ -797,94 +800,85 @@ void ToolPresetCommandManager::initialize() {
 void ToolPresetCommandManager::registerToolPresetCommands() {
   MainWindow* mainWindow = dynamic_cast<MainWindow*>(TApp::instance()->getMainWindow());
   if (!mainWindow) return;
-  
-  // === Auto-create icons directory if it doesn't exist ===
+
+  // Ensure the icons directory exists (one stat per full registration, not per preset).
   TFilePath iconFolder = TEnv::getStuffDir() + "library" + "brushpreseticons";
   if (!TFileStatus(iconFolder).doesExist()) {
     try {
       TSystem::mkDir(iconFolder);
-    } catch (...) {
-      // If directory creation fails, continue anyway (icons will use defaults)
-    }
+    } catch (...) {}
   }
-  
+
+  // Read the preference once — avoids opening QSettings N times inside the loop.
+  const bool sampleStrokes = useSampleStrokesEnabled();
+
   QSet<QString> currentPresets;
-  
-  // Process all supported brush tools
+
   for (const BrushToolConfig& config : BRUSH_TOOLS) {
     QList<QString> presets = getPresetsFromTool(config.toolId, config.targetType);
-    
-    // Register new presets for this tool
+
     for (const QString& presetName : presets) {
       QString commandId = config.commandPrefix + presetName;
       currentPresets.insert(commandId);
-      
-      // Check if already registered
+
       QAction* existingAction = CommandManager::instance()->getAction(
           commandId.toStdString().c_str(), false);
       if (existingAction) {
-        // Update icon - check for custom icon first, then dynamic, then default
+        // Refresh the icon in case the sample-strokes preference changed.
+        // This runs only when the dirty flag was set, so it is not a hot path.
         QString customIconPath = findCustomPresetIcon(presetName);
-        
         if (!customIconPath.isEmpty()) {
           existingAction->setIcon(QIcon(customIconPath));
-        } else if (useSampleStrokesEnabled()) {
-          // Dynamic sample stroke icon
+        } else if (sampleStrokes) {
           QString toolType = toolTypeFromPrefix(config.commandPrefix);
           BrushRenderInfo rInfo = loadBrushRenderInfo(presetName, toolType);
-          if (rInfo.found) {
-            QPixmap px = generateDynamicBrushIcon(rInfo, 32);
-            existingAction->setIcon(QIcon(px));
-          } else if (config.iconName && *config.iconName) {
+          if (rInfo.found)
+            existingAction->setIcon(QIcon(generateDynamicBrushIcon(rInfo, 32)));
+          else if (config.iconName && *config.iconName)
             existingAction->setIcon(createQIcon(config.iconName, true));
-          }
         } else if (config.iconName && *config.iconName) {
           existingAction->setIcon(createQIcon(config.iconName, true));
         }
         continue;
       }
-      
+
+      // New preset — create and register the QAction.
       QString displayName = config.displayPrefix + presetName;
       QAction* action = new DVAction(displayName, mainWindow);
-      
-      // Make the action checkable for visual feedback in Custom Panels
       action->setCheckable(true);
-      action->setChecked(false);  // Default unchecked
-      
+      action->setChecked(false);
+
       // Priority 1: Custom icon  ->  2: Dynamic stroke  ->  3: Default icon
       QString customIconPath = findCustomPresetIcon(presetName);
       const char* iconNameToRegister = config.iconName;
-      
+
       if (!customIconPath.isEmpty()) {
         action->setIcon(QIcon(customIconPath));
-      } else if (useSampleStrokesEnabled()) {
-        // Generate a sample-stroke icon dynamically
+      } else if (sampleStrokes) {
         QString toolType = toolTypeFromPrefix(config.commandPrefix);
         BrushRenderInfo rInfo = loadBrushRenderInfo(presetName, toolType);
         if (rInfo.found) {
-          QPixmap px = generateDynamicBrushIcon(rInfo, 32);
-          action->setIcon(QIcon(px));
+          action->setIcon(QIcon(generateDynamicBrushIcon(rInfo, 32)));
         } else if (config.iconName && *config.iconName) {
           action->setIcon(createQIcon(config.iconName));
         }
       } else if (config.iconName && *config.iconName) {
         action->setIcon(createQIcon(config.iconName));
       }
-      
+
       mainWindow->addAction(action);
-      
-      // Add action to preset action group for mutual exclusivity
+
       if (m_presetActionGroup) {
         m_presetActionGroup->addAction(action);
       }
-      
+
       CommandManager::instance()->define(
           commandId.toStdString().c_str(),
-          BrushPresetCommandType,  // Tool Modifiers/Brush Presets category
+          BrushPresetCommandType,
           "",
           action,
           iconNameToRegister);
-      
+
       CommandManager::instance()->setHandler(
           commandId.toStdString().c_str(),
           new BrushPresetHandler(config.toolId, presetName));
@@ -944,8 +938,17 @@ void ToolPresetCommandManager::registerToolPresetCommands() {
 
 //-----------------------------------------------------------------------------
 
+void ToolPresetCommandManager::markCommandsDirty() {
+  m_commandsDirty = true;
+}
+
+//-----------------------------------------------------------------------------
+
 void ToolPresetCommandManager::refreshPresetCommands() {
-  // Simply re-register all commands (new ones will be added, existing ones skipped)
+  // Only rebuild commands when the preset list has actually changed.
+  // This prevents O(N*disk) I/O on every room switch when nothing changed.
+  if (!m_commandsDirty) return;
+  m_commandsDirty = false;
   registerToolPresetCommands();
 }
 
@@ -954,103 +957,91 @@ void ToolPresetCommandManager::refreshPresetCommands() {
 void ToolPresetCommandManager::registerSizeCommands() {
   MainWindow* mainWindow = dynamic_cast<MainWindow*>(TApp::instance()->getMainWindow());
   if (!mainWindow) return;
-  
-  // === Auto-create icons directory if it doesn't exist ===
+
   TFilePath iconFolder = TEnv::getStuffDir() + "library" + "brushpreseticons";
   if (!TFileStatus(iconFolder).doesExist()) {
     try {
       TSystem::mkDir(iconFolder);
-    } catch (...) {
-      // If directory creation fails, continue anyway (icons will use defaults)
-    }
+    } catch (...) {}
   }
-  
+
+  // Read the preference once — avoids opening QSettings N times inside the loop.
+  const bool sampleStrokes = useSampleStrokesEnabled();
+
   QSet<QString> currentSizes;
-  
-  // Register commands for each fixed size
+
   const int numSizes = sizeof(FIXED_SIZES) / sizeof(FIXED_SIZES[0]);
   for (int i = 0; i < numSizes; ++i) {
     double size = FIXED_SIZES[i];
-    
-    // Create command ID and display name
+
     QString sizeStr = QString::number(size);
-    if (sizeStr.contains('.')) {
-      sizeStr.replace('.', '_');  // Replace decimal point with underscore for ID
-    }
+    if (sizeStr.contains('.')) sizeStr.replace('.', '_');
     QString commandId = "MI_ToolSize_" + sizeStr;
     currentSizes.insert(commandId);
-    
-    // Check if already registered
+
     QAction* existingAction = CommandManager::instance()->getAction(
         commandId.toStdString().c_str(), false);
     if (existingAction) {
-      // Update icon if custom one is available, or use dynamic rendering
+      // Refresh icon when sample-strokes preference changed (dirty-flag run only).
       QString iconName = "size_" + QString::number(size);
       QString customIconPath = findCustomPresetIcon(iconName);
-      
-      if (!customIconPath.isEmpty()) {
+      if (!customIconPath.isEmpty())
         existingAction->setIcon(QIcon(customIconPath));
-      } else if (useSampleStrokesEnabled()) {
-        // Use dynamic rendering
-        QPixmap pixmap = generateDynamicSizeIcon(size, 32);
-        existingAction->setIcon(QIcon(pixmap));
-      }
+      else if (sampleStrokes)
+        existingAction->setIcon(QIcon(generateDynamicSizeIcon(size, 32)));
+      else
+        existingAction->setIcon(createQIcon("thickness"));
       continue;
     }
-    
-    // Create display name
+
     QString displayName = "[Size] " + QString::number(size);
     QAction* action = new DVAction(displayName, mainWindow);
-    
-    // Make the action checkable for visual feedback in Custom Panels
     action->setCheckable(true);
-    action->setChecked(false);  // Default unchecked
-    
-    // Try to find custom icon (e.g., size_50.svg)
+    action->setChecked(false);
+
     QString iconName = "size_" + QString::number(size);
     QString customIconPath = findCustomPresetIcon(iconName);
-    
+
     if (!customIconPath.isEmpty()) {
-      // Custom icon found - use it
       action->setIcon(QIcon(customIconPath));
-    } else if (useSampleStrokesEnabled()) {
-      // Use dynamic rendering (circle with number)
-      QPixmap pixmap = generateDynamicSizeIcon(size, 32);
-      action->setIcon(QIcon(pixmap));
+    } else if (sampleStrokes) {
+      action->setIcon(QIcon(generateDynamicSizeIcon(size, 32)));
     } else {
-      // Use generic thickness icon
       action->setIcon(createQIcon("thickness"));
     }
-    
+
     mainWindow->addAction(action);
-    
-    // Add action to size action group for mutual exclusivity
+
     if (m_sizeActionGroup) {
       m_sizeActionGroup->addAction(action);
     }
-    
+
     CommandManager::instance()->define(
         commandId.toStdString().c_str(),
-        BrushSizeCommandType,  // Tool Modifiers/Brush Sizes category
+        BrushSizeCommandType,
         "",
         action,
-        "thickness");  // Default icon name
-    
+        "thickness");
+
     CommandManager::instance()->setHandler(
         commandId.toStdString().c_str(),
         new ToolSizeHandler(size));
   }
-  
+
   m_registeredSizeIds = currentSizes;
 }
 
 //-----------------------------------------------------------------------------
 
 void ToolPresetCommandManager::refreshSizeCommands() {
-  // Re-register size commands (updates icons for dynamic rendering mode)
+  // Regenerate both size and preset command icons to reflect the current
+  // sample-strokes preference.  Force the dirty flag so registerToolPresetCommands
+  // actually runs (it would be a no-op otherwise after a previous refresh).
+  m_commandsDirty = true;
   registerSizeCommands();
-  // Also refresh brush preset icons to match the current rendering mode
+  m_commandsDirty = true;
   registerToolPresetCommands();
+  m_commandsDirty = false;
 }
 
 //-----------------------------------------------------------------------------

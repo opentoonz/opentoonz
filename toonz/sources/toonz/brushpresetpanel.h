@@ -74,7 +74,13 @@ class BrushPresetItem : public QToolButton {
   QPoint m_dragStartPosition;
   
 public:
-  BrushPresetItem(const QString &presetName, const QString &toolType, bool isListMode, bool useSampleStrokes, QWidget *parent = nullptr);
+  // Primary constructor: caller provides pre-resolved icon path and render data.
+  // No disk I/O is performed — use this in loops via refreshPresetList().
+  BrushPresetItem(const QString &presetName, const QString &toolType,
+                  bool isListMode, bool useSampleStrokes,
+                  const QString &resolvedIconPath,
+                  const PresetRenderData &preloadedData,
+                  QWidget *parent = nullptr);
   
   QString getPresetName() const { return m_presetName; }
   QString getToolType() const { return m_toolType; }
@@ -92,7 +98,10 @@ public:
   
   // Update scaled icon (cache) according to current size
   void updateScaledIcon();
-  
+
+  // Static so it can be called from refreshPresetList() without an instance.
+  static QString findCustomPresetIcon(const QString &presetName);
+
 protected:
   void paintEvent(QPaintEvent *event) override;
   QSize sizeHint() const override;
@@ -104,9 +113,8 @@ protected:
   void dragEnterEvent(QDragEnterEvent *event) override;
   void dragMoveEvent(QDragMoveEvent *event) override;
   void dropEvent(QDropEvent *event) override;
-  
+
 private:
-  QString findCustomPresetIcon(const QString &presetName);
   void drawDynamicFallback(QPainter &painter, const QRect &iconRect) const;
   
 signals:
