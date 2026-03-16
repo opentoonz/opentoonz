@@ -1994,6 +1994,14 @@ void BrushToolOptionsBox::filterControls() {
     return;
   }
 
+  // Skip all setVisible() calls — and the Qt layout recalculation they
+  // trigger — when the modifier-visibility state has not actually changed.
+  // Each BrushToolOptionsBox instance is cached per TTool* by ToolOptions,
+  // so repeated switches back to the same level+tool type are free.
+  if (m_filterInitialized && showModifiers == m_lastShowModifiers) return;
+  m_filterInitialized = true;
+  m_lastShowModifiers = showModifiers;
+
   for (QMap<std::string, QLabel *>::iterator it = m_labels.begin();
        it != m_labels.end(); it++) {
     bool isModifier = (it.key().substr(0, 8) == "Modifier");
