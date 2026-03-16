@@ -1238,6 +1238,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
     addMenuItem(newMenu, MI_NewToonzRasterLevel);
     addMenuItem(newMenu, MI_NewVectorLevel);
     addMenuItem(newMenu, MI_NewRasterLevel);
+    addMenuItem(newMenu, MI_NewMetaLevel);
     addMenuItem(newMenu, MI_NewNoteLevel);
   }
   addMenuItem(levelMenu, MI_LoadLevel);

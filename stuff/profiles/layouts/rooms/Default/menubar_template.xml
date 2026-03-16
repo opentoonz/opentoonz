@@ -107,6 +107,7 @@
             <command>MI_NewToonzRasterLevel</command>
             <command>MI_NewVectorLevel</command>
             <command>MI_NewRasterLevel</command>
+            <command>MI_NewMetaLevel</command>
             <command>MI_NewNoteLevel</command>
         </menu>
         <command>MI_LoadLevel</command>
