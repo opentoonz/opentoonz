@@ -17,6 +17,10 @@
 #include "toonzqt/doublefield.h"
 #include "historytypes.h"
 
+// TnzTools includes
+#include "tools/assistant.h"
+#include "tools/editassistantstool.h"
+
 // TnzLib includes
 #include "toonz/toonzscene.h"
 #include "toonz/txsheet.h"
@@ -650,9 +654,33 @@ bool LevelCreatePopup::apply() {
 
     if (lType == PLI_XSHLEVEL) {
       sl->setFrame(fid, new TVectorImage());
-    } else if (lType == META_XSHLEVEL) {
-      sl->setFrame(fid, new TMetaImage());
-    } else if (lType == TZP_XSHLEVEL) {
+    else if (lType == META_XSHLEVEL) {
+      TImageP metaImg(new TMetaImage());
+      // Add default assistant to first frame only when Auto-Switch & Keep is
+      // enabled and a type is memorized
+      if (i == from &&
+          isEditAssistantsAutoSwitchAndKeepEnabled()) {
+        QString defType = Preferences::instance()->getDefAssistantType();
+        if (!defType.isEmpty()) {
+          TStringId typeId = TStringId::find(defType.toStdString());
+          if (TMetaObject::findType(typeId)) {
+            TMetaObjectP object(new TMetaObject(typeId));
+            if (TAssistantBase *assistant =
+                    object->getHandler<TAssistantBase>()) {
+              assistant->setDefaults();
+              assistant->move(TPointD(0, 0));
+              if (TMetaImage *metaImage =
+                      dynamic_cast<TMetaImage *>(metaImg.getPointer())) {
+                TMetaImage::Writer writer(*metaImage);
+                writer->push_back(object);
+              }
+            }
+          }
+        }
+      }
+      sl->setFrame(fid, metaImg);
+    }
+    else if (lType == TZP_XSHLEVEL) {
       TRasterCM32P raster(xres, yres);
       raster->fill(TPixelCM32());
       TToonzImageP ti(raster, TRect());
