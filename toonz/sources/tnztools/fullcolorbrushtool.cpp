@@ -782,8 +782,10 @@ void FullColorBrushTool::loadPreset() {
         TPaletteHandle *paletteHandle =
             app->getPaletteController()->getCurrentLevelPalette();
         TPalette *palette = paletteHandle ? paletteHandle->getPalette() : nullptr;
-        if (palette) {
-            int styleIndex = app->getCurrentLevelStyleIndex();
+        int styleIndex = app ? app->getCurrentLevelStyleIndex() : 0;
+        // Style 0 is the transparent/eraser style and must never be
+        // overwritten, matching the Level Palette protection rules.
+        if (palette && styleIndex >= 1) {
             TColorStyle *currentStyle = palette->getStyle(styleIndex);
             TPixel32 currentColor = TPixel32::Black;
             if (currentStyle) {
