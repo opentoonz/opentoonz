@@ -1784,8 +1784,10 @@ void ToonzVectorBrushTool::loadPreset() {
       TApplication *app = getApplication();
       if (app && app->getCurrentPalette()) {
         TPalette *palette = app->getCurrentPalette()->getPalette();
-        if (palette) {
-          int styleIndex = app->getCurrentLevelStyleIndex();
+        int styleIndex = app->getCurrentLevelStyleIndex();
+        // Style 0 is the transparent/eraser style and must never be
+        // overwritten, matching the Level Palette protection rules.
+        if (palette && styleIndex >= 1) {
           TColorStyle *currentStyle = palette->getStyle(styleIndex);
           TPixel32 currentColor = TPixel32::Black;
           if (currentStyle) {
