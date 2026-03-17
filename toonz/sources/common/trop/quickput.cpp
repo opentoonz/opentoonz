@@ -4027,20 +4027,18 @@ void doQuickPutCmapped(const TRaster32P &dn, const TRasterCM32P &up,
       (aff * TRectD(-0.5, -0.5, up->getLx() - 0.5, up->getLy() - 0.5));
   if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
     return;
-  int yMin = std::max(tfloor(boundingBoxD.y0), 0);
-  int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
-  int xMin = std::max(tfloor(boundingBoxD.x0), 0);
-  int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
-
+  int yMin       = std::max(tfloor(boundingBoxD.y0), 0);
+  int yMax       = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
+  int xMin       = std::max(tfloor(boundingBoxD.x0), 0);
+  int xMax       = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
   TAffine invAff = inv(aff);
   int deltaXL    = tround(invAff.a11 * (1 << PADN));
   int deltaYL    = tround(invAff.a21 * (1 << PADN));
   if ((deltaXL == 0) && (deltaYL == 0)) return;
-  int lxPred = up->getLx() * (1 << PADN) - 1;
-  int lyPred = up->getLy() * (1 << PADN) - 1;
-  int dnWrap = dn->getWrap();
-  int upWrap = up->getWrap();
-
+  int lxPred     = up->getLx() * (1 << PADN) - 1;
+  int lyPred     = up->getLy() * (1 << PADN) - 1;
+  int dnWrap     = dn->getWrap();
+  int upWrap     = up->getWrap();
   int styleCount = palette->getStyleCount();
   std::vector<TPixel32> paints(styleCount);
   std::vector<TPixel32> inks(styleCount);
@@ -4065,11 +4063,32 @@ void doQuickPutCmapped(const TRaster32P &dn, const TRasterCM32P &up,
           palette->getStyle(i)->getAverageColor(), s.m_globalColorScale);
   }
 
+  // --- Neutralize check colors when the checks are disabled ---
+  TRop::CmappedQuickputSettings effectiveSettings = s;  // copy of settings
+
+  if (!effectiveSettings.m_inkCheckEnabled &&
+      effectiveSettings.m_inkIndex >= 0 &&
+      effectiveSettings.m_inkIndex < styleCount) {
+    effectiveSettings.m_inkCheckColor = inks[effectiveSettings.m_inkIndex];
+  }
+  if (!effectiveSettings.m_ink1CheckEnabled && 1 < styleCount) {
+    effectiveSettings.m_ink1CheckColor = inks[1];
+  }
+  if (!effectiveSettings.m_paintCheckEnabled &&
+      effectiveSettings.m_paintIndex >= 0 &&
+      effectiveSettings.m_paintIndex < styleCount) {
+    effectiveSettings.m_paintCheckColor =
+        paints[effectiveSettings.m_paintIndex];
+  }
+
   dn->lock();
   up->lock();
 
   TPixel32 *dnRow       = dn->pixels(yMin);
   TPixelCM32 *upBasePix = up->pixels();
+
+  // We will use effectiveSettings in the loop
+  const TRop::CmappedQuickputSettings &settings = effectiveSettings;
 
   for (int y = yMin; y <= yMax; y++, dnRow += dnWrap) {
     TPointD a = invAff * TPointD(xMin, y);
@@ -4113,8 +4132,9 @@ void doQuickPutCmapped(const TRaster32P &dn, const TRasterCM32P &up,
       yL += deltaYL;
       int xI = xL >> PADN;
       int yI = yL >> PADN;
-      assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) &&
-             (yI <= up->getLy() - 1));
+      if (xI < 0 || xI >= up->getLx() || yI < 0 || yI >= up->getLy()) {
+        continue;
+      }
 
       TPixelCM32 *upPix = upBasePix + (yI * upWrap + xI);
       int t             = upPix->getTone();
@@ -4130,90 +4150,81 @@ void doQuickPutCmapped(const TRaster32P &dn, const TRasterCM32P &up,
 
       TPixel32 colorUp;
 
-      if (s.m_inksOnly) {
+      //=============================================================================
+      // UNIFIED INK COLOR
+      //=============================================================================
+      TPixel inkColor;
+
+      // If it's Style 1, we decide which button "rules" it now
+      if (i_valid == 1) {
+        if (settings.m_inkCheckEnabled && settings.m_inkIndex == 1) {
+          // If style 1 is selected AND the general check is ON, it rules
+          inkColor = settings.m_inkCheckColor;
+        } else {
+          // Otherwise (Check1 on or normal color), Check1 has priority
+          inkColor = settings.m_ink1CheckColor;
+        }
+      }
+      // If it's not style 1, but is the selected one
+      else if (i_valid == settings.m_inkIndex) {
+        inkColor = settings.m_inkCheckColor;
+      }
+      // Common styles
+      else if (i_valid >= 0) {
+        inkColor = inks[i_valid];
+      } else {
+        inkColor = TPixel::Transparent;
+      }
+
+      //=============================================================================
+      // COLOR CALCULATION (Inks Only or Normal)
+      //=============================================================================
+      if (settings.m_inksOnly) {
+        // ------------------- INKS ONLY MODE -------------------
         if (t == 0) {
-          if (i_valid == s.m_inkIndex)
-            colorUp = s.m_inkCheckColor;
-          else if (s.m_inkCheckEnabled && i_valid == s.m_inkIndex)
-            colorUp = s.m_inkCheckColor;
-          else if (s.m_ink1CheckEnabled && i_valid == 1)
-            colorUp = s.m_ink1CheckColor;
-          else if (i_valid >= 0)
-            colorUp = inks[i_valid];
-          else
-            colorUp = TPixel::Transparent;
+          colorUp = inkColor;
         } else if (t == 255) {
           colorUp = TPixel::Transparent;
         } else {
-          TPixel inkColor;
-          if (i_valid == s.m_inkIndex)
-            inkColor = s.m_inkCheckColor;
-          else if (s.m_inkCheckEnabled && i_valid == s.m_inkIndex)
-            inkColor = s.m_inkCheckColor;
-          else if (s.m_ink1CheckEnabled && i_valid == 1)
-            inkColor = s.m_ink1CheckColor;
-          else if (i_valid >= 0)
-            inkColor = inks[i_valid];
-          else
-            inkColor = TPixel::Transparent;
-
-          if (p_valid == 0 && s.m_transparencyCheck) t = t / 2;
-
+          // Anti-aliased border: uses the inkColor decided above
+          if (p_valid == 0 && settings.m_transparencyCheck) t = t / 2;
           colorUp = antialias(inkColor, 255 - t);
         }
       } else {
+        //  -------- NORMAL MODE (blend ink + paint) --------
         if (t == 0) {
-          if (i_valid == s.m_inkIndex)
-            colorUp = s.m_inkCheckColor;
-          else if (s.m_inkCheckEnabled && i_valid == s.m_inkIndex)
-            colorUp = s.m_inkCheckColor;
-          else if (s.m_ink1CheckEnabled && i_valid == 1)
-            colorUp = s.m_ink1CheckColor;
-          else if (i_valid >= 0)
-            colorUp = inks[i_valid];
-          else
-            colorUp = TPixel::Transparent;
+          colorUp = inkColor;
         } else if (t == 255) {
-          if (p_valid == s.m_paintIndex)
-            colorUp = s.m_paintCheckColor;
-          else if (s.m_paintCheckEnabled && p_valid == s.m_paintIndex)
-            colorUp = s.m_paintCheckColor;
+          // Solid paint pixel
+          if (settings.m_paintCheckEnabled && p_valid == settings.m_paintIndex)
+            colorUp = settings.m_paintCheckColor;
           else if (p_valid >= 0)
             colorUp = paints[p_valid];
           else
             colorUp = TPixel::Transparent;
         } else {
-          TPixel inkColor;
-          if (i_valid == s.m_inkIndex)
-            inkColor = s.m_inkCheckColor;
-          else if (s.m_inkCheckEnabled && i_valid == s.m_inkIndex)
-            inkColor = s.m_inkCheckColor;
-          else if (s.m_ink1CheckEnabled && i_valid == 1)
-            inkColor = s.m_ink1CheckColor;
-          else if (i_valid >= 0)
-            inkColor = inks[i_valid];
-          else
-            inkColor = TPixel::Transparent;
-
-          TPixel paintColor;
-          if (p_valid == s.m_paintIndex)
-            paintColor = s.m_paintCheckColor;
-          else if (s.m_paintCheckEnabled && p_valid == s.m_paintIndex)
-            paintColor = s.m_paintCheckColor;
+          // Anti-aliased border (blend ink + paint)
+          TPixel32 paintColor;
+          if (settings.m_paintCheckEnabled && p_valid == settings.m_paintIndex)
+            paintColor = settings.m_paintCheckColor;
           else if (p_valid >= 0)
             paintColor = paints[p_valid];
           else
             paintColor = TPixel::Transparent;
 
-          if (p_valid == 0 && s.m_transparencyCheck)
+          if (p_valid == 0 && settings.m_transparencyCheck)
             paintColor = TPixel::Transparent;
 
-          if (s.m_transparencyCheck) t = t / 2;
+          if (settings.m_transparencyCheck) t = t / 2;
 
+          // Blend using the consistent inkColor
           colorUp = blend(inkColor, paintColor, t, TPixelCM32::getMaxTone());
         }
       }
 
+      //=============================================================================
+      // FINAL BLEND
+      //=============================================================================
       if (colorUp.m == 255)
         *dnPix = colorUp;
       else if (colorUp.m != 0)
