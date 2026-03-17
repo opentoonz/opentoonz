@@ -651,10 +651,9 @@ bool LevelCreatePopup::apply() {
 
   for (int i = from; i <= to; i += inc) {
     TFrameId fid(i);
-
     if (lType == PLI_XSHLEVEL) {
       sl->setFrame(fid, new TVectorImage());
-    else if (lType == META_XSHLEVEL) {
+    } else if (lType == META_XSHLEVEL) {
       TImageP metaImg(new TMetaImage());
       // Add default assistant to first frame only when Auto-Switch & Keep is
       // enabled and a type is memorized
