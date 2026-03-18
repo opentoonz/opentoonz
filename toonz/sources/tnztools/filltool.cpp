@@ -1986,7 +1986,7 @@ FillTool::FillTool(int targetType)
     , m_autopaintLines("Autopaint Lines", true)
     , m_referFill("Refer Fill", false)
     , m_extendFill("Extend Fill", true)
-    , m_savebox("Savebox", Preferences::instance()->getFillOnlySavebox())
+    , m_savebox("Savebox", false)
 {
   m_areaFillTool       = new AreaFillTool(this);
   m_normalLineFillTool = new NormalLineFillTool(this);
@@ -2436,7 +2436,9 @@ void FillTool::resetMulti(bool resetAreaFiller) {
 bool FillTool::onPropertyChanged(std::string propertyName, bool addToUndo) {
 
   bool rectPropChangedflag = false;
+
   if (propertyName == m_savebox.getName()) {
+  Preferences::instance()->setValue(FillOnlysavebox, m_savebox.getValue());
   notifyImageChanged();
 }
 
