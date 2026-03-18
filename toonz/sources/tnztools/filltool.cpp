@@ -2251,57 +2251,65 @@ void FillTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
     return;
   }
 
-  /*-- Below, for NormalFill --*/
-  TTool::Application *app = TTool::getApplication();
-  if (!app) return;
-  Preferences::instance()->setValue(FillOnlysavebox, m_savebox.getValue());
-  FillParameters params = getFillParameters();
-  if (m_onion.getValue() &&
-      app->getCurrentOnionSkin()->getOnionSkinMask().isEnabled() &&
-      !app->getCurrentOnionSkin()->getOnionSkinMask().isEmpty()) {
-    m_onionStyleId = pickOnionColor(pos);
-    if (m_onionStyleId > 0) app->setCurrentLevelStyleIndex(m_onionStyleId);
-    return;
-  }
-  buildFillInfo(params);
-  if (!m_frameRange.getValue()) {
-    auto fid = getCurrentFid();
-    TRaster32P Ref =
-        m_level ? m_refImgTable[m_level->getImageId(fid, 0)] : TRaster32P();
-    doRefFill(getImage(true), Ref, pos, params, e.isShiftPressed(),
-              m_level.getPointer(), fid, m_autopaintLines.getValue());
-    invalidate();
-  } else if (!m_firstFrameSelected)
-    m_firstFrameSelected = true;
-  else if (!m_slFidsPairs.empty()) {  // Multi
-    // When using tablet on windows, the mouse press event may be called AFTER
-    // tablet release. It causes unwanted another "first click" just after
-    // frame-range-filling. Calling processEvents() here to make sure to
-    // consume the mouse press event in advance.
-    qApp->processEvents();
-    // SECOND CLICK
-    MultiFiller filler(m_refImgTable, m_firstPoint, pos, params,
-                       m_autopaintLines.getValue());
-    filler.setSelectionUndo(new FillToolSelectionUndo(
-        m_beginCell.row, m_beginCell.col, m_slFidsPairs[0].first,
-        m_slFidsPairs[0].second));
-    filler.processSequence(m_slFidsPairs);
+ /*-- Below, for NormalFill --*/
+TTool::Application *app = TTool::getApplication();
+if (!app) return;
 
-    if (e.isShiftPressed()) {
-      m_firstPoint   = pos;
-      m_firstFrameId = getCurrentFid();
-      m_beginCell    = {getColumnIndex(), getFrame()};
+FillParameters params = getFillParameters();
+params.m_fillOnlySavebox = m_savebox.getValue();  
+
+if (m_onion.getValue() &&
+    app->getCurrentOnionSkin()->getOnionSkinMask().isEnabled() &&
+    !app->getCurrentOnionSkin()->getOnionSkinMask().isEmpty()) {
+  m_onionStyleId = pickOnionColor(pos);
+  if (m_onionStyleId > 0)
+    app->setCurrentLevelStyleIndex(m_onionStyleId);
+  return;
+}
+
+buildFillInfo(params);
+
+if (!m_frameRange.getValue()) {
+  auto fid = getCurrentFid();
+  TRaster32P Ref =
+      m_level ? m_refImgTable[m_level->getImageId(fid, 0)] : TRaster32P();
+
+  doRefFill(getImage(true), Ref, pos, params, e.isShiftPressed(),
+            m_level.getPointer(), fid, m_autopaintLines.getValue());
+
+  invalidate();
+}
+else if (!m_firstFrameSelected)
+  m_firstFrameSelected = true;
+else if (!m_slFidsPairs.empty()) {  // Multi
+  qApp->processEvents();
+
+  MultiFiller filler(m_refImgTable, m_firstPoint, pos, params,
+                     m_autopaintLines.getValue());
+
+  filler.setSelectionUndo(new FillToolSelectionUndo(
+      m_beginCell.row, m_beginCell.col, m_slFidsPairs[0].first,
+      m_slFidsPairs[0].second));
+
+  filler.processSequence(m_slFidsPairs);
+
+  if (e.isShiftPressed()) {
+    m_firstPoint   = pos;
+    m_firstFrameId = getCurrentFid();
+    m_beginCell    = {getColumnIndex(), getFrame()};
+  } else {
+    if (app->getCurrentFrame()->isEditingScene()) {
+      app->getCurrentColumn()->setColumnIndex(m_beginCell.col);
+      app->getCurrentFrame()->setFrame(m_beginCell.row);
     } else {
-      if (app->getCurrentFrame()->isEditingScene()) {
-        app->getCurrentColumn()->setColumnIndex(m_beginCell.col);
-        app->getCurrentFrame()->setFrame(m_beginCell.row);
-      } else
-        app->getCurrentFrame()->setFid(m_firstFrameId);
-      resetMulti();
+      app->getCurrentFrame()->setFid(m_firstFrameId);
     }
-    TTool *t = app->getCurrentTool()->getTool();
-    if (t) t->notifyImageChanged();
+    resetMulti();
   }
+
+  TTool *t = app->getCurrentTool()->getTool();
+  if (t) t->notifyImageChanged();
+}
 }
 
 //-----------------------------------------------------------------------------
