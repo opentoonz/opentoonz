@@ -2436,9 +2436,7 @@ void FillTool::resetMulti(bool resetAreaFiller) {
 bool FillTool::onPropertyChanged(std::string propertyName, bool addToUndo) {
 
   bool rectPropChangedflag = false;
-
   if (propertyName == m_savebox.getName()) {
-  Preferences::instance()->setValue(FillOnlysavebox, m_savebox.getValue());
   notifyImageChanged();
 }
 
