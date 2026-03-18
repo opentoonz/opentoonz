@@ -1,7 +1,8 @@
 # Developing Stylesheets
 Stylesheets are written with [LESS](http://lesscss.org/), which is a dynamic preprocessor stylesheet language that can be compiled into Qt stylesheets.
 
-ℹ️ [LESS Functions](http://lesscss.org/functions/)
+> [!TIP]
+> List of [LESS Functions](http://lesscss.org/functions/).
 
 ## Recommended Setup
 
@@ -23,7 +24,8 @@ A `settings.json` file is already included to ensure developers work to the same
 }
 ```
 
-ℹ️ [How to Change Settings in Visual Studio Code](https://code.visualstudio.com/docs/getstarted/settings).
+> [!TIP]
+> [How to Change Settings in Visual Studio Code](https://code.visualstudio.com/docs/getstarted/settings).
 
 ### Linux
 
@@ -100,9 +102,10 @@ Example:
 @border-color: darken(@bg-color, 15%);
 ```
 
-If a theme overrides `@bg`, all derived colors automatically update. This keeps themes consistent and reduces the number of values that must be manually maintained.
+If a theme overrides `@bg-color`, all derived colors automatically update. This keeps themes consistent and reduces the number of values that must be manually maintained.
 
-For a full list of available color variables and properties, view `themes/default/default-theme.less`.
+> [!TIP]
+> For a full list of available color variables and properties, view `themes/default/default-theme.less`.
 
 # Adding New Features
 This is an example of how to add new features into the layout files.
@@ -132,7 +135,8 @@ To reuse styles from another class you can reference another class as a mixin:
 }
 ```
 
-ℹ️ This is more stable than using `extend`, even if it produces a larger `.qss` output.
+> [!NOTE]
+> This is more stable than using `extend`, even if it produces a larger `.qss` output.
 
 # Creating New Themes
 It's possible to create custom themes.
@@ -159,37 +163,38 @@ If creating an empty file, make sure to include the required sections:
 // Image path relative to where this *.qss is output
 @img-url: '../Default/imgs/white';
 
+//------------------------------------------------------------------------------
+//! Now override variables necessary for this theme below!
+// -----------------------------------------------------------------------------
+
 // SETTINGS --------------------------------------------------------------------
 
-@ui-contrast: 1.0; // multiplier
+@ui-contrast: 1.0; //? example
 
 // COLORS ----------------------------------------------------------------------
 
-@bg-color: green;
+@bg-color: green; //? example
 ```
 
-You only need to override most base variables, like `@bg-color`, if another variable referenced it using a LESS color function the updated color is automatically propgated.
+> [!NOTE]
+> You only need to override most base variables, like `@bg-color`, if another variable referenced it using a LESS color function the updated color is automatically propogated.
 
-A full list of possible color variables and properties can be found by viewing the default theme file at `themes/default/default-theme.less`.
+> [!TIP]
+> A full list of possible color variables and properties can be found by viewing the default theme file at `themes/default/default-theme.less`.
 
 # Development Guidelines
-⚠️ Always develop using the **Default** theme first.
+> [!IMPORTANT]
+> - Always develop using the **Default** theme first as most layout changes will automatically propogate to other themes.<br>
+> - Only adjust other themes if a variable override is needed.
+> - Avoid hard-coded colors in layout files and always use variables so themes remain compatible.
 
-Most layout changes will automatically propgate to other themes. Only adjust other themes if a variable override is required.
+## Folder Responsibilities
 
-⚠️ Avoid hard-coded colors in layout files.
-
-Always use variables so themes remain compatible.
-
-### Folder Responsibilities
-
-**Base**
+### Base
 Reusable UI structures such as buttons, tabs, icon layouts, etc.
 
-**Layouts**
+## Layouts
 Window-level layout definitions for widgets, panels and containers.
 
-**Themes**
+## Themes
 Color definitions that override base variables.
-
-**Themes:** Alternate theme colors that inherit the Default theme, it is only necessary to override variable values unique to the theme.
