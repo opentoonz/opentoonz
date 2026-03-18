@@ -2256,7 +2256,6 @@ TTool::Application *app = TTool::getApplication();
 if (!app) return;
 
 FillParameters params = getFillParameters();
-params.m_fillOnlySavebox = m_savebox.getValue();  
 
 if (m_onion.getValue() &&
     app->getCurrentOnionSkin()->getOnionSkinMask().isEnabled() &&
