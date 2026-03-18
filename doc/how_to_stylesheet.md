@@ -193,8 +193,8 @@ If creating an empty file, make sure to include the required sections:
 ### Base
 Reusable UI structures such as buttons, tabs, icon layouts, etc.
 
-## Layouts
+### Layouts
 Window-level layout definitions for widgets, panels and containers.
 
-## Themes
+### Themes
 Color definitions that override base variables.
