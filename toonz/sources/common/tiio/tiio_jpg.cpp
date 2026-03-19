@@ -29,6 +29,20 @@
 #include <stdexcept>  // for std::runtime_error
 
 //=========================================================
+// Jpg Error Management
+//=========================================================
+
+extern "C" {
+static void tnz_error_exit(j_common_ptr cinfo) {
+  // Cast the error manager to our custom struct to access the jump buffer.
+  // This must match the struct definition used in the class.
+  Tiio::JpgReader::tnz_error_mgr *myerr =
+      (Tiio::JpgReader::tnz_error_mgr *)cinfo->err;
+  longjmp(myerr->setjmp_buffer, 1);
+}
+}
+
+//=========================================================
 // JpgWriterProperties
 //=========================================================
 
@@ -63,15 +77,6 @@ void fillCheckerboard(char *buffer, int x0, int x1, int shrink,
 // JpgReader
 //=========================================================
 
-extern "C" {
-// Custom error handler for libjpeg: throws a C++ exception
-static void tnz_error_exit(j_common_ptr cinfo) {
-  char buffer[JMSG_LENGTH_MAX];
-  (*cinfo->err->format_message)(cinfo, buffer);
-  throw TException(buffer);
-}
-}
-
 #ifdef CICCIO
 // Custom error and message handling (probably legacy / platform-specific)
 JMETHOD(void, error_exit, (j_common_ptr cinfo));
@@ -92,11 +97,11 @@ JpgReader::JpgReader()
     : m_chan(nullptr)
     , m_isOpen(false)
     , m_errorOccurred(false)
-    , m_currentLine(0) {
+    , m_currentLine(0)
+    , m_decompressCreated(false)
+    , m_buffer(nullptr) {
   memset(&m_cinfo, 0, sizeof m_cinfo);
   memset(&m_jerr, 0, sizeof m_jerr);
-  m_buffer            = nullptr;
-  m_decompressCreated = false;
 
   // Set a default size in case the file is completely corrupted
   m_info.m_lx             = 1920;
@@ -107,12 +112,17 @@ JpgReader::JpgReader()
 }
 
 JpgReader::~JpgReader() {
-  if (m_isOpen) {
-    try {
-      jpeg_finish_decompress(&m_cinfo);
-      jpeg_destroy_decompress(&m_cinfo);
-    } catch (...) {
+  if (m_decompressCreated) {
+    // Only call finish if no critical error occurred
+    if (!m_errorOccurred) {
+      if (setjmp(m_jerr.setjmp_buffer) == 0) {
+        try {
+          jpeg_finish_decompress(&m_cinfo);
+        } catch (...) {
+        }
+      }
     }
+    jpeg_destroy_decompress(&m_cinfo);
   }
   m_chan = nullptr;
 }
@@ -128,89 +138,90 @@ void JpgReader::open(FILE *file) {
     return;
   }
 
-  m_cinfo.err             = jpeg_std_error(&m_jerr);
-  m_cinfo.err->error_exit = tnz_error_exit;
+  // Set up error handling using the class member m_jerr
+  m_cinfo.err           = jpeg_std_error(&m_jerr.pub);
+  m_jerr.pub.error_exit = tnz_error_exit;
 
-  try {
-    jpeg_create_decompress(&m_cinfo);
-    m_chan = file;
-    jpeg_stdio_src(&m_cinfo, m_chan);
-    jpeg_save_markers(&m_cinfo, JPEG_APP0 + 1, 0xffff);
-
-    int ret = jpeg_read_header(&m_cinfo, TRUE);
-    if (ret != JPEG_HEADER_OK) throw TException("JPEG header error");
-    m_info.m_lx = m_cinfo.image_width;
-    m_info.m_ly = m_cinfo.image_height;
-    m_info.m_samplePerPixel =
-        3;  // JPEG is always RGB (or grayscale, but treated as RGB)
-
-    // Try reading EXIF for resolution (optional, may fail)
-    bool resolutionFoundInExif = false;
-    for (jpeg_saved_marker_ptr mark = m_cinfo.marker_list; mark;
-         mark                       = mark->next) {
-      if (mark->marker == JPEG_APP0 + 1) {
-        JpgExifReader exifReader;
-        exifReader.process_EXIF(mark->data - 2, mark->data_length);
-        if (exifReader.containsResolution()) {
-          resolutionFoundInExif = true;
-          int resUnit           = exifReader.getResolutionUnit();
-          if (resUnit == 1 || resUnit == 2) {
-            m_info.m_dpix = static_cast<double>(exifReader.getXResolution());
-            m_info.m_dpiy = static_cast<double>(exifReader.getYResolution());
-          } else if (resUnit == 3) {
-            m_info.m_dpix =
-                static_cast<double>(exifReader.getXResolution()) * 2.54;
-            m_info.m_dpiy =
-                static_cast<double>(exifReader.getYResolution()) * 2.54;
-          } else {
-            resolutionFoundInExif = false;
-          }
-        }
-        break;
-      }
-    }
-
-    // Fallback to JFIF if EXIF failed
-    if (!resolutionFoundInExif && m_cinfo.saw_JFIF_marker &&
-        m_cinfo.X_density != 1 && m_cinfo.Y_density != 1) {
-      if (m_cinfo.density_unit == 1) {
-        m_info.m_dpix = static_cast<double>(m_cinfo.X_density);
-        m_info.m_dpiy = static_cast<double>(m_cinfo.Y_density);
-      } else if (m_cinfo.density_unit == 2) {
-        m_info.m_dpix = static_cast<double>(m_cinfo.X_density) * 2.54;
-        m_info.m_dpiy = static_cast<double>(m_cinfo.Y_density) * 2.54;
-      }
-    }
-
-    // Now try to start decompression
-    if (!jpeg_start_decompress(&m_cinfo)) {
-      // If it fails, destroy the structure and mark as invalid
+  if (setjmp(m_jerr.setjmp_buffer)) {
+    // Error occurred during libjpeg operations
+    if (m_decompressCreated) {
       jpeg_destroy_decompress(&m_cinfo);
-      m_info.m_valid  = false;
-      m_isOpen        = true;  // Allows readLine to generate checkerboard
-      m_errorOccurred = true;
-      return;
+      m_decompressCreated = false;
     }
-
-    // Decompression started successfully
-    int row_stride = m_cinfo.output_width * m_cinfo.output_components;
-    m_buffer = (*m_cinfo.mem->alloc_sarray)((j_common_ptr)&m_cinfo, JPOOL_IMAGE,
-                                            row_stride, 1);
-
-    m_info.m_valid  = true;
-    m_isOpen        = true;
-    m_currentLine   = 0;
-    m_errorOccurred = false;
-
-  } catch (...) {
-    // On exception, destroy the structure
-    // Dimensions may already have been set (if exception happened after
-    // jpeg_read_header) or still be the default (1920x1080)
-    jpeg_destroy_decompress(&m_cinfo);
     m_info.m_valid  = false;
-    m_isOpen        = true;
     m_errorOccurred = true;
+    m_isOpen        = true;
+    return;
   }
+
+  // Initialize decompression
+  jpeg_create_decompress(&m_cinfo);
+  m_decompressCreated = true;
+  m_chan              = file;
+  jpeg_stdio_src(&m_cinfo, m_chan);
+  jpeg_save_markers(&m_cinfo, JPEG_APP0 + 1, 0xffff);
+
+  int ret = jpeg_read_header(&m_cinfo, TRUE);
+  if (ret != JPEG_HEADER_OK) {
+    longjmp(m_jerr.setjmp_buffer, 1);
+  }
+
+  m_info.m_lx             = m_cinfo.image_width;
+  m_info.m_ly             = m_cinfo.image_height;
+  m_info.m_samplePerPixel = 3;
+
+  // Try reading EXIF for resolution (optional, may fail)
+  bool resolutionFoundInExif = false;
+  for (jpeg_saved_marker_ptr mark = m_cinfo.marker_list; mark;
+       mark                       = mark->next) {
+    if (mark->marker == JPEG_APP0 + 1) {
+      JpgExifReader exifReader;
+      exifReader.process_EXIF(mark->data - 2, mark->data_length);
+      if (exifReader.containsResolution()) {
+        resolutionFoundInExif = true;
+        int resUnit           = exifReader.getResolutionUnit();
+        if (resUnit == 1 || resUnit == 2) {
+          m_info.m_dpix = static_cast<double>(exifReader.getXResolution());
+          m_info.m_dpiy = static_cast<double>(exifReader.getYResolution());
+        } else if (resUnit == 3) {
+          m_info.m_dpix =
+              static_cast<double>(exifReader.getXResolution()) * 2.54;
+          m_info.m_dpiy =
+              static_cast<double>(exifReader.getYResolution()) * 2.54;
+        } else {
+          resolutionFoundInExif = false;
+        }
+      }
+      break;
+    }
+  }
+
+  // Fallback to JFIF if EXIF failed
+  if (!resolutionFoundInExif && m_cinfo.saw_JFIF_marker &&
+      m_cinfo.X_density != 1 && m_cinfo.Y_density != 1) {
+    if (m_cinfo.density_unit == 1) {
+      m_info.m_dpix = static_cast<double>(m_cinfo.X_density);
+      m_info.m_dpiy = static_cast<double>(m_cinfo.Y_density);
+    } else if (m_cinfo.density_unit == 2) {
+      m_info.m_dpix = static_cast<double>(m_cinfo.X_density) * 2.54;
+      m_info.m_dpiy = static_cast<double>(m_cinfo.Y_density) * 2.54;
+    }
+  }
+
+  // Now try to start decompression
+  if (!jpeg_start_decompress(&m_cinfo)) {
+    longjmp(m_jerr.setjmp_buffer, 1);
+  }
+
+  // Allocate row buffer
+  int row_stride = m_cinfo.output_width * m_cinfo.output_components;
+  m_buffer = (*m_cinfo.mem->alloc_sarray)((j_common_ptr)&m_cinfo, JPOOL_IMAGE,
+                                          row_stride, 1);
+
+  m_info.m_valid  = true;
+  m_isOpen        = true;
+  m_currentLine   = 0;
+  m_errorOccurred = false;
 }
 
 // Read a line from JPEG, fills checkerboard if invalid or error occurred
@@ -223,12 +234,19 @@ void JpgReader::readLine(char *buffer, int x0, int x1, int shrink) {
     return;
   }
 
-  int ret = jpeg_read_scanlines(&m_cinfo, m_buffer, 1);
-  if (ret != 1) {
+  // Setjmp for errors during scanline reading
+  m_cinfo.err           = jpeg_std_error(&m_jerr.pub);
+  m_jerr.pub.error_exit = tnz_error_exit;
+
+  if (setjmp(m_jerr.setjmp_buffer)) {
     m_errorOccurred = true;
     fillCheckerboard(buffer, x0, x1, shrink, m_currentLine);
     m_currentLine++;
     return;
+  }
+
+  if (jpeg_read_scanlines(&m_cinfo, m_buffer, 1) != 1) {
+    longjmp(m_jerr.setjmp_buffer, 1);
   }
 
   unsigned char *src = m_buffer[0];
@@ -261,10 +279,18 @@ void JpgReader::readLine(char *buffer, int x0, int x1, int shrink) {
 
 int JpgReader::skipLines(int lineCount) {
   if (!m_isOpen || !m_info.m_valid || m_errorOccurred) return 0;
+
+  m_cinfo.err           = jpeg_std_error(&m_jerr.pub);
+  m_jerr.pub.error_exit = tnz_error_exit;
+
+  if (setjmp(m_jerr.setjmp_buffer)) {
+    m_errorOccurred = true;
+    return 0;
+  }
+
   int skipped = 0;
   for (int i = 0; i < lineCount; ++i) {
-    int ret = jpeg_read_scanlines(&m_cinfo, m_buffer, 1);
-    if (ret != 1) break;
+    if (jpeg_read_scanlines(&m_cinfo, m_buffer, 1) != 1) break;
     skipped++;
     m_currentLine++;
   }
@@ -285,7 +311,10 @@ class JpgWriter final : public Tiio::Writer {
 
 public:
   JpgWriter()
-      : m_chan(nullptr), m_headerWritten(false), m_ownProperties(false) {}
+      : m_chan(nullptr), m_headerWritten(false), m_ownProperties(false) {
+    memset(&m_cinfo, 0, sizeof m_cinfo);
+    memset(&m_jerr, 0, sizeof m_jerr);
+  }
 
   void open(FILE *file, const TImageInfo &info) override {
     m_cinfo.err = jpeg_std_error(&m_jerr);
@@ -304,7 +333,7 @@ public:
     m_cinfo.JFIF_minor_version = 2;
     m_cinfo.X_density          = static_cast<UINT16>(std::lround(info.m_dpix));
     m_cinfo.Y_density          = static_cast<UINT16>(std::lround(info.m_dpiy));
-    m_cinfo.density_unit       = 1;  // dots per inch
+    m_cinfo.density_unit       = 1;
     m_cinfo.write_Adobe_marker = 0;
 
     if (!m_properties) {
@@ -312,13 +341,14 @@ public:
       m_ownProperties = true;
     }
 
-    int quality =
-        static_cast<TIntProperty *>(m_properties->getProperty("Quality"))
-            ->getValue();
+    TIntProperty *qProp =
+        static_cast<TIntProperty *>(m_properties->getProperty("Quality"));
+    TIntProperty *sProp =
+        static_cast<TIntProperty *>(m_properties->getProperty("Smoothing"));
+
+    int quality = qProp ? qProp->getValue() : 75;
     jpeg_set_quality(&m_cinfo, quality, TRUE);
-    m_cinfo.smoothing_factor =
-        static_cast<TIntProperty *>(m_properties->getProperty("Smoothing"))
-            ->getValue();
+    m_cinfo.smoothing_factor = sProp ? sProp->getValue() : 0;
 
     // Chroma subsampling based on quality
     if (quality >= 70) {  // no chroma-subsampling (4:4:4)
@@ -331,10 +361,8 @@ public:
       m_cinfo.comp_info[0].h_samp_factor = 2;
       m_cinfo.comp_info[0].v_samp_factor = 2;
     }
-    m_cinfo.comp_info[1].h_samp_factor = 1;
-    m_cinfo.comp_info[1].v_samp_factor = 1;
-    m_cinfo.comp_info[2].h_samp_factor = 1;
-    m_cinfo.comp_info[2].v_samp_factor = 1;
+    m_cinfo.comp_info[1].h_samp_factor = m_cinfo.comp_info[2].h_samp_factor = 1;
+    m_cinfo.comp_info[1].v_samp_factor = m_cinfo.comp_info[2].v_samp_factor = 1;
 
     int row_stride = m_cinfo.image_width * m_cinfo.input_components;
     m_buffer = (*m_cinfo.mem->alloc_sarray)((j_common_ptr)&m_cinfo, JPOOL_IMAGE,
@@ -345,17 +373,19 @@ public:
   }
 
   ~JpgWriter() {
-    if (m_headerWritten) jpeg_finish_compress(&m_cinfo);
-    jpeg_destroy_compress(&m_cinfo);
-
-    if (m_ownProperties) {
-      delete m_properties;
-      m_properties = nullptr;
+    if (m_headerWritten) {
+      try {
+        jpeg_finish_compress(&m_cinfo);
+      } catch (...) {
+      }
     }
+    jpeg_destroy_compress(&m_cinfo);
+    if (m_ownProperties) delete m_properties;
   }
 
-  void flush() override { fflush(m_chan); }
-
+  void flush() override {
+    if (m_chan) fflush(m_chan);
+  }
   Tiio::RowOrder getRowOrder() const override { return Tiio::TOP2BOTTOM; }
 
   void writeLine(char *buffer) override {
@@ -363,18 +393,14 @@ public:
       m_headerWritten = true;
       jpeg_start_compress(&m_cinfo, TRUE);
     }
-
     TPixel32 *src      = reinterpret_cast<TPixel32 *>(buffer);
     unsigned char *dst = m_buffer[0];
     int lx             = m_cinfo.image_width;
-
     while (--lx >= 0) {
       // If the pixel is fully transparent (alpha == 0),
       // replace with white. Otherwise, copy original colors.
       if (src->m == 0) {
-        dst[0] = 255;  // R
-        dst[1] = 255;  // G
-        dst[2] = 255;  // B
+        dst[0] = dst[1] = dst[2] = 255;
       } else {
         dst[0] = src->r;
         dst[1] = src->g;
@@ -383,7 +409,6 @@ public:
       dst += 3;
       ++src;
     }
-
     jpeg_write_scanlines(&m_cinfo, m_buffer, 1);
   }
 
