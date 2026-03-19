@@ -175,6 +175,16 @@ class TPanelTitleBar final : public QFrame {
   Q_OBJECT
   Q_DISABLE_COPY(TPanelTitleBar)
 
+  // Pixmap properties
+  Q_PROPERTY(QPixmap BorderPixmap READ getBorderPixmap WRITE setBorderPixmap)
+  Q_PROPERTY(QPixmap ActiveBorderPixmap READ getActiveBorderPixmap WRITE
+                 setActiveBorderPixmap)
+  Q_PROPERTY(QPixmap FloatBorderPixmap READ getFloatBorderPixmap WRITE
+                 setFloatBorderPixmap)
+  Q_PROPERTY(QPixmap FloatActiveBorderPixmap READ getFloatActiveBorderPixmap
+                 WRITE setFloatActiveBorderPixmap)
+
+  // Color properties
   Q_PROPERTY(QColor TitleColor READ getTitleColor WRITE setTitleColor)
   Q_PROPERTY(QColor ActiveTitleColor READ getActiveTitleColor WRITE
                  setActiveTitleColor)
@@ -190,9 +200,29 @@ public:
   QSize sizeHint() const override { return minimumSizeHint(); }
   QSize minimumSizeHint() const override;
 
-  // pos = widget position. n.b. if pos.x()<0 then origin is top‑right corner
+  // pos = widget position. n.b. if pos.x()<0 then origin is top-right corner
   void add(const QPoint &pos, QWidget *widget);
 
+  // --- Pixmap getters/setters ---
+  QPixmap getBorderPixmap() const { return m_borderPm; }
+  void setBorderPixmap(const QPixmap &pixmap) { m_borderPm = pixmap; }
+
+  QPixmap getActiveBorderPixmap() const { return m_activeBorderPm; }
+  void setActiveBorderPixmap(const QPixmap &pixmap) {
+    m_activeBorderPm = pixmap;
+  }
+
+  QPixmap getFloatBorderPixmap() const { return m_floatBorderPm; }
+  void setFloatBorderPixmap(const QPixmap &pixmap) {
+    m_floatBorderPm = pixmap;
+  }
+
+  QPixmap getFloatActiveBorderPixmap() const { return m_floatActiveBorderPm; }
+  void setFloatActiveBorderPixmap(const QPixmap &pixmap) {
+    m_floatActiveBorderPm = pixmap;
+  }
+
+  // --- Color getters/setters ---
   QColor getTitleColor() const noexcept { return m_titleColor; }
   void setTitleColor(const QColor &color) noexcept { m_titleColor = color; }
 
@@ -221,6 +251,8 @@ protected:
 private:
   bool m_closeButtonHighlighted;
   std::vector<std::pair<QPoint, QWidget *>> m_buttons;
+
+  QPixmap m_borderPm, m_activeBorderPm, m_floatBorderPm, m_floatActiveBorderPm;
   QColor m_titleColor, m_activeTitleColor, m_closeOverColor;
 };
 

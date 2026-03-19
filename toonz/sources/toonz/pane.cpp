@@ -749,8 +749,12 @@ void TPanelTitleBar::paintEvent(QPaintEvent *) {
 
   if (!dw->isFloating()) {  // docked panel
     isPanelActive = dw->widgetInThisPanelIsFocused();
+    qDrawBorderPixmap(&painter, rect, QMargins(3, 3, 3, 3),
+                      isPanelActive ? m_activeBorderPm : m_borderPm);
   } else {  // floating panel
     isPanelActive = isActiveWindow();
+    qDrawBorderPixmap(&painter, rect, QMargins(3, 3, 3, 3),
+                      isPanelActive ? m_floatActiveBorderPm : m_floatBorderPm);
   }
 
   if (dw->getOrientation() == TDockWidget::vertical) {
