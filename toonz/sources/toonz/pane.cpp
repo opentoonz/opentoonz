@@ -27,6 +27,7 @@
 #include <QMap>
 #include <QMenu>
 #include <QApplication>
+#include <qdrawutil.h>
 #include <assert.h>
 #include <QDialog>
 #include <QLineEdit>
