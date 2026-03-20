@@ -10,7 +10,9 @@
 #include <cstdio>
 
 extern "C" {
+#ifndef XMD_H
 #define XMD_H
+#endif
 #include "jpeglib.h"
 
 /*
@@ -34,17 +36,24 @@ namespace Tiio {
 //=========================================================
 
 class DVAPI JpgReader final : public Tiio::Reader {
+public:
+  // Structure for the safety error mechanism (setjmp)
+  struct tnz_error_mgr {
+    struct jpeg_error_mgr pub;
+    jmp_buf setjmp_buffer;
+  };
+
+private:
   struct jpeg_decompress_struct m_cinfo;
-  struct jpeg_error_mgr m_jerr;
+  struct tnz_error_mgr m_jerr;
+
   FILE *m_chan;         // file pointer
   JSAMPARRAY m_buffer;  // temporary scanline buffer
-  bool m_isOpen;        // true if file is opened successfully
 
-  // === Added members to track decoding state ===
+  bool m_isOpen;             // true if file is opened successfully
   bool m_errorOccurred;      // true if an error occurred during reading
-  int m_currentLine;         // current scanline index
   bool m_decompressCreated;  // true if jpeg_create_decompress has been called
-  // ============================================
+  int m_currentLine;         // current scanline index
 
 public:
   JpgReader();
@@ -67,8 +76,8 @@ public:
 // Factory functions
 //=========================================================
 
-DVAPI Tiio::ReaderMaker makeJpgReader;
-DVAPI Tiio::WriterMaker makeJpgWriter;
+DVAPI Tiio::Reader *makeJpgReader();
+DVAPI Tiio::Writer *makeJpgWriter();
 
 //=========================================================
 // JpgWriterProperties
