@@ -1383,7 +1383,7 @@ void IoCmd::newScene() {
 
   if (!TApp::instance()->isApplicationStarting())
     QApplication::clipboard()->clear();
-  TSelection::setCurrent(0);
+  TSelection::setCurrent(nullptr);
   TUndoManager::manager()->reset();
 
   bool exist = TSystem::doesExistFileOrLevel(
