@@ -12,6 +12,8 @@
 #include <set>
 #include "tenv.h"
 
+#include "preferences.h"
+
 #undef DVAPI
 #undef DVVAR
 #ifdef TOONZLIB_EXPORTS
@@ -72,8 +74,10 @@ public:
   }
 
   static const std::vector<Segment> &getSegmentCache(const std::string &id) {
+    std::string cacheKey =
+        Preferences::instance()->getFillOnlySavebox() ? id + "s" : id;
     std::lock_guard<std::mutex> lock(m_mutex);
-    auto it = m_cache.find(id);
+    auto it = m_cache.find(cacheKey);
     if (it != m_cache.end()) {
       return it->second;
     }
@@ -83,11 +87,13 @@ public:
 
   static void setSegmentCache(const std::string &id,
                               const std::vector<Segment> &segments) {
+    std::string cacheKey =
+        Preferences::instance()->getFillOnlySavebox() ? id + "s" : id;
     std::lock_guard<std::mutex> lock(m_mutex);
 
     constexpr size_t MAX_CACHE_SIZE = 50;  // maximum number of images in cache
 
-    m_cache[id] = segments;  // Stores or replaces
+    m_cache[cacheKey] = segments;  // Stores or replaces
 
     // Remove oldest entries if exceeding limit
     if (m_cache.size() > MAX_CACHE_SIZE) {
@@ -100,6 +106,7 @@ public:
   static void invalidateSegmentCache(const std::string &id) {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_cache.erase(id);
+    m_cache.erase(id + "s");
   }
 
   static void clearSegmentCache() {
