@@ -44,6 +44,14 @@
 #include <QPushButton>
 #include <QDrag>
 #include <QApplication>
+#include <QLabel>
+#include <QButtonGroup>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QRadioButton>
+#include <QCheckBox>
+#include <QVBoxLayout>
+#include <QButtonGroup>
 
 #include <ctime>
 
@@ -669,23 +677,80 @@ void StudioPaletteTreeViewer::searchForPalette() {
 void StudioPaletteTreeViewer::setAsDefault() {
   TFilePath srcPath = getCurrentItemPath();
   if (srcPath.isEmpty()) return;
+
   StudioPalette *studioPalette = StudioPalette::instance();
+
+  struct DialogResult {
+    int paletteType;     // 1-4: ToonzRaster/Vector/Raster/Cleanup
+    bool keepLink;       // true: maintain StudioPalette link, false: break link
+    bool applyToGlobal;  // true: save to global directory as well
+  };
+
+  DialogResult result;
+
+  QDialog dialog(this);
+  dialog.setWindowTitle(tr("Set As Default Palette"));
+
+  QVBoxLayout *layout = new QVBoxLayout(&dialog);
+
+  QLabel *infoLabel = new QLabel(tr("Select default palette type:"), &dialog);
+  layout->addWidget(infoLabel);
+
+  QButtonGroup *typeGroup = new QButtonGroup(&dialog);
+  QRadioButton *rasterBtn =
+      new QRadioButton(tr("Default Toonz Raster Palette"), &dialog);
+  QRadioButton *vectorBtn =
+      new QRadioButton(tr("Default Toonz Vector Palette"), &dialog);
+  QRadioButton *drawingBtn =
+      new QRadioButton(tr("Default Raster Palette"), &dialog);
+  QRadioButton *cleanupBtn =
+      new QRadioButton(tr("Default Cleanup Palette"), &dialog);
+
+  typeGroup->addButton(rasterBtn, 1);
+  typeGroup->addButton(vectorBtn, 2);
+  typeGroup->addButton(drawingBtn, 3);
+  typeGroup->addButton(cleanupBtn, 4);
+  rasterBtn->setChecked(true);
+
+  layout->addWidget(rasterBtn);
+  layout->addWidget(vectorBtn);
+  layout->addWidget(drawingBtn);
+  layout->addWidget(cleanupBtn);
+
+  layout->addSpacing(10);
+
+  QCheckBox *keepLinkCheckBox =
+      new QCheckBox(tr("Keep Link to StudioPalette"), &dialog);
+  // keepLinkCheckBox->setToolTip(tr(""));
+  keepLinkCheckBox->setChecked(true);
+  layout->addWidget(keepLinkCheckBox);
+
+  layout->addSpacing(10);
+
+  QCheckBox *globalCheckBox = new QCheckBox(tr("Apply to Global"), &dialog);
+  // globalCheckBox->setToolTip(tr(""));
+  globalCheckBox->setChecked(true);
+  layout->addWidget(globalCheckBox);
+
+  layout->addSpacing(20);
+
+  QDialogButtonBox *buttonBox =
+      new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+  connect(buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+  connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+  layout->addWidget(buttonBox);
+
+  if (dialog.exec() != QDialog::Accepted) return;
+
+  result.paletteType   = typeGroup->checkedId();
+  result.keepLink      = keepLinkCheckBox->isChecked();
+  result.applyToGlobal = globalCheckBox->isChecked();
 
   std::string fileName;
   TFilePath folderPath;
   TFilePath dstPath;
 
-  QString label = QObject::tr("Set As...");
-  QStringList radioButtons;
-  radioButtons.append(QString("Default Toonz Raster Palette"));
-  radioButtons.append(QString("Default Toonz Vector Palette"));
-  radioButtons.append(QString("Default Raster Drawing Palette"));
-  radioButtons.append(QString("Default Cleanup Palette"));
-
-  int type =
-      DVGui::RadioButtonMsgBox(DVGui::QUESTION, label, radioButtons, this);
-
-  switch (type) {
+  switch (result.paletteType) {
   case 1:
     fileName = "Toonz_Raster_Palette.tpl";
     break;
@@ -707,16 +772,18 @@ void StudioPaletteTreeViewer::setAsDefault() {
   TPalette *srcPalette = studioPalette->getPalette(srcPath);
   if (!srcPalette) return;
 
-  // Remove all Link
   for (int i = 0; i < srcPalette->getPageCount(); ++i) {
     TPalette::Page *page = srcPalette->getPage(i);
     for (int j = 0; j < page->getStyleCount(); ++j) {
       TColorStyle *cs = page->getStyle(j);
-      cs->setGlobalName(L"");
+      if (result.keepLink)
+        // Keep link to StudioPalette
+        cs->setOriginalName(cs->getName());
+      else
+        cs->setGlobalName(L"");
     }
   }
 
-  // Save Palette
   folderPath = studioPalette->getProjectPalettesRoot();
   dstPath    = folderPath + fileName;
   if (TSystem::doesExistFileOrLevel(dstPath))
@@ -724,9 +791,7 @@ void StudioPaletteTreeViewer::setAsDefault() {
   TOStream os(dstPath);
   if (srcPalette) os << srcPalette;
 
-  int policy = DVGui::MsgBox(QString("Apply to Global?"), QString("Yes"),
-                             QString("No"), 0, this);
-  if (policy == 1) {
+  if (result.applyToGlobal) {
     folderPath = studioPalette->getLevelPalettesRoot() + "Default Palettes";
     dstPath    = folderPath + fileName;
     TOStream os(dstPath);
@@ -736,7 +801,6 @@ void StudioPaletteTreeViewer::setAsDefault() {
   delete srcPalette;
   refresh();
 }
-
 //-----------------------------------------------------------------------------
 
 class InvalidateIconsUndo final : public TUndo {
