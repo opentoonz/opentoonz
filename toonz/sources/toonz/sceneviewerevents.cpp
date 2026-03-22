@@ -1366,7 +1366,7 @@ bool SceneViewer::event(QEvent *e) {
       } else {
         m_mouseScrubbing = 0;
         m_keyAction->setEnabled(true);
-        m_keyAction = 0;
+        m_keyAction = nullptr;
         invalidateToolStatus();
         e->accept();
         return true;

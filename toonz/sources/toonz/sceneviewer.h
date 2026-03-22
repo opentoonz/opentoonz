@@ -62,8 +62,7 @@ public:
 // SceneViewer
 //-----------------------------------------------------------------------------
 
-class SceneViewer final : public TToolViewer,
-                          public Previewer::Listener {
+class SceneViewer final : public TToolViewer, public Previewer::Listener {
   Q_OBJECT
 
   double m_pressure;
@@ -96,8 +95,8 @@ class SceneViewer final : public TToolViewer,
 
   TPointD m_oldPos;
   bool m_dragging;
-  int m_mouseScrubbing                   = 0;
-  QAction *m_keyAction;
+  int m_mouseScrubbing = 0;
+  QAction *m_keyAction = nullptr;
 
   QPointF m_firstPanPoint;
   QPointF m_undoPoint;
@@ -220,7 +219,7 @@ public:
   void onRenderStarted(int frame) override;
   void onRenderCompleted(int frame) override;
   void onPreviewUpdate() override;
-  
+
   bool isPreviewEnabled() const { return m_previewMode != NO_PREVIEW; }
   int getPreviewMode() const { return m_previewMode; }
 
