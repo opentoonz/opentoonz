@@ -17,6 +17,7 @@
 #include <QDir>
 #include <QFile>
 #include <QDateTime>
+#include <QCryptographicHash>  // For MD5 hash
 #include "tmsgcore.h"
 #include "thirdparty.h"
 
@@ -76,15 +77,25 @@ TFilePath Ffmpeg::getFfmpegCache() const {
 
 void Ffmpeg::setFrameRate(double fps) { m_frameRate = fps; }
 
-void Ffmpeg::setPath(const TFilePath &path) { m_path = path; }
+void Ffmpeg::setPath(const TFilePath &path) {
+  m_path = path;
+
+  // Generate a short, unique identifier based on the full file path
+  QFileInfo fi(path.getQString());
+  QString fullPath = fi.absoluteFilePath();  // resolve absolute path
+  if (fullPath.isEmpty()) fullPath = path.getQString();  // fallback
+  QByteArray hash =
+      QCryptographicHash::hash(fullPath.toUtf8(), QCryptographicHash::Md5);
+  m_tempBaseName = hash.toHex().left(6);
+}
 
 void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex) {
   m_frameCount++;
   int idx = frameIndex - 1;
   if (idx < m_startNumber) m_startNumber = idx;
 
-  // Name without UUID, with 6-digit padding to match %06d in ffmpeg
-  QString tempFileName = QString::fromStdString(m_path.getName()) + "tempOut" +
+  // Hash prefix + zero-padded 6-digit index (ffmpeg %06d)
+  QString tempFileName = m_tempBaseName + "_in" +
                          QString("%1").arg(idx, 6, 10, QChar('0')) + "." +
                          m_intermediateFormat;
 
@@ -184,8 +195,7 @@ void Ffmpeg::runFfmpeg(const QStringList &preInputArgs,
                        bool asynchronous) {
   // Pattern with %06d to exactly match the generated names
   QString tempName = getFfmpegCache().getQString() + QDir::separator() +
-                     QString::fromStdString(m_path.getName()) + "tempOut%06d." +
-                     m_intermediateFormat;
+                     m_tempBaseName + "_in%06d." + m_intermediateFormat;
 
   QStringList args = preInputArgs;
 
@@ -283,7 +293,7 @@ void Ffmpeg::saveSoundTrack(TSoundTrack *soundTrack) {
   const UCHAR *buffer = soundTrack->getRawData();
 
   m_audioPath = getFfmpegCache().getQString() + QDir::separator() +
-                QString::fromStdString(m_path.getName()) + "tempOut.raw";
+                m_tempBaseName + "_in.raw";
 
   m_audioFormat = ((soundTrack->getSampleType() == TSound::FLOAT) ? "f" : "s") +
                   QString::number(m_bitsPerSample);
@@ -318,9 +328,8 @@ void Ffmpeg::saveSoundTrack(TSoundTrack *soundTrack) {
 bool Ffmpeg::checkFilesExist() const {
   QString ffmpegCachePath = getFfmpegCache().getQString();
   // Look for the first frame (6 digits) directly in cache root
-  QString tempPath = ffmpegCachePath + QDir::separator() +
-                     QString::fromStdString(m_path.getName()) +
-                     "tempOut000001." + m_intermediateFormat;
+  QString tempPath = ffmpegCachePath + QDir::separator() + m_tempBaseName +
+                     "_in000001." + m_intermediateFormat;
   return TSystem::doesExistFileOrLevel(TFilePath(tempPath));
 }
 
@@ -335,8 +344,9 @@ ffmpegFileInfo Ffmpeg::getInfo() const {
   }
 
   QString ffmpegCachePath = getFfmpegCache().getQString();
+  // Use short base name for the info cache file
   QString tempPath =
-      ffmpegCachePath + QDir::separator() + cleanPathSymbols() + ".txt";
+      ffmpegCachePath + QDir::separator() + m_tempBaseName + ".txt";
 
   if (QFile::exists(tempPath)) {
     QFile infoText(tempPath);
@@ -554,19 +564,16 @@ void Ffmpeg::getFramesFromMovie(int frame) {
   }
 
   QString ffmpegCachePath = getFfmpegCache().getQString();
-  QString tempName        = ffmpegCachePath + QDir::separator() +
-                     QString::fromStdString(m_path.getName()) + "tempOut%06d." +
-                     m_intermediateFormat;
+  QString tempName = ffmpegCachePath + QDir::separator() + m_tempBaseName +
+                     "_in%06d." + m_intermediateFormat;
 
   QString tempStart;
   if (frame == -1) {
-    tempStart = ffmpegCachePath + QDir::separator() +
-                QString::fromStdString(m_path.getName()) + "tempOut000001." +
-                m_intermediateFormat;
+    tempStart = ffmpegCachePath + QDir::separator() + m_tempBaseName +
+                "_in000001." + m_intermediateFormat;
   } else {
-    tempStart = ffmpegCachePath + QDir::separator() +
-                QString::fromStdString(m_path.getName()) +
-                QString("tempOut%1.").arg(frame, 6, 10, QChar('0')) +
+    tempStart = ffmpegCachePath + QDir::separator() + m_tempBaseName +
+                QString("_in%1.").arg(frame, 6, 10, QChar('0')) +
                 m_intermediateFormat;
   }
 
@@ -607,9 +614,8 @@ void Ffmpeg::getFramesFromMovie(int frame) {
 
     // Add all extracted frames to cleanup list
     for (int i = 1; i <= m_frameCount; i++) {
-      QString frameFile = ffmpegCachePath + QDir::separator() +
-                          QString::fromStdString(m_path.getName()) +
-                          QString("tempOut%1.").arg(i, 6, 10, QChar('0')) +
+      QString frameFile = ffmpegCachePath + QDir::separator() + m_tempBaseName +
+                          QString("_in%1.").arg(i, 6, 10, QChar('0')) +
                           m_intermediateFormat;
       if (!m_cleanUpList.contains(frameFile)) {
         m_cleanUpList.push_back(frameFile);
@@ -622,9 +628,8 @@ TRasterImageP Ffmpeg::getImage(int frameIndex) {
   QString ffmpegCachePath = getFfmpegCache().getQString();
   QString number =
       QString("%1").arg(frameIndex, 6, 10, QChar('0'));  // 6 digits
-  QString tempName = ffmpegCachePath + QDir::separator() +
-                     QString::fromStdString(m_path.getName()) + "tempOut" +
-                     number + ".png";
+  QString tempName = ffmpegCachePath + QDir::separator() + m_tempBaseName +
+                     "_in" + number + ".png";
 
   if (QFile::exists(tempName)) {
     QImage qi;
@@ -651,6 +656,8 @@ TRasterImageP Ffmpeg::getImage(int frameIndex) {
 }
 
 QString Ffmpeg::cleanPathSymbols() const {
+  // This function is kept for compatibility but no longer used for temporary
+  // files. It may be used elsewhere; we keep the original implementation.
   QString name = QString::fromStdString(m_path.getName());
   name.replace(QRegularExpression("[^a-zA-Z0-9_\\-\\.]"), "_");
   return name;
@@ -661,9 +668,8 @@ int Ffmpeg::getGifFrameCount() {
   QString ffmpegCachePath = getFfmpegCache().getQString();
 
   while (true) {
-    QString frameFile = ffmpegCachePath + QDir::separator() +
-                        QString::fromStdString(m_path.getName()) +
-                        QString("tempOut%1.").arg(frame, 6, 10, QChar('0')) +
+    QString frameFile = ffmpegCachePath + QDir::separator() + m_tempBaseName +
+                        QString("_in%1.").arg(frame, 6, 10, QChar('0')) +
                         m_intermediateFormat;
     if (!TSystem::doesExistFileOrLevel(TFilePath(frameFile))) {
       break;
@@ -819,11 +825,8 @@ TImageP TLevelReaderFFmpeg::load(int frameIndex) {
   if (!m_framesExtracted) {
     try {
       m_ffmpegReader->getFramesFromMovie();
-      // Verify that at least the first frame exists
-      QString testPath =
-          m_ffmpegReader->getFfmpegCache().getQString() + QDir::separator() +
-          QString::fromStdString(m_path.getName()) + "tempOut000001.png";
-      if (TSystem::doesExistFileOrLevel(TFilePath(testPath))) {
+      // Use checkFilesExist() instead of accessing private member
+      if (m_ffmpegReader->checkFilesExist()) {
         m_framesExtracted = true;
       } else {
         throw TImageException(m_path, "Frame extraction produced no files.");

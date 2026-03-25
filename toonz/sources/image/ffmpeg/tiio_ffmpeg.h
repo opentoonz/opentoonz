@@ -117,6 +117,9 @@ private:
   TFilePath m_path;
   QVector<QString> m_cleanUpList;
 
+  // Unique identifier for temporary files (based on full path hash)
+  QString m_tempBaseName;
+
   QString cleanPathSymbols() const;
   bool waitFfmpeg(QProcess &process, bool async) const;
 
