@@ -348,13 +348,13 @@ private:
   TImageReaderTzl &operator=(const TImageReaderTzl &src);
   TImageP load10();
   TImageP load11();
-  TImageP load13();  // Aggiunta iconcine
-  TImageP load14();  //	Aggiunto creator con lunghezza fissa
+  TImageP load13();  // Added icons
+  TImageP load14();  // Added fixed‑size creator
   const TImageInfo *getImageInfo10() const;
-  const TImageInfo *getImageInfo11() const;  // vale anche le versioni > di 11
+  const TImageInfo *getImageInfo11() const;  // also works for versions > 11
 
 public:
-  //! Indice del frame del livello
+  //! Frame index
   TFrameId m_fid;
   TImageP load() override;
   TImageP loadIcon() override {
@@ -387,10 +387,8 @@ class TImageWriterTzl final : public TImageWriter {
   TLevelWriterTzl *m_lwp;
   TFrameId m_fid;
   TDimension
-      m_iconSize;  // Dimensioni dell'iconcina salvata all'interno del file tlv
-  //	In genere questo parametro viene settato come quello impostato
-  // dall'utente
-  // nelle preferenze.
+      m_iconSize;  // Size of the icon saved inside the TLV file
+                   // This parameter is usually set to the user's preferences.
 public:
   TImageWriterTzl(TLevelWriterTzl *lw, TFrameId fid)
       : TImageWriter(TFilePath())
@@ -455,8 +453,8 @@ public:
 void TLevelWriterTzl::buildFreeChunksTable() {
   std::set<TzlChunk> occupiedChunks;
   TzlOffsetMap::const_iterator it1 = m_frameOffsTable.begin();
-  TINT32 lastOccupiedPos = 0;  // ultima posizione all'interno del file occupata
-                               // dall'ultima immagine(grande o icona)
+  TINT32 lastOccupiedPos = 0;  // last position inside the file occupied by the
+                               // last image (full or icon)
 
   while (it1 != m_frameOffsTable.end()) {
     occupiedChunks.insert(TzlChunk(it1->second.m_offs, it1->second.m_length));
@@ -474,8 +472,8 @@ void TLevelWriterTzl::buildFreeChunksTable() {
   }
 
   std::set<TzlChunk>::const_iterator it2 = occupiedChunks.begin();
-  TINT32 curPos;  // prima posizione utile nel file in cui vengono memorizzati i
-                  // dati relativi alle immagini
+  TINT32
+  curPos;  // first usable position in the file where image data are stored
   if (m_version == 13)
     curPos = 6 * sizeof(TINT32) + 4 * sizeof(char) + 8 * sizeof(char);
   else if (m_version >= 14)
@@ -536,11 +534,11 @@ TLevelWriterTzl::TLevelWriterTzl(const TFilePath &path, TPropertyGroup *info)
   if (fs.doesExist()) {
     // if (!fs.isWritable())
     m_chan = fopen(path, "rb+");
-    /*--- 誰かが開いている、または権限が無いとき ---*/
+    /*--- Someone already has it open, or no permission ---*/
     if (!m_chan) {
       throw TSystemException(path, "can't fopen.");
     }
-    /*--- TLVファイルのヘッダが正しく読めなかった場合 ---*/
+    /*--- TLV file header could not be read correctly ---*/
     if (!readHeaderAndOffsets(m_chan, m_frameOffsTable, m_iconOffsTable, m_res,
                               m_version, m_creator, &m_frameCount,
                               &m_offsetTablePos, &m_iconOffsetTablePos, 0)) {
@@ -657,11 +655,9 @@ TLevelWriterTzl::~TLevelWriterTzl() {
       fclose(historyChan);
     }
   }
-  // Se lo spazio libero (cioè la somma di tutti i buchi che si sono creati tra
-  // i frame)
-  // è maggiore di una certa soglia oppure è stato rimosso almeno un frame
-  // allora ottimizzo il file
-  // (in pratica risalvo il file da capo senza buchi).
+  // If the free space (i.e., the sum of all holes created between frames)
+  // is greater than a certain threshold or at least one frame was removed,
+  // optimize the file (rewrite it from scratch without holes).
   if (getFreeSpace() > 0.3 || erasedFrame) optimize();
 }
 
@@ -708,7 +704,7 @@ void TLevelWriterTzl::addFreeChunk(TINT32 offs, TINT32 length) {
     // if (it->m_offs>offs+length+1)
     //  break;
 
-    if (it->m_offs + it->m_length == offs)  // accorpo due chunks in uno
+    if (it->m_offs + it->m_length == offs)  // merge two chunks into one
     {
       TzlChunk chunk(it->m_offs, it->m_length + length);
       m_freeChunks.erase(it);
@@ -732,8 +728,7 @@ void TLevelWriterTzl::addFreeChunk(TINT32 offs, TINT32 length) {
 TINT32 TLevelWriterTzl::findSavingChunk(const TFrameId &fid, TINT32 length,
                                         bool isIcon) {
   TzlOffsetMap::iterator it;
-  // prima libero il chunk del fid, se c'e'. accorpo con altro chunk se trovo
-  // uno contiguo.
+  // first free the chunk of fid, if it exists. Merge with adjacent chunks.
   if (!isIcon) {
     if ((it = m_frameOffsTable.find(fid)) != m_frameOffsTable.end()) {
       addFreeChunk(it->second.m_offs, it->second.m_length);
@@ -747,7 +742,7 @@ TINT32 TLevelWriterTzl::findSavingChunk(const TFrameId &fid, TINT32 length,
     }
   }
 
-  // ora cerco un cioncone libero con la piu' piccola memoria sufficiente
+  // now search for a free chunk with the smallest sufficient memory
   std::set<TzlChunk>::iterator it1   = m_freeChunks.begin(),
                                found = m_freeChunks.end();
   for (; it1 != m_freeChunks.end(); it1++) {
@@ -778,8 +773,7 @@ TINT32 TLevelWriterTzl::findSavingChunk(const TFrameId &fid, TINT32 length,
 //-------------------------------------------------------------------
 bool TLevelWriterTzl::convertToLatestVersion() {
   TFileStatus fs(m_path);
-  // se il file è di una versione precedente deve necessariamente già esistere
-  // su disco
+  // if the file is from an earlier version it must already exist on disk
   assert(fs.doesExist());
   if (!fs.doesExist()) return false;
   m_exists         = false;
@@ -905,7 +899,7 @@ void TLevelWriterTzl::saveImage(const TImageP &img, const TFrameId &_fid,
   TFrameId fid = _fid;
   if (!m_chan) return;
 
-  // se il file è di una versione precedente allora lo converto prima
+  // if the file is from an earlier version, convert it first
   if (m_version < currentVersion()) {
     if (!convertToLatestVersion()) return;
     assert(m_version == currentVersion());
@@ -1076,19 +1070,19 @@ void TLevelWriterTzl::saveImage(const TImageP &img, const TFrameId &_fid,
 //-------------------------------------------------------------------
 
 void TLevelWriterTzl::doSave(const TImageP &img, const TFrameId &_fid) {
-  // salvo l'immagine grande
+  // save the full image
   saveImage(img, _fid);
   if (!img)
     throw(TException(
         "Saving tlv: it is not possible to create the image frame."));
-  // creo l'iconcina
+  // create the icon
   TImageP icon = TImageP();
   createIcon(img, icon);
   assert(icon);
   if (!icon)
     throw(
         TException("Saving tlv: it is not possible to create the image icon."));
-  // salvo l'iconcina
+  // save the icon
   saveImage(icon, _fid, true);
   return;
 }
@@ -1100,7 +1094,7 @@ void TLevelWriterTzl::save(const TImageP &img, const TFrameId &fid) {
 void TLevelWriterTzl::save(const TImageP &img) { doSave(img, TFrameId()); }
 //-------------------------------------------------------------------
 void TLevelWriterTzl::saveIcon(const TImageP &img, const TFrameId &fid) {
-  // salvo su file come icona
+  // save to file as icon
   saveImage(img, fid, true);
 }
 //-------------------------------------------------------------------
@@ -1118,7 +1112,7 @@ void TLevelWriterTzl::renumberFids(
   if (m_version < 13) return;
   if (m_frameOffsTable.empty() || !m_exists) return;
 
-  // Rimozione dei frame non presenti nella prima colonna di renumberTable
+  // Remove frames not present in the first column of renumberTable
   std::map<TFrameId, TzlChunk> frameOffsTableTemp;
   frameOffsTableTemp        = m_frameOffsTable;
   TzlOffsetMap::iterator it = frameOffsTableTemp.begin();
@@ -1153,7 +1147,7 @@ void TLevelWriterTzl::renumberFids(
 //-------------------------------------------------------------------
 
 void TLevelWriterTzl::createIcon(const TImageP &imgIn, TImageP &imgOut) {
-  // Creo iconcina e poi la salvo
+  // Create icon and then save it
   TToonzImageP ti = imgIn;
   if (!ti) return;
   TRect sb    = ti->getSavebox();
@@ -1218,24 +1212,24 @@ void TLevelWriterTzl::createIcon(const TImageP &imgIn, TImageP &imgOut) {
 
 void TLevelWriterTzl::remove(const TFrameId &fid) {
   TzlOffsetMap::iterator it = m_frameOffsTable.find(fid);
-  // se il fid non esiste non faccio nulla
+  // if the fid does not exist, do nothing
   if (it == m_frameOffsTable.end()) return;
-  // aggiungo spazio vuoto
+  // add empty space
   // m_freeChunks.insert(TzlChunk(it->second.m_offs, it->second.m_length));
   addFreeChunk(it->second.m_offs, it->second.m_length);
-  // cancello l'immagine dalla tabella
+  // delete the image from the table
   m_frameOffsTable.erase(it);
 
   if (m_iconOffsTable.size() > 0) {
     TzlOffsetMap::iterator iconIt = m_iconOffsTable.find(fid);
-    // deve necessariamente esserci anche l'iconcina
+    // the icon must necessarily exist as well
     assert(iconIt != m_iconOffsTable.end());
     if (iconIt == m_iconOffsTable.end()) return;
-    // aggiungo spazio vuoto
+    // add empty space
     // m_freeChunks.insert(TzlChunk(iconIt->second.m_offs,
     // iconIt->second.m_length));
     addFreeChunk(iconIt->second.m_offs, iconIt->second.m_length);
-    // Cancello la relativa icona
+    // Delete the corresponding icon
     m_iconOffsTable.erase(iconIt);
     erasedFrame = true;
   }
@@ -1348,7 +1342,7 @@ bool TLevelWriterTzl::resizeIcons(const TDimension &newSize) {
           {
                   TImageReaderP ir = lr->getFrameReader(it->first);
 
-                  // carico l'iconcina
+                  // load the icon
             TImageP img = ir->loadIcon();
                   TImageP icon;
                   createIcon(img,icon);
@@ -1357,11 +1351,11 @@ bool TLevelWriterTzl::resizeIcons(const TDimension &newSize) {
   }
   else
   {				 */
-  // leggo tutte le immagini da file e creo le iconcine da da zero
+  // read all images from file and create icons from scratch
   for (TLevel::Iterator it = level->begin(); it != level->end(); ++it) {
-    // carico l'iconcina
+    // load the icon
     TImageP img = lr->getFrameReader(it->first)->load();
-    // creo e salvo
+    // create and save
     TImageP icon;
     createIcon(img, icon);
     saveIcon(icon, it->first);
@@ -1395,14 +1389,14 @@ float TLevelWriterTzl::getFreeSpace() {
   }
   return 0;
 }
-// creo il file ottimizzato, cioè senza spazi liberi
+// create the optimized file, i.e., without free spaces
 bool TLevelWriterTzl::optimize() {
   TFileStatus fs(m_path);
   assert(fs.doesExist());
 
   std::string tempName = "~" + m_path.getName() + "tmp&.tlv";
-  TFilePath tempPath =
-      TSystem::getTempDir() + tempName;  // Path temporaneo del file ottimizzato
+  TFilePath tempPath   = TSystem::getTempDir() +
+                       tempName;  // Temporary path for the optimized file
 
   if (TSystem::doesExistFileOrLevel(tempPath)) TSystem::deleteFile(tempPath);
 
@@ -1421,12 +1415,12 @@ bool TLevelWriterTzl::optimize() {
   lr = TLevelReaderP();
   lw = TLevelWriterP();
 
-  // Se il file tempPath (ottimizzato) è stato creato
-  // lo copio sostituendolo ad m_path
+  // If the optimized file tempPath was created,
+  // copy it to replace m_path
   if (TSystem::doesExistFileOrLevel(tempPath)) {
     assert(m_path != tempPath);
     if (TSystem::doesExistFileOrLevel(m_path))
-      TSystem::deleteFile(m_path);  // Cancello il file non ottimizzato
+      TSystem::deleteFile(m_path);  // Delete the non‑optimized file
     TSystem::copyFile(m_path, tempPath);
     TSystem::deleteFile(tempPath);
   } else
@@ -1554,7 +1548,7 @@ bool TLevelReaderTzl::getIconSize(TDimension &iconSize) {
 
   fseek(m_chan, offs, SEEK_SET);
   TINT32 iconLx = 0, iconLy = 0;
-  // leggo la dimensione delle iconcine nel file
+  // read the icon size in the file
   fread(&iconLx, sizeof(TINT32), 1, m_chan);
   fread(&iconLy, sizeof(TINT32), 1, m_chan);
   assert(iconLx > 0 && iconLy > 0);
@@ -1872,7 +1866,7 @@ TImageP TImageReaderTzl::load13() {
   reverse((char *)&xdpi, sizeof(double));
   reverse((char *)&ydpi, sizeof(double));
 #endif
-  // Carico l'icona dal file
+  // Load icon from file
   if (m_isIcon) {
     fseek(chan, iconIt->second.m_offs, SEEK_SET);
     fread(&iconLx, sizeof(TINT32), 1, chan);
@@ -2034,10 +2028,10 @@ TImageP TImageReaderTzl::load13() {
   // ToonzImageUtils::updateRas32(ti);
 }
 
-// Restituisce la regione del raster shrinkata e la relativa savebox.
+// Returns the shrunk raster region and the corresponding savebox.
 static TRect applyShrinkAndRegion(TRasterP &ras, int shrink, TRect region,
                                   TRect savebox) {
-  // estraggo la regione solo se essa ha coordinate valide.
+  // extract the region only if it has valid coordinates.
   if (!region.isEmpty() && region != TRect() && region.getLx() > 0 &&
       region.getLy() > 0)
     ras = ras->extract(region);
@@ -2110,7 +2104,7 @@ TImageP TImageReaderTzl::load14() {
   reverse((char *)&ydpi, sizeof(double));
 #endif
 
-  // Carico l'icona dal file
+  // Load icon from file
   if (m_isIcon) {
     fseek(chan, iconIt->second.m_offs, SEEK_SET);
     fread(&iconLx, sizeof(TINT32), 1, chan);
@@ -2121,7 +2115,7 @@ TImageP TImageReaderTzl::load14() {
     fread(&actualBuffSize, sizeof(TINT32), 1, chan);
 
     if (actualBuffSize <= 0 ||
-        actualBuffSize > (int)(iconLx * iconLx * sizeof(TPixelCM32)))
+        actualBuffSize > (int)(iconLx * iconLy * sizeof(TPixelCM32)))
       throw TException("Loading tlv: icon buffer size error.");
 
     TRasterCM32P raux = TRasterCM32P(iconLx, iconLy);
@@ -2209,10 +2203,15 @@ TImageP TImageReaderTzl::load14() {
 
       // fullRas->extractT(rect)->fill(bgColorRect);
       // assert(savebox.getSize() == ras->getSize());
-      if (savebox.getSize() != ras->getSize())
-        throw TException("Loading tlv: bad icon savebox size.");
-      fullRas->extractT(savebox)->copy(ras);
-      ras = fullRas;
+      if (savebox.getSize() != ras->getSize()) {
+        // Fallback: the savebox does not match the raster size.
+        // Instead of crashing, use the entire raster as the icon.
+        savebox = TRect(ras->getSize());
+        ras     = ras->clone();  // Ensure we have a copy (if needed)
+      } else {
+        fullRas->extractT(savebox)->copy(ras);
+        ras = fullRas;
+      }
     }
 
     TToonzImageP ti(ras, savebox);
