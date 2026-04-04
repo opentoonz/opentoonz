@@ -1,5 +1,8 @@
 blank_issues_enabled: true
 contact_links:
+  - name: Feature request
+    url: https://github.com/opentoonz/opentoonz/discussions/new?category=ideas
+    about: Suggest an idea for this project
   - name: Manual
     url: https://opentoonz.readthedocs.io/
     about: The official, extensive manual for OpenToonz
