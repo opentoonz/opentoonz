@@ -319,8 +319,91 @@ private:
   QString m_boundRoomName;
   TPanelTitleBarButton *m_roomBindButton;
 
-  QColor getBGColor() const { return m_bgcolor; }
-  void setBGColor(const QColor &color) { m_bgcolor = color; }
+public:
+  TPanel(QWidget *parent = 0, Qt::WindowFlags flags = Qt::WindowFlags(),
+         TDockWidget::Orientation orientation = TDockWidget::vertical);
+  ~TPanel();
+
+  void setPanelType(const std::string &panelType) { m_panelType = panelType; }
+  std::string getPanelType() { return m_panelType; }
+
+  void setIsMaximizable(bool value) { m_isMaximizable = value; }
+  bool isMaximizable() { return m_isMaximizable; }
+  // bool isMaximized() { return m_isMaximized; }
+  // void setMaximized(bool isMaximized, Room *room = 0);
+
+  QList<TPanel *> getHiddenDockWidget() const { return m_hiddenDockWidgets; }
+  QByteArray getSavedOldState() const { return m_currentRoomOldState; }
+
+  // void setTitleBarWidget(TPanelTitleBar *newTitleBar);
+
+  // si riferisce a istanze multiple dei pannelli floating; default = true
+  void allowMultipleInstances(bool allowed) {
+    m_multipleInstancesAllowed = allowed;
+  }
+  bool areMultipleInstancesAllowed() const {
+    return m_multipleInstancesAllowed;
+  }
+
+  TPanelTitleBar *getTitleBar() const { return m_panelTitleBar; }
+
+  // Room binding methods (for all panels)
+  bool isRoomBound() const { return m_isRoomBound; }
+  void setRoomBound(bool bound);
+  QString getBoundRoomName() const { return m_boundRoomName; }
+  void setBoundRoomName(const QString &roomName);
+  void setRoomBindButton(TPanelTitleBarButton *button) {
+    m_roomBindButton = button;
+  }
+  
+  // Add room binding toggle button to the title bar
+  // This enables the "Bind to Room" feature for any panel
+  void addRoomBindButton();
+
+  virtual void reset() {};
+
+  virtual int getViewType() { return -1; };
+  virtual void setViewType(int viewType) {};
+
+  virtual bool widgetInThisPanelIsFocused() {
+    // by default, check if the panel content itself has focus
+    if (widget())
+      return widget()->hasFocus();
+    else
+      return false;
+  };
+
+  virtual void restoreFloatingPanelState();
+  virtual void zoomContentsAndFitGeometry(bool forward);
+
+protected:
+  void paintEvent(QPaintEvent *) override;
+  void enterEvent(QEvent *) override;
+  void leaveEvent(QEvent *) override;
+
+  // Show/hide the BTR grip button to match the floating/docked state.
+  // Called on all paths: interactive dock/undock AND workspace restore.
+  void setFloatingAppearance() override;
+  void setDockedAppearance() override;
+
+  virtual bool isActivatableOnEnter() { return false; }
+
+protected slots:
+
+  void onCloseButtonPressed();
+  void onCustomContextMenuRequested(const QPoint &pos);
+  virtual void widgetFocusOnEnter() {
+    // by default, focus the panel content
+    if (widget()) widget()->setFocus();
+  };
+  virtual void widgetClearFocusOnLeave() {
+    if (widget()) widget()->clearFocus();
+  };
+
+signals:
+
+  void doubleClick(QMouseEvent *me);
+  void closeButtonPressed();
 };
 
 //-----------------------------------------------------------------------------

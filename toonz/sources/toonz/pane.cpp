@@ -312,6 +312,8 @@ void TPanel::addRoomBindButton() {
 
   // Position: -60 pixels from right edge (before close button)
   titleBar->add(QPoint(-60, 0), m_roomBindButton);
+  // Sync initial visibility with current dock state at button creation time.
+  m_roomBindButton->setVisible(isFloating());
 
   // Connect toggle signal to handle room binding state changes (modern lambda)
   connect(m_roomBindButton, &TPanelTitleBarButton::toggled,
@@ -337,6 +339,20 @@ void TPanel::addRoomBindButton() {
               if (isHidden()) show();
             }
           });
+}
+
+//-----------------------------------------------------------------------------
+
+void TPanel::setFloatingAppearance() {
+  TDockWidget::setFloatingAppearance();
+  if (m_roomBindButton) m_roomBindButton->setVisible(true);
+}
+
+//-----------------------------------------------------------------------------
+
+void TPanel::setDockedAppearance() {
+  TDockWidget::setDockedAppearance();
+  if (m_roomBindButton) m_roomBindButton->setVisible(false);
 }
 
 //=============================================================================
