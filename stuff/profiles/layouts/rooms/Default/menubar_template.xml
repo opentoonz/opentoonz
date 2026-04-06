@@ -66,6 +66,7 @@
         <command>MI_Insert</command>
         <command>MI_InsertAbove</command>
         <command>MI_Clear</command>
+        <command>MI_ClearViewerContent</command>
         <separator/>
         <command>MI_SelectAll</command>
         <command>MI_InvertSelection</command>
