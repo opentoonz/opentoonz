@@ -263,7 +263,7 @@ QMenu {
       .checkbox-indicator-style();
       border-color: @menu-checkbox-border-color;
 
-      &:selected {
+      &:selected, &:hover {
         border-color: @menu-checkbox-border-color-hover;
       }
 
@@ -303,6 +303,12 @@ TPanelTitleBar {
   &:hover {
     background-color: @titlebar-bg-color-hover;
   }
+
+  // QSS only works when an image is applied (even a transparent one)
+  qproperty-BorderPixmap: url('@{img-url}/@{title-docked-border-img}');
+  qproperty-ActiveBorderPixmap: url('@{img-url}/@{title-docked-active-border-img}');
+  qproperty-FloatBorderPixmap: url('@{img-url}/@{title-float-border-img}');
+  qproperty-FloatActiveBorderPixmap: url('@{img-url}/@{title-float-active-border-img}');
 }
 
 TPanelTitleBarButton {

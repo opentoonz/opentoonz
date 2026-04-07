@@ -350,6 +350,7 @@
 // -----------------------------------------------------------------------------
 
 .treeview-item-style(@show-alt-row: false) {
+  .text-bold-items();
   background-color: @tree-bg-color;
   alternate-background-color: if(@show-alt-row, @tree-bg-color-alt-row, transparent);
   border: 0;
@@ -362,7 +363,7 @@
       color: @hl-text-color;
 
       &:hover {
-        background-color: lighten(@hl-color, 8% * @hover-adjust-amount);
+        background-color: lighten(@hl-color, @hover-amount);
         color: @hl-text-color;
       }
     }
@@ -441,6 +442,15 @@
 
 .font-style-monospace() {
   font-family: 'Courier New', Courier, monospace;
+}
+
+.text-bold-items() {
+  & when(@bold-list-text = true) {
+    font-weight: bold;
+  }
+  & when(@bold-list-text = false) {
+    font-weight: normal;
+  }
 }
 
 // -----------------------------------------------------------------------------

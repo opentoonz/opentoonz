@@ -43,7 +43,7 @@
     }
 
     &:pressed {
-      background-color: darken(@keyframe-total-color, 8% * @pressed-adjust-amount);
+      background-color: darken(@keyframe-total-color, @pressed-amount);
       border-color: @keyframe-total-border-color;
     }
   }
@@ -58,7 +58,7 @@
     }
 
     &:pressed {
-      background-color: darken(@keyframe-total-color, 8% * @pressed-adjust-amount);
+      background-color: darken(@keyframe-total-color, @pressed-amount);
       border-color: @keyframe-total-border-color;
   
     }

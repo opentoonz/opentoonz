@@ -14,64 +14,68 @@
 
 // SETTINGS --------------------------------------------------------------------
 
-// >>> Inherit other settings from default-theme.less
-
-@ui-contrast: 0.8; // multiplier
+// Adjust Contrast (Multiplier)
+@dark-contrast:   0.8;
+@light-contrast:  1.2;
+@border-contrast: 1.0;
 
 // COLORS ----------------------------------------------------------------------
 
 @bg-color: #303030;
-@text-color: #d3d3d3; 
-@hl-color: #456aa9;
 
-// Icon Colors
-@icon-base-color: darken(@text-color, 2%);
+// -----------------------------------------------------------------------------
+// Context Menu
+// -----------------------------------------------------------------------------
+@menu-bg-color: @dark-color-2;
+@menu-border-color: lighten(@menu-bg-color, 15% * @border-contrast);
+@menu-checkbox-border-color-hover: rgba(255, 255, 255, 0.65);
+
+// -----------------------------------------------------------------------------
+// Button
+// -----------------------------------------------------------------------------
+@button-border-color: lighten(@button-bg-color, 5% * @border-contrast);
 
 // -----------------------------------------------------------------------------
 // Textfield
 // -----------------------------------------------------------------------------
-@input-bg-color: darken(@bg-color, 14% * @ui-contrast);
-@input-border-color: lighten(@bg-color, 10% * @border-contrast);
-@input-border-radius: 2px;
+@input-border-color: @light-color-1;
 
 // -----------------------------------------------------------------------------
-// Treeview
+// Checkbox
 // -----------------------------------------------------------------------------
-@tree-bg-color-alt-row: rgba(0, 0, 0, 0.2);
+@checkbox-border-color: @light-color-3;
+
+// -----------------------------------------------------------------------------
+// Sliders
+// -----------------------------------------------------------------------------
+@slider-groove-img: 'slider/slider-groove-dark.svg';
 
 // -----------------------------------------------------------------------------
 // Viewer
 // -----------------------------------------------------------------------------
 @flipmarker-img: 'flipslider/flipmarker-dark.svg';
 @flipslider-img: 'flipslider/flipslider-dark-hc.svg';
-@flipslider-base-color: darken(@bg-color, 10% * @ui-contrast);
+@flipslider-base-color: @dark-color-3;
 
 // -----------------------------------------------------------------------------
-// Sliders
+// Treeview
 // -----------------------------------------------------------------------------
-@slider-groove-img: 'slider/slider-groove-dark.svg';
-@slider-groove-color: darken(@bg-color, 25% * @ui-contrast);
+@tree-bg-color-alt-row: rgba(255, 255, 255, 0.05);
 
 // -----------------------------------------------------------------------------
-// X-Sheet
+// X-Sheet [xsh]
 // -----------------------------------------------------------------------------
 
 // SETTINGS --------------------------------------------------------------------
 
-@xsh-color: lighten(@bg-color, 4%);
-
-@xsh-border-contrast: 1.2;
-
-@xsh-cell-lighten-amount: -8%;
-@xsh-cell-sat-amount: 4%;
-
-@xsh-border-darken-amount: 18%;
-@xsh-border-sat-amount: 0%;
+@xsh-color: lighten(@bg-color, 5%);
 
 // -----------------------------------------------------------------------------
-// Function Editor
+// Function Editor [fe]
 // -----------------------------------------------------------------------------
 
-// Curves Viewer
-@fe-panel-line-tone: 10%;
-@fe-panel-bg-color: lighten(@bg-color, 3%);
+// HEADER AREA -----------------------------------------------------------------
+@fe-header-border-color: @light-color-3;
+
+// CURVES VIEWER ---------------------------------------------------------------
+@fe-panel-bg-color: @xsh-color;
