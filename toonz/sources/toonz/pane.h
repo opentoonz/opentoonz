@@ -232,6 +232,9 @@ class TPanel : public TDockWidget {
   Q_PROPERTY(QColor BGColor READ getBGColor WRITE setBGColor)
 
 public:
+  QColor getBGColor() const { return m_bgcolor; }
+  void setBGColor(const QColor &color) { m_bgcolor = color; }
+
   explicit TPanel(QWidget *parent                      = nullptr,
                   Qt::WindowFlags flags                = Qt::WindowFlags(),
                   TDockWidget::Orientation orientation = TDockWidget::vertical);
