@@ -9,6 +9,8 @@
 #include "histogrampopup.h"
 #include "sceneviewer.h"  // ToggleCommandHandler
 #include "mainwindow.h"   //RecentFiles
+#include "layoutUtils.h"
+#include "tapp.h"
 
 // TnzTools includes
 #include "tools/toolcommandids.h"
@@ -21,6 +23,7 @@
 #include "toonzqt/viewcommandids.h"
 #include "toonzqt/imageutils.h"
 #include "toonzqt/lutcalibrator.h"
+#include "toonzqt/camerasettingswidget.h"
 
 // TnzLib includes
 #include "toonz/tscenehandle.h"
@@ -29,6 +32,9 @@
 #include "toonz/palettecontroller.h"
 #include "toonz/tpalettehandle.h"
 #include "toonz/preferences.h"
+#include "toonz/tcamera.h"
+#include "toonz/stage.h"
+#include "toonz/stagevisitor.h"
 
 // TnzCore includes
 #include "tgl.h"
@@ -43,10 +49,7 @@
 
 //===================================================================================
 
-extern ToggleCommandHandler safeAreaToggle;
-extern void getSafeAreaData(double &_smallSize, double &_largeSize);
-// enable to choose safe area from a list, and enable to draw multiple lines
-extern void getSafeAreaSizeList(QList<QList<double>> &_sizeList);
+extern ToggleCommandHandler layoutGuideToggle;
 
 //===================================================================================
 
@@ -55,38 +58,13 @@ extern void getSafeAreaSizeList(QList<QList<double>> &_sizeList);
 //------------------------------
 
 namespace {
-// enable to choose safe area from a list, and enable to draw multiple lines
-void drawSafeArea(const TRectD box) {
-  glPushMatrix();
-  glLoadIdentity();
-
-  tglColor(TPixel32::Red);
-  glLineStipple(1, 0xCCCC);
-  glEnable(GL_LINE_STIPPLE);
-
-  tglDrawRect(box);
-
-  QList<QList<double>> sizeList;
-
-  getSafeAreaSizeList(sizeList);
-
-  for (int i = 0; i < sizeList.size(); i++) {
-    QList<double> curSize = sizeList.at(i);
-    if (curSize.size() == 5)
-      tglColor(
-          TPixel((int)curSize.at(2), (int)curSize.at(3), (int)curSize.at(4)));
-    else
-      tglColor(TPixel32::Red);
-
-    double facX = -0.5 * (1 - curSize.at(0) / 100.0);
-    double facY = -0.5 * (1 - curSize.at(1) / 100.0);
-    tglDrawRect(box.enlarge(facX * box.getLx(), facY * box.getLy()));
-  }
-
-  glDisable(GL_LINE_STIPPLE);
-  glPopMatrix();
+TPointD getCameraDpi() {
+  return TApp::instance()
+      ->getCurrentScene()
+      ->getScene()
+      ->getCurrentCamera()
+      ->getDpi();
 }
-
 //-----------------------------------------------------------------------------
 
 inline TRect getImageBounds(const TImageP &img) {
@@ -576,7 +554,7 @@ void ImageViewer::paintGL() {
     return;
   }
 
-  if (safeAreaToggle.getStatus() && !m_isColorModel) {
+  if (layoutGuideToggle.getStatus() && !m_isColorModel) {
     TRasterImageP rimg = (TRasterImageP)m_image;
     TVectorImageP vimg = (TVectorImageP)m_image;
     TToonzImageP timg  = (TToonzImageP)m_image;
@@ -593,10 +571,7 @@ void ImageViewer::paintGL() {
     }
 
     if (!vimg) {
-      TAffine aff = TTranslation(viewerSize.lx * 0.5, viewerSize.ly * 0.5) *
-                    m_viewAff * TTranslation(-centerD);
-      TRectD bbox = aff * TRectD(0, 0, bounds.getLx() - 1, bounds.getLy() - 1);
-      drawSafeArea(bbox);
+      drawLayoutGuide(centerD, bounds);
     }
   }
   TPoint fromPos, toPos;
@@ -660,6 +635,64 @@ void ImageViewer::paintGL() {
       currentInstant = m_timer->nsecsElapsed();
     }
   }
+}
+
+void ImageViewer::drawLayoutGuide(TPointD centerD, TRect bounds) {
+  QList<QList<double>> sizeList;
+  TXshSimpleLevelP sl = nullptr;
+  TPointD offset;
+  TDimension viewerSize(width(), height());
+
+  layoutUtils::getLayoutPreset(sizeList, sl, offset);
+
+  if (sl) {
+    ImagePainter::VisualSettings vs;
+    bool isVector = sl->getType() == TXshLevelType::PLI_XSHLEVEL;
+    TRect clipRect(0, 0, width(), height());
+
+    Stage::RasterPainter painter(viewerSize, m_viewAff, clipRect, vs, false);
+
+    Stage::Player player;
+    player.m_sl  = sl.getPointer();
+    player.m_fid = sl->getFirstFid();
+    if (isVector)
+      player.m_xsh =
+          TApp::instance()->getCurrentScene()->getScene()->getXsheet();
+
+    painter.onImage(player);
+    painter.flushRasterImages();
+  }
+
+  glPushMatrix();
+  glLoadIdentity();
+
+  tglColor(TPixel32::Red);
+  glLineStipple(1, 0xCCCC);
+  glEnable(GL_LINE_STIPPLE);
+
+  TAffine aff = TTranslation(viewerSize.lx * 0.5, viewerSize.ly * 0.5) *
+                m_viewAff * TTranslation(-centerD);
+  // Use exclusive bounds
+  TRectD bbox = aff * TRectD(0, 0, bounds.getLx(), bounds.getLy());
+
+  // Draw Image/Camera Bounds
+  tglDrawRect(bbox);
+
+  for (int i = 0; i < sizeList.size(); i++) {
+    QList<double> curSize = sizeList.at(i);
+    if (curSize.size() == 5)
+      tglColor(
+          TPixel((int)curSize.at(2), (int)curSize.at(3), (int)curSize.at(4)));
+    else
+      tglColor(TPixel32::Red);
+
+    double facX = -0.5 * (1 - curSize.at(0) / 100.0);
+    double facY = -0.5 * (1 - curSize.at(1) / 100.0);
+    tglDrawRect(bbox.enlarge(facX * bbox.getLx(), facY * bbox.getLy()));
+  }
+
+  glDisable(GL_LINE_STIPPLE);
+  glPopMatrix();
 }
 
 //------------------------------------------------------------------------------

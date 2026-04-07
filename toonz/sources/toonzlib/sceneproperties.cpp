@@ -74,7 +74,8 @@ TSceneProperties::TSceneProperties()
     , m_fieldGuideSize(16)
     , m_fieldGuideAspectRatio(1.77778)
     , m_columnColorFilterOnRender(false)
-    , m_camCapSaveInPath() {
+    , m_camCapSaveInPath()
+    , m_layoutPresetName("") {
   // Default color
   m_notesColor.push_back(TPixel32(255, 235, 140));
   m_notesColor.push_back(TPixel32(255, 160, 120));
@@ -391,6 +392,8 @@ void TSceneProperties::saveData(TOStream &os) const {
   os.child("markers") << m_markerDistance << m_markerOffset;
   os.child("subsampling") << m_fullcolorSubsampling << m_tlvSubsampling;
   os.child("fieldguide") << m_fieldGuideSize << m_fieldGuideAspectRatio;
+  if (!m_layoutPresetName.isEmpty())
+    os.child("layoutPresetName") << m_layoutPresetName;
   if (m_columnColorFilterOnRender) os.child("columnColorFilterOnRender") << 1;
   if (!m_camCapSaveInPath.isEmpty())
     os.child("cameraCaputureSaveInPath") << m_camCapSaveInPath;
@@ -450,6 +453,8 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject) {
       is >> m_markerDistance >> m_markerOffset;
     } else if (tagName == "subsampling") {
       is >> m_fullcolorSubsampling >> m_tlvSubsampling;
+    } else if (tagName == "layoutPresetName") {
+      is >> m_layoutPresetName;
     } else if (tagName == "fieldguide") {
       is >> m_fieldGuideSize >> m_fieldGuideAspectRatio;
     } else if (tagName == "columnColorFilterOnRender") {

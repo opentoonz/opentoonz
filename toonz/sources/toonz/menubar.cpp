@@ -483,7 +483,7 @@ QMenuBar *StackedMenuBar::createCleanupMenuBar() {
     addMenuItem(viewPartsMenu, MI_ViewCamera);
     addMenuItem(viewPartsMenu, MI_ViewTable);
     addMenuItem(viewPartsMenu, MI_FieldGuide);
-    addMenuItem(viewPartsMenu, MI_SafeArea);
+    addMenuItem(viewPartsMenu, MI_LayoutGuide);
     addMenuItem(viewPartsMenu, MI_ViewBBox);
     addMenuItem(viewPartsMenu, MI_ViewColorcard);
   }
@@ -654,7 +654,7 @@ QMenuBar *StackedMenuBar::createPltEditMenuBar() {
     addMenuItem(viewPartsMenu, MI_ViewCamera);
     addMenuItem(viewPartsMenu, MI_ViewTable);
     addMenuItem(viewPartsMenu, MI_FieldGuide);
-    addMenuItem(viewPartsMenu, MI_SafeArea);
+    addMenuItem(viewPartsMenu, MI_LayoutGuide);
     addMenuItem(viewPartsMenu, MI_ViewColorcard);
   }
   customizeMenu->addSeparator();
@@ -834,7 +834,7 @@ QMenuBar *StackedMenuBar::createInknPaintMenuBar() {
     addMenuItem(viewPartsMenu, MI_ViewCamera);
     addMenuItem(viewPartsMenu, MI_ViewTable);
     addMenuItem(viewPartsMenu, MI_FieldGuide);
-    addMenuItem(viewPartsMenu, MI_SafeArea);
+    addMenuItem(viewPartsMenu, MI_LayoutGuide);
     addMenuItem(viewPartsMenu, MI_ViewColorcard);
   }
   customizeMenu->addSeparator();
@@ -1020,7 +1020,7 @@ QMenuBar *StackedMenuBar::createXsheetMenuBar() {
     addMenuItem(viewPartsMenu, MI_ViewCamera);
     addMenuItem(viewPartsMenu, MI_ViewTable);
     addMenuItem(viewPartsMenu, MI_FieldGuide);
-    addMenuItem(viewPartsMenu, MI_SafeArea);
+    addMenuItem(viewPartsMenu, MI_LayoutGuide);
     addMenuItem(viewPartsMenu, MI_ViewBBox);
     addMenuItem(viewPartsMenu, MI_ViewColorcard);
   }
@@ -1415,7 +1415,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(viewMenu, MI_ViewColorcard);
   addMenuItem(viewMenu, MI_ViewBBox);
   viewMenu->addSeparator();
-  addMenuItem(viewMenu, MI_SafeArea);
+  addMenuItem(viewMenu, MI_LayoutGuide);
   addMenuItem(viewMenu, MI_FieldGuide);
   addMenuItem(viewMenu, MI_ViewRuler);
   addMenuItem(viewMenu, MI_ViewGuide);
