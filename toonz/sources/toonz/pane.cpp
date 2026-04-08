@@ -390,7 +390,9 @@ void TPanelTitleBarButton::setOffColor(const QColor &color) {
   }
 }
 
-QColor TPanelTitleBarButton::getOffColor() const { return m_offColor; }
+QColor TPanelTitleBarButton::getOffColor() const {
+  return m_offColor.isValid() ? m_offColor : Qt::transparent;
+}
 
 //-----------------------------------------------------------------------------
 
@@ -481,16 +483,23 @@ void TPanelTitleBarButton::paintEvent(QPaintEvent *event) {
 
     if (!pm.isNull()) {
       QColor bgColor = getOffColor();
+
       if (m_pressed) {
+        QColor tgtColor;
         if (m_standardPixmapName.contains(QLatin1String("freeze"))) {
-          bgColor = getFreezeColor();
+          tgtColor = getFreezeColor();
         } else if (m_standardPixmapName.contains(QLatin1String("preview"))) {
-          bgColor = getPreviewColor();
+          tgtColor = getPreviewColor();
         } else {
-          bgColor = getPressedColor();
+          tgtColor = getPressedColor();
         }
+
+        // Only overwrite if stylesheet actually provided valid color
+        if (tgtColor.isValid()) bgColor = tgtColor;
       } else if (m_rollover) {
-        bgColor = getOverColor();
+        QColor overColor = getOverColor();
+        // Only overwrite if valid, or keep the safe transparent color
+        if (overColor.isValid()) bgColor = overColor;
       }
 
       pm.setDevicePixelRatio(dpr);
