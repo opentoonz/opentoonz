@@ -264,6 +264,9 @@ class TPanel : public TDockWidget {
   Q_PROPERTY(QColor BGColor READ getBGColor WRITE setBGColor)
 
 public:
+  QColor getBGColor() const { return m_bgcolor; }
+  void setBGColor(const QColor &color) { m_bgcolor = color; }
+
   explicit TPanel(QWidget *parent                      = nullptr,
                   Qt::WindowFlags flags                = Qt::WindowFlags(),
                   TDockWidget::Orientation orientation = TDockWidget::vertical);
@@ -319,6 +322,11 @@ protected:
   void paintEvent(QPaintEvent *) override;
   void enterEvent(QEvent *) override;
   void leaveEvent(QEvent *) override;
+
+  // BTR grip visibility follows floating/docked state (dock + workspace restore).
+  void setFloatingAppearance() override;
+  void setDockedAppearance() override;
+
   virtual bool isActivatableOnEnter() { return false; }
 
 protected slots:
@@ -350,9 +358,6 @@ private:
   bool m_isRoomBound;
   QString m_boundRoomName;
   TPanelTitleBarButton *m_roomBindButton;
-
-  QColor getBGColor() const { return m_bgcolor; }
-  void setBGColor(const QColor &color) { m_bgcolor = color; }
 };
 
 //-----------------------------------------------------------------------------
