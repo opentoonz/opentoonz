@@ -192,7 +192,7 @@ DrawableTextureDataP texture_utils::getTextureData(const TXsheet *xsh,
   bbox = (cameraAff.inv() * bbox).enlarge(1.0);
 
 // Render the xsheet on the specified bbox
-#ifdef MACOSX
+#if defined(MACOSX) || defined(LINUX) || defined(FREEBSD)
   xsh->getScene()->renderFrame(tex, frame, xsh, bbox, TAffine());
 #else
   // The call below will change context (I know, it's a shame :( )
