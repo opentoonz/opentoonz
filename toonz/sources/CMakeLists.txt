@@ -85,7 +85,7 @@ endmacro()
 # values to initialize WITH_****
 option_defaults_init(
     _init_SYSTEM_LZO
-)
+  )
 
 # customize...
 if(BUILD_ENV_MSVC)
@@ -182,7 +182,7 @@ if(BUILD_ENV_MSVC)
         -DVC_EXTRALEAN
         -DNOMINMAX
         -D_USE_MATH_DEFINES
-    )
+      )
 elseif(BUILD_ENV_APPLE)
     # Try to find Qt from Homebrew if not explicitly set
     if(NOT DEFINED QT_PATH)
@@ -191,7 +191,7 @@ elseif(BUILD_ENV_APPLE)
             OUTPUT_VARIABLE HOMEBREW_QT_PREFIX
             OUTPUT_STRIP_TRAILING_WHITESPACE
             RESULT_VARIABLE BREW_RESULT
-        )
+          )
         if(NOT BREW_RESULT EQUAL 0)
             message(FATAL_ERROR "Homebrew 'qt@5' not found. Install with 'brew install qt@5' or set QT_PATH manually.")
         endif()
@@ -199,7 +199,7 @@ elseif(BUILD_ENV_APPLE)
         message(STATUS "Auto-detected Qt path: ${QT_PATH}")
         set(QT_LIB_PATH "${QT_PATH}")
         list(APPEND CMAKE_PREFIX_PATH "${HOMEBREW_QT_PREFIX}/lib/cmake/Qt5")  # More precise for find_package(Qt5)
-    # Conventional usage: if the QT_PATH is explicitly set
+        # Conventional usage: if the QT_PATH is explicitly set
     else()
         set(QT_LIB_PATH "${QT_PATH}/")
         list(APPEND CMAKE_PREFIX_PATH "${QT_LIB_PATH}cmake/")
@@ -214,7 +214,7 @@ elseif(BUILD_ENV_APPLE)
         -DMACOSX
         -Di386
         -D__MACOS__
-    )
+      )
     if(PLATFORM EQUAL 64)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64 -stdlib=libc++ -fno-implicit-templates")
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64")
@@ -258,7 +258,7 @@ add_definitions(
     -DQT_NETWORK_LIB
     -DQT_CORE_LIB
     -DQT_SHARED
-)
+  )
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -278,7 +278,7 @@ endif()
 
 include_directories(
     include
-)
+  )
 
 # Find the QtWidgets library
 find_package(Qt5 REQUIRED
@@ -296,10 +296,10 @@ find_package(Qt5 REQUIRED
     MultimediaWidgets
     SerialPort
     UiTools
-)
+  )
 
 if(NOT Qt5Core_FOUND)
-  message(FATAL_ERROR "Qt5Core not found check paths")
+    message(FATAL_ERROR "Qt5Core not found check paths")
 endif()
 message(STATUS "Qt5 Modules: ${Qt5Core_VERSION}")
 
@@ -317,10 +317,10 @@ if(BUILD_ENV_MSVC)
         ${SDKROOT}/zlib-1.2.8
         #${SDKROOT}/LibJPEG/jpeg-9
         ${SDKROOT}/libjpeg-turbo/include
-    )
+      )
     add_definitions(
         -DGLUT_NO_LIB_PRAGMA
-    )
+      )
 endif()
 
 
@@ -336,7 +336,7 @@ if(PLATFORM EQUAL 64)
     if(WITH_CANON)
         include_directories(
             ${SDKROOT}/canon/Header
-        )
+          )
     endif()
 endif()
 
@@ -370,21 +370,21 @@ if(BUILD_ENV_MSVC)
     set(GLUT_LIB ${SDKROOT}/glut/3.7.6/lib/glut${PLATFORM}.lib)
     set(GL_LIB opengl32.lib)
     set(Z_LIB
-        optimized ${SDKROOT}/zlib-1.2.8/lib/zlib-1.2.8_${MSVC_LIB_VERSION}${PLATFORM2}.lib
-        debug ${SDKROOT}/zlib-1.2.8/lib/zlib-1.2.8_${MSVC_LIB_VERSION}${PLATFORM2}d.lib
-    )
+    optimized ${SDKROOT}/zlib-1.2.8/lib/zlib-1.2.8_${MSVC_LIB_VERSION}${PLATFORM2}.lib
+    debug ${SDKROOT}/zlib-1.2.8/lib/zlib-1.2.8_${MSVC_LIB_VERSION}${PLATFORM2}d.lib
+      )
     #set(JPEG_LIB ${SDKROOT}/LibJPEG/jpeg-9/lib/LibJPEG-9_${MSVC_LIB_VERSION}${PLATFORM2}.lib)
     set(JPEG_LIB ${SDKROOT}/libjpeg-turbo/lib/jpeg-static_${MSVC_LIB_VERSION}${PLATFORM2}.lib)
     set(TURBOJPEG_LIB ${SDKROOT}/libjpeg-turbo/lib/turbojpeg-static_${MSVC_LIB_VERSION}${PLATFORM2}.lib)
     set(TIFF_INCLUDE_DIR ${SDKROOT}/tiff-4.0.3/libtiff)
     set(TIFF_LIB
-        optimized ${SDKROOT}/tiff-4.0.3/lib/LibTIFF-4.0.3_${MSVC_LIB_VERSION}${PLATFORM2}.lib
-        debug  ${SDKROOT}/tiff-4.0.3/lib/LibTIFF-4.0.3_${MSVC_LIB_VERSION}${PLATFORM2}d.lib
-    )
+    optimized ${SDKROOT}/tiff-4.0.3/lib/LibTIFF-4.0.3_${MSVC_LIB_VERSION}${PLATFORM2}.lib
+    debug  ${SDKROOT}/tiff-4.0.3/lib/LibTIFF-4.0.3_${MSVC_LIB_VERSION}${PLATFORM2}d.lib
+      )
     set(PNG_LIB
-        optimized ${SDKROOT}/libpng-1.6.21/lib/libpng16_${MSVC_LIB_VERSION}${PLATFORM2}.lib
-        debug  ${SDKROOT}/libpng-1.6.21/lib/libpng16_${MSVC_LIB_VERSION}${PLATFORM2}d.lib
-    )
+    optimized ${SDKROOT}/libpng-1.6.21/lib/libpng16_${MSVC_LIB_VERSION}${PLATFORM2}.lib
+    debug  ${SDKROOT}/libpng-1.6.21/lib/libpng16_${MSVC_LIB_VERSION}${PLATFORM2}d.lib
+      )
     set(GLEW_LIB ${SDKROOT}/glew/glew-1.9.0/lib/glew${PLATFORM}.lib)
     set(LZ4_LIB ${SDKROOT}/Lz4/Lz4_131/lz4_${PLATFORM}.lib)
     set(SUPERLU_LIB ${SDKROOT}/superlu/SuperLU_${MSVC_LIB_VERSION}_${PLATFORM}.lib)
@@ -455,7 +455,7 @@ elseif(BUILD_ENV_APPLE)
 
     pkg_check_modules(MYPAINT_LIB REQUIRED libmypaint)
 
-    set(MYPAINT_LIB_LIBRARIES ${MYPAINT_LIB_LIBRARIES} CACHE INTERNAL "") 
+    set(MYPAINT_LIB_LIBRARIES ${MYPAINT_LIB_LIBRARIES} CACHE INTERNAL "")
     set(MYPAINT_LIB_INCLUDE_DIRS ${MYPAINT_LIB_INCLUDE_DIRS} CACHE INTERNAL "")
 
     if(PLATFORM EQUAL 64)
@@ -501,10 +501,15 @@ elseif(BUILD_ENV_UNIXLIKE)
     pkg_check_modules(LZMA liblzma)
     set(TIFF_LIB ${TIFF_LIBRARY} ${LZMA_LIBRARIES})
 
-    if(GLEW-NOTFOUND)
+    if(TARGET GLEW::GLEW)
+        set(GLEW_LIB GLEW::GLEW)
+    elseif(GLEW_FOUND)
+        set(GLEW_LIB ${GLEW_LIBRARIES})
+    else()
+        find_package(PkgConfig REQUIRED)
         pkg_check_modules(GLEW REQUIRED glew)
+        set(GLEW_LIB ${GLEW_LIBRARIES})
     endif()
-    set(GLEW_LIB ${GLEW_LIBRARIES})
 
     pkg_check_modules(LZ4_LIB REQUIRED liblz4)
 
@@ -572,7 +577,7 @@ include_directories(
     BEFORE
     ${TIFF_INCLUDE_DIR}
     ${PNG_INCLUDE_DIRS}
-)
+  )
 
 if(BUILD_ENV_MSVC OR BUILD_ENV_APPLE)
     # Handle CMake 3.30+/4.x: Force legacy module for prebuilt Boost (no config files)
@@ -583,21 +588,21 @@ if(BUILD_ENV_MSVC OR BUILD_ENV_APPLE)
     set(Boost_NO_BOOST_CMAKE ON)  # Explicitly disable config search
     find_path(
         BOOST_ROOT
-            include/boost
-            boost
+        include/boost
+        boost
         HINTS
             ${BOOST_ROOT}  # From -D or env
             ${THIRDPARTY_LIBS_HINTS}
-        PATH_SUFFIXES
-            boost/boost_1_89_0/  # Added recent versions (e.g., Homebrew 1.89)
-            boost/boost_1_87_0/
-            boost/boost_1_86_0/
-            boost/boost_1_85_0/
-            boost/boost_1_75_0/
-            boost/boost_1_74_0/
-            boost/boost_1_73_0/
-            boost/boost_1_72_0/
-    )
+            PATH_SUFFIXES
+                boost/boost_1_89_0/  # Added recent versions (e.g., Homebrew 1.89)
+                boost/boost_1_87_0/
+                boost/boost_1_86_0/
+                boost/boost_1_85_0/
+                boost/boost_1_75_0/
+                boost/boost_1_74_0/
+                boost/boost_1_73_0/
+                boost/boost_1_72_0/
+      )
     find_package(Boost 1.55 REQUIRED)
 else()
     find_package(Boost)
@@ -611,7 +616,7 @@ include_directories(
     ${SUPERLU_INCLUDE_DIR}
     ${JPEG_INCLUDE_DIR}
     ${MYPAINT_LIB_INCLUDE_DIRS}
-)
+  )
 
 if(PLATFORM EQUAL 64)
     add_definitions(-Dx64)
@@ -661,12 +666,12 @@ if(WITH_TRANSLATION)
     # Language data and display names
     # ---------------------------------------------------------------------
     set(LANG_CODES
-        japanese italian french spanish chinese german russian korean czech
-    )
+    japanese italian french spanish chinese german russian korean czech
+      )
 
     set(LANG_DISPLAY_NAMES
-        "日本語" "Italiano" "Français" "Español" "中文" "Deutsch" "Русский" "한국어" "Čeština"
-    )
+    "日本語" "Italiano" "Français" "Español" "中文" "Deutsch" "Русский" "한국어" "Čeština"
+      )
 
     list(LENGTH LANG_CODES CODE_COUNT)
     list(LENGTH LANG_DISPLAY_NAMES DISPLAY_COUNT)
@@ -694,7 +699,7 @@ if(WITH_TRANSLATION)
                     DEPENDS "${ts_file}"
                     COMMENT "lrelease ${lang}/${module}.qm"
                     VERBATIM
-                )
+                  )
                 list(APPEND qm_files "${qm_file}")
             endif()
         endforeach()
@@ -706,8 +711,8 @@ if(WITH_TRANSLATION)
 
     # List of all modules that have translations
     set(TRANSLATION_MODULES
-        toonz tnzcore toonzlib tnztools toonzqt image colorfx
-    )
+    toonz tnzcore toonzlib tnztools toonzqt image colorfx
+      )
 
     foreach(mod ${TRANSLATION_MODULES})
         compile_translations(${mod})
@@ -719,48 +724,48 @@ if(WITH_TRANSLATION)
     set(LOC_ROOT "${CMAKE_BINARY_DIR}/../../stuff/config/loc")
 
     add_custom_target(rename_translation_folders ALL
-        DEPENDS
-            translate_toonz
-            translate_tnzcore
-            translate_toonzlib
-            translate_tnztools
-            translate_toonzqt
-            translate_image
-            translate_colorfx
+    DEPENDS
+        translate_toonz
+        translate_tnzcore
+        translate_toonzlib
+        translate_tnztools
+        translate_toonzqt
+        translate_image
+        translate_colorfx
         COMMENT "Renaming language folders to native display names"
-    )
+      )
 
     # Generate the rename script (runs once per build)
     file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/rename_languages.cmake" CONTENT
-"set(LOC_ROOT \"${LOC_ROOT}\")
-set(LANG_CODES ${LANG_CODES})
-set(LANG_DISPLAY_NAMES ${LANG_DISPLAY_NAMES})
+        "set(LOC_ROOT \"${LOC_ROOT}\")
+        set(LANG_CODES ${LANG_CODES})
+        set(LANG_DISPLAY_NAMES ${LANG_DISPLAY_NAMES})
 
-list(LENGTH LANG_CODES NUM_LANGS)
-math(EXPR LAST_INDEX \"\${NUM_LANGS}-1\")
+        list(LENGTH LANG_CODES NUM_LANGS)
+        math(EXPR LAST_INDEX \"\${NUM_LANGS}-1\")
 
-message(STATUS \"Renaming language folders to native display names...\")
-foreach(idx RANGE 0 \${LAST_INDEX})
-    list(GET LANG_CODES \${idx} src)
-    list(GET LANG_DISPLAY_NAMES \${idx} dst)
-    set(src_path \"\${LOC_ROOT}/\${src}\")
-    set(dst_path \"\${LOC_ROOT}/\${dst}\")
+        message(STATUS \"Renaming language folders to native display names...\")
+        foreach(idx RANGE 0 \${LAST_INDEX})
+        list(GET LANG_CODES \${idx} src)
+        list(GET LANG_DISPLAY_NAMES \${idx} dst)
+        set(src_path \"\${LOC_ROOT}/\${src}\")
+        set(dst_path \"\${LOC_ROOT}/\${dst}\")
 
-    if(EXISTS \"\${src_path}\")
+        if(EXISTS \"\${src_path}\")
         if(EXISTS \"\${dst_path}\")
-            file(REMOVE_RECURSE \"\${dst_path}\")
+        file(REMOVE_RECURSE \"\${dst_path}\")
         endif()
         file(RENAME \"\${src_path}\" \"\${dst_path}\")
         message(STATUS \" => \${src}\")
-    endif()
-endforeach()
-")
+        endif()
+        endforeach()
+        ")
 
-    # Execute rename after all .qm files are built
-    add_custom_command(TARGET rename_translation_folders POST_BUILD
+        # Execute rename after all .qm files are built
+        add_custom_command(TARGET rename_translation_folders POST_BUILD
         COMMAND ${CMAKE_COMMAND} -P "${CMAKE_CURRENT_BINARY_DIR}/rename_languages.cmake"
         VERBATIM
-    )
+          )
 
 endif()
 
