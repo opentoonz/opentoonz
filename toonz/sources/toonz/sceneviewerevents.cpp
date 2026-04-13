@@ -67,7 +67,7 @@
 #include <QGestureEvent>
 #include <QPainter>
 
-// definito - per ora - in tapp.cpp
+// defined currently in tapp.cpp
 extern QString updateToolEnableStatus(TTool *tool);
 
 //-----------------------------------------------------------------------------
@@ -79,7 +79,7 @@ void initToonzEvent(TMouseEvent &toonzEvent, QMouseEvent *event,
   toonzEvent.m_pos      = TPointD(event->pos().x() * devPixRatio,
                                   widgetHeight - 1 - event->pos().y() * devPixRatio);
   toonzEvent.m_mousePos = event->pos();
-  toonzEvent.m_pressure = 1.0;
+  toonzEvent.m_pressure = pressure;
 
   toonzEvent.setModifiers(event->modifiers() & Qt::ShiftModifier,
                           event->modifiers() & Qt::AltModifier,
@@ -250,8 +250,7 @@ void SceneViewer::onButtonPressed(FlipConsole::EGadget button) {
 
 //-----------------------------------------------------------------------------
 // when using tablet on OSX, use tabletEvent instead of all the mouse-related
-// events
-// on Windows or on other OS, handle only left-button case
+// events on Windows or on other OS, handle only left-button case
 
 void SceneViewer::tabletEvent(QTabletEvent *e) {
   if (m_freezedStatus != NO_FREEZED) return;
@@ -325,8 +324,9 @@ void SceneViewer::tabletEvent(QTabletEvent *e) {
       onContextMenu(e->pos(), e->globalPos());
     }
 #endif
-
+    e->accept();
   } break;
+
   case QEvent::TabletRelease: {
 #ifdef MACOSX
     if (m_tabletState == StartStroke || m_tabletState == OnStroke)
@@ -347,7 +347,11 @@ void SceneViewer::tabletEvent(QTabletEvent *e) {
     } else
       m_tabletEvent = false;
 #endif
+    if (toolHandle->getTool() && !toolHandle->getTool()->isUndoable())
+      toolHandle->getTool()->setCanUndo(true);
+    e->accept();
   } break;
+
   case QEvent::TabletMove: {
 #ifdef MACOSX
     // for now OSX seems to fail to call enter/leaveEvent properly while
@@ -365,6 +369,7 @@ void SceneViewer::tabletEvent(QTabletEvent *e) {
 #endif
 
     QPointF curPos = e->posF() * getDevPixRatio();
+
 #if defined(_WIN32)
     // Use the application attribute Qt::AA_CompressTabletEvents instead of the
     // delay timer
@@ -888,7 +893,8 @@ void SceneViewer::mouseReleaseEvent(QMouseEvent *event) {
     // initiated by tableEvent. All other cases, it's ok to clear flag
     if (m_tabletState == Released || m_tabletState == None)
       m_tabletEvent = false;
-    return;
+    else
+      return;
   }
   // for touchscreens but not touchpads...
   if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen) {
@@ -1763,7 +1769,7 @@ using namespace ImageUtils;
 //-----------------------------------------------------------------------------
 
 void SceneViewer::contextMenuEvent(QContextMenuEvent *e) {
-  if (m_tabletEvent) return;
+  if (m_tabletEvent || m_tabletState != None) return;
 #ifndef _WIN32
   /* On windows the widget receive the release event before the menu
      is shown, on linux and osx the release event is lost, never
