@@ -359,17 +359,17 @@
   
   &::item {
     &:selected {
-      background-color: @hl-color;
-      color: @hl-text-color;
+      background-color: @tree-item-bg-color-selected;
+      color: @tree-item-text-color-selected;
 
       &:hover {
-        background-color: lighten(@hl-color, @hover-amount);
-        color: @hl-text-color;
+        background-color: lighten(@tree-item-bg-color-selected, @hover-amount);
+        color: @tree-item-text-color-selected;
       }
     }
 
     &:hover {
-      background-color: @tree-item-bg-color-hover;
+      background-color: lighten(@tree-bg-color, @hover-amount);
     }
   }
 }

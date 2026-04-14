@@ -1116,7 +1116,7 @@ QTreeWidget::item:selected:hover {
   color: white;
 }
 QTreeWidget::item:hover {
-  background-color: #5b5f68;
+  background-color: #4f525b;
 }
 QTreeWidget::branch {
   background-color: transparent;
@@ -1170,7 +1170,7 @@ QTreeView::item:selected:hover {
   color: white;
 }
 QTreeView::item:hover {
-  background-color: #5b5f68;
+  background-color: #4f525b;
 }
 QTreeView::branch {
   background-color: transparent;
@@ -1997,6 +1997,10 @@ QDialog #dialogButtonFrame QPushButton:focus:pressed {
 #OutputSettingsPopup QListWidget::item:selected {
   background-color: #4f7bc7;
   color: white;
+}
+#PreferencesPopup QListWidget::item:selected:hover,
+#OutputSettingsPopup QListWidget::item:selected:hover {
+  background-color: #7698d3;
 }
 /* -----------------------------------------------------------------------------
    Keyboard Shortcuts
@@ -3260,7 +3264,7 @@ XsheetViewer QListWidget::item:selected {
   color: white;
 }
 #FunctionEditorTree::item:hover {
-  background-color: #5b5f68;
+  background-color: #4f525b;
 }
 #FunctionEditorTree::branch {
   background-color: transparent;

@@ -123,6 +123,7 @@
 // -----------------------------------------------------------------------------
 @topbar-bg-color: @bg-color;
 
+@menubar-item-text-color-selected: @hl-text-color;
 @menubar-item-bg-color-selected: @hl-color;
 @menubar-item-bg-color-hover: lighten(@topbar-bg-color, @hover-amount);
 
@@ -448,7 +449,8 @@
 @tree-bg-color: @dark-color-1;
 @tree-bg-color-alt-row: rgba(0, 0, 0, 0.15);
 
-@tree-item-bg-color-hover: @bg-color-hover;
+@tree-item-bg-color-selected: @hl-color;
+@tree-item-text-color-selected: @hl-text-color;
 
 // Lists
 @list-bg-color: @tree-bg-color;
@@ -458,6 +460,7 @@
 @browser-selected-item-bg-color: @hl-color;
 @browser-selected-text-color: @hl-text-color;
 @browser-text-color: @text-color;
+@browser-text-color-selected: @hl-text-color;
 @browser-folder-text-color: @normal-label-color;
 @browser-folder-text-color-selected: @hl-text-color;
 
@@ -701,6 +704,8 @@
 @fe-ib-border-sat-amount: 0%;
 @fe-ib-hl-lighten-amount: 22%;
 @fe-ib-hl-sat-amount: 5%;
+
+@fe-current-row-bg-alpha: 80%;
 
 // HEADER AREA -----------------------------------------------------------------
 @fe-header-border-color: @border-color;

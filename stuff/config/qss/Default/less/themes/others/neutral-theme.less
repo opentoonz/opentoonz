@@ -16,7 +16,7 @@
 
 // Adjust Contrast (Multiplier)
 @dark-contrast:   1.0;
-@light-contrast:  1.2;
+@light-contrast:  1.0;
 @border-contrast: 1.4;
 
 // Toggles
@@ -34,9 +34,13 @@
 @text-color-active: white;
 @text-color-inactive: fade(@text-color, 80%);
 
-// Highlight
-@hl-color: #c2d3da;
+// Highlight (tool buttons)
+@hl-color: #dddddd;
 @hl-text-color: if(lightness(@hl-color) > 45%, rgba(0, 0, 0, 0.8), rgba(255, 255, 255, 0.8));
+
+// Highlight (menus) > WinXP Blue
+@menu-hl-color: #0A246A;
+@menu-hl-text-color: rgb(229, 229, 235);
 
 @lock-color: #ff7e85;
 @preview-color: #d2cb67;
@@ -45,6 +49,17 @@
 @normal-label-color: rgb(0, 0, 183);
 @error-label-color: rgba(255, 0, 0, 0.7);
 @fx-settings-label-color: rgb(3, 39, 0);
+
+// Icon Theme Colors
+@icon-active-color: @menu-hl-text-color; // menu hover
+@icon-on-color: @text-color;
+
+// Individual Icon Colors
+//! Just set all to black
+@icon-lock-color: @text-color;
+@icon-keyframe-color: @text-color;
+@icon-keyframe-modified-color: @text-color;
+@icon-close-color: @text-color;
 
 // -----------------------------------------------------------------------------
 // Tabs
@@ -56,13 +71,16 @@
 @tab-text-color-hover: @tab-text-color;
 
 // Selected
-@tab-bg-color-selected: @light-color-1;
+@tab-bg-color-selected: @hl-color;
 @tab-text-color-selected: @tab-text-color;
 
 // -----------------------------------------------------------------------------
 // Top Menubar / Rooms
 // -----------------------------------------------------------------------------
 @topbar-bg-color: @light-color-1;
+
+@menubar-item-text-color-selected: @menu-hl-text-color;
+@menubar-item-bg-color-selected: @menu-hl-color;
 
 // Rooms
 @rooms-tab-bg-color: @bg-color;
@@ -72,7 +90,17 @@
 // Context Menu
 // -----------------------------------------------------------------------------
 @menu-bg-color: @light-color-1;
-@menu-checkbox-border-color-hover: @checkbox-border-color;
+
+// Item
+
+// Hover
+@menu-item-bg-color-selected: @menu-hl-color;
+@menu-item-text-color-selected: @menu-hl-text-color;
+@menu-checkbox-border-color-hover: @menu-checkbox-border-color;
+
+// Checked Icon
+@menu-icon-checked-bg-color: cyan;
+@menu-icon-checked-border-color: cyan;
 
 // -----------------------------------------------------------------------------
 // Button
@@ -90,12 +118,20 @@
 // -----------------------------------------------------------------------------
 // Tool Button
 // -----------------------------------------------------------------------------
-@toolbutton-border-color-checked: darken(@toolbutton-bg-color-checked, 40%);
+
+// Hover
+@toolbutton-text-color-hover: white;
+@toolbutton-bg-color-hover: @dark-color-3;
+@toolbutton-border-color-hover: darken(@toolbutton-bg-color-hover, 15%);
+
+// Pressed
+@toolbutton-bg-color-pressed: darken(@toolbutton-bg-color-hover, @pressed-amount);
+@toolbutton-text-color-pressed: @toolbutton-text-color-hover;
+
+// Checked
+@toolbutton-border-color-checked: @border-color;
 @toolbutton-border-color-checked-hover: @toolbutton-border-color-checked;
 @toolbutton-border-color-checked-disabled: darken(@bg-color, 8%);
-
-@toolbutton-text-color-hover: @hl-text-color;
-@toolbutton-border-color-hover: @button-border-color-hover;
 
 // -----------------------------------------------------------------------------
 // Lockbutton
@@ -111,9 +147,8 @@
 @input-border-color-focus: black;
 @input-text-color-focus: black;
 
-// High contrast selection colors
-@input-selection-text-color: white;
-@input-selection-bg-color: #0078D7;
+@input-selection-text-color: @menu-hl-text-color;
+@input-selection-bg-color: @menu-hl-color;
 
 // -----------------------------------------------------------------------------
 // Checkbox
@@ -139,7 +174,15 @@
 // Treeviews
 @tree-bg-color: @bg-color;
 @tree-bg-color-alt-row: rgba(255, 255, 255, 0.1);
-@tree-item-bg-color-hover: lighten(@tree-bg-color, 20%);
+
+@tree-item-bg-color-selected: @menu-hl-color;
+@tree-item-text-color-selected: @menu-hl-text-color;
+
+// All Panes
+@browser-selected-item-bg-color: @menu-hl-color;
+@browser-selected-text-color: @menu-hl-text-color;
+@browser-folder-text-color-selected: cyan;
+@browser-text-color-selected: @menu-hl-text-color;
 
 // -----------------------------------------------------------------------------
 // Viewer
@@ -173,6 +216,7 @@
 // Icon BG Colors
 //! If using titlebar border images, be sure to uncomment this line
 // @titlebar-button-off-bg-color: transparent;
+@titlebar-button-rollover-bg-color: darken(@titlebar-bg-color, @hover-amount + 6%);
 
 // -----------------------------------------------------------------------------
 // Xsheet [xsh]
@@ -181,7 +225,7 @@
 // SETTINGS --------------------------------------------------------------------
 
 // Adjust Contrast (Multiplier)
-@xsh-border-contrast: 0.65;
+@xsh-border-contrast: 0.45;
 
 // Toggles
 @xsh-mono-icons: true;
@@ -199,7 +243,7 @@
 @xsh-hl-sat-amount: @xsh-cell-sat-amount + 8%;
 
 // LEVEL COLORS ----------------------------------------------------------------
-@xsh-notes-color: #bcbcbc;
+@xsh-notes-color: #dadada;
 @xsh-notes-border-color: rgb(124, 124, 124);
 @xsh-notes-hl-color: lighten(@xsh-notes-color, 15%);
 
@@ -211,7 +255,7 @@
 
 // SPREADSHEET CELL AREA -------------------------------------------------------
 @xsh-empty-column-color: @bg-color;
-@xsh-empty-column-range-color: @light-color-1;
+@xsh-empty-column-range-color: mix(@light-color-1, @bg-color, 50%);
 
 @xsh-cell-text-color: black;
 
@@ -226,8 +270,8 @@
 @xsh-framenumber-column-range-text-color: rgb(0, 4, 255);
 @xsh-framenumber-column-range-bg-color: lighten(@xsh-framenumber-column-bg-color, 8%);
 
-@xsh-framenumber-current-text-color: rgb(1, 1, 1); // won't show pure black for some reason, nudge it a bit
-@xsh-framenumber-current-bg-color: rgb(218, 127, 210);
+@xsh-framenumber-current-text-color: rgb(0, 0, 0);
+@xsh-framenumber-current-bg-color: #dfdfdf;
 
 // COLUMN HEADER AREA ----------------------------------------------------------
 @xsh-column-header-selected-color: rgba(255, 255, 255, 0.5);
@@ -275,6 +319,8 @@
 @fe-ib-border-sat-amount: 0%;
 @fe-ib-hl-lighten-amount: 45%;
 @fe-ib-hl-sat-amount: 20%;
+
+@fe-current-row-bg-alpha: 80%;
 
 // CELL COLORS -----------------------------------------------------------------
 @fe-keyframe-color: #C4833E;

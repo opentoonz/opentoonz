@@ -63,8 +63,12 @@ QDialog {
       }
 
       &:selected {
-        background-color: @menubar-item-bg-color-selected;
-        color: @menu-item-text-color-selected;
+        background-color: @tree-item-bg-color-selected;
+        color: @tree-item-text-color-selected;
+
+        &:hover {
+          background-color: lighten(@tree-item-bg-color-selected, @hover-amount);
+        }
       }
     }
   }

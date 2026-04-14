@@ -207,12 +207,12 @@ QMenu::indicator {
 }
 QMenu::indicator:non-exclusive {
   background-color: #0f0f0f;
-  border: 1 solid #6d6d6d;
+  border: 1 solid #4f4f4f;
   border-radius: 2px;
   padding: 1;
   width: 10px;
   height: 10px;
-  border-color: #6d6d6d;
+  border-color: #4f4f4f;
 }
 QMenu::indicator:non-exclusive:hover {
   background-color: #292929;
@@ -248,11 +248,11 @@ QMenu::indicator:non-exclusive:indeterminate:disabled {
 }
 QMenu::indicator:non-exclusive:disabled {
   background-color: #232323;
-  border-color: #484848;
+  border-color: #3c3c3c;
 }
 QMenu::indicator:non-exclusive:selected,
 QMenu::indicator:non-exclusive:hover {
-  border-color: rgba(255, 255, 255, 0.65);
+  border-color: #4f4f4f;
 }
 QMenu::indicator:non-exclusive:checked {
   border-color: #4f7bc7;
@@ -688,7 +688,7 @@ QCheckBox:disabled {
 }
 QCheckBox::indicator {
   background-color: #0f0f0f;
-  border: 1 solid #6d6d6d;
+  border: 1 solid #4f4f4f;
   border-radius: 2px;
   padding: 1;
   width: 10px;
@@ -728,7 +728,7 @@ QCheckBox::indicator:indeterminate:disabled {
 }
 QCheckBox::indicator:disabled {
   background-color: #232323;
-  border-color: #484848;
+  border-color: #3c3c3c;
 }
 QRadioButton {
   color: #dfdfdf;
@@ -794,7 +794,7 @@ QGroupBox::title:disabled {
 }
 QGroupBox::indicator {
   background-color: #0f0f0f;
-  border: 1 solid #6d6d6d;
+  border: 1 solid #4f4f4f;
   border-radius: 2px;
   padding: 1;
   width: 10px;
@@ -836,7 +836,7 @@ QGroupBox::indicator:indeterminate:disabled {
 }
 QGroupBox::indicator:disabled {
   background-color: #232323;
-  border-color: #484848;
+  border-color: #3c3c3c;
 }
 QGroupBox:disabled {
   color: rgba(223, 223, 223, 0.4);
@@ -1116,7 +1116,7 @@ QTreeWidget::item:selected:hover {
   color: white;
 }
 QTreeWidget::item:hover {
-  background-color: #4a4a4a;
+  background-color: #3f3f3f;
 }
 QTreeWidget::branch {
   background-color: transparent;
@@ -1170,7 +1170,7 @@ QTreeView::item:selected:hover {
   color: white;
 }
 QTreeView::item:hover {
-  background-color: #4a4a4a;
+  background-color: #3f3f3f;
 }
 QTreeView::branch {
   background-color: transparent;
@@ -1551,7 +1551,7 @@ ParamsPage {
 }
 #CameraSettingsRadioButton::indicator {
   background-color: #0f0f0f;
-  border: 1 solid #6d6d6d;
+  border: 1 solid #4f4f4f;
   padding: 1;
   width: 10px;
   height: 10px;
@@ -1603,7 +1603,7 @@ ParamsPage {
 }
 #CameraSettingsRadioButton::indicator:disabled {
   background-color: #232323;
-  border-color: #484848;
+  border-color: #3c3c3c;
 }
 #CameraSettingsRadioButton::indicator:hover {
   background-color: #686868;
@@ -1997,6 +1997,10 @@ QDialog #dialogButtonFrame QPushButton:focus:pressed {
 #OutputSettingsPopup QListWidget::item:selected {
   background-color: #4f7bc7;
   color: white;
+}
+#PreferencesPopup QListWidget::item:selected:hover,
+#OutputSettingsPopup QListWidget::item:selected:hover {
+  background-color: #7698d3;
 }
 /* -----------------------------------------------------------------------------
    Keyboard Shortcuts
@@ -3260,7 +3264,7 @@ XsheetViewer QListWidget::item:selected {
   color: white;
 }
 #FunctionEditorTree::item:hover {
-  background-color: #4a4a4a;
+  background-color: #3f3f3f;
 }
 #FunctionEditorTree::branch {
   background-color: transparent;
