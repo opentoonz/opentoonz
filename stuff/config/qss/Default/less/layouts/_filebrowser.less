@@ -4,6 +4,7 @@
 
 // Left pane
 #DirTreeView {
+  .text-bold-items();
   background-color: @tree-bg-color;
   alternate-background-color: @tree-bg-color;
   border: 1 solid @border-color;
@@ -38,10 +39,12 @@
 }
 
 DvItemViewerPanel { // contents
+  .text-bold-items();
   background-color: @browser-right-pane-bg-color;
+
   qproperty-TextColor: @browser-text-color;
   qproperty-AlternateBackground: @tree-bg-color-alt-row;
-  qproperty-SelectedTextColor: @hl-text-color;
+  qproperty-SelectedTextColor: @browser-text-color-selected;
   qproperty-FolderTextColor: @browser-folder-text-color;
   qproperty-SelectedItemBackground: @browser-selected-item-bg-color;
 }

@@ -157,47 +157,47 @@ XsheetViewer {
   // Toonz Raster
   qproperty-LevelColumnColor: saturate(lighten(@xsh-toonzraster-color, @xsh-cell-lighten-amount), @xsh-cell-sat-amount);
   qproperty-LevelColumnBorderColor: saturate(darken(@xsh-toonzraster-color, @xsh-border-darken-amount), @xsh-border-sat-amount);
-  qproperty-SelectedLevelColumnColor: mix(lighten(@xsh-toonzraster-color, @xsh-hl-lighten-amount), @xsh-hl-mix-color, @xsh-hl-mix-amount);
+  qproperty-SelectedLevelColumnColor: saturate(lighten(@xsh-toonzraster-color, @xsh-hl-lighten-amount), @xsh-hl-sat-amount);
 
   // Raster
   qproperty-FullcolorColumnColor: saturate(lighten(@xsh-raster-color, @xsh-cell-lighten-amount), @xsh-cell-sat-amount);
   qproperty-FullcolorColumnBorderColor: saturate(darken(@xsh-raster-color, @xsh-border-darken-amount), @xsh-border-sat-amount);
-  qproperty-SelectedFullcolorColumnColor: mix(lighten(@xsh-raster-color, @xsh-hl-lighten-amount), @xsh-hl-mix-color, @xsh-hl-mix-amount);
+  qproperty-SelectedFullcolorColumnColor: saturate(lighten(@xsh-raster-color, @xsh-hl-lighten-amount), @xsh-hl-sat-amount);
 
   // Toonz Vector
   qproperty-VectorColumnColor: saturate(lighten(@xsh-vector-color, @xsh-cell-lighten-amount), @xsh-cell-sat-amount);
   qproperty-VectorColumnBorderColor: saturate(darken(@xsh-vector-color, @xsh-border-darken-amount), @xsh-border-sat-amount);
-  qproperty-SelectedVectorColumnColor: mix(lighten(@xsh-vector-color, @xsh-hl-lighten-amount), @xsh-hl-mix-color, @xsh-hl-mix-amount);
+  qproperty-SelectedVectorColumnColor: saturate(lighten(@xsh-vector-color, @xsh-hl-lighten-amount), @xsh-hl-sat-amount);
 
   // Sub X-Sheet
   qproperty-ChildColumnColor: saturate(lighten(@xsh-sub-color, @xsh-cell-lighten-amount), @xsh-cell-sat-amount);
   qproperty-ChildColumnBorderColor: saturate(darken(@xsh-sub-color, @xsh-border-darken-amount), @xsh-border-sat-amount);
-  qproperty-SelectedChildColumnColor: mix(lighten(@xsh-sub-color, @xsh-hl-lighten-amount), @xsh-hl-mix-color, @xsh-hl-mix-amount);
+  qproperty-SelectedChildColumnColor: saturate(lighten(@xsh-sub-color, @xsh-hl-lighten-amount), @xsh-hl-sat-amount);
 
   // FX
   qproperty-FxColumnColor: saturate(lighten(@xsh-fx-color, @xsh-cell-lighten-amount), @xsh-cell-sat-amount);
   qproperty-FxColumnBorderColor: saturate(darken(@xsh-fx-color, @xsh-border-darken-amount), @xsh-border-sat-amount);
-  qproperty-SelectedFxColumnColor: mix(lighten(@xsh-fx-color, @xsh-hl-lighten-amount), @xsh-hl-mix-color, @xsh-hl-mix-amount);
+  qproperty-SelectedFxColumnColor: saturate(lighten(@xsh-fx-color, @xsh-hl-lighten-amount), @xsh-hl-sat-amount);
 
   // Reference / Disconnected, etc.
   qproperty-ReferenceColumnColor: lighten(@xsh-reference-color, @xsh-cell-lighten-amount);
   qproperty-ReferenceColumnBorderColor: darken(@xsh-reference-color, @xsh-border-darken-amount);
-  qproperty-SelectedReferenceColumnColor: mix(lighten(@xsh-reference-color, @xsh-hl-lighten-amount), @xsh-hl-mix-color, @xsh-hl-mix-amount);
+  qproperty-SelectedReferenceColumnColor: lighten(@xsh-reference-color, @xsh-hl-lighten-amount);
 
   // Palette
   qproperty-PaletteColumnColor: saturate(lighten(@xsh-palette-color, @xsh-cell-lighten-amount), @xsh-cell-sat-amount);
   qproperty-PaletteColumnBorderColor: saturate(darken(@xsh-palette-color, @xsh-border-darken-amount), @xsh-border-sat-amount);
-  qproperty-SelectedPaletteColumnColor: mix(lighten(@xsh-palette-color, @xsh-hl-lighten-amount), @xsh-hl-mix-color, @xsh-hl-mix-amount);
+  qproperty-SelectedPaletteColumnColor: saturate(lighten(@xsh-palette-color, @xsh-hl-lighten-amount), @xsh-hl-sat-amount);
 
   // Plastic Mesh
   qproperty-MeshColumnColor: saturate(lighten(@xsh-mesh-color, @xsh-cell-lighten-amount), @xsh-cell-sat-amount);
   qproperty-MeshColumnBorderColor: saturate(darken(@xsh-mesh-color, @xsh-border-darken-amount), @xsh-border-sat-amount);
-  qproperty-SelectedMeshColumnColor: mix(lighten(@xsh-mesh-color, @xsh-hl-lighten-amount), @xsh-hl-mix-color, @xsh-hl-mix-amount);
+  qproperty-SelectedMeshColumnColor: saturate(lighten(@xsh-mesh-color, @xsh-hl-lighten-amount), @xsh-hl-sat-amount);
 
   // Assistants
   qproperty-MetaColumnColor: saturate(lighten(@xsh-assistants-color, @xsh-cell-lighten-amount), @xsh-cell-sat-amount);
   qproperty-MetaColumnBorderColor: saturate(darken(@xsh-assistants-color, @xsh-border-darken-amount), @xsh-border-sat-amount);
-  qproperty-SelectedMetaColumnColor: mix(lighten(@xsh-assistants-color, @xsh-hl-lighten-amount), @xsh-hl-mix-color, @xsh-hl-mix-amount);
+  qproperty-SelectedMetaColumnColor: saturate(lighten(@xsh-assistants-color, @xsh-hl-lighten-amount), @xsh-hl-sat-amount);
 
   // Notes (text-color is hard-coded, no choice but to use a white cell-color)
   qproperty-SoundTextColumnColor: @xsh-notes-color;
@@ -207,17 +207,17 @@ XsheetViewer {
   // Audio
   qproperty-SoundColumnColor: saturate(lighten(@xsh-sound-color, @xsh-cell-lighten-amount), @xsh-cell-sat-amount);
   qproperty-SoundColumnBorderColor: saturate(darken(@xsh-sound-color, @xsh-border-darken-amount), @xsh-border-sat-amount);
-  qproperty-SelectedSoundColumnColor: mix(lighten(@xsh-sound-color, @xsh-hl-lighten-amount), @xsh-hl-mix-color, @xsh-hl-mix-amount);
+  qproperty-SelectedSoundColumnColor: saturate(lighten(@xsh-sound-color, @xsh-hl-lighten-amount), @xsh-hl-sat-amount);
   qproperty-SoundColumnHlColor: #34FE5E;
   qproperty-SoundColumnTrackColor: @xsh-sound-track-color;
 
   // Active Camera
   qproperty-ActiveCameraColor: saturate(lighten(@xsh-camera-active-color, @xsh-cell-lighten-amount), @xsh-cell-sat-amount);
-  qproperty-SelectedActiveCameraColor: mix(lighten(@xsh-camera-active-color, @xsh-hl-lighten-amount), @xsh-hl-mix-color, @xsh-hl-mix-amount);
+  qproperty-SelectedActiveCameraColor: saturate(lighten(@xsh-camera-active-color, @xsh-hl-lighten-amount), @xsh-hl-sat-amount);
 
   // Other Camera
   qproperty-OtherCameraColor: saturate(lighten(@xsh-camera-other-color, @xsh-cell-lighten-amount), @xsh-cell-sat-amount);
-  qproperty-SelectedOtherCameraColor: mix(lighten(@xsh-camera-other-color, @xsh-hl-lighten-amount), @xsh-hl-mix-color, @xsh-hl-mix-amount);
+  qproperty-SelectedOtherCameraColor: saturate(lighten(@xsh-camera-other-color, @xsh-hl-lighten-amount), @xsh-hl-sat-amount);
 
   // Misc
   qproperty-TableColor: @xsh-xsheet-color;
@@ -293,7 +293,7 @@ XsheetViewer {
       padding: 3 0 3 0;
       
       &:hover {
-        background-color: lighten(@menu-bg-color, 8% * @hover-adjust-amount);
+        background-color: lighten(@menu-bg-color, @hover-amount);
         color: @hl-text-color;
       }
       
@@ -367,6 +367,7 @@ FunctionTreeView {
 }
 
 FunctionPanel {
+  font-weight: bold; // make framenumbers and values easier to read
   qproperty-BGColor: @fe-panel-bg-color;
   qproperty-ValueLineColor: mix(@fe-panel-line-color, @fe-panel-bg-color, @fe-panel-line-tone);
   qproperty-FrameLineColor: mix(@fe-panel-line-color, @fe-panel-bg-color, @fe-panel-line-tone);
@@ -384,46 +385,43 @@ SpreadsheetViewer {
     .spreadsheet-textfield-style();
   }
 
-  qproperty-BGColor: @xsh-color;
+  qproperty-BGColor: @xsh-empty-column-range-color; // labelled as "BGColor" but this is really the column header and current cell range
   qproperty-TextColor: @fe-text-color;
-  qproperty-LightLightBGColor: @xsh-empty-column-color;
+  qproperty-LightLightBGColor: @xsh-empty-column-color; // framenumber area and empty cell area
   qproperty-LightLineColor: @xsh-horizontal-row-line-color;
   qproperty-VerticalLineColor: @xsh-vertical-column-line-color;
   qproperty-KeyframeLineColor: @fe-text-color;
 
   qproperty-FrameTextColor: @xsh-framenumber-column-text-color;
   qproperty-CurrentRowTextColor: @xsh-framenumber-current-text-color;
-  qproperty-CurrentRowBgColor: @xsh-framenumber-current-bg-color;
+  qproperty-CurrentRowBgColor: fade(@xsh-framenumber-current-bg-color, @fe-current-row-bg-alpha);
 
   qproperty-MarkerLineColor: @xsh-marker-line-color;
   qproperty-SecMarkerLineColor: @xsh-sec-marker-line-color;
 
   qproperty-GroupNameTextColor: @normal-label-color;
   qproperty-ChannelNameTextColor: @text-color;
-  qproperty-ColumnHeaderBorderColor: @border-color;
+  qproperty-ColumnHeaderBorderColor: @fe-header-border-color;
 
   // Cells
   // ---------------------------------------------------------------------------
 
-  // Normalize hl-color, we only care about hue
-  @hl-tint-color: hsl(hue(@xsh-hl-mix-color), 50%, 50%);
-
   qproperty-SelectedEmptyColor: @fe-empty-color;
   qproperty-SelectedSceneRangeEmptyColor: @fe-empty-range-color-selected;
 
-  qproperty-KeyFrameColor: @fe-keyframe-color;
+  qproperty-KeyFrameColor: saturate(tint(@fe-keyframe-color, @fe-kf-lighten-amount), @fe-kf-sat-amount);
   qproperty-KeyFrameBorderColor: saturate(shade(@fe-keyframe-color, @fe-kf-border-darken-amount), @fe-kf-border-sat-amount);
-  qproperty-SelectedKeyFrameColor: mix(tint(@fe-keyframe-color, @fe-kf-hl-lighten-amount), @fe-kf-hl-mix-color, @fe-kf-hl-mix-amount);
+  qproperty-SelectedKeyFrameColor: saturate(tint(@fe-keyframe-color, @fe-kf-hl-lighten-amount), @fe-kf-hl-sat-amount);
 
   qproperty-IgnoredKeyFrameColor: @fe-ignored-keyframe-color;
-  qproperty-SelectedIgnoredKeyFrameColor: mix(tint(@fe-ignored-keyframe-color, @fe-kf-hl-lighten-amount), @fe-kf-hl-mix-color, @fe-kf-hl-mix-amount);
+  qproperty-SelectedIgnoredKeyFrameColor: tint(@fe-ignored-keyframe-color, @fe-kf-hl-lighten-amount);
 
   qproperty-InBetweenColor: @fe-inbetween-color;
   qproperty-InBetweenBorderColor: saturate(shade(@fe-inbetween-color, @fe-ib-border-darken-amount), @fe-ib-border-sat-amount);
-  qproperty-SelectedInBetweenColor: mix(tint(@fe-inbetween-color, @fe-ib-hl-lighten-amount), @fe-ib-hl-mix-color, @fe-ib-hl-mix-amount);
-  
+  qproperty-SelectedInBetweenColor: saturate(tint(@fe-inbetween-color, @fe-ib-hl-lighten-amount), @fe-ib-hl-sat-amount);
+
   qproperty-IgnoredInBetweenColor: @fe-ignored-inbetween-color;
-  qproperty-SelectedIgnoredInBetweenColor: mix(tint(@fe-ignored-inbetween-color, @fe-ib-hl-lighten-amount), @fe-ib-hl-mix-color, @fe-ib-hl-mix-amount);
+  qproperty-SelectedIgnoredInBetweenColor: tint(@fe-ignored-inbetween-color, @fe-ib-hl-lighten-amount);
 }
 
 #FunctionSegmentViewer {
