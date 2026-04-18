@@ -46,6 +46,7 @@ ShortcutPopup *ShortcutPopup::s_instance = nullptr;
 #include <QSignalBlocker>
 
 // STD includes
+#include <string>
 #include <vector>
 
 //=============================================================================
@@ -498,6 +499,17 @@ void ShortcutTree::addFolder(const QString &title, int commandType,
   std::vector<QAction *> actions;
   CommandManager::instance()->getActions((CommandType)commandType, actions);
   for (int i = 0; i < (int)actions.size(); i++) {
+    // Skip invisible actions (used for disabled/renamed room commands)
+    if (!actions[i]->isVisible()) continue;
+
+    // Skip AssistantType tool options - they are duplicates of Tools/MI_Assistant*
+    // which allow switching to Edit Assistants + setting type from any tool
+    if (commandType == ToolModifierCommandType) {
+      std::string id =
+          CommandManager::instance()->getIdFromAction(actions[i]);
+      if (id.find("A_ToolOption_AssistantType") == 0) continue;
+    }
+
     ShortcutItem *item = new ShortcutItem(folder, actions[i]);
     m_items.push_back(item);
   }
