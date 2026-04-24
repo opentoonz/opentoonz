@@ -21,13 +21,28 @@
 #include "tpixel.h"
 #include "toonzqt/menubarcommand.h"
 
-#include "toonz/preferences.h"
 #include "toonzqt/gutil.h"
 
+#include "tenv.h"
+#include "trop.h"
+
 #include "tgl.h"
+#include <algorithm>
 #include <math.h>
 #include <QKeyEvent>
 
+//=============================================================================
+// ShiftTraceTool
+//
+// Hit testing order in getGadget() matters:
+// 1) Curve control points (when defining the correspondence curve).
+// 2) Active ghost: corner scale, pivot, edge strip (translate vs rotate),
+//    then interior (NoGadget_InBox).
+// 3) Ghost selection: point inside m_ghostBox[gi].enlarge(3 * pickerPadLocal)
+//    in that ghost's local space; if both match, the closer box center wins.
+//
+// leftButtonDown handles GhostPick* first, then falls back to xsheet row pick
+// (scene / level strip) when gadget is NoGadget / NoGadget_InBox.
 //=============================================================================
 
 static bool circumCenter(TPointD &out, const TPointD &a, const TPointD &b,
@@ -50,13 +65,84 @@ static bool circumCenter(TPointD &out, const TPointD &a, const TPointD &b,
 
 //=============================================================================
 
+// Persisted combo index for toolbar: 0 = full raster bounds, 1 = savebox,
+// 2 = TRop::computeBBox (alpha / CM32 rules).
+TEnv::IntVar ShiftTraceGhostBBoxMode("ShiftTraceGhostBBoxMode", 0);
+
+ShiftTraceTool *ShiftTraceTool::s_instance = nullptr;
+
 ShiftTraceTool::ShiftTraceTool()
     : TTool("T_ShiftTrace")
     , m_ghostIndex(0)
     , m_curveStatus(NoCurve)
     , m_gadget(NoGadget)
     , m_highlightedGadget(NoGadget) {
+  for (int i = 0; i < 2; i++) {
+    m_contentBBoxCacheLevel[i]     = nullptr;
+    m_contentBBoxCacheGhostRow[i]  = -1;
+    m_contentBBoxCacheValid[i]     = false;
+    m_dpiAffPerGhost[i]            = TAffine();
+    m_ghostBox[i]                  = TRectD();
+  }
+  s_instance = this;
   bind(TTool::AllTargets);  // Deals with tool deactivation internally
+}
+
+ShiftTraceTool::GhostBBoxMode ShiftTraceTool::getGhostBBoxMode() {
+  int v = ShiftTraceGhostBBoxMode;
+  if (v < 0 || v > 2) v = 0;
+  return (GhostBBoxMode)v;
+}
+
+void ShiftTraceTool::setGhostBBoxMode(GhostBBoxMode mode) {
+  ShiftTraceGhostBBoxMode = (int)mode;
+  if (s_instance) {
+    s_instance->invalidateGhostContentBBoxCache();
+    s_instance->invalidate();
+  }
+}
+
+void ShiftTraceTool::invalidateGhostContentBBoxCache() {
+  m_contentBBoxCacheValid[0] = m_contentBBoxCacheValid[1] = false;
+}
+
+TRectD ShiftTraceTool::rasterRefBox(const TRasterP &ras, int subsampling,
+                                    GhostBBoxMode mode, const TRect &savebox,
+                                    TXshSimpleLevel *sl, const TFrameId &fid,
+                                    int cacheSlot) {
+  // Result is in the same centered coordinates as the original shift-trace
+  // raster path: (pixelRect in raster space) minus raster center, times subsampling.
+  const TRect full = ras->getBounds();
+  TRect pixelRect  = full;
+
+  switch (mode) {
+  case GhostBBoxMode::FullRaster:
+    break;
+  case GhostBBoxMode::Savebox:
+    if (!savebox.isEmpty()) {
+      TRect sb = savebox * full;
+      pixelRect = sb.isEmpty() ? full : sb;
+    }
+    break;
+  case GhostBBoxMode::ContentAlpha:
+    if (m_contentBBoxCacheValid[cacheSlot] &&
+        m_contentBBoxCacheLevel[cacheSlot] == sl &&
+        m_contentBBoxCacheFid[cacheSlot] == fid &&
+        m_contentBBoxCacheGhostRow[cacheSlot] == m_row[cacheSlot]) {
+      pixelRect = m_contentBBoxCachePixelRect[cacheSlot];
+    } else {
+      TRop::computeBBox(ras, pixelRect);
+      if (pixelRect.isEmpty()) pixelRect = full;
+      m_contentBBoxCacheValid[cacheSlot]     = true;
+      m_contentBBoxCacheLevel[cacheSlot]     = sl;
+      m_contentBBoxCacheFid[cacheSlot]       = fid;
+      m_contentBBoxCacheGhostRow[cacheSlot]  = m_row[cacheSlot];
+      m_contentBBoxCachePixelRect[cacheSlot] = pixelRect;
+    }
+    break;
+  }
+
+  return (convert(pixelRect) - ras->getCenterD()) * subsampling;
 }
 
 void ShiftTraceTool::clearData() {
@@ -65,7 +151,9 @@ void ShiftTraceTool::clearData() {
   m_gadget            = NoGadget;
   m_highlightedGadget = NoGadget;
 
-  m_box = TRectD();
+  invalidateGhostContentBBoxCache();
+
+  m_ghostBox[0] = m_ghostBox[1] = TRectD();
   for (int i = 0; i < 2; i++) {
     m_row[i]    = -1;
     m_aff[i]    = TAffine();
@@ -73,55 +161,65 @@ void ShiftTraceTool::clearData() {
   }
 }
 
-void ShiftTraceTool::updateBox() {
-  if (m_ghostIndex < 0 || 2 <= m_ghostIndex || m_row[m_ghostIndex] < 0) return;
+void ShiftTraceTool::updateAllGhostBoxes() {
+  m_ghostBox[0] = m_ghostBox[1] = TRectD();
+  const GhostBBoxMode bboxMode = getGhostBBoxMode();
+  TApplication *app            = TTool::getApplication();
 
-  TImageP img;
+  for (int gi = 0; gi < 2; gi++) {
+    if (m_row[gi] < 0) continue;
 
-  TApplication *app = TTool::getApplication();
-  if (app->getCurrentFrame()->isEditingScene()) {
-    int col      = app->getCurrentColumn()->getColumnIndex();
-    int row      = m_row[m_ghostIndex];
-    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+    TImageP img;
+    TXshSimpleLevel *sl = nullptr;
+    TFrameId ghostFid;
 
-    TXshCell cell       = xsh->getCell(row, col);
-    TXshSimpleLevel *sl = cell.getSimpleLevel();
-    if (sl) {
-      m_dpiAff = getDpiAffine(sl, cell.m_frameId);
-      img      = cell.getImage(false);
+    if (app->getCurrentFrame()->isEditingScene()) {
+      int col      = app->getCurrentColumn()->getColumnIndex();
+      int row      = m_row[gi];
+      TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+
+      TXshCell cell = xsh->getCell(row, col);
+      sl            = cell.getSimpleLevel();
+      if (sl) {
+        ghostFid             = cell.m_frameId;
+        m_dpiAffPerGhost[gi] = getDpiAffine(sl, cell.m_frameId);
+        img                  = cell.getImage(false);
+      }
+    } else {
+      TXshLevel *level = app->getCurrentLevel()->getLevel();
+      if (!level) continue;
+      sl = level->getSimpleLevel();
+      if (!sl) continue;
+
+      ghostFid             = sl->index2fid(m_row[gi]);
+      m_dpiAffPerGhost[gi] = getDpiAffine(sl, ghostFid);
+      img                  = sl->getFrame(ghostFid, false);
     }
-  }
-  // on editing level
-  else {
-    TXshLevel *level = app->getCurrentLevel()->getLevel();
-    if (!level) return;
-    TXshSimpleLevel *sl = level->getSimpleLevel();
-    if (!sl) return;
 
-    const TFrameId &ghostFid = sl->index2fid(m_row[m_ghostIndex]);
-    m_dpiAff                 = getDpiAffine(sl, ghostFid);
-    img                      = sl->getFrame(ghostFid, false);
-  }
+    if (!img) continue;
 
-  if (img) {
     if (TRasterImageP ri = img) {
       TRasterP ras = ri->getRaster();
-      m_box        = (convert(ras->getBounds()) - ras->getCenterD()) *
-              ri->getSubsampling();
+      if (!ras) continue;
+      m_ghostBox[gi] =
+          rasterRefBox(ras, ri->getSubsampling(), bboxMode, ri->getSavebox(), sl,
+                       ghostFid, gi);
     } else if (TToonzImageP ti = img) {
       TRasterP ras = ti->getRaster();
-      m_box        = (convert(ras->getBounds()) - ras->getCenterD()) *
-              ti->getSubsampling();
+      if (!ras) continue;
+      m_ghostBox[gi] =
+          rasterRefBox(ras, ti->getSubsampling(), bboxMode, ti->getSavebox(), sl,
+                       ghostFid, gi);
     } else if (TVectorImageP vi = img) {
-      m_box = vi->getBBox();
+      m_ghostBox[gi] = vi->getBBox();
     }
   }
 }
 
 void ShiftTraceTool::updateData() {
-  m_box = TRectD();
+  m_ghostBox[0] = m_ghostBox[1] = TRectD();
   for (int i = 0; i < 2; i++) m_row[i] = -1;
-  m_dpiAff          = TAffine();
+  for (int i = 0; i < 2; i++) m_dpiAffPerGhost[i] = TAffine();
   TApplication *app = TTool::getApplication();
 
   OnionSkinMask osm  = app->getCurrentOnionSkin()->getOnionSkinMask();
@@ -163,11 +261,11 @@ void ShiftTraceTool::updateData() {
       }
     }
   }
-  updateBox();
+  updateAllGhostBoxes();
 }
 
 //
-// Compute m_aff[0] and m_aff[1] according to the current curve
+// Compute m_aff[0] and m_aff[1] according to the current curve.
 //
 void ShiftTraceTool::updateCurveAffs() {
   if (m_curveStatus != ThreePointsCurve) {
@@ -210,11 +308,20 @@ void ShiftTraceTool::reset() {
       ->notifyToolChanged();  // Refreshes toolbar values
 }
 
-TAffine ShiftTraceTool::getGhostAff() {
-  if (0 <= m_ghostIndex && m_ghostIndex < 2)
-    return m_aff[m_ghostIndex] * m_dpiAff;
-  else
-    return TAffine();
+TAffine ShiftTraceTool::getGhostAff() const { return getGhostAffForIndex(m_ghostIndex); }
+
+TAffine ShiftTraceTool::getGhostAffForIndex(int ghostIndex) const {
+  if (0 <= ghostIndex && ghostIndex < 2)
+    return m_aff[ghostIndex] * m_dpiAffPerGhost[ghostIndex];
+  return TAffine();
+}
+
+double ShiftTraceTool::pickerPadLocal() const {
+  // Same base scale as other GL overlays; multiply by DPR for crisp picking.
+  double unit = sqrt(tglGetPixelSize2());
+  if (m_viewer && m_viewer->viewerWidget())
+    unit *= getDevicePixelRatio(m_viewer->viewerWidget());
+  return unit;
 }
 
 void ShiftTraceTool::drawDot(const TPointD &center, double r,
@@ -226,28 +333,23 @@ void ShiftTraceTool::drawDot(const TPointD &center, double r,
 }
 
 void ShiftTraceTool::drawControlRect() {  // TODO
-  if (m_ghostIndex < 0 || m_ghostIndex > 1) return;
-  int row = m_row[m_ghostIndex];
-  if (row < 0) return;
+  const double pad = pickerPadLocal();
 
-  TRectD box = m_box;
-  if (box.isEmpty()) return;
-  glPushMatrix();
-  tglMultMatrix(getGhostAff());
-
-  TPixel32 color;
-
-  // draw onion-colored rectangle to indicate which ghost is grabbed
-  {
-    TPixel32 frontOniColor, backOniColor;
-    bool inksOnly;
-    Preferences::instance()->getOnionData(frontOniColor, backOniColor,
-                                          inksOnly);
-    color       = (m_ghostIndex == 0) ? backOniColor : frontOniColor;
-    double unit = sqrt(tglGetPixelSize2());
-    unit *= getDevicePixelRatio(m_viewer->viewerWidget());
-    TRectD coloredBox = box.enlarge(3.0 * unit);
-    tglColor(color);
+  // Layer 1: outer pick frames for every valid ghost (must match getGadget outer rect).
+  // Red = previous ghost, green = following; yellow highlight when GhostPick* is hot.
+  for (int gi = 0; gi < 2; gi++) {
+    if (m_row[gi] < 0 || m_ghostBox[gi].isEmpty()) continue;
+    glPushMatrix();
+    tglMultMatrix(getGhostAffForIndex(gi));
+    TRectD box        = m_ghostBox[gi];
+    TRectD coloredBox = box.enlarge(3.0 * pad);
+    TPixel32 ring =
+        (gi == 0) ? TPixel32(220, 70, 70) : TPixel32(70, 200, 70);
+    if (m_highlightedGadget == (gi == 0 ? GhostPickPrevGadget
+                                        : GhostPickNextGadget)) {
+      ring = TPixel32(255, 220, 80);
+    }
+    tglColor(ring);
     glBegin(GL_LINE_STRIP);
     glVertex2d(coloredBox.x0, coloredBox.y0);
     glVertex2d(coloredBox.x1, coloredBox.y0);
@@ -255,11 +357,20 @@ void ShiftTraceTool::drawControlRect() {  // TODO
     glVertex2d(coloredBox.x0, coloredBox.y1);
     glVertex2d(coloredBox.x0, coloredBox.y0);
     glEnd();
+    glPopMatrix();
   }
 
-  color = m_highlightedGadget == TranslateGadget ? TPixel32(200, 100, 100)
-          : m_highlightedGadget == RotateGadget  ? TPixel32(100, 200, 100)
-                                                 : TPixel32(120, 120, 120);
+  // Layer 2: inner frame + handles for the active ghost only (translate/rotate colors).
+  if (m_ghostIndex < 0 || m_ghostIndex > 1) return;
+  if (m_row[m_ghostIndex] < 0 || m_ghostBox[m_ghostIndex].isEmpty()) return;
+
+  TRectD box = m_ghostBox[m_ghostIndex];
+  glPushMatrix();
+  tglMultMatrix(getGhostAff());
+
+  TPixel32 color = m_highlightedGadget == TranslateGadget ? TPixel32(200, 100, 100)
+                     : m_highlightedGadget == RotateGadget  ? TPixel32(100, 200, 100)
+                                                            : TPixel32(120, 120, 120);
   tglColor(color);
   glBegin(GL_LINE_STRIP);
   glVertex2d(box.x0, box.y0);
@@ -268,8 +379,8 @@ void ShiftTraceTool::drawControlRect() {  // TODO
   glVertex2d(box.x0, box.y1);
   glVertex2d(box.x0, box.y0);
   glEnd();
-  color    = m_highlightedGadget == ScaleGadget ? TPixel32(200, 100, 100)
-                                                : TPixel32::White;
+  color = m_highlightedGadget == ScaleGadget ? TPixel32(200, 100, 100)
+                                               : TPixel32::White;
   double r = 4 * sqrt(tglGetPixelSize2());
   drawDot(box.getP00(), r, color);
   drawDot(box.getP01(), r, color);
@@ -369,30 +480,33 @@ ShiftTraceTool::GadgetId ShiftTraceTool::getGadget(const TPointD &p) {
   gadgets.push_back(std::make_pair(m_p0, CurveP0Gadget));
   gadgets.push_back(std::make_pair(m_p1, CurveP1Gadget));
   gadgets.push_back(std::make_pair(m_p2, CurvePmGadget));
-  TAffine aff      = getGhostAff();
-  double pixelSize = getPixelSize();
-  double d         = 15 * pixelSize;  // offset for rotation handle
-  if (0 <= m_ghostIndex && m_ghostIndex < 2) {
+
+  const double pixelSize = getPixelSize();
+  const double edgeHit   = 10.0 * pixelSize;
+
+  // --- Active ghost manipulation (takes priority over ghost picking below).
+  if (0 <= m_ghostIndex && m_ghostIndex < 2 && m_row[m_ghostIndex] >= 0 &&
+      !m_ghostBox[m_ghostIndex].isEmpty()) {
+    TAffine aff  = getGhostAff();
+    TRectD m_box = m_ghostBox[m_ghostIndex];
     gadgets.push_back(std::make_pair(aff * m_box.getP00(), ScaleGadget));
     gadgets.push_back(std::make_pair(aff * m_box.getP01(), ScaleGadget));
     gadgets.push_back(std::make_pair(aff * m_box.getP10(), ScaleGadget));
     gadgets.push_back(std::make_pair(aff * m_box.getP11(), ScaleGadget));
     gadgets.push_back(
         std::make_pair(aff * m_center[m_ghostIndex], MoveCenterGadget));
-  }
-  int k           = -1;
-  double minDist2 = pow(10 * pixelSize, 2);
-  for (int i = 0; i < (int)gadgets.size(); i++) {
-    double d2 = norm2(gadgets[i].first - p);
-    if (d2 < minDist2) {
-      minDist2 = d2;
-      k        = i;
-    }
-  }
-  if (k >= 0) return gadgets[k].second;
 
-  // rect-point
-  if (0 <= m_ghostIndex && m_ghostIndex < 2) {
+    int k           = -1;
+    double minDist2 = pow(edgeHit, 2);
+    for (int i = 0; i < (int)gadgets.size(); i++) {
+      double d2 = norm2(gadgets[i].first - p);
+      if (d2 < minDist2) {
+        minDist2 = d2;
+        k        = i;
+      }
+    }
+    if (k >= 0) return gadgets[k].second;
+
     TPointD q  = aff.inv() * p;
     double big = 1.0e6;
     double d = big, x = 0, y = 0;
@@ -423,20 +537,38 @@ ShiftTraceTool::GadgetId ShiftTraceTool::getGadget(const TPointD &p) {
       }
     }
     if (d < big) {
-      TPointD pp = aff * TPointD(x, y);
-      double d   = norm(p - pp);
-      if (d < 10 * getPixelSize()) {
+      TPointD pp  = aff * TPointD(x, y);
+      double dist = norm(p - pp);
+      if (dist < edgeHit) {
         if (m_box.contains(q))
           return TranslateGadget;
         else
           return RotateGadget;
       }
     }
-    if (m_box.contains(q))
-      return NoGadget_InBox;
-    else
-      return NoGadget;
+    if (m_box.contains(q)) return NoGadget_InBox;
   }
+
+  // --- Ghost selection: inside enlarged m_ghostBox[gi] in that ghost's space.
+  const double pad = pickerPadLocal();
+  int pick         = -1;
+  double bestD2    = 1.0e30;
+  for (int gi = 0; gi < 2; gi++) {
+    if (m_row[gi] < 0 || m_ghostBox[gi].isEmpty()) continue;
+    TAffine affg   = getGhostAffForIndex(gi);
+    TPointD q      = affg.inv() * p;
+    TRectD outer   = m_ghostBox[gi].enlarge(3.0 * pad);
+    if (!outer.contains(q)) continue;
+    const TRectD &gb = m_ghostBox[gi];
+    TPointD c((gb.x0 + gb.x1) * 0.5, (gb.y0 + gb.y1) * 0.5);
+    double d2 = norm2(affg * c - p);
+    if (d2 < bestD2) {
+      bestD2 = d2;
+      pick   = gi;
+    }
+  }
+  if (pick == 0) return GhostPickPrevGadget;
+  if (pick == 1) return GhostPickNextGadget;
   return NoGadget;
 }
 
@@ -454,6 +586,31 @@ void ShiftTraceTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
 
   bool notify = false;
 
+  // Click on red/green outer frame: switch active ghost, then start drag like a
+  // normal empty click (translate inside box, rotate outside).
+  if (m_gadget == GhostPickPrevGadget || m_gadget == GhostPickNextGadget) {
+    int idx = (m_gadget == GhostPickPrevGadget) ? 0 : 1;
+    setCurrentGhostIndex(idx);
+    m_highlightedGadget = getGadget(pos);
+    if (isGhostPickGadget(m_highlightedGadget)) {
+      TAffine aff = getGhostAff();
+      TPointD q   = aff.inv() * pos;
+      m_highlightedGadget =
+          m_ghostBox[m_ghostIndex].contains(q) ? NoGadget_InBox : NoGadget;
+    }
+    m_gadget = m_highlightedGadget;
+    if (!e.isCtrlPressed()) {
+      if (m_gadget == NoGadget_InBox)
+        m_gadget = TranslateGadget;
+      else if (m_gadget == NoGadget)
+        m_gadget = RotateGadget;
+    }
+    m_oldAff = m_aff[m_ghostIndex];
+    invalidate();
+    return;
+  }
+
+  // Legacy fallback: click near xsheet / level-strip row to pick ghost.
   if (!e.isCtrlPressed() &&
       (m_gadget == NoGadget || m_gadget == NoGadget_InBox)) {
     if (m_gadget == NoGadget_InBox) {
@@ -481,7 +638,6 @@ void ShiftTraceTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
 
       if (index >= 0) {
         m_ghostIndex = index;
-        updateBox();
         m_gadget            = TranslateGadget;
         m_highlightedGadget = TranslateGadget;
         notify              = true;
@@ -567,8 +723,8 @@ void ShiftTraceTool::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
       updateCurveAffs();
       updateGhost();
 
-      m_center[0] = (m_aff[0] * m_dpiAff).inv() * m_p2;
-      m_center[1] = (m_aff[1] * m_dpiAff).inv() * m_p2;
+      m_center[0] = (m_aff[0] * m_dpiAffPerGhost[0]).inv() * m_p2;
+      m_center[1] = (m_aff[1] * m_dpiAffPerGhost[1]).inv() * m_p2;
     }
   }
   m_gadget = NoGadget;
@@ -580,12 +736,15 @@ void ShiftTraceTool::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
 }
 
 void ShiftTraceTool::draw() {
+  // Rebuilds m_row and both m_ghostBox[] every frame (same as prior behavior).
   updateData();
   drawControlRect();
   drawCurve();
 }
 
 int ShiftTraceTool::getCursorId() const {
+  if (isGhostPickGadget(m_highlightedGadget))
+    return ToolCursor::MoveCursor;
   if (m_highlightedGadget == RotateGadget || m_highlightedGadget == NoGadget)
     return ToolCursor::RotateCursor;
   else if (m_highlightedGadget == ScaleGadget)
@@ -611,9 +770,12 @@ void ShiftTraceTool::onLeave() {
 }
 
 void ShiftTraceTool::setCurrentGhostIndex(int index) {
+  // Boxes are already computed for both indices; only the active index changes.
   m_ghostIndex = index;
-  updateBox();
   invalidate();
+  TApplication *app = TTool::getApplication();
+  if (app && app->getCurrentTool())
+    app->getCurrentTool()->notifyToolChanged();
 }
 
 ShiftTraceTool shiftTraceTool;

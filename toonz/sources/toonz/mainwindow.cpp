@@ -2463,8 +2463,16 @@ void MainWindow::defineActions() {
   CommandManager::instance()->enable(MI_EditShift, false);
   CommandManager::instance()->enable(MI_NoShift, false);
   CommandManager::instance()->enable(MI_ShowShiftOrigin, false);
+  CommandManager::instance()->enable(MI_ShiftTraceSelectPrevGhost, false);
+  CommandManager::instance()->enable(MI_ShiftTraceSelectNextGhost, false);
   createAction(MI_ResetShift, QT_TR_NOOP("Reset Shift"), "",
                MenuViewCommandType, "shift_and_trace_reset");
+  createAction(MI_ShiftTraceSelectPrevGhost,
+               QT_TR_NOOP("Shift && Trace: Select Previous Ghost"), "",
+               MenuViewCommandType, "shift_trace_select_prev_ghost");
+  createAction(MI_ShiftTraceSelectNextGhost,
+               QT_TR_NOOP("Shift && Trace: Select Following Ghost"), "",
+               MenuViewCommandType, "shift_trace_select_next_ghost");
   createToggle(MI_VectorGuidedDrawing, QT_TR_NOOP("Vector Guided Drawing"), "",
                Preferences::instance()->isGuidedDrawingEnabled(),
                MenuViewCommandType, "view_guided_drawing");

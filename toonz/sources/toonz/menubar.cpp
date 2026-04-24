@@ -756,6 +756,8 @@ QMenuBar *StackedMenuBar::createInknPaintMenuBar() {
   addMenuItem(drawMenu, MI_EditShift);
   addMenuItem(drawMenu, MI_NoShift);
   addMenuItem(drawMenu, MI_ResetShift);
+  addMenuItem(drawMenu, MI_ShiftTraceSelectPrevGhost);
+  addMenuItem(drawMenu, MI_ShiftTraceSelectNextGhost);
   drawMenu->addSeparator();
   addMenuItem(drawMenu, MI_RasterizePli);
 
