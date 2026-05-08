@@ -148,6 +148,7 @@ protected:
   void initializeGL() override;
   void resizeGL(int width, int height) override;
   void paintGL() override;
+  void drawLayoutGuide(TPointD centerD, TRect bounds);
 
   void showEvent(QShowEvent *) override;
   void hideEvent(QHideEvent *) override;
