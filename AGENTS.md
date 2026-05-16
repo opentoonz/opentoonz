@@ -58,6 +58,18 @@ cmake ../sources -G Ninja \
 ninja
 ```
 
+The preferred reproducible workflow is the Nix + mise setup:
+
+```sh
+mise run doctor
+mise run configure
+mise run build
+```
+
+Nix owns the C++ dependency set; mise is only a task runner. The CMake presets
+for this path live in `toonz/sources/CMakePresets.json`, and the default build
+directory is `toonz/build/nix-relwithdebinfo`.
+
 Important build notes:
 
 - CMake requires C++17 and Qt 5.15 or newer from the Qt 5 series.

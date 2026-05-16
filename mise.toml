@@ -1,0 +1,35 @@
+[env]
+MISE_DISABLE_VERSION_CHECK = "1"
+MISE_DISABLE_TOOLS = "1"
+
+[tasks.dev]
+description = "Enter the pinned Nix development shell."
+run = "nix develop path:."
+
+[tasks.doctor]
+description = "Print the key tool and dependency versions from the Nix shell."
+run = "nix develop path:. --command bash -lc 'cmake --version && ninja --version && pkg-config --modversion Qt5Core libmypaint liblz4 libusb-1.0 libturbojpeg'"
+
+[tasks.prepare-tiff]
+description = "Build OpenToonz's vendored libtiff dependency."
+run = "nix develop path:. --command bash scripts/nix/prepare-tiff.sh"
+
+[tasks.configure]
+description = "Configure the RelWithDebInfo Ninja build with the Nix dependency set."
+run = "nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-relwithdebinfo'"
+
+[tasks.build]
+description = "Configure and build OpenToonz with Ninja in toonz/build/nix-relwithdebinfo."
+run = "nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-relwithdebinfo && cmake --build toonz/build/nix-relwithdebinfo --parallel'"
+
+[tasks.run]
+description = "Run the locally built OpenToonz binary or app bundle."
+run = "nix develop path:. --command bash -lc 'if [ -d toonz/build/nix-relwithdebinfo/toonz/OpenToonz.app ]; then open toonz/build/nix-relwithdebinfo/toonz/OpenToonz.app; elif [ -x toonz/build/nix-relwithdebinfo/bin/opentoonz ]; then toonz/build/nix-relwithdebinfo/bin/opentoonz; else toonz/build/nix-relwithdebinfo/bin/OpenToonz; fi'"
+
+[tasks.check]
+description = "Run the flake configure check and whitespace validation."
+run = "nix flake check path:. && git diff --check"
+
+[tasks.format]
+description = "Run the repository clang-format helper for changed C/C++ files."
+run = "nix develop path:. --command bash -lc 'cd toonz/sources && ./beautification.sh'"

@@ -32,6 +32,7 @@ Older versions and unstable nightly builds are also available at <https://github
 - [macOS](./doc/how_to_build_macosx.md)
 - [Linux](./doc/how_to_build_linux.md)
 - [BSD](./doc/how_to_build_bsd.md)
+- [Nix + mise](./doc/how_to_build_nix_mise.md)
 
 For instructions on how to build stylesheets, please [see here](./doc/how_to_stylesheet.md).
 

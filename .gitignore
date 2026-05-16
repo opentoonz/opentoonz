@@ -9,6 +9,10 @@ GeneratedFiles
 *.suo
 *.user
 build*
+/toonz/build/
+/.direnv/
+/result
+/result-*
 Thumbs.db
 
 # bundled thirdparty libraries
@@ -38,4 +42,3 @@ ipch/
 
 #macOS
 .DS_Store
-
