@@ -241,9 +241,20 @@ public:
     std::vector<TAutocloser::Segment> segments;
 
     // ==== ALWAYS RECOMPUTE – NO CACHING ====
-    TAutocloser ac(raux, params.m_closingDistance, params.m_spotAngle,
-                   params.m_inkIndex, params.m_opacity);
-    ac.compute(segments);
+    if (AutocloseIgnoreAutoPaint) {
+      std::set<int> autoPaintInks;
+      TPalette *plt = sl->getPalette();
+      for (int i = 1; i < plt->getStyleCount(); ++i) {
+        if (plt->getStyle(i)->getFlags() != 0) autoPaintInks.insert(i);
+      }
+      TAutocloser ac(raux, params.m_closingDistance, params.m_spotAngle,
+                     params.m_inkIndex, params.m_opacity, autoPaintInks);
+      ac.compute(segments);
+    } else {
+      TAutocloser ac(raux, params.m_closingDistance, params.m_spotAngle,
+                     params.m_inkIndex, params.m_opacity);
+      ac.compute(segments);
+    }
 
     if (segments.empty()) return false;
 
