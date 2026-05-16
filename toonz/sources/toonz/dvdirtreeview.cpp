@@ -632,8 +632,9 @@ void DvDirTreeView::enableCommands() {
 
 void DvDirTreeView::currentChanged(const QModelIndex &current,
                                    const QModelIndex &previous) {
-  if (m_globalSelectionEnabled) {
-    // Make current selection; needed to intercept the MI_Clear command
+  // Only refresh the global selection after user made first selection(aka. previous selection is valid)
+  if (m_globalSelectionEnabled && previous.isValid()) {
+    // ???? Make current selection; needed to intercept the MI_Clear command
     makeCurrent();
   }
 

@@ -1788,6 +1788,7 @@ public:
       selection->selectColumn(*it + dCol, true);
   }
   void onRelease(const CellPosition &pos) override {
+    TApp::instance()->getCurrentSelection()->notifySelectionChanged();
     int delta = m_lastCol - m_firstCol;
     if (delta != 0) {
       TColumnSelection *selection = getViewer()->getColumnSelection();
