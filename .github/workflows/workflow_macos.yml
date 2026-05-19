@@ -42,8 +42,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-        with:
-          lfs: true
 
       - name: Install Nix
         uses: cachix/install-nix-action@v31
