@@ -60,7 +60,7 @@ let
     pkgs.xorg.libxcb
   ] ++ lib.optionals stdenv.isDarwin [
     pkgs.apple-sdk_15
-    pkgs.libiconv
+    pkgs.libiconvReal
   ];
 
   buildInputs = qtInputs ++ libraryInputs;
@@ -75,6 +75,9 @@ let
   libraryPath = lib.makeLibraryPath libOutputs;
 
   qtBaseDev = lib.getDev qt5.qtbase;
+  qtBaseBin = lib.getBin qt5.qtbase;
+  qtMultimediaBin = lib.getBin qt5.qtmultimedia;
+  qtPluginPrefix = qt5.qtbase.qtPluginPrefix;
   lzoDev = lib.getDev pkgs.lzo;
   lzoLib = lib.getLib pkgs.lzo;
   superluDev = lib.getDev pkgs.superlu;
@@ -134,19 +137,28 @@ let
     fi
   '';
 
+  darwinEnvVars = lib.optionalAttrs stdenv.isDarwin {
+    OPENTOONZ_DARWIN_LIBICONV_LIBRARY = "${lib.getLib pkgs.libiconv}/lib/libiconv.2.${dylibExt}";
+    OPENTOONZ_GNU_LIBICONV_LIBRARY = "${lib.getLib pkgs.libiconvReal}/lib/libiconv.2.${dylibExt}";
+  };
+
   envVars = {
     CC = compiler.cc;
     CXX = compiler.cxx;
     OPENTOONZ_QT_PATH = "${qtBaseDev}/lib";
     OPENTOONZ_QT5_DIR = "${qtBaseDev}/lib/cmake/Qt5";
+    OPENTOONZ_QT_PLUGIN_DIRS = lib.concatStringsSep ":" [
+      "${qtBaseBin}/${qtPluginPrefix}"
+      "${qtMultimediaBin}/${qtPluginPrefix}"
+    ];
     OPENTOONZ_BOOST_ROOT = "${lib.getDev pkgs.boost}";
     OPENTOONZ_CMAKE_C_COMPILER = compiler.cc;
     OPENTOONZ_CMAKE_CXX_COMPILER = compiler.cxx;
-    OPENTOONZ_LZO_INCLUDE_DIR = "${lzoDev}/include/lzo";
+    OPENTOONZ_LZO_INCLUDE_DIR = "${lzoDev}/include";
     OPENTOONZ_LZO_LIBRARY = "${lzoLib}/lib/liblzo2.${dylibExt}";
     OPENTOONZ_SUPERLU_INCLUDE_DIR = superluIncludeDir;
     OPENTOONZ_SUPERLU_LIBRARY = "${superluLib}/lib/libsuperlu.${dylibExt}";
-  };
+  } // darwinEnvVars;
 
   cmakeFlags = [
     "-G"

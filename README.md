@@ -34,6 +34,11 @@ Older versions and unstable nightly builds are also available at <https://github
 - [BSD](./doc/how_to_build_bsd.md)
 - [Nix + mise](./doc/how_to_build_nix_mise.md)
 
+For Apple Silicon Macs, prefer the [Nix + mise](./doc/how_to_build_nix_mise.md)
+workflow. It pins the C++ dependency set, builds a native arm64 app bundle,
+and documents the current differences between the new arm64 package and the
+last Intel macOS package.
+
 For instructions on how to build stylesheets, please [see here](./doc/how_to_stylesheet.md).
 
 Can't develop but still want to help? Help us test individual Pull Requests before they are merged with [these steps](./doc/how_to_test_prs.md).

@@ -26,6 +26,18 @@ run = "nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh &
 description = "Run the locally built OpenToonz binary or app bundle."
 run = "nix develop path:. --command bash -lc 'if [ -d toonz/build/nix-relwithdebinfo/toonz/OpenToonz.app ]; then open toonz/build/nix-relwithdebinfo/toonz/OpenToonz.app; elif [ -x toonz/build/nix-relwithdebinfo/bin/opentoonz ]; then toonz/build/nix-relwithdebinfo/bin/opentoonz; else toonz/build/nix-relwithdebinfo/bin/OpenToonz; fi'"
 
+[tasks.package-macos]
+description = "Bundle the Nix-built macOS app with stuff data and Qt dependencies."
+run = "nix develop path:. --command bash scripts/macos/package-nix-app.sh"
+
+[tasks.check-macos-arm64]
+description = "Verify the Nix-built macOS app bundle contains arm64-only Mach-O files."
+run = "nix develop path:. --command bash scripts/macos/assert-arm64-bundle.sh"
+
+[tasks.dmg-macos]
+description = "Create a DMG from the Nix-built macOS app bundle."
+run = "nix develop path:. --command bash scripts/macos/create-dmg.sh"
+
 [tasks.check]
 description = "Run the flake configure check and whitespace validation."
 run = "nix flake check path:. && git diff --check"
