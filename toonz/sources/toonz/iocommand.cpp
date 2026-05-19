@@ -2846,7 +2846,7 @@ void IoCmd::convertNAARaster2TLV(
   TApp *app                           = TApp::instance();
   ToonzScene *scene                   = app->getCurrentScene()->getScene();
   for (auto &rd : rds) {
-    TFilePath &path = rd.m_path;
+    TFilePath path = rd.m_path;
     if (path.getDots() == ".." &&
         rasterExts.contains(QString::fromStdString(path.getType()).toLower())) {
       if (!path.isAbsolute()) path = scene->decodeFilePath(path);
@@ -2905,7 +2905,8 @@ void IoCmd::convertNAARaster2TLV(
           }
         }
         convertingPopup.hide();
-        if (!convertingPopup.wasCanceled()) path = scene->codeFilePath(dstPath);
+        if (!convertingPopup.wasCanceled())
+          rd = LoadResourceArguments::ResourceData(dstPath);
       }
     }
   }
