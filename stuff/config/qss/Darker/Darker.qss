@@ -2454,7 +2454,7 @@ QToolBar#FlipConsolePlayToolBar #NextKey {
 #ViewerFpsSlider::sub-line:horizontal {
   subcontrol-origin: absolute;
   background-color: #424C61;
-  border: 1 solid #2424242;
+  border: 1 solid #242424;
   border-top-left-radius: 2;
   border-bottom-left-radius: 2;
   height: 19;
