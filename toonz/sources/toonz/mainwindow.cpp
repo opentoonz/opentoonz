@@ -2132,8 +2132,8 @@ void MainWindow::defineActions() {
                         "new_toonz_raster_level");
   createMenuLevelAction(MI_NewRasterLevel, QT_TR_NOOP("&New Raster Level"), "",
                         "new_raster_level");
-  createMenuFileAction(MI_NewMetaLevel, QT_TR_NOOP("&New Assistant Level"),
-                       "new_meta_level");
+  createMenuLevelAction(MI_NewMetaLevel, QT_TR_NOOP("&New Assistant Level"), "",
+                        "assistant");
   createMenuLevelAction(MI_LoadLevel, QT_TR_NOOP("&Load Level..."), "",
                         "load_level");
   createMenuLevelAction(MI_SaveLevel, QT_TR_NOOP("&Save Level"), "",
@@ -2966,6 +2966,37 @@ void MainWindow::defineActions() {
   createAction(MI_PlasticAnimate, QT_TR_NOOP("Plastic Tool - Animate"), "",
                ToolCommandType);
 
+  /*-- Edit Assistants tool + type switching shortcuts --*/
+  createAction(MI_AssistantNextType,
+               QT_TR_NOOP("Assistant Type - Cycle"), "", ToolCommandType);
+  createAction(MI_AssistantLine, QT_TR_NOOP("Assistant Type - Line"), "",
+               ToolCommandType, "assistant_line");
+  createAction(MI_AssistantEllipse, QT_TR_NOOP("Assistant Type - Ellipse"), "",
+               ToolCommandType, "assistant_ellipse");
+  createAction(MI_AssistantPerspective,
+               QT_TR_NOOP("Assistant Type - Perspective"), "",
+               ToolCommandType, "assistant_perspective");
+  createAction(MI_AssistantVanishingPoint,
+               QT_TR_NOOP("Assistant Type - Vanishing Point"), "",
+               ToolCommandType, "assistant_vanishingpoint");
+  createAction(MI_AssistantFisheye, QT_TR_NOOP("Assistant Type - Fisheye"), "",
+               ToolCommandType, "assistant_fisheye");
+  createAction(MI_AssistantReplicatorStar,
+               QT_TR_NOOP("Assistant Type - Replicator Star"), "",
+               ToolCommandType, "replicator_star");
+  createAction(MI_AssistantReplicatorMirror,
+               QT_TR_NOOP("Assistant Type - Replicator Mirror"), "",
+               ToolCommandType, "replicator_mirror");
+  createAction(MI_AssistantReplicatorJitter,
+               QT_TR_NOOP("Assistant Type - Replicator Jitter"), "",
+               ToolCommandType, "replicator_jitter");
+  createAction(MI_AssistantReplicatorGrid,
+               QT_TR_NOOP("Assistant Type - Replicator Grid"), "",
+               ToolCommandType, "replicator_grid");
+  createAction(MI_AssistantReplicatorAffine,
+               QT_TR_NOOP("Assistant Type - Replicator Affine"), "",
+               ToolCommandType, "replicator_affine");
+
   // Tool Modifiers
 
   createToolOptionsAction(MI_SelectNextGuideStroke,
@@ -3071,6 +3102,29 @@ void MainWindow::defineActions() {
                           QT_TR_NOOP("Geometric Shape Polygon"), "");
   createToolOptionsAction("A_ToolOption_GeometricEdge",
                           QT_TR_NOOP("Geometric Edge"), "");
+  createToolOptionsAction("A_ToolOption_AssistantType",
+                          QT_TR_NOOP("Assistant Type"), "");
+  createToolOptionsAction("A_ToolOption_AssistantType:assistantLine",
+                          QT_TR_NOOP("Assistant Type - Line"), "");
+  createToolOptionsAction("A_ToolOption_AssistantType:assistantEllipse",
+                          QT_TR_NOOP("Assistant Type - Ellipse"), "");
+  createToolOptionsAction("A_ToolOption_AssistantType:assistantPerspective",
+                          QT_TR_NOOP("Assistant Type - Perspective"), "");
+  createToolOptionsAction(
+      "A_ToolOption_AssistantType:assistantVanishingPoint",
+      QT_TR_NOOP("Assistant Type - Vanishing Point"), "");
+  createToolOptionsAction("A_ToolOption_AssistantType:assistantFisheye",
+                          QT_TR_NOOP("Assistant Type - Fisheye"), "");
+  createToolOptionsAction("A_ToolOption_AssistantType:replicatorStar",
+                          QT_TR_NOOP("Assistant Type - Replicator Star"), "");
+  createToolOptionsAction("A_ToolOption_AssistantType:replicatorMirror",
+                          QT_TR_NOOP("Assistant Type - Replicator Mirror"), "");
+  createToolOptionsAction("A_ToolOption_AssistantType:replicatorJitter",
+                          QT_TR_NOOP("Assistant Type - Replicator Jitter"), "");
+  createToolOptionsAction("A_ToolOption_AssistantType:replicatorGrid",
+                          QT_TR_NOOP("Assistant Type - Replicator Grid"), "");
+  createToolOptionsAction("A_ToolOption_AssistantType:replicatorAffine",
+                          QT_TR_NOOP("Assistant Type - Replicator Affine"), "");
   createToolOptionsAction("A_ToolOption_Mode", QT_TR_NOOP("Mode"), "");
   menuAct = createToolOptionsAction(
       "A_ToolOption_Mode:Areas", QT_TR_NOOP("Mode - Areas"), "", "mode_areas");

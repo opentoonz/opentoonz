@@ -355,6 +355,18 @@
 #define MI_SelectionFreehand "MI_SelectionFreehand"
 #define MI_SelectionPolyline "MI_SelectionPolyline"
 
+#define MI_AssistantNextType "MI_AssistantNextType"
+#define MI_AssistantLine "MI_AssistantLine"
+#define MI_AssistantEllipse "MI_AssistantEllipse"
+#define MI_AssistantPerspective "MI_AssistantPerspective"
+#define MI_AssistantVanishingPoint "MI_AssistantVanishingPoint"
+#define MI_AssistantFisheye "MI_AssistantFisheye"
+#define MI_AssistantReplicatorStar "MI_AssistantReplicatorStar"
+#define MI_AssistantReplicatorMirror "MI_AssistantReplicatorMirror"
+#define MI_AssistantReplicatorJitter "MI_AssistantReplicatorJitter"
+#define MI_AssistantReplicatorGrid "MI_AssistantReplicatorGrid"
+#define MI_AssistantReplicatorAffine "MI_AssistantReplicatorAffine"
+
 #define MI_GeometricNextShape "MI_GeometricNextShape"
 #define MI_GeometricRectangle "MI_GeometricRectangle"
 #define MI_GeometricCircle "MI_GeometricCircle"
