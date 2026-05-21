@@ -66,3 +66,29 @@ if(BUILD_ENV_APPLE)
 endif()
 
 add_test(NAME tzl_header_regression COMMAND tzl_header_regression)
+
+add_executable(externfx_process_regression externfx_process_regression.cpp)
+
+target_include_directories(externfx_process_regression PRIVATE ${CMAKE_SOURCE_DIR})
+
+target_link_libraries(externfx_process_regression
+    Qt5::Core
+    tnzbase
+    image
+)
+
+if(BUILD_ENV_APPLE)
+    add_custom_command(
+        TARGET externfx_process_regression POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:tnzcore>
+            $<TARGET_FILE:tnzbase>
+            $<TARGET_FILE:tnzext>
+            $<TARGET_FILE:toonzlib>
+            $<TARGET_FILE:image>
+            $<TARGET_FILE_DIR:externfx_process_regression>
+        VERBATIM
+    )
+endif()
+
+add_test(NAME externfx_process_regression COMMAND externfx_process_regression)
