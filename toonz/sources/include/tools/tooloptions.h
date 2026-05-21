@@ -563,6 +563,12 @@ private:
   class PresetNamePopup;
   PresetNamePopup *m_presetNamePopup;
   void filterControls();
+  // Guard: skip redundant setVisible() calls — and the Qt layout recalculation
+  // they trigger — when the modifier-visibility state has not changed.
+  // Each BrushToolOptionsBox is cached per TTool* by ToolOptions, so switching
+  // back to a previously-seen level type is a no-op after the first visit.
+  bool m_lastShowModifiers = false;
+  bool m_filterInitialized = false;
 
 public:
   BrushToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,

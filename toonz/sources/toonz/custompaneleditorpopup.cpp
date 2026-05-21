@@ -12,6 +12,7 @@
 
 // TnzQt includes
 #include "toonzqt/gutil.h"
+#include "toonzqt/menubarcommand.h"
 
 // ToonzLib
 #include "toonz/toonzfolders.h"
@@ -30,6 +31,7 @@
 #include <QLabel>
 #include <QScrollArea>
 #include <QComboBox>
+#include <QCheckBox>
 #include <QPushButton>
 #include <QUiLoader>
 #include <QColor>
@@ -38,6 +40,7 @@
 #include <QBuffer>
 #include <QToolButton>
 #include <QRegularExpression>
+#include <QInputDialog>
 
 namespace {
 const TFilePath CustomPanelTemplateFolderName("custom panel templates");
@@ -775,9 +778,245 @@ void CustomPanelEditorPopup::onRegister() {
 
 //-----------------------------------------------------------------------------
 
+// Custom dialog for panel removal with collapsible multi-selection.
+// Top section stays anchored; collapsible section expands downward only.
+class RemoveCustomPanelDialog : public QDialog {
+  QLineEdit* m_mainPanelField;
+  QString m_mainPanelName;
+  QWidget* m_collapsibleWidget;
+  QList<QCheckBox*> m_checkboxes;
+  QStringList m_allPanels;
+  QPushButton* m_toggleButton;
+  
+public:
+  RemoveCustomPanelDialog(const QStringList& panels, const QString& currentPanel, QWidget* parent)
+      : QDialog(parent), m_allPanels(panels), m_mainPanelName(currentPanel) {
+    setWindowTitle(tr("Remove Custom Panels"));
+    setModal(true);
+    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+    
+    QVBoxLayout* mainLayout = new QVBoxLayout(this);
+    mainLayout->setContentsMargins(12, 12, 12, 12);
+    mainLayout->setSpacing(4);
+    
+    // --- Top section: anchored, never moves ---
+    QLabel* mainLabel = new QLabel(tr("Selected Panel to Remove:"), this);
+    mainLayout->addWidget(mainLabel);
+    
+    // Read-only field with dark background for visibility
+    m_mainPanelField = new QLineEdit(currentPanel, this);
+    m_mainPanelField->setReadOnly(true);
+    m_mainPanelField->setFrame(true);
+    m_mainPanelField->setStyleSheet(
+        "QLineEdit { background-color: #2a2a2a; color: #e0e0e0; "
+        "border: 1px solid #555; padding: 3px; }");
+    mainLayout->addWidget(m_mainPanelField);
+    
+    // Collapsible toggle (immediately below, minimal gap)
+    m_toggleButton = new QPushButton(this);
+    m_toggleButton->setFlat(true);
+    m_toggleButton->setText(QString::fromUtf8("\xe2\x96\xb6") + tr(" Other custom panels"));
+    m_toggleButton->setStyleSheet("text-align: left; padding: 4px 0px;");
+    m_toggleButton->setCursor(Qt::PointingHandCursor);
+    mainLayout->addWidget(m_toggleButton);
+    
+    // Collapsible container (starts hidden, zero size policy when hidden)
+    m_collapsibleWidget = new QWidget(this);
+    m_collapsibleWidget->setVisible(false);
+    m_collapsibleWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    QVBoxLayout* collapsibleLayout = new QVBoxLayout(m_collapsibleWidget);
+    collapsibleLayout->setContentsMargins(16, 2, 0, 2);
+    collapsibleLayout->setSpacing(2);
+    
+    // Scroll area for the list of other panels
+    QScrollArea* scrollArea = new QScrollArea(m_collapsibleWidget);
+    scrollArea->setFrameShape(QFrame::NoFrame);
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setMaximumHeight(180);
+    
+    QWidget* scrollWidget = new QWidget();
+    QVBoxLayout* scrollLayout = new QVBoxLayout(scrollWidget);
+    scrollLayout->setContentsMargins(0, 0, 0, 0);
+    scrollLayout->setSpacing(2);
+    
+    for (const QString& panel : panels) {
+      if (panel != currentPanel) {
+        QCheckBox* cb = new QCheckBox(panel, scrollWidget);
+        scrollLayout->addWidget(cb);
+        m_checkboxes.append(cb);
+      }
+    }
+    scrollLayout->addStretch();
+    scrollArea->setWidget(scrollWidget);
+    collapsibleLayout->addWidget(scrollArea);
+    mainLayout->addWidget(m_collapsibleWidget);
+    
+    // Stretch between content and buttons so buttons stay at bottom
+    mainLayout->addStretch(1);
+    
+    // Bottom buttons
+    QHBoxLayout* buttonLayout = new QHBoxLayout();
+    buttonLayout->setSpacing(6);
+    QPushButton* okBtn = new QPushButton(tr("Remove"), this);
+    QPushButton* cancelBtn = new QPushButton(tr("Cancel"), this);
+    buttonLayout->addStretch();
+    buttonLayout->addWidget(okBtn);
+    buttonLayout->addWidget(cancelBtn);
+    mainLayout->addLayout(buttonLayout);
+    
+    connect(okBtn, &QPushButton::clicked, this, &QDialog::accept);
+    connect(cancelBtn, &QPushButton::clicked, this, &QDialog::reject);
+    
+    // Toggle logic: show/hide collapsible widget, resize downward
+    connect(m_toggleButton, &QPushButton::clicked, [this]() {
+      bool wasVisible = m_collapsibleWidget->isVisible();
+      m_collapsibleWidget->setVisible(!wasVisible);
+      if (wasVisible) {
+        m_toggleButton->setText(QString::fromUtf8("\xe2\x96\xb6") + tr(" Other custom panels"));
+      } else {
+        m_toggleButton->setText(QString::fromUtf8("\xe2\x96\xbc") + tr(" Other custom panels"));
+      }
+      // Resize dialog to fit content, expanding downward only
+      QApplication::processEvents();
+      resize(width(), sizeHint().height());
+    });
+    
+    // Start compact
+    resize(320, sizeHint().height());
+  }
+  
+  QStringList getSelectedPanels() const {
+    QStringList selected;
+    // Always include main panel
+    selected.append(m_mainPanelName);
+    // Add checked panels from collapsible section
+    for (QCheckBox* cb : m_checkboxes) {
+      if (cb->isChecked() && !selected.contains(cb->text())) {
+        selected.append(cb->text());
+      }
+    }
+    return selected;
+  }
+};
+
+void CustomPanelEditorPopup::onRemove() {
+  // List all existing custom panels
+  TFilePath customPanelsFolder = customPaneFolderPath();
+  if (!TSystem::doesExistFileOrLevel(customPanelsFolder)) {
+    DVGui::warning(tr("No custom panels found."));
+    return;
+  }
+  
+  TFilePathSet fileList =
+      TSystem::readDirectory(customPanelsFolder, false, true, false);
+  
+  QStringList panelNames;
+  for (auto file : fileList) {
+    if (file.getType() != "ui") continue;
+    panelNames.append(QString::fromStdString(file.getName()));
+  }
+  
+  if (panelNames.isEmpty()) {
+    DVGui::warning(tr("No custom panels found."));
+    return;
+  }
+  
+  // Determine current panel (use panel name edit field if it matches an existing panel)
+  QString currentPanel = m_panelNameEdit->text();
+  if (!panelNames.contains(currentPanel)) {
+    currentPanel = panelNames.first();  // Fallback to first panel
+  }
+  
+  // Show custom dialog
+  RemoveCustomPanelDialog dialog(panelNames, currentPanel, this);
+  if (dialog.exec() != QDialog::Accepted) {
+    return;  // User cancelled
+  }
+  
+  QStringList selectedPanels = dialog.getSelectedPanels();
+  if (selectedPanels.isEmpty()) {
+    return;
+  }
+  
+  // Confirmation dialog
+  QString question;
+  if (selectedPanels.size() == 1) {
+    question = tr("Are you sure you want to permanently remove the custom panel '%1'?\n\n"
+                  "This will delete the panel file and unregister its command.")
+                  .arg(selectedPanels.first());
+  } else {
+    question = tr("Are you sure you want to permanently remove %1 custom panels?\n\n"
+                  "This will delete the panel files and unregister their commands.")
+                  .arg(selectedPanels.size());
+  }
+  
+  int ret = DVGui::MsgBox(question, tr("Remove"), tr("Cancel"), 0);
+  if (ret == 0 || ret == 2) {
+    return;  // User cancelled
+  }
+  
+  // Delete the .ui files and mark commands as invisible
+  int successCount = 0;
+  QStringList deletedPanels;
+  
+  for (const QString& panelName : selectedPanels) {
+    TFilePath panelPath = customPanelsFolder + TFilePath(panelName.toStdString() + ".ui");
+    if (TSystem::doesExistFileOrLevel(panelPath)) {
+      try {
+        TSystem::deleteFile(panelPath);
+        deletedPanels.append(panelName);
+        successCount++;
+        
+        // IMMEDIATELY mark the command action as invisible
+        // to hide it from Configure Shortcuts during current session
+        QString commandId = "MI_CustomPanel_" + panelName;
+        QAction* action = CommandManager::instance()->getAction(
+            commandId.toStdString().c_str(), false);
+        if (action) {
+          action->setVisible(false);
+        }
+      } catch (...) {
+        DVGui::warning(tr("Failed to delete panel: %1").arg(panelName));
+      }
+    }
+  }
+  
+  if (successCount > 0) {
+    // Reload custom panel entries
+    // This rebuilds m_registeredPanelIds to exclude deleted panels
+    // and updates the Custom Panels menu
+    CustomPanelManager::instance()->loadCustomPanelEntries();
+    
+    // Refresh the template combo in this editor to reflect changes
+    loadTemplateList();
+    
+    QString message = (successCount == 1) 
+        ? tr("Custom panel has been successfully removed.")
+        : tr("%1 custom panels have been successfully removed.").arg(successCount);
+    DVGui::info(message);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+// Static instance pointer for refreshCommandTreeIfOpen()
+CustomPanelEditorPopup* CustomPanelEditorPopup::s_instance = nullptr;
+
+CustomPanelEditorPopup::~CustomPanelEditorPopup() {
+  if (s_instance == this) s_instance = nullptr;
+}
+
+void CustomPanelEditorPopup::refreshCommandTreeIfOpen() {
+  if (s_instance && s_instance->m_commandListTree) {
+    s_instance->m_commandListTree->refreshTree();
+    s_instance->m_commandListTree->searchItems();
+  }
+}
+
 CustomPanelEditorPopup::CustomPanelEditorPopup()
     : Dialog(TApp::instance()->getMainWindow(), true, false,
              "CustomPanelEditorPopup") {
+  s_instance = this;
   setWindowTitle(tr("Custom Panel Editor"));
 
   m_commandListTree =
@@ -795,6 +1034,7 @@ CustomPanelEditorPopup::CustomPanelEditorPopup()
   m_panelNameEdit     = new QLineEdit("My Custom Panel", this);
 
   QPushButton* registerButton = new QPushButton(tr("Register"), this);
+  QPushButton* removeButton   = new QPushButton(tr("Remove"), this);
   QPushButton* cancelButton   = new QPushButton(tr("Cancel"), this);
 
   m_previewArea->setStyleSheet("background-color: black;");
@@ -847,6 +1087,7 @@ CustomPanelEditorPopup::CustomPanelEditorPopup()
   }
   m_buttonLayout->addLayout(nameLay, 0);
   m_buttonLayout->addWidget(registerButton, 0);
+  m_buttonLayout->addWidget(removeButton, 0);
   m_buttonLayout->addSpacing(10);
   m_buttonLayout->addWidget(cancelButton, 0);
 
@@ -856,6 +1097,8 @@ CustomPanelEditorPopup::CustomPanelEditorPopup()
           this, &CustomPanelEditorPopup::onTemplateSwitched);
   connect(registerButton, &QPushButton::clicked, this,
           &CustomPanelEditorPopup::onRegister);
+  connect(removeButton, &QPushButton::clicked, this,
+          &CustomPanelEditorPopup::onRemove);
   connect(searchEdit, &QLineEdit::textChanged, this,
           &CustomPanelEditorPopup::onSearchTextChanged);
 
