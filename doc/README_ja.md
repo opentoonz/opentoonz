@@ -27,6 +27,12 @@
 
 - [Windows](./how_to_build_win_ja.md)
 - [macOS](./how_to_build_macosx_ja.md)
+- [Linux](./how_to_build_linux.md)（英語）
+- [BSD](./how_to_build_bsd.md)（英語）
+
+スタイルシートのビルド方法は[こちら](./how_to_stylesheet.md)（英語）をご覧ください。
+
+開発はできないけれど協力したい方は、[こちらの手順](./how_to_test_prs.md)（英語）でマージ前のプルリクエストのテストにご協力いただけます。
 
 ### ライセンス
 
