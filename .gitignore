@@ -23,6 +23,7 @@ Thumbs.db
 lzo-2.09
 
 .clang_complete
+.direnv/
 Debug/
 Debug Library/
 Release/
