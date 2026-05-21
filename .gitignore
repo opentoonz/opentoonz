@@ -46,3 +46,6 @@ ipch/
 
 # generated qm files
 /stuff/config/loc
+
+# generated static analysis reports
+static_analysis_semgrep_*

@@ -97,6 +97,27 @@ area:
 When a full local build is not feasible, state that explicitly in the final
 handoff and include the configure/build command that should be run.
 
+## Static Analysis
+
+Semgrep is useful for audit passes, but its generated output should not be
+committed. Keep raw JSON, SARIF, cloned rulesets, and scratch reports outside
+the repo, for example under `/private/tmp`, or in a local ignored
+`static_analysis_semgrep_*` directory. Commit only curated findings, fixes,
+tests, and maintainer-facing summaries under `doc/` when they are useful for
+review.
+
+When running Semgrep in this environment, use a writable temporary home so the
+tool does not try to create `~/.semgrep`:
+
+```sh
+mkdir -p /private/tmp/opentoonz-semgrep-home
+HOME=/private/tmp/opentoonz-semgrep-home semgrep scan --metrics=off ...
+```
+
+Prefer focused re-scans on files touched by a fix, and record the Semgrep
+version, rulesets, command line, and high-level results in the report instead
+of checking in generated artifacts.
+
 ## Formatting And Style
 
 - C++ code is formatted with `toonz/sources/.clang-format`.
