@@ -9,6 +9,10 @@ GeneratedFiles
 *.suo
 *.user
 build*
+/toonz/build/
+/.direnv/
+/result
+/result-*
 Thumbs.db
 
 # bundled thirdparty libraries

@@ -4,6 +4,7 @@
 #include "tconvert.h"
 #include <ctype.h>
 
+#include "tbuildinfo.h"
 #include "tversion.h"
 using namespace TVER;
 
@@ -28,7 +29,7 @@ void printToonzRelease(ostream &out) {
 
 void printLibRelease(ostream &out) {
   TVER::ToonzVersion tver;
-  out << tver.getAppVersionInfo("") << " - " __DATE__ << endl;
+  out << tver.getAppVersionInfo("") << " - " OPENTOONZ_BUILD_DATE << endl;
 }
 //---------------------------------------------------------
 
