@@ -193,6 +193,20 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
         <source>pixel</source>
         <translation>píxeles</translation>
     </message>
+    <message>
+        <source>Deleting &quot;%1&quot;.
+Are you sure?</source>
+        <translation type="unfinished">Borrando &quot;%1&quot;.
+¿Confirma?</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Borrar</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Cancelar</translation>
+    </message>
 </context>
 <context>
     <name>ChannelHisto</name>
@@ -508,7 +522,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Error importing color names XML</source>
-        <translation>Error importando XML de nombres de colores</translation>
+        <translation type="vanished">Error importando XML de nombres de colores</translation>
     </message>
     <message>
         <source>Save Color Names</source>
@@ -521,6 +535,38 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     <message>
         <source>Error exporting color names XML</source>
         <translation>Error exportando XML de nombres de colores</translation>
+    </message>
+    <message>
+        <source>Color name is not valid.
+The following characters cannot be used: \ # &lt; &gt; &quot; &apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Color name already exists.
+Please use another name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid hex color format.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error importing color names XML:
+File not found or invalid format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error importing color names XML:
+The file may be corrupt or have invalid format.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An unexpected error occurred while importing colors.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to save user color names file.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -907,6 +953,14 @@ La ganancia se mostrará en forma de f-stops donde el valor &quot;neutral&quot;,
     <message>
         <source> (gain %1)</source>
         <translation> (ganancia %1)</translation>
+    </message>
+    <message>
+        <source>&amp;Rotate Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Rotate Right</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2229,7 +2283,7 @@ y su tono puede notarse ligeramente discretizado.</translation>
     </message>
     <message>
         <source>It is not possible to delete the style #</source>
-        <translation>No es posible borrar el estilo № </translation>
+        <translation type="vanished">No es posible borrar el estilo № </translation>
     </message>
     <message>
         <source>It is not possible to delete styles #0 and #1.</source>
@@ -2308,7 +2362,7 @@ Are you sure?</source>
     <message>
         <source>Deleting &quot;%1&quot;.
 Are you sure?</source>
-        <translation>Borrando &quot;%1&quot;.
+        <translation type="vanished">Borrando &quot;%1&quot;.
 ¿Confirma?</translation>
     </message>
     <message>
@@ -2317,19 +2371,19 @@ Are you sure?</source>
     </message>
     <message>
         <source>Paste Style  in Palette : %1</source>
-        <translation>Pegar estilo en paleta: %1</translation>
+        <translation type="vanished">Pegar estilo en paleta: %1</translation>
     </message>
     <message>
         <source>Delete Style  from Palette : %1</source>
-        <translation>Borrar estilo de paleta: %1</translation>
+        <translation type="vanished">Borrar estilo de paleta: %1</translation>
     </message>
     <message>
         <source>Cut Style  from Palette : %1</source>
-        <translation>Cortar estilo de paleta: %1</translation>
+        <translation type="vanished">Cortar estilo de paleta: %1</translation>
     </message>
     <message>
         <source>  to Palette : %1</source>
-        <translation>  a paleta: %1</translation>
+        <translation type="vanished">  a paleta: %1</translation>
     </message>
     <message>
         <source>Paste Color &amp;&amp; Name%1</source>
@@ -2349,11 +2403,11 @@ Are you sure?</source>
     </message>
     <message>
         <source>Blend Colors  in Palette : %1</source>
-        <translation>Fundir colores en paleta: %1</translation>
+        <translation type="vanished">Fundir colores en paleta: %1</translation>
     </message>
     <message>
         <source>Toggle Link  in Palette : %1</source>
-        <translation>Alternar vínculo en paleta: %1</translation>
+        <translation type="vanished">Alternar vínculo en paleta: %1</translation>
     </message>
     <message>
         <source>Remove Link  in Palette : %1</source>
@@ -2457,7 +2511,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Remove Reference  in Palette : %1</source>
-        <translation>Eliminar referencia en paleta : %1</translation>
+        <translation type="vanished">Eliminar referencia en paleta : %1</translation>
     </message>
     <message>
         <source>It is not possible to assign a shortcut with modifiers to the visualization commands.</source>
@@ -2594,6 +2648,46 @@ La segunda línea debería tener la forma &quot;Mesh [profundidad de bits de ent
     <message>
         <source>Sample Type: </source>
         <translation>Tipo de muestra: </translation>
+    </message>
+    <message>
+        <source>It is not possible to delete style #</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paste Style to Palette: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Style from Palette: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cut Style from Palette: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> to Palette: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blend Colors in Palette: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Link in Palette: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Reference in Palette: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set As...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Lines and Areas</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2964,6 +3058,14 @@ Are you sure ?</source>
     <message>
         <source>Failed to save palette.</source>
         <translation>Falla al guardar paleta.</translation>
+    </message>
+    <message>
+        <source>Set As...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refresh</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

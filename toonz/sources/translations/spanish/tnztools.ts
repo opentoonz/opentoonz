@@ -325,6 +325,21 @@
     </message>
 </context>
 <context>
+    <name>EditAssistantsTool</name>
+    <message>
+        <source>&lt;choose to create&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Assistant Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Order</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>EditTool</name>
     <message>
         <source>Scale Constraint:</source>
@@ -546,7 +561,7 @@
     </message>
     <message>
         <source>Selective</source>
-        <translation>Selectivo</translation>
+        <translation type="vanished">Selectivo</translation>
     </message>
     <message>
         <source>Mode:</source>
@@ -604,6 +619,26 @@
         <source>Pick+Freehand</source>
         <translation>Escoger+Lazo</translation>
     </message>
+    <message>
+        <source>Empty Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close Gap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refer Fill</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gap Close Distance:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Extend Fill</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FingerTool</name>
@@ -614,6 +649,18 @@
     <message>
         <source>Invert</source>
         <translation>Invertir</translation>
+    </message>
+    <message>
+        <source>Mode:</source>
+        <translation type="unfinished">Modo:</translation>
+    </message>
+    <message>
+        <source>Pick</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Empty Only</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -662,6 +709,10 @@
         <source>&lt;custom&gt;</source>
         <translation>&lt;personalizado&gt;</translation>
     </message>
+    <message>
+        <source>Assistants</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FullColorEraserTool</name>
@@ -704,6 +755,10 @@
     <message>
         <source>Polyline</source>
         <translation>Línea poligonal</translation>
+    </message>
+    <message>
+        <source>MultiArc</source>
+        <translation type="unfinished">Arco múltiple</translation>
     </message>
 </context>
 <context>
@@ -763,6 +818,18 @@
     <message>
         <source>Lock Alpha</source>
         <translation>Preservar alfa</translation>
+    </message>
+    <message>
+        <source>Empty Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pick</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paint by Filling</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -978,7 +1045,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Selective</source>
-        <translation>Selectivo</translation>
+        <translation type="vanished">Selectivo</translation>
     </message>
     <message>
         <source>Pencil Mode</source>
@@ -1080,6 +1147,18 @@ Do you want to proceed?</source>
         <source>Rotate</source>
         <translation>Rotar</translation>
     </message>
+    <message>
+        <source>Empty Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished">Tamaño</translation>
+    </message>
+    <message>
+        <source>Opacity</source>
+        <translation type="unfinished">Opacidad</translation>
+    </message>
 </context>
 <context>
     <name>PumpTool</name>
@@ -1152,19 +1231,19 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>The current tool cannot be used on a Vector Level.</source>
-        <translation>No es posible usar la herramienta actual en un nivel vectorial.</translation>
+        <translation type="vanished">No es posible usar la herramienta actual en un nivel vectorial.</translation>
     </message>
     <message>
         <source>The current tool cannot be used on a Toonz Level.</source>
-        <translation>No es posible usar la herramienta actual en un nivel de imagen de Toonz.</translation>
+        <translation type="vanished">No es posible usar la herramienta actual en un nivel de imagen de Toonz.</translation>
     </message>
     <message>
         <source>The current tool cannot be used on a Raster Level.</source>
-        <translation>No es posible usar la herramienta actual en un nivel de imagen.</translation>
+        <translation type="vanished">No es posible usar la herramienta actual en un nivel de imagen.</translation>
     </message>
     <message>
         <source>The current tool cannot be used on a Mesh Level.</source>
-        <translation>No es posible usar la herramienta actual en un nivel de malla.</translation>
+        <translation type="vanished">No es posible usar la herramienta actual en un nivel de malla.</translation>
     </message>
     <message>
         <source>The current tool cannot be used on a mesh-deformed level</source>
@@ -1290,6 +1369,34 @@ Do you want to proceed?</source>
         <source>Snap At Intersection</source>
         <translation>Adherir a intersecciones</translation>
     </message>
+    <message>
+        <source>Sort Vector Strokes With Palette Order Level : %1 Frame : %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort Vector Strokes With Palette Order Level : %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The current tool cannot be used on: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>, </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You can use this tool on empty cell in Xsheet/Timeline.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You can use this tool with: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Or just choose an empty cell in Xsheet/Timeline.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RGBPickerTool</name>
@@ -1382,12 +1489,28 @@ Do you want to proceed?</source>
         <source>current</source>
         <translation>actual</translation>
     </message>
+    <message>
+        <source>Ignore AutoPaint Inks</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RotateTool</name>
     <message>
         <source>Rotate On Camera Center</source>
         <translation>Rotar en torno al centro de la cámara</translation>
+    </message>
+    <message>
+        <source>Rotate by Step</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Step Angle:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotate Left/Right Angle:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1566,7 +1689,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Palette must have more than one palette to be organized.</source>
-        <translation>Es necesario que exista más de una paleta para poder organizarlas.</translation>
+        <translation type="vanished">Es necesario que exista más de una paleta para poder organizarlas.</translation>
     </message>
     <message>
         <source>Mode:</source>
@@ -1592,14 +1715,328 @@ Do you want to proceed?</source>
         <source>Lines &amp; Areas</source>
         <translation>Líneas y áreas</translation>
     </message>
+    <message>
+        <source>No available palette.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Palette to be organized must have more than one page.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StylePickerToolOptionsBox</name>
     <message>
         <source>With this option being activated, the picked style will be
 moved to the end of the first page of the palette.</source>
-        <translation>Con esta opción activa, el estilo escogido será
+        <translation type="vanished">Con esta opción activa, el estilo escogido será
 movido hacia el final de la primera página de la paleta.</translation>
+    </message>
+    <message>
+        <source>With this option being activated, the picked style will replace
+the current style in current level.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>With this option being activated, the picked style will be
+moved to the end of the current style&apos;s page of the palette.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TAssistant</name>
+    <message>
+        <source>Magnetism</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TAssistantBase</name>
+    <message>
+        <source>Enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TAssistantEllipse</name>
+    <message>
+        <source>Fish Eye</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Circle</source>
+        <translation type="unfinished">Círculo</translation>
+    </message>
+    <message>
+        <source>Grid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Depth Grid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flip Grids</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ellipse</source>
+        <translation type="unfinished">Elipse</translation>
+    </message>
+    <message>
+        <source>Restrict A</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restrict B</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Repeat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Perspective</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Depth</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TAssistantPerspective</name>
+    <message>
+        <source>Perspective</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parallel X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parallel Y</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parallel Z</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Grid XY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Grid YZ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Grid ZX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Box</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TAssistantVanishingPoint</name>
+    <message>
+        <source>Vanishing Point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pass Through</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Grid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Perspective</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Line</source>
+        <translation type="unfinished">Línea</translation>
+    </message>
+    <message>
+        <source>Restrict A</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restrict B</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parallel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TReplicator</name>
+    <message>
+        <source>Skip First Tracks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip Last Tracks</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TReplicatorAffine</name>
+    <message>
+        <source>Replicator Affine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fix Scale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fix Aspect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fix Angle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fix Skew</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inv. Count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation type="unfinished">Presión</translation>
+    </message>
+</context>
+<context>
+    <name>TReplicatorGrid</name>
+    <message>
+        <source>Replicator Grid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fix Angle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fix Skew</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mirror A</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mirror B</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Count A</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inv. Count A</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Count B</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inv. Count B</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TReplicatorJitter</name>
+    <message>
+        <source>Jitter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Amplitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fix First Point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fix Last Point</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TReplicatorMirror</name>
+    <message>
+        <source>Replicator Mirror</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Discrete Angle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation type="unfinished">Presión</translation>
+    </message>
+</context>
+<context>
+    <name>TReplicatorStar</name>
+    <message>
+        <source>Replicator Star</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Discrete Angle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mirror</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Count</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TTool</name>
+    <message>
+        <source>Toonz Vector Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toonz Raster Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Raster Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mesh Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Assistants Level</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1651,6 +2088,10 @@ movido hacia el final de la primera página de la paleta.</translation>
     <message>
         <source>Lock Alpha</source>
         <translation>Preservar alfa</translation>
+    </message>
+    <message>
+        <source>Assistants</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1758,6 +2199,26 @@ movido hacia el final de la primera página de la paleta.</translation>
     <message>
         <source>Bevel join</source>
         <translation>Biseladas</translation>
+    </message>
+    <message>
+        <source>Draw Order:</source>
+        <translation type="unfinished">Orden:</translation>
+    </message>
+    <message>
+        <source>Over All</source>
+        <translation type="unfinished">Por encima</translation>
+    </message>
+    <message>
+        <source>Under All</source>
+        <translation type="unfinished">Por debajo</translation>
+    </message>
+    <message>
+        <source>Palette Order</source>
+        <translation type="unfinished">Según paleta</translation>
+    </message>
+    <message>
+        <source>Assistants</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

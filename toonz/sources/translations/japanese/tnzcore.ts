@@ -39,7 +39,7 @@
     </message>
     <message>
         <source>Skipping frame.</source>
-        <translation>フレームをスキップします。</translation>
+        <translation type="vanished">フレームをスキップします。</translation>
     </message>
     <message>
         <source>Malformed frame name</source>

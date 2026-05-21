@@ -731,12 +731,6 @@ endif()
 # =============================================================================
 if(WITH_TRANSLATION)
 
-    # -------------------------------------------------------------------------
-    # Dummy compatibility function
-    # -------------------------------------------------------------------------
-    function(add_translation module)
-    endfunction()
-
     # ---------------------------------------------------------------------
     # Language data and display names
     # ---------------------------------------------------------------------
@@ -753,95 +747,61 @@ if(WITH_TRANSLATION)
     if(NOT CODE_COUNT EQUAL DISPLAY_COUNT)
         message(FATAL_ERROR "LANG_CODES and LANG_DISPLAY_NAMES must have the same length!")
     endif()
+    
+    # -------------------------------------------------------------------------
+    # translate_update_** projects for lupdate (update .ts files)
+    # -------------------------------------------------------------------------
+    function(add_translation module)
+        set(translation)
+        foreach(lang ${LANG_CODES})
+            set(name "${CMAKE_SOURCE_DIR}/translations/${lang}/${module}.ts")
+            list(APPEND translation ${name})
+            set_source_files_properties(${name} PROPERTIES
+                OUTPUT_LOCATION "${CMAKE_BINARY_DIR}/loc/${lang}"
+            )
+        endforeach()
+
+        qt5_create_translation(message ${translation} ${ARGN})
+
+        add_custom_target("translate_update_${module}" DEPENDS ${message})
+        set_target_properties("translate_update_${module}" PROPERTIES
+            EXCLUDE_FROM_DEFAULT_BUILD TRUE
+        )
+    endfunction()
 
     # ---------------------------------------------------------------------
-    # Compile .ts -> .qm
+    # add lrelease command (compiling .ts -> .qm) to each project
     # ---------------------------------------------------------------------
-    function(compile_translations module)
+    function(add_compile_translations_command module ts_name)
         set(qm_files "")
-        foreach(lang ${LANG_CODES})
-            set(ts_file "${CMAKE_SOURCE_DIR}/translations/${lang}/${module}.ts")
-            set(qm_dir  "${CMAKE_BINARY_DIR}/../../stuff/config/loc/${lang}")
-            set(qm_file "${qm_dir}/${module}.qm")
+        list(LENGTH LANG_CODES NUM_LANGS)
+        math(EXPR LAST_INDEX "${NUM_LANGS}-1")
+        foreach(idx RANGE 0 ${LAST_INDEX})
+            list(GET LANG_CODES ${idx} lang)
+            list(GET LANG_DISPLAY_NAMES ${idx} lang_disp_name)
+            set(ts_file "${CMAKE_SOURCE_DIR}/translations/${lang}/${ts_name}.ts")
+            set(qm_dir  "${CMAKE_BINARY_DIR}/../../stuff/config/loc/${lang_disp_name}")
+            set(qm_file "${qm_dir}/${ts_name}.qm")
+            # Temporarily generate qm files directly under loc, then rename them to respective language folders
+            set(qm_tmp_dir  "${CMAKE_BINARY_DIR}/../../stuff/config/loc")
+            set(qm_tmp_file "${qm_tmp_dir}/${lang}_${ts_name}.qm")
 
             # Ensure output directory exists at configure time (safe for parallel builds)
             file(MAKE_DIRECTORY "${qm_dir}")
 
             if(EXISTS "${ts_file}")
                 add_custom_command(
-                    OUTPUT  "${qm_file}"
-                    COMMAND ${Qt5_LRELEASE_EXECUTABLE} "${ts_file}" -qm "${qm_file}"
+                    TARGET "${module}" POST_BUILD 
+                    COMMAND ${Qt5_LRELEASE_EXECUTABLE} "${ts_file}" -qm "${qm_tmp_file}"
+                    COMMAND ${CMAKE_COMMAND} -E rename ${qm_tmp_file} ${qm_file}
                     DEPENDS "${ts_file}"
-                    COMMENT "lrelease ${lang}/${module}.qm"
+                    BYPRODUCTS "${qm_file}"
+                    COMMENT "lrelease ${lang_disp_name}/${ts_name}.qm"
                     VERBATIM
                   )
-                list(APPEND qm_files "${qm_file}")
             endif()
         endforeach()
-
-        if(qm_files)
-            add_custom_target(translate_${module} ALL DEPENDS ${qm_files})
-        endif()
     endfunction()
-
-    # List of all modules that have translations
-    set(TRANSLATION_MODULES
-    toonz tnzcore toonzlib tnztools toonzqt image colorfx
-      )
-
-    foreach(mod ${TRANSLATION_MODULES})
-        compile_translations(${mod})
-    endforeach()
-
-    # ---------------------------------------------------------------------
-    # Rename language folders from code to native name (e.g. japanese → 日本語)
-    # ---------------------------------------------------------------------
-    set(LOC_ROOT "${CMAKE_BINARY_DIR}/../../stuff/config/loc")
-
-    add_custom_target(rename_translation_folders ALL
-    DEPENDS
-        translate_toonz
-        translate_tnzcore
-        translate_toonzlib
-        translate_tnztools
-        translate_toonzqt
-        translate_image
-        translate_colorfx
-        COMMENT "Renaming language folders to native display names"
-      )
-
-    # Generate the rename script (runs once per build)
-    file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/rename_languages.cmake" CONTENT
-        "set(LOC_ROOT \"${LOC_ROOT}\")
-        set(LANG_CODES ${LANG_CODES})
-        set(LANG_DISPLAY_NAMES ${LANG_DISPLAY_NAMES})
-
-        list(LENGTH LANG_CODES NUM_LANGS)
-        math(EXPR LAST_INDEX \"\${NUM_LANGS}-1\")
-
-        message(STATUS \"Renaming language folders to native display names...\")
-        foreach(idx RANGE 0 \${LAST_INDEX})
-        list(GET LANG_CODES \${idx} src)
-        list(GET LANG_DISPLAY_NAMES \${idx} dst)
-        set(src_path \"\${LOC_ROOT}/\${src}\")
-        set(dst_path \"\${LOC_ROOT}/\${dst}\")
-
-        if(EXISTS \"\${src_path}\")
-        if(EXISTS \"\${dst_path}\")
-        file(REMOVE_RECURSE \"\${dst_path}\")
-        endif()
-        file(RENAME \"\${src_path}\" \"\${dst_path}\")
-        message(STATUS \" => \${src}\")
-        endif()
-        endforeach()
-        ")
-
-        # Execute rename after all .qm files are built
-        add_custom_command(TARGET rename_translation_folders POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -P "${CMAKE_CURRENT_BINARY_DIR}/rename_languages.cmake"
-        VERBATIM
-          )
-
 endif()
 
 set(CMAKE_C_FLAGS "${C_WARNINGS} ${CMAKE_C_FLAGS}")

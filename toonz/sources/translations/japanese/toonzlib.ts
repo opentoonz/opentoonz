@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ja_JP" sourcelanguage="en">
+<TS version="2.1" language="ja_JP" sourcelanguage="en_US">
 <context>
     <name>Preferences</name>
     <message>
@@ -58,7 +58,7 @@
     </message>
     <message>
         <source>%1 is not a valid color (valid color names are &apos;red&apos;, &apos;transparent&apos;, &apos;#FF8800&apos;, ecc.)</source>
-        <translation>%1 は有効な色ではありません（有効な色名は&apos;red&apos;, &apos;transparent&apos;, &apos;#FF8800&apos; 等です）</translation>
+        <translation type="vanished">%1 は有効な色ではありません（有効な色名は&apos;red&apos;, &apos;transparent&apos;, &apos;#FF8800&apos; 等です）</translation>
     </message>
     <message>
         <source>Vectorization failed</source>
@@ -491,6 +491,14 @@
         <comment>TextureStyleChooserPage</comment>
         <translation>カスタムテクスチャ</translation>
     </message>
+    <message>
+        <source>Set Current Style from #%1 to %2</source>
+        <translation>現在のスタイルを#%1から%2に設定</translation>
+    </message>
+    <message>
+        <source>%1 is not a valid color (valid color names are &apos;red&apos;, &apos;transparent&apos;, &apos;#FF8800&apos;, etc.)</source>
+        <translation>%1は有効な色ではありません（有効な色の名前は &apos;red&apos;, &apos;transparent&apos;, &apos;#FF8800&apos;等です。）</translation>
+    </message>
 </context>
 <context>
     <name>TScriptBinding::CenterlineVectorizer</name>
@@ -608,11 +616,11 @@
     </message>
     <message>
         <source>Unrecognized file type :</source>
-        <translation>認識できないファイル形式 :</translation>
+        <translation type="vanished">認識できないファイル形式 :</translation>
     </message>
     <message>
         <source>Can&apos;t save a %1 level to this file type : %2</source>
-        <translation>レベル %1 をこのファイル形式で保存できません : %2</translation>
+        <translation type="vanished">レベル %1 をこのファイル形式で保存できません : %2</translation>
     </message>
     <message>
         <source>Exception writing %1</source>
@@ -632,10 +640,30 @@
     </message>
     <message>
         <source>can not insert a %1 image into a level</source>
-        <translation>画像 %1 をレベルに挿入できません</translation>
+        <translation type="vanished">画像 %1 をレベルに挿入できません</translation>
     </message>
     <message>
         <source>can not insert a %1 image to a %2 level</source>
+        <translation type="vanished">画像 %1 をレベル %2 に挿入できません</translation>
+    </message>
+    <message>
+        <source>Cannot set path on empty level</source>
+        <translation>空のレベルにパスを設定できません</translation>
+    </message>
+    <message>
+        <source>Unrecognized file type: %1</source>
+        <translation>認識できないファイル形式 : %1</translation>
+    </message>
+    <message>
+        <source>Can&apos;t save a %1 level to this file type: %2</source>
+        <translation>レベル %1 をこのファイル形式で保存できません : %2</translation>
+    </message>
+    <message>
+        <source>cannot insert a %1 image into a level</source>
+        <translation>画像 %1 をレベルに挿入できません</translation>
+    </message>
+    <message>
+        <source>cannot insert a %1 image to a %2 level</source>
         <translation>画像 %1 をレベル %2 に挿入できません</translation>
     </message>
 </context>
@@ -659,7 +687,11 @@
     </message>
     <message>
         <source>Invalid color : </source>
-        <translation>無効な色 : </translation>
+        <translation type="vanished">無効な色 : </translation>
+    </message>
+    <message>
+        <source>Invalid color: %1</source>
+        <translation>無効な色 : %1</translation>
     </message>
 </context>
 <context>

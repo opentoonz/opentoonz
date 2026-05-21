@@ -258,6 +258,10 @@ Nearest format will be internally used.</source>
         <source>Stereo 32-Bits</source>
         <translation>ステレオ32ビット</translation>
     </message>
+    <message>
+        <source>Bind to Current Room</source>
+        <translation>現在のワークスペースに紐づける</translation>
+    </message>
 </context>
 <context>
     <name>AutoInputCellNumberPopup</name>
@@ -475,6 +479,62 @@ Please choose a valid lip sync data file to continue.</source>
     <message>
         <source>Drawing: </source>
         <translation>画像： </translation>
+    </message>
+    <message>
+        <source>Analyzing audio...</source>
+        <translation>音声を分析中...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>キャンセル</translation>
+    </message>
+    <message>
+        <source>Frame </source>
+        <translation>フレーム </translation>
+    </message>
+    <message>
+        <source>Audio file field is not available.</source>
+        <translation>音声ファイルフィールドが無効です。</translation>
+    </message>
+    <message>
+        <source>Please select an audio file first.</source>
+        <translation>先に音声ファイルを選択して下さい。</translation>
+    </message>
+    <message>
+        <source>Audio file does not exist.</source>
+        <translation>音声ファイルが存在しません。</translation>
+    </message>
+    <message>
+        <source>Rhubarb process timed out after %1 seconds. The process may be stuck.</source>
+        <translation>Rhubarbの処理が %1 秒経過してタイムアウトしました。処理が固まっているかもしれません。</translation>
+    </message>
+    <message>
+        <source>Rhubarb process crashed.</source>
+        <translation>Rhubarbの処理がクラッシュしました。</translation>
+    </message>
+    <message>
+        <source>Rhubarb failed to start. Check if the path is correct.</source>
+        <translation>Rhubarbが開始できませんでした。パスが正しいかどうか確認して下さい。</translation>
+    </message>
+    <message>
+        <source>Rhubarb crashed during execution.</source>
+        <translation>Rhubarbが実行中にクラッシュしました。</translation>
+    </message>
+    <message>
+        <source>Rhubarb process timed out.</source>
+        <translation>Rhubarbの処理がタイムアウトしました。</translation>
+    </message>
+    <message>
+        <source>Communication error with Rhubarb process.</source>
+        <translation>Rhubarb処理との通信エラー。</translation>
+    </message>
+    <message>
+        <source>Unknown error occurred with Rhubarb.</source>
+        <translation>Rhubarbで不明なエラーが発生しました。</translation>
+    </message>
+    <message>
+        <source>Cancelling...</source>
+        <translation>キャンセル中...</translation>
     </message>
 </context>
 <context>
@@ -838,6 +898,117 @@ Do you want to overwrite it?</source>
     <message>
         <source>Path %1 doesn&apos;t exists.</source>
         <translation>パス %1 は存在しません。</translation>
+    </message>
+</context>
+<context>
+    <name>BrushPresetPanel</name>
+    <message>
+        <source>No brush tool selected</source>
+        <translation>ブラシツールが選択されていません</translation>
+    </message>
+    <message>
+        <source>Remove selected preset</source>
+        <translation>選択プリセットを削除</translation>
+    </message>
+    <message>
+        <source>Add current settings as new preset</source>
+        <translation>現在の設定を新規プリセットとして追加</translation>
+    </message>
+    <message>
+        <source>Refresh preset list</source>
+        <translation>プリセット一覧を更新</translation>
+    </message>
+    <message>
+        <source>View mode</source>
+        <translation>表示モード</translation>
+    </message>
+    <message>
+        <source>Brush Presets</source>
+        <translation>ブラシプリセット</translation>
+    </message>
+    <message>
+        <source>Vector Brush</source>
+        <translation>ベクターブラシ</translation>
+    </message>
+    <message>
+        <source>Toonz Raster Brush</source>
+        <translation>Toonzラスターブラシ</translation>
+    </message>
+    <message>
+        <source>MyPaint Brush</source>
+        <translation>MyPaintブラシ</translation>
+    </message>
+    <message>
+        <source>MyPaint Brush Tnz</source>
+        <translation>Toonz MyPaintブラシ</translation>
+    </message>
+    <message>
+        <source>Raster Brush</source>
+        <translation>ラスターブラシ</translation>
+    </message>
+    <message>
+        <source>Invalid Name</source>
+        <translation>無効な名前</translation>
+    </message>
+    <message>
+        <source>Please enter a valid preset name.</source>
+        <translation>有効なプリセット名を入力して下さい。</translation>
+    </message>
+    <message>
+        <source>Add Preset</source>
+        <translation>プリセットを追加</translation>
+    </message>
+    <message>
+        <source>Please use the [+] button in the Tool Options Bar to add new presets.
+
+The new preset will automatically appear in this panel.</source>
+        <translation>新規プリセットを追加するには、ツールオプション内の [+] ボタンを押して下さい。
+
+このパネルに新しいプリセットが自動的に表示されます。</translation>
+    </message>
+    <message>
+        <source>Remove Preset</source>
+        <translation>プリセットの削除</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to remove the preset &apos;%1&apos;?</source>
+        <translation>プリセット &apos;%1&apos; を削除してよろしいですか？</translation>
+    </message>
+    <message>
+        <source>Please use the [-] button in the Tool Options Bar to remove presets.
+
+The change will automatically be reflected in this panel.</source>
+        <translation>プリセットを削除するには、ツールオプション内の [-] ボタンを押して下さい。
+
+このパネルに自動的に変更が反映されます。</translation>
+    </message>
+    <message>
+        <source>List</source>
+        <translation>リスト表示</translation>
+    </message>
+    <message>
+        <source>Small</source>
+        <translation>小</translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation>中</translation>
+    </message>
+    <message>
+        <source>Large</source>
+        <translation>大</translation>
+    </message>
+    <message>
+        <source>GUI Show / Hide</source>
+        <translation>GUI 表示/非表示</translation>
+    </message>
+    <message>
+        <source>Cell Borders</source>
+        <translation>枠線</translation>
+    </message>
+    <message>
+        <source>Cell Backgrounds</source>
+        <translation>背景</translation>
     </message>
 </context>
 <context>
@@ -2144,11 +2315,12 @@ contain the dpi information, then the current camera dpi will be used.
 be appended to the palette after conversion in 
 order to save the effort of creating styles 
 before color designing.</source>
-        <translation type="unfinished"></translation>
+        <translation>このオプションがONのとき、デフォルトパレット ($TOONZSTUDIOPALETTE\Global Palettes\Default Palettes\Cleanup_Palette.tpl)
+のスタイルが変換後のパレットに追加されます。色見本を作成する際に、スタイルを新規作成する手間を省くことができます。</translation>
     </message>
     <message>
         <source>Convert 1 Level : %1</source>
-        <translation type="unfinished"></translation>
+        <translation>1個のレベルを変換：%1</translation>
     </message>
 </context>
 <context>
@@ -2489,6 +2661,14 @@ before color designing.</source>
         <source>The local path does not exist:</source>
         <translation>ローカルパスは存在しません：</translation>
     </message>
+    <message>
+        <source>Unlock</source>
+        <translation>ロック解除</translation>
+    </message>
+    <message>
+        <source>Revert</source>
+        <translation>復帰</translation>
+    </message>
 </context>
 <context>
     <name>DvItemViewerButtonBar</name>
@@ -2595,27 +2775,27 @@ before color designing.</source>
     <name>ExportAllLevelsPopup</name>
     <message>
         <source>Export All</source>
-        <translation type="unfinished"></translation>
+        <translation>全て書き出し</translation>
     </message>
     <message>
         <source>Skip</source>
-        <translation type="unfinished"></translation>
+        <translation>飛ばす</translation>
     </message>
     <message>
         <source>No level found in the camera view or levels are null!!</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラスタンド表示されているレベルが見つからないか、レベルが空です！</translation>
     </message>
     <message>
         <source>Please select a Folder!</source>
-        <translation type="unfinished"></translation>
+        <translation>フォルダを選択して下さい！</translation>
     </message>
     <message>
         <source>It is not possible to create the %1 folder.</source>
-        <translation type="unfinished">%1 フォルダを作成できません。</translation>
+        <translation>%1 フォルダを作成できません。</translation>
     </message>
     <message>
         <source>Export failed,please delete exported files and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>書き出しに失敗しました。書き出されたファイルを消去して再度お試し下さい。</translation>
     </message>
 </context>
 <context>
@@ -2822,27 +3002,27 @@ before color designing.</source>
     </message>
     <message>
         <source>Export Level: No Level Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>レベルの書き出し：レベルが選択されていません</translation>
     </message>
     <message>
         <source>Export Level: %1 Level Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>レベルの書き出し：%1 個のレベルが選択されています</translation>
     </message>
     <message>
         <source>Please select a folder!</source>
-        <translation type="unfinished"></translation>
+        <translation>フォルダを選択して下さい！</translation>
     </message>
     <message>
         <source>Please select at least one level(column).</source>
-        <translation type="unfinished"></translation>
+        <translation>少なくとも1つのレベル／列を選択して下さい。</translation>
     </message>
     <message>
         <source>It is not possible to create the %1 folder.</source>
-        <translation type="unfinished">%1 フォルダを作成できません。</translation>
+        <translation>%1 フォルダを作成できません。</translation>
     </message>
     <message>
         <source>Please type file name!</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル名を入力して下さい！</translation>
     </message>
 </context>
 <context>
@@ -2921,7 +3101,7 @@ before color designing.</source>
     </message>
     <message>
         <source>Create Folder(equal file name)</source>
-        <translation type="unfinished"></translation>
+        <translation>フォルダを作成（ファイル名と同一）</translation>
     </message>
 </context>
 <context>
@@ -2968,12 +3148,13 @@ Unchecked: Vectors are saved as SVG</source>
     </message>
     <message>
         <source>Export Reference Layers</source>
-        <translation type="unfinished"></translation>
+        <translation>参照レイヤーも書き出し</translation>
     </message>
     <message>
         <source>Checked: Layers with Preview Visible OFF are also exported
 Unchecked: Only layers with Preview Visible ON are exported</source>
-        <translation type="unfinished"></translation>
+        <translation>[ONのとき]レンダリング無効の列も書き出されます
+[OFFのとき]レンダリング有効の列のみ書き出されます</translation>
     </message>
 </context>
 <context>
@@ -3055,11 +3236,17 @@ Unchecked: Only layers with Preview Visible ON are exported</source>
     </message>
     <message>
         <source>Export as Standalone Scene</source>
-        <translation type="unfinished"></translation>
+        <translation>アセットを収集</translation>
     </message>
     <message>
         <source>Export To:</source>
-        <translation type="unfinished"></translation>
+        <translation>書き出し先：</translation>
+    </message>
+    <message>
+        <source>Target folder already exists and not empty.
+ %1</source>
+        <translation>書き出し先フォルダは既に存在しており、空ではありません。
+ %1</translation>
     </message>
 </context>
 <context>
@@ -3315,11 +3502,11 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Export CSV</source>
-        <translation type="unfinished"></translation>
+        <translation>CSVをエクスポート</translation>
     </message>
     <message>
         <source>Failed to create file %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル %1 の作成に失敗しました。</translation>
     </message>
 </context>
 <context>
@@ -3544,6 +3731,20 @@ Do you want to explode anyway ?</source>
         <source>The input folder path was invalid.</source>
         <translation>入力されたフォルダパスは無効です。</translation>
     </message>
+    <message>
+        <source>Level %1 already exists
+Do you want to duplicate it?</source>
+        <translation>レベル %1 は既に存在します
+複製してもよろしいですか？</translation>
+    </message>
+    <message>
+        <source>Duplicate</source>
+        <translation>複製する</translation>
+    </message>
+    <message>
+        <source>Don&apos;t Duplicate</source>
+        <translation>複製しない</translation>
+    </message>
 </context>
 <context>
     <name>FileBrowserPopup</name>
@@ -3615,6 +3816,33 @@ Do you want to explode anyway ?</source>
     <message>
         <source>File Format:</source>
         <translation type="vanished">ファイル形式：</translation>
+    </message>
+</context>
+<context>
+    <name>FillHolesDialog</name>
+    <message>
+        <source>Fill Small Holes</source>
+        <translation>小さい穴を埋める</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>サイズ</translation>
+    </message>
+    <message>
+        <source>Apply</source>
+        <translation>適用</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>キャンセル</translation>
+    </message>
+    <message>
+        <source>No Toonz Raster Level Selected</source>
+        <translation>Toonzラスターレベルが選択されていません</translation>
+    </message>
+    <message>
+        <source>Filling Holes...</source>
+        <translation>穴埋め中...</translation>
     </message>
 </context>
 <context>
@@ -4002,6 +4230,13 @@ Do you want to overwrite it?</source>
     </message>
 </context>
 <context>
+    <name>IoCmd::ConvertingPopup</name>
+    <message>
+        <source>Error occurred.</source>
+        <translation>エラーが発生しました。</translation>
+    </message>
+</context>
+<context>
     <name>ItemInfoView</name>
     <message>
         <source>Bold</source>
@@ -4187,7 +4422,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Unable to create</source>
-        <translation>作成できません </translation>
+        <translation type="vanished">作成できません </translation>
     </message>
     <message>
         <source>Invalid increment value</source>
@@ -4231,7 +4466,11 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Assistants Level</source>
-        <translation type="unfinished"></translation>
+        <translation>パース定規レベル</translation>
+    </message>
+    <message>
+        <source>Unable to create %1</source>
+        <translation>%1 を作成できません</translation>
     </message>
 </context>
 <context>
@@ -4607,6 +4846,18 @@ Please use the frame numbers for reference.</source>
     <message>
         <source>Drawing: </source>
         <translation>画像： </translation>
+    </message>
+    <message>
+        <source>Frame </source>
+        <translation>フレーム </translation>
+    </message>
+    <message>
+        <source>Invalid configuration or data.</source>
+        <translation>無効な設定またはデータです。</translation>
+    </message>
+    <message>
+        <source>Invalid data file. Need at least one phoneme entry.</source>
+        <translation>無効なデータです。音素入力が少なくとも1つ必要です。</translation>
     </message>
 </context>
 <context>
@@ -7693,55 +7944,115 @@ or you may delete necessary files for it.</source>
     </message>
     <message>
         <source>Import Open Cel Animation (OCA)</source>
-        <translation type="unfinished"></translation>
+        <translation>Open Cel Animation(OCA)形式の読み込み</translation>
     </message>
     <message>
         <source>&amp;New Assistant Level</source>
-        <translation type="unfinished"></translation>
+        <translation>新規パース定規レベル (&amp;N)</translation>
     </message>
     <message>
         <source>Toggle Sub-Xsheet Navigation Bar</source>
-        <translation type="unfinished"></translation>
+        <translation>サブシートナビゲーションバーの表示/非表示</translation>
     </message>
     <message>
         <source>Edit Assistants</source>
-        <translation type="unfinished"></translation>
+        <translation>パース定規の編集</translation>
     </message>
     <message>
         <source>Show build date in title</source>
-        <translation type="unfinished"></translation>
+        <translation>タイトルバーにビルド日時を表示</translation>
     </message>
     <message>
         <source>&amp;Save Scene Only</source>
-        <translation type="unfinished"></translation>
+        <translation>シーンのみを保存 (&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Set Scene Settings as Default</source>
-        <translation type="unfinished"></translation>
+        <translation>現在のシーン設定を既定値としてプロジェクト設定に保存 (&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Export All Levels... </source>
-        <translation type="unfinished"></translation>
+        <translation>全てのレベルを書き出し (&amp;E)... </translation>
     </message>
     <message>
         <source>Convert to Toonz Raster...</source>
-        <translation type="unfinished"></translation>
+        <translation>Toonzラスターに変換...</translation>
     </message>
     <message>
         <source>Show Shift Origin</source>
-        <translation type="unfinished"></translation>
+        <translation>オフセット前の画像も表示</translation>
     </message>
     <message>
         <source>&amp;Locator</source>
-        <translation type="unfinished"></translation>
+        <translation>ロケーター (&amp;L)</translation>
     </message>
     <message>
         <source>Toggle Viewer Indicators</source>
-        <translation type="unfinished"></translation>
+        <translation>ビューアインジケータの表示/非表示</translation>
     </message>
     <message>
         <source>Eraser Type - MultiArc</source>
-        <translation type="unfinished"></translation>
+        <translation>消しゴムツール（切り替え） - タイプ - 連続円弧</translation>
+    </message>
+    <message>
+        <source>Export Stylos Exchange Format(SXF)</source>
+        <translation>Stylos作画タイムシート（SXF）の書き出し</translation>
+    </message>
+    <message>
+        <source>&amp;Clear Viewer Content</source>
+        <translation>ビューアに表示中の内容を全てクリア (&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Sort Strokes with Palette Order</source>
+        <translation>描線の重ね順をパレット順に並べ替える (&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Fill Holes...</source>
+        <translation>穴を埋める (&amp;F)...</translation>
+    </message>
+    <message>
+        <source>&amp;Brush Presets</source>
+        <translation>ブラシプリセット (&amp;B)</translation>
+    </message>
+    <message>
+        <source>&amp;Tool Properties</source>
+        <translation>ツールオプション（パネル）(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Zoom View</source>
+        <translation>ズーム（押下時）</translation>
+    </message>
+    <message>
+        <source>Rotate View</source>
+        <translation>回転（押下時）</translation>
+    </message>
+    <message>
+        <source>Pan View</source>
+        <translation>手のひら（押下時）</translation>
+    </message>
+    <message>
+        <source>Empty Only</source>
+        <translation>共通 - 透明部分のみ</translation>
+    </message>
+    <message>
+        <source>Rotate Viewer Left</source>
+        <translation>ビューアを左に回転</translation>
+    </message>
+    <message>
+        <source>Rotate Viewer Right</source>
+        <translation>ビューアを右に回転</translation>
+    </message>
+    <message>
+        <source>Rotate View Left</source>
+        <translation>ビューアを左に回転</translation>
+    </message>
+    <message>
+        <source>Rotate View Right</source>
+        <translation>ビューアを右に回転</translation>
+    </message>
+    <message>
+        <source>Viewer Scrub</source>
+        <translation>スクラブ再生</translation>
     </message>
 </context>
 <context>
@@ -9039,15 +9350,15 @@ Custom : Always use the custom dpi specified here.</source>
     </message>
     <message>
         <source>Save Current Image Adjust Parameters As Default</source>
-        <translation type="unfinished"></translation>
+        <translation>現在の画像調整パラメータを既定値として保存</translation>
     </message>
     <message>
         <source>BG Reduction is set but the White BG image is missing. Please capture the White BG again.</source>
-        <translation type="unfinished"></translation>
+        <translation>「背景の除去」がONになっていますが、白背景画像が見つかりません。白背景を再度撮影して下さい。</translation>
     </message>
     <message>
         <source>Do you want to save the current parameters as the default values?</source>
-        <translation type="unfinished"></translation>
+        <translation>現在のパラメータを既定値として保存してよろしいですか？</translation>
     </message>
 </context>
 <context>
@@ -9255,6 +9566,10 @@ Set the output folder path to the subfolder as well.</source>
         <source>Alpha</source>
         <translation>アルファチャンネル</translation>
     </message>
+    <message>
+        <source>Bind to Current Room</source>
+        <translation>現在のワークスペースに紐づける</translation>
+    </message>
 </context>
 <context>
     <name>PreferencesPopup</name>
@@ -9268,7 +9583,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Use Default Viewer for Movie Formats</source>
-        <translation>動画形式を再生するとき、既定のメディアプレーヤーを使用</translation>
+        <translation type="vanished">動画形式を再生するとき、既定のメディアプレーヤーを使用</translation>
     </message>
     <message>
         <source>Save Automatically Every Minutes</source>
@@ -9312,7 +9627,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Loading</source>
-        <translation>読み込み</translation>
+        <translation type="vanished">読み込み</translation>
     </message>
     <message>
         <source>Expose Loaded Levels in Xsheet</source>
@@ -9372,7 +9687,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Display in a New Flipbook Window</source>
-        <translation>新規フリップブックを開いて表示</translation>
+        <translation type="vanished">新規フリップブックを開いて表示</translation>
     </message>
     <message>
         <source>Rewind after Playback</source>
@@ -9412,7 +9727,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Show Info in Rendered Frames</source>
-        <translation>レンダリングされたフレーム内に情報を表示</translation>
+        <translation type="vanished">レンダリングされたフレーム内に情報を表示</translation>
     </message>
     <message>
         <source>cm</source>
@@ -9460,7 +9775,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Minimize Savebox after Editing</source>
-        <translation>画像編集の後、セーブボックスを最小化する</translation>
+        <translation type="vanished">画像編集の後、セーブボックスを最小化する</translation>
     </message>
     <message>
         <source>Use the TLV Savebox to Limit Filling Operations</source>
@@ -9504,7 +9819,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Fit to Flipbook</source>
-        <translation>フリップブックに全体を表示</translation>
+        <translation type="vanished">フリップブックに全体を表示</translation>
     </message>
     <message>
         <source>New Level Format</source>
@@ -9532,7 +9847,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Visualization</source>
-        <translation>視覚化</translation>
+        <translation type="vanished">視覚化</translation>
     </message>
     <message>
         <source>Show Lines with Thickness 0</source>
@@ -9588,7 +9903,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Multi Layer Style Picker: Switch Levels by Picking</source>
-        <translation>多層スポイトツールを有効化：スタイルを拾うと同時にカレントレベルを切り替える</translation>
+        <translation type="vanished">多層スポイトツールを有効化：スタイルを拾うと同時にカレントレベルを切り替える</translation>
     </message>
     <message>
         <source>Onion Skin ON</source>
@@ -9640,7 +9955,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Viewer Zoom Center:</source>
-        <translation>ビューア上のズームの中心位置：</translation>
+        <translation type="vanished">ビューア上のズームの中心位置：</translation>
     </message>
     <message>
         <source>Language*:</source>
@@ -9784,7 +10099,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Import/Export</source>
-        <translation>インポート/エクスポート</translation>
+        <translation type="vanished">インポート/エクスポート</translation>
     </message>
     <message>
         <source>Show Onion Skin During Playback</source>
@@ -9870,7 +10185,7 @@ Is it OK to release these shortcuts?</source>
     </message>
     <message>
         <source>Enable to Input Cells without Double Clicking</source>
-        <translation>ダブルクリックなしでシートのコマを入力できるようにする</translation>
+        <translation type="vanished">ダブルクリックなしでシートのコマを入力できるようにする</translation>
     </message>
     <message>
         <source>Please indicate where you would like exports from Fast Render (MP4) to go.</source>
@@ -10130,7 +10445,7 @@ Also the initial output destination for new scenes will be set to $scenefolder a
     </message>
     <message>
         <source>Cursor Options</source>
-        <translation>カーソル設定</translation>
+        <translation type="vanished">カーソル設定</translation>
     </message>
     <message>
         <source>Basic Cursor Type:</source>
@@ -10312,7 +10627,7 @@ in non alpha-enabled image format.</source>
     </message>
     <message>
         <source>Use %1 to Resize Brush</source>
-        <translation>%1 でブラシサイズを変更する</translation>
+        <translation type="vanished">%1 でブラシサイズを変更する</translation>
     </message>
     <message>
         <source>Switch Tool Temporarily Keypress Length (ms):</source>
@@ -10376,7 +10691,7 @@ in non alpha-enabled image format.</source>
     <message>
         <source>Number of Frames to Play 
 for Short Play:</source>
-        <translation>「少し前から再生」のフレーム数：</translation>
+        <translation type="vanished">「少し前から再生」のフレーム数：</translation>
     </message>
     <message>
         <source>Minimum</source>
@@ -10497,70 +10812,292 @@ but a random crash might occur, use at your own risk.</source>
     </message>
     <message>
         <source>Show Sub-Xsheet Navigation Bar</source>
-        <translation type="unfinished"></translation>
+        <translation>サブシートナビゲーションバーを表示する</translation>
     </message>
     <message>
         <source>Expand Function Editor Header to Match Xsheet Header Height*</source>
-        <translation type="unfinished"></translation>
+        <translation>パラメータエディタのヘッダの余白を、タイムシートのヘッダに揃えて調整する *</translation>
     </message>
     <message>
         <source>Unify Preview and Camstand Visibility Toggles</source>
-        <translation type="unfinished"></translation>
+        <translation>ビューア表示/非表示とレンダリング有効/無効の切り替えボタンを統合する</translation>
     </message>
     <message>
         <source>Link Column Name with Level</source>
-        <translation type="unfinished"></translation>
+        <translation>カラム名をレベルに紐づける</translation>
     </message>
     <message>
         <source>Disable Dragging Cells</source>
-        <translation type="unfinished"></translation>
+        <translation>ドラッグ操作を無効にする</translation>
     </message>
     <message>
         <source>Xsheet Tools</source>
-        <translation type="unfinished"></translation>
+        <translation>タイムシートツール</translation>
     </message>
     <message>
         <source>This option will do the following:
 - When setting a cell in the empty column, level name will be copied to the column name
 - Typing the cell without level name in the empty column will try to use a level with the same name as the column
 The behavior may be changed in the future development.</source>
-        <translation type="unfinished"></translation>
+        <translation>このオプションがONのとき、以下の動作をします：
+- 空の列にレベルを配置するとき、レベル名が列の名前にコピーされます
+- 空の列のコマに対し、キーボードで動画番号のみを入力したとき、列と同じ名前のレベルを探して使います
+この挙動は今後の開発で変更される可能性があります。</translation>
     </message>
     <message>
         <source>Show Viewer Indicators</source>
-        <translation type="unfinished"></translation>
+        <translation>ビューアインジケータを表示する</translation>
     </message>
     <message>
         <source>Rasterize Vector with Anti Aliasing</source>
-        <translation type="unfinished"></translation>
+        <translation>「ベクター画像をラスタライズ表示」時にアンチエイリアスを行う</translation>
     </message>
     <message>
         <source>Normalize Imported Image Sequences:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use Inverted Cursor at Stroke End</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click Twice to Create Arcs</source>
-        <translation type="unfinished"></translation>
+        <translation>読み込んだ連番画像ファイル名の自動標準化：</translation>
     </message>
     <message>
         <source>Always Drag Frame Cell</source>
-        <translation type="unfinished"></translation>
+        <translation>クリック位置に関わらず、常にドラッグでコマの内容を移動する</translation>
     </message>
     <message>
         <source>Always ask before renaming</source>
-        <translation type="unfinished"></translation>
+        <translation>リネーム時に毎回確認する</translation>
     </message>
     <message>
         <source>Normalize sequence names automatically</source>
-        <translation type="unfinished"></translation>
+        <translation>連番ファイル名を自動的に標準化する</translation>
     </message>
     <message>
         <source>Keep original filenames</source>
-        <translation type="unfinished"></translation>
+        <translation>元のファイル名を保持</translation>
+    </message>
+    <message>
+        <source>Add Info water mark in Rendered Frames</source>
+        <translation>レンダリングされたフレーム内に情報ウォーターマークを表示</translation>
+    </message>
+    <message>
+        <source>Lazy Load Rooms</source>
+        <translation>ワークスペースの遅延読み込み</translation>
+    </message>
+    <message>
+        <source>Zoom In/Out Center:</source>
+        <translation>ビューア上のズームの中心位置：</translation>
+    </message>
+    <message>
+        <source>Show Room Bind Buttons*</source>
+        <translation>「現在のワークスペースに紐づける」を表示 *</translation>
+    </message>
+    <message>
+        <source>Convert Imported NAA Image Sequences to TLV:</source>
+        <translation>読み込まれた二値連番画像をTLVに変換する：</translation>
+    </message>
+    <message>
+        <source>Use QuickTime to decode/code .mov and .3gp (If Installed)</source>
+        <translation>MOVと3GPファイルのエンコード/デコードにQuickTimeを用いる（インストールされている場合）</translation>
+    </message>
+    <message>
+        <source>Minimize Savebox after Editing (Toonz Raster Level)</source>
+        <translation>画像編集の後、セーブボックスを最小化する（Toonzラスターレベル）</translation>
+    </message>
+    <message>
+        <source>Define Filling Region Using both Lines and Areas</source>
+        <translation>塗りの境界でも塗りつぶし範囲を区切る</translation>
+    </message>
+    <message>
+        <source>Paint Under Lines in Refer Fill</source>
+        <translation>「全レイヤーを参照」時に、参照線の下にも塗りを浸透させる</translation>
+    </message>
+    <message>
+        <source>Style Picker: Switch Current Level by Picking on Multi Layer</source>
+        <translation>スポイトツールの多層化：スタイルを拾うと同時にカレントレベルを切り替える</translation>
+    </message>
+    <message>
+        <source>Brush Tool: Use %1 to Resize</source>
+        <translation>ブラシツール：%1 でサイズを変更する</translation>
+    </message>
+    <message>
+        <source>Draw Cursor at End of Stroke</source>
+        <translation>ストロークの終端にカーソルを描く</translation>
+    </message>
+    <message>
+        <source>Geometric Tool: Click Twice to Create Arcs</source>
+        <translation>図形ツール：クリック２回で円弧を作成する</translation>
+    </message>
+    <message>
+        <source>Handle Size (%):</source>
+        <translation>ハンドルのサイズ（％）：</translation>
+    </message>
+    <message>
+        <source>Handle Color:</source>
+        <translation>ハンドルの色：</translation>
+    </message>
+    <message>
+        <source>Cell Input Method:</source>
+        <translation>コマの入力方法</translation>
+    </message>
+    <message>
+        <source>Preview Movie Formats in Default System Viewer</source>
+        <translation>動画形式を再生するとき、既定のメディアプレーヤーを使用</translation>
+    </message>
+    <message>
+        <source>Number of Frames to Play 
+for Short Play Command:</source>
+        <translation>「少し前から再生」のフレーム数：</translation>
+    </message>
+    <message>
+        <source>Always Open New Flipbook Window </source>
+        <translation>常に新しいフリップブックウィンドウを開く </translation>
+    </message>
+    <message>
+        <source>Fit to Flipbook when Flipbook Window Open</source>
+        <translation>フリップブックウィンドウが開いているとき、そのフリップブックにフィットさせる</translation>
+    </message>
+    <message>
+        <source>Ink Check Color:</source>
+        <translation>線チェックの色：</translation>
+    </message>
+    <message>
+        <source>Ink#1 Check Color:</source>
+        <translation>実線チェックの色：</translation>
+    </message>
+    <message>
+        <source>Paint Check Color:</source>
+        <translation>塗りチェックの色：</translation>
+    </message>
+    <message>
+        <source>Automatic by Scene</source>
+        <translation>シーンの位置によって切り替える</translation>
+    </message>
+    <message>
+        <source>Always ask before converting</source>
+        <translation>変換時に毎回確認する</translation>
+    </message>
+    <message>
+        <source>Convert raster level automatically</source>
+        <translation>ラスターレベルを自動で変換する</translation>
+    </message>
+    <message>
+        <source>Do not convert</source>
+        <translation>変換しない</translation>
+    </message>
+    <message>
+        <source>Input by Double Click Only</source>
+        <translation>ダブルクリックでのみ入力</translation>
+    </message>
+    <message>
+        <source>Input by Numpad</source>
+        <translation>数字キーで入力</translation>
+    </message>
+    <message>
+        <source>Input by Single Click</source>
+        <translation>シングルクリックで入力</translation>
+    </message>
+    <message>
+        <source>Preview/Render</source>
+        <translation>プレビュー／レンダリング</translation>
+    </message>
+    <message>
+        <source>Load/Import</source>
+        <translation>読み込み／インポート</translation>
+    </message>
+    <message>
+        <source>Decoder/Encoder</source>
+        <translation>デコード／エンコード</translation>
+    </message>
+    <message>
+        <source>Vector Visualize</source>
+        <translation>ベクター線の視覚化</translation>
+    </message>
+    <message>
+        <source>Addons</source>
+        <translation>アドオン</translation>
+    </message>
+    <message>
+        <source>Automatically sets folder based on scene type:
+Standalone -&gt; $scenefolder
+Project -&gt; project folder aliases (+drawing...)</source>
+        <translation>シーンの保存場所によって自動で切り替えます：
+プロジェクトフォルダ外 -&gt; $scenefolder
+プロジェクトフォルダ内 -&gt; プロジェクトフォルダのエイリアス（+drawings...）</translation>
+    </message>
+    <message>
+        <source>enabled</source>
+        <translation>有効</translation>
+    </message>
+    <message>
+        <source>disabled</source>
+        <translation>無効</translation>
+    </message>
+    <message>
+        <source>rooms will load on demand</source>
+        <translation>ワークスペースを最初に表示する時に読み込む</translation>
+    </message>
+    <message>
+        <source>all rooms load at startup</source>
+        <translation>起動時に全てのワークスペースを読み込む</translation>
+    </message>
+    <message>
+        <source>Lazy loading %1 - %2</source>
+        <translation>遅延読み込みが%1です - %2</translation>
+    </message>
+    <message>
+        <source>Default Level Size</source>
+        <translation>既定のレベルサイズ</translation>
+    </message>
+    <message>
+        <source>Fill Tool Options (Toonz Raster Level)</source>
+        <translation>塗りつぶしツール（Toonzラスター）の設定</translation>
+    </message>
+    <message>
+        <source>Brush Cursor Options</source>
+        <translation>ブラシカーソル設定</translation>
+    </message>
+    <message>
+        <source>Animate Tool</source>
+        <translation>編集ツール</translation>
+    </message>
+    <message>
+        <source>Xsheet Column Area</source>
+        <translation>タイムシート - 列ヘッダ領域</translation>
+    </message>
+    <message>
+        <source>Xsheet Cell Area</source>
+        <translation>タイムシート - コマ領域</translation>
+    </message>
+    <message>
+        <source>Viewer</source>
+        <translation>メインビューア</translation>
+    </message>
+    <message>
+        <source>Play Control</source>
+        <translation>再生コントロール</translation>
+    </message>
+    <message>
+        <source>Render</source>
+        <translation>レンダリング</translation>
+    </message>
+    <message>
+        <source>Ink and Paint Check</source>
+        <translation>線／塗りチェック</translation>
+    </message>
+    <message>
+        <source>Windows Explorer Thumbnails (Shell Extension)</source>
+        <translation>Windowsエクスプローラのサムネイル（シェル拡張）</translation>
+    </message>
+    <message>
+        <source>Enable thumbnails for OpenToonz files (.tnz, .pli, .tlv) in Windows Explorer. 
+Administrator privileges are required; you may need to restart Explorer for changes to take effect.</source>
+        <translation>Windows エクスプローラーで OpenToonz ファイル（.tnz、.pli、.tlv）のサムネイル表示を有効にします。
+管理者権限が必要です。変更を反映させるには、エクスプローラーを再起動する必要があるかもしれません。</translation>
+    </message>
+    <message>
+        <source>Uninstall</source>
+        <translation>アンインストールする</translation>
+    </message>
+    <message>
+        <source>Install</source>
+        <translation>インストールする</translation>
     </message>
 </context>
 <context>
@@ -10616,6 +11153,21 @@ The behavior may be changed in the future development.</source>
     <message>
         <source>Priority</source>
         <translation>優先順位</translation>
+    </message>
+</context>
+<context>
+    <name>PresetNamePopup</name>
+    <message>
+        <source>Enter Preset Name</source>
+        <translation>プリセット名を入力して下さい</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>キャンセル</translation>
     </message>
 </context>
 <context>
@@ -11360,11 +11912,11 @@ What do you want to do?</source>
     </message>
     <message>
         <source> Task added to the Batch Render List.</source>
-        <translation>タスクはバッチレンダリングリストに追加されました。</translation>
+        <translation type="vanished">タスクはバッチレンダリングリストに追加されました。</translation>
     </message>
     <message>
         <source> Task added to the Batch Cleanup List.</source>
-        <translation>タスクはバッチトレースリストに追加されました。</translation>
+        <translation type="vanished">タスクはバッチトレースリストに追加されました。</translation>
     </message>
     <message>
         <source>There are no assets to collect</source>
@@ -11372,7 +11924,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>One asset imported</source>
-        <translation>1つのアセットをインポートしました</translation>
+        <translation type="vanished">1つのアセットをインポートしました</translation>
     </message>
     <message>
         <source>%1 assets imported</source>
@@ -11380,7 +11932,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Converting %1 images to tlv format...</source>
-        <translation>%1 個の画像をTLV形式に変換しています...</translation>
+        <translation type="vanished">%1 個の画像をTLV形式に変換しています...</translation>
     </message>
     <message>
         <source>No scene imported</source>
@@ -11715,7 +12267,7 @@ Some levels have not been loaded because their version is not supported</source>
     </message>
     <message>
         <source>There was an error saving the %1 scene.</source>
-        <translation>シーン %1 を保存する時にエラーが発生しました。</translation>
+        <translation type="vanished">シーン %1 を保存する時にエラーが発生しました。</translation>
     </message>
     <message>
         <source>It is not possible to export the scene %1 because it does not belong to any project.</source>
@@ -12132,11 +12684,11 @@ Are you sure to </source>
     </message>
     <message>
         <source>Paste  File  : </source>
-        <translation>ファイルを貼り付け : </translation>
+        <translation type="vanished">ファイルを貼り付け : </translation>
     </message>
     <message>
         <source>Duplicate  File  : </source>
-        <translation>ファイルを複製 : </translation>
+        <translation type="vanished">ファイルを複製 : </translation>
     </message>
     <message>
         <source>Paste Cells</source>
@@ -12593,7 +13145,7 @@ Allow duplicate?</source>
     </message>
     <message>
         <source>A separation task is in progress! wait until it stops or cancel it</source>
-        <translation>色線を分けるタスクの処理中です! 完了まで待つか、またはキャンセルして下さい</translation>
+        <translation type="vanished">色線を分けるタスクの処理中です! 完了まで待つか、またはキャンセルして下さい</translation>
     </message>
     <message>
         <source>Duplicate Frame in XSheet</source>
@@ -12813,7 +13365,7 @@ to use the duplicate command in the xsheet / timeline.</source>
     </message>
     <message>
         <source>Unsopporter raster format, cannot save</source>
-        <translation>サポートされていないラスター形式です。保存できません</translation>
+        <translation type="vanished">サポートされていないラスター形式です。保存できません</translation>
     </message>
     <message>
         <source>Cannot create %1 : %2</source>
@@ -13080,7 +13632,7 @@ Do you wish to continue loading the last good save or stop and try to salvage th
     </message>
     <message>
         <source>A conversion task is in progress! wait until it stops or cancel it</source>
-        <translation>変換タスクの処理中です! 完了まで待つか、またはキャンセルして下さい</translation>
+        <translation type="vanished">変換タスクの処理中です! 完了まで待つか、またはキャンセルして下さい</translation>
     </message>
     <message>
         <source>ACTION</source>
@@ -13388,71 +13940,71 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Unable to create OCA folder.</source>
-        <translation type="unfinished"></translation>
+        <translation>OCAフォルダを作成できません。</translation>
     </message>
     <message>
         <source>Unable to open OCA file for saving.</source>
-        <translation type="unfinished"></translation>
+        <translation>保存するためのOCAファイルを開けません。</translation>
     </message>
     <message>
         <source>Unable to create folder for saving layers.</source>
-        <translation type="unfinished"></translation>
+        <translation>レイヤーを保存するためのフォルダーを作成できません。</translation>
     </message>
     <message>
         <source>Import Open Cel Animation (OCA)</source>
-        <translation type="unfinished"></translation>
+        <translation>Open Cel Animation(OCA)形式の読み込み</translation>
     </message>
     <message>
         <source>OCA Import cancelled : empty filepath.</source>
-        <translation type="unfinished"></translation>
+        <translation>OCAの読み込みがキャンセルされました：ファイルパスが空です。</translation>
     </message>
     <message>
         <source>OCA Import file : %1</source>
-        <translation type="unfinished"></translation>
+        <translation>OCAファイルの読み込み：%1</translation>
     </message>
     <message>
         <source>Do you want to import or load image files from their original location?</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルをインポート（プロジェクト内にコピーして読み込み）しますか、それとも元の場所から読み込みますか？</translation>
     </message>
     <message>
         <source>Failed to load OCA file: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>OCAファイルの読み込みに失敗しました：%1</translation>
     </message>
     <message>
         <source>Unable to open OCA file for loading.</source>
-        <translation type="unfinished"></translation>
+        <translation>読み込むためのOCAファイルを開けません。</translation>
     </message>
     <message>
         <source>Reading OCA file: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>OCAファイルを読み込んでいます：%1</translation>
     </message>
     <message>
         <source>Parse error at %1 while loading OCA file.</source>
-        <translation type="unfinished"></translation>
+        <translation>OCAファイルの読み込み時に %1 でパースエラーが発生しました。</translation>
     </message>
     <message>
         <source>Blending mode &apos;%1&apos; not implemented for %2 &apos;%3&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>合成モード &apos;%1&apos; は %2 &apos;%3&apos; に実装されていません</translation>
     </message>
     <message>
         <source>Skipped %1 &apos;%2&apos;. No image file indicated.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 &apos;%2&apos;をスキップしました。画像ファイルが指定されていません。</translation>
     </message>
     <message>
         <source>Unable to load images for %1 &apos;%2&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 &apos;%2&apos;の画像を読み込めません。</translation>
     </message>
     <message>
         <source>Sub-layers in grouplayer &apos;%1&apos; will be imported without grouping.</source>
-        <translation type="unfinished"></translation>
+        <translation>グループレイヤー &apos;%1&apos; 内のサブレイヤーは、グループ解除されて読み込まれます。</translation>
     </message>
     <message>
         <source>Skipping unimplemented %1 &apos;%2&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>未実装の %1 &apos;%2&apos; をスキップしました</translation>
     </message>
     <message>
         <source>Ignore all future warnings and errors.</source>
-        <translation type="unfinished"></translation>
+        <translation>以降の警告とエラーを全て無視する。</translation>
     </message>
     <message>
         <source>Inbetween Symbol1 (O):</source>
@@ -13466,7 +14018,9 @@ What do you want to do?</source>
         <source>The visibility toggles of following columns are modified 
 due to &quot;Unify Preview and Camstand Visibility Toggles&quot; preference option : 
   %1</source>
-        <translation type="unfinished"></translation>
+        <translation>環境設定「ビューア表示/非表示とレンダリング有効/無効の切り替えボタンを統合する」が有効なため、
+以下の列の表示/非表示を切り替えました：
+  %1</translation>
     </message>
     <message>
         <source>Cell marks for XDTS symbols</source>
@@ -13480,39 +14034,228 @@ XDTS Viewer以外のアプリケーションでは、正しく表示されなか
     </message>
     <message>
         <source>Add separator for Frames</source>
-        <translation type="unfinished"></translation>
+        <translation>Add separator for Frames</translation>
     </message>
     <message>
         <source>It is not possible to load the scene %1 because it does not belong to any project.
 Please delete scenes.xml if this scene dones&apos;t belong to any project.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>OpenToonz uses an underscore (_) or dot (.) as a frame separator.
-Would you like to add a separator to the image sequence?
-
-%1 (and similar files)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No, treat as single frame.</source>
-        <translation type="unfinished"></translation>
+        <translation>シーン%1はどのプロジェクトにも属していないため、開くことができません。
+どのプロジェクトにも属していない場合、scenes.xmlを消去して下さい。</translation>
     </message>
     <message>
         <source>Hide Viewer Indicators</source>
-        <translation type="unfinished"></translation>
+        <translation>ビューアインジケータを隠す</translation>
     </message>
     <message>
         <source>Show Viewer Indicators</source>
-        <translation type="unfinished"></translation>
+        <translation>ビューアインジケータを表示する</translation>
     </message>
     <message>
         <source>Fx Browser</source>
-        <translation type="unfinished"></translation>
+        <translation>新規エフェクト</translation>
     </message>
     <message>
         <source>Locator</source>
-        <translation type="unfinished">ロケーター</translation>
+        <translation>ロケーター</translation>
+    </message>
+    <message>
+        <source>Error while loading SXF scene: %1</source>
+        <translation>SXFシーンを読み込む時にエラーが発生しました： %1</translation>
+    </message>
+    <message>
+        <source>SXF data has no frames to import.</source>
+        <translation>SXFデータに読み込むフレームがありません。</translation>
+    </message>
+    <message>
+        <source>Import SXF Area</source>
+        <translation>SXF範囲の読み込み</translation>
+    </message>
+    <message>
+        <source>ACTION</source>
+        <translation>アクション</translation>
+    </message>
+    <message>
+        <source>CELL</source>
+        <translation>セル</translation>
+    </message>
+    <message>
+        <source>Current XSheet is emepty.</source>
+        <translation>現在のタイムシートは空です。</translation>
+    </message>
+    <message>
+        <source>ACTION &amp; CELL</source>
+        <translation>アクションとセル</translation>
+    </message>
+    <message>
+        <source>Direction</source>
+        <translation>指示書き</translation>
+    </message>
+    <message>
+        <source>Enter text here...
+Supports multiple lines</source>
+        <translation>ここにテキストを入力してください...
+複数行でも可です</translation>
+    </message>
+    <message>
+        <source>Large Font</source>
+        <translation>大きい文字</translation>
+    </message>
+    <message>
+        <source>Text Encoding:</source>
+        <translation>文字列のエンコード：</translation>
+    </message>
+    <message>
+        <source>Cell marks for SXF symbols</source>
+        <translation>Stylos記号に対応するコママーク</translation>
+    </message>
+    <message>
+        <source>Inbetween Symbol1 (○)</source>
+        <translation>中割り記号1 （○）</translation>
+    </message>
+    <message>
+        <source>Inbetween Symbol2 (●):</source>
+        <translation>中割り記号2 （●）：</translation>
+    </message>
+    <message>
+        <source>Target Column:</source>
+        <translation>対象の列：</translation>
+    </message>
+    <message>
+        <source>Export Area:</source>
+        <translation>書き出し範囲：</translation>
+    </message>
+    <message>
+        <source>Export SXF File</source>
+        <translation>SXFファイルの書き出し</translation>
+    </message>
+    <message>
+        <source>Failed to export SXF file.%1</source>
+        <translation>SXFファイルの書き出しに失敗しました。 %1</translation>
+    </message>
+    <message>
+        <source>Cannot clear: level is read-only or no level is selected.</source>
+        <translation>消去できません：レベルは読み取り専用か、レベルが選択されていません。</translation>
+    </message>
+    <message>
+        <source>No frame to clear.</source>
+        <translation>消去するフレームがありません。</translation>
+    </message>
+    <message>
+        <source>There were problems loading the scene %1.
+Details:
+
+%2</source>
+        <translation>シーン %1 の読み込み中に問題が発生しました。
+詳細：
+
+%2</translation>
+    </message>
+    <message>
+        <source>%1
+
+is an image sequence that can be converted into a TLV format 
+Would you like to convert it?</source>
+        <translation>%1
+
+はTLV形式に変換可能な連番画像ファイルです。
+変換しますか？</translation>
+    </message>
+    <message>
+        <source>No, use as is</source>
+        <translation>いいえ、そのまま使用します</translation>
+    </message>
+    <message>
+        <source>Image sequence detected, but the filenames are missing a separator: 
+OpenToonz requires a separator (such as an underscore (_) or dot (.) 
+between the name and the frame number to recognize sequences properly.
+Example: A0001.png → A.0001.png
+
+Would you like OpenToonz to automatically add a dot to fix the sequence format?
+
+%1 (and similar files)</source>
+        <translation>連番画像が検知されましたが、ファイル名にセパレータがありません：
+OpenToonzが連番を正しく認識するためには、レベル名と動画番号の間にセパレータ（アンダースコア &apos;_&apos; やドット &apos;.&apos; ）が必要です。
+例：A0001.png → A.0001.png
+
+自動的にファイル名にドットを付加して連番画像形式を修正しますか？
+
+%1 (と、それに似た名前のファイル)</translation>
+    </message>
+    <message>
+        <source>Yes, add dot</source>
+        <translation>はい、ドットを追加します</translation>
+    </message>
+    <message>
+        <source>No, treat as single frame</source>
+        <translation>いいえ、個別のフレームとして扱います</translation>
+    </message>
+    <message>
+        <source>Create Level %1 at Column %2</source>
+        <translation>列 %2 に レベル %1 を作成</translation>
+    </message>
+    <message>
+        <source>Paste File: </source>
+        <translation>ファイルを貼り付け : </translation>
+    </message>
+    <message>
+        <source>Duplicate File: </source>
+        <translation>ファイルを複製 : </translation>
+    </message>
+    <message>
+        <source>Task added to the Batch Render List.</source>
+        <translation>タスクはバッチレンダリングリストに追加されました。</translation>
+    </message>
+    <message>
+        <source>Task added to the Batch Cleanup List.</source>
+        <translation>タスクはバッチトレースリストに追加されました。</translation>
+    </message>
+    <message>
+        <source>Deleting folder %1. Are you sure?</source>
+        <translation>フォルダ %1 を削除します。よろしいですか？</translation>
+    </message>
+    <message>
+        <source>A conversion task is in progress! Wait until it stops or cancel it.</source>
+        <translation>変換タスクの処理中です! 完了まで待つか、またはキャンセルして下さい。</translation>
+    </message>
+    <message>
+        <source>Error loading scene %1 : %2</source>
+        <translation>シーン %1 を読み込む時にエラーが発生しました： %2</translation>
+    </message>
+    <message>
+        <source>Error saving scene %1</source>
+        <translation>シーン %1 を保存する時にエラーが発生しました</translation>
+    </message>
+    <message>
+        <source>A separation task is in progress! Wait until it stops or cancel it.</source>
+        <translation>色線を分けるタスクの処理中です! 完了まで待つか、またはキャンセルして下さい。</translation>
+    </message>
+    <message>
+        <source>Cannot paste into the camera column.</source>
+        <translation>カメラ列には貼り付けできません。</translation>
+    </message>
+    <message>
+        <source>Brush Presets</source>
+        <translation>ブラシプリセット</translation>
+    </message>
+    <message>
+        <source>Tool Properties</source>
+        <translation>ツールオプション（パネル）</translation>
+    </message>
+    <message>
+        <source>The specified name is already assigned to the folder.</source>
+        <translation>指定された名前は、 既にフォルダに割り当てられています。</translation>
+    </message>
+    <message>
+        <source>Unsupported raster format, cannot save</source>
+        <translation>サポートされていないラスター形式です。保存できません</translation>
+    </message>
+    <message>
+        <source>Bind to Current Room</source>
+        <translation>現在のワークスペースに紐づける</translation>
+    </message>
+    <message>
+        <source>Converting %1 to tlv format...</source>
+        <translation>%1 をTLV形式に変換しています...</translation>
     </message>
 </context>
 <context>
@@ -13582,7 +14325,7 @@ Would you like to add a separator to the image sequence?
     </message>
     <message>
         <source>Renaming File </source>
-        <translation>ファイルをリネーム中...</translation>
+        <translation>以下のファイルをリネームします </translation>
     </message>
     <message>
         <source>Creating an animation level of %1 frames</source>
@@ -13592,6 +14335,14 @@ Would you like to add a separator to the image sequence?
         <source>The file name cannot be empty or contain any of the following characters:(new line)  \ / : * ? &quot;  |</source>
         <translation>ファイル名は空であることができません。また、次の記号のいずれかを含むことができません：
  \ / : * ? &quot;  |</translation>
+    </message>
+    <message>
+        <source>Renaming Folder </source>
+        <translation>以下のフォルダをリネームします </translation>
+    </message>
+    <message>
+        <source>Folder Name:</source>
+        <translation>フォルダ名：</translation>
     </message>
 </context>
 <context>
@@ -13703,6 +14454,26 @@ These levels can&apos;t be exported with this tool.</source>
         <source>Nothing to replace: no cells or columns selected.</source>
         <translation type="vanished">置き換えることができません：選択されているコマまたは列がありません。</translation>
     </message>
+    <message>
+        <source>The level paths have been replaced as follows:
+
+</source>
+        <translation>レベルのパスは以下の通り置き換わりました：
+
+</translation>
+    </message>
+    <message>
+        <source>%1 : No change was made.
+</source>
+        <translation>%1 : 変更されていません。
+</translation>
+    </message>
+    <message>
+        <source>%1 : %2 -&gt; %3
+</source>
+        <translation>%1 : %2 -&gt; %3
+</translation>
+    </message>
 </context>
 <context>
     <name>RoomTabWidget</name>
@@ -13781,7 +14552,7 @@ These levels can&apos;t be exported with this tool.</source>
     <name>SVNCommitDialog</name>
     <message>
         <source>Version Control: Put changes</source>
-        <translation>バージョン管理：変更を置き換える</translation>
+        <translation type="vanished">バージョン管理：変更を置き換える</translation>
     </message>
     <message>
         <source>Select / Deselect All</source>
@@ -13801,11 +14572,11 @@ These levels can&apos;t be exported with this tool.</source>
     </message>
     <message>
         <source>Put Scene Contents</source>
-        <translation>シーン内容を登録する</translation>
+        <translation type="vanished">シーン内容を登録する</translation>
     </message>
     <message>
         <source>Put</source>
-        <translation>登録する</translation>
+        <translation type="vanished">登録する</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -13817,7 +14588,7 @@ These levels can&apos;t be exported with this tool.</source>
     </message>
     <message>
         <source>Set needs-lock property...</source>
-        <translation>「ロックが必要」の属性を設定...</translation>
+        <translation type="vanished">「ロックが必要」の属性を設定...</translation>
     </message>
     <message>
         <source>Committing %1 items...</source>
@@ -13825,19 +14596,19 @@ These levels can&apos;t be exported with this tool.</source>
     </message>
     <message>
         <source>Put done successfully.</source>
-        <translation>登録が完了しました。</translation>
+        <translation type="vanished">登録が完了しました。</translation>
     </message>
     <message>
         <source>Putting %1 items...</source>
-        <translation>%1 項目を登録中...</translation>
+        <translation type="vanished">%1 項目を登録中...</translation>
     </message>
     <message>
         <source>No items to put.</source>
-        <translation>登録する必要のある項目がありません。</translation>
+        <translation type="vanished">登録する必要のある項目がありません。</translation>
     </message>
     <message>
         <source>%1 items to put.</source>
-        <translation>%1 個の登録するファイルがあります。</translation>
+        <translation type="vanished">%1 個の登録するファイルがあります。</translation>
     </message>
     <message>
         <source>%1 Selected / %2 Total</source>
@@ -13847,12 +14618,40 @@ These levels can&apos;t be exported with this tool.</source>
         <source>Close</source>
         <translation>閉じる</translation>
     </message>
+    <message>
+        <source>Version Control: Commit changes</source>
+        <translation>バージョン管理：変更のコミット</translation>
+    </message>
+    <message>
+        <source>Commit Scene Contents</source>
+        <translation>シーンの内容をコミット</translation>
+    </message>
+    <message>
+        <source>Commit</source>
+        <translation>コミット</translation>
+    </message>
+    <message>
+        <source>Setting needs-lock property...</source>
+        <translation>「ロックが必要」の属性を設定中...</translation>
+    </message>
+    <message>
+        <source>Commit completed successfully.</source>
+        <translation>コミットが正常に完了しました。</translation>
+    </message>
+    <message>
+        <source>No items to commit.</source>
+        <translation>コミットする項目がありません。</translation>
+    </message>
+    <message>
+        <source>%1 items to commit.</source>
+        <translation>%1 個のコミットする項目があります。</translation>
+    </message>
 </context>
 <context>
     <name>SVNCommitFrameRangeDialog</name>
     <message>
         <source>Version Control: Put</source>
-        <translation>バージョン管理：登録する</translation>
+        <translation type="vanished">バージョン管理：登録する</translation>
     </message>
     <message>
         <source>Note: the file will be updated too.</source>
@@ -13864,7 +14663,7 @@ These levels can&apos;t be exported with this tool.</source>
     </message>
     <message>
         <source>Put</source>
-        <translation>登録</translation>
+        <translation type="vanished">登録</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -13872,7 +14671,7 @@ These levels can&apos;t be exported with this tool.</source>
     </message>
     <message>
         <source>Put done successfully.</source>
-        <translation>登録が完了しました。</translation>
+        <translation type="vanished">登録が完了しました。</translation>
     </message>
     <message>
         <source>Locking file...</source>
@@ -13892,7 +14691,7 @@ These levels can&apos;t be exported with this tool.</source>
     </message>
     <message>
         <source>Putting changes...</source>
-        <translation>変更点を登録中...</translation>
+        <translation type="vanished">変更点を登録中...</translation>
     </message>
     <message>
         <source>Updating file...</source>
@@ -13906,12 +14705,32 @@ These levels can&apos;t be exported with this tool.</source>
         <source>Setting the needs-lock property to hook file...</source>
         <translation>「ロックが必要」の属性をフックファイルに設定中...</translation>
     </message>
+    <message>
+        <source>Version Control: Commit Frame Range</source>
+        <translation>バージョン管理：フレーム範囲をコミット</translation>
+    </message>
+    <message>
+        <source>Commit</source>
+        <translation>コミット</translation>
+    </message>
+    <message>
+        <source>Commit completed successfully.</source>
+        <translation>コミットが正常に完了しました。</translation>
+    </message>
+    <message>
+        <source>Committing changes...</source>
+        <translation>変更をコミットしています...</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>閉じる</translation>
+    </message>
 </context>
 <context>
     <name>SVNConfigWriter</name>
     <message>
         <source>Select</source>
-        <translation type="unfinished"></translation>
+        <translation>選択</translation>
     </message>
 </context>
 <context>
@@ -14264,6 +15083,10 @@ These levels can&apos;t be exported with this tool.</source>
         <source>Revert done successfully.</source>
         <translation>復帰が完了しました。</translation>
     </message>
+    <message>
+        <source>Close</source>
+        <translation>閉じる</translation>
+    </message>
 </context>
 <context>
     <name>SVNRevertFrameRangeDialog</name>
@@ -14298,6 +15121,10 @@ These levels can&apos;t be exported with this tool.</source>
     <message>
         <source>It is not possible to revert the file.</source>
         <translation>ファイルを復帰することができません。</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>閉じる</translation>
     </message>
 </context>
 <context>
@@ -14795,11 +15622,11 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Convert to Painted TLV</source>
-        <translation>彩色済TLVファイルに変換</translation>
+        <translation type="vanished">彩色済TLVファイルに変換</translation>
     </message>
     <message>
         <source>Convert to Unpainted TLV</source>
-        <translation>線画TLVファイルに変換</translation>
+        <translation type="vanished">線画TLVファイルに変換</translation>
     </message>
     <message>
         <source>Version Control</source>
@@ -14863,31 +15690,31 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Convert To Unpainted Tlv</source>
-        <translation>線画TLVファイルに変換</translation>
+        <translation type="vanished">線画TLVファイルに変換</translation>
     </message>
     <message>
         <source>Warning: level %1 already exists; overwrite?</source>
-        <translation>警告：レベル %1 は既に存在します。上書きしますか？</translation>
+        <translation type="vanished">警告：レベル %1 は既に存在します。上書きしますか？</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation>はい</translation>
+        <translation type="vanished">はい</translation>
     </message>
     <message>
         <source>No</source>
-        <translation>いいえ</translation>
+        <translation type="vanished">いいえ</translation>
     </message>
     <message>
         <source>Done: All Levels  converted to TLV Format</source>
-        <translation>完了：すべてのレベルがTLV形式に変換されました</translation>
+        <translation type="vanished">完了：すべてのレベルがTLV形式に変換されました</translation>
     </message>
     <message>
         <source>Convert To Painted Tlv</source>
-        <translation>彩色済TLVファイルに変換</translation>
+        <translation type="vanished">彩色済TLVファイルに変換</translation>
     </message>
     <message>
         <source>Done: 2 Levels  converted to TLV Format</source>
-        <translation>完了：2つのレベルがTLV形式に変換されました</translation>
+        <translation type="vanished">完了：2つのレベルがTLV形式に変換されました</translation>
     </message>
     <message>
         <source>New Folder</source>
@@ -15008,43 +15835,43 @@ Please commit or revert changes first.</source>
     <name>SceneViewer</name>
     <message>
         <source>FROZEN</source>
-        <translation type="unfinished"></translation>
+        <translation>フリーズ中</translation>
     </message>
     <message>
         <source>Motion Path Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>モーションパスを選択中</translation>
     </message>
     <message>
         <source>Transparency Check</source>
-        <translation type="unfinished">透明度チェック</translation>
+        <translation>透明度チェック</translation>
     </message>
     <message>
         <source>Ink Check</source>
-        <translation type="unfinished"></translation>
+        <translation>線チェック</translation>
     </message>
     <message>
         <source>Ink#1 Check</source>
-        <translation type="unfinished"></translation>
+        <translation>実線チェック</translation>
     </message>
     <message>
         <source>Paint Check</source>
-        <translation type="unfinished"></translation>
+        <translation>塗りチェック</translation>
     </message>
     <message>
         <source>Inks Only Check</source>
-        <translation type="unfinished"></translation>
+        <translation>線のみ表示</translation>
     </message>
     <message>
         <source>Black BG Check</source>
-        <translation type="unfinished"></translation>
+        <translation>黒背景チェック</translation>
     </message>
     <message>
         <source>Fill Check</source>
-        <translation type="unfinished"></translation>
+        <translation>閉領域チェック</translation>
     </message>
     <message>
         <source>Gap Check</source>
-        <translation type="unfinished"></translation>
+        <translation>すきまチェック</translation>
     </message>
 </context>
 <context>
@@ -15160,6 +15987,10 @@ Please commit or revert changes first.</source>
     <message>
         <source>Ease In/Out Interpolation</source>
         <translation>両詰め</translation>
+    </message>
+    <message>
+        <source>Rotate View</source>
+        <translation>表示を回転</translation>
     </message>
 </context>
 <context>
@@ -15648,6 +16479,22 @@ Please commit or revert changes first.</source>
         <source>Advanced</source>
         <translation>特殊なコマンド</translation>
     </message>
+    <message>
+        <source>Custom Panels</source>
+        <translation>カスタムパネル</translation>
+    </message>
+    <message>
+        <source>Brush Presets</source>
+        <translation>ブラシプリセット</translation>
+    </message>
+    <message>
+        <source>Brush Sizes</source>
+        <translation>ブラシサイズ</translation>
+    </message>
+    <message>
+        <source>Special Modifier Keys</source>
+        <translation>特殊な修飾キー</translation>
+    </message>
 </context>
 <context>
     <name>ShortcutViewer</name>
@@ -15674,19 +16521,8 @@ Assign to &apos;%3&apos;?</source>
     <message>
         <source>Initial sequence &apos;%1&apos; is assigned to &apos;%2&apos; which takes priority.
 Assign shortcut sequence anyway?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The Space + Shift combination is reserved for viewer rotation.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The Space + Ctrl combination is reserved for viewer zoom.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The Space key is reserved for viewer navigation.</source>
-        <translation type="unfinished"></translation>
+        <translation>最初のシーケンス &apos;%1&apos; は既に &apos;%2&apos; に割り当てられていて、そちらが優先されます。
+それでもショートカットキーを割り当てますか？</translation>
     </message>
 </context>
 <context>
@@ -16789,6 +17625,13 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
 </context>
 <context>
+    <name>TPanel</name>
+    <message>
+        <source>Bind to Current Room</source>
+        <translation>現在のワークスペースに紐づける</translation>
+    </message>
+</context>
+<context>
     <name>TPanelTitleBarButtonForPreview</name>
     <message>
         <source>Current frame</source>
@@ -17157,6 +18000,153 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
 </context>
 <context>
+    <name>ToolPropertiesPanel</name>
+    <message>
+        <source>Tool Properties</source>
+        <translation>ツールオプション</translation>
+    </message>
+    <message>
+        <source>Tool Properties - %1</source>
+        <translation>ツールオプション - %1</translation>
+    </message>
+    <message>
+        <source>Properties for Fill tool - Coming soon!</source>
+        <translation>塗りつぶしツールのオプション - 工事中です！</translation>
+    </message>
+    <message>
+        <source>Properties for Eraser tool - Coming soon!</source>
+        <translation>消しゴムツールのオプション - 工事中です！</translation>
+    </message>
+    <message>
+        <source>Properties for this tool - Coming soon!</source>
+        <translation>このツールのオプション - 工事中です！</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>サイズ</translation>
+    </message>
+    <message>
+        <source>Hardness</source>
+        <translation>硬さ</translation>
+    </message>
+    <message>
+        <source>Opacity</source>
+        <translation>不透明度</translation>
+    </message>
+    <message>
+        <source>Lock Alpha</source>
+        <translation>透明部分の保護</translation>
+    </message>
+    <message>
+        <source>Pencil Mode</source>
+        <translation>鉛筆モード</translation>
+    </message>
+    <message>
+        <source>Draw Order</source>
+        <translation>線の重ね順</translation>
+    </message>
+    <message>
+        <source>Cap</source>
+        <translation>線端の形状</translation>
+    </message>
+    <message>
+        <source>Join</source>
+        <translation>結合の形状</translation>
+    </message>
+    <message>
+        <source>Smooth</source>
+        <translation>平滑化</translation>
+    </message>
+    <message>
+        <source>Assistants</source>
+        <translation>パース定規</translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation>筆圧感知</translation>
+    </message>
+    <message>
+        <source>Accuracy</source>
+        <translation>精度</translation>
+    </message>
+    <message>
+        <source>Break Angles</source>
+        <translation>鋭角で線を分割</translation>
+    </message>
+    <message>
+        <source>Frame Range</source>
+        <translation>中割り</translation>
+    </message>
+    <message>
+        <source>Snap</source>
+        <translation>スナップ</translation>
+    </message>
+    <message>
+        <source>Sensitivity</source>
+        <translation>スナップ感度</translation>
+    </message>
+    <message>
+        <source>Miter</source>
+        <translation>マイター結合</translation>
+    </message>
+    <message>
+        <source>Modifier Size</source>
+        <translation>サイズ</translation>
+    </message>
+    <message>
+        <source>Modifier Opacity</source>
+        <translation>不透明度</translation>
+    </message>
+    <message>
+        <source>Eraser</source>
+        <translation>消しゴムモード</translation>
+    </message>
+    <message>
+        <source>Min</source>
+        <translation>最小</translation>
+    </message>
+    <message>
+        <source>Max</source>
+        <translation>最大</translation>
+    </message>
+    <message>
+        <source>Min:</source>
+        <translation>最小：</translation>
+    </message>
+    <message>
+        <source>Max:</source>
+        <translation>最大：</translation>
+    </message>
+    <message>
+        <source>GUI Show / Hide</source>
+        <translation>GUI 表示/非表示</translation>
+    </message>
+    <message>
+        <source>Single Slider (Max Only)</source>
+        <translation>スライダーを最大値のみにする</translation>
+    </message>
+    <message>
+        <source>Show Labels</source>
+        <translation>ラベルを表示</translation>
+    </message>
+    <message>
+        <source>Show Numeric Fields</source>
+        <translation>数値フィールドを表示</translation>
+    </message>
+    <message>
+        <source>Cell Borders</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Cell Backgrounds</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Show Icons</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
     <name>Toolbar</name>
     <message>
         <source>Collapse toolbar</source>
@@ -17499,7 +18489,7 @@ Please refer to the user guide for details.</source>
     <name>XDTSImportPopup</name>
     <message>
         <source>Importing XDTS file %1</source>
-        <translation>XDTSファイル %1 の読み込み</translation>
+        <translation type="vanished">XDTSファイル %1 の読み込み</translation>
     </message>
     <message>
         <source>Load</source>
@@ -17543,15 +18533,87 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Cell marks for XDTS symbols</source>
-        <translation>タイムシート記号に対応するコママーク</translation>
+        <translation type="vanished">タイムシート記号に対応するコママーク</translation>
     </message>
     <message>
         <source>Inbetween Symbol1 (O):</source>
-        <translation>中割り記号1 （○）：</translation>
+        <translation type="vanished">中割り記号1 （○）：</translation>
     </message>
     <message>
         <source>Inbetween Symbol2 (*)</source>
-        <translation>中割り記号2 （●）：</translation>
+        <translation type="vanished">中割り記号2 （●）：</translation>
+    </message>
+    <message>
+        <source>Importing %1 file %2</source>
+        <translation>%1ファイル %2 の読み込み</translation>
+    </message>
+    <message>
+        <source>Rename Image Sequence</source>
+        <translation>必要なら連番画像ファイル名を修正する</translation>
+    </message>
+    <message>
+        <source>Do not Convert</source>
+        <translation>変換しない</translation>
+    </message>
+    <message>
+        <source>Convert Every Level with Settings Popup</source>
+        <translation>各レベルで変換ダイアログを開いて変換する</translation>
+    </message>
+    <message>
+        <source>Convert Unpainted Aliasing Raster(Inks Only)</source>
+        <translation>二値のラスター画像を変換する（線のみになります）</translation>
+    </message>
+    <message>
+        <source>Append Default Palette</source>
+        <translation>デフォルトパレットを追加する</translation>
+    </message>
+    <message>
+        <source>When activated, styles of the default palette
+($TOONZSTUDIOPALETTE\Global Palettes\Default Palettes\Cleanup_Palette.tpl) will 
+be appended to the palette after conversion</source>
+        <translation>このオプションがONのとき、デフォルトパレット
+($TOONZSTUDIOPALETTE\Global Palettes\Default Palettes\Cleanup_Palette.tpl)
+のスタイルが変換後のパレットに追加されます。</translation>
+    </message>
+    <message>
+        <source>Image DPI</source>
+        <translation>画像のDPI</translation>
+    </message>
+    <message>
+        <source>Current Camera DPI</source>
+        <translation>現在のカメラのDPI</translation>
+    </message>
+    <message>
+        <source>Custom DPI</source>
+        <translation>カスタムDPI</translation>
+    </message>
+    <message>
+        <source>DPI:</source>
+        <translation>DPI：</translation>
+    </message>
+    <message>
+        <source>Cell marks for %1 symbols</source>
+        <translation>%1記号に対応するコママーク</translation>
+    </message>
+    <message>
+        <source>Inbetween Symbol1 (%1):</source>
+        <translation>中割り記号1 （%1）：</translation>
+    </message>
+    <message>
+        <source>Inbetween Symbol2 (%1):</source>
+        <translation>中割り記号2 （%1）：</translation>
+    </message>
+    <message>
+        <source>Keyframe Symbol:</source>
+        <translation>原画記号：</translation>
+    </message>
+    <message>
+        <source>Reference Frame Symbol:</source>
+        <translation>中割り参考記号：</translation>
+    </message>
+    <message>
+        <source>Convert Raster to TLV : </source>
+        <translation>ラスター画像をTLVに変換：</translation>
     </message>
 </context>
 <context>
@@ -17585,23 +18647,23 @@ Please refer to the user guide for details.</source>
     <name>XsheetGUI::BreadcrumbArea</name>
     <message>
         <source>  &gt;  </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>  |  </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>---</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Main</source>
-        <translation type="unfinished">実線</translation>
+        <translation>メイン</translation>
     </message>
     <message>
         <source>Xsheet Depth:</source>
-        <translation type="unfinished"></translation>
+        <translation>タイムシートの階層：</translation>
     </message>
 </context>
 <context>
@@ -17855,6 +18917,14 @@ Please refer to the user guide for details.</source>
     <message>
         <source>Click to select parent object</source>
         <translation>［クリック］親オブジェクトを選択</translation>
+    </message>
+    <message>
+        <source>Show Column Parent Colors</source>
+        <translation>親オブジェクトの色を表示</translation>
+    </message>
+    <message>
+        <source>Show the column parent&apos;s color in the Xsheet</source>
+        <translation>列の親オブジェクトの表示色を種類ごとに変える</translation>
     </message>
 </context>
 <context>

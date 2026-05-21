@@ -1794,8 +1794,9 @@ FillToolOptionsBox::FillToolOptionsBox(QWidget *parent, TTool *tool,
                             SLOT(onOnionModeToggled(bool)));
   ret      = ret && connect(m_multiFrameMode, SIGNAL(toggled(bool)), this,
                             SLOT(onMultiFrameModeToggled(bool)));
-  ret      = ret && connect(m_closeGap, &ToolOptionCheckbox::toggled,
-                            m_gapCloseDistance, &QWidget::setEnabled);
+  if (m_closeGap)
+    ret = ret && connect(m_closeGap, &ToolOptionCheckbox::toggled,
+                         m_gapCloseDistance, &QWidget::setEnabled);
 
   assert(ret);
   onColorModeChanged(m_colorMode->getProperty()->getIndex());

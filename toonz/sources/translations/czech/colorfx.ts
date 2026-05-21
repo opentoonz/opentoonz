@@ -27,22 +27,22 @@
 <context>
     <name>FlowLineStrokeStyle</name>
     <message>
-        <location filename="../../colorfx/flowlinestrokestyle.cpp" line="129"/>
+        <location filename="../../colorfx/flowlinestrokestyle.cpp" line="136"/>
         <source>Density</source>
         <translation type="unfinished">Hustota</translation>
     </message>
     <message>
-        <location filename="../../colorfx/flowlinestrokestyle.cpp" line="131"/>
+        <location filename="../../colorfx/flowlinestrokestyle.cpp" line="138"/>
         <source>Extension</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/flowlinestrokestyle.cpp" line="133"/>
+        <location filename="../../colorfx/flowlinestrokestyle.cpp" line="140"/>
         <source>Width Scale</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../colorfx/flowlinestrokestyle.cpp" line="135"/>
+        <location filename="../../colorfx/flowlinestrokestyle.cpp" line="142"/>
         <source>Straighten Ends</source>
         <translation type="unfinished"></translation>
     </message>

@@ -18,11 +18,13 @@ set(SOURCES
     flowlinestrokestyle.cpp
 )
 
+add_library(colorfx SHARED ${HEADERS} ${SOURCES})
+
 if(WITH_TRANSLATION)
     add_translation(colorfx ${HEADERS} ${SOURCES})
+    add_compile_translations_command(colorfx colorfx)
 endif()
 
-add_library(colorfx SHARED ${HEADERS} ${SOURCES})
 add_definitions(
     -D_USRDLL
     -DCOLORFX_EXPORTS

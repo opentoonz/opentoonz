@@ -42,3 +42,6 @@ ipch/
 
 #macOS
 .DS_Store
+
+# generated qm files
+/stuff/config/loc

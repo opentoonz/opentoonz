@@ -22,12 +22,12 @@
 <context>
     <name>JpgWriterProperties</name>
     <message>
-        <location filename="../../common/tiio/tiio_jpg.cpp" line="284"/>
+        <location filename="../../common/tiio/tiio_jpg.cpp" line="423"/>
         <source>Quality</source>
         <translation>Качество</translation>
     </message>
     <message>
-        <location filename="../../common/tiio/tiio_jpg.cpp" line="285"/>
+        <location filename="../../common/tiio/tiio_jpg.cpp" line="424"/>
         <source>Smoothing</source>
         <translation>Сглаживание</translation>
     </message>
@@ -35,14 +35,13 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../common/tvrender/tpalette.cpp" line="258"/>
+        <location filename="../../common/tvrender/tpalette.cpp" line="250"/>
         <source>colors</source>
         <translation>цвета</translation>
     </message>
     <message>
-        <location filename="../../common/timage_io/tlevel_io.cpp" line="127"/>
         <source>Skipping frame.</source>
-        <translation>Пропуск кадра.</translation>
+        <translation type="vanished">Пропуск кадра.</translation>
     </message>
     <message>
         <source>Malformed frame name</source>

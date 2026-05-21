@@ -542,8 +542,8 @@ QFrame *OutputSettingsPopup::createColorSettingsBox(bool isPreview) {
   bool ret = true;
   ret      = ret && connect(m_channelWidthOm, SIGNAL(currentIndexChanged(int)),
                             SLOT(onChannelWidthChanged(int)));
-  ret      = ret && connect(m_linearColorSpaceChk, SIGNAL(stateChanged(int)),
-                            SLOT(onLinearColorSpaceChecked(int)));
+  ret      = ret && connect(m_linearColorSpaceChk, SIGNAL(clicked(bool)),
+                            SLOT(onLinearColorSpaceClicked(bool)));
 
   ret = ret && connect(m_colorSpaceGammaFld, SIGNAL(editingFinished()),
                        SLOT(onColorSpaceGammaEdited()));
@@ -1447,11 +1447,11 @@ void OutputSettingsPopup::onChannelWidthChanged(int type) {
 }
 //-----------------------------------------------------------------------------
 
-void OutputSettingsPopup::onLinearColorSpaceChecked(int state) {
+void OutputSettingsPopup::onLinearColorSpaceClicked(bool checked) {
   if (!getCurrentScene()) return;
   TOutputProperties *prop = getProperties();
   TRenderSettings rs      = prop->getRenderSettings();
-  rs.m_linearColorSpace   = (state == Qt::Checked);
+  rs.m_linearColorSpace   = checked;
   // force floating point when compute in linear color space
   if (rs.m_linearColorSpace) {
     prop->setNonlinearBpp(rs.m_bpp);
@@ -1465,7 +1465,7 @@ void OutputSettingsPopup::onLinearColorSpaceChecked(int state) {
       getCurrentScene()->getProperties()->getPreviewProperties();
   if (!m_isPreviewSettings && prev_prop->isColorSettingsSynced()) {
     TRenderSettings prev_rs    = prev_prop->getRenderSettings();
-    prev_rs.m_linearColorSpace = (state == Qt::Checked);
+    prev_rs.m_linearColorSpace = checked;
     if (prev_rs.m_linearColorSpace) {
       prev_prop->setNonlinearBpp(prev_rs.m_bpp);
       prev_rs.m_bpp = 128;

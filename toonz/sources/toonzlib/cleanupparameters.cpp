@@ -301,8 +301,12 @@ void CleanupParameters::assign(const CleanupParameters *param,
   // In modern Toonz scenes, there always is a cleanup palette.
   // In older Toonz scenes, it may be missing. In this case, leave the current
   // one.
-  if (clonePalette && param->m_cleanupPalette)
-    m_cleanupPalette = param->m_cleanupPalette->clone();
+  if (param->m_cleanupPalette) {
+    if (clonePalette)
+      m_cleanupPalette = param->m_cleanupPalette->clone();
+    else
+      m_cleanupPalette->assign(param->m_cleanupPalette.getPointer());
+  }
 
   m_offx_lock     = param->m_offx_lock;
   m_offy_lock     = param->m_offy_lock;
@@ -382,7 +386,7 @@ void CleanupParameters::saveData(TOStream &os) const {
 void CleanupParameters::loadData(TIStream &is, bool globalParams) {
   if (globalParams) {
     CleanupParameters cp;
-    assign(&cp);
+    assign(&cp, false);
   }
 
   std::string tagName;

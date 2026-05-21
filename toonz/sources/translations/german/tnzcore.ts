@@ -37,10 +37,6 @@
         <source>Unidentified Action</source>
         <translation>Unbekannte Aktion</translation>
     </message>
-    <message>
-        <source>Skipping frame.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>TCenterLineStrokeStyle</name>

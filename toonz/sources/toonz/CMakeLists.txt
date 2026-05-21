@@ -434,9 +434,6 @@ else()
     )
 endif()
 
-if(WITH_TRANSLATION)
-    add_translation(toonz ${HEADERS} ${SOURCES})
-endif()
 
 set(OBJCSOURCES filebrowsermodel.cpp)
 
@@ -471,6 +468,11 @@ else()
     #    -DTAPPTOOLS_EXPORTS
     #    -DTTEST_EXPORTS
     #)
+endif()
+
+if(WITH_TRANSLATION)
+    add_translation(toonz ${HEADERS} ${SOURCES})
+    add_compile_translations_command(OpenToonz toonz)
 endif()
 
 if(BUILD_TARGET_WIN)

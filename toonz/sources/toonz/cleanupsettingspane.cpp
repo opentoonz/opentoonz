@@ -209,7 +209,9 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
     QVBoxLayout *cleanupCameraFrameLay = new QVBoxLayout();
     cleanupCameraFrameLay->setContentsMargins(0, 0, 0, 0);
     cleanupCameraFrameLay->setSpacing(0);
-    { cleanupCameraFrameLay->addWidget(m_cameraWidget); }
+    {
+      cleanupCameraFrameLay->addWidget(m_cameraWidget);
+    }
     cameraFrame->setLayout(cleanupCameraFrameLay);
     mainLay->addWidget(cameraFrame, 0);
 
@@ -276,11 +278,11 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
   //-----signal-slot connections
   bool ret = true;
   ret      = ret && connect(m_autocenterBox, SIGNAL(clicked(bool)),
-                       SLOT(onGenericSettingsChange()));
+                            SLOT(onGenericSettingsChange()));
   ret      = ret && connect(m_pegHolesOm, SIGNAL(activated(int)),
-                       SLOT(onGenericSettingsChange()));
+                            SLOT(onGenericSettingsChange()));
   ret      = ret && connect(m_fieldGuideOm, SIGNAL(activated(int)),
-                       SLOT(onGenericSettingsChange()));
+                            SLOT(onGenericSettingsChange()));
 
   ret = ret && connect(m_rotateOm, SIGNAL(activated(int)),
                        SLOT(onGenericSettingsChange()));
@@ -312,8 +314,8 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
       ret && connect(saveBtn, SIGNAL(pressed()), this, SLOT(onSaveSettings()));
 
   ret = ret && connect(loadBtn, SIGNAL(pressed()), model, SLOT(promptLoad()));
-  ret = ret && connect(resetBtn, SIGNAL(pressed()), this,
-                       SLOT(onRestoreSettings()));
+  ret = ret &&
+        connect(resetBtn, SIGNAL(pressed()), this, SLOT(onRestoreSettings()));
 
   assert(ret);
 }
@@ -332,9 +334,9 @@ void CleanupSettingsPane::showEvent(QShowEvent *se) {
 
     bool ret = true;
     ret      = ret && connect(model, SIGNAL(imageSwitched()), this,
-                         SLOT(onImageSwitched()));
+                              SLOT(onImageSwitched()));
     ret      = ret && connect(model, SIGNAL(modelChanged(bool)), this,
-                         SLOT(updateGui(bool)));
+                              SLOT(updateGui(bool)));
     ret = ret && connect(model, SIGNAL(clnLoaded()), this, SLOT(onClnLoaded()));
     assert(ret);
 
@@ -366,9 +368,9 @@ void CleanupSettingsPane::hideEvent(QHideEvent *he) {
 
     bool ret = true;
     ret      = ret && disconnect(model, SIGNAL(imageSwitched()), this,
-                            SLOT(onImageSwitched()));
+                                 SLOT(onImageSwitched()));
     ret      = ret && disconnect(model, SIGNAL(modelChanged(bool)), this,
-                            SLOT(updateGui(bool)));
+                                 SLOT(updateGui(bool)));
     ret      = ret &&
           disconnect(model, SIGNAL(clnLoaded()), this, SLOT(onClnLoaded()));
     assert(ret);
@@ -411,8 +413,9 @@ void CleanupSettingsPane::updateGui(CleanupParameters *params,
   m_pathField->setPath(toQString(m_path));
 
   m_lineProcessing->setCurrentIndex(params->m_lineProcessingMode);
-  m_antialias->setCurrentIndex(
-      params->m_postAntialias ? 2 : params->m_noAntialias ? 1 : 0);
+  m_antialias->setCurrentIndex(params->m_postAntialias ? 2
+                               : params->m_noAntialias ? 1
+                                                       : 0);
   m_sharpness->setValue(params->m_sharpness);
   m_despeckling->setValue(params->m_despeckling);
   m_aaValue->setValue(params->m_aaValue);

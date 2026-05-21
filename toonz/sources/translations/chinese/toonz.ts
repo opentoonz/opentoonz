@@ -265,6 +265,10 @@ Nearest format will be internally used.</source>
         <source>Stereo 32-Bits</source>
         <translation>立体声32位</translation>
     </message>
+    <message>
+        <source>Bind to Current Room</source>
+        <translation>绑定至当前工作区</translation>
+    </message>
 </context>
 <context>
     <name>AutoInputCellNumberPopup</name>
@@ -482,6 +486,62 @@ Please choose a valid lip sync data file to continue.</source>
     <message>
         <source>Drawing: </source>
         <translation>绘图: </translation>
+    </message>
+    <message>
+        <source>Analyzing audio...</source>
+        <translation>分析音频中...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <source>Frame </source>
+        <translation>帧</translation>
+    </message>
+    <message>
+        <source>Audio file field is not available.</source>
+        <translation>输入的音频文件路径无效。</translation>
+    </message>
+    <message>
+        <source>Please select an audio file first.</source>
+        <translation>请先选择一个音频文件。</translation>
+    </message>
+    <message>
+        <source>Audio file does not exist.</source>
+        <translation>音频文件不存在。</translation>
+    </message>
+    <message>
+        <source>Rhubarb process timed out after %1 seconds. The process may be stuck.</source>
+        <translation>Rhubarb在%1秒后超时。进程可能受阻。</translation>
+    </message>
+    <message>
+        <source>Rhubarb process crashed.</source>
+        <translation>Rhubarb进程崩溃。</translation>
+    </message>
+    <message>
+        <source>Rhubarb failed to start. Check if the path is correct.</source>
+        <translation>Rhubarb无法启动，请检查路径是否正确。</translation>
+    </message>
+    <message>
+        <source>Rhubarb crashed during execution.</source>
+        <translation>Rhubarb在运行中崩溃。</translation>
+    </message>
+    <message>
+        <source>Rhubarb process timed out.</source>
+        <translation>Rhubarb处理超时。</translation>
+    </message>
+    <message>
+        <source>Communication error with Rhubarb process.</source>
+        <translation>与Rhubarb通信错误。</translation>
+    </message>
+    <message>
+        <source>Unknown error occurred with Rhubarb.</source>
+        <translation>Rhubarb发生了未知错误。</translation>
+    </message>
+    <message>
+        <source>Cancelling...</source>
+        <translation>取消中...</translation>
     </message>
 </context>
 <context>
@@ -783,6 +843,33 @@ Stop it or wait for its completion before removing it.</source>
         <source>Image</source>
         <translation>图像</translation>
     </message>
+    <message>
+        <source>Export Board Image</source>
+        <translation>导出场记板</translation>
+    </message>
+    <message>
+        <source>File Name Suffix:</source>
+        <translation>文件名后缀：</translation>
+    </message>
+    <message>
+        <source>File name suffix can&apos;t be empty.</source>
+        <translation>文件名后缀不能为空。</translation>
+    </message>
+    <message>
+        <source>There is no board image to export.</source>
+        <translatorcomment>暂不知道如何翻译board image</translatorcomment>
+        <translation>无可导出的场记板</translation>
+    </message>
+    <message>
+        <source>It is not possible to save because the selected file format is not supported.</source>
+        <translation>无法保存，不支持所选文件格式。</translation>
+    </message>
+    <message>
+        <source>File %1 already exists.
+Do you want to overwrite it?</source>
+        <translation>文件 %1 已经存在
+你想要覆盖它吗？</translation>
+    </message>
 </context>
 <context>
     <name>BoardView</name>
@@ -819,6 +906,113 @@ Stop it or wait for its completion before removing it.</source>
     <message>
         <source>Path %1 doesn&apos;t exists.</source>
         <translation>路径 %1 不存在。</translation>
+    </message>
+</context>
+<context>
+    <name>BrushPresetPanel</name>
+    <message>
+        <source>No brush tool selected</source>
+        <translation type="unfinished">没有激活的笔刷工具</translation>
+    </message>
+    <message>
+        <source>Remove selected preset</source>
+        <translation>删除所选预设</translation>
+    </message>
+    <message>
+        <source>Add current settings as new preset</source>
+        <translation type="unfinished">保存当前设置为新预设</translation>
+    </message>
+    <message>
+        <source>Refresh preset list</source>
+        <translation>刷新预设列表</translation>
+    </message>
+    <message>
+        <source>View mode</source>
+        <translation type="unfinished">查看模式</translation>
+    </message>
+    <message>
+        <source>Brush Presets</source>
+        <translation type="unfinished">笔刷预设</translation>
+    </message>
+    <message>
+        <source>Vector Brush</source>
+        <translation>矢量笔刷</translation>
+    </message>
+    <message>
+        <source>Toonz Raster Brush</source>
+        <translation>Toonz栅格笔刷</translation>
+    </message>
+    <message>
+        <source>MyPaint Brush</source>
+        <translation type="unfinished">MyPaint笔刷</translation>
+    </message>
+    <message>
+        <source>MyPaint Brush Tnz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Raster Brush</source>
+        <translation>栅格笔刷</translation>
+    </message>
+    <message>
+        <source>Invalid Name</source>
+        <translation type="unfinished">无效名字</translation>
+    </message>
+    <message>
+        <source>Please enter a valid preset name.</source>
+        <translation type="unfinished">请输入有效预设名</translation>
+    </message>
+    <message>
+        <source>Add Preset</source>
+        <translation type="unfinished">添加预设</translation>
+    </message>
+    <message>
+        <source>Please use the [+] button in the Tool Options Bar to add new presets.
+
+The new preset will automatically appear in this panel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Preset</source>
+        <translation>删除预设</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to remove the preset &apos;%1&apos;?</source>
+        <translation type="unfinished">你确定要移除预设 %1吗？</translation>
+    </message>
+    <message>
+        <source>Please use the [-] button in the Tool Options Bar to remove presets.
+
+The change will automatically be reflected in this panel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>List</source>
+        <translation type="unfinished">列表</translation>
+    </message>
+    <message>
+        <source>Small</source>
+        <translation>小</translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation type="unfinished">中</translation>
+    </message>
+    <message>
+        <source>Large</source>
+        <translation type="unfinished">大</translation>
+    </message>
+    <message>
+        <source>GUI Show / Hide</source>
+        <translation type="unfinished">显示/隐藏界面</translation>
+    </message>
+    <message>
+        <source>Cell Borders</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cell Backgrounds</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1893,7 +2087,7 @@ What do you want to do? </source>
     </message>
     <message>
         <source>Convert 1 Level</source>
-        <translation>转换一个层级</translation>
+        <translation type="vanished">转换一个层级</translation>
     </message>
     <message>
         <source>Convert %1 Levels</source>
@@ -2119,7 +2313,7 @@ contain the dpi information, then the current camera dpi will be used.
 be appended to the palette after conversion in 
 order to save the effort of creating styles 
 before color designing.</source>
-        <translation>当启用时，默认调色板的样式
+        <translation type="vanished">当启用时，默认调色板的样式
 ($TOONZSTUDIOPALETTE\cleanup_default.tpl)
 将在转换后被打包到调色板中，
 以便在开始颜色设计前保存样式调整效果。</translation>
@@ -2137,6 +2331,18 @@ contain the dpi information, then the current camera dpi will be used.
     <message>
         <source>Level %1 converting to same file format; skipped.</source>
         <translation>层级%1 转换到同样的文件格式；跳过。</translation>
+    </message>
+    <message>
+        <source>When activated, styles of the default palette
+($TOONZSTUDIOPALETTE\Global Palettes\Default Palettes\Cleanup_Palette.tpl) will 
+be appended to the palette after conversion in 
+order to save the effort of creating styles 
+before color designing.</source>
+        <translation>此项激活时，默认调色板($TOONZSTUDIOPALETTE\Global Palettes\Default Palettes\Cleanup_Palette.tpl)中的样式将自动附加至转换后的调色板，以减少在色彩设计前创建样式的操作。</translation>
+    </message>
+    <message>
+        <source>Convert 1 Level : %1</source>
+        <translation>导出层级 %1</translation>
     </message>
 </context>
 <context>
@@ -2478,6 +2684,14 @@ contain the dpi information, then the current camera dpi will be used.
         <source>The local path does not exist:</source>
         <translation>不存在的本地路径:</translation>
     </message>
+    <message>
+        <source>Unlock</source>
+        <translation type="unfinished">解锁</translation>
+    </message>
+    <message>
+        <source>Revert</source>
+        <translation type="unfinished">复原</translation>
+    </message>
 </context>
 <context>
     <name>DvItemViewerButtonBar</name>
@@ -2582,6 +2796,33 @@ contain the dpi information, then the current camera dpi will be used.
     <message>
         <source>Scan &amp;&amp; Cleanup</source>
         <translation type="vanished">扫描&amp;&amp;清稿</translation>
+    </message>
+</context>
+<context>
+    <name>ExportAllLevelsPopup</name>
+    <message>
+        <source>Export All</source>
+        <translation>导出全部</translation>
+    </message>
+    <message>
+        <source>Skip</source>
+        <translation>跳过</translation>
+    </message>
+    <message>
+        <source>No level found in the camera view or levels are null!!</source>
+        <translation>当前无可见层级或层级为空！</translation>
+    </message>
+    <message>
+        <source>Please select a Folder!</source>
+        <translation>请选择一个文件夹！</translation>
+    </message>
+    <message>
+        <source>It is not possible to create the %1 folder.</source>
+        <translation>无法创建文件夹 %1。</translation>
+    </message>
+    <message>
+        <source>Export failed,please delete exported files and try again.</source>
+        <translation>导出失败，请删除已导出文件并重试。</translation>
     </message>
 </context>
 <context>
@@ -2780,11 +3021,35 @@ contain the dpi information, then the current camera dpi will be used.
     </message>
     <message>
         <source>The file name cannot be empty or contain any of the following characters:(new line)  \ / : * ? &quot;  |</source>
-        <translation>文件名不能为空或能包含如下的任一字符:(new line)  \ / : * ?&quot;  |</translation>
+        <translation type="vanished">文件名不能为空或能包含如下的任一字符:(new line)  \ / : * ?&quot;  |</translation>
     </message>
     <message>
         <source>File Browser</source>
         <translation>文件浏览器</translation>
+    </message>
+    <message>
+        <source>Export Level: No Level Selected</source>
+        <translation>导出层级：无选中的层级</translation>
+    </message>
+    <message>
+        <source>Export Level: %1 Level Selected</source>
+        <translation>导出层级：%1 个层级被选中</translation>
+    </message>
+    <message>
+        <source>Please select a folder!</source>
+        <translation>请选择一个文件夹！</translation>
+    </message>
+    <message>
+        <source>Please select at least one level(column).</source>
+        <translation>请至少选择1个层级（图层）。</translation>
+    </message>
+    <message>
+        <source>It is not possible to create the %1 folder.</source>
+        <translation>无法创建 %1 文件夹。</translation>
+    </message>
+    <message>
+        <source>Please type file name!</source>
+        <translation>请输入文件名！</translation>
     </message>
 </context>
 <context>
@@ -2861,6 +3126,10 @@ contain the dpi information, then the current camera dpi will be used.
         <source>Height: </source>
         <translation>高度: </translation>
     </message>
+    <message>
+        <source>Create Folder(equal file name)</source>
+        <translation>创建同名文件夹</translation>
+    </message>
 </context>
 <context>
     <name>ExportOCACommand</name>
@@ -2906,12 +3175,13 @@ Unchecked: Vectors are saved as SVG</source>
     </message>
     <message>
         <source>Export Reference Layers</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">导出参照图层</translation>
     </message>
     <message>
         <source>Checked: Layers with Preview Visible OFF are also exported
 Unchecked: Only layers with Preview Visible ON are exported</source>
-        <translation type="unfinished"></translation>
+        <translation>勾选：预览可见图层将被导出
+不勾选：只有摄像机可见图层将被导出</translation>
     </message>
 </context>
 <context>
@@ -2990,6 +3260,20 @@ Unchecked: Only layers with Preview Visible ON are exported</source>
     <message>
         <source>Project &apos;%1&apos; already exists</source>
         <translation>项目“%1”已经存在</translation>
+    </message>
+    <message>
+        <source>Export as Standalone Scene</source>
+        <translation>导出独立场景文件夹</translation>
+    </message>
+    <message>
+        <source>Export To:</source>
+        <translation>导出至：</translation>
+    </message>
+    <message>
+        <source>Target folder already exists and not empty.
+ %1</source>
+        <translation>目标文件夹已存在且不为空。
+%1</translation>
     </message>
 </context>
 <context>
@@ -3227,6 +3511,14 @@ Do you want to create it?</source>
         <source>Inbetween mark 2:</source>
         <translation>过渡帧标记2:</translation>
     </message>
+    <message>
+        <source>Export CSV</source>
+        <translation>导出CSV</translation>
+    </message>
+    <message>
+        <source>Failed to create file %1.</source>
+        <translation>无法创建文件 %1</translation>
+    </message>
 </context>
 <context>
     <name>ExpressionReferenceManager</name>
@@ -3450,6 +3742,20 @@ Do you want to explode anyway ?</source>
         <source>The input folder path was invalid.</source>
         <translation>输入文件夹的路径是无效的。</translation>
     </message>
+    <message>
+        <source>Level %1 already exists
+Do you want to duplicate it?</source>
+        <translation type="unfinished">层级 %1 已经存在
+你想要复制它吗？</translation>
+    </message>
+    <message>
+        <source>Duplicate</source>
+        <translation type="unfinished">复制</translation>
+    </message>
+    <message>
+        <source>Don&apos;t Duplicate</source>
+        <translation type="unfinished">不要复制</translation>
+    </message>
 </context>
 <context>
     <name>FileBrowserPopup</name>
@@ -3528,6 +3834,33 @@ Do you want to explode anyway ?</source>
     <message>
         <source>Viewer</source>
         <translation type="vanished">查看器</translation>
+    </message>
+</context>
+<context>
+    <name>FillHolesDialog</name>
+    <message>
+        <source>Fill Small Holes</source>
+        <translation type="unfinished">填补细小孔隙</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>大小</translation>
+    </message>
+    <message>
+        <source>Apply</source>
+        <translation>应用</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <source>No Toonz Raster Level Selected</source>
+        <translation>未选中Toonz栅格层级</translation>
+    </message>
+    <message>
+        <source>Filling Holes...</source>
+        <translation type="unfinished">填补孔隙中...</translation>
     </message>
 </context>
 <context>
@@ -3915,6 +4248,13 @@ Do you want to overwrite it?</source>
     </message>
 </context>
 <context>
+    <name>IoCmd::ConvertingPopup</name>
+    <message>
+        <source>Error occurred.</source>
+        <translation>发生错误</translation>
+    </message>
+</context>
+<context>
     <name>ItemInfoView</name>
     <message>
         <source>Bold</source>
@@ -4100,7 +4440,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Unable to create</source>
-        <translation>无法创建</translation>
+        <translation type="vanished">无法创建</translation>
     </message>
     <message>
         <source>Invalid increment value</source>
@@ -4144,7 +4484,11 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Assistants Level</source>
-        <translation type="unfinished"></translation>
+        <translation>辅助层级</translation>
+    </message>
+    <message>
+        <source>Unable to create %1</source>
+        <translation>无法创建 %1</translation>
     </message>
 </context>
 <context>
@@ -4520,6 +4864,18 @@ Please use the frame numbers for reference.</source>
     <message>
         <source>Drawing: </source>
         <translation>绘图: </translation>
+    </message>
+    <message>
+        <source>Frame </source>
+        <translation>帧</translation>
+    </message>
+    <message>
+        <source>Invalid configuration or data.</source>
+        <translation>无效的配置或数据。</translation>
+    </message>
+    <message>
+        <source>Invalid data file. Need at least one phoneme entry.</source>
+        <translation type="unfinished">无效的数据文件。需要至少一个音素条目</translation>
     </message>
 </context>
 <context>
@@ -4903,7 +5259,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>&amp;Save Scene</source>
-        <translation>保存场景(&amp;S)</translation>
+        <translation type="vanished">保存场景(&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Save Scene As...</source>
@@ -4975,7 +5331,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>&amp;Save Default Settings</source>
-        <translation>保存为默认设置(&amp;S)</translation>
+        <translation type="vanished">保存为默认设置(&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Output Settings...</source>
@@ -6691,7 +7047,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Vectors to Toonz Raster</source>
-        <translation>转换矢量为 Toonz 光栅</translation>
+        <translation type="vanished">转换矢量为 Toonz 光栅</translation>
     </message>
     <message>
         <source>Replace Vectors with Simplified Vectors</source>
@@ -7611,19 +7967,115 @@ N.B. 确保你没有在运行其他 OpenToonz 进程、
     </message>
     <message>
         <source>Import Open Cel Animation (OCA)</source>
-        <translation type="unfinished"></translation>
+        <translation>导入开放赛璐璐动画格式(OCA)</translation>
     </message>
     <message>
         <source>&amp;New Assistant Level</source>
-        <translation type="unfinished"></translation>
+        <translation>创建辅助层级(&amp;S)</translation>
     </message>
     <message>
         <source>Toggle Sub-Xsheet Navigation Bar</source>
-        <translation type="unfinished"></translation>
+        <translation>显示/隐藏子摄影表导航栏</translation>
     </message>
     <message>
         <source>Edit Assistants</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">编辑辅助层级</translation>
+    </message>
+    <message>
+        <source>Show build date in title</source>
+        <translation type="unfinished">在标题中展示应用程序构建日期</translation>
+    </message>
+    <message>
+        <source>&amp;Save Scene Only</source>
+        <translation>仅保存场景(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Set Scene Settings as Default</source>
+        <translation>设置当前场景配置为默认(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Export Stylos Exchange Format(SXF)</source>
+        <translation>导出Stylos数字律表(SXF)</translation>
+    </message>
+    <message>
+        <source>&amp;Clear Viewer Content</source>
+        <translation>清除查看器内容(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Export All Levels... </source>
+        <translation>导出所有层级(&amp;E)</translation>
+    </message>
+    <message>
+        <source>&amp;Sort Strokes with Palette Order</source>
+        <translation>以调色板顺序整理矢量线(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Convert to Toonz Raster...</source>
+        <translation>转换为Toonz栅格...</translation>
+    </message>
+    <message>
+        <source>&amp;Fill Holes...</source>
+        <translation>填充细小孔隙(&amp;F)</translation>
+    </message>
+    <message>
+        <source>Show Shift Origin</source>
+        <translation type="unfinished">显示原图</translation>
+    </message>
+    <message>
+        <source>&amp;Brush Presets</source>
+        <translation>笔刷预设(&amp;B)</translation>
+    </message>
+    <message>
+        <source>&amp;Tool Properties</source>
+        <translation>工具属性(&amp;T)</translation>
+    </message>
+    <message>
+        <source>&amp;Locator</source>
+        <translation>定位器(&amp;L)</translation>
+    </message>
+    <message>
+        <source>Toggle Viewer Indicators</source>
+        <translation>显示/隐藏查看器检查模式</translation>
+    </message>
+    <message>
+        <source>Zoom View</source>
+        <translation>缩放视图</translation>
+    </message>
+    <message>
+        <source>Rotate View</source>
+        <translation>旋转视图</translation>
+    </message>
+    <message>
+        <source>Pan View</source>
+        <translation type="unfinished">平移视图</translation>
+    </message>
+    <message>
+        <source>Empty Only</source>
+        <translation>仅空像素</translation>
+    </message>
+    <message>
+        <source>Eraser Type - MultiArc</source>
+        <translation>橡皮擦类型 - 多段弧</translation>
+    </message>
+    <message>
+        <source>Rotate Viewer Left</source>
+        <translation>向左旋转视图</translation>
+    </message>
+    <message>
+        <source>Rotate Viewer Right</source>
+        <translation>向右旋转视图</translation>
+    </message>
+    <message>
+        <source>Rotate View Left</source>
+        <translation>向左旋转视图</translation>
+    </message>
+    <message>
+        <source>Rotate View Right</source>
+        <translation>向右旋转视图</translation>
+    </message>
+    <message>
+        <source>Viewer Scrub</source>
+        <translation type="unfinished">查看器抓手</translation>
     </message>
 </context>
 <context>
@@ -8928,15 +9380,15 @@ Custom : Always use the custom dpi specified here.</source>
     </message>
     <message>
         <source>Save Current Image Adjust Parameters As Default</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">保存当前图像调整参数为默认</translation>
     </message>
     <message>
         <source>BG Reduction is set but the White BG image is missing. Please capture the White BG again.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">背景减淡功能已开启，但无法找到白色背景图像。请重新拍摄白色背景图像。</translation>
     </message>
     <message>
         <source>Do you want to save the current parameters as the default values?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">是否保存当前参数作为默认值？</translation>
     </message>
 </context>
 <context>
@@ -9138,6 +9590,10 @@ Set the output folder path to the subfolder as well.</source>
         <source>Alpha</source>
         <translation>透明度</translation>
     </message>
+    <message>
+        <source>Bind to Current Room</source>
+        <translation>绑定到当前工作区</translation>
+    </message>
 </context>
 <context>
     <name>PreferencesPopup</name>
@@ -9151,7 +9607,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Use Default Viewer for Movie Formats</source>
-        <translation>使用默认播放器播放视频格式</translation>
+        <translation type="vanished">使用默认播放器播放视频格式</translation>
     </message>
     <message>
         <source>Save Automatically Every Minutes</source>
@@ -9199,7 +9655,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Loading</source>
-        <translation>加载</translation>
+        <translation type="vanished">加载</translation>
     </message>
     <message>
         <source>Expose Loaded Levels in Xsheet</source>
@@ -9259,7 +9715,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Display in a New Flipbook Window</source>
-        <translation>在新翻页书窗口中显示</translation>
+        <translation type="vanished">在新翻页书窗口中显示</translation>
     </message>
     <message>
         <source>Rewind after Playback</source>
@@ -9299,7 +9755,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Show Info in Rendered Frames</source>
-        <translation>在渲染好的帧中显示信息</translation>
+        <translation type="vanished">在渲染好的帧中显示信息</translation>
     </message>
     <message>
         <source>cm</source>
@@ -9347,7 +9803,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Minimize Savebox after Editing</source>
-        <translation>编辑之后最小化保存框</translation>
+        <translation type="vanished">编辑之后最小化保存框</translation>
     </message>
     <message>
         <source>Use the TLV Savebox to Limit Filling Operations</source>
@@ -9399,7 +9855,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Fit to Flipbook</source>
-        <translation>适合翻页书</translation>
+        <translation type="vanished">适合翻页书</translation>
     </message>
     <message>
         <source>New Level Format</source>
@@ -9427,7 +9883,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Visualization</source>
-        <translation>可视化</translation>
+        <translation type="vanished">可视化</translation>
     </message>
     <message>
         <source>Show Lines with Thickness 0</source>
@@ -9487,7 +9943,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Multi Layer Style Picker: Switch Levels by Picking</source>
-        <translation>多层样式拾取器：拾取时切换层级</translation>
+        <translation type="vanished">多层样式拾取器：拾取时切换层级</translation>
     </message>
     <message>
         <source>Onion Skin ON</source>
@@ -9535,7 +9991,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Viewer Zoom Center:</source>
-        <translation>查看器缩放中心:</translation>
+        <translation type="vanished">查看器缩放中心:</translation>
     </message>
     <message>
         <source>Language*:</source>
@@ -9679,7 +10135,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Import/Export</source>
-        <translation>导入/导出</translation>
+        <translation type="vanished">导入/导出</translation>
     </message>
     <message>
         <source>Show Onion Skin During Playback</source>
@@ -9765,7 +10221,7 @@ Is it OK to release these shortcuts?</source>
     </message>
     <message>
         <source>Enable to Input Cells without Double Clicking</source>
-        <translation>启用不双击情况下置入帧格</translation>
+        <translation type="vanished">启用不双击情况下置入帧格</translation>
     </message>
     <message>
         <source>Please indicate where you would like exports from Fast Render (MP4) to go.</source>
@@ -10017,7 +10473,7 @@ Also the initial output destination for new scenes will be set to $scenefolder a
     </message>
     <message>
         <source>Cursor Options</source>
-        <translation>光标选项</translation>
+        <translation type="vanished">光标选项</translation>
     </message>
     <message>
         <source>Basic Cursor Type:</source>
@@ -10179,7 +10635,7 @@ in non alpha-enabled image format.</source>
     </message>
     <message>
         <source>Switch to dark icons</source>
-        <translation>切换至黑色图标</translation>
+        <translation type="vanished">切换至黑色图标</translation>
     </message>
     <message>
         <source>Level Strip Thumbnail Size*:</source>
@@ -10199,7 +10655,7 @@ in non alpha-enabled image format.</source>
     </message>
     <message>
         <source>Use %1 to Resize Brush</source>
-        <translation>使用 %1 调整画笔大小</translation>
+        <translation type="vanished">使用 %1 调整画笔大小</translation>
     </message>
     <message>
         <source>Switch Tool Temporarily Keypress Length (ms):</source>
@@ -10219,7 +10675,7 @@ in non alpha-enabled image format.</source>
     </message>
     <message>
         <source>Icon Theme*:</source>
-        <translation>图标主题*:</translation>
+        <translation type="vanished">图标主题*:</translation>
     </message>
     <message>
         <source>Show Icons In Menu*</source>
@@ -10263,7 +10719,7 @@ in non alpha-enabled image format.</source>
     <message>
         <source>Number of Frames to Play 
 for Short Play:</source>
-        <translation>简短播放的帧数:</translation>
+        <translation type="vanished">简短播放的帧数:</translation>
     </message>
     <message>
         <source>Minimum</source>
@@ -10385,34 +10841,292 @@ but a random crash might occur, use at your own risk.</source>
     </message>
     <message>
         <source>Show Sub-Xsheet Navigation Bar</source>
-        <translation type="unfinished"></translation>
+        <translation>显示子摄影表导航栏</translation>
     </message>
     <message>
         <source>Expand Function Editor Header to Match Xsheet Header Height*</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">扩展功能编辑器头以适配摄影表头的高度</translation>
     </message>
     <message>
         <source>Unify Preview and Camstand Visibility Toggles</source>
-        <translation type="unfinished"></translation>
+        <translation>统一预览/摄像机可见性按钮</translation>
     </message>
     <message>
         <source>Link Column Name with Level</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">链接层级名与列名（图层名）</translation>
     </message>
     <message>
         <source>Disable Dragging Cells</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">禁止拖动帧格</translation>
     </message>
     <message>
         <source>Xsheet Tools</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">摄影表工具</translation>
     </message>
     <message>
         <source>This option will do the following:
 - When setting a cell in the empty column, level name will be copied to the column name
 - Typing the cell without level name in the empty column will try to use a level with the same name as the column
 The behavior may be changed in the future development.</source>
+        <translation type="unfinished">此选项将执行以下操作：
+• 在空列中设置单元格时，层级名称会被复制到列名。
+• 在空列中键入不含层级名称的单元格时，会尝试使用与列同名的层级。
+未来开发中可能会更改此行为。</translation>
+    </message>
+    <message>
+        <source>Add Info water mark in Rendered Frames</source>
+        <translation type="unfinished">在渲染的序列帧中加入信息水印</translation>
+    </message>
+    <message>
+        <source>Lazy Load Rooms</source>
+        <translation type="unfinished">延迟加载工作区</translation>
+    </message>
+    <message>
+        <source>Zoom In/Out Center:</source>
+        <translation type="unfinished">缩放中心：</translation>
+    </message>
+    <message>
+        <source>Show Room Bind Buttons*</source>
+        <translation>显示工作区绑定按钮</translation>
+    </message>
+    <message>
+        <source>Show Viewer Indicators</source>
+        <translation>显示查看器检查模式提示</translation>
+    </message>
+    <message>
+        <source>Rasterize Vector with Anti Aliasing</source>
+        <translation>栅格化矢量时启用抗锯齿</translation>
+    </message>
+    <message>
+        <source>Normalize Imported Image Sequences:</source>
+        <translation type="unfinished">规范化图像序列：</translation>
+    </message>
+    <message>
+        <source>Convert Imported NAA Image Sequences to TLV:</source>
+        <translation type="unfinished">转换导入的二值图像序列为TLV</translation>
+    </message>
+    <message>
+        <source>Use QuickTime to decode/code .mov and .3gp (If Installed)</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimize Savebox after Editing (Toonz Raster Level)</source>
+        <translation type="unfinished">编辑后最小化保存框（Toonz栅格层级）</translation>
+    </message>
+    <message>
+        <source>Define Filling Region Using both Lines and Areas</source>
+        <translation type="unfinished">使用线条和填充共同定义填充区域</translation>
+    </message>
+    <message>
+        <source>Paint Under Lines in Refer Fill</source>
+        <translation type="unfinished">参照填充时填充至线条底部</translation>
+    </message>
+    <message>
+        <source>Style Picker: Switch Current Level by Picking on Multi Layer</source>
+        <translation type="unfinished">样式拾取器：在多图层上拾取时切换至对应层级</translation>
+    </message>
+    <message>
+        <source>Brush Tool: Use %1 to Resize</source>
+        <translation type="unfinished">画笔工具：使用 %1 调整大小</translation>
+    </message>
+    <message>
+        <source>Draw Cursor at End of Stroke</source>
+        <translation type="unfinished">光标显示在线条末尾</translation>
+    </message>
+    <message>
+        <source>Geometric Tool: Click Twice to Create Arcs</source>
+        <translation type="unfinished">几何工具：两次点击以创建弧线</translation>
+    </message>
+    <message>
+        <source>Handle Size (%):</source>
+        <translation>控制柄大小 (%):</translation>
+    </message>
+    <message>
+        <source>Handle Color:</source>
+        <translation>控制柄颜色：</translation>
+    </message>
+    <message>
+        <source>Always Drag Frame Cell</source>
+        <translation type="unfinished">总是拖动数字帧格</translation>
+    </message>
+    <message>
+        <source>Cell Input Method:</source>
+        <translation type="unfinished">动画序号输入方法：</translation>
+    </message>
+    <message>
+        <source>Preview Movie Formats in Default System Viewer</source>
+        <translation type="unfinished">使用系统播放器预览视频格式</translation>
+    </message>
+    <message>
+        <source>Number of Frames to Play 
+for Short Play Command:</source>
+        <translation type="unfinished">短时播放命令的帧数：</translation>
+    </message>
+    <message>
+        <source>Always Open New Flipbook Window </source>
+        <translation type="unfinished">总是打开新的翻页书窗口</translation>
+    </message>
+    <message>
+        <source>Fit to Flipbook when Flipbook Window Open</source>
+        <translation type="unfinished">翻页书打开时，将视图适配到翻页书大小</translation>
+    </message>
+    <message>
+        <source>Ink Check Color:</source>
+        <translation type="unfinished">线条检查颜色</translation>
+    </message>
+    <message>
+        <source>Ink#1 Check Color:</source>
+        <translation type="unfinished">#1主线检查颜色</translation>
+    </message>
+    <message>
+        <source>Paint Check Color:</source>
+        <translation>当前样式填充检查颜色：</translation>
+    </message>
+    <message>
+        <source>Automatic by Scene</source>
+        <translation type="unfinished">根据场景自动设置</translation>
+    </message>
+    <message>
+        <source>Always ask before renaming</source>
+        <translation type="unfinished">总是在重命名前询问</translation>
+    </message>
+    <message>
+        <source>Normalize sequence names automatically</source>
+        <translation type="unfinished">自动重命名图像序列</translation>
+    </message>
+    <message>
+        <source>Keep original filenames</source>
+        <translation type="unfinished">保持原文件名</translation>
+    </message>
+    <message>
+        <source>Always ask before converting</source>
+        <translation type="unfinished">总是在转换前询问</translation>
+    </message>
+    <message>
+        <source>Convert raster level automatically</source>
+        <translation type="unfinished">自动转换栅格层级</translation>
+    </message>
+    <message>
+        <source>Do not convert</source>
+        <translation>不进行转换</translation>
+    </message>
+    <message>
+        <source>Input by Double Click Only</source>
+        <translation type="unfinished">仅双击输入</translation>
+    </message>
+    <message>
+        <source>Input by Numpad</source>
+        <translation type="unfinished">小键盘输入</translation>
+    </message>
+    <message>
+        <source>Input by Single Click</source>
+        <translation type="unfinished">单击输入</translation>
+    </message>
+    <message>
+        <source>Preview/Render</source>
+        <translation type="unfinished">预览/渲染</translation>
+    </message>
+    <message>
+        <source>Load/Import</source>
+        <translation type="unfinished">加载/导入</translation>
+    </message>
+    <message>
+        <source>Decoder/Encoder</source>
+        <translation type="unfinished">编解码器</translation>
+    </message>
+    <message>
+        <source>Vector Visualize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Addons</source>
+        <translation type="unfinished">插件</translation>
+    </message>
+    <message>
+        <source>Automatically sets folder based on scene type:
+Standalone -&gt; $scenefolder
+Project -&gt; project folder aliases (+drawing...)</source>
+        <translation type="unfinished">根据场景类型自动设置文件夹别名优先级：
+• 独立场景 → $scenefolder
+• 项目 → 项目文件夹别名（+drawing...）</translation>
+    </message>
+    <message>
+        <source>enabled</source>
+        <translation type="unfinished">已启用</translation>
+    </message>
+    <message>
+        <source>disabled</source>
+        <translation>已禁用</translation>
+    </message>
+    <message>
+        <source>rooms will load on demand</source>
+        <translation>工作区将按需加载</translation>
+    </message>
+    <message>
+        <source>all rooms load at startup</source>
+        <translation type="unfinished">所有工作区将在启动时加载</translation>
+    </message>
+    <message>
+        <source>Lazy loading %1 - %2</source>
+        <translation type="unfinished">延迟加载%1 - %2</translation>
+    </message>
+    <message>
+        <source>Default Level Size</source>
+        <translation type="unfinished">默认层级尺寸</translation>
+    </message>
+    <message>
+        <source>Fill Tool Options (Toonz Raster Level)</source>
+        <translation>填充工具选项（Toonz栅格层级）</translation>
+    </message>
+    <message>
+        <source>Brush Cursor Options</source>
+        <translation type="unfinished">画笔光标选项</translation>
+    </message>
+    <message>
+        <source>Animate Tool</source>
+        <translation type="unfinished">动画工具</translation>
+    </message>
+    <message>
+        <source>Xsheet Column Area</source>
+        <translation type="unfinished">摄影表头部区域</translation>
+    </message>
+    <message>
+        <source>Xsheet Cell Area</source>
+        <translation type="unfinished">摄影表帧格区域</translation>
+    </message>
+    <message>
+        <source>Viewer</source>
+        <translation type="unfinished">查看器</translation>
+    </message>
+    <message>
+        <source>Play Control</source>
+        <translation type="unfinished">播放控制</translation>
+    </message>
+    <message>
+        <source>Render</source>
+        <translation>渲染</translation>
+    </message>
+    <message>
+        <source>Ink and Paint Check</source>
+        <translation type="unfinished">当前样式线条/填充检查</translation>
+    </message>
+    <message>
+        <source>Windows Explorer Thumbnails (Shell Extension)</source>
+        <translation type="unfinished">Windows 资源管理器缩略图（Shell 扩展）</translation>
+    </message>
+    <message>
+        <source>Enable thumbnails for OpenToonz files (.tnz, .pli, .tlv) in Windows Explorer. 
+Administrator privileges are required; you may need to restart Explorer for changes to take effect.</source>
+        <translation type="unfinished">在 Windows 资源管理器中启用 OpenToonz 文件（.tnz、.pli、.tlv）的缩略图功能。
+需要管理员权限；可能需要重启资源管理器才能使更改生效。</translation>
+    </message>
+    <message>
+        <source>Uninstall</source>
+        <translation type="unfinished">卸载</translation>
+    </message>
+    <message>
+        <source>Install</source>
+        <translation type="unfinished">安装</translation>
     </message>
 </context>
 <context>
@@ -10468,6 +11182,21 @@ The behavior may be changed in the future development.</source>
     <message>
         <source>Priority</source>
         <translation>优先级</translation>
+    </message>
+</context>
+<context>
+    <name>PresetNamePopup</name>
+    <message>
+        <source>Enter Preset Name</source>
+        <translation type="unfinished">输入预设名称</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">确定</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">取消</translation>
     </message>
 </context>
 <context>
@@ -11212,11 +11941,11 @@ What do you want to do?</source>
     </message>
     <message>
         <source> Task added to the Batch Render List.</source>
-        <translation> 任务已添加到批处理渲染列表。</translation>
+        <translation type="vanished"> 任务已添加到批处理渲染列表。</translation>
     </message>
     <message>
         <source> Task added to the Batch Cleanup List.</source>
-        <translation> 任务已添加到批处理清稿列表。</translation>
+        <translation type="vanished"> 任务已添加到批处理清稿列表。</translation>
     </message>
     <message>
         <source>There are no assets to collect</source>
@@ -11224,7 +11953,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>One asset imported</source>
-        <translation>导入了 1 项素材</translation>
+        <translation type="vanished">导入了 1 项素材</translation>
     </message>
     <message>
         <source>%1 assets imported</source>
@@ -11232,7 +11961,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Converting %1 images to tlv format...</source>
-        <translation>%1 个图像正在转换为 TLV 格式...</translation>
+        <translation type="vanished">%1 个图像正在转换为 TLV 格式...</translation>
     </message>
     <message>
         <source>No scene imported</source>
@@ -11380,7 +12109,7 @@ Some levels have not been loaded because their version is not supported</source>
     </message>
     <message>
         <source>Save the scene first</source>
-        <translation>请先保存场景</translation>
+        <translation type="vanished">请先保存场景</translation>
     </message>
     <message>
         <source>It is not possible to load the %1 level.</source>
@@ -11568,7 +12297,7 @@ Some levels have not been loaded because their version is not supported</source>
     </message>
     <message>
         <source>There was an error saving the %1 scene.</source>
-        <translation>保存场景 %1 时发生错误。</translation>
+        <translation type="vanished">保存场景 %1 时发生错误。</translation>
     </message>
     <message>
         <source>It is not possible to export the scene %1 because it does not belong to any project.</source>
@@ -11986,11 +12715,11 @@ Are you sure to </source>
     </message>
     <message>
         <source>Paste  File  : </source>
-        <translation>粘贴文件 : </translation>
+        <translation type="vanished">粘贴文件 : </translation>
     </message>
     <message>
         <source>Duplicate  File  : </source>
-        <translation>复制文件 : </translation>
+        <translation type="vanished">复制文件 : </translation>
     </message>
     <message>
         <source>Paste Cells</source>
@@ -12462,7 +13191,7 @@ Allow duplicate?</source>
     </message>
     <message>
         <source>A separation task is in progress! wait until it stops or cancel it</source>
-        <translation>已有分色任务进行中！等待它完成或者取消它</translation>
+        <translation type="vanished">已有分色任务进行中！等待它完成或者取消它</translation>
     </message>
     <message>
         <source>Duplicate Frame in XSheet</source>
@@ -12681,7 +13410,7 @@ to use the duplicate command in the xsheet / timeline.</source>
     </message>
     <message>
         <source>Unsopporter raster format, cannot save</source>
-        <translation>不支持的光栅格式，不能保存</translation>
+        <translation type="vanished">不支持的光栅格式，不能保存</translation>
     </message>
     <message>
         <source>Cannot create %1 : %2</source>
@@ -12843,7 +13572,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Group strokes by vector levels?</source>
-        <translation>按矢量层级成组描绘</translation>
+        <translation>按矢量层级成组线条？</translation>
     </message>
     <message>
         <source>Merge Vector Levels</source>
@@ -13085,7 +13814,7 @@ Do you wish to continue loading the last good save or stop and try to salvage th
     </message>
     <message>
         <source>A conversion task is in progress! wait until it stops or cancel it</source>
-        <translation>一项转换任务正在进行中!等待它完成或者取消它</translation>
+        <translation type="vanished">一项转换任务正在进行中!等待它完成或者取消它</translation>
     </message>
     <message>
         <source>None</source>
@@ -13247,101 +13976,387 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Keyframe Symbol:</source>
-        <translation type="unfinished"></translation>
+        <translation>关键张符号：</translation>
     </message>
     <message>
         <source>Reference Frame Symbol:</source>
-        <translation type="unfinished"></translation>
+        <translation>参考张符号：</translation>
     </message>
     <message>
         <source>Unable to create OCA folder.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法创建OCA文件夹。</translation>
     </message>
     <message>
         <source>Unable to open OCA file for saving.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法保存OCA文件</translation>
     </message>
     <message>
         <source>Unable to create folder for saving layers.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法创建文件夹以保存图层。</translation>
     </message>
     <message>
         <source>Import Open Cel Animation (OCA)</source>
-        <translation type="unfinished"></translation>
+        <translation>导入开放赛璐珞动画格式（OCA）</translation>
     </message>
     <message>
         <source>OCA Import cancelled : empty filepath.</source>
-        <translation type="unfinished"></translation>
+        <translation>OCA导入被取消：空的文件路径</translation>
     </message>
     <message>
         <source>OCA Import file : %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OCA导入文件 %1</translation>
     </message>
     <message>
         <source>Do you want to import or load image files from their original location?</source>
-        <translation type="unfinished"></translation>
+        <translation>是否需要从原位置导入/加载图像文件？</translation>
     </message>
     <message>
         <source>Failed to load OCA file: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>加载OCA文件失败：%1</translation>
     </message>
     <message>
         <source>Unable to open OCA file for loading.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法加载OCA文件</translation>
     </message>
     <message>
         <source>Reading OCA file: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>读取OCA文件：%1</translation>
     </message>
     <message>
         <source>Parse error at %1 while loading OCA file.</source>
-        <translation type="unfinished"></translation>
+        <translation>加载OCA文件时，在%1行遇到语法错误。</translation>
     </message>
     <message>
         <source>Blending mode &apos;%1&apos; not implemented for %2 &apos;%3&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>混合模式%1在%2&apos;%3未实现</translation>
     </message>
     <message>
         <source>Skipped %1 &apos;%2&apos;. No image file indicated.</source>
-        <translation type="unfinished"></translation>
+        <translation>跳过 %1 &apos;%2&apos;. 未指定图像文件。</translation>
     </message>
     <message>
         <source>Unable to load images for %1 &apos;%2&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法加载图像：%1 %2。</translation>
     </message>
     <message>
         <source>Sub-layers in grouplayer &apos;%1&apos; will be imported without grouping.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">分组&quot;%1&quot;中的子图层在导入时不会保持。</translation>
     </message>
     <message>
         <source>Skipping unimplemented %1 &apos;%2&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">跳过未实现的：%1 %2</translation>
     </message>
     <message>
         <source>Ignore all future warnings and errors.</source>
-        <translation type="unfinished"></translation>
+        <translation>忽略之后所有的警告与错误</translation>
     </message>
     <message>
         <source>Inbetween Symbol1 (O):</source>
-        <translation type="unfinished"></translation>
+        <translation>中割符号1（O）：</translation>
     </message>
     <message>
         <source>Inbetween Symbol2 (*):</source>
-        <translation type="unfinished"></translation>
+        <translation>中割符号2（*）：</translation>
     </message>
     <message>
         <source>The visibility toggles of following columns are modified 
 due to &quot;Unify Preview and Camstand Visibility Toggles&quot; preference option : 
   %1</source>
-        <translation type="unfinished"></translation>
+        <translation>由于“合并图层预览与相机可见性按钮”首选项，图层可见性按钮已被更改
+%1</translation>
     </message>
     <message>
         <source>Cell marks for XDTS symbols</source>
-        <translation type="unfinished"></translation>
+        <translation>XDTS的帧标记符号</translation>
     </message>
     <message>
         <source>The Keyframe and the Reference Frame symbols will be exported in an unofficial format,
 which may not be displayed correctly or may cause errors in applications other than XDTS Viewer.</source>
+        <translation>关键帧与参考帧标记会以非官方格式导出，可能导致除XDTS Viewer以外的软件内的显示异常或错误。</translation>
+    </message>
+    <message>
+        <source>Error while loading SXF scene: %1</source>
+        <translation>加载SXF场景时遇到错误：%1</translation>
+    </message>
+    <message>
+        <source>SXF data has no frames to import.</source>
+        <translation>SXF数据中没有可供导入的帧数据。</translation>
+    </message>
+    <message>
+        <source>Import SXF Area</source>
+        <translation>导入SXF区域（表）</translation>
+    </message>
+    <message>
+        <source>ACTION</source>
+        <translation>原画</translation>
+    </message>
+    <message>
+        <source>CELL</source>
+        <translation>帧格</translation>
+    </message>
+    <message>
+        <source>Current XSheet is emepty.</source>
+        <translation>当前摄影表为空。</translation>
+    </message>
+    <message>
+        <source>ACTION &amp; CELL</source>
+        <translation>原画 &amp; 动画</translation>
+    </message>
+    <message>
+        <source>Direction</source>
+        <translation>方向</translation>
+    </message>
+    <message>
+        <source>Enter text here...
+Supports multiple lines</source>
+        <translation>在此输入备注：
+支持多行</translation>
+    </message>
+    <message>
+        <source>Large Font</source>
+        <translation>大字体</translation>
+    </message>
+    <message>
+        <source>Text Encoding:</source>
+        <translation>文本编码：</translation>
+    </message>
+    <message>
+        <source>Cell marks for SXF symbols</source>
+        <translation>SXF的帧标记符号</translation>
+    </message>
+    <message>
+        <source>Inbetween Symbol1 (○)</source>
+        <translation>中割符号1（○）</translation>
+    </message>
+    <message>
+        <source>Inbetween Symbol2 (●):</source>
+        <translation>中割符号2（●）：</translation>
+    </message>
+    <message>
+        <source>Target Column:</source>
+        <translation>目标列：</translation>
+    </message>
+    <message>
+        <source>Export Area:</source>
+        <translation>导出区域（表）：</translation>
+    </message>
+    <message>
+        <source>Export SXF File</source>
+        <translation>导出SXF数字律表</translation>
+    </message>
+    <message>
+        <source>Failed to export SXF file.%1</source>
+        <translation>导出SXF文件失败：%1</translation>
+    </message>
+    <message>
+        <source>Cannot clear: level is read-only or no level is selected.</source>
+        <translation>无法清除：层级只读或无选中的层级</translation>
+    </message>
+    <message>
+        <source>No frame to clear.</source>
+        <translation>无可清空的帧</translation>
+    </message>
+    <message>
+        <source>Add separator for Frames</source>
+        <translation>为序列增加分隔符</translation>
+    </message>
+    <message>
+        <source>It is not possible to load the scene %1 because it does not belong to any project.
+Please delete scenes.xml if this scene dones&apos;t belong to any project.</source>
+        <translation>由于找不到其所在的项目，无法加载场景%1。
+请删除scenes.xml如果该场景不属于任何项目。</translation>
+    </message>
+    <message>
+        <source>There were problems loading the scene %1.
+Details:
+
+%2</source>
+        <translation>加载场景时遇到错误：%1
+详情：
+
+%2</translation>
+    </message>
+    <message>
+        <source>%1
+
+is an image sequence that can be converted into a TLV format 
+Would you like to convert it?</source>
+        <translation>%1
+
+是一个图像序列，且可以被转换为TLV格式
+是否进行转换？</translation>
+    </message>
+    <message>
+        <source>No, use as is</source>
+        <translation>不，保持原样</translation>
+    </message>
+    <message>
+        <source>Image sequence detected, but the filenames are missing a separator: 
+OpenToonz requires a separator (such as an underscore (_) or dot (.) 
+between the name and the frame number to recognize sequences properly.
+Example: A0001.png → A.0001.png
+
+Would you like OpenToonz to automatically add a dot to fix the sequence format?
+
+%1 (and similar files)</source>
+        <translation>检测到图像序列，但文件名中缺失分隔符：
+为正确识别图像序列，OpenToonz需要文件名中序号分隔符，例如下划线(_)或小数点(.)。
+例如：A0001.png → A.0001.png
+
+你需要OpenToonz自动重命名图像文件，添加小数点分隔符吗？
+
+%1 (以及其他相似的文件）</translation>
+    </message>
+    <message>
+        <source>Yes, add dot</source>
+        <translation>是，添加点分隔符</translation>
+    </message>
+    <message>
+        <source>No, treat as single frame</source>
+        <translation>不，视作单张图像</translation>
+    </message>
+    <message>
+        <source>Hide Viewer Indicators</source>
+        <translation>隐藏查看器检查模式提示</translation>
+    </message>
+    <message>
+        <source>Show Viewer Indicators</source>
+        <translation>显示查看器检查模式提示</translation>
+    </message>
+    <message>
+        <source>Create Level %1 at Column %2</source>
+        <translation>在列（图层）%1创建层级%1</translation>
+    </message>
+    <message>
+        <source>Paste File: </source>
+        <translation>粘贴文件：</translation>
+    </message>
+    <message>
+        <source>Duplicate File: </source>
+        <translation>重复文件：</translation>
+    </message>
+    <message>
+        <source>Task added to the Batch Render List.</source>
+        <translation>任务已被添加至渲染任务列表。</translation>
+    </message>
+    <message>
+        <source>Task added to the Batch Cleanup List.</source>
+        <translation>任务已被添加至清稿任务列表。</translation>
+    </message>
+    <message>
+        <source>Deleting folder %1. Are you sure?</source>
+        <translation>即将删除文件夹 %1。确认要这么做？</translation>
+    </message>
+    <message>
+        <source>A conversion task is in progress! Wait until it stops or cancel it.</source>
+        <translation>一项转换任务正在进行中！请等待其完成或终止任务。</translation>
+    </message>
+    <message>
+        <source>Error loading scene %1 : %2</source>
+        <translation>加载场景时遇到错误%1：%2</translation>
+    </message>
+    <message>
+        <source>Error saving scene %1</source>
+        <translation>保存场景时遇到错误：%1</translation>
+    </message>
+    <message>
+        <source>A separation task is in progress! Wait until it stops or cancel it.</source>
+        <translation type="unfinished">一项分离任务正在进行中！请等待其完成或终止任务。</translation>
+    </message>
+    <message>
+        <source>Cannot paste into the camera column.</source>
+        <translation>无法粘贴至摄像机列（图层）</translation>
+    </message>
+    <message>
+        <source>Brush Presets</source>
+        <translation>笔刷预设</translation>
+    </message>
+    <message>
+        <source>Tool Properties</source>
+        <translation>工具属性</translation>
+    </message>
+    <message>
+        <source>Fx Browser</source>
+        <translation>特效浏览器</translation>
+    </message>
+    <message>
+        <source>Locator</source>
+        <translation>定位器</translation>
+    </message>
+    <message>
+        <source>The specified name is already assigned to the folder.</source>
+        <translation>指定的名字已被分配给当前目录</translation>
+    </message>
+    <message>
+        <source>Unsupported raster format, cannot save</source>
+        <translation>无法保存，不支持的栅格格式</translation>
+    </message>
+    <message>
+        <source>Bind to Current Room</source>
+        <translation>绑定至当前工作区</translation>
+    </message>
+    <message>
+        <source>Converting %1 to tlv format...</source>
+        <translation>将%1转换为tlv格式...</translation>
+    </message>
+    <message>
+        <source>Task added to the Batch Cleanup List.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deleting folder %1. Are you sure?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A conversion task is in progress! Wait until it stops or cancel it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error loading scene %1 : %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error saving scene %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A separation task is in progress! Wait until it stops or cancel it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot paste into the camera column.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brush Presets</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tool Properties</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fx Browser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Locator</source>
+        <translation type="unfinished">定位器</translation>
+    </message>
+    <message>
+        <source>The specified name is already assigned to the folder.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsupported raster format, cannot save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bind to Current Room</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Converting %1 to tlv format...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -13417,6 +14432,14 @@ which may not be displayed correctly or may cause errors in applications other t
     <message>
         <source>The file name cannot be empty or contain any of the following characters:(new line)  \ / : * ? &quot;  |</source>
         <translation>文件名不能为空或能包含如下的任一字符:(new line)  \ / : * ?&quot;  |</translation>
+    </message>
+    <message>
+        <source>Renaming Folder </source>
+        <translation>重命名文件夹。</translation>
+    </message>
+    <message>
+        <source>Folder Name:</source>
+        <translation>文件夹名：</translation>
     </message>
 </context>
 <context>
@@ -13529,6 +14552,24 @@ These levels can&apos;t be exported with this tool.</source>
         <source>Nothing to replace: no cells or columns selected.</source>
         <translation type="vanished">没有可替换的: 没有帧格或者列被选中。</translation>
     </message>
+    <message>
+        <source>The level paths have been replaced as follows:
+
+</source>
+        <translation>层级目录将被替换为以下路径：
+</translation>
+    </message>
+    <message>
+        <source>%1 : No change was made.
+</source>
+        <translation>%1 没有发生改动。</translation>
+    </message>
+    <message>
+        <source>%1 : %2 -&gt; %3
+</source>
+        <translation>%1 ：%2 -&gt; %3
+</translation>
+    </message>
 </context>
 <context>
     <name>RoomTabWidget</name>
@@ -13607,7 +14648,7 @@ These levels can&apos;t be exported with this tool.</source>
     <name>SVNCommitDialog</name>
     <message>
         <source>Version Control: Put changes</source>
-        <translation>版本控制: 放置更改</translation>
+        <translation type="vanished">版本控制: 放置更改</translation>
     </message>
     <message>
         <source>Select / Deselect All</source>
@@ -13627,11 +14668,11 @@ These levels can&apos;t be exported with this tool.</source>
     </message>
     <message>
         <source>Put Scene Contents</source>
-        <translation>放置场景内容</translation>
+        <translation type="vanished">放置场景内容</translation>
     </message>
     <message>
         <source>Put</source>
-        <translation>放置</translation>
+        <translation type="vanished">放置</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -13643,7 +14684,7 @@ These levels can&apos;t be exported with this tool.</source>
     </message>
     <message>
         <source>Set needs-lock property...</source>
-        <translation>设置 needs-lock 属性...</translation>
+        <translation type="vanished">设置 needs-lock 属性...</translation>
     </message>
     <message>
         <source>Committing %1 items...</source>
@@ -13651,19 +14692,19 @@ These levels can&apos;t be exported with this tool.</source>
     </message>
     <message>
         <source>Put done successfully.</source>
-        <translation>放置成功完成。</translation>
+        <translation type="vanished">放置成功完成。</translation>
     </message>
     <message>
         <source>Putting %1 items...</source>
-        <translation>正在放置 %1 个项目...</translation>
+        <translation type="vanished">正在放置 %1 个项目...</translation>
     </message>
     <message>
         <source>No items to put.</source>
-        <translation>没有项目可放置。</translation>
+        <translation type="vanished">没有项目可放置。</translation>
     </message>
     <message>
         <source>%1 items to put.</source>
-        <translation>共 %1 个项目可放置。</translation>
+        <translation type="vanished">共 %1 个项目可放置。</translation>
     </message>
     <message>
         <source>%1 Selected / %2 Total</source>
@@ -13673,12 +14714,40 @@ These levels can&apos;t be exported with this tool.</source>
         <source>Close</source>
         <translation>关闭</translation>
     </message>
+    <message>
+        <source>Version Control: Commit changes</source>
+        <translation>版本控制：提交修改</translation>
+    </message>
+    <message>
+        <source>Commit Scene Contents</source>
+        <translation>提交场景相关内容</translation>
+    </message>
+    <message>
+        <source>Commit</source>
+        <translation>提交</translation>
+    </message>
+    <message>
+        <source>Setting needs-lock property...</source>
+        <translation>正在设置 needs-lock （需要获取锁）属性...</translation>
+    </message>
+    <message>
+        <source>Commit completed successfully.</source>
+        <translation>提交成功。</translation>
+    </message>
+    <message>
+        <source>No items to commit.</source>
+        <translation>无可提交的项目。</translation>
+    </message>
+    <message>
+        <source>%1 items to commit.</source>
+        <translation>有%1 项待提交。</translation>
+    </message>
 </context>
 <context>
     <name>SVNCommitFrameRangeDialog</name>
     <message>
         <source>Version Control: Put</source>
-        <translation>版本控制: 放置</translation>
+        <translation type="vanished">版本控制: 放置</translation>
     </message>
     <message>
         <source>Note: the file will be updated too.</source>
@@ -13690,7 +14759,7 @@ These levels can&apos;t be exported with this tool.</source>
     </message>
     <message>
         <source>Put</source>
-        <translation>放置</translation>
+        <translation type="vanished">放置</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -13698,7 +14767,7 @@ These levels can&apos;t be exported with this tool.</source>
     </message>
     <message>
         <source>Put done successfully.</source>
-        <translation>放置成功完成。</translation>
+        <translation type="vanished">放置成功完成。</translation>
     </message>
     <message>
         <source>Locking file...</source>
@@ -13718,7 +14787,7 @@ These levels can&apos;t be exported with this tool.</source>
     </message>
     <message>
         <source>Putting changes...</source>
-        <translation>正在放置更改...</translation>
+        <translation type="vanished">正在放置更改...</translation>
     </message>
     <message>
         <source>Updating file...</source>
@@ -13731,6 +14800,33 @@ These levels can&apos;t be exported with this tool.</source>
     <message>
         <source>Setting the needs-lock property to hook file...</source>
         <translation>正在设置 needs-lock 属性到钩子文件...</translation>
+    </message>
+    <message>
+        <source>Version Control: Commit Frame Range</source>
+        <translation type="unfinished">版本控制：提交帧范围</translation>
+    </message>
+    <message>
+        <source>Commit</source>
+        <translation>提交</translation>
+    </message>
+    <message>
+        <source>Commit completed successfully.</source>
+        <translation>提交成功。</translation>
+    </message>
+    <message>
+        <source>Committing changes...</source>
+        <translation>提交修改中...</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>关闭</translation>
+    </message>
+</context>
+<context>
+    <name>SVNConfigWriter</name>
+    <message>
+        <source>Select</source>
+        <translation>选择</translation>
     </message>
 </context>
 <context>
@@ -14083,6 +15179,10 @@ These levels can&apos;t be exported with this tool.</source>
         <source>Revert done successfully.</source>
         <translation>复原成功完成。</translation>
     </message>
+    <message>
+        <source>Close</source>
+        <translation>关闭</translation>
+    </message>
 </context>
 <context>
     <name>SVNRevertFrameRangeDialog</name>
@@ -14117,6 +15217,10 @@ These levels can&apos;t be exported with this tool.</source>
     <message>
         <source>It is not possible to revert the file.</source>
         <translation>无法复原该文件。</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>关闭</translation>
     </message>
 </context>
 <context>
@@ -14369,6 +15473,13 @@ Please commit or revert changes first.</source>
     </message>
 </context>
 <context>
+    <name>SaveBoardImagePopup</name>
+    <message>
+        <source>Export Board Image</source>
+        <translation>导出场记板</translation>
+    </message>
+</context>
+<context>
     <name>SaveBoardPresetFilePopup</name>
     <message>
         <source>Save Clapperboard Settings As Preset</source>
@@ -14607,11 +15718,11 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Convert to Painted TLV</source>
-        <translation>转换为已上色的 TLV</translation>
+        <translation type="vanished">转换为已上色的 TLV</translation>
     </message>
     <message>
         <source>Convert to Unpainted TLV</source>
-        <translation>转换为未上色的 TLV</translation>
+        <translation type="vanished">转换为未上色的 TLV</translation>
     </message>
     <message>
         <source>Version Control</source>
@@ -14675,31 +15786,31 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Convert To Unpainted Tlv</source>
-        <translation>转换为未上色的 TLV</translation>
+        <translation type="vanished">转换为未上色的 TLV</translation>
     </message>
     <message>
         <source>Warning: level %1 already exists; overwrite?</source>
-        <translation>警告：层级 %1 已经存在，要覆盖它吗？</translation>
+        <translation type="vanished">警告：层级 %1 已经存在，要覆盖它吗？</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation>是</translation>
+        <translation type="vanished">是</translation>
     </message>
     <message>
         <source>No</source>
-        <translation>否</translation>
+        <translation type="vanished">否</translation>
     </message>
     <message>
         <source>Done: All Levels  converted to TLV Format</source>
-        <translation>完成：所有层级已转换为 TLV 格式</translation>
+        <translation type="vanished">完成：所有层级已转换为 TLV 格式</translation>
     </message>
     <message>
         <source>Convert To Painted Tlv</source>
-        <translation>转换为已上色的 TLV</translation>
+        <translation type="vanished">转换为已上色的 TLV</translation>
     </message>
     <message>
         <source>Done: 2 Levels  converted to TLV Format</source>
-        <translation>完成：2 个层级已转换为 TLV 格式</translation>
+        <translation type="vanished">完成：2 个层级已转换为 TLV 格式</translation>
     </message>
     <message>
         <source>New Folder</source>
@@ -14817,6 +15928,92 @@ Please commit or revert changes first.</source>
     </message>
 </context>
 <context>
+    <name>SceneViewer</name>
+    <message>
+        <source>FROZEN</source>
+        <translation>冻结</translation>
+    </message>
+    <message>
+        <source>Motion Path Selected</source>
+        <translation>运动路径已选择</translation>
+    </message>
+    <message>
+        <source>Transparency Check</source>
+        <translation>透明度检查</translation>
+    </message>
+    <message>
+        <source>Ink Check</source>
+        <translation>当前样式线条检查</translation>
+    </message>
+    <message>
+        <source>Ink#1 Check</source>
+        <translation>#1主线检查</translation>
+    </message>
+    <message>
+        <source>Paint Check</source>
+        <translation>当前样式填充检查</translation>
+    </message>
+    <message>
+        <source>Inks Only Check</source>
+        <translation>线条检查</translation>
+    </message>
+    <message>
+        <source>Black BG Check</source>
+        <translation>黑背景检查</translation>
+    </message>
+    <message>
+        <source>Fill Check</source>
+        <translation>填充检查</translation>
+    </message>
+    <message>
+        <source>Gap Check</source>
+        <translation>间隙检查</translation>
+    </message>
+</context>
+<context>
+    <name>SceneViewer</name>
+    <message>
+        <source>FROZEN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion Path Selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transparency Check</source>
+        <translation type="unfinished">透明度检查</translation>
+    </message>
+    <message>
+        <source>Ink Check</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ink#1 Check</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paint Check</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inks Only Check</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Black BG Check</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fill Check</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gap Check</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>SceneViewerContextMenu</name>
     <message>
         <source>Swap Compared Images</source>
@@ -14929,6 +16126,10 @@ Please commit or revert changes first.</source>
     <message>
         <source>Ease In/Out Interpolation</source>
         <translation>缓入/缓出插值</translation>
+    </message>
+    <message>
+        <source>Rotate View</source>
+        <translation>旋转视图</translation>
     </message>
 </context>
 <context>
@@ -15413,6 +16614,22 @@ Please commit or revert changes first.</source>
         <source>Advanced</source>
         <translation>高级</translation>
     </message>
+    <message>
+        <source>Custom Panels</source>
+        <translation>自定义面板</translation>
+    </message>
+    <message>
+        <source>Brush Presets</source>
+        <translation>笔刷预设</translation>
+    </message>
+    <message>
+        <source>Brush Sizes</source>
+        <translation>笔刷大小</translation>
+    </message>
+    <message>
+        <source>Special Modifier Keys</source>
+        <translation type="unfinished">特殊修饰键</translation>
+    </message>
 </context>
 <context>
     <name>ShortcutViewer</name>
@@ -15433,12 +16650,13 @@ Assign to &apos;%3&apos;?</source>
     <message>
         <source>&apos;%1&apos; is already assigned to &apos;%2&apos;
 Assign to &apos;%3&apos;?</source>
-        <translation type="unfinished"></translation>
+        <translation>快捷键 %1 已被 %2 占用。
+是否分配给 %3？</translation>
     </message>
     <message>
         <source>Initial sequence &apos;%1&apos; is assigned to &apos;%2&apos; which takes priority.
 Assign shortcut sequence anyway?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">初始按键序列 %1 已分配给优先度更高的 %2。是否仍要分配该快捷键？</translation>
     </message>
 </context>
 <context>
@@ -16610,6 +17828,13 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
 </context>
 <context>
+    <name>TPanel</name>
+    <message>
+        <source>Bind to Current Room</source>
+        <translation>绑定到当前工作区</translation>
+    </message>
+</context>
+<context>
     <name>TPanelTitleBarButtonForPreview</name>
     <message>
         <source>Current frame</source>
@@ -16978,6 +18203,300 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
 </context>
 <context>
+    <name>ToolPropertiesPanel</name>
+    <message>
+        <source>Tool Properties</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tool Properties - %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Properties for Fill tool - Coming soon!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Properties for Eraser tool - Coming soon!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Properties for this tool - Coming soon!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished">大小</translation>
+    </message>
+    <message>
+        <source>Hardness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Opacity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lock Alpha</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pencil Mode</source>
+        <translation type="unfinished">铅笔模式</translation>
+    </message>
+    <message>
+        <source>Draw Order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Join</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smooth</source>
+        <translation type="unfinished">平滑</translation>
+    </message>
+    <message>
+        <source>Assistants</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Accuracy</source>
+        <translation type="unfinished">精度</translation>
+    </message>
+    <message>
+        <source>Break Angles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frame Range</source>
+        <translation type="unfinished">帧范围</translation>
+    </message>
+    <message>
+        <source>Snap</source>
+        <translation type="unfinished">吸附</translation>
+    </message>
+    <message>
+        <source>Sensitivity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Miter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modifier Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modifier Opacity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Eraser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Min</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Min:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GUI Show / Hide</source>
+        <translation type="unfinished">显示/隐藏界面</translation>
+    </message>
+    <message>
+        <source>Single Slider (Max Only)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Labels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Numeric Fields</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cell Borders</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cell Backgrounds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Icons</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ToolPropertiesPanel</name>
+    <message>
+        <source>Tool Properties</source>
+        <translation>工具属性</translation>
+    </message>
+    <message>
+        <source>Tool Properties - %1</source>
+        <translation>工具属性 - %1</translation>
+    </message>
+    <message>
+        <source>Properties for Fill tool - Coming soon!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Properties for Eraser tool - Coming soon!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Properties for this tool - Coming soon!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>大小</translation>
+    </message>
+    <message>
+        <source>Hardness</source>
+        <translation>硬度</translation>
+    </message>
+    <message>
+        <source>Opacity</source>
+        <translation>不透明度</translation>
+    </message>
+    <message>
+        <source>Lock Alpha</source>
+        <translation>锁定透明度</translation>
+    </message>
+    <message>
+        <source>Pencil Mode</source>
+        <translation>铅笔模式</translation>
+    </message>
+    <message>
+        <source>Draw Order</source>
+        <translation>绘制顺序</translation>
+    </message>
+    <message>
+        <source>Cap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Join</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smooth</source>
+        <translation>平滑</translation>
+    </message>
+    <message>
+        <source>Assistants</source>
+        <translation type="unfinished">辅助绘图</translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation>压感</translation>
+    </message>
+    <message>
+        <source>Accuracy</source>
+        <translation>精度</translation>
+    </message>
+    <message>
+        <source>Break Angles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frame Range</source>
+        <translation>帧范围</translation>
+    </message>
+    <message>
+        <source>Snap</source>
+        <translation>吸附</translation>
+    </message>
+    <message>
+        <source>Sensitivity</source>
+        <translation>敏感度</translation>
+    </message>
+    <message>
+        <source>Miter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modifier Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modifier Opacity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Eraser</source>
+        <translation>橡皮擦</translation>
+    </message>
+    <message>
+        <source>Min</source>
+        <translation>最小</translation>
+    </message>
+    <message>
+        <source>Max</source>
+        <translation>最大：</translation>
+    </message>
+    <message>
+        <source>Min:</source>
+        <translation>最小：</translation>
+    </message>
+    <message>
+        <source>Max:</source>
+        <translation>最大：</translation>
+    </message>
+    <message>
+        <source>GUI Show / Hide</source>
+        <translation>显示/隐藏界面</translation>
+    </message>
+    <message>
+        <source>Single Slider (Max Only)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Labels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Numeric Fields</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cell Borders</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cell Backgrounds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Icons</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Toolbar</name>
     <message>
         <source>Collapse toolbar</source>
@@ -17320,7 +18839,7 @@ Please refer to the user guide for details.</source>
     <name>XDTSImportPopup</name>
     <message>
         <source>Importing XDTS file %1</source>
-        <translation>导入 XDTS 文件 %1</translation>
+        <translation type="vanished">导入 XDTS 文件 %1</translation>
     </message>
     <message>
         <source>Load</source>
@@ -17363,16 +18882,75 @@ Please refer to the user guide for details.</source>
         <translation type="vanished">用于过渡帧符号2的帧格标记 (*)</translation>
     </message>
     <message>
-        <source>Cell marks for XDTS symbols</source>
-        <translation type="unfinished"></translation>
+        <source>Importing %1 file %2</source>
+        <translation>导入 %1 文件 %2</translation>
     </message>
     <message>
-        <source>Inbetween Symbol1 (O):</source>
-        <translation type="unfinished"></translation>
+        <source>Rename Image Sequence</source>
+        <translation>重命名图像序列</translation>
     </message>
     <message>
-        <source>Inbetween Symbol2 (*)</source>
-        <translation type="unfinished"></translation>
+        <source>Do not Convert</source>
+        <translation>不进行转换</translation>
+    </message>
+    <message>
+        <source>Convert Every Level with Settings Popup</source>
+        <translation>单独转换每个层级（弹窗）</translation>
+    </message>
+    <message>
+        <source>Convert Unpainted Aliasing Raster(Inks Only)</source>
+        <translation>转换未填色的栅格图像（仅有线条）</translation>
+    </message>
+    <message>
+        <source>Append Default Palette</source>
+        <translation>添加默认调色板</translation>
+    </message>
+    <message>
+        <source>When activated, styles of the default palette
+($TOONZSTUDIOPALETTE\Global Palettes\Default Palettes\Cleanup_Palette.tpl) will 
+be appended to the palette after conversion</source>
+        <translation>启用该选项时，转换完成后将自动附件默认调色板
+($TOONZSTUDIOPALETTE\cleanup_default.tpl)的样式到调色板中。</translation>
+    </message>
+    <message>
+        <source>Image DPI</source>
+        <translation>图像 DPI</translation>
+    </message>
+    <message>
+        <source>Current Camera DPI</source>
+        <translation>当前摄影机 DPI</translation>
+    </message>
+    <message>
+        <source>Custom DPI</source>
+        <translation>定制 DPI</translation>
+    </message>
+    <message>
+        <source>DPI:</source>
+        <translation>DPI:</translation>
+    </message>
+    <message>
+        <source>Cell marks for %1 symbols</source>
+        <translation>符号%1的帧标记</translation>
+    </message>
+    <message>
+        <source>Inbetween Symbol1 (%1):</source>
+        <translation>中割符号1（%1）：</translation>
+    </message>
+    <message>
+        <source>Inbetween Symbol2 (%1):</source>
+        <translation>中割符号2（%1）：</translation>
+    </message>
+    <message>
+        <source>Keyframe Symbol:</source>
+        <translation>关键张符号：</translation>
+    </message>
+    <message>
+        <source>Reference Frame Symbol:</source>
+        <translation>参考张符号：</translation>
+    </message>
+    <message>
+        <source>Convert Raster to TLV : </source>
+        <translation>转换栅格图像至TLV：</translation>
     </message>
 </context>
 <context>
@@ -17391,11 +18969,11 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Main</source>
-        <translation type="unfinished">主</translation>
+        <translation>根摄影表</translation>
     </message>
     <message>
         <source>Xsheet Depth:</source>
-        <translation type="unfinished"></translation>
+        <translation>子摄影表深度</translation>
     </message>
 </context>
 <context>
@@ -17649,6 +19227,14 @@ Please refer to the user guide for details.</source>
     <message>
         <source>Click to select parent object</source>
         <translation>大家选择父级物件</translation>
+    </message>
+    <message>
+        <source>Show Column Parent Colors</source>
+        <translation>显示父列颜色</translation>
+    </message>
+    <message>
+        <source>Show the column parent&apos;s color in the Xsheet</source>
+        <translation>在摄影表头显示父列的颜色</translation>
     </message>
 </context>
 <context>

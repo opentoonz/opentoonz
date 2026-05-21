@@ -58,7 +58,7 @@
     </message>
     <message>
         <source>%1 is not a valid color (valid color names are &apos;red&apos;, &apos;transparent&apos;, &apos;#FF8800&apos;, ecc.)</source>
-        <translation>%1 n&apos;est pas une couleur valide (les noms de couleur valides sont «&#xa0;red&#xa0;», «&#xa0;transparent&#xa0;», «&#xa0;#FF8800&#xa0;», etc.)</translation>
+        <translation type="vanished">%1 n&apos;est pas une couleur valide (les noms de couleur valides sont «&#xa0;red&#xa0;», «&#xa0;transparent&#xa0;», «&#xa0;#FF8800&#xa0;», etc.)</translation>
     </message>
     <message>
         <source>Vectorization failed</source>
@@ -499,6 +499,14 @@
         <comment>TextureStyleChooserPage</comment>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Set Current Style from #%1 to %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 is not a valid color (valid color names are &apos;red&apos;, &apos;transparent&apos;, &apos;#FF8800&apos;, etc.)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TScriptBinding::CenterlineVectorizer</name>
@@ -616,11 +624,11 @@
     </message>
     <message>
         <source>Unrecognized file type :</source>
-        <translation>Type de fichier non reconnu :</translation>
+        <translation type="vanished">Type de fichier non reconnu :</translation>
     </message>
     <message>
         <source>Can&apos;t save a %1 level to this file type : %2</source>
-        <translation>Impossible d&apos;enregistrer un niveau %1 vers ce type de fichier : %2</translation>
+        <translation type="vanished">Impossible d&apos;enregistrer un niveau %1 vers ce type de fichier : %2</translation>
     </message>
     <message>
         <source>Exception writing %1</source>
@@ -640,11 +648,31 @@
     </message>
     <message>
         <source>can not insert a %1 image into a level</source>
-        <translation>impossible d&apos;insérer une image %1 dans un niveau</translation>
+        <translation type="vanished">impossible d&apos;insérer une image %1 dans un niveau</translation>
     </message>
     <message>
         <source>can not insert a %1 image to a %2 level</source>
-        <translation>impossible d&apos;insérer une image %1 dans un niveau %2</translation>
+        <translation type="vanished">impossible d&apos;insérer une image %1 dans un niveau %2</translation>
+    </message>
+    <message>
+        <source>Cannot set path on empty level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unrecognized file type: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can&apos;t save a %1 level to this file type: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cannot insert a %1 image into a level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cannot insert a %1 image to a %2 level</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -667,7 +695,11 @@
     </message>
     <message>
         <source>Invalid color : </source>
-        <translation>Couleur invalide : </translation>
+        <translation type="vanished">Couleur invalide : </translation>
+    </message>
+    <message>
+        <source>Invalid color: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

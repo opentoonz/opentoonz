@@ -111,11 +111,13 @@ elseif(BUILD_TARGET_UNIX)
     )
 endif()
 
+add_library(image SHARED ${HEADERS} ${SOURCES})
+
 if(WITH_TRANSLATION)
     add_translation(image ${HEADERS} ${SOURCES})
+    add_compile_translations_command(image image)
 endif()
 
-add_library(image SHARED ${HEADERS} ${SOURCES})
 add_definitions(
     -DTNZIMAGE_DLL
     -D_USRDLL
