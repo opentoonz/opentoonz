@@ -1875,21 +1875,26 @@ static void cdb_free_tree_item(void *data) {
 
 static char *strsave(const char *str) {
   char *neww;
+  size_t len;
   if (!str) return 0;
-  neww = malloc(strlen(str) + 1);
+  len  = strlen(str);
+  neww = malloc(len + 1);
+  if (!neww) return 0;
 
-  strcpy(neww, str);
+  memcpy(neww, str, len + 1);
   return neww;
 }
 
 /*---------------------------------------------------------------------------*/
 
-static char *strnsave(const char *str, int n) {
+static char *strnsave(const char *str, size_t n) {
   char *neww;
+  if (!str) return 0;
 
   neww = malloc(n + 1);
+  if (!neww) return 0;
 
-  strncpy(neww, str, n);
+  memcpy(neww, str, n);
   neww[n] = '\0';
   return neww;
 }
