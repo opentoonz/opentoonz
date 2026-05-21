@@ -32,3 +32,12 @@ if(BUILD_ENV_APPLE)
 endif()
 
 add_test(NAME svg_parser_regression COMMAND svg_parser_regression)
+
+add_executable(tzp_color_names_regression
+    tzp_color_names_regression.c
+    ${CMAKE_SOURCE_DIR}/image/tzp/avl.c
+)
+
+target_include_directories(tzp_color_names_regression PRIVATE ${CMAKE_SOURCE_DIR})
+
+add_test(NAME tzp_color_names_regression COMMAND tzp_color_names_regression)
