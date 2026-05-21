@@ -68,8 +68,8 @@ public:
 
   void searchItems(const QString &searchWord = QString());
   void refreshTree(); // Rebuild the entire tree from CommandManager
-  void saveExpandedState(); // Save expansion state to QSettings
-  void restoreExpandedState(); // Restore expansion state from QSettings
+  void saveExpandedState();   // Save expansion state to TEnv (user .env)
+  void restoreExpandedState(); // Restore expansion state from TEnv (user .env)
 
 protected:
   // adds a block of QActions. commandType is a

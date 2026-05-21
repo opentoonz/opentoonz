@@ -1,4 +1,4 @@
-#include "brushpresetpanel.h"
+﻿#include "brushpresetpanel.h"
 
 // ToonzQt includes
 #include "tapp.h"
@@ -85,6 +85,37 @@ public:
   void removeName() { m_nameFld->setText(""); }
 };
 
+namespace {
+
+// Brush Preset Panel display prefs in user .env (TEnv), not the Windows registry.
+TEnv::IntVar BrushPresetPanelShowBorders("BrushPresetPanelShowBorders", 0);
+TEnv::IntVar BrushPresetPanelShowBackgrounds("BrushPresetPanelShowBackgrounds", 1);
+TEnv::IntVar BrushPresetPanelViewMode(
+    "BrushPresetPanelViewMode",
+    static_cast<int>(BrushPresetPanel::GridLarge));
+
+// One-time import of Part 1 display preferences from legacy QSettings.
+void migratePanelPrefsFromRegistryIfNeeded() {
+  static bool migrated = false;
+  if (migrated) return;
+  migrated = true;
+
+  QSettings settings;
+  if (!settings.contains("BrushPresetPanel/showBorders") &&
+      !settings.contains("BrushPresetPanel/viewMode"))
+    return;
+
+  BrushPresetPanelShowBorders =
+      settings.value("BrushPresetPanel/showBorders", false).toBool() ? 1 : 0;
+  BrushPresetPanelShowBackgrounds =
+      settings.value("BrushPresetPanel/showBackgrounds", true).toBool() ? 1 : 0;
+  BrushPresetPanelViewMode =
+      settings.value("BrushPresetPanel/viewMode",
+                     static_cast<int>(BrushPresetPanel::GridLarge))
+          .toInt();
+}
+
+}  // namespace
 //=============================================================================
 // BrushPresetItem implementation
 //=============================================================================
@@ -568,13 +599,13 @@ BrushPresetPanel::BrushPresetPanel(QWidget *parent)
     , m_showBorders(false)  // Borders disabled by default
     , m_showBackgrounds(true) {  // Backgrounds enabled by default
   
-  // Load preferences from settings FIRST (before creating UI)
-  QSettings settings;
-  m_showBorders = settings.value("BrushPresetPanel/showBorders", false).toBool();
-  m_showBackgrounds = settings.value("BrushPresetPanel/showBackgrounds", true).toBool();
+  // Load preferences from TEnv FIRST (before creating UI)
+  migratePanelPrefsFromRegistryIfNeeded();
+  m_showBorders = BrushPresetPanelShowBorders != 0;
+  m_showBackgrounds = BrushPresetPanelShowBackgrounds != 0;
   
   // Load view mode (default: GridLarge)
-  int savedViewMode = settings.value("BrushPresetPanel/viewMode", static_cast<int>(GridLarge)).toInt();
+  int savedViewMode = static_cast<int>(BrushPresetPanelViewMode);
   m_viewMode = static_cast<ViewMode>(savedViewMode);
   
   // NOW initialize UI (menu will be created with correct m_viewMode)
@@ -1418,9 +1449,8 @@ void BrushPresetPanel::onViewModeChanged(ViewMode mode) {
   setViewMode(mode);
   refreshPresetList();
   
-  // Save view preference in settings
-  QSettings settings;
-  settings.setValue("BrushPresetPanel/viewMode", static_cast<int>(mode));
+  // Save view preference in TEnv
+  BrushPresetPanelViewMode = static_cast<int>(mode);
 }
 
 //-----------------------------------------------------------------------------
@@ -1457,18 +1487,17 @@ void BrushPresetPanel::onShowHideActionTriggered() {
   if (!action) return;
   
   QString actionType = action->data().toString();
-  QSettings settings;
   
   if (actionType == "borders") {
     // Toggle borders state
     m_showBorders = action->isChecked();
     updateItemBorders();
-    settings.setValue("BrushPresetPanel/showBorders", m_showBorders);
+    BrushPresetPanelShowBorders = m_showBorders ? 1 : 0;
   } else if (actionType == "backgrounds") {
     // Toggle backgrounds state
     m_showBackgrounds = action->isChecked();
     updateItemBackgrounds();
-    settings.setValue("BrushPresetPanel/showBackgrounds", m_showBackgrounds);
+    BrushPresetPanelShowBackgrounds = m_showBackgrounds ? 1 : 0;
   }
 }
 
@@ -1516,4 +1545,3 @@ void BrushPresetPanel::reorganizeLayout(int newColumns) {
     }
   }
 }
-
