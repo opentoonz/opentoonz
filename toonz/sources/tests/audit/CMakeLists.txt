@@ -92,3 +92,27 @@ if(BUILD_ENV_APPLE)
 endif()
 
 add_test(NAME externfx_process_regression COMMAND externfx_process_regression)
+
+add_executable(thirdparty_empty_path_regression thirdparty_empty_path_regression.cpp)
+
+target_include_directories(thirdparty_empty_path_regression PRIVATE ${CMAKE_SOURCE_DIR})
+
+target_link_libraries(thirdparty_empty_path_regression
+    Qt5::Core
+    toonzlib
+)
+
+if(BUILD_ENV_APPLE)
+    add_custom_command(
+        TARGET thirdparty_empty_path_regression POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:tnzcore>
+            $<TARGET_FILE:tnzbase>
+            $<TARGET_FILE:tnzext>
+            $<TARGET_FILE:toonzlib>
+            $<TARGET_FILE_DIR:thirdparty_empty_path_regression>
+        VERBATIM
+    )
+endif()
+
+add_test(NAME thirdparty_empty_path_regression COMMAND thirdparty_empty_path_regression)
