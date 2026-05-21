@@ -41,3 +41,28 @@ add_executable(tzp_color_names_regression
 target_include_directories(tzp_color_names_regression PRIVATE ${CMAKE_SOURCE_DIR})
 
 add_test(NAME tzp_color_names_regression COMMAND tzp_color_names_regression)
+
+add_executable(tzl_header_regression tzl_header_regression.cpp)
+
+target_include_directories(tzl_header_regression PRIVATE ${CMAKE_SOURCE_DIR})
+
+target_link_libraries(tzl_header_regression
+    Qt5::Core
+    image
+)
+
+if(BUILD_ENV_APPLE)
+    add_custom_command(
+        TARGET tzl_header_regression POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:tnzcore>
+            $<TARGET_FILE:tnzbase>
+            $<TARGET_FILE:tnzext>
+            $<TARGET_FILE:toonzlib>
+            $<TARGET_FILE:image>
+            $<TARGET_FILE_DIR:tzl_header_regression>
+        VERBATIM
+    )
+endif()
+
+add_test(NAME tzl_header_regression COMMAND tzl_header_regression)
