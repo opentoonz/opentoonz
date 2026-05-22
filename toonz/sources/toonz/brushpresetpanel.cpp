@@ -29,7 +29,6 @@
 #include <QScrollArea>
 #include <QGridLayout>
 #include <QPushButton>
-#include <QSettings>
 #include <QLabel>
 #include <QMessageBox>
 #include <QPainter>
@@ -93,27 +92,6 @@ TEnv::IntVar BrushPresetPanelShowBackgrounds("BrushPresetPanelShowBackgrounds", 
 TEnv::IntVar BrushPresetPanelViewMode(
     "BrushPresetPanelViewMode",
     static_cast<int>(BrushPresetPanel::GridLarge));
-
-// One-time import of Part 1 display preferences from legacy QSettings.
-void migratePanelPrefsFromRegistryIfNeeded() {
-  static bool migrated = false;
-  if (migrated) return;
-  migrated = true;
-
-  QSettings settings;
-  if (!settings.contains("BrushPresetPanel/showBorders") &&
-      !settings.contains("BrushPresetPanel/viewMode"))
-    return;
-
-  BrushPresetPanelShowBorders =
-      settings.value("BrushPresetPanel/showBorders", false).toBool() ? 1 : 0;
-  BrushPresetPanelShowBackgrounds =
-      settings.value("BrushPresetPanel/showBackgrounds", true).toBool() ? 1 : 0;
-  BrushPresetPanelViewMode =
-      settings.value("BrushPresetPanel/viewMode",
-                     static_cast<int>(BrushPresetPanel::GridLarge))
-          .toInt();
-}
 
 }  // namespace
 //=============================================================================
@@ -600,7 +578,6 @@ BrushPresetPanel::BrushPresetPanel(QWidget *parent)
     , m_showBackgrounds(true) {  // Backgrounds enabled by default
   
   // Load preferences from TEnv FIRST (before creating UI)
-  migratePanelPrefsFromRegistryIfNeeded();
   m_showBorders = BrushPresetPanelShowBorders != 0;
   m_showBackgrounds = BrushPresetPanelShowBackgrounds != 0;
   
