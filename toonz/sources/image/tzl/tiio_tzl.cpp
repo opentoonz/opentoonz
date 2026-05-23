@@ -105,6 +105,45 @@ namespace {
 
 bool erasedFrame;  // True if at least one frame has been removed.
 
+const int kMaxTzlFrameSuffixLength = 1024;
+
+bool readBytes(FILE *chan, void *data, size_t count) {
+  return count == 0 || fread(data, 1, count, chan) == count;
+}
+
+template <typename T>
+bool readValue(FILE *chan, T &value) {
+  return fread(&value, sizeof(T), 1, chan) == 1;
+}
+
+bool readTzlInt32(FILE *chan, TINT32 &value) {
+  if (!readValue(chan, value)) return false;
+#if !TNZ_LITTLE_ENDIAN
+  value = swapTINT32(value);
+#endif
+  return true;
+}
+
+bool seekTo(FILE *chan, TINT32 offset) {
+  return offset >= 0 && fseek(chan, offset, SEEK_SET) == 0;
+}
+
+bool readFrameSuffix(FILE *chan, int version, QByteArray &suffix) {
+  if (version >= 15) {
+    TINT32 suffixLength = 0;
+    if (!readTzlInt32(chan, suffixLength)) return false;
+    if (suffixLength < 0 || suffixLength > kMaxTzlFrameSuffixLength)
+      return false;
+    suffix.resize(suffixLength);
+    return readBytes(chan, suffix.data(), suffixLength);
+  }
+
+  char letter = 0;
+  if (!readValue(chan, letter)) return false;
+  suffix = QByteArray(&letter, 1);
+  return true;
+}
+
 bool writeVersionAndCreator(FILE *chan, const char *version, QString creator) {
   if (!chan) return false;
   tfwrite(version, strlen(version), chan);
@@ -125,7 +164,7 @@ bool writeVersionAndCreator(FILE *chan, const char *version, QString creator) {
 bool readVersion(FILE *chan, int &version) {
   char magic[8];
   memset(magic, 0, sizeof(magic));
-  fread(&magic, sizeof(char), 8, chan);
+  if (!readBytes(chan, magic, sizeof(magic))) return false;
   if (memcmp(magic, "TLV10", 5) == 0) {
     version = 10;
   } else if (memcmp(magic, "TLV11", 5) == 0) {
@@ -152,8 +191,8 @@ bool readHeaderAndOffsets(FILE *chan, TzlOffsetMap &frameOffsTable,
   TINT32 hdrSize;
   TINT32 lx = 0, ly = 0, frameCount = 0;
   char codec[4];
-  TINT32 offsetTablePos;
-  TINT32 iconOffsetTablePos;
+  TINT32 offsetTablePos     = 0;
+  TINT32 iconOffsetTablePos = 0;
   // char magic[8];
 
   assert(frameOffsTable.empty());
@@ -165,62 +204,39 @@ bool readHeaderAndOffsets(FILE *chan, TzlOffsetMap &frameOffsTable,
   if (version >= 14) {
     char buffer[CREATOR_LENGTH + 1];
     memset(buffer, 0, sizeof buffer);
-    fread(&buffer, sizeof(char), CREATOR_LENGTH, chan);
+    if (!readBytes(chan, buffer, CREATOR_LENGTH)) return false;
     creator = buffer;
   }
 
-  fread(&hdrSize, sizeof(TINT32), 1, chan);
-  fread(&lx, sizeof(TINT32), 1, chan);
-  fread(&ly, sizeof(TINT32), 1, chan);
-  fread(&frameCount, sizeof(TINT32), 1, chan);
+  if (!readTzlInt32(chan, hdrSize) || !readTzlInt32(chan, lx) ||
+      !readTzlInt32(chan, ly) || !readTzlInt32(chan, frameCount))
+    return false;
 
   if (version > 10) {
-    fread(&offsetTablePos, sizeof(TINT32), 1, chan);
-    fread(&iconOffsetTablePos, sizeof(TINT32), 1, chan);
-#if !TNZ_LITTLE_ENDIAN
-    offsetTablePos     = swapTINT32(offsetTablePos);
-    iconOffsetTablePos = swapTINT32(iconOffsetTablePos);
-#endif
+    if (!readTzlInt32(chan, offsetTablePos) ||
+        !readTzlInt32(chan, iconOffsetTablePos))
+      return false;
   }
 
-  fread(&codec, 4, 1, chan);
-
-#if !TNZ_LITTLE_ENDIAN
-  hdrSize    = swapTINT32(hdrSize);
-  lx         = swapTINT32(lx);
-  ly         = swapTINT32(ly);
-  frameCount = swapTINT32(frameCount);
-#endif
+  if (!readBytes(chan, codec, sizeof(codec))) return false;
   assert(0 < frameCount && frameCount < 60000);
+  if (frameCount <= 0 || frameCount >= 60000 || lx <= 0 || ly <= 0)
+    return false;
 
   if (version > 10 && offsetTablePos != 0 && iconOffsetTablePos != 0) {
     // assert(offsetTablePos>0);
     assert(frameCount > 0);
 
-    fseek(chan, offsetTablePos, SEEK_SET);
+    if (!seekTo(chan, offsetTablePos)) return false;
     TFrameId oldFid(TFrameId::EMPTY_FRAME);
     for (int i = 0; i < (int)frameCount; i++) {
-      TINT32 number, offs, length;
+      TINT32 number = 0, offs = 0, length = 0;
       QByteArray suffix;
-      fread(&number, sizeof(TINT32), 1, chan);
-      if (version >= 15) {
-        TINT32 suffixLength;
-        fread(&suffixLength, sizeof(TINT32), 1, chan);
-        suffix.resize(suffixLength);
-        fread(suffix.data(), sizeof(char), suffixLength, chan);
-      } else {
-        char letter;
-        fread(&letter, sizeof(char), 1, chan);
-        suffix = QByteArray(&letter, 1);
-      }
-      fread(&offs, sizeof(TINT32), 1, chan);
-      if (version >= 12) fread(&length, sizeof(TINT32), 1, chan);
-
-#if !TNZ_LITTLE_ENDIAN
-      number = swapTINT32(number);
-      offs   = swapTINT32(offs);
-      if (version == 12) length = swapTINT32(length);
-#endif
+      if (!readTzlInt32(chan, number) || !readFrameSuffix(chan, version, suffix) ||
+          !readTzlInt32(chan, offs))
+        return false;
+      if (version >= 12 && !readTzlInt32(chan, length)) return false;
+      if (offs <= 0 || (version >= 12 && length < 0)) return false;
       //		std::cout << "#" << i << std::hex << " n 0x" << number
       //<< " l 0x" << letter << " o 0x" << offs << std::dec << std::endl;
 
@@ -246,30 +262,17 @@ bool readHeaderAndOffsets(FILE *chan, TzlOffsetMap &frameOffsTable,
     }
     if (version >= 13) {
       // Build IconOffsetTable
-      fseek(chan, iconOffsetTablePos, SEEK_SET);
+      if (!seekTo(chan, iconOffsetTablePos)) return false;
 
       for (int i = 0; i < (int)frameCount; i++) {
-        TINT32 number, thumbnailOffs, thumbnailLength;
+        TINT32 number = 0, thumbnailOffs = 0, thumbnailLength = 0;
         QByteArray suffix;
-        fread(&number, sizeof(TINT32), 1, chan);
-        if (version >= 15) {
-          TINT32 suffixLength;
-          fread(&suffixLength, sizeof(TINT32), 1, chan);
-          suffix.resize(suffixLength);
-          fread(suffix.data(), sizeof(char), suffixLength, chan);
-        } else {
-          char letter;
-          fread(&letter, sizeof(char), 1, chan);
-          suffix = QByteArray(&letter, 1);
-        }
-        fread(&thumbnailOffs, sizeof(TINT32), 1, chan);
-        fread(&thumbnailLength, sizeof(TINT32), 1, chan);
-
-#if !TNZ_LITTLE_ENDIAN
-        number          = swapTINT32(number);
-        thumbnailOffs   = swapTINT32(thumbnailOffs);
-        thumbnailLength = swapTINT32(thumbnailLength);
-#endif
+        if (!readTzlInt32(chan, number) ||
+            !readFrameSuffix(chan, version, suffix) ||
+            !readTzlInt32(chan, thumbnailOffs) ||
+            !readTzlInt32(chan, thumbnailLength))
+          return false;
+        if (thumbnailOffs <= 0 || thumbnailLength < 0) return false;
         TFrameId fid(number, QString::fromUtf8(suffix));
         iconOffsTable[fid] = TzlChunk(thumbnailOffs, thumbnailLength);
       }
