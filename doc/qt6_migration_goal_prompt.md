@@ -50,31 +50,66 @@ instead of recreating an older OpenGL design.
 - Keep changes small enough that another agent can continue from the result.
 - In final handoffs, list changed files and validation actually run.
 
-## First Implementation Slice
+## Current Branch Status
 
-Implement a safe Qt 6 runway, not the whole port.
+As of May 24, 2026, the initial Qt 6 runway is already implemented in this
+branch.
 
-Required deliverables:
+- `OPENTOONZ_QT_MAJOR` exists and defaults to the Qt 5 lane.
+- Qt target, MOC, resource, and translation command selection is centralized.
+- Nix, CMake presets, and mise tasks include a Qt 6 lane next to the Qt 5 lane.
+- The Qt 5 app target links with
+  `cmake --build toonz/build/nix-relwithdebinfo --target OpenToonz --parallel`.
+- The Qt 6 app target links with
+  `cmake --build toonz/build/nix-qt6-relwithdebinfo --target OpenToonz
+  --parallel`.
+- Compile fixes already cover the first build frontier across CMake, screen
+  helpers, Qt Script shell bring-up, audio, stop-motion camera enumeration,
+  layout margin APIs, MOC-visible Qt-major guards, and stale MOC/header entries.
+- A bounded Qt 6 Cocoa startup smoke has been attempted with an isolated runtime
+  `stuff` copy. It stayed alive until stopped by the smoke harness, but exposed
+  plugin discovery gaps.
+- Runtime plugin wiring is now in place for the current macOS Qt 6 lane: the
+  Nix Qt plugin path includes QtSvg, macOS packaging recognizes Qt 6
+  `multimedia` plugins plus SVG `iconengines`, and packaged plugins are
+  rewritten to use bundled Qt frameworks instead of Nix-store Qt frameworks.
+- `mise` includes Qt 6 macOS packaging and arm64 bundle-check tasks:
+  `package-macos-qt6` and `check-macos-arm64-qt6`.
+- `mise run package-macos-qt6` and `mise run check-macos-arm64-qt6` pass for
+  the current macOS arm64 Qt 6 bundle.
+- A bounded startup smoke of the packaged Qt 6 app now gets past the prior
+  duplicate-Qt/platform-plugin abort and loads the Qt Multimedia FFmpeg backend.
+  OpenGL fallback messages and crash-handler noise after harness termination
+  remain to be triaged during interactive GUI smoke.
+- A first Qt 6 script smoke fixture exists at
+  `toonz/sources/tests/scriptengine/basic.toonzscript` and is run by
+  `mise run script-smoke-qt6`. It validates the `QJSEngine` bootstrap for
+  `print`, `warning`, and `run` through the packaged Qt 6 app.
+- The script smoke can run in bounded mode or natural-exit mode. Natural
+  command-line `.toonzscript` process exit now passes with
+  `OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-qt6` after the
+  Qt 6 `QJSEngine` wrapper was marked as C++-owned.
+- This is not product-ready Qt 6 support. Interactive runtime launch,
+  non-macOS packaging, scripting object binding parity, hardware camera/audio
+  smoke, and rendering validation remain open.
 
-1. Add a CMake cache option such as `OPENTOONZ_QT_MAJOR`, defaulting to `5`.
-2. Add central Qt helper variables or functions so subdirectories do not hard
-   code `qt5_wrap_cpp`, `qt5_add_resources`, or `qt5_create_translation`
-   directly.
-3. Add a Qt 6 Nix dependency set next to the existing Qt 5 dependency set.
-4. Add Qt 6 CMake presets:
-   - `nix-qt6-relwithdebinfo`
-   - `nix-qt6-debug`
-5. Add mise tasks:
-   - `doctor-qt6`
-   - `configure-qt6`
-   - `build-qt6`
-6. Convert a representative subset of CMake targets to version-aware Qt targets
-   while preserving the Qt 5 build.
-7. Add a diagnostic deprecated-API lane using
-   `QT_DISABLE_DEPRECATED_UP_TO=0x050F00`, but do not enable it for the default
-   build.
-8. Port one contained removed API family, preferably `QDesktopWidget`, behind a
-   shared helper.
+## Next Implementation Slice
+
+Do not redo the first runway slice unless the current branch has been discarded.
+The next slice should make the Qt 6 app useful enough to run and diagnose:
+
+1. Run an interactive GUI smoke of the packaged Qt 6 macOS app and capture the
+   first real workflow blockers.
+2. Verify viewer redraw, high-DPI behavior, OpenGL fallback warnings, and the
+   crash-handler `atos` noise observed after bounded smoke termination.
+3. Extend the script fixture set into the first `QJSEngine` object-binding
+   compatibility slice, starting with narrow files/paths behavior rather than a
+   full script API rewrite.
+4. Run focused audio playback/recording and camera enumeration smoke tests on
+   real hardware.
+5. Add a second script fixture that exercises one real OpenToonz object-binding
+   group, then keep both bounded and natural-exit smoke modes green.
+6. Keep broad viewer/rendering work deferred until the Metal checkpoint.
 
 ## Required Technical Direction
 
@@ -107,25 +142,26 @@ facade and a `QJSEngine` backend.
 
 ## Follow-On Workstreams
 
-After the first slice, proceed in this order unless the live compile errors
-force a narrower dependency order:
+Proceed in this order unless the live runtime or compile errors force a narrower
+dependency order:
 
 1. Keep Qt 5 as the default lane and rerun a focused Qt 5 build after every
    shared-source fix.
-2. Port `QRegExp` and `QRegExpValidator` to `QRegularExpression`.
-3. Add a text-codec adapter for `QTextCodec` call sites and reduce direct
+2. Launch the Qt 6 app from the build tree and make resource/plugin/rpath fixes
+   needed for a basic startup smoke.
+3. Add script compatibility fixtures and port OpenToonz object bindings behind
+   the project-owned scripting facade.
+4. Add a text-codec adapter for `QTextCodec` call sites and reduce direct
    `Core5Compat` usage.
-4. Replace direct `QGLWidget::convertToGLFormat` calls with a local helper.
-5. Finish the scripting abstraction: the Qt 6 `QJSEngine` shell exists, but
-   OpenToonz object bindings remain Qt 5-only until they move behind a
-   project-owned facade.
-6. Finish audio recording and playback validation on real devices.
-7. Port stop-motion camera enumeration, preview, and still capture APIs.
-8. Continue narrow compile-frontier work in non-rendering targets, preserving
+5. Finish audio recording and playback validation on real devices.
+6. Finish stop-motion camera preview and still capture validation.
+7. Continue narrow compile-frontier work in non-rendering targets, preserving
    both Qt 5 and Qt 6 validation.
-9. Rebase onto the Metal checkpoint before doing broad viewer/rendering Qt 6
+8. Rebase onto the Metal checkpoint before doing broad viewer/rendering Qt 6
    work.
-10. Add Qt 6 packaging lanes for macOS, Linux, and Windows.
+9. Add Qt 6 packaging lanes for macOS, Linux, and Windows.
+10. Remove or reduce transitional `Core5Compat` usage after equivalent Qt 6
+    APIs are in place.
 
 ## Validation Expectations
 
@@ -147,8 +183,12 @@ For later slices, add the relevant checks:
 
 ```sh
 mise run build-qt6
+cmake --build toonz/build/nix-relwithdebinfo --target OpenToonz --parallel
 cmake --build toonz/build/nix-qt6-relwithdebinfo --target OpenToonz
 mise run package-macos-qt6
+mise run check-macos-arm64-qt6
+mise run script-smoke-qt6
+OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-qt6
 ```
 
 Manual smoke validation is required before calling the Qt 6 port product-ready:

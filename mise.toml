@@ -50,9 +50,21 @@ run = "nix develop path:. --command bash -lc 'if [ -d toonz/build/nix-relwithdeb
 description = "Bundle the Nix-built macOS app with stuff data and Qt dependencies."
 run = "nix develop path:. --command bash scripts/macos/package-nix-app.sh"
 
+[tasks.package-macos-qt6]
+description = "Bundle the Nix-built Qt 6 macOS app with stuff data and Qt dependencies."
+run = "nix develop path:.#qt6 --command bash -lc 'OPENTOONZ_APP=toonz/build/nix-qt6-relwithdebinfo/toonz/OpenToonz.app bash scripts/macos/package-nix-app.sh'"
+
 [tasks.check-macos-arm64]
 description = "Verify the Nix-built macOS app bundle contains arm64-only Mach-O files."
 run = "nix develop path:. --command bash scripts/macos/assert-arm64-bundle.sh"
+
+[tasks.check-macos-arm64-qt6]
+description = "Verify the Nix-built Qt 6 macOS app bundle contains arm64-only Mach-O files."
+run = "nix develop path:.#qt6 --command bash -lc 'OPENTOONZ_APP=toonz/build/nix-qt6-relwithdebinfo/toonz/OpenToonz.app bash scripts/macos/assert-arm64-bundle.sh'"
+
+[tasks.script-smoke-qt6]
+description = "Run the packaged Qt 6 app against the basic script engine fixture."
+run = "bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.dmg-macos]
 description = "Create a DMG from the Nix-built macOS app bundle."

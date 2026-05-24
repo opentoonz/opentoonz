@@ -16,7 +16,7 @@
 #include <QCheckBox>
 #include <QtGlobal>
 #include <QMediaPlayer>
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#if OPENTOONZ_QT_MAJOR >= 6
 #include <QAudioOutput>
 #endif
 #include <QTimer>
@@ -84,7 +84,7 @@ class AutoLipSyncPopup final : public DVGui::Dialog {
   QString m_audioPath;
   TFilePath m_datPath;
   QMediaPlayer *m_player;
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#if OPENTOONZ_QT_MAJOR >= 6
   QAudioOutput *m_audioOutput;
 #endif
   QLabel *m_scriptLabel;
@@ -139,7 +139,7 @@ public slots:
   void onLevelChanged(int index);
 
   // Media control
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#if OPENTOONZ_QT_MAJOR >= 6
   void onMediaStateChanged(QMediaPlayer::PlaybackState state);
 #else
   void onMediaStateChanged(QMediaPlayer::State state);

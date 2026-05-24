@@ -261,7 +261,10 @@ void ScriptEngine::evaluate(const QString &cmd) {
 }
 
 bool ScriptEngine::wait(unsigned long time) {
-  return !m_executor || m_executor->wait(time);
+  if (!m_executor) return true;
+  const bool finished = m_executor->wait(time);
+  if (finished) onTerminated();
+  return finished;
 }
 
 bool ScriptEngine::isEvaluating() const { return m_engine->isEvaluating(); }
@@ -269,6 +272,7 @@ bool ScriptEngine::isEvaluating() const { return m_engine->isEvaluating(); }
 void ScriptEngine::interrupt() { m_engine->abortEvaluation(); }
 
 void ScriptEngine::onTerminated() {
+  if (!m_executor) return;
   emit evaluationDone();
   delete m_executor;
   m_executor = 0;
@@ -378,10 +382,11 @@ const char kBootstrapScript[] = R"JS(
   global.run = function(path) {
     return __opentoonzScriptEngine.runScriptFile(String(path));
   };
-})(globalThis);
+})(typeof globalThis !== "undefined" ? globalThis : this);
 )JS";
 
 void installBootstrap(QJSEngine *engine, ScriptEngine *scriptEngine) {
+  QJSEngine::setObjectOwnership(scriptEngine, QJSEngine::CppOwnership);
   engine->globalObject().setProperty(
       QStringLiteral("__opentoonzScriptEngine"),
       engine->newQObject(scriptEngine));
@@ -475,7 +480,10 @@ void ScriptEngine::evaluate(const QString &cmd) {
 }
 
 bool ScriptEngine::wait(unsigned long time) {
-  return !m_executor || m_executor->wait(time);
+  if (!m_executor) return true;
+  const bool finished = m_executor->wait(time);
+  if (finished) onTerminated();
+  return finished;
 }
 
 bool ScriptEngine::isEvaluating() const { return m_executor != 0; }
@@ -485,6 +493,7 @@ void ScriptEngine::interrupt() { m_engine->setInterrupted(true); }
 void ScriptEngine::onMainThreadEvaluationPosted() {}
 
 void ScriptEngine::onTerminated() {
+  if (!m_executor) return;
   emit evaluationDone();
   delete m_executor;
   m_executor = 0;

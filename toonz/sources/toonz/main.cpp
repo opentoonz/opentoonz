@@ -86,6 +86,8 @@
 #include <QLibraryInfo>
 #include <QHash>
 
+#include <atomic>
+
 #ifdef _WIN32
 #ifndef x64
 #include <float.h>
@@ -238,7 +240,12 @@ project->setUseScenePath(TProject::Extras, false);
 
 //-----------------------------------------------------------------------------
 
+static std::atomic_bool gScriptHadError(false);
+
 static void script_output(int type, const QString &value) {
+  if (type == ScriptEngine::ExecutionError || type == ScriptEngine::SyntaxError)
+    gScriptHadError.store(true);
+
   if (type == ScriptEngine::ExecutionError ||
       type == ScriptEngine::SyntaxError ||
       type == ScriptEngine::UndefinedEvaluationResult ||
@@ -343,7 +350,11 @@ int main(int argc, char *argv[]) {
 
   public:
     bool nativeEventFilter(const QByteArray &eventType, void *message,
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+                           long *) Q_DECL_OVERRIDE {
+#else
                            qintptr *) Q_DECL_OVERRIDE {
+#endif
       if (IsLeftMouseDown(message)) {
         leftButtonPressed = true;
       }
@@ -719,7 +730,7 @@ if (QFileInfo(localSplashPath).exists() && QFileInfo(localSplashPath).isFile()) 
       engine.evaluate(cmd);
       engine.wait();
       if (!oldProjectPath.isEmpty()) pm->setCurrentProjectPath(oldProjectPath);
-      return 1;
+      return gScriptHadError.load() ? 1 : 0;
     } else {
       std::cerr << QObject::tr("Script file %1 does not exists.")
                        .arg(loadFilePath.getQString())

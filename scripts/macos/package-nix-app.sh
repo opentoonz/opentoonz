@@ -34,8 +34,30 @@ rewrite_bundle_dylib_references() {
     if ! file "$target_file" | grep -q 'Mach-O'; then
       continue
     fi
+    install_id="$(otool -D "$target_file" 2>/dev/null | sed -n '2p' || true)"
+    if [[ -n "$install_id" && "$install_id" != @executable_path/../Frameworks/* ]]; then
+      if [[ "$install_id" == *.dylib ]]; then
+        lib_name="$(basename "$install_id")"
+        if [[ -e "$frameworks_dir/$lib_name" ]]; then
+          install_name_tool -id "@executable_path/../Frameworks/$lib_name" \
+            "$target_file"
+        fi
+      elif [[ "$install_id" == *.framework/Versions/* ]]; then
+        framework_dir="${install_id%%.framework/*}.framework"
+        framework_name="$(basename "$framework_dir")"
+        framework_binary="${framework_name%.framework}"
+        bundled_framework="$frameworks_dir/$framework_name/Versions/A/$framework_binary"
+        if [[ -e "$bundled_framework" ]]; then
+          install_name_tool -id \
+            "@executable_path/../Frameworks/$framework_name/Versions/A/$framework_binary" \
+            "$target_file"
+        fi
+      fi
+    fi
+
     while read -r from_path; do
       [[ -n "$from_path" ]] || continue
+      [[ "$from_path" != "$install_id" ]] || continue
       lib_name="$(basename "$from_path")"
       if [[ -e "$frameworks_dir/$lib_name" ]]; then
         install_name_tool -change "$from_path" \
@@ -46,6 +68,25 @@ rewrite_bundle_dylib_references() {
       otool -L "$target_file" |
         awk '/\.dylib/ { print $1 }' |
         grep -v '^@executable_path/../Frameworks/' || true
+    )
+
+    while read -r from_path; do
+      [[ -n "$from_path" ]] || continue
+      [[ "$from_path" != "$install_id" ]] || continue
+      framework_dir="${from_path%%.framework/*}.framework"
+      framework_name="$(basename "$framework_dir")"
+      framework_binary="${framework_name%.framework}"
+      bundled_framework="$frameworks_dir/$framework_name/Versions/A/$framework_binary"
+      if [[ -e "$bundled_framework" ]]; then
+        install_name_tool -change "$from_path" \
+          "@executable_path/../Frameworks/$framework_name/Versions/A/$framework_binary" \
+          "$target_file"
+      fi
+    done < <(
+      otool -L "$target_file" |
+        awk '/\.framework\/Versions\// { print $1 }' |
+        grep -v '^@executable_path/../Frameworks/' |
+        grep -v '^@loader_path/../Frameworks/' || true
     )
   done < <(find "$app_path/Contents" -type f -print0)
 }
@@ -93,7 +134,7 @@ copy_qt_plugins() {
     while IFS= read -r -d '' plugin_group; do
       group_name="$(basename "$plugin_group")"
       case "$group_name" in
-        audio|imageformats|mediaservice|platforms|playlistformats|printsupport|styles) ;;
+        audio|iconengines|imageformats|mediaservice|multimedia|platforms|playlistformats|printsupport|styles) ;;
         *) continue ;;
       esac
       if [[ -e "$plugins_dir/$group_name" ]]; then
@@ -102,6 +143,7 @@ copy_qt_plugins() {
       rm -rf "$plugins_dir/$group_name"
       mkdir -p "$plugins_dir/$group_name"
 
+      plugin_patterns=("*.dylib")
       case "$group_name" in
         audio)
           plugin_patterns=(libqtaudio_coreaudio.dylib)
@@ -109,11 +151,11 @@ copy_qt_plugins() {
         mediaservice)
           plugin_patterns=(libqavfcamera.dylib libqavfmediaplayer.dylib libqtmedia_audioengine.dylib)
           ;;
+        multimedia)
+          plugin_patterns=(libdarwinmediaplugin.dylib libffmpegmediaplugin.dylib)
+          ;;
         platforms)
           plugin_patterns=(libqcocoa.dylib libqminimal.dylib libqoffscreen.dylib)
-          ;;
-        *)
-          plugin_patterns=(*.dylib)
           ;;
       esac
 

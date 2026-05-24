@@ -17,6 +17,7 @@ let
       throw "Unsupported OpenToonz Qt major: ${qtMajorString}";
 
   qtBase = qt.qtbase;
+  qtSvg = qt.qtsvg;
   qtMultimedia = qt.qtmultimedia;
   defaultBuildDirName =
     if qtMajor == 5 then "nix-relwithdebinfo" else "nix-qt6-relwithdebinfo";
@@ -103,6 +104,7 @@ let
 
   qtBaseDev = lib.getDev qtBase;
   qtBaseBin = lib.getBin qtBase;
+  qtSvgBin = lib.getBin qtSvg;
   qtMultimediaBin = lib.getBin qtMultimedia;
   qtPluginPrefix = qtBase.qtPluginPrefix;
   lzoDev = lib.getDev pkgs.lzo;
@@ -179,6 +181,7 @@ let
     OPENTOONZ_QT6_DIR = lib.optionalString (qtMajor == 6) "${qtBaseDev}/lib/cmake/Qt6";
     OPENTOONZ_QT_PLUGIN_DIRS = lib.concatStringsSep ":" [
       "${qtBaseBin}/${qtPluginPrefix}"
+      "${qtSvgBin}/${qtPluginPrefix}"
       "${qtMultimediaBin}/${qtPluginPrefix}"
     ];
     OPENTOONZ_BOOST_ROOT = "${lib.getDev pkgs.boost}";

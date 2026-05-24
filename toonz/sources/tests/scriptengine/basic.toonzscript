@@ -1,0 +1,3 @@
+print("qt-script-smoke", 1 + 2, [true, "ok"]);
+warning("qt-script-warning");
+"qt-script-smoke-result";

@@ -7,7 +7,7 @@
 #include "tsystem.h"
 #include <QtGlobal>
 #include <QAudioFormat>
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#if OPENTOONZ_QT_MAJOR >= 6
 #include <QAudioOutput>
 #include <QAudioSource>
 #else
@@ -18,7 +18,7 @@
 #include <QMediaPlayer>
 #include <QIcon>
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#if OPENTOONZ_QT_MAJOR >= 6
 using ToonzAudioInput = QAudioSource;
 #else
 using ToonzAudioInput = QAudioInput;
@@ -47,7 +47,7 @@ class AudioRecordingPopup : public DVGui::Dialog {
       *m_pauseRecordingButton, *m_pausePlaybackButton, *m_saveButton;
   QComboBox *m_deviceListCB;
   ToonzAudioInput *m_audioInput;
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#if OPENTOONZ_QT_MAJOR >= 6
   QAudioOutput *m_audioOutput;
 #endif
   AudioWriterWAV *m_audioWriterWAV;
@@ -106,7 +106,7 @@ private slots:
   void onPausePlaybackButtonPressed();
   void onPlayStateChanged(bool playing);
   void onPlayXSheetCBChanged(int status);
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#if OPENTOONZ_QT_MAJOR >= 6
   void onMediaStateChanged(QMediaPlayer::PlaybackState state);
 #else
   void onMediaStateChanged(QMediaPlayer::State state);

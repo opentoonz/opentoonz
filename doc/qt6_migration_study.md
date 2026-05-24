@@ -143,7 +143,9 @@ Notes:
 
 ## Local Risk Inventory
 
-The following search results were taken from this checkout.
+The following search results were taken from the pre-migration baseline and are
+kept here as the original risk inventory. Later status notes call out items
+already addressed in this branch.
 
 | Area | Local evidence | Migration meaning |
 |---|---|---|
@@ -202,12 +204,25 @@ Current branch status:
 - The Qt target and resource/moc/translation command selection is centralized
   so subdirectories can build against either Qt major without hard-coding
   `Qt5::` targets or `qt5_*` commands.
-- The Qt 6 lane currently validates through `tnzcore`, `toonzlib`, and
-  `tnzstdfx` using the Nix Qt 6 environment.
+- The Qt 5 default lane currently compiles and links the `OpenToonz` app target
+  with `cmake --build toonz/build/nix-relwithdebinfo --target OpenToonz
+  --parallel`.
+- The Qt 6 lane currently compiles and links the `OpenToonz` app target with
+  `cmake --build toonz/build/nix-qt6-relwithdebinfo --target OpenToonz
+  --parallel`. This is a compile/link milestone only, not product-ready Qt 6
+  support.
+- The Qt 6 macOS app bundle now packages and passes the arm64 bundle check with
+  `mise run package-macos-qt6` and `mise run check-macos-arm64-qt6`.
 - First removed-API fixes in this branch include `QDesktopWidget` to `QScreen`
   helper usage, `QMutex::Recursive` to `QRecursiveMutex`, Qt 6 audio playback
   construction, `QMatrix` to `QTransform` in `iwa_floorbumpfx.cpp`, and local
   `qsizetype` size fixes in `iwa_particlesengine.cpp`.
+- Later compile-frontier fixes in this branch include removal of stale
+  `QDirModel` usage, removal of remaining `QRegExp` hits, Qt 6-safe layout
+  margin calls, Qt 6-safe MOC guards using `OPENTOONZ_QT_MAJOR`, a stop-motion
+  camera-info helper around `QMediaDevices`/`QCameraDevice`, and removal of a
+  stale `FileInfoPopup` MOC entry that generated an invalid Qt 6 metatype
+  reference.
 - Qt 6 builds still emit many macOS OpenGL deprecation warnings. Those are not
   treated as this slice's migration failures because broad GL/viewer churn
   should wait for the Metal checkpoint.
@@ -289,6 +304,21 @@ Current branch status:
 - Qt 5 still builds the existing `QScriptEngine` runtime and binding classes.
 - Qt 6 builds a first `QJSEngine` runtime shell for `ScriptEngine`, including
   JavaScript evaluation plus `print`, `warning`, and `run` bootstrap functions.
+- The Qt 6 bootstrap no longer assumes `globalThis`, which keeps the
+  compatibility shell usable in older JavaScript global-object contexts.
+- `ScriptEngine::wait()` now performs idempotent executor cleanup after
+  command-line and other non-event-loop evaluations finish.
+- The Qt 6 `ScriptEngine` QObject wrapper is explicitly marked with
+  `QJSEngine::CppOwnership`. Without that, `QJSEngine` tried to own the
+  stack-local script engine during teardown and command-line scripts could
+  crash instead of exiting naturally.
+- `toonz/sources/tests/scriptengine/basic.toonzscript` is the first repo-local
+  Qt 6 script fixture. `mise run script-smoke-qt6` runs it through the packaged
+  Qt 6 app and verifies `print`, `warning`, and `run` output.
+- The script fixture can run in bounded mode or natural-exit mode. Both
+  `mise run script-smoke-qt6` and
+  `OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-qt6` pass for the
+  current packaged Qt 6 app.
 - The OpenToonz object binding groups are still Qt 5-only in this branch:
   files, scenes, levels, images, renderer, rasterizer, vectorizers, and
   converters. This is an explicit temporary limitation, not product-ready Qt 6
@@ -336,6 +366,20 @@ hardware smoke tests:
 - audio playback and lip-sync preview
 - device hotplug or refresh behavior where supported
 
+Current branch status:
+
+- The Qt 6 app target compiles with the refactored audio playback, audio
+  recording, auto lip-sync playback, active pencil-test camera, and stop-motion
+  camera enumeration code paths.
+- `stopmotion/stopmotioncamera.h` centralizes the Qt 5 `QCameraInfo` versus Qt
+  6 `QCameraDevice` split for camera descriptions, device ids, and supported
+  resolutions.
+- The legacy `penciltestpopup_qt.*` path remains a Qt 5-era 32-bit path and
+  still contains `QAbstractVideoSurface`/`QCameraInfo` usage. It is not part of
+  the current 64-bit Qt 6 app compile frontier.
+- Real camera and audio hardware smoke tests have not been completed. Treat
+  the media work as compile-ready, not behavior-certified.
+
 ### 5. OpenGL, Viewer, Offscreen Rendering, And Metal
 
 Qt 6 does not require removing OpenGL from a Qt Widgets application, but it
@@ -378,6 +422,23 @@ cleanup now. It should avoid churn in files like:
 - `toonz/sources/include/qtofflinegl.h`
 - `toonz/sources/stdfx/shader*`
 
+Current branch status:
+
+- The Qt 6 app target links while still using the existing OpenGL-heavy viewer
+  and FX code. This proves the Qt 6 widget/build integration is viable, but it
+  does not validate rendering behavior.
+- The compile work deliberately avoided broad viewer, renderer, offscreen GL,
+  shader, and tool-overlay rewrites. The remaining OpenGL and high-DPI warning
+  cleanup should be scheduled after the Metal checkpoint or against an explicit
+  renderer/backend boundary.
+- An offscreen Qt 6 startup smoke is not a useful GUI substitute on macOS
+  because the offscreen platform cannot create the OpenGL context OpenToonz
+  still expects.
+- A bounded Cocoa startup smoke with a copied `stuff` tree stayed alive until
+  the smoke harness stopped it. That is a better first startup signal than the
+  offscreen run, but it still needs an interactive GUI smoke before runtime
+  behavior is considered validated.
+
 ### 6. Platform Packaging
 
 Packaging has to be treated as part of the port.
@@ -390,6 +451,38 @@ macOS:
   helper executables, and copied `stuff`.
 - Verify whether the Metal migration changes bundled framework or entitlement
   requirements.
+
+Current branch status:
+
+- `OPENTOONZ_QT_PLUGIN_DIRS` now includes the QtSvg plugin root in addition to
+  QtBase and QtMultimedia. This is needed for SVG image/icon plugins during
+  build-tree and packaged runs.
+- The macOS Nix packaging script now recognizes Qt 6's `multimedia` plugin
+  group and `iconengines`, while preserving the existing Qt 5 plugin groups.
+- The packaging script now rewrites copied Qt plugin framework references into
+  `Contents/Frameworks`; without this, the packaged Qt 6 app could find the
+  `cocoa` plugin but abort because the plugin loaded a second Qt copy from the
+  Nix store.
+- The packaging script also rewrites copied framework and library install IDs,
+  so bundled Qt plugin dependencies identify themselves through
+  `@executable_path/../Frameworks` instead of a Nix-store path.
+- `mise` now has `package-macos-qt6` and `check-macos-arm64-qt6` tasks that
+  point the existing macOS package and architecture-check scripts at the Qt 6
+  app bundle.
+- `mise run package-macos-qt6` now completes and ad hoc signs the Qt 6 bundle.
+  `mise run check-macos-arm64-qt6` reports the main binary as arm64 and checks
+  291 Mach-O files for arm64.
+- The first Qt 6 Cocoa startup smoke reported missing multimedia backends and
+  SVG pixmap load failures. After the plugin-path fix, a second bounded Cocoa
+  smoke from the Qt 6 Nix shell loaded the Qt Multimedia FFmpeg backend and no
+  longer reported SVG pixmap failures. It still needs an interactive GUI smoke;
+  the bounded harness stops the app after startup and therefore cannot validate
+  user workflows.
+- A bounded startup smoke of the packaged Qt 6 app now gets past the prior
+  duplicate-Qt/platform-plugin abort and loads the Qt Multimedia FFmpeg backend
+  from the package. The smoke still reports OpenGL fallback messages and
+  crash-handler `atos` noise after the harness terminates the process, so this
+  is not a substitute for an interactive GUI smoke.
 
 Windows:
 
@@ -613,25 +706,27 @@ against an obsolete OpenGL boundary while the Metal work is still changing that
 same boundary. Let Metal reduce the rendering ambiguity, then port the Qt shell
 and platform integration around it.
 
-## Recommended First Implementation Slice
+## Recommended Next Implementation Slice
 
-The first Qt 6 implementation branch should not try to compile the whole app
-with Qt 6. It should produce durable migration infrastructure:
+The first infrastructure slice has now been achieved in this branch: the dual
+Qt lane exists and both Qt 5 and Qt 6 can compile/link the `OpenToonz` app
+target. The next implementation branch should not repeat that runway work. It
+should turn the compile/link milestone into a runtime and subsystem validation
+milestone:
 
-1. Add `OPENTOONZ_QT_MAJOR` and wrapper functions for Qt CMake commands.
-2. Add a Qt 6 Nix dependency set without replacing the Qt 5 set.
-3. Add `doctor-qt6` and `configure-qt6` mise tasks.
-4. Convert a small, representative subset of libraries to version-aware Qt
-   targets.
-5. Add the diagnostic deprecated-API lane.
-6. Port one small removed API family, preferably `QDesktopWidget`, behind a
-   shared helper.
-7. Leave rendering files alone unless they are required for configure-only
-   progress.
+1. Launch the Qt 6 build-tree app and document the first runtime blockers.
+2. Verify that app resources, `stuff`, plugins, helper executables, and runtime
+   paths are sufficient outside the linker step.
+3. Extend the current script compatibility fixture set and use it to drive the
+   next `QJSEngine` object-binding slice.
+4. Run focused audio playback/recording and camera enumeration smoke tests on
+   real hardware.
+5. Harden the existing macOS Qt 6 packaging lane only when runtime evidence
+   requires it; otherwise move package follow-up to Linux and Windows.
+6. Keep viewer/rendering changes narrow until the Metal boundary is stable.
 
-That slice creates a safe runway for later agents: they can compile against
-both Qt majors, make one subsystem green at a time, and avoid stepping on the
-Metal branch.
+That slice gives later agents runtime evidence instead of another compile-only
+milestone, while still avoiding overlap with the Metal branch.
 
 ## Validation Matrix
 
@@ -656,11 +751,23 @@ mise run build-qt6
 cmake --build toonz/build/nix-qt6-relwithdebinfo --target OpenToonz
 ```
 
+Current verified compile/link checks in this branch:
+
+```sh
+cmake --build toonz/build/nix-relwithdebinfo --target OpenToonz --parallel
+cmake --build toonz/build/nix-qt6-relwithdebinfo --target OpenToonz --parallel
+```
+
+These commands prove the app target links in both lanes. They do not replace
+launch, packaging, GUI, scripting, audio, camera, or renderer smoke validation.
+
 Packaging checks once artifacts exist:
 
 ```sh
 mise run package-macos-qt6
-mise run check-macos-arm64
+mise run check-macos-arm64-qt6
+mise run script-smoke-qt6
+OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-qt6
 ```
 
 Manual smoke checks:
