@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 set(CMAKE_BUILD_TYPE_INIT Release)
 
-# Set C++17 globally 
+# Set C++17 globally
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 message(STATUS "C++ standard: ${CMAKE_CXX_STANDARD}")
@@ -183,6 +183,20 @@ option(WITH_SYSTEM_SUPERLU "Use the system SuperLU library instead of 'thirdpart
 option(WITH_CANON "Build with Canon DSLR support - Requires Canon SDK" OFF)
 option(WITH_TRANSLATION "Generate translation projects as well" ON)
 option(WITH_WINTAB "(Windows only) Build with customized Qt with WinTab support. https://github.com/shun-iwasawa/qt5/releases/tag/v5.15.2_wintab" OFF)
+set(OPENTOONZ_QT_MAJOR "5" CACHE STRING "Qt major version to build against")
+set_property(CACHE OPENTOONZ_QT_MAJOR PROPERTY STRINGS 5 6)
+option(OPENTOONZ_QT_DEPRECATED_ERRORS "Fail when using Qt APIs deprecated through Qt 5.15" OFF)
+
+if(NOT OPENTOONZ_QT_MAJOR MATCHES "^[56]$")
+    message(FATAL_ERROR "OPENTOONZ_QT_MAJOR must be 5 or 6, got ${OPENTOONZ_QT_MAJOR}")
+endif()
+set(OPENTOONZ_QT_PACKAGE "Qt${OPENTOONZ_QT_MAJOR}")
+message(STATUS "Qt major version: ${OPENTOONZ_QT_MAJOR}")
+add_compile_definitions(OPENTOONZ_QT_MAJOR=${OPENTOONZ_QT_MAJOR})
+
+if(OPENTOONZ_QT_DEPRECATED_ERRORS)
+    add_compile_definitions(QT_DISABLE_DEPRECATED_UP_TO=0x050F00)
+endif()
 
 # avoid using again
 option_defaults_clear()
@@ -244,7 +258,11 @@ message(STATUS "Thirdparty Library Search path:" ${THIRDPARTY_LIBS_HINTS})
 
 if(BUILD_ENV_MSVC)
     if(NOT DEFINED QT_PATH OR NOT EXISTS ${QT_PATH})
-        set(QT_PATH "C:/Qt/5.15.2/msvc2019${PLATFORM2}" CACHE PATH "Qt installation directory")
+        if(OPENTOONZ_QT_MAJOR EQUAL 5)
+            set(QT_PATH "C:/Qt/5.15.2/msvc2019${PLATFORM2}" CACHE PATH "Qt installation directory")
+        else()
+            message(FATAL_ERROR "Set QT_PATH to a Qt 6 MSVC installation directory.")
+        endif()
         if(NOT EXISTS ${QT_PATH})
             message(FATAL_ERROR "QT_PATH not found: ${QT_PATH}. Specify QT_PATH properly.")
         endif()
@@ -261,19 +279,24 @@ if(BUILD_ENV_MSVC)
 elseif(BUILD_ENV_APPLE)
     # Try to find Qt from Homebrew if not explicitly set
     if(NOT DEFINED QT_PATH)
+        if(OPENTOONZ_QT_MAJOR EQUAL 5)
+            set(_opentoonz_homebrew_qt_formula "qt@5")
+        else()
+            set(_opentoonz_homebrew_qt_formula "qt")
+        endif()
         execute_process(
-            COMMAND brew --prefix qt@5
+            COMMAND brew --prefix ${_opentoonz_homebrew_qt_formula}
             OUTPUT_VARIABLE HOMEBREW_QT_PREFIX
             OUTPUT_STRIP_TRAILING_WHITESPACE
             RESULT_VARIABLE BREW_RESULT
           )
         if(NOT BREW_RESULT EQUAL 0)
-            message(FATAL_ERROR "Homebrew 'qt@5' not found. Install with 'brew install qt@5' or set QT_PATH manually.")
+            message(FATAL_ERROR "Homebrew '${_opentoonz_homebrew_qt_formula}' not found. Install it or set QT_PATH manually.")
         endif()
         set(QT_PATH "${HOMEBREW_QT_PREFIX}/lib" CACHE PATH "Qt installation directory (from Homebrew)")
         message(STATUS "Auto-detected Qt path: ${QT_PATH}")
         set(QT_LIB_PATH "${QT_PATH}")
-        list(APPEND CMAKE_PREFIX_PATH "${HOMEBREW_QT_PREFIX}/lib/cmake/Qt5")  # More precise for find_package(Qt5)
+        list(APPEND CMAKE_PREFIX_PATH "${HOMEBREW_QT_PREFIX}/lib/cmake/${OPENTOONZ_QT_PACKAGE}")
         # Conventional usage: if the QT_PATH is explicitly set
     else()
         set(QT_LIB_PATH "${QT_PATH}/")
@@ -319,7 +342,7 @@ elseif(BUILD_ENV_UNIXLIKE)
 
     set(CMAKE_CXX_STANDARD 17)
 
-    find_package(Qt5Widgets)
+    find_package(${OPENTOONZ_QT_PACKAGE} COMPONENTS Widgets)
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
     if (NOT (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
@@ -355,15 +378,13 @@ include_directories(
     include
   )
 
-# Find the QtWidgets library
-find_package(Qt5 REQUIRED
+set(OPENTOONZ_QT_COMPONENTS
     Core
     Gui
     Network
     OpenGL
     Svg
     Xml
-    Script
     Widgets
     PrintSupport
     LinguistTools
@@ -373,17 +394,94 @@ find_package(Qt5 REQUIRED
     UiTools
   )
 
-if(NOT Qt5Core_FOUND)
-    message(FATAL_ERROR "Qt5Core not found check paths")
+if(OPENTOONZ_QT_MAJOR EQUAL 5)
+    list(APPEND OPENTOONZ_QT_COMPONENTS Script)
+else()
+    list(APPEND OPENTOONZ_QT_COMPONENTS OpenGLWidgets Core5Compat Qml)
 endif()
-message(STATUS "Qt5 Modules: ${Qt5Core_VERSION}")
 
-set(QT_MINIMUM_VERSION 5.5.0)
-if(Qt5Core_VERSION VERSION_LESS QT_MINIMUM_VERSION)
+# Find the Qt library set.
+find_package(${OPENTOONZ_QT_PACKAGE} REQUIRED COMPONENTS ${OPENTOONZ_QT_COMPONENTS})
+
+set(_opentoonz_qt_core_found_var "${OPENTOONZ_QT_PACKAGE}Core_FOUND")
+set(_opentoonz_qt_core_version_var "${OPENTOONZ_QT_PACKAGE}Core_VERSION")
+set(OPENTOONZ_QT_CORE_VERSION "${${_opentoonz_qt_core_version_var}}")
+
+if(NOT ${_opentoonz_qt_core_found_var})
+    message(FATAL_ERROR "${OPENTOONZ_QT_PACKAGE}Core not found check paths")
+endif()
+message(STATUS "${OPENTOONZ_QT_PACKAGE} Modules: ${OPENTOONZ_QT_CORE_VERSION}")
+
+if(OPENTOONZ_QT_MAJOR EQUAL 5)
+    set(QT_MINIMUM_VERSION 5.5.0)
+else()
+    set(QT_MINIMUM_VERSION 6.5.0)
+endif()
+if(OPENTOONZ_QT_CORE_VERSION VERSION_LESS QT_MINIMUM_VERSION)
     MESSAGE(FATAL_ERROR "Minimum supported Qt version: ${QT_MINIMUM_VERSION}.
-    Installed version: ${Qt5Core_VERSION}")
+    Installed version: ${OPENTOONZ_QT_CORE_VERSION}")
 endif()
 unset(QT_MINIMUM_VERSION)
+
+set(QT_CORE_TARGET Qt${OPENTOONZ_QT_MAJOR}::Core)
+set(QT_GUI_TARGET Qt${OPENTOONZ_QT_MAJOR}::Gui)
+set(QT_NETWORK_TARGET Qt${OPENTOONZ_QT_MAJOR}::Network)
+set(QT_OPENGL_TARGET Qt${OPENTOONZ_QT_MAJOR}::OpenGL)
+set(QT_SVG_TARGET Qt${OPENTOONZ_QT_MAJOR}::Svg)
+set(QT_XML_TARGET Qt${OPENTOONZ_QT_MAJOR}::Xml)
+set(QT_WIDGETS_TARGET Qt${OPENTOONZ_QT_MAJOR}::Widgets)
+set(QT_PRINTSUPPORT_TARGET Qt${OPENTOONZ_QT_MAJOR}::PrintSupport)
+set(QT_MULTIMEDIA_TARGET Qt${OPENTOONZ_QT_MAJOR}::Multimedia)
+set(QT_MULTIMEDIA_WIDGETS_TARGET Qt${OPENTOONZ_QT_MAJOR}::MultimediaWidgets)
+set(QT_SERIALPORT_TARGET Qt${OPENTOONZ_QT_MAJOR}::SerialPort)
+set(QT_UITOOLS_TARGET Qt${OPENTOONZ_QT_MAJOR}::UiTools)
+set(QT_SCRIPT_TARGET)
+set(QT_OPENGL_WIDGETS_TARGET)
+set(QT_CORE5COMPAT_TARGET)
+set(QT_QML_TARGET)
+set(QT_WINMAIN_TARGET)
+
+if(OPENTOONZ_QT_MAJOR EQUAL 5)
+    set(QT_SCRIPT_TARGET Qt5::Script)
+    set(QT_WINMAIN_TARGET Qt5::WinMain)
+else()
+    set(QT_OPENGL_WIDGETS_TARGET Qt6::OpenGLWidgets)
+    set(QT_CORE5COMPAT_TARGET Qt6::Core5Compat)
+    set(QT_QML_TARGET Qt6::Qml)
+    set(QT_WINMAIN_TARGET Qt6::EntryPointImplementation)
+endif()
+
+set(QT_CORE_LINK_TARGETS ${QT_CORE_TARGET} ${QT_CORE5COMPAT_TARGET})
+set(QT_OPENGL_LINK_TARGETS ${QT_OPENGL_TARGET} ${QT_OPENGL_WIDGETS_TARGET})
+
+set(_opentoonz_qt_widgets_includes_var "${OPENTOONZ_QT_PACKAGE}Widgets_INCLUDE_DIRS")
+set(OPENTOONZ_QT_WIDGETS_INCLUDE_DIRS "${${_opentoonz_qt_widgets_includes_var}}")
+set(_opentoonz_qt_lrelease_var "${OPENTOONZ_QT_PACKAGE}_LRELEASE_EXECUTABLE")
+set(OPENTOONZ_QT_LRELEASE_EXECUTABLE "${${_opentoonz_qt_lrelease_var}}")
+
+macro(opentoonz_qt_wrap_cpp)
+    if(OPENTOONZ_QT_MAJOR EQUAL 5)
+        qt5_wrap_cpp(${ARGV})
+    else()
+        qt6_wrap_cpp(${ARGV})
+    endif()
+endmacro()
+
+macro(opentoonz_qt_add_resources)
+    if(OPENTOONZ_QT_MAJOR EQUAL 5)
+        qt5_add_resources(${ARGV})
+    else()
+        qt6_add_resources(${ARGV})
+    endif()
+endmacro()
+
+macro(opentoonz_qt_create_translation)
+    if(OPENTOONZ_QT_MAJOR EQUAL 5)
+        qt5_create_translation(${ARGV})
+    else()
+        qt6_create_translation(${ARGV})
+    endif()
+endmacro()
 
 if(BUILD_ENV_MSVC)
     include_directories(
@@ -415,8 +513,8 @@ if(PLATFORM EQUAL 64)
     endif()
 endif()
 
-get_target_property(QtCore_location Qt5::Core LOCATION)
-get_target_property(QtWidget_location Qt5::Widgets LOCATION)
+get_target_property(QtCore_location ${QT_CORE_TARGET} LOCATION)
+get_target_property(QtWidget_location ${QT_WIDGETS_TARGET} LOCATION)
 message(STATUS "Qt Core Location:" ${QtCore_location})
 
 macro(_find_toonz_library OUT_LIB_LIST IN_LIB_LIST)
@@ -761,7 +859,7 @@ if(WITH_TRANSLATION)
             )
         endforeach()
 
-        qt5_create_translation(message ${translation} ${ARGN})
+        opentoonz_qt_create_translation(message ${translation} ${ARGN})
 
         add_custom_target("translate_update_${module}" DEPENDS ${message})
         set_target_properties("translate_update_${module}" PROPERTIES
@@ -792,7 +890,7 @@ if(WITH_TRANSLATION)
             if(EXISTS "${ts_file}")
                 add_custom_command(
                     TARGET "${module}" POST_BUILD 
-                    COMMAND ${Qt5_LRELEASE_EXECUTABLE} "${ts_file}" -qm "${qm_tmp_file}"
+                    COMMAND ${OPENTOONZ_QT_LRELEASE_EXECUTABLE} "${ts_file}" -qm "${qm_tmp_file}"
                     COMMAND ${CMAKE_COMMAND} -E rename ${qm_tmp_file} ${qm_file}
                     DEPENDS "${ts_file}"
                     BYPRODUCTS "${qm_file}"

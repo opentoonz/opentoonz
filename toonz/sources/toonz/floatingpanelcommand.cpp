@@ -8,9 +8,9 @@
 #include "pane.h"
 
 #include "toonzqt/styleeditor.h"
+#include "toonzqt/gutil.h"
 
 #include <QMainWindow>
-#include <QDesktopWidget>
 #include <QApplication>
 #include <../toonzqt/tdockwindows.h>
 
@@ -19,11 +19,10 @@
 // mette il widget al centro dello schermo e lo fa diventare la finestra
 // corrente
 static void activateWidget(QWidget *w) {
-  QDesktopWidget *desktop = qApp->desktop();
-  QRect screenRect        = desktop->screenGeometry(w);
+  QRect screenRect = getScreenGeometry(w);
 
-  QPoint p((screenRect.width() - w->width()) / 2,
-           (screenRect.height() - w->height()) / 2);
+  QPoint p(screenRect.left() + (screenRect.width() - w->width()) / 2,
+           screenRect.top() + (screenRect.height() - w->height()) / 2);
   w->setGeometry(QRect(p, w->size()));
   w->activateWindow();
 }

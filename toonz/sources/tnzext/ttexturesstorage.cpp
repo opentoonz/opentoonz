@@ -14,6 +14,7 @@
 #include <QCache>
 #include <QMutex>
 #include <QMutexLocker>
+#include <QRecursiveMutex>
 
 #include "ext/ttexturesstorage.h"
 
@@ -40,8 +41,8 @@ private:
 
 namespace {
 
-QMutex l_mutex(QMutex::Recursive);  // A mutex is needed to synchronize access
-                                    // to the following objects
+QRecursiveMutex l_mutex;  // A mutex is needed to synchronize access to the
+                          // following objects
 
 std::map<int, TexturesContainer *>
     l_texturesContainers;  // Texture Containers by display lists space id

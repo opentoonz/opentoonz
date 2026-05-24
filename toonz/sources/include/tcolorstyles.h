@@ -9,6 +9,7 @@
 
 // Qt includes
 #include <QString>
+#include <QStringList>
 
 #undef DVAPI
 #undef DVVAR
@@ -33,7 +34,6 @@ class TVectorRenderData;
 class TInputStreamInterface;
 class TOutputStreamInterface;
 class TRasterStyleFx;
-class QStringList;
 
 //=================================================
 

@@ -6,9 +6,17 @@ MISE_DISABLE_TOOLS = "1"
 description = "Enter the pinned Nix development shell."
 run = "nix develop path:."
 
+[tasks.dev-qt6]
+description = "Enter the pinned Nix development shell for the Qt 6 migration lane."
+run = "nix develop path:.#qt6"
+
 [tasks.doctor]
 description = "Print the key tool and dependency versions from the Nix shell."
 run = "nix develop path:. --command bash -lc 'cmake --version && ninja --version && pkg-config --modversion Qt5Core libmypaint liblz4 libusb-1.0 libturbojpeg'"
+
+[tasks.doctor-qt6]
+description = "Print the key tool and dependency versions from the Qt 6 Nix shell."
+run = "nix develop path:.#qt6 --command bash -lc 'cmake --version && ninja --version && pkg-config --modversion Qt6Core libmypaint liblz4 libusb-1.0 libturbojpeg'"
 
 [tasks.prepare-tiff]
 description = "Build OpenToonz's vendored libtiff dependency."
@@ -18,9 +26,21 @@ run = "nix develop path:. --command bash scripts/nix/prepare-tiff.sh"
 description = "Configure the RelWithDebInfo Ninja build with the Nix dependency set."
 run = "nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-relwithdebinfo'"
 
+[tasks.configure-deprecated-api]
+description = "Configure the Qt 5 lane with Qt APIs deprecated through 5.15 disabled."
+run = "nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-deprecated-api'"
+
+[tasks.configure-qt6]
+description = "Configure the RelWithDebInfo Ninja build with the Qt 6 Nix dependency set."
+run = "nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-relwithdebinfo'"
+
 [tasks.build]
 description = "Configure and build OpenToonz with Ninja in toonz/build/nix-relwithdebinfo."
 run = "nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-relwithdebinfo && cmake --build toonz/build/nix-relwithdebinfo --parallel'"
+
+[tasks.build-qt6]
+description = "Configure and build OpenToonz with Qt 6 in toonz/build/nix-qt6-relwithdebinfo."
+run = "nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-relwithdebinfo && cmake --build toonz/build/nix-qt6-relwithdebinfo --parallel'"
 
 [tasks.run]
 description = "Run the locally built OpenToonz binary or app bundle."

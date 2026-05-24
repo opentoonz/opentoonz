@@ -32,4 +32,4 @@ message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})
 _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;toonzlib")
 message("ToonzCore: " ${EXTRA_LIBS})
 
-target_link_libraries(sound Qt5::Core ${EXTRA_LIBS})
+target_link_libraries(sound ${QT_CORE_LINK_TARGETS} ${EXTRA_LIBS})

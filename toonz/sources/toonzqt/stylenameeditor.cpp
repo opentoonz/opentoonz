@@ -324,7 +324,7 @@ void EasyInputArea::onRemoveWord(const QString& word) {
 
 //------------------------------------------------------------
 
-void EasyInputArea::enterEvent(QEvent*) { emit mouseEnter(); }
+void EasyInputArea::enterEvent(QtCompat::EnterEvent*) { emit mouseEnter(); }
 
 //------------------------------------------------------------
 
@@ -521,7 +521,7 @@ void StyleNameEditor::onCancelPressed() { close(); }
 
 //-------
 // focus when the mouse enters
-void StyleNameEditor::enterEvent(QEvent* e) {
+void StyleNameEditor::enterEvent(QtCompat::EnterEvent* e) {
   activateWindow();
   m_styleName->setFocus();
 }

@@ -326,7 +326,7 @@ SchematicSceneViewer::~SchematicSceneViewer() {}
  */
 void SchematicSceneViewer::mousePressEvent(QMouseEvent *me) {
   // qDebug() << "[mousePressEvent]";
-  if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen &&
+  if (m_gestureActive && m_touchDevice == QtCompat::TouchScreen &&
       !m_stylusUsed) {
     return;
   }
@@ -341,14 +341,14 @@ void SchematicSceneViewer::mousePressEvent(QMouseEvent *me) {
       m_zooming   = true;
       return;
     } else if (m_cursorMode == CursorMode::Hand) {
-      m_mousePanPoint = m_touchDevice == QTouchDevice::TouchScreen
+      m_mousePanPoint = m_touchDevice == QtCompat::TouchScreen
                             ? mapToScene(me->pos())
                             : me->pos() * getDevicePixelRatio(this);
       m_panning       = true;
       return;
     }
   } else if (m_buttonState == Qt::MiddleButton) {
-    m_mousePanPoint = m_touchDevice == QTouchDevice::TouchScreen
+    m_mousePanPoint = m_touchDevice == QtCompat::TouchScreen
                           ? mapToScene(me->pos())
                           : me->pos() * getDevicePixelRatio(this);
   }
@@ -375,7 +375,7 @@ void SchematicSceneViewer::mousePressEvent(QMouseEvent *me) {
  */
 void SchematicSceneViewer::mouseMoveEvent(QMouseEvent *me) {
   // qDebug() << "[mouseMoveEvent]";
-  if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen &&
+  if (m_gestureActive && m_touchDevice == QtCompat::TouchScreen &&
       !m_stylusUsed) {
     return;
   }
@@ -384,12 +384,12 @@ void SchematicSceneViewer::mouseMoveEvent(QMouseEvent *me) {
   QPointF currScenePos = mapToScene(currWinPos);
   if ((m_cursorMode == CursorMode::Hand && m_panning) ||
       m_buttonState == Qt::MiddleButton) {
-    QPointF usePos     = m_touchDevice == QTouchDevice::TouchScreen
+    QPointF usePos     = m_touchDevice == QtCompat::TouchScreen
                              ? mapToScene(me->pos())
                              : me->pos() * getDevicePixelRatio(this);
     QPointF deltaPoint = usePos - m_mousePanPoint;
     panQt(deltaPoint);
-    m_mousePanPoint = m_touchDevice == QTouchDevice::TouchScreen
+    m_mousePanPoint = m_touchDevice == QtCompat::TouchScreen
                           ? mapToScene(me->pos())
                           : me->pos() * getDevicePixelRatio(this);
   } else {
@@ -492,7 +492,7 @@ void SchematicSceneViewer::wheelEvent(QWheelEvent *me) {
 
   if (abs(delta) > 0) {
     if ((m_gestureActive == true &&
-         m_touchDevice == QTouchDevice::TouchScreen) ||
+         m_touchDevice == QtCompat::TouchScreen) ||
         m_gestureActive == false) {
       double factor = exp(delta * 0.001);
       changeScale(me->position().toPoint(), factor);
@@ -602,7 +602,7 @@ void SchematicSceneViewer::showEvent(QShowEvent *se) {
 
 //------------------------------------------------------------------
 
-void SchematicSceneViewer::enterEvent(QEvent *e) {
+void SchematicSceneViewer::enterEvent(QtCompat::EnterEvent *e) {
   switch (m_cursorMode) {
   case CursorMode::Hand:
     setToolCursor(this, ToolCursor::PanCursor);
@@ -625,7 +625,7 @@ void SchematicSceneViewer::leaveEvent(QEvent *e) { setCursor(Qt::ArrowCursor); }
 void SchematicSceneViewer::tabletEvent(QTabletEvent *e) {
   // qDebug() << "[tabletEvent]";
   if (e->type() == QTabletEvent::TabletPress) {
-    m_stylusUsed = e->pointerType() ? true : false;
+    m_stylusUsed = QtCompat::isStylusPointer(e);
   } else if (e->type() == QTabletEvent::TabletRelease) {
     m_stylusUsed = false;
   }
@@ -647,7 +647,7 @@ void SchematicSceneViewer::gestureEvent(QGestureEvent *e) {
     QPinchGesture *gesture = static_cast<QPinchGesture *>(pinch);
     QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
     QPoint firstCenter                     = gesture->centerPoint().toPoint();
-    if (m_touchDevice == QTouchDevice::TouchScreen)
+    if (m_touchDevice == QtCompat::TouchScreen)
       firstCenter = mapFromGlobal(firstCenter);
 
     if (gesture->state() == Qt::GestureStarted) {
@@ -709,9 +709,9 @@ void SchematicSceneViewer::touchEvent(QTouchEvent *e, int type) {
     // touchpads must have 2 finger panning for tools and navigation to be
     // functional on other devices, 1 finger panning is preferred
     if ((e->touchPoints().count() == 2 &&
-         m_touchDevice == QTouchDevice::TouchPad) ||
+         m_touchDevice == QtCompat::TouchPad) ||
         (e->touchPoints().count() == 1 &&
-         m_touchDevice == QTouchDevice::TouchScreen)) {
+         m_touchDevice == QtCompat::TouchScreen)) {
       QTouchEvent::TouchPoint panPoint = e->touchPoints().at(0);
       if (!m_panning) {
         QPointF deltaPoint = panPoint.pos() - m_firstPanPoint;
@@ -722,11 +722,11 @@ void SchematicSceneViewer::touchEvent(QTouchEvent *e, int type) {
         }
       }
       if (m_panning) {
-        QPointF curPos      = m_touchDevice == QTouchDevice::TouchScreen
+        QPointF curPos      = m_touchDevice == QtCompat::TouchScreen
                                   ? mapToScene(panPoint.pos().toPoint())
                                   : mapToScene(panPoint.pos().toPoint()) *
                                    getDevicePixelRatio(this);
-        QPointF lastPos     = m_touchDevice == QTouchDevice::TouchScreen
+        QPointF lastPos     = m_touchDevice == QtCompat::TouchScreen
                                   ? mapToScene(panPoint.lastPos().toPoint())
                                   : mapToScene(panPoint.lastPos().toPoint()) *
                                     getDevicePixelRatio(this);

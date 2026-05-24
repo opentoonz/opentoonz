@@ -2,20 +2,47 @@
   pkgs,
   lib ? pkgs.lib,
   src ? ../.,
+  qtMajor ? 5,
 }:
 
 let
+  qtMajorString = toString qtMajor;
   inherit (pkgs) stdenv;
-  qt5 = pkgs.qt5;
+  qt =
+    if qtMajor == 5 then
+      pkgs.qt5
+    else if qtMajor == 6 then
+      pkgs.qt6
+    else
+      throw "Unsupported OpenToonz Qt major: ${qtMajorString}";
 
-  qtInputs = with qt5; [
-    qtbase
-    qtsvg
-    qtscript
-    qttools
-    qtmultimedia
-    qtserialport
-  ] ++ lib.optionals stdenv.isLinux [ qtwayland ];
+  qtBase = qt.qtbase;
+  qtMultimedia = qt.qtmultimedia;
+  defaultBuildDirName =
+    if qtMajor == 5 then "nix-relwithdebinfo" else "nix-qt6-relwithdebinfo";
+
+  qtInputs =
+    if qtMajor == 5 then
+      (with qt; [
+        qtbase
+        qtsvg
+        qtscript
+        qttools
+        qtmultimedia
+        qtserialport
+      ])
+      ++ lib.optionals stdenv.isLinux [ qt.qtwayland ]
+    else
+      (with qt; [
+        qtbase
+        qtsvg
+        qttools
+        qtmultimedia
+        qtserialport
+        qt5compat
+        qtdeclarative
+      ])
+      ++ lib.optionals stdenv.isLinux [ qt.qtwayland ];
 
   nativeInputs = [
     pkgs.autoconf
@@ -74,10 +101,10 @@ let
   ];
   libraryPath = lib.makeLibraryPath libOutputs;
 
-  qtBaseDev = lib.getDev qt5.qtbase;
-  qtBaseBin = lib.getBin qt5.qtbase;
-  qtMultimediaBin = lib.getBin qt5.qtmultimedia;
-  qtPluginPrefix = qt5.qtbase.qtPluginPrefix;
+  qtBaseDev = lib.getDev qtBase;
+  qtBaseBin = lib.getBin qtBase;
+  qtMultimediaBin = lib.getBin qtMultimedia;
+  qtPluginPrefix = qtBase.qtPluginPrefix;
   lzoDev = lib.getDev pkgs.lzo;
   lzoLib = lib.getLib pkgs.lzo;
   superluDev = lib.getDev pkgs.superlu;
@@ -145,8 +172,11 @@ let
   envVars = {
     CC = compiler.cc;
     CXX = compiler.cxx;
+    OPENTOONZ_QT_MAJOR = qtMajorString;
     OPENTOONZ_QT_PATH = "${qtBaseDev}/lib";
-    OPENTOONZ_QT5_DIR = "${qtBaseDev}/lib/cmake/Qt5";
+    OPENTOONZ_QT_DIR = "${qtBaseDev}/lib/cmake/Qt${qtMajorString}";
+    OPENTOONZ_QT5_DIR = lib.optionalString (qtMajor == 5) "${qtBaseDev}/lib/cmake/Qt5";
+    OPENTOONZ_QT6_DIR = lib.optionalString (qtMajor == 6) "${qtBaseDev}/lib/cmake/Qt6";
     OPENTOONZ_QT_PLUGIN_DIRS = lib.concatStringsSep ":" [
       "${qtBaseBin}/${qtPluginPrefix}"
       "${qtMultimediaBin}/${qtPluginPrefix}"
@@ -168,8 +198,9 @@ let
     "-DWITH_TRANSLATION=OFF"
     "-DWITH_SYSTEM_LZO=ON"
     "-DWITH_SYSTEM_SUPERLU=ON"
+    "-DOPENTOONZ_QT_MAJOR=${qtMajorString}"
     "-DQT_PATH=${envVars.OPENTOONZ_QT_PATH}"
-    "-DQt5_DIR=${envVars.OPENTOONZ_QT5_DIR}"
+    "-DQt${qtMajorString}_DIR=${envVars.OPENTOONZ_QT_DIR}"
     "-DBOOST_ROOT=${envVars.OPENTOONZ_BOOST_ROOT}"
     "-DBoost_NO_BOOST_CMAKE=ON"
     "-DLZO_INCLUDE_DIR=${envVars.OPENTOONZ_LZO_INCLUDE_DIR}"
@@ -183,7 +214,7 @@ let
     version = "dev";
     inherit src;
 
-    nativeBuildInputs = nativeInputs ++ [ qt5.wrapQtAppsHook ];
+    nativeBuildInputs = nativeInputs ++ [ qt.wrapQtAppsHook ];
     inherit buildInputs;
 
     CMAKE_PREFIX_PATH = cmakePrefixPath;
@@ -204,7 +235,7 @@ in
         ${darwinCompilerSetup}
         export CC="${envVars.CC}"
         export CXX="${envVars.CXX}"
-        export OPENTOONZ_BUILD_DIR="''${OPENTOONZ_BUILD_DIR:-$PWD/toonz/build/nix-relwithdebinfo}"
+        export OPENTOONZ_BUILD_DIR="''${OPENTOONZ_BUILD_DIR:-$PWD/toonz/build/${defaultBuildDirName}}"
         export CMAKE_PREFIX_PATH="${cmakePrefixPath}''${CMAKE_PREFIX_PATH:+:$CMAKE_PREFIX_PATH}"
         export PKG_CONFIG_PATH="${pkgConfigPath}''${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
         export LD_LIBRARY_PATH="${libraryPath}''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"

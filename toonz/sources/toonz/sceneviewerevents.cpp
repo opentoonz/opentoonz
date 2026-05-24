@@ -261,7 +261,7 @@ void SceneViewer::tabletEvent(QTabletEvent *e) {
   m_tabletMove  = false;
   // Management of the Eraser pointer
   ToolHandle *toolHandle = TApp::instance()->getCurrentTool();
-  if (e->pointerType() == QTabletEvent::Eraser) {
+  if (QtCompat::isEraserPointer(e)) {
     if (!m_eraserPointerOn) {
       if (toolHandle->getTool()->getName() != T_Eraser) {
         // Save the current tool
@@ -440,7 +440,7 @@ void SceneViewer::onLeave() {
 
 //-----------------------------------------------------------------------------
 
-void SceneViewer::enterEvent(QEvent *) { onEnter(); }
+void SceneViewer::enterEvent(QtCompat::EnterEvent *) { onEnter(); }
 
 //-----------------------------------------------------------------------------
 
@@ -492,7 +492,7 @@ void SceneViewer::mouseMoveEvent(QMouseEvent *event) {
   // if this is called just after tabletEvent, skip the execution
   if (m_tabletEvent) return;
   // and touchscreens but not touchpads...
-  if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen) {
+  if (m_gestureActive && m_touchDevice == QtCompat::TouchScreen) {
     return;
   }
   // Strangely, mouseMoveEvent seems to be called once just after releasing
@@ -730,7 +730,7 @@ void SceneViewer::mousePressEvent(QMouseEvent *event) {
   // if this is called just after tabletEvent, skip the execution
   if (m_tabletEvent) return;
   // and touchscreens but not touchpads...
-  if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen) {
+  if (m_gestureActive && m_touchDevice == QtCompat::TouchScreen) {
     return;
   }
   // For now OSX has a critical problem that mousePressEvent is called just
@@ -891,7 +891,7 @@ void SceneViewer::mouseReleaseEvent(QMouseEvent *event) {
     return;
   }
   // for touchscreens but not touchpads...
-  if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen) {
+  if (m_gestureActive && m_touchDevice == QtCompat::TouchScreen) {
     m_gestureActive = false;
     m_rotating      = false;
     m_zooming       = false;
@@ -1044,7 +1044,7 @@ void SceneViewer::wheelEvent(QWheelEvent *event) {
 
   }  // end switch
 
-  if (abs(delta) > 0 || m_touchDevice == QTouchDevice::TouchPad) {
+  if (abs(delta) > 0 || m_touchDevice == QtCompat::TouchPad) {
     // scrub with mouse wheel
     if ((event->modifiers() & Qt::AltModifier) &&
         (event->modifiers() & Qt::ShiftModifier) &&
@@ -1068,7 +1068,7 @@ void SceneViewer::wheelEvent(QWheelEvent *event) {
       } else if (delta > 0) {
         CommandManager::instance()->execute("MI_PrevDrawing");
       }
-    } else if (m_touchDevice == QTouchDevice::TouchPad) {
+    } else if (m_touchDevice == QtCompat::TouchPad) {
       QPointF centerDelta =
           QPointF(event->angleDelta().x(), event->angleDelta().y());
       panQt(centerDelta.toPoint());
@@ -1077,7 +1077,7 @@ void SceneViewer::wheelEvent(QWheelEvent *event) {
     // Mouse wheel zoom interfered with touchpad panning (touch enabled)
     // Now if touch is enabled, touchpads ignore the mouse wheel zoom
     else if ((m_gestureActive == true &&
-              m_touchDevice == QTouchDevice::TouchScreen) ||
+              m_touchDevice == QtCompat::TouchScreen) ||
              m_gestureActive == false) {
       zoomQt(event->position().toPoint() * getDevPixRatio(),
              exp(0.001 * delta));
@@ -1100,7 +1100,7 @@ void SceneViewer::gestureEvent(QGestureEvent *e) {
     QPinchGesture *gesture = static_cast<QPinchGesture *>(pinch);
     QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
     QPoint firstCenter                     = gesture->centerPoint().toPoint();
-    if (m_touchDevice == QTouchDevice::TouchScreen)
+    if (m_touchDevice == QtCompat::TouchScreen)
       firstCenter = mapFromGlobal(firstCenter);
 
     if (gesture->state() == Qt::GestureStarted) {
@@ -1183,7 +1183,7 @@ void SceneViewer::touchEvent(QTouchEvent *e, int type) {
     // functional
     // on other devices, 1 finger panning is preferred
     if (e->touchPoints().count() == 1 &&
-        m_touchDevice == QTouchDevice::TouchScreen) {
+        m_touchDevice == QtCompat::TouchScreen) {
       QTouchEvent::TouchPoint panPoint = e->touchPoints().at(0);
       if (!m_panning) {
         QPointF deltaPoint = panPoint.pos() - m_firstPanPoint;
@@ -1304,9 +1304,8 @@ bool SceneViewer::event(QEvent *e) {
       TApp::instance()->getCurrentTool()->storeTool();
     }
 
-    std::string keyStr = QKeySequence(keyEvent->key() + keyEvent->modifiers())
-                             .toString()
-                             .toStdString();
+    std::string keyStr =
+        QtCompat::keySequence(keyEvent).toString().toStdString();
     QAction *action = CommandManager::instance()->getActionFromShortcut(keyStr);
     std::string actionId = CommandManager::instance()->getIdFromAction(action);
 

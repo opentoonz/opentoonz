@@ -37,11 +37,12 @@
 #include <QMouseEvent>
 #include <QIcon>
 #include <QAction>
+#include <QActionGroup>
 #include <QWidgetAction>
 #include <QStyle>
 #include <QStylePainter>
 #include <QStyleOption>
-#include <QStyleOptionFrameV3>
+#include <QStyleOptionFrame>
 #include <QSettings>
 #include <QPushButton>
 #include <QScrollBar>

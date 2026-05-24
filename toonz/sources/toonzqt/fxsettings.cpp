@@ -34,6 +34,7 @@
 #include <QToolBar>
 #include <QIcon>
 #include <QAction>
+#include <QActionGroup>
 #include <QStackedWidget>
 #include <QLabel>
 #include <QMap>
@@ -682,10 +683,11 @@ QSize ParamsPage::getPreferredSize() {
 
   updateMaximumPageSize(m_mainLayout, maxLabelWidth, maxWidgetWidth,
                         fieldsHeight);
+  const QMargins margins = m_mainLayout->contentsMargins();
   return QSize(maxLabelWidth + maxWidgetWidth +
                    m_mainLayout->horizontalSpacing() +
-                   2 * m_mainLayout->margin(),
-               fieldsHeight + 2 * m_mainLayout->margin() +
+                   margins.left() + margins.right(),
+               fieldsHeight + margins.top() + margins.bottom() +
                    31 /* spacing for the swatch */);
 }
 

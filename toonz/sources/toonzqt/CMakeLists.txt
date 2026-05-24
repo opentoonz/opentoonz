@@ -206,18 +206,18 @@ set(SOURCES
 
 set(RESOURCES toonzqt.qrc)
 
-get_target_property(QW_LOC Qt5::Widgets INTERFACE_INCLUDE_DIRECTORIES)
+get_target_property(QW_LOC ${QT_WIDGETS_TARGET} INTERFACE_INCLUDE_DIRECTORIES)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(incs)
-foreach(dir ${Qt5Widgets_INCLUDE_DIRS})
+foreach(dir ${OPENTOONZ_QT_WIDGETS_INCLUDE_DIRS})
     set(incs ${incs} -I${dir})
 endforeach()
 
-qt5_add_resources(SOURCES ${RESOURCES})
+opentoonz_qt_add_resources(SOURCES ${RESOURCES})
 
-qt5_wrap_cpp(SOURCES ${MOC_HEADERS} OPTIONS ${incs})
+opentoonz_qt_wrap_cpp(SOURCES ${MOC_HEADERS} OPTIONS ${incs})
 
 add_library(toonzqt SHARED ${HEADERS} ${SOURCES} ${RESOURCES})
 
@@ -254,4 +254,4 @@ elseif(BUILD_ENV_UNIXLIKE)
     endif()
 endif()
 
-target_link_libraries(toonzqt Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network Qt5::OpenGL Qt5::Svg ${EXTRA_LIBS} ${GL_LIB})
+target_link_libraries(toonzqt ${QT_CORE_LINK_TARGETS} ${QT_GUI_TARGET} ${QT_WIDGETS_TARGET} ${QT_NETWORK_TARGET} ${QT_OPENGL_LINK_TARGETS} ${QT_SVG_TARGET} ${EXTRA_LIBS} ${GL_LIB})

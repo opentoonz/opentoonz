@@ -45,6 +45,7 @@
 #include <QDir>
 #include <QRegularExpression>
 #include <QMessageBox>
+#include <QTextCodec>
 #include <QtCore>
 
 #include "../common/psdlib/psd.h"

@@ -33,6 +33,7 @@
 #include <QVBoxLayout>
 #include <QMouseEvent>
 #include <QAction>
+#include <QActionGroup>
 #include <QLabel>
 #include <QMainWindow>
 #include <QButtonGroup>

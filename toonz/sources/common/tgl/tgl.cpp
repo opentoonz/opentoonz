@@ -20,7 +20,13 @@
 #endif
 
 #if defined(MACOSX) || defined(LINUX) || defined(FREEBSD) || defined(HAIKU)
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QOpenGLContext>
+#include <QSurface>
+#else
 #include <QGLContext>
+#endif
 #endif
 
 //#include "tthread.h"
@@ -600,6 +606,31 @@ void tglDoneCurrent(TGlContext) { wglMakeCurrent(NULL, NULL); }
 
 #elif defined(LINUX) || defined(FREEBSD) || defined(__sgi) || defined(MACOSX) || defined(HAIKU)
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+
+TGlContext tglGetCurrentContext() {
+  return reinterpret_cast<TGlContext>(QOpenGLContext::currentContext());
+}
+
+void tglMakeCurrent(TGlContext context) {
+  if (context) {
+    QOpenGLContext *glContext = reinterpret_cast<QOpenGLContext *>(context);
+    QSurface *surface         = glContext->surface();
+    if (surface)
+      glContext->makeCurrent(surface);
+    else
+      glContext->doneCurrent();
+  } else {
+    tglDoneCurrent(tglGetCurrentContext());
+  }
+}
+
+void tglDoneCurrent(TGlContext context) {
+  if (context) reinterpret_cast<QOpenGLContext *>(context)->doneCurrent();
+}
+
+#else
+
 TGlContext tglGetCurrentContext() {
   return reinterpret_cast<TGlContext>(
       const_cast<QGLContext *>(QGLContext::currentContext()));
@@ -618,6 +649,8 @@ void tglMakeCurrent(TGlContext context) {
 void tglDoneCurrent(TGlContext context) {
   if (context) reinterpret_cast<QGLContext *>(context)->doneCurrent();
 }
+
+#endif
 
 #else
 #error "unknown platform!"

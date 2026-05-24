@@ -5,11 +5,18 @@
 
 #include <memory>
 
-#include <QtOpenGL>
-#include <QGLFormat>
-#include <QGLContext>
-#include <QGLPixelBuffer>
+#include <QImage>
+#include <QtGlobal>
+#include <QOffscreenSurface>
+#include <QOpenGLContext>
 #include <QOpenGLFramebufferObject>
+#include <QSurfaceFormat>
+#include <QThread>
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#include <QGLFormat>
+#include <QGLPixelBuffer>
+#endif
 
 #include "tofflinegl.h"
 
@@ -36,6 +43,8 @@ public:
 
 //-----------------------------------------------------------------------------
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+
 class QtOfflineGLPBuffer final : public TOfflineGL::Imp {
 public:
   std::shared_ptr<QGLPixelBuffer> m_context;
@@ -49,5 +58,7 @@ public:
 
   void getRaster(TRaster32P raster) override;
 };
+
+#endif
 
 #endif

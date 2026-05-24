@@ -768,13 +768,7 @@ void Preferences::define(PreferencesItemId id, QString idString,
   case QMetaType::QVariantMap:  // Used in colorCalibrationLutPaths
     if (m_settings->contains(idString) &&
         m_settings->value(idString).canConvert(type)) {
-      QMap<QString, QVariant> pathMap;
-      QAssociativeIterable iterable =
-          m_settings->value(idString).value<QAssociativeIterable>();
-      QAssociativeIterable::const_iterator it        = iterable.begin();
-      const QAssociativeIterable::const_iterator end = iterable.end();
-      for (; it != end; ++it)
-        pathMap.insert(it.key().toString(), it.value().toString());
+      QMap<QString, QVariant> pathMap = m_settings->value(idString).toMap();
       value.setValue(pathMap);
     }
     break;

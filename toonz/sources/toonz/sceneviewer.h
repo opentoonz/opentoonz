@@ -20,10 +20,10 @@
 // Toonz includes
 #include "pane.h"
 #include "previewer.h"
+#include "toonzqt/qtcompat.h"
 
 #include <array>
 #include <QMatrix4x4>
-#include <QTouchDevice>
 
 //=====================================================================
 
@@ -88,7 +88,7 @@ class SceneViewer final : public TToolViewer, public Previewer::Listener {
   bool m_shownOnce                       = false;
   bool m_gestureActive                   = false;
   bool m_touchActive                     = false;
-  QTouchDevice::DeviceType m_touchDevice = QTouchDevice::TouchScreen;
+  QtCompat::TouchDeviceType m_touchDevice = QtCompat::TouchScreen;
   bool m_rotating                        = false;
   bool m_zooming                         = false;
   bool m_panning                         = false;
@@ -345,7 +345,7 @@ protected:
   void touchEvent(QTouchEvent *e, int type);
   void tabletEvent(QTabletEvent *) override;
   void leaveEvent(QEvent *) override;
-  void enterEvent(QEvent *) override;
+  void enterEvent(QtCompat::EnterEvent *) override;
   void mouseMoveEvent(QMouseEvent *event) override;
   void mousePressEvent(QMouseEvent *event) override;
   void mouseReleaseEvent(QMouseEvent *event) override;

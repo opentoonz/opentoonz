@@ -53,7 +53,6 @@
 #include <QApplication>
 #include <QMenu>
 #include <QGraphicsSceneMouseEvent>
-#include <QDesktopWidget>
 #include <cassert>
 
 //********************************************************************************

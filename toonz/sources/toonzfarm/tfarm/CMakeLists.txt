@@ -57,6 +57,6 @@ elseif(BUILD_ENV_UNIXLIKE)
     endif()
 endif()
 target_link_libraries(tfarm
-    Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Network
+    ${QT_CORE_LINK_TARGETS} ${QT_GUI_TARGET} ${QT_OPENGL_LINK_TARGETS} ${QT_NETWORK_TARGET}
     ${GLUT_LIB} ${GL_LIB} ${EXTRA_LIBS}
 )

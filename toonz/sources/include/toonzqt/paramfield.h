@@ -8,6 +8,7 @@
 #endif
 
 #include "tcommon.h"
+#include "toonzqt/qtcompat.h"
 #include <QWidget>
 #include <QSpinBox>
 #include <QSlider>
@@ -161,7 +162,7 @@ public:
 protected:
   void paintEvent(QPaintEvent *) override;
   void mousePressEvent(QMouseEvent *) override;
-  void enterEvent(QEvent *) override;
+  void enterEvent(QtCompat::EnterEvent *) override;
   void leaveEvent(QEvent *) override;
 
   // keyframe colors

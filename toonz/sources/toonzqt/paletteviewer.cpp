@@ -43,6 +43,7 @@
 #include <QApplication>
 #include <QLabel>
 #include <QDrag>
+#include <QActionGroup>
 
 TEnv::IntVar ShowNewStyleButton("ShowNewStyleButton", 1);
 using namespace PaletteViewerGUI;

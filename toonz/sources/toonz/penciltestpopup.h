@@ -11,7 +11,6 @@
 #include "toonz/tproject.h"
 #include "filebrowserpopup.h"
 
-#include <QAbstractVideoSurface>
 #include <QRunnable>
 #include <QLineEdit>
 #include <QPushButton>
@@ -19,19 +18,14 @@
 
 // forward decl.
 class QCamera;
-class QCameraImageCapture;
 class QComboBox;
 class QSlider;
 class QCheckBox;
-class QVideoFrame;
 class QTimer;
 class QIntValidator;
 class QLabel;
 class QGroupBox;
 class QRadioButton;
-#ifdef MACOSX
-class QCameraViewfinder;
-#endif
 
 namespace DVGui {
 class FileField;

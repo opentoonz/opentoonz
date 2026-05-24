@@ -596,7 +596,7 @@ void BrushPresetPanel::initializeUI() {
   // Main widget
   QWidget *mainWidget = new QWidget(this);
   QVBoxLayout *mainLayout = new QVBoxLayout(mainWidget);
-  mainLayout->setMargin(5);
+  mainLayout->setContentsMargins(5, 5, 5, 5);
   mainLayout->setSpacing(5);
   
   // Label for displaying active tool (theme-aware colors)
@@ -659,7 +659,7 @@ void BrushPresetPanel::initializeUI() {
   
   m_presetContainer = new QWidget();
   m_presetLayout = new QGridLayout(m_presetContainer);
-  m_presetLayout->setMargin(5);
+  m_presetLayout->setContentsMargins(5, 5, 5, 5);
   m_presetLayout->setSpacing(8);
   m_presetLayout->setAlignment(Qt::AlignTop);
   
@@ -722,7 +722,7 @@ void BrushPresetPanel::hideEvent(QHideEvent *e) {
   disconnectSignals();
 }
 
-void BrushPresetPanel::enterEvent(QEvent *e) {
+void BrushPresetPanel::enterEvent(QtCompat::EnterEvent *e) {
   TPanel::enterEvent(e);
   // Refresh automatically when mouse enters panel
   refreshPresetList();
@@ -1516,4 +1516,3 @@ void BrushPresetPanel::reorganizeLayout(int newColumns) {
     }
   }
 }
-

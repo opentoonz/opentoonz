@@ -23,6 +23,7 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include <QMainWindow>
+#include <QActionGroup>
 #include <QSettings>
 #include <QMap>
 #include <QMenu>
@@ -156,7 +157,7 @@ void TPanel::onCustomContextMenuRequested(const QPoint &pos) {
 //-----------------------------------------------------------------------------
 /*! activate the panel and set focus specified widget when mouse enters
  */
-void TPanel::enterEvent(QEvent *event) {
+void TPanel::enterEvent(QtCompat::EnterEvent *event) {
   // Only when Toonz application is active
   QWidget *w = QApplication::activeWindow();
   if (w) {
@@ -538,7 +539,7 @@ void TPanelTitleBarButton::mouseMoveEvent(QMouseEvent *event) {}
 
 //-----------------------------------------------------------------------------
 
-void TPanelTitleBarButton::enterEvent(QEvent *) {
+void TPanelTitleBarButton::enterEvent(QtCompat::EnterEvent *) {
   if (!m_rollover) {
     m_rollover = true;
     if (!m_pressed) update();

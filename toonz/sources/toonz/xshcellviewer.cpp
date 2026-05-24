@@ -67,6 +67,7 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include <QMenu>
+#include <QActionGroup>
 #include <QUrl>
 #include <QToolTip>
 #include <QApplication>
@@ -1042,7 +1043,7 @@ bool RenameCellField::eventFilter(QObject *obj, QEvent *e) {
 
   QKeyEvent *ke = (QKeyEvent *)e;
   std::string keyStr =
-      QKeySequence(ke->key() + ke->modifiers()).toString().toStdString();
+      QtCompat::keySequence(ke).toString().toStdString();
   QAction *action = CommandManager::instance()->getActionFromShortcut(keyStr);
   if (!action) return QLineEdit::eventFilter(obj, e);
 

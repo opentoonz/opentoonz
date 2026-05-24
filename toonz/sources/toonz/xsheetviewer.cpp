@@ -1420,7 +1420,7 @@ void XsheetViewer::keyReleaseEvent(QKeyEvent *event) {
   }
 }
 
-void XsheetViewer::enterEvent(QEvent *) {
+void XsheetViewer::enterEvent(QtCompat::EnterEvent *) {
   m_cellArea->onControlPressed(false);
   m_columnArea->onControlPressed(false);
   TApp *app = TApp::instance();

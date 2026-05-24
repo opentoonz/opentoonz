@@ -18,26 +18,51 @@
       forAllSystems = lib.genAttrs supportedSystems;
       pkgsFor = system: import nixpkgs { inherit system; };
       opentoonzFor =
-        system:
+        system: qtMajor:
         import ./nix/opentoonz-env.nix {
           pkgs = pkgsFor system;
           inherit lib;
           src = self;
+          inherit qtMajor;
         };
     in
     {
-      devShells = forAllSystems (system: {
-        default = (opentoonzFor system).devShell;
-      });
+      devShells = forAllSystems (
+        system:
+        let
+          qt5Env = opentoonzFor system 5;
+          qt6Env = opentoonzFor system 6;
+        in
+        {
+          default = qt5Env.devShell;
+          qt6 = qt6Env.devShell;
+        }
+      );
 
-      packages = forAllSystems (system: rec {
-        opentoonz = (opentoonzFor system).package;
-        default = opentoonz;
-      });
+      packages = forAllSystems (
+        system:
+        let
+          qt5Env = opentoonzFor system 5;
+          qt6Env = opentoonzFor system 6;
+        in
+        rec {
+          opentoonz = qt5Env.package;
+          opentoonz-qt6 = qt6Env.package;
+          default = opentoonz;
+        }
+      );
 
-      checks = forAllSystems (system: {
-        configure = (opentoonzFor system).configureCheck;
-      });
+      checks = forAllSystems (
+        system:
+        let
+          qt5Env = opentoonzFor system 5;
+          qt6Env = opentoonzFor system 6;
+        in
+        {
+          configure = qt5Env.configureCheck;
+          configure-qt6 = qt6Env.configureCheck;
+        }
+      );
 
       formatter = forAllSystems (system: (pkgsFor system).nixfmt);
     };

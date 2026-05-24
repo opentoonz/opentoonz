@@ -24,7 +24,7 @@ class QPushButton;
 class QVideoFrame;
 class QTimer;
 class QIntValidator;
-class QRegExpValidator;
+class QRegularExpressionValidator;
 class QPushButton;
 #ifdef MACOSX
 class QCameraViewfinder;
@@ -189,7 +189,7 @@ class FrameNumberLineEdit : public DVGui::LineEdit,
                             public TProjectManager::Listener {
   Q_OBJECT
   /* having two validators and switch them according to the preferences*/
-  QRegExpValidator *m_regexpValidator, *m_regexpValidator_alt;
+  QRegularExpressionValidator *m_regexpValidator, *m_regexpValidator_alt;
 
   void updateValidator();
   void updateSize();

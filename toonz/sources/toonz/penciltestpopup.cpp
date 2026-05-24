@@ -59,13 +59,18 @@
 
 // Qt includes
 #include <QMainWindow>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QCameraDevice>
+#include <QCameraFormat>
+#include <QMediaDevices>
+#else
 #include <QCameraInfo>
-#include <QCamera>
-#include <QCameraImageCapture>
 #include <QCameraViewfinderSettings>
 #ifdef MACOSX
 #include <QCameraViewfinder>
 #endif
+#endif
+#include <QCamera>
 
 #include <QComboBox>
 #include <QPushButton>
@@ -80,7 +85,6 @@
 #include <QGridLayout>
 #include <QToolButton>
 #include <QDateTime>
-#include <QMultimedia>
 #include <QPainter>
 #include <QKeyEvent>
 #include <QCommonStyle>
@@ -88,7 +92,6 @@
 #include <QIntValidator>
 #include <QRegularExpressionValidator>
 
-#include <QVideoSurfaceFormat>
 #include <QThreadPool>
 #include <QHostInfo>
 #include <QDesktopServices>
@@ -129,6 +132,60 @@ TEnv::DoubleVar CamCapCustomDpi("CamCapDpiForNewLevel", 120.0);
 TEnv::StringVar CamCapFileType("CamCapFileType", "jpg");
 
 namespace {
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+using ToonzCameraInfo = QCameraDevice;
+#else
+using ToonzCameraInfo = QCameraInfo;
+#endif
+
+QList<ToonzCameraInfo> availableCameras() {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return QMediaDevices::videoInputs();
+#else
+  return QCameraInfo::availableCameras();
+#endif
+}
+
+ToonzCameraInfo defaultCamera() {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return QMediaDevices::defaultVideoInput();
+#else
+  return QCameraInfo::defaultCamera();
+#endif
+}
+
+bool isNullCamera(const ToonzCameraInfo& camera) {
+  return camera.isNull();
+}
+
+QString cameraDescription(const ToonzCameraInfo& camera) {
+  return camera.description();
+}
+
+QString cameraDeviceName(const ToonzCameraInfo& camera) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return QString::fromUtf8(camera.id());
+#else
+  return camera.deviceName();
+#endif
+}
+
+QList<QSize> cameraResolutions(QCamera* camera,
+                               const ToonzCameraInfo& cameraInfo) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  Q_UNUSED(camera)
+  QList<QSize> sizes;
+  for (const QCameraFormat& format : cameraInfo.videoFormats()) {
+    const QSize size = format.resolution();
+    if (size.isValid() && !sizes.contains(size)) sizes.append(size);
+  }
+  return sizes;
+#else
+  Q_UNUSED(cameraInfo)
+  return camera->supportedViewfinderResolutions();
+#endif
+}
 
 void convertImageToRaster(TRaster32P dstRas, const QImage& srcImg) {
   dstRas->lock();
@@ -2118,9 +2175,9 @@ PencilTestPopup::PencilTestPopup()
       QString::fromStdString(CamCapCameraName.getValue()));
   // If previous camera is not found, then try to activate the connected default
   // camera
-  if (startupCamIndex <= 0 && !QCameraInfo::defaultCamera().isNull()) {
-    startupCamIndex =
-        m_cameraListCombo->findText(QCameraInfo::defaultCamera().description());
+  if (startupCamIndex <= 0 && !isNullCamera(defaultCamera())) {
+    startupCamIndex = m_cameraListCombo->findText(
+        cameraDescription(defaultCamera()));
   }
   if (startupCamIndex > 0) {
     m_cameraListCombo->setCurrentIndex(startupCamIndex);
@@ -2210,7 +2267,7 @@ QMenu* PencilTestPopup::createOptionsMenu() {
 void PencilTestPopup::refreshCameraList() {
   m_cameraListCombo->clear();
 
-  QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
+  QList<ToonzCameraInfo> cameras = availableCameras();
   if (cameras.empty()) {
     m_cameraListCombo->addItem(tr("No camera found"));
     m_cameraListCombo->setMaximumWidth(250);
@@ -2221,7 +2278,7 @@ void PencilTestPopup::refreshCameraList() {
   // Add non-connected state as default
   m_cameraListCombo->addItem(tr("- Select camera -"));
   for (int c = 0; c < cameras.size(); c++) {
-    QString camDesc = cameras.at(c).description();
+    QString camDesc = cameraDescription(cameras.at(c));
     m_cameraListCombo->addItem(camDesc);
     maxTextLength =
         std::max(maxTextLength, fontMetrics().horizontalAdvance(camDesc));
@@ -2234,7 +2291,7 @@ void PencilTestPopup::refreshCameraList() {
 //-----------------------------------------------------------------------------
 
 void PencilTestPopup::onCameraListComboActivated(int comboIndex) {
-  QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
+  QList<ToonzCameraInfo> cameras = availableCameras();
   if (cameras.size() != m_cameraListCombo->count() - 1) return;
 
   m_cvWebcam.release();
@@ -2252,17 +2309,19 @@ void PencilTestPopup::onCameraListComboActivated(int comboIndex) {
 
   int index = comboIndex - 1;
   // In case the camera is not changed (just click the combobox)
-  if (cameras.at(index).deviceName() == m_deviceName) return;
+  if (cameraDeviceName(cameras.at(index)) == m_deviceName) return;
 
   m_currentCamera = new QCamera(cameras.at(index), this);
-  m_deviceName    = cameras.at(index).deviceName();
+  m_deviceName    = cameraDeviceName(cameras.at(index));
 
   // Loading new camera
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   m_currentCamera->load();
+#endif
 
   // Refresh resolution
   m_resolutionCombo->clear();
-  QList<QSize> sizes = m_currentCamera->supportedViewfinderResolutions();
+  QList<QSize> sizes = cameraResolutions(m_currentCamera, cameras.at(index));
   // Simple workaround because Qt fails to auto-detect the camera resolutions
   // https://forum.qt.io/topic/68904/how-to-get-the-supported-resolution-of-a-qcamera/5
   if (sizes.size() == 0) {
@@ -2282,7 +2341,9 @@ void PencilTestPopup::onCameraListComboActivated(int comboIndex) {
     sizes.push_back(QSize(3840, 2160));
   }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   m_currentCamera->unload();
+#endif
   for (const QSize size : sizes) {
     m_resolutionCombo->addItem(
         QString("%1 x %2").arg(size.width()).arg(size.height()), size);
@@ -3299,11 +3360,11 @@ bool PencilTestPopup::importImage(QImage image) {
 void PencilTestPopup::onCaptureFilterSettingsBtnPressed() {
   if (!m_currentCamera || m_deviceName.isNull()) return;
 
-  QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
+  QList<ToonzCameraInfo> cameras = availableCameras();
   for (int c = 0; c < cameras.size(); c++) {
-    if (cameras.at(c).deviceName() == m_deviceName) {
+    if (cameraDeviceName(cameras.at(c)) == m_deviceName) {
 #ifdef _WIN32
-      openCaptureFilterSettings(this, cameras.at(c).description());
+      openCaptureFilterSettings(this, cameraDescription(cameras.at(c)));
 #endif
       return;
     }

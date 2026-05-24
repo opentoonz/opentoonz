@@ -34,7 +34,6 @@ class SchematicName;
 
 class DVAPI SchematicWindowEditor : public QObject, public QGraphicsItem {
   Q_OBJECT
-  Q_INTERFACES(QGraphicsItem)
 
   QPointF m_lastPos;
 

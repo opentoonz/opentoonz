@@ -27,7 +27,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QMainWindow>
-#include <QRegularExpression>  // Changed from QRegExp
+#include <QRegularExpression>
 #include <QButtonGroup>
 #include <QRadioButton>
 
@@ -60,7 +60,7 @@ typedef TFilePath (*PathFunc)(const TFilePath &);
 //--------------------------------------------------------------
 
 struct FormatData {
-  QRegularExpression m_regExp;  // Changed from QRegExp
+  QRegularExpression m_regExp;
   PathFunc m_resourcePathFunc, m_componentPathFunc;
 };
 
@@ -194,7 +194,6 @@ TFilePath retasResourcePath(const TFilePath &fp) {
 //--------------------------------------------------------------
 
 static const FormatData l_formatDatas[] = {
-    // Changed QRegExp patterns to QRegularExpression
     {QRegularExpression(R"(.+\.[0-9]{4,4}.*\..*)"), &multiframeResourcePath,
      nullptr},
     {QRegularExpression(R"(.+[0-9]{4,4}\.tga)",
@@ -221,7 +220,7 @@ struct buildResources_locals {
   }
 
   struct MergeData {
-    QRegularExpression m_regExp;  // Changed from QRegExp
+    QRegularExpression m_regExp;
     int m_componentIdx;           //!< Starting index for components merging.
   };
 

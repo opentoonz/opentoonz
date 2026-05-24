@@ -697,9 +697,10 @@ bool tipc::writeShMemBuffer(Stream& stream, Message& msg, int bufSize,
       // Write to the shared memory segment
       tipc_debug(QTime xchTime; xchTime.start());
       shmem.lock();
-      remainingData -= chunkData =
-          dataWriter->write(reinterpret_cast<char*>(shmem.data()),
-                            std::min(shmem.size(), remainingData));
+      chunkData = dataWriter->write(
+          reinterpret_cast<char*>(shmem.data()),
+          std::min(static_cast<int>(shmem.size()), remainingData));
+      remainingData -= chunkData;
       shmem.unlock();
       tipc_debug(qDebug() << "exchange time:" << xchTime.elapsed());
 

@@ -184,7 +184,7 @@ void PlaneViewer::resizeGL(int width, int height) {
 //=========================================================================================
 
 void PlaneViewer::mouseMoveEvent(QMouseEvent *event) {
-  if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen &&
+  if (m_gestureActive && m_touchDevice == QtCompat::TouchScreen &&
       !m_stylusUsed) {
     return;
   }
@@ -200,7 +200,7 @@ void PlaneViewer::mouseMoveEvent(QMouseEvent *event) {
 
 void PlaneViewer::mousePressEvent(QMouseEvent *event) {
   // qDebug() << "[mousePressEvent]";
-  if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen &&
+  if (m_gestureActive && m_touchDevice == QtCompat::TouchScreen &&
       !m_stylusUsed) {
     return;
   }
@@ -267,7 +267,7 @@ void PlaneViewer::wheelEvent(QWheelEvent *event) {
 
   if (abs(delta) > 0) {
     if ((m_gestureActive == true &&
-         m_touchDevice == QTouchDevice::TouchScreen) ||
+         m_touchDevice == QtCompat::TouchScreen) ||
         m_gestureActive == false) {
       TPointD pos(event->position().x() * getDevPixRatio(),
                   height() - event->position().y() * getDevPixRatio());
@@ -322,7 +322,7 @@ void PlaneViewer::contextMenuEvent(QContextMenuEvent *event) {
 void PlaneViewer::tabletEvent(QTabletEvent *e) {
   // qDebug() << "[tabletEvent]";
   if (e->type() == QTabletEvent::TabletPress) {
-    m_stylusUsed = e->pointerType() ? true : false;
+    m_stylusUsed = QtCompat::isStylusPointer(e);
   } else if (e->type() == QTabletEvent::TabletRelease) {
     m_stylusUsed = false;
   }
@@ -344,7 +344,7 @@ void PlaneViewer::gestureEvent(QGestureEvent *e) {
     QPinchGesture *gesture = static_cast<QPinchGesture *>(pinch);
     QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
     QPoint firstCenter                     = gesture->centerPoint().toPoint();
-    if (m_touchDevice == QTouchDevice::TouchScreen)
+    if (m_touchDevice == QtCompat::TouchScreen)
       firstCenter = mapFromGlobal(firstCenter);
 
     if (gesture->state() == Qt::GestureStarted) {
@@ -406,9 +406,9 @@ void PlaneViewer::touchEvent(QTouchEvent *e, int type) {
     // touchpads must have 2 finger panning for tools and navigation to be
     // functional on other devices, 1 finger panning is preferred
     if ((e->touchPoints().count() == 2 &&
-         m_touchDevice == QTouchDevice::TouchPad) ||
+         m_touchDevice == QtCompat::TouchPad) ||
         (e->touchPoints().count() == 1 &&
-         m_touchDevice == QTouchDevice::TouchScreen)) {
+         m_touchDevice == QtCompat::TouchScreen)) {
       QTouchEvent::TouchPoint panPoint = e->touchPoints().at(0);
       if (!m_panning) {
         QPointF deltaPoint = panPoint.pos() - m_firstPanPoint;

@@ -32,6 +32,7 @@
 #include <QPainter>
 #include <QToolTip>
 #include <QAction>
+#include <QActionGroup>
 #include <QDate>
 #include <QContextMenuEvent>
 #include <QMenu>

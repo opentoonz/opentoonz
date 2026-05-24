@@ -52,6 +52,7 @@
 #include <QPainter>
 #include <QVBoxLayout>
 #include <QAction>
+#include <QActionGroup>
 #include <QDialogButtonBox>
 #include <QAbstractButton>
 #include <QMouseEvent>

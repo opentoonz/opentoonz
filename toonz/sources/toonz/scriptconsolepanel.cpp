@@ -3,8 +3,14 @@
 #include "scriptconsolepanel.h"
 #include "toonzqt/scriptconsole.h"
 #include "toonz/scriptengine.h"
+
+#include <QtGlobal>
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include "toonz/scriptbinding.h"
 #include "toonz/scriptbinding_level.h"
+#endif
+
 #include "iocommand.h"
 #include "tapp.h"
 #include "toonz/toonzscene.h"
@@ -19,9 +25,13 @@
 #include "flipbook.h"
 #include "tvectorimage.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QScriptEngine>
+#endif
 #include <QFile>
 #include <QTextStream>
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 
 static QScriptValue loadSceneFun(QScriptContext *context,
                                  QScriptEngine *engine) {
@@ -123,6 +133,8 @@ static void def(ScriptEngine *teng, const QString &name,
   eng->globalObject().setProperty(name, evalFun);
 }
 
+#endif
+
 ScriptConsolePanel::ScriptConsolePanel(QWidget *parent, Qt::WindowFlags flags)
     : TPanel(parent) {
   setPanelType("ScriptConsole");
@@ -133,6 +145,7 @@ ScriptConsolePanel::ScriptConsolePanel(QWidget *parent, Qt::WindowFlags flags)
 
   ScriptEngine *teng = m_scriptConsole->getEngine();
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   /*
 def(teng, "saveScene", saveSceneFun);
 def(teng, "loadScene", loadSceneFun);
@@ -155,6 +168,11 @@ initFile.close();
 teng->getQScriptEngine()->evaluate(contents, "init.js");
 }
 */
+#else
+  teng->emitOutput(ScriptEngine::Warning,
+                   tr("Qt 6 scripting is running on QJSEngine; OpenToonz "
+                      "object bindings are not ported yet."));
+#endif
 
   setWidget(m_scriptConsole);
   setMinimumHeight(80);

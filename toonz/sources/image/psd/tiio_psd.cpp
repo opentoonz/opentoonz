@@ -4,6 +4,7 @@
 #if (defined(x64) || defined(__LP64__))
 #include "toonz/preferences.h"
 #include <QtCore>
+#include <QTextCodec>
 #endif
 
 // forward declaration

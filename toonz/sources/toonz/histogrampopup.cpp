@@ -23,7 +23,6 @@
 // Qt includes
 #include <QTimer>
 #include <QMainWindow>
-#include <QDesktopWidget>
 #include <QFocusEvent>
 #include <QScreen>
 

@@ -125,8 +125,8 @@ void QtOfflineGL::createContext(TDimension rasterSize,
 
 */
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   QGLFormat fmt;
-
 #if defined(_WIN32)
   fmt.setAlphaBufferSize(8);
   fmt.setAlpha(true);
@@ -158,9 +158,13 @@ void QtOfflineGL::createContext(TDimension rasterSize,
   // printf("GL Version: %s\n",glGetString(GL_VERSION));
   fmt.setVersion(2, 1); /* XXX? */
 #endif
+#endif
 
   QSurfaceFormat format;
   format.setProfile(QSurfaceFormat::CompatibilityProfile);
+#if defined(MACOSX) || defined(LINUX) || defined(FREEBSD)
+  format.setVersion(2, 1);
+#endif
 
   m_surface = std::make_shared<QOffscreenSurface>();
   m_surface->setFormat(format);
@@ -236,6 +240,8 @@ void QtOfflineGL::getRaster(TRaster32P raster) {
 //=============================================================================
 // QtOfflineGLPBuffer : implem. offlineGL usando QT e PBuffer
 //-----------------------------------------------------------------------------
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 
 QtOfflineGLPBuffer::QtOfflineGLPBuffer(TDimension rasterSize)
     : TOfflineGL::Imp(rasterSize.lx, rasterSize.ly), m_context(0) {
@@ -372,3 +378,5 @@ void QtOfflineGLPBuffer::getRaster(TRaster32P raster) {
   }
   raster->unlock();
 }
+
+#endif

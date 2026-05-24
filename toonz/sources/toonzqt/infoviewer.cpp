@@ -297,7 +297,7 @@ QString InfoViewerImp::getTypeString() {
 //----------------------------------------------------------------
 
 void InfoViewerImp::setGeneralFileInfo(const TFilePath &path) {
-  QFileInfo fi = toQString(path);
+  QFileInfo fi(toQString(path));
   assert(fi.exists());
 
   setVal(eFullpath, fi.absoluteFilePath());

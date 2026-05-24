@@ -110,15 +110,19 @@ facade and a `QJSEngine` backend.
 After the first slice, proceed in this order unless the live compile errors
 force a narrower dependency order:
 
-1. Port remaining `QDesktopWidget` uses.
+1. Keep Qt 5 as the default lane and rerun a focused Qt 5 build after every
+   shared-source fix.
 2. Port `QRegExp` and `QRegExpValidator` to `QRegularExpression`.
-3. Add a text-codec adapter for `QTextCodec` call sites.
+3. Add a text-codec adapter for `QTextCodec` call sites and reduce direct
+   `Core5Compat` usage.
 4. Replace direct `QGLWidget::convertToGLFormat` calls with a local helper.
-5. Introduce a `ScriptRuntime` facade and move the existing Qt 5 script engine
-   behind it.
-6. Implement the Qt 6 `QJSEngine` script backend with fixtures.
-7. Port audio playback and recording APIs.
-8. Port stop-motion camera enumeration, preview, and still capture APIs.
+5. Finish the scripting abstraction: the Qt 6 `QJSEngine` shell exists, but
+   OpenToonz object bindings remain Qt 5-only until they move behind a
+   project-owned facade.
+6. Finish audio recording and playback validation on real devices.
+7. Port stop-motion camera enumeration, preview, and still capture APIs.
+8. Continue narrow compile-frontier work in non-rendering targets, preserving
+   both Qt 5 and Qt 6 validation.
 9. Rebase onto the Metal checkpoint before doing broad viewer/rendering Qt 6
    work.
 10. Add Qt 6 packaging lanes for macOS, Linux, and Windows.

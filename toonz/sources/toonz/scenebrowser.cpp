@@ -55,11 +55,10 @@
 #include <QDateTime>
 #include <QInputDialog>
 #include <QDesktopServices>
-#include <QDirModel>
 #include <QDir>
 #include <QPixmap>
 #include <QUrl>
-#include <QRegularExpression>  // Updated from QRegExp
+#include <QRegularExpression>
 #include <QScrollBar>
 #include <QMap>
 #include <QPushButton>

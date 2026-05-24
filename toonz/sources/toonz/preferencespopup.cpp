@@ -1185,8 +1185,15 @@ void PreferencesPopup::insertFootNote(QGridLayout* layout) {
 
 QString PreferencesPopup::getUIString(PreferencesItemId id) {
   auto CtrlAltStr = []() {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QString str =
+        QKeySequence(QKeyCombination(Qt::CTRL | Qt::ALT, Qt::Key_A))
+            .toString(QKeySequence::NativeText);
+    str.chop(1);
+#else
     QString str =
         QKeySequence(Qt::CTRL + Qt::ALT).toString(QKeySequence::NativeText);
+#endif
     if (str.endsWith("+")) str.chop(1);
     return str;
   };
@@ -2557,7 +2564,7 @@ QWidget* PreferencesPopup::createAddonsPage() {
   QGroupBox* groupBox =
       new QGroupBox(tr("Windows Explorer Thumbnails (Shell Extension)"));
   QVBoxLayout* gbLayout = new QVBoxLayout(groupBox);
-  gbLayout->setMargin(10);
+  gbLayout->setContentsMargins(10, 10, 10, 10);
 
   QLabel* infoLabel =
       new QLabel(tr("Enable thumbnails for OpenToonz files (.tnz, .pli, .tlv) "

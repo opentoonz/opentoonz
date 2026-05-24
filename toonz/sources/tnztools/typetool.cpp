@@ -26,6 +26,7 @@
 
 #include "toonzqt/selection.h"
 #include "toonzqt/imageutils.h"
+#include "toonzqt/qtcompat.h"
 #include "trop.h"
 #include "toonz/ttileset.h"
 #include "toonz/glrasterpainter.h"
@@ -1539,7 +1540,7 @@ bool TypeTool::keyDown(QKeyEvent *event) {
   QString text = event->text();
   if ((event->modifiers() & Qt::ShiftModifier)) text = text.toUpper();
 
-  if (QKeySequence(event->key() + event->modifiers()) == QKeySequence::Paste) {
+  if (QtCompat::keySequence(event) == QKeySequence::Paste) {
     QClipboard *clipboard     = QApplication::clipboard();
     const QMimeData *mimeData = clipboard->mimeData();
     if (!mimeData->hasText()) return true;

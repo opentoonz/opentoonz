@@ -4,6 +4,7 @@
 #define FLIPBOOK_H
 
 #include "toonzqt/flipconsole.h"
+#include "toonzqt/qtcompat.h"
 #include "imageviewer.h"
 
 #include "tlevel_io.h"
@@ -284,7 +285,9 @@ protected:
   void focusInEvent(QFocusEvent *e) override;
   void resizeEvent(QResizeEvent *e) override;
 
-  void enterEvent(QEvent *e) override { m_flipConsole->makeCurrent(); }
+  void enterEvent(QtCompat::EnterEvent *e) override {
+    m_flipConsole->makeCurrent();
+  }
 
 signals:
 

@@ -38,6 +38,9 @@
 #include <QBuffer>
 #include <QToolButton>
 #include <QRegularExpression>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QStringConverter>
+#endif
 
 namespace {
 const TFilePath CustomPanelTemplateFolderName("custom panel templates");
@@ -122,7 +125,7 @@ bool CustomPanelUIField::setCommand(const QString& commandId) {
   return true;
 }
 
-void CustomPanelUIField::enterEvent(QEvent* event) {
+void CustomPanelUIField::enterEvent(QtCompat::EnterEvent* event) {
   Q_UNUSED(event);
   emit highlight(m_id);
 }
@@ -765,7 +768,11 @@ void CustomPanelEditorPopup::onRegister() {
   }
 
   QTextStream stream(&file);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  stream.setEncoding(QStringConverter::Utf8);
+#else
   stream.setCodec("UTF-8");
+#endif
   stream << doc.toString();
   file.close();
 

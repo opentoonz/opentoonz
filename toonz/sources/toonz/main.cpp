@@ -75,7 +75,11 @@
 #include <QAbstractEventDispatcher>
 #include <QAbstractNativeEventFilter>
 #include <QSplashScreen>
+#include <QSurfaceFormat>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QGLPixelBuffer>
+#include <QGLFormat>
+#endif
 #include <QTranslator>
 #include <QFileInfo>
 #include <QSettings>
@@ -339,7 +343,7 @@ int main(int argc, char *argv[]) {
 
   public:
     bool nativeEventFilter(const QByteArray &eventType, void *message,
-                           long *) Q_DECL_OVERRIDE {
+                           qintptr *) Q_DECL_OVERRIDE {
       if (IsLeftMouseDown(message)) {
         leftButtonPressed = true;
       }
@@ -463,7 +467,7 @@ if (QFileInfo(localSplashPath).exists() && QFileInfo(localSplashPath).isFile()) 
   QFont font("Helvetica", -1);
 #endif
   font.setPixelSize(13);
-  font.setWeight(50);
+  font.setWeight(QFont::Normal);
   a.setFont(font);
 
   QString offsetStr("\n\n\n\n\n\n\n\n");
@@ -483,10 +487,21 @@ if (QFileInfo(localSplashPath).exists() && QFileInfo(localSplashPath).isFile()) 
   a.processEvents();
 
   // OpenGL
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   QGLFormat fmt;
   fmt.setAlpha(true);
   fmt.setStencil(true);
   QGLFormat::setDefaultFormat(fmt);
+#else
+  QSurfaceFormat fmt = QSurfaceFormat::defaultFormat();
+  fmt.setAlphaBufferSize(8);
+  fmt.setStencilBufferSize(8);
+  fmt.setProfile(QSurfaceFormat::CompatibilityProfile);
+#if defined(MACOSX) || defined(LINUX) || defined(FREEBSD)
+  fmt.setVersion(2, 1);
+#endif
+  QSurfaceFormat::setDefaultFormat(fmt);
+#endif
 
 #ifndef __HAIKU__
   glutInit(&argc, argv);

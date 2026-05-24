@@ -14,15 +14,33 @@
 #include <QByteArray>
 #include <QAudioFormat>
 #include <QIODevice>
+#include <QMutex>
+#include <QRecursiveMutex>
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QAudioDevice>
+#include <QAudioSink>
+#include <QMediaDevices>
+#include <QTimer>
+#else
+#include <QAudioDeviceInfo>
 #include <QAudioOutput>
+#endif
 
 using namespace std;
 
 //==============================================================================
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+using TQtAudioOutput = QAudioSink;
+#else
+using TQtAudioOutput = QAudioOutput;
+#endif
+using TQtAudioMutex = QRecursiveMutex;
+
 class TSoundOutputDeviceImp: public std::enable_shared_from_this<TSoundOutputDeviceImp> {
 private:
-  QMutex m_mutex;
+  TQtAudioMutex m_mutex;
 
   double m_volume;
   bool m_looping;
@@ -31,20 +49,34 @@ private:
   qint64 m_bufferIndex;
 
   QByteArray m_buffer;
-  QPointer<QAudioOutput> m_audioOutput;
+  QPointer<TQtAudioOutput> m_audioOutput;
   QIODevice *m_audioBuffer;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  QTimer *m_notifyTimer;
+#endif
 
 public:
   std::set<TSoundOutputDeviceListener *> m_listeners;
 
   TSoundOutputDeviceImp():
-    m_mutex(QMutex::Recursive),
     m_volume(0.5),
     m_looping(false),
     m_bytesSent(0),
     m_bufferIndex(0),
     m_audioBuffer()
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    , m_notifyTimer(0)
+#endif
   { }
+
+  ~TSoundOutputDeviceImp() {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    if (m_notifyTimer) {
+      m_notifyTimer->stop();
+      delete m_notifyTimer;
+    }
+#endif
+  }
 
 private:
   void reset() {
@@ -52,6 +84,9 @@ private:
       m_audioOutput->reset();
       m_audioBuffer = m_audioOutput->start();
       m_bytesSent = 0;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+      if (m_notifyTimer) m_notifyTimer->start();
+#endif
     }
   }
 
@@ -59,10 +94,13 @@ private:
     QMutexLocker lock(&m_mutex);
 
     if (!m_audioOutput) return;
+    if (!m_audioBuffer) return;
     if (!m_buffer.size()) return;
-    if ( m_audioOutput->error() != QAudio::NoError
-      && m_audioOutput->error() != QAudio::UnderrunError )
-    {
+    if (m_audioOutput->error() != QAudio::NoError
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        && m_audioOutput->error() != QAudio::UnderrunError
+#endif
+    ) {
       stop();
       std::cerr << "error " << m_audioOutput->error() << std::endl;
       return;
@@ -145,6 +183,9 @@ public:
   void stop() {
     QMutexLocker lock(&m_mutex);
     //reset(); audio buffer too small, so optimization not uses
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    if (m_notifyTimer) m_notifyTimer->stop();
+#endif
     m_buffer.clear();
     m_bufferIndex = 0;
   }
@@ -153,6 +194,29 @@ public:
     QMutexLocker lock(&m_mutex);
 
     QAudioFormat format;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    format.setSampleRate(st->getSampleRate());
+    format.setChannelCount(st->getChannelCount());
+    switch (st->getSampleType()) {
+    case TSound::INT:
+      format.setSampleFormat(st->getBitPerSample() <= 16
+                                 ? QAudioFormat::Int16
+                                 : QAudioFormat::Int32);
+      break;
+    case TSound::UINT:
+      format.setSampleFormat(st->getBitPerSample() <= 8
+                                 ? QAudioFormat::UInt8
+                                 : QAudioFormat::Int16);
+      break;
+    case TSound::FLOAT:
+      format.setSampleFormat(QAudioFormat::Float);
+      break;
+    }
+
+    QAudioDevice info(QMediaDevices::defaultAudioOutput());
+    if (!info.isNull() && !info.isFormatSupported(format))
+      format = info.preferredFormat();
+#else
     format.setSampleSize(st->getBitPerSample());
     format.setCodec("audio/pcm");
     format.setChannelCount(st->getChannelCount());
@@ -173,6 +237,7 @@ public:
     QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
     if (!info.isFormatSupported((format)))
       format = info.nearestFormat(format);
+#endif
 
     qint64 totalPacketCount = s1 - s0;
     qint64 fileByteCount    = (s1 - s0)*st->getSampleSize();
@@ -183,14 +248,30 @@ public:
     m_looping = loop;
     if (!m_audioOutput || m_audioOutput->format() != format) {
       if (m_audioOutput) m_audioOutput->stop();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+      if (info.isNull())
+        m_audioOutput = new TQtAudioOutput(format);
+      else
+        m_audioOutput = new TQtAudioOutput(info, format);
+#else
       m_audioOutput = new QAudioOutput(format);
+#endif
       m_audioOutput->setVolume(m_volume);
 
       // audio buffer size
       qint64 audioBufferSize = format.bytesForDuration(100000);
       m_audioOutput->setBufferSize(audioBufferSize);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+      if (!m_notifyTimer) {
+        m_notifyTimer = new QTimer;
+        m_notifyTimer->setInterval(50);
+        QObject::connect(m_notifyTimer, &QTimer::timeout,
+                         [this]() { sendBuffer(); });
+      }
+#else
       m_audioOutput->setNotifyInterval(50);
       QObject::connect(m_audioOutput.data(), &QAudioOutput::notify, [=](){ sendBuffer(); });
+#endif
 
       reset();
     }/* audio buffer too small, so optimization not uses

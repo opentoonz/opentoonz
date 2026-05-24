@@ -836,14 +836,14 @@ StudioPaletteViewer::StudioPaletteViewer(QWidget *parent,
   setAcceptDrops(true);
 
   QVBoxLayout *layout = new QVBoxLayout(this);
-  layout->setMargin(0);
+  layout->setContentsMargins(0, 0, 0, 0);
   QSplitter *splitter = new QSplitter(this);
   splitter->setOrientation(Qt::Vertical);
 
   // First Splitter Widget
   QWidget *treeWidget      = new QWidget(this);
   QVBoxLayout *treeVLayout = new QVBoxLayout(treeWidget);
-  treeVLayout->setMargin(0);
+  treeVLayout->setContentsMargins(0, 0, 0, 0);
   treeVLayout->setSpacing(0);
 
   StudioPaletteTreeViewer *studioPltTreeViewer = new StudioPaletteTreeViewer(
@@ -856,7 +856,7 @@ StudioPaletteViewer::StudioPaletteViewer(QWidget *parent,
   QWidget *treeToolbarWidget = new QWidget(this);
   treeToolbarWidget->setFixedHeight(22);
   QHBoxLayout *treeToolbarLayout = new QHBoxLayout(treeToolbarWidget);
-  treeToolbarLayout->setMargin(0);
+  treeToolbarLayout->setContentsMargins(0, 0, 0, 0);
   treeToolbarLayout->setSpacing(0);
 
   QToolBar *newToolbar = new QToolBar(treeToolbarWidget);

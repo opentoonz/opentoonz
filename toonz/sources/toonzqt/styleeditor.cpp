@@ -42,6 +42,7 @@
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include <QPainter>
+#include <QActionGroup>
 #include <QButtonGroup>
 #include <QMouseEvent>
 #include <QLabel>
@@ -3838,7 +3839,7 @@ bool StyleEditor::setStyle(TColorStyle *currentStyle) {
   // if(!gname.isEmpty() && gname == "ColorFieldSimpleColor")
   //	isStyleNull = true;
   // else
-  if (!gname.isEmpty() && gname[0] != L'-') {
+  if (!gname.isEmpty() && gname[0] != QChar('-')) {
     currentStyle = 0;
     isStyleNull  = true;
   }

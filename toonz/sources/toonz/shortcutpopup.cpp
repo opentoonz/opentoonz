@@ -223,7 +223,7 @@ void ShortcutViewer::removeShortcut() {
 
 //-----------------------------------------------------------------------------
 
-void ShortcutViewer::enterEvent(QEvent *event) {
+void ShortcutViewer::enterEvent(QtCompat::EnterEvent *event) {
   setFocus();
   update();
 }

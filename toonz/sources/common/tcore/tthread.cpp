@@ -15,6 +15,7 @@
 // STL includes
 #include <set>
 #include <deque>
+#include <iterator>
 
 // tcg includes
 #include "tcg/tcg_pool.h"
@@ -738,12 +739,11 @@ void Executor::shutdown() {
     }
 
     // Finally, deal with the global queue tasks
-    QMutableMapIterator<int, RunnableP> jt(globalImp->m_tasks);
-    while (jt.hasNext()) {
-      jt.next();
+    for (QMultiMap<int, RunnableP>::iterator jt = globalImp->m_tasks.begin();
+         jt != globalImp->m_tasks.end();) {
       RunnableP task = jt.value();
       Q_EMIT task->canceled(task);
-      jt.remove();
+      jt = globalImp->m_tasks.erase(jt);
     }
 
     // Now, send the terminate() signal to all active tasks
@@ -873,13 +873,14 @@ void Executor::cancelAll() {
   // Finally, clear the global tasks list from all tasks inserted by this
   // executor
   // NOTE: An easier way here?
-  QMutableMapIterator<int, RunnableP> jt(globalImp->m_tasks);
-  while (jt.hasNext()) {
-    jt.next();
+  for (QMultiMap<int, RunnableP>::iterator jt = globalImp->m_tasks.begin();
+       jt != globalImp->m_tasks.end();) {
     if (jt.value()->m_id == m_id) {
       RunnableP task = jt.value();
       Q_EMIT task->canceled(task);
-      jt.remove();
+      jt = globalImp->m_tasks.erase(jt);
+    } else {
+      ++jt;
     }
   }
 }
@@ -1032,7 +1033,7 @@ void ExecutorImp::refreshAssignments() {
 
   int i, tasksCount = m_tasks.size();
   QMultiMap<int, RunnableP>::iterator it;
-  for (i = 0, e = 0, it = m_tasks.end() - 1;
+  for (i = 0, e = 0, it = std::prev(m_tasks.end());
        i < tasksCount && e < executorsCount; ++i, --it) {
     // std::cout<< "global tasks-refreshAss" << std::endl;
     // Take the task
@@ -1102,7 +1103,7 @@ inline void Worker::takeTask() {
 
   int i, tasksCount = globalImp->m_tasks.size();
   QMultiMap<int, RunnableP>::iterator it;
-  for (i = 0, e = 0, it = globalImp->m_tasks.end() - 1;
+  for (i = 0, e = 0, it = std::prev(globalImp->m_tasks.end());
        i < tasksCount && e < executorsCount; ++i, --it) {
     // std::cout<< "global tasks-takeTask" << std::endl;
     // Take the first task

@@ -27,12 +27,12 @@
 #include <QIconEngine>
 #include <QString>
 #include <QApplication>
+#include <QGuiApplication>
 #include <QMouseEvent>
 #include <QTabletEvent>
 #include <QKeyEvent>
 #include <QUrl>
 #include <QFileInfo>
-#include <QDesktopWidget>
 #include <QSvgRenderer>
 #include <QRegularExpression>
 #include <QScreen>
@@ -46,7 +46,8 @@ inline bool hasScreensWithDifferentDevPixRatio() {
   static bool ret     = false;
   static bool checked = false;
   if (!checked) {  // check once
-    int dpr = QApplication::desktop()->devicePixelRatio();
+    QScreen *primaryScreen = QGuiApplication::primaryScreen();
+    int dpr = primaryScreen ? (int)primaryScreen->devicePixelRatio() : 1;
     for (auto screen : QGuiApplication::screens()) {
       if ((int)screen->devicePixelRatio() != dpr) {
         ret = true;
@@ -190,11 +191,58 @@ QPixmap scalePixmapKeepingAspectRatio(QPixmap pixmap, QSize size,
 
 //-----------------------------------------------------------------------------
 
+QScreen *getScreenForWidget(const QWidget *widget) {
+  if (widget) {
+    if (QWindow *window = widget->windowHandle()) {
+      if (window->screen()) return window->screen();
+    }
+
+    if (const QWidget *topLevel = widget->window()) {
+      if (QWindow *window = topLevel->windowHandle()) {
+        if (window->screen()) return window->screen();
+      }
+    }
+
+    const QPoint globalCenter = widget->mapToGlobal(widget->rect().center());
+    for (QScreen *screen : QGuiApplication::screens()) {
+      if (screen->geometry().contains(globalCenter)) return screen;
+    }
+  }
+
+  return QGuiApplication::primaryScreen();
+}
+
+//-----------------------------------------------------------------------------
+
+QRect getScreenGeometry(const QWidget *widget) {
+  QScreen *screen = getScreenForWidget(widget);
+  return screen ? screen->geometry() : QRect();
+}
+
+//-----------------------------------------------------------------------------
+
+QRect getScreenGeometry(int screenIndex) {
+  const QList<QScreen *> screens = QGuiApplication::screens();
+  if (0 <= screenIndex && screenIndex < screens.size())
+    return screens.at(screenIndex)->geometry();
+  return getScreenGeometry();
+}
+
+//-----------------------------------------------------------------------------
+
+QRect getAvailableScreenGeometry(const QWidget *widget) {
+  QScreen *screen = getScreenForWidget(widget);
+  return screen ? screen->availableGeometry() : QRect();
+}
+
+//-----------------------------------------------------------------------------
+
 int getDevicePixelRatio(const QWidget *widget) {
   if (hasScreensWithDifferentDevPixRatio() && widget) {
-    return widget->screen()->devicePixelRatio();
+    QScreen *screen = getScreenForWidget(widget);
+    return screen ? (int)screen->devicePixelRatio() : 1;
   }
-  static int devPixRatio = QApplication::desktop()->devicePixelRatio();
+  static int devPixRatio = getHighestDevicePixelRatio();
   return devPixRatio;
 }
 

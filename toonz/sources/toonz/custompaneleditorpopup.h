@@ -6,6 +6,7 @@
 #include "toonzqt/dvdialog.h"
 // ToonzQt
 #include "toonzqt/menubarcommand.h"
+#include "toonzqt/qtcompat.h"
 
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
@@ -50,7 +51,7 @@ public:
   bool setCommand(const QString& commandId);
 
 protected:
-  void enterEvent(QEvent* event) override;
+  void enterEvent(QtCompat::EnterEvent* event) override;
   void leaveEvent(QEvent* event) override;
   void dragEnterEvent(QDragEnterEvent* event) override;
   void dragLeaveEvent(QDragLeaveEvent* event) override;

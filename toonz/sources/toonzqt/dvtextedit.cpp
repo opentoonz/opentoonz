@@ -10,6 +10,7 @@
 #include <QToolBar>
 #include <QFontComboBox>
 #include <QAction>
+#include <QActionGroup>
 #include <QMouseEvent>
 #include <QTextCursor>
 #include <QColorDialog>

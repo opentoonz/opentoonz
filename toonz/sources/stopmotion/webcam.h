@@ -7,12 +7,12 @@
 
 // Toonz Includes
 #include "traster.h"
+#include "stopmotioncamera.h"
 #include "toonzqt/gutil.h"
 
 #include <QObject>
 
 class QCamera;
-class QCameraInfo;
 
 class Webcam : public QObject {
   Q_OBJECT
@@ -37,7 +37,7 @@ public:
 
   void releaseWebcam();
   void clearWebcam();
-  QList<QCameraInfo> getWebcams();
+  QList<StopMotionCamera::Info> getWebcams();
   QCamera* getWebcam() { return m_webcam; }
   void setWebcam(QCamera* camera);
   bool initWebcam(int index = 0);
@@ -80,7 +80,7 @@ public:
 
 private:
   // Webcam Properties
-  QList<QCameraInfo> m_webcams;
+  QList<StopMotionCamera::Info> m_webcams;
   QCamera* m_webcam;
   cv::VideoCapture m_cvWebcam;
   QList<QSize> m_webcamResolutions;

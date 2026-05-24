@@ -52,7 +52,10 @@
 #include <QStackedWidget>
 #include <QSettings>
 #include <QApplication>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QGLPixelBuffer>
+#endif
+#include <QActionGroup>
 #include <QDebug>
 #include <QDesktopServices>
 #include <QButtonGroup>
@@ -63,6 +66,18 @@
 #include <QtPlatformHeaders/QWindowsWindowFunctions>
 #endif
 #include <docklayout.h>
+
+namespace {
+
+bool hasRasterizePliOpenGLSupport() {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+  return QGLPixelBuffer::hasOpenGLPbuffers();
+#else
+  return true;
+#endif
+}
+
+}  // namespace
 
 TEnv::IntVar ViewCameraToggleAction("ViewCameraToggleAction", 1);
 TEnv::IntVar ViewTableToggleAction("ViewTableToggleAction", 1);
@@ -1485,7 +1500,7 @@ void MainWindow::onMenuCheckboxChanged() {
   else if (cm->getAction(MI_FieldGuide) == action)
     FieldGuideToggleAction = isChecked;
   else if (cm->getAction(MI_RasterizePli) == action) {
-    if (!QGLPixelBuffer::hasOpenGLPbuffers()) isChecked = 0;
+    if (!hasRasterizePliOpenGLSupport()) isChecked = 0;
     RasterizePliToggleAction = isChecked;
   } else if (cm->getAction(MI_SafeArea) == action)
     SafeAreaToggleAction = isChecked;
@@ -2462,7 +2477,7 @@ void MainWindow::defineActions() {
   createToggle(MI_VectorGuidedDrawing, QT_TR_NOOP("Vector Guided Drawing"), "",
                Preferences::instance()->isGuidedDrawingEnabled(),
                MenuViewCommandType, "view_guided_drawing");
-  if (QGLPixelBuffer::hasOpenGLPbuffers())
+  if (hasRasterizePliOpenGLSupport())
     createToggle(MI_RasterizePli, QT_TR_NOOP("&Visualize Vector As Raster"), "",
                  RasterizePliToggleAction ? 1 : 0, MenuViewCommandType,
                  "view_vector_as_raster");

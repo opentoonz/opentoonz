@@ -14,7 +14,11 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QCheckBox>
+#include <QtGlobal>
 #include <QMediaPlayer>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QAudioOutput>
+#endif
 #include <QTimer>
 
 // Forward declarations
@@ -80,6 +84,9 @@ class AutoLipSyncPopup final : public DVGui::Dialog {
   QString m_audioPath;
   TFilePath m_datPath;
   QMediaPlayer *m_player;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  QAudioOutput *m_audioOutput;
+#endif
   QLabel *m_scriptLabel;
   QLabel *m_columnLabel;
   QLabel *m_insertAtLabel;
@@ -132,7 +139,11 @@ public slots:
   void onLevelChanged(int index);
 
   // Media control
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  void onMediaStateChanged(QMediaPlayer::PlaybackState state);
+#else
   void onMediaStateChanged(QMediaPlayer::State state);
+#endif
   void onAudioTimeout();
 
   // Rhubarb process handling

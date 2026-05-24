@@ -1732,7 +1732,9 @@ void PaletteIconWidget::mouseMoveEvent(QMouseEvent *me) {
 
 //-----------------------------------------------------------------------------
 
-void PaletteIconWidget::enterEvent(QEvent *event) { m_isOver = true; }
+void PaletteIconWidget::enterEvent(QtCompat::EnterEvent *event) {
+  m_isOver = true;
+}
 
 //-----------------------------------------------------------------------------
 

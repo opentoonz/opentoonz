@@ -71,7 +71,6 @@ class SchematicThumbnailToggle final : public QObject, public QGraphicsItem {
   Q_OBJECT
   Q_DISABLE_COPY(SchematicThumbnailToggle)
 #ifndef MACOSX
-  Q_INTERFACES(QGraphicsItem)
 #endif
 
   bool m_isDown;
@@ -102,7 +101,6 @@ class SchematicToggle : public QObject, public QGraphicsItem {
   Q_OBJECT
   Q_DISABLE_COPY(SchematicToggle)
 #ifndef MACOSX
-  Q_INTERFACES(QGraphicsItem)
 #endif
 protected:
   QIcon m_imageOn, m_imageOn2, m_imageOff;
@@ -190,7 +188,6 @@ protected:
 class SchematicHandleSpinBox : public QObject, public QGraphicsItem {
   Q_OBJECT
 #ifndef MACOSX
-  Q_INTERFACES(QGraphicsItem)
 #endif
 
 protected:
@@ -239,7 +236,6 @@ class SchematicLink : public QObject, public QGraphicsItem {
   Q_OBJECT
   Q_DISABLE_COPY(SchematicLink)
   #ifndef MACOSX
-  Q_INTERFACES(QGraphicsItem)
   #endif
   SchematicPort *m_startPort, *m_endPort;
   QPainterPath m_path, m_hitPath;
@@ -330,7 +326,6 @@ class SchematicPort : public QObject, public QGraphicsItem {
   Q_OBJECT
   Q_DISABLE_COPY(SchematicPort)
 #ifndef MACOSX
-  Q_INTERFACES(QGraphicsItem)
 #endif
 
 protected:
@@ -442,7 +437,6 @@ class SchematicNode : public QObject, public QGraphicsItem {
   Q_OBJECT
   Q_DISABLE_COPY(SchematicNode)
 #ifndef MACOSX
-  Q_INTERFACES(QGraphicsItem)
 #endif
 
 protected:

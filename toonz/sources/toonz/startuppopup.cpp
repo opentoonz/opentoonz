@@ -40,7 +40,6 @@
 #include <QMainWindow>
 #include <QApplication>
 #include <QScreen>
-#include <QDesktopWidget>
 #include <QMessageBox>
 #include <QTextStream>
 #include <QFrame>

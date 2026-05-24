@@ -195,6 +195,23 @@ The Nix file should introduce a Qt 6 dependency set next to the existing Qt 5
 set rather than replacing it immediately. This allows the project to prove
 configuration and partial compilation while preserving the known Qt 5 build.
 
+Current branch status:
+
+- The default lane remains Qt 5. A separate `OPENTOONZ_QT_MAJOR=6` lane now
+  exists in CMake, Nix, CMake presets, and mise tasks.
+- The Qt target and resource/moc/translation command selection is centralized
+  so subdirectories can build against either Qt major without hard-coding
+  `Qt5::` targets or `qt5_*` commands.
+- The Qt 6 lane currently validates through `tnzcore`, `toonzlib`, and
+  `tnzstdfx` using the Nix Qt 6 environment.
+- First removed-API fixes in this branch include `QDesktopWidget` to `QScreen`
+  helper usage, `QMutex::Recursive` to `QRecursiveMutex`, Qt 6 audio playback
+  construction, `QMatrix` to `QTransform` in `iwa_floorbumpfx.cpp`, and local
+  `qsizetype` size fixes in `iwa_particlesengine.cpp`.
+- Qt 6 builds still emit many macOS OpenGL deprecation warnings. Those are not
+  treated as this slice's migration failures because broad GL/viewer churn
+  should wait for the Metal checkpoint.
+
 ### 2. Qt 5.15-Compatible API Cleanup
 
 The official Qt guidance is to make the Qt 5 application clean on Qt 5.15
@@ -266,6 +283,18 @@ Migration design:
    `run`.
 6. Decide what to do with the debugger path. `QScriptEngineDebugger` has no
    direct drop-in equivalent in the target Qt 6 API set.
+
+Current branch status:
+
+- Qt 5 still builds the existing `QScriptEngine` runtime and binding classes.
+- Qt 6 builds a first `QJSEngine` runtime shell for `ScriptEngine`, including
+  JavaScript evaluation plus `print`, `warning`, and `run` bootstrap functions.
+- The OpenToonz object binding groups are still Qt 5-only in this branch:
+  files, scenes, levels, images, renderer, rasterizer, vectorizers, and
+  converters. This is an explicit temporary limitation, not product-ready Qt 6
+  script support.
+- The script console warns in Qt 6 that the OpenToonz object bindings have not
+  been ported yet.
 
 Avoid making an external Qt Script fork the default plan. It might be useful as
 a short-lived proof-of-build bridge if maintainers explicitly accept the

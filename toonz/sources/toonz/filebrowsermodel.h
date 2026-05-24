@@ -176,8 +176,7 @@ public:
   void getChildrenNames(std::vector<std::wstring> &names) const override;
 
   QList<TFilePath> getMissingFiles() const;
-  QStringList getMissingFiles(
-      const QRegularExpression &filter) const;  // Updated from QRegExp
+  QStringList getMissingFiles(const QRegularExpression &filter) const;
   QList<TFilePath> getMissingFolders() const;
 
   void insertVersionControlStatus(const QString &fileName, SVNStatus status);

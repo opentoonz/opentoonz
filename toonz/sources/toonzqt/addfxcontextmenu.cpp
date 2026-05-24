@@ -32,6 +32,7 @@
 // Qt includes
 #include <QMenu>
 #include <QAction>
+#include <QActionGroup>
 #include <QStack>
 
 #include "pluginhost.h"

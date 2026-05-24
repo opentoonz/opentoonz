@@ -8,6 +8,7 @@
 #define FXICONMANAGER_H
 
 #include "tcommon.h"
+#include <QObject>
 #include <QPixmap>
 
 #undef DVAPI

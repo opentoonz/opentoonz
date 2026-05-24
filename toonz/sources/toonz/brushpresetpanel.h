@@ -4,6 +4,7 @@
 #define BRUSHPRESETPANEL_H
 
 #include "pane.h"
+#include "toonzqt/qtcompat.h"
 #include <QWidget>
 #include <QScrollArea>
 #include <QGridLayout>
@@ -129,7 +130,7 @@ public:
 protected:
   void showEvent(QShowEvent *e) override;
   void hideEvent(QHideEvent *e) override;
-  void enterEvent(QEvent *e) override;
+  void enterEvent(QtCompat::EnterEvent *e) override;
   void contextMenuEvent(QContextMenuEvent *event) override;
   
 private:
@@ -188,4 +189,3 @@ private slots:
 };
 
 #endif  // BRUSHPRESETPANEL_H
-

@@ -906,13 +906,13 @@ void ExportXDTSCommand::execute() {
 
     // leftLay
     {
-      leftLay->setMargin(5);
+      leftLay->setContentsMargins(5, 5, 5, 5);
       leftLay->setSpacing(10);
       // 1. Direction
       QGroupBox* textEditGroupBox = new QGroupBox(QObject::tr("Direction"));
 
       QVBoxLayout* textEditLay = new QVBoxLayout();
-      textEditLay->setMargin(10);
+      textEditLay->setContentsMargins(10, 10, 10, 10);
       textEditLay->setSpacing(8);
 
       {
@@ -967,7 +967,7 @@ void ExportXDTSCommand::execute() {
     }
     // rightLay - Cell Marks and Export Settings
     {
-      rightLay->setMargin(5);
+      rightLay->setContentsMargins(5, 5, 5, 5);
       rightLay->setSpacing(10);
 
       // 2. Cell Marks
@@ -975,7 +975,7 @@ void ExportXDTSCommand::execute() {
           new QGroupBox(QObject::tr("Cell marks for SXF symbols"));
 
       QGridLayout* cellMarkLay = new QGridLayout();
-      cellMarkLay->setMargin(10);
+      cellMarkLay->setContentsMargins(10, 10, 10, 10);
       cellMarkLay->setVerticalSpacing(10);
       cellMarkLay->setHorizontalSpacing(5);
 
@@ -994,7 +994,7 @@ void ExportXDTSCommand::execute() {
 
       // 3. Export Settings
       QHBoxLayout* settingsLay = new QHBoxLayout();
-      settingsLay->setMargin(0);
+      settingsLay->setContentsMargins(0, 0, 0, 0);
       settingsLay->setSpacing(15);
 
       settingsLay->addStretch();

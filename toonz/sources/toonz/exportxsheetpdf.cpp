@@ -1480,8 +1480,8 @@ void XSheetPDFTemplate::drawXsheetContents(QPainter& painter, int framePage,
     if (m_dataRects.contains(Data_Memo) && !m_info.memoText.isEmpty() &&
         framePage == 0) {
       // define the preferable font size
-      int lines =
-          std::max(m_info.memoText.count("\n") + 1, param(MemoLinesAmount));
+      int lines = std::max(static_cast<int>(m_info.memoText.count("\n")) + 1,
+                           param(MemoLinesAmount));
       int lineSpacing = m_dataRects.value(Data_Memo).height() / lines;
       int pixelSize   = lineSpacing;
       while (1) {

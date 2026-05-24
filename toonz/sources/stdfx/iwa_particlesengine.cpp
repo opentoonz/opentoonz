@@ -238,7 +238,8 @@ void Iwa_Particles_Engine::roll_particles(
                        particleOrigins);
 
   /*- Once particles are exhausted, stop emitting -*/
-  int actualBirthParticles = std::min(genPartNum, particleOrigins.size());
+  int actualBirthParticles =
+      std::min(genPartNum, static_cast<int>(particleOrigins.size()));
   /*- Index of particles that will depart -*/
   QList<int> leavingPartIndex;
   if (myregions.size() &&
@@ -262,7 +263,8 @@ void Iwa_Particles_Engine::roll_particles(
         int wariate = tceil((float)(myWeight[m]) * (float)(partLeft) /
                             (float)potential_sum);
         /*- Actual number of particles departing from this potential -*/
-        int leaveNum = std::min(myHistogram.at(m).size(), wariate);
+        int leaveNum = std::min(static_cast<int>(myHistogram.at(m).size()),
+                                wariate);
         /*- Register allocated particles from the beginning -*/
         for (int lp = 0; lp < leaveNum; lp++) {
           /*- Add while reducing from Histogram -*/
