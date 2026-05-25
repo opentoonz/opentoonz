@@ -101,6 +101,7 @@
 #include <QTextStream>
 
 #include <atomic>
+#include <cstdlib>
 
 #ifdef _WIN32
 #ifndef x64
@@ -335,6 +336,13 @@ static void write_gui_smoke_status(const QString &action, const QString &status,
   out << "action=" << action << "\n";
   out << "status=" << status << "\n";
   for (const QString &detail : details) out << detail << "\n";
+}
+
+static void log_gui_smoke_progress(const char *message) {
+  const char *action = std::getenv("OPENTOONZ_GUI_SMOKE_ACTION");
+  if (!action || !*action) return;
+
+  std::cerr << "[gui-smoke] " << message << std::endl;
 }
 
 static QString gui_smoke_scene_name(const QString &requestedSceneName) {
@@ -620,8 +628,10 @@ int main(int argc, char *argv[]) {
   // Enables high-DPI scaling. This attribute must be set before QApplication is
   // constructed. Available from Qt 5.6.
   QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+  log_gui_smoke_progress("before-qapplication");
 
   QApplication a(argc, argv);
+  log_gui_smoke_progress("qapplication-created");
 
 #ifdef MACOSX
   // This workaround is to avoid missing left button problem on Qt5.6.0.
@@ -817,6 +827,7 @@ if (QFileInfo(localSplashPath).exists() && QFileInfo(localSplashPath).isFile()) 
 
   // Toonz environment
   initToonzEnv(argumentPathValues);
+  log_gui_smoke_progress("toonz-env-initialized");
 
   // prepare for 30bit display
   if (Preferences::instance()->is30bitDisplayEnabled()) {
@@ -830,6 +841,7 @@ if (QFileInfo(localSplashPath).exists() && QFileInfo(localSplashPath).isFile()) 
 
   // Initialize thread components
   TThread::init();
+  log_gui_smoke_progress("threads-initialized");
 
 #if OPENTOONZ_QT_MAJOR >= 6
   if (isRunScript) return run_script(loadFilePath);
@@ -967,6 +979,7 @@ if (QFileInfo(localSplashPath).exists() && QFileInfo(localSplashPath).isFile()) 
 
   TTool::setApplication(TApp::instance());
   TApp::instance()->init();
+  log_gui_smoke_progress("tapp-initialized");
 
   splash.showMessage(offsetStr + "Loading Plugins...", Qt::AlignCenter,
                      Qt::white);
@@ -986,7 +999,9 @@ if (QFileInfo(localSplashPath).exists() && QFileInfo(localSplashPath).isFile()) 
   a.processEvents();
 
   /*-- Layoutファイル名をMainWindowのctorに渡す --*/
+  log_gui_smoke_progress("main-window-constructing");
   MainWindow w(argumentLayoutFileName);
+  log_gui_smoke_progress("main-window-constructed");
   CrashHandler::attachParentWindow(&w);
   CrashHandler::reportProjectInfo(true);
 
@@ -1066,25 +1081,30 @@ if (QFileInfo(localSplashPath).exists() && QFileInfo(localSplashPath).isFile()) 
     w.checkForUpdates();
 
   w.show();
-
-  // Show floating panels only after the main window has been shown
-  w.startupFloatingPanels();
-
-  CommandManager::instance()->execute(T_Hand);
-  if (!loadFilePath.isEmpty()) {
-    splash.showMessage(
-        QString("Loading file '") + loadFilePath.getQString() + "'...",
-        Qt::AlignCenter, Qt::white);
-    if (TFileStatus(loadFilePath).doesExist()) IoCmd::loadScene(loadFilePath);
-  }
+  log_gui_smoke_progress("main-window-shown");
 
   QString guiSmokeAction = qEnvironmentVariable("OPENTOONZ_GUI_SMOKE_ACTION");
   if (!guiSmokeAction.isEmpty()) {
+    log_gui_smoke_progress("hook-starting");
+    if (!loadFilePath.isEmpty() && TFileStatus(loadFilePath).doesExist())
+      IoCmd::loadScene(loadFilePath);
     QString guiSmokeSceneName =
         qEnvironmentVariable("OPENTOONZ_GUI_SMOKE_SCENE_NAME");
     TFilePath guiSmokeLoadedScenePath = loadFilePath;
     run_gui_smoke_hook(guiSmokeAction, guiSmokeSceneName,
                        guiSmokeLoadedScenePath);
+    log_gui_smoke_progress("hook-finished");
+  } else {
+    // Show floating panels only after the main window has been shown
+    w.startupFloatingPanels();
+
+    CommandManager::instance()->execute(T_Hand);
+    if (!loadFilePath.isEmpty()) {
+      splash.showMessage(
+          QString("Loading file '") + loadFilePath.getQString() + "'...",
+          Qt::AlignCenter, Qt::white);
+      if (TFileStatus(loadFilePath).doesExist()) IoCmd::loadScene(loadFilePath);
+    }
   }
 
   QFont *myFont;
