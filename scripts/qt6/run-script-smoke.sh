@@ -7,17 +7,37 @@ script_path="${OPENTOONZ_SCRIPT_FIXTURE:-$repo_root/toonz/sources/tests/scripten
 smoke_root="${OPENTOONZ_SCRIPT_SMOKE_ROOT:-$repo_root/toonz/build/qt6-script-smoke}"
 timeout_seconds="${OPENTOONZ_SCRIPT_SMOKE_TIMEOUT:-45}"
 require_exit="${OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT:-0}"
+expected_output="${OPENTOONZ_SCRIPT_EXPECTED_OUTPUT:-qt-script-smoke 3 [true,ok]|qt-script-warning}"
+
+case "$script_path" in
+  /*) ;;
+  *) script_path="$repo_root/$script_path" ;;
+esac
 
 executable="$app_path/Contents/MacOS/OpenToonz"
-log_path="$smoke_root/script-smoke.log"
+script_name="$(basename "$script_path")"
+log_path="$smoke_root/${script_name%.*}-script-smoke.log"
 
 has_expected_output() {
-  grep -Fq "qt-script-smoke 3 [true,ok]" "$log_path" &&
-    grep -Fq "qt-script-warning" "$log_path"
+  local expected
+  IFS='|' read -ra expected_lines <<<"$expected_output"
+  for expected in "${expected_lines[@]}"; do
+    if [[ -n "$expected" ]] && ! grep -Fq "$expected" "$log_path"; then
+      return 1
+    fi
+  done
+  return 0
 }
 
 is_smoke_process_running() {
   jobs -pr | grep -Fxq "$pid"
+}
+
+stop_smoke_process() {
+  # OpenToonz handles SIGTERM as a crash signal; bounded smokes use SIGKILL so
+  # harness cleanup does not generate misleading crash-handler output.
+  kill -9 "$pid" 2>/dev/null || true
+  wait "$pid" 2>/dev/null || true
 }
 
 if [[ ! -x "$executable" ]]; then
@@ -48,19 +68,14 @@ while is_smoke_process_running; do
   if has_expected_output; then
     expected_seen=1
     if [[ "$require_exit" != "1" ]]; then
-      kill "$pid" 2>/dev/null || true
-      sleep 2
-      kill -9 "$pid" 2>/dev/null || true
-      wait "$pid" 2>/dev/null || true
+      stop_smoke_process
       echo "Script smoke passed: $script_path"
       exit 0
     fi
   fi
 
   if ((elapsed >= timeout_seconds)); then
-    kill "$pid" 2>/dev/null || true
-    sleep 2
-    kill -9 "$pid" 2>/dev/null || true
+    stop_smoke_process
     if ((expected_seen)); then
       echo "error: script smoke saw expected output but the process did not exit after ${timeout_seconds}s" >&2
     else

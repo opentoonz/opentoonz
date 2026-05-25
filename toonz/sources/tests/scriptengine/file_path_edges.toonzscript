@@ -1,0 +1,34 @@
+var base = new FilePath("alpha/beta");
+var child = base.concat("child.txt");
+print("qt-script-filepath-edges-relative", child.name, child.extension,
+      child.parentDirectory.name);
+
+var concatError = false;
+try {
+  base.concat("/tmp/absolute.txt");
+} catch (e) {
+  concatError = String(e.message).indexOf(
+                  "can't concatenate an absolute path") >= 0;
+}
+
+var filesError = false;
+try {
+  child.files();
+} catch (e) {
+  filesError = String(e.message).indexOf("is not a directory") >= 0;
+}
+
+print("qt-script-filepath-edges-errors", concatError, filesError);
+
+var resources = new FilePath("toonz/sources/tnztools/Resources");
+var files = resources.files();
+var hasBrush = false;
+for (var i = 0; i < files.length; ++i) {
+  if (files[i].name == "brush" && files[i].extension == "png")
+    hasBrush = true;
+}
+
+print("qt-script-filepath-edges-files", resources.isDirectory,
+      files.length > 0, hasBrush);
+
+"qt-script-filepath-edges-result";

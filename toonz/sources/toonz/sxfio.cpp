@@ -15,6 +15,7 @@
 #include "toonz/txshleveltypes.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/preferences.h"
+#include "ttextcodec.h"
 
 #include "toonzqt/menubarcommand.h"
 #include "menubarcommandids.h"
@@ -24,7 +25,6 @@
 #include <QRegularExpression>
 #include <QUrl>
 #include <QDebug>
-#include <QTextCodec>
 #include <QByteArray>
 #include <QDataStream>
 #include <stdexcept>
@@ -46,6 +46,17 @@ int _exportArea       = 1;  // ACTION =0,CELL =1, ALL=2
 QString _directText   = QString();
 bool _bigFont         = false;
 int _textEncoding     = 0;  // 0: UTF-8, 1: SHIFT-JIS, 2: GBK
+
+const char *currentTextCodecName() {
+  switch (_textEncoding) {
+  case 1:
+    return "Shift-JIS";
+  case 2:
+    return "GBK";
+  default:
+    return "UTF-8";
+  }
+}
 
 int checkLanguage() {
   QString lang = Preferences::instance()->getCurrentLanguage();
@@ -172,19 +183,7 @@ void SxfProperty::write(QDataStream& stream) {
 
 quint32 SxfDirection::getSize() {
   QByteArray contentBytes;
-  QTextCodec* codec = nullptr;
-  switch (_textEncoding) {
-  case 1:
-    codec = QTextCodec::codecForName("Shift-JIS");
-    break;
-  case 2:
-    codec = QTextCodec::codecForName("GBK");
-    break;
-  default:
-    codec = QTextCodec::codecForName("UTF-8");
-    break;
-  }
-  contentBytes = codec->fromUnicode(content);
+  contentBytes = TTextCodec::fromUnicode(currentTextCodecName(), content);
 
   quint16 contentSize = static_cast<quint16>(contentBytes.size());
   return 2 + contentSize + 4;
@@ -203,19 +202,7 @@ void SxfDirection::read(QDataStream& stream) {
   contentBytes.resize(contentSize);
   stream.readRawData(contentBytes.data(), contentSize);
 
-  QTextCodec* codec = nullptr;
-  switch (_textEncoding) {
-  case 1:
-    codec = QTextCodec::codecForName("Shift-JIS");
-    break;
-  case 2:
-    codec = QTextCodec::codecForName("GBK");
-    break;
-  default:
-    codec = QTextCodec::codecForName("UTF-8");
-    break;
-  }
-  content = codec->toUnicode(contentBytes);
+  content = TTextCodec::toUnicode(currentTextCodecName(), contentBytes);
 
   stream >> bigFont;
 }
@@ -226,19 +213,7 @@ void SxfDirection::write(QDataStream& stream) {
   stream << getSize();
 
   QByteArray contentBytes;
-  QTextCodec* codec = nullptr;
-  switch (_textEncoding) {
-  case 1:
-    codec = QTextCodec::codecForName("Shift-JIS");
-    break;
-  case 2:
-    codec = QTextCodec::codecForName("GBK");
-    break;
-  default:
-    codec = QTextCodec::codecForName("UTF-8");
-    break;
-  }
-  contentBytes = codec->fromUnicode(content);
+  contentBytes = TTextCodec::fromUnicode(currentTextCodecName(), content);
 
   quint16 contentSize = static_cast<quint16>(contentBytes.size());
   stream << contentSize;
@@ -929,7 +904,7 @@ void ExportXDTSCommand::execute() {
 
         bigFont->setText(QObject::tr("Large Font"));
 
-        QObject::connect(bigFont, &QCheckBox::stateChanged, [&](int state) {
+        auto updateDirectionFont = [&](Qt::CheckState state) {
           QFont font = directTextEdit->font();
           if (state == Qt::Checked) {
             font.setPointSize(14);  // Big Font
@@ -937,7 +912,16 @@ void ExportXDTSCommand::execute() {
             font.setPointSize(9);  // Normal Font
           }
           directTextEdit->setFont(font);
+        };
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+        QObject::connect(bigFont, &QCheckBox::checkStateChanged,
+                         updateDirectionFont);
+#else
+        QObject::connect(bigFont, &QCheckBox::stateChanged, [=](int state) {
+          updateDirectionFont(static_cast<Qt::CheckState>(state));
         });
+#endif
 
         optionsLay->addWidget(bigFont);
 

@@ -4,6 +4,7 @@
 #define TOONZQT_QTCOMPAT_H
 
 #include <QtGlobal>
+#include <QImage>
 #include <QKeyEvent>
 #include <QKeySequence>
 
@@ -56,6 +57,15 @@ inline QKeySequence keySequence(const QKeyEvent *event) {
   return QKeySequence(event->keyCombination());
 #else
   return QKeySequence(event->key() + event->modifiers());
+#endif
+}
+
+inline QImage convertToGLFormat(const QImage &image) {
+  QImage converted = image.convertToFormat(QImage::Format_RGBA8888);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return converted.flipped(Qt::Vertical);
+#else
+  return converted.mirrored(false, true);
 #endif
 }
 

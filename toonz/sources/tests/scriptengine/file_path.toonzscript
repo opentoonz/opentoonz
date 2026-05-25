@@ -1,0 +1,12 @@
+var fp = new FilePath("alpha/beta/test.tif");
+var png = fp.withExtension("png");
+var renamed = fp.withName("renamed");
+var child = new FilePath("alpha/beta").concat("child.txt");
+
+print("qt-script-filepath", fp.name, fp.extension, fp.parentDirectory.name,
+      png.name, png.extension, renamed.name);
+print("qt-script-filepath-string", fp.toString());
+print("qt-script-filepath-child", child.name, child.extension,
+      child.parentDirectory.name);
+
+"qt-script-filepath-result";

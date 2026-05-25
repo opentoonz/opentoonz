@@ -1,0 +1,34 @@
+var scene = new Scene();
+var level = new Level();
+var image = new Image();
+var filePath = new FilePath("alpha/beta/test.tif");
+var transform = new Transform();
+var imageBuilder = new ImageBuilder(4, 4);
+var converter = new ToonzRasterConverter();
+var outline = new OutlineVectorizer();
+var centerline = new CenterlineVectorizer();
+var rasterizer = new Rasterizer();
+
+print("qt-script-wrapper-id-positive",
+      scene.id > 0, level.id > 0, image.id > 0, filePath.id > 0,
+      transform.id > 0, imageBuilder.id > 0, converter.id > 0,
+      outline.id > 0, centerline.id > 0, rasterizer.id > 0);
+
+print("qt-script-wrapper-id-values",
+      scene.id, level.id, image.id, filePath.id, transform.id,
+      imageBuilder.id, converter.id, outline.id, centerline.id, rasterizer.id);
+
+scene.dispose();
+level.dispose();
+image.dispose();
+transform.dispose();
+imageBuilder.dispose();
+outline.dispose();
+centerline.dispose();
+rasterizer.dispose();
+
+print("qt-script-wrapper-id-disposed",
+      scene.id, level.id, image.id, transform.id, imageBuilder.id,
+      outline.id, centerline.id, rasterizer.id);
+
+"qt-script-wrapper-id-result";

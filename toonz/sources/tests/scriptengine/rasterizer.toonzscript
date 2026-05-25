@@ -1,0 +1,43 @@
+var source = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var vectorizer = new OutlineVectorizer();
+var vector = vectorizer.vectorize(source);
+var rasterizer = new Rasterizer();
+
+print("qt-script-rasterizer-defaults", rasterizer.toString(),
+      rasterizer.colorMapped, rasterizer.xres, rasterizer.yres,
+      rasterizer.dpi, rasterizer.antialiasing);
+
+rasterizer.colorMapped = true;
+rasterizer.xres = 48;
+rasterizer.yres = 36;
+rasterizer.dpi = 120;
+rasterizer.antialiasing = false;
+
+var toonz = rasterizer.rasterize(vector);
+print("qt-script-rasterizer-image", toonz.type, toonz.toString(),
+      toonz.width, toonz.height, rasterizer.colorMapped, rasterizer.xres,
+      rasterizer.yres, rasterizer.dpi, rasterizer.antialiasing);
+
+var output = new FilePath("toonz/build/qt6-script-smoke/rasterizer_" +
+                          (new Date()).getTime() + ".tlv");
+toonz.save(output);
+var reloaded = new Image(output);
+print("qt-script-rasterizer-saved", output.exists, reloaded.type,
+      reloaded.toString());
+
+var level = new Level();
+level.setFrame("1", toonz);
+var frame = level.getFrame("1");
+print("qt-script-rasterizer-level", level.type, level.frameCount,
+      level.getFrameIds()[0], frame.type);
+
+frame.dispose();
+level.dispose();
+reloaded.dispose();
+toonz.dispose();
+rasterizer.dispose();
+vector.dispose();
+vectorizer.dispose();
+source.dispose();
+
+"qt-script-rasterizer-result";

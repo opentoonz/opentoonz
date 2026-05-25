@@ -1,0 +1,14 @@
+var scene = new Scene();
+
+print("qt-script-scene", scene.frameCount, scene.columnCount,
+      scene.toString());
+
+scene.insertColumn(0);
+print("qt-script-scene-columns", scene.columnCount);
+
+scene.deleteColumn(0);
+print("qt-script-scene-columns-after-delete", scene.columnCount);
+
+scene.dispose();
+
+"qt-script-scene-result";

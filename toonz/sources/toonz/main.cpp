@@ -31,10 +31,17 @@
 #include "toonz/preferences.h"
 #include "toonz/toonzfolders.h"
 #include "toonz/tproject.h"
+#include "toonz/toonzscene.h"
 #include "toonz/studiopalette.h"
 #include "toonz/stylemanager.h"
+#include "toonz/tcolumnhandle.h"
+#include "toonz/tframehandle.h"
 #include "toonz/tscenehandle.h"
+#include "toonz/txshcell.h"
 #include "toonz/txshsimplelevel.h"
+#include "toonz/txsheet.h"
+#include "toonz/txsheethandle.h"
+#include "toonz/txshleveltypes.h"
 #include "toonz/tproject.h"
 #include "toonz/scriptengine.h"
 
@@ -59,9 +66,11 @@
 #include "timagecache.h"
 #include "tofflinegl.h"
 #include "tpluginmanager.h"
+#include "trasterimage.h"
 #include "tsimplecolorstyles.h"
 #include "toonz/imagestyles.h"
 #include "tvectorbrushstyle.h"
+#include "tvectorimage.h"
 #include "tfont.h"
 
 #include "kis_tablet_support_win8.h"
@@ -72,6 +81,7 @@
 
 // Qt includes
 #include <QApplication>
+#include <QCoreApplication>
 #include <QAbstractEventDispatcher>
 #include <QAbstractNativeEventFilter>
 #include <QSplashScreen>
@@ -82,9 +92,13 @@
 #endif
 #include <QTranslator>
 #include <QFileInfo>
+#include <QFile>
+#include <QDir>
 #include <QSettings>
 #include <QLibraryInfo>
 #include <QHash>
+#include <QStringList>
+#include <QTextStream>
 
 #include <atomic>
 
@@ -153,7 +167,8 @@ DV_IMPORT_API void initColorFx();
     la stuffDir, controlla se la directory di outputs esiste (e provvede a
     crearla in caso contrario) verifica inoltre che stuffDir esista.
 */
-static void initToonzEnv(QHash<QString, QString> &argPathValues) {
+static void initToonzEnv(QHash<QString, QString> &argPathValues,
+                         bool preferWritablePlatformCache = true) {
   StudioPalette::enable(true);
   TEnv::setRootVarName(rootVarName);
   TEnv::setSystemVarPrefix(systemVarPrefix);
@@ -233,7 +248,8 @@ project->setUseScenePath(TProject::Extras, false);
   // Imposto la rootDir per ImageCache
 
   /*-- TOONZCACHEROOTの設定  --*/
-  TFilePath cacheDir = ToonzFolder::getCacheRootFolder();
+  TFilePath cacheDir;
+  if (preferWritablePlatformCache) cacheDir = ToonzFolder::getCacheRootFolder();
   if (cacheDir.isEmpty()) cacheDir = TEnv::getStuffDir() + "cache";
   TImageCache::instance()->setRootDir(cacheDir);
 }
@@ -253,6 +269,252 @@ static void script_output(int type, const QString &value) {
     std::cerr << value.toStdString() << std::endl;
   else
     std::cout << value.toStdString() << std::endl;
+}
+
+static int run_script(const TFilePath &loadFilePath) {
+  if (!TFileStatus(loadFilePath).doesExist()) {
+    std::cerr << QObject::tr("Script file %1 does not exists.")
+                     .arg(loadFilePath.getQString())
+                     .toStdString()
+              << std::endl;
+    return 1;
+  }
+
+  TProjectManager *pm = TProjectManager::instance();
+  auto sceneProject   = pm->loadSceneProject(loadFilePath);
+  TFilePath oldProjectPath;
+  if (!sceneProject) {
+    std::cerr << QObject::tr(
+                     "It is not possible to load the scene %1 because it does "
+                     "not belong to any project.")
+                     .arg(loadFilePath.getQString())
+                     .toStdString()
+              << std::endl;
+    return 1;
+  }
+  if (sceneProject && !sceneProject->isCurrent()) {
+    oldProjectPath = pm->getCurrentProjectPath();
+    pm->setCurrentProjectPath(sceneProject->getProjectPath());
+  }
+
+  ScriptEngine engine;
+  QObject::connect(&engine, &ScriptEngine::output, script_output);
+  QString s = QString::fromStdWString(loadFilePath.getWideString())
+                  .replace("\\", "\\\\")
+                  .replace("\"", "\\\"");
+#if OPENTOONZ_QT_MAJOR >= 6
+  QString result = engine.runScriptFile(s);
+  if (!result.isEmpty())
+    engine.emitOutput(ScriptEngine::EvaluationResult, result);
+#else
+  QString cmd = QString("run(\"%1\")").arg(s);
+  engine.evaluate(cmd);
+  engine.wait();
+#endif
+
+  if (!oldProjectPath.isEmpty()) pm->setCurrentProjectPath(oldProjectPath);
+  return gScriptHadError.load() ? 1 : 0;
+}
+
+static void write_gui_smoke_status(const QString &action, const QString &status,
+                                   const QStringList &details = QStringList()) {
+  QString statusPath = qEnvironmentVariable("OPENTOONZ_GUI_SMOKE_STATUS_FILE");
+  if (statusPath.isEmpty()) return;
+
+  QFileInfo statusInfo(statusPath);
+  QDir().mkpath(statusInfo.absolutePath());
+
+  QFile statusFile(statusPath);
+  if (!statusFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+    std::cerr << "Could not write GUI smoke status file: "
+              << statusPath.toStdString() << std::endl;
+    return;
+  }
+
+  QTextStream out(&statusFile);
+  out << "action=" << action << "\n";
+  out << "status=" << status << "\n";
+  for (const QString &detail : details) out << detail << "\n";
+}
+
+static QString gui_smoke_scene_name(const QString &requestedSceneName) {
+  QString sceneName = requestedSceneName.trimmed();
+  return sceneName.isEmpty() ? QStringLiteral("qt6_gui_smoke") : sceneName;
+}
+
+static TFilePath gui_smoke_scene_path(const QString &sceneName) {
+  auto project = TProjectManager::instance()->getCurrentProject();
+  return project->getScenesPath() +
+         TFilePath(sceneName.toStdWString() + L".tnz");
+}
+
+static bool add_gui_smoke_frame(TXshSimpleLevel *level, const TFrameId &fid) {
+  if (!level) return false;
+
+  if (level->getType() == OVL_XSHLEVEL) {
+    TRaster32P raster(32, 32);
+    raster->clear();
+    level->setFrame(fid, TRasterImageP(raster));
+    return true;
+  }
+
+  if (level->getType() == PLI_XSHLEVEL) {
+    TVectorImageP image = new TVectorImage();
+    level->setFrame(fid, image);
+    return true;
+  }
+
+  return false;
+}
+
+static void run_gui_smoke_hook(const QString &action,
+                               const QString &requestedSceneName,
+                               const TFilePath &loadedScenePath) {
+  if (action.isEmpty()) return;
+
+  try {
+    if (action == "startup") {
+      write_gui_smoke_status(
+          action, "ok",
+          QStringList()
+              << QString("window=%1").arg(TApp::instance()
+                                              ->getMainWindow()
+                                              ->windowTitle()));
+      return;
+    }
+
+    if (action == "open-scene") {
+      ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+      write_gui_smoke_status(
+          action, "ok",
+          QStringList() << QString("scene=%1").arg(scene->getScenePath().getQString())
+                        << QString("requested=%1").arg(loadedScenePath.getQString())
+                        << QString("window=%1").arg(TApp::instance()
+                                                        ->getMainWindow()
+                                                        ->windowTitle()));
+      return;
+    }
+
+    if (action == "create-scene") {
+      QString sceneName     = gui_smoke_scene_name(requestedSceneName);
+      TFilePath scenePath   = gui_smoke_scene_path(sceneName);
+      if (!TSystem::touchParentDir(scenePath)) {
+        write_gui_smoke_status(
+            action, "error",
+            QStringList() << QString("message=failed to create scene folder")
+                          << QString("scene=%1").arg(scenePath.getQString()));
+        return;
+      }
+
+      IoCmd::newScene();
+      ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+      scene->setScenePath(scenePath);
+      bool saved = IoCmd::saveScene(scenePath, IoCmd::SILENTLY_OVERWRITE);
+      if (saved) {
+        TApp::instance()->getCurrentScene()->notifySceneSwitched();
+        TApp::instance()->getCurrentScene()->notifyNameSceneChange();
+      }
+
+      write_gui_smoke_status(
+          action, saved ? "ok" : "error",
+          QStringList() << QString("scene=%1").arg(scenePath.getQString())
+                        << QString("window=%1").arg(TApp::instance()
+                                                        ->getMainWindow()
+                                                        ->windowTitle()));
+      return;
+    }
+
+    if (action == "xsheet-scrub") {
+      QString sceneName   = gui_smoke_scene_name(requestedSceneName);
+      TFilePath scenePath = gui_smoke_scene_path(sceneName);
+      if (!TSystem::touchParentDir(scenePath)) {
+        write_gui_smoke_status(
+            action, "error",
+            QStringList() << QString("message=failed to create scene folder")
+                          << QString("scene=%1").arg(scenePath.getQString()));
+        return;
+      }
+
+      IoCmd::newScene();
+      ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+      scene->setScenePath(scenePath);
+
+      TXshLevel *rasterXl =
+          scene->createNewLevel(OVL_XSHLEVEL, L"qt6_gui_raster");
+      TXshLevel *vectorXl =
+          scene->createNewLevel(PLI_XSHLEVEL, L"qt6_gui_vector");
+      TXshSimpleLevel *rasterLevel =
+          rasterXl ? rasterXl->getSimpleLevel() : nullptr;
+      TXshSimpleLevel *vectorLevel =
+          vectorXl ? vectorXl->getSimpleLevel() : nullptr;
+      const TFrameId fid(1);
+
+      if (!add_gui_smoke_frame(rasterLevel, fid) ||
+          !add_gui_smoke_frame(vectorLevel, fid)) {
+        write_gui_smoke_status(
+            action, "error",
+            QStringList() << QString("message=failed to create smoke frames"));
+        return;
+      }
+
+      TXsheet *xsheet = scene->getXsheet();
+      const bool rasterCellOk =
+          xsheet->setCell(0, 0, TXshCell(rasterLevel, fid)) &&
+          xsheet->setCell(1, 0, TXshCell(rasterLevel, fid));
+      const bool vectorCellOk =
+          xsheet->setCell(2, 1, TXshCell(vectorLevel, fid));
+      if (!rasterCellOk || !vectorCellOk) {
+        write_gui_smoke_status(
+            action, "error",
+            QStringList() << QString("message=failed to populate xsheet"));
+        return;
+      }
+
+      TApp::instance()->getCurrentFrame()->setFrame(0);
+      TApp::instance()->getCurrentFrame()->setFrame(2);
+      TApp::instance()->getCurrentColumn()->setColumnIndex(1);
+      TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+      TApp::instance()->getCurrentScene()->notifySceneChanged();
+
+      const bool saved = IoCmd::saveScene(scenePath, IoCmd::SILENTLY_OVERWRITE);
+      if (saved) {
+        TApp::instance()->getCurrentScene()->notifySceneSwitched();
+        TApp::instance()->getCurrentScene()->notifyNameSceneChange();
+      }
+
+      write_gui_smoke_status(
+          action, saved ? "ok" : "error",
+          QStringList()
+              << QString("scene=%1").arg(scenePath.getQString())
+              << QString("frame=%1")
+                     .arg(TApp::instance()->getCurrentFrame()->getFrame())
+              << QString("column=%1")
+                     .arg(TApp::instance()->getCurrentColumn()->getColumnIndex())
+              << QString("frameCount=%1").arg(scene->getFrameCount())
+              << QString("columnCount=%1").arg(xsheet->getColumnCount())
+              << QString("rasterFrames=%1").arg(rasterLevel->getFrameCount())
+              << QString("vectorFrames=%1").arg(vectorLevel->getFrameCount())
+              << QString("window=%1").arg(TApp::instance()
+                                              ->getMainWindow()
+                                              ->windowTitle()));
+      return;
+    }
+
+    write_gui_smoke_status(
+        action, "error",
+        QStringList() << QString("message=unsupported GUI smoke action"));
+  } catch (const TException &e) {
+    write_gui_smoke_status(
+        action, "error",
+        QStringList() << QString("message=%1").arg(
+            QString::fromStdWString(e.getMessage())));
+  } catch (const std::exception &e) {
+    write_gui_smoke_status(action, "error",
+                           QStringList() << QString("message=%1").arg(e.what()));
+  } catch (...) {
+    write_gui_smoke_status(action, "error",
+                           QStringList() << QString("message=unknown exception"));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -330,6 +592,30 @@ int main(int argc, char *argv[]) {
 
     argc = 1;
   }
+
+#if OPENTOONZ_QT_MAJOR >= 6
+  if (loadFilePath.getType() == "toonzscript") {
+    try {
+      QCoreApplication a(argc, argv);
+      TSystem::hasMainLoop(true);
+      TMessageRepository::instance();
+      ThirdParty::initialize();
+      initToonzEnv(argumentPathValues, false);
+      TThread::init();
+      return run_script(loadFilePath);
+    } catch (const TException &e) {
+      std::cerr << QString::fromStdWString(e.getMessage()).toStdString()
+                << std::endl;
+      return 1;
+    } catch (const std::exception &e) {
+      std::cerr << e.what() << std::endl;
+      return 1;
+    } catch (...) {
+      std::cerr << "Unknown script-mode initialization error" << std::endl;
+      return 1;
+    }
+  }
+#endif
 
   // Enables high-DPI scaling. This attribute must be set before QApplication is
   // constructed. Available from Qt 5.6.
@@ -545,6 +831,10 @@ if (QFileInfo(localSplashPath).exists() && QFileInfo(localSplashPath).isFile()) 
   // Initialize thread components
   TThread::init();
 
+#if OPENTOONZ_QT_MAJOR >= 6
+  if (isRunScript) return run_script(loadFilePath);
+#endif
+
   TProjectManager *projectManager = TProjectManager::instance();
   if (Preferences::instance()->isSVNEnabled()) {
     // Read Version Control repositories and add it to project manager as
@@ -701,43 +991,7 @@ if (QFileInfo(localSplashPath).exists() && QFileInfo(localSplashPath).isFile()) 
   CrashHandler::reportProjectInfo(true);
 
   if (isRunScript) {
-    // load script
-    if (TFileStatus(loadFilePath).doesExist()) {
-      // find project for this script file
-      TProjectManager *pm = TProjectManager::instance();
-      auto sceneProject   = pm->loadSceneProject(loadFilePath);
-      TFilePath oldProjectPath;
-      if (!sceneProject) {
-        std::cerr << QObject::tr(
-                         "It is not possible to load the scene %1 because it "
-                         "does not "
-                         "belong to any project.")
-                         .arg(loadFilePath.getQString())
-                         .toStdString()
-                  << std::endl;
-        return 1;
-      }
-      if (sceneProject && !sceneProject->isCurrent()) {
-        oldProjectPath = pm->getCurrentProjectPath();
-        pm->setCurrentProjectPath(sceneProject->getProjectPath());
-      }
-      ScriptEngine engine;
-      QObject::connect(&engine, &ScriptEngine::output, script_output);
-      QString s = QString::fromStdWString(loadFilePath.getWideString())
-                      .replace("\\", "\\\\")
-                      .replace("\"", "\\\"");
-      QString cmd = QString("run(\"%1\")").arg(s);
-      engine.evaluate(cmd);
-      engine.wait();
-      if (!oldProjectPath.isEmpty()) pm->setCurrentProjectPath(oldProjectPath);
-      return gScriptHadError.load() ? 1 : 0;
-    } else {
-      std::cerr << QObject::tr("Script file %1 does not exists.")
-                       .arg(loadFilePath.getQString())
-                       .toStdString()
-                << std::endl;
-      return 1;
-    }
+    return run_script(loadFilePath);
   }
 
 #ifdef _WIN32
@@ -822,6 +1076,15 @@ if (QFileInfo(localSplashPath).exists() && QFileInfo(localSplashPath).isFile()) 
         QString("Loading file '") + loadFilePath.getQString() + "'...",
         Qt::AlignCenter, Qt::white);
     if (TFileStatus(loadFilePath).doesExist()) IoCmd::loadScene(loadFilePath);
+  }
+
+  QString guiSmokeAction = qEnvironmentVariable("OPENTOONZ_GUI_SMOKE_ACTION");
+  if (!guiSmokeAction.isEmpty()) {
+    QString guiSmokeSceneName =
+        qEnvironmentVariable("OPENTOONZ_GUI_SMOKE_SCENE_NAME");
+    TFilePath guiSmokeLoadedScenePath = loadFilePath;
+    run_gui_smoke_hook(guiSmokeAction, guiSmokeSceneName,
+                       guiSmokeLoadedScenePath);
   }
 
   QFont *myFont;

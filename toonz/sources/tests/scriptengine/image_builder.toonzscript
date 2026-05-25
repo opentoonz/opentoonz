@@ -1,0 +1,42 @@
+var source = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+
+var identity = new Transform();
+var shifted = identity.translate(4, 6);
+print("qt-script-imagebuilder-transform", identity.toString(),
+      shifted.toString());
+
+var builder = new ImageBuilder(source.width + 8, source.height + 6);
+builder.add(source, shifted);
+
+var composite = builder.image;
+var output = new FilePath("toonz/build/qt6-script-smoke/image_builder.png");
+composite.save(output);
+
+var reloaded = new Image(output);
+print("qt-script-imagebuilder-composite", builder.toString(), composite.type,
+      composite.width, composite.height, output.exists, reloaded.width,
+      reloaded.height);
+
+builder.clear();
+builder.fill("#FF8800");
+var filled = builder.image;
+print("qt-script-imagebuilder-filled", builder.toString(), filled.type,
+      filled.width, filled.height);
+
+var typed = new ImageBuilder(12, 10, "Raster");
+typed.fill("transparent");
+var typedImage = typed.image;
+print("qt-script-imagebuilder-typed", typed.toString(), typedImage.type,
+      typedImage.width, typedImage.height);
+
+typedImage.dispose();
+typed.dispose();
+filled.dispose();
+reloaded.dispose();
+composite.dispose();
+builder.dispose();
+shifted.dispose();
+identity.dispose();
+source.dispose();
+
+"qt-script-imagebuilder-result";

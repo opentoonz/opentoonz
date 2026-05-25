@@ -38,6 +38,7 @@
 #include "tstream.h"
 #include "tsimplecolorstyles.h"
 #include "tsystem.h"
+#include "ttextcodec.h"
 #include "tcontenthistory.h"
 #include "tfilepath.h"
 
@@ -45,7 +46,6 @@
 #include <QDir>
 #include <QRegularExpression>
 #include <QMessageBox>
-#include <QTextCodec>
 #include <QtCore>
 
 #include "../common/psdlib/psd.h"
@@ -1059,15 +1059,15 @@ static TFilePath getLevelPathAndSetNameWithPsdLevelName(
 
   if (list.size() >= 2 && list.at(1) != "frames") {
     bool hasLayerId;
-    int layid                  = list.at(1).toInt(&hasLayerId);
-    QTextCodec* layerNameCodec = QTextCodec::codecForName(
-        Preferences::instance()->getLayerNameEncoding().c_str());
+    int layid = list.at(1).toInt(&hasLayerId);
 
     if (hasLayerId) {
       TPSDParser psdparser(xshLevel->getScene()->decodeFilePath(retfp));
       std::string levelName = psdparser.getLevelNameWithCounter(layid);
 
-      list[1]                 = layerNameCodec->toUnicode(levelName.c_str());
+      list[1] = TTextCodec::toUnicode(
+          Preferences::instance()->getLayerNameEncoding().c_str(),
+          levelName.c_str());
       std::wstring wLevelName = list.join("#").toStdWString();
       retfp                   = retfp.withName(wLevelName);
 

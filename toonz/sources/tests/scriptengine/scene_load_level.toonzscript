@@ -1,0 +1,24 @@
+var image = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var sourceLevel = new Level();
+sourceLevel.setFrame("1", image);
+
+var levelPath = new FilePath("toonz/build/qt6-script-smoke/scene_load_level..tif");
+sourceLevel.save(levelPath);
+
+var scene = new Scene();
+var loaded = scene.loadLevel("qt6_scene_loaded_raster", levelPath);
+print("qt-script-scene-loadlevel-loaded", loaded.type, loaded.name,
+      loaded.frameCount, loaded.getFrameIds()[0], scene.getLevels().length);
+
+scene.setCell(0, 0, loaded, "1");
+var cell = scene.getCell(0, 0);
+print("qt-script-scene-loadlevel-cell", scene.frameCount, scene.columnCount,
+      cell.level.name, cell.fid);
+
+cell.level.dispose();
+loaded.dispose();
+scene.dispose();
+sourceLevel.dispose();
+image.dispose();
+
+"qt-script-scene-loadlevel-result";
