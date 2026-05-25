@@ -1,0 +1,35 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return needle === undefined || String(e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var transform = new Transform();
+var shifted = transform.translate(-2, 3);
+var rotated = transform.rotate(-45);
+var scaled = transform.scale(0.5);
+var nonUniformScaled = transform.scale(0.5, 1.25);
+
+print("qt-script-transform-edges-valid", shifted.toString(),
+      rotated.toString(), scaled.toString(), nonUniformScaled.toString());
+
+var disposed = new Transform();
+disposed.dispose();
+
+var errors = [
+  hasError(function() { transform.translate(1); }, "Transform.translate"),
+  hasError(function() { transform.translate("1", 2); }, "Transform.translate"),
+  hasError(function() { transform.rotate(); }, "Transform.rotate"),
+  hasError(function() { transform.rotate("90"); }, "Transform.rotate"),
+  hasError(function() { transform.scale(); }, "Transform.scale"),
+  hasError(function() { transform.scale("2"); }, "Transform.scale"),
+  hasError(function() { transform.scale(2, "3"); }, "Transform.scale"),
+  hasError(function() { transform.scale(1, 2, 3); }, "Transform.scale"),
+  hasError(function() { disposed.translate(1, 2); }, "Invalid Transform")
+];
+print("qt-script-transform-edges-errors", errors);
+
+"qt-script-transform-edges-result";

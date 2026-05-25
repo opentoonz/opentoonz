@@ -1,0 +1,74 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e.message || e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var scene = new Scene();
+var raster = scene.newLevel("Raster", "qt6_scene_edges_raster");
+var toonz = scene.newLevel("ToonzRaster", "qt6_scene_edges_toonz");
+var vector = scene.newLevel("Vector", "qt6_scene_edges_vector");
+
+print("qt-script-scene-edges-level-types", raster.type, toonz.type,
+      vector.type, scene.getLevels().length,
+      scene.getLevel("qt6_scene_edges_missing") === undefined);
+
+var duplicateLevelError = hasError(function() {
+  scene.newLevel("Raster", "qt6_scene_edges_raster");
+}, "name(qt6_scene_edges_raster) is already used");
+
+var badLevelTypeError = hasError(function() {
+  scene.newLevel("BadType", "qt6_scene_edges_bad");
+}, "Bad level type");
+
+var missingLevelCellError = hasError(function() {
+  scene.setCell(0, 0, "qt6_scene_edges_missing", "1");
+}, "not included in the scene");
+
+var badCellObjectError = hasError(function() {
+  scene.setCell(0, 0, { level: raster });
+}, "Third argument should be an object");
+
+var badLevelArgumentError = hasError(function() {
+  scene.setCell(0, 0, 42, "1");
+}, "Expected a Level instance or a level name");
+
+var badCellLevelArgumentError = hasError(function() {
+  scene.setCell(0, 0, { level: 42, fid: "1" });
+}, "Expected a Level instance or a level name");
+
+var undefinedLevelFourArgError = hasError(function() {
+  scene.setCell(0, 0, undefined, "1");
+}, "Expected a Level instance or a level name");
+
+var badRowError = hasError(function() {
+  scene.setCell(-1, 0, raster, "1");
+}, "Bad row/col values");
+
+print("qt-script-scene-edges-errors", duplicateLevelError,
+      badLevelTypeError, missingLevelCellError, badCellObjectError,
+      badLevelArgumentError, badCellLevelArgumentError,
+      undefinedLevelFourArgError, badRowError);
+
+var missingLoadError = hasError(function() {
+  scene.loadLevel("qt6_scene_edges_missing_file",
+                  new FilePath("toonz/build/qt6-script-smoke/missing_level..tif"));
+}, "doesn't exist");
+
+var duplicateLoadError = hasError(function() {
+  scene.loadLevel("qt6_scene_edges_raster",
+                  new FilePath("toonz/build/qt6-script-smoke/missing_level..tif"));
+}, "name(qt6_scene_edges_raster) is already used");
+
+print("qt-script-scene-edges-load-errors", missingLoadError,
+      duplicateLoadError);
+
+raster.dispose();
+toonz.dispose();
+vector.dispose();
+scene.dispose();
+
+"qt-script-scene-edges-result";

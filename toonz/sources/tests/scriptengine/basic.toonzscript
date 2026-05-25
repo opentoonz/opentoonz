@@ -1,3 +1,11 @@
 print("qt-script-smoke", 1 + 2, [true, "ok"]);
-warning("qt-script-warning");
-"qt-script-smoke-result";
+print("qt-script-version", ToonzVersion);
+var scriptGlobal = (function() { return this; })();
+var voidGlobal = scriptGlobal["void"];
+var warningResult = warning("qt-script-warning");
+var printResult = print("qt-script-void", typeof voidGlobal,
+                        voidGlobal !== undefined,
+                        warningResult === voidGlobal);
+print("qt-script-print-return", printResult === voidGlobal);
+var runResult = run("run_child.toonzscript");
+print("qt-script-run-result", runResult);

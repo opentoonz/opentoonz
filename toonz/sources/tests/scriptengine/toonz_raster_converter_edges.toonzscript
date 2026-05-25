@@ -1,0 +1,52 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var source = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var converter = new ToonzRasterConverter();
+var converted = converter.convert(source);
+print("qt-script-toonz-raster-converter-edges-success", converted.type,
+      converted.width, converted.height);
+
+var outline = new OutlineVectorizer();
+var vectorImage = outline.vectorize(source);
+var toonzImage = ToonzRasterConverter.convert(source);
+
+var scene = new Scene();
+var emptyRasterLevel = scene.newLevel("Raster", "qt6_converter_empty_raster");
+var vectorLevel = scene.newLevel("Vector", "qt6_converter_vector");
+
+var errors = [
+  hasError(function() { ToonzRasterConverter.convert(); },
+           "Expected one argument"),
+  hasError(function() { converter.convert(source, source); },
+           "Expected one argument"),
+  hasError(function() { ToonzRasterConverter.convert(42); },
+           "should be a raster Level or a raster Image"),
+  hasError(function() { ToonzRasterConverter.convert(toonzImage); },
+           "Can't convert a ToonzRaster image"),
+  hasError(function() { ToonzRasterConverter.convert(vectorImage); },
+           "Can't convert a Vector image"),
+  hasError(function() { ToonzRasterConverter.convert(emptyRasterLevel); },
+           "Can't convert a level with no frames"),
+  hasError(function() { ToonzRasterConverter.convert(vectorLevel); },
+           "Can't convert a Vector level")
+];
+print("qt-script-toonz-raster-converter-edges-errors", errors);
+
+vectorLevel.dispose();
+emptyRasterLevel.dispose();
+scene.dispose();
+toonzImage.dispose();
+vectorImage.dispose();
+outline.dispose();
+converted.dispose();
+converter.dispose();
+source.dispose();
+
+"qt-script-toonz-raster-converter-edges-result";

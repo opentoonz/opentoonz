@@ -1,0 +1,39 @@
+var renderer = new Renderer();
+
+print("qt-script-renderer-basic", renderer.toString(), renderer.id > 0,
+      Array.isArray(renderer.frames), renderer.frames.length,
+      Array.isArray(renderer.columns), renderer.columns.length);
+
+renderer.frames.push(0);
+renderer.frames.push(2);
+renderer.columns.push(1);
+
+print("qt-script-renderer-state", renderer.frames.length, renderer.frames[0],
+      renderer.frames[1], renderer.columns.length, renderer.columns[0]);
+
+try {
+  renderer.renderFrame(new Scene(), 0);
+} catch (e) {
+  print("qt-script-renderer-renderframe-error",
+        String(e).indexOf("Renderer.renderFrame") >= 0);
+}
+
+try {
+  renderer.renderScene(new Scene());
+} catch (e) {
+  print("qt-script-renderer-renderscene-error",
+        String(e).indexOf("Renderer.renderScene") >= 0);
+}
+
+try {
+  renderer.dumpCache();
+} catch (e) {
+  print("qt-script-renderer-dumpcache-error",
+        String(e).indexOf("Renderer.dumpCache") >= 0);
+}
+
+renderer.dispose();
+
+print("qt-script-renderer-disposed", renderer.id);
+
+"qt-script-renderer-result";

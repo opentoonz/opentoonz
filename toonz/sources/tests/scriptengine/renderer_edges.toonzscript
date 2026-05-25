@@ -1,0 +1,39 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e.message || e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var renderer = new Renderer();
+var scene = new Scene();
+var disposedScene = new Scene();
+disposedScene.dispose();
+
+var errors = [
+  hasError(function() { renderer.renderScene(); },
+           "First argument must be a scene"),
+  hasError(function() { renderer.renderScene(42); },
+           "First argument must be a scene"),
+  hasError(function() { renderer.renderScene(disposedScene); },
+           "Invalid Scene"),
+  hasError(function() { renderer.renderFrame(); },
+           "First argument must be a scene"),
+  hasError(function() { renderer.renderFrame(scene); },
+           "Second argument must be a frame number"),
+  hasError(function() { renderer.renderFrame(scene, "1"); },
+           "Second argument must be a frame number"),
+  hasError(function() { renderer.renderFrame(scene, 0); },
+           "Renderer.renderFrame"),
+  hasError(function() { renderer.renderScene(scene); },
+           "Renderer.renderScene")
+];
+
+print("qt-script-renderer-edges-errors", errors);
+
+scene.dispose();
+renderer.dispose();
+
+"qt-script-renderer-edges-result";

@@ -134,7 +134,7 @@ public:
   Q_INVOKABLE bool filePathExists(const QString& path) const;
   Q_INVOKABLE bool filePathIsDirectory(const QString& path) const;
   Q_INVOKABLE bool filePathIsAbsolute(const QString& path) const;
-  Q_INVOKABLE QString filePathLastModified(const QString& path) const;
+  Q_INVOKABLE double filePathLastModified(const QString& path) const;
   Q_INVOKABLE QString filePathConcat(const QString& path,
                                      const QString& value) const;
   Q_INVOKABLE QStringList filePathFiles(const QString& path) const;

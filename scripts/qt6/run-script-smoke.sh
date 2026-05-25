@@ -7,12 +7,23 @@ script_path="${OPENTOONZ_SCRIPT_FIXTURE:-$repo_root/toonz/sources/tests/scripten
 smoke_root="${OPENTOONZ_SCRIPT_SMOKE_ROOT:-$repo_root/toonz/build/qt6-script-smoke}"
 timeout_seconds="${OPENTOONZ_SCRIPT_SMOKE_TIMEOUT:-45}"
 require_exit="${OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT:-0}"
-expected_output="${OPENTOONZ_SCRIPT_EXPECTED_OUTPUT:-qt-script-smoke 3 [true,ok]|qt-script-warning}"
+expected_output="${OPENTOONZ_SCRIPT_EXPECTED_OUTPUT:-qt-script-smoke 3 [true,ok]|qt-script-version 7.1|qt-script-warning}"
 
 case "$script_path" in
   /*) ;;
   *) script_path="$repo_root/$script_path" ;;
 esac
+
+library_fixture="${OPENTOONZ_SCRIPT_LIBRARY_FIXTURE:-}"
+if [[ -z "$library_fixture" && "$(basename "$script_path")" == "basic.toonzscript" ]]; then
+  library_fixture="$repo_root/toonz/sources/tests/scriptengine/run_child.toonzscript"
+fi
+if [[ -n "$library_fixture" ]]; then
+  case "$library_fixture" in
+    /*) ;;
+    *) library_fixture="$repo_root/$library_fixture" ;;
+  esac
+fi
 
 executable="$app_path/Contents/MacOS/OpenToonz"
 script_name="$(basename "$script_path")"
@@ -50,15 +61,60 @@ if [[ ! -f "$script_path" ]]; then
   exit 1
 fi
 
-mkdir -p "$smoke_root/home" "$smoke_root/xdg-config" "$smoke_root/xdg-cache"
+if [[ -n "$library_fixture" && ! -f "$library_fixture" ]]; then
+  echo "error: script smoke library fixture not found: $library_fixture" >&2
+  exit 1
+fi
+
+smoke_home="$smoke_root/smoke-home"
+mkdir -p "$smoke_home" "$smoke_root/xdg-config" "$smoke_root/xdg-cache"
 if [[ ! -d "$smoke_root/stuff" ]]; then
   cp -pR "$repo_root/stuff" "$smoke_root/stuff"
 fi
+mkdir -p \
+  "$smoke_home/.config/OpenToonz" \
+  "$smoke_root/stuff/cache" \
+  "$smoke_root/stuff/config" \
+  "$smoke_root/stuff/fxs" \
+  "$smoke_root/stuff/library" \
+  "$smoke_root/stuff/profiles" \
+  "$smoke_root/stuff/projects" \
+  "$smoke_root/stuff/studiopalette"
+system_var_path="$smoke_home/.config/OpenToonz/SystemVar.ini"
+{
+  printf '[General]\n'
+  printf 'TOONZROOT=%s\n' "$smoke_root/stuff"
+  printf 'TOONZPROFILES=%s\n' "$smoke_root/stuff/profiles"
+  printf 'TOONZCONFIG=%s\n' "$smoke_root/stuff/config"
+  printf 'TOONZLIBRARY=%s\n' "$smoke_root/stuff/library"
+  printf 'TOONZSTUDIOPALETTE=%s\n' "$smoke_root/stuff/studiopalette"
+  printf 'TOONZFXPRESETS=%s\n' "$smoke_root/stuff/fxs"
+  printf 'TOONZPROJECTS=%s\n' "$smoke_root/stuff/projects"
+  printf 'TOONZCACHEROOT=%s\n' "$smoke_root/stuff/cache"
+} >"$system_var_path"
+if [[ ! -e "$smoke_root/toonz" ]]; then
+  ln -s "$repo_root/toonz" "$smoke_root/toonz"
+fi
+if [[ -n "$library_fixture" ]]; then
+  mkdir -p "$smoke_root/stuff/library/scripts"
+  cp -p "$library_fixture" "$smoke_root/stuff/library/scripts/$(basename "$library_fixture")"
+fi
 
-HOME="$smoke_root/home" \
-XDG_CONFIG_HOME="$smoke_root/xdg-config" \
-XDG_CACHE_HOME="$smoke_root/xdg-cache" \
-"$executable" -TOONZROOT "$smoke_root/stuff" "$script_path" \
+(
+  cd "$smoke_root"
+  HOME="$smoke_home" \
+  XDG_CONFIG_HOME="$smoke_root/xdg-config" \
+  XDG_CACHE_HOME="$smoke_root/xdg-cache" \
+  "$executable" \
+    -TOONZROOT "$smoke_root/stuff" \
+    -TOONZPROFILES "$smoke_root/stuff/profiles" \
+    -TOONZCONFIG "$smoke_root/stuff/config" \
+    -TOONZLIBRARY "$smoke_root/stuff/library" \
+    -TOONZSTUDIOPALETTE "$smoke_root/stuff/studiopalette" \
+    -TOONZFXPRESETS "$smoke_root/stuff/fxs" \
+    -TOONZPROJECTS "$smoke_root/stuff/projects" \
+    "$script_path"
+) \
   >"$log_path" 2>&1 &
 pid=$!
 

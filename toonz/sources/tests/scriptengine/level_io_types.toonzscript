@@ -1,0 +1,55 @@
+var source = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var suffix = (new Date()).getTime();
+
+var vectorizer = new OutlineVectorizer();
+var vector = vectorizer.vectorize(source);
+var vectorLevel = new Level();
+vectorLevel.setFrame("1", vector);
+var vectorPath = new FilePath("toonz/build/qt6-script-smoke/level_io_types_vector_" +
+                              suffix + "..pli");
+vectorLevel.save(vectorPath);
+var loadedVectorLevel = new Level(vectorPath);
+var loadedVectorFrame = loadedVectorLevel.getFrameByIndex(0);
+
+print("qt-script-level-io-types-vector", loadedVectorLevel.type,
+      loadedVectorLevel.frameCount,
+      loadedVectorLevel.getFrameIds()[0], loadedVectorFrame.type,
+      loadedVectorFrame.toString());
+
+var rasterizer = new Rasterizer();
+rasterizer.colorMapped = true;
+rasterizer.xres = 32;
+rasterizer.yres = 32;
+var toonz = rasterizer.rasterize(vector);
+var toonzLevel = new Level();
+toonzLevel.setFrame("1", toonz);
+var toonzPath = new FilePath("toonz/build/qt6-script-smoke/level_io_types_toonz_" +
+                             suffix + "..tlv");
+toonzLevel.save(toonzPath);
+var loadedToonzLevel = new Level(toonzPath);
+var loadedToonzFrameId = loadedToonzLevel.getFrameIds()[0];
+var loadedToonzFrame = loadedToonzLevel.getFrame(loadedToonzFrameId);
+var loadedToonzFrameByIndex = loadedToonzLevel.getFrameByIndex(0);
+
+print("qt-script-level-io-types-toonz", loadedToonzLevel.type,
+      loadedToonzLevel.frameCount,
+      loadedToonzFrameId);
+print("qt-script-level-io-types-toonz-frame", loadedToonzFrame.type,
+      loadedToonzFrame.width, loadedToonzFrame.height,
+      loadedToonzFrameByIndex.type, loadedToonzFrameByIndex.width,
+      loadedToonzFrameByIndex.height);
+
+loadedToonzFrameByIndex.dispose();
+loadedToonzFrame.dispose();
+loadedToonzLevel.dispose();
+toonzLevel.dispose();
+toonz.dispose();
+rasterizer.dispose();
+loadedVectorFrame.dispose();
+loadedVectorLevel.dispose();
+vectorLevel.dispose();
+vector.dispose();
+vectorizer.dispose();
+source.dispose();
+
+"qt-script-level-io-types-result";

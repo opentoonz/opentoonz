@@ -1,0 +1,2 @@
+print("qt-script-run-child", ToonzVersion);
+"qt-script-run-child-result";

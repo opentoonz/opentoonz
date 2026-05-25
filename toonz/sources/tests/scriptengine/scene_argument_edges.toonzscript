@@ -1,0 +1,49 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e.message || e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var scene = new Scene();
+var level = scene.newLevel("Raster", "qt6_scene_argument_edges_raster");
+
+scene.insertColumn(0);
+scene.deleteColumn(0);
+scene.setCell(0, 0, level, "1");
+var cell = scene.getCell(0, 0);
+var validCell = cell.level.type === "Raster" && cell.fid === 1;
+cell.level.dispose();
+scene.setCell(0, 0);
+var clearedCell = scene.getCell(0, 0) === undefined;
+
+print("qt-script-scene-argument-edges-valid", validCell, clearedCell,
+      scene.frameCount >= 0, scene.columnCount >= 0);
+
+var errors = [
+  hasError(function() { scene.insertColumn(); }, "Column argument"),
+  hasError(function() { scene.insertColumn("0"); }, "Column argument"),
+  hasError(function() { scene.insertColumn(Infinity); }, "Column argument"),
+  hasError(function() { scene.deleteColumn(); }, "Column argument"),
+  hasError(function() { scene.deleteColumn("0"); }, "Column argument"),
+  hasError(function() { scene.getCell(); }, "Row argument"),
+  hasError(function() { scene.getCell("0", 0); }, "Row argument"),
+  hasError(function() { scene.getCell(0, "0"); }, "Column argument"),
+  hasError(function() { scene.getCell(-1, 0); }, "Bad row/col values"),
+  hasError(function() { scene.setCell(); }, "Row argument"),
+  hasError(function() { scene.setCell("0", 0); }, "Row argument"),
+  hasError(function() { scene.setCell(0, "0"); }, "Column argument"),
+  hasError(function() { scene.setCell(-1, 0, level, "1"); },
+           "Bad row/col values"),
+  hasError(function() { scene.setCell(0, 0, level, "bad"); },
+           "does not look like a FrameId")
+];
+
+print("qt-script-scene-argument-edges-errors", errors);
+
+level.dispose();
+scene.dispose();
+
+"qt-script-scene-argument-edges-result";

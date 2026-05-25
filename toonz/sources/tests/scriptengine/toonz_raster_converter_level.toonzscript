@@ -1,0 +1,46 @@
+var source = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var rasterLevel = new Level();
+rasterLevel.setFrame("1", source);
+rasterLevel.setFrame("2", source);
+
+var converter = new ToonzRasterConverter();
+var convertedByInstance = converter.convert(rasterLevel);
+var convertedByStatic = ToonzRasterConverter.convert(rasterLevel);
+
+var ids = convertedByInstance.getFrameIds();
+var frame1 = convertedByInstance.getFrame(ids[0]);
+var frame2 = convertedByInstance.getFrame(ids[1]);
+var staticFrame = convertedByStatic.getFrameByIndex(0);
+
+print("qt-script-toonz-raster-converter-level",
+      convertedByInstance.type, convertedByInstance.frameCount,
+      ids[0] + "," + ids[1], frame1.type, frame1.width, frame1.height,
+      frame2.type, frame2.width, frame2.height);
+print("qt-script-toonz-raster-converter-level-static",
+      convertedByStatic.type, convertedByStatic.frameCount,
+      staticFrame.type, staticFrame.width, staticFrame.height);
+
+var output = new FilePath("toonz/build/qt6-script-smoke/toonz_raster_converter_level_" +
+                          (new Date()).getTime() + "..tlv");
+convertedByInstance.save(output);
+var reloaded = new Level(output);
+var reloadedFrame1 = reloaded.getFrameByIndex(0);
+var reloadedFrame2 = reloaded.getFrameByIndex(1);
+print("qt-script-toonz-raster-converter-level-saved",
+      reloaded.type, reloaded.frameCount,
+      reloadedFrame1.type, reloadedFrame1.width, reloadedFrame1.height,
+      reloadedFrame2.type, reloadedFrame2.width, reloadedFrame2.height);
+
+reloadedFrame2.dispose();
+reloadedFrame1.dispose();
+reloaded.dispose();
+staticFrame.dispose();
+frame2.dispose();
+frame1.dispose();
+convertedByStatic.dispose();
+convertedByInstance.dispose();
+converter.dispose();
+rasterLevel.dispose();
+source.dispose();
+
+"qt-script-toonz-raster-converter-level-result";

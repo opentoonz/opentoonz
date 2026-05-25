@@ -1,0 +1,24 @@
+var image = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var scene = new Scene();
+var level = scene.newLevel("Raster", "qt6_scene_cell_fids_raster");
+
+level.setFrame("1", image);
+level.setFrame("2A", image);
+
+scene.setCell(0, 0, level, 1);
+scene.setCell(1, 0, level, "2A");
+
+var numeric = scene.getCell(0, 0);
+var lettered = scene.getCell(1, 0);
+
+print("qt-script-scene-cell-fids", typeof numeric.fid, numeric.fid === 1,
+      typeof lettered.fid, lettered.fid === "0002A", scene.frameCount,
+      scene.columnCount);
+
+numeric.level.dispose();
+lettered.level.dispose();
+level.dispose();
+scene.dispose();
+image.dispose();
+
+"qt-script-scene-cell-fids-result";

@@ -1,0 +1,69 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e.message || e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var source = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var outline = new OutlineVectorizer();
+var centerline = new CenterlineVectorizer();
+var rasterizer = new Rasterizer();
+var converter = new ToonzRasterConverter();
+
+outline.accuracy = 11;
+outline.despeckling = 2;
+outline.preservePaintedAreas = true;
+outline.transparentColor = "#00ff80";
+outline.toneThreshold = 64;
+
+centerline.threshold = 4;
+centerline.maxThickness = 120;
+centerline.eir = true;
+
+rasterizer.colorMapped = true;
+rasterizer.xres = 64;
+rasterizer.yres = 48;
+rasterizer.dpi = 144;
+rasterizer.antialiasing = false;
+
+print("qt-script-binding-lifecycle-properties", outline.accuracy,
+      outline.despeckling, outline.preservePaintedAreas,
+      outline.transparentColor, outline.toneThreshold, centerline.threshold,
+      centerline.maxThickness, centerline.eir, rasterizer.colorMapped,
+      rasterizer.xres, rasterizer.yres, rasterizer.dpi,
+      rasterizer.antialiasing, converter.foo(9));
+
+var badColor = hasError(function() {
+  outline.transparentColor = "#gggggg";
+}, "Invalid color");
+
+outline.dispose();
+centerline.dispose();
+rasterizer.dispose();
+converter.dispose();
+
+var disposedErrors = [
+  hasError(function() { outline.toString(); },
+           "Invalid OutlineVectorizer object"),
+  hasError(function() { var value = outline.accuracy; },
+           "Invalid OutlineVectorizer object"),
+  hasError(function() { centerline.toString(); },
+           "Invalid CenterlineVectorizer object"),
+  hasError(function() { centerline.threshold = 8; },
+           "Invalid CenterlineVectorizer object"),
+  hasError(function() { rasterizer.toString(); },
+           "Invalid Rasterizer object"),
+  hasError(function() { rasterizer.colorMapped = false; },
+           "Invalid Rasterizer object"),
+  hasError(function() { converter.convert(source); },
+           "Invalid ToonzRasterConverter object")
+];
+
+print("qt-script-binding-lifecycle-errors", badColor, disposedErrors);
+
+source.dispose();
+
+"qt-script-binding-lifecycle-result";

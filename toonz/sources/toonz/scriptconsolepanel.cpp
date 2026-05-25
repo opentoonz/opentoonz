@@ -170,8 +170,9 @@ teng->getQScriptEngine()->evaluate(contents, "init.js");
 */
 #else
   teng->emitOutput(ScriptEngine::Warning,
-                   tr("Qt 6 scripting is running on QJSEngine; OpenToonz "
-                      "object bindings are not ported yet."));
+                   tr("Qt 6 scripting is running on QJSEngine with partial "
+                      "non-rendering OpenToonz object bindings. The legacy "
+                      "view() helper is not available yet."));
 #endif
 
   setWidget(m_scriptConsole);

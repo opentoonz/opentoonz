@@ -188,7 +188,7 @@ if [[ -z "$smoke_action" ]]; then
 fi
 
 case "$smoke_action" in
-  startup|create-scene|open-scene|xsheet-scrub) ;;
+  startup|create-scene|open-scene|high-dpi|media-devices|audio-input|audio-recording-wav|audio-playback-wav|camera-formats|audio-output|xsheet-scrub) ;;
   *)
     echo "error: unsupported OPENTOONZ_GUI_SMOKE_ACTION: $smoke_action" >&2
     exit 1
@@ -298,6 +298,375 @@ while is_smoke_process_running; do
       stop_smoke_process
       echo "Qt 6 GUI scene-open smoke passed: $opened_window"
       echo "Scene: $scene_path"
+      echo "Log: $log_path"
+      exit 0
+    fi
+
+    if [[ "$smoke_action" == "high-dpi" ]]; then
+      if ! high_dpi_window="$(wait_for_app_smoke_status high-dpi)"; then
+        stop_smoke_process
+        echo "error: Qt 6 GUI high-DPI smoke failed" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      window_dpr="$(status_value windowDevicePixelRatio || true)"
+      screen_dpr="$(status_value screenDevicePixelRatio || true)"
+      logical_dpi_x="$(status_value logicalDpiX || true)"
+      logical_dpi_y="$(status_value logicalDpiY || true)"
+      high_dpi_mode="$(status_value highDpiMode || true)"
+      if [[ -z "$window_dpr" || "$window_dpr" == "0" || "$window_dpr" == "0.00" ||
+            -z "$screen_dpr" || "$screen_dpr" == "0" || "$screen_dpr" == "0.00" ||
+            -z "$logical_dpi_x" || "$logical_dpi_x" == "0" || "$logical_dpi_x" == "0.00" ||
+            -z "$logical_dpi_y" || "$logical_dpi_y" == "0" || "$logical_dpi_y" == "0.00" ||
+            "$high_dpi_mode" != "qt6-always-on" ]]; then
+        stop_smoke_process
+        echo "error: Qt 6 GUI high-DPI smoke reported unexpected state" >&2
+        sed -n '1,120p' "$status_path" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      if [[ "$hold_app" == "1" ]]; then
+        echo "Qt 6 GUI high-DPI smoke launched and is still running: pid $pid"
+        echo "Window: $high_dpi_window"
+        echo "Window DPR: $window_dpr"
+        echo "Screen DPR: $screen_dpr"
+        echo "Log: $log_path"
+        wait "$pid"
+        exit $?
+      fi
+
+      stop_smoke_process
+      echo "Qt 6 GUI high-DPI smoke passed: $high_dpi_window"
+      echo "Window DPR: $window_dpr"
+      echo "Screen DPR: $screen_dpr"
+      echo "Log: $log_path"
+      exit 0
+    fi
+
+    if [[ "$smoke_action" == "media-devices" ]]; then
+      if ! media_window="$(wait_for_app_smoke_status media-devices)"; then
+        stop_smoke_process
+        echo "error: Qt 6 GUI media-devices smoke failed" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      qt_multimedia_api="$(status_value qtMultimediaApi || true)"
+      audio_input_count="$(status_value audioInputCount || true)"
+      audio_output_count="$(status_value audioOutputCount || true)"
+      video_input_count="$(status_value videoInputCount || true)"
+      if [[ "$qt_multimedia_api" != "Qt6" ||
+            ! "$audio_input_count" =~ ^[0-9]+$ ||
+            ! "$audio_output_count" =~ ^[0-9]+$ ||
+            ! "$video_input_count" =~ ^[0-9]+$ ]]; then
+        stop_smoke_process
+        echo "error: Qt 6 GUI media-devices smoke reported unexpected state" >&2
+        sed -n '1,120p' "$status_path" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      if [[ "$hold_app" == "1" ]]; then
+        echo "Qt 6 GUI media-devices smoke launched and is still running: pid $pid"
+        echo "Window: $media_window"
+        echo "Audio inputs: $audio_input_count"
+        echo "Audio outputs: $audio_output_count"
+        echo "Video inputs: $video_input_count"
+        echo "Log: $log_path"
+        wait "$pid"
+        exit $?
+      fi
+
+      stop_smoke_process
+      echo "Qt 6 GUI media-devices smoke passed: $media_window"
+      echo "Audio inputs: $audio_input_count"
+      echo "Audio outputs: $audio_output_count"
+      echo "Video inputs: $video_input_count"
+      echo "Log: $log_path"
+      exit 0
+    fi
+
+    if [[ "$smoke_action" == "camera-formats" ]]; then
+      if ! camera_window="$(wait_for_app_smoke_status camera-formats)"; then
+        stop_smoke_process
+        echo "error: Qt 6 GUI camera-formats smoke failed" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      qt_multimedia_api="$(status_value qtMultimediaApi || true)"
+      video_input_count="$(status_value videoInputCount || true)"
+      default_video_input_available="$(status_value defaultVideoInputAvailable || true)"
+      default_video_format_count="$(status_value defaultVideoFormatCount || true)"
+      camera_format_probe="$(status_value cameraFormatProbe || true)"
+      if [[ "$qt_multimedia_api" != "Qt6" ||
+            ! "$video_input_count" =~ ^[0-9]+$ ||
+            ! "$default_video_format_count" =~ ^[0-9]+$ ]]; then
+        stop_smoke_process
+        echo "error: Qt 6 GUI camera-formats smoke reported unexpected state" >&2
+        sed -n '1,120p' "$status_path" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      if ((video_input_count == 0)); then
+        if [[ "$camera_format_probe" != "no-camera" ]]; then
+          stop_smoke_process
+          echo "error: Qt 6 GUI camera-formats smoke expected no-camera state" >&2
+          sed -n '1,120p' "$status_path" >&2
+          sed -n '1,180p' "$log_path" >&2
+          exit 1
+        fi
+      elif [[ "$default_video_input_available" != "true" ||
+              "$camera_format_probe" != "ok" ||
+              "$default_video_format_count" == "0" ]]; then
+        stop_smoke_process
+        echo "error: Qt 6 GUI camera-formats smoke reported no usable default camera formats" >&2
+        sed -n '1,120p' "$status_path" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      if [[ "$hold_app" == "1" ]]; then
+        echo "Qt 6 GUI camera-formats smoke launched and is still running: pid $pid"
+        echo "Window: $camera_window"
+        echo "Video inputs: $video_input_count"
+        echo "Default camera formats: $default_video_format_count"
+        echo "Log: $log_path"
+        wait "$pid"
+        exit $?
+      fi
+
+      stop_smoke_process
+      echo "Qt 6 GUI camera-formats smoke passed: $camera_window"
+      echo "Video inputs: $video_input_count"
+      echo "Default camera formats: $default_video_format_count"
+      echo "Log: $log_path"
+      exit 0
+    fi
+
+    if [[ "$smoke_action" == "audio-input" ]]; then
+      if ! audio_input_window="$(wait_for_app_smoke_status audio-input)"; then
+        stop_smoke_process
+        echo "error: Qt 6 GUI audio-input smoke failed" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      qt_multimedia_api="$(status_value qtMultimediaApi || true)"
+      audio_input_available="$(status_value audioInputAvailable || true)"
+      audio_input_probe="$(status_value audioInputProbe || true)"
+      audio_error="$(status_value audioError || true)"
+      sample_rate="$(status_value sampleRate || true)"
+      bytes_captured="$(status_value bytesCaptured || true)"
+      if [[ "$qt_multimedia_api" != "Qt6" ||
+            "$audio_input_available" != "true" ||
+            "$audio_input_probe" != "ok" ||
+            "$audio_error" != "NoError" ||
+            ! "$sample_rate" =~ ^[0-9]+$ ||
+            ! "$bytes_captured" =~ ^[0-9]+$ ||
+            "$sample_rate" == "0" ||
+            "$bytes_captured" == "0" ]]; then
+        stop_smoke_process
+        echo "error: Qt 6 GUI audio-input smoke reported unexpected state" >&2
+        sed -n '1,120p' "$status_path" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      if [[ "$hold_app" == "1" ]]; then
+        echo "Qt 6 GUI audio-input smoke launched and is still running: pid $pid"
+        echo "Window: $audio_input_window"
+        echo "Sample rate: $sample_rate"
+        echo "Bytes captured: $bytes_captured"
+        echo "Log: $log_path"
+        wait "$pid"
+        exit $?
+      fi
+
+      stop_smoke_process
+      echo "Qt 6 GUI audio-input smoke passed: $audio_input_window"
+      echo "Sample rate: $sample_rate"
+      echo "Bytes captured: $bytes_captured"
+      echo "Log: $log_path"
+      exit 0
+    fi
+
+    if [[ "$smoke_action" == "audio-recording-wav" ]]; then
+      if ! audio_recording_window="$(wait_for_app_smoke_status audio-recording-wav)"; then
+        stop_smoke_process
+        echo "error: Qt 6 GUI audio-recording-wav smoke failed" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      qt_multimedia_api="$(status_value qtMultimediaApi || true)"
+      audio_input_available="$(status_value audioInputAvailable || true)"
+      recording_probe="$(status_value audioRecordingWavProbe || true)"
+      audio_error="$(status_value audioError || true)"
+      sample_rate="$(status_value sampleRate || true)"
+      bytes_recorded="$(status_value bytesRecorded || true)"
+      wav_file_size="$(status_value wavFileSize || true)"
+      wav_load_ok="$(status_value wavLoadOk || true)"
+      wav_sample_count="$(status_value wavSampleCount || true)"
+      recording_path="$(status_value recordingPath || true)"
+      if [[ "$qt_multimedia_api" != "Qt6" ||
+            "$audio_input_available" != "true" ||
+            "$recording_probe" != "ok" ||
+            "$audio_error" != "NoError" ||
+            "$wav_load_ok" != "true" ||
+            ! "$sample_rate" =~ ^[0-9]+$ ||
+            ! "$bytes_recorded" =~ ^[0-9]+$ ||
+            ! "$wav_file_size" =~ ^[0-9]+$ ||
+            ! "$wav_sample_count" =~ ^[0-9]+$ ||
+            "$sample_rate" == "0" ||
+            "$bytes_recorded" == "0" ||
+            "$wav_file_size" -le 44 ||
+            "$wav_sample_count" == "0" ||
+            ! -f "$recording_path" ]]; then
+        stop_smoke_process
+        echo "error: Qt 6 GUI audio-recording-wav smoke reported unexpected state" >&2
+        sed -n '1,140p' "$status_path" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      if [[ "$hold_app" == "1" ]]; then
+        echo "Qt 6 GUI audio-recording-wav smoke launched and is still running: pid $pid"
+        echo "Window: $audio_recording_window"
+        echo "Sample rate: $sample_rate"
+        echo "Bytes recorded: $bytes_recorded"
+        echo "WAV sample count: $wav_sample_count"
+        echo "Recording: $recording_path"
+        echo "Log: $log_path"
+        wait "$pid"
+        exit $?
+      fi
+
+      stop_smoke_process
+      echo "Qt 6 GUI audio-recording-wav smoke passed: $audio_recording_window"
+      echo "Sample rate: $sample_rate"
+      echo "Bytes recorded: $bytes_recorded"
+      echo "WAV sample count: $wav_sample_count"
+      echo "Recording: $recording_path"
+      echo "Log: $log_path"
+      exit 0
+    fi
+
+    if [[ "$smoke_action" == "audio-output" ]]; then
+      if ! audio_window="$(wait_for_app_smoke_status audio-output)"; then
+        stop_smoke_process
+        echo "error: Qt 6 GUI audio-output smoke failed" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      qt_multimedia_api="$(status_value qtMultimediaApi || true)"
+      audio_output_available="$(status_value audioOutputAvailable || true)"
+      audio_output_probe="$(status_value audioOutputProbe || true)"
+      audio_error="$(status_value audioError || true)"
+      sample_rate="$(status_value sampleRate || true)"
+      bytes_provided="$(status_value bytesProvided || true)"
+      if [[ "$qt_multimedia_api" != "Qt6" ||
+            "$audio_output_available" != "true" ||
+            "$audio_output_probe" != "ok" ||
+            "$audio_error" != "NoError" ||
+            ! "$sample_rate" =~ ^[0-9]+$ ||
+            ! "$bytes_provided" =~ ^[0-9]+$ ||
+            "$sample_rate" == "0" ||
+            "$bytes_provided" == "0" ]]; then
+        stop_smoke_process
+        echo "error: Qt 6 GUI audio-output smoke reported unexpected state" >&2
+        sed -n '1,120p' "$status_path" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      if [[ "$hold_app" == "1" ]]; then
+        echo "Qt 6 GUI audio-output smoke launched and is still running: pid $pid"
+        echo "Window: $audio_window"
+        echo "Sample rate: $sample_rate"
+        echo "Bytes provided: $bytes_provided"
+        echo "Log: $log_path"
+        wait "$pid"
+        exit $?
+      fi
+
+      stop_smoke_process
+      echo "Qt 6 GUI audio-output smoke passed: $audio_window"
+      echo "Sample rate: $sample_rate"
+      echo "Bytes provided: $bytes_provided"
+      echo "Log: $log_path"
+      exit 0
+    fi
+
+    if [[ "$smoke_action" == "audio-playback-wav" ]]; then
+      if ! playback_window="$(wait_for_app_smoke_status audio-playback-wav)"; then
+        stop_smoke_process
+        echo "error: Qt 6 GUI audio-playback-wav smoke failed" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      qt_multimedia_api="$(status_value qtMultimediaApi || true)"
+      audio_output_available="$(status_value audioOutputAvailable || true)"
+      target_format_supported="$(status_value targetFormatSupported || true)"
+      playback_probe="$(status_value audioPlaybackWavProbe || true)"
+      output_installed="$(status_value audioOutputInstalled || true)"
+      playback_open_ok="$(status_value playbackOpenOk || true)"
+      playback_started="$(status_value playbackStarted || true)"
+      playback_stopped="$(status_value playbackStoppedAfterStop || true)"
+      wav_load_ok="$(status_value wavLoadOk || true)"
+      sample_rate="$(status_value sampleRate || true)"
+      bytes_written="$(status_value bytesWritten || true)"
+      wav_file_size="$(status_value wavFileSize || true)"
+      wav_sample_count="$(status_value wavSampleCount || true)"
+      playback_path="$(status_value playbackPath || true)"
+      if [[ "$qt_multimedia_api" != "Qt6" ||
+            "$audio_output_available" != "true" ||
+            "$target_format_supported" != "true" ||
+            "$playback_probe" != "ok" ||
+            "$output_installed" != "true" ||
+            "$playback_open_ok" != "true" ||
+            "$playback_started" != "true" ||
+            "$playback_stopped" != "true" ||
+            "$wav_load_ok" != "true" ||
+            ! "$sample_rate" =~ ^[0-9]+$ ||
+            ! "$bytes_written" =~ ^[0-9]+$ ||
+            ! "$wav_file_size" =~ ^[0-9]+$ ||
+            ! "$wav_sample_count" =~ ^[0-9]+$ ||
+            "$sample_rate" == "0" ||
+            "$bytes_written" == "0" ||
+            "$wav_file_size" -le 44 ||
+            "$wav_sample_count" == "0" ||
+            ! -f "$playback_path" ]]; then
+        stop_smoke_process
+        echo "error: Qt 6 GUI audio-playback-wav smoke reported unexpected state" >&2
+        sed -n '1,150p' "$status_path" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      if [[ "$hold_app" == "1" ]]; then
+        echo "Qt 6 GUI audio-playback-wav smoke launched and is still running: pid $pid"
+        echo "Window: $playback_window"
+        echo "Sample rate: $sample_rate"
+        echo "Bytes written: $bytes_written"
+        echo "WAV sample count: $wav_sample_count"
+        echo "Playback WAV: $playback_path"
+        echo "Log: $log_path"
+        wait "$pid"
+        exit $?
+      fi
+
+      stop_smoke_process
+      echo "Qt 6 GUI audio-playback-wav smoke passed: $playback_window"
+      echo "Sample rate: $sample_rate"
+      echo "Bytes written: $bytes_written"
+      echo "WAV sample count: $wav_sample_count"
+      echo "Playback WAV: $playback_path"
       echo "Log: $log_path"
       exit 0
     fi

@@ -309,6 +309,7 @@ void ScriptEngine::onTerminated() {
 
 #include <QApplication>
 #include <QColor>
+#include <QDateTime>
 #include <QFile>
 #include <QFileInfo>
 #include <QJSEngine>
@@ -322,6 +323,7 @@ void ScriptEngine::onTerminated() {
 
 #include <utility>
 #include <cmath>
+#include <limits>
 
 //=========================================================
 
@@ -619,7 +621,11 @@ bool isRasterizerProperty(const QString& name) {
 
 bool frameIdFromString(const QString& value, TFrameId& fid, QString& error) {
   static const QRegularExpression re(QStringLiteral(R"(^(-?\d+)(\w?)$)"));
-  const QRegularExpressionMatch match = re.match(value);
+  QString normalized = value.trimmed();
+  normalized.remove(QChar::Null);
+  normalized.remove(QLatin1Char('\r'));
+  normalized.remove(QLatin1Char('\n'));
+  const QRegularExpressionMatch match = re.match(normalized);
   if (!match.hasMatch()) {
     error =
         QObject::tr("Argument '%1' does not look like a FrameId").arg(value);
@@ -628,9 +634,9 @@ bool frameIdFromString(const QString& value, TFrameId& fid, QString& error) {
 
   const int number     = match.captured(1).toInt();
   const QString letter = match.captured(2);
-  fid                  = letter.length() == 1
-                             ? TFrameId(number, static_cast<wchar_t>(letter[0].unicode()))
-                             : TFrameId(number);
+  fid = letter.length() == 1
+            ? TFrameId(number, static_cast<wchar_t>(letter[0].unicode()))
+            : TFrameId(number);
   error.clear();
   return true;
 }
@@ -640,10 +646,51 @@ QVariant scriptFrameIdValue(const TFrameId& fid) {
   return QString::fromStdString(fid.expand());
 }
 
+TImageP loadScriptLevelFrame(TXshSimpleLevel* level, const TFrameId& frameId) {
+  if (!level) return TImageP();
+
+  TImageP image = level->getFrame(frameId, false);
+  if (image) return image;
+
+  TFilePath path = level->getPath();
+  if (path == TFilePath()) return TImageP();
+
+  if (ToonzScene* scene = level->getScene()) {
+    path = scene->decodeFilePath(path);
+  }
+
+  try {
+    TLevelReaderP reader(path);
+    TLevelP levelInfo = reader->loadInfo();
+    TFrameId readerFrameId = frameId;
+    if (levelInfo) {
+      bool matchedFrameId = false;
+      for (TLevel::Iterator it = levelInfo->begin(); it != levelInfo->end();
+           ++it) {
+        if (it->first == frameId) {
+          readerFrameId = it->first;
+          matchedFrameId = true;
+          break;
+        }
+      }
+      if (!matchedFrameId && levelInfo->getFrameCount() == 1) {
+        readerFrameId = levelInfo->begin()->first;
+      }
+    }
+    image = reader->getFrameReader(readerFrameId)->load();
+    if (image) image->setPalette(level->getPalette());
+  } catch (...) {
+    return TImageP();
+  }
+
+  return image;
+}
+
 const char kBootstrapScript[] = R"JS(
 (function(global) {
   var nextFilePathId = 0;
   var nextToonzRasterConverterId = 0;
+  var nextRendererId = 0;
 
   function toFilePathString(value) {
     if (value instanceof FilePath)
@@ -651,9 +698,37 @@ const char kBootstrapScript[] = R"JS(
     return String(value);
   }
 
+  function filePathArgument(value) {
+    if (value instanceof FilePath)
+      return value.__path;
+    if (typeof value === "string" || value instanceof String)
+      return String(value);
+    throw new Error("Argument doesn't look like a file path : " +
+                    String(value));
+  }
+
   function throwIfError(message) {
     if (message)
       throw new Error(message);
+  }
+
+  function isNumberArgument(value) {
+    return typeof value === "number" && isFinite(value);
+  }
+
+  function sceneNumberArgument(value, name) {
+    if (!isNumberArgument(value))
+      throw new Error(name + " must be a number : " + String(value));
+    return Number(value);
+  }
+
+  function throwTransformArgumentError(method, expected) {
+    throw new Error("Bad arguments: Transform." + method + " expected " +
+                    expected);
+  }
+
+  function isStringArgument(value) {
+    return typeof value === "string" || value instanceof String;
   }
 
   function sceneId(scene) {
@@ -705,6 +780,24 @@ const char kBootstrapScript[] = R"JS(
     if (!(rasterizer instanceof Rasterizer) || rasterizer.__rasterizerId < 0)
       throw new Error("Invalid Rasterizer object");
     return rasterizer.__rasterizerId;
+  }
+
+  function rendererId(renderer) {
+    if (!(renderer instanceof Renderer) || renderer.__rendererId < 0)
+      throw new Error("Invalid Renderer object");
+    return renderer.__rendererId;
+  }
+
+  function rendererSceneId(scene) {
+    if (!(scene instanceof Scene))
+      throw new Error("First argument must be a scene : " + String(scene));
+    return sceneId(scene);
+  }
+
+  function throwRendererDeferred(method) {
+    throw new Error("Qt 6 script Renderer." + method +
+                    " is deferred until the rendering backend migration " +
+                    "boundary is stable");
   }
 
   function createLevel(levelIdValue) {
@@ -791,6 +884,7 @@ const char kBootstrapScript[] = R"JS(
     for (var i = 0; i < arguments.length; ++i)
       items.push(format(arguments[i], false));
     __opentoonzScriptEngine.emitScriptOutput(0, items.join(" "));
+    return global["void"];
   };
 
   global.warning = function() {
@@ -798,19 +892,27 @@ const char kBootstrapScript[] = R"JS(
     for (var i = 0; i < arguments.length; ++i)
       items.push(format(arguments[i], false));
     __opentoonzScriptEngine.emitScriptOutput(1, items.join(" "));
+    return global["void"];
   };
 
   global.run = function(path) {
-    var script = __opentoonzScriptEngine.readScriptFile(toFilePathString(path));
+    if (arguments.length !== 1)
+      throw new Error("expected one parameter");
+
+    var script = __opentoonzScriptEngine.readScriptFile(
+      filePathArgument(path));
     if (!script.ok)
-      return undefined;
+      throw new Error(String(script.error));
     return (0, eval)(String(script.content) + "\n//# sourceURL=" +
                      encodeURI(String(script.path)));
   };
 
+  global.ToonzVersion = "7.1";
+  global["void"] = {};
+
   global.FilePath = function(path) {
     this.__filePathId = ++nextFilePathId;
-    this.__path = path === undefined ? "" : toFilePathString(path);
+    this.__path = arguments.length === 1 ? toFilePathString(path) : "";
   };
 
   Object.defineProperty(FilePath.prototype, "id", {
@@ -854,7 +956,7 @@ const char kBootstrapScript[] = R"JS(
     },
     set: function(parentDirectory) {
       this.__path = __opentoonzScriptEngine.filePathWithParentDirectory(
-        this.__path, toFilePathString(parentDirectory));
+        this.__path, filePathArgument(parentDirectory));
     }
   });
 
@@ -866,7 +968,8 @@ const char kBootstrapScript[] = R"JS(
 
   Object.defineProperty(FilePath.prototype, "lastModified", {
     get: function() {
-      return __opentoonzScriptEngine.filePathLastModified(this.__path);
+      var msecs = __opentoonzScriptEngine.filePathLastModified(this.__path);
+      return isNaN(msecs) ? new Date(NaN) : new Date(msecs);
     }
   });
 
@@ -888,15 +991,16 @@ const char kBootstrapScript[] = R"JS(
 
   FilePath.prototype.withParentDirectory = function(parentDirectory) {
     return new FilePath(__opentoonzScriptEngine.filePathWithParentDirectory(
-      this.__path, toFilePathString(parentDirectory)));
+      this.__path, filePathArgument(parentDirectory)));
   };
 
   FilePath.prototype.concat = function(value) {
-    if (__opentoonzScriptEngine.filePathIsAbsolute(toFilePathString(value)))
+    var path = filePathArgument(value);
+    if (__opentoonzScriptEngine.filePathIsAbsolute(path))
       throw new Error("can't concatenate an absolute path : " +
                       String(value));
     return new FilePath(__opentoonzScriptEngine.filePathConcat(
-      this.__path, toFilePathString(value)));
+      this.__path, path));
   };
 
   FilePath.prototype.files = function() {
@@ -910,8 +1014,11 @@ const char kBootstrapScript[] = R"JS(
   };
 
   global.Image = function(path) {
+    if (arguments.length > 1)
+      throw new Error("Bad argument count. expected: [path]");
+
     this.__imageId = __opentoonzScriptEngine.imageCreate();
-    if (path !== undefined)
+    if (arguments.length === 1)
       this.load(path);
   };
 
@@ -957,13 +1064,13 @@ const char kBootstrapScript[] = R"JS(
 
   Image.prototype.load = function(path) {
     throwIfError(__opentoonzScriptEngine.imageLoad(
-      imageId(this), toFilePathString(path)));
+      imageId(this), filePathArgument(path)));
     return this;
   };
 
   Image.prototype.save = function(path) {
     throwIfError(__opentoonzScriptEngine.imageSave(
-      imageId(this), toFilePathString(path)));
+      imageId(this), filePathArgument(path)));
     return this;
   };
 
@@ -988,20 +1095,32 @@ const char kBootstrapScript[] = R"JS(
   };
 
   Transform.prototype.translate = function(x, y) {
+    var id = transformId(this);
+    if (arguments.length !== 2 || !isNumberArgument(x) || !isNumberArgument(y))
+      throwTransformArgumentError("translate", "x,y");
     return transformFromResult(__opentoonzScriptEngine.transformTranslate(
-      transformId(this), Number(x), Number(y)));
+      id, x, y));
   };
 
   Transform.prototype.rotate = function(degrees) {
+    var id = transformId(this);
+    if (arguments.length !== 1 || !isNumberArgument(degrees))
+      throwTransformArgumentError("rotate", "degrees");
     return transformFromResult(__opentoonzScriptEngine.transformRotate(
-      transformId(this), Number(degrees)));
+      id, degrees));
   };
 
   Transform.prototype.scale = function(sx, sy) {
-    if (sy === undefined)
+    var id = transformId(this);
+    if (arguments.length !== 1 && arguments.length !== 2)
+      throwTransformArgumentError("scale", "s[,sy]");
+    if (!isNumberArgument(sx) ||
+        (arguments.length === 2 && !isNumberArgument(sy)))
+      throwTransformArgumentError("scale", "s[,sy]");
+    if (arguments.length === 1)
       sy = sx;
     return transformFromResult(__opentoonzScriptEngine.transformScale(
-      transformId(this), Number(sx), Number(sy)));
+      id, sx, sy));
   };
 
   global.ImageBuilder = function(width, height, type) {
@@ -1009,8 +1128,10 @@ const char kBootstrapScript[] = R"JS(
     if (arguments.length === 0) {
       result = __opentoonzScriptEngine.imageBuilderCreate(-1, -1, "");
     } else if (arguments.length === 2 || arguments.length === 3) {
+      if (!isNumberArgument(width) || !isNumberArgument(height))
+        throw new Error("Bad arguments: expected width,height[,type]");
       result = __opentoonzScriptEngine.imageBuilderCreate(
-        Number(width), Number(height),
+        width, height,
         type === undefined ? "" : String(type));
     } else {
       throw new Error("Bad argument count. expected: width,height[,type]");
@@ -1057,8 +1178,13 @@ const char kBootstrapScript[] = R"JS(
 
   ImageBuilder.prototype.add = function(image, transform) {
     var transformIdValue = -1;
-    if (transform !== undefined)
+    if (transform !== undefined) {
+      if (!(transform instanceof Transform)) {
+        throw new Error("Bad argument (" + String(transform) +
+                        "): should be a Transformation");
+      }
       transformIdValue = transformId(transform);
+    }
     throwIfError(__opentoonzScriptEngine.imageBuilderAdd(
       imageBuilderId(this), imageId(image), transformIdValue));
     return this;
@@ -1079,17 +1205,46 @@ const char kBootstrapScript[] = R"JS(
     return "ToonzRasterConverter";
   };
 
+  ToonzRasterConverter.prototype.dispose = function() {
+    this.__toonzRasterConverterId = -1;
+  };
+
   ToonzRasterConverter.prototype.foo = function(x) {
     return Number(x) * 2;
   };
 
-  ToonzRasterConverter.prototype.convert = function(image) {
-    return ToonzRasterConverter.convert(image);
+  ToonzRasterConverter.prototype.convert = function(value) {
+    if (arguments.length !== 1)
+      throw new Error("Expected one argument (a raster Level or a raster Image)");
+    if (this.__toonzRasterConverterId < 0)
+      throw new Error("Invalid ToonzRasterConverter object");
+    return ToonzRasterConverter.convert(value);
   };
 
-  ToonzRasterConverter.convert = function(image) {
+  ToonzRasterConverter.convert = function(value) {
+    if (arguments.length !== 1)
+      throw new Error("Expected one argument (a raster Level or a raster Image)");
+
+    if (value instanceof Level) {
+      if (value.type !== "Raster")
+        throw new Error("Can't convert a " + value.type + " level");
+      if (value.frameCount <= 0)
+        throw new Error("Can't convert a level with no frames");
+
+      return mapLevelFrames(value, function(frame) {
+        return ToonzRasterConverter.convert(frame);
+      });
+    }
+
+    if (!(value instanceof Image)) {
+      throw new Error("Bad argument (" + String(value) +
+                      "): should be a raster Level or a raster Image");
+    }
+    if (value.type !== "Raster")
+      throw new Error("Can't convert a " + value.type + " image");
+
     return imageFromResult(__opentoonzScriptEngine.toonzRasterConvertImage(
-      imageId(image)));
+      imageId(value)));
   };
 
   function defineOutlineVectorizerProperty(name) {
@@ -1130,11 +1285,23 @@ const char kBootstrapScript[] = R"JS(
 
   OutlineVectorizer.prototype.vectorize = function(value) {
     if (value instanceof Level) {
+      if (value.type !== "Raster" && value.type !== "ToonzRaster")
+        throw new Error("Can't vectorize a " + value.type + " level");
+      if (value.frameCount <= 0)
+        throw new Error("Can't vectorize a level with no frames");
+
       var vectorizer = this;
       return mapLevelFrames(value, function(frame) {
         return vectorizer.vectorize(frame);
       });
     }
+
+    if (!(value instanceof Image)) {
+      throw new Error("Bad argument (" + String(value) +
+                      "): should be an Image or a Level");
+    }
+    if (value.type !== "Raster" && value.type !== "ToonzRaster")
+      throw new Error("Can't vectorize a " + value.type + " image");
 
     return imageFromResult(
       __opentoonzScriptEngine.outlineVectorizerVectorizeImage(
@@ -1189,11 +1356,23 @@ const char kBootstrapScript[] = R"JS(
 
   CenterlineVectorizer.prototype.vectorize = function(value) {
     if (value instanceof Level) {
+      if (value.type !== "Raster" && value.type !== "ToonzRaster")
+        throw new Error("Can't vectorize a " + value.type + " level");
+      if (value.frameCount <= 0)
+        throw new Error("Can't vectorize a level with no frames");
+
       var vectorizer = this;
       return mapLevelFrames(value, function(frame) {
         return vectorizer.vectorize(frame);
       });
     }
+
+    if (!(value instanceof Image)) {
+      throw new Error("Bad argument (" + String(value) +
+                      "): should be an Image or a Level");
+    }
+    if (value.type !== "Raster" && value.type !== "ToonzRaster")
+      throw new Error("Can't vectorize a " + value.type + " image");
 
     return imageFromResult(
       __opentoonzScriptEngine.centerlineVectorizerVectorizeImage(
@@ -1243,12 +1422,23 @@ const char kBootstrapScript[] = R"JS(
   };
 
   Rasterizer.prototype.rasterize = function(value) {
+    rasterizerId(this);
     if (value instanceof Level) {
+      if (value.type !== "Vector")
+        throw new Error("Expected a vector level: " + value.toString());
+
       var rasterizer = this;
       return mapLevelFrames(value, function(frame) {
         return rasterizer.rasterize(frame);
       });
     }
+
+    if (!(value instanceof Image)) {
+      throw new Error("Argument must be a vector level or image : " +
+                      String(value));
+    }
+    if (value.type !== "Vector")
+      throw new Error("Expected a vector image: " + value.toString());
 
     return imageFromResult(__opentoonzScriptEngine.rasterizerRasterizeImage(
       rasterizerId(this), imageId(value)));
@@ -1260,9 +1450,50 @@ const char kBootstrapScript[] = R"JS(
   defineRasterizerProperty("dpi");
   defineRasterizerProperty("antialiasing");
 
+  global.Renderer = function() {
+    this.__rendererId = ++nextRendererId;
+    this.frames = [];
+    this.columns = [];
+  };
+
+  Object.defineProperty(Renderer.prototype, "id", {
+    get: function() {
+      return this.__rendererId;
+    }
+  });
+
+  Renderer.prototype.dispose = function() {
+    this.__rendererId = -1;
+  };
+
+  Renderer.prototype.toString = function() {
+    rendererId(this);
+    return "Renderer";
+  };
+
+  Renderer.prototype.renderScene = function() {
+    rendererId(this);
+    rendererSceneId(arguments[0]);
+    throwRendererDeferred("renderScene");
+  };
+
+  Renderer.prototype.renderFrame = function() {
+    rendererId(this);
+    rendererSceneId(arguments[0]);
+    if (!isNumberArgument(arguments[1]))
+      throw new Error("Second argument must be a frame number : " +
+                      String(arguments[1]));
+    throwRendererDeferred("renderFrame");
+  };
+
+  Renderer.prototype.dumpCache = function() {
+    rendererId(this);
+    throwRendererDeferred("dumpCache");
+  };
+
   global.Level = function(path) {
     this.__levelId = __opentoonzScriptEngine.levelCreate();
-    if (path !== undefined)
+    if (arguments.length === 1)
       this.load(path);
   };
 
@@ -1306,11 +1537,14 @@ const char kBootstrapScript[] = R"JS(
 
   Object.defineProperty(Level.prototype, "path", {
     get: function() {
-      return new FilePath(__opentoonzScriptEngine.levelPath(levelId(this)));
+      var id = levelId(this);
+      if (__opentoonzScriptEngine.levelType(id) === "Empty")
+        return undefined;
+      return new FilePath(__opentoonzScriptEngine.levelPath(id));
     },
     set: function(path) {
       throwIfError(__opentoonzScriptEngine.levelSetPath(
-        levelId(this), toFilePathString(path)));
+        levelId(this), filePathArgument(path)));
     }
   });
 
@@ -1324,8 +1558,10 @@ const char kBootstrapScript[] = R"JS(
   };
 
   Level.prototype.getFrameByIndex = function(index) {
+    if (!isNumberArgument(index))
+      throw new Error("frame index (" + String(index) + ") must be a number");
     return imageFromResult(__opentoonzScriptEngine.levelGetFrameByIndex(
-      levelId(this), Number(index)));
+      levelId(this), index));
   };
 
   Level.prototype.setFrame = function(fid, image) {
@@ -1336,19 +1572,19 @@ const char kBootstrapScript[] = R"JS(
 
   Level.prototype.load = function(path) {
     throwIfError(__opentoonzScriptEngine.levelLoad(
-      levelId(this), toFilePathString(path)));
+      levelId(this), filePathArgument(path)));
     return this;
   };
 
   Level.prototype.save = function(path) {
     throwIfError(__opentoonzScriptEngine.levelSave(
-      levelId(this), toFilePathString(path)));
+      levelId(this), filePathArgument(path)));
     return this;
   };
 
   global.Scene = function(path) {
     this.__sceneId = __opentoonzScriptEngine.sceneCreate();
-    if (path !== undefined)
+    if (arguments.length === 1)
       this.load(path);
   };
 
@@ -1382,31 +1618,35 @@ const char kBootstrapScript[] = R"JS(
 
   Scene.prototype.load = function(path) {
     throwIfError(__opentoonzScriptEngine.sceneLoad(
-      sceneId(this), toFilePathString(path)));
+      sceneId(this), filePathArgument(path)));
     return this;
   };
 
   Scene.prototype.save = function(path) {
     throwIfError(__opentoonzScriptEngine.sceneSave(
-      sceneId(this), toFilePathString(path)));
+      sceneId(this), filePathArgument(path)));
     return this;
   };
 
   Scene.prototype.insertColumn = function(column) {
+    var columnValue = sceneNumberArgument(column, "Column argument");
     throwIfError(__opentoonzScriptEngine.sceneInsertColumn(
-      sceneId(this), Number(column)));
+      sceneId(this), columnValue));
     return this;
   };
 
   Scene.prototype.deleteColumn = function(column) {
+    var columnValue = sceneNumberArgument(column, "Column argument");
     throwIfError(__opentoonzScriptEngine.sceneDeleteColumn(
-      sceneId(this), Number(column)));
+      sceneId(this), columnValue));
     return this;
   };
 
   Scene.prototype.getCell = function(row, column) {
+    var rowValue = sceneNumberArgument(row, "Row argument");
+    var columnValue = sceneNumberArgument(column, "Column argument");
     var cell = __opentoonzScriptEngine.sceneGetCell(
-      sceneId(this), Number(row), Number(column));
+      sceneId(this), rowValue, columnValue);
     throwIfError(cell.error || "");
     if (cell.empty)
       return undefined;
@@ -1414,10 +1654,13 @@ const char kBootstrapScript[] = R"JS(
   };
 
   Scene.prototype.setCell = function(row, column, levelOrCell, fid) {
+    var rowValue = sceneNumberArgument(row, "Row argument");
+    var columnValue = sceneNumberArgument(column, "Column argument");
     var message = "";
-    if (arguments.length < 3 || levelOrCell === undefined) {
+    if (arguments.length < 3 ||
+        (arguments.length === 3 && levelOrCell === undefined)) {
       message = __opentoonzScriptEngine.sceneClearCell(
-        sceneId(this), Number(row), Number(column));
+        sceneId(this), rowValue, columnValue);
     } else if (arguments.length === 3) {
       if (typeof levelOrCell !== "object" ||
           levelOrCell.level === undefined ||
@@ -1428,12 +1671,15 @@ const char kBootstrapScript[] = R"JS(
       return this.setCell(row, column, levelOrCell.level, levelOrCell.fid);
     } else if (levelOrCell instanceof Level) {
       message = __opentoonzScriptEngine.sceneSetCell(
-        sceneId(this), Number(row), Number(column),
+        sceneId(this), rowValue, columnValue,
         levelId(levelOrCell), String(fid));
-    } else {
+    } else if (isStringArgument(levelOrCell)) {
       message = __opentoonzScriptEngine.sceneSetCellByLevelName(
-        sceneId(this), Number(row), Number(column),
+        sceneId(this), rowValue, columnValue,
         String(levelOrCell), String(fid));
+    } else {
+      throw new Error(String(levelOrCell) +
+                      " : Expected a Level instance or a level name");
     }
     throwIfError(message);
     return this;
@@ -1459,7 +1705,7 @@ const char kBootstrapScript[] = R"JS(
 
   Scene.prototype.loadLevel = function(name, path) {
     return levelFromResult(__opentoonzScriptEngine.sceneLoadLevel(
-      sceneId(this), String(name), toFilePathString(path)));
+      sceneId(this), String(name), filePathArgument(path)));
   };
 })(typeof globalThis !== "undefined" ? globalThis : this);
 )JS";
@@ -1470,6 +1716,12 @@ void installBootstrap(QJSEngine* engine, ScriptEngine* scriptEngine) {
                                      engine->newQObject(scriptEngine));
   engine->evaluate(QString::fromLatin1(kBootstrapScript),
                    QStringLiteral("opentoonz-script-bootstrap.js"));
+}
+
+bool isVoidResult(QJSEngine* engine, const QJSValue& result) {
+  QJSValue voidValue =
+      engine->globalObject().property(QStringLiteral("void"));
+  return voidValue.isObject() && result.strictlyEquals(voidValue);
 }
 
 }  // namespace
@@ -1490,6 +1742,7 @@ public:
     QJSValue result = m_engine->m_engine->evaluate(m_cmd);
     if (result.isError()) {
       m_engine->emitOutput(ScriptEngine::SyntaxError, formatError(result, ""));
+    } else if (isVoidResult(m_engine->m_engine, result)) {
     } else if (result.isUndefined()) {
       m_engine->emitOutput(ScriptEngine::UndefinedEvaluationResult,
                            "undefined");
@@ -1544,7 +1797,7 @@ QVariantMap ScriptEngine::readScriptFile(const QString& path) {
 
   QFile file(fpStr);
   if (!file.open(QIODevice::ReadOnly)) {
-    emitOutput(ExecutionError, "can't read file " + fpStr);
+    result.insert(QStringLiteral("error"), "can't read file " + fpStr);
     return result;
   }
 
@@ -1559,7 +1812,10 @@ QVariantMap ScriptEngine::readScriptFile(const QString& path) {
 
 QString ScriptEngine::runScriptFile(const QString& path) {
   const QVariantMap script = readScriptFile(path);
-  if (!script.value(QStringLiteral("ok")).toBool()) return QString();
+  if (!script.value(QStringLiteral("ok")).toBool()) {
+    emitOutput(ExecutionError, script.value(QStringLiteral("error")).toString());
+    return QString();
+  }
 
   const QString fpStr   = script.value(QStringLiteral("path")).toString();
   const QString content = script.value(QStringLiteral("content")).toString();
@@ -1568,6 +1824,7 @@ QString ScriptEngine::runScriptFile(const QString& path) {
     emitOutput(SyntaxError, formatError(result, fpStr));
     return QString();
   }
+  if (isVoidResult(m_engine, result)) return QString();
   if (result.isUndefined()) return QString();
   return print(result, true);
 }
@@ -1623,8 +1880,12 @@ bool ScriptEngine::filePathIsAbsolute(const QString& path) const {
   return TFilePath(path.toStdWString()).isAbsolute();
 }
 
-QString ScriptEngine::filePathLastModified(const QString& path) const {
-  return QFileInfo(path).lastModified().toString(Qt::ISODate);
+double ScriptEngine::filePathLastModified(const QString& path) const {
+  const QDateTime lastModified = QFileInfo(path).lastModified();
+  if (!lastModified.isValid()) {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
+  return static_cast<double>(lastModified.toMSecsSinceEpoch());
 }
 
 QString ScriptEngine::filePathConcat(const QString& path,
@@ -1895,7 +2156,9 @@ QString ScriptEngine::sceneSave(int sceneId, const QString& path) {
   }
 
   try {
-    scene->save(fp);
+    // Qt 6 headless script smokes validate scene data I/O here. Scene icon
+    // generation still crosses the offscreen renderer/backend boundary.
+    scene->save(fp, nullptr, false);
   } catch (...) {
     return tr("Exception writing %1").arg(path);
   }
@@ -2134,8 +2397,10 @@ QString ScriptEngine::levelName(int levelId) const {
 }
 
 QString ScriptEngine::levelSetName(int levelId, const QString& name) {
+  if (!m_qjsLevels.contains(levelId))
+    return QStringLiteral("Invalid Level object");
   TXshSimpleLevel* level = qjsLevel(levelId);
-  if (!level) return QStringLiteral("Cannot set name on empty level");
+  if (!level) return QString();
   level->setName(name.toStdWString());
   return QString();
 }
@@ -2184,7 +2449,7 @@ QVariantMap ScriptEngine::levelGetFrame(int levelId, const QString& fid) {
   TFrameId frameId;
   if (!frameIdFromString(fid, frameId, error)) return imageResult(-1, error);
 
-  TImageP image = level->getFrame(frameId, false);
+  TImageP image = loadScriptLevelFrame(level, frameId);
   if (!image) return imageResult(-1);
   return imageResult(imageCreate(image.getPointer()));
 }
@@ -2202,7 +2467,7 @@ QVariantMap ScriptEngine::levelGetFrameByIndex(int levelId, int index) {
   }
 
   TFrameId frameId = level->index2fid(index);
-  TImageP image    = level->getFrame(frameId, false);
+  TImageP image    = loadScriptLevelFrame(level, frameId);
   if (!image) return imageResult(-1);
   return imageResult(imageCreate(image.getPointer()));
 }
@@ -2329,7 +2594,29 @@ QString ScriptEngine::levelSave(int levelId, const QString& path) const {
   }
 
   try {
-    level->save(fp);
+    TFilePath outputPath = fp;
+    if (ToonzScene* scene = level->getScene()) {
+      outputPath = scene->decodeFilePath(outputPath);
+    }
+
+    std::vector<TFrameId> fids;
+    level->getFids(fids);
+    TLevelWriterP writer(outputPath);
+    if (level->getPalette()) writer->setPalette(level->getPalette());
+
+    for (const TFrameId& fid : fids) {
+      TImageP image = loadScriptLevelFrame(level, fid);
+      if (!image) {
+        return tr("Could not read frame %1").arg(
+            QString::fromStdString(fid.expand()));
+      }
+      if (TToonzImageP toonzImage = image) {
+        if (TRasterCM32P raster = toonzImage->getRaster()) {
+          toonzImage->setSavebox(raster->getBounds());
+        }
+      }
+      writer->getFrameWriter(fid)->save(image);
+    }
   } catch (const TSystemException& error) {
     return tr("Exception writing %1")
         .arg(QString::fromStdWString(error.getMessage()));
@@ -3039,6 +3326,7 @@ void ScriptEngine::evaluate(const QString& cmd) {
   QJSValue result = m_engine->evaluate(cmd);
   if (result.isError()) {
     emitOutput(ScriptEngine::SyntaxError, formatError(result, ""));
+  } else if (isVoidResult(m_engine, result)) {
   } else if (result.isUndefined()) {
     emitOutput(ScriptEngine::UndefinedEvaluationResult, "undefined");
   } else {

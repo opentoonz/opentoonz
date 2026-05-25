@@ -1,0 +1,68 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e.message || e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var badCtorCountError = hasError(function() {
+  new ImageBuilder(12);
+}, "Bad argument count");
+var badCtorArgsError = hasError(function() {
+  new ImageBuilder("12", 10);
+}, "Bad arguments");
+var badCtorSizeError = hasError(function() {
+  new ImageBuilder(0, 10);
+}, "Bad size");
+var badCtorTypeError = hasError(function() {
+  new ImageBuilder(10, 10, "Vector");
+}, "should be 'Raster' or ToonzRaster");
+
+print("qt-script-imagebuilder-edges-constructors",
+      [badCtorCountError, badCtorArgsError, badCtorSizeError,
+       badCtorTypeError]);
+
+var source = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var builder = new ImageBuilder(8, 6);
+
+var invalidColorError = hasError(function() {
+  builder.fill("not-a-color");
+}, "not a valid color");
+var emptyImageError = hasError(function() {
+  builder.add(new Image());
+}, "should be an Image (not empty)");
+var badTransformError = hasError(function() {
+  builder.add(source, {});
+}, "should be a Transformation");
+
+builder.add(source);
+
+var toonzBuilder = new ImageBuilder(9, 7, "ToonzRaster");
+var toonzImage = toonzBuilder.image;
+var toonzFillError = hasError(function() {
+  toonzBuilder.fill("red");
+}, "non-'Raster'");
+var mismatchError = hasError(function() {
+  builder.add(toonzImage);
+}, "Image type mismatch");
+
+var disposedBuilder = new ImageBuilder(2, 2);
+disposedBuilder.dispose();
+var disposedError = hasError(function() {
+  disposedBuilder.toString();
+}, "Invalid ImageBuilder object");
+
+print("qt-script-imagebuilder-edges-builders", builder.toString(),
+      toonzBuilder.toString(),
+      [invalidColorError, emptyImageError, badTransformError, toonzFillError,
+       mismatchError, disposedError]);
+
+disposedBuilder.dispose();
+toonzImage.dispose();
+toonzBuilder.dispose();
+builder.dispose();
+source.dispose();
+
+"qt-script-imagebuilder-edges-result";

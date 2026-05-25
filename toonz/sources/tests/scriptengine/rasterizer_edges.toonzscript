@@ -1,0 +1,50 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var source = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var vector = new OutlineVectorizer().vectorize(source);
+var toonz = ToonzRasterConverter.convert(source);
+var scene = new Scene();
+var rasterLevel = scene.newLevel("Raster", "qt6_rasterizer_edges_raster");
+var emptyLevel = new Level();
+var rasterizer = new Rasterizer();
+
+var fullColorDeferred = hasError(function() {
+  rasterizer.rasterize(vector);
+}, "currently supports only colorMapped");
+
+rasterizer.colorMapped = true;
+var rasterized = rasterizer.rasterize(vector);
+print("qt-script-rasterizer-edges-success", fullColorDeferred,
+      rasterized.type, rasterized.width, rasterized.height);
+
+var errors = [
+  hasError(function() { rasterizer.rasterize(42); },
+           "Argument must be a vector level or image"),
+  hasError(function() { rasterizer.rasterize(source); },
+           "Expected a vector image"),
+  hasError(function() { rasterizer.rasterize(toonz); },
+           "Expected a vector image"),
+  hasError(function() { rasterizer.rasterize(rasterLevel); },
+           "Expected a vector level"),
+  hasError(function() { rasterizer.rasterize(emptyLevel); },
+           "Expected a vector level")
+];
+print("qt-script-rasterizer-edges-errors", errors);
+
+rasterized.dispose();
+rasterizer.dispose();
+emptyLevel.dispose();
+rasterLevel.dispose();
+scene.dispose();
+toonz.dispose();
+vector.dispose();
+source.dispose();
+
+"qt-script-rasterizer-edges-result";

@@ -1,0 +1,22 @@
+var fixture = new FilePath("toonz/sources/tests/scriptengine/file_path.toonzscript");
+var fixtureModified = fixture.lastModified;
+var fixtureTime = fixtureModified.valueOf();
+
+print("qt-script-filepath-metadata-file", fixture.exists, fixture.isDirectory,
+      fixtureModified instanceof Date, !isNaN(fixtureTime),
+      fixtureModified.getFullYear() >= 2020);
+
+var directory = new FilePath("toonz/sources/tests/scriptengine");
+var directoryModified = directory.lastModified;
+var directoryTime = directoryModified.valueOf();
+print("qt-script-filepath-metadata-dir", directory.exists,
+      directory.isDirectory, directoryModified instanceof Date,
+      !isNaN(directoryTime), directory.files().length > 0);
+
+var missing = new FilePath("toonz/sources/tests/scriptengine/missing-file-does-not-exist.toonzscript");
+var missingModified = missing.lastModified;
+print("qt-script-filepath-metadata-missing", missing.exists,
+      missing.isDirectory, missingModified instanceof Date,
+      isNaN(missingModified.valueOf()));
+
+"qt-script-filepath-metadata-result";
