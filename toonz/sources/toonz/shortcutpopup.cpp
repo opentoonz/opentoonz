@@ -50,8 +50,7 @@ ShortcutPopup *ShortcutPopup::s_instance = nullptr;
 
 namespace {
 
-// Persist Configure Shortcuts UI state in the user profile (.env), not the
-// Windows registry (default QSettings).
+// Persist Configure Shortcuts UI state in the user profile (.env).
 TEnv::StringVar ShortcutPopupExpandedFolders("ShortcutPopupExpandedFolders", "");
 TEnv::IntVar ShortcutPopupExpandedStateSaved("ShortcutPopupExpandedStateSaved",
                                              0);
@@ -69,26 +68,6 @@ QStringList expandedFoldersFromEnv() {
 void saveExpandedFoldersToEnv(const QStringList &expandedFolders) {
   ShortcutPopupExpandedFolders =
       expandedFolders.join(kFolderListSeparator).toStdString();
-}
-
-// One-time import from legacy QSettings (registry) into TEnv.
-void migrateShortcutPopupFromRegistryIfNeeded() {
-  static bool migrated = false;
-  if (migrated) return;
-  migrated = true;
-  if (ShortcutPopupExpandedStateSaved != 0) return;
-
-  QSettings settings;
-  if (!settings.contains("ShortcutPopup/expandedStateSaved")) return;
-
-  const QStringList expandedFolders =
-      settings.value("ShortcutPopup/expandedFolders").toStringList();
-  saveExpandedFoldersToEnv(expandedFolders);
-  ShortcutPopupExpandedStateSaved = 1;
-  if (settings.contains("ShortcutPopup/searchText")) {
-    ShortcutPopupSearchText =
-        settings.value("ShortcutPopup/searchText").toString().toStdString();
-  }
 }
 
 }  // namespace
@@ -364,7 +343,6 @@ void ShortcutTree::saveExpandedState() {
 //-----------------------------------------------------------------------------
 
 void ShortcutTree::restoreExpandedState() {
-  migrateShortcutPopupFromRegistryIfNeeded();
   const bool hasSavedState = ShortcutPopupExpandedStateSaved != 0;
   const QStringList expandedFolders = expandedFoldersFromEnv();
   QSignalBlocker blocker(this);
@@ -1166,7 +1144,6 @@ void ShortcutPopup::onSavePreset() {
 //-----------------------------------------------------------------------------
 
 void ShortcutPopup::showEvent(QShowEvent *se) {
-  migrateShortcutPopupFromRegistryIfNeeded();
   getCurrentPresetPref();
 
   // Refresh brush preset and size commands to ensure they're up-to-date
