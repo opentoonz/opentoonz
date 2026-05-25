@@ -105,6 +105,14 @@ fi
   HOME="$smoke_home" \
   XDG_CONFIG_HOME="$smoke_root/xdg-config" \
   XDG_CACHE_HOME="$smoke_root/xdg-cache" \
+  TOONZROOT="$smoke_root/stuff" \
+  TOONZPROFILES="$smoke_root/stuff/profiles" \
+  TOONZCONFIG="$smoke_root/stuff/config" \
+  TOONZLIBRARY="$smoke_root/stuff/library" \
+  TOONZSTUDIOPALETTE="$smoke_root/stuff/studiopalette" \
+  TOONZFXPRESETS="$smoke_root/stuff/fxs" \
+  TOONZPROJECTS="$smoke_root/stuff/projects" \
+  TOONZCACHEROOT="$smoke_root/stuff/cache" \
   "$executable" \
     -TOONZROOT "$smoke_root/stuff" \
     -TOONZPROFILES "$smoke_root/stuff/profiles" \

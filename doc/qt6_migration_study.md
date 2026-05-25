@@ -671,9 +671,10 @@ Current branch status:
   passes explicit Toonz path qualifiers, and launches from the smoke root with a
   `toonz` symlink back to the checkout. This keeps profile/config/cache writes
   under `toonz/build/qt6-script-smoke` instead of creating repo-root `profiles`
-  files while preserving existing relative fixture paths. Early legacy `TEnv`
-  startup warnings about missing `TOONZROOT` may still appear before CLI
-  qualifiers are registered.
+  files while preserving existing relative fixture paths. Unix `TEnv` startup
+  now honors explicit process environment values before the legacy
+  `SystemVar.ini` warning fallback, and the harness exports the same isolated
+  Toonz paths before launch.
 - The Qt 6 Script Console warning now describes the current state accurately:
   QJSEngine has partial non-rendering OpenToonz object bindings, while legacy
   GUI-only helpers such as `view()` remain unavailable until that interactive

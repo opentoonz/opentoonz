@@ -468,8 +468,9 @@ branch.
   `SystemVar.ini`, passes explicit Toonz path qualifiers, and launches from the
   smoke root with a `toonz` symlink back to the checkout so profile/config/cache
   writes stay under `toonz/build/qt6-script-smoke` instead of creating repo-root
-  `profiles` files. Early legacy `TEnv` startup warnings about missing
-  `TOONZROOT` may still appear before CLI qualifiers are registered.
+  `profiles` files. Unix `TEnv` startup now honors explicit process
+  environment values before the legacy `SystemVar.ini` warning fallback, and
+  the harness exports the same isolated Toonz paths before launch.
 - `mise run script-smokes-qt6` runs every current Qt 6 headless script fixture
   in bounded mode, and `mise run script-smokes-natural-exit-qt6` runs the same
   fixture set while requiring the app process to exit naturally. Use the

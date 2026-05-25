@@ -4,6 +4,7 @@
 #include "tfilepath_io.h"
 #include "tversion.h"
 
+#include <QByteArray>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -141,6 +142,9 @@ public:
 #ifdef _WIN32
     return TSystem::getSystemValue(getSystemVarPath(varName)).toStdString();
 #else
+    const QByteArray environmentValue = qgetenv(varName.c_str());
+    if (!environmentValue.isEmpty()) return environmentValue.toStdString();
+
     TFilePath systemVarPath = getSystemVarPath(varName);
     if (systemVarPath.isEmpty()) {
       std::cout << "varName:" << varName << " TOONZROOT not set..."
