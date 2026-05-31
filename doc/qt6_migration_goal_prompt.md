@@ -51,7 +51,7 @@ but do not defer Qt 6 rendering work solely because a Metal draft exists.
 
 ## Current Branch Status
 
-As of May 30, 2026, the initial Qt 6 runway is already implemented in this
+As of May 31, 2026, the initial Qt 6 runway is already implemented in this
 branch.
 
 - `OPENTOONZ_QT_MAJOR` exists and defaults to the Qt 5 lane.
@@ -194,6 +194,118 @@ branch.
   matched those measurements. This is an app-side onion-skin framebuffer guard;
   it does not validate timeline onion marker UI, interactive onion toggles,
   custom onion colors, overlay placement, or full visual parity.
+- On 2026-05-31, the packaged Qt 6 app also passes
+  `mise run gui-smoke-viewer-onion-skin-rowarea-qt6`. This app-side smoke
+  creates a three-frame raster scene, captures the xsheet row area, sends Qt
+  mouse events to set one relative and one fixed onion marker through
+  `RowArea`, double-clicks the current-row onion handle off and back on, then
+  requires `onionSkinUiProbe=ok`, `onionSkinProbe=ok`,
+  `xsheetRowAreaProbe=ok`, `xsheetRowAreaHighDpiProbe=ok`,
+  `viewerRenderProbe=ok`, high-DPI viewer probes, changed row-area pixels,
+  visible onion pixels, and visible current-frame red pixels. The packaged Qt
+  6 run reported logical viewer size `994x819`, DPR `2` / `2.00`, framebuffer
+  `1988x1638`, onion rows `0,2`, MOS count `1`, FOS count `1`, row-area
+  changed pixels `516`, row-area non-background pixels `106702`, onion pixels
+  `0 -> 42012`, `10455` changed viewer pixels, and `45651` red pixels. The
+  packaged Qt 5 run matched those measurements. This covers app-side xsheet
+  row-area onion marker creation and current-row enable/disable toggling through
+  Qt widget events; it does not validate real OS-level input delivery, broader
+  timeline onion workflows, or full visual parity.
+- On 2026-05-31, the packaged Qt 6 app also passes
+  `mise run gui-smoke-viewer-onion-skin-rowarea-drag-qt6`. This app-side smoke
+  creates a five-frame raster scene, captures the xsheet row area, sends a Qt
+  mouse drag from the row-0 MOS handle to row 4 through `RowArea` and
+  `XsheetViewer` drag-tool dispatch, then requires `onionSkinDragProbe=ok`,
+  `onionSkinProbe=ok`, `xsheetRowAreaProbe=ok`,
+  `xsheetRowAreaHighDpiProbe=ok`, `viewerRenderProbe=ok`, high-DPI viewer
+  probes, a four-marker mobile onion range, changed row-area pixels, visible
+  onion pixels, and visible current-frame red pixels. The packaged Qt 6 run
+  reported logical viewer size `994x819`, DPR `2` / `2.00`, framebuffer
+  `1988x1638`, current row `2`, onion rows `0,1,3,4`, MOS count `4`, FOS
+  count `0`, MOS range `-2,2`, row-area drag event delivery `true`, row-area
+  changed pixels `1076`, row-area non-background pixels `106700`, onion pixels
+  `0 -> 71318`, `43180` changed viewer pixels, and `45651` red pixels. The
+  packaged Qt 5 run matched those measurements. This covers app-side xsheet
+  row-area onion marker drag ranges through Qt widget events; real OS-level
+  input delivery, broader timeline onion workflows, and full visual parity
+  remain open.
+- On 2026-05-31, the packaged Qt 6 app also passes
+  `mise run gui-smoke-viewer-onion-skin-fixed-marker-drag-qt6`. This app-side
+  smoke creates a six-frame raster scene, sets row `3` as the current frame,
+  sends Qt drags through the fixed onion-marker row-area handles to add back
+  FOS rows `0,1,2`, remove rows `1,2`, and add front FOS rows `5,4`, then
+  requires `onionSkinFixedDragProbe=ok`, `onionSkinProbe=ok`,
+  `xsheetRowAreaProbe=ok`, `xsheetRowAreaHighDpiProbe=ok`,
+  `viewerRenderProbe=ok`, high-DPI viewer probes, changed row-area pixels,
+  visible onion pixels, and visible current-frame red pixels. The packaged Qt
+  6 run reported logical viewer size `994x819`, DPR `2` / `2.00`, framebuffer
+  `1988x1638`, current row `3`, onion rows `0,4,5`, MOS count `0`, FOS count
+  `3`, fixed-marker counts add `3`, remove `1`, final `3`, fixed-drag event
+  delivery `true/true/true`, row-area changed pixels `768`, row-area
+  non-background pixels `105554`, onion pixels `0 -> 34969`, `5952` changed
+  viewer pixels, and `45651` red pixels. The packaged Qt 5 run matched those
+  measurements. This covers app-side fixed onion-marker add/remove/front range
+  drags through Qt widget events; real OS-level input delivery, broader
+  timeline onion workflows, and full visual parity remain open.
+- On 2026-05-31, the packaged Qt 6 app also passes
+  `mise run gui-smoke-viewer-onion-skin-context-menu-qt6`. This app-side smoke
+  creates a five-frame raster scene, builds the onion-skin command menu through
+  `OnioniSkinMaskGUI::addOnionSkinCommand`, triggers activate, deactivate,
+  extend to scene, limit to level, clear fixed markers, clear relative markers,
+  and clear all markers, then requires `onionSkinMenuProbe=ok`,
+  `onionSkinProbe=ok`, `xsheetRowAreaProbe=ok`,
+  `xsheetRowAreaHighDpiProbe=ok`, `viewerRenderProbe=ok`, high-DPI viewer
+  probes, changed row-area pixels, visible onion pixels, and visible
+  current-frame red pixels. The packaged Qt 6 run reported logical viewer size
+  `994x819`, DPR `2` / `2.00`, framebuffer `1988x1638`, current row `3`,
+  onion rows `0,1,2`, MOS count `3`, FOS count `0`, MOS range `-3,-1`,
+  activate/deactivate/extend/limit/clear fixed/clear relative/clear all command
+  status `ok`, row-area changed pixels `820`, row-area non-background pixels
+  `106716`, onion pixels `0 -> 91203`, `52610` changed viewer pixels, and
+  `45651` red pixels. The packaged Qt 5 run matched those measurements. This
+  covers app-side onion-skin context-menu command behavior through Qt actions;
+  real OS-level right-click/menu delivery, broader timeline onion workflows, and
+  full visual parity remain open.
+- On 2026-05-31, the packaged Qt 6 app also passes
+  `mise run gui-smoke-viewer-onion-skin-custom-colors-qt6`. This app-side smoke
+  sets custom back/front onion colors, creates black back/front raster frames so
+  the onion tint is visible, keeps a red current frame, enables back and front
+  mobile onion markers, and requires `onionSkinCustomColorProbe=ok`,
+  `onionSkinViewerColorProbe=ok`, `onionSkinPreferenceColorProbe=ok`,
+  `xsheetRowAreaProbe=ok`, `xsheetRowAreaHighDpiProbe=ok`,
+  `onionSkinProbe=ok`, `viewerRenderProbe=ok`, high-DPI viewer probes, custom
+  hue pixels in the viewer and row area, changed viewer pixels, and visible red
+  current-frame pixels. The packaged Qt 6 run reported logical viewer size
+  `994x819`, DPR `2` / `2.00`, framebuffer `1988x1638`, custom colors back
+  `44,92,224` and front `232,184,28`, viewer custom-color pixels back `54237`
+  and front `32761`, row-area custom-color pixels back `3545` and front `915`,
+  current row `2`, onion rows `1,3`, MOS count `2`, FOS count `0`, `86998`
+  changed viewer pixels, and `57927` red pixels. The packaged Qt 5 run matched
+  those measurements. This covers app-side custom onion color preference
+  propagation, row-area marker color, and viewer framebuffer tinting; real
+  OS-level input/menu delivery, broader timeline onion workflows, and full
+  visual parity remain open.
+- On 2026-05-31, the packaged Qt 6 app also passes
+  `mise run gui-smoke-viewer-onion-skin-orientations-qt6`. This app-side smoke
+  creates a three-frame raster scene, normalizes the xsheet to the
+  `TopToBottom` orientation, sends Qt row-area events to create relative and
+  fixed onion markers plus current-row off/on toggles, flips to `LeftToRight`,
+  and repeats the row-area marker sequence. It requires
+  `onionSkinOrientationProbe=ok`, `onionSkinUiProbe=ok`,
+  `onionSkinProbe=ok`, `xsheetRowAreaProbe=ok`,
+  `xsheetRowAreaHighDpiProbe=ok`, `viewerRenderProbe=ok`, high-DPI viewer
+  probes, changed row-area pixels in both orientations, visible onion pixels,
+  and visible current-frame red pixels. The packaged Qt 6 run reported logical
+  viewer size `994x819`, DPR `2` / `2.00`, framebuffer `1988x1638`,
+  orientation `TopToBottom -> LeftToRight`, vertical row-area changed pixels
+  `516`, vertical row-area non-background pixels `106702`, horizontal row-area
+  changed pixels `572`, horizontal row-area non-background pixels `14294`,
+  onion rows `0,2`, MOS count `1`, FOS count `1`, onion pixels `0 -> 42012`,
+  `32761` changed viewer pixels, and `45651` red pixels. The packaged Qt 5 run
+  matched those measurements. This covers app-side onion marker creation and
+  current-row toggle behavior across both current xsheet/timeline orientations;
+  real OS-level input/menu delivery, other timeline onion workflows, and full
+  visual parity remain open.
 - On 2026-05-30, the packaged Qt 6 app also passes
   `mise run gui-smoke-viewer-camera-overlay-qt6`. This app-side smoke creates a
   blank sandbox scene, disables the camera box overlay through `MI_ViewCamera` /
@@ -220,8 +332,66 @@ branch.
   pixels. The packaged Qt 5 run matched those measurements. This is an
   app-side safe-area and field-guide overlay framebuffer guard only; it does not
   validate selection handles, tool cursor overlays, rulers/guides added through
-  ruler UI, OS/menu interaction, custom safe-area presets or colors, custom
-  field-guide settings, or full overlay visual parity.
+  ruler UI, OS/menu interaction, safe-area variants beyond the separate
+  preset/color and custom-file smokes, field-guide variants beyond the separate
+  settings smoke, or full overlay visual parity.
+- On 2026-05-31, the packaged Qt 6 app also passes
+  `mise run gui-smoke-viewer-safe-area-presets-qt6`. This app-side smoke
+  creates a blank sandbox scene, disables camera, field-guide, ruler, guide, and
+  safe-area overlays, captures the `SceneViewer`, enables the default
+  `PR_safe` safe-area preset, switches to the bundled custom
+  `150MT_FR_PR_safe` preset, and requires `safeAreaPresetProbe=ok`,
+  `viewerRenderProbe=ok`, high-DPI framebuffer probes, stored safe-area preset
+  name, visible default red safe-area pixels, visible custom red/green/blue
+  safe-area pixels, changed green and blue pixels between presets, and saved
+  captures. The packaged Qt 6 run reported logical viewer size `1006x831`, DPR
+  `2` / `2.00`, framebuffer `2012x1662`, preset
+  `PR_safe -> 150MT_FR_PR_safe`, default red pixels `5279`, default changed red
+  pixels `5279`, custom red pixels `4884`, custom green pixels `2873`, custom
+  blue pixels `3008`, preset-delta changed pixels `16043`, preset-delta green
+  pixels `2873`, preset-delta blue pixels `3008`, and final red pixels `4884`.
+  The packaged Qt 5 run matched those measurements. This covers app-side
+  safe-area preset selection, bundled custom-color parsing, and viewer
+  framebuffer rendering; it does not validate real title-bar context-menu
+  delivery, persistent user-managed safe-area file lifecycle, OS/menu
+  interaction, or full overlay visual parity.
+- On 2026-05-31, the packaged Qt 6 app also passes
+  `mise run gui-smoke-viewer-safe-area-custom-file-qt6`. This app-side smoke
+  creates a blank sandbox scene, disables camera, field-guide, ruler, guide,
+  and safe-area overlays, writes a custom `safearea.ini` into the isolated smoke
+  config root, enables the custom `codex_custom_safe_area_probe` preset, and
+  requires `safeAreaCustomFileProbe=ok`, `viewerRenderProbe=ok`, high-DPI
+  framebuffer probes, custom-file write/restore, stored preset name, visible
+  red/green/blue safe-area pixels, changed red/green/blue safe-area pixels, and
+  saved captures. The packaged Qt 6 run reported logical viewer size
+  `1006x831`, DPR `2` / `2.00`, framebuffer `2012x1662`, custom-file write and
+  restore `true`, preset `codex_custom_safe_area_probe`, custom red pixels
+  `2724`, custom green pixels `2248`, custom blue pixels `1712`, changed red
+  pixels `2724`, changed green pixels `2248`, changed blue pixels `1712`,
+  total changed pixels `6684`, and final red pixels `2724`. The packaged Qt 5
+  run matched those measurements. This covers app-side user-authored
+  `safearea.ini` parsing and viewer framebuffer rendering inside the isolated
+  smoke config root; it does not validate real title-bar context-menu delivery,
+  persistent user-profile file management outside the smoke root, OS/menu
+  interaction, or full overlay visual parity.
+- On 2026-05-31, the packaged Qt 6 app also passes
+  `mise run gui-smoke-viewer-field-guide-settings-qt6`. This app-side smoke
+  creates a blank sandbox scene, disables camera, safe-area, field-guide, ruler,
+  and guide overlays, captures the `SceneViewer`, applies field-guide size and
+  aspect-ratio settings `10` / `1.3333` and then `24` / `2.4000`, and requires
+  `fieldGuideSettingsProbe=ok`, `fieldGuideProbe=ok`, `viewerRenderProbe=ok`,
+  high-DPI framebuffer probes, stored field-guide settings, visible gray guide
+  pixels in both captures, changed gray guide pixels between the two settings,
+  no red pixels, and saved captures. The packaged Qt 6 run reported logical
+  viewer size `1006x831`, DPR `2` / `2.00`, framebuffer `2012x1662`,
+  field-guide settings `16 -> 10 -> 24`, aspect `1.7778 -> 1.3333 -> 2.4000`,
+  first gray pixels `619965`, first changed gray pixels `49276`, second gray
+  pixels `699049`, second changed gray pixels `145718`, settings-delta changed
+  pixels `141998`, settings-delta gray pixels `119220`, and `0` red pixels.
+  The packaged Qt 5 run matched those measurements. This covers app-side
+  field-guide size/aspect setting propagation and viewer framebuffer rendering;
+  it does not validate field-guide variants outside this size/aspect guard,
+  OS/menu interaction, or full overlay visual parity.
 - On 2026-05-30, the packaged Qt 6 app also passes
   `mise run gui-smoke-viewer-ruler-guide-qt6`. This app-side smoke creates a
   blank sandbox scene, seeds one horizontal and one vertical scene guide,
@@ -239,7 +409,111 @@ branch.
   app-side guide framebuffer and ruler-widget visibility guard only; it does not
   validate creating, moving, or deleting guides through the ruler UI, ruler tick
   rendering pixels, selection handles, tool cursor overlays, OS/menu
-  interaction, custom guide positions or colors, or full overlay visual parity.
+  interaction, custom guide positions, or full overlay visual parity.
+- On 2026-05-31, the packaged Qt 6 app also passes
+  `mise run gui-smoke-viewer-ruler-guide-events-qt6`. This app-side smoke
+  creates a blank sandbox scene, clears guides, enables the ruler and guide
+  overlays, resolves the visible horizontal and vertical `Ruler` widgets, then
+  sends Qt mouse events to create and move one horizontal and one vertical guide
+  and right-click-delete the horizontal guide. It requires
+  `rulerGuideEventProbe=ok`, `viewerRenderProbe=ok`, high-DPI framebuffer
+  probes, delivered ruler drag events, guide value changes, the horizontal guide
+  deletion, the vertical guide remaining, one final scene guide, changed neutral
+  guide pixels, two visible ruler widgets, and before/after captures. The
+  packaged Qt 6 run reported logical viewer size `994x819`, DPR `2` / `2.00`,
+  framebuffer `1988x1638`, horizontal guides `0 -> 1 -> 0`, vertical guides
+  `0 -> 1 -> 1`, horizontal guide value `-77.2788 -> 94.4181 -> deleted`,
+  vertical guide value `67.8050 -> -103.8918`, `994` changed pixels, `994`
+  changed neutral guide pixels, `539112` gray pixels, `0` changed gray pixels,
+  and `0` red pixels. The packaged Qt 5 run matched those measurements. This
+  covers app-side ruler-guide create, move, and delete through `Ruler` Qt mouse
+  events; it does not validate real OS-level input delivery, ruler tick
+  rendering pixels, custom guide positions, ruler drag-hide variants,
+  remaining manual ruler-guide
+  variants, or full overlay visual parity.
+- On 2026-05-31, the packaged Qt 6 app also passes
+  `mise run gui-smoke-viewer-ruler-guide-variants-qt6`. This app-side smoke
+  creates a blank sandbox scene, clears guides, enables the ruler and guide
+  overlays, resolves the visible horizontal and vertical `Ruler` widgets, then
+  creates a horizontal guide and a vertical guide through Qt mouse events,
+  drags each one outside its ruler to exercise the drag-hide/delete path, and
+  creates final horizontal and vertical guides for a framebuffer delta. It
+  requires `rulerGuideVariantProbe=ok`, `viewerRenderProbe=ok`, high-DPI
+  framebuffer probes, delivered create/hide/final drag events, guide counts
+  returning to zero after each hide, two final scene guides, changed neutral
+  guide pixels, two visible ruler widgets, and before/after captures. The
+  packaged Qt 6 run reported logical viewer size `994x819`, DPR `2` / `2.00`,
+  framebuffer `1988x1638`, horizontal hide counts `0 -> 1 -> 0 -> 1`,
+  vertical hide counts `0 -> 1 -> 0 -> 1`, hide endpoints
+  `H 617.00,-8.00` and `V -8.00,529.50`, `1697` changed pixels, `1697`
+  changed neutral guide pixels, and `0` red pixels. The packaged Qt 5 run
+  matched those measurements. This covers app-side ruler-guide drag-hide
+  variants through `Ruler` Qt mouse events; it does not validate real OS-level
+  input delivery, every manual ruler-guide variant not covered by app-side
+  create/move/delete/drag-hide, guide-line visual variants beyond app-side
+  custom-position dashed-line coverage, or full overlay visual parity.
+- On 2026-05-31, the packaged Qt 6 app also passes
+  `mise run gui-smoke-viewer-ruler-guide-lines-qt6`. This app-side smoke
+  creates a blank sandbox scene, seeds two horizontal and two vertical guides at
+  custom world positions, captures the `SceneViewer` with guides disabled,
+  enables the guide overlay, then moves the guides and captures again. It
+  requires `rulerGuideLineProbe=ok`, `viewerRenderProbe=ok`, high-DPI
+  framebuffer probes, custom guide counts, changed neutral guide-line pixels,
+  vertical and horizontal dashed guide-line segments, expected guide-position
+  bands, moved-guide framebuffer deltas, two visible ruler widgets, and saved
+  captures. The packaged Qt 6 run reported logical viewer size `994x819`, DPR
+  `2` / `2.00`, framebuffer `1988x1638`, guide positions H
+  `-96.00,132.00 -> -156.00,48.00` and V
+  `-88.00,116.00 -> -136.00,56.00`, first guide-line neutral pixels `3393`,
+  second guide-line neutral pixels `3394`, two detected guide columns and two
+  guide rows in each capture, dashed segment counts V/H `702/993` then
+  `703/992`, moved guide-line neutral pixels `3681`, `6785` changed pixels, and
+  `0` red pixels. The packaged Qt 5 run matched those measurements. This covers
+  app-side custom guide positions and dashed viewer guide-line rendering; it
+  does not validate real OS-level input delivery, every manual ruler-guide
+  variant, guide-line visual variants outside this app-side dashed-line guard,
+  or full overlay visual parity.
+- On 2026-05-31, the packaged Qt 6 app also passes
+  `mise run gui-smoke-viewer-ruler-ticks-qt6`. This app-side smoke creates a
+  visible raster scene, disables the guide overlay, enables the ruler overlay,
+  captures the horizontal and vertical `Ruler` widgets before and after a viewer
+  zoom/pan transform, and requires `rulerTickProbe=ok`,
+  `rulerWidgetHighDpiProbe=ok`, `rulerTransformProbe=ok`,
+  `viewerRenderProbe=ok`, high-DPI framebuffer probes, visible ruler tick
+  pixels, changed ruler tick pixels, saved ruler widget captures, visible red
+  viewer pixels, and before/after `SceneViewer` captures. The packaged Qt 6 run
+  reported logical viewer size `994x819`, DPR `2` / `2.00`, framebuffer
+  `1988x1638`, two visible ruler widgets, horizontal ruler tick pixels
+  `4098 -> 4074`, vertical ruler tick pixels `3410 -> 3374`, horizontal changed
+  ruler pixels `224`, vertical changed ruler pixels `236`, ruler units
+  `124.2500 -> 180.1625`, `1425551` viewer changed pixels, and `747490` red
+  pixels. The packaged Qt 5 run matched those measurements. This covers
+  app-side ruler widget tick rendering and high-DPI widget capture after a
+  viewer transform; it does not validate real OS-level input delivery,
+  remaining manual ruler-guide variants beyond app-side
+  create/move/delete/drag-hide, guide-line visual variants beyond app-side
+  custom-position dashed-line coverage, or full overlay visual parity.
+- On 2026-05-31, the packaged Qt 6 app also passes
+  `mise run gui-smoke-viewer-ruler-guide-styles-qt6`. This app-side smoke
+  creates a blank sandbox scene, seeds one horizontal and one vertical guide,
+  enables the ruler widgets, captures both `Ruler` widgets, applies a custom
+  QSS block through the existing `qproperty-ParentBGColor`,
+  `qproperty-ScaleColor`, `qproperty-HandleColor`, and
+  `qproperty-HandleDragColor` path, enables the guide overlay, and requires
+  `rulerStyleProbe=ok`, `rulerWidgetHighDpiProbe=ok`,
+  `viewerRenderProbe=ok`, high-DPI framebuffer and widget captures, custom
+  ruler background/handle/scale pixels, changed ruler widget pixels, visible
+  ruler widgets, guide counts, and changed neutral guide pixels. The packaged
+  Qt 6 run reported logical viewer size `994x819`, DPR `2` / `2.00`,
+  framebuffer `1988x1638`, horizontal ruler style pixels: background
+  `0 -> 43570`, handle `0 -> 48`, scale `124`, changed `47712`; vertical
+  ruler style pixels: background `0 -> 35858`, handle `0 -> 48`, scale `136`,
+  changed `39312`; `1697` changed neutral guide pixels and `0` red pixels. The
+  packaged Qt 5 run matched those measurements. This covers the app-side ruler
+  QSS/qproperty style path and guide-overlay coexistence; it does not validate
+  real OS-level input delivery, remaining manual ruler-guide variants beyond
+  app-side create/move/delete/drag-hide, guide-line visual variants beyond
+  app-side custom-position dashed-line coverage, or full overlay visual parity.
 - On 2026-05-30, the packaged Qt 6 app also passes
   `mise run gui-smoke-viewer-animate-tool-overlay-qt6`. This app-side smoke
   creates a visible raster scene, captures a `T_Hand` baseline, switches the
@@ -320,6 +594,136 @@ branch.
   the Qt mouse-event transform path; it does not validate real OS-level input
   delivery, selection-handle hit-testing, full cursor artwork/hover variants, or
   full transform workflow visual parity.
+- On 2026-05-31, the packaged Qt 6 app also passes
+  `mise run gui-smoke-viewer-animate-tool-handles-qt6`. This app-side smoke
+  creates the same visible raster scene, switches the current tool to `T_Edit`
+  on `Col1`, sets the active axis to `All`, hovers the rotation handle, then
+  drags the rotation, scale, and center handles through `SceneViewer` Qt mouse
+  events using the viewer DPR. It requires `mouseEventProbe=ok`,
+  `handleHoverProbe=ok`, `handleHitTestProbe=ok`, `viewerRenderProbe=ok`,
+  high-DPI framebuffer probes, changed rotation/scale/center values, changed
+  hover pixels, changed final pixels, visible red content pixels, and
+  before/after captures. The packaged Qt 6 run reported logical viewer size
+  `994x819`, DPR `2` / `2.00`, framebuffer `1988x1638`, active axis `All`,
+  handle unit `0.8585`, rotation angle `0.0000 -> -44.5595`, scale
+  `1.0000 -> 1.5039`, center `0.0000,0.0000 -> 0.3863,0.1932`, `570` hover
+  changed pixels, `2185` final changed pixels, and `357521` red pixels. The
+  packaged Qt 5 run matched those measurements. This covers app-side
+  Animate/Edit rotation, scale, and center handle hover and hit-test dragging
+  through Qt mouse events; it does not validate real OS-level input delivery,
+  cursor artwork variants beyond the separate mode cursor smoke, or full manual
+  transform workflow visual parity.
+- On 2026-05-31, the packaged Qt 6 app also passes
+  `mise run gui-smoke-viewer-animate-tool-handle-variants-qt6`. This app-side
+  smoke creates the same visible raster scene, switches the current tool to
+  `T_Edit` on `Col1`, sets the active axis to `All`, then drives the All-mode
+  fallback translation path plus the ScaleXY and Shear handles through
+  `SceneViewer` Qt mouse events using the viewer DPR. It requires
+  `mouseEventProbe=ok`, `handleVariantProbe=ok`, `viewerRenderProbe=ok`,
+  high-DPI framebuffer probes, changed fallback translation X/Y, changed
+  ScaleXY X/Y values, changed Shear X/Y values, visible red content pixels, and
+  before/after captures. The packaged Qt 6 run reported logical viewer size
+  `994x819`, DPR `2` / `2.00`, framebuffer `1988x1638`, fallback translation
+  `0.0000,0.0000 -> 0.4829,-0.5634`, ScaleXY
+  `1.0000,1.0000 -> 1.1534,1.0588`, Shear
+  `0.0000,0.0000 -> -0.2146,0.1545`, `58364` changed pixels, and `368866`
+  red pixels. The packaged Qt 5 run matched those measurements. This covers
+  app-side Animate/Edit All-mode fallback translation, nonuniform ScaleXY, and
+  Shear handle variants through Qt mouse events; it does not validate real
+  OS-level input delivery, full cursor artwork variants, or full manual
+  transform workflow visual parity.
+- On 2026-05-31, the packaged Qt 6 app also passes
+  `mise run gui-smoke-viewer-animate-tool-axis-drags-qt6`. This app-side smoke
+  creates the same visible raster scene, switches the current tool to `T_Edit`
+  on `Col1`, then separately sets Position, Rotation, Scale, Shear, and Center
+  active-axis modes and drags each through `SceneViewer` Qt mouse events using
+  the viewer DPR. It requires `axisDragProbe=ok`, `mouseEventProbe=ok`,
+  `viewerRenderProbe=ok`, changed stage-object X/Y, angle, scale, shear, and
+  center values, high-DPI framebuffer probes, visible red content pixels, and
+  before/after captures. The packaged Qt 6 run reported logical viewer size
+  `994x819`, DPR `2` / `2.00`, framebuffer `1988x1638`, Position
+  `0.0000,0.0000 -> 2.7042,-1.3521`, Rotation `0.0000 -> -44.5595`, Scale
+  `1.0000 -> 1.5039`, Shear `0.0000,0.0000 -> -0.2146,-0.1545`, Center
+  `0.0000,0.0000 -> 0.3863,0.1932`, `3099` changed pixels, and `358145` red
+  pixels. The packaged Qt 5 run matched those measurements. This covers
+  app-side Animate/Edit active-axis transform dragging for the five primary
+  axis modes through Qt mouse events; real OS-level input delivery, full cursor
+  artwork variants, and full manual transform workflow visual parity remain
+  open.
+- On 2026-05-31, the packaged Qt 6 app also passes
+  `mise run gui-smoke-viewer-animate-tool-cursors-qt6`. This app-side smoke
+  creates the same visible raster scene, switches the current tool to `T_Edit`
+  on `Col1`, sends Qt mouse-move events through `SceneViewer` for Position,
+  Rotation, Scale, Shear, and Center active-axis modes, and requires
+  `animateCursorProbe=ok`, `mouseEventProbe=ok`, `viewerRenderProbe=ok`,
+  expected normal cursor IDs, Alt precise-decoration cursor IDs, cursor pixmap
+  availability for every checked cursor, high-DPI framebuffer probes, visible
+  red content pixels, and before/after captures. The packaged Qt 6 run reported
+  logical viewer size `994x819`, DPR `2` / `2.00`, framebuffer `1988x1638`,
+  Position cursor `23/2097175`, Rotation cursor `33/2097185`, Scale cursor
+  `64/2097216`, Shear cursor `38/2097190`, Center cursor `23/2097175`, `580`
+  changed pixels, and `358176` red pixels. A follow-up run also records cursor
+  artwork signatures for every checked normal/Alt cursor. Qt 6 and Qt 5 matched
+  the signatures exactly: every cursor is `32x32@1.00` with hotspot `15,15`;
+  Position/Center use hashes `1e19f313f559b6d3` and
+  `b756652c7d59b6d3`, Rotation uses `137572f5ab7d9ccd` and
+  `e5f471814b7d9ccd`, Scale uses `85c794af41f0f0e3` and
+  `84d4229245f0f0e3`, and Shear uses `8161bce21e155637` and
+  `812dd0e66155637`. The packaged Qt 5 run matched those measurements. This
+  covers app-side Animate/Edit mode-specific cursor IDs, Alt precise-cursor
+  decoration, cursor resource availability, and cursor artwork signatures
+  through Qt mouse-move delivery; it does not validate real OS-level cursor
+  delivery, unchecked cursor artwork variants, or full manual transform workflow
+  visual parity.
+- On 2026-05-31, the packaged Qt 6 app also passes
+  `mise run gui-smoke-viewer-selection-tool-vector-handles-qt6`. This app-side
+  smoke creates a vector stroke, switches the current tool to `T_Selection`,
+  uses rectangular selection through `SceneViewer` Qt mouse events, hovers the
+  selected vector stroke bbox scale handle, and drags that handle through Qt
+  mouse events using the viewer DPR. It requires `selectionToolProbe=ok`,
+  `selectionRectProbe=ok`, `selectionCursorProbe=ok`,
+  `selectionHandleProbe=ok`, `mouseEventProbe=ok`, `viewerRenderProbe=ok`,
+  high-DPI framebuffer probes, one selected stroke, scale-cursor artwork, a
+  changed selected-stroke bbox, changed framebuffer pixels, visible red content
+  pixels, and before/after captures. The packaged Qt 6 run reported logical
+  viewer size `994x819`, DPR `2` / `2.00`, framebuffer `1988x1638`, selection
+  mode `Standard`, type `Rectangular`, selected stroke count `1`, bbox
+  `-208.0000,-138.0000,208.0000,33.0000 ->
+  -209.6763,-136.2378,279.8100,81.0663`, bbox delta `73.4863,46.3041`,
+  cursor ID `38`, cursor artwork `ok`, `195080` changed pixels, and `174082`
+  red pixels. The packaged Qt 5 run matched those measurements. This covers
+  app-side vector Selection tool rectangular selection, scale-handle hover
+  feedback, cursor resource availability, and scale-handle dragging through Qt
+  mouse events; real OS-level input/cursor delivery, other Selection tool modes
+  and handles, raster selection, multi-object selection workflows, and full
+  manual selection visual parity remain open.
+- On 2026-05-31, the packaged Qt 6 app also passes
+  `mise run gui-smoke-viewer-selection-tool-vector-handle-variants-qt6`. This
+  app-side smoke creates the same vector stroke, switches the current tool to
+  `T_Selection`, selects the stroke with a rectangular drag, then hovers and
+  drags the horizontal edge-scale handle, vertical edge-scale handle, and
+  top-right rotation handle through `SceneViewer` Qt mouse events. It requires
+  `selectionToolProbe=ok`, `selectionRectProbe=ok`,
+  `selectionVariantCursorProbe=ok`, `selectionVariantHandleProbe=ok`,
+  `mouseEventProbe=ok`, `viewerRenderProbe=ok`, high-DPI framebuffer probes,
+  one selected stroke, cursor artwork for each checked handle, changed vector
+  bbox measurements, changed framebuffer pixels, visible red content pixels,
+  and before/after captures. The packaged Qt 6 run reported logical viewer
+  size `994x819`, DPR `2` / `2.00`, framebuffer `1988x1638`, selection mode
+  `Standard`, type `Rectangular`, selected stroke count `1`, horizontal-scale
+  bbox `-208.0000,-138.0000,208.0000,33.0000 ->
+  -206.1030,-139.7834,260.7839,34.7834` with width delta `50.8869` and cursor
+  `40`, vertical-scale bbox `-206.1030,-139.7834,260.7839,34.7834 ->
+  -209.6923,-135.7615,264.3733,75.3727` with height delta `36.5673` and
+  cursor `41`, rotation bbox `-209.6923,-135.7615,264.3733,75.3727 ->
+  -188.4725,-179.3471,275.3424,77.2171` with cursor `33`, `198156` changed
+  pixels, and `163929` red pixels. The packaged Qt 5 run matched those
+  measurements. This covers app-side vector Selection tool rectangular
+  selection, horizontal/vertical edge-scale handle cursor feedback, rotation
+  handle cursor feedback, cursor resource availability, and handle dragging
+  through Qt mouse events; real OS-level input/cursor delivery, Selection tool
+  center/thickness/free-deform handles, raster selection, multi-object
+  selection workflows, and full manual selection visual parity remain open.
 - On 2026-05-30, the packaged Qt 6 app also passes vector and full-color raster
   brush tool-input smokes through
   `mise run gui-smoke-viewer-vector-brush-qt6` and
@@ -363,13 +767,18 @@ branch.
   requires raster opaque/red pixel counts plus `SceneViewer` framebuffer pixels
   to change. The harness now launches this permission-sensitive smoke through
   LaunchServices with explicit smoke environment/log routing, preflights
-  `CGPreflightPostEventAccess()`, attempts bundle/PID activation, and posts a
-  prime click before the drag. In the current local session, this gate is still
-  not green: `cgPostEventAccess=true`, but the target app remains inactive
-  (`targetAppActiveAfter=false` and `targetAppActiveAfterPrimeClick=false`),
-  raster pixels stay at zero, and the System Events click fallback still fails
-  with macOS error `-25200`. Treat this as a current app-activation or OS-event
-  delivery blocker, not as Qt 6 brush logic parity, because
+  `CGPreflightPostEventAccess()`, attempts AX raise/frontmost plus bundle/PID
+  activation, reports the frontmost application, reports target window bounds
+  and point containment, posts both the Qt global stroke and a diagnostic
+  backing-scaled stroke, and posts a prime click before the drag. In the
+  current local session, this gate is still not green: `cgPostEventAccess=true`
+  and `axProcessTrusted=true`, the Qt global points are inside the OpenToonz
+  window while backing-scaled points are outside it, but the frontmost
+  application remains `com.apple.loginwindow`, the app-side event filter records
+  `systemMouseAppEventCount=0` and `systemMouseViewerEventCount=0`, raster
+  pixels stay at zero, and the System Events click fallback still fails with
+  macOS error `-25200`. Treat this as a current desktop-session activation or
+  OS-event delivery blocker, not as Qt 6 brush logic parity, because
   `mise run gui-smoke-viewer-raster-brush-mouse-events-qt6` still passes
   against the packaged Qt 6 app.
 - The 2026-05-30 validation slice reran the Qt 6 app build, macOS Qt 6
@@ -402,7 +811,15 @@ branch.
   successfully. A follow-up harness slice moved that OS-input smoke to a
   LaunchServices launch path, added CGEvent post-access and target-activation
   diagnostics, confirmed `cgPostEventAccess=true`, and narrowed the remaining
-  failure to target activation/event delivery with unchanged raster pixels. The
+  failure to target activation/event delivery with unchanged raster pixels. A
+  2026-05-31 diagnostic slice rebuilt and repackaged Qt 6, reran the arm64
+  bundle check, added app-side OS mouse event counters plus shell-side AX,
+  frontmost-application, backing-scale, posted-point-set, and target-window
+  containment diagnostics, and proved the current failure is below OpenToonz
+  input handling: the Qt global points are on the OpenToonz window, but no
+  spontaneous mouse events reach the Qt application while `loginwindow` remains
+  frontmost; it also rebuilt the Qt 5 app target to verify the shared probe code
+  stays dual-lane compatible. The
   viewer high-DPI slice rebuilt both app targets, refreshed the macOS Qt 6 and
   Qt 5 packages, added viewer logical/device/framebuffer probes to the existing
   capture path, reran the Qt 6 arm64 bundle check, and verified that both
@@ -415,8 +832,43 @@ branch.
   app targets, refreshed both macOS packages, added
   `viewer-onion-skin`, reran the Qt 6 arm64 bundle check, and verified that
   both packaged lanes pass with matching DPR, framebuffer, stage-player,
-  current-frame red-pixel, and onion-pixel measurements. The follow-up camera
-  overlay slice rebuilt both app targets, refreshed both macOS packages, added
+  current-frame red-pixel, and onion-pixel measurements.
+  The follow-up row-area onion marker slice rebuilt both app targets, refreshed
+  both macOS packages, added `viewer-onion-skin-rowarea`, reran the Qt 6 and Qt
+  5 arm64 bundle checks, and verified that both packaged lanes pass with
+  matching DPR, framebuffer, row-area high-DPI, row-area changed-pixel,
+  MOS/FOS marker, toggle-state, onion-pixel, changed viewer-pixel, and
+  red-pixel measurements. The follow-up row-area onion marker drag-range slice
+  rebuilt both app targets, refreshed both macOS packages, added
+  `viewer-onion-skin-rowarea-drag`, reran the Qt 6 and Qt 5 arm64 bundle
+  checks, and verified that both packaged lanes pass with matching DPR,
+  framebuffer, row-area high-DPI, row-area changed-pixel, MOS range, onion-row,
+  onion-pixel, changed viewer-pixel, and red-pixel measurements. The follow-up
+  fixed onion marker drag-range slice rebuilt both app targets, refreshed both
+  macOS packages, added `viewer-onion-skin-fixed-marker-drag`, reran the Qt 6
+  and Qt 5 arm64 bundle checks, and verified that both packaged lanes pass with
+  matching DPR, framebuffer, row-area high-DPI, fixed-marker add/remove/front
+  drag delivery, FOS add/remove/final counts, onion-row, onion-pixel, changed
+  viewer-pixel, and red-pixel measurements. The follow-up
+  onion-skin context-menu command slice rebuilt both app targets, refreshed
+  both macOS packages, added `viewer-onion-skin-context-menu`, reran the Qt 6
+  and Qt 5 arm64 bundle checks, and verified that both packaged lanes pass with
+  matching DPR, framebuffer, row-area high-DPI, row-area changed-pixel, onion
+  command, MOS/FOS marker, onion-row, onion-pixel, changed viewer-pixel, and
+  red-pixel measurements. The follow-up custom onion color slice rebuilt both
+  app targets, refreshed both macOS packages, added
+  `viewer-onion-skin-custom-colors`, reran the Qt 6 and Qt 5 arm64 bundle
+  checks, and verified that both packaged lanes pass with matching DPR,
+  framebuffer, stored custom color, row-area high-DPI, row-area custom-color
+  pixel, viewer custom-color pixel, onion-row, MOS/FOS marker, changed
+  viewer-pixel, and red-pixel measurements. The follow-up orientation onion
+  marker slice rebuilt both app targets, refreshed both macOS packages, added
+  `viewer-onion-skin-orientations`, reran the Qt 6 and Qt 5 arm64 bundle
+  checks, and verified that both packaged lanes pass with matching DPR,
+  framebuffer, orientation flip, row-area high-DPI, vertical and horizontal
+  row-area changed-pixel, MOS/FOS marker, onion-row, onion-pixel, changed
+  viewer-pixel, and red-pixel measurements. The follow-up camera overlay slice
+  rebuilt both app targets, refreshed both macOS packages, added
   `viewer-camera-overlay`, reran the Qt 6 arm64 bundle check, and verified that
   both packaged lanes pass with matching DPR, framebuffer, changed-pixel, and
   red camera-box overlay measurements. The follow-up safe-area/field-guide
@@ -424,11 +876,57 @@ branch.
   `viewer-safe-area-field-guide`, reran the Qt 6 arm64 bundle check, and
   verified that both packaged lanes pass with matching DPR, framebuffer,
   changed-pixel, red safe-area, gray guide, and changed-gray guide
-  measurements. The follow-up ruler/guide overlay slice rebuilt both app
-  targets, refreshed both macOS packages, added `viewer-ruler-guide`, reran the
-  Qt 6 arm64 bundle check, and verified that both packaged lanes pass with
+  measurements. The follow-up safe-area preset/color slice rebuilt both app
+  targets, refreshed both macOS packages, added `viewer-safe-area-presets`,
+  reran the Qt 6 and Qt 5 arm64 bundle checks, and verified that both packaged
+  lanes pass with matching DPR, framebuffer, stored safe-area preset name,
+  default red safe-area pixels, custom red/green/blue safe-area pixels,
+  preset-delta changed/green/blue pixels, and final red-pixel measurements. The
+  follow-up safe-area custom-file slice rebuilt both app targets, refreshed both
+  macOS packages, added `viewer-safe-area-custom-file`, reran the Qt 6 and Qt 5
+  arm64 bundle checks, and verified that both packaged lanes pass with matching
+  DPR, framebuffer, custom-file write/restore, stored safe-area preset name,
+  custom red/green/blue safe-area pixels, changed red/green/blue pixels, and
+  final red-pixel measurements. The follow-up field-guide settings slice rebuilt
+  both app targets, refreshed both macOS packages, added
+  `viewer-field-guide-settings`,
+  reran the Qt 6 and Qt 5 arm64 bundle checks, and verified that both packaged
+  lanes pass with matching DPR, framebuffer, stored field-guide size/aspect,
+  first/second gray guide pixels, settings-delta changed/gray pixels, and
+  red-pixel measurements. The follow-up ruler/guide overlay slice rebuilt both
+  app targets, refreshed both macOS packages, added `viewer-ruler-guide`, reran
+  the Qt 6 arm64 bundle check, and verified that both packaged lanes pass with
   matching DPR, framebuffer, changed-pixel, changed-neutral-guide-pixel,
   ruler-widget, and guide-count measurements.
+- The follow-up ruler-guide event slice rebuilt both app targets, refreshed
+  both macOS packages, added `viewer-ruler-guide-events`, reran the Qt 6 and Qt
+  5 arm64 bundle checks, and verified that both packaged lanes pass with
+  matching DPR, framebuffer, ruler-widget, guide-count, guide-value,
+  create/move/delete, changed-pixel, changed-neutral-guide-pixel, and red-pixel
+  measurements.
+- The follow-up ruler-guide variant slice rebuilt both app targets, refreshed
+  both macOS packages, added `viewer-ruler-guide-variants`, reran the Qt 6 and
+  Qt 5 arm64 bundle checks, and verified that both packaged lanes pass with
+  matching DPR, framebuffer, ruler-widget, horizontal and vertical drag-hide
+  guide counts, hide endpoints, changed-neutral-guide-pixel, and red-pixel
+  measurements.
+- The follow-up ruler tick rendering slice rebuilt both app targets, refreshed
+  both macOS packages, added `viewer-ruler-ticks`, reran the Qt 6 and Qt 5
+  arm64 bundle checks, and verified that both packaged lanes pass with matching
+  DPR, framebuffer, ruler-widget, ruler tick-pixel, changed tick-pixel, ruler
+  unit, changed viewer-pixel, and red-pixel measurements.
+- The follow-up ruler/guide style slice rebuilt both app targets, refreshed
+  both macOS packages, added `viewer-ruler-guide-styles`, reran the Qt 6 and Qt
+  5 arm64 bundle checks, and verified that both packaged lanes pass with
+  matching DPR, framebuffer, ruler-widget high-DPI, custom ruler background,
+  handle, and scale color-pixel, changed ruler-pixel,
+  changed-neutral-guide-pixel, and red-pixel measurements.
+- The follow-up ruler guide-line rendering slice rebuilt both app targets,
+  refreshed both macOS packages, added `viewer-ruler-guide-lines`, reran the Qt
+  6 and Qt 5 arm64 bundle checks, and verified that both packaged lanes pass
+  with matching DPR, framebuffer, custom guide positions, dashed vertical and
+  horizontal guide-line segments, expected guide-position bands, moved-guide
+  changed-neutral-pixel, changed-pixel, and red-pixel measurements.
 - The follow-up Animate tool overlay slice rebuilt both app targets, refreshed
   both macOS packages, added `viewer-animate-tool-overlay`, reran the Qt 6 and
   Qt 5 arm64 bundle checks, and verified that both packaged lanes pass with
@@ -459,6 +957,41 @@ branch.
   mouse-event dispatch, `T_Edit`/`Col1` state, normal/Alt/Shift `TStageObject`
   deltas, Alt precision ratio, Shift dominant-axis lock, precise-cursor state,
   changed-pixel, and red-pixel measurements.
+- The follow-up Animate tool active-axis drag slice rebuilt both app targets,
+  refreshed both macOS packages, added `viewer-animate-tool-axis-drags`, reran
+  the Qt 6 and Qt 5 arm64 bundle checks, and verified that both packaged lanes
+  pass with matching DPR, framebuffer, Qt mouse-event dispatch, `T_Edit`/`Col1`
+  state, Position X/Y movement, Rotation angle movement, Scale movement, Shear
+  X/Y movement, Center movement, changed-pixel, and red-pixel measurements.
+- The follow-up Animate tool cursor slice rebuilt both app targets, refreshed
+  both macOS packages, added `viewer-animate-tool-cursors`, reran the Qt 6 and
+  Qt 5 arm64 bundle checks, and verified that both packaged lanes pass with
+  matching DPR, framebuffer, Qt mouse-event dispatch, `T_Edit`/`Col1` state,
+  Position/Rotation/Scale/Shear/Center cursor IDs, Alt precise cursor
+  decoration, cursor pixmap availability, normal/Alt cursor artwork signatures,
+  changed-pixel, and red-pixel measurements.
+- The follow-up Selection tool vector handle slice rebuilt both app targets,
+  refreshed both macOS packages, added
+  `viewer-selection-tool-vector-handles`, reran the Qt 6 and Qt 5 arm64 bundle
+  checks, and verified that both packaged lanes pass with matching DPR,
+  framebuffer, Qt mouse-event dispatch, `T_Selection` state, rectangular
+  selection mode/type, selected stroke count, selected bbox scale-handle drag
+  deltas, scale cursor ID/artwork availability, changed-pixel, and red-pixel
+  measurements.
+- The follow-up Selection tool vector handle-variant slice rebuilt both app
+  targets, refreshed both macOS packages, added
+  `viewer-selection-tool-vector-handle-variants`, reran the Qt 6 and Qt 5 arm64
+  bundle checks, and verified that both packaged lanes pass with matching DPR,
+  framebuffer, Qt mouse-event dispatch, `T_Selection` state, rectangular
+  selection mode/type, selected stroke count, horizontal edge-scale delta,
+  vertical edge-scale delta, rotation bbox delta, handle cursor IDs/artwork
+  availability, changed-pixel, and red-pixel measurements.
+- The follow-up Animate tool handle-variant slice rebuilt both app targets,
+  refreshed both macOS packages, added `viewer-animate-tool-handle-variants`,
+  reran the Qt 6 and Qt 5 arm64 bundle checks, and verified that both packaged
+  lanes pass with matching DPR, framebuffer, Qt mouse-event dispatch,
+  `T_Edit`/`Col1` state, All-mode fallback translation movement, ScaleXY X/Y
+  movement, Shear X/Y movement, changed-pixel, and red-pixel measurements.
 - A non-rendering packaged Qt 6 high-DPI diagnostic smoke is now green through
   `mise run gui-smoke-highdpi-qt6`. It records main-window DPR, screen DPR,
   logical DPI, screen geometry, and the expected Qt 6 always-on high-DPI mode.
@@ -818,15 +1351,32 @@ branch.
   before re-signing the bundle.
 - This is not product-ready Qt 6 support. Narrow packaged raster/vector viewer
   framebuffer smokes, a direct `SceneViewer` zoom/pan transform smoke,
-  app-side onion-skin, camera-box, safe-area/field-guide, ruler/guide, and
-  Animate/Edit tool overlay, direct-drag, Qt mouse-event transform, and
-  undo-redo/modifier-key transform smokes, vector/full-color raster direct-tool
-  brush smokes, and a `SceneViewer` Qt mouse-event plus synthetic tablet-event
-  raster brush smoke exist, but real OS-level/hardware tablet input, full
-  drawing workflows, timeline/UI onion workflow, selection-handle hit-testing
-  and overlays, real OS-level transform dragging, broader overlay and high-DPI
-  visual behavior, broader rendering, non-macOS packaging, scripting object
-  binding parity, and hardware camera/audio smoke remain open.
+  app-side onion-skin, row-area onion marker UI, mobile drag ranges, fixed
+  marker add/remove/front drags, onion-skin context-menu commands, custom onion
+  colors, row-area onion marker behavior across both current xsheet/timeline
+  orientations, camera-box,
+  safe-area/field-guide, safe-area presets/colors, safe-area custom files,
+  field-guide settings,
+  ruler/guide, ruler-guide event, ruler-guide variant, ruler guide-line
+  rendering, ruler tick rendering, ruler/guide style,
+  Animate/Edit tool overlay, direct transform-drag, Qt mouse-event transform,
+  and undo-redo/modifier-key/handle hit-test/handle-variant/active-axis
+  transform smokes, mode-cursor feedback plus cursor artwork signatures,
+  Selection tool vector rectangular selection, scale-handle dragging, and
+  edge-scale/rotation handle variants, vector/full-color raster direct-tool
+  brush smokes, and a `SceneViewer` Qt
+  mouse-event plus synthetic tablet-event raster brush smoke exist, but real
+  OS-level/hardware tablet input, full drawing workflows, remaining timeline
+  onion workflows beyond the current app-side row-area marker/toggle/drag,
+  context/color/orientation coverage, remaining selection workflows beyond the
+  vector scale/edge/rotation handle paths, remaining cursor artwork outside
+  the checked Animate/Edit mode cursor set,
+  real OS-level transform dragging, remaining manual ruler-guide variants not
+  covered by app-side
+  create/move/delete/drag-hide, guide-line visual variants beyond app-side
+  custom-position dashed-line coverage, broader overlay and
+  high-DPI visual behavior, broader rendering, non-macOS packaging, scripting
+  object binding parity, and hardware camera/audio smoke remain open.
 
 ## Next Implementation Slice
 
@@ -835,22 +1385,42 @@ The next slice should make the Qt 6 app useful enough to run and diagnose:
 
 1. Continue packaged Qt 6 interactive GUI smoke beyond the now-green scripted
    startup/create/open/xsheet-state, raster/vector viewer-framebuffer, direct
-   viewer zoom/pan transform, app-side onion-skin, camera-box,
-   safe-area/field-guide, ruler/guide, Animate/Edit tool overlay framebuffer,
-   direct Animate/Edit tool transform-drag, and Qt mouse-event Animate/Edit
-   transform-drag plus undo-redo and modifier-key behavior, vector/raster brush
-   tool-input, Qt mouse-event, and synthetic Qt tablet-event paths. A real
-   macOS
-   CGEvent/System Events raster-brush gate now exists, but
-   the current local run is blocked by app activation or OS input delivery:
-   CGEvent post access is trusted, yet the smoke-launched target never becomes
-   active, System Events still reports `-25200`, and raster pixels remain
-   unchanged. Resolve or rerun that permissioned path before treating OS-level
-   mouse delivery as covered. Then continue into hardware tablet pressure/tilt,
-   timeline/UI onion workflow, selection-handle hit-testing and overlays, real
-   OS-level transform dragging, interactive ruler-guide workflows, broader
-   high-DPI input and viewer/rendering behavior, and OpenGL fallback warning
-   triage.
+   viewer zoom/pan transform, app-side onion-skin, row-area onion marker UI and
+   mobile drag ranges, fixed marker add/remove/front drags, onion-skin
+   context-menu commands, custom onion colors, row-area onion marker
+   orientation coverage, camera-box,
+   safe-area/field-guide, safe-area presets/colors, safe-area custom files,
+   field-guide settings,
+   ruler/guide, ruler-guide event, ruler-guide variant, ruler guide-line
+   rendering, ruler tick rendering, ruler/guide style,
+   Animate/Edit tool overlay framebuffer, direct Animate/Edit tool
+   transform-drag, Qt mouse-event Animate/Edit transform-drag plus undo-redo,
+   modifier-key behavior, app-side rotation/scale/center handle hit-testing,
+   app-side All-mode fallback translation/ScaleXY/Shear handle variants,
+   Position/Rotation/Scale/Shear/Center active-axis transform dragging, mode
+   cursor feedback, Selection tool vector rectangular selection, scale-handle
+   dragging, and edge-scale/rotation handle variants,
+   vector/raster brush tool-input, Qt mouse-event, and synthetic Qt
+   tablet-event paths. A real macOS CGEvent/System Events raster-brush gate
+   now exists, but the current local run is blocked by app activation or OS
+   input delivery:
+   CGEvent post access and AX trust are present, and the Qt global stroke
+   points are inside the target OpenToonz window, but the active desktop session
+   still leaves `loginwindow` frontmost, the app-side event filter sees zero
+   mouse events, System Events still reports `-25200`, and raster pixels remain
+   unchanged. Resolve or rerun that permissioned path in an unlocked/frontmost
+   user session before treating OS-level mouse delivery as covered. Then
+   continue into hardware tablet pressure/tilt,
+   remaining timeline onion workflows beyond the current app-side row-area
+   marker/toggle/drag, context/color/orientation smokes, remaining selection
+   workflows beyond the vector scale/edge/rotation handle paths, real
+   OS-level cursor delivery,
+   remaining cursor artwork outside the checked Animate/Edit mode cursor set,
+   real OS-level transform dragging,
+   remaining manual ruler-guide variants not covered by
+   app-side create/move/delete/drag-hide, guide-line visual variants beyond
+   app-side custom-position dashed-line coverage, broader high-DPI input and
+   viewer/rendering behavior, and OpenGL fallback warning triage.
 2. Keep the app-side GUI smoke status hook narrow and test-only. System Events
    remains useful as a fallback/manual diagnostic, but do not make Qt 6
    create/open validation depend on macOS accessibility window discovery unless
@@ -1000,14 +1570,34 @@ mise run gui-smoke-viewer-render-qt6
 mise run gui-smoke-viewer-vector-render-qt6
 mise run gui-smoke-viewer-zoom-pan-qt6
 mise run gui-smoke-viewer-onion-skin-qt6
+mise run gui-smoke-viewer-onion-skin-rowarea-qt6
+mise run gui-smoke-viewer-onion-skin-rowarea-drag-qt6
+mise run gui-smoke-viewer-onion-skin-fixed-marker-drag-qt6
+mise run gui-smoke-viewer-onion-skin-context-menu-qt6
+mise run gui-smoke-viewer-onion-skin-custom-colors-qt6
+mise run gui-smoke-viewer-onion-skin-orientations-qt6
 mise run gui-smoke-viewer-camera-overlay-qt6
 mise run gui-smoke-viewer-safe-area-field-guide-qt6
+mise run gui-smoke-viewer-safe-area-presets-qt6
+mise run gui-smoke-viewer-safe-area-custom-file-qt6
+mise run gui-smoke-viewer-field-guide-settings-qt6
 mise run gui-smoke-viewer-ruler-guide-qt6
+mise run gui-smoke-viewer-ruler-guide-events-qt6
+mise run gui-smoke-viewer-ruler-guide-variants-qt6
+mise run gui-smoke-viewer-ruler-guide-lines-qt6
+mise run gui-smoke-viewer-ruler-guide-styles-qt6
+mise run gui-smoke-viewer-ruler-ticks-qt6
 mise run gui-smoke-viewer-animate-tool-overlay-qt6
 mise run gui-smoke-viewer-animate-tool-drag-qt6
 mise run gui-smoke-viewer-animate-tool-mouse-events-qt6
 mise run gui-smoke-viewer-animate-tool-undo-redo-qt6
 mise run gui-smoke-viewer-animate-tool-modifiers-qt6
+mise run gui-smoke-viewer-animate-tool-handles-qt6
+mise run gui-smoke-viewer-animate-tool-handle-variants-qt6
+mise run gui-smoke-viewer-animate-tool-axis-drags-qt6
+mise run gui-smoke-viewer-animate-tool-cursors-qt6
+mise run gui-smoke-viewer-selection-tool-vector-handles-qt6
+mise run gui-smoke-viewer-selection-tool-vector-handle-variants-qt6
 mise run gui-smoke-viewer-vector-brush-qt6
 mise run gui-smoke-viewer-raster-brush-qt6
 mise run gui-smoke-viewer-raster-brush-mouse-events-qt6

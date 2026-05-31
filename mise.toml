@@ -126,6 +126,30 @@ run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-zoom-pan bash scripts/qt6/run-gui-smoke
 description = "Enable onion skin on a visible raster frame and verify Qt 6 SceneViewer framebuffer/high-DPI behavior."
 run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-onion-skin bash scripts/qt6/run-gui-smoke.sh"
 
+[tasks.gui-smoke-viewer-onion-skin-rowarea-qt6]
+description = "Replay xsheet row-area onion marker UI events and verify Qt 6 viewer/row-area rendering."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-onion-skin-rowarea bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-viewer-onion-skin-rowarea-drag-qt6]
+description = "Replay xsheet row-area onion marker drag ranges and verify Qt 6 viewer/row-area rendering."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-onion-skin-rowarea-drag bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-viewer-onion-skin-fixed-marker-drag-qt6]
+description = "Replay xsheet row-area fixed onion marker range drags and verify Qt 6 viewer/row-area rendering."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-onion-skin-fixed-marker-drag bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-viewer-onion-skin-context-menu-qt6]
+description = "Trigger onion-skin context menu commands and verify Qt 6 viewer/row-area rendering."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-onion-skin-context-menu bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-viewer-onion-skin-custom-colors-qt6]
+description = "Apply custom onion colors and verify Qt 6 viewer/row-area rendering."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-onion-skin-custom-colors bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-viewer-onion-skin-orientations-qt6]
+description = "Flip xsheet timeline orientation and verify Qt 6 onion row-area rendering."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-onion-skin-orientations bash scripts/qt6/run-gui-smoke.sh"
+
 [tasks.gui-smoke-viewer-camera-overlay-qt6]
 description = "Toggle the camera box overlay and verify Qt 6 SceneViewer framebuffer/high-DPI behavior."
 run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-camera-overlay bash scripts/qt6/run-gui-smoke.sh"
@@ -134,9 +158,41 @@ run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-camera-overlay bash scripts/qt6/run-gui
 description = "Toggle safe-area and field-guide overlays and verify Qt 6 SceneViewer framebuffer/high-DPI behavior."
 run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-safe-area-field-guide bash scripts/qt6/run-gui-smoke.sh"
 
+[tasks.gui-smoke-viewer-safe-area-presets-qt6]
+description = "Switch safe-area presets and verify Qt 6 SceneViewer custom-color rendering."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-safe-area-presets bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-viewer-safe-area-custom-file-qt6]
+description = "Load a user-authored safearea.ini and verify Qt 6 SceneViewer custom-color rendering."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-safe-area-custom-file bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-viewer-field-guide-settings-qt6]
+description = "Apply custom field-guide size/aspect settings and verify Qt 6 SceneViewer rendering."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-field-guide-settings bash scripts/qt6/run-gui-smoke.sh"
+
 [tasks.gui-smoke-viewer-ruler-guide-qt6]
 description = "Toggle ruler guide overlays and verify Qt 6 SceneViewer framebuffer/high-DPI behavior."
 run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-ruler-guide bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-viewer-ruler-guide-events-qt6]
+description = "Replay ruler guide create, move, and delete through Qt 6 Ruler mouse events."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-ruler-guide-events bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-viewer-ruler-guide-variants-qt6]
+description = "Replay ruler guide drag-hide variants through Qt 6 Ruler mouse events."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-ruler-guide-variants bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-viewer-ruler-guide-lines-qt6]
+description = "Verify custom ruler guide line positions and dashed viewer guide rendering in Qt 6."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-ruler-guide-lines bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-viewer-ruler-guide-styles-qt6]
+description = "Apply custom QSS ruler guide styles and verify Qt 6 Ruler widget rendering."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-ruler-guide-styles bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-viewer-ruler-ticks-qt6]
+description = "Capture ruler tick rendering through Qt 6 Ruler widgets after viewer transform changes."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-ruler-ticks bash scripts/qt6/run-gui-smoke.sh"
 
 [tasks.gui-smoke-viewer-animate-tool-overlay-qt6]
 description = "Toggle the Animate tool overlay and verify Qt 6 SceneViewer framebuffer/high-DPI behavior."
@@ -161,6 +217,30 @@ run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-animate-tool-modifiers bash scripts/qt6
 [tasks.gui-smoke-viewer-animate-tool-handles-qt6]
 description = "Replay Animate tool handle hover and drag hit-tests through Qt 6 SceneViewer mouse events."
 run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-animate-tool-handles bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-viewer-animate-tool-handle-variants-qt6]
+description = "Replay Animate tool ScaleXY, Shear, and All-mode translation handle variants through Qt 6 SceneViewer mouse events."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-animate-tool-handle-variants bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-viewer-animate-tool-axis-drags-qt6]
+description = "Replay Animate tool active-axis drags through Qt 6 SceneViewer mouse events."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-animate-tool-axis-drags bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-viewer-animate-tool-cursors-qt6]
+description = "Verify Animate tool mode cursor IDs and precise cursor decoration through Qt 6 SceneViewer mouse events."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-animate-tool-cursors bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-viewer-selection-tool-vector-handles-qt6]
+description = "Select a vector stroke and drag Selection tool handles through Qt 6 SceneViewer mouse events."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-selection-tool-vector-handles bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-viewer-selection-tool-vector-handle-variants-qt6]
+description = "Replay Selection tool vector edge-scale and rotation handle variants through Qt 6 SceneViewer mouse events."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-selection-tool-vector-handle-variants bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-viewer-selection-tool-vector-center-thickness-deform-qt6]
+description = "Replay Selection tool vector center, thickness, and free-deform handles through Qt 6 SceneViewer mouse events."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-selection-tool-vector-center-thickness-deform bash scripts/qt6/run-gui-smoke.sh"
 
 [tasks.gui-smoke-viewer-vector-brush-qt6]
 description = "Replay a vector brush stroke and verify Qt 6 SceneViewer framebuffer pixels in the packaged app."

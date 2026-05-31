@@ -246,6 +246,7 @@ APPLESCRIPT
   swift_driver="$smoke_root/post_mouse_drag.swift"
   cat >"$swift_driver" <<'SWIFT'
 import AppKit
+import ApplicationServices
 import CoreGraphics
 import Foundation
 
@@ -289,17 +290,79 @@ if #available(macOS 10.15, *) {
 }
 
 let wasActive = targetApp.isActive
+let axTrusted = AXIsProcessTrusted()
+let targetElement = AXUIElementCreateApplication(pid_t(pidValue))
+let axRaiseResult = AXUIElementPerformAction(targetElement,
+                                             kAXRaiseAction as CFString)
+let axFrontResult = AXUIElementSetAttributeValue(
+  targetElement, kAXFrontmostAttribute as CFString, kCFBooleanTrue)
 let activationRequested = targetApp.activate(options: [.activateAllWindows])
 RunLoop.current.run(until: Date().addingTimeInterval(0.75))
 fputs("targetAppActiveBefore=\(wasActive)\n", stderr)
+fputs("axProcessTrusted=\(axTrusted)\n", stderr)
+fputs("axRaiseResult=\(axRaiseResult.rawValue)\n", stderr)
+fputs("axFrontmostResult=\(axFrontResult.rawValue)\n", stderr)
 fputs("targetAppActivationRequested=\(activationRequested)\n", stderr)
 fputs("targetAppActiveAfter=\(targetApp.isActive)\n", stderr)
+if let frontmostApp = NSWorkspace.shared.frontmostApplication {
+  let bundleID = frontmostApp.bundleIdentifier ?? "unknown"
+  fputs("frontmostAppPID=\(frontmostApp.processIdentifier)\n", stderr)
+  fputs("frontmostAppBundleID=\(bundleID)\n", stderr)
+}
 
 guard let source = CGEventSource(stateID: .hidSystemState) else {
   fail("could not create CGEventSource", 7)
 }
 
-func post(_ type: CGEventType, at point: CGPoint) {
+let backingScale = NSScreen.screens.first(where: { $0.frame.contains(points[0]) })?.backingScaleFactor ??
+                   NSScreen.main?.backingScaleFactor ??
+                   1.0
+fputs("cgEventBackingScale=\(backingScale)\n", stderr)
+
+func windowContains(_ bounds: CGRect, _ point: CGPoint) -> Bool {
+  return point.x >= bounds.minX && point.x <= bounds.maxX &&
+         point.y >= bounds.minY && point.y <= bounds.maxY
+}
+
+func targetWindowDiagnostics(_ pointSets: [(String, [CGPoint])]) {
+  guard let windowList = CGWindowListCopyWindowInfo(
+      [.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID)
+      as? [[String: Any]] else {
+    fputs("targetWindowProbe=unavailable\n", stderr)
+    return
+  }
+
+  let targetWindows = windowList.filter { info in
+    guard let ownerPID = info[kCGWindowOwnerPID as String] as? Int else {
+      return false
+    }
+    return ownerPID == Int(pidValue)
+  }
+  fputs("targetWindowCount=\(targetWindows.count)\n", stderr)
+
+  for (index, info) in targetWindows.prefix(5).enumerated() {
+    guard let boundsDict = info[kCGWindowBounds as String] as? NSDictionary,
+          let bounds = CGRect(dictionaryRepresentation: boundsDict) else {
+      continue
+    }
+    let number = info[kCGWindowNumber as String] as? Int ?? -1
+    let layer = info[kCGWindowLayer as String] as? Int ?? -1
+    var containsParts: [String] = []
+    for (label, strokePoints) in pointSets {
+      guard let first = strokePoints.first, let last = strokePoints.last else {
+        continue
+      }
+      containsParts.append(
+        "\(label):first=\(windowContains(bounds, first)),last=\(windowContains(bounds, last))")
+    }
+    let containsText = containsParts.joined(separator: ";")
+    fputs(
+      "targetWindow[\(index)]=number=\(number),layer=\(layer),bounds=\(bounds.origin.x),\(bounds.origin.y),\(bounds.size.width),\(bounds.size.height),contains=\(containsText)\n",
+      stderr)
+  }
+}
+
+func post(_ type: CGEventType, at point: CGPoint, hidTap: Bool) {
   guard let event = CGEvent(mouseEventSource: source,
                             mouseType: type,
                             mouseCursorPosition: point,
@@ -307,22 +370,47 @@ func post(_ type: CGEventType, at point: CGPoint) {
     fail("could not create CGEvent", 8)
   }
   event.setIntegerValueField(.mouseEventClickState, value: 1)
-  event.post(tap: .cghidEventTap)
+  event.postToPid(pid_t(pidValue))
+  if hidTap {
+    event.post(tap: .cghidEventTap)
+  }
   usleep(70000)
 }
 
-post(.mouseMoved, at: points[0])
-post(.leftMouseDown, at: points[0])
-post(.leftMouseUp, at: points[0])
-RunLoop.current.run(until: Date().addingTimeInterval(0.45))
-fputs("targetAppActiveAfterPrimeClick=\(targetApp.isActive)\n", stderr)
+func postStroke(_ strokePoints: [CGPoint], label: String, hidTap: Bool) {
+  guard let firstPoint = strokePoints.first, let lastPoint = strokePoints.last else {
+    return
+  }
+  fputs("postedPointSet=\(label),hidTap=\(hidTap),first=\(firstPoint.x),\(firstPoint.y),last=\(lastPoint.x),\(lastPoint.y)\n", stderr)
+  post(.mouseMoved, at: firstPoint, hidTap: hidTap)
+  post(.leftMouseDown, at: firstPoint, hidTap: hidTap)
+  post(.leftMouseUp, at: firstPoint, hidTap: hidTap)
+  RunLoop.current.run(until: Date().addingTimeInterval(0.45))
+  fputs("targetAppActiveAfterPrimeClick[\(label)]=\(targetApp.isActive)\n", stderr)
 
-post(.mouseMoved, at: points[0])
-post(.leftMouseDown, at: points[0])
-for point in points.dropFirst() {
-  post(.leftMouseDragged, at: point)
+  post(.mouseMoved, at: firstPoint, hidTap: hidTap)
+  post(.leftMouseDown, at: firstPoint, hidTap: hidTap)
+  for point in strokePoints.dropFirst() {
+    post(.leftMouseDragged, at: point, hidTap: hidTap)
+  }
+  post(.leftMouseUp, at: lastPoint, hidTap: hidTap)
+  RunLoop.current.run(until: Date().addingTimeInterval(0.45))
 }
-post(.leftMouseUp, at: points[points.count - 1])
+
+var diagnosticPointSets: [(String, [CGPoint])] = [("qt-global", points)]
+if backingScale != 1.0 {
+  diagnosticPointSets.append(("backing-scaled", points.map {
+    CGPoint(x: $0.x * backingScale, y: $0.y * backingScale)
+  }))
+}
+targetWindowDiagnostics(diagnosticPointSets)
+
+postStroke(points, label: "qt-global", hidTap: true)
+if backingScale != 1.0 {
+  let scaledPoints = points.map { CGPoint(x: $0.x * backingScale,
+                                          y: $0.y * backingScale) }
+  postStroke(scaledPoints, label: "backing-scaled", hidTap: false)
+}
 usleep(150000)
 SWIFT
 
@@ -383,7 +471,7 @@ if [[ -z "$smoke_action" ]]; then
 fi
 
 case "$smoke_action" in
-  startup|create-scene|open-scene|high-dpi|media-devices|audio-input|audio-recording-wav|audio-playback-wav|camera-formats|audio-output|viewer-render|viewer-vector-render|viewer-zoom-pan|viewer-onion-skin|viewer-camera-overlay|viewer-safe-area-field-guide|viewer-ruler-guide|viewer-animate-tool-overlay|viewer-animate-tool-drag|viewer-animate-tool-mouse-events|viewer-animate-tool-undo-redo|viewer-animate-tool-modifiers|viewer-animate-tool-handles|viewer-vector-brush|viewer-raster-brush|viewer-raster-brush-mouse-events|viewer-raster-brush-tablet-events|viewer-raster-brush-system-events|xsheet-scrub) ;;
+  startup|create-scene|open-scene|high-dpi|media-devices|audio-input|audio-recording-wav|audio-playback-wav|camera-formats|audio-output|viewer-render|viewer-vector-render|viewer-zoom-pan|viewer-onion-skin|viewer-onion-skin-rowarea|viewer-onion-skin-rowarea-drag|viewer-onion-skin-fixed-marker-drag|viewer-onion-skin-context-menu|viewer-onion-skin-custom-colors|viewer-onion-skin-orientations|viewer-camera-overlay|viewer-safe-area-field-guide|viewer-safe-area-presets|viewer-safe-area-custom-file|viewer-field-guide-settings|viewer-ruler-guide|viewer-ruler-guide-events|viewer-ruler-guide-variants|viewer-ruler-guide-lines|viewer-ruler-guide-styles|viewer-ruler-ticks|viewer-animate-tool-overlay|viewer-animate-tool-drag|viewer-animate-tool-mouse-events|viewer-animate-tool-undo-redo|viewer-animate-tool-modifiers|viewer-animate-tool-handles|viewer-animate-tool-handle-variants|viewer-animate-tool-axis-drags|viewer-animate-tool-cursors|viewer-selection-tool-vector-handles|viewer-selection-tool-vector-handle-variants|viewer-selection-tool-vector-center-thickness-deform|viewer-vector-brush|viewer-raster-brush|viewer-raster-brush-mouse-events|viewer-raster-brush-tablet-events|viewer-raster-brush-system-events|xsheet-scrub) ;;
   *)
     echo "error: unsupported OPENTOONZ_GUI_SMOKE_ACTION: $smoke_action" >&2
     exit 1
@@ -969,7 +1057,7 @@ while is_smoke_process_running; do
       exit 0
     fi
 
-    if [[ "$smoke_action" == "viewer-render" || "$smoke_action" == "viewer-vector-render" || "$smoke_action" == "viewer-zoom-pan" || "$smoke_action" == "viewer-onion-skin" || "$smoke_action" == "viewer-camera-overlay" || "$smoke_action" == "viewer-safe-area-field-guide" || "$smoke_action" == "viewer-ruler-guide" || "$smoke_action" == "viewer-animate-tool-overlay" || "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-vector-brush" || "$smoke_action" == "viewer-raster-brush" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
+    if [[ "$smoke_action" == "viewer-render" || "$smoke_action" == "viewer-vector-render" || "$smoke_action" == "viewer-zoom-pan" || "$smoke_action" == "viewer-onion-skin" || "$smoke_action" == "viewer-onion-skin-rowarea" || "$smoke_action" == "viewer-onion-skin-rowarea-drag" || "$smoke_action" == "viewer-onion-skin-fixed-marker-drag" || "$smoke_action" == "viewer-onion-skin-context-menu" || "$smoke_action" == "viewer-onion-skin-custom-colors" || "$smoke_action" == "viewer-onion-skin-orientations" || "$smoke_action" == "viewer-camera-overlay" || "$smoke_action" == "viewer-safe-area-field-guide" || "$smoke_action" == "viewer-safe-area-presets" || "$smoke_action" == "viewer-safe-area-custom-file" || "$smoke_action" == "viewer-field-guide-settings" || "$smoke_action" == "viewer-ruler-guide" || "$smoke_action" == "viewer-ruler-guide-events" || "$smoke_action" == "viewer-ruler-guide-variants" || "$smoke_action" == "viewer-ruler-guide-lines" || "$smoke_action" == "viewer-ruler-guide-styles" || "$smoke_action" == "viewer-ruler-ticks" || "$smoke_action" == "viewer-animate-tool-overlay" || "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-animate-tool-handle-variants" || "$smoke_action" == "viewer-animate-tool-axis-drags" || "$smoke_action" == "viewer-animate-tool-cursors" || "$smoke_action" == "viewer-selection-tool-vector-handles" || "$smoke_action" == "viewer-selection-tool-vector-handle-variants" || "$smoke_action" == "viewer-selection-tool-vector-center-thickness-deform" || "$smoke_action" == "viewer-vector-brush" || "$smoke_action" == "viewer-raster-brush" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
       viewer_status_attempts=100
       if [[ "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
         viewer_status_attempts=400
@@ -1005,8 +1093,47 @@ while is_smoke_process_running; do
         viewer_transform_probe="$(status_value viewerTransformProbe || true)"
       fi
       onion_skin_probe="ok"
-      if [[ "$smoke_action" == "viewer-onion-skin" ]]; then
+      onion_skin_ui_probe="ok"
+      onion_skin_drag_probe="ok"
+      onion_skin_menu_probe="ok"
+      onion_skin_custom_color_probe="ok"
+      onion_skin_orientation_probe="ok"
+      xsheet_row_area_probe="ok"
+      xsheet_row_area_high_dpi_probe="ok"
+      if [[ "$smoke_action" == "viewer-onion-skin" || "$smoke_action" == "viewer-onion-skin-rowarea" || "$smoke_action" == "viewer-onion-skin-rowarea-drag" || "$smoke_action" == "viewer-onion-skin-fixed-marker-drag" || "$smoke_action" == "viewer-onion-skin-context-menu" || "$smoke_action" == "viewer-onion-skin-custom-colors" || "$smoke_action" == "viewer-onion-skin-orientations" ]]; then
         onion_skin_probe="$(status_value onionSkinProbe || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-onion-skin-rowarea" ]]; then
+        onion_skin_ui_probe="$(status_value onionSkinUiProbe || true)"
+        xsheet_row_area_probe="$(status_value xsheetRowAreaProbe || true)"
+        xsheet_row_area_high_dpi_probe="$(status_value xsheetRowAreaHighDpiProbe || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-onion-skin-rowarea-drag" ]]; then
+        onion_skin_drag_probe="$(status_value onionSkinDragProbe || true)"
+        xsheet_row_area_probe="$(status_value xsheetRowAreaProbe || true)"
+        xsheet_row_area_high_dpi_probe="$(status_value xsheetRowAreaHighDpiProbe || true)"
+      fi
+      onion_skin_fixed_drag_probe="ok"
+      if [[ "$smoke_action" == "viewer-onion-skin-fixed-marker-drag" ]]; then
+        onion_skin_fixed_drag_probe="$(status_value onionSkinFixedDragProbe || true)"
+        xsheet_row_area_probe="$(status_value xsheetRowAreaProbe || true)"
+        xsheet_row_area_high_dpi_probe="$(status_value xsheetRowAreaHighDpiProbe || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-onion-skin-context-menu" ]]; then
+        onion_skin_menu_probe="$(status_value onionSkinMenuProbe || true)"
+        xsheet_row_area_probe="$(status_value xsheetRowAreaProbe || true)"
+        xsheet_row_area_high_dpi_probe="$(status_value xsheetRowAreaHighDpiProbe || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-onion-skin-custom-colors" ]]; then
+        onion_skin_custom_color_probe="$(status_value onionSkinCustomColorProbe || true)"
+        xsheet_row_area_probe="$(status_value xsheetRowAreaProbe || true)"
+        xsheet_row_area_high_dpi_probe="$(status_value xsheetRowAreaHighDpiProbe || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-onion-skin-orientations" ]]; then
+        onion_skin_orientation_probe="$(status_value onionSkinOrientationProbe || true)"
+        onion_skin_ui_probe="$(status_value onionSkinUiProbe || true)"
+        xsheet_row_area_probe="$(status_value xsheetRowAreaProbe || true)"
+        xsheet_row_area_high_dpi_probe="$(status_value xsheetRowAreaHighDpiProbe || true)"
       fi
       safe_area_probe="ok"
       field_guide_probe="ok"
@@ -1014,9 +1141,48 @@ while is_smoke_process_running; do
         safe_area_probe="$(status_value safeAreaProbe || true)"
         field_guide_probe="$(status_value fieldGuideProbe || true)"
       fi
+      safe_area_preset_probe="ok"
+      if [[ "$smoke_action" == "viewer-safe-area-presets" ]]; then
+        safe_area_preset_probe="$(status_value safeAreaPresetProbe || true)"
+      fi
+      safe_area_custom_file_probe="ok"
+      safe_area_custom_file_restored="true"
+      if [[ "$smoke_action" == "viewer-safe-area-custom-file" ]]; then
+        safe_area_custom_file_probe="$(status_value safeAreaCustomFileProbe || true)"
+        safe_area_custom_file_restored="$(status_value safeAreaCustomFileRestored || true)"
+      fi
+      field_guide_settings_probe="ok"
+      if [[ "$smoke_action" == "viewer-field-guide-settings" ]]; then
+        field_guide_settings_probe="$(status_value fieldGuideSettingsProbe || true)"
+      fi
       ruler_guide_probe="ok"
       if [[ "$smoke_action" == "viewer-ruler-guide" ]]; then
         ruler_guide_probe="$(status_value rulerGuideProbe || true)"
+      fi
+      ruler_guide_event_probe="ok"
+      if [[ "$smoke_action" == "viewer-ruler-guide-events" ]]; then
+        ruler_guide_event_probe="$(status_value rulerGuideEventProbe || true)"
+      fi
+      ruler_guide_variant_probe="ok"
+      if [[ "$smoke_action" == "viewer-ruler-guide-variants" ]]; then
+        ruler_guide_variant_probe="$(status_value rulerGuideVariantProbe || true)"
+      fi
+      ruler_guide_line_probe="ok"
+      if [[ "$smoke_action" == "viewer-ruler-guide-lines" ]]; then
+        ruler_guide_line_probe="$(status_value rulerGuideLineProbe || true)"
+      fi
+      ruler_widget_high_dpi_probe="ok"
+      ruler_style_probe="ok"
+      if [[ "$smoke_action" == "viewer-ruler-guide-styles" ]]; then
+        ruler_style_probe="$(status_value rulerStyleProbe || true)"
+        ruler_widget_high_dpi_probe="$(status_value rulerWidgetHighDpiProbe || true)"
+      fi
+      ruler_tick_probe="ok"
+      ruler_transform_probe="ok"
+      if [[ "$smoke_action" == "viewer-ruler-ticks" ]]; then
+        ruler_tick_probe="$(status_value rulerTickProbe || true)"
+        ruler_widget_high_dpi_probe="$(status_value rulerWidgetHighDpiProbe || true)"
+        ruler_transform_probe="$(status_value rulerTransformProbe || true)"
       fi
       tool_overlay_probe="ok"
       if [[ "$smoke_action" == "viewer-animate-tool-overlay" ]]; then
@@ -1032,6 +1198,42 @@ while is_smoke_process_running; do
         handle_hover_probe="$(status_value handleHoverProbe || true)"
         handle_hit_test_probe="$(status_value handleHitTestProbe || true)"
       fi
+      handle_variant_probe="ok"
+      if [[ "$smoke_action" == "viewer-animate-tool-handle-variants" ]]; then
+        handle_variant_probe="$(status_value handleVariantProbe || true)"
+      fi
+      axis_drag_probe="ok"
+      if [[ "$smoke_action" == "viewer-animate-tool-axis-drags" ]]; then
+        axis_drag_probe="$(status_value axisDragProbe || true)"
+      fi
+      animate_cursor_probe="ok"
+      if [[ "$smoke_action" == "viewer-animate-tool-cursors" ]]; then
+        animate_cursor_probe="$(status_value animateCursorProbe || true)"
+      fi
+      selection_tool_probe="ok"
+      selection_rect_probe="ok"
+      selection_cursor_probe="ok"
+      selection_handle_probe="ok"
+      selection_variant_cursor_probe="ok"
+      selection_variant_handle_probe="ok"
+      selection_advanced_cursor_probe="ok"
+      selection_advanced_handle_probe="ok"
+      if [[ "$smoke_action" == "viewer-selection-tool-vector-handles" || "$smoke_action" == "viewer-selection-tool-vector-handle-variants" || "$smoke_action" == "viewer-selection-tool-vector-center-thickness-deform" ]]; then
+        selection_tool_probe="$(status_value selectionToolProbe || true)"
+        selection_rect_probe="$(status_value selectionRectProbe || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-selection-tool-vector-handles" ]]; then
+        selection_cursor_probe="$(status_value selectionCursorProbe || true)"
+        selection_handle_probe="$(status_value selectionHandleProbe || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-selection-tool-vector-handle-variants" ]]; then
+        selection_variant_cursor_probe="$(status_value selectionVariantCursorProbe || true)"
+        selection_variant_handle_probe="$(status_value selectionVariantHandleProbe || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-selection-tool-vector-center-thickness-deform" ]]; then
+        selection_advanced_cursor_probe="$(status_value selectionAdvancedCursorProbe || true)"
+        selection_advanced_handle_probe="$(status_value selectionAdvancedHandleProbe || true)"
+      fi
       undo_redo_probe="ok"
       if [[ "$smoke_action" == "viewer-animate-tool-undo-redo" ]]; then
         undo_redo_probe="$(status_value undoRedoProbe || true)"
@@ -1044,19 +1246,19 @@ while is_smoke_process_running; do
       fi
       changed_pixels_probe="error"
       if [[ "$changed_pixels" =~ ^[0-9]+$ ]]; then
-        if [[ "$smoke_action" == "viewer-onion-skin" || "$changed_pixels" != "0" ]]; then
+        if [[ "$smoke_action" == "viewer-onion-skin" || "$smoke_action" == "viewer-onion-skin-rowarea" || "$smoke_action" == "viewer-onion-skin-rowarea-drag" || "$smoke_action" == "viewer-onion-skin-fixed-marker-drag" || "$smoke_action" == "viewer-onion-skin-context-menu" || "$smoke_action" == "viewer-onion-skin-custom-colors" || "$smoke_action" == "viewer-onion-skin-orientations" || "$changed_pixels" != "0" ]]; then
           changed_pixels_probe="ok"
         fi
       fi
       red_pixels_probe="ok"
-      if [[ "$smoke_action" != "viewer-ruler-guide" ]]; then
+      if [[ "$smoke_action" != "viewer-field-guide-settings" && "$smoke_action" != "viewer-ruler-guide" && "$smoke_action" != "viewer-ruler-guide-events" && "$smoke_action" != "viewer-ruler-guide-variants" && "$smoke_action" != "viewer-ruler-guide-lines" && "$smoke_action" != "viewer-ruler-guide-styles" ]]; then
         red_pixels_probe="error"
         if [[ "$red_pixels" =~ ^[0-9]+$ && "$red_pixels" != "0" ]]; then
           red_pixels_probe="ok"
         fi
       fi
       neutral_pixels_probe="ok"
-      if [[ "$smoke_action" == "viewer-ruler-guide" ]]; then
+      if [[ "$smoke_action" == "viewer-ruler-guide" || "$smoke_action" == "viewer-ruler-guide-events" || "$smoke_action" == "viewer-ruler-guide-variants" || "$smoke_action" == "viewer-ruler-guide-lines" || "$smoke_action" == "viewer-ruler-guide-styles" ]]; then
         neutral_pixels_probe="error"
         if [[ "$changed_neutral_pixels" =~ ^[0-9]+$ &&
               "$changed_neutral_pixels" != "0" ]]; then
@@ -1064,7 +1266,7 @@ while is_smoke_process_running; do
         fi
       fi
       onion_pixels_probe="ok"
-      if [[ "$smoke_action" == "viewer-onion-skin" ]]; then
+      if [[ "$smoke_action" == "viewer-onion-skin" || "$smoke_action" == "viewer-onion-skin-rowarea" || "$smoke_action" == "viewer-onion-skin-rowarea-drag" || "$smoke_action" == "viewer-onion-skin-fixed-marker-drag" || "$smoke_action" == "viewer-onion-skin-context-menu" || "$smoke_action" == "viewer-onion-skin-orientations" ]]; then
         onion_pixels_probe="error"
         if [[ "$onion_pixels" =~ ^[0-9]+$ &&
               "$baseline_onion_pixels" =~ ^[0-9]+$ &&
@@ -1082,7 +1284,7 @@ while is_smoke_process_running; do
         raster_input_probe="$(status_value rasterInputProbe || true)"
       fi
       mouse_event_probe="ok"
-      if [[ "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" ]]; then
+      if [[ "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-animate-tool-handle-variants" || "$smoke_action" == "viewer-animate-tool-axis-drags" || "$smoke_action" == "viewer-animate-tool-cursors" || "$smoke_action" == "viewer-selection-tool-vector-handles" || "$smoke_action" == "viewer-selection-tool-vector-handle-variants" || "$smoke_action" == "viewer-selection-tool-vector-center-thickness-deform" ]]; then
         mouse_event_probe="$(status_value mouseEventProbe || true)"
       fi
       tablet_event_probe="ok"
@@ -1099,13 +1301,43 @@ while is_smoke_process_running; do
             "$raster_input_probe" != "ok" ||
             "$viewer_transform_probe" != "ok" ||
             "$onion_skin_probe" != "ok" ||
+            "$onion_skin_ui_probe" != "ok" ||
+            "$onion_skin_drag_probe" != "ok" ||
+            "$onion_skin_fixed_drag_probe" != "ok" ||
+            "$onion_skin_menu_probe" != "ok" ||
+            "$onion_skin_custom_color_probe" != "ok" ||
+            "$onion_skin_orientation_probe" != "ok" ||
+            "$xsheet_row_area_probe" != "ok" ||
+            "$xsheet_row_area_high_dpi_probe" != "ok" ||
             "$safe_area_probe" != "ok" ||
+            "$safe_area_preset_probe" != "ok" ||
+            "$safe_area_custom_file_probe" != "ok" ||
+            "$safe_area_custom_file_restored" != "true" ||
             "$field_guide_probe" != "ok" ||
+            "$field_guide_settings_probe" != "ok" ||
             "$ruler_guide_probe" != "ok" ||
+            "$ruler_guide_event_probe" != "ok" ||
+            "$ruler_guide_variant_probe" != "ok" ||
+            "$ruler_guide_line_probe" != "ok" ||
+            "$ruler_style_probe" != "ok" ||
+            "$ruler_tick_probe" != "ok" ||
+            "$ruler_widget_high_dpi_probe" != "ok" ||
+            "$ruler_transform_probe" != "ok" ||
             "$tool_overlay_probe" != "ok" ||
             "$tool_transform_probe" != "ok" ||
             "$handle_hover_probe" != "ok" ||
             "$handle_hit_test_probe" != "ok" ||
+            "$handle_variant_probe" != "ok" ||
+            "$axis_drag_probe" != "ok" ||
+            "$animate_cursor_probe" != "ok" ||
+            "$selection_tool_probe" != "ok" ||
+            "$selection_rect_probe" != "ok" ||
+            "$selection_cursor_probe" != "ok" ||
+            "$selection_handle_probe" != "ok" ||
+            "$selection_variant_cursor_probe" != "ok" ||
+            "$selection_variant_handle_probe" != "ok" ||
+            "$selection_advanced_cursor_probe" != "ok" ||
+            "$selection_advanced_handle_probe" != "ok" ||
             "$undo_redo_probe" != "ok" ||
             "$modifier_probe" != "ok" ||
             "$cursor_precise_probe" != "ok" ||
@@ -1146,6 +1378,44 @@ while is_smoke_process_running; do
           echo "Onion skin: row $(status_value onionSkinCurrentRow || true), back offset $(status_value onionSkinBackOffset || true), mobile count $(status_value onionSkinMosCount || true)"
           echo "Onion pixels: ${baseline_onion_pixels} -> ${onion_pixels}"
         fi
+        if [[ "$smoke_action" == "viewer-onion-skin-rowarea" ]]; then
+          echo "Onion row area: row $(status_value onionSkinCurrentRow || true), MOS $(status_value onionSkinMosCount || true), FOS $(status_value onionSkinFosCount || true), rows $(status_value onionSkinRows || true)"
+          echo "Onion toggles: markers $(status_value onionSkinEnabledAfterMarkers || true), disabled $(status_value onionSkinEnabledAfterDisable || true), enabled $(status_value onionSkinEnabledAfterEnable || true)"
+          echo "Row area pixels: changed $(status_value xsheetRowAreaChangedPixels || true), non-background $(status_value xsheetRowAreaNonBackgroundPixels || true)"
+          echo "Onion pixels: ${baseline_onion_pixels} -> ${onion_pixels}"
+        fi
+        if [[ "$smoke_action" == "viewer-onion-skin-rowarea-drag" ]]; then
+          echo "Onion row area drag: row $(status_value onionSkinCurrentRow || true), MOS $(status_value onionSkinMosCount || true), FOS $(status_value onionSkinFosCount || true), rows $(status_value onionSkinRows || true), range $(status_value onionSkinMosRange || true)"
+          echo "Row area drag: delivered $(status_value rowAreaDragEventDelivered || true), points $(status_value rowAreaDragPoints || true)"
+          echo "Row area pixels: changed $(status_value xsheetRowAreaChangedPixels || true), non-background $(status_value xsheetRowAreaNonBackgroundPixels || true)"
+          echo "Onion pixels: ${baseline_onion_pixels} -> ${onion_pixels}"
+        fi
+        if [[ "$smoke_action" == "viewer-onion-skin-fixed-marker-drag" ]]; then
+          echo "Fixed onion marker drag: row $(status_value onionSkinCurrentRow || true), MOS $(status_value onionSkinMosCount || true), FOS $(status_value onionSkinFosCount || true), rows $(status_value onionSkinRows || true)"
+          echo "Fixed onion marker counts: add $(status_value onionSkinFosCountAfterAddBack || true), remove $(status_value onionSkinFosCountAfterRemoveBack || true), final $(status_value onionSkinFosCount || true)"
+          echo "Fixed onion marker events: add $(status_value rowAreaAddFixedDragDelivered || true), remove $(status_value rowAreaRemoveFixedDragDelivered || true), front $(status_value rowAreaAddFrontFixedDragDelivered || true)"
+          echo "Row area pixels: changed $(status_value xsheetRowAreaChangedPixels || true), non-background $(status_value xsheetRowAreaNonBackgroundPixels || true)"
+          echo "Onion pixels: ${baseline_onion_pixels} -> ${onion_pixels}"
+        fi
+        if [[ "$smoke_action" == "viewer-onion-skin-context-menu" ]]; then
+          echo "Onion context menu: row $(status_value onionSkinCurrentRow || true), MOS $(status_value onionSkinMosCount || true), FOS $(status_value onionSkinFosCount || true), rows $(status_value onionSkinRows || true), range $(status_value onionSkinMosRange || true)"
+          echo "Onion commands: activate $(status_value onionSkinActivateCommand || true), deactivate $(status_value onionSkinDeactivateCommand || true), extend $(status_value onionSkinExtendCommand || true), limit $(status_value onionSkinLimitCommand || true), clear fixed $(status_value onionSkinClearFixedCommand || true), clear relative $(status_value onionSkinClearRelativeCommand || true), clear all $(status_value onionSkinClearAllCommand || true)"
+          echo "Row area pixels: changed $(status_value xsheetRowAreaChangedPixels || true), non-background $(status_value xsheetRowAreaNonBackgroundPixels || true)"
+          echo "Onion pixels: ${baseline_onion_pixels} -> ${onion_pixels}"
+        fi
+        if [[ "$smoke_action" == "viewer-onion-skin-custom-colors" ]]; then
+          echo "Onion custom colors: back $(status_value onionSkinBackColor || true), front $(status_value onionSkinFrontColor || true)"
+          echo "Onion color pixels: viewer back $(status_value viewerBackColorPixels || true), viewer front $(status_value viewerFrontColorPixels || true), row back $(status_value xsheetRowAreaBackColorPixels || true), row front $(status_value xsheetRowAreaFrontColorPixels || true)"
+          echo "Onion rows: row $(status_value onionSkinCurrentRow || true), MOS $(status_value onionSkinMosCount || true), rows $(status_value onionSkinRows || true)"
+          echo "Onion pixels: ${baseline_onion_pixels} -> ${onion_pixels}"
+        fi
+        if [[ "$smoke_action" == "viewer-onion-skin-orientations" ]]; then
+          echo "Onion orientations: $(status_value orientationBefore || true) -> $(status_value orientationAfter || true)"
+          echo "Vertical row area pixels: changed $(status_value verticalRowAreaChangedPixels || true), non-background $(status_value verticalRowAreaNonBackgroundPixels || true)"
+          echo "Horizontal row area pixels: changed $(status_value horizontalRowAreaChangedPixels || true), non-background $(status_value horizontalRowAreaNonBackgroundPixels || true)"
+          echo "Onion rows: row $(status_value onionSkinCurrentRow || true), MOS $(status_value onionSkinMosCount || true), FOS $(status_value onionSkinFosCount || true), rows $(status_value onionSkinRows || true)"
+          echo "Onion pixels: ${baseline_onion_pixels} -> ${onion_pixels}"
+        fi
         if [[ "$smoke_action" == "viewer-camera-overlay" ]]; then
           echo "Camera overlay: disabled $(status_value cameraOverlayDisabled || true), enabled $(status_value cameraOverlayEnabled || true)"
         fi
@@ -1154,6 +1424,24 @@ while is_smoke_process_running; do
           echo "Field guide: disabled $(status_value fieldGuideDisabled || true), enabled $(status_value fieldGuideEnabled || true)"
           echo "Gray pixels: $(status_value grayPixels || true), changed gray pixels: $(status_value changedGrayPixels || true)"
         fi
+        if [[ "$smoke_action" == "viewer-safe-area-presets" ]]; then
+          echo "Safe area preset: $(status_value safeAreaNameDefault || true) -> $(status_value safeAreaNameCustom || true), stored $(status_value storedSafeAreaName || true)"
+          echo "Default safe area pixels: red $(status_value defaultSafeAreaRedPixels || true), changed red $(status_value defaultSafeAreaChangedRedPixels || true)"
+          echo "Custom safe area pixels: red $(status_value customSafeAreaRedPixels || true), green $(status_value customSafeAreaGreenPixels || true), blue $(status_value customSafeAreaBluePixels || true)"
+          echo "Safe area preset delta: changed $(status_value safeAreaPresetChangedPixels || true), green $(status_value safeAreaPresetChangedGreenPixels || true), blue $(status_value safeAreaPresetChangedBluePixels || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-safe-area-custom-file" ]]; then
+          echo "Custom safe area file: written $(status_value customSafeAreaFileWritten || true), restored $(status_value safeAreaCustomFileRestored || true)"
+          echo "Custom safe area preset: $(status_value customSafeAreaName || true), stored $(status_value storedSafeAreaName || true)"
+          echo "Custom safe area pixels: red $(status_value customSafeAreaRedPixels || true), green $(status_value customSafeAreaGreenPixels || true), blue $(status_value customSafeAreaBluePixels || true)"
+          echo "Custom safe area changed pixels: red $(status_value customSafeAreaChangedRedPixels || true), green $(status_value customSafeAreaChangedGreenPixels || true), blue $(status_value customSafeAreaChangedBluePixels || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-field-guide-settings" ]]; then
+          echo "Field guide overlay: disabled $(status_value fieldGuideDisabled || true), enabled $(status_value fieldGuideEnabled || true)"
+          echo "Field guide settings: size $(status_value initialFieldGuideSize || true) -> $(status_value firstFieldGuideSize || true) -> $(status_value secondFieldGuideSize || true), aspect $(status_value initialFieldGuideAspectRatio || true) -> $(status_value firstFieldGuideAspectRatio || true) -> $(status_value secondFieldGuideAspectRatio || true)"
+          echo "Field guide pixels: first gray $(status_value firstFieldGuideGrayPixels || true), changed $(status_value firstFieldGuideChangedGrayPixels || true); second gray $(status_value secondFieldGuideGrayPixels || true), changed $(status_value secondFieldGuideChangedGrayPixels || true)"
+          echo "Field guide settings delta: changed $(status_value fieldGuideSettingsChangedPixels || true), gray $(status_value fieldGuideSettingsChangedGrayPixels || true)"
+        fi
         if [[ "$smoke_action" == "viewer-ruler-guide" ]]; then
           echo "Guide overlay: disabled $(status_value viewGuideDisabled || true), enabled $(status_value viewGuideEnabled || true)"
           echo "Ruler overlay: disabled $(status_value viewRulerDisabled || true), enabled $(status_value viewRulerEnabled || true)"
@@ -1161,10 +1449,49 @@ while is_smoke_process_running; do
           echo "Ruler widgets: $(status_value visibleRulerWidgetCount || true) visible of $(status_value rulerWidgetCount || true)"
           echo "Gray pixels: $(status_value grayPixels || true), changed gray pixels: $(status_value changedGrayPixels || true), changed neutral pixels: $(status_value changedNeutralPixels || true)"
         fi
-        if [[ "$smoke_action" == "viewer-animate-tool-overlay" || "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-vector-brush" || "$smoke_action" == "viewer-raster-brush" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
+        if [[ "$smoke_action" == "viewer-ruler-guide-events" ]]; then
+          echo "Guide/ruler overlays: guide $(status_value viewGuideEnabled || true), ruler $(status_value viewRulerEnabled || true)"
+          echo "Horizontal guides: $(status_value horizontalGuideCountBefore || true) -> $(status_value horizontalGuideCountAfterMove || true) -> $(status_value horizontalGuideCountAfterDelete || true)"
+          echo "Vertical guides: $(status_value verticalGuideCountBefore || true) -> $(status_value verticalGuideCountAfterMove || true) -> $(status_value verticalGuideCountAfterDelete || true)"
+          echo "Guide values: H $(status_value horizontalGuideStart || true) -> $(status_value horizontalGuideAfterMove || true) -> deleted, V $(status_value verticalGuideStart || true) -> $(status_value verticalGuideAfterMove || true)"
+          echo "Ruler widgets: $(status_value visibleRulerWidgetCount || true) visible of $(status_value rulerWidgetCount || true)"
+          echo "Gray pixels: $(status_value grayPixels || true), changed gray pixels: $(status_value changedGrayPixels || true), changed neutral pixels: $(status_value changedNeutralPixels || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-ruler-guide-variants" ]]; then
+          echo "Guide/ruler overlays: guide $(status_value viewGuideEnabled || true), ruler $(status_value viewRulerEnabled || true)"
+          echo "Horizontal hide variant: $(status_value horizontalGuideCountBefore || true) -> $(status_value horizontalGuideCountAfterCreate || true) -> $(status_value horizontalGuideCountAfterHide || true) -> $(status_value horizontalGuideCountFinal || true)"
+          echo "Vertical hide variant: $(status_value verticalGuideCountBefore || true) -> $(status_value verticalGuideCountAfterCreate || true) -> $(status_value verticalGuideCountAfterHide || true) -> $(status_value verticalGuideCountFinal || true)"
+          echo "Hide endpoints: H $(status_value horizontalHideEnd || true), V $(status_value verticalHideEnd || true)"
+          echo "Ruler widgets: $(status_value visibleRulerWidgetCount || true) visible of $(status_value rulerWidgetCount || true)"
+          echo "Guide pixels: changed neutral pixels $(status_value changedNeutralPixels || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-ruler-guide-lines" ]]; then
+          echo "Guide/ruler overlays: guide $(status_value viewGuideEnabled || true), ruler $(status_value viewRulerEnabled || true)"
+          echo "Guide line positions: H $(status_value firstHGuides || true) -> $(status_value secondHGuides || true), V $(status_value firstVGuides || true) -> $(status_value secondVGuides || true)"
+          echo "First guide lines: neutral $(status_value firstGuideLineChangedNeutralPixels || true), columns $(status_value firstVerticalGuideLineColumns || true), rows $(status_value firstHorizontalGuideLineRows || true), dash V/H $(status_value firstVerticalGuideLineDashSegments || true)/$(status_value firstHorizontalGuideLineDashSegments || true)"
+          echo "Second guide lines: neutral $(status_value secondGuideLineChangedNeutralPixels || true), columns $(status_value secondVerticalGuideLineColumns || true), rows $(status_value secondHorizontalGuideLineRows || true), dash V/H $(status_value secondVerticalGuideLineDashSegments || true)/$(status_value secondHorizontalGuideLineDashSegments || true)"
+          echo "Guide line bands: first V/H $(status_value firstVerticalGuideBandPixels || true)/$(status_value firstHorizontalGuideBandPixels || true), second V/H $(status_value secondVerticalGuideBandPixels || true)/$(status_value secondHorizontalGuideBandPixels || true)"
+          echo "Moved guide lines: neutral $(status_value movedGuideLineChangedNeutralPixels || true), columns $(status_value movedVerticalGuideLineColumns || true), rows $(status_value movedHorizontalGuideLineRows || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-ruler-guide-styles" ]]; then
+          echo "Guide/ruler overlays: guide $(status_value viewGuideEnabled || true), ruler $(status_value viewRulerEnabled || true)"
+          echo "Ruler style colors: background $(status_value rulerStyleBackgroundColor || true), scale $(status_value rulerStyleScaleColor || true), handle $(status_value rulerStyleHandleColor || true)"
+          echo "Horizontal ruler style pixels: background $(status_value horizontalRulerStyleBackgroundPixels || true), handle $(status_value horizontalRulerStyleHandlePixels || true), scale $(status_value horizontalRulerStyleScalePixels || true), changed $(status_value horizontalRulerChangedPixels || true)"
+          echo "Vertical ruler style pixels: background $(status_value verticalRulerStyleBackgroundPixels || true), handle $(status_value verticalRulerStyleHandlePixels || true), scale $(status_value verticalRulerStyleScalePixels || true), changed $(status_value verticalRulerChangedPixels || true)"
+          echo "Ruler widgets: $(status_value visibleRulerWidgetCount || true) visible of $(status_value rulerWidgetCount || true)"
+          echo "Guide pixels: changed neutral pixels $(status_value changedNeutralPixels || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-ruler-ticks" ]]; then
+          echo "Ruler overlays: guide disabled $(status_value viewGuideDisabled || true), ruler enabled $(status_value viewRulerEnabled || true)"
+          echo "Ruler widgets: $(status_value visibleRulerWidgetCount || true) visible of $(status_value rulerWidgetCount || true)"
+          echo "Horizontal ruler ticks: $(status_value horizontalRulerTickPixelsBefore || true) -> $(status_value horizontalRulerTickPixelsAfter || true), changed $(status_value horizontalRulerChangedPixels || true)"
+          echo "Vertical ruler ticks: $(status_value verticalRulerTickPixelsBefore || true) -> $(status_value verticalRulerTickPixelsAfter || true), changed $(status_value verticalRulerChangedPixels || true)"
+          echo "Ruler units: H $(status_value horizontalRulerUnit || true), V $(status_value verticalRulerUnit || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-animate-tool-overlay" || "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-animate-tool-handle-variants" || "$smoke_action" == "viewer-animate-tool-axis-drags" || "$smoke_action" == "viewer-selection-tool-vector-handles" || "$smoke_action" == "viewer-selection-tool-vector-handle-variants" || "$smoke_action" == "viewer-selection-tool-vector-center-thickness-deform" || "$smoke_action" == "viewer-vector-brush" || "$smoke_action" == "viewer-raster-brush" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
           echo "Tool: $(status_value toolName || true)"
         fi
-        if [[ "$smoke_action" == "viewer-animate-tool-overlay" || "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" ]]; then
+        if [[ "$smoke_action" == "viewer-animate-tool-overlay" || "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-animate-tool-handle-variants" || "$smoke_action" == "viewer-animate-tool-axis-drags" || "$smoke_action" == "viewer-animate-tool-cursors" ]]; then
           echo "Stage object: $(status_value stageObject || true)"
         fi
         if [[ "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" ]]; then
@@ -1190,6 +1517,40 @@ while is_smoke_process_running; do
           echo "Center: $(status_value centerBefore || true) -> $(status_value centerAfterCenterHandle || true)"
           echo "Hover changed pixels: $(status_value hoverChangedPixels || true)"
         fi
+        if [[ "$smoke_action" == "viewer-animate-tool-handle-variants" ]]; then
+          echo "Handle variants: translation $(status_value translationBefore || true) -> $(status_value translationAfter || true)"
+          echo "Handle variants: scaleXY $(status_value scaleXBefore || true),$(status_value scaleYBefore || true) -> $(status_value scaleXAfterScaleXYHandle || true),$(status_value scaleYAfterScaleXYHandle || true), shear $(status_value shearXBefore || true),$(status_value shearYBefore || true) -> $(status_value shearXAfterShearHandle || true),$(status_value shearYAfterShearHandle || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-animate-tool-axis-drags" ]]; then
+          echo "Axis drags: position $(status_value animateAxisPositionBefore || true) -> $(status_value animateAxisPositionAfter || true), rotation $(status_value animateAxisRotationBefore || true) -> $(status_value animateAxisRotationAfter || true)"
+          echo "Axis drags: scale $(status_value animateAxisScaleBefore || true) -> $(status_value animateAxisScaleAfter || true), shear $(status_value animateAxisShearBefore || true) -> $(status_value animateAxisShearAfter || true), center $(status_value animateAxisCenterBefore || true) -> $(status_value animateAxisCenterAfter || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-animate-tool-cursors" ]]; then
+          echo "Animate/Edit cursors: position $(status_value animateCursorPositionNormalCursor || true)/$(status_value animateCursorPositionAltCursor || true), rotation $(status_value animateCursorRotationNormalCursor || true)/$(status_value animateCursorRotationAltCursor || true)"
+          echo "Animate/Edit cursors: scale $(status_value animateCursorScaleNormalCursor || true)/$(status_value animateCursorScaleAltCursor || true), shear $(status_value animateCursorShearNormalCursor || true)/$(status_value animateCursorShearAltCursor || true), center $(status_value animateCursorCenterNormalCursor || true)/$(status_value animateCursorCenterAltCursor || true)"
+          echo "Animate/Edit cursor artwork: position $(status_value animateCursorPositionNormalArtwork || true) / $(status_value animateCursorPositionAltArtwork || true)"
+          echo "Animate/Edit cursor artwork: rotation $(status_value animateCursorRotationNormalArtwork || true) / $(status_value animateCursorRotationAltArtwork || true)"
+          echo "Animate/Edit cursor artwork: scale $(status_value animateCursorScaleNormalArtwork || true) / $(status_value animateCursorScaleAltArtwork || true)"
+          echo "Animate/Edit cursor artwork: shear $(status_value animateCursorShearNormalArtwork || true) / $(status_value animateCursorShearAltArtwork || true)"
+          echo "Animate/Edit cursor artwork: center $(status_value animateCursorCenterNormalArtwork || true) / $(status_value animateCursorCenterAltArtwork || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-selection-tool-vector-handles" ]]; then
+          echo "Selection tool: mode $(status_value selectionMode || true), type $(status_value selectionType || true), count $(status_value selectionCount || true), stroke 0 selected $(status_value selectionStroke0Selected || true)"
+          echo "Selection bbox: $(status_value selectionBBoxBeforeScale || true) -> $(status_value selectionBBoxAfterScale || true), delta $(status_value selectionBBoxWidthDelta || true),$(status_value selectionBBoxHeightDelta || true)"
+          echo "Selection cursor: id $(status_value selectionScaleCursorId || true), artwork $(status_value selectionScaleCursorArtwork || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-selection-tool-vector-handle-variants" ]]; then
+          echo "Selection tool: mode $(status_value selectionMode || true), type $(status_value selectionType || true), count $(status_value selectionCount || true), stroke 0 selected $(status_value selectionStroke0Selected || true)"
+          echo "Selection horizontal scale: $(status_value selectionBBoxBeforeHorizontalScale || true) -> $(status_value selectionBBoxAfterHorizontalScale || true), delta $(status_value selectionHorizontalWidthDelta || true), cursor $(status_value selectionHorizontalScaleCursorId || true)/$(status_value selectionHorizontalScaleCursorArtwork || true)"
+          echo "Selection vertical scale: $(status_value selectionBBoxBeforeVerticalScale || true) -> $(status_value selectionBBoxAfterVerticalScale || true), delta $(status_value selectionVerticalHeightDelta || true), cursor $(status_value selectionVerticalScaleCursorId || true)/$(status_value selectionVerticalScaleCursorArtwork || true)"
+          echo "Selection rotation: $(status_value selectionBBoxBeforeRotation || true) -> $(status_value selectionBBoxAfterRotation || true), cursor $(status_value selectionRotationCursorId || true)/$(status_value selectionRotationCursorArtwork || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-selection-tool-vector-center-thickness-deform" ]]; then
+          echo "Selection tool: mode $(status_value selectionMode || true), type $(status_value selectionType || true), count $(status_value selectionCount || true), stroke 0 selected $(status_value selectionStroke0Selected || true)"
+          echo "Selection center: $(status_value selectionCenterBefore || true) -> $(status_value selectionCenterAfter || true), delta $(status_value selectionCenterDelta || true), cursor $(status_value selectionCenterCursorId || true)/$(status_value selectionCenterCursorArtwork || true)"
+          echo "Selection thickness: $(status_value selectionThicknessBefore || true) -> $(status_value selectionThicknessAfter || true), delta $(status_value selectionThicknessDelta || true), cursor $(status_value selectionThicknessCursorId || true)/$(status_value selectionThicknessCursorArtwork || true)"
+          echo "Selection free deform: $(status_value selectionBBoxBeforeDeform || true) -> $(status_value selectionBBoxAfterDeform || true), cursor $(status_value selectionDeformCursorId || true)/$(status_value selectionDeformCursorArtwork || true)"
+        fi
         if [[ "$smoke_action" == "viewer-vector-brush" ]]; then
           echo "Strokes: $(status_value strokesBefore || true) -> $(status_value strokesAfter || true)"
         fi
@@ -1197,7 +1558,7 @@ while is_smoke_process_running; do
           echo "Raster pixels: $(status_value rasterPixelsBefore || true) -> $(status_value rasterPixelsAfter || true)"
           echo "Raster red pixels: $(status_value rasterRedPixelsBefore || true) -> $(status_value rasterRedPixelsAfter || true)"
         fi
-        if [[ "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
+        if [[ "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-animate-tool-handle-variants" || "$smoke_action" == "viewer-animate-tool-axis-drags" || "$smoke_action" == "viewer-animate-tool-cursors" || "$smoke_action" == "viewer-selection-tool-vector-handles" || "$smoke_action" == "viewer-selection-tool-vector-handle-variants" || "$smoke_action" == "viewer-selection-tool-vector-center-thickness-deform" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
           echo "Input path: $(status_value toolInputPath || true)"
         fi
         if [[ "$smoke_action" == "viewer-raster-brush-tablet-events" ]]; then
@@ -1227,6 +1588,44 @@ while is_smoke_process_running; do
         echo "Onion skin: row $(status_value onionSkinCurrentRow || true), back offset $(status_value onionSkinBackOffset || true), mobile count $(status_value onionSkinMosCount || true)"
         echo "Onion pixels: ${baseline_onion_pixels} -> ${onion_pixels}"
       fi
+      if [[ "$smoke_action" == "viewer-onion-skin-rowarea" ]]; then
+        echo "Onion row area: row $(status_value onionSkinCurrentRow || true), MOS $(status_value onionSkinMosCount || true), FOS $(status_value onionSkinFosCount || true), rows $(status_value onionSkinRows || true)"
+        echo "Onion toggles: markers $(status_value onionSkinEnabledAfterMarkers || true), disabled $(status_value onionSkinEnabledAfterDisable || true), enabled $(status_value onionSkinEnabledAfterEnable || true)"
+        echo "Row area pixels: changed $(status_value xsheetRowAreaChangedPixels || true), non-background $(status_value xsheetRowAreaNonBackgroundPixels || true)"
+        echo "Onion pixels: ${baseline_onion_pixels} -> ${onion_pixels}"
+      fi
+      if [[ "$smoke_action" == "viewer-onion-skin-rowarea-drag" ]]; then
+        echo "Onion row area drag: row $(status_value onionSkinCurrentRow || true), MOS $(status_value onionSkinMosCount || true), FOS $(status_value onionSkinFosCount || true), rows $(status_value onionSkinRows || true), range $(status_value onionSkinMosRange || true)"
+        echo "Row area drag: delivered $(status_value rowAreaDragEventDelivered || true), points $(status_value rowAreaDragPoints || true)"
+        echo "Row area pixels: changed $(status_value xsheetRowAreaChangedPixels || true), non-background $(status_value xsheetRowAreaNonBackgroundPixels || true)"
+        echo "Onion pixels: ${baseline_onion_pixels} -> ${onion_pixels}"
+      fi
+      if [[ "$smoke_action" == "viewer-onion-skin-fixed-marker-drag" ]]; then
+        echo "Fixed onion marker drag: row $(status_value onionSkinCurrentRow || true), MOS $(status_value onionSkinMosCount || true), FOS $(status_value onionSkinFosCount || true), rows $(status_value onionSkinRows || true)"
+        echo "Fixed onion marker counts: add $(status_value onionSkinFosCountAfterAddBack || true), remove $(status_value onionSkinFosCountAfterRemoveBack || true), final $(status_value onionSkinFosCount || true)"
+        echo "Fixed onion marker events: add $(status_value rowAreaAddFixedDragDelivered || true), remove $(status_value rowAreaRemoveFixedDragDelivered || true), front $(status_value rowAreaAddFrontFixedDragDelivered || true)"
+        echo "Row area pixels: changed $(status_value xsheetRowAreaChangedPixels || true), non-background $(status_value xsheetRowAreaNonBackgroundPixels || true)"
+        echo "Onion pixels: ${baseline_onion_pixels} -> ${onion_pixels}"
+      fi
+      if [[ "$smoke_action" == "viewer-onion-skin-context-menu" ]]; then
+        echo "Onion context menu: row $(status_value onionSkinCurrentRow || true), MOS $(status_value onionSkinMosCount || true), FOS $(status_value onionSkinFosCount || true), rows $(status_value onionSkinRows || true), range $(status_value onionSkinMosRange || true)"
+        echo "Onion commands: activate $(status_value onionSkinActivateCommand || true), deactivate $(status_value onionSkinDeactivateCommand || true), extend $(status_value onionSkinExtendCommand || true), limit $(status_value onionSkinLimitCommand || true), clear fixed $(status_value onionSkinClearFixedCommand || true), clear relative $(status_value onionSkinClearRelativeCommand || true), clear all $(status_value onionSkinClearAllCommand || true)"
+        echo "Row area pixels: changed $(status_value xsheetRowAreaChangedPixels || true), non-background $(status_value xsheetRowAreaNonBackgroundPixels || true)"
+        echo "Onion pixels: ${baseline_onion_pixels} -> ${onion_pixels}"
+      fi
+      if [[ "$smoke_action" == "viewer-onion-skin-custom-colors" ]]; then
+        echo "Onion custom colors: back $(status_value onionSkinBackColor || true), front $(status_value onionSkinFrontColor || true)"
+        echo "Onion color pixels: viewer back $(status_value viewerBackColorPixels || true), viewer front $(status_value viewerFrontColorPixels || true), row back $(status_value xsheetRowAreaBackColorPixels || true), row front $(status_value xsheetRowAreaFrontColorPixels || true)"
+        echo "Onion rows: row $(status_value onionSkinCurrentRow || true), MOS $(status_value onionSkinMosCount || true), rows $(status_value onionSkinRows || true)"
+        echo "Onion pixels: ${baseline_onion_pixels} -> ${onion_pixels}"
+      fi
+      if [[ "$smoke_action" == "viewer-onion-skin-orientations" ]]; then
+        echo "Onion orientations: $(status_value orientationBefore || true) -> $(status_value orientationAfter || true)"
+        echo "Vertical row area pixels: changed $(status_value verticalRowAreaChangedPixels || true), non-background $(status_value verticalRowAreaNonBackgroundPixels || true)"
+        echo "Horizontal row area pixels: changed $(status_value horizontalRowAreaChangedPixels || true), non-background $(status_value horizontalRowAreaNonBackgroundPixels || true)"
+        echo "Onion rows: row $(status_value onionSkinCurrentRow || true), MOS $(status_value onionSkinMosCount || true), FOS $(status_value onionSkinFosCount || true), rows $(status_value onionSkinRows || true)"
+        echo "Onion pixels: ${baseline_onion_pixels} -> ${onion_pixels}"
+      fi
       if [[ "$smoke_action" == "viewer-camera-overlay" ]]; then
         echo "Camera overlay: disabled $(status_value cameraOverlayDisabled || true), enabled $(status_value cameraOverlayEnabled || true)"
       fi
@@ -1235,6 +1634,24 @@ while is_smoke_process_running; do
         echo "Field guide: disabled $(status_value fieldGuideDisabled || true), enabled $(status_value fieldGuideEnabled || true)"
         echo "Gray pixels: $(status_value grayPixels || true), changed gray pixels: $(status_value changedGrayPixels || true)"
       fi
+      if [[ "$smoke_action" == "viewer-safe-area-presets" ]]; then
+        echo "Safe area preset: $(status_value safeAreaNameDefault || true) -> $(status_value safeAreaNameCustom || true), stored $(status_value storedSafeAreaName || true)"
+        echo "Default safe area pixels: red $(status_value defaultSafeAreaRedPixels || true), changed red $(status_value defaultSafeAreaChangedRedPixels || true)"
+        echo "Custom safe area pixels: red $(status_value customSafeAreaRedPixels || true), green $(status_value customSafeAreaGreenPixels || true), blue $(status_value customSafeAreaBluePixels || true)"
+        echo "Safe area preset delta: changed $(status_value safeAreaPresetChangedPixels || true), green $(status_value safeAreaPresetChangedGreenPixels || true), blue $(status_value safeAreaPresetChangedBluePixels || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-safe-area-custom-file" ]]; then
+        echo "Custom safe area file: written $(status_value customSafeAreaFileWritten || true), restored $(status_value safeAreaCustomFileRestored || true)"
+        echo "Custom safe area preset: $(status_value customSafeAreaName || true), stored $(status_value storedSafeAreaName || true)"
+        echo "Custom safe area pixels: red $(status_value customSafeAreaRedPixels || true), green $(status_value customSafeAreaGreenPixels || true), blue $(status_value customSafeAreaBluePixels || true)"
+        echo "Custom safe area changed pixels: red $(status_value customSafeAreaChangedRedPixels || true), green $(status_value customSafeAreaChangedGreenPixels || true), blue $(status_value customSafeAreaChangedBluePixels || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-field-guide-settings" ]]; then
+        echo "Field guide overlay: disabled $(status_value fieldGuideDisabled || true), enabled $(status_value fieldGuideEnabled || true)"
+        echo "Field guide settings: size $(status_value initialFieldGuideSize || true) -> $(status_value firstFieldGuideSize || true) -> $(status_value secondFieldGuideSize || true), aspect $(status_value initialFieldGuideAspectRatio || true) -> $(status_value firstFieldGuideAspectRatio || true) -> $(status_value secondFieldGuideAspectRatio || true)"
+        echo "Field guide pixels: first gray $(status_value firstFieldGuideGrayPixels || true), changed $(status_value firstFieldGuideChangedGrayPixels || true); second gray $(status_value secondFieldGuideGrayPixels || true), changed $(status_value secondFieldGuideChangedGrayPixels || true)"
+        echo "Field guide settings delta: changed $(status_value fieldGuideSettingsChangedPixels || true), gray $(status_value fieldGuideSettingsChangedGrayPixels || true)"
+      fi
       if [[ "$smoke_action" == "viewer-ruler-guide" ]]; then
         echo "Guide overlay: disabled $(status_value viewGuideDisabled || true), enabled $(status_value viewGuideEnabled || true)"
         echo "Ruler overlay: disabled $(status_value viewRulerDisabled || true), enabled $(status_value viewRulerEnabled || true)"
@@ -1242,10 +1659,49 @@ while is_smoke_process_running; do
         echo "Ruler widgets: $(status_value visibleRulerWidgetCount || true) visible of $(status_value rulerWidgetCount || true)"
         echo "Gray pixels: $(status_value grayPixels || true), changed gray pixels: $(status_value changedGrayPixels || true), changed neutral pixels: $(status_value changedNeutralPixels || true)"
       fi
-      if [[ "$smoke_action" == "viewer-animate-tool-overlay" || "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-vector-brush" || "$smoke_action" == "viewer-raster-brush" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
+      if [[ "$smoke_action" == "viewer-ruler-guide-events" ]]; then
+        echo "Guide/ruler overlays: guide $(status_value viewGuideEnabled || true), ruler $(status_value viewRulerEnabled || true)"
+        echo "Horizontal guides: $(status_value horizontalGuideCountBefore || true) -> $(status_value horizontalGuideCountAfterMove || true) -> $(status_value horizontalGuideCountAfterDelete || true)"
+        echo "Vertical guides: $(status_value verticalGuideCountBefore || true) -> $(status_value verticalGuideCountAfterMove || true) -> $(status_value verticalGuideCountAfterDelete || true)"
+        echo "Guide values: H $(status_value horizontalGuideStart || true) -> $(status_value horizontalGuideAfterMove || true) -> deleted, V $(status_value verticalGuideStart || true) -> $(status_value verticalGuideAfterMove || true)"
+        echo "Ruler widgets: $(status_value visibleRulerWidgetCount || true) visible of $(status_value rulerWidgetCount || true)"
+        echo "Gray pixels: $(status_value grayPixels || true), changed gray pixels: $(status_value changedGrayPixels || true), changed neutral pixels: $(status_value changedNeutralPixels || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-ruler-guide-variants" ]]; then
+        echo "Guide/ruler overlays: guide $(status_value viewGuideEnabled || true), ruler $(status_value viewRulerEnabled || true)"
+        echo "Horizontal hide variant: $(status_value horizontalGuideCountBefore || true) -> $(status_value horizontalGuideCountAfterCreate || true) -> $(status_value horizontalGuideCountAfterHide || true) -> $(status_value horizontalGuideCountFinal || true)"
+        echo "Vertical hide variant: $(status_value verticalGuideCountBefore || true) -> $(status_value verticalGuideCountAfterCreate || true) -> $(status_value verticalGuideCountAfterHide || true) -> $(status_value verticalGuideCountFinal || true)"
+        echo "Hide endpoints: H $(status_value horizontalHideEnd || true), V $(status_value verticalHideEnd || true)"
+        echo "Ruler widgets: $(status_value visibleRulerWidgetCount || true) visible of $(status_value rulerWidgetCount || true)"
+        echo "Guide pixels: changed neutral pixels $(status_value changedNeutralPixels || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-ruler-guide-lines" ]]; then
+        echo "Guide/ruler overlays: guide $(status_value viewGuideEnabled || true), ruler $(status_value viewRulerEnabled || true)"
+        echo "Guide line positions: H $(status_value firstHGuides || true) -> $(status_value secondHGuides || true), V $(status_value firstVGuides || true) -> $(status_value secondVGuides || true)"
+        echo "First guide lines: neutral $(status_value firstGuideLineChangedNeutralPixels || true), columns $(status_value firstVerticalGuideLineColumns || true), rows $(status_value firstHorizontalGuideLineRows || true), dash V/H $(status_value firstVerticalGuideLineDashSegments || true)/$(status_value firstHorizontalGuideLineDashSegments || true)"
+        echo "Second guide lines: neutral $(status_value secondGuideLineChangedNeutralPixels || true), columns $(status_value secondVerticalGuideLineColumns || true), rows $(status_value secondHorizontalGuideLineRows || true), dash V/H $(status_value secondVerticalGuideLineDashSegments || true)/$(status_value secondHorizontalGuideLineDashSegments || true)"
+        echo "Guide line bands: first V/H $(status_value firstVerticalGuideBandPixels || true)/$(status_value firstHorizontalGuideBandPixels || true), second V/H $(status_value secondVerticalGuideBandPixels || true)/$(status_value secondHorizontalGuideBandPixels || true)"
+        echo "Moved guide lines: neutral $(status_value movedGuideLineChangedNeutralPixels || true), columns $(status_value movedVerticalGuideLineColumns || true), rows $(status_value movedHorizontalGuideLineRows || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-ruler-guide-styles" ]]; then
+        echo "Guide/ruler overlays: guide $(status_value viewGuideEnabled || true), ruler $(status_value viewRulerEnabled || true)"
+        echo "Ruler style colors: background $(status_value rulerStyleBackgroundColor || true), scale $(status_value rulerStyleScaleColor || true), handle $(status_value rulerStyleHandleColor || true)"
+        echo "Horizontal ruler style pixels: background $(status_value horizontalRulerStyleBackgroundPixels || true), handle $(status_value horizontalRulerStyleHandlePixels || true), scale $(status_value horizontalRulerStyleScalePixels || true), changed $(status_value horizontalRulerChangedPixels || true)"
+        echo "Vertical ruler style pixels: background $(status_value verticalRulerStyleBackgroundPixels || true), handle $(status_value verticalRulerStyleHandlePixels || true), scale $(status_value verticalRulerStyleScalePixels || true), changed $(status_value verticalRulerChangedPixels || true)"
+        echo "Ruler widgets: $(status_value visibleRulerWidgetCount || true) visible of $(status_value rulerWidgetCount || true)"
+        echo "Guide pixels: changed neutral pixels $(status_value changedNeutralPixels || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-ruler-ticks" ]]; then
+        echo "Ruler overlays: guide disabled $(status_value viewGuideDisabled || true), ruler enabled $(status_value viewRulerEnabled || true)"
+        echo "Ruler widgets: $(status_value visibleRulerWidgetCount || true) visible of $(status_value rulerWidgetCount || true)"
+        echo "Horizontal ruler ticks: $(status_value horizontalRulerTickPixelsBefore || true) -> $(status_value horizontalRulerTickPixelsAfter || true), changed $(status_value horizontalRulerChangedPixels || true)"
+        echo "Vertical ruler ticks: $(status_value verticalRulerTickPixelsBefore || true) -> $(status_value verticalRulerTickPixelsAfter || true), changed $(status_value verticalRulerChangedPixels || true)"
+        echo "Ruler units: H $(status_value horizontalRulerUnit || true), V $(status_value verticalRulerUnit || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-animate-tool-overlay" || "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-animate-tool-handle-variants" || "$smoke_action" == "viewer-animate-tool-axis-drags" || "$smoke_action" == "viewer-selection-tool-vector-handles" || "$smoke_action" == "viewer-selection-tool-vector-handle-variants" || "$smoke_action" == "viewer-selection-tool-vector-center-thickness-deform" || "$smoke_action" == "viewer-vector-brush" || "$smoke_action" == "viewer-raster-brush" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
         echo "Tool: $(status_value toolName || true)"
       fi
-      if [[ "$smoke_action" == "viewer-animate-tool-overlay" || "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" ]]; then
+      if [[ "$smoke_action" == "viewer-animate-tool-overlay" || "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-animate-tool-handle-variants" || "$smoke_action" == "viewer-animate-tool-axis-drags" || "$smoke_action" == "viewer-animate-tool-cursors" ]]; then
         echo "Stage object: $(status_value stageObject || true)"
       fi
       if [[ "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" ]]; then
@@ -1271,6 +1727,40 @@ while is_smoke_process_running; do
         echo "Center: $(status_value centerBefore || true) -> $(status_value centerAfterCenterHandle || true)"
         echo "Hover changed pixels: $(status_value hoverChangedPixels || true)"
       fi
+      if [[ "$smoke_action" == "viewer-animate-tool-handle-variants" ]]; then
+        echo "Handle variants: translation $(status_value translationBefore || true) -> $(status_value translationAfter || true)"
+        echo "Handle variants: scaleXY $(status_value scaleXBefore || true),$(status_value scaleYBefore || true) -> $(status_value scaleXAfterScaleXYHandle || true),$(status_value scaleYAfterScaleXYHandle || true), shear $(status_value shearXBefore || true),$(status_value shearYBefore || true) -> $(status_value shearXAfterShearHandle || true),$(status_value shearYAfterShearHandle || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-animate-tool-axis-drags" ]]; then
+        echo "Axis drags: position $(status_value animateAxisPositionBefore || true) -> $(status_value animateAxisPositionAfter || true), rotation $(status_value animateAxisRotationBefore || true) -> $(status_value animateAxisRotationAfter || true)"
+        echo "Axis drags: scale $(status_value animateAxisScaleBefore || true) -> $(status_value animateAxisScaleAfter || true), shear $(status_value animateAxisShearBefore || true) -> $(status_value animateAxisShearAfter || true), center $(status_value animateAxisCenterBefore || true) -> $(status_value animateAxisCenterAfter || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-animate-tool-cursors" ]]; then
+        echo "Animate/Edit cursors: position $(status_value animateCursorPositionNormalCursor || true)/$(status_value animateCursorPositionAltCursor || true), rotation $(status_value animateCursorRotationNormalCursor || true)/$(status_value animateCursorRotationAltCursor || true)"
+        echo "Animate/Edit cursors: scale $(status_value animateCursorScaleNormalCursor || true)/$(status_value animateCursorScaleAltCursor || true), shear $(status_value animateCursorShearNormalCursor || true)/$(status_value animateCursorShearAltCursor || true), center $(status_value animateCursorCenterNormalCursor || true)/$(status_value animateCursorCenterAltCursor || true)"
+        echo "Animate/Edit cursor artwork: position $(status_value animateCursorPositionNormalArtwork || true) / $(status_value animateCursorPositionAltArtwork || true)"
+        echo "Animate/Edit cursor artwork: rotation $(status_value animateCursorRotationNormalArtwork || true) / $(status_value animateCursorRotationAltArtwork || true)"
+        echo "Animate/Edit cursor artwork: scale $(status_value animateCursorScaleNormalArtwork || true) / $(status_value animateCursorScaleAltArtwork || true)"
+        echo "Animate/Edit cursor artwork: shear $(status_value animateCursorShearNormalArtwork || true) / $(status_value animateCursorShearAltArtwork || true)"
+        echo "Animate/Edit cursor artwork: center $(status_value animateCursorCenterNormalArtwork || true) / $(status_value animateCursorCenterAltArtwork || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-selection-tool-vector-handles" ]]; then
+        echo "Selection tool: mode $(status_value selectionMode || true), type $(status_value selectionType || true), count $(status_value selectionCount || true), stroke 0 selected $(status_value selectionStroke0Selected || true)"
+        echo "Selection bbox: $(status_value selectionBBoxBeforeScale || true) -> $(status_value selectionBBoxAfterScale || true), delta $(status_value selectionBBoxWidthDelta || true),$(status_value selectionBBoxHeightDelta || true)"
+        echo "Selection cursor: id $(status_value selectionScaleCursorId || true), artwork $(status_value selectionScaleCursorArtwork || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-selection-tool-vector-handle-variants" ]]; then
+        echo "Selection tool: mode $(status_value selectionMode || true), type $(status_value selectionType || true), count $(status_value selectionCount || true), stroke 0 selected $(status_value selectionStroke0Selected || true)"
+        echo "Selection horizontal scale: $(status_value selectionBBoxBeforeHorizontalScale || true) -> $(status_value selectionBBoxAfterHorizontalScale || true), delta $(status_value selectionHorizontalWidthDelta || true), cursor $(status_value selectionHorizontalScaleCursorId || true)/$(status_value selectionHorizontalScaleCursorArtwork || true)"
+        echo "Selection vertical scale: $(status_value selectionBBoxBeforeVerticalScale || true) -> $(status_value selectionBBoxAfterVerticalScale || true), delta $(status_value selectionVerticalHeightDelta || true), cursor $(status_value selectionVerticalScaleCursorId || true)/$(status_value selectionVerticalScaleCursorArtwork || true)"
+        echo "Selection rotation: $(status_value selectionBBoxBeforeRotation || true) -> $(status_value selectionBBoxAfterRotation || true), cursor $(status_value selectionRotationCursorId || true)/$(status_value selectionRotationCursorArtwork || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-selection-tool-vector-center-thickness-deform" ]]; then
+        echo "Selection tool: mode $(status_value selectionMode || true), type $(status_value selectionType || true), count $(status_value selectionCount || true), stroke 0 selected $(status_value selectionStroke0Selected || true)"
+        echo "Selection center: $(status_value selectionCenterBefore || true) -> $(status_value selectionCenterAfter || true), delta $(status_value selectionCenterDelta || true), cursor $(status_value selectionCenterCursorId || true)/$(status_value selectionCenterCursorArtwork || true)"
+        echo "Selection thickness: $(status_value selectionThicknessBefore || true) -> $(status_value selectionThicknessAfter || true), delta $(status_value selectionThicknessDelta || true), cursor $(status_value selectionThicknessCursorId || true)/$(status_value selectionThicknessCursorArtwork || true)"
+        echo "Selection free deform: $(status_value selectionBBoxBeforeDeform || true) -> $(status_value selectionBBoxAfterDeform || true), cursor $(status_value selectionDeformCursorId || true)/$(status_value selectionDeformCursorArtwork || true)"
+      fi
       if [[ "$smoke_action" == "viewer-vector-brush" ]]; then
         echo "Strokes: $(status_value strokesBefore || true) -> $(status_value strokesAfter || true)"
       fi
@@ -1278,7 +1768,7 @@ while is_smoke_process_running; do
         echo "Raster pixels: $(status_value rasterPixelsBefore || true) -> $(status_value rasterPixelsAfter || true)"
         echo "Raster red pixels: $(status_value rasterRedPixelsBefore || true) -> $(status_value rasterRedPixelsAfter || true)"
       fi
-      if [[ "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
+      if [[ "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-animate-tool-handle-variants" || "$smoke_action" == "viewer-animate-tool-axis-drags" || "$smoke_action" == "viewer-animate-tool-cursors" || "$smoke_action" == "viewer-selection-tool-vector-handles" || "$smoke_action" == "viewer-selection-tool-vector-handle-variants" || "$smoke_action" == "viewer-selection-tool-vector-center-thickness-deform" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
         echo "Input path: $(status_value toolInputPath || true)"
       fi
       if [[ "$smoke_action" == "viewer-raster-brush-tablet-events" ]]; then
