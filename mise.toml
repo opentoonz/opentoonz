@@ -90,6 +90,10 @@ run = "OPENTOONZ_GUI_SMOKE_ACTION=create-scene bash scripts/qt6/run-gui-smoke.sh
 description = "Capture packaged Qt 6 high-DPI screen and window state without exercising rendering."
 run = "OPENTOONZ_GUI_SMOKE_ACTION=high-dpi bash scripts/qt6/run-gui-smoke.sh"
 
+[tasks.gui-smoke-script-console-view-qt6]
+description = "Run the packaged Qt 6 Script Console view() helper against generated Image and Level values."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=script-console-view bash scripts/qt6/run-gui-smoke.sh"
+
 [tasks.gui-smoke-media-devices-qt6]
 description = "Enumerate packaged Qt 6 audio input/output and camera devices without capture or playback."
 run = "OPENTOONZ_GUI_SMOKE_ACTION=media-devices bash scripts/qt6/run-gui-smoke.sh"
@@ -125,6 +129,10 @@ run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-render bash scripts/qt6/run-gui-smoke.s
 [tasks.gui-smoke-viewer-vector-render-qt6]
 description = "Create a visible vector frame and verify Qt 6 SceneViewer framebuffer pixels in the packaged app."
 run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-vector-render bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-final-render-output-qt6]
+description = "Render a camera-DPI red raster scene through Qt 6 MovieRenderer and verify the PNG output pixels."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=final-render-output bash scripts/qt6/run-gui-smoke.sh"
 
 [tasks.gui-smoke-viewer-zoom-pan-qt6]
 description = "Zoom and pan a visible raster frame and verify Qt 6 SceneViewer framebuffer/high-DPI behavior."

@@ -31,6 +31,8 @@
 #include <QFile>
 #include <QTextStream>
 
+#include "timage.h"
+
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 
 static QScriptValue loadSceneFun(QScriptContext *context,
@@ -169,10 +171,14 @@ teng->getQScriptEngine()->evaluate(contents, "init.js");
 }
 */
 #else
+  QString helperError = teng->installConsoleBridge(this);
+  if (!helperError.isEmpty())
+    teng->emitOutput(ScriptEngine::Warning, helperError);
+
   teng->emitOutput(ScriptEngine::Warning,
                    tr("Qt 6 scripting is running on QJSEngine with partial "
-                      "non-rendering OpenToonz object bindings. The legacy "
-                      "view() helper is not available yet."));
+                      "OpenToonz object bindings. The legacy view() helper is "
+                      "available for Image and Level values."));
 #endif
 
   setWidget(m_scriptConsole);
@@ -187,6 +193,37 @@ teng->getQScriptEngine()->evaluate(contents, "init.js");
 //-----------------------------------------------------------------------------
 
 ScriptConsolePanel::~ScriptConsolePanel() {}
+
+//-----------------------------------------------------------------------------
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+
+QString ScriptConsolePanel::viewScriptImage(int imageId) {
+  ScriptEngine *engine = m_scriptConsole ? m_scriptConsole->getEngine() : 0;
+  TImage *image        = engine ? engine->scriptImageForView(imageId) : 0;
+  if (!image) return tr("Can't view an empty image");
+
+  FlipBook *flipBook = FlipBookPool::instance()->pop();
+  if (!flipBook || !flipBook->getImageViewer())
+    return tr("Could not open FlipBook");
+
+  flipBook->getImageViewer()->setImage(TImageP(image));
+  return QString();
+}
+
+QString ScriptConsolePanel::viewScriptLevel(int levelId) {
+  ScriptEngine *engine   = m_scriptConsole ? m_scriptConsole->getEngine() : 0;
+  TXshSimpleLevel *level = engine ? engine->scriptLevelForView(levelId) : 0;
+  if (!level) return tr("Can't view an empty level");
+
+  FlipBook *flipBook = FlipBookPool::instance()->pop();
+  if (!flipBook) return tr("Could not open FlipBook");
+
+  flipBook->setLevel(level);
+  return QString();
+}
+
+#endif
 
 //-----------------------------------------------------------------------------
 

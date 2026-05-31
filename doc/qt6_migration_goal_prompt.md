@@ -163,8 +163,18 @@ branch.
   and after the update, require changed and red-dominant pixels, and save the
   before/after captures beside the GUI smoke status file. These are narrow
   rendering guards; they do not yet validate brush input, interactive vector
-  drawing, onion skin, tool overlays, FX preview, final render output, or Qt
-  5-vs-Qt 6 visual parity.
+  drawing, onion skin, tool overlays, FX preview, or Qt 5-vs-Qt 6 visual
+  parity.
+- On 2026-05-31, the packaged Qt 6 app has a prototype
+  `mise run gui-smoke-final-render-output-qt6` gate, but it is not green yet.
+  This app-side smoke creates a one-frame camera-DPI red raster scene, sends it
+  through `MovieRenderer` to a PNG sequence under the isolated GUI smoke root,
+  reloads the PNG with Qt image I/O, and requires a 320x240 nonempty output
+  with visible red pixels. The current run writes a valid 320x240 PNG and
+  reports one completed frame, but the image contains only one red pixel, so
+  final-render output remains an active blocker. This probe is still narrower
+  than Render popup UI, multi-frame sequences, movie formats, FX-heavy scenes,
+  audio muxing, preview rendering, or full Qt 5-vs-Qt 6 render parity.
 - On 2026-05-30, the viewer framebuffer capture path was tightened to treat
   high-DPI sizing as part of the pass condition. The app-side status now records
   logical viewer size, device-pixel viewer size, `SceneViewer::getDevPixRatio()`,
@@ -1519,6 +1529,12 @@ branch.
   `profiles` files. Unix `TEnv` startup now honors explicit process
   environment values before the legacy `SystemVar.ini` warning fallback, and
   the harness exports the same isolated Toonz paths before launch.
+- The Qt 6 Script Console now restores the legacy GUI-only `view()` helper for
+  `Image` and `Level` values by injecting a console bridge on top of the
+  `QJSEngine` facade. The flipbook UI path remains in the `toonz` app layer,
+  headless script-smoke execution still does not expose `view()`, and
+  `mise run gui-smoke-script-console-view-qt6` validates the GUI helper against
+  generated `Image` and `Level` values.
 - `mise run script-smokes-qt6` runs every current Qt 6 script fixture
   in bounded mode, and `mise run script-smokes-natural-exit-qt6` runs the same
   fixture set while requiring the app process to exit naturally. Use the
@@ -1596,8 +1612,9 @@ The next slice should make the Qt 6 app useful enough to run and diagnose:
    mouse events, System Events still reports `-25200`, and raster pixels remain
    unchanged. Resolve or rerun that permissioned path in an unlocked/frontmost
    user session before treating OS-level mouse delivery as covered. Keep
-   hardware tablet pressure/tilt deferred unless a real device or credible
-   OS-level simulator becomes available, then continue into
+   hardware tablet pressure/tilt deferred rather than blocking the Qt 6 port
+   unless a real device or credible OS-level simulator becomes available, then
+   continue into
    remaining timeline onion workflows beyond the current app-side row-area
    marker/toggle/drag, fixed-marker, Shift and Trace,
    context/color/orientation smokes, remaining selection workflows beyond

@@ -1936,6 +1936,33 @@ const char kBootstrapScript[] = R"JS(
 })(typeof globalThis !== "undefined" ? globalThis : this);
 )JS";
 
+const char kQt6ScriptConsoleHelpers[] = R"JS(
+(function(global) {
+  global.view = function(value) {
+    if (arguments.length !== 1)
+      throw new Error("expected one argument : an image or a level");
+
+    if (value instanceof Image) {
+      var imageError =
+        __opentoonzScriptConsolePanel.viewScriptImage(value.__imageId);
+      if (imageError)
+        throw new Error(String(imageError));
+      return global["void"];
+    }
+
+    if (value instanceof Level) {
+      var levelError =
+        __opentoonzScriptConsolePanel.viewScriptLevel(value.__levelId);
+      if (levelError)
+        throw new Error(String(levelError));
+      return global["void"];
+    }
+
+    throw new Error("expected one argument : an image or a level");
+  };
+})(typeof globalThis !== "undefined" ? globalThis : this);
+)JS";
+
 void installBootstrap(QJSEngine* engine, ScriptEngine* scriptEngine) {
   QJSEngine::setObjectOwnership(scriptEngine, QJSEngine::CppOwnership);
   engine->globalObject().setProperty(QStringLiteral("__opentoonzScriptEngine"),
@@ -2055,6 +2082,20 @@ QString ScriptEngine::runScriptFile(const QString& path) {
   return print(result, true);
 }
 
+QString ScriptEngine::installConsoleBridge(QObject* bridge) {
+  if (!bridge) return QStringLiteral("Invalid Script Console bridge");
+
+  QJSEngine::setObjectOwnership(bridge, QJSEngine::CppOwnership);
+  m_engine->globalObject().setProperty(
+      QStringLiteral("__opentoonzScriptConsolePanel"),
+      m_engine->newQObject(bridge));
+
+  QJSValue result =
+      m_engine->evaluate(QString::fromLatin1(kQt6ScriptConsoleHelpers),
+                         QStringLiteral("opentoonz-script-console-helpers.js"));
+  return result.isError() ? result.toString() : QString();
+}
+
 QString ScriptEngine::filePathToString(const QString& path) const {
   return tr("\"%1\"").arg(path);
 }
@@ -2148,6 +2189,14 @@ TImage* ScriptEngine::qjsImage(int imageId) const {
 
 TImage* ScriptEngine::qjsImageBuilder(int imageBuilderId) const {
   return m_qjsImageBuilders.value(imageBuilderId, nullptr);
+}
+
+TXshSimpleLevel* ScriptEngine::scriptLevelForView(int levelId) const {
+  return qjsLevel(levelId);
+}
+
+TImage* ScriptEngine::scriptImageForView(int imageId) const {
+  return qjsImage(imageId);
 }
 
 ToonzScene* ScriptEngine::levelScene(int levelId) const {

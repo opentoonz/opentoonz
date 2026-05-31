@@ -471,7 +471,7 @@ if [[ -z "$smoke_action" ]]; then
 fi
 
 case "$smoke_action" in
-  startup|create-scene|open-scene|high-dpi|media-devices|audio-input|audio-recording-wav|audio-playback-wav|camera-formats|audio-output|viewer-render|viewer-vector-render|viewer-zoom-pan|viewer-onion-skin|viewer-onion-skin-rowarea|viewer-onion-skin-rowarea-drag|viewer-onion-skin-fixed-marker-drag|viewer-onion-skin-shift-trace|viewer-onion-skin-context-menu|viewer-onion-skin-custom-colors|viewer-onion-skin-orientations|viewer-camera-overlay|viewer-safe-area-field-guide|viewer-safe-area-presets|viewer-safe-area-custom-file|viewer-field-guide-settings|viewer-ruler-guide|viewer-ruler-guide-events|viewer-ruler-guide-variants|viewer-ruler-guide-lines|viewer-ruler-guide-styles|viewer-ruler-ticks|viewer-animate-tool-overlay|viewer-animate-tool-drag|viewer-animate-tool-mouse-events|viewer-animate-tool-undo-redo|viewer-animate-tool-modifiers|viewer-animate-tool-handles|viewer-animate-tool-handle-variants|viewer-animate-tool-axis-drags|viewer-animate-tool-cursors|viewer-selection-tool-vector-handles|viewer-selection-tool-vector-handle-variants|viewer-selection-tool-vector-center-thickness-deform|viewer-selection-tool-vector-mode-variants|viewer-selection-tool-raster-handles|viewer-selection-tool-raster-mode-variants|viewer-vector-brush|viewer-raster-brush|viewer-raster-brush-mouse-events|viewer-raster-brush-tablet-events|viewer-raster-brush-system-events|xsheet-scrub) ;;
+  startup|create-scene|open-scene|high-dpi|script-console-view|final-render-output|media-devices|audio-input|audio-recording-wav|audio-playback-wav|camera-formats|audio-output|viewer-render|viewer-vector-render|viewer-zoom-pan|viewer-onion-skin|viewer-onion-skin-rowarea|viewer-onion-skin-rowarea-drag|viewer-onion-skin-fixed-marker-drag|viewer-onion-skin-shift-trace|viewer-onion-skin-context-menu|viewer-onion-skin-custom-colors|viewer-onion-skin-orientations|viewer-camera-overlay|viewer-safe-area-field-guide|viewer-safe-area-presets|viewer-safe-area-custom-file|viewer-field-guide-settings|viewer-ruler-guide|viewer-ruler-guide-events|viewer-ruler-guide-variants|viewer-ruler-guide-lines|viewer-ruler-guide-styles|viewer-ruler-ticks|viewer-animate-tool-overlay|viewer-animate-tool-drag|viewer-animate-tool-mouse-events|viewer-animate-tool-undo-redo|viewer-animate-tool-modifiers|viewer-animate-tool-handles|viewer-animate-tool-handle-variants|viewer-animate-tool-axis-drags|viewer-animate-tool-cursors|viewer-selection-tool-vector-handles|viewer-selection-tool-vector-handle-variants|viewer-selection-tool-vector-center-thickness-deform|viewer-selection-tool-vector-mode-variants|viewer-selection-tool-raster-handles|viewer-selection-tool-raster-mode-variants|viewer-vector-brush|viewer-raster-brush|viewer-raster-brush-mouse-events|viewer-raster-brush-tablet-events|viewer-raster-brush-system-events|xsheet-scrub) ;;
   *)
     echo "error: unsupported OPENTOONZ_GUI_SMOKE_ACTION: $smoke_action" >&2
     exit 1
@@ -939,6 +939,106 @@ while is_smoke_process_running; do
       echo "$smoke_label audio-output smoke passed: $audio_window"
       echo "Sample rate: $sample_rate"
       echo "Bytes provided: $bytes_provided"
+      echo "Log: $log_path"
+      exit 0
+    fi
+
+    if [[ "$smoke_action" == "script-console-view" ]]; then
+      if ! script_console_window="$(wait_for_app_smoke_status script-console-view)"; then
+        stop_smoke_process
+        echo "error: $smoke_label script-console-view smoke failed" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      script_console_probe="$(status_value scriptConsoleViewProbe || true)"
+      script_console_output="$(status_value scriptConsoleOutput || true)"
+      visible_flipbook_delta="$(status_value visibleFlipbookDelta || true)"
+      if [[ "$script_console_probe" != "ok" ||
+            ! "$visible_flipbook_delta" =~ ^-?[0-9]+$ ||
+            "$script_console_output" != *qt-script-console-view* ]]; then
+        stop_smoke_process
+        echo "error: $smoke_label script-console-view smoke reported unexpected state" >&2
+        sed -n '1,120p' "$status_path" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      if (( visible_flipbook_delta <= 0 )); then
+        stop_smoke_process
+        echo "error: $smoke_label script-console-view smoke did not open a flipbook" >&2
+        sed -n '1,120p' "$status_path" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      if [[ "$hold_app" == "1" ]]; then
+        echo "$smoke_label script-console-view smoke launched and is still running: pid $pid"
+        echo "Window: $script_console_window"
+        echo "Flipbooks opened: $visible_flipbook_delta"
+        echo "Output: $script_console_output"
+        echo "Log: $log_path"
+        wait "$pid"
+        exit $?
+      fi
+
+      stop_smoke_process
+      echo "$smoke_label script-console-view smoke passed: $script_console_window"
+      echo "Flipbooks opened: $visible_flipbook_delta"
+      echo "Output: $script_console_output"
+      echo "Log: $log_path"
+      exit 0
+    fi
+
+    if [[ "$smoke_action" == "final-render-output" ]]; then
+      if ! final_render_window="$(wait_for_app_smoke_status final-render-output 180)"; then
+        stop_smoke_process
+        echo "error: $smoke_label final-render-output smoke failed" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      final_render_probe="$(status_value finalRenderProbe || true)"
+      final_render_output_probe="$(status_value finalRenderOutputProbe || true)"
+      final_render_completed="$(status_value finalRenderCompletedFrames || true)"
+      final_render_failed="$(status_value finalRenderFailedFrames || true)"
+      final_render_width="$(status_value finalRenderOutputWidth || true)"
+      final_render_height="$(status_value finalRenderOutputHeight || true)"
+      final_render_red_pixels="$(status_value finalRenderOutputRedPixels || true)"
+      final_render_output_path="$(status_value finalRenderOutputPath || true)"
+      if [[ "$final_render_probe" != "ok" ||
+            "$final_render_output_probe" != "ok" ||
+            "$final_render_completed" != "1" ||
+            "$final_render_failed" != "0" ||
+            "$final_render_width" != "320" ||
+            "$final_render_height" != "240" ||
+            ! "$final_render_red_pixels" =~ ^[0-9]+$ ||
+            "$final_render_red_pixels" == "0" ||
+            -z "$final_render_output_path" ||
+            ! -s "$final_render_output_path" ]]; then
+        stop_smoke_process
+        echo "error: $smoke_label final-render-output smoke reported unexpected state" >&2
+        sed -n '1,140p' "$status_path" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      if [[ "$hold_app" == "1" ]]; then
+        echo "$smoke_label final-render-output smoke launched and is still running: pid $pid"
+        echo "Window: $final_render_window"
+        echo "Output: $final_render_output_path"
+        echo "Output size: ${final_render_width}x${final_render_height}"
+        echo "Red pixels: $final_render_red_pixels"
+        echo "Log: $log_path"
+        wait "$pid"
+        exit $?
+      fi
+
+      stop_smoke_process
+      echo "$smoke_label final-render-output smoke passed: $final_render_window"
+      echo "Output: $final_render_output_path"
+      echo "Output size: ${final_render_width}x${final_render_height}"
+      echo "Red pixels: $final_render_red_pixels"
       echo "Log: $log_path"
       exit 0
     fi

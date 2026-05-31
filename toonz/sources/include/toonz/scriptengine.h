@@ -241,6 +241,10 @@ public:
                                               const QVariantList& columns);
   Q_INVOKABLE QVariantMap rendererDumpCache(int rendererId);
 
+  QString installConsoleBridge(QObject* bridge);
+  TXshSimpleLevel* scriptLevelForView(int levelId) const;
+  TImage* scriptImageForView(int imageId) const;
+
 private:
   ToonzScene* qjsScene(int sceneId) const;
   TXshSimpleLevel* qjsLevel(int levelId) const;

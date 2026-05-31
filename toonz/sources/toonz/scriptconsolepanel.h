@@ -5,6 +5,9 @@
 
 #include "pane.h"
 
+#include <QString>
+#include <QtGlobal>
+
 class ScriptConsole;
 
 class ScriptConsolePanel final : public TPanel {
@@ -17,6 +20,11 @@ public:
   ~ScriptConsolePanel();
 
   void executeCommand(const QString &cmd);
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  Q_INVOKABLE QString viewScriptImage(int imageId);
+  Q_INVOKABLE QString viewScriptLevel(int levelId);
+#endif
 
 public slots:
   void selectNone();

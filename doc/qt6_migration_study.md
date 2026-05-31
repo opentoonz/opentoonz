@@ -261,8 +261,18 @@ Current branch status:
   requires changed and red-dominant pixels, and saves the captures beside the
   smoke status file. This proves that simple raster and vector cells can reach
   visible Qt 6 viewer pixels in the packaged app; it does not prove brush
-  input, interactive vector drawing, onion skin, overlays, FX preview, final
-  render output, or Qt 5-vs-Qt 6 visual parity.
+  input, interactive vector drawing, onion skin, overlays, FX preview, or Qt
+  5-vs-Qt 6 visual parity.
+- The packaged Qt 6 app now has a prototype
+  `mise run gui-smoke-final-render-output-qt6` gate, but it is not green yet.
+  The app-side hook creates a one-frame camera-DPI red raster scene, sends it
+  through `MovieRenderer` to a PNG sequence under the isolated GUI smoke root,
+  reloads the PNG with Qt image I/O, and requires a 320x240 nonempty output
+  with visible red pixels. The current run writes a valid 320x240 PNG and
+  reports one completed frame, but the image contains only one red pixel, so
+  final-render output remains an active blocker. This probe is still narrower
+  than Render popup UI, multi-frame sequences, movie formats, FX-heavy scenes,
+  audio muxing, preview rendering, or Qt 5-vs-Qt 6 render parity.
 - On 2026-05-30, the viewer framebuffer capture path was hardened so high-DPI
   sizing is part of the same pass/fail gate as visible pixels. The app-side
   status now records logical viewer size, device-pixel viewer size,
@@ -1502,10 +1512,12 @@ Current branch status:
   now honors explicit process environment values before the legacy
   `SystemVar.ini` warning fallback, and the harness exports the same isolated
   Toonz paths before launch.
-- The Qt 6 Script Console warning now describes the current state accurately:
-  QJSEngine has partial non-rendering OpenToonz object bindings, while legacy
-  GUI-only helpers such as `view()` remain unavailable until that interactive
-  console surface is ported.
+- The Qt 6 Script Console now installs a GUI-only `view()` bridge for `Image`
+  and `Level` values on top of the `QJSEngine` facade. The helper stays in the
+  `toonz` app layer so flipbook UI dependencies do not leak into `toonzlib`;
+  `mise run gui-smoke-script-console-view-qt6` validates the GUI helper against
+  generated `Image` and `Level` values. Headless script-smoke execution still
+  does not expose `view()`.
 - The Qt 6 branch now has a minimal `FilePath` compatibility slice for
   construction, string conversion, name/extension/parent accessors, mutation
   helpers, path concatenation, existence checks, directory checks, modified-time
@@ -2422,7 +2434,8 @@ Current branch status:
   red-dominant `SceneViewer` framebuffer pixels. This narrows Qt tablet-event
   dispatch and `TMouseEvent` tablet/pressure propagation. Real tablet hardware
   is not available for this migration pass, so hardware pressure/tilt should
-  stay deferred unless a device or credible OS-level simulator is added;
+  stay deferred rather than block the Qt 6 port unless a device or credible
+  OS-level simulator is added;
   OS-level event delivery, platform driver pressure/tilt, timeline/UI onion
   workflow, overlays, FX preview, final render output, and visual parity against
   the Qt 5 baseline remain open.
