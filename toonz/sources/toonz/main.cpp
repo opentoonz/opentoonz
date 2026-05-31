@@ -23,6 +23,7 @@
 #include "tools/toolhandle.h"
 #include "tools/cursors.h"
 #include "tools/cursormanager.h"
+#include "tools/rasterselection.h"
 #include "tools/strokeselection.h"
 #include "../tnztools/selectiontool.h"
 
@@ -1039,6 +1040,33 @@ static bool gui_smoke_add_vector_probe_frame(TXshSimpleLevel *level,
   TStroke *stroke = new TStroke(points);
   stroke->setStyle(1);
   image->addStroke(stroke);
+  image->validateRegions(true);
+
+  level->setFrame(fid, image);
+  level->setDirtyFlag(true);
+  return true;
+}
+
+static bool gui_smoke_add_vector_multi_probe_frame(TXshSimpleLevel *level,
+                                                   const TFrameId &fid) {
+  if (!gui_smoke_prepare_red_palette(level)) return false;
+
+  TVectorImageP image = new TVectorImage();
+  image->setPalette(level->getPalette());
+
+  auto addStroke = [&](const std::vector<TThickPoint> &points) {
+    TStroke *stroke = new TStroke(points);
+    stroke->setStyle(1);
+    image->addStroke(stroke);
+  };
+
+  addStroke({TThickPoint(-230.0, -95.0, 18.0),
+             TThickPoint(-165.0, 105.0, 24.0),
+             TThickPoint(-75.0, -95.0, 18.0)});
+  addStroke({TThickPoint(65.0, -85.0, 18.0),
+             TThickPoint(150.0, 115.0, 24.0),
+             TThickPoint(245.0, -85.0, 18.0)});
+
   image->validateRegions(true);
 
   level->setFrame(fid, image);
@@ -2216,6 +2244,28 @@ static bool gui_smoke_replay_row_area_drag(
                   Qt::LeftButton, Qt::NoButton, Qt::NoModifier) &&
               delivered;
   return delivered;
+}
+
+static bool gui_smoke_set_shift_trace_enabled(bool enabled) {
+  TOnionSkinMaskHandle *onionHandle =
+      TApp::instance()->getCurrentOnionSkin();
+  QAction *action = CommandManager::instance()->getAction("MI_ShiftTrace");
+  if (!onionHandle || !action) return false;
+
+  action->setChecked(enabled);
+  if (enabled) OnioniSkinMaskGUI::resetShiftTraceFrameOffset();
+
+  OnionSkinMask mask = onionHandle->getOnionSkinMask();
+  mask.setShiftTraceStatus(enabled ? OnionSkinMask::ENABLED
+                                   : OnionSkinMask::DISABLED);
+  if (!enabled) {
+    mask.setShiftTraceGhostFrameOffset(0, 0);
+    mask.setShiftTraceGhostFrameOffset(1, 0);
+  }
+  onionHandle->setOnionSkinMask(mask);
+  onionHandle->notifyOnionSkinMaskChanged();
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  return action->isChecked() == enabled;
 }
 
 static double gui_smoke_clamp_widget_coordinate(double value, int extent) {
@@ -3706,6 +3756,393 @@ static QStringList gui_smoke_viewer_onion_skin_fixed_marker_drag_details(
   details += gui_smoke_viewer_capture_details(
       viewer, before, QStringLiteral("viewer-onion-skin-fixed-marker-drag"),
       QStringLiteral("fixed-marker-onion-skin-drag"), fixedDragOk, 1);
+
+  return details;
+}
+
+static QString gui_smoke_shift_trace_offsets(OnionSkinMask &mask) {
+  return QString("%1,%2")
+      .arg(mask.getShiftTraceGhostFrameOffset(0))
+      .arg(mask.getShiftTraceGhostFrameOffset(1));
+}
+
+static QStringList gui_smoke_viewer_onion_skin_shift_trace_details(
+    const QString &requestedSceneName) {
+  QStringList details;
+  SceneViewer *viewer = gui_smoke_resolve_scene_viewer();
+  TOnionSkinMaskHandle *onionHandle =
+      TApp::instance()->getCurrentOnionSkin();
+  if (!viewer || !onionHandle) {
+    details << QStringLiteral("viewerRenderProbe=no-viewer")
+            << QStringLiteral("onionSkinProbe=no-viewer")
+            << QStringLiteral("onionSkinShiftTraceProbe=no-viewer");
+    return details;
+  }
+
+  QString sceneName   = gui_smoke_scene_name(requestedSceneName);
+  TFilePath scenePath = gui_smoke_scene_path(sceneName);
+  if (!TSystem::touchParentDir(scenePath)) {
+    details << QStringLiteral("viewerRenderProbe=scene-folder-error")
+            << QStringLiteral("onionSkinProbe=scene-folder-error")
+            << QStringLiteral("onionSkinShiftTraceProbe=scene-folder-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  Preferences::instance()->setValue(onionSkinEnabled, true, false);
+  gui_smoke_set_shift_trace_enabled(false);
+
+  OnionSkinMask mask;
+  mask.clear();
+  mask.enable(false);
+  mask.setShiftTraceStatus(OnionSkinMask::DISABLED);
+  onionHandle->setOnionSkinMask(mask);
+  onionHandle->notifyOnionSkinMaskChanged();
+
+  IoCmd::newScene();
+  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+  scene->setScenePath(scenePath);
+  TApp::instance()->getCurrentScene()->notifySceneSwitched();
+  TApp::instance()->getCurrentScene()->notifyNameSceneChange();
+
+  TXshLevel *levelXl = scene->createNewLevel(
+      OVL_XSHLEVEL, L"qt6_gui_viewer_onion_shift_trace");
+  TXshSimpleLevel *level =
+      levelXl ? levelXl->getSimpleLevel() : nullptr;
+  if (!level) {
+    details << QStringLiteral("viewerRenderProbe=level-error")
+            << QStringLiteral("onionSkinProbe=level-error")
+            << QStringLiteral("onionSkinShiftTraceProbe=level-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  const TFrameId back2Fid(1);
+  const TFrameId back1Fid(2);
+  const TFrameId currentFid(3);
+  const TFrameId front1Fid(4);
+  const TFrameId front2Fid(5);
+  gui_smoke_add_transparent_raster_probe_frame(
+      level, back2Fid, TPixel32(24, 192, 232, 255), 20, 26, 110, 116);
+  gui_smoke_add_transparent_raster_probe_frame(
+      level, back1Fid, TPixel32(48, 122, 232, 255), 82, 94, 172, 184);
+  gui_smoke_add_transparent_raster_probe_frame(
+      level, currentFid, TPixel32(232, 24, 24, 255), 134, 134, 224, 224);
+  gui_smoke_add_transparent_raster_probe_frame(
+      level, front1Fid, TPixel32(232, 210, 24, 255), 226, 38, 316, 128);
+  gui_smoke_add_transparent_raster_probe_frame(
+      level, front2Fid, TPixel32(56, 208, 92, 255), 258, 154, 348, 244);
+
+  TXsheet *xsheet = scene->getXsheet();
+  if (!xsheet->setCell(0, 0, TXshCell(level, back2Fid)) ||
+      !xsheet->setCell(1, 0, TXshCell(level, back1Fid)) ||
+      !xsheet->setCell(2, 0, TXshCell(level, currentFid)) ||
+      !xsheet->setCell(3, 0, TXshCell(level, front1Fid)) ||
+      !xsheet->setCell(4, 0, TXshCell(level, front2Fid))) {
+    details << QStringLiteral("viewerRenderProbe=xsheet-error")
+            << QStringLiteral("onionSkinProbe=xsheet-error")
+            << QStringLiteral("onionSkinShiftTraceProbe=xsheet-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  TApp::instance()->getCurrentFrame()->setFrame(2);
+  TApp::instance()->getCurrentColumn()->setColumnIndex(0);
+  TApp::instance()->getCurrentObject()->setObjectId(TStageObjectId::ColumnId(0));
+  TApp::instance()->getCurrentLevel()->setLevel(levelXl);
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  TApp::instance()->getCurrentScene()->notifySceneChanged();
+  TApp::instance()->getCurrentLevel()->notifyLevelChange();
+
+  viewer->resetSceneViewer();
+  viewer->fitToCamera();
+  viewer->GLInvalidateAll();
+  gui_smoke_pump_events(150);
+
+  XsheetViewer *xsheetViewer = gui_smoke_resolve_xsheet_viewer();
+  if (xsheetViewer) {
+    if (!xsheetViewer->orientation()->isVerticalTimeline()) {
+      xsheetViewer->flipOrientation();
+      gui_smoke_pump_events(150);
+    }
+    xsheetViewer->scrollTo(2, 0);
+    xsheetViewer->updateAreeSize();
+    xsheetViewer->updateRows();
+  }
+  gui_smoke_pump_events(150);
+
+  XsheetGUI::RowArea *rowArea =
+      gui_smoke_resolve_xsheet_row_area(xsheetViewer);
+  const bool shiftTraceActionOk = gui_smoke_set_shift_trace_enabled(true);
+  viewer->GLInvalidateAll();
+  if (xsheetViewer) xsheetViewer->updateRows();
+  gui_smoke_pump_events(150);
+
+  const QImage before = gui_smoke_grab_viewer_frame(viewer);
+  if (!xsheetViewer || !rowArea) {
+    details << QString("scene=%1").arg(scenePath.getQString())
+            << QStringLiteral("onionSkinContent=shift-trace-raster")
+            << QString("xsheetViewerFound=%1")
+                   .arg(xsheetViewer ? QStringLiteral("true")
+                                     : QStringLiteral("false"))
+            << QString("xsheetRowAreaFound=%1")
+                   .arg(rowArea ? QStringLiteral("true")
+                                : QStringLiteral("false"))
+            << QStringLiteral("onionSkinProbe=no-row-area")
+            << QStringLiteral("onionSkinShiftTraceProbe=no-row-area");
+    details += gui_smoke_viewer_capture_details(
+        viewer, before, QStringLiteral("viewer-onion-skin-shift-trace"),
+        QStringLiteral("shift-trace-onion-skin"), false, 1);
+    return details;
+  }
+
+  const QImage rowBefore = gui_smoke_grab_widget_frame(rowArea);
+  QString rowBeforePath;
+  const bool rowBeforeSaved = gui_smoke_save_capture(
+      rowBefore,
+      QStringLiteral("viewer-onion-skin-shift-trace-xsheet-before.png"),
+      &rowBeforePath);
+
+  auto shiftPoint = [&](int row) {
+    return QPointF(gui_smoke_xsheet_row_area_point(
+        xsheetViewer, row, PredefinedRect::SHIFTTRACE_DOT_AREA, false));
+  };
+  auto pointsInBounds = [&](const std::vector<QPointF> &points) {
+    for (const QPointF &point : points) {
+      if (!rowArea->rect().contains(point.toPoint())) return false;
+    }
+    return true;
+  };
+  auto joinedPoints = [](const std::vector<QPointF> &points) {
+    QStringList values;
+    for (const QPointF &point : points) {
+      values << QString("%1,%2")
+                    .arg(std::round(point.x()))
+                    .arg(std::round(point.y()));
+    }
+    return values.join('|');
+  };
+
+  const std::vector<QPointF> points = {
+      shiftPoint(0), shiftPoint(1), shiftPoint(2), shiftPoint(3),
+      shiftPoint(4)};
+  const bool allPointsInBounds = pointsInBounds(points);
+
+  OnionSkinMask initialMask = onionHandle->getOnionSkinMask();
+  const bool initialOffsetsOk =
+      initialMask.isShiftTraceEnabled() &&
+      initialMask.getShiftTraceGhostFrameOffset(0) == -1 &&
+      initialMask.getShiftTraceGhostFrameOffset(1) == 1;
+
+  const bool moveBackDelivered =
+      gui_smoke_replay_row_area_click(rowArea, points[0]);
+  gui_smoke_pump_events(100);
+  OnionSkinMask afterMoveBackMask = onionHandle->getOnionSkinMask();
+  const bool moveBackOk =
+      moveBackDelivered &&
+      afterMoveBackMask.getShiftTraceGhostFrameOffset(0) == -2 &&
+      afterMoveBackMask.getShiftTraceGhostFrameOffset(1) == 1;
+
+  const bool moveFrontDelivered =
+      gui_smoke_replay_row_area_click(rowArea, points[4]);
+  gui_smoke_pump_events(100);
+  OnionSkinMask afterMoveFrontMask = onionHandle->getOnionSkinMask();
+  const bool moveFrontOk =
+      moveFrontDelivered &&
+      afterMoveFrontMask.getShiftTraceGhostFrameOffset(0) == -2 &&
+      afterMoveFrontMask.getShiftTraceGhostFrameOffset(1) == 2;
+
+  const bool resetDelivered =
+      gui_smoke_replay_row_area_click(rowArea, points[2]);
+  gui_smoke_pump_events(100);
+  OnionSkinMask afterResetMask = onionHandle->getOnionSkinMask();
+  const bool resetOk =
+      resetDelivered && afterResetMask.getShiftTraceGhostFrameOffset(0) == -1 &&
+      afterResetMask.getShiftTraceGhostFrameOffset(1) == 1;
+
+  const bool hideBackDelivered =
+      gui_smoke_replay_row_area_click(rowArea, points[1]);
+  gui_smoke_pump_events(100);
+  OnionSkinMask afterHideBackMask = onionHandle->getOnionSkinMask();
+  const bool hideBackOk =
+      hideBackDelivered &&
+      afterHideBackMask.getShiftTraceGhostFrameOffset(0) == 0 &&
+      afterHideBackMask.getShiftTraceGhostFrameOffset(1) == 1;
+
+  const bool hideFrontDelivered =
+      gui_smoke_replay_row_area_click(rowArea, points[3]);
+  gui_smoke_pump_events(100);
+  OnionSkinMask afterHideFrontMask = onionHandle->getOnionSkinMask();
+  const bool hideFrontOk =
+      hideFrontDelivered &&
+      afterHideFrontMask.getShiftTraceGhostFrameOffset(0) == 0 &&
+      afterHideFrontMask.getShiftTraceGhostFrameOffset(1) == 0;
+
+  const bool finalMoveBackDelivered =
+      gui_smoke_replay_row_area_click(rowArea, points[0]);
+  gui_smoke_pump_events(100);
+  const bool finalMoveFrontDelivered =
+      gui_smoke_replay_row_area_click(rowArea, points[4]);
+  gui_smoke_pump_events(150);
+  OnionSkinMask activeMask = onionHandle->getOnionSkinMask();
+  const bool finalOffsetsOk =
+      finalMoveBackDelivered && finalMoveFrontDelivered &&
+      activeMask.isShiftTraceEnabled() &&
+      activeMask.getShiftTraceStatus() == OnionSkinMask::ENABLED &&
+      activeMask.getShiftTraceGhostFrameOffset(0) == -2 &&
+      activeMask.getShiftTraceGhostFrameOffset(1) == 2;
+
+  viewer->GLInvalidateAll();
+  xsheetViewer->updateRows();
+  rowArea->update();
+  gui_smoke_pump_events(180);
+
+  const QImage rowAfter = gui_smoke_grab_widget_frame(rowArea);
+  QString rowAfterPath;
+  const bool rowAfterSaved = gui_smoke_save_capture(
+      rowAfter,
+      QStringLiteral("viewer-onion-skin-shift-trace-xsheet-after.png"),
+      &rowAfterPath);
+  const GuiSmokeWidgetImageStats rowStats =
+      gui_smoke_analyze_widget_frame(rowAfter, rowBefore);
+  const bool rowHighDpiOk = gui_smoke_widget_high_dpi_ok(rowArea, rowAfter);
+  const bool rowAreaOk = rowBeforeSaved && rowAfterSaved && rowHighDpiOk &&
+                         rowStats.changedPixels > 0 &&
+                         rowStats.nonBackgroundPixels > 0;
+
+  const int currentFrame = TApp::instance()->getCurrentFrame()->getFrame();
+  const int currentColumn =
+      TApp::instance()->getCurrentColumn()->getColumnIndex();
+  const TXshCell currentCell = xsheet->getCell(2, 0);
+
+  ImagePainter::VisualSettings visualSettings;
+  visualSettings.m_sceneProperties = scene->getProperties();
+  GuiSmokeStageOnionCounts stageCounts(visualSettings);
+  Stage::VisitArgs args;
+  args.m_scene          = scene;
+  args.m_xsh            = xsheet;
+  args.m_row            = currentFrame;
+  args.m_col            = currentColumn;
+  args.m_osm            = &activeMask;
+  args.m_currentFrameId = currentCell.getFrameId();
+  Stage::visit(stageCounts, args);
+
+  const bool onionOk =
+      finalOffsetsOk && stageCounts.m_onionPlayers >= 2 &&
+      stageCounts.m_backOnionPlayers >= 1 &&
+      stageCounts.m_frontOnionPlayers >= 1 && currentFrame == 2 &&
+      currentColumn == 0 && !currentCell.isEmpty();
+  const bool shiftTraceOk =
+      shiftTraceActionOk && allPointsInBounds && initialOffsetsOk &&
+      moveBackOk && moveFrontOk && resetOk && hideBackOk && hideFrontOk &&
+      finalOffsetsOk && onionOk && rowAreaOk;
+
+  details << QString("scene=%1").arg(scenePath.getQString())
+          << QStringLiteral("onionSkinContent=shift-trace-raster")
+          << QString("xsheetViewerFound=%1")
+                 .arg(xsheetViewer ? QStringLiteral("true")
+                                   : QStringLiteral("false"))
+          << QString("xsheetViewerVisible=%1")
+                 .arg(xsheetViewer->isVisible() ? QStringLiteral("true")
+                                                : QStringLiteral("false"))
+          << QString("xsheetRowAreaFound=%1")
+                 .arg(rowArea ? QStringLiteral("true")
+                              : QStringLiteral("false"))
+          << QString("xsheetRowAreaVisible=%1")
+                 .arg(rowArea->isVisible() ? QStringLiteral("true")
+                                           : QStringLiteral("false"))
+          << QString("xsheetRowAreaWidth=%1").arg(rowArea->width())
+          << QString("xsheetRowAreaHeight=%1").arg(rowArea->height())
+          << QString("xsheetRowAreaImageWidth=%1").arg(rowAfter.width())
+          << QString("xsheetRowAreaImageHeight=%1").arg(rowAfter.height())
+          << QString("xsheetRowAreaHighDpiProbe=%1")
+                 .arg(rowHighDpiOk ? QStringLiteral("ok")
+                                   : QStringLiteral("error"))
+          << QString("xsheetRowAreaChangedPixels=%1")
+                 .arg(rowStats.changedPixels)
+          << QString("xsheetRowAreaNonBackgroundPixels=%1")
+                 .arg(rowStats.nonBackgroundPixels)
+          << QString("xsheetRowAreaDistinctColors=%1")
+                 .arg(rowStats.distinctColors)
+          << QString("xsheetRowAreaBeforeCaptureSaved=%1")
+                 .arg(rowBeforeSaved ? QStringLiteral("true")
+                                     : QStringLiteral("false"))
+          << QString("xsheetRowAreaAfterCaptureSaved=%1")
+                 .arg(rowAfterSaved ? QStringLiteral("true")
+                                    : QStringLiteral("false"))
+          << QString("xsheetRowAreaBeforeCapturePath=%1")
+                 .arg(gui_smoke_status_value(rowBeforePath))
+          << QString("xsheetRowAreaAfterCapturePath=%1")
+                 .arg(gui_smoke_status_value(rowAfterPath))
+          << QString("xsheetRowAreaProbe=%1")
+                 .arg(rowAreaOk ? QStringLiteral("ok")
+                                : QStringLiteral("error"))
+          << QString("shiftTraceActionEnabled=%1")
+                 .arg(shiftTraceActionOk ? QStringLiteral("true")
+                                         : QStringLiteral("false"))
+          << QString("shiftTraceInitialOffsets=%1")
+                 .arg(gui_smoke_shift_trace_offsets(initialMask))
+          << QString("shiftTraceAfterMoveBackOffsets=%1")
+                 .arg(gui_smoke_shift_trace_offsets(afterMoveBackMask))
+          << QString("shiftTraceAfterMoveFrontOffsets=%1")
+                 .arg(gui_smoke_shift_trace_offsets(afterMoveFrontMask))
+          << QString("shiftTraceAfterResetOffsets=%1")
+                 .arg(gui_smoke_shift_trace_offsets(afterResetMask))
+          << QString("shiftTraceAfterHideBackOffsets=%1")
+                 .arg(gui_smoke_shift_trace_offsets(afterHideBackMask))
+          << QString("shiftTraceAfterHideFrontOffsets=%1")
+                 .arg(gui_smoke_shift_trace_offsets(afterHideFrontMask))
+          << QString("shiftTraceFinalOffsets=%1")
+                 .arg(gui_smoke_shift_trace_offsets(activeMask))
+          << QString("shiftTracePointsInBounds=%1")
+                 .arg(allPointsInBounds ? QStringLiteral("true")
+                                        : QStringLiteral("false"))
+          << QString("shiftTracePoints=%1").arg(joinedPoints(points))
+          << QString("shiftTraceMoveBackEventDelivered=%1")
+                 .arg(moveBackDelivered ? QStringLiteral("true")
+                                        : QStringLiteral("false"))
+          << QString("shiftTraceMoveFrontEventDelivered=%1")
+                 .arg(moveFrontDelivered ? QStringLiteral("true")
+                                         : QStringLiteral("false"))
+          << QString("shiftTraceResetEventDelivered=%1")
+                 .arg(resetDelivered ? QStringLiteral("true")
+                                     : QStringLiteral("false"))
+          << QString("shiftTraceHideBackEventDelivered=%1")
+                 .arg(hideBackDelivered ? QStringLiteral("true")
+                                        : QStringLiteral("false"))
+          << QString("shiftTraceHideFrontEventDelivered=%1")
+                 .arg(hideFrontDelivered ? QStringLiteral("true")
+                                         : QStringLiteral("false"))
+          << QString("shiftTraceFinalMoveBackEventDelivered=%1")
+                 .arg(finalMoveBackDelivered ? QStringLiteral("true")
+                                             : QStringLiteral("false"))
+          << QString("shiftTraceFinalMoveFrontEventDelivered=%1")
+                 .arg(finalMoveFrontDelivered ? QStringLiteral("true")
+                                              : QStringLiteral("false"))
+          << QString("onionSkinCurrentRow=%1").arg(currentFrame)
+          << QString("onionSkinShiftTraceStatus=%1")
+                 .arg(activeMask.getShiftTraceStatus())
+          << QString("stagePlayerCount=%1").arg(stageCounts.m_totalPlayers)
+          << QString("stageCurrentPlayerCount=%1")
+                 .arg(stageCounts.m_currentPlayers)
+          << QString("stageCurrentColumnPlayerCount=%1")
+                 .arg(stageCounts.m_currentColumnCount)
+          << QString("stageOnionPlayerCount=%1")
+                 .arg(stageCounts.m_onionPlayers)
+          << QString("stageBackOnionPlayerCount=%1")
+                 .arg(stageCounts.m_backOnionPlayers)
+          << QString("stageFrontOnionPlayerCount=%1")
+                 .arg(stageCounts.m_frontOnionPlayers)
+          << QString("stageOnionRows=%1").arg(stageCounts.m_rows.join(','))
+          << QString("onionSkinProbe=%1")
+                 .arg(onionOk ? QStringLiteral("ok")
+                              : QStringLiteral("error"))
+          << QString("onionSkinShiftTraceProbe=%1")
+                 .arg(shiftTraceOk ? QStringLiteral("ok")
+                                   : QStringLiteral("error"));
+  details += gui_smoke_viewer_capture_details(
+      viewer, before, QStringLiteral("viewer-onion-skin-shift-trace"),
+      QStringLiteral("shift-trace-onion-skin"), shiftTraceOk, 1);
 
   return details;
 }
@@ -6338,6 +6775,49 @@ static bool gui_smoke_replay_viewer_mouse_drag(
                   Qt::LeftButton, Qt::NoButton, modifiers) &&
               delivered;
   gui_smoke_pump_events(100);
+
+  if (localPointsOut) *localPointsOut = localPoints;
+  return delivered;
+}
+
+static bool gui_smoke_replay_viewer_mouse_polyline(
+    SceneViewer *viewer, const std::vector<TPointD> &worldPoints,
+    std::vector<QPointF> *localPointsOut = nullptr) {
+  if (!viewer || worldPoints.size() < 3) return false;
+
+  viewer->setFocus(Qt::OtherFocusReason);
+  gui_smoke_pump_events();
+
+  std::vector<QPointF> localPoints;
+  localPoints.reserve(worldPoints.size());
+  for (const TPointD &point : worldPoints) {
+    const QPointF localPoint = gui_smoke_world_to_viewer_local(viewer, point);
+    if (!viewer->rect().contains(localPoint.toPoint())) return false;
+    localPoints.push_back(localPoint);
+  }
+
+  bool delivered = true;
+  for (const QPointF &localPoint : localPoints) {
+    delivered = gui_smoke_send_viewer_mouse_event(
+                    viewer, QEvent::MouseButtonPress, localPoint,
+                    Qt::LeftButton, Qt::LeftButton) &&
+                delivered;
+    delivered = gui_smoke_send_viewer_mouse_event(
+                    viewer, QEvent::MouseButtonRelease, localPoint,
+                    Qt::LeftButton, Qt::NoButton) &&
+                delivered;
+  }
+
+  const QPointF closePoint = localPoints.back();
+  delivered = gui_smoke_send_viewer_mouse_event(
+                  viewer, QEvent::MouseButtonDblClick, closePoint,
+                  Qt::LeftButton, Qt::LeftButton) &&
+              delivered;
+  delivered = gui_smoke_send_viewer_mouse_event(
+                  viewer, QEvent::MouseButtonRelease, closePoint,
+                  Qt::LeftButton, Qt::NoButton) &&
+              delivered;
+  gui_smoke_pump_events(120);
 
   if (localPointsOut) *localPointsOut = localPoints;
   return delivered;
@@ -9768,6 +10248,966 @@ gui_smoke_viewer_selection_tool_vector_center_thickness_deform_details(
   return details;
 }
 
+static QStringList
+gui_smoke_viewer_selection_tool_vector_mode_variants_details(
+    const QString &requestedSceneName) {
+  QStringList details;
+  SceneViewer *viewer = gui_smoke_resolve_scene_viewer();
+  if (!viewer) {
+    details << QStringLiteral("viewerRenderProbe=no-viewer")
+            << QStringLiteral("selectionToolProbe=no-viewer")
+            << QStringLiteral("selectionFreehandProbe=no-viewer")
+            << QStringLiteral("selectionPolylineProbe=no-viewer")
+            << QStringLiteral("mouseEventProbe=no-viewer");
+    return details;
+  }
+
+  QString sceneName   = gui_smoke_scene_name(requestedSceneName);
+  TFilePath scenePath = gui_smoke_scene_path(sceneName);
+  if (!TSystem::touchParentDir(scenePath)) {
+    details << QStringLiteral("viewerRenderProbe=scene-folder-error")
+            << QStringLiteral("selectionToolProbe=scene-folder-error")
+            << QStringLiteral("selectionFreehandProbe=scene-folder-error")
+            << QStringLiteral("selectionPolylineProbe=scene-folder-error")
+            << QStringLiteral("mouseEventProbe=scene-folder-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  IoCmd::newScene();
+  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+  scene->setScenePath(scenePath);
+  TApp::instance()->getCurrentScene()->notifySceneSwitched();
+  TApp::instance()->getCurrentScene()->notifyNameSceneChange();
+
+  TXshLevel *levelXl = scene->createNewLevel(
+      PLI_XSHLEVEL, L"qt6_gui_viewer_selection_tool_vector_mode_variants");
+  TXshSimpleLevel *simpleLevel = levelXl ? levelXl->getSimpleLevel() : nullptr;
+  if (!simpleLevel) {
+    details << QStringLiteral("viewerRenderProbe=level-error")
+            << QStringLiteral("selectionToolProbe=level-error")
+            << QStringLiteral("selectionFreehandProbe=level-error")
+            << QStringLiteral("selectionPolylineProbe=level-error")
+            << QStringLiteral("mouseEventProbe=level-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  const TFrameId fid(1);
+  if (!gui_smoke_add_vector_multi_probe_frame(simpleLevel, fid)) {
+    details << QStringLiteral("viewerRenderProbe=vector-frame-error")
+            << QStringLiteral("selectionToolProbe=vector-frame-error")
+            << QStringLiteral("selectionFreehandProbe=vector-frame-error")
+            << QStringLiteral("selectionPolylineProbe=vector-frame-error")
+            << QStringLiteral("mouseEventProbe=vector-frame-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  TXsheet *xsheet = scene->getXsheet();
+  if (!xsheet->setCell(0, 0, TXshCell(simpleLevel, fid))) {
+    details << QStringLiteral("viewerRenderProbe=xsheet-error")
+            << QStringLiteral("selectionToolProbe=xsheet-error")
+            << QStringLiteral("selectionFreehandProbe=xsheet-error")
+            << QStringLiteral("selectionPolylineProbe=xsheet-error")
+            << QStringLiteral("mouseEventProbe=xsheet-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  const TStageObjectId objectId = TStageObjectId::ColumnId(0);
+  TApp::instance()->getCurrentFrame()->setFrame(0);
+  TApp::instance()->getCurrentColumn()->setColumnIndex(0);
+  TApp::instance()->getCurrentObject()->setObjectId(objectId);
+  TApp::instance()->getCurrentObject()->notifyObjectIdSwitched();
+  TApp::instance()->getCurrentLevel()->setLevel(levelXl);
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  TApp::instance()->getCurrentScene()->notifySceneChanged();
+  TApp::instance()->getCurrentLevel()->notifyLevelChange();
+
+  viewer->resetSceneViewer();
+  viewer->fitToCamera();
+  viewer->GLInvalidateAll();
+  gui_smoke_pump_events(100);
+
+  ToolHandle *toolHandle = TApp::instance()->getCurrentTool();
+  if (!toolHandle) {
+    details << QStringLiteral("viewerRenderProbe=tool-handle-error")
+            << QStringLiteral("selectionToolProbe=tool-handle-error")
+            << QStringLiteral("selectionFreehandProbe=tool-handle-error")
+            << QStringLiteral("selectionPolylineProbe=tool-handle-error")
+            << QStringLiteral("mouseEventProbe=tool-handle-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  toolHandle->onImageChanged(TImage::VECTOR);
+  toolHandle->setTool(T_Selection);
+  TTool *tool = toolHandle->getTool();
+  if (!tool || tool->getName() != T_Selection) {
+    details << QStringLiteral("viewerRenderProbe=tool-error")
+            << QStringLiteral("selectionToolProbe=tool-error")
+            << QStringLiteral("selectionFreehandProbe=tool-error")
+            << QStringLiteral("selectionPolylineProbe=tool-error")
+            << QStringLiteral("mouseEventProbe=tool-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  SelectionTool *selectionTool = dynamic_cast<SelectionTool *>(tool);
+  if (!selectionTool) {
+    details << QStringLiteral("viewerRenderProbe=tool-cast-error")
+            << QStringLiteral("selectionToolProbe=tool-cast-error")
+            << QStringLiteral("selectionFreehandProbe=tool-cast-error")
+            << QStringLiteral("selectionPolylineProbe=tool-cast-error")
+            << QStringLiteral("mouseEventProbe=tool-cast-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  tool->setViewer(viewer);
+  tool->updateMatrix();
+  const QString disabledReason = tool->updateEnabled();
+  if (!tool->isEnabled()) {
+    details << QStringLiteral("viewerRenderProbe=tool-disabled")
+            << QStringLiteral("selectionToolProbe=tool-disabled")
+            << QStringLiteral("selectionFreehandProbe=tool-disabled")
+            << QStringLiteral("selectionPolylineProbe=tool-disabled")
+            << QStringLiteral("mouseEventProbe=tool-disabled")
+            << QString("toolDisabledReason=%1")
+                   .arg(gui_smoke_status_value(disabledReason))
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  QString selectionModeValue;
+  const bool selectionModeOk = gui_smoke_set_tool_enum_property(
+      tool, "Mode:", "SelectionMode", L"Standard", &selectionModeValue);
+  QString freehandTypeValue;
+  const bool freehandTypeOk = gui_smoke_set_tool_enum_property(
+      tool, "Type:", "Type", L"Freehand", &freehandTypeValue);
+  tool->updateMatrix();
+  viewer->GLInvalidateAll();
+  gui_smoke_pump_events(100);
+  const QImage before = gui_smoke_grab_viewer_frame(viewer);
+
+  TVectorImageP image = (TVectorImageP)simpleLevel->getFrame(fid, false);
+  const int vectorStrokeCount = image ? image->getStrokeCount() : -1;
+
+  StrokeSelection *selection =
+      dynamic_cast<StrokeSelection *>(tool->getSelection());
+  const bool selectionEmptyBefore = selection ? selection->isEmpty() : true;
+
+  const std::vector<TPointD> freehandPoints = {
+      TPointD(-270.0, -135.0), TPointD(-260.0, 145.0),
+      TPointD(-40.0, 145.0),   TPointD(-40.0, -135.0),
+      TPointD(-270.0, -135.0)};
+  std::vector<QPointF> freehandLocalPoints;
+  const bool freehandMouseEventsDelivered =
+      freehandTypeOk ? gui_smoke_replay_viewer_mouse_drag(
+                           viewer, freehandPoints, &freehandLocalPoints)
+                     : false;
+
+  TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  TApp::instance()->getCurrentScene()->notifySceneChanged();
+  viewer->GLInvalidateAll();
+  gui_smoke_pump_events(150);
+
+  selection = dynamic_cast<StrokeSelection *>(tool->getSelection());
+  const int freehandCount =
+      selection ? static_cast<int>(selection->getSelection().size()) : -1;
+  const bool freehandStroke0Selected = selection && selection->isSelected(0);
+  const bool freehandStroke1Selected = selection && selection->isSelected(1);
+  const int freehandBBoxCount        = selectionTool->getBBoxsCount();
+  const TRectD freehandBBox =
+      freehandBBoxCount > 0 ? selectionTool->getBBox().getBox() : TRectD();
+  const bool selectionFreehandOk =
+      freehandTypeOk && freehandMouseEventsDelivered && selection &&
+      selectionEmptyBefore && freehandCount == 1 && freehandStroke0Selected &&
+      !freehandStroke1Selected && freehandBBoxCount > 0 &&
+      !freehandBBox.isEmpty();
+
+  bool selectionClearedBeforePolyline = false;
+  if (selection) {
+    selection->selectNone();
+    selectionTool->onSelectionChanged();
+    TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+    selectionClearedBeforePolyline = selection->isEmpty();
+  }
+
+  QString polylineTypeValue;
+  const bool polylineTypeOk = gui_smoke_set_tool_enum_property(
+      tool, "Type:", "Type", L"Polyline", &polylineTypeValue);
+  tool->updateMatrix();
+  viewer->GLInvalidateAll();
+  gui_smoke_pump_events(80);
+
+  const std::vector<TPointD> polylinePoints = {
+      TPointD(35.0, -125.0), TPointD(275.0, -125.0),
+      TPointD(275.0, 150.0), TPointD(35.0, 150.0)};
+  std::vector<QPointF> polylineLocalPoints;
+  const bool polylineMouseEventsDelivered =
+      polylineTypeOk ? gui_smoke_replay_viewer_mouse_polyline(
+                           viewer, polylinePoints, &polylineLocalPoints)
+                     : false;
+
+  TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  TApp::instance()->getCurrentScene()->notifySceneChanged();
+  TApp::instance()->getCurrentLevel()->notifyLevelChange();
+  tool->updateMatrix();
+  viewer->GLInvalidateAll();
+  gui_smoke_pump_events(150);
+
+  selection = dynamic_cast<StrokeSelection *>(tool->getSelection());
+  const int polylineCount =
+      selection ? static_cast<int>(selection->getSelection().size()) : -1;
+  const bool polylineStroke0Selected = selection && selection->isSelected(0);
+  const bool polylineStroke1Selected = selection && selection->isSelected(1);
+  const int polylineBBoxCount        = selectionTool->getBBoxsCount();
+  const TRectD polylineBBox =
+      polylineBBoxCount > 0 ? selectionTool->getBBox().getBox() : TRectD();
+  const bool bboxChangedFromFreehand =
+      !freehandBBox.isEmpty() && !polylineBBox.isEmpty() &&
+      (std::abs(polylineBBox.x0 - freehandBBox.x0) > 1.0 ||
+       std::abs(polylineBBox.x1 - freehandBBox.x1) > 1.0 ||
+       std::abs(polylineBBox.y0 - freehandBBox.y0) > 1.0 ||
+       std::abs(polylineBBox.y1 - freehandBBox.y1) > 1.0);
+  const bool selectionPolylineOk =
+      polylineTypeOk && polylineMouseEventsDelivered && selection &&
+      selectionClearedBeforePolyline && polylineCount == 1 &&
+      !polylineStroke0Selected && polylineStroke1Selected &&
+      polylineBBoxCount > 0 && !polylineBBox.isEmpty() &&
+      bboxChangedFromFreehand;
+
+  simpleLevel->setDirtyFlag(true);
+  const bool selectionToolOk =
+      selectionModeOk && freehandTypeOk && polylineTypeOk && tool->isEnabled();
+  const bool mouseEventsDelivered =
+      freehandMouseEventsDelivered && polylineMouseEventsDelivered;
+  const bool selectionOk =
+      selectionToolOk && selectionFreehandOk && selectionPolylineOk;
+
+  details << QString("scene=%1").arg(scenePath.getQString())
+          << QStringLiteral("toolInputPath=qt-mouse-events")
+          << QString("toolName=%1").arg(QString::fromStdString(tool->getName()))
+          << QString("toolTargetType=%1").arg(tool->getTargetType())
+          << QString("toolEnabled=%1")
+                 .arg(tool->isEnabled() ? QStringLiteral("true")
+                                        : QStringLiteral("false"))
+          << QString("toolDisabledReason=%1")
+                 .arg(gui_smoke_status_value(disabledReason))
+          << QString("selectionMode=%1")
+                 .arg(gui_smoke_status_value(selectionModeValue))
+          << QString("selectionFreehandType=%1")
+                 .arg(gui_smoke_status_value(freehandTypeValue))
+          << QString("selectionPolylineType=%1")
+                 .arg(gui_smoke_status_value(polylineTypeValue))
+          << QString("selectionEmptyBefore=%1")
+                 .arg(selectionEmptyBefore ? QStringLiteral("true")
+                                           : QStringLiteral("false"))
+          << QString("vectorStrokeCount=%1").arg(vectorStrokeCount)
+          << QString("selectionFreehandCount=%1").arg(freehandCount)
+          << QString("selectionFreehandStroke0Selected=%1")
+                 .arg(freehandStroke0Selected ? QStringLiteral("true")
+                                              : QStringLiteral("false"))
+          << QString("selectionFreehandStroke1Selected=%1")
+                 .arg(freehandStroke1Selected ? QStringLiteral("true")
+                                              : QStringLiteral("false"))
+          << QString("selectionFreehandBBox=%1")
+                 .arg(gui_smoke_rect_details(freehandBBox))
+          << QString("selectionFreehandBBoxCount=%1").arg(freehandBBoxCount)
+          << QString("selectionClearedBeforePolyline=%1")
+                 .arg(selectionClearedBeforePolyline ? QStringLiteral("true")
+                                                     : QStringLiteral("false"))
+          << QString("selectionPolylineCount=%1").arg(polylineCount)
+          << QString("selectionPolylineStroke0Selected=%1")
+                 .arg(polylineStroke0Selected ? QStringLiteral("true")
+                                              : QStringLiteral("false"))
+          << QString("selectionPolylineStroke1Selected=%1")
+                 .arg(polylineStroke1Selected ? QStringLiteral("true")
+                                              : QStringLiteral("false"))
+          << QString("selectionPolylineBBox=%1")
+                 .arg(gui_smoke_rect_details(polylineBBox))
+          << QString("selectionPolylineBBoxCount=%1").arg(polylineBBoxCount)
+          << QString("selectionBBoxChangedFromFreehand=%1")
+                 .arg(bboxChangedFromFreehand ? QStringLiteral("true")
+                                              : QStringLiteral("false"))
+          << QString("selectionFreehandLocalPoints=%1")
+                 .arg(gui_smoke_joined_local_points(freehandLocalPoints))
+          << QString("selectionPolylineLocalPoints=%1")
+                 .arg(gui_smoke_joined_local_points(polylineLocalPoints))
+          << QString("selectionFreehandMouseEvents=%1")
+                 .arg(freehandMouseEventsDelivered ? QStringLiteral("ok")
+                                                   : QStringLiteral("error"))
+          << QString("selectionPolylineMouseEvents=%1")
+                 .arg(polylineMouseEventsDelivered ? QStringLiteral("ok")
+                                                   : QStringLiteral("error"))
+          << QString("selectionToolProbe=%1")
+                 .arg(selectionToolOk ? QStringLiteral("ok")
+                                      : QStringLiteral("error"))
+          << QString("selectionFreehandProbe=%1")
+                 .arg(selectionFreehandOk ? QStringLiteral("ok")
+                                          : QStringLiteral("error"))
+          << QString("selectionPolylineProbe=%1")
+                 .arg(selectionPolylineOk ? QStringLiteral("ok")
+                                          : QStringLiteral("error"))
+          << QString("mouseEventProbe=%1")
+                 .arg(mouseEventsDelivered ? QStringLiteral("ok")
+                                           : QStringLiteral("error"));
+  details += gui_smoke_viewer_capture_details(
+      viewer, before,
+      QStringLiteral("viewer-selection-tool-vector-mode-variants"),
+      QStringLiteral("selection-tool-vector-mode-variants"), selectionOk);
+
+  return details;
+}
+
+static QStringList gui_smoke_viewer_selection_tool_raster_handles_details(
+    const QString &requestedSceneName) {
+  QStringList details;
+  SceneViewer *viewer = gui_smoke_resolve_scene_viewer();
+  if (!viewer) {
+    details << QStringLiteral("viewerRenderProbe=no-viewer")
+            << QStringLiteral("selectionToolProbe=no-viewer")
+            << QStringLiteral("selectionRectProbe=no-viewer")
+            << QStringLiteral("selectionRasterCursorProbe=no-viewer")
+            << QStringLiteral("selectionRasterHandleProbe=no-viewer")
+            << QStringLiteral("mouseEventProbe=no-viewer");
+    return details;
+  }
+
+  QString sceneName   = gui_smoke_scene_name(requestedSceneName);
+  TFilePath scenePath = gui_smoke_scene_path(sceneName);
+  if (!TSystem::touchParentDir(scenePath)) {
+    details << QStringLiteral("viewerRenderProbe=scene-folder-error")
+            << QStringLiteral("selectionToolProbe=scene-folder-error")
+            << QStringLiteral("selectionRectProbe=scene-folder-error")
+            << QStringLiteral("selectionRasterCursorProbe=scene-folder-error")
+            << QStringLiteral("selectionRasterHandleProbe=scene-folder-error")
+            << QStringLiteral("mouseEventProbe=scene-folder-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  IoCmd::newScene();
+  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+  scene->setScenePath(scenePath);
+  TApp::instance()->getCurrentScene()->notifySceneSwitched();
+  TApp::instance()->getCurrentScene()->notifyNameSceneChange();
+
+  TXshLevel *levelXl = scene->createNewLevel(
+      OVL_XSHLEVEL, L"qt6_gui_viewer_selection_tool_raster_handles");
+  TXshSimpleLevel *simpleLevel = levelXl ? levelXl->getSimpleLevel() : nullptr;
+  if (!simpleLevel) {
+    details << QStringLiteral("viewerRenderProbe=level-error")
+            << QStringLiteral("selectionToolProbe=level-error")
+            << QStringLiteral("selectionRectProbe=level-error")
+            << QStringLiteral("selectionRasterCursorProbe=level-error")
+            << QStringLiteral("selectionRasterHandleProbe=level-error")
+            << QStringLiteral("mouseEventProbe=level-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  const TFrameId fid(1);
+  gui_smoke_add_raster_probe_frame(simpleLevel, fid);
+
+  TXsheet *xsheet = scene->getXsheet();
+  if (!xsheet->setCell(0, 0, TXshCell(simpleLevel, fid))) {
+    details << QStringLiteral("viewerRenderProbe=xsheet-error")
+            << QStringLiteral("selectionToolProbe=xsheet-error")
+            << QStringLiteral("selectionRectProbe=xsheet-error")
+            << QStringLiteral("selectionRasterCursorProbe=xsheet-error")
+            << QStringLiteral("selectionRasterHandleProbe=xsheet-error")
+            << QStringLiteral("mouseEventProbe=xsheet-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  const TStageObjectId objectId = TStageObjectId::ColumnId(0);
+  TApp::instance()->getCurrentFrame()->setFrame(0);
+  TApp::instance()->getCurrentColumn()->setColumnIndex(0);
+  TApp::instance()->getCurrentObject()->setObjectId(objectId);
+  TApp::instance()->getCurrentObject()->notifyObjectIdSwitched();
+  TApp::instance()->getCurrentLevel()->setLevel(levelXl);
+  TApp::instance()->getCurrentPalette()->setPalette(simpleLevel->getPalette(),
+                                                    1);
+  TApp::instance()->getPaletteController()->getCurrentLevelPalette()->setPalette(
+      simpleLevel->getPalette(), 1);
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  TApp::instance()->getCurrentScene()->notifySceneChanged();
+  TApp::instance()->getCurrentLevel()->notifyLevelChange();
+
+  viewer->resetSceneViewer();
+  viewer->fitToCamera();
+  viewer->GLInvalidateAll();
+  gui_smoke_pump_events(100);
+
+  ToolHandle *toolHandle = TApp::instance()->getCurrentTool();
+  if (!toolHandle) {
+    details << QStringLiteral("viewerRenderProbe=tool-handle-error")
+            << QStringLiteral("selectionToolProbe=tool-handle-error")
+            << QStringLiteral("selectionRectProbe=tool-handle-error")
+            << QStringLiteral("selectionRasterCursorProbe=tool-handle-error")
+            << QStringLiteral("selectionRasterHandleProbe=tool-handle-error")
+            << QStringLiteral("mouseEventProbe=tool-handle-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  toolHandle->onImageChanged(TImage::RASTER);
+  toolHandle->setTool(T_Selection);
+  TTool *tool = toolHandle->getTool();
+  if (!tool || tool->getName() != T_Selection) {
+    details << QStringLiteral("viewerRenderProbe=tool-error")
+            << QStringLiteral("selectionToolProbe=tool-error")
+            << QStringLiteral("selectionRectProbe=tool-error")
+            << QStringLiteral("selectionRasterCursorProbe=tool-error")
+            << QStringLiteral("selectionRasterHandleProbe=tool-error")
+            << QStringLiteral("mouseEventProbe=tool-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  SelectionTool *selectionTool = dynamic_cast<SelectionTool *>(tool);
+  if (!selectionTool) {
+    details << QStringLiteral("viewerRenderProbe=tool-cast-error")
+            << QStringLiteral("selectionToolProbe=tool-cast-error")
+            << QStringLiteral("selectionRectProbe=tool-cast-error")
+            << QStringLiteral("selectionRasterCursorProbe=tool-cast-error")
+            << QStringLiteral("selectionRasterHandleProbe=tool-cast-error")
+            << QStringLiteral("mouseEventProbe=tool-cast-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  tool->setViewer(viewer);
+  tool->updateMatrix();
+  const QString disabledReason = tool->updateEnabled();
+  if (!tool->isEnabled()) {
+    details << QStringLiteral("viewerRenderProbe=tool-disabled")
+            << QStringLiteral("selectionToolProbe=tool-disabled")
+            << QStringLiteral("selectionRectProbe=tool-disabled")
+            << QStringLiteral("selectionRasterCursorProbe=tool-disabled")
+            << QStringLiteral("selectionRasterHandleProbe=tool-disabled")
+            << QStringLiteral("mouseEventProbe=tool-disabled")
+            << QString("toolDisabledReason=%1")
+                   .arg(gui_smoke_status_value(disabledReason))
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  QString selectionModeValue;
+  bool selectionModeOk = gui_smoke_set_tool_enum_property(
+      tool, "Mode:", "SelectionMode", L"Standard", &selectionModeValue);
+  if (!selectionModeOk && selectionModeValue == QStringLiteral("<missing>")) {
+    selectionModeOk    = true;
+    selectionModeValue = QStringLiteral("not-applicable");
+  }
+  QString selectionTypeValue;
+  const bool selectionTypeOk = gui_smoke_set_tool_enum_property(
+      tool, "Type:", "Type", L"Rectangular", &selectionTypeValue);
+  tool->updateMatrix();
+  viewer->GLInvalidateAll();
+  gui_smoke_pump_events(100);
+  const QImage before = gui_smoke_grab_viewer_frame(viewer);
+  const GuiSmokeRasterStats rasterBefore =
+      gui_smoke_analyze_raster_frame(simpleLevel, fid);
+
+  RasterSelection *selection =
+      dynamic_cast<RasterSelection *>(tool->getSelection());
+  const bool selectionEmptyBefore = selection ? selection->isEmpty() : true;
+  const bool selectionFloatingBefore =
+      selection ? selection->isFloating() : false;
+
+  const TPointD selectStart(-90.0, -85.0);
+  const TPointD selectEnd(95.0, 90.0);
+  std::vector<QPointF> selectionRectLocalPoints;
+  const bool selectionRectMouseEventsDelivered =
+      gui_smoke_replay_viewer_mouse_drag(
+          viewer, {selectStart, selectEnd}, &selectionRectLocalPoints);
+
+  TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  TApp::instance()->getCurrentScene()->notifySceneChanged();
+  viewer->GLInvalidateAll();
+  gui_smoke_pump_events(120);
+
+  selection = dynamic_cast<RasterSelection *>(tool->getSelection());
+  const bool selectionEmptyAfterRect = selection ? selection->isEmpty() : true;
+  const bool selectionFloatingAfterRect =
+      selection ? selection->isFloating() : false;
+  const TRectD selectionBBoxAfterRect =
+      selection ? selection->getSelectionBbox() : TRectD();
+  const int bboxCountAfterRect = selectionTool->getBBoxsCount();
+  const bool selectionRectOk =
+      selectionRectMouseEventsDelivered && selection && selectionEmptyBefore &&
+      !selectionEmptyAfterRect && !selectionFloatingAfterRect &&
+      !selectionBBoxAfterRect.isEmpty() && bboxCountAfterRect > 0;
+
+  DragSelectionTool::FourPoints bboxBeforeScale =
+      bboxCountAfterRect > 0 ? selectionTool->getBBox()
+                             : DragSelectionTool::FourPoints();
+  const bool bboxBeforeScaleEmpty = bboxBeforeScale.isEmpty();
+  const TPointD scaleHandle = bboxBeforeScale.getP11();
+  const TPointD scaleEnd(scaleHandle.x + 55.0, scaleHandle.y + 45.0);
+  const QPointF scaleHandleLocal =
+      gui_smoke_world_to_viewer_local(viewer, scaleHandle);
+  bool scaleHoverDelivered  = false;
+  int scaleCursorId         = ToolCursor::CURSOR_NONE;
+  bool scaleCursorArtworkOk = false;
+  if (selectionRectOk && !bboxBeforeScaleEmpty &&
+      viewer->rect().contains(scaleHandleLocal.toPoint())) {
+    scaleHoverDelivered =
+        gui_smoke_send_viewer_mouse_event(viewer, QEvent::MouseMove,
+                                          scaleHandleLocal, Qt::NoButton,
+                                          Qt::NoButton, Qt::NoModifier);
+    scaleCursorId        = tool->getCursorId();
+    scaleCursorArtworkOk = gui_smoke_tool_cursor_pixmap_ok(scaleCursorId);
+  }
+  const bool selectionCursorOk =
+      scaleHoverDelivered && scaleCursorArtworkOk &&
+      (scaleCursorId == ToolCursor::ScaleCursor ||
+       scaleCursorId == ToolCursor::ScaleInvCursor);
+
+  std::vector<QPointF> scaleLocalDragPoints;
+  const bool scaleMouseEventsDelivered =
+      selectionRectOk && !bboxBeforeScaleEmpty
+          ? gui_smoke_replay_viewer_mouse_drag(viewer, {scaleHandle, scaleEnd},
+                                               &scaleLocalDragPoints)
+          : false;
+
+  TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  TApp::instance()->getCurrentScene()->notifySceneChanged();
+  TApp::instance()->getCurrentLevel()->notifyLevelChange();
+  tool->updateMatrix();
+  viewer->GLInvalidateAll();
+  gui_smoke_pump_events(150);
+
+  selection = dynamic_cast<RasterSelection *>(tool->getSelection());
+  const bool selectionEmptyAfterScale = selection ? selection->isEmpty() : true;
+  const bool selectionFloatingAfterScale =
+      selection ? selection->isFloating() : false;
+  const TRectD selectionBBoxAfterScale =
+      selection ? selection->getSelectionBbox() : TRectD();
+  const double bboxWidthDelta =
+      selectionBBoxAfterScale.getLx() - selectionBBoxAfterRect.getLx();
+  const double bboxHeightDelta =
+      selectionBBoxAfterScale.getLy() - selectionBBoxAfterRect.getLy();
+  const bool selectionHandleOk =
+      scaleMouseEventsDelivered && !selectionEmptyAfterScale &&
+      selectionFloatingAfterScale && !selectionBBoxAfterScale.isEmpty() &&
+      (std::abs(bboxWidthDelta) > 0.5 || std::abs(bboxHeightDelta) > 0.5);
+
+  simpleLevel->setDirtyFlag(true);
+  const GuiSmokeRasterStats rasterAfter =
+      gui_smoke_analyze_raster_frame(simpleLevel, fid);
+  const bool selectionToolOk =
+      selectionModeOk && selectionTypeOk && tool->isEnabled();
+  const bool mouseEventsDelivered = selectionRectMouseEventsDelivered &&
+                                    scaleHoverDelivered &&
+                                    scaleMouseEventsDelivered;
+  const bool selectionOk = selectionToolOk && selectionRectOk &&
+                           selectionCursorOk && selectionHandleOk;
+
+  details << QString("scene=%1").arg(scenePath.getQString())
+          << QStringLiteral("toolInputPath=qt-mouse-events")
+          << QString("toolName=%1").arg(QString::fromStdString(tool->getName()))
+          << QString("toolTargetType=%1").arg(tool->getTargetType())
+          << QString("toolEnabled=%1")
+                 .arg(tool->isEnabled() ? QStringLiteral("true")
+                                        : QStringLiteral("false"))
+          << QString("toolDisabledReason=%1")
+                 .arg(gui_smoke_status_value(disabledReason))
+          << QString("selectionMode=%1")
+                 .arg(gui_smoke_status_value(selectionModeValue))
+          << QString("selectionType=%1")
+                 .arg(gui_smoke_status_value(selectionTypeValue))
+          << QString("selectionEmptyBefore=%1")
+                 .arg(selectionEmptyBefore ? QStringLiteral("true")
+                                           : QStringLiteral("false"))
+          << QString("selectionFloatingBefore=%1")
+                 .arg(selectionFloatingBefore ? QStringLiteral("true")
+                                              : QStringLiteral("false"))
+          << QString("selectionEmptyAfterRect=%1")
+                 .arg(selectionEmptyAfterRect ? QStringLiteral("true")
+                                              : QStringLiteral("false"))
+          << QString("selectionFloatingAfterRect=%1")
+                 .arg(selectionFloatingAfterRect ? QStringLiteral("true")
+                                                 : QStringLiteral("false"))
+          << QString("selectionBBoxAfterRect=%1")
+                 .arg(gui_smoke_rect_details(selectionBBoxAfterRect))
+          << QString("selectionBBoxAfterScale=%1")
+                 .arg(gui_smoke_rect_details(selectionBBoxAfterScale))
+          << QString("selectionBBoxWidthDelta=%1")
+                 .arg(bboxWidthDelta, 0, 'f', 4)
+          << QString("selectionBBoxHeightDelta=%1")
+                 .arg(bboxHeightDelta, 0, 'f', 4)
+          << QString("selectionEmptyAfterScale=%1")
+                 .arg(selectionEmptyAfterScale ? QStringLiteral("true")
+                                               : QStringLiteral("false"))
+          << QString("selectionFloatingAfterScale=%1")
+                 .arg(selectionFloatingAfterScale ? QStringLiteral("true")
+                                                  : QStringLiteral("false"))
+          << QString("selectionBBoxCountAfterRect=%1").arg(bboxCountAfterRect)
+          << QString("selectionRectLocalPoints=%1")
+                 .arg(gui_smoke_joined_local_points(selectionRectLocalPoints))
+          << QString("selectionScaleHandleWorld=%1,%2")
+                 .arg(scaleHandle.x, 0, 'f', 4)
+                 .arg(scaleHandle.y, 0, 'f', 4)
+          << QString("selectionScaleHandleLocalPoints=%1")
+                 .arg(gui_smoke_joined_local_points(scaleLocalDragPoints))
+          << QString("selectionScaleCursorId=%1").arg(scaleCursorId)
+          << QString("selectionScaleCursorArtwork=%1")
+                 .arg(scaleCursorArtworkOk ? QStringLiteral("ok")
+                                           : QStringLiteral("error"))
+          << QString("rasterPixelsBefore=%1").arg(rasterBefore.opaquePixels)
+          << QString("rasterPixelsAfter=%1").arg(rasterAfter.opaquePixels)
+          << QString("rasterRedPixelsBefore=%1").arg(rasterBefore.redPixels)
+          << QString("rasterRedPixelsAfter=%1").arg(rasterAfter.redPixels)
+          << QString("selectionRectMouseEvents=%1")
+                 .arg(selectionRectMouseEventsDelivered
+                          ? QStringLiteral("ok")
+                          : QStringLiteral("error"))
+          << QString("selectionScaleHoverEvent=%1")
+                 .arg(scaleHoverDelivered ? QStringLiteral("ok")
+                                          : QStringLiteral("error"))
+          << QString("selectionScaleMouseEvents=%1")
+                 .arg(scaleMouseEventsDelivered ? QStringLiteral("ok")
+                                                : QStringLiteral("error"))
+          << QString("selectionToolProbe=%1")
+                 .arg(selectionToolOk ? QStringLiteral("ok")
+                                      : QStringLiteral("error"))
+          << QString("selectionRectProbe=%1")
+                 .arg(selectionRectOk ? QStringLiteral("ok")
+                                      : QStringLiteral("error"))
+          << QString("selectionRasterCursorProbe=%1")
+                 .arg(selectionCursorOk ? QStringLiteral("ok")
+                                        : QStringLiteral("error"))
+          << QString("selectionRasterHandleProbe=%1")
+                 .arg(selectionHandleOk ? QStringLiteral("ok")
+                                        : QStringLiteral("error"))
+          << QString("mouseEventProbe=%1")
+                 .arg(mouseEventsDelivered ? QStringLiteral("ok")
+                                           : QStringLiteral("error"));
+  details += gui_smoke_viewer_capture_details(
+      viewer, before, QStringLiteral("viewer-selection-tool-raster-handles"),
+      QStringLiteral("selection-tool-raster-handles"), selectionOk);
+
+  return details;
+}
+
+static QStringList
+gui_smoke_viewer_selection_tool_raster_mode_variants_details(
+    const QString &requestedSceneName) {
+  QStringList details;
+  SceneViewer *viewer = gui_smoke_resolve_scene_viewer();
+  if (!viewer) {
+    details << QStringLiteral("viewerRenderProbe=no-viewer")
+            << QStringLiteral("selectionToolProbe=no-viewer")
+            << QStringLiteral("selectionFreehandProbe=no-viewer")
+            << QStringLiteral("selectionPolylineProbe=no-viewer")
+            << QStringLiteral("mouseEventProbe=no-viewer");
+    return details;
+  }
+
+  QString sceneName   = gui_smoke_scene_name(requestedSceneName);
+  TFilePath scenePath = gui_smoke_scene_path(sceneName);
+  if (!TSystem::touchParentDir(scenePath)) {
+    details << QStringLiteral("viewerRenderProbe=scene-folder-error")
+            << QStringLiteral("selectionToolProbe=scene-folder-error")
+            << QStringLiteral("selectionFreehandProbe=scene-folder-error")
+            << QStringLiteral("selectionPolylineProbe=scene-folder-error")
+            << QStringLiteral("mouseEventProbe=scene-folder-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  IoCmd::newScene();
+  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+  scene->setScenePath(scenePath);
+  TApp::instance()->getCurrentScene()->notifySceneSwitched();
+  TApp::instance()->getCurrentScene()->notifyNameSceneChange();
+
+  TXshLevel *levelXl = scene->createNewLevel(
+      OVL_XSHLEVEL, L"qt6_gui_viewer_selection_tool_raster_mode_variants");
+  TXshSimpleLevel *simpleLevel = levelXl ? levelXl->getSimpleLevel() : nullptr;
+  if (!simpleLevel) {
+    details << QStringLiteral("viewerRenderProbe=level-error")
+            << QStringLiteral("selectionToolProbe=level-error")
+            << QStringLiteral("selectionFreehandProbe=level-error")
+            << QStringLiteral("selectionPolylineProbe=level-error")
+            << QStringLiteral("mouseEventProbe=level-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  const TFrameId fid(1);
+  gui_smoke_add_raster_probe_frame(simpleLevel, fid);
+
+  TXsheet *xsheet = scene->getXsheet();
+  if (!xsheet->setCell(0, 0, TXshCell(simpleLevel, fid))) {
+    details << QStringLiteral("viewerRenderProbe=xsheet-error")
+            << QStringLiteral("selectionToolProbe=xsheet-error")
+            << QStringLiteral("selectionFreehandProbe=xsheet-error")
+            << QStringLiteral("selectionPolylineProbe=xsheet-error")
+            << QStringLiteral("mouseEventProbe=xsheet-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  const TStageObjectId objectId = TStageObjectId::ColumnId(0);
+  TApp::instance()->getCurrentFrame()->setFrame(0);
+  TApp::instance()->getCurrentColumn()->setColumnIndex(0);
+  TApp::instance()->getCurrentObject()->setObjectId(objectId);
+  TApp::instance()->getCurrentObject()->notifyObjectIdSwitched();
+  TApp::instance()->getCurrentLevel()->setLevel(levelXl);
+  TApp::instance()->getCurrentPalette()->setPalette(simpleLevel->getPalette(),
+                                                    1);
+  TApp::instance()->getPaletteController()->getCurrentLevelPalette()->setPalette(
+      simpleLevel->getPalette(), 1);
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  TApp::instance()->getCurrentScene()->notifySceneChanged();
+  TApp::instance()->getCurrentLevel()->notifyLevelChange();
+
+  viewer->resetSceneViewer();
+  viewer->fitToCamera();
+  viewer->GLInvalidateAll();
+  gui_smoke_pump_events(100);
+
+  ToolHandle *toolHandle = TApp::instance()->getCurrentTool();
+  if (!toolHandle) {
+    details << QStringLiteral("viewerRenderProbe=tool-handle-error")
+            << QStringLiteral("selectionToolProbe=tool-handle-error")
+            << QStringLiteral("selectionFreehandProbe=tool-handle-error")
+            << QStringLiteral("selectionPolylineProbe=tool-handle-error")
+            << QStringLiteral("mouseEventProbe=tool-handle-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  toolHandle->onImageChanged(TImage::RASTER);
+  toolHandle->setTool(T_Selection);
+  TTool *tool = toolHandle->getTool();
+  if (!tool || tool->getName() != T_Selection) {
+    details << QStringLiteral("viewerRenderProbe=tool-error")
+            << QStringLiteral("selectionToolProbe=tool-error")
+            << QStringLiteral("selectionFreehandProbe=tool-error")
+            << QStringLiteral("selectionPolylineProbe=tool-error")
+            << QStringLiteral("mouseEventProbe=tool-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  SelectionTool *selectionTool = dynamic_cast<SelectionTool *>(tool);
+  if (!selectionTool) {
+    details << QStringLiteral("viewerRenderProbe=tool-cast-error")
+            << QStringLiteral("selectionToolProbe=tool-cast-error")
+            << QStringLiteral("selectionFreehandProbe=tool-cast-error")
+            << QStringLiteral("selectionPolylineProbe=tool-cast-error")
+            << QStringLiteral("mouseEventProbe=tool-cast-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  tool->setViewer(viewer);
+  tool->updateMatrix();
+  const QString disabledReason = tool->updateEnabled();
+  if (!tool->isEnabled()) {
+    details << QStringLiteral("viewerRenderProbe=tool-disabled")
+            << QStringLiteral("selectionToolProbe=tool-disabled")
+            << QStringLiteral("selectionFreehandProbe=tool-disabled")
+            << QStringLiteral("selectionPolylineProbe=tool-disabled")
+            << QStringLiteral("mouseEventProbe=tool-disabled")
+            << QString("toolDisabledReason=%1")
+                   .arg(gui_smoke_status_value(disabledReason))
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  QString selectionModeValue;
+  bool selectionModeOk = gui_smoke_set_tool_enum_property(
+      tool, "Mode:", "SelectionMode", L"Standard", &selectionModeValue);
+  if (!selectionModeOk && selectionModeValue == QStringLiteral("<missing>")) {
+    selectionModeOk    = true;
+    selectionModeValue = QStringLiteral("not-applicable");
+  }
+
+  QString freehandTypeValue;
+  const bool freehandTypeOk = gui_smoke_set_tool_enum_property(
+      tool, "Type:", "Type", L"Freehand", &freehandTypeValue);
+  tool->updateMatrix();
+  viewer->GLInvalidateAll();
+  gui_smoke_pump_events(100);
+  const QImage before = gui_smoke_grab_viewer_frame(viewer);
+
+  RasterSelection *selection =
+      dynamic_cast<RasterSelection *>(tool->getSelection());
+  const bool selectionEmptyBefore = selection ? selection->isEmpty() : true;
+
+  const std::vector<TPointD> freehandPoints = {
+      TPointD(-150.0, -85.0), TPointD(-130.0, -130.0),
+      TPointD(-70.0, -150.0), TPointD(-15.0, -110.0),
+      TPointD(-5.0, -35.0),   TPointD(-45.0, 55.0),
+      TPointD(-110.0, 70.0),  TPointD(-160.0, 15.0),
+      TPointD(-150.0, -85.0)};
+  std::vector<QPointF> freehandLocalPoints;
+  const bool freehandMouseEventsDelivered =
+      freehandTypeOk ? gui_smoke_replay_viewer_mouse_drag(
+                           viewer, freehandPoints, &freehandLocalPoints)
+                     : false;
+
+  TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  TApp::instance()->getCurrentScene()->notifySceneChanged();
+  viewer->GLInvalidateAll();
+  gui_smoke_pump_events(150);
+
+  selection = dynamic_cast<RasterSelection *>(tool->getSelection());
+  const bool selectionEmptyAfterFreehand =
+      selection ? selection->isEmpty() : true;
+  const bool selectionFloatingAfterFreehand =
+      selection ? selection->isFloating() : false;
+  const TRectD selectionBBoxAfterFreehand =
+      selection ? selection->getSelectionBbox() : TRectD();
+  const int bboxCountAfterFreehand = selectionTool->getBBoxsCount();
+  const bool selectionFreehandOk =
+      freehandTypeOk && freehandMouseEventsDelivered && selection &&
+      selectionEmptyBefore && !selectionEmptyAfterFreehand &&
+      !selectionFloatingAfterFreehand && !selectionBBoxAfterFreehand.isEmpty() &&
+      bboxCountAfterFreehand > 0;
+
+  QString polylineTypeValue;
+  const bool polylineTypeOk = gui_smoke_set_tool_enum_property(
+      tool, "Type:", "Type", L"Polyline", &polylineTypeValue);
+  tool->updateMatrix();
+  viewer->GLInvalidateAll();
+  gui_smoke_pump_events(80);
+
+  const std::vector<TPointD> polylinePoints = {
+      TPointD(35.0, -95.0), TPointD(155.0, -95.0),
+      TPointD(165.0, 55.0), TPointD(55.0, 105.0)};
+  std::vector<QPointF> polylineLocalPoints;
+  const bool polylineMouseEventsDelivered =
+      polylineTypeOk ? gui_smoke_replay_viewer_mouse_polyline(
+                           viewer, polylinePoints, &polylineLocalPoints)
+                     : false;
+
+  TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  TApp::instance()->getCurrentScene()->notifySceneChanged();
+  TApp::instance()->getCurrentLevel()->notifyLevelChange();
+  tool->updateMatrix();
+  viewer->GLInvalidateAll();
+  gui_smoke_pump_events(150);
+
+  selection = dynamic_cast<RasterSelection *>(tool->getSelection());
+  const bool selectionEmptyAfterPolyline =
+      selection ? selection->isEmpty() : true;
+  const bool selectionFloatingAfterPolyline =
+      selection ? selection->isFloating() : false;
+  const TRectD selectionBBoxAfterPolyline =
+      selection ? selection->getSelectionBbox() : TRectD();
+  const int bboxCountAfterPolyline = selectionTool->getBBoxsCount();
+  const bool bboxChangedFromFreehand =
+      !selectionBBoxAfterFreehand.isEmpty() &&
+      !selectionBBoxAfterPolyline.isEmpty() &&
+      (std::abs(selectionBBoxAfterPolyline.x0 -
+                selectionBBoxAfterFreehand.x0) > 1.0 ||
+       std::abs(selectionBBoxAfterPolyline.x1 -
+                selectionBBoxAfterFreehand.x1) > 1.0 ||
+       std::abs(selectionBBoxAfterPolyline.y0 -
+                selectionBBoxAfterFreehand.y0) > 1.0 ||
+       std::abs(selectionBBoxAfterPolyline.y1 -
+                selectionBBoxAfterFreehand.y1) > 1.0);
+  const bool selectionPolylineOk =
+      polylineTypeOk && polylineMouseEventsDelivered && selection &&
+      !selectionEmptyAfterPolyline && !selectionFloatingAfterPolyline &&
+      !selectionBBoxAfterPolyline.isEmpty() && bboxCountAfterPolyline > 0 &&
+      bboxChangedFromFreehand;
+
+  simpleLevel->setDirtyFlag(true);
+  const bool selectionToolOk =
+      selectionModeOk && freehandTypeOk && polylineTypeOk && tool->isEnabled();
+  const bool mouseEventsDelivered =
+      freehandMouseEventsDelivered && polylineMouseEventsDelivered;
+  const bool selectionOk =
+      selectionToolOk && selectionFreehandOk && selectionPolylineOk;
+
+  details << QString("scene=%1").arg(scenePath.getQString())
+          << QStringLiteral("toolInputPath=qt-mouse-events")
+          << QString("toolName=%1").arg(QString::fromStdString(tool->getName()))
+          << QString("toolTargetType=%1").arg(tool->getTargetType())
+          << QString("toolEnabled=%1")
+                 .arg(tool->isEnabled() ? QStringLiteral("true")
+                                        : QStringLiteral("false"))
+          << QString("toolDisabledReason=%1")
+                 .arg(gui_smoke_status_value(disabledReason))
+          << QString("selectionMode=%1")
+                 .arg(gui_smoke_status_value(selectionModeValue))
+          << QString("selectionFreehandType=%1")
+                 .arg(gui_smoke_status_value(freehandTypeValue))
+          << QString("selectionPolylineType=%1")
+                 .arg(gui_smoke_status_value(polylineTypeValue))
+          << QString("selectionEmptyBefore=%1")
+                 .arg(selectionEmptyBefore ? QStringLiteral("true")
+                                           : QStringLiteral("false"))
+          << QString("selectionEmptyAfterFreehand=%1")
+                 .arg(selectionEmptyAfterFreehand ? QStringLiteral("true")
+                                                  : QStringLiteral("false"))
+          << QString("selectionFloatingAfterFreehand=%1")
+                 .arg(selectionFloatingAfterFreehand ? QStringLiteral("true")
+                                                     : QStringLiteral("false"))
+          << QString("selectionBBoxAfterFreehand=%1")
+                 .arg(gui_smoke_rect_details(selectionBBoxAfterFreehand))
+          << QString("selectionBBoxCountAfterFreehand=%1")
+                 .arg(bboxCountAfterFreehand)
+          << QString("selectionEmptyAfterPolyline=%1")
+                 .arg(selectionEmptyAfterPolyline ? QStringLiteral("true")
+                                                  : QStringLiteral("false"))
+          << QString("selectionFloatingAfterPolyline=%1")
+                 .arg(selectionFloatingAfterPolyline ? QStringLiteral("true")
+                                                     : QStringLiteral("false"))
+          << QString("selectionBBoxAfterPolyline=%1")
+                 .arg(gui_smoke_rect_details(selectionBBoxAfterPolyline))
+          << QString("selectionBBoxCountAfterPolyline=%1")
+                 .arg(bboxCountAfterPolyline)
+          << QString("selectionBBoxChangedFromFreehand=%1")
+                 .arg(bboxChangedFromFreehand ? QStringLiteral("true")
+                                              : QStringLiteral("false"))
+          << QString("selectionFreehandLocalPoints=%1")
+                 .arg(gui_smoke_joined_local_points(freehandLocalPoints))
+          << QString("selectionPolylineLocalPoints=%1")
+                 .arg(gui_smoke_joined_local_points(polylineLocalPoints))
+          << QString("selectionFreehandMouseEvents=%1")
+                 .arg(freehandMouseEventsDelivered ? QStringLiteral("ok")
+                                                   : QStringLiteral("error"))
+          << QString("selectionPolylineMouseEvents=%1")
+                 .arg(polylineMouseEventsDelivered ? QStringLiteral("ok")
+                                                   : QStringLiteral("error"))
+          << QString("selectionToolProbe=%1")
+                 .arg(selectionToolOk ? QStringLiteral("ok")
+                                      : QStringLiteral("error"))
+          << QString("selectionFreehandProbe=%1")
+                 .arg(selectionFreehandOk ? QStringLiteral("ok")
+                                          : QStringLiteral("error"))
+          << QString("selectionPolylineProbe=%1")
+                 .arg(selectionPolylineOk ? QStringLiteral("ok")
+                                          : QStringLiteral("error"))
+          << QString("mouseEventProbe=%1")
+                 .arg(mouseEventsDelivered ? QStringLiteral("ok")
+                                           : QStringLiteral("error"));
+  details += gui_smoke_viewer_capture_details(
+      viewer, before,
+      QStringLiteral("viewer-selection-tool-raster-mode-variants"),
+      QStringLiteral("selection-tool-raster-mode-variants"), selectionOk);
+
+  return details;
+}
+
 static bool gui_smoke_send_viewer_tablet_event(SceneViewer *viewer,
                                                QEvent::Type type,
                                                const QPointF &localPos,
@@ -11081,6 +12521,20 @@ static void run_gui_smoke_hook(const QString &action,
       return;
     }
 
+    if (action == "viewer-onion-skin-shift-trace") {
+      QStringList details =
+          gui_smoke_viewer_onion_skin_shift_trace_details(requestedSceneName);
+      details << QString("window=%1").arg(TApp::instance()
+                                              ->getMainWindow()
+                                              ->windowTitle());
+      const bool ok = details.contains(QStringLiteral("viewerRenderProbe=ok")) &&
+                      details.contains(QStringLiteral("onionSkinProbe=ok")) &&
+                      details.contains(
+                          QStringLiteral("onionSkinShiftTraceProbe=ok"));
+      write_gui_smoke_status(action, ok ? "ok" : "error", details);
+      return;
+    }
+
     if (action == "viewer-onion-skin-context-menu") {
       QStringList details =
           gui_smoke_viewer_onion_skin_context_menu_details(
@@ -11445,6 +12899,61 @@ static void run_gui_smoke_hook(const QString &action,
                           QStringLiteral("selectionAdvancedCursorProbe=ok")) &&
                       details.contains(
                           QStringLiteral("selectionAdvancedHandleProbe=ok")) &&
+                      details.contains(QStringLiteral("mouseEventProbe=ok"));
+      write_gui_smoke_status(action, ok ? "ok" : "error", details);
+      return;
+    }
+
+    if (action == "viewer-selection-tool-vector-mode-variants") {
+      QStringList details =
+          gui_smoke_viewer_selection_tool_vector_mode_variants_details(
+              requestedSceneName);
+      details << QString("window=%1").arg(TApp::instance()
+                                              ->getMainWindow()
+                                              ->windowTitle());
+      const bool ok = details.contains(QStringLiteral("viewerRenderProbe=ok")) &&
+                      details.contains(QStringLiteral("selectionToolProbe=ok")) &&
+                      details.contains(
+                          QStringLiteral("selectionFreehandProbe=ok")) &&
+                      details.contains(
+                          QStringLiteral("selectionPolylineProbe=ok")) &&
+                      details.contains(QStringLiteral("mouseEventProbe=ok"));
+      write_gui_smoke_status(action, ok ? "ok" : "error", details);
+      return;
+    }
+
+    if (action == "viewer-selection-tool-raster-handles") {
+      QStringList details =
+          gui_smoke_viewer_selection_tool_raster_handles_details(
+              requestedSceneName);
+      details << QString("window=%1").arg(TApp::instance()
+                                              ->getMainWindow()
+                                              ->windowTitle());
+      const bool ok = details.contains(QStringLiteral("viewerRenderProbe=ok")) &&
+                      details.contains(QStringLiteral("selectionToolProbe=ok")) &&
+                      details.contains(QStringLiteral("selectionRectProbe=ok")) &&
+                      details.contains(
+                          QStringLiteral("selectionRasterCursorProbe=ok")) &&
+                      details.contains(
+                          QStringLiteral("selectionRasterHandleProbe=ok")) &&
+                      details.contains(QStringLiteral("mouseEventProbe=ok"));
+      write_gui_smoke_status(action, ok ? "ok" : "error", details);
+      return;
+    }
+
+    if (action == "viewer-selection-tool-raster-mode-variants") {
+      QStringList details =
+          gui_smoke_viewer_selection_tool_raster_mode_variants_details(
+              requestedSceneName);
+      details << QString("window=%1").arg(TApp::instance()
+                                              ->getMainWindow()
+                                              ->windowTitle());
+      const bool ok = details.contains(QStringLiteral("viewerRenderProbe=ok")) &&
+                      details.contains(QStringLiteral("selectionToolProbe=ok")) &&
+                      details.contains(
+                          QStringLiteral("selectionFreehandProbe=ok")) &&
+                      details.contains(
+                          QStringLiteral("selectionPolylineProbe=ok")) &&
                       details.contains(QStringLiteral("mouseEventProbe=ok"));
       write_gui_smoke_status(action, ok ? "ok" : "error", details);
       return;

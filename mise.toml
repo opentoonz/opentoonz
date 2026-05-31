@@ -26,6 +26,14 @@ run = "nix develop path:. --command bash scripts/qt6/check-textcodec.sh qt5"
 description = "Compile and run the Qt 6 legacy text-codec adapter regression check."
 run = "nix develop path:.#qt6 --command bash scripts/qt6/check-textcodec.sh qt6"
 
+[tasks.check-no-qregexp]
+description = "Fail if removed Qt 5 QRegExp APIs reappear under toonz/sources."
+run = "bash scripts/qt6/check-no-qregexp.sh"
+
+[tasks.check-core5compat-scope]
+description = "Fail if Core5Compat or direct QTextCodec usage escapes the documented adapter scope."
+run = "bash scripts/qt6/check-core5compat-scope.sh"
+
 [tasks.prepare-tiff]
 description = "Build OpenToonz's vendored libtiff dependency."
 run = "nix develop path:. --command bash scripts/nix/prepare-tiff.sh"
@@ -138,6 +146,10 @@ run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-onion-skin-rowarea-drag bash scripts/qt
 description = "Replay xsheet row-area fixed onion marker range drags and verify Qt 6 viewer/row-area rendering."
 run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-onion-skin-fixed-marker-drag bash scripts/qt6/run-gui-smoke.sh"
 
+[tasks.gui-smoke-viewer-onion-skin-shift-trace-qt6]
+description = "Replay xsheet row-area Shift and Trace ghost marker clicks and verify Qt 6 viewer/row-area rendering."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-onion-skin-shift-trace bash scripts/qt6/run-gui-smoke.sh"
+
 [tasks.gui-smoke-viewer-onion-skin-context-menu-qt6]
 description = "Trigger onion-skin context menu commands and verify Qt 6 viewer/row-area rendering."
 run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-onion-skin-context-menu bash scripts/qt6/run-gui-smoke.sh"
@@ -241,6 +253,18 @@ run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-selection-tool-vector-handle-variants b
 [tasks.gui-smoke-viewer-selection-tool-vector-center-thickness-deform-qt6]
 description = "Replay Selection tool vector center, thickness, and free-deform handles through Qt 6 SceneViewer mouse events."
 run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-selection-tool-vector-center-thickness-deform bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-viewer-selection-tool-vector-mode-variants-qt6]
+description = "Select vector strokes with Freehand and Polyline Selection tool modes through Qt 6 SceneViewer mouse events."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-selection-tool-vector-mode-variants bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-viewer-selection-tool-raster-handles-qt6]
+description = "Select and scale a raster Selection tool region through Qt 6 SceneViewer mouse events."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-selection-tool-raster-handles bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-viewer-selection-tool-raster-mode-variants-qt6]
+description = "Select raster regions with Freehand and Polyline Selection tool modes through Qt 6 SceneViewer mouse events."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-selection-tool-raster-mode-variants bash scripts/qt6/run-gui-smoke.sh"
 
 [tasks.gui-smoke-viewer-vector-brush-qt6]
 description = "Replay a vector brush stroke and verify Qt 6 SceneViewer framebuffer pixels in the packaged app."
@@ -362,6 +386,10 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_basic.too
 description = "Run the Qt 6 app bundle against Image constructor, load, and save edge cases."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-image-edges-empty Empty 0 0 0 Empty image true|qt-script-image-edges-load true true true Empty 0 0|qt-script-image-edges-save true true true ToonzRaster 9 7' bash scripts/qt6/run-script-smoke.sh"
 
+[tasks.script-smoke-image-level-first-frame-qt6]
+description = "Run the Qt 6 app bundle against Image loading the first frame from a multi-frame level."
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_level_first_frame.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='Loaded first frame of 2|qt-script-image-level-first-frame Raster 2 false 32 32 true Raster image ( 32 x 32 )|qt-script-image-level-explicit-frame true Raster 21 17 Raster image ( 21 x 17 )' bash scripts/qt6/run-script-smoke.sh"
+
 [tasks.script-smoke-image-builder-qt6]
 description = "Run the Qt 6 app bundle against the ImageBuilder and Transform headless script binding fixture."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_builder.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-imagebuilder-transform Identity Translation(4,6)|qt-script-imagebuilder-transform-variants Rotation(90) Scale(200%) Scale(200%, 300%) Translation(-6,4)*Rotation(90)|qt-script-imagebuilder-composite ImageBuilder(Raster image) Raster 40 38 true 40 38|qt-script-imagebuilder-filled ImageBuilder(Raster image) Raster 40 38|qt-script-imagebuilder-typed ImageBuilder(Raster image) Raster 12 10|qt-script-imagebuilder-typed-toonz ImageBuilder(ToonzRaster image) ToonzRaster 9 7' bash scripts/qt6/run-script-smoke.sh"
@@ -416,7 +444,7 @@ run = "OPENTOONZ_SCRIPT_USE_QAPPLICATION=1 OPENTOONZ_SCRIPT_FIXTURE=toonz/source
 
 [tasks.script-smoke-renderer-edges-qt6]
 description = "Run the Qt 6 app bundle against Renderer argument edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/renderer_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-renderer-edges-errors [true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/renderer_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-renderer-edges-errors [true,true,true,true,true,true,true,true]|qt-script-renderer-list-edges-errors [true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-level-transformers-qt6]
 description = "Run the Qt 6 app bundle against level-wide vectorizer and rasterizer binding fixtures."

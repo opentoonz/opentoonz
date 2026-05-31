@@ -30,6 +30,7 @@ tasks=(
   script-smoke-level-path-qt6
   script-smoke-image-qt6
   script-smoke-image-edges-qt6
+  script-smoke-image-level-first-frame-qt6
   script-smoke-image-builder-qt6
   script-smoke-transform-edges-qt6
   script-smoke-image-builder-edges-qt6

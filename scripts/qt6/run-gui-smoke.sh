@@ -471,7 +471,7 @@ if [[ -z "$smoke_action" ]]; then
 fi
 
 case "$smoke_action" in
-  startup|create-scene|open-scene|high-dpi|media-devices|audio-input|audio-recording-wav|audio-playback-wav|camera-formats|audio-output|viewer-render|viewer-vector-render|viewer-zoom-pan|viewer-onion-skin|viewer-onion-skin-rowarea|viewer-onion-skin-rowarea-drag|viewer-onion-skin-fixed-marker-drag|viewer-onion-skin-context-menu|viewer-onion-skin-custom-colors|viewer-onion-skin-orientations|viewer-camera-overlay|viewer-safe-area-field-guide|viewer-safe-area-presets|viewer-safe-area-custom-file|viewer-field-guide-settings|viewer-ruler-guide|viewer-ruler-guide-events|viewer-ruler-guide-variants|viewer-ruler-guide-lines|viewer-ruler-guide-styles|viewer-ruler-ticks|viewer-animate-tool-overlay|viewer-animate-tool-drag|viewer-animate-tool-mouse-events|viewer-animate-tool-undo-redo|viewer-animate-tool-modifiers|viewer-animate-tool-handles|viewer-animate-tool-handle-variants|viewer-animate-tool-axis-drags|viewer-animate-tool-cursors|viewer-selection-tool-vector-handles|viewer-selection-tool-vector-handle-variants|viewer-selection-tool-vector-center-thickness-deform|viewer-vector-brush|viewer-raster-brush|viewer-raster-brush-mouse-events|viewer-raster-brush-tablet-events|viewer-raster-brush-system-events|xsheet-scrub) ;;
+  startup|create-scene|open-scene|high-dpi|media-devices|audio-input|audio-recording-wav|audio-playback-wav|camera-formats|audio-output|viewer-render|viewer-vector-render|viewer-zoom-pan|viewer-onion-skin|viewer-onion-skin-rowarea|viewer-onion-skin-rowarea-drag|viewer-onion-skin-fixed-marker-drag|viewer-onion-skin-shift-trace|viewer-onion-skin-context-menu|viewer-onion-skin-custom-colors|viewer-onion-skin-orientations|viewer-camera-overlay|viewer-safe-area-field-guide|viewer-safe-area-presets|viewer-safe-area-custom-file|viewer-field-guide-settings|viewer-ruler-guide|viewer-ruler-guide-events|viewer-ruler-guide-variants|viewer-ruler-guide-lines|viewer-ruler-guide-styles|viewer-ruler-ticks|viewer-animate-tool-overlay|viewer-animate-tool-drag|viewer-animate-tool-mouse-events|viewer-animate-tool-undo-redo|viewer-animate-tool-modifiers|viewer-animate-tool-handles|viewer-animate-tool-handle-variants|viewer-animate-tool-axis-drags|viewer-animate-tool-cursors|viewer-selection-tool-vector-handles|viewer-selection-tool-vector-handle-variants|viewer-selection-tool-vector-center-thickness-deform|viewer-selection-tool-vector-mode-variants|viewer-selection-tool-raster-handles|viewer-selection-tool-raster-mode-variants|viewer-vector-brush|viewer-raster-brush|viewer-raster-brush-mouse-events|viewer-raster-brush-tablet-events|viewer-raster-brush-system-events|xsheet-scrub) ;;
   *)
     echo "error: unsupported OPENTOONZ_GUI_SMOKE_ACTION: $smoke_action" >&2
     exit 1
@@ -1057,7 +1057,7 @@ while is_smoke_process_running; do
       exit 0
     fi
 
-    if [[ "$smoke_action" == "viewer-render" || "$smoke_action" == "viewer-vector-render" || "$smoke_action" == "viewer-zoom-pan" || "$smoke_action" == "viewer-onion-skin" || "$smoke_action" == "viewer-onion-skin-rowarea" || "$smoke_action" == "viewer-onion-skin-rowarea-drag" || "$smoke_action" == "viewer-onion-skin-fixed-marker-drag" || "$smoke_action" == "viewer-onion-skin-context-menu" || "$smoke_action" == "viewer-onion-skin-custom-colors" || "$smoke_action" == "viewer-onion-skin-orientations" || "$smoke_action" == "viewer-camera-overlay" || "$smoke_action" == "viewer-safe-area-field-guide" || "$smoke_action" == "viewer-safe-area-presets" || "$smoke_action" == "viewer-safe-area-custom-file" || "$smoke_action" == "viewer-field-guide-settings" || "$smoke_action" == "viewer-ruler-guide" || "$smoke_action" == "viewer-ruler-guide-events" || "$smoke_action" == "viewer-ruler-guide-variants" || "$smoke_action" == "viewer-ruler-guide-lines" || "$smoke_action" == "viewer-ruler-guide-styles" || "$smoke_action" == "viewer-ruler-ticks" || "$smoke_action" == "viewer-animate-tool-overlay" || "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-animate-tool-handle-variants" || "$smoke_action" == "viewer-animate-tool-axis-drags" || "$smoke_action" == "viewer-animate-tool-cursors" || "$smoke_action" == "viewer-selection-tool-vector-handles" || "$smoke_action" == "viewer-selection-tool-vector-handle-variants" || "$smoke_action" == "viewer-selection-tool-vector-center-thickness-deform" || "$smoke_action" == "viewer-vector-brush" || "$smoke_action" == "viewer-raster-brush" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
+    if [[ "$smoke_action" == "viewer-render" || "$smoke_action" == "viewer-vector-render" || "$smoke_action" == "viewer-zoom-pan" || "$smoke_action" == "viewer-onion-skin" || "$smoke_action" == "viewer-onion-skin-rowarea" || "$smoke_action" == "viewer-onion-skin-rowarea-drag" || "$smoke_action" == "viewer-onion-skin-fixed-marker-drag" || "$smoke_action" == "viewer-onion-skin-shift-trace" || "$smoke_action" == "viewer-onion-skin-context-menu" || "$smoke_action" == "viewer-onion-skin-custom-colors" || "$smoke_action" == "viewer-onion-skin-orientations" || "$smoke_action" == "viewer-camera-overlay" || "$smoke_action" == "viewer-safe-area-field-guide" || "$smoke_action" == "viewer-safe-area-presets" || "$smoke_action" == "viewer-safe-area-custom-file" || "$smoke_action" == "viewer-field-guide-settings" || "$smoke_action" == "viewer-ruler-guide" || "$smoke_action" == "viewer-ruler-guide-events" || "$smoke_action" == "viewer-ruler-guide-variants" || "$smoke_action" == "viewer-ruler-guide-lines" || "$smoke_action" == "viewer-ruler-guide-styles" || "$smoke_action" == "viewer-ruler-ticks" || "$smoke_action" == "viewer-animate-tool-overlay" || "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-animate-tool-handle-variants" || "$smoke_action" == "viewer-animate-tool-axis-drags" || "$smoke_action" == "viewer-animate-tool-cursors" || "$smoke_action" == "viewer-selection-tool-vector-handles" || "$smoke_action" == "viewer-selection-tool-vector-handle-variants" || "$smoke_action" == "viewer-selection-tool-vector-center-thickness-deform" || "$smoke_action" == "viewer-selection-tool-vector-mode-variants" || "$smoke_action" == "viewer-selection-tool-raster-handles" || "$smoke_action" == "viewer-selection-tool-raster-mode-variants" || "$smoke_action" == "viewer-vector-brush" || "$smoke_action" == "viewer-raster-brush" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
       viewer_status_attempts=100
       if [[ "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
         viewer_status_attempts=400
@@ -1100,7 +1100,7 @@ while is_smoke_process_running; do
       onion_skin_orientation_probe="ok"
       xsheet_row_area_probe="ok"
       xsheet_row_area_high_dpi_probe="ok"
-      if [[ "$smoke_action" == "viewer-onion-skin" || "$smoke_action" == "viewer-onion-skin-rowarea" || "$smoke_action" == "viewer-onion-skin-rowarea-drag" || "$smoke_action" == "viewer-onion-skin-fixed-marker-drag" || "$smoke_action" == "viewer-onion-skin-context-menu" || "$smoke_action" == "viewer-onion-skin-custom-colors" || "$smoke_action" == "viewer-onion-skin-orientations" ]]; then
+      if [[ "$smoke_action" == "viewer-onion-skin" || "$smoke_action" == "viewer-onion-skin-rowarea" || "$smoke_action" == "viewer-onion-skin-rowarea-drag" || "$smoke_action" == "viewer-onion-skin-fixed-marker-drag" || "$smoke_action" == "viewer-onion-skin-shift-trace" || "$smoke_action" == "viewer-onion-skin-context-menu" || "$smoke_action" == "viewer-onion-skin-custom-colors" || "$smoke_action" == "viewer-onion-skin-orientations" ]]; then
         onion_skin_probe="$(status_value onionSkinProbe || true)"
       fi
       if [[ "$smoke_action" == "viewer-onion-skin-rowarea" ]]; then
@@ -1116,6 +1116,12 @@ while is_smoke_process_running; do
       onion_skin_fixed_drag_probe="ok"
       if [[ "$smoke_action" == "viewer-onion-skin-fixed-marker-drag" ]]; then
         onion_skin_fixed_drag_probe="$(status_value onionSkinFixedDragProbe || true)"
+        xsheet_row_area_probe="$(status_value xsheetRowAreaProbe || true)"
+        xsheet_row_area_high_dpi_probe="$(status_value xsheetRowAreaHighDpiProbe || true)"
+      fi
+      onion_skin_shift_trace_probe="ok"
+      if [[ "$smoke_action" == "viewer-onion-skin-shift-trace" ]]; then
+        onion_skin_shift_trace_probe="$(status_value onionSkinShiftTraceProbe || true)"
         xsheet_row_area_probe="$(status_value xsheetRowAreaProbe || true)"
         xsheet_row_area_high_dpi_probe="$(status_value xsheetRowAreaHighDpiProbe || true)"
       fi
@@ -1218,8 +1224,14 @@ while is_smoke_process_running; do
       selection_variant_handle_probe="ok"
       selection_advanced_cursor_probe="ok"
       selection_advanced_handle_probe="ok"
-      if [[ "$smoke_action" == "viewer-selection-tool-vector-handles" || "$smoke_action" == "viewer-selection-tool-vector-handle-variants" || "$smoke_action" == "viewer-selection-tool-vector-center-thickness-deform" ]]; then
+      selection_raster_cursor_probe="ok"
+      selection_raster_handle_probe="ok"
+      selection_freehand_probe="ok"
+      selection_polyline_probe="ok"
+      if [[ "$smoke_action" == "viewer-selection-tool-vector-handles" || "$smoke_action" == "viewer-selection-tool-vector-handle-variants" || "$smoke_action" == "viewer-selection-tool-vector-center-thickness-deform" || "$smoke_action" == "viewer-selection-tool-vector-mode-variants" || "$smoke_action" == "viewer-selection-tool-raster-handles" || "$smoke_action" == "viewer-selection-tool-raster-mode-variants" ]]; then
         selection_tool_probe="$(status_value selectionToolProbe || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-selection-tool-vector-handles" || "$smoke_action" == "viewer-selection-tool-vector-handle-variants" || "$smoke_action" == "viewer-selection-tool-vector-center-thickness-deform" || "$smoke_action" == "viewer-selection-tool-raster-handles" ]]; then
         selection_rect_probe="$(status_value selectionRectProbe || true)"
       fi
       if [[ "$smoke_action" == "viewer-selection-tool-vector-handles" ]]; then
@@ -1234,6 +1246,14 @@ while is_smoke_process_running; do
         selection_advanced_cursor_probe="$(status_value selectionAdvancedCursorProbe || true)"
         selection_advanced_handle_probe="$(status_value selectionAdvancedHandleProbe || true)"
       fi
+      if [[ "$smoke_action" == "viewer-selection-tool-raster-handles" ]]; then
+        selection_raster_cursor_probe="$(status_value selectionRasterCursorProbe || true)"
+        selection_raster_handle_probe="$(status_value selectionRasterHandleProbe || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-selection-tool-vector-mode-variants" || "$smoke_action" == "viewer-selection-tool-raster-mode-variants" ]]; then
+        selection_freehand_probe="$(status_value selectionFreehandProbe || true)"
+        selection_polyline_probe="$(status_value selectionPolylineProbe || true)"
+      fi
       undo_redo_probe="ok"
       if [[ "$smoke_action" == "viewer-animate-tool-undo-redo" ]]; then
         undo_redo_probe="$(status_value undoRedoProbe || true)"
@@ -1246,7 +1266,7 @@ while is_smoke_process_running; do
       fi
       changed_pixels_probe="error"
       if [[ "$changed_pixels" =~ ^[0-9]+$ ]]; then
-        if [[ "$smoke_action" == "viewer-onion-skin" || "$smoke_action" == "viewer-onion-skin-rowarea" || "$smoke_action" == "viewer-onion-skin-rowarea-drag" || "$smoke_action" == "viewer-onion-skin-fixed-marker-drag" || "$smoke_action" == "viewer-onion-skin-context-menu" || "$smoke_action" == "viewer-onion-skin-custom-colors" || "$smoke_action" == "viewer-onion-skin-orientations" || "$changed_pixels" != "0" ]]; then
+        if [[ "$smoke_action" == "viewer-onion-skin" || "$smoke_action" == "viewer-onion-skin-rowarea" || "$smoke_action" == "viewer-onion-skin-rowarea-drag" || "$smoke_action" == "viewer-onion-skin-fixed-marker-drag" || "$smoke_action" == "viewer-onion-skin-shift-trace" || "$smoke_action" == "viewer-onion-skin-context-menu" || "$smoke_action" == "viewer-onion-skin-custom-colors" || "$smoke_action" == "viewer-onion-skin-orientations" || "$changed_pixels" != "0" ]]; then
           changed_pixels_probe="ok"
         fi
       fi
@@ -1266,7 +1286,7 @@ while is_smoke_process_running; do
         fi
       fi
       onion_pixels_probe="ok"
-      if [[ "$smoke_action" == "viewer-onion-skin" || "$smoke_action" == "viewer-onion-skin-rowarea" || "$smoke_action" == "viewer-onion-skin-rowarea-drag" || "$smoke_action" == "viewer-onion-skin-fixed-marker-drag" || "$smoke_action" == "viewer-onion-skin-context-menu" || "$smoke_action" == "viewer-onion-skin-orientations" ]]; then
+      if [[ "$smoke_action" == "viewer-onion-skin" || "$smoke_action" == "viewer-onion-skin-rowarea" || "$smoke_action" == "viewer-onion-skin-rowarea-drag" || "$smoke_action" == "viewer-onion-skin-fixed-marker-drag" || "$smoke_action" == "viewer-onion-skin-shift-trace" || "$smoke_action" == "viewer-onion-skin-context-menu" || "$smoke_action" == "viewer-onion-skin-orientations" ]]; then
         onion_pixels_probe="error"
         if [[ "$onion_pixels" =~ ^[0-9]+$ &&
               "$baseline_onion_pixels" =~ ^[0-9]+$ &&
@@ -1284,7 +1304,7 @@ while is_smoke_process_running; do
         raster_input_probe="$(status_value rasterInputProbe || true)"
       fi
       mouse_event_probe="ok"
-      if [[ "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-animate-tool-handle-variants" || "$smoke_action" == "viewer-animate-tool-axis-drags" || "$smoke_action" == "viewer-animate-tool-cursors" || "$smoke_action" == "viewer-selection-tool-vector-handles" || "$smoke_action" == "viewer-selection-tool-vector-handle-variants" || "$smoke_action" == "viewer-selection-tool-vector-center-thickness-deform" ]]; then
+      if [[ "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-animate-tool-handle-variants" || "$smoke_action" == "viewer-animate-tool-axis-drags" || "$smoke_action" == "viewer-animate-tool-cursors" || "$smoke_action" == "viewer-selection-tool-vector-handles" || "$smoke_action" == "viewer-selection-tool-vector-handle-variants" || "$smoke_action" == "viewer-selection-tool-vector-center-thickness-deform" || "$smoke_action" == "viewer-selection-tool-vector-mode-variants" || "$smoke_action" == "viewer-selection-tool-raster-handles" || "$smoke_action" == "viewer-selection-tool-raster-mode-variants" ]]; then
         mouse_event_probe="$(status_value mouseEventProbe || true)"
       fi
       tablet_event_probe="ok"
@@ -1304,6 +1324,7 @@ while is_smoke_process_running; do
             "$onion_skin_ui_probe" != "ok" ||
             "$onion_skin_drag_probe" != "ok" ||
             "$onion_skin_fixed_drag_probe" != "ok" ||
+            "$onion_skin_shift_trace_probe" != "ok" ||
             "$onion_skin_menu_probe" != "ok" ||
             "$onion_skin_custom_color_probe" != "ok" ||
             "$onion_skin_orientation_probe" != "ok" ||
@@ -1338,6 +1359,10 @@ while is_smoke_process_running; do
             "$selection_variant_handle_probe" != "ok" ||
             "$selection_advanced_cursor_probe" != "ok" ||
             "$selection_advanced_handle_probe" != "ok" ||
+            "$selection_raster_cursor_probe" != "ok" ||
+            "$selection_raster_handle_probe" != "ok" ||
+            "$selection_freehand_probe" != "ok" ||
+            "$selection_polyline_probe" != "ok" ||
             "$undo_redo_probe" != "ok" ||
             "$modifier_probe" != "ok" ||
             "$cursor_precise_probe" != "ok" ||
@@ -1394,6 +1419,12 @@ while is_smoke_process_running; do
           echo "Fixed onion marker drag: row $(status_value onionSkinCurrentRow || true), MOS $(status_value onionSkinMosCount || true), FOS $(status_value onionSkinFosCount || true), rows $(status_value onionSkinRows || true)"
           echo "Fixed onion marker counts: add $(status_value onionSkinFosCountAfterAddBack || true), remove $(status_value onionSkinFosCountAfterRemoveBack || true), final $(status_value onionSkinFosCount || true)"
           echo "Fixed onion marker events: add $(status_value rowAreaAddFixedDragDelivered || true), remove $(status_value rowAreaRemoveFixedDragDelivered || true), front $(status_value rowAreaAddFrontFixedDragDelivered || true)"
+          echo "Row area pixels: changed $(status_value xsheetRowAreaChangedPixels || true), non-background $(status_value xsheetRowAreaNonBackgroundPixels || true)"
+          echo "Onion pixels: ${baseline_onion_pixels} -> ${onion_pixels}"
+        fi
+        if [[ "$smoke_action" == "viewer-onion-skin-shift-trace" ]]; then
+          echo "Shift trace offsets: initial $(status_value shiftTraceInitialOffsets || true), moved $(status_value shiftTraceAfterMoveFrontOffsets || true), reset $(status_value shiftTraceAfterResetOffsets || true), hidden $(status_value shiftTraceAfterHideFrontOffsets || true), final $(status_value shiftTraceFinalOffsets || true)"
+          echo "Shift trace events: move back $(status_value shiftTraceMoveBackEventDelivered || true), move front $(status_value shiftTraceMoveFrontEventDelivered || true), reset $(status_value shiftTraceResetEventDelivered || true), hide back $(status_value shiftTraceHideBackEventDelivered || true), hide front $(status_value shiftTraceHideFrontEventDelivered || true)"
           echo "Row area pixels: changed $(status_value xsheetRowAreaChangedPixels || true), non-background $(status_value xsheetRowAreaNonBackgroundPixels || true)"
           echo "Onion pixels: ${baseline_onion_pixels} -> ${onion_pixels}"
         fi
@@ -1488,7 +1519,7 @@ while is_smoke_process_running; do
           echo "Vertical ruler ticks: $(status_value verticalRulerTickPixelsBefore || true) -> $(status_value verticalRulerTickPixelsAfter || true), changed $(status_value verticalRulerChangedPixels || true)"
           echo "Ruler units: H $(status_value horizontalRulerUnit || true), V $(status_value verticalRulerUnit || true)"
         fi
-        if [[ "$smoke_action" == "viewer-animate-tool-overlay" || "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-animate-tool-handle-variants" || "$smoke_action" == "viewer-animate-tool-axis-drags" || "$smoke_action" == "viewer-selection-tool-vector-handles" || "$smoke_action" == "viewer-selection-tool-vector-handle-variants" || "$smoke_action" == "viewer-selection-tool-vector-center-thickness-deform" || "$smoke_action" == "viewer-vector-brush" || "$smoke_action" == "viewer-raster-brush" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
+        if [[ "$smoke_action" == "viewer-animate-tool-overlay" || "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-animate-tool-handle-variants" || "$smoke_action" == "viewer-animate-tool-axis-drags" || "$smoke_action" == "viewer-selection-tool-vector-handles" || "$smoke_action" == "viewer-selection-tool-vector-handle-variants" || "$smoke_action" == "viewer-selection-tool-vector-center-thickness-deform" || "$smoke_action" == "viewer-selection-tool-vector-mode-variants" || "$smoke_action" == "viewer-selection-tool-raster-handles" || "$smoke_action" == "viewer-selection-tool-raster-mode-variants" || "$smoke_action" == "viewer-vector-brush" || "$smoke_action" == "viewer-raster-brush" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
           echo "Tool: $(status_value toolName || true)"
         fi
         if [[ "$smoke_action" == "viewer-animate-tool-overlay" || "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-animate-tool-handle-variants" || "$smoke_action" == "viewer-animate-tool-axis-drags" || "$smoke_action" == "viewer-animate-tool-cursors" ]]; then
@@ -1551,6 +1582,21 @@ while is_smoke_process_running; do
           echo "Selection thickness: $(status_value selectionThicknessBefore || true) -> $(status_value selectionThicknessAfter || true), delta $(status_value selectionThicknessDelta || true), cursor $(status_value selectionThicknessCursorId || true)/$(status_value selectionThicknessCursorArtwork || true)"
           echo "Selection free deform: $(status_value selectionBBoxBeforeDeform || true) -> $(status_value selectionBBoxAfterDeform || true), cursor $(status_value selectionDeformCursorId || true)/$(status_value selectionDeformCursorArtwork || true)"
         fi
+        if [[ "$smoke_action" == "viewer-selection-tool-vector-mode-variants" ]]; then
+          echo "Vector selection modes: mode $(status_value selectionMode || true), freehand $(status_value selectionFreehandType || true), polyline $(status_value selectionPolylineType || true), strokes $(status_value vectorStrokeCount || true)"
+          echo "Vector freehand selection: count $(status_value selectionFreehandCount || true), stroke 0 $(status_value selectionFreehandStroke0Selected || true), stroke 1 $(status_value selectionFreehandStroke1Selected || true), bbox $(status_value selectionFreehandBBox || true)"
+          echo "Vector polyline selection: count $(status_value selectionPolylineCount || true), stroke 0 $(status_value selectionPolylineStroke0Selected || true), stroke 1 $(status_value selectionPolylineStroke1Selected || true), bbox $(status_value selectionPolylineBBox || true), changed from freehand $(status_value selectionBBoxChangedFromFreehand || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-selection-tool-raster-handles" ]]; then
+          echo "Raster selection tool: mode $(status_value selectionMode || true), type $(status_value selectionType || true), empty $(status_value selectionEmptyBefore || true) -> $(status_value selectionEmptyAfterRect || true), floating $(status_value selectionFloatingAfterRect || true) -> $(status_value selectionFloatingAfterScale || true)"
+          echo "Raster selection bbox: $(status_value selectionBBoxAfterRect || true) -> $(status_value selectionBBoxAfterScale || true), delta $(status_value selectionBBoxWidthDelta || true),$(status_value selectionBBoxHeightDelta || true)"
+          echo "Raster selection cursor: id $(status_value selectionScaleCursorId || true), artwork $(status_value selectionScaleCursorArtwork || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-selection-tool-raster-mode-variants" ]]; then
+          echo "Raster selection modes: mode $(status_value selectionMode || true), freehand $(status_value selectionFreehandType || true), polyline $(status_value selectionPolylineType || true)"
+          echo "Raster freehand selection: empty $(status_value selectionEmptyBefore || true) -> $(status_value selectionEmptyAfterFreehand || true), floating $(status_value selectionFloatingAfterFreehand || true), bbox $(status_value selectionBBoxAfterFreehand || true)"
+          echo "Raster polyline selection: empty $(status_value selectionEmptyAfterPolyline || true), floating $(status_value selectionFloatingAfterPolyline || true), bbox $(status_value selectionBBoxAfterPolyline || true), changed from freehand $(status_value selectionBBoxChangedFromFreehand || true)"
+        fi
         if [[ "$smoke_action" == "viewer-vector-brush" ]]; then
           echo "Strokes: $(status_value strokesBefore || true) -> $(status_value strokesAfter || true)"
         fi
@@ -1558,7 +1604,7 @@ while is_smoke_process_running; do
           echo "Raster pixels: $(status_value rasterPixelsBefore || true) -> $(status_value rasterPixelsAfter || true)"
           echo "Raster red pixels: $(status_value rasterRedPixelsBefore || true) -> $(status_value rasterRedPixelsAfter || true)"
         fi
-        if [[ "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-animate-tool-handle-variants" || "$smoke_action" == "viewer-animate-tool-axis-drags" || "$smoke_action" == "viewer-animate-tool-cursors" || "$smoke_action" == "viewer-selection-tool-vector-handles" || "$smoke_action" == "viewer-selection-tool-vector-handle-variants" || "$smoke_action" == "viewer-selection-tool-vector-center-thickness-deform" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
+        if [[ "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-animate-tool-handle-variants" || "$smoke_action" == "viewer-animate-tool-axis-drags" || "$smoke_action" == "viewer-animate-tool-cursors" || "$smoke_action" == "viewer-selection-tool-vector-handles" || "$smoke_action" == "viewer-selection-tool-vector-handle-variants" || "$smoke_action" == "viewer-selection-tool-vector-center-thickness-deform" || "$smoke_action" == "viewer-selection-tool-vector-mode-variants" || "$smoke_action" == "viewer-selection-tool-raster-handles" || "$smoke_action" == "viewer-selection-tool-raster-mode-variants" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
           echo "Input path: $(status_value toolInputPath || true)"
         fi
         if [[ "$smoke_action" == "viewer-raster-brush-tablet-events" ]]; then
@@ -1604,6 +1650,12 @@ while is_smoke_process_running; do
         echo "Fixed onion marker drag: row $(status_value onionSkinCurrentRow || true), MOS $(status_value onionSkinMosCount || true), FOS $(status_value onionSkinFosCount || true), rows $(status_value onionSkinRows || true)"
         echo "Fixed onion marker counts: add $(status_value onionSkinFosCountAfterAddBack || true), remove $(status_value onionSkinFosCountAfterRemoveBack || true), final $(status_value onionSkinFosCount || true)"
         echo "Fixed onion marker events: add $(status_value rowAreaAddFixedDragDelivered || true), remove $(status_value rowAreaRemoveFixedDragDelivered || true), front $(status_value rowAreaAddFrontFixedDragDelivered || true)"
+        echo "Row area pixels: changed $(status_value xsheetRowAreaChangedPixels || true), non-background $(status_value xsheetRowAreaNonBackgroundPixels || true)"
+        echo "Onion pixels: ${baseline_onion_pixels} -> ${onion_pixels}"
+      fi
+      if [[ "$smoke_action" == "viewer-onion-skin-shift-trace" ]]; then
+        echo "Shift trace offsets: initial $(status_value shiftTraceInitialOffsets || true), moved $(status_value shiftTraceAfterMoveFrontOffsets || true), reset $(status_value shiftTraceAfterResetOffsets || true), hidden $(status_value shiftTraceAfterHideFrontOffsets || true), final $(status_value shiftTraceFinalOffsets || true)"
+        echo "Shift trace events: move back $(status_value shiftTraceMoveBackEventDelivered || true), move front $(status_value shiftTraceMoveFrontEventDelivered || true), reset $(status_value shiftTraceResetEventDelivered || true), hide back $(status_value shiftTraceHideBackEventDelivered || true), hide front $(status_value shiftTraceHideFrontEventDelivered || true)"
         echo "Row area pixels: changed $(status_value xsheetRowAreaChangedPixels || true), non-background $(status_value xsheetRowAreaNonBackgroundPixels || true)"
         echo "Onion pixels: ${baseline_onion_pixels} -> ${onion_pixels}"
       fi
@@ -1698,7 +1750,7 @@ while is_smoke_process_running; do
         echo "Vertical ruler ticks: $(status_value verticalRulerTickPixelsBefore || true) -> $(status_value verticalRulerTickPixelsAfter || true), changed $(status_value verticalRulerChangedPixels || true)"
         echo "Ruler units: H $(status_value horizontalRulerUnit || true), V $(status_value verticalRulerUnit || true)"
       fi
-      if [[ "$smoke_action" == "viewer-animate-tool-overlay" || "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-animate-tool-handle-variants" || "$smoke_action" == "viewer-animate-tool-axis-drags" || "$smoke_action" == "viewer-selection-tool-vector-handles" || "$smoke_action" == "viewer-selection-tool-vector-handle-variants" || "$smoke_action" == "viewer-selection-tool-vector-center-thickness-deform" || "$smoke_action" == "viewer-vector-brush" || "$smoke_action" == "viewer-raster-brush" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
+      if [[ "$smoke_action" == "viewer-animate-tool-overlay" || "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-animate-tool-handle-variants" || "$smoke_action" == "viewer-animate-tool-axis-drags" || "$smoke_action" == "viewer-selection-tool-vector-handles" || "$smoke_action" == "viewer-selection-tool-vector-handle-variants" || "$smoke_action" == "viewer-selection-tool-vector-center-thickness-deform" || "$smoke_action" == "viewer-selection-tool-vector-mode-variants" || "$smoke_action" == "viewer-selection-tool-raster-handles" || "$smoke_action" == "viewer-selection-tool-raster-mode-variants" || "$smoke_action" == "viewer-vector-brush" || "$smoke_action" == "viewer-raster-brush" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
         echo "Tool: $(status_value toolName || true)"
       fi
       if [[ "$smoke_action" == "viewer-animate-tool-overlay" || "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-animate-tool-handle-variants" || "$smoke_action" == "viewer-animate-tool-axis-drags" || "$smoke_action" == "viewer-animate-tool-cursors" ]]; then
@@ -1761,6 +1813,21 @@ while is_smoke_process_running; do
         echo "Selection thickness: $(status_value selectionThicknessBefore || true) -> $(status_value selectionThicknessAfter || true), delta $(status_value selectionThicknessDelta || true), cursor $(status_value selectionThicknessCursorId || true)/$(status_value selectionThicknessCursorArtwork || true)"
         echo "Selection free deform: $(status_value selectionBBoxBeforeDeform || true) -> $(status_value selectionBBoxAfterDeform || true), cursor $(status_value selectionDeformCursorId || true)/$(status_value selectionDeformCursorArtwork || true)"
       fi
+      if [[ "$smoke_action" == "viewer-selection-tool-vector-mode-variants" ]]; then
+        echo "Vector selection modes: mode $(status_value selectionMode || true), freehand $(status_value selectionFreehandType || true), polyline $(status_value selectionPolylineType || true), strokes $(status_value vectorStrokeCount || true)"
+        echo "Vector freehand selection: count $(status_value selectionFreehandCount || true), stroke 0 $(status_value selectionFreehandStroke0Selected || true), stroke 1 $(status_value selectionFreehandStroke1Selected || true), bbox $(status_value selectionFreehandBBox || true)"
+        echo "Vector polyline selection: count $(status_value selectionPolylineCount || true), stroke 0 $(status_value selectionPolylineStroke0Selected || true), stroke 1 $(status_value selectionPolylineStroke1Selected || true), bbox $(status_value selectionPolylineBBox || true), changed from freehand $(status_value selectionBBoxChangedFromFreehand || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-selection-tool-raster-handles" ]]; then
+        echo "Raster selection tool: mode $(status_value selectionMode || true), type $(status_value selectionType || true), empty $(status_value selectionEmptyBefore || true) -> $(status_value selectionEmptyAfterRect || true), floating $(status_value selectionFloatingAfterRect || true) -> $(status_value selectionFloatingAfterScale || true)"
+        echo "Raster selection bbox: $(status_value selectionBBoxAfterRect || true) -> $(status_value selectionBBoxAfterScale || true), delta $(status_value selectionBBoxWidthDelta || true),$(status_value selectionBBoxHeightDelta || true)"
+        echo "Raster selection cursor: id $(status_value selectionScaleCursorId || true), artwork $(status_value selectionScaleCursorArtwork || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-selection-tool-raster-mode-variants" ]]; then
+        echo "Raster selection modes: mode $(status_value selectionMode || true), freehand $(status_value selectionFreehandType || true), polyline $(status_value selectionPolylineType || true)"
+        echo "Raster freehand selection: empty $(status_value selectionEmptyBefore || true) -> $(status_value selectionEmptyAfterFreehand || true), floating $(status_value selectionFloatingAfterFreehand || true), bbox $(status_value selectionBBoxAfterFreehand || true)"
+        echo "Raster polyline selection: empty $(status_value selectionEmptyAfterPolyline || true), floating $(status_value selectionFloatingAfterPolyline || true), bbox $(status_value selectionBBoxAfterPolyline || true), changed from freehand $(status_value selectionBBoxChangedFromFreehand || true)"
+      fi
       if [[ "$smoke_action" == "viewer-vector-brush" ]]; then
         echo "Strokes: $(status_value strokesBefore || true) -> $(status_value strokesAfter || true)"
       fi
@@ -1768,7 +1835,7 @@ while is_smoke_process_running; do
         echo "Raster pixels: $(status_value rasterPixelsBefore || true) -> $(status_value rasterPixelsAfter || true)"
         echo "Raster red pixels: $(status_value rasterRedPixelsBefore || true) -> $(status_value rasterRedPixelsAfter || true)"
       fi
-      if [[ "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-animate-tool-handle-variants" || "$smoke_action" == "viewer-animate-tool-axis-drags" || "$smoke_action" == "viewer-animate-tool-cursors" || "$smoke_action" == "viewer-selection-tool-vector-handles" || "$smoke_action" == "viewer-selection-tool-vector-handle-variants" || "$smoke_action" == "viewer-selection-tool-vector-center-thickness-deform" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
+      if [[ "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-animate-tool-handle-variants" || "$smoke_action" == "viewer-animate-tool-axis-drags" || "$smoke_action" == "viewer-animate-tool-cursors" || "$smoke_action" == "viewer-selection-tool-vector-handles" || "$smoke_action" == "viewer-selection-tool-vector-handle-variants" || "$smoke_action" == "viewer-selection-tool-vector-center-thickness-deform" || "$smoke_action" == "viewer-selection-tool-vector-mode-variants" || "$smoke_action" == "viewer-selection-tool-raster-handles" || "$smoke_action" == "viewer-selection-tool-raster-mode-variants" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
         echo "Input path: $(status_value toolInputPath || true)"
       fi
       if [[ "$smoke_action" == "viewer-raster-brush-tablet-events" ]]; then

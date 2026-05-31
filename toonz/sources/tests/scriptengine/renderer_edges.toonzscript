@@ -33,6 +33,38 @@ var errors = [
 
 print("qt-script-renderer-edges-errors", errors);
 
+var builder = new ImageBuilder(16, 12, "Raster");
+builder.fill("#ff0000");
+var level = scene.newLevel("Raster", "qt6_renderer_edges_raster");
+level.setFrame("1", builder.image);
+scene.setCell(0, 0, level, "1");
+
+renderer.columns = ["bad"];
+var badColumnTypeError = hasError(function() {
+  renderer.renderFrame(scene, 0);
+}, "Renderer.columns must contain frame or column numbers");
+renderer.columns = [-1];
+var negativeColumnError = hasError(function() {
+  renderer.renderFrame(scene, 0);
+}, "Renderer.columns values must be non-negative");
+
+renderer.columns = [];
+renderer.frames = ["bad"];
+var badFrameTypeError = hasError(function() {
+  renderer.renderScene(scene);
+}, "Renderer.frames must contain frame or column numbers");
+renderer.frames = [-1];
+var negativeFrameError = hasError(function() {
+  renderer.renderScene(scene);
+}, "Renderer.frames values must be non-negative");
+
+print("qt-script-renderer-list-edges-errors", [
+  badColumnTypeError, negativeColumnError, badFrameTypeError,
+  negativeFrameError
+]);
+
+level.dispose();
+builder.dispose();
 scene.dispose();
 renderer.dispose();
 
