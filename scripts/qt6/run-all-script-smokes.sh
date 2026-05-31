@@ -17,8 +17,11 @@ tasks=(
   script-smoke-scene-cell-fids-qt6
   script-smoke-scene-edges-qt6
   script-smoke-scene-argument-edges-qt6
+  script-smoke-scene-lifecycle-edges-qt6
   script-smoke-scene-loadlevel-qt6
   script-smoke-scene-save-reopen-qt6
+  script-smoke-scene-reload-edges-qt6
+  script-smoke-scene-save-icon-qt6
   script-smoke-scene-frameids-qt6
   script-smoke-level-qt6
   script-smoke-level-edges-qt6

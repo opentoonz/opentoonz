@@ -15,13 +15,15 @@ var rasterLevel = scene.newLevel("Raster", "qt6_rasterizer_edges_raster");
 var emptyLevel = new Level();
 var rasterizer = new Rasterizer();
 
-var fullColorDeferred = hasError(function() {
+var badFullColorGeometryError = hasError(function() {
+  rasterizer.xres = 0;
   rasterizer.rasterize(vector);
-}, "currently supports only colorMapped");
+}, "Bad Rasterizer resolution or dpi");
 
 rasterizer.colorMapped = true;
+rasterizer.xres = 720;
 var rasterized = rasterizer.rasterize(vector);
-print("qt-script-rasterizer-edges-success", fullColorDeferred,
+print("qt-script-rasterizer-edges-success", badFullColorGeometryError,
       rasterized.type, rasterized.width, rasterized.height);
 
 var errors = [

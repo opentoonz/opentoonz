@@ -31,6 +31,37 @@ var frame = level.getFrame("1");
 print("qt-script-rasterizer-level", level.type, level.frameCount,
       level.getFrameIds()[0], frame.type);
 
+var fullColorVectorLevel = new Level();
+fullColorVectorLevel.setFrame("1", vector);
+
+rasterizer.colorMapped = false;
+rasterizer.xres = 40;
+rasterizer.yres = 30;
+rasterizer.dpi = 96;
+rasterizer.antialiasing = true;
+
+var fullColorImage = rasterizer.rasterize(vector);
+var fullColorOutput =
+    new FilePath("toonz/build/qt6-script-smoke/rasterizer_fullcolor.png");
+fullColorImage.save(fullColorOutput);
+var fullColorReloaded = new Image(fullColorOutput);
+print("qt-script-rasterizer-fullcolor-image", fullColorImage.type,
+      fullColorImage.toString(), fullColorImage.width, fullColorImage.height,
+      fullColorOutput.exists, fullColorReloaded.type, fullColorReloaded.width,
+      fullColorReloaded.height, rasterizer.colorMapped,
+      rasterizer.antialiasing);
+
+var fullColorLevel = rasterizer.rasterize(fullColorVectorLevel);
+var fullColorFrame = fullColorLevel.getFrame("1");
+print("qt-script-rasterizer-fullcolor-level", fullColorLevel.type,
+      fullColorLevel.frameCount, fullColorLevel.getFrameIds()[0],
+      fullColorFrame.type, fullColorFrame.width, fullColorFrame.height);
+
+fullColorFrame.dispose();
+fullColorLevel.dispose();
+fullColorReloaded.dispose();
+fullColorImage.dispose();
+fullColorVectorLevel.dispose();
 frame.dispose();
 level.dispose();
 reloaded.dispose();

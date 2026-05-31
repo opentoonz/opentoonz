@@ -233,6 +233,13 @@ public:
                                             const QVariant& value);
   Q_INVOKABLE QVariantMap rasterizerRasterizeImage(int rasterizerId,
                                                    int imageId);
+  Q_INVOKABLE QVariantMap rendererRenderFrame(int rendererId, int sceneId,
+                                              int frame,
+                                              const QVariantList& columns);
+  Q_INVOKABLE QVariantMap rendererRenderScene(int rendererId, int sceneId,
+                                              const QVariantList& frames,
+                                              const QVariantList& columns);
+  Q_INVOKABLE QVariantMap rendererDumpCache(int rendererId);
 
 private:
   ToonzScene* qjsScene(int sceneId) const;

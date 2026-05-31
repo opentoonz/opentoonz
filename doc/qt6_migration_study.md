@@ -13,22 +13,22 @@ platform packaging behavior.
 The recommended strategy is:
 
 1. Keep the current Qt 5 build green while introducing a separate Qt 6 lane.
-2. Finish the active Metal migration to a mergeable checkpoint before doing
-   broad rendering-side Qt 6 rewrites.
-3. Start Qt 6 work now only where it is independent of Metal: CMake scaffolding,
-   deprecated Qt 5.15 API cleanup, `QDesktopWidget`, `QRegExp`, `QTextCodec`,
-   Qt Script replacement design, Nix/mise dependency planning, and CI matrix
-   design.
-4. Do not start a large Qt 6 rendering branch from the old OpenGL state if the
-   Metal worktree is already changing viewer, renderer, or offscreen GL
-   boundaries.
+2. Treat Qt 6 as the active priority. The Metal draft did not reach visual
+   parity, so Metal should be revisited after Qt 6 is complete rather than
+   blocking this port.
+3. Continue Qt 6 work across compile, runtime, script, multimedia, packaging,
+   viewer, rendering, drawing, and visual-parity surfaces in incremental
+   validated slices.
+4. Bring Qt 6 rendering work forward directly from the current OpenToonz
+   behavior. Keep changes small and testable, but do not defer viewer,
+   renderer, or offscreen GL fixes solely because a Metal draft exists.
 5. Treat `Core5Compat` as a temporary bridge only. It can keep `QTextCodec` or
    `QRegExp` compiling during early bring-up, but the release-quality port
    should move to maintained Qt 6 APIs wherever practical.
 
-In practical sequencing terms: do not pause the Metal migration. Pause only the
-parts of the Qt 6 migration that would rewrite the same rendering files. Finish
-Metal to a stable integration point, then make Qt 6 consume that boundary.
+In practical sequencing terms: finish Qt 6 first and use the current OpenToonz
+Qt 5 behavior as the visual-parity baseline. Revisit Metal as a separate
+follow-up after the Qt 6 port is complete.
 
 ## Source Basis
 
@@ -158,7 +158,7 @@ already addressed in this branch.
 | Desktop geometry | 19 files use `QDesktopWidget`, `QApplication::desktop`, or `qApp->desktop` | Must move to `QScreen` and widget screen helpers |
 | Regular expressions | 8 files reference `QRegExp` or `QRegExpValidator` | Port to `QRegularExpression` and `QRegularExpressionValidator`; avoid long-term `Core5Compat` dependency |
 | Text codecs | 7 files reference `QTextCodec` or text-stream codec APIs | Either bridge with `Core5Compat` or create explicit legacy encoding adapters |
-| Qt OpenGL classes | 34 files mention `QOpenGL*`, `QGLWidget`, `QSurfaceFormat`, or Qt offscreen GL classes | Needs Qt 6 module changes and coordination with the Metal migration |
+| Qt OpenGL classes | 34 files mention `QOpenGL*`, `QGLWidget`, `QSurfaceFormat`, or Qt offscreen GL classes | Needs Qt 6 module changes and direct viewer/offscreen rendering validation |
 | Direct OpenGL calls | More than 100 files in core rendering, tools, FX, and viewer code call GL directly | Qt 6 itself does not remove OpenGL, but platform behavior and packaging change |
 
 ## Major Workstreams
@@ -216,7 +216,7 @@ Current branch status:
   support.
 - The Qt 6 macOS app bundle now packages and passes the arm64 bundle check with
   `mise run package-macos-qt6` and `mise run check-macos-arm64-qt6`.
-- On 2026-05-25, the latest post-relink validation reran the macOS Qt 6 package,
+- On 2026-05-25, post-relink validation reran the macOS Qt 6 package,
   arm64 bundle check, bounded startup smoke, non-rendering high-DPI diagnostic
   smoke, scene create/open smoke, app-side xsheet scrub smoke, media-device
   enumeration smoke, camera-format smoke, audio-input backend smoke,
@@ -250,8 +250,316 @@ Current branch status:
   and vector cells into the xsheet, switches current frame and column state,
   saves the scene, and verifies the resulting frame/column/level counts. This
   deliberately avoids drawing, viewer redraw, preview render, and final render
-  validation, so it should remain safe to run in parallel with the Metal
-  migration.
+  validation. Those rendering surfaces are now part of the active Qt 6 parity
+  work.
+- The packaged Qt 6 app now also passes narrow raster and vector viewer
+  framebuffer smokes through `mise run gui-smoke-viewer-render-qt6` and
+  `mise run gui-smoke-viewer-vector-render-qt6`. The app-side hook creates a
+  sandbox scene, inserts either a red raster frame or a red vector stroke,
+  captures the `SceneViewer` framebuffer before and after the xsheet update,
+  requires changed and red-dominant pixels, and saves the captures beside the
+  smoke status file. This proves that simple raster and vector cells can reach
+  visible Qt 6 viewer pixels in the packaged app; it does not prove brush
+  input, interactive vector drawing, onion skin, overlays, FX preview, final
+  render output, or Qt 5-vs-Qt 6 visual parity.
+- On 2026-05-30, the viewer framebuffer capture path was hardened so high-DPI
+  sizing is part of the same pass/fail gate as visible pixels. The app-side
+  status now records logical viewer size, device-pixel viewer size,
+  `SceneViewer::getDevPixRatio()`, Qt widget DPR, screen DPR, a
+  logical-to-device probe, and a framebuffer-to-viewer-size probe.
+  `viewerRenderProbe=ok` now requires those probes plus changed and
+  red-dominant pixels. After rebuild and packaging, the packaged Qt 6
+  viewer-render smoke passed with logical viewer size `994x819`, DPR `2` /
+  `2.00`, framebuffer `1988x1638`, `771605` changed pixels, and `358756` red
+  pixels. The packaged Qt 5 app passed the same smoke with the same
+  measurements, giving this guard a current dual-lane baseline.
+- On 2026-05-30, the packaged Qt 6 app now also passes
+  `mise run gui-smoke-viewer-zoom-pan-qt6`. The app-side smoke inserts a red
+  raster frame, captures the `SceneViewer` framebuffer, applies a `1.35` view
+  transform plus a `48,-32` logical-pixel pan scaled through
+  `SceneViewer::getDevPixRatio()`, and requires both `viewerRenderProbe=ok` and
+  `viewerTransformProbe=ok`. The packaged Qt 6 run reported logical viewer size
+  `994x819`, DPR `2` / `2.00`, framebuffer `1988x1638`, scale
+  `2.3297 -> 3.1451`, `1303367` changed pixels, and `648404` red pixels. The
+  packaged Qt 5 run matched those measurements. This is a direct view-matrix
+  zoom/pan and high-DPI framebuffer guard; it does not validate OS-level wheel,
+  trackpad, or drag event delivery.
+- On 2026-05-30, the packaged Qt 6 app now also passes
+  `mise run gui-smoke-viewer-onion-skin-qt6`. The app-side smoke creates two
+  transparent raster levels in one xsheet column, captures the current row with
+  onion skin disabled, enables whole-scene mobile onion skin at back offset
+  `-1`, and requires `onionSkinProbe=ok`, `viewerRenderProbe=ok`, high-DPI
+  framebuffer probes, visible red current-frame pixels, one back onion stage
+  player, and an onion-pixel increase. The packaged Qt 6 run reported logical
+  viewer size `994x819`, DPR `2` / `2.00`, framebuffer `1988x1638`,
+  `45651` red pixels, and onion pixels `0 -> 42012`. The packaged Qt 5 run
+  matched those measurements. This is an app-side onion-skin framebuffer guard;
+  it does not validate timeline onion marker UI, interactive onion toggles,
+  custom onion colors, overlay placement, or full visual parity.
+- On 2026-05-30, the packaged Qt 6 app now also passes
+  `mise run gui-smoke-viewer-camera-overlay-qt6`. The app-side smoke creates a
+  blank sandbox scene, disables the camera box overlay through `MI_ViewCamera` /
+  `viewCameraToggle`, captures the `SceneViewer`, enables the same overlay, and
+  requires `cameraOverlayProbe=ok`, `viewerRenderProbe=ok`, the high-DPI
+  framebuffer probes, changed pixels, red overlay pixels, and before/after
+  captures. The packaged Qt 6 run reported logical viewer size `994x819`, DPR
+  `2` / `2.00`, framebuffer `1988x1638`, `3638` changed pixels, and `3638`
+  red pixels. The packaged Qt 5 run matched those measurements. This is an
+  app-side camera-box overlay framebuffer guard only; it does not validate
+  selection handles, tool cursor overlays, rulers, OS/menu interaction, or full
+  overlay visual parity.
+- On 2026-05-30, the packaged Qt 6 app now also passes
+  `mise run gui-smoke-viewer-safe-area-field-guide-qt6`. The app-side smoke
+  creates a blank sandbox scene, disables the camera box, safe-area, and
+  field-guide overlays, captures the `SceneViewer`, enables safe area and field
+  guide through `MI_SafeArea` / `safeAreaToggle` and `MI_FieldGuide` /
+  `fieldGuideToggle`, and requires `safeAreaProbe=ok`, `fieldGuideProbe=ok`,
+  `viewerRenderProbe=ok`, high-DPI framebuffer probes, changed pixels, red
+  safe-area pixels, gray guide pixels, changed gray guide pixels, and
+  before/after captures. The packaged Qt 6 run reported logical viewer size
+  `994x819`, DPR `2` / `2.00`, framebuffer `1988x1638`, `112230` changed
+  pixels, `5279` red pixels, `645999` gray pixels, and `106951` changed gray
+  pixels. The packaged Qt 5 run matched those measurements. This is an
+  app-side safe-area and field-guide overlay framebuffer guard only; it does not
+  validate selection handles, tool cursor overlays, rulers/guides added through
+  ruler UI, OS/menu interaction, custom safe-area presets or colors, custom
+  field-guide settings, or full overlay visual parity.
+- On 2026-05-30, the packaged Qt 6 app now also passes
+  `mise run gui-smoke-viewer-ruler-guide-qt6`. The app-side smoke creates a
+  blank sandbox scene, seeds one horizontal and one vertical scene guide,
+  disables camera, safe-area, field-guide, guide, and ruler overlays, enables
+  the ruler, captures the `SceneViewer` with guides still disabled, enables the
+  guide overlay through `MI_ViewGuide` / `viewGuideToggle`, and requires
+  `rulerGuideProbe=ok`, `viewerRenderProbe=ok`, high-DPI framebuffer probes,
+  two visible ruler widgets, guide counts, changed pixels, changed neutral guide
+  pixels, and before/after captures. The baseline capture is taken after the
+  ruler is visible because toggling the ruler changes the viewer widget size.
+  The packaged Qt 6 run reported logical viewer size `994x819`, DPR `2` /
+  `2.00`, framebuffer `1988x1638`, `1707` changed pixels, `1707` changed
+  neutral guide pixels, `551872` gray pixels, `0` changed gray pixels, and `0`
+  red pixels. The packaged Qt 5 run matched those measurements. This is an
+  app-side guide framebuffer and ruler-widget visibility guard only; it does not
+  validate creating, moving, or deleting guides through the ruler UI, ruler tick
+  rendering pixels, selection handles, tool cursor overlays, OS/menu
+  interaction, custom guide positions or colors, or full overlay visual parity.
+- On 2026-05-30, the packaged Qt 6 app now also passes
+  `mise run gui-smoke-viewer-animate-tool-overlay-qt6`. The app-side smoke
+  creates a visible raster scene, captures a `T_Hand` baseline, switches the
+  current tool to `T_Edit` on `Col1`, and requires `toolOverlayProbe=ok`,
+  `viewerRenderProbe=ok`, high-DPI framebuffer probes, changed pixels, visible
+  red content pixels, and before/after captures. The packaged Qt 6 run reported
+  logical viewer size `994x819`, DPR `2` / `2.00`, framebuffer `1988x1638`,
+  `2898` changed pixels, and `357248` red pixels. The packaged Qt 5 run matched
+  those measurements. This covers the Animate/Edit tool-gadget overlay path
+  through `SceneViewer::drawToolGadgets()` only; it does not validate selection
+  handles, cursor feedback, interactive transform dragging, OS/menu
+  interaction, or full overlay visual parity.
+- On 2026-05-30, the packaged Qt 6 app now also passes
+  `mise run gui-smoke-viewer-animate-tool-drag-qt6`. The app-side smoke creates
+  a visible raster scene, switches the current tool to `T_Edit` on `Col1`,
+  captures the `SceneViewer` with the tool active, replays a direct Animate/Edit
+  tool left-button drag from `0,0` to `144,-72`, and requires
+  `toolTransformProbe=ok`, `viewerRenderProbe=ok`, high-DPI framebuffer probes,
+  changed `TStageObject` placement, changed pixels, visible red content pixels,
+  and before/after captures. The packaged Qt 6 run reported logical viewer size
+  `994x819`, DPR `2` / `2.00`, framebuffer `1988x1638`, stage object X
+  `0.0000 -> 2.7000`, stage object Y `0.0000 -> -1.3500`, `492731` changed
+  pixels, and `356145` red pixels. The packaged Qt 5 run matched those
+  measurements. This covers the direct Animate/Edit tool transform path only; it
+  does not validate selection-handle hit-testing, cursor feedback, real
+  OS-level or hardware input delivery, or full transform workflow visual parity.
+  Undo/redo integration and modifier-key behavior are covered by separate Qt
+  mouse-event smokes below.
+- On 2026-05-30, the packaged Qt 6 app now also passes
+  `mise run gui-smoke-viewer-animate-tool-mouse-events-qt6`. The app-side smoke
+  creates a visible raster scene, switches the current tool to `T_Edit` on
+  `Col1`, maps the same Animate/Edit transform path through `SceneViewer` Qt
+  mouse press/move/release events using the viewer DPR, and requires
+  `mouseEventProbe=ok`, `toolTransformProbe=ok`, `viewerRenderProbe=ok`,
+  high-DPI framebuffer probes, changed `TStageObject` placement, changed
+  pixels, visible red content pixels, and before/after captures. The packaged
+  Qt 6 run reported logical viewer size `994x819`, DPR `2` / `2.00`,
+  framebuffer `1988x1638`, stage object X `0.0000 -> 1.3521`, stage object Y
+  `0.0000 -> -0.6761`, `280162` changed pixels, and `357248` red pixels. The
+  packaged Qt 5 run matched those measurements. This covers Qt widget event
+  dispatch and high-DPI coordinate mapping for the Animate/Edit transform path;
+  it does not validate real OS-level input delivery, selection-handle
+  hit-testing, cursor feedback, or full transform workflow visual parity.
+  Modifier-key behavior is covered by the separate Qt mouse-event modifier smoke
+  below.
+- On 2026-05-30, the packaged Qt 6 app now also passes
+  `mise run gui-smoke-viewer-animate-tool-undo-redo-qt6`. The app-side smoke
+  creates the same visible raster scene, switches the current tool to `T_Edit` on
+  `Col1`, maps the Animate/Edit transform path through `SceneViewer` Qt mouse
+  press/move/release events using the viewer DPR, resets the undo stack before
+  the drag, and requires `mouseEventProbe=ok`, `toolTransformProbe=ok`,
+  `undoRedoProbe=ok`, `viewerRenderProbe=ok`, one undo history entry, exact
+  undo restoration, redo restoration, high-DPI framebuffer probes, changed
+  pixels, visible red content pixels, and before/after captures. The packaged
+  Qt 6 run reported logical viewer size `994x819`, DPR `2` / `2.00`,
+  framebuffer `1988x1638`, stage object X `0.0000 -> 1.3521 -> 0.0000 ->
+  1.3521`, stage object Y `0.0000 -> -0.6761 -> 0.0000 -> -0.6761`, undo
+  history `0 -> 1`, history indices `0/1/0/1`, `280162` changed pixels, and
+  `357248` red pixels. The packaged Qt 5 run matched those measurements. This
+  covers Qt widget event dispatch, high-DPI coordinate mapping, and undo/redo
+  integration for the Animate/Edit transform path; it does not validate real
+  OS-level input delivery, selection-handle hit-testing, full cursor
+  artwork/hover variants, or full transform workflow visual parity.
+- On 2026-05-30, the packaged Qt 6 app now also passes
+  `mise run gui-smoke-viewer-animate-tool-modifiers-qt6`. The app-side smoke
+  creates the same visible raster scene, switches the current tool to `T_Edit`
+  on `Col1`, maps normal, Alt, and Shift Animate/Edit drags through
+  `SceneViewer` Qt mouse events using the viewer DPR, and requires
+  `mouseEventProbe=ok`, `toolTransformProbe=ok`, `modifierProbe=ok`,
+  `cursorPreciseProbe=ok`, `viewerRenderProbe=ok`, high-DPI framebuffer probes,
+  visible red content pixels, and before/after captures. The packaged Qt 6 run
+  reported logical viewer size `994x819`, DPR `2` / `2.00`, framebuffer
+  `1988x1638`, normal delta `1.3521,-0.6761`, Alt delta `0.1352,-0.0676`,
+  Shift delta `1.3521,0.0000`, cursor precise state `false -> true`, `203603`
+  changed pixels, and `357248` red pixels. The packaged Qt 5 run matched those
+  measurements. This covers Qt modifier delivery, Alt precision transform,
+  Shift dominant-axis constraint, and the Animate/Edit precise-cursor state for
+  the Qt mouse-event transform path; it does not validate real OS-level input
+  delivery, selection-handle hit-testing, full cursor artwork/hover variants, or
+  full transform workflow visual parity.
+- On 2026-05-30, the packaged Qt 6 app now also passes vector and full-color
+  raster brush tool-input smokes through
+  `mise run gui-smoke-viewer-vector-brush-qt6` and
+  `mise run gui-smoke-viewer-raster-brush-qt6`. The app-side hook creates a
+  sandbox level, selects `T_Brush`, replays a direct left-button stroke path
+  through the product tool, requires the vector stroke count or raster
+  opaque/red pixel counts to increase, captures the `SceneViewer` framebuffer
+  before and after the stroke, and requires changed and red-dominant pixels.
+  The raster brush hook was also run against the Qt 5 build to verify the smoke
+  remains dual-lane compatible. This is still a narrow drawing guard: OS-level
+  mouse/tablet event delivery, pressure/tilt, high-DPI input mapping,
+  timeline/UI onion workflow, overlays, FX preview, final render output, and
+  visual parity remain open.
+- On 2026-05-30, the packaged Qt 6 app now also passes
+  `mise run gui-smoke-viewer-raster-brush-mouse-events-qt6`. This smoke sends
+  Qt mouse press/move/release events through `SceneViewer`, maps the shared
+  world-space brush path into logical widget coordinates using the viewer DPR,
+  verifies increased raster opaque/red pixel counts, and requires changed plus
+  red-dominant `SceneViewer` framebuffer pixels. The same smoke also passed
+  against the Qt 5 app build. This narrows Qt widget event dispatch and
+  high-DPI input coordinate coverage, but real OS-level CGEvent/System Events
+  delivery, tablet input, timeline/UI onion workflow, overlays, FX preview,
+  final render output, and visual parity remain open.
+- On 2026-05-30, the packaged Qt 6 app now also passes
+  `mise run gui-smoke-viewer-raster-brush-tablet-events-qt6`. This smoke sends
+  synthetic Qt tablet press/move/release events through `SceneViewer`, maps the
+  shared world-space brush path into logical widget coordinates using the
+  viewer DPR, drives pressure from 0.35 to 0.85 with tilt `-18,12`, verifies
+  increased raster opaque/red pixel counts, and requires changed plus
+  red-dominant `SceneViewer` framebuffer pixels. The same synthetic tablet
+  smoke also passed against the Qt 5 app build. This narrows Qt tablet-event
+  dispatch, `TMouseEvent` tablet/pressure propagation, and high-DPI input
+  coordinate coverage, but real tablet hardware, OS-level CGEvent/System Events
+  delivery, platform driver pressure/tilt, timeline/UI onion workflow,
+  overlays, FX preview, final render output, and visual parity remain open.
+- On 2026-05-30, this branch added the permission-sensitive
+  `mise run gui-smoke-viewer-raster-brush-system-events-qt6` gate for real
+  macOS OS-level input delivery. The app-side hook creates the same raster brush
+  scene, publishes screen coordinates for the shared stroke path, waits for the
+  shell-side CGEvent/System Events driver, and requires raster opaque/red pixel
+  counts plus `SceneViewer` framebuffer pixels to change. The harness now uses
+  a LaunchServices launch path for this permission-sensitive smoke, preserving
+  smoke environment and log routing through `open --env`, preflighting
+  `CGPreflightPostEventAccess()`, attempting bundle/PID activation, and posting
+  a prime click before the drag. In the current local session this gate remains
+  blocked: `cgPostEventAccess=true`, but the target app remains inactive
+  (`targetAppActiveAfter=false` and `targetAppActiveAfterPrimeClick=false`),
+  raster pixels stay at zero, and the System Events click fallback fails with
+  macOS error `-25200`. The existing Qt mouse-event raster brush smoke still
+  passes, so this is currently an app-activation or OS input delivery gap
+  rather than a product brush regression.
+- The 2026-05-30 validation slice reran the Qt 6 app build, macOS Qt 6
+  packaging, arm64 bundle check, raster viewer smoke, vector viewer smoke, and
+  vector/raster direct-tool brush smokes. A later slice in the same day reran
+  the Qt 6 arm64 bundle check, added the `SceneViewer` mouse-event raster brush
+  smoke, reran the direct raster brush smoke, rebuilt the Qt 5 app target, and
+  ran the same mouse-event raster brush smoke against the Qt 5 build. A further
+  slice reran the Qt 6 app build, macOS Qt 6 packaging, arm64 bundle check,
+  added the `SceneViewer` synthetic tablet-event raster brush smoke, and ran
+  that tablet-event smoke against both the packaged Qt 6 app and the Qt 5 app
+  build. A later script-binding slice rebuilt the Qt 6 app, refreshed the macOS
+  Qt 6 package, reran the arm64 bundle check, made `Renderer.dumpCache()` write
+  a portable cache-map diagnostic, reran the focused Renderer smoke, reran the
+  aggregate Qt 6 script smokes in bounded and natural-exit modes, and rebuilt
+  the Qt 5 app target. A subsequent Rasterizer script-binding slice rebuilt the
+  Qt 6 app, refreshed the macOS Qt 6 package, reran the arm64 bundle check,
+  ported `Rasterizer.rasterize()` full-color vector output through
+  `TOfflineGL`, reran the focused Rasterizer and Rasterizer edge smokes, reran
+  the aggregate Qt 6 script smokes in bounded and natural-exit modes, and
+  rebuilt the Qt 5 app target. A subsequent Scene reload lifecycle slice rebuilt
+  the Qt 6 app, refreshed the macOS Qt 6 package, reran the arm64 bundle check,
+  invalidated scene-owned Qt 6 `Level` wrappers before `Scene.load()` replaces
+  the native scene, added the focused Scene reload edge smoke, reran the
+  aggregate Qt 6 script smokes in bounded and natural-exit modes, and rebuilt
+  the Qt 5 app target. The current OS-input slice rebuilt the Qt 6 app,
+  refreshed the macOS Qt 6 package, reran the arm64 bundle check, added the
+  CGEvent/System Events raster brush smoke, recorded the local `-25200` System
+  Events blocker, and reran the existing Qt mouse-event raster brush smoke
+  successfully. A follow-up harness slice moved this OS-input smoke to
+  LaunchServices launch, added CGEvent post-access and target-activation
+  diagnostics, confirmed `cgPostEventAccess=true`, and narrowed the remaining
+  failure to target activation/event delivery with unchanged raster pixels. The
+  viewer high-DPI slice rebuilt both app targets, refreshed the macOS Qt 6 and
+  Qt 5 packages, added viewer logical/device/framebuffer probes to the existing
+  capture path, reran the Qt 6 arm64 bundle check, and verified that both
+  packaged lanes pass the raster viewer-render smoke with matching DPR and
+  framebuffer measurements. The follow-up viewer transform slice rebuilt the Qt
+  6 app target, refreshed both macOS packages, added the `viewer-zoom-pan`
+  smoke, reran the Qt 6 arm64 bundle check, and verified that both packaged
+  lanes pass with matching DPR, transform, framebuffer, changed-pixel, and
+  red-pixel measurements. The follow-up viewer onion-skin slice rebuilt both
+  app targets, refreshed both macOS packages, added `viewer-onion-skin`, reran
+  the Qt 6 arm64 bundle check, and verified that both packaged lanes pass with
+  matching DPR, framebuffer, stage-player, current-frame red-pixel, and
+  onion-pixel measurements. The follow-up camera overlay slice rebuilt both
+  app targets, refreshed both macOS packages, added `viewer-camera-overlay`,
+  reran the Qt 6 arm64 bundle check, and verified that both packaged lanes pass
+  with matching DPR, framebuffer, changed-pixel, and red camera-box overlay
+  measurements. The follow-up safe-area/field-guide overlay slice rebuilt both
+  app targets, refreshed both macOS packages, added
+  `viewer-safe-area-field-guide`, reran the Qt 6 arm64 bundle check, and
+  verified that both packaged lanes pass with matching DPR, framebuffer,
+  changed-pixel, red safe-area, gray guide, and changed-gray guide
+  measurements. The follow-up ruler/guide overlay slice rebuilt both app
+  targets, refreshed both macOS packages, added `viewer-ruler-guide`, reran the
+  Qt 6 arm64 bundle check, and verified that both packaged lanes pass with
+  matching DPR, framebuffer, changed-pixel, changed-neutral-guide-pixel,
+  ruler-widget, and guide-count measurements.
+  The follow-up Animate tool overlay slice rebuilt both app targets, refreshed
+  both macOS packages, added `viewer-animate-tool-overlay`, reran the Qt 6 and
+  Qt 5 arm64 bundle checks, and verified that both packaged lanes pass with
+  matching DPR, framebuffer, `T_Edit`/`Col1` state, changed-pixel, and red-pixel
+  measurements.
+  The follow-up Animate tool drag slice rebuilt both app targets, refreshed both
+  macOS packages, added `viewer-animate-tool-drag`, reran the Qt 6 and Qt 5
+  arm64 bundle checks, and verified that both packaged lanes pass with matching
+  DPR, framebuffer, `T_Edit`/`Col1` state, `TStageObject` X/Y movement,
+  changed-pixel, and red-pixel measurements.
+  The follow-up Animate tool mouse-event slice rebuilt both app targets,
+  refreshed both macOS packages, added `viewer-animate-tool-mouse-events`, reran
+  the Qt 6 and Qt 5 arm64 bundle checks, and verified that both packaged lanes
+  pass with matching DPR, framebuffer, Qt mouse-event dispatch, `T_Edit`/`Col1`
+  state, `TStageObject` X/Y movement, changed-pixel, and red-pixel
+  measurements.
+  The follow-up Animate tool undo-redo slice rebuilt the Qt 6 and Qt 5 app
+  targets as needed, refreshed both macOS packages, added
+  `viewer-animate-tool-undo-redo`, reran the Qt 6 and Qt 5 arm64 bundle checks,
+  and verified that both packaged lanes pass with matching DPR, framebuffer, Qt
+  mouse-event dispatch, `T_Edit`/`Col1` state, `TStageObject` X/Y movement,
+  undo/redo restoration, undo history indices, changed-pixel, and red-pixel
+  measurements.
+  The follow-up Animate tool modifier slice rebuilt the Qt 6 and Qt 5 app
+  targets as needed, refreshed both macOS packages, added
+  `viewer-animate-tool-modifiers`, reran the Qt 6 and Qt 5 arm64 bundle checks,
+  and verified that both packaged lanes pass with matching DPR, framebuffer, Qt
+  mouse-event dispatch, `T_Edit`/`Col1` state, normal/Alt/Shift `TStageObject`
+  deltas, Alt precision ratio, Shift dominant-axis lock, precise-cursor state,
+  changed-pixel, and red-pixel measurements.
 - The packaged Qt 6 app now also passes a non-rendering high-DPI diagnostic
   smoke through `mise run gui-smoke-highdpi-qt6`. The app-side hook records the
   main-window DPR, screen DPR, logical DPI, screen geometry, and the expected
@@ -295,8 +603,8 @@ Current branch status:
   stale `FileInfoPopup` MOC entry that generated an invalid Qt 6 metatype
   reference.
 - Qt 6 builds still emit macOS OpenGL/GLUT deprecation warnings. Those are not
-  treated as this slice's migration failures because broad GL/viewer churn
-  should wait for the Metal checkpoint.
+  treated as compile failures, but the related GL/viewer behavior is now part
+  of the active Qt 6 visual-parity work.
 
 ### 2. Qt 5.15-Compatible API Cleanup
 
@@ -465,6 +773,11 @@ Current branch status:
   `getCell()`, and `setCell()`, plus backend negative row/column and bad
   frame-id errors without entering scene icon, viewer, offscreen GL, or
   renderer paths.
+- `toonz/sources/tests/scriptengine/scene_lifecycle_edges.toonzscript` is the
+  repo-local Qt 6 Scene lifecycle fixture. It is run by
+  `mise run script-smoke-scene-lifecycle-edges-qt6` and verifies cross-scene
+  level isolation, scene disposal errors, and invalidated scene-owned level
+  wrappers without entering viewer, offscreen GL, or renderer paths.
 - `toonz/sources/tests/scriptengine/level_io.toonzscript` is the first
   repo-local Qt 6 level-I/O compatibility fixture. It is run by
   `mise run script-smoke-level-io-qt6` and verifies standalone empty `Level()`
@@ -490,6 +803,21 @@ Current branch status:
   saved raster level. The Qt 6 script save path skips scene-icon generation in
   headless script mode, so this fixture deliberately does not claim scene icon,
   viewer, offscreen GL, or renderer parity.
+- `toonz/sources/tests/scriptengine/scene_reload_edges.toonzscript` is the
+  repo-local Qt 6 Scene reload lifecycle fixture. It is run by
+  `mise run script-smoke-scene-reload-edges-qt6` and verifies loading a saved
+  scene into an existing `Scene` facade, replacing it with a second saved scene,
+  restoring the first scene, checking the loaded level/cell state after each
+  `Scene.load()`, and proving stale scene-owned `Level` wrappers are invalidated
+  rather than kept live.
+- `toonz/sources/tests/scriptengine/scene_save_icon.toonzscript` is the
+  repo-local Qt 6 scene-icon save compatibility fixture. It is run by
+  `mise run script-smoke-scene-save-icon-qt6` and verifies the
+  `QApplication` script path for `Scene.save()` scene-icon generation by saving
+  a scene, checking the generated `sceneIcons` PNG, and loading that icon back
+  through the Qt 6 `Image` facade. This is a narrow offscreen-rendering
+  boundary check; it does not claim scene-icon visual parity, viewer parity, or
+  broader render-output parity.
 - `toonz/sources/tests/scriptengine/scene_columns.toonzscript` is the
   repo-local Qt 6 Scene/xsheet column mutation fixture. It is run by
   `mise run script-smoke-scene-columns-qt6` and verifies populated cells shift
@@ -579,30 +907,37 @@ Current branch status:
   `Rasterizer`, invalid `OutlineVectorizer.transparentColor` rejection, and
   disposed-object method/property rejection for `OutlineVectorizer`,
   `CenterlineVectorizer`, `Rasterizer`, and `ToonzRasterConverter`.
-- `toonz/sources/tests/scriptengine/rasterizer.toonzscript` is the first
-  repo-local Qt 6 Rasterizer compatibility fixture. It is run by
+- `toonz/sources/tests/scriptengine/rasterizer.toonzscript` is the repo-local
+  Qt 6 Rasterizer compatibility fixture. It is run by
   `mise run script-smoke-rasterizer-qt6` and verifies `Rasterizer`
   construction, property get/set behavior, color-mapped vector-image
-  rasterization to a ToonzRaster `Image`, TLV save/reload, and inserting the
-  rasterized image into a ToonzRaster `Level`.
+  rasterization to a ToonzRaster `Image`, TLV save/reload, inserting the
+  rasterized image into a ToonzRaster `Level`, and full-color vector
+  image/level rasterization through `TOfflineGL` to Raster `Image`/`Level`
+  output. This fixture opts into `OPENTOONZ_SCRIPT_USE_QAPPLICATION=1` because
+  the full-color path needs Qt's plugin/offscreen-surface path.
 - `toonz/sources/tests/scriptengine/rasterizer_edges.toonzscript` is the
   repo-local Qt 6 Rasterizer edge-case fixture. It is run by
   `mise run script-smoke-rasterizer-edges-qt6` and verifies legacy-style
   `Rasterizer.rasterize()` argument and type rejection for non-image/non-level
-  values, Raster/ToonzRaster images, Raster/Empty levels, and the explicit
-  full-color-rasterizer deferral while keeping the color-mapped path green.
-- `toonz/sources/tests/scriptengine/renderer_basic.toonzscript` is the first
-  repo-local Qt 6 non-rendering Renderer compatibility fixture. It is run by
+  values, Raster/ToonzRaster images, Raster/Empty levels, and bad full-color
+  resolution/DPI rejection while keeping the color-mapped path green.
+- `toonz/sources/tests/scriptengine/renderer_basic.toonzscript` is the
+  repo-local Qt 6 Renderer compatibility fixture. It is run by
   `mise run script-smoke-renderer-qt6` and verifies `Renderer` construction,
-  read-only `id`, mutable `frames`/`columns` arrays, `toString()`, and
-  disposal. The rendering entry points are deliberately limited to explicit
-  deferred errors until the rendering backend boundary is stable.
+  read-only `id`, mutable `frames`/`columns` arrays, `toString()`,
+  `renderFrame()`, `renderScene()`, and disposal. The fixture creates a
+  scene-owned Raster level, renders one frame, saves/reloads the rendered PNG,
+  renders a one-frame output level, and validates the Raster image/level shape.
+  This smoke opts into `OPENTOONZ_SCRIPT_USE_QAPPLICATION=1` because renderer
+  execution needs Qt's plugin/offscreen-surface path. It also verifies that
+  `dumpCache()` writes a portable cache-map diagnostic under the configured
+  OpenToonz cache root and returns the generated `FilePath`.
 - `toonz/sources/tests/scriptengine/renderer_edges.toonzscript` is the
   repo-local Qt 6 Renderer edge-case compatibility fixture. It is run by
   `mise run script-smoke-renderer-edges-qt6` and verifies that
   `renderScene()` and `renderFrame()` reject missing/non-`Scene`/disposed scene
-  arguments and bad frame values before reaching the explicit deferred
-  rendering error.
+  arguments and bad frame values before reaching the Qt 6 renderer path.
 - `toonz/sources/tests/scriptengine/wrapper_id.toonzscript` is the repo-local
   Qt 6 inherited Wrapper id compatibility fixture. It is run by
   `mise run script-smoke-wrapper-id-qt6` and verifies read-only `id` parity for
@@ -619,8 +954,7 @@ Current branch status:
   repo-local Qt 6 level-wide transformer compatibility fixture. It is run by
   `mise run script-smoke-level-transformers-qt6` and verifies
   `OutlineVectorizer.vectorize(Level)`, `CenterlineVectorizer.vectorize(Level)`,
-  and color-mapped `Rasterizer.rasterize(Level)` without crossing into the
-  full-color `TOfflineGL` renderer path.
+  and `Rasterizer.rasterize(Level)`.
 - The script fixtures can run in bounded mode or natural-exit mode.
   `mise run script-smoke-qt6`, `mise run script-smoke-run-errors-qt6`,
   `mise run script-smoke-filepath-qt6`,
@@ -632,8 +966,10 @@ Current branch status:
   `mise run script-smoke-scene-cell-fids-qt6`,
   `mise run script-smoke-scene-edges-qt6`,
   `mise run script-smoke-scene-argument-edges-qt6`,
+  `mise run script-smoke-scene-lifecycle-edges-qt6`,
   `mise run script-smoke-scene-loadlevel-qt6`,
   `mise run script-smoke-scene-save-reopen-qt6`,
+  `mise run script-smoke-scene-reload-edges-qt6`,
   `mise run script-smoke-scene-frameids-qt6`,
   `mise run script-smoke-level-qt6`, `mise run script-smoke-level-edges-qt6`,
   `mise run script-smoke-level-io-qt6`,
@@ -657,16 +993,23 @@ Current branch status:
   `mise run script-smoke-wrapper-id-qt6`, and
   `mise run script-smoke-level-transformers-qt6` pass in both modes for the
   current Qt 6 app bundle.
-- `mise run script-smokes-qt6` now runs every current Qt 6 headless script
-  fixture in bounded mode, and `mise run script-smokes-natural-exit-qt6` runs
-  the same fixture set with `OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1`. Use these
-  aggregate tasks as the default script-parity regression gate after adding or
-  changing a QJSEngine facade fixture, and keep the individual fixture tasks for
-  focused failure triage.
+- `mise run script-smokes-qt6` now runs every current Qt 6 script fixture in
+  bounded mode, and `mise run script-smokes-natural-exit-qt6` runs the same
+  fixture set with `OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1`. Most fixtures use
+  the fast QCoreApplication script path; the renderer and full-color Rasterizer
+  fixtures opt into `QApplication` because rendering needs Qt plugins/offscreen
+  surfaces. Use the aggregate tasks as the default script-parity regression gate
+  after adding or changing a QJSEngine facade fixture, and keep the individual
+  fixture tasks for focused failure triage.
 - Qt 6 command-line script execution now uses an early headless path before
   macOS `QApplication`, plugin loading, and main-window construction. That path
   still performs Toonz environment setup, uses `stuff/cache` for script-mode
   cache writes, and reports `TException`/`std::exception` failures to stderr.
+- Qt 6 script execution can opt into the normal `QApplication` startup path with
+  `OPENTOONZ_SCRIPT_USE_QAPPLICATION=1`. On macOS that path restores the launch
+  working directory before running the script, after the bundle-relative startup
+  work has completed, so existing relative fixture paths keep the same meaning
+  as the fast QCoreApplication path.
 - The Qt 6 script-smoke harness now creates a smoke-local `SystemVar.ini`,
   passes explicit Toonz path qualifiers, and launches from the smoke root with a
   `toonz` symlink back to the checkout. This keeps profile/config/cache writes
@@ -693,12 +1036,15 @@ Current branch status:
   `setCell()`, `getCell()`, `loadLevel()`, numeric/string
   `Scene.getCell().fid` type parity, lettered frame-id cells, non-string
   `setCell()` level argument rejection, four-argument undefined level
-  rejection, and headless scene data save/reopen.
-  The Qt 6 script save path intentionally skips `makeSceneIcon()` for headless
-  script execution because scene-icon generation calls into offscreen
-  rendering. Normal application saves still generate scene icons by default, and
-  scene icon/offscreen rendering validation remains deferred until the
-  rendering/backend boundary is stable.
+  rejection, headless scene data save/reopen, existing-scene reload with stale
+  level-wrapper invalidation, and a narrow
+  `QApplication` script-mode scene-icon generation check. The Qt 6 script save
+  path intentionally skips `makeSceneIcon()` for headless script execution, but
+  opts into scene-icon generation when
+  `OPENTOONZ_SCRIPT_USE_QAPPLICATION=1` is set so the offscreen-rendering
+  boundary can be validated in the packaged app. This proves icon creation and
+  image reload, not scene-icon visual parity, viewer parity, or broader
+  render-output parity.
 - The Qt 6 branch now has a minimal `Level` compatibility slice for empty
   handles, simple-level handles owned by a `Scene`, type/name/path/frame-count
   inspection, frame-id listing, name mutation, and frame get/set support for
@@ -730,48 +1076,53 @@ Current branch status:
   for raster image conversion into ToonzRaster images, level-wide raster to
   ToonzRaster conversion, TLV save/reload, converted-level frame reload, and
   legacy-style argument/type rejection for unsupported converter inputs. This
-  does not yet claim full rasterizer, broader converter, or renderer parity.
+  does not yet claim broader converter or renderer parity.
 - The Qt 6 branch now has a minimal `OutlineVectorizer` compatibility slice for
   property state, raster-image vectorization into Vector images, PLI
   save/reload, vector-level insertion, and level-wide raster-to-vector
   conversion. It now also rejects unsupported argument and level/image types
   before attempting conversion. This does not yet claim full vectorizer,
-  rasterizer, or renderer parity.
+  rasterizer visual parity, or renderer parity.
 - The Qt 6 branch now has a minimal `CenterlineVectorizer` compatibility slice
   for property state, raster-image vectorization into Vector images, PLI
   save/reload, vector-level insertion, and level-wide raster-to-vector
   conversion. It now also rejects unsupported argument and level/image types
   before attempting conversion. This does not yet claim full vectorizer,
-  rasterizer, or renderer parity.
+  rasterizer visual parity, or renderer parity.
 - The Qt 6 branch now has a minimal `Rasterizer` compatibility slice for
   property state and color-mapped vector-image rasterization into ToonzRaster
-  images, plus TLV save/reload, ToonzRaster level insertion, and level-wide
-  color-mapped Vector-to-ToonzRaster conversion. It now also rejects unsupported
-  argument and level/image types before attempting rasterization. Full-color
-  Rasterizer output remains intentionally unported in this slice because the
-  Qt 5 binding uses `TOfflineGL`, which belongs with the viewer/offscreen
-  rendering boundary after the Metal checkpoint.
-- The Qt 6 branch now has a non-rendering `Renderer` compatibility slice for
-  construction, `id`, `frames`/`columns` arrays, `toString()`, and disposal.
-  The actual `renderFrame()`, `renderScene()`, and `dumpCache()` methods are
-  present only as explicit deferred errors until the Metal/rendering boundary is
-  stable enough for renderer validation. The Renderer edge-case fixture now
-  validates the non-rendering argument checks before those deferred render
-  errors.
+  images, plus TLV save/reload, ToonzRaster level insertion, level-wide
+  Vector-to-ToonzRaster conversion, and fixture-sized full-color vector
+  image/level output through `TOfflineGL` to Raster `Image`/`Level` output. It
+  now also rejects unsupported argument and level/image types before attempting
+  rasterization. This is a narrow script/offscreen coverage slice, not viewer,
+  final-render, or broader visual parity.
+- The Qt 6 branch now has a `Renderer` compatibility slice for construction,
+  `id`, `frames`/`columns` arrays, `toString()`, `renderFrame()`,
+  `renderScene()`, and disposal. `renderFrame()` and `renderScene()` use the
+  same `TRenderer`/`TRenderPort` shape as the Qt 5 binding and are covered by a
+  QApplication script smoke that renders a scene-owned Raster level and reloads
+  the saved output image. `dumpCache()` now writes `TImageCache`'s cache-map
+  diagnostic to the configured cache root and returns the generated `FilePath`
+  for script-side inspection.
 - The Qt 6 branch now exposes the inherited `Wrapper::id` compatibility
   property on the non-rendering `QJSEngine` facades. This preserves a small but
   script-visible Qt 5 wrapper contract without touching renderer or viewer
   code.
 - The remaining OpenToonz object binding groups are still largely Qt 5-only in
-  this branch: renderer output, full rasterizer behavior, broader converters,
-  scene icon/rendering behavior, and deeper scene/level APIs. Scene,
-  Scene cell frame-id type, Level, Image, ImageBuilder, ImageBuilder edge-case,
-  Transform edge-case, ToonzRasterConverter, OutlineVectorizer,
-  CenterlineVectorizer, Rasterizer, and Renderer support are only facade slices
+  this branch: broader rasterizer visual parity, broader converters,
+  broader scene icon/rendering visual parity, renderer diagnostics beyond cache
+  map dumping, and deeper scene/level APIs. Scene,
+  Scene cell frame-id type, Scene lifecycle, Level, Image, ImageBuilder,
+  ImageBuilder edge-case, Transform edge-case, ToonzRasterConverter,
+  OutlineVectorizer,
+  CenterlineVectorizer, Rasterizer, and Renderer support are still partial
+  compatibility slices
   even with the level-wide transformer, level-wide converter, scene data
-  save/reopen, scene edge-case, Renderer metadata, and Renderer edge-case
-  fixtures. This is an explicit temporary limitation, not product-ready Qt 6
-  script support.
+  save/reopen, scene reload edge-case, scene edge-case, Renderer
+  renderFrame/renderScene, and Renderer edge-case fixtures. This is an explicit
+  temporary limitation, not
+  product-ready Qt 6 script support.
 
 Avoid making an external Qt Script fork the default plan. It might be useful as
 a short-lived proof-of-build bridge if maintainers explicitly accept the
@@ -875,7 +1226,7 @@ Current branch status:
   generated-WAV playback startup, and camera metadata smokes are green, but
   preview/capture/record/playback UI behavior is not product-certified.
 
-### 5. OpenGL, Viewer, Offscreen Rendering, And Metal
+### 5. OpenGL, Viewer, Offscreen Rendering, And Visual Parity
 
 Qt 6 does not require removing OpenGL from a Qt Widgets application, but it
 changes the module split and platform assumptions:
@@ -894,19 +1245,19 @@ This checkout has a broad OpenGL surface:
 - tool drawing overlays and selection rendering
 - texture and GL utility code
 
-Because a Metal migration is already happening in another worktree, the Qt 6
-rendering work should not start as a parallel rewrite of the same old OpenGL
-files. The safer plan is:
+The Metal draft is no longer a blocker for this port. Qt 6 rendering work
+should proceed against the current OpenToonz visual behavior and keep Qt 5
+parity visible while the new lane stabilizes. The safer plan is:
 
-1. Let the Metal migration establish a renderer/backend boundary.
-2. Merge or rebase Qt 6 work on top of that boundary.
-3. Keep a compatibility OpenGL backend only where necessary for non-macOS or
-   transitional validation.
-4. Make Qt 6 deal with widget integration, event handling, high-DPI, and
-   packaging, not with inventing a second renderer architecture.
+1. Use the Qt 5 application behavior as the visual and workflow baseline.
+2. Fix Qt 6 widget integration, event handling, high-DPI, OpenGLWidgets,
+   offscreen GL, shader, and tool-overlay behavior in narrow slices.
+3. Keep OpenGL compatibility where it is still required by current OpenToonz
+   rendering and non-macOS paths.
+4. Revisit Metal after Qt 6 parity is complete, using the Qt 6-stabilized
+   renderer behavior as the integration baseline.
 
-If the Metal work is long-running, the Qt 6 branch can still do non-rendering
-cleanup now. It should avoid churn in files like:
+Qt 6 rendering work is now allowed to touch files such as:
 
 - `toonz/sources/toonz/sceneviewer.*`
 - `toonz/sources/toonz/imageviewer.*`
@@ -922,10 +1273,9 @@ Current branch status:
 - The Qt 6 app target links while still using the existing OpenGL-heavy viewer
   and FX code. This proves the Qt 6 widget/build integration is viable, but it
   does not validate rendering behavior.
-- The compile work deliberately avoided broad viewer, renderer, offscreen GL,
-  shader, and tool-overlay rewrites. The remaining OpenGL and high-DPI warning
-  cleanup should be scheduled after the Metal checkpoint or against an explicit
-  renderer/backend boundary.
+- The remaining OpenGL, offscreen rendering, shader, high-DPI, and
+  tool-overlay work is now part of the active Qt 6 port rather than parked
+  behind the Metal draft.
 - An offscreen Qt 6 startup smoke is not a useful GUI substitute on macOS
   because the offscreen platform cannot create the OpenGL context OpenToonz
   still expects.
@@ -953,6 +1303,173 @@ Current branch status:
   scene, and checks the resulting counts. It does not validate viewer drawing,
   redraw, OpenGL fallback behavior, high-DPI rendering, preview render, or
   final render.
+- The app-side smoke hook also has green raster and vector viewer framebuffer
+  checks via `mise run gui-smoke-viewer-render-qt6` and
+  `mise run gui-smoke-viewer-vector-render-qt6`. It inserts either a red raster
+  frame or a red vector stroke into a sandbox scene, captures the `SceneViewer`
+  framebuffer before and after the update, requires nonzero changed and
+  red-dominant pixel counts, and writes the before/after captures beside the
+  smoke status file. These are narrow packaged-app rendering guards only;
+  brush input, interactive vector drawing, timeline/UI onion workflow, overlay
+  placement, FX preview, final render output, and Qt 5-vs-Qt 6 visual parity
+  remain open.
+  The raster viewer-render check now also fails if the logical viewer size,
+  OpenToonz device-pixel ratio, Qt DPR, screen DPR, and captured framebuffer
+  size disagree. The latest packaged Qt 6 and Qt 5 runs both reported logical
+  size `994x819`, DPR `2` / `2.00`, framebuffer `1988x1638`, `771605` changed
+  pixels, and `358756` red pixels.
+- The app-side smoke hook also has a green onion-skin framebuffer check via
+  `mise run gui-smoke-viewer-onion-skin-qt6`. It creates two transparent
+  raster levels in one column, captures the current row with onion skin
+  disabled, enables whole-scene mobile onion skin at back offset `-1`, and
+  requires one back onion stage player, visible red current-frame pixels, and
+  an onion-pixel increase in the `SceneViewer` framebuffer. The latest packaged
+  Qt 6 and Qt 5 runs both reported logical size `994x819`, DPR `2` / `2.00`,
+  framebuffer `1988x1638`, `45651` red pixels, and onion pixels `0 -> 42012`.
+  This covers the app-side onion framebuffer path only; timeline onion marker
+  UI, interactive onion toggles, custom onion colors, overlay placement, and
+  full visual parity remain open.
+- The app-side smoke hook also has a green camera-box overlay framebuffer check
+  via `mise run gui-smoke-viewer-camera-overlay-qt6`. It creates a blank
+  sandbox scene, toggles the camera box overlay off and on through
+  `MI_ViewCamera` / `viewCameraToggle`, captures the `SceneViewer` framebuffer
+  before and after the toggle, and requires `cameraOverlayProbe=ok`,
+  `viewerRenderProbe=ok`, high-DPI framebuffer probes, changed pixels, and red
+  overlay pixels. The latest packaged Qt 6 and Qt 5 runs both reported logical
+  size `994x819`, DPR `2` / `2.00`, framebuffer `1988x1638`, `3638` changed
+  pixels, and `3638` red pixels. This covers the app-side camera-box overlay
+  path only; selection handles, tool cursor overlays, rulers, OS/menu
+  interaction, and full overlay visual parity remain open.
+- The app-side smoke hook also has a green safe-area and field-guide overlay
+  framebuffer check via `mise run gui-smoke-viewer-safe-area-field-guide-qt6`.
+  It creates a blank sandbox scene, toggles safe area and field guide off and
+  on through `MI_SafeArea` / `safeAreaToggle` and `MI_FieldGuide` /
+  `fieldGuideToggle`, captures the `SceneViewer` framebuffer before and after
+  the toggle, and requires `safeAreaProbe=ok`, `fieldGuideProbe=ok`,
+  `viewerRenderProbe=ok`, high-DPI framebuffer probes, changed pixels, red
+  safe-area pixels, gray guide pixels, and changed gray guide pixels. The latest
+  packaged Qt 6 and Qt 5 runs both reported logical size `994x819`, DPR `2` /
+  `2.00`, framebuffer `1988x1638`, `112230` changed pixels, `5279` red pixels,
+  `645999` gray pixels, and `106951` changed gray pixels. This covers the
+  app-side safe-area and field-guide overlay paths only; selection handles, tool
+  cursor overlays, rulers/guides added through ruler UI, OS/menu interaction,
+  custom safe-area presets or colors, custom field-guide settings, and full
+  overlay visual parity remain open.
+- The app-side smoke hook also has a green ruler/guide overlay framebuffer
+  check via `mise run gui-smoke-viewer-ruler-guide-qt6`. It creates a blank
+  sandbox scene, seeds one horizontal and one vertical scene guide, toggles the
+  ruler and guide overlays through `MI_ViewRuler` / `viewRulerToggle` and
+  `MI_ViewGuide` / `viewGuideToggle`, captures the `SceneViewer` after the
+  ruler is visible but before guides are enabled, and then requires
+  `rulerGuideProbe=ok`, `viewerRenderProbe=ok`, high-DPI framebuffer probes,
+  two visible ruler widgets, guide counts, changed pixels, and changed neutral
+  guide pixels. The latest packaged Qt 6 and Qt 5 runs both reported logical
+  size `994x819`, DPR `2` / `2.00`, framebuffer `1988x1638`, `1707` changed
+  pixels, `1707` changed neutral guide pixels, `551872` gray pixels, `0`
+  changed gray pixels, and `0` red pixels. This covers the app-side guide
+  framebuffer and ruler-widget visibility paths only; guide creation/movement
+  through the ruler UI, ruler tick rendering pixels, selection handles, tool
+  cursor overlays, OS/menu interaction, custom guide positions or colors, and
+  full overlay visual parity remain open.
+- The app-side smoke hook also has a green Animate/Edit tool overlay
+  framebuffer check via `mise run gui-smoke-viewer-animate-tool-overlay-qt6`.
+  It creates a visible raster scene, captures a `T_Hand` baseline, switches the
+  active tool to `T_Edit` on `Col1`, and requires `toolOverlayProbe=ok`,
+  `viewerRenderProbe=ok`, high-DPI framebuffer probes, changed pixels, and
+  visible red content pixels. The latest packaged Qt 6 and Qt 5 runs both
+  reported logical size `994x819`, DPR `2` / `2.00`, framebuffer `1988x1638`,
+  `2898` changed pixels, and `357248` red pixels. This covers the
+  `SceneViewer::drawToolGadgets()` Animate/Edit overlay path only; selection
+  handles, cursor feedback, interactive transform dragging, OS/menu
+  interaction, and full overlay visual parity remain open.
+- The app-side smoke hook also has a green Animate/Edit direct transform-drag
+  check via `mise run gui-smoke-viewer-animate-tool-drag-qt6`. It creates a
+  visible raster scene, activates `T_Edit` on `Col1`, captures the viewer with
+  the tool active, replays a direct tool left-button drag from `0,0` to
+  `144,-72`, and requires `toolTransformProbe=ok`, `viewerRenderProbe=ok`,
+  high-DPI framebuffer probes, changed `TStageObject` placement, changed
+  pixels, and visible red content pixels. The latest packaged Qt 6 and Qt 5 runs
+  both reported logical size `994x819`, DPR `2` / `2.00`, framebuffer
+  `1988x1638`, stage object X `0.0000 -> 2.7000`, stage object Y
+  `0.0000 -> -1.3500`, `492731` changed pixels, and `356145` red pixels. This
+  covers the direct Animate/Edit tool transform path only; selection-handle
+  hit-testing, cursor feedback, real OS-level or hardware input delivery, and
+  full transform workflow visual parity remain open. Undo/redo integration and
+  modifier-key behavior are covered by separate Qt mouse-event smokes below.
+- The app-side smoke hook also has a green Animate/Edit Qt mouse-event
+  transform check via `mise run gui-smoke-viewer-animate-tool-mouse-events-qt6`.
+  It creates a visible raster scene, activates `T_Edit` on `Col1`, maps the
+  same transform path through `SceneViewer` Qt mouse press/move/release events
+  using the viewer DPR, and requires `mouseEventProbe=ok`,
+  `toolTransformProbe=ok`, `viewerRenderProbe=ok`, high-DPI framebuffer probes,
+  changed `TStageObject` placement, changed pixels, and visible red content
+  pixels. The latest packaged Qt 6 and Qt 5 runs both reported logical size
+  `994x819`, DPR `2` / `2.00`, framebuffer `1988x1638`, stage object X
+  `0.0000 -> 1.3521`, stage object Y `0.0000 -> -0.6761`, `280162` changed
+  pixels, and `357248` red pixels. This covers Qt widget event dispatch and
+  high-DPI coordinate mapping for the Animate/Edit transform path;
+  selection-handle hit-testing, cursor feedback, real OS-level or hardware input
+  delivery, and full transform workflow visual parity remain open. Modifier-key
+  behavior is covered by the separate Qt mouse-event modifier smoke below.
+- The app-side smoke hook also has a green Animate/Edit Qt mouse-event undo-redo
+  check via `mise run gui-smoke-viewer-animate-tool-undo-redo-qt6`. It creates a
+  visible raster scene, activates `T_Edit` on `Col1`, maps the transform path
+  through `SceneViewer` Qt mouse press/move/release events using the viewer DPR,
+  resets the undo stack before the drag, and requires one undo entry, exact undo
+  restoration, redo restoration, high-DPI framebuffer probes, changed pixels, and
+  visible red content pixels. The latest packaged Qt 6 and Qt 5 runs both
+  reported logical size `994x819`, DPR `2` / `2.00`, framebuffer `1988x1638`,
+  stage object X `0.0000 -> 1.3521 -> 0.0000 -> 1.3521`, stage object Y
+  `0.0000 -> -0.6761 -> 0.0000 -> -0.6761`, undo history `0 -> 1`, history
+  indices `0/1/0/1`, `280162` changed pixels, and `357248` red pixels. This
+  narrows Qt widget event dispatch, high-DPI coordinate mapping, and undo/redo
+  integration for the Animate/Edit transform path; real OS-level input delivery,
+  selection-handle hit-testing, full cursor artwork/hover variants, and full
+  transform workflow visual parity remain open.
+- The app-side smoke hook also has a green Animate/Edit Qt mouse-event modifier
+  check via `mise run gui-smoke-viewer-animate-tool-modifiers-qt6`. It creates
+  a visible raster scene, activates `T_Edit` on `Col1`, maps normal, Alt, and
+  Shift drags through `SceneViewer` Qt mouse events using the viewer DPR, and
+  requires Qt mouse-event dispatch, transform movement, Alt precision ratio,
+  Shift dominant-axis lock, precise-cursor state, a nonblank framebuffer, and
+  visible red content pixels. The latest packaged Qt 6 and Qt 5 runs both
+  reported logical size `994x819`, DPR `2` / `2.00`, framebuffer `1988x1638`,
+  normal delta `1.3521,-0.6761`, Alt delta `0.1352,-0.0676`, Shift delta
+  `1.3521,0.0000`, precise cursor `false -> true`, `203603` changed pixels,
+  and `357248` red pixels. This covers Qt modifier delivery, Alt precision
+  transform, Shift axis constraint, and the Animate/Edit precise-cursor state;
+  real OS-level input delivery, selection-handle hit-testing, full cursor
+  artwork/hover variants, and full transform workflow visual parity remain open.
+- The app-side smoke hook also has green vector and full-color raster brush
+  tool-input checks via `mise run gui-smoke-viewer-vector-brush-qt6` and
+  `mise run gui-smoke-viewer-raster-brush-qt6`. It creates a sandbox level,
+  selects `T_Brush`, replays a direct left-button stroke path through the tool,
+  requires the vector stroke count or raster opaque/red pixel counts to
+  increase, and verifies changed plus red-dominant `SceneViewer` framebuffer
+  pixels. These are the first drawing tool guards in the Qt 6 lane, but
+  OS-level event delivery, high-DPI input mapping, timeline/UI onion workflow,
+  overlays, FX preview, final render output, and Qt 5-vs-Qt 6 visual parity
+  remain open.
+- The app-side smoke hook also has a green raster brush event-dispatch check via
+  `mise run gui-smoke-viewer-raster-brush-mouse-events-qt6`. It sends Qt mouse
+  press/move/release events through `SceneViewer`, maps the shared world-space
+  brush path into logical widget coordinates using the viewer DPR, verifies
+  increased raster opaque/red pixel counts, and requires changed plus
+  red-dominant `SceneViewer` framebuffer pixels. This narrows Qt widget event
+  dispatch and high-DPI input coordinate coverage; real OS-level event delivery,
+  tablet input, timeline/UI onion workflow, overlays, FX preview, final render
+  output, and visual parity against the Qt 5 baseline remain open.
+- The app-side smoke hook also has a green raster brush synthetic tablet-event
+  check via `mise run gui-smoke-viewer-raster-brush-tablet-events-qt6`. It
+  sends Qt tablet press/move/release events through `SceneViewer`, maps the
+  shared world-space brush path into logical widget coordinates using the
+  viewer DPR, drives pressure from 0.35 to 0.85 with tilt `-18,12`, verifies
+  increased raster opaque/red pixel counts, and requires changed plus
+  red-dominant `SceneViewer` framebuffer pixels. This narrows Qt tablet-event
+  dispatch and `TMouseEvent` tablet/pressure propagation; real tablet hardware,
+  OS-level event delivery, platform driver pressure/tilt, timeline/UI onion
+  workflow, overlays, FX preview, final render output, and visual parity against
+  the Qt 5 baseline remain open.
 - The app-side smoke hook also has a green non-rendering high-DPI diagnostic
   check via `mise run gui-smoke-highdpi-qt6`. It records main-window DPR,
   screen DPR, logical DPI, screen geometry, and Qt 6 high-DPI mode from the
@@ -1009,10 +1526,16 @@ Current branch status:
   erase-then-decrement iterator invalidation in both
   `ExecutorImp::refreshAssignments()` and `Worker::takeTask()`. Both Qt 6 and
   Qt 5 `OpenToonz` app targets rebuild after this shared fix.
-- This is still not rendering validation. Drawing workflows, viewer redraw,
-  high-DPI visual behavior, timeline/xsheet interaction, preview rendering,
-  and final rendering remain open and should be coordinated with the Metal
-  boundary.
+- This is still not broad rendering validation. Narrow raster-cell,
+  vector-cell, direct viewer zoom/pan, app-side onion-skin, camera-box, and
+  safe-area/field-guide, ruler/guide, Animate/Edit tool overlay, direct
+  Animate/Edit tool transform-drag, Qt mouse-event Animate/Edit transform, and
+  Animate/Edit undo-redo/modifier-key `SceneViewer` framebuffer smokes are
+  green, but drawing workflows, timeline/UI onion workflow, selection-handle
+  hit-testing and overlays, real OS-level transform dragging, interactive
+  ruler-guide workflows, broader vector rendering, broader high-DPI visual
+  behavior, timeline/xsheet interaction, preview rendering, final rendering,
+  and Qt 5-vs-Qt 6 visual parity remain open and are active Qt 6 parity work.
 
 ### 6. Platform Packaging
 
@@ -1024,8 +1547,8 @@ macOS:
 - Re-audit plugin group names and deployed library names after `macdeployqt`.
 - Re-check app bundle structure, ad hoc signing, release signing, notarization,
   helper executables, and copied `stuff`.
-- Verify whether the Metal migration changes bundled framework or entitlement
-  requirements.
+- Verify whether Qt 6 rendering, multimedia, or helper-process changes require
+  bundled framework or entitlement updates.
 
 Current branch status:
 
@@ -1076,8 +1599,7 @@ Windows:
   custom Qt package can be removed.
 - Replace the manual Qt 5 path setup with a reproducible Qt 6 acquisition
   strategy.
-- Re-run tablet, stylus, OpenGL or Metal-equivalent rendering, camera, and
-  audio checks.
+- Re-run tablet, stylus, OpenGL rendering, camera, and audio checks.
 - Re-audit `windeployqt` arguments and plugin output.
 
 Linux:
@@ -1106,25 +1628,24 @@ Expected changes:
 
 ## Proposed Migration Plan
 
-### Phase 0: Freeze The Baseline And Metal Boundary
+### Phase 0: Freeze The Baseline And Qt 6 Scope
 
-Goal: prevent two long-running branches from rewriting the same rendering
-surface.
+Goal: preserve the Qt 5 baseline while making Qt 6 the active migration focus.
 
 Tasks:
 
 - Confirm the Qt 5 default build still configures with `mise run configure`.
-- Confirm the Metal worktree's intended merge boundary and touched files.
-- Decide whether Metal lands before Qt 6 rendering work. The recommendation is
-  yes.
+- Record that Metal is parked until the Qt 6 port is complete.
+- Use the current Qt 5 application behavior as the visual-parity baseline for
+  Qt 6 rendering work.
 - Create a Qt 6 tracking document or issue with ownership by subsystem.
 - Capture the current Qt 5 module list and all Qt 5-specific CMake references.
 
 Exit criteria:
 
 - Qt 5 default path remains unchanged.
-- There is a written list of files the Qt 6 prep branch should avoid until the
-  Metal work is stable.
+- There is a written list of Qt 6 rendering, viewer, multimedia, scripting, and
+  packaging areas that still need product-parity validation.
 
 ### Phase 1: Qt 5.15-Compatible Cleanup
 
@@ -1213,13 +1734,13 @@ Exit criteria:
 - Camera and audio smoke checks are documented and at least one local platform
   has been verified.
 
-### Phase 5: Rendering Integration After Metal
+### Phase 5: Qt 6 Rendering And Viewer Integration
 
-Goal: make Qt 6 use the stable renderer/backend boundary.
+Goal: make Qt 6 match current OpenToonz viewer, drawing, and rendering
+behavior.
 
 Tasks:
 
-- Rebase on the Metal checkpoint.
 - Update viewer widgets for Qt 6 event, high-DPI, and OpenGLWidgets behavior.
 - Keep direct GL compatibility only where required by non-macOS paths.
 - Validate frame rendering, viewer drawing, onion skin, selection overlays,
@@ -1229,7 +1750,7 @@ Exit criteria:
 
 - Qt 6 build runs the app on at least one desktop platform.
 - A GUI smoke pass exercises viewer and drawing behavior.
-- Known Metal-vs-OpenGL parity differences are documented.
+- Known Qt 6-vs-Qt 5 visual parity differences are documented.
 
 ### Phase 6: Packaging And CI Expansion
 
@@ -1282,16 +1803,16 @@ Approximate effort by area:
 | `QTextCodec` and legacy encodings | Medium | Medium |
 | Qt Script replacement | Large | High |
 | Qt Multimedia camera/audio | Large | High |
-| OpenGL/Metal/Qt 6 viewer integration | Large | High |
+| OpenGL/Qt 6 viewer integration | Large | High |
 | macOS packaging | Medium | Medium |
 | Windows packaging and tablet validation | Large | High |
 | Linux packaging | Medium | Medium |
 | QA and release stabilization | Large | High |
 
-The most important schedule decision is to avoid doing Qt 6 rendering work
-against an obsolete OpenGL boundary while the Metal work is still changing that
-same boundary. Let Metal reduce the rendering ambiguity, then port the Qt shell
-and platform integration around it.
+The most important schedule decision has changed: Qt 6 is now the active
+priority, and Metal should be revisited only after the Qt 6 port reaches
+product parity. Qt 6 rendering work should proceed directly against the current
+OpenToonz behavior.
 
 ## Recommended Next Implementation Slice
 
@@ -1302,9 +1823,24 @@ should turn the compile/link milestone into a runtime and subsystem validation
 milestone:
 
 1. Continue packaged Qt 6 interactive GUI validation beyond the now-green
-   scripted startup/create/open/xsheet-state path: draw raster/vector strokes,
-   inspect viewer redraw, validate high-DPI viewer/rendering behavior, and
-   document the first workflow blockers.
+   scripted startup/create/open/xsheet-state, raster/vector viewer-framebuffer,
+   direct viewer zoom/pan transform, app-side onion-skin, camera-box,
+   safe-area/field-guide, ruler/guide, Animate/Edit tool overlay framebuffer,
+   direct Animate/Edit tool transform-drag, Qt mouse-event Animate/Edit
+   transform-drag plus undo-redo and modifier-key behavior, vector/raster brush
+   tool-input paths, Qt mouse-event raster brush path, and synthetic Qt
+   tablet-event raster brush path. A real macOS
+   CGEvent/System Events
+   raster-brush gate now exists, but the current local run is blocked by app
+   activation or OS input delivery:
+   CGEvent post access is
+   trusted, yet the smoke-launched target never becomes active, System Events
+   still reports `-25200`, and raster pixels remain unchanged. Resolve or rerun
+   that permissioned path before treating OS-level mouse delivery as covered.
+   Then validate real tablet hardware pressure/tilt, timeline/UI onion
+   workflow, selection-handle hit-testing and overlays, real OS-level transform
+   dragging, interactive ruler-guide workflows, broader high-DPI input and
+   viewer/rendering behavior, and the first remaining workflow blockers.
 2. Keep the app-side GUI smoke status hook narrow and test-only. System Events
    remains useful as a fallback/manual diagnostic, but do not make Qt 6
    create/open validation depend on macOS accessibility window discovery unless
@@ -1317,17 +1853,20 @@ milestone:
    FilePath-edge, FilePath metadata, path-argument, `Scene`, Scene edge-case,
    `Level`, `Level.path`,
    Level edge-case, level-wide transformer, Level I/O types including
-   ToonzRaster reload frame access, scene data save/reopen, Scene frame-id
-   handling, Scene cell frame-id type, `Image`, Image edge-case,
+   ToonzRaster reload frame access, scene data save/reopen, Scene reload edge,
+   Scene save-icon,
+   Scene frame-id
+   handling, Scene cell frame-id type, Scene lifecycle edge cases, `Image`,
+   Image edge-case,
    `ImageBuilder`, ImageBuilder edge-case, Transform edge-case,
    ToonzRasterConverter, ToonzRasterConverter level conversion,
    ToonzRasterConverter edge-case,
-   OutlineVectorizer/CenterlineVectorizer/Rasterizer, non-rendering Renderer,
-   Renderer edge-case, Wrapper id facades, and binding lifecycle/property
-   edges.
-   Good next candidates are remaining advanced scene APIs or a non-rendering
-   subset of another script binding. Scene icon/offscreen rendering behavior
-   remains deferred until the rendering/backend boundary is stable.
+   OutlineVectorizer/CenterlineVectorizer/Rasterizer including full-color
+   Rasterizer output, Renderer
+   renderFrame/renderScene/dumpCache, Renderer edge-case, Wrapper id facades,
+   and binding lifecycle/property edges.
+   Good next candidates are remaining advanced scene APIs, broader
+   scene-icon/offscreen visual parity, or another script binding subset.
 5. Run focused product-level audio playback/recording and camera smoke tests on
    real hardware. The current audio-input, audio-output, audio-recording WAV,
    audio-playback WAV, and camera-format smokes are backend, WAV-writer, sound
@@ -1338,10 +1877,11 @@ milestone:
 6. Harden the existing macOS Qt 6 packaging lane where runtime evidence already
    requires it: package after every GUI relink, reduce repeated `macdeployqt`
    install-name churn, and then move package follow-up to Linux and Windows.
-7. Keep viewer/rendering changes narrow until the Metal boundary is stable.
+7. Bring viewer/rendering changes forward in narrow, validated slices until Qt
+   6 reaches visual parity.
 
 That slice gives later agents runtime evidence instead of another compile-only
-milestone, while still avoiding overlap with the Metal branch.
+milestone while keeping the Qt 6 port focused on product parity.
 
 ## Validation Matrix
 
@@ -1391,6 +1931,23 @@ mise run gui-smoke-audio-output-qt6
 mise run gui-smoke-audio-recording-wav-qt6
 mise run gui-smoke-audio-playback-wav-qt6
 mise run gui-smoke-xsheet-scrub-qt6
+mise run gui-smoke-viewer-render-qt6
+mise run gui-smoke-viewer-vector-render-qt6
+mise run gui-smoke-viewer-zoom-pan-qt6
+mise run gui-smoke-viewer-onion-skin-qt6
+mise run gui-smoke-viewer-camera-overlay-qt6
+mise run gui-smoke-viewer-safe-area-field-guide-qt6
+mise run gui-smoke-viewer-ruler-guide-qt6
+mise run gui-smoke-viewer-animate-tool-overlay-qt6
+mise run gui-smoke-viewer-animate-tool-drag-qt6
+mise run gui-smoke-viewer-animate-tool-mouse-events-qt6
+mise run gui-smoke-viewer-animate-tool-undo-redo-qt6
+mise run gui-smoke-viewer-animate-tool-modifiers-qt6
+mise run gui-smoke-viewer-vector-brush-qt6
+mise run gui-smoke-viewer-raster-brush-qt6
+mise run gui-smoke-viewer-raster-brush-mouse-events-qt6
+mise run gui-smoke-viewer-raster-brush-tablet-events-qt6
+mise run gui-smoke-viewer-raster-brush-system-events-qt6
 OPENTOONZ_GUI_SMOKE_FILE=<path-to-scene.tnz> bash scripts/qt6/run-gui-smoke.sh
 mise run script-smoke-qt6
 mise run script-smoke-run-errors-qt6
@@ -1404,8 +1961,11 @@ mise run script-smoke-scene-columns-qt6
 mise run script-smoke-scene-cell-fids-qt6
 mise run script-smoke-scene-edges-qt6
 mise run script-smoke-scene-argument-edges-qt6
+mise run script-smoke-scene-lifecycle-edges-qt6
 mise run script-smoke-scene-loadlevel-qt6
 mise run script-smoke-scene-save-reopen-qt6
+mise run script-smoke-scene-reload-edges-qt6
+mise run script-smoke-scene-save-icon-qt6
 mise run script-smoke-scene-frameids-qt6
 mise run script-smoke-level-qt6
 mise run script-smoke-level-edges-qt6
@@ -1430,6 +1990,7 @@ mise run script-smoke-renderer-qt6
 mise run script-smoke-renderer-edges-qt6
 mise run script-smoke-level-transformers-qt6
 mise run script-smoke-wrapper-id-qt6
+mise run script-smokes-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-run-errors-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-filepath-qt6
@@ -1442,8 +2003,11 @@ OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-columns-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-cell-fids-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-argument-edges-qt6
+OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-lifecycle-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-loadlevel-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-save-reopen-qt6
+OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-reload-edges-qt6
+OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-save-icon-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-frameids-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-level-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-level-edges-qt6
@@ -1468,6 +2032,7 @@ OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-renderer-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-renderer-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-level-transformers-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-wrapper-id-qt6
+mise run script-smokes-natural-exit-qt6
 ```
 
 Manual smoke checks:
@@ -1487,7 +2052,8 @@ Manual smoke checks:
 
 ## Final Answer On Metal Sequencing
 
-Do not pause the Metal migration. Finish it to a stable checkpoint. Begin Qt 6
-prep in parallel only where it is clearly independent of rendering. Once Metal
-has landed or has a stable integration branch, start the Qt 6 rendering work
-from that base.
+Park Metal follow-up until the Qt 6 migration is complete. The Metal draft did
+not reach visual parity, so the Qt 6 port should proceed directly against the
+current OpenToonz behavior, including viewer, drawing, rendering, and
+visual-parity work. Revisit Metal later using the completed Qt 6 port as the
+baseline.

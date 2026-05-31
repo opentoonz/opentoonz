@@ -285,6 +285,8 @@ void ScriptEngine::onTerminated() {
 #include "toonz/levelproperties.h"
 #include "toonz/tcamera.h"
 #include "toonz/tcenterlinevectorizer.h"
+#include "toonz/scenefx.h"
+#include "toonz/sceneproperties.h"
 #include "toonz/toonzscene.h"
 #include "toonz/toonzimageutils.h"
 #include "toonz/tproject.h"
@@ -293,18 +295,23 @@ void ScriptEngine::onTerminated() {
 #include "toonz/txshleveltypes.h"
 #include "toonz/txshsimplelevel.h"
 #include "convert2tlv.h"
+#include "tenv.h"
 #include "tfiletype.h"
 #include "tgeometry.h"
 #include "timage.h"
+#include "timagecache.h"
 #include "timage_io.h"
 #include "tlevel.h"
 #include "tlevel_io.h"
+#include "tofflinegl.h"
 #include "tpalette.h"
 #include "trenderer.h"
 #include "trasterimage.h"
 #include "trop.h"
+#include "toutputproperties.h"
 #include "tsystem.h"
 #include "ttoonzimage.h"
+#include "tvectorrenderdata.h"
 #include "tvectorimage.h"
 
 #include <QApplication>
@@ -324,6 +331,7 @@ void ScriptEngine::onTerminated() {
 #include <utility>
 #include <cmath>
 #include <limits>
+#include <vector>
 
 //=========================================================
 
@@ -618,6 +626,223 @@ bool isRasterizerProperty(const QString& name) {
       QStringLiteral("antialiasing")};
   return properties.contains(name);
 }
+
+bool intListFromVariantList(const QVariantList& values, std::vector<int>& result,
+                            QString& error, const QString& name) {
+  result.clear();
+  for (const QVariant& value : values) {
+    bool ok      = false;
+    const int iv = value.toInt(&ok);
+    if (!ok) {
+      error = QObject::tr("%1 must contain frame or column numbers").arg(name);
+      return false;
+    }
+    if (iv < 0) {
+      error = QObject::tr("%1 values must be non-negative").arg(name);
+      return false;
+    }
+    result.push_back(iv);
+  }
+  error.clear();
+  return true;
+}
+
+class QjsRendererPort final : public TRenderPort {
+  bool m_completed = false;
+  bool m_failed    = false;
+  QString m_error;
+  TRenderer m_renderer;
+  TPointD m_cameraDpi;
+  TImageP m_outputImage;
+  std::vector<std::pair<TFrameId, TImageP>> m_outputFrames;
+
+public:
+  QjsRendererPort() : m_renderer(1) { m_renderer.addPort(this); }
+
+  ~QjsRendererPort() { m_renderer.removePort(this); }
+
+  bool setRenderAreaFromScene(ToonzScene* scene, QString& error) {
+    if (!scene) {
+      error = QObject::tr("Invalid Scene object");
+      return false;
+    }
+    TCamera* camera = scene->getCurrentCamera();
+    if (!camera) {
+      error = QObject::tr("Renderer.renderFrame requires a camera");
+      return false;
+    }
+
+    TDimension cameraRes = camera->getRes();
+    if (cameraRes.lx <= 0 || cameraRes.ly <= 0) {
+      error = QObject::tr("Renderer.renderFrame requires a valid camera size");
+      return false;
+    }
+
+    const double rx = cameraRes.lx * 0.5;
+    const double ry = cameraRes.ly * 0.5;
+    setRenderArea(TRectD(-rx, -ry, rx, ry));
+    m_cameraDpi = camera->getDpi();
+    error.clear();
+    return true;
+  }
+
+  void enableColumns(ToonzScene* scene, const std::vector<int>& columns,
+                     std::vector<bool>& oldStatus) {
+    if (columns.empty()) return;
+
+    TXsheet* xsheet = scene->getXsheet();
+    const int columnCount = xsheet->getColumnCount();
+    oldStatus.reserve(columnCount);
+    std::vector<bool> newStatus(columnCount, false);
+    for (int i = 0; i < columnCount; ++i) {
+      oldStatus.push_back(xsheet->getColumn(i)->isPreviewVisible());
+    }
+    for (int column : columns) {
+      if (0 <= column && column < columnCount) newStatus[column] = true;
+    }
+    for (int i = 0; i < columnCount; ++i) {
+      xsheet->getColumn(i)->setPreviewVisible(newStatus[i]);
+    }
+  }
+
+  void restoreColumns(ToonzScene* scene, const std::vector<bool>& oldStatus) {
+    TXsheet* xsheet = scene->getXsheet();
+    for (int i = 0; i < (int)oldStatus.size(); ++i) {
+      xsheet->getColumn(i)->setPreviewVisible(oldStatus[i]);
+    }
+  }
+
+  std::vector<TRenderer::RenderData>* makeRenderData(
+      ToonzScene* scene, const std::vector<int>& rows,
+      const std::vector<int>& columns) {
+    TRenderSettings settings =
+        scene->getProperties()->getOutputProperties()->getRenderSettings();
+
+    std::vector<bool> oldColumnStates;
+    enableColumns(scene, columns, oldColumnStates);
+
+    std::vector<TRenderer::RenderData>* renderData =
+        new std::vector<TRenderer::RenderData>;
+    for (int row : rows) {
+      const double frame = row;
+      TFxP sceneFx       = buildSceneFx(scene, frame, 1, false);
+      TFxPair fxPair;
+      fxPair.m_frameA = sceneFx;
+      renderData->push_back(TRenderer::RenderData(frame, settings, fxPair));
+    }
+
+    restoreColumns(scene, oldColumnStates);
+    return renderData;
+  }
+
+  bool render(ToonzScene* scene, const std::vector<int>& rows,
+              const std::vector<int>& columns, QString& error) {
+    if (!setRenderAreaFromScene(scene, error)) return false;
+    if (rows.empty()) {
+      error = QObject::tr("Renderer.renderScene requires a non-empty scene");
+      return false;
+    }
+
+    m_completed = false;
+    m_failed    = false;
+    m_error.clear();
+    m_outputImage = TImageP();
+    m_outputFrames.clear();
+
+    QMutex mutex;
+    mutex.lock();
+    m_renderer.startRendering(makeRenderData(scene, rows, columns));
+    while (!m_completed) {
+      QEventLoop loop;
+      loop.processEvents();
+      QWaitCondition waitCondition;
+      waitCondition.wait(&mutex, 100);
+    }
+    mutex.unlock();
+
+    if (m_failed) {
+      error = m_error.isEmpty() ? QObject::tr("Renderer render failed")
+                                : m_error;
+      return false;
+    }
+
+    error.clear();
+    return true;
+  }
+
+  TImageP renderFrame(ToonzScene* scene, int row,
+                      const std::vector<int>& columns, QString& error) {
+    if (row < 0) {
+      error = QObject::tr("Renderer.renderFrame frame must be non-negative");
+      return TImageP();
+    }
+    if (!scene || scene->getFrameCount() <= 0) {
+      error = QObject::tr("Renderer.renderFrame requires a non-empty scene");
+      return TImageP();
+    }
+
+    std::vector<int> rows;
+    rows.push_back(row);
+    if (!render(scene, rows, columns, error)) return TImageP();
+    if (!m_outputImage) {
+      error = QObject::tr("Renderer.renderFrame produced no image");
+      return TImageP();
+    }
+    return m_outputImage;
+  }
+
+  std::vector<std::pair<TFrameId, TImageP>> renderScene(
+      ToonzScene* scene, const std::vector<int>& requestedRows,
+      const std::vector<int>& columns, QString& error) {
+    if (!scene || scene->getFrameCount() <= 0) {
+      error = QObject::tr("Renderer.renderScene requires a non-empty scene");
+      return {};
+    }
+
+    std::vector<int> rows = requestedRows;
+    if (rows.empty()) {
+      for (int i = 0; i < scene->getFrameCount(); ++i) rows.push_back(i);
+    }
+    if (!render(scene, rows, columns, error)) return {};
+    if (m_outputFrames.empty()) {
+      error = QObject::tr("Renderer.renderScene produced no frames");
+      return {};
+    }
+    return m_outputFrames;
+  }
+
+  void onRenderRasterCompleted(const RenderData& renderData) override {
+    TRasterP outputRaster = renderData.m_rasA;
+    if (!outputRaster) return;
+
+    TRasterImageP image(outputRaster->clone());
+    image->setDpi(m_cameraDpi.x, m_cameraDpi.y);
+
+    if (renderData.m_frames.empty()) {
+      m_outputImage = image;
+      return;
+    }
+
+    if (!m_outputImage) m_outputImage = image;
+    for (double frame : renderData.m_frames) {
+      m_outputFrames.push_back(
+          std::make_pair(TFrameId((int)frame + 1), TImageP(image)));
+    }
+  }
+
+  void onRenderFailure(const RenderData& renderData, TException& e) override {
+    m_failed = true;
+    m_error  = QString::fromStdWString(e.getMessage());
+  }
+
+  void onRenderFinished(bool isCanceled = false) override {
+    if (isCanceled) {
+      m_failed = true;
+      if (m_error.isEmpty()) m_error = QObject::tr("Renderer render canceled");
+    }
+    m_completed = true;
+  }
+};
 
 bool frameIdFromString(const QString& value, TFrameId& fid, QString& error) {
   static const QRegularExpression re(QStringLiteral(R"(^(-?\d+)(\w?)$)"));
@@ -1472,23 +1697,24 @@ const char kBootstrapScript[] = R"JS(
   };
 
   Renderer.prototype.renderScene = function() {
-    rendererId(this);
-    rendererSceneId(arguments[0]);
-    throwRendererDeferred("renderScene");
+    return levelFromResult(__opentoonzScriptEngine.rendererRenderScene(
+      rendererId(this), rendererSceneId(arguments[0]), this.frames.slice(0),
+      this.columns.slice(0)));
   };
 
   Renderer.prototype.renderFrame = function() {
-    rendererId(this);
-    rendererSceneId(arguments[0]);
+    var sceneIdValue = rendererSceneId(arguments[0]);
     if (!isNumberArgument(arguments[1]))
       throw new Error("Second argument must be a frame number : " +
                       String(arguments[1]));
-    throwRendererDeferred("renderFrame");
+    return imageFromResult(__opentoonzScriptEngine.rendererRenderFrame(
+      rendererId(this), sceneIdValue, Number(arguments[1]), this.columns.slice(0)));
   };
 
   Renderer.prototype.dumpCache = function() {
-    rendererId(this);
-    throwRendererDeferred("dumpCache");
+    var result = __opentoonzScriptEngine.rendererDumpCache(rendererId(this));
+    throwIfError(result.error || "");
+    return new FilePath(String(result.path));
   };
 
   global.Level = function(path) {
@@ -2139,6 +2365,7 @@ QString ScriptEngine::sceneLoad(int sceneId, const QString& path) {
     if (!TSystem::doesExistFileOrLevel(fp)) {
       return tr("File %1 doesn't exist").arg(path);
     }
+    clearQjsLevelsForScene(sceneId);
     scene->load(fp);
   } catch (...) {
     return tr("Exception reading %1").arg(path);
@@ -2156,9 +2383,9 @@ QString ScriptEngine::sceneSave(int sceneId, const QString& path) {
   }
 
   try {
-    // Qt 6 headless script smokes validate scene data I/O here. Scene icon
-    // generation still crosses the offscreen renderer/backend boundary.
-    scene->save(fp, nullptr, false);
+    const bool saveSceneIcon =
+        qEnvironmentVariableIsSet("OPENTOONZ_SCRIPT_USE_QAPPLICATION");
+    scene->save(fp, nullptr, saveSceneIcon);
   } catch (...) {
     return tr("Exception writing %1").arg(path);
   }
@@ -3275,12 +3502,6 @@ QVariantMap ScriptEngine::rasterizerRasterizeImage(int rasterizerId,
   }
 
   const QVariantMap state = rasterizerState(rasterizerId);
-  if (!state.value(QStringLiteral("colorMapped"), false).toBool()) {
-    return imageResult(
-        -1, tr("Qt 6 script Rasterizer currently supports only colorMapped "
-               "vector-to-ToonzRaster rasterization"));
-  }
-
   const int xres   = state.value(QStringLiteral("xres"), 720).toInt();
   const int yres   = state.value(QStringLiteral("yres"), 576).toInt();
   const double dpi = state.value(QStringLiteral("dpi"), 72.0).toDouble();
@@ -3306,15 +3527,146 @@ QVariantMap ScriptEngine::rasterizerRasterizeImage(int rasterizerId,
   camera.setSize(TDimensionD(xres / dpi, yres / dpi));
 
   try {
-    TToonzImageP toonzImage = ToonzImageUtils::vectorToToonzImage(
-        vectorImage, camera.getStageToCameraRef(), palette, TPointD(), res, 0,
-        true);
-    if (!toonzImage) return imageResult(-1, tr("Rasterization failed"));
-    toonzImage->setPalette(palette);
-    return imageResult(imageCreate(toonzImage.getPointer()));
+    if (state.value(QStringLiteral("colorMapped"), false).toBool()) {
+      TToonzImageP toonzImage = ToonzImageUtils::vectorToToonzImage(
+          vectorImage, camera.getStageToCameraRef(), palette, TPointD(), res, 0,
+          true);
+      if (!toonzImage) return imageResult(-1, tr("Rasterization failed"));
+      toonzImage->setPalette(palette);
+      return imageResult(imageCreate(toonzImage.getPointer()));
+    }
+
+    TOfflineGL glContext(res);
+    glContext.makeCurrent();
+
+    TVectorRenderData renderData(TVectorRenderData::ProductionSettings(),
+                                 camera.getStageToCameraRef(), TRect(),
+                                 palette);
+    renderData.m_antiAliasing =
+        state.value(QStringLiteral("antialiasing"), true).toBool();
+
+    glContext.clear(TPixel32::White);
+    glContext.draw(vectorImage, renderData);
+
+    TRasterImageP rasterImage(glContext.getRaster());
+    const TPointD imageDpi = camera.getDpi();
+    rasterImage->setDpi(imageDpi.x, imageDpi.y);
+    return imageResult(imageCreate(rasterImage.getPointer()));
   } catch (...) {
     return imageResult(-1, tr("Rasterization failed"));
   }
+}
+
+QVariantMap ScriptEngine::rendererRenderFrame(int rendererId, int sceneId,
+                                              int frame,
+                                              const QVariantList& columns) {
+  if (rendererId < 0) {
+    return imageResult(-1, QStringLiteral("Invalid Renderer object"));
+  }
+
+  ToonzScene* scene = qjsScene(sceneId);
+  if (!scene) return imageResult(-1, QStringLiteral("Invalid Scene object"));
+
+  QString error;
+  std::vector<int> columnList;
+  if (!intListFromVariantList(columns, columnList, error,
+                              QStringLiteral("Renderer.columns"))) {
+    return imageResult(-1, error);
+  }
+
+  QjsRendererPort renderer;
+  TImageP image = renderer.renderFrame(scene, frame, columnList, error);
+  if (!image) {
+    return imageResult(-1, error.isEmpty()
+                               ? QStringLiteral("Renderer.renderFrame failed")
+                               : error);
+  }
+  return imageResult(imageCreate(image.getPointer()));
+}
+
+QVariantMap ScriptEngine::rendererRenderScene(int rendererId, int sceneId,
+                                              const QVariantList& frames,
+                                              const QVariantList& columns) {
+  if (rendererId < 0) {
+    return levelResult(-1, QStringLiteral("Invalid Renderer object"));
+  }
+
+  ToonzScene* scene = qjsScene(sceneId);
+  if (!scene) return levelResult(-1, QStringLiteral("Invalid Scene object"));
+
+  QString error;
+  std::vector<int> frameList;
+  if (!intListFromVariantList(frames, frameList, error,
+                              QStringLiteral("Renderer.frames"))) {
+    return levelResult(-1, error);
+  }
+
+  std::vector<int> columnList;
+  if (!intListFromVariantList(columns, columnList, error,
+                              QStringLiteral("Renderer.columns"))) {
+    return levelResult(-1, error);
+  }
+
+  QjsRendererPort renderer;
+  std::vector<std::pair<TFrameId, TImageP>> renderedFrames =
+      renderer.renderScene(scene, frameList, columnList, error);
+  if (renderedFrames.empty()) {
+    return levelResult(-1, error.isEmpty()
+                               ? QStringLiteral("Renderer.renderScene failed")
+                               : error);
+  }
+
+  const int levelId = levelCreate(nullptr, -1);
+  for (const auto& frame : renderedFrames) {
+    const int imageId = imageCreate(frame.second.getPointer());
+    QString setFrameError =
+        levelSetFrame(levelId, QString::fromStdString(frame.first.expand()),
+                      imageId);
+    imageDelete(imageId);
+    if (!setFrameError.isEmpty()) {
+      levelDelete(levelId);
+      return levelResult(-1, setFrameError);
+    }
+  }
+
+  return levelResult(levelId);
+}
+
+QVariantMap ScriptEngine::rendererDumpCache(int rendererId) {
+  QVariantMap result;
+  if (rendererId < 0) {
+    result.insert(QStringLiteral("error"),
+                  QStringLiteral("Invalid Renderer object"));
+    return result;
+  }
+
+  TFilePath cacheRoot = ToonzFolder::getCacheRootFolder();
+  if (cacheRoot.isEmpty()) cacheRoot = TEnv::getStuffDir() + "cache";
+  if (cacheRoot.isEmpty()) {
+    result.insert(QStringLiteral("error"),
+                  tr("Renderer.dumpCache requires a cache directory"));
+    return result;
+  }
+
+  TFilePath dumpBase = cacheRoot + TFilePath("opentoonz-script-renderer-cache");
+  TFilePath dumpPath = dumpBase.withType("txt");
+  try {
+    if (!TSystem::touchParentDir(dumpPath)) {
+      result.insert(QStringLiteral("error"),
+                    tr("Can't create cache dump directory: %1")
+                        .arg(QString::fromStdWString(
+                            dumpPath.getParentDir().getWideString())));
+      return result;
+    }
+    TImageCache::instance()->outputMap(0, dumpBase.getQString().toStdString());
+  } catch (...) {
+    result.insert(QStringLiteral("error"),
+                  tr("Exception writing %1").arg(dumpPath.getQString()));
+    return result;
+  }
+
+  result.insert(QStringLiteral("path"), dumpPath.getQString());
+  return result;
 }
 
 void ScriptEngine::evaluate(const QString& cmd) {

@@ -4,6 +4,7 @@ set -euo pipefail
 repo_root="${OPENTOONZ_REPO_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 app_path="${OPENTOONZ_APP:-$repo_root/toonz/build/nix-qt6-relwithdebinfo/toonz/OpenToonz.app}"
 smoke_root="${OPENTOONZ_GUI_SMOKE_ROOT:-$repo_root/toonz/build/qt6-gui-smoke}"
+smoke_label="${OPENTOONZ_GUI_SMOKE_LABEL:-Qt 6 GUI}"
 stable_seconds="${OPENTOONZ_GUI_SMOKE_STABLE_SECONDS:-12}"
 timeout_seconds="${OPENTOONZ_GUI_SMOKE_TIMEOUT:-45}"
 hold_app="${OPENTOONZ_GUI_SMOKE_HOLD:-0}"
@@ -11,23 +12,39 @@ scene_path="${OPENTOONZ_GUI_SMOKE_FILE:-}"
 smoke_action="${OPENTOONZ_GUI_SMOKE_ACTION:-}"
 scene_name="${OPENTOONZ_GUI_SMOKE_SCENE_NAME:-qt6_gui_smoke_$(date +%Y%m%d%H%M%S)}"
 
+if [[ "$app_path" != /* ]]; then
+  app_path="$repo_root/$app_path"
+fi
+if [[ "$smoke_root" != /* ]]; then
+  smoke_root="$repo_root/$smoke_root"
+fi
+
 executable="$app_path/Contents/MacOS/OpenToonz"
 log_path="$smoke_root/gui-smoke.log"
 pid_path="$smoke_root/gui-smoke.pid"
 status_path="$smoke_root/gui-smoke.status"
 
 is_smoke_process_running() {
-  jobs -pr | grep -Fxq "$pid"
+  if [[ "${launch_with_open:-0}" == "1" ]]; then
+    [[ -n "${pid:-}" ]] && kill -0 "$pid" 2>/dev/null
+  else
+    jobs -pr | grep -Fxq "$pid"
+  fi
 }
 
 stop_smoke_process() {
   # OpenToonz handles SIGTERM as a crash signal; bounded smokes use SIGKILL so
   # harness cleanup does not generate misleading crash-handler output.
   kill -9 "$pid" 2>/dev/null || true
+  if [[ -n "${open_pid:-}" ]]; then
+    kill -9 "$open_pid" 2>/dev/null || true
+    wait "$open_pid" 2>/dev/null || true
+  fi
   wait "$pid" 2>/dev/null || true
 }
 
 has_fatal_startup_output() {
+  [[ -f "$log_path" ]] || return 1
   grep -Eiq \
     'could not load the Qt platform plugin|no Qt platform plugin could be initialized|Cannot load library .*platforms/libqcocoa|Library not loaded: .*Qt|duplicate class .* is implemented in both|Abort trap|Segmentation fault' \
     "$log_path"
@@ -43,9 +60,10 @@ status_value() {
 
 wait_for_app_smoke_status() {
   local expected_action="$1"
+  local max_attempts="${2:-100}"
   local action status window
 
-  for _ in {1..100}; do
+  for ((attempt = 0; attempt < max_attempts; attempt++)); do
     if [[ -f "$status_path" ]]; then
       action="$(status_value action || true)"
       status="$(status_value status || true)"
@@ -59,7 +77,7 @@ wait_for_app_smoke_status() {
         return 0
       fi
       if [[ "$action" == "$expected_action" && "$status" == "error" ]]; then
-        echo "error: app-side Qt 6 GUI $expected_action smoke failed" >&2
+        echo "error: app-side $smoke_label $expected_action smoke failed" >&2
         sed -n '1,80p' "$status_path" >&2
         return 2
       fi
@@ -174,6 +192,183 @@ verify_scene_open_smoke() {
   verify_scene_open_with_system_events "$expected_scene_name"
 }
 
+drive_viewer_raster_brush_with_cg_events() {
+  if [[ "$(uname -s)" != "Darwin" ]]; then
+    echo "error: CGEvent viewer brush smoke is only supported on macOS" >&2
+    return 1
+  fi
+
+  local points swift_bin swift_driver swift_output bundle_id
+  points="$(status_value systemMousePoints || true)"
+  if [[ -z "$points" ]]; then
+    echo "error: app-side CGEvent smoke did not publish systemMousePoints" >&2
+    return 1
+  fi
+
+  swift_bin="$(xcrun --find swift 2>/dev/null || command -v swift || true)"
+  if [[ -z "$swift_bin" ]]; then
+    echo "error: CGEvent viewer brush smoke requires swift from Xcode command line tools" >&2
+    return 1
+  fi
+
+  bundle_id="$(plutil -extract CFBundleIdentifier raw "$app_path/Contents/Info.plist" 2>/dev/null || true)"
+
+  if [[ -n "$bundle_id" && -x /usr/bin/open ]]; then
+    /usr/bin/open -b "$bundle_id" >/dev/null 2>&1 || true
+    sleep 0.4
+  fi
+
+  if command -v osascript >/dev/null 2>&1; then
+    if [[ -n "$bundle_id" ]]; then
+      osascript - "$bundle_id" <<'APPLESCRIPT' >/dev/null 2>&1 || true
+on run argv
+  tell application id (item 1 of argv) to activate
+end run
+APPLESCRIPT
+      sleep 0.2
+    fi
+
+    osascript - "$pid" <<'APPLESCRIPT' >/dev/null 2>&1 || true
+on run argv
+  set targetPid to item 1 of argv as integer
+  tell application "System Events"
+    repeat 30 times
+      if exists (first process whose unix id is targetPid) then exit repeat
+      delay 0.1
+    end repeat
+    set frontmost of first process whose unix id is targetPid to true
+  end tell
+end run
+APPLESCRIPT
+    sleep 0.2
+  fi
+
+  swift_driver="$smoke_root/post_mouse_drag.swift"
+  cat >"$swift_driver" <<'SWIFT'
+import AppKit
+import CoreGraphics
+import Foundation
+
+func fail(_ message: String, _ code: Int32) -> Never {
+  fputs(message + "\n", stderr)
+  exit(code)
+}
+
+if CommandLine.arguments.count < 3 {
+  fail("missing point list or target pid", 2)
+}
+
+let points = CommandLine.arguments[1].split(separator: "|").compactMap { item -> CGPoint? in
+  let pair = item.split(separator: ",")
+  guard pair.count == 2,
+        let x = Double(pair[0]),
+        let y = Double(pair[1]) else {
+    return nil
+  }
+  return CGPoint(x: x, y: y)
+}
+
+guard points.count >= 2 else {
+  fail("point list must contain at least two points", 3)
+}
+
+guard let pidValue = Int32(CommandLine.arguments[2]) else {
+  fail("target pid is not an integer", 4)
+}
+
+guard let targetApp = NSRunningApplication(processIdentifier: pid_t(pidValue)) else {
+  fail("could not resolve target application", 5)
+}
+
+if #available(macOS 10.15, *) {
+  let canPost = CGPreflightPostEventAccess()
+  fputs("cgPostEventAccess=\(canPost)\n", stderr)
+  if !canPost {
+    fail("CGEvent post access is not trusted", 6)
+  }
+}
+
+let wasActive = targetApp.isActive
+let activationRequested = targetApp.activate(options: [.activateAllWindows])
+RunLoop.current.run(until: Date().addingTimeInterval(0.75))
+fputs("targetAppActiveBefore=\(wasActive)\n", stderr)
+fputs("targetAppActivationRequested=\(activationRequested)\n", stderr)
+fputs("targetAppActiveAfter=\(targetApp.isActive)\n", stderr)
+
+guard let source = CGEventSource(stateID: .hidSystemState) else {
+  fail("could not create CGEventSource", 7)
+}
+
+func post(_ type: CGEventType, at point: CGPoint) {
+  guard let event = CGEvent(mouseEventSource: source,
+                            mouseType: type,
+                            mouseCursorPosition: point,
+                            mouseButton: .left) else {
+    fail("could not create CGEvent", 8)
+  }
+  event.setIntegerValueField(.mouseEventClickState, value: 1)
+  event.post(tap: .cghidEventTap)
+  usleep(70000)
+}
+
+post(.mouseMoved, at: points[0])
+post(.leftMouseDown, at: points[0])
+post(.leftMouseUp, at: points[0])
+RunLoop.current.run(until: Date().addingTimeInterval(0.45))
+fputs("targetAppActiveAfterPrimeClick=\(targetApp.isActive)\n", stderr)
+
+post(.mouseMoved, at: points[0])
+post(.leftMouseDown, at: points[0])
+for point in points.dropFirst() {
+  post(.leftMouseDragged, at: point)
+}
+post(.leftMouseUp, at: points[points.count - 1])
+usleep(150000)
+SWIFT
+
+  if ! swift_output="$("$swift_bin" "$swift_driver" "$points" "$pid" 2>&1)"; then
+    printf '%s\n' "$swift_output" >&2
+    return 1
+  fi
+  printf '%s\n' "$swift_output"
+  echo "$smoke_label viewer-raster-brush-system-events CGEvent driver posted: $points"
+
+  if command -v osascript >/dev/null 2>&1; then
+    osascript - "$points" "$pid" <<'APPLESCRIPT' || \
+      echo "warning: System Events click fallback failed" >&2
+on splitText(theText, delimiter)
+  set oldDelimiters to AppleScript's text item delimiters
+  set AppleScript's text item delimiters to delimiter
+  set parts to text items of theText
+  set AppleScript's text item delimiters to oldDelimiters
+  return parts
+end splitText
+
+on run argv
+  set pointList to item 1 of argv
+  set targetPid to item 2 of argv as integer
+  tell application "System Events"
+    repeat 30 times
+      if exists (first process whose unix id is targetPid) then exit repeat
+      delay 0.1
+    end repeat
+    set frontmost of first process whose unix id is targetPid to true
+    delay 0.2
+
+    set pointItems to my splitText(pointList, "|")
+    repeat with pointItem in pointItems
+      set pair to my splitText(pointItem as text, ",")
+      set pointX to item 1 of pair as integer
+      set pointY to item 2 of pair as integer
+      click at {pointX, pointY}
+      delay 0.08
+    end repeat
+  end tell
+end run
+APPLESCRIPT
+  fi
+}
+
 if [[ ! -x "$executable" ]]; then
   echo "error: OpenToonz executable not found: $executable" >&2
   exit 1
@@ -188,7 +383,7 @@ if [[ -z "$smoke_action" ]]; then
 fi
 
 case "$smoke_action" in
-  startup|create-scene|open-scene|high-dpi|media-devices|audio-input|audio-recording-wav|audio-playback-wav|camera-formats|audio-output|xsheet-scrub) ;;
+  startup|create-scene|open-scene|high-dpi|media-devices|audio-input|audio-recording-wav|audio-playback-wav|camera-formats|audio-output|viewer-render|viewer-vector-render|viewer-zoom-pan|viewer-onion-skin|viewer-camera-overlay|viewer-safe-area-field-guide|viewer-ruler-guide|viewer-animate-tool-overlay|viewer-animate-tool-drag|viewer-animate-tool-mouse-events|viewer-animate-tool-undo-redo|viewer-animate-tool-modifiers|viewer-animate-tool-handles|viewer-vector-brush|viewer-raster-brush|viewer-raster-brush-mouse-events|viewer-raster-brush-tablet-events|viewer-raster-brush-system-events|xsheet-scrub) ;;
   *)
     echo "error: unsupported OPENTOONZ_GUI_SMOKE_ACTION: $smoke_action" >&2
     exit 1
@@ -216,31 +411,89 @@ if [[ -n "$scene_path" ]]; then
   launch_args+=("$scene_path")
 fi
 
-HOME="$smoke_root/home" \
-XDG_CONFIG_HOME="$smoke_root/xdg-config" \
-XDG_CACHE_HOME="$smoke_root/xdg-cache" \
-OPENTOONZ_GUI_SMOKE_ACTION="$smoke_action" \
-OPENTOONZ_GUI_SMOKE_SCENE_NAME="$scene_name" \
-OPENTOONZ_GUI_SMOKE_STATUS_FILE="$status_path" \
-"$executable" "${launch_args[@]}" \
-  >"$log_path" 2>&1 &
-pid=$!
+launch_with_open=0
+if [[ "$(uname -s)" == "Darwin" &&
+      "$smoke_action" == "viewer-raster-brush-system-events" &&
+      -x /usr/bin/open ]]; then
+  launch_with_open=1
+fi
+
+if [[ "$launch_with_open" == "1" ]]; then
+  /usr/bin/open -W -n -a "$app_path" \
+    --stdout "$log_path" \
+    --stderr "$log_path" \
+    --env "HOME=$smoke_root/home" \
+    --env "XDG_CONFIG_HOME=$smoke_root/xdg-config" \
+    --env "XDG_CACHE_HOME=$smoke_root/xdg-cache" \
+    --env "OPENTOONZ_GUI_SMOKE_ACTION=$smoke_action" \
+    --env "OPENTOONZ_GUI_SMOKE_SCENE_NAME=$scene_name" \
+    --env "OPENTOONZ_GUI_SMOKE_STATUS_FILE=$status_path" \
+    --args "${launch_args[@]}" \
+    >/dev/null 2>&1 &
+  open_pid=$!
+  pid=""
+  for ((attempt = 0; attempt < 100; attempt++)); do
+    pid="$(pgrep -n -f "$executable" 2>/dev/null || true)"
+    if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
+      break
+    fi
+    sleep 0.1
+  done
+  if [[ -z "$pid" ]]; then
+    kill -9 "$open_pid" 2>/dev/null || true
+    echo "error: failed to resolve OpenToonz pid after LaunchServices launch" >&2
+    exit 1
+  fi
+else
+  HOME="$smoke_root/home" \
+  XDG_CONFIG_HOME="$smoke_root/xdg-config" \
+  XDG_CACHE_HOME="$smoke_root/xdg-cache" \
+  OPENTOONZ_GUI_SMOKE_ACTION="$smoke_action" \
+  OPENTOONZ_GUI_SMOKE_SCENE_NAME="$scene_name" \
+  OPENTOONZ_GUI_SMOKE_STATUS_FILE="$status_path" \
+  "$executable" "${launch_args[@]}" \
+    >"$log_path" 2>&1 &
+  pid=$!
+fi
 echo "$pid" >"$pid_path"
 
 elapsed=0
+system_mouse_driven=0
 while is_smoke_process_running; do
   if has_fatal_startup_output; then
     stop_smoke_process
-    echo "error: Qt 6 GUI smoke saw fatal startup output" >&2
+    echo "error: $smoke_label smoke saw fatal startup output" >&2
     sed -n '1,180p' "$log_path" >&2
     exit 1
+  fi
+
+  if [[ "$smoke_action" == "viewer-raster-brush-system-events" &&
+        "$system_mouse_driven" == "0" ]]; then
+    current_action="$(status_value action || true)"
+    current_status="$(status_value status || true)"
+    if [[ "$current_action" == "$smoke_action" && "$current_status" == "ready" ]]; then
+      if ! drive_viewer_raster_brush_with_cg_events; then
+        stop_smoke_process
+        echo "error: $smoke_label ${smoke_action} CGEvent driver failed" >&2
+        sed -n '1,120p' "$status_path" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+      system_mouse_driven=1
+    elif [[ "$current_action" == "$smoke_action" && "$current_status" == "error" ]]; then
+      stop_smoke_process
+      echo "error: app-side $smoke_label $smoke_action smoke failed" >&2
+      sed -n '1,120p' "$status_path" >&2
+      sed -n '1,180p' "$log_path" >&2
+      exit 1
+    fi
   fi
 
   if ((elapsed >= stable_seconds)); then
     if [[ "$smoke_action" == "create-scene" ]]; then
       if ! created_window="$(drive_scene_create_smoke)"; then
         stop_smoke_process
-        echo "error: Qt 6 GUI scene-create smoke failed" >&2
+        echo "error: $smoke_label scene-create smoke failed" >&2
         sed -n '1,180p' "$log_path" >&2
         exit 1
       fi
@@ -254,7 +507,7 @@ while is_smoke_process_running; do
       fi
 
       if [[ "$hold_app" == "1" ]]; then
-        echo "Qt 6 GUI scene-create smoke launched and is still running: pid $pid"
+        echo "$smoke_label scene-create smoke launched and is still running: pid $pid"
         echo "Window: $created_window"
         echo "Scene: $created_scene_path"
         echo "Log: $log_path"
@@ -263,7 +516,7 @@ while is_smoke_process_running; do
       fi
 
       stop_smoke_process
-      echo "Qt 6 GUI scene-create smoke passed: $created_window"
+      echo "$smoke_label scene-create smoke passed: $created_window"
       echo "Scene: $created_scene_path"
       echo "Log: $log_path"
       exit 0
@@ -281,13 +534,13 @@ while is_smoke_process_running; do
       scene_title="${scene_title%.*}"
       if ! opened_window="$(verify_scene_open_smoke "$scene_title")"; then
         stop_smoke_process
-        echo "error: Qt 6 GUI scene-open smoke failed" >&2
+        echo "error: $smoke_label scene-open smoke failed" >&2
         sed -n '1,180p' "$log_path" >&2
         exit 1
       fi
 
       if [[ "$hold_app" == "1" ]]; then
-        echo "Qt 6 GUI scene-open smoke launched and is still running: pid $pid"
+        echo "$smoke_label scene-open smoke launched and is still running: pid $pid"
         echo "Window: $opened_window"
         echo "Scene: $scene_path"
         echo "Log: $log_path"
@@ -296,7 +549,7 @@ while is_smoke_process_running; do
       fi
 
       stop_smoke_process
-      echo "Qt 6 GUI scene-open smoke passed: $opened_window"
+      echo "$smoke_label scene-open smoke passed: $opened_window"
       echo "Scene: $scene_path"
       echo "Log: $log_path"
       exit 0
@@ -305,7 +558,7 @@ while is_smoke_process_running; do
     if [[ "$smoke_action" == "high-dpi" ]]; then
       if ! high_dpi_window="$(wait_for_app_smoke_status high-dpi)"; then
         stop_smoke_process
-        echo "error: Qt 6 GUI high-DPI smoke failed" >&2
+        echo "error: $smoke_label high-DPI smoke failed" >&2
         sed -n '1,180p' "$log_path" >&2
         exit 1
       fi
@@ -321,14 +574,14 @@ while is_smoke_process_running; do
             -z "$logical_dpi_y" || "$logical_dpi_y" == "0" || "$logical_dpi_y" == "0.00" ||
             "$high_dpi_mode" != "qt6-always-on" ]]; then
         stop_smoke_process
-        echo "error: Qt 6 GUI high-DPI smoke reported unexpected state" >&2
+        echo "error: $smoke_label high-DPI smoke reported unexpected state" >&2
         sed -n '1,120p' "$status_path" >&2
         sed -n '1,180p' "$log_path" >&2
         exit 1
       fi
 
       if [[ "$hold_app" == "1" ]]; then
-        echo "Qt 6 GUI high-DPI smoke launched and is still running: pid $pid"
+        echo "$smoke_label high-DPI smoke launched and is still running: pid $pid"
         echo "Window: $high_dpi_window"
         echo "Window DPR: $window_dpr"
         echo "Screen DPR: $screen_dpr"
@@ -338,7 +591,7 @@ while is_smoke_process_running; do
       fi
 
       stop_smoke_process
-      echo "Qt 6 GUI high-DPI smoke passed: $high_dpi_window"
+      echo "$smoke_label high-DPI smoke passed: $high_dpi_window"
       echo "Window DPR: $window_dpr"
       echo "Screen DPR: $screen_dpr"
       echo "Log: $log_path"
@@ -348,7 +601,7 @@ while is_smoke_process_running; do
     if [[ "$smoke_action" == "media-devices" ]]; then
       if ! media_window="$(wait_for_app_smoke_status media-devices)"; then
         stop_smoke_process
-        echo "error: Qt 6 GUI media-devices smoke failed" >&2
+        echo "error: $smoke_label media-devices smoke failed" >&2
         sed -n '1,180p' "$log_path" >&2
         exit 1
       fi
@@ -362,14 +615,14 @@ while is_smoke_process_running; do
             ! "$audio_output_count" =~ ^[0-9]+$ ||
             ! "$video_input_count" =~ ^[0-9]+$ ]]; then
         stop_smoke_process
-        echo "error: Qt 6 GUI media-devices smoke reported unexpected state" >&2
+        echo "error: $smoke_label media-devices smoke reported unexpected state" >&2
         sed -n '1,120p' "$status_path" >&2
         sed -n '1,180p' "$log_path" >&2
         exit 1
       fi
 
       if [[ "$hold_app" == "1" ]]; then
-        echo "Qt 6 GUI media-devices smoke launched and is still running: pid $pid"
+        echo "$smoke_label media-devices smoke launched and is still running: pid $pid"
         echo "Window: $media_window"
         echo "Audio inputs: $audio_input_count"
         echo "Audio outputs: $audio_output_count"
@@ -380,7 +633,7 @@ while is_smoke_process_running; do
       fi
 
       stop_smoke_process
-      echo "Qt 6 GUI media-devices smoke passed: $media_window"
+      echo "$smoke_label media-devices smoke passed: $media_window"
       echo "Audio inputs: $audio_input_count"
       echo "Audio outputs: $audio_output_count"
       echo "Video inputs: $video_input_count"
@@ -391,7 +644,7 @@ while is_smoke_process_running; do
     if [[ "$smoke_action" == "camera-formats" ]]; then
       if ! camera_window="$(wait_for_app_smoke_status camera-formats)"; then
         stop_smoke_process
-        echo "error: Qt 6 GUI camera-formats smoke failed" >&2
+        echo "error: $smoke_label camera-formats smoke failed" >&2
         sed -n '1,180p' "$log_path" >&2
         exit 1
       fi
@@ -405,7 +658,7 @@ while is_smoke_process_running; do
             ! "$video_input_count" =~ ^[0-9]+$ ||
             ! "$default_video_format_count" =~ ^[0-9]+$ ]]; then
         stop_smoke_process
-        echo "error: Qt 6 GUI camera-formats smoke reported unexpected state" >&2
+        echo "error: $smoke_label camera-formats smoke reported unexpected state" >&2
         sed -n '1,120p' "$status_path" >&2
         sed -n '1,180p' "$log_path" >&2
         exit 1
@@ -414,7 +667,7 @@ while is_smoke_process_running; do
       if ((video_input_count == 0)); then
         if [[ "$camera_format_probe" != "no-camera" ]]; then
           stop_smoke_process
-          echo "error: Qt 6 GUI camera-formats smoke expected no-camera state" >&2
+          echo "error: $smoke_label camera-formats smoke expected no-camera state" >&2
           sed -n '1,120p' "$status_path" >&2
           sed -n '1,180p' "$log_path" >&2
           exit 1
@@ -423,14 +676,14 @@ while is_smoke_process_running; do
               "$camera_format_probe" != "ok" ||
               "$default_video_format_count" == "0" ]]; then
         stop_smoke_process
-        echo "error: Qt 6 GUI camera-formats smoke reported no usable default camera formats" >&2
+        echo "error: $smoke_label camera-formats smoke reported no usable default camera formats" >&2
         sed -n '1,120p' "$status_path" >&2
         sed -n '1,180p' "$log_path" >&2
         exit 1
       fi
 
       if [[ "$hold_app" == "1" ]]; then
-        echo "Qt 6 GUI camera-formats smoke launched and is still running: pid $pid"
+        echo "$smoke_label camera-formats smoke launched and is still running: pid $pid"
         echo "Window: $camera_window"
         echo "Video inputs: $video_input_count"
         echo "Default camera formats: $default_video_format_count"
@@ -440,7 +693,7 @@ while is_smoke_process_running; do
       fi
 
       stop_smoke_process
-      echo "Qt 6 GUI camera-formats smoke passed: $camera_window"
+      echo "$smoke_label camera-formats smoke passed: $camera_window"
       echo "Video inputs: $video_input_count"
       echo "Default camera formats: $default_video_format_count"
       echo "Log: $log_path"
@@ -450,7 +703,7 @@ while is_smoke_process_running; do
     if [[ "$smoke_action" == "audio-input" ]]; then
       if ! audio_input_window="$(wait_for_app_smoke_status audio-input)"; then
         stop_smoke_process
-        echo "error: Qt 6 GUI audio-input smoke failed" >&2
+        echo "error: $smoke_label audio-input smoke failed" >&2
         sed -n '1,180p' "$log_path" >&2
         exit 1
       fi
@@ -470,14 +723,14 @@ while is_smoke_process_running; do
             "$sample_rate" == "0" ||
             "$bytes_captured" == "0" ]]; then
         stop_smoke_process
-        echo "error: Qt 6 GUI audio-input smoke reported unexpected state" >&2
+        echo "error: $smoke_label audio-input smoke reported unexpected state" >&2
         sed -n '1,120p' "$status_path" >&2
         sed -n '1,180p' "$log_path" >&2
         exit 1
       fi
 
       if [[ "$hold_app" == "1" ]]; then
-        echo "Qt 6 GUI audio-input smoke launched and is still running: pid $pid"
+        echo "$smoke_label audio-input smoke launched and is still running: pid $pid"
         echo "Window: $audio_input_window"
         echo "Sample rate: $sample_rate"
         echo "Bytes captured: $bytes_captured"
@@ -487,7 +740,7 @@ while is_smoke_process_running; do
       fi
 
       stop_smoke_process
-      echo "Qt 6 GUI audio-input smoke passed: $audio_input_window"
+      echo "$smoke_label audio-input smoke passed: $audio_input_window"
       echo "Sample rate: $sample_rate"
       echo "Bytes captured: $bytes_captured"
       echo "Log: $log_path"
@@ -497,7 +750,7 @@ while is_smoke_process_running; do
     if [[ "$smoke_action" == "audio-recording-wav" ]]; then
       if ! audio_recording_window="$(wait_for_app_smoke_status audio-recording-wav)"; then
         stop_smoke_process
-        echo "error: Qt 6 GUI audio-recording-wav smoke failed" >&2
+        echo "error: $smoke_label audio-recording-wav smoke failed" >&2
         sed -n '1,180p' "$log_path" >&2
         exit 1
       fi
@@ -527,14 +780,14 @@ while is_smoke_process_running; do
             "$wav_sample_count" == "0" ||
             ! -f "$recording_path" ]]; then
         stop_smoke_process
-        echo "error: Qt 6 GUI audio-recording-wav smoke reported unexpected state" >&2
+        echo "error: $smoke_label audio-recording-wav smoke reported unexpected state" >&2
         sed -n '1,140p' "$status_path" >&2
         sed -n '1,180p' "$log_path" >&2
         exit 1
       fi
 
       if [[ "$hold_app" == "1" ]]; then
-        echo "Qt 6 GUI audio-recording-wav smoke launched and is still running: pid $pid"
+        echo "$smoke_label audio-recording-wav smoke launched and is still running: pid $pid"
         echo "Window: $audio_recording_window"
         echo "Sample rate: $sample_rate"
         echo "Bytes recorded: $bytes_recorded"
@@ -546,7 +799,7 @@ while is_smoke_process_running; do
       fi
 
       stop_smoke_process
-      echo "Qt 6 GUI audio-recording-wav smoke passed: $audio_recording_window"
+      echo "$smoke_label audio-recording-wav smoke passed: $audio_recording_window"
       echo "Sample rate: $sample_rate"
       echo "Bytes recorded: $bytes_recorded"
       echo "WAV sample count: $wav_sample_count"
@@ -558,7 +811,7 @@ while is_smoke_process_running; do
     if [[ "$smoke_action" == "audio-output" ]]; then
       if ! audio_window="$(wait_for_app_smoke_status audio-output)"; then
         stop_smoke_process
-        echo "error: Qt 6 GUI audio-output smoke failed" >&2
+        echo "error: $smoke_label audio-output smoke failed" >&2
         sed -n '1,180p' "$log_path" >&2
         exit 1
       fi
@@ -578,14 +831,14 @@ while is_smoke_process_running; do
             "$sample_rate" == "0" ||
             "$bytes_provided" == "0" ]]; then
         stop_smoke_process
-        echo "error: Qt 6 GUI audio-output smoke reported unexpected state" >&2
+        echo "error: $smoke_label audio-output smoke reported unexpected state" >&2
         sed -n '1,120p' "$status_path" >&2
         sed -n '1,180p' "$log_path" >&2
         exit 1
       fi
 
       if [[ "$hold_app" == "1" ]]; then
-        echo "Qt 6 GUI audio-output smoke launched and is still running: pid $pid"
+        echo "$smoke_label audio-output smoke launched and is still running: pid $pid"
         echo "Window: $audio_window"
         echo "Sample rate: $sample_rate"
         echo "Bytes provided: $bytes_provided"
@@ -595,7 +848,7 @@ while is_smoke_process_running; do
       fi
 
       stop_smoke_process
-      echo "Qt 6 GUI audio-output smoke passed: $audio_window"
+      echo "$smoke_label audio-output smoke passed: $audio_window"
       echo "Sample rate: $sample_rate"
       echo "Bytes provided: $bytes_provided"
       echo "Log: $log_path"
@@ -605,7 +858,7 @@ while is_smoke_process_running; do
     if [[ "$smoke_action" == "audio-playback-wav" ]]; then
       if ! playback_window="$(wait_for_app_smoke_status audio-playback-wav)"; then
         stop_smoke_process
-        echo "error: Qt 6 GUI audio-playback-wav smoke failed" >&2
+        echo "error: $smoke_label audio-playback-wav smoke failed" >&2
         sed -n '1,180p' "$log_path" >&2
         exit 1
       fi
@@ -643,14 +896,14 @@ while is_smoke_process_running; do
             "$wav_sample_count" == "0" ||
             ! -f "$playback_path" ]]; then
         stop_smoke_process
-        echo "error: Qt 6 GUI audio-playback-wav smoke reported unexpected state" >&2
+        echo "error: $smoke_label audio-playback-wav smoke reported unexpected state" >&2
         sed -n '1,150p' "$status_path" >&2
         sed -n '1,180p' "$log_path" >&2
         exit 1
       fi
 
       if [[ "$hold_app" == "1" ]]; then
-        echo "Qt 6 GUI audio-playback-wav smoke launched and is still running: pid $pid"
+        echo "$smoke_label audio-playback-wav smoke launched and is still running: pid $pid"
         echo "Window: $playback_window"
         echo "Sample rate: $sample_rate"
         echo "Bytes written: $bytes_written"
@@ -662,7 +915,7 @@ while is_smoke_process_running; do
       fi
 
       stop_smoke_process
-      echo "Qt 6 GUI audio-playback-wav smoke passed: $playback_window"
+      echo "$smoke_label audio-playback-wav smoke passed: $playback_window"
       echo "Sample rate: $sample_rate"
       echo "Bytes written: $bytes_written"
       echo "WAV sample count: $wav_sample_count"
@@ -674,7 +927,7 @@ while is_smoke_process_running; do
     if [[ "$smoke_action" == "xsheet-scrub" ]]; then
       if ! xsheet_window="$(wait_for_app_smoke_status xsheet-scrub)"; then
         stop_smoke_process
-        echo "error: Qt 6 GUI xsheet-scrub smoke failed" >&2
+        echo "error: $smoke_label xsheet-scrub smoke failed" >&2
         sed -n '1,180p' "$log_path" >&2
         exit 1
       fi
@@ -694,14 +947,14 @@ while is_smoke_process_running; do
             "$raster_frames" != "1" ||
             "$vector_frames" != "1" ]]; then
         stop_smoke_process
-        echo "error: Qt 6 GUI xsheet-scrub smoke reported unexpected state" >&2
+        echo "error: $smoke_label xsheet-scrub smoke reported unexpected state" >&2
         sed -n '1,80p' "$status_path" >&2
         sed -n '1,180p' "$log_path" >&2
         exit 1
       fi
 
       if [[ "$hold_app" == "1" ]]; then
-        echo "Qt 6 GUI xsheet-scrub smoke launched and is still running: pid $pid"
+        echo "$smoke_label xsheet-scrub smoke launched and is still running: pid $pid"
         echo "Window: $xsheet_window"
         echo "Scene: $created_scene_path"
         echo "Log: $log_path"
@@ -710,28 +963,352 @@ while is_smoke_process_running; do
       fi
 
       stop_smoke_process
-      echo "Qt 6 GUI xsheet-scrub smoke passed: $xsheet_window"
+      echo "$smoke_label xsheet-scrub smoke passed: $xsheet_window"
       echo "Scene: $created_scene_path"
       echo "Log: $log_path"
       exit 0
     fi
 
+    if [[ "$smoke_action" == "viewer-render" || "$smoke_action" == "viewer-vector-render" || "$smoke_action" == "viewer-zoom-pan" || "$smoke_action" == "viewer-onion-skin" || "$smoke_action" == "viewer-camera-overlay" || "$smoke_action" == "viewer-safe-area-field-guide" || "$smoke_action" == "viewer-ruler-guide" || "$smoke_action" == "viewer-animate-tool-overlay" || "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-vector-brush" || "$smoke_action" == "viewer-raster-brush" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
+      viewer_status_attempts=100
+      if [[ "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
+        viewer_status_attempts=400
+      fi
+      if ! viewer_window="$(wait_for_app_smoke_status "$smoke_action" "$viewer_status_attempts")"; then
+        stop_smoke_process
+        echo "error: $smoke_label ${smoke_action} smoke failed" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      viewer_probe="$(status_value viewerRenderProbe || true)"
+      viewer_high_dpi_probe="$(status_value viewerHighDpiProbe || true)"
+      viewer_content="$(status_value viewerRenderContent || true)"
+      viewer_logical_width="$(status_value viewerLogicalWidth || true)"
+      viewer_logical_height="$(status_value viewerLogicalHeight || true)"
+      viewer_dev_pix_ratio="$(status_value viewerDevPixRatio || true)"
+      viewer_device_pixel_ratio="$(status_value viewerDevicePixelRatio || true)"
+      viewer_screen_device_pixel_ratio="$(status_value viewerScreenDevicePixelRatio || true)"
+      framebuffer_width="$(status_value framebufferWidth || true)"
+      framebuffer_height="$(status_value framebufferHeight || true)"
+      changed_pixels="$(status_value changedPixels || true)"
+      red_pixels="$(status_value redPixels || true)"
+      changed_neutral_pixels="$(status_value changedNeutralPixels || true)"
+      onion_pixels="$(status_value onionPixels || true)"
+      baseline_onion_pixels="$(status_value baselineOnionPixels || true)"
+      before_capture_saved="$(status_value beforeCaptureSaved || true)"
+      after_capture_saved="$(status_value afterCaptureSaved || true)"
+      before_capture_path="$(status_value beforeCapturePath || true)"
+      after_capture_path="$(status_value afterCapturePath || true)"
+      viewer_transform_probe="ok"
+      if [[ "$smoke_action" == "viewer-zoom-pan" ]]; then
+        viewer_transform_probe="$(status_value viewerTransformProbe || true)"
+      fi
+      onion_skin_probe="ok"
+      if [[ "$smoke_action" == "viewer-onion-skin" ]]; then
+        onion_skin_probe="$(status_value onionSkinProbe || true)"
+      fi
+      safe_area_probe="ok"
+      field_guide_probe="ok"
+      if [[ "$smoke_action" == "viewer-safe-area-field-guide" ]]; then
+        safe_area_probe="$(status_value safeAreaProbe || true)"
+        field_guide_probe="$(status_value fieldGuideProbe || true)"
+      fi
+      ruler_guide_probe="ok"
+      if [[ "$smoke_action" == "viewer-ruler-guide" ]]; then
+        ruler_guide_probe="$(status_value rulerGuideProbe || true)"
+      fi
+      tool_overlay_probe="ok"
+      if [[ "$smoke_action" == "viewer-animate-tool-overlay" ]]; then
+        tool_overlay_probe="$(status_value toolOverlayProbe || true)"
+      fi
+      tool_transform_probe="ok"
+      if [[ "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" ]]; then
+        tool_transform_probe="$(status_value toolTransformProbe || true)"
+      fi
+      handle_hover_probe="ok"
+      handle_hit_test_probe="ok"
+      if [[ "$smoke_action" == "viewer-animate-tool-handles" ]]; then
+        handle_hover_probe="$(status_value handleHoverProbe || true)"
+        handle_hit_test_probe="$(status_value handleHitTestProbe || true)"
+      fi
+      undo_redo_probe="ok"
+      if [[ "$smoke_action" == "viewer-animate-tool-undo-redo" ]]; then
+        undo_redo_probe="$(status_value undoRedoProbe || true)"
+      fi
+      modifier_probe="ok"
+      cursor_precise_probe="ok"
+      if [[ "$smoke_action" == "viewer-animate-tool-modifiers" ]]; then
+        modifier_probe="$(status_value modifierProbe || true)"
+        cursor_precise_probe="$(status_value cursorPreciseProbe || true)"
+      fi
+      changed_pixels_probe="error"
+      if [[ "$changed_pixels" =~ ^[0-9]+$ ]]; then
+        if [[ "$smoke_action" == "viewer-onion-skin" || "$changed_pixels" != "0" ]]; then
+          changed_pixels_probe="ok"
+        fi
+      fi
+      red_pixels_probe="ok"
+      if [[ "$smoke_action" != "viewer-ruler-guide" ]]; then
+        red_pixels_probe="error"
+        if [[ "$red_pixels" =~ ^[0-9]+$ && "$red_pixels" != "0" ]]; then
+          red_pixels_probe="ok"
+        fi
+      fi
+      neutral_pixels_probe="ok"
+      if [[ "$smoke_action" == "viewer-ruler-guide" ]]; then
+        neutral_pixels_probe="error"
+        if [[ "$changed_neutral_pixels" =~ ^[0-9]+$ &&
+              "$changed_neutral_pixels" != "0" ]]; then
+          neutral_pixels_probe="ok"
+        fi
+      fi
+      onion_pixels_probe="ok"
+      if [[ "$smoke_action" == "viewer-onion-skin" ]]; then
+        onion_pixels_probe="error"
+        if [[ "$onion_pixels" =~ ^[0-9]+$ &&
+              "$baseline_onion_pixels" =~ ^[0-9]+$ &&
+              "$onion_pixels" != "0" ]] &&
+           ((onion_pixels > baseline_onion_pixels)); then
+          onion_pixels_probe="ok"
+        fi
+      fi
+      tool_input_probe="ok"
+      raster_input_probe="ok"
+      if [[ "$smoke_action" == "viewer-vector-brush" || "$smoke_action" == "viewer-raster-brush" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
+        tool_input_probe="$(status_value toolInputProbe || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-raster-brush" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
+        raster_input_probe="$(status_value rasterInputProbe || true)"
+      fi
+      mouse_event_probe="ok"
+      if [[ "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" ]]; then
+        mouse_event_probe="$(status_value mouseEventProbe || true)"
+      fi
+      tablet_event_probe="ok"
+      if [[ "$smoke_action" == "viewer-raster-brush-tablet-events" ]]; then
+        tablet_event_probe="$(status_value tabletEventProbe || true)"
+      fi
+      system_mouse_event_probe="ok"
+      if [[ "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
+        system_mouse_event_probe="$(status_value systemMouseEventProbe || true)"
+      fi
+      if [[ "$viewer_probe" != "ok" ||
+            "$viewer_high_dpi_probe" != "ok" ||
+            "$tool_input_probe" != "ok" ||
+            "$raster_input_probe" != "ok" ||
+            "$viewer_transform_probe" != "ok" ||
+            "$onion_skin_probe" != "ok" ||
+            "$safe_area_probe" != "ok" ||
+            "$field_guide_probe" != "ok" ||
+            "$ruler_guide_probe" != "ok" ||
+            "$tool_overlay_probe" != "ok" ||
+            "$tool_transform_probe" != "ok" ||
+            "$handle_hover_probe" != "ok" ||
+            "$handle_hit_test_probe" != "ok" ||
+            "$undo_redo_probe" != "ok" ||
+            "$modifier_probe" != "ok" ||
+            "$cursor_precise_probe" != "ok" ||
+            "$onion_pixels_probe" != "ok" ||
+            "$mouse_event_probe" != "ok" ||
+            "$tablet_event_probe" != "ok" ||
+            "$system_mouse_event_probe" != "ok" ||
+            -z "$viewer_content" ||
+            ! "$framebuffer_width" =~ ^[0-9]+$ ||
+            ! "$framebuffer_height" =~ ^[0-9]+$ ||
+            "$changed_pixels_probe" != "ok" ||
+            "$red_pixels_probe" != "ok" ||
+            "$neutral_pixels_probe" != "ok" ||
+            "$framebuffer_width" == "0" ||
+            "$framebuffer_height" == "0" ||
+            "$before_capture_saved" != "true" ||
+            "$after_capture_saved" != "true" ||
+            ! -f "$before_capture_path" ||
+            ! -f "$after_capture_path" ]]; then
+        stop_smoke_process
+        echo "error: $smoke_label ${smoke_action} smoke reported unexpected state" >&2
+        sed -n '1,120p' "$status_path" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      if [[ "$hold_app" == "1" ]]; then
+        echo "$smoke_label ${smoke_action} smoke launched and is still running: pid $pid"
+        echo "Window: $viewer_window"
+        echo "Content: $viewer_content"
+        echo "Viewer logical size: ${viewer_logical_width}x${viewer_logical_height}"
+        echo "Viewer DPR: ${viewer_dev_pix_ratio} (${viewer_device_pixel_ratio}; screen ${viewer_screen_device_pixel_ratio})"
+        if [[ "$smoke_action" == "viewer-zoom-pan" ]]; then
+          echo "Transform: zoom $(status_value viewerZoomFactor || true), pan $(status_value viewerPanLogicalX || true),$(status_value viewerPanLogicalY || true) logical pixels"
+          echo "Viewer scale: $(status_value viewerScaleBefore || true) -> $(status_value viewerScaleAfter || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-onion-skin" ]]; then
+          echo "Onion skin: row $(status_value onionSkinCurrentRow || true), back offset $(status_value onionSkinBackOffset || true), mobile count $(status_value onionSkinMosCount || true)"
+          echo "Onion pixels: ${baseline_onion_pixels} -> ${onion_pixels}"
+        fi
+        if [[ "$smoke_action" == "viewer-camera-overlay" ]]; then
+          echo "Camera overlay: disabled $(status_value cameraOverlayDisabled || true), enabled $(status_value cameraOverlayEnabled || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-safe-area-field-guide" ]]; then
+          echo "Safe area: disabled $(status_value safeAreaDisabled || true), enabled $(status_value safeAreaEnabled || true)"
+          echo "Field guide: disabled $(status_value fieldGuideDisabled || true), enabled $(status_value fieldGuideEnabled || true)"
+          echo "Gray pixels: $(status_value grayPixels || true), changed gray pixels: $(status_value changedGrayPixels || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-ruler-guide" ]]; then
+          echo "Guide overlay: disabled $(status_value viewGuideDisabled || true), enabled $(status_value viewGuideEnabled || true)"
+          echo "Ruler overlay: disabled $(status_value viewRulerDisabled || true), enabled $(status_value viewRulerEnabled || true)"
+          echo "Guides: H $(status_value hGuideCount || true), V $(status_value vGuideCount || true)"
+          echo "Ruler widgets: $(status_value visibleRulerWidgetCount || true) visible of $(status_value rulerWidgetCount || true)"
+          echo "Gray pixels: $(status_value grayPixels || true), changed gray pixels: $(status_value changedGrayPixels || true), changed neutral pixels: $(status_value changedNeutralPixels || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-animate-tool-overlay" || "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-vector-brush" || "$smoke_action" == "viewer-raster-brush" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
+          echo "Tool: $(status_value toolName || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-animate-tool-overlay" || "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" ]]; then
+          echo "Stage object: $(status_value stageObject || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" ]]; then
+          echo "Stage object X: $(status_value stageObjectXBefore || true) -> $(status_value stageObjectXAfter || true)"
+          echo "Stage object Y: $(status_value stageObjectYBefore || true) -> $(status_value stageObjectYAfter || true)"
+          echo "Tool drag: $(status_value toolDragStart || true) -> $(status_value toolDragEnd || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-animate-tool-undo-redo" ]]; then
+          echo "Undo X/Y: $(status_value stageObjectXUndo || true),$(status_value stageObjectYUndo || true)"
+          echo "Redo X/Y: $(status_value stageObjectXRedo || true),$(status_value stageObjectYRedo || true)"
+          echo "Undo history: $(status_value undoHistoryCountBefore || true) -> $(status_value undoHistoryCountAfterDrag || true), index $(status_value undoHistoryIndexBefore || true)/$(status_value undoHistoryIndexAfterDrag || true)/$(status_value undoHistoryIndexAfterUndo || true)/$(status_value undoHistoryIndexAfterRedo || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-animate-tool-modifiers" ]]; then
+          echo "Normal delta: $(status_value normalDeltaX || true),$(status_value normalDeltaY || true)"
+          echo "Alt delta: $(status_value altDeltaX || true),$(status_value altDeltaY || true)"
+          echo "Shift delta: $(status_value shiftDeltaX || true),$(status_value shiftDeltaY || true)"
+          echo "Cursor precise: $(status_value cursorPreciseBefore || true) -> $(status_value cursorPreciseAfter || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-animate-tool-handles" ]]; then
+          echo "Active axis: $(status_value activeAxis || true), handle unit: $(status_value handleUnit || true)"
+          echo "Rotation angle: $(status_value angleBefore || true) -> $(status_value angleAfterRotationHandle || true)"
+          echo "Scale: $(status_value scaleBefore || true) -> $(status_value scaleAfterScaleHandle || true)"
+          echo "Center: $(status_value centerBefore || true) -> $(status_value centerAfterCenterHandle || true)"
+          echo "Hover changed pixels: $(status_value hoverChangedPixels || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-vector-brush" ]]; then
+          echo "Strokes: $(status_value strokesBefore || true) -> $(status_value strokesAfter || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-raster-brush" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
+          echo "Raster pixels: $(status_value rasterPixelsBefore || true) -> $(status_value rasterPixelsAfter || true)"
+          echo "Raster red pixels: $(status_value rasterRedPixelsBefore || true) -> $(status_value rasterRedPixelsAfter || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
+          echo "Input path: $(status_value toolInputPath || true)"
+        fi
+        if [[ "$smoke_action" == "viewer-raster-brush-tablet-events" ]]; then
+          echo "Tablet pressure: $(status_value tabletPressurePress || true) -> $(status_value tabletPressureDrag || true)"
+          echo "Tablet tilt: $(status_value tabletTiltX || true),$(status_value tabletTiltY || true)"
+        fi
+        echo "Framebuffer: ${framebuffer_width}x${framebuffer_height}"
+        echo "Changed pixels: $changed_pixels"
+        echo "Red pixels: $red_pixels"
+        echo "Before capture: $before_capture_path"
+        echo "After capture: $after_capture_path"
+        echo "Log: $log_path"
+        wait "$pid"
+        exit $?
+      fi
+
+      stop_smoke_process
+      echo "$smoke_label ${smoke_action} smoke passed: $viewer_window"
+      echo "Content: $viewer_content"
+      echo "Viewer logical size: ${viewer_logical_width}x${viewer_logical_height}"
+      echo "Viewer DPR: ${viewer_dev_pix_ratio} (${viewer_device_pixel_ratio}; screen ${viewer_screen_device_pixel_ratio})"
+      if [[ "$smoke_action" == "viewer-zoom-pan" ]]; then
+        echo "Transform: zoom $(status_value viewerZoomFactor || true), pan $(status_value viewerPanLogicalX || true),$(status_value viewerPanLogicalY || true) logical pixels"
+        echo "Viewer scale: $(status_value viewerScaleBefore || true) -> $(status_value viewerScaleAfter || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-onion-skin" ]]; then
+        echo "Onion skin: row $(status_value onionSkinCurrentRow || true), back offset $(status_value onionSkinBackOffset || true), mobile count $(status_value onionSkinMosCount || true)"
+        echo "Onion pixels: ${baseline_onion_pixels} -> ${onion_pixels}"
+      fi
+      if [[ "$smoke_action" == "viewer-camera-overlay" ]]; then
+        echo "Camera overlay: disabled $(status_value cameraOverlayDisabled || true), enabled $(status_value cameraOverlayEnabled || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-safe-area-field-guide" ]]; then
+        echo "Safe area: disabled $(status_value safeAreaDisabled || true), enabled $(status_value safeAreaEnabled || true)"
+        echo "Field guide: disabled $(status_value fieldGuideDisabled || true), enabled $(status_value fieldGuideEnabled || true)"
+        echo "Gray pixels: $(status_value grayPixels || true), changed gray pixels: $(status_value changedGrayPixels || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-ruler-guide" ]]; then
+        echo "Guide overlay: disabled $(status_value viewGuideDisabled || true), enabled $(status_value viewGuideEnabled || true)"
+        echo "Ruler overlay: disabled $(status_value viewRulerDisabled || true), enabled $(status_value viewRulerEnabled || true)"
+        echo "Guides: H $(status_value hGuideCount || true), V $(status_value vGuideCount || true)"
+        echo "Ruler widgets: $(status_value visibleRulerWidgetCount || true) visible of $(status_value rulerWidgetCount || true)"
+        echo "Gray pixels: $(status_value grayPixels || true), changed gray pixels: $(status_value changedGrayPixels || true), changed neutral pixels: $(status_value changedNeutralPixels || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-animate-tool-overlay" || "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-vector-brush" || "$smoke_action" == "viewer-raster-brush" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
+        echo "Tool: $(status_value toolName || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-animate-tool-overlay" || "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" ]]; then
+        echo "Stage object: $(status_value stageObject || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-animate-tool-drag" || "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" ]]; then
+        echo "Stage object X: $(status_value stageObjectXBefore || true) -> $(status_value stageObjectXAfter || true)"
+        echo "Stage object Y: $(status_value stageObjectYBefore || true) -> $(status_value stageObjectYAfter || true)"
+        echo "Tool drag: $(status_value toolDragStart || true) -> $(status_value toolDragEnd || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-animate-tool-undo-redo" ]]; then
+        echo "Undo X/Y: $(status_value stageObjectXUndo || true),$(status_value stageObjectYUndo || true)"
+        echo "Redo X/Y: $(status_value stageObjectXRedo || true),$(status_value stageObjectYRedo || true)"
+        echo "Undo history: $(status_value undoHistoryCountBefore || true) -> $(status_value undoHistoryCountAfterDrag || true), index $(status_value undoHistoryIndexBefore || true)/$(status_value undoHistoryIndexAfterDrag || true)/$(status_value undoHistoryIndexAfterUndo || true)/$(status_value undoHistoryIndexAfterRedo || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-animate-tool-modifiers" ]]; then
+        echo "Normal delta: $(status_value normalDeltaX || true),$(status_value normalDeltaY || true)"
+        echo "Alt delta: $(status_value altDeltaX || true),$(status_value altDeltaY || true)"
+        echo "Shift delta: $(status_value shiftDeltaX || true),$(status_value shiftDeltaY || true)"
+        echo "Cursor precise: $(status_value cursorPreciseBefore || true) -> $(status_value cursorPreciseAfter || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-animate-tool-handles" ]]; then
+        echo "Active axis: $(status_value activeAxis || true), handle unit: $(status_value handleUnit || true)"
+        echo "Rotation angle: $(status_value angleBefore || true) -> $(status_value angleAfterRotationHandle || true)"
+        echo "Scale: $(status_value scaleBefore || true) -> $(status_value scaleAfterScaleHandle || true)"
+        echo "Center: $(status_value centerBefore || true) -> $(status_value centerAfterCenterHandle || true)"
+        echo "Hover changed pixels: $(status_value hoverChangedPixels || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-vector-brush" ]]; then
+        echo "Strokes: $(status_value strokesBefore || true) -> $(status_value strokesAfter || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-raster-brush" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
+        echo "Raster pixels: $(status_value rasterPixelsBefore || true) -> $(status_value rasterPixelsAfter || true)"
+        echo "Raster red pixels: $(status_value rasterRedPixelsBefore || true) -> $(status_value rasterRedPixelsAfter || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-animate-tool-mouse-events" || "$smoke_action" == "viewer-animate-tool-undo-redo" || "$smoke_action" == "viewer-animate-tool-modifiers" || "$smoke_action" == "viewer-animate-tool-handles" || "$smoke_action" == "viewer-raster-brush-mouse-events" || "$smoke_action" == "viewer-raster-brush-tablet-events" || "$smoke_action" == "viewer-raster-brush-system-events" ]]; then
+        echo "Input path: $(status_value toolInputPath || true)"
+      fi
+      if [[ "$smoke_action" == "viewer-raster-brush-tablet-events" ]]; then
+        echo "Tablet pressure: $(status_value tabletPressurePress || true) -> $(status_value tabletPressureDrag || true)"
+        echo "Tablet tilt: $(status_value tabletTiltX || true),$(status_value tabletTiltY || true)"
+      fi
+      echo "Framebuffer: ${framebuffer_width}x${framebuffer_height}"
+      echo "Changed pixels: $changed_pixels"
+      echo "Red pixels: $red_pixels"
+      echo "After capture: $after_capture_path"
+      echo "Log: $log_path"
+      exit 0
+    fi
+
     if [[ "$hold_app" == "1" ]]; then
-      echo "Qt 6 GUI smoke launched and is still running after ${stable_seconds}s: pid $pid"
+      echo "$smoke_label smoke launched and is still running after ${stable_seconds}s: pid $pid"
       echo "Log: $log_path"
       wait "$pid"
       exit $?
     fi
 
     stop_smoke_process
-    echo "Qt 6 GUI smoke passed: app stayed running for ${stable_seconds}s"
+    echo "$smoke_label smoke passed: app stayed running for ${stable_seconds}s"
     echo "Log: $log_path"
     exit 0
   fi
 
   if ((elapsed >= timeout_seconds)); then
     stop_smoke_process
-    echo "error: Qt 6 GUI smoke timed out after ${timeout_seconds}s" >&2
+    echo "error: $smoke_label smoke timed out after ${timeout_seconds}s" >&2
     sed -n '1,180p' "$log_path" >&2
     exit 124
   fi
@@ -745,6 +1322,6 @@ wait "$pid"
 status=$?
 set -e
 
-echo "error: Qt 6 GUI smoke exited early with status $status" >&2
+echo "error: $smoke_label smoke exited early with status $status" >&2
 sed -n '1,180p' "$log_path" >&2
 exit "$status"
