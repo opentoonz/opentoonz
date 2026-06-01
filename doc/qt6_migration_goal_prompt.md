@@ -196,9 +196,8 @@ branch.
   inspects the `PreviewFxManager` cache raster. It verifies a ready 160x120
   cropped preview cache image with `Red pixels: 6820`. This narrows the FX
   Preview sub-camera manager/cache path; it does not yet validate the manual
-  schematic context-menu command, live UI sub-camera dragging, sub-camera
-  saved-frame export, production FX-heavy preview scenes, or Qt 5-vs-Qt 6
-  visual parity.
+  schematic context-menu command, live UI sub-camera dragging, production
+  FX-heavy preview scenes, or Qt 5-vs-Qt 6 visual parity.
 - On 2026-05-31, the packaged Qt 6 app now passes
   `mise run gui-smoke-fx-preview-flipbook-controls-qt6`. The app-side smoke
   creates a two-frame standard-DPI raster scene, starts
@@ -224,6 +223,20 @@ branch.
   schematic context-menu command, live UI playback/timer behavior, manual save
   popup/overwrite/warning dialogs, production FX-heavy preview scenes, or Qt
   5-vs-Qt 6 visual parity.
+- On 2026-05-31, the packaged Qt 6 app now passes
+  `mise run gui-smoke-fx-preview-subcamera-save-previewed-frames-qt6`. The
+  app-side smoke creates a two-frame standard-DPI raster scene, enables Preview
+  Properties sub-camera preview, sets a 160x120 interest rectangle inside a
+  320x240 preview camera, starts `PreviewFxManager::showNewPreview()` on the
+  column FX, waits for both preview cache frames, saves the preview `FlipBook`
+  to a PNG sequence through `FlipBook::doSaveImages()` with the test-safe
+  completion notification suppressed, reloads both exported PNGs through Qt
+  image I/O, and verifies two 160x120 cropped output frames with
+  `Frame 0 red pixels: 6820` and `Frame 1 green pixels: 6820`. This narrows FX
+  Preview sub-camera saved-frame export for a simple two-frame raster scene; it
+  does not yet validate the manual schematic context-menu command, live UI
+  sub-camera dragging, manual save popup/overwrite/warning dialogs, production
+  FX-heavy preview scenes, or Qt 5-vs-Qt 6 visual parity.
 - On 2026-05-31, the packaged Qt 6 app now passes seven focused final-render
   PNG-output smokes:
   `mise run gui-smoke-final-render-output-qt6` and
@@ -1742,7 +1755,8 @@ The next slice should make the Qt 6 app useful enough to run and diagnose:
    Freehand and Polyline mode variants,
    Previewer render-cache, PreviewFxManager flipbook/cache render-output,
    PreviewFxManager sub-camera cache render-output, and PreviewFxManager
-   flipbook frame-switch/clone/freeze/unfreeze controls,
+   flipbook frame-switch/clone/freeze/unfreeze controls, plus full-frame and
+   sub-camera saved-frame export,
    vector/raster brush tool-input, Qt mouse-event, and synthetic Qt
    tablet-event paths. A real macOS CGEvent/System Events raster-brush gate
    now exists, but the current local run is blocked by app activation or OS
@@ -1931,6 +1945,7 @@ mise run gui-smoke-fx-preview-render-output-qt6
 mise run gui-smoke-fx-preview-subcamera-render-output-qt6
 mise run gui-smoke-fx-preview-flipbook-controls-qt6
 mise run gui-smoke-fx-preview-save-previewed-frames-qt6
+mise run gui-smoke-fx-preview-subcamera-save-previewed-frames-qt6
 mise run gui-smoke-final-render-output-qt6
 mise run gui-smoke-final-render-background-output-qt6
 mise run gui-smoke-final-render-sequence-output-qt6

@@ -150,6 +150,10 @@ run = "OPENTOONZ_GUI_SMOKE_ACTION=fx-preview-flipbook-controls bash scripts/qt6/
 description = "Save two Qt 6 FX Preview flipbook frames to PNG and verify the exported pixels."
 run = "OPENTOONZ_GUI_SMOKE_ACTION=fx-preview-save-previewed-frames bash scripts/qt6/run-gui-smoke.sh"
 
+[tasks.gui-smoke-fx-preview-subcamera-save-previewed-frames-qt6]
+description = "Save two cropped Qt 6 FX Preview sub-camera flipbook frames to PNG and verify the exported pixels."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=fx-preview-subcamera-save-previewed-frames bash scripts/qt6/run-gui-smoke.sh"
+
 [tasks.gui-smoke-final-render-output-qt6]
 description = "Render a standard-DPI red raster scene through Qt 6 MovieRenderer and verify the PNG output pixels."
 run = "OPENTOONZ_GUI_SMOKE_ACTION=final-render-output bash scripts/qt6/run-gui-smoke.sh"

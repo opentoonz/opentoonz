@@ -2466,13 +2466,16 @@ static QStringList gui_smoke_fx_preview_save_previewed_frames_details(
                               camera->getRes().ly / renderDpi));
 
   const TRect subcameraRect(80, 60, 239, 179);
-  TCamera *previewCamera = scene->getCurrentPreviewCamera();
-  if (previewCamera != camera) {
-    previewCamera->setRes(TDimension(320, 240));
-    previewCamera->setSize(TDimensionD(previewCamera->getRes().lx / renderDpi,
-                                       previewCamera->getRes().ly / renderDpi));
+  if (subcameraPreview) {
+    TCamera *previewCamera = scene->getCurrentPreviewCamera();
+    if (previewCamera != camera) {
+      previewCamera->setRes(TDimension(320, 240));
+      previewCamera->setSize(
+          TDimensionD(previewCamera->getRes().lx / renderDpi,
+                      previewCamera->getRes().ly / renderDpi));
+    }
+    previewCamera->setInterestRect(subcameraRect);
   }
-  previewCamera->setInterestRect(subcameraRect);
   const TDimension expectedPreviewSize =
       subcameraPreview ? TDimension(subcameraRect.getLx(), subcameraRect.getLy())
                        : TDimension(320, 240);
