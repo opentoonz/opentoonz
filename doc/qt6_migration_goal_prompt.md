@@ -108,7 +108,8 @@ branch.
 - `mise` includes Qt 6 macOS packaging and arm64 bundle-check tasks:
   `package-macos-qt6` and `check-macos-arm64-qt6`.
 - `mise run package-macos-qt6` and `mise run check-macos-arm64-qt6` pass for
-  the current macOS arm64 Qt 6 bundle.
+  the current macOS arm64 Qt 6 bundle; the 2026-05-31 post-GUI-relink check
+  inspected 291 packaged arm64 Mach-O files.
 - On 2026-05-25, post-relink validation reran the macOS Qt 6 package,
   arm64 bundle check, bounded startup smoke, non-rendering high-DPI diagnostic
   smoke, scene create/open smoke, app-side xsheet scrub smoke, media-device
@@ -163,18 +164,114 @@ branch.
   and after the update, require changed and red-dominant pixels, and save the
   before/after captures beside the GUI smoke status file. These are narrow
   rendering guards; they do not yet validate brush input, interactive vector
-  drawing, onion skin, tool overlays, FX preview, or Qt 5-vs-Qt 6 visual
-  parity.
-- On 2026-05-31, the packaged Qt 6 app has a prototype
-  `mise run gui-smoke-final-render-output-qt6` gate, but it is not green yet.
-  This app-side smoke creates a one-frame camera-DPI red raster scene, sends it
-  through `MovieRenderer` to a PNG sequence under the isolated GUI smoke root,
-  reloads the PNG with Qt image I/O, and requires a 320x240 nonempty output
-  with visible red pixels. The current run writes a valid 320x240 PNG and
-  reports one completed frame, but the image contains only one red pixel, so
-  final-render output remains an active blocker. This probe is still narrower
-  than Render popup UI, multi-frame sequences, movie formats, FX-heavy scenes,
-  audio muxing, preview rendering, or full Qt 5-vs-Qt 6 render parity.
+  drawing, onion skin, tool overlays, manual FX Preview UI and broader FX
+  preview workflows, or Qt 5-vs-Qt 6 visual parity.
+- On 2026-05-31, the packaged Qt 6 app now passes
+  `mise run gui-smoke-preview-render-output-qt6`. The app-side smoke creates a
+  one-frame standard-DPI red raster scene, sets the preview render settings to
+  320x240 without viewer shrink, renders frame 0 through the `Previewer`
+  render-cache path, and verifies a ready 320x240 preview raster with
+  `Red pixels: 76800`. This narrows the basic Previewer cache/render path; it
+  does not yet validate the File > Preview UI, manual schematic FX Preview
+  command path, sub-camera preview, flipbook controls, manual preview-save
+  popup/overwrite/warning dialogs, production FX-heavy preview scenes, or Qt
+  5-vs-Qt 6 visual parity.
+- On 2026-05-31, the packaged Qt 6 app now passes
+  `mise run gui-smoke-fx-preview-render-output-qt6`. The app-side smoke creates
+  a one-frame standard-DPI red raster scene, starts
+  `PreviewFxManager::showNewPreview()` on the column FX, verifies that a
+  preview `FlipBook` is attached to the expected FX/xsheet, waits for the
+  `renderedFrame` signal, and inspects the `PreviewFxManager` cache raster. It
+  verifies a ready 320x240 preview cache image with `Red pixels: 76800`. This
+  narrows the FX Preview manager/flipbook/cache render path; it does not yet
+  validate the manual schematic context-menu command, live UI playback/timer
+  behavior, manual save popup/overwrite/warning dialogs, production FX-heavy
+  preview scenes, or Qt 5-vs-Qt 6 visual parity.
+- On 2026-05-31, the packaged Qt 6 app now passes
+  `mise run gui-smoke-fx-preview-subcamera-render-output-qt6`. The app-side
+  smoke creates a one-frame standard-DPI red raster scene, enables Preview
+  Properties sub-camera preview, sets a 160x120 interest rectangle inside a
+  320x240 preview camera, starts `PreviewFxManager::showNewPreview()` on the
+  column FX, verifies that the manager reports sub-camera preview active, and
+  inspects the `PreviewFxManager` cache raster. It verifies a ready 160x120
+  cropped preview cache image with `Red pixels: 6820`. This narrows the FX
+  Preview sub-camera manager/cache path; it does not yet validate the manual
+  schematic context-menu command, live UI sub-camera dragging, sub-camera
+  saved-frame export, production FX-heavy preview scenes, or Qt 5-vs-Qt 6
+  visual parity.
+- On 2026-05-31, the packaged Qt 6 app now passes
+  `mise run gui-smoke-fx-preview-flipbook-controls-qt6`. The app-side smoke
+  creates a two-frame standard-DPI raster scene, starts
+  `PreviewFxManager::showNewPreview()` on the column FX, verifies both active
+  preview cache frames, switches the preview `FlipBook` to frame 2, clones the
+  preview, freezes it, verifies the cloned frozen cache frames, and unfreezes
+  it. It verifies frame 0 as 320x240 with `Red pixels: 76800` and frame 1 as
+  320x240 with `Green pixels: 76800`. This narrows FX Preview flipbook frame
+  switching, clone, freeze, and unfreeze behavior; it does not yet validate the
+  manual schematic context-menu command, live UI playback/timer behavior,
+  manual save popup/overwrite/warning dialogs, production FX-heavy preview
+  scenes, or Qt 5-vs-Qt 6 visual parity.
+- On 2026-05-31, the packaged Qt 6 app now passes
+  `mise run gui-smoke-fx-preview-save-previewed-frames-qt6`. The app-side smoke
+  creates a two-frame standard-DPI raster scene, starts
+  `PreviewFxManager::showNewPreview()` on the column FX, waits for both preview
+  cache frames, saves the preview `FlipBook` to a PNG sequence through
+  `FlipBook::doSaveImages()` with the test-safe completion notification
+  suppressed, reloads both exported PNGs through Qt image I/O, and verifies two
+  320x240 output frames with `Frame 0 red pixels: 76800` and
+  `Frame 1 green pixels: 76800`. This narrows FX Preview saved-frame export for
+  a simple two-frame raster scene; it does not yet validate the manual
+  schematic context-menu command, live UI playback/timer behavior, manual save
+  popup/overwrite/warning dialogs, production FX-heavy preview scenes, or Qt
+  5-vs-Qt 6 visual parity.
+- On 2026-05-31, the packaged Qt 6 app now passes seven focused final-render
+  PNG-output smokes:
+  `mise run gui-smoke-final-render-output-qt6` and
+  `mise run gui-smoke-final-render-background-output-qt6`, plus
+  `mise run gui-smoke-final-render-sequence-output-qt6` and
+  `mise run gui-smoke-final-render-composite-output-qt6`, plus
+  `mise run gui-smoke-final-render-vector-output-qt6`, plus
+  `mise run gui-smoke-final-render-toonz-raster-output-qt6`, plus
+  `mise run gui-smoke-final-render-fx-output-qt6`. The first app-side smoke
+  creates a one-frame standard-DPI red raster scene, sends it through
+  `MovieRenderer` to a PNG sequence under the isolated GUI smoke root, reloads
+  the PNG with Qt image I/O, and requires a 320x240 nonempty output with
+  visible red pixels. The second smoke renders a partial red raster over an
+  opaque blue scene background and requires both red foreground and blue
+  background pixels. The third smoke renders two xsheet rows through
+  `MovieRenderer` and verifies a two-frame 320x240 PNG sequence with a red
+  first frame and green second frame. The fourth smoke renders two raster
+  levels in separate xsheet columns and verifies red and green pixel columns in
+  the composited 320x240 PNG output. The vector smoke renders a red vector level
+  through `MovieRenderer` and verifies red pixels in the 320x240 PNG output.
+  The Toonz Raster smoke creates a color-mapped `TZP_XSHLEVEL` frame with a red
+  palette style, renders it through `MovieRenderer`, and verifies red pixels in
+  the 320x240 PNG output. The FX smoke wraps a partial red raster scene in a
+  `STD_blurFx` root
+  generated with `TFxUtil::makeBlur()`, renders that root through
+  `MovieRenderer`, and verifies red pixels plus the reported FX root.
+  The first prototype exposed a one-pixel render: the source raster frame had
+  all 76,800 pixels opaque and red, direct xsheet/column FX bboxes were valid,
+  and the unified scene-FX tree without the legacy background wrapper had the
+  correct bbox, but the legacy transparent scene background color-card wrapper
+  collapsed the rendered result. The transparent-background fix skips that
+  no-op wrapper when the scene background alpha is zero. The opaque-background
+  probe then exposed a second one-pixel render where infinite color-card bboxes
+  were collapsed by finite integer enlargement in the `TRasterFx` public bbox,
+  dry-compute, and compute paths. The current renderer fix preserves
+  `TConsts::infiniteRectD` through those paths. After rebuild and package
+  validation, the transparent smoke passed with `Red pixels: 76800`, and the
+  opaque-background smoke passed with `Red pixels: 25200` and
+  `Blue pixels: 51600`; the sequence smoke passed with two output frames,
+  first-frame `Red pixels: 76800`, and second-frame `Green pixels: 76800`;
+  the composite smoke passed with `Red pixels: 36000` and
+  `Green pixels: 36000`; the vector smoke passed with `Red pixels: 36316`;
+  the Toonz Raster smoke passed with `Red pixels: 76800`;
+  the FX smoke passed with `Red pixels: 16396` and
+  `FX root: STD_blurFx:0`.
+  These probes are still narrower than Render popup UI, movie formats,
+  broader production FX-heavy scenes, audio muxing, File > Preview UI/manual
+  FX Preview UI, or full Qt 5-vs-Qt 6 render parity.
 - On 2026-05-30, the viewer framebuffer capture path was tightened to treat
   high-DPI sizing as part of the pass condition. The app-side status now records
   logical viewer size, device-pixel viewer size, `SceneViewer::getDevPixRatio()`,
@@ -874,8 +971,9 @@ branch.
   brush hook was also run against the Qt 5 build to keep the smoke dual-lane
   compatible. These are narrow product-tool drawing guards; they do not yet
   validate OS-level mouse/tablet event delivery, pressure/tilt, high-DPI input
-  mapping, timeline/UI onion workflow, tool overlays, FX preview, final render
-  output, or visual parity against the Qt 5 baseline.
+  mapping, timeline/UI onion workflow, tool overlays, manual FX Preview UI and
+  broader FX preview workflows, broader final-render parity, or visual parity
+  against the Qt 5 baseline.
 - On 2026-05-30, the packaged Qt 6 app also passes
   `mise run gui-smoke-viewer-raster-brush-mouse-events-qt6`. This smoke sends
   Qt mouse press/move/release events through `SceneViewer`, maps the shared
@@ -885,7 +983,8 @@ branch.
   also run against the Qt 5 build. This narrows Qt widget event dispatch and
   high-DPI input coordinate coverage, but it still does not validate real
   OS-level CGEvent/System Events delivery, tablet input, timeline/UI onion
-  workflow, overlays, FX preview, final render output, or visual parity.
+  workflow, overlays, manual FX Preview UI and broader FX preview workflows,
+  broader final-render parity, or visual parity.
 - On 2026-05-30, the packaged Qt 6 app also passes
   `mise run gui-smoke-viewer-raster-brush-tablet-events-qt6`. This smoke sends
   synthetic Qt tablet press/move/release events through `SceneViewer`, maps the
@@ -899,8 +998,8 @@ branch.
   pass, so hardware pressure/tilt should stay deferred unless a device or
   credible OS-level simulator is added; the synthetic smoke does not validate
   OS-level CGEvent/System Events delivery, platform driver pressure/tilt,
-  timeline/UI onion workflow, overlays, FX preview, final render output, or
-  visual parity.
+  timeline/UI onion workflow, overlays, manual FX Preview UI and broader FX
+  preview workflows, broader final-render parity, or visual parity.
 - On 2026-05-30, this branch added the permission-sensitive
   `mise run gui-smoke-viewer-raster-brush-system-events-qt6` gate for real
   macOS OS-level input delivery. The app-side hook now prepares the same raster
@@ -1312,6 +1411,13 @@ branch.
   `mise run script-smoke-scene-loadlevel-qt6`. It validates
   `Scene.loadLevel()` by loading a saved raster level into a `Scene`, checking
   the loaded level metadata, and assigning the loaded level to an xsheet cell.
+- A companion Scene load-level sequence Qt 6 script fixture exists at
+  `toonz/sources/tests/scriptengine/scene_load_level_sequence.toonzscript` and
+  is run by `mise run script-smoke-scene-loadlevel-sequence-qt6`. It validates
+  multi-frame `Scene.loadLevel()` behavior, `Scene.getLevels()` /
+  `Scene.getLevel()` registry lookup, name-based and object-based
+  `Scene.setCell()` assignment, and a headless `Scene.save()` /
+  `new Scene(path)` roundtrip for the loaded sequence.
 - A Scene reload edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/scene_reload_edges.toonzscript` and is run
   by `mise run script-smoke-scene-reload-edges-qt6`. It validates loading a
@@ -1319,6 +1425,12 @@ branch.
   second saved scene, restoring the first scene, checking the loaded level/cell
   state after each `Scene.load()`, and proving stale scene-owned `Level` wrappers
   are invalidated rather than kept live.
+- A Scene failed-load Qt 6 script fixture exists at
+  `toonz/sources/tests/scriptengine/scene_load_failure.toonzscript` and is run
+  by `mise run script-smoke-scene-load-failure-qt6`. It validates that
+  `Scene.load()` rejects an existing non-scene file before mutating the native
+  scene, preserves current scene/cell data, and keeps existing scene-owned
+  `Level` wrappers valid until a replacement scene successfully loads.
 - A ninth Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/image_builder.toonzscript` and is run by
   `mise run script-smoke-image-builder-qt6`. It validates the first narrow
@@ -1408,6 +1520,19 @@ branch.
   execution needs Qt's plugin/offscreen-surface path. It also validates that
   `dumpCache()` writes a portable cache-map diagnostic under the configured
   OpenToonz cache root and returns the generated `FilePath`.
+- A Renderer frame/column selection Qt 6 script fixture exists at
+  `toonz/sources/tests/scriptengine/renderer_frames_columns.toonzscript` and
+  is run by `mise run script-smoke-renderer-frames-columns-qt6`. It validates
+  that `Renderer.frames` and `Renderer.columns` drive actual
+  `renderScene()`/`renderFrame()` execution for a two-row, two-column Raster
+  scene, including selected-column multi-frame output and default full-scene
+  frame-list behavior.
+- A Renderer vector-input Qt 6 script fixture exists at
+  `toonz/sources/tests/scriptengine/renderer_vector.toonzscript` and is run by
+  `mise run script-smoke-renderer-vector-qt6`. It validates that a scene-owned
+  Vector level can pass through `Renderer.renderFrame()` and
+  `Renderer.renderScene()` under the Qt 6 `QJSEngine` facade, producing Raster
+  image/level output that can be saved and reloaded.
 - A Renderer edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/renderer_edges.toonzscript` and is run by
   `mise run script-smoke-renderer-edges-qt6`. It validates that
@@ -1471,6 +1596,14 @@ branch.
   through the Qt 6 `Image` facade. This is a narrow offscreen-rendering
   boundary check; it does not claim scene-icon visual parity, viewer parity, or
   broader render-output parity.
+- A companion Qt 6 script fixture exists at
+  `toonz/sources/tests/scriptengine/scene_save_icon_variants.toonzscript` and
+  is run by `mise run script-smoke-scene-save-icon-variants-qt6`. It validates
+  the same `QApplication` scene-icon path for a two-column raster scene and a
+  second save, then checks that both generated `sceneIcons` PNGs load through
+  the Qt 6 `Image` facade with stable nonzero dimensions. This remains a
+  scene-icon/offscreen boundary check; it does not claim pixel-level icon
+  parity or viewer parity.
 - A twenty-first Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/scene_frameids.toonzscript` and is run by
   `mise run script-smoke-scene-frameids-qt6`. It validates lettered `TFrameId`
@@ -1503,17 +1636,19 @@ branch.
   `run()` error, FilePath, FilePath edges, FilePath metadata, path-argument,
   Scene, Scene cells, Scene columns,
   Scene cell frame-id type, Scene edges, Scene argument edges,
-  Scene lifecycle edges, Scene load-level, Scene save/reopen, Scene reload edge,
-  Scene save-icon, Scene frame-id, Level, Level I/O,
-  Level edge-case, Level I/O types, Image, Image edge-case,
+  Scene lifecycle edges, Scene load-level, Scene load-level sequence,
+  Scene save/reopen, Scene reload edge,
+  Scene failed-load, Scene save-icon, Scene save-icon variants, Scene frame-id,
+  Level, Level I/O, Level edge-case, Level I/O types, Image, Image edge-case,
   Image level-first-frame, ImageBuilder, ImageBuilder edge-case,
   Transform edge-case, ToonzRasterConverter,
   ToonzRasterConverter level conversion, ToonzRasterConverter edge-case,
   OutlineVectorizer,
   CenterlineVectorizer, vectorizer edge-case, binding lifecycle edge,
-  Rasterizer including full-color output, Renderer, Renderer edge-case, Wrapper
-  id, Rasterizer edge-case, Level path, and level transformer fixtures pass in
-  both modes for the current Qt 6 app bundle.
+  Rasterizer including full-color output, Renderer, Renderer frame/column
+  selection, Renderer vector input, Renderer edge-case, Wrapper id, Rasterizer
+  edge-case, Level path, and level transformer fixtures pass in both modes for
+  the current Qt 6 app bundle.
   The default script entry path now intentionally exits before the normal macOS
   `QApplication`/plugin/main-window startup and uses `stuff/cache` instead of
   the platform cache root so sandboxed CLI smokes do not write into a user
@@ -1561,8 +1696,9 @@ branch.
   edge-scale/rotation/center/thickness/free-deform handle variants,
   vector Selection Freehand/Polyline mode variants,
   raster Selection rectangular selection and scale-handle dragging,
-  vector/full-color raster direct-tool brush smokes, and a `SceneViewer` Qt
-  mouse-event plus synthetic tablet-event raster brush smoke exist, but real
+  vector/full-color raster direct-tool brush smokes, Previewer/FX Preview
+  render-cache and flipbook-control smokes, and a `SceneViewer` Qt mouse-event
+  plus synthetic tablet-event raster brush smoke exist, but real
   OS-level/hardware tablet input, full drawing workflows, remaining timeline
   onion workflows beyond the current app-side row-area marker/toggle/drag,
   fixed-marker, Shift and Trace, context/color/orientation coverage, remaining
@@ -1574,8 +1710,10 @@ branch.
   covered by app-side
   create/move/delete/drag-hide, guide-line visual variants beyond app-side
   custom-position dashed-line coverage, broader overlay and
-  high-DPI visual behavior, broader rendering, non-macOS packaging, scripting
-  object binding parity, and hardware camera/audio smoke remain open.
+  high-DPI visual behavior, manual Preview/FX Preview UI, manual preview-save
+  popup/overwrite/warning dialogs and broader production preview scenes,
+  broader rendering, non-macOS packaging, scripting object binding parity, and
+  hardware camera/audio smoke remain open.
 
 ## Next Implementation Slice
 
@@ -1602,6 +1740,9 @@ The next slice should make the Qt 6 app useful enough to run and diagnose:
    variants, vector Selection Freehand and Polyline mode variants, raster
    Selection rectangular selection and scale-handle dragging, raster Selection
    Freehand and Polyline mode variants,
+   Previewer render-cache, PreviewFxManager flipbook/cache render-output,
+   PreviewFxManager sub-camera cache render-output, and PreviewFxManager
+   flipbook frame-switch/clone/freeze/unfreeze controls,
    vector/raster brush tool-input, Qt mouse-event, and synthetic Qt
    tablet-event paths. A real macOS CGEvent/System Events raster-brush gate
    now exists, but the current local run is blocked by app activation or OS
@@ -1623,6 +1764,8 @@ The next slice should make the Qt 6 app useful enough to run and diagnose:
    rectangular/freehand/polyline app-side paths, real OS-level cursor delivery,
    remaining cursor artwork outside the checked Animate/Edit mode cursor set,
    real OS-level transform dragging,
+   manual Preview/FX Preview UI, manual preview-save popup/overwrite/warning
+   dialogs, production FX-heavy preview scenes,
    remaining manual ruler-guide variants not covered by
    app-side create/move/delete/drag-hide, guide-line visual variants beyond
    app-side custom-position dashed-line coverage, broader high-DPI input and
@@ -1635,8 +1778,10 @@ The next slice should make the Qt 6 app useful enough to run and diagnose:
    FilePath-edge, FilePath metadata, path-argument, `Scene`, Scene edge-case,
    `Level`, `Level.path`,
    Level edge-case, level-wide transformer, Level I/O types including
-   ToonzRaster reload frame access, scene data save/reopen, Scene reload edge,
-   Scene save-icon,
+   ToonzRaster reload frame access, scene load-level sequence,
+   scene data save/reopen, Scene reload edge, Scene failed-load wrapper
+   preservation,
+   Scene save-icon, Scene save-icon variants,
    Scene frame-id
    handling, Scene cell frame-id type, Scene argument edge cases,
    Scene lifecycle edge cases, `Image`, Image edge-case,
@@ -1646,8 +1791,9 @@ The next slice should make the Qt 6 app useful enough to run and diagnose:
    ToonzRasterConverter edge-case,
    OutlineVectorizer/CenterlineVectorizer/Rasterizer including full-color
    Rasterizer output, Renderer
-   renderFrame/renderScene/dumpCache, Renderer edge-case, Wrapper id
-   compatibility, and binding lifecycle/property edge slices into the next
+   renderFrame/renderScene/dumpCache, Renderer frame/column selection,
+   Renderer vector input, Renderer edge-case, Wrapper id compatibility, and
+   binding lifecycle/property edge slices into the next
    `QJSEngine` object-binding group, likely remaining advanced scene APIs,
    broader scene-icon/offscreen visual parity, or another helper subset, rather
    than attempting a full script API rewrite in one change.
@@ -1661,9 +1807,10 @@ The next slice should make the Qt 6 app useful enough to run and diagnose:
 5. Keep the basic, `run()` error, FilePath, FilePath-edge, FilePath metadata,
    path-argument, Scene, Scene cells, Scene columns,
    Scene cell frame-id type, Scene edges, Scene argument edges,
-   Scene lifecycle edges, Scene load-level, Scene save/reopen,
-   Scene reload edge,
-   Scene save-icon, Scene frame-id,
+   Scene lifecycle edges, Scene load-level, Scene load-level sequence,
+   Scene save/reopen,
+   Scene reload edge, Scene failed-load,
+   Scene save-icon, Scene save-icon variants, Scene frame-id,
    Level,
    Level edge-case, Level I/O, Level path,
    level transformer, Image,
@@ -1674,7 +1821,8 @@ The next slice should make the Qt 6 app useful enough to run and diagnose:
    ToonzRasterConverter edge-case, OutlineVectorizer, CenterlineVectorizer,
    vectorizer edge-case, binding lifecycle edge, Rasterizer including
    full-color output, Rasterizer edge-case, Renderer including `dumpCache()`,
-   Renderer edge-case, and Wrapper
+   Renderer frame/column selection, Renderer vector input, Renderer edge-case,
+   and Wrapper
    id script fixtures green in both bounded and natural-exit smoke modes while
    adding the next object-binding fixture.
 6. Bring Qt 6 viewer/rendering work forward directly. Keep changes narrow and
@@ -1778,6 +1926,18 @@ mise run gui-smoke-audio-playback-wav-qt6
 mise run gui-smoke-xsheet-scrub-qt6
 mise run gui-smoke-viewer-render-qt6
 mise run gui-smoke-viewer-vector-render-qt6
+mise run gui-smoke-preview-render-output-qt6
+mise run gui-smoke-fx-preview-render-output-qt6
+mise run gui-smoke-fx-preview-subcamera-render-output-qt6
+mise run gui-smoke-fx-preview-flipbook-controls-qt6
+mise run gui-smoke-fx-preview-save-previewed-frames-qt6
+mise run gui-smoke-final-render-output-qt6
+mise run gui-smoke-final-render-background-output-qt6
+mise run gui-smoke-final-render-sequence-output-qt6
+mise run gui-smoke-final-render-composite-output-qt6
+mise run gui-smoke-final-render-vector-output-qt6
+mise run gui-smoke-final-render-toonz-raster-output-qt6
+mise run gui-smoke-final-render-fx-output-qt6
 mise run gui-smoke-viewer-zoom-pan-qt6
 mise run gui-smoke-viewer-onion-skin-qt6
 mise run gui-smoke-viewer-onion-skin-rowarea-qt6
@@ -1833,9 +1993,12 @@ mise run script-smoke-scene-edges-qt6
 mise run script-smoke-scene-argument-edges-qt6
 mise run script-smoke-scene-lifecycle-edges-qt6
 mise run script-smoke-scene-loadlevel-qt6
+mise run script-smoke-scene-loadlevel-sequence-qt6
 mise run script-smoke-scene-save-reopen-qt6
 mise run script-smoke-scene-reload-edges-qt6
+mise run script-smoke-scene-load-failure-qt6
 mise run script-smoke-scene-save-icon-qt6
+mise run script-smoke-scene-save-icon-variants-qt6
 mise run script-smoke-scene-frameids-qt6
 mise run script-smoke-level-qt6
 mise run script-smoke-level-edges-qt6
@@ -1858,6 +2021,8 @@ mise run script-smoke-binding-lifecycle-edges-qt6
 mise run script-smoke-rasterizer-qt6
 mise run script-smoke-rasterizer-edges-qt6
 mise run script-smoke-renderer-qt6
+mise run script-smoke-renderer-frames-columns-qt6
+mise run script-smoke-renderer-vector-qt6
 mise run script-smoke-renderer-edges-qt6
 mise run script-smoke-level-transformers-qt6
 mise run script-smoke-wrapper-id-qt6
@@ -1876,9 +2041,12 @@ OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-argument-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-lifecycle-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-loadlevel-qt6
+OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-loadlevel-sequence-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-save-reopen-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-reload-edges-qt6
+OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-load-failure-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-save-icon-qt6
+OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-save-icon-variants-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-frameids-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-level-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-level-edges-qt6
@@ -1901,6 +2069,8 @@ OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-binding-lifecycle-ed
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-rasterizer-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-rasterizer-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-renderer-qt6
+OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-renderer-frames-columns-qt6
+OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-renderer-vector-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-renderer-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-level-transformers-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-wrapper-id-qt6

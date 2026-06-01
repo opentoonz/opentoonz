@@ -19,9 +19,12 @@ tasks=(
   script-smoke-scene-argument-edges-qt6
   script-smoke-scene-lifecycle-edges-qt6
   script-smoke-scene-loadlevel-qt6
+  script-smoke-scene-loadlevel-sequence-qt6
   script-smoke-scene-save-reopen-qt6
   script-smoke-scene-reload-edges-qt6
+  script-smoke-scene-load-failure-qt6
   script-smoke-scene-save-icon-qt6
+  script-smoke-scene-save-icon-variants-qt6
   script-smoke-scene-frameids-qt6
   script-smoke-level-qt6
   script-smoke-level-edges-qt6
@@ -44,6 +47,8 @@ tasks=(
   script-smoke-rasterizer-qt6
   script-smoke-rasterizer-edges-qt6
   script-smoke-renderer-qt6
+  script-smoke-renderer-frames-columns-qt6
+  script-smoke-renderer-vector-qt6
   script-smoke-renderer-edges-qt6
   script-smoke-level-transformers-qt6
   script-smoke-wrapper-id-qt6

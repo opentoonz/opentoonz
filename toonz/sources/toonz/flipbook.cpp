@@ -171,6 +171,7 @@ FlipBook::FlipBook(QWidget *parent, QString viewerTitle,
     , m_player(0)
     //, m_doCompare(false)
     , m_currentFrameToSave(0)
+    , m_showSaveImagesCompletionInfo(true)
     , m_lw()
     , m_lr()
     , m_loadPopup(0)
@@ -302,8 +303,13 @@ public:
   int m_choice;
   int m_val;
   QString m_str;
-  ProgressBarMessager(int choice, int val, const QString &str = "")
-      : m_choice(choice), m_val(val), m_str(str) {}
+  bool m_showCompletionInfo;
+  ProgressBarMessager(int choice, int val, const QString &str = "",
+                      bool showCompletionInfo = true)
+      : m_choice(choice)
+      , m_val(val)
+      , m_str(str)
+      , m_showCompletionInfo(showCompletionInfo) {}
   void onDeliver() override {
     switch (m_choice) {
     case eBegin:
@@ -325,7 +331,7 @@ public:
       }
       break;
     case eEnd: {
-      DVGui::info(m_str);
+      if (m_showCompletionInfo) DVGui::info(m_str);
       delete Pd;
       Pd = 0;
     } break;
@@ -591,7 +597,7 @@ FlipBook::~FlipBook() {
 
 //=============================================================================
 
-bool FlipBook::doSaveImages(TFilePath fp) {
+bool FlipBook::doSaveImages(TFilePath fp, bool showCompletionInfo) {
   QStringList formats;
   TLevelWriter::getSupportedFormats(formats, true);
   Tiio::Writer::getSupportedFormats(formats, true);
@@ -695,7 +701,8 @@ bool FlipBook::doSaveImages(TFilePath fp) {
 
   m_lw->setFrameRate(outputSettings->getFrameRate());
 
-  m_currentFrameToSave = 1;
+  m_showSaveImagesCompletionInfo = showCompletionInfo;
+  m_currentFrameToSave           = 1;
 
   ProgressBarMessager(eBegin, m_framesCount).sendBlocking();
 
@@ -727,10 +734,11 @@ void FlipBook::saveImage() {
       writer->save(img);
     } catch (...) {
       QString str(tr("It is not possible to save Flipbook content."));
-      ProgressBarMessager(eEnd, 0, str).send();
-      m_currentFrameToSave = 0;
-      m_lw                 = TLevelWriterP();
-      savedFrames          = 0;
+      ProgressBarMessager(eEnd, 0, str, m_showSaveImagesCompletionInfo).send();
+      m_currentFrameToSave           = 0;
+      m_showSaveImagesCompletionInfo = true;
+      m_lw                           = TLevelWriterP();
+      savedFrames                    = 0;
       return;
     }
     savedFrames++;
@@ -750,11 +758,12 @@ void FlipBook::saveImage() {
 
   if (!Pd) str = "Canceled! " + str;
 
-  ProgressBarMessager(eEnd, 0, str).send();
+  ProgressBarMessager(eEnd, 0, str, m_showSaveImagesCompletionInfo).send();
 
-  m_currentFrameToSave = 0;
-  m_lw                 = TLevelWriterP();
-  savedFrames          = 0;
+  m_currentFrameToSave           = 0;
+  m_showSaveImagesCompletionInfo = true;
+  m_lw                           = TLevelWriterP();
+  savedFrames                    = 0;
 }
 
 //=============================================================================

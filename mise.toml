@@ -130,9 +130,53 @@ run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-render bash scripts/qt6/run-gui-smoke.s
 description = "Create a visible vector frame and verify Qt 6 SceneViewer framebuffer pixels in the packaged app."
 run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-vector-render bash scripts/qt6/run-gui-smoke.sh"
 
+[tasks.gui-smoke-preview-render-output-qt6]
+description = "Render a raster scene through the Qt 6 Previewer cache path and verify preview pixels."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=preview-render-output bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-fx-preview-render-output-qt6]
+description = "Render a raster scene through the Qt 6 PreviewFxManager flipbook path and verify cached preview pixels."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=fx-preview-render-output bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-fx-preview-subcamera-render-output-qt6]
+description = "Render a raster scene through the Qt 6 PreviewFxManager sub-camera path and verify cropped cached preview pixels."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=fx-preview-subcamera-render-output bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-fx-preview-flipbook-controls-qt6]
+description = "Exercise Qt 6 FX Preview flipbook frame switching, clone, freeze, and unfreeze against two cached frames."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=fx-preview-flipbook-controls bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-fx-preview-save-previewed-frames-qt6]
+description = "Save two Qt 6 FX Preview flipbook frames to PNG and verify the exported pixels."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=fx-preview-save-previewed-frames bash scripts/qt6/run-gui-smoke.sh"
+
 [tasks.gui-smoke-final-render-output-qt6]
-description = "Render a camera-DPI red raster scene through Qt 6 MovieRenderer and verify the PNG output pixels."
+description = "Render a standard-DPI red raster scene through Qt 6 MovieRenderer and verify the PNG output pixels."
 run = "OPENTOONZ_GUI_SMOKE_ACTION=final-render-output bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-final-render-background-output-qt6]
+description = "Render a partial red raster scene over an opaque blue background through Qt 6 MovieRenderer and verify PNG output pixels."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=final-render-background-output bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-final-render-sequence-output-qt6]
+description = "Render a two-frame red/green raster scene through Qt 6 MovieRenderer and verify PNG sequence output pixels."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=final-render-sequence-output bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-final-render-composite-output-qt6]
+description = "Render two raster columns through Qt 6 MovieRenderer and verify red/green composite PNG output pixels."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=final-render-composite-output bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-final-render-vector-output-qt6]
+description = "Render a red vector scene through Qt 6 MovieRenderer and verify PNG output pixels."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=final-render-vector-output bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-final-render-toonz-raster-output-qt6]
+description = "Render a color-mapped Toonz Raster scene through Qt 6 MovieRenderer and verify PNG output pixels."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=final-render-toonz-raster-output bash scripts/qt6/run-gui-smoke.sh"
+
+[tasks.gui-smoke-final-render-fx-output-qt6]
+description = "Render a blurred raster FX scene through Qt 6 MovieRenderer and verify PNG output pixels."
+run = "OPENTOONZ_GUI_SMOKE_ACTION=final-render-fx-output bash scripts/qt6/run-gui-smoke.sh"
 
 [tasks.gui-smoke-viewer-zoom-pan-qt6]
 description = "Zoom and pan a visible raster frame and verify Qt 6 SceneViewer framebuffer/high-DPI behavior."
@@ -350,6 +394,10 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_lifecycle
 description = "Run the Qt 6 app bundle against the Scene loadLevel headless script binding fixture."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_load_level.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-loadlevel-loaded Raster qt6_scene_loaded_raster 1 0001 1|qt-script-scene-loadlevel-cell 1 1 qt6_scene_loaded_raster 1' bash scripts/qt6/run-script-smoke.sh"
 
+[tasks.script-smoke-scene-loadlevel-sequence-qt6]
+description = "Run the Qt 6 app bundle against Scene loadLevel multi-frame registry and save/reopen behavior."
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_load_level_sequence.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-loadlevel-sequence-loaded Raster qt6_scene_loaded_sequence 2 0001,0002 1 qt6_scene_loaded_sequence Raster 18 Raster 22|qt-script-scene-loadlevel-sequence-cells 2 1 qt6_scene_loaded_sequence 1 qt6_scene_loaded_sequence 2|qt-script-scene-loadlevel-sequence-reopened 2 1 1 qt6_scene_loaded_sequence 1 qt6_scene_loaded_sequence 2' bash scripts/qt6/run-script-smoke.sh"
+
 [tasks.script-smoke-scene-save-reopen-qt6]
 description = "Run the Qt 6 app bundle against the Scene save/reopen headless script binding fixture."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_save_reopen.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-save-before 1 1 1 qt6_scene_saved_raster 1|qt-script-scene-save-loaded 1 1 1 qt6_scene_saved_raster 1' bash scripts/qt6/run-script-smoke.sh"
@@ -358,9 +406,17 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_save_reop
 description = "Run the Qt 6 app bundle against Scene load replacement and stale wrapper invalidation."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_reload_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-reload-first 1 1 1 qt6_scene_reload_a 1|qt-script-scene-reload-second 1 1 1 true qt6_scene_reload_b 1 Empty 0 Empty level true true|qt-script-scene-reload-third 1 1 1 true qt6_scene_reload_a 1 Empty 0 true' bash scripts/qt6/run-script-smoke.sh"
 
+[tasks.script-smoke-scene-load-failure-qt6]
+description = "Run the Qt 6 app bundle against failed Scene load wrapper-preservation behavior."
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_load_failure.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-load-failure-preserve true 1 1 qt6_scene_load_failure 1 true 2 qt6_scene_load_failure' bash scripts/qt6/run-script-smoke.sh"
+
 [tasks.script-smoke-scene-save-icon-qt6]
 description = "Run the Qt 6 app bundle against Scene save scene-icon generation in QApplication script mode."
 run = "OPENTOONZ_SCRIPT_USE_QAPPLICATION=1 OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_save_icon.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-save-icon true Raster true true' bash scripts/qt6/run-script-smoke.sh"
+
+[tasks.script-smoke-scene-save-icon-variants-qt6]
+description = "Run the Qt 6 app bundle against multi-column Scene save scene-icon generation in QApplication script mode."
+run = "OPENTOONZ_SCRIPT_USE_QAPPLICATION=1 OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_save_icon_variants.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-save-icon-variants-first true Raster true true|qt-script-scene-save-icon-variants-second true Raster true true true true' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-scene-frameids-qt6]
 description = "Run the Qt 6 app bundle against the Scene frame-id headless script binding fixture."
@@ -449,6 +505,14 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/rasterizer_edge
 [tasks.script-smoke-renderer-qt6]
 description = "Run the Qt 6 app bundle against the Renderer renderFrame/renderScene script binding fixture."
 run = "OPENTOONZ_SCRIPT_USE_QAPPLICATION=1 OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/renderer_basic.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-renderer-basic Renderer true true 0 true 0|qt-script-renderer-state 2 0 2 1 1|qt-script-renderer-frame Raster true true true Raster|qt-script-renderer-scene Raster 1 0001 Raster true true|qt-script-renderer-renderframe-error true|qt-script-renderer-renderscene-error true|qt-script-renderer-dumpcache true txt opentoonz-script-renderer-cache|qt-script-renderer-disposed -1' bash scripts/qt6/run-script-smoke.sh"
+
+[tasks.script-smoke-renderer-frames-columns-qt6]
+description = "Run the Qt 6 app bundle against Renderer frame and column selection behavior."
+run = "OPENTOONZ_SCRIPT_USE_QAPPLICATION=1 OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/renderer_frames_columns.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-renderer-frames-columns-selection 2 2 0,1 1 Raster 2 0001,0002 Raster true true|qt-script-renderer-frames-columns-frame Raster true true|qt-script-renderer-frames-columns-default 2 0001,0002 Raster true' bash scripts/qt6/run-script-smoke.sh"
+
+[tasks.script-smoke-renderer-vector-qt6]
+description = "Run the Qt 6 app bundle against Renderer vector-level input behavior."
+run = "OPENTOONZ_SCRIPT_USE_QAPPLICATION=1 OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/renderer_vector.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-renderer-vector-frame Vector Raster true true true Raster|qt-script-renderer-vector-scene Raster 1 0001 Raster true true' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-renderer-edges-qt6]
 description = "Run the Qt 6 app bundle against Renderer argument edge cases."

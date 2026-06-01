@@ -12,6 +12,7 @@
 #include "tapp.h"
 #include "iocommand.h"
 #include "previewfxmanager.h"
+#include "previewer.h"
 #include "cleanupsettingspopup.h"
 #include "filebrowsermodel.h"
 #include "expressionreferencemanager.h"
@@ -56,6 +57,7 @@
 #include "toonz/tscenehandle.h"
 #include "toonz/tonionskinmaskhandle.h"
 #include "toonz/txshcell.h"
+#include "toonz/txshcolumn.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/txsheet.h"
@@ -68,6 +70,10 @@
 #include "toonz/stagevisitor.h"
 #include "toonz/movierenderer.h"
 #include "toonz/scenefx.h"
+#include "toonz/dpiscale.h"
+#include "toonz/fxdag.h"
+#include "toonz/tcolumnfxset.h"
+#include "toonz/tcolumnfx.h"
 
 // TnzSound includes
 #include "tnzsound.h"
@@ -93,8 +99,11 @@
 #include "timagecache.h"
 #include "tofflinegl.h"
 #include "tpluginmanager.h"
+#include "tfxutil.h"
 #include "trasterimage.h"
+#include "ttoonzimage.h"
 #include "timage.h"
+#include "timageinfo.h"
 #include "tstroke.h"
 #include "tsimplecolorstyles.h"
 #include "tpalette.h"
@@ -457,6 +466,61 @@ static QString gui_smoke_joined_values(const QStringList &values) {
   return sanitized.join('|');
 }
 
+static QString gui_smoke_rect_value(const TRect &rect) {
+  return QStringLiteral("%1,%2,%3,%4")
+      .arg(rect.x0)
+      .arg(rect.y0)
+      .arg(rect.x1)
+      .arg(rect.y1);
+}
+
+static QString gui_smoke_rectd_value(const TRectD &rect) {
+  if (rect == TConsts::infiniteRectD) return QStringLiteral("infinite");
+  return QStringLiteral("%1,%2,%3,%4")
+      .arg(rect.x0, 0, 'f', 3)
+      .arg(rect.y0, 0, 'f', 3)
+      .arg(rect.x1, 0, 'f', 3)
+      .arg(rect.y1, 0, 'f', 3);
+}
+
+static QString gui_smoke_affine_value(const TAffine &affine) {
+  return QStringLiteral("%1,%2,%3,%4,%5,%6")
+      .arg(affine.a11, 0, 'f', 6)
+      .arg(affine.a12, 0, 'f', 6)
+      .arg(affine.a13, 0, 'f', 6)
+      .arg(affine.a21, 0, 'f', 6)
+      .arg(affine.a22, 0, 'f', 6)
+      .arg(affine.a23, 0, 'f', 6);
+}
+
+static QString gui_smoke_fx_value(TFx *fx) {
+  if (!fx) return QStringLiteral("missing");
+  return QString("%1:%2")
+      .arg(QString::fromStdString(fx->getFxType()))
+      .arg(QString::number(fx->getIdentifier()));
+}
+
+static QStringList gui_smoke_fx_bbox_details(const QString &prefix,
+                                             const TFxP &fx, double frame,
+                                             const TRenderSettings &settings) {
+  QStringList details;
+  TRasterFx *rasterFx = dynamic_cast<TRasterFx *>(fx.getPointer());
+  TRectD bbox;
+  const bool bboxOk = rasterFx && rasterFx->getBBox(frame, bbox, settings);
+  details << QString("%1Fx=%2")
+                 .arg(prefix)
+                 .arg(gui_smoke_fx_value(fx.getPointer()))
+          << QString("%1BBoxOk=%2")
+                 .arg(prefix)
+                 .arg(bboxOk ? QStringLiteral("true")
+                              : QStringLiteral("false"))
+          << QString("%1BBox=%2")
+                 .arg(prefix)
+                 .arg(bboxOk ? gui_smoke_rectd_value(bbox)
+                              : QStringLiteral("none"));
+  return details;
+}
+
 static void gui_smoke_pump_events(int msec = 50) {
   QApplication::processEvents(QEventLoop::AllEvents, msec);
   QEventLoop loop;
@@ -472,6 +536,20 @@ static int gui_smoke_visible_flipbook_count() {
     if (flipBook && flipBook->isVisible()) ++count;
   }
   return count;
+}
+
+static std::vector<FlipBook *> gui_smoke_visible_preview_flipbooks(
+    TFx *fx, TXsheet *xsheet) {
+  std::vector<FlipBook *> flipbooks;
+  for (QWidget *widget : QApplication::allWidgets()) {
+    FlipBook *flipbook = qobject_cast<FlipBook *>(widget);
+    if (flipbook && flipbook->isVisible() &&
+        flipbook->getPreviewedFx() == fx &&
+        flipbook->getPreviewXsheet() == xsheet) {
+      flipbooks.push_back(flipbook);
+    }
+  }
+  return flipbooks;
 }
 
 static QStringList gui_smoke_script_console_view_details() {
@@ -628,6 +706,7 @@ struct GuiSmokeRasterStats {
   int sampleCount  = 0;
   int opaquePixels = 0;
   int redPixels    = 0;
+  int greenPixels  = 0;
 };
 
 static bool gui_smoke_is_onion_pixel(int red, int green, int blue) {
@@ -934,6 +1013,10 @@ static GuiSmokeRasterStats gui_smoke_analyze_raster_frame(
           pixel.r > pixel.b * 2) {
         ++stats.redPixels;
       }
+      if (pixel.m > 0 && pixel.g > 120 && pixel.g > pixel.r * 2 &&
+          pixel.g > pixel.b * 2) {
+        ++stats.greenPixels;
+      }
     }
   }
   raster->unlock();
@@ -957,6 +1040,9 @@ static GuiSmokeRasterStats gui_smoke_analyze_raster_pixels(
         if (pixel.m > 0 && pixel.r > 120 && pixel.r > pixel.g * 2 &&
             pixel.r > pixel.b * 2)
           ++stats.redPixels;
+        if (pixel.m > 0 && pixel.g > 120 && pixel.g > pixel.r * 2 &&
+            pixel.g > pixel.b * 2)
+          ++stats.greenPixels;
       }
     }
     raster->unlock();
@@ -974,12 +1060,25 @@ static GuiSmokeRasterStats gui_smoke_analyze_raster_pixels(
         if (pixel.m > 30840 && pixel.r > 30840 && pixel.r > pixel.g * 2 &&
             pixel.r > pixel.b * 2)
           ++stats.redPixels;
+        if (pixel.m > 30840 && pixel.g > 30840 && pixel.g > pixel.r * 2 &&
+            pixel.g > pixel.b * 2)
+          ++stats.greenPixels;
       }
     }
     raster->unlock();
   }
 
   return stats;
+}
+
+static TRasterP gui_smoke_raster_from_image(const TImageP &image) {
+  if (!image) return TRasterP();
+
+  TRasterImageP rasterImage = (TRasterImageP)image;
+  if (rasterImage) return rasterImage->getRaster();
+
+  TToonzImageP toonzImage = (TToonzImageP)image;
+  return toonzImage ? TRasterP(toonzImage->getRaster()) : TRasterP();
 }
 
 static bool gui_smoke_prepare_red_palette(TXshSimpleLevel *level) {
@@ -1204,6 +1303,56 @@ static void gui_smoke_add_raster_probe_frame(
   level->setDirtyFlag(true);
 }
 
+static void gui_smoke_add_raster_rect_probe_frame(
+    TXshSimpleLevel *level, const TFrameId &fid, const TDimension &size,
+    const TRect &rect, const TPixel32 &color, const TPointD &dpi = TPointD()) {
+  TRaster32P raster(size.lx, size.ly);
+  raster->clear();
+  raster->lock();
+  const int left   = std::max(0, std::min(rect.x0, rect.x1));
+  const int right  = std::min(raster->getLx(), std::max(rect.x0, rect.x1));
+  const int top    = std::max(0, std::min(rect.y0, rect.y1));
+  const int bottom = std::min(raster->getLy(), std::max(rect.y0, rect.y1));
+  for (int y = top; y < bottom; ++y) {
+    TPixel32 *scanLine = raster->pixels(y);
+    for (int x = left; x < right; ++x) scanLine[x] = color;
+  }
+  raster->unlock();
+
+  TRasterImageP image(raster);
+  if (dpi.x > 0.0 && dpi.y > 0.0) image->setDpi(dpi.x, dpi.y);
+  level->setFrame(fid, image);
+  level->setDirtyFlag(true);
+}
+
+static bool gui_smoke_add_toonz_raster_rect_probe_frame(
+    TXshSimpleLevel *level, const TFrameId &fid, const TDimension &size,
+    const TRect &rect, const TPointD &dpi = TPointD()) {
+  if (!gui_smoke_prepare_red_palette(level)) return false;
+
+  TRasterCM32P raster(size.lx, size.ly);
+  raster->fill(TPixelCM32(0, 0, 255));
+  raster->lock();
+  const int left   = std::max(0, std::min(rect.x0, rect.x1));
+  const int right  = std::min(raster->getLx(), std::max(rect.x0, rect.x1));
+  const int top    = std::max(0, std::min(rect.y0, rect.y1));
+  const int bottom = std::min(raster->getLy(), std::max(rect.y0, rect.y1));
+  for (int y = top; y < bottom; ++y) {
+    TPixelCM32 *scanLine = raster->pixels(y);
+    for (int x = left; x < right; ++x) {
+      scanLine[x] = TPixelCM32(0, 1, 255);
+    }
+  }
+  raster->unlock();
+
+  TToonzImageP image(raster, raster->getBounds());
+  image->setPalette(level->getPalette());
+  if (dpi.x > 0.0 && dpi.y > 0.0) image->setDpi(dpi.x, dpi.y);
+  level->setFrame(fid, image);
+  level->setDirtyFlag(true);
+  return true;
+}
+
 static void gui_smoke_add_transparent_raster_probe_frame(
     TXshSimpleLevel *level, const TFrameId &fid, const TPixel32 &color,
     int x0, int y0, int x1, int y1) {
@@ -1334,6 +1483,56 @@ static QStringList gui_smoke_viewer_render_details(
   return details;
 }
 
+class GuiSmokePreviewRenderListener final : public Previewer::Listener {
+  TRectD m_previewRect;
+
+public:
+  QEventLoop *m_loop = nullptr;
+  int m_startedFrames = 0;
+  int m_completedFrames = 0;
+  int m_failedFrames = 0;
+  int m_updateCount = 0;
+
+  explicit GuiSmokePreviewRenderListener(const TRectD &previewRect)
+      : m_previewRect(previewRect) {}
+
+  TRectD getPreviewRect() const override { return m_previewRect; }
+
+  void onRenderStarted(int) override { ++m_startedFrames; }
+
+  void onRenderCompleted(int frame) override {
+    ++m_completedFrames;
+    if (frame == 0 && m_loop)
+      QMetaObject::invokeMethod(m_loop, "quit", Qt::QueuedConnection);
+  }
+
+  void onRenderFailed(int frame) override {
+    ++m_failedFrames;
+    if (frame == 0 && m_loop)
+      QMetaObject::invokeMethod(m_loop, "quit", Qt::QueuedConnection);
+  }
+
+  void onPreviewUpdate() override { ++m_updateCount; }
+};
+
+struct GuiSmokeFxPreviewRenderProbe {
+  unsigned long m_fxId = 0;
+  int m_startedFrames  = 0;
+  int m_renderedFrames = 0;
+  bool m_frameReady    = false;
+  TDimension m_rasterSize;
+  GuiSmokeRasterStats m_stats;
+  QEventLoop *m_loop = nullptr;
+
+  explicit GuiSmokeFxPreviewRenderProbe(unsigned long fxId) : m_fxId(fxId) {}
+
+  bool accepts(unsigned long fxId, const TRenderPort::RenderData &renderData) {
+    return fxId == m_fxId &&
+           std::find(renderData.m_frames.begin(), renderData.m_frames.end(),
+                     0) != renderData.m_frames.end();
+  }
+};
+
 class GuiSmokeFinalRenderListener final : public MovieRenderer::Listener {
 public:
   QEventLoop *m_loop = nullptr;
@@ -1386,19 +1585,1198 @@ public:
   }
 };
 
-static QString gui_smoke_find_final_render_output(const QString &outputDir) {
+static QStringList gui_smoke_preview_render_output_details(
+    const QString &requestedSceneName) {
+  QStringList details;
+  QString sceneName   = gui_smoke_scene_name(requestedSceneName);
+  TFilePath scenePath = gui_smoke_scene_path(sceneName);
+  if (!TSystem::touchParentDir(scenePath)) {
+    details << QStringLiteral("previewRenderProbe=scene-folder-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  IoCmd::newScene();
+  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+  scene->setScenePath(scenePath);
+  TApp::instance()->getCurrentScene()->notifySceneSwitched();
+  TApp::instance()->getCurrentScene()->notifyNameSceneChange();
+
+  TCamera *camera = scene->getCurrentCamera();
+  camera->setRes(TDimension(320, 240));
+  const double renderDpi = Stage::standardDpi;
+  camera->setSize(TDimensionD(camera->getRes().lx / renderDpi,
+                              camera->getRes().ly / renderDpi));
+
+  TOutputProperties *previewProperties =
+      scene->getProperties()->getPreviewProperties();
+  previewProperties->setRange(0, 0, 1);
+  previewProperties->setThreadIndex(0);
+  previewProperties->setMaxTileSizeIndex(1);
+  TRenderSettings previewSettings = previewProperties->getRenderSettings();
+  previewSettings.m_bpp                 = 32;
+  previewSettings.m_shrinkX             = 1;
+  previewSettings.m_shrinkY             = 1;
+  previewSettings.m_applyShrinkToViewer = false;
+  previewSettings.m_stereoscopic        = false;
+  previewSettings.m_getFullSizeBBox     = false;
+  previewSettings.m_cameraBox =
+      TRectD(TPointD(-160.0, -120.0), TDimensionD(320.0, 240.0));
+  previewProperties->setRenderSettings(previewSettings);
+
+  TXshLevel *levelXl =
+      scene->createNewLevel(OVL_XSHLEVEL, L"qt6_gui_preview_render_raster");
+  TXshSimpleLevel *simpleLevel = levelXl ? levelXl->getSimpleLevel() : nullptr;
+  if (!simpleLevel) {
+    details << QStringLiteral("previewRenderProbe=level-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  const TFrameId fid(1);
+  gui_smoke_add_raster_rect_probe_frame(
+      simpleLevel, fid, TDimension(320, 240), TRect(0, 0, 320, 240),
+      TPixel32(232, 24, 24, 255), camera->getDpi());
+
+  TXsheet *xsheet = scene->getXsheet();
+  if (!xsheet->setCell(0, 0, TXshCell(simpleLevel, fid))) {
+    details << QStringLiteral("previewRenderProbe=xsheet-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  TApp::instance()->getCurrentFrame()->setFrame(0);
+  TApp::instance()->getCurrentColumn()->setColumnIndex(0);
+  TApp::instance()->getCurrentLevel()->setLevel(levelXl);
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  TApp::instance()->getCurrentScene()->notifySceneChanged();
+  TApp::instance()->getCurrentLevel()->notifyLevelChange();
+  gui_smoke_pump_events(100);
+
+  const TRectD previewRect(TPointD(-160.0, -120.0),
+                           TDimensionD(320.0, 240.0));
+  GuiSmokePreviewRenderListener listener(previewRect);
+  Previewer *previewer = Previewer::instance(false);
+  previewer->addListener(&listener);
+  previewer->clear();
+  previewer->update();
+
+  QEventLoop loop;
+  QTimer timeoutTimer;
+  timeoutTimer.setSingleShot(true);
+  listener.m_loop = &loop;
+  QObject::connect(&timeoutTimer, &QTimer::timeout, &loop, &QEventLoop::quit);
+
+  previewer->addFramesToRenderQueue(std::vector<int>{0});
+  if (!previewer->isFrameReady(0) && listener.m_failedFrames == 0) {
+    timeoutTimer.start(15000);
+    loop.exec();
+  }
+  timeoutTimer.stop();
+  gui_smoke_pump_events(100);
+
+  const bool frameReady  = previewer->isFrameReady(0);
+  const bool previewBusy = previewer->isBusy();
+  TRasterP previewRaster = previewer->getRaster(0, false);
+  const GuiSmokeRasterStats previewStats =
+      gui_smoke_analyze_raster_pixels(previewRaster);
+  const TDimension previewSize =
+      previewRaster ? previewRaster->getSize() : TDimension();
+  const bool previewOk = frameReady && previewRaster &&
+                         previewSize == TDimension(320, 240) &&
+                         listener.m_failedFrames == 0 &&
+                         previewStats.redPixels > 1000;
+
+  previewer->removeListener(&listener);
+  previewer->clear(0);
+  listener.m_loop = nullptr;
+
+  details << QString("scene=%1").arg(scenePath.getQString())
+          << QStringLiteral("previewRenderSource=raster-scene-standard-dpi")
+          << QString("previewRenderFrameReady=%1")
+                 .arg(frameReady ? QStringLiteral("true")
+                                 : QStringLiteral("false"))
+          << QString("previewRenderBusy=%1")
+                 .arg(previewBusy ? QStringLiteral("true")
+                                  : QStringLiteral("false"))
+          << QString("previewRenderStartedFrames=%1")
+                 .arg(listener.m_startedFrames)
+          << QString("previewRenderCompletedFrames=%1")
+                 .arg(listener.m_completedFrames)
+          << QString("previewRenderFailedFrames=%1")
+                 .arg(listener.m_failedFrames)
+          << QString("previewRenderUpdateCount=%1").arg(listener.m_updateCount)
+          << QString("previewRenderRasterWidth=%1").arg(previewSize.lx)
+          << QString("previewRenderRasterHeight=%1").arg(previewSize.ly)
+          << QString("previewRenderSampleCount=%1")
+                 .arg(previewStats.sampleCount)
+          << QString("previewRenderOpaquePixels=%1")
+                 .arg(previewStats.opaquePixels)
+          << QString("previewRenderRedPixels=%1").arg(previewStats.redPixels)
+          << QString("previewRenderProbe=%1")
+                 .arg(previewOk ? QStringLiteral("ok")
+                                : QStringLiteral("error"));
+
+  return details;
+}
+
+static QStringList gui_smoke_fx_preview_render_output_details(
+    const QString &requestedSceneName) {
+  QStringList details;
+  QString sceneName   = gui_smoke_scene_name(requestedSceneName);
+  TFilePath scenePath = gui_smoke_scene_path(sceneName);
+  if (!TSystem::touchParentDir(scenePath)) {
+    details << QStringLiteral("fxPreviewRenderProbe=scene-folder-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  IoCmd::newScene();
+  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+  scene->setScenePath(scenePath);
+  TApp::instance()->getCurrentScene()->notifySceneSwitched();
+  TApp::instance()->getCurrentScene()->notifyNameSceneChange();
+
+  TCamera *camera = scene->getCurrentCamera();
+  camera->setRes(TDimension(320, 240));
+  const double renderDpi = Stage::standardDpi;
+  camera->setSize(TDimensionD(camera->getRes().lx / renderDpi,
+                              camera->getRes().ly / renderDpi));
+
+  TOutputProperties *previewProperties =
+      scene->getProperties()->getPreviewProperties();
+  previewProperties->setRange(0, 0, 1);
+  previewProperties->setThreadIndex(0);
+  previewProperties->setMaxTileSizeIndex(1);
+  TRenderSettings previewSettings = previewProperties->getRenderSettings();
+  previewSettings.m_bpp                 = 32;
+  previewSettings.m_shrinkX             = 1;
+  previewSettings.m_shrinkY             = 1;
+  previewSettings.m_applyShrinkToViewer = false;
+  previewSettings.m_stereoscopic        = false;
+  previewSettings.m_getFullSizeBBox     = false;
+  previewSettings.m_cameraBox =
+      TRectD(TPointD(-160.0, -120.0), TDimensionD(320.0, 240.0));
+  previewProperties->setRenderSettings(previewSettings);
+
+  TXshLevel *levelXl =
+      scene->createNewLevel(OVL_XSHLEVEL, L"qt6_gui_fx_preview_render_raster");
+  TXshSimpleLevel *simpleLevel = levelXl ? levelXl->getSimpleLevel() : nullptr;
+  if (!simpleLevel) {
+    details << QStringLiteral("fxPreviewRenderProbe=level-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  const TFrameId fid(1);
+  gui_smoke_add_raster_rect_probe_frame(
+      simpleLevel, fid, TDimension(320, 240), TRect(0, 0, 320, 240),
+      TPixel32(232, 24, 24, 255), camera->getDpi());
+
+  TXsheet *xsheet = scene->getXsheet();
+  if (!xsheet->setCell(0, 0, TXshCell(simpleLevel, fid))) {
+    details << QStringLiteral("fxPreviewRenderProbe=xsheet-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  TApp::instance()->getCurrentFrame()->setFrame(0);
+  TApp::instance()->getCurrentColumn()->setColumnIndex(0);
+  TApp::instance()->getCurrentLevel()->setLevel(levelXl);
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  TApp::instance()->getCurrentScene()->notifySceneChanged();
+  TApp::instance()->getCurrentLevel()->notifyLevelChange();
+  gui_smoke_pump_events(100);
+
+  TXshColumn *column = xsheet->getColumn(0);
+  TFx *columnFx      = column ? column->getFx() : nullptr;
+  if (!columnFx) {
+    details << QStringLiteral("fxPreviewRenderProbe=column-fx-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  const TFxP previewFx(columnFx);
+  const unsigned long previewFxId = previewFx->getIdentifier();
+  const std::string cacheId =
+      std::to_string(previewFxId) + ".noext" + std::to_string(0);
+
+  PreviewFxManager *manager = PreviewFxManager::instance();
+  manager->reset(true);
+  TImageCache::instance()->remove(cacheId);
+  gui_smoke_pump_events(100);
+
+  GuiSmokeFxPreviewRenderProbe probe(previewFxId);
+  QEventLoop loop;
+  QTimer timeoutTimer;
+  timeoutTimer.setSingleShot(true);
+  probe.m_loop = &loop;
+
+  QMetaObject::Connection startedConnection =
+      QObject::connect(manager, &PreviewFxManager::startedFrame,
+                       QCoreApplication::instance(),
+                       [&probe](unsigned long fxId,
+                                TRenderPort::RenderData renderData) {
+                         if (probe.accepts(fxId, renderData))
+                           ++probe.m_startedFrames;
+                       });
+  QMetaObject::Connection renderedConnection =
+      QObject::connect(manager, &PreviewFxManager::renderedFrame,
+                       QCoreApplication::instance(),
+                       [&probe, &cacheId](unsigned long fxId,
+                                          TRenderPort::RenderData renderData) {
+                         if (!probe.accepts(fxId, renderData)) return;
+
+                         ++probe.m_renderedFrames;
+                         TRasterImageP image =
+                             (TRasterImageP)TImageCache::instance()->get(
+                                 cacheId, false);
+                         TRasterP raster = image ? image->getRaster()
+                                                 : TRasterP();
+                         probe.m_frameReady = (bool)raster;
+                         if (raster) {
+                           probe.m_rasterSize = raster->getSize();
+                           probe.m_stats = gui_smoke_analyze_raster_pixels(
+                               raster);
+                         }
+                         if (probe.m_loop)
+                           QMetaObject::invokeMethod(
+                               probe.m_loop, "quit", Qt::QueuedConnection);
+                       });
+  QObject::connect(&timeoutTimer, &QTimer::timeout, &loop, &QEventLoop::quit);
+
+  FlipBook *flipbook = manager->showNewPreview(previewFx, false);
+  gui_smoke_pump_events(100);
+  if (!probe.m_frameReady && probe.m_renderedFrames == 0) {
+    timeoutTimer.start(15000);
+    loop.exec();
+  }
+  timeoutTimer.stop();
+  gui_smoke_pump_events(100);
+
+  if (!probe.m_frameReady) {
+    TRasterImageP image =
+        (TRasterImageP)TImageCache::instance()->get(cacheId, false);
+    TRasterP raster = image ? image->getRaster() : TRasterP();
+    probe.m_frameReady = (bool)raster;
+    if (raster) {
+      probe.m_rasterSize = raster->getSize();
+      probe.m_stats      = gui_smoke_analyze_raster_pixels(raster);
+    }
+  }
+
+  const bool flipbookOk = flipbook && flipbook->getPreviewedFx() == columnFx &&
+                          flipbook->getPreviewXsheet() == xsheet;
+  const bool previewOk = flipbookOk && probe.m_frameReady &&
+                         probe.m_renderedFrames > 0 &&
+                         probe.m_rasterSize == TDimension(320, 240) &&
+                         probe.m_stats.redPixels > 1000;
+
+  QObject::disconnect(startedConnection);
+  QObject::disconnect(renderedConnection);
+  probe.m_loop = nullptr;
+
+  if (flipbook) manager->detach(flipbook);
+  TImageCache::instance()->remove(cacheId);
+
+  details << QString("scene=%1").arg(scenePath.getQString())
+          << QStringLiteral("fxPreviewRenderSource=column-fx-raster-scene")
+          << QString("fxPreviewRenderFxId=%1").arg(previewFxId)
+          << QString("fxPreviewRenderCacheId=%1")
+                 .arg(QString::fromStdString(cacheId))
+          << QString("fxPreviewRenderFlipbook=%1")
+                 .arg(flipbook ? QStringLiteral("true")
+                               : QStringLiteral("false"))
+          << QString("fxPreviewRenderFlipbookAttached=%1")
+                 .arg(flipbookOk ? QStringLiteral("true")
+                                 : QStringLiteral("false"))
+          << QString("fxPreviewRenderStartedFrames=%1")
+                 .arg(probe.m_startedFrames)
+          << QString("fxPreviewRenderCompletedFrames=%1")
+                 .arg(probe.m_renderedFrames)
+          << QString("fxPreviewRenderFrameReady=%1")
+                 .arg(probe.m_frameReady ? QStringLiteral("true")
+                                         : QStringLiteral("false"))
+          << QString("fxPreviewRenderRasterWidth=%1").arg(probe.m_rasterSize.lx)
+          << QString("fxPreviewRenderRasterHeight=%1")
+                 .arg(probe.m_rasterSize.ly)
+          << QString("fxPreviewRenderSampleCount=%1")
+                 .arg(probe.m_stats.sampleCount)
+          << QString("fxPreviewRenderOpaquePixels=%1")
+                 .arg(probe.m_stats.opaquePixels)
+          << QString("fxPreviewRenderRedPixels=%1")
+                 .arg(probe.m_stats.redPixels)
+          << QString("fxPreviewRenderProbe=%1")
+                 .arg(previewOk ? QStringLiteral("ok")
+                                : QStringLiteral("error"));
+
+  return details;
+}
+
+static QStringList gui_smoke_fx_preview_subcamera_render_output_details(
+    const QString &requestedSceneName) {
+  QStringList details;
+  QString sceneName   = gui_smoke_scene_name(requestedSceneName);
+  TFilePath scenePath = gui_smoke_scene_path(sceneName);
+  if (!TSystem::touchParentDir(scenePath)) {
+    details << QStringLiteral("fxPreviewSubcameraProbe=scene-folder-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  IoCmd::newScene();
+  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+  scene->setScenePath(scenePath);
+  TApp::instance()->getCurrentScene()->notifySceneSwitched();
+  TApp::instance()->getCurrentScene()->notifyNameSceneChange();
+
+  TCamera *camera = scene->getCurrentCamera();
+  camera->setRes(TDimension(320, 240));
+  const double renderDpi = Stage::standardDpi;
+  camera->setSize(TDimensionD(camera->getRes().lx / renderDpi,
+                              camera->getRes().ly / renderDpi));
+
+  TCamera *previewCamera = scene->getCurrentPreviewCamera();
+  if (previewCamera != camera) {
+    previewCamera->setRes(TDimension(320, 240));
+    previewCamera->setSize(TDimensionD(previewCamera->getRes().lx / renderDpi,
+                                       previewCamera->getRes().ly / renderDpi));
+  }
+  const TRect subcameraRect(80, 60, 239, 179);
+  previewCamera->setInterestRect(subcameraRect);
+  const TDimension subcameraSize(subcameraRect.getLx(),
+                                 subcameraRect.getLy());
+
+  TOutputProperties *previewProperties =
+      scene->getProperties()->getPreviewProperties();
+  previewProperties->setRange(0, 0, 1);
+  previewProperties->setThreadIndex(0);
+  previewProperties->setMaxTileSizeIndex(1);
+  previewProperties->setSubcameraPreview(true);
+  TRenderSettings previewSettings = previewProperties->getRenderSettings();
+  previewSettings.m_bpp                 = 32;
+  previewSettings.m_shrinkX             = 1;
+  previewSettings.m_shrinkY             = 1;
+  previewSettings.m_applyShrinkToViewer = false;
+  previewSettings.m_stereoscopic        = false;
+  previewSettings.m_getFullSizeBBox     = false;
+  previewSettings.m_cameraBox =
+      TRectD(TPointD(-160.0, -120.0), TDimensionD(320.0, 240.0));
+  previewProperties->setRenderSettings(previewSettings);
+
+  TXshLevel *levelXl = scene->createNewLevel(
+      OVL_XSHLEVEL, L"qt6_gui_fx_preview_subcamera_raster");
+  TXshSimpleLevel *simpleLevel = levelXl ? levelXl->getSimpleLevel() : nullptr;
+  if (!simpleLevel) {
+    details << QStringLiteral("fxPreviewSubcameraProbe=level-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  const TFrameId fid(1);
+  gui_smoke_add_raster_rect_probe_frame(
+      simpleLevel, fid, TDimension(320, 240), TRect(0, 0, 320, 240),
+      TPixel32(232, 24, 24, 255), camera->getDpi());
+
+  TXsheet *xsheet = scene->getXsheet();
+  if (!xsheet->setCell(0, 0, TXshCell(simpleLevel, fid))) {
+    details << QStringLiteral("fxPreviewSubcameraProbe=xsheet-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  TApp::instance()->getCurrentFrame()->setFrame(0);
+  TApp::instance()->getCurrentColumn()->setColumnIndex(0);
+  TApp::instance()->getCurrentLevel()->setLevel(levelXl);
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  TApp::instance()->getCurrentScene()->notifySceneChanged();
+  TApp::instance()->getCurrentLevel()->notifyLevelChange();
+  gui_smoke_pump_events(100);
+
+  TXshColumn *column = xsheet->getColumn(0);
+  TFx *columnFx      = column ? column->getFx() : nullptr;
+  if (!columnFx) {
+    details << QStringLiteral("fxPreviewSubcameraProbe=column-fx-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  const TFxP previewFx(columnFx);
+  const unsigned long previewFxId = previewFx->getIdentifier();
+  const std::string cacheId =
+      std::to_string(previewFxId) + ".noext" + std::to_string(0);
+
+  PreviewFxManager *manager = PreviewFxManager::instance();
+  manager->reset(true);
+  TImageCache::instance()->remove(cacheId);
+  gui_smoke_pump_events(100);
+
+  GuiSmokeFxPreviewRenderProbe probe(previewFxId);
+  QEventLoop loop;
+  QTimer timeoutTimer;
+  timeoutTimer.setSingleShot(true);
+  probe.m_loop = &loop;
+
+  QMetaObject::Connection startedConnection =
+      QObject::connect(manager, &PreviewFxManager::startedFrame,
+                       QCoreApplication::instance(),
+                       [&probe](unsigned long fxId,
+                                TRenderPort::RenderData renderData) {
+                         if (probe.accepts(fxId, renderData))
+                           ++probe.m_startedFrames;
+                       });
+  QMetaObject::Connection renderedConnection =
+      QObject::connect(manager, &PreviewFxManager::renderedFrame,
+                       QCoreApplication::instance(),
+                       [&probe, &cacheId](unsigned long fxId,
+                                          TRenderPort::RenderData renderData) {
+                         if (!probe.accepts(fxId, renderData)) return;
+
+                         ++probe.m_renderedFrames;
+                         TRasterImageP image =
+                             (TRasterImageP)TImageCache::instance()->get(
+                                 cacheId, false);
+                         TRasterP raster = image ? image->getRaster()
+                                                 : TRasterP();
+                         probe.m_frameReady = (bool)raster;
+                         if (raster) {
+                           probe.m_rasterSize = raster->getSize();
+                           probe.m_stats = gui_smoke_analyze_raster_pixels(
+                               raster);
+                         }
+                         if (probe.m_loop)
+                           QMetaObject::invokeMethod(
+                               probe.m_loop, "quit", Qt::QueuedConnection);
+                       });
+  QObject::connect(&timeoutTimer, &QTimer::timeout, &loop, &QEventLoop::quit);
+
+  FlipBook *flipbook = manager->showNewPreview(previewFx, false);
+  gui_smoke_pump_events(100);
+  if (!probe.m_frameReady && probe.m_renderedFrames == 0) {
+    timeoutTimer.start(15000);
+    loop.exec();
+  }
+  timeoutTimer.stop();
+  gui_smoke_pump_events(100);
+
+  if (!probe.m_frameReady) {
+    TRasterImageP image =
+        (TRasterImageP)TImageCache::instance()->get(cacheId, false);
+    TRasterP raster = image ? image->getRaster() : TRasterP();
+    probe.m_frameReady = (bool)raster;
+    if (raster) {
+      probe.m_rasterSize = raster->getSize();
+      probe.m_stats      = gui_smoke_analyze_raster_pixels(raster);
+    }
+  }
+
+  const bool flipbookOk = flipbook && flipbook->getPreviewedFx() == columnFx &&
+                          flipbook->getPreviewXsheet() == xsheet;
+  const bool subcameraActive = manager->isSubCameraActive(previewFx);
+  const bool previewOk = flipbookOk && subcameraActive && probe.m_frameReady &&
+                         probe.m_renderedFrames > 0 &&
+                         probe.m_rasterSize == subcameraSize &&
+                         probe.m_stats.redPixels > 1000;
+
+  QObject::disconnect(startedConnection);
+  QObject::disconnect(renderedConnection);
+  probe.m_loop = nullptr;
+
+  if (flipbook) manager->detach(flipbook);
+  TImageCache::instance()->remove(cacheId);
+
+  details << QString("scene=%1").arg(scenePath.getQString())
+          << QStringLiteral("fxPreviewSubcameraSource=column-fx-raster-scene")
+          << QString("fxPreviewSubcameraFxId=%1").arg(previewFxId)
+          << QString("fxPreviewSubcameraCacheId=%1")
+                 .arg(QString::fromStdString(cacheId))
+          << QString("fxPreviewSubcameraRect=%1,%2,%3,%4")
+                 .arg(subcameraRect.x0)
+                 .arg(subcameraRect.y0)
+                 .arg(subcameraRect.x1)
+                 .arg(subcameraRect.y1)
+          << QString("fxPreviewSubcameraExpectedWidth=%1")
+                 .arg(subcameraSize.lx)
+          << QString("fxPreviewSubcameraExpectedHeight=%1")
+                 .arg(subcameraSize.ly)
+          << QString("fxPreviewSubcameraFlipbook=%1")
+                 .arg(flipbook ? QStringLiteral("true")
+                               : QStringLiteral("false"))
+          << QString("fxPreviewSubcameraFlipbookAttached=%1")
+                 .arg(flipbookOk ? QStringLiteral("true")
+                                 : QStringLiteral("false"))
+          << QString("fxPreviewSubcameraActive=%1")
+                 .arg(subcameraActive ? QStringLiteral("true")
+                                      : QStringLiteral("false"))
+          << QString("fxPreviewSubcameraStartedFrames=%1")
+                 .arg(probe.m_startedFrames)
+          << QString("fxPreviewSubcameraCompletedFrames=%1")
+                 .arg(probe.m_renderedFrames)
+          << QString("fxPreviewSubcameraFrameReady=%1")
+                 .arg(probe.m_frameReady ? QStringLiteral("true")
+                                         : QStringLiteral("false"))
+          << QString("fxPreviewSubcameraRasterWidth=%1")
+                 .arg(probe.m_rasterSize.lx)
+          << QString("fxPreviewSubcameraRasterHeight=%1")
+                 .arg(probe.m_rasterSize.ly)
+          << QString("fxPreviewSubcameraSampleCount=%1")
+                 .arg(probe.m_stats.sampleCount)
+          << QString("fxPreviewSubcameraOpaquePixels=%1")
+                 .arg(probe.m_stats.opaquePixels)
+          << QString("fxPreviewSubcameraRedPixels=%1")
+                 .arg(probe.m_stats.redPixels)
+          << QString("fxPreviewSubcameraProbe=%1")
+                 .arg(previewOk ? QStringLiteral("ok")
+                                : QStringLiteral("error"));
+
+  return details;
+}
+
+static QStringList gui_smoke_fx_preview_flipbook_controls_details(
+    const QString &requestedSceneName) {
+  QStringList details;
+  QString sceneName   = gui_smoke_scene_name(requestedSceneName);
+  TFilePath scenePath = gui_smoke_scene_path(sceneName);
+  if (!TSystem::touchParentDir(scenePath)) {
+    details << QStringLiteral("fxPreviewFlipbookControlsProbe=scene-folder-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  IoCmd::newScene();
+  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+  scene->setScenePath(scenePath);
+  TApp::instance()->getCurrentScene()->notifySceneSwitched();
+  TApp::instance()->getCurrentScene()->notifyNameSceneChange();
+
+  TCamera *camera = scene->getCurrentCamera();
+  camera->setRes(TDimension(320, 240));
+  const double renderDpi = Stage::standardDpi;
+  camera->setSize(TDimensionD(camera->getRes().lx / renderDpi,
+                              camera->getRes().ly / renderDpi));
+
+  TOutputProperties *previewProperties =
+      scene->getProperties()->getPreviewProperties();
+  previewProperties->setRange(0, 1, 1);
+  previewProperties->setThreadIndex(0);
+  previewProperties->setMaxTileSizeIndex(1);
+  previewProperties->setSubcameraPreview(false);
+  TRenderSettings previewSettings = previewProperties->getRenderSettings();
+  previewSettings.m_bpp                 = 32;
+  previewSettings.m_shrinkX             = 1;
+  previewSettings.m_shrinkY             = 1;
+  previewSettings.m_applyShrinkToViewer = false;
+  previewSettings.m_stereoscopic        = false;
+  previewSettings.m_getFullSizeBBox     = false;
+  previewSettings.m_cameraBox =
+      TRectD(TPointD(-160.0, -120.0), TDimensionD(320.0, 240.0));
+  previewProperties->setRenderSettings(previewSettings);
+
+  TXshLevel *levelXl = scene->createNewLevel(
+      OVL_XSHLEVEL, L"qt6_gui_fx_preview_flipbook_controls_raster");
+  TXshSimpleLevel *simpleLevel = levelXl ? levelXl->getSimpleLevel() : nullptr;
+  if (!simpleLevel) {
+    details << QStringLiteral("fxPreviewFlipbookControlsProbe=level-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  const TFrameId firstFid(1);
+  const TFrameId secondFid(2);
+  gui_smoke_add_raster_rect_probe_frame(
+      simpleLevel, firstFid, TDimension(320, 240), TRect(0, 0, 320, 240),
+      TPixel32(232, 24, 24, 255), camera->getDpi());
+  gui_smoke_add_raster_rect_probe_frame(
+      simpleLevel, secondFid, TDimension(320, 240), TRect(0, 0, 320, 240),
+      TPixel32(24, 232, 24, 255), camera->getDpi());
+
+  TXsheet *xsheet = scene->getXsheet();
+  if (!xsheet->setCell(0, 0, TXshCell(simpleLevel, firstFid)) ||
+      !xsheet->setCell(1, 0, TXshCell(simpleLevel, secondFid))) {
+    details << QStringLiteral("fxPreviewFlipbookControlsProbe=xsheet-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  TApp::instance()->getCurrentFrame()->setFrame(0);
+  TApp::instance()->getCurrentColumn()->setColumnIndex(0);
+  TApp::instance()->getCurrentLevel()->setLevel(levelXl);
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  TApp::instance()->getCurrentScene()->notifySceneChanged();
+  TApp::instance()->getCurrentLevel()->notifyLevelChange();
+  gui_smoke_pump_events(100);
+
+  TXshColumn *column = xsheet->getColumn(0);
+  TFx *columnFx      = column ? column->getFx() : nullptr;
+  if (!columnFx) {
+    details << QStringLiteral("fxPreviewFlipbookControlsProbe=column-fx-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  const TFxP previewFx(columnFx);
+  const unsigned long previewFxId = previewFx->getIdentifier();
+  const std::string firstCacheId =
+      std::to_string(previewFxId) + ".noext" + std::to_string(0);
+  const std::string secondCacheId =
+      std::to_string(previewFxId) + ".noext" + std::to_string(1);
+
+  PreviewFxManager *manager = PreviewFxManager::instance();
+  manager->reset(true);
+  TImageCache::instance()->remove(firstCacheId);
+  TImageCache::instance()->remove(secondCacheId);
+  gui_smoke_pump_events(100);
+
+  int startedFrames  = 0;
+  int renderedFrames = 0;
+  QMetaObject::Connection startedConnection =
+      QObject::connect(manager, &PreviewFxManager::startedFrame,
+                       QCoreApplication::instance(),
+                       [&](unsigned long fxId,
+                           TRenderPort::RenderData renderData) {
+                         if (fxId != previewFxId) return;
+                         for (int frame : renderData.m_frames) {
+                           if (frame == 0 || frame == 1) ++startedFrames;
+                         }
+                       });
+  QMetaObject::Connection renderedConnection =
+      QObject::connect(manager, &PreviewFxManager::renderedFrame,
+                       QCoreApplication::instance(),
+                       [&](unsigned long fxId,
+                           TRenderPort::RenderData renderData) {
+                         if (fxId != previewFxId) return;
+                         for (int frame : renderData.m_frames) {
+                           if (frame == 0 || frame == 1) ++renderedFrames;
+                         }
+                       });
+
+  auto analyzeCacheImage = [](const std::string &cacheId, TDimension &size,
+                              GuiSmokeRasterStats &stats) {
+    TImageP image = TImageCache::instance()->get(cacheId, false);
+    TRasterP raster = gui_smoke_raster_from_image(image);
+    size            = raster ? raster->getSize() : TDimension();
+    stats           = gui_smoke_analyze_raster_pixels(raster);
+    return (bool)raster;
+  };
+
+  TDimension firstCacheSize;
+  TDimension secondCacheSize;
+  GuiSmokeRasterStats firstCacheStats;
+  GuiSmokeRasterStats secondCacheStats;
+  bool firstFrameReady  = false;
+  bool secondFrameReady = false;
+
+  FlipBook *flipbook = manager->showNewPreview(previewFx, false);
+  gui_smoke_pump_events(100);
+  QElapsedTimer waitTimer;
+  waitTimer.start();
+  do {
+    firstFrameReady =
+        analyzeCacheImage(firstCacheId, firstCacheSize, firstCacheStats);
+    secondFrameReady =
+        analyzeCacheImage(secondCacheId, secondCacheSize, secondCacheStats);
+    if (firstFrameReady && secondFrameReady) break;
+    gui_smoke_pump_events(100);
+  } while (waitTimer.elapsed() < 15000);
+  gui_smoke_pump_events(100);
+
+  firstFrameReady =
+      analyzeCacheImage(firstCacheId, firstCacheSize, firstCacheStats);
+  secondFrameReady =
+      analyzeCacheImage(secondCacheId, secondCacheSize, secondCacheStats);
+
+  QObject::disconnect(startedConnection);
+  QObject::disconnect(renderedConnection);
+
+  const bool flipbookOk = flipbook && flipbook->getPreviewedFx() == columnFx &&
+                          flipbook->getPreviewXsheet() == xsheet;
+
+  TDimension frozenFirstSize;
+  TDimension frozenSecondSize;
+  GuiSmokeRasterStats frozenFirstStats;
+  GuiSmokeRasterStats frozenSecondStats;
+
+  bool frameSwitchOk = false;
+  if (flipbook) {
+    flipbook->showFrame(2);
+    gui_smoke_pump_events(100);
+    frameSwitchOk = flipbook->getCurrentFrame() == 2;
+  }
+
+  const int beforeCloneCount =
+      (int)gui_smoke_visible_preview_flipbooks(columnFx, xsheet).size();
+  bool cloneOk        = false;
+  int afterCloneCount = beforeCloneCount;
+  if (flipbook) {
+    flipbook->clonePreview();
+    gui_smoke_pump_events(300);
+    std::vector<FlipBook *> afterCloneFlipbooks =
+        gui_smoke_visible_preview_flipbooks(columnFx, xsheet);
+    afterCloneCount = (int)afterCloneFlipbooks.size();
+    cloneOk         = afterCloneCount > beforeCloneCount;
+    for (FlipBook *candidate : afterCloneFlipbooks) {
+      if (candidate && candidate != flipbook) candidate->reset();
+    }
+    gui_smoke_pump_events(100);
+  }
+
+  bool freezeOk   = false;
+  bool unfreezeOk = false;
+  bool frozenFirstReady  = false;
+  bool frozenSecondReady = false;
+  std::string frozenFirstCacheId;
+  std::string frozenSecondCacheId;
+  if (flipbook) {
+    flipbook->showFrame(1);
+    gui_smoke_pump_events(100);
+    frozenFirstCacheId = "freezed" + std::to_string(flipbook->getPoolIndex()) +
+                         ".noext" + std::to_string(0);
+    frozenSecondCacheId = "freezed" + std::to_string(flipbook->getPoolIndex()) +
+                          ".noext" + std::to_string(1);
+    flipbook->freezePreview();
+    gui_smoke_pump_events(200);
+    freezeOk = flipbook->isFreezed();
+    frozenFirstReady =
+        analyzeCacheImage(frozenFirstCacheId, frozenFirstSize,
+                          frozenFirstStats);
+    frozenSecondReady =
+        analyzeCacheImage(frozenSecondCacheId, frozenSecondSize,
+                          frozenSecondStats);
+
+    flipbook->unfreezePreview();
+    gui_smoke_pump_events(300);
+    unfreezeOk = !flipbook->isFreezed() &&
+                 flipbook->getPreviewedFx() == columnFx &&
+                 flipbook->getPreviewXsheet() == xsheet;
+  }
+
+  const bool controlsOk =
+      flipbookOk && firstFrameReady && secondFrameReady &&
+      firstCacheSize == TDimension(320, 240) &&
+      secondCacheSize == TDimension(320, 240) &&
+      firstCacheStats.redPixels > 1000 &&
+      secondCacheStats.greenPixels > 1000 && frameSwitchOk && cloneOk &&
+      freezeOk && frozenFirstReady && frozenSecondReady &&
+      frozenFirstSize == TDimension(320, 240) &&
+      frozenSecondSize == TDimension(320, 240) &&
+      frozenFirstStats.redPixels > 1000 &&
+      frozenSecondStats.greenPixels > 1000 && unfreezeOk;
+
+  if (flipbook) flipbook->reset();
+  manager->reset(true);
+  TImageCache::instance()->remove(firstCacheId);
+  TImageCache::instance()->remove(secondCacheId);
+  if (!frozenFirstCacheId.empty())
+    TImageCache::instance()->remove(frozenFirstCacheId);
+  if (!frozenSecondCacheId.empty())
+    TImageCache::instance()->remove(frozenSecondCacheId);
+
+  details << QString("scene=%1").arg(scenePath.getQString())
+          << QStringLiteral(
+                 "fxPreviewFlipbookControlsSource=two-frame-column-fx")
+          << QString("fxPreviewFlipbookControlsFxId=%1").arg(previewFxId)
+          << QString("fxPreviewFlipbookControlsCacheId0=%1")
+                 .arg(QString::fromStdString(firstCacheId))
+          << QString("fxPreviewFlipbookControlsCacheId1=%1")
+                 .arg(QString::fromStdString(secondCacheId))
+          << QString("fxPreviewFlipbookControlsFlipbook=%1")
+                 .arg(flipbook ? QStringLiteral("true")
+                               : QStringLiteral("false"))
+          << QString("fxPreviewFlipbookControlsFlipbookAttached=%1")
+                 .arg(flipbookOk ? QStringLiteral("true")
+                                 : QStringLiteral("false"))
+          << QString("fxPreviewFlipbookControlsStartedFrames=%1")
+                 .arg(startedFrames)
+          << QString("fxPreviewFlipbookControlsCompletedFrames=%1")
+                 .arg(renderedFrames)
+          << QString("fxPreviewFlipbookControlsFrame0Ready=%1")
+                 .arg(firstFrameReady ? QStringLiteral("true")
+                                      : QStringLiteral("false"))
+          << QString("fxPreviewFlipbookControlsFrame1Ready=%1")
+                 .arg(secondFrameReady ? QStringLiteral("true")
+                                       : QStringLiteral("false"))
+          << QString("fxPreviewFlipbookControlsFrame0RasterWidth=%1")
+                 .arg(firstCacheSize.lx)
+          << QString("fxPreviewFlipbookControlsFrame0RasterHeight=%1")
+                 .arg(firstCacheSize.ly)
+          << QString("fxPreviewFlipbookControlsFrame1RasterWidth=%1")
+                 .arg(secondCacheSize.lx)
+          << QString("fxPreviewFlipbookControlsFrame1RasterHeight=%1")
+                 .arg(secondCacheSize.ly)
+          << QString("fxPreviewFlipbookControlsFrame0RedPixels=%1")
+                 .arg(firstCacheStats.redPixels)
+          << QString("fxPreviewFlipbookControlsFrame1GreenPixels=%1")
+                 .arg(secondCacheStats.greenPixels)
+          << QString("fxPreviewFlipbookControlsFrameSwitch=%1")
+                 .arg(frameSwitchOk ? QStringLiteral("true")
+                                    : QStringLiteral("false"))
+          << QString("fxPreviewFlipbookControlsVisibleBeforeClone=%1")
+                 .arg(beforeCloneCount)
+          << QString("fxPreviewFlipbookControlsVisibleAfterClone=%1")
+                 .arg(afterCloneCount)
+          << QString("fxPreviewFlipbookControlsClone=%1")
+                 .arg(cloneOk ? QStringLiteral("true")
+                              : QStringLiteral("false"))
+          << QString("fxPreviewFlipbookControlsFreeze=%1")
+                 .arg(freezeOk ? QStringLiteral("true")
+                               : QStringLiteral("false"))
+          << QString("fxPreviewFlipbookControlsFrozenFrame0RedPixels=%1")
+                 .arg(frozenFirstStats.redPixels)
+          << QString("fxPreviewFlipbookControlsFrozenFrame1GreenPixels=%1")
+                 .arg(frozenSecondStats.greenPixels)
+          << QString("fxPreviewFlipbookControlsUnfreeze=%1")
+                 .arg(unfreezeOk ? QStringLiteral("true")
+                                 : QStringLiteral("false"))
+          << QString("fxPreviewFlipbookControlsProbe=%1")
+                 .arg(controlsOk ? QStringLiteral("ok")
+                                 : QStringLiteral("error"));
+
+  return details;
+}
+
+static QFileInfoList gui_smoke_png_output_entries(const QString &outputDir,
+                                                  const QString &prefix) {
   QDir dir(outputDir);
-  const QFileInfoList entries = dir.entryInfoList(
+  return dir.entryInfoList(QStringList() << (prefix + QStringLiteral("*.png")),
+                           QDir::Files, QDir::Name);
+}
+
+static QStringList gui_smoke_fx_preview_save_previewed_frames_details(
+    const QString &requestedSceneName, bool subcameraPreview = false) {
+  QStringList details;
+  QString sceneName   = gui_smoke_scene_name(requestedSceneName);
+  TFilePath scenePath = gui_smoke_scene_path(sceneName);
+  if (!TSystem::touchParentDir(scenePath)) {
+    details
+        << QStringLiteral("fxPreviewSavePreviewedFramesProbe=scene-folder-error")
+        << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  IoCmd::newScene();
+  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+  scene->setScenePath(scenePath);
+  TApp::instance()->getCurrentScene()->notifySceneSwitched();
+  TApp::instance()->getCurrentScene()->notifyNameSceneChange();
+
+  TCamera *camera = scene->getCurrentCamera();
+  camera->setRes(TDimension(320, 240));
+  const double renderDpi = Stage::standardDpi;
+  camera->setSize(TDimensionD(camera->getRes().lx / renderDpi,
+                              camera->getRes().ly / renderDpi));
+
+  const TRect subcameraRect(80, 60, 239, 179);
+  TCamera *previewCamera = scene->getCurrentPreviewCamera();
+  if (previewCamera != camera) {
+    previewCamera->setRes(TDimension(320, 240));
+    previewCamera->setSize(TDimensionD(previewCamera->getRes().lx / renderDpi,
+                                       previewCamera->getRes().ly / renderDpi));
+  }
+  previewCamera->setInterestRect(subcameraRect);
+  const TDimension expectedPreviewSize =
+      subcameraPreview ? TDimension(subcameraRect.getLx(), subcameraRect.getLy())
+                       : TDimension(320, 240);
+
+  TOutputProperties *previewProperties =
+      scene->getProperties()->getPreviewProperties();
+  previewProperties->setRange(0, 1, 1);
+  previewProperties->setThreadIndex(0);
+  previewProperties->setMaxTileSizeIndex(1);
+  previewProperties->setSubcameraPreview(subcameraPreview);
+  TRenderSettings previewSettings = previewProperties->getRenderSettings();
+  previewSettings.m_bpp                 = 32;
+  previewSettings.m_shrinkX             = 1;
+  previewSettings.m_shrinkY             = 1;
+  previewSettings.m_applyShrinkToViewer = false;
+  previewSettings.m_stereoscopic        = false;
+  previewSettings.m_getFullSizeBBox     = false;
+  previewSettings.m_cameraBox =
+      TRectD(TPointD(-160.0, -120.0), TDimensionD(320.0, 240.0));
+  previewProperties->setRenderSettings(previewSettings);
+
+  TOutputProperties *outputProperties =
+      scene->getProperties()->getOutputProperties();
+  TRenderSettings outputSettings = outputProperties->getRenderSettings();
+  outputSettings.m_bpp           = 32;
+  outputProperties->setRenderSettings(outputSettings);
+
+  TXshLevel *levelXl = scene->createNewLevel(
+      OVL_XSHLEVEL,
+      subcameraPreview
+          ? L"qt6_gui_fx_preview_subcamera_save_previewed_frames_raster"
+          : L"qt6_gui_fx_preview_save_previewed_frames_raster");
+  TXshSimpleLevel *simpleLevel = levelXl ? levelXl->getSimpleLevel() : nullptr;
+  if (!simpleLevel) {
+    details << QStringLiteral("fxPreviewSavePreviewedFramesProbe=level-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  const TFrameId firstFid(1);
+  const TFrameId secondFid(2);
+  gui_smoke_add_raster_rect_probe_frame(
+      simpleLevel, firstFid, TDimension(320, 240), TRect(0, 0, 320, 240),
+      TPixel32(232, 24, 24, 255), camera->getDpi());
+  gui_smoke_add_raster_rect_probe_frame(
+      simpleLevel, secondFid, TDimension(320, 240), TRect(0, 0, 320, 240),
+      TPixel32(24, 232, 24, 255), camera->getDpi());
+
+  TXsheet *xsheet = scene->getXsheet();
+  if (!xsheet->setCell(0, 0, TXshCell(simpleLevel, firstFid)) ||
+      !xsheet->setCell(1, 0, TXshCell(simpleLevel, secondFid))) {
+    details << QStringLiteral("fxPreviewSavePreviewedFramesProbe=xsheet-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  TApp::instance()->getCurrentFrame()->setFrame(0);
+  TApp::instance()->getCurrentColumn()->setColumnIndex(0);
+  TApp::instance()->getCurrentLevel()->setLevel(levelXl);
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  TApp::instance()->getCurrentScene()->notifySceneChanged();
+  TApp::instance()->getCurrentLevel()->notifyLevelChange();
+  gui_smoke_pump_events(100);
+
+  TXshColumn *column = xsheet->getColumn(0);
+  TFx *columnFx      = column ? column->getFx() : nullptr;
+  if (!columnFx) {
+    details
+        << QStringLiteral("fxPreviewSavePreviewedFramesProbe=column-fx-error")
+        << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+
+  const TFxP previewFx(columnFx);
+  const unsigned long previewFxId = previewFx->getIdentifier();
+  const std::string firstCacheId =
+      std::to_string(previewFxId) + ".noext" + std::to_string(0);
+  const std::string secondCacheId =
+      std::to_string(previewFxId) + ".noext" + std::to_string(1);
+
+  PreviewFxManager *manager = PreviewFxManager::instance();
+  manager->reset(true);
+  TImageCache::instance()->remove(firstCacheId);
+  TImageCache::instance()->remove(secondCacheId);
+  gui_smoke_pump_events(100);
+
+  auto analyzeCacheImage = [](const std::string &cacheId, TDimension &size,
+                              GuiSmokeRasterStats &stats) {
+    TImageP image  = TImageCache::instance()->get(cacheId, false);
+    TRasterP raster = gui_smoke_raster_from_image(image);
+    size            = raster ? raster->getSize() : TDimension();
+    stats           = gui_smoke_analyze_raster_pixels(raster);
+    return (bool)raster;
+  };
+
+  TDimension firstCacheSize;
+  TDimension secondCacheSize;
+  GuiSmokeRasterStats firstCacheStats;
+  GuiSmokeRasterStats secondCacheStats;
+  bool firstFrameReady  = false;
+  bool secondFrameReady = false;
+
+  FlipBook *flipbook = manager->showNewPreview(previewFx, false);
+  gui_smoke_pump_events(100);
+  QElapsedTimer waitTimer;
+  waitTimer.start();
+  do {
+    firstFrameReady =
+        analyzeCacheImage(firstCacheId, firstCacheSize, firstCacheStats);
+    secondFrameReady =
+        analyzeCacheImage(secondCacheId, secondCacheSize, secondCacheStats);
+    if (firstFrameReady && secondFrameReady) break;
+    gui_smoke_pump_events(100);
+  } while (waitTimer.elapsed() < 15000);
+  gui_smoke_pump_events(100);
+
+  firstFrameReady =
+      analyzeCacheImage(firstCacheId, firstCacheSize, firstCacheStats);
+  secondFrameReady =
+      analyzeCacheImage(secondCacheId, secondCacheSize, secondCacheStats);
+
+  const bool flipbookOk = flipbook && flipbook->getPreviewedFx() == columnFx &&
+                          flipbook->getPreviewXsheet() == xsheet;
+  const bool subcameraActive = manager->isSubCameraActive(previewFx);
+
+  QString statusPath = qEnvironmentVariable("OPENTOONZ_GUI_SMOKE_STATUS_FILE");
+  const QString outputPrefix =
+      subcameraPreview
+          ? QStringLiteral("fx-preview-subcamera-save-previewed-frames")
+          : QStringLiteral("fx-preview-save-previewed-frames");
+  QString outputDir =
+      statusPath.isEmpty()
+          ? QDir(QDir::tempPath()).filePath(outputPrefix)
+          : QFileInfo(statusPath).absoluteDir().filePath(outputPrefix);
+  QDir().mkpath(outputDir);
+  QDir saveDir(outputDir);
+  for (const QFileInfo &entry :
+       gui_smoke_png_output_entries(outputDir, outputPrefix)) {
+    QFile::remove(entry.absoluteFilePath());
+  }
+
+  const QString requestedOutputPath =
+      saveDir.filePath(outputPrefix + QStringLiteral("..png"));
+  const bool saveStarted =
+      flipbook && firstFrameReady && secondFrameReady &&
+      flipbook->doSaveImages(TFilePath(requestedOutputPath.toStdWString()),
+                             false);
+
+  QFileInfoList outputEntries;
+  QImage firstOutputImage;
+  QImage secondOutputImage;
+  GuiSmokeImageStats firstOutputStats;
+  GuiSmokeImageStats secondOutputStats;
+  bool outputOk = false;
+  waitTimer.restart();
+  do {
+    gui_smoke_pump_events(100);
+    outputEntries = gui_smoke_png_output_entries(outputDir, outputPrefix);
+    if (outputEntries.size() >= 2) {
+      firstOutputImage =
+          QImage(outputEntries.at(0).absoluteFilePath())
+              .convertToFormat(QImage::Format_ARGB32);
+      secondOutputImage =
+          QImage(outputEntries.at(1).absoluteFilePath())
+              .convertToFormat(QImage::Format_ARGB32);
+      firstOutputStats  = gui_smoke_analyze_viewer_frame(firstOutputImage);
+      secondOutputStats = gui_smoke_analyze_viewer_frame(secondOutputImage);
+      outputOk =
+          !firstOutputImage.isNull() && !secondOutputImage.isNull() &&
+          firstOutputImage.width() == expectedPreviewSize.lx &&
+          firstOutputImage.height() == expectedPreviewSize.ly &&
+          secondOutputImage.width() == expectedPreviewSize.lx &&
+          secondOutputImage.height() == expectedPreviewSize.ly &&
+          firstOutputStats.redPixels > 1000 &&
+          secondOutputStats.greenPixels > 1000;
+      if (outputOk) break;
+    }
+  } while (waitTimer.elapsed() < 15000);
+  gui_smoke_pump_events(100);
+
+  outputEntries = gui_smoke_png_output_entries(outputDir, outputPrefix);
+  if (outputEntries.size() >= 2) {
+    firstOutputImage =
+        QImage(outputEntries.at(0).absoluteFilePath())
+            .convertToFormat(QImage::Format_ARGB32);
+    secondOutputImage =
+        QImage(outputEntries.at(1).absoluteFilePath())
+            .convertToFormat(QImage::Format_ARGB32);
+    firstOutputStats  = gui_smoke_analyze_viewer_frame(firstOutputImage);
+    secondOutputStats = gui_smoke_analyze_viewer_frame(secondOutputImage);
+    outputOk =
+        !firstOutputImage.isNull() && !secondOutputImage.isNull() &&
+        firstOutputImage.width() == expectedPreviewSize.lx &&
+        firstOutputImage.height() == expectedPreviewSize.ly &&
+        secondOutputImage.width() == expectedPreviewSize.lx &&
+        secondOutputImage.height() == expectedPreviewSize.ly &&
+        firstOutputStats.redPixels > 1000 &&
+        secondOutputStats.greenPixels > 1000;
+  }
+
+  const QFileInfo firstOutputInfo =
+      outputEntries.size() > 0 ? outputEntries.at(0) : QFileInfo();
+  const QFileInfo secondOutputInfo =
+      outputEntries.size() > 1 ? outputEntries.at(1) : QFileInfo();
+  const bool saveOk =
+      flipbookOk && (!subcameraPreview || subcameraActive) &&
+      firstFrameReady && secondFrameReady &&
+      firstCacheSize == expectedPreviewSize &&
+      secondCacheSize == expectedPreviewSize &&
+      firstCacheStats.redPixels > 1000 &&
+      secondCacheStats.greenPixels > 1000 && saveStarted &&
+      outputEntries.size() == 2 && outputOk;
+
+  if (flipbook) flipbook->reset();
+  manager->reset(true);
+  TImageCache::instance()->remove(firstCacheId);
+  TImageCache::instance()->remove(secondCacheId);
+
+  details << QString("scene=%1").arg(scenePath.getQString())
+          << QString("fxPreviewSavePreviewedFramesSource=%1")
+                 .arg(subcameraPreview
+                          ? QStringLiteral("two-frame-subcamera-column-fx")
+                          : QStringLiteral("two-frame-column-fx"))
+          << QString("fxPreviewSavePreviewedFramesFxId=%1").arg(previewFxId)
+          << QString("fxPreviewSavePreviewedFramesSubcamera=%1")
+                 .arg(subcameraPreview ? QStringLiteral("true")
+                                       : QStringLiteral("false"))
+          << QString("fxPreviewSavePreviewedFramesSubcameraActive=%1")
+                 .arg(subcameraActive ? QStringLiteral("true")
+                                      : QStringLiteral("false"))
+          << QString("fxPreviewSavePreviewedFramesExpectedWidth=%1")
+                 .arg(expectedPreviewSize.lx)
+          << QString("fxPreviewSavePreviewedFramesExpectedHeight=%1")
+                 .arg(expectedPreviewSize.ly)
+          << QString("fxPreviewSavePreviewedFramesFlipbook=%1")
+                 .arg(flipbook ? QStringLiteral("true")
+                               : QStringLiteral("false"))
+          << QString("fxPreviewSavePreviewedFramesFlipbookAttached=%1")
+                 .arg(flipbookOk ? QStringLiteral("true")
+                                 : QStringLiteral("false"))
+          << QString("fxPreviewSavePreviewedFramesFrame0Ready=%1")
+                 .arg(firstFrameReady ? QStringLiteral("true")
+                                      : QStringLiteral("false"))
+          << QString("fxPreviewSavePreviewedFramesFrame1Ready=%1")
+                 .arg(secondFrameReady ? QStringLiteral("true")
+                                       : QStringLiteral("false"))
+          << QString("fxPreviewSavePreviewedFramesFrame0RedPixels=%1")
+                 .arg(firstCacheStats.redPixels)
+          << QString("fxPreviewSavePreviewedFramesFrame1GreenPixels=%1")
+                 .arg(secondCacheStats.greenPixels)
+          << QString("fxPreviewSavePreviewedFramesStarted=%1")
+                 .arg(saveStarted ? QStringLiteral("true")
+                                  : QStringLiteral("false"))
+          << QString("fxPreviewSavePreviewedFramesRequestedOutputPath=%1")
+                 .arg(gui_smoke_status_value(requestedOutputPath))
+          << QString("fxPreviewSavePreviewedFramesOutputDir=%1")
+                 .arg(gui_smoke_status_value(outputDir))
+          << QString("fxPreviewSavePreviewedFramesOutputCount=%1")
+                 .arg(outputEntries.size())
+          << QString("fxPreviewSavePreviewedFramesOutput0Path=%1")
+                 .arg(gui_smoke_status_value(
+                     firstOutputInfo.absoluteFilePath()))
+          << QString("fxPreviewSavePreviewedFramesOutput1Path=%1")
+                 .arg(gui_smoke_status_value(
+                     secondOutputInfo.absoluteFilePath()))
+          << QString("fxPreviewSavePreviewedFramesOutput0Bytes=%1")
+                 .arg(firstOutputInfo.size())
+          << QString("fxPreviewSavePreviewedFramesOutput1Bytes=%1")
+                 .arg(secondOutputInfo.size())
+          << QString("fxPreviewSavePreviewedFramesOutput0Width=%1")
+                 .arg(firstOutputImage.width())
+          << QString("fxPreviewSavePreviewedFramesOutput0Height=%1")
+                 .arg(firstOutputImage.height())
+          << QString("fxPreviewSavePreviewedFramesOutput1Width=%1")
+                 .arg(secondOutputImage.width())
+          << QString("fxPreviewSavePreviewedFramesOutput1Height=%1")
+                 .arg(secondOutputImage.height())
+          << QString("fxPreviewSavePreviewedFramesOutput0RedPixels=%1")
+                 .arg(firstOutputStats.redPixels)
+          << QString("fxPreviewSavePreviewedFramesOutput1GreenPixels=%1")
+                 .arg(secondOutputStats.greenPixels)
+          << QString("fxPreviewSavePreviewedFramesOutputProbe=%1")
+                 .arg(outputOk ? QStringLiteral("ok")
+                               : QStringLiteral("error"))
+          << QString("fxPreviewSavePreviewedFramesProbe=%1")
+                 .arg(saveOk ? QStringLiteral("ok")
+                             : QStringLiteral("error"));
+
+  return details;
+}
+
+static QFileInfoList gui_smoke_final_render_output_entries(
+    const QString &outputDir) {
+  QDir dir(outputDir);
+  return dir.entryInfoList(
       QStringList() << QStringLiteral("final-render-output*.png"), QDir::Files,
       QDir::Name);
-  for (const QFileInfo &entry : entries) {
-    if (entry.size() > 0) return entry.absoluteFilePath();
-  }
-  return QString();
 }
 
 static QStringList gui_smoke_final_render_output_details(
-    const QString &requestedSceneName) {
+    const QString &requestedSceneName, bool opaqueBackground = false,
+    bool sequenceOutput = false, bool compositeOutput = false,
+    bool vectorOutput = false, bool fxOutput = false,
+    bool toonzRasterOutput = false) {
   QStringList details;
   QString sceneName   = gui_smoke_scene_name(requestedSceneName);
   TFilePath scenePath = gui_smoke_scene_path(sceneName);
@@ -1419,25 +2797,119 @@ static QStringList gui_smoke_final_render_output_details(
   const double renderDpi = Stage::standardDpi;
   camera->setSize(TDimensionD(camera->getRes().lx / renderDpi,
                               camera->getRes().ly / renderDpi));
+  if (opaqueBackground)
+    scene->getProperties()->setBgColor(TPixel32(24, 24, 232, 255));
 
-  TXshLevel *levelXl =
-      scene->createNewLevel(OVL_XSHLEVEL, L"qt6_gui_final_render_raster");
+  int levelType = OVL_XSHLEVEL;
+  std::wstring levelName = L"qt6_gui_final_render_raster";
+  if (vectorOutput) {
+    levelType = PLI_XSHLEVEL;
+    levelName = L"qt6_gui_final_render_vector";
+  } else if (toonzRasterOutput) {
+    levelType = TZP_XSHLEVEL;
+    levelName = L"qt6_gui_final_render_toonz_raster";
+  }
+  TXshLevel *levelXl = scene->createNewLevel(levelType, levelName);
   TXshSimpleLevel *simpleLevel = levelXl ? levelXl->getSimpleLevel() : nullptr;
   if (!simpleLevel) {
     details << QStringLiteral("finalRenderProbe=level-error")
             << QString("scene=%1").arg(scenePath.getQString());
     return details;
   }
+  TXshLevel *compositeLevelXl = nullptr;
+  TXshSimpleLevel *compositeSimpleLevel = nullptr;
+  if (compositeOutput) {
+    compositeLevelXl = scene->createNewLevel(
+        OVL_XSHLEVEL, L"qt6_gui_final_render_composite_raster");
+    compositeSimpleLevel =
+        compositeLevelXl ? compositeLevelXl->getSimpleLevel() : nullptr;
+    if (!compositeSimpleLevel) {
+      details << QStringLiteral("finalRenderProbe=level-error")
+              << QString("scene=%1").arg(scenePath.getQString());
+      return details;
+    }
+  }
 
   const TFrameId fid(1);
-  gui_smoke_add_raster_probe_frame(simpleLevel, fid, TDimension(320, 240),
-                                   camera->getDpi());
+  const TFrameId secondFid(2);
+  if (vectorOutput) {
+    if (!gui_smoke_add_vector_probe_frame(simpleLevel, fid)) {
+      details << QStringLiteral("finalRenderProbe=vector-frame-error")
+              << QString("scene=%1").arg(scenePath.getQString());
+      return details;
+    }
+  } else if (toonzRasterOutput) {
+    if (!gui_smoke_add_toonz_raster_rect_probe_frame(
+            simpleLevel, fid, TDimension(320, 240), TRect(0, 0, 320, 240),
+            camera->getDpi())) {
+      details << QStringLiteral("finalRenderProbe=toonz-raster-frame-error")
+              << QString("scene=%1").arg(scenePath.getQString());
+      return details;
+    }
+  } else if (fxOutput) {
+    gui_smoke_add_raster_rect_probe_frame(
+        simpleLevel, fid, TDimension(320, 240), TRect(95, 70, 225, 170),
+        TPixel32(232, 24, 24, 255), camera->getDpi());
+  } else if (compositeOutput) {
+    gui_smoke_add_raster_rect_probe_frame(
+        simpleLevel, fid, TDimension(320, 240), TRect(0, 0, 150, 240),
+        TPixel32(232, 24, 24, 255), camera->getDpi());
+    gui_smoke_add_raster_rect_probe_frame(
+        compositeSimpleLevel, fid, TDimension(320, 240),
+        TRect(170, 0, 320, 240), TPixel32(24, 232, 24, 255),
+        camera->getDpi());
+  } else if (sequenceOutput) {
+    gui_smoke_add_raster_rect_probe_frame(
+        simpleLevel, fid, TDimension(320, 240), TRect(0, 0, 320, 240),
+        TPixel32(232, 24, 24, 255), camera->getDpi());
+    gui_smoke_add_raster_rect_probe_frame(
+        simpleLevel, secondFid, TDimension(320, 240),
+        TRect(0, 0, 320, 240), TPixel32(24, 232, 24, 255),
+        camera->getDpi());
+  } else if (opaqueBackground) {
+    gui_smoke_add_raster_rect_probe_frame(
+        simpleLevel, fid, TDimension(320, 240), TRect(70, 50, 250, 190),
+        TPixel32(232, 24, 24, 255), camera->getDpi());
+  } else {
+    gui_smoke_add_raster_probe_frame(simpleLevel, fid, TDimension(320, 240),
+                                     camera->getDpi());
+  }
   const GuiSmokeRasterStats sourceStats =
-      gui_smoke_analyze_raster_frame(simpleLevel, fid);
+      vectorOutput || toonzRasterOutput
+          ? GuiSmokeRasterStats()
+          : gui_smoke_analyze_raster_frame(simpleLevel, fid);
   TPointD levelDpi = simpleLevel->getDpi(fid);
+  TImageInfo *frameInfo = simpleLevel->getFrameInfo(fid, false);
+  TRasterImageP sourceImage =
+      vectorOutput ? TRasterImageP()
+                   : (TRasterImageP)simpleLevel->getFrame(fid, false);
+  TRect sourceSavebox;
+  TRectD sourceBBox;
+  TDimension sourceRasterSize;
+  if (sourceImage) {
+    sourceSavebox = sourceImage->getSavebox();
+    sourceBBox    = sourceImage->getBBox();
+    if (sourceImage->getRaster())
+      sourceRasterSize = sourceImage->getRaster()->getSize();
+  }
+  const TAffine cameraDpiAffine = getDpiAffine(camera);
+  const TAffine levelDpiAffine  = getDpiAffine(simpleLevel, fid, true);
+  const TAffine combinedDpiAffine = cameraDpiAffine.inv() * levelDpiAffine;
 
   TXsheet *xsheet = scene->getXsheet();
   if (!xsheet->setCell(0, 0, TXshCell(simpleLevel, fid))) {
+    details << QStringLiteral("finalRenderProbe=xsheet-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+  if (sequenceOutput &&
+      !xsheet->setCell(1, 0, TXshCell(simpleLevel, secondFid))) {
+    details << QStringLiteral("finalRenderProbe=xsheet-error")
+            << QString("scene=%1").arg(scenePath.getQString());
+    return details;
+  }
+  if (compositeOutput &&
+      !xsheet->setCell(0, 1, TXshCell(compositeSimpleLevel, fid))) {
     details << QStringLiteral("finalRenderProbe=xsheet-error")
             << QString("scene=%1").arg(scenePath.getQString());
     return details;
@@ -1466,7 +2938,7 @@ static QStringList gui_smoke_final_render_output_details(
   TOutputProperties *outputProperties =
       scene->getProperties()->getOutputProperties();
   outputProperties->setPath(renderPath);
-  outputProperties->setRange(0, 0, 1);
+  outputProperties->setRange(0, sequenceOutput ? 1 : 0, 1);
   outputProperties->setThreadIndex(0);
   outputProperties->setMaxTileSizeIndex(1);
   outputProperties->setMultimediaRendering(0);
@@ -1477,8 +2949,62 @@ static QStringList gui_smoke_final_render_output_details(
   renderSettings.m_stereoscopic  = false;
   outputProperties->setRenderSettings(renderSettings);
 
+  const int xsheetColumnCount = xsheet->getColumnCount();
+  TXshColumn *column0         = xsheet->getColumn(0);
+  TFx *columnFx              = column0 ? column0->getFx() : nullptr;
+  FxDag *fxDag               = xsheet->getFxDag();
+  TFxSet *terminalFxs        = fxDag ? fxDag->getTerminalFxs() : nullptr;
+  const int terminalFxCount  = terminalFxs ? terminalFxs->getFxCount() : -1;
+  TFx *terminalFx0 =
+      terminalFxCount > 0 ? terminalFxs->getFx(0) : nullptr;
+  TOutputFx *outputFx        = fxDag ? fxDag->getOutputFx(0) : nullptr;
+  TFx *outputInputFx =
+      outputFx && outputFx->getInputPortCount() > 0
+          ? outputFx->getInputPort(0)->getFx()
+          : nullptr;
+  TRasterFx *rasterColumnFx = dynamic_cast<TRasterFx *>(columnFx);
+  TRectD columnBBox;
+  const bool columnBBoxOk = rasterColumnFx && rasterColumnFx->getBBox(
+                                                  0.0, columnBBox,
+                                                  renderSettings);
+  TAffine columnPlacement;
+  const bool columnPlacementOk =
+      getColumnPlacement(columnPlacement, xsheet, 0.0, 0, false);
+  const int whichLevels = outputProperties->getWhichLevels();
+  const TFxP columnRoot = columnFx ? TFxP(columnFx) : TFxP();
+  QStringList sceneFxBBoxDetails;
+  sceneFxBBoxDetails += gui_smoke_fx_bbox_details(
+      QStringLiteral("finalRenderUnifiedXsheetDefault"),
+      buildSceneFx(scene, 0.0, xsheet, TFxP(), BSFX_DEFAULT_TR, false,
+                   whichLevels, renderSettings.m_shrinkX),
+      0.0, renderSettings);
+  sceneFxBBoxDetails += gui_smoke_fx_bbox_details(
+      QStringLiteral("finalRenderColumnNoTr"),
+      buildSceneFx(scene, 0.0, xsheet, columnRoot, BSFX_NO_TR, false,
+                   whichLevels, renderSettings.m_shrinkX),
+      0.0, renderSettings);
+  sceneFxBBoxDetails += gui_smoke_fx_bbox_details(
+      QStringLiteral("finalRenderColumnColumnTr"),
+      buildSceneFx(scene, 0.0, xsheet, columnRoot, BSFX_COLUMN_TR, false,
+                   whichLevels, renderSettings.m_shrinkX),
+      0.0, renderSettings);
+  sceneFxBBoxDetails += gui_smoke_fx_bbox_details(
+      QStringLiteral("finalRenderColumnCameraColumnTr"),
+      buildSceneFx(scene, 0.0, xsheet, columnRoot,
+                   BSFX_Transforms_Enum(BSFX_CAMERA_TR | BSFX_COLUMN_TR),
+                   false, whichLevels, renderSettings.m_shrinkX),
+      0.0, renderSettings);
+  sceneFxBBoxDetails += gui_smoke_fx_bbox_details(
+      QStringLiteral("finalRenderColumnDefault"),
+      buildSceneFx(scene, 0.0, xsheet, columnRoot, BSFX_DEFAULT_TR, false,
+                   whichLevels, renderSettings.m_shrinkX),
+      0.0, renderSettings);
+
   TFxPair fxPair;
-  fxPair.m_frameA = buildSceneFx(scene, 0.0, renderSettings.m_shrinkX, false);
+  TFxP baseSceneFx =
+      buildSceneFx(scene, 0.0, renderSettings.m_shrinkX, false);
+  fxPair.m_frameA = fxOutput ? TFxUtil::makeBlur(baseSceneFx, 8.0)
+                             : baseSceneFx;
   fxPair.m_frameB = TRasterFxP();
   if (!fxPair.m_frameA) {
     details << QStringLiteral("finalRenderProbe=build-fx-error")
@@ -1487,6 +3013,27 @@ static QStringList gui_smoke_final_render_output_details(
                    .arg(gui_smoke_status_value(requestedOutputPath));
     return details;
   }
+  TFxPair secondFxPair;
+  if (sequenceOutput) {
+    secondFxPair.m_frameA =
+        buildSceneFx(scene, 1.0, renderSettings.m_shrinkX, false);
+    secondFxPair.m_frameB = TRasterFxP();
+    if (!secondFxPair.m_frameA) {
+      details << QStringLiteral("finalRenderProbe=build-fx-error")
+              << QString("scene=%1").arg(scenePath.getQString())
+              << QString("requestedOutputPath=%1")
+                     .arg(gui_smoke_status_value(requestedOutputPath));
+      return details;
+    }
+  }
+  TRectD rootBBox;
+  const bool rootBBoxOk =
+      fxPair.m_frameA->getBBox(0.0, rootBBox, renderSettings);
+  TRenderSettings fullSizeBBoxSettings(renderSettings);
+  fullSizeBBoxSettings.m_getFullSizeBBox = true;
+  TRectD rootFullSizeBBox;
+  const bool rootFullSizeBBoxOk =
+      fxPair.m_frameA->getBBox(0.0, rootFullSizeBBox, fullSizeBBoxSettings);
 
   GuiSmokeFinalRenderListener listener;
   QEventLoop loop;
@@ -1509,6 +3056,7 @@ static QStringList gui_smoke_final_render_output_details(
   renderer.addListener(&listener);
   renderer.getTRenderer()->addPort(&capturePort);
   renderer.addFrame(0.0, fxPair);
+  if (sequenceOutput) renderer.addFrame(1.0, secondFxPair);
   timeoutTimer.start(15000);
   renderer.start();
   loop.exec();
@@ -1518,22 +3066,84 @@ static QStringList gui_smoke_final_render_output_details(
 
   gui_smoke_pump_events(100);
 
-  const QString outputPath = gui_smoke_find_final_render_output(outputDir);
+  const QFileInfoList outputEntries =
+      gui_smoke_final_render_output_entries(outputDir);
+  const QString outputPath = outputEntries.isEmpty()
+                                 ? QString()
+                                 : outputEntries.first().absoluteFilePath();
+  const QString secondOutputPath = outputEntries.size() > 1
+                                       ? outputEntries.at(1).absoluteFilePath()
+                                       : QString();
   const QFileInfo outputInfo(outputPath);
+  const QFileInfo secondOutputInfo(secondOutputPath);
   const QImage outputImage =
       outputPath.isEmpty()
           ? QImage()
           : QImage(outputPath).convertToFormat(QImage::Format_ARGB32);
+  const QImage secondOutputImage =
+      secondOutputPath.isEmpty()
+          ? QImage()
+          : QImage(secondOutputPath).convertToFormat(QImage::Format_ARGB32);
   const GuiSmokeImageStats stats = gui_smoke_analyze_viewer_frame(outputImage);
-  const bool outputOk = outputInfo.exists() && outputInfo.size() > 0 &&
-                        !outputImage.isNull() && outputImage.width() == 320 &&
-                        outputImage.height() == 240 && stats.redPixels > 1000;
+  const GuiSmokeImageStats secondStats =
+      gui_smoke_analyze_viewer_frame(secondOutputImage);
+  const bool firstColorPixelsOk =
+      compositeOutput ? stats.redPixels > 1000 && stats.greenPixels > 1000
+                      : opaqueBackground
+                            ? stats.redPixels > 1000 && stats.bluePixels > 1000
+                            : stats.redPixels > 1000;
+  const bool secondOutputOk =
+      !sequenceOutput ||
+      (secondOutputInfo.exists() && secondOutputInfo.size() > 0 &&
+       !secondOutputImage.isNull() && secondOutputImage.width() == 320 &&
+       secondOutputImage.height() == 240 && secondStats.greenPixels > 1000);
+  const bool outputCountOk = outputEntries.size() == (sequenceOutput ? 2 : 1);
+  const bool outputOk = outputCountOk && outputInfo.exists() &&
+                        outputInfo.size() > 0 && !outputImage.isNull() &&
+                        outputImage.width() == 320 &&
+                        outputImage.height() == 240 && firstColorPixelsOk &&
+                        secondOutputOk;
+  const int expectedFrames = sequenceOutput ? 2 : 1;
   const bool renderOk = listener.m_sequenceCompleted &&
-                        listener.m_completedFrames == 1 &&
+                        listener.m_completedFrames == expectedFrames &&
                         listener.m_failedFrames == 0 && outputOk;
 
   details << QString("scene=%1").arg(scenePath.getQString())
-          << QStringLiteral("finalRenderFxSource=raster-scene-camera-dpi")
+          << QString("finalRenderFxSource=%1")
+                 .arg(compositeOutput
+                          ? QStringLiteral("two-column-raster-composite")
+                          : vectorOutput
+                                ? QStringLiteral("vector-scene-standard-dpi")
+                          : toonzRasterOutput
+                                ? QStringLiteral(
+                                      "toonz-raster-scene-standard-dpi")
+                          : fxOutput
+                                ? QStringLiteral("blurred-partial-raster-fx")
+                          : opaqueBackground
+                                ? QStringLiteral(
+                                      "partial-raster-opaque-background")
+                                : QStringLiteral("raster-scene-standard-dpi"))
+          << QString("finalRenderFxApplied=%1")
+                 .arg(fxOutput ? QStringLiteral("true")
+                               : QStringLiteral("false"))
+          << QString("finalRenderFxRoot=%1")
+                 .arg(gui_smoke_fx_value(fxPair.m_frameA.getPointer()))
+          << QString("finalRenderOpaqueBackground=%1")
+                 .arg(opaqueBackground ? QStringLiteral("true")
+                                       : QStringLiteral("false"))
+          << QString("finalRenderSequenceOutput=%1")
+                 .arg(sequenceOutput ? QStringLiteral("true")
+                                     : QStringLiteral("false"))
+          << QString("finalRenderCompositeOutput=%1")
+                 .arg(compositeOutput ? QStringLiteral("true")
+                                      : QStringLiteral("false"))
+          << QString("finalRenderVectorOutput=%1")
+                 .arg(vectorOutput ? QStringLiteral("true")
+                                   : QStringLiteral("false"))
+          << QString("finalRenderToonzRasterOutput=%1")
+                 .arg(toonzRasterOutput ? QStringLiteral("true")
+                                        : QStringLiteral("false"))
+          << QString("finalRenderExpectedFrames=%1").arg(expectedFrames)
           << QString("finalRenderCameraRes=%1x%2")
                  .arg(cameraRes.lx)
                  .arg(cameraRes.ly)
@@ -1543,6 +3153,96 @@ static QStringList gui_smoke_final_render_output_details(
           << QString("finalRenderLevelDpi=%1x%2")
                  .arg(levelDpi.x, 0, 'f', 2)
                  .arg(levelDpi.y, 0, 'f', 2)
+          << QString("finalRenderFrameInfoPresent=%1")
+                 .arg(frameInfo ? QStringLiteral("true")
+                                : QStringLiteral("false"))
+          << QString("finalRenderFrameInfoValid=%1")
+                 .arg(frameInfo && frameInfo->m_valid ? QStringLiteral("true")
+                                                      : QStringLiteral("false"))
+          << QString("finalRenderFrameInfoSize=%1x%2")
+                 .arg(frameInfo ? frameInfo->m_lx : -1)
+                 .arg(frameInfo ? frameInfo->m_ly : -1)
+          << QString("finalRenderFrameInfoSavebox=%1,%2,%3,%4")
+                 .arg(frameInfo ? frameInfo->m_x0 : 0)
+                 .arg(frameInfo ? frameInfo->m_y0 : 0)
+                 .arg(frameInfo ? frameInfo->m_x1 : -1)
+                 .arg(frameInfo ? frameInfo->m_y1 : -1)
+          << QString("finalRenderFrameInfoDpi=%1x%2")
+                 .arg(frameInfo ? frameInfo->m_dpix : 0.0, 0, 'f', 2)
+                 .arg(frameInfo ? frameInfo->m_dpiy : 0.0, 0, 'f', 2)
+          << QString("finalRenderSourceRasterSize=%1x%2")
+                 .arg(sourceRasterSize.lx)
+                 .arg(sourceRasterSize.ly)
+          << QString("finalRenderSourceSavebox=%1")
+                 .arg(sourceImage ? gui_smoke_rect_value(sourceSavebox)
+                                  : QStringLiteral("missing"))
+          << QString("finalRenderSourceBBox=%1")
+                 .arg(sourceImage ? gui_smoke_rectd_value(sourceBBox)
+                                  : QStringLiteral("missing"))
+          << QString("finalRenderCameraDpiAffine=%1")
+                 .arg(gui_smoke_affine_value(cameraDpiAffine))
+          << QString("finalRenderLevelDpiAffine=%1")
+                 .arg(gui_smoke_affine_value(levelDpiAffine))
+          << QString("finalRenderCombinedDpiAffine=%1")
+                 .arg(gui_smoke_affine_value(combinedDpiAffine))
+          << QString("finalRenderWhichLevels=%1").arg(whichLevels)
+          << QString("finalRenderXsheetColumnCount=%1").arg(xsheetColumnCount)
+          << QString("finalRenderColumn0Present=%1")
+                 .arg(column0 ? QStringLiteral("true")
+                              : QStringLiteral("false"))
+          << QString("finalRenderColumn0Empty=%1")
+                 .arg(column0 && column0->isEmpty() ? QStringLiteral("true")
+                                                    : QStringLiteral("false"))
+          << QString("finalRenderColumn0PreviewVisible=%1")
+                 .arg(column0 && column0->isPreviewVisible()
+                          ? QStringLiteral("true")
+                          : QStringLiteral("false"))
+          << QString("finalRenderColumn0Rendered=%1")
+                 .arg(column0 && column0->isRendered()
+                          ? QStringLiteral("true")
+                          : QStringLiteral("false"))
+          << QString("finalRenderColumn0Type=%1")
+                 .arg(column0 ? static_cast<int>(column0->getColumnType()) : -1)
+          << QString("finalRenderColumnFx=%1").arg(gui_smoke_fx_value(columnFx))
+          << QString("finalRenderColumnFxOutputConnections=%1")
+                 .arg(columnFx ? columnFx->getOutputConnectionCount() : -1)
+          << QString("finalRenderColumnBBoxOk=%1")
+                 .arg(columnBBoxOk ? QStringLiteral("true")
+                                    : QStringLiteral("false"))
+          << QString("finalRenderColumnBBox=%1")
+                 .arg(columnBBoxOk ? gui_smoke_rectd_value(columnBBox)
+                                    : QStringLiteral("none"))
+          << QString("finalRenderColumnPlacementOk=%1")
+                 .arg(columnPlacementOk ? QStringLiteral("true")
+                                        : QStringLiteral("false"))
+          << QString("finalRenderColumnPlacement=%1")
+                 .arg(columnPlacementOk ? gui_smoke_affine_value(columnPlacement)
+                                        : QStringLiteral("none"))
+          << QString("finalRenderTerminalFxCount=%1").arg(terminalFxCount)
+          << QString("finalRenderTerminalFx0=%1")
+                 .arg(gui_smoke_fx_value(terminalFx0))
+          << QString("finalRenderTerminalContainsColumnFx=%1")
+                 .arg(terminalFxs && terminalFxs->containsFx(columnFx)
+                          ? QStringLiteral("true")
+                          : QStringLiteral("false"))
+          << QString("finalRenderOutputFx=%1").arg(gui_smoke_fx_value(outputFx))
+          << QString("finalRenderOutputInputFx=%1")
+                 .arg(gui_smoke_fx_value(outputInputFx))
+          << QString("finalRenderOutputInputIsXsheetFx=%1")
+                 .arg(fxDag && outputInputFx == fxDag->getXsheetFx()
+                          ? QStringLiteral("true")
+                          : QStringLiteral("false"))
+          << sceneFxBBoxDetails
+          << QString("finalRenderRootBBoxOk=%1")
+                 .arg(rootBBoxOk ? QStringLiteral("true")
+                                  : QStringLiteral("false"))
+          << QString("finalRenderRootBBox=%1")
+                 .arg(gui_smoke_rectd_value(rootBBox))
+          << QString("finalRenderRootFullSizeBBoxOk=%1")
+                 .arg(rootFullSizeBBoxOk ? QStringLiteral("true")
+                                          : QStringLiteral("false"))
+          << QString("finalRenderRootFullSizeBBox=%1")
+                 .arg(gui_smoke_rectd_value(rootFullSizeBBox))
           << QString("finalRenderSourceSampleCount=%1")
                  .arg(sourceStats.sampleCount)
           << QString("finalRenderSourceOpaquePixels=%1")
@@ -1577,6 +3277,7 @@ static QStringList gui_smoke_final_render_output_details(
                  .arg(gui_smoke_status_value(listener.m_outputPath.getQString()))
           << QString("finalRenderOutputPath=%1")
                  .arg(gui_smoke_status_value(outputPath))
+          << QString("finalRenderOutputFrameCount=%1").arg(outputEntries.size())
           << QString("finalRenderOutputExists=%1")
                  .arg(outputInfo.exists() ? QStringLiteral("true")
                                           : QStringLiteral("false"))
@@ -1585,6 +3286,27 @@ static QStringList gui_smoke_final_render_output_details(
           << QString("finalRenderOutputHeight=%1").arg(outputImage.height())
           << QString("finalRenderOutputSampleCount=%1").arg(stats.sampleCount)
           << QString("finalRenderOutputRedPixels=%1").arg(stats.redPixels)
+          << QString("finalRenderOutputGreenPixels=%1").arg(stats.greenPixels)
+          << QString("finalRenderOutputBluePixels=%1").arg(stats.bluePixels)
+          << QString("finalRenderSecondOutputPath=%1")
+                 .arg(gui_smoke_status_value(secondOutputPath))
+          << QString("finalRenderSecondOutputExists=%1")
+                 .arg(secondOutputInfo.exists() ? QStringLiteral("true")
+                                                : QStringLiteral("false"))
+          << QString("finalRenderSecondOutputBytes=%1")
+                 .arg(secondOutputInfo.size())
+          << QString("finalRenderSecondOutputWidth=%1")
+                 .arg(secondOutputImage.width())
+          << QString("finalRenderSecondOutputHeight=%1")
+                 .arg(secondOutputImage.height())
+          << QString("finalRenderSecondOutputSampleCount=%1")
+                 .arg(secondStats.sampleCount)
+          << QString("finalRenderSecondOutputRedPixels=%1")
+                 .arg(secondStats.redPixels)
+          << QString("finalRenderSecondOutputGreenPixels=%1")
+                 .arg(secondStats.greenPixels)
+          << QString("finalRenderSecondOutputBluePixels=%1")
+                 .arg(secondStats.bluePixels)
           << QString("finalRenderOutputProbe=%1")
                  .arg(outputOk ? QStringLiteral("ok") : QStringLiteral("error"))
           << QString("finalRenderProbe=%1")
@@ -12831,9 +14553,98 @@ static void run_gui_smoke_hook(const QString &action,
       return;
     }
 
-    if (action == "final-render-output") {
+    if (action == "preview-render-output") {
       QStringList details =
-          gui_smoke_final_render_output_details(requestedSceneName);
+          gui_smoke_preview_render_output_details(requestedSceneName);
+      details << QString("window=%1").arg(TApp::instance()
+                                              ->getMainWindow()
+                                              ->windowTitle());
+      const bool ok = details.contains(QStringLiteral("previewRenderProbe=ok"));
+      write_gui_smoke_status(action, ok ? "ok" : "error", details);
+      return;
+    }
+
+    if (action == "fx-preview-render-output") {
+      QStringList details =
+          gui_smoke_fx_preview_render_output_details(requestedSceneName);
+      details << QString("window=%1").arg(TApp::instance()
+                                              ->getMainWindow()
+                                              ->windowTitle());
+      const bool ok =
+          details.contains(QStringLiteral("fxPreviewRenderProbe=ok"));
+      write_gui_smoke_status(action, ok ? "ok" : "error", details);
+      return;
+    }
+
+    if (action == "fx-preview-subcamera-render-output") {
+      QStringList details =
+          gui_smoke_fx_preview_subcamera_render_output_details(
+              requestedSceneName);
+      details << QString("window=%1").arg(TApp::instance()
+                                              ->getMainWindow()
+                                              ->windowTitle());
+      const bool ok =
+          details.contains(QStringLiteral("fxPreviewSubcameraProbe=ok"));
+      write_gui_smoke_status(action, ok ? "ok" : "error", details);
+      return;
+    }
+
+    if (action == "fx-preview-flipbook-controls") {
+      QStringList details =
+          gui_smoke_fx_preview_flipbook_controls_details(requestedSceneName);
+      details << QString("window=%1").arg(TApp::instance()
+                                              ->getMainWindow()
+                                              ->windowTitle());
+      const bool ok = details.contains(
+          QStringLiteral("fxPreviewFlipbookControlsProbe=ok"));
+      write_gui_smoke_status(action, ok ? "ok" : "error", details);
+      return;
+    }
+
+    if (action == "fx-preview-save-previewed-frames") {
+      QStringList details =
+          gui_smoke_fx_preview_save_previewed_frames_details(
+              requestedSceneName);
+      details << QString("window=%1").arg(TApp::instance()
+                                              ->getMainWindow()
+                                              ->windowTitle());
+      const bool ok = details.contains(
+          QStringLiteral("fxPreviewSavePreviewedFramesProbe=ok"));
+      write_gui_smoke_status(action, ok ? "ok" : "error", details);
+      return;
+    }
+
+    if (action == "fx-preview-subcamera-save-previewed-frames") {
+      QStringList details =
+          gui_smoke_fx_preview_save_previewed_frames_details(
+              requestedSceneName, true);
+      details << QString("window=%1").arg(TApp::instance()
+                                              ->getMainWindow()
+                                              ->windowTitle());
+      const bool ok = details.contains(
+          QStringLiteral("fxPreviewSavePreviewedFramesProbe=ok"));
+      write_gui_smoke_status(action, ok ? "ok" : "error", details);
+      return;
+    }
+
+    if (action == "final-render-output" ||
+        action == "final-render-background-output" ||
+        action == "final-render-sequence-output" ||
+        action == "final-render-composite-output" ||
+        action == "final-render-vector-output" ||
+        action == "final-render-toonz-raster-output" ||
+        action == "final-render-fx-output") {
+      const bool opaqueBackground =
+          action == "final-render-background-output";
+      const bool sequenceOutput = action == "final-render-sequence-output";
+      const bool compositeOutput = action == "final-render-composite-output";
+      const bool vectorOutput = action == "final-render-vector-output";
+      const bool fxOutput = action == "final-render-fx-output";
+      const bool toonzRasterOutput =
+          action == "final-render-toonz-raster-output";
+      QStringList details = gui_smoke_final_render_output_details(
+          requestedSceneName, opaqueBackground, sequenceOutput,
+          compositeOutput, vectorOutput, fxOutput, toonzRasterOutput);
       details << QString("window=%1").arg(TApp::instance()
                                               ->getMainWindow()
                                               ->windowTitle());

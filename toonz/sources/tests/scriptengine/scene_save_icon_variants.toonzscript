@@ -1,0 +1,53 @@
+var redBuilder = new ImageBuilder(48, 32, "Raster");
+redBuilder.fill("#ff0000");
+var greenBuilder = new ImageBuilder(48, 32, "Raster");
+greenBuilder.fill("#00ff00");
+
+var scene = new Scene();
+var redLevel = scene.newLevel("Raster", "qt6_scene_icon_variants_red");
+var greenLevel = scene.newLevel("Raster", "qt6_scene_icon_variants_green");
+redLevel.setFrame("1", redBuilder.image);
+greenLevel.setFrame("1", greenBuilder.image);
+
+scene.setCell(0, 0, redLevel, "1");
+scene.setCell(0, 1, greenLevel, "1");
+
+var stamp = (new Date()).getTime();
+var firstScenePath = new FilePath(
+  "qt6_scene_save_icon_variants_first_" + stamp + ".tnz");
+scene.save(firstScenePath);
+
+var firstIconPath = new FilePath(
+  "toonz/build/qt6-script-smoke/stuff/sandbox/scenes/sceneIcons/" +
+  firstScenePath.name + " .png");
+var firstIcon = new Image(firstIconPath);
+
+print("qt-script-scene-save-icon-variants-first", firstIconPath.exists,
+      firstIcon.type, firstIcon.width > 0, firstIcon.height > 0);
+
+scene.setCell(1, 0, redLevel, "1");
+scene.setCell(1, 1, greenLevel, "1");
+
+var secondScenePath = new FilePath(
+  "qt6_scene_save_icon_variants_second_" + stamp + ".tnz");
+scene.save(secondScenePath);
+
+var secondIconPath = new FilePath(
+  "toonz/build/qt6-script-smoke/stuff/sandbox/scenes/sceneIcons/" +
+  secondScenePath.name + " .png");
+var secondIcon = new Image(secondIconPath);
+
+print("qt-script-scene-save-icon-variants-second", secondIconPath.exists,
+      secondIcon.type, secondIcon.width > 0, secondIcon.height > 0,
+      secondIcon.width == firstIcon.width,
+      secondIcon.height == firstIcon.height);
+
+firstIcon.dispose();
+secondIcon.dispose();
+redLevel.dispose();
+greenLevel.dispose();
+scene.dispose();
+redBuilder.dispose();
+greenBuilder.dispose();
+
+"qt-script-scene-save-icon-variants-result";

@@ -471,7 +471,7 @@ if [[ -z "$smoke_action" ]]; then
 fi
 
 case "$smoke_action" in
-  startup|create-scene|open-scene|high-dpi|script-console-view|final-render-output|media-devices|audio-input|audio-recording-wav|audio-playback-wav|camera-formats|audio-output|viewer-render|viewer-vector-render|viewer-zoom-pan|viewer-onion-skin|viewer-onion-skin-rowarea|viewer-onion-skin-rowarea-drag|viewer-onion-skin-fixed-marker-drag|viewer-onion-skin-shift-trace|viewer-onion-skin-context-menu|viewer-onion-skin-custom-colors|viewer-onion-skin-orientations|viewer-camera-overlay|viewer-safe-area-field-guide|viewer-safe-area-presets|viewer-safe-area-custom-file|viewer-field-guide-settings|viewer-ruler-guide|viewer-ruler-guide-events|viewer-ruler-guide-variants|viewer-ruler-guide-lines|viewer-ruler-guide-styles|viewer-ruler-ticks|viewer-animate-tool-overlay|viewer-animate-tool-drag|viewer-animate-tool-mouse-events|viewer-animate-tool-undo-redo|viewer-animate-tool-modifiers|viewer-animate-tool-handles|viewer-animate-tool-handle-variants|viewer-animate-tool-axis-drags|viewer-animate-tool-cursors|viewer-selection-tool-vector-handles|viewer-selection-tool-vector-handle-variants|viewer-selection-tool-vector-center-thickness-deform|viewer-selection-tool-vector-mode-variants|viewer-selection-tool-raster-handles|viewer-selection-tool-raster-mode-variants|viewer-vector-brush|viewer-raster-brush|viewer-raster-brush-mouse-events|viewer-raster-brush-tablet-events|viewer-raster-brush-system-events|xsheet-scrub) ;;
+  startup|create-scene|open-scene|high-dpi|script-console-view|preview-render-output|fx-preview-render-output|fx-preview-subcamera-render-output|fx-preview-flipbook-controls|fx-preview-save-previewed-frames|fx-preview-subcamera-save-previewed-frames|final-render-output|final-render-background-output|final-render-sequence-output|final-render-composite-output|final-render-vector-output|final-render-toonz-raster-output|final-render-fx-output|media-devices|audio-input|audio-recording-wav|audio-playback-wav|camera-formats|audio-output|viewer-render|viewer-vector-render|viewer-zoom-pan|viewer-onion-skin|viewer-onion-skin-rowarea|viewer-onion-skin-rowarea-drag|viewer-onion-skin-fixed-marker-drag|viewer-onion-skin-shift-trace|viewer-onion-skin-context-menu|viewer-onion-skin-custom-colors|viewer-onion-skin-orientations|viewer-camera-overlay|viewer-safe-area-field-guide|viewer-safe-area-presets|viewer-safe-area-custom-file|viewer-field-guide-settings|viewer-ruler-guide|viewer-ruler-guide-events|viewer-ruler-guide-variants|viewer-ruler-guide-lines|viewer-ruler-guide-styles|viewer-ruler-ticks|viewer-animate-tool-overlay|viewer-animate-tool-drag|viewer-animate-tool-mouse-events|viewer-animate-tool-undo-redo|viewer-animate-tool-modifiers|viewer-animate-tool-handles|viewer-animate-tool-handle-variants|viewer-animate-tool-axis-drags|viewer-animate-tool-cursors|viewer-selection-tool-vector-handles|viewer-selection-tool-vector-handle-variants|viewer-selection-tool-vector-center-thickness-deform|viewer-selection-tool-vector-mode-variants|viewer-selection-tool-raster-handles|viewer-selection-tool-raster-mode-variants|viewer-vector-brush|viewer-raster-brush|viewer-raster-brush-mouse-events|viewer-raster-brush-tablet-events|viewer-raster-brush-system-events|xsheet-scrub) ;;
   *)
     echo "error: unsupported OPENTOONZ_GUI_SMOKE_ACTION: $smoke_action" >&2
     exit 1
@@ -990,10 +990,340 @@ while is_smoke_process_running; do
       exit 0
     fi
 
-    if [[ "$smoke_action" == "final-render-output" ]]; then
-      if ! final_render_window="$(wait_for_app_smoke_status final-render-output 180)"; then
+    if [[ "$smoke_action" == "preview-render-output" ]]; then
+      if ! preview_render_window="$(wait_for_app_smoke_status preview-render-output 180)"; then
         stop_smoke_process
-        echo "error: $smoke_label final-render-output smoke failed" >&2
+        echo "error: $smoke_label preview-render-output smoke failed" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      preview_render_probe="$(status_value previewRenderProbe || true)"
+      preview_render_ready="$(status_value previewRenderFrameReady || true)"
+      preview_render_failed="$(status_value previewRenderFailedFrames || true)"
+      preview_render_width="$(status_value previewRenderRasterWidth || true)"
+      preview_render_height="$(status_value previewRenderRasterHeight || true)"
+      preview_render_red_pixels="$(status_value previewRenderRedPixels || true)"
+      preview_render_opaque_pixels="$(status_value previewRenderOpaquePixels || true)"
+      if [[ "$preview_render_probe" != "ok" ||
+            "$preview_render_ready" != "true" ||
+            "$preview_render_failed" != "0" ||
+            "$preview_render_width" != "320" ||
+            "$preview_render_height" != "240" ||
+            ! "$preview_render_red_pixels" =~ ^[0-9]+$ ||
+            "$preview_render_red_pixels" == "0" ||
+            ! "$preview_render_opaque_pixels" =~ ^[0-9]+$ ||
+            "$preview_render_opaque_pixels" == "0" ]]; then
+        stop_smoke_process
+        echo "error: $smoke_label preview-render-output smoke reported unexpected state" >&2
+        sed -n '1,140p' "$status_path" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      if [[ "$hold_app" == "1" ]]; then
+        echo "$smoke_label preview-render-output smoke launched and is still running: pid $pid"
+        echo "Window: $preview_render_window"
+        echo "Preview raster size: ${preview_render_width}x${preview_render_height}"
+        echo "Red pixels: $preview_render_red_pixels"
+        echo "Log: $log_path"
+        wait "$pid"
+        exit $?
+      fi
+
+      stop_smoke_process
+      echo "$smoke_label preview-render-output smoke passed: $preview_render_window"
+      echo "Preview raster size: ${preview_render_width}x${preview_render_height}"
+      echo "Red pixels: $preview_render_red_pixels"
+      echo "Log: $log_path"
+      exit 0
+    fi
+
+    if [[ "$smoke_action" == "fx-preview-render-output" ]]; then
+      if ! fx_preview_render_window="$(wait_for_app_smoke_status fx-preview-render-output 180)"; then
+        stop_smoke_process
+        echo "error: $smoke_label fx-preview-render-output smoke failed" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      fx_preview_render_probe="$(status_value fxPreviewRenderProbe || true)"
+      fx_preview_render_ready="$(status_value fxPreviewRenderFrameReady || true)"
+      fx_preview_render_flipbook="$(status_value fxPreviewRenderFlipbook || true)"
+      fx_preview_render_attached="$(status_value fxPreviewRenderFlipbookAttached || true)"
+      fx_preview_render_completed="$(status_value fxPreviewRenderCompletedFrames || true)"
+      fx_preview_render_width="$(status_value fxPreviewRenderRasterWidth || true)"
+      fx_preview_render_height="$(status_value fxPreviewRenderRasterHeight || true)"
+      fx_preview_render_red_pixels="$(status_value fxPreviewRenderRedPixels || true)"
+      fx_preview_render_opaque_pixels="$(status_value fxPreviewRenderOpaquePixels || true)"
+      if [[ "$fx_preview_render_probe" != "ok" ||
+            "$fx_preview_render_ready" != "true" ||
+            "$fx_preview_render_flipbook" != "true" ||
+            "$fx_preview_render_attached" != "true" ||
+            ! "$fx_preview_render_completed" =~ ^[0-9]+$ ||
+            "$fx_preview_render_completed" == "0" ||
+            "$fx_preview_render_width" != "320" ||
+            "$fx_preview_render_height" != "240" ||
+            ! "$fx_preview_render_red_pixels" =~ ^[0-9]+$ ||
+            "$fx_preview_render_red_pixels" == "0" ||
+            ! "$fx_preview_render_opaque_pixels" =~ ^[0-9]+$ ||
+            "$fx_preview_render_opaque_pixels" == "0" ]]; then
+        stop_smoke_process
+        echo "error: $smoke_label fx-preview-render-output smoke reported unexpected state" >&2
+        sed -n '1,160p' "$status_path" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      if [[ "$hold_app" == "1" ]]; then
+        echo "$smoke_label fx-preview-render-output smoke launched and is still running: pid $pid"
+        echo "Window: $fx_preview_render_window"
+        echo "FX preview raster size: ${fx_preview_render_width}x${fx_preview_render_height}"
+        echo "Red pixels: $fx_preview_render_red_pixels"
+        echo "Log: $log_path"
+        wait "$pid"
+        exit $?
+      fi
+
+      stop_smoke_process
+      echo "$smoke_label fx-preview-render-output smoke passed: $fx_preview_render_window"
+      echo "FX preview raster size: ${fx_preview_render_width}x${fx_preview_render_height}"
+      echo "Red pixels: $fx_preview_render_red_pixels"
+      echo "Log: $log_path"
+      exit 0
+    fi
+
+    if [[ "$smoke_action" == "fx-preview-subcamera-render-output" ]]; then
+      if ! fx_preview_subcamera_window="$(wait_for_app_smoke_status fx-preview-subcamera-render-output 180)"; then
+        stop_smoke_process
+        echo "error: $smoke_label fx-preview-subcamera-render-output smoke failed" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      fx_preview_subcamera_probe="$(status_value fxPreviewSubcameraProbe || true)"
+      fx_preview_subcamera_ready="$(status_value fxPreviewSubcameraFrameReady || true)"
+      fx_preview_subcamera_flipbook="$(status_value fxPreviewSubcameraFlipbook || true)"
+      fx_preview_subcamera_attached="$(status_value fxPreviewSubcameraFlipbookAttached || true)"
+      fx_preview_subcamera_active="$(status_value fxPreviewSubcameraActive || true)"
+      fx_preview_subcamera_completed="$(status_value fxPreviewSubcameraCompletedFrames || true)"
+      fx_preview_subcamera_width="$(status_value fxPreviewSubcameraRasterWidth || true)"
+      fx_preview_subcamera_height="$(status_value fxPreviewSubcameraRasterHeight || true)"
+      fx_preview_subcamera_red_pixels="$(status_value fxPreviewSubcameraRedPixels || true)"
+      fx_preview_subcamera_opaque_pixels="$(status_value fxPreviewSubcameraOpaquePixels || true)"
+      if [[ "$fx_preview_subcamera_probe" != "ok" ||
+            "$fx_preview_subcamera_ready" != "true" ||
+            "$fx_preview_subcamera_flipbook" != "true" ||
+            "$fx_preview_subcamera_attached" != "true" ||
+            "$fx_preview_subcamera_active" != "true" ||
+            ! "$fx_preview_subcamera_completed" =~ ^[0-9]+$ ||
+            "$fx_preview_subcamera_completed" == "0" ||
+            "$fx_preview_subcamera_width" != "160" ||
+            "$fx_preview_subcamera_height" != "120" ||
+            ! "$fx_preview_subcamera_red_pixels" =~ ^[0-9]+$ ||
+            "$fx_preview_subcamera_red_pixels" == "0" ||
+            ! "$fx_preview_subcamera_opaque_pixels" =~ ^[0-9]+$ ||
+            "$fx_preview_subcamera_opaque_pixels" == "0" ]]; then
+        stop_smoke_process
+        echo "error: $smoke_label fx-preview-subcamera-render-output smoke reported unexpected state" >&2
+        sed -n '1,160p' "$status_path" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      if [[ "$hold_app" == "1" ]]; then
+        echo "$smoke_label fx-preview-subcamera-render-output smoke launched and is still running: pid $pid"
+        echo "Window: $fx_preview_subcamera_window"
+        echo "FX preview sub-camera raster size: ${fx_preview_subcamera_width}x${fx_preview_subcamera_height}"
+        echo "Red pixels: $fx_preview_subcamera_red_pixels"
+        echo "Log: $log_path"
+        wait "$pid"
+        exit $?
+      fi
+
+      stop_smoke_process
+      echo "$smoke_label fx-preview-subcamera-render-output smoke passed: $fx_preview_subcamera_window"
+      echo "FX preview sub-camera raster size: ${fx_preview_subcamera_width}x${fx_preview_subcamera_height}"
+      echo "Red pixels: $fx_preview_subcamera_red_pixels"
+      echo "Log: $log_path"
+      exit 0
+    fi
+
+    if [[ "$smoke_action" == "fx-preview-flipbook-controls" ]]; then
+      if ! fx_preview_flipbook_window="$(wait_for_app_smoke_status fx-preview-flipbook-controls 180)"; then
+        stop_smoke_process
+        echo "error: $smoke_label fx-preview-flipbook-controls smoke failed" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      fx_preview_flipbook_probe="$(status_value fxPreviewFlipbookControlsProbe || true)"
+      fx_preview_flipbook_attached="$(status_value fxPreviewFlipbookControlsFlipbookAttached || true)"
+      fx_preview_flipbook_frame0_ready="$(status_value fxPreviewFlipbookControlsFrame0Ready || true)"
+      fx_preview_flipbook_frame1_ready="$(status_value fxPreviewFlipbookControlsFrame1Ready || true)"
+      fx_preview_flipbook_frame0_width="$(status_value fxPreviewFlipbookControlsFrame0RasterWidth || true)"
+      fx_preview_flipbook_frame0_height="$(status_value fxPreviewFlipbookControlsFrame0RasterHeight || true)"
+      fx_preview_flipbook_frame1_width="$(status_value fxPreviewFlipbookControlsFrame1RasterWidth || true)"
+      fx_preview_flipbook_frame1_height="$(status_value fxPreviewFlipbookControlsFrame1RasterHeight || true)"
+      fx_preview_flipbook_frame0_red_pixels="$(status_value fxPreviewFlipbookControlsFrame0RedPixels || true)"
+      fx_preview_flipbook_frame1_green_pixels="$(status_value fxPreviewFlipbookControlsFrame1GreenPixels || true)"
+      fx_preview_flipbook_frame_switch="$(status_value fxPreviewFlipbookControlsFrameSwitch || true)"
+      fx_preview_flipbook_clone="$(status_value fxPreviewFlipbookControlsClone || true)"
+      fx_preview_flipbook_freeze="$(status_value fxPreviewFlipbookControlsFreeze || true)"
+      fx_preview_flipbook_unfreeze="$(status_value fxPreviewFlipbookControlsUnfreeze || true)"
+      fx_preview_flipbook_frozen_frame0_red_pixels="$(status_value fxPreviewFlipbookControlsFrozenFrame0RedPixels || true)"
+      fx_preview_flipbook_frozen_frame1_green_pixels="$(status_value fxPreviewFlipbookControlsFrozenFrame1GreenPixels || true)"
+      if [[ "$fx_preview_flipbook_probe" != "ok" ||
+            "$fx_preview_flipbook_attached" != "true" ||
+            "$fx_preview_flipbook_frame0_ready" != "true" ||
+            "$fx_preview_flipbook_frame1_ready" != "true" ||
+            "$fx_preview_flipbook_frame0_width" != "320" ||
+            "$fx_preview_flipbook_frame0_height" != "240" ||
+            "$fx_preview_flipbook_frame1_width" != "320" ||
+            "$fx_preview_flipbook_frame1_height" != "240" ||
+            ! "$fx_preview_flipbook_frame0_red_pixels" =~ ^[0-9]+$ ||
+            "$fx_preview_flipbook_frame0_red_pixels" == "0" ||
+            ! "$fx_preview_flipbook_frame1_green_pixels" =~ ^[0-9]+$ ||
+            "$fx_preview_flipbook_frame1_green_pixels" == "0" ||
+            "$fx_preview_flipbook_frame_switch" != "true" ||
+            "$fx_preview_flipbook_clone" != "true" ||
+            "$fx_preview_flipbook_freeze" != "true" ||
+            "$fx_preview_flipbook_unfreeze" != "true" ||
+            ! "$fx_preview_flipbook_frozen_frame0_red_pixels" =~ ^[0-9]+$ ||
+            "$fx_preview_flipbook_frozen_frame0_red_pixels" == "0" ||
+            ! "$fx_preview_flipbook_frozen_frame1_green_pixels" =~ ^[0-9]+$ ||
+            "$fx_preview_flipbook_frozen_frame1_green_pixels" == "0" ]]; then
+        stop_smoke_process
+        echo "error: $smoke_label fx-preview-flipbook-controls smoke reported unexpected state" >&2
+        sed -n '1,180p' "$status_path" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      if [[ "$hold_app" == "1" ]]; then
+        echo "$smoke_label fx-preview-flipbook-controls smoke launched and is still running: pid $pid"
+        echo "Window: $fx_preview_flipbook_window"
+        echo "FX preview frame 0 size: ${fx_preview_flipbook_frame0_width}x${fx_preview_flipbook_frame0_height}"
+        echo "FX preview frame 1 size: ${fx_preview_flipbook_frame1_width}x${fx_preview_flipbook_frame1_height}"
+        echo "Frame 0 red pixels: $fx_preview_flipbook_frame0_red_pixels"
+        echo "Frame 1 green pixels: $fx_preview_flipbook_frame1_green_pixels"
+        echo "Log: $log_path"
+        wait "$pid"
+        exit $?
+      fi
+
+      stop_smoke_process
+      echo "$smoke_label fx-preview-flipbook-controls smoke passed: $fx_preview_flipbook_window"
+      echo "FX preview frame 0 size: ${fx_preview_flipbook_frame0_width}x${fx_preview_flipbook_frame0_height}"
+      echo "FX preview frame 1 size: ${fx_preview_flipbook_frame1_width}x${fx_preview_flipbook_frame1_height}"
+      echo "Frame 0 red pixels: $fx_preview_flipbook_frame0_red_pixels"
+      echo "Frame 1 green pixels: $fx_preview_flipbook_frame1_green_pixels"
+      echo "Log: $log_path"
+      exit 0
+    fi
+
+    if [[ "$smoke_action" == "fx-preview-save-previewed-frames" ||
+          "$smoke_action" == "fx-preview-subcamera-save-previewed-frames" ]]; then
+      if ! fx_preview_save_window="$(wait_for_app_smoke_status "$smoke_action" 180)"; then
+        stop_smoke_process
+        echo "error: $smoke_label $smoke_action smoke failed" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      if [[ "$smoke_action" == "fx-preview-subcamera-save-previewed-frames" ]]; then
+        fx_preview_save_expected_width="160"
+        fx_preview_save_expected_height="120"
+        fx_preview_save_expected_subcamera="true"
+      else
+        fx_preview_save_expected_width="320"
+        fx_preview_save_expected_height="240"
+        fx_preview_save_expected_subcamera="false"
+      fi
+      fx_preview_save_probe="$(status_value fxPreviewSavePreviewedFramesProbe || true)"
+      fx_preview_save_subcamera="$(status_value fxPreviewSavePreviewedFramesSubcamera || true)"
+      fx_preview_save_subcamera_active="$(status_value fxPreviewSavePreviewedFramesSubcameraActive || true)"
+      fx_preview_save_reported_width="$(status_value fxPreviewSavePreviewedFramesExpectedWidth || true)"
+      fx_preview_save_reported_height="$(status_value fxPreviewSavePreviewedFramesExpectedHeight || true)"
+      fx_preview_save_attached="$(status_value fxPreviewSavePreviewedFramesFlipbookAttached || true)"
+      fx_preview_save_frame0_ready="$(status_value fxPreviewSavePreviewedFramesFrame0Ready || true)"
+      fx_preview_save_frame1_ready="$(status_value fxPreviewSavePreviewedFramesFrame1Ready || true)"
+      fx_preview_save_started="$(status_value fxPreviewSavePreviewedFramesStarted || true)"
+      fx_preview_save_output_probe="$(status_value fxPreviewSavePreviewedFramesOutputProbe || true)"
+      fx_preview_save_output_count="$(status_value fxPreviewSavePreviewedFramesOutputCount || true)"
+      fx_preview_save_output0_width="$(status_value fxPreviewSavePreviewedFramesOutput0Width || true)"
+      fx_preview_save_output0_height="$(status_value fxPreviewSavePreviewedFramesOutput0Height || true)"
+      fx_preview_save_output1_width="$(status_value fxPreviewSavePreviewedFramesOutput1Width || true)"
+      fx_preview_save_output1_height="$(status_value fxPreviewSavePreviewedFramesOutput1Height || true)"
+      fx_preview_save_output0_red_pixels="$(status_value fxPreviewSavePreviewedFramesOutput0RedPixels || true)"
+      fx_preview_save_output1_green_pixels="$(status_value fxPreviewSavePreviewedFramesOutput1GreenPixels || true)"
+      fx_preview_save_output0_bytes="$(status_value fxPreviewSavePreviewedFramesOutput0Bytes || true)"
+      fx_preview_save_output1_bytes="$(status_value fxPreviewSavePreviewedFramesOutput1Bytes || true)"
+      fx_preview_save_output_dir="$(status_value fxPreviewSavePreviewedFramesOutputDir || true)"
+      if [[ "$fx_preview_save_probe" != "ok" ||
+            "$fx_preview_save_subcamera" != "$fx_preview_save_expected_subcamera" ||
+            "$fx_preview_save_reported_width" != "$fx_preview_save_expected_width" ||
+            "$fx_preview_save_reported_height" != "$fx_preview_save_expected_height" ||
+            ( "$fx_preview_save_expected_subcamera" == "true" && "$fx_preview_save_subcamera_active" != "true" ) ||
+            "$fx_preview_save_attached" != "true" ||
+            "$fx_preview_save_frame0_ready" != "true" ||
+            "$fx_preview_save_frame1_ready" != "true" ||
+            "$fx_preview_save_started" != "true" ||
+            "$fx_preview_save_output_probe" != "ok" ||
+            "$fx_preview_save_output_count" != "2" ||
+            "$fx_preview_save_output0_width" != "$fx_preview_save_expected_width" ||
+            "$fx_preview_save_output0_height" != "$fx_preview_save_expected_height" ||
+            "$fx_preview_save_output1_width" != "$fx_preview_save_expected_width" ||
+            "$fx_preview_save_output1_height" != "$fx_preview_save_expected_height" ||
+            ! "$fx_preview_save_output0_red_pixels" =~ ^[0-9]+$ ||
+            "$fx_preview_save_output0_red_pixels" == "0" ||
+            ! "$fx_preview_save_output1_green_pixels" =~ ^[0-9]+$ ||
+            "$fx_preview_save_output1_green_pixels" == "0" ||
+            ! "$fx_preview_save_output0_bytes" =~ ^[0-9]+$ ||
+            "$fx_preview_save_output0_bytes" == "0" ||
+            ! "$fx_preview_save_output1_bytes" =~ ^[0-9]+$ ||
+            "$fx_preview_save_output1_bytes" == "0" ]]; then
+        stop_smoke_process
+        echo "error: $smoke_label $smoke_action smoke reported unexpected state" >&2
+        sed -n '1,180p' "$status_path" >&2
+        sed -n '1,180p' "$log_path" >&2
+        exit 1
+      fi
+
+      if [[ "$hold_app" == "1" ]]; then
+        echo "$smoke_label $smoke_action smoke launched and is still running: pid $pid"
+        echo "Window: $fx_preview_save_window"
+        echo "Saved preview frame 0 size: ${fx_preview_save_output0_width}x${fx_preview_save_output0_height}"
+        echo "Saved preview frame 1 size: ${fx_preview_save_output1_width}x${fx_preview_save_output1_height}"
+        echo "Frame 0 red pixels: $fx_preview_save_output0_red_pixels"
+        echo "Frame 1 green pixels: $fx_preview_save_output1_green_pixels"
+        echo "Output dir: $fx_preview_save_output_dir"
+        echo "Log: $log_path"
+        wait "$pid"
+        exit $?
+      fi
+
+      stop_smoke_process
+      echo "$smoke_label $smoke_action smoke passed: $fx_preview_save_window"
+      echo "Saved preview frame 0 size: ${fx_preview_save_output0_width}x${fx_preview_save_output0_height}"
+      echo "Saved preview frame 1 size: ${fx_preview_save_output1_width}x${fx_preview_save_output1_height}"
+      echo "Frame 0 red pixels: $fx_preview_save_output0_red_pixels"
+      echo "Frame 1 green pixels: $fx_preview_save_output1_green_pixels"
+      echo "Output dir: $fx_preview_save_output_dir"
+      echo "Log: $log_path"
+      exit 0
+    fi
+
+    if [[ "$smoke_action" == "final-render-output" ||
+          "$smoke_action" == "final-render-background-output" ||
+          "$smoke_action" == "final-render-sequence-output" ||
+          "$smoke_action" == "final-render-composite-output" ||
+          "$smoke_action" == "final-render-vector-output" ||
+          "$smoke_action" == "final-render-toonz-raster-output" ||
+          "$smoke_action" == "final-render-fx-output" ]]; then
+      if ! final_render_window="$(wait_for_app_smoke_status "$smoke_action" 180)"; then
+        stop_smoke_process
+        echo "error: $smoke_label $smoke_action smoke failed" >&2
         sed -n '1,180p' "$log_path" >&2
         exit 1
       fi
@@ -1005,40 +1335,115 @@ while is_smoke_process_running; do
       final_render_width="$(status_value finalRenderOutputWidth || true)"
       final_render_height="$(status_value finalRenderOutputHeight || true)"
       final_render_red_pixels="$(status_value finalRenderOutputRedPixels || true)"
+      final_render_green_pixels="$(status_value finalRenderOutputGreenPixels || true)"
+      final_render_blue_pixels="$(status_value finalRenderOutputBluePixels || true)"
+      final_render_frame_count="$(status_value finalRenderOutputFrameCount || true)"
       final_render_output_path="$(status_value finalRenderOutputPath || true)"
+      final_render_second_width="$(status_value finalRenderSecondOutputWidth || true)"
+      final_render_second_height="$(status_value finalRenderSecondOutputHeight || true)"
+      final_render_second_green_pixels="$(status_value finalRenderSecondOutputGreenPixels || true)"
+      final_render_second_output_path="$(status_value finalRenderSecondOutputPath || true)"
+      final_render_fx_applied="$(status_value finalRenderFxApplied || true)"
+      final_render_fx_root="$(status_value finalRenderFxRoot || true)"
+      final_render_background_ok=1
+      if [[ "$smoke_action" == "final-render-background-output" &&
+            ( ! "$final_render_blue_pixels" =~ ^[0-9]+$ ||
+              "$final_render_blue_pixels" == "0" ) ]]; then
+        final_render_background_ok=0
+      fi
+      final_render_composite_ok=1
+      if [[ "$smoke_action" == "final-render-composite-output" &&
+            ( ! "$final_render_green_pixels" =~ ^[0-9]+$ ||
+              "$final_render_green_pixels" == "0" ) ]]; then
+        final_render_composite_ok=0
+      fi
+      final_render_expected_frames=1
+      final_render_sequence_ok=1
+      if [[ "$smoke_action" == "final-render-sequence-output" ]]; then
+        final_render_expected_frames=2
+        if [[ "$final_render_frame_count" != "2" ||
+              "$final_render_second_width" != "320" ||
+              "$final_render_second_height" != "240" ||
+              ! "$final_render_second_green_pixels" =~ ^[0-9]+$ ||
+              "$final_render_second_green_pixels" == "0" ||
+              -z "$final_render_second_output_path" ||
+              ! -s "$final_render_second_output_path" ]]; then
+          final_render_sequence_ok=0
+        fi
+      fi
+      final_render_fx_ok=1
+      if [[ "$smoke_action" == "final-render-fx-output" &&
+            ( "$final_render_fx_applied" != "true" ||
+              "$final_render_fx_root" != STD_blurFx:* ) ]]; then
+        final_render_fx_ok=0
+      fi
       if [[ "$final_render_probe" != "ok" ||
             "$final_render_output_probe" != "ok" ||
-            "$final_render_completed" != "1" ||
+            "$final_render_completed" != "$final_render_expected_frames" ||
             "$final_render_failed" != "0" ||
             "$final_render_width" != "320" ||
             "$final_render_height" != "240" ||
             ! "$final_render_red_pixels" =~ ^[0-9]+$ ||
             "$final_render_red_pixels" == "0" ||
+            "$final_render_background_ok" != "1" ||
+            "$final_render_composite_ok" != "1" ||
+            "$final_render_sequence_ok" != "1" ||
+            "$final_render_fx_ok" != "1" ||
             -z "$final_render_output_path" ||
             ! -s "$final_render_output_path" ]]; then
         stop_smoke_process
-        echo "error: $smoke_label final-render-output smoke reported unexpected state" >&2
+        echo "error: $smoke_label $smoke_action smoke reported unexpected state" >&2
         sed -n '1,140p' "$status_path" >&2
         sed -n '1,180p' "$log_path" >&2
         exit 1
       fi
 
       if [[ "$hold_app" == "1" ]]; then
-        echo "$smoke_label final-render-output smoke launched and is still running: pid $pid"
+        echo "$smoke_label $smoke_action smoke launched and is still running: pid $pid"
         echo "Window: $final_render_window"
         echo "Output: $final_render_output_path"
         echo "Output size: ${final_render_width}x${final_render_height}"
         echo "Red pixels: $final_render_red_pixels"
+        if [[ "$smoke_action" == "final-render-background-output" ]]; then
+          echo "Blue pixels: $final_render_blue_pixels"
+        fi
+        if [[ "$smoke_action" == "final-render-composite-output" ]]; then
+          echo "Green pixels: $final_render_green_pixels"
+        fi
+        if [[ "$smoke_action" == "final-render-sequence-output" ]]; then
+          echo "Output frames: $final_render_frame_count"
+          echo "Second output: $final_render_second_output_path"
+          echo "Second output size: ${final_render_second_width}x${final_render_second_height}"
+          echo "Second green pixels: $final_render_second_green_pixels"
+        fi
+        if [[ "$smoke_action" == "final-render-fx-output" ]]; then
+          echo "FX root: $final_render_fx_root"
+        fi
         echo "Log: $log_path"
         wait "$pid"
         exit $?
       fi
 
       stop_smoke_process
-      echo "$smoke_label final-render-output smoke passed: $final_render_window"
+      echo "$smoke_label $smoke_action smoke passed: $final_render_window"
       echo "Output: $final_render_output_path"
       echo "Output size: ${final_render_width}x${final_render_height}"
       echo "Red pixels: $final_render_red_pixels"
+      if [[ "$smoke_action" == "final-render-background-output" ]]; then
+        echo "Blue pixels: $final_render_blue_pixels"
+      fi
+      if [[ "$smoke_action" == "final-render-composite-output" ]]; then
+        echo "Green pixels: $final_render_green_pixels"
+      fi
+      if [[ "$smoke_action" == "final-render-sequence-output" ]]; then
+        echo "Output frames: $final_render_frame_count"
+        echo "Second output: $final_render_second_output_path"
+        echo "Second output size: ${final_render_second_width}x${final_render_second_height}"
+        echo "Second green pixels: $final_render_second_green_pixels"
+      fi
+      if [[ "$smoke_action" == "final-render-fx-output" ]]; then
+        echo "FX root: $final_render_fx_root"
+      fi
       echo "Log: $log_path"
       exit 0
     fi

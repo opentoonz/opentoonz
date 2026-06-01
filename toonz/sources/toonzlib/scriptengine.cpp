@@ -2414,8 +2414,14 @@ QString ScriptEngine::sceneLoad(int sceneId, const QString& path) {
     if (!TSystem::doesExistFileOrLevel(fp)) {
       return tr("File %1 doesn't exist").arg(path);
     }
-    clearQjsLevelsForScene(sceneId);
+
+    const TFileType::Type type = TFileType::getInfo(fp);
+    if (!TFileType::isScene(type)) {
+      return tr("Can't load this kind of file as a scene : %1").arg(path);
+    }
+
     scene->load(fp);
+    clearQjsLevelsForScene(sceneId);
   } catch (...) {
     return tr("Exception reading %1").arg(path);
   }
