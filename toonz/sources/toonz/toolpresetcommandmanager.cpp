@@ -29,6 +29,7 @@
 #include "tstream.h"
 
 #include <QSettings>
+#include "tenv.h"
 #include <QPainter>
 #include <QPainterPath>
 #include <QPixmap>
@@ -218,10 +219,12 @@ QPixmap generateDynamicSizeIcon(double size, int iconSize = 32) {
   return pixmap;
 }
 
-// Check if user preference is set to use sample strokes
+// Check if user preference is set to use sample strokes (TEnv, shared name
+// with BrushPresetPanel).
 bool useSampleStrokesEnabled() {
-  QSettings settings;
-  return settings.value("BrushPresetPanel/useSampleStrokes", false).toBool();
+  static TEnv::IntVar BrushPresetPanelUseSampleStrokes(
+      "BrushPresetPanelUseSampleStrokes", 0);
+  return BrushPresetPanelUseSampleStrokes != 0;
 }
 
 // Helper structure to hold minimal render data for a brush preset

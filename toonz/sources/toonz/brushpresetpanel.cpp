@@ -49,7 +49,6 @@
 #include <QScrollArea>
 #include <QGridLayout>
 #include <QPushButton>
-#include <QSettings>
 #include <QLabel>
 #include <QMessageBox>
 #include <QPainter>
@@ -110,12 +109,77 @@ public:
 
 namespace {
 
-// Brush Preset Panel display prefs in user .env (TEnv), not the Windows registry.
+// Brush Preset Panel UI state in user .env (TEnv), not the Windows registry.
 TEnv::IntVar BrushPresetPanelShowBorders("BrushPresetPanelShowBorders", 0);
 TEnv::IntVar BrushPresetPanelShowBackgrounds("BrushPresetPanelShowBackgrounds", 1);
+TEnv::IntVar BrushPresetPanelUseSampleStrokes("BrushPresetPanelUseSampleStrokes",
+                                              0);
 TEnv::IntVar BrushPresetPanelViewMode(
     "BrushPresetPanelViewMode",
     static_cast<int>(BrushPresetPanel::GridLarge));
+TEnv::IntVar BrushPresetPanelNonDestructive("BrushPresetPanelNonDestructive", 0);
+TEnv::IntVar BrushPresetPanelSelectivePreset("BrushPresetPanelSelectivePreset",
+                                             0);
+
+TEnv::StringVar BrushPresetPagesVector("BrushPresetPages_vector", "");
+TEnv::StringVar BrushPresetPagesToonzRaster("BrushPresetPages_toonzraster", "");
+TEnv::StringVar BrushPresetPagesRaster("BrushPresetPages_raster", "");
+
+const QChar kPageFieldSeparator(0x1e);
+const QChar kPageEntrySeparator(0x1f);
+
+TEnv::StringVar &brushPresetPagesEnvForToolType(const QString &toolType) {
+  if (toolType == "vector") return BrushPresetPagesVector;
+  if (toolType == "toonzraster") return BrushPresetPagesToonzRaster;
+  return BrushPresetPagesRaster;
+}
+
+QString serializePageConfiguration(const QList<BrushPresetPage *> &pages,
+                                 int currentPageIndex) {
+  QStringList parts;
+  parts << QString::number(pages.size());
+  parts << QString::number(currentPageIndex);
+  for (BrushPresetPage *page : pages) {
+    if (!page) continue;
+    QString entry = page->getName() + kPageFieldSeparator +
+                    page->getPresetNames().join("|||") + kPageFieldSeparator +
+                    page->getLastSelectedPreset();
+    parts << entry;
+  }
+  return parts.join(kPageEntrySeparator);
+}
+
+bool deserializePageConfiguration(
+    const QString &serialized, QList<BrushPresetPage *> &outPages,
+    int &outCurrentPageIndex) {
+  outPages.clear();
+  if (serialized.isEmpty()) return false;
+
+  const QStringList parts = serialized.split(kPageEntrySeparator);
+  if (parts.size() < 2) return false;
+
+  bool okCount = false, okCurrent = false;
+  const int pageCount = parts[0].toInt(&okCount);
+  outCurrentPageIndex = parts[1].toInt(&okCurrent);
+  if (!okCount || !okCurrent || pageCount <= 0) return false;
+
+  for (int i = 0; i < pageCount; ++i) {
+    const int partIndex = i + 2;
+    if (partIndex >= parts.size()) break;
+
+    const QStringList fields = parts[partIndex].split(kPageFieldSeparator);
+    const QString pageName = fields.value(0, QString("Page %1").arg(i + 1));
+    BrushPresetPage *page = new BrushPresetPage(pageName, i);
+
+    if (fields.size() > 1 && !fields[1].isEmpty()) {
+      page->setPresetNames(fields[1].split("|||", Qt::SkipEmptyParts));
+    }
+    if (fields.size() > 2) page->setLastSelectedPreset(fields[2]);
+    outPages.append(page);
+  }
+
+  return !outPages.isEmpty();
+}
 
 // Parse the preset file for toolType once and return a map of all presets.
 // This is the efficient alternative to calling loadPresetRenderData() N times
@@ -1225,12 +1289,7 @@ BrushPresetPanel::BrushPresetPanel(QWidget *parent)
   // Load preferences from TEnv FIRST (before creating UI)
   m_showBorders = BrushPresetPanelShowBorders != 0;
   m_showBackgrounds = BrushPresetPanelShowBackgrounds != 0;
-  {
-    QSettings settings;
-    m_useSampleStrokes =
-        settings.value("BrushPresetPanel/useSampleStrokes", false).toBool();
-  }
-
+  m_useSampleStrokes = BrushPresetPanelUseSampleStrokes != 0;
   // Load view mode (default: GridLarge)
   int savedViewMode = static_cast<int>(BrushPresetPanelViewMode);
   m_viewMode = static_cast<ViewMode>(savedViewMode);
@@ -1347,11 +1406,10 @@ void BrushPresetPanel::initializeUI() {
   m_plainColorButton->setFixedSize(20, 20);
   m_plainColorButton->setToolTip(tr("Plain Color"));
   
-  // Restore toggle states from QSettings
+  // Restore toggle states from TEnv
   {
-    QSettings settings;
-    bool nd = settings.value("BrushPresetPanel/NonDestructive", false).toBool();
-    bool sp = settings.value("BrushPresetPanel/SelectivePreset", false).toBool();
+    bool nd = BrushPresetPanelNonDestructive != 0;
+    bool sp = BrushPresetPanelSelectivePreset != 0;
     m_nonDestructiveToggle->setChecked(nd);
     m_selectivePresetToggle->setChecked(sp);
     BrushPresetBridge::setNonDestructiveMode(nd);
@@ -2311,14 +2369,12 @@ void BrushPresetPanel::onRefreshClicked() {
 
 void BrushPresetPanel::onNonDestructiveToggled(bool checked) {
   BrushPresetBridge::setNonDestructiveMode(checked);
-  QSettings settings;
-  settings.setValue("BrushPresetPanel/NonDestructive", checked);
+  BrushPresetPanelNonDestructive = checked ? 1 : 0;
 }
 
 void BrushPresetPanel::onSelectivePresetToggled(bool checked) {
   BrushPresetBridge::setSelectivePresetMode(checked);
-  QSettings settings;
-  settings.setValue("BrushPresetPanel/SelectivePreset", checked);
+  BrushPresetPanelSelectivePreset = checked ? 1 : 0;
 }
 
 void BrushPresetPanel::onPlainColorClicked() {
@@ -2474,9 +2530,8 @@ void BrushPresetPanel::createViewModeMenu() {
   m_viewModeMenu->addAction(sampleStrokesAction);
   connect(sampleStrokesAction, &QAction::triggered, [this, sampleStrokesAction]() {
     m_useSampleStrokes = sampleStrokesAction->isChecked();
-    // Save preference
-    QSettings settings;
-    settings.setValue("BrushPresetPanel/useSampleStrokes", m_useSampleStrokes);
+    // Save preference to TEnv
+    BrushPresetPanelUseSampleStrokes = m_useSampleStrokes ? 1 : 0;
     // Refresh display in Brush Preset Panel
     refreshPresetList();
     // Refresh Universal Size icons in Custom Panels
@@ -3158,7 +3213,7 @@ void BrushPresetPanel::initializeTabs() {
     m_tabBar->removeTab(i);
   }
   
-  // Load page configuration for current tool type from QSettings
+  // Load page configuration for current tool type from TEnv
   // This populates m_pages[m_currentToolType]
   loadPageConfiguration();
   
@@ -3388,123 +3443,35 @@ void BrushPresetPanel::movePageTab(int srcIndex, int dstIndex) {
 
 void BrushPresetPanel::savePageConfiguration() {
   if (m_currentToolType.isEmpty()) return;
-  
-  QSettings settings;
-  QList<BrushPresetPage*> pages = m_pages.value(m_currentToolType);
-  
-  // Clear old page data first to avoid stale data
-  int oldPageCount = settings.value(QString("BrushPresetPanel/PageCount_%1").arg(m_currentToolType), 0).toInt();
-  for (int i = 0; i < oldPageCount; ++i) {
-    QString prefix = QString("BrushPresetPanel/%1_Page%2").arg(m_currentToolType).arg(i);
-    settings.remove(prefix + "_Name");
-    settings.remove(prefix + "_Presets");
-    settings.remove(prefix + "_LastPreset");
-  }
-  
-  // Save number of pages
-  settings.setValue(QString("BrushPresetPanel/PageCount_%1").arg(m_currentToolType), pages.size());
-  
-  // Save each page configuration with explicit index
+
+  const QList<BrushPresetPage *> pages = m_pages.value(m_currentToolType);
   for (int i = 0; i < pages.size(); ++i) {
-    BrushPresetPage *page = pages[i];
-    // Ensure page index is synchronized
-    page->setIndex(i);
-    
-    QString prefix = QString("BrushPresetPanel/%1_Page%2").arg(m_currentToolType).arg(i);
-    
-    // Save page name
-    settings.setValue(prefix + "_Name", page->getName());
-    
-    // Save presets in this page (join with ||| to avoid comma conflicts)
-    settings.setValue(prefix + "_Presets", page->getPresetNames().join("|||"));
-    
-    // Save last selected preset
-    settings.setValue(prefix + "_LastPreset", page->getLastSelectedPreset());
+    if (pages[i]) pages[i]->setIndex(i);
   }
-  
-  // Save current page index
-  settings.setValue(QString("BrushPresetPanel/CurrentPage_%1").arg(m_currentToolType),
-                   m_currentPageIndex);
-  
-  // Force sync to disk
-  settings.sync();
+
+  TEnv::StringVar &pagesEnv = brushPresetPagesEnvForToolType(m_currentToolType);
+  pagesEnv =
+      serializePageConfiguration(pages, m_currentPageIndex).toStdString();
 }
 
 void BrushPresetPanel::loadPageConfiguration() {
   if (m_currentToolType.isEmpty()) return;
-  
-  QSettings settings;
-  
-  // MIGRATION: Clean up obsolete engine-specific keys from previous versions.
-  // Pages are now stored per level type (vector/toonzraster/raster) only.
-  // Remove any data stored under old "mypainttnz" or "mypaint" keys
-  // and merge their presets into the correct level-type pages.
-  static bool migrationDone = false;
-  if (!migrationDone) {
-    QStringList obsoleteKeys = {"mypainttnz", "mypaint"};
-    for (const QString &oldKey : obsoleteKeys) {
-      int oldPageCount = settings.value(
-          QString("BrushPresetPanel/PageCount_%1").arg(oldKey), 0).toInt();
-      if (oldPageCount > 0) {
-        // Remove all old page data
-        for (int i = 0; i < oldPageCount; ++i) {
-          QString prefix = QString("BrushPresetPanel/%1_Page%2").arg(oldKey).arg(i);
-          settings.remove(prefix + "_Name");
-          settings.remove(prefix + "_Presets");
-          settings.remove(prefix + "_LastPreset");
-        }
-        settings.remove(QString("BrushPresetPanel/PageCount_%1").arg(oldKey));
-        settings.remove(QString("BrushPresetPanel/CurrentPage_%1").arg(oldKey));
-      }
-    }
-    migrationDone = true;
-    settings.sync();
-  }
-  
-  // Clear existing pages for this tool type
-  QList<BrushPresetPage*> &pages = m_pages[m_currentToolType];
+
+  QList<BrushPresetPage *> &pages = m_pages[m_currentToolType];
   qDeleteAll(pages);
   pages.clear();
-  
-  // Load number of pages (default 0 means no user data yet - will auto-create Page 1)
-  int pageCount = settings.value(QString("BrushPresetPanel/PageCount_%1").arg(m_currentToolType), 0).toInt();
-  
-  if (pageCount <= 0) pageCount = 1;
-  
-  // Load each page
-  for (int i = 0; i < pageCount; ++i) {
-    QString prefix = QString("BrushPresetPanel/%1_Page%2").arg(m_currentToolType).arg(i);
-    
-    // Load page name
-    QString pageName = settings.value(prefix + "_Name", tr("Page %1").arg(i + 1)).toString();
-    
-    // Create page
-    BrushPresetPage *page = new BrushPresetPage(pageName, i);
-    
-    // Load presets (using ||| separator to avoid comma conflicts)
-    QString presetsStr = settings.value(prefix + "_Presets", "").toString();
-    if (!presetsStr.isEmpty()) {
-      QStringList presetNames = presetsStr.split("|||", Qt::SkipEmptyParts);
-      page->setPresetNames(presetNames);
-    }
-    
-    // Load last selected preset
-    QString lastPreset = settings.value(prefix + "_LastPreset", "").toString();
-    page->setLastSelectedPreset(lastPreset);
-    
-    pages.append(page);
-  }
-  
-  // Ensure at least one page exists
-  if (pages.isEmpty()) {
+
+  const QString serialized =
+      QString::fromStdString(
+          (std::string)brushPresetPagesEnvForToolType(m_currentToolType));
+  int loadedCurrentPage = 0;
+  if (!deserializePageConfiguration(serialized, pages, loadedCurrentPage)) {
     BrushPresetPage *defaultPage = new BrushPresetPage(tr("Page 1"), 0);
     pages.append(defaultPage);
+    loadedCurrentPage = 0;
   }
-  
-  // Load current page index
-  m_currentPageIndex = settings.value(QString("BrushPresetPanel/CurrentPage_%1").arg(m_currentToolType), 0).toInt();
-  
-  // Bound to valid range
+
+  m_currentPageIndex = loadedCurrentPage;
   if (m_currentPageIndex < 0 || m_currentPageIndex >= pages.size()) {
     m_currentPageIndex = 0;
   }
