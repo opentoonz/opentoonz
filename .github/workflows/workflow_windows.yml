@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master  # Specify branches where the workflow should run
+      - codex/** # Allow fork-maintained migration branches to run Windows CI
     paths:
       - '**/*'                                    # Include all files in the repository
       - '!appveyor.yml'                           # Ignore changes in AppVeyor
@@ -19,6 +20,7 @@ on:
       - '!doc/**'
       - '!**/.github/**'
       - '.github/workflows/workflow_windows.yml'
+  workflow_dispatch:
 
 jobs:
   Windows:

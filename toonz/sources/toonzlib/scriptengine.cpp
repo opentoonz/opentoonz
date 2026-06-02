@@ -62,7 +62,7 @@ QScriptValue printFunction(QScriptContext* context, QScriptEngine* engine) {
   QScriptValue calleeData = context->callee().data();
   ScriptEngine* se        = qobject_cast<ScriptEngine*>(calleeData.toQObject());
   se->emitOutput(ScriptEngine::SimpleText, result);
-  sleep(50);
+  sleepMilliseconds(50);
   return se->voidValue();
 }
 
@@ -75,7 +75,7 @@ QScriptValue warningFunction(QScriptContext* context, QScriptEngine* engine) {
   QScriptValue calleeData = context->callee().data();
   ScriptEngine* se        = qobject_cast<ScriptEngine*>(calleeData.toQObject());
   se->emitOutput(ScriptEngine::Warning, result);
-  sleep(50);
+  sleepMilliseconds(50);
   return se->voidValue();
 }
 
