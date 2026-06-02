@@ -25,11 +25,10 @@ public:
   std::string getAppVersionInfo(std::string msg);
 
 private:
-  const char *applicationName     = "OpenToonz";
-  const float applicationVersion  = 1.8f;
-  const float applicationRevision = 0;
-  const char *applicationNote     = "RC";
-  const char *systemVarPrefix     = "TOONZ";
+  const char *applicationName    = "OpenToonz";
+  const char *applicationVersion = OPENTOONZ_APP_VERSION;
+  const char *applicationNote    = "RC";
+  const char *systemVarPrefix    = "TOONZ";
 };
 
 std::string ToonzVersion::getAppName(void) {
