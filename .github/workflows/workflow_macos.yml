@@ -50,7 +50,7 @@ jobs:
             experimental-features = nix-command flakes
 
       - name: Install mise
-        uses: jdx/mise-action@v3
+        uses: jdx/mise-action@v4
         with:
           install: false
 
