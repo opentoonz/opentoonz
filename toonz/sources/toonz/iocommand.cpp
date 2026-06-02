@@ -2481,7 +2481,7 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
     if (importDialog.aborted()) break;
 
     LoadResourceArguments::ResourceData rd(args.resourceDatas[r]);
-    TFilePath &path  = rd.m_path;
+    TFilePath path   = rd.m_path;
     QString origName = path.withoutParentDir().getQString();
 
     if (!path.isLevelName())
@@ -2489,8 +2489,13 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
 
     // duplicate check
     auto isDuplicate =
-        [&rd](const IoCmd::LoadResourceArguments::ResourceData &existingRd) {
-          return existingRd.m_path == rd.m_path;
+        [&path,
+         scene](const IoCmd::LoadResourceArguments::ResourceData &existingRd) {
+          if (!existingRd.m_path.isAbsolute() || !path.isAbsolute())
+            return scene->decodeFilePath(existingRd.m_path) ==
+                   scene->decodeFilePath(path);
+          else
+            return existingRd.m_path == path;
         };
     if (std::find_if(rds.begin(), rds.end(), isDuplicate) != rds.end()) {
       if (!all) {

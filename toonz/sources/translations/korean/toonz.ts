@@ -997,6 +997,10 @@ The change will automatically be reflected in this panel.</source>
         <source>Cell Backgrounds</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source> [WIP]</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraCaptureLevelControl</name>
@@ -7646,6 +7650,16 @@ N.B. Open Toonz 다른 프로세스를 실행하고 있지 않은지 확인하�
         <source>Viewer Scrub</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source> [WIP]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This feature is a work in progress.
+Please be advised that it may have incomplete implementation or cause unexpected behavior.
+We welcome your feedback and assistance with its development!</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MatchlinesDialog</name>
@@ -13472,6 +13486,10 @@ Would you like OpenToonz to automatically add a dot to fix the sequence format?
     </message>
     <message>
         <source>Converting %1 to tlv format...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> [WIP]</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
