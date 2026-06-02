@@ -395,6 +395,7 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
   EditTool *editTool = dynamic_cast<EditTool *>(tool);
 
   m_axisOptionWidgets = new QWidget *[AllAxis];
+  m_axisIcons         = new QWidget *[AllAxis];
 
   /* --- General Parts --- */
 
@@ -612,8 +613,9 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
       posLay->setSpacing(0);
       posFrame->setLayout(posLay);
       {
-        posLay->addWidget(
-            new SimpleIconViewField("edit_position", tr("Position"), this), 0);
+        m_axisIcons[Position] =
+            new SimpleIconViewField("edit_position", tr("Position"), this);
+        posLay->addWidget(m_axisIcons[Position], 0);
         posLay->addSpacing(LABEL_SPACING * 2);
         posLay->addWidget(m_motionPathPosLabel, 0);
         posLay->addWidget(m_motionPathPosField, 0);
@@ -660,8 +662,9 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
       rotLay->setSpacing(0);
       rotFrame->setLayout(rotLay);
       {
-        rotLay->addWidget(
-            new SimpleIconViewField("edit_rotation", tr("Rotation"), this), 0);
+        m_axisIcons[Rotation] =
+            new SimpleIconViewField("edit_rotation", tr("Rotation"), this);
+        rotLay->addWidget(m_axisIcons[Rotation], 0);
         rotLay->addSpacing(LABEL_SPACING * 2);
         rotLay->addWidget(m_rotationLabel, 0);
         rotLay->addSpacing(LABEL_SPACING);
@@ -684,8 +687,9 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
       scaleLay->setSpacing(0);
       scaleFrame->setLayout(scaleLay);
       {
-        scaleLay->addWidget(
-            new SimpleIconViewField("edit_scale", tr("Scale"), this), 0);
+        m_axisIcons[Scale] =
+            new SimpleIconViewField("edit_scale", tr("Scale"), this);
+        scaleLay->addWidget(m_axisIcons[Scale], 0);
         scaleLay->addSpacing(LABEL_SPACING * 2);
 
         scaleLay->addWidget(m_globalScaleLabel, 0);
@@ -729,8 +733,9 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
       shearLay->setSpacing(0);
       shearFrame->setLayout(shearLay);
       {
-        shearLay->addWidget(
-            new SimpleIconViewField("edit_shear", tr("Shear"), this), 0);
+        m_axisIcons[Shear] =
+            new SimpleIconViewField("edit_shear", tr("Shear"), this);
+        shearLay->addWidget(m_axisIcons[Shear], 0);
         shearLay->addSpacing(LABEL_SPACING * 2);
 
         shearLay->addWidget(m_shearHLabel, 0);
@@ -761,9 +766,9 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
       centerPosLay->setSpacing(0);
       centerPosFrame->setLayout(centerPosLay);
       {
-        centerPosLay->addWidget(
-            new SimpleIconViewField("edit_center", tr("Center Position"), this),
-            0);
+        m_axisIcons[CenterPosition] =
+            new SimpleIconViewField("edit_center", tr("Center Position"), this);
+        centerPosLay->addWidget(m_axisIcons[CenterPosition], 0);
         centerPosLay->addSpacing(LABEL_SPACING * 2);
 
         centerPosLay->addWidget(m_ewCenterLabel, 0);
@@ -1035,8 +1040,10 @@ void ArrowToolOptionsBox::onCurrentStageObjectComboActivated(int index) {
 
 void ArrowToolOptionsBox::onCurrentAxisChanged(int axisId) {
   // Show the specified axis options, hide all the others
-  for (int a = 0; a != AllAxis; ++a)
+  for (int a = 0; a != AllAxis; ++a) {
     m_axisOptionWidgets[a]->setVisible(a == axisId || axisId == AllAxis);
+    m_axisIcons[a]->setVisible(axisId == AllAxis);
+  }
 
   m_pickWidget->setVisible(axisId == AllAxis);
 }

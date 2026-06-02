@@ -195,6 +195,7 @@ class ArrowToolOptionsBox final : public ToolOptionsBox {
   TXsheetHandle *m_xshHandle;
 
   QWidget **m_axisOptionWidgets;
+  QWidget **m_axisIcons;
   QWidget *m_pickWidget;
 
   // General
