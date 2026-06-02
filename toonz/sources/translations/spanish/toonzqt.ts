@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="es" sourcelanguage="en">
+<TS version="2.1" language="es_ES" sourcelanguage="en_US">
 <context>
     <name>AddFxContextMenu</name>
     <message>
@@ -113,17 +113,17 @@
     </message>
     <message>
         <source>Bad camera preset</source>
-        <translation>Ajuste de cámara defectuoso</translation>
+        <translation>Preajuste de cámara defectuoso</translation>
     </message>
     <message>
-        <source>&apos;%1&apos; doesn&apos;t seem a well formed camera preset. 
+        <source>&apos;%1&apos; doesn&apos;t seem a well formed camera preset.
 Possibly the preset file has been corrupted</source>
-        <translation>&apos;%1&apos; no parece ser un ajuste de cámara con un formato correcto. 
-Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
+        <translation>&apos;%1&apos; no parece ser un preajuste de cámara con un formato correcto.
+Es posible que el archivo de dicho preajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Preset name</source>
-        <translation>Nombre del ajuste</translation>
+        <translation>Nombre del preajuste</translation>
     </message>
     <message>
         <source>Enter the name for %1</source>
@@ -147,11 +147,11 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Error : Preset Name is Invalid</source>
-        <translation>Error: El nombre del ajuste no es válido</translation>
+        <translation>Error: El nombre del preajuste no es válido</translation>
     </message>
     <message>
         <source>The preset name must not use &apos;,&apos;(comma).</source>
-        <translation>El nombre del ajuste no puede utilizar &apos;,&apos;(coma).</translation>
+        <translation>El nombre del preajuste no puede utilizar &apos;,&apos;(coma).</translation>
     </message>
     <message>
         <source>DPI</source>
@@ -163,7 +163,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>x</source>
-        <translation>x</translation>
+        <translation>×</translation>
     </message>
     <message>
         <source>A/R</source>
@@ -196,16 +196,16 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     <message>
         <source>Deleting &quot;%1&quot;.
 Are you sure?</source>
-        <translation type="unfinished">Borrando &quot;%1&quot;.
-¿Confirma?</translation>
+        <translation>Borrando &quot;%1&quot;.
+¿Confirmar?</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Borrar</translation>
+        <translation>Borrar</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
 </context>
 <context>
@@ -539,34 +539,38 @@ Are you sure?</source>
     <message>
         <source>Color name is not valid.
 The following characters cannot be used: \ # &lt; &gt; &quot; &apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>El nombre del color no es válido.
+Los siguientes caracteres no pueden ser usados: \ # &lt; &gt; &quot; &apos;</translation>
     </message>
     <message>
         <source>Color name already exists.
 Please use another name.</source>
-        <translation type="unfinished"></translation>
+        <translation>El nombre del color ya existe.
+Usar un nombre diferente.</translation>
     </message>
     <message>
         <source>Invalid hex color format.</source>
-        <translation type="unfinished"></translation>
+        <translation>Formato de color hexadecimal inválido.</translation>
     </message>
     <message>
         <source>Error importing color names XML:
 File not found or invalid format</source>
-        <translation type="unfinished"></translation>
+        <translation>Error al importar XML con nombres de colores:
+Archivo no encontrado o formato inválido</translation>
     </message>
     <message>
         <source>Error importing color names XML:
 The file may be corrupt or have invalid format.</source>
-        <translation type="unfinished"></translation>
+        <translation>Error al importar XML con nombres de colores:
+El archivo puede estar corrupto o contener un formato inváido.</translation>
     </message>
     <message>
         <source>An unexpected error occurred while importing colors.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ocurrió un error inesperado al importar colores.</translation>
     </message>
     <message>
         <source>Failed to save user color names file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Error al guardar el archivo con los nombres de colores del usuario.</translation>
     </message>
 </context>
 <context>
@@ -956,11 +960,11 @@ La ganancia se mostrará en forma de f-stops donde el valor &quot;neutral&quot;,
     </message>
     <message>
         <source>&amp;Rotate Left</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Rotar antihorario</translation>
     </message>
     <message>
         <source>&amp;Rotate Right</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Rotar horario</translation>
     </message>
 </context>
 <context>
@@ -1500,7 +1504,7 @@ Cambiar el clave de forma manual eliminará la advertencia.</translation>
     </message>
     <message>
         <source>&amp;Save As Preset...</source>
-        <translation>Guardar como aju&amp;ste...</translation>
+        <translation>Guardar como preaju&amp;ste...</translation>
     </message>
     <message>
         <source>&amp;Preview</source>
@@ -2651,43 +2655,43 @@ La segunda línea debería tener la forma &quot;Mesh [profundidad de bits de ent
     </message>
     <message>
         <source>It is not possible to delete style #</source>
-        <translation type="unfinished"></translation>
+        <translation>No es posible borrar el estilo №</translation>
     </message>
     <message>
         <source>Paste Style to Palette: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Pegar estilo en paleta: %1</translation>
     </message>
     <message>
         <source>Delete Style from Palette: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Borrar estilo de paleta: %1</translation>
     </message>
     <message>
         <source>Cut Style from Palette: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Cortar estilo de paleta: %1</translation>
     </message>
     <message>
         <source> to Palette: %1</source>
-        <translation type="unfinished"></translation>
+        <translation> a paleta: %1</translation>
     </message>
     <message>
         <source>Blend Colors in Palette: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Mezclar colores en paleta: %1</translation>
     </message>
     <message>
         <source>Toggle Link in Palette: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Alternar vínculo en paleta: %1</translation>
     </message>
     <message>
         <source>Remove Reference in Palette: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminar referencia en paleta: %1</translation>
     </message>
     <message>
         <source>Set As...</source>
-        <translation type="unfinished"></translation>
+        <translation>Establecer como...</translation>
     </message>
     <message>
         <source>Delete Lines and Areas</source>
-        <translation type="unfinished"></translation>
+        <translation>Borrar líneas y áreas</translation>
     </message>
 </context>
 <context>
@@ -3022,9 +3026,9 @@ de la paleta de estudio ha sido modificada. ¿Guardar los cambios?</translation>
         <translation>Descartar</translation>
     </message>
     <message>
-        <source>Convert %1 to Studio Palette and Overwrite. 
+        <source>Convert %1 to Studio Palette and Overwrite.
 Are you sure ?</source>
-        <translation>Convertir %1 en una Paleta de Estudio y sobreescribirla. 
+        <translation>Convertir %1 en una Paleta de Estudio y sobreescribirla.
 ¿Seguro?</translation>
     </message>
     <message>
@@ -3036,15 +3040,15 @@ Are you sure ?</source>
         <translation type="obsolete">No</translation>
     </message>
     <message>
-        <source>Replacing all selected palettes with the palette &quot;%1&quot;. 
+        <source>Replacing all selected palettes with the palette &quot;%1&quot;.
 Are you sure ?</source>
-        <translation>Reemplazar todas las paletas seleccionadas con la paleta &quot;%1&quot;. 
+        <translation>Reemplazar todas las paletas seleccionadas con la paleta &quot;%1&quot;.
 ¿Seguro?</translation>
     </message>
     <message>
-        <source>Replacing the palette &quot;%1&quot; with the palette &quot;%2&quot;. 
+        <source>Replacing the palette &quot;%1&quot; with the palette &quot;%2&quot;.
 Are you sure ?</source>
-        <translation>Reemplazar la paleta &quot;%1&quot; con la paleta &quot;%2&quot;. 
+        <translation>Reemplazar la paleta &quot;%1&quot; con la paleta &quot;%2&quot;.
 ¿Seguro?</translation>
     </message>
     <message>
@@ -3061,11 +3065,11 @@ Are you sure ?</source>
     </message>
     <message>
         <source>Set As...</source>
-        <translation type="unfinished"></translation>
+        <translation>Establecer como...</translation>
     </message>
     <message>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>Refrescar</translation>
     </message>
 </context>
 <context>
@@ -3138,7 +3142,7 @@ Are you sure ?</source>
         <translation>Opciones</translation>
     </message>
     <message>
-        <source>Auto  
+        <source>Auto
 Apply</source>
         <translation type="vanished">Aplicar
 Autom</translation>
@@ -3326,7 +3330,7 @@ Autom</translation>
     <name>StyleEditorGUI::SettingsPage</name>
     <message>
         <source>Autopaint for Lines</source>
-        <translation>Pintar líneas automáticamente al rellenar</translation>
+        <translation>Pintar (líneas) automáticamente al rellenar</translation>
     </message>
     <message>
         <source>Reset to default</source>

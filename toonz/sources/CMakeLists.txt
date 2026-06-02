@@ -12,7 +12,7 @@ project(OpenToonz LANGUAGES C CXX)
 #-----------------------------------------------------------------------------
 # Application Build Metadata
 
-set(OPENTOONZ_APP_VERSION "1.7.99" CACHE STRING "OpenToonz application version")
+set(OPENTOONZ_APP_VERSION "1.8.0" CACHE STRING "OpenToonz application version")
 set(OPENTOONZ_BUNDLE_SHORT_VERSION "" CACHE STRING "Override macOS CFBundleShortVersionString")
 set(OPENTOONZ_BUNDLE_VERSION "" CACHE STRING "Override macOS CFBundleVersion")
 set(OPENTOONZ_BUILD_DATE "" CACHE STRING "Override the displayed build date")

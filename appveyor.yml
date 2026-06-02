@@ -1,4 +1,4 @@
-version: 1.7.1.{build}
+version: 1.8.0.{build}
 
 environment:
   QT_PATH: "%APPVEYOR_BUILD_FOLDER%\\thirdparty\\qt\\5.15.2_wintab\\msvc2019_64"

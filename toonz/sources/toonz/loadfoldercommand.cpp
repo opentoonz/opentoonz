@@ -194,7 +194,8 @@ TFilePath retasResourcePath(const TFilePath &fp) {
 //--------------------------------------------------------------
 
 static const FormatData l_formatDatas[] = {
-    {QRegularExpression(R"(.+\.[0-9]{4,4}.*\..*)"), &multiframeResourcePath,
+    // Changed QRegExp patterns to QRegularExpression
+    {QRegularExpression(R"(.+[._][0-9]{4,4}.*\..*)"), &multiframeResourcePath,
      nullptr},
     {QRegularExpression(R"(.+[0-9]{4,4}\.tga)",
                         QRegularExpression::CaseInsensitiveOption),

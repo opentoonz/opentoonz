@@ -1254,14 +1254,15 @@ void MainWindow::onCurrentRoomChanged(int newRoomIndex) {
   QString newRoomName = newRoom->getName();
 
   // Handle room-bound panels (all panels with binding enabled)
-  // Use DockLayout directly instead of findChildren to avoid deep widget tree traversal
-  // which can trigger expensive operations in complex panels like FileBrowser
+  // Use DockLayout directly instead of findChildren to avoid deep widget tree
+  // traversal which can trigger expensive operations in complex panels like
+  // FileBrowser
   QList<TPanel *> panelsToUpdate;
   for (int i = 0; i < m_stackedWidget->count(); i++) {
-    Room *room = getRoom(i);
+    Room *room         = getRoom(i);
     DockLayout *layout = room->dockLayout();
     if (!layout) continue;
-    
+
     // Iterate only through docked panels (shallow traversal, not recursive)
     for (int j = 0; j < layout->count(); j++) {
       TPanel *panel = static_cast<TPanel *>(layout->itemAt(j)->widget());
@@ -1274,7 +1275,7 @@ void MainWindow::onCurrentRoomChanged(int newRoomIndex) {
   // Process room-bound panels (only visibility changes, no reparenting)
   for (TPanel *panel : panelsToUpdate) {
     QString boundRoomName = panel->getBoundRoomName();
-    
+
     if (boundRoomName == newRoomName) {
       // Show panel when entering its bound room
       if (panel->isHidden()) {
@@ -1317,7 +1318,7 @@ void MainWindow::onCurrentRoomChanged(int newRoomIndex) {
       pane->show();
     }
   }
-  
+
   // Handle room-bound persistent popups (DVGui::Dialog-based)
   // AudioRecordingPopup
   AudioRecordingPopup *audioPopup = findChild<AudioRecordingPopup *>();
@@ -1333,7 +1334,7 @@ void MainWindow::onCurrentRoomChanged(int newRoomIndex) {
       }
     }
   }
-  
+
   // PltGizmoPopup
   PltGizmoPopup *pltGizmoPopup = findChild<PltGizmoPopup *>();
   if (pltGizmoPopup && pltGizmoPopup->isRoomBound()) {
@@ -1348,7 +1349,7 @@ void MainWindow::onCurrentRoomChanged(int newRoomIndex) {
       }
     }
   }
-  
+
   m_oldRoomIndex = newRoomIndex;
   TSelection::setCurrent(0);
 }
@@ -1364,10 +1365,10 @@ void MainWindow::updatePanelVisibility() {
   // Use DockLayout directly to avoid expensive findChildren() traversal
   QList<TPanel *> panelsToUpdate;
   for (int i = 0; i < m_stackedWidget->count(); i++) {
-    Room *room = getRoom(i);
+    Room *room         = getRoom(i);
     DockLayout *layout = room->dockLayout();
     if (!layout) continue;
-    
+
     // Iterate only through docked panels (shallow, not recursive)
     for (int j = 0; j < layout->count(); j++) {
       TPanel *panel = static_cast<TPanel *>(layout->itemAt(j)->widget());
@@ -1380,7 +1381,7 @@ void MainWindow::updatePanelVisibility() {
   // Update visibility of all room-bound panels
   for (TPanel *panel : panelsToUpdate) {
     QString boundRoomName = panel->getBoundRoomName();
-    
+
     if (boundRoomName == currentRoomName) {
       // Show panel in its bound room
       if (panel->isHidden()) {
@@ -1448,35 +1449,34 @@ void MainWindow::deleteRoom(int index) {
 
 void MainWindow::renameRoom(int index, const QString name) {
   Room *room = getRoom(index);
-  
+
   // Store the old name before renaming
   QString oldName = room->getName();
-  
+
   // Rename the room
   room->setName(name);
-  
+
   // Update all room-bound panels with the new room name
   // This ensures the panel-room link persists after renaming
   for (int i = 0; i < m_stackedWidget->count(); i++) {
-    Room *currentRoom = getRoom(i);
+    Room *currentRoom  = getRoom(i);
     DockLayout *layout = currentRoom->dockLayout();
     if (!layout) continue;
-    
+
     // Iterate through all docked panels
     for (int j = 0; j < layout->count(); j++) {
       TPanel *panel = static_cast<TPanel *>(layout->itemAt(j)->widget());
-      if (panel && 
-          panel->isRoomBound() &&
+      if (panel && panel->isRoomBound() &&
           panel->getBoundRoomName() == oldName) {
         // Update the bound room name to the new name
         panel->setBoundRoomName(name);
       }
     }
   }
-  
+
   // Update visibility immediately to reflect the change
   updatePanelVisibility();
-  
+
   if (m_saveSettingsOnQuit) room->save();
 }
 
@@ -1924,6 +1924,18 @@ QAction *MainWindow::createSpecialModifierAction(
 
 //-----------------------------------------------------------------------------
 
+void MainWindow::setCommandToWIP(QAction *action) {
+  if (!action) return;
+  action->setText(action->text() + tr(" [WIP]"));
+  action->setToolTip(
+      tr("This feature is a work in progress.\n"
+         "Please be advised that it may have incomplete implementation or "
+         "cause unexpected behavior.\n"
+         "We welcome your feedback and assistance with its development!"));
+}
+
+//-----------------------------------------------------------------------------
+
 QAction *MainWindow::createToggle(const char *id, const char *name,
                                   const QString &defaultShortcut,
                                   bool startStatus, CommandType type,
@@ -2039,7 +2051,8 @@ void MainWindow::defineActions() {
       "");
   createMenuFileAction(
       MI_ExportSXF,
-      QT_TRANSLATE_NOOP("MainWindow", "Export Stylos Exchange Format(SXF)"), "");
+      QT_TRANSLATE_NOOP("MainWindow", "Export Stylos Exchange Format(SXF)"),
+      "");
   createMenuFileAction(
       MI_ExportOCA,
       QT_TRANSLATE_NOOP("MainWindow", "Export Open Cel Animation (OCA)"), "",
@@ -2091,7 +2104,8 @@ void MainWindow::defineActions() {
   createMenuEditAction(MI_PasteInto, QT_TR_NOOP("&Paste Into"), "",
                        "paste_into");
   createMenuEditAction(MI_Clear, QT_TR_NOOP("&Delete"), "Del", "delete");
-  createMenuEditAction(MI_ClearViewerContent, QT_TR_NOOP("&Clear Viewer Content"), "", "clear_viewer");
+  createMenuEditAction(MI_ClearViewerContent,
+                       QT_TR_NOOP("&Clear Viewer Content"), "", "clear_viewer");
   createMenuEditAction(MI_Insert, QT_TR_NOOP("&Insert"), "Ins", "insert");
   createMenuEditAction(MI_InsertAbove, QT_TR_NOOP("&Insert Above/After"),
                        "Shift+Ins", "insert_above_after");
@@ -2537,10 +2551,18 @@ void MainWindow::defineActions() {
                           "comboviewer");
   createMenuWindowsAction(MI_OpenHistoryPanel, QT_TR_NOOP("&History"), "Ctrl+H",
                           "history");
-  createMenuWindowsAction(MI_OpenBrushPresetPanel, QT_TR_NOOP("&Brush Presets"), "Ctrl+Shift+B",
-                          "brush");
-  createMenuWindowsAction(MI_OpenToolPropertiesPanel, QT_TR_NOOP("&Tool Properties"), "Ctrl+Shift+P",
-                          "properties");
+
+  // Shortcut keys will be assigned once the feature is complete.
+  QAction *brushPresetAct = createMenuWindowsAction(
+      MI_OpenBrushPresetPanel, QT_TR_NOOP("&Brush Presets"),
+      "" /* Ctrl+Shift+B */, "brush");
+  QAction *ToolPropertiesAct = createMenuWindowsAction(
+      MI_OpenToolPropertiesPanel, QT_TR_NOOP("&Tool Properties"),
+      "" /* Ctrl+Shift+P */, "properties");
+  // set WIP label
+  setCommandToWIP(brushPresetAct);
+  setCommandToWIP(ToolPropertiesAct);
+
   createMenuWindowsAction(MI_AudioRecording, QT_TR_NOOP("Record Audio"),
                           "Alt+A", "recordaudio");
   createMenuWindowsAction(MI_ResetRoomLayout,
