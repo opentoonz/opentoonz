@@ -1,4 +1,4 @@
-set(VERSION "${OPENTOONZ_APP_VERSION}")
+set(VERSION 1.8)
 
 set(MOC_HEADERS
     addfilmstripframespopup.h

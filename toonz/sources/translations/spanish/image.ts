@@ -242,47 +242,47 @@
     <message>
         <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="71"/>
         <source>Cannot create FFmpeg cache directory: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>No es posible crear carpeta de caché para FFmpeg: %1</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="107"/>
         <source>Cannot save non-raster image to FFmpeg</source>
-        <translation type="unfinished"></translation>
+        <translation>No es posible guardar imagen vectorial a FFmpeg</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="113"/>
         <source>Invalid or empty raster for FFmpeg</source>
-        <translation type="unfinished"></translation>
+        <translation>Imagen inválida o vacía para FFmpeg</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="127"/>
         <source>Failed to clone raster for FFmpeg</source>
-        <translation type="unfinished"></translation>
+        <translation>Error al clonar imagen para FFmpeg</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="136"/>
         <source>Failed to allocate 32-bit raster for FFmpeg</source>
-        <translation type="unfinished"></translation>
+        <translation>Error al asignar imagen de 32 bits para FFmpeg</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="163"/>
         <source>Failed to convert raster to 32-bit ARGB (after clamp)</source>
-        <translation type="unfinished"></translation>
+        <translation>Error al convertir imagen a 32 bits αRVA (después de limitación)</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="174"/>
         <source>Failed to create QImage for intermediate file</source>
-        <translation type="unfinished"></translation>
+        <translation>Error al crear QImage para archivo intermedio</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="185"/>
         <source>Failed to save intermediate image: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Error al guardar imagen intermedia: %1</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="223"/>
         <source>FFmpeg process failed for: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Error al procesar con FFmpeg: %1</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="273"/>
@@ -292,30 +292,33 @@
     <message>
         <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="307"/>
         <source>Cannot open audio file for writing: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>No es posible abrir archivo de audio para escritura: %1</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="312"/>
         <source>Failed to write audio data to file</source>
-        <translation type="unfinished"></translation>
+        <translation>Error al escribir datos de audio al archivo</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="378"/>
         <source>Size error: %1
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Error de tamaño: %1
+</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="386"/>
         <source>Frame rate error: %1
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Error de velocidad de fotogramas: %1
+</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="394"/>
         <source>Frame count error: %1
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Error de cantidad de fotogramas: %1
+</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="401"/>
@@ -323,29 +326,34 @@
 Error details:
 %2Using available data and fallback values where necessary.
 Note: Zero values in dimensions, frame count or frame rate indicate that the information could not be retrieved.</source>
-        <translation type="unfinished"></translation>
+        <translation>Error al obtener %1 desde el video mediante ffprobe.
+Detalles del error:
+%2 Usando los datos disponibles y valores alternativos donde fuera necesario.
+Nota: Valores nulos en las dimensiones, cantidad o velocidad de fotogramas indicarán que la información no pudo ser obtenida.</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="561"/>
         <source>Unable to determine frame count for: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>No fue posible determinar la cantidad de fotogramas para: %1</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="609"/>
         <source>FFmpeg failed to extract frames from: %1
 Check file and codec support.</source>
-        <translation type="unfinished"></translation>
+        <translation>Error de FFmpeg al intentar extraer fotogramas de : %1
+Comprobar soporte para el formato de archivo y codec.</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="695"/>
         <source>Failed to delete file: %1
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Error al intentar borrar el archivo: %1
+%2</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="835"/>
         <source>Failed to extract frames from movie: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Error al intentar extraer fotogramas de la película: %1</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="260"/>
@@ -647,72 +655,72 @@ intentar aumentar el tiempo de espera en las Preferencias.</translation>
     <message>
         <location filename="../../image/ffmpeg/tiio_webm.cpp" line="309"/>
         <source>Placebo (Smallest File)</source>
-        <translation type="unfinished"></translation>
+        <translation>Placebo (el archivo más pequeño)</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_webm.cpp" line="310"/>
         <source>Very Slow</source>
-        <translation type="unfinished"></translation>
+        <translation>Extremadamente lento</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_webm.cpp" line="311"/>
         <source>Slower</source>
-        <translation type="unfinished"></translation>
+        <translation>Más lento</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_webm.cpp" line="312"/>
         <source>Slow</source>
-        <translation type="unfinished"></translation>
+        <translation>Lento</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_webm.cpp" line="313"/>
         <source>Medium</source>
-        <translation type="unfinished">Media</translation>
+        <translation>MedioMedia</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_webm.cpp" line="314"/>
         <source>Fast</source>
-        <translation type="unfinished"></translation>
+        <translation>Rápido</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_webm.cpp" line="315"/>
         <source>Faster</source>
-        <translation type="unfinished"></translation>
+        <translation>Más rápido</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_webm.cpp" line="316"/>
         <source>Very Fast</source>
-        <translation type="unfinished"></translation>
+        <translation>Extremadamente rápido</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_webm.cpp" line="318"/>
         <source>Ultra Fast (Largest File)</source>
-        <translation type="unfinished"></translation>
+        <translation>Ultra rápido (el archivo más grande)</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_webm.cpp" line="322"/>
         <source>Every Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Cada fotograma</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_webm.cpp" line="323"/>
         <source>Every Second</source>
-        <translation type="unfinished"></translation>
+        <translation>Cada segundo</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_webm.cpp" line="324"/>
         <source>Every 2 Seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>Cada 2 segundos</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_webm.cpp" line="325"/>
         <source>Every 5 Seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>Cada 5 segundos</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_webm.cpp" line="326"/>
         <source>Every 10 Seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>Cada 10 segundos</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_webm.cpp" line="331"/>
@@ -722,22 +730,22 @@ intentar aumentar el tiempo de espera en las Preferencias.</translation>
     <message>
         <location filename="../../image/ffmpeg/tiio_webm.cpp" line="332"/>
         <source>Encoding Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Velocidad de codificación</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_webm.cpp" line="333"/>
         <source>Keyframe Interval</source>
-        <translation type="unfinished"></translation>
+        <translation>Intervalo fotogramas clave</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_webm.cpp" line="334"/>
         <source>Preserve Alpha</source>
-        <translation type="unfinished"></translation>
+        <translation>Preservar alfa</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_webm.cpp" line="335"/>
         <source>Lossless</source>
-        <translation type="unfinished"></translation>
+        <translation>Sin pérdida</translation>
     </message>
 </context>
 </TS>
