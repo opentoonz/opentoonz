@@ -639,7 +639,8 @@ void SwatchViewer::mousePressEvent(QMouseEvent *event) {
     return;
   }
 
-  TPoint pos    = TPoint(event->pos().x(), event->pos().y());
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
+  TPoint pos            = TPoint(eventPos.x(), eventPos.y());
   m_mouseButton = event->button();
   if (m_mouseButton == Qt::LeftButton) {
     m_selectedPoint = -1;
@@ -702,7 +703,8 @@ void SwatchViewer::mouseMoveEvent(QMouseEvent *event) {
     return;
   }
 
-  TPoint pos = TPoint(event->pos().x(), event->pos().y());
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
+  TPoint pos            = TPoint(eventPos.x(), eventPos.y());
   if (m_mouseButton == Qt::LeftButton) {
     if (m_selectedPoint < 0 || m_selectedPoint >= (int)m_points.size()) return;
     TPointD p = win2world(pos) + m_pointPosDelta;
@@ -732,7 +734,8 @@ void SwatchViewer::mouseMoveEvent(QMouseEvent *event) {
 void SwatchViewer::mouseReleaseEvent(QMouseEvent *event) {
   m_mouseButton   = Qt::NoButton;
   m_selectedPoint = -1;
-  TPoint pos      = TPoint(event->pos().x(), event->pos().y());
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
+  TPoint pos            = TPoint(eventPos.x(), eventPos.y());
   if (event->button() == Qt::MiddleButton) {
     if (!m_oldContent || !m_curContent) return;
     TPointD p = convert(pos - m_pos);

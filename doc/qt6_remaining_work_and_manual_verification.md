@@ -83,8 +83,11 @@ Already covered:
 - `PlaneViewer` mouse press/move handling now uses
   `QtCompat::mouseEventPosition()` instead of deprecated `QMouseEvent::x()` /
   `y()` accessors.
-- Shared `toonzqt` numeric fields, scroll widgets, mini-toolbar dragging, and
-  dock hover/drag/resize/separator/drop-placeholder paths now use `QtCompat`
+- Shared `toonzqt` numeric fields, paired numeric range fields, spectrum key
+  editing, color sample fields, swatch point editing/panning, scroll widgets,
+  flip-console slider/split-button controls, Function Tree channel middle-drag
+  initiation, mini-toolbar dragging, and dock
+  hover/drag/resize/separator/drop-placeholder paths now use `QtCompat`
   event-position helpers instead of direct Qt 5-era event coordinate accessors.
 - Shared `toonzqt` tree item hit testing, drag dispatch, context-menu
   placement, and tone-curve control-point editing now use `QtCompat`

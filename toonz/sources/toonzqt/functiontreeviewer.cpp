@@ -30,6 +30,7 @@
 #include "toonzqt/functionviewer.h"
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/plasticvertexselection.h"
 #include "tw/stringtable.h"
 
@@ -1488,7 +1489,7 @@ void FunctionTreeView::onMidClick(TreeModel::Item *item, const QPoint &itemPos,
       dynamic_cast<FunctionTreeModel::Channel *>(item);
   if (channel && e->button() == Qt::MiddleButton) {
     m_draggingChannel   = channel;
-    m_dragStartPosition = e->pos();
+    m_dragStartPosition = QtCompat::mouseEventPosition(e);
   } else
     m_draggingChannel = 0;
 }
@@ -1498,8 +1499,9 @@ void FunctionTreeView::onMidClick(TreeModel::Item *item, const QPoint &itemPos,
 void FunctionTreeView::onDrag(TreeModel::Item *item, const QPoint &itemPos,
                               QMouseEvent *e) {
   // middle drag of the channel item can retrieve expression name
+  const QPoint eventPos = QtCompat::mouseEventPosition(e);
   if ((e->buttons() & Qt::MiddleButton) && m_draggingChannel &&
-      (e->pos() - m_dragStartPosition).manhattanLength() >=
+      (eventPos - m_dragStartPosition).manhattanLength() >=
           QApplication::startDragDistance()) {
     QDrag *drag         = new QDrag(this);
     QMimeData *mimeData = new QMimeData;

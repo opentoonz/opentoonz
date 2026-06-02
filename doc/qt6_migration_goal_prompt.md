@@ -106,16 +106,18 @@ branch.
   context-menu releases also routes through `QtCompat::makeMouseEvent()` with
   explicit local/global positions, and `PlaneViewer` mouse press/move handling
   no longer uses deprecated `QMouseEvent::x()` / `y()` accessors. Shared
-  `toonzqt` numeric fields, scroll widgets, mini-toolbar dragging, and dock
-  hover/drag/resize/separator/drop-placeholder paths also use `QtCompat`
-  event-position helpers instead of direct Qt 5-era local/global coordinate
-  accessors. `TreeView` item hit testing, drag dispatch, and context-menu
-  placement plus `ToneCurveField` channel curve control-point editing also use
-  the same helpers. SceneViewer mouse/tablet event initialization, tablet
-  context-menu delivery, tablet hover-edge handling, mouse double-click
-  mapping, and the Function Panel graph/drag tools now use the same helpers,
-  removing another Qt 6 event-coordinate warning slice while preserving the
-  Qt 5 lane.
+  `toonzqt` numeric fields, paired numeric range fields, spectrum key editing,
+  color sample fields, swatch point editing/panning, scroll widgets,
+  flip-console slider/split-button controls, Function Tree channel middle-drag
+  initiation, mini-toolbar dragging, and dock hover/drag/resize/separator/
+  drop-placeholder paths also use `QtCompat` event-position helpers instead of
+  direct Qt 5-era local/global coordinate accessors. `TreeView` item hit
+  testing, drag dispatch, and context-menu placement plus `ToneCurveField`
+  channel curve control-point editing also use the same helpers. SceneViewer
+  mouse/tablet event initialization, tablet context-menu delivery, tablet
+  hover-edge handling, mouse double-click mapping, and the Function Panel
+  graph/drag tools now use the same helpers, removing another Qt 6
+  event-coordinate warning slice while preserving the Qt 5 lane.
 - `DvTextEdit` mini-toolbar font-size population and text-family formatting no
   longer use Qt 6-deprecated `QFontDatabase` instance construction or
   `QTextCharFormat::setFontFamily()`. The code now uses APIs available in both

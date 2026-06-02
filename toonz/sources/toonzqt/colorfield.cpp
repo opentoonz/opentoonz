@@ -5,6 +5,7 @@
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/gutil.h"
 #include "toonzqt/menubarcommand.h"
+#include "toonzqt/qtcompat.h"
 #include "toonz/cleanupcolorstyles.h"
 #include "tconvert.h"
 #include "tcolorstyles.h"
@@ -568,7 +569,7 @@ void ColorField::updateChannels() {
 
 void ColorField::mousePressEvent(QMouseEvent *event) {
   if (event->button() != Qt::LeftButton) return;
-  QPoint p = event->pos();
+  QPoint p = QtCompat::mouseEventPosition(event);
   if (!m_colorSample->visibleRegion().contains(p)) return;
 
   if (!m_useStyleEditor || !getEditorController()) return;
@@ -579,7 +580,7 @@ void ColorField::mousePressEvent(QMouseEvent *event) {
 //-----------------------------------------------------------------------------
 
 void ColorField::mouseDoubleClickEvent(QMouseEvent *event) {
-  QPoint p = event->pos();
+  QPoint p = QtCompat::mouseEventPosition(event);
   if (!m_colorSample->visibleRegion().contains(p)) return;
 
   if (!m_useStyleEditor || !getEditorController()) return;
@@ -978,7 +979,7 @@ void CleanupColorField::setEditorController(
 //------------------------------------------------------------------
 
 void CleanupColorField::mouseDoubleClickEvent(QMouseEvent *event) {
-  QPoint p = event->pos();
+  QPoint p = QtCompat::mouseEventPosition(event);
   if (!m_colorSample->visibleRegion().contains(p)) return;
   emit StyleSelected(m_cleanupStyle);
   if (!getEditorController()) return;
