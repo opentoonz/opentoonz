@@ -4,9 +4,15 @@
 #define TOONZQT_QTCOMPAT_H
 
 #include <QtGlobal>
+#include <QCheckBox>
+#include <QDropEvent>
 #include <QImage>
 #include <QKeyEvent>
 #include <QKeySequence>
+#include <QMouseEvent>
+#include <QObject>
+
+#include <utility>
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 #include <QEnterEvent>
@@ -66,6 +72,45 @@ inline QImage convertToGLFormat(const QImage &image) {
   return converted.flipped(Qt::Vertical);
 #else
   return converted.mirrored(false, true);
+#endif
+}
+
+inline QPoint mouseEventPosition(const QMouseEvent *event) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return event->position().toPoint();
+#else
+  return event->pos();
+#endif
+}
+
+inline QPoint mouseEventGlobalPosition(const QMouseEvent *event) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return event->globalPosition().toPoint();
+#else
+  return event->globalPos();
+#endif
+}
+
+inline QPoint dropEventPosition(const QDropEvent *event) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return event->position().toPoint();
+#else
+  return event->pos();
+#endif
+}
+
+template <typename Receiver, typename Func>
+inline QMetaObject::Connection connectCheckStateChanged(
+    QCheckBox *checkBox, Receiver *receiver, Func &&slot) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+  return QObject::connect(checkBox, &QCheckBox::checkStateChanged, receiver,
+                          std::forward<Func>(slot));
+#else
+  return QObject::connect(
+      checkBox, &QCheckBox::stateChanged, receiver,
+      [slot = std::forward<Func>(slot)](int state) mutable {
+        slot(static_cast<Qt::CheckState>(state));
+      });
 #endif
 }
 

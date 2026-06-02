@@ -16,6 +16,7 @@
 #include "toonzqt/lineedit.h"
 #include "toonzqt/checkbox.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib
 #include "toonz/filepathproperties.h"
@@ -588,7 +589,8 @@ ProjectSettingsPopup::ProjectSettingsPopup() : ProjectPopup(false) {
   }
   for (i = 0; i < m_useScenePathCbs.size(); i++) {
     CheckBox *cb = m_useScenePathCbs[i].second;
-    connect(cb, SIGNAL(stateChanged(int)), this, SLOT(onSomethingChanged()));
+    QtCompat::connectCheckStateChanged(
+        cb, this, [this](Qt::CheckState) { onSomethingChanged(); });
   }
 
   connect(m_chooseProjectCombo, SIGNAL(activated(int)), this,

@@ -2,6 +2,7 @@
 
 #include "toonzqt/tmessageviewer.h"
 #include "toonzqt/dvdialog.h"
+#include "toonzqt/qtcompat.h"
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QListView>
@@ -152,20 +153,26 @@ TMessageViewer::TMessageViewer(QWidget *parent) : QFrame(parent) {
 
   m_redCheck = new QCheckBox(tr("Errors"));
   m_redCheck->setChecked(true);
-  ret = ret && connect(m_redCheck, SIGNAL(stateChanged(int)),
-                       SLOT(refreshFilter(int)));
+  ret = ret && static_cast<bool>(QtCompat::connectCheckStateChanged(
+                   m_redCheck, this, [this](Qt::CheckState state) {
+                     refreshFilter(static_cast<int>(state));
+                   }));
   hLayout->addWidget(m_redCheck);
 
   m_yellowCheck = new QCheckBox(tr("Warnings"));
   m_yellowCheck->setChecked(true);
-  ret = ret && connect(m_yellowCheck, SIGNAL(stateChanged(int)),
-                       SLOT(refreshFilter(int)));
+  ret = ret && static_cast<bool>(QtCompat::connectCheckStateChanged(
+                   m_yellowCheck, this, [this](Qt::CheckState state) {
+                     refreshFilter(static_cast<int>(state));
+                   }));
   hLayout->addWidget(m_yellowCheck);
 
   m_greenCheck = new QCheckBox(tr("Info"));
   m_greenCheck->setChecked(true);
-  ret = ret && connect(m_greenCheck, SIGNAL(stateChanged(int)),
-                       SLOT(refreshFilter(int)));
+  ret = ret && static_cast<bool>(QtCompat::connectCheckStateChanged(
+                   m_greenCheck, this, [this](Qt::CheckState state) {
+                     refreshFilter(static_cast<int>(state));
+                   }));
   hLayout->addWidget(m_greenCheck);
 
   hLayout->addStretch();

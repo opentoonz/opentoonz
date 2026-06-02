@@ -17,6 +17,7 @@
 #include "toonzqt/gutil.h"
 #include "toonzqt/doublefield.h"
 #include "toonzqt/icongenerator.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/toonzscene.h"
@@ -313,8 +314,10 @@ StartupPopup::StartupPopup()
           this, &StartupPopup::onProjectChanged);
   connect(createButton, &QPushButton::clicked, this,
           &StartupPopup::onCreateButton);
-  connect(m_showAtStartCB, &QCheckBox::stateChanged, this,
-          &StartupPopup::onShowAtStartChanged);
+  QtCompat::connectCheckStateChanged(
+      m_showAtStartCB, this, [this](Qt::CheckState state) {
+        onShowAtStartChanged(static_cast<int>(state));
+      });
   connect(m_widthFld, &MeasuredDoubleLineEdit::valueChanged, this,
           &StartupPopup::updateResolution);
   connect(m_heightFld, &MeasuredDoubleLineEdit::valueChanged, this,
@@ -338,8 +341,10 @@ StartupPopup::StartupPopup()
           &StartupPopup::removePreset);
   connect(m_nameFld, &LineEdit::returnPressedNow, this,
           [createButton]() { createButton->animateClick(); });
-  connect(m_autoSaveOnCB, &QCheckBox::stateChanged, this,
-          &StartupPopup::onAutoSaveOnChanged);
+  QtCompat::connectCheckStateChanged(
+      m_autoSaveOnCB, this, [this](Qt::CheckState state) {
+        onAutoSaveOnChanged(static_cast<int>(state));
+      });
   connect(m_autoSaveTimeFld, &IntLineEdit::editingFinished, this,
           &StartupPopup::onAutoSaveTimeChanged);
   connect(m_existingList, &StartupScenesList::itemClicked, this,

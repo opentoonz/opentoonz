@@ -65,6 +65,19 @@ Already covered:
 - Direct `QRegExp` usage is guarded against by `mise run check-no-qregexp`.
 - Direct `QTextCodec` usage is isolated behind the legacy text-codec adapter
   and guarded by `mise run check-core5compat-scope`.
+- An isolated Qt 6 translation configure lane exists through
+  `nix-qt6-translation-check` and `mise run configure-qt6-translations`.
+  This verifies Qt 6 translation target generation without perturbing the
+  default Qt 5 or normal Qt 6 build directories.
+- Direct checkbox state-change connects in `toonz`, `toonzqt`, and shared
+  headers are centralized behind `QtCompat::connectCheckStateChanged`, with a
+  Qt 6.7+ `checkStateChanged` path and a Qt 5 `stateChanged` fallback.
+- Selected `QMouseEvent` and `QDropEvent`-derived coordinate users are
+  centralized behind `QtCompat` helpers so the Qt 6 lane uses
+  `position()`/`globalPosition()` APIs while the Qt 5 lane keeps its existing
+  integer-position behavior.
+- `DvDirTreeView` uses templated `QVariant::canConvert<QString>()` checks
+  instead of the deprecated Qt 6 overloads.
 
 Still needed:
 
@@ -74,8 +87,12 @@ Still needed:
   no longer needs it.
 - Keep direct `QTextCodec`, `QRegExp`, and `QRegExpValidator` out of feature
   code.
-- Re-enable and verify translation generation in the Qt 6 lane when the rest of
-  the port is stable enough.
+- Build and inspect generated `.qm` files in a release workflow before treating
+  translation generation as fully release-ready.
+- Continue reducing the Qt 6 deprecation warning frontier, including
+  `QTouchEvent::touchPoints()`, remaining `QMouseEvent::globalPos()` users,
+  legacy `QVariant::Type` conversions, `QColor::setNamedColor()`, deprecated
+  `QMouseEvent` constructors, and the broader OpenGL warning field.
 - Add or wire CI coverage for the Qt 6 lane on macOS, Linux, and Windows.
 - Make any remaining Qt 5 specific setup in documentation conditional or
   clearly marked as Qt 5 only.

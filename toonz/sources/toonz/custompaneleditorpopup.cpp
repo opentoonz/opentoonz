@@ -12,6 +12,7 @@
 
 // TnzQt includes
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 // ToonzLib
 #include "toonz/toonzfolders.h"
@@ -259,7 +260,7 @@ void UiPreviewWidget::onMove(const QPoint& pos) {
 }
 
 void UiPreviewWidget::mouseMoveEvent(QMouseEvent* event) {
-  onMove(event->pos());
+  onMove(QtCompat::mouseEventPosition(event));
 }
 
 void UiPreviewWidget::dragEnterEvent(QDragEnterEvent* event) {
@@ -271,7 +272,7 @@ void UiPreviewWidget::dragEnterEvent(QDragEnterEvent* event) {
 }
 
 void UiPreviewWidget::dragMoveEvent(QDragMoveEvent* event) {
-  onMove(event->pos());
+  onMove(QtCompat::dropEventPosition(event));
 
   if (m_highlightUiId < 0) {
     event->ignore();

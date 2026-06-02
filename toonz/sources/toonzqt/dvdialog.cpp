@@ -5,6 +5,7 @@
 // TnzQt includes
 #include "toonzqt/checkbox.h"
 #include "toonzqt/lineedit.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/fxsettings.h"
 
 // TnzLib includes
@@ -1306,8 +1307,10 @@ MessageAndCheckboxDialog *DVGui::createMsgandCheckbox(
 
   dialogCheckBox->setCheckState(defaultCheckBoxState);
 
-  QObject::connect(dialogCheckBox, &QCheckBox::stateChanged, dialog,
-                   &MessageAndCheckboxDialog::onCheckboxChanged);
+  QtCompat::connectCheckStateChanged(
+      dialogCheckBox, dialog, [dialog](Qt::CheckState state) {
+        dialog->onCheckboxChanged(static_cast<int>(state));
+      });
   QObject::connect(buttonGroup, &QButtonGroup::idClicked, dialog,
                    &MessageAndCheckboxDialog::onButtonClicked);
 

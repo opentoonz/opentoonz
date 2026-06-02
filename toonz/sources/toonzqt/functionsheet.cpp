@@ -5,6 +5,7 @@
 // TnzQt includes
 #include "toonzqt/gutil.h"
 #include "toonzqt/functionviewer.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/tframehandle.h"
@@ -422,8 +423,9 @@ void FunctionSheetColumnHeadViewer::paintEvent(QPaintEvent *e) {
 /*! update tooltips
  */
 void FunctionSheetColumnHeadViewer::mouseMoveEvent(QMouseEvent *e) {
+  const QPoint eventPos = QtCompat::mouseEventPosition(e);
   if ((e->buttons() & Qt::MiddleButton) && m_draggingChannel &&
-      (e->pos() - m_dragStartPosition).manhattanLength() >=
+      (eventPos - m_dragStartPosition).manhattanLength() >=
           QApplication::startDragDistance()) {
     QDrag *drag         = new QDrag(this);
     QMimeData *mimeData = new QMimeData;
@@ -436,7 +438,7 @@ void FunctionSheetColumnHeadViewer::mouseMoveEvent(QMouseEvent *e) {
   }
 
   // get the column under the cursor
-  int col = getViewer()->xyToPosition(e->pos()).layer();
+  int col = getViewer()->xyToPosition(eventPos).layer();
   FunctionTreeModel::Channel *channel = m_sheet->getChannel(col);
   if (!channel) {
     setToolTip(QString(""));
@@ -474,7 +476,7 @@ void FunctionSheetColumnHeadViewer::mouseMoveEvent(QMouseEvent *e) {
 //-----------------------------------------------------------------------------
 
 void FunctionSheetColumnHeadViewer::mousePressEvent(QMouseEvent *e) {
-  QPoint pos                          = e->pos();
+  QPoint pos                          = QtCompat::mouseEventPosition(e);
   int currentC                        = getViewer()->xyToPosition(pos).layer();
   FunctionTreeModel::Channel *channel = m_sheet->getChannel(currentC);
   if (!channel) {
@@ -484,7 +486,7 @@ void FunctionSheetColumnHeadViewer::mousePressEvent(QMouseEvent *e) {
 
   if (e->button() == Qt::MiddleButton) {
     m_draggingChannel   = channel;
-    m_dragStartPosition = e->pos();
+    m_dragStartPosition = pos;
     return;
   } else
     channel->setIsCurrent(true);
@@ -639,7 +641,8 @@ FunctionSheetCellViewer::FunctionSheetCellViewer(FunctionSheet *parent)
 /*! Called when the cell panel is left/right-clicked
  */
 Spreadsheet::DragTool *FunctionSheetCellViewer::createDragTool(QMouseEvent *e) {
-  CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
+  const QPoint eventPos     = QtCompat::mouseEventPosition(e);
+  CellPosition cellPosition = getViewer()->xyToPosition(eventPos);
   int row                   = cellPosition.frame();
   int col                   = cellPosition.layer();
   bool isEmpty              = true;
@@ -654,7 +657,7 @@ Spreadsheet::DragTool *FunctionSheetCellViewer::createDragTool(QMouseEvent *e) {
   }
 
   if (!isEmpty) {
-    int x = e->pos().x() - getViewer()->columnToX(col);
+    int x = eventPos.x() - getViewer()->columnToX(col);
     if (0 <= x && x < cColumnDragHandleWidth + 9)
       return new MoveChannelsDragTool(m_sheet);
   }
@@ -892,7 +895,8 @@ void FunctionSheetCellViewer::drawCells(QPainter &painter, int r0, int c0,
 //-----------------------------------------------------------------------------
 
 void FunctionSheetCellViewer::mouseDoubleClickEvent(QMouseEvent *e) {
-  CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
+  CellPosition cellPosition =
+      getViewer()->xyToPosition(QtCompat::mouseEventPosition(e));
   int row                   = cellPosition.frame();
   int col                   = cellPosition.layer();
   int x0, y0, x1, y1;
@@ -970,11 +974,12 @@ void FunctionSheetCellViewer::mousePressEvent(QMouseEvent *e) {
     mouseDoubleClickEvent(e);
     if (m_lineEdit->text() != "") {
       m_lineEdit->setMouseDragEditing(true);
-      m_mouseXPosition = e->x();
+      m_mouseXPosition = QtCompat::mouseEventPosition(e).x();
     }
   } else if (e->button() == Qt::LeftButton &&
              e->modifiers() == Qt::AltModifier) {
-    CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
+    CellPosition cellPosition =
+        getViewer()->xyToPosition(QtCompat::mouseEventPosition(e));
     int row                   = cellPosition.frame();
     int col                   = cellPosition.layer();
     TDoubleParam *curve       = m_sheet->getCurve(col);
@@ -1012,7 +1017,10 @@ m_sheet->setDragTool(0);
 
 void FunctionSheetCellViewer::mouseMoveEvent(QMouseEvent *e) {
   if (m_lineEdit->getMouseDragEditing()) {
-    double newValue = m_currentValue + ((e->x() - m_mouseXPosition) / 2);
+    double newValue =
+        m_currentValue + ((QtCompat::mouseEventPosition(e).x() -
+                           m_mouseXPosition) /
+                          2);
     m_lineEdit->setText(QString::number(newValue, 'f', 4));
     m_updatedValue = newValue;
   } else
@@ -1045,7 +1053,8 @@ void FunctionSheetCellViewer::openContextMenu(QMouseEvent *e) {
   QAction showIbtwnAction(tr("Show Inbetween Values"), 0);
   QAction hideIbtwnAction(tr("Hide Inbetween Values"), 0);
 
-  CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
+  CellPosition cellPosition =
+      getViewer()->xyToPosition(QtCompat::mouseEventPosition(e));
   int row                   = cellPosition.frame();
   int col                   = cellPosition.layer();
   TDoubleParam *curve       = m_sheet->getCurve(col);
@@ -1134,7 +1143,8 @@ void FunctionSheetCellViewer::openContextMenu(QMouseEvent *e) {
 
   TSceneHandle *sceneHandle = m_sheet->getViewer()->getSceneHandle();
   // execute menu
-  QAction *action = menu.exec(e->globalPos());  // QCursor::pos());
+  QAction *action =
+      menu.exec(QtCompat::mouseEventGlobalPosition(e));  // QCursor::pos());
   if (action == &deleteKeyframeAction) {
     KeyframeSetter::removeKeyframeAt(curve, row);
   } else if (action == &insertKeyframeAction) {

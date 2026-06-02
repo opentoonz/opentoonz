@@ -18,6 +18,7 @@
 #include "ttextcodec.h"
 
 #include "toonzqt/menubarcommand.h"
+#include "toonzqt/qtcompat.h"
 #include "menubarcommandids.h"
 
 #include <QFile>
@@ -914,14 +915,8 @@ void ExportXDTSCommand::execute() {
           directTextEdit->setFont(font);
         };
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
-        QObject::connect(bigFont, &QCheckBox::checkStateChanged,
-                         updateDirectionFont);
-#else
-        QObject::connect(bigFont, &QCheckBox::stateChanged, [=](int state) {
-          updateDirectionFont(static_cast<Qt::CheckState>(state));
-        });
-#endif
+        QtCompat::connectCheckStateChanged(bigFont, bigFont,
+                                           updateDirectionFont);
 
         optionsLay->addWidget(bigFont);
 

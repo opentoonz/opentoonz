@@ -16,6 +16,7 @@
 #include "toonzqt/filefield.h"
 #include "toonzqt/doublefield.h"
 #include "toonzqt/checkbox.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/tscenehandle.h"
@@ -350,8 +351,10 @@ QFrame *OutputSettingsPopup::createPanel(bool isPreview) {
   panel->setLayout(lay);
 
   if (isPreview && m_syncColorSettingsButton) {
-    bool ret = connect(m_syncColorSettingsButton, SIGNAL(stateChanged(int)),
-                       SLOT(onSyncColorSettingsChecked(int)));
+    bool ret = static_cast<bool>(QtCompat::connectCheckStateChanged(
+        m_syncColorSettingsButton, this, [this](Qt::CheckState state) {
+          onSyncColorSettingsChecked(static_cast<int>(state));
+        }));
     assert(ret);
   }
 
@@ -469,8 +472,10 @@ QFrame *OutputSettingsPopup::createCameraSettingsBox(bool isPreview) {
     ret = ret && connect(m_cameraSettings, SIGNAL(changed()), this,
                          SLOT(onCameraSettingsChanged()));
   } else {
-    ret = ret && connect(m_applyShrinkChk, SIGNAL(stateChanged(int)),
-                         SLOT(onApplyShrinkChecked(int)));
+    ret = ret && static_cast<bool>(QtCompat::connectCheckStateChanged(
+                     m_applyShrinkChk, this, [this](Qt::CheckState state) {
+                       onApplyShrinkChecked(static_cast<int>(state));
+                     }));
   }
 
   assert(ret);
@@ -687,8 +692,10 @@ QFrame *OutputSettingsPopup::createFileSettingsBox(bool isPreview) {
                        SLOT(onRasterGranularityChanged(int)));
 
   if (m_subcameraChk)
-    ret = ret && connect(m_subcameraChk, SIGNAL(stateChanged(int)),
-                         SLOT(onSubcameraChecked(int)));
+    ret = ret && static_cast<bool>(QtCompat::connectCheckStateChanged(
+                     m_subcameraChk, this, [this](Qt::CheckState state) {
+                       onSubcameraChecked(static_cast<int>(state));
+                     }));
   assert(ret);
   return fileSettingsBox;
 }
@@ -792,8 +799,10 @@ QFrame *OutputSettingsPopup::createMoreSettingsBox() {
 
   bool ret = true;
   // clapperboard
-  ret = ret && connect(m_addBoard, SIGNAL(stateChanged(int)), this,
-                       SLOT(onAddBoardChecked(int)));
+  ret = ret && static_cast<bool>(QtCompat::connectCheckStateChanged(
+                   m_addBoard, this, [this](Qt::CheckState state) {
+                     onAddBoardChecked(static_cast<int>(state));
+                   }));
   ret = ret && connect(m_boardSettingsBtn, SIGNAL(clicked()), this,
                        SLOT(onBoardSettingsBtnClicked()));
 
@@ -809,8 +818,10 @@ QFrame *OutputSettingsPopup::createMoreSettingsBox() {
                        SLOT(onStretchFldEditFinished()));
   ret = ret && connect(m_multimediaOm, SIGNAL(currentIndexChanged(int)), this,
                        SLOT(onMultimediaChanged(int)));
-  ret = ret && connect(m_doStereoscopy, SIGNAL(stateChanged(int)),
-                       SLOT(onStereoChecked(int)));
+  ret = ret && static_cast<bool>(QtCompat::connectCheckStateChanged(
+                   m_doStereoscopy, this, [this](Qt::CheckState state) {
+                     onStereoChecked(static_cast<int>(state));
+                   }));
   ret = ret && connect(m_stereoShift, SIGNAL(editingFinished()),
                        SLOT(onStereoChanged()));
   assert(ret);

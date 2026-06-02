@@ -893,7 +893,6 @@ if(WITH_TRANSLATION)
                     TARGET "${module}" POST_BUILD 
                     COMMAND ${OPENTOONZ_QT_LRELEASE_EXECUTABLE} "${ts_file}" -qm "${qm_tmp_file}"
                     COMMAND ${CMAKE_COMMAND} -E rename ${qm_tmp_file} ${qm_file}
-                    DEPENDS "${ts_file}"
                     BYPRODUCTS "${qm_file}"
                     COMMENT "lrelease ${lang_disp_name}/${ts_name}.qm"
                     VERBATIM

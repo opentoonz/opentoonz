@@ -13,6 +13,7 @@
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/gutil.h"
 #include "toonzqt/dvscrollwidget.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzCore includes
 #include "tconvert.h"
@@ -953,8 +954,10 @@ TaskSheet::TaskSheet(TasksViewer *owner) : QScrollArea(owner) {
 
   ret = ret && connect(m_multimedia, SIGNAL(currentIndexChanged(int)), this,
                        SLOT(setMultimedia(int)));
-  ret = ret && connect(m_visible, SIGNAL(stateChanged(int)), this,
-                       SLOT(setVisible(int)));
+  ret = ret && static_cast<bool>(QtCompat::connectCheckStateChanged(
+                   m_visible, this, [this](Qt::CheckState state) {
+                     setVisible(static_cast<int>(state));
+                   }));
 
   ret = ret && connect(m_overwrite, SIGNAL(currentIndexChanged(int)), this,
                        SLOT(setOverwrite(int)));

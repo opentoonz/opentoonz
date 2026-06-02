@@ -28,6 +28,7 @@
 #include "toonzqt/viewcommandids.h"
 #include "toonzqt/updatechecker.h"
 #include "toonzqt/paletteviewer.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/seethroughwindow.h"
 
 // TnzLib includes
@@ -1105,11 +1106,12 @@ void MainWindow::onAbout() {
     QCheckBox *showDateCheckBox =
         new QCheckBox(tr("Show build date in title"), dialog);
     showDateCheckBox->setChecked(ShowBuildDateInTitle);
-    connect(showDateCheckBox, &QCheckBox::stateChanged, [=](int state) {
-      bool show            = (state == Qt::Checked);
-      ShowBuildDateInTitle = show;
-      changeWindowTitle();
-    });
+    QtCompat::connectCheckStateChanged(
+        showDateCheckBox, dialog, [=](Qt::CheckState state) {
+          bool show            = (state == Qt::Checked);
+          ShowBuildDateInTitle = show;
+          changeWindowTitle();
+        });
     hLay->addWidget(showDateCheckBox);
   }
   dialog->addLayout(hLay);

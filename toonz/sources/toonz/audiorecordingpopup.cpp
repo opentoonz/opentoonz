@@ -9,6 +9,7 @@
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/flipconsole.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 // Tnzlib includes
 #include "toonz/tproject.h"
@@ -364,8 +365,10 @@ AudioRecordingPopup::AudioRecordingPopup()
 
   m_playXSheetCB->setChecked(true);
 
-  bool ret = connect(m_playXSheetCB, SIGNAL(stateChanged(int)), this,
-                     SLOT(onPlayXSheetCBChanged(int)));
+  bool ret = static_cast<bool>(QtCompat::connectCheckStateChanged(
+      m_playXSheetCB, this, [this](Qt::CheckState state) {
+        onPlayXSheetCBChanged(static_cast<int>(state));
+      }));
 
   ret = ret && connect(m_saveButton, SIGNAL(clicked()), this,
                        SLOT(onSaveButtonPressed()));

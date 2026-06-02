@@ -7,6 +7,7 @@
 #include "toonzqt/filefield.h"
 #include "historytypes.h"
 #include "toonzqt/lutcalibrator.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/txshlevel.h"
@@ -2517,8 +2518,9 @@ SettingsPage::SettingsPage(QWidget *parent)
   paramsContainerLayout->addWidget(m_autoFillCheckBox, 0,
                                    Qt::AlignLeft | Qt::AlignVCenter);
 
-  ret = connect(m_autoFillCheckBox, SIGNAL(stateChanged(int)), this,
-                SLOT(onAutofillChanged()));
+  ret = static_cast<bool>(QtCompat::connectCheckStateChanged(
+      m_autoFillCheckBox, this,
+      [this](Qt::CheckState) { onAutofillChanged(); }));
   assert(ret);
 
   // Prepare the style parameters layout

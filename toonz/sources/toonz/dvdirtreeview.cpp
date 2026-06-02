@@ -12,6 +12,7 @@
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 // ToonzLib
 #include "tconvert.h"
@@ -140,7 +141,7 @@ QWidget *DvDirTreeViewDelegate::createEditor(QWidget *parent,
   QPixmap px = node->getPixmap(m_treeView->isExpanded(index));
   QRect rect = option.rect;
 
-  if (index.data().canConvert(QMetaType::QString)) {
+  if (index.data().canConvert<QString>()) {
     NodeEditor *editor = new NodeEditor(parent, rect, px.width());
     editor->setText(index.data().toString());
     connect(editor, &NodeEditor::editingFinished, this,
@@ -159,7 +160,7 @@ bool DvDirTreeViewDelegate::editorEvent(QEvent *ev, QAbstractItemModel *model,
   if (ev->type() == QEvent::MouseButtonPress) {
     QMouseEvent *mev = static_cast<QMouseEvent *>(ev);
     QRect bounds     = option.rect;
-    int x            = mev->pos().x() - bounds.x();
+    int x            = QtCompat::mouseEventPosition(mev).x() - bounds.x();
 
     DvDirModelNode *node         = DvDirModel::instance()->getNode(index);
     DvDirModelProjectNode *pnode = dynamic_cast<DvDirModelProjectNode *>(node);
@@ -288,7 +289,7 @@ void DvDirTreeViewDelegate::paint(QPainter *painter,
 
 void DvDirTreeViewDelegate::setEditorData(QWidget *editor,
                                           const QModelIndex &index) const {
-  if (index.data().canConvert(QMetaType::QString)) {
+  if (index.data().canConvert<QString>()) {
     NodeEditor *nodeEditor = qobject_cast<NodeEditor *>(editor);
     if (nodeEditor) {
       nodeEditor->setText(index.data().toString());
@@ -303,7 +304,7 @@ void DvDirTreeViewDelegate::setEditorData(QWidget *editor,
 void DvDirTreeViewDelegate::setModelData(QWidget *editor,
                                          QAbstractItemModel *model,
                                          const QModelIndex &index) const {
-  if (index.data().canConvert(QMetaType::QString)) {
+  if (index.data().canConvert<QString>()) {
     NodeEditor *nodeEditor = qobject_cast<NodeEditor *>(editor);
     if (nodeEditor) {
       model->setData(index, QVariant::fromValue(nodeEditor->getText()));
@@ -430,7 +431,7 @@ void DvDirTreeView::dragMoveEvent(QDragMoveEvent *e) {
   const QMimeData *mimeData = e->mimeData();
   if (!acceptResourceDrop(mimeData->urls())) return;
 
-  QModelIndex index = indexAt(e->pos());
+  QModelIndex index = indexAt(QtCompat::dropEventPosition(e));
   DvDirModelFileFolderNode *folderNode =
       dynamic_cast<DvDirModelFileFolderNode *>(
           DvDirModel::instance()->getNode(index));
@@ -450,7 +451,7 @@ void DvDirTreeView::dropEvent(QDropEvent *e) {
   m_currentDropItem         = nullptr;
   update();
 
-  QModelIndex index = indexAt(e->pos());
+  QModelIndex index = indexAt(QtCompat::dropEventPosition(e));
   DvDirModelFileFolderNode *folderNode =
       dynamic_cast<DvDirModelFileFolderNode *>(
           DvDirModel::instance()->getNode(index));

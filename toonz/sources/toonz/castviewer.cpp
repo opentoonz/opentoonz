@@ -28,6 +28,7 @@
 #include "toonzqt/trepetitionguard.h"
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/infoviewer.h"
+#include "toonzqt/qtcompat.h"
 #include "historytypes.h"
 
 // TnzCore includes
@@ -276,7 +277,7 @@ void CastTreeViewer::dragEnterEvent(QDragEnterEvent *e) {
   if (!e->mimeData()->hasFormat("application/vnd.toonz.levels") &&
       m_dropFilePath == TFilePath())
     return;
-  m_dropTargetItem = itemAt(e->pos());
+  m_dropTargetItem = itemAt(QtCompat::dropEventPosition(e));
   if (m_dropTargetItem &&
       m_dropTargetItem->data(0, Qt::DisplayRole).toString() == AudioFolderName)
     m_dropTargetItem = 0;
@@ -292,7 +293,7 @@ void CastTreeViewer::dragMoveEvent(QDragMoveEvent *event) {
       m_dropFilePath != TFilePath())
     return;
 
-  m_dropTargetItem  = itemAt(event->pos());
+  m_dropTargetItem  = itemAt(QtCompat::dropEventPosition(event));
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
   QString rootName  = QString("Root");
   if (scene) {
@@ -327,7 +328,7 @@ void CastTreeViewer::dropEvent(QDropEvent *event) {
   }
 
   if (!event->mimeData()->hasFormat("application/vnd.toonz.levels")) return;
-  m_dropTargetItem = itemAt(event->pos());
+  m_dropTargetItem = itemAt(QtCompat::dropEventPosition(event));
   if (!m_dropTargetItem) return;
   TFilePath folderPath(
       m_dropTargetItem->data(1, Qt::DisplayRole).toString().toStdWString());

@@ -51,7 +51,7 @@ but do not defer Qt 6 rendering work solely because a Metal draft exists.
 
 ## Current Branch Status
 
-As of May 31, 2026, the initial Qt 6 runway is already implemented in this
+As of June 2, 2026, the initial Qt 6 runway is already implemented in this
 branch.
 
 - `OPENTOONZ_QT_MAJOR` exists and defaults to the Qt 5 lane.
@@ -85,13 +85,25 @@ branch.
   `image`, `toonzlib`, and `OpenToonz`, the current targets that include the
   legacy text-codec adapter. Drop those targeted links once the adapter no
   longer needs Core5Compat.
+- An isolated Qt 6 translation configure lane exists through the
+  `nix-qt6-translation-check` CMake preset and
+  `mise run configure-qt6-translations`. It keeps `WITH_TRANSLATION=ON`
+  verification separate from the default Qt 5 lane and the normal Qt 6 build
+  directory.
 - After that link-scope reduction, both app targets still build:
   `cmake --build toonz/build/nix-qt6-relwithdebinfo --target OpenToonz
   --parallel` and `cmake --build toonz/build/nix-relwithdebinfo --target
   OpenToonz --parallel`.
-- The SXF direct-text popup now uses `QCheckBox::checkStateChanged` on Qt 6.7+
-  and the existing `stateChanged` signal on Qt 5, removing a Qt 6 deprecation
-  warning without changing the Qt 5 lane.
+- Direct checkbox state-change connects in `toonz`, `toonzqt`, and shared
+  headers now route through `QtCompat::connectCheckStateChanged`. Qt 6.7+ uses
+  `QCheckBox::checkStateChanged`, while the Qt 5 lane keeps the existing
+  `stateChanged` signal behind the helper.
+- A small event-coordinate compatibility slice is now centralized in
+  `QtCompat`: selected `QMouseEvent` position/global-position and
+  `QDropEvent`-derived drag/drop position users now call Qt 6
+  `position()`/`globalPosition()` APIs while preserving Qt 5 behavior.
+- `DvDirTreeView` no longer uses deprecated `QVariant::canConvert` overloads
+  for string-valued model data.
 - The Qt 6 startup path no longer sets the removed/deprecated high-DPI
   application attributes; Qt 6 uses its always-on high-DPI behavior, while the
   Qt 5 lane keeps the existing attributes. The translator startup path also

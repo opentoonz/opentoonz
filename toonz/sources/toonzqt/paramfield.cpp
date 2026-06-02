@@ -10,6 +10,7 @@
 #include "toonzqt/tonecurvefield.h"
 #include "toonzqt/checkbox.h"
 #include "toonzqt/menubarcommand.h"
+#include "toonzqt/qtcompat.h"
 
 #include "tdoubleparam.h"
 #include "tnotanimatableparam.h"
@@ -1312,10 +1313,9 @@ ModeSensitiveBox::ModeSensitiveBox(QWidget *parent,
 ModeSensitiveBox::ModeSensitiveBox(QWidget *parent, QCheckBox *checkBox)
     : QWidget(parent) {
   m_modes << 1;
-  connect(
-      checkBox, &QCheckBox::stateChanged, this,
-      [=]() { onModeChanged(checkBox->isChecked() ? 1 : 0); },
-      Qt::AutoConnection);
+  QtCompat::connectCheckStateChanged(
+      checkBox, this,
+      [=](Qt::CheckState) { onModeChanged(checkBox->isChecked() ? 1 : 0); });
 }
 
 //-----------------------------------------------------------------------------
@@ -2364,7 +2364,9 @@ CheckBox_bool::CheckBox_bool(QWidget *parent, QString name,
   value_ = new QCheckBox(this);
   value_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-  connect(value_, SIGNAL(stateChanged(int)), this, SLOT(update_value(int)));
+  QtCompat::connectCheckStateChanged(value_, this, [this](Qt::CheckState state) {
+    update_value(static_cast<int>(state));
+  });
 
   m_layout->addWidget(value_);
 

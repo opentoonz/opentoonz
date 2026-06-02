@@ -20,6 +20,7 @@
 #include "toonzqt/colorfield.h"
 #include "toonzqt/checkbox.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/namebuilder.h"
@@ -808,19 +809,25 @@ paramsLayout->addWidget(m_cThicknessRatio, row++, 1);*/
           SLOT(onValueEdited()));
   connect(m_cThicknessRatioLast, SIGNAL(valueChanged()), this,
           SLOT(onValueEdited()));
-  connect(m_cMakeFrame, SIGNAL(stateChanged(int)), this, SLOT(onValueEdited()));
-  connect(m_cPaintFill, SIGNAL(stateChanged(int)), this, SLOT(onValueEdited()));
-  connect(m_cAlignBoundaryStrokesDirection, SIGNAL(stateChanged(int)), this,
-          SLOT(onValueEdited()));
-  connect(m_cNaaSource, SIGNAL(stateChanged(int)), this, SLOT(onValueEdited()));
+  QtCompat::connectCheckStateChanged(
+      m_cMakeFrame, this, [this](Qt::CheckState) { onValueEdited(); });
+  QtCompat::connectCheckStateChanged(
+      m_cPaintFill, this, [this](Qt::CheckState) { onValueEdited(); });
+  QtCompat::connectCheckStateChanged(
+      m_cAlignBoundaryStrokesDirection, this,
+      [this](Qt::CheckState) { onValueEdited(); });
+  QtCompat::connectCheckStateChanged(
+      m_cNaaSource, this, [this](Qt::CheckState) { onValueEdited(); });
 
   connect(m_oAccuracy, SIGNAL(valueChanged(bool)), this,
           SLOT(onValueEdited(bool)));
   connect(m_oDespeckling, SIGNAL(valueChanged(bool)), this,
           SLOT(onValueEdited(bool)));
-  connect(m_oPaintFill, SIGNAL(stateChanged(int)), this, SLOT(onValueEdited()));
-  connect(m_oAlignBoundaryStrokesDirection, SIGNAL(stateChanged(int)), this,
-          SLOT(onValueEdited()));
+  QtCompat::connectCheckStateChanged(
+      m_oPaintFill, this, [this](Qt::CheckState) { onValueEdited(); });
+  QtCompat::connectCheckStateChanged(
+      m_oAlignBoundaryStrokesDirection, this,
+      [this](Qt::CheckState) { onValueEdited(); });
   connect(m_oAdherence, SIGNAL(valueChanged(bool)), this,
           SLOT(onValueEdited(bool)));
   connect(m_oAngle, SIGNAL(valueChanged(bool)), this,

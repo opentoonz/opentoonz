@@ -10,6 +10,7 @@
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/txsheet.h"
@@ -593,8 +594,9 @@ SceneSettingsPopup::SceneSettingsPopup()
                        SLOT(onMakerInformationChanged()));
 
   // Use Color Filter and Transparency for Rendering
-  ret = ret && connect(m_colorFilterOnRenderCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onColorFilterOnRenderChanged()));
+  ret = ret && static_cast<bool>(QtCompat::connectCheckStateChanged(
+                   m_colorFilterOnRenderCB, this,
+                   [this](Qt::CheckState) { onColorFilterOnRenderChanged(); }));
   ret = ret && connect(editColorFiltersButton, SIGNAL(clicked()), this,
                        SLOT(onEditColorFiltersButtonClicked()));
 
