@@ -261,19 +261,15 @@ XDTSImportPopup::XDTSImportPopup(QStringList levelNames, ToonzScene* scene,
   markLayout->setHorizontalSpacing(5);
 
   {
-    // Symbols for SXF: ○ (0x25CB) and ● (0x25CF)
-    // Symbols for XDTS: '0' and '*'
-    const QChar symbol1 = isSXF ? QChar(0x25CB) : QChar('0');
-    const QChar symbol2 = isSXF ? QChar(0x25CF) : QChar('*');
-
+    // Inbetween symbols: ○ (0x25CB) and ● (0x25CF)
     markLayout->addWidget(
-        new QLabel(tr("Inbetween Symbol1 (%1):").arg(symbol1), this), 0, 0,
-        Qt::AlignRight | Qt::AlignVCenter);
+        new QLabel(tr("Inbetween Symbol1 (%1):").arg(QChar(0x25CB)), this), 0,
+        0, Qt::AlignRight | Qt::AlignVCenter);
     markLayout->addWidget(m_tick1Combo, 0, 1);
     markLayout->addItem(new QSpacerItem(10, 1), 0, 2);
     markLayout->addWidget(
-        new QLabel(tr("Inbetween Symbol2 (%1):").arg(symbol2), this), 0, 3,
-        Qt::AlignRight | Qt::AlignVCenter);
+        new QLabel(tr("Inbetween Symbol2 (%1):").arg(QChar(0x25CF)), this), 0,
+        3, Qt::AlignRight | Qt::AlignVCenter);
     markLayout->addWidget(m_tick2Combo, 0, 4);
 
     if (m_isUext) {

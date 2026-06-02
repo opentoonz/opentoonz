@@ -279,7 +279,7 @@ QMenuBar *StackedMenuBar::loadMenuBar(const TFilePath &fp) {
           /*- Menu title will be translated if the title is registered in
            * translation file -*/
           QMenu *menu = new QMenu(tr(title.toStdString().c_str()));
-
+          menu->setToolTipsVisible(true);
           if (readMenuRecursive(reader, menu))
             menuBar->addMenu(menu);
           else {
@@ -289,12 +289,13 @@ QMenuBar *StackedMenuBar::loadMenuBar(const TFilePath &fp) {
         } else if (reader.name() == "command") {
           // Read the optional 'label' attribute for display
           QString displayLabel = reader.attributes().value("label").toString();
-          QString cmdName = reader.readElementText();
+          QString cmdName      = reader.readElementText();
 
           QAction *action = CommandManager::instance()->getAction(
               cmdName.toStdString().c_str());
           if (action) {
-            // Override the QAction text if a custom 'label' attribute is provided
+            // Override the QAction text if a custom 'label' attribute is
+            // provided
             if (!displayLabel.isEmpty()) {
               action->setText(tr(displayLabel.toStdString().c_str()));
             }
@@ -324,7 +325,7 @@ QMenuBar *StackedMenuBar::loadMenuBar(const TFilePath &fp) {
 bool StackedMenuBar::readMenuRecursive(QXmlStreamReader &reader, QMenu *menu) {
   while (reader.readNextStartElement()) {
     if (reader.name() == "menu") {
-      QString title = reader.attributes().value("title").toString();
+      QString title  = reader.attributes().value("title").toString();
       QMenu *subMenu = new QMenu(tr(title.toStdString().c_str()));
 
       if (readMenuRecursive(reader, subMenu))
@@ -336,9 +337,9 @@ bool StackedMenuBar::readMenuRecursive(QXmlStreamReader &reader, QMenu *menu) {
       }
     } else if (reader.name() == "command") {
       QString displayLabel = reader.attributes().value("label").toString();
-      QString cmdName = reader.readElementText();
-      QAction *action = CommandManager::instance()->getAction(
-          cmdName.toStdString().c_str());
+      QString cmdName      = reader.readElementText();
+      QAction *action =
+          CommandManager::instance()->getAction(cmdName.toStdString().c_str());
       if (action) {
         if (!displayLabel.isEmpty()) {
           action->setText(tr(displayLabel.toStdString().c_str()));
@@ -348,9 +349,9 @@ bool StackedMenuBar::readMenuRecursive(QXmlStreamReader &reader, QMenu *menu) {
     } else if (reader.name() == "command_debug") {
 #ifndef NDEBUG
       QString displayLabel = reader.attributes().value("label").toString();
-      QString cmdName = reader.readElementText();
-      QAction *action = CommandManager::instance()->getAction(
-          cmdName.toStdString().c_str());
+      QString cmdName      = reader.readElementText();
+      QAction *action =
+          CommandManager::instance()->getAction(cmdName.toStdString().c_str());
       if (action) {
         if (!displayLabel.isEmpty()) {
           action->setText(tr(displayLabel.toStdString().c_str()));
@@ -1143,8 +1144,8 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   }
   fileMenu->addSeparator();
   QMenu *importMenu = fileMenu->addMenu(tr("Import"));
-  { 
-    addMenuItem(importMenu, MI_ImportMagpieFile); 
+  {
+    addMenuItem(importMenu, MI_ImportMagpieFile);
     addMenuItem(importMenu, MI_ImportOCA);
   }
   QMenu *exportMenu = fileMenu->addMenu(tr("Export"));

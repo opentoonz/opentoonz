@@ -225,6 +225,8 @@ private:
   QAction *createSpecialModifierAction(const char *id, const char *name,
                                        const QString &defaultShortcut);
 
+  void setCommandToWIP(QAction *);
+
 protected slots:
   void onCurrentRoomChanged(int newRoomIndex);
   void onIndexSwapped(int firstIndex, int secondIndex);
