@@ -10,6 +10,9 @@
 #include "toonz/preferences.h"
 #include "toonz/mypaintbrushstyle.h"
 
+// TnzCore includes
+#include "tenv.h"
+
 // Tools includes
 #include "tools/tool.h"
 #include "tools/toolhandle.h"
@@ -36,7 +39,7 @@
 
 // Standard library
 #include <algorithm>  // For std::min
-#include <QSettings>
+#include <map>
 #include <QMenu>
 #include <QContextMenuEvent>
 #include <QIcon>
@@ -44,6 +47,60 @@
 #include <QPainter>
 #include <QStyleOptionToolButton>
 #include <QStyle>
+
+namespace {
+
+// Tool Properties Panel UI preferences (stored in user .env via TEnv).
+TEnv::IntVar ToolPropertiesUseSingleMaxSlider("ToolPropertiesUseSingleMaxSlider",
+                                              0);
+TEnv::IntVar ToolPropertiesShowLabels("ToolPropertiesShowLabels", 1);
+TEnv::IntVar ToolPropertiesShowNumericFields("ToolPropertiesShowNumericFields",
+                                             1);
+TEnv::IntVar ToolPropertiesShowBorders("ToolPropertiesShowBorders", 1);
+TEnv::IntVar ToolPropertiesShowBackgrounds("ToolPropertiesShowBackgrounds", 1);
+TEnv::IntVar ToolPropertiesShowIcons("ToolPropertiesShowIcons", 1);
+// Serialized map: "propName=0|1" entries separated by ';' (1 = expanded).
+TEnv::StringVar ToolPropertiesCollapsedStates("ToolPropertiesCollapsedStates",
+                                              "");
+
+std::map<std::string, bool> parseCollapsedStates() {
+  std::map<std::string, bool> result;
+  const QString stored =
+      QString::fromStdString((std::string)ToolPropertiesCollapsedStates);
+  const QStringList entries =
+      stored.split(';', Qt::SkipEmptyParts);
+  for (const QString &entry : entries) {
+    const int eq = entry.indexOf('=');
+    if (eq <= 0) continue;
+    const std::string name = entry.left(eq).toStdString();
+    result[name]           = entry.mid(eq + 1).toInt() != 0;
+  }
+  return result;
+}
+
+void writeCollapsedStates(const std::map<std::string, bool> &states) {
+  QStringList entries;
+  for (const auto &it : states) {
+    entries << QString::fromStdString(it.first) + "=" +
+                 QString::number(it.second ? 1 : 0);
+  }
+  ToolPropertiesCollapsedStates = entries.join(";").toStdString();
+}
+
+bool collapsedStateFromEnv(const std::string &propName, bool defaultExpanded) {
+  const std::map<std::string, bool> states = parseCollapsedStates();
+  const auto it                            = states.find(propName);
+  if (it == states.end()) return defaultExpanded;
+  return it->second;
+}
+
+void setCollapsedStateInEnv(const std::string &propName, bool expanded) {
+  std::map<std::string, bool> states = parseCollapsedStates();
+  states[propName]                   = expanded;
+  writeCollapsedStates(states);
+}
+
+}  // namespace
 
 //=============================================================================
 // ToolPropertyButton - Custom button with theme-aware painting
@@ -128,14 +185,13 @@ ToolPropertiesPanel::ToolPropertiesPanel(QWidget *parent)
     , m_showBackgrounds(true)      // Show option backgrounds by default
     , m_showIcons(true) {          // Show Cap/Join icons by default
   
-  // Load preferences from settings
-  QSettings settings;
-  m_useSingleMaxSlider = settings.value("ToolPropertiesPanel/useSingleMaxSlider", false).toBool();
-  m_showLabels = settings.value("ToolPropertiesPanel/showLabels", true).toBool();
-  m_showNumericFields = settings.value("ToolPropertiesPanel/showNumericFields", true).toBool();
-  m_showBorders = settings.value("ToolPropertiesPanel/showBorders", true).toBool();
-  m_showBackgrounds = settings.value("ToolPropertiesPanel/showBackgrounds", true).toBool();
-  m_showIcons = settings.value("ToolPropertiesPanel/showIcons", true).toBool();
+  // Load preferences from TEnv
+  m_useSingleMaxSlider = ToolPropertiesUseSingleMaxSlider != 0;
+  m_showLabels         = ToolPropertiesShowLabels != 0;
+  m_showNumericFields  = ToolPropertiesShowNumericFields != 0;
+  m_showBorders        = ToolPropertiesShowBorders != 0;
+  m_showBackgrounds    = ToolPropertiesShowBackgrounds != 0;
+  m_showIcons          = ToolPropertiesShowIcons != 0;
 
   initializeUI();
   connectSignals();
@@ -1767,10 +1823,9 @@ QWidget* ToolPropertiesPanel::createCollapsibleEnum(const QString &label,
   // Content (checkable buttons in a group)
   QWidget *content = new QWidget(container);
   
-  // Load saved collapse state from QSettings (persists between sessions)
-  QSettings settings;
-  QString settingsKey = QString("ToolPropertiesPanel/CollapsedState/%1").arg(QString::fromStdString(propName));
-  bool isExpanded = settings.value(settingsKey, false).toBool();  // Default: collapsed
+  // Load saved collapse state from TEnv (persists between sessions)
+  bool isExpanded =
+      collapsedStateFromEnv(propName, false);  // Default: collapsed
   content->setVisible(isExpanded);
   toggleButton->setChecked(isExpanded);
   toggleButton->setArrowType(isExpanded ? Qt::DownArrow : Qt::RightArrow);
@@ -1815,10 +1870,8 @@ QWidget* ToolPropertiesPanel::createCollapsibleEnum(const QString &label,
     content->setVisible(checked);
     toggleButton->setArrowType(checked ? Qt::DownArrow : Qt::RightArrow);
     
-    // Save collapsed state to QSettings for persistence
-    QSettings settings;
-    QString settingsKey = QString("ToolPropertiesPanel/CollapsedState/%1").arg(QString::fromStdString(propName));
-    settings.setValue(settingsKey, checked);
+    // Save collapsed state to TEnv for persistence
+    setCollapsedStateInEnv(propName, checked);
   });
   
   // Store propName in container for later use
@@ -1887,10 +1940,8 @@ QWidget* ToolPropertiesPanel::createCollapsibleEnumWithIcons(
   toggleButton->setAutoRaise(true);
   toggleButton->setFixedSize(16, 16);
   
-  // Load collapsed state from QSettings
-  QSettings settings;
-  QString settingsKey = QString("ToolPropertiesPanel/CollapsedState/%1").arg(QString::fromStdString(propName));
-  bool isExpanded = settings.value(settingsKey, true).toBool();
+  // Load collapsed state from TEnv
+  bool isExpanded = collapsedStateFromEnv(propName, true);
   toggleButton->setChecked(isExpanded);
   toggleButton->setArrowType(isExpanded ? Qt::DownArrow : Qt::RightArrow);
   
@@ -1985,9 +2036,7 @@ QWidget* ToolPropertiesPanel::createCollapsibleEnumWithIcons(
     content->setVisible(checked);
     toggleButton->setArrowType(checked ? Qt::DownArrow : Qt::RightArrow);
     
-    QSettings settings;
-    QString settingsKey = QString("ToolPropertiesPanel/CollapsedState/%1").arg(QString::fromStdString(propName));
-    settings.setValue(settingsKey, checked);
+    setCollapsedStateInEnv(propName, checked);
   });
   
   // Connect button group to property update
@@ -2688,39 +2737,37 @@ void ToolPropertiesPanel::onShowHideActionTriggered() {
   QString actionName = action->objectName();
   bool needsRefresh = false;
   
-  // Save preferences according to the action
-  QSettings settings;
-  
+  // Save preferences according to the action (TEnv)
   if (actionName == "singleSlider") {
     m_useSingleMaxSlider = action->isChecked();
-    settings.setValue("ToolPropertiesPanel/useSingleMaxSlider", m_useSingleMaxSlider);
+    ToolPropertiesUseSingleMaxSlider = m_useSingleMaxSlider ? 1 : 0;
     needsRefresh = true;
   } 
   else if (actionName == "showLabels") {
     m_showLabels = action->isChecked();
-    settings.setValue("ToolPropertiesPanel/showLabels", m_showLabels);
+    ToolPropertiesShowLabels = m_showLabels ? 1 : 0;
     needsRefresh = true;
   } 
   else if (actionName == "showNumeric") {
     m_showNumericFields = action->isChecked();
-    settings.setValue("ToolPropertiesPanel/showNumericFields", m_showNumericFields);
+    ToolPropertiesShowNumericFields = m_showNumericFields ? 1 : 0;
     needsRefresh = true;
   }
   else if (actionName == "showBorders") {
     m_showBorders = action->isChecked();
-    settings.setValue("ToolPropertiesPanel/showBorders", m_showBorders);
+    ToolPropertiesShowBorders = m_showBorders ? 1 : 0;
     updateContainerStylesheet();  // Update container stylesheet immediately
     needsRefresh = true;
   }
   else if (actionName == "showBackgrounds") {
     m_showBackgrounds = action->isChecked();
-    settings.setValue("ToolPropertiesPanel/showBackgrounds", m_showBackgrounds);
+    ToolPropertiesShowBackgrounds = m_showBackgrounds ? 1 : 0;
     updateContainerStylesheet();  // Update container stylesheet immediately
     needsRefresh = true;
   }
   else if (actionName == "showIcons") {
     m_showIcons = action->isChecked();
-    settings.setValue("ToolPropertiesPanel/showIcons", m_showIcons);
+    ToolPropertiesShowIcons = m_showIcons ? 1 : 0;
     needsRefresh = true;
   }
   

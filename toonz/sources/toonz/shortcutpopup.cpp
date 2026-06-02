@@ -48,6 +48,30 @@ ShortcutPopup *ShortcutPopup::s_instance = nullptr;
 // STD includes
 #include <vector>
 
+namespace {
+
+// Persist Configure Shortcuts UI state in the user profile (.env).
+TEnv::StringVar ShortcutPopupExpandedFolders("ShortcutPopupExpandedFolders", "");
+TEnv::IntVar ShortcutPopupExpandedStateSaved("ShortcutPopupExpandedStateSaved",
+                                             0);
+TEnv::StringVar ShortcutPopupSearchText("ShortcutPopupSearchText", "");
+
+const QChar kFolderListSeparator(0x1e);
+
+QStringList expandedFoldersFromEnv() {
+  const QString stored =
+      QString::fromStdString((std::string)ShortcutPopupExpandedFolders);
+  if (stored.isEmpty()) return QStringList();
+  return stored.split(kFolderListSeparator, Qt::SkipEmptyParts);
+}
+
+void saveExpandedFoldersToEnv(const QStringList &expandedFolders) {
+  ShortcutPopupExpandedFolders =
+      expandedFolders.join(kFolderListSeparator).toStdString();
+}
+
+}  // namespace
+
 //=============================================================================
 // ShortcutItem
 // ------------
@@ -312,20 +336,15 @@ ShortcutTree::~ShortcutTree() {}
 //-----------------------------------------------------------------------------
 
 void ShortcutTree::saveExpandedState() {
-  QSettings settings;
-  QStringList expandedFolders = collectExpandedState();
-
-  settings.setValue("ShortcutPopup/expandedFolders", expandedFolders);
-  settings.setValue("ShortcutPopup/expandedStateSaved", true);
+  saveExpandedFoldersToEnv(collectExpandedState());
+  ShortcutPopupExpandedStateSaved = 1;
 }
 
 //-----------------------------------------------------------------------------
 
 void ShortcutTree::restoreExpandedState() {
-  QSettings settings;
-  bool hasSavedState = settings.contains("ShortcutPopup/expandedStateSaved");
-  QStringList expandedFolders =
-      settings.value("ShortcutPopup/expandedFolders").toStringList();
+  const bool hasSavedState = ShortcutPopupExpandedStateSaved != 0;
+  const QStringList expandedFolders = expandedFoldersFromEnv();
   QSignalBlocker blocker(this);
   applyExpandedState(expandedFolders, !hasSavedState);
 }
@@ -1131,18 +1150,16 @@ void ShortcutPopup::showEvent(QShowEvent *se) {
   ToolPresetCommandManager::instance()->refreshPresetCommands();
   ToolPresetCommandManager::instance()->refreshSizeCommands();
 
-  // Restore search term from QSettings
-  QSettings settings;
-  QString lastSearchTerm =
-      settings.value("ShortcutPopup/searchText", "").toString();
-
+  // Restore search term from TEnv
+  const QString lastSearchTerm =
+      QString::fromStdString((std::string)ShortcutPopupSearchText);
   // Step 1: Restore search text in the field WITHOUT triggering searchItems
   {
     QSignalBlocker blocker(m_searchEdit);
     m_searchEdit->setText(lastSearchTerm);
   }
 
-  // Step 2: Restore folder expansion state from QSettings
+  // Step 2: Restore folder expansion state from TEnv
   m_list->restoreExpandedState();
 
   // Step 3: If there was a search, apply filtering WITHOUT changing expansion
@@ -1177,10 +1194,8 @@ void ShortcutPopup::hideEvent(QHideEvent *he) {
     m_list->saveExpandedState();
   }
 
-  // Save search text to QSettings
-  QSettings settings;
-  settings.setValue("ShortcutPopup/searchText", m_searchEdit->text());
-
+  // Save search text to TEnv
+  ShortcutPopupSearchText = m_searchEdit->text().toStdString();
   DVGui::Dialog::hideEvent(he);
 }
 
