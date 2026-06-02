@@ -21,7 +21,7 @@ public:
 
   void executeCommand(const QString &cmd);
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#if OPENTOONZ_QT_MAJOR >= 6
   Q_INVOKABLE QString viewScriptImage(int imageId);
   Q_INVOKABLE QString viewScriptLevel(int levelId);
 #endif

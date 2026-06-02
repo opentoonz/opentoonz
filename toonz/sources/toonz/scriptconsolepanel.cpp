@@ -196,7 +196,7 @@ ScriptConsolePanel::~ScriptConsolePanel() {}
 
 //-----------------------------------------------------------------------------
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#if OPENTOONZ_QT_MAJOR >= 6
 
 QString ScriptConsolePanel::viewScriptImage(int imageId) {
   ScriptEngine *engine = m_scriptConsole ? m_scriptConsole->getEngine() : 0;
