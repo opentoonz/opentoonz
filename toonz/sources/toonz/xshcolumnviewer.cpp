@@ -18,6 +18,7 @@
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/intfield.h"
 #include "toonzqt/fxiconmanager.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/txshcolumn.h"
@@ -2915,8 +2916,9 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
   /* On windows the widget receive the release event before the menu
      is shown, on linux and osx the release event is lost, never
      received by the widget */
-  QMouseEvent fakeRelease(QEvent::MouseButtonRelease, event->pos(),
-                          Qt::RightButton, Qt::NoButton, Qt::NoModifier);
+  QMouseEvent fakeRelease = QtCompat::makeMouseEvent(
+      QEvent::MouseButtonRelease, event->pos(), event->globalPos(),
+      Qt::RightButton, Qt::NoButton, Qt::NoModifier);
 
   QApplication::instance()->sendEvent(this, &fakeRelease);
 #endif

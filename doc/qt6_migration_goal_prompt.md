@@ -102,6 +102,32 @@ branch.
   `QtCompat`: selected `QMouseEvent` position/global-position and
   `QDropEvent`-derived drag/drop position users now call Qt 6
   `position()`/`globalPosition()` APIs while preserving Qt 5 behavior.
+  Synthetic `QMouseEvent` construction for Xsheet auto-pan and fake
+  context-menu releases also routes through `QtCompat::makeMouseEvent()` with
+  explicit local/global positions, and `PlaneViewer` mouse press/move handling
+  no longer uses deprecated `QMouseEvent::x()` / `y()` accessors. Shared
+  `toonzqt` numeric fields, scroll widgets, mini-toolbar dragging, and dock
+  hover/drag/resize/separator/drop-placeholder paths also use `QtCompat`
+  event-position helpers instead of direct Qt 5-era local/global coordinate
+  accessors. `TreeView` item hit testing, drag dispatch, and context-menu
+  placement plus `ToneCurveField` channel curve control-point editing also use
+  the same helpers. SceneViewer mouse/tablet event initialization, tablet
+  context-menu delivery, tablet hover-edge handling, mouse double-click
+  mapping, and the Function Panel graph/drag tools now use the same helpers,
+  removing another Qt 6 event-coordinate warning slice while preserving the
+  Qt 5 lane.
+- `DvTextEdit` mini-toolbar font-size population and text-family formatting no
+  longer use Qt 6-deprecated `QFontDatabase` instance construction or
+  `QTextCharFormat::setFontFamily()`. The code now uses APIs available in both
+  Qt 5 and Qt 6.
+- Configure Shortcuts multi-key conflict checking no longer relies on the
+  Qt 6-deprecated implicit `QKeyCombination` to `int` conversion. The Qt 6 lane
+  uses `QKeyCombination::toCombined()`, while the Qt 5 lane keeps the existing
+  integer key-sequence values.
+- Separate Colors color-string defaults and settings restoration no longer call
+  Qt 6-deprecated `QColor::setNamedColor()`. Stored color strings now parse
+  through `QColor(QString)`, which keeps the Qt 5 lane compatible and removes
+  the direct deprecated call from the current app/UI/header tree.
 - Touch gesture code in the plane, swatch, schematic, image, and scene viewer
   paths now uses `QtCompat` touch-point helpers. Qt 6 uses
   `QTouchEvent::points()` with `QEventPoint::position()` / `lastPosition()`,

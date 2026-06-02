@@ -190,7 +190,7 @@ void PlaneViewer::mouseMoveEvent(QMouseEvent *event) {
     return;
   }
 
-  QPoint curPos = event->pos() * getDevPixRatio();
+  QPoint curPos = QtCompat::mouseEventPosition(event) * getDevPixRatio();
   if (event->buttons() & Qt::MiddleButton)
     moveView(curPos.x() - m_xpos, height() - curPos.y() - m_ypos);
 
@@ -206,8 +206,10 @@ void PlaneViewer::mousePressEvent(QMouseEvent *event) {
     return;
   }
 
-  m_xpos = event->x() * getDevPixRatio();
-  m_ypos = height() - event->y() * getDevPixRatio();
+  const QPoint pos = QtCompat::mouseEventPosition(event);
+  const double devPixRatio = getDevPixRatio();
+  m_xpos = pos.x() * devPixRatio;
+  m_ypos = height() - pos.y() * devPixRatio;
 }
 
 //------------------------------------------------------

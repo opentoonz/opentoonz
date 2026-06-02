@@ -174,7 +174,11 @@ void ShortcutViewer::onEditingFinished() {
   // Extract individual keys from the key sequence
   QVector<int> keys;
   for (int i = 0; i < keySeq.count(); i++) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    keys.append(keySeq[i].toCombined());
+#else
     keys.append(keySeq[i]);
+#endif
   }
 
   // Check for conflicts with existing shortcuts

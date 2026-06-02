@@ -1,6 +1,7 @@
 
 
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/treemodel.h"
 
 #include <QStringList>
@@ -381,17 +382,18 @@ void TreeView::mouseDoubleClickEvent(QMouseEvent *) {
 
 void TreeView::mousePressEvent(QMouseEvent *e) {
   if (e->button() != Qt::RightButton) QTreeView::mousePressEvent(e);
-  QModelIndex index = indexAt(e->pos());
+  const QPoint eventPos = QtCompat::mouseEventPosition(e);
+  QModelIndex index     = indexAt(eventPos);
   if (index.isValid()) {
     TreeModel::Item *item =
         static_cast<TreeModel::Item *>(index.internalPointer());
     QRect itemRect = visualRect(index);
-    QPoint itemPos = e->pos() - itemRect.topLeft();
+    QPoint itemPos = eventPos - itemRect.topLeft();
     if (e->button() == Qt::RightButton) {
       if (selectionMode() != QAbstractItemView::ExtendedSelection)
         setCurrentIndex(item->createIndex());
       onClick(item, itemPos, e);
-      openContextMenu(item, e->globalPos());
+      openContextMenu(item, QtCompat::mouseEventGlobalPosition(e));
     } else if (e->button() == Qt::LeftButton) {
       m_dragging = true;
       setMouseTracking(true);
@@ -411,12 +413,13 @@ void TreeView::mousePressEvent(QMouseEvent *e) {
 void TreeView::mouseMoveEvent(QMouseEvent *e) {
   QTreeView::mouseMoveEvent(e);
   if (m_dragging) {
-    QModelIndex index = indexAt(e->pos());
+    const QPoint eventPos = QtCompat::mouseEventPosition(e);
+    QModelIndex index     = indexAt(eventPos);
     if (index.isValid()) {
       TreeModel::Item *item =
           static_cast<TreeModel::Item *>(index.internalPointer());
       QRect itemRect = visualRect(index);
-      QPoint itemPos = e->pos() - itemRect.topLeft();
+      QPoint itemPos = eventPos - itemRect.topLeft();
       onDrag(item, itemPos, e);
     }
   }

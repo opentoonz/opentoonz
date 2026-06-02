@@ -111,12 +111,60 @@ inline QPoint mouseEventPosition(const QMouseEvent *event) {
 #endif
 }
 
+inline QPointF mouseEventPositionF(const QMouseEvent *event) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return event->position();
+#else
+  return QPointF(event->pos());
+#endif
+}
+
 inline QPoint mouseEventGlobalPosition(const QMouseEvent *event) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   return event->globalPosition().toPoint();
 #else
   return event->globalPos();
 #endif
+}
+
+inline QPoint tabletEventPosition(const QTabletEvent *event) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return event->position().toPoint();
+#else
+  return event->pos();
+#endif
+}
+
+inline QPointF tabletEventPositionF(const QTabletEvent *event) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return event->position();
+#else
+  return event->posF();
+#endif
+}
+
+inline QPoint tabletEventGlobalPosition(const QTabletEvent *event) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return event->globalPosition().toPoint();
+#else
+  return event->globalPos();
+#endif
+}
+
+inline QPoint hoverEventPosition(const QHoverEvent *event) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return event->position().toPoint();
+#else
+  return event->pos();
+#endif
+}
+
+inline QMouseEvent makeMouseEvent(QEvent::Type type, const QPointF &localPos,
+                                  const QPointF &globalPos,
+                                  Qt::MouseButton button,
+                                  Qt::MouseButtons buttons,
+                                  Qt::KeyboardModifiers modifiers) {
+  return QMouseEvent(type, localPos, globalPos, button, buttons, modifiers);
 }
 
 inline QPoint dropEventPosition(const QDropEvent *event) {

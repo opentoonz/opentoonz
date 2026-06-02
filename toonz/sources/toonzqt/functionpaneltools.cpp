@@ -4,6 +4,7 @@
 
 // TnzQt includes
 #include "toonzqt/functionselection.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/tframehandle.h"
@@ -23,7 +24,7 @@ MoveFrameDragTool::MoveFrameDragTool(FunctionPanel *panel,
     : m_panel(panel), m_frameHandle(frameHandle) {}
 
 void MoveFrameDragTool::drag(QMouseEvent *e) {
-  double frame = m_panel->xToFrame(e->pos().x());
+  double frame = m_panel->xToFrame(QtCompat::mouseEventPosition(e).x());
   m_panel->getSelection()->deselectAllKeyframes();
   m_frameHandle->setFrame(frame);
 }
@@ -33,25 +34,29 @@ void MoveFrameDragTool::drag(QMouseEvent *e) {
 PanDragTool::PanDragTool(FunctionPanel *panel, bool xLocked, bool yLocked)
     : m_panel(panel), m_xLocked(xLocked), m_yLocked(yLocked) {}
 
-void PanDragTool::click(QMouseEvent *e) { m_oldPos = e->pos(); }
+void PanDragTool::click(QMouseEvent *e) {
+  m_oldPos = QtCompat::mouseEventPosition(e);
+}
 
 void PanDragTool::drag(QMouseEvent *e) {
-  QPoint delta = e->pos() - m_oldPos;
+  const QPoint eventPos = QtCompat::mouseEventPosition(e);
+  QPoint delta          = eventPos - m_oldPos;
   if (m_xLocked) delta.setX(0);
   if (m_yLocked) delta.setY(0);
   m_panel->pan(delta);
-  m_oldPos = e->pos();
+  m_oldPos = eventPos;
 }
 
 //=============================================================================
 /*--- Ruler部分ドラッグによるズーム ---*/
 void ZoomDragTool::click(QMouseEvent *e) {
-  m_startPos = m_oldPos = m_startPos = e->pos();
+  m_startPos = m_oldPos = QtCompat::mouseEventPosition(e);
 }
 
 void ZoomDragTool::drag(QMouseEvent *e) {
-  QPoint delta = e->pos() - m_oldPos;
-  m_oldPos     = e->pos();
+  const QPoint eventPos = QtCompat::mouseEventPosition(e);
+  QPoint delta          = eventPos - m_oldPos;
+  m_oldPos              = eventPos;
   double sx = 1, sy = 1;
   // reflect horizontal drag for frame zoom
   double zoomFactor =
@@ -64,8 +69,9 @@ void ZoomDragTool::drag(QMouseEvent *e) {
 }
 
 void ZoomDragTool::release(QMouseEvent *e) {
-  if ((e->pos() - m_startPos).manhattanLength() < 2) {
-    double frame = m_panel->xToFrame(e->pos().x());
+  const QPoint eventPos = QtCompat::mouseEventPosition(e);
+  if ((eventPos - m_startPos).manhattanLength() < 2) {
+    double frame = m_panel->xToFrame(eventPos.x());
     if (m_panel->getFrameHandle()) m_panel->getFrameHandle()->setFrame(frame);
   }
 }
@@ -73,12 +79,12 @@ void ZoomDragTool::release(QMouseEvent *e) {
 //=============================================================================
 
 void RectSelectTool::click(QMouseEvent *e) {
-  m_startPos = e->pos();
+  m_startPos = QtCompat::mouseEventPosition(e);
   m_rect     = QRect();
 }
 
 void RectSelectTool::drag(QMouseEvent *e) {
-  m_rect = QRect(m_startPos, e->pos()).normalized();
+  m_rect = QRect(m_startPos, QtCompat::mouseEventPosition(e)).normalized();
   m_panel->getSelection()->deselectAllKeyframes();
   for (int i = 0; i < m_curve->getKeyframeCount(); i++) {
     QPointF p = m_panel->getWinPos(m_curve, m_curve->getKeyframe(i));
@@ -188,9 +194,10 @@ void MovePointDragTool::setSelection(FunctionSelection *selection) {
 //-----------------------------------------------------------------------------
 
 void MovePointDragTool::click(QMouseEvent *e) {
-  m_startPos = m_oldPos = e->pos();
+  const QPoint eventPos = QtCompat::mouseEventPosition(e);
+  m_startPos = m_oldPos = eventPos;
   m_deltaFrame          = 0;
-  double frame          = m_panel->xToFrame(e->pos().x());
+  double frame          = m_panel->xToFrame(eventPos.x());
 
   for (int i = 0; i < (int)m_setters.size(); i++) {
     KeyframeSetter *setter = m_setters[i];
@@ -209,12 +216,12 @@ void MovePointDragTool::click(QMouseEvent *e) {
 //-----------------------------------------------------------------------------
 
 void MovePointDragTool::drag(QMouseEvent *e) {
-  QPoint pos = e->pos();
+  QPoint pos = QtCompat::mouseEventPosition(e);
 
   // if shift is pressed then apply constraints (only horizontal or vertical
   // moves)
   if (e->modifiers() & Qt::ShiftModifier) {
-    QPoint delta = e->pos() - m_startPos;
+    QPoint delta = pos - m_startPos;
     if (abs(delta.x()) > abs(delta.y()))
       pos.setY(m_startPos.y());
     else
@@ -274,8 +281,8 @@ MoveHandleDragTool::MoveHandleDragTool(FunctionPanel *panel,
 //-----------------------------------------------------------------------------
 
 void MoveHandleDragTool::click(QMouseEvent *e) {
-  m_startPos = e->pos();
-  // m_startPos = m_oldPos = e->pos();
+  m_startPos = QtCompat::mouseEventPosition(e);
+  // m_startPos = m_oldPos = QtCompat::mouseEventPosition(e);
   m_deltaFrame       = 0;
   m_keyframe         = m_curve->getKeyframe(m_kIndex);
   m_keyframe.m_value = m_curve->getValue(m_keyframe.m_frame);
@@ -331,12 +338,12 @@ void MoveHandleDragTool::click(QMouseEvent *e) {
 
 void MoveHandleDragTool::drag(QMouseEvent *e) {
   if (!m_curve) return;
-  QPoint pos = e->pos();
+  QPoint pos = QtCompat::mouseEventPosition(e);
 
   // if shift is pressed then apply constraints (only horizontal or vertical
   // moves)
   if (e->modifiers() & Qt::ShiftModifier) {
-    QPoint delta = e->pos() - m_startPos;
+    QPoint delta = pos - m_startPos;
     if (abs(delta.x()) > abs(delta.y()))
       pos.setY(m_startPos.y());
     else
@@ -444,7 +451,7 @@ void MoveGroupHandleDragTool::click(QMouseEvent *e) {
 
 void MoveGroupHandleDragTool::drag(QMouseEvent *e) {
   //  if(!m_curve) return;
-  QPoint pos = e->pos();
+  QPoint pos = QtCompat::mouseEventPosition(e);
   QPointF posF(pos);
 
   /*
@@ -565,10 +572,11 @@ StretchPointDragTool::~StretchPointDragTool() {
 }
 
 void StretchPointDragTool::click(QMouseEvent *e) {
-  m_clickedFrame = m_panel->xToFrame(e->pos().x());
+  m_clickedFrame = m_panel->xToFrame(QtCompat::mouseEventPosition(e).x());
 }
 void StretchPointDragTool::drag(QMouseEvent *e) {
-  double currentPosFrame = m_panel->xToFrame(e->pos().x());
+  double currentPosFrame =
+      m_panel->xToFrame(QtCompat::mouseEventPosition(e).x());
 
   // moved distance
   double dFrame = currentPosFrame - m_clickedFrame;

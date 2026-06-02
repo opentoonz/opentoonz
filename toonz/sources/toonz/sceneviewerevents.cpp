@@ -77,9 +77,10 @@ namespace {
 
 void initToonzEvent(TMouseEvent &toonzEvent, QMouseEvent *event,
                     int widgetHeight, double pressure, int devPixRatio) {
-  toonzEvent.m_pos      = TPointD(event->pos().x() * devPixRatio,
-                                  widgetHeight - 1 - event->pos().y() * devPixRatio);
-  toonzEvent.m_mousePos = event->pos();
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
+  toonzEvent.m_pos      = TPointD(eventPos.x() * devPixRatio,
+                                  widgetHeight - 1 - eventPos.y() * devPixRatio);
+  toonzEvent.m_mousePos = eventPos;
   toonzEvent.m_pressure = 1.0;
 
   toonzEvent.setModifiers(event->modifiers() & Qt::ShiftModifier,
@@ -96,10 +97,11 @@ void initToonzEvent(TMouseEvent &toonzEvent, QMouseEvent *event,
 void initToonzEvent(TMouseEvent &toonzEvent, QTabletEvent *event,
                     int widgetHeight, double pressure, int devPixRatio,
                     bool isHighFrequent = false) {
+  const QPointF eventPos = QtCompat::tabletEventPositionF(event);
   toonzEvent.m_pos = TPointD(
-      event->posF().x() * (float)devPixRatio,
-      (float)widgetHeight - 1.0f - event->posF().y() * (float)devPixRatio);
-  toonzEvent.m_mousePos = event->posF();
+      eventPos.x() * (float)devPixRatio,
+      (float)widgetHeight - 1.0f - eventPos.y() * (float)devPixRatio);
+  toonzEvent.m_mousePos = eventPos;
   toonzEvent.m_pressure = pressure;
 
   toonzEvent.setModifiers(event->modifiers() & Qt::ShiftModifier,
@@ -293,7 +295,8 @@ void SceneViewer::tabletEvent(QTabletEvent *e) {
     // create context menu on right click here
     if (e->button() == Qt::RightButton) {
       m_mouseButton = Qt::NoButton;
-      onContextMenu(e->pos(), e->globalPos());
+      onContextMenu(QtCompat::tabletEventPosition(e),
+                    QtCompat::tabletEventGlobalPosition(e));
     }
 #else
     // for Windows, use tabletEvent only for the left Button
@@ -323,7 +326,8 @@ void SceneViewer::tabletEvent(QTabletEvent *e) {
     // could possibly merge with OSX code above
     if (e->button() == Qt::RightButton) {
       m_mouseButton = Qt::NoButton;
-      onContextMenu(e->pos(), e->globalPos());
+      onContextMenu(QtCompat::tabletEventPosition(e),
+                    QtCompat::tabletEventGlobalPosition(e));
     }
 #endif
 
@@ -354,7 +358,8 @@ void SceneViewer::tabletEvent(QTabletEvent *e) {
     // for now OSX seems to fail to call enter/leaveEvent properly while
     // the tablet is floating
     bool isHoveringInsideViewer =
-        !rect().marginsRemoved(QMargins(5, 5, 5, 5)).contains(e->pos());
+        !rect().marginsRemoved(QMargins(5, 5, 5, 5))
+             .contains(QtCompat::tabletEventPosition(e));
     // call the fake enter event
     if (isHoveringInsideViewer) onEnter();
 #else
@@ -365,7 +370,7 @@ void SceneViewer::tabletEvent(QTabletEvent *e) {
     }
 #endif
 
-    QPointF curPos = e->posF() * getDevPixRatio();
+    QPointF curPos = QtCompat::tabletEventPositionF(e) * getDevPixRatio();
 #if defined(_WIN32)
     // Use the application attribute Qt::AA_CompressTabletEvents instead of the
     // delay timer
@@ -1742,8 +1747,9 @@ void SceneViewer::mouseDoubleClickEvent(QMouseEvent *event) {
   if (!tool || !tool->isEnabled()) return;
   TMouseEvent toonzEvent;
   initToonzEvent(toonzEvent, event, height(), 1.0, getDevPixRatio());
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
   TPointD pos =
-      tool->getMatrix().inv() * winToWorld(event->pos() * getDevPixRatio());
+      tool->getMatrix().inv() * winToWorld(eventPos * getDevPixRatio());
   TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
   if ((tool->getToolType() & TTool::LevelTool) && !objHandle->isSpline()) {
     pos.x /= m_dpiScale.x;
@@ -1770,8 +1776,9 @@ void SceneViewer::contextMenuEvent(QContextMenuEvent *e) {
   /* On windows the widget receive the release event before the menu
      is shown, on linux and osx the release event is lost, never
      received by the widget */
-  QMouseEvent fakeRelease(QEvent::MouseButtonRelease, e->pos(), Qt::RightButton,
-                          Qt::NoButton, Qt::NoModifier);
+  QMouseEvent fakeRelease = QtCompat::makeMouseEvent(
+      QEvent::MouseButtonRelease, e->pos(), e->globalPos(), Qt::RightButton,
+      Qt::NoButton, Qt::NoModifier);
 
   QApplication::instance()->sendEvent(this, &fakeRelease);
 #endif

@@ -17,6 +17,7 @@
 #include "toutputproperties.h"
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/icongenerator.h"
+#include "toonzqt/qtcompat.h"
 #include "cellselection.h"
 #include "keyframeselection.h"
 #include "cellkeyframeselection.h"
@@ -734,8 +735,10 @@ void XsheetViewer::timerEvent(QTimerEvent *) {
   if (!isAutoPanning()) return;
   scroll(m_autoPanSpeed);
   if (!m_dragTool) return;
-  QMouseEvent mouseEvent(QEvent::MouseMove, m_lastAutoPanPos - m_autoPanSpeed,
-                         Qt::NoButton, Qt::MouseButtons(), m_qtModifiers);
+  const QPoint mousePos = m_lastAutoPanPos - m_autoPanSpeed;
+  QMouseEvent mouseEvent = QtCompat::makeMouseEvent(
+      QEvent::MouseMove, mousePos, mapToGlobal(mousePos), Qt::NoButton,
+      Qt::MouseButtons(), m_qtModifiers);
   m_dragTool->onDrag(&mouseEvent);
   m_lastAutoPanPos += m_autoPanSpeed;
 }

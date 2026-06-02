@@ -1,6 +1,8 @@
 
 
 #include "tdockwindows.h"
+#include "toonzqt/qtcompat.h"
+
 #include <QBoxLayout>
 #include <QVBoxLayout>
 
@@ -467,7 +469,8 @@ void TDockWidget::selectDockPlaceholder(QMouseEvent *me) {
   if (m_placeholders.size() && m_placeholders[0]->isRoot()) {
     DockPlaceholder *selected = 0;
 
-    QPoint pos = parentWidget()->mapFromGlobal(me->globalPos());
+    QPoint pos =
+        parentWidget()->mapFromGlobal(QtCompat::mouseEventGlobalPosition(me));
     if (parentLayout()->contentsRect().contains(pos))
       selected = m_placeholders[0];
 

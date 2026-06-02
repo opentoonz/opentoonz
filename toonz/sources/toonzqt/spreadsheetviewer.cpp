@@ -923,13 +923,6 @@ void SpreadsheetViewer::timerEvent(QTimerEvent *e) {
   if (!isAutoPanning()) return;
   scroll(m_autoPanSpeed);
   m_lastAutoPanPos += m_autoPanSpeed;
-  /*
-if(m_dragTool)
-{
-QMouseEvent mouseEvent(QEvent::MouseMove, m_lastAutoPanPos, Qt::NoButton, 0, 0);
-m_dragTool->onDrag(&mouseEvent);
-}
-*/
 }
 
 void SpreadsheetViewer::keyPressEvent(QKeyEvent *e) {

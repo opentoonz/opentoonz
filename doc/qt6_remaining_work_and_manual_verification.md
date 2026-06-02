@@ -76,6 +76,38 @@ Already covered:
   centralized behind `QtCompat` helpers so the Qt 6 lane uses
   `position()`/`globalPosition()` APIs while the Qt 5 lane keeps its existing
   integer-position behavior.
+- Synthetic `QMouseEvent` construction for Xsheet auto-pan and fake
+  context-menu releases is centralized behind `QtCompat::makeMouseEvent()` with
+  explicit local/global positions. The stale disabled spreadsheet auto-pan
+  sample was removed so direct constructor scans report only the helper.
+- `PlaneViewer` mouse press/move handling now uses
+  `QtCompat::mouseEventPosition()` instead of deprecated `QMouseEvent::x()` /
+  `y()` accessors.
+- Shared `toonzqt` numeric fields, scroll widgets, mini-toolbar dragging, and
+  dock hover/drag/resize/separator/drop-placeholder paths now use `QtCompat`
+  event-position helpers instead of direct Qt 5-era event coordinate accessors.
+- Shared `toonzqt` tree item hit testing, drag dispatch, context-menu
+  placement, and tone-curve control-point editing now use `QtCompat`
+  mouse-position helpers instead of direct `QMouseEvent::pos()` /
+  `globalPos()` calls.
+- `SceneViewer` mouse/tablet event initialization, tablet context-menu
+  delivery, tablet hover-edge handling, and mouse double-click mapping now use
+  `QtCompat` mouse/tablet position helpers instead of direct Qt 5-era event
+  coordinate accessors.
+- `FunctionPanel` and its graph drag tools now use `QtCompat` mouse-position
+  helpers for graph hit testing, panning, zooming, keyframe dragging, handle
+  dragging, rectangular selection, stretch operations, and context-menu
+  placement.
+- `DvTextEdit` mini-toolbar font-size population and text-family formatting now
+  use Qt 5/Qt 6-compatible APIs instead of Qt 6-deprecated `QFontDatabase`
+  instance construction and `QTextCharFormat::setFontFamily()`.
+- Configure Shortcuts multi-key conflict checking now uses
+  `QKeyCombination::toCombined()` on Qt 6 instead of the deprecated implicit
+  `QKeyCombination` to `int` conversion, with the existing integer key-sequence
+  path preserved on Qt 5.
+- Separate Colors color-string defaults and settings restoration parse stored
+  strings through `QColor(QString)` instead of calling Qt 6-deprecated
+  `QColor::setNamedColor()`.
 - Viewer touch gesture paths are centralized behind `QtCompat` helpers so the
   Qt 6 lane uses `QTouchEvent::points()` and `QEventPoint` positions while the
   Qt 5 lane keeps the existing `touchPoints()` / `QTouchEvent::TouchPoint`
@@ -95,8 +127,9 @@ Still needed:
 - Build and inspect generated `.qm` files in a release workflow before treating
   translation generation as fully release-ready.
 - Continue reducing the Qt 6 deprecation warning frontier, including
-  remaining `QMouseEvent::globalPos()` users, `QColor::setNamedColor()`,
-  deprecated `QMouseEvent` constructors, and the broader OpenGL warning field.
+  remaining legacy event-coordinate accessors outside the completed
+  SceneViewer, Function Panel, and shared-widget slices and the broader OpenGL
+  warning field.
 - Add or wire CI coverage for the Qt 6 lane on macOS, Linux, and Windows.
 - Make any remaining Qt 5 specific setup in documentation conditional or
   clearly marked as Qt 5 only.

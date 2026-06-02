@@ -4,6 +4,7 @@
 
 // TnzQt includes
 #include "toonzqt/freelayout.h"
+#include "toonzqt/qtcompat.h"
 
 // Qt includes
 #include <QLayout>
@@ -326,8 +327,9 @@ void DvScrollWidget::resizeEvent(QResizeEvent *re) {
 //------------------------------------------------------------------------------
 
 void DvScrollWidget::mousePressEvent(QMouseEvent *me) {
-  m_pressed  = true;
-  m_mousePos = m_horizontal ? me->x() : me->y();
+  const QPoint pos = QtCompat::mouseEventPosition(me);
+  m_pressed        = true;
+  m_mousePos       = m_horizontal ? pos.x() : pos.y();
   me->accept();
 }
 
@@ -336,12 +338,13 @@ void DvScrollWidget::mousePressEvent(QMouseEvent *me) {
 void DvScrollWidget::mouseMoveEvent(QMouseEvent *me) {
   if (!m_pressed) return;
 
+  const QPoint pos = QtCompat::mouseEventPosition(me);
   if (m_horizontal) {
-    scroll(me->x() - m_mousePos);
-    m_mousePos = me->x();
+    scroll(pos.x() - m_mousePos);
+    m_mousePos = pos.x();
   } else {
-    scroll(me->y() - m_mousePos);
-    m_mousePos = me->y();
+    scroll(pos.y() - m_mousePos);
+    m_mousePos = pos.y();
   }
   me->accept();
 }

@@ -8,6 +8,7 @@
 #include "toonzqt/imageutils.h"
 #include "functionpaneltools.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/tframehandle.h"
@@ -1187,10 +1188,11 @@ void FunctionPanel::mousePressEvent(QMouseEvent *e) {
     m_dragTool = nullptr;
   }
 
+  const QPoint eventPos = QtCompat::mouseEventPosition(e);
   if (e->button() == Qt::MiddleButton) {
     // mid mouse click => panning
-    bool xLocked = e->pos().x() <= m_valueAxisX;
-    bool yLocked = e->pos().y() <= m_valueAxisX;
+    bool xLocked = eventPos.x() <= m_valueAxisX;
+    bool yLocked = eventPos.y() <= m_valueAxisX;
     m_dragTool   = new PanDragTool(this, xLocked, yLocked);
     m_dragTool->click(e);
     return;
@@ -1200,16 +1202,17 @@ void FunctionPanel::mousePressEvent(QMouseEvent *e) {
     return;
   }
 
-  QPoint winPos         = e->pos();
+  QPoint winPos         = eventPos;
   Handle handle         = None;
   const int maxDistance = 20;
-  int closestGadgetId   = findClosestGadget(e->pos(), handle, maxDistance);
+  int closestGadgetId   = findClosestGadget(eventPos, handle, maxDistance);
 
-  if (e->pos().x() > m_valueAxisX && e->pos().y() < m_frameAxisY &&
+  if (eventPos.x() > m_valueAxisX && eventPos.y() < m_frameAxisY &&
       closestGadgetId < 0 && (e->modifiers() & Qt::ControlModifier) == 0) {
     // click on topbar => frame zoom
     m_dragTool = new ZoomDragTool(this, ZoomDragTool::FrameZoom);
-  } else if (e->pos().x() < m_valueAxisX && e->pos().y() > m_graphViewportY) {
+  } else if (eventPos.x() < m_valueAxisX &&
+             eventPos.y() > m_graphViewportY) {
     // click on topbar => value zoom
     m_dragTool = new ZoomDragTool(this, ZoomDragTool::ValueZoom);
   } else if (m_currentFrameStatus == 1 && m_frameHandle != 0 &&
@@ -1390,30 +1393,31 @@ void FunctionPanel::mouseMoveEvent(QMouseEvent *e) {
   if (e->buttons()) {
     if (m_dragTool) m_dragTool->drag(e);
   } else {
-    m_cursor.frame   = xToFrame(e->pos().x());
+    const QPoint eventPos = QtCompat::mouseEventPosition(e);
+    m_cursor.frame   = xToFrame(eventPos.x());
     m_cursor.value   = 0;
     m_cursor.visible = true;
 
     TDoubleParam *currentCurve = getCurrentCurve();
     if (currentCurve) {
       Handle handle = None;
-      int gIndex    = findClosestGadget(e->pos(), handle, 20);
+      int gIndex    = findClosestGadget(eventPos, handle, 20);
       if (m_highlighted.handle != handle || m_highlighted.gIndex != gIndex) {
         m_highlighted.handle = handle;
         m_highlighted.gIndex = gIndex;
       }
-      m_cursor.value = yToValue(currentCurve, e->pos().y());
+      m_cursor.value = yToValue(currentCurve, eventPos.y());
     }
 
     double currentFrame = m_frameHandle ? m_frameHandle->getFrame() : 0;
     if (m_highlighted.handle == None &&
-        std::abs(e->pos().x() - frameToX(currentFrame)) < 5)
+        std::abs(eventPos.x() - frameToX(currentFrame)) < 5)
       m_currentFrameStatus = 1;
     else
       m_currentFrameStatus = 0;
 
     FunctionTreeModel::Channel *closestChannel =
-        findClosestChannel(e->pos(), 20);
+        findClosestChannel(eventPos, 20);
     if (closestChannel && m_highlighted.handle == None) {
       TDoubleParam *curve = closestChannel->getParam();
       if (m_functionTreeModel->getActiveChannelCount() <= 1)
@@ -1584,7 +1588,8 @@ void FunctionPanel::openContextMenu(QMouseEvent *e) {
   int segmentIndex    = -1;
   if (!curve) return;
   TDoubleKeyframe kf;
-  double frame = xToFrame(e->pos().x());
+  const QPoint eventPos = QtCompat::mouseEventPosition(e);
+  double frame = xToFrame(eventPos.x());
 
   // build menu
   QMenu menu(0);
@@ -1667,9 +1672,8 @@ void FunctionPanel::openContextMenu(QMouseEvent *e) {
   Highlighted highlighted(m_highlighted);
 
   // execute menu
-  QAction *action = menu.exec(e->globalPos());  // Will process events, possibly
-                                                // altering m_highlighted
-                                                // (MAC-verified)
+  QAction *action = menu.exec(QtCompat::mouseEventGlobalPosition(e));
+  // Will process events, possibly altering m_highlighted (MAC-verified).
   if (action == &linkHandlesAction)  // Let's just *hope* that doesn't happen to
                                      // m_gadgets though...  :/
   {
