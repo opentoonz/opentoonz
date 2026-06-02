@@ -1,6 +1,6 @@
 # Qt 6 Remaining Work And Manual Verification Guide
 
-Prepared: June 1, 2026
+Prepared: June 2, 2026
 
 This document consolidates the current Qt 5 to Qt 6 port status into a working
 implementation checklist and a manual verification guide. It is intentionally
@@ -76,8 +76,13 @@ Already covered:
   centralized behind `QtCompat` helpers so the Qt 6 lane uses
   `position()`/`globalPosition()` APIs while the Qt 5 lane keeps its existing
   integer-position behavior.
-- `DvDirTreeView` uses templated `QVariant::canConvert<QString>()` checks
-  instead of the deprecated Qt 6 overloads.
+- Viewer touch gesture paths are centralized behind `QtCompat` helpers so the
+  Qt 6 lane uses `QTouchEvent::points()` and `QEventPoint` positions while the
+  Qt 5 lane keeps the existing `touchPoints()` / `QTouchEvent::TouchPoint`
+  behavior.
+- Deprecated `QVariant::canConvert(QVariant::...)` overloads are no longer
+  present in the current app/UI/header tree. `DvDirTreeView` and the remaining
+  settings restore paths use templated `canConvert<T>()` checks instead.
 
 Still needed:
 
@@ -90,9 +95,8 @@ Still needed:
 - Build and inspect generated `.qm` files in a release workflow before treating
   translation generation as fully release-ready.
 - Continue reducing the Qt 6 deprecation warning frontier, including
-  `QTouchEvent::touchPoints()`, remaining `QMouseEvent::globalPos()` users,
-  legacy `QVariant::Type` conversions, `QColor::setNamedColor()`, deprecated
-  `QMouseEvent` constructors, and the broader OpenGL warning field.
+  remaining `QMouseEvent::globalPos()` users, `QColor::setNamedColor()`,
+  deprecated `QMouseEvent` constructors, and the broader OpenGL warning field.
 - Add or wire CI coverage for the Qt 6 lane on macOS, Linux, and Windows.
 - Make any remaining Qt 5 specific setup in documentation conditional or
   clearly marked as Qt 5 only.

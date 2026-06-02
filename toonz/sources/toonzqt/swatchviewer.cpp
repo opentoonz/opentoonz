@@ -3,6 +3,7 @@
 #include "toonzqt/swatchviewer.h"
 #include "toonzqt/gutil.h"
 #include "toonzqt/menubarcommand.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/viewcommandids.h"
 
 #include "../toonz/menubarcommandids.h"
@@ -934,21 +935,22 @@ void SwatchViewer::gestureEvent(QGestureEvent *e) {
 
 void SwatchViewer::touchEvent(QTouchEvent *e, int type) {
   // qDebug() << "[touchEvent]";
+  const auto &touchPoints = QtCompat::touchPoints(e);
   if (type == QEvent::TouchBegin) {
     m_touchActive   = true;
-    m_firstPanPoint = e->touchPoints().at(0).pos();
+    m_firstPanPoint = QtCompat::touchPointPosition(touchPoints.at(0));
     // obtain device type
     m_touchDevice = e->device()->type();
   } else if (m_touchActive) {
     // touchpads must have 2 finger panning for tools and navigation to be
     // functional on other devices, 1 finger panning is preferred
-    if ((e->touchPoints().count() == 2 &&
-         m_touchDevice == QtCompat::TouchPad) ||
-        (e->touchPoints().count() == 1 &&
+    if ((touchPoints.count() == 2 && m_touchDevice == QtCompat::TouchPad) ||
+        (touchPoints.count() == 1 &&
          m_touchDevice == QtCompat::TouchScreen)) {
-      QTouchEvent::TouchPoint panPoint = e->touchPoints().at(0);
+      const auto panPoint = touchPoints.at(0);
       if (!m_panning) {
-        QPointF deltaPoint = panPoint.pos() - m_firstPanPoint;
+        QPointF deltaPoint =
+            QtCompat::touchPointPosition(panPoint) - m_firstPanPoint;
         // minimize accidental and jerky zooming/rotating during 2 finger
         // panning
         if ((deltaPoint.manhattanLength() > 100) && !m_zooming) {
@@ -956,8 +958,8 @@ void SwatchViewer::touchEvent(QTouchEvent *e, int type) {
         }
       }
       if (m_panning) {
-        QPoint curPos  = panPoint.pos().toPoint();
-        QPoint lastPos = panPoint.lastPos().toPoint();
+        QPoint curPos  = QtCompat::touchPointPosition(panPoint).toPoint();
+        QPoint lastPos = QtCompat::touchPointLastPosition(panPoint).toPoint();
         TPoint centerDelta =
             TPoint(curPos.x(), curPos.y()) - TPoint(lastPos.x(), lastPos.y());
         pan(centerDelta);

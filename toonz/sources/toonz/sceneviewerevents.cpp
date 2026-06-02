@@ -24,6 +24,7 @@
 // TnzQt includes
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/styleselection.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzTools includes
 #include "tools/cursors.h"
@@ -1170,11 +1171,12 @@ void SceneViewer::gestureEvent(QGestureEvent *e) {
 }
 
 void SceneViewer::touchEvent(QTouchEvent *e, int type) {
+  const auto &touchPoints = QtCompat::touchPoints(e);
   if (type == QEvent::TouchBegin) {
     if (m_tabletEvent) return;
 
     m_touchActive   = true;
-    m_firstPanPoint = e->touchPoints().at(0).pos();
+    m_firstPanPoint = QtCompat::touchPointPosition(touchPoints.at(0));
     m_undoPoint     = m_firstPanPoint;
     // obtain device type
     m_touchDevice = e->device()->type();
@@ -1182,11 +1184,11 @@ void SceneViewer::touchEvent(QTouchEvent *e, int type) {
     // touchpads must have 2 finger panning for tools and navigation to be
     // functional
     // on other devices, 1 finger panning is preferred
-    if (e->touchPoints().count() == 1 &&
-        m_touchDevice == QtCompat::TouchScreen) {
-      QTouchEvent::TouchPoint panPoint = e->touchPoints().at(0);
+    if (touchPoints.count() == 1 && m_touchDevice == QtCompat::TouchScreen) {
+      const auto panPoint = touchPoints.at(0);
       if (!m_panning) {
-        QPointF deltaPoint = panPoint.pos() - m_firstPanPoint;
+        QPointF deltaPoint =
+            QtCompat::touchPointPosition(panPoint) - m_firstPanPoint;
         // minimize accidental and jerky zooming/rotating during 2 finger
         // panning
         if ((deltaPoint.manhattanLength() > 100) && !m_zooming && !m_rotating) {
@@ -1194,12 +1196,13 @@ void SceneViewer::touchEvent(QTouchEvent *e, int type) {
         }
       }
       if (m_panning) {
-        QPointF centerDelta = (panPoint.pos() * getDevPixRatio()) -
-                              (panPoint.lastPos() * getDevPixRatio());
+        QPointF centerDelta =
+            (QtCompat::touchPointPosition(panPoint) * getDevPixRatio()) -
+            (QtCompat::touchPointLastPosition(panPoint) * getDevPixRatio());
         panQt(centerDelta.toPoint());
       }
-    } else if (e->touchPoints().count() == 3) {
-      QPointF newPoint = e->touchPoints().at(0).pos();
+    } else if (touchPoints.count() == 3) {
+      QPointF newPoint = QtCompat::touchPointPosition(touchPoints.at(0));
       if (m_undoPoint.x() - newPoint.x() > 100) {
         CommandManager::instance()->execute("MI_Undo");
         m_undoPoint = newPoint;

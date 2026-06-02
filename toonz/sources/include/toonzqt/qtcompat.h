@@ -11,11 +11,13 @@
 #include <QKeySequence>
 #include <QMouseEvent>
 #include <QObject>
+#include <QTouchEvent>
 
 #include <utility>
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 #include <QEnterEvent>
+#include <QEventPoint>
 #include <QInputDevice>
 #include <QPointingDevice>
 #include <QTabletEvent>
@@ -29,6 +31,7 @@ namespace QtCompat {
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 using EnterEvent      = QEnterEvent;
+using TouchPoint      = QEventPoint;
 using TouchDeviceType = QInputDevice::DeviceType;
 
 static constexpr TouchDeviceType TouchScreen =
@@ -36,11 +39,36 @@ static constexpr TouchDeviceType TouchScreen =
 static constexpr TouchDeviceType TouchPad = QInputDevice::DeviceType::TouchPad;
 #else
 using EnterEvent      = QEvent;
+using TouchPoint      = QTouchEvent::TouchPoint;
 using TouchDeviceType = QTouchDevice::DeviceType;
 
 static constexpr TouchDeviceType TouchScreen = QTouchDevice::TouchScreen;
 static constexpr TouchDeviceType TouchPad    = QTouchDevice::TouchPad;
 #endif
+
+inline const QList<TouchPoint> &touchPoints(const QTouchEvent *event) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return event->points();
+#else
+  return event->touchPoints();
+#endif
+}
+
+inline QPointF touchPointPosition(const TouchPoint &point) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return point.position();
+#else
+  return point.pos();
+#endif
+}
+
+inline QPointF touchPointLastPosition(const TouchPoint &point) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return point.lastPosition();
+#else
+  return point.lastPos();
+#endif
+}
 
 inline bool isStylusPointer(const QTabletEvent *event) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)

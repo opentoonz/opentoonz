@@ -4036,12 +4036,12 @@ void StyleEditor::save(QSettings &settings) const {
 }
 void StyleEditor::load(QSettings &settings) {
   QVariant isVertical = settings.value("isVertical");
-  if (isVertical.canConvert(QVariant::Bool)) {
+  if (isVertical.canConvert<bool>()) {
     m_colorPageIsVertical = isVertical.toBool();
     m_plainColorPage->setIsVertical(m_colorPageIsVertical);
   }
   QVariant visibleParts = settings.value("visibleParts");
-  if (visibleParts.canConvert(QVariant::Int)) {
+  if (visibleParts.canConvert<int>()) {
     int visiblePartsInt = visibleParts.toInt();
 
     if (visiblePartsInt & 0x01)
@@ -4070,7 +4070,7 @@ void StyleEditor::load(QSettings &settings) {
       m_searchAction->setChecked(false);
   }
   QVariant splitterState = settings.value("splitterState");
-  if (splitterState.canConvert(QVariant::ByteArray))
+  if (splitterState.canConvert<QByteArray>())
     m_plainColorPage->setSplitterState(splitterState.toByteArray());
 }
 

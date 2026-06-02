@@ -387,7 +387,7 @@ void Room::load(const TFilePath &fp, RoomLoadParams &params) {
 
     // Retrieve panel name
     QVariant name = m_settings->value("name");
-    if (name.canConvert(QVariant::String)) {
+    if (name.canConvert<QString>()) {
       // Allocate panel
       paneObjectName          = name.toString();
       std::string paneStrName = paneObjectName.toStdString();

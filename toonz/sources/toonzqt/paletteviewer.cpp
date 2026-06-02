@@ -290,7 +290,7 @@ void PaletteViewer::load(QSettings &settings) {
 
   int visibleParts;
   QVariant visibleVar = settings.value("toolbarVisibleMsk");
-  if (visibleVar.canConvert(QVariant::Int)) {
+  if (visibleVar.canConvert<int>()) {
     visibleParts = visibleVar.toInt();
   } else {
     visibleParts = 3;  // Show keyframes and new style/page

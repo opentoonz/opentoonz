@@ -102,8 +102,14 @@ branch.
   `QtCompat`: selected `QMouseEvent` position/global-position and
   `QDropEvent`-derived drag/drop position users now call Qt 6
   `position()`/`globalPosition()` APIs while preserving Qt 5 behavior.
-- `DvDirTreeView` no longer uses deprecated `QVariant::canConvert` overloads
-  for string-valued model data.
+- Touch gesture code in the plane, swatch, schematic, image, and scene viewer
+  paths now uses `QtCompat` touch-point helpers. Qt 6 uses
+  `QTouchEvent::points()` with `QEventPoint::position()` / `lastPosition()`,
+  while Qt 5 keeps `touchPoints()` with `QTouchEvent::TouchPoint::pos()` /
+  `lastPos()`.
+- Deprecated `QVariant::canConvert(QVariant::...)` overloads have been removed
+  from the current app/UI/header tree. `DvDirTreeView` and the remaining
+  settings restore paths now use templated `canConvert<T>()` checks.
 - The Qt 6 startup path no longer sets the removed/deprecated high-DPI
   application attributes; Qt 6 uses its always-on high-DPI behavior, while the
   Qt 5 lane keeps the existing attributes. The translator startup path also

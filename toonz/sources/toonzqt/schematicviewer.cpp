@@ -12,6 +12,7 @@
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/gutil.h"
 #include "toonzqt/imageutils.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/dvscrollwidget.h"
 #include "toonzqt/fxselection.h"
 #include "stageobjectselection.h"
@@ -700,21 +701,22 @@ void SchematicSceneViewer::gestureEvent(QGestureEvent *e) {
 
 void SchematicSceneViewer::touchEvent(QTouchEvent *e, int type) {
   // qDebug() << "[touchEvent]";
+  const auto &touchPoints = QtCompat::touchPoints(e);
   if (type == QEvent::TouchBegin) {
     m_touchActive   = true;
-    m_firstPanPoint = e->touchPoints().at(0).pos();
+    m_firstPanPoint = QtCompat::touchPointPosition(touchPoints.at(0));
     // obtain device type
     m_touchDevice = e->device()->type();
   } else if (m_touchActive) {
     // touchpads must have 2 finger panning for tools and navigation to be
     // functional on other devices, 1 finger panning is preferred
-    if ((e->touchPoints().count() == 2 &&
-         m_touchDevice == QtCompat::TouchPad) ||
-        (e->touchPoints().count() == 1 &&
+    if ((touchPoints.count() == 2 && m_touchDevice == QtCompat::TouchPad) ||
+        (touchPoints.count() == 1 &&
          m_touchDevice == QtCompat::TouchScreen)) {
-      QTouchEvent::TouchPoint panPoint = e->touchPoints().at(0);
+      const auto panPoint = touchPoints.at(0);
       if (!m_panning) {
-        QPointF deltaPoint = panPoint.pos() - m_firstPanPoint;
+        QPointF deltaPoint =
+            QtCompat::touchPointPosition(panPoint) - m_firstPanPoint;
         // minimize accidental and jerky zooming/rotating during 2 finger
         // panning
         if ((deltaPoint.manhattanLength() > 100) && !m_zooming) {
@@ -722,13 +724,17 @@ void SchematicSceneViewer::touchEvent(QTouchEvent *e, int type) {
         }
       }
       if (m_panning) {
+        const QPoint panPointPosition =
+            QtCompat::touchPointPosition(panPoint).toPoint();
+        const QPoint panPointLastPosition =
+            QtCompat::touchPointLastPosition(panPoint).toPoint();
         QPointF curPos      = m_touchDevice == QtCompat::TouchScreen
-                                  ? mapToScene(panPoint.pos().toPoint())
-                                  : mapToScene(panPoint.pos().toPoint()) *
+                                  ? mapToScene(panPointPosition)
+                                  : mapToScene(panPointPosition) *
                                    getDevicePixelRatio(this);
         QPointF lastPos     = m_touchDevice == QtCompat::TouchScreen
-                                  ? mapToScene(panPoint.lastPos().toPoint())
-                                  : mapToScene(panPoint.lastPos().toPoint()) *
+                                  ? mapToScene(panPointLastPosition)
+                                  : mapToScene(panPointLastPosition) *
                                     getDevicePixelRatio(this);
         QPointF centerDelta = curPos - lastPos;
         panQt(centerDelta);
