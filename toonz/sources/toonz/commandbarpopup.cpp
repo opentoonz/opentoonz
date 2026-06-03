@@ -9,6 +9,7 @@
 
 // TnzQt includes
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/toonzfolders.h"
@@ -263,8 +264,9 @@ QTreeWidgetItem* CommandListTree::addFolder(const QString& title,
 //-----------------------------------------------------------------------------
 
 void CommandListTree::mousePressEvent(QMouseEvent* event) {
-  setCurrentItem(itemAt(event->pos()));
-  QTreeWidgetItem* clickedItem = itemAt(event->pos());
+  QPoint pos = QtCompat::mouseEventPosition(event);
+  setCurrentItem(itemAt(pos));
+  QTreeWidgetItem* clickedItem = itemAt(pos);
 
   CommandItem* commandItem     = dynamic_cast<CommandItem*>(clickedItem);
   SeparatorItem* separatorItem = dynamic_cast<SeparatorItem*>(clickedItem);

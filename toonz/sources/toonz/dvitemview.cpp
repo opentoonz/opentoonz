@@ -12,6 +12,7 @@
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/toonzscene.h"
@@ -1183,7 +1184,8 @@ void DvItemViewerPanel::paintTableItem(QPainter &p, int index) {
 
 void DvItemViewerPanel::mousePressEvent(QMouseEvent *event) {
   updateViewParameters(width());
-  int index       = pos2index(event->pos());
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
+  int index             = pos2index(eventPos);
   bool isSelected = m_selection->isSelected(index);
   m_currentIndex  = index;
   if (event->button() == Qt::RightButton) {
@@ -1196,7 +1198,7 @@ void DvItemViewerPanel::mousePressEvent(QMouseEvent *event) {
     }
     return;
   } else if (event->button() == Qt::MiddleButton) {
-    m_lastMousePos = event->globalPos();
+    m_lastMousePos = QtCompat::mouseEventGlobalPosition(event);
     event->accept();
     return;
   }
@@ -1208,7 +1210,7 @@ void DvItemViewerPanel::mousePressEvent(QMouseEvent *event) {
     if (model->getItemData(index, DvItemListModel::PlayAvailable).toBool() &&
         isSelected) {
       if (m_itemViewPlayDelegate->setPlayWidget(getModel(), index, iconRect,
-                                                event->pos())) {
+                                                eventPos)) {
         update();
         return;
       }
@@ -1251,7 +1253,7 @@ void DvItemViewerPanel::mousePressEvent(QMouseEvent *event) {
   }
   if (m_globalSelectionEnabled) m_selection->makeCurrent();
   // if (m_viewer ) m_viewer->notifyClick(index);
-  m_startDragPosition = event->pos();
+  m_startDragPosition = eventPos;
   update();
 }
 
@@ -1259,8 +1261,9 @@ void DvItemViewerPanel::mousePressEvent(QMouseEvent *event) {
 
 void DvItemViewerPanel::mouseMoveEvent(QMouseEvent *event) {
   if (event->buttons() == Qt::MiddleButton) {
-    QPoint d       = event->globalPos() - m_lastMousePos;
-    m_lastMousePos = event->globalPos();
+    const QPoint globalPos = QtCompat::mouseEventGlobalPosition(event);
+    QPoint d               = globalPos - m_lastMousePos;
+    m_lastMousePos         = globalPos;
     if (m_viewer) {
       QScrollBar *scb = m_viewer->verticalScrollBar();
       scb->setValue(scb->value() - d.y());
@@ -1271,8 +1274,9 @@ void DvItemViewerPanel::mouseMoveEvent(QMouseEvent *event) {
   else if (!(event->buttons() & Qt::LeftButton))
     return;
 
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
   if (!m_isPlayDelegateDisable) {
-    int index       = pos2index(event->pos());
+    int index       = pos2index(eventPos);
     bool isSelected = m_selection->isSelected(index);
     QRect rect      = index2pos(index);
     QRect iconRect(rect.left() + (rect.width() - m_iconSize.width()) / 2,
@@ -1281,7 +1285,7 @@ void DvItemViewerPanel::mouseMoveEvent(QMouseEvent *event) {
     if (model->getItemData(index, DvItemListModel::PlayAvailable).toBool() &&
         isSelected) {
       if (m_itemViewPlayDelegate->setPlayWidget(getModel(), index, iconRect,
-                                                event->pos())) {
+                                                eventPos)) {
         update();
         return;
       }
@@ -1290,7 +1294,7 @@ void DvItemViewerPanel::mouseMoveEvent(QMouseEvent *event) {
   }
 
   // faccio partire il drag&drop solo se mi sono mosso di una certa quantita'
-  if ((event->pos() - m_startDragPosition).manhattanLength() < 20) return;
+  if ((eventPos - m_startDragPosition).manhattanLength() < 20) return;
   // e se c'e' una selezione non vuota
   if (m_currentIndex < 0 || m_currentIndex >= getItemCount()) return;
 
@@ -1308,12 +1312,13 @@ void DvItemViewerPanel::mouseReleaseEvent(QMouseEvent *event) {
 //-----------------------------------------------------------------------------
 
 void DvItemViewerPanel::mouseDoubleClickEvent(QMouseEvent *event) {
-  int index = pos2index(event->pos());
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
+  int index             = pos2index(eventPos);
   if (index < 0 || index >= getItemCount()) return;
   if (m_viewer) m_viewer->notifyDoubleClick(index);
   if (!getModel()->canRenameItem(index)) return;
   QRect captionRect = getCaptionRect(index);
-  if (!captionRect.contains(event->pos())) return;
+  if (!captionRect.contains(eventPos)) return;
   m_currentIndex = index;
 
   DVGui::LineEdit *fld = m_editFld;
@@ -1614,7 +1619,7 @@ void DvItemViewerTitleBar::onViewTypeChanged(
 //-----------------------------------------------------------------------------
 
 void DvItemViewerTitleBar::mouseMoveEvent(QMouseEvent *event) {
-  QPoint pos = event->pos();
+  QPoint pos = QtCompat::mouseEventPosition(event);
   std::vector<std::pair<DvItemListModel::DataType, std::pair<int, bool>>>
       columns;
   m_itemViewer->getPanel()->getColumns(columns);
@@ -1649,7 +1654,7 @@ void DvItemViewerTitleBar::mouseMoveEvent(QMouseEvent *event) {
 //-----------------------------------------------------------------------------
 
 void DvItemViewerTitleBar::mousePressEvent(QMouseEvent *event) {
-  QPoint pos = event->pos();
+  QPoint pos = QtCompat::mouseEventPosition(event);
   if (event->button() == Qt::LeftButton) {
     if (m_dragColumnIndex >= 0) {
       m_pos = pos;
@@ -1721,7 +1726,8 @@ void DvItemViewerTitleBar::openContextMenu(QMouseEvent *event) {
     menu.addAction(&setVersionControlAction);
   }
 
-  QAction *action = menu.exec(event->globalPos());  // QCursor::pos());
+  QAction *action =
+      menu.exec(QtCompat::mouseEventGlobalPosition(event));  // QCursor::pos());
   // if(action==&setNameAction)
   // m_itemViewer->getPanel()->setVisibility(DvItemListModel::Name,!m_itemViewer->getPanel()->getVisibility(DvItemListModel::Name));
   if (action == &setSizeAction)

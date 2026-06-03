@@ -8,6 +8,7 @@
 
 // TnzQt includes
 #include "historytypes.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/txsheethandle.h"
@@ -414,7 +415,8 @@ void KeyframeMoverTool::onClick(const QMouseEvent *event) {
   m_firstKeyframeMovement   = true;
   m_selecting               = false;
   TXsheet *xsheet           = getViewer()->getXsheet();
-  CellPosition cellPosition = getViewer()->xyToPosition(event->pos());
+  const QPoint eventPos     = QtCompat::mouseEventPosition(event);
+  CellPosition cellPosition = getViewer()->xyToPosition(eventPos);
   int row                   = cellPosition.frame();
   int col                   = cellPosition.layer();
   m_firstRow                = row;
@@ -436,17 +438,18 @@ void KeyframeMoverTool::onClick(const QMouseEvent *event) {
     m_offset       = row - getSelection()->getFirstRow();
   m_startSelection = *getSelection();
   getViewer()->update();
-  m_startPos = TPointD(event->pos().x(), event->pos().y());
+  m_startPos = TPointD(eventPos.x(), eventPos.y());
   m_curPos   = m_startPos;
 }
 
 //-----------------------------------------------------------------------------
 
 void KeyframeMoverTool::onDrag(const QMouseEvent *e) {
-  int x                     = e->pos().x();
-  int y                     = e->pos().y();
+  const QPoint eventPos     = QtCompat::mouseEventPosition(e);
+  int x                     = eventPos.x();
+  int y                     = eventPos.y();
   m_curPos                  = TPointD(x, y);
-  CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
+  CellPosition cellPosition = getViewer()->xyToPosition(eventPos);
   int row                   = cellPosition.frame();
   int col                   = cellPosition.layer();
   if (m_selecting)

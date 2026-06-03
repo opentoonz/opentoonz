@@ -5,6 +5,7 @@
 #include "menubarcommandids.h"
 #include "toonzqt/gutil.h"
 #include "toonzqt/dvdialog.h"
+#include "toonzqt/qtcompat.h"
 #include "toolpresetcommandmanager.h"
 
 // ToonzLib includes
@@ -474,7 +475,7 @@ QSize BrushPresetItem::minimumSizeHint() const {
 
 void BrushPresetItem::mousePressEvent(QMouseEvent *event) {
   if (event->button() == Qt::LeftButton) {
-    m_dragStartPosition = event->pos();
+    m_dragStartPosition = QtCompat::mouseEventPosition(event);
   }
   QToolButton::mousePressEvent(event);
 }
@@ -485,7 +486,8 @@ void BrushPresetItem::mouseMoveEvent(QMouseEvent *event) {
     return;
   }
 
-  if ((event->pos() - m_dragStartPosition).manhattanLength() <
+  QPoint pos = QtCompat::mouseEventPosition(event);
+  if ((pos - m_dragStartPosition).manhattanLength() <
       QApplication::startDragDistance()) {
     QToolButton::mouseMoveEvent(event);
     return;
@@ -503,7 +505,7 @@ void BrushPresetItem::mouseMoveEvent(QMouseEvent *event) {
   // Create drag pixmap (visual feedback)
   QPixmap dragPixmap = grab();
   drag->setPixmap(dragPixmap);
-  drag->setHotSpot(event->pos());
+  drag->setHotSpot(pos);
 
   // Execute drag
   drag->exec(Qt::MoveAction);

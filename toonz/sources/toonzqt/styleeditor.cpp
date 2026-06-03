@@ -822,7 +822,7 @@ void HexagonalColorWheel::mousePressEvent(QMouseEvent *event) {
 
   // check whether the mouse cursor is in the wheel or in the triangle (or
   // nothing).
-  QPoint curPos = event->pos() * getDevPixRatio();
+  QPoint curPos = QtCompat::mouseEventPosition(event) * getDevPixRatio();
 
   QPolygonF wheelPolygon;
   // in the case of the wheel
@@ -857,10 +857,10 @@ void HexagonalColorWheel::mouseMoveEvent(QMouseEvent *event) {
   case none:
     break;
   case leftWheel:
-    clickLeftWheel(event->pos() * getDevPixRatio());
+    clickLeftWheel(QtCompat::mouseEventPosition(event) * getDevPixRatio());
     break;
   case rightTriangle:
-    clickRightTriangle(event->pos() * getDevPixRatio());
+    clickRightTriangle(QtCompat::mouseEventPosition(event) * getDevPixRatio());
     break;
   }
 }
@@ -971,13 +971,15 @@ void SquaredColorWheel::click(const QPoint &pos) {
 //-----------------------------------------------------------------------------
 
 void SquaredColorWheel::mousePressEvent(QMouseEvent *event) {
-  if (event->buttons() & Qt::LeftButton) click(event->pos());
+  if (event->buttons() & Qt::LeftButton)
+    click(QtCompat::mouseEventPosition(event));
 }
 
 //-----------------------------------------------------------------------------
 
 void SquaredColorWheel::mouseMoveEvent(QMouseEvent *event) {
-  if (event->buttons() & Qt::LeftButton) click(event->pos());
+  if (event->buttons() & Qt::LeftButton)
+    click(QtCompat::mouseEventPosition(event));
 }
 
 //-----------------------------------------------------------------------------
@@ -1115,7 +1117,8 @@ void ColorSlider::paintEvent(QPaintEvent *event) {
 //-----------------------------------------------------------------------------
 
 void ColorSlider::mousePressEvent(QMouseEvent *event) {
-  chandleMouse(event->pos().x(), event->pos().y());
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
+  chandleMouse(eventPos.x(), eventPos.y());
 }
 
 //-----------------------------------------------------------------------------
@@ -1127,7 +1130,8 @@ void ColorSlider::mouseReleaseEvent(QMouseEvent *event) {
 //-----------------------------------------------------------------------------
 
 void ColorSlider::mouseMoveEvent(QMouseEvent *event) {
-  chandleMouse(event->pos().x(), event->pos().y());
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
+  chandleMouse(eventPos.x(), eventPos.y());
 }
 
 //-----------------------------------------------------------------------------
@@ -1534,7 +1538,7 @@ void ColorParameterSelector::clear() {
 //-----------------------------------------------------------------------------
 
 void ColorParameterSelector::mousePressEvent(QMouseEvent *event) {
-  QPoint pos = event->pos() - m_chipOrigin;
+  QPoint pos = QtCompat::mouseEventPosition(event) - m_chipOrigin;
   int index  = pos.x() / m_chipDelta.x();
   QRect chipRect(index * m_chipDelta, m_chipSize);
   if (chipRect.contains(pos)) {
@@ -2012,7 +2016,7 @@ int StyleChooserPage::posToIndex(const QPoint &pos) const {
 //-----------------------------------------------------------------------------
 
 void StyleChooserPage::mousePressEvent(QMouseEvent *event) {
-  QPoint pos       = event->pos();
+  QPoint pos       = QtCompat::mouseEventPosition(event);
   int currentIndex = posToIndex(pos);
   if (currentIndex < 0) return;
   // m_currentIndex = currentIndex;
@@ -2024,7 +2028,7 @@ void StyleChooserPage::mousePressEvent(QMouseEvent *event) {
 //-----------------------------------------------------------------------------
 
 void StyleChooserPage::mouseMoveEvent(QMouseEvent *event) {
-  QPoint pos       = event->pos();
+  QPoint pos       = QtCompat::mouseEventPosition(event);
   int currentIndex = posToIndex(pos);
   if (currentIndex >= 0 && currentIndex < getChipCount())
     setCursor(Qt::PointingHandCursor);

@@ -833,7 +833,7 @@ void ImageViewer::mouseMoveEvent(QMouseEvent *event) {
     return;
   }
 
-  QPoint curQPos = event->pos() * getDevPixRatio();
+  QPoint curQPos = QtCompat::mouseEventPosition(event) * getDevPixRatio();
 
   TPoint curPos = TPoint(curQPos.x(), curQPos.y());
 
@@ -961,7 +961,7 @@ void ImageViewer::pickColor(QMouseEvent *event, bool putValueToStyleEditor) {
   if (!m_isHistogramEnable) return;
   if (!m_histogramPopup->isVisible()) return;
 
-  QPointF curPos = event->localPos() * getDevPixRatio();
+  QPointF curPos = QtCompat::mouseEventPositionF(event) * getDevPixRatio();
 
   // avoid to pick outside of the flip
   if ((!m_image) || !rect().contains(curPos.toPoint())) {
@@ -994,7 +994,8 @@ void ImageViewer::pickColor(QMouseEvent *event, bool putValueToStyleEditor) {
   } else if (!img->raster()) {  // vector image
     // For unknown reasons, glReadPixels is covering the entire window not the
     // OpenGL widget.
-    QPointF winPos = event->windowPos() * getDevPixRatio();
+    QPointF winPos =
+        QtCompat::mouseEventWindowPositionF(event) * getDevPixRatio();
     TPointD mousePos =
         TPointD(winPos.x(), (double)(window()->height()) - winPos.y());
     TRectD area  = TRectD(mousePos.x, mousePos.y, mousePos.x, mousePos.y);
@@ -1177,12 +1178,13 @@ void ImageViewer::mousePressEvent(QMouseEvent *event) {
     return;
   }
 
-  m_pos                   = event->pos() * getDevPixRatio();
+  m_pos = QtCompat::mouseEventPosition(event) * getDevPixRatio();
   m_pressedMousePos       = TPoint(m_pos.x(), m_pos.y());
   m_mouseButton           = event->button();
   m_draggingZoomSelection = false;
 
-  QPointF winPosMousePos = event->windowPos() * getDevPixRatio() - m_pos;
+  QPointF winPosMousePos =
+      QtCompat::mouseEventWindowPositionF(event) * getDevPixRatio() - m_pos;
   m_winPosMousePosOffset = TPointD(winPosMousePos.x(), winPosMousePos.y());
 
   if (m_mouseButton != Qt::LeftButton) {

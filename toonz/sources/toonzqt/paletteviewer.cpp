@@ -6,6 +6,7 @@
 #include "toonzqt/gutil.h"
 #include "toonzqt/keyframenavigator.h"
 #include "toonzqt/trepetitionguard.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/dvscrollwidget.h"
 #include "toonzqt/studiopaletteviewer.h"
@@ -939,7 +940,8 @@ void PaletteViewer::dropEvent(QDropEvent *event) {
   const QMimeData *mimeData = event->mimeData();
   if (!mimeData) return;
 
-  QPoint tollBarPos      = m_savePaletteToolBar->mapFrom(this, event->pos());
+  QPoint tollBarPos = m_savePaletteToolBar->mapFrom(
+      this, QtCompat::dropEventPosition(event));
   QAction *currentAction = m_savePaletteToolBar->actionAt(tollBarPos);
   bool loadPalette =
       currentAction && currentAction->text() == QString(tr("&Move Palette"));

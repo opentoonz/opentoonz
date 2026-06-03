@@ -110,13 +110,43 @@ branch.
   color sample fields, swatch point editing/panning, scroll widgets,
   flip-console slider/split-button controls, Function Tree channel middle-drag
   initiation, mini-toolbar dragging, and dock hover/drag/resize/separator/
-  drop-placeholder paths also use `QtCompat` event-position helpers instead of
-  direct Qt 5-era local/global coordinate accessors. `TreeView` item hit
-  testing, drag dispatch, and context-menu placement plus `ToneCurveField`
-  channel curve control-point editing also use the same helpers. SceneViewer
-  mouse/tablet event initialization, tablet context-menu delivery, tablet
-  hover-edge handling, mouse double-click mapping, and the Function Panel
-  graph/drag tools now use the same helpers, removing another Qt 6
+  drop-placeholder paths, plus Palette Viewer page-chip hit testing, drag
+  thresholding, rename activation, tab dragging, tab rename activation,
+  page-drop targeting, palette-icon drag thresholding, and save-toolbar drop
+  hit testing, plus Studio Palette tree drag thresholding and drop-target
+  tracking, also use `QtCompat` event-position helpers instead of direct
+  Qt 5-era local/global coordinate accessors. Schematic Viewer panning,
+  zooming, rubber-band gating, and double-click fit-scene hit testing also use
+  the same helpers. Spreadsheet panel panning, cell hit testing, and auto-pan
+  edge tracking now use the same helpers. Style Editor color wheels, color
+  sliders, parameter chips, and style chooser chip hit testing now use the
+  same helpers. Custom Panel scroller drag thresholds now use the same helpers.
+  Room tab selection, reordering, and rename activation now use the same
+  helpers. History pane undo/redo row selection now uses the same helpers.
+  Camera Capture histogram range dragging, Camera Track export preview panning,
+  Xsheet PDF export preview panning, Cleanup swatch panning, Separate Colors
+  swatch panning, Color Model picking, Brush Preset item drag initiation and
+  hotspot placement, Command Bar command-list hit testing, `TreeView` item hit
+  testing, drag dispatch, and context-menu placement plus Ruler guide
+  creation, movement, deletion, and hover hit testing plus Board Settings item
+  hover and drag geometry plus floating panel title-bar close-button hover and
+  click hit testing plus Startup scene-list hover hit testing plus
+  `ToneCurveField` channel curve control-point editing plus `DvItemViewer`
+  item selection, play-hit testing, middle-button panning, drag initiation,
+  rename activation, and table-column resize tracking plus Xsheet keyframe
+  mover click/drag cell mapping plus Pencil Test sub-camera handle hit testing
+  and drag resizing also use the same helpers. Pencil Test capture image
+  orientation flips now use Qt 6 `QImage::flipped()` while preserving the Qt 5
+  `mirrored()` path. Filmstrip frame double-click selection, press selection,
+  navigator panning initiation, inbetween-button hit testing, and drag/drop
+  arming, plus drag-select, auto-pan edge tracking, and inbetween tooltip
+  hover checks now use the same helpers. Screen Picker screen-rectangle
+  press, drag, and release geometry and Image Viewer panning, color picking,
+  and loadbox/zoom drag setup now use the same helpers. SceneViewer
+  mouse/tablet event initialization, tablet context-menu
+  delivery, tablet hover-edge handling, mouse double-click mapping, and the
+  Function Panel graph/drag tools now use the same helpers, removing another
+  Qt 6
   event-coordinate warning slice while preserving the Qt 5 lane.
 - `DvTextEdit` mini-toolbar font-size population and text-family formatting no
   longer use Qt 6-deprecated `QFontDatabase` instance construction or

@@ -119,6 +119,14 @@ inline QPointF mouseEventPositionF(const QMouseEvent *event) {
 #endif
 }
 
+inline QPointF mouseEventWindowPositionF(const QMouseEvent *event) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return event->scenePosition();
+#else
+  return event->windowPos();
+#endif
+}
+
 inline QPoint mouseEventGlobalPosition(const QMouseEvent *event) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   return event->globalPosition().toPoint();

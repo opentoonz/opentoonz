@@ -12,6 +12,7 @@
 #include "toonzqt/colorfield.h"
 #include "toonzqt/filefield.h"
 #include "toonzqt/doublefield.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/txsheet.h"
@@ -208,14 +209,15 @@ void CameraTrackPreviewPane::fitScaleTo(QSize size) {
 
 //-----------------------------------------------------------------------------
 void CameraTrackPreviewArea::mousePressEvent(QMouseEvent* e) {
-  m_mousePos = e->pos();
+  m_mousePos = QtCompat::mouseEventPosition(e);
 }
 
 void CameraTrackPreviewArea::mouseMoveEvent(QMouseEvent* e) {
-  QPoint d = m_mousePos - e->pos();
+  QPoint pos = QtCompat::mouseEventPosition(e);
+  QPoint d   = m_mousePos - pos;
   horizontalScrollBar()->setValue(horizontalScrollBar()->value() + d.x());
   verticalScrollBar()->setValue(verticalScrollBar()->value() + d.y());
-  m_mousePos = e->pos();
+  m_mousePos = pos;
 }
 
 void CameraTrackPreviewArea::contextMenuEvent(QContextMenuEvent* event) {
@@ -611,7 +613,11 @@ QImage ExportCameraTrackPopup::generateCameraTrackImg(
   QImage colImg(imgRas->getRawData(), imgRes.lx, imgRes.ly,
                 QImage::Format_ARGB32_Premultiplied);
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  QImage img = colImg.flipped(Qt::Vertical);
+#else
   QImage img = colImg.mirrored(false, true);
+#endif
 
   TPointD imgDpi = sl->getImageDpi();
   if (imgDpi != TPointD()) {

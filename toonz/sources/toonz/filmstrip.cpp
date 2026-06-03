@@ -16,6 +16,7 @@
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/trepetitionguard.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/tselectionhandle.h"
 
 // TnzLib includes
@@ -318,11 +319,12 @@ void FilmstripFrames::scroll(int dy) {
 //---------------------------------------------------------------------------
 
 void FilmstripFrames::mouseDoubleClickEvent(QMouseEvent *event) {
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
   int index;
   if (m_isVertical) {
-    index = y2index(event->pos().y());
+    index = y2index(eventPos.y());
   } else {
-    index = x2index(event->pos().x());
+    index = x2index(eventPos.x());
   }
   select(index, ONLY_SELECT);  // ONLY_SELECT
 }
@@ -849,11 +851,12 @@ TFrameId FilmstripFrames::getCurrentFrameId() {
 
 void FilmstripFrames::mousePressEvent(QMouseEvent *event) {
   m_selecting = false;
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
   int index   = 0;
   if (m_isVertical) {
-    index = y2index(event->pos().y());
+    index = y2index(eventPos.y());
   } else {
-    index = x2index(event->pos().x());
+    index = x2index(eventPos.x());
   }
   TFrameId fid = index2fid(index);
 
@@ -869,10 +872,10 @@ void FilmstripFrames::mousePressEvent(QMouseEvent *event) {
 
   if (m_isVertical) {
     i0         = y2index(0);
-    clickedPos = event->pos() - QPoint(0, (index - i0) * frameHeight);
+    clickedPos = eventPos - QPoint(0, (index - i0) * frameHeight);
   } else {
     i0         = x2index(0);
-    clickedPos = event->pos() - QPoint((index - i0) * frameWidth, 0);
+    clickedPos = eventPos - QPoint((index - i0) * frameWidth, 0);
   }
   actualIconClicked =
       QRect(QPoint(fs_leftMargin + fs_iconMarginLR,
@@ -893,7 +896,7 @@ void FilmstripFrames::mousePressEvent(QMouseEvent *event) {
         event->button() == Qt::MiddleButton) {
       if (m_showNavigator) {
         m_isNavigatorPanning = true;
-        execNavigatorPan(event->pos());
+        execNavigatorPan(eventPos);
         QApplication::setOverrideCursor(Qt::ClosedHandCursor);
       }
     } else
@@ -909,11 +912,11 @@ void FilmstripFrames::mousePressEvent(QMouseEvent *event) {
     // was the inbetween button clicked?
     bool inbetweenSelected = false;
     if (m_isVertical)
-      inbetweenSelected = event->pos().x() > width() - 20 - fs_rightMargin;
+      inbetweenSelected = eventPos.x() > width() - 20 - fs_rightMargin;
     else
       inbetweenSelected =
-          event->pos().y() > height() - fs_iconMarginBottom - 20 &&
-          event->pos().y() < height() - fs_iconMarginBottom - fs_frameSpacing;
+          eventPos.y() > height() - fs_iconMarginBottom - 20 &&
+          eventPos.y() < height() - fs_iconMarginBottom - fs_frameSpacing;
 
     // with shift or control
     if (event->modifiers() & Qt::ShiftModifier) {
@@ -922,7 +925,7 @@ void FilmstripFrames::mousePressEvent(QMouseEvent *event) {
         // If the frame is already selected enable
         // drag'n'drop
         m_dragDropArmed = true;
-        m_pos           = event->pos();
+        m_pos           = eventPos;
       }
     } else if (event->modifiers() & Qt::ControlModifier)
       select(index, CTRL_SELECT);
@@ -948,7 +951,7 @@ void FilmstripFrames::mousePressEvent(QMouseEvent *event) {
       } else if (m_selection->isSelected(fid)) {
         // if it's already selected - it can be drag and dropped
         m_dragDropArmed = true;
-        m_pos           = event->pos();
+        m_pos           = eventPos;
         // allow a the frame to be reselected if the mouse isn't moved far
         // this is to enable a group selection to become a single selection
         m_allowResetSelection    = true;
@@ -957,7 +960,7 @@ void FilmstripFrames::mousePressEvent(QMouseEvent *event) {
         // this allows clicking the frame number to trigger an instant drag
         select(index, ONLY_SELECT);
         m_dragDropArmed = true;
-        m_pos           = event->pos();
+        m_pos           = eventPos;
       }
     }
     update();
@@ -1025,32 +1028,32 @@ void FilmstripFrames::mouseReleaseEvent(QMouseEvent *e) {
 //-----------------------------------------------------------------------------
 
 void FilmstripFrames::mouseMoveEvent(QMouseEvent *e) {
-  QPoint pos = e->pos();
+  QPoint pos = QtCompat::mouseEventPosition(e);
   //m_dragDropArmed
   int index;
   if (m_isVertical) {
-    index = y2index(e->pos().y());
-    if (isOutOfBounds(e->pos().x())) m_dragDropArmed = true;
+    index = y2index(pos.y());
+    if (isOutOfBounds(pos.x())) m_dragDropArmed = true;
   } else {
-    index = x2index(e->pos().x());
-    if (isOutOfBounds(e->pos().y())) m_dragDropArmed = true;
+    index = x2index(pos.x());
+    if (isOutOfBounds(pos.y())) m_dragDropArmed = true;
   }
   if (e->buttons() & Qt::LeftButton || e->buttons() & Qt::MiddleButton) {
     // navigator pan
     if (m_showNavigator && m_isNavigatorPanning) {
-      execNavigatorPan(e->pos());
+      execNavigatorPan(pos);
       e->accept();
       return;
     }
     if (e->buttons() & Qt::MiddleButton) return;
     if (m_dragDropArmed) {
-      if ((m_pos - e->pos()).manhattanLength() > 10) {
+      if ((m_pos - pos).manhattanLength() > 10) {
         startDragDrop();
         m_dragDropArmed       = false;
         m_allowResetSelection = false;
       }
     } else if (m_selecting) {
-      m_pos = e->globalPos();
+      m_pos = QtCompat::mouseEventGlobalPosition(e);
       select(index, DRAG_SELECT);
     }
 
@@ -1111,7 +1114,7 @@ void FilmstripFrames::mouseMoveEvent(QMouseEvent *e) {
     update();
   } else if (e->buttons() & Qt::MiddleButton) {
     // scroll con il tasto centrale
-    pos = e->globalPos();
+    pos = QtCompat::mouseEventGlobalPosition(e);
     if (m_isVertical) {
       scroll((m_pos.y() - pos.y()) * 10);
     } else {
@@ -1124,13 +1127,13 @@ void FilmstripFrames::mouseMoveEvent(QMouseEvent *e) {
 
     if (m_isVertical && sl && m_selection && sl->getType() == PLI_XSHLEVEL &&
         m_selection->isInInbetweenRange(fid) &&
-        e->pos().x() > width() - 20 - fs_rightMargin) {
+        pos.x() > width() - 20 - fs_rightMargin) {
       setToolTip(tr("Auto Inbetween"));
     }
     if (!m_isVertical && sl && m_selection && sl->getType() == PLI_XSHLEVEL &&
         m_selection->isInInbetweenRange(fid) &&
-        e->pos().y() > height() - 15 - fs_iconMarginBottom &&
-        e->pos().y() < height() - fs_iconMarginBottom - fs_frameSpacing) {
+        pos.y() > height() - 15 - fs_iconMarginBottom &&
+        pos.y() < height() - fs_iconMarginBottom - fs_frameSpacing) {
       setToolTip(tr("Auto Inbetween"));
     }
   }

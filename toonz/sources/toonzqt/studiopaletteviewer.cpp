@@ -9,6 +9,7 @@
 #include "toonzqt/gutil.h"
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/intfield.h"
+#include "toonzqt/qtcompat.h"
 #include "palettesscanpopup.h"
 #include "palettedata.h"
 
@@ -1082,7 +1083,8 @@ void StudioPaletteTreeViewer::contextMenuEvent(QContextMenuEvent *event) {
 void StudioPaletteTreeViewer::mousePressEvent(QMouseEvent *event) {
   QTreeWidget::mousePressEvent(event);
   // If left button is not pressed return
-  if (event->button() == Qt::LeftButton) m_startPos = event->pos();
+  if (event->button() == Qt::LeftButton)
+    m_startPos = QtCompat::mouseEventPosition(event);
 }
 
 //-----------------------------------------------------------------------------
@@ -1090,8 +1092,9 @@ void StudioPaletteTreeViewer::mousePressEvent(QMouseEvent *event) {
 void StudioPaletteTreeViewer::mouseMoveEvent(QMouseEvent *event) {
   // If left button is not pressed return; is not drag event.
   if (!(event->buttons() & Qt::LeftButton)) return;
-  if (!m_startPos.isNull() && (m_startPos - event->pos()).manhattanLength() >=
-                                  QApplication::startDragDistance())
+  if (!m_startPos.isNull() &&
+      (m_startPos - QtCompat::mouseEventPosition(event)).manhattanLength() >=
+          QApplication::startDragDistance())
     startDragDrop();
 }
 
@@ -1163,7 +1166,7 @@ void StudioPaletteTreeViewer::dragEnterEvent(QDragEnterEvent *event) {
 //-----------------------------------------------------------------------------
 
 void StudioPaletteTreeViewer::dragMoveEvent(QDragMoveEvent *event) {
-  QTreeWidgetItem *item = itemAt(event->pos());
+  QTreeWidgetItem *item = itemAt(QtCompat::dropEventPosition(event));
   TFilePath newPath     = getItemPath(item);
 
   if (item) {

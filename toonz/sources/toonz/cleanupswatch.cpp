@@ -3,6 +3,7 @@
 #include "cleanupswatch.h"
 #include "trop.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 #include <QHBoxLayout>
 #include <QBrush>
 #include <QPainter>
@@ -81,7 +82,7 @@ void CleanupSwatch::CleanupSwatchArea::mousePressEvent(QMouseEvent *event) {
   if (!m_sw->m_resampledRaster || m_sw->m_lx == 0 || m_sw->m_ly == 0) return;
   // if (m_sw->m_lastRasCleanupped)
   //   TRop::addBackground(m_sw->m_lastRasCleanupped, TPixel::White);
-  m_pos = event->pos();
+  m_pos = QtCompat::mouseEventPosition(event);
 
   if (event->button() != Qt::MiddleButton || !m_sw->m_resampledRaster) {
     event->ignore();
@@ -171,17 +172,15 @@ void CleanupSwatch::CleanupSwatchArea::mouseReleaseEvent(QMouseEvent *event) {
 void CleanupSwatch::CleanupSwatchArea::mouseMoveEvent(QMouseEvent *event) {
   if (!m_panning) return;
 
-  TPoint curPos = TPoint(event->pos().x(), event->pos().y());
-
-  QPoint delta = event->pos() - m_pos;
+  QPoint pos   = QtCompat::mouseEventPosition(event);
+  QPoint delta = pos - m_pos;
   if (delta == QPoint()) return;
-  TAffine oldAff  = m_sw->m_viewAff;
   m_sw->m_viewAff = TTranslation(delta.x(), -delta.y()) * m_sw->m_viewAff;
 
   m_sw->m_leftSwatch->updateRaster();
   m_sw->m_rightSwatch->updateRaster(true);
 
-  m_pos = event->pos();
+  m_pos = pos;
 }
 
 //---------------------------------------------------------------

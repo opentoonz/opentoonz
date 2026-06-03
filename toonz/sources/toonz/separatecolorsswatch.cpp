@@ -7,6 +7,7 @@
 #include "toonzqt/viewcommandids.h"
 #include "toonzqt/gutil.h"
 #include "toonzqt/dvdialog.h"
+#include "toonzqt/qtcompat.h"
 
 #include "toonz/tcleanupper.h"
 
@@ -87,7 +88,7 @@ SeparateSwatchArea::SeparateSwatchArea(SeparateSwatch *parent, SWATCH_TYPE type)
 void SeparateSwatchArea::mousePressEvent(QMouseEvent *event) {
   if (!m_sw->m_mainRaster || m_sw->m_lx == 0 || m_sw->m_ly == 0) return;
 
-  m_pos = event->pos();
+  m_pos = QtCompat::mouseEventPosition(event);
 
   // return if there is no raster
   if (!m_r) {
@@ -156,11 +157,9 @@ void SeparateSwatchArea::mouseReleaseEvent(QMouseEvent *event) {
 void SeparateSwatchArea::mouseMoveEvent(QMouseEvent *event) {
   if (!m_panning) return;
 
-  TPoint curPos = TPoint(event->pos().x(), event->pos().y());
-
-  QPoint delta = event->pos() - m_pos;
+  QPoint pos   = QtCompat::mouseEventPosition(event);
+  QPoint delta = pos - m_pos;
   if (delta == QPoint()) return;
-  TAffine oldAff  = m_sw->m_viewAff;
   m_sw->m_viewAff = TTranslation(delta.x(), -delta.y()) * m_sw->m_viewAff;
 
   m_sw->m_orgSwatch->updateRaster();
@@ -169,7 +168,7 @@ void SeparateSwatchArea::mouseMoveEvent(QMouseEvent *event) {
   m_sw->m_sub2Swatch->updateRaster(true);
   m_sw->m_sub3Swatch->updateRaster(true);
 
-  m_pos = event->pos();
+  m_pos = pos;
 }
 
 //---------------------------------------------------------------

@@ -1283,7 +1283,7 @@ void StartupScenesList::findFirstScenePath(const QList<QString> paths) {
 }
 
 void StartupScenesList::mouseMoveEvent(QMouseEvent *event) {
-  QListWidgetItem *it = itemAt(event->pos());
+  QListWidgetItem *it = itemAt(QtCompat::mouseEventPosition(event));
   if (it)
     setCursor(Qt::PointingHandCursor);
   else

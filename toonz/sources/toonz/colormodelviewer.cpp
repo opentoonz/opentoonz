@@ -23,6 +23,7 @@
 #include "toonzqt/gutil.h"
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/styleselection.h"
+#include "toonzqt/qtcompat.h"
 // TnzLib includes
 #include "toonz/palettecmd.h"
 #include "toonz/txshlevelhandle.h"
@@ -244,14 +245,14 @@ void ColorModelViewer::contextMenuEvent(QContextMenuEvent *event) {
  */
 void ColorModelViewer::mousePressEvent(QMouseEvent *event) {
   if (event->button() == Qt::LeftButton)
-    pick(event->pos() * getDevicePixelRatio(this));
+    pick(QtCompat::mouseEventPosition(event) * getDevicePixelRatio(this));
 }
 //-----------------------------------------------------------------------------
 /*! If left button is moved recall \b pick() in event pos.
  */
 void ColorModelViewer::mouseMoveEvent(QMouseEvent *event) {
   if (event->buttons() & Qt::LeftButton)
-    pick(event->pos() * getDevicePixelRatio(this));
+    pick(QtCompat::mouseEventPosition(event) * getDevicePixelRatio(this));
 }
 //-----------------------------------------------------------------------------
 /*! Pick color from image and set it as current style.

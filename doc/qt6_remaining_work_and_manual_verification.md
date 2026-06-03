@@ -87,12 +87,79 @@ Already covered:
   editing, color sample fields, swatch point editing/panning, scroll widgets,
   flip-console slider/split-button controls, Function Tree channel middle-drag
   initiation, mini-toolbar dragging, and dock
-  hover/drag/resize/separator/drop-placeholder paths now use `QtCompat`
-  event-position helpers instead of direct Qt 5-era event coordinate accessors.
+  hover/drag/resize/separator/drop-placeholder paths, plus Palette Viewer
+  page-chip hit testing, drag thresholding, rename activation, tab dragging,
+  tab rename activation, page-drop targeting, palette-icon drag thresholding,
+  and save-toolbar drop hit testing, plus Studio Palette tree drag thresholding
+  and drop-target tracking, now use `QtCompat` event-position helpers instead
+  of direct Qt 5-era event coordinate accessors.
+- Shared `toonzqt` Schematic Viewer panning, zooming, rubber-band gating, and
+  double-click fit-scene hit testing now use `QtCompat` mouse-position helpers
+  instead of direct `QMouseEvent::pos()` calls.
+- Shared `toonzqt` Spreadsheet panel panning, cell hit testing, and auto-pan
+  edge tracking now use `QtCompat` mouse-position helpers instead of direct
+  `QMouseEvent::pos()` calls.
+- Shared `toonzqt` Style Editor color wheels, color sliders, parameter chips,
+  and style chooser chip hit testing now use `QtCompat` mouse-position helpers
+  instead of direct `QMouseEvent::pos()` calls.
+- `toonz` Custom Panel scroller drag thresholds now use `QtCompat`
+  mouse-position helpers instead of direct `QMouseEvent::pos()` calls.
+- `toonz` room tab selection, reordering, and rename activation now use
+  `QtCompat` mouse-position helpers instead of direct `QMouseEvent::pos()`
+  calls.
+- `toonz` History pane undo/redo row selection now uses `QtCompat`
+  mouse-position helpers instead of direct `QMouseEvent::pos()` calls.
+- `toonz` Camera Capture histogram range dragging now uses `QtCompat`
+  mouse-position helpers instead of direct `QMouseEvent::pos()` calls.
+- `toonz` Camera Track and Xsheet PDF export preview panning now use
+  `QtCompat` mouse-position helpers instead of direct `QMouseEvent::pos()`
+  calls.
+- `toonz` Cleanup and Separate Colors swatch panning now use `QtCompat`
+  mouse-position helpers instead of direct `QMouseEvent::pos()` calls.
+- `toonz` Color Model picking now uses `QtCompat` mouse-position helpers
+  instead of direct `QMouseEvent::pos()` calls.
+- `toonz` Brush Preset item drag initiation and hotspot placement now use
+  `QtCompat` mouse-position helpers instead of direct `QMouseEvent::pos()`
+  calls.
+- `toonz` Command Bar command-list hit testing now uses `QtCompat`
+  mouse-position helpers instead of direct `QMouseEvent::pos()` calls.
+- `toonz` Ruler guide creation, movement, deletion, and hover hit testing now
+  use `QtCompat` mouse-position helpers instead of direct `QMouseEvent::pos()`
+  calls.
+- `toonz` Board Settings item hover and drag geometry now use `QtCompat`
+  mouse-position helpers instead of direct `QMouseEvent::pos()` calls.
+- `toonz` floating panel title-bar close-button hover and click hit testing now
+  uses `QtCompat` mouse-position helpers instead of direct
+  `QMouseEvent::pos()` calls.
+- `toonz` Startup scene-list hover hit testing now uses `QtCompat`
+  mouse-position helpers instead of direct `QMouseEvent::pos()` calls.
 - Shared `toonzqt` tree item hit testing, drag dispatch, context-menu
   placement, and tone-curve control-point editing now use `QtCompat`
   mouse-position helpers instead of direct `QMouseEvent::pos()` /
   `globalPos()` calls.
+- `toonz` `DvItemViewer` item selection, play-button hit testing,
+  middle-button panning, drag initiation, rename activation, and table-column
+  resize tracking now use `QtCompat` mouse-position helpers instead of direct
+  `QMouseEvent::pos()` / `globalPos()` calls.
+- `toonz` Xsheet keyframe mover click/drag cell mapping now uses `QtCompat`
+  mouse-position helpers instead of direct `QMouseEvent::pos()` calls.
+- `toonz` Pencil Test sub-camera handle hit testing and drag resizing now use
+  `QtCompat` mouse-position helpers instead of direct `QMouseEvent::pos()`
+  calls in both active camera widget implementations.
+- `toonz` Pencil Test capture image orientation flips now use
+  `QImage::flipped()` on Qt 6 while preserving the existing `mirrored()` path
+  on Qt 5.
+- `toonz` Filmstrip frame double-click selection, press selection, navigator
+  panning initiation, inbetween-button hit testing, drag/drop arming,
+  drag-select, auto-pan edge tracking, and inbetween tooltip hover checks now
+  use `QtCompat` mouse-position helpers instead of direct `QMouseEvent::pos()`
+  / `globalPos()` calls.
+- `tnztools` Screen Picker screen-rectangle press, drag, and release geometry
+  now uses `QtCompat` mouse-position helpers instead of direct
+  `QMouseEvent::pos()` calls.
+- `toonz` Image Viewer panning, color picking, and loadbox/zoom drag setup now
+  use `QtCompat` mouse-position helpers instead of direct `QMouseEvent::pos()`,
+  `localPos()`, and `windowPos()` calls.
 - `SceneViewer` mouse/tablet event initialization, tablet context-menu
   delivery, tablet hover-edge handling, and mouse double-click mapping now use
   `QtCompat` mouse/tablet position helpers instead of direct Qt 5-era event

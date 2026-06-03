@@ -10,6 +10,7 @@
 #include "custompanelmanager.h"
 
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/preferences.h"
@@ -860,7 +861,7 @@ void TPanelTitleBar::leaveEvent(QEvent *) {
 void TPanelTitleBar::mousePressEvent(QMouseEvent *event) {
   auto *dw = static_cast<TDockWidget *>(parentWidget());
 
-  const QPoint pos = event->pos();
+  const QPoint pos = QtCompat::mouseEventPosition(event);
 
   if (dw->isFloating()) {
     const QRect rect = this->rect();
@@ -882,7 +883,7 @@ void TPanelTitleBar::mouseMoveEvent(QMouseEvent *event) {
   auto *dw = static_cast<TDockWidget *>(parentWidget());
 
   if (dw->isFloating()) {
-    const QPoint pos = event->pos();
+    const QPoint pos = QtCompat::mouseEventPosition(event);
     const QRect rect = this->rect();
     const QRect closeButtonRect(rect.right() - 18, rect.top() + 1, 18, 18);
 

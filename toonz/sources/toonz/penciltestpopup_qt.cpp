@@ -15,6 +15,7 @@
 #include "toonzqt/filefield.h"
 #include "toonzqt/intfield.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 // Tnzlib includes
 #include "toonz/tproject.h"
@@ -726,9 +727,10 @@ void MyVideoWidget::drawSubCamera(QPainter& p) {
 
 void MyVideoWidget::mouseMoveEvent(QMouseEvent* event) {
   int d = 10;
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
 
   auto isNearBy = [&](QPoint handlePos) -> bool {
-    return (handlePos - event->pos()).manhattanLength() <= d * 2;
+    return (handlePos - eventPos).manhattanLength() <= d * 2;
   };
 
   auto isNearEdge = [&](int handlePos, int mousePos) -> bool {
@@ -742,9 +744,9 @@ void MyVideoWidget::mouseMoveEvent(QMouseEvent* event) {
   if (event->buttons() == Qt::NoButton) {
     QRect vidSubRect    = m_surface->transform().mapRect(m_subCameraRect);
     SUBHANDLE preHandle = m_activeSubHandle;
-    if (!vidSubRect.adjusted(-d, -d, d, d).contains(event->pos()))
+    if (!vidSubRect.adjusted(-d, -d, d, d).contains(eventPos))
       m_activeSubHandle = HandleNone;
-    else if (vidSubRect.adjusted(d, d, -d, -d).contains(event->pos()))
+    else if (vidSubRect.adjusted(d, d, -d, -d).contains(eventPos))
       m_activeSubHandle = HandleFrame;
     else if (isNearBy(vidSubRect.topLeft()))
       m_activeSubHandle = HandleTopLeft;
@@ -754,13 +756,13 @@ void MyVideoWidget::mouseMoveEvent(QMouseEvent* event) {
       m_activeSubHandle = HandleBottomLeft;
     else if (isNearBy(vidSubRect.bottomRight()))
       m_activeSubHandle = HandleBottomRight;
-    else if (isNearEdge(vidSubRect.left(), event->pos().x()))
+    else if (isNearEdge(vidSubRect.left(), eventPos.x()))
       m_activeSubHandle = HandleLeft;
-    else if (isNearEdge(vidSubRect.top(), event->pos().y()))
+    else if (isNearEdge(vidSubRect.top(), eventPos.y()))
       m_activeSubHandle = HandleTop;
-    else if (isNearEdge(vidSubRect.right(), event->pos().x()))
+    else if (isNearEdge(vidSubRect.right(), eventPos.x()))
       m_activeSubHandle = HandleRight;
-    else if (isNearEdge(vidSubRect.bottom(), event->pos().y()))
+    else if (isNearEdge(vidSubRect.bottom(), eventPos.y()))
       m_activeSubHandle = HandleBottom;
     else
       m_activeSubHandle = HandleNone;
@@ -805,7 +807,7 @@ void MyVideoWidget::mouseMoveEvent(QMouseEvent* event) {
     int minimumSize = 100;
 
     QPoint offset =
-        m_surface->transform().inverted().map(event->pos()) - m_dragStartPos;
+        m_surface->transform().inverted().map(eventPos) - m_dragStartPos;
     if (m_activeSubHandle >= HandleTopLeft &&
         m_activeSubHandle <= HandleBottomRight) {
       QSize offsetSize = m_preSubCameraRect.size();
@@ -871,7 +873,8 @@ void MyVideoWidget::mousePressEvent(QMouseEvent* event) {
 
   // record the original sub camera size
   m_preSubCameraRect = m_subCameraRect;
-  m_dragStartPos     = m_surface->transform().inverted().map(event->pos());
+  m_dragStartPos =
+      m_surface->transform().inverted().map(QtCompat::mouseEventPosition(event));
 
   // temporary stop the camera
   emit stopCamera();
@@ -2215,7 +2218,14 @@ void PencilTestPopup::onFrameCaptured(QImage& image) {
         QVideoSurfaceFormat::BottomToTop;
     bool upsideDown = m_upsideDownCB->isChecked();
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    Qt::Orientations flipOrientations = Qt::Orientations();
+    if (upsideDown) flipOrientations |= Qt::Horizontal;
+    if (upsideDown != scanBtoT) flipOrientations |= Qt::Vertical;
+    image = image.flipped(flipOrientations);
+#else
     image = image.mirrored(upsideDown, upsideDown != scanBtoT);
+#endif
 
     if (importImage(image)) {
       m_videoWidget->setPreviousImage(image.copy());
@@ -2689,7 +2699,11 @@ bool PencilTestPopup::importImage(QImage image) {
   TPointD levelDpi = sl->getDpi();
   /* create the raster */
   TRaster32P raster(image.width(), image.height());
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  convertImageToRaster(raster, image.flipped(Qt::Horizontal | Qt::Vertical));
+#else
   convertImageToRaster(raster, image.mirrored(true, true));
+#endif
 
   TRasterImageP ri(raster);
   ri->setDpi(levelDpi.x, levelDpi.y);

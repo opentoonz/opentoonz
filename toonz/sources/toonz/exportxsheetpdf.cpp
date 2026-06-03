@@ -13,6 +13,7 @@
 #include "toonzqt/filefield.h"
 #include "toonzqt/colorfield.h"
 #include "toonzqt/intfield.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/tscenehandle.h"
@@ -383,14 +384,14 @@ void doDrawText(QPainter& p, const QString& str, const QRect rect) {
   QFontMetrics fm(p.font());
   int spaceWidth = fm.boundingRect('A').width();
   // check if spaces can be iserted between letters
-  int textWidth = fm.boundingRect(str).width() + spaceWidth * (str.count() - 1);
+  int textWidth = fm.boundingRect(str).width() + spaceWidth * (str.size() - 1);
   if (rect.width() - spaceWidth * 2 <= textWidth) {
     p.drawText(rect, Qt::AlignCenter, str);
     return;
   }
   // check if spaces can be doubled
   int textWidth_s2 =
-      fm.boundingRect(str).width() + spaceWidth * 2 * (str.count() - 1);
+      fm.boundingRect(str).width() + spaceWidth * 2 * (str.size() - 1);
   if (rect.width() - spaceWidth * 4 > textWidth_s2) textWidth = textWidth_s2;
   QRect textRect(rect.center().x() - textWidth / 2, rect.y(), textWidth,
                  rect.height());
@@ -1226,7 +1227,7 @@ void XSheetPDFTemplate::drawDialogue(QPainter& painter, int framePage) {
 
       QString text = cell.getSoundTextLevel()->getFrameText(
           cell.m_frameId.getNumber() - 1);
-      int textCount = text.count();
+      int textCount = text.size();
       // separate text if it overflows the body
       if (row < drawStart) {
         int partialBlockLength = rowTo - drawStart + 1;
@@ -1804,14 +1805,15 @@ void XsheetPdfPreviewPane::fitScaleTo(QSize size) {
 
 //-----------------------------------------------------------------------------
 void XsheetPdfPreviewArea::mousePressEvent(QMouseEvent* e) {
-  m_mousePos = e->pos();
+  m_mousePos = QtCompat::mouseEventPosition(e);
 }
 
 void XsheetPdfPreviewArea::mouseMoveEvent(QMouseEvent* e) {
-  QPoint d = m_mousePos - e->pos();
+  QPoint pos = QtCompat::mouseEventPosition(e);
+  QPoint d   = m_mousePos - pos;
   horizontalScrollBar()->setValue(horizontalScrollBar()->value() + d.x());
   verticalScrollBar()->setValue(verticalScrollBar()->value() + d.y());
-  m_mousePos = e->pos();
+  m_mousePos = pos;
 }
 
 void XsheetPdfPreviewArea::contextMenuEvent(QContextMenuEvent* event) {
@@ -2612,7 +2614,11 @@ void ExportXsheetPdfPopup::onExport() {
 
   QFile pdfFile(fp.getQString());
 
-  pdfFile.open(QIODevice::WriteOnly);
+  if (!pdfFile.open(QIODevice::WriteOnly)) {
+    DVGui::MsgBoxInPopup(DVGui::CRITICAL,
+                         tr("Failed to open %1.").arg(fp.getQString()));
+    return;
+  }
   QPdfWriter writer(&pdfFile);
 
   initTemplate();
