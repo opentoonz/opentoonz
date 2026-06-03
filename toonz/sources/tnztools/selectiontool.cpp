@@ -172,7 +172,7 @@ FourPoints DragSelectionTool::FourPoints::enlarge(double d) {
 
 //-----------------------------------------------------------------------------
 
-DVAPI bool DragSelectionTool::FourPoints::isEmpty() {
+bool DragSelectionTool::FourPoints::isEmpty() {
   return ((getP00().x == getP01().x && getP01().x == getP10().x &&
            getP10().x == getP11().x) ||
           (getP00().y == getP01().y && getP01().y == getP10().y &&
@@ -205,7 +205,7 @@ bool DragSelectionTool::FourPoints::contains(TPointD p) {
 
 //-----------------------------------------------------------------------------
 
-DVAPI TRectD DragSelectionTool::FourPoints::getBox() const {
+TRectD DragSelectionTool::FourPoints::getBox() const {
   double x0 = std::min({getP00().x, getP10().x, getP01().x, getP11().x});
   double y0 = std::min({getP00().y, getP10().y, getP01().y, getP11().y});
   double x1 = std::max({getP00().x, getP10().x, getP01().x, getP11().x});
@@ -878,7 +878,7 @@ void SelectionTool::clearDeformers() { clearPointerContainer(m_freeDeformers); }
 
 //-----------------------------------------------------------------------------
 
-DVAPI TPointD SelectionTool::getCenter(int index) const {
+TPointD SelectionTool::getCenter(int index) const {
   if (m_centers.empty()) return TPointD();
   assert((int)m_centers.size() > index);
   return m_centers[index];
@@ -894,11 +894,11 @@ void SelectionTool::setCenter(const TPointD &center, int index) {
 
 //-----------------------------------------------------------------------------
 
-DVAPI int SelectionTool::getBBoxsCount() const { return m_bboxs.size(); }
+int SelectionTool::getBBoxsCount() const { return m_bboxs.size(); }
 
 //-----------------------------------------------------------------------------
 
-DVAPI DragSelectionTool::FourPoints SelectionTool::getBBox(int index) const {
+DragSelectionTool::FourPoints SelectionTool::getBBox(int index) const {
   if (m_bboxs.empty()) return DragSelectionTool::FourPoints();
   assert((int)m_bboxs.size() > index);
   return m_bboxs[index];
