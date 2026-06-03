@@ -358,7 +358,8 @@ macOS already covered:
 - The current arm64 bundle check passes.
 - The `qt6-experimental` GitHub Actions workflow builds a Qt 6 macOS arm64 DMG
   artifact and publishes it to the `qt6-experimental` prerelease when that tag
-  is pushed.
+  is pushed. `mise run release-qt6-experimental` retags the current clean branch
+  and pushes the tag to refresh that rolling prerelease.
 
 macOS still needed:
 

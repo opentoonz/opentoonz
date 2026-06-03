@@ -62,7 +62,8 @@ branch.
   experimental Qt 6 binary artifacts for Linux, Windows, and macOS. It runs on
   the `qt6-experimental` tag or manual dispatch, labels artifacts with
   `qt6-experimental`, and publishes a prerelease with that tag when the tag
-  trigger is used.
+  trigger is used. `mise run release-qt6-experimental` retags the current clean
+  branch and pushes the tag to refresh that rolling prerelease.
 - The Qt 5 app target links with
   `cmake --build toonz/build/nix-relwithdebinfo --target OpenToonz --parallel`.
 - The Qt 6 app target links with

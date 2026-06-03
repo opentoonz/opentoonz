@@ -68,7 +68,7 @@ jobs:
           build_dir="$PWD/toonz/build/qt6-experimental-linux"
           appdir="$build_dir/appdir"
           artifact_dir="$build_dir/artifact"
-          artifact_name="OpenToonz-${QT6_EXPERIMENTAL_LABEL}-linux-x86_64-${GITHUB_SHA}"
+          artifact_name="OpenToonz-${QT6_EXPERIMENTAL_LABEL}-linux-x86_64"
 
           cmake --install "$build_dir" --prefix "$appdir/usr"
 
@@ -112,8 +112,8 @@ jobs:
 
       - uses: actions/upload-artifact@v6
         with:
-          name: OpenToonz-${{ env.QT6_EXPERIMENTAL_LABEL }}-linux-x86_64-${{ github.sha }}
-          path: toonz/build/qt6-experimental-linux/OpenToonz-${{ env.QT6_EXPERIMENTAL_LABEL }}-linux-x86_64-${{ github.sha }}.tar.gz
+          name: OpenToonz-${{ env.QT6_EXPERIMENTAL_LABEL }}-linux-x86_64
+          path: toonz/build/qt6-experimental-linux/OpenToonz-${{ env.QT6_EXPERIMENTAL_LABEL }}-linux-x86_64.tar.gz
 
   Windows:
     name: Windows x64
@@ -218,7 +218,7 @@ jobs:
 
       - name: Create artifact
         run: |
-          $artifactName = "OpenToonz-${env:QT6_EXPERIMENTAL_LABEL}-windows-x64-${env:GITHUB_SHA}"
+          $artifactName = "OpenToonz-${env:QT6_EXPERIMENTAL_LABEL}-windows-x64"
           New-Item -ItemType Directory -Path $artifactName | Out-Null
           Copy-Item -Recurse -Force toonz\build\Opentoonz "$artifactName\OpenToonz"
           Compress-Archive -Path "$artifactName\*" -DestinationPath "$artifactName.zip"
@@ -227,8 +227,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v6
         with:
-          name: OpenToonz-${{ env.QT6_EXPERIMENTAL_LABEL }}-windows-x64-${{ github.sha }}
-          path: OpenToonz-${{ env.QT6_EXPERIMENTAL_LABEL }}-windows-x64-${{ github.sha }}.zip
+          name: OpenToonz-${{ env.QT6_EXPERIMENTAL_LABEL }}-windows-x64
+          path: OpenToonz-${{ env.QT6_EXPERIMENTAL_LABEL }}-windows-x64.zip
 
   macOS:
     name: macOS Apple Silicon arm64
@@ -279,7 +279,7 @@ jobs:
 
       - name: Create artifact
         run: |
-          artifact_name="OpenToonz-${QT6_EXPERIMENTAL_LABEL}-macos-arm64-${GITHUB_SHA}"
+          artifact_name="OpenToonz-${QT6_EXPERIMENTAL_LABEL}-macos-arm64"
           artifact_dir="toonz/build/qt6-experimental-macos"
           mkdir -p "$artifact_dir"
           cp toonz/build/nix-qt6-relwithdebinfo/toonz/OpenToonz.dmg "$artifact_dir/$artifact_name.dmg"
@@ -287,8 +287,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v6
         with:
-          name: OpenToonz-${{ env.QT6_EXPERIMENTAL_LABEL }}-macos-arm64-${{ github.sha }}
-          path: toonz/build/qt6-experimental-macos/OpenToonz-${{ env.QT6_EXPERIMENTAL_LABEL }}-macos-arm64-${{ github.sha }}.dmg
+          name: OpenToonz-${{ env.QT6_EXPERIMENTAL_LABEL }}-macos-arm64
+          path: toonz/build/qt6-experimental-macos/OpenToonz-${{ env.QT6_EXPERIMENTAL_LABEL }}-macos-arm64.dmg
 
   publish-release:
     name: Publish qt6-experimental prerelease
@@ -314,6 +314,15 @@ jobs:
               --prerelease \
               --notes "Experimental Qt 6 binary builds. These are not release-quality OpenToonz builds."
           fi
+
+          gh release view "${QT6_EXPERIMENTAL_LABEL}" --json assets --jq '.assets[].name' |
+            while IFS= read -r asset_name; do
+              case "${asset_name}" in
+                OpenToonz-${QT6_EXPERIMENTAL_LABEL}-*)
+                  gh release delete-asset "${QT6_EXPERIMENTAL_LABEL}" "${asset_name}" --yes
+                  ;;
+              esac
+            done
 
           find dist -type f -print0 |
             while IFS= read -r -d '' artifact; do
