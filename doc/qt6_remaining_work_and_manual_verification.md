@@ -200,7 +200,9 @@ Still needed:
   remaining legacy event-coordinate accessors outside the completed
   SceneViewer, Function Panel, and shared-widget slices and the broader OpenGL
   warning field.
-- Add or wire CI coverage for the Qt 6 lane on macOS, Linux, and Windows.
+- Promote the new `qt6-experimental` binary-build workflow into release-quality
+  Qt 6 CI coverage once its platform artifacts and deployment behavior are
+  validated.
 - Make any remaining Qt 5 specific setup in documentation conditional or
   clearly marked as Qt 5 only.
 
@@ -354,6 +356,9 @@ macOS already covered:
 - Qt 6 multimedia and SVG/icon plugins are included.
 - Qt plugin framework references are rewritten into the bundle.
 - The current arm64 bundle check passes.
+- The `qt6-experimental` GitHub Actions workflow builds a Qt 6 macOS arm64 DMG
+  artifact and publishes it to the `qt6-experimental` prerelease when that tag
+  is pushed.
 
 macOS still needed:
 
@@ -366,15 +371,18 @@ macOS still needed:
 
 Windows still needed:
 
-- Add a Qt 6 Windows CI lane.
-- Replace the custom Qt 5.15.2 WinTab package strategy with a Qt 6 strategy.
-- Re-audit `windeployqt` arguments and plugin output.
+- Validate the new `qt6-experimental` Windows x64 binary workflow on GitHub
+  Actions.
+- Re-audit the Qt 6 `aqtinstall` module list, `windeployqt` arguments, and
+  plugin output.
 - Validate OpenGL, tablet/stylus, camera, audio, and file associations.
 
 Linux still needed:
 
-- Add an Ubuntu Qt 6 CI lane.
-- Audit Qt 6 package names and plugin package coverage.
+- Validate the new `qt6-experimental` Linux x86_64 AppImage workflow on GitHub
+  Actions.
+- Audit the Qt 6 `aqtinstall` module list, AppImage bundling, and plugin
+  coverage.
 - Validate X11 and Wayland behavior separately.
 - Re-test deployment tooling, runtime library paths, multimedia backends, and
   OpenGL behavior.

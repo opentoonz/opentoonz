@@ -57,6 +57,12 @@ branch.
 - `OPENTOONZ_QT_MAJOR` exists and defaults to the Qt 5 lane.
 - Qt target, MOC, resource, and translation command selection is centralized.
 - Nix, CMake presets, and mise tasks include a Qt 6 lane next to the Qt 5 lane.
+- A dedicated GitHub Actions workflow,
+  `.github/workflows/workflow_qt6_experimental_binaries.yml`, builds
+  experimental Qt 6 binary artifacts for Linux, Windows, and macOS. It runs on
+  the `qt6-experimental` tag or manual dispatch, labels artifacts with
+  `qt6-experimental`, and publishes a prerelease with that tag when the tag
+  trigger is used.
 - The Qt 5 app target links with
   `cmake --build toonz/build/nix-relwithdebinfo --target OpenToonz --parallel`.
 - The Qt 6 app target links with
@@ -1972,7 +1978,8 @@ dependency order:
 8. Finish Qt 6 viewer/rendering parity first, then revisit the Metal migration
    as a separate follow-up using the Qt 6-stabilized rendering behavior as the
    baseline.
-9. Add Qt 6 packaging lanes for macOS, Linux, and Windows.
+9. Harden the experimental Qt 6 binary packaging workflow into release-quality
+   packaging lanes for macOS, Linux, and Windows.
 10. Remove or reduce transitional `Core5Compat` usage after equivalent Qt 6
     APIs are in place.
 

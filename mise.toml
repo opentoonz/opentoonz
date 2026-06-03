@@ -546,6 +546,10 @@ run = "OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 bash scripts/qt6/run-all-script-smo
 description = "Create a DMG from the Nix-built macOS app bundle."
 run = "nix develop path:. --command bash scripts/macos/create-dmg.sh"
 
+[tasks.dmg-macos-qt6]
+description = "Create a DMG from the Nix-built Qt 6 macOS app bundle."
+run = "nix develop path:.#qt6 --command bash -lc 'OPENTOONZ_APP=toonz/build/nix-qt6-relwithdebinfo/toonz/OpenToonz.app bash scripts/macos/create-dmg.sh'"
+
 [tasks.check]
 description = "Run the flake configure check and whitespace validation."
 run = "nix flake check path:. && git diff --check"

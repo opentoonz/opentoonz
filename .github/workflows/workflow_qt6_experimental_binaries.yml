@@ -1,0 +1,321 @@
+name: Qt 6 Experimental Binary Builds
+
+on:
+  push:
+    tags:
+      - qt6-experimental
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  QT6_EXPERIMENTAL_LABEL: qt6-experimental
+  QT6_EXPERIMENTAL_QT_VERSION: 6.9.3
+
+jobs:
+  Linux:
+    name: Linux x86_64 AppImage
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake pkg-config ninja-build ccache python3-pip wget libboost-all-dev libsuperlu-dev liblz4-dev libusb-1.0-0-dev liblzo2-dev libpng-dev libjpeg-dev libglew-dev freeglut3-dev libfreetype6-dev libjson-c-dev libmypaint-dev libopencv-dev libturbojpeg-dev libomp-dev libfuse2 libxcb-cursor0 libxcb-xinerama0 libxcb-xinput0 libxkbcommon-x11-0
+
+      - name: Install Qt 6
+        run: |
+          python3 -m pip install --user aqtinstall
+          python3 -m aqt install-qt linux desktop "${QT6_EXPERIMENTAL_QT_VERSION}" linux_gcc_64 -O "$PWD/Qt" -m qt5compat qtdeclarative qtmultimedia qtserialport qtsvg qttools
+
+      - name: Build libtiff
+        run: |
+          cd thirdparty/tiff-4.0.3
+          CFLAGS='-fPIC' CXXFLAGS='-fPIC' ./configure --disable-jbig
+          make -j "$(nproc)"
+
+      - name: Build OpenToonz with Qt 6
+        run: |
+          export QT_PATH="$PWD/Qt/${QT6_EXPERIMENTAL_QT_VERSION}/gcc_64"
+          export CMAKE_PREFIX_PATH="$QT_PATH/lib/cmake"
+          export CC="ccache gcc"
+          export CXX="ccache g++"
+          mkdir -p /home/runner/.ccache
+
+          cmake -S toonz/sources -B toonz/build/qt6-experimental-linux -G Ninja \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER=g++ \
+            -DCMAKE_C_COMPILER=gcc \
+            -DOPENTOONZ_QT_MAJOR=6 \
+            -DQT_PATH="$QT_PATH" \
+            -DQt6_DIR="$QT_PATH/lib/cmake/Qt6" \
+            -DCMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH" \
+            -DWITH_TRANSLATION=OFF
+          cmake --build toonz/build/qt6-experimental-linux --parallel
+
+      - name: Create AppImage artifact
+        run: |
+          export QT_PATH="$PWD/Qt/${QT6_EXPERIMENTAL_QT_VERSION}/gcc_64"
+          export PATH="$QT_PATH/bin:$PATH"
+          export QMAKE="$QT_PATH/bin/qmake6"
+          if [ ! -x "$QMAKE" ]; then
+            export QMAKE="$QT_PATH/bin/qmake"
+          fi
+
+          build_dir="$PWD/toonz/build/qt6-experimental-linux"
+          appdir="$build_dir/appdir"
+          artifact_dir="$build_dir/artifact"
+          artifact_name="OpenToonz-${QT6_EXPERIMENTAL_LABEL}-linux-x86_64-${GITHUB_SHA}"
+
+          cmake --install "$build_dir" --prefix "$appdir/usr"
+
+          cp "$appdir"/usr/share/applications/*.desktop "$appdir"
+          cp "$appdir"/usr/share/icons/hicolor/*/apps/*.png "$appdir"
+
+          mkdir "$artifact_dir"
+          mv "$appdir/usr/share/opentoonz/stuff" "$artifact_dir/portablestuff"
+          rmdir "$appdir/usr/share/opentoonz" || true
+
+          wget -q -c 'https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage'
+          wget -q -c 'https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage'
+          wget -q -c 'https://github.com/linuxdeploy/linuxdeploy-plugin-appimage/releases/download/continuous/linuxdeploy-plugin-appimage-x86_64.AppImage'
+          chmod 755 linuxdeploy-x86_64.AppImage
+          chmod 755 linuxdeploy-plugin-qt-x86_64.AppImage
+          chmod 755 linuxdeploy-plugin-appimage-x86_64.AppImage
+
+          cat << 'EOF' > apprun.sh
+          #!/usr/bin/env bash
+          exec "${APPDIR}/usr/bin/OpenToonz" "$@"
+          EOF
+          chmod 755 apprun.sh
+
+          export LD_LIBRARY_PATH="$QT_PATH/lib:$appdir/usr/lib/opentoonz:${LD_LIBRARY_PATH:-}"
+          ./linuxdeploy-x86_64.AppImage \
+            --appdir="$appdir" \
+            --plugin=qt \
+            --output=appimage \
+            --custom-apprun=apprun.sh \
+            --executable="$appdir/usr/bin/lzocompress" \
+            --executable="$appdir/usr/bin/lzodecompress" \
+            --executable="$appdir/usr/bin/tcleanup" \
+            --executable="$appdir/usr/bin/tcomposer" \
+            --executable="$appdir/usr/bin/tconverter" \
+            --executable="$appdir/usr/bin/tfarmcontroller" \
+            --executable="$appdir/usr/bin/tfarmserver"
+
+          mv OpenToonz*.AppImage "$artifact_dir/OpenToonz-${QT6_EXPERIMENTAL_LABEL}.AppImage"
+          mv "$artifact_dir" "$build_dir/$artifact_name"
+          tar -C "$build_dir" -czf "$build_dir/$artifact_name.tar.gz" "$artifact_name"
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: OpenToonz-${{ env.QT6_EXPERIMENTAL_LABEL }}-linux-x86_64-${{ github.sha }}
+          path: toonz/build/qt6-experimental-linux/OpenToonz-${{ env.QT6_EXPERIMENTAL_LABEL }}-linux-x86_64-${{ github.sha }}.tar.gz
+
+  Windows:
+    name: Windows x64
+    runs-on: windows-2025
+    timeout-minutes: 180
+    env:
+      QT_PATH: ${{ github.workspace }}\Qt\6.9.3\msvc2022_64
+      MSVCVERSION: "Visual Studio 17 2022"
+      BOOST_TOOLSET: "14.3"
+      BOOST_VERSION: "1.87.0"
+      BOOST_ROOT: C:\local\boost_1_87_0
+      OPENCV_VERSION: "4.13.0"
+      OpenCV_DIR: C:\tools\opencv\build
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          lfs: false
+
+      - name: Cache OpenCV and Boost
+        id: cache-deps
+        uses: actions/cache@v5
+        with:
+          path: |
+            C:\tools\opencv
+            ${{ env.BOOST_ROOT }}
+          key: ${{ runner.os }}-opencv-boost-${{ env.OPENCV_VERSION }}-boost-${{ env.BOOST_VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-opencv-boost-${{ env.OPENCV_VERSION }}-boost-
+
+      - name: Install OpenCV and Boost if cache is missing
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: |
+          @echo on
+          choco install opencv --version=${{ env.OPENCV_VERSION }} -y
+          choco install boost-msvc-${{ env.BOOST_TOOLSET }} --version=${{ env.BOOST_VERSION }} -y
+        shell: cmd
+
+      - name: Install Qt 6
+        run: |
+          @echo on
+          py -m pip install aqtinstall
+          py -m aqt install-qt windows desktop %QT6_EXPERIMENTAL_QT_VERSION% win64_msvc2022_64 -O "%GITHUB_WORKSPACE%\Qt" -m qt5compat qtdeclarative qtmultimedia qtserialport qtsvg qttools
+        shell: cmd
+
+      - name: Install third-party prebuilt libs
+        run: |
+          @echo on
+          curl -fsSL -o thirdparty-libs.zip https://github.com/andeon/opentoonz-thirdparty-libs/releases/download/prebuilt-libs-v1/thirdparty-libs.zip
+          7z x -y thirdparty-libs.zip
+        shell: cmd
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v3
+
+      - name: CMake configuration
+        run: |
+          @echo on
+          cd thirdparty
+          copy /Y tiff-4.0.3\libtiff\tif_config.vc.h tiff-4.0.3\libtiff\tif_config.h
+          copy /Y tiff-4.0.3\libtiff\tiffconf.vc.h tiff-4.0.3\libtiff\tiffconf.h
+          copy /Y libpng-1.6.21\scripts\pnglibconf.h.prebuilt libpng-1.6.21\pnglibconf.h
+
+          cd ../toonz
+          rmdir /S /Q build
+          mkdir build
+          cd build
+
+          cmake ..\sources -G "%MSVCVERSION%" -Ax64 -DOPENTOONZ_QT_MAJOR=6 -DQT_PATH="%QT_PATH%" -DQt6_DIR="%QT_PATH%\lib\cmake\Qt6" -DBOOST_ROOT="%BOOST_ROOT%" -DOpenCV_DIR="%OpenCV_DIR%" -DWITH_TRANSLATION=OFF
+        shell: cmd
+
+      - name: Build OpenToonz
+        run: |
+          @echo on
+          cd toonz\build
+          msbuild /p:Configuration=RelWithDebInfo /m /verbosity:minimal ALL_BUILD.vcxproj
+        shell: cmd
+
+      - name: Create package
+        run: |
+          @echo on
+          cd toonz\build
+
+          mkdir Opentoonz
+          copy /Y RelWithDebInfo\*.* Opentoonz\
+          copy /Y ..\..\thirdparty\glut\3.7.6\lib\glut64.dll Opentoonz
+          copy /Y ..\..\thirdparty\glew\glew-1.9.0\bin\64bit\glew32.dll Opentoonz
+          copy /Y ..\..\thirdparty\libmypaint\dist\64\libiconv-2.dll Opentoonz
+          copy /Y ..\..\thirdparty\libmypaint\dist\64\libintl-8.dll Opentoonz
+          copy /Y ..\..\thirdparty\libmypaint\dist\64\libjson-c-2.dll Opentoonz
+          copy /Y ..\..\thirdparty\libmypaint\dist\64\libmypaint-1-4-0.dll Opentoonz
+          copy /Y "C:\tools\opencv\build\x64\vc16\bin\opencv_world4130.dll" Opentoonz
+
+          "%QT_PATH%\bin\windeployqt.exe" Opentoonz\Opentoonz.exe --opengl --compiler-runtime
+
+          del /Q Opentoonz\*.pdb
+          del /Q Opentoonz\vc_redist.x64.exe
+
+          mkdir Opentoonz\portablestuff
+          xcopy /Y /E /I ..\..\stuff .\Opentoonz\portablestuff
+        shell: cmd
+
+      - name: Create artifact
+        run: |
+          $artifactName = "OpenToonz-${env:QT6_EXPERIMENTAL_LABEL}-windows-x64-${env:GITHUB_SHA}"
+          New-Item -ItemType Directory -Path $artifactName | Out-Null
+          Copy-Item -Recurse -Force toonz\build\Opentoonz "$artifactName\OpenToonz"
+          Compress-Archive -Path "$artifactName\*" -DestinationPath "$artifactName.zip"
+        shell: pwsh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: OpenToonz-${{ env.QT6_EXPERIMENTAL_LABEL }}-windows-x64-${{ github.sha }}
+          path: OpenToonz-${{ env.QT6_EXPERIMENTAL_LABEL }}-windows-x64-${{ github.sha }}.zip
+
+  macOS:
+    name: macOS Apple Silicon arm64
+    runs-on: macos-15
+    timeout-minutes: 180
+    env:
+      OPENTOONZ_APP: toonz/build/nix-qt6-relwithdebinfo/toonz/OpenToonz.app
+      OPENTOONZ_DMG: toonz/build/nix-qt6-relwithdebinfo/toonz/OpenToonz.dmg
+      OPENTOONZ_REQUIRED_ARCH: arm64
+      OPENTOONZ_ALLOW_UNIVERSAL: '0'
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Install mise
+        uses: jdx/mise-action@v4
+        with:
+          install: false
+
+      - name: Confirm Apple Silicon runner
+        run: |
+          uname -a
+          test "$(uname -m)" = "arm64"
+
+      - name: Trust mise configuration
+        run: mise trust --yes ./mise.toml
+
+      - name: Check pinned Qt 6 toolchain
+        run: mise run doctor-qt6
+
+      - name: Build OpenToonz with Qt 6
+        run: mise run build-qt6
+
+      - name: Bundle Qt 6 app
+        run: mise run package-macos-qt6
+
+      - name: Verify arm64 Qt 6 bundle
+        run: mise run check-macos-arm64-qt6
+
+      - name: Create Qt 6 DMG
+        run: mise run dmg-macos-qt6
+
+      - name: Create artifact
+        run: |
+          artifact_name="OpenToonz-${QT6_EXPERIMENTAL_LABEL}-macos-arm64-${GITHUB_SHA}"
+          artifact_dir="toonz/build/qt6-experimental-macos"
+          mkdir -p "$artifact_dir"
+          cp toonz/build/nix-qt6-relwithdebinfo/toonz/OpenToonz.dmg "$artifact_dir/$artifact_name.dmg"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: OpenToonz-${{ env.QT6_EXPERIMENTAL_LABEL }}-macos-arm64-${{ github.sha }}
+          path: toonz/build/qt6-experimental-macos/OpenToonz-${{ env.QT6_EXPERIMENTAL_LABEL }}-macos-arm64-${{ github.sha }}.dmg
+
+  publish-release:
+    name: Publish qt6-experimental prerelease
+    runs-on: ubuntu-24.04
+    needs:
+      - Linux
+      - Windows
+      - macOS
+    if: github.ref == 'refs/tags/qt6-experimental'
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v6
+        with:
+          path: dist
+
+      - name: Create or update prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh release view "${QT6_EXPERIMENTAL_LABEL}" >/dev/null 2>&1; then
+            gh release create "${QT6_EXPERIMENTAL_LABEL}" \
+              --title "Qt 6 Experimental" \
+              --prerelease \
+              --notes "Experimental Qt 6 binary builds. These are not release-quality OpenToonz builds."
+          fi
+
+          find dist -type f -print0 |
+            while IFS= read -r -d '' artifact; do
+              gh release upload "${QT6_EXPERIMENTAL_LABEL}" "$artifact" --clobber
+            done
