@@ -17,6 +17,7 @@
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/selection.h"
 #include "toonzqt/stageobjectsdata.h"
+#include "toonzqt/qtcompat.h"
 #include "historytypes.h"
 
 // TnzLib includes
@@ -545,8 +546,8 @@ bool LevelMoverTool::canMoveColumns(const TPoint &pos) {
 
 void LevelMoverTool::onClick(const QMouseEvent *e) {
   const Orientation *o      = getViewer()->orientation();
-  QPoint pos                = e->pos();
-  CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
+  CellPosition cellPosition =
+      getViewer()->xyToPosition(QtCompat::mouseEventPosition(e));
   int row                   = cellPosition.frame();
   int col                   = cellPosition.layer();
   TXsheet *xsh              = getViewer()->getXsheet();
@@ -733,7 +734,8 @@ void LevelMoverTool::onCellChange(int row, int col) {
 }
 
 void LevelMoverTool::onDrag(const QMouseEvent *e) {
-  CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
+  CellPosition cellPosition =
+      getViewer()->xyToPosition(QtCompat::mouseEventPosition(e));
   onCellChange(cellPosition.frame(), cellPosition.layer());
   refreshCellsArea();
   refreshColumnsArea();

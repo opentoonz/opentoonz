@@ -1426,9 +1426,10 @@ void PageViewer::select(int indexInPage, QMouseEvent *event) {
   bool wasSelected = m_styleSelection->isSelected(pageIndex, indexInPage);
   if (event->modifiers() == Qt::NoModifier)
     m_styleSelection->selectNone();
-  else if (event->modifiers() == Qt::CTRL && wasSelected)
+  else if (event->modifiers() == Qt::ControlModifier && wasSelected)
     on = false;
-  else if (event->modifiers() == Qt::SHIFT && !m_styleSelection->isEmpty()) {
+  else if (event->modifiers() == Qt::ShiftModifier &&
+           !m_styleSelection->isEmpty()) {
     // premuto shift. la selezione si estende fino ai piu' vicini colori
     // selezionati (prima e dopo)
     // a e' b diventeranno gli estremi della selezione

@@ -1276,15 +1276,15 @@ void ImageViewer::wheelEvent(QWheelEvent *event) {
   switch (event->source()) {
   case Qt::MouseEventNotSynthesized: {
     if (event->modifiers() & Qt::AltModifier)
-      delta = event->angleDelta().x();
+      delta = QtCompat::wheelEventAngleDelta(event).x();
     else
-      delta = event->angleDelta().y();
+      delta = QtCompat::wheelEventAngleDeltaY(event);
     break;
   }
 
   case Qt::MouseEventSynthesizedBySystem: {
     QPoint numPixels  = event->pixelDelta();
-    QPoint numDegrees = event->angleDelta() / 8;
+    QPoint numDegrees = QtCompat::wheelEventAngleDelta(event) / 8;
     if (!numPixels.isNull()) {
       delta = event->pixelDelta().y();
     } else if (!numDegrees.isNull()) {

@@ -7,5 +7,8 @@ var printResult = print("qt-script-void", typeof voidGlobal,
                         voidGlobal !== undefined,
                         warningResult === voidGlobal);
 print("qt-script-print-return", printResult === voidGlobal);
+print("qt-script-dummy", dummy());
 var runResult = run("run_child.toonzscript");
 print("qt-script-run-result", runResult);
+print("qt-script-run-global", qtScriptRunChildGlobal,
+      qtScriptRunChildFunction());

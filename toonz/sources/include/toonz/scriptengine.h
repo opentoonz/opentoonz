@@ -41,6 +41,8 @@ class QScriptEngine;
 #else
 #include <QHash>
 class QJSEngine;
+class QJSValue;
+Q_MOC_INCLUDE("QJSValue")
 #endif
 
 class DVAPI ScriptCommand {
@@ -120,6 +122,8 @@ public:
 
   Q_INVOKABLE void emitScriptOutput(int type, const QString& value);
   Q_INVOKABLE QVariantMap readScriptFile(const QString& path);
+  Q_INVOKABLE QJSValue evaluateScriptContent(const QString& content,
+                                             const QString& path);
   Q_INVOKABLE QString runScriptFile(const QString& path);
   Q_INVOKABLE QString filePathToString(const QString& path) const;
   Q_INVOKABLE QString filePathExtension(const QString& path) const;

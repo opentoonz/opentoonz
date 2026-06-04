@@ -239,7 +239,7 @@ void SeparateSwatchArea::paintEvent(QPaintEvent *event) {
 void SeparateSwatchArea::wheelEvent(QWheelEvent *event) {
   if (!m_sw->m_mainSwatch || m_sw->m_lx == 0 || m_sw->m_ly == 0) return;
 
-  int step      = event->angleDelta().y() > 0 ? 120 : -120;
+  int step = QtCompat::wheelEventAngleDeltaY(event) > 0 ? 120 : -120;
   double factor = exp(0.001 * step);
   if (factor == 1.0) return;
   double scale   = m_sw->m_viewAff.det();

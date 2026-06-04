@@ -886,12 +886,13 @@ degli scrollbar.
 void SpreadsheetViewer::wheelEvent(QWheelEvent *event) {
   switch (event->source()) {
   case Qt::MouseEventNotSynthesized: {
-    if (event->angleDelta().x() == 0) {  // vertical scroll
-      int scrollPixels = (event->angleDelta().y() > 0 ? 1 : -1) *
+    const QPoint angleDelta = QtCompat::wheelEventAngleDelta(event);
+    if (angleDelta.x() == 0) {  // vertical scroll
+      int scrollPixels = (angleDelta.y() > 0 ? 1 : -1) *
                          m_markRowDistance * m_rowHeight;
       scroll(QPoint(0, -scrollPixels));
     } else {  // horizontal scroll
-      int scrollPixels = (event->angleDelta().x() > 0 ? 1 : -1) * m_columnWidth;
+      int scrollPixels = (angleDelta.x() > 0 ? 1 : -1) * m_columnWidth;
       scroll(QPoint(-scrollPixels, 0));
     }
     break;
@@ -900,7 +901,7 @@ void SpreadsheetViewer::wheelEvent(QWheelEvent *event) {
   case Qt::MouseEventSynthesizedBySystem:  // macbook touch-pad
   {
     QPoint numPixels  = event->pixelDelta();
-    QPoint numDegrees = event->angleDelta() / 8;
+    QPoint numDegrees = QtCompat::wheelEventAngleDelta(event) / 8;
     if (!numPixels.isNull()) {
       scroll(-numPixels);
     } else if (!numDegrees.isNull()) {

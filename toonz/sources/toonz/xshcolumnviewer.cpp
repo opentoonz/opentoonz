@@ -290,7 +290,7 @@ void MotionPathMenu::paintEvent(QPaintEvent *) {
 //-----------------------------------------------------------------------------
 
 void MotionPathMenu::mousePressEvent(QMouseEvent *event) {
-  m_pos                   = event->pos();
+  m_pos                   = QtCompat::mouseEventPosition(event);
   TStageObjectId objectId = TApp::instance()->getCurrentObject()->getObjectId();
   TStageObject *pegbar =
       TApp::instance()->getCurrentXsheet()->getXsheet()->getStageObject(
@@ -312,7 +312,7 @@ void MotionPathMenu::mousePressEvent(QMouseEvent *event) {
 //-----------------------------------------------------------------------------
 
 void MotionPathMenu::mouseMoveEvent(QMouseEvent *event) {
-  m_pos = event->pos();
+  m_pos = QtCompat::mouseEventPosition(event);
   update();
 }
 
@@ -377,7 +377,8 @@ void ChangeObjectWidget::setXsheetHandle(TXsheetHandle *xsheetHandle) {
 //-----------------------------------------------------------------------------
 
 void ChangeObjectWidget::mouseMoveEvent(QMouseEvent *event) {
-  QListWidgetItem *currentWidgetItem = itemAt(event->pos());
+  QListWidgetItem *currentWidgetItem =
+      itemAt(QtCompat::mouseEventPosition(event));
   if (!currentWidgetItem) return;
   clearSelection();
   currentWidgetItem->setSelected(true);
@@ -2097,7 +2098,9 @@ void ColumnTransparencyPopup::setColumn(TXshColumn *column) {
 
 /*void ColumnTransparencyPopup::mouseMoveEvent ( QMouseEvent * e )
 {
-        int val = tcrop((e->pos().x()+10)/(this->width()/(99-1+1)), 1, 99);
+        int val = tcrop((QtCompat::mouseEventPosition(e).x() + 10) /
+                            (this->width() / (99 - 1 + 1)),
+                        1, 99);
         m_value->setText(QString::number(val));
         m_slider->setValue(val);
 }*/
@@ -2305,7 +2308,7 @@ void ColumnArea::startTransparencyPopupTimer(QMouseEvent *e) {  // AREA
   if (!m_columnTransparencyPopup)
     m_columnTransparencyPopup = new ColumnTransparencyPopup(m_viewer, this);
 
-  m_columnTransparencyPopup->move(e->globalPos().x(), e->globalPos().y());
+  m_columnTransparencyPopup->move(QtCompat::mouseEventGlobalPosition(e));
 
   if (!m_transparencyPopupTimer) {
     m_transparencyPopupTimer = new QTimer(this);
@@ -2335,7 +2338,8 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
   if (event->button() == Qt::LeftButton || event->button() == Qt::RightButton) {
     TXsheet *xsh   = m_viewer->getXsheet();
     ColumnFan *fan = xsh->getColumnFan(o);
-    m_col          = m_viewer->xyToPosition(event->pos()).layer();
+    const QPoint eventPos = QtCompat::mouseEventPosition(event);
+    m_col                 = m_viewer->xyToPosition(eventPos).layer();
     // when clicking the column fan
     if (!fan->isActive(m_col))  // column Fan
     {
@@ -2355,9 +2359,9 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
 
     // get mouse position
     QPoint mouseInCell =
-        event->pos() - m_viewer->positionToXY(CellPosition(0, m_col));
-    // int x = event->pos().x() - m_viewer->columnToX(m_col);
-    // int y = event->pos().y();
+        eventPos - m_viewer->positionToXY(CellPosition(0, m_col));
+    // int x = eventPos.x() - m_viewer->columnToX(m_col);
+    // int y = eventPos.y();
     // QPoint mouseInCell(x, y);
     int x = mouseInCell.x(), y = mouseInCell.y();
 
@@ -2593,7 +2597,7 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
     update();
 
   } else if (event->button() == Qt::MiddleButton) {
-    m_pos       = event->pos();
+    m_pos       = QtCompat::mouseEventPosition(event);
     m_isPanning = true;
   }
 }
@@ -2604,7 +2608,7 @@ void ColumnArea::mouseMoveEvent(QMouseEvent *event) {
   const Orientation *o = m_viewer->orientation();
 
   m_viewer->setQtModifiers(event->modifiers());
-  QPoint pos = event->pos();
+  QPoint pos = QtCompat::mouseEventPosition(event);
 
   if (m_isPanning) {  // Pan tasto centrale
     QPoint delta = m_pos - pos;
@@ -2755,8 +2759,9 @@ void ColumnArea::mouseReleaseEvent(QMouseEvent *event) {
   if (m_doOnRelease != 0) {
     TXshColumn *column = xsh->getColumn(m_col);
     if (m_doOnRelease == OpenSettings) {
-      QPoint pos = event->pos();
+      QPoint pos = QtCompat::mouseEventPosition(event);
       int col    = m_viewer->xyToPosition(pos).layer();
+      QPoint globalPos = QtCompat::mouseEventGlobalPosition(event);
       // Align popup to be below to CONFIG button
       QRect configRect = m_viewer->orientation()->rect(
           (col < 0) ? PredefinedRect::CAMERA_CONFIG_AREA
@@ -2771,14 +2776,12 @@ void ColumnArea::mouseReleaseEvent(QMouseEvent *event) {
           configRect.bottom();  // distance from bottum edge of CONFIG button
 
       if (col < 0) {
-        openCameraColumnPopup(
-            QPoint(event->globalPos().x() + x, event->globalPos().y() - y));
+        openCameraColumnPopup(QPoint(globalPos.x() + x, globalPos.y() - y));
       } else if (column->getSoundColumn()) {
         if (!m_soundColumnPopup)
           m_soundColumnPopup = new SoundColumnPopup(this);
 
-        m_soundColumnPopup->move(event->globalPos().x() + x,
-                                 event->globalPos().y() - y);
+        m_soundColumnPopup->move(globalPos.x() + x, globalPos.y() - y);
 
         openSoundColumnPopup();
       } else {
@@ -2786,13 +2789,12 @@ void ColumnArea::mouseReleaseEvent(QMouseEvent *event) {
           m_columnTransparencyPopup =
               new ColumnTransparencyPopup(m_viewer, this);
 
-        m_columnTransparencyPopup->move(event->globalPos().x() + x,
-                                        event->globalPos().y() - y);
+        m_columnTransparencyPopup->move(globalPos.x() + x, globalPos.y() - y);
 
         // make sure the popup doesn't go off the screen to the right
         QRect screenRect = getScreenGeometry(app->getMainWindow());
 
-        int popupLeft  = event->globalPos().x() + x;
+        int popupLeft  = globalPos.x() + x;
         int popupRight = popupLeft + m_columnTransparencyPopup->width();
 
         // first condition checks if popup is on same monitor as main app;
@@ -2886,7 +2888,7 @@ void ColumnArea::mouseReleaseEvent(QMouseEvent *event) {
 void ColumnArea::mouseDoubleClickEvent(QMouseEvent *event) {
   const Orientation *o = m_viewer->orientation();
 
-  QPoint pos = event->pos();
+  QPoint pos = QtCompat::mouseEventPosition(event);
   int col    = m_viewer->xyToPosition(pos).layer();
   CellPosition cellPosition(0, col);
   QPoint topLeft     = m_viewer->positionToXY(cellPosition);
@@ -2917,21 +2919,23 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
      is shown, on linux and osx the release event is lost, never
      received by the widget */
   QMouseEvent fakeRelease = QtCompat::makeMouseEvent(
-      QEvent::MouseButtonRelease, event->pos(), event->globalPos(),
-      Qt::RightButton, Qt::NoButton, Qt::NoModifier);
+      QEvent::MouseButtonRelease, QtCompat::contextMenuEventPosition(event),
+      QtCompat::contextMenuEventGlobalPosition(event), Qt::RightButton,
+      Qt::NoButton, Qt::NoModifier);
 
   QApplication::instance()->sendEvent(this, &fakeRelease);
 #endif
   const Orientation *o = m_viewer->orientation();
 
-  int col = m_viewer->xyToPosition(event->pos()).layer();
+  QPoint eventPos = QtCompat::contextMenuEventPosition(event);
+  int col         = m_viewer->xyToPosition(eventPos).layer();
 
   bool isCamera = col < 0;
 
   m_viewer->setCurrentColumn(col);
   TXsheet *xsh       = m_viewer->getXsheet();
   QPoint topLeft     = m_viewer->positionToXY(CellPosition(0, col));
-  QPoint mouseInCell = event->pos() - topLeft;
+  QPoint mouseInCell = eventPos - topLeft;
 
   QMenu menu(this);
   CommandManager *cmdManager = CommandManager::instance();
@@ -3047,7 +3051,7 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
     menu.addAction(cmdManager->getAction(MI_ToggleXsheetBreadcrumbs));
 
     if (isCamera) {
-      menu.exec(event->globalPos());
+      menu.exec(QtCompat::contextMenuEventGlobalPosition(event));
       return;
     }
 
@@ -3123,7 +3127,7 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
     act4->setText(tr("&Paste Insert Above"));
   }
 
-  menu.exec(event->globalPos());
+  menu.exec(QtCompat::contextMenuEventGlobalPosition(event));
 
   act->setText(actText);
   act2->setText(act2Text);

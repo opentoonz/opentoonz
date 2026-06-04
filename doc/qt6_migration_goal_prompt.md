@@ -128,11 +128,14 @@ branch.
   thresholding, rename activation, tab dragging, tab rename activation,
   page-drop targeting, palette page context-menu placement, palette page
   tooltip placement, palette-icon drag thresholding, and save-toolbar drop hit
-  testing, plus Studio Palette tree drag thresholding and drop-target tracking,
-  also use `QtCompat` event-position helpers instead of direct Qt 5-era
-  local/global coordinate accessors. Schematic Viewer panning,
-  zooming, rubber-band gating, and double-click fit-scene hit testing also use
-  the same helpers. Spreadsheet panel panning, cell hit testing, and auto-pan
+  testing, plus Studio Palette tree drag thresholding, row hit testing,
+  context-menu placement, and drop-target tracking, also use `QtCompat`
+  event-position helpers instead of direct Qt 5-era local/global coordinate
+  accessors. Schematic Viewer panning,
+  zooming, rubber-band gating, double-click fit-scene hit testing, port
+  link-start geometry, group-editor title-bar hit testing, and FX/stage
+  schematic node rename double-click hit testing also use the same helpers.
+  Spreadsheet panel panning, cell hit testing, and auto-pan
   edge tracking now use the same helpers. Style Editor color wheels, color
   sliders, parameter chips, style chooser chip hit testing, style chooser
   context-menu placement, and style chooser tooltip placement now use the same
@@ -143,7 +146,8 @@ branch.
   Menu Bar customization tree, room tabs, panel title-bar Safe Area/Preview
   menus, Viewer panel show/hide menu, Brush Preset panel show/hide menu, Layer
   Footer frames-per-page menu, Farm Server list, Camera Track preview, Palette
-  Gizmo binding menu, Color Model viewer, and Xsheet PDF preview context-menu
+  Gizmo binding menu, Color Model viewer, task tree context-menu plumbing,
+  `DvItemViewer` context-menu placement, and Xsheet PDF preview context-menu
   placement now also route through the same context-menu helpers.
   Room tab selection, reordering, and rename activation now use the same
   helpers. History pane undo/redo row selection now uses the same helpers.
@@ -157,21 +161,38 @@ branch.
   click hit testing plus Startup scene-list hover hit testing plus
   `ToneCurveField` channel curve control-point editing plus `DvItemViewer`
   item selection, play-hit testing, middle-button panning, drag initiation,
-  rename activation, and table-column resize tracking plus Xsheet keyframe
-  mover click/drag cell mapping plus Pencil Test sub-camera handle hit testing
-  and drag resizing plus measured-value field middle-drag editing also use the
-  same helpers. Pencil Test capture image orientation flips now use Qt 6
+  rename activation, table-column resize tracking, and item tooltip placement
+  plus Xsheet keyframe mover click/drag cell mapping plus Pencil Test
+  sub-camera handle hit testing and drag resizing plus measured-value field
+  middle-drag editing also use the same helpers. Pencil Test capture image
+  orientation flips now use Qt 6
   `QImage::flipped()` while preserving the Qt 5 `mirrored()` path. Filmstrip
   frame double-click selection, press selection, navigator panning initiation,
   inbetween-button hit testing, and drag/drop arming, plus drag-select,
-  auto-pan edge tracking, and inbetween tooltip hover checks now use the same
-  helpers. Screen Picker screen-rectangle press, drag, and release geometry
+  auto-pan edge tracking, inbetween tooltip hover checks, frame-head onion-skin
+  toggles, frame-head current-frame movement, and shift-trace frame-head hover
+  hit testing now use the same helpers. Xsheet row-area current-frame,
+  onion-skin, shift-trace, navigation-tag, play-range, panning, auto-pan,
+  marker removal, context-menu placement, and double-click onion toggle paths
+  now use the same helpers. Xsheet column-area motion-path menu, object-change
+  popup hover, column selection, toggle hit testing, panning, auto-pan,
+  settings popup placement, double-click rename hit testing, synthetic
+  context-menu release, and context-menu placement now use the same helpers.
+  Xsheet cell-area note hit testing, cell/level drag initiation, sound-level
+  handle hit testing, panning, auto-pan, tooltip targeting, double-click rename
+  targeting, and context-menu placement now use the same helpers. Xsheet drag
+  tools for generic cell mapping, selection drags, note movement, column
+  selection/movement, sound volume editing, and drag/drop target mapping also
+  use the same helpers. Xsheet level-cell move click/drag mapping now uses the
+  same helpers. Screen Picker screen-rectangle press, drag, and release geometry
   and Image Viewer panning, color picking, context-menu placement, and
-  loadbox/zoom drag setup now use the same helpers. SceneViewer
+  loadbox/zoom drag setup now use the same helpers.
+  SceneViewer
   mouse/tablet event initialization, tablet context-menu
   delivery, widget context-menu delivery, tablet hover-edge handling, mouse
-  double-click mapping, and the Function Panel graph/drag tools now use the
-  same helpers, removing another Qt 6
+  double-click mapping, GUI smoke system-event mouse diagnostics, synthetic
+  smoke mouse-event construction, and the Function Panel graph/drag tools now
+  use the same helpers, removing another Qt 6
   event-coordinate warning slice while preserving the Qt 5 lane.
 - Plane and Swatch Viewer context-menu placement now also routes through
   `QtCompat` context-menu helpers instead of direct global-position accessors.
@@ -1458,7 +1479,9 @@ branch.
   `print`, `warning`, `run`, the legacy `ToonzVersion` global, and the legacy
   global `void` object returned by `print`/`warning` to suppress unwanted
   top-level evaluation-result output through the Qt 6 app bundle in headless
-  `QCoreApplication` script mode. The `run()` check uses
+  `QCoreApplication` script mode. It also validates the legacy `dummy()`
+  helper and checks that child scripts evaluated by `run()` can leave global
+  variables and functions visible to the caller. The `run()` check uses
   `toonz/sources/tests/scriptengine/run_child.toonzscript`, copied by the
   smoke harness into the isolated `stuff/library/scripts` tree, so it exercises
   the same library-script lookup path as the legacy Qt 5 engine.
@@ -1466,8 +1489,9 @@ branch.
   `toonz/sources/tests/scriptengine/run_errors.toonzscript` and is run by
   `mise run script-smoke-run-errors-qt6`. It validates that the Qt 6 bootstrap
   throws script-visible errors for missing arguments, extra arguments,
-  non-file-path arguments, and missing script files instead of silently
-  returning `undefined`.
+  non-file-path arguments, missing script files, and child-script exceptions
+  from `toonz/sources/tests/scriptengine/run_error_child.toonzscript` instead
+  of silently returning `undefined`.
 - A second Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/file_path.toonzscript` and is run by
   `mise run script-smoke-filepath-qt6`. It validates the first narrow
@@ -1564,7 +1588,8 @@ branch.
   `Transform` and `ImageBuilder` compatibility slice: identity, translation,
   rotation, uniform scale, non-uniform scale, transform string reporting,
   translated raster composition, generated image access, image save and reload,
-  clear/fill behavior, and typed Raster/ToonzRaster builder construction.
+  `ImageBuilder.clear()` returning legacy `undefined`, clear/fill behavior,
+  and typed Raster/ToonzRaster builder construction.
 - An ImageBuilder edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/image_builder_edges.toonzscript` and is run
   by `mise run script-smoke-image-builder-edges-qt6`. It validates constructor

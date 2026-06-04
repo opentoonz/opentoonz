@@ -1831,11 +1831,11 @@ void XsheetPdfPreviewArea::wheelEvent(QWheelEvent* event) {
   int delta = 0;
   switch (event->source()) {
   case Qt::MouseEventNotSynthesized: {
-    delta = event->angleDelta().y();
+    delta = QtCompat::wheelEventAngleDeltaY(event);
   }
   case Qt::MouseEventSynthesizedBySystem: {
     QPoint numPixels  = event->pixelDelta();
-    QPoint numDegrees = event->angleDelta() / 8;
+    QPoint numDegrees = QtCompat::wheelEventAngleDelta(event) / 8;
     if (!numPixels.isNull()) {
       delta = event->pixelDelta().y();
     } else if (!numDegrees.isNull()) {

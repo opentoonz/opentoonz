@@ -25,6 +25,7 @@
 #include "toonzqt/tselectionhandle.h"
 #include "historytypes.h"
 #include "toonzqt/menubarcommand.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/tscenehandle.h"
@@ -2558,7 +2559,7 @@ void CellArea::drawSoundTextColumn(QPainter &p, int r0, int r1, int col) {
       row = rowTo;
       continue;
     }
-    int textCount = text.count();
+    int textCount = text.size();
 
     p.setPen(Qt::black);
     // Vertical case
@@ -3256,12 +3257,13 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
   if (event->button() == Qt::LeftButton) {
     assert(getDragTool() == 0);
 
-    TPoint pos(event->pos().x(), event->pos().y());
-    CellPosition cellPosition = m_viewer->xyToPosition(event->pos());
+    const QPoint eventPos     = QtCompat::mouseEventPosition(event);
+    TPoint pos(eventPos.x(), eventPos.y());
+    CellPosition cellPosition = m_viewer->xyToPosition(eventPos);
     int row                   = cellPosition.frame();
     int col                   = cellPosition.layer();
     QPoint cellTopLeft        = m_viewer->positionToXY(CellPosition(row, col));
-    QPoint mouseInCell        = event->pos() - cellTopLeft;
+    QPoint mouseInCell        = eventPos - cellTopLeft;
     int x                     = mouseInCell.x();  // where in the cell click is
 
     // Check if a note is clicked
@@ -3273,7 +3275,7 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
       QPoint xy   = m_viewer->positionToXY(CellPosition(r, c));
       TPointD pos = notes->getNotePos(i) + TPointD(xy.x(), xy.y());
       QRect rect  = o->rect(PredefinedRect::NOTE_ICON).translated(pos.x, pos.y);
-      if (!rect.contains(event->pos())) continue;
+      if (!rect.contains(eventPos)) continue;
       setDragTool(XsheetGUI::DragTool::makeNoteMoveTool(m_viewer));
       m_viewer->setCurrentNoteIndex(i);
       m_viewer->dragToolClick(event);
@@ -3444,14 +3446,14 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
         setDragTool(XsheetGUI::DragTool::makeSoundScrubTool(
             m_viewer, column->getSoundColumn()));
       else if (isSoundColumn &&
-               rectContainsPos(m_soundLevelModifyRects, event->pos()))
+               rectContainsPos(m_soundLevelModifyRects, eventPos))
         setDragTool(XsheetGUI::DragTool::makeSoundLevelModifierTool(m_viewer));
       else
         setDragTool(XsheetGUI::DragTool::makeSelectionTool(m_viewer));
     }
     m_viewer->dragToolClick(event);
   } else if (event->button() == Qt::MiddleButton) {
-    m_pos       = event->pos();
+    m_pos       = QtCompat::mouseEventPosition(event);
     m_isPanning = true;
   }
   event->accept();
@@ -3466,7 +3468,7 @@ void CellArea::mouseMoveEvent(QMouseEvent *event) {
 
   m_viewer->setQtModifiers(event->modifiers());
   setCursor(Qt::ArrowCursor);
-  QPoint pos        = event->pos();
+  QPoint pos        = QtCompat::mouseEventPosition(event);
   QRect visibleRect = visibleRegion().boundingRect();
   if (m_isPanning) {
     // Middle button pan
@@ -3603,8 +3605,9 @@ void CellArea::mouseReleaseEvent(QMouseEvent *event) {
 
 void CellArea::mouseDoubleClickEvent(QMouseEvent *event) {
   const Orientation *o = m_viewer->orientation();
-  TPoint pos(event->pos().x(), event->pos().y());
-  CellPosition cellPosition = m_viewer->xyToPosition(event->pos());
+  const QPoint eventPos     = QtCompat::mouseEventPosition(event);
+  TPoint pos(eventPos.x(), eventPos.y());
+  CellPosition cellPosition = m_viewer->xyToPosition(eventPos);
   int row                   = cellPosition.frame();
   int col                   = cellPosition.layer();
   // If the column is sound, do nothing
@@ -3620,7 +3623,7 @@ void CellArea::mouseDoubleClickEvent(QMouseEvent *event) {
     QPoint xy   = m_viewer->positionToXY(CellPosition(r, c));
     TPointD pos = notes->getNotePos(i) + TPointD(xy.x(), xy.y());
     QRect rect  = o->rect(PredefinedRect::NOTE_ICON).translated(pos.x, pos.y);
-    if (!rect.contains(event->pos())) continue;
+    if (!rect.contains(eventPos)) continue;
     m_viewer->setCurrentNoteIndex(i);
     m_viewer->getNotesWidget().at(i)->openNotePopup();
     return;
@@ -3650,8 +3653,9 @@ void CellArea::mouseDoubleClickEvent(QMouseEvent *event) {
 
 void CellArea::contextMenuEvent(QContextMenuEvent *event) {
   const Orientation *o = m_viewer->orientation();
-  TPoint pos(event->pos().x(), event->pos().y());
-  CellPosition cellPosition = m_viewer->xyToPosition(event->pos());
+  const QPoint eventPos     = QtCompat::contextMenuEventPosition(event);
+  TPoint pos(eventPos.x(), eventPos.y());
+  CellPosition cellPosition = m_viewer->xyToPosition(eventPos);
   int row                   = cellPosition.frame();
   int col                   = cellPosition.layer();
   TXshCell cell             = m_viewer->getXsheet()->getCell(row, col);
@@ -3667,10 +3671,11 @@ void CellArea::contextMenuEvent(QContextMenuEvent *event) {
     QPoint xy   = m_viewer->positionToXY(CellPosition(r, c));
     TPointD pos = notes->getNotePos(i) + TPointD(xy.x(), xy.y());
     QRect rect  = o->rect(PredefinedRect::NOTE_ICON).translated(pos.x, pos.y);
-    if (!rect.contains(event->pos())) continue;
+    if (!rect.contains(eventPos)) continue;
     m_viewer->setCurrentNoteIndex(i);
     createNoteMenu(menu);
-    if (!menu.isEmpty()) menu.exec(event->globalPos());
+    if (!menu.isEmpty())
+      menu.exec(QtCompat::contextMenuEventGlobalPosition(event));
     return;
   }
 
@@ -3683,7 +3688,7 @@ void CellArea::contextMenuEvent(QContextMenuEvent *event) {
   m_viewer->getCellSelection()->getSelectedCells(r0, c0, r1, c1);
 
   QPoint cellTopLeft = m_viewer->positionToXY(CellPosition(row, col));
-  QPoint mouseInCell = event->pos() - cellTopLeft;
+  QPoint mouseInCell = eventPos - cellTopLeft;
   bool isKeyframeFrame =
       Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled() &&
       pegbar && pegbar->getKeyframeRange(k0, k1) && k0 <= row && row <= k1 + 1;
@@ -3733,7 +3738,8 @@ void CellArea::contextMenuEvent(QContextMenuEvent *event) {
     createCellMenu(menu, !cell.isEmpty(), cell, row, col);
   }
 
-  if (!menu.isEmpty()) menu.exec(event->globalPos());
+  if (!menu.isEmpty())
+    menu.exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 //-----------------------------------------------------------------------------
@@ -3801,8 +3807,9 @@ bool CellArea::event(QEvent *event) {
       QToolTip::hideText();
   }
   if (type == QEvent::WindowDeactivate && m_isMousePressed) {
-    QMouseEvent e(QEvent::MouseButtonRelease, m_pos, Qt::LeftButton,
-                  Qt::NoButton, Qt::NoModifier);
+    QMouseEvent e = QtCompat::makeMouseEvent(
+        QEvent::MouseButtonRelease, m_pos, mapToGlobal(m_pos), Qt::LeftButton,
+        Qt::NoButton, Qt::NoModifier);
     mouseReleaseEvent(&e);
   }
   return QWidget::event(event);

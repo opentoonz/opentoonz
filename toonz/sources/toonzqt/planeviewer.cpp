@@ -239,15 +239,15 @@ void PlaneViewer::wheelEvent(QWheelEvent *event) {
   switch (event->source()) {
   case Qt::MouseEventNotSynthesized: {
     if (event->modifiers() & Qt::AltModifier)
-      delta = event->angleDelta().x();
+      delta = QtCompat::wheelEventAngleDelta(event).x();
     else
-      delta = event->angleDelta().y();
+      delta = QtCompat::wheelEventAngleDeltaY(event);
     break;
   }
 
   case Qt::MouseEventSynthesizedBySystem: {
     QPoint numPixels  = event->pixelDelta();
-    QPoint numDegrees = event->angleDelta() / 8;
+    QPoint numDegrees = QtCompat::wheelEventAngleDelta(event) / 8;
     if (!numPixels.isNull()) {
       delta = event->pixelDelta().y();
     } else if (!numDegrees.isNull()) {
@@ -275,7 +275,7 @@ void PlaneViewer::wheelEvent(QWheelEvent *event) {
       const QPointF eventPos = QtCompat::wheelEventPositionF(event);
       TPointD pos(eventPos.x() * getDevPixRatio(),
                   height() - eventPos.y() * getDevPixRatio());
-      double zoom_par = 1 + event->angleDelta().y() * 0.001;
+      double zoom_par = 1 + QtCompat::wheelEventAngleDeltaY(event) * 0.001;
 
       zoomView(pos.x, pos.y, zoom_par);
     }

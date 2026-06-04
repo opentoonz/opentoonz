@@ -1470,7 +1470,7 @@ void FunctionPanel::leaveEvent(QEvent *) {
 //-----------------------------------------------------------------------------
 
 void FunctionPanel::wheelEvent(QWheelEvent *e) {
-  double factor = exp(0.002 * (double)e->angleDelta().y());
+  double factor = exp(0.002 * (double)QtCompat::wheelEventAngleDeltaY(e));
   zoom(factor, factor, QtCompat::wheelEventPosition(e));
 }
 

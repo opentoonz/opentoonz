@@ -1120,6 +1120,10 @@ const char kBootstrapScript[] = R"JS(
     return global["void"];
   };
 
+  global.dummy = function() {
+    return 0;
+  };
+
   global.run = function(path) {
     if (arguments.length !== 1)
       throw new Error("expected one parameter");
@@ -1128,8 +1132,11 @@ const char kBootstrapScript[] = R"JS(
       filePathArgument(path));
     if (!script.ok)
       throw new Error(String(script.error));
-    return (0, eval)(String(script.content) + "\n//# sourceURL=" +
-                     encodeURI(String(script.path)));
+    var result = __opentoonzScriptEngine.evaluateScriptContent(
+      String(script.content), String(script.path));
+    if (result instanceof Error)
+      throw result;
+    return result;
   };
 
   global.ToonzVersion = "7.1";
@@ -1392,7 +1399,6 @@ const char kBootstrapScript[] = R"JS(
   ImageBuilder.prototype.clear = function() {
     throwIfError(__opentoonzScriptEngine.imageBuilderClear(
       imageBuilderId(this)));
-    return this;
   };
 
   ImageBuilder.prototype.fill = function(colorName) {
@@ -2061,6 +2067,11 @@ QVariantMap ScriptEngine::readScriptFile(const QString& path) {
   result.insert(QStringLiteral("ok"), true);
   result.insert(QStringLiteral("content"), content);
   return result;
+}
+
+QJSValue ScriptEngine::evaluateScriptContent(const QString& content,
+                                             const QString& path) {
+  return m_engine->evaluate(content, path);
 }
 
 QString ScriptEngine::runScriptFile(const QString& path) {

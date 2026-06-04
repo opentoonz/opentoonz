@@ -1205,7 +1205,7 @@ void FilmstripFrames::keyPressEvent(QKeyEvent *event) {
 //-----------------------------------------------------------------------------
 
 void FilmstripFrames::wheelEvent(QWheelEvent *event) {
-  scroll(-event->angleDelta().y());
+  scroll(-QtCompat::wheelEventAngleDeltaY(event));
 }
 
 //-----------------------------------------------------------------------------

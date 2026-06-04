@@ -8,6 +8,7 @@
 #include "toonz/tonionskinmaskhandle.h"
 #include "xsheetdragtool.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 #include "onionskinmaskgui.h"
 #include "cellselection.h"
 #include "menubarcommandids.h"
@@ -1028,7 +1029,8 @@ void RowArea::mousePressEvent(QMouseEvent *event) {
 
     TApp *app    = TApp::instance();
     TXsheet *xsh = app->getCurrentScene()->getScene()->getXsheet();
-    TPoint pos(event->pos().x(), event->pos().y());
+    const QPoint eventPos = QtCompat::mouseEventPosition(event);
+    TPoint pos(eventPos.x(), eventPos.y());
     int currentFrame = TApp::instance()->getCurrentFrame()->getFrame();
 
     int row        = m_viewer->xyToPosition(pos).frame();
@@ -1037,7 +1039,7 @@ void RowArea::mousePressEvent(QMouseEvent *event) {
       topLeft.setY(0);
     else
       topLeft.setX(0);
-    QPoint mouseInCell = event->pos() - topLeft;
+    QPoint mouseInCell = eventPos - topLeft;
     QPoint frameAdj    = m_viewer->getFrameZoomAdjustment();
 
     if (CommandManager::instance()->getAction(MI_ShiftTrace)->isChecked() &&
@@ -1150,7 +1152,7 @@ void RowArea::mousePressEvent(QMouseEvent *event) {
   }  // left-click
      // pan by middle-drag
   else if (event->button() == Qt::MiddleButton) {
-    m_pos       = event->pos();
+    m_pos       = QtCompat::mouseEventPosition(event);
     m_isPanning = true;
   }
 }
@@ -1160,7 +1162,7 @@ void RowArea::mousePressEvent(QMouseEvent *event) {
 void RowArea::mouseMoveEvent(QMouseEvent *event) {
   const Orientation *o = m_viewer->orientation();
   m_viewer->setQtModifiers(event->modifiers());
-  QPoint pos = event->pos();
+  QPoint pos = QtCompat::mouseEventPosition(event);
 
   // pan by middle-drag
   if (m_isPanning) {
@@ -1203,7 +1205,7 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
     topLeft.setY(0);
   else
     topLeft.setX(0);
-  QPoint mouseInCell = event->pos() - topLeft;
+  QPoint mouseInCell = pos - topLeft;
   if (row < 0) return;
 
   m_tooltip = tr("");
@@ -1336,7 +1338,8 @@ void RowArea::mouseReleaseEvent(QMouseEvent *event) {
   m_isPanning = false;
   m_viewer->dragToolRelease(event);
 
-  TPoint pos(event->pos().x(), event->pos().y());
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
+  TPoint pos(eventPos.x(), eventPos.y());
 
   int row = m_viewer->xyToPosition(pos).frame();
   if (m_playRangeActiveInMousePress && row == m_mousePressRow &&
@@ -1422,7 +1425,7 @@ void RowArea::contextMenuEvent(QContextMenuEvent *event) {
   menu->addAction(cmdManager->getAction(MI_NextTaggedFrame));
   menu->addAction(cmdManager->getAction(MI_PrevTaggedFrame));
 
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 //-----------------------------------------------------------------------------
@@ -1454,15 +1457,16 @@ int RowArea::getNonEmptyCell(int row, int column, Direction direction) {
 //-----------------------------------------------------------------------------
 
 void RowArea::mouseDoubleClickEvent(QMouseEvent *event) {
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
   int currentFrame = TApp::instance()->getCurrentFrame()->getFrame();
-  int row          = m_viewer->xyToPosition(event->pos()).frame();
+  int row          = m_viewer->xyToPosition(eventPos).frame();
   QPoint frameAdj  = m_viewer->getFrameZoomAdjustment();
   QPoint topLeft   = m_viewer->positionToXY(CellPosition(row, -1));
   if (!m_viewer->orientation()->isVerticalTimeline())
     topLeft.setY(0);
   else
     topLeft.setX(0);
-  QPoint mouseInCell = event->pos() - topLeft;
+  QPoint mouseInCell = eventPos - topLeft;
   if (TApp::instance()->getCurrentFrame()->isEditingScene() &&
       event->buttons() & Qt::LeftButton &&
       Preferences::instance()->isOnionSkinEnabled() && row == currentFrame &&

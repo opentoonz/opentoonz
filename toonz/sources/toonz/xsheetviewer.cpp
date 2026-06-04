@@ -1208,7 +1208,7 @@ void XsheetViewer::wheelEvent(QWheelEvent *event) {
   switch (event->source()) {
   case Qt::MouseEventNotSynthesized: {
     if (0 != (event->modifiers() & Qt::ControlModifier) &&
-        event->angleDelta().y() != 0) {
+        QtCompat::wheelEventAngleDeltaY(event) != 0) {
       const QPoint eventPos = QtCompat::wheelEventPosition(event);
       QPoint pos(eventPos.x() - m_columnArea->geometry().width() +
                      m_cellArea->visibleRegion().boundingRect().left(),
@@ -1216,7 +1216,8 @@ void XsheetViewer::wheelEvent(QWheelEvent *event) {
       int targetFrame = xyToPosition(pos).frame();
 
       int newFactor =
-          getFrameZoomFactor() + ((event->angleDelta().y() > 0 ? 1 : -1) * 10);
+          getFrameZoomFactor() +
+          ((QtCompat::wheelEventAngleDeltaY(event) > 0 ? 1 : -1) * 10);
       if (newFactor > XsheetGUI::ZOOM_FACTOR_MAX)
         newFactor = XsheetGUI::ZOOM_FACTOR_MAX;
       else if (newFactor < XsheetGUI::ZOOM_FACTOR_MIN)
@@ -1234,14 +1235,15 @@ void XsheetViewer::wheelEvent(QWheelEvent *event) {
         ->getProperties()
         ->getMarkers(markerDistance, markerOffset, secDistance);
 
-    if (event->angleDelta().x() == 0) {  // vertical scroll
+    const QPoint angleDelta = QtCompat::wheelEventAngleDelta(event);
+    if (angleDelta.x() == 0) {  // vertical scroll
       if (!orientation()->isVerticalTimeline()) markerDistance = 1;
-      int scrollPixels = (event->angleDelta().y() > 0 ? 1 : -1) *
+      int scrollPixels = (angleDelta.y() > 0 ? 1 : -1) *
                          markerDistance * orientation()->cellHeight();
       scroll(QPoint(0, -scrollPixels));
     } else {  // horizontal scroll
       if (orientation()->isVerticalTimeline()) markerDistance = 1;
-      int scrollPixels = (event->angleDelta().x() > 0 ? 1 : -1) *
+      int scrollPixels = (angleDelta.x() > 0 ? 1 : -1) *
                          markerDistance * orientation()->cellWidth();
       scroll(QPoint(-scrollPixels, 0));
     }
@@ -1251,7 +1253,7 @@ void XsheetViewer::wheelEvent(QWheelEvent *event) {
   case Qt::MouseEventSynthesizedBySystem:  // macbook touch-pad
   {
     QPoint numPixels  = event->pixelDelta();
-    QPoint numDegrees = event->angleDelta() / 8;
+    QPoint numDegrees = QtCompat::wheelEventAngleDelta(event) / 8;
     if (!numPixels.isNull()) {
       scroll(-numPixels);
     } else if (!numDegrees.isNull()) {

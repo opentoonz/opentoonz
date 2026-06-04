@@ -7,6 +7,7 @@
 #include "toonzqt/fxschematicscene.h"
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/fxselection.h"
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/fxiconmanager.h"
@@ -265,7 +266,7 @@ void FxColumnPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
       menu.addAction(fxScene->getAgainAction(AddFxContextMenu::Add |
                                              AddFxContextMenu::Insert));
       if (!menu.actions().isEmpty()) {
-        menu.exec(cme->screenPos());
+        menu.exec(QtCompat::graphicsSceneContextMenuEventGlobalPosition(cme));
         return;
       }
     }
@@ -375,7 +376,7 @@ void FxColumnPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
     menu.addAction(levelSettings);
   }
 
-  menu.exec(cme->screenPos());
+  menu.exec(QtCompat::graphicsSceneContextMenuEventGlobalPosition(cme));
 }
 
 //-----------------------------------------------------
@@ -570,7 +571,7 @@ void FxPalettePainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
   if (group) menu.addAction(group);
 
   // Execute the context menu at the mouse position
-  menu.exec(cme->screenPos());
+  menu.exec(QtCompat::graphicsSceneContextMenuEventGlobalPosition(cme));
 }
 
 //*****************************************************
@@ -757,7 +758,7 @@ void FxPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
                          : AddFxContextMenu::Add | AddFxContextMenu::Insert;
       menu.addAction(fxScene->getAgainAction(commands));
       if (!menu.actions().isEmpty()) {
-        menu.exec(cme->screenPos());
+        menu.exec(QtCompat::graphicsSceneContextMenuEventGlobalPosition(cme));
         return;
       }
     }
@@ -919,7 +920,7 @@ void FxPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
       if (editGroup) menu.addAction(editGroup);
     }
   }
-  menu.exec(cme->screenPos());
+  menu.exec(QtCompat::graphicsSceneContextMenuEventGlobalPosition(cme));
 }
 
 //------------------------------------------------------------------------
@@ -1072,7 +1073,7 @@ void FxXSheetPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
     menu.addAction(fxScene->getAgainAction(AddFxContextMenu::Add |
                                            AddFxContextMenu::Insert));
     if (!menu.actions().isEmpty()) {
-      menu.exec(cme->screenPos());
+      menu.exec(QtCompat::graphicsSceneContextMenuEventGlobalPosition(cme));
       return;
     }
   }
@@ -1098,7 +1099,7 @@ void FxXSheetPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
   menu.addAction(addPaste);
   menu.addAction(addOutputFx);
   menu.addAction(preview);
-  menu.exec(cme->screenPos());
+  menu.exec(QtCompat::graphicsSceneContextMenuEventGlobalPosition(cme));
 }
 
 //*****************************************************
@@ -1190,7 +1191,7 @@ void FxOutputPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
         CommandManager::instance()->getAction("MI_NewOutputFx");
     menu.addAction(addOutputFx);
   }
-  menu.exec(cme->screenPos());
+  menu.exec(QtCompat::graphicsSceneContextMenuEventGlobalPosition(cme));
 }
 
 //*****************************************************
@@ -1218,7 +1219,7 @@ void FxSchematicLink::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
   if (cme->modifiers() & Qt::ControlModifier) {
     menu.addAction(fxScene->getAgainAction(AddFxContextMenu::Insert));
     if (!menu.actions().isEmpty()) {
-      menu.exec(cme->screenPos());
+      menu.exec(QtCompat::graphicsSceneContextMenuEventGlobalPosition(cme));
       return;
     }
   }
@@ -1236,7 +1237,7 @@ void FxSchematicLink::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
   menu.addAction(insertPaste);
   menu.addAction(deleteFx);
 
-  menu.exec(cme->screenPos());
+  menu.exec(QtCompat::graphicsSceneContextMenuEventGlobalPosition(cme));
 }
 
 //*****************************************************
@@ -1688,7 +1689,7 @@ void FxSchematicPort::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
     if (cme->modifiers() & Qt::ControlModifier) {
       menu.addAction(fxScene->getAgainAction(AddFxContextMenu::Add));
       if (!menu.actions().isEmpty()) {
-        menu.exec(cme->screenPos());
+        menu.exec(QtCompat::graphicsSceneContextMenuEventGlobalPosition(cme));
         return;
       }
     }
@@ -1713,7 +1714,7 @@ void FxSchematicPort::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
     else
       menu.addAction(connectToXSheet);
   }
-  menu.exec(cme->screenPos());
+  menu.exec(QtCompat::graphicsSceneContextMenuEventGlobalPosition(cme));
 }
 
 //-----------------------------------------------------
@@ -2784,7 +2785,8 @@ void FxSchematicNormalFxNode::onRenderToggleClicked(bool value) {
 void FxSchematicNormalFxNode::mouseDoubleClickEvent(
     QGraphicsSceneMouseEvent *me) {
   QRectF nameArea(0, 0, m_width, 14);
-  if (nameArea.contains(me->pos()) && me->modifiers() == Qt::ControlModifier) {
+  if (nameArea.contains(QtCompat::graphicsSceneMouseEventPositionF(me)) &&
+      me->modifiers() == Qt::ControlModifier) {
     m_nameItem->setPlainText(m_name);
     m_nameItem->show();
     m_nameItem->setFocus();
@@ -3020,7 +3022,8 @@ bool FxSchematicZeraryNode::isCached() const {
 void FxSchematicZeraryNode::mouseDoubleClickEvent(
     QGraphicsSceneMouseEvent *me) {
   QRectF nameArea(0, 0, m_width, 14);
-  if (nameArea.contains(me->pos()) && me->modifiers() == Qt::ControlModifier) {
+  if (nameArea.contains(QtCompat::graphicsSceneMouseEventPositionF(me)) &&
+      me->modifiers() == Qt::ControlModifier) {
     FxSchematicScene *fxScene = dynamic_cast<FxSchematicScene *>(scene());
     TXshColumn *column        = fxScene->getXsheet()->getColumn(m_columnIndex);
     TStageObjectId id         = TStageObjectId::ColumnId(m_columnIndex);
@@ -3357,7 +3360,8 @@ void FxSchematicColumnNode::resize(bool maximized) {
 void FxSchematicColumnNode::mouseDoubleClickEvent(
     QGraphicsSceneMouseEvent *me) {
   QRectF nameArea(14, 0, m_width - 15, 14);
-  if (nameArea.contains(me->pos()) && me->modifiers() == Qt::ControlModifier) {
+  if (nameArea.contains(QtCompat::graphicsSceneMouseEventPositionF(me)) &&
+      me->modifiers() == Qt::ControlModifier) {
     TStageObjectId id         = TStageObjectId::ColumnId(m_columnIndex);
     FxSchematicScene *fxScene = dynamic_cast<FxSchematicScene *>(scene());
     if (!fxScene) return;
@@ -3552,7 +3556,8 @@ void FxSchematicPaletteNode::onNameChanged() {
 void FxSchematicPaletteNode::mouseDoubleClickEvent(
     QGraphicsSceneMouseEvent *me) {
   QRectF nameArea(18, 2, 54, 14);
-  if (nameArea.contains(me->pos()) && me->modifiers() == Qt::ControlModifier) {
+  if (nameArea.contains(QtCompat::graphicsSceneMouseEventPositionF(me)) &&
+      me->modifiers() == Qt::ControlModifier) {
     m_nameItem->setPlainText(m_name);
     m_nameItem->show();
     m_nameItem->setFocus();
@@ -3722,7 +3727,7 @@ void FxGroupNode::updateFxsDagPosition(const TPointD &pos) const {
 
 void FxGroupNode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me) {
   QRectF nameArea(0, 0, m_width, 14);
-  if (nameArea.contains(me->pos())) {
+  if (nameArea.contains(QtCompat::graphicsSceneMouseEventPositionF(me))) {
     m_nameItem->setPlainText(m_name);
     m_nameItem->show();
     m_nameItem->setFocus();
@@ -3940,7 +3945,7 @@ void FxPassThroughPainter::contextMenuEvent(
     menu.addAction(fxScene->getAgainAction(AddFxContextMenu::Add |
                                            AddFxContextMenu::Insert));
     if (!menu.actions().isEmpty()) {
-      menu.exec(cme->screenPos());
+      menu.exec(QtCompat::graphicsSceneContextMenuEventGlobalPosition(cme));
       return;
     }
   }
@@ -3966,7 +3971,7 @@ void FxPassThroughPainter::contextMenuEvent(
   menu.addAction(addPaste);
   menu.addAction(addOutputFx);
   menu.addAction(preview);
-  menu.exec(cme->screenPos());
+  menu.exec(QtCompat::graphicsSceneContextMenuEventGlobalPosition(cme));
 }
 
 //*****************************************************

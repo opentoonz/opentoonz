@@ -36,6 +36,7 @@
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/gutil.h"
 #include "toonzqt/pluginloader.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/scriptconsole.h"
 #include "toonzqt/tselectionhandle.h"
 
@@ -8748,14 +8749,10 @@ public:
       ++viewerEventCount;
     }
 
-    QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    const QPointF localPoint = mouseEvent->position();
-    const QPointF globalPoint = mouseEvent->globalPosition();
-#else
-    const QPointF localPoint = mouseEvent->localPos();
-    const QPointF globalPoint = mouseEvent->globalPos();
-#endif
+    QMouseEvent *mouseEvent  = static_cast<QMouseEvent *>(event);
+    const QPointF localPoint = QtCompat::mouseEventPositionF(mouseEvent);
+    const QPointF globalPoint =
+        QtCompat::mouseEventGlobalPosition(mouseEvent);
     lastLocalPoint =
         QString("%1,%2").arg(localPoint.x(), 0, 'f', 2).arg(localPoint.y(), 0,
                                                             'f', 2);
@@ -8795,12 +8792,8 @@ static bool gui_smoke_send_widget_mouse_event(QWidget *widget,
   if (!widget) return false;
 
   const QPointF globalPos = widget->mapToGlobal(localPos.toPoint());
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-  QMouseEvent event(type, localPos, localPos, globalPos, button, buttons,
-                    modifiers);
-#else
-  QMouseEvent event(type, localPos, globalPos, button, buttons, modifiers);
-#endif
+  QMouseEvent event = QtCompat::makeMouseEvent(type, localPos, globalPos,
+                                               button, buttons, modifiers);
   const bool delivered = QApplication::sendEvent(widget, &event);
   gui_smoke_pump_events(25);
   return delivered;

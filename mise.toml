@@ -38,6 +38,10 @@ run = "bash scripts/qt6/check-core5compat-scope.sh"
 description = "Fail on export/import annotations that are known to break MSVC Windows builds."
 run = "bash scripts/windows/check-msvc-abi.sh"
 
+[tasks.check-windows-msvc-abi-selftest]
+description = "Self-test the Windows MSVC ABI guard against synthetic good and bad source snippets."
+run = "bash scripts/windows/test-check-msvc-abi.sh"
+
 [tasks.prepare-tiff]
 description = "Build OpenToonz's vendored libtiff dependency."
 run = "nix develop path:. --command bash scripts/nix/prepare-tiff.sh"
@@ -352,11 +356,11 @@ run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-raster-brush-system-events bash scripts
 
 [tasks.script-smoke-qt6]
 description = "Run the Qt 6 app bundle against the basic headless script engine fixture."
-run = "OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-smoke 3 [true,ok]|qt-script-version 7.1|qt-script-warning|qt-script-void object true true|qt-script-print-return true|qt-script-run-child 7.1|qt-script-run-result qt-script-run-child-result' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-smoke 3 [true,ok]|qt-script-version 7.1|qt-script-warning|qt-script-void object true true|qt-script-print-return true|qt-script-dummy 0|qt-script-run-child 7.1|qt-script-run-result qt-script-run-child-result|qt-script-run-global child-global child-function' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-run-errors-qt6]
-description = "Run the Qt 6 app bundle against run() argument and missing-script error parity."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/run_errors.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-run-errors [true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
+description = "Run the Qt 6 app bundle against run() argument, child-error, and missing-script error parity."
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/run_errors.toonzscript OPENTOONZ_SCRIPT_LIBRARY_FIXTURE=toonz/sources/tests/scriptengine/run_error_child.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-run-errors [true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-filepath-qt6]
 description = "Run the Qt 6 app bundle against the FilePath headless script binding fixture."
@@ -468,7 +472,7 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_level_fir
 
 [tasks.script-smoke-image-builder-qt6]
 description = "Run the Qt 6 app bundle against the ImageBuilder and Transform headless script binding fixture."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_builder.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-imagebuilder-transform Identity Translation(4,6)|qt-script-imagebuilder-transform-variants Rotation(90) Scale(200%) Scale(200%, 300%) Translation(-6,4)*Rotation(90)|qt-script-imagebuilder-composite ImageBuilder(Raster image) Raster 40 38 true 40 38|qt-script-imagebuilder-filled ImageBuilder(Raster image) Raster 40 38|qt-script-imagebuilder-typed ImageBuilder(Raster image) Raster 12 10|qt-script-imagebuilder-typed-toonz ImageBuilder(ToonzRaster image) ToonzRaster 9 7' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_builder.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-imagebuilder-transform Identity Translation(4,6)|qt-script-imagebuilder-transform-variants Rotation(90) Scale(200%) Scale(200%, 300%) Translation(-6,4)*Rotation(90)|qt-script-imagebuilder-composite ImageBuilder(Raster image) Raster 40 38 true 40 38|qt-script-imagebuilder-filled ImageBuilder(Raster image) Raster 40 38 true|qt-script-imagebuilder-typed ImageBuilder(Raster image) Raster 12 10|qt-script-imagebuilder-typed-toonz ImageBuilder(ToonzRaster image) ToonzRaster 9 7' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-transform-edges-qt6]
 description = "Run the Qt 6 app bundle against Transform argument and disposal edge cases."

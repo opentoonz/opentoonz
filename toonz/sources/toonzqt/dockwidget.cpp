@@ -399,10 +399,10 @@ void DockWidget::wheelEvent(QWheelEvent *we) {
   if (m_dragging) {
     if (m_selectedPlace) {
       DockPlaceholder *newSelected =
-          (we->angleDelta().y() > 0)
+          (QtCompat::wheelEventAngleDeltaY(we) > 0)
               ? m_selectedPlace->parentPlaceholder()
               : m_selectedPlace->childPlaceholder(parentWidget()->mapFromGlobal(
-                    we->globalPosition().toPoint()));
+                    QtCompat::wheelEventGlobalPosition(we)));
       if (newSelected != m_selectedPlace) {
         m_selectedPlace->hide();
         newSelected->show();

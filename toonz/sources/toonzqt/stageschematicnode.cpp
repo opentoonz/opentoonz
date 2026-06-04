@@ -34,6 +34,7 @@
 
 // TnzQt includes
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/stageschematicscene.h"
 #include "toonzqt/menubarcommand.h"
@@ -244,7 +245,7 @@ void ColumnPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
   menu.addSeparator();
 
   menu.addAction(group);
-  menu.exec(cme->screenPos());
+  menu.exec(QtCompat::graphicsSceneContextMenuEventGlobalPosition(cme));
 }
 
 //--------------------------------------------------------
@@ -357,7 +358,7 @@ void GroupPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
   menu.addAction(group);
   menu.addAction(ungroup);
   menu.addAction(editGroup);
-  menu.exec(cme->screenPos());
+  menu.exec(QtCompat::graphicsSceneContextMenuEventGlobalPosition(cme));
 }
 
 //========================================================
@@ -438,7 +439,7 @@ void PegbarPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
   menu.addAction(paste);
   menu.addSeparator();
   menu.addAction(group);
-  menu.exec(cme->screenPos());
+  menu.exec(QtCompat::graphicsSceneContextMenuEventGlobalPosition(cme));
 }
 
 //========================================================
@@ -541,7 +542,7 @@ void CameraPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
   if (isDeactivated && cut) menu.addAction(cut);
   if (paste) menu.addAction(paste);
 
-  menu.exec(cme->screenPos());
+  menu.exec(QtCompat::graphicsSceneContextMenuEventGlobalPosition(cme));
 }
 
 //========================================================
@@ -612,7 +613,7 @@ void TablePainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
           &StageSchematicScene::onResetCenterPublic);
 
   menu.addAction(resetCenter);
-  menu.exec(cme->screenPos());
+  menu.exec(QtCompat::graphicsSceneContextMenuEventGlobalPosition(cme));
 }
 
 //========================================================
@@ -719,7 +720,7 @@ void SplinePainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
   menu.addAction(copy);
   menu.addAction(cut);
   menu.addAction(paste);
-  menu.exec(cme->screenPos());
+  menu.exec(QtCompat::graphicsSceneContextMenuEventGlobalPosition(cme));
 }
 
 //========================================================
@@ -1630,7 +1631,7 @@ void StageSchematicPegbarNode::paint(QPainter *painter,
 void StageSchematicPegbarNode::mouseDoubleClickEvent(
     QGraphicsSceneMouseEvent *me) {
   QRectF nameArea(18, 0, m_width - 36, 14);
-  if (nameArea.contains(me->pos())) {
+  if (nameArea.contains(QtCompat::graphicsSceneMouseEventPositionF(me))) {
     m_nameItem->setPlainText(m_name);
     m_nameItem->show();
     m_nameItem->setFocus();
@@ -1960,7 +1961,7 @@ void StageSchematicColumnNode::mouseDoubleClickEvent(
       dynamic_cast<StageSchematicScene *>(scene());
   if (!stageScene) return;
   QRectF nameArea(14, 0, m_width - 15, 14);
-  if (nameArea.contains(me->pos())) {
+  if (nameArea.contains(QtCompat::graphicsSceneMouseEventPositionF(me))) {
     std::string name = m_stageObject->getName();
 
     TStageObjectId id  = m_stageObject->getId();
@@ -2127,7 +2128,7 @@ void StageSchematicCameraNode::paint(QPainter *painter,
 void StageSchematicCameraNode::mouseDoubleClickEvent(
     QGraphicsSceneMouseEvent *me) {
   QRectF nameArea(0, -14, m_width, 14);
-  if (nameArea.contains(me->pos())) {
+  if (nameArea.contains(QtCompat::graphicsSceneMouseEventPositionF(me))) {
     m_nameItem->setPlainText(m_name);
     m_nameItem->show();
     m_nameItem->setFocus();
@@ -2257,7 +2258,7 @@ void StageSchematicSplineNode::resize(bool maximized) {
 void StageSchematicSplineNode::mouseDoubleClickEvent(
     QGraphicsSceneMouseEvent *me) {
   QRectF nameArea(14, 0, m_width - 15, 14);
-  if (nameArea.contains(me->pos())) {
+  if (nameArea.contains(QtCompat::graphicsSceneMouseEventPositionF(me))) {
     m_nameItem->setPlainText(m_splineName);
     m_nameItem->show();
     m_nameItem->setFocus();
@@ -2381,7 +2382,7 @@ void StageSchematicGroupNode::paint(QPainter *painter,
 void StageSchematicGroupNode::mouseDoubleClickEvent(
     QGraphicsSceneMouseEvent *me) {
   QRectF nameArea(14, 0, m_width - 15, 14);
-  if (nameArea.contains(me->pos())) {
+  if (nameArea.contains(QtCompat::graphicsSceneMouseEventPositionF(me))) {
     m_name = QString::fromStdWString(m_root->getGroupName(false));
     m_nameItem->setPlainText(m_name);
     m_nameItem->show();

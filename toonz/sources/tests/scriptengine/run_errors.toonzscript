@@ -13,7 +13,9 @@ var errors = [
   hasErrorMessage(function() { run("basic.toonzscript", "extra"); },
                   "expected one parameter"),
   hasErrorMessage(function() { run(42); }, "file path"),
-  hasErrorMessage(function() { run(missingScript); }, "can't read file")
+  hasErrorMessage(function() { run(missingScript); }, "can't read file"),
+  hasErrorMessage(function() { run("run_error_child.toonzscript"); },
+                  "qt-script-run-child-error")
 ];
 print("qt-script-run-errors", errors);
 

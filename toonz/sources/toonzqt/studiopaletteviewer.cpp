@@ -958,7 +958,8 @@ void StudioPaletteTreeViewer::contextMenuEvent(QContextMenuEvent *event) {
   if (count == 1) {
     // Verify if click position is in a row containing an item.
     QRect rect = visualItemRect(currentItem());
-    if (!QRect(0, rect.y(), width(), rect.height()).contains(event->pos()))
+    const QPoint eventPos = QtCompat::contextMenuEventPosition(event);
+    if (!QRect(0, rect.y(), width(), rect.height()).contains(eventPos))
       return;
 
     bool isFolder = (studioPalette->isFolder(path));
@@ -1035,7 +1036,7 @@ void StudioPaletteTreeViewer::contextMenuEvent(QContextMenuEvent *event) {
       connect(refreshAct, &QAction::triggered, this,
               &StudioPaletteTreeViewer::refresh);
     }
-    menu.exec(event->globalPos());
+    menu.exec(QtCompat::contextMenuEventGlobalPosition(event));
     return;
   }
 
@@ -1043,11 +1044,12 @@ void StudioPaletteTreeViewer::contextMenuEvent(QContextMenuEvent *event) {
   // Verify if click position is in a row containing an item.
   bool areAllPalette      = true;
   bool isClickInSelection = false;
+  const QPoint eventPos   = QtCompat::contextMenuEventPosition(event);
   int i;
   for (i = 0; i < count; i++) {
     QTreeWidgetItem *item = items[i];
     QRect rect            = visualItemRect(item);
-    if (QRect(0, rect.y(), width(), rect.height()).contains(event->pos()))
+    if (QRect(0, rect.y(), width(), rect.height()).contains(eventPos))
       isClickInSelection = true;
     TFilePath path = getItemPath(item);
     if (studioPalette->isFolder(path)) areAllPalette = false;
@@ -1075,7 +1077,7 @@ void StudioPaletteTreeViewer::contextMenuEvent(QContextMenuEvent *event) {
   connect(deleteAct, &QAction::triggered, this,
           &StudioPaletteTreeViewer::deleteItems);
 
-  menu.exec(event->globalPos());
+  menu.exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 //-----------------------------------------------------------------------------

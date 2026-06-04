@@ -24,11 +24,11 @@ print("qt-script-imagebuilder-composite", builder.toString(), composite.type,
       composite.width, composite.height, output.exists, reloaded.width,
       reloaded.height);
 
-builder.clear();
+var clearReturn = builder.clear();
 builder.fill("#FF8800");
 var filled = builder.image;
 print("qt-script-imagebuilder-filled", builder.toString(), filled.type,
-      filled.width, filled.height);
+      filled.width, filled.height, clearReturn === undefined);
 
 var typed = new ImageBuilder(12, 10, "Raster");
 typed.fill("transparent");

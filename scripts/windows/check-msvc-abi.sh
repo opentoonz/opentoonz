@@ -4,6 +4,11 @@ set -euo pipefail
 repo_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$repo_root"
 
+scan_paths=("$@")
+if ((${#scan_paths[@]} == 0)); then
+  scan_paths=(toonz/sources)
+fi
+
 search_sources() {
   local pattern="$1"
 
@@ -13,9 +18,9 @@ search_sources() {
       --glob '*.cxx' \
       --glob '*.cc' \
       --glob '*.mm' \
-      "$pattern" toonz/sources || true
+      "$pattern" "${scan_paths[@]}" || true
   else
-    git grep -n -E "$pattern" -- toonz/sources |
+    git grep -n -E "$pattern" -- "${scan_paths[@]}" |
       awk -F: '$1 ~ /\.(cpp|cxx|cc|mm)$/ { print }' || true
   fi
 }

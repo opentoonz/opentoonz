@@ -94,12 +94,15 @@ Already covered:
   page-chip hit testing, drag thresholding, rename activation, tab dragging,
   tab rename activation, page-drop targeting, palette page context-menu
   placement, palette page tooltip placement, palette-icon drag thresholding, and
-  save-toolbar drop hit testing, plus Studio Palette tree drag thresholding and
-  drop-target tracking, now use `QtCompat` event-position helpers instead of
-  direct Qt 5-era event coordinate accessors.
+  save-toolbar drop hit testing, plus Studio Palette tree drag thresholding,
+  row hit testing, context-menu placement, and drop-target tracking, now use
+  `QtCompat` event-position helpers instead of direct Qt 5-era event coordinate
+  accessors.
 - Shared `toonzqt` Schematic Viewer panning, zooming, rubber-band gating, and
-  double-click fit-scene hit testing now use `QtCompat` mouse-position helpers
-  instead of direct `QMouseEvent::pos()` calls.
+  double-click fit-scene hit testing, plus schematic port link-start geometry,
+  group-editor title-bar hit testing, and FX/stage schematic node rename
+  double-click hit testing, now use `QtCompat` event-position helpers instead
+  of direct event coordinate calls.
 - Shared `toonzqt` Spreadsheet panel panning, cell hit testing, and auto-pan
   edge tracking now use `QtCompat` mouse-position helpers instead of direct
   `QMouseEvent::pos()` calls.
@@ -115,7 +118,8 @@ Already covered:
   version-control tree, Menu Bar customization tree, room tabs, panel title-bar
   Safe Area/Preview menus, Viewer panel show/hide menu, Brush Preset panel
   show/hide menu, Layer Footer frames-per-page menu, Farm Server list, Camera
-  Track preview, Palette Gizmo binding menu, Color Model viewer, and Xsheet PDF
+  Track preview, Palette Gizmo binding menu, Color Model viewer, task tree
+  context-menu plumbing, `DvItemViewer` context-menu placement, and Xsheet PDF
   preview context-menu placement now use `QtCompat` context-menu helpers
   instead of direct Qt 5-era context-menu coordinate accessors.
 - `toonz` room tab selection, reordering, and rename activation now use
@@ -152,9 +156,9 @@ Already covered:
   mouse-position helpers instead of direct `QMouseEvent::pos()` /
   `globalPos()` calls.
 - `toonz` `DvItemViewer` item selection, play-button hit testing,
-  middle-button panning, drag initiation, rename activation, and table-column
-  resize tracking now use `QtCompat` mouse-position helpers instead of direct
-  `QMouseEvent::pos()` / `globalPos()` calls.
+  middle-button panning, drag initiation, rename activation, table-column
+  resize tracking, and item tooltip placement now use `QtCompat` event-position
+  helpers instead of direct Qt 5-era local/global event coordinate calls.
 - `toonz` Xsheet keyframe mover click/drag cell mapping now uses `QtCompat`
   mouse-position helpers instead of direct `QMouseEvent::pos()` calls.
 - `toonz` Pencil Test sub-camera handle hit testing and drag resizing now use
@@ -165,9 +169,31 @@ Already covered:
   on Qt 5.
 - `toonz` Filmstrip frame double-click selection, press selection, navigator
   panning initiation, inbetween-button hit testing, drag/drop arming,
-  drag-select, auto-pan edge tracking, and inbetween tooltip hover checks now
-  use `QtCompat` mouse-position helpers instead of direct `QMouseEvent::pos()`
-  / `globalPos()` calls.
+  drag-select, auto-pan edge tracking, inbetween tooltip hover checks,
+  frame-head onion-skin toggles, frame-head current-frame movement, and
+  shift-trace frame-head hover hit testing now use `QtCompat` mouse-position
+  helpers instead of direct `QMouseEvent::pos()` / `globalPos()` calls.
+- `toonz` Xsheet row-area current-frame, onion-skin, shift-trace,
+  navigation-tag, play-range, panning, auto-pan, marker removal, context-menu
+  placement, and double-click onion toggle paths now use `QtCompat`
+  mouse-position and context-menu helpers instead of direct local/global event
+  coordinate calls.
+- `toonz` Xsheet column-area motion-path menu, object-change popup hover,
+  column selection, toggle hit testing, panning, auto-pan, settings popup
+  placement, double-click rename hit testing, synthetic context-menu release,
+  and context-menu placement now use `QtCompat` mouse-position and context-menu
+  helpers instead of direct local/global event coordinate calls.
+- `toonz` Xsheet cell-area note hit testing, cell/level drag initiation,
+  sound-level handle hit testing, panning, auto-pan, tooltip targeting,
+  double-click rename targeting, and context-menu placement now use `QtCompat`
+  mouse-position and context-menu helpers instead of direct local/global event
+  coordinate calls.
+- `toonz` Xsheet drag tools for generic cell mapping, selection drags, note
+  movement, column selection/movement, sound volume editing, and drag/drop
+  target mapping now use `QtCompat` mouse-position and drop-position helpers
+  instead of direct Qt 5-era event coordinate calls.
+- `toonz` Xsheet level-cell move click/drag mapping now uses `QtCompat`
+  mouse-position helpers instead of direct `QMouseEvent::pos()` calls.
 - `tnztools` Screen Picker screen-rectangle press, drag, and release geometry
   now uses `QtCompat` mouse-position helpers instead of direct
   `QMouseEvent::pos()` calls.
@@ -178,8 +204,10 @@ Already covered:
   helpers instead of direct local/global event coordinate calls.
 - `SceneViewer` mouse/tablet event initialization, tablet context-menu
   delivery, widget context-menu delivery, tablet hover-edge handling, and mouse
-  double-click mapping now use `QtCompat` mouse/tablet/context-menu position
-  helpers instead of direct Qt 5-era event coordinate accessors.
+  double-click mapping, plus GUI smoke system-event mouse diagnostics and
+  synthetic smoke mouse-event construction, now use `QtCompat`
+  mouse/tablet/context-menu position helpers instead of direct Qt 5-era event
+  coordinate accessors.
 - `PlaneViewer` and `SwatchViewer` context-menu placement now use `QtCompat`
   context-menu helpers instead of direct global-position accessors.
 - `FunctionPanel` and its graph drag tools now use `QtCompat` mouse-position
@@ -240,9 +268,16 @@ Still needed:
 Already covered:
 
 - Qt 6 has a QJSEngine-based runtime shell for the app's script system.
+- The basic script smoke now covers `print`, `warning`, the legacy `dummy()`
+  helper, the legacy `void` result object, `run()` library lookup, `run()`
+  return values, and child-script global variable/function persistence.
+- The `run()` error smoke covers missing/extra arguments, bad path arguments,
+  missing script files, and child-script exception propagation.
 - The smoke suite covers the current facades for file/path, scene, level,
   image, image builder, rasterizer, vectorizers, renderer, wrapper id, binding
   lifecycle, and several edge cases.
+- The ImageBuilder smoke covers legacy `ImageBuilder.clear()` returning
+  `undefined` in addition to clear/fill behavior.
 - Aggregate script smoke tasks exist in both bounded and natural-exit modes.
 
 Still needed:

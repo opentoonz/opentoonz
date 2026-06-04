@@ -1027,7 +1027,8 @@ if (!index.isValid()) return;
 m_mainViewer->setSelected(((TaskTreeModel::Item*)index.internalPointer())->getTask());
 
 if (event->button()==Qt::RightButton)
-  ((TaskTreeModel*)model())->openContextMenu(event->globalPos());
+  ((TaskTreeModel*)model())->openContextMenu(
+      QtCompat::mouseEventGlobalPosition(event));
 
 }
 */

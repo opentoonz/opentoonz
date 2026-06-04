@@ -1348,10 +1348,10 @@ void DvItemViewerPanel::contextMenuEvent(QContextMenuEvent *event) {
   if (!getModel()) return;
   if (m_noContextMenu) return;
 
-  int index   = pos2index(event->pos());
+  int index   = pos2index(QtCompat::contextMenuEventPosition(event));
   QMenu *menu = getModel()->getContextMenu(this, index);
   if (menu) {
-    menu->exec(event->globalPos());
+    menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
     delete menu;
   }
 }
@@ -1362,14 +1362,15 @@ bool DvItemViewerPanel::event(QEvent *event) {
   if (event->type() == QEvent::ToolTip) {
     // getModel()->refreshData();
     QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
-    int index             = pos2index(helpEvent->pos());
+    const QPoint helpPos  = QtCompat::helpEventPosition(helpEvent);
+    int index             = pos2index(helpPos);
     if (0 <= index && index < getItemCount()) {
       QRect rect      = index2pos(index);
       QPoint iconSize = QPoint(18, 18);
       QPoint point    = rect.topLeft() - QPoint(1, 4);
       QRect pixmapRect(point.x(), point.y(), iconSize.x(), iconSize.y());
-      if (pixmapRect.contains(helpEvent->pos()))
-        QToolTip::showText(helpEvent->globalPos(),
+      if (pixmapRect.contains(helpPos))
+        QToolTip::showText(QtCompat::helpEventGlobalPosition(helpEvent),
                            getModel()->getItemDataAsString(
                                index, DvItemListModel::VersionControlStatus));
       else {
@@ -1378,7 +1379,8 @@ bool DvItemViewerPanel::event(QEvent *event) {
         if (data == QVariant())
           QToolTip::hideText();
         else
-          QToolTip::showText(helpEvent->globalPos(), data.toString());
+          QToolTip::showText(QtCompat::helpEventGlobalPosition(helpEvent),
+                             data.toString());
       }
     } else
       QToolTip::hideText();

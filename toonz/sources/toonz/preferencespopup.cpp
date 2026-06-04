@@ -59,6 +59,9 @@
 #include <QStringList>
 #include <QListWidget>
 #include <QGroupBox>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QKeyCombination>
+#endif
 #include <QKeySequence>
 
 using namespace DVGui;
@@ -1189,12 +1192,14 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
   auto CtrlAltStr = []() {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     QString str =
-        QKeySequence(QKeyCombination(Qt::CTRL | Qt::ALT, Qt::Key_A))
+        QKeySequence(QKeyCombination(Qt::ControlModifier | Qt::AltModifier,
+                                     Qt::Key_A))
             .toString(QKeySequence::NativeText);
     str.chop(1);
 #else
     QString str =
-        QKeySequence(Qt::CTRL + Qt::ALT).toString(QKeySequence::NativeText);
+        QKeySequence(Qt::ControlModifier + Qt::AltModifier)
+            .toString(QKeySequence::NativeText);
 #endif
     if (str.endsWith("+")) str.chop(1);
     return str;

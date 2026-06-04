@@ -9,6 +9,8 @@
 #include <QDropEvent>
 #include <QFont>
 #include <QFontDatabase>
+#include <QGraphicsSceneContextMenuEvent>
+#include <QGraphicsSceneMouseEvent>
 #include <QHelpEvent>
 #include <QImage>
 #include <QKeyEvent>
@@ -182,8 +184,16 @@ inline QPointF wheelEventPositionF(const QWheelEvent *event) {
   return event->position();
 }
 
+inline QPoint wheelEventAngleDelta(const QWheelEvent *event) {
+  return event->angleDelta();
+}
+
 inline int wheelEventAngleDeltaY(const QWheelEvent *event) {
   return event->angleDelta().y();
+}
+
+inline QPoint wheelEventGlobalPosition(const QWheelEvent *event) {
+  return event->globalPosition().toPoint();
 }
 
 inline QPoint tabletEventPosition(const QTabletEvent *event) {
@@ -218,6 +228,21 @@ inline QPoint hoverEventPosition(const QHoverEvent *event) {
 #endif
 }
 
+inline QPointF graphicsSceneMouseEventPositionF(
+    const QGraphicsSceneMouseEvent *event) {
+  return event->pos();
+}
+
+inline QPointF graphicsSceneContextMenuEventPositionF(
+    const QGraphicsSceneContextMenuEvent *event) {
+  return event->pos();
+}
+
+inline QPoint graphicsSceneContextMenuEventGlobalPosition(
+    const QGraphicsSceneContextMenuEvent *event) {
+  return event->screenPos();
+}
+
 inline QMouseEvent makeMouseEvent(QEvent::Type type, const QPointF &localPos,
                                   const QPointF &globalPos,
                                   Qt::MouseButton button,
@@ -231,6 +256,14 @@ inline QPoint dropEventPosition(const QDropEvent *event) {
   return event->position().toPoint();
 #else
   return event->pos();
+#endif
+}
+
+inline Qt::KeyboardModifiers dropEventModifiers(const QDropEvent *event) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return event->modifiers();
+#else
+  return event->keyboardModifiers();
 #endif
 }
 
