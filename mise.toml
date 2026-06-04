@@ -34,6 +34,10 @@ run = "bash scripts/qt6/check-no-qregexp.sh"
 description = "Fail if Core5Compat or direct QTextCodec usage escapes the documented adapter scope."
 run = "bash scripts/qt6/check-core5compat-scope.sh"
 
+[tasks.check-windows-msvc-abi]
+description = "Fail on export/import annotations that are known to break MSVC Windows builds."
+run = "bash scripts/windows/check-msvc-abi.sh"
+
 [tasks.prepare-tiff]
 description = "Build OpenToonz's vendored libtiff dependency."
 run = "nix develop path:. --command bash scripts/nix/prepare-tiff.sh"
@@ -56,11 +60,11 @@ run = "nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.
 
 [tasks.build]
 description = "Configure and build OpenToonz with Ninja in toonz/build/nix-relwithdebinfo."
-run = "nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-relwithdebinfo && cmake --build toonz/build/nix-relwithdebinfo --parallel'"
+run = "bash scripts/windows/check-msvc-abi.sh && nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-relwithdebinfo && cmake --build toonz/build/nix-relwithdebinfo --parallel'"
 
 [tasks.build-qt6]
 description = "Configure and build OpenToonz with Qt 6 in toonz/build/nix-qt6-relwithdebinfo."
-run = "nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-relwithdebinfo && cmake --build toonz/build/nix-qt6-relwithdebinfo --parallel'"
+run = "bash scripts/windows/check-msvc-abi.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-relwithdebinfo && cmake --build toonz/build/nix-qt6-relwithdebinfo --parallel'"
 
 [tasks.run]
 description = "Run the locally built OpenToonz binary or app bundle."
@@ -556,7 +560,7 @@ run = "bash scripts/qt6/release-experimental.sh"
 
 [tasks.check]
 description = "Run the flake configure check and whitespace validation."
-run = "nix flake check path:. && git diff --check"
+run = "bash scripts/windows/check-msvc-abi.sh && nix flake check path:. && git diff --check"
 
 [tasks.format]
 description = "Run the repository clang-format helper for changed C/C++ files."
