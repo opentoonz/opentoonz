@@ -1,0 +1,57 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e.message || e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var image = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var scene = new Scene();
+var levelA = scene.newLevel("Raster", "qt6_scene_wrappers_a");
+var levelB = scene.newLevel("Raster", "qt6_scene_wrappers_b");
+
+levelA.setFrame("1", image);
+levelB.setFrame("1", image);
+scene.setCell(0, 0, levelA, "1");
+scene.setCell(1, 1, levelB, "1");
+
+var levels = scene.getLevels();
+print("qt-script-scene-level-wrappers-list", levels.length, levels[0].name,
+      levels[1].name, levels[0].id > 0, levels[1].id > 0,
+      levels[0].id !== levelA.id, levels[1].id !== levelB.id);
+
+var firstWrapperId = levels[0].id;
+levels[0].dispose();
+var disposedWrapperError = hasError(function() {
+  levels[0].toString();
+}, "Invalid Level object");
+var levelAStillValid = levelA.frameCount === 1 &&
+    scene.getLevel("qt6_scene_wrappers_a").name === "qt6_scene_wrappers_a";
+var cellA = scene.getCell(0, 0);
+print("qt-script-scene-level-wrappers-dispose-one", levels[0].id,
+      firstWrapperId > 0, disposedWrapperError, levelAStillValid,
+      cellA.level.name, cellA.fid);
+
+var levelsAgain = scene.getLevels();
+print("qt-script-scene-level-wrappers-again", levelsAgain.length,
+      levelsAgain[0].id > 0, levelsAgain[0].name,
+      levelsAgain[1].id > 0, levelsAgain[1].name);
+
+scene.dispose();
+print("qt-script-scene-level-wrappers-scene-dispose", scene.id,
+      levels[1].type, levels[1].frameCount, levels[1].toString(),
+      cellA.level.type, cellA.level.frameCount,
+      levelsAgain[0].type, levelsAgain[0].frameCount,
+      levelA.type, levelA.frameCount, levelB.type, levelB.frameCount);
+
+levels[1].dispose();
+cellA.level.dispose();
+levelsAgain[0].dispose();
+levelsAgain[1].dispose();
+levelA.dispose();
+levelB.dispose();
+image.dispose();
+
+"qt-script-scene-level-wrappers-result";

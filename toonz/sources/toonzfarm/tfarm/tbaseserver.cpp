@@ -2,12 +2,13 @@
 
 #include "tbaseserver.h"
 
+#include <cstdio>
+
 #ifndef WIN32
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
-#include <stdio.h>
 #include <unistd.h>
 #endif
 
@@ -46,8 +47,8 @@ void TBaseServer::start() {
   if ((m_socketId = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 #ifdef WIN32
     char szError[1024];
-    wsprintf(szError, TEXT("Allocating socket failed. Error: %d"),
-             WSAGetLastError());
+    snprintf(szError, sizeof(szError),
+             "Allocating socket failed. Error: %d", WSAGetLastError());
     throw(szError);
 #else
     throw("Allocating socket failed.");
@@ -96,8 +97,8 @@ void TBaseServer::start() {
     // Verify that data was received. If yes, use it.
     if (iReturn == SOCKET_ERROR) {
       char szError[1024];
-      wsprintf(szError,
-               TEXT("No data is received, receive failed.") TEXT(" Error: %d"),
+      snprintf(szError, sizeof(szError),
+               "No data is received, receive failed. Error: %d",
                WSAGetLastError());
 
       throw(szError);
@@ -130,8 +131,12 @@ void TBaseServer::start() {
       char szError[1024];
 
 #ifdef WIN32
-      wsprintf(szError, TEXT("Sending data to the client failed. Error: %d"),
+      snprintf(szError, sizeof(szError),
+               "Sending data to the client failed. Error: %d",
                WSAGetLastError());
+#else
+      snprintf(szError, sizeof(szError),
+               "Sending data to the client failed.");
 #endif
 
       throw(szError);
@@ -154,7 +159,7 @@ void TBaseServer::stop() {
 #ifdef WIN32
     if (closesocket(m_socketId) != 0) {
       char szError[1024];
-      wsprintf(szError, TEXT(" Error: %d"), WSAGetLastError());
+      snprintf(szError, sizeof(szError), " Error: %d", WSAGetLastError());
 
       throw(szError);
     }

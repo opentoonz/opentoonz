@@ -1199,6 +1199,10 @@ Current branch status:
   uses `QLibraryInfo::path()` on Qt 6 and explicitly discards optional
   `QTranslator::load()` results. After this cleanup, the current app-target
   warning frontier in `main.cpp` is limited to OpenGL/GLUT deprecation output.
+- Legacy `toonzfarm/tfarm/tbaseserver.cpp` Windows socket diagnostic formatting
+  no longer uses unbounded `wsprintf()` calls. The file now uses bounded
+  `snprintf()` formatting for those messages and initializes the non-Windows
+  send failure message before throwing.
 - Later compile-frontier fixes in this branch include removal of stale
   `QDirModel` usage, removal of remaining `QRegExp` hits, Qt 6-safe layout
   margin calls, Qt 6-safe MOC guards using `OPENTOONZ_QT_MAJOR`, a stop-motion
@@ -1331,6 +1335,12 @@ Current branch status:
   `mise run script-smoke-filepath-metadata-qt6` and verifies `exists`,
   `isDirectory`, directory listing, and legacy-style `lastModified` exposure as
   a JS `Date` object for existing files, directories, and missing paths.
+- `toonz/sources/tests/scriptengine/file_path_mutation_metadata.toonzscript`
+  extends the FilePath fixture set. It is run by
+  `mise run script-smoke-filepath-mutation-metadata-qt6` and verifies mutable
+  `extension`, `name`, and `parentDirectory` properties,
+  `withParentDirectory()` string/FilePath conversion, `exists`, `isDirectory`,
+  and `lastModified` exposure as a JS `Date`.
 - `toonz/sources/tests/scriptengine/path_arguments.toonzscript` extends
   script path-argument validation. It is run by
   `mise run script-smoke-path-arguments-qt6` and verifies legacy-style
@@ -1383,6 +1393,13 @@ Current branch status:
   `mise run script-smoke-scene-lifecycle-edges-qt6` and verifies cross-scene
   level isolation, scene disposal errors, and invalidated scene-owned level
   wrappers without entering viewer, offscreen GL, or renderer paths.
+- `toonz/sources/tests/scriptengine/scene_level_wrappers.toonzscript` is the
+  repo-local Qt 6 Scene level-wrapper fixture. It is run by
+  `mise run script-smoke-scene-level-wrappers-qt6` and verifies
+  `Scene.getLevels()` wrapper identity and lifetime behavior, including
+  disposal of returned wrappers without deleting the scene-owned level, fresh
+  wrapper lookup after disposal, and the current empty-wrapper behavior for
+  stale scene-owned level wrappers after `Scene.dispose()`.
 - `toonz/sources/tests/scriptengine/level_io.toonzscript` is the first
   repo-local Qt 6 level-I/O compatibility fixture. It is run by
   `mise run script-smoke-level-io-qt6` and verifies standalone empty `Level()`
@@ -1613,6 +1630,7 @@ Current branch status:
   `mise run script-smoke-filepath-qt6`,
   `mise run script-smoke-filepath-edges-qt6`,
   `mise run script-smoke-filepath-metadata-qt6`,
+  `mise run script-smoke-filepath-mutation-metadata-qt6`,
   `mise run script-smoke-path-arguments-qt6`,
   `mise run script-smoke-scene-qt6`, `mise run script-smoke-scene-cells-qt6`,
   `mise run script-smoke-scene-columns-qt6`,
@@ -1620,6 +1638,7 @@ Current branch status:
   `mise run script-smoke-scene-edges-qt6`,
   `mise run script-smoke-scene-argument-edges-qt6`,
   `mise run script-smoke-scene-lifecycle-edges-qt6`,
+  `mise run script-smoke-scene-level-wrappers-qt6`,
   `mise run script-smoke-scene-loadlevel-qt6`,
   `mise run script-smoke-scene-loadlevel-sequence-qt6`,
   `mise run script-smoke-scene-save-reopen-qt6`,

@@ -246,6 +246,9 @@ Already covered:
   use templated `canConvert<T>()` checks, and dynamic preference type checks
   route through a version-aware helper that uses `QMetaType` on Qt 6 while
   preserving the Qt 5 `QMetaType::Type` path.
+- Legacy `toonzfarm/tfarm/tbaseserver.cpp` Windows socket diagnostic messages
+  now use bounded `snprintf()` formatting instead of unbounded `wsprintf()`,
+  and the non-Windows send failure message is initialized before throwing.
 
 Still needed:
 
@@ -281,6 +284,13 @@ Already covered:
 - The smoke suite covers the current facades for file/path, scene, level,
   image, image builder, rasterizer, vectorizers, renderer, wrapper id, binding
   lifecycle, and several edge cases.
+- The FilePath smoke coverage now includes mutable property setters,
+  `withParentDirectory()` parent conversion, `exists`, `isDirectory`, and
+  `lastModified` JS `Date` exposure.
+- The Scene smoke coverage now includes `Scene.getLevels()` wrapper identity
+  and lifetime behavior, including disposal of returned wrappers without
+  deleting scene-owned levels and the current empty-wrapper behavior for stale
+  scene-owned level wrappers after `Scene.dispose()`.
 - The ImageBuilder smoke covers legacy `ImageBuilder.clear()` returning
   `undefined` in addition to clear/fill behavior.
 - The focused QApplication scene-icon script smokes now pass under

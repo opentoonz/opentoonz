@@ -1,0 +1,45 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e.message || e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var fp = new FilePath("alpha/beta/original.tif");
+fp.extension = "png";
+fp.name = "renamed";
+fp.parentDirectory = new FilePath("gamma/delta");
+
+print("qt-script-filepath-mutation-setters", fp.name, fp.extension,
+      fp.parentDirectory.name, fp.toString());
+
+var moved = fp.withParentDirectory("epsilon/zeta");
+var stringParent = new FilePath("folder/source.txt");
+stringParent.parentDirectory = "string/parent";
+
+print("qt-script-filepath-mutation-parent", moved.name, moved.extension,
+      moved.parentDirectory.name, stringParent.parentDirectory.name,
+      stringParent.toString());
+
+var invalidParentError = hasError(function() {
+  fp.withParentDirectory({});
+}, "Argument doesn't look like a file path");
+try {
+  fp.parentDirectory = {};
+} catch (e) {
+}
+
+print("qt-script-filepath-mutation-errors", invalidParentError, fp.toString());
+
+var resources = new FilePath("toonz/sources/tnztools/Resources");
+var brush = resources.concat("brush.png");
+var missing = resources.concat("missing-file-for-qt6-script-smoke.png");
+var brushModified = brush.lastModified;
+
+print("qt-script-filepath-metadata-values", resources.exists,
+      resources.isDirectory, brush.exists, brush.isDirectory, missing.exists,
+      brushModified instanceof Date, brushModified.getTime() > 0);
+
+"qt-script-filepath-mutation-metadata-result";

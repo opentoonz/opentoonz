@@ -241,6 +241,10 @@ branch.
   uses `QLibraryInfo::path()` on Qt 6 and explicitly discards optional
   `QTranslator::load()` results. After this cleanup, the current app-target
   warning frontier in `main.cpp` is limited to OpenGL/GLUT deprecation output.
+- Legacy `toonzfarm/tfarm/tbaseserver.cpp` Windows socket diagnostics no
+  longer use unbounded `wsprintf()` calls; the messages now use bounded
+  `snprintf()` formatting, and the non-Windows send failure message is
+  initialized before throwing.
 - A bounded Qt 6 Cocoa startup smoke has been attempted with an isolated runtime
   `stuff` copy. It stayed alive until stopped by the smoke harness, but exposed
   plugin discovery gaps.
@@ -1504,6 +1508,12 @@ branch.
   `toonz/sources/tests/scriptengine/file_path.toonzscript` and is run by
   `mise run script-smoke-filepath-qt6`. It validates the first narrow
   `FilePath` compatibility facade on top of the Qt 6 `QJSEngine` backend.
+- A FilePath mutation/metadata Qt 6 script fixture exists at
+  `toonz/sources/tests/scriptengine/file_path_mutation_metadata.toonzscript`
+  and is run by `mise run script-smoke-filepath-mutation-metadata-qt6`. It
+  validates mutable `extension`, `name`, and `parentDirectory` properties,
+  `withParentDirectory()` string/FilePath conversion, `exists`, `isDirectory`,
+  and `lastModified` exposure as a JS `Date`.
 - A third Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/scene_basic.toonzscript` and is run by
   `mise run script-smoke-scene-qt6`. It validates the first narrow `Scene`
@@ -1559,6 +1569,13 @@ branch.
   cross-scene level isolation, scene disposal error behavior, and invalidated
   scene-owned level wrappers without entering viewer, offscreen GL, or renderer
   paths.
+- A Scene level-wrapper Qt 6 script fixture exists at
+  `toonz/sources/tests/scriptengine/scene_level_wrappers.toonzscript` and is
+  run by `mise run script-smoke-scene-level-wrappers-qt6`. It validates
+  `Scene.getLevels()` wrapper identity and lifetime behavior, including
+  disposing a returned wrapper without deleting the scene-owned level and the
+  current empty-wrapper behavior for stale scene-owned level wrappers after
+  `Scene.dispose()`.
 - A seventh Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/level_io.toonzscript` and is run by
   `mise run script-smoke-level-io-qt6`. It validates standalone empty
@@ -2184,6 +2201,7 @@ mise run script-smoke-run-errors-qt6
 mise run script-smoke-filepath-qt6
 mise run script-smoke-filepath-edges-qt6
 mise run script-smoke-filepath-metadata-qt6
+mise run script-smoke-filepath-mutation-metadata-qt6
 mise run script-smoke-path-arguments-qt6
 mise run script-smoke-scene-qt6
 mise run script-smoke-scene-cells-qt6
@@ -2192,6 +2210,7 @@ mise run script-smoke-scene-cell-fids-qt6
 mise run script-smoke-scene-edges-qt6
 mise run script-smoke-scene-argument-edges-qt6
 mise run script-smoke-scene-lifecycle-edges-qt6
+mise run script-smoke-scene-level-wrappers-qt6
 mise run script-smoke-scene-loadlevel-qt6
 mise run script-smoke-scene-loadlevel-sequence-qt6
 mise run script-smoke-scene-save-reopen-qt6
@@ -2232,6 +2251,7 @@ OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-run-errors-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-filepath-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-filepath-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-filepath-metadata-qt6
+OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-filepath-mutation-metadata-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-path-arguments-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-cells-qt6
@@ -2240,6 +2260,7 @@ OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-cell-fids-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-argument-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-lifecycle-edges-qt6
+OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-level-wrappers-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-loadlevel-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-loadlevel-sequence-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-save-reopen-qt6
