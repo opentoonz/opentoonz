@@ -65,10 +65,12 @@ Already covered:
 - Direct `QRegExp` usage is guarded against by `mise run check-no-qregexp`.
 - Direct `QTextCodec` usage is isolated behind the legacy text-codec adapter
   and guarded by `mise run check-core5compat-scope`.
-- An isolated Qt 6 translation configure lane exists through
-  `nix-qt6-translation-check` and `mise run configure-qt6-translations`.
-  This verifies Qt 6 translation target generation without perturbing the
-  default Qt 5 or normal Qt 6 build directories.
+- An isolated Qt 6 translation lane exists through
+  `nix-qt6-translation-check`, `mise run configure-qt6-translations`, and
+  `mise run build-qt6-translations`. The build task keeps
+  `WITH_TRANSLATION=ON` separate from the default Qt 5 and normal Qt 6 build
+  directories, resolves Qt 6 `lrelease` through the imported `Qt6::lrelease`
+  target, and verifies that the expected 63 generated `.qm` files are produced.
 - Direct checkbox state-change connects in `toonz`, `toonzqt`, and shared
   headers are centralized behind `QtCompat::connectCheckStateChanged`, with a
   Qt 6.7+ `checkStateChanged` path and a Qt 5 `stateChanged` fallback.
@@ -240,8 +242,10 @@ Already covered:
   Qt 5 lane keeps the existing `touchPoints()` / `QTouchEvent::TouchPoint`
   behavior.
 - Deprecated `QVariant::canConvert(QVariant::...)` overloads are no longer
-  present in the current app/UI/header tree. `DvDirTreeView` and the remaining
-  settings restore paths use templated `canConvert<T>()` checks instead.
+  present in the current app/UI/header tree. Fixed-type settings restore paths
+  use templated `canConvert<T>()` checks, and dynamic preference type checks
+  route through a version-aware helper that uses `QMetaType` on Qt 6 while
+  preserving the Qt 5 `QMetaType::Type` path.
 
 Still needed:
 
@@ -251,8 +255,9 @@ Still needed:
   no longer needs it.
 - Keep direct `QTextCodec`, `QRegExp`, and `QRegExpValidator` out of feature
   code.
-- Build and inspect generated `.qm` files in a release workflow before treating
-  translation generation as fully release-ready.
+- Verify packaged translations at runtime before treating translation support
+  as release-ready: switch each supported UI language in a packaged Qt 6 build,
+  restart the app, and spot-check menus, dialogs, tooltips, and fallback text.
 - Continue reducing the Qt 6 deprecation warning frontier, including
   remaining legacy event-coordinate accessors outside the completed
   SceneViewer, Function Panel, and shared-widget slices and the broader OpenGL
@@ -278,6 +283,27 @@ Already covered:
   lifecycle, and several edge cases.
 - The ImageBuilder smoke covers legacy `ImageBuilder.clear()` returning
   `undefined` in addition to clear/fill behavior.
+- The focused QApplication scene-icon script smokes now pass under
+  `QT_QPA_PLATFORM=offscreen`; the Qt 6 offscreen path writes a valid
+  background-filled icon instead of entering the unsupported offscreen
+  `TOfflineGL` path, while normal GUI/platform sessions keep the existing
+  rendered scene-icon path.
+- The packaged Qt 6 Script Console smoke covers the GUI-only `view()` helper
+  for generated `Image` and `Level` values, warning output delivery, a
+  repeated command after the `view()` calls, `run()` of a child script from the
+  isolated library scripts folder, child-script print output, child-script
+  return values, child-script global variable persistence back to the console,
+  expected error display for invalid `view()` usage, and Up-arrow
+  command-history recall inside the real console widget.
+- On macOS, the GUI smoke wrapper launches the packaged `.app` through
+  LaunchServices by default because direct executable launch can stall inside
+  `QApplication` construction in sandboxed automation contexts. Set
+  `OPENTOONZ_GUI_SMOKE_DIRECT_EXEC=1` only when intentionally debugging the
+  direct executable path.
+- On macOS, QApplication-based script smokes also launch through
+  LaunchServices by default and restore an explicit script smoke working
+  directory before fixture execution. The aggregate Qt 6 script smoke suite now
+  passes in this mode, including full-color Rasterizer and Renderer fixtures.
 - Aggregate script smoke tasks exist in both bounded and natural-exit modes.
 
 Still needed:
@@ -289,10 +315,25 @@ Still needed:
 - Verify legacy script-visible behavior for object lifetime, invalid argument
   handling, property conversion, arrays, frame ids, paths, scene mutation, and
   renderer output.
+- Resolve the remaining forced-offscreen OpenGL gap for full-color Rasterizer
+  and Renderer fixtures. A normal macOS LaunchServices-started QApplication
+  script smoke pass validates those fixtures with a real platform OpenGL
+  context, but a forced
+  `QT_QPA_PLATFORM=offscreen` aggregate run currently reaches
+  `script-smoke-rasterizer-qt6`, completes the color-mapped checks, then exits
+  with `Rasterization failed` when full-color Rasterizer output enters
+  `TOfflineGL` and Qt reports that the offscreen platform cannot create a
+  platform OpenGL context. `QtOfflineGL` now treats failed offscreen surface,
+  context, current-context, and framebuffer creation as normal C++ failures, so
+  this unsupported path is reported quickly instead of hanging in GL setup.
 - Decide the replacement story for `QScriptEngineDebugger`, which has no direct
   Qt 6 equivalent.
-- Confirm Script Console behavior manually, including `print`, `warning`,
-  `run`, `view(Image)`, `view(Level)`, error display, and cleanup.
+- Confirm Script Console behavior manually, including broader interactive
+  command editing, `run()` error paths from the GUI console, `view(Image)`,
+  `view(Level)`, FlipBook cleanup, behavior across repeated console sessions,
+  and real user scripts. The app-side smoke now covers `print`, `warning`, a
+  `run()` happy path with child output/return/global persistence, expected
+  `view()` error display, and one Up-arrow history recall path.
 - Remove `Qt5::Script` from all Qt 6 production targets.
 - Keep the Qt 5 script backend or retire it only after the compatibility suite
   proves that Qt 6 behavior is acceptable.
@@ -336,6 +377,7 @@ Already covered by focused smokes:
 - Final-render PNG output for basic raster, background, sequence, composite,
   vector, Toonz Raster, and a basic FX path.
 - Several offscreen/script renderer and rasterizer slices.
+- Focused scene-icon script save checks under Qt's offscreen platform.
 
 Still needed:
 
@@ -347,6 +389,9 @@ Still needed:
 - Production FX-heavy preview scenes.
 - Broader final-render parity against Qt 5 using real scenes.
 - Broader vector rendering parity.
+- Full-color Rasterizer/Renderer validation under a real OpenGL-capable
+  QApplication session, or a product-quality non-OpenGL fallback where
+  appropriate.
 - High-DPI visual behavior beyond the current framebuffer probes.
 - OpenGL fallback message triage.
 - Blank-viewer and stale-frame regression checks on realistic scenes.
@@ -420,6 +465,8 @@ macOS already covered:
 - Qt 6 multimedia and SVG/icon plugins are included.
 - Qt plugin framework references are rewritten into the bundle.
 - The current arm64 bundle check passes.
+- Packaged macOS Qt 6 app-side high-DPI and Script Console GUI smokes pass when
+  run through the LaunchServices wrapper outside the sandbox.
 - The `qt6-experimental` GitHub Actions workflow builds a Qt 6 macOS arm64 DMG
   artifact and publishes it to the `qt6-experimental` prerelease when that tag
   is pushed. `mise run release-qt6-experimental` retags the current clean branch

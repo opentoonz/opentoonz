@@ -62,6 +62,10 @@ run = "bash scripts/windows/check-msvc-abi.sh && nix develop path:.#qt6 --comman
 description = "Configure an isolated Qt 6 build with translation target generation enabled."
 run = "bash scripts/windows/check-msvc-abi.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-translation-check'"
 
+[tasks.build-qt6-translations]
+description = "Build the isolated Qt 6 translation lane and verify generated .qm files."
+run = "bash scripts/windows/check-msvc-abi.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-translation-check && cmake --build toonz/build/nix-qt6-translation-check --target OpenToonz --parallel && count=$(find toonz/stuff/config/loc -mindepth 2 -maxdepth 2 -name \"*.qm\" | wc -l | tr -d \" \"); test \"$count\" = 63'"
+
 [tasks.build]
 description = "Configure and build OpenToonz with Ninja in toonz/build/nix-relwithdebinfo."
 run = "bash scripts/windows/check-msvc-abi.sh && nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-relwithdebinfo && cmake --build toonz/build/nix-relwithdebinfo --parallel'"
@@ -103,7 +107,7 @@ description = "Capture packaged Qt 6 high-DPI screen and window state without ex
 run = "OPENTOONZ_GUI_SMOKE_ACTION=high-dpi bash scripts/qt6/run-gui-smoke.sh"
 
 [tasks.gui-smoke-script-console-view-qt6]
-description = "Run the packaged Qt 6 Script Console view() helper against generated Image and Level values."
+description = "Run packaged Qt 6 Script Console view(), warning, and expected-error helpers."
 run = "OPENTOONZ_GUI_SMOKE_ACTION=script-console-view bash scripts/qt6/run-gui-smoke.sh"
 
 [tasks.gui-smoke-media-devices-qt6]

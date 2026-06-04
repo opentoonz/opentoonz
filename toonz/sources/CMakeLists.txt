@@ -459,6 +459,11 @@ set(_opentoonz_qt_widgets_includes_var "${OPENTOONZ_QT_PACKAGE}Widgets_INCLUDE_D
 set(OPENTOONZ_QT_WIDGETS_INCLUDE_DIRS "${${_opentoonz_qt_widgets_includes_var}}")
 set(_opentoonz_qt_lrelease_var "${OPENTOONZ_QT_PACKAGE}_LRELEASE_EXECUTABLE")
 set(OPENTOONZ_QT_LRELEASE_EXECUTABLE "${${_opentoonz_qt_lrelease_var}}")
+if(TARGET ${OPENTOONZ_QT_PACKAGE}::lrelease)
+    set(OPENTOONZ_QT_LRELEASE_EXECUTABLE "$<TARGET_FILE:${OPENTOONZ_QT_PACKAGE}::lrelease>")
+elseif(NOT OPENTOONZ_QT_LRELEASE_EXECUTABLE)
+    message(FATAL_ERROR "${OPENTOONZ_QT_PACKAGE} lrelease executable not found")
+endif()
 
 macro(opentoonz_qt_wrap_cpp)
     if(OPENTOONZ_QT_MAJOR EQUAL 5)

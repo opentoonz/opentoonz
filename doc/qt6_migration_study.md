@@ -88,7 +88,10 @@ Important local facts:
   `qtscript5-dev`, `qtmultimedia5-dev`, Qt Wayland, Qt SVG, Qt OpenGL, and Qt
   Serial Port packages.
 - `WITH_TRANSLATION=OFF` is the common CI/Nix path, but translation generation
-  still uses Qt-specific CMake commands when enabled.
+  still uses Qt-specific CMake commands when enabled. The Qt 6 branch now has
+  an isolated `WITH_TRANSLATION=ON` lane that builds `OpenToonz`, resolves
+  `lrelease` through `Qt6::lrelease`, and verifies the expected 63 generated
+  `.qm` files.
 
 ## Qt Module Inventory
 
@@ -208,6 +211,10 @@ Current branch status:
 - The Qt target and resource/moc/translation command selection is centralized
   so subdirectories can build against either Qt major without hard-coding
   `Qt5::` targets or `qt5_*` commands.
+- The isolated Qt 6 translation lane is build-verified with
+  `mise run build-qt6-translations`; this covers `.ts` to `.qm` generation,
+  but packaged runtime language switching and localized UI spot checks remain
+  manual release verification work.
 - The Qt 5 default lane currently compiles and links the `OpenToonz` app target
   with `cmake --build toonz/build/nix-relwithdebinfo --target OpenToonz
   --parallel`.
@@ -1427,8 +1434,12 @@ Current branch status:
   `QApplication` script path for `Scene.save()` scene-icon generation by saving
   a scene, checking the generated `sceneIcons` PNG, and loading that icon back
   through the Qt 6 `Image` facade. This is a narrow offscreen-rendering
-  boundary check; it does not claim scene-icon visual parity, viewer parity, or
-  broader render-output parity.
+  boundary check; under Qt's `offscreen` platform the Qt 6 scene-icon save path
+  writes a valid background-filled icon instead of entering `TOfflineGL`, which
+  avoids the unsupported offscreen OpenGL context path used only by automation.
+  Normal GUI/platform sessions still use the existing rendered scene-icon path.
+  This does not claim scene-icon visual parity, viewer parity, or broader
+  render-output parity.
 - `toonz/sources/tests/scriptengine/scene_save_icon_variants.toonzscript` is
   the repo-local Qt 6 scene-icon variant compatibility fixture. It is run by
   `mise run script-smoke-scene-save-icon-variants-qt6` and verifies the
@@ -1436,7 +1447,7 @@ Current branch status:
   save, checking that both generated `sceneIcons` PNGs load through the Qt 6
   `Image` facade with stable nonzero dimensions. This remains a
   scene-icon/offscreen boundary check; it does not claim pixel-level icon
-  parity or viewer parity.
+  parity, rendered icon parity, or viewer parity.
 - `toonz/sources/tests/scriptengine/scene_columns.toonzscript` is the
   repo-local Qt 6 Scene/xsheet column mutation fixture. It is run by
   `mise run script-smoke-scene-columns-qt6` and verifies populated cells shift
@@ -1650,6 +1661,19 @@ Current branch status:
   surfaces. Use the aggregate tasks as the default script-parity regression gate
   after adding or changing a QJSEngine facade fixture, and keep the individual
   fixture tasks for focused failure triage.
+- On 2026-06-04, focused scene-icon verification passed under
+  `QT_QPA_PLATFORM=offscreen` for `mise run script-smoke-scene-save-icon-qt6`
+  and `mise run script-smoke-scene-save-icon-variants-qt6`. A broader forced
+  offscreen `mise run script-smokes-qt6` run still fails at
+  `script-smoke-rasterizer-qt6` after the color-mapped Rasterizer checks, when
+  full-color Rasterizer output enters `TOfflineGL` and Qt reports that the
+  offscreen platform cannot create a platform OpenGL context. `QtOfflineGL` now
+  validates offscreen surface, context, current-context, and framebuffer
+  creation so this unsupported path exits quickly with `Rasterization failed`
+  instead of timing out in GL setup. The remaining full-color
+  Rasterizer/Renderer offscreen OpenGL path needs either a real OpenGL-capable
+  QApplication validation run or a product-appropriate non-OpenGL
+  implementation; it is not closed by the scene-icon fallback.
 - Qt 6 command-line script execution now uses an early headless path before
   macOS `QApplication`, plugin loading, and main-window construction. That path
   still performs Toonz environment setup, uses `stuff/cache` for script-mode
@@ -1671,8 +1695,27 @@ Current branch status:
   and `Level` values on top of the `QJSEngine` facade. The helper stays in the
   `toonz` app layer so flipbook UI dependencies do not leak into `toonzlib`;
   `mise run gui-smoke-script-console-view-qt6` validates the GUI helper against
-  generated `Image` and `Level` values. Headless script-smoke execution still
-  does not expose `view()`.
+  generated `Image` and `Level` values, warning output delivery, a repeated
+  command after the `view()` calls, `run()` of a child script from the isolated
+  library scripts folder, child-script print output, child-script return
+  values, child-script global variable persistence back to the console,
+  expected error display for invalid `view()` usage, and one Up-arrow
+  command-history recall through the real console widget. Headless script-smoke
+  execution still does not expose `view()`, and manual console verification
+  remains required for broader interactive command editing, `run()` error
+  paths, FlipBook cleanup, repeated sessions, and real user scripts.
+- On macOS, the packaged Qt 6 GUI smoke wrapper now launches the `.app` through
+  LaunchServices by default. This avoids a sandbox-sensitive direct-executable
+  stall inside `QApplication` construction and matches normal bundle startup
+  more closely. `OPENTOONZ_GUI_SMOKE_DIRECT_EXEC=1` remains available for
+  focused direct-launch diagnostics.
+- The Qt 6 script smoke wrapper now uses LaunchServices for macOS
+  `OPENTOONZ_SCRIPT_USE_QAPPLICATION=1` fixtures, while preserving direct
+  execution for fast headless fixtures. It passes an explicit
+  `OPENTOONZ_SCRIPT_WORKING_DIRECTORY`, which OpenToonz restores before running
+  script bootstrap and fixture code. With this path, the aggregate Qt 6 script
+  smoke suite passes, including full-color Rasterizer and Renderer
+  QApplication fixtures.
 - The Qt 6 branch now has a minimal `FilePath` compatibility slice for
   construction, string conversion, name/extension/parent accessors, mutation
   helpers, path concatenation, existence checks, directory checks, modified-time

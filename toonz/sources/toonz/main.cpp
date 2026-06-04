@@ -159,12 +159,14 @@
 #endif
 #include <QEventLoop>
 #include <QHash>
+#include <QKeyEvent>
 #include <QMouseEvent>
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 #include <QInputDevice>
 #include <QPointingDevice>
 #endif
 #include <QTabletEvent>
+#include <QTextBlock>
 #include <QTimer>
 #include <QStringList>
 #include <QTextStream>
@@ -554,10 +556,12 @@ static std::vector<FlipBook *> gui_smoke_visible_preview_flipbooks(
 }
 
 static QStringList gui_smoke_script_console_view_details() {
+  log_gui_smoke_progress("script-console-view-start");
   QStringList details;
   const int beforeFlipbooks = gui_smoke_visible_flipbook_count();
 
   ScriptConsolePanel panel(TApp::instance()->getMainWindow());
+  log_gui_smoke_progress("script-console-view-panel-created");
   ScriptConsole *console = panel.findChild<ScriptConsole *>();
   if (!console) {
     return details << QStringLiteral("scriptConsoleViewProbe=missing-console");
@@ -572,45 +576,131 @@ static QStringList gui_smoke_script_console_view_details() {
   QStringList outputs;
   QObject::connect(engine, &ScriptEngine::output, &panel,
                    [&](int type, const QString &value) {
-                     if (type == ScriptEngine::ExecutionError ||
-                         type == ScriptEngine::SyntaxError) {
+                     const bool expectedViewError =
+                         type == ScriptEngine::SyntaxError &&
+                         value.contains(QStringLiteral(
+                             "expected one argument : an image or a level"));
+                     if (!expectedViewError &&
+                         (type == ScriptEngine::ExecutionError ||
+                          type == ScriptEngine::SyntaxError)) {
                        hadError = true;
                      }
                      outputs << QString("%1:%2").arg(type).arg(
                          gui_smoke_status_value(value));
                    });
 
-  panel.executeCommand(
-      QStringLiteral("var builder = new ImageBuilder(16, 12, \"Raster\");"
-                     "builder.fill(\"#FF0000\");"
-                     "var image = builder.image;"
-                     "view(image);"
-                     "var level = new Level(\"Raster\", "
-                     "\"qt_script_console_view\");"
-                     "level.setFrame(\"1\", image);"
-                     "view(level);"
-                     "print(\"qt-script-console-view\", image.type, "
-                     "image.width, image.height, level.type, "
-                     "level.frameCount);"));
-  gui_smoke_pump_events(100);
+  auto executeAndWait = [&](const QString &cmd) {
+    panel.executeCommand(cmd);
+    QElapsedTimer timer;
+    timer.start();
+    while (engine->isEvaluating() && timer.elapsed() < 10000)
+      gui_smoke_pump_events(50);
+    gui_smoke_pump_events(200);
+  };
 
-  const int afterFlipbooks = gui_smoke_visible_flipbook_count();
-  bool sawMarker           = false;
-  for (const QString &output : outputs) {
-    if (output.contains(QStringLiteral("qt-script-console-view"))) {
-      sawMarker = true;
-      break;
+  const TFilePath consoleRunScriptPath =
+      ToonzFolder::getLibraryFolder() + "scripts" +
+      "qt_script_console_run_child.toonzscript";
+  const TFilePath consoleRunScriptFolder =
+      consoleRunScriptPath.getParentDir();
+  const QString consoleRunScriptFolderString =
+      QString::fromStdWString(consoleRunScriptFolder.getWideString());
+  const QString consoleRunScriptPathString =
+      QString::fromStdWString(consoleRunScriptPath.getWideString());
+  bool consoleRunScriptReady =
+      QDir().mkpath(consoleRunScriptFolderString);
+  if (consoleRunScriptReady) {
+    QFile consoleRunScript(consoleRunScriptPathString);
+    if (consoleRunScript.open(QIODevice::WriteOnly | QIODevice::Truncate |
+                              QIODevice::Text)) {
+      QTextStream stream(&consoleRunScript);
+      stream << "print(\"qt-script-console-run-child\", 4 + 5);\n"
+             << "qtScriptConsoleRunChildGlobal = \"child-global\";\n"
+             << "\"child-return\";\n";
+      consoleRunScript.close();
+    } else {
+      consoleRunScriptReady = false;
     }
   }
 
+  log_gui_smoke_progress("script-console-view-command-view");
+  executeAndWait(QStringLiteral(
+      "var builder = new ImageBuilder(16, 12, \"Raster\");"
+      "builder.fill(\"#FF0000\");"
+      "var image = builder.image;"
+      "view(image);"
+      "var level = new Level(\"Raster\", "
+      "\"qt_script_console_view\");"
+      "level.setFrame(\"1\", image);"
+      "view(level);"
+      "print(\"qt-script-console-view\", image.type, "
+      "image.width, image.height, level.type, "
+      "level.frameCount);"));
+  log_gui_smoke_progress("script-console-view-command-warning");
+  executeAndWait(
+      QStringLiteral("warning(\"qt-script-console-warning\");"));
+  log_gui_smoke_progress("script-console-view-command-repeat");
+  executeAndWait(
+      QStringLiteral("print(\"qt-script-console-repeat\", 1 + 2);"));
+  if (consoleRunScriptReady) {
+    log_gui_smoke_progress("script-console-view-command-run");
+    executeAndWait(QStringLiteral(
+        "var runResult = run(\"qt_script_console_run_child.toonzscript\");"
+        "print(\"qt-script-console-run\", runResult, "
+        "qtScriptConsoleRunChildGlobal);"));
+  }
+  log_gui_smoke_progress("script-console-view-command-error");
+  executeAndWait(QStringLiteral("view();"));
+  log_gui_smoke_progress("script-console-view-commands-done");
+
+  console->setFocus();
+  console->moveCursor(QTextCursor::End);
+  QKeyEvent historyUpEvent(QEvent::KeyPress, Qt::Key_Up, Qt::NoModifier);
+  QApplication::sendEvent(console, &historyUpEvent);
+  gui_smoke_pump_events(100);
+  const QString historyLine = console->document()->lastBlock().text();
+
+  const int afterFlipbooks = gui_smoke_visible_flipbook_count();
+  bool sawMarker           = false;
+  bool sawWarning          = false;
+  bool sawRepeat           = false;
+  bool sawRunChild         = false;
+  bool sawRun              = false;
+  bool sawExpectedError    = false;
+  for (const QString &output : outputs) {
+    if (output.contains(QStringLiteral("qt-script-console-view"))) {
+      sawMarker = true;
+    } else if (output.contains(QStringLiteral("qt-script-console-warning"))) {
+      sawWarning = true;
+    } else if (output.contains(QStringLiteral("qt-script-console-repeat"))) {
+      sawRepeat = true;
+    } else if (output.contains(QStringLiteral("qt-script-console-run-child"))) {
+      sawRunChild = true;
+    } else if (output.contains(QStringLiteral("qt-script-console-run"))) {
+      sawRun = true;
+    } else if (output.contains(QStringLiteral(
+                   "expected one argument : an image or a level"))) {
+      sawExpectedError = true;
+    }
+  }
+  const bool historyOk =
+      historyLine.contains(QStringLiteral("view();"));
+
   details << QString("scriptConsoleOutput=%1").arg(
                  gui_smoke_joined_values(outputs))
+          << QString("scriptConsoleHistoryLine=%1").arg(
+                 gui_smoke_status_value(historyLine))
+          << QString("scriptConsoleRunScriptReady=%1")
+                 .arg(consoleRunScriptReady ? QStringLiteral("yes")
+                                            : QStringLiteral("no"))
           << QString("visibleFlipbooksBefore=%1").arg(beforeFlipbooks)
           << QString("visibleFlipbooksAfter=%1").arg(afterFlipbooks)
           << QString("visibleFlipbookDelta=%1")
                  .arg(afterFlipbooks - beforeFlipbooks)
           << QString("scriptConsoleViewProbe=%1")
-                 .arg(!hadError && sawMarker && afterFlipbooks > beforeFlipbooks
+                 .arg(!hadError && sawMarker && sawWarning && sawRepeat &&
+                              sawRunChild && sawRun && sawExpectedError &&
+                              afterFlipbooks > beforeFlipbooks && historyOk
                           ? QStringLiteral("ok")
                           : QStringLiteral("error"));
   return details;
@@ -15553,7 +15643,8 @@ int main(int argc, char *argv[]) {
   setlocale(LC_NUMERIC, "C");
 
   const bool isRunScript = (loadFilePath.getType() == "toonzscript");
-  const QString scriptWorkingDirectory = QDir::currentPath();
+  const QString scriptWorkingDirectory = qEnvironmentVariable(
+      "OPENTOONZ_SCRIPT_WORKING_DIRECTORY", QDir::currentPath());
 
 // Set current directory to the bundle/application path - this is needed to have
 // correct relative paths
@@ -15571,6 +15662,37 @@ int main(int argc, char *argv[]) {
   QApplication::instance()->setAttribute(Qt::AA_DontShowIconsInMenus, false);
 
   TEnv::setApplicationFileName(argv[0]);
+
+#if OPENTOONZ_QT_MAJOR >= 6
+  if (isRunScript) {
+    try {
+      TSystem::hasMainLoop(true);
+      TMessageRepository::instance();
+      TBigMemoryManager::instance()->setRunOutOfContiguousMemoryHandler(
+          &toonzRunOutOfContMemHandler);
+      ThirdParty::initialize();
+      initToonzEnv(argumentPathValues, false);
+      log_gui_smoke_progress("toonz-env-initialized");
+      IconGenerator::setFilmstripIconSize(
+          Preferences::instance()->getIconSize());
+      TThread::init();
+      log_gui_smoke_progress("threads-initialized");
+      QDir::setCurrent(scriptWorkingDirectory);
+      return run_script(loadFilePath);
+    } catch (const TException &e) {
+      std::cerr << QString::fromStdWString(e.getMessage()).toStdString()
+                << std::endl;
+      return 1;
+    } catch (const std::exception &e) {
+      std::cerr << e.what() << std::endl;
+      return 1;
+    } catch (...) {
+      std::cerr << "Unknown QApplication script-mode initialization error"
+                << std::endl;
+      return 1;
+    }
+  }
+#endif
 
 // splash screen (override with local file if present)
 QString exeDir = QCoreApplication::applicationDirPath();
@@ -15659,13 +15781,6 @@ if (QFileInfo(localSplashPath).exists() && QFileInfo(localSplashPath).isFile()) 
   // Initialize thread components
   TThread::init();
   log_gui_smoke_progress("threads-initialized");
-
-#if OPENTOONZ_QT_MAJOR >= 6
-  if (isRunScript) {
-    QDir::setCurrent(scriptWorkingDirectory);
-    return run_script(loadFilePath);
-  }
-#endif
 
   TProjectManager *projectManager = TProjectManager::instance();
   if (Preferences::instance()->isSVNEnabled()) {

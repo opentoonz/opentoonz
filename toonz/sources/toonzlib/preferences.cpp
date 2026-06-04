@@ -50,6 +50,17 @@ const char *s_dpiPolicy = "dpiPolicy", *s_dpi = "dpi",
 
 //=================================================================
 
+inline bool canConvertPreferenceValue(const QVariant &value,
+                                      QMetaType::Type type) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return value.canConvert(QMetaType(type));
+#else
+  return value.canConvert(type);
+#endif
+}
+
+//=================================================================
+
 inline QString colorToString(const QColor &color) {
   return QString("%1 %2 %3 %4")
       .arg(color.red())
@@ -728,12 +739,12 @@ void Preferences::define(PreferencesItemId id, QString idString,
   case QMetaType::Double:
   case QMetaType::QString:
     if (m_settings->contains(idString) &&
-        m_settings->value(idString).canConvert(type))
+        canConvertPreferenceValue(m_settings->value(idString), type))
       value = m_settings->value(idString);
     break;
   case QMetaType::QSize:  // Used in iconSize
     if (m_settings->contains(idString) &&
-        m_settings->value(idString).canConvert(QMetaType::QSize))
+        canConvertPreferenceValue(m_settings->value(idString), QMetaType::QSize))
       value = m_settings->value(idString);
     // To keep compatibility with older versions
     else if (m_settings->contains(idString + "X")) {
@@ -767,7 +778,7 @@ void Preferences::define(PreferencesItemId id, QString idString,
     break;
   case QMetaType::QVariantMap:  // Used in colorCalibrationLutPaths
     if (m_settings->contains(idString) &&
-        m_settings->value(idString).canConvert(type)) {
+        canConvertPreferenceValue(m_settings->value(idString), type)) {
       QMap<QString, QVariant> pathMap = m_settings->value(idString).toMap();
       value.setValue(pathMap);
     }

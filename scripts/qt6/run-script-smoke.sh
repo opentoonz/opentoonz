@@ -28,6 +28,7 @@ fi
 executable="$app_path/Contents/MacOS/OpenToonz"
 script_name="$(basename "$script_path")"
 log_path="$smoke_root/${script_name%.*}-script-smoke.log"
+rm -f "$log_path"
 
 has_expected_output() {
   local expected
@@ -41,14 +42,24 @@ has_expected_output() {
 }
 
 is_smoke_process_running() {
-  jobs -pr | grep -Fxq "$pid"
+  if [[ "${launch_with_open:-0}" == "1" ]]; then
+    [[ -n "${open_pid:-}" ]] && kill -0 "$open_pid" 2>/dev/null
+  else
+    jobs -pr | grep -Fxq "$pid"
+  fi
 }
 
 stop_smoke_process() {
   # OpenToonz handles SIGTERM as a crash signal; bounded smokes use SIGKILL so
   # harness cleanup does not generate misleading crash-handler output.
-  kill -9 "$pid" 2>/dev/null || true
-  wait "$pid" 2>/dev/null || true
+  if [[ -n "${pid:-}" ]]; then
+    kill -9 "$pid" 2>/dev/null || true
+    wait "$pid" 2>/dev/null || true
+  fi
+  if [[ -n "${open_pid:-}" ]]; then
+    kill -9 "$open_pid" 2>/dev/null || true
+    wait "$open_pid" 2>/dev/null || true
+  fi
 }
 
 if [[ ! -x "$executable" ]]; then
@@ -100,8 +111,59 @@ if [[ -n "$library_fixture" ]]; then
   cp -p "$library_fixture" "$smoke_root/stuff/library/scripts/$(basename "$library_fixture")"
 fi
 
-(
-  cd "$smoke_root"
+launch_args=(
+  -TOONZROOT "$smoke_root/stuff"
+  -TOONZPROFILES "$smoke_root/stuff/profiles"
+  -TOONZCONFIG "$smoke_root/stuff/config"
+  -TOONZLIBRARY "$smoke_root/stuff/library"
+  -TOONZSTUDIOPALETTE "$smoke_root/stuff/studiopalette"
+  -TOONZFXPRESETS "$smoke_root/stuff/fxs"
+  -TOONZPROJECTS "$smoke_root/stuff/projects"
+  "$script_path"
+)
+
+launch_with_open=0
+if [[ "$(uname -s)" == "Darwin" &&
+      "${OPENTOONZ_SCRIPT_USE_QAPPLICATION:-0}" == "1" &&
+      "${OPENTOONZ_SCRIPT_SMOKE_DIRECT_EXEC:-0}" != "1" &&
+      -x /usr/bin/open ]]; then
+  launch_with_open=1
+fi
+
+if [[ "$launch_with_open" == "1" ]]; then
+  (
+    cd "$smoke_root"
+    /usr/bin/open -W -n "$app_path" \
+      --stdout "$log_path" \
+      --stderr "$log_path" \
+      --env "HOME=$smoke_home" \
+      --env "XDG_CONFIG_HOME=$smoke_root/xdg-config" \
+      --env "XDG_CACHE_HOME=$smoke_root/xdg-cache" \
+      --env "TOONZROOT=$smoke_root/stuff" \
+      --env "TOONZPROFILES=$smoke_root/stuff/profiles" \
+      --env "TOONZCONFIG=$smoke_root/stuff/config" \
+      --env "TOONZLIBRARY=$smoke_root/stuff/library" \
+      --env "TOONZSTUDIOPALETTE=$smoke_root/stuff/studiopalette" \
+      --env "TOONZFXPRESETS=$smoke_root/stuff/fxs" \
+    --env "TOONZPROJECTS=$smoke_root/stuff/projects" \
+    --env "TOONZCACHEROOT=$smoke_root/stuff/cache" \
+    --env "OPENTOONZ_SCRIPT_USE_QAPPLICATION=1" \
+    --env "OPENTOONZ_SCRIPT_WORKING_DIRECTORY=$smoke_root" \
+    --args "${launch_args[@]}"
+  ) \
+    >/dev/null 2>&1 &
+  open_pid=$!
+  pid=""
+  for ((attempt = 0; attempt < 100; attempt++)); do
+    pid="$(pgrep -n -f "$executable" 2>/dev/null || true)"
+    if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
+      break
+    fi
+    sleep 0.1
+  done
+else
+  (
+    cd "$smoke_root"
   HOME="$smoke_home" \
   XDG_CONFIG_HOME="$smoke_root/xdg-config" \
   XDG_CACHE_HOME="$smoke_root/xdg-cache" \
@@ -113,18 +175,13 @@ fi
   TOONZFXPRESETS="$smoke_root/stuff/fxs" \
   TOONZPROJECTS="$smoke_root/stuff/projects" \
   TOONZCACHEROOT="$smoke_root/stuff/cache" \
+  OPENTOONZ_SCRIPT_WORKING_DIRECTORY="$smoke_root" \
   "$executable" \
-    -TOONZROOT "$smoke_root/stuff" \
-    -TOONZPROFILES "$smoke_root/stuff/profiles" \
-    -TOONZCONFIG "$smoke_root/stuff/config" \
-    -TOONZLIBRARY "$smoke_root/stuff/library" \
-    -TOONZSTUDIOPALETTE "$smoke_root/stuff/studiopalette" \
-    -TOONZFXPRESETS "$smoke_root/stuff/fxs" \
-    -TOONZPROJECTS "$smoke_root/stuff/projects" \
-    "$script_path"
-) \
-  >"$log_path" 2>&1 &
-pid=$!
+    "${launch_args[@]}"
+  ) \
+    >"$log_path" 2>&1 &
+  pid=$!
+fi
 
 elapsed=0
 expected_seen=0
@@ -153,7 +210,11 @@ while is_smoke_process_running; do
 done
 
 set +e
-wait "$pid"
+if [[ "$launch_with_open" == "1" ]]; then
+  wait "$open_pid"
+else
+  wait "$pid"
+fi
 status=$?
 set -e
 

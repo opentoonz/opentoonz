@@ -48,6 +48,7 @@
 
 TOfflineGL *currentOfflineGL = 0;
 
+#include <QGuiApplication>
 #include <QProgressDialog>
 
 #if defined(MACOSX) || defined(LINUX) || defined(FREEBSD)
@@ -147,6 +148,15 @@ void makeSceneIcon(ToonzScene *scene) {
   TRaster32P ras(iconCameraSize);
   TPixel32 bgColor = scene->getProperties()->getBgColor();
   ras->fill(bgColor);
+
+#if OPENTOONZ_QT_MAJOR >= 6
+  if (QGuiApplication::platformName() == QStringLiteral("offscreen")) {
+    TFilePath iconPath = scene->getIconPath();
+    if (TSystem::touchParentDir(iconPath)) TImageWriter::save(iconPath, ras);
+    return;
+  }
+#endif
+
   scene->renderFrame(ras, 0);
 
   TFilePath iconPath = scene->getIconPath();

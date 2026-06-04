@@ -28,6 +28,8 @@
 #include "toonz/tscenehandle.h"
 #include "toonz/toonzscene.h"
 
+#include <cstdio>
+
 #include <QOperatingSystemVersion>
 #include <QDesktopServices>
 #include <QApplication>
@@ -153,7 +155,7 @@ static void printBacktrace(std::string &out) {
     if (frameStack++ < frameSkip) continue;
     char numStr[32];
     memset(numStr, 0, sizeof(numStr));
-    sprintf(numStr, "%3i> ", frameStack - frameSkip);
+    snprintf(numStr, sizeof(numStr), "%3i> ", frameStack - frameSkip);
     out.append(numStr);
 
     sourceSym->SizeOfStruct  = sizeof(IMAGEHLP_SYMBOL64);
@@ -182,7 +184,8 @@ static void printBacktrace(std::string &out) {
         out.append("}");
       } else {
         memset(numStr, 0, sizeof(numStr));
-        sprintf(numStr, " [0x%" PRIx64 "]", stackframe.AddrPC.Offset);
+        snprintf(numStr, sizeof(numStr), " [0x%" PRIx64 "]",
+                 stackframe.AddrPC.Offset);
         out.append(numStr);
       }
       out.append(" <");
@@ -290,9 +293,10 @@ static bool sh(std::string &out, const char *cmd) {
 static bool addr2line(std::string &out, const char *exepath, const char *addr) {
   char cmd[512];
 #ifdef MACOSX
-  sprintf(cmd, "atos -o \"%.400s\" %s 2>&1", exepath, addr);
+  snprintf(cmd, sizeof(cmd), "atos -o \"%.400s\" %s 2>&1", exepath, addr);
 #else
-  sprintf(cmd, "addr2line -f -p -e \"%.400s\" %s 2>&1", exepath, addr);
+  snprintf(cmd, sizeof(cmd), "addr2line -f -p -e \"%.400s\" %s 2>&1", exepath,
+           addr);
 #endif
   return sh(out, cmd);
 }
@@ -331,7 +335,7 @@ static void printBacktrace(std::string &out) {
       if (frameStack++ < frameSkip) continue;
       char numStr[32];
       memset(numStr, 0, sizeof(numStr));
-      sprintf(numStr, "%3i> ", frameStack - frameSkip);
+      snprintf(numStr, sizeof(numStr), "%3i> ", frameStack - frameSkip);
       out.append(numStr);
 
       std::string sym = bts[i];

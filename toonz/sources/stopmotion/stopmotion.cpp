@@ -1917,7 +1917,7 @@ void StopMotion::saveXmlFile() {
   TFilePath tempFile     = parentDir + TFilePath(levelName + L".xml");
   QString xmlFileName    = tempFile.getQString();
   QFile xmlFile(xmlFileName);
-  xmlFile.open(QIODevice::WriteOnly);
+  if (!xmlFile.open(QIODevice::WriteOnly)) return;
   QXmlStreamWriter xmlWriter(&xmlFile);
   xmlWriter.setAutoFormatting(true);
   xmlWriter.writeStartDocument();
@@ -1990,7 +1990,7 @@ bool StopMotion::loadXmlFile() {
   QString xmlFileName    = tempFile.getQString();
   QFile xmlFile(xmlFileName);
   if (!xmlFile.exists()) return false;
-  xmlFile.open(QIODevice::ReadOnly);
+  if (!xmlFile.open(QIODevice::ReadOnly)) return false;
 
   QXmlStreamReader xmlReader;
   xmlReader.setDevice(&xmlFile);

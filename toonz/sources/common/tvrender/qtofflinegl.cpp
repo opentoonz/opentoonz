@@ -4,6 +4,8 @@
 #include <traster.h>
 #include <tconvert.h>
 
+#include <stdexcept>
+
 //-----------------------------------------------------------------------------
 
 #if 0  // was _WIN32, this function not used
@@ -169,16 +171,26 @@ void QtOfflineGL::createContext(TDimension rasterSize,
   m_surface = std::make_shared<QOffscreenSurface>();
   m_surface->setFormat(format);
   m_surface->create();
+  if (!m_surface->isValid()) {
+    throw std::runtime_error("Failed to create Qt offscreen OpenGL surface");
+  }
 
   m_context = std::make_shared<QOpenGLContext>();
   m_context->setFormat(format);
-  m_context->create();
-  m_context->makeCurrent(m_surface.get());
+  if (!m_context->create()) {
+    throw std::runtime_error("Failed to create Qt offscreen OpenGL context");
+  }
+  if (!m_context->makeCurrent(m_surface.get())) {
+    throw std::runtime_error("Failed to make Qt offscreen OpenGL context current");
+  }
 
   QOpenGLFramebufferObjectFormat fbo_format;
   fbo_format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
   m_fbo = std::make_shared<QOpenGLFramebufferObject>(rasterSize.lx,
                                                      rasterSize.ly, fbo_format);
+  if (!m_fbo->isValid()) {
+    throw std::runtime_error("Failed to create Qt offscreen OpenGL framebuffer");
+  }
   m_fbo->bind();
 
   printf("create context:%p [thread:0x%x]\n", m_context.get(),
@@ -193,7 +205,10 @@ void QtOfflineGL::createContext(TDimension rasterSize,
 void QtOfflineGL::makeCurrent() {
   if (m_context) {
     m_context->moveToThread(QThread::currentThread());
-    m_context->makeCurrent(m_surface.get());
+    if (!m_context->makeCurrent(m_surface.get())) {
+      throw std::runtime_error(
+          "Failed to make Qt offscreen OpenGL context current");
+    }
   }
 }
 

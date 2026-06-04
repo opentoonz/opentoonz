@@ -501,13 +501,13 @@ fi
 
 launch_with_open=0
 if [[ "$(uname -s)" == "Darwin" &&
-      "$smoke_action" == "viewer-raster-brush-system-events" &&
+      "${OPENTOONZ_GUI_SMOKE_DIRECT_EXEC:-0}" != "1" &&
       -x /usr/bin/open ]]; then
   launch_with_open=1
 fi
 
 if [[ "$launch_with_open" == "1" ]]; then
-  /usr/bin/open -W -n -a "$app_path" \
+  /usr/bin/open -W -n "$app_path" \
     --stdout "$log_path" \
     --stderr "$log_path" \
     --env "HOME=$smoke_root/home" \
@@ -953,10 +953,19 @@ while is_smoke_process_running; do
 
       script_console_probe="$(status_value scriptConsoleViewProbe || true)"
       script_console_output="$(status_value scriptConsoleOutput || true)"
+      script_console_history="$(status_value scriptConsoleHistoryLine || true)"
+      script_console_run_script_ready="$(status_value scriptConsoleRunScriptReady || true)"
       visible_flipbook_delta="$(status_value visibleFlipbookDelta || true)"
       if [[ "$script_console_probe" != "ok" ||
+            "$script_console_run_script_ready" != "yes" ||
             ! "$visible_flipbook_delta" =~ ^-?[0-9]+$ ||
-            "$script_console_output" != *qt-script-console-view* ]]; then
+            "$script_console_output" != *qt-script-console-view* ||
+            "$script_console_output" != *qt-script-console-repeat* ||
+            "$script_console_output" != *qt-script-console-run-child* ||
+            "$script_console_output" != *qt-script-console-run* ||
+            "$script_console_output" != *child-return* ||
+            "$script_console_output" != *child-global* ||
+            "$script_console_history" != *view* ]]; then
         stop_smoke_process
         echo "error: $smoke_label script-console-view smoke reported unexpected state" >&2
         sed -n '1,120p' "$status_path" >&2
@@ -977,6 +986,8 @@ while is_smoke_process_running; do
         echo "Window: $script_console_window"
         echo "Flipbooks opened: $visible_flipbook_delta"
         echo "Output: $script_console_output"
+        echo "History line: $script_console_history"
+        echo "Run script ready: $script_console_run_script_ready"
         echo "Log: $log_path"
         wait "$pid"
         exit $?
@@ -986,6 +997,8 @@ while is_smoke_process_running; do
       echo "$smoke_label script-console-view smoke passed: $script_console_window"
       echo "Flipbooks opened: $visible_flipbook_delta"
       echo "Output: $script_console_output"
+      echo "History line: $script_console_history"
+      echo "Run script ready: $script_console_run_script_ready"
       echo "Log: $log_path"
       exit 0
     fi

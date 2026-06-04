@@ -96,11 +96,17 @@ branch.
   `image`, `toonzlib`, and `OpenToonz`, the current targets that include the
   legacy text-codec adapter. Drop those targeted links once the adapter no
   longer needs Core5Compat.
-- An isolated Qt 6 translation configure lane exists through the
-  `nix-qt6-translation-check` CMake preset and
-  `mise run configure-qt6-translations`. It keeps `WITH_TRANSLATION=ON`
-  verification separate from the default Qt 5 lane and the normal Qt 6 build
-  directory.
+- An isolated Qt 6 translation lane exists through the
+  `nix-qt6-translation-check` CMake preset,
+  `mise run configure-qt6-translations`, and
+  `mise run build-qt6-translations`. The build task keeps
+  `WITH_TRANSLATION=ON` verification separate from the default Qt 5 lane and
+  the normal Qt 6 build directory, resolves Qt 6 `lrelease` through the
+  imported `Qt6::lrelease` target, and verifies that the expected 63 generated
+  `.qm` files are produced under `toonz/stuff/config/loc`.
+- Translation generation now has build evidence, but packaged runtime language
+  switching still needs manual verification before claiming release-ready
+  localization parity.
 - After that link-scope reduction, both app targets still build:
   `cmake --build toonz/build/nix-qt6-relwithdebinfo --target OpenToonz
   --parallel` and `cmake --build toonz/build/nix-relwithdebinfo --target
@@ -225,8 +231,10 @@ branch.
   while Qt 5 keeps `touchPoints()` with `QTouchEvent::TouchPoint::pos()` /
   `lastPos()`.
 - Deprecated `QVariant::canConvert(QVariant::...)` overloads have been removed
-  from the current app/UI/header tree. `DvDirTreeView` and the remaining
-  settings restore paths now use templated `canConvert<T>()` checks.
+  from the current app/UI/header tree. Fixed-type settings restore paths use
+  templated `canConvert<T>()` checks, and dynamic preference type checks route
+  through a version-aware helper that uses `QMetaType` on Qt 6 while preserving
+  the Qt 5 `QMetaType::Type` path.
 - The Qt 6 startup path no longer sets the removed/deprecated high-DPI
   application attributes; Qt 6 uses its always-on high-DPI behavior, while the
   Qt 5 lane keeps the existing attributes. The translator startup path also
@@ -1746,8 +1754,12 @@ branch.
   `QApplication` script path for `Scene.save()` scene-icon generation by saving
   a scene, checking the generated `sceneIcons` PNG, and loading that icon back
   through the Qt 6 `Image` facade. This is a narrow offscreen-rendering
-  boundary check; it does not claim scene-icon visual parity, viewer parity, or
-  broader render-output parity.
+  boundary check; under Qt's `offscreen` platform the Qt 6 scene-icon save path
+  writes a valid background-filled icon instead of entering `TOfflineGL`, which
+  avoids the unsupported offscreen OpenGL context path used only by automation.
+  Normal GUI/platform sessions still use the existing rendered scene-icon path.
+  This does not claim scene-icon visual parity, viewer parity, or broader
+  render-output parity.
 - A companion Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/scene_save_icon_variants.toonzscript` and
   is run by `mise run script-smoke-scene-save-icon-variants-qt6`. It validates
@@ -1755,7 +1767,7 @@ branch.
   second save, then checks that both generated `sceneIcons` PNGs load through
   the Qt 6 `Image` facade with stable nonzero dimensions. This remains a
   scene-icon/offscreen boundary check; it does not claim pixel-level icon
-  parity or viewer parity.
+  parity, rendered icon parity, or viewer parity.
 - A twenty-first Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/scene_frameids.toonzscript` and is run by
   `mise run script-smoke-scene-frameids-qt6`. It validates lettered `TFrameId`
@@ -1816,12 +1828,45 @@ branch.
   `profiles` files. Unix `TEnv` startup now honors explicit process
   environment values before the legacy `SystemVar.ini` warning fallback, and
   the harness exports the same isolated Toonz paths before launch.
+- On 2026-06-04, the focused scene-icon fixtures passed under
+  `QT_QPA_PLATFORM=offscreen` after packaging the Qt 6 app bundle:
+  `mise run script-smoke-scene-save-icon-qt6` and
+  `mise run script-smoke-scene-save-icon-variants-qt6`. The broader aggregate
+  run with forced `QT_QPA_PLATFORM=offscreen` still fails at
+  `script-smoke-rasterizer-qt6` when full-color Rasterizer output enters
+  `TOfflineGL` and Qt reports that the offscreen platform does not support
+  `createPlatformOpenGLContext`. `QtOfflineGL` now validates failed offscreen
+  surface, context, current-context, and framebuffer creation, so this path
+  exits quickly with `Rasterization failed` instead of timing out in GL setup.
+  Treat full-color Rasterizer/Renderer offscreen OpenGL behavior as an open
+  Qt 6 validation/implementation gap, not as closed by the scene-icon fallback.
 - The Qt 6 Script Console now restores the legacy GUI-only `view()` helper for
   `Image` and `Level` values by injecting a console bridge on top of the
   `QJSEngine` facade. The flipbook UI path remains in the `toonz` app layer,
   headless script-smoke execution still does not expose `view()`, and
   `mise run gui-smoke-script-console-view-qt6` validates the GUI helper against
-  generated `Image` and `Level` values.
+  generated `Image` and `Level` values, warning output delivery, a repeated
+  command after the `view()` calls, `run()` of a child script from the isolated
+  library scripts folder, child-script print output, child-script return
+  values, child-script global variable persistence back to the console,
+  expected error display for invalid `view()` usage, and one Up-arrow
+  command-history recall through the real console widget. Manual console
+  verification is still required for broader interactive command editing,
+  `run()` error paths, FlipBook cleanup, repeated sessions, and real user
+  scripts.
+- On macOS, `scripts/qt6/run-gui-smoke.sh` now launches packaged Qt 6 GUI
+  smokes through LaunchServices by default instead of directly executing the
+  bundle binary. This matches normal `.app` startup more closely and avoids a
+  sandbox-sensitive stall inside `QApplication` construction seen with direct
+  executable launch. Use `OPENTOONZ_GUI_SMOKE_DIRECT_EXEC=1` only for focused
+  direct-launch diagnostics.
+- On macOS, `scripts/qt6/run-script-smoke.sh` uses the same LaunchServices
+  strategy for `OPENTOONZ_SCRIPT_USE_QAPPLICATION=1` fixtures while preserving
+  direct execution for fast headless script fixtures. It passes an explicit
+  `OPENTOONZ_SCRIPT_WORKING_DIRECTORY` so the app restores the isolated smoke
+  root before executing script bootstrap and fixture code. With this path,
+  `mise run script-smokes-qt6` passes, including full-color Rasterizer and
+  Renderer QApplication fixtures.
 - `mise run script-smokes-qt6` runs every current Qt 6 script fixture
   in bounded mode, and `mise run script-smokes-natural-exit-qt6` runs the same
   fixture set while requiring the app process to exit naturally. Use the
