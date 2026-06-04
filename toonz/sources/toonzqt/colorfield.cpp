@@ -638,7 +638,7 @@ void ColorField::contextMenuEvent(QContextMenuEvent *event) {
   connect(copyAction, SIGNAL(triggered()), this, SLOT(onCopyColor()));
   menu.addAction(copyAction);
 
-  menu.exec(event->globalPos());
+  menu.exec(QtCompat::contextMenuEventGlobalPosition(event));
   event->accept();
 }
 

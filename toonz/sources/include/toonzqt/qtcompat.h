@@ -5,13 +5,19 @@
 
 #include <QtGlobal>
 #include <QCheckBox>
+#include <QContextMenuEvent>
 #include <QDropEvent>
+#include <QFont>
+#include <QFontDatabase>
+#include <QHelpEvent>
 #include <QImage>
 #include <QKeyEvent>
 #include <QKeySequence>
 #include <QMouseEvent>
 #include <QObject>
+#include <QStringList>
 #include <QTouchEvent>
+#include <QWheelEvent>
 
 #include <utility>
 
@@ -103,6 +109,25 @@ inline QImage convertToGLFormat(const QImage &image) {
 #endif
 }
 
+inline QStringList fontDatabaseStyles(const QString &family) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return QFontDatabase::styles(family);
+#else
+  QFontDatabase fontDatabase;
+  return fontDatabase.styles(family);
+#endif
+}
+
+inline QFont fontDatabaseFont(const QString &family, const QString &style,
+                              int pointSize) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return QFontDatabase::font(family, style, pointSize);
+#else
+  QFontDatabase fontDatabase;
+  return fontDatabase.font(family, style, pointSize);
+#endif
+}
+
 inline QPoint mouseEventPosition(const QMouseEvent *event) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   return event->position().toPoint();
@@ -133,6 +158,32 @@ inline QPoint mouseEventGlobalPosition(const QMouseEvent *event) {
 #else
   return event->globalPos();
 #endif
+}
+
+inline QPoint contextMenuEventPosition(const QContextMenuEvent *event) {
+  return event->pos();
+}
+
+inline QPoint contextMenuEventGlobalPosition(const QContextMenuEvent *event) {
+  return event->globalPos();
+}
+
+inline QPoint helpEventPosition(const QHelpEvent *event) { return event->pos(); }
+
+inline QPoint helpEventGlobalPosition(const QHelpEvent *event) {
+  return event->globalPos();
+}
+
+inline QPoint wheelEventPosition(const QWheelEvent *event) {
+  return event->position().toPoint();
+}
+
+inline QPointF wheelEventPositionF(const QWheelEvent *event) {
+  return event->position();
+}
+
+inline int wheelEventAngleDeltaY(const QWheelEvent *event) {
+  return event->angleDelta().y();
 }
 
 inline QPoint tabletEventPosition(const QTabletEvent *event) {

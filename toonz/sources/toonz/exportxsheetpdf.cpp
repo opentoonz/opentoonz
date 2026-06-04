@@ -1820,7 +1820,7 @@ void XsheetPdfPreviewArea::contextMenuEvent(QContextMenuEvent* event) {
   QMenu* menu        = new QMenu(this);
   QAction* fitAction = menu->addAction(tr("Fit To Window"));
   connect(fitAction, SIGNAL(triggered()), this, SLOT(fitToWindow()));
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 void XsheetPdfPreviewArea::fitToWindow() {

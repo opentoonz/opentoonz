@@ -1085,7 +1085,7 @@ void SceneViewer::wheelEvent(QWheelEvent *event) {
     else if ((m_gestureActive == true &&
               m_touchDevice == QtCompat::TouchScreen) ||
              m_gestureActive == false) {
-      zoomQt(event->position().toPoint() * getDevPixRatio(),
+      zoomQt(QtCompat::wheelEventPosition(event) * getDevPixRatio(),
              exp(0.001 * delta));
       m_panning = false;
     }
@@ -1777,13 +1777,15 @@ void SceneViewer::contextMenuEvent(QContextMenuEvent *e) {
      is shown, on linux and osx the release event is lost, never
      received by the widget */
   QMouseEvent fakeRelease = QtCompat::makeMouseEvent(
-      QEvent::MouseButtonRelease, e->pos(), e->globalPos(), Qt::RightButton,
+      QEvent::MouseButtonRelease, QtCompat::contextMenuEventPosition(e),
+      QtCompat::contextMenuEventGlobalPosition(e), Qt::RightButton,
       Qt::NoButton, Qt::NoModifier);
 
   QApplication::instance()->sendEvent(this, &fakeRelease);
 #endif
 
-  onContextMenu(e->pos(), e->globalPos());
+  onContextMenu(QtCompat::contextMenuEventPosition(e),
+                QtCompat::contextMenuEventGlobalPosition(e));
 }
 
 //-----------------------------------------------------------------------------

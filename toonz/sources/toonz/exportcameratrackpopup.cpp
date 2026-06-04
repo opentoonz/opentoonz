@@ -225,7 +225,7 @@ void CameraTrackPreviewArea::contextMenuEvent(QContextMenuEvent* event) {
   QAction* fitAction = menu->addAction(tr("Fit To Window"));
   connect(fitAction, &QAction::triggered, this,
           &CameraTrackPreviewArea::fitToWindow);
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 void CameraTrackPreviewArea::fitToWindow() {

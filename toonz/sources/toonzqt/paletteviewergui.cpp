@@ -1179,7 +1179,7 @@ void PageViewer::contextMenuEvent(QContextMenuEvent *event) {
 
   // Verifica se lo stile e' link.
   // Abilita e disabilita le voci di menu' in base a dove si e' cliccato.
-  int index     = posToIndex(event->pos());
+  int index     = posToIndex(QtCompat::contextMenuEventPosition(event));
   int indexPage = m_page ? m_page->getIndex() : -1;
 
   bool isLocked = m_page ? m_page->getPalette()->isLocked() : false;
@@ -1228,7 +1228,7 @@ void PageViewer::contextMenuEvent(QContextMenuEvent *event) {
     connect(newPage, SIGNAL(triggered()), SLOT(addNewPage()));
   }
 
-  menu.exec(event->globalPos());
+  menu.exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 //-----------------------------------------------------------------------------
@@ -1383,7 +1383,7 @@ bool PageViewer::event(QEvent *e) {
   if (m_page && e->type() == QEvent::ToolTip) {
     QHelpEvent *helpEvent = dynamic_cast<QHelpEvent *>(e);
     QString toolTip;
-    QPoint pos      = helpEvent->pos();
+    QPoint pos      = QtCompat::helpEventPosition(helpEvent);
     int indexInPage = posToIndex(pos);
     if (0 <= indexInPage && indexInPage < m_page->getStyleCount()) {
       TColorStyle *style = m_page->getStyle(indexInPage);
@@ -1402,7 +1402,7 @@ bool PageViewer::event(QEvent *e) {
       toolTip = tr("New Style");
     }
     if (toolTip != "")
-      QToolTip::showText(helpEvent->globalPos(), toolTip);
+      QToolTip::showText(QtCompat::helpEventGlobalPosition(helpEvent), toolTip);
     else
       QToolTip::hideText();
     e->accept();

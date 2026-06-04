@@ -1539,7 +1539,7 @@ void SubCameraButton::contextMenuEvent(QContextMenuEvent* event) {
 
   m_settings->endGroup();
 
-  menu.exec(event->globalPos());
+  menu.exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 void SubCameraButton::onSubCameraAct() {

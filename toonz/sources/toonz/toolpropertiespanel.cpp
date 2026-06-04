@@ -5,6 +5,7 @@
 #include "menubarcommandids.h"
 #include "toonzqt/doublepairfield.h"
 #include "toonzqt/intpairfield.h"
+#include "toonzqt/qtcompat.h"
 
 // ToonzLib includes
 #include "toonz/preferences.h"
@@ -2659,7 +2660,7 @@ void ToolPropertiesPanel::contextMenuEvent(QContextMenuEvent *event) {
   // NOTE: The "Bind to Room" menu is handled by the parent DockWidget, not by the panel itself.
   // It appears when right-clicking on the panel title bar, not on its content.
   
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
   delete menu;
 }
 

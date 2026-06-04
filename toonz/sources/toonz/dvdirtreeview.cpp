@@ -493,7 +493,7 @@ void DvDirTreeView::dropEvent(QDropEvent *e) {
 //-----------------------------------------------------------------------------
 
 void DvDirTreeView::contextMenuEvent(QContextMenuEvent *e) {
-  QModelIndex index = indexAt(e->pos());
+  QModelIndex index = indexAt(QtCompat::contextMenuEventPosition(e));
   if (!index.isValid()) return;
 
   DvDirModelNode *node = DvDirModel::instance()->getNode(index);
@@ -589,7 +589,7 @@ void DvDirTreeView::contextMenuEvent(QContextMenuEvent *e) {
   }
 
   if (!menu.isEmpty()) {
-    menu.exec(e->globalPos());
+    menu.exec(QtCompat::contextMenuEventGlobalPosition(e));
   }
 }
 

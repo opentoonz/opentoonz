@@ -9,6 +9,7 @@
 
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/styleselection.h"
 #include "toonzqt/tselectionhandle.h"
 #include "historytypes.h"
@@ -727,7 +728,7 @@ void PltGizmoPopup::contextMenuEvent(QContextMenuEvent *event) {
     }
   });
   
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
   delete menu;
 }
 

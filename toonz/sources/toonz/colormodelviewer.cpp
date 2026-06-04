@@ -211,7 +211,7 @@ void ColorModelViewer::contextMenuEvent(QContextMenuEvent *event) {
   connect(loadCurrentFrame, SIGNAL(triggered()), SLOT(loadCurrentFrame()));
   menu.addAction(loadCurrentFrame);
   if (!m_imageViewer->getImage()) {
-    menu.exec(event->globalPos());
+    menu.exec(QtCompat::contextMenuEventGlobalPosition(event));
     return;
   }
   QAction *removeColorModel =
@@ -238,7 +238,7 @@ void ColorModelViewer::contextMenuEvent(QContextMenuEvent *event) {
       CommandManager::instance()->getShortcutFromId(V_ZoomFit));
   QAction *fit = menu.addAction(tr("Fit to Window") + "\t" + shortcut);
   connect(fit, SIGNAL(triggered()), m_imageViewer, SLOT(fitView()));
-  menu.exec(event->globalPos());
+  menu.exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 //-----------------------------------------------------------------------------
 /*! If left button is pressed recall \b pick() in event pos.

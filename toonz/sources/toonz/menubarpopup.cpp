@@ -11,6 +11,7 @@
 
 // TnzQt includes
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/toonzfolders.h"
@@ -257,7 +258,7 @@ QStringList MenuBarTree::mimeTypes() const {
 //-----------------------------------------------------------------------------
 
 void MenuBarTree::contextMenuEvent(QContextMenuEvent* event) {
-  QTreeWidgetItem* item = itemAt(event->pos());
+  QTreeWidgetItem* item = itemAt(QtCompat::contextMenuEventPosition(event));
   if (item != currentItem()) setCurrentItem(item);
 
   // --- STACK-ALLOCATED QMenu, NO MANUAL DELETE ---
@@ -276,7 +277,7 @@ void MenuBarTree::contextMenuEvent(QContextMenuEvent* event) {
     connect(action, &QAction::triggered, this, [this] { removeItem(); });
   }
 
-  menu.exec(event->globalPos());
+  menu.exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 //-----------------------------------------------------------------------------

@@ -1493,7 +1493,7 @@ void BrushPresetPanel::onViewModeChanged(ViewMode mode) {
 void BrushPresetPanel::contextMenuEvent(QContextMenuEvent *event) {
   QMenu *menu = new QMenu(this);
   addShowHideContextMenu(menu);
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
   delete menu;
 }
 

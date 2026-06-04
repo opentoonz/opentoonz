@@ -339,7 +339,8 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event) {
     bool addedSep = false;
 
     if (m_isHistogramEnable &&
-        visibleRegion().contains(event->pos() * getDevPixRatio())) {
+        visibleRegion().contains(QtCompat::contextMenuEventPosition(event) *
+                                 getDevPixRatio())) {
       menu->addSeparator();
       addedSep = true;
       action   = menu->addAction(tr("Show Histogram"));
@@ -362,7 +363,7 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event) {
     }
   }
 
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
 
   if (m_flipbook) {
     action = CommandManager::instance()->getAction(MI_LoadRecentImage);
@@ -1309,8 +1310,9 @@ void ImageViewer::wheelEvent(QWheelEvent *event) {
          m_touchDevice == QtCompat::TouchScreen) ||
         m_gestureActive == false) {
       int d = delta > 0 ? 120 : -120;
-      QPoint center(event->position().x() * getDevPixRatio() - width() / 2,
-                    -event->position().y() * getDevPixRatio() + height() / 2);
+      const QPoint eventPos = QtCompat::wheelEventPosition(event);
+      QPoint center(eventPos.x() * getDevPixRatio() - width() / 2,
+                    -eventPos.y() * getDevPixRatio() + height() / 2);
       zoomQt(center, exp(0.001 * d));
     }
   }

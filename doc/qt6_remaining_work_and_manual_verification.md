@@ -85,14 +85,18 @@ Already covered:
   `y()` accessors.
 - Shared `toonzqt` numeric fields, paired numeric range fields, spectrum key
   editing, color sample fields, swatch point editing/panning, scroll widgets,
-  flip-console slider/split-button controls, Function Tree channel middle-drag
-  initiation, mini-toolbar dragging, and dock
-  hover/drag/resize/separator/drop-placeholder paths, plus Palette Viewer
+  flip-console slider/split-button controls, Function Sheet row and column-head
+  context-menu placement, Function Tree channel middle-drag initiation,
+  mini-toolbar dragging, and dock hover/drag/resize/separator/drop-placeholder
+  paths, plus Color Field context-menu placement, Style Name Editor word-button
+  context-menu placement, Palette Viewer tab-bar context-menu placement,
+  Palette Viewer
   page-chip hit testing, drag thresholding, rename activation, tab dragging,
-  tab rename activation, page-drop targeting, palette-icon drag thresholding,
-  and save-toolbar drop hit testing, plus Studio Palette tree drag thresholding
-  and drop-target tracking, now use `QtCompat` event-position helpers instead
-  of direct Qt 5-era event coordinate accessors.
+  tab rename activation, page-drop targeting, palette page context-menu
+  placement, palette page tooltip placement, palette-icon drag thresholding, and
+  save-toolbar drop hit testing, plus Studio Palette tree drag thresholding and
+  drop-target tracking, now use `QtCompat` event-position helpers instead of
+  direct Qt 5-era event coordinate accessors.
 - Shared `toonzqt` Schematic Viewer panning, zooming, rubber-band gating, and
   double-click fit-scene hit testing now use `QtCompat` mouse-position helpers
   instead of direct `QMouseEvent::pos()` calls.
@@ -100,10 +104,20 @@ Already covered:
   edge tracking now use `QtCompat` mouse-position helpers instead of direct
   `QMouseEvent::pos()` calls.
 - Shared `toonzqt` Style Editor color wheels, color sliders, parameter chips,
-  and style chooser chip hit testing now use `QtCompat` mouse-position helpers
-  instead of direct `QMouseEvent::pos()` calls.
+  style chooser chip hit testing, style chooser context-menu placement, and
+  style chooser tooltip placement now use `QtCompat` event-position helpers
+  instead of direct Qt 5-era event coordinate accessors.
 - `toonz` Custom Panel scroller drag thresholds now use `QtCompat`
   mouse-position helpers instead of direct `QMouseEvent::pos()` calls.
+- `toonz` Insert FX preset removal, Audio Recording popup, Filmstrip
+  frame-panel, Pencil Test sub-camera preset, Command Bar, Xsheet Toolbar, Tool
+  Properties panel, Command Bar customization tree, DvDirTreeView
+  version-control tree, Menu Bar customization tree, room tabs, panel title-bar
+  Safe Area/Preview menus, Viewer panel show/hide menu, Brush Preset panel
+  show/hide menu, Layer Footer frames-per-page menu, Farm Server list, Camera
+  Track preview, Palette Gizmo binding menu, Color Model viewer, and Xsheet PDF
+  preview context-menu placement now use `QtCompat` context-menu helpers
+  instead of direct Qt 5-era context-menu coordinate accessors.
 - `toonz` room tab selection, reordering, and rename activation now use
   `QtCompat` mouse-position helpers instead of direct `QMouseEvent::pos()`
   calls.
@@ -157,26 +171,41 @@ Already covered:
 - `tnztools` Screen Picker screen-rectangle press, drag, and release geometry
   now uses `QtCompat` mouse-position helpers instead of direct
   `QMouseEvent::pos()` calls.
-- `toonz` Image Viewer panning, color picking, and loadbox/zoom drag setup now
-  use `QtCompat` mouse-position helpers instead of direct `QMouseEvent::pos()`,
-  `localPos()`, and `windowPos()` calls.
+- `tnztools` measured-value field middle-drag editing now uses
+  `QtCompat::mouseEventPosition()` instead of direct `QMouseEvent::x()` calls.
+- `toonz` Image Viewer panning, color picking, context-menu placement, and
+  loadbox/zoom drag setup now use `QtCompat` mouse-position and context-menu
+  helpers instead of direct local/global event coordinate calls.
 - `SceneViewer` mouse/tablet event initialization, tablet context-menu
-  delivery, tablet hover-edge handling, and mouse double-click mapping now use
-  `QtCompat` mouse/tablet position helpers instead of direct Qt 5-era event
-  coordinate accessors.
+  delivery, widget context-menu delivery, tablet hover-edge handling, and mouse
+  double-click mapping now use `QtCompat` mouse/tablet/context-menu position
+  helpers instead of direct Qt 5-era event coordinate accessors.
+- `PlaneViewer` and `SwatchViewer` context-menu placement now use `QtCompat`
+  context-menu helpers instead of direct global-position accessors.
 - `FunctionPanel` and its graph drag tools now use `QtCompat` mouse-position
   helpers for graph hit testing, panning, zooming, keyframe dragging, handle
   dragging, rectangular selection, stretch operations, and context-menu
   placement.
+- Wheel-event zoom centers for the plane, swatch, schematic, Function Panel,
+  Cleanup swatch, Separate Colors swatch, Image Viewer, SceneViewer, and
+  Xsheet frame zoom, plus the optional straight-skeleton debugger wheel zoom,
+  now use `QtCompat` wheel-position helpers instead of direct Qt 5-era
+  `QWheelEvent` position/delta accessors.
 - `DvTextEdit` mini-toolbar font-size population and text-family formatting now
   use Qt 5/Qt 6-compatible APIs instead of Qt 6-deprecated `QFontDatabase`
   instance construction and `QTextCharFormat::setFontFamily()`.
+- Font parameter style lookup and preview font construction now use `QtCompat`
+  helpers so Qt 6 can use the static `QFontDatabase` APIs while Qt 5 keeps the
+  instance-based path.
 - Configure Shortcuts multi-key conflict checking now uses
   `QKeyCombination::toCombined()` on Qt 6 instead of the deprecated implicit
   `QKeyCombination` to `int` conversion, with the existing integer key-sequence
   path preserved on Qt 5.
 - Separate Colors color-string defaults and settings restoration parse stored
   strings through `QColor(QString)` instead of calling Qt 6-deprecated
+  `QColor::setNamedColor()`.
+- Qt Script/QJSEngine color argument parsing and OutlineVectorizer transparent
+  color assignment also use `QColor(QString)` instead of
   `QColor::setNamedColor()`.
 - Viewer touch gesture paths are centralized behind `QtCompat` helpers so the
   Qt 6 lane uses `QTouchEvent::points()` and `QEventPoint` positions while the
@@ -372,6 +401,9 @@ macOS still needed:
 
 Windows still needed:
 
+- Keep `mise run check-windows-msvc-abi` passing before local Qt 5/Qt 6 builds;
+  it is an early warning for MSVC DLL import/export annotation mistakes, not a
+  replacement for the real Windows workflow.
 - Validate the new `qt6-experimental` Windows x64 binary workflow on GitHub
   Actions.
 - Re-audit the Qt 6 `aqtinstall` module list, `windeployqt` arguments, and

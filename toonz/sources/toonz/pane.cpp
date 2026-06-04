@@ -662,7 +662,7 @@ void TPanelTitleBarButtonForSafeArea::contextMenuEvent(QContextMenuEvent *e) {
     }
   }
 
-  menu.exec(e->globalPos());
+  menu.exec(QtCompat::contextMenuEventGlobalPosition(e));
 }
 
 //-----------------------------------------------------------------------------
@@ -718,7 +718,7 @@ void TPanelTitleBarButtonForPreview::contextMenuEvent(QContextMenuEvent *e) {
     if (i == EnvViewerPreviewBehavior) action->setChecked(true);
   }
 
-  menu.exec(e->globalPos());
+  menu.exec(QtCompat::contextMenuEventGlobalPosition(e));
 }
 
 //-----------------------------------------------------------------------------

@@ -788,8 +788,9 @@ void SwatchViewer::wheelEvent(QWheelEvent *event) {
     if ((m_gestureActive == true &&
          m_touchDevice == QtCompat::TouchScreen) ||
         m_gestureActive == false) {
-      TPoint center(event->position().x() - width() / 2,
-                    -event->position().y() + height() / 2);
+      const QPoint eventPos = QtCompat::wheelEventPosition(event);
+      TPoint center(eventPos.x() - width() / 2,
+                    -eventPos.y() + height() / 2);
       zoom(center, exp(0.001 * event->angleDelta().y()));
     }
   }
@@ -851,7 +852,7 @@ void SwatchViewer::contextMenuEvent(QContextMenuEvent *event) {
       QKeySequence(CommandManager::instance()->getKeyFromId(V_ZoomFit)));
   connect(fit, SIGNAL(triggered()), SLOT(fitView()));
 
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
 
   delete menu;
   update();

@@ -64,6 +64,10 @@ branch.
   `qt6-experimental`, and publishes a prerelease with that tag when the tag
   trigger is used. `mise run release-qt6-experimental` retags the current clean
   branch and pushes the tag to refresh that rolling prerelease.
+- `mise run check-windows-msvc-abi` provides a fast local guard for Windows
+  MSVC DLL import/export annotation hazards that native macOS/Linux builds can
+  miss. The guard also runs before the normal `mise run build`,
+  `mise run build-qt6`, and `mise run check` tasks.
 - The Qt 5 app target links with
   `cmake --build toonz/build/nix-relwithdebinfo --target OpenToonz --parallel`.
 - The Qt 6 app target links with
@@ -115,19 +119,32 @@ branch.
   no longer uses deprecated `QMouseEvent::x()` / `y()` accessors. Shared
   `toonzqt` numeric fields, paired numeric range fields, spectrum key editing,
   color sample fields, swatch point editing/panning, scroll widgets,
-  flip-console slider/split-button controls, Function Tree channel middle-drag
-  initiation, mini-toolbar dragging, and dock hover/drag/resize/separator/
-  drop-placeholder paths, plus Palette Viewer page-chip hit testing, drag
+  flip-console slider/split-button controls, Function Sheet row and column-head
+  context-menu placement, Function Tree channel middle-drag initiation,
+  mini-toolbar dragging, and dock hover/drag/resize/separator/
+  drop-placeholder paths, plus Color Field context-menu placement, Style Name
+  Editor word-button context-menu placement, Palette Viewer tab-bar
+  context-menu placement, Palette Viewer page-chip hit testing, drag
   thresholding, rename activation, tab dragging, tab rename activation,
-  page-drop targeting, palette-icon drag thresholding, and save-toolbar drop
-  hit testing, plus Studio Palette tree drag thresholding and drop-target
-  tracking, also use `QtCompat` event-position helpers instead of direct
-  Qt 5-era local/global coordinate accessors. Schematic Viewer panning,
+  page-drop targeting, palette page context-menu placement, palette page
+  tooltip placement, palette-icon drag thresholding, and save-toolbar drop hit
+  testing, plus Studio Palette tree drag thresholding and drop-target tracking,
+  also use `QtCompat` event-position helpers instead of direct Qt 5-era
+  local/global coordinate accessors. Schematic Viewer panning,
   zooming, rubber-band gating, and double-click fit-scene hit testing also use
   the same helpers. Spreadsheet panel panning, cell hit testing, and auto-pan
   edge tracking now use the same helpers. Style Editor color wheels, color
-  sliders, parameter chips, and style chooser chip hit testing now use the
-  same helpers. Custom Panel scroller drag thresholds now use the same helpers.
+  sliders, parameter chips, style chooser chip hit testing, style chooser
+  context-menu placement, and style chooser tooltip placement now use the same
+  helpers. Custom Panel scroller drag thresholds now use the same helpers.
+  Insert FX preset removal, Audio Recording popup, Filmstrip frame-panel,
+  Pencil Test sub-camera preset, Command Bar, Xsheet Toolbar, Tool Properties
+  panel, Command Bar customization tree, DvDirTreeView version-control tree,
+  Menu Bar customization tree, room tabs, panel title-bar Safe Area/Preview
+  menus, Viewer panel show/hide menu, Brush Preset panel show/hide menu, Layer
+  Footer frames-per-page menu, Farm Server list, Camera Track preview, Palette
+  Gizmo binding menu, Color Model viewer, and Xsheet PDF preview context-menu
+  placement now also route through the same context-menu helpers.
   Room tab selection, reordering, and rename activation now use the same
   helpers. History pane undo/redo row selection now uses the same helpers.
   Camera Capture histogram range dragging, Camera Track export preview panning,
@@ -142,23 +159,34 @@ branch.
   item selection, play-hit testing, middle-button panning, drag initiation,
   rename activation, and table-column resize tracking plus Xsheet keyframe
   mover click/drag cell mapping plus Pencil Test sub-camera handle hit testing
-  and drag resizing also use the same helpers. Pencil Test capture image
-  orientation flips now use Qt 6 `QImage::flipped()` while preserving the Qt 5
-  `mirrored()` path. Filmstrip frame double-click selection, press selection,
-  navigator panning initiation, inbetween-button hit testing, and drag/drop
-  arming, plus drag-select, auto-pan edge tracking, and inbetween tooltip
-  hover checks now use the same helpers. Screen Picker screen-rectangle
-  press, drag, and release geometry and Image Viewer panning, color picking,
-  and loadbox/zoom drag setup now use the same helpers. SceneViewer
+  and drag resizing plus measured-value field middle-drag editing also use the
+  same helpers. Pencil Test capture image orientation flips now use Qt 6
+  `QImage::flipped()` while preserving the Qt 5 `mirrored()` path. Filmstrip
+  frame double-click selection, press selection, navigator panning initiation,
+  inbetween-button hit testing, and drag/drop arming, plus drag-select,
+  auto-pan edge tracking, and inbetween tooltip hover checks now use the same
+  helpers. Screen Picker screen-rectangle press, drag, and release geometry
+  and Image Viewer panning, color picking, context-menu placement, and
+  loadbox/zoom drag setup now use the same helpers. SceneViewer
   mouse/tablet event initialization, tablet context-menu
-  delivery, tablet hover-edge handling, mouse double-click mapping, and the
-  Function Panel graph/drag tools now use the same helpers, removing another
-  Qt 6
+  delivery, widget context-menu delivery, tablet hover-edge handling, mouse
+  double-click mapping, and the Function Panel graph/drag tools now use the
+  same helpers, removing another Qt 6
   event-coordinate warning slice while preserving the Qt 5 lane.
+- Plane and Swatch Viewer context-menu placement now also routes through
+  `QtCompat` context-menu helpers instead of direct global-position accessors.
+- Wheel-event zoom centers for the plane, swatch, schematic, Function Panel,
+  Cleanup swatch, Separate Colors swatch, Image Viewer, SceneViewer, and
+  Xsheet frame zoom, plus the optional straight-skeleton debugger wheel zoom,
+  now use `QtCompat` wheel-position helpers instead of direct Qt 5-era
+  `QWheelEvent` position/delta accessors.
 - `DvTextEdit` mini-toolbar font-size population and text-family formatting no
   longer use Qt 6-deprecated `QFontDatabase` instance construction or
   `QTextCharFormat::setFontFamily()`. The code now uses APIs available in both
   Qt 5 and Qt 6.
+- Font parameter style lookup and preview font construction now route through
+  `QtCompat` helpers. Qt 6 uses the static `QFontDatabase` APIs, while Qt 5
+  keeps the instance-based API path.
 - Configure Shortcuts multi-key conflict checking no longer relies on the
   Qt 6-deprecated implicit `QKeyCombination` to `int` conversion. The Qt 6 lane
   uses `QKeyCombination::toCombined()`, while the Qt 5 lane keeps the existing
@@ -167,6 +195,9 @@ branch.
   Qt 6-deprecated `QColor::setNamedColor()`. Stored color strings now parse
   through `QColor(QString)`, which keeps the Qt 5 lane compatible and removes
   the direct deprecated call from the current app/UI/header tree.
+- Qt Script/QJSEngine color argument parsing and OutlineVectorizer transparent
+  color assignment also use `QColor(QString)` instead of the deprecated
+  `QColor::setNamedColor()` call.
 - Touch gesture code in the plane, swatch, schematic, image, and scene viewer
   paths now uses `QtCompat` touch-point helpers. Qt 6 uses
   `QTouchEvent::points()` with `QEventPoint::position()` / `lastPosition()`,

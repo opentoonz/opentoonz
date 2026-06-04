@@ -141,7 +141,7 @@ void RoomTabWidget::contextMenuEvent(QContextMenuEvent *event) {
   QAction *newRoom   = menu->addAction(tr("New Room"));
   connect(newRoom, SIGNAL(triggered()), SLOT(addNewTab()));
 
-  int index = tabAt(event->pos());
+  int index = tabAt(QtCompat::contextMenuEventPosition(event));
   if (index >= 0) {
     m_tabToDeleteIndex = index;
     if (index != currentIndex()) {
@@ -156,7 +156,7 @@ void RoomTabWidget::contextMenuEvent(QContextMenuEvent *event) {
     connect(customizeMenuBar, SIGNAL(triggered()), SLOT(onCustomizeMenuBar()));
 #endif
   }
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 //-----------------------------------------------------------------------------

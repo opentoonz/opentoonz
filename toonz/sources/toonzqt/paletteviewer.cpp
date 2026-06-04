@@ -803,7 +803,7 @@ void PaletteViewer::setChangeStyleCommand(
  */
 void PaletteViewer::contextMenuEvent(QContextMenuEvent *event) {
   m_indexPageToDelete = -1;
-  QPoint pos          = event->pos();
+  QPoint pos          = QtCompat::contextMenuEventPosition(event);
   if (!getPalette() || !m_tabBarContainer->geometry().contains(pos)) return;
 
   QMenu *menu = new QMenu(this);
@@ -844,7 +844,7 @@ void PaletteViewer::contextMenuEvent(QContextMenuEvent *event) {
         CommandManager::instance()->getAction("MI_EraseUnusedStyles"));
   }
 
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 //-----------------------------------------------------------------------------

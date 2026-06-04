@@ -440,7 +440,7 @@ void AudioRecordingPopup::contextMenuEvent(QContextMenuEvent *event) {
     }
   });
   
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
   delete menu;
 }
 

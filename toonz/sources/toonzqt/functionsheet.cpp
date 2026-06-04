@@ -269,7 +269,7 @@ void FunctionSheetRowViewer::contextMenuEvent(QContextMenuEvent *event) {
   menu->addAction(cmdManager->getAction(MI_RemoveSceneFrame));
   menu->addAction(cmdManager->getAction(MI_InsertGlobalKeyframe));
   menu->addAction(cmdManager->getAction(MI_RemoveGlobalKeyframe));
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 //********************************************************************************
@@ -545,7 +545,7 @@ void FunctionSheetColumnHeadViewer::mousePressEvent(QMouseEvent *e) {
 
 void FunctionSheetColumnHeadViewer::contextMenuEvent(QContextMenuEvent *ce) {
   // First, select column under cursor
-  const QPoint &pos = ce->pos();
+  const QPoint pos  = QtCompat::contextMenuEventPosition(ce);
   int cursorCol     = getViewer()->xyToPosition(pos).layer();
 
   if (cursorCol < 0 || cursorCol >= m_sheet->getChannelCount()) return;
@@ -560,7 +560,7 @@ void FunctionSheetColumnHeadViewer::contextMenuEvent(QContextMenuEvent *ce) {
     return;
   }
 
-  const QPoint &globalPos = mapToGlobal(pos);
+  const QPoint globalPos = QtCompat::contextMenuEventGlobalPosition(ce);
 
   if (pos.y() >= cChannelNameY)
     fv->openContextMenu(channel, globalPos);

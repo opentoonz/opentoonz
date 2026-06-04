@@ -1209,9 +1209,10 @@ void XsheetViewer::wheelEvent(QWheelEvent *event) {
   case Qt::MouseEventNotSynthesized: {
     if (0 != (event->modifiers() & Qt::ControlModifier) &&
         event->angleDelta().y() != 0) {
-      QPoint pos(event->position().x() - m_columnArea->geometry().width() +
+      const QPoint eventPos = QtCompat::wheelEventPosition(event);
+      QPoint pos(eventPos.x() - m_columnArea->geometry().width() +
                      m_cellArea->visibleRegion().boundingRect().left(),
-                 event->position().y());
+                 eventPos.y());
       int targetFrame = xyToPosition(pos).frame();
 
       int newFactor =

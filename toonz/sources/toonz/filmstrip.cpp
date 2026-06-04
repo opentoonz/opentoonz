@@ -1305,7 +1305,7 @@ void FilmstripFrames::contextMenuEvent(QContextMenuEvent *event) {
   connect(hideNavigator, SIGNAL(triggered(bool)), this,
           SLOT(navigatorToggled(bool)));
 
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 //-----------------------------------------------------------------------------

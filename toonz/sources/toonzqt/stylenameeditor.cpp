@@ -2,6 +2,7 @@
 
 // TnzQt includes
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/toonzfolders.h"
@@ -105,7 +106,7 @@ void WordButton::contextMenuEvent(QContextMenuEvent* event) {
   QAction* removeAct = new QAction(tr("Remove %1").arg(text()), &menu);
   bool ret = connect(removeAct, SIGNAL(triggered()), this, SLOT(onRemove()));
   menu.addAction(removeAct);
-  menu.exec(event->globalPos());
+  menu.exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 //------------------------------------------------------------

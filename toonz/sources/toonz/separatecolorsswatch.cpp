@@ -248,7 +248,8 @@ void SeparateSwatchArea::wheelEvent(QWheelEvent *event) {
   if ((factor < 1 && sqrt(scale) < minZoom) || (factor > 1 && scale > 1200.0))
     return;
 
-  TPointD delta(event->position().x(), height() - event->position().y());
+  const QPointF eventPos = QtCompat::wheelEventPositionF(event);
+  TPointD delta(eventPos.x(), height() - eventPos.y());
   m_sw->m_viewAff =
       (TTranslation(delta) * TScale(factor) * TTranslation(-delta)) *
       m_sw->m_viewAff;

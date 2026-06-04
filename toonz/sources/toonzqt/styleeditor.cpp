@@ -2043,7 +2043,7 @@ void StyleChooserPage::mouseReleaseEvent(QMouseEvent *event) {}
 //-----------------------------------------------------------------------------
 
 void StyleChooserPage::contextMenuEvent(QContextMenuEvent *event) {
-  QPoint pos       = event->pos();
+  QPoint pos       = QtCompat::contextMenuEventPosition(event);
   int currentIndex = posToIndex(pos);
   if (currentIndex < 0) return;
 
@@ -2067,7 +2067,7 @@ void StyleChooserPage::contextMenuEvent(QContextMenuEvent *event) {
   // QMenu *menuvis = menu.addMenu("Visible Brushes");
   // menuvis->addAction(m_setPinsToTopAct);
   // menuvis->addAction(m_clrPinsToTopAct);
-  menu.exec(event->globalPos());
+  menu.exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 //-----------------------------------------------------------------------------
@@ -2079,7 +2079,8 @@ bool StyleChooserPage::event(QEvent *e) {
   // see StyleChooserPage::paintEvent
   QHelpEvent *he = static_cast<QHelpEvent *>(e);
 
-  int chipIdx = posToIndex(he->pos()), chipCount = getChipCount();
+  int chipIdx = posToIndex(QtCompat::helpEventPosition(he));
+  int chipCount = getChipCount();
   if (chipIdx < 0 || chipIdx >= chipCount) {
     QToolTip::hideText();
     return false;
@@ -2089,7 +2090,7 @@ bool StyleChooserPage::event(QEvent *e) {
   if (toolTip.isEmpty())
     QToolTip::hideText();
   else
-    QToolTip::showText(he->globalPos(), toolTip);
+    QToolTip::showText(QtCompat::helpEventGlobalPosition(he), toolTip);
 
   return true;
 }

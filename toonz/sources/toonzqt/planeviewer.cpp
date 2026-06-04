@@ -272,8 +272,9 @@ void PlaneViewer::wheelEvent(QWheelEvent *event) {
     if ((m_gestureActive == true &&
          m_touchDevice == QtCompat::TouchScreen) ||
         m_gestureActive == false) {
-      TPointD pos(event->position().x() * getDevPixRatio(),
-                  height() - event->position().y() * getDevPixRatio());
+      const QPointF eventPos = QtCompat::wheelEventPositionF(event);
+      TPointD pos(eventPos.x() * getDevPixRatio(),
+                  height() - eventPos.y() * getDevPixRatio());
       double zoom_par = 1 + event->angleDelta().y() * 0.001;
 
       zoomView(pos.x, pos.y, zoom_par);
@@ -314,7 +315,7 @@ void PlaneViewer::contextMenuEvent(QContextMenuEvent *event) {
       QKeySequence(CommandManager::instance()->getKeyFromId(V_ZoomFit)));
   connect(fit, SIGNAL(triggered()), SLOT(fitView()));
 
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
 
   delete menu;
   update();

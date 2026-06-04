@@ -44,19 +44,19 @@ run = "nix develop path:. --command bash scripts/nix/prepare-tiff.sh"
 
 [tasks.configure]
 description = "Configure the RelWithDebInfo Ninja build with the Nix dependency set."
-run = "nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-relwithdebinfo'"
+run = "bash scripts/windows/check-msvc-abi.sh && nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-relwithdebinfo'"
 
 [tasks.configure-deprecated-api]
 description = "Configure the Qt 5 lane with Qt APIs deprecated through 5.15 disabled."
-run = "nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-deprecated-api'"
+run = "bash scripts/windows/check-msvc-abi.sh && nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-deprecated-api'"
 
 [tasks.configure-qt6]
 description = "Configure the RelWithDebInfo Ninja build with the Qt 6 Nix dependency set."
-run = "nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-relwithdebinfo'"
+run = "bash scripts/windows/check-msvc-abi.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-relwithdebinfo'"
 
 [tasks.configure-qt6-translations]
 description = "Configure an isolated Qt 6 build with translation target generation enabled."
-run = "nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-translation-check'"
+run = "bash scripts/windows/check-msvc-abi.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-translation-check'"
 
 [tasks.build]
 description = "Configure and build OpenToonz with Ninja in toonz/build/nix-relwithdebinfo."

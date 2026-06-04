@@ -1709,11 +1709,10 @@ FontParamField::FontParamField(QWidget *parent, QString name,
 //-----------------------------------------------------------------------------
 
 void FontParamField::findStyles(const QFont &font) {
-  QFontDatabase fontDatabase;
   QString currentItem = m_styleCombo->currentText();
   m_styleCombo->clear();
 
-  for (const QString &style : fontDatabase.styles(font.family()))
+  for (const QString &style : QtCompat::fontDatabaseStyles(font.family()))
     m_styleCombo->addItem(style);
 
   int styleIndex = m_styleCombo->findText(currentItem);
@@ -1748,8 +1747,7 @@ void FontParamField::onChange() {
   m_sizeField->getRange(min, max);
   if (size < min) size = min;
 
-  QFontDatabase fontDatabase;
-  QFont font = fontDatabase.font(family, style, 10);
+  QFont font = QtCompat::fontDatabaseFont(family, style, 10);
   font.setPixelSize(size);
 
   TUndo *undo = 0;

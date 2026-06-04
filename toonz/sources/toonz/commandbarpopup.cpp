@@ -569,7 +569,7 @@ QStringList CommandBarTree::mimeTypes() const {
 //-----------------------------------------------------------------------------
 
 void CommandBarTree::contextMenuEvent(QContextMenuEvent* event) {
-  QTreeWidgetItem* item = itemAt(event->pos());
+  QTreeWidgetItem* item = itemAt(QtCompat::contextMenuEventPosition(event));
   if (item != currentItem()) {
     setCurrentItem(item);
   }
@@ -583,7 +583,7 @@ void CommandBarTree::contextMenuEvent(QContextMenuEvent* event) {
             &CommandBarTree::removeItem);
   }
 
-  menu.exec(event->globalPos());
+  menu.exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 //-----------------------------------------------------------------------------
