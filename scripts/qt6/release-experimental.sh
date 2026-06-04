@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-tag_name="${QT6_EXPERIMENTAL_TAG:-qt6-experimental}"
+tag_name="${QT6_EXPERIMENTAL_TAG:-qt-6-experimental}"
 
 if [[ -n "$(git status --porcelain)" ]]; then
   echo "Refusing to release with uncommitted changes." >&2

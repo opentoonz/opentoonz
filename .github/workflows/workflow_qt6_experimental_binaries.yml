@@ -4,22 +4,31 @@ on:
   push:
     tags:
       - qt6-experimental
+      - qt-6-experimental
+  schedule:
+    # GitHub schedules run from the repository default branch. This workflow
+    # explicitly checks out QT6_EXPERIMENTAL_BRANCH for scheduled builds.
+    - cron: '0 10 * * 1'
   workflow_dispatch:
 
 permissions:
   contents: write
 
 env:
-  QT6_EXPERIMENTAL_LABEL: qt6-experimental
+  QT6_EXPERIMENTAL_BRANCH: codex/qt-6-port
+  QT6_EXPERIMENTAL_LABEL: qt-6-experimental
   QT6_EXPERIMENTAL_QT_VERSION: 6.9.3
 
 jobs:
   Linux:
     name: Linux x86_64 AppImage
+    if: github.repository == 'bgyss/opentoonz' && !(github.event_name == 'push' && github.actor == 'github-actions[bot]')
     runs-on: ubuntu-24.04
     timeout-minutes: 180
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event_name == 'push' && github.ref || env.QT6_EXPERIMENTAL_BRANCH }}
 
       - name: Install libraries
         run: |
@@ -117,6 +126,7 @@ jobs:
 
   Windows:
     name: Windows x64
+    if: github.repository == 'bgyss/opentoonz' && !(github.event_name == 'push' && github.actor == 'github-actions[bot]')
     runs-on: windows-2025
     timeout-minutes: 180
     env:
@@ -131,6 +141,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          ref: ${{ github.event_name == 'push' && github.ref || env.QT6_EXPERIMENTAL_BRANCH }}
           lfs: false
 
       - name: Cache OpenCV and Boost
@@ -232,6 +243,7 @@ jobs:
 
   macOS:
     name: macOS Apple Silicon arm64
+    if: github.repository == 'bgyss/opentoonz' && !(github.event_name == 'push' && github.actor == 'github-actions[bot]')
     runs-on: macos-15
     timeout-minutes: 180
     env:
@@ -242,6 +254,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event_name == 'push' && github.ref || env.QT6_EXPERIMENTAL_BRANCH }}
 
       - name: Install Nix
         uses: cachix/install-nix-action@v31
@@ -291,18 +305,32 @@ jobs:
           path: toonz/build/qt6-experimental-macos/OpenToonz-${{ env.QT6_EXPERIMENTAL_LABEL }}-macos-arm64.dmg
 
   publish-release:
-    name: Publish qt6-experimental prerelease
+    name: Publish qt-6-experimental prerelease
     runs-on: ubuntu-24.04
     needs:
       - Linux
       - Windows
       - macOS
-    if: github.ref == 'refs/tags/qt6-experimental'
+    if: github.repository == 'bgyss/opentoonz' && !(github.event_name == 'push' && github.actor == 'github-actions[bot]') && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.ref == 'refs/tags/qt6-experimental' || github.ref == 'refs/tags/qt-6-experimental')
     steps:
+      - name: Check out release target
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event_name == 'push' && github.ref || env.QT6_EXPERIMENTAL_BRANCH }}
+          fetch-depth: 0
+
       - name: Download artifacts
         uses: actions/download-artifact@v6
         with:
           path: dist
+
+      - name: Refresh rolling release tag
+        if: github.event_name != 'push'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -f "${QT6_EXPERIMENTAL_LABEL}" HEAD
+          git push --force origin "refs/tags/${QT6_EXPERIMENTAL_LABEL}"
 
       - name: Create or update prerelease
         env:
@@ -310,9 +338,9 @@ jobs:
         run: |
           if ! gh release view "${QT6_EXPERIMENTAL_LABEL}" >/dev/null 2>&1; then
             gh release create "${QT6_EXPERIMENTAL_LABEL}" \
-              --title "Qt 6 Experimental" \
+              --title "Qt 6 Experimental (${QT6_EXPERIMENTAL_LABEL})" \
               --prerelease \
-              --notes "Experimental Qt 6 binary builds. These are not release-quality OpenToonz builds."
+              --notes "Experimental Qt 6 binary builds from ${QT6_EXPERIMENTAL_BRANCH}. These are not release-quality OpenToonz builds."
           fi
 
           gh release view "${QT6_EXPERIMENTAL_LABEL}" --json assets --jq '.assets[].name' |

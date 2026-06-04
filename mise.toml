@@ -571,7 +571,7 @@ description = "Create a DMG from the Nix-built Qt 6 macOS app bundle."
 run = "nix develop path:.#qt6 --command bash -lc 'OPENTOONZ_APP=toonz/build/nix-qt6-relwithdebinfo/toonz/OpenToonz.app bash scripts/macos/create-dmg.sh'"
 
 [tasks.release-qt6-experimental]
-description = "Retag the current clean branch as qt6-experimental and push it to refresh the rolling prerelease."
+description = "Retag the current clean branch as qt-6-experimental and push it to refresh the rolling prerelease."
 run = "bash scripts/qt6/release-experimental.sh"
 
 [tasks.check]
