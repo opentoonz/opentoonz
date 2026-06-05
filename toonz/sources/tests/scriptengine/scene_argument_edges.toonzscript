@@ -38,6 +38,10 @@ var errors = [
   hasError(function() { scene.setCell(-1, 0, level, "1"); },
            "Bad row/col values"),
   hasError(function() { scene.setCell(0, 0, level, "bad"); },
+           "does not look like a FrameId"),
+  hasError(function() { scene.setCell(0, 0, 42, "bad"); },
+           "does not look like a FrameId"),
+  hasError(function() { scene.setCell(0, 0, "missing_level", "bad"); },
            "does not look like a FrameId")
 ];
 

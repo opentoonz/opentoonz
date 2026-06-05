@@ -502,6 +502,12 @@ QString imageBuilderTypeName(TImage* image) {
   return imageTypeName(image);
 }
 
+QString scriptColorErrorMessage(const QString& colorName) {
+  return QObject::tr("%1 is not a valid color (valid color names are 'red', "
+                     "'transparent', '#FF8800', etc.)")
+      .arg(colorName);
+}
+
 QVariantMap defaultOutlineVectorizerState() {
   QVariantMap state;
   state.insert(QStringLiteral("accuracy"), 8);
@@ -551,7 +557,7 @@ NewOutlineConfiguration outlineConfigurationFromState(
   parameters.m_toneTol =
       state.value(QStringLiteral("toneThreshold"), 128).toInt();
 
-  const QColor transparentColor = QColor::fromString(
+  const QColor transparentColor(
       state.value(QStringLiteral("transparentColor"), QStringLiteral("#000000"))
           .toString());
   if (transparentColor.isValid()) {
@@ -945,6 +951,20 @@ const char kBootstrapScript[] = R"JS(
     if (!isNumberArgument(value))
       throw new Error(name + " must be a number : " + String(value));
     return Number(value);
+  }
+
+  function frameIdArgument(value) {
+    if (!isNumberArgument(value) && !isStringArgument(value))
+      throw new Error("Argument '" + String(value) +
+                      "' does not look like a FrameId");
+    var text = String(value);
+    var normalized = text.replace(/\u0000/g, "")
+                         .replace(/\r/g, "")
+                         .replace(/\n/g, "")
+                         .trim();
+    if (!/^(-?\d+)(\w?)$/.test(normalized))
+      throw new Error("Argument '" + text + "' does not look like a FrameId");
+    return normalized;
   }
 
   function throwTransformArgumentError(method, expected) {
@@ -1423,7 +1443,7 @@ const char kBootstrapScript[] = R"JS(
 
   global.ToonzRasterConverter = function() {
     this.__toonzRasterConverterId = ++nextToonzRasterConverterId;
-    this.flatSource = false;
+    this.__flatSource = false;
   };
 
   Object.defineProperty(ToonzRasterConverter.prototype, "id", {
@@ -1439,6 +1459,15 @@ const char kBootstrapScript[] = R"JS(
   ToonzRasterConverter.prototype.dispose = function() {
     this.__toonzRasterConverterId = -1;
   };
+
+  Object.defineProperty(ToonzRasterConverter.prototype, "flatSource", {
+    get: function() {
+      return this.__flatSource;
+    },
+    set: function(value) {
+      this.__flatSource = Boolean(value);
+    }
+  });
 
   ToonzRasterConverter.prototype.foo = function(x) {
     return Number(x) * 2;
@@ -1687,6 +1716,10 @@ const char kBootstrapScript[] = R"JS(
     this.columns = [];
   };
 
+  function rendererList(value) {
+    return Array.isArray(value) ? value.slice(0) : [];
+  }
+
   Object.defineProperty(Renderer.prototype, "id", {
     get: function() {
       return this.__rendererId;
@@ -1704,8 +1737,8 @@ const char kBootstrapScript[] = R"JS(
 
   Renderer.prototype.renderScene = function() {
     return levelFromResult(__opentoonzScriptEngine.rendererRenderScene(
-      rendererId(this), rendererSceneId(arguments[0]), this.frames.slice(0),
-      this.columns.slice(0)));
+      rendererId(this), rendererSceneId(arguments[0]),
+      rendererList(this.frames), rendererList(this.columns)));
   };
 
   Renderer.prototype.renderFrame = function() {
@@ -1714,7 +1747,8 @@ const char kBootstrapScript[] = R"JS(
       throw new Error("Second argument must be a frame number : " +
                       String(arguments[1]));
     return imageFromResult(__opentoonzScriptEngine.rendererRenderFrame(
-      rendererId(this), sceneIdValue, Number(arguments[1]), this.columns.slice(0)));
+      rendererId(this), sceneIdValue, Number(arguments[1]),
+      rendererList(this.columns)));
   };
 
   Renderer.prototype.dumpCache = function() {
@@ -1786,7 +1820,7 @@ const char kBootstrapScript[] = R"JS(
 
   Level.prototype.getFrame = function(fid) {
     return imageFromResult(__opentoonzScriptEngine.levelGetFrame(
-      levelId(this), String(fid)));
+      levelId(this), frameIdArgument(fid)));
   };
 
   Level.prototype.getFrameByIndex = function(index) {
@@ -1797,8 +1831,12 @@ const char kBootstrapScript[] = R"JS(
   };
 
   Level.prototype.setFrame = function(fid, image) {
+    var fidValue = frameIdArgument(fid);
+    if (!(image instanceof Image)) {
+      throw new Error("second argument (" + String(image) + ") is not an image");
+    }
     throwIfError(__opentoonzScriptEngine.levelSetFrame(
-      levelId(this), String(fid), imageId(image)));
+      levelId(this), fidValue, imageId(image)));
     return this;
   };
 
@@ -1894,7 +1932,8 @@ const char kBootstrapScript[] = R"JS(
       message = __opentoonzScriptEngine.sceneClearCell(
         sceneId(this), rowValue, columnValue);
     } else if (arguments.length === 3) {
-      if (typeof levelOrCell !== "object" ||
+      if (levelOrCell === null ||
+          typeof levelOrCell !== "object" ||
           levelOrCell.level === undefined ||
           levelOrCell.fid === undefined) {
         throw new Error("Third argument should be an object with attributes " +
@@ -1902,14 +1941,17 @@ const char kBootstrapScript[] = R"JS(
       }
       return this.setCell(row, column, levelOrCell.level, levelOrCell.fid);
     } else if (levelOrCell instanceof Level) {
+      var fidValue = frameIdArgument(fid);
       message = __opentoonzScriptEngine.sceneSetCell(
         sceneId(this), rowValue, columnValue,
-        levelId(levelOrCell), String(fid));
+        levelId(levelOrCell), fidValue);
     } else if (isStringArgument(levelOrCell)) {
+      var fidValue = frameIdArgument(fid);
       message = __opentoonzScriptEngine.sceneSetCellByLevelName(
         sceneId(this), rowValue, columnValue,
-        String(levelOrCell), String(fid));
+        String(levelOrCell), fidValue);
     } else {
+      frameIdArgument(fid);
       throw new Error(String(levelOrCell) +
                       " : Expected a Level instance or a level name");
     }
@@ -3167,11 +3209,9 @@ QString ScriptEngine::imageBuilderFill(int imageBuilderId,
   if (!m_qjsImageBuilders.contains(imageBuilderId))
     return QStringLiteral("Invalid ImageBuilder object");
 
-  QColor color = QColor::fromString(colorName);
+  QColor color(colorName);
   if (!color.isValid()) {
-    return tr("%1 is not a valid color (valid color names are 'red', "
-              "'transparent', '#FF8800', etc.)")
-        .arg(colorName);
+    return scriptColorErrorMessage(colorName);
   }
 
   const TPixel32 pixel(color.red(), color.green(), color.blue(), color.alpha());
@@ -3345,8 +3385,7 @@ QString ScriptEngine::outlineVectorizerSetProperty(int outlineVectorizerId,
   QVariantMap state = outlineVectorizerState(outlineVectorizerId);
   if (name == QStringLiteral("transparentColor")) {
     const QString colorName = value.toString();
-    if (!QColor::fromString(colorName).isValid())
-      return tr("Invalid color: %1").arg(colorName);
+    if (!QColor(colorName).isValid()) return scriptColorErrorMessage(colorName);
     state.insert(name, colorName);
   } else if (name == QStringLiteral("preservePaintedAreas")) {
     state.insert(name, value.toBool());

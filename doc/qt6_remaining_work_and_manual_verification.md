@@ -62,9 +62,12 @@ Already covered:
 - Qt target, MOC, resource, and translation command selection is centralized.
 - Qt 6 builds link with `OpenGLWidgets`, scoped `Core5Compat`, and the current
   `QJSEngine`/Qml dependency where needed.
-- Direct `QRegExp` usage is guarded against by `mise run check-no-qregexp`.
+- Direct `QRegExp` usage is guarded against by `mise run check-no-qregexp`,
+  which now uses explicit C++ identifier-boundary matching so removed Qt 5 API
+  tokens cannot slip past the grep check.
 - Direct `QTextCodec` usage is isolated behind the legacy text-codec adapter
-  and guarded by `mise run check-core5compat-scope`.
+  and guarded by `mise run check-core5compat-scope`, using the same explicit
+  identifier-boundary matching.
 - An isolated Qt 6 translation lane exists through
   `nix-qt6-translation-check`, `mise run configure-qt6-translations`, and
   `mise run build-qt6-translations`. The build task keeps
@@ -227,6 +230,9 @@ Already covered:
 - Font parameter style lookup and preview font construction now use `QtCompat`
   helpers so Qt 6 can use the static `QFontDatabase` APIs while Qt 5 keeps the
   instance-based path.
+- Stop-motion camera-option sizing and legacy Pencil Test camera-label sizing
+  now use `QtCompat::fontMetricsHorizontalAdvance()`, removing direct
+  `QFontMetrics::width()` calls from that slice while preserving Qt 5 behavior.
 - Configure Shortcuts multi-key conflict checking now uses
   `QKeyCombination::toCombined()` on Qt 6 instead of the deprecated implicit
   `QKeyCombination` to `int` conversion, with the existing integer key-sequence
@@ -265,7 +271,7 @@ Still needed:
   remaining legacy event-coordinate accessors outside the completed
   SceneViewer, Function Panel, and shared-widget slices and the broader OpenGL
   warning field.
-- Promote the new `qt6-experimental` binary-build workflow into release-quality
+- Promote the new `qt-6-experimental` binary-build workflow into release-quality
   Qt 6 CI coverage once its platform artifacts and deployment behavior are
   validated.
 - Make any remaining Qt 5 specific setup in documentation conditional or
@@ -279,20 +285,53 @@ Already covered:
 - The basic script smoke now covers `print`, `warning`, the legacy `dummy()`
   helper, the legacy `void` result object, `run()` library lookup, `run()`
   return values, and child-script global variable/function persistence.
+- `mise run check-qt6-script-scope` now guards the CMake boundary between the
+  legacy Qt Script implementation and the Qt 6 `QJSEngine` facade, keeping
+  `Qt5::Script` and legacy `scriptbinding_*` compilation inside Qt 5-only
+  blocks.
 - The `run()` error smoke covers missing/extra arguments, bad path arguments,
   missing script files, and child-script exception propagation.
 - The smoke suite covers the current facades for file/path, scene, level,
   image, image builder, rasterizer, vectorizers, renderer, wrapper id, binding
   lifecycle, and several edge cases.
+- The Image smoke coverage now includes post-dispose rejection for metadata
+  access, string conversion, `load()`, and `save()`, in addition to load/save,
+  first-frame sequence loading, and incompatible save error coverage.
 - The FilePath smoke coverage now includes mutable property setters,
   `withParentDirectory()` parent conversion, `exists`, `isDirectory`, and
-  `lastModified` JS `Date` exposure.
+  `lastModified` JS `Date` exposure, plus `valueOf()`, `String(filePath)`,
+  copy construction, and JavaScript string concatenation.
 - The Scene smoke coverage now includes `Scene.getLevels()` wrapper identity
   and lifetime behavior, including disposal of returned wrappers without
   deleting scene-owned levels and the current empty-wrapper behavior for stale
-  scene-owned level wrappers after `Scene.dispose()`.
+  scene-owned level wrappers after `Scene.dispose()`. It also covers null and
+  malformed cell-object rejection in `Scene.setCell()`, plus legacy
+  frame-id-before-level-argument error precedence.
+- The Level smoke coverage now includes `Level.path` bad setter rejection, the
+  current failed path reload behavior for missing target paths, and
+  post-dispose rejection across the Level public surface. It also covers the
+  legacy non-image `Level.setFrame()` error path and frame-id-before-image
+  error precedence.
+- The ToonzRasterConverter smoke coverage now includes legacy bool coercion for
+  `flatSource`, instance `dispose()` behavior, post-dispose `flatSource`
+  persistence, and static conversion after instance disposal.
+- The vectorizer/rasterizer lifecycle smoke coverage now includes disposed
+  `vectorize()` and `rasterize()` rejection, not only property and `toString()`
+  rejection, and covers legacy bool coercion for representative
+  OutlineVectorizer, CenterlineVectorizer, and Rasterizer properties.
+- The Renderer smoke coverage now includes post-dispose error behavior for
+  `toString()`, `renderScene()`, `renderFrame()`, and `dumpCache()`, plus
+  legacy non-array `frames` / `columns` handling.
 - The ImageBuilder smoke covers legacy `ImageBuilder.clear()` returning
-  `undefined` in addition to clear/fill behavior.
+  `undefined`, clear/fill behavior, and post-dispose rejection for
+  `toString()`, `image`, `clear()`, `fill()`, and `add()`. It also confirms
+  that the Qt 6 color path accepts the legacy `transparent` color name.
+- The OutlineVectorizer smoke now covers `transparentColor = "transparent"`
+  round-tripping and invalid transparent-color rejection with the legacy
+  Qt Script-style color error.
+- The Transform smoke covers post-dispose rejection for `toString()`,
+  `translate()`, `rotate()`, and `scale()`, plus finite-number argument
+  validation.
 - The focused QApplication scene-icon script smokes now pass under
   `QT_QPA_PLATFORM=offscreen`; the Qt 6 offscreen path writes a valid
   background-filled icon instead of entering the unsupported offscreen
@@ -312,8 +351,12 @@ Already covered:
   direct executable path.
 - On macOS, QApplication-based script smokes also launch through
   LaunchServices by default and restore an explicit script smoke working
-  directory before fixture execution. The aggregate Qt 6 script smoke suite now
-  passes in this mode, including full-color Rasterizer and Renderer fixtures.
+  directory before fixture execution. When the executable is linked to
+  Nix-store Qt, the harness now uses matching Nix Qt plugins and temporarily
+  hides bundled Qt frameworks/`qt.conf` during the smoke so LaunchServices does
+  not mix two Qt runtimes. The aggregate Qt 6 script smoke suite now passes in
+  bounded and natural-exit modes, including full-color Rasterizer and Renderer
+  fixtures.
 - Aggregate script smoke tasks exist in both bounded and natural-exit modes.
 
 Still needed:
@@ -354,6 +397,18 @@ Already covered:
 
 - Qt 6 API migration work exists for audio playback, audio recording, active
   pencil-test camera paths, and stop-motion camera enumeration.
+- Stop-motion capture-sound playback now uses `QSoundEffect` in both Qt lanes,
+  removing the old Qt 5-only `QSound` branch while preserving the camera snap
+  sound feature.
+- `mise run check-qt6-multimedia-scope` now guards the current multimedia API
+  boundary: `QSound` must not reappear, and Qt 5 video-surface APIs must remain
+  confined to the legacy 32-bit Qt 5 `penciltestpopup_qt.*` fallback. The
+  `toonz` CMake source split now explicitly keeps that fallback out of every
+  Qt 6 lane by selecting the modern stop-motion/Pencil Test sources whenever
+  `OPENTOONZ_QT_MAJOR` is 6, even if an unusual non-64-bit Qt 6 configuration
+  is attempted. The guard also runs before the normal local configure, build,
+  translation-build, and check tasks so multimedia API regressions fail early,
+  and uses explicit C++ identifier boundaries for the forbidden API tokens.
 - Packaged Qt 6 smokes cover device enumeration, camera-format metadata,
   default audio input, default audio output, WAV recording/reload, and
   generated-WAV playback startup.
@@ -369,8 +424,11 @@ Still needed:
 - Verify still capture and frame insertion.
 - Verify hotplug behavior for camera and audio devices.
 - Verify stop-motion UI workflows end to end.
-- Replace any remaining Qt 5 multimedia classes such as video-surface handling
-  with Qt 6 equivalents, including `QVideoSink` where appropriate.
+- If the legacy 32-bit `penciltestpopup_qt.*` fallback is ever brought into the
+  Qt 6 release scope, replace its Qt 5 `QAbstractVideoSurface` /
+  `QVideoSurfaceFormat` handling with a Qt 6 video-frame path such as
+  `QVideoSink`. The active Qt 6 Pencil Test path currently avoids that surface
+  API and still needs real live-camera workflow validation.
 
 ### 5. Viewer, OpenGL, Rendering, And Visual Parity
 
@@ -477,10 +535,27 @@ macOS already covered:
 - The current arm64 bundle check passes.
 - Packaged macOS Qt 6 app-side high-DPI and Script Console GUI smokes pass when
   run through the LaunchServices wrapper outside the sandbox.
-- The `qt6-experimental` GitHub Actions workflow builds a Qt 6 macOS arm64 DMG
-  artifact and publishes it to the `qt6-experimental` prerelease when that tag
-  is pushed. `mise run release-qt6-experimental` retags the current clean branch
-  and pushes the tag to refresh that rolling prerelease.
+- The bounded Qt 6 script-engine smoke suite, including the QApplication-backed
+  scene icon, rasterizer, and renderer fixtures, passes when the app bundle is
+  launched outside the sandbox.
+- The full app-side `gui-smokes-app-qt6` aggregate passes outside the sandbox.
+  The current run covered startup, scene creation, high-DPI, Script Console,
+  multimedia device enumeration, camera-format no-camera handling, audio
+  playback/output, xsheet scrub, raster/vector viewer framebuffers, preview/FX
+  preview/final render outputs, onion skin, safe-area/field-guide/ruler-guide
+  overlays, Animate/Edit cursor and drag paths, vector/raster Selection modes,
+  vector brush, raster brush, Qt mouse-event raster brush delivery, and
+  synthetic Qt tablet-event raster brush delivery.
+- On the current machine/session, the audio-input and audio-recording WAV
+  smokes report structured `timeout` skips rather than failures. Treat those as
+  environment-limited microphone capture coverage, not proof of microphone
+  recording parity.
+- The `qt-6-experimental` GitHub Actions workflow builds Qt 6 Linux, Windows,
+  and macOS artifacts from `codex/qt-6-port` on `bgyss/opentoonz`, runs weekly
+  on Mondays at 10:00 UTC or by manual dispatch, and publishes them to the
+  rolling `qt-6-experimental` prerelease. `mise run release-qt6-experimental`
+  retags the current clean branch and pushes the tag to refresh that rolling
+  prerelease manually.
 
 macOS still needed:
 
@@ -496,7 +571,7 @@ Windows still needed:
 - Keep `mise run check-windows-msvc-abi` passing before local Qt 5/Qt 6 builds;
   it is an early warning for MSVC DLL import/export annotation mistakes, not a
   replacement for the real Windows workflow.
-- Validate the new `qt6-experimental` Windows x64 binary workflow on GitHub
+- Validate the new `qt-6-experimental` Windows x64 binary workflow on GitHub
   Actions.
 - Re-audit the Qt 6 `aqtinstall` module list, `windeployqt` arguments, and
   plugin output.
@@ -504,7 +579,7 @@ Windows still needed:
 
 Linux still needed:
 
-- Validate the new `qt6-experimental` Linux x86_64 AppImage workflow on GitHub
+- Validate the new `qt-6-experimental` Linux x86_64 AppImage workflow on GitHub
   Actions.
 - Audit the Qt 6 `aqtinstall` module list, AppImage bundling, and plugin
   coverage.
@@ -556,6 +631,8 @@ Run compatibility guardrails:
 ```sh
 mise run check-no-qregexp
 mise run check-core5compat-scope
+mise run check-qt6-multimedia-scope
+mise run check-qt6-script-scope
 mise run check-textcodec
 mise run check-textcodec-qt6
 git diff --check
@@ -571,6 +648,16 @@ mise run script-smokes-natural-exit-qt6
 ```
 
 Run the core packaged GUI smokes:
+
+```sh
+mise run gui-smokes-app-qt6
+```
+
+The aggregate above runs the packaged GUI smokes that do not require real
+OS-level input delivery. Audio input and audio-recording may pass as structured
+`timeout` or `no-device` skips when the current session cannot capture from a
+microphone; follow up with manual microphone recording before claiming audio
+input parity. To bisect failures or run only one area, use the individual tasks:
 
 ```sh
 mise run gui-smoke-qt6
@@ -606,6 +693,12 @@ mise run gui-smoke-audio-playback-wav-qt6
 ```
 
 Run the current tool, overlay, and input smokes relevant to manual parity:
+
+```sh
+mise run gui-smokes-app-qt6
+```
+
+For focused reruns:
 
 ```sh
 mise run gui-smoke-viewer-zoom-pan-qt6

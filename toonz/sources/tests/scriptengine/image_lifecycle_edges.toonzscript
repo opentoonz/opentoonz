@@ -1,0 +1,30 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e.message || e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var image = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+print("qt-script-image-lifecycle-before", image.id > 0, image.type,
+      image.width, image.height, image.dpi >= 0, image.toString());
+
+image.dispose();
+
+var errors = [
+  hasError(function() { image.toString(); }, "Invalid Image object"),
+  hasError(function() { var value = image.type; }, "Invalid Image object"),
+  hasError(function() { var value = image.width; }, "Invalid Image object"),
+  hasError(function() { var value = image.height; }, "Invalid Image object"),
+  hasError(function() { var value = image.dpi; }, "Invalid Image object"),
+  hasError(function() { image.load(new FilePath("toonz/sources/tnztools/Resources/brush.png")); },
+           "Invalid Image object"),
+  hasError(function() { image.save(new FilePath("toonz/build/qt6-script-smoke/image_lifecycle_disposed.png")); },
+           "Invalid Image object")
+];
+
+print("qt-script-image-lifecycle-after", image.id, errors);
+
+"qt-script-image-lifecycle-result";

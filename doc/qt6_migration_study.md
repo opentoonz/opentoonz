@@ -1193,6 +1193,10 @@ Current branch status:
 - The SXF direct-text popup now uses `QCheckBox::checkStateChanged` on Qt 6.7+
   and the existing `stateChanged` signal on Qt 5, removing a Qt 6 deprecation
   warning without changing the Qt 5 lane.
+- Stop-motion camera-option sizing and legacy Pencil Test camera-label sizing
+  now use `QtCompat::fontMetricsHorizontalAdvance()`, removing direct
+  `QFontMetrics::width()` calls from that warning slice while preserving the
+  Qt 5 fallback.
 - The Qt 6 startup path no longer sets the removed/deprecated high-DPI
   application attributes; Qt 6 uses its always-on high-DPI behavior, while the
   Qt 5 lane keeps the existing attributes. The translator startup path also
@@ -1325,6 +1329,11 @@ Current branch status:
   repo-local Qt 6 object-binding compatibility fixture. It is run by
   `mise run script-smoke-filepath-qt6` and verifies a narrow JavaScript
   `FilePath` facade backed by `TFilePath` helpers.
+- `toonz/sources/tests/scriptengine/file_path_coercion.toonzscript` extends
+  the FilePath fixture set. It is run by
+  `mise run script-smoke-filepath-coercion-qt6` and verifies
+  `FilePath.valueOf()`, `String(filePath)`, JavaScript string concatenation,
+  copy construction from another `FilePath`, and chained path mutation helpers.
 - `toonz/sources/tests/scriptengine/file_path_edges.toonzscript` extends the
   FilePath fixture set. It is run by
   `mise run script-smoke-filepath-edges-qt6` and verifies relative concat,
@@ -1493,6 +1502,11 @@ Current branch status:
   save errors, constructor argument-count errors, non-path argument rejection,
   missing-image load errors that clear the image handle, incompatible
   raster/ToonzRaster save rejection, and unrecognized output type errors.
+- `toonz/sources/tests/scriptengine/image_lifecycle_edges.toonzscript` is the
+  repo-local Qt 6 Image lifecycle compatibility fixture. It is run by
+  `mise run script-smoke-image-lifecycle-edges-qt6` and verifies loaded raster
+  image metadata before disposal, disposed id reporting, and post-dispose
+  rejection for `toString`, metadata access, `load()`, and `save()`.
 - `toonz/sources/tests/scriptengine/image_level_first_frame.toonzscript` is the
   repo-local Qt 6 Image level-loading compatibility fixture. It is run by
   `mise run script-smoke-image-level-first-frame-qt6` and verifies
@@ -1512,12 +1526,14 @@ Current branch status:
   `mise run script-smoke-image-builder-edges-qt6` and verifies constructor
   argument-count/type/size errors, bad image type rejection, invalid fill color,
   empty-image add errors, non-`Transform` add argument rejection, ToonzRaster
-  fill rejection, image type mismatch errors, and disposed builder errors.
+  fill rejection, image type mismatch errors, and disposed builder rejection
+  for `toString()`, `image`, `clear()`, `fill()`, and `add()`.
 - `toonz/sources/tests/scriptengine/transform_edges.toonzscript` is the
   repo-local Qt 6 Transform edge-case compatibility fixture. It is run by
   `mise run script-smoke-transform-edges-qt6` and verifies finite-number
   argument rejection for `translate()`, `rotate()`, and `scale()`, plus
-  disposed Transform object rejection without entering rendering paths.
+  disposed `toString()`, `translate()`, `rotate()`, and `scale()` rejection
+  without entering rendering paths.
 - `toonz/sources/tests/scriptengine/toonz_raster_converter.toonzscript` is the
   first repo-local Qt 6 converter compatibility fixture. It is run by
   `mise run script-smoke-toonz-raster-converter-qt6` and verifies
@@ -1536,6 +1552,11 @@ Current branch status:
   legacy-style `ToonzRasterConverter.convert()` argument and type rejection for
   missing/extra arguments, non-image/non-level values, ToonzRaster and Vector
   images, empty Raster levels, and Vector levels.
+- `toonz/sources/tests/scriptengine/toonz_raster_converter_lifecycle_edges.toonzscript`
+  is the repo-local Qt 6 converter lifecycle fixture. It is run by
+  `mise run script-smoke-toonz-raster-converter-lifecycle-edges-qt6` and
+  verifies instance `convert()` rejection after `dispose()`, disposed id
+  reporting, stable `toString()` behavior, and continued static conversion.
 - `toonz/sources/tests/scriptengine/outline_vectorizer.toonzscript` is the
   first repo-local Qt 6 vectorizer compatibility fixture. It is run by
   `mise run script-smoke-outline-vectorizer-qt6` and verifies
@@ -1560,7 +1581,9 @@ Current branch status:
   get/set roundtrips for `OutlineVectorizer`, `CenterlineVectorizer`, and
   `Rasterizer`, invalid `OutlineVectorizer.transparentColor` rejection, and
   disposed-object method/property rejection for `OutlineVectorizer`,
-  `CenterlineVectorizer`, `Rasterizer`, and `ToonzRasterConverter`.
+  `CenterlineVectorizer`, `Rasterizer`, and `ToonzRasterConverter`, including
+  disposed `vectorize()`, `rasterize()`, and converter instance `convert()`
+  calls.
 - `toonz/sources/tests/scriptengine/rasterizer.toonzscript` is the repo-local
   Qt 6 Rasterizer compatibility fixture. It is run by
   `mise run script-smoke-rasterizer-qt6` and verifies `Rasterizer`
@@ -1608,6 +1631,12 @@ Current branch status:
   `renderScene()` and `renderFrame()` reject missing/non-`Scene`/disposed scene
   arguments, bad frame values, and invalid `Renderer.frames` /
   `Renderer.columns` list values before reaching the Qt 6 renderer path.
+- `toonz/sources/tests/scriptengine/renderer_lifecycle_edges.toonzscript` is
+  the repo-local Qt 6 Renderer lifecycle compatibility fixture. It is run by
+  `mise run script-smoke-renderer-lifecycle-edges-qt6` and verifies that
+  `Renderer.toString()`, `renderScene()`, `renderFrame()`, and `dumpCache()`
+  reject use after `Renderer.dispose()` while preserving script-owned
+  `frames` and `columns` arrays.
 - `toonz/sources/tests/scriptengine/wrapper_id.toonzscript` is the repo-local
   Qt 6 inherited Wrapper id compatibility fixture. It is run by
   `mise run script-smoke-wrapper-id-qt6` and verifies read-only `id` parity for
@@ -1620,6 +1649,18 @@ Current branch status:
   `mise run script-smoke-level-path-qt6` and verifies setter parity for both
   `FilePath` objects and strings by assigning a saved raster level path and
   reloading that level through the Qt 6 facade.
+- `toonz/sources/tests/scriptengine/level_path_edges.toonzscript` extends
+  `Level.path` coverage. It is run by
+  `mise run script-smoke-level-path-edges-qt6` and verifies bad path setter
+  rejection plus the current failed path reload behavior, where a missing
+  target path assignment leaves the wrapper as a zero-frame level at the
+  requested path.
+- `toonz/sources/tests/scriptengine/level_lifecycle_edges.toonzscript` is the
+  repo-local Qt 6 Level lifecycle fixture. It is run by
+  `mise run script-smoke-level-lifecycle-edges-qt6` and verifies promoted
+  empty-level metadata before disposal plus post-dispose rejection for string
+  conversion, metadata/path access and mutation, frame access/mutation,
+  `load()`, and `save()`.
 - `toonz/sources/tests/scriptengine/level_transformers.toonzscript` is the
   repo-local Qt 6 level-wide transformer compatibility fixture. It is run by
   `mise run script-smoke-level-transformers-qt6` and verifies
@@ -1628,6 +1669,7 @@ Current branch status:
 - The script fixtures can run in bounded mode or natural-exit mode.
   `mise run script-smoke-qt6`, `mise run script-smoke-run-errors-qt6`,
   `mise run script-smoke-filepath-qt6`,
+  `mise run script-smoke-filepath-coercion-qt6`,
   `mise run script-smoke-filepath-edges-qt6`,
   `mise run script-smoke-filepath-metadata-qt6`,
   `mise run script-smoke-filepath-mutation-metadata-qt6`,
@@ -1650,8 +1692,12 @@ Current branch status:
   `mise run script-smoke-level-qt6`, `mise run script-smoke-level-edges-qt6`,
   `mise run script-smoke-level-io-qt6`,
   `mise run script-smoke-level-io-types-qt6`,
-  `mise run script-smoke-level-path-qt6`, `mise run script-smoke-image-qt6`,
+  `mise run script-smoke-level-path-qt6`,
+  `mise run script-smoke-level-path-edges-qt6`,
+  `mise run script-smoke-level-lifecycle-edges-qt6`,
+  `mise run script-smoke-image-qt6`,
   `mise run script-smoke-image-edges-qt6`,
+  `mise run script-smoke-image-lifecycle-edges-qt6`,
   `mise run script-smoke-image-level-first-frame-qt6`,
   `mise run script-smoke-image-builder-qt6`,
   `mise run script-smoke-image-builder-edges-qt6`,
@@ -1659,6 +1705,7 @@ Current branch status:
   `mise run script-smoke-toonz-raster-converter-qt6`,
   `mise run script-smoke-toonz-raster-converter-level-qt6`,
   `mise run script-smoke-toonz-raster-converter-edges-qt6`,
+  `mise run script-smoke-toonz-raster-converter-lifecycle-edges-qt6`,
   `mise run script-smoke-outline-vectorizer-qt6`,
   `mise run script-smoke-centerline-vectorizer-qt6`,
   `mise run script-smoke-vectorizer-edges-qt6`,
@@ -1669,6 +1716,7 @@ Current branch status:
   `mise run script-smoke-renderer-frames-columns-qt6`,
   `mise run script-smoke-renderer-vector-qt6`,
   `mise run script-smoke-renderer-edges-qt6`,
+  `mise run script-smoke-renderer-lifecycle-edges-qt6`,
   `mise run script-smoke-wrapper-id-qt6`, and
   `mise run script-smoke-level-transformers-qt6` pass in both modes for the
   current Qt 6 app bundle.
@@ -1769,6 +1817,8 @@ Current branch status:
   behavior, bad frame/index input including non-number frame-index rejection,
   empty-level name setter no-op parity, empty-level path `undefined` parity,
   level/image type mismatch, incompatible save, and missing-load errors.
+  The Level lifecycle fixture covers promoted-empty-level metadata and
+  post-dispose rejection for the Level public surface.
   Broader path-policy coverage still needs fixtures before claiming full
   `scriptbinding_level.*` parity.
 - The Qt 6 branch now has a minimal `Image` compatibility slice for empty image
@@ -1776,23 +1826,28 @@ Current branch status:
   `Level.setFrame()` input. The Image edge-case fixture also covers empty-image
   save errors, constructor argument errors, non-path argument rejection, failed
   load state clearing, incompatible save errors, and unrecognized output type
-  errors. The Image level-first-frame fixture covers loading a saved two-frame
-  Raster image sequence through `Image`, preserving the legacy first-frame
-  warning while also checking explicit frame-2 path loading and observable
-  Raster image metadata.
+  errors. The Image lifecycle edge-case fixture covers post-dispose rejection
+  for metadata access, string conversion, load, and save calls. The Image
+  level-first-frame fixture covers loading a saved two-frame Raster image
+  sequence through `Image`, preserving the legacy first-frame warning while
+  also checking explicit frame-2 path loading and observable Raster image
+  metadata.
 - The Qt 6 branch now has a minimal `Transform`/`ImageBuilder` compatibility
   slice for identity, translation, rotation, uniform scale, non-uniform scale,
   transform-derived raster composition, generated image access, clear/fill,
   image save/reload, and typed Raster/ToonzRaster builder construction. The
   Transform and ImageBuilder edge-case fixtures also cover invalid Transform
-  numeric inputs, disposed Transform object rejection, constructor argument
-  errors, invalid fill/add inputs, type mismatch rejection, ToonzRaster fill
-  rejection, and disposed builder errors.
+  numeric inputs, disposed Transform `toString()`, `translate()`, `rotate()`,
+  and `scale()` rejection, constructor argument errors, invalid fill/add
+  inputs, type mismatch rejection, ToonzRaster fill rejection, and disposed
+  builder rejection for `toString()`, `image`, `clear()`, `fill()`, and
+  `add()`.
 - The Qt 6 branch now has a minimal `ToonzRasterConverter` compatibility slice
   for raster image conversion into ToonzRaster images, level-wide raster to
   ToonzRaster conversion, TLV save/reload, converted-level frame reload, and
-  legacy-style argument/type rejection for unsupported converter inputs. This
-  does not yet claim broader converter or renderer parity.
+  legacy-style argument/type rejection for unsupported converter inputs. It now
+  also covers instance converter disposal while preserving static conversion
+  behavior. This does not yet claim broader converter or renderer parity.
 - The Qt 6 branch now has a minimal `OutlineVectorizer` compatibility slice for
   property state, raster-image vectorization into Vector images, PLI
   save/reload, vector-level insertion, and level-wide raster-to-vector
@@ -2686,20 +2741,24 @@ Current branch status:
   permission behavior.
 - The app-side smoke hook also has a Qt 6 audio-input backend check via
   `mise run gui-smoke-audio-input-qt6`. It starts the packaged app's default
-  audio input with `QAudioSource`, captures a short buffer, and verifies
-  `NoError`. The current local packaged run used the MacBook Pro Microphone at
-  48 kHz and captured 96,256 bytes. This narrows the recording-backend path,
-  but it does not validate the Record Audio popup, WAV save/reload behavior,
-  permission UX, lip-sync timing, or capture quality.
+  audio input with `QAudioSource`, captures a short buffer when the session can
+  deliver microphone data, and verifies `NoError`. The smoke now has a bounded
+  app-side timeout so microphone permission/device stalls report structured
+  status instead of hanging. The current local aggregate run reported
+  `audioInputProbe=timeout` and was treated as an environment skip. This keeps
+  the backend smoke useful in headless or permission-limited sessions, but it
+  does not validate microphone recording parity, the Record Audio popup, WAV
+  save/reload behavior, permission UX, lip-sync timing, or capture quality.
 - The app-side smoke hook also has a Qt 6 audio-recording WAV check via
   `mise run gui-smoke-audio-recording-wav-qt6`. It starts the packaged app's
   default audio input, records through `AudioWriterWAV`, saves a short WAV, and
-  reloads it through `TSoundTrackReader`. The current local packaged run used
-  the MacBook Pro Microphone at 44.1 kHz, recorded 65,536 bytes, produced a
-  65,580-byte WAV, and reloaded 32,768 samples over 743 ms. This narrows the
-  Record Audio writer and sound I/O reload path, but it does not validate the
-  Record Audio popup button flow, Save and Insert column insertion, microphone
-  permission UX, lip-sync timing, or capture quality.
+  reloads it through `TSoundTrackReader` when microphone capture is available.
+  This smoke also has a bounded app-side timeout. The current local aggregate
+  run reported `audioRecordingWavProbe=timeout` and was treated as an
+  environment skip. This narrows harness behavior and prevents hung GUI smoke
+  runs, but it does not validate the Record Audio writer path on this session,
+  the Record Audio popup button flow, Save and Insert column insertion,
+  microphone permission UX, lip-sync timing, or capture quality.
 - The app-side smoke hook also has a Qt 6 generated-WAV playback check via
   `mise run gui-smoke-audio-playback-wav-qt6`. It writes a low-volume PCM16 WAV
   through `AudioWriterWAV`, reloads it through `TSoundTrackReader`, opens the
@@ -2938,7 +2997,9 @@ Tasks:
 - Port auto lip-sync preview playback.
 - Port stop-motion camera enumeration, preview, still capture, and frame
   ingestion.
-- Replace `QAbstractVideoSurface` with `QVideoSink`-based handling.
+- Keep `QAbstractVideoSurface` out of every Qt 6 production source list. If the
+  legacy 32-bit `penciltestpopup_qt.*` fallback becomes part of the Qt 6
+  release scope, replace that fallback with `QVideoSink`-based frame handling.
 - Add manual smoke scripts or repo-local checklists for camera and audio.
 
 Exit criteria:
@@ -3173,6 +3234,7 @@ mise run package-macos-qt6
 mise run check-macos-arm64-qt6
 mise run check-no-qregexp
 mise run check-core5compat-scope
+mise run gui-smokes-app-qt6
 mise run gui-smoke-qt6
 mise run gui-smoke-scene-create-qt6
 mise run gui-smoke-highdpi-qt6
@@ -3242,6 +3304,7 @@ OPENTOONZ_GUI_SMOKE_FILE=<path-to-scene.tnz> bash scripts/qt6/run-gui-smoke.sh
 mise run script-smoke-qt6
 mise run script-smoke-run-errors-qt6
 mise run script-smoke-filepath-qt6
+mise run script-smoke-filepath-coercion-qt6
 mise run script-smoke-filepath-edges-qt6
 mise run script-smoke-filepath-metadata-qt6
 mise run script-smoke-path-arguments-qt6
@@ -3265,8 +3328,11 @@ mise run script-smoke-level-edges-qt6
 mise run script-smoke-level-io-qt6
 mise run script-smoke-level-io-types-qt6
 mise run script-smoke-level-path-qt6
+mise run script-smoke-level-path-edges-qt6
+mise run script-smoke-level-lifecycle-edges-qt6
 mise run script-smoke-image-qt6
 mise run script-smoke-image-edges-qt6
+mise run script-smoke-image-lifecycle-edges-qt6
 mise run script-smoke-image-level-first-frame-qt6
 mise run script-smoke-image-builder-qt6
 mise run script-smoke-image-builder-edges-qt6
@@ -3274,6 +3340,7 @@ mise run script-smoke-transform-edges-qt6
 mise run script-smoke-toonz-raster-converter-qt6
 mise run script-smoke-toonz-raster-converter-level-qt6
 mise run script-smoke-toonz-raster-converter-edges-qt6
+mise run script-smoke-toonz-raster-converter-lifecycle-edges-qt6
 mise run script-smoke-outline-vectorizer-qt6
 mise run script-smoke-centerline-vectorizer-qt6
 mise run script-smoke-vectorizer-edges-qt6
@@ -3284,12 +3351,14 @@ mise run script-smoke-renderer-qt6
 mise run script-smoke-renderer-frames-columns-qt6
 mise run script-smoke-renderer-vector-qt6
 mise run script-smoke-renderer-edges-qt6
+mise run script-smoke-renderer-lifecycle-edges-qt6
 mise run script-smoke-level-transformers-qt6
 mise run script-smoke-wrapper-id-qt6
 mise run script-smokes-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-run-errors-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-filepath-qt6
+OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-filepath-coercion-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-filepath-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-filepath-metadata-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-path-arguments-qt6
@@ -3313,8 +3382,11 @@ OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-level-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-level-io-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-level-io-types-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-level-path-qt6
+OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-level-path-edges-qt6
+OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-level-lifecycle-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-image-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-image-edges-qt6
+OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-image-lifecycle-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-image-level-first-frame-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-image-builder-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-image-builder-edges-qt6
@@ -3322,6 +3394,7 @@ OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-transform-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-toonz-raster-converter-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-toonz-raster-converter-level-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-toonz-raster-converter-edges-qt6
+OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-toonz-raster-converter-lifecycle-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-outline-vectorizer-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-centerline-vectorizer-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-vectorizer-edges-qt6
@@ -3332,6 +3405,7 @@ OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-renderer-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-renderer-frames-columns-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-renderer-vector-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-renderer-edges-qt6
+OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-renderer-lifecycle-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-level-transformers-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-wrapper-id-qt6
 mise run script-smokes-natural-exit-qt6

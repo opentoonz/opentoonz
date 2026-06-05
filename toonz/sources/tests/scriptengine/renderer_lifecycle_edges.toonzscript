@@ -1,0 +1,34 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e.message || e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var renderer = new Renderer();
+renderer.frames = [0, 2];
+renderer.columns = [1];
+
+print("qt-script-renderer-lifecycle-before", renderer.id > 0,
+      renderer.toString(), renderer.frames.join(","), renderer.columns.join(","));
+
+renderer.dispose();
+
+var scene = new Scene();
+var errors = [
+  hasError(function() { renderer.toString(); }, "Invalid Renderer object"),
+  hasError(function() { renderer.renderScene(scene); },
+           "Invalid Renderer object"),
+  hasError(function() { renderer.renderFrame(scene, 0); },
+           "Invalid Renderer object"),
+  hasError(function() { renderer.dumpCache(); }, "Invalid Renderer object")
+];
+
+print("qt-script-renderer-lifecycle-after", renderer.id, errors,
+      renderer.frames.join(","), renderer.columns.join(","));
+
+scene.dispose();
+
+"qt-script-renderer-lifecycle-result";

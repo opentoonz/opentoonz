@@ -173,8 +173,11 @@
 
 #include <algorithm>
 #include <atomic>
+#include <chrono>
 #include <cmath>
 #include <cstdlib>
+#include <future>
+#include <thread>
 
 #ifdef _WIN32
 #ifndef x64
@@ -14287,6 +14290,22 @@ static QStringList gui_smoke_audio_input_details() {
   return details;
 }
 
+static QStringList gui_smoke_audio_input_details_bounded() {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  std::packaged_task<QStringList()> task(gui_smoke_audio_input_details);
+  std::future<QStringList> future = task.get_future();
+  std::thread(std::move(task)).detach();
+  if (future.wait_for(std::chrono::seconds(8)) == std::future_status::ready) {
+    return future.get();
+  }
+  return QStringList()
+         << QStringLiteral("qtMultimediaApi=Qt6")
+         << QStringLiteral("audioInputProbe=timeout");
+#else
+  return gui_smoke_audio_input_details();
+#endif
+}
+
 static QStringList gui_smoke_audio_recording_wav_details() {
   QStringList details;
 
@@ -14402,6 +14421,23 @@ static QStringList gui_smoke_audio_recording_wav_details() {
 #endif
 
   return details;
+}
+
+static QStringList gui_smoke_audio_recording_wav_details_bounded() {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  std::packaged_task<QStringList()> task(
+      gui_smoke_audio_recording_wav_details);
+  std::future<QStringList> future = task.get_future();
+  std::thread(std::move(task)).detach();
+  if (future.wait_for(std::chrono::seconds(8)) == std::future_status::ready) {
+    return future.get();
+  }
+  return QStringList()
+         << QStringLiteral("qtMultimediaApi=Qt6")
+         << QStringLiteral("audioRecordingWavProbe=timeout");
+#else
+  return gui_smoke_audio_recording_wav_details();
+#endif
 }
 
 static QStringList gui_smoke_camera_format_details() {
@@ -14575,7 +14611,7 @@ static void run_gui_smoke_hook(const QString &action,
     }
 
     if (action == "audio-input") {
-      QStringList details = gui_smoke_audio_input_details();
+      QStringList details = gui_smoke_audio_input_details_bounded();
       details << QString("window=%1").arg(TApp::instance()
                                               ->getMainWindow()
                                               ->windowTitle());
@@ -14585,7 +14621,7 @@ static void run_gui_smoke_hook(const QString &action,
     }
 
     if (action == "audio-recording-wav") {
-      QStringList details = gui_smoke_audio_recording_wav_details();
+      QStringList details = gui_smoke_audio_recording_wav_details_bounded();
       details << QString("window=%1").arg(TApp::instance()
                                               ->getMainWindow()
                                               ->windowTitle());

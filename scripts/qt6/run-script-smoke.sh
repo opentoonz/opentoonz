@@ -28,7 +28,22 @@ fi
 executable="$app_path/Contents/MacOS/OpenToonz"
 script_name="$(basename "$script_path")"
 log_path="$smoke_root/${script_name%.*}-script-smoke.log"
+qt_plugin_path="${OPENTOONZ_SCRIPT_SMOKE_QT_PLUGIN_PATH:-}"
+hidden_qt_conf=""
+hidden_qt_frameworks=()
 rm -f "$log_path"
+
+restore_hidden_qt_runtime() {
+  if [[ -n "$hidden_qt_conf" && -f "$hidden_qt_conf.hidden" ]]; then
+    mv "$hidden_qt_conf.hidden" "$hidden_qt_conf"
+  fi
+  local framework
+  for framework in "${hidden_qt_frameworks[@]:-}"; do
+    if [[ -d "$framework.hidden" ]]; then
+      mv "$framework.hidden" "$framework"
+    fi
+  done
+}
 
 has_expected_output() {
   local expected
@@ -130,6 +145,32 @@ if [[ "$(uname -s)" == "Darwin" &&
   launch_with_open=1
 fi
 
+if [[ "$(uname -s)" == "Darwin" && -z "$qt_plugin_path" ]]; then
+  qt_core_path="$(otool -L "$executable" 2>/dev/null |
+    awk '$1 ~ /qtbase-/ && $1 ~ /\/lib\/QtCore.framework\/Versions\/A\/QtCore/ {print $1; exit}')"
+  if [[ "$qt_core_path" == /nix/store/*/lib/QtCore.framework/Versions/A/QtCore ]]; then
+    qt_plugin_path="${qt_core_path%/lib/QtCore.framework/Versions/A/QtCore}/lib/qt-6/plugins"
+  fi
+fi
+if [[ -n "$qt_plugin_path" &&
+      -f "$app_path/Contents/Resources/qt.conf" &&
+      ! -f "$app_path/Contents/Resources/qt.conf.hidden" ]]; then
+  hidden_qt_conf="$app_path/Contents/Resources/qt.conf"
+  mv "$hidden_qt_conf" "$hidden_qt_conf.hidden"
+  trap restore_hidden_qt_runtime EXIT
+fi
+if [[ -n "$qt_plugin_path" && -d "$app_path/Contents/Frameworks" ]]; then
+  for framework in "$app_path"/Contents/Frameworks/Qt*.framework; do
+    if [[ -d "$framework" && ! -e "$framework.hidden" ]]; then
+      mv "$framework" "$framework.hidden"
+      hidden_qt_frameworks+=("$framework")
+    fi
+  done
+  if ((${#hidden_qt_frameworks[@]} > 0)); then
+    trap restore_hidden_qt_runtime EXIT
+  fi
+fi
+
 if [[ "$launch_with_open" == "1" ]]; then
   (
     cd "$smoke_root"
@@ -139,6 +180,8 @@ if [[ "$launch_with_open" == "1" ]]; then
       --env "HOME=$smoke_home" \
       --env "XDG_CONFIG_HOME=$smoke_root/xdg-config" \
       --env "XDG_CACHE_HOME=$smoke_root/xdg-cache" \
+      ${qt_plugin_path:+--env "QT_PLUGIN_PATH=$qt_plugin_path"} \
+      ${qt_plugin_path:+--env "QT_QPA_PLATFORM_PLUGIN_PATH=$qt_plugin_path/platforms"} \
       --env "TOONZROOT=$smoke_root/stuff" \
       --env "TOONZPROFILES=$smoke_root/stuff/profiles" \
       --env "TOONZCONFIG=$smoke_root/stuff/config" \
@@ -151,7 +194,7 @@ if [[ "$launch_with_open" == "1" ]]; then
     --env "OPENTOONZ_SCRIPT_WORKING_DIRECTORY=$smoke_root" \
     --args "${launch_args[@]}"
   ) \
-    >/dev/null 2>&1 &
+    >>"$log_path" 2>&1 &
   open_pid=$!
   pid=""
   for ((attempt = 0; attempt < 100; attempt++)); do
@@ -164,20 +207,26 @@ if [[ "$launch_with_open" == "1" ]]; then
 else
   (
     cd "$smoke_root"
-  HOME="$smoke_home" \
-  XDG_CONFIG_HOME="$smoke_root/xdg-config" \
-  XDG_CACHE_HOME="$smoke_root/xdg-cache" \
-  TOONZROOT="$smoke_root/stuff" \
-  TOONZPROFILES="$smoke_root/stuff/profiles" \
-  TOONZCONFIG="$smoke_root/stuff/config" \
-  TOONZLIBRARY="$smoke_root/stuff/library" \
-  TOONZSTUDIOPALETTE="$smoke_root/stuff/studiopalette" \
-  TOONZFXPRESETS="$smoke_root/stuff/fxs" \
-  TOONZPROJECTS="$smoke_root/stuff/projects" \
-  TOONZCACHEROOT="$smoke_root/stuff/cache" \
-  OPENTOONZ_SCRIPT_WORKING_DIRECTORY="$smoke_root" \
-  "$executable" \
-    "${launch_args[@]}"
+  env -u DYLD_FRAMEWORK_PATH \
+    -u DYLD_LIBRARY_PATH \
+    -u QML2_IMPORT_PATH \
+    -u QML_IMPORT_PATH \
+    ${qt_plugin_path:+QT_PLUGIN_PATH="$qt_plugin_path"} \
+    ${qt_plugin_path:+QT_QPA_PLATFORM_PLUGIN_PATH="$qt_plugin_path/platforms"} \
+    HOME="$smoke_home" \
+    XDG_CONFIG_HOME="$smoke_root/xdg-config" \
+    XDG_CACHE_HOME="$smoke_root/xdg-cache" \
+    TOONZROOT="$smoke_root/stuff" \
+    TOONZPROFILES="$smoke_root/stuff/profiles" \
+    TOONZCONFIG="$smoke_root/stuff/config" \
+    TOONZLIBRARY="$smoke_root/stuff/library" \
+    TOONZSTUDIOPALETTE="$smoke_root/stuff/studiopalette" \
+    TOONZFXPRESETS="$smoke_root/stuff/fxs" \
+    TOONZPROJECTS="$smoke_root/stuff/projects" \
+    TOONZCACHEROOT="$smoke_root/stuff/cache" \
+    OPENTOONZ_SCRIPT_WORKING_DIRECTORY="$smoke_root" \
+    "$executable" \
+      "${launch_args[@]}"
   ) \
     >"$log_path" 2>&1 &
   pid=$!

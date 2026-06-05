@@ -9,6 +9,7 @@
 #include <QDropEvent>
 #include <QFont>
 #include <QFontDatabase>
+#include <QFontMetrics>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QGraphicsSceneMouseEvent>
 #include <QHelpEvent>
@@ -127,6 +128,15 @@ inline QFont fontDatabaseFont(const QString &family, const QString &style,
 #else
   QFontDatabase fontDatabase;
   return fontDatabase.font(family, style, pointSize);
+#endif
+}
+
+inline int fontMetricsHorizontalAdvance(const QFontMetrics &metrics,
+                                        const QString &text) {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+  return metrics.horizontalAdvance(text);
+#else
+  return metrics.width(text);
 #endif
 }
 

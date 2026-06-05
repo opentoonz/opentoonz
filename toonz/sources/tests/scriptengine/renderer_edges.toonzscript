@@ -63,6 +63,17 @@ print("qt-script-renderer-list-edges-errors", [
   negativeFrameError
 ]);
 
+renderer.frames = undefined;
+renderer.columns = null;
+var nonArrayFrameError = hasError(function() {
+  renderer.renderFrame(new Scene(), 0);
+}, "Renderer.renderFrame");
+var nonArraySceneError = hasError(function() {
+  renderer.renderScene(new Scene());
+}, "Renderer.renderScene");
+print("qt-script-renderer-list-edges-non-arrays", nonArrayFrameError,
+      nonArraySceneError);
+
 level.dispose();
 builder.dispose();
 scene.dispose();

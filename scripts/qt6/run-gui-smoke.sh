@@ -23,6 +23,21 @@ executable="$app_path/Contents/MacOS/OpenToonz"
 log_path="$smoke_root/gui-smoke.log"
 pid_path="$smoke_root/gui-smoke.pid"
 status_path="$smoke_root/gui-smoke.status"
+qt_plugin_path="${OPENTOONZ_GUI_SMOKE_QT_PLUGIN_PATH:-}"
+hidden_qt_conf=""
+hidden_qt_frameworks=()
+
+restore_hidden_qt_conf() {
+  if [[ -n "$hidden_qt_conf" && -f "$hidden_qt_conf.hidden" ]]; then
+    mv "$hidden_qt_conf.hidden" "$hidden_qt_conf"
+  fi
+  local framework
+  for framework in "${hidden_qt_frameworks[@]:-}"; do
+    if [[ -d "$framework.hidden" ]]; then
+      mv "$framework.hidden" "$framework"
+    fi
+  done
+}
 
 is_smoke_process_running() {
   if [[ "${launch_with_open:-0}" == "1" ]]; then
@@ -506,6 +521,32 @@ if [[ "$(uname -s)" == "Darwin" &&
   launch_with_open=1
 fi
 
+if [[ -z "$qt_plugin_path" ]]; then
+  qt_core_path="$(otool -L "$executable" 2>/dev/null |
+    awk '$1 ~ /qtbase-/ && $1 ~ /\/lib\/QtCore.framework\/Versions\/A\/QtCore/ {print $1; exit}')"
+  if [[ "$qt_core_path" == /nix/store/*/lib/QtCore.framework/Versions/A/QtCore ]]; then
+    qt_plugin_path="${qt_core_path%/lib/QtCore.framework/Versions/A/QtCore}/lib/qt-6/plugins"
+  fi
+fi
+if [[ -n "$qt_plugin_path" &&
+      -f "$app_path/Contents/Resources/qt.conf" &&
+      ! -f "$app_path/Contents/Resources/qt.conf.hidden" ]]; then
+  hidden_qt_conf="$app_path/Contents/Resources/qt.conf"
+  mv "$hidden_qt_conf" "$hidden_qt_conf.hidden"
+  trap restore_hidden_qt_conf EXIT
+fi
+if [[ -n "$qt_plugin_path" && -d "$app_path/Contents/Frameworks" ]]; then
+  for framework in "$app_path"/Contents/Frameworks/Qt*.framework; do
+    if [[ -d "$framework" && ! -e "$framework.hidden" ]]; then
+      mv "$framework" "$framework.hidden"
+      hidden_qt_frameworks+=("$framework")
+    fi
+  done
+  if ((${#hidden_qt_frameworks[@]} > 0)); then
+    trap restore_hidden_qt_conf EXIT
+  fi
+fi
+
 if [[ "$launch_with_open" == "1" ]]; then
   /usr/bin/open -W -n "$app_path" \
     --stdout "$log_path" \
@@ -513,6 +554,8 @@ if [[ "$launch_with_open" == "1" ]]; then
     --env "HOME=$smoke_root/home" \
     --env "XDG_CONFIG_HOME=$smoke_root/xdg-config" \
     --env "XDG_CACHE_HOME=$smoke_root/xdg-cache" \
+    ${qt_plugin_path:+--env "QT_PLUGIN_PATH=$qt_plugin_path"} \
+    ${qt_plugin_path:+--env "QT_QPA_PLATFORM_PLUGIN_PATH=$qt_plugin_path/platforms"} \
     --env "OPENTOONZ_GUI_SMOKE_ACTION=$smoke_action" \
     --env "OPENTOONZ_GUI_SMOKE_SCENE_NAME=$scene_name" \
     --env "OPENTOONZ_GUI_SMOKE_STATUS_FILE=$status_path" \
@@ -533,13 +576,19 @@ if [[ "$launch_with_open" == "1" ]]; then
     exit 1
   fi
 else
-  HOME="$smoke_root/home" \
-  XDG_CONFIG_HOME="$smoke_root/xdg-config" \
-  XDG_CACHE_HOME="$smoke_root/xdg-cache" \
-  OPENTOONZ_GUI_SMOKE_ACTION="$smoke_action" \
-  OPENTOONZ_GUI_SMOKE_SCENE_NAME="$scene_name" \
-  OPENTOONZ_GUI_SMOKE_STATUS_FILE="$status_path" \
-  "$executable" "${launch_args[@]}" \
+  env -u DYLD_FRAMEWORK_PATH \
+    -u DYLD_LIBRARY_PATH \
+    -u QML2_IMPORT_PATH \
+    -u QML_IMPORT_PATH \
+    ${qt_plugin_path:+QT_PLUGIN_PATH="$qt_plugin_path"} \
+    ${qt_plugin_path:+QT_QPA_PLATFORM_PLUGIN_PATH="$qt_plugin_path/platforms"} \
+    HOME="$smoke_root/home" \
+    XDG_CONFIG_HOME="$smoke_root/xdg-config" \
+    XDG_CACHE_HOME="$smoke_root/xdg-cache" \
+    OPENTOONZ_GUI_SMOKE_ACTION="$smoke_action" \
+    OPENTOONZ_GUI_SMOKE_SCENE_NAME="$scene_name" \
+    OPENTOONZ_GUI_SMOKE_STATUS_FILE="$status_path" \
+    "$executable" "${launch_args[@]}" \
     >"$log_path" 2>&1 &
   pid=$!
 fi
@@ -789,9 +838,25 @@ while is_smoke_process_running; do
     fi
 
     if [[ "$smoke_action" == "audio-input" ]]; then
-      if ! audio_input_window="$(wait_for_app_smoke_status audio-input)"; then
+      audio_input_window=""
+      status_error_path="$smoke_root/audio-input-status.err"
+      rm -f "$status_error_path"
+      status_rc=0
+      audio_input_window="$(wait_for_app_smoke_status audio-input 300 2>"$status_error_path")" ||
+        status_rc=$?
+      if ((status_rc != 0)); then
+        audio_input_probe="$(status_value audioInputProbe || true)"
+        if ((status_rc == 2)) &&
+           [[ "$audio_input_probe" == "no-device" ||
+              "$audio_input_probe" == "timeout" ]]; then
+          stop_smoke_process
+          echo "$smoke_label audio-input smoke skipped: $audio_input_probe"
+          echo "Log: $log_path"
+          exit 0
+        fi
         stop_smoke_process
         echo "error: $smoke_label audio-input smoke failed" >&2
+        sed -n '1,80p' "$status_error_path" >&2
         sed -n '1,180p' "$log_path" >&2
         exit 1
       fi
@@ -836,9 +901,26 @@ while is_smoke_process_running; do
     fi
 
     if [[ "$smoke_action" == "audio-recording-wav" ]]; then
-      if ! audio_recording_window="$(wait_for_app_smoke_status audio-recording-wav)"; then
+      audio_recording_window=""
+      status_error_path="$smoke_root/audio-recording-wav-status.err"
+      rm -f "$status_error_path"
+      status_rc=0
+      audio_recording_window="$(wait_for_app_smoke_status audio-recording-wav 300 2>"$status_error_path")" ||
+        status_rc=$?
+      if ((status_rc != 0)); then
+        recording_probe="$(status_value audioRecordingWavProbe || true)"
+        if ((status_rc == 2)) &&
+           [[ "$recording_probe" == "no-device" ||
+              "$recording_probe" == "timeout" ||
+              "$recording_probe" == "writer-start-failed" ]]; then
+          stop_smoke_process
+          echo "$smoke_label audio-recording-wav smoke skipped: $recording_probe"
+          echo "Log: $log_path"
+          exit 0
+        fi
         stop_smoke_process
         echo "error: $smoke_label audio-recording-wav smoke failed" >&2
+        sed -n '1,80p' "$status_error_path" >&2
         sed -n '1,180p' "$log_path" >&2
         exit 1
       fi

@@ -34,6 +34,14 @@ run = "bash scripts/qt6/check-no-qregexp.sh"
 description = "Fail if Core5Compat or direct QTextCodec usage escapes the documented adapter scope."
 run = "bash scripts/qt6/check-core5compat-scope.sh"
 
+[tasks.check-qt6-multimedia-scope]
+description = "Fail if removed Qt 5 multimedia APIs escape the documented Qt 6 migration scope."
+run = "bash scripts/qt6/check-multimedia-scope.sh"
+
+[tasks.check-qt6-script-scope]
+description = "Fail if legacy Qt Script bindings escape their Qt 5-only CMake scope."
+run = "bash scripts/qt6/check-script-scope.sh"
+
 [tasks.check-windows-msvc-abi]
 description = "Fail on export/import annotations that are known to break MSVC Windows builds."
 run = "bash scripts/windows/check-msvc-abi.sh"
@@ -48,31 +56,31 @@ run = "nix develop path:. --command bash scripts/nix/prepare-tiff.sh"
 
 [tasks.configure]
 description = "Configure the RelWithDebInfo Ninja build with the Nix dependency set."
-run = "bash scripts/windows/check-msvc-abi.sh && nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-relwithdebinfo'"
+run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-relwithdebinfo'"
 
 [tasks.configure-deprecated-api]
 description = "Configure the Qt 5 lane with Qt APIs deprecated through 5.15 disabled."
-run = "bash scripts/windows/check-msvc-abi.sh && nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-deprecated-api'"
+run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-deprecated-api'"
 
 [tasks.configure-qt6]
 description = "Configure the RelWithDebInfo Ninja build with the Qt 6 Nix dependency set."
-run = "bash scripts/windows/check-msvc-abi.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-relwithdebinfo'"
+run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-relwithdebinfo'"
 
 [tasks.configure-qt6-translations]
 description = "Configure an isolated Qt 6 build with translation target generation enabled."
-run = "bash scripts/windows/check-msvc-abi.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-translation-check'"
+run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-translation-check'"
 
 [tasks.build-qt6-translations]
 description = "Build the isolated Qt 6 translation lane and verify generated .qm files."
-run = "bash scripts/windows/check-msvc-abi.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-translation-check && cmake --build toonz/build/nix-qt6-translation-check --target OpenToonz --parallel && count=$(find toonz/stuff/config/loc -mindepth 2 -maxdepth 2 -name \"*.qm\" | wc -l | tr -d \" \"); test \"$count\" = 63'"
+run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-translation-check && cmake --build toonz/build/nix-qt6-translation-check --target OpenToonz --parallel && count=$(find toonz/stuff/config/loc -mindepth 2 -maxdepth 2 -name \"*.qm\" | wc -l | tr -d \" \"); test \"$count\" = 63'"
 
 [tasks.build]
 description = "Configure and build OpenToonz with Ninja in toonz/build/nix-relwithdebinfo."
-run = "bash scripts/windows/check-msvc-abi.sh && nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-relwithdebinfo && cmake --build toonz/build/nix-relwithdebinfo --parallel'"
+run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-relwithdebinfo && cmake --build toonz/build/nix-relwithdebinfo --parallel'"
 
 [tasks.build-qt6]
 description = "Configure and build OpenToonz with Qt 6 in toonz/build/nix-qt6-relwithdebinfo."
-run = "bash scripts/windows/check-msvc-abi.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-relwithdebinfo && cmake --build toonz/build/nix-qt6-relwithdebinfo --parallel'"
+run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-relwithdebinfo && cmake --build toonz/build/nix-qt6-relwithdebinfo --parallel'"
 
 [tasks.run]
 description = "Run the locally built OpenToonz binary or app bundle."
@@ -358,6 +366,10 @@ run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-raster-brush-tablet-events bash scripts
 description = "Post macOS CGEvents/System Events through SceneViewer for a full-color raster brush stroke in the packaged Qt 6 app."
 run = "OPENTOONZ_GUI_SMOKE_ACTION=viewer-raster-brush-system-events bash scripts/qt6/run-gui-smoke.sh"
 
+[tasks.gui-smokes-app-qt6]
+description = "Run the bounded Qt 6 GUI smoke suite that does not require real OS input delivery."
+run = "bash scripts/qt6/run-all-gui-smokes.sh"
+
 [tasks.script-smoke-qt6]
 description = "Run the Qt 6 app bundle against the basic headless script engine fixture."
 run = "OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-smoke 3 [true,ok]|qt-script-version 7.1|qt-script-warning|qt-script-void object true true|qt-script-print-return true|qt-script-dummy 0|qt-script-run-child 7.1|qt-script-run-result qt-script-run-child-result|qt-script-run-global child-global child-function' bash scripts/qt6/run-script-smoke.sh"
@@ -369,6 +381,10 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/run_errors.toon
 [tasks.script-smoke-filepath-qt6]
 description = "Run the Qt 6 app bundle against the FilePath headless script binding fixture."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/file_path.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-filepath test tif beta test png renamed|qt-script-filepath-string \"alpha/beta/test.tif\"|qt-script-filepath-child child txt beta' bash scripts/qt6/run-script-smoke.sh"
+
+[tasks.script-smoke-filepath-coercion-qt6]
+description = "Run the Qt 6 app bundle against FilePath valueOf and JavaScript string coercion behavior."
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/file_path_coercion.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-filepath-coercion-values alpha/beta/test.tif \"alpha/beta/test.tif\" alpha/beta/test.tif alpha/beta/test.tif alpha/beta/test.tif|qt-script-filepath-coercion-parent alpha/beta alpha/beta/child.txt alpha/beta/child.txt|qt-script-filepath-coercion-chain alpha/beta/renamed.tif alpha/beta/renamed.png \"alpha/beta/renamed.png\"' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-filepath-edges-qt6]
 description = "Run the Qt 6 app bundle against FilePath error and directory-listing edge cases."
@@ -404,11 +420,11 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_cell_fids
 
 [tasks.script-smoke-scene-edges-qt6]
 description = "Run the Qt 6 app bundle against Scene level and cell error edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-edges-level-types Raster ToonzRaster Vector 3 true|qt-script-scene-edges-errors true true true true true true true true|qt-script-scene-edges-load-errors true true' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-edges-level-types Raster ToonzRaster Vector 3 true|qt-script-scene-edges-errors true true true true true true true true true|qt-script-scene-edges-load-errors true true' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-scene-argument-edges-qt6]
 description = "Run the Qt 6 app bundle against Scene row, column, and frame-id argument edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_argument_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-argument-edges-valid true true true true|qt-script-scene-argument-edges-errors [true,true,true,true,true,true,true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_argument_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-argument-edges-valid true true true true|qt-script-scene-argument-edges-errors [true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-scene-lifecycle-edges-qt6]
 description = "Run the Qt 6 app bundle against Scene lifecycle and cross-scene isolation edge cases."
@@ -456,7 +472,7 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/level_basic.too
 
 [tasks.script-smoke-level-edges-qt6]
 description = "Run the Qt 6 app bundle against Level frame and I/O edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/level_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-level-edges-empty Empty 0 true true true true true true|qt-script-level-edges-frame-access Raster 1 true true true true|qt-script-level-edges-errors true true true true' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/level_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-level-edges-empty Empty 0 true true true true true true|qt-script-level-edges-frame-access Raster 1 true true true true|qt-script-level-edges-errors true true true true true true' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-level-io-qt6]
 description = "Run the Qt 6 app bundle against the Level load/save and empty-level setFrame fixture."
@@ -470,6 +486,14 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/level_io_types.
 description = "Run the Qt 6 app bundle against the Level path setter headless script binding fixture."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/level_path.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-level-path-initial level_path tif 1 0001 32|qt-script-level-path-filepath level_path tif 1 32|qt-script-level-path-string level_path tif 1 32 32' bash scripts/qt6/run-script-smoke.sh"
 
+[tasks.script-smoke-level-path-edges-qt6]
+description = "Run the Qt 6 app bundle against Level path setter error and failed-load edge behavior."
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/level_path_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-level-path-edges-bad-object true level_path_edges tif 1|qt-script-level-path-edges-missing false missing_level_path_edges tif 0 level_path_edges tif 1|qt-script-level-path-edges-after-missing Raster 0 true Raster level (level_path_edges, 0 frames)' bash scripts/qt6/run-script-smoke.sh"
+
+[tasks.script-smoke-level-lifecycle-edges-qt6]
+description = "Run the Qt 6 app bundle against Level dispose and post-dispose error behavior."
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/level_lifecycle_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-level-lifecycle-before true Raster 1 A false Raster level (A, 1 frames)|qt-script-level-lifecycle-after -1 [true,true,true,true,true,true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
+
 [tasks.script-smoke-image-qt6]
 description = "Run the Qt 6 app bundle against the basic Image and Level frame headless script binding fixture."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_basic.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-image-loaded Raster 32 32 Raster image ( 32 x 32 ) true|qt-script-image-saved true Raster 32 32|qt-script-image-level Raster 1 0001 Raster 32 32' bash scripts/qt6/run-script-smoke.sh"
@@ -477,6 +501,10 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_basic.too
 [tasks.script-smoke-image-edges-qt6]
 description = "Run the Qt 6 app bundle against Image constructor, load, and save edge cases."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-image-edges-empty Empty 0 0 0 Empty image true|qt-script-image-edges-load true true true Empty 0 0|qt-script-image-edges-save true true true ToonzRaster 9 7' bash scripts/qt6/run-script-smoke.sh"
+
+[tasks.script-smoke-image-lifecycle-edges-qt6]
+description = "Run the Qt 6 app bundle against Image dispose and post-dispose error behavior."
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_lifecycle_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-image-lifecycle-before true Raster 32 32 true Raster image ( 32 x 32 )|qt-script-image-lifecycle-after -1 [true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-image-level-first-frame-qt6]
 description = "Run the Qt 6 app bundle against Image loading the first frame from a multi-frame level."
@@ -488,11 +516,11 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_builder.t
 
 [tasks.script-smoke-transform-edges-qt6]
 description = "Run the Qt 6 app bundle against Transform argument and disposal edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/transform_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-transform-edges-valid Translation(-2,3) Rotation(-45) Scale(50%) Scale(50%, 125%)|qt-script-transform-edges-errors [true,true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/transform_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-transform-edges-valid Translation(-2,3) Rotation(-45) Scale(50%) Scale(50%, 125%)|qt-script-transform-edges-errors [true,true,true,true,true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-image-builder-edges-qt6]
 description = "Run the Qt 6 app bundle against ImageBuilder constructor, fill, add, and disposal edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_builder_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-imagebuilder-edges-constructors [true,true,true,true]|qt-script-imagebuilder-edges-builders ImageBuilder(Raster image) ImageBuilder(ToonzRaster image) [true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_builder_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-imagebuilder-edges-constructors [true,true,true,true]|qt-script-imagebuilder-edges-builders ImageBuilder(Raster image) ImageBuilder(ToonzRaster image) [true,true,true,true,true] [true,true,true,true,true]|qt-script-imagebuilder-edges-colors true' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-toonz-raster-converter-qt6]
 description = "Run the Qt 6 app bundle against the ToonzRasterConverter headless script binding fixture."
@@ -506,9 +534,13 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/toonz_raster_co
 description = "Run the Qt 6 app bundle against ToonzRasterConverter argument and type edge cases."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/toonz_raster_converter_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-toonz-raster-converter-edges-success ToonzRaster 32 32|qt-script-toonz-raster-converter-edges-errors [true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
 
+[tasks.script-smoke-toonz-raster-converter-lifecycle-edges-qt6]
+description = "Run the Qt 6 app bundle against ToonzRasterConverter dispose and static conversion behavior."
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/toonz_raster_converter_lifecycle_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-toonz-raster-converter-lifecycle-before true ToonzRasterConverter true false true ToonzRaster 32 32|qt-script-toonz-raster-converter-lifecycle-after -1 true ToonzRaster 32 32 ToonzRasterConverter false' bash scripts/qt6/run-script-smoke.sh"
+
 [tasks.script-smoke-outline-vectorizer-qt6]
 description = "Run the Qt 6 app bundle against the OutlineVectorizer headless script binding fixture."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/outline_vectorizer.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-outline-vectorizer-defaults Outline Vectorizer 8 4 false #000000 128|qt-script-outline-vectorizer-vector Vector Vector image 0 0 6 8 #ff00ff 96|qt-script-outline-vectorizer-saved true Vector Vector image|qt-script-outline-vectorizer-level Vector 1 0001 Vector' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/outline_vectorizer.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-outline-vectorizer-defaults Outline Vectorizer 8 4 false #000000 128|qt-script-outline-vectorizer-vector Vector Vector image 0 0 6 8 #ff00ff 96|qt-script-outline-vectorizer-color-edges true transparent|qt-script-outline-vectorizer-saved true Vector Vector image|qt-script-outline-vectorizer-level Vector 1 0001 Vector' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-centerline-vectorizer-qt6]
 description = "Run the Qt 6 app bundle against the CenterlineVectorizer headless script binding fixture."
@@ -520,7 +552,7 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/vectorizer_edge
 
 [tasks.script-smoke-binding-lifecycle-edges-qt6]
 description = "Run the Qt 6 app bundle against non-rendering binding property and lifecycle edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/binding_lifecycle_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-binding-lifecycle-properties 11 2 true #00ff80 64 4 120 true true 64 48 144 false 18|qt-script-binding-lifecycle-errors true [true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/binding_lifecycle_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-binding-lifecycle-properties 11 2 true #00ff80 64 4 120 true true 64 48 144 false 18|qt-script-binding-lifecycle-bool-coercion true false true false true false|qt-script-binding-lifecycle-errors true [true,true,true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-rasterizer-qt6]
 description = "Run the Qt 6 app bundle against the Rasterizer color-mapped and full-color script binding fixture."
@@ -544,7 +576,11 @@ run = "OPENTOONZ_SCRIPT_USE_QAPPLICATION=1 OPENTOONZ_SCRIPT_FIXTURE=toonz/source
 
 [tasks.script-smoke-renderer-edges-qt6]
 description = "Run the Qt 6 app bundle against Renderer argument edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/renderer_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-renderer-edges-errors [true,true,true,true,true,true,true,true]|qt-script-renderer-list-edges-errors [true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/renderer_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-renderer-edges-errors [true,true,true,true,true,true,true,true]|qt-script-renderer-list-edges-errors [true,true,true,true]|qt-script-renderer-list-edges-non-arrays true true' bash scripts/qt6/run-script-smoke.sh"
+
+[tasks.script-smoke-renderer-lifecycle-edges-qt6]
+description = "Run the Qt 6 app bundle against Renderer dispose and post-dispose error behavior."
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/renderer_lifecycle_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-renderer-lifecycle-before true Renderer 0,2 1|qt-script-renderer-lifecycle-after -1 [true,true,true,true] 0,2 1' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-level-transformers-qt6]
 description = "Run the Qt 6 app bundle against level-wide vectorizer and rasterizer binding fixtures."
@@ -576,7 +612,7 @@ run = "bash scripts/qt6/release-experimental.sh"
 
 [tasks.check]
 description = "Run the flake configure check and whitespace validation."
-run = "bash scripts/windows/check-msvc-abi.sh && nix flake check path:. && git diff --check"
+run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && nix flake check path:. && git diff --check"
 
 [tasks.format]
 description = "Run the repository clang-format helper for changed C/C++ files."

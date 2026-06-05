@@ -138,7 +138,7 @@ set(MOC_HEADERS
     exportcameratrackpopup.h
 )
 
-if(PLATFORM EQUAL 64)
+if((PLATFORM EQUAL 64) OR (OPENTOONZ_QT_MAJOR EQUAL 6))
     set(MOC_HEADERS
         ${MOC_HEADERS}
         ../stopmotion/stopmotion.h
@@ -408,7 +408,7 @@ set(SOURCES
     predict3d.cpp
 )
 
-if(PLATFORM EQUAL 64)
+if((PLATFORM EQUAL 64) OR (OPENTOONZ_QT_MAJOR EQUAL 6))
     set(SOURCES
         ${SOURCES}
         ../stopmotion/stopmotion.cpp

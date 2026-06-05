@@ -4,8 +4,10 @@ set -euo pipefail
 repo_root="${OPENTOONZ_REPO_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 cd "$repo_root"
 
+qt_textcodec_boundary='(^|[^[:alnum:]_])QTextCodec([^[:alnum:]_]|$)'
+
 unexpected_qtextcodec="$(
-  git grep -nE '\bQTextCodec\b' -- 'toonz/sources' \
+  git grep -nE "$qt_textcodec_boundary" -- 'toonz/sources' \
     ':!toonz/sources/include/ttextcodec.h' || true
 )"
 if [[ -n "$unexpected_qtextcodec" ]]; then

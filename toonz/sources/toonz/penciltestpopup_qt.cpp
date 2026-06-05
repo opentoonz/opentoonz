@@ -1557,7 +1557,9 @@ PencilTestPopup::PencilTestPopup()
 
   //----
 
-  m_resolutionCombo->setMaximumWidth(fontMetrics().width("0000 x 0000") + 25);
+  m_resolutionCombo->setMaximumWidth(
+      QtCompat::fontMetricsHorizontalAdvance(fontMetrics(), "0000 x 0000") +
+      25);
   m_fileTypeCombo->addItems({"jpg", "png", "tga", "tif"});
   m_fileTypeCombo->setCurrentIndex(0);
 
@@ -1925,7 +1927,9 @@ void PencilTestPopup::refreshCameraList() {
   for (int c = 0; c < cameras.size(); c++) {
     QString camDesc = cameras.at(c).description();
     m_cameraListCombo->addItem(camDesc);
-    maxTextLength = std::max(maxTextLength, fontMetrics().width(camDesc));
+    maxTextLength = std::max(
+        maxTextLength,
+        QtCompat::fontMetricsHorizontalAdvance(fontMetrics(), camDesc));
   }
   m_cameraListCombo->setMaximumWidth(maxTextLength + 25);
   m_cameraListCombo->setEnabled(true);

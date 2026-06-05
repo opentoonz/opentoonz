@@ -30,6 +30,7 @@
 #include "toonzqt/intfield.h"
 #include "toonzqt/doublefield.h"
 #include "toonzqt/menubarcommand.h"
+#include "toonzqt/qtcompat.h"
 
 // Qt includes
 #include <QAction>
@@ -1617,7 +1618,9 @@ void StopMotionController::refreshCameraList(QString activeCamera) {
         std::string name = StopMotionCamera::deviceName(webcams.at(c)).toStdString();
         QString camDesc  = StopMotionCamera::description(webcams.at(c));
         m_cameraListCombo->addItem(camDesc);
-        maxTextLength = std::max(maxTextLength, fontMetrics().horizontalAdvance(camDesc));
+        maxTextLength = std::max(
+            maxTextLength,
+            QtCompat::fontMetricsHorizontalAdvance(fontMetrics(), camDesc));
       }
     }
 #ifdef WITH_CANON
@@ -1630,7 +1633,9 @@ void StopMotionController::refreshCameraList(QString activeCamera) {
       if (!open) m_stopMotion->m_canon->closeCameraSession();
       m_cameraSettingsLabel->setText(name);
       m_cameraListCombo->addItem(name);
-      maxTextLength = std::max(maxTextLength, fontMetrics().width(name));
+      maxTextLength = std::max(
+          maxTextLength,
+          QtCompat::fontMetricsHorizontalAdvance(fontMetrics(), name));
     }
 #endif
     m_cameraListCombo->setMaximumWidth(maxTextLength + 25);
@@ -1792,12 +1797,16 @@ void StopMotionController::refreshExposureList() {
   m_exposureCombo->addItems(options);
   int maxTextLength = 0;
   for (int i = 0; i < options.size(); i++) {
-    maxTextLength = std::max(maxTextLength, fontMetrics().width(options.at(i)));
+    maxTextLength = std::max(
+        maxTextLength,
+        QtCompat::fontMetricsHorizontalAdvance(fontMetrics(), options.at(i)));
   }
   if (m_exposureCombo->count() == 0) {
     m_exposureCombo->addItem(tr("Disabled"));
     m_exposureCombo->setDisabled(true);
-    m_exposureCombo->setMaximumWidth(fontMetrics().width(tr("Disabled")) + 25);
+    m_exposureCombo->setMaximumWidth(
+        QtCompat::fontMetricsHorizontalAdvance(fontMetrics(), tr("Disabled")) +
+        25);
   } else {
     m_exposureCombo->setEnabled(true);
     m_exposureCombo->setCurrentText(
@@ -1819,13 +1828,16 @@ void StopMotionController::refreshWhiteBalanceList() {
   m_whiteBalanceCombo->addItems(options);
   int maxTextLength = 0;
   for (int i = 0; i < options.size(); i++) {
-    maxTextLength = std::max(maxTextLength, fontMetrics().width(options.at(i)));
+    maxTextLength = std::max(
+        maxTextLength,
+        QtCompat::fontMetricsHorizontalAdvance(fontMetrics(), options.at(i)));
   }
   if (m_whiteBalanceCombo->count() == 0) {
     m_whiteBalanceCombo->addItem(tr("Disabled"));
     m_whiteBalanceCombo->setDisabled(true);
-    m_whiteBalanceCombo->setMaximumWidth(fontMetrics().width(tr("Disabled")) +
-                                         25);
+    m_whiteBalanceCombo->setMaximumWidth(
+        QtCompat::fontMetricsHorizontalAdvance(fontMetrics(), tr("Disabled")) +
+        25);
   } else {
     m_whiteBalanceCombo->setEnabled(true);
     m_whiteBalanceCombo->setCurrentText(
@@ -1875,13 +1887,16 @@ void StopMotionController::refreshImageQualityList() {
   m_imageQualityCombo->addItems(options);
   int maxTextLength = 0;
   for (int i = 0; i < options.size(); i++) {
-    maxTextLength = std::max(maxTextLength, fontMetrics().width(options.at(i)));
+    maxTextLength = std::max(
+        maxTextLength,
+        QtCompat::fontMetricsHorizontalAdvance(fontMetrics(), options.at(i)));
   }
   if (m_imageQualityCombo->count() == 0) {
     m_imageQualityCombo->addItem(tr("Disabled"));
     m_imageQualityCombo->setDisabled(true);
-    m_imageQualityCombo->setMaximumWidth(fontMetrics().width(tr("Disabled")) +
-                                         25);
+    m_imageQualityCombo->setMaximumWidth(
+        QtCompat::fontMetricsHorizontalAdvance(fontMetrics(), tr("Disabled")) +
+        25);
   } else {
     m_imageQualityCombo->setEnabled(true);
     m_imageQualityCombo->setCurrentText(
@@ -1904,13 +1919,16 @@ void StopMotionController::refreshPictureStyleList() {
       m_stopMotion->m_canon->getPictureStyleOptions());
   int maxTextLength = 0;
   for (int i = 0; i < options.size(); i++) {
-    maxTextLength = std::max(maxTextLength, fontMetrics().width(options.at(i)));
+    maxTextLength = std::max(
+        maxTextLength,
+        QtCompat::fontMetricsHorizontalAdvance(fontMetrics(), options.at(i)));
   }
   if (m_pictureStyleCombo->count() == 0) {
     m_pictureStyleCombo->addItem(tr("Disabled"));
     m_pictureStyleCombo->setDisabled(true);
-    m_pictureStyleCombo->setMaximumWidth(fontMetrics().width(tr("Disabled")) +
-                                         25);
+    m_pictureStyleCombo->setMaximumWidth(
+        QtCompat::fontMetricsHorizontalAdvance(fontMetrics(), tr("Disabled")) +
+        25);
   } else {
     m_pictureStyleCombo->setEnabled(true);
     m_pictureStyleCombo->setCurrentText(

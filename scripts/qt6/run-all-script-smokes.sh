@@ -8,6 +8,7 @@ tasks=(
   script-smoke-qt6
   script-smoke-run-errors-qt6
   script-smoke-filepath-qt6
+  script-smoke-filepath-coercion-qt6
   script-smoke-filepath-edges-qt6
   script-smoke-filepath-metadata-qt6
   script-smoke-filepath-mutation-metadata-qt6
@@ -33,8 +34,11 @@ tasks=(
   script-smoke-level-io-qt6
   script-smoke-level-io-types-qt6
   script-smoke-level-path-qt6
+  script-smoke-level-path-edges-qt6
+  script-smoke-level-lifecycle-edges-qt6
   script-smoke-image-qt6
   script-smoke-image-edges-qt6
+  script-smoke-image-lifecycle-edges-qt6
   script-smoke-image-level-first-frame-qt6
   script-smoke-image-builder-qt6
   script-smoke-transform-edges-qt6
@@ -42,6 +46,7 @@ tasks=(
   script-smoke-toonz-raster-converter-qt6
   script-smoke-toonz-raster-converter-level-qt6
   script-smoke-toonz-raster-converter-edges-qt6
+  script-smoke-toonz-raster-converter-lifecycle-edges-qt6
   script-smoke-outline-vectorizer-qt6
   script-smoke-centerline-vectorizer-qt6
   script-smoke-vectorizer-edges-qt6
@@ -52,6 +57,7 @@ tasks=(
   script-smoke-renderer-frames-columns-qt6
   script-smoke-renderer-vector-qt6
   script-smoke-renderer-edges-qt6
+  script-smoke-renderer-lifecycle-edges-qt6
   script-smoke-level-transformers-qt6
   script-smoke-wrapper-id-qt6
 )

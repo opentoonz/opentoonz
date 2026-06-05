@@ -28,13 +28,9 @@
 #include "toonz/txshsimplelevel.h"
 
 #include <QObject>
+#include <QSoundEffect>
 #include <QThread>
 #include <QtGlobal>
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-#include <QSoundEffect>
-#else
-#include <QSound>
-#endif
 
 class QCamera;
 class QCameraInfo;
@@ -77,11 +73,7 @@ private:
   std::map<int, TRaster32P> m_liveViewImageMap;
 
   bool m_playCaptureSound = false;
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   QSoundEffect* m_camSnapSound = 0;
-#else
-  QSound* m_camSnapSound  = 0;
-#endif
 
 public:
   enum LiveViewStatus {

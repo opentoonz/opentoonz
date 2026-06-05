@@ -32,6 +32,10 @@ var badCellObjectError = hasError(function() {
   scene.setCell(0, 0, { level: raster });
 }, "Third argument should be an object");
 
+var nullCellObjectError = hasError(function() {
+  scene.setCell(0, 0, null);
+}, "Third argument should be an object");
+
 var badLevelArgumentError = hasError(function() {
   scene.setCell(0, 0, 42, "1");
 }, "Expected a Level instance or a level name");
@@ -50,7 +54,7 @@ var badRowError = hasError(function() {
 
 print("qt-script-scene-edges-errors", duplicateLevelError,
       badLevelTypeError, missingLevelCellError, badCellObjectError,
-      badLevelArgumentError, badCellLevelArgumentError,
+      nullCellObjectError, badLevelArgumentError, badCellLevelArgumentError,
       undefinedLevelFourArgError, badRowError);
 
 var missingLoadError = hasError(function() {

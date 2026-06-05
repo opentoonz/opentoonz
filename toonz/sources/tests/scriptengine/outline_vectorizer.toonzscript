@@ -16,10 +16,24 @@ vectorizer.maxColors = 8;
 vectorizer.transparentColor = "#ff00ff";
 vectorizer.toneThreshold = 96;
 
+var invalidTransparentColorError = false;
+try {
+  vectorizer.transparentColor = "not-a-color";
+} catch (e) {
+  invalidTransparentColorError =
+      String(e.message || e).indexOf("not a valid color") >= 0;
+}
+
+vectorizer.transparentColor = "transparent";
+var transparentColorName = vectorizer.transparentColor;
+vectorizer.transparentColor = "#ff00ff";
+
 var vector = vectorizer.vectorize(source);
 print("qt-script-outline-vectorizer-vector", vector.type, vector.toString(),
       vector.width, vector.height, vectorizer.accuracy, vectorizer.maxColors,
       vectorizer.transparentColor, vectorizer.toneThreshold);
+print("qt-script-outline-vectorizer-color-edges",
+      invalidTransparentColorError, transparentColorName);
 
 var output = new FilePath("toonz/build/qt6-script-smoke/outline_vectorizer_" +
                           (new Date()).getTime() + ".pli");

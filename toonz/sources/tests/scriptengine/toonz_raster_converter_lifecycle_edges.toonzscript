@@ -1,0 +1,41 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e.message || e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var source = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var converter = new ToonzRasterConverter();
+
+converter.flatSource = 1;
+var truthyFlatSource = converter.flatSource;
+converter.flatSource = "";
+var falseyFlatSource = converter.flatSource;
+converter.flatSource = true;
+
+var before = converter.convert(source);
+print("qt-script-toonz-raster-converter-lifecycle-before",
+      converter.id > 0, converter.toString(), truthyFlatSource,
+      falseyFlatSource, converter.flatSource, before.type, before.width,
+      before.height);
+
+converter.dispose();
+
+var staticAfterDispose = ToonzRasterConverter.convert(source);
+var instanceConvertError = hasError(function() {
+  converter.convert(source);
+}, "Invalid ToonzRasterConverter object");
+converter.flatSource = false;
+
+print("qt-script-toonz-raster-converter-lifecycle-after", converter.id,
+      instanceConvertError, staticAfterDispose.type, staticAfterDispose.width,
+      staticAfterDispose.height, converter.toString(), converter.flatSource);
+
+staticAfterDispose.dispose();
+before.dispose();
+source.dispose();
+
+"qt-script-toonz-raster-converter-lifecycle-result";

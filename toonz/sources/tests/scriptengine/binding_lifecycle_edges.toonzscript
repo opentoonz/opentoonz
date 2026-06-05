@@ -36,9 +36,27 @@ print("qt-script-binding-lifecycle-properties", outline.accuracy,
       rasterizer.xres, rasterizer.yres, rasterizer.dpi,
       rasterizer.antialiasing, converter.foo(9));
 
+outline.preservePaintedAreas = 1;
+var outlineTruthy = outline.preservePaintedAreas;
+outline.preservePaintedAreas = "";
+var outlineFalsey = outline.preservePaintedAreas;
+centerline.addBorder = 1;
+var centerlineTruthy = centerline.addBorder;
+centerline.addBorder = "";
+var centerlineFalsey = centerline.addBorder;
+rasterizer.colorMapped = 1;
+var rasterizerTruthy = rasterizer.colorMapped;
+rasterizer.colorMapped = "";
+var rasterizerFalsey = rasterizer.colorMapped;
+
+print("qt-script-binding-lifecycle-bool-coercion", outlineTruthy,
+      outlineFalsey, centerlineTruthy, centerlineFalsey, rasterizerTruthy,
+      rasterizerFalsey);
+
 var badColor = hasError(function() {
   outline.transparentColor = "#gggggg";
-}, "Invalid color");
+}, "not a valid color");
+var vectorImage = outline.vectorize(source);
 
 outline.dispose();
 centerline.dispose();
@@ -50,13 +68,19 @@ var disposedErrors = [
            "Invalid OutlineVectorizer object"),
   hasError(function() { var value = outline.accuracy; },
            "Invalid OutlineVectorizer object"),
+  hasError(function() { outline.vectorize(source); },
+           "Invalid OutlineVectorizer object"),
   hasError(function() { centerline.toString(); },
            "Invalid CenterlineVectorizer object"),
   hasError(function() { centerline.threshold = 8; },
            "Invalid CenterlineVectorizer object"),
+  hasError(function() { centerline.vectorize(source); },
+           "Invalid CenterlineVectorizer object"),
   hasError(function() { rasterizer.toString(); },
            "Invalid Rasterizer object"),
   hasError(function() { rasterizer.colorMapped = false; },
+           "Invalid Rasterizer object"),
+  hasError(function() { rasterizer.rasterize(vectorImage); },
            "Invalid Rasterizer object"),
   hasError(function() { converter.convert(source); },
            "Invalid ToonzRasterConverter object")
@@ -64,6 +88,7 @@ var disposedErrors = [
 
 print("qt-script-binding-lifecycle-errors", badColor, disposedErrors);
 
+vectorImage.dispose();
 source.dispose();
 
 "qt-script-binding-lifecycle-result";

@@ -6,6 +6,7 @@ on:
       - qt6-experimental
       - qt-6-experimental
   schedule:
+    # Run weekly at 10:00 UTC on Mondays.
     # GitHub schedules run from the repository default branch. This workflow
     # explicitly checks out QT6_EXPERIMENTAL_BRANCH for scheduled builds.
     - cron: '0 10 * * 1'

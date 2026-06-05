@@ -30,6 +30,9 @@ var builder = new ImageBuilder(8, 6);
 var invalidColorError = hasError(function() {
   builder.fill("not-a-color");
 }, "not a valid color");
+var transparentFillError = hasError(function() {
+  builder.fill("transparent");
+}, "not a valid color");
 var emptyImageError = hasError(function() {
   builder.add(new Image());
 }, "should be an Image (not empty)");
@@ -50,14 +53,24 @@ var mismatchError = hasError(function() {
 
 var disposedBuilder = new ImageBuilder(2, 2);
 disposedBuilder.dispose();
-var disposedError = hasError(function() {
-  disposedBuilder.toString();
-}, "Invalid ImageBuilder object");
+var disposedErrors = [
+  hasError(function() { disposedBuilder.toString(); },
+           "Invalid ImageBuilder object"),
+  hasError(function() { var value = disposedBuilder.image; },
+           "Invalid ImageBuilder object"),
+  hasError(function() { disposedBuilder.clear(); },
+           "Invalid ImageBuilder object"),
+  hasError(function() { disposedBuilder.fill("red"); },
+           "Invalid ImageBuilder object"),
+  hasError(function() { disposedBuilder.add(source); },
+           "Invalid ImageBuilder object")
+];
 
 print("qt-script-imagebuilder-edges-builders", builder.toString(),
       toonzBuilder.toString(),
       [invalidColorError, emptyImageError, badTransformError, toonzFillError,
-       mismatchError, disposedError]);
+       mismatchError], disposedErrors);
+print("qt-script-imagebuilder-edges-colors", !transparentFillError);
 
 disposedBuilder.dispose();
 toonzImage.dispose();

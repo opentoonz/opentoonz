@@ -52,6 +52,12 @@ var toonzImage = toonzBuilder.image;
 var badSetFrameIdError = hasError(function() {
   raster.setFrame("bad", image);
 }, "does not look like a FrameId");
+var badSetFrameImageError = hasError(function() {
+  raster.setFrame("2", 42);
+}, "second argument (42) is not an image");
+var badSetFrameIdBeforeImageError = hasError(function() {
+  raster.setFrame("bad", 42);
+}, "does not look like a FrameId");
 var typeMismatchError = hasError(function() {
   raster.setFrame("2", toonzImage);
 }, "cannot insert a ToonzRaster image to a Raster level");
@@ -62,7 +68,8 @@ var missingLoadError = hasError(function() {
   raster.load(new FilePath("toonz/build/qt6-script-smoke/level_edges_missing..tif"));
 }, "doesn't exist");
 
-print("qt-script-level-edges-errors", badSetFrameIdError, typeMismatchError,
+print("qt-script-level-edges-errors", badSetFrameIdError,
+      badSetFrameImageError, badSetFrameIdBeforeImageError, typeMismatchError,
       incompatibleSaveError, missingLoadError);
 
 toonzImage.dispose();

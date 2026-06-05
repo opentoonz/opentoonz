@@ -28,7 +28,10 @@ var errors = [
   hasError(function() { transform.scale("2"); }, "Transform.scale"),
   hasError(function() { transform.scale(2, "3"); }, "Transform.scale"),
   hasError(function() { transform.scale(1, 2, 3); }, "Transform.scale"),
-  hasError(function() { disposed.translate(1, 2); }, "Invalid Transform")
+  hasError(function() { disposed.toString(); }, "Invalid Transform"),
+  hasError(function() { disposed.translate(1, 2); }, "Invalid Transform"),
+  hasError(function() { disposed.rotate(90); }, "Invalid Transform"),
+  hasError(function() { disposed.scale(2); }, "Invalid Transform")
 ];
 print("qt-script-transform-edges-errors", errors);
 
