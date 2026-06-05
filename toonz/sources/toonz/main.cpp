@@ -15764,7 +15764,7 @@ if (QFileInfo(localSplashPath).exists() && QFileInfo(localSplashPath).isFile()) 
   if (!isRunScript) splash.show();
   a.processEvents();
 
-  splash.showMessage(offsetStr + "Initializing QGLFormat...", Qt::AlignCenter,
+  splash.showMessage(offsetStr + "Initializing OpenGL format...", Qt::AlignCenter,
                      Qt::white);
   a.processEvents();
 

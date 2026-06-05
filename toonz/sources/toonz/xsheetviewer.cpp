@@ -1252,7 +1252,7 @@ void XsheetViewer::wheelEvent(QWheelEvent *event) {
 
   case Qt::MouseEventSynthesizedBySystem:  // macbook touch-pad
   {
-    QPoint numPixels  = event->pixelDelta();
+    QPoint numPixels  = QtCompat::wheelEventPixelDelta(event);
     QPoint numDegrees = QtCompat::wheelEventAngleDelta(event) / 8;
     if (!numPixels.isNull()) {
       scroll(-numPixels);

@@ -1283,10 +1283,10 @@ void ImageViewer::wheelEvent(QWheelEvent *event) {
   }
 
   case Qt::MouseEventSynthesizedBySystem: {
-    QPoint numPixels  = event->pixelDelta();
+    QPoint numPixels  = QtCompat::wheelEventPixelDelta(event);
     QPoint numDegrees = QtCompat::wheelEventAngleDelta(event) / 8;
     if (!numPixels.isNull()) {
-      delta = event->pixelDelta().y();
+      delta = numPixels.y();
     } else if (!numDegrees.isNull()) {
       QPoint numSteps = numDegrees / 15;
       delta           = numSteps.y();
@@ -1672,7 +1672,7 @@ public:
     QAction *act = CommandManager::instance()->getAction(MI_LoadRecentImage);
 
     /*--- 右クリックで呼ばれないとここにWidgetが入らない ---*/
-    FlipBook *flip = qobject_cast<FlipBook *>(act->parentWidget());
+    FlipBook *flip = qobject_cast<FlipBook *>(act->parent());
     if (!flip) return;
 
     DVMenuAction *menu = dynamic_cast<DVMenuAction *>(act->menu());

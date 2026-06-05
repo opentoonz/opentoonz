@@ -205,6 +205,10 @@ inline int wheelEventAngleDeltaY(const QWheelEvent* event) {
   return event->angleDelta().y();
 }
 
+inline QPoint wheelEventPixelDelta(const QWheelEvent* event) {
+  return event->pixelDelta();
+}
+
 inline QPoint wheelEventGlobalPosition(const QWheelEvent* event) {
   return event->globalPosition().toPoint();
 }

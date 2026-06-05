@@ -135,6 +135,18 @@ branch.
   `stateChanged` signal behind the helper. `mise run
   check-qt6-checkbox-state-scope` keeps direct `QCheckBox::stateChanged`
   connects out of feature code.
+- The active `QtOfflineGL` offscreen context path now uses `QSurfaceFormat`
+  instead of an unused legacy `QGLFormat` setup block. `mise run
+  check-qt6-qglformat-scope` keeps `QGLFormat` limited to the remaining Qt
+  5-only startup/PBuffer compatibility scope.
+- `QWheelEvent` pixel-delta access is now centralized behind
+  `QtCompat::wheelEventPixelDelta()` alongside the existing wheel position and
+  angle-delta helpers. `mise run check-qt6-wheelevent-scope` keeps direct
+  `QWheelEvent::pixelDelta()` calls out of feature code.
+- The recent flipbook image loader no longer uses Qt 6-deprecated
+  `QAction::parentWidget()` and now casts the action `parent()` instead.
+  `mise run check-qt6-qaction-scope` guards that QAction parent-widget warning
+  slice.
 - A small event-coordinate compatibility slice is now centralized in
   `QtCompat`: selected `QMouseEvent` position/global-position and
   `QDropEvent`-derived drag/drop position users now call Qt 6
@@ -304,8 +316,9 @@ branch.
   check-qt6-combobox-activated-scope` keeps direct `QComboBox::activated`
   connections out of the current source tree and runs before the normal local
   configure, build, and translation-build tasks.
-- On June 5, 2026, targeted app-target rebuilds after the combo-box activation
-  and checkbox state-change helper slices passed in both lanes:
+- On June 5, 2026, targeted app-target rebuilds after the combo-box activation,
+  checkbox state-change, QWheelEvent pixel-delta, and QGLFormat scope slices
+  passed in both lanes:
   `cmake --build toonz/build/nix-qt6-relwithdebinfo --target OpenToonz
   --parallel` and
   `cmake --build toonz/build/nix-relwithdebinfo --target OpenToonz
@@ -2264,6 +2277,9 @@ mise run check-qt6-fontmetrics-scope
 mise run check-qt6-highdpi-attribute-scope
 mise run check-qt6-combobox-activated-scope
 mise run check-qt6-checkbox-state-scope
+mise run check-qt6-wheelevent-scope
+mise run check-qt6-qaction-scope
+mise run check-qt6-qglformat-scope
 mise run gui-smokes-app-qt6
 mise run gui-smoke-qt6
 mise run gui-smoke-scene-create-qt6

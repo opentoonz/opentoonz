@@ -1222,6 +1222,19 @@ Current branch status:
   check-qt6-checkbox-state-scope` keeps direct `QCheckBox::stateChanged`
   connects out of feature code so Qt 6.7+ can use `checkStateChanged` while the
   Qt 5 lane keeps the existing signal path.
+- The active `QtOfflineGL` offscreen context path now uses only
+  `QSurfaceFormat` for Qt 5 and Qt 6 format setup. The unused legacy
+  `QGLFormat` setup block was removed from that path, and `mise run
+  check-qt6-qglformat-scope` keeps `QGLFormat` limited to the remaining Qt
+  5-only startup/PBuffer compatibility scope.
+- `QWheelEvent` pixel-delta access now goes through
+  `QtCompat::wheelEventPixelDelta()` in the current wheel handlers. `mise run
+  check-qt6-wheelevent-scope` keeps direct `QWheelEvent::pixelDelta()` calls
+  out of feature code while preserving Qt 5 behavior.
+- The recent flipbook image loader now uses `QAction::parent()` with
+  `qobject_cast()` instead of the Qt 6-deprecated `QAction::parentWidget()`.
+  `mise run check-qt6-qaction-scope` keeps that deprecated QAction API out of
+  the current app source.
 - Legacy `toonzfarm/tfarm/tbaseserver.cpp` Windows socket diagnostic formatting
   no longer uses unbounded `wsprintf()` calls. The file now uses bounded
   `snprintf()` formatting for those messages and initializes the non-Windows
@@ -2960,6 +2973,12 @@ Tasks:
 - Keep direct `QCheckBox::stateChanged` connects out of feature code with
   `mise run check-qt6-checkbox-state-scope`; use
   `QtCompat::connectCheckStateChanged()` for checkbox check-state changes.
+- Keep `QGLFormat` out of active Qt 5/Qt 6 OpenGL setup with
+  `mise run check-qt6-qglformat-scope`; use `QSurfaceFormat` for shared
+  OpenGL format configuration.
+- Keep direct `QWheelEvent::pixelDelta()` calls out of feature code with
+  `mise run check-qt6-wheelevent-scope`; use
+  `QtCompat::wheelEventPixelDelta()` for wheel pixel-delta access.
 - Extend the `ttextcodec.h` adapter only where legacy encodings still require
   exact behavior, and keep direct `QTextCodec` usage out of feature code.
 
@@ -3260,8 +3279,9 @@ It passed with the expanded local preflight chain enabled: Windows MSVC ABI,
 QRegExp, Core5Compat scope, multimedia scope, script scope, font metrics scope,
 and high-DPI startup attribute scope. The remaining compiler warnings in that
 run were macOS OpenGL deprecation warnings from `tgl.h`.
-After the combo-box activation and checkbox state-change helper slices,
-targeted app-target rebuilds also passed on June 5, 2026 in both lanes:
+After the combo-box activation, checkbox state-change, QWheelEvent pixel-delta,
+and QGLFormat scope slices, targeted app-target rebuilds also passed on June 5,
+2026 in both lanes:
 `cmake --build toonz/build/nix-qt6-relwithdebinfo --target OpenToonz
 --parallel` and
 `cmake --build toonz/build/nix-relwithdebinfo --target OpenToonz --parallel`.
@@ -3279,6 +3299,9 @@ mise run check-qt6-fontmetrics-scope
 mise run check-qt6-highdpi-attribute-scope
 mise run check-qt6-combobox-activated-scope
 mise run check-qt6-checkbox-state-scope
+mise run check-qt6-wheelevent-scope
+mise run check-qt6-qaction-scope
+mise run check-qt6-qglformat-scope
 mise run gui-smokes-app-qt6
 mise run gui-smoke-qt6
 mise run gui-smoke-scene-create-qt6

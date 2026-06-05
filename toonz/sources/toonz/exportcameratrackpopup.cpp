@@ -233,7 +233,7 @@ void CameraTrackPreviewArea::fitToWindow() {
 }
 
 void CameraTrackPreviewArea::wheelEvent(QWheelEvent* event) {
-  QPoint numPixels  = event->pixelDelta();
+  QPoint numPixels  = QtCompat::wheelEventPixelDelta(event);
   QPoint numDegrees = QtCompat::wheelEventAngleDelta(event) / 8;
 
   int delta = 0;

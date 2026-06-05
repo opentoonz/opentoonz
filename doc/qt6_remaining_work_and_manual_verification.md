@@ -87,6 +87,17 @@ Already covered:
   and a Qt 5 `stateChanged` fallback. `mise run
   check-qt6-checkbox-state-scope` keeps direct `QCheckBox::stateChanged`
   connects out of feature code.
+- The active `QtOfflineGL` offscreen context path now uses `QSurfaceFormat`
+  for shared Qt 5/Qt 6 format setup instead of an unused legacy `QGLFormat`
+  block. `mise run check-qt6-qglformat-scope` keeps `QGLFormat` limited to the
+  remaining Qt 5-only startup/PBuffer compatibility scope.
+- `QWheelEvent` pixel-delta access is centralized behind
+  `QtCompat::wheelEventPixelDelta()` in current wheel handlers. `mise run
+  check-qt6-wheelevent-scope` keeps direct `QWheelEvent::pixelDelta()` calls
+  out of feature code.
+- The recent flipbook image loader now avoids Qt 6-deprecated
+  `QAction::parentWidget()` by casting `QAction::parent()`. `mise run
+  check-qt6-qaction-scope` guards that QAction warning slice.
 - Selected `QMouseEvent` and `QDropEvent`-derived coordinate users are
   centralized behind `QtCompat` helpers so the Qt 6 lane uses
   `position()`/`globalPosition()` APIs while the Qt 5 lane keeps its existing
@@ -284,8 +295,9 @@ Still needed:
   QRegExp, Core5Compat scope, multimedia scope, script scope, font metrics
   scope, and high-DPI startup attribute scope. The remaining compiler warnings
   in that run were macOS OpenGL deprecation warnings from `tgl.h`.
-  Latest targeted app-target rebuild evidence after the combo-box activation
-  and checkbox state-change helper slices: on June 5, 2026,
+  Latest targeted app-target rebuild evidence after the combo-box activation,
+  checkbox state-change, QWheelEvent pixel-delta, and QGLFormat scope slices:
+  on June 5, 2026,
   `cmake --build toonz/build/nix-qt6-relwithdebinfo --target OpenToonz
   --parallel` and
   `cmake --build toonz/build/nix-relwithdebinfo --target OpenToonz --parallel`
@@ -675,6 +687,9 @@ mise run check-qt6-fontmetrics-scope
 mise run check-qt6-highdpi-attribute-scope
 mise run check-qt6-combobox-activated-scope
 mise run check-qt6-checkbox-state-scope
+mise run check-qt6-wheelevent-scope
+mise run check-qt6-qaction-scope
+mise run check-qt6-qglformat-scope
 mise run check-textcodec
 mise run check-textcodec-qt6
 git diff --check

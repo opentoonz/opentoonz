@@ -127,41 +127,6 @@ void QtOfflineGL::createContext(TDimension rasterSize,
 
 */
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-  QGLFormat fmt;
-#if defined(_WIN32)
-  fmt.setAlphaBufferSize(8);
-  fmt.setAlpha(true);
-  fmt.setRgba(true);
-  fmt.setDepthBufferSize(32);
-  fmt.setDepth(true);
-  fmt.setStencilBufferSize(32);
-  fmt.setStencil(true);
-  fmt.setAccum(false);
-  fmt.setPlane(0);
-#elif defined(MACOSX)
-  fmt = QGLFormat::defaultFormat();
-  // printf("GL Version: %s\n",glGetString(GL_VERSION));
-  fmt.setVersion(2, 1); /* 3.2 might not work on OSX10.8 */
-#if 0
-  fmt.setAlphaBufferSize(8);
-  fmt.setAlpha(true);
-  fmt.setRgba(true);
-  fmt.setDepthBufferSize(32);
-  fmt.setDepth(true);
-  fmt.setStencilBufferSize(8);
-  fmt.setStencil(true);
-  fmt.setAccum(false);
-  fmt.setPlane(0);
-  fmt.setDirectRendering(false);
-#endif
-#elif defined(LINUX) || defined(FREEBSD)
-  fmt = QGLFormat::defaultFormat();
-  // printf("GL Version: %s\n",glGetString(GL_VERSION));
-  fmt.setVersion(2, 1); /* XXX? */
-#endif
-#endif
-
   QSurfaceFormat format;
   format.setProfile(QSurfaceFormat::CompatibilityProfile);
 #if defined(MACOSX) || defined(LINUX) || defined(FREEBSD)

@@ -472,10 +472,10 @@ void SchematicSceneViewer::wheelEvent(QWheelEvent *me) {
   }
 
   case Qt::MouseEventSynthesizedBySystem: {
-    QPoint numPixels  = me->pixelDelta();
+    QPoint numPixels  = QtCompat::wheelEventPixelDelta(me);
     QPoint numDegrees = QtCompat::wheelEventAngleDelta(me) / 8;
     if (!numPixels.isNull()) {
-      delta = me->pixelDelta().y();
+      delta = numPixels.y();
     } else if (!numDegrees.isNull()) {
       QPoint numSteps = numDegrees / 15;
       delta           = numSteps.y();
