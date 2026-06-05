@@ -98,6 +98,11 @@ Already covered:
 - The recent flipbook image loader now avoids Qt 6-deprecated
   `QAction::parentWidget()` by casting `QAction::parent()`. `mise run
   check-qt6-qaction-scope` guards that QAction warning slice.
+- Direct feature-code `QImage::mirrored()` usage is centralized behind
+  `QtCompat::mirroredImage()`. Qt 6 uses `QImage::flipped()` with explicit
+  orientations, while Qt 5 keeps the existing `mirrored()` path inside the
+  helper. `mise run check-qt6-qimage-mirrored-scope` keeps direct
+  `QImage::mirrored()` calls out of feature code.
 - Selected `QMouseEvent` and `QDropEvent`-derived coordinate users are
   centralized behind `QtCompat` helpers so the Qt 6 lane uses
   `position()`/`globalPosition()` APIs while the Qt 5 lane keeps its existing
@@ -277,11 +282,17 @@ Already covered:
   high-DPI startup attributes `AA_EnableHighDpiScaling` and
   `AA_UseHighDpiPixmaps` stay inside
   `QT_VERSION < QT_VERSION_CHECK(6, 0, 0)` blocks.
-- User-activated combo-box index handling in Pencil Test, Camera Track export,
-  and Startup preset selection now routes through
+- User-activated real combo-box index handling now routes through
   `QtCompat::connectComboBoxActivatedIndex()` instead of direct
-  `QComboBox::activated(int)` connections. `mise run
-  check-qt6-combobox-activated-scope` guards that deprecated signal boundary.
+  `QComboBox::activated(int)` connections. The cleanup covers Pencil Test,
+  Camera Track export, cleanup settings panes, project selectors, tool option
+  combos, board settings, Xsheet PDF export, Filmstrip, level settings, Xsheet
+  column filters, histogram/function segment widgets, file browser DPI policy,
+  format settings, and navigation-tag color selection. Custom project-local
+  `ToolOptionPopupButton::activated(int)` signals remain on their custom signal
+  path. `mise run check-qt6-combobox-activated-scope` guards the deprecated
+  real-combo signal boundary, including old macro `SIGNAL(activated(int))`
+  combo connections.
 - Legacy `toonzfarm/tfarm/tbaseserver.cpp` Windows socket diagnostic messages
   now use bounded `snprintf()` formatting instead of unbounded `wsprintf()`,
   and the non-Windows send failure message is initialized before throwing.
@@ -296,8 +307,8 @@ Still needed:
   scope, and high-DPI startup attribute scope. The remaining compiler warnings
   in that run were macOS OpenGL deprecation warnings from `tgl.h`.
   Latest targeted app-target rebuild evidence after the combo-box activation,
-  checkbox state-change, QWheelEvent pixel-delta, and QGLFormat scope slices:
-  on June 5, 2026,
+  QImage mirrored/flipped, checkbox state-change, QWheelEvent pixel-delta, and
+  QGLFormat scope slices: on June 5, 2026,
   `cmake --build toonz/build/nix-qt6-relwithdebinfo --target OpenToonz
   --parallel` and
   `cmake --build toonz/build/nix-relwithdebinfo --target OpenToonz --parallel`
@@ -689,6 +700,7 @@ mise run check-qt6-combobox-activated-scope
 mise run check-qt6-checkbox-state-scope
 mise run check-qt6-wheelevent-scope
 mise run check-qt6-qaction-scope
+mise run check-qt6-qimage-mirrored-scope
 mise run check-qt6-qglformat-scope
 mise run check-textcodec
 mise run check-textcodec-qt6

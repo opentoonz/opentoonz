@@ -1210,11 +1210,16 @@ Current branch status:
 - `mise run check-qt6-highdpi-attribute-scope` now guards that
   `AA_EnableHighDpiScaling` and `AA_UseHighDpiPixmaps` stay inside
   `QT_VERSION < QT_VERSION_CHECK(6, 0, 0)` startup blocks.
-- Remaining user-activated `QComboBox::activated(int)` connects in Pencil
-  Test, Camera Track export, and Startup preset selection now go through
+- User-activated real `QComboBox` index handling now goes through
   `QtCompat::connectComboBoxActivatedIndex()`, which uses `textActivated` and
-  forwards the combo box current index. `mise run
-  check-qt6-combobox-activated-scope` keeps direct `QComboBox::activated`
+  forwards the combo box current index. The cleanup covers Pencil Test, Camera
+  Track export, cleanup settings panes, project selectors, tool option combos,
+  board settings, Xsheet PDF export, Filmstrip, level settings, Xsheet column
+  filters, histogram/function segment widgets, file browser DPI policy, format
+  settings, and navigation-tag color selection. Project-local custom
+  `ToolOptionPopupButton::activated(int)` signals remain on their custom signal
+  path. `mise run check-qt6-combobox-activated-scope` keeps direct real-combo
+  `QComboBox::activated` connects and old macro `SIGNAL(activated(int))` combo
   connects out of the current source tree.
 - Remaining direct checkbox `stateChanged(int)` connects in the stop-motion
   controller and Type tool options now also route through
@@ -1235,6 +1240,11 @@ Current branch status:
   `qobject_cast()` instead of the Qt 6-deprecated `QAction::parentWidget()`.
   `mise run check-qt6-qaction-scope` keeps that deprecated QAction API out of
   the current app source.
+- Direct feature-code `QImage::mirrored()` calls now route through
+  `QtCompat::mirroredImage()`. Qt 6 uses `QImage::flipped()` with explicit
+  orientations, while Qt 5 keeps the existing `mirrored()` behavior inside the
+  helper. `mise run check-qt6-qimage-mirrored-scope` keeps new direct
+  `QImage::mirrored()` calls out of feature code.
 - Legacy `toonzfarm/tfarm/tbaseserver.cpp` Windows socket diagnostic formatting
   no longer uses unbounded `wsprintf()` calls. The file now uses bounded
   `snprintf()` formatting for those messages and initializes the non-Windows
@@ -2979,6 +2989,10 @@ Tasks:
 - Keep direct `QWheelEvent::pixelDelta()` calls out of feature code with
   `mise run check-qt6-wheelevent-scope`; use
   `QtCompat::wheelEventPixelDelta()` for wheel pixel-delta access.
+- Keep direct `QImage::mirrored()` calls out of feature code with
+  `mise run check-qt6-qimage-mirrored-scope`; use
+  `QtCompat::mirroredImage()` so Qt 6 can use `QImage::flipped()` while Qt 5
+  keeps the existing mirror behavior.
 - Extend the `ttextcodec.h` adapter only where legacy encodings still require
   exact behavior, and keep direct `QTextCodec` usage out of feature code.
 
@@ -3301,6 +3315,7 @@ mise run check-qt6-combobox-activated-scope
 mise run check-qt6-checkbox-state-scope
 mise run check-qt6-wheelevent-scope
 mise run check-qt6-qaction-scope
+mise run check-qt6-qimage-mirrored-scope
 mise run check-qt6-qglformat-scope
 mise run gui-smokes-app-qt6
 mise run gui-smoke-qt6

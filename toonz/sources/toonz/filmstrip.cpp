@@ -1559,8 +1559,9 @@ Filmstrip::Filmstrip(QWidget *parent, Qt::WindowFlags flags) : QWidget(parent) {
   // signal-slot connections
   // switch the current level when the current index of m_chooseLevelCombo is
   // changed
-  connect(m_chooseLevelCombo, SIGNAL(activated(int)), this,
-          SLOT(onChooseLevelComboChanged(int)));
+  QtCompat::connectComboBoxActivatedIndex(
+      m_chooseLevelCombo, this,
+      [this](int index) { onChooseLevelComboChanged(index); });
   connect(m_frames, SIGNAL(orientationToggledSignal(bool)), this,
           SLOT(orientationToggled(bool)));
   connect(m_frames, SIGNAL(comboBoxToggledSignal()), this,

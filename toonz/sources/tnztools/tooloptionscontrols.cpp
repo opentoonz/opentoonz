@@ -320,10 +320,12 @@ ToolOptionCombo::ToolOptionCombo(TTool *tool, TEnumProperty *property,
   m_property->addListener(this);
   loadEntries();
   setSizeAdjustPolicy(QComboBox::AdjustToContents);
-  connect(this, SIGNAL(activated(int)), this, SLOT(onActivated(int)));
+  QtCompat::connectComboBoxActivatedIndex(
+      this, this, [this](int index) { onActivated(index); });
   // synchronize the state with the same widgets in other tool option bars
   if (toolHandle) {
-    connect(this, SIGNAL(activated(int)), toolHandle, SIGNAL(toolChanged()));
+    QtCompat::connectComboBoxActivatedIndex(
+        this, toolHandle, [toolHandle](int) { emit toolHandle->toolChanged(); });
   }
 }
 
@@ -404,10 +406,12 @@ ToolOptionFontCombo::ToolOptionFontCombo(TTool *tool, TEnumProperty *property,
   setMaximumWidth(250);
   m_property->addListener(this);
   setSizeAdjustPolicy(QFontComboBox::AdjustToContents);
-  connect(this, SIGNAL(activated(int)), this, SLOT(onActivated(int)));
+  QtCompat::connectComboBoxActivatedIndex(
+      this, this, [this](int index) { onActivated(index); });
   // synchronize the state with the same widgets in other tool option bars
   if (toolHandle)
-    connect(this, SIGNAL(activated(int)), toolHandle, SIGNAL(toolChanged()));
+    QtCompat::connectComboBoxActivatedIndex(
+        this, toolHandle, [toolHandle](int) { emit toolHandle->toolChanged(); });
 
   updateStatus();
 }

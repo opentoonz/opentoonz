@@ -26,6 +26,7 @@
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/colorfield.h"
 #include "toonzqt/tselectionhandle.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/tscenehandle.h"
@@ -926,8 +927,8 @@ LoadLevelPopup::LoadLevelPopup()
   connect(m_browser, SIGNAL(filePathDoubleClicked(const TFilePath &)), this,
           SLOT(onFilePathDoubleClicked(const TFilePath &)));
   //----Level Properties
-  connect(m_dpiPolicy, SIGNAL(activated(int)), this,
-          SLOT(onDpiPolicyActivated()));
+  QtCompat::connectComboBoxActivatedIndex(
+      m_dpiPolicy, this, [this](int) { onDpiPolicyActivated(); });
   connect(m_premultiply, SIGNAL(clicked(bool)), this,
           SLOT(onDoPremultiplyClicked()));
   connect(m_whiteTransp, SIGNAL(clicked(bool)), this,

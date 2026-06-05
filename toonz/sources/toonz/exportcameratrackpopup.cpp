@@ -616,11 +616,7 @@ QImage ExportCameraTrackPopup::generateCameraTrackImg(
   QImage colImg(imgRas->getRawData(), imgRes.lx, imgRes.ly,
                 QImage::Format_ARGB32_Premultiplied);
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-  QImage img = colImg.flipped(Qt::Vertical);
-#else
-  QImage img = colImg.mirrored(false, true);
-#endif
+  QImage img = QtCompat::mirroredImage(colImg, false, true);
 
   TPointD imgDpi = sl->getImageDpi();
   if (imgDpi != TPointD()) {

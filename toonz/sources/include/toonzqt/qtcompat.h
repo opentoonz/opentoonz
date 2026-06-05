@@ -113,6 +113,18 @@ inline QImage convertToGLFormat(const QImage& image) {
 #endif
 }
 
+inline QImage mirroredImage(const QImage& image, bool horizontally = false,
+                            bool vertically = true) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  Qt::Orientations orientations;
+  if (horizontally) orientations |= Qt::Horizontal;
+  if (vertically) orientations |= Qt::Vertical;
+  return image.flipped(orientations);
+#else
+  return image.mirrored(horizontally, vertically);
+#endif
+}
+
 inline QStringList fontDatabaseStyles(const QString& family) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   return QFontDatabase::styles(family);

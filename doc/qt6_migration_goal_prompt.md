@@ -147,6 +147,11 @@ branch.
   `QAction::parentWidget()` and now casts the action `parent()` instead.
   `mise run check-qt6-qaction-scope` guards that QAction parent-widget warning
   slice.
+- Direct feature-code `QImage::mirrored()` usage is now centralized behind
+  `QtCompat::mirroredImage()`. Qt 6 uses `QImage::flipped()` with explicit
+  orientations, while Qt 5 keeps the existing `mirrored()` behavior behind the
+  helper. `mise run check-qt6-qimage-mirrored-scope` keeps direct
+  `QImage::mirrored()` calls out of feature code.
 - A small event-coordinate compatibility slice is now centralized in
   `QtCompat`: selected `QMouseEvent` position/global-position and
   `QDropEvent`-derived drag/drop position users now call Qt 6
@@ -309,21 +314,28 @@ branch.
   `QFontMetrics::width()` warning slice by allowing that deprecated API only in
   the Qt 5 fallback inside `QtCompat::fontMetricsHorizontalAdvance()`. It runs
   before the normal local configure, build, and translation-build tasks.
-- Remaining user-activated `QComboBox::activated(int)` connections in the
-  stop-motion Pencil Test popup, Camera Track export popup, and Startup popup
-  now route through `QtCompat::connectComboBoxActivatedIndex()`, which uses
-  `textActivated` and forwards the selected current index. `mise run
-  check-qt6-combobox-activated-scope` keeps direct `QComboBox::activated`
-  connections out of the current source tree and runs before the normal local
-  configure, build, and translation-build tasks.
+- User-activated real `QComboBox` index handling now routes through
+  `QtCompat::connectComboBoxActivatedIndex()`, which uses `textActivated` and
+  forwards the selected current index. The cleanup covers the stop-motion
+  Pencil Test popup, Camera Track export popup, cleanup settings panes,
+  project selectors, tool option combos, board settings, Xsheet PDF export,
+  Filmstrip, level settings, Xsheet column filters, histogram/function segment
+  widgets, file browser DPI policy, format settings, and navigation-tag color
+  selector. Project-local custom `ToolOptionPopupButton::activated(int)`
+  signals remain on their custom signal path. `mise run
+  check-qt6-combobox-activated-scope` keeps direct real-combo
+  `QComboBox::activated` connections and old macro `SIGNAL(activated(int))`
+  combo connections out of the current source tree and runs before the normal
+  local configure, build, and translation-build tasks.
 - On June 5, 2026, targeted app-target rebuilds after the combo-box activation,
-  checkbox state-change, QWheelEvent pixel-delta, and QGLFormat scope slices
-  passed in both lanes:
+  QImage mirrored/flipped, checkbox state-change, QWheelEvent pixel-delta, and
+  QGLFormat scope slices passed in both lanes:
   `cmake --build toonz/build/nix-qt6-relwithdebinfo --target OpenToonz
   --parallel` and
   `cmake --build toonz/build/nix-relwithdebinfo --target OpenToonz
-  --parallel`. The remaining output was existing macOS OpenGL and legacy
-  compiler warning noise.
+  --parallel`. The Qt 5 run became a broad rebuild after Ninja recovered its
+  build log, but still linked successfully. The remaining output was existing
+  macOS OpenGL and legacy compiler warning noise.
 - On June 5, 2026, `mise run script-smokes-qt6` passed against the current Qt 6
   app bundle, covering the aggregate FilePath, Scene, Level, Image,
   ImageBuilder, Transform, ToonzRasterConverter, vectorizer, Rasterizer,
@@ -2279,6 +2291,7 @@ mise run check-qt6-combobox-activated-scope
 mise run check-qt6-checkbox-state-scope
 mise run check-qt6-wheelevent-scope
 mise run check-qt6-qaction-scope
+mise run check-qt6-qimage-mirrored-scope
 mise run check-qt6-qglformat-scope
 mise run gui-smokes-app-qt6
 mise run gui-smoke-qt6

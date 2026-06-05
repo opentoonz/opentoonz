@@ -3279,11 +3279,7 @@ bool PencilTestPopup::importImage(QImage image) {
   TPointD levelDpi = sl->getDpi();
   /* Create the raster */
   TRaster32P raster(image.width(), image.height());
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-  convertImageToRaster(raster, image.flipped(Qt::Horizontal | Qt::Vertical));
-#else
-  convertImageToRaster(raster, image.mirrored(true, true));
-#endif
+  convertImageToRaster(raster, QtCompat::mirroredImage(image, true, true));
 
   TRasterImageP ri(raster);
   ri->setDpi(levelDpi.x, levelDpi.y);

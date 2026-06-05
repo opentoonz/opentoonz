@@ -593,16 +593,17 @@ ProjectSettingsPopup::ProjectSettingsPopup() : ProjectPopup(false) {
         cb, this, [this](Qt::CheckState) { onSomethingChanged(); });
   }
 
-  connect(m_chooseProjectCombo, SIGNAL(activated(int)), this,
-          SLOT(onChooseProjectChanged(int)));
+  QtCompat::connectComboBoxActivatedIndex(
+      m_chooseProjectCombo, this,
+      [this](int index) { onChooseProjectChanged(index); });
 
   // file path settings
   connect(m_rulePreferenceBG, SIGNAL(idClicked(int)), this,
           SLOT(onSomethingChanged()));
   connect(m_acceptNonAlphabetSuffixCB, SIGNAL(clicked(bool)), this,
           SLOT(onSomethingChanged()));
-  connect(m_letterCountCombo, SIGNAL(activated(int)), this,
-          SLOT(onSomethingChanged()));
+  QtCompat::connectComboBoxActivatedIndex(
+      m_letterCountCombo, this, [this](int) { onSomethingChanged(); });
 }
 
 //-----------------------------------------------------------------------------

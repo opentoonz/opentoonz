@@ -472,8 +472,9 @@ ItemInfoView::ItemInfoView(QWidget* parent) : QStackedWidget(parent) {
                             SLOT(onNameEdited()));
   ret      = ret && connect(m_maxFontSizeEdit, SIGNAL(editingFinished()), this,
                             SLOT(onMaxFontSizeEdited()));
-  ret      = ret && connect(m_typeCombo, SIGNAL(activated(int)), this,
-                            SLOT(onTypeComboActivated(int)));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_typeCombo, this,
+                   [this](int index) { onTypeComboActivated(index); }));
   ret      = ret && connect(m_textEdit, SIGNAL(textChanged()), this,
                             SLOT(onFreeTextChanged()));
   ret      = ret && connect(m_imgPathField, SIGNAL(pathChanged()), this,
@@ -487,8 +488,9 @@ ItemInfoView::ItemInfoView(QWidget* parent) : QStackedWidget(parent) {
   ret = ret &&
         connect(m_fontColorField, SIGNAL(colorChanged(const TPixel32&, bool)),
                 this, SLOT(onFontColorChanged(const TPixel32&, bool)));
-  ret = ret && connect(m_imgARModeCombo, SIGNAL(activated(int)), this,
-                       SLOT(onImgARModeComboActivated()));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_imgARModeCombo, this,
+                   [this](int) { onImgARModeComboActivated(); }));
   assert(ret);
 }
 
@@ -1223,12 +1225,7 @@ void BoardSettingsPopup::onExportBoardImage() {
     iw->setProperties(outputSettings->getFileFormatProperties(fp.getType()));
 
     TRaster32P raster(boardImg.width(), boardImg.height());
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    convertImageToRaster(raster,
-                         boardImg.flipped(Qt::Horizontal | Qt::Vertical));
-#else
-    convertImageToRaster(raster, boardImg.mirrored(true, true));
-#endif
+    convertImageToRaster(raster, QtCompat::mirroredImage(boardImg, true, true));
 
     TRasterImageP ri(raster);
 

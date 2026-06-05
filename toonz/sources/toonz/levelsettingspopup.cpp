@@ -547,7 +547,8 @@ LevelSettingsPopup::LevelSettingsPopup()
   //----signal/slot connections
   connect(m_nameFld, SIGNAL(editingFinished()), SLOT(onNameChanged()));
   connect(m_pathFld, SIGNAL(pathChanged()), SLOT(onPathChanged()));
-  connect(m_dpiTypeOm, SIGNAL(activated(int)), SLOT(onDpiTypeChanged(int)));
+  QtCompat::connectComboBoxActivatedIndex(
+      m_dpiTypeOm, this, [this](int index) { onDpiTypeChanged(index); });
   connect(m_dpiFld, SIGNAL(editingFinished()), SLOT(onDpiFieldChanged()));
   QtCompat::connectCheckStateChanged(
       m_squarePixCB, this, [this](Qt::CheckState state) {

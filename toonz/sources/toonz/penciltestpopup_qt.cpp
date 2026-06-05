@@ -1810,8 +1810,9 @@ PencilTestPopup::PencilTestPopup()
   bool ret = true;
   ret      = ret && connect(refreshCamListButton, SIGNAL(pressed()), this,
                             SLOT(refreshCameraList()));
-  ret      = ret && connect(m_cameraListCombo, SIGNAL(activated(int)), this,
-                            SLOT(onCameraListComboActivated(int)));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_cameraListCombo, this,
+                   [this](int index) { onCameraListComboActivated(index); }));
   ret = ret && connect(m_resolutionCombo, SIGNAL(activated(const QString&)),
                        this, SLOT(onResolutionComboActivated(const QString&)));
   ret = ret && connect(m_fileFormatOptionButton, SIGNAL(pressed()), this,
@@ -1851,8 +1852,9 @@ PencilTestPopup::PencilTestPopup()
                        SLOT(openSaveInFolderPopup()));
   ret = ret && connect(m_saveInFileFld, SIGNAL(pathChanged()), this,
                        SLOT(onSaveInPathEdited()));
-  ret = ret && connect(m_fileTypeCombo, SIGNAL(activated(int)), this,
-                       SLOT(refreshFrameInfo()));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_fileTypeCombo, this,
+                   [this](int) { refreshFrameInfo(); }));
   ret = ret && connect(m_frameNumberEdit, SIGNAL(editingFinished()), this,
                        SLOT(refreshFrameInfo()));
 
@@ -2222,14 +2224,7 @@ void PencilTestPopup::onFrameCaptured(QImage& image) {
         QVideoSurfaceFormat::BottomToTop;
     bool upsideDown = m_upsideDownCB->isChecked();
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    Qt::Orientations flipOrientations = Qt::Orientations();
-    if (upsideDown) flipOrientations |= Qt::Horizontal;
-    if (upsideDown != scanBtoT) flipOrientations |= Qt::Vertical;
-    image = image.flipped(flipOrientations);
-#else
-    image = image.mirrored(upsideDown, upsideDown != scanBtoT);
-#endif
+    image = QtCompat::mirroredImage(image, upsideDown, upsideDown != scanBtoT);
 
     if (importImage(image)) {
       m_videoWidget->setPreviousImage(image.copy());
@@ -2703,11 +2698,7 @@ bool PencilTestPopup::importImage(QImage image) {
   TPointD levelDpi = sl->getDpi();
   /* create the raster */
   TRaster32P raster(image.width(), image.height());
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-  convertImageToRaster(raster, image.flipped(Qt::Horizontal | Qt::Vertical));
-#else
-  convertImageToRaster(raster, image.mirrored(true, true));
-#endif
+  convertImageToRaster(raster, QtCompat::mirroredImage(image, true, true));
 
   TRasterImageP ri(raster);
   ri->setDpi(levelDpi.x, levelDpi.y);

@@ -12,6 +12,7 @@
 #include "toonzqt/dvmimedata.h"
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/selectioncommandids.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/tframehandle.h"
@@ -534,8 +535,8 @@ void PlasticToolOptionsBox::showEvent(QShowEvent *se) {
                        SLOT(onSkelIdsListChanged()));
   ret = ret && connect(&l_plasticTool, SIGNAL(skelIdChanged()),
                        SLOT(onSkelIdChanged()));
-  ret = ret && connect(m_skelIdComboBox, SIGNAL(activated(int)),
-                       SLOT(onSkelIdEdited()));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_skelIdComboBox, this, [this](int) { onSkelIdEdited(); }));
   ret = ret &&
         connect(m_addSkelButton, SIGNAL(released()), SLOT(onAddSkeleton()));
   ret = ret && connect(m_removeSkelButton, SIGNAL(released()),

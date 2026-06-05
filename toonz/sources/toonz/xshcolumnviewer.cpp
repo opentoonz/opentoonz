@@ -1994,8 +1994,9 @@ m_value->setFont(font);*/
   ret      = ret && connect(m_value, SIGNAL(textChanged(const QString &)), this,
                             SLOT(onValueChanged(const QString &)));
 
-  ret = ret && connect(m_filterColorCombo, SIGNAL(activated(int)), this,
-                       SLOT(onFilterColorChanged()));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_filterColorCombo, this,
+                   [this](int) { onFilterColorChanged(); }));
   if (m_lockBtn)
     ret = ret && connect(m_lockBtn, SIGNAL(clicked(bool)), this,
                          SLOT(onLockButtonClicked(bool)));

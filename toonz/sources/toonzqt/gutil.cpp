@@ -1,6 +1,7 @@
 
 
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 #include "toonz/preferences.h"
 
 // TnzQt includes
@@ -90,7 +91,7 @@ QImage rasterToQImage(const TRasterP &ras, bool premultiplied, bool mirrored) {
     QImage image(ras->getRawData(), ras->getLx(), ras->getLy(),
                  premultiplied ? QImage::Format_ARGB32_Premultiplied
                                : QImage::Format_ARGB32);
-    if (mirrored) return image.mirrored();
+    if (mirrored) return QtCompat::mirroredImage(image);
     return image;
   } else if (TRasterGR8P ras8 = ras) {
     QImage image(ras->getRawData(), ras->getLx(), ras->getLy(), ras->getWrap(),
@@ -101,7 +102,7 @@ QImage rasterToQImage(const TRasterP &ras, bool premultiplied, bool mirrored) {
       for (i = 0; i < 256; i++) colorTable.append(QColor(i, i, i).rgb());
     }
     image.setColorTable(colorTable);
-    if (mirrored) return image.mirrored();
+    if (mirrored) return QtCompat::mirroredImage(image);
     return image;
   }
   return QImage();
@@ -124,7 +125,7 @@ TRaster32P rasterFromQImage(
     QImage image, bool premultiply,
     bool mirror)  // no need of const& - Qt uses implicit sharing...
 {
-  QImage copyImage = mirror ? image.mirrored() : image;
+  QImage copyImage = mirror ? QtCompat::mirroredImage(image) : image;
   TRaster32P ras(image.width(), image.height(), image.width(),
                  (TPixelRGBM32 *)copyImage.bits(), false);
   if (premultiply) TRop::premultiply(ras);

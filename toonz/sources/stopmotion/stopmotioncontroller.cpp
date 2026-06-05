@@ -949,8 +949,9 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
   // Control Page
   ret = ret && connect(refreshCamListButton, SIGNAL(clicked()), this,
                        SLOT(refreshCameraListCalled()));
-  ret = ret && connect(m_cameraListCombo, SIGNAL(activated(int)), this,
-                       SLOT(onCameraListComboActivated(int)));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_cameraListCombo, this,
+                   [this](int index) { onCameraListComboActivated(index); }));
   ret = ret && connect(m_resolutionCombo, SIGNAL(activated(const QString &)),
                        this, SLOT(onResolutionComboActivated(const QString &)));
   if (m_captureFilterSettingsBtn)
@@ -988,8 +989,9 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
   //                     SLOT(openSaveInFolderPopup()));
   ret = ret && connect(m_saveInFileFld, SIGNAL(pathChanged()), this,
                        SLOT(onSaveInPathEdited()));
-  ret = ret && connect(m_fileTypeCombo, SIGNAL(activated(int)), this,
-                       SLOT(onFileTypeActivated()));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_fileTypeCombo, this,
+                   [this](int) { onFileTypeActivated(); }));
   ret = ret && connect(m_frameNumberEdit, SIGNAL(editingFinished()), this,
                        SLOT(onFrameNumberChanged()));
   ret = ret && connect(m_xSheetFrameNumberEdit, SIGNAL(editingFinished()), this,

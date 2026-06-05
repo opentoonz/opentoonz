@@ -2148,12 +2148,13 @@ ExportXsheetPdfPopup::ExportXsheetPdfPopup()
 
   connect(m_durationFld, SIGNAL(editingFinished()), this,
           SLOT(onDurationEdited()));
-  connect(m_templateCombo, SIGNAL(activated(int)), this, SLOT(initTemplate()));
+  QtCompat::connectComboBoxActivatedIndex(
+      m_templateCombo, this, [this](int) { initTemplate(); });
 
-  connect(m_exportAreaCombo, SIGNAL(activated(int)), this,
-          SLOT(updatePreview()));
-  connect(m_continuousLineCombo, SIGNAL(activated(int)), this,
-          SLOT(updatePreview()));
+  QtCompat::connectComboBoxActivatedIndex(
+      m_exportAreaCombo, this, [this](int) { updatePreview(); });
+  QtCompat::connectComboBoxActivatedIndex(
+      m_continuousLineCombo, this, [this](int) { updatePreview(); });
   connect(m_lineColorFld, SIGNAL(colorChanged(const TPixel32&, bool)), this,
           SLOT(updatePreview()));
   connect(m_templateFontCB, SIGNAL(currentFontChanged(const QFont&)), this,
@@ -2170,8 +2171,8 @@ ExportXsheetPdfPopup::ExportXsheetPdfPopup()
   connect(m_drawDialogueCB, SIGNAL(clicked(bool)), this, SLOT(updatePreview()));
   connect(m_drawDialogueCB, SIGNAL(clicked(bool)), m_dialogueColCombo,
           SLOT(setEnabled(bool)));
-  connect(m_dialogueColCombo, SIGNAL(activated(int)), this,
-          SLOT(updatePreview()));
+  QtCompat::connectComboBoxActivatedIndex(
+      m_dialogueColCombo, this, [this](int) { updatePreview(); });
   connect(m_addSceneNameCB, SIGNAL(clicked(bool)), this, SLOT(updatePreview()));
   connect(m_addSceneNameCB, SIGNAL(clicked(bool)), m_sceneNameEdit,
           SLOT(setEnabled(bool)));
@@ -2190,15 +2191,16 @@ ExportXsheetPdfPopup::ExportXsheetPdfPopup()
   connect(m_prev, SIGNAL(clicked(bool)), this, SLOT(onPrev()));
   connect(m_next, SIGNAL(clicked(bool)), this, SLOT(onNext()));
 
-  connect(m_tick1IdCombo, SIGNAL(activated(int)), this,
-          SLOT(onTickIdComboActivated()));
-  connect(m_tick2IdCombo, SIGNAL(activated(int)), this,
-          SLOT(onTickIdComboActivated()));
-  connect(m_keyIdCombo, SIGNAL(activated(int)), this, SLOT(updatePreview()));
-  connect(m_tick1MarkCombo, SIGNAL(activated(int)), this,
-          SLOT(updatePreview()));
-  connect(m_tick2MarkCombo, SIGNAL(activated(int)), this,
-          SLOT(updatePreview()));
+  QtCompat::connectComboBoxActivatedIndex(
+      m_tick1IdCombo, this, [this](int) { onTickIdComboActivated(); });
+  QtCompat::connectComboBoxActivatedIndex(
+      m_tick2IdCombo, this, [this](int) { onTickIdComboActivated(); });
+  QtCompat::connectComboBoxActivatedIndex(
+      m_keyIdCombo, this, [this](int) { updatePreview(); });
+  QtCompat::connectComboBoxActivatedIndex(
+      m_tick1MarkCombo, this, [this](int) { updatePreview(); });
+  QtCompat::connectComboBoxActivatedIndex(
+      m_tick2MarkCombo, this, [this](int) { updatePreview(); });
 
   // The following lines are "translation word book" listing the words which may
   // appear in the template
