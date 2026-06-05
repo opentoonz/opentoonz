@@ -98,6 +98,12 @@ branch.
 - `mise run check-qt6-fontmetrics-scope` now enforces that direct deprecated
   `QFontMetrics::width()` calls stay out of feature code and remain behind
   `QtCompat::fontMetricsHorizontalAdvance()`.
+- Direct removed desktop-widget APIs are no longer present under
+  `toonz/sources`. `mise run check-qt6-desktopwidget-scope` now keeps
+  `QDesktopWidget`, `QApplication::desktop()`, `qApp->desktop()`, and direct
+  generic `desktop()` calls out of the source tree so screen geometry work
+  stays on `QScreen`/widget-screen helpers. Multi-monitor, mixed-DPI, and
+  off-primary-screen behavior still need manual runtime verification.
 - `mise run check-no-qregexp` and `mise run check-core5compat-scope` now also
   run before the normal local configure, build, Qt 6 configure, and Qt 6
   translation-build tasks, so removed regex APIs and adapter-scope regressions
@@ -2287,6 +2293,7 @@ mise run check-qt6-multimedia-scope
 mise run check-qt6-script-scope
 mise run check-qt6-fontmetrics-scope
 mise run check-qt6-highdpi-attribute-scope
+mise run check-qt6-desktopwidget-scope
 mise run check-qt6-combobox-activated-scope
 mise run check-qt6-checkbox-state-scope
 mise run check-qt6-wheelevent-scope

@@ -159,7 +159,7 @@ already addressed in this branch.
 | Qt CMake bindings | Many `Qt5::` links and `qt5_*` commands across `toonz/sources` CMake files | Need version-aware targets and wrapper commands before a Qt 6 build can configure cleanly |
 | Qt Script | 26 source/header files use `QScriptEngine`, `QScriptValue`, `QScriptContext`, or related APIs | Biggest API blocker because Qt Script was removed from Qt 6 |
 | Multimedia and capture | 16 files use Qt 5 camera/audio/media classes in app, stop-motion, and sound code | Needs focused API rewrite and real hardware validation |
-| Desktop geometry | 19 files use `QDesktopWidget`, `QApplication::desktop`, or `qApp->desktop` | Must move to `QScreen` and widget screen helpers |
+| Desktop geometry | Baseline had 19 files using `QDesktopWidget`, `QApplication::desktop`, or `qApp->desktop`; current source is guarded by `mise run check-qt6-desktopwidget-scope` | Keep removed desktop APIs out of `toonz/sources`; use `QScreen` and widget-screen helpers, then verify multi-monitor and mixed-DPI behavior manually |
 | Regular expressions | Baseline had 8 files using `QRegExp` or `QRegExpValidator`; current source is guarded by `mise run check-no-qregexp` | Keep these removed Qt 5 APIs out of `toonz/sources`; use `QRegularExpression` and `QRegularExpressionValidator` for new code |
 | Text codecs | 7 files reference `QTextCodec` or text-stream codec APIs | Either bridge with `Core5Compat` or create explicit legacy encoding adapters |
 | Qt OpenGL classes | 34 files mention `QOpenGL*`, `QGLWidget`, `QSurfaceFormat`, or Qt offscreen GL classes | Needs Qt 6 module changes and direct viewer/offscreen rendering validation |
@@ -1210,6 +1210,12 @@ Current branch status:
 - `mise run check-qt6-highdpi-attribute-scope` now guards that
   `AA_EnableHighDpiScaling` and `AA_UseHighDpiPixmaps` stay inside
   `QT_VERSION < QT_VERSION_CHECK(6, 0, 0)` startup blocks.
+- `mise run check-qt6-desktopwidget-scope` now fails if removed desktop-widget
+  APIs reappear under `toonz/sources`, including `QDesktopWidget`,
+  `QApplication::desktop()`, `qApp->desktop()`, and direct generic
+  `desktop()` calls. This keeps current screen geometry code on
+  `QScreen`/widget-screen helpers, but runtime multi-monitor and mixed-DPI
+  behavior still needs manual verification.
 - User-activated real `QComboBox` index handling now goes through
   `QtCompat::connectComboBoxActivatedIndex()`, which uses `textActivated` and
   forwards the combo box current index. The cleanup covers Pencil Test, Camera
@@ -1277,9 +1283,10 @@ diagnostic: it should list work, not break the default build.
 
 High-value cleanup that can be done before Qt 6:
 
-- Replace `QDesktopWidget` and `qApp->desktop()` with helpers based on
+- Keep removed desktop-widget APIs out of `toonz/sources` with
+  `mise run check-qt6-desktopwidget-scope`; use
   `QGuiApplication::primaryScreen()`, `QGuiApplication::screens()`, and
-  `QWidget::screen()`.
+  `QWidget::screen()` helpers for screen geometry work.
 - Keep `QRegExp` and `QRegExpValidator` out of `toonz/sources` with
   `mise run check-no-qregexp`; use `QRegularExpression` and
   `QRegularExpressionValidator` for any future regex code.
@@ -2975,7 +2982,9 @@ Tasks:
 
 - Add a diagnostic `QT_DISABLE_DEPRECATED_UP_TO=0x050F00` lane.
 - Run Clazy Qt 6 checks against the Qt 5 build.
-- Port `QDesktopWidget` and `qApp->desktop()` to a local screen helper.
+- Keep removed desktop-widget APIs out of feature code with
+  `mise run check-qt6-desktopwidget-scope`; use local `QScreen` and
+  widget-screen helpers for screen geometry work.
 - Keep `QRegExp` and `QRegExpValidator` removed with
   `mise run check-no-qregexp`.
 - Keep direct `QGLWidget::convertToGLFormat` calls out of feature code; the
@@ -3311,6 +3320,7 @@ mise run check-no-qregexp
 mise run check-core5compat-scope
 mise run check-qt6-fontmetrics-scope
 mise run check-qt6-highdpi-attribute-scope
+mise run check-qt6-desktopwidget-scope
 mise run check-qt6-combobox-activated-scope
 mise run check-qt6-checkbox-state-scope
 mise run check-qt6-wheelevent-scope

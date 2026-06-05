@@ -75,6 +75,12 @@ Already covered:
 - Direct deprecated `QFontMetrics::width()` usage is isolated behind
   `QtCompat::fontMetricsHorizontalAdvance()` and guarded by
   `mise run check-qt6-fontmetrics-scope`.
+- Direct removed desktop-widget APIs are absent from `toonz/sources` and
+  guarded by `mise run check-qt6-desktopwidget-scope`. Keep
+  `QDesktopWidget`, `QApplication::desktop()`, `qApp->desktop()`, and direct
+  generic `desktop()` calls out of feature code; use `QScreen` and
+  widget-screen helpers instead. This is a source guard only. It does not
+  replace manual multi-monitor, mixed-DPI, and off-primary-screen validation.
 - An isolated Qt 6 translation lane exists through
   `nix-qt6-translation-check`, `mise run configure-qt6-translations`, and
   `mise run build-qt6-translations`. The build task keeps
@@ -696,6 +702,7 @@ mise run check-qt6-multimedia-scope
 mise run check-qt6-script-scope
 mise run check-qt6-fontmetrics-scope
 mise run check-qt6-highdpi-attribute-scope
+mise run check-qt6-desktopwidget-scope
 mise run check-qt6-combobox-activated-scope
 mise run check-qt6-checkbox-state-scope
 mise run check-qt6-wheelevent-scope
