@@ -17,9 +17,19 @@ reports, and the GitHub Project used to track Qt 6 migration validation.
 
 The workflow expects a repository secret named `QT6_PROJECT_TOKEN` with access to
 the user-owned GitHub Project. The token needs permission to read repository
-Actions results and update GitHub Projects. The workflow falls back to the
-default `GITHUB_TOKEN`, but user-owned Projects often require the explicit
-Project-capable token.
+Actions results and update GitHub Projects. The default `GITHUB_TOKEN` cannot
+update this user-owned Project, so the workflow skips cleanly until the secret is
+present.
+
+Recommended token shape:
+
+- Owner: `bgyss`
+- Repository access: only `bgyss/opentoonz`
+- Account permissions: Projects read/write
+- Repository permissions: Actions read, Contents read, Metadata read
+
+A classic personal token with broad `repo` and `project` scopes also works, but
+it is broader than this workflow needs.
 
 ## Codex Progress Report Integration
 

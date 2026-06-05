@@ -48,12 +48,17 @@ jobs:
       - name: Sync GitHub Project
         env:
           QT6_PROJECT_TOKEN: ${{ secrets.QT6_PROJECT_TOKEN }}
-          GITHUB_TOKEN_FALLBACK: ${{ github.token }}
         run: |
-          if [ -n "${QT6_PROJECT_TOKEN:-}" ]; then
-            export GH_PROJECT_TOKEN="$QT6_PROJECT_TOKEN"
-          else
-            export GH_PROJECT_TOKEN="$GITHUB_TOKEN_FALLBACK"
+          if [ -z "${QT6_PROJECT_TOKEN:-}" ]; then
+            {
+              echo "## Qt 6 Project Sync"
+              echo
+              echo "Skipped: repository secret \`QT6_PROJECT_TOKEN\` is not set."
+              echo
+              echo "Create a fine-grained token that can update the bgyss user Project and store it as this repository secret."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
           fi
 
+          export GH_PROJECT_TOKEN="$QT6_PROJECT_TOKEN"
           node scripts/qt6/sync-github-project.mjs
