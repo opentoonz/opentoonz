@@ -4,6 +4,7 @@
 #define TOONZQT_QTCOMPAT_H
 
 #include <QtGlobal>
+#include <QButtonGroup>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QContextMenuEvent>
@@ -13,6 +14,7 @@
 #include <QFontMetrics>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QGraphicsSceneMouseEvent>
+#include <QHash>
 #include <QHelpEvent>
 #include <QImage>
 #include <QKeyEvent>
@@ -43,17 +45,30 @@ namespace QtCompat {
 using EnterEvent      = QEnterEvent;
 using TouchPoint      = QEventPoint;
 using TouchDeviceType = QInputDevice::DeviceType;
+using TabletDeviceType = QInputDevice::DeviceType;
+using TabletPointerType = QPointingDevice::PointerType;
 
 static constexpr TouchDeviceType TouchScreen =
     QInputDevice::DeviceType::TouchScreen;
 static constexpr TouchDeviceType TouchPad = QInputDevice::DeviceType::TouchPad;
+static constexpr TabletDeviceType TabletStylus =
+    QInputDevice::DeviceType::Stylus;
+static constexpr TabletPointerType TabletPen =
+    QPointingDevice::PointerType::Pen;
+static constexpr TabletPointerType TabletEraser =
+    QPointingDevice::PointerType::Eraser;
 #else
 using EnterEvent      = QEvent;
 using TouchPoint      = QTouchEvent::TouchPoint;
 using TouchDeviceType = QTouchDevice::DeviceType;
+using TabletDeviceType = QTabletEvent::TabletDevice;
+using TabletPointerType = QTabletEvent::PointerType;
 
 static constexpr TouchDeviceType TouchScreen = QTouchDevice::TouchScreen;
 static constexpr TouchDeviceType TouchPad    = QTouchDevice::TouchPad;
+static constexpr TabletDeviceType TabletStylus = QTabletEvent::Stylus;
+static constexpr TabletPointerType TabletPen = QTabletEvent::Pen;
+static constexpr TabletPointerType TabletEraser = QTabletEvent::Eraser;
 #endif
 
 inline const QList<TouchPoint>& touchPoints(const QTouchEvent* event) {
@@ -62,6 +77,10 @@ inline const QList<TouchPoint>& touchPoints(const QTouchEvent* event) {
 #else
   return event->touchPoints();
 #endif
+}
+
+inline TouchDeviceType touchDeviceType(const QTouchEvent* event) {
+  return event->device()->type();
 }
 
 inline QPointF touchPointPosition(const TouchPoint& point) {
@@ -101,6 +120,14 @@ inline QKeySequence keySequence(const QKeyEvent* event) {
   return QKeySequence(event->keyCombination());
 #else
   return QKeySequence(event->key() + event->modifiers());
+#endif
+}
+
+inline int keySequenceEntryToInt(const QKeySequence& sequence, int index) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return sequence[index].toCombined();
+#else
+  return sequence[index];
 #endif
 }
 
@@ -249,6 +276,52 @@ inline QPoint tabletEventGlobalPosition(const QTabletEvent* event) {
 #endif
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+inline const QPointingDevice* syntheticTabletDevice(
+    TabletDeviceType deviceType, TabletPointerType pointerType,
+    qint64 uniqueId) {
+  using Capability = QInputDevice::Capability;
+  static QHash<QString, QPointingDevice*> devices;
+
+  const QString key =
+      QString("%1:%2:%3")
+          .arg(static_cast<int>(deviceType))
+          .arg(static_cast<int>(pointerType))
+          .arg(uniqueId);
+  if (!devices.contains(key)) {
+    devices.insert(
+        key,
+        new QPointingDevice(
+            QStringLiteral("OpenToonz synthetic tablet"), uniqueId, deviceType,
+            pointerType,
+            Capability::Position | Capability::Pressure | Capability::XTilt |
+                Capability::YTilt | Capability::Rotation | Capability::Hover,
+            1, 3, QString(),
+            QPointingDeviceUniqueId::fromNumericId(uniqueId)));
+  }
+  return devices.value(key);
+}
+#endif
+
+inline QTabletEvent makeTabletEvent(
+    QEvent::Type type, const QPointF& position, const QPointF& globalPosition,
+    TabletDeviceType deviceType, TabletPointerType pointerType, qreal pressure,
+    int xTilt, int yTilt, qreal tangentialPressure, qreal rotation, int z,
+    Qt::KeyboardModifiers modifiers, qint64 uniqueId, Qt::MouseButton button,
+    Qt::MouseButtons buttons) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return QTabletEvent(type,
+                      syntheticTabletDevice(deviceType, pointerType, uniqueId),
+                      position, globalPosition, pressure, xTilt, yTilt,
+                      tangentialPressure, rotation, z, modifiers, button,
+                      buttons);
+#else
+  return QTabletEvent(type, position, globalPosition, deviceType, pointerType,
+                      pressure, xTilt, yTilt, tangentialPressure, rotation, z,
+                      modifiers, uniqueId, button, buttons);
+#endif
+}
+
 inline QPoint hoverEventPosition(const QHoverEvent* event) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   return event->position().toPoint();
@@ -260,6 +333,16 @@ inline QPoint hoverEventPosition(const QHoverEvent* event) {
 inline QPointF graphicsSceneMouseEventPositionF(
     const QGraphicsSceneMouseEvent* event) {
   return event->pos();
+}
+
+inline QPoint graphicsSceneMouseEventScreenPosition(
+    const QGraphicsSceneMouseEvent* event) {
+  return event->screenPos();
+}
+
+inline QPoint graphicsSceneMouseEventLastScreenPosition(
+    const QGraphicsSceneMouseEvent* event) {
+  return event->lastScreenPos();
 }
 
 inline QPointF graphicsSceneContextMenuEventPositionF(
@@ -294,6 +377,20 @@ inline Qt::KeyboardModifiers dropEventModifiers(const QDropEvent* event) {
 #else
   return event->keyboardModifiers();
 #endif
+}
+
+template <typename Receiver, typename Func>
+inline QMetaObject::Connection connectButtonGroupIdClicked(
+    QButtonGroup* buttonGroup, Receiver* receiver, Func&& slot) {
+  return QObject::connect(buttonGroup, &QButtonGroup::idClicked, receiver,
+                          std::forward<Func>(slot));
+}
+
+template <typename Receiver, typename Func>
+inline QMetaObject::Connection connectButtonGroupIdPressed(
+    QButtonGroup* buttonGroup, Receiver* receiver, Func&& slot) {
+  return QObject::connect(buttonGroup, &QButtonGroup::idPressed, receiver,
+                          std::forward<Func>(slot));
 }
 
 template <typename Receiver, typename Func>

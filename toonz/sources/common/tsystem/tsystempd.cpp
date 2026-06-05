@@ -106,7 +106,8 @@
 #include <dlfcn.h>
 
 // macOS-specific headers
-#include "Carbon/Carbon.h"
+#include <QDir>
+#include <QFileInfo>
 #endif
 
 #ifdef __sgi
@@ -537,27 +538,15 @@ void TSystem::moveFileToRecycleBin(const TFilePath &fp) {
   int ret = SHFileOperationW(&data);  // do it!
 
 #elif defined(MACOSX)
-  FSRef foundRef;
-  OSErr err = FSFindFolder(kOnSystemDisk, kTrashFolderType, kDontCreateFolder,
-                           &foundRef);
+  const QDir trashDir(QDir::homePath() + "/.Trash");
+  const QString fileName = QFileInfo(fp.getQString()).fileName();
+  if (!trashDir.exists() || fileName.isEmpty()) {
+    assert(false);
+    deleteFile(fp);
+    return;
+  }
 
-  if (err) {
-    assert(false);
-    deleteFile(fp);
-    return;
-  }
-  UInt8 path[255];
-  err = FSRefMakePath(&foundRef, path, 254);
-  if (err) {
-    assert(false);
-    deleteFile(fp);
-    return;
-  }
-  // TFilePath dest = TFilePath(path)+(fp.getName()+fp.getDottedType());
-  string fullNameWithExt = ::to_string(fp);
-  int i                  = fullNameWithExt.rfind("/");
-  string nameWithExt     = fullNameWithExt.substr(i + 1);
-  TFilePath dest         = TFilePath((char *)path) + nameWithExt;
+  TFilePath dest(trashDir.filePath(fileName).toStdWString());
 
   try {
     renameFile(dest, fp);

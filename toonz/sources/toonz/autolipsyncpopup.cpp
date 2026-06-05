@@ -10,6 +10,7 @@
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/icongenerator.h"
+#include "toonzqt/qtmediacompat.h"
 
 // TnzLib includes
 #include "toonz/toonzscene.h"
@@ -53,26 +54,6 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QUrl>
-
-namespace {
-
-auto mediaPlayerState(const QMediaPlayer *player) {
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-  return player->playbackState();
-#else
-  return player->state();
-#endif
-}
-
-void setMediaPlayerSource(QMediaPlayer *player, const QUrl &url) {
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-  player->setSource(url);
-#else
-  player->setMedia(url);
-#endif
-}
-
-}  // namespace
 
 //=============================================================================
 /*! \class AutoLipSyncPopup
@@ -736,7 +717,7 @@ void AutoLipSyncPopup::playSound() {
       }
     }
   } else {  // level < 0
-    if (mediaPlayerState(m_player) == QMediaPlayer::StoppedState) {
+    if (QtCompat::mediaPlayerState(m_player) == QMediaPlayer::StoppedState) {
       // Check null pointer
       if (!m_audioFile) {
         DVGui::warning(tr("Audio file field is not available."));
@@ -758,7 +739,8 @@ void AutoLipSyncPopup::playSound() {
         return;
       }
 
-      setMediaPlayerSource(m_player, QUrl::fromLocalFile(tempPath.getQString()));
+      QtCompat::setMediaPlayerSource(
+          m_player, QUrl::fromLocalFile(tempPath.getQString()));
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
       m_audioOutput->setVolume(0.5);
 #else
@@ -799,7 +781,7 @@ void AutoLipSyncPopup::stopAllSound() {
     }
   }
 
-  if (mediaPlayerState(m_player) != QMediaPlayer::StoppedState) {
+  if (QtCompat::mediaPlayerState(m_player) != QMediaPlayer::StoppedState) {
     m_player->stop();
   }
 

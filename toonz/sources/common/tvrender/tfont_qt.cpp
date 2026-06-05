@@ -27,6 +27,55 @@
 #include "tvectorimage.h"
 using namespace std;
 
+namespace {
+
+QStringList fontDatabaseFamilies() {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return QFontDatabase::families();
+#else
+  QFontDatabase fontDatabase;
+  return fontDatabase.families();
+#endif
+}
+
+QStringList fontDatabaseStyles(const QString& family) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return QFontDatabase::styles(family);
+#else
+  QFontDatabase fontDatabase;
+  return fontDatabase.styles(family);
+#endif
+}
+
+bool fontDatabaseIsPrivateFamily(const QString& family) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return QFontDatabase::isPrivateFamily(family);
+#else
+  QFontDatabase fontDatabase;
+  return fontDatabase.isPrivateFamily(family);
+#endif
+}
+
+bool fontDatabaseBold(const QString& family, const QString& style) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return QFontDatabase::bold(family, style);
+#else
+  QFontDatabase fontDatabase;
+  return fontDatabase.bold(family, style);
+#endif
+}
+
+bool fontDatabaseItalic(const QString& family, const QString& style) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return QFontDatabase::italic(family, style);
+#else
+  QFontDatabase fontDatabase;
+  return fontDatabase.italic(family, style);
+#endif
+}
+
+}  // namespace
+
 //=============================================================================
 
 struct TFont::Impl {
@@ -185,7 +234,8 @@ TPoint TFont::drawChar(QImage &outImage, TPoint &unused, wchar_t charcode,
   QImage image = raw.alphaMapForGlyph(indices[0], QRawFont::PixelAntialiasing);
   if (image.format() != QImage::Format_Indexed8 &&
       image.format() != QImage::Format_Alpha8)
-    throw TException(L"bad QImage format " + image.format());
+    throw TException(L"bad QImage format " +
+                     std::to_wstring(static_cast<int>(image.format())));
 
   QRectF boundingRect = raw.boundingRect(indices[0]);
 
@@ -303,7 +353,6 @@ bool TFont::hasVertical() const {
 //---------------------------------------------------------
 
 struct TFontManager::Impl {
-  QFontDatabase *m_qfontdb;
   bool m_loaded;
 
   TFont *m_currentFont;
@@ -316,13 +365,8 @@ struct TFontManager::Impl {
   // has the @-version, the library use it.
   bool m_vertical;
 
-  Impl()
-      : m_qfontdb(NULL)
-      , m_loaded(false)
-      , m_currentFont(0)
-      , m_size(0)
-      , m_vertical(false) {}
-  ~Impl() { delete m_qfontdb; }
+  Impl() : m_loaded(false), m_currentFont(0), m_size(0), m_vertical(false) {}
+  ~Impl() {}
 };
 
 //---------------------------------------------------------
@@ -345,9 +389,7 @@ TFontManager *TFontManager::instance() {
 void TFontManager::loadFontNames() {
   if (m_pimpl->m_loaded) return;
 
-  m_pimpl->m_qfontdb = new QFontDatabase;
-
-  if (m_pimpl->m_qfontdb->families().empty()) throw TFontLibraryLoadingError();
+  if (fontDatabaseFamilies().empty()) throw TFontLibraryLoadingError();
 
   m_pimpl->m_loaded = true;
 }
@@ -358,7 +400,7 @@ void TFontManager::setFamily(const wstring family) {
   if (m_pimpl->m_currentFamily == family) return;
 
   QString qFamily      = QString::fromStdWString(family);
-  QStringList families = m_pimpl->m_qfontdb->families();
+  QStringList families = fontDatabaseFamilies();
   if (!families.contains(qFamily)) throw TFontCreationError();
 
   m_pimpl->m_currentFamily = family;
@@ -366,7 +408,7 @@ void TFontManager::setFamily(const wstring family) {
 // XXX: if current style is not valid for family, reset it?
 // doing so asserts when choosing a font in the GUI
 #if 0
-  QStringList styles = m_pimpl->m_qfontdb->styles(qFamily);
+  QStringList styles = fontDatabaseStyles(qFamily);
   if (styles.contains(QString::fromStdWString(m_pimpl->m_currentTypeface))) {
     m_pimpl->m_currentTypeface = L"";
   }
@@ -381,9 +423,9 @@ void TFontManager::setFamily(const wstring family) {
 void TFontManager::setTypeface(const wstring typeface) {
   if (m_pimpl->m_currentTypeface == typeface) return;
 
-  QString qTypeface  = QString::fromStdWString(typeface);
-  QStringList styles = m_pimpl->m_qfontdb->styles(
-      QString::fromStdWString(m_pimpl->m_currentFamily));
+  QString qTypeface = QString::fromStdWString(typeface);
+  QStringList styles =
+      fontDatabaseStyles(QString::fromStdWString(m_pimpl->m_currentFamily));
   if (!styles.contains(qTypeface)) {
     throw TFontCreationError();
   }
@@ -428,8 +470,9 @@ TFont *TFontManager::getCurrentFont() {
     loadFontNames();
   }
 
-  assert(!m_pimpl->m_qfontdb->families().empty());
-  setFamily(m_pimpl->m_qfontdb->families().first().toStdWString());
+  const QStringList families = fontDatabaseFamilies();
+  assert(!families.empty());
+  setFamily(families.first().toStdWString());
 
   return m_pimpl->m_currentFont;
 }
@@ -437,14 +480,14 @@ TFont *TFontManager::getCurrentFont() {
 //---------------------------------------------------------
 
 void TFontManager::getAllFamilies(vector<wstring> &families) const {
-  QStringList qFamilies = m_pimpl->m_qfontdb->families();
+  QStringList qFamilies = fontDatabaseFamilies();
 
   families.clear();
   families.reserve(qFamilies.count());
 
   QStringList::const_iterator it = qFamilies.begin();
   for (; it != qFamilies.end(); ++it) {
-    if (!m_pimpl->m_qfontdb->isPrivateFamily(*it))
+    if (!fontDatabaseIsPrivateFamily(*it))
       families.push_back(it->toStdWString());
   }
 }
@@ -454,8 +497,8 @@ void TFontManager::getAllFamilies(vector<wstring> &families) const {
 void TFontManager::getAllTypefaces(vector<wstring> &typefaces) const {
   typefaces.clear();
 
-  QStringList qStyles = m_pimpl->m_qfontdb->styles(
-      QString::fromStdWString(m_pimpl->m_currentFamily));
+  QStringList qStyles =
+      fontDatabaseStyles(QString::fromStdWString(m_pimpl->m_currentFamily));
 
   if (qStyles.empty()) return;
 
@@ -473,11 +516,11 @@ void TFontManager::setVertical(bool vertical) {}
 //---------------------------------------------------------
 
 bool TFontManager::isBold(const QString &family, const QString &style) {
-  return m_pimpl->m_qfontdb->bold(family, style);
+  return fontDatabaseBold(family, style);
 }
 
 //---------------------------------------------------------
 
 bool TFontManager::isItalic(const QString &family, const QString &style) {
-  return m_pimpl->m_qfontdb->italic(family, style);
+  return fontDatabaseItalic(family, style);
 }

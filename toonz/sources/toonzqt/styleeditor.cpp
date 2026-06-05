@@ -60,6 +60,11 @@
 #include <QOpenGLFramebufferObject>
 
 namespace {
+bool haveSameColorStyleType(const TColorStyle *lhs, const TColorStyle *rhs) {
+  assert(lhs && rhs);
+  return typeid(*lhs) == typeid(*rhs);
+}
+
 enum ColorSliderAppearance {
   RelativeColoredTriangleHandle,
   AbsoluteColoredLineHandle
@@ -1694,8 +1699,6 @@ PlainColorPage::PlainColorPage(QWidget *parent)
   // SLOT(onWheelSliderReleased()));
   // connect( m_verticalSlider,		SIGNAL(sliderReleased()),	this,
   // SLOT(onWheelSliderReleased()));
-  // connect(channelButtonGroup, SIGNAL(buttonClicked(int)), this,
-  // SLOT(setWheelChannel(int)));
 }
 
 //-----------------------------------------------------------------------------
@@ -2564,12 +2567,12 @@ void SettingsPage::setStyle(const TColorStyleP &editedStyle) {
   // function may be invoked when signals emitted from this function are still
   // "flying"...
 
+  const TColorStyle *currentStyle = m_editedStyle.getPointer();
+  const TColorStyle *newStyle = editedStyle.getPointer();
   bool clearLayout =
-      m_editedStyle &&
-      !(editedStyle && typeid(*m_editedStyle) == typeid(*editedStyle));
+      currentStyle && !(newStyle && haveSameColorStyleType(currentStyle, newStyle));
   bool buildLayout =
-      editedStyle &&
-      !(m_editedStyle && typeid(*m_editedStyle) == typeid(*editedStyle));
+      newStyle && !(currentStyle && haveSameColorStyleType(currentStyle, newStyle));
 
   m_editedStyle = editedStyle;
 

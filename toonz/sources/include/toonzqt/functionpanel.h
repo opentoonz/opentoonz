@@ -67,7 +67,10 @@ public:
     EaseIn,
     EaseOut,
     EaseInPercentage,
-    EaseOutPercentage
+    EaseOutPercentage,
+    GroupPoint = 100,
+    GroupSpeedOut,
+    GroupSpeedIn
   };
 
 private:

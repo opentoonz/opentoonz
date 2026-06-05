@@ -13,22 +13,30 @@ var disposedScene = new Scene();
 disposedScene.dispose();
 
 var errors = [
+  hasError(function() { new Renderer(0); },
+           "Renderer constructor expected no arguments"),
   hasError(function() { renderer.renderScene(); },
-           "First argument must be a scene"),
+           "Renderer.renderScene expected one scene argument"),
   hasError(function() { renderer.renderScene(42); },
            "First argument must be a scene"),
+  hasError(function() { renderer.renderScene(scene, 0); },
+           "Renderer.renderScene expected one scene argument"),
   hasError(function() { renderer.renderScene(disposedScene); },
            "Invalid Scene"),
   hasError(function() { renderer.renderFrame(); },
-           "First argument must be a scene"),
+           "Renderer.renderFrame expected a scene and frame"),
+  hasError(function() { renderer.renderFrame(scene, 0, 1); },
+           "Renderer.renderFrame expected a scene and frame"),
   hasError(function() { renderer.renderFrame(scene); },
-           "Second argument must be a frame number"),
+           "Renderer.renderFrame expected a scene and frame"),
   hasError(function() { renderer.renderFrame(scene, "1"); },
            "Second argument must be a frame number"),
   hasError(function() { renderer.renderFrame(scene, 0); },
            "Renderer.renderFrame"),
   hasError(function() { renderer.renderScene(scene); },
-           "Renderer.renderScene")
+           "Renderer.renderScene"),
+  hasError(function() { renderer.dumpCache(0); },
+           "Renderer.dumpCache expected no arguments")
 ];
 
 print("qt-script-renderer-edges-errors", errors);

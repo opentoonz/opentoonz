@@ -837,8 +837,7 @@ void FunctionPanel::updateGadgets(TDoubleParam *curve) {
     double frame = it->first;  // redundant, already in the key... oh well
     QPointF p(frameToX(frame), groupHandleY);
 
-    Gadget gadget((FunctionPanel::Handle)100, -1, p, 6,
-                  6);  // No idea what the '100' type value mean...
+    Gadget gadget(FunctionPanel::GroupPoint, -1, p, 6, 6);
     gadget.m_keyframePosition = frame;
 
     m_gadgets.push_back(gadget);
@@ -871,7 +870,7 @@ void FunctionPanel::updateGadgets(TDoubleParam *curve) {
          kf.m_type == TDoubleKeyframe::EaseInOut) &&
         kf.m_speedOut.x != 0) {
       QPointF p(frameToX(frame + kf.m_speedOut.x), groupHandleY);
-      Gadget gadget((FunctionPanel::Handle)101, -1, p, 6, 15);  // type value...
+      Gadget gadget(FunctionPanel::GroupSpeedOut, -1, p, 6, 15);
       gadget.m_keyframePosition = frame;
       m_gadgets.push_back(gadget);
     }
@@ -880,7 +879,7 @@ void FunctionPanel::updateGadgets(TDoubleParam *curve) {
          kf.m_prevType == TDoubleKeyframe::EaseInOut) &&
         kf.m_speedIn.x != 0) {
       QPointF p(frameToX(frame + kf.m_speedIn.x), groupHandleY);
-      Gadget gadget((FunctionPanel::Handle)102, -1, p, 6, 15);  // type value...
+      Gadget gadget(FunctionPanel::GroupSpeedIn, -1, p, 6, 15);
       gadget.m_keyframePosition = frame;
       m_gadgets.push_back(gadget);
     }
@@ -950,7 +949,7 @@ void FunctionPanel::drawCurrentCurve(QPainter &painter) {
   painter.setPen(solidPen);
   for (int j = 0; j < (int)m_gadgets.size() - 1; j++)
     if (m_gadgets[j].m_handle == Point && m_gadgets[j + 1].m_handle &&
-        m_gadgets[j + 1].m_handle != 100 &&
+        m_gadgets[j + 1].m_handle != GroupPoint &&
         m_gadgets[j].m_pos.x() == m_gadgets[j + 1].m_pos.x())
       painter.drawLine(m_gadgets[j].m_pos, m_gadgets[j + 1].m_pos);
 
@@ -1044,15 +1043,15 @@ void FunctionPanel::drawGroupKeyframes(QPainter &painter) {
     int d = 2;
     int h = 4;
     switch (g.m_handle) {
-    case 100:
+    case GroupPoint:
       drawSquare(painter, p, r);
       y = p.y();
       keyframes.push_back(p.x());
       break;
-    case 101:
+    case GroupSpeedOut:
       d = -d;
     // Note: NO break!
-    case 102:
+    case GroupSpeedIn:
       painter.setBrush(Qt::NoBrush);
       painter.setPen(isHighlighted ? QColor(255, 126, 0) : m_textColor);
       pp.moveTo(p + QPointF(d, -h));
@@ -1223,12 +1222,12 @@ void FunctionPanel::mousePressEvent(QMouseEvent *e) {
   }
 
   if (0 <= closestGadgetId && closestGadgetId < (int)m_gadgets.size()) {
-    if (handle == 100)  // group move gadget
+    if (handle == GroupPoint)  // group move gadget
     {
       MovePointDragTool *dragTool = new MovePointDragTool(this, 0);
       dragTool->selectKeyframes(m_gadgets[closestGadgetId].m_keyframePosition);
       m_dragTool = dragTool;
-    } else if (handle == 101 || handle == 102) {
+    } else if (handle == GroupSpeedOut || handle == GroupSpeedIn) {
       m_dragTool = new MoveGroupHandleDragTool(
           this, m_gadgets[closestGadgetId].m_keyframePosition, handle);
     }
@@ -1594,7 +1593,7 @@ void FunctionPanel::openContextMenu(QMouseEvent *e) {
   // build menu
   QMenu menu(0);
   if (m_highlighted.handle == Point && m_highlighted.gIndex >= 0 &&
-      m_gadgets[m_highlighted.gIndex].m_handle != 100) {
+      m_gadgets[m_highlighted.gIndex].m_handle != GroupPoint) {
     kf = curve->getKeyframe(m_gadgets[m_highlighted.gIndex].m_kIndex);
     if (kf.m_linkedHandles)
       menu.addAction(&unlinkHandlesAction);
@@ -1677,11 +1676,11 @@ void FunctionPanel::openContextMenu(QMouseEvent *e) {
   if (action == &linkHandlesAction)  // Let's just *hope* that doesn't happen to
                                      // m_gadgets though...  :/
   {
-    if (m_gadgets[highlighted.gIndex].m_handle != 100)
+    if (m_gadgets[highlighted.gIndex].m_handle != GroupPoint)
       KeyframeSetter(curve, m_gadgets[highlighted.gIndex].m_kIndex)
           .linkHandles();
   } else if (action == &unlinkHandlesAction) {
-    if (m_gadgets[highlighted.gIndex].m_handle != 100)
+    if (m_gadgets[highlighted.gIndex].m_handle != GroupPoint)
       KeyframeSetter(curve, m_gadgets[highlighted.gIndex].m_kIndex)
           .unlinkHandles();
   } else if (action == &resetHandlesAction) {

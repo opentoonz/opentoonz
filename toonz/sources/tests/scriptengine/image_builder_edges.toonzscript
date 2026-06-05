@@ -26,10 +26,26 @@ print("qt-script-imagebuilder-edges-constructors",
 
 var source = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
 var builder = new ImageBuilder(8, 6);
+var transform = new Transform();
 
 var invalidColorError = hasError(function() {
   builder.fill("not-a-color");
 }, "not a valid color");
+var badClearExtraArityError = hasError(function() {
+  builder.clear(0);
+}, "ImageBuilder.clear expected no arguments");
+var badFillMissingArityError = hasError(function() {
+  builder.fill();
+}, "ImageBuilder.fill expected one color argument");
+var badFillExtraArityError = hasError(function() {
+  builder.fill("red", 0);
+}, "ImageBuilder.fill expected one color argument");
+var badAddMissingArityError = hasError(function() {
+  builder.add();
+}, "ImageBuilder.add expected image and optional transform arguments");
+var badAddExtraArityError = hasError(function() {
+  builder.add(source, transform, 0);
+}, "ImageBuilder.add expected image and optional transform arguments");
 var transparentFillError = hasError(function() {
   builder.fill("transparent");
 }, "not a valid color");
@@ -70,9 +86,13 @@ print("qt-script-imagebuilder-edges-builders", builder.toString(),
       toonzBuilder.toString(),
       [invalidColorError, emptyImageError, badTransformError, toonzFillError,
        mismatchError], disposedErrors);
+print("qt-script-imagebuilder-edges-arity", badClearExtraArityError,
+      badFillMissingArityError, badFillExtraArityError,
+      badAddMissingArityError, badAddExtraArityError);
 print("qt-script-imagebuilder-edges-colors", !transparentFillError);
 
 disposedBuilder.dispose();
+transform.dispose();
 toonzImage.dispose();
 toonzBuilder.dispose();
 builder.dispose();

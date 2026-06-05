@@ -49,6 +49,42 @@ print("qt-script-level-edges-frame-access", raster.type, raster.frameCount,
 var toonzBuilder = new ImageBuilder(9, 7, "ToonzRaster");
 var toonzImage = toonzBuilder.image;
 
+var badConstructorArityError = hasError(function() {
+  new Level(new FilePath("missing..tif"), 0);
+}, "Level constructor expected zero or one path argument");
+var badGetFrameIdsArityError = hasError(function() {
+  raster.getFrameIds(0);
+}, "Level.getFrameIds expected no arguments");
+var badGetFrameMissingArityError = hasError(function() {
+  raster.getFrame();
+}, "Level.getFrame expected one frame argument");
+var badGetFrameExtraArityError = hasError(function() {
+  raster.getFrame("1", 0);
+}, "Level.getFrame expected one frame argument");
+var badGetFrameByIndexMissingArityError = hasError(function() {
+  raster.getFrameByIndex();
+}, "Level.getFrameByIndex expected one index argument");
+var badGetFrameByIndexExtraArityError = hasError(function() {
+  raster.getFrameByIndex(0, 1);
+}, "Level.getFrameByIndex expected one index argument");
+var badSetFrameMissingArityError = hasError(function() {
+  raster.setFrame("2");
+}, "Level.setFrame expected frame and image arguments");
+var badSetFrameExtraArityError = hasError(function() {
+  raster.setFrame("2", image, 0);
+}, "Level.setFrame expected frame and image arguments");
+var badLoadMissingArityError = hasError(function() {
+  raster.load();
+}, "Level.load expected one path argument");
+var badLoadExtraArityError = hasError(function() {
+  raster.load(new FilePath("missing..tif"), 0);
+}, "Level.load expected one path argument");
+var badSaveMissingArityError = hasError(function() {
+  raster.save();
+}, "Level.save expected one path argument");
+var badSaveExtraArityError = hasError(function() {
+  raster.save(new FilePath("missing..tif"), 0);
+}, "Level.save expected one path argument");
 var badSetFrameIdError = hasError(function() {
   raster.setFrame("bad", image);
 }, "does not look like a FrameId");
@@ -71,6 +107,13 @@ var missingLoadError = hasError(function() {
 print("qt-script-level-edges-errors", badSetFrameIdError,
       badSetFrameImageError, badSetFrameIdBeforeImageError, typeMismatchError,
       incompatibleSaveError, missingLoadError);
+print("qt-script-level-edges-arity", badConstructorArityError,
+      badGetFrameIdsArityError, badGetFrameMissingArityError,
+      badGetFrameExtraArityError, badGetFrameByIndexMissingArityError,
+      badGetFrameByIndexExtraArityError, badSetFrameMissingArityError,
+      badSetFrameExtraArityError, badLoadMissingArityError,
+      badLoadExtraArityError, badSaveMissingArityError,
+      badSaveExtraArityError);
 
 toonzImage.dispose();
 toonzBuilder.dispose();

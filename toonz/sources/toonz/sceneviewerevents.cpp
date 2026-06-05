@@ -1185,7 +1185,7 @@ void SceneViewer::touchEvent(QTouchEvent *e, int type) {
     m_firstPanPoint = QtCompat::touchPointPosition(touchPoints.at(0));
     m_undoPoint     = m_firstPanPoint;
     // obtain device type
-    m_touchDevice = e->device()->type();
+    m_touchDevice = QtCompat::touchDeviceType(e);
   } else if (m_touchActive) {
     // touchpads must have 2 finger panning for tools and navigation to be
     // functional

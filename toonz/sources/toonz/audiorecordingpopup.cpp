@@ -9,6 +9,7 @@
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/flipconsole.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtmediacompat.h"
 #include "toonzqt/qtcompat.h"
 
 // Tnzlib includes
@@ -161,22 +162,6 @@ ToonzAudioInput *makeAudioInput(const ToonzAudioDeviceInfo &deviceInfo,
 #else
   Q_UNUSED(parent)
   return new QAudioInput(deviceInfo, format);
-#endif
-}
-
-auto mediaPlayerState(const QMediaPlayer *player) {
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-  return player->playbackState();
-#else
-  return player->state();
-#endif
-}
-
-void setMediaPlayerSource(QMediaPlayer *player, const QUrl &url) {
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-  player->setSource(url);
-#else
-  player->setMedia(url);
 #endif
 }
 
@@ -577,8 +562,9 @@ void AudioRecordingPopup::updatePlaybackDuration(qint64 duration) {
 //-----------------------------------------------------------------------------
 
 void AudioRecordingPopup::onPlayButtonPressed() {
-  if (mediaPlayerState(m_player) == QMediaPlayer::StoppedState) {
-    setMediaPlayerSource(m_player, QUrl::fromLocalFile(m_filePath.getQString()));
+  if (QtCompat::mediaPlayerState(m_player) == QMediaPlayer::StoppedState) {
+    QtCompat::setMediaPlayerSource(
+        m_player, QUrl::fromLocalFile(m_filePath.getQString()));
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     m_audioOutput->setVolume(0.5);
 #else
@@ -652,9 +638,9 @@ void AudioRecordingPopup::onPauseRecordingButtonPressed() {
 //-----------------------------------------------------------------------------
 
 void AudioRecordingPopup::onPausePlaybackButtonPressed() {
-  if (mediaPlayerState(m_player) == QMediaPlayer::StoppedState) {
+  if (QtCompat::mediaPlayerState(m_player) == QMediaPlayer::StoppedState) {
     return;
-  } else if (mediaPlayerState(m_player) == QMediaPlayer::PausedState) {
+  } else if (QtCompat::mediaPlayerState(m_player) == QMediaPlayer::PausedState) {
     m_player->play();
     m_pausePlaybackButton->setIcon(m_pauseIcon);
     if (m_syncPlayback && !m_isPlaying && !m_stoppedAtEnd) {
@@ -736,7 +722,7 @@ void AudioRecordingPopup::onSaveButtonPressed() {
     m_audioInput->stop();
     m_audioLevelsDisplay->setLevel(-1, -1);
   }
-  if (mediaPlayerState(m_player) != QMediaPlayer::StoppedState) {
+  if (QtCompat::mediaPlayerState(m_player) != QMediaPlayer::StoppedState) {
     m_player->stop();
     m_audioLevelsDisplay->setLevel(-1, -1);
   }
@@ -826,7 +812,7 @@ void AudioRecordingPopup::hideEvent(QHideEvent *event) {
     m_audioInput->stop();
     m_audioWriterWAV->stop();
   }
-  if (mediaPlayerState(m_player) != QMediaPlayer::StoppedState) {
+  if (QtCompat::mediaPlayerState(m_player) != QMediaPlayer::StoppedState) {
     m_player->stop();
   }
   // make sure the file is freed before deleting

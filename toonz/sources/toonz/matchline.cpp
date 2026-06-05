@@ -10,6 +10,7 @@
 
 // TnzQt includes
 #include "toonzqt/icongenerator.h"
+#include "toonzqt/qtcompat.h"
 #include "historytypes.h"
 
 // TnzLib includes
@@ -468,8 +469,8 @@ MatchlinesDialog::MatchlinesDialog()
           SLOT(onChooseInkClicked(bool)));
   connect(okBtn, SIGNAL(clicked()), this, SLOT(accept()));
   connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
-  connect(lineStackButtonGroup, SIGNAL(buttonPressed(int)),
-          SLOT(onLineStackButtonPressed(int)));
+  QtCompat::connectButtonGroupIdPressed(
+      lineStackButtonGroup, this, &MatchlinesDialog::onLineStackButtonPressed);
   connect(m_inkPrevalence, SIGNAL(valueChanged(bool)),
           SLOT(onInkPrevalenceChanged(bool)));
 }

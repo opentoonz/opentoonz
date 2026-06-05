@@ -1042,7 +1042,8 @@ SplineAimChanger::~SplineAimChanger() {}
 void SplineAimChanger::mouseMoveEvent(QGraphicsSceneMouseEvent *me) {
   if (m_buttonState == Qt::LeftButton) {
     bool increase = false;
-    int delta     = me->screenPos().y() - me->lastScreenPos().y();
+    int delta = QtCompat::graphicsSceneMouseEventScreenPosition(me).y() -
+                QtCompat::graphicsSceneMouseEventLastScreenPosition(me).y();
     // if (delta < 0) increase = true;
     m_delta += abs(delta);
     if (m_delta > 15) {

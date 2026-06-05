@@ -1163,6 +1163,8 @@ const char kBootstrapScript[] = R"JS(
   global["void"] = {};
 
   global.FilePath = function(path) {
+    if (arguments.length > 1)
+      throw new Error("FilePath constructor expected zero or one path argument");
     this.__filePathId = ++nextFilePathId;
     this.__path = arguments.length === 1 ? toFilePathString(path) : "";
   };
@@ -1232,21 +1234,30 @@ const char kBootstrapScript[] = R"JS(
   });
 
   FilePath.prototype.withExtension = function(extension) {
+    if (arguments.length !== 1)
+      throw new Error("FilePath.withExtension expected one extension argument");
     return new FilePath(__opentoonzScriptEngine.filePathWithExtension(
       this.__path, String(extension)));
   };
 
   FilePath.prototype.withName = function(name) {
+    if (arguments.length !== 1)
+      throw new Error("FilePath.withName expected one name argument");
     return new FilePath(__opentoonzScriptEngine.filePathWithName(
       this.__path, String(name)));
   };
 
   FilePath.prototype.withParentDirectory = function(parentDirectory) {
+    if (arguments.length !== 1)
+      throw new Error(
+        "FilePath.withParentDirectory expected one parent-directory argument");
     return new FilePath(__opentoonzScriptEngine.filePathWithParentDirectory(
       this.__path, filePathArgument(parentDirectory)));
   };
 
   FilePath.prototype.concat = function(value) {
+    if (arguments.length !== 1)
+      throw new Error("FilePath.concat expected one path argument");
     var path = filePathArgument(value);
     if (__opentoonzScriptEngine.filePathIsAbsolute(path))
       throw new Error("can't concatenate an absolute path : " +
@@ -1256,6 +1267,8 @@ const char kBootstrapScript[] = R"JS(
   };
 
   FilePath.prototype.files = function() {
+    if (arguments.length !== 0)
+      throw new Error("FilePath.files expected no arguments");
     if (!this.isDirectory)
       throw new Error(this.toString() + " is not a directory");
     var paths = __opentoonzScriptEngine.filePathFiles(this.__path);
@@ -1315,18 +1328,24 @@ const char kBootstrapScript[] = R"JS(
   });
 
   Image.prototype.load = function(path) {
+    if (arguments.length !== 1)
+      throw new Error("Image.load expected one path argument");
     throwIfError(__opentoonzScriptEngine.imageLoad(
       imageId(this), filePathArgument(path)));
     return this;
   };
 
   Image.prototype.save = function(path) {
+    if (arguments.length !== 1)
+      throw new Error("Image.save expected one path argument");
     throwIfError(__opentoonzScriptEngine.imageSave(
       imageId(this), filePathArgument(path)));
     return this;
   };
 
   global.Transform = function() {
+    if (arguments.length !== 0)
+      throw new Error("Transform constructor expected no arguments");
     this.__transformId = __opentoonzScriptEngine.transformCreate();
   };
 
@@ -1417,17 +1436,24 @@ const char kBootstrapScript[] = R"JS(
   });
 
   ImageBuilder.prototype.clear = function() {
+    if (arguments.length !== 0)
+      throw new Error("ImageBuilder.clear expected no arguments");
     throwIfError(__opentoonzScriptEngine.imageBuilderClear(
       imageBuilderId(this)));
   };
 
   ImageBuilder.prototype.fill = function(colorName) {
+    if (arguments.length !== 1)
+      throw new Error("ImageBuilder.fill expected one color argument");
     throwIfError(__opentoonzScriptEngine.imageBuilderFill(
       imageBuilderId(this), String(colorName)));
     return this;
   };
 
   ImageBuilder.prototype.add = function(image, transform) {
+    if (arguments.length < 1 || arguments.length > 2)
+      throw new Error(
+        "ImageBuilder.add expected image and optional transform arguments");
     var transformIdValue = -1;
     if (transform !== undefined) {
       if (!(transform instanceof Transform)) {
@@ -1442,6 +1468,9 @@ const char kBootstrapScript[] = R"JS(
   };
 
   global.ToonzRasterConverter = function() {
+    if (arguments.length !== 0)
+      throw new Error(
+        "ToonzRasterConverter constructor expected no arguments");
     this.__toonzRasterConverterId = ++nextToonzRasterConverterId;
     this.__flatSource = false;
   };
@@ -1470,6 +1499,10 @@ const char kBootstrapScript[] = R"JS(
   });
 
   ToonzRasterConverter.prototype.foo = function(x) {
+    if (arguments.length !== 1)
+      throw new Error("ToonzRasterConverter.foo expected one argument");
+    if (this.__toonzRasterConverterId < 0)
+      throw new Error("Invalid ToonzRasterConverter object");
     return Number(x) * 2;
   };
 
@@ -1521,6 +1554,8 @@ const char kBootstrapScript[] = R"JS(
   }
 
   global.OutlineVectorizer = function() {
+    if (arguments.length !== 0)
+      throw new Error("OutlineVectorizer constructor expected no arguments");
     this.__outlineVectorizerId =
       __opentoonzScriptEngine.outlineVectorizerCreate();
   };
@@ -1544,6 +1579,9 @@ const char kBootstrapScript[] = R"JS(
   };
 
   OutlineVectorizer.prototype.vectorize = function(value) {
+    if (arguments.length !== 1)
+      throw new Error("OutlineVectorizer.vectorize expected one argument");
+
     if (value instanceof Level) {
       if (value.type !== "Raster" && value.type !== "ToonzRaster")
         throw new Error("Can't vectorize a " + value.type + " level");
@@ -1592,6 +1630,8 @@ const char kBootstrapScript[] = R"JS(
   }
 
   global.CenterlineVectorizer = function() {
+    if (arguments.length !== 0)
+      throw new Error("CenterlineVectorizer constructor expected no arguments");
     this.__centerlineVectorizerId =
       __opentoonzScriptEngine.centerlineVectorizerCreate();
   };
@@ -1615,6 +1655,9 @@ const char kBootstrapScript[] = R"JS(
   };
 
   CenterlineVectorizer.prototype.vectorize = function(value) {
+    if (arguments.length !== 1)
+      throw new Error("CenterlineVectorizer.vectorize expected one argument");
+
     if (value instanceof Level) {
       if (value.type !== "Raster" && value.type !== "ToonzRaster")
         throw new Error("Can't vectorize a " + value.type + " level");
@@ -1662,6 +1705,8 @@ const char kBootstrapScript[] = R"JS(
   }
 
   global.Rasterizer = function() {
+    if (arguments.length !== 0)
+      throw new Error("Rasterizer constructor expected no arguments");
     this.__rasterizerId = __opentoonzScriptEngine.rasterizerCreate();
   };
 
@@ -1682,6 +1727,9 @@ const char kBootstrapScript[] = R"JS(
   };
 
   Rasterizer.prototype.rasterize = function(value) {
+    if (arguments.length !== 1)
+      throw new Error("Rasterizer.rasterize expected one argument");
+
     rasterizerId(this);
     if (value instanceof Level) {
       if (value.type !== "Vector")
@@ -1711,6 +1759,9 @@ const char kBootstrapScript[] = R"JS(
   defineRasterizerProperty("antialiasing");
 
   global.Renderer = function() {
+    if (arguments.length !== 0)
+      throw new Error("Renderer constructor expected no arguments");
+
     this.__rendererId = ++nextRendererId;
     this.frames = [];
     this.columns = [];
@@ -1736,12 +1787,16 @@ const char kBootstrapScript[] = R"JS(
   };
 
   Renderer.prototype.renderScene = function() {
+    if (arguments.length !== 1)
+      throw new Error("Renderer.renderScene expected one scene argument");
     return levelFromResult(__opentoonzScriptEngine.rendererRenderScene(
       rendererId(this), rendererSceneId(arguments[0]),
       rendererList(this.frames), rendererList(this.columns)));
   };
 
   Renderer.prototype.renderFrame = function() {
+    if (arguments.length !== 2)
+      throw new Error("Renderer.renderFrame expected a scene and frame");
     var sceneIdValue = rendererSceneId(arguments[0]);
     if (!isNumberArgument(arguments[1]))
       throw new Error("Second argument must be a frame number : " +
@@ -1752,12 +1807,17 @@ const char kBootstrapScript[] = R"JS(
   };
 
   Renderer.prototype.dumpCache = function() {
+    if (arguments.length !== 0)
+      throw new Error("Renderer.dumpCache expected no arguments");
     var result = __opentoonzScriptEngine.rendererDumpCache(rendererId(this));
     throwIfError(result.error || "");
     return new FilePath(String(result.path));
   };
 
   global.Level = function(path) {
+    if (arguments.length > 1)
+      throw new Error("Level constructor expected zero or one path argument");
+
     this.__levelId = __opentoonzScriptEngine.levelCreate();
     if (arguments.length === 1)
       this.load(path);
@@ -1815,15 +1875,24 @@ const char kBootstrapScript[] = R"JS(
   });
 
   Level.prototype.getFrameIds = function() {
+    if (arguments.length !== 0)
+      throw new Error("Level.getFrameIds expected no arguments");
+
     return __opentoonzScriptEngine.levelFrameIds(levelId(this));
   };
 
   Level.prototype.getFrame = function(fid) {
+    if (arguments.length !== 1)
+      throw new Error("Level.getFrame expected one frame argument");
+
     return imageFromResult(__opentoonzScriptEngine.levelGetFrame(
       levelId(this), frameIdArgument(fid)));
   };
 
   Level.prototype.getFrameByIndex = function(index) {
+    if (arguments.length !== 1)
+      throw new Error("Level.getFrameByIndex expected one index argument");
+
     if (!isNumberArgument(index))
       throw new Error("frame index (" + String(index) + ") must be a number");
     return imageFromResult(__opentoonzScriptEngine.levelGetFrameByIndex(
@@ -1831,6 +1900,9 @@ const char kBootstrapScript[] = R"JS(
   };
 
   Level.prototype.setFrame = function(fid, image) {
+    if (arguments.length !== 2)
+      throw new Error("Level.setFrame expected frame and image arguments");
+
     var fidValue = frameIdArgument(fid);
     if (!(image instanceof Image)) {
       throw new Error("second argument (" + String(image) + ") is not an image");
@@ -1841,18 +1913,27 @@ const char kBootstrapScript[] = R"JS(
   };
 
   Level.prototype.load = function(path) {
+    if (arguments.length !== 1)
+      throw new Error("Level.load expected one path argument");
+
     throwIfError(__opentoonzScriptEngine.levelLoad(
       levelId(this), filePathArgument(path)));
     return this;
   };
 
   Level.prototype.save = function(path) {
+    if (arguments.length !== 1)
+      throw new Error("Level.save expected one path argument");
+
     throwIfError(__opentoonzScriptEngine.levelSave(
       levelId(this), filePathArgument(path)));
     return this;
   };
 
   global.Scene = function(path) {
+    if (arguments.length > 1)
+      throw new Error("Scene constructor expected zero or one path argument");
+
     this.__sceneId = __opentoonzScriptEngine.sceneCreate();
     if (arguments.length === 1)
       this.load(path);
@@ -1887,18 +1968,27 @@ const char kBootstrapScript[] = R"JS(
   });
 
   Scene.prototype.load = function(path) {
+    if (arguments.length !== 1)
+      throw new Error("Scene.load expected one path argument");
+
     throwIfError(__opentoonzScriptEngine.sceneLoad(
       sceneId(this), filePathArgument(path)));
     return this;
   };
 
   Scene.prototype.save = function(path) {
+    if (arguments.length !== 1)
+      throw new Error("Scene.save expected one path argument");
+
     throwIfError(__opentoonzScriptEngine.sceneSave(
       sceneId(this), filePathArgument(path)));
     return this;
   };
 
   Scene.prototype.insertColumn = function(column) {
+    if (arguments.length !== 1)
+      throw new Error("Scene.insertColumn expected one column argument");
+
     var columnValue = sceneNumberArgument(column, "Column argument");
     throwIfError(__opentoonzScriptEngine.sceneInsertColumn(
       sceneId(this), columnValue));
@@ -1906,6 +1996,9 @@ const char kBootstrapScript[] = R"JS(
   };
 
   Scene.prototype.deleteColumn = function(column) {
+    if (arguments.length !== 1)
+      throw new Error("Scene.deleteColumn expected one column argument");
+
     var columnValue = sceneNumberArgument(column, "Column argument");
     throwIfError(__opentoonzScriptEngine.sceneDeleteColumn(
       sceneId(this), columnValue));
@@ -1913,6 +2006,9 @@ const char kBootstrapScript[] = R"JS(
   };
 
   Scene.prototype.getCell = function(row, column) {
+    if (arguments.length !== 2)
+      throw new Error("Scene.getCell expected row and column arguments");
+
     var rowValue = sceneNumberArgument(row, "Row argument");
     var columnValue = sceneNumberArgument(column, "Column argument");
     var cell = __opentoonzScriptEngine.sceneGetCell(
@@ -1924,6 +2020,11 @@ const char kBootstrapScript[] = R"JS(
   };
 
   Scene.prototype.setCell = function(row, column, levelOrCell, fid) {
+    if (arguments.length < 2 || arguments.length > 4) {
+      throw new Error(
+        "Scene.setCell expected row, column, and optional cell arguments");
+    }
+
     var rowValue = sceneNumberArgument(row, "Row argument");
     var columnValue = sceneNumberArgument(column, "Column argument");
     var message = "";
@@ -1960,6 +2061,9 @@ const char kBootstrapScript[] = R"JS(
   };
 
   Scene.prototype.getLevels = function() {
+    if (arguments.length !== 0)
+      throw new Error("Scene.getLevels expected no arguments");
+
     var ids = __opentoonzScriptEngine.sceneLevelIds(sceneId(this));
     var result = [];
     for (var i = 0; i < ids.length; ++i)
@@ -1968,16 +2072,25 @@ const char kBootstrapScript[] = R"JS(
   };
 
   Scene.prototype.getLevel = function(name) {
+    if (arguments.length !== 1)
+      throw new Error("Scene.getLevel expected one name argument");
+
     return levelFromResult(__opentoonzScriptEngine.sceneGetLevel(
       sceneId(this), String(name)));
   };
 
   Scene.prototype.newLevel = function(type, name) {
+    if (arguments.length !== 2)
+      throw new Error("Scene.newLevel expected type and name arguments");
+
     return levelFromResult(__opentoonzScriptEngine.sceneNewLevel(
       sceneId(this), String(type), String(name)));
   };
 
   Scene.prototype.loadLevel = function(name, path) {
+    if (arguments.length !== 2)
+      throw new Error("Scene.loadLevel expected name and path arguments");
+
     return levelFromResult(__opentoonzScriptEngine.sceneLoadLevel(
       sceneId(this), String(name), filePathArgument(path)));
   };

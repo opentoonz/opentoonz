@@ -14,6 +14,7 @@
 #include "toonzqt/gutil.h"
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/dvdialog.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/preferences.h"
@@ -174,11 +175,7 @@ void ShortcutViewer::onEditingFinished() {
   // Extract individual keys from the key sequence
   QVector<int> keys;
   for (int i = 0; i < keySeq.count(); i++) {
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    keys.append(keySeq[i].toCombined());
-#else
-    keys.append(keySeq[i]);
-#endif
+    keys.append(QtCompat::keySequenceEntryToInt(keySeq, i));
   }
 
   // Check for conflicts with existing shortcuts

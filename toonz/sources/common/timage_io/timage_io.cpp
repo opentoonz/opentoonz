@@ -213,7 +213,7 @@ void copyLine(typename pixel_traits<Pix>::rgbm_pixel_type *lineIn, Pix *lineOut,
   lineIn += x0;
 
   for (int i = 0; i < length; ++i, lineIn += shrink, ++lineOut)
-    memcpy(lineOut, lineIn, sizeof(Pix));
+    memcpy(static_cast<void *>(lineOut), lineIn, sizeof(Pix));
 }
 
 template <>

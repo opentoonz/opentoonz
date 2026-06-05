@@ -311,6 +311,13 @@ SPECIFICHE  MAC = depth_size 24, stencil_size 8, alpha_size 1
 
 //-----------------------------------------------------------------------------
 
+void QtOfflineGLPBuffer::createContext(TDimension rasterSize,
+                                       std::shared_ptr<TOfflineGL::Imp>) {
+  createContext(rasterSize);
+}
+
+//-----------------------------------------------------------------------------
+
 void QtOfflineGLPBuffer::makeCurrent() {
   if (m_context) {
     m_context->makeCurrent();

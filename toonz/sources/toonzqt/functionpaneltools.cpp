@@ -394,9 +394,9 @@ void MoveHandleDragTool::drag(QMouseEvent *e) {
     if (m_segmentWidth > 0)
       m_setter.setEaseOut(100.0 * handlePos.x / m_segmentWidth);
     break;
-  case 100:
-  case 101:
-  case 102:
+  case FunctionPanel::GroupPoint:
+  case FunctionPanel::GroupSpeedOut:
+  case FunctionPanel::GroupSpeedIn:
     break;
   default:
     assert(0);
@@ -477,7 +477,7 @@ posF.setX(p0.x());
     TDoubleKeyframe kf     = m_setters[i].first;
     KeyframeSetter *setter = m_setters[i].second;
 
-    if (m_handle == 101)  // why the magic numbers... use enums!
+    if (m_handle == FunctionPanel::GroupSpeedOut)
     {
       kf.m_speedOut.x = frame - kf.m_frame;
 
@@ -491,7 +491,7 @@ posF.setX(p0.x());
       default:
         assert(false);
       }
-    } else if (m_handle == 102)  // aagghhrrr
+    } else if (m_handle == FunctionPanel::GroupSpeedIn)
     {
       kf.m_speedIn.x = frame - kf.m_frame;
 
@@ -531,9 +531,9 @@ case FunctionPanel::EaseOutPercentage:
 if(m_segmentWidth>0)
 m_setter.setEaseOut(100.0*handlePos.x/m_segmentWidth);
 break;
-case 100:
-case 101:
-case 102:
+case GroupPoint:
+case GroupSpeedOut:
+case GroupSpeedIn:
 break;
 default:assert(0);
 }

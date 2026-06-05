@@ -131,9 +131,10 @@ branch.
 - On June 5, 2026, `mise run build-qt6` passed against the current branch with
   the expanded local preflight chain enabled: Windows MSVC ABI, QRegExp,
   Core5Compat scope, multimedia scope, script scope, font metrics scope, and
-  high-DPI startup attribute scope. The remaining compiler warning output in
-  that run was macOS OpenGL deprecation output from `tgl.h` included by
-  `crashhandler.cpp` and `mainwindow.cpp`.
+  high-DPI startup attribute scope. Apple builds now define
+  `GL_SILENCE_DEPRECATION` at the CMake compile-definition boundary, removing
+  known legacy OpenGL/GLUT deprecation-warning noise without changing the active
+  rendering path.
 - Direct checkbox state-change connects in `toonz`, `toonzqt`, shared headers,
   stop-motion, and Type tool options now route through
   `QtCompat::connectCheckStateChanged`. Qt 6.7+ uses
@@ -141,14 +142,29 @@ branch.
   `stateChanged` signal behind the helper. `mise run
   check-qt6-checkbox-state-scope` keeps direct `QCheckBox::stateChanged`
   connects out of feature code.
+- Legacy `QButtonGroup` integer button-signal connects now route through
+  `QtCompat::connectButtonGroupIdClicked()` and
+  `QtCompat::connectButtonGroupIdPressed()`. Both supported lanes use the non-deprecated `idClicked` /
+  `idPressed` signals behind the helpers. `mise run check-qt6-buttongroup-scope` keeps direct legacy
+  `buttonClicked(int)` / `buttonPressed(int)` connects out of feature code.
 - The active `QtOfflineGL` offscreen context path now uses `QSurfaceFormat`
   instead of an unused legacy `QGLFormat` setup block. `mise run
   check-qt6-qglformat-scope` keeps `QGLFormat` limited to the remaining Qt
-  5-only startup/PBuffer compatibility scope.
+  5-only startup/PBuffer compatibility scope and verifies active references
+  remain inside Qt 5-only preprocessor branches.
+- `mise run check-qt6-qgllegacy-scope` keeps `QGLContext` and
+  `QGLPixelBuffer` limited to the documented Qt 5-only OpenGL compatibility
+  scope, so active Qt 6 paths stay on `QOpenGLContext`, `QOffscreenSurface`,
+  and `QOpenGLFramebufferObject`.
 - `QWheelEvent` pixel-delta access is now centralized behind
   `QtCompat::wheelEventPixelDelta()` alongside the existing wheel position and
   angle-delta helpers. `mise run check-qt6-wheelevent-scope` keeps direct
   `QWheelEvent::pixelDelta()` calls out of feature code.
+- Schematic graphics-scene spin/aim handle drags now route screen-position
+  deltas through `QtCompat::graphicsSceneMouseEventScreenPosition()` and
+  `QtCompat::graphicsSceneMouseEventLastScreenPosition()`. `mise run
+  check-qt6-graphicssceneevent-scope` keeps direct `screenPos()` /
+  `lastScreenPos()` calls out of feature code.
 - The recent flipbook image loader no longer uses Qt 6-deprecated
   `QAction::parentWidget()` and now casts the action `parent()` instead.
   `mise run check-qt6-qaction-scope` guards that QAction parent-widget warning
@@ -253,22 +269,105 @@ branch.
 - `DvTextEdit` mini-toolbar font-size population and text-family formatting no
   longer use Qt 6-deprecated `QFontDatabase` instance construction or
   `QTextCharFormat::setFontFamily()`. The code now uses APIs available in both
-  Qt 5 and Qt 6.
+  Qt 5 and Qt 6. `mise run check-qt6-fontdatabase-scope` keeps those direct
+  deprecated font APIs out of feature code, and verifies that the documented
+  compatibility files only instantiate `QFontDatabase` inside Qt 5 fallback
+  branches.
 - Font parameter style lookup and preview font construction now route through
   `QtCompat` helpers. Qt 6 uses the static `QFontDatabase` APIs, while Qt 5
   keeps the instance-based API path.
+- The lower-level `TFontManager` path in `common/tvrender/tfont_qt.cpp` no
+  longer stores a heap `QFontDatabase` instance. Font family/style/private
+  family/bold/italic queries now go through local Qt-version-aware helpers so
+  the Qt 6 lane uses the static font database APIs while preserving the Qt 5
+  lane.
+- The `t32bitsrv` raster exchanger now makes its raw byte-copy intent explicit
+  when writing into non-trivial pixel wrapper storage, removing the
+  `-Wnontrivial-memcall` warning from the `tnzcore` frontier without changing
+  the byte-stream exchange behavior.
+- The raster codec header restore path and generic image-I/O pixel copy loop
+  now also make their raw byte-copy destination intent explicit with
+  `static_cast<void *>`, removing another pair of `-Wnontrivial-memcall`
+  warnings from the `tnzcore` / `image` frontier without changing the serialized
+  raster data layout or pixel-copy stride.
+- Function Panel group keyframe handles now have named enum values
+  (`GroupPoint`, `GroupSpeedOut`, and `GroupSpeedIn`) instead of casting and
+  comparing magic `100` / `101` / `102` values against `FunctionPanel::Handle`.
+  This removes the Qt 5/Qt 6 `-Wswitch` and tautological enum comparison warning
+  cluster while preserving the existing handle values and group-keyframe UI
+  behavior.
+- Palette/style RTTI comparisons now resolve smart pointers to raw
+  `TColorStyle` / `TPersist` pointers before calling `typeid`, removing the
+  side-effect operand warning from `TPalette::setStyle()`,
+  `TPersistSet::insert()`, and `SettingsPage::setStyle()` without changing
+  dynamic-style replacement behavior.
+- The 64-bit non-matte `TRop::ropmin()` path now uses the 64-bit raster loop
+  macros and `TPixel64` temporary storage instead of accidentally re-entering
+  the 32-bit loop. This removes the tautological 8-bit channel comparison
+  warning and keeps the 16-bit blend path on 16-bit pixel types.
+- The RGB blur column writer now selects its backlit crop constant at compile
+  time from the pixel channel size, so 8-bit builds no longer instantiate the
+  16-bit crop assignment that produced `-Wconstant-conversion` noise. The
+  existing 8-bit `204` and 16-bit `204 * 257` crop values are unchanged.
+- The legacy OpenToonz 4.6 raster release wrapper no longer compiles an
+  unsupported `delete` of `_RASTER::buffer`, which is stored as `void *`.
+  Buffer ownership remains with the modern smart raster objects; unsupported
+  buffer-release requests still trip the existing assertion.
+- The legacy `flt_w_1` resample filter value is now named as `TRop::W1 = 101`
+  instead of appearing as a raw numeric switch case. `TRop::HowMany` keeps its
+  previous count value, and the old filter function/radius mapping is
+  unchanged.
+- The 64-bit proxied QuickTime movie-settings path now brings the application
+  window back to the front through Qt `raise()` / `activateWindow()` instead
+  of deprecated Carbon `SetFrontProcess`, removing that macOS deprecation
+  warning without changing the 32-bit helper communication flow.
+- The remaining abstract-final warning cluster in `tnzcore` has been resolved
+  by restoring the Qt 5 `QtOfflineGLPBuffer` override for the shared-context
+  `createContext()` interface and by completing the
+  `TStrokeTwirlDeformation` control-point displacement overrides. This keeps
+  both classes concrete instead of relying on stale final annotations.
+- The `stdfx` / `tnztools` compile frontier now removes another warning slice:
+  Mosaic and Motion Blur raw pixel buffer operations use explicit `void *`
+  casts, Iwa seed ranges explicitly cross the `double` parameter boundary,
+  Flow Paint Brush handles its `NoSort` enum value, `ChangeColorFx` implements
+  the required `canHandle()` override, and raster-selection paste logic now
+  compares `TImage::Type` with `TImage::RASTER` instead of an xsheet level
+  enum.
+- The `toonzqt` / `tnztools` warning frontier now also makes
+  `ColumnToCurveMapper` safely deletable through its abstract base pointer,
+  marks vector/stroke selection undo history methods as overrides, and ensures
+  Style Picker property changes return a defined success value on every path.
+- The `stdfx` Fractal Noise warning frontier now spells out all `FractalType`
+  values in the conversion switch, including no-op base, dynamic,
+  dynamic-twist, and sentinel cases, so the compiler can verify enum coverage
+  without changing the existing conversion behavior.
+- The macOS `TSystem::moveFileToRecycleBin()` path no longer uses deprecated
+  Carbon `FSFindFolder` / `FSRefMakePath` trash-folder lookup. It resolves the
+  current user's `~/.Trash` through Qt and keeps the existing rename/copy/delete
+  fallback behavior.
 - Stop-motion and legacy Pencil Test sizing code now routes font text
   measurement through `QtCompat::fontMetricsHorizontalAdvance()`, so Qt 6 avoids
   deprecated `QFontMetrics::width()` while the Qt 5 lane keeps the compatible
   fallback.
 - Configure Shortcuts multi-key conflict checking no longer relies on the
   Qt 6-deprecated implicit `QKeyCombination` to `int` conversion. The Qt 6 lane
-  uses `QKeyCombination::toCombined()`, while the Qt 5 lane keeps the existing
-  integer key-sequence values.
+  now uses `QtCompat::keySequenceEntryToInt()`, which calls
+  `QKeyCombination::toCombined()` on Qt 6 while the Qt 5 lane keeps the
+  existing integer key-sequence values. `mise run
+  check-qt6-qkeysequence-scope` keeps direct `toCombined()` calls inside
+  `QtCompat`.
+- Audio Recording and Auto Lip Sync media preview source/state handling now use
+  `QtCompat::setMediaPlayerSource()` and `QtCompat::mediaPlayerState()`, so the
+  Qt 6 lane uses `QMediaPlayer::setSource()` / `playbackState()` in one shared
+  boundary while the Qt 5 lane keeps `setMedia()` / `state()`. `mise run
+  check-qt6-mediaplayer-scope` keeps those direct Qt 6 `QMediaPlayer` source
+  and state calls inside `QtCompat`.
 - Separate Colors color-string defaults and settings restoration no longer call
   Qt 6-deprecated `QColor::setNamedColor()`. Stored color strings now parse
   through `QColor(QString)`, which keeps the Qt 5 lane compatible and removes
-  the direct deprecated call from the current app/UI/header tree.
+  the direct deprecated call from the current app/UI/header tree. `mise run
+  check-qt6-qcolor-scope` keeps direct `QColor::setNamedColor()` calls out of
+  feature code.
 - Qt Script/QJSEngine color argument parsing and OutlineVectorizer transparent
   color assignment also use `QColor(QString)` instead of the deprecated
   `QColor::setNamedColor()` call.
@@ -276,12 +375,33 @@ branch.
   paths now uses `QtCompat` touch-point helpers. Qt 6 uses
   `QTouchEvent::points()` with `QEventPoint::position()` / `lastPosition()`,
   while Qt 5 keeps `touchPoints()` with `QTouchEvent::TouchPoint::pos()` /
-  `lastPos()`.
+  `lastPos()`. Touch device type checks also route through
+  `QtCompat::touchDeviceType()`, keeping the Qt 6 `QInputDevice` and Qt 5
+  `QTouchDevice` type boundary in one place. `mise run check-qt6-touch-scope`
+  keeps direct `QTouchEvent::touchPoints()` and `device()->type()` access
+  inside `QtCompat`.
+- Direct tablet-event `posF()` / `globalPos()` access and direct
+  `QTabletEvent` construction are guarded by
+  `mise run check-qt6-tabletevent-scope`, keeping those paths behind
+  `QtCompat::tabletEventPositionF()`,
+  `QtCompat::tabletEventGlobalPosition()`, and
+  `QtCompat::makeTabletEvent()`. The Windows pointer-input bridge now creates
+  synthetic tablet events through that helper; Qt 6 uses a synthetic
+  `QPointingDevice`, while Qt 5 keeps the existing `QTabletEvent` constructor
+  path. This is source-level guard coverage; real hardware pressure/tilt
+  validation remains manual.
+- Direct mouse/context/drop-event coordinate access is now guarded by
+  `mise run check-qt6-mouseevent-scope`, keeping stale `x()`, `y()`, `pos()`,
+  `globalPos()`, `globalX()`, and `globalY()` event accessors from
+  re-entering common handler code after the broad `QtCompat` coordinate-helper
+  migration. The guard also removed obsolete commented examples that still
+  showed direct `QMouseEvent::pos()` usage.
 - Deprecated `QVariant::canConvert(QVariant::...)` overloads have been removed
   from the current app/UI/header tree. Fixed-type settings restore paths use
   templated `canConvert<T>()` checks, and dynamic preference type checks route
   through a version-aware helper that uses `QMetaType` on Qt 6 while preserving
-  the Qt 5 `QMetaType::Type` path.
+  the Qt 5 `QMetaType::Type` path. `mise run check-qt6-qvariant-scope` keeps
+  non-template `canConvert(...)` calls inside that helper.
 - The Qt 6 startup path no longer sets the removed/deprecated high-DPI
   application attributes; Qt 6 uses its always-on high-DPI behavior, while the
   Qt 5 lane keeps the existing attributes. The translator startup path also
@@ -1671,9 +1791,11 @@ branch.
 - A Scene argument edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/scene_argument_edges.toonzscript` and is
   run by `mise run script-smoke-scene-argument-edges-qt6`. It validates
-  non-rendering Scene row/column argument rejection for insert/delete/get/set
-  cell APIs, backend negative row/column errors, bad frame-id rejection, and
-  legacy frame-id-before-level-argument error precedence
+  strict Scene constructor arity, non-rendering Scene method arity checks for
+  load/save, column insertion and deletion, cell access, level lookup/creation,
+  and load-level calls. It also validates row/column argument rejection for
+  insert/delete/get/set cell APIs, backend negative row/column errors, bad
+  frame-id rejection, and legacy frame-id-before-level-argument error precedence
   without entering scene icon, viewer, offscreen GL, or renderer paths.
 - A Scene lifecycle edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/scene_lifecycle_edges.toonzscript` and is
@@ -1732,14 +1854,15 @@ branch.
   by `mise run script-smoke-image-builder-edges-qt6`. It validates constructor
   argument-count/type/size errors, bad image type rejection, invalid fill color,
   empty-image add errors, non-`Transform` add argument rejection, ToonzRaster
-  fill rejection, image type mismatch errors, and disposed builder rejection
-  for `toString()`, `image`, `clear()`, `fill()`, and `add()`.
+  fill rejection, image type mismatch errors, strict ImageBuilder method arity
+  for `clear()`, `fill()`, and `add()`, and disposed builder rejection for
+  `toString()`, `image`, `clear()`, `fill()`, and `add()`.
 - A Transform edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/transform_edges.toonzscript` and is run by
   `mise run script-smoke-transform-edges-qt6`. It validates finite-number
-  argument rejection for `translate()`, `rotate()`, and `scale()`, plus
-  disposed `toString()`, `translate()`, `rotate()`, and `scale()` rejection
-  without entering rendering paths.
+  argument rejection for `translate()`, `rotate()`, and `scale()`, strict
+  constructor arity, plus disposed `toString()`, `translate()`, `rotate()`,
+  and `scale()` rejection without entering rendering paths.
 - A tenth Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/toonz_raster_converter.toonzscript` and is
   run by `mise run script-smoke-toonz-raster-converter-qt6`. It validates the
@@ -1759,7 +1882,8 @@ branch.
   `mise run script-smoke-toonz-raster-converter-edges-qt6`. It validates
   legacy-style `ToonzRasterConverter.convert()` argument and type rejection for
   missing/extra arguments, non-image/non-level values, ToonzRaster and Vector
-  images, empty Raster levels, and Vector levels.
+  images, empty Raster levels, and Vector levels, plus strict
+  `ToonzRasterConverter` constructor arity and strict `foo()` helper arity.
 - A converter lifecycle edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/toonz_raster_converter_lifecycle_edges.toonzscript`
   and is run by
@@ -1786,8 +1910,10 @@ branch.
   `toonz/sources/tests/scriptengine/vectorizer_edges.toonzscript` and is run by
   `mise run script-smoke-vectorizer-edges-qt6`. It validates legacy-style
   `OutlineVectorizer.vectorize()` and `CenterlineVectorizer.vectorize()`
-  argument and type rejection for non-image/non-level values, Vector images,
-  empty Raster levels, and Vector levels without entering renderer paths.
+  argument and type rejection for missing/extra arguments, non-image/non-level
+  values, Vector images, empty Raster levels, and Vector levels, plus strict
+  `OutlineVectorizer`/`CenterlineVectorizer` constructor arity, without
+  entering renderer paths.
 - A non-rendering binding lifecycle/property edge Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/binding_lifecycle_edges.toonzscript` and is
   run by `mise run script-smoke-binding-lifecycle-edges-qt6`. It validates
@@ -1796,8 +1922,8 @@ branch.
   invalid `OutlineVectorizer.transparentColor` rejection, and
   disposed-object method/property rejection for `OutlineVectorizer`,
   `CenterlineVectorizer`, `Rasterizer`, and `ToonzRasterConverter`, including
-  disposed `vectorize()`, `rasterize()`, and converter instance `convert()`
-  calls.
+  disposed `vectorize()`, `rasterize()`, converter instance `convert()`, and
+  converter `foo()` calls.
 - A thirteenth Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/rasterizer.toonzscript` and is run by
   `mise run script-smoke-rasterizer-qt6`. It validates the Rasterizer binding
@@ -1810,9 +1936,11 @@ branch.
 - A Rasterizer edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/rasterizer_edges.toonzscript` and is run by
   `mise run script-smoke-rasterizer-edges-qt6`. It validates legacy-style
-  `Rasterizer.rasterize()` argument and type rejection for non-image/non-level
-  values, Raster/ToonzRaster images, Raster/Empty levels, and bad full-color
-  resolution/DPI rejection while keeping the color-mapped path green.
+  `Rasterizer.rasterize()` argument and type rejection for missing/extra
+  arguments, non-image/non-level values, Raster/ToonzRaster images,
+  Raster/Empty levels, strict `Rasterizer` constructor arity, and bad
+  full-color resolution/DPI rejection while keeping the color-mapped path
+  green.
 - A Qt 6 Renderer fixture exists at
   `toonz/sources/tests/scriptengine/renderer_basic.toonzscript` and is run by
   `mise run script-smoke-renderer-qt6`. It validates `Renderer` construction,
@@ -1840,11 +1968,12 @@ branch.
 - A Renderer edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/renderer_edges.toonzscript` and is run by
   `mise run script-smoke-renderer-edges-qt6`. It validates that
-  `renderScene()` and `renderFrame()` reject missing/non-`Scene`/disposed scene
-  arguments, bad frame values, and invalid `Renderer.frames` /
-  `Renderer.columns` list values before reaching the Qt 6 renderer path, while
-  preserving the legacy behavior that non-array `frames` / `columns` properties
-  are treated as empty selection lists.
+  `Renderer` rejects constructor arguments and that `renderScene()` and
+  `renderFrame()` reject missing/extra/non-`Scene`/disposed scene arguments,
+  bad frame values, extra `dumpCache()` arguments, and invalid
+  `Renderer.frames` / `Renderer.columns` list values before reaching the Qt 6
+  renderer path, while preserving the legacy behavior that non-array `frames`
+  / `columns` properties are treated as empty selection lists.
 - A Renderer lifecycle edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/renderer_lifecycle_edges.toonzscript` and
   is run by `mise run script-smoke-renderer-lifecycle-edges-qt6`. It validates
@@ -1884,8 +2013,8 @@ branch.
   `toonz/sources/tests/scriptengine/file_path_edges.toonzscript` and is run by
   `mise run script-smoke-filepath-edges-qt6`. It validates FilePath edge-case
   parity for relative concatenation, absolute-path concat rejection,
-  non-directory `files()` errors, and directory listing through the Qt 6
-  facade.
+  non-directory `files()` errors, strict constructor and method arity for path
+  mutation/listing helpers, and directory listing through the Qt 6 facade.
 - A FilePath metadata Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/file_path_metadata.toonzscript` and is run
   by `mise run script-smoke-filepath-metadata-qt6`. It validates
@@ -1895,8 +2024,9 @@ branch.
   `toonz/sources/tests/scriptengine/path_arguments.toonzscript` and is run by
   `mise run script-smoke-path-arguments-qt6`. It validates legacy-style
   string/FilePath argument checking for `run()`, FilePath parent/concat
-  helpers, Image/Level/Scene path methods, and constructor edge behavior that
-  should not silently coerce arbitrary values through `String()`.
+  helpers, Image/Level/Scene path methods, and strict `FilePath`/`Level`/
+  `Scene` constructor edge behavior that should not silently ignore extra
+  arguments or coerce arbitrary values through `String()`.
 - An eighteenth Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/level_io_types.toonzscript` and is run by
   `mise run script-smoke-level-io-types-qt6`. It validates standalone
@@ -1947,13 +2077,15 @@ branch.
   empty-level name setter no-op parity, empty-level path `undefined` parity,
   legacy non-image `setFrame()` rejection, legacy frame-id-before-image error
   precedence, level/image type mismatch rejection, incompatible save rejection,
-  and missing-level load errors.
+  missing-level load errors, and strict Level method arity for constructor,
+  frame access, frame assignment, load, and save calls.
 - An Image edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/image_edges.toonzscript` and is run by
   `mise run script-smoke-image-edges-qt6`. It validates empty image metadata
   and save errors, constructor argument-count errors, non-path argument
   rejection, missing-image load errors that clear the image handle, incompatible
-  raster/ToonzRaster save rejection, and unrecognized output type errors.
+  raster/ToonzRaster save rejection, unrecognized output type errors, and
+  strict Image method arity for load and save calls.
 - An Image lifecycle edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/image_lifecycle_edges.toonzscript` and is
   run by `mise run script-smoke-image-lifecycle-edges-qt6`. It validates that
@@ -2292,14 +2424,23 @@ mise run check-core5compat-scope
 mise run check-qt6-multimedia-scope
 mise run check-qt6-script-scope
 mise run check-qt6-fontmetrics-scope
+mise run check-qt6-fontdatabase-scope
 mise run check-qt6-highdpi-attribute-scope
+mise run check-qt6-touch-scope
+mise run check-qt6-qvariant-scope
+mise run check-qt6-qkeysequence-scope
+mise run check-qt6-mediaplayer-scope
 mise run check-qt6-desktopwidget-scope
 mise run check-qt6-combobox-activated-scope
 mise run check-qt6-checkbox-state-scope
+mise run check-qt6-buttongroup-scope
 mise run check-qt6-wheelevent-scope
+mise run check-qt6-graphicssceneevent-scope
 mise run check-qt6-qaction-scope
+mise run check-qt6-qcolor-scope
 mise run check-qt6-qimage-mirrored-scope
 mise run check-qt6-qglformat-scope
+mise run check-qt6-qgllegacy-scope
 mise run gui-smokes-app-qt6
 mise run gui-smoke-qt6
 mise run gui-smoke-scene-create-qt6

@@ -75,6 +75,81 @@ Already covered:
 - Direct deprecated `QFontMetrics::width()` usage is isolated behind
   `QtCompat::fontMetricsHorizontalAdvance()` and guarded by
   `mise run check-qt6-fontmetrics-scope`.
+- Direct deprecated `QFontDatabase` instance construction and
+  `QTextCharFormat::setFontFamily()` usage are guarded by
+  `mise run check-qt6-fontdatabase-scope`; use `QtCompat` font database and
+  text-format helpers for those paths. The guard also verifies that the
+  documented compatibility files only instantiate `QFontDatabase` inside Qt 5
+  fallback branches.
+- The lower-level `TFontManager` font family/style/private family/bold/italic
+  queries no longer store a heap `QFontDatabase` instance. They use local
+  Qt-version-aware helpers in `common/tvrender/tfont_qt.cpp` so this render
+  layer avoids a `toonzqt` dependency while the Qt 6 lane uses static font
+  database APIs.
+- The `t32bitsrv` raster exchanger now makes its raw byte-copy intent explicit
+  when writing into non-trivial pixel wrapper storage, removing the
+  `-Wnontrivial-memcall` warning from the `tnzcore` frontier without changing
+  the byte-stream exchange behavior.
+- The raster codec header restore path and generic image-I/O pixel copy loop
+  now also make their raw byte-copy destination intent explicit with
+  `static_cast<void *>`, removing another pair of `-Wnontrivial-memcall`
+  warnings from the `tnzcore` / `image` frontier without changing the serialized
+  raster data layout or pixel-copy stride.
+- Function Panel group keyframe handles now have named enum values
+  (`GroupPoint`, `GroupSpeedOut`, and `GroupSpeedIn`) instead of casting and
+  comparing magic `100` / `101` / `102` values against `FunctionPanel::Handle`.
+  This removes the Qt 5/Qt 6 `-Wswitch` and tautological enum comparison warning
+  cluster while preserving the existing handle values and group-keyframe UI
+  behavior.
+- Palette/style RTTI comparisons now resolve smart pointers to raw
+  `TColorStyle` / `TPersist` pointers before calling `typeid`, removing the
+  side-effect operand warning from `TPalette::setStyle()`,
+  `TPersistSet::insert()`, and `SettingsPage::setStyle()` without changing
+  dynamic-style replacement behavior.
+- The 64-bit non-matte `TRop::ropmin()` path now uses the 64-bit raster loop
+  macros and `TPixel64` temporary storage instead of accidentally re-entering
+  the 32-bit loop. This removes the tautological 8-bit channel comparison
+  warning and keeps the 16-bit blend path on 16-bit pixel types.
+- The RGB blur column writer now selects its backlit crop constant at compile
+  time from the pixel channel size, so 8-bit builds no longer instantiate the
+  16-bit crop assignment that produced `-Wconstant-conversion` noise. The
+  existing 8-bit `204` and 16-bit `204 * 257` crop values are unchanged.
+- The legacy OpenToonz 4.6 raster release wrapper no longer compiles an
+  unsupported `delete` of `_RASTER::buffer`, which is stored as `void *`.
+  Buffer ownership remains with the modern smart raster objects; unsupported
+  buffer-release requests still trip the existing assertion.
+- The legacy `flt_w_1` resample filter value is now named as `TRop::W1 = 101`
+  instead of appearing as a raw numeric switch case. `TRop::HowMany` keeps its
+  previous count value, and the old filter function/radius mapping is
+  unchanged.
+- The 64-bit proxied QuickTime movie-settings path now brings the application
+  window back to the front through Qt `raise()` / `activateWindow()` instead
+  of deprecated Carbon `SetFrontProcess`, removing that macOS deprecation
+  warning without changing the 32-bit helper communication flow.
+- The remaining abstract-final warning cluster in `tnzcore` has been resolved
+  by restoring the Qt 5 `QtOfflineGLPBuffer` override for the shared-context
+  `createContext()` interface and by completing the
+  `TStrokeTwirlDeformation` control-point displacement overrides. This keeps
+  both classes concrete instead of relying on stale final annotations.
+- The `stdfx` / `tnztools` compile frontier now removes another warning slice:
+  Mosaic and Motion Blur raw pixel buffer operations use explicit `void *`
+  casts, Iwa seed ranges explicitly cross the `double` parameter boundary,
+  Flow Paint Brush handles its `NoSort` enum value, `ChangeColorFx` implements
+  the required `canHandle()` override, and raster-selection paste logic now
+  compares `TImage::Type` with `TImage::RASTER` instead of an xsheet level
+  enum.
+- The `toonzqt` / `tnztools` warning frontier now also makes
+  `ColumnToCurveMapper` safely deletable through its abstract base pointer,
+  marks vector/stroke selection undo history methods as overrides, and ensures
+  Style Picker property changes return a defined success value on every path.
+- The `stdfx` Fractal Noise warning frontier now spells out all `FractalType`
+  values in the conversion switch, including no-op base, dynamic,
+  dynamic-twist, and sentinel cases, so the compiler can verify enum coverage
+  without changing the existing conversion behavior.
+- The macOS `TSystem::moveFileToRecycleBin()` path now resolves the user's
+  `~/.Trash` with Qt instead of deprecated Carbon `FSFindFolder` /
+  `FSRefMakePath` calls, while preserving the existing rename/copy/delete
+  fallback behavior.
 - Direct removed desktop-widget APIs are absent from `toonz/sources` and
   guarded by `mise run check-qt6-desktopwidget-scope`. Keep
   `QDesktopWidget`, `QApplication::desktop()`, `qApp->desktop()`, and direct
@@ -93,17 +168,49 @@ Already covered:
   and a Qt 5 `stateChanged` fallback. `mise run
   check-qt6-checkbox-state-scope` keeps direct `QCheckBox::stateChanged`
   connects out of feature code.
+- Legacy `QButtonGroup` integer button-signal connects now use
+  `QtCompat::connectButtonGroupIdClicked()` and
+  `QtCompat::connectButtonGroupIdPressed()`. Both supported lanes use the non-deprecated `idClicked` /
+  `idPressed` signals inside the helpers.
+  `mise run check-qt6-buttongroup-scope` keeps direct legacy
+  `buttonClicked(int)` / `buttonPressed(int)` connects out of feature code.
+- Direct tablet-event `posF()` / `globalPos()` access and direct
+  `QTabletEvent` construction are guarded by
+  `mise run check-qt6-tabletevent-scope`, keeping those paths behind
+  `QtCompat::tabletEventPositionF()`,
+  `QtCompat::tabletEventGlobalPosition()`, and
+  `QtCompat::makeTabletEvent()`. The Windows pointer-input bridge now uses
+  the helper to preserve the existing synthetic pen/eraser, pressure, tilt,
+  rotation, and button fields across the Qt 5 and Qt 6 constructor split. This
+  does not replace manual hardware-tablet pressure and tilt validation.
 - The active `QtOfflineGL` offscreen context path now uses `QSurfaceFormat`
   for shared Qt 5/Qt 6 format setup instead of an unused legacy `QGLFormat`
   block. `mise run check-qt6-qglformat-scope` keeps `QGLFormat` limited to the
-  remaining Qt 5-only startup/PBuffer compatibility scope.
+  remaining Qt 5-only startup/PBuffer compatibility scope and verifies active
+  references remain inside Qt 5-only preprocessor branches.
+- `mise run check-qt6-qgllegacy-scope` keeps `QGLContext` and
+  `QGLPixelBuffer` limited to the documented Qt 5-only OpenGL compatibility
+  files and verifies active references remain inside Qt 5-only preprocessor
+  branches.
 - `QWheelEvent` pixel-delta access is centralized behind
   `QtCompat::wheelEventPixelDelta()` in current wheel handlers. `mise run
   check-qt6-wheelevent-scope` keeps direct `QWheelEvent::pixelDelta()` calls
   out of feature code.
+- Schematic graphics-scene spin/aim handle drag deltas now use
+  `QtCompat::graphicsSceneMouseEventScreenPosition()` and
+  `QtCompat::graphicsSceneMouseEventLastScreenPosition()` instead of direct
+  `screenPos()` / `lastScreenPos()` calls. `mise run
+  check-qt6-graphicssceneevent-scope` guards that boundary.
+- Common direct mouse/context/drop-event coordinate access is now guarded by
+  `mise run check-qt6-mouseevent-scope`, keeping direct `x()`, `y()`, `pos()`,
+  `globalPos()`, `globalX()`, and `globalY()` event accessors out of handler
+  code after the `QtCompat` coordinate-helper migration.
 - The recent flipbook image loader now avoids Qt 6-deprecated
   `QAction::parentWidget()` by casting `QAction::parent()`. `mise run
   check-qt6-qaction-scope` guards that QAction warning slice.
+- Direct `QColor::setNamedColor()` usage is removed from feature code and
+  guarded by `mise run check-qt6-qcolor-scope`; use `QColor(QString)` or a
+  local color parsing helper for string color parsing.
 - Direct feature-code `QImage::mirrored()` usage is centralized behind
   `QtCompat::mirroredImage()`. Qt 6 uses `QImage::flipped()` with explicit
   orientations, while Qt 5 keeps the existing `mirrored()` path inside the
@@ -261,29 +368,54 @@ Already covered:
   instance construction and `QTextCharFormat::setFontFamily()`.
 - Font parameter style lookup and preview font construction now use `QtCompat`
   helpers so Qt 6 can use the static `QFontDatabase` APIs while Qt 5 keeps the
-  instance-based path.
+  instance-based path. `mise run check-qt6-fontdatabase-scope` keeps direct
+  deprecated font APIs out of feature code.
+- The lower-level `TFontManager` path in `common/tvrender/tfont_qt.cpp` now
+  uses local Qt-version-aware font database helpers for family/style/private
+  family/bold/italic queries, preserving the Qt 5 behavior without storing a
+  deprecated heap `QFontDatabase` instance in Qt 6.
+- `t32bitsrv` raster exchange now casts the raw destination pixel pointer to
+  `void *` for its intentional byte-copy path, removing the
+  `-Wnontrivial-memcall` warning seen during `tnzcore` rebuilds.
+- macOS recycle-bin handling now uses Qt to resolve `~/.Trash` instead of
+  deprecated Carbon `FSFindFolder` / `FSRefMakePath` lookup, keeping the
+  existing rename/copy/delete fallback path.
 - Stop-motion camera-option sizing and legacy Pencil Test camera-label sizing
   now use `QtCompat::fontMetricsHorizontalAdvance()`, removing direct
   `QFontMetrics::width()` calls from that slice while preserving Qt 5 behavior.
 - Configure Shortcuts multi-key conflict checking now uses
-  `QKeyCombination::toCombined()` on Qt 6 instead of the deprecated implicit
-  `QKeyCombination` to `int` conversion, with the existing integer key-sequence
-  path preserved on Qt 5.
+  `QtCompat::keySequenceEntryToInt()` instead of open-coded Qt-version checks.
+  Qt 6 uses `QKeyCombination::toCombined()` inside `QtCompat`, and Qt 5 keeps
+  the existing integer key-sequence path. `mise run
+  check-qt6-qkeysequence-scope` keeps direct `toCombined()` calls inside
+  `QtCompat`.
+- Audio Recording and Auto Lip Sync media preview source/state handling now use
+  `QtCompat::setMediaPlayerSource()` and `QtCompat::mediaPlayerState()`, so Qt 6
+  keeps `QMediaPlayer::setSource()` / `playbackState()` inside the shared
+  helper while Qt 5 keeps `setMedia()` / `state()`. `mise run
+  check-qt6-mediaplayer-scope` guards that boundary.
 - Separate Colors color-string defaults and settings restoration parse stored
   strings through `QColor(QString)` instead of calling Qt 6-deprecated
-  `QColor::setNamedColor()`.
+  `QColor::setNamedColor()`. `mise run check-qt6-qcolor-scope` keeps direct
+  deprecated calls out of `toonz/sources`.
 - Qt Script/QJSEngine color argument parsing and OutlineVectorizer transparent
   color assignment also use `QColor(QString)` instead of
   `QColor::setNamedColor()`.
 - Viewer touch gesture paths are centralized behind `QtCompat` helpers so the
   Qt 6 lane uses `QTouchEvent::points()` and `QEventPoint` positions while the
   Qt 5 lane keeps the existing `touchPoints()` / `QTouchEvent::TouchPoint`
-  behavior.
+  behavior. Touch device type checks also route through
+  `QtCompat::touchDeviceType()`, keeping the Qt 6 `QInputDevice` and Qt 5
+  `QTouchDevice` type boundary in one place. `mise run check-qt6-touch-scope`
+  keeps direct `QTouchEvent::touchPoints()` and `device()->type()` access
+  inside `QtCompat`.
 - Deprecated `QVariant::canConvert(QVariant::...)` overloads are no longer
   present in the current app/UI/header tree. Fixed-type settings restore paths
   use templated `canConvert<T>()` checks, and dynamic preference type checks
   route through a version-aware helper that uses `QMetaType` on Qt 6 while
-  preserving the Qt 5 `QMetaType::Type` path.
+  preserving the Qt 5 `QMetaType::Type` path. `mise run
+  check-qt6-qvariant-scope` keeps non-template `canConvert(...)` calls inside
+  that helper.
 - `mise run check-qt6-highdpi-attribute-scope` now guards that the Qt 5-only
   high-DPI startup attributes `AA_EnableHighDpiScaling` and
   `AA_UseHighDpiPixmaps` stay inside
@@ -310,8 +442,10 @@ Still needed:
   Latest local Qt 6 build evidence: `mise run build-qt6` passed on June 5,
   2026, with the expanded local preflight chain enabled: Windows MSVC ABI,
   QRegExp, Core5Compat scope, multimedia scope, script scope, font metrics
-  scope, and high-DPI startup attribute scope. The remaining compiler warnings
-  in that run were macOS OpenGL deprecation warnings from `tgl.h`.
+  scope, and high-DPI startup attribute scope. Apple builds now define
+  `GL_SILENCE_DEPRECATION` at the CMake compile-definition boundary, so known
+  legacy OpenGL/GLUT deprecation-warning noise should no longer obscure newer
+  Qt 6 build diagnostics.
   Latest targeted app-target rebuild evidence after the combo-box activation,
   QImage mirrored/flipped, checkbox state-change, QWheelEvent pixel-delta, and
   QGLFormat scope slices: on June 5, 2026,
@@ -363,39 +497,58 @@ Already covered:
   including the QApplication-backed Rasterizer and Renderer fixtures.
 - The Image smoke coverage now includes post-dispose rejection for metadata
   access, string conversion, `load()`, and `save()`, in addition to load/save,
-  first-frame sequence loading, and incompatible save error coverage.
+  first-frame sequence loading, incompatible save error coverage, and strict
+  Image method arity for load and save calls.
 - The FilePath smoke coverage now includes mutable property setters,
   `withParentDirectory()` parent conversion, `exists`, `isDirectory`, and
   `lastModified` JS `Date` exposure, plus `valueOf()`, `String(filePath)`,
-  copy construction, and JavaScript string concatenation.
+  copy construction, JavaScript string concatenation, strict constructor arity,
+  and strict method arity for path mutation/listing helpers.
+- The path-argument smoke coverage now also verifies strict
+  `FilePath`/`Level`/`Scene` constructor arity alongside string/FilePath
+  argument rejection for `run()`, path helpers, and Image/Level/Scene path
+  methods.
 - The Scene smoke coverage now includes `Scene.getLevels()` wrapper identity
   and lifetime behavior, including disposal of returned wrappers without
   deleting scene-owned levels and the current empty-wrapper behavior for stale
   scene-owned level wrappers after `Scene.dispose()`. It also covers null and
-  malformed cell-object rejection in `Scene.setCell()`, plus legacy
-  frame-id-before-level-argument error precedence.
+  malformed cell-object rejection in `Scene.setCell()`, strict Scene
+  constructor arity, strict method arity for non-rendering Scene load/save,
+  cell, level, and load-level APIs, plus legacy frame-id-before-level-argument
+  error precedence.
 - The Level smoke coverage now includes `Level.path` bad setter rejection, the
   current failed path reload behavior for missing target paths, and
   post-dispose rejection across the Level public surface. It also covers the
   legacy non-image `Level.setFrame()` error path and frame-id-before-image
-  error precedence.
+  error precedence, plus strict Level method arity for constructor, frame
+  access, frame assignment, load, and save calls.
 - The ToonzRasterConverter smoke coverage now includes legacy bool coercion for
   `flatSource`, instance `dispose()` behavior, post-dispose `flatSource`
-  persistence, and static conversion after instance disposal.
+  persistence, static conversion after instance disposal, strict constructor
+  arity, strict `foo()` helper arity, and post-dispose rejection for instance
+  `convert()` and `foo()` calls.
 - The vectorizer/rasterizer lifecycle smoke coverage now includes disposed
   `vectorize()` and `rasterize()` rejection, not only property and `toString()`
   rejection, and covers legacy bool coercion for representative
   OutlineVectorizer, CenterlineVectorizer, and Rasterizer properties.
-- The Renderer smoke coverage now includes post-dispose error behavior for
-  `toString()`, `renderScene()`, `renderFrame()`, and `dumpCache()`, plus
-  legacy non-array `frames` / `columns` handling.
+- The Renderer smoke coverage now includes strict constructor arity,
+  `renderScene()` / `renderFrame()` argument arity checks, strict
+  `dumpCache()` arity, post-dispose error behavior for `toString()`,
+  `renderScene()`, `renderFrame()`, and `dumpCache()`, plus legacy non-array
+  `frames` / `columns` handling.
 - The ImageBuilder smoke covers legacy `ImageBuilder.clear()` returning
-  `undefined`, clear/fill behavior, and post-dispose rejection for
-  `toString()`, `image`, `clear()`, `fill()`, and `add()`. It also confirms
-  that the Qt 6 color path accepts the legacy `transparent` color name.
+  `undefined`, clear/fill behavior, strict Transform constructor arity, strict
+  ImageBuilder method arity for `clear()`, `fill()`, and `add()`, and
+  post-dispose rejection for `toString()`, `image`, `clear()`, `fill()`, and
+  `add()`. It also confirms that the Qt 6 color path accepts the legacy
+  `transparent` color name.
 - The OutlineVectorizer smoke now covers `transparentColor = "transparent"`
   round-tripping and invalid transparent-color rejection with the legacy
-  Qt Script-style color error.
+  Qt Script-style color error. The vectorizer edge smoke also covers strict
+  `OutlineVectorizer`/`CenterlineVectorizer` constructor arity and strict
+  `vectorize()` method arity for missing/extra arguments.
+- The Rasterizer edge smoke covers strict `Rasterizer` constructor arity and
+  strict `rasterize()` method arity for missing/extra arguments.
 - The Transform smoke covers post-dispose rejection for `toString()`,
   `translate()`, `rotate()`, and `scale()`, plus finite-number argument
   validation.
@@ -701,14 +854,23 @@ mise run check-core5compat-scope
 mise run check-qt6-multimedia-scope
 mise run check-qt6-script-scope
 mise run check-qt6-fontmetrics-scope
+mise run check-qt6-fontdatabase-scope
 mise run check-qt6-highdpi-attribute-scope
+mise run check-qt6-touch-scope
+mise run check-qt6-qvariant-scope
+mise run check-qt6-qkeysequence-scope
+mise run check-qt6-mediaplayer-scope
 mise run check-qt6-desktopwidget-scope
 mise run check-qt6-combobox-activated-scope
 mise run check-qt6-checkbox-state-scope
+mise run check-qt6-buttongroup-scope
 mise run check-qt6-wheelevent-scope
+mise run check-qt6-graphicssceneevent-scope
 mise run check-qt6-qaction-scope
+mise run check-qt6-qcolor-scope
 mise run check-qt6-qimage-mirrored-scope
 mise run check-qt6-qglformat-scope
+mise run check-qt6-qgllegacy-scope
 mise run check-textcodec
 mise run check-textcodec-qt6
 git diff --check

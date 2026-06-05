@@ -1003,14 +1003,6 @@ void FunctionSheetCellViewer::mouseReleaseEvent(QMouseEvent *e) {
     m_lineEdit->setMouseDragEditing(false);
   } else
     Spreadsheet::CellPanel::mouseReleaseEvent(e);
-  /*
-  CellPosition cellPosition = getViewer ()->xyToPosition (e->pos ());
-int row = cellPosition.frame ();
-int col = cellPosition.layer ();
-FunctionSheet::DragTool *dragTool = m_sheet->getDragTool();
-if(dragTool) dragTool->release(row,col);
-m_sheet->setDragTool(0);
-*/
 }
 
 //-----------------------------------------------------------------------------

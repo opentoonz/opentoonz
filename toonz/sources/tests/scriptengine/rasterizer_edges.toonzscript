@@ -27,6 +27,12 @@ print("qt-script-rasterizer-edges-success", badFullColorGeometryError,
       rasterized.type, rasterized.width, rasterized.height);
 
 var errors = [
+  hasError(function() { new Rasterizer(0); },
+           "Rasterizer constructor expected no arguments"),
+  hasError(function() { rasterizer.rasterize(); },
+           "Rasterizer.rasterize expected one argument"),
+  hasError(function() { rasterizer.rasterize(vector, vector); },
+           "Rasterizer.rasterize expected one argument"),
   hasError(function() { rasterizer.rasterize(42); },
            "Argument must be a vector level or image"),
   hasError(function() { rasterizer.rasterize(source); },

@@ -2426,7 +2426,8 @@ RadioButton_enum::RadioButton_enum(QWidget *parent, QString name,
     m_layout->addWidget(button);
   }
 
-  connect(value_, SIGNAL(buttonClicked(int)), this, SLOT(update_value(int)));
+  QtCompat::connectButtonGroupIdClicked(value_, this,
+                                        &RadioButton_enum::update_value);
 
   setLayout(m_layout);
 }

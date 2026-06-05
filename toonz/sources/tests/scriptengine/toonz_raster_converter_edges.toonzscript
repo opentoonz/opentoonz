@@ -22,6 +22,12 @@ var emptyRasterLevel = scene.newLevel("Raster", "qt6_converter_empty_raster");
 var vectorLevel = scene.newLevel("Vector", "qt6_converter_vector");
 
 var errors = [
+  hasError(function() { new ToonzRasterConverter(0); },
+           "ToonzRasterConverter constructor expected no arguments"),
+  hasError(function() { converter.foo(); },
+           "ToonzRasterConverter.foo expected one argument"),
+  hasError(function() { converter.foo(1, 2); },
+           "ToonzRasterConverter.foo expected one argument"),
   hasError(function() { ToonzRasterConverter.convert(); },
            "Expected one argument"),
   hasError(function() { converter.convert(source, source); },

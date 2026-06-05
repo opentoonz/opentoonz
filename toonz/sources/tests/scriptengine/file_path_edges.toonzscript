@@ -18,7 +18,40 @@ try {
   filesError = String(e.message).indexOf("is not a directory") >= 0;
 }
 
-print("qt-script-filepath-edges-errors", concatError, filesError);
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var arityErrors = [
+  hasError(function() { new FilePath("alpha", "extra"); },
+           "FilePath constructor expected zero or one path argument"),
+  hasError(function() { base.withExtension(); },
+           "FilePath.withExtension expected one extension argument"),
+  hasError(function() { base.withExtension("png", "extra"); },
+           "FilePath.withExtension expected one extension argument"),
+  hasError(function() { base.withName(); },
+           "FilePath.withName expected one name argument"),
+  hasError(function() { base.withName("renamed", "extra"); },
+           "FilePath.withName expected one name argument"),
+  hasError(function() { base.withParentDirectory(); },
+           "FilePath.withParentDirectory expected one parent-directory argument"),
+  hasError(function() { base.withParentDirectory("gamma", "extra"); },
+           "FilePath.withParentDirectory expected one parent-directory argument"),
+  hasError(function() { base.concat(); },
+           "FilePath.concat expected one path argument"),
+  hasError(function() { base.concat("child.txt", "extra"); },
+           "FilePath.concat expected one path argument"),
+  hasError(function() { base.files("extra"); },
+           "FilePath.files expected no arguments")
+];
+
+print("qt-script-filepath-edges-errors", concatError, filesError,
+      arityErrors);
 
 var resources = new FilePath("toonz/sources/tnztools/Resources");
 var files = resources.files();

@@ -50,6 +50,8 @@
 
 #include "kis_tablet_support_win8.h"
 
+#include "toonzqt/qtcompat.h"
+
 #include <QApplication>
 #include <QDebug>
 #include <QHash>
@@ -505,14 +507,14 @@ bool registerOrUpdateDevice(HANDLE deviceHandle) {
 QTabletEvent makeProximityTabletEvent(const QEvent::Type eventType,
                                       const POINTER_PEN_INFO &penInfo) {
   PenFlagsWrapper penFlags = PenFlagsWrapper::fromPenInfo(penInfo);
-  QTabletEvent::PointerType pointerType =
-      penFlags.isInverted() ? QTabletEvent::Eraser : QTabletEvent::Pen;
+  QtCompat::TabletPointerType pointerType =
+      penFlags.isInverted() ? QtCompat::TabletEraser : QtCompat::TabletPen;
   const QPointF emptyPoint;
-  return QTabletEvent(
+  return QtCompat::makeTabletEvent(
       eventType,             // type
       emptyPoint,            // pos
       emptyPoint,            // globalPos
-      QTabletEvent::Stylus,  // device
+      QtCompat::TabletStylus,  // device
       pointerType,           // pointerType
       0,                     // pressure
       0,                     // xTilt
@@ -575,8 +577,8 @@ QTabletEvent makePositionalTabletEvent(const QWidget *targetWidget,
   const QPointF delta     = globalPosF - globalPos;
   const QPointF localPosF = localPos + delta;
 
-  const QTabletEvent::PointerType pointerType =
-      penFlags.isInverted() ? QTabletEvent::Eraser : QTabletEvent::Pen;
+  const QtCompat::TabletPointerType pointerType =
+      penFlags.isInverted() ? QtCompat::TabletEraser : QtCompat::TabletPen;
 
   Qt::MouseButton mouseButton;
   if (eventType == QEvent::TabletPress) {
@@ -643,11 +645,11 @@ QTabletEvent makePositionalTabletEvent(const QWidget *targetWidget,
     }
   }
 
-  return QTabletEvent(
+  return QtCompat::makeTabletEvent(
       eventType,             // type
       localPosF,             // pos
       globalPosF,            // globalPos
-      QTabletEvent::Stylus,  // device
+      QtCompat::TabletStylus,  // device
       pointerType,           // pointerType
       penMask.pressureValid() ? static_cast<qreal>(penInfo.pressure) / 1024
                               : 0,             // pressure

@@ -21,6 +21,18 @@ var emptyRasterLevel = scene.newLevel("Raster", "qt6_vectorizer_empty_raster");
 var vectorLevel = scene.newLevel("Vector", "qt6_vectorizer_vector");
 
 var errors = [
+  hasError(function() { new OutlineVectorizer(0); },
+           "OutlineVectorizer constructor expected no arguments"),
+  hasError(function() { new CenterlineVectorizer(0); },
+           "CenterlineVectorizer constructor expected no arguments"),
+  hasError(function() { outline.vectorize(); },
+           "OutlineVectorizer.vectorize expected one argument"),
+  hasError(function() { outline.vectorize(source, source); },
+           "OutlineVectorizer.vectorize expected one argument"),
+  hasError(function() { centerline.vectorize(); },
+           "CenterlineVectorizer.vectorize expected one argument"),
+  hasError(function() { centerline.vectorize(source, source); },
+           "CenterlineVectorizer.vectorize expected one argument"),
   hasError(function() { outline.vectorize(42); },
            "should be an Image or a Level"),
   hasError(function() { centerline.vectorize(42); },

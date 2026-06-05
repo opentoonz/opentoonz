@@ -82,7 +82,10 @@ enum ResampleFilterType {
   //! 'Quick' filter
   Bilinear,
 
-  HowMany
+  HowMany,
+
+  //! Legacy internal filter value preserved for old resampling code paths.
+  W1 = 101
 };
 
 enum ColorMask { RChan = 0x1, GChan = 0x2, BChan = 0x4, MChan = 0x8 };

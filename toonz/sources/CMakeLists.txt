@@ -194,6 +194,10 @@ set(OPENTOONZ_QT_PACKAGE "Qt${OPENTOONZ_QT_MAJOR}")
 message(STATUS "Qt major version: ${OPENTOONZ_QT_MAJOR}")
 add_compile_definitions(OPENTOONZ_QT_MAJOR=${OPENTOONZ_QT_MAJOR})
 
+if(BUILD_ENV_APPLE)
+    add_compile_definitions(GL_SILENCE_DEPRECATION)
+endif()
+
 if(OPENTOONZ_QT_DEPRECATED_ERRORS)
     add_compile_definitions(QT_DISABLE_DEPRECATED_UP_TO=0x050F00)
 endif()

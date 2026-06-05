@@ -16,6 +16,7 @@
 
 #include <memory>
 #include <sstream>
+#include <typeinfo>
 
 PERSIST_IDENTIFIER(TPalette, "palette")
 
@@ -28,6 +29,11 @@ DEFINE_CLASS_CODE(TPalette, 30)
 //*************************************************************************************
 
 namespace {
+
+bool haveSameColorStyleType(const TColorStyle *lhs, const TColorStyle *rhs) {
+  assert(lhs && rhs);
+  return typeid(*lhs) == typeid(*rhs);
+}
 
 const std::string pointToString(const TColorStyle::PickedPosition &point) {
   if (point.frame == 0)
@@ -350,7 +356,8 @@ void TPalette::setStyle(int styleId, TColorStyle *style) {
       if (style == getStyle(i)) return;
 
     // Substitution can take place
-    if (typeid(*m_styles[styleId].second.getPointer()) != typeid(*style))
+    const TColorStyle *oldStyle = m_styles[styleId].second.getPointer();
+    if (!haveSameColorStyleType(oldStyle, style))
       m_styleAnimationTable.erase(styleId);
 
     m_styles[styleId].second = styleOwner.release();

@@ -46,9 +46,37 @@ run = "bash scripts/qt6/check-script-scope.sh"
 description = "Fail if direct deprecated QFontMetrics::width() usage escapes QtCompat."
 run = "bash scripts/qt6/check-fontmetrics-scope.sh"
 
+[tasks.check-qt6-fontdatabase-scope]
+description = "Fail if deprecated direct QFontDatabase or QTextCharFormat font-family APIs reappear."
+run = "bash scripts/qt6/check-fontdatabase-scope.sh"
+
 [tasks.check-qt6-highdpi-attribute-scope]
 description = "Fail if Qt 5 high-DPI startup attributes escape their Qt 5-only guards."
 run = "bash scripts/qt6/check-highdpi-attribute-scope.sh"
+
+[tasks.check-qt6-touch-scope]
+description = "Fail if direct QTouchEvent::touchPoints() usage escapes QtCompat."
+run = "bash scripts/qt6/check-touch-scope.sh"
+
+[tasks.check-qt6-tabletevent-scope]
+description = "Fail if direct QTabletEvent position access escapes QtCompat."
+run = "bash scripts/qt6/check-tabletevent-scope.sh"
+
+[tasks.check-qt6-mouseevent-scope]
+description = "Fail if direct event coordinate access escapes QtCompat."
+run = "bash scripts/qt6/check-mouseevent-scope.sh"
+
+[tasks.check-qt6-qvariant-scope]
+description = "Fail if non-template QVariant::canConvert() usage escapes the version-aware helper."
+run = "bash scripts/qt6/check-qvariant-scope.sh"
+
+[tasks.check-qt6-qkeysequence-scope]
+description = "Fail if direct QKeyCombination::toCombined() usage escapes QtCompat."
+run = "bash scripts/qt6/check-qkeysequence-scope.sh"
+
+[tasks.check-qt6-mediaplayer-scope]
+description = "Fail if direct QMediaPlayer Qt 6 source/state APIs escape QtCompat."
+run = "bash scripts/qt6/check-mediaplayer-scope.sh"
 
 [tasks.check-qt6-desktopwidget-scope]
 description = "Fail if removed QDesktopWidget or QApplication::desktop APIs reappear."
@@ -62,13 +90,25 @@ run = "bash scripts/qt6/check-combobox-activated-scope.sh"
 description = "Fail if direct QCheckBox::stateChanged connects escape QtCompat."
 run = "bash scripts/qt6/check-checkbox-state-scope.sh"
 
+[tasks.check-qt6-buttongroup-scope]
+description = "Fail if direct QButtonGroup legacy int signal connects escape QtCompat."
+run = "bash scripts/qt6/check-buttongroup-scope.sh"
+
 [tasks.check-qt6-wheelevent-scope]
 description = "Fail if direct QWheelEvent pixel-delta access escapes QtCompat."
 run = "bash scripts/qt6/check-wheelevent-scope.sh"
 
+[tasks.check-qt6-graphicssceneevent-scope]
+description = "Fail if direct graphics-scene screen-position access escapes QtCompat."
+run = "bash scripts/qt6/check-graphicssceneevent-scope.sh"
+
 [tasks.check-qt6-qaction-scope]
 description = "Fail if deprecated QAction parentWidget usage reappears."
 run = "bash scripts/qt6/check-qaction-scope.sh"
+
+[tasks.check-qt6-qcolor-scope]
+description = "Fail if deprecated QColor::setNamedColor() calls reappear."
+run = "bash scripts/qt6/check-qcolor-scope.sh"
 
 [tasks.check-qt6-qimage-mirrored-scope]
 description = "Fail if deprecated QImage mirrored usage escapes QtCompat."
@@ -77,6 +117,10 @@ run = "bash scripts/qt6/check-qimage-mirrored-scope.sh"
 [tasks.check-qt6-qglformat-scope]
 description = "Fail if QGLFormat escapes the Qt 5-only OpenGL compatibility scope."
 run = "bash scripts/qt6/check-qglformat-scope.sh"
+
+[tasks.check-qt6-qgllegacy-scope]
+description = "Fail if legacy QGLContext or QGLPixelBuffer APIs escape the Qt 5-only OpenGL compatibility scope."
+run = "bash scripts/qt6/check-qgllegacy-scope.sh"
 
 [tasks.check-windows-msvc-abi]
 description = "Fail on export/import annotations that are known to break MSVC Windows builds."
@@ -92,31 +136,31 @@ run = "nix develop path:. --command bash scripts/nix/prepare-tiff.sh"
 
 [tasks.configure]
 description = "Configure the RelWithDebInfo Ninja build with the Nix dependency set."
-run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-no-qregexp.sh && bash scripts/qt6/check-core5compat-scope.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && bash scripts/qt6/check-fontmetrics-scope.sh && bash scripts/qt6/check-highdpi-attribute-scope.sh && bash scripts/qt6/check-desktopwidget-scope.sh && bash scripts/qt6/check-combobox-activated-scope.sh && bash scripts/qt6/check-checkbox-state-scope.sh && bash scripts/qt6/check-wheelevent-scope.sh && bash scripts/qt6/check-qaction-scope.sh && bash scripts/qt6/check-qimage-mirrored-scope.sh && bash scripts/qt6/check-qglformat-scope.sh && nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-relwithdebinfo'"
+run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-no-qregexp.sh && bash scripts/qt6/check-core5compat-scope.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && bash scripts/qt6/check-fontmetrics-scope.sh && bash scripts/qt6/check-fontdatabase-scope.sh && bash scripts/qt6/check-highdpi-attribute-scope.sh && bash scripts/qt6/check-touch-scope.sh && bash scripts/qt6/check-tabletevent-scope.sh && bash scripts/qt6/check-mouseevent-scope.sh && bash scripts/qt6/check-qvariant-scope.sh && bash scripts/qt6/check-qkeysequence-scope.sh && bash scripts/qt6/check-mediaplayer-scope.sh && bash scripts/qt6/check-desktopwidget-scope.sh && bash scripts/qt6/check-combobox-activated-scope.sh && bash scripts/qt6/check-checkbox-state-scope.sh && bash scripts/qt6/check-buttongroup-scope.sh && bash scripts/qt6/check-wheelevent-scope.sh && bash scripts/qt6/check-graphicssceneevent-scope.sh && bash scripts/qt6/check-qaction-scope.sh && bash scripts/qt6/check-qcolor-scope.sh && bash scripts/qt6/check-qimage-mirrored-scope.sh && bash scripts/qt6/check-qglformat-scope.sh && bash scripts/qt6/check-qgllegacy-scope.sh && nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-relwithdebinfo'"
 
 [tasks.configure-deprecated-api]
 description = "Configure the Qt 5 lane with Qt APIs deprecated through 5.15 disabled."
-run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-no-qregexp.sh && bash scripts/qt6/check-core5compat-scope.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && bash scripts/qt6/check-fontmetrics-scope.sh && bash scripts/qt6/check-highdpi-attribute-scope.sh && bash scripts/qt6/check-desktopwidget-scope.sh && bash scripts/qt6/check-combobox-activated-scope.sh && bash scripts/qt6/check-checkbox-state-scope.sh && bash scripts/qt6/check-wheelevent-scope.sh && bash scripts/qt6/check-qaction-scope.sh && bash scripts/qt6/check-qimage-mirrored-scope.sh && bash scripts/qt6/check-qglformat-scope.sh && nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-deprecated-api'"
+run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-no-qregexp.sh && bash scripts/qt6/check-core5compat-scope.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && bash scripts/qt6/check-fontmetrics-scope.sh && bash scripts/qt6/check-fontdatabase-scope.sh && bash scripts/qt6/check-highdpi-attribute-scope.sh && bash scripts/qt6/check-touch-scope.sh && bash scripts/qt6/check-tabletevent-scope.sh && bash scripts/qt6/check-mouseevent-scope.sh && bash scripts/qt6/check-qvariant-scope.sh && bash scripts/qt6/check-qkeysequence-scope.sh && bash scripts/qt6/check-mediaplayer-scope.sh && bash scripts/qt6/check-desktopwidget-scope.sh && bash scripts/qt6/check-combobox-activated-scope.sh && bash scripts/qt6/check-checkbox-state-scope.sh && bash scripts/qt6/check-buttongroup-scope.sh && bash scripts/qt6/check-wheelevent-scope.sh && bash scripts/qt6/check-graphicssceneevent-scope.sh && bash scripts/qt6/check-qaction-scope.sh && bash scripts/qt6/check-qcolor-scope.sh && bash scripts/qt6/check-qimage-mirrored-scope.sh && bash scripts/qt6/check-qglformat-scope.sh && bash scripts/qt6/check-qgllegacy-scope.sh && nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-deprecated-api'"
 
 [tasks.configure-qt6]
 description = "Configure the RelWithDebInfo Ninja build with the Qt 6 Nix dependency set."
-run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-no-qregexp.sh && bash scripts/qt6/check-core5compat-scope.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && bash scripts/qt6/check-fontmetrics-scope.sh && bash scripts/qt6/check-highdpi-attribute-scope.sh && bash scripts/qt6/check-desktopwidget-scope.sh && bash scripts/qt6/check-combobox-activated-scope.sh && bash scripts/qt6/check-checkbox-state-scope.sh && bash scripts/qt6/check-wheelevent-scope.sh && bash scripts/qt6/check-qaction-scope.sh && bash scripts/qt6/check-qimage-mirrored-scope.sh && bash scripts/qt6/check-qglformat-scope.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-relwithdebinfo'"
+run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-no-qregexp.sh && bash scripts/qt6/check-core5compat-scope.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && bash scripts/qt6/check-fontmetrics-scope.sh && bash scripts/qt6/check-fontdatabase-scope.sh && bash scripts/qt6/check-highdpi-attribute-scope.sh && bash scripts/qt6/check-touch-scope.sh && bash scripts/qt6/check-tabletevent-scope.sh && bash scripts/qt6/check-mouseevent-scope.sh && bash scripts/qt6/check-qvariant-scope.sh && bash scripts/qt6/check-qkeysequence-scope.sh && bash scripts/qt6/check-mediaplayer-scope.sh && bash scripts/qt6/check-desktopwidget-scope.sh && bash scripts/qt6/check-combobox-activated-scope.sh && bash scripts/qt6/check-checkbox-state-scope.sh && bash scripts/qt6/check-buttongroup-scope.sh && bash scripts/qt6/check-wheelevent-scope.sh && bash scripts/qt6/check-graphicssceneevent-scope.sh && bash scripts/qt6/check-qaction-scope.sh && bash scripts/qt6/check-qcolor-scope.sh && bash scripts/qt6/check-qimage-mirrored-scope.sh && bash scripts/qt6/check-qglformat-scope.sh && bash scripts/qt6/check-qgllegacy-scope.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-relwithdebinfo'"
 
 [tasks.configure-qt6-translations]
 description = "Configure an isolated Qt 6 build with translation target generation enabled."
-run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-no-qregexp.sh && bash scripts/qt6/check-core5compat-scope.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && bash scripts/qt6/check-fontmetrics-scope.sh && bash scripts/qt6/check-highdpi-attribute-scope.sh && bash scripts/qt6/check-desktopwidget-scope.sh && bash scripts/qt6/check-combobox-activated-scope.sh && bash scripts/qt6/check-checkbox-state-scope.sh && bash scripts/qt6/check-wheelevent-scope.sh && bash scripts/qt6/check-qaction-scope.sh && bash scripts/qt6/check-qimage-mirrored-scope.sh && bash scripts/qt6/check-qglformat-scope.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-translation-check'"
+run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-no-qregexp.sh && bash scripts/qt6/check-core5compat-scope.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && bash scripts/qt6/check-fontmetrics-scope.sh && bash scripts/qt6/check-fontdatabase-scope.sh && bash scripts/qt6/check-highdpi-attribute-scope.sh && bash scripts/qt6/check-touch-scope.sh && bash scripts/qt6/check-tabletevent-scope.sh && bash scripts/qt6/check-mouseevent-scope.sh && bash scripts/qt6/check-qvariant-scope.sh && bash scripts/qt6/check-qkeysequence-scope.sh && bash scripts/qt6/check-mediaplayer-scope.sh && bash scripts/qt6/check-desktopwidget-scope.sh && bash scripts/qt6/check-combobox-activated-scope.sh && bash scripts/qt6/check-checkbox-state-scope.sh && bash scripts/qt6/check-buttongroup-scope.sh && bash scripts/qt6/check-wheelevent-scope.sh && bash scripts/qt6/check-graphicssceneevent-scope.sh && bash scripts/qt6/check-qaction-scope.sh && bash scripts/qt6/check-qcolor-scope.sh && bash scripts/qt6/check-qimage-mirrored-scope.sh && bash scripts/qt6/check-qglformat-scope.sh && bash scripts/qt6/check-qgllegacy-scope.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-translation-check'"
 
 [tasks.build-qt6-translations]
 description = "Build the isolated Qt 6 translation lane and verify generated .qm files."
-run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-no-qregexp.sh && bash scripts/qt6/check-core5compat-scope.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && bash scripts/qt6/check-fontmetrics-scope.sh && bash scripts/qt6/check-highdpi-attribute-scope.sh && bash scripts/qt6/check-desktopwidget-scope.sh && bash scripts/qt6/check-combobox-activated-scope.sh && bash scripts/qt6/check-checkbox-state-scope.sh && bash scripts/qt6/check-wheelevent-scope.sh && bash scripts/qt6/check-qaction-scope.sh && bash scripts/qt6/check-qimage-mirrored-scope.sh && bash scripts/qt6/check-qglformat-scope.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-translation-check && cmake --build toonz/build/nix-qt6-translation-check --target OpenToonz --parallel && count=$(find toonz/stuff/config/loc -mindepth 2 -maxdepth 2 -name \"*.qm\" | wc -l | tr -d \" \"); test \"$count\" = 63'"
+run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-no-qregexp.sh && bash scripts/qt6/check-core5compat-scope.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && bash scripts/qt6/check-fontmetrics-scope.sh && bash scripts/qt6/check-fontdatabase-scope.sh && bash scripts/qt6/check-highdpi-attribute-scope.sh && bash scripts/qt6/check-touch-scope.sh && bash scripts/qt6/check-tabletevent-scope.sh && bash scripts/qt6/check-mouseevent-scope.sh && bash scripts/qt6/check-qvariant-scope.sh && bash scripts/qt6/check-qkeysequence-scope.sh && bash scripts/qt6/check-mediaplayer-scope.sh && bash scripts/qt6/check-desktopwidget-scope.sh && bash scripts/qt6/check-combobox-activated-scope.sh && bash scripts/qt6/check-checkbox-state-scope.sh && bash scripts/qt6/check-buttongroup-scope.sh && bash scripts/qt6/check-wheelevent-scope.sh && bash scripts/qt6/check-graphicssceneevent-scope.sh && bash scripts/qt6/check-qaction-scope.sh && bash scripts/qt6/check-qcolor-scope.sh && bash scripts/qt6/check-qimage-mirrored-scope.sh && bash scripts/qt6/check-qglformat-scope.sh && bash scripts/qt6/check-qgllegacy-scope.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-translation-check && cmake --build toonz/build/nix-qt6-translation-check --target OpenToonz --parallel && count=$(find toonz/stuff/config/loc -mindepth 2 -maxdepth 2 -name \"*.qm\" | wc -l | tr -d \" \"); test \"$count\" = 63'"
 
 [tasks.build]
 description = "Configure and build OpenToonz with Ninja in toonz/build/nix-relwithdebinfo."
-run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-no-qregexp.sh && bash scripts/qt6/check-core5compat-scope.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && bash scripts/qt6/check-fontmetrics-scope.sh && bash scripts/qt6/check-highdpi-attribute-scope.sh && bash scripts/qt6/check-desktopwidget-scope.sh && bash scripts/qt6/check-combobox-activated-scope.sh && bash scripts/qt6/check-checkbox-state-scope.sh && bash scripts/qt6/check-wheelevent-scope.sh && bash scripts/qt6/check-qaction-scope.sh && bash scripts/qt6/check-qimage-mirrored-scope.sh && bash scripts/qt6/check-qglformat-scope.sh && nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-relwithdebinfo && cmake --build toonz/build/nix-relwithdebinfo --parallel'"
+run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-no-qregexp.sh && bash scripts/qt6/check-core5compat-scope.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && bash scripts/qt6/check-fontmetrics-scope.sh && bash scripts/qt6/check-fontdatabase-scope.sh && bash scripts/qt6/check-highdpi-attribute-scope.sh && bash scripts/qt6/check-touch-scope.sh && bash scripts/qt6/check-tabletevent-scope.sh && bash scripts/qt6/check-mouseevent-scope.sh && bash scripts/qt6/check-qvariant-scope.sh && bash scripts/qt6/check-qkeysequence-scope.sh && bash scripts/qt6/check-mediaplayer-scope.sh && bash scripts/qt6/check-desktopwidget-scope.sh && bash scripts/qt6/check-combobox-activated-scope.sh && bash scripts/qt6/check-checkbox-state-scope.sh && bash scripts/qt6/check-buttongroup-scope.sh && bash scripts/qt6/check-wheelevent-scope.sh && bash scripts/qt6/check-graphicssceneevent-scope.sh && bash scripts/qt6/check-qaction-scope.sh && bash scripts/qt6/check-qcolor-scope.sh && bash scripts/qt6/check-qimage-mirrored-scope.sh && bash scripts/qt6/check-qglformat-scope.sh && bash scripts/qt6/check-qgllegacy-scope.sh && nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-relwithdebinfo && cmake --build toonz/build/nix-relwithdebinfo --parallel'"
 
 [tasks.build-qt6]
 description = "Configure and build OpenToonz with Qt 6 in toonz/build/nix-qt6-relwithdebinfo."
-run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-no-qregexp.sh && bash scripts/qt6/check-core5compat-scope.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && bash scripts/qt6/check-fontmetrics-scope.sh && bash scripts/qt6/check-highdpi-attribute-scope.sh && bash scripts/qt6/check-desktopwidget-scope.sh && bash scripts/qt6/check-combobox-activated-scope.sh && bash scripts/qt6/check-checkbox-state-scope.sh && bash scripts/qt6/check-wheelevent-scope.sh && bash scripts/qt6/check-qaction-scope.sh && bash scripts/qt6/check-qimage-mirrored-scope.sh && bash scripts/qt6/check-qglformat-scope.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-relwithdebinfo && cmake --build toonz/build/nix-qt6-relwithdebinfo --parallel'"
+run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-no-qregexp.sh && bash scripts/qt6/check-core5compat-scope.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && bash scripts/qt6/check-fontmetrics-scope.sh && bash scripts/qt6/check-fontdatabase-scope.sh && bash scripts/qt6/check-highdpi-attribute-scope.sh && bash scripts/qt6/check-touch-scope.sh && bash scripts/qt6/check-tabletevent-scope.sh && bash scripts/qt6/check-mouseevent-scope.sh && bash scripts/qt6/check-qvariant-scope.sh && bash scripts/qt6/check-qkeysequence-scope.sh && bash scripts/qt6/check-mediaplayer-scope.sh && bash scripts/qt6/check-desktopwidget-scope.sh && bash scripts/qt6/check-combobox-activated-scope.sh && bash scripts/qt6/check-checkbox-state-scope.sh && bash scripts/qt6/check-buttongroup-scope.sh && bash scripts/qt6/check-wheelevent-scope.sh && bash scripts/qt6/check-graphicssceneevent-scope.sh && bash scripts/qt6/check-qaction-scope.sh && bash scripts/qt6/check-qcolor-scope.sh && bash scripts/qt6/check-qimage-mirrored-scope.sh && bash scripts/qt6/check-qglformat-scope.sh && bash scripts/qt6/check-qgllegacy-scope.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-relwithdebinfo && cmake --build toonz/build/nix-qt6-relwithdebinfo --parallel'"
 
 [tasks.run]
 description = "Run the locally built OpenToonz binary or app bundle."
@@ -424,7 +468,7 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/file_path_coerc
 
 [tasks.script-smoke-filepath-edges-qt6]
 description = "Run the Qt 6 app bundle against FilePath error and directory-listing edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/file_path_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-filepath-edges-relative child txt beta|qt-script-filepath-edges-errors true true|qt-script-filepath-edges-files true true true' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/file_path_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-filepath-edges-relative child txt beta|qt-script-filepath-edges-errors true true [true,true,true,true,true,true,true,true,true,true]|qt-script-filepath-edges-files true true true' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-filepath-metadata-qt6]
 description = "Run the Qt 6 app bundle against FilePath metadata and modified-time parity."
@@ -436,7 +480,7 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/file_path_mutat
 
 [tasks.script-smoke-path-arguments-qt6]
 description = "Run the Qt 6 app bundle against file-path argument validation parity cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/path_arguments.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-path-args-filepath \"alpha/beta/test.tif\" test tif beta \"\"|qt-script-path-args-multi Empty 0 0 0|qt-script-path-args-errors [true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/path_arguments.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-path-args-filepath \"alpha/beta/test.tif\" test tif beta|qt-script-path-args-errors [true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-scene-qt6]
 description = "Run the Qt 6 app bundle against the basic Scene headless script binding fixture."
@@ -460,7 +504,7 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_edges.too
 
 [tasks.script-smoke-scene-argument-edges-qt6]
 description = "Run the Qt 6 app bundle against Scene row, column, and frame-id argument edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_argument_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-argument-edges-valid true true true true|qt-script-scene-argument-edges-errors [true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_argument_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-argument-edges-valid true true true true|qt-script-scene-argument-edges-errors [true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-scene-lifecycle-edges-qt6]
 description = "Run the Qt 6 app bundle against Scene lifecycle and cross-scene isolation edge cases."
@@ -508,7 +552,7 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/level_basic.too
 
 [tasks.script-smoke-level-edges-qt6]
 description = "Run the Qt 6 app bundle against Level frame and I/O edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/level_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-level-edges-empty Empty 0 true true true true true true|qt-script-level-edges-frame-access Raster 1 true true true true|qt-script-level-edges-errors true true true true true true' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/level_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-level-edges-empty Empty 0 true true true true true true|qt-script-level-edges-frame-access Raster 1 true true true true|qt-script-level-edges-errors true true true true true true|qt-script-level-edges-arity true true true true true true true true true true true true' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-level-io-qt6]
 description = "Run the Qt 6 app bundle against the Level load/save and empty-level setFrame fixture."
@@ -536,7 +580,7 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_basic.too
 
 [tasks.script-smoke-image-edges-qt6]
 description = "Run the Qt 6 app bundle against Image constructor, load, and save edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-image-edges-empty Empty 0 0 0 Empty image true|qt-script-image-edges-load true true true Empty 0 0|qt-script-image-edges-save true true true ToonzRaster 9 7' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-image-edges-empty Empty 0 0 0 Empty image true|qt-script-image-edges-load true true true Empty 0 0|qt-script-image-edges-arity true true true true|qt-script-image-edges-save true true true ToonzRaster 9 7' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-image-lifecycle-edges-qt6]
 description = "Run the Qt 6 app bundle against Image dispose and post-dispose error behavior."
@@ -552,11 +596,11 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_builder.t
 
 [tasks.script-smoke-transform-edges-qt6]
 description = "Run the Qt 6 app bundle against Transform argument and disposal edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/transform_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-transform-edges-valid Translation(-2,3) Rotation(-45) Scale(50%) Scale(50%, 125%)|qt-script-transform-edges-errors [true,true,true,true,true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/transform_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-transform-edges-valid Translation(-2,3) Rotation(-45) Scale(50%) Scale(50%, 125%)|qt-script-transform-edges-errors [true,true,true,true,true,true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-image-builder-edges-qt6]
 description = "Run the Qt 6 app bundle against ImageBuilder constructor, fill, add, and disposal edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_builder_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-imagebuilder-edges-constructors [true,true,true,true]|qt-script-imagebuilder-edges-builders ImageBuilder(Raster image) ImageBuilder(ToonzRaster image) [true,true,true,true,true] [true,true,true,true,true]|qt-script-imagebuilder-edges-colors true' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_builder_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-imagebuilder-edges-constructors [true,true,true,true]|qt-script-imagebuilder-edges-builders ImageBuilder(Raster image) ImageBuilder(ToonzRaster image) [true,true,true,true,true] [true,true,true,true,true]|qt-script-imagebuilder-edges-arity true true true true true|qt-script-imagebuilder-edges-colors true' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-toonz-raster-converter-qt6]
 description = "Run the Qt 6 app bundle against the ToonzRasterConverter headless script binding fixture."
@@ -568,7 +612,7 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/toonz_raster_co
 
 [tasks.script-smoke-toonz-raster-converter-edges-qt6]
 description = "Run the Qt 6 app bundle against ToonzRasterConverter argument and type edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/toonz_raster_converter_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-toonz-raster-converter-edges-success ToonzRaster 32 32|qt-script-toonz-raster-converter-edges-errors [true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/toonz_raster_converter_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-toonz-raster-converter-edges-success ToonzRaster 32 32|qt-script-toonz-raster-converter-edges-errors [true,true,true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-toonz-raster-converter-lifecycle-edges-qt6]
 description = "Run the Qt 6 app bundle against ToonzRasterConverter dispose and static conversion behavior."
@@ -584,11 +628,11 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/centerline_vect
 
 [tasks.script-smoke-vectorizer-edges-qt6]
 description = "Run the Qt 6 app bundle against vectorizer argument and type edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/vectorizer_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-vectorizer-edges-raster Vector Vector|qt-script-vectorizer-edges-errors [true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/vectorizer_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-vectorizer-edges-raster Vector Vector|qt-script-vectorizer-edges-errors [true,true,true,true,true,true,true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-binding-lifecycle-edges-qt6]
 description = "Run the Qt 6 app bundle against non-rendering binding property and lifecycle edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/binding_lifecycle_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-binding-lifecycle-properties 11 2 true #00ff80 64 4 120 true true 64 48 144 false 18|qt-script-binding-lifecycle-bool-coercion true false true false true false|qt-script-binding-lifecycle-errors true [true,true,true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/binding_lifecycle_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-binding-lifecycle-properties 11 2 true #00ff80 64 4 120 true true 64 48 144 false 18|qt-script-binding-lifecycle-bool-coercion true false true false true false|qt-script-binding-lifecycle-errors true [true,true,true,true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-rasterizer-qt6]
 description = "Run the Qt 6 app bundle against the Rasterizer color-mapped and full-color script binding fixture."
@@ -596,7 +640,7 @@ run = "OPENTOONZ_SCRIPT_USE_QAPPLICATION=1 OPENTOONZ_SCRIPT_FIXTURE=toonz/source
 
 [tasks.script-smoke-rasterizer-edges-qt6]
 description = "Run the Qt 6 app bundle against Rasterizer argument and type edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/rasterizer_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-rasterizer-edges-success true ToonzRaster 720 576|qt-script-rasterizer-edges-errors [true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/rasterizer_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-rasterizer-edges-success true ToonzRaster 720 576|qt-script-rasterizer-edges-errors [true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-renderer-qt6]
 description = "Run the Qt 6 app bundle against the Renderer renderFrame/renderScene script binding fixture."
@@ -612,7 +656,7 @@ run = "OPENTOONZ_SCRIPT_USE_QAPPLICATION=1 OPENTOONZ_SCRIPT_FIXTURE=toonz/source
 
 [tasks.script-smoke-renderer-edges-qt6]
 description = "Run the Qt 6 app bundle against Renderer argument edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/renderer_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-renderer-edges-errors [true,true,true,true,true,true,true,true]|qt-script-renderer-list-edges-errors [true,true,true,true]|qt-script-renderer-list-edges-non-arrays true true' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/renderer_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-renderer-edges-errors [true,true,true,true,true,true,true,true,true,true,true,true]|qt-script-renderer-list-edges-errors [true,true,true,true]|qt-script-renderer-list-edges-non-arrays true true' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-renderer-lifecycle-edges-qt6]
 description = "Run the Qt 6 app bundle against Renderer dispose and post-dispose error behavior."
@@ -648,7 +692,7 @@ run = "bash scripts/qt6/release-experimental.sh"
 
 [tasks.check]
 description = "Run the flake configure check and whitespace validation."
-run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && bash scripts/qt6/check-desktopwidget-scope.sh && bash scripts/qt6/check-checkbox-state-scope.sh && bash scripts/qt6/check-wheelevent-scope.sh && bash scripts/qt6/check-qaction-scope.sh && bash scripts/qt6/check-qimage-mirrored-scope.sh && bash scripts/qt6/check-qglformat-scope.sh && nix flake check path:. && git diff --check"
+run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && bash scripts/qt6/check-fontdatabase-scope.sh && bash scripts/qt6/check-touch-scope.sh && bash scripts/qt6/check-tabletevent-scope.sh && bash scripts/qt6/check-mouseevent-scope.sh && bash scripts/qt6/check-qvariant-scope.sh && bash scripts/qt6/check-qkeysequence-scope.sh && bash scripts/qt6/check-mediaplayer-scope.sh && bash scripts/qt6/check-desktopwidget-scope.sh && bash scripts/qt6/check-checkbox-state-scope.sh && bash scripts/qt6/check-buttongroup-scope.sh && bash scripts/qt6/check-wheelevent-scope.sh && bash scripts/qt6/check-graphicssceneevent-scope.sh && bash scripts/qt6/check-qaction-scope.sh && bash scripts/qt6/check-qcolor-scope.sh && bash scripts/qt6/check-qimage-mirrored-scope.sh && bash scripts/qt6/check-qglformat-scope.sh && bash scripts/qt6/check-qgllegacy-scope.sh && nix flake check path:. && git diff --check"
 
 [tasks.format]
 description = "Run the repository clang-format helper for changed C/C++ files."

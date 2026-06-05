@@ -9,6 +9,7 @@
 
 // TnzQt includes
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/tproject.h"
@@ -614,8 +615,8 @@ ExportScenePopup::ExportScenePopup(std::vector<TFilePath> scenes)
   lonelyProjectWidget->setLayout(lonelyProjectLayout);
   layout->addWidget(lonelyProjectWidget);
 
-  ret = ret &&
-        connect(group, SIGNAL(buttonClicked(int)), this, SLOT(switchMode(int)));
+  ret = ret && QtCompat::connectButtonGroupIdClicked(
+                   group, this, &ExportScenePopup::switchMode);
 
   addLayout(layout, false);
 

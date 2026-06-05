@@ -1233,6 +1233,11 @@ Current branch status:
   check-qt6-checkbox-state-scope` keeps direct `QCheckBox::stateChanged`
   connects out of feature code so Qt 6.7+ can use `checkStateChanged` while the
   Qt 5 lane keeps the existing signal path.
+- Legacy `QButtonGroup` integer button-signal connects now go through
+  `QtCompat::connectButtonGroupIdClicked()` and
+  `QtCompat::connectButtonGroupIdPressed()`. Both supported lanes use the non-deprecated `idClicked` /
+  `idPressed` signals behind the helpers. `mise run check-qt6-buttongroup-scope` keeps direct legacy
+  `buttonClicked(int)` / `buttonPressed(int)` connects out of feature code.
 - The active `QtOfflineGL` offscreen context path now uses only
   `QSurfaceFormat` for Qt 5 and Qt 6 format setup. The unused legacy
   `QGLFormat` setup block was removed from that path, and `mise run
@@ -1242,10 +1247,38 @@ Current branch status:
   `QtCompat::wheelEventPixelDelta()` in the current wheel handlers. `mise run
   check-qt6-wheelevent-scope` keeps direct `QWheelEvent::pixelDelta()` calls
   out of feature code while preserving Qt 5 behavior.
+- Schematic graphics-scene spin/aim handle drag deltas now go through
+  `QtCompat::graphicsSceneMouseEventScreenPosition()` and
+  `QtCompat::graphicsSceneMouseEventLastScreenPosition()`. `mise run
+  check-qt6-graphicssceneevent-scope` keeps direct `screenPos()` /
+  `lastScreenPos()` calls out of feature code.
+- Direct `QFontDatabase` instance construction and
+  `QTextCharFormat::setFontFamily()` usage now stay out of feature code with
+  `mise run check-qt6-fontdatabase-scope`; use `QtCompat` font database and
+  text-format helpers for those paths.
 - The recent flipbook image loader now uses `QAction::parent()` with
   `qobject_cast()` instead of the Qt 6-deprecated `QAction::parentWidget()`.
   `mise run check-qt6-qaction-scope` keeps that deprecated QAction API out of
   the current app source.
+- Direct `QColor::setNamedColor()` usage now stays out of feature code with
+  `mise run check-qt6-qcolor-scope`; use `QColor(QString)` or a local color
+  parsing helper for string color parsing.
+- Direct `QTouchEvent::touchPoints()` access now stays inside `QtCompat` with
+  `mise run check-qt6-touch-scope`; feature code should use the shared
+  touch-point helpers so Qt 6 can use `QTouchEvent::points()` and
+  `QEventPoint` positions.
+- Non-template `QVariant::canConvert(...)` calls now stay inside the
+  version-aware preference helper with `mise run check-qt6-qvariant-scope`;
+  feature code should use `canConvert<T>()` for fixed types or a local
+  Qt-version helper for dynamic `QMetaType` paths.
+- Direct `QKeyCombination::toCombined()` usage now stays inside `QtCompat` with
+  `mise run check-qt6-qkeysequence-scope`; feature code should use
+  `QtCompat::keySequenceEntryToInt()` when it needs the integer form of a
+  `QKeySequence` entry.
+- Direct Qt 6 `QMediaPlayer::setSource()` / `playbackState()` usage now stays
+  inside `QtCompat` with `mise run check-qt6-mediaplayer-scope`; media preview
+  feature code should use `QtCompat::setMediaPlayerSource()` and
+  `QtCompat::mediaPlayerState()` so Qt 5 keeps `setMedia()` / `state()`.
 - Direct feature-code `QImage::mirrored()` calls now route through
   `QtCompat::mirroredImage()`. Qt 6 uses `QImage::flipped()` with explicit
   orientations, while Qt 5 keeps the existing `mirrored()` behavior inside the
@@ -1390,8 +1423,9 @@ Current branch status:
 - `toonz/sources/tests/scriptengine/file_path_edges.toonzscript` extends the
   FilePath fixture set. It is run by
   `mise run script-smoke-filepath-edges-qt6` and verifies relative concat,
-  absolute-path concat rejection, non-directory `files()` errors, and directory
-  listing through the Qt 6 facade.
+  absolute-path concat rejection, non-directory `files()` errors, strict method
+  arity for path mutation/listing helpers, and directory listing through the Qt
+  6 facade.
 - `toonz/sources/tests/scriptengine/file_path_metadata.toonzscript` extends the
   FilePath fixture set. It is run by
   `mise run script-smoke-filepath-metadata-qt6` and verifies `exists`,
@@ -1446,9 +1480,11 @@ Current branch status:
 - `toonz/sources/tests/scriptengine/scene_argument_edges.toonzscript` is the
   repo-local Qt 6 Scene argument-validation fixture. It is run by
   `mise run script-smoke-scene-argument-edges-qt6` and verifies non-rendering
-  row/column argument rejection for `insertColumn()`, `deleteColumn()`,
-  `getCell()`, and `setCell()`, plus backend negative row/column and bad
-  frame-id errors without entering scene icon, viewer, offscreen GL, or
+  constructor arity and method arity checks for `load()`, `save()`,
+  `insertColumn()`, `deleteColumn()`, `getCell()`, `setCell()`, `getLevels()`,
+  `getLevel()`, `newLevel()`, and `loadLevel()`. It also verifies row/column
+  argument rejection for the cell APIs, plus backend negative row/column and
+  bad frame-id errors without entering scene icon, viewer, offscreen GL, or
   renderer paths.
 - `toonz/sources/tests/scriptengine/scene_lifecycle_edges.toonzscript` is the
   repo-local Qt 6 Scene lifecycle fixture. It is run by
@@ -1548,7 +1584,8 @@ Current branch status:
   out-of-range and non-number frame-index errors, bad frame-id rejection,
   empty-level name setter no-op parity, empty-level path `undefined` parity,
   level/image type mismatch rejection, incompatible save rejection, and
-  missing-level load errors.
+  missing-level load errors. It also verifies strict Level method arity for
+  constructor, frame access, frame assignment, load, and save calls.
 - `toonz/sources/tests/scriptengine/image_edges.toonzscript` is the repo-local
   Qt 6 Image edge-case compatibility fixture. It is run by
   `mise run script-smoke-image-edges-qt6` and verifies empty image metadata and
@@ -1604,7 +1641,8 @@ Current branch status:
   `mise run script-smoke-toonz-raster-converter-edges-qt6` and verifies
   legacy-style `ToonzRasterConverter.convert()` argument and type rejection for
   missing/extra arguments, non-image/non-level values, ToonzRaster and Vector
-  images, empty Raster levels, and Vector levels.
+  images, empty Raster levels, and Vector levels, plus strict
+  `ToonzRasterConverter` constructor arity and strict `foo()` helper arity.
 - `toonz/sources/tests/scriptengine/toonz_raster_converter_lifecycle_edges.toonzscript`
   is the repo-local Qt 6 converter lifecycle fixture. It is run by
   `mise run script-smoke-toonz-raster-converter-lifecycle-edges-qt6` and
@@ -1626,8 +1664,10 @@ Current branch status:
   repo-local Qt 6 vectorizer edge-case fixture. It is run by
   `mise run script-smoke-vectorizer-edges-qt6` and verifies legacy-style
   `OutlineVectorizer.vectorize()` and `CenterlineVectorizer.vectorize()`
-  argument and type rejection for non-image/non-level values, Vector images,
-  empty Raster levels, and Vector levels without entering renderer paths.
+  argument and type rejection for missing/extra arguments, non-image/non-level
+  values, Vector images, empty Raster levels, and Vector levels, plus strict
+  `OutlineVectorizer`/`CenterlineVectorizer` constructor arity, without
+  entering renderer paths.
 - `toonz/sources/tests/scriptengine/binding_lifecycle_edges.toonzscript` is a
   repo-local Qt 6 non-rendering binding lifecycle/property fixture. It is run by
   `mise run script-smoke-binding-lifecycle-edges-qt6` and verifies property
@@ -1635,8 +1675,8 @@ Current branch status:
   `Rasterizer`, invalid `OutlineVectorizer.transparentColor` rejection, and
   disposed-object method/property rejection for `OutlineVectorizer`,
   `CenterlineVectorizer`, `Rasterizer`, and `ToonzRasterConverter`, including
-  disposed `vectorize()`, `rasterize()`, and converter instance `convert()`
-  calls.
+  disposed `vectorize()`, `rasterize()`, converter instance `convert()`, and
+  converter `foo()` calls.
 - `toonz/sources/tests/scriptengine/rasterizer.toonzscript` is the repo-local
   Qt 6 Rasterizer compatibility fixture. It is run by
   `mise run script-smoke-rasterizer-qt6` and verifies `Rasterizer`
@@ -1649,9 +1689,11 @@ Current branch status:
 - `toonz/sources/tests/scriptengine/rasterizer_edges.toonzscript` is the
   repo-local Qt 6 Rasterizer edge-case fixture. It is run by
   `mise run script-smoke-rasterizer-edges-qt6` and verifies legacy-style
-  `Rasterizer.rasterize()` argument and type rejection for non-image/non-level
-  values, Raster/ToonzRaster images, Raster/Empty levels, and bad full-color
-  resolution/DPI rejection while keeping the color-mapped path green.
+  `Rasterizer.rasterize()` argument and type rejection for missing/extra
+  arguments, non-image/non-level values, Raster/ToonzRaster images,
+  Raster/Empty levels, strict `Rasterizer` constructor arity, and bad
+  full-color resolution/DPI rejection while keeping the color-mapped path
+  green.
 - `toonz/sources/tests/scriptengine/renderer_basic.toonzscript` is the
   repo-local Qt 6 Renderer compatibility fixture. It is run by
   `mise run script-smoke-renderer-qt6` and verifies `Renderer` construction,
@@ -1681,9 +1723,11 @@ Current branch status:
 - `toonz/sources/tests/scriptengine/renderer_edges.toonzscript` is the
   repo-local Qt 6 Renderer edge-case compatibility fixture. It is run by
   `mise run script-smoke-renderer-edges-qt6` and verifies that
-  `renderScene()` and `renderFrame()` reject missing/non-`Scene`/disposed scene
-  arguments, bad frame values, and invalid `Renderer.frames` /
-  `Renderer.columns` list values before reaching the Qt 6 renderer path.
+  `Renderer` rejects constructor arguments and that `renderScene()` and
+  `renderFrame()` reject missing/extra/non-`Scene`/disposed scene arguments,
+  bad frame values, extra `dumpCache()` arguments, and invalid
+  `Renderer.frames` / `Renderer.columns` list values before reaching the Qt 6
+  renderer path.
 - `toonz/sources/tests/scriptengine/renderer_lifecycle_edges.toonzscript` is
   the repo-local Qt 6 Renderer lifecycle compatibility fixture. It is run by
   `mise run script-smoke-renderer-lifecycle-edges-qt6` and verifies that
@@ -1846,7 +1890,8 @@ Current branch status:
   non-directory `files()` errors. The shared path-argument checks now reject non-string,
   non-FilePath values for `run()`, FilePath parent/concat helpers, and
   Image/Level/Scene path methods instead of silently coercing arbitrary values
-  through `String()`. This does not yet claim full `scriptbinding_files.*`
+  through `String()`. The FilePath edge fixture also covers strict constructor
+  arity. This does not yet claim full `scriptbinding_files.*`
   parity.
 - The Qt 6 branch now has a minimal `Scene` compatibility slice for
   construction, frame/column count, string conversion, column insert/delete,
@@ -1882,8 +1927,9 @@ Current branch status:
   `Level.setFrame()` input. The Image edge-case fixture also covers empty-image
   save errors, constructor argument errors, non-path argument rejection, failed
   load state clearing, incompatible save errors, and unrecognized output type
-  errors. The Image lifecycle edge-case fixture covers post-dispose rejection
-  for metadata access, string conversion, load, and save calls. The Image
+  errors, plus strict Image method arity for load and save calls. The Image
+  lifecycle edge-case fixture covers post-dispose rejection for metadata access,
+  string conversion, load, and save calls. The Image
   level-first-frame fixture covers loading a saved two-frame Raster image
   sequence through `Image`, preserving the legacy first-frame warning while
   also checking explicit frame-2 path loading and observable Raster image
@@ -1893,37 +1939,43 @@ Current branch status:
   transform-derived raster composition, generated image access, clear/fill,
   image save/reload, and typed Raster/ToonzRaster builder construction. The
   Transform and ImageBuilder edge-case fixtures also cover invalid Transform
-  numeric inputs, disposed Transform `toString()`, `translate()`, `rotate()`,
-  and `scale()` rejection, constructor argument errors, invalid fill/add
-  inputs, type mismatch rejection, ToonzRaster fill rejection, and disposed
+  numeric inputs, strict Transform constructor arity, disposed Transform
+  `toString()`, `translate()`, `rotate()`, and `scale()` rejection,
+  constructor argument errors, strict ImageBuilder method arity for `clear()`,
+  `fill()`, and `add()`, invalid fill/add inputs, type mismatch rejection,
+  ToonzRaster fill rejection, and disposed
   builder rejection for `toString()`, `image`, `clear()`, `fill()`, and
   `add()`.
 - The Qt 6 branch now has a minimal `ToonzRasterConverter` compatibility slice
   for raster image conversion into ToonzRaster images, level-wide raster to
   ToonzRaster conversion, TLV save/reload, converted-level frame reload, and
   legacy-style argument/type rejection for unsupported converter inputs. It now
-  also covers instance converter disposal while preserving static conversion
-  behavior. This does not yet claim broader converter or renderer parity.
+  also covers strict converter constructor/helper arity and instance converter
+  disposal while preserving static conversion behavior. This does not yet claim
+  broader converter or renderer parity.
 - The Qt 6 branch now has a minimal `OutlineVectorizer` compatibility slice for
   property state, raster-image vectorization into Vector images, PLI
   save/reload, vector-level insertion, and level-wide raster-to-vector
-  conversion. It now also rejects unsupported argument and level/image types
-  before attempting conversion. This does not yet claim full vectorizer,
+  conversion. It now also rejects unsupported argument and level/image types,
+  enforces strict constructor arity, and enforces strict `vectorize()` method
+  arity before attempting conversion. This does not yet claim full vectorizer,
   rasterizer visual parity, or renderer parity.
 - The Qt 6 branch now has a minimal `CenterlineVectorizer` compatibility slice
   for property state, raster-image vectorization into Vector images, PLI
   save/reload, vector-level insertion, and level-wide raster-to-vector
-  conversion. It now also rejects unsupported argument and level/image types
-  before attempting conversion. This does not yet claim full vectorizer,
+  conversion. It now also rejects unsupported argument and level/image types,
+  enforces strict constructor arity, and enforces strict `vectorize()` method
+  arity before attempting conversion. This does not yet claim full vectorizer,
   rasterizer visual parity, or renderer parity.
 - The Qt 6 branch now has a minimal `Rasterizer` compatibility slice for
   property state and color-mapped vector-image rasterization into ToonzRaster
   images, plus TLV save/reload, ToonzRaster level insertion, level-wide
   Vector-to-ToonzRaster conversion, and fixture-sized full-color vector
   image/level output through `TOfflineGL` to Raster `Image`/`Level` output. It
-  now also rejects unsupported argument and level/image types before attempting
-  rasterization. This is a narrow script/offscreen coverage slice, not viewer,
-  final-render, or broader visual parity.
+  now also rejects unsupported argument and level/image types, enforces strict
+  constructor arity, and enforces strict `rasterize()` method arity before
+  attempting rasterization. This is a narrow script/offscreen coverage slice,
+  not viewer, final-render, or broader visual parity.
 - The Qt 6 branch now has a `Renderer` compatibility slice for construction,
   `id`, `frames`/`columns` arrays, `toString()`, `renderFrame()`,
   `renderScene()`, and disposal. `renderFrame()` and `renderScene()` use the
@@ -2998,6 +3050,23 @@ Tasks:
 - Keep direct `QWheelEvent::pixelDelta()` calls out of feature code with
   `mise run check-qt6-wheelevent-scope`; use
   `QtCompat::wheelEventPixelDelta()` for wheel pixel-delta access.
+- Keep direct `QFontDatabase` instance construction and
+  `QTextCharFormat::setFontFamily()` out of feature code with
+  `mise run check-qt6-fontdatabase-scope`; use `QtCompat` font helpers.
+- Keep direct `QTouchEvent::touchPoints()` access out of feature code with
+  `mise run check-qt6-touch-scope`; use `QtCompat` touch-point helpers.
+- Keep non-template `QVariant::canConvert(...)` calls out of feature code with
+  `mise run check-qt6-qvariant-scope`; use `canConvert<T>()` or local
+  Qt-version helpers for dynamic type checks.
+- Keep direct `QKeyCombination::toCombined()` calls out of feature code with
+  `mise run check-qt6-qkeysequence-scope`; use
+  `QtCompat::keySequenceEntryToInt()`.
+- Keep direct Qt 6 `QMediaPlayer::setSource()` / `playbackState()` calls out of
+  feature code with `mise run check-qt6-mediaplayer-scope`; use
+  `QtCompat::setMediaPlayerSource()` and `QtCompat::mediaPlayerState()`.
+- Keep direct `QColor::setNamedColor()` calls out of feature code with
+  `mise run check-qt6-qcolor-scope`; use `QColor(QString)` or local parsing
+  helpers for string color parsing.
 - Keep direct `QImage::mirrored()` calls out of feature code with
   `mise run check-qt6-qimage-mirrored-scope`; use
   `QtCompat::mirroredImage()` so Qt 6 can use `QImage::flipped()` while Qt 5
@@ -3319,12 +3388,20 @@ mise run check-macos-arm64-qt6
 mise run check-no-qregexp
 mise run check-core5compat-scope
 mise run check-qt6-fontmetrics-scope
+mise run check-qt6-fontdatabase-scope
 mise run check-qt6-highdpi-attribute-scope
+mise run check-qt6-touch-scope
+mise run check-qt6-qvariant-scope
+mise run check-qt6-qkeysequence-scope
+mise run check-qt6-mediaplayer-scope
 mise run check-qt6-desktopwidget-scope
 mise run check-qt6-combobox-activated-scope
 mise run check-qt6-checkbox-state-scope
+mise run check-qt6-buttongroup-scope
 mise run check-qt6-wheelevent-scope
+mise run check-qt6-graphicssceneevent-scope
 mise run check-qt6-qaction-scope
+mise run check-qt6-qcolor-scope
 mise run check-qt6-qimage-mirrored-scope
 mise run check-qt6-qglformat-scope
 mise run gui-smokes-app-qt6

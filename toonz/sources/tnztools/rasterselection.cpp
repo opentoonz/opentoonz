@@ -1287,7 +1287,7 @@ void RasterSelection::pasteSelection() {
   }
 
   if (clipImage.height() > 0 && (levelType == OVL_XSHLEVEL ||
-                                 m_currentImage->getType() == OVL_XSHLEVEL)) {
+                                 m_currentImage->getType() == TImage::RASTER)) {
     // An image was pasted from outside OpenToonz
 
     // Set up variables

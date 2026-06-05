@@ -440,7 +440,7 @@ void doDirectionalBlur(TRasterPT<T> r, double blur, bool bidirectional) {
 
   std::unique_ptr<T[]> row(new T[lx + 2 * brad + 2]);
   if (!row) return;
-  memset(row.get(), 0, (lx + 2 * brad + 2) * sizeof(T));
+  memset(static_cast<void *>(row.get()), 0, (lx + 2 * brad + 2) * sizeof(T));
 
   globmatte = 0.8; /* a little bit of transparency is also added */
 

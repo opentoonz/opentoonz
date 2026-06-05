@@ -406,7 +406,7 @@ void PlaneViewer::touchEvent(QTouchEvent *e, int type) {
     m_touchActive   = true;
     m_firstPanPoint = QtCompat::touchPointPosition(touchPoints.at(0));
     // obtain device type
-    m_touchDevice = e->device()->type();
+    m_touchDevice = QtCompat::touchDeviceType(e);
   } else if (m_touchActive) {
     // touchpads must have 2 finger panning for tools and navigation to be
     // functional on other devices, 1 finger panning is preferred

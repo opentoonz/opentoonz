@@ -435,23 +435,3 @@ void TreeView::mouseReleaseEvent(QMouseEvent *e) {
     onRelease();
   }
 }
-
-//----------------------------------------------------------------------------------------------------------------
-
-/*
-bool TreeView::Delegate::editorEvent(QEvent *e, QAbstractItemModel
-*abstractModel, const QStyleOptionViewItem &option, const QModelIndex &index)
-{
-  if(e->type() != QEvent::MouseButtonPress) return false;
-  TreeModel *model = dynamic_cast<TreeModel *>(abstractModel);
-  if(!model || !index.isValid()) return false;
-
-  TreeModel::Item *item = static_cast<TreeModel::Item
-*>(index.internalPointer());
-  QMouseEvent* mouseEvent = dynamic_cast<QMouseEvent*>(e);
-  QPoint pos = mouseEvent->pos();
-
-  m_treeView->onClick(item, pos, option);
-  return true;
-}
-*/

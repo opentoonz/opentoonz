@@ -9,19 +9,14 @@ function hasError(fn) {
 
 var fp = new FilePath("alpha/beta/test.tif");
 var fpCopy = new FilePath(fp);
-var fpMulti = new FilePath("first", "second");
 print("qt-script-path-args-filepath", fpCopy.toString(), fpCopy.name,
-      fpCopy.extension, fpCopy.parentDirectory.name, fpMulti.toString());
-
-var multiLevel = new Level("missing..tif", "ignored");
-var multiScene = new Scene("missing.tnz", "ignored");
-print("qt-script-path-args-multi", multiLevel.type, multiLevel.frameCount,
-      multiScene.frameCount, multiScene.columnCount);
+      fpCopy.extension, fpCopy.parentDirectory.name);
 
 var errors = [
   hasError(function() { run(); }),
   hasError(function() { run("basic.toonzscript", "extra"); }),
   hasError(function() { run(42); }),
+  hasError(function() { new FilePath("first", "second"); }),
   hasError(function() { fp.parentDirectory = 42; }),
   hasError(function() { fp.withParentDirectory(42); }),
   hasError(function() { fp.concat(42); }),
@@ -29,9 +24,11 @@ var errors = [
   hasError(function() { new Image(42); }),
   hasError(function() { new Image().load(42); }),
   hasError(function() { new Image().save(42); }),
+  hasError(function() { new Level("missing..tif", "ignored"); }),
   hasError(function() { new Level(42); }),
   hasError(function() { new Level().load(42); }),
   hasError(function() { var level = new Level(); level.path = 42; }),
+  hasError(function() { new Scene("missing.tnz", "ignored"); }),
   hasError(function() { new Scene(42); }),
   hasError(function() { new Scene().load(42); }),
   hasError(function() { new Scene().save(42); }),

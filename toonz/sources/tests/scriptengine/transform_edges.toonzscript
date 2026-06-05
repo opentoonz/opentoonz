@@ -20,6 +20,8 @@ var disposed = new Transform();
 disposed.dispose();
 
 var errors = [
+  hasError(function() { new Transform(0); },
+           "Transform constructor expected no arguments"),
   hasError(function() { transform.translate(1); }, "Transform.translate"),
   hasError(function() { transform.translate("1", 2); }, "Transform.translate"),
   hasError(function() { transform.rotate(); }, "Transform.rotate"),

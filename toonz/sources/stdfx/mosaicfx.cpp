@@ -129,7 +129,7 @@ public:
         *pix = *pixRev = val * GRAY::maxChannelValue;
       }
 
-      memcpy(lineRev, line, cellLx * sizeof(GRAY));
+      memcpy(static_cast<void *>(lineRev), line, cellLx * sizeof(GRAY));
     }
   }
 };
@@ -161,7 +161,7 @@ public:
         *pix = *pixRev = val * GRAY::maxChannelValue;
       }
 
-      memcpy(lineRev, line, cellLx * sizeof(GRAY));
+      memcpy(static_cast<void *>(lineRev), line, cellLx * sizeof(GRAY));
     }
   }
 };
