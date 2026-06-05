@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "source": "OpenToonz Qt 6 Port Progress Reports",
+  "updated_at": "2026-06-05",
+  "baseline": "OpenToonz 1.7.1 / Qt 5",
+  "goals": [
+    {
+      "title": "Startup/workspace smoke: isolated profile launch",
+      "body": "Launch the Qt 6 app with an isolated runtime profile, confirm the intended instance is under test, and capture startup/workspace screenshots.",
+      "area": "Startup/workspace",
+      "platform": "Cross-platform",
+      "validation_type": "Codex GUI smoke",
+      "validation_status": "Ready for Codex smoke",
+      "risk": "P1 high",
+      "automation_candidate": "Codex GUI",
+      "requires_build": true
+    },
+    {
+      "title": "Viewer/rendering parity: default scene and viewer crop",
+      "body": "Compare the Qt 6 viewer against the baseline for default scene display, blank/nonblank viewer behavior, and screenshot crop evidence.",
+      "area": "Viewer/rendering",
+      "platform": "Cross-platform",
+      "validation_type": "Codex GUI smoke",
+      "validation_status": "Ready for Codex smoke",
+      "risk": "P1 high",
+      "automation_candidate": "Codex GUI",
+      "requires_build": true
+    },
+    {
+      "title": "Drawing/input parity: raster/vector strokes and tablet basics",
+      "body": "Validate basic raster and vector drawing input, cursor/stroke alignment, pressure-sensitive tablet behavior, and obvious latency regressions.",
+      "area": "Drawing/input",
+      "platform": "Cross-platform",
+      "validation_type": "Human smoke",
+      "validation_status": "Needs human pass",
+      "risk": "P1 high",
+      "automation_candidate": "Needs triage",
+      "requires_build": true
+    },
+    {
+      "title": "Timeline/xsheet smoke: navigation, selection, playback basics",
+      "body": "Smoke frame navigation, cell selection, playback controls, and common xsheet/timeline interactions for Qt 6 regressions.",
+      "area": "Timeline/xsheet",
+      "platform": "Cross-platform",
+      "validation_type": "Codex GUI smoke",
+      "validation_status": "Ready for Codex smoke",
+      "risk": "P2 medium",
+      "automation_candidate": "Codex GUI",
+      "requires_build": true
+    },
+    {
+      "title": "Palette/styles smoke: style selection and color edit behavior",
+      "body": "Validate style selection, color editing, palette panel interactions, and any Qt 6 visual or signal/slot regressions.",
+      "area": "Palette/styles",
+      "platform": "Cross-platform",
+      "validation_type": "Codex GUI smoke",
+      "validation_status": "Ready for Codex smoke",
+      "risk": "P2 medium",
+      "automation_candidate": "Codex GUI",
+      "requires_build": true
+    },
+    {
+      "title": "Studio field-test pass: creative workflow acceptance",
+      "body": "Reserve a human field-test pass for real creative workflows once CI, Codex smoke evidence, and targeted human smoke items are no longer blocking.",
+      "area": "Drawing/input",
+      "platform": "Cross-platform",
+      "validation_type": "Studio field test",
+      "validation_status": "Studio field test",
+      "risk": "P2 medium",
+      "automation_candidate": "No",
+      "requires_build": true
+    }
+  ]
+}
