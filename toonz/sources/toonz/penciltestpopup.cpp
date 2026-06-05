@@ -156,9 +156,7 @@ ToonzCameraInfo defaultCamera() {
 #endif
 }
 
-bool isNullCamera(const ToonzCameraInfo& camera) {
-  return camera.isNull();
-}
+bool isNullCamera(const ToonzCameraInfo& camera) { return camera.isNull(); }
 
 QString cameraDescription(const ToonzCameraInfo& camera) {
   return camera.description();
@@ -650,7 +648,7 @@ void MyVideoWidget::drawSubCamera(QPainter& p) {
 }
 
 void MyVideoWidget::mouseMoveEvent(QMouseEvent* event) {
-  int d = 10;
+  int d                 = 10;
   const QPoint eventPos = QtCompat::mouseEventPosition(event);
 
   auto isNearBy = [&](QPoint handlePos) -> bool {
@@ -2042,11 +2040,12 @@ PencilTestPopup::PencilTestPopup()
   connect(refreshCamListButton, &QPushButton::pressed, this,
           &PencilTestPopup::refreshCameraList);
 
-  connect(m_cameraListCombo, QOverload<int>::of(&QComboBox::activated), this,
-          &PencilTestPopup::onCameraListComboActivated);
+  QtCompat::connectComboBoxActivatedIndex(
+      m_cameraListCombo, this,
+      [this](int index) { onCameraListComboActivated(index); });
 
-  connect(m_resolutionCombo, QOverload<int>::of(&QComboBox::activated), this,
-          &PencilTestPopup::onResolutionComboActivated);
+  QtCompat::connectComboBoxActivatedIndex(
+      m_resolutionCombo, this, [this](int) { onResolutionComboActivated(); });
 
   connect(m_fileFormatOptionButton, &QPushButton::pressed, this,
           &PencilTestPopup::onFileFormatOptionButtonPressed);
@@ -2103,11 +2102,10 @@ PencilTestPopup::PencilTestPopup()
 
   // File type changed (usando lambda porque atualiza variável global + chama
   // função)
-  connect(m_fileTypeCombo, QOverload<int>::of(&QComboBox::activated), this,
-          [this](int) {
-            CamCapFileType = m_fileTypeCombo->currentText().toStdString();
-            refreshFrameInfo();
-          });
+  QtCompat::connectComboBoxActivatedIndex(m_fileTypeCombo, this, [this](int) {
+    CamCapFileType = m_fileTypeCombo->currentText().toStdString();
+    refreshFrameInfo();
+  });
 
   connect(m_frameNumberEdit, &QLineEdit::editingFinished, this,
           &PencilTestPopup::refreshFrameInfo);
@@ -2178,8 +2176,8 @@ PencilTestPopup::PencilTestPopup()
   // If previous camera is not found, then try to activate the connected default
   // camera
   if (startupCamIndex <= 0 && !isNullCamera(defaultCamera())) {
-    startupCamIndex = m_cameraListCombo->findText(
-        cameraDescription(defaultCamera()));
+    startupCamIndex =
+        m_cameraListCombo->findText(cameraDescription(defaultCamera()));
   }
   if (startupCamIndex > 0) {
     m_cameraListCombo->setCurrentIndex(startupCamIndex);

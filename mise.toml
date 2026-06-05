@@ -42,6 +42,22 @@ run = "bash scripts/qt6/check-multimedia-scope.sh"
 description = "Fail if legacy Qt Script bindings escape their Qt 5-only CMake scope."
 run = "bash scripts/qt6/check-script-scope.sh"
 
+[tasks.check-qt6-fontmetrics-scope]
+description = "Fail if direct deprecated QFontMetrics::width() usage escapes QtCompat."
+run = "bash scripts/qt6/check-fontmetrics-scope.sh"
+
+[tasks.check-qt6-highdpi-attribute-scope]
+description = "Fail if Qt 5 high-DPI startup attributes escape their Qt 5-only guards."
+run = "bash scripts/qt6/check-highdpi-attribute-scope.sh"
+
+[tasks.check-qt6-combobox-activated-scope]
+description = "Fail if deprecated QComboBox::activated() connects escape QtCompat."
+run = "bash scripts/qt6/check-combobox-activated-scope.sh"
+
+[tasks.check-qt6-checkbox-state-scope]
+description = "Fail if direct QCheckBox::stateChanged connects escape QtCompat."
+run = "bash scripts/qt6/check-checkbox-state-scope.sh"
+
 [tasks.check-windows-msvc-abi]
 description = "Fail on export/import annotations that are known to break MSVC Windows builds."
 run = "bash scripts/windows/check-msvc-abi.sh"
@@ -56,31 +72,31 @@ run = "nix develop path:. --command bash scripts/nix/prepare-tiff.sh"
 
 [tasks.configure]
 description = "Configure the RelWithDebInfo Ninja build with the Nix dependency set."
-run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-relwithdebinfo'"
+run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-no-qregexp.sh && bash scripts/qt6/check-core5compat-scope.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && bash scripts/qt6/check-fontmetrics-scope.sh && bash scripts/qt6/check-highdpi-attribute-scope.sh && bash scripts/qt6/check-combobox-activated-scope.sh && bash scripts/qt6/check-checkbox-state-scope.sh && nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-relwithdebinfo'"
 
 [tasks.configure-deprecated-api]
 description = "Configure the Qt 5 lane with Qt APIs deprecated through 5.15 disabled."
-run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-deprecated-api'"
+run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-no-qregexp.sh && bash scripts/qt6/check-core5compat-scope.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && bash scripts/qt6/check-fontmetrics-scope.sh && bash scripts/qt6/check-highdpi-attribute-scope.sh && bash scripts/qt6/check-combobox-activated-scope.sh && bash scripts/qt6/check-checkbox-state-scope.sh && nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-deprecated-api'"
 
 [tasks.configure-qt6]
 description = "Configure the RelWithDebInfo Ninja build with the Qt 6 Nix dependency set."
-run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-relwithdebinfo'"
+run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-no-qregexp.sh && bash scripts/qt6/check-core5compat-scope.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && bash scripts/qt6/check-fontmetrics-scope.sh && bash scripts/qt6/check-highdpi-attribute-scope.sh && bash scripts/qt6/check-combobox-activated-scope.sh && bash scripts/qt6/check-checkbox-state-scope.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-relwithdebinfo'"
 
 [tasks.configure-qt6-translations]
 description = "Configure an isolated Qt 6 build with translation target generation enabled."
-run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-translation-check'"
+run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-no-qregexp.sh && bash scripts/qt6/check-core5compat-scope.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && bash scripts/qt6/check-fontmetrics-scope.sh && bash scripts/qt6/check-highdpi-attribute-scope.sh && bash scripts/qt6/check-combobox-activated-scope.sh && bash scripts/qt6/check-checkbox-state-scope.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-translation-check'"
 
 [tasks.build-qt6-translations]
 description = "Build the isolated Qt 6 translation lane and verify generated .qm files."
-run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-translation-check && cmake --build toonz/build/nix-qt6-translation-check --target OpenToonz --parallel && count=$(find toonz/stuff/config/loc -mindepth 2 -maxdepth 2 -name \"*.qm\" | wc -l | tr -d \" \"); test \"$count\" = 63'"
+run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-no-qregexp.sh && bash scripts/qt6/check-core5compat-scope.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && bash scripts/qt6/check-fontmetrics-scope.sh && bash scripts/qt6/check-highdpi-attribute-scope.sh && bash scripts/qt6/check-combobox-activated-scope.sh && bash scripts/qt6/check-checkbox-state-scope.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-translation-check && cmake --build toonz/build/nix-qt6-translation-check --target OpenToonz --parallel && count=$(find toonz/stuff/config/loc -mindepth 2 -maxdepth 2 -name \"*.qm\" | wc -l | tr -d \" \"); test \"$count\" = 63'"
 
 [tasks.build]
 description = "Configure and build OpenToonz with Ninja in toonz/build/nix-relwithdebinfo."
-run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-relwithdebinfo && cmake --build toonz/build/nix-relwithdebinfo --parallel'"
+run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-no-qregexp.sh && bash scripts/qt6/check-core5compat-scope.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && bash scripts/qt6/check-fontmetrics-scope.sh && bash scripts/qt6/check-highdpi-attribute-scope.sh && bash scripts/qt6/check-combobox-activated-scope.sh && bash scripts/qt6/check-checkbox-state-scope.sh && nix develop path:. --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-relwithdebinfo && cmake --build toonz/build/nix-relwithdebinfo --parallel'"
 
 [tasks.build-qt6]
 description = "Configure and build OpenToonz with Qt 6 in toonz/build/nix-qt6-relwithdebinfo."
-run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-relwithdebinfo && cmake --build toonz/build/nix-qt6-relwithdebinfo --parallel'"
+run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-no-qregexp.sh && bash scripts/qt6/check-core5compat-scope.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && bash scripts/qt6/check-fontmetrics-scope.sh && bash scripts/qt6/check-highdpi-attribute-scope.sh && bash scripts/qt6/check-combobox-activated-scope.sh && bash scripts/qt6/check-checkbox-state-scope.sh && nix develop path:.#qt6 --command bash -lc 'bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-relwithdebinfo && cmake --build toonz/build/nix-qt6-relwithdebinfo --parallel'"
 
 [tasks.run]
 description = "Run the locally built OpenToonz binary or app bundle."
@@ -612,7 +628,7 @@ run = "bash scripts/qt6/release-experimental.sh"
 
 [tasks.check]
 description = "Run the flake configure check and whitespace validation."
-run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && nix flake check path:. && git diff --check"
+run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && bash scripts/qt6/check-checkbox-state-scope.sh && nix flake check path:. && git diff --check"
 
 [tasks.format]
 description = "Run the repository clang-format helper for changed C/C++ files."

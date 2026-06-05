@@ -1181,6 +1181,10 @@ Current branch status:
   escapes `ttextcodec.h`, if a new adapter consumer is added without updating
   the documented scope, or if Core5Compat references appear outside the
   adapter-owning CMake files.
+- `mise run check-no-qregexp` and `mise run check-core5compat-scope` now also
+  run before the normal local configure, build, Qt 6 configure, and Qt 6
+  translation-build tasks, so removed regex APIs and adapter-scope regressions
+  fail before CMake/Nix work starts.
 - Core5Compat is now scoped out of `${QT_CORE_LINK_TARGETS}` and into the
   dedicated `${QT_CORE5COMPAT_LINK_TARGETS}` variable. The only current target
   links are `image`, `toonzlib`, and `OpenToonz`, matching the adapter-owning
@@ -1203,6 +1207,21 @@ Current branch status:
   uses `QLibraryInfo::path()` on Qt 6 and explicitly discards optional
   `QTranslator::load()` results. After this cleanup, the current app-target
   warning frontier in `main.cpp` is limited to OpenGL/GLUT deprecation output.
+- `mise run check-qt6-highdpi-attribute-scope` now guards that
+  `AA_EnableHighDpiScaling` and `AA_UseHighDpiPixmaps` stay inside
+  `QT_VERSION < QT_VERSION_CHECK(6, 0, 0)` startup blocks.
+- Remaining user-activated `QComboBox::activated(int)` connects in Pencil
+  Test, Camera Track export, and Startup preset selection now go through
+  `QtCompat::connectComboBoxActivatedIndex()`, which uses `textActivated` and
+  forwards the combo box current index. `mise run
+  check-qt6-combobox-activated-scope` keeps direct `QComboBox::activated`
+  connects out of the current source tree.
+- Remaining direct checkbox `stateChanged(int)` connects in the stop-motion
+  controller and Type tool options now also route through
+  `QtCompat::connectCheckStateChanged()`. `mise run
+  check-qt6-checkbox-state-scope` keeps direct `QCheckBox::stateChanged`
+  connects out of feature code so Qt 6.7+ can use `checkStateChanged` while the
+  Qt 5 lane keeps the existing signal path.
 - Legacy `toonzfarm/tfarm/tbaseserver.cpp` Windows socket diagnostic formatting
   no longer uses unbounded `wsprintf()` calls. The file now uses bounded
   `snprintf()` formatting for those messages and initializes the non-Windows
@@ -1254,6 +1273,10 @@ High-value cleanup that can be done before Qt 6:
   `mise run check-core5compat-scope` as the link/include scope guard before
   changing it, then remove those target-specific links when the adapter no
   longer needs the Qt 6 compatibility module.
+- Keep direct deprecated `QFontMetrics::width()` calls behind
+  `QtCompat::fontMetricsHorizontalAdvance()`. `mise run
+  check-qt6-fontmetrics-scope` catches feature-code regressions while allowing
+  the Qt 5 fallback inside the compatibility helper.
 - Run Clazy's Qt 6 checks against a Qt 5 build and apply fixits only in small,
   reviewable slices.
 
@@ -1727,7 +1750,10 @@ Current branch status:
   fixtures opt into `QApplication` because rendering needs Qt plugins/offscreen
   surfaces. Use the aggregate tasks as the default script-parity regression gate
   after adding or changing a QJSEngine facade fixture, and keep the individual
-  fixture tasks for focused failure triage.
+  fixture tasks for focused failure triage. On June 5, 2026,
+  `mise run script-smokes-qt6` and `mise run script-smokes-natural-exit-qt6`
+  both passed against the current Qt 6 app bundle, including the
+  QApplication-backed Rasterizer and Renderer fixtures.
 - On 2026-06-04, focused scene-icon verification passed under
   `QT_QPA_PLATFORM=offscreen` for `mise run script-smoke-scene-save-icon-qt6`
   and `mise run script-smoke-scene-save-icon-variants-qt6`. A broader forced
@@ -2931,6 +2957,9 @@ Tasks:
   `mise run check-no-qregexp`.
 - Keep direct `QGLWidget::convertToGLFormat` calls out of feature code; the
   current tool call sites route through `QtCompat::convertToGLFormat`.
+- Keep direct `QCheckBox::stateChanged` connects out of feature code with
+  `mise run check-qt6-checkbox-state-scope`; use
+  `QtCompat::connectCheckStateChanged()` for checkbox check-state changes.
 - Extend the `ttextcodec.h` adapter only where legacy encodings still require
   exact behavior, and keep direct `QTextCodec` usage out of feature code.
 
@@ -3226,6 +3255,18 @@ cmake --build toonz/build/nix-qt6-relwithdebinfo --target OpenToonz --parallel
 
 These commands prove the app target links in both lanes. They do not replace
 launch, packaging, GUI, scripting, audio, camera, or renderer smoke validation.
+The latest local Qt 6 build evidence is `mise run build-qt6` on June 5, 2026.
+It passed with the expanded local preflight chain enabled: Windows MSVC ABI,
+QRegExp, Core5Compat scope, multimedia scope, script scope, font metrics scope,
+and high-DPI startup attribute scope. The remaining compiler warnings in that
+run were macOS OpenGL deprecation warnings from `tgl.h`.
+After the combo-box activation and checkbox state-change helper slices,
+targeted app-target rebuilds also passed on June 5, 2026 in both lanes:
+`cmake --build toonz/build/nix-qt6-relwithdebinfo --target OpenToonz
+--parallel` and
+`cmake --build toonz/build/nix-relwithdebinfo --target OpenToonz --parallel`.
+The Qt 5 run became a broad rebuild after Ninja recovered its log, but it still
+linked successfully.
 
 Packaging checks once artifacts exist:
 
@@ -3234,6 +3275,10 @@ mise run package-macos-qt6
 mise run check-macos-arm64-qt6
 mise run check-no-qregexp
 mise run check-core5compat-scope
+mise run check-qt6-fontmetrics-scope
+mise run check-qt6-highdpi-attribute-scope
+mise run check-qt6-combobox-activated-scope
+mise run check-qt6-checkbox-state-scope
 mise run gui-smokes-app-qt6
 mise run gui-smoke-qt6
 mise run gui-smoke-scene-create-qt6

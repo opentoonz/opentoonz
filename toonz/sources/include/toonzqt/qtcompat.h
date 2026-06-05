@@ -5,6 +5,7 @@
 
 #include <QtGlobal>
 #include <QCheckBox>
+#include <QComboBox>
 #include <QContextMenuEvent>
 #include <QDropEvent>
 #include <QFont>
@@ -55,7 +56,7 @@ static constexpr TouchDeviceType TouchScreen = QTouchDevice::TouchScreen;
 static constexpr TouchDeviceType TouchPad    = QTouchDevice::TouchPad;
 #endif
 
-inline const QList<TouchPoint> &touchPoints(const QTouchEvent *event) {
+inline const QList<TouchPoint>& touchPoints(const QTouchEvent* event) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   return event->points();
 #else
@@ -63,7 +64,7 @@ inline const QList<TouchPoint> &touchPoints(const QTouchEvent *event) {
 #endif
 }
 
-inline QPointF touchPointPosition(const TouchPoint &point) {
+inline QPointF touchPointPosition(const TouchPoint& point) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   return point.position();
 #else
@@ -71,7 +72,7 @@ inline QPointF touchPointPosition(const TouchPoint &point) {
 #endif
 }
 
-inline QPointF touchPointLastPosition(const TouchPoint &point) {
+inline QPointF touchPointLastPosition(const TouchPoint& point) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   return point.lastPosition();
 #else
@@ -79,7 +80,7 @@ inline QPointF touchPointLastPosition(const TouchPoint &point) {
 #endif
 }
 
-inline bool isStylusPointer(const QTabletEvent *event) {
+inline bool isStylusPointer(const QTabletEvent* event) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   return event->pointerType() != QPointingDevice::PointerType::Unknown;
 #else
@@ -87,7 +88,7 @@ inline bool isStylusPointer(const QTabletEvent *event) {
 #endif
 }
 
-inline bool isEraserPointer(const QTabletEvent *event) {
+inline bool isEraserPointer(const QTabletEvent* event) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   return event->pointerType() == QPointingDevice::PointerType::Eraser;
 #else
@@ -95,7 +96,7 @@ inline bool isEraserPointer(const QTabletEvent *event) {
 #endif
 }
 
-inline QKeySequence keySequence(const QKeyEvent *event) {
+inline QKeySequence keySequence(const QKeyEvent* event) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   return QKeySequence(event->keyCombination());
 #else
@@ -103,7 +104,7 @@ inline QKeySequence keySequence(const QKeyEvent *event) {
 #endif
 }
 
-inline QImage convertToGLFormat(const QImage &image) {
+inline QImage convertToGLFormat(const QImage& image) {
   QImage converted = image.convertToFormat(QImage::Format_RGBA8888);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   return converted.flipped(Qt::Vertical);
@@ -112,7 +113,7 @@ inline QImage convertToGLFormat(const QImage &image) {
 #endif
 }
 
-inline QStringList fontDatabaseStyles(const QString &family) {
+inline QStringList fontDatabaseStyles(const QString& family) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   return QFontDatabase::styles(family);
 #else
@@ -121,7 +122,7 @@ inline QStringList fontDatabaseStyles(const QString &family) {
 #endif
 }
 
-inline QFont fontDatabaseFont(const QString &family, const QString &style,
+inline QFont fontDatabaseFont(const QString& family, const QString& style,
                               int pointSize) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   return QFontDatabase::font(family, style, pointSize);
@@ -131,8 +132,8 @@ inline QFont fontDatabaseFont(const QString &family, const QString &style,
 #endif
 }
 
-inline int fontMetricsHorizontalAdvance(const QFontMetrics &metrics,
-                                        const QString &text) {
+inline int fontMetricsHorizontalAdvance(const QFontMetrics& metrics,
+                                        const QString& text) {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
   return metrics.horizontalAdvance(text);
 #else
@@ -140,7 +141,7 @@ inline int fontMetricsHorizontalAdvance(const QFontMetrics &metrics,
 #endif
 }
 
-inline QPoint mouseEventPosition(const QMouseEvent *event) {
+inline QPoint mouseEventPosition(const QMouseEvent* event) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   return event->position().toPoint();
 #else
@@ -148,7 +149,7 @@ inline QPoint mouseEventPosition(const QMouseEvent *event) {
 #endif
 }
 
-inline QPointF mouseEventPositionF(const QMouseEvent *event) {
+inline QPointF mouseEventPositionF(const QMouseEvent* event) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   return event->position();
 #else
@@ -156,7 +157,7 @@ inline QPointF mouseEventPositionF(const QMouseEvent *event) {
 #endif
 }
 
-inline QPointF mouseEventWindowPositionF(const QMouseEvent *event) {
+inline QPointF mouseEventWindowPositionF(const QMouseEvent* event) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   return event->scenePosition();
 #else
@@ -164,7 +165,7 @@ inline QPointF mouseEventWindowPositionF(const QMouseEvent *event) {
 #endif
 }
 
-inline QPoint mouseEventGlobalPosition(const QMouseEvent *event) {
+inline QPoint mouseEventGlobalPosition(const QMouseEvent* event) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   return event->globalPosition().toPoint();
 #else
@@ -172,41 +173,43 @@ inline QPoint mouseEventGlobalPosition(const QMouseEvent *event) {
 #endif
 }
 
-inline QPoint contextMenuEventPosition(const QContextMenuEvent *event) {
+inline QPoint contextMenuEventPosition(const QContextMenuEvent* event) {
   return event->pos();
 }
 
-inline QPoint contextMenuEventGlobalPosition(const QContextMenuEvent *event) {
+inline QPoint contextMenuEventGlobalPosition(const QContextMenuEvent* event) {
   return event->globalPos();
 }
 
-inline QPoint helpEventPosition(const QHelpEvent *event) { return event->pos(); }
+inline QPoint helpEventPosition(const QHelpEvent* event) {
+  return event->pos();
+}
 
-inline QPoint helpEventGlobalPosition(const QHelpEvent *event) {
+inline QPoint helpEventGlobalPosition(const QHelpEvent* event) {
   return event->globalPos();
 }
 
-inline QPoint wheelEventPosition(const QWheelEvent *event) {
+inline QPoint wheelEventPosition(const QWheelEvent* event) {
   return event->position().toPoint();
 }
 
-inline QPointF wheelEventPositionF(const QWheelEvent *event) {
+inline QPointF wheelEventPositionF(const QWheelEvent* event) {
   return event->position();
 }
 
-inline QPoint wheelEventAngleDelta(const QWheelEvent *event) {
+inline QPoint wheelEventAngleDelta(const QWheelEvent* event) {
   return event->angleDelta();
 }
 
-inline int wheelEventAngleDeltaY(const QWheelEvent *event) {
+inline int wheelEventAngleDeltaY(const QWheelEvent* event) {
   return event->angleDelta().y();
 }
 
-inline QPoint wheelEventGlobalPosition(const QWheelEvent *event) {
+inline QPoint wheelEventGlobalPosition(const QWheelEvent* event) {
   return event->globalPosition().toPoint();
 }
 
-inline QPoint tabletEventPosition(const QTabletEvent *event) {
+inline QPoint tabletEventPosition(const QTabletEvent* event) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   return event->position().toPoint();
 #else
@@ -214,7 +217,7 @@ inline QPoint tabletEventPosition(const QTabletEvent *event) {
 #endif
 }
 
-inline QPointF tabletEventPositionF(const QTabletEvent *event) {
+inline QPointF tabletEventPositionF(const QTabletEvent* event) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   return event->position();
 #else
@@ -222,7 +225,7 @@ inline QPointF tabletEventPositionF(const QTabletEvent *event) {
 #endif
 }
 
-inline QPoint tabletEventGlobalPosition(const QTabletEvent *event) {
+inline QPoint tabletEventGlobalPosition(const QTabletEvent* event) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   return event->globalPosition().toPoint();
 #else
@@ -230,7 +233,7 @@ inline QPoint tabletEventGlobalPosition(const QTabletEvent *event) {
 #endif
 }
 
-inline QPoint hoverEventPosition(const QHoverEvent *event) {
+inline QPoint hoverEventPosition(const QHoverEvent* event) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   return event->position().toPoint();
 #else
@@ -239,29 +242,29 @@ inline QPoint hoverEventPosition(const QHoverEvent *event) {
 }
 
 inline QPointF graphicsSceneMouseEventPositionF(
-    const QGraphicsSceneMouseEvent *event) {
+    const QGraphicsSceneMouseEvent* event) {
   return event->pos();
 }
 
 inline QPointF graphicsSceneContextMenuEventPositionF(
-    const QGraphicsSceneContextMenuEvent *event) {
+    const QGraphicsSceneContextMenuEvent* event) {
   return event->pos();
 }
 
 inline QPoint graphicsSceneContextMenuEventGlobalPosition(
-    const QGraphicsSceneContextMenuEvent *event) {
+    const QGraphicsSceneContextMenuEvent* event) {
   return event->screenPos();
 }
 
-inline QMouseEvent makeMouseEvent(QEvent::Type type, const QPointF &localPos,
-                                  const QPointF &globalPos,
+inline QMouseEvent makeMouseEvent(QEvent::Type type, const QPointF& localPos,
+                                  const QPointF& globalPos,
                                   Qt::MouseButton button,
                                   Qt::MouseButtons buttons,
                                   Qt::KeyboardModifiers modifiers) {
   return QMouseEvent(type, localPos, globalPos, button, buttons, modifiers);
 }
 
-inline QPoint dropEventPosition(const QDropEvent *event) {
+inline QPoint dropEventPosition(const QDropEvent* event) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   return event->position().toPoint();
 #else
@@ -269,7 +272,7 @@ inline QPoint dropEventPosition(const QDropEvent *event) {
 #endif
 }
 
-inline Qt::KeyboardModifiers dropEventModifiers(const QDropEvent *event) {
+inline Qt::KeyboardModifiers dropEventModifiers(const QDropEvent* event) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   return event->modifiers();
 #else
@@ -278,18 +281,28 @@ inline Qt::KeyboardModifiers dropEventModifiers(const QDropEvent *event) {
 }
 
 template <typename Receiver, typename Func>
-inline QMetaObject::Connection connectCheckStateChanged(
-    QCheckBox *checkBox, Receiver *receiver, Func &&slot) {
+inline QMetaObject::Connection connectCheckStateChanged(QCheckBox* checkBox,
+                                                        Receiver* receiver,
+                                                        Func&& slot) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
   return QObject::connect(checkBox, &QCheckBox::checkStateChanged, receiver,
                           std::forward<Func>(slot));
 #else
-  return QObject::connect(
-      checkBox, &QCheckBox::stateChanged, receiver,
-      [slot = std::forward<Func>(slot)](int state) mutable {
-        slot(static_cast<Qt::CheckState>(state));
-      });
+  return QObject::connect(checkBox, &QCheckBox::stateChanged, receiver,
+                          [slot = std::forward<Func>(slot)](int state) mutable {
+                            slot(static_cast<Qt::CheckState>(state));
+                          });
 #endif
+}
+
+template <typename Receiver, typename Func>
+inline QMetaObject::Connection connectComboBoxActivatedIndex(
+    QComboBox* comboBox, Receiver* receiver, Func&& slot) {
+  return QObject::connect(
+      comboBox, &QComboBox::textActivated, receiver,
+      [comboBox, slot = std::forward<Func>(slot)](const QString&) mutable {
+        slot(comboBox->currentIndex());
+      });
 }
 
 }  // namespace QtCompat

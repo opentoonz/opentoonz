@@ -440,8 +440,9 @@ ExportCameraTrackPopup::ExportCameraTrackPopup()
 
   loadSettings();
 
-  connect(m_targetColumnCombo, QOverload<int>::of(&QComboBox::activated), this,
-          &ExportCameraTrackPopup::updatePreview);
+  QtCompat::connectComboBoxActivatedIndex(
+      m_targetColumnCombo, this,
+      [this](int) { ExportCameraTrackPopup::updatePreview(); });
   connect(m_bgOpacityField, &DVGui::DoubleField::valueEditedByHand, this,
           &ExportCameraTrackPopup::updatePreview);
   connect(m_lineColorFld, &DVGui::ColorField::colorChanged, this,
@@ -462,11 +463,13 @@ ExportCameraTrackPopup::ExportCameraTrackPopup()
           &ExportCameraTrackPopup::updatePreview);
   connect(m_lineBR_CB, &QCheckBox::clicked, this,
           &ExportCameraTrackPopup::updatePreview);
-  connect(m_graduationIntervalCombo, QOverload<int>::of(&QComboBox::activated),
-          this, &ExportCameraTrackPopup::updatePreview);
+  QtCompat::connectComboBoxActivatedIndex(
+      m_graduationIntervalCombo, this,
+      [this](int) { ExportCameraTrackPopup::updatePreview(); });
 
-  connect(m_numberAtCombo, QOverload<int>::of(&QComboBox::activated), this,
-          &ExportCameraTrackPopup::updatePreview);
+  QtCompat::connectComboBoxActivatedIndex(m_numberAtCombo, this, [this](int) {
+    ExportCameraTrackPopup::updatePreview();
+  });
   connect(m_numbersOnLineCB, &QCheckBox::clicked, this,
           &ExportCameraTrackPopup::updatePreview);
   connect(m_fontCombo, &QFontComboBox::currentFontChanged, this,

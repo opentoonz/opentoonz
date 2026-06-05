@@ -26,6 +26,7 @@
 #include "toonzqt/gutil.h"
 #include "toonzqt/dvscrollwidget.h"
 #include "toonzqt/lutcalibrator.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/viewcommandids.h"
 
 // TnzLib includes
@@ -1646,8 +1647,9 @@ TypeToolOptionsBox::TypeToolOptionsBox(QWidget *parent, TTool *tool,
 
   ToolOptionCheckbox *orientationField = dynamic_cast<ToolOptionCheckbox *>(
       m_controls.value("Vertical Orientation"));
-  ret = ret && connect(orientationField, SIGNAL(stateChanged(int)), this,
-                       SLOT(onFieldChanged()));
+  ret = ret && QtCompat::connectCheckStateChanged(
+                   orientationField, this,
+                   [this](Qt::CheckState) { onFieldChanged(); });
 
   assert(ret);
 }

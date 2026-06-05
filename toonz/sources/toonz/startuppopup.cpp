@@ -58,8 +58,8 @@ namespace {
 // The first value in the preset list
 const QString custom = QObject::tr("<custom>");
 
-void removeAll(QLayout *layout) {
-  QLayoutItem *child;
+void removeAll(QLayout* layout) {
+  QLayoutItem* child;
   while (layout->count() != 0) {
     child = layout->takeAt(0);
     if (child->layout() != nullptr) {
@@ -128,9 +128,9 @@ StartupPopup::StartupPopup()
   m_showAtStartCB           = new QCheckBox(tr("Show this at startup"), this);
   m_autoSaveOnCB            = new QCheckBox(tr("Automatically Save Every "));
   m_autoSaveTimeFld         = new IntLineEdit(this, 10);
-  QPushButton *createButton = new QPushButton(tr("Create Scene"), this);
-  QPushButton *newProjectButton = new QPushButton(tr("New Project..."), this);
-  QPushButton *loadOtherSceneButton =
+  QPushButton* createButton = new QPushButton(tr("Create Scene"), this);
+  QPushButton* newProjectButton = new QPushButton(tr("New Project..."), this);
+  QPushButton* loadOtherSceneButton =
       new QPushButton(tr("Open Another Scene..."), this);
 
   m_projectsCB = new QComboBox(this);
@@ -138,8 +138,8 @@ StartupPopup::StartupPopup()
   type << tr("pixel") << tr("cm") << tr("mm") << tr("inch") << tr("field");
   m_unitsCB->addItems(type);
 
-  QPushButton *openProjectButton = new QPushButton(tr("Open Project..."), this);
-  QPushButton *exploreProjectButton =
+  QPushButton* openProjectButton = new QPushButton(tr("Open Project..."), this);
+  QPushButton* exploreProjectButton =
       new QPushButton(tr("Explore Folder"), this);
 
   m_existingList = new StartupScenesList(this, QSize(96, 54));
@@ -170,7 +170,7 @@ StartupPopup::StartupPopup()
       "QPushButton { padding-left: 4px; padding-right: 4px;}");
   m_removePresetBtn->setStyleSheet(
       "QPushButton { padding-left: 4px; padding-right: 4px;}");
-  QLabel *label = new QLabel();
+  QLabel* label = new QLabel();
   label->setPixmap(createQIcon("opentoonz_logo")
                        .pixmap(QSize(315, 77), QIcon::Normal, QIcon::Off));
   m_projectBox->setObjectName("SolidLineFrame");
@@ -188,10 +188,10 @@ StartupPopup::StartupPopup()
   m_topLayout->setContentsMargins(0, 0, 0, 0);
   m_topLayout->setSpacing(0);
   {
-    QGridLayout *guiLay      = new QGridLayout();
-    QGridLayout *projectLay  = new QGridLayout();
-    QGridLayout *newSceneLay = new QGridLayout();
-    QWidget *newSceneWidget  = new QWidget();
+    QGridLayout* guiLay      = new QGridLayout();
+    QGridLayout* projectLay  = new QGridLayout();
+    QGridLayout* newSceneLay = new QGridLayout();
+    QWidget* newSceneWidget  = new QWidget();
     m_recentSceneLay         = new QVBoxLayout();
     guiLay->setContentsMargins(10, 10, 10, 10);
     guiLay->setVerticalSpacing(10);
@@ -230,7 +230,7 @@ StartupPopup::StartupPopup()
       newSceneLay->addWidget(m_pathFld, 1, 1, 1, 3);
       newSceneLay->addWidget(new QLabel(tr("Camera Size:")), 2, 0,
                              Qt::AlignRight | Qt::AlignVCenter);
-      QHBoxLayout *resListLay = new QHBoxLayout();
+      QHBoxLayout* resListLay = new QHBoxLayout();
       resListLay->setSpacing(3);
       resListLay->setContentsMargins(1, 1, 1, 1);
       {
@@ -288,13 +288,13 @@ StartupPopup::StartupPopup()
     m_buttonLayout->addStretch();
     m_buttonLayout->addWidget(m_autoSaveOnCB);
     m_buttonLayout->addWidget(m_autoSaveTimeFld);
-    QLabel *minutesLabel = new QLabel(tr("Minutes"), this);
+    QLabel* minutesLabel = new QLabel(tr("Minutes"), this);
     minutesLabel->setStyleSheet("QLabel{ background-color: none; }");
     m_buttonLayout->addWidget(minutesLabel);
   }
 
-  TApp *app                 = TApp::instance();
-  TSceneHandle *sceneHandle = app->getCurrentScene();
+  TApp* app                 = TApp::instance();
+  TSceneHandle* sceneHandle = app->getCurrentScene();
 
   //---- signal-slot connections
   // Using modern Qt connection syntax
@@ -328,11 +328,11 @@ StartupPopup::StartupPopup()
           &StartupPopup::updateSize);
   connect(m_dpiFld, &DoubleLineEdit::editingFinished, this,
           &StartupPopup::onDpiChanged);
-  connect(m_presetCombo, QOverload<int>::of(&QComboBox::activated), this,
-          [this](int index) {
-            if (index < 0) return;
-            onPresetSelected(m_presetCombo->itemText(index));
-          });
+  QtCompat::connectComboBoxActivatedIndex(
+      m_presetCombo, this, [this](int index) {
+        if (index < 0) return;
+        onPresetSelected(m_presetCombo->itemText(index));
+      });
   connect(m_addPresetBtn, &QPushButton::clicked, this,
           &StartupPopup::addPreset);
   connect(m_unitsCB, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
@@ -353,7 +353,7 @@ StartupPopup::StartupPopup()
 
 //-----------------------------------------------------------------------------
 
-void StartupPopup::showEvent(QShowEvent *) {
+void StartupPopup::showEvent(QShowEvent*) {
   loadPresetList();
   updateProjectCB();
   m_nameFld->setFocus();
@@ -425,7 +425,7 @@ void StartupPopup::showEvent(QShowEvent *) {
   refreshRecentScenes();
   refreshExistingScenes();
   // Center window
-  QScreen *screen =
+  QScreen* screen =
       QGuiApplication::screenAt(TApp::instance()->getMainWindow()->pos());
   if (!screen) {
     screen = QGuiApplication::primaryScreen();
@@ -444,7 +444,7 @@ void StartupPopup::refreshRecentScenes() {
   m_sceneNames.clear();
   m_sceneNames = RecentFiles::instance()->getFilesNameList(RecentFiles::Scene);
   m_recentNamesLabels.clear();
-  m_recentNamesLabels = QVector<StartupLabel *>(m_sceneNames.count());
+  m_recentNamesLabels = QVector<StartupLabel*>(m_sceneNames.count());
 
   if (m_sceneNames.count() <= 0) {
     m_recentSceneLay->addWidget(new QLabel(tr("No Recent Scenes"), this), 1,
@@ -610,7 +610,7 @@ void StartupPopup::updateProjectCB() {
   m_projectPaths.clear();
   m_projectsCB->clear();
 
-  TProjectManager *pm = TProjectManager::instance();
+  TProjectManager* pm = TProjectManager::instance();
 
   TFilePath sandboxFl = pm->getSandboxProjectFolder();
   TFilePath sandboxFp = sandboxFl + "sandbox_otprj.xml";
@@ -669,7 +669,7 @@ void StartupPopup::onProjectChanged(int index) {
   if (m_updating) return;
   TFilePath projectFp = m_projectPaths[index];
 
-  TProjectManager *pm = TProjectManager::instance();
+  TProjectManager* pm = TProjectManager::instance();
   pm->setCurrentProjectPath(projectFp);
 
   auto currentProject = pm->getCurrentProject();
@@ -807,7 +807,7 @@ void StartupPopup::removePreset() {
 
 //-----------------------------------------------------------------------------
 
-void StartupPopup::onPresetSelected(const QString &str) {
+void StartupPopup::onPresetSelected(const QString& str) {
   if (str == custom || str.isEmpty()) return;
   QString name, arStr;
   int xres = 0, yres = 0;
@@ -846,10 +846,10 @@ void StartupPopup::onPresetSelected(const QString &str) {
 
 //--------------------------------------------------------------------------
 
-bool StartupPopup::parsePresetString(const QString &str, QString &name,
-                                     int &xres, int &yres, double &fx,
-                                     double &fy, QString &xoffset,
-                                     QString &yoffset, double &ar,
+bool StartupPopup::parsePresetString(const QString& str, QString& name,
+                                     int& xres, int& yres, double& fx,
+                                     double& fy, QString& xoffset,
+                                     QString& yoffset, double& ar,
                                      bool forCleanup) {
   /*
   Parsing preset string with QString::split().
@@ -906,7 +906,7 @@ bool StartupPopup::parsePresetString(const QString &str, QString &name,
 
 //-----------------------------------------------------------------------------
 
-double StartupPopup::aspectRatioStringToValue(const QString &s) {
+double StartupPopup::aspectRatioStringToValue(const QString& s) {
   if (s == "") {
     return 1;
   }
@@ -952,9 +952,9 @@ void StartupPopup::onNewProjectButtonPressed() {
 //-----------------------------------------------------------------------------
 
 void StartupPopup::onOpenProjectButtonPressed() {
-  TProjectManager *pm = TProjectManager::instance();
+  TProjectManager* pm = TProjectManager::instance();
 
-  FileField::BrowserPopupController *bpc =
+  FileField::BrowserPopupController* bpc =
       FileField::getBrowserPopupController();
   if (!bpc) return;
 
@@ -981,7 +981,7 @@ void StartupPopup::onOpenProjectButtonPressed() {
 //-----------------------------------------------------------------------------
 
 void StartupPopup::onExploreProjectButtonPressed() {
-  TProjectManager *pm = TProjectManager::instance();
+  TProjectManager* pm = TProjectManager::instance();
   TFilePath cfp       = pm->getCurrentProject()->getProjectFolder();
 
   QDesktopServices::openUrl(QUrl("file:///" + cfp.getQString()));
@@ -1067,7 +1067,7 @@ void StartupPopup::onRecentSceneClicked(int index) {
 //-----------------------------------------------------------------------------
 
 void StartupPopup::onCameraUnitChanged(int index) {
-  Preferences *pref = Preferences::instance();
+  Preferences* pref = Preferences::instance();
   QStringList type;
   // Preference value should not be translated
   type << "pixel" << "cm" << "mm" << "inch" << "field";
@@ -1169,7 +1169,7 @@ void StartupPopup::updateSize() {
 
 //-----------------------------------------------------------------------------
 
-StartupLabel::StartupLabel(const QString &text, QWidget *parent, int index)
+StartupLabel::StartupLabel(const QString& text, QWidget* parent, int index)
     : QLabel(parent), m_index(index) {
   setText(text);
   setObjectName("StartupLabel");
@@ -1177,7 +1177,7 @@ StartupLabel::StartupLabel(const QString &text, QWidget *parent, int index)
 
 StartupLabel::~StartupLabel() {}
 
-void StartupLabel::mousePressEvent(QMouseEvent *event) {
+void StartupLabel::mousePressEvent(QMouseEvent* event) {
   m_text              = text();
   std::string strText = m_text.toStdString();
   emit wasClicked(m_index);
@@ -1185,7 +1185,7 @@ void StartupLabel::mousePressEvent(QMouseEvent *event) {
 
 //-----------------------------------------------------------------------------
 
-StartupScenesList::StartupScenesList(QWidget *parent, const QSize &iconSize)
+StartupScenesList::StartupScenesList(QWidget* parent, const QSize& iconSize)
     : QListWidget(parent), m_iconSize(iconSize) {
   setObjectName("StartupScenesList");
 
@@ -1207,8 +1207,8 @@ StartupScenesList::StartupScenesList(QWidget *parent, const QSize &iconSize)
 
 StartupScenesList::~StartupScenesList() {}
 
-QPixmap StartupScenesList::createScenePreview(const QString &name,
-                                              const TFilePath &fp) {
+QPixmap StartupScenesList::createScenePreview(const QString& name,
+                                              const TFilePath& fp) {
   TFilePath iconPath = ToonzScene::getIconPath(fp);
   if (TFileStatus(iconPath).doesExist()) {
     QPixmap scenePreview(iconPath.getQString());
@@ -1237,7 +1237,7 @@ QPixmap StartupScenesList::createScenePreview(const QString &name,
 
 void StartupScenesList::clearScenes() { clear(); }
 
-void StartupScenesList::addScene(const QString &name, const QString &path) {
+void StartupScenesList::addScene(const QString& name, const QString& path) {
   QPixmap pixmap;
   if (path == ":")
     pixmap = createQIcon("new_scene", false)
@@ -1246,7 +1246,7 @@ void StartupScenesList::addScene(const QString &name, const QString &path) {
     pixmap = createScenePreview(name, TFilePath(path));
   QIcon icon(pixmap);
 
-  QListWidgetItem *lw = new QListWidgetItem(name);
+  QListWidgetItem* lw = new QListWidgetItem(name);
   lw->setData(Qt::UserRole, path);
   lw->setToolTip(name);
 
@@ -1282,8 +1282,8 @@ void StartupScenesList::findFirstScenePath(const QList<QString> paths) {
   clearSelection();
 }
 
-void StartupScenesList::mouseMoveEvent(QMouseEvent *event) {
-  QListWidgetItem *it = itemAt(QtCompat::mouseEventPosition(event));
+void StartupScenesList::mouseMoveEvent(QMouseEvent* event) {
+  QListWidgetItem* it = itemAt(QtCompat::mouseEventPosition(event));
   if (it)
     setCursor(Qt::PointingHandCursor);
   else
@@ -1291,12 +1291,12 @@ void StartupScenesList::mouseMoveEvent(QMouseEvent *event) {
   setCurrentItem(it);
 }
 
-void StartupScenesList::leaveEvent(QEvent *event) {
+void StartupScenesList::leaveEvent(QEvent* event) {
   unsetCursor();
   clearSelection();
 }
 
-void StartupScenesList::onItemClicked(QListWidgetItem *item) {
+void StartupScenesList::onItemClicked(QListWidgetItem* item) {
   emit itemClicked(row(item));
 }
 

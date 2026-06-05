@@ -1017,22 +1017,37 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
                        SLOT(onOpacityChanged(int)));
 
   // Options Page
-  ret = ret && connect(m_useScaledFullSizeImages, SIGNAL(stateChanged(int)),
-                       this, SLOT(onScaleFullSizeImagesChanged(int)));
-  ret = ret && connect(m_liveViewOnAllFramesCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onLiveViewOnAllFramesChanged(int)));
+  ret = ret && QtCompat::connectCheckStateChanged(
+                   m_useScaledFullSizeImages, this,
+                   [this](Qt::CheckState state) {
+                     onScaleFullSizeImagesChanged(static_cast<int>(state));
+                   });
+  ret = ret && QtCompat::connectCheckStateChanged(
+                   m_liveViewOnAllFramesCB, this, [this](Qt::CheckState state) {
+                     onLiveViewOnAllFramesChanged(static_cast<int>(state));
+                   });
   ret = ret && connect(m_playSound, SIGNAL(toggled(bool)), this,
                        SLOT(onPlaySoundToggled(bool)));
-  ret = ret && connect(m_placeOnXSheetCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onPlaceOnXSheetChanged(int)));
-  ret = ret && connect(m_directShowCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onUseDirectShowChanged(int)));
-  ret = ret && connect(m_useMjpgCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onUseMjpgChanged(int)));
-  ret = ret && connect(m_useNumpadCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onUseNumpadChanged(int)));
-  ret = ret && connect(m_drawBeneathCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onDrawBeneathChanged(int)));
+  ret = ret && QtCompat::connectCheckStateChanged(
+                   m_placeOnXSheetCB, this, [this](Qt::CheckState state) {
+                     onPlaceOnXSheetChanged(static_cast<int>(state));
+                   });
+  ret = ret && QtCompat::connectCheckStateChanged(
+                   m_directShowCB, this, [this](Qt::CheckState state) {
+                     onUseDirectShowChanged(static_cast<int>(state));
+                   });
+  ret = ret && QtCompat::connectCheckStateChanged(
+                   m_useMjpgCB, this, [this](Qt::CheckState state) {
+                     onUseMjpgChanged(static_cast<int>(state));
+                   });
+  ret = ret && QtCompat::connectCheckStateChanged(
+                   m_useNumpadCB, this, [this](Qt::CheckState state) {
+                     onUseNumpadChanged(static_cast<int>(state));
+                   });
+  ret = ret && QtCompat::connectCheckStateChanged(
+                   m_drawBeneathCB, this, [this](Qt::CheckState state) {
+                     onDrawBeneathChanged(static_cast<int>(state));
+                   });
   ret = ret && connect(m_postCaptureReviewFld, SIGNAL(valueEditedByHand()),
                        this, SLOT(onCaptureReviewFldEdited()));
   ret = ret && connect(m_postCaptureReviewFld, SIGNAL(valueChanged(bool)), this,
@@ -1218,8 +1233,10 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
   ret =
       ret && connect(m_stopMotion->m_light, SIGNAL(screen3OverlayChanged(bool)),
                      this, SLOT(onScreen3OverlayChanged(bool)));
-  ret = ret && connect(m_blackScreenForCapture, SIGNAL(stateChanged(int)), this,
-                       SLOT(onBlackScreenForCaptureChanged(int)));
+  ret = ret && QtCompat::connectCheckStateChanged(
+                   m_blackScreenForCapture, this, [this](Qt::CheckState state) {
+                     onBlackScreenForCaptureChanged(static_cast<int>(state));
+                   });
   ret = ret && connect(m_stopMotion->m_light, SIGNAL(blackCaptureSignal(bool)),
                        this, SLOT(onBlackCaptureSignal(bool)));
 
