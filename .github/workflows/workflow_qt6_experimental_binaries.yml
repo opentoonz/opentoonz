@@ -38,7 +38,7 @@ jobs:
       - name: Install Qt 6
         run: |
           python3 -m pip install --user aqtinstall
-          python3 -m aqt install-qt linux desktop "${QT6_EXPERIMENTAL_QT_VERSION}" linux_gcc_64 -O "$PWD/Qt" -m qt5compat qtdeclarative qtmultimedia qtserialport qtsvg qttools
+          python3 -m aqt install-qt linux desktop "${QT6_EXPERIMENTAL_QT_VERSION}" linux_gcc_64 -O "$PWD/Qt" -m qt5compat qtmultimedia qtserialport
 
       - name: Build libtiff
         run: |
@@ -167,7 +167,7 @@ jobs:
         run: |
           @echo on
           py -m pip install aqtinstall
-          py -m aqt install-qt windows desktop %QT6_EXPERIMENTAL_QT_VERSION% win64_msvc2022_64 -O "%GITHUB_WORKSPACE%\Qt" -m qt5compat qtdeclarative qtmultimedia qtserialport qtsvg qttools
+          py -m aqt install-qt windows desktop %QT6_EXPERIMENTAL_QT_VERSION% win64_msvc2022_64 -O "%GITHUB_WORKSPACE%\Qt" -m qt5compat qtmultimedia qtserialport
         shell: cmd
 
       - name: Install third-party prebuilt libs
