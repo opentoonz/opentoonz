@@ -433,6 +433,28 @@ branch.
   and the full `mise run script-smokes-qt6` aggregate passes against the
   rebuilt Qt 6 app. GUI smokes after this SDK change still require
   `mise run package-macos-qt6` before rerunning.
+- On June 10, 2026, the `gui-smoke-script-console-view-qt6` console command was
+  updated for the strict binding argument validation added on June 5. The smoke
+  used the legacy two-argument `new Level("Raster", "name")` form, which the
+  legacy Qt Script constructor silently ignored (creating an empty level); the
+  strict QJSEngine bootstrap now rejects more than one argument, so the smoke
+  constructs `new Level()` directly, preserving the empty-level-then-`setFrame`
+  behavior it always exercised. The smoke passes again after the fix.
+- On June 10, 2026, a race in `gui-smoke-preview-render-output-qt6` was fixed
+  in both lanes. The smoke fired level/xsheet/scene change notifications and
+  started the Previewer render after only a 100 ms event pump, but the
+  Previewer invalidates cached frames through 300 ms debounce timers hooked to
+  those notifications; when the debounced invalidation fired after the render
+  completed, it cleared the freshly cached frame (raster pixels zeroed, frame
+  no longer ready) even though the listener saw a completion callback —
+  `Previewer::Imp::doOnRenderRasterFailed` also reports failures through
+  `notifyCompleted`, and `notifyFailed` is never called, so listeners cannot
+  distinguish those outcomes. The smoke now pumps 500 ms past the debounce
+  window before rendering, records frame-ready/raster stats at
+  completion-callback time in the failure output, and
+  `Previewer::Imp::onRenderFailure` now logs the failed frame and exception
+  message instead of failing silently. The preview smoke passed five
+  consecutive packaged Qt 6 runs after the fix.
 - Legacy `toonzfarm/tfarm/tbaseserver.cpp` Windows socket diagnostics no
   longer use unbounded `wsprintf()` calls; the messages now use bounded
   `snprintf()` formatting, and the non-Windows send failure message is

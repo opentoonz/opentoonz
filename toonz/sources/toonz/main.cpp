@@ -632,8 +632,7 @@ static QStringList gui_smoke_script_console_view_details() {
       "builder.fill(\"#FF0000\");"
       "var image = builder.image;"
       "view(image);"
-      "var level = new Level(\"Raster\", "
-      "\"qt_script_console_view\");"
+      "var level = new Level();"
       "level.setFrame(\"1\", image);"
       "view(level);"
       "print(\"qt-script-console-view\", image.type, "
@@ -1596,9 +1595,20 @@ public:
 
   void onRenderCompleted(int frame) override {
     ++m_completedFrames;
-    if (frame == 0 && m_loop)
-      QMetaObject::invokeMethod(m_loop, "quit", Qt::QueuedConnection);
+    if (frame == 0) {
+      Previewer *previewer = Previewer::instance(false);
+      m_readyAtCompletion  = previewer->isFrameReady(0);
+      TRasterP raster      = previewer->getRaster(0, false);
+      m_rasterAtCompletion = raster ? raster->getSize() : TDimension();
+      m_statsAtCompletion  = gui_smoke_analyze_raster_pixels(raster);
+      if (m_loop)
+        QMetaObject::invokeMethod(m_loop, "quit", Qt::QueuedConnection);
+    }
   }
+
+  bool m_readyAtCompletion = false;
+  TDimension m_rasterAtCompletion;
+  GuiSmokeRasterStats m_statsAtCompletion;
 
   void onRenderFailed(int frame) override {
     ++m_failedFrames;
@@ -1745,7 +1755,11 @@ static QStringList gui_smoke_preview_render_output_details(
   TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   TApp::instance()->getCurrentScene()->notifySceneChanged();
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
-  gui_smoke_pump_events(100);
+  // The Previewer invalidates cached frames through 300 ms debounce timers
+  // hooked to the level/xsheet/scene notifications above. Pump past that
+  // window so the deferred invalidation cannot race the render below and
+  // clear the freshly cached frame.
+  gui_smoke_pump_events(500);
 
   const TRectD previewRect(TPointD(-160.0, -120.0),
                            TDimensionD(320.0, 240.0));
@@ -1800,6 +1814,14 @@ static QStringList gui_smoke_preview_render_output_details(
           << QString("previewRenderFailedFrames=%1")
                  .arg(listener.m_failedFrames)
           << QString("previewRenderUpdateCount=%1").arg(listener.m_updateCount)
+          << QString("previewRenderReadyAtCompletion=%1")
+                 .arg(listener.m_readyAtCompletion ? QStringLiteral("true")
+                                                   : QStringLiteral("false"))
+          << QString("previewRenderSizeAtCompletion=%1x%2")
+                 .arg(listener.m_rasterAtCompletion.lx)
+                 .arg(listener.m_rasterAtCompletion.ly)
+          << QString("previewRenderRedAtCompletion=%1")
+                 .arg(listener.m_statsAtCompletion.redPixels)
           << QString("previewRenderRasterWidth=%1").arg(previewSize.lx)
           << QString("previewRenderRasterHeight=%1").arg(previewSize.ly)
           << QString("previewRenderSampleCount=%1")

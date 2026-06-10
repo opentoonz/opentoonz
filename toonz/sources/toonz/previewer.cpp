@@ -55,6 +55,7 @@
 #include <QTimer>
 #include <QRegion>
 #include <QMetaType>
+#include <QDebug>
 
 #include "previewer.h"
 
@@ -743,6 +744,9 @@ void Previewer::Imp::doOnRenderRasterCompleted(const RenderData &renderData) {
 //! aware.
 void Previewer::Imp::onRenderFailure(const RenderData &renderData,
                                      TException &e) {
+  qWarning() << "Preview render failed for frame"
+             << (renderData.m_frames.empty() ? -1 : renderData.m_frames[0])
+             << ":" << QString::fromStdWString(e.getMessage());
   m_owner->emitFailedFrame(renderData);
 }
 
