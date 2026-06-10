@@ -412,6 +412,27 @@ branch.
   `AA_EnableHighDpiScaling` and `AA_UseHighDpiPixmaps` must remain inside
   `QT_VERSION < QT_VERSION_CHECK(6, 0, 0)` blocks. It runs before the normal
   local configure, build, and translation-build tasks.
+- On June 10, 2026, macOS SDK detection in `nix/opentoonz-env.nix` and
+  `scripts/nix/prepare-tiff.sh` was updated for macOS 26+ toolchains. The old
+  logic only accepted `MacOSX15.sdk`/`MacOSX15.4.sdk` and used the removed
+  `AGL.framework` as its detection marker, so a Command Line Tools update that
+  dropped SDK 15 broke every local compile lane. Detection now validates any
+  inherited `OPENTOONZ_MACOS_SDKROOT` (ignoring stale paths), uses
+  `OpenGL.framework` plus `GLUT.framework` as the marker, and falls back to the
+  default `MacOSX.sdk` locations. Because Qt 5.15's static UiTools `.prl`
+  still lists `-framework AGL`, the Qt 5 lane seeds
+  `_Qt5UiTools_RELEASE_AGL_PATH` from the new
+  `OPENTOONZ_QT5_AGL_COMPAT_PATH` env var (real AGL when present, otherwise
+  `OpenGL.framework` as a no-op stand-in; UiTools references no AGL symbols).
+  The sandboxed flake `package`/`configureCheck` derivations seed the same
+  cache variable directly on their `cmake` command line. `AGL/agl.h` is only
+  included by dead `LEVO_MACOSX` code, so no active source path needs AGL.
+  After wiping the stale SDK-15 build caches, both lanes fully rebuilt and
+  linked against `MacOSX.sdk` (macOS 26), `mise run check` passes both
+  sandboxed configure checks, `check-textcodec`/`check-textcodec-qt6` pass,
+  and the full `mise run script-smokes-qt6` aggregate passes against the
+  rebuilt Qt 6 app. GUI smokes after this SDK change still require
+  `mise run package-macos-qt6` before rerunning.
 - Legacy `toonzfarm/tfarm/tbaseserver.cpp` Windows socket diagnostics no
   longer use unbounded `wsprintf()` calls; the messages now use bounded
   `snprintf()` formatting, and the non-Windows send failure message is

@@ -147,14 +147,23 @@ let
     unset NIX_BINTOOLS_WRAPPER_TARGET_HOST_aarch64_apple_darwin
     unset NIX_BINTOOLS_WRAPPER_TARGET_HOST_x86_64_apple_darwin
     unset LIBRARY_PATH CPATH C_INCLUDE_PATH CPLUS_INCLUDE_PATH
+    if [ -n "''${OPENTOONZ_MACOS_SDKROOT:-}" ] \
+      && ! { [ -d "$OPENTOONZ_MACOS_SDKROOT/System/Library/Frameworks/OpenGL.framework" ] \
+        && [ -d "$OPENTOONZ_MACOS_SDKROOT/System/Library/Frameworks/GLUT.framework" ]; }; then
+      echo "Ignoring stale OPENTOONZ_MACOS_SDKROOT: $OPENTOONZ_MACOS_SDKROOT" >&2
+      unset OPENTOONZ_MACOS_SDKROOT SDKROOT
+    fi
     if [ -z "''${OPENTOONZ_MACOS_SDKROOT:-}" ]; then
       for sdk in \
         /Library/Developer/CommandLineTools/SDKs/MacOSX15.sdk \
         /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk \
         /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.sdk \
-        /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk
+        /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk \
+        /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk \
+        /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
       do
-        if [ -d "$sdk/System/Library/Frameworks/AGL.framework" ]; then
+        if [ -d "$sdk/System/Library/Frameworks/OpenGL.framework" ] \
+          && [ -d "$sdk/System/Library/Frameworks/GLUT.framework" ]; then
           export OPENTOONZ_MACOS_SDKROOT="$sdk"
           break
         fi
@@ -164,6 +173,15 @@ let
       export SDKROOT="$OPENTOONZ_MACOS_SDKROOT"
       export OPENTOONZ_MACOS_FRAMEWORK_PATH="$OPENTOONZ_MACOS_SDKROOT/System/Library/Frameworks"
       export CMAKE_FRAMEWORK_PATH="$OPENTOONZ_MACOS_FRAMEWORK_PATH''${CMAKE_FRAMEWORK_PATH:+:$CMAKE_FRAMEWORK_PATH}"
+      # Qt 5.15's static UiTools .prl still lists -framework AGL, but Apple
+      # removed AGL from macOS 26+ SDKs. UiTools does not reference AGL
+      # symbols, so when AGL is gone we seed the Qt5UiTools find_library cache
+      # with OpenGL.framework (already linked) to keep configure working.
+      if [ -d "$OPENTOONZ_MACOS_FRAMEWORK_PATH/AGL.framework" ]; then
+        export OPENTOONZ_QT5_AGL_COMPAT_PATH="$OPENTOONZ_MACOS_FRAMEWORK_PATH/AGL.framework"
+      else
+        export OPENTOONZ_QT5_AGL_COMPAT_PATH="$OPENTOONZ_MACOS_FRAMEWORK_PATH/OpenGL.framework"
+      fi
     fi
   '';
 
@@ -213,6 +231,12 @@ let
     "-DSUPERLU_LIBRARY=${envVars.OPENTOONZ_SUPERLU_LIBRARY}"
   ];
 
+  # Qt 5.15's static UiTools .prl lists -framework AGL, which macOS 26+ SDKs
+  # no longer ship. Seed the Qt5UiTools find_library cache from the env var
+  # exported by darwinCompilerSetup so configure succeeds on AGL-less SDKs.
+  qt5AglCompatFlag = lib.optionalString (qtMajor == 5 && stdenv.isDarwin)
+    "\"-D_Qt5UiTools_RELEASE_AGL_PATH=$OPENTOONZ_QT5_AGL_COMPAT_PATH\"";
+
   baseDerivation = {
     pname = "opentoonz";
     version = "dev";
@@ -257,7 +281,8 @@ in
         runHook preConfigure
         ${darwinCompilerSetup}
         bash scripts/nix/prepare-tiff.sh
-        cmake -S toonz/sources -B build ${lib.escapeShellArgs cmakeFlags} -DCMAKE_INSTALL_PREFIX="$out"
+        cmake -S toonz/sources -B build ${lib.escapeShellArgs cmakeFlags} -DCMAKE_INSTALL_PREFIX="$out" \
+          ${qt5AglCompatFlag}
         runHook postConfigure
       '';
 
@@ -295,7 +320,8 @@ in
         runHook preConfigure
         ${darwinCompilerSetup}
         bash scripts/nix/prepare-tiff.sh
-        cmake -S toonz/sources -B build ${lib.escapeShellArgs cmakeFlags} -DCMAKE_INSTALL_PREFIX="$out"
+        cmake -S toonz/sources -B build ${lib.escapeShellArgs cmakeFlags} -DCMAKE_INSTALL_PREFIX="$out" \
+          ${qt5AglCompatFlag}
         runHook postConfigure
       '';
 

@@ -37,7 +37,8 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
         "OPENTOONZ_QT_MAJOR": "5",
-        "Qt5_DIR": "$env{OPENTOONZ_QT5_DIR}"
+        "Qt5_DIR": "$env{OPENTOONZ_QT5_DIR}",
+        "_Qt5UiTools_RELEASE_AGL_PATH": "$env{OPENTOONZ_QT5_AGL_COMPAT_PATH}"
       }
     },
     {
