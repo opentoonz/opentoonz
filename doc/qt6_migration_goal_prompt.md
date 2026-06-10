@@ -455,6 +455,15 @@ branch.
   `Previewer::Imp::onRenderFailure` now logs the failed frame and exception
   message instead of failing silently. The preview smoke passed five
   consecutive packaged Qt 6 runs after the fix.
+- On June 10, 2026, after the macOS 26 SDK migration and the two smoke fixes
+  above, a full validation sweep passed on the rebuilt branch: all 25 Qt 6
+  scope guards, `check-textcodec`/`check-textcodec-qt6`, `mise run check`
+  (both sandboxed flake configure checks), full Qt 5 and Qt 6 lane builds,
+  `package-macos-qt6`, `check-macos-arm64-qt6` (291 arm64 Mach-O files),
+  the complete `gui-smokes-app-qt6` aggregate (63 packaged app-side GUI
+  smokes), `script-smokes-qt6`, and `script-smokes-natural-exit-qt6`
+  (55 fixtures). Hardware camera/audio, real OS-level input delivery, and
+  Qt 5-vs-Qt 6 visual parity items remain open as before.
 - Legacy `toonzfarm/tfarm/tbaseserver.cpp` Windows socket diagnostics no
   longer use unbounded `wsprintf()` calls; the messages now use bounded
   `snprintf()` formatting, and the non-Windows send failure message is
