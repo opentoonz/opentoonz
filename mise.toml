@@ -692,7 +692,7 @@ run = "bash scripts/qt6/release-experimental.sh"
 
 [tasks.check]
 description = "Run the flake configure check and whitespace validation."
-run = "bash scripts/windows/check-msvc-abi.sh && bash scripts/qt6/check-multimedia-scope.sh && bash scripts/qt6/check-script-scope.sh && bash scripts/qt6/check-fontdatabase-scope.sh && bash scripts/qt6/check-touch-scope.sh && bash scripts/qt6/check-tabletevent-scope.sh && bash scripts/qt6/check-mouseevent-scope.sh && bash scripts/qt6/check-qvariant-scope.sh && bash scripts/qt6/check-qkeysequence-scope.sh && bash scripts/qt6/check-mediaplayer-scope.sh && bash scripts/qt6/check-desktopwidget-scope.sh && bash scripts/qt6/check-checkbox-state-scope.sh && bash scripts/qt6/check-buttongroup-scope.sh && bash scripts/qt6/check-wheelevent-scope.sh && bash scripts/qt6/check-graphicssceneevent-scope.sh && bash scripts/qt6/check-qaction-scope.sh && bash scripts/qt6/check-qcolor-scope.sh && bash scripts/qt6/check-qimage-mirrored-scope.sh && bash scripts/qt6/check-qglformat-scope.sh && bash scripts/qt6/check-qgllegacy-scope.sh && nix flake check path:. && git diff --check"
+run = "nix develop path:. --command bash -lc 'bash scripts/qt6/check-migration-preflight.sh && nix flake check path:. && git diff --check'"
 
 [tasks.format]
 description = "Run the repository clang-format helper for changed C/C++ files."
