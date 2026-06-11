@@ -98,6 +98,12 @@ branch.
 - `mise run check-qt6-fontmetrics-scope` now enforces that direct deprecated
   `QFontMetrics::width()` calls stay out of feature code and remain behind
   `QtCompat::fontMetricsHorizontalAdvance()`.
+- `mise run check-qt6-script-smoke-registry` now verifies that every task in
+  `scripts/qt6/run-all-script-smokes.sh` exists in `mise.toml` and that every
+  `OPENTOONZ_SCRIPT_FIXTURE` / `OPENTOONZ_SCRIPT_LIBRARY_FIXTURE` path
+  referenced by the script-smoke tasks exists on disk. This keeps new
+  QJSEngine compatibility fixtures from silently drifting out of the aggregate
+  smoke suite.
 - Direct removed desktop-widget APIs are no longer present under
   `toonz/sources`. `mise run check-qt6-desktopwidget-scope` now keeps
   `QDesktopWidget`, `QApplication::desktop()`, `qApp->desktop()`, and direct
@@ -1774,6 +1780,11 @@ branch.
   component/target selection, legacy `scriptbinding_*` MOC headers, and legacy
   `scriptbinding_*` sources must remain inside `OPENTOONZ_QT_MAJOR EQUAL 5`
   blocks, and Qt 6 must not gain a Qt Script target.
+- `mise run check-qt6-script-smoke-registry` now guards the Qt 6 script-smoke
+  registry: every task listed in `scripts/qt6/run-all-script-smokes.sh` must
+  exist in `mise.toml`, and every `OPENTOONZ_SCRIPT_FIXTURE` /
+  `OPENTOONZ_SCRIPT_LIBRARY_FIXTURE` path referenced by the script-smoke tasks
+  must exist on disk.
 - A `run()` error parity fixture exists at
   `toonz/sources/tests/scriptengine/run_errors.toonzscript` and is run by
   `mise run script-smoke-run-errors-qt6`. It validates that the Qt 6 bootstrap
@@ -1966,6 +1977,14 @@ branch.
   values, Vector images, empty Raster levels, and Vector levels, plus strict
   `OutlineVectorizer`/`CenterlineVectorizer` constructor arity, without
   entering renderer paths.
+- A vectorizer property edge-case Qt 6 script fixture exists at
+  `toonz/sources/tests/scriptengine/vectorizer_property_edges.toonzscript` and
+  is run by `mise run script-smoke-vectorizer-property-edges-qt6`. It validates
+  `OutlineVectorizer` corner tuning property roundtrips, transparent-color
+  parsing, numeric string coercion for `toneThreshold`,
+  `CenterlineVectorizer` numeric property coercion, bool coercion for
+  representative centerline toggles, invalid transparent-color rejection,
+  strict constructor arity, and missing-property error behavior.
 - A non-rendering binding lifecycle/property edge Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/binding_lifecycle_edges.toonzscript` and is
   run by `mise run script-smoke-binding-lifecycle-edges-qt6`. It validates
@@ -2163,7 +2182,8 @@ branch.
   Transform edge-case, ToonzRasterConverter,
   ToonzRasterConverter level conversion, ToonzRasterConverter edge-case,
   OutlineVectorizer,
-  CenterlineVectorizer, vectorizer edge-case, binding lifecycle edge,
+  CenterlineVectorizer, vectorizer edge-case, vectorizer property edge-case,
+  binding lifecycle edge,
   Rasterizer including full-color output, Renderer, Renderer frame/column
   selection, Renderer vector input, Renderer edge-case, Wrapper id, Rasterizer
   edge-case, Level path, and level transformer fixtures pass in both modes for
@@ -2377,7 +2397,7 @@ The next slice should make the Qt 6 app useful enough to run and diagnose:
    Level I/O types,
    ToonzRasterConverter, ToonzRasterConverter level conversion,
    ToonzRasterConverter edge-case, OutlineVectorizer, CenterlineVectorizer,
-   vectorizer edge-case, binding lifecycle edge, Rasterizer including
+   vectorizer edge-case, vectorizer property edge-case, binding lifecycle edge, Rasterizer including
    full-color output, Rasterizer edge-case, Renderer including `dumpCache()`,
    Renderer frame/column selection, Renderer vector input, Renderer edge-case,
    and Wrapper
@@ -2475,6 +2495,7 @@ mise run check-no-qregexp
 mise run check-core5compat-scope
 mise run check-qt6-multimedia-scope
 mise run check-qt6-script-scope
+mise run check-qt6-script-smoke-registry
 mise run check-qt6-fontmetrics-scope
 mise run check-qt6-fontdatabase-scope
 mise run check-qt6-highdpi-attribute-scope
@@ -2605,6 +2626,7 @@ mise run script-smoke-toonz-raster-converter-lifecycle-edges-qt6
 mise run script-smoke-outline-vectorizer-qt6
 mise run script-smoke-centerline-vectorizer-qt6
 mise run script-smoke-vectorizer-edges-qt6
+mise run script-smoke-vectorizer-property-edges-qt6
 mise run script-smoke-binding-lifecycle-edges-qt6
 mise run script-smoke-rasterizer-qt6
 mise run script-smoke-rasterizer-edges-qt6
@@ -2661,6 +2683,7 @@ OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-toonz-raster-convert
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-outline-vectorizer-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-centerline-vectorizer-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-vectorizer-edges-qt6
+OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-vectorizer-property-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-binding-lifecycle-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-rasterizer-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-rasterizer-edges-qt6

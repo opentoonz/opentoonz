@@ -483,6 +483,10 @@ Already covered:
   legacy Qt Script implementation and the Qt 6 `QJSEngine` facade, keeping
   `Qt5::Script` and legacy `scriptbinding_*` compilation inside Qt 5-only
   blocks.
+- `mise run check-qt6-script-smoke-registry` now guards the script-smoke
+  registry: every task listed in `scripts/qt6/run-all-script-smokes.sh` must
+  exist in `mise.toml`, and every script fixture path referenced by the
+  script-smoke tasks must exist on disk.
 - The `run()` error smoke covers missing/extra arguments, bad path arguments,
   missing script files, and child-script exception propagation.
 - The smoke suite covers the current facades for file/path, scene, level,
@@ -547,6 +551,11 @@ Already covered:
   Qt Script-style color error. The vectorizer edge smoke also covers strict
   `OutlineVectorizer`/`CenterlineVectorizer` constructor arity and strict
   `vectorize()` method arity for missing/extra arguments.
+- The vectorizer property edge smoke now covers `OutlineVectorizer` corner
+  tuning property roundtrips, transparent-color parsing, numeric string
+  coercion for `toneThreshold`, `CenterlineVectorizer` numeric and bool
+  property coercion, invalid transparent-color rejection, constructor arity
+  rejection, and missing-property error behavior.
 - The Rasterizer edge smoke covers strict `Rasterizer` constructor arity and
   strict `rasterize()` method arity for missing/extra arguments.
 - The Transform smoke covers post-dispose rejection for `toString()`,
@@ -853,6 +862,7 @@ mise run check-no-qregexp
 mise run check-core5compat-scope
 mise run check-qt6-multimedia-scope
 mise run check-qt6-script-scope
+mise run check-qt6-script-smoke-registry
 mise run check-qt6-fontmetrics-scope
 mise run check-qt6-fontdatabase-scope
 mise run check-qt6-highdpi-attribute-scope

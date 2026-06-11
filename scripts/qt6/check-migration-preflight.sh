@@ -10,6 +10,7 @@ checks=(
   scripts/qt6/check-core5compat-scope.sh
   scripts/qt6/check-multimedia-scope.sh
   scripts/qt6/check-script-scope.sh
+  scripts/qt6/check-script-smoke-registry.sh
   scripts/qt6/check-fontmetrics-scope.sh
   scripts/qt6/check-fontdatabase-scope.sh
   scripts/qt6/check-highdpi-attribute-scope.sh

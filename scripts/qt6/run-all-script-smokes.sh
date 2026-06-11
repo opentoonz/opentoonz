@@ -50,6 +50,7 @@ tasks=(
   script-smoke-outline-vectorizer-qt6
   script-smoke-centerline-vectorizer-qt6
   script-smoke-vectorizer-edges-qt6
+  script-smoke-vectorizer-property-edges-qt6
   script-smoke-binding-lifecycle-edges-qt6
   script-smoke-rasterizer-qt6
   script-smoke-rasterizer-edges-qt6

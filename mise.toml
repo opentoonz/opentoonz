@@ -42,6 +42,10 @@ run = "bash scripts/qt6/check-multimedia-scope.sh"
 description = "Fail if legacy Qt Script bindings escape their Qt 5-only CMake scope."
 run = "bash scripts/qt6/check-script-scope.sh"
 
+[tasks.check-qt6-script-smoke-registry]
+description = "Fail if the aggregate Qt 6 script-smoke task list or fixture paths drift out of sync."
+run = "bash scripts/qt6/check-script-smoke-registry.sh"
+
 [tasks.check-qt6-fontmetrics-scope]
 description = "Fail if direct deprecated QFontMetrics::width() usage escapes QtCompat."
 run = "bash scripts/qt6/check-fontmetrics-scope.sh"
@@ -629,6 +633,10 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/centerline_vect
 [tasks.script-smoke-vectorizer-edges-qt6]
 description = "Run the Qt 6 app bundle against vectorizer argument and type edge cases."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/vectorizer_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-vectorizer-edges-raster Vector Vector|qt-script-vectorizer-edges-errors [true,true,true,true,true,true,true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
+
+[tasks.script-smoke-vectorizer-property-edges-qt6]
+description = "Run the Qt 6 app bundle against vectorizer property conversion edge cases."
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/vectorizer_property_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-vectorizer-property-edges-values 12.5 33.25 4.75 3 #123456 72 5 6 7 140 70 true true false|qt-script-vectorizer-property-edges-errors [true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-binding-lifecycle-edges-qt6]
 description = "Run the Qt 6 app bundle against non-rendering binding property and lifecycle edge cases."
