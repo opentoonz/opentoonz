@@ -6,6 +6,7 @@ app_path="${OPENTOONZ_APP:-$repo_root/toonz/build/nix-qt6-relwithdebinfo/toonz/O
 script_path="${OPENTOONZ_SCRIPT_FIXTURE:-$repo_root/toonz/sources/tests/scriptengine/basic.toonzscript}"
 smoke_root="${OPENTOONZ_SCRIPT_SMOKE_ROOT:-$repo_root/toonz/build/qt6-script-smoke}"
 timeout_seconds="${OPENTOONZ_SCRIPT_SMOKE_TIMEOUT:-45}"
+runtime_lock_timeout="${OPENTOONZ_SCRIPT_SMOKE_LOCK_TIMEOUT:-$((timeout_seconds * 2))}"
 require_exit="${OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT:-0}"
 expected_output="${OPENTOONZ_SCRIPT_EXPECTED_OUTPUT:-qt-script-smoke 3 [true,ok]|qt-script-version 7.1|qt-script-warning}"
 
@@ -31,6 +32,7 @@ log_path="$smoke_root/${script_name%.*}-script-smoke.log"
 qt_plugin_path="${OPENTOONZ_SCRIPT_SMOKE_QT_PLUGIN_PATH:-}"
 hidden_qt_conf=""
 hidden_qt_frameworks=()
+runtime_lock_dir=""
 rm -f "$log_path"
 
 restore_hidden_qt_runtime() {
@@ -43,6 +45,32 @@ restore_hidden_qt_runtime() {
       mv "$framework.hidden" "$framework"
     fi
   done
+}
+
+release_runtime_lock() {
+  if [[ -n "$runtime_lock_dir" && -d "$runtime_lock_dir" ]]; then
+    rmdir "$runtime_lock_dir" 2>/dev/null || true
+  fi
+}
+
+cleanup_runtime_state() {
+  restore_hidden_qt_runtime
+  release_runtime_lock
+}
+
+acquire_runtime_lock() {
+  local lock_root="$app_path/Contents/.qt-runtime-smoke.lock"
+  local waited=0
+  while ! mkdir "$lock_root" 2>/dev/null; do
+    if ((waited >= runtime_lock_timeout)); then
+      echo "error: timed out waiting for Qt runtime smoke lock: $lock_root" >&2
+      exit 124
+    fi
+    sleep 1
+    waited=$((waited + 1))
+  done
+  runtime_lock_dir="$lock_root"
+  trap cleanup_runtime_state EXIT
 }
 
 has_expected_output() {
@@ -148,16 +176,18 @@ fi
 if [[ "$(uname -s)" == "Darwin" && -z "$qt_plugin_path" ]]; then
   qt_core_path="$(otool -L "$executable" 2>/dev/null |
     awk '$1 ~ /qtbase-/ && $1 ~ /\/lib\/QtCore.framework\/Versions\/A\/QtCore/ {print $1; exit}')"
-  if [[ "$qt_core_path" == /nix/store/*/lib/QtCore.framework/Versions/A/QtCore ]]; then
+if [[ "$qt_core_path" == /nix/store/*/lib/QtCore.framework/Versions/A/QtCore ]]; then
     qt_plugin_path="${qt_core_path%/lib/QtCore.framework/Versions/A/QtCore}/lib/qt-6/plugins"
   fi
+fi
+if [[ -n "$qt_plugin_path" ]]; then
+  acquire_runtime_lock
 fi
 if [[ -n "$qt_plugin_path" &&
       -f "$app_path/Contents/Resources/qt.conf" &&
       ! -f "$app_path/Contents/Resources/qt.conf.hidden" ]]; then
   hidden_qt_conf="$app_path/Contents/Resources/qt.conf"
   mv "$hidden_qt_conf" "$hidden_qt_conf.hidden"
-  trap restore_hidden_qt_runtime EXIT
 fi
 if [[ -n "$qt_plugin_path" && -d "$app_path/Contents/Frameworks" ]]; then
   for framework in "$app_path"/Contents/Frameworks/Qt*.framework; do
@@ -166,9 +196,6 @@ if [[ -n "$qt_plugin_path" && -d "$app_path/Contents/Frameworks" ]]; then
       hidden_qt_frameworks+=("$framework")
     fi
   done
-  if ((${#hidden_qt_frameworks[@]} > 0)); then
-    trap restore_hidden_qt_runtime EXIT
-  fi
 fi
 
 if [[ "$launch_with_open" == "1" ]]; then

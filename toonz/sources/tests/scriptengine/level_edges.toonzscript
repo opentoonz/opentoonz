@@ -42,9 +42,13 @@ var highIndexError = hasError(function() {
 var stringIndexError = hasError(function() {
   raster.getFrameByIndex("0");
 }, "must be a number");
+var fractionalIndexError = hasError(function() {
+  raster.getFrameByIndex(0.5);
+}, "must be a number");
 
 print("qt-script-level-edges-frame-access", raster.type, raster.frameCount,
-      missingFrame, negativeIndexError, highIndexError, stringIndexError);
+      missingFrame, negativeIndexError, highIndexError, stringIndexError,
+      fractionalIndexError);
 
 var toonzBuilder = new ImageBuilder(9, 7, "ToonzRaster");
 var toonzImage = toonzBuilder.image;

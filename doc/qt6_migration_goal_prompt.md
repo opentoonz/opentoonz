@@ -101,9 +101,12 @@ branch.
 - `mise run check-qt6-script-smoke-registry` now verifies that every task in
   `scripts/qt6/run-all-script-smokes.sh` exists in `mise.toml` and that every
   `OPENTOONZ_SCRIPT_FIXTURE` / `OPENTOONZ_SCRIPT_LIBRARY_FIXTURE` path
-  referenced by the script-smoke tasks exists on disk. This keeps new
-  QJSEngine compatibility fixtures from silently drifting out of the aggregate
-  smoke suite.
+  referenced by the script-smoke tasks exists on disk. It also fails if a new
+  top-level `.toonzscript` fixture under `toonz/sources/tests/scriptengine`
+  is not registered in `mise.toml`, except for the documented default
+  `basic.toonzscript` and its default child helper `run_child.toonzscript`.
+  This keeps new QJSEngine compatibility fixtures from silently drifting out
+  of the aggregate smoke suite.
 - Direct removed desktop-widget APIs are no longer present under
   `toonz/sources`. `mise run check-qt6-desktopwidget-scope` now keeps
   `QDesktopWidget`, `QApplication::desktop()`, `qApp->desktop()`, and direct
@@ -1779,12 +1782,16 @@ branch.
   legacy Qt Script implementation and the Qt 6 `QJSEngine` facade. `Qt5::Script`
   component/target selection, legacy `scriptbinding_*` MOC headers, and legacy
   `scriptbinding_*` sources must remain inside `OPENTOONZ_QT_MAJOR EQUAL 5`
-  blocks, and Qt 6 must not gain a Qt Script target.
+  blocks, Qt 6 must not gain a Qt Script target, and the orphaned app-side
+  `toonz/scriptengine.cpp` debugger popup must not be added back to the
+  OpenToonz app target because it depends on `QScriptEngineDebugger`.
 - `mise run check-qt6-script-smoke-registry` now guards the Qt 6 script-smoke
   registry: every task listed in `scripts/qt6/run-all-script-smokes.sh` must
   exist in `mise.toml`, and every `OPENTOONZ_SCRIPT_FIXTURE` /
   `OPENTOONZ_SCRIPT_LIBRARY_FIXTURE` path referenced by the script-smoke tasks
-  must exist on disk.
+  must exist on disk. It also fails if a new top-level script fixture is added
+  without a corresponding `mise` task, except for the documented default
+  `basic.toonzscript` / `run_child.toonzscript` pair.
 - A `run()` error parity fixture exists at
   `toonz/sources/tests/scriptengine/run_errors.toonzscript` and is run by
   `mise run script-smoke-run-errors-qt6`. It validates that the Qt 6 bootstrap
@@ -1857,9 +1864,11 @@ branch.
   strict Scene constructor arity, non-rendering Scene method arity checks for
   load/save, column insertion and deletion, cell access, level lookup/creation,
   and load-level calls. It also validates row/column argument rejection for
-  insert/delete/get/set cell APIs, backend negative row/column errors, bad
-  frame-id rejection, and legacy frame-id-before-level-argument error precedence
-  without entering scene icon, viewer, offscreen GL, or renderer paths.
+  insert/delete/get/set cell APIs, integer-only row/column index enforcement so
+  fractional JavaScript numbers cannot be truncated at the native Qt boundary,
+  backend negative row/column errors, bad frame-id rejection, and legacy
+  frame-id-before-level-argument error precedence without entering scene icon,
+  viewer, offscreen GL, or renderer paths.
 - A Scene lifecycle edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/scene_lifecycle_edges.toonzscript` and is
   run by `mise run script-smoke-scene-lifecycle-edges-qt6`. It validates
@@ -2041,10 +2050,12 @@ branch.
   `mise run script-smoke-renderer-edges-qt6`. It validates that
   `Renderer` rejects constructor arguments and that `renderScene()` and
   `renderFrame()` reject missing/extra/non-`Scene`/disposed scene arguments,
-  bad frame values, extra `dumpCache()` arguments, and invalid
+  bad non-integer frame values, extra `dumpCache()` arguments, and invalid
   `Renderer.frames` / `Renderer.columns` list values before reaching the Qt 6
-  renderer path, while preserving the legacy behavior that non-array `frames`
-  / `columns` properties are treated as empty selection lists.
+  renderer path. It also validates integer-only frame/column selection lists so
+  fractional JavaScript numbers cannot be truncated at the native Qt boundary,
+  while preserving the legacy behavior that non-array `frames` / `columns`
+  properties are treated as empty selection lists.
 - A Renderer lifecycle edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/renderer_lifecycle_edges.toonzscript` and
   is run by `mise run script-smoke-renderer-lifecycle-edges-qt6`. It validates
@@ -2144,12 +2155,14 @@ branch.
   `toonz/sources/tests/scriptengine/level_edges.toonzscript` and is run by
   `mise run script-smoke-level-edges-qt6`. It validates empty-level frame
   access errors, empty-level save errors, missing-frame `undefined` behavior,
-  out-of-range and non-number frame-index errors, bad frame-id rejection,
-  empty-level name setter no-op parity, empty-level path `undefined` parity,
-  legacy non-image `setFrame()` rejection, legacy frame-id-before-image error
-  precedence, level/image type mismatch rejection, incompatible save rejection,
-  missing-level load errors, and strict Level method arity for constructor,
-  frame access, frame assignment, load, and save calls.
+  out-of-range, non-number, and fractional frame-index errors so fractional
+  JavaScript numbers cannot be truncated at the native Qt boundary, bad frame-id
+  rejection, empty-level name setter no-op parity, empty-level path `undefined`
+  parity, legacy non-image `setFrame()` rejection, legacy
+  frame-id-before-image error precedence, level/image type mismatch rejection,
+  incompatible save rejection, missing-level load errors, and strict Level
+  method arity for constructor, frame access, frame assignment, load, and save
+  calls.
 - An Image edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/image_edges.toonzscript` and is run by
   `mise run script-smoke-image-edges-qt6`. It validates empty image metadata
@@ -2229,6 +2242,11 @@ branch.
   verification is still required for broader interactive command editing,
   `run()` error paths, FlipBook cleanup, repeated sessions, and real user
   scripts.
+- The Qt 6 replacement path intentionally does not provide an embedded
+  `QScriptEngineDebugger` equivalent. The active supported path is the
+  `QJSEngine` Script Console and `Run Script...` execution path; any future
+  debugger replacement should be designed as new Qt 6 UI/tooling instead of
+  reintroducing the orphaned Qt Script debugger popup.
 - On macOS, `scripts/qt6/run-gui-smoke.sh` now launches packaged Qt 6 GUI
   smokes through LaunchServices by default instead of directly executing the
   bundle binary. This matches normal `.app` startup more closely and avoids a
@@ -2243,7 +2261,10 @@ branch.
   is linked to Nix-store Qt, the harness also points Qt plugin paths at the
   matching Nix plugin directory and temporarily hides bundled Qt frameworks and
   `qt.conf` during the smoke, preventing LaunchServices from loading both Nix
-  and bundled Qt frameworks in the same process. With this path,
+  and bundled Qt frameworks in the same process. The GUI and script smoke
+  harnesses serialize that temporary bundle-runtime mutation through a
+  bundle-local lock, so focused smokes cannot race while hiding/restoring
+  `qt.conf` or bundled frameworks. With this path,
   `mise run script-smokes-qt6` and
   `mise run script-smokes-natural-exit-qt6` pass, including scene-icon,
   full-color Rasterizer, and Renderer QApplication fixtures.

@@ -482,11 +482,16 @@ Already covered:
 - `mise run check-qt6-script-scope` now guards the CMake boundary between the
   legacy Qt Script implementation and the Qt 6 `QJSEngine` facade, keeping
   `Qt5::Script` and legacy `scriptbinding_*` compilation inside Qt 5-only
-  blocks.
+  blocks. It also prevents the orphaned app-side
+  `toonz/scriptengine.cpp` debugger popup from being added back to the app
+  target, because that path depends on `QScriptEngineDebugger`.
 - `mise run check-qt6-script-smoke-registry` now guards the script-smoke
   registry: every task listed in `scripts/qt6/run-all-script-smokes.sh` must
   exist in `mise.toml`, and every script fixture path referenced by the
-  script-smoke tasks must exist on disk.
+  script-smoke tasks must exist on disk. It also fails if a new top-level
+  `.toonzscript` fixture is added under `toonz/sources/tests/scriptengine`
+  without a corresponding `mise` task, except for the documented default
+  `basic.toonzscript` / `run_child.toonzscript` pair.
 - The `run()` error smoke covers missing/extra arguments, bad path arguments,
   missing script files, and child-script exception propagation.
 - The smoke suite covers the current facades for file/path, scene, level,
@@ -518,14 +523,16 @@ Already covered:
   scene-owned level wrappers after `Scene.dispose()`. It also covers null and
   malformed cell-object rejection in `Scene.setCell()`, strict Scene
   constructor arity, strict method arity for non-rendering Scene load/save,
-  cell, level, and load-level APIs, plus legacy frame-id-before-level-argument
-  error precedence.
+  cell, level, and load-level APIs, integer-only row/column index enforcement
+  for Scene column/cell APIs, backend negative row/column errors, plus legacy
+  frame-id-before-level-argument error precedence.
 - The Level smoke coverage now includes `Level.path` bad setter rejection, the
   current failed path reload behavior for missing target paths, and
   post-dispose rejection across the Level public surface. It also covers the
   legacy non-image `Level.setFrame()` error path and frame-id-before-image
-  error precedence, plus strict Level method arity for constructor, frame
-  access, frame assignment, load, and save calls.
+  error precedence, integer-only `Level.getFrameByIndex()` enforcement, plus
+  strict Level method arity for constructor, frame access, frame assignment,
+  load, and save calls.
 - The ToonzRasterConverter smoke coverage now includes legacy bool coercion for
   `flatSource`, instance `dispose()` behavior, post-dispose `flatSource`
   persistence, static conversion after instance disposal, strict constructor
@@ -539,7 +546,8 @@ Already covered:
   `renderScene()` / `renderFrame()` argument arity checks, strict
   `dumpCache()` arity, post-dispose error behavior for `toString()`,
   `renderScene()`, `renderFrame()`, and `dumpCache()`, plus legacy non-array
-  `frames` / `columns` handling.
+  `frames` / `columns` handling and integer-only frame/column selection
+  validation.
 - The ImageBuilder smoke covers legacy `ImageBuilder.clear()` returning
   `undefined`, clear/fill behavior, strict Transform constructor arity, strict
   ImageBuilder method arity for `clear()`, `fill()`, and `add()`, and
@@ -583,9 +591,11 @@ Already covered:
   directory before fixture execution. When the executable is linked to
   Nix-store Qt, the harness now uses matching Nix Qt plugins and temporarily
   hides bundled Qt frameworks/`qt.conf` during the smoke so LaunchServices does
-  not mix two Qt runtimes. The aggregate Qt 6 script smoke suite now passes in
-  bounded and natural-exit modes, including full-color Rasterizer and Renderer
-  fixtures.
+  not mix two Qt runtimes. The GUI and script smoke harnesses serialize that
+  temporary bundle-runtime mutation through a bundle-local lock, avoiding
+  focused-smoke races while `qt.conf` or bundled frameworks are hidden. The
+  aggregate Qt 6 script smoke suite now passes in bounded and natural-exit
+  modes, including full-color Rasterizer and Renderer fixtures.
 - Aggregate script smoke tasks exist in both bounded and natural-exit modes.
 
 Still needed:
@@ -608,8 +618,9 @@ Still needed:
   platform OpenGL context. `QtOfflineGL` now treats failed offscreen surface,
   context, current-context, and framebuffer creation as normal C++ failures, so
   this unsupported path is reported quickly instead of hanging in GL setup.
-- Decide the replacement story for `QScriptEngineDebugger`, which has no direct
-  Qt 6 equivalent.
+- Design any future script-debugger UI as new Qt 6 tooling if it is still a
+  product requirement. The current Qt 6 replacement story is Script Console and
+  `Run Script...` execution without the orphaned `QScriptEngineDebugger` popup.
 - Confirm Script Console behavior manually, including broader interactive
   command editing, `run()` error paths from the GUI console, `view(Image)`,
   `view(Level)`, FlipBook cleanup, behavior across repeated console sessions,

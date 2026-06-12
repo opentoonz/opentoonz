@@ -643,6 +643,12 @@ bool intListFromVariantList(const QVariantList& values, std::vector<int>& result
       error = QObject::tr("%1 must contain frame or column numbers").arg(name);
       return false;
     }
+    bool doubleOk      = false;
+    const double number = value.toDouble(&doubleOk);
+    if (!doubleOk || std::floor(number) != number) {
+      error = QObject::tr("%1 must contain frame or column numbers").arg(name);
+      return false;
+    }
     if (iv < 0) {
       error = QObject::tr("%1 values must be non-negative").arg(name);
       return false;
@@ -951,6 +957,13 @@ const char kBootstrapScript[] = R"JS(
     if (!isNumberArgument(value))
       throw new Error(name + " must be a number : " + String(value));
     return Number(value);
+  }
+
+  function sceneIndexArgument(value, name) {
+    var number = sceneNumberArgument(value, name);
+    if (Math.floor(number) !== number)
+      throw new Error(name + " must be an integer : " + String(value));
+    return number;
   }
 
   function frameIdArgument(value) {
@@ -1798,7 +1811,8 @@ const char kBootstrapScript[] = R"JS(
     if (arguments.length !== 2)
       throw new Error("Renderer.renderFrame expected a scene and frame");
     var sceneIdValue = rendererSceneId(arguments[0]);
-    if (!isNumberArgument(arguments[1]))
+    if (!isNumberArgument(arguments[1]) ||
+        Math.floor(arguments[1]) !== arguments[1])
       throw new Error("Second argument must be a frame number : " +
                       String(arguments[1]));
     return imageFromResult(__opentoonzScriptEngine.rendererRenderFrame(
@@ -1893,7 +1907,7 @@ const char kBootstrapScript[] = R"JS(
     if (arguments.length !== 1)
       throw new Error("Level.getFrameByIndex expected one index argument");
 
-    if (!isNumberArgument(index))
+    if (!isNumberArgument(index) || Math.floor(index) !== index)
       throw new Error("frame index (" + String(index) + ") must be a number");
     return imageFromResult(__opentoonzScriptEngine.levelGetFrameByIndex(
       levelId(this), index));
@@ -1989,7 +2003,7 @@ const char kBootstrapScript[] = R"JS(
     if (arguments.length !== 1)
       throw new Error("Scene.insertColumn expected one column argument");
 
-    var columnValue = sceneNumberArgument(column, "Column argument");
+    var columnValue = sceneIndexArgument(column, "Column argument");
     throwIfError(__opentoonzScriptEngine.sceneInsertColumn(
       sceneId(this), columnValue));
     return this;
@@ -1999,7 +2013,7 @@ const char kBootstrapScript[] = R"JS(
     if (arguments.length !== 1)
       throw new Error("Scene.deleteColumn expected one column argument");
 
-    var columnValue = sceneNumberArgument(column, "Column argument");
+    var columnValue = sceneIndexArgument(column, "Column argument");
     throwIfError(__opentoonzScriptEngine.sceneDeleteColumn(
       sceneId(this), columnValue));
     return this;
@@ -2009,8 +2023,8 @@ const char kBootstrapScript[] = R"JS(
     if (arguments.length !== 2)
       throw new Error("Scene.getCell expected row and column arguments");
 
-    var rowValue = sceneNumberArgument(row, "Row argument");
-    var columnValue = sceneNumberArgument(column, "Column argument");
+    var rowValue = sceneIndexArgument(row, "Row argument");
+    var columnValue = sceneIndexArgument(column, "Column argument");
     var cell = __opentoonzScriptEngine.sceneGetCell(
       sceneId(this), rowValue, columnValue);
     throwIfError(cell.error || "");
@@ -2025,8 +2039,8 @@ const char kBootstrapScript[] = R"JS(
         "Scene.setCell expected row, column, and optional cell arguments");
     }
 
-    var rowValue = sceneNumberArgument(row, "Row argument");
-    var columnValue = sceneNumberArgument(column, "Column argument");
+    var rowValue = sceneIndexArgument(row, "Row argument");
+    var columnValue = sceneIndexArgument(column, "Column argument");
     var message = "";
     if (arguments.length < 3 ||
         (arguments.length === 3 && levelOrCell === undefined)) {

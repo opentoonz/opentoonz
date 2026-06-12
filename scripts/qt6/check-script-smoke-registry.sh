@@ -6,6 +6,8 @@ cd "$repo_root"
 
 missing_tasks=()
 missing_fixtures=()
+unregistered_fixtures=()
+referenced_fixtures=()
 
 while IFS= read -r task; do
   [[ -n "$task" ]] || continue
@@ -28,6 +30,7 @@ done < <(
 
 while IFS= read -r fixture; do
   [[ -n "$fixture" ]] || continue
+  referenced_fixtures+=("$fixture")
   if [[ ! -f "$fixture" ]]; then
     missing_fixtures+=("$fixture")
   fi
@@ -35,6 +38,35 @@ done < <(
   rg -o "OPENTOONZ_SCRIPT_(LIBRARY_)?FIXTURE=[^[:space:]']+" mise.toml |
     sed -E 's/^.*OPENTOONZ_SCRIPT_(LIBRARY_)?FIXTURE=//' |
     sort -u
+)
+
+fixture_is_referenced() {
+  local fixture="$1"
+  local referenced
+  for referenced in "${referenced_fixtures[@]}"; do
+    if [[ "$fixture" == "$referenced" ]]; then
+      return 0
+    fi
+  done
+
+  case "$fixture" in
+    toonz/sources/tests/scriptengine/basic.toonzscript | \
+      toonz/sources/tests/scriptengine/run_child.toonzscript)
+      return 0
+      ;;
+  esac
+
+  return 1
+}
+
+while IFS= read -r fixture; do
+  [[ -n "$fixture" ]] || continue
+  if ! fixture_is_referenced "$fixture"; then
+    unregistered_fixtures+=("$fixture")
+  fi
+done < <(
+  find toonz/sources/tests/scriptengine -maxdepth 1 -name '*.toonzscript' -print |
+    sort
 )
 
 if ((${#missing_tasks[@]} > 0)); then
@@ -46,6 +78,13 @@ fi
 if ((${#missing_fixtures[@]} > 0)); then
   printf 'missing script-smoke fixtures:\n' >&2
   printf '  %s\n' "${missing_fixtures[@]}" >&2
+  exit 1
+fi
+
+if ((${#unregistered_fixtures[@]} > 0)); then
+  printf 'unregistered top-level script-smoke fixtures:\n' >&2
+  printf '  %s\n' "${unregistered_fixtures[@]}" >&2
+  printf 'add a mise script-smoke task or document the fixture as a helper exception\n' >&2
   exit 1
 fi
 

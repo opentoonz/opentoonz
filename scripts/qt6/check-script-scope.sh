@@ -76,4 +76,16 @@ if git grep -nE 'Qt6::Script|Qt::Script|QT_SCRIPT_TARGET.*Qt6' -- 'toonz/sources
   exit 1
 fi
 
+if git grep -nE '(^|[[:space:]])scriptengine[.]cpp([[:space:]]|$)' -- \
+  'toonz/sources/toonz/CMakeLists.txt'; then
+  echo "error: legacy toonz/scriptengine.cpp uses QScriptEngineDebugger and must not be added to the OpenToonz app target" >&2
+  exit 1
+fi
+
+if git grep -nE 'QScriptEngineDebugger' -- 'toonz/sources' \
+  ':!toonz/sources/toonz/scriptengine.cpp'; then
+  echo "error: QScriptEngineDebugger has no Qt 6 replacement; keep debugger usage out of production script paths" >&2
+  exit 1
+fi
+
 echo "qt6-script-scope-check ok"
