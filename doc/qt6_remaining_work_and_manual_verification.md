@@ -592,7 +592,7 @@ Already covered:
   Nix-store Qt, the harness now uses matching Nix Qt plugins and temporarily
   hides bundled Qt frameworks/`qt.conf` during the smoke so LaunchServices does
   not mix two Qt runtimes. The GUI and script smoke harnesses serialize that
-  temporary bundle-runtime mutation through a bundle-local lock, avoiding
+  temporary bundle-runtime mutation through a build-local lock, avoiding
   focused-smoke races while `qt.conf` or bundled frameworks are hidden. The
   aggregate Qt 6 script smoke suite now passes in bounded and natural-exit
   modes, including full-color Rasterizer and Renderer fixtures.

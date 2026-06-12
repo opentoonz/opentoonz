@@ -53,8 +53,12 @@ cleanup_runtime_state() {
 }
 
 acquire_runtime_lock() {
-  local lock_root="$app_path/Contents/.qt-runtime-smoke.lock"
+  local lock_parent="$repo_root/toonz/build/.qt-runtime-smoke-locks"
+  local lock_name
+  lock_name="$(printf '%s' "$app_path" | tr '/ :' '___')"
+  local lock_root="$lock_parent/$lock_name.lock"
   local waited=0
+  mkdir -p "$lock_parent"
   while ! mkdir "$lock_root" 2>/dev/null; do
     if ((waited >= runtime_lock_timeout)); then
       echo "error: timed out waiting for Qt runtime smoke lock: $lock_root" >&2

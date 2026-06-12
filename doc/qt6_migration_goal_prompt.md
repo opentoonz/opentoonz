@@ -2263,7 +2263,7 @@ branch.
   `qt.conf` during the smoke, preventing LaunchServices from loading both Nix
   and bundled Qt frameworks in the same process. The GUI and script smoke
   harnesses serialize that temporary bundle-runtime mutation through a
-  bundle-local lock, so focused smokes cannot race while hiding/restoring
+  build-local lock, so focused smokes cannot race while hiding/restoring
   `qt.conf` or bundled frameworks. With this path,
   `mise run script-smokes-qt6` and
   `mise run script-smokes-natural-exit-qt6` pass, including scene-icon,
