@@ -526,6 +526,23 @@ bool DVAPI doUpdateXSheet(TXshSimpleLevel *sl, std::vector<TFrameId> oldFids,
 bool DVAPI renumberForInsertFId(TXshSimpleLevel *sl, const TFrameId &fid,
                                 const TFrameId &maxFid, TXsheet *xsh);
 
+struct DVAPI StrokeSegmentRanges {
+  int strokeIndex;
+  std::vector<DoublePair> ranges;
+};
+
+DVAPI std::vector<StrokeSegmentRanges> computeSegmentTouchRanges(
+    const TVectorImageP &vi, TStroke *lineStroke, bool selective,
+    int colorStyle);
+
+DVAPI std::vector<DoublePair> computeBrushHiddenRanges(const TStroke *stroke,
+                                                       const TPointD &pos,
+                                                       double pointSize);
+
+DVAPI std::vector<int> findStrokesInClosedRegion(const TVectorImageP &vi,
+                                                 const TStroke *boundaryStroke,
+                                                 bool selective, int colorStyle);
+
 }  // namespace ToolUtils
 
 #endif  // TOOLSUTILS_H
