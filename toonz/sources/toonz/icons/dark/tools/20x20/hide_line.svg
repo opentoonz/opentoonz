@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <rect x="0" y="0" width="20" height="20" style="fill-opacity:0;"/>
+
+    <!-- Solid diagonal stroke (visible line) -->
+    <line x1="3" y1="16" x2="12" y2="5"
+          style="stroke:#000;stroke-width:1.5px;stroke-linecap:round;"/>
+
+    <!-- Dashed parallel stroke (hidden/masked line) -->
+    <line x1="5.4" y1="17.8" x2="14.4" y2="6.8"
+          style="stroke:#000;stroke-width:1.4px;stroke-linecap:butt;stroke-dasharray:1.8,1.25;"/>
+
+    <!-- Star 1: cx=9.0  cy=2.5  r=2.2  (upper-left of solid line) -->
+    <path d="M9.0,0.3 L9.429,1.820 L11.2,2.5 L9.680,2.929 L9.0,4.7 L8.571,3.180 L6.8,2.5 L8.320,2.071 Z"
+          style="fill:#000;stroke:none;"/>
+
+    <!-- Star 2: cx=17.0  cy=9.5  r=2.2  (lower-right of dashed line) -->
+    <path d="M17.0,7.3 L17.429,8.820 L19.2,9.5 L17.680,9.929 L17.0,11.7 L16.571,10.180 L14.8,9.5 L16.320,9.071 Z"
+          style="fill:#000;stroke:none;"/>
+</svg>
