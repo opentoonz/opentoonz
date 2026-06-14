@@ -14,6 +14,7 @@
 #include <list>
 
 #include "../tvectorimage/tvectorimageP.h"
+#include "thidelinesegment.h"
 
 //#include "tdebugmessage.h"
 //--------------------------------------------------------------------------------------
@@ -1522,6 +1523,9 @@ TVectorImageP TInbetween::Imp::tween(double t) const {
     stroke->outlineOptions() = stroke1->outlineOptions();
     VIStroke *vs =
         new VIStroke(stroke, m_firstImage->getVIStroke(i)->m_groupId);
+    vs->m_hideLineSegments = interpolateHideLineSegments(
+        m_firstImage->getHideLineSegments(i),
+        m_lastImage->getHideLineSegments(i), t);
     vi->m_imp->m_strokes.push_back(vs);
 
   }  // end for each stroke
