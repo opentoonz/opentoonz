@@ -290,12 +290,13 @@ namespace {
 struct CreateStrokeData {
   int m_styleId;
   TStroke::OutlineOptions m_options;
+  std::vector<THideLineSegment> m_hideLineSegments;
 
   CreateStrokeData() : m_styleId(-1) {}
 };
 
 void createStroke(ThickQuadraticChainTag *quadTag, TVectorImage *outVectImage,
-                  const CreateStrokeData &data) {
+                  CreateStrokeData &data) {
   std::vector<TThickQuadratic *> chunks(quadTag->m_numCurves);
 
   for (UINT k = 0; k < quadTag->m_numCurves; k++)
@@ -310,6 +311,11 @@ void createStroke(ThickQuadraticChainTag *quadTag, TVectorImage *outVectImage,
   if (quadTag->m_isLoop) stroke->setSelfLoop();
   // stroke->setSketchMode(groupTag->m_type==GroupTag::SKETCH_STROKE);
   outVectImage->addStroke(stroke, false);
+  if (!data.m_hideLineSegments.empty()) {
+    outVectImage->setHideLineSegments(outVectImage->getStrokeCount() - 1,
+                                      data.m_hideLineSegments);
+    data.m_hideLineSegments.clear();
+  }
 }
 
 }  // namespace
@@ -325,6 +331,9 @@ static void createGroup(GroupTag *groupTag, TVectorImage *vi,
     else if (groupTag->m_object[j]->m_type == PliTag::OUTLINE_OPTIONS_GOBJ)
       data.m_options =
           ((StrokeOutlineOptionsTag *)groupTag->m_object[j])->m_options;
+    else if (groupTag->m_object[j]->m_type == PliTag::HIDE_LINE_SEGMENTS_GOBJ)
+      data.m_hideLineSegments =
+          ((HideLineSegmentsTag *)groupTag->m_object[j])->m_segments;
     else if (groupTag->m_object[j]->m_type == PliTag::GROUP_GOBJ)
       createGroup((GroupTag *)groupTag->m_object[j], vi, data);
     else {
@@ -400,6 +409,10 @@ TImageP TImageReaderPli::doLoad() {
       strokeData.m_options =
           ((StrokeOutlineOptionsTag *)imageTag->m_object[i])->m_options;
       break;
+    case PliTag::HIDE_LINE_SEGMENTS_GOBJ:
+      strokeData.m_hideLineSegments =
+          ((HideLineSegmentsTag *)imageTag->m_object[i])->m_segments;
+      break;
     case PliTag::AUTOCLOSE_TOLERANCE_GOBJ: {
       // aggiunge curve quadratiche con spessore costante
       AutoCloseToleranceTag *toleranceTag =
@@ -457,10 +470,11 @@ TImageWriterPli::TImageWriterPli(const TFilePath &f, const TFrameId &frameId,
 
 //-----------------------------------------------------------------------------
 
-static void putStroke(TStroke *stroke, int &currStyleId,
+static void putStroke(TVectorImageP &vi, int strokeIndex, int &currStyleId,
                       std::vector<PliObjectTag *> &tags) {
   double maxThickness = 0;
   bool nonStdOutline  = false;
+  TStroke *stroke     = vi->getStroke(strokeIndex);
   assert(stroke);
 
   int chunkCount = stroke->getChunkCount();
@@ -487,6 +501,12 @@ static void putStroke(TStroke *stroke, int &currStyleId,
         new StrokeOutlineOptionsTag(options);
     tags.push_back((PliObjectTag *)outlineOptionsTag);
     nonStdOutline = true;
+  }
+
+  if (!vi->getHideLineSegments(strokeIndex).empty()) {
+    HideLineSegmentsTag *hideTag =
+        new HideLineSegmentsTag(vi->getHideLineSegments(strokeIndex));
+    tags.push_back((PliObjectTag *)hideTag);
   }
 
   UINT k;
@@ -590,7 +610,7 @@ solo nel costruttore)
     if (tempVecImg->isStrokeGrouped(i))
       tags.push_back(makeGroup(tempVecImg, currStyleId, i, 1));
     else
-      putStroke(tempVecImg->getStroke(i++), currStyleId, tags);
+      putStroke(tempVecImg, i++, currStyleId, tags);
   }
 
   if (intersectionSize > 0) {
@@ -853,7 +873,7 @@ GroupTag *makeGroup(TVectorImageP &vi, int &currStyleId, int &index,
          vi->getCommonGroupDepth(i, index) >= currDepth) {
     int strokeDepth = vi->getGroupDepth(i);
     if (strokeDepth == currDepth)
-      putStroke(vi->getStroke(i++), currStyleId, tags);
+      putStroke(vi, i++, currStyleId, tags);
     else if (strokeDepth > currDepth)
       tags.push_back(makeGroup(vi, currStyleId, i, currDepth + 1));
     else

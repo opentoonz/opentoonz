@@ -347,6 +347,7 @@ public:
   PliTag *readBitmapTag();
   PliTag *readIntersectionDataTag();
   PliTag *readOutlineOptionsTag();
+  PliTag *readHideLineSegmentsTag();
   PliTag *readPrecisionScaleTag();
   PliTag *readAutoCloseToleranceTag();
 
@@ -373,6 +374,7 @@ public:
   TUINT32 writeBitmapTag(BitmapTag *tag);
   TUINT32 writeIntersectionDataTag(IntersectionDataTag *tag);
   TUINT32 writeOutlineOptionsTag(StrokeOutlineOptionsTag *tag);
+  TUINT32 writeHideLineSegmentsTag(HideLineSegmentsTag *tag);
   TUINT32 writePrecisionScaleTag(PrecisionScaleTag *tag);
   TUINT32 writeAutoCloseToleranceTag(AutoCloseToleranceTag *tag);
 
@@ -987,6 +989,9 @@ TagElem *ParsedPliImp::readTag() {
   case PliTag::OUTLINE_OPTIONS_GOBJ:
     newTag = readOutlineOptionsTag();
     break;
+  case PliTag::HIDE_LINE_SEGMENTS_GOBJ:
+    newTag = readHideLineSegmentsTag();
+    break;
   case PliTag::PRECISION_SCALE_GOBJ:
     newTag = readPrecisionScaleTag();
     break;
@@ -1436,6 +1441,32 @@ PliTag *ParsedPliImp::readOutlineOptionsTag() {
 
 /*=====================================================================*/
 
+PliTag *ParsedPliImp::readHideLineSegmentsTag() {
+  TUINT32 bufOffs = 0;
+  TINT32 d;
+  const double scale = 0.00001;
+
+  readDynamicData(d, bufOffs);
+  int count = d;
+  std::vector<THideLineSegment> segments;
+  segments.reserve(count);
+
+  for (int i = 0; i < count; ++i) {
+    double w0, w1;
+    readDynamicData(d, bufOffs);
+    w0 = scale * d;
+    readDynamicData(d, bufOffs);
+    w1 = scale * d;
+    int mode = m_buf[bufOffs++];
+    segments.emplace_back(w0, w1,
+                          mode ? THideLineMode::Hidden : THideLineMode::Invisible);
+  }
+
+  return new HideLineSegmentsTag(segments);
+}
+
+/*=====================================================================*/
+
 PliTag *ParsedPliImp::readPrecisionScaleTag() {
   TUINT32 bufOffs = 0;
 
@@ -1869,6 +1900,10 @@ void ParsedPliImp::writeTag(TagElem *elem) {
   case PliTag::OUTLINE_OPTIONS_GOBJ:
     elem->m_offset =
         writeOutlineOptionsTag((StrokeOutlineOptionsTag *)elem->m_tag);
+    break;
+  case PliTag::HIDE_LINE_SEGMENTS_GOBJ:
+    elem->m_offset =
+        writeHideLineSegmentsTag((HideLineSegmentsTag *)elem->m_tag);
     break;
   case PliTag::PRECISION_SCALE_GOBJ:
     elem->m_offset = writePrecisionScaleTag((PrecisionScaleTag *)elem->m_tag);
@@ -2430,6 +2465,29 @@ TUINT32 ParsedPliImp::writeOutlineOptionsTag(StrokeOutlineOptionsTag *tag) {
   *m_oChan << (UCHAR)tag->m_options.m_joinStyle;
   writeDynamicData(miterLower);
   writeDynamicData(miterUpper);
+
+  return offset;
+}
+
+/*=====================================================================*/
+
+TUINT32 ParsedPliImp::writeHideLineSegmentsTag(HideLineSegmentsTag *tag) {
+  assert(m_oChan);
+
+  const double scale = 100000.0;
+  int count          = (int)tag->m_segments.size();
+
+  setDynamicTypeBytesNum(0, count);
+  int tagLength = m_currDynamicTypeBytesNum + count * (2 * m_currDynamicTypeBytesNum + 1);
+  int offset =
+      (int)writeTagHeader((UCHAR)PliTag::HIDE_LINE_SEGMENTS_GOBJ, tagLength);
+
+  writeDynamicData((TINT32)count);
+  for (const THideLineSegment &seg : tag->m_segments) {
+    writeDynamicData((TINT32)(scale * seg.m_w0));
+    writeDynamicData((TINT32)(scale * seg.m_w1));
+    *m_oChan << (UCHAR)(seg.m_mode == THideLineMode::Hidden ? 1 : 0);
+  }
 
   return offset;
 }
