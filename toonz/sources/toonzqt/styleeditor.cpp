@@ -54,6 +54,7 @@
 #include <QStyleOptionSlider>
 #include <QToolTip>
 #include <QSplitter>
+#include <QTimer>
 #include <QMenu>
 #include <QOpenGLFramebufferObject>
 
@@ -2874,6 +2875,9 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
     , m_paletteHandle(paletteController->getCurrentPalette())
     , m_cleanupPaletteHandle(paletteController->getCurrentCleanupPalette())
     , m_toolBar(0)
+    , m_mainSplitter(0)
+    , m_bottomWidget(0)
+    , m_bottomBarAction(0)
     , m_enabled(false)
     , m_enabledOnlyFirstTab(false)
     , m_enabledFirstAndLastTab(false)
@@ -2931,9 +2935,9 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
   m_styleChooser->addWidget(makeChooserPageWithoutScrollBar(emptyPage));
   m_styleChooser->setFocusPolicy(Qt::NoFocus);
 
-  QFrame *bottomWidget = createBottomWidget();
+  createBottomWidget();
   /* ------- layout ------- */
-  QGridLayout *mainLayout = new QGridLayout;
+  QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setSpacing(0);
   {
@@ -2946,19 +2950,29 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
     }
     m_tabBarContainer->setLayout(hLayout);
 
-    mainLayout->addWidget(m_tabBarContainer, 0, 0, 1, 2);
-    mainLayout->addWidget(m_styleChooser, 1, 0, 1, 2);
-    mainLayout->addWidget(bottomWidget, 2, 0, 1, 2);
-    // mainLayout->addWidget(m_toolBar, 3, 0);
-    // mainLayout->addWidget(displayToolbar, 3, 1);
+    m_mainSplitter = new QSplitter(Qt::Vertical, this);
+    m_mainSplitter->setFocusPolicy(Qt::NoFocus);
+    // setHandleWidth(2): any value > 0 overrides the global QSS
+    // "QSplitter::handle { height: 4 }" (Qt falls back to QSS only when
+    // handleWidth == 0). 2px gives a thin but draggable handle.
+    m_mainSplitter->setHandleWidth(2);
+    m_mainSplitter->addWidget(m_styleChooser);
+    m_mainSplitter->addWidget(m_bottomWidget);
+    m_mainSplitter->setStretchFactor(0, 1);
+    m_mainSplitter->setStretchFactor(1, 0);
+    m_mainSplitter->setCollapsible(0, false);
+    m_mainSplitter->setCollapsible(1, true);
+
+    mainLayout->addWidget(m_tabBarContainer);
+    mainLayout->addWidget(m_mainSplitter, 1);
   }
-  mainLayout->setColumnStretch(0, 1);
-  mainLayout->setRowStretch(1, 1);
   setLayout(mainLayout);
 
   /* ------- signal-slot connections ------- */
 
   bool ret = true;
+  ret      = ret && connect(m_mainSplitter, SIGNAL(splitterMoved(int, int)), this,
+                            SLOT(onMainSplitterMoved(int, int)));
   ret      = ret && connect(m_styleBar, SIGNAL(currentChanged(int)), this,
                             SLOT(setPage(int)));
   ret = ret && connect(m_colorParameterSelector, SIGNAL(colorParamChanged()),
@@ -3006,7 +3020,8 @@ void StyleEditor::setPaletteHandle(TPaletteHandle* paletteHandle)
 //-----------------------------------------------------------------------------
 
 QFrame *StyleEditor::createBottomWidget() {
-  QFrame *bottomWidget = new QFrame(this);
+  m_bottomWidget       = new QFrame(this);
+  QFrame *bottomWidget = m_bottomWidget;
   m_autoButton         = new QPushButton(tr("Auto"));
   m_oldColor           = new DVGui::StyleSample(this, 42, 24);
   m_newColor           = new DVGui::StyleSample(this, 42, 24);
@@ -3015,7 +3030,7 @@ QFrame *StyleEditor::createBottomWidget() {
   bottomWidget->setFrameStyle(QFrame::StyledPanel);
   bottomWidget->setObjectName("bottomWidget");
   bottomWidget->setContentsMargins(0, 0, 0, 0);
-  bottomWidget->setMinimumHeight(60);
+  bottomWidget->setMinimumHeight(0);
   m_applyButton->setToolTip(tr("Apply changes to current style"));
   m_applyButton->setDisabled(m_paletteController->isColorAutoApplyEnabled());
   m_applyButton->setFocusPolicy(Qt::NoFocus);
@@ -3048,7 +3063,8 @@ QFrame *StyleEditor::createBottomWidget() {
   m_alphaAction  = new QAction(tr("Alpha"), this);
   m_rgbAction    = new QAction(tr("RGB"), this);
   m_hexAction    = new QAction(tr("Hex"), this);
-  m_searchAction = new QAction(tr("Search"), this);
+  m_searchAction    = new QAction(tr("Search"), this);
+  m_bottomBarAction = new QAction(tr("Bottom Bar"), this);
 
   m_wheelAction->setCheckable(true);
   m_hsvAction->setCheckable(true);
@@ -3056,18 +3072,24 @@ QFrame *StyleEditor::createBottomWidget() {
   m_rgbAction->setCheckable(true);
   m_hexAction->setCheckable(true);
   m_searchAction->setCheckable(true);
+  m_bottomBarAction->setCheckable(true);
+  m_bottomBarAction->setToolTip(
+      tr("Show or hide the bottom bar (Apply, Auto, controls)."));
   m_wheelAction->setChecked(true);
   m_hsvAction->setChecked(true);
   m_alphaAction->setChecked(true);
   m_rgbAction->setChecked(true);
   m_hexAction->setChecked(false);
   m_searchAction->setChecked(false);
+  m_bottomBarAction->setChecked(true);
   menu->addAction(m_wheelAction);
   menu->addAction(m_hsvAction);
   menu->addAction(m_alphaAction);
   menu->addAction(m_rgbAction);
   menu->addAction(m_hexAction);
   menu->addAction(m_searchAction);
+  menu->addSeparator();
+  menu->addAction(m_bottomBarAction);
 
   m_sliderAppearanceAG = new QActionGroup(this);
   QAction *relColorAct =
@@ -3169,6 +3191,8 @@ QFrame *StyleEditor::createBottomWidget() {
                        SLOT(setVisible(bool)));
   ret = ret && connect(m_searchAction, SIGNAL(toggled(bool)), this,
                        SLOT(onSearchVisible(bool)));
+  ret = ret && connect(m_bottomBarAction, SIGNAL(toggled(bool)), this,
+                       SLOT(onBottomBarToggled(bool)));
   ret = ret && connect(m_hexLineEdit, SIGNAL(editingFinished()), this,
                        SLOT(onHexChanged()));
   ret = ret && connect(m_hexEditorAction, SIGNAL(triggered()), this,
@@ -3182,6 +3206,11 @@ QFrame *StyleEditor::createBottomWidget() {
   ret = ret && connect(menu, SIGNAL(aboutToShow()), this,
                        SLOT(onPopupMenuAboutToShow()));
   assert(ret);
+
+  // Cap the maximum height to the widget's natural size so the bottom section
+  // can only collapse (0) or sit at its original height — never grow via drag.
+  int naturalH = bottomWidget->sizeHint().height();
+  if (naturalH > 0) bottomWidget->setMaximumHeight(naturalH);
 
   return bottomWidget;
 }
@@ -3487,6 +3516,18 @@ void StyleEditor::showEvent(QShowEvent *) {
   onSearchVisible(m_searchAction->isChecked());
   updateOrientationButton();
   assert(ret);
+
+  if (!m_bottomInitialized && m_mainSplitter) {
+    m_bottomInitialized = true;
+    QTimer::singleShot(0, this, [this]() {
+      int total    = m_mainSplitter->height();
+      if (total <= 0) return;
+      bool visible = m_bottomBarAction && m_bottomBarAction->isChecked();
+      int naturalH = visible ? m_bottomWidget->sizeHint().height() : 0;
+      naturalH     = qBound(0, naturalH, total - 40);
+      m_mainSplitter->setSizes({total - naturalH, naturalH});
+    });
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -4028,8 +4069,11 @@ void StyleEditor::save(QSettings &settings) const {
   if (m_rgbAction->isChecked()) visibleParts |= 0x08;
   if (m_hexAction->isChecked()) visibleParts |= 0x10;
   if (m_searchAction->isChecked()) visibleParts |= 0x20;
+  if (m_bottomBarAction && m_bottomBarAction->isChecked()) visibleParts |= 0x40;
   settings.setValue("visibleParts", visibleParts);
   settings.setValue("splitterState", m_plainColorPage->getSplitterState());
+  if (m_mainSplitter)
+    settings.setValue("bottomSplitterState", m_mainSplitter->saveState());
 }
 void StyleEditor::load(QSettings &settings) {
   QVariant isVertical = settings.value("isVertical");
@@ -4065,10 +4109,45 @@ void StyleEditor::load(QSettings &settings) {
       m_searchAction->setChecked(true);
     else
       m_searchAction->setChecked(false);
+    if (m_bottomBarAction) {
+      bool bottomVisible = (visiblePartsInt & 0x40) != 0;
+      m_bottomBarAction->setChecked(bottomVisible);
+    }
   }
   QVariant splitterState = settings.value("splitterState");
   if (splitterState.canConvert(QVariant::ByteArray))
     m_plainColorPage->setSplitterState(splitterState.toByteArray());
+  QVariant bottomState = settings.value("bottomSplitterState");
+  if (m_mainSplitter && bottomState.canConvert(QVariant::ByteArray))
+    m_mainSplitter->restoreState(bottomState.toByteArray());
+}
+
+//-----------------------------------------------------------------------------
+
+void StyleEditor::onBottomBarToggled(bool visible) {
+  if (!m_mainSplitter) return;
+  QList<int> sizes = m_mainSplitter->sizes();
+  if (sizes.size() < 2) return;
+  int total = sizes[0] + sizes[1];
+  if (visible) {
+    int naturalH = m_bottomWidget->sizeHint().height();
+    naturalH     = qBound(naturalH / 2, naturalH, total - 40);
+    m_mainSplitter->setSizes({total - naturalH, naturalH});
+  } else {
+    m_mainSplitter->setSizes({total, 0});
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void StyleEditor::onMainSplitterMoved(int, int) {
+  if (!m_mainSplitter || !m_bottomBarAction) return;
+  QList<int> sizes = m_mainSplitter->sizes();
+  if (sizes.size() < 2) return;
+  bool collapsed = sizes[1] == 0;
+  bool blocked   = m_bottomBarAction->blockSignals(true);
+  m_bottomBarAction->setChecked(!collapsed);
+  m_bottomBarAction->blockSignals(blocked);
 }
 
 //-----------------------------------------------------------------------------
@@ -4100,3 +4179,6 @@ void StyleEditor::onPopupMenuAboutToShow() {
       action->setChecked(true);
   }
 }
+
+//-----------------------------------------------------------------------------
+
