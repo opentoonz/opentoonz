@@ -301,6 +301,7 @@ set(SOURCES
     scanpopup.cpp
     scenebrowser.cpp
     scenebrowserversioncontrol.cpp
+    hidelinestrokegui.cpp
     sceneviewercontextmenu.cpp
     scenesettingspopup.cpp
     scriptconsolepanel.cpp

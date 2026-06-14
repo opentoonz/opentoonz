@@ -17,6 +17,7 @@
 #include "custompanelmanager.h"
 #include "audiorecordingpopup.h"
 #include "pltgizmopopup.h"
+#include "sceneviewercontextmenu.h"
 
 // TnzTools includes
 #include "tools/toolcommandids.h"
@@ -2468,6 +2469,11 @@ void MainWindow::defineActions() {
   createToggle(MI_VectorGuidedDrawing, QT_TR_NOOP("Vector Guided Drawing"), "",
                Preferences::instance()->isGuidedDrawingEnabled(),
                MenuViewCommandType, "view_guided_drawing");
+  createToggle(MI_ShowHideLineStrokes,
+               QT_TR_NOOP("Hide Line: Show Invisible/Hidden Strokes"), "Shift+K",
+               Preferences::instance()->getShowHideLineStrokes(),
+               MenuViewCommandType);
+  HideLineStrokeGui::syncCommandActionLabel();
   if (QGLPixelBuffer::hasOpenGLPbuffers())
     createToggle(MI_RasterizePli, QT_TR_NOOP("&Visualize Vector As Raster"), "",
                  RasterizePliToggleAction ? 1 : 0, MenuViewCommandType,

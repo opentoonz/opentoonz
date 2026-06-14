@@ -245,6 +245,7 @@
 #define MI_ZeroThick "MI_ZeroThick"
 #define MI_CursorOutline "MI_CursorOutline"
 #define MI_ViewerIndicator "MI_ViewerIndicator"
+#define MI_ShowHideLineStrokes "MI_ShowHideLineStrokes"
 
 // #define MI_LoadResourceFile       "MI_LoadResourceFile"
 #define MI_DuplicateFile "MI_DuplicateFile"

@@ -84,6 +84,8 @@ public:
       m_is3dView,           //!< Whether image rendering is in 3D mode.
       m_show0ThickStrokes,  //!< Whether strokes with 0 thickness should be
                             //! rendered anyway.
+      m_showHideLineStrokes,  //!< Whether hide-line masked segments are shown
+                              //! as editor overlay (orange/green).
       m_regionAntialias,    //!< Whether regions should be rendered with
                             //! antialiasing at boundaries.
       m_isOfflineRender,    //!< Whether image rendering is in render or
@@ -124,6 +126,7 @@ public:
       , m_is3dView(false)  // Standard view by default
       , m_show0ThickStrokes(
             true)                 // Wanna see every stroke, even invisible ones
+      , m_showHideLineStrokes(false)
       , m_regionAntialias(false)  // No need for pretty region boundaries,
                                   // typically shadowed by strokes
       // This is also related to interference with the directly above param
@@ -157,6 +160,7 @@ public:
       , m_isIcon(false)             // Not an icon by default
       , m_is3dView(false)           // Definitely standard view
       , m_show0ThickStrokes(false)  // Invisible strokes must be invisible
+      , m_showHideLineStrokes(false)
       , m_regionAntialias(true)  // Pretty region boundaries under invisible or
                                  // semitransparent strokes
       , m_isOfflineRender(true)  // By definition
@@ -191,6 +195,7 @@ public:
       , m_isIcon(other.m_isIcon)
       , m_is3dView(other.m_is3dView)
       , m_show0ThickStrokes(other.m_show0ThickStrokes)
+      , m_showHideLineStrokes(other.m_showHideLineStrokes)
       , m_regionAntialias(other.m_regionAntialias)
       , m_isOfflineRender(other.m_isOfflineRender)
       , m_indexToHighlight(other.m_indexToHighlight)
@@ -227,6 +232,7 @@ public:
       , m_isIcon(false)
       , m_is3dView(is3dView)
       , m_show0ThickStrokes(true)
+      , m_showHideLineStrokes(false)
       , m_regionAntialias(false)
       , m_isOfflineRender(false)
       , m_indexToHighlight(-1)

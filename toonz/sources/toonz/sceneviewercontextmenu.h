@@ -74,4 +74,10 @@ public slots:
 };
 }  // namespace ViewerIndicatorToggleGui
 
+namespace HideLineStrokeGui {
+void syncCommandActionLabel();
+void setShowEnabled(bool on, SceneViewer *viewer = nullptr);
+void ensureViewMenuEntry(QMenuBar *menuBar);
+}  // namespace HideLineStrokeGui
+
 #endif
