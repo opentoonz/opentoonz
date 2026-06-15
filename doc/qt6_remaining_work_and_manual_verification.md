@@ -795,6 +795,12 @@ macOS already covered:
   overlays, Animate/Edit cursor and drag paths, vector/raster Selection modes,
   vector brush, raster brush, Qt mouse-event raster brush delivery, and
   synthetic Qt tablet-event raster brush delivery.
+- On June 15, 2026, the aggregate was rerun after fixing the macOS
+  LaunchServices wrapper to wait on the child `/usr/bin/open -W` process
+  instead of the resolved OpenToonz app PID. This avoids false `wait: pid ... is
+  not a child of this shell` failures when a fast app-side smoke completes
+  before the shell reaches the final early-exit path. The rerun passed the full
+  aggregate with the documented microphone-related structured timeout skips.
 - On the current machine/session, the audio-input and audio-recording WAV
   smokes report structured `timeout` skips rather than failures. Treat those as
   environment-limited microphone capture coverage, not proof of microphone

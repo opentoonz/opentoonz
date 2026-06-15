@@ -730,6 +730,13 @@ branch.
   second-frame capture, and requires changed green pixels. After rebuild and
   packaging, `mise run gui-smoke-viewer-render-qt6` passed with `355118`
   second-frame changed pixels, green pixels, and changed green pixels.
+- On 2026-06-15, the macOS GUI smoke harness was fixed to wait on the
+  LaunchServices child `/usr/bin/open -W` process instead of the resolved
+  OpenToonz app PID when reporting early exits or hold-mode exits. This removes
+  false `wait: pid ... is not a child of this shell` failures for fast
+  app-side smokes. After the fix, `mise run gui-smokes-app-qt6` passed the
+  full packaged Qt 6 aggregate with the documented audio-input and
+  audio-recording WAV structured timeout skips.
 - On 2026-05-30, the packaged Qt 6 app also passes
   `mise run gui-smoke-viewer-zoom-pan-qt6`. This app-side smoke inserts a red
   raster frame, captures the `SceneViewer` framebuffer, applies a `1.35` view

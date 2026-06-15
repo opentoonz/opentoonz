@@ -90,6 +90,14 @@ stop_smoke_process() {
   wait "$pid" 2>/dev/null || true
 }
 
+wait_for_smoke_process_exit() {
+  if [[ "${launch_with_open:-0}" == "1" && -n "${open_pid:-}" ]]; then
+    wait "$open_pid"
+  else
+    wait "$pid"
+  fi
+}
+
 has_fatal_startup_output() {
   [[ -f "$log_path" ]] || return 1
   grep -Eiq \
@@ -2516,7 +2524,7 @@ while is_smoke_process_running; do
     if [[ "$hold_app" == "1" ]]; then
       echo "$smoke_label smoke launched and is still running after ${stable_seconds}s: pid $pid"
       echo "Log: $log_path"
-      wait "$pid"
+      wait_for_smoke_process_exit
       exit $?
     fi
 
@@ -2538,7 +2546,7 @@ while is_smoke_process_running; do
 done
 
 set +e
-wait "$pid"
+wait_for_smoke_process_exit
 status=$?
 set -e
 
