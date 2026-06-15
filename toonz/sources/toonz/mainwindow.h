@@ -33,6 +33,11 @@ class Room final : public TMainWindow {
   // For lazy loading
   bool m_initialized;
 
+  // Deferred layout restore: saved state re-applied after the first show
+  // to counteract redistribute() overwriting panel sizes.
+  bool m_hasPendingLayoutRestore = false;
+  DockLayout::State m_pendingLayoutState;
+
 public:
   Room(QWidget *parent = 0, Qt::WindowFlags flags = Qt::WindowFlags())
       : TMainWindow(parent, flags)
@@ -63,6 +68,9 @@ public:
     params.forceBuildGui = true;
     load(m_path, params);
   }
+
+protected:
+  void showEvent(QShowEvent *event) override;
 };
 
 //-----------------------------------------------------------------------------

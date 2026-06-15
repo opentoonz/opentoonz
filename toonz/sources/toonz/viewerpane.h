@@ -10,6 +10,11 @@
 #include "saveloadqsettings.h"
 
 #include <QFrame>
+<<<<<<< HEAD
+=======
+#include <QContextMenuEvent>
+#include <array>
+>>>>>>> 37c40d2d3 (feat: persist viewer zoom/pan and reference mode across sessions)
 
 class SceneViewer;
 class QPoint;
@@ -66,6 +71,11 @@ protected:
   TSoundTrack *m_sound = NULL;
 
   bool m_isActive = false;
+
+  // Deferred view restore after first sceneSwitched (session persistence)
+  bool m_hasPendingViewRestore        = false;
+  std::array<TAffine, 2> m_pendingViewAffs = {TAffine(), TAffine()};
+  int m_pendingReferenceMode          = -1;
 
 public:
   BaseViewerPanel(QWidget *parent = 0, Qt::WindowFlags flags = Qt::WindowFlags());

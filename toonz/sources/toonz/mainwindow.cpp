@@ -58,6 +58,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QMessageBox>
+#include <QTimer>
 #ifdef _WIN32
 #include <QtPlatformHeaders/QWindowsWindowFunctions>
 #endif
@@ -418,7 +419,28 @@ void Room::load(const TFilePath &fp, RoomLoadParams &params) {
 
   layout->restoreState(state);
 
+  // Store layout state for deferred re-apply after the first show.
+  // Without this, TMainWindow::resizeEvent → redistribute() recalculates
+  // panel sizes before the window has reached its final geometry.
+  m_pendingLayoutState        = state;
+  m_hasPendingLayoutRestore   = true;
+
   m_initialized = true;
+}
+
+//-----------------------------------------------------------------------------
+
+void Room::showEvent(QShowEvent *event) {
+  TMainWindow::showEvent(event);
+
+  if (m_hasPendingLayoutRestore) {
+    m_hasPendingLayoutRestore = false;
+    DockLayout::State savedState = m_pendingLayoutState;
+    DockLayout *layout           = dockLayout();
+    QTimer::singleShot(0, this, [layout, savedState]() {
+      layout->restoreState(savedState);
+    });
+  }
 }
 
 //=============================================================================
