@@ -482,9 +482,10 @@ Already covered:
 - `mise run check-qt6-script-scope` now guards the CMake boundary between the
   legacy Qt Script implementation and the Qt 6 `QJSEngine` facade, keeping
   `Qt5::Script` and legacy `scriptbinding_*` compilation inside Qt 5-only
-  blocks. It also prevents the orphaned app-side
-  `toonz/scriptengine.cpp` debugger popup from being added back to the app
-  target, because that path depends on `QScriptEngineDebugger`.
+  blocks, and failing if any production CMake target links `Qt5::Script`
+  directly. It also prevents the orphaned app-side `toonz/scriptengine.cpp`
+  debugger popup from being added back to the app target, because that path
+  depends on `QScriptEngineDebugger`.
 - `mise run check-qt6-script-smoke-registry` now guards the script-smoke
   registry: every task listed in `scripts/qt6/run-all-script-smokes.sh` must
   exist in `mise.toml`, and every script fixture path referenced by the
@@ -547,10 +548,12 @@ Already covered:
   `dumpCache()` arity, post-dispose error behavior for `toString()`,
   `renderScene()`, `renderFrame()`, and `dumpCache()`, plus legacy non-array
   `frames` / `columns` handling and integer-only frame/column selection
-  validation.
+  validation that rejects fractional, non-finite, sparse, or otherwise
+  malformed JavaScript list values before native integer conversion.
 - The ImageBuilder smoke covers legacy `ImageBuilder.clear()` returning
   `undefined`, clear/fill behavior, strict Transform constructor arity, strict
-  ImageBuilder method arity for `clear()`, `fill()`, and `add()`, and
+  ImageBuilder method arity for `clear()`, `fill()`, and `add()`,
+  integer-only width/height validation before native `int` conversion, and
   post-dispose rejection for `toString()`, `image`, `clear()`, `fill()`, and
   `add()`. It also confirms that the Qt 6 color path accepts the legacy
   `transparent` color name.
@@ -562,10 +565,14 @@ Already covered:
 - The vectorizer property edge smoke now covers `OutlineVectorizer` corner
   tuning property roundtrips, transparent-color parsing, numeric string
   coercion for `toneThreshold`, `CenterlineVectorizer` numeric and bool
-  property coercion, invalid transparent-color rejection, constructor arity
-  rejection, and missing-property error behavior.
+  property coercion, integer-only validation for integral properties,
+  finite-number validation for floating-point properties, invalid
+  transparent-color rejection, constructor arity rejection, and
+  missing-property error behavior.
 - The Rasterizer edge smoke covers strict `Rasterizer` constructor arity and
-  strict `rasterize()` method arity for missing/extra arguments.
+  strict `rasterize()` method arity for missing/extra arguments, plus
+  integer-only integral-property assignment and finite-number DPI validation
+  before native numeric conversion.
 - The Transform smoke covers post-dispose rejection for `toString()`,
   `translate()`, `rotate()`, and `scale()`, plus finite-number argument
   validation.
@@ -627,7 +634,6 @@ Still needed:
   and real user scripts. The app-side smoke now covers `print`, `warning`, a
   `run()` happy path with child output/return/global persistence, expected
   `view()` error display, and one Up-arrow history recall path.
-- Remove `Qt5::Script` from all Qt 6 production targets.
 - Keep the Qt 5 script backend or retire it only after the compatibility suite
   proves that Qt 6 behavior is acceptable.
 
@@ -675,7 +681,9 @@ Still needed:
 Already covered by focused smokes:
 
 - Packaged startup and high-DPI diagnostics.
-- Raster and vector viewer framebuffer rendering.
+- Raster and vector viewer framebuffer rendering, including a narrow raster
+  stale-frame guard that switches from a red first frame to a green second
+  frame and requires changed green pixels.
 - Direct viewer zoom/pan transform.
 - Previewer render-cache output.
 - FX Preview manager/cache output.
@@ -702,7 +710,8 @@ Still needed:
   appropriate.
 - High-DPI visual behavior beyond the current framebuffer probes.
 - OpenGL fallback message triage.
-- Blank-viewer and stale-frame regression checks on realistic scenes.
+- Blank-viewer and stale-frame regression checks on realistic scenes beyond the
+  current synthetic red-to-green raster frame switch.
 - Qt 5 versus Qt 6 screenshot or pixel comparison for representative workflows.
 
 ### 6. Drawing, Tools, Input, And Tablet Behavior

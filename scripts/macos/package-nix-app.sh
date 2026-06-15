@@ -125,12 +125,14 @@ copy_qt_plugins() {
   mkdir -p "$plugins_dir"
   shopt -s nullglob
   IFS=':' read -r -a plugin_roots <<< "$OPENTOONZ_QT_PLUGIN_DIRS"
+  found_plugin_root=0
   for plugin_root in "${plugin_roots[@]}"; do
     [[ -n "$plugin_root" ]] || continue
     if [[ ! -d "$plugin_root" ]]; then
-      echo "error: Qt plugin directory does not exist: $plugin_root" >&2
-      exit 1
+      echo "warning: skipping missing Qt plugin directory: $plugin_root" >&2
+      continue
     fi
+    found_plugin_root=1
     while IFS= read -r -d '' plugin_group; do
       group_name="$(basename "$plugin_group")"
       case "$group_name" in
@@ -168,6 +170,11 @@ copy_qt_plugins() {
     done < <(find "$plugin_root" -mindepth 1 -maxdepth 1 -type d -print0)
   done
   shopt -u nullglob
+
+  if [[ "$found_plugin_root" != "1" ]]; then
+    echo "error: none of the configured Qt plugin directories exist" >&2
+    exit 1
+  fi
 }
 
 rm -rf "$portable_stuff" "$legacy_portable_stuff"

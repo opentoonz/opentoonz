@@ -13,6 +13,15 @@ var badCtorCountError = hasError(function() {
 var badCtorArgsError = hasError(function() {
   new ImageBuilder("12", 10);
 }, "Bad arguments");
+var badCtorFractionalWidthError = hasError(function() {
+  new ImageBuilder(12.5, 10);
+}, "Bad arguments");
+var badCtorFractionalHeightError = hasError(function() {
+  new ImageBuilder(12, 10.5);
+}, "Bad arguments");
+var badCtorInfiniteError = hasError(function() {
+  new ImageBuilder(Infinity, 10);
+}, "Bad arguments");
 var badCtorSizeError = hasError(function() {
   new ImageBuilder(0, 10);
 }, "Bad size");
@@ -22,7 +31,8 @@ var badCtorTypeError = hasError(function() {
 
 print("qt-script-imagebuilder-edges-constructors",
       [badCtorCountError, badCtorArgsError, badCtorSizeError,
-       badCtorTypeError]);
+       badCtorTypeError, badCtorFractionalWidthError,
+       badCtorFractionalHeightError, badCtorInfiniteError]);
 
 var source = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
 var builder = new ImageBuilder(8, 6);

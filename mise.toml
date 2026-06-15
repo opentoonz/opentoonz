@@ -604,7 +604,7 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/transform_edges
 
 [tasks.script-smoke-image-builder-edges-qt6]
 description = "Run the Qt 6 app bundle against ImageBuilder constructor, fill, add, and disposal edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_builder_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-imagebuilder-edges-constructors [true,true,true,true]|qt-script-imagebuilder-edges-builders ImageBuilder(Raster image) ImageBuilder(ToonzRaster image) [true,true,true,true,true] [true,true,true,true,true]|qt-script-imagebuilder-edges-arity true true true true true|qt-script-imagebuilder-edges-colors true' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_builder_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-imagebuilder-edges-constructors [true,true,true,true,true,true,true]|qt-script-imagebuilder-edges-builders ImageBuilder(Raster image) ImageBuilder(ToonzRaster image) [true,true,true,true,true] [true,true,true,true,true]|qt-script-imagebuilder-edges-arity true true true true true|qt-script-imagebuilder-edges-colors true' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-toonz-raster-converter-qt6]
 description = "Run the Qt 6 app bundle against the ToonzRasterConverter headless script binding fixture."
@@ -636,7 +636,7 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/vectorizer_edge
 
 [tasks.script-smoke-vectorizer-property-edges-qt6]
 description = "Run the Qt 6 app bundle against vectorizer property conversion edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/vectorizer_property_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-vectorizer-property-edges-values 12.5 33.25 4.75 3 #123456 72 5 6 7 140 70 true true false|qt-script-vectorizer-property-edges-errors [true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/vectorizer_property_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-vectorizer-property-edges-values 12.5 33.25 4.75 3 #123456 72 5 6 7 140 70 true true false|qt-script-vectorizer-property-edges-errors [true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-binding-lifecycle-edges-qt6]
 description = "Run the Qt 6 app bundle against non-rendering binding property and lifecycle edge cases."
@@ -648,7 +648,7 @@ run = "OPENTOONZ_SCRIPT_USE_QAPPLICATION=1 OPENTOONZ_SCRIPT_FIXTURE=toonz/source
 
 [tasks.script-smoke-rasterizer-edges-qt6]
 description = "Run the Qt 6 app bundle against Rasterizer argument and type edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/rasterizer_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-rasterizer-edges-success true ToonzRaster 720 576|qt-script-rasterizer-edges-errors [true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/rasterizer_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-rasterizer-edges-success true ToonzRaster 720 576|qt-script-rasterizer-edges-errors [true,true,true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-renderer-qt6]
 description = "Run the Qt 6 app bundle against the Renderer renderFrame/renderScene script binding fixture."
@@ -664,7 +664,7 @@ run = "OPENTOONZ_SCRIPT_USE_QAPPLICATION=1 OPENTOONZ_SCRIPT_FIXTURE=toonz/source
 
 [tasks.script-smoke-renderer-edges-qt6]
 description = "Run the Qt 6 app bundle against Renderer argument edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/renderer_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-renderer-edges-errors [true,true,true,true,true,true,true,true,true,true,true,true,true]|qt-script-renderer-list-edges-errors [true,true,true,true,true,true]|qt-script-renderer-list-edges-non-arrays true true' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/renderer_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-renderer-edges-errors [true,true,true,true,true,true,true,true,true,true,true,true,true]|qt-script-renderer-list-edges-errors [true,true,true,true,true,true,true,true,true,true]|qt-script-renderer-list-edges-non-arrays true true' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-renderer-lifecycle-edges-qt6]
 description = "Run the Qt 6 app bundle against Renderer dispose and post-dispose error behavior."

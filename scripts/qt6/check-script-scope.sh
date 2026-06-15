@@ -76,6 +76,13 @@ if git grep -nE 'Qt6::Script|Qt::Script|QT_SCRIPT_TARGET.*Qt6' -- 'toonz/sources
   exit 1
 fi
 
+if git grep -nE 'target_link_libraries[[:space:]]*\([^)]*Qt5::Script|Qt5::Script' -- \
+  'toonz/sources' \
+  ':!toonz/sources/CMakeLists.txt'; then
+  echo "error: production targets must not link Qt5::Script directly; keep Qt Script behind the Qt 5-only QT_SCRIPT_TARGET boundary" >&2
+  exit 1
+fi
+
 if git grep -nE '(^|[[:space:]])scriptengine[.]cpp([[:space:]]|$)' -- \
   'toonz/sources/toonz/CMakeLists.txt'; then
   echo "error: legacy toonz/scriptengine.cpp uses QScriptEngineDebugger and must not be added to the OpenToonz app target" >&2

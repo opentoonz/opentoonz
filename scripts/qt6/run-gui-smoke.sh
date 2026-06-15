@@ -1719,6 +1719,20 @@ while is_smoke_process_running; do
       after_capture_saved="$(status_value afterCaptureSaved || true)"
       before_capture_path="$(status_value beforeCapturePath || true)"
       after_capture_path="$(status_value afterCapturePath || true)"
+      stale_frame_probe="ok"
+      stale_frame_changed_pixels="0"
+      stale_frame_green_pixels="0"
+      stale_frame_changed_green_pixels="0"
+      stale_frame_capture_saved="true"
+      stale_frame_capture_path="$after_capture_path"
+      if [[ "$smoke_action" == "viewer-render" ]]; then
+        stale_frame_probe="$(status_value viewerStaleFrameProbe || true)"
+        stale_frame_changed_pixels="$(status_value viewerStaleFrameChangedPixels || true)"
+        stale_frame_green_pixels="$(status_value viewerStaleFrameGreenPixels || true)"
+        stale_frame_changed_green_pixels="$(status_value viewerStaleFrameChangedGreenPixels || true)"
+        stale_frame_capture_saved="$(status_value viewerStaleFrameCaptureSaved || true)"
+        stale_frame_capture_path="$(status_value viewerStaleFrameCapturePath || true)"
+      fi
       viewer_transform_probe="ok"
       if [[ "$smoke_action" == "viewer-zoom-pan" ]]; then
         viewer_transform_probe="$(status_value viewerTransformProbe || true)"
@@ -2007,6 +2021,12 @@ while is_smoke_process_running; do
             "$changed_pixels_probe" != "ok" ||
             "$red_pixels_probe" != "ok" ||
             "$neutral_pixels_probe" != "ok" ||
+            "$stale_frame_probe" != "ok" ||
+            ! "$stale_frame_changed_pixels" =~ ^[0-9]+$ ||
+            ! "$stale_frame_green_pixels" =~ ^[0-9]+$ ||
+            ! "$stale_frame_changed_green_pixels" =~ ^[0-9]+$ ||
+            "$stale_frame_capture_saved" != "true" ||
+            ! -f "$stale_frame_capture_path" ||
             "$framebuffer_width" == "0" ||
             "$framebuffer_height" == "0" ||
             "$before_capture_saved" != "true" ||
@@ -2245,6 +2265,12 @@ while is_smoke_process_running; do
         echo "Framebuffer: ${framebuffer_width}x${framebuffer_height}"
         echo "Changed pixels: $changed_pixels"
         echo "Red pixels: $red_pixels"
+        if [[ "$smoke_action" == "viewer-render" ]]; then
+          echo "Second-frame changed pixels: $stale_frame_changed_pixels"
+          echo "Second-frame green pixels: $stale_frame_green_pixels"
+          echo "Second-frame changed green pixels: $stale_frame_changed_green_pixels"
+          echo "Second-frame capture: $stale_frame_capture_path"
+        fi
         echo "Before capture: $before_capture_path"
         echo "After capture: $after_capture_path"
         echo "Log: $log_path"
@@ -2476,6 +2502,12 @@ while is_smoke_process_running; do
       echo "Framebuffer: ${framebuffer_width}x${framebuffer_height}"
       echo "Changed pixels: $changed_pixels"
       echo "Red pixels: $red_pixels"
+      if [[ "$smoke_action" == "viewer-render" ]]; then
+        echo "Second-frame changed pixels: $stale_frame_changed_pixels"
+        echo "Second-frame green pixels: $stale_frame_green_pixels"
+        echo "Second-frame changed green pixels: $stale_frame_changed_green_pixels"
+        echo "Second-frame capture: $stale_frame_capture_path"
+      fi
       echo "After capture: $after_capture_path"
       echo "Log: $log_path"
       exit 0

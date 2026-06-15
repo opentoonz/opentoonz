@@ -587,10 +587,14 @@ branch.
   hook to create a sandbox scene, insert either a red raster frame or a red
   vector stroke into the xsheet, capture the `SceneViewer` framebuffer before
   and after the update, require changed and red-dominant pixels, and save the
-  before/after captures beside the GUI smoke status file. These are narrow
-  rendering guards; they do not yet validate brush input, interactive vector
-  drawing, onion skin, tool overlays, manual FX Preview UI and broader FX
-  preview workflows, or Qt 5-vs-Qt 6 visual parity.
+  before/after captures beside the GUI smoke status file. The raster
+  viewer-render smoke also switches to a green second frame and requires
+  changed green pixels plus a saved second-frame capture, giving the automated
+  smoke a narrow stale-frame regression guard. These are narrow rendering
+  guards; they do not yet validate brush input, interactive vector drawing,
+  onion skin, tool overlays, manual FX Preview UI and broader FX preview
+  workflows, realistic-scene stale-frame behavior, or Qt 5-vs-Qt 6 visual
+  parity.
 - On 2026-05-31, the packaged Qt 6 app now passes
   `mise run gui-smoke-preview-render-output-qt6`. The app-side smoke creates a
   one-frame standard-DPI red raster scene, sets the preview render settings to
@@ -720,6 +724,12 @@ branch.
   size `994x819`, DPR `2` / `2.00`, framebuffer `1988x1638`, `771605` changed
   pixels, and `358756` red pixels. The packaged Qt 5 app passed the same smoke
   with the same measurements, giving this check a current dual-lane baseline.
+- On 2026-06-12, the raster viewer-render smoke was extended with a second-row
+  stale-frame probe. The app-side hook now adds a green frame 2, switches the
+  current frame from the red frame 1 to frame 2, invalidates the viewer, saves a
+  second-frame capture, and requires changed green pixels. After rebuild and
+  packaging, `mise run gui-smoke-viewer-render-qt6` passed with `355118`
+  second-frame changed pixels, green pixels, and changed green pixels.
 - On 2026-05-30, the packaged Qt 6 app also passes
   `mise run gui-smoke-viewer-zoom-pan-qt6`. This app-side smoke inserts a red
   raster frame, captures the `SceneViewer` framebuffer, applies a `1.35` view
@@ -1782,7 +1792,8 @@ branch.
   legacy Qt Script implementation and the Qt 6 `QJSEngine` facade. `Qt5::Script`
   component/target selection, legacy `scriptbinding_*` MOC headers, and legacy
   `scriptbinding_*` sources must remain inside `OPENTOONZ_QT_MAJOR EQUAL 5`
-  blocks, Qt 6 must not gain a Qt Script target, and the orphaned app-side
+  blocks, Qt 6 must not gain a Qt Script target, production CMake targets must
+  not link `Qt5::Script` directly, and the orphaned app-side
   `toonz/scriptengine.cpp` debugger popup must not be added back to the
   OpenToonz app target because it depends on `QScriptEngineDebugger`.
 - `mise run check-qt6-script-smoke-registry` now guards the Qt 6 script-smoke
@@ -1924,7 +1935,8 @@ branch.
 - An ImageBuilder edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/image_builder_edges.toonzscript` and is run
   by `mise run script-smoke-image-builder-edges-qt6`. It validates constructor
-  argument-count/type/size errors, bad image type rejection, invalid fill color,
+  argument-count/type/size errors, integer-only width/height validation before
+  native `int` conversion, bad image type rejection, invalid fill color,
   empty-image add errors, non-`Transform` add argument rejection, ToonzRaster
   fill rejection, image type mismatch errors, strict ImageBuilder method arity
   for `clear()`, `fill()`, and `add()`, and disposed builder rejection for
@@ -1992,8 +2004,10 @@ branch.
   `OutlineVectorizer` corner tuning property roundtrips, transparent-color
   parsing, numeric string coercion for `toneThreshold`,
   `CenterlineVectorizer` numeric property coercion, bool coercion for
-  representative centerline toggles, invalid transparent-color rejection,
-  strict constructor arity, and missing-property error behavior.
+  representative centerline toggles, integer-only validation for integral
+  properties, finite-number validation for floating-point properties, invalid
+  transparent-color rejection, strict constructor arity, and missing-property
+  error behavior.
 - A non-rendering binding lifecycle/property edge Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/binding_lifecycle_edges.toonzscript` and is
   run by `mise run script-smoke-binding-lifecycle-edges-qt6`. It validates
@@ -2020,7 +2034,8 @@ branch.
   arguments, non-image/non-level values, Raster/ToonzRaster images,
   Raster/Empty levels, strict `Rasterizer` constructor arity, and bad
   full-color resolution/DPI rejection while keeping the color-mapped path
-  green.
+  green. It also validates integer-only integral Rasterizer properties and
+  finite-number DPI assignment before native numeric conversion.
 - A Qt 6 Renderer fixture exists at
   `toonz/sources/tests/scriptengine/renderer_basic.toonzscript` and is run by
   `mise run script-smoke-renderer-qt6`. It validates `Renderer` construction,
@@ -2053,9 +2068,10 @@ branch.
   bad non-integer frame values, extra `dumpCache()` arguments, and invalid
   `Renderer.frames` / `Renderer.columns` list values before reaching the Qt 6
   renderer path. It also validates integer-only frame/column selection lists so
-  fractional JavaScript numbers cannot be truncated at the native Qt boundary,
-  while preserving the legacy behavior that non-array `frames` / `columns`
-  properties are treated as empty selection lists.
+  fractional, non-finite, sparse, or otherwise malformed JavaScript values
+  cannot be truncated at the native Qt boundary, while preserving the legacy
+  behavior that non-array `frames` / `columns` properties are treated as empty
+  selection lists.
 - A Renderer lifecycle edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/renderer_lifecycle_edges.toonzscript` and
   is run by `mise run script-smoke-renderer-lifecycle-edges-qt6`. It validates

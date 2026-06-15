@@ -61,6 +61,14 @@ renderer.columns = [0.5];
 var fractionalColumnError = hasError(function() {
   renderer.renderFrame(scene, 0);
 }, "Renderer.columns must contain frame or column numbers");
+renderer.columns = [Infinity];
+var infiniteColumnError = hasError(function() {
+  renderer.renderFrame(scene, 0);
+}, "Renderer.columns must contain frame or column numbers");
+renderer.columns = [0, , 1];
+var sparseColumnError = hasError(function() {
+  renderer.renderFrame(scene, 0);
+}, "Renderer.columns must contain frame or column numbers");
 
 renderer.columns = [];
 renderer.frames = ["bad"];
@@ -75,10 +83,19 @@ renderer.frames = [0.5];
 var fractionalFrameError = hasError(function() {
   renderer.renderScene(scene);
 }, "Renderer.frames must contain frame or column numbers");
+renderer.frames = [0 / 0];
+var nanFrameError = hasError(function() {
+  renderer.renderScene(scene);
+}, "Renderer.frames must contain frame or column numbers");
+renderer.frames = [0, , 1];
+var sparseFrameError = hasError(function() {
+  renderer.renderScene(scene);
+}, "Renderer.frames must contain frame or column numbers");
 
 print("qt-script-renderer-list-edges-errors", [
   badColumnTypeError, negativeColumnError, fractionalColumnError,
-  badFrameTypeError, negativeFrameError, fractionalFrameError
+  infiniteColumnError, sparseColumnError, badFrameTypeError,
+  negativeFrameError, fractionalFrameError, nanFrameError, sparseFrameError
 ]);
 
 renderer.frames = undefined;

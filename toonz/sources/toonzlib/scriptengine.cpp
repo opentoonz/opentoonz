@@ -633,22 +633,47 @@ bool isRasterizerProperty(const QString& name) {
   return properties.contains(name);
 }
 
+bool doubleFromVariant(const QVariant& value, double& result, QString& error,
+                       const QString& name) {
+  bool ok       = false;
+  const double number = value.toDouble(&ok);
+  if (!ok || !std::isfinite(number)) {
+    error = QObject::tr("%1 must be a finite number").arg(name);
+    return false;
+  }
+  result = number;
+  error.clear();
+  return true;
+}
+
+bool intFromVariant(const QVariant& value, int& result, QString& error,
+                    const QString& name) {
+  double number = 0.0;
+  if (!doubleFromVariant(value, number, error, name)) return false;
+  if (std::floor(number) != number ||
+      number < std::numeric_limits<int>::min() ||
+      number > std::numeric_limits<int>::max()) {
+    error = QObject::tr("%1 must be an integer").arg(name);
+    return false;
+  }
+  result = static_cast<int>(number);
+  error.clear();
+  return true;
+}
+
 bool intListFromVariantList(const QVariantList& values, std::vector<int>& result,
                             QString& error, const QString& name) {
   result.clear();
   for (const QVariant& value : values) {
-    bool ok      = false;
-    const int iv = value.toInt(&ok);
-    if (!ok) {
+    double number = 0.0;
+    if (!doubleFromVariant(value, number, error, name) ||
+        std::floor(number) != number ||
+        number < std::numeric_limits<int>::min() ||
+        number > std::numeric_limits<int>::max()) {
       error = QObject::tr("%1 must contain frame or column numbers").arg(name);
       return false;
     }
-    bool doubleOk      = false;
-    const double number = value.toDouble(&doubleOk);
-    if (!doubleOk || std::floor(number) != number) {
-      error = QObject::tr("%1 must contain frame or column numbers").arg(name);
-      return false;
-    }
+    const int iv = static_cast<int>(number);
     if (iv < 0) {
       error = QObject::tr("%1 values must be non-negative").arg(name);
       return false;
@@ -964,6 +989,12 @@ const char kBootstrapScript[] = R"JS(
     if (Math.floor(number) !== number)
       throw new Error(name + " must be an integer : " + String(value));
     return number;
+  }
+
+  function imageDimensionArgument(value) {
+    if (!isNumberArgument(value) || Math.floor(value) !== value)
+      throw new Error("Bad arguments: expected width,height[,type]");
+    return Number(value);
   }
 
   function frameIdArgument(value) {
@@ -1412,10 +1443,8 @@ const char kBootstrapScript[] = R"JS(
     if (arguments.length === 0) {
       result = __opentoonzScriptEngine.imageBuilderCreate(-1, -1, "");
     } else if (arguments.length === 2 || arguments.length === 3) {
-      if (!isNumberArgument(width) || !isNumberArgument(height))
-        throw new Error("Bad arguments: expected width,height[,type]");
       result = __opentoonzScriptEngine.imageBuilderCreate(
-        width, height,
+        imageDimensionArgument(width), imageDimensionArgument(height),
         type === undefined ? "" : String(type));
     } else {
       throw new Error("Bad argument count. expected: width,height[,type]");
@@ -3519,9 +3548,21 @@ QString ScriptEngine::outlineVectorizerSetProperty(int outlineVectorizerId,
   } else if (name == QStringLiteral("cornerAdherence") ||
              name == QStringLiteral("cornerAngle") ||
              name == QStringLiteral("cornerCurveRadius")) {
-    state.insert(name, value.toDouble());
+    double number = 0.0;
+    QString error;
+    if (!doubleFromVariant(value, number, error,
+                           QStringLiteral("OutlineVectorizer.%1").arg(name))) {
+      return error;
+    }
+    state.insert(name, number);
   } else {
-    state.insert(name, value.toInt());
+    int number = 0;
+    QString error;
+    if (!intFromVariant(value, number, error,
+                        QStringLiteral("OutlineVectorizer.%1").arg(name))) {
+      return error;
+    }
+    state.insert(name, number);
   }
   m_qjsOutlineVectorizers.insert(outlineVectorizerId, state);
   return QString();
@@ -3620,9 +3661,21 @@ QString ScriptEngine::centerlineVectorizerSetProperty(
     state.insert(name, value.toBool());
   } else if (name == QStringLiteral("maxThickness") ||
              name == QStringLiteral("thicknessCalibration")) {
-    state.insert(name, value.toDouble());
+    double number = 0.0;
+    QString error;
+    if (!doubleFromVariant(value, number, error,
+                           QStringLiteral("CenterlineVectorizer.%1").arg(name))) {
+      return error;
+    }
+    state.insert(name, number);
   } else {
-    state.insert(name, value.toInt());
+    int number = 0;
+    QString error;
+    if (!intFromVariant(value, number, error,
+                        QStringLiteral("CenterlineVectorizer.%1").arg(name))) {
+      return error;
+    }
+    state.insert(name, number);
   }
   m_qjsCenterlineVectorizers.insert(centerlineVectorizerId, state);
   return QString();
@@ -3719,9 +3772,21 @@ QString ScriptEngine::rasterizerSetProperty(int rasterizerId,
       name == QStringLiteral("antialiasing")) {
     state.insert(name, value.toBool());
   } else if (name == QStringLiteral("dpi")) {
-    state.insert(name, value.toDouble());
+    double number = 0.0;
+    QString error;
+    if (!doubleFromVariant(value, number, error,
+                           QStringLiteral("Rasterizer.%1").arg(name))) {
+      return error;
+    }
+    state.insert(name, number);
   } else {
-    state.insert(name, value.toInt());
+    int number = 0;
+    QString error;
+    if (!intFromVariant(value, number, error,
+                        QStringLiteral("Rasterizer.%1").arg(name))) {
+      return error;
+    }
+    state.insert(name, number);
   }
   m_qjsRasterizers.insert(rasterizerId, state);
   return QString();
