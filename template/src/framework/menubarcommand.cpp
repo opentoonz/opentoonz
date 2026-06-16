@@ -3,7 +3,8 @@
 #include <assert.h>
 #include <QObject>
 #include <QAction>
-#include <QSettings>
+#include <QXmlStreamReader>
+#include <QXmlStreamWriter>
 #include <QKeySequence>
 #include <QApplication>
 #include <QStandardPaths>
@@ -97,11 +98,41 @@ void CommandManager::setShortcut(CommandId id, QAction *action,
     action->setShortcut(QKeySequence());
   QString shortcutDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
   QDir().mkpath(shortcutDir);
-  QString shortcutPath = shortcutDir + "/shortcuts.ini";
-  QSettings settings(shortcutPath, QSettings::IniFormat);
-  settings.beginGroup("shortcuts");
-  settings.setValue(QString(id), QString::fromStdString(shortcutString));
-  settings.endGroup();
+  QString shortcutPath = shortcutDir + "/shortcuts.xml";
+
+  // Read existing, update, write back
+  QMap<QString, QString> map;
+  QFile rfile(shortcutPath);
+  if (rfile.open(QIODevice::ReadOnly)) {
+      QXmlStreamReader xml(&rfile);
+      while (!xml.atEnd() && !xml.hasError()) {
+          xml.readNext();
+          if (xml.isStartElement() && xml.name() == QStringLiteral("shortcut")) {
+              QString sid = xml.attributes().value("id").toString();
+              QString sv  = xml.attributes().value("value").toString();
+              if (!sid.isEmpty()) map[sid] = sv;
+          }
+      }
+      rfile.close();
+  }
+  map[QString(id)] = QString::fromStdString(shortcutString);
+
+  QFile wfile(shortcutPath);
+  if (wfile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+      QXmlStreamWriter xml(&wfile);
+      xml.setAutoFormatting(true);
+      xml.writeStartDocument();
+      xml.writeStartElement("shortcuts");
+      for (auto it = map.begin(); it != map.end(); ++it) {
+          xml.writeStartElement("shortcut");
+          xml.writeAttribute("id", it.key());
+          xml.writeAttribute("value", it.value());
+          xml.writeEndElement();
+      }
+      xml.writeEndElement();
+      xml.writeEndDocument();
+      wfile.close();
+  }
 }
 
 //---------------------------------------------------------
@@ -299,18 +330,47 @@ void CommandManager::setShortcut(QAction *action, std::string shortcutString,
   // e aggiungo il nuovo legame
   m_shortcutTable[shortcutString] = node;
 
-  // registro il tutto
+  // Save to XML shortcuts
   QString shortcutDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
   QDir().mkpath(shortcutDir);
-  QString shortcutPath = shortcutDir + "/shortcuts.ini";
-  QSettings settings(shortcutPath, QSettings::IniFormat);
-  settings.beginGroup("shortcuts");
-  settings.setValue(QString::fromStdString(node->m_id),
-                    QString::fromStdString(shortcutString));
-  if (keepDefault) {
-    if (oldActionId != "") settings.remove(oldActionId);
+  QString shortcutPath = shortcutDir + "/shortcuts.xml";
+
+  QMap<QString, QString> map;
+  QFile rfile(shortcutPath);
+  if (rfile.open(QIODevice::ReadOnly)) {
+      QXmlStreamReader xml(&rfile);
+      while (!xml.atEnd() && !xml.hasError()) {
+          xml.readNext();
+          if (xml.isStartElement() && xml.name() == QStringLiteral("shortcut")) {
+              QString sid = xml.attributes().value("id").toString();
+              QString sv  = xml.attributes().value("value").toString();
+              if (!sid.isEmpty()) map[sid] = sv;
+          }
+      }
+      rfile.close();
   }
-  settings.endGroup();
+  map[QString::fromStdString(node->m_id)] = QString::fromStdString(shortcutString);
+  if (keepDefault && !oldActionId.isEmpty()) {
+      if (map.contains(oldActionId) && oldActionId != QString::fromStdString(node->m_id))
+          map.remove(oldActionId);
+  }
+
+  QFile wfile(shortcutPath);
+  if (wfile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+      QXmlStreamWriter xml(&wfile);
+      xml.setAutoFormatting(true);
+      xml.writeStartDocument();
+      xml.writeStartElement("shortcuts");
+      for (auto it = map.begin(); it != map.end(); ++it) {
+          xml.writeStartElement("shortcut");
+          xml.writeAttribute("id", it.key());
+          xml.writeAttribute("value", it.value());
+          xml.writeEndElement();
+      }
+      xml.writeEndElement();
+      xml.writeEndDocument();
+      wfile.close();
+  }
 }
 
 //---------------------------------------------------------
@@ -428,20 +488,34 @@ void CommandManager::enlargeIcon(CommandId id, const QSize dstSize) {
 
 // In menubarcommand.cpp
 void CommandManager::loadShortcuts() {
-  // Load shortcuts file
   QString shortcutDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
   QDir().mkpath(shortcutDir);
-  QString shortcutPath = shortcutDir + "/shortcuts.ini";
+  QString shortcutPath = shortcutDir + "/shortcuts.xml";
 
   if (!QFile::exists(shortcutPath)) return;
 
-  QSettings settings(shortcutPath, QSettings::IniFormat);
-  settings.beginGroup("shortcuts");
-  QStringList ids = settings.allKeys();
+  QFile file(shortcutPath);
+  if (!file.open(QIODevice::ReadOnly)) return;
 
-  for (int i = 0; i < ids.size(); i++) {
-    std::string id   = ids.at(i).toStdString();
-    QString shortcut = settings.value(ids.at(i), "").toString();
+  QXmlStreamReader xml(&file);
+  // First pass: collect all id/value pairs
+  struct ShortcutEntry { QString id; QString shortcut; };
+  QList<ShortcutEntry> entries;
+
+  while (!xml.atEnd() && !xml.hasError()) {
+      xml.readNext();
+      if (xml.isStartElement() && xml.name() == QStringLiteral("shortcut")) {
+          ShortcutEntry e;
+          e.id = xml.attributes().value("id").toString();
+          e.shortcut = xml.attributes().value("value").toString();
+          if (!e.id.isEmpty()) entries.append(e);
+      }
+  }
+  file.close();
+
+  for (const auto& entry : entries) {
+    std::string id   = entry.id.toStdString();
+    QString shortcut = entry.shortcut;
 
     QAction *action = getAction(&id[0], false);
 
@@ -470,8 +544,6 @@ void CommandManager::loadShortcuts() {
       action->setShortcut(QKeySequence(shortcut));
     }
   }
-
-  settings.endGroup();
 }
 
 /*

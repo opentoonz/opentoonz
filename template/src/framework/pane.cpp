@@ -12,7 +12,10 @@
 #include <QTextEdit>
 #include <QMenu>
 #include <QAction>
+#include <QFile>
 #include <QContextMenuEvent>
+#include <QXmlStreamReader>
+#include <QXmlStreamWriter>
 
 //=============================================================================
 // TPanel
@@ -33,17 +36,48 @@ TPanel::TPanel(QWidget *parent, Qt::WindowFlags flags,
 //-----------------------------------------------------------------------------
 
 TPanel::~TPanel() {
-  // On quitting, save the floating panel's geometry and state in order to
-  // restore them when opening the floating panel next time
+  // On quitting, save the floating panel's geometry in XML
   if (isFloating() && !isHidden()) {
     QString popupPath =
         QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) +
-        "/popups.ini";
-    QSettings settings(popupPath, QSettings::IniFormat);
-    settings.beginGroup("Popups");
-    settings.setValue(QString::fromStdString(m_panelType),
-                      saveGeometry().toBase64());
-    settings.endGroup();
+        "/popups.xml";
+
+    // Read existing popups, update or add this one, write back
+    QMap<QString, QByteArray> popups;
+    QFile rfile(popupPath);
+    if (rfile.open(QIODevice::ReadOnly)) {
+        QXmlStreamReader xml(&rfile);
+        QString ptype;
+        while (!xml.atEnd() && !xml.hasError()) {
+            xml.readNext();
+            if (xml.isStartElement() && xml.name() == QStringLiteral("popup"))
+                ptype = xml.attributes().value("type").toString();
+            else if (xml.isStartElement() && xml.name() == QStringLiteral("geometry") && !ptype.isEmpty())
+                popups[ptype] = QByteArray::fromBase64(xml.readElementText().toUtf8());
+            else if (xml.isEndElement() && xml.name() == QStringLiteral("popup"))
+                ptype.clear();
+        }
+        rfile.close();
+    }
+
+    popups[QString::fromStdString(m_panelType)] = saveGeometry().toBase64();
+
+    QFile wfile(popupPath);
+    if (wfile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        QXmlStreamWriter xml(&wfile);
+        xml.setAutoFormatting(true);
+        xml.writeStartDocument();
+        xml.writeStartElement("popups");
+        for (auto it = popups.begin(); it != popups.end(); ++it) {
+            xml.writeStartElement("popup");
+            xml.writeAttribute("type", it.key());
+            xml.writeTextElement("geometry", QString::fromUtf8(it.value()));
+            xml.writeEndElement();
+        }
+        xml.writeEndElement();
+        xml.writeEndDocument();
+        wfile.close();
+    }
   }
 }
 
@@ -143,16 +177,29 @@ void TPanel::leaveEvent(QEvent *event) {
 void TPanel::restoreFloatingPanelState() {
   QString popupPath =
       QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) +
-      "/popups.ini";
-  QSettings settings(popupPath, QSettings::IniFormat);
-  settings.beginGroup("Popups");
-  QByteArray geom = QByteArray::fromBase64(
-      settings.value(QString::fromStdString(m_panelType)).toByteArray());
-  settings.endGroup();
+      "/popups.xml";
 
-  if (!geom.isEmpty()) {
-    restoreGeometry(geom);
+  QFile file(popupPath);
+  if (!file.open(QIODevice::ReadOnly)) return;
+
+  QXmlStreamReader xml(&file);
+  QString targetType = QString::fromStdString(m_panelType);
+
+  while (!xml.atEnd() && !xml.hasError()) {
+      xml.readNext();
+      if (xml.isStartElement() && xml.name() == QStringLiteral("popup")) {
+          if (xml.attributes().value("type").toString() == targetType) {
+              while (!(xml.isEndElement() && xml.name() == QStringLiteral("popup"))) {
+                  xml.readNext();
+                  if (xml.isStartElement() && xml.name() == QStringLiteral("geometry")) {
+                      QByteArray geom = QByteArray::fromBase64(xml.readElementText().toUtf8());
+                      if (!geom.isEmpty()) restoreGeometry(geom);
+                  }
+              }
+          }
+      }
   }
+  file.close();
 }
 
 //-----------------------------------------------------------------------------

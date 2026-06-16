@@ -2,7 +2,8 @@
 
 #include <QObject>
 #include <QString>
-#include <QSettings>
+#include <QVariant>
+#include <QMap>
 #include <memory>
 
 class Room;
@@ -14,8 +15,12 @@ class AppContext : public QObject {
 public:
     static AppContext* instance();
 
-    void setSettingsPath(const QString& path);
-    QSettings* settings() { return m_settings.get(); }
+    // XML-based settings (replaces QSettings)
+    QVariant setting(const QString& group, const QString& key,
+                     const QVariant& defaultValue = QVariant()) const;
+    void setSetting(const QString& group, const QString& key, const QVariant& val);
+    void saveSettings();
+    QString settingsPath() const { return m_settingsPath; }
 
     void setCurrentRoomName(const QString& name);
     QString currentRoomName() const { return m_currentRoomName; }
@@ -32,7 +37,7 @@ public:
     QString currentLanguage() const { return m_currentLanguage; }
     void setCurrentLanguage(const QString& language);
     QStringList availableLanguages() const;
-    QString languageCode() const;  // "chinese"/"japanese"/"" (English)
+    QString languageCode() const;
 
     // Stylesheet loading
     QString loadStylesheet(const QString& themeName) const;
@@ -47,11 +52,13 @@ private:
     void scanAvailableThemes();
     void loadTranslator(const QString& langCode);
     void unloadTranslator();
+    void loadSettings();
+    QString prefixedKey(const QString& group, const QString& key) const;
 
     QStringList m_availableThemes;
     QStringList m_availableLanguages;
     explicit AppContext(QObject* parent = nullptr);
-    std::unique_ptr<QSettings> m_settings;
+    QMap<QString, QVariant> m_settingsMap;
     QString m_settingsPath;
     QString m_currentRoomName;
     QString m_currentTheme;

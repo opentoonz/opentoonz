@@ -5,6 +5,8 @@
 #include <QFile>
 #include <QApplication>
 #include <QTranslator>
+#include <QXmlStreamReader>
+#include <QXmlStreamWriter>
 #include <QDebug>
 
 AppContext* AppContext::m_instance = nullptr;
@@ -22,28 +24,106 @@ AppContext::AppContext(QObject* parent)
 {
     QString appData = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QDir().mkpath(appData);
-    QString iniPath = appData + "/settings.ini";
-    m_settings = std::make_unique<QSettings>(iniPath, QSettings::IniFormat);
-
-    // Restore saved preferences
-    scanAvailableThemes();
-    QString savedTheme = m_settings->value("Preferences/Theme", "Dark").toString();
-    m_currentTheme = m_availableThemes.contains(savedTheme) ? savedTheme : QString("Dark");
-
-    m_currentLanguage = m_settings->value("Preferences/Language", "English").toString();
+    m_settingsPath = appData + "/settings.xml";
 
     // Available languages
     m_availableLanguages << "English" << "中文" << "日本語";
+
+    // Load settings from XML
+    loadSettings();
+
+    // Restore saved preferences
+    scanAvailableThemes();
+    QString savedTheme = setting("Preferences", "Theme", "Dark").toString();
+    m_currentTheme = m_availableThemes.contains(savedTheme) ? savedTheme : QString("Dark");
+
+    m_currentLanguage = setting("Preferences", "Language", "English").toString();
 
     // Load saved language translator at startup
     QString code = languageCode();
     if (!code.isEmpty()) loadTranslator(code);
 }
 
-void AppContext::setSettingsPath(const QString& path) {
-    m_settingsPath = path;
-    m_settings = std::make_unique<QSettings>(path, QSettings::IniFormat);
+//-----------------------------------------------------------------------------
+// XML Settings
+//-----------------------------------------------------------------------------
+
+QString AppContext::prefixedKey(const QString& group, const QString& key) const {
+    return group + "/" + key;
 }
+
+QVariant AppContext::setting(const QString& group, const QString& key,
+                              const QVariant& defaultValue) const {
+    return m_settingsMap.value(prefixedKey(group, key), defaultValue);
+}
+
+void AppContext::setSetting(const QString& group, const QString& key,
+                             const QVariant& val) {
+    m_settingsMap[prefixedKey(group, key)] = val;
+}
+
+void AppContext::loadSettings() {
+    QFile file(m_settingsPath);
+    if (!file.open(QIODevice::ReadOnly)) return;
+
+    QXmlStreamReader xml(&file);
+    QString currentGroup;
+
+    while (!xml.atEnd() && !xml.hasError()) {
+        xml.readNext();
+        if (xml.isStartElement()) {
+            if (xml.name() == QStringLiteral("group"))
+                currentGroup = xml.attributes().value("name").toString();
+            else if (xml.name() == QStringLiteral("value") && !currentGroup.isEmpty()) {
+                QString key = xml.attributes().value("key").toString();
+                QString val = xml.readElementText();
+                m_settingsMap[prefixedKey(currentGroup, key)] = val;
+            }
+        }
+    }
+    file.close();
+}
+
+void AppContext::saveSettings() {
+    QFile file(m_settingsPath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) return;
+
+    // Collect groups
+    QSet<QString> groups;
+    for (const QString& pk : m_settingsMap.keys()) {
+        int slash = pk.indexOf('/');
+        if (slash > 0) groups.insert(pk.left(slash));
+    }
+
+    QXmlStreamWriter xml(&file);
+    xml.setAutoFormatting(true);
+    xml.writeStartDocument();
+    xml.writeStartElement("settings");
+
+    for (const QString& group : groups) {
+        xml.writeStartElement("group");
+        xml.writeAttribute("name", group);
+
+        QString prefix = group + "/";
+        for (auto it = m_settingsMap.begin(); it != m_settingsMap.end(); ++it) {
+            if (it.key().startsWith(prefix)) {
+                QString key = it.key().mid(prefix.length());
+                xml.writeStartElement("value");
+                xml.writeAttribute("key", key);
+                xml.writeCharacters(it.value().toString());
+                xml.writeEndElement(); // value
+            }
+        }
+
+        xml.writeEndElement(); // group
+    }
+
+    xml.writeEndElement(); // settings
+    xml.writeEndDocument();
+    file.close();
+}
+
+//-----------------------------------------------------------------------------
 
 void AppContext::setCurrentRoomName(const QString& name) {
     if (m_currentRoomName != name) {
@@ -71,7 +151,8 @@ void AppContext::scanAvailableThemes() {
 void AppContext::setCurrentTheme(const QString& theme) {
     if (m_currentTheme != theme && m_availableThemes.contains(theme)) {
         m_currentTheme = theme;
-        m_settings->setValue("Preferences/Theme", theme);
+        setSetting("Preferences", "Theme", theme);
+        saveSettings();
         applyTheme(theme);
         emit themeChanged(theme);
     }
@@ -86,9 +167,6 @@ QString AppContext::loadStylesheet(const QString& themeName) const {
     }
     QString content = file.readAll();
     file.close();
-    // Rewrite relative icon paths to Qt resource paths.
-    // QSS files reference icons via ../Default/imgs/{black,white}/ or imgs/{black,white}/
-    // Replace the path portion only, preserving quote style.
     content.replace("../Default/imgs/black/", ":/icons/black/");
     content.replace("../Default/imgs/white/", ":/icons/white/");
     content.replace("imgs/black/", ":/icons/black/");
@@ -111,14 +189,12 @@ void AppContext::applyTheme(const QString& themeName) {
 QString AppContext::languageCode() const {
     if (m_currentLanguage == "中文") return "chinese";
     if (m_currentLanguage == "日本語") return "japanese";
-    return QString();  // English = no extra translator
+    return QString();
 }
 
 void AppContext::loadTranslator(const QString& langCode) {
-    // Try filesystem first (runtime directory)
     QString fsPath = QApplication::applicationDirPath()
                    + "/translations/" + langCode + "/template.qm";
-    // Fallback to resource
     QString resPath = QString(":/translations/%1/template.qm").arg(langCode);
 
     QTranslator* t = new QTranslator(this);
@@ -151,9 +227,9 @@ void AppContext::setCurrentLanguage(const QString& language) {
         return;
 
     m_currentLanguage = language;
-    m_settings->setValue("Preferences/Language", language);
+    setSetting("Preferences", "Language", language);
+    saveSettings();
 
-    // Hot-swap translator
     unloadTranslator();
     QString code = languageCode();
     if (!code.isEmpty()) loadTranslator(code);

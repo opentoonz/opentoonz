@@ -13,6 +13,8 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QStyle>
+#include <QXmlStreamReader>
+#include <QXmlStreamWriter>
 #include <QSlider>
 #include <QPushButton>
 #include <QLabel>
@@ -27,12 +29,18 @@ extern void registerDemoPanels();
 void Room::save() {
     QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/rooms/";
     QDir().mkpath(dirPath);
-    QString filePath = dirPath + m_name + ".ini";
-    QSettings settings(filePath, QSettings::IniFormat);
-    settings.clear();
+    QString filePath = dirPath + m_name + ".xml";
+
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) return;
 
     DockLayout* layout = dockLayout();
-    settings.beginGroup("room");
+    QXmlStreamWriter xml(&file);
+    xml.setAutoFormatting(true);
+    xml.writeStartDocument();
+    xml.writeStartElement("room");
+    xml.writeAttribute("name", m_name);
+    xml.writeStartElement("panels");
 
     for (int i = 0; i < layout->count(); ++i) {
         QLayoutItem* item = layout->itemAt(i);
@@ -40,15 +48,25 @@ void Room::save() {
         TPanel* pane = qobject_cast<TPanel*>(item->widget());
         if (!pane) continue;
 
-        settings.beginGroup(QString("pane_%1").arg(i));
-        settings.setValue("name", QString::fromStdString(pane->getPanelType()));
-        settings.setValue("geometry", pane->geometry());
-        settings.endGroup();
+        xml.writeStartElement("panel");
+        xml.writeAttribute("index", QString::number(i));
+        xml.writeAttribute("name", QString::fromStdString(pane->getPanelType()));
+        QRect g = pane->geometry();
+        xml.writeAttribute("x", QString::number(g.x()));
+        xml.writeAttribute("y", QString::number(g.y()));
+        xml.writeAttribute("w", QString::number(g.width()));
+        xml.writeAttribute("h", QString::number(g.height()));
+        xml.writeEndElement(); // panel
     }
 
+    xml.writeEndElement(); // panels
+
     DockLayout::State state = layout->saveState();
-    settings.setValue("hierarchy", state.second);
-    settings.endGroup();
+    xml.writeTextElement("hierarchy", state.second);
+
+    xml.writeEndElement(); // room
+    xml.writeEndDocument();
+    file.close();
 }
 
 //-----------------------------------------------------------------------------
@@ -57,35 +75,41 @@ void Room::load(const QString& path) {
     QString filePath = path;
     if (filePath.isEmpty()) {
         filePath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
-                   + "/rooms/" + m_name + ".ini";
+                   + "/rooms/" + m_name + ".xml";
     }
     m_path = filePath;
 
-    QSettings settings(filePath, QSettings::IniFormat);
-    settings.beginGroup("room");
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        m_initialized = true;
+        return;
+    }
 
-    QStringList keys = settings.childGroups();
     DockLayout* layout = dockLayout();
+    QXmlStreamReader xml(&file);
+    QString hierarchy;
 
-    QStringList paneKeys;
-    for (const QString& key : keys) {
-        if (key.startsWith("pane_")) paneKeys.append(key);
-    }
-    paneKeys.sort();
+    while (!xml.atEnd() && !xml.hasError()) {
+        xml.readNext();
+        if (xml.isStartElement()) {
+            if (xml.name() == QStringLiteral("panel")) {
+                QString typeName = xml.attributes().value("name").toString();
+                int x = xml.attributes().value("x").toInt();
+                int y = xml.attributes().value("y").toInt();
+                int w = xml.attributes().value("w").toInt();
+                int h = xml.attributes().value("h").toInt();
 
-    for (const QString& key : paneKeys) {
-        settings.beginGroup(key);
-        QString typeName = settings.value("name").toString();
-        TPanel* pane = TPanelFactory::createPanel(this, typeName);
-        if (pane) {
-            addDockWidget(pane);
-            QRect geom = settings.value("geometry").toRect();
-            if (geom.isValid()) pane->setGeometry(geom);
+                TPanel* pane = TPanelFactory::createPanel(this, typeName);
+                if (pane) {
+                    addDockWidget(pane);
+                    if (w > 0 && h > 0) pane->setGeometry(x, y, w, h);
+                }
+            } else if (xml.name() == QStringLiteral("hierarchy")) {
+                hierarchy = xml.readElementText();
+            }
         }
-        settings.endGroup();
     }
 
-    QString hierarchy = settings.value("hierarchy").toString();
     if (!hierarchy.isEmpty()) {
         std::vector<QRect> geoms;
         for (int i = 0; i < layout->count(); ++i) {
@@ -95,7 +119,7 @@ void Room::load(const QString& path) {
         layout->restoreState({geoms, hierarchy});
     }
 
-    settings.endGroup();
+    file.close();
     m_initialized = true;
 }
 
@@ -313,15 +337,13 @@ void MainWindow::createDefaultRooms() {
 //-----------------------------------------------------------------------------
 
 void MainWindow::readSettings() {
-    QSettings* settings = AppContext::instance()->settings();
-    settings->beginGroup("MainWindow");
-    restoreGeometry(settings->value("geometry").toByteArray());
-    int lastRoom = settings->value("lastRoom", 0).toInt();
-    settings->endGroup();
+    auto* ctx = AppContext::instance();
+    restoreGeometry(ctx->setting("MainWindow", "geometry").toByteArray());
+    int lastRoom = ctx->setting("MainWindow", "lastRoom", 0).toInt();
 
     QString roomsDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/rooms/";
     QDir dir(roomsDir);
-    QStringList roomFiles = dir.entryList({"*.ini"}, QDir::Files, QDir::Name);
+    QStringList roomFiles = dir.entryList({"*.xml"}, QDir::Files, QDir::Name);
 
     if (roomFiles.isEmpty()) {
         createDefaultRooms();
@@ -351,11 +373,10 @@ void MainWindow::writeSettings() {
         if (room) room->save();
     }
 
-    QSettings* settings = AppContext::instance()->settings();
-    settings->beginGroup("MainWindow");
-    settings->setValue("geometry", saveGeometry());
-    settings->setValue("lastRoom", m_stackedWidget->currentIndex());
-    settings->endGroup();
+    auto* ctx = AppContext::instance();
+    ctx->setSetting("MainWindow", "geometry", saveGeometry());
+    ctx->setSetting("MainWindow", "lastRoom", m_stackedWidget->currentIndex());
+    ctx->saveSettings();
 }
 
 //-----------------------------------------------------------------------------
