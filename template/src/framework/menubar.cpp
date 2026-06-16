@@ -204,8 +204,12 @@ QMenuBar *StackedMenuBar::buildDefaultMenuBar() {
   fileMenu->addAction(
       CommandManager::instance()->getAction("MI_Quit", true));
 
-  //---- View Menu (placeholder — panels are added by MainWindow)
-  bar->addMenu(tr("View"));
+  //---- View Menu
+  QMenu *viewMenu = bar->addMenu(tr("View"));
+  viewMenu->addAction(
+      CommandManager::instance()->getAction("MI_FullScreenWindow", true));
+  viewMenu->addAction(
+      CommandManager::instance()->getAction("MI_SeeThroughWindow", true));
 
   //---- Settings Menu
   QMenu *settingsMenu = bar->addMenu(tr("Settings"));

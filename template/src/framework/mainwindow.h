@@ -57,6 +57,8 @@ public slots:
     void deleteRoom(int index);
     void renameRoom(int index, const QString& name);
     void onLockRoomChanged(bool locked);
+    void fullScreenWindow();   // toggle standard fullscreen
+    void seeThroughWindow();   // toggle see-through mode
 
 protected:
     void closeEvent(QCloseEvent*) override;
@@ -72,5 +74,7 @@ private:
     QToolBar* m_leftToolBar = nullptr;
     QStackedWidget* m_stackedWidget = nullptr;
     bool m_saveSettingsOnQuit = true;
+    bool m_wasMaximized = false;
     int m_oldRoomIndex = 0;
+    QWidget* m_seeThroughPopup = nullptr;
 };

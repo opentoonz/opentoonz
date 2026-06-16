@@ -11,6 +11,12 @@
 #include <QDir>
 #include <QCloseEvent>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QStyle>
+#include <QSlider>
+#include <QPushButton>
+#include <QLabel>
+#include <QStyle>
 
 extern void registerDemoPanels();
 
@@ -168,30 +174,49 @@ void MainWindow::defineActions() {
     };
     CommandManager::instance()->setHandler("MI_Quit", new QuitHandler());
 
+    // View actions (fullscreen)
+    cm->createAction("MI_FullScreenWindow", "Full Screen", "Ctrl+`");
+    cm->createAction("MI_SeeThroughWindow", "See Through Mode", "Alt+`");
+
     // Toolbar handlers
     setCommandHandler("MI_NewRoom", this, &MainWindow::insertNewRoom);
+    setCommandHandler("MI_FullScreenWindow", this, &MainWindow::fullScreenWindow);
+    setCommandHandler("MI_SeeThroughWindow", this, &MainWindow::seeThroughWindow);
 }
 
 //-----------------------------------------------------------------------------
 
 void MainWindow::createToolBars() {
+    QStyle* style = QApplication::style();
+
     // ===== Top Horizontal Toolbar =====
     m_topToolBar = new QToolBar(tr("Main Toolbar"), this);
     m_topToolBar->setObjectName("MainToolBar");
     m_topToolBar->setMovable(false);
-    m_topToolBar->setIconSize(QSize(16, 16));
+    m_topToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    m_topToolBar->setIconSize(QSize(20, 20));
 
-    m_topToolBar->addAction(
-        CommandManager::instance()->getAction("MI_NewRoom", true));
-    m_topToolBar->addSeparator();
-    m_topToolBar->addAction(
-        CommandManager::instance()->getAction("MI_SaveLayout", true));
-    m_topToolBar->addAction(
-        CommandManager::instance()->getAction("MI_LoadLayout", true));
-    m_topToolBar->addSeparator();
-    m_topToolBar->addAction(
-        CommandManager::instance()->getAction("MI_About", true));
+    QAction* newRoomAct = CommandManager::instance()->getAction("MI_NewRoom", true);
+    newRoomAct->setIcon(style->standardIcon(QStyle::SP_FileDialogNewFolder));
+    m_topToolBar->addAction(newRoomAct);
 
+    m_topToolBar->addSeparator();
+
+    QAction* saveAct = CommandManager::instance()->getAction("MI_SaveLayout", true);
+    saveAct->setIcon(style->standardIcon(QStyle::SP_DialogSaveButton));
+    m_topToolBar->addAction(saveAct);
+
+    QAction* loadAct = CommandManager::instance()->getAction("MI_LoadLayout", true);
+    loadAct->setIcon(style->standardIcon(QStyle::SP_DialogOpenButton));
+    m_topToolBar->addAction(loadAct);
+
+    m_topToolBar->addSeparator();
+
+    QAction* aboutAct = CommandManager::instance()->getAction("MI_About", true);
+    aboutAct->setIcon(style->standardIcon(QStyle::SP_MessageBoxInformation));
+    m_topToolBar->addAction(aboutAct);
+
+    addToolBarBreak(Qt::TopToolBarArea);
     addToolBar(Qt::TopToolBarArea, m_topToolBar);
 
     // ===== Left Vertical Toolbar =====
@@ -199,18 +224,28 @@ void MainWindow::createToolBars() {
     m_leftToolBar->setObjectName("PanelToolBar");
     m_leftToolBar->setOrientation(Qt::Vertical);
     m_leftToolBar->setMovable(false);
-    m_leftToolBar->setIconSize(QSize(16, 16));
+    m_leftToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    m_leftToolBar->setIconSize(QSize(20, 20));
 
-    m_leftToolBar->addAction(
-        CommandManager::instance()->getAction("MI_OpenLogPanel", true));
-    m_leftToolBar->addAction(
-        CommandManager::instance()->getAction("MI_OpenPropertyPanel", true));
-    m_leftToolBar->addAction(
-        CommandManager::instance()->getAction("MI_OpenCanvasPanel", true));
-    m_leftToolBar->addAction(
-        CommandManager::instance()->getAction("MI_OpenCommandPalette", true));
-    m_leftToolBar->addAction(
-        CommandManager::instance()->getAction("MI_OpenWelcomePanel", true));
+    QAction* logAct = CommandManager::instance()->getAction("MI_OpenLogPanel", true);
+    logAct->setIcon(style->standardIcon(QStyle::SP_FileDialogDetailedView));
+    m_leftToolBar->addAction(logAct);
+
+    QAction* propAct = CommandManager::instance()->getAction("MI_OpenPropertyPanel", true);
+    propAct->setIcon(style->standardIcon(QStyle::SP_FileDialogInfoView));
+    m_leftToolBar->addAction(propAct);
+
+    QAction* canvasAct = CommandManager::instance()->getAction("MI_OpenCanvasPanel", true);
+    canvasAct->setIcon(style->standardIcon(QStyle::SP_ComputerIcon));
+    m_leftToolBar->addAction(canvasAct);
+
+    QAction* cmdAct = CommandManager::instance()->getAction("MI_OpenCommandPalette", true);
+    cmdAct->setIcon(style->standardIcon(QStyle::SP_MediaPlay));
+    m_leftToolBar->addAction(cmdAct);
+
+    QAction* welcomeAct = CommandManager::instance()->getAction("MI_OpenWelcomePanel", true);
+    welcomeAct->setIcon(style->standardIcon(QStyle::SP_TitleBarContextHelpButton));
+    m_leftToolBar->addAction(welcomeAct);
 
     addToolBar(Qt::LeftToolBarArea, m_leftToolBar);
 }
@@ -440,3 +475,96 @@ void MainWindow::onLockRoomChanged(bool locked) {
     RoomTabWidget* tabs = qobject_cast<RoomTabWidget*>(m_topBar->getRoomTabWidget());
     if (tabs) tabs->setIsLocked(locked);
 }
+
+//-----------------------------------------------------------------------------
+// Fullscreen
+//-----------------------------------------------------------------------------
+
+void MainWindow::fullScreenWindow() {
+    if (isFullScreen()) {
+        if (m_wasMaximized)
+            showMaximized();
+        else
+            showNormal();
+    } else {
+        m_wasMaximized = isMaximized();
+        showFullScreen();
+    }
+}
+
+//-----------------------------------------------------------------------------
+// See-Through Window Mode (opacity slider popup)
+//-----------------------------------------------------------------------------
+
+class SeeThroughPopup : public QWidget {
+    Q_OBJECT
+public:
+    SeeThroughPopup(QWidget* mainWindow)
+        : QWidget(nullptr, Qt::Window | Qt::WindowStaysOnTopHint)
+        , m_mainWindow(mainWindow), m_savedOpacity(1.0)
+    {
+        setWindowTitle(tr("See Through Mode"));
+        setFixedSize(320, 80);
+
+        auto* layout = new QVBoxLayout(this);
+        layout->setContentsMargins(8, 8, 8, 8);
+
+        auto* topLayout = new QHBoxLayout();
+        topLayout->addWidget(new QLabel(tr("Opacity:"), this));
+
+        m_slider = new QSlider(Qt::Horizontal, this);
+        m_slider->setRange(2, 100);
+        m_slider->setValue(100);
+        m_slider->setTickPosition(QSlider::TicksBelow);
+        m_slider->setTickInterval(10);
+        connect(m_slider, &QSlider::valueChanged, this, &SeeThroughPopup::onSliderChanged);
+        topLayout->addWidget(m_slider);
+
+        m_toggleBtn = new QPushButton(tr("Toggle"), this);
+        m_toggleBtn->setCheckable(true);
+        m_toggleBtn->setToolTip(tr("Hold Alt to toggle full transparent"));
+        connect(m_toggleBtn, &QPushButton::clicked, this, &SeeThroughPopup::onToggle);
+        topLayout->addWidget(m_toggleBtn);
+
+        layout->addLayout(topLayout);
+    }
+
+protected:
+    void showEvent(QShowEvent*) override {
+        m_slider->setValue(static_cast<int>(m_savedOpacity * 100));
+        onSliderChanged(m_slider->value());
+    }
+    void hideEvent(QHideEvent*) override {
+        m_savedOpacity = m_slider->value() / 100.0;
+        m_mainWindow->setWindowOpacity(1.0);
+    }
+
+private slots:
+    void onToggle() {
+        if (m_toggleBtn->isChecked()) {
+            bool altHeld = QApplication::keyboardModifiers() & Qt::AltModifier;
+            double opacity = altHeld ? 0.0 : 1.0;
+            m_mainWindow->setWindowOpacity(opacity);
+        } else {
+            m_mainWindow->setWindowOpacity(m_slider->value() / 100.0);
+        }
+    }
+    void onSliderChanged(int value) {
+        m_mainWindow->setWindowOpacity(value / 100.0);
+        m_slider->setToolTip(QString::number(value) + "%");
+    }
+
+private:
+    QWidget* m_mainWindow;
+    QSlider* m_slider;
+    QPushButton* m_toggleBtn;
+    double m_savedOpacity;
+};
+
+void MainWindow::seeThroughWindow() {
+    if (!m_seeThroughPopup)
+        m_seeThroughPopup = new SeeThroughPopup(this);
+    m_seeThroughPopup->setVisible(!m_seeThroughPopup->isVisible());
+}
+
+#include "mainwindow.moc"
