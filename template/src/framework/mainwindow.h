@@ -2,6 +2,7 @@
 
 #include <QMainWindow>
 #include <QStackedWidget>
+#include <QToolBar>
 #include <QSettings>
 #include <QString>
 #include <QMap>
@@ -64,8 +65,11 @@ protected:
 
 private:
     void createDefaultRooms();
+    void createToolBars();
 
     TopBar* m_topBar = nullptr;
+    QToolBar* m_topToolBar = nullptr;
+    QToolBar* m_leftToolBar = nullptr;
     QStackedWidget* m_stackedWidget = nullptr;
     bool m_saveSettingsOnQuit = true;
     int m_oldRoomIndex = 0;

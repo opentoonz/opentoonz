@@ -117,8 +117,11 @@ MainWindow::MainWindow(QWidget* parent)
     m_stackedWidget = new QStackedWidget(this);
     setCentralWidget(m_stackedWidget);
 
-    // Define actions (must happen before menu building)
+    // Define actions (must happen before menu + toolbar building)
     defineActions();
+
+    // Create toolbars
+    createToolBars();
 
     // Connect TopBar signals
     RoomTabWidget* tabs = qobject_cast<RoomTabWidget*>(m_topBar->getRoomTabWidget());
@@ -143,20 +146,73 @@ MainWindow::~MainWindow() {
 void MainWindow::defineActions() {
     CommandManager* cm = CommandManager::instance();
 
+    // File actions
     cm->createAction("MI_SaveLayout", "Save Layout", "Ctrl+S");
     cm->createAction("MI_LoadLayout", "Load Layout", "Ctrl+O");
     cm->createAction("MI_Quit", "Quit", "Ctrl+Q");
+
+    // Panel toggle actions
     cm->createAction("MI_OpenLogPanel", "Log Panel", "");
     cm->createAction("MI_OpenPropertyPanel", "Property Inspector", "");
     cm->createAction("MI_OpenCanvasPanel", "Canvas", "");
     cm->createAction("MI_OpenCommandPalette", "Command Palette", "");
     cm->createAction("MI_OpenWelcomePanel", "Welcome", "");
+
+    // Toolbar actions (top)
+    cm->createAction("MI_NewRoom", "New Room", "Ctrl+N");
+    cm->createAction("MI_LockRooms", "Lock Rooms", "");
     cm->createAction("MI_About", "About", "");
 
     struct QuitHandler final : CommandHandlerInterface {
         void execute() override { QApplication::quit(); }
     };
     CommandManager::instance()->setHandler("MI_Quit", new QuitHandler());
+
+    // Toolbar handlers
+    setCommandHandler("MI_NewRoom", this, &MainWindow::insertNewRoom);
+}
+
+//-----------------------------------------------------------------------------
+
+void MainWindow::createToolBars() {
+    // ===== Top Horizontal Toolbar =====
+    m_topToolBar = new QToolBar(tr("Main Toolbar"), this);
+    m_topToolBar->setObjectName("MainToolBar");
+    m_topToolBar->setMovable(false);
+    m_topToolBar->setIconSize(QSize(16, 16));
+
+    m_topToolBar->addAction(
+        CommandManager::instance()->getAction("MI_NewRoom", true));
+    m_topToolBar->addSeparator();
+    m_topToolBar->addAction(
+        CommandManager::instance()->getAction("MI_SaveLayout", true));
+    m_topToolBar->addAction(
+        CommandManager::instance()->getAction("MI_LoadLayout", true));
+    m_topToolBar->addSeparator();
+    m_topToolBar->addAction(
+        CommandManager::instance()->getAction("MI_About", true));
+
+    addToolBar(Qt::TopToolBarArea, m_topToolBar);
+
+    // ===== Left Vertical Toolbar =====
+    m_leftToolBar = new QToolBar(tr("Panel Toolbar"), this);
+    m_leftToolBar->setObjectName("PanelToolBar");
+    m_leftToolBar->setOrientation(Qt::Vertical);
+    m_leftToolBar->setMovable(false);
+    m_leftToolBar->setIconSize(QSize(16, 16));
+
+    m_leftToolBar->addAction(
+        CommandManager::instance()->getAction("MI_OpenLogPanel", true));
+    m_leftToolBar->addAction(
+        CommandManager::instance()->getAction("MI_OpenPropertyPanel", true));
+    m_leftToolBar->addAction(
+        CommandManager::instance()->getAction("MI_OpenCanvasPanel", true));
+    m_leftToolBar->addAction(
+        CommandManager::instance()->getAction("MI_OpenCommandPalette", true));
+    m_leftToolBar->addAction(
+        CommandManager::instance()->getAction("MI_OpenWelcomePanel", true));
+
+    addToolBar(Qt::LeftToolBarArea, m_leftToolBar);
 }
 
 //-----------------------------------------------------------------------------
