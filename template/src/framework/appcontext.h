@@ -7,6 +7,7 @@
 
 class Room;
 class MainWindow;
+class QTranslator;
 
 class AppContext : public QObject {
     Q_OBJECT
@@ -27,10 +28,11 @@ public:
     void setCurrentTheme(const QString& theme);
     QStringList availableThemes() const;
 
-    // Language management (requires restart)
+    // Language management (hot-switch, no restart needed)
     QString currentLanguage() const { return m_currentLanguage; }
     void setCurrentLanguage(const QString& language);
     QStringList availableLanguages() const;
+    QString languageCode() const;  // "chinese"/"japanese"/"" (English)
 
     // Stylesheet loading
     QString loadStylesheet(const QString& themeName) const;
@@ -39,9 +41,12 @@ public:
 signals:
     void roomChanged(const QString& roomName);
     void themeChanged(const QString& themeName);
+    void languageChanged(const QString& language);
 
 private:
     void scanAvailableThemes();
+    void loadTranslator(const QString& langCode);
+    void unloadTranslator();
 
     QStringList m_availableThemes;
     QStringList m_availableLanguages;
@@ -52,6 +57,7 @@ private:
     QString m_currentTheme;
     QString m_currentLanguage;
     MainWindow* m_mainWindow = nullptr;
+    QTranslator* m_appTranslator = nullptr;
 
     static AppContext* m_instance;
 };

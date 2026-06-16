@@ -160,13 +160,33 @@ void RoomTabWidget::setIsLocked(bool lock) {
 
 StackedMenuBar::StackedMenuBar(QWidget *parent) : QStackedWidget(parent) {
   setObjectName("StackedMenuBar");
+  connect(AppContext::instance(), &AppContext::languageChanged,
+          this, &StackedMenuBar::refreshCurrentMenu);
 }
 
 //-----------------------------------------------------------------------------
 
+void StackedMenuBar::refreshCurrentMenu() {
+    if (!m_currentRoomName.isEmpty())
+        createMenuBarForRoom(m_currentRoomName);
+}
+
 void StackedMenuBar::createMenuBarForRoom(const QString &roomName) {
+  // Remove old widget for this room
+  for (int i = 0; i < count(); i++) {
+    if (widget(i) && widget(i)->objectName() == roomName) {
+      QWidget *w = widget(i);
+      removeWidget(w);
+      delete w;
+      break;
+    }
+  }
+
+  m_currentRoomName = roomName;
   QMenuBar *bar = buildDefaultMenuBar();
+  bar->setObjectName(roomName);
   addWidget(bar);
+  setCurrentWidget(bar);
 }
 
 //-----------------------------------------------------------------------------
@@ -217,11 +237,7 @@ QMenuBar *StackedMenuBar::buildDefaultMenuBar() {
       langGroup->addAction(action);
       QString lang = l;
       QObject::connect(action, &QAction::triggered, [ctx, lang]() {
-          if (lang != ctx->currentLanguage()) {
-              ctx->setCurrentLanguage(lang);
-              QMessageBox::information(nullptr, tr("Language"),
-                  tr("Restart required to change language"));
-          }
+          ctx->setCurrentLanguage(lang);
       });
   }
 

@@ -57,9 +57,11 @@ class StackedMenuBar final : public QStackedWidget {
 public:
   StackedMenuBar(QWidget *parent);
   void createMenuBarForRoom(const QString &roomName);
+  void refreshCurrentMenu();
 
 private:
   QMenuBar *buildDefaultMenuBar();
+  QString m_currentRoomName;
 };
 
 //-----------------------------------------------------------------------------
