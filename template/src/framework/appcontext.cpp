@@ -86,8 +86,13 @@ QString AppContext::loadStylesheet(const QString& themeName) const {
     }
     QString content = file.readAll();
     file.close();
-    content.replace("url(\"imgs/black/", "url(\":/icons/black/");
-    content.replace("url(\"imgs/white/", "url(\":/icons/white/");
+    // Rewrite relative icon paths to Qt resource paths.
+    // QSS files reference icons via ../Default/imgs/{black,white}/ or imgs/{black,white}/
+    // Replace the path portion only, preserving quote style.
+    content.replace("../Default/imgs/black/", ":/icons/black/");
+    content.replace("../Default/imgs/white/", ":/icons/white/");
+    content.replace("imgs/black/", ":/icons/black/");
+    content.replace("imgs/white/", ":/icons/white/");
     return content;
 }
 
