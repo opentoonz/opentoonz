@@ -2,6 +2,7 @@
 
 #include "menubarcommand.h"
 #include "appcontext.h"
+#include "mainwindow.h"
 
 #include <QIcon>
 #include <QPainter>
@@ -11,6 +12,7 @@
 #include <QShortcut>
 #include <QCheckBox>
 #include <QActionGroup>
+#include <QKeySequence>
 #include <QtDebug>
 #include <QMessageBox>
 
@@ -206,10 +208,31 @@ QMenuBar *StackedMenuBar::buildDefaultMenuBar() {
 
   //---- View Menu
   QMenu *viewMenu = bar->addMenu(tr("View"));
-  viewMenu->addAction(
-      CommandManager::instance()->getAction("MI_FullScreenWindow", true));
-  viewMenu->addAction(
-      CommandManager::instance()->getAction("MI_SeeThroughWindow", true));
+  QAction* fullScreenAct =
+      CommandManager::instance()->getAction("MI_FullScreenWindow", true);
+  QAction* seeThroughAct =
+      CommandManager::instance()->getAction("MI_SeeThroughWindow", true);
+  // Fallback: create actions directly if CommandManager lookup fails
+  if (!fullScreenAct) {
+      fullScreenAct = viewMenu->addAction(tr("Full Screen"));
+      fullScreenAct->setShortcut(QKeySequence("Ctrl+`"));
+      QObject::connect(fullScreenAct, &QAction::triggered, []() {
+          if (auto* mw = AppContext::instance()->mainWindow())
+              mw->fullScreenWindow();
+      });
+  } else {
+      viewMenu->addAction(fullScreenAct);
+  }
+  if (!seeThroughAct) {
+      seeThroughAct = viewMenu->addAction(tr("See Through Mode"));
+      seeThroughAct->setShortcut(QKeySequence("Alt+`"));
+      QObject::connect(seeThroughAct, &QAction::triggered, []() {
+          if (auto* mw = AppContext::instance()->mainWindow())
+              mw->seeThroughWindow();
+      });
+  } else {
+      viewMenu->addAction(seeThroughAct);
+  }
 
   //---- Settings Menu
   QMenu *settingsMenu = bar->addMenu(tr("Settings"));
