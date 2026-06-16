@@ -498,6 +498,11 @@ Already covered:
 - The smoke suite covers the current facades for file/path, scene, level,
   image, image builder, rasterizer, vectorizers, renderer, wrapper id, binding
   lifecycle, and several edge cases.
+- The script suite now includes a user-style workflow fixture that creates a
+  two-frame scene, vectorizes a raster level, rasterizes the vector result back
+  to full-color raster frames, inserts the output into a scene-owned level,
+  saves and reopens the scene, renders both a scene and a frame through
+  `Renderer`, saves/reloads rendered output, and disposes the public wrappers.
 - On June 5, 2026, `mise run script-smokes-qt6` passed against the current Qt 6
   app bundle, covering the aggregate FilePath, Scene, Level, Image,
   ImageBuilder, Transform, ToonzRasterConverter, vectorizer, Rasterizer,

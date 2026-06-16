@@ -60,6 +60,7 @@ tasks=(
   script-smoke-renderer-edges-qt6
   script-smoke-renderer-lifecycle-edges-qt6
   script-smoke-level-transformers-qt6
+  script-smoke-user-workflow-qt6
   script-smoke-wrapper-id-qt6
 )
 

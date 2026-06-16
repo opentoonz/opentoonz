@@ -2414,8 +2414,10 @@ The next slice should make the Qt 6 app useful enough to run and diagnose:
    OutlineVectorizer/CenterlineVectorizer/Rasterizer including full-color
    Rasterizer output, Renderer
    renderFrame/renderScene/dumpCache, Renderer frame/column selection,
-   Renderer vector input, Renderer edge-case, Wrapper id compatibility, and
-   binding lifecycle/property edge slices into the next
+   Renderer vector input, Renderer edge-case, Wrapper id compatibility,
+   binding lifecycle/property edge slices, and the user-style workflow fixture
+   that chains scene creation, vectorization, full-color rasterization, scene
+   save/reopen, renderer scene/frame output, and wrapper disposal into the next
    `QJSEngine` object-binding group, likely remaining advanced scene APIs,
    broader scene-icon/offscreen visual parity, or another helper subset, rather
    than attempting a full script API rewrite in one change.
