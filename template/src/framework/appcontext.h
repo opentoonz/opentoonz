@@ -22,14 +22,35 @@ public:
     void setMainWindow(MainWindow* mw) { m_mainWindow = mw; }
     MainWindow* mainWindow() const { return m_mainWindow; }
 
+    // Theme management
+    QString currentTheme() const { return m_currentTheme; }
+    void setCurrentTheme(const QString& theme);
+    QStringList availableThemes() const;
+
+    // Language management (requires restart)
+    QString currentLanguage() const { return m_currentLanguage; }
+    void setCurrentLanguage(const QString& language);
+    QStringList availableLanguages() const;
+
+    // Stylesheet loading
+    QString loadStylesheet(const QString& themeName) const;
+    void applyTheme(const QString& themeName);
+
 signals:
     void roomChanged(const QString& roomName);
+    void themeChanged(const QString& themeName);
 
 private:
+    void scanAvailableThemes();
+
+    QStringList m_availableThemes;
+    QStringList m_availableLanguages;
     explicit AppContext(QObject* parent = nullptr);
     std::unique_ptr<QSettings> m_settings;
     QString m_settingsPath;
     QString m_currentRoomName;
+    QString m_currentTheme;
+    QString m_currentLanguage;
     MainWindow* m_mainWindow = nullptr;
 
     static AppContext* m_instance;

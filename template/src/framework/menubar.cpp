@@ -1,6 +1,7 @@
 #include "menubar.h"
 
 #include "menubarcommand.h"
+#include "appcontext.h"
 
 #include <QIcon>
 #include <QPainter>
@@ -184,6 +185,37 @@ QMenuBar *StackedMenuBar::buildDefaultMenuBar() {
 
   //---- View Menu (placeholder — panels are added by MainWindow)
   bar->addMenu(tr("View"));
+
+  //---- Settings Menu
+  QMenu *settingsMenu = bar->addMenu(tr("Settings"));
+  QMenu *themeMenu    = settingsMenu->addMenu(tr("Theme"));
+  AppContext* ctx = AppContext::instance();
+  QStringList themes = ctx->availableThemes();
+  for (const QString& t : themes) {
+      QAction* action = themeMenu->addAction(t);
+      action->setCheckable(true);
+      action->setChecked(t == ctx->currentTheme());
+      QString theme = t;
+      QObject::connect(action, &QAction::triggered, [ctx, theme]() {
+          ctx->setCurrentTheme(theme);
+      });
+  }
+
+  QMenu *langMenu = settingsMenu->addMenu(tr("Language"));
+  QStringList languages = ctx->availableLanguages();
+  for (const QString& l : languages) {
+      QAction* action = langMenu->addAction(l);
+      action->setCheckable(true);
+      action->setChecked(l == ctx->currentLanguage());
+      QString lang = l;
+      QObject::connect(action, &QAction::triggered, [ctx, lang]() {
+          if (lang != ctx->currentLanguage()) {
+              ctx->setCurrentLanguage(lang);
+              QMessageBox::information(nullptr, tr("Language"),
+                  tr("Restart required to change language"));
+          }
+      });
+  }
 
   //---- Help Menu
   QMenu *helpMenu = bar->addMenu(tr("Help"));
