@@ -60,7 +60,19 @@
     </message>
 </context>
 <context>
-    <name>TopBar</name>
+    <name>StackedMenuBar</name>
+    <message>
+        <source>File</source>
+        <translation>文件</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>视图</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>设置</translation>
+    </message>
     <message>
         <source>Theme</source>
         <translation>主题</translation>
@@ -70,41 +82,19 @@
         <translation>语言</translation>
     </message>
     <message>
+        <source>Help</source>
+        <translation>帮助</translation>
+    </message>
+    <message>
         <source>Restart required to change language</source>
         <translation>更改语言需要重启应用</translation>
     </message>
-    <message>
-        <source>Lock</source>
-        <translation>锁定</translation>
-    </message>
 </context>
 <context>
-    <name>WelcomePanel</name>
+    <name>TopBar</name>
     <message>
-        <source>Custom Docking Framework
-
-Features:
-  - Drag-to-dock / float panels
-  - Multi-room workspace switching
-  - Layout persistence (QSettings)
-  - Maximizable panels
-  - Global action/command system
-  - Tab-based room navigation
-
-Use the tabs above to switch rooms.
-Drag panel title bars to rearrange.</source>
-        <translation>自定义停靠框架
-
-功能：
-  - 拖拽停靠 / 浮动面板
-  - 多房间工作区切换
-  - 布局持久化 (QSettings)
-  - 可最大化面板
-  - 全局动作/命令系统
-  - 标签式房间导航
-
-使用上方标签切换房间。
-拖拽面板标题栏来重排布局。</translation>
+        <source>Lock Rooms Tab</source>
+        <translation>锁定房间标签</translation>
     </message>
 </context>
 </TS>

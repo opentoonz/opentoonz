@@ -60,7 +60,19 @@
     </message>
 </context>
 <context>
-    <name>TopBar</name>
+    <name>StackedMenuBar</name>
+    <message>
+        <source>File</source>
+        <translation>ファイル</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>表示</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>設定</translation>
+    </message>
     <message>
         <source>Theme</source>
         <translation>テーマ</translation>
@@ -70,12 +82,19 @@
         <translation>言語</translation>
     </message>
     <message>
+        <source>Help</source>
+        <translation>ヘルプ</translation>
+    </message>
+    <message>
         <source>Restart required to change language</source>
         <translation>言語を変更するには再起動が必要です</translation>
     </message>
+</context>
+<context>
+    <name>TopBar</name>
     <message>
-        <source>Lock</source>
-        <translation>ロック</translation>
+        <source>Lock Rooms Tab</source>
+        <translation>ルームタブをロック</translation>
     </message>
 </context>
 </TS>

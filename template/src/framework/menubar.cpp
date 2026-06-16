@@ -10,6 +10,7 @@
 #include <QMenuBar>
 #include <QShortcut>
 #include <QCheckBox>
+#include <QActionGroup>
 #include <QtDebug>
 #include <QMessageBox>
 
@@ -190,11 +191,15 @@ QMenuBar *StackedMenuBar::buildDefaultMenuBar() {
   QMenu *settingsMenu = bar->addMenu(tr("Settings"));
   QMenu *themeMenu    = settingsMenu->addMenu(tr("Theme"));
   AppContext* ctx = AppContext::instance();
+
+  QActionGroup* themeGroup = new QActionGroup(themeMenu);
+  themeGroup->setExclusive(true);
   QStringList themes = ctx->availableThemes();
   for (const QString& t : themes) {
       QAction* action = themeMenu->addAction(t);
       action->setCheckable(true);
       action->setChecked(t == ctx->currentTheme());
+      themeGroup->addAction(action);
       QString theme = t;
       QObject::connect(action, &QAction::triggered, [ctx, theme]() {
           ctx->setCurrentTheme(theme);
@@ -202,11 +207,14 @@ QMenuBar *StackedMenuBar::buildDefaultMenuBar() {
   }
 
   QMenu *langMenu = settingsMenu->addMenu(tr("Language"));
+  QActionGroup* langGroup = new QActionGroup(langMenu);
+  langGroup->setExclusive(true);
   QStringList languages = ctx->availableLanguages();
   for (const QString& l : languages) {
       QAction* action = langMenu->addAction(l);
       action->setCheckable(true);
       action->setChecked(l == ctx->currentLanguage());
+      langGroup->addAction(action);
       QString lang = l;
       QObject::connect(action, &QAction::triggered, [ctx, lang]() {
           if (lang != ctx->currentLanguage()) {
