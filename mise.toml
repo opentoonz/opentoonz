@@ -534,6 +534,10 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_save_reop
 description = "Run the Qt 6 app bundle against Scene load replacement and stale wrapper invalidation."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_reload_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-reload-first 1 1 1 qt6_scene_reload_a 1|qt-script-scene-reload-second 1 1 1 true qt6_scene_reload_b 1 Empty 0 Empty level true true|qt-script-scene-reload-third 1 1 1 true qt6_scene_reload_a 1 Empty 0 true' bash scripts/qt6/run-script-smoke.sh"
 
+[tasks.script-smoke-scene-mutation-workflow-qt6]
+description = "Run the Qt 6 app bundle against user-style Scene mutation, level lookup, and reload behavior."
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_mutation_workflow.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-mutation-initial 2 1 2 qt6_scene_mutation_a 1 qt6_scene_mutation_b 0002A true true true|qt-script-scene-mutation-shifted 2 1 true qt6_scene_mutation_b 0002A 2|qt-script-scene-mutation-reopened 1 1 qt6_scene_mutation_b 0002A true qt6_scene_mutation_a 0 qt6_scene_mutation_b 0|qt-script-scene-mutation-reloaded 2 1 qt6_scene_mutation_a 1 Empty 0 true 2' bash scripts/qt6/run-script-smoke.sh"
+
 [tasks.script-smoke-scene-load-failure-qt6]
 description = "Run the Qt 6 app bundle against failed Scene load wrapper-preservation behavior."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_load_failure.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-load-failure-preserve true 1 1 qt6_scene_load_failure 1 true 2 qt6_scene_load_failure' bash scripts/qt6/run-script-smoke.sh"

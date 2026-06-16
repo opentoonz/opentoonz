@@ -531,7 +531,11 @@ Already covered:
   constructor arity, strict method arity for non-rendering Scene load/save,
   cell, level, and load-level APIs, integer-only row/column index enforcement
   for Scene column/cell APIs, backend negative row/column errors, plus legacy
-  frame-id-before-level-argument error precedence.
+  frame-id-before-level-argument error precedence. The scene mutation workflow
+  smoke now also covers duplicate level-name rejection, level-name based cell
+  insertion, clearing and shifting cells through column deletion, missing-level
+  lookup behavior, save/reopen of a mutated scene, and stale scene-owned level
+  wrapper behavior after a subsequent scene reload.
 - The Level smoke coverage now includes `Level.path` bad setter rejection, the
   current failed path reload behavior for missing target paths, and
   post-dispose rejection across the Level public surface. It also covers the

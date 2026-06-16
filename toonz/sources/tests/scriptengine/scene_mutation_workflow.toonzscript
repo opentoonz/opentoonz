@@ -1,0 +1,86 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e.message || e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var source = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var stamp = (new Date()).getTime();
+var scenePathA = new FilePath("scene_mutation_workflow_a_" + stamp + ".tnz");
+var scenePathB = new FilePath("scene_mutation_workflow_b_" + stamp + ".tnz");
+
+var scene = new Scene();
+var levelA = scene.newLevel("Raster", "qt6_scene_mutation_a");
+var levelB = scene.newLevel("Raster", "qt6_scene_mutation_b");
+levelA.setFrame("1", source);
+levelB.setFrame("2A", source);
+scene.setCell(0, 0, "qt6_scene_mutation_a", "1");
+scene.setCell(1, 0, "qt6_scene_mutation_b", "2A");
+
+var cellA = scene.getCell(0, 0);
+var cellB = scene.getCell(1, 0);
+var duplicateLevelError = hasError(function() {
+  scene.newLevel("Raster", "qt6_scene_mutation_a");
+}, "name(qt6_scene_mutation_a) is already used");
+var missingLevelError = hasError(function() {
+  scene.setCell(2, 0, "qt6_scene_mutation_missing", "1");
+}, "is not included in the scene");
+var missingLookup = scene.getLevel("qt6_scene_mutation_missing");
+scene.save(scenePathA);
+
+print("qt-script-scene-mutation-initial", scene.frameCount,
+      scene.columnCount, scene.getLevels().length, cellA.level.name,
+      cellA.fid, cellB.level.name, cellB.fid, missingLookup === undefined,
+      duplicateLevelError, missingLevelError);
+
+scene.setCell(0, 0);
+scene.insertColumn(1);
+scene.setCell(0, 1, cellB);
+scene.deleteColumn(0);
+var shiftedCell = scene.getCell(0, 0);
+scene.save(scenePathB);
+
+print("qt-script-scene-mutation-shifted", scene.frameCount,
+      scene.columnCount, scene.getCell(1, 0) === undefined,
+      shiftedCell.level.name, shiftedCell.fid, scene.getLevels().length);
+
+var reopened = new Scene(scenePathB);
+var reopenedCell = reopened.getCell(0, 0);
+var reopenedMissingCell = reopened.getCell(1, 0);
+var reopenedLevelA = reopened.getLevel("qt6_scene_mutation_a");
+var reopenedLevelB = reopened.getLevel("qt6_scene_mutation_b");
+
+print("qt-script-scene-mutation-reopened", reopened.frameCount,
+      reopened.columnCount, reopenedCell.level.name, reopenedCell.fid,
+      reopenedMissingCell === undefined, reopenedLevelA.name,
+      reopenedLevelA.frameCount, reopenedLevelB.name, reopenedLevelB.frameCount);
+
+var staleLevel = reopenedCell.level;
+reopened.load(scenePathA);
+var restoredA = reopened.getCell(0, 0);
+var staleLevelError = hasError(function() {
+  staleLevel.load(new FilePath("missing_scene_mutation_level..tif"));
+}, "Invalid Level object");
+
+print("qt-script-scene-mutation-reloaded", reopened.frameCount,
+      reopened.columnCount, restoredA.level.name, restoredA.fid,
+      staleLevel.type, staleLevel.frameCount, staleLevelError,
+      reopened.getLevels().length);
+
+restoredA.level.dispose();
+staleLevel.dispose();
+reopenedLevelB.dispose();
+reopenedLevelA.dispose();
+reopened.dispose();
+shiftedCell.level.dispose();
+cellB.level.dispose();
+cellA.level.dispose();
+levelB.dispose();
+levelA.dispose();
+scene.dispose();
+source.dispose();
+
+"qt-script-scene-mutation-workflow-result";

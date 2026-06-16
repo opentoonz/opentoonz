@@ -2406,7 +2406,7 @@ The next slice should make the Qt 6 app useful enough to run and diagnose:
    Scene save-icon, Scene save-icon variants,
    Scene frame-id
    handling, Scene cell frame-id type, Scene argument edge cases,
-   Scene lifecycle edge cases, `Image`, Image edge-case,
+   Scene lifecycle edge cases, Scene mutation workflow, `Image`, Image edge-case,
    Image level-first-frame,
    `ImageBuilder`, ImageBuilder edge-case, Transform edge-case,
    ToonzRasterConverter, ToonzRasterConverter level conversion,
@@ -2647,6 +2647,7 @@ mise run script-smoke-scene-loadlevel-qt6
 mise run script-smoke-scene-loadlevel-sequence-qt6
 mise run script-smoke-scene-save-reopen-qt6
 mise run script-smoke-scene-reload-edges-qt6
+mise run script-smoke-scene-mutation-workflow-qt6
 mise run script-smoke-scene-load-failure-qt6
 mise run script-smoke-scene-save-icon-qt6
 mise run script-smoke-scene-save-icon-variants-qt6
