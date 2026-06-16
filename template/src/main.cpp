@@ -4,6 +4,8 @@
 #include <QTranslator>
 #include <QLibraryInfo>
 #include <QDir>
+#include <QFile>
+#include <QDebug>
 
 #include "framework/appcontext.h"
 #include "framework/mainwindow.h"
@@ -30,33 +32,33 @@ int main(int argc, char* argv[]) {
         ThemeManager::getInstance().parseCustomPropertiesFromStylesheet(stylesheet);
     }
 
-    // Load language translator
+    // Load language translator - try filesystem first, then resource
     QString language = AppContext::instance()->currentLanguage();
     QTranslator* appTranslator = nullptr;
     if (language != "English") {
-        // Map display name to directory name
         QString langDir;
         if (language == "中文") langDir = "chinese";
         else if (language == "日本語") langDir = "japanese";
 
         if (!langDir.isEmpty()) {
-            QString qmPath = QString(":/translations/%1/template.qm").arg(langDir);
-            QFile qmFile(qmPath);
-            if (qmFile.open(QIODevice::ReadOnly)) {
-                QByteArray data = qmFile.readAll();
-                appTranslator = new QTranslator();
-                appTranslator->load(reinterpret_cast<const uchar*>(data.constData()),
-                                    data.size());
-                app.installTranslator(appTranslator);
+            appTranslator = new QTranslator();
+            // Try filesystem first (runtime directory)
+            QString fsPath = QApplication::applicationDirPath()
+                           + "/translations/" + langDir + "/template.qm";
+            bool ok = appTranslator->load(fsPath);
+            // Fallback to resource system
+            if (!ok) {
+                QString qmPath = QString(":/translations/%1/template.qm").arg(langDir);
+                QFile qmFile(qmPath);
+                if (qmFile.open(QIODevice::ReadOnly)) {
+                    QByteArray data = qmFile.readAll();
+                    ok = appTranslator->load(
+                        reinterpret_cast<const uchar*>(data.constData()), data.size());
+                }
             }
+            if (ok) app.installTranslator(appTranslator);
+            else delete appTranslator;
         }
-    }
-
-    // Qt system translator for standard dialogs
-    QTranslator qtTranslator;
-    if (qtTranslator.load("qt_" + QLocale::system().name(),
-                          QLibraryInfo::path(QLibraryInfo::TranslationsPath))) {
-        app.installTranslator(&qtTranslator);
     }
 
     // Create and show main window
