@@ -167,6 +167,7 @@ void MainWindow::defineActions() {
     // Toolbar actions (top)
     cm->createAction("MI_NewRoom", "New Room", "Ctrl+N");
     cm->createAction("MI_LockRooms", "Lock Rooms", "");
+    cm->createAction("MI_MaximizePanel", "Maximize Panel", "`");
     cm->createAction("MI_About", "About", "");
 
     struct QuitHandler final : CommandHandlerInterface {
@@ -180,6 +181,7 @@ void MainWindow::defineActions() {
 
     // Toolbar handlers
     setCommandHandler("MI_NewRoom", this, &MainWindow::insertNewRoom);
+    setCommandHandler("MI_MaximizePanel", this, &MainWindow::maximizePanel);
     setCommandHandler("MI_FullScreenWindow", this, &MainWindow::fullScreenWindow);
     setCommandHandler("MI_SeeThroughWindow", this, &MainWindow::seeThroughWindow);
 }
@@ -374,6 +376,8 @@ void MainWindow::switchToRoom(int index) {
             // Update menu bar for this room
             StackedMenuBar* smb = m_topBar->getStackedMenuBar();
             smb->createMenuBarForRoom(room->getName());
+            // Show/hide room-bound panels
+            updatePanelVisibility();
         }
     }
 }
@@ -565,6 +569,61 @@ void MainWindow::seeThroughWindow() {
     if (!m_seeThroughPopup)
         m_seeThroughPopup = new SeeThroughPopup(this);
     m_seeThroughPopup->setVisible(!m_seeThroughPopup->isVisible());
+}
+
+//-----------------------------------------------------------------------------
+// Panel Maximize
+//-----------------------------------------------------------------------------
+
+void MainWindow::maximizePanel() {
+    Room* room = getCurrentRoom();
+    if (!room) return;
+    DockLayout* layout = room->dockLayout();
+
+    // If there is already a maximized dock, release it
+    DockWidget* maximized = layout->getMaximized();
+    if (maximized) {
+        maximized->maximizeDock();
+        return;
+    }
+
+    // Find the dock widget under the cursor and maximize it
+    QWidget* widgetUnderCursor = layout->containerOf(QCursor::pos());
+    TDockWidget* tdw = qobject_cast<TDockWidget*>(widgetUnderCursor);
+    if (tdw) tdw->maximizeDock();
+}
+
+//-----------------------------------------------------------------------------
+// Room-Bound Panel Visibility
+//-----------------------------------------------------------------------------
+
+void MainWindow::updatePanelVisibility() {
+    Room* currentRoom = getCurrentRoom();
+    if (!currentRoom) return;
+
+    QString currentRoomName = currentRoom->getName();
+
+    // Iterate ALL rooms, show/hide room-bound panels
+    for (int r = 0; r < getRoomCount(); ++r) {
+        Room* room = getRoom(r);
+        if (!room) continue;
+
+        DockLayout* layout = room->dockLayout();
+        for (int i = 0; i < layout->count(); ++i) {
+            QLayoutItem* item = layout->itemAt(i);
+            if (!item || !item->widget()) continue;
+            TPanel* pane = qobject_cast<TPanel*>(item->widget());
+            if (!pane || !pane->isRoomBound()) continue;
+
+            if (pane->getBoundRoomName() == currentRoomName) {
+                // Panel belongs to current room — show it
+                pane->show();
+            } else {
+                // Panel belongs to another room — hide it
+                pane->hide();
+            }
+        }
+    }
 }
 
 #include "mainwindow.moc"

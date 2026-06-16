@@ -59,6 +59,8 @@ public slots:
     void onLockRoomChanged(bool locked);
     void fullScreenWindow();   // toggle standard fullscreen
     void seeThroughWindow();   // toggle see-through mode
+    void maximizePanel();      // maximize dock widget under cursor
+    void updatePanelVisibility(); // show/hide room-bound panels on room switch
 
 protected:
     void closeEvent(QCloseEvent*) override;

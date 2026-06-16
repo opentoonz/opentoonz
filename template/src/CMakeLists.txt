@@ -7,6 +7,7 @@ set(FRAMEWORK_SOURCES
     framework/menubar.cpp
     framework/menubarcommand.cpp
     framework/appcontext.cpp
+    framework/floatingpanelcommand.cpp
     framework/thememanager.cpp
 )
 

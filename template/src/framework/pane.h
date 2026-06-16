@@ -222,6 +222,12 @@ public:
   // Title bar access
   TPanelTitleBar *getTitleBar() const noexcept { return m_panelTitleBar; }
 
+  // Room binding
+  bool isRoomBound() const noexcept { return m_isRoomBound; }
+  void setRoomBound(bool bound);
+  QString getBoundRoomName() const { return m_boundRoomName; }
+  void setBoundRoomName(const QString& roomName);
+
   // Virtuals that may be overridden
   virtual void reset() {}
   virtual int getViewType() { return -1; }
@@ -238,6 +244,9 @@ protected:
 
   void setFloatingAppearance() override;
   void setDockedAppearance() override;
+
+protected:
+  void contextMenuEvent(QContextMenuEvent* event) override;
 
 protected slots:
   void onCloseButtonPressed();
@@ -257,6 +266,10 @@ private:
   bool m_isMaximizable = false;
   bool m_multipleInstancesAllowed = true;
   TPanelTitleBar *m_panelTitleBar = nullptr;
+
+  // Room binding
+  bool m_isRoomBound = false;
+  QString m_boundRoomName;
 };
 
 //-----------------------------------------------------------------------------

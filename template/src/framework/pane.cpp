@@ -1,4 +1,5 @@
 #include "pane.h"
+#include "appcontext.h"
 
 #include <QApplication>
 #include <QGuiApplication>
@@ -9,6 +10,9 @@
 #include <QMouseEvent>
 #include <QLineEdit>
 #include <QTextEdit>
+#include <QMenu>
+#include <QAction>
+#include <QContextMenuEvent>
 
 //=============================================================================
 // TPanel
@@ -62,9 +66,40 @@ void TPanel::paintEvent(QPaintEvent *) {
 
 void TPanel::onCloseButtonPressed() {
   emit closeButtonPressed();
-
-  // Remove widget from its dock layout control
+  // Hide panel so OpenFloatingPanel can restore it later
+  hide();
   if (parentLayout()) parentLayout()->removeWidget(this);
+}
+
+//-----------------------------------------------------------------------------
+
+void TPanel::contextMenuEvent(QContextMenuEvent* event) {
+  QMenu menu(this);
+
+  QAction* bindAction = menu.addAction(
+      m_isRoomBound ? tr("Unbind from Room") : tr("Bind to Current Room"));
+  QAction* selected = menu.exec(event->globalPos());
+
+  if (selected == bindAction) {
+    if (m_isRoomBound) {
+      setRoomBound(false);
+    } else {
+      setRoomBound(true);
+      m_boundRoomName = AppContext::instance()->currentRoomName();
+    }
+    update();
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void TPanel::setRoomBound(bool bound) {
+  m_isRoomBound = bound;
+  if (!bound) m_boundRoomName.clear();
+}
+
+void TPanel::setBoundRoomName(const QString& roomName) {
+  m_boundRoomName = roomName;
 }
 
 //-----------------------------------------------------------------------------

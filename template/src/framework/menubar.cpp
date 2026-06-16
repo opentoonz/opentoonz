@@ -208,31 +208,28 @@ QMenuBar *StackedMenuBar::buildDefaultMenuBar() {
 
   //---- View Menu
   QMenu *viewMenu = bar->addMenu(tr("View"));
+
+  // Auto-fill: all panel toggle commands (MenuWindowsCommandType)
+  std::vector<QAction*> winActions;
+  CommandManager::instance()->getActions(MenuWindowsCommandType, winActions);
+  for (QAction* act : winActions)
+      viewMenu->addAction(act);
+
+  viewMenu->addSeparator();
+
+  // Maximize panel
+  QAction* maxAct = CommandManager::instance()->getAction("MI_MaximizePanel", true);
+  if (maxAct) viewMenu->addAction(maxAct);
+
+  viewMenu->addSeparator();
+
+  // Fullscreen modes
   QAction* fullScreenAct =
       CommandManager::instance()->getAction("MI_FullScreenWindow", true);
   QAction* seeThroughAct =
       CommandManager::instance()->getAction("MI_SeeThroughWindow", true);
-  // Fallback: create actions directly if CommandManager lookup fails
-  if (!fullScreenAct) {
-      fullScreenAct = viewMenu->addAction(tr("Full Screen"));
-      fullScreenAct->setShortcut(QKeySequence("Ctrl+`"));
-      QObject::connect(fullScreenAct, &QAction::triggered, []() {
-          if (auto* mw = AppContext::instance()->mainWindow())
-              mw->fullScreenWindow();
-      });
-  } else {
-      viewMenu->addAction(fullScreenAct);
-  }
-  if (!seeThroughAct) {
-      seeThroughAct = viewMenu->addAction(tr("See Through Mode"));
-      seeThroughAct->setShortcut(QKeySequence("Alt+`"));
-      QObject::connect(seeThroughAct, &QAction::triggered, []() {
-          if (auto* mw = AppContext::instance()->mainWindow())
-              mw->seeThroughWindow();
-      });
-  } else {
-      viewMenu->addAction(seeThroughAct);
-  }
+  if (fullScreenAct) viewMenu->addAction(fullScreenAct);
+  if (seeThroughAct) viewMenu->addAction(seeThroughAct);
 
   //---- Settings Menu
   QMenu *settingsMenu = bar->addMenu(tr("Settings"));
