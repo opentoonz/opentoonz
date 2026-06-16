@@ -4,6 +4,7 @@
 #include "menubarcommand.h"
 #include "appcontext.h"
 #include "docklayout.h"
+#include "preferences/prefpopup.h"
 
 #include <QApplication>
 #include <QSettings>
@@ -181,23 +182,33 @@ void MainWindow::defineActions() {
     cm->createAction("MI_LoadLayout", "Load Layout", "Ctrl+O");
     cm->createAction("MI_Quit", "Quit", "Ctrl+Q");
 
-    // Panel toggle actions
-    cm->createAction("MI_OpenLogPanel", "Log Panel", "");
-    cm->createAction("MI_OpenPropertyPanel", "Property Inspector", "");
-    cm->createAction("MI_OpenCanvasPanel", "Canvas", "");
-    cm->createAction("MI_OpenCommandPalette", "Command Palette", "");
-    cm->createAction("MI_OpenWelcomePanel", "Welcome", "");
+    // Panel toggle actions (MenuWindowsCommandType for View menu auto-fill)
+    cm->createAction("MI_OpenLogPanel", "Log Panel", "", MenuWindowsCommandType);
+    cm->createAction("MI_OpenPropertyPanel", "Property Inspector", "", MenuWindowsCommandType);
+    cm->createAction("MI_OpenCanvasPanel", "Canvas", "", MenuWindowsCommandType);
+    cm->createAction("MI_OpenCommandPalette", "Command Palette", "", MenuWindowsCommandType);
+    cm->createAction("MI_OpenWelcomePanel", "Welcome", "", MenuWindowsCommandType);
+    cm->createAction("MI_OpenComboViewer", "Combo Viewer", "", MenuWindowsCommandType);
 
     // Toolbar actions (top)
     cm->createAction("MI_NewRoom", "New Room", "Ctrl+N");
     cm->createAction("MI_LockRooms", "Lock Rooms", "");
     cm->createAction("MI_MaximizePanel", "Maximize Panel", "`");
+    cm->createAction("MI_Preferences", "Preferences", "Ctrl+P");
     cm->createAction("MI_About", "About", "");
 
     struct QuitHandler final : CommandHandlerInterface {
         void execute() override { QApplication::quit(); }
     };
     CommandManager::instance()->setHandler("MI_Quit", new QuitHandler());
+
+    struct PrefHandler final : CommandHandlerInterface {
+        void execute() override {
+            PreferencesPopup popup;
+            popup.exec();
+        }
+    };
+    CommandManager::instance()->setHandler("MI_Preferences", new PrefHandler());
 
     // View actions (fullscreen)
     cm->createAction("MI_FullScreenWindow", "Full Screen", "Ctrl+`");
@@ -285,17 +296,17 @@ void MainWindow::createDefaultRooms() {
         room->setName("Edit");
         DockLayout* layout = room->dockLayout();
 
-        TPanel* canvas = TPanelFactory::createPanel(room, "Canvas");
-        room->addDockWidget(canvas);
-        layout->dockItem(canvas);
+        TPanel* viewer = TPanelFactory::createPanel(room, "ComboViewer");
+        room->addDockWidget(viewer);
+        layout->dockItem(viewer);
 
         TPanel* props = TPanelFactory::createPanel(room, "PropertyInspector");
         room->addDockWidget(props);
-        layout->dockItem(props, canvas, Region::right);
+        layout->dockItem(props, viewer, Region::right);
 
         TPanel* cmd = TPanelFactory::createPanel(room, "CommandPalette");
         room->addDockWidget(cmd);
-        layout->dockItem(cmd, canvas, Region::bottom);
+        layout->dockItem(cmd, viewer, Region::bottom);
 
         m_stackedWidget->addWidget(room);
         m_topBar->getRoomTabWidget()->addTab("Edit");
@@ -317,6 +328,36 @@ void MainWindow::createDefaultRooms() {
 
         m_stackedWidget->addWidget(room);
         m_topBar->getRoomTabWidget()->addTab("Debug");
+    }
+
+    // ===== Design Room (Figma-style layout) =====
+    {
+        Room* room = new Room(this);
+        room->setName("Design");
+        DockLayout* layout = room->dockLayout();
+
+        // Top: Design toolbar (fixed height)
+        TPanel* toolbar = TPanelFactory::createPanel(room, "DesignToolbar");
+        room->addDockWidget(toolbar);
+        layout->dockItem(toolbar);
+
+        // Center: Canvas with rulers
+        TPanel* canvas = TPanelFactory::createPanel(room, "Canvas");
+        room->addDockWidget(canvas);
+        layout->dockItem(canvas, toolbar, Region::bottom);
+
+        // Left: Layers panel
+        TPanel* layers = TPanelFactory::createPanel(room, "Layers");
+        room->addDockWidget(layers);
+        layout->dockItem(layers, canvas, Region::left);
+
+        // Right: Properties panel
+        TPanel* props = TPanelFactory::createPanel(room, "Properties");
+        room->addDockWidget(props);
+        layout->dockItem(props, canvas, Region::right);
+
+        m_stackedWidget->addWidget(room);
+        m_topBar->getRoomTabWidget()->addTab("Design");
     }
 
     // ===== Settings Room =====

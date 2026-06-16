@@ -411,11 +411,12 @@ QAction *CommandManager::getAction(CommandId id, bool createIfNeeded) {
 //---------------------------------------------------------
 
 QAction *CommandManager::createAction(const char *id, const char *name,
-                                      const char *defaultShortcut) {
+                                      const char *defaultShortcut,
+                                      CommandType type) {
   DVAction *action = new DVAction(QString::fromUtf8(name), 0);
   if (defaultShortcut && defaultShortcut[0])
     action->setShortcut(QKeySequence(QString::fromUtf8(defaultShortcut)));
-  define(id, MenuCommandType, std::string(defaultShortcut), action);
+  define(id, type, std::string(defaultShortcut), action);
   return action;
 }
 

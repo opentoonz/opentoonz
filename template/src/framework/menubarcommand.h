@@ -139,7 +139,8 @@ public:
               QAction *action, const char *iconSVGName = "");
 
   QAction *createAction(const char *id, const char *name,
-                        const char *defaultShortcut);
+                        const char *defaultShortcut,
+                        CommandType type = MenuCommandType);
 
   void getActions(CommandType type, std::vector<QAction *> &actions);
   QAction *getActionFromShortcut(std::string shortcutString);

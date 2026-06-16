@@ -7,6 +7,20 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets Core Gui Svg LinguistTools)
+# ---- Options ----
+option(BUILD_TESTS "Build unit tests" ON)
 
+# ---- Qt6 ----
+find_package(Qt6 REQUIRED COMPONENTS
+    Widgets Core Gui Svg Network Sql LinguistTools)
+
+# ---- FetchContent Dependencies ----
+include(cmake/dependencies.cmake)
+
+# ---- Subdirectories ----
 add_subdirectory(src)
+
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()

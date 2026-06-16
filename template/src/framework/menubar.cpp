@@ -268,6 +268,9 @@ QMenuBar *StackedMenuBar::buildDefaultMenuBar() {
   //---- Help Menu
   QMenu *helpMenu = bar->addMenu(tr("Help"));
   helpMenu->addAction(
+      CommandManager::instance()->getAction("MI_Preferences", true));
+  helpMenu->addSeparator();
+  helpMenu->addAction(
       CommandManager::instance()->getAction("MI_About", true));
 
   return bar;

@@ -8,12 +8,16 @@
 #include "framework/mainwindow.h"
 #include "framework/menubarcommand.h"
 #include "framework/thememanager.h"
+#include "framework/logger.h"
 
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
     app.setApplicationName("YZ UI Template");
     app.setOrganizationName("YZ");
     app.setStyle(QStyleFactory::create("Fusion"));
+
+    // Initialize logging (console + rotating file)
+    initLogger();
 
     // Initialize ThemeManager and preload icon metadata
     ThemeManager::getInstance().initialize();
