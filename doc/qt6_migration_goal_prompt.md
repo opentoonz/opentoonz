@@ -1925,6 +1925,14 @@ branch.
   second saved scene, restoring the first scene, checking the loaded level/cell
   state after each `Scene.load()`, and proving stale scene-owned `Level` wrappers
   are invalidated rather than kept live.
+- A Scene mutation workflow Qt 6 script fixture exists at
+  `toonz/sources/tests/scriptengine/scene_mutation_workflow.toonzscript` and is
+  run by `mise run script-smoke-scene-mutation-workflow-qt6`. It validates a
+  user-style non-rendering scene mutation sequence: duplicate level-name
+  rejection, level-name based cell insertion, missing-level lookup and
+  assignment errors, clearing and shifting cells through column deletion,
+  saving/reopening the mutated scene, and stale scene-owned `Level` wrapper
+  behavior after a subsequent scene reload.
 - A Scene failed-load Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/scene_load_failure.toonzscript` and is run
   by `mise run script-smoke-scene-load-failure-qt6`. It validates that
@@ -2705,6 +2713,7 @@ OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-loadlevel-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-loadlevel-sequence-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-save-reopen-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-reload-edges-qt6
+OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-mutation-workflow-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-load-failure-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-save-icon-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-save-icon-variants-qt6
