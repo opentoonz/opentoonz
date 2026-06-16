@@ -1,13 +1,13 @@
 <RCC>
   <qresource prefix="/themes">
-    <file>themes/Blue/Blue.qss</file>
-    <file>themes/Clay/Clay.qss</file>
-    <file>themes/Dark/Dark.qss</file>
-    <file>themes/Default/Default.qss</file>
-    <file>themes/Default-Green/Default-Green.qss</file>
-    <file>themes/Light/Light.qss</file>
-    <file>themes/Neutral/Neutral.qss</file>
-    <file>themes/Synthwave/Synthwave.qss</file>
+    <file alias="Blue.qss">themes/Blue/Blue.qss</file>
+    <file alias="Clay.qss">themes/Clay/Clay.qss</file>
+    <file alias="Dark.qss">themes/Dark/Dark.qss</file>
+    <file alias="Default.qss">themes/Default/Default.qss</file>
+    <file alias="Default-Green.qss">themes/Default-Green/Default-Green.qss</file>
+    <file alias="Light.qss">themes/Light/Light.qss</file>
+    <file alias="Neutral.qss">themes/Neutral/Neutral.qss</file>
+    <file alias="Synthwave.qss">themes/Synthwave/Synthwave.qss</file>
   </qresource>
   <qresource prefix="/icons/black">
     <file>icons/black/checkmark/checkmark.svg</file>

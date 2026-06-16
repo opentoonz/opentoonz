@@ -63,13 +63,13 @@ QStringList AppContext::availableThemes() const {
 
 void AppContext::scanAvailableThemes() {
     m_availableThemes.clear();
-    // Themes are embedded as Qt resources under :/themes/
+    // Themes are embedded as Qt resources under :/themes/ as flat .qss files
     QDir dir(":/themes");
-    QStringList entries = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    QStringList entries = dir.entryList({"*.qss"}, QDir::Files, QDir::Name);
     for (const QString& entry : entries) {
-        QString qssPath = QString(":/themes/%1/%2.qss").arg(entry, entry);
-        if (QFile::exists(qssPath))
-            m_availableThemes << entry;
+        // entry is like "Blue.qss" — extract theme name without extension
+        QString themeName = entry.chopped(4); // remove ".qss"
+        m_availableThemes << themeName;
     }
 }
 
@@ -95,7 +95,7 @@ QStringList AppContext::availableLanguages() const {
 }
 
 QString AppContext::loadStylesheet(const QString& themeName) const {
-    QString qssPath = QString(":/themes/%1/%2.qss").arg(themeName, themeName);
+    QString qssPath = QString(":/themes/%1.qss").arg(themeName);
     QFile file(qssPath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qWarning() << "Cannot load stylesheet:" << qssPath;

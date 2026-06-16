@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
 
     // Load language translator
     QString language = AppContext::instance()->currentLanguage();
-    QTranslator appTranslator;
+    QTranslator* appTranslator = nullptr;
     if (language != "English") {
         // Map display name to directory name
         QString langDir;
@@ -40,10 +40,14 @@ int main(int argc, char* argv[]) {
         else if (language == "日本語") langDir = "japanese";
 
         if (!langDir.isEmpty()) {
-            // Try loading from resource system first, then from filesystem
             QString qmPath = QString(":/translations/%1/template.qm").arg(langDir);
-            if (appTranslator.load(qmPath)) {
-                app.installTranslator(&appTranslator);
+            QFile qmFile(qmPath);
+            if (qmFile.open(QIODevice::ReadOnly)) {
+                QByteArray data = qmFile.readAll();
+                appTranslator = new QTranslator();
+                appTranslator->load(reinterpret_cast<const uchar*>(data.constData()),
+                                    data.size());
+                app.installTranslator(appTranslator);
             }
         }
     }
