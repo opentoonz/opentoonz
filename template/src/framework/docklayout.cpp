@@ -9,6 +9,7 @@
 #include <QTextStream>
 #include <QApplication>
 #include <QScreen>
+#include <QIODevice>
 
 //========================================================
 // TO DO:

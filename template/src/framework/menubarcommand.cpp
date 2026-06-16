@@ -350,6 +350,17 @@ QAction *CommandManager::getAction(CommandId id, bool createIfNeeded) {
 
 //---------------------------------------------------------
 
+QAction *CommandManager::createAction(const char *id, const char *name,
+                                      const char *defaultShortcut) {
+  QAction *action = new QAction(QString::fromUtf8(name), 0);
+  if (defaultShortcut && defaultShortcut[0])
+    action->setShortcut(QKeySequence(QString::fromUtf8(defaultShortcut)));
+  define(id, MenuCommandType, std::string(defaultShortcut), action);
+  return action;
+}
+
+//---------------------------------------------------------
+
 QAction *CommandManager::createAction(CommandId id, QObject *parent,
                                       bool state) {
   Node *node = getNode(id, false);

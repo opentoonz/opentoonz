@@ -8,6 +8,7 @@
 #include <QCheckBox>
 #include <QLineEdit>
 #include <QMap>
+#include <QContextMenuEvent>
 
 class RoomTabWidget : public QTabBar {
   Q_OBJECT
@@ -24,6 +25,9 @@ public:
 
   bool isLocked() { return m_isLocked; }
 
+public slots:
+  void setIsLocked(bool lock);
+
 protected:
   void swapIndex(int firstIndex, int secondIndex);
 
@@ -37,7 +41,6 @@ protected slots:
   void updateTabName();
   void addNewTab();
   void deleteTab();
-  void setIsLocked(bool lock);
 
 signals:
   void indexSwapped(int firstIndex, int secondIndex);

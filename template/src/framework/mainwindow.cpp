@@ -143,17 +143,20 @@ MainWindow::~MainWindow() {
 void MainWindow::defineActions() {
     CommandManager* cm = CommandManager::instance();
 
-    cm->createAction("MI_SaveLayout", tr("Save Layout"), "Ctrl+S");
-    cm->createAction("MI_LoadLayout", tr("Load Layout"), "Ctrl+O");
-    cm->createAction("MI_Quit", tr("Quit"), "Ctrl+Q");
-    cm->createAction("MI_OpenLogPanel", tr("Log Panel"), "");
-    cm->createAction("MI_OpenPropertyPanel", tr("Property Inspector"), "");
-    cm->createAction("MI_OpenCanvasPanel", tr("Canvas"), "");
-    cm->createAction("MI_OpenCommandPalette", tr("Command Palette"), "");
-    cm->createAction("MI_OpenWelcomePanel", tr("Welcome"), "");
-    cm->createAction("MI_About", tr("About"), "");
+    cm->createAction("MI_SaveLayout", "Save Layout", "Ctrl+S");
+    cm->createAction("MI_LoadLayout", "Load Layout", "Ctrl+O");
+    cm->createAction("MI_Quit", "Quit", "Ctrl+Q");
+    cm->createAction("MI_OpenLogPanel", "Log Panel", "");
+    cm->createAction("MI_OpenPropertyPanel", "Property Inspector", "");
+    cm->createAction("MI_OpenCanvasPanel", "Canvas", "");
+    cm->createAction("MI_OpenCommandPalette", "Command Palette", "");
+    cm->createAction("MI_OpenWelcomePanel", "Welcome", "");
+    cm->createAction("MI_About", "About", "");
 
-    setCommandHandler("MI_Quit", this, &MainWindow::close);
+    struct QuitHandler final : CommandHandlerInterface {
+        void execute() override { QApplication::quit(); }
+    };
+    CommandManager::instance()->setHandler("MI_Quit", new QuitHandler());
 }
 
 //-----------------------------------------------------------------------------
