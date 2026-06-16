@@ -24,8 +24,8 @@ RoomTabWidget::RoomTabWidget(QWidget *parent)
     , m_renameTextField(new QLineEdit(this))
     , m_isLocked(false) {
   m_renameTextField->hide();
-  connect(m_renameTextField, SIGNAL(editingFinished()), this,
-          SLOT(updateTabName()));
+  connect(m_renameTextField, &QLineEdit::editingFinished, this,
+          &RoomTabWidget::updateTabName);
 }
 
 //-----------------------------------------------------------------------------
@@ -97,7 +97,7 @@ void RoomTabWidget::contextMenuEvent(QContextMenuEvent *event) {
   m_tabToDeleteIndex = -1;
   QMenu *menu        = new QMenu(this);
   QAction *newRoom   = menu->addAction(tr("New Room"));
-  connect(newRoom, SIGNAL(triggered()), SLOT(addNewTab()));
+  connect(newRoom, &QAction::triggered, this, &RoomTabWidget::addNewTab);
 
   int index = tabAt(event->pos());
   if (index >= 0) {
@@ -105,7 +105,7 @@ void RoomTabWidget::contextMenuEvent(QContextMenuEvent *event) {
     if (index != currentIndex()) {
       QAction *deleteRoom =
           menu->addAction(tr("Delete Room \"%1\"").arg(tabText(index)));
-      connect(deleteRoom, SIGNAL(triggered()), SLOT(deleteTab()));
+      connect(deleteRoom, &QAction::triggered, this, &RoomTabWidget::deleteTab);
     }
   }
   menu->exec(event->globalPos());
@@ -237,9 +237,9 @@ TopBar::TopBar(QWidget *parent) : QToolBar(parent) {
   addWidget(m_containerFrame);
 
   bool ret = true;
-  ret = ret && connect(m_roomTabBar, SIGNAL(currentChanged(int)),
-                       m_stackedMenuBar, SLOT(setCurrentIndex(int)));
-  ret = ret && connect(m_lockRoomCB, SIGNAL(toggled(bool)), m_roomTabBar,
-                       SLOT(setIsLocked(bool)));
+  ret = ret && connect(m_roomTabBar, &QTabBar::currentChanged,
+                       m_stackedMenuBar, &QStackedWidget::setCurrentIndex);
+  ret = ret && connect(m_lockRoomCB, &QCheckBox::toggled, m_roomTabBar,
+                       &RoomTabWidget::setIsLocked);
   assert(ret);
 }

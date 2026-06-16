@@ -11,8 +11,6 @@
 #include <QFile>
 #include <QMessageBox>
 
-#include <sys/types.h>
-
 //---------------------------------------------------------
 
 namespace {

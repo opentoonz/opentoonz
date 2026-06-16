@@ -7,7 +7,7 @@
 #include <QEvent>
 #include <QMouseEvent>
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QScreen>
 #include <QScreen>
 
 // STD includes
@@ -80,7 +80,6 @@ inline QRect toRect(const QRectF &rect) {
 
 // Forward declaration
 namespace {
-QDesktopWidget *desktop;
 void getClosestAvailableMousePosition(QPoint &globalPos);
 }  // namespace
 
@@ -127,8 +126,7 @@ DockWidget::DockWidget(QWidget *parent, Qt::WindowFlags flags)
 
   m_decoAllocator = new DockDecoAllocator;
 
-  // Make sure the desktop is initialized and known
-  desktop = qApp->desktop();
+  // Qt6: screen geometry accessed via QScreen when needed
 }
 
 //-------------------------------------

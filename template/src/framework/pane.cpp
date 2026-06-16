@@ -1,5 +1,4 @@
 #include "pane.h"
-#include "appcontext.h"
 
 #include <QApplication>
 #include <QGuiApplication>

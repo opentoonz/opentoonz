@@ -10,6 +10,7 @@ set(FRAMEWORK_SOURCES
 )
 
 set(PANEL_SOURCES
+    panels/register.cpp
     panels/logpanel.cpp
     panels/propertypanel.cpp
     panels/canvaspanel.cpp
