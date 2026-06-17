@@ -41,6 +41,7 @@
 
 // TnzBase includes
 #include "tenv.h"
+#include "tbuildinfo.h"
 
 // TnzCore includes
 #include "tsystem.h"
@@ -211,13 +212,20 @@ void makePrivate(std::vector<Room *> &rooms) {
 // major version  :  7 bits
 // minor version  :  8 bits
 // revision number: 16 bits
+int get_version_component_from(std::string component) {
+  std::string::size_type nonDigit = component.find_first_not_of("0123456789");
+  if (nonDigit == 0) return 0;
+  if (nonDigit != std::string::npos) component = component.substr(0, nonDigit);
+  return std::stoi(component);
+}
+
 int get_version_code_from(std::string ver) {
   int version = 0;
 
   // major version: assume that the major version is less than 127.
   std::string::size_type const a = ver.find('.');
   std::string const major = (a == std::string::npos) ? ver : ver.substr(0, a);
-  version += std::stoi(major) << 24;
+  version += get_version_component_from(major) << 24;
   if ((a == std::string::npos) || (a + 1 == ver.length())) {
     return version;
   }
@@ -227,13 +235,13 @@ int get_version_code_from(std::string ver) {
   std::string const minor        = (b == std::string::npos)
                                        ? ver.substr(a + 1)
                                        : ver.substr(a + 1, b - a - 1);
-  version += std::stoi(minor) << 16;
+  version += get_version_component_from(minor) << 16;
   if ((b == std::string::npos) || (b + 1 == ver.length())) {
     return version;
   }
 
   // revision number: assume that the revision number is less than 32767.
-  version += std::stoi(ver.substr(b + 1));
+  version += get_version_component_from(ver.substr(b + 1));
 
   return version;
 }
@@ -570,7 +578,7 @@ void MainWindow::changeWindowTitle() {
                  QString::fromStdString(TEnv::getApplicationFullName());
 
   if (ShowBuildDateInTitle) {
-    name += " (built " __DATE__ " " __TIME__ ")";
+    name += " (built " OPENTOONZ_BUILD_TIMESTAMP ")";
   }
   setWindowTitle(name);
 }
@@ -1076,7 +1084,7 @@ void MainWindow::onAbout() {
   QHBoxLayout *hLay = new QHBoxLayout();
   {
     QString name = QString::fromStdString(TEnv::getApplicationFullName());
-    name += " (built " __DATE__ " " __TIME__ ")";
+    name += " (built " OPENTOONZ_BUILD_TIMESTAMP ")";
     hLay->addWidget(new QLabel(name, dialog));
 
     QCheckBox *showDateCheckBox =

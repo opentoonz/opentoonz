@@ -32,6 +32,12 @@ Older versions and unstable nightly builds are also available at <https://github
 - [macOS](./doc/how_to_build_macosx.md)
 - [Linux](./doc/how_to_build_linux.md)
 - [BSD](./doc/how_to_build_bsd.md)
+- [Nix + mise](./doc/how_to_build_nix_mise.md)
+
+For Apple Silicon Macs, prefer the [Nix + mise](./doc/how_to_build_nix_mise.md)
+workflow. It pins the C++ dependency set, builds a native arm64 app bundle,
+and documents the current differences between the new arm64 package and the
+last Intel macOS package.
 
 For instructions on how to build stylesheets, please [see here](./doc/how_to_stylesheet.md).
 
