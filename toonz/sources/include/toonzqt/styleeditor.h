@@ -931,6 +931,8 @@ class DVAPI StyleEditor final : public QWidget, public SaveLoadQSettings {
   bool m_enabledOnlyFirstTab;
   bool m_enabledFirstAndLastTab;
   bool m_colorPageIsVertical = true;
+  int m_pendingPageIndex     = -1;
+  int m_currentPageIndex     = 0;
 
 public:
   StyleEditor(PaletteController *, QWidget *parent = 0);
