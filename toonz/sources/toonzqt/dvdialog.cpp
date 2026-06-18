@@ -73,7 +73,8 @@ QPixmap getMsgBoxPixmap(MsgType type) {
 QString getMsgBoxTitle(MsgType type) {
   TVER::ToonzVersion tver;
   QString title = QString::fromStdString(tver.getAppName() + " " +
-                                         tver.getAppVersionString() + " - ");
+                                         tver.getAppFullVersionString() +
+                                         " - ");
 
   switch (type) {
   case DVGui::INFORMATION:
