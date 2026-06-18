@@ -14,6 +14,8 @@
 #pragma warning(disable : 4996)
 #endif
 
+#include <errno.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1841,23 +1843,58 @@ typedef struct {
   CDB_PARAM *param;
 } CDB_EFFECT;
 
+static void cdb_free_effect(void *data) {
+  CDB_EFFECT *effect = (CDB_EFFECT *)data;
+  int i;
+
+  if (!effect) return;
+
+  free(effect->name);
+  for (i = 0; i < effect->num_params; i++) {
+    free(effect->param[i].name);
+    free(effect->param[i].value);
+  }
+  free(effect->param);
+  free(effect);
+}
+
+static void cdb_free_tree_item(void *data) {
+  CDB_TREE_ITEM *item = (CDB_TREE_ITEM *)data;
+
+  if (!item) return;
+
+  free(item->group);
+  free(item->name);
+  free(item->accelerator);
+  if (item->effects) {
+    avl_release(item->effects, cdb_free_effect);
+    avl_close(item->effects);
+  }
+  free(item);
+}
+
 static char *strsave(const char *str) {
   char *neww;
+  size_t len;
   if (!str) return 0;
-  neww = malloc(strlen(str) + 1);
+  len  = strlen(str);
+  neww = malloc(len + 1);
+  if (!neww) return 0;
 
-  strcpy(neww, str);
+  memcpy(neww, str, len + 1);
   return neww;
 }
 
 /*---------------------------------------------------------------------------*/
 
-static char *strnsave(const char *str, int n) {
+static char *strnsave(const char *str, size_t n) {
   char *neww;
+  if (!str) return 0;
 
   neww = malloc(n + 1);
+  if (!neww) return 0;
 
-  strncpy(neww, str, n);
+  memcpy(neww, str, n);
   neww[n] = '\0';
   return neww;
 }
@@ -1866,13 +1903,18 @@ TREE *cdb_decode_all(char *names_in_plt_file, TCM_INFO tcm) {
   TREE *tree;
   char *c1, *c2, *endcol, *endstr, *ct;
   char tmp[100];
+  char *endptr;
+  long parsedNumParams;
   int i, p;
+  size_t paramCountLength;
   CDB_TREE_ITEM *item;
   CDB_EFFECT *effect;
 
   tree = avl_tree_nodup_int(CDB_TREE_ITEM, index);
 
   item   = NIL;
+  effect = NIL;
+  if (!names_in_plt_file) names_in_plt_file = "";
   endstr = strchr(names_in_plt_file, '\0');
   c1     = names_in_plt_file;
   c2     = NIL;
@@ -1937,9 +1979,17 @@ TREE *cdb_decode_all(char *names_in_plt_file, TCM_INFO tcm) {
         c1 = c2 + 1;
         c2 = strchr(c1, '#');
         if (!c2) goto error;
-        strncpy(tmp, c1, c2 - c1);
-        tmp[c2 - c1]       = '\0';
-        effect->num_params = atoi(tmp);
+        paramCountLength = (size_t)(c2 - c1);
+        if (paramCountLength == 0 || paramCountLength >= sizeof(tmp))
+          goto error;
+        memcpy(tmp, c1, paramCountLength);
+        tmp[paramCountLength] = '\0';
+        errno                 = 0;
+        parsedNumParams       = strtol(tmp, &endptr, 10);
+        if (errno == ERANGE || *endptr != '\0' || parsedNumParams < 0 ||
+            parsedNumParams > INT_MAX)
+          goto error;
+        effect->num_params = (int)parsedNumParams;
         if (effect->num_params) CDB_TCALLOC(effect->param, effect->num_params)
         c1 = c2 + 1;
         for (p = 0; p < effect->num_params; p++) {
@@ -1956,6 +2006,7 @@ TREE *cdb_decode_all(char *names_in_plt_file, TCM_INFO tcm) {
           c1      = c2 + 3;
         }
         avl_insert(item->effects, effect);
+        effect = NIL;
         item->num_effects++;
         if (*endcol != '|')
           c1 = endcol + 3;
@@ -1966,12 +2017,16 @@ TREE *cdb_decode_all(char *names_in_plt_file, TCM_INFO tcm) {
       }
     }
     avl_insert(tree, item);
+    item = NIL;
   }
   return tree;
 
 error:
 
   printf("error parsing color names and fx\n");
+  if (effect) cdb_free_effect(effect);
+  if (item) cdb_free_tree_item(item);
+  avl_release(tree, cdb_free_tree_item);
 
   return tree;
 }
