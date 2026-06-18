@@ -11,12 +11,15 @@ checks=(
   scripts/qt6/check-multimedia-scope.sh
   scripts/qt6/check-script-scope.sh
   scripts/qt6/check-script-smoke-registry.sh
+  scripts/qt6/check-gui-smoke-registry.sh
   scripts/qt6/check-fontmetrics-scope.sh
   scripts/qt6/check-fontdatabase-scope.sh
   scripts/qt6/check-highdpi-attribute-scope.sh
   scripts/qt6/check-touch-scope.sh
   scripts/qt6/check-tabletevent-scope.sh
   scripts/qt6/check-mouseevent-scope.sh
+  scripts/qt6/check-enterevent-scope.sh
+  scripts/qt6/check-helpevent-scope.sh
   scripts/qt6/check-qvariant-scope.sh
   scripts/qt6/check-qkeysequence-scope.sh
   scripts/qt6/check-mediaplayer-scope.sh

@@ -205,6 +205,15 @@ Already covered:
   `mise run check-qt6-mouseevent-scope`, keeping direct `x()`, `y()`, `pos()`,
   `globalPos()`, `globalX()`, and `globalY()` event accessors out of handler
   code after the `QtCompat` coordinate-helper migration.
+- `enterEvent` override signatures now stay on the version-aware
+  `QtCompat::EnterEvent` alias, which resolves to `QEnterEvent` in Qt 6 and
+  `QEvent` in Qt 5. `mise run check-qt6-enterevent-scope` keeps direct
+  `enterEvent(QEvent*)` / `enterEvent(QEnterEvent*)` signatures from
+  reappearing outside the compatibility alias.
+- Tooltip `QHelpEvent` coordinate access now stays behind
+  `QtCompat::helpEventPosition()` and `QtCompat::helpEventGlobalPosition()`.
+  `mise run check-qt6-helpevent-scope` keeps direct `pos()` / `globalPos()`
+  tooltip-event access from reappearing in feature code.
 - The recent flipbook image loader now avoids Qt 6-deprecated
   `QAction::parentWidget()` by casting `QAction::parent()`. `mise run
   check-qt6-qaction-scope` guards that QAction warning slice.
@@ -493,6 +502,14 @@ Already covered:
   `.toonzscript` fixture is added under `toonz/sources/tests/scriptengine`
   without a corresponding `mise` task, except for the documented default
   `basic.toonzscript` / `run_child.toonzscript` pair.
+- `mise run check-qt6-gui-smoke-registry` now guards the packaged GUI-smoke
+  registry: every task listed in `scripts/qt6/run-all-gui-smokes.sh` must
+  exist in `mise.toml`, every non-startup task must declare an
+  `OPENTOONZ_GUI_SMOKE_ACTION`, and each action must have an app-side handler
+  in `toonz/sources/toonz/main.cpp`. It also fails when a new
+  `gui-smoke-*` mise task is left out of the aggregate runner unless the task
+  is an explicit non-aggregate exception such as the OS-input System Events
+  smoke.
 - The `run()` error smoke covers missing/extra arguments, bad path arguments,
   missing script files, and child-script exception propagation.
 - The smoke suite covers the current facades for file/path, scene, level,
@@ -519,6 +536,11 @@ Already covered:
   `lastModified` JS `Date` exposure, plus `valueOf()`, `String(filePath)`,
   copy construction, JavaScript string concatenation, strict constructor arity,
   and strict method arity for path mutation/listing helpers.
+- FilePath directory-listing coverage now also verifies that `files()` returns
+  reusable `FilePath` wrappers, that returned entries preserve
+  name/extension/parent/exists metadata, that wrapper copy construction and
+  sibling concatenation round-trip, and that non-directory/absolute-concat
+  errors remain strict.
 - The path-argument smoke coverage now also verifies strict
   `FilePath`/`Level`/`Scene` constructor arity alongside string/FilePath
   argument rejection for `run()`, path helpers, and Image/Level/Scene path
@@ -527,7 +549,9 @@ Already covered:
   and lifetime behavior, including disposal of returned wrappers without
   deleting scene-owned levels and the current empty-wrapper behavior for stale
   scene-owned level wrappers after `Scene.dispose()`. It also covers null and
-  malformed cell-object rejection in `Scene.setCell()`, strict Scene
+  malformed cell-object rejection in `Scene.setCell()`, object-form
+  `Scene.setCell()` assignment by level wrapper and level name, clear through
+  explicit `undefined`, disposed-level object rejection, strict Scene
   constructor arity, strict method arity for non-rendering Scene load/save,
   cell, level, and load-level APIs, integer-only row/column index enforcement
   for Scene column/cell APIs, backend negative row/column errors, plus legacy
@@ -898,6 +922,7 @@ mise run check-core5compat-scope
 mise run check-qt6-multimedia-scope
 mise run check-qt6-script-scope
 mise run check-qt6-script-smoke-registry
+mise run check-qt6-gui-smoke-registry
 mise run check-qt6-fontmetrics-scope
 mise run check-qt6-fontdatabase-scope
 mise run check-qt6-highdpi-attribute-scope

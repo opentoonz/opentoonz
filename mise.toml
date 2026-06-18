@@ -46,6 +46,10 @@ run = "bash scripts/qt6/check-script-scope.sh"
 description = "Fail if the aggregate Qt 6 script-smoke task list or fixture paths drift out of sync."
 run = "bash scripts/qt6/check-script-smoke-registry.sh"
 
+[tasks.check-qt6-gui-smoke-registry]
+description = "Fail if the aggregate Qt 6 GUI-smoke task list or app-side actions drift out of sync."
+run = "bash scripts/qt6/check-gui-smoke-registry.sh"
+
 [tasks.check-qt6-fontmetrics-scope]
 description = "Fail if direct deprecated QFontMetrics::width() usage escapes QtCompat."
 run = "bash scripts/qt6/check-fontmetrics-scope.sh"
@@ -69,6 +73,14 @@ run = "bash scripts/qt6/check-tabletevent-scope.sh"
 [tasks.check-qt6-mouseevent-scope]
 description = "Fail if direct event coordinate access escapes QtCompat."
 run = "bash scripts/qt6/check-mouseevent-scope.sh"
+
+[tasks.check-qt6-enterevent-scope]
+description = "Fail if direct enterEvent QEvent/QEnterEvent signatures escape QtCompat."
+run = "bash scripts/qt6/check-enterevent-scope.sh"
+
+[tasks.check-qt6-helpevent-scope]
+description = "Fail if direct QHelpEvent coordinate access escapes QtCompat."
+run = "bash scripts/qt6/check-helpevent-scope.sh"
 
 [tasks.check-qt6-qvariant-scope]
 description = "Fail if non-template QVariant::canConvert() usage escapes the version-aware helper."
@@ -474,6 +486,10 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/file_path_coerc
 description = "Run the Qt 6 app bundle against FilePath error and directory-listing edge cases."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/file_path_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-filepath-edges-relative child txt beta|qt-script-filepath-edges-errors true true [true,true,true,true,true,true,true,true,true,true]|qt-script-filepath-edges-files true true true' bash scripts/qt6/run-script-smoke.sh"
 
+[tasks.script-smoke-filepath-files-edges-qt6]
+description = "Run the Qt 6 app bundle against FilePath.files wrapper and round-trip edge cases."
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/file_path_files_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-filepath-files-entries true true true true false scriptengine true true|qt-script-filepath-files-roundtrip basic toonzscript true true file_path true file_path_edges|qt-script-filepath-files-errors [true,true,true]' bash scripts/qt6/run-script-smoke.sh"
+
 [tasks.script-smoke-filepath-metadata-qt6]
 description = "Run the Qt 6 app bundle against FilePath metadata and modified-time parity."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/file_path_metadata.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-filepath-metadata-file true false true true true|qt-script-filepath-metadata-dir true true true true true|qt-script-filepath-metadata-missing false false true true' bash scripts/qt6/run-script-smoke.sh"
@@ -501,6 +517,10 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_columns.t
 [tasks.script-smoke-scene-cell-fids-qt6]
 description = "Run the Qt 6 app bundle against Scene getCell frame-id type parity."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_cell_fids.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-cell-fids number true string true 2 1' bash scripts/qt6/run-script-smoke.sh"
+
+[tasks.script-smoke-scene-cell-object-edges-qt6]
+description = "Run the Qt 6 app bundle against Scene.setCell object-form edge cases."
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_cell_object_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-cell-object-values qt6_scene_cell_object_edges 1 qt6_scene_cell_object_edges 0002A true 2 1|qt-script-scene-cell-object-errors [true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-scene-edges-qt6]
 description = "Run the Qt 6 app bundle against Scene level and cell error edge cases."

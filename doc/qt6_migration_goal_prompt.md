@@ -107,6 +107,14 @@ branch.
   `basic.toonzscript` and its default child helper `run_child.toonzscript`.
   This keeps new QJSEngine compatibility fixtures from silently drifting out
   of the aggregate smoke suite.
+- `mise run check-qt6-gui-smoke-registry` now verifies that every task in
+  `scripts/qt6/run-all-gui-smokes.sh` exists in `mise.toml`, that each
+  non-startup GUI smoke task declares an `OPENTOONZ_GUI_SMOKE_ACTION`, and that
+  the action has an app-side handler in `toonz/sources/toonz/main.cpp`. It also
+  fails when a new `gui-smoke-*` mise task is not added to the aggregate runner,
+  except for documented non-aggregate tasks such as the OS-input System Events
+  smoke. This keeps packaged GUI smoke coverage from drifting as viewer,
+  renderer, input, audio, and camera smoke tasks are added.
 - Direct removed desktop-widget APIs are no longer present under
   `toonz/sources`. `mise run check-qt6-desktopwidget-scope` now keeps
   `QDesktopWidget`, `QApplication::desktop()`, `qApp->desktop()`, and direct
@@ -405,6 +413,15 @@ branch.
   re-entering common handler code after the broad `QtCompat` coordinate-helper
   migration. The guard also removed obsolete commented examples that still
   showed direct `QMouseEvent::pos()` usage.
+- `enterEvent` override signatures now stay on the version-aware
+  `QtCompat::EnterEvent` alias, which resolves to `QEnterEvent` in Qt 6 and
+  `QEvent` in Qt 5. `mise run check-qt6-enterevent-scope` keeps direct
+  `enterEvent(QEvent*)` / `enterEvent(QEnterEvent*)` signatures from
+  reappearing outside the compatibility alias.
+- Tooltip `QHelpEvent` coordinate access now stays behind
+  `QtCompat::helpEventPosition()` and `QtCompat::helpEventGlobalPosition()`.
+  `mise run check-qt6-helpevent-scope` keeps direct `pos()` / `globalPos()`
+  tooltip-event access from reappearing in feature code.
 - Deprecated `QVariant::canConvert(QVariant::...)` overloads have been removed
   from the current app/UI/header tree. Fixed-type settings restore paths use
   templated `canConvert<T>()` checks, and dynamic preference type checks route
@@ -1867,6 +1884,13 @@ branch.
   `mise run script-smoke-scene-cell-fids-qt6`. It validates the legacy
   `Scene.getCell().fid` type contract: numeric frame ids return as numbers, and
   lettered frame ids return as strings.
+- A Scene cell object-form edge fixture exists at
+  `toonz/sources/tests/scriptengine/scene_cell_object_edges.toonzscript` and is
+  run by `mise run script-smoke-scene-cell-object-edges-qt6`. It validates
+  `Scene.setCell()` with `{level, fid}` objects using both level wrappers and
+  level names, explicit `undefined` clearing, malformed object rejection,
+  invalid frame-id rejection, missing-level rejection, and disposed-level
+  wrapper rejection.
 - A Scene edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/scene_edges.toonzscript` and is run by
   `mise run script-smoke-scene-edges-qt6`. It validates a non-rendering
@@ -2128,6 +2152,13 @@ branch.
   parity for relative concatenation, absolute-path concat rejection,
   non-directory `files()` errors, strict constructor and method arity for path
   mutation/listing helpers, and directory listing through the Qt 6 facade.
+- A FilePath directory-listing wrapper fixture exists at
+  `toonz/sources/tests/scriptengine/file_path_files_edges.toonzscript` and is
+  run by `mise run script-smoke-filepath-files-edges-qt6`. It validates that
+  `FilePath.files()` returns reusable `FilePath` wrappers with preserved
+  name/extension/parent/exists metadata, that wrapper copy construction and
+  sibling concatenation round-trip, and that non-directory and absolute-concat
+  errors remain strict.
 - A FilePath metadata Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/file_path_metadata.toonzscript` and is run
   by `mise run script-smoke-filepath-metadata-qt6`. It validates
@@ -2215,9 +2246,11 @@ branch.
   fallback, explicit frame-2 path loading, Raster type reporting, size, DPI,
   and string reporting.
 - The script smoke can run in bounded mode or natural-exit mode. The basic,
-  `run()` error, FilePath, FilePath edges, FilePath metadata, path-argument,
+  `run()` error, FilePath, FilePath edges, FilePath files edge,
+  FilePath metadata, path-argument,
   Scene, Scene cells, Scene columns,
-  Scene cell frame-id type, Scene edges, Scene argument edges,
+  Scene cell frame-id type, Scene cell object edge, Scene edges,
+  Scene argument edges,
   Scene lifecycle edges, Scene load-level, Scene load-level sequence,
   Scene save/reopen, Scene reload edge,
   Scene failed-load, Scene save-icon, Scene save-icon variants, Scene frame-id,
@@ -2640,12 +2673,14 @@ mise run script-smoke-run-errors-qt6
 mise run script-smoke-filepath-qt6
 mise run script-smoke-filepath-coercion-qt6
 mise run script-smoke-filepath-edges-qt6
+mise run script-smoke-filepath-files-edges-qt6
 mise run script-smoke-filepath-metadata-qt6
 mise run script-smoke-filepath-mutation-metadata-qt6
 mise run script-smoke-path-arguments-qt6
 mise run script-smoke-scene-qt6
 mise run script-smoke-scene-cells-qt6
 mise run script-smoke-scene-columns-qt6
+mise run script-smoke-scene-cell-object-edges-qt6
 mise run script-smoke-scene-cell-fids-qt6
 mise run script-smoke-scene-edges-qt6
 mise run script-smoke-scene-argument-edges-qt6
@@ -2698,12 +2733,14 @@ OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-run-errors-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-filepath-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-filepath-coercion-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-filepath-edges-qt6
+OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-filepath-files-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-filepath-metadata-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-filepath-mutation-metadata-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-path-arguments-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-cells-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-columns-qt6
+OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-cell-object-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-cell-fids-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-argument-edges-qt6

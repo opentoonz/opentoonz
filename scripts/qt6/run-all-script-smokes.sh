@@ -10,6 +10,7 @@ tasks=(
   script-smoke-filepath-qt6
   script-smoke-filepath-coercion-qt6
   script-smoke-filepath-edges-qt6
+  script-smoke-filepath-files-edges-qt6
   script-smoke-filepath-metadata-qt6
   script-smoke-filepath-mutation-metadata-qt6
   script-smoke-path-arguments-qt6
@@ -17,6 +18,7 @@ tasks=(
   script-smoke-scene-cells-qt6
   script-smoke-scene-columns-qt6
   script-smoke-scene-cell-fids-qt6
+  script-smoke-scene-cell-object-edges-qt6
   script-smoke-scene-edges-qt6
   script-smoke-scene-argument-edges-qt6
   script-smoke-scene-lifecycle-edges-qt6

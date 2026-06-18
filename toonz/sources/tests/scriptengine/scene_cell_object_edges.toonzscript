@@ -1,0 +1,54 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e.message || e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var image = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var scene = new Scene();
+var level = scene.newLevel("Raster", "qt6_scene_cell_object_edges");
+level.setFrame("1", image);
+level.setFrame("2A", image);
+
+scene.setCell(0, 0, { level: level, fid: "1" });
+scene.setCell(1, 0, { level: "qt6_scene_cell_object_edges", fid: "2A" });
+scene.setCell(2, 0, level, "1");
+scene.setCell(2, 0, undefined);
+
+var objectLevel = scene.getCell(0, 0);
+var objectName = scene.getCell(1, 0);
+var cleared = scene.getCell(2, 0);
+
+print("qt-script-scene-cell-object-values", objectLevel.level.name,
+      objectLevel.fid, objectName.level.name, objectName.fid,
+      cleared === undefined, scene.frameCount, scene.columnCount);
+
+var detachedLevel = scene.newLevel("Raster", "qt6_scene_cell_object_detached");
+detachedLevel.dispose();
+
+var errors = [
+  hasError(function() { scene.setCell(3, 0, { level: level }); },
+           "Third argument should be an object"),
+  hasError(function() { scene.setCell(3, 0, { fid: "1" }); },
+           "Third argument should be an object"),
+  hasError(function() { scene.setCell(3, 0, { level: level, fid: "bad" }); },
+           "does not look like a FrameId"),
+  hasError(function() { scene.setCell(3, 0, { level: "missing", fid: "1" }); },
+           "not included in the scene"),
+  hasError(function() {
+    scene.setCell(3, 0, { level: detachedLevel, fid: "1" });
+  }, "Invalid Level object")
+];
+
+print("qt-script-scene-cell-object-errors", errors);
+
+objectLevel.level.dispose();
+objectName.level.dispose();
+level.dispose();
+scene.dispose();
+image.dispose();
+
+"qt-script-scene-cell-object-edges-result";
