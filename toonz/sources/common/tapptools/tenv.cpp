@@ -5,6 +5,8 @@
 #include "tversion.h"
 
 #include <QDir>
+#include <QFile>
+#include <QFileInfo>
 #include <QSettings>
 #include <QStandardPaths>
 
@@ -37,6 +39,34 @@ const std::map<std::string, std::string> systemPathMap{
     {"LIBRARY", "library"}, {"STUDIOPALETTE", "studiopalette"},
     {"FXPRESETS", "fxs"},   {"PROFILES", "profiles"},
     {"CONFIG", "config"},   {"PROJECTS", "projects"}};
+
+#ifdef MACOSX
+bool copyDirectoryIfMissing(const QString &sourcePath,
+                            const QString &targetPath) {
+  QDir sourceDir(sourcePath);
+  if (!sourceDir.exists()) return false;
+
+  QDir targetDir(targetPath);
+  if (!targetDir.exists() && !targetDir.mkpath(".")) return false;
+
+  const QFileInfoList entries =
+      sourceDir.entryInfoList(QDir::NoDotAndDotDot | QDir::AllEntries |
+                              QDir::Hidden | QDir::System);
+  for (const QFileInfo &entry : entries) {
+    const QString targetEntryPath = targetDir.filePath(entry.fileName());
+    if (entry.isDir()) {
+      if (!copyDirectoryIfMissing(entry.filePath(), targetEntryPath))
+        return false;
+    } else if (!QFile::exists(targetEntryPath)) {
+      if (!QFile::copy(entry.filePath(), targetEntryPath)) return false;
+      QFile::setPermissions(targetEntryPath,
+                            QFile::permissions(targetEntryPath) |
+                                QFileDevice::WriteOwner);
+    }
+  }
+  return true;
+}
+#endif
 
 class EnvGlobals {  // singleton
 
@@ -169,12 +199,7 @@ public:
   }
 
   void init() {
-    if (m_version.getAppRevision() != 0) {
-      m_applicationVersion = m_version.getAppVersionString() + "." +
-                             m_version.getAppRevisionString();
-    } else {
-      m_applicationVersion = m_version.getAppVersionString();
-    }
+    m_applicationVersion = m_version.getAppFullVersionString();
 
     m_applicationFullName = m_version.getAppName() + " " + m_applicationVersion;
     if (m_version.hasAppNote())
@@ -246,20 +271,55 @@ public:
     // depending on how it was installed. This separates the app from the
     // portablestuff folder and we don't know where it is so we stop treating it
     // as a portable. Placing portablestuff inside OpenToonz.app will keep
-    // everything together when it translocates.
+    // everything together when it translocates. Contents/Resources is preferred
+    // because files at the app bundle root cannot be sealed by codesign.
+    if (!m_isPortable) {
+      portableCheck =
+          TFilePath(m_workingDirectory + "\\" + getApplicationFileName() +
+                    ".app\\Contents\\Resources\\portablestuff\\");
+      portableStatus = TFileStatus(portableCheck);
+      m_isPortable   = portableStatus.doesExist();
+      if (m_isPortable) {
+        setMacBundleWritableStuffDir(portableCheck);
+      }
+    }
     if (!m_isPortable) {
       portableCheck =
           TFilePath(m_workingDirectory + "\\" + getApplicationFileName() +
                     ".app\\portablestuff\\");
       portableStatus = TFileStatus(portableCheck);
       m_isPortable   = portableStatus.doesExist();
-      if (m_isPortable)
-        m_workingDirectory =
-            portableCheck.getParentDir().getQString().toStdString();
+      if (m_isPortable) {
+        setMacBundleWritableStuffDir(portableCheck);
+      }
     }
 #endif
   }
   std::string getWorkingDirectory() { return m_workingDirectory; }
+
+#ifdef MACOSX
+  void setMacBundleWritableStuffDir(const TFilePath &bundleStuffDir) {
+    QString supportRoot =
+        QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+    if (supportRoot.isEmpty())
+      supportRoot = QDir::home().filePath("Library/Application Support");
+
+    QString appName = QString::fromStdString(getApplicationName());
+    if (appName.isEmpty()) appName = "OpenToonz";
+
+    const QString targetStuffDir =
+        QDir(supportRoot).filePath(appName + "/stuff");
+
+    if (!QDir(targetStuffDir).exists()) {
+      copyDirectoryIfMissing(bundleStuffDir.getQString(), targetStuffDir);
+    }
+
+    setStuffDir(TFilePath(targetStuffDir.toStdWString()));
+    m_workingDirectory =
+        TFilePath(targetStuffDir.toStdWString()).getParentDir().getQString()
+            .toStdString();
+  }
+#endif
 
   bool getIsPortable() { return m_isPortable; }
 

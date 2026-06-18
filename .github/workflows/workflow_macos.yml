@@ -3,12 +3,12 @@ name: MacOS Build
 on:
   push:
     paths:
-      - '**/*'                                  # Include all files in the repository
-      - '!appveyor.yml'                         # Ignore changes in AppVeyor
-      - '!README.md'                            # Exclude README
-      - '!doc/**'                               # Exclude documentation
-      - '!**/.github/**'                        # Exclude everything in .github folder
-      - '.github/workflows/workflow_macos.yml'  # Include MacOs workflow file
+      - '**/*'
+      - '!appveyor.yml'
+      - '!README.md'
+      - '!doc/**'
+      - '!**/.github/**'
+      - '.github/workflows/workflow_macos.yml'
   pull_request:
     paths:
       - '**/*'
@@ -17,126 +17,99 @@ on:
       - '!doc/**'
       - '!**/.github/**'
       - '.github/workflows/workflow_macos.yml'
+  release:
+    types: [published]
+  workflow_dispatch:
 
 jobs:
   macOS:
-    timeout-minutes: 180 # Stop job if it exceeds expected build time
-    # GHA are sunsetting support for macOS 13 (Intel & Apple Silicon/arm) & will be fully unsupported on (December 4th 2025),
-    # See: https://github.blog/changelog/2025-09-19-github-actions-macos-13-runner-image-is-closing-down/ & https://github.com/actions/runner-images/issues/13046
-    # (Septemer 19th 2025) - Replacing `macos-13` runner image with the new `macos-15-intel` runner image to maintain macOS (Intel x64) support.
-    # See: https://github.com/actions/runner-images/issues/13045
-    # GHA (x86_64) SUNSETTING SUPPORT DEADLINE WARNING!!! `macos-15-intel` runner image will be the last available x86_64 image from Actions, and after (August 2027) the x86_64 architecture will not be supported on GitHub Actions.
-    # Xref.: https://github.com/actions/runner-images/issues/13045
-    # TODO: Change macOS GHA Runner Image to (Apple Silicon) based image on/prior to sunsetting of `macos-15-intel` (x86_64) runner image (August 2027)
-    runs-on: macos-15-intel
+    name: Apple Silicon arm64
+    timeout-minutes: 180
+    runs-on: macos-15
+    env:
+      OPENTOONZ_APP: toonz/build/nix-relwithdebinfo/toonz/OpenToonz.app
+      OPENTOONZ_DMG: toonz/build/nix-relwithdebinfo/toonz/OpenToonz.dmg
+      OPENTOONZ_REQUIRED_ARCH: arm64
+      OPENTOONZ_ALLOW_UNIVERSAL: '0'
+      MACOS_CERTIFICATE_P12_BASE64: ${{ secrets.MACOS_CERTIFICATE_P12_BASE64 }}
+      MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+      MACOS_KEYCHAIN_PASSWORD: ${{ secrets.MACOS_KEYCHAIN_PASSWORD }}
+      MACOS_DEVELOPER_ID_APPLICATION: ${{ secrets.MACOS_DEVELOPER_ID_APPLICATION }}
+      MACOS_NOTARY_KEYCHAIN_PROFILE: ${{ secrets.MACOS_NOTARY_KEYCHAIN_PROFILE }}
+      MACOS_NOTARY_APPLE_ID: ${{ secrets.MACOS_NOTARY_APPLE_ID }}
+      MACOS_NOTARY_TEAM_ID: ${{ secrets.MACOS_NOTARY_TEAM_ID }}
+      MACOS_NOTARY_PASSWORD: ${{ secrets.MACOS_NOTARY_PASSWORD }}
+
     steps:
       - uses: actions/checkout@v6
 
-      - name: Clean Python symlinks
-        run: |
-          # Remove potentially conflicting Python symlinks
-          find /usr/local/bin -type l \( -name "python*" -o -name "pip*" -o -name "2to3*" -o -name "idle*" -o -name "pydoc*" \) \
-            -exec sh -c 'file -b {} | grep -q "symbolic link to .*Python.framework" && echo "Removing {}" && rm {}' \;
-          # Ensure Homebrew Python is properly linked
-          for py_version in python@3.11 python@3.12 python@3.13 python@3.14; do
-            if brew list --versions $py_version >/dev/null; then
-              brew unlink $py_version || true
-            fi
-          done
-          brew link --overwrite --force python@3.14 || true
-
-      - name: Install libraries
-        run: |
-          checkPkgAndInstall() {
-            for pkg in "$@"; do
-              if brew ls --versions "$pkg" >/dev/null; then
-                echo "$pkg already installed"
-              else
-                brew install "$pkg"
-              fi
-            done
-          }
-
-          brew update
-
-          checkPkgAndInstall pkg-config glew lz4 libjpeg libpng lzo boost libusb libmypaint ccache jpeg-turbo ninja opencv openjph openexr
-
-          brew list --formula | grep '^qt' | grep -v '@5' | xargs -n1 brew unlink || true
-
-          brew install qt@5
-          brew unlink qt@5 || true
-          brew link qt@5 || true
-
-      - name: Set up cache
-        run: |
-          export PATH="/usr/local/opt/ccache/libexec:$PATH"
-          mkdir -p /Users/runner/.ccache
-      - uses: actions/cache@v5
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
         with:
-          path: /Users/runner/.ccache
-          key: ${{ runner.os }}-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-
+          extra_nix_config: |
+            experimental-features = nix-command flakes
 
-      - name: Build libtiff
+      - name: Install mise
+        uses: jdx/mise-action@v3
+        with:
+          install: false
+
+      - name: Confirm Apple Silicon runner
         run: |
-          cd thirdparty/tiff-4.0.3
-          CFLAGS='-fPIC' CXXFLAGS='-fPIC' ./configure --disable-lzma
-          make -j $(sysctl -n hw.ncpu)
-          make install  # Ensures CMake finds the installed lib (avoid linking issues)
-      - name: Build
+          uname -a
+          test "$(uname -m)" = "arm64"
+
+      - name: Trust mise configuration
+        run: mise trust --yes ./mise.toml
+
+      - name: Check pinned toolchain
+        run: mise run doctor
+
+      - name: Build OpenToonz
+        run: mise run build
+
+      - name: Bundle app
+        run: mise run package-macos
+
+      - name: Verify arm64 bundle
+        run: mise run check-macos-arm64
+
+      - name: Import Apple signing certificate
+        if: ${{ github.event_name == 'release' && env.MACOS_CERTIFICATE_P12_BASE64 != '' && env.MACOS_CERTIFICATE_PASSWORD != '' }}
         run: |
-          export PKG_CONFIG_PATH="/usr/local/opt/jpeg-turbo/lib/pkgconfig:$PKG_CONFIG_PATH"
-          cd toonz
-          rm -rf build  
-          mkdir -p build
-          cd build
-          cmake ../sources -G Ninja \
-            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-            -DQT_PATH=$(brew --prefix qt@5)/lib \
-            -DQt5_DIR=$(brew --prefix qt@5)/lib/cmake/Qt5 \
-            -DCMAKE_PREFIX_PATH=$(brew --prefix qt@5)/lib/cmake/Qt5 \
-            -DWITH_TRANSLATION=OFF
-          ninja -j $(sysctl -n hw.ncpu)
-      - name: Introduce Libraries and Stuff
-        run: |
-          cd toonz/build/toonz
-          cp -pr ../../../stuff OpenToonz.app/portablestuff
-          /usr/local/opt/qt@5/bin/macdeployqt OpenToonz.app -verbose=0 -always-overwrite \
-            -executable=OpenToonz.app/Contents/MacOS/lzocompress \
-            -executable=OpenToonz.app/Contents/MacOS/lzodecompress \
-            -executable=OpenToonz.app/Contents/MacOS/tcleanup \
-            -executable=OpenToonz.app/Contents/MacOS/tcomposer \
-            -executable=OpenToonz.app/Contents/MacOS/tconverter \
-            -executable=OpenToonz.app/Contents/MacOS/tfarmcontroller \
-            -executable=OpenToonz.app/Contents/MacOS/tfarmserver
-      - name: Modify Library Paths
-        run: |
-          cd toonz/build/toonz/OpenToonz.app/Contents/Frameworks
-          for TARGETLIB in *.dylib; do
-            otool -L "$TARGETLIB" | grep ".dylib" | grep -v "$TARGETLIB" | grep -v "@executable_path/../Frameworks" | awk '{print $1}' | while read -r FROMPATH; do
-              LIBNAME=$(basename "$FROMPATH")
-              if [[ -e ./$LIBNAME ]]; then
-                install_name_tool -change "$FROMPATH" "@executable_path/../Frameworks/$LIBNAME" "$TARGETLIB"
-              fi
-            done
-          done
-      - name: Create Artifact
-        run: |
-          cd toonz/build/toonz
-          echo "Creating DMG..."
-          ATTEMPT=1
-          until /usr/local/opt/qt@5/bin/macdeployqt OpenToonz.app -dmg -verbose=0 && [ -f OpenToonz.dmg ]; do
-            echo "Attempt $ATTEMPT failed to build DMG."
-            if [ $ATTEMPT -eq 10 ]; then
-              echo ">>> DMG file creation failed after 10 attempts. Aborting!"
-              exit 1
-            fi
-            ATTEMPT=$((ATTEMPT + 1))
-            echo "Retrying in 5 seconds..."
-            sleep 5
-          done
-          echo "DMG created successfully."
+          keychain_password="${MACOS_KEYCHAIN_PASSWORD:-temporary-ci-keychain-password}"
+          certificate_path="$RUNNER_TEMP/developer-id.p12"
+          keychain_path="$RUNNER_TEMP/opentoonz-signing.keychain-db"
+
+          echo "$MACOS_CERTIFICATE_P12_BASE64" | base64 -D > "$certificate_path"
+          security create-keychain -p "$keychain_password" "$keychain_path"
+          security set-keychain-settings -lut 21600 "$keychain_path"
+          security unlock-keychain -p "$keychain_password" "$keychain_path"
+          security import "$certificate_path" \
+            -P "$MACOS_CERTIFICATE_PASSWORD" \
+            -A \
+            -t cert \
+            -f pkcs12 \
+            -k "$keychain_path"
+          security list-keychains -d user -s "$keychain_path" $(security list-keychains -d user | sed 's/"//g')
+          security set-key-partition-list \
+            -S apple-tool:,apple:,codesign: \
+            -s \
+            -k "$keychain_password" \
+            "$keychain_path"
+
+      - name: Sign app for release
+        if: ${{ github.event_name == 'release' }}
+        run: scripts/macos/sign-notarize.sh
+
+      - name: Create DMG
+        run: mise run dmg-macos
+
+      - name: Sign and notarize DMG for release
+        if: ${{ github.event_name == 'release' }}
+        run: scripts/macos/sign-notarize.sh
+
       - uses: actions/upload-artifact@v6
         with:
-          name: Opentoonz-${{ runner.os }}-${{ github.sha }}
-          path: toonz/build/toonz/OpenToonz.dmg
+          name: OpenToonz-macos-arm64-${{ github.sha }}
+          path: toonz/build/nix-relwithdebinfo/toonz/OpenToonz.dmg
