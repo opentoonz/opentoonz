@@ -1057,10 +1057,7 @@ void ExportXDTSCommand::execute() {
   // Open containing folder
   if (ret == 2) {
     TFilePath folderPath = fp.getParentDir();
-    if (TSystem::isUNC(folderPath))
-      QDesktopServices::openUrl(QUrl(folderPath.getQString()));
-    else
-      QDesktopServices::openUrl(QUrl::fromLocalFile(folderPath.getQString()));
+    QDesktopServices::openUrl(QtCompat::localFileUrl(folderPath.getQString()));
   }
 }
 }  // namespace SxfIo

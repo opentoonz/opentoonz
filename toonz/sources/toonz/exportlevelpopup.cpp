@@ -697,10 +697,7 @@ bool ExportLevelPopup::execute() {
       QString("%1 Levels Exported").arg(m_levelExportedCount), buttons);
   if (tmp == 2) {
     TFilePath folderPath = TFilePath(m_browser->getFolder());
-    if (TSystem::isUNC(folderPath))
-      QDesktopServices::openUrl(QUrl(folderPath.getQString()));
-    else
-      QDesktopServices::openUrl(QUrl::fromLocalFile(folderPath.getQString()));
+    QDesktopServices::openUrl(QtCompat::localFileUrl(folderPath.getQString()));
   }
   // Reuse END
 

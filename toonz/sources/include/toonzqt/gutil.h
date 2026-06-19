@@ -8,6 +8,7 @@
 #include <QFrame>
 #include <QIconEngine>
 #include <QColor>
+#include <QPoint>
 #include "traster.h"
 #include "toonz/preferences.h"
 
@@ -128,6 +129,8 @@ QScreen DVAPI *getScreenForWidget(const QWidget *widget = nullptr);
 QRect DVAPI getScreenGeometry(const QWidget *widget = nullptr);
 QRect DVAPI getScreenGeometry(int screenIndex);
 QRect DVAPI getAvailableScreenGeometry(const QWidget *widget = nullptr);
+QRect DVAPI getAvailableScreenGeometry(const QPoint &globalPos,
+                                        const QWidget *fallbackWidget = nullptr);
 
 //-----------------------------------------------------------------------------
 

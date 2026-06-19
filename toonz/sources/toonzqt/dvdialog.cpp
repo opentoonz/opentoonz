@@ -7,6 +7,7 @@
 #include "toonzqt/lineedit.h"
 #include "toonzqt/qtcompat.h"
 #include "toonzqt/fxsettings.h"
+#include "toonzqt/gutil.h"
 
 // TnzLib includes
 #include "toonz/txsheethandle.h"
@@ -30,8 +31,6 @@
 #include <QRadioButton>
 #include <QThread>
 #include <QCheckBox>
-#include <QScreen>
-#include <QGuiApplication>
 
 #include <algorithm>
 
@@ -229,8 +228,7 @@ Dialog::Dialog(QWidget *parent, bool hasButton, bool hasFixedSize,
     , m_layoutSpacing(5)
     , m_layoutMargin(0)
     , m_labelWidth(100)
-    , m_name()
-    , m_currentScreen(0) {  // Initialize to primary screen to prevent a crash
+    , m_name() {
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setSpacing(0);
@@ -301,14 +299,7 @@ Dialog::Dialog(QWidget *parent, bool hasButton, bool hasFixedSize,
       // it will be got out of the screen on the next launch.
       // The following position adjustment will also prevent such behavior.
 
-      // try and get active screen
-      if (parent != nullptr) {
-        QScreen *screen = QGuiApplication::screenAt(parent->pos());
-        m_currentScreen =
-            screen ? QGuiApplication::screens().indexOf(screen) : 0;
-      }
-      QRect screen =
-          QGuiApplication::screens().at(m_currentScreen)->availableGeometry();
+      QRect screen = getAvailableScreenGeometry(parent);
       int x = values.at(0).toInt();
       int y = values.at(1).toInt();
 
@@ -365,19 +356,7 @@ void Dialog::hideEvent(QHideEvent *event) {
   int x = pos().rx();
   int y = pos().ry();
   // make sure the dialog is actually visible on a screen
-  auto screens      = QGuiApplication::screens();
-  int currentScreen = 0;
-  for (int i = 0; i < screens.count(); ++i) {
-    if (screens[i]->geometry().contains(pos())) {
-      currentScreen = i;
-      break;
-    } else {
-      // if not - put it back on the main window
-      currentScreen = m_currentScreen;
-    }
-  }
-  QRect screen =
-      QGuiApplication::screens().at(currentScreen)->availableGeometry();
+  QRect screen = getAvailableScreenGeometry(pos(), parentWidget());
 
   if (x > screen.right() - 50) x = screen.right() - 50;
   if (x < screen.left()) x = screen.left();

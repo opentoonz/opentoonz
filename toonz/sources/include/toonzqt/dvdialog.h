@@ -162,7 +162,6 @@ class DVAPI Dialog : public QDialog {
   // If the dialog has button then is modal too.
   bool m_hasButton;
   QString m_name;
-  int m_currentScreen = -1;
 
 protected:
   QHBoxLayout *m_buttonLayout;

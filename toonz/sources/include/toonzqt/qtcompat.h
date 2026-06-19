@@ -23,6 +23,7 @@
 #include <QObject>
 #include <QStringList>
 #include <QTouchEvent>
+#include <QUrl>
 #include <QWheelEvent>
 
 #include <utility>
@@ -377,6 +378,10 @@ inline Qt::KeyboardModifiers dropEventModifiers(const QDropEvent* event) {
 #else
   return event->keyboardModifiers();
 #endif
+}
+
+inline QUrl localFileUrl(const QString& path) {
+  return QUrl::fromLocalFile(path);
 }
 
 template <typename Receiver, typename Func>

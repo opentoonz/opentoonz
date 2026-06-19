@@ -27,6 +27,7 @@
 #include "toonz/tproject.h"
 #include "toonz/tscenehandle.h"
 #include "toonz/toonzscene.h"
+#include "toonzqt/qtcompat.h"
 
 #include <cstdio>
 
@@ -500,7 +501,7 @@ void CrashHandler::openWebpage() {
 
 void CrashHandler::openFolder() {
   TFilePath fp = ToonzFolder::getCrashReportFolder();
-  QDesktopServices::openUrl(QUrl("file:///" + fp.getQString()));
+  QDesktopServices::openUrl(QtCompat::localFileUrl(fp.getQString()));
 }
 
 //-----------------------------------------------------------------------------

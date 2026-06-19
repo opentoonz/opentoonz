@@ -11,7 +11,6 @@
 
 #include "toonzqt/lineedit.h"
 
-#include <QUrl>
 #include <QStackedWidget>
 #include <QContextMenuEvent>
 
@@ -125,18 +124,6 @@ protected:
 */
 //-----------------------------------------------------------------------------
 
-class UrlOpener final : public QObject {
-  Q_OBJECT
-  QUrl m_url;
-
-public:
-  UrlOpener(const QUrl &url) : m_url(url) {}
-
-public slots:
-  void open();
-};
-
-//-----------------------------------------------------------------------------
 /*-- モジュールごとにMenubarの内容を切り替える --*/
 class StackedMenuBar final : public QStackedWidget {
   Q_OBJECT

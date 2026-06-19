@@ -853,12 +853,8 @@ void CastBrowser::showFolderContents() {
           tr("It is not possible to show the folder containing the selected "
              "file, as the file has not been saved yet."));
     } else {
-      if (TSystem::isUNC(folderPath))
-        QDesktopServices::openUrl(
-            QUrl(QString::fromStdWString(folderPath.getWideString())));
-      else
-        QDesktopServices::openUrl(QUrl::fromLocalFile(
-            QString::fromStdWString(folderPath.getWideString())));
+      QDesktopServices::openUrl(QtCompat::localFileUrl(
+          QString::fromStdWString(folderPath.getWideString())));
     }
   }
 }
@@ -888,7 +884,7 @@ void CastBrowser::viewFile() {
       if (Preferences::instance()->isDefaultViewerEnabled() &&
           (filePath.getType() == "mov" || filePath.getType() == "avi" ||
            filePath.getType() == "3gp"))
-        QDesktopServices::openUrl(QUrl("file:///" + toQString(filePath)));
+        QDesktopServices::openUrl(QtCompat::localFileUrl(toQString(filePath)));
       else
         ::viewFile(filePath);
     }

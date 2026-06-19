@@ -3924,10 +3924,7 @@ void PencilTestPopup::onCalibReadme() {
   TFilePath readmeFp =
       ToonzFolder::getLibraryFolder() + "camera calibration" + "readme.txt";
   if (!TFileStatus(readmeFp).doesExist()) return;
-  if (TSystem::isUNC(readmeFp))
-    QDesktopServices::openUrl(QUrl(readmeFp.getQString()));
-  else
-    QDesktopServices::openUrl(QUrl::fromLocalFile(readmeFp.getQString()));
+  QDesktopServices::openUrl(QtCompat::localFileUrl(readmeFp.getQString()));
 }
 //-----------------------------------------------------------------------------
 

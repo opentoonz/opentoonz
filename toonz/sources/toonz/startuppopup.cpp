@@ -40,7 +40,6 @@
 #include <QPushButton>
 #include <QMainWindow>
 #include <QApplication>
-#include <QScreen>
 #include <QMessageBox>
 #include <QTextStream>
 #include <QFrame>
@@ -425,12 +424,8 @@ void StartupPopup::showEvent(QShowEvent*) {
   refreshRecentScenes();
   refreshExistingScenes();
   // Center window
-  QScreen* screen =
-      QGuiApplication::screenAt(TApp::instance()->getMainWindow()->pos());
-  if (!screen) {
-    screen = QGuiApplication::primaryScreen();
-  }
-  QPoint activeMonitorCenter     = screen->availableGeometry().center();
+  QPoint activeMonitorCenter =
+      getAvailableScreenGeometry(TApp::instance()->getMainWindow()).center();
   QPoint thisPopupCenter         = this->rect().center();
   QPoint centeredOnActiveMonitor = activeMonitorCenter - thisPopupCenter;
   this->move(centeredOnActiveMonitor);
@@ -984,7 +979,7 @@ void StartupPopup::onExploreProjectButtonPressed() {
   TProjectManager* pm = TProjectManager::instance();
   TFilePath cfp       = pm->getCurrentProject()->getProjectFolder();
 
-  QDesktopServices::openUrl(QUrl("file:///" + cfp.getQString()));
+  QDesktopServices::openUrl(QtCompat::localFileUrl(cfp.getQString()));
 }
 
 //-----------------------------------------------------------------------------

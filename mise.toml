@@ -118,6 +118,18 @@ run = "bash scripts/qt6/check-wheelevent-scope.sh"
 description = "Fail if direct graphics-scene screen-position access escapes QtCompat."
 run = "bash scripts/qt6/check-graphicssceneevent-scope.sh"
 
+[tasks.check-qt6-graphicsscenecontextmenu-scope]
+description = "Fail if direct graphics-scene context-menu position access escapes QtCompat."
+run = "bash scripts/qt6/check-graphicsscenecontextmenu-scope.sh"
+
+[tasks.check-qt6-hoverevent-scope]
+description = "Fail if direct hover-event position access escapes QtCompat."
+run = "bash scripts/qt6/check-hoverevent-scope.sh"
+
+[tasks.check-qt6-localfileurl-scope]
+description = "Fail if local file URLs bypass QtCompat."
+run = "bash scripts/qt6/check-localfileurl-scope.sh"
+
 [tasks.check-qt6-qaction-scope]
 description = "Fail if deprecated QAction parentWidget usage reappears."
 run = "bash scripts/qt6/check-qaction-scope.sh"

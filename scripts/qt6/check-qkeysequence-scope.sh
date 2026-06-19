@@ -28,9 +28,17 @@ qkeysequence_hits="$(
     ':!toonz/sources/translations'
 )"
 
-if [[ -n "$qkeysequence_hits" ]]; then
+indexed_conversion_hits="$(
+  grep_hits git grep -nE -e 'return[[:space:]]+(ks|keySequence|sequence)[[:space:]]*\[[[:space:]]*[0-9]+[[:space:]]*\][[:space:]]*;' -- \
+    'toonz/sources' \
+    ':!toonz/sources/include/toonzqt/qtcompat.h' \
+    ':!toonz/sources/translations'
+)"
+
+if [[ -n "$qkeysequence_hits" || -n "$indexed_conversion_hits" ]]; then
   printf '%s\n' "$qkeysequence_hits"
-  echo "error: use QtCompat::keySequenceEntryToInt() instead of direct QKeyCombination::toCombined()" >&2
+  printf '%s\n' "$indexed_conversion_hits"
+  echo "error: use QtCompat::keySequenceEntryToInt() instead of direct QKeySequence entry conversion" >&2
   exit 1
 fi
 

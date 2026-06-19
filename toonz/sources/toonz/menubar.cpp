@@ -42,15 +42,9 @@
 #include <QHBoxLayout>
 #include <QMenuBar>
 #include <QShortcut>
-#include <QDesktopServices>
 #include <QCheckBox>
 #include <QtDebug>
 #include <QXmlStreamReader>
-
-void UrlOpener::open() { QDesktopServices::openUrl(m_url); }
-
-UrlOpener dvHome(QUrl("http://www.toonz.com/"));
-UrlOpener manual(QUrl("file:///C:/gmt/butta/M&C in EU.pdf"));
 
 TEnv::IntVar LockRoomTabToggle("LockRoomTabToggle", 0);
 

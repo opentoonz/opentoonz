@@ -10,9 +10,25 @@ desktop_widget_hits="$(
     ':!toonz/sources/translations' || true
 )"
 
-if [[ -n "$desktop_widget_hits" ]]; then
+primary_screen_hits="$(
+  git grep -nE -e '(QGuiApplication|QApplication)::primaryScreen[[:space:]]*\(' -- \
+    'toonz/sources' \
+    ':!toonz/sources/toonzqt/gutil.cpp' \
+    ':!toonz/sources/toonz/main.cpp' \
+    ':!toonz/sources/translations' || true
+)"
+
+dialog_screen_hits="$(
+  git grep -nE -e 'QGuiApplication::screenAt|QGuiApplication::screens[[:space:]]*\([[:space:]]*\).*availableGeometry' -- \
+    'toonz/sources/toonzqt/dvdialog.cpp' || true
+)"
+
+if [[ -n "$desktop_widget_hits" || -n "$primary_screen_hits" ||
+      -n "$dialog_screen_hits" ]]; then
   printf '%s\n' "$desktop_widget_hits"
-  echo "error: use QScreen/widget screen helpers instead of removed QDesktopWidget/QApplication::desktop APIs" >&2
+  printf '%s\n' "$primary_screen_hits"
+  printf '%s\n' "$dialog_screen_hits"
+  echo "error: use QScreen/widget screen helpers instead of removed desktop APIs and direct primary-screen fallbacks" >&2
   exit 1
 fi
 

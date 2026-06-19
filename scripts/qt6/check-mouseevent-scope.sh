@@ -23,7 +23,7 @@ grep_hits() {
 
 mouse_event_position_hits="$(
   grep_hits git grep -nE \
-    -e '(^|[^[:alnum:]_])(event|e|me|mouseEvent)->[[:space:]]*(x|y|pos|globalPos|globalX|globalY)[[:space:]]*\(' -- \
+    -e '(^|[^[:alnum:]_])(event|e|me|mouseEvent)->[[:space:]]*(x|y|pos|globalPos|globalX|globalY|windowPos|scenePosition)[[:space:]]*\(' -- \
     'toonz/sources' \
     ':!toonz/sources/include/toonzqt/qtcompat.h' \
     ':!toonz/sources/translations'
@@ -35,8 +35,23 @@ if [[ -n "$mouse_event_position_hits" ]]; then
   exit 1
 fi
 
-for helper in mouseEventPosition mouseEventPositionF mouseEventGlobalPosition \
-  contextMenuEventPosition contextMenuEventGlobalPosition dropEventPosition; do
+drop_event_modifier_hits="$(
+  grep_hits git grep -nE \
+    -e '(^|[^[:alnum:]_])(dropEvent|drop|de)->[[:space:]]*(keyboardModifiers|modifiers)[[:space:]]*\(' -- \
+    'toonz/sources' \
+    ':!toonz/sources/include/toonzqt/qtcompat.h' \
+    ':!toonz/sources/translations'
+)"
+
+if [[ -n "$drop_event_modifier_hits" ]]; then
+  printf '%s\n' "$drop_event_modifier_hits"
+  echo "error: use QtCompat::dropEventModifiers() instead of direct QDropEvent modifier access" >&2
+  exit 1
+fi
+
+for helper in mouseEventPosition mouseEventPositionF mouseEventWindowPositionF \
+  mouseEventGlobalPosition contextMenuEventPosition \
+  contextMenuEventGlobalPosition dropEventPosition dropEventModifiers; do
   if ! git grep -q "$helper" -- 'toonz/sources/include/toonzqt/qtcompat.h'; then
     echo "error: expected QtCompat::$helper() helper in qtcompat.h" >&2
     exit 1

@@ -441,7 +441,7 @@ void AudioRecordingPopup::onRecordButtonPressed() {
     }
     // clear the player in case the file is open there
     // can't record to an opened file
-    if (m_player->mediaStatus() != QMediaPlayer::NoMedia) {
+    if (QtCompat::mediaPlayerHasMedia(m_player)) {
       m_player->stop();
       delete m_player;
       m_player = new QMediaPlayer(this);
@@ -573,13 +573,8 @@ void AudioRecordingPopup::onPlayButtonPressed() {
 #endif
     connect(m_player, &QMediaPlayer::positionChanged, this,
             &AudioRecordingPopup::updatePlaybackDuration);
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    connect(m_player, &QMediaPlayer::playbackStateChanged, this,
-            &AudioRecordingPopup::onMediaStateChanged);
-#else
-    connect(m_player, SIGNAL(stateChanged(QMediaPlayer::State)), this,
-            SLOT(onMediaStateChanged(QMediaPlayer::State)));
-#endif
+    QtCompat::connectMediaPlayerStateChanged(
+        m_player, this, &AudioRecordingPopup::onMediaStateChanged);
     m_playButton->setIcon(m_stopIcon);
     m_recordButton->setDisabled(true);
     m_saveButton->setDisabled(true);

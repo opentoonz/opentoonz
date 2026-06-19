@@ -44,8 +44,6 @@
 
 #include <QDesktopServices>
 #include <QUrl>
-#include <QGuiApplication>
-#include <QScreen>
 
 using namespace DVGui;
 
@@ -1666,8 +1664,7 @@ void FxSettings::onPreferredSizeChanged(QSize pvBestSize) {
 
   QSize popupBestSize = pvBestSize;
 
-  static int maximumHeight =
-      (QGuiApplication::primaryScreen()->geometry().height()) * 0.9;
+  static int maximumHeight = getScreenGeometry(popup).height() * 0.9;
 
   // Set minimum size, just in case
   popupBestSize.setHeight(

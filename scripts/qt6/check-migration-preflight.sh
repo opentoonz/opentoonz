@@ -29,6 +29,9 @@ checks=(
   scripts/qt6/check-buttongroup-scope.sh
   scripts/qt6/check-wheelevent-scope.sh
   scripts/qt6/check-graphicssceneevent-scope.sh
+  scripts/qt6/check-graphicsscenecontextmenu-scope.sh
+  scripts/qt6/check-hoverevent-scope.sh
+  scripts/qt6/check-localfileurl-scope.sh
   scripts/qt6/check-qaction-scope.sh
   scripts/qt6/check-qcolor-scope.sh
   scripts/qt6/check-qimage-mirrored-scope.sh

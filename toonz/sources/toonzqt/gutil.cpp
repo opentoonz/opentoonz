@@ -238,6 +238,17 @@ QRect getAvailableScreenGeometry(const QWidget *widget) {
 
 //-----------------------------------------------------------------------------
 
+QRect getAvailableScreenGeometry(const QPoint &globalPos,
+                                 const QWidget *fallbackWidget) {
+  for (QScreen *screen : QGuiApplication::screens()) {
+    if (screen->geometry().contains(globalPos))
+      return screen->availableGeometry();
+  }
+  return getAvailableScreenGeometry(fallbackWidget);
+}
+
+//-----------------------------------------------------------------------------
+
 int getDevicePixelRatio(const QWidget *widget) {
   if (hasScreensWithDifferentDevPixRatio() && widget) {
     QScreen *screen = getScreenForWidget(widget);

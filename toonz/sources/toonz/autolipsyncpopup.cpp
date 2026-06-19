@@ -752,13 +752,8 @@ void AutoLipSyncPopup::playSound() {
       // The positionChanged signal emits the current playback position in
       // milliseconds. connect(m_player, &QMediaPlayer::positionChanged, this,
       //         &AutoLipSyncPopup::updatePlaybackPosition);
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-      connect(m_player, &QMediaPlayer::playbackStateChanged, this,
-              &AutoLipSyncPopup::onMediaStateChanged);
-#else
-      connect(m_player, &QMediaPlayer::stateChanged, this,
-              &AutoLipSyncPopup::onMediaStateChanged);
-#endif
+      QtCompat::connectMediaPlayerStateChanged(
+          m_player, this, &AutoLipSyncPopup::onMediaStateChanged);
 
       m_player->play();
     } else {

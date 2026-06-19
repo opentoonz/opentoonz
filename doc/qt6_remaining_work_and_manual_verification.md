@@ -131,6 +131,9 @@ Already covered:
   `createContext()` interface and by completing the
   `TStrokeTwirlDeformation` control-point displacement overrides. This keeps
   both classes concrete instead of relying on stale final annotations.
+- The app-side abstract-final warning cluster in farm submission and xsheet
+  frame-head declarations has also been resolved by dropping `final` from the
+  abstract `TaskConfigPanel` and `XsheetFrameHeadGadget` base declarations.
 - The `stdfx` / `tnztools` compile frontier now removes another warning slice:
   Mosaic and Motion Blur raw pixel buffer operations use explicit `void *`
   casts, Iwa seed ranges explicitly cross the `double` parameter boundary,
@@ -154,8 +157,14 @@ Already covered:
   guarded by `mise run check-qt6-desktopwidget-scope`. Keep
   `QDesktopWidget`, `QApplication::desktop()`, `qApp->desktop()`, and direct
   generic `desktop()` calls out of feature code; use `QScreen` and
-  widget-screen helpers instead. This is a source guard only. It does not
-  replace manual multi-monitor, mixed-DPI, and off-primary-screen validation.
+  widget-screen helpers instead. The guard also blocks new direct
+  primary-screen fallbacks outside the shared helper/high-DPI smoke scope, and
+  FX popup sizing, Scene Viewer actual-pixel fit scaling, and Startup popup
+  centering now use widget-aware screen helpers. Dialog geometry restore/hide
+  clamping now uses the same screen-helper layer through an available-geometry
+  helper that accepts a point plus a fallback widget. This is a source guard
+  only. It does not replace manual multi-monitor, mixed-DPI, and
+  off-primary-screen validation.
 - An isolated Qt 6 translation lane exists through
   `nix-qt6-translation-check`, `mise run configure-qt6-translations`, and
   `mise run build-qt6-translations`. The build task keeps
@@ -201,10 +210,27 @@ Already covered:
   `QtCompat::graphicsSceneMouseEventLastScreenPosition()` instead of direct
   `screenPos()` / `lastScreenPos()` calls. `mise run
   check-qt6-graphicssceneevent-scope` guards that boundary.
+- Graphics-scene context-menu item/global positions now use
+  `QtCompat::graphicsSceneContextMenuEventPositionF()` and
+  `QtCompat::graphicsSceneContextMenuEventGlobalPosition()`. `mise run
+  check-qt6-graphicsscenecontextmenu-scope` keeps direct `pos()` /
+  `screenPos()` context-menu access out of feature code while leaving
+  intentional `scenePos()` scene-coordinate logic alone.
+- Floating dock hover-resize hit testing now uses
+  `QtCompat::hoverEventPosition()`. `mise run check-qt6-hoverevent-scope`
+  prevents direct `QHoverEvent::pos()` / `oldPos()` access from reappearing in
+  feature code.
+- Local file/folder URLs opened through `QDesktopServices` now use
+  `QtCompat::localFileUrl()` instead of hand-built `file:///` strings or direct
+  `QUrl(path)` construction. `mise run check-qt6-localfileurl-scope` keeps
+  those conversions centralized. The same slice also removed the unused legacy
+  menu-bar URL opener that still pointed at a stale hardcoded local manual
+  path.
 - Common direct mouse/context/drop-event coordinate access is now guarded by
   `mise run check-qt6-mouseevent-scope`, keeping direct `x()`, `y()`, `pos()`,
-  `globalPos()`, `globalX()`, and `globalY()` event accessors out of handler
-  code after the `QtCompat` coordinate-helper migration.
+  `globalPos()`, `globalX()`, `globalY()`, `windowPos()`, `scenePosition()`,
+  and drop-event modifier accessors out of handler code after the `QtCompat`
+  coordinate-helper migration.
 - `enterEvent` override signatures now stay on the version-aware
   `QtCompat::EnterEvent` alias, which resolves to `QEnterEvent` in Qt 6 and
   `QEvent` in Qt 5. `mise run check-qt6-enterevent-scope` keeps direct
@@ -228,7 +254,9 @@ Already covered:
 - Selected `QMouseEvent` and `QDropEvent`-derived coordinate users are
   centralized behind `QtCompat` helpers so the Qt 6 lane uses
   `position()`/`globalPosition()` APIs while the Qt 5 lane keeps its existing
-  integer-position behavior.
+  integer-position behavior. Window-relative mouse positions and drop-event
+  keyboard modifiers use the same boundary through
+  `QtCompat::mouseEventWindowPositionF()` and `QtCompat::dropEventModifiers()`.
 - Synthetic `QMouseEvent` construction for Xsheet auto-pan and fake
   context-menu releases is centralized behind `QtCompat::makeMouseEvent()` with
   explicit local/global positions. The stale disabled spreadsheet auto-pan
@@ -395,13 +423,17 @@ Already covered:
 - Configure Shortcuts multi-key conflict checking now uses
   `QtCompat::keySequenceEntryToInt()` instead of open-coded Qt-version checks.
   Qt 6 uses `QKeyCombination::toCombined()` inside `QtCompat`, and Qt 5 keeps
-  the existing integer key-sequence path. `mise run
-  check-qt6-qkeysequence-scope` keeps direct `toCombined()` calls inside
-  `QtCompat`.
+  the existing integer key-sequence path. Command-manager shortcut decoding
+  uses the same helper instead of returning `QKeySequence` entries directly.
+  `mise run check-qt6-qkeysequence-scope` keeps direct `toCombined()` and
+  likely direct key-sequence entry conversions inside `QtCompat`.
 - Audio Recording and Auto Lip Sync media preview source/state handling now use
-  `QtCompat::setMediaPlayerSource()` and `QtCompat::mediaPlayerState()`, so Qt 6
-  keeps `QMediaPlayer::setSource()` / `playbackState()` inside the shared
-  helper while Qt 5 keeps `setMedia()` / `state()`. `mise run
+  `QtCompat::setMediaPlayerSource()`, `QtCompat::mediaPlayerState()`,
+  `QtCompat::mediaPlayerHasMedia()`, and
+  `QtCompat::connectMediaPlayerStateChanged()`, so Qt 6 keeps
+  `QMediaPlayer::setSource()` / `playbackState()` / `mediaStatus()` /
+  `playbackStateChanged()` inside the shared helper while Qt 5 keeps
+  `setMedia()` / `state()` / `mediaStatus()` / `stateChanged()`. `mise run
   check-qt6-mediaplayer-scope` guards that boundary.
 - Separate Colors color-string defaults and settings restoration parse stored
   strings through `QColor(QString)` instead of calling Qt 6-deprecated
