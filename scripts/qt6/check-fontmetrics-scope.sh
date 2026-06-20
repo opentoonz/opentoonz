@@ -37,9 +37,21 @@ direct_fontmetrics_width="$(
   } | sort -u
 )"
 
+direct_runtime_bounding_width="$(
+  git grep -nE 'boundingRect[[:space:]]*\([^)]*\)[[:space:]]*\.width[[:space:]]*\(' -- \
+    'toonz/sources/toonz/xshcellviewer.cpp' \
+    'toonz/sources/toonz/xshrowviewer.cpp' || true
+)"
+
 if [[ -n "$direct_fontmetrics_width" ]]; then
   printf '%s\n' "$direct_fontmetrics_width"
   echo "error: use QtCompat::fontMetricsHorizontalAdvance() instead of deprecated QFontMetrics::width()" >&2
+  exit 1
+fi
+
+if [[ -n "$direct_runtime_bounding_width" ]]; then
+  printf '%s\n' "$direct_runtime_bounding_width"
+  echo "error: use QtCompat::fontMetricsHorizontalAdvance() for Xsheet text advance measurement" >&2
   exit 1
 fi
 

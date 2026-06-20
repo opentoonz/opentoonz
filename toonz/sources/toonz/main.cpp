@@ -15277,29 +15277,29 @@ int main(int argc, char* argv[]) {
   public:
     bool nativeEventFilter(const QByteArray& eventType, void* message,
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-                           long*) Q_DECL_OVERRIDE{
+                           long*) override {
 #else
-                           qintptr*) Q_DECL_OVERRIDE {
+                           qintptr*) override {
 #endif
-        if (IsLeftMouseDown(message)) {
-          leftButtonPressed = true;
-  } if (IsLeftMouseUp(message)) {
-    leftButtonPressed = false;
-  }
+      if (IsLeftMouseDown(message)) {
+        leftButtonPressed = true;
+      }
+      if (IsLeftMouseUp(message)) {
+        leftButtonPressed = false;
+      }
 
-  if (eventType == "mac_generic_NSEvent") {
-    if (IsLeftMouseDragged(message) && !leftButtonPressed) {
-      std::cout << "force mouse press event" << std::endl;
-      SendLeftMousePressEvent();
-      return true;
+      if (eventType == "mac_generic_NSEvent") {
+        if (IsLeftMouseDragged(message) && !leftButtonPressed) {
+          std::cout << "force mouse press event" << std::endl;
+          SendLeftMousePressEvent();
+          return true;
+        }
+      }
+      return false;
     }
-  }
-  return false;
-}
-}
-;
+  };
 
-a.installNativeEventFilter(new OSXMouseDragFilter);
+  a.installNativeEventFilter(new OSXMouseDragFilter);
 #endif
 
 #ifdef Q_OS_WIN

@@ -201,8 +201,9 @@ void DvTextEdit::createMiniToolBar() {
   m_fontComboBox->setMaximumHeight(20);
   m_fontComboBox->setMinimumWidth(140);
 
-  connect(m_fontComboBox, SIGNAL(activated(const QString &)), this,
-          SLOT(setTextFamily(const QString &)));
+  QtCompat::connectComboBoxTextActivated(
+      m_fontComboBox, this,
+      [this](const QString &family) { setTextFamily(family); });
 
   m_sizeComboBox = new QComboBox(toolBarUp);
   m_sizeComboBox->setEditable(true);
@@ -212,8 +213,8 @@ void DvTextEdit::createMiniToolBar() {
   for (int size : QFontDatabase::standardSizes())
     m_sizeComboBox->addItem(QString::number(size));
 
-  connect(m_sizeComboBox, SIGNAL(activated(const QString &)), this,
-          SLOT(setTextSize(const QString &)));
+  QtCompat::connectComboBoxTextActivated(
+      m_sizeComboBox, this, [this](const QString &size) { setTextSize(size); });
 
   toolBarUp->addWidget(m_fontComboBox);
   toolBarUp->addWidget(m_sizeComboBox);

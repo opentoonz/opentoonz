@@ -103,7 +103,6 @@
 
 // Qt includes
 #include <QAction>
-#include <QScreen>
 
 //=============================================================================
 // XsheetViewer
@@ -1070,23 +1069,9 @@ void FlipbookBasePanel::zoomContentsAndFitGeometry(bool forward) {
   }
   // Resize the window keeping the top-left corner fixed (Photoshop-like
   // behavior)
-  auto getScreen = [&]() {
-    QScreen *ret = nullptr;
-    ret          = QGuiApplication::screenAt(geometry().topLeft());
-    if (ret) return ret;
-    ret = QGuiApplication::screenAt(geometry().topRight());
-    if (ret) return ret;
-    ret = QGuiApplication::screenAt(geometry().center());
-    if (ret) return ret;
-    ret = QGuiApplication::screenAt(geometry().bottomLeft());
-    if (ret) return ret;
-    ret = QGuiApplication::screenAt(geometry().bottomRight());
-    return ret;
-  };
   // Get screen geometry
-  QScreen *screen = getScreen();
-  if (!screen) return;
-  QRect screenGeom  = screen->availableGeometry();
+  QRect screenGeom = getAvailableScreenGeometry(geometry(), this);
+  if (screenGeom.isEmpty()) return;
   QPoint oldTopLeft = geometry().topLeft();
 
   m_flipbook->zoomAndAdaptGeometry(forward);
@@ -1636,8 +1621,7 @@ void FxSettingsPanel::restoreFloatingPanelState() {
 
   QRect geom = settings.value("geometry", saveGeometry()).toRect();
   // Check if it can be visible in the current screen
-  if (!(geom & this->screen()->availableGeometry()).isEmpty())
-    move(geom.topLeft());
+  if (getAvailableScreenGeometry(this).intersects(geom)) move(geom.topLeft());
 
   // FxSettings has no optional settings (SaveLoadQSettings) to load
 }
@@ -1652,7 +1636,7 @@ public:
 
   TPanel *createPanel(QWidget *parent) override {
     FxSettingsPanel *panel = new FxSettingsPanel(parent);
-    panel->move(getScreenGeometry(panel).center());
+    panel->move(getAvailableScreenGeometry(panel).center());
     panel->setObjectName(getPanelType());
     panel->setWindowTitle(QObject::tr("Fx Settings"));
     panel->setMinimumSize(390, 85);
@@ -1746,7 +1730,7 @@ public:
 
   TPanel *createPanel(QWidget *parent) override {
     LocatorPanel *panel = new LocatorPanel(parent);
-    panel->move(getScreenGeometry(panel).center());
+    panel->move(getAvailableScreenGeometry(panel).center());
     panel->setObjectName(getPanelType());
     panel->setWindowTitle(QObject::tr("Locator"));
     panel->allowMultipleInstances(false);

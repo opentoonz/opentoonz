@@ -564,7 +564,7 @@ void AudioRecordingPopup::updatePlaybackDuration(qint64 duration) {
 void AudioRecordingPopup::onPlayButtonPressed() {
   if (QtCompat::mediaPlayerState(m_player) == QMediaPlayer::StoppedState) {
     QtCompat::setMediaPlayerSource(
-        m_player, QUrl::fromLocalFile(m_filePath.getQString()));
+        m_player, QtCompat::localFileUrl(m_filePath.getQString()));
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     m_audioOutput->setVolume(0.5);
 #else

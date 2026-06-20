@@ -54,6 +54,10 @@ run = "bash scripts/qt6/check-gui-smoke-registry.sh"
 description = "Fail if direct deprecated QFontMetrics::width() usage escapes QtCompat."
 run = "bash scripts/qt6/check-fontmetrics-scope.sh"
 
+[tasks.check-qt6-qtextstream-scope]
+description = "Fail if direct QTextStream::setCodec() usage escapes QtCompat."
+run = "bash scripts/qt6/check-qtextstream-scope.sh"
+
 [tasks.check-qt6-fontdatabase-scope]
 description = "Fail if deprecated direct QFontDatabase or QTextCharFormat font-family APIs reappear."
 run = "bash scripts/qt6/check-fontdatabase-scope.sh"
@@ -149,6 +153,10 @@ run = "bash scripts/qt6/check-qglformat-scope.sh"
 [tasks.check-qt6-qgllegacy-scope]
 description = "Fail if legacy QGLContext or QGLPixelBuffer APIs escape the Qt 5-only OpenGL compatibility scope."
 run = "bash scripts/qt6/check-qgllegacy-scope.sh"
+
+[tasks.check-qt6-modern-qt-macros]
+description = "Fail if source uses legacy Qt compatibility macros instead of C++17 override/final/nullptr."
+run = "bash scripts/qt6/check-modern-qt-macros.sh"
 
 [tasks.check-windows-msvc-abi]
 description = "Fail on export/import annotations that are known to break MSVC Windows builds."

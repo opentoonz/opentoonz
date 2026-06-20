@@ -1349,8 +1349,8 @@ EnumParamField::EnumParamField(QWidget *parent, QString name,
     QString str;
     m_om->addItem(str.fromStdString(caption));
   }
-  connect(m_om, SIGNAL(activated(const QString &)), this,
-          SLOT(onChange(const QString &)));
+  QtCompat::connectComboBoxTextActivated(
+      m_om, this, [this](const QString &text) { onChange(text); });
   m_layout->addWidget(m_om);
 
   m_layout->addStretch();
@@ -1695,10 +1695,10 @@ FontParamField::FontParamField(QWidget *parent, QString name,
   setLayout(m_layout);
 
   bool ret = true;
-  ret = ret && connect(m_fontCombo, SIGNAL(activated(const QString &)), this,
-                       SLOT(onChange()));
-  ret = ret && connect(m_styleCombo, SIGNAL(activated(const QString &)), this,
-                       SLOT(onChange()));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxTextActivated(
+                   m_fontCombo, this, [this](const QString &) { onChange(); }));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxTextActivated(
+                   m_styleCombo, this, [this](const QString &) { onChange(); }));
   ret = ret && connect(m_sizeField, SIGNAL(valueChanged(bool)), this,
                        SLOT(onSizeChange(bool)));
   assert(ret);

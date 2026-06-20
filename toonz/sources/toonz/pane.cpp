@@ -34,7 +34,6 @@
 #include <QDialog>
 #include <QLineEdit>
 #include <QTextEdit>
-#include <QScreen>
 #include <QGlobalStatic>
 #include <memory>
 #include <utility>
@@ -214,15 +213,7 @@ void TPanel::restoreFloatingPanelState() {
 
   QRect geom = settings.value(QStringLiteral("geometry"), geometry()).toRect();
 
-  // Check if the geometry is visible on any available screen (modern API)
-  bool visible = false;
-  for (QScreen *screen : QGuiApplication::screens()) {
-    if (screen->availableGeometry().intersects(geom)) {
-      visible = true;
-      break;
-    }
-  }
-  if (visible) setGeometry(geom);
+  if (intersectsAvailableScreenGeometry(geom)) setGeometry(geom);
 
   // load optional settings
   if (auto *persistent = dynamic_cast<SaveLoadQSettings *>(widget()))
@@ -235,24 +226,9 @@ void TPanel::restoreFloatingPanelState() {
 void TPanel::zoomContentsAndFitGeometry(bool forward) {
   if (!isFloating()) return;
 
-  auto getScreen = [&]() -> QScreen * {
-    QScreen *ret = nullptr;
-    ret          = QGuiApplication::screenAt(geometry().topLeft());
-    if (ret) return ret;
-    ret = QGuiApplication::screenAt(geometry().topRight());
-    if (ret) return ret;
-    ret = QGuiApplication::screenAt(geometry().center());
-    if (ret) return ret;
-    ret = QGuiApplication::screenAt(geometry().bottomLeft());
-    if (ret) return ret;
-    ret = QGuiApplication::screenAt(geometry().bottomRight());
-    return ret;
-  };
-
   // Get screen geometry
-  QScreen *screen = getScreen();
-  if (!screen) return;
-  const QRect screenGeom = screen->availableGeometry();
+  const QRect screenGeom = getAvailableScreenGeometry(geometry(), this);
+  if (screenGeom.isEmpty()) return;
 
   QSize newSize;
   if (forward)

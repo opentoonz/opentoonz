@@ -1813,8 +1813,11 @@ PencilTestPopup::PencilTestPopup()
   ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
                    m_cameraListCombo, this,
                    [this](int index) { onCameraListComboActivated(index); }));
-  ret = ret && connect(m_resolutionCombo, SIGNAL(activated(const QString&)),
-                       this, SLOT(onResolutionComboActivated(const QString&)));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxTextActivated(
+                   m_resolutionCombo, this,
+                   [this](const QString &resolution) {
+                     onResolutionComboActivated(resolution);
+                   }));
   ret = ret && connect(m_fileFormatOptionButton, SIGNAL(pressed()), this,
                        SLOT(onFileFormatOptionButtonPressed()));
   ret = ret && connect(m_levelNameEdit, SIGNAL(levelNameEdited()), this,

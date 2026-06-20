@@ -249,6 +249,29 @@ QRect getAvailableScreenGeometry(const QPoint &globalPos,
 
 //-----------------------------------------------------------------------------
 
+QRect getAvailableScreenGeometry(const QRect &globalRect,
+                                 const QWidget *fallbackWidget) {
+  const QPoint positions[] = {globalRect.topLeft(), globalRect.topRight(),
+                              globalRect.center(), globalRect.bottomLeft(),
+                              globalRect.bottomRight()};
+  for (const QPoint &position : positions) {
+    QRect screenGeometry = getAvailableScreenGeometry(position, nullptr);
+    if (!screenGeometry.isEmpty()) return screenGeometry;
+  }
+  return getAvailableScreenGeometry(fallbackWidget);
+}
+
+//-----------------------------------------------------------------------------
+
+bool intersectsAvailableScreenGeometry(const QRect &globalRect) {
+  for (QScreen *screen : QGuiApplication::screens()) {
+    if (screen->availableGeometry().intersects(globalRect)) return true;
+  }
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+
 int getDevicePixelRatio(const QWidget *widget) {
   if (hasScreensWithDifferentDevPixRatio() && widget) {
     QScreen *screen = getScreenForWidget(widget);

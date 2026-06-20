@@ -614,7 +614,7 @@ namespace component {
 class MyTextEdit : public QTextEdit {
   Q_OBJECT
 public:
-  MyTextEdit(const QString &text, QWidget *parent = Q_NULLPTR);
+  MyTextEdit(const QString &text, QWidget *parent = nullptr);
 
 protected:
   void keyPressEvent(QKeyEvent *event) override;

@@ -2,6 +2,7 @@
 
 #include "toonzqt/fxsettings.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/keyframenavigator.h"
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/fxhistogramrender.h"
@@ -1007,7 +1008,7 @@ void ParamsPageSet::openHelpFile() {
   // QProcess process;
   // process.start(command);
   QDesktopServices::openUrl(
-      QUrl::fromLocalFile(QString::fromStdWString(helpFp.getWideString())));
+      QtCompat::localFileUrl(QString::fromStdWString(helpFp.getWideString())));
 }
 
 void ParamsPageSet::openHelpUrl() {

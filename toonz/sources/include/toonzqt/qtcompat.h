@@ -22,6 +22,7 @@
 #include <QMouseEvent>
 #include <QObject>
 #include <QStringList>
+#include <QTextStream>
 #include <QTouchEvent>
 #include <QUrl>
 #include <QWheelEvent>
@@ -33,6 +34,7 @@
 #include <QEventPoint>
 #include <QInputDevice>
 #include <QPointingDevice>
+#include <QStringConverter>
 #include <QTabletEvent>
 #else
 #include <QEvent>
@@ -178,6 +180,14 @@ inline int fontMetricsHorizontalAdvance(const QFontMetrics& metrics,
   return metrics.horizontalAdvance(text);
 #else
   return metrics.width(text);
+#endif
+}
+
+inline void setTextStreamUtf8(QTextStream& stream) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  stream.setEncoding(QStringConverter::Utf8);
+#else
+  stream.setCodec("UTF-8");
 #endif
 }
 
@@ -421,6 +431,13 @@ inline QMetaObject::Connection connectComboBoxActivatedIndex(
       [comboBox, slot = std::forward<Func>(slot)](const QString&) mutable {
         slot(comboBox->currentIndex());
       });
+}
+
+template <typename Receiver, typename Func>
+inline QMetaObject::Connection connectComboBoxTextActivated(
+    QComboBox* comboBox, Receiver* receiver, Func&& slot) {
+  return QObject::connect(comboBox, &QComboBox::textActivated, receiver,
+                          std::forward<Func>(slot));
 }
 
 }  // namespace QtCompat

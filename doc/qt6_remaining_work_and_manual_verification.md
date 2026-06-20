@@ -134,6 +134,11 @@ Already covered:
 - The app-side abstract-final warning cluster in farm submission and xsheet
   frame-head declarations has also been resolved by dropping `final` from the
   abstract `TaskConfigPanel` and `XsheetFrameHeadGadget` base declarations.
+  The movie-generator `AlphaChecker` visitor is now concrete as well, with
+  no-op overrides for the property visitor types it intentionally ignores.
+  Camera resolution presets now use explicit empty string defaults instead of
+  null pointer constants for optional string offsets, removing the related
+  non-null string construction warnings.
 - The `stdfx` / `tnztools` compile frontier now removes another warning slice:
   Mosaic and Motion Blur raw pixel buffer operations use explicit `void *`
   casts, Iwa seed ranges explicitly cross the `double` parameter boundary,
@@ -162,9 +167,12 @@ Already covered:
   FX popup sizing, Scene Viewer actual-pixel fit scaling, and Startup popup
   centering now use widget-aware screen helpers. Dialog geometry restore/hide
   clamping now uses the same screen-helper layer through an available-geometry
-  helper that accepts a point plus a fallback widget. This is a source guard
-  only. It does not replace manual multi-monitor, mixed-DPI, and
-  off-primary-screen validation.
+  helper that accepts a point plus a fallback widget. Floating panel geometry
+  restore, initial Fx Settings/Locator placement, zoom-to-fit clamping, and
+  Histogram popup placement now use the same shared available-screen helpers
+  instead of open-coded screen probing. This is a source guard only. It does
+  not replace manual multi-monitor, mixed-DPI, and off-primary-screen
+  validation.
 - An isolated Qt 6 translation lane exists through
   `nix-qt6-translation-check`, `mise run configure-qt6-translations`, and
   `mise run build-qt6-translations`. The build task keeps
@@ -225,7 +233,9 @@ Already covered:
   `QUrl(path)` construction. `mise run check-qt6-localfileurl-scope` keeps
   those conversions centralized. The same slice also removed the unused legacy
   menu-bar URL opener that still pointed at a stale hardcoded local manual
-  path.
+  path. FX parameter help-file opening and media preview source URLs now use
+  the same helper; the lower-level system document opener remains outside this
+  `toonzqt` helper boundary.
 - Common direct mouse/context/drop-event coordinate access is now guarded by
   `mise run check-qt6-mouseevent-scope`, keeping direct `x()`, `y()`, `pos()`,
   `globalPos()`, `globalX()`, `globalY()`, `windowPos()`, `scenePosition()`,
@@ -420,6 +430,10 @@ Already covered:
 - Stop-motion camera-option sizing and legacy Pencil Test camera-label sizing
   now use `QtCompat::fontMetricsHorizontalAdvance()`, removing direct
   `QFontMetrics::width()` calls from that slice while preserving Qt 5 behavior.
+  Xsheet frame-label expansion and Xsheet sound-text cell layout also use the
+  helper for text advance measurement instead of deriving text advance through a
+  bounding rectangle. The font-metrics guard now blocks those runtime Xsheet
+  paths from regressing to `boundingRect(...).width()` text-advance checks.
 - Configure Shortcuts multi-key conflict checking now uses
   `QtCompat::keySequenceEntryToInt()` instead of open-coded Qt-version checks.
   Qt 6 uses `QKeyCombination::toCombined()` inside `QtCompat`, and Qt 5 keeps
@@ -461,17 +475,31 @@ Already covered:
   high-DPI startup attributes `AA_EnableHighDpiScaling` and
   `AA_UseHighDpiPixmaps` stay inside
   `QT_VERSION < QT_VERSION_CHECK(6, 0, 0)` blocks.
-- User-activated real combo-box index handling now routes through
-  `QtCompat::connectComboBoxActivatedIndex()` instead of direct
-  `QComboBox::activated(int)` connections. The cleanup covers Pencil Test,
+- User-activated real combo-box index and text handling now routes through
+  `QtCompat::connectComboBoxActivatedIndex()` and
+  `QtCompat::connectComboBoxTextActivated()` instead of direct
+  `QComboBox::activated(...)` connections. The cleanup covers Pencil Test,
   Camera Track export, cleanup settings panes, project selectors, tool option
   combos, board settings, Xsheet PDF export, Filmstrip, level settings, Xsheet
   column filters, histogram/function segment widgets, file browser DPI policy,
-  format settings, and navigation-tag color selection. Custom project-local
-  `ToolOptionPopupButton::activated(int)` signals remain on their custom signal
-  path. `mise run check-qt6-combobox-activated-scope` guards the deprecated
-  real-combo signal boundary, including old macro `SIGNAL(activated(int))`
-  combo connections.
+  format settings, navigation-tag color selection, output preset selection,
+  text-editor font/size controls, param fields, and Qt 5 stop-motion
+  resolution selectors. Custom project-local `ToolOptionPopupButton::activated(int)`
+  signals remain on their custom signal path. `mise run
+  check-qt6-combobox-activated-scope` guards the deprecated real-combo signal
+  boundary, including old macro `SIGNAL(activated(int))` and
+  `SIGNAL(activated(const QString &))` combo connections.
+- Legacy Qt compatibility macros in source now use C++17 language forms:
+  `Q_DECL_OVERRIDE` was replaced with `override` in the macOS native event
+  filter, and the remaining `Q_NULLPTR` defaults were replaced with `nullptr`.
+  `mise run check-qt6-modern-qt-macros` keeps `Q_DECL_OVERRIDE`,
+  `Q_DECL_FINAL`, and `Q_NULLPTR` out of `toonz/sources`.
+- Custom Panel `.ui` template writing now sets UTF-8 text stream encoding
+  through `QtCompat::setTextStreamUtf8()`. Qt 6 uses
+  `QTextStream::setEncoding(QStringConverter::Utf8)`, and Qt 5 keeps the
+  existing `QTextStream::setCodec("UTF-8")` behavior inside the compatibility
+  helper. `mise run check-qt6-qtextstream-scope` guards direct text-stream
+  codec calls in feature code.
 - Legacy `toonzfarm/tfarm/tbaseserver.cpp` Windows socket diagnostic messages
   now use bounded `snprintf()` formatting instead of unbounded `wsprintf()`,
   and the non-Windows send failure message is initialized before throwing.
@@ -968,6 +996,7 @@ mise run check-qt6-checkbox-state-scope
 mise run check-qt6-buttongroup-scope
 mise run check-qt6-wheelevent-scope
 mise run check-qt6-graphicssceneevent-scope
+mise run check-qt6-qtextstream-scope
 mise run check-qt6-qaction-scope
 mise run check-qt6-qcolor-scope
 mise run check-qt6-qimage-mirrored-scope

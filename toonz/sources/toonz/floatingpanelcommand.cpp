@@ -19,7 +19,8 @@
 // mette il widget al centro dello schermo e lo fa diventare la finestra
 // corrente
 static void activateWidget(QWidget *w) {
-  QRect screenRect = getScreenGeometry(w);
+  QRect screenRect = getAvailableScreenGeometry(w);
+  if (screenRect.isEmpty()) return;
 
   QPoint p(screenRect.left() + (screenRect.width() - w->width()) / 2,
            screenRect.top() + (screenRect.height() - w->height()) / 2);

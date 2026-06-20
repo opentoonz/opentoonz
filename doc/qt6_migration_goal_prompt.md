@@ -124,8 +124,11 @@ branch.
   scope; FX popup sizing, Scene Viewer actual-pixel fit scaling, and Startup
   popup centering now use widget-aware screen helpers. Dialog geometry
   restore/hide clamping now uses the same screen-helper layer through a
-  point-and-fallback-widget available-geometry helper. Multi-monitor, mixed-DPI,
-  and off-primary-screen behavior still need manual runtime verification.
+  point-and-fallback-widget available-geometry helper. Floating panel geometry
+  restore, initial Fx Settings/Locator placement, zoom-to-fit clamping, and
+  Histogram popup placement now use the same shared available-screen helpers
+  instead of open-coded screen probing. Multi-monitor, mixed-DPI, and
+  off-primary-screen behavior still need manual runtime verification.
 - `mise run check-no-qregexp` and `mise run check-core5compat-scope` now also
   run before the normal local configure, build, Qt 6 configure, and Qt 6
   translation-build tasks, so removed regex APIs and adapter-scope regressions
@@ -201,7 +204,9 @@ branch.
   `QUrl(path)` construction. `mise run check-qt6-localfileurl-scope` keeps
   those local-file URL conversions centralized. The same slice also removed
   the unused legacy menu-bar URL opener that still pointed at a stale
-  hardcoded local manual path.
+  hardcoded local manual path. FX parameter help-file opening and media preview
+  source URLs now use the same helper; the lower-level system document opener
+  remains outside this `toonzqt` helper boundary.
 - The recent flipbook image loader no longer uses Qt 6-deprecated
   `QAction::parentWidget()` and now casts the action `parent()` instead.
   `mise run check-qt6-qaction-scope` guards that QAction parent-widget warning
@@ -369,6 +374,11 @@ branch.
 - The app-side abstract-final warning cluster in farm submission and xsheet
   frame-head declarations has also been removed by dropping `final` from the
   abstract `TaskConfigPanel` and `XsheetFrameHeadGadget` base declarations.
+  The movie-generator `AlphaChecker` visitor is now concrete as well, with
+  no-op overrides for the property visitor types it intentionally ignores.
+  Camera resolution presets now use explicit empty string defaults instead of
+  null pointer constants for optional string offsets, removing the related
+  non-null string construction warnings.
 - The `stdfx` / `tnztools` compile frontier now removes another warning slice:
   Mosaic and Motion Blur raw pixel buffer operations use explicit `void *`
   casts, Iwa seed ranges explicitly cross the `double` parameter boundary,
@@ -547,21 +557,43 @@ branch.
   so multimedia API regressions fail early.
 - `mise run check-qt6-fontmetrics-scope` now guards the direct
   `QFontMetrics::width()` warning slice by allowing that deprecated API only in
-  the Qt 5 fallback inside `QtCompat::fontMetricsHorizontalAdvance()`. It runs
-  before the normal local configure, build, and translation-build tasks.
-- User-activated real `QComboBox` index handling now routes through
-  `QtCompat::connectComboBoxActivatedIndex()`, which uses `textActivated` and
-  forwards the selected current index. The cleanup covers the stop-motion
+  the Qt 5 fallback inside `QtCompat::fontMetricsHorizontalAdvance()`. Xsheet
+  frame-label expansion and Xsheet sound-text cell layout also use that helper
+  for text advance measurement instead of deriving text advance through a
+  bounding rectangle. The guard runs before the normal local configure, build,
+  and translation-build tasks and now blocks those runtime Xsheet paths from
+  regressing to `boundingRect(...).width()` text-advance checks.
+- Custom Panel `.ui` template writing now sets UTF-8 text stream encoding
+  through `QtCompat::setTextStreamUtf8()`. Qt 6 uses
+  `QTextStream::setEncoding(QStringConverter::Utf8)`, while Qt 5 keeps
+  `QTextStream::setCodec("UTF-8")` behind the compatibility helper. `mise run
+  check-qt6-qtextstream-scope` keeps direct text-stream `setCodec()` usage out
+  of feature code while leaving the separate Qt 5-only audio-format codec
+  fallback sites documented in the multimedia scope.
+- User-activated real `QComboBox` index and text handling now routes through
+  `QtCompat::connectComboBoxActivatedIndex()` and
+  `QtCompat::connectComboBoxTextActivated()`, which use `textActivated` and
+  forward either the selected current index or selected text. The cleanup
+  covers the stop-motion
   Pencil Test popup, Camera Track export popup, cleanup settings panes,
   project selectors, tool option combos, board settings, Xsheet PDF export,
   Filmstrip, level settings, Xsheet column filters, histogram/function segment
-  widgets, file browser DPI policy, format settings, and navigation-tag color
-  selector. Project-local custom `ToolOptionPopupButton::activated(int)`
-  signals remain on their custom signal path. `mise run
+  widgets, file browser DPI policy, format settings, navigation-tag color
+  selector, output preset selection, text-editor font/size controls, param
+  fields, and Qt 5 stop-motion resolution selectors. Project-local custom
+  `ToolOptionPopupButton::activated(int)` signals remain on their custom
+  signal path. `mise run
   check-qt6-combobox-activated-scope` keeps direct real-combo
-  `QComboBox::activated` connections and old macro `SIGNAL(activated(int))`
-  combo connections out of the current source tree and runs before the normal
-  local configure, build, and translation-build tasks.
+  `QComboBox::activated` connections and old macro `SIGNAL(activated(int))` /
+  `SIGNAL(activated(const QString &))` combo connections out of the current
+  source tree and runs before the normal local configure, build, and
+  translation-build tasks.
+- Legacy Qt compatibility macros in source now use C++17 language forms:
+  `Q_DECL_OVERRIDE` was replaced with `override` in the macOS native event
+  filter, and the remaining `Q_NULLPTR` defaults were replaced with `nullptr`.
+  `mise run check-qt6-modern-qt-macros` keeps `Q_DECL_OVERRIDE`,
+  `Q_DECL_FINAL`, and `Q_NULLPTR` out of `toonz/sources` and runs through the
+  shared Qt 6 migration preflight.
 - On June 5, 2026, targeted app-target rebuilds after the combo-box activation,
   QImage mirrored/flipped, checkbox state-change, QWheelEvent pixel-delta, and
   QGLFormat scope slices passed in both lanes:
@@ -2615,6 +2647,7 @@ mise run check-qt6-multimedia-scope
 mise run check-qt6-script-scope
 mise run check-qt6-script-smoke-registry
 mise run check-qt6-fontmetrics-scope
+mise run check-qt6-qtextstream-scope
 mise run check-qt6-fontdatabase-scope
 mise run check-qt6-highdpi-attribute-scope
 mise run check-qt6-touch-scope

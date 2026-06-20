@@ -11,6 +11,7 @@
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/qtmediacompat.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/toonzscene.h"
@@ -740,7 +741,7 @@ void AutoLipSyncPopup::playSound() {
       }
 
       QtCompat::setMediaPlayerSource(
-          m_player, QUrl::fromLocalFile(tempPath.getQString()));
+          m_player, QtCompat::localFileUrl(tempPath.getQString()));
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
       m_audioOutput->setVolume(0.5);
 #else

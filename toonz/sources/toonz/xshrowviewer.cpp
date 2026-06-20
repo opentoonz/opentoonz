@@ -165,9 +165,10 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
 
   int extraSpaces = 0;
   if (checkExpandFrameArea()) {
+    const QFontMetrics metrics(p.font());
     extraSpaces =
         std::max(0, o->rect(PredefinedRect::FRAME_LABEL).width() /
-                            QFontMetrics(p.font()).boundingRect("0").width() -
+                            QtCompat::fontMetricsHorizontalAdvance(metrics, "0") -
                         6);
   }
 

@@ -2570,9 +2570,8 @@ void CellArea::drawSoundTextColumn(QPainter &p, int r0, int r1, int col) {
           (int)std::ceil((double)textCount / (double)(lettersPerChunk));
       bool isChunkOverflow = false;
       for (int c = 0; c < chunkCount; c++) {
-        int chunkWidth =
-            fm.boundingRect(text.mid(c * lettersPerChunk, lettersPerChunk))
-                .width();
+        int chunkWidth = QtCompat::fontMetricsHorizontalAdvance(
+            fm, text.mid(c * lettersPerChunk, lettersPerChunk));
         if (chunkWidth > infoList.front().nameRect.width()) {
           isChunkOverflow = true;
           break;
@@ -2587,8 +2586,8 @@ void CellArea::drawSoundTextColumn(QPainter &p, int r0, int r1, int col) {
           // add letter and check if the text can be inside the cell
           int len = 1;
           while (textPos + len < textCount &&
-                 fm.boundingRect(text.mid(textPos, len + 1)).width() <=
-                     info.nameRect.width()) {
+                 QtCompat::fontMetricsHorizontalAdvance(
+                     fm, text.mid(textPos, len + 1)) <= info.nameRect.width()) {
             len++;
           }
           // elide text at the last row
@@ -2630,7 +2629,8 @@ void CellArea::drawSoundTextColumn(QPainter &p, int r0, int r1, int col) {
       // unite the cell rects
       QRect unitedRect =
           infoList.front().nameRect.united(infoList.last().nameRect);
-      int extraWidth = unitedRect.width() - fm.boundingRect(text).width();
+      int extraWidth =
+          unitedRect.width() - QtCompat::fontMetricsHorizontalAdvance(fm, text);
       if (extraWidth >= 0) {
         int margin = extraWidth / (2 * textCount);
         // Qt::TextJustificationForced flag is needed to make Qt::AlignJustify

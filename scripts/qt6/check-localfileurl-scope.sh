@@ -29,14 +29,26 @@ fi
 direct_file_url_hits="$(
   grep_hits git grep -nE \
     -e 'QUrl[[:space:]]*\([[:space:]]*"file:///' \
-    -e 'QUrl[[:space:]]*\([[:space:]]*[^)]*(getQString|toQString|fromStdWString)' -- \
+    -e 'QUrl[[:space:]]*\([[:space:]]*[^)]*(getQString|toQString|fromStdWString)' \
+    -e 'QUrl::fromLocalFile[[:space:]]*\([[:space:]]*[^)]*(getQString|toQString|fromStdWString)' -- \
     'toonz/sources' \
     ':!toonz/sources/include/toonzqt/qtcompat.h' \
+    ':!toonz/sources/toonzqt/gutil.cpp' \
+    ':!toonz/sources/common/tsystem/tsystem.cpp' \
     ':!toonz/sources/translations'
 )"
 
-if [[ -n "$direct_file_url_hits" ]]; then
+direct_desktop_services_from_local_file_hits="$(
+  grep_hits git grep -nE \
+    -e 'QDesktopServices::openUrl[[:space:]]*\([[:space:]]*QUrl::fromLocalFile' -- \
+    'toonz/sources' \
+    ':!toonz/sources/common/tsystem/tsystem.cpp' \
+    ':!toonz/sources/translations'
+)"
+
+if [[ -n "$direct_file_url_hits" || -n "$direct_desktop_services_from_local_file_hits" ]]; then
   printf '%s\n' "$direct_file_url_hits"
+  printf '%s\n' "$direct_desktop_services_from_local_file_hits"
   echo "error: use QtCompat::localFileUrl() for local file/folder URLs" >&2
   exit 1
 fi

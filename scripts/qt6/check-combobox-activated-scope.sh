@@ -10,14 +10,26 @@ direct_combobox_activated="$(
     ':!toonz/sources/include/toonzqt/qtcompat.h' || true
 )"
 
-if [[ -n "$direct_combobox_activated" ]]; then
+direct_combobox_text_activated="$(
+  git grep -nE -e 'connect\([^;]*(Combo|ComboBox|Om|CB|m_currentStageObjectCombo)[^;]*SIGNAL\(activated\((const[[:space:]]+)?QString[[:space:]]*&?\)\)' -- \
+    'toonz/sources' \
+    ':!toonz/sources/include/toonzqt/qtcompat.h' || true
+)"
+
+if [[ -n "$direct_combobox_activated" || -n "$direct_combobox_text_activated" ]]; then
   printf '%s\n' "$direct_combobox_activated"
-  echo "error: use QtCompat::connectComboBoxActivatedIndex() instead of deprecated QComboBox::activated(int)" >&2
+  printf '%s\n' "$direct_combobox_text_activated"
+  echo "error: use QtCompat combo-box activation helpers instead of deprecated QComboBox::activated(...)" >&2
   exit 1
 fi
 
 if ! git grep -q 'connectComboBoxActivatedIndex' -- 'toonz/sources/include/toonzqt/qtcompat.h'; then
   echo "error: expected QtCompat::connectComboBoxActivatedIndex() helper in qtcompat.h" >&2
+  exit 1
+fi
+
+if ! git grep -q 'connectComboBoxTextActivated' -- 'toonz/sources/include/toonzqt/qtcompat.h'; then
+  echo "error: expected QtCompat::connectComboBoxTextActivated() helper in qtcompat.h" >&2
   exit 1
 fi
 

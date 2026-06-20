@@ -263,8 +263,9 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
                        SLOT(onAddPresetButtonPressed()));
   ret = ret && connect(removePresetButton, SIGNAL(pressed()), this,
                        SLOT(onRemovePresetButtonPressed()));
-  ret = ret && connect(m_presetCombo, SIGNAL(activated(const QString &)), this,
-                       SLOT(onPresetSelected(const QString &)));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxTextActivated(
+                   m_presetCombo, this,
+                   [this](const QString &preset) { onPresetSelected(preset); }));
   ret = ret && connect(categoryList, SIGNAL(itemClicked(QListWidgetItem *)),
                        this, SLOT(onCategoryActivated(QListWidgetItem *)));
   assert(ret);

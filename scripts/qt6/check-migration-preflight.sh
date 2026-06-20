@@ -13,6 +13,7 @@ checks=(
   scripts/qt6/check-script-smoke-registry.sh
   scripts/qt6/check-gui-smoke-registry.sh
   scripts/qt6/check-fontmetrics-scope.sh
+  scripts/qt6/check-qtextstream-scope.sh
   scripts/qt6/check-fontdatabase-scope.sh
   scripts/qt6/check-highdpi-attribute-scope.sh
   scripts/qt6/check-touch-scope.sh
@@ -37,6 +38,7 @@ checks=(
   scripts/qt6/check-qimage-mirrored-scope.sh
   scripts/qt6/check-qglformat-scope.sh
   scripts/qt6/check-qgllegacy-scope.sh
+  scripts/qt6/check-modern-qt-macros.sh
 )
 
 for check in "${checks[@]}"; do
