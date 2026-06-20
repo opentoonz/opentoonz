@@ -430,10 +430,11 @@ Already covered:
 - Stop-motion camera-option sizing and legacy Pencil Test camera-label sizing
   now use `QtCompat::fontMetricsHorizontalAdvance()`, removing direct
   `QFontMetrics::width()` calls from that slice while preserving Qt 5 behavior.
-  Xsheet frame-label expansion and Xsheet sound-text cell layout also use the
-  helper for text advance measurement instead of deriving text advance through a
-  bounding rectangle. The font-metrics guard now blocks those runtime Xsheet
-  paths from regressing to `boundingRect(...).width()` text-advance checks.
+  Xsheet frame-label expansion, Xsheet sound-text cell layout, and Xsheet PDF
+  export text fitting also use the helper for text advance measurement instead
+  of deriving text advance through a bounding rectangle. The font-metrics guard
+  now blocks those runtime Xsheet/PDF paths from regressing to
+  `boundingRect(...).width()` text-advance checks.
 - Configure Shortcuts multi-key conflict checking now uses
   `QtCompat::keySequenceEntryToInt()` instead of open-coded Qt-version checks.
   Qt 6 uses `QKeyCombination::toCombined()` inside `QtCompat`, and Qt 5 keeps

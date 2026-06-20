@@ -558,11 +558,12 @@ branch.
 - `mise run check-qt6-fontmetrics-scope` now guards the direct
   `QFontMetrics::width()` warning slice by allowing that deprecated API only in
   the Qt 5 fallback inside `QtCompat::fontMetricsHorizontalAdvance()`. Xsheet
-  frame-label expansion and Xsheet sound-text cell layout also use that helper
-  for text advance measurement instead of deriving text advance through a
-  bounding rectangle. The guard runs before the normal local configure, build,
-  and translation-build tasks and now blocks those runtime Xsheet paths from
-  regressing to `boundingRect(...).width()` text-advance checks.
+  frame-label expansion, Xsheet sound-text cell layout, and Xsheet PDF export
+  text fitting also use that helper for text advance measurement instead of
+  deriving text advance through a bounding rectangle. The guard runs before the
+  normal local configure, build, and translation-build tasks and now blocks
+  those runtime Xsheet/PDF paths from regressing to `boundingRect(...).width()`
+  text-advance checks.
 - Custom Panel `.ui` template writing now sets UTF-8 text stream encoding
   through `QtCompat::setTextStreamUtf8()`. Qt 6 uses
   `QTextStream::setEncoding(QStringConverter::Utf8)`, while Qt 5 keeps

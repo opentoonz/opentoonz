@@ -39,6 +39,7 @@ direct_fontmetrics_width="$(
 
 direct_runtime_bounding_width="$(
   git grep -nE 'boundingRect[[:space:]]*\([^)]*\)[[:space:]]*\.width[[:space:]]*\(' -- \
+    'toonz/sources/toonz/exportxsheetpdf.cpp' \
     'toonz/sources/toonz/xshcellviewer.cpp' \
     'toonz/sources/toonz/xshrowviewer.cpp' || true
 )"
@@ -51,7 +52,7 @@ fi
 
 if [[ -n "$direct_runtime_bounding_width" ]]; then
   printf '%s\n' "$direct_runtime_bounding_width"
-  echo "error: use QtCompat::fontMetricsHorizontalAdvance() for Xsheet text advance measurement" >&2
+  echo "error: use QtCompat::fontMetricsHorizontalAdvance() for Xsheet/PDF text advance measurement" >&2
   exit 1
 fi
 

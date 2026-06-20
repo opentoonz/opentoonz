@@ -189,7 +189,8 @@ void decoTimeInfo(QPainter& painter, QRect rect,
     font.setPixelSize(rect.height() / 2 - mm2px(1));
     font.setLetterSpacing(QFont::PercentageSpacing, 100);
     while (font.pixelSize() > mm2px(2)) {
-      if (QFontMetrics(font).boundingRect(plusStr).width() < rect.width() / 12)
+      if (QtCompat::fontMetricsHorizontalAdvance(QFontMetrics(font),
+                                                 plusStr) < rect.width() / 12)
         break;
       font.setPixelSize(font.pixelSize() - mm2px(0.2));
     }
@@ -235,7 +236,8 @@ void doDecoSheetInfo(QPainter& painter, QRect rect,
     font.setPixelSize(rect.height() / 2 - mm2px(1));
     font.setLetterSpacing(QFont::PercentageSpacing, 100);
     while (font.pixelSize() > mm2px(2)) {
-      if (QFontMetrics(font).boundingRect(totStr).width() < rect.width() / 6)
+      if (QtCompat::fontMetricsHorizontalAdvance(QFontMetrics(font), totStr) <
+          rect.width() / 6)
         break;
       font.setPixelSize(font.pixelSize() - mm2px(0.2));
     }
@@ -382,16 +384,19 @@ QComboBox* createTickMarkCombo(QWidget* parent) {
 
 void doDrawText(QPainter& p, const QString& str, const QRect rect) {
   QFontMetrics fm(p.font());
-  int spaceWidth = fm.boundingRect('A').width();
+  int spaceWidth = QtCompat::fontMetricsHorizontalAdvance(fm, QString("A"));
   // check if spaces can be iserted between letters
-  int textWidth = fm.boundingRect(str).width() + spaceWidth * (str.size() - 1);
+  int textWidth =
+      QtCompat::fontMetricsHorizontalAdvance(fm, str) +
+      spaceWidth * (str.size() - 1);
   if (rect.width() - spaceWidth * 2 <= textWidth) {
     p.drawText(rect, Qt::AlignCenter, str);
     return;
   }
   // check if spaces can be doubled
   int textWidth_s2 =
-      fm.boundingRect(str).width() + spaceWidth * 2 * (str.size() - 1);
+      QtCompat::fontMetricsHorizontalAdvance(fm, str) +
+      spaceWidth * 2 * (str.size() - 1);
   if (rect.width() - spaceWidth * 4 > textWidth_s2) textWidth = textWidth_s2;
   QRect textRect(rect.center().x() - textWidth / 2, rect.y(), textWidth,
                  rect.height());
@@ -406,8 +411,9 @@ void setFontFittingRectWidth(QPainter& p, const QString& str, const QRect rect,
   int pixelSize = rect.height() - mm2px(vmargin);
   while (1) {
     font.setPixelSize(pixelSize);
-    if (pixelSize <= mm2px(2) || QFontMetrics(font).boundingRect(str).width() <=
-                                     rect.width() - mm2px(hmargin))
+    if (pixelSize <= mm2px(2) ||
+        QtCompat::fontMetricsHorizontalAdvance(QFontMetrics(font), str) <=
+            rect.width() - mm2px(hmargin))
       break;
     pixelSize -= mm2px(0.1);
   }
@@ -714,7 +720,8 @@ void XSheetPDFTemplate::drawDialogBlock(QPainter& painter, const int framePage,
   QString serifLabel =
       (param(TranslateBodyLabel, 1) == 1) ? QObject::tr("S", "XSheetPDF") : "S";
   while (font.pixelSize() > mm2px(1)) {
-    if (QFontMetrics(font).boundingRect(serifLabel).width() <
+    if (QtCompat::fontMetricsHorizontalAdvance(QFontMetrics(font),
+                                               serifLabel) <
         labelRect.width() - mm2px(1))
       break;
     font.setPixelSize(font.pixelSize() - mm2px(0.5));
@@ -1035,7 +1042,8 @@ void XSheetPDFTemplate::drawLevelName(QPainter& painter, QRect rect,
   painter.setFont(font);
 
   // if it can fit in the rect, then just draw it
-  if (QFontMetrics(font).boundingRect(name).width() < rect.width()) {
+  if (QtCompat::fontMetricsHorizontalAdvance(QFontMetrics(font), name) <
+      rect.width()) {
     painter.drawText(rect, Qt::AlignCenter, name);
     return;
   }
@@ -1043,7 +1051,8 @@ void XSheetPDFTemplate::drawLevelName(QPainter& painter, QRect rect,
   // if it can fit with 90% sized font
   QFont altFont(font);
   altFont.setPixelSize(font.pixelSize() * 0.9);
-  if (QFontMetrics(altFont).boundingRect(name).width() < rect.width()) {
+  if (QtCompat::fontMetricsHorizontalAdvance(QFontMetrics(altFont), name) <
+      rect.width()) {
     painter.setFont(altFont);
     painter.drawText(rect, Qt::AlignCenter, name);
     return;
@@ -1078,7 +1087,8 @@ void XSheetPDFTemplate::drawLogo(QPainter& painter) {
     QFont font = painter.font();
     font.setPixelSize(logoRect.height() - mm2px(2));
     while (1) {
-      if (QFontMetrics(font).boundingRect(m_info.logoText).width() <
+      if (QtCompat::fontMetricsHorizontalAdvance(QFontMetrics(font),
+                                                 m_info.logoText) <
               logoRect.width() &&
           QFontMetrics(font).boundingRect(m_info.logoText).height() <
               logoRect.height())
@@ -1264,11 +1274,12 @@ void XSheetPDFTemplate::drawDialogue(QPainter& painter, int framePage) {
         continue;
       }
 
-      int normalLettersPerChunk = textCount * m_soundCellRects[0].width() /
-                                  QFontMetrics(font).boundingRect(text).width();
+      int normalLettersPerChunk =
+          textCount * m_soundCellRects[0].width() /
+          QtCompat::fontMetricsHorizontalAdvance(QFontMetrics(font), text);
       int maxLettersPerChunk =
           textCount * m_soundCellRects[0].width() /
-          QFontMetrics(smallFont).boundingRect(text).width();
+          QtCompat::fontMetricsHorizontalAdvance(QFontMetrics(smallFont), text);
 
       int lettersPerChunk =
           (int)std::ceil((double)textCount / ((double)blockLength));
