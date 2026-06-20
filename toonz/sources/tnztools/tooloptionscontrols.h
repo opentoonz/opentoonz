@@ -87,7 +87,7 @@ public:
 //    ToolOptionControl derivative  declarations
 //***********************************************************************************
 
-class ToolOptionCheckbox final : public DVGui::CheckBox,
+class DVAPI ToolOptionCheckbox final : public DVGui::CheckBox,
                                  public ToolOptionControl {
   Q_OBJECT
 
@@ -179,7 +179,7 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class ToolOptionCombo final : public QComboBox, public ToolOptionControl {
+class DVAPI ToolOptionCombo final : public QComboBox, public ToolOptionControl {
   Q_OBJECT
 
 protected:
@@ -200,8 +200,8 @@ public slots:
 
 //-----------------------------------------------------------------------------
 
-class ToolOptionFontCombo final : public QFontComboBox,
-                                  public ToolOptionControl {
+class DVAPI ToolOptionFontCombo final : public QFontComboBox,
+                                        public ToolOptionControl {
   Q_OBJECT
 
 protected:
@@ -239,7 +239,7 @@ public slots:
 
 //-----------------------------------------------------------------------------
 
-class ToolOptionTextField final : public DVGui::LineEdit,
+class DVAPI ToolOptionTextField final : public DVGui::LineEdit,
                                   public ToolOptionControl {
   Q_OBJECT
 
@@ -290,7 +290,7 @@ public slots:
   the edited one)
   \li Undo/Redo of user interactions.
 */
-class ToolOptionParamRelayField final : public DVGui::MeasuredDoubleLineEdit,
+class DVAPI ToolOptionParamRelayField final : public DVGui::MeasuredDoubleLineEdit,
                                         public ToolOptionControl {
   Q_OBJECT
 
@@ -384,7 +384,7 @@ signals:
 };
 //-----------------------------------------------------------------------------
 
-class PegbarChannelField final : public MeasuredValueField,
+class DVAPI PegbarChannelField final : public MeasuredValueField,
                                  public ToolOptionControl {
   Q_OBJECT
 
@@ -445,7 +445,7 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class NoScaleField final : public MeasuredValueField, public ToolOptionControl {
+class DVAPI NoScaleField final : public MeasuredValueField, public ToolOptionControl {
   Q_OBJECT
 
 public:
@@ -487,7 +487,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class SelectionScaleField final : public MeasuredValueField {
+class DVAPI SelectionScaleField final : public MeasuredValueField {
   Q_OBJECT
 
   int m_id;
@@ -513,7 +513,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class SelectionRotationField final : public MeasuredValueField {
+class DVAPI SelectionRotationField final : public MeasuredValueField {
   Q_OBJECT
 
   SelectionTool *m_tool;
@@ -534,7 +534,7 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class SelectionMoveField final : public MeasuredValueField {
+class DVAPI SelectionMoveField final : public MeasuredValueField {
   Q_OBJECT
 
   int m_id;
@@ -555,7 +555,7 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class ThickChangeField final : public MeasuredValueField {
+class DVAPI ThickChangeField final : public MeasuredValueField {
   Q_OBJECT
 
   SelectionTool *m_tool;
@@ -577,7 +577,7 @@ protected slots:
 
 // The ClickableLabel class is used to allow click and dragging
 // on a label to change the value of a linked field
-class ClickableLabel : public QLabel {
+class DVAPI ClickableLabel : public QLabel {
   Q_OBJECT
 
 protected:

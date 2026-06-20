@@ -492,6 +492,7 @@ include_directories(
     ../../sources/toonzfarm/include
     ../../sources/toonzqt
     ../../sources/stopmotion
+    ../../sources/tnztools   # Required for SelectionScaleField, SelectionRotationField, etc.
 )
 
 if (WITH_CANON)

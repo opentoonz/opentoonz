@@ -56,7 +56,7 @@
 //    PlasticTool  declaration
 //****************************************************************************************
 
-class PlasticTool final : public QObject,
+class DVAPI PlasticTool final : public QObject,
                           public TTool,
                           public TParamObserver,
                           public TSelection::View {
@@ -189,6 +189,14 @@ public:
   ToolOptionsBox *createOptionsBox() override;
 
   TPropertyGroup *getProperties(int idx) override { return &m_propGroup[idx]; }
+
+  int currentSkeletonId() const;
+
+  void keyframePlasticRelays(TDoubleParamRelayProperty *editedRelay);
+
+  TDoubleParamRelayProperty &distanceRelayProperty() { return m_distanceRelay; }
+  TDoubleParamRelayProperty &angleRelayProperty() { return m_angleRelay; }
+  TDoubleParamRelayProperty &soRelayProperty() { return m_soRelay; }
 
   void updateTranslation() override;
 
