@@ -583,6 +583,9 @@ branch.
   check-qt6-qtextstream-scope` keeps direct text-stream `setCodec()` usage out
   of feature code while leaving the separate Qt 5-only audio-format codec
   fallback sites documented in the multimedia scope.
+- `mise run check-qt6-qiodevice-open-scope` now guards the warning frontier for
+  ignored Qt I/O open results by failing on bare `QIODevice` / `QFile`
+  `open()` calls whose return values are not checked.
 - User-activated real `QComboBox` index and text handling now routes through
   `QtCompat::connectComboBoxActivatedIndex()` and
   `QtCompat::connectComboBoxTextActivated()`, which use `textActivated` and
@@ -2667,6 +2670,7 @@ mise run check-qt6-script-scope
 mise run check-qt6-script-smoke-registry
 mise run check-qt6-fontmetrics-scope
 mise run check-qt6-qtextstream-scope
+mise run check-qt6-qiodevice-open-scope
 mise run check-qt6-fontdatabase-scope
 mise run check-qt6-highdpi-attribute-scope
 mise run check-qt6-touch-scope
