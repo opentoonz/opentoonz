@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/translations">
+    <file alias="chinese/template.qm">../translations/chinese/template.qm</file>
+    <file alias="japanese/template.qm">../translations/japanese/template.qm</file>
+  </qresource>
+</RCC>
