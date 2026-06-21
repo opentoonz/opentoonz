@@ -31,7 +31,9 @@ bool SVNConfigWriter::writeSvnUser(QString name, QString passwd,bool remove) {
   QXmlStreamReader r(&file);
   QByteArray newXmlContent;
   QBuffer buffer(&newXmlContent);
-  buffer.open(QIODevice::WriteOnly);
+  if (!buffer.open(QIODevice::WriteOnly)) {
+    return false;
+  }
 
   QXmlStreamWriter w(&buffer);
   w.setAutoFormatting(true);
@@ -117,7 +119,9 @@ bool SVNConfigWriter::writeRepository(QString name, QString repoPath,
   QXmlStreamReader r(&file);
   QByteArray newXmlContent;
   QBuffer buffer(&newXmlContent);
-  buffer.open(QIODevice::WriteOnly);
+  if (!buffer.open(QIODevice::WriteOnly)) {
+    return false;
+  }
 
   QXmlStreamWriter w(&buffer);
   w.setAutoFormatting(true);

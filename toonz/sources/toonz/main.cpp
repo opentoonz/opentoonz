@@ -13760,7 +13760,10 @@ static QStringList gui_smoke_audio_output_details() {
   samples.fill('\0');
 
   QBuffer buffer(&samples);
-  buffer.open(QIODevice::ReadOnly);
+  if (!buffer.open(QIODevice::ReadOnly)) {
+    details << QStringLiteral("audioOutputProbe=buffer-open-failed");
+    return details;
+  }
 
   QAudioSink sink(output, format);
   sink.setVolume(0.0);

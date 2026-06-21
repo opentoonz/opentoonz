@@ -680,7 +680,7 @@ QByteArray TStyleSelection::toByteArray(int pageIndex,
                                         const QString paletteGlobalName) {
   QByteArray data;
   QBuffer dataBuffer(&data);
-  dataBuffer.open(QIODevice::WriteOnly);
+  if (!dataBuffer.open(QIODevice::WriteOnly)) return data;
   QDataStream out(&dataBuffer);
   out << (int)pageIndex << (int)indicesInPage.size() << paletteGlobalName;
 
@@ -696,7 +696,7 @@ void TStyleSelection::fromByteArray(QByteArray &byteArray, int &pageIndex,
                                     std::set<int> &indicesInPage,
                                     QString &paletteGlobalName) {
   QBuffer dataBuffer(&byteArray);
-  dataBuffer.open(QIODevice::ReadOnly);
+  if (!dataBuffer.open(QIODevice::ReadOnly)) return;
   QDataStream in(&dataBuffer);
   int i, count = 0;
   in >> pageIndex >> count >> paletteGlobalName;
