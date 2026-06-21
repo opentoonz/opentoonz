@@ -1,0 +1,135 @@
+name: Qt 6 migration regression
+description: File a Qt 6-only regression found during validation.
+title: "[Qt6 regression]: "
+labels: ["bug", "qt6-validation", "gui-parity"]
+projects: ["bgyss/1"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for regressions observed while validating the Qt 6 migration.
+        Prefer a separate validation report when recording a passing or blocked validation pass.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Regression area
+      options:
+        - Build/package
+        - Startup/workspace
+        - Viewer/rendering
+        - Drawing/input
+        - Timeline/xsheet
+        - Palette/styles
+        - File IO
+        - Preferences
+        - Scripting
+        - Tablet/input
+        - Cross-platform packaging
+        - Documentation
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - macOS arm64
+        - macOS x64
+        - Windows x64
+        - Linux x64
+        - Cross-platform
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - P0 blocker
+        - P1 high
+        - P2 medium
+        - P3 low
+    validations:
+      required: true
+
+  - type: input
+    id: build_sha
+    attributes:
+      label: Qt 6 build SHA
+      description: Commit SHA or release artifact identifier under test.
+      placeholder: 8482a0053d6eb7b03811cdd454988c1a918d0b2c
+    validations:
+      required: true
+
+  - type: input
+    id: baseline
+    attributes:
+      label: Baseline
+      description: Baseline used for comparison.
+      placeholder: OpenToonz 1.7.1 / Qt 5
+    validations:
+      required: true
+
+  - type: dropdown
+    id: baseline_result
+    attributes:
+      label: Does the baseline reproduce it?
+      options:
+        - No, Qt 6 only
+        - Yes, exists in baseline
+        - Not checked
+        - Not applicable
+    validations:
+      required: true
+
+  - type: textarea
+    id: current_behavior
+    attributes:
+      label: Current behavior
+      description: What happened in the Qt 6 build?
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected behavior
+      description: What should match the baseline or intended behavior?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Link CI runs, artifacts, screenshots, videos, logs, or Codex reports.
+      placeholder: Paste links or drag files here.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: automation_candidate
+    attributes:
+      label: Automation candidate
+      options:
+        - Needs triage
+        - QTest
+        - Codex GUI
+        - Actions script
+        - No
+    validations:
+      required: true

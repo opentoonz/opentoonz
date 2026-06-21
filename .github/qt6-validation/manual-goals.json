@@ -1,0 +1,272 @@
+{
+  "schema_version": 1,
+  "source": "OpenToonz Qt 6 Port Progress Reports",
+  "updated_at": "2026-06-15",
+  "baseline": "OpenToonz 1.7.1 / Qt 5; codex/qt-6-port reviewed at b49ed0df5; regular Linux, macOS, and Windows branch CI green on 2026-06-12; latest Qt 6 Experimental Binary Builds result still failed on 2026-06-08 pending rerun; Project Sync skips until QT6_PROJECT_TOKEN is configured",
+  "goals": [
+    {
+      "title": "Restore macOS Qt 6 CI guard preflight",
+      "body": "Superseded by later regular branch CI. Linux, macOS, and Windows builds were green at codex/qt-6-port commit b49ed0df5 in the latest observed runs, so the prior macOS rg preflight blocker is accepted unless it regresses.",
+      "area": "Build/package",
+      "platform": "macOS arm64",
+      "validation_type": "CI build",
+      "validation_status": "Accepted",
+      "risk": "P3 low",
+      "automation_candidate": "Actions script",
+      "requires_build": false
+    },
+    {
+      "title": "Validate latest local Qt 6 branch commit",
+      "body": "codex/qt-6-port was reviewed at b49ed0df5, and the latest observed regular branch CI for Linux, macOS, and Windows succeeded for that commit on 2026-06-12.",
+      "area": "Build/package",
+      "platform": "Cross-platform",
+      "validation_type": "CI build",
+      "validation_status": "Accepted",
+      "risk": "P3 low",
+      "automation_candidate": "Actions script",
+      "requires_build": false
+    },
+    {
+      "title": "Verify Qt 6 Experimental Binary Builds after aqt module fix",
+      "body": "The latest observed Qt 6 Experimental Binary Builds workflow result still failed on 2026-06-08 before package creation because the Linux aqt install step could not resolve qtdeclarative, qtsvg, and qttools for the configured Qt version. Later branch commits restore module handling and preflight checks, but a fresh manual or scheduled run is needed before package validation can proceed.",
+      "area": "Build/package",
+      "platform": "Cross-platform",
+      "validation_type": "CI build",
+      "validation_status": "Blocked by build",
+      "risk": "P0 blocker",
+      "automation_candidate": "Actions script",
+      "requires_build": false
+    },
+    {
+      "title": "Enable Qt 6 Project Sync token",
+      "body": "The Qt 6 Project Sync workflow is present and scheduled, and it reads manual-goals JSON, but current runs skip Project updates because QT6_PROJECT_TOKEN is not configured. Add the repository secret before treating GitHub Project status as live.",
+      "area": "Documentation",
+      "platform": "Cross-platform",
+      "validation_type": "Regression follow-up",
+      "validation_status": "Needs human pass",
+      "risk": "P2 medium",
+      "automation_candidate": "Actions script",
+      "requires_build": false
+    },
+    {
+      "title": "Startup/workspace smoke: isolated profile launch",
+      "body": "Launch the packaged Qt 6 app with an isolated runtime profile, confirm the intended instance is under test, create and save a scene, relaunch, reopen it, switch rooms, and capture startup/workspace screenshots. Report docs: doc/qt6_port_progress/2026-06-15-functional-gaps.md and doc/qt6_port_progress/2026-06-15-manual-verification-checklist.md.",
+      "area": "Startup/workspace",
+      "platform": "Cross-platform",
+      "validation_type": "Codex GUI smoke",
+      "validation_status": "Ready for Codex smoke",
+      "risk": "P1 high",
+      "automation_candidate": "Codex GUI",
+      "requires_build": true
+    },
+    {
+      "title": "Verify package runtime data and plugin loading",
+      "body": "Confirm packaged apps load Qt frameworks, Qt plugins, SVG/icons, multimedia backends, stuff data, rooms, QSS, shaders, brushes, presets, and default projects from the package rather than a developer environment.",
+      "area": "Startup/workspace",
+      "platform": "Cross-platform",
+      "validation_type": "Human smoke",
+      "validation_status": "Needs human pass",
+      "risk": "P1 high",
+      "automation_candidate": "Needs triage",
+      "requires_build": true
+    },
+    {
+      "title": "Viewer/rendering parity: default scene and viewer crop",
+      "body": "Compare the Qt 6 viewer against the Qt 5 baseline for default scene display, blank/nonblank viewer behavior, stale framebuffer behavior, high-DPI alignment, and screenshot or pixel crop evidence on representative raster, vector, Toonz Raster, composite, and FX-heavy scenes.",
+      "area": "Viewer/rendering",
+      "platform": "Cross-platform",
+      "validation_type": "Codex GUI smoke",
+      "validation_status": "Ready for Codex smoke",
+      "risk": "P1 high",
+      "automation_candidate": "Codex GUI",
+      "requires_build": true
+    },
+    {
+      "title": "Verify manual Preview and FX Preview UI workflows",
+      "body": "Exercise File > Preview, schematic FX Preview command, live playback and timer behavior, sub-camera dragging, previewed-frame save UI, overwrite and warning dialogs, cancellation, invalid output paths, and production FX-heavy preview scenes.",
+      "area": "Viewer/rendering",
+      "platform": "Cross-platform",
+      "validation_type": "Human smoke",
+      "validation_status": "Needs human pass",
+      "risk": "P1 high",
+      "automation_candidate": "Codex GUI",
+      "requires_build": true
+    },
+    {
+      "title": "Verify final render parity on production scenes",
+      "body": "Render representative raster, vector, Toonz Raster, composite, frame-sequence, and FX-heavy scenes. Compare dimensions, frame count, alpha/background handling, color, output file naming, external-viewer behavior, and Qt 5 output.",
+      "area": "Viewer/rendering",
+      "platform": "Cross-platform",
+      "validation_type": "Studio field test",
+      "validation_status": "Studio field test",
+      "risk": "P1 high",
+      "automation_candidate": "Needs triage",
+      "requires_build": true
+    },
+    {
+      "title": "Drawing/input parity: raster/vector strokes and tablet basics",
+      "body": "Validate repeated raster and vector drawing input, cursor/stroke alignment, undo/redo, save/reopen, redraw behavior, pressure-sensitive tablet behavior, and obvious latency regressions. Synthetic tablet-event smokes are not enough for hardware parity.",
+      "area": "Drawing/input",
+      "platform": "Cross-platform",
+      "validation_type": "Human smoke",
+      "validation_status": "Needs human pass",
+      "risk": "P1 high",
+      "automation_candidate": "Codex GUI",
+      "requires_build": true
+    },
+    {
+      "title": "Verify real OS-level mouse and cursor delivery",
+      "body": "Rerun the real desktop input path in an unlocked, frontmost user session and verify drawing, transform drags, context menus, cursor feedback, and event delivery. Prior app-side and synthetic smokes do not prove real operating-system input delivery.",
+      "area": "Drawing/input",
+      "platform": "macOS arm64",
+      "validation_type": "Human smoke",
+      "validation_status": "Needs human pass",
+      "risk": "P1 high",
+      "automation_candidate": "Needs triage",
+      "requires_build": true
+    },
+    {
+      "title": "Verify Selection and Animate/Edit tool parity",
+      "body": "Rerun Codex smokes where possible, then have a human verify rectangular, freehand, and polyline selection, transform handles, mode variants, modifiers, active-axis dragging, undo/redo, and cursor feedback against Qt 5 behavior.",
+      "area": "Drawing/input",
+      "platform": "Cross-platform",
+      "validation_type": "Codex GUI smoke",
+      "validation_status": "Ready for Codex smoke",
+      "risk": "P2 medium",
+      "automation_candidate": "Codex GUI",
+      "requires_build": true
+    },
+    {
+      "title": "Timeline/xsheet smoke: navigation, selection, playback basics",
+      "body": "Smoke frame navigation, cell selection, playback controls, note editing, column movement, panning, auto-pan, context menus, and common xsheet/timeline interactions for Qt 6 regressions.",
+      "area": "Timeline/xsheet",
+      "platform": "Cross-platform",
+      "validation_type": "Codex GUI smoke",
+      "validation_status": "Ready for Codex smoke",
+      "risk": "P2 medium",
+      "automation_candidate": "Codex GUI",
+      "requires_build": true
+    },
+    {
+      "title": "Verify onion skin guides rulers and overlays",
+      "body": "Manually verify onion-skin marker workflows, fixed and relative markers, Shift and Trace, colors, orientations, camera box, safe area, field guides, ruler and guide variants, and overlay coexistence with drawing, room changes, DPI settings, and stylesheets.",
+      "area": "Timeline/xsheet",
+      "platform": "Cross-platform",
+      "validation_type": "Human smoke",
+      "validation_status": "Needs human pass",
+      "risk": "P2 medium",
+      "automation_candidate": "Codex GUI",
+      "requires_build": true
+    },
+    {
+      "title": "Palette/styles smoke: style selection and color edit behavior",
+      "body": "Validate style selection, color editing, palette panel interactions, page and tab behavior, context menus, style chooser behavior, and any Qt 6 visual or signal/slot regressions.",
+      "area": "Palette/styles",
+      "platform": "Cross-platform",
+      "validation_type": "Codex GUI smoke",
+      "validation_status": "Ready for Codex smoke",
+      "risk": "P2 medium",
+      "automation_candidate": "Codex GUI",
+      "requires_build": true
+    },
+    {
+      "title": "Expand and maintain QJSEngine script compatibility evidence",
+      "body": "Keep the current bounded and natural-exit script-smoke fixtures green while maintaining the script-smoke registry guard and strict Qt 6 script guards. Add coverage for remaining advanced scene APIs, additional object bindings, and external scripts users depend on.",
+      "area": "Scripting",
+      "platform": "Cross-platform",
+      "validation_type": "Codex report review",
+      "validation_status": "Codex evidence ready",
+      "risk": "P2 medium",
+      "automation_candidate": "QTest",
+      "requires_build": false
+    },
+    {
+      "title": "Verify Script Console GUI workflows",
+      "body": "Open the Script Console and verify basic commands, view(Image), view(Level), invalid argument cases, visible error reporting, stale-state cleanup, and external script behavior against Qt 5 where practical.",
+      "area": "Scripting",
+      "platform": "Cross-platform",
+      "validation_type": "Human smoke",
+      "validation_status": "Needs human pass",
+      "risk": "P2 medium",
+      "automation_candidate": "Codex GUI",
+      "requires_build": true
+    },
+    {
+      "title": "Verify audio recording playback and lip sync UI",
+      "body": "Run product-level audio workflows on real hardware, including recording, save, insert, audible playback, permission prompts, cancellation, selected output route, and lip-sync preview/timing. Backend and WAV-writer smokes are preflight only.",
+      "area": "File IO",
+      "platform": "Cross-platform",
+      "validation_type": "Human smoke",
+      "validation_status": "Needs human pass",
+      "risk": "P1 high",
+      "automation_candidate": "Needs triage",
+      "requires_build": true
+    },
+    {
+      "title": "Verify camera preview and stop motion capture",
+      "body": "Run live camera and stop-motion workflows on real hardware, including device enumeration, preview, still capture, scene insertion, device changes, and hotplug behavior.",
+      "area": "Drawing/input",
+      "platform": "Cross-platform",
+      "validation_type": "Studio field test",
+      "validation_status": "Studio field test",
+      "risk": "P1 high",
+      "automation_candidate": "No",
+      "requires_build": true
+    },
+    {
+      "title": "Verify tablet stylus pressure tilt and Windows pointer bridge",
+      "body": "Test pressure, tilt, hover, eraser, side buttons, device switching, latency, and Windows pointer-input bridge behavior on real tablet or stylus hardware.",
+      "area": "Tablet/input",
+      "platform": "Windows x64",
+      "validation_type": "Studio field test",
+      "validation_status": "Studio field test",
+      "risk": "P1 high",
+      "automation_candidate": "No",
+      "requires_build": true
+    },
+    {
+      "title": "Validate Linux Windows and macOS Qt 6 release packages",
+      "body": "Validate Linux AppImage, Windows package, macOS DMG, deploy-tool arguments, Qt module lists, plugins, multimedia backends, runtime library paths, helper executables, OpenGL behavior, and file associations after the Qt 6 Experimental Binary Builds workflow produces fresh artifacts.",
+      "area": "Cross-platform packaging",
+      "platform": "Cross-platform",
+      "validation_type": "Human smoke",
+      "validation_status": "Blocked by build",
+      "risk": "P1 high",
+      "automation_candidate": "Actions script",
+      "requires_build": true
+    },
+    {
+      "title": "Verify runtime translation and language switching",
+      "body": "Build translations, package them, switch UI language, restart, and spot-check localized UI. The Qt 6 translation build lane has prior evidence, but packaged runtime language switching remains a manual release check.",
+      "area": "Preferences",
+      "platform": "Cross-platform",
+      "validation_type": "Human smoke",
+      "validation_status": "Needs human pass",
+      "risk": "P2 medium",
+      "automation_candidate": "Needs triage",
+      "requires_build": true
+    },
+    {
+      "title": "Define Qt 6 release candidate signoff criteria",
+      "body": "Create and review release-candidate validation criteria covering supported platforms, Qt 5 baseline version, representative production scenes, known limitations, release blockers, user-facing docs, developer docs, and troubleshooting updates.",
+      "area": "Documentation",
+      "platform": "Cross-platform",
+      "validation_type": "Codex report review",
+      "validation_status": "Needs human pass",
+      "risk": "P2 medium",
+      "automation_candidate": "Codex GUI",
+      "requires_build": false
+    },
+    {
+      "title": "Studio field-test pass: creative workflow acceptance",
+      "body": "Reserve a human field-test pass for real creative workflows once CI, Codex smoke evidence, and targeted human smoke items are no longer blocking. Use representative production scenes and record accepted limitations explicitly.",
+      "area": "Drawing/input",
+      "platform": "Cross-platform",
+      "validation_type": "Studio field test",
+      "validation_status": "Studio field test",
+      "risk": "P2 medium",
+      "automation_candidate": "No",
+      "requires_build": true
+    }
+  ]
+}
