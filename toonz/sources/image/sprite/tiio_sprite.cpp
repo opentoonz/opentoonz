@@ -163,7 +163,7 @@ TLevelWriterSprite::~TLevelWriterSprite() {
 
     path = path.replace(".png", ".txt");
     QFile file(path);
-    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) return;
     QTextStream out(&file);
     out << "Total Images: " << m_imagesResized.size() << "\n";
     out << "Individual Image Width: " << resizedWidth << "\n";

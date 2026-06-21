@@ -513,6 +513,9 @@ Already covered:
 - Legacy `toonzfarm/tfarm/tbaseserver.cpp` Windows socket diagnostic messages
   now use bounded `snprintf()` formatting instead of unbounded `wsprintf()`,
   and the non-Windows send failure message is initialized before throwing.
+- Sprite sheet sidecar metadata writing now checks the `QFile::open()` result
+  before constructing the text stream, removing that Qt 6 build warning without
+  changing the successful `.txt` metadata output path.
 
 Still needed:
 
@@ -525,6 +528,8 @@ Still needed:
   `GL_SILENCE_DEPRECATION` at the CMake compile-definition boundary, so known
   legacy OpenGL/GLUT deprecation-warning noise should no longer obscure newer
   Qt 6 build diagnostics.
+  Updated local Qt 6 build evidence: `mise run build-qt6` passed on June 21,
+  2026, after the latest master merge recovery.
   Latest targeted app-target rebuild evidence after the combo-box activation,
   QImage mirrored/flipped, checkbox state-change, QWheelEvent pixel-delta, and
   QGLFormat scope slices: on June 5, 2026,
