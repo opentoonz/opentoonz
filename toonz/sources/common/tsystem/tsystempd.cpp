@@ -593,7 +593,10 @@ void TSystem::moveFileToRecycleBin(const TFilePath &fp) {
   // create file for the "Trash/info" folder
   QFile infoFile(trashInfoPath + FileName.completeBaseName() + "." + FileName.completeSuffix() + ".trashinfo");     // filename+extension+.trashinfo
 
-  infoFile.open(QIODevice::ReadWrite);
+  if (!infoFile.open(QIODevice::ReadWrite)) {
+    outputDebug("Could not create recycle bin metadata file.");
+    return;
+  }
 
   QTextStream stream(&infoFile);
 
