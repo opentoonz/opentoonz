@@ -6,7 +6,7 @@
 
 bool IsLeftMouseDown(void *message){
   NSEvent * event = (NSEvent*)message;
-  if([event type] == NSLeftMouseDown){
+  if([event type] == NSEventTypeLeftMouseDown){
     return true;
   }
   return false;
@@ -15,7 +15,7 @@ bool IsLeftMouseDown(void *message){
 
 bool IsLeftMouseUp(void *message){
   NSEvent * event = (NSEvent*)message;
-  if([event type] == NSLeftMouseUp){
+  if([event type] == NSEventTypeLeftMouseUp){
     return true;
   }
   return false;
@@ -24,7 +24,7 @@ bool IsLeftMouseUp(void *message){
 
 bool IsLeftMouseDragged(void *message){
   NSEvent * event = (NSEvent*)message;
-  if([event type] == NSLeftMouseDragged){
+  if([event type] == NSEventTypeLeftMouseDragged){
     return true;
   }
   return false;
@@ -34,17 +34,17 @@ bool IsLeftMouseDragged(void *message){
 void MonitorNSMouseEvent(void *message){
   NSEvent * event = (NSEvent*)message;
   switch ([event type]) {
-  case NSLeftMouseDown:
+  case NSEventTypeLeftMouseDown:
     std::cout << "Lv" << std::endl; break;
-  case NSLeftMouseUp:
+  case NSEventTypeLeftMouseUp:
     std::cout << "L^" << std::endl; break;
-  case NSRightMouseDown:
+  case NSEventTypeRightMouseDown:
     std::cout << "Rv" << std::endl; break;
-  case NSRightMouseUp:
+  case NSEventTypeRightMouseUp:
     std::cout << "R^" << std::endl; break;
-  case NSOtherMouseDown:
+  case NSEventTypeOtherMouseDown:
     std::cout << [event buttonNumber] << "v" << std::endl; break;
-  case NSOtherMouseUp:
+  case NSEventTypeOtherMouseUp:
     std::cout << [event buttonNumber] << "^" << std::endl; break;
   default:
     break;

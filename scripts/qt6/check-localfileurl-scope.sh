@@ -46,10 +46,20 @@ direct_desktop_services_from_local_file_hits="$(
     ':!toonz/sources/translations'
 )"
 
-if [[ -n "$direct_file_url_hits" || -n "$direct_desktop_services_from_local_file_hits" ]]; then
+direct_desktop_services_string_hits="$(
+  grep_hits git grep -nE \
+    -e 'QDesktopServices::openUrl[[:space:]]*\([[:space:]]*(QObject::tr|tr|QString)[[:space:]]*\(' -- \
+    'toonz/sources' \
+    ':!toonz/sources/translations'
+)"
+
+if [[ -n "$direct_file_url_hits" ||
+      -n "$direct_desktop_services_from_local_file_hits" ||
+      -n "$direct_desktop_services_string_hits" ]]; then
   printf '%s\n' "$direct_file_url_hits"
   printf '%s\n' "$direct_desktop_services_from_local_file_hits"
-  echo "error: use QtCompat::localFileUrl() for local file/folder URLs" >&2
+  printf '%s\n' "$direct_desktop_services_string_hits"
+  echo "error: use QtCompat::localFileUrl() for local file/folder URLs and explicit QUrl(...) for remote URLs" >&2
   exit 1
 fi
 

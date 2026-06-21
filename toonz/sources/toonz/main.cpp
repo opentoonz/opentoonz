@@ -11224,6 +11224,7 @@ static QStringList gui_smoke_viewer_selection_tool_vector_handles_details(
   bool scaleHoverDelivered  = false;
   int scaleCursorId         = ToolCursor::CURSOR_NONE;
   bool scaleCursorArtworkOk = false;
+  GuiSmokeCursorArtworkSignature scaleCursorArtwork;
   if (selectionRectOk && !selectionBBoxBeforeScale.isEmpty() &&
       viewer->rect().contains(scaleHandleLocal.toPoint())) {
     scaleHoverDelivered = gui_smoke_send_viewer_mouse_event(
@@ -11231,8 +11232,10 @@ static QStringList gui_smoke_viewer_selection_tool_vector_handles_details(
         Qt::NoModifier);
     scaleCursorId        = tool->getCursorId();
     scaleCursorArtworkOk = gui_smoke_tool_cursor_pixmap_ok(scaleCursorId);
+    scaleCursorArtwork   = gui_smoke_cursor_artwork_signature(scaleCursorId);
   }
   const bool selectionCursorOk = scaleHoverDelivered && scaleCursorArtworkOk &&
+                                 scaleCursorArtwork.ok &&
                                  (scaleCursorId == ToolCursor::ScaleCursor ||
                                   scaleCursorId == ToolCursor::ScaleInvCursor);
 
@@ -11310,6 +11313,8 @@ static QStringList gui_smoke_viewer_selection_tool_vector_handles_details(
       << QString("selectionScaleCursorArtwork=%1")
              .arg(scaleCursorArtworkOk ? QStringLiteral("ok")
                                        : QStringLiteral("error"))
+      << QString("selectionScaleCursorArtworkSignature=%1")
+             .arg(gui_smoke_cursor_artwork_summary(scaleCursorArtwork))
       << QString("selectionRectMouseEvents=%1")
              .arg(selectionRectMouseEventsDelivered ? QStringLiteral("ok")
                                                     : QStringLiteral("error"))
@@ -12711,6 +12716,7 @@ static QStringList gui_smoke_viewer_selection_tool_raster_handles_details(
   bool scaleHoverDelivered  = false;
   int scaleCursorId         = ToolCursor::CURSOR_NONE;
   bool scaleCursorArtworkOk = false;
+  GuiSmokeCursorArtworkSignature scaleCursorArtwork;
   if (selectionRectOk && !bboxBeforeScaleEmpty &&
       viewer->rect().contains(scaleHandleLocal.toPoint())) {
     scaleHoverDelivered = gui_smoke_send_viewer_mouse_event(
@@ -12718,8 +12724,10 @@ static QStringList gui_smoke_viewer_selection_tool_raster_handles_details(
         Qt::NoModifier);
     scaleCursorId        = tool->getCursorId();
     scaleCursorArtworkOk = gui_smoke_tool_cursor_pixmap_ok(scaleCursorId);
+    scaleCursorArtwork   = gui_smoke_cursor_artwork_signature(scaleCursorId);
   }
   const bool selectionCursorOk = scaleHoverDelivered && scaleCursorArtworkOk &&
+                                 scaleCursorArtwork.ok &&
                                  (scaleCursorId == ToolCursor::ScaleCursor ||
                                   scaleCursorId == ToolCursor::ScaleInvCursor);
 
@@ -12814,6 +12822,8 @@ static QStringList gui_smoke_viewer_selection_tool_raster_handles_details(
       << QString("selectionScaleCursorArtwork=%1")
              .arg(scaleCursorArtworkOk ? QStringLiteral("ok")
                                        : QStringLiteral("error"))
+      << QString("selectionScaleCursorArtworkSignature=%1")
+             .arg(gui_smoke_cursor_artwork_summary(scaleCursorArtwork))
       << QString("rasterPixelsBefore=%1").arg(rasterBefore.opaquePixels)
       << QString("rasterPixelsAfter=%1").arg(rasterAfter.opaquePixels)
       << QString("rasterRedPixelsBefore=%1").arg(rasterBefore.redPixels)
@@ -13163,25 +13173,10 @@ static bool gui_smoke_send_viewer_tablet_event(
   if (!viewer) return false;
 
   const QPointF globalPos = viewer->mapToGlobal(localPos.toPoint());
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-  static const QPointingDevice* smokeTabletDevice = [] {
-    QInputDevice::Capabilities capabilities =
-        QInputDevice::Capability::Position |
-        QInputDevice::Capability::Pressure | QInputDevice::Capability::XTilt |
-        QInputDevice::Capability::YTilt;
-    return new QPointingDevice(QStringLiteral("OpenToonz GUI smoke stylus"),
-                               0x746e7a36, QInputDevice::DeviceType::Stylus,
-                               QPointingDevice::PointerType::Pen, capabilities,
-                               1, 1);
-  }();
-  QTabletEvent event(type, smokeTabletDevice, localPos, globalPos, pressure,
-                     xTilt, yTilt, 0.0f, 0.0, 0.0f, Qt::NoModifier, button,
-                     buttons);
-#else
-  QTabletEvent event(type, localPos, globalPos, QTabletEvent::Stylus,
-                     QTabletEvent::Pen, pressure, xTilt, yTilt, 0.0, 0.0, 0,
-                     Qt::NoModifier, 0x746e7a36, button, buttons);
-#endif
+  QTabletEvent event = QtCompat::makeTabletEvent(
+      type, localPos, globalPos, QtCompat::TabletStylus, QtCompat::TabletPen,
+      pressure, xTilt, yTilt, 0.0, 0.0, 0, Qt::NoModifier, 0x746e7a36, button,
+      buttons);
   const bool delivered = QApplication::sendEvent(viewer, &event);
   gui_smoke_pump_events(30);
   return delivered;

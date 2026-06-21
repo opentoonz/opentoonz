@@ -196,10 +196,13 @@ Already covered:
   `mise run check-qt6-tabletevent-scope`, keeping those paths behind
   `QtCompat::tabletEventPositionF()`,
   `QtCompat::tabletEventGlobalPosition()`, and
-  `QtCompat::makeTabletEvent()`. The Windows pointer-input bridge now uses
-  the helper to preserve the existing synthetic pen/eraser, pressure, tilt,
-  rotation, and button fields across the Qt 5 and Qt 6 constructor split. This
-  does not replace manual hardware-tablet pressure and tilt validation.
+  `QtCompat::makeTabletEvent()`. The Windows pointer-input bridge and
+  app-side synthetic tablet GUI smoke now use the helper to preserve the
+  existing synthetic pen/eraser, pressure, tilt, rotation, and button fields
+  across the Qt 5 and Qt 6 constructor split. The guard also catches direct
+  local variable-style `QTabletEvent` construction so future smokes cannot
+  bypass the helper. This does not replace manual hardware-tablet pressure and
+  tilt validation.
 - The active `QtOfflineGL` offscreen context path now uses `QSurfaceFormat`
   for shared Qt 5/Qt 6 format setup instead of an unused legacy `QGLFormat`
   block. `mise run check-qt6-qglformat-scope` keeps `QGLFormat` limited to the
@@ -234,8 +237,10 @@ Already covered:
   those conversions centralized. The same slice also removed the unused legacy
   menu-bar URL opener that still pointed at a stale hardcoded local manual
   path. FX parameter help-file opening and media preview source URLs now use
-  the same helper; the lower-level system document opener remains outside this
-  `toonzqt` helper boundary.
+  the same helper; remote `QDesktopServices::openUrl()` calls now pass
+  explicit `QUrl(...)` values instead of relying on string conversion. The
+  lower-level system document opener remains outside this `toonzqt` helper
+  boundary.
 - Common direct mouse/context/drop-event coordinate access is now guarded by
   `mise run check-qt6-mouseevent-scope`, keeping direct `x()`, `y()`, `pos()`,
   `globalPos()`, `globalX()`, `globalY()`, `windowPos()`, `scenePosition()`,
@@ -427,6 +432,9 @@ Already covered:
 - macOS recycle-bin handling now uses Qt to resolve `~/.Trash` instead of
   deprecated Carbon `FSFindFolder` / `FSRefMakePath` lookup, keeping the
   existing rename/copy/delete fallback path.
+- The macOS mouse drag filter now uses modern `NSEventType*` constants instead
+  of deprecated AppKit `NS*Mouse*` event constants, guarded by
+  `mise run check-qt6-appkit-event-scope`.
 - Stop-motion camera-option sizing and legacy Pencil Test camera-label sizing
   now use `QtCompat::fontMetricsHorizontalAdvance()`, removing direct
   `QFontMetrics::width()` calls from that slice while preserving Qt 5 behavior.
@@ -471,7 +479,8 @@ Already covered:
   route through a version-aware helper that uses `QMetaType` on Qt 6 while
   preserving the Qt 5 `QMetaType::Type` path. `mise run
   check-qt6-qvariant-scope` keeps non-template `canConvert(...)` calls inside
-  that helper.
+  that helper instead of allowlisting the whole preferences implementation
+  file.
 - `mise run check-qt6-highdpi-attribute-scope` now guards that the Qt 5-only
   high-DPI startup attributes `AA_EnableHighDpiScaling` and
   `AA_UseHighDpiPixmaps` stay inside
@@ -629,10 +638,10 @@ Already covered:
   strict Level method arity for constructor, frame access, frame assignment,
   load, and save calls.
 - The ToonzRasterConverter smoke coverage now includes legacy bool coercion for
-  `flatSource`, instance `dispose()` behavior, post-dispose `flatSource`
-  persistence, static conversion after instance disposal, strict constructor
-  arity, strict `foo()` helper arity, and post-dispose rejection for instance
-  `convert()` and `foo()` calls.
+  `flatSource`, instance `dispose()` behavior, static conversion after instance
+  disposal, strict constructor arity, strict `foo()` helper arity, and
+  post-dispose rejection for instance `toString()`, `flatSource` reads/writes,
+  `convert()`, and `foo()` calls.
 - The vectorizer/rasterizer lifecycle smoke coverage now includes disposed
   `vectorize()` and `rasterize()` rejection, not only property and `toString()`
   rejection, and covers legacy bool coercion for representative
@@ -640,8 +649,9 @@ Already covered:
 - The Renderer smoke coverage now includes strict constructor arity,
   `renderScene()` / `renderFrame()` argument arity checks, strict
   `dumpCache()` arity, post-dispose error behavior for `toString()`,
-  `renderScene()`, `renderFrame()`, and `dumpCache()`, plus legacy non-array
-  `frames` / `columns` handling and integer-only frame/column selection
+  `frames`, `columns`, `renderScene()`, `renderFrame()`, and `dumpCache()`,
+  plus legacy pre-dispose `frames` / `columns` array identity, non-array
+  `frames` / `columns` handling, and integer-only frame/column selection
   validation that rejects fractional, non-finite, sparse, or otherwise
   malformed JavaScript list values before native integer conversion.
 - The ImageBuilder smoke covers legacy `ImageBuilder.clear()` returning
@@ -742,7 +752,10 @@ Already covered:
   sound feature.
 - `mise run check-qt6-multimedia-scope` now guards the current multimedia API
   boundary: `QSound` must not reappear, and Qt 5 video-surface APIs must remain
-  confined to the legacy 32-bit Qt 5 `penciltestpopup_qt.*` fallback. The
+  confined to the legacy 32-bit Qt 5 `penciltestpopup_qt.*` fallback. It also
+  keeps Qt 6-removed `QAudioFormat::setCodec("audio/pcm")` confined to the
+  audited Qt 5-only audio-format branches in sound playback, audio recording,
+  and sound-column format negotiation. The
   `toonz` CMake source split now explicitly keeps that fallback out of every
   Qt 6 lane by selecting the modern stop-motion/Pencil Test sources whenever
   `OPENTOONZ_QT_MAJOR` is 6, even if an unusual non-64-bit Qt 6 configuration
@@ -828,7 +841,8 @@ Still needed:
 - Real OS-level cursor delivery.
 - Full manual transform workflow parity.
 - Multi-object and multi-frame selection workflows.
-- Remaining cursor artwork outside the checked Animate/Edit cursor set.
+- Remaining cursor artwork outside the checked Animate/Edit cursor set and
+  Selection scale-handle cursor signatures.
 - Full drawing workflow parity, including repeated edits, undo/redo, save,
   reopen, and redraw behavior.
 - Real tablet/stylus hardware pressure, tilt, hover, eraser, buttons, and

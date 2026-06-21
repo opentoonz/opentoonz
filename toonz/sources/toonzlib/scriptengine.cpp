@@ -1051,6 +1051,13 @@ const char kBootstrapScript[] = R"JS(
     return imageBuilder.__imageBuilderId;
   }
 
+  function toonzRasterConverterId(converter) {
+    if (!(converter instanceof ToonzRasterConverter) ||
+        converter.__toonzRasterConverterId < 0)
+      throw new Error("Invalid ToonzRasterConverter object");
+    return converter.__toonzRasterConverterId;
+  }
+
   function outlineVectorizerId(vectorizer) {
     if (!(vectorizer instanceof OutlineVectorizer) ||
         vectorizer.__outlineVectorizerId < 0)
@@ -1524,6 +1531,7 @@ const char kBootstrapScript[] = R"JS(
   });
 
   ToonzRasterConverter.prototype.toString = function() {
+    toonzRasterConverterId(this);
     return "ToonzRasterConverter";
   };
 
@@ -1533,9 +1541,11 @@ const char kBootstrapScript[] = R"JS(
 
   Object.defineProperty(ToonzRasterConverter.prototype, "flatSource", {
     get: function() {
+      toonzRasterConverterId(this);
       return this.__flatSource;
     },
     set: function(value) {
+      toonzRasterConverterId(this);
       this.__flatSource = Boolean(value);
     }
   });
@@ -1543,16 +1553,14 @@ const char kBootstrapScript[] = R"JS(
   ToonzRasterConverter.prototype.foo = function(x) {
     if (arguments.length !== 1)
       throw new Error("ToonzRasterConverter.foo expected one argument");
-    if (this.__toonzRasterConverterId < 0)
-      throw new Error("Invalid ToonzRasterConverter object");
+    toonzRasterConverterId(this);
     return Number(x) * 2;
   };
 
   ToonzRasterConverter.prototype.convert = function(value) {
     if (arguments.length !== 1)
       throw new Error("Expected one argument (a raster Level or a raster Image)");
-    if (this.__toonzRasterConverterId < 0)
-      throw new Error("Invalid ToonzRasterConverter object");
+    toonzRasterConverterId(this);
     return ToonzRasterConverter.convert(value);
   };
 
@@ -1805,8 +1813,8 @@ const char kBootstrapScript[] = R"JS(
       throw new Error("Renderer constructor expected no arguments");
 
     this.__rendererId = ++nextRendererId;
-    this.frames = [];
-    this.columns = [];
+    this.__rendererFrames = [];
+    this.__rendererColumns = [];
   };
 
   function rendererList(value) {
@@ -1816,6 +1824,28 @@ const char kBootstrapScript[] = R"JS(
   Object.defineProperty(Renderer.prototype, "id", {
     get: function() {
       return this.__rendererId;
+    }
+  });
+
+  Object.defineProperty(Renderer.prototype, "frames", {
+    get: function() {
+      rendererId(this);
+      return this.__rendererFrames;
+    },
+    set: function(value) {
+      rendererId(this);
+      this.__rendererFrames = Array.isArray(value) ? value : [];
+    }
+  });
+
+  Object.defineProperty(Renderer.prototype, "columns", {
+    get: function() {
+      rendererId(this);
+      return this.__rendererColumns;
+    },
+    set: function(value) {
+      rendererId(this);
+      this.__rendererColumns = Array.isArray(value) ? value : [];
     }
   });
 

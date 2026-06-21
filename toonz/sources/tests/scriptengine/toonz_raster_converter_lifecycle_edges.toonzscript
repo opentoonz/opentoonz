@@ -28,11 +28,20 @@ var staticAfterDispose = ToonzRasterConverter.convert(source);
 var instanceConvertError = hasError(function() {
   converter.convert(source);
 }, "Invalid ToonzRasterConverter object");
-converter.flatSource = false;
+var toStringError = hasError(function() {
+  converter.toString();
+}, "Invalid ToonzRasterConverter object");
+var flatSourceReadError = hasError(function() {
+  var value = converter.flatSource;
+}, "Invalid ToonzRasterConverter object");
+var flatSourceWriteError = hasError(function() {
+  converter.flatSource = false;
+}, "Invalid ToonzRasterConverter object");
 
 print("qt-script-toonz-raster-converter-lifecycle-after", converter.id,
       instanceConvertError, staticAfterDispose.type, staticAfterDispose.width,
-      staticAfterDispose.height, converter.toString(), converter.flatSource);
+      staticAfterDispose.height, toStringError, flatSourceReadError,
+      flatSourceWriteError);
 
 staticAfterDispose.dispose();
 before.dispose();

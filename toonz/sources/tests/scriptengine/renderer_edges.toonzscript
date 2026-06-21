@@ -109,6 +109,16 @@ var nonArraySceneError = hasError(function() {
 print("qt-script-renderer-list-edges-non-arrays", nonArrayFrameError,
       nonArraySceneError);
 
+var frameSelection = [0];
+var columnSelection = [0];
+renderer.frames = frameSelection;
+renderer.columns = columnSelection;
+frameSelection.push(1);
+columnSelection.push(1);
+print("qt-script-renderer-list-edges-array-identity",
+      renderer.frames === frameSelection, renderer.frames.join(","),
+      renderer.columns === columnSelection, renderer.columns.join(","));
+
 level.dispose();
 builder.dispose();
 scene.dispose();

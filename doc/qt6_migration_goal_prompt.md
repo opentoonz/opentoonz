@@ -205,8 +205,10 @@ branch.
   those local-file URL conversions centralized. The same slice also removed
   the unused legacy menu-bar URL opener that still pointed at a stale
   hardcoded local manual path. FX parameter help-file opening and media preview
-  source URLs now use the same helper; the lower-level system document opener
-  remains outside this `toonzqt` helper boundary.
+  source URLs now use the same helper; remote `QDesktopServices::openUrl()`
+  calls now pass explicit `QUrl(...)` values instead of relying on string
+  conversion. The lower-level system document opener remains outside this
+  `toonzqt` helper boundary.
 - The recent flipbook image loader no longer uses Qt 6-deprecated
   `QAction::parentWidget()` and now casts the action `parent()` instead.
   `mise run check-qt6-qaction-scope` guards that QAction parent-widget warning
@@ -398,6 +400,10 @@ branch.
   Carbon `FSFindFolder` / `FSRefMakePath` trash-folder lookup. It resolves the
   current user's `~/.Trash` through Qt and keeps the existing rename/copy/delete
   fallback behavior.
+- The macOS mouse drag filter no longer uses deprecated AppKit `NS*Mouse*`
+  event constants. `mousedragfilter.mm` now uses the modern `NSEventType*`
+  constants, and `mise run check-qt6-appkit-event-scope` keeps the deprecated
+  constants out of `toonz/sources`.
 - Stop-motion and legacy Pencil Test sizing code now routes font text
   measurement through `QtCompat::fontMetricsHorizontalAdvance()`, so Qt 6 avoids
   deprecated `QFontMetrics::width()` while the Qt 5 lane keeps the compatible
@@ -442,10 +448,12 @@ branch.
   `mise run check-qt6-tabletevent-scope`, keeping those paths behind
   `QtCompat::tabletEventPositionF()`,
   `QtCompat::tabletEventGlobalPosition()`, and
-  `QtCompat::makeTabletEvent()`. The Windows pointer-input bridge now creates
-  synthetic tablet events through that helper; Qt 6 uses a synthetic
-  `QPointingDevice`, while Qt 5 keeps the existing `QTabletEvent` constructor
-  path. This is source-level guard coverage; real hardware pressure/tilt
+  `QtCompat::makeTabletEvent()`. The Windows pointer-input bridge and app-side
+  synthetic tablet GUI smoke now create tablet events through that helper; Qt 6
+  uses a synthetic `QPointingDevice`, while Qt 5 keeps the existing
+  `QTabletEvent` constructor path. The guard also catches direct local
+  variable-style `QTabletEvent` construction so future smokes cannot bypass the
+  helper. This is source-level guard coverage; real hardware pressure/tilt
   validation remains manual.
 - Direct mouse/context/drop-event coordinate access is now guarded by
   `mise run check-qt6-mouseevent-scope`, keeping stale `x()`, `y()`, `pos()`,
@@ -468,7 +476,8 @@ branch.
   templated `canConvert<T>()` checks, and dynamic preference type checks route
   through a version-aware helper that uses `QMetaType` on Qt 6 while preserving
   the Qt 5 `QMetaType::Type` path. `mise run check-qt6-qvariant-scope` keeps
-  non-template `canConvert(...)` calls inside that helper.
+  non-template `canConvert(...)` calls inside that helper instead of
+  allowlisting the whole preferences implementation file.
 - The Qt 6 startup path no longer sets the removed/deprecated high-DPI
   application attributes; Qt 6 uses its always-on high-DPI behavior, while the
   Qt 5 lane keeps the existing attributes. The translator startup path also
@@ -547,7 +556,10 @@ branch.
   sound feature.
 - `mise run check-qt6-multimedia-scope` now guards the current multimedia API
   boundary: `QSound` must not reappear, and Qt 5 video-surface APIs must remain
-  confined to the legacy 32-bit Qt 5 `penciltestpopup_qt.*` fallback. The
+  confined to the legacy 32-bit Qt 5 `penciltestpopup_qt.*` fallback. The guard
+  also keeps Qt 6-removed `QAudioFormat::setCodec("audio/pcm")` confined to
+  the audited Qt 5-only audio-format branches in sound playback, audio
+  recording, and sound-column format negotiation. The
   `toonz` CMake source split now explicitly keeps that fallback out of every
   Qt 6 lane by selecting the modern stop-motion/Pencil Test sources whenever
   `OPENTOONZ_QT_MAJOR` is 6, even if an unusual non-64-bit Qt 6 configuration
@@ -2075,10 +2087,10 @@ branch.
   `toonz/sources/tests/scriptengine/toonz_raster_converter_lifecycle_edges.toonzscript`
   and is run by
   `mise run script-smoke-toonz-raster-converter-lifecycle-edges-qt6`. It
-  validates instance `convert()` rejection after `dispose()`, disposed id
-  reporting, stable `toString()` behavior, legacy bool coercion for the
-  `flatSource` property, post-dispose `flatSource` persistence, and continued
-  static `ToonzRasterConverter.convert()` behavior.
+  validates disposed id reporting, post-dispose rejection for instance
+  `toString()`, `flatSource` reads/writes, and `convert()`, legacy bool
+  coercion for the `flatSource` property before disposal, and continued static
+  `ToonzRasterConverter.convert()` behavior.
 - An eleventh Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/outline_vectorizer.toonzscript` and is run
   by `mise run script-smoke-outline-vectorizer-qt6`. It validates the first
@@ -2173,14 +2185,16 @@ branch.
   renderer path. It also validates integer-only frame/column selection lists so
   fractional, non-finite, sparse, or otherwise malformed JavaScript values
   cannot be truncated at the native Qt boundary, while preserving the legacy
-  behavior that non-array `frames` / `columns` properties are treated as empty
-  selection lists.
+  behavior that assigned `frames` / `columns` arrays stay mutable by reference
+  and non-array `frames` / `columns` properties are treated as empty selection
+  lists.
 - A Renderer lifecycle edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/renderer_lifecycle_edges.toonzscript` and
   is run by `mise run script-smoke-renderer-lifecycle-edges-qt6`. It validates
-  that `Renderer.toString()`, `renderScene()`, `renderFrame()`, and
-  `dumpCache()` reject use after `Renderer.dispose()` while preserving the
-  script-owned `frames` and `columns` arrays.
+  that `Renderer.toString()`, `frames`, `columns`, `renderScene()`,
+  `renderFrame()`, and `dumpCache()` reject use after `Renderer.dispose()`.
+  Before disposal, `frames` and `columns` still keep legacy list behavior,
+  including treating non-array assignment as an empty selection list.
 - A fourteenth Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/wrapper_id.toonzscript` and is run by
   `mise run script-smoke-wrapper-id-qt6`. It validates inherited Wrapper `id`
@@ -2418,10 +2432,12 @@ branch.
   Animate/Edit tool overlay, direct transform-drag, Qt mouse-event transform,
   and undo-redo/modifier-key/handle hit-test/handle-variant/active-axis
   transform smokes, mode-cursor feedback plus cursor artwork signatures,
-  Selection tool vector rectangular selection, scale-handle dragging, and
+  Selection tool vector rectangular selection, scale-handle dragging with
+  cursor artwork signatures, and
   edge-scale/rotation/center/thickness/free-deform handle variants,
   vector Selection Freehand/Polyline mode variants,
-  raster Selection rectangular selection and scale-handle dragging,
+  raster Selection rectangular selection and scale-handle dragging with
+  cursor artwork signatures,
   vector/full-color raster direct-tool brush smokes, Previewer/FX Preview
   render-cache and flipbook-control smokes, and a `SceneViewer` Qt mouse-event
   plus synthetic tablet-event raster brush smoke exist, but real
@@ -2431,7 +2447,8 @@ branch.
   selection workflows beyond vector rectangular/freehand/polyline mode coverage,
   vector scale/edge/rotation/center/thickness/free-deform handle paths, and
   raster rectangular/freehand/polyline app-side paths,
-  remaining cursor artwork outside the checked Animate/Edit mode cursor set,
+  remaining cursor artwork outside the checked Animate/Edit mode cursor set and
+  Selection scale-handle cursor signatures,
   real OS-level transform dragging, remaining manual ruler-guide variants not
   covered by app-side
   create/move/delete/drag-hide, guide-line visual variants beyond app-side
@@ -2489,7 +2506,8 @@ The next slice should make the Qt 6 app useful enough to run and diagnose:
    vector rectangular/freehand/polyline mode coverage, vector
    scale/edge/rotation/center/thickness/free-deform handle paths, and raster
    rectangular/freehand/polyline app-side paths, real OS-level cursor delivery,
-   remaining cursor artwork outside the checked Animate/Edit mode cursor set,
+   remaining cursor artwork outside the checked Animate/Edit mode cursor set
+   and Selection scale-handle cursor signatures,
    real OS-level transform dragging,
    manual Preview/FX Preview UI, manual preview-save popup/overwrite/warning
    dialogs, production FX-heavy preview scenes,

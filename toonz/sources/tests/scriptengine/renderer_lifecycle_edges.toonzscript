@@ -19,6 +19,14 @@ renderer.dispose();
 var scene = new Scene();
 var errors = [
   hasError(function() { renderer.toString(); }, "Invalid Renderer object"),
+  hasError(function() { var value = renderer.frames; },
+           "Invalid Renderer object"),
+  hasError(function() { renderer.frames = [4]; },
+           "Invalid Renderer object"),
+  hasError(function() { var value = renderer.columns; },
+           "Invalid Renderer object"),
+  hasError(function() { renderer.columns = [2]; },
+           "Invalid Renderer object"),
   hasError(function() { renderer.renderScene(scene); },
            "Invalid Renderer object"),
   hasError(function() { renderer.renderFrame(scene, 0); },
@@ -26,8 +34,7 @@ var errors = [
   hasError(function() { renderer.dumpCache(); }, "Invalid Renderer object")
 ];
 
-print("qt-script-renderer-lifecycle-after", renderer.id, errors,
-      renderer.frames.join(","), renderer.columns.join(","));
+print("qt-script-renderer-lifecycle-after", renderer.id, errors);
 
 scene.dispose();
 

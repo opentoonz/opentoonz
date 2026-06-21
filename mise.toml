@@ -154,6 +154,10 @@ run = "bash scripts/qt6/check-qglformat-scope.sh"
 description = "Fail if legacy QGLContext or QGLPixelBuffer APIs escape the Qt 5-only OpenGL compatibility scope."
 run = "bash scripts/qt6/check-qgllegacy-scope.sh"
 
+[tasks.check-qt6-appkit-event-scope]
+description = "Fail if deprecated AppKit NS*Mouse* event constants reappear."
+run = "bash scripts/qt6/check-appkit-event-scope.sh"
+
 [tasks.check-qt6-modern-qt-macros]
 description = "Fail if source uses legacy Qt compatibility macros instead of C++17 override/final/nullptr."
 run = "bash scripts/qt6/check-modern-qt-macros.sh"
@@ -664,7 +668,7 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/toonz_raster_co
 
 [tasks.script-smoke-toonz-raster-converter-lifecycle-edges-qt6]
 description = "Run the Qt 6 app bundle against ToonzRasterConverter dispose and static conversion behavior."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/toonz_raster_converter_lifecycle_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-toonz-raster-converter-lifecycle-before true ToonzRasterConverter true false true ToonzRaster 32 32|qt-script-toonz-raster-converter-lifecycle-after -1 true ToonzRaster 32 32 ToonzRasterConverter false' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/toonz_raster_converter_lifecycle_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-toonz-raster-converter-lifecycle-before true ToonzRasterConverter true false true ToonzRaster 32 32|qt-script-toonz-raster-converter-lifecycle-after -1 true ToonzRaster 32 32 true true true' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-outline-vectorizer-qt6]
 description = "Run the Qt 6 app bundle against the OutlineVectorizer headless script binding fixture."
@@ -708,11 +712,11 @@ run = "OPENTOONZ_SCRIPT_USE_QAPPLICATION=1 OPENTOONZ_SCRIPT_FIXTURE=toonz/source
 
 [tasks.script-smoke-renderer-edges-qt6]
 description = "Run the Qt 6 app bundle against Renderer argument edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/renderer_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-renderer-edges-errors [true,true,true,true,true,true,true,true,true,true,true,true,true]|qt-script-renderer-list-edges-errors [true,true,true,true,true,true,true,true,true,true]|qt-script-renderer-list-edges-non-arrays true true' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/renderer_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-renderer-edges-errors [true,true,true,true,true,true,true,true,true,true,true,true,true]|qt-script-renderer-list-edges-errors [true,true,true,true,true,true,true,true,true,true]|qt-script-renderer-list-edges-non-arrays true true|qt-script-renderer-list-edges-array-identity true 0,1 true 0,1' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-renderer-lifecycle-edges-qt6]
 description = "Run the Qt 6 app bundle against Renderer dispose and post-dispose error behavior."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/renderer_lifecycle_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-renderer-lifecycle-before true Renderer 0,2 1|qt-script-renderer-lifecycle-after -1 [true,true,true,true] 0,2 1' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/renderer_lifecycle_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-renderer-lifecycle-before true Renderer 0,2 1|qt-script-renderer-lifecycle-after -1 [true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-level-transformers-qt6]
 description = "Run the Qt 6 app bundle against level-wide vectorizer and rasterizer binding fixtures."

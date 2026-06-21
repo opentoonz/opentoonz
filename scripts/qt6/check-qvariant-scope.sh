@@ -24,12 +24,25 @@ grep_hits() {
 qvariant_hits="$(
   grep_hits git grep -nE -e '[.]canConvert[[:space:]]*\(' -- \
     'toonz/sources' \
-    ':!toonz/sources/toonzlib/preferences.cpp' \
     ':!toonz/sources/translations'
 )"
 
+unexpected_qvariant_hits=""
 if [[ -n "$qvariant_hits" ]]; then
-  printf '%s\n' "$qvariant_hits"
+  while IFS= read -r hit; do
+    case "$hit" in
+      'toonz/sources/toonzlib/preferences.cpp:'*'return value.canConvert(QMetaType(type));' | \
+      'toonz/sources/toonzlib/preferences.cpp:'*'return value.canConvert(type);')
+        ;;
+      *)
+        unexpected_qvariant_hits+="${hit}"$'\n'
+        ;;
+    esac
+  done <<<"$qvariant_hits"
+fi
+
+if [[ -n "$unexpected_qvariant_hits" ]]; then
+  printf '%s' "$unexpected_qvariant_hits"
   echo "error: use QVariant::canConvert<T>() or a local Qt-version helper instead of non-template canConvert()" >&2
   exit 1
 fi
