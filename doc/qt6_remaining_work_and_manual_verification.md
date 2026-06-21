@@ -510,6 +510,9 @@ Already covered:
   existing `QTextStream::setCodec("UTF-8")` behavior inside the compatibility
   helper. `mise run check-qt6-qtextstream-scope` guards direct text-stream
   codec calls in feature code.
+- `mise run check-qt6-qiodevice-open-scope` now guards the warning frontier for
+  ignored Qt I/O open results by failing on bare `QIODevice` / `QFile`
+  `open()` calls whose return values are not checked.
 - Legacy `toonzfarm/tfarm/tbaseserver.cpp` Windows socket diagnostic messages
   now use bounded `snprintf()` formatting instead of unbounded `wsprintf()`,
   and the non-Windows send failure message is initialized before throwing.
@@ -1017,6 +1020,7 @@ mise run check-qt6-buttongroup-scope
 mise run check-qt6-wheelevent-scope
 mise run check-qt6-graphicssceneevent-scope
 mise run check-qt6-qtextstream-scope
+mise run check-qt6-qiodevice-open-scope
 mise run check-qt6-qaction-scope
 mise run check-qt6-qcolor-scope
 mise run check-qt6-qimage-mirrored-scope

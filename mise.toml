@@ -58,6 +58,10 @@ run = "bash scripts/qt6/check-fontmetrics-scope.sh"
 description = "Fail if direct QTextStream::setCodec() usage escapes QtCompat."
 run = "bash scripts/qt6/check-qtextstream-scope.sh"
 
+[tasks.check-qt6-qiodevice-open-scope]
+description = "Fail if QIODevice/QFile open results are ignored."
+run = "bash scripts/qt6/check-qiodevice-open-scope.sh"
+
 [tasks.check-qt6-fontdatabase-scope]
 description = "Fail if deprecated direct QFontDatabase or QTextCharFormat font-family APIs reappear."
 run = "bash scripts/qt6/check-fontdatabase-scope.sh"
