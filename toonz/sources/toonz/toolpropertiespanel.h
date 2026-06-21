@@ -27,12 +27,18 @@ class ToolPropertyButton : public QToolButton {
   
   bool m_showBorders;
   bool m_showBackgrounds;
+  int m_compactIconSize = 0;  // >0: highlight/hover only around icon (px)
   
 public:
   ToolPropertyButton(const QString &text, QWidget *parent = nullptr);
   
   void setShowBorders(bool show) { m_showBorders = show; update(); }
   void setShowBackgrounds(bool show) { m_showBackgrounds = show; update(); }
+  // Compact highlight: keeps hit area, draws theme state on a smaller centered rect.
+  void setCompactIconHighlight(int iconSize) {
+    m_compactIconSize = iconSize;
+    update();
+  }
   
 protected:
   void paintEvent(QPaintEvent *event) override;
@@ -43,6 +49,7 @@ class TTool;
 class ToolHandle;
 class TApplication;
 class TStringProperty;
+class TEnumProperty;
 class TXsheetHandle;
 class TObjectHandle;
 class QSpinBox;
@@ -126,7 +133,7 @@ class ToolPropertiesPanel : public TPanel {
   bool m_showNumericFields;    // Show/hide numeric fields
   bool m_showBorders;          // Show/hide option borders in collapsible menus
   bool m_showBackgrounds;      // Show/hide option backgrounds in collapsible menus
-  bool m_showIcons;            // Show/hide icons in Cap/Join options
+  bool m_showIcons;            // Icon grid replaces collapsible enums when possible
   
 public:
   ToolPropertiesPanel(QWidget *parent = nullptr);
@@ -218,6 +225,10 @@ private:
   void updatePlasticRelayFields();
   void createAnimateProperties();
   void updateAnimateColumnPicker();
+  QWidget *createEnumIconGridPanel(
+      const QString &label, TEnumProperty *enumProp, const std::string &propName,
+      int propGroup = 0, QWidget *parentWidget = nullptr,
+      const std::function<void(int)> &onChanged = nullptr);
 
   // Eraser properties (3 variants: vector / toonz-raster / fullcolor-raster)
   void createEraserProperties();
@@ -277,6 +288,11 @@ private:
   QWidget* createCollapsibleEnumWithIcons(const QString &label, const QStringList &items,
                                           int currentIndex, const std::string &propName,
                                           const QStringList &iconNames);
+  QWidget *createCollapsibleEnumForProperty(
+      const QString &label, TEnumProperty *enumProp, const std::string &propName,
+      int propGroup = 0, const QString &headerIconName = QString(),
+      const std::function<void(int)> &onChanged = nullptr,
+      bool reserveHeaderRightSlot = false, QWidget *parentWidget = nullptr);
   void addShowHideContextMenu(QMenu *menu);
   
   // Container stylesheet management for Cells Borders/Backgrounds

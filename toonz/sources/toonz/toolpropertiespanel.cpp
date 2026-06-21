@@ -137,6 +137,31 @@ void setCollapsedStateInEnv(const std::string &propName, bool expanded) {
 
 }  // namespace
 
+namespace {
+
+// Same cell fill as ToolPropertyButton in collapsible enum menus.
+QColor tppCollapsibleCellBackground(const QColor &panelBg) {
+  if (!panelBg.isValid()) return panelBg;
+  if (panelBg.lightness() > 128) return panelBg.darker(105);
+  return panelBg.lighter(108);
+}
+
+QColor tppCollapsibleCellPanelBackground(const QWidget *widget) {
+  if (!widget) return QColor();
+  // Use the same panel surface as collapsible pickers (toolOptionsPanel), not a
+  // styled QFrame parent whose palette can read too dark under stylesheets.
+  for (const QWidget *w = widget; w; w = w->parentWidget()) {
+    if (w->objectName() == QLatin1String("toolOptionsPanel"))
+      return w->palette().color(QPalette::Window);
+  }
+  QColor panelBg = widget->palette().color(QPalette::Window);
+  if (widget->parentWidget())
+    panelBg = widget->parentWidget()->palette().color(QPalette::Window);
+  return panelBg;
+}
+
+}  // namespace
+
 //=============================================================================
 // ToolPropertyButton - Custom button with theme-aware painting
 //=============================================================================
@@ -161,6 +186,44 @@ void ToolPropertyButton::paintEvent(QPaintEvent *event) {
   QPainter painter(this);
   painter.setRenderHint(QPainter::Antialiasing);
 
+  // Compact highlight: theme colors on a small centered pill, icon size unchanged.
+  if (m_compactIconSize > 0) {
+    constexpr int kCompactHighlightPad = 4;
+    const int hlSize =
+        m_compactIconSize + kCompactHighlightPad * 2;
+    const QRect hlRect((width() - hlSize) / 2, (height() - hlSize) / 2, hlSize,
+                       hlSize);
+
+    // Full cell fill first — same layer as collapsible enum rows (Column, etc.).
+    if (m_showBackgrounds) {
+      painter.setPen(Qt::NoPen);
+      painter.setBrush(
+          tppCollapsibleCellBackground(tppCollapsibleCellPanelBackground(this)));
+      painter.drawRect(rect());
+    }
+
+    if (useThemeState) {
+      QStyleOptionToolButton hlOpt = opt;
+      hlOpt.rect = QRect(0, 0, hlRect.width(), hlRect.height());
+      painter.save();
+      painter.translate(hlRect.topLeft());
+      style()->drawComplexControl(QStyle::CC_ToolButton, &hlOpt, &painter, this);
+      painter.restore();
+    }
+
+    style()->drawControl(QStyle::CE_ToolButtonLabel, &opt, &painter, this);
+
+    if (m_showBorders) {
+      QColor borderColor = palette().color(QPalette::Mid);
+      QPen borderPen(borderColor);
+      borderPen.setWidthF(0.5);
+      painter.setPen(borderPen);
+      painter.setBrush(Qt::NoBrush);
+      painter.drawRect(rect().adjusted(0, 0, -1, -1));
+    }
+    return;
+  }
+
   if (useThemeState) {
     // Hover/checked/pressed: let QSS draw full button to match theme colors
     style()->drawComplexControl(QStyle::CC_ToolButton, &opt, &painter, this);
@@ -169,20 +232,9 @@ void ToolPropertyButton::paintEvent(QPaintEvent *event) {
 
   // Normal state: draw background based on Cells Backgrounds option
   if (m_showBackgrounds) {
-    QColor panelBg = palette().color(QPalette::Window);
-    if (QWidget *parent = parentWidget()) {
-      panelBg = parent->palette().color(QPalette::Window);
-    }
-
-    QColor bgColor = panelBg;
-    if (panelBg.lightness() > 128) {
-      bgColor = panelBg.darker(105);
-    } else {
-      bgColor = panelBg.lighter(108);
-    }
-
     painter.setPen(Qt::NoPen);
-    painter.setBrush(bgColor);
+    painter.setBrush(
+        tppCollapsibleCellBackground(tppCollapsibleCellPanelBackground(this)));
     painter.drawRect(rect());
   }
 
@@ -218,7 +270,7 @@ ToolPropertiesPanel::ToolPropertiesPanel(QWidget *parent)
     , m_showNumericFields(true)    // Show numeric fields by default
     , m_showBorders(true)          // Show option borders by default
     , m_showBackgrounds(true)      // Show option backgrounds by default
-    , m_showIcons(true) {          // Show Cap/Join icons by default
+    , m_showIcons(true) {          // Icon grid replaces collapsible enums when possible
   
   // Load preferences from TEnv
   m_useSingleMaxSlider = ToolPropertiesUseSingleMaxSlider != 0;
@@ -1021,10 +1073,7 @@ void ToolPropertiesPanel::createCapProperty() {
     if (!props) return;
   }
   
-  // Cap icon names corresponding to the enum items
-  QStringList capIcons;
-  capIcons << "butt_cap" << "round_cap" << "projecting_cap";
-  
+  // Cap icon names are stored on TEnumProperty items (or resolved from values).
   // Search for Cap Style property
   for (int i = 0; i < props->getPropertyCount(); ++i) {
     TProperty *prop = props->getProperty(i);
@@ -1034,21 +1083,10 @@ void ToolPropertiesPanel::createCapProperty() {
     
     if (propName == "Cap:" || propName == "Cap" || propName == "CapStyle" || propName == "Cap Style:" || propName == "Cap Style") {
       TEnumProperty *enumProp = dynamic_cast<TEnumProperty*>(prop);
-      if (enumProp) {
-        QStringList items;
-        const TEnumProperty::Items &enumItems = enumProp->getItems();
-        for (int j = 0; j < enumItems.size(); ++j) {
-          items << enumItems[j].UIName;
-        }
-        int currentIndex = enumProp->getIndex();
-        
-        // Only create widget if we have items
-        if (items.size() > 0) {
-          // Use standard collapsible enum but add icons if m_showIcons is true
-          QWidget *widget = createCollapsibleEnumWithIcons(tr("Cap"), items, currentIndex, propName, capIcons);
-          widget->setProperty("propGroup", 1);  // Cap is in group 1
-          m_propertiesLayout->addWidget(widget);
-        }
+      if (enumProp && enumProp->getItems().size() > 0) {
+        QWidget *widget =
+            createCollapsibleEnumForProperty(tr("Cap"), enumProp, propName, 1);
+        if (widget) m_propertiesLayout->addWidget(widget);
         return;
       }
     }
@@ -1066,10 +1104,7 @@ void ToolPropertiesPanel::createJoinProperty() {
     if (!props) return;
   }
   
-  // Join icon names corresponding to the enum items
-  QStringList joinIcons;
-  joinIcons << "miter_join" << "round_join" << "bevel_join";
-  
+  // Join icon names are stored on TEnumProperty items (or resolved from values).
   // Search for Join Style property
   for (int i = 0; i < props->getPropertyCount(); ++i) {
     TProperty *prop = props->getProperty(i);
@@ -1079,21 +1114,10 @@ void ToolPropertiesPanel::createJoinProperty() {
     
     if (propName == "Join:" || propName == "Join" || propName == "JoinStyle" || propName == "Join Style:" || propName == "Join Style") {
       TEnumProperty *enumProp = dynamic_cast<TEnumProperty*>(prop);
-      if (enumProp) {
-        QStringList items;
-        const TEnumProperty::Items &enumItems = enumProp->getItems();
-        for (int j = 0; j < enumItems.size(); ++j) {
-          items << enumItems[j].UIName;
-        }
-        int currentIndex = enumProp->getIndex();
-        
-        // Only create widget if we have items
-        if (items.size() > 0) {
-          // Use collapsible enum with icons if m_showIcons is true
-          QWidget *widget = createCollapsibleEnumWithIcons(tr("Join"), items, currentIndex, propName, joinIcons);
-          widget->setProperty("propGroup", 1);  // Join is in group 1
-          m_propertiesLayout->addWidget(widget);
-        }
+      if (enumProp && enumProp->getItems().size() > 0) {
+        QWidget *widget =
+            createCollapsibleEnumForProperty(tr("Join"), enumProp, propName, 1);
+        if (widget) m_propertiesLayout->addWidget(widget);
         return;
       }
     }
@@ -3086,6 +3110,284 @@ QWidget* ToolPropertiesPanel::createCollapsibleEnumWithIcons(
   return container;
 }
 
+namespace {
+
+// Enum icon grid — 3-column framed panel (replaces collapsible enum when Show Icons is on).
+constexpr int kEnumIconGridCols        = 3;
+constexpr int kEnumIconGridBtnSize     = 40;
+constexpr int kEnumIconGridIconSize    = 20;
+constexpr int kEnumIconGridFrameRadius = 6;
+constexpr int kEnumIconGridFramePad    = 8;
+constexpr int kEnumIconGridSpacingH    = 10;
+constexpr int kEnumIconGridSpacingV    = 8;
+constexpr int kEnumIconGridLabelGap    = 3;  // air below label descenders (g, p, q)
+
+void applyEnumIconGridFrameStyle(QFrame *frame, bool showBorder,
+                                 bool showBackground, const QPalette &pal) {
+  Q_UNUSED(showBackground);
+  frame->setFrameShape(QFrame::NoFrame);
+  QStringList rules;
+  // Cell backgrounds are drawn per icon button (same as collapsible enum cells).
+  rules << QStringLiteral("background-color: transparent");
+  if (showBorder) {
+    rules << QStringLiteral("border: 1px solid %1")
+                 .arg(pal.color(QPalette::Mid).name());
+  } else {
+    rules << QStringLiteral("border: none");
+  }
+  rules << QStringLiteral("border-radius: %1px").arg(kEnumIconGridFrameRadius);
+  frame->setStyleSheet(QStringLiteral("QFrame#tppEnumIconGridFrame { %1 }")
+                           .arg(rules.join("; ")));
+}
+
+// Resolve SVG icon name for enum items that do not carry iconName in the tool source.
+QString resolveEnumItemIcon(TTool *tool, const std::string &propName,
+                            const std::wstring &value) {
+  const QString v  = QString::fromStdWString(value);
+  const QString pn = QString::fromStdString(propName);
+
+  if (v.endsWith(QStringLiteral("_cap"), Qt::CaseInsensitive) ||
+      v.endsWith(QStringLiteral("_join"), Qt::CaseInsensitive))
+    return v;
+
+  if (!tool) return QString();
+  const QString tid = QString::fromStdString(tool->getName());
+
+  if (pn == QLatin1String("Shape:") || pn == QLatin1String("Shape")) {
+    if (v == QLatin1String("Rectangle"))
+      return QStringLiteral("geometric_rectangle");
+    if (v == QLatin1String("Circle")) return QStringLiteral("geometric_circle");
+    if (v == QLatin1String("Ellipse"))
+      return QStringLiteral("geometric_ellipse");
+    if (v == QLatin1String("Line")) return QStringLiteral("geometric_line");
+    if (v == QLatin1String("Polyline"))
+      return QStringLiteral("geometric_polyline");
+    if (v == QLatin1String("Arc")) return QStringLiteral("geometric_arc");
+    if (v == QLatin1String("MultiArc"))
+      return QStringLiteral("geometric_multiarc");
+    if (v == QLatin1String("Polygon"))
+      return QStringLiteral("geometric_polygon");
+    return QString();
+  }
+
+  if (pn == QLatin1String("Type:") || pn == QLatin1String("Type")) {
+    QString prefix;
+    if (tid == QLatin1String(T_Fill))
+      prefix = QStringLiteral("fill_");
+    else if (tid == QLatin1String(T_Eraser))
+      prefix = QStringLiteral("eraser_");
+    else if (tid == QLatin1String(T_Tape))
+      prefix = QStringLiteral("tape_");
+    else if (tid == QLatin1String(T_Selection))
+      prefix = QStringLiteral("selection_");
+
+    if (prefix.isEmpty()) return QString();
+
+    if (v == QLatin1String("Normal")) return prefix + QStringLiteral("normal");
+    if (v == QLatin1String("Rectangular"))
+      return prefix + QStringLiteral("rectangular");
+    if (v == QLatin1String("Freehand"))
+      return prefix + QStringLiteral("freehand");
+    if (v == QLatin1String("Polyline"))
+      return prefix + QStringLiteral("polyline");
+    if (v == QLatin1String("Freepick"))
+      return prefix + QStringLiteral("freepick");
+    if (v == QLatin1String("Segment"))
+      return prefix + QStringLiteral("segment");
+    return QString();
+  }
+
+  if (pn == QLatin1String("Mode:") || pn == QLatin1String("Mode")) {
+    if (tid == QLatin1String(T_Fill) || tid == QLatin1String(T_Eraser) ||
+        tid == QLatin1String(T_PaintBrush) || tid == QLatin1String(T_Finger) ||
+        tid == QLatin1String(T_StylePicker)) {
+      if (v == QLatin1String("Lines"))
+        return QStringLiteral("fill_mode_lines");
+      if (v == QLatin1String("Areas"))
+        return QStringLiteral("fill_mode_areas");
+      if (v == QLatin1String("Lines & Areas"))
+        return QStringLiteral("fill_mode_lines_areas");
+    }
+    if (tid == QLatin1String(T_Tape)) {
+      if (v == QLatin1String("Endpoint to Endpoint"))
+        return QStringLiteral("tape_end_to_end");
+      if (v == QLatin1String("Endpoint to Line"))
+        return QStringLiteral("tape_end_to_line");
+      if (v == QLatin1String("Line to Line"))
+        return QStringLiteral("tape_line_to_line");
+    }
+    if (tid == QLatin1String(T_Selection) && v == QLatin1String("Standard"))
+      return QStringLiteral("selection_normal");
+  }
+
+  return QString();
+}
+
+QStringList collectEnumItemIcons(TTool *tool, TEnumProperty *enumProp) {
+  QStringList icons;
+  if (!enumProp) return icons;
+
+  const TEnumProperty::Items &items = enumProp->getItems();
+  const TEnumProperty::Range &range = enumProp->getRange();
+  const int count = std::min((int)items.size(), (int)range.size());
+  icons.reserve(count);
+  for (int i = 0; i < count; ++i) {
+    if (!items[i].iconName.isEmpty())
+      icons << items[i].iconName;
+    else
+      icons << resolveEnumItemIcon(tool, enumProp->getName(), range[i]);
+  }
+  return icons;
+}
+
+bool enumIconsComplete(const QStringList &icons, int itemCount) {
+  if ((int)icons.size() < itemCount || itemCount <= 0) return false;
+  for (int i = 0; i < itemCount; ++i) {
+    if (icons[i].isEmpty()) return false;
+  }
+  return true;
+}
+
+}  // namespace
+
+QWidget *ToolPropertiesPanel::createEnumIconGridPanel(
+    const QString &label, TEnumProperty *enumProp, const std::string &propName,
+    int propGroup, QWidget *parentWidget,
+    const std::function<void(int)> &onChanged) {
+  if (!enumProp) return nullptr;
+
+  TTool *tool = getCurrentTool();
+  const QStringList iconNames = collectEnumItemIcons(tool, enumProp);
+  const TEnumProperty::Items &items = enumProp->getItems();
+  if (!enumIconsComplete(iconNames, (int)items.size())) return nullptr;
+
+  QWidget *host = parentWidget ? parentWidget : m_propertiesContainer;
+  QWidget *container = new QWidget(host);
+  container->setProperty("propName", QString::fromStdString(propName));
+  container->setProperty("propGroup", propGroup);
+  container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+  QVBoxLayout *outerLayout = new QVBoxLayout(container);
+  outerLayout->setContentsMargins(0, 0, 0, 0);
+  outerLayout->setSpacing(CollapsibleStyle::kItemSpacing);
+
+  const QString sectionLabel =
+      label.isEmpty() ? enumProp->getQStringName() : label;
+  if (m_showLabels && !sectionLabel.isEmpty()) {
+    auto *nameLabel = new QLabel(sectionLabel, container);
+    nameLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    outerLayout->addWidget(nameLabel);
+    outerLayout->addSpacing(kEnumIconGridLabelGap);
+  }
+
+  QFrame *frame = new QFrame(container);
+  frame->setObjectName(QStringLiteral("tppEnumIconGridFrame"));
+  applyEnumIconGridFrameStyle(frame, m_showBorders, m_showBackgrounds,
+                              palette());
+
+  // Host grid on a plain widget so icon cells inherit toolOptionsPanel palette
+  // (styled QFrame parents can make cell backgrounds read too dark).
+  QWidget *gridHost = new QWidget(frame);
+  gridHost->setAttribute(Qt::WA_TranslucentBackground);
+  gridHost->setAutoFillBackground(false);
+
+  QVBoxLayout *frameLayout = new QVBoxLayout(frame);
+  frameLayout->setContentsMargins(0, 0, 0, 0);
+  frameLayout->setSpacing(0);
+  frameLayout->addWidget(gridHost);
+
+  QGridLayout *gridLayout = new QGridLayout(gridHost);
+  gridLayout->setContentsMargins(kEnumIconGridFramePad, kEnumIconGridFramePad,
+                                 kEnumIconGridFramePad, kEnumIconGridFramePad);
+  gridLayout->setHorizontalSpacing(kEnumIconGridSpacingH);
+  gridLayout->setVerticalSpacing(kEnumIconGridSpacingV);
+  for (int col = 0; col < kEnumIconGridCols; ++col)
+    gridLayout->setColumnStretch(col, 1);
+
+  QButtonGroup *buttonGroup = new QButtonGroup(container);
+  buttonGroup->setExclusive(true);
+
+  const int currentIndex = enumProp->getIndex();
+
+  for (int i = 0; i < (int)items.size(); ++i) {
+    const int row = i / kEnumIconGridCols;
+    const int col = i % kEnumIconGridCols;
+
+    ToolPropertyButton *btn = new ToolPropertyButton(QString(), gridHost);
+    btn->setCheckable(true);
+    btn->setCursor(Qt::PointingHandCursor);
+    btn->setAutoFillBackground(false);
+    btn->setFixedSize(kEnumIconGridBtnSize, kEnumIconGridBtnSize);
+    btn->setIconSize(QSize(kEnumIconGridIconSize, kEnumIconGridIconSize));
+    btn->setIcon(createQIcon(iconNames[i].toStdString().c_str()));
+    btn->setToolTip(items[i].UIName);
+    btn->setCompactIconHighlight(kEnumIconGridIconSize);
+    btn->setShowBorders(m_showBorders);
+    btn->setShowBackgrounds(m_showBackgrounds);
+    if (i == currentIndex) btn->setChecked(true);
+
+    buttonGroup->addButton(btn, i);
+    gridLayout->addWidget(btn, row, col, Qt::AlignCenter);
+  }
+
+  outerLayout->addWidget(frame);
+
+  connect(buttonGroup, &QButtonGroup::idClicked,
+          [this, container, propName, onChanged](int id) {
+            TTool *tool = getCurrentTool();
+            if (!tool) return;
+
+            const int group = container->property("propGroup").toInt();
+            TPropertyGroup *props = tool->getProperties(group);
+            if (!props) return;
+
+            for (int k = 0; k < props->getPropertyCount(); ++k) {
+              TProperty *prop = props->getProperty(k);
+              if (!prop || prop->getName() != propName) continue;
+
+              if (TEnumProperty *ep = dynamic_cast<TEnumProperty *>(prop)) {
+                ep->setIndex(id);
+                tool->onPropertyChanged(propName);
+                if (m_toolHandle) m_toolHandle->notifyToolChanged();
+              }
+              break;
+            }
+
+            if (onChanged) onChanged(id);
+          });
+
+  return container;
+}
+
+QWidget *ToolPropertiesPanel::createCollapsibleEnumForProperty(
+    const QString &label, TEnumProperty *enumProp, const std::string &propName,
+    int propGroup, const QString &headerIconName,
+    const std::function<void(int)> &onChanged, bool reserveHeaderRightSlot,
+    QWidget *parentWidget) {
+  if (!enumProp) return nullptr;
+
+  QStringList items;
+  for (const auto &item : enumProp->getItems()) items << item.UIName;
+  if (items.isEmpty()) return nullptr;
+
+  const int index = enumProp->getIndex();
+  QWidget *widget = nullptr;
+
+  if (m_showIcons) {
+    widget = createEnumIconGridPanel(label, enumProp, propName, propGroup,
+                                     parentWidget, onChanged);
+  }
+
+  if (!widget) {
+    widget = createCollapsibleEnum(label, items, index, propName, headerIconName,
+                                   onChanged, reserveHeaderRightSlot,
+                                   parentWidget);
+  }
+
+  if (widget) widget->setProperty("propGroup", propGroup);
+  return widget;
+}
+
 //=============================================================================
 // Generic Property Helpers
 // Name-based property lookup: each helper is a no-op when the property is
@@ -3108,15 +3410,11 @@ void ToolPropertiesPanel::createEnumProperty(const QString &label,
     TEnumProperty *enumProp = dynamic_cast<TEnumProperty *>(prop);
     if (!enumProp) return;
 
-    QStringList items;
-    for (const auto &item : enumProp->getItems())
-      items << item.UIName;
-    int index = enumProp->getIndex();
-    if (items.isEmpty()) return;
+    if (enumProp->getItems().empty()) return;
 
-    QWidget *w =
-        createCollapsibleEnum(label, items, index, propName, iconName);
-    w->setProperty("propGroup", propGroup);
+    QWidget *w = createCollapsibleEnumForProperty(label, enumProp, propName,
+                                                  propGroup, iconName);
+    if (!w) return;
     m_propertiesLayout->addWidget(w);
     return;
   }
@@ -3267,11 +3565,9 @@ bool ToolPropertiesPanel::createGenericProperties(int propGroup,
     QWidget *w = nullptr;
 
     if (auto *ep = dynamic_cast<TEnumProperty *>(prop)) {
-      QStringList items;
-      for (const auto &item : ep->getItems()) items << item.UIName;
-      if (!items.isEmpty())
-        w = createCollapsibleEnum(label, items, ep->getIndex(), name, QString(),
-                                  nullptr, plasticAlignedFields);
+      if (ep->getItems().empty()) continue;
+      w = createCollapsibleEnumForProperty(label, ep, name, propGroup, QString(),
+                                           nullptr, plasticAlignedFields);
 
     } else if (auto *bp = dynamic_cast<TBoolProperty *>(prop)) {
       w = createCheckBox(label, bp->getValue(), name);
@@ -3596,10 +3892,10 @@ void ToolPropertiesPanel::createPlasticRigidityModeProperties(
       if (items.isEmpty()) continue;
 
       const QString rigidLabel = rigidValue->getQStringName();
-      QWidget *rigidWidget = createCollapsibleEnum(
-          rigidLabel, items, rigidValue->getIndex(), name, QString(), nullptr,
-          true, m_propertiesContainer);
-      rigidWidget->setProperty("propGroup", PlasticTool::RIGIDITY_IDX);
+      QWidget *rigidWidget = createCollapsibleEnumForProperty(
+          rigidLabel, rigidValue, name, PlasticTool::RIGIDITY_IDX, QString(),
+          nullptr, true, m_propertiesContainer);
+      if (!rigidWidget) continue;
       rigidWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
       m_plasticModeLayout->addWidget(rigidWidget);
     }
@@ -3718,14 +4014,10 @@ void ToolPropertiesPanel::createPlasticProperties() {
       dynamic_cast<TEnumProperty *>(modeGroup->getProperty("mode"));
   if (!modeProp) return;
 
-  QStringList modeItems;
-  for (const auto &item : modeProp->getItems()) modeItems << item.UIName;
-
-  QWidget *modeWidget = createCollapsibleEnum(
-      modeProp->getQStringName(), modeItems, modeProp->getIndex(), "mode",
+  QWidget *modeWidget = createCollapsibleEnumForProperty(
+      modeProp->getQStringName(), modeProp, "mode", PlasticTool::MODES_COUNT,
       QString(), [this](int) { rebuildPlasticModeSection(); }, true);
-  modeWidget->setProperty("propGroup", PlasticTool::MODES_COUNT);
-  m_propertiesLayout->addWidget(modeWidget);
+  if (modeWidget) m_propertiesLayout->addWidget(modeWidget);
 
   m_propertiesLayout->addSpacing(CollapsibleStyle::kBlockGap);
 
@@ -4222,14 +4514,13 @@ void ToolPropertiesPanel::createAnimateProperties() {
 
   if (TEnumProperty *activeAxisProp =
           dynamic_cast<TEnumProperty *>(pg->getProperty("Active Axis"))) {
-    QStringList axisItems;
-    for (const auto &item : activeAxisProp->getItems())
-      axisItems << item.UIName;
-    QWidget *axisWidget = createCollapsibleEnum(
-        activeAxisProp->getQStringName(), axisItems, activeAxisProp->getIndex(),
+    QWidget *axisWidget = createCollapsibleEnumForProperty(
+        activeAxisProp->getQStringName(), activeAxisProp,
         activeAxisProp->getName());
-    axisWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    m_propertiesLayout->addWidget(axisWidget);
+    if (axisWidget) {
+      axisWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+      m_propertiesLayout->addWidget(axisWidget);
+    }
   }
 
   // Position / X-Y / Z / SO — full-width grid, adaptive fields
@@ -4812,12 +5103,10 @@ void ToolPropertiesPanel::createTypeProperties() {
 
       if (name == "Style:") {
         auto *ep = dynamic_cast<TEnumProperty *>(prop);
-        if (!ep) continue;
-        QStringList items;
-        for (const auto &item : ep->getItems()) items << item.UIName;
-        m_typeStyleWidget = createCollapsibleEnum(label, items, ep->getIndex(),
-                                                  name);
-        m_typeStyleWidget->setProperty("propGroup", propGroup);
+        if (!ep || ep->getItems().empty()) continue;
+        m_typeStyleWidget = createCollapsibleEnumForProperty(
+            label, ep, name, propGroup);
+        if (!m_typeStyleWidget) continue;
         m_typeStyleWidget->setSizePolicy(QSizePolicy::Expanding,
                                          QSizePolicy::Fixed);
         m_propertiesLayout->addWidget(m_typeStyleWidget);
@@ -4825,10 +5114,8 @@ void ToolPropertiesPanel::createTypeProperties() {
       }
 
       if (auto *ep = dynamic_cast<TEnumProperty *>(prop)) {
-        QStringList items;
-        for (const auto &item : ep->getItems()) items << item.UIName;
-        if (items.isEmpty()) continue;
-        QWidget *w = createCollapsibleEnum(label, items, ep->getIndex(), name);
+        if (ep->getItems().empty()) continue;
+        QWidget *w = createCollapsibleEnumForProperty(label, ep, name, propGroup);
         if (!w) continue;
         w->setProperty("propGroup", propGroup);
         w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -4867,11 +5154,9 @@ void ToolPropertiesPanel::refreshTypeStyleWidget() {
   m_typeStyleWidget->deleteLater();
   m_typeStyleWidget = nullptr;
 
-  QStringList items;
-  for (const auto &item : ep->getItems()) items << item.UIName;
-  m_typeStyleWidget =
-      createCollapsibleEnum(ep->getQStringName(), items, ep->getIndex(), "Style:");
-  m_typeStyleWidget->setProperty("propGroup", 1);
+  m_typeStyleWidget = createCollapsibleEnumForProperty(
+      ep->getQStringName(), ep, "Style:", 1);
+  if (!m_typeStyleWidget) return;
   m_typeStyleWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   if (index >= 0)
     m_propertiesLayout->insertWidget(index, m_typeStyleWidget);
@@ -5647,7 +5932,7 @@ void ToolPropertiesPanel::addShowHideContextMenu(QMenu *menu) {
   showBackgroundsAction->setChecked(m_showBackgrounds);
   showBackgroundsAction->setObjectName("showBackgrounds");
   
-  // Action to show/hide Cap/Join icons
+  // Show Icons: icon grid replaces collapsible enum menus (when every option has an icon)
   QAction *showIconsAction = showHideMenu->addAction(tr("Show Icons"));
   showIconsAction->setCheckable(true);
   showIconsAction->setChecked(m_showIcons);
