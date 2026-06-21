@@ -24,7 +24,7 @@ on:
 
 jobs:
   Windows:
-    runs-on: windows-2025
+    runs-on: windows-2022
     env:
       # QT related variable
       QT_PATH: ${{ github.workspace }}\thirdparty\qt\5.15.2_wintab\msvc2019_64  # Path to custom Qt

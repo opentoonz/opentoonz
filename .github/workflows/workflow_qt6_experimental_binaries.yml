@@ -128,7 +128,7 @@ jobs:
   Windows:
     name: Windows x64
     if: github.repository == 'bgyss/opentoonz' && !(github.event_name == 'push' && github.actor == 'github-actions[bot]')
-    runs-on: windows-2025
+    runs-on: windows-2022
     timeout-minutes: 180
     env:
       QT_PATH: ${{ github.workspace }}\Qt\6.9.3\msvc2022_64
