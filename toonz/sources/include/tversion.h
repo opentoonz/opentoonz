@@ -26,7 +26,7 @@ public:
 
 private:
   const char *applicationName     = "OpenToonz";
-  const float applicationVersion  = 1.8f;
+  const char *applicationVersion  = OPENTOONZ_APP_VERSION;
   const float applicationRevision = 0;
   const char *applicationNote     = "";
   const char *systemVarPrefix     = "TOONZ";
