@@ -1014,6 +1014,10 @@ The change will automatically be reflected in this panel.</source>
         <source>Cell Backgrounds</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source> [WIP]</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraCaptureLevelControl</name>
@@ -8077,6 +8081,16 @@ N.B. 确保你没有在运行其他 OpenToonz 进程、
         <source>Viewer Scrub</source>
         <translation type="unfinished">查看器抓手</translation>
     </message>
+    <message>
+        <source> [WIP]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This feature is a work in progress.
+Please be advised that it may have incomplete implementation or cause unexpected behavior.
+We welcome your feedback and assistance with its development!</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MatchlinesDialog</name>
@@ -14300,63 +14314,7 @@ Would you like OpenToonz to automatically add a dot to fix the sequence format?
         <translation>将%1转换为tlv格式...</translation>
     </message>
     <message>
-        <source>Task added to the Batch Cleanup List.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Deleting folder %1. Are you sure?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>A conversion task is in progress! Wait until it stops or cancel it.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error loading scene %1 : %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error saving scene %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>A separation task is in progress! Wait until it stops or cancel it.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot paste into the camera column.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Brush Presets</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Tool Properties</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Fx Browser</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Locator</source>
-        <translation type="unfinished">定位器</translation>
-    </message>
-    <message>
-        <source>The specified name is already assigned to the folder.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unsupported raster format, cannot save</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Bind to Current Room</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Converting %1 to tlv format...</source>
+        <source> [WIP]</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -15968,49 +15926,6 @@ Please commit or revert changes first.</source>
     <message>
         <source>Gap Check</source>
         <translation>间隙检查</translation>
-    </message>
-</context>
-<context>
-    <name>SceneViewer</name>
-    <message>
-        <source>FROZEN</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Motion Path Selected</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Transparency Check</source>
-        <translation type="unfinished">透明度检查</translation>
-    </message>
-    <message>
-        <source>Ink Check</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ink#1 Check</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Paint Check</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Inks Only Check</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Black BG Check</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Fill Check</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Gap Check</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -18206,11 +18121,11 @@ Click the arrow button to create a new sub-xsheet</source>
     <name>ToolPropertiesPanel</name>
     <message>
         <source>Tool Properties</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">工具属性</translation>
     </message>
     <message>
         <source>Tool Properties - %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">工具属性 - %1</translation>
     </message>
     <message>
         <source>Properties for Fill tool - Coming soon!</source>
@@ -18230,15 +18145,15 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>Hardness</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">硬度</translation>
     </message>
     <message>
         <source>Opacity</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">不透明度</translation>
     </message>
     <message>
         <source>Lock Alpha</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">锁定透明度</translation>
     </message>
     <message>
         <source>Pencil Mode</source>
@@ -18246,7 +18161,7 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>Draw Order</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">绘制顺序</translation>
     </message>
     <message>
         <source>Cap</source>
@@ -18262,11 +18177,11 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>Assistants</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">辅助绘图</translation>
     </message>
     <message>
         <source>Pressure</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">压感</translation>
     </message>
     <message>
         <source>Accuracy</source>
@@ -18286,7 +18201,7 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>Sensitivity</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">敏感度</translation>
     </message>
     <message>
         <source>Miter</source>
@@ -18302,174 +18217,27 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>Eraser</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">橡皮擦</translation>
     </message>
     <message>
         <source>Min</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">最小</translation>
     </message>
     <message>
         <source>Max</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">最大：</translation>
     </message>
     <message>
         <source>Min:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">最小：</translation>
     </message>
     <message>
         <source>Max:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">最大：</translation>
     </message>
     <message>
         <source>GUI Show / Hide</source>
         <translation type="unfinished">显示/隐藏界面</translation>
-    </message>
-    <message>
-        <source>Single Slider (Max Only)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show Labels</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show Numeric Fields</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cell Borders</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cell Backgrounds</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show Icons</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ToolPropertiesPanel</name>
-    <message>
-        <source>Tool Properties</source>
-        <translation>工具属性</translation>
-    </message>
-    <message>
-        <source>Tool Properties - %1</source>
-        <translation>工具属性 - %1</translation>
-    </message>
-    <message>
-        <source>Properties for Fill tool - Coming soon!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Properties for Eraser tool - Coming soon!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Properties for this tool - Coming soon!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation>大小</translation>
-    </message>
-    <message>
-        <source>Hardness</source>
-        <translation>硬度</translation>
-    </message>
-    <message>
-        <source>Opacity</source>
-        <translation>不透明度</translation>
-    </message>
-    <message>
-        <source>Lock Alpha</source>
-        <translation>锁定透明度</translation>
-    </message>
-    <message>
-        <source>Pencil Mode</source>
-        <translation>铅笔模式</translation>
-    </message>
-    <message>
-        <source>Draw Order</source>
-        <translation>绘制顺序</translation>
-    </message>
-    <message>
-        <source>Cap</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Join</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Smooth</source>
-        <translation>平滑</translation>
-    </message>
-    <message>
-        <source>Assistants</source>
-        <translation type="unfinished">辅助绘图</translation>
-    </message>
-    <message>
-        <source>Pressure</source>
-        <translation>压感</translation>
-    </message>
-    <message>
-        <source>Accuracy</source>
-        <translation>精度</translation>
-    </message>
-    <message>
-        <source>Break Angles</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Frame Range</source>
-        <translation>帧范围</translation>
-    </message>
-    <message>
-        <source>Snap</source>
-        <translation>吸附</translation>
-    </message>
-    <message>
-        <source>Sensitivity</source>
-        <translation>敏感度</translation>
-    </message>
-    <message>
-        <source>Miter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Modifier Size</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Modifier Opacity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Eraser</source>
-        <translation>橡皮擦</translation>
-    </message>
-    <message>
-        <source>Min</source>
-        <translation>最小</translation>
-    </message>
-    <message>
-        <source>Max</source>
-        <translation>最大：</translation>
-    </message>
-    <message>
-        <source>Min:</source>
-        <translation>最小：</translation>
-    </message>
-    <message>
-        <source>Max:</source>
-        <translation>最大：</translation>
-    </message>
-    <message>
-        <source>GUI Show / Hide</source>
-        <translation>显示/隐藏界面</translation>
     </message>
     <message>
         <source>Single Slider (Max Only)</source>

@@ -155,7 +155,7 @@ public:
         }
         if (m_modifier & Qt::ControlModifier)
           getViewer()->getCellKeyframeSelection()->selectCellsKeyframes(r0, c0,
-                                                           r1, c1);
+                                                                        r1, c1);
         else
           getViewer()->getCellSelection()->selectCells(r0, c0, r1, c1);
       } else {
@@ -386,7 +386,7 @@ public:
     for (int c = 0; c < m_colCount; c++) {
       TXshColumn *column = xsh->getColumn(c);
       bool isSoundColumn = (column && column->getSoundColumn());
-      int col = m_col + c;
+      int col            = m_col + c;
       xsh->insertCells(r0, col, count);
       int r;
       for (r = r0; r <= r1; r++) {
@@ -432,7 +432,7 @@ public:
     for (int c = 0; c < m_colCount; c++) {
       TXshColumn *column = xsh->getColumn(c);
       bool isSoundColumn = (column && column->getSoundColumn());
-      int col = m_col + c;
+      int col            = m_col + c;
       for (int r = r0; r <= r1; r++) {
         int k = (r - m_row) * m_colCount + c;
         if (isSoundColumn)
@@ -587,14 +587,14 @@ public:
     // celle dopo un cambio di frame
     m_offset = 0;
     if (m_step > 1) {
-      //先頭と異なるセルを仮にループ終端とする
+      // 先頭と異なるセルを仮にループ終端とする
       TFrameId fid(m_sourceCells[m_step].m_frameId);
-      //次にループ終端と異なるセルがくるまでセルを送る
+      // 次にループ終端と異なるセルがくるまでセルを送る
       for (i++; i < count && m_sourceCells[i].m_frameId == fid; i++) {
       }
-      //次のループ終端候補が見つかった
+      // 次のループ終端候補が見つかった
       int step = i - m_step;
-      //ループ距離が縮んでいたら規則なし
+      // ループ距離が縮んでいたら規則なし
       if (step < m_step) return;
       m_offset = step - m_step;
       m_step   = step;
@@ -713,23 +713,22 @@ public:
 
   void onDrag(const CellPosition &pos) override {
     int row = pos.frame(), col = pos.layer();
-    if (!m_invert){
-        // Allow the negative drag
-        if (row == m_r0 && m_colCount == m_rowCount == 1) {
-            int r0, c0, r1, c1;
-            getViewer()->getCellSelection()->getSelectedCells(r0, c0, r1, c1);
-            TXsheet* xsh = getViewer()->getXsheet();
-            if (!xsh->getCell(m_r0, m_c0).isEmpty())
-                for (; xsh->getCell(m_r0 - 1, m_c0) == xsh->getCell(m_r0, m_c0);
-                    ++m_rowCount, --m_r0, --r0);
-            getViewer()->setCurrentRow(m_r0);
-            m_columns.clear();
-            m_columns.push_back(CellBuilder(xsh, r0, c0, m_rowCount, m_invert));
-            m_undo->setCells(xsh, r0, c0, m_rowCount - 1, m_colCount);
-        }
-        onCellChange(row, col);
-    }
-    else
+    if (!m_invert) {
+      // Allow the negative drag
+      if (row == m_r0 && m_colCount == m_rowCount == 1) {
+        int r0, c0, r1, c1;
+        getViewer()->getCellSelection()->getSelectedCells(r0, c0, r1, c1);
+        TXsheet *xsh = getViewer()->getXsheet();
+        if (!xsh->getCell(m_r0, m_c0).isEmpty())
+          for (; xsh->getCell(m_r0 - 1, m_c0) == xsh->getCell(m_r0, m_c0);
+               ++m_rowCount, --m_r0, --r0);
+        getViewer()->setCurrentRow(m_r0);
+        m_columns.clear();
+        m_columns.push_back(CellBuilder(xsh, r0, c0, m_rowCount, m_invert));
+        m_undo->setCells(xsh, r0, c0, m_rowCount - 1, m_colCount);
+      }
+      onCellChange(row, col);
+    } else
       onCellChangeInvert(row, col);
     refreshCellsArea();
   }
@@ -1093,8 +1092,10 @@ public:
   }
 
   void onDrag(const QMouseEvent *e) override {
+    // check if the cells are moved
+    TPoint lastPos = m_lastPos;
     LevelMoverTool::onDrag(e);
-    if (m_validPos) m_keyframeMoverTool->onDrag(e);
+    if (m_validPos && lastPos != m_lastPos) m_keyframeMoverTool->onDrag(e);
   }
   void onRelease(const CellPosition &pos) override {
     int row = pos.frame(), col = pos.layer();
@@ -2189,7 +2190,7 @@ public:
         std::vector<TFrameId> fids = m_data->m_levels[0].second;
         if (!sl || fids.empty()) return;
         auto xsh = TTool::getApplication()->getCurrentXsheet()->getXsheet();
-        int r1 = row;
+        int r1   = row;
         if (!xsh->getCell(r1, col).isEmpty())
           for (; xsh->getCell(r1, col) == xsh->getCell(r1 + 1, col);
                fids.push_back(fids.front()), r1++);
@@ -2262,13 +2263,13 @@ public:
   NavigationTagDragTool(XsheetViewer *viewer) : DragTool(viewer) {}
 
   void onClick(const CellPosition &pos) override {
-    int row = pos.frame();
+    int row     = pos.frame();
     m_taggedRow = row;
     refreshRowsArea();
   }
 
   void onDrag(const CellPosition &pos) override {
-    int row          = pos.frame();
+    int row = pos.frame();
     if (row < 0) row = 0;
     onRowChange(row);
     refreshRowsArea();

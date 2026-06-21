@@ -1549,12 +1549,13 @@ public:
   TPanel *createPanel(QWidget *parent) override {
     BrushPresetPanel *panel = new BrushPresetPanel(parent);
     panel->setObjectName(getPanelType());
-    panel->setWindowTitle(QObject::tr("Brush Presets"));
+    panel->setWindowTitle(QObject::tr("Brush Presets") +
+                          QObject::tr(" [WIP]"));  // Temporarily add WIP label
     panel->setIsMaximizable(false);
-    
+
     // Enable room binding feature
     panel->addRoomBindButton();
-    
+
     return panel;
   }
 
@@ -1562,7 +1563,8 @@ public:
 } brushPresetPanelFactory;
 
 //=============================================================================
-OpenFloatingPanel openBrushPresetPanelCommand(MI_OpenBrushPresetPanel, "BrushPreset",
+OpenFloatingPanel openBrushPresetPanelCommand(MI_OpenBrushPresetPanel,
+                                              "BrushPreset",
                                               QObject::tr("Brush Presets"));
 //-----------------------------------------------------------------------------
 
@@ -1577,12 +1579,13 @@ public:
   TPanel *createPanel(QWidget *parent) override {
     ToolPropertiesPanel *panel = new ToolPropertiesPanel(parent);
     panel->setObjectName(getPanelType());
-    panel->setWindowTitle(QObject::tr("Tool Properties"));
+    panel->setWindowTitle(QObject::tr("Tool Properties") +
+                          QObject::tr(" [WIP]"));  // Temporarily add WIP label
     panel->setIsMaximizable(false);
-    
+
     // Enable room binding feature
     panel->addRoomBindButton();
-    
+
     return panel;
   }
 
@@ -1590,8 +1593,9 @@ public:
 } toolPropertiesPanelFactory;
 
 //=============================================================================
-OpenFloatingPanel openToolPropertiesPanelCommand(MI_OpenToolPropertiesPanel, "ToolProperties",
-                                                  QObject::tr("Tool Properties"));
+OpenFloatingPanel openToolPropertiesPanelCommand(
+    MI_OpenToolPropertiesPanel, "ToolProperties",
+    QObject::tr("Tool Properties"));
 //-----------------------------------------------------------------------------
 
 //=============================================================================
