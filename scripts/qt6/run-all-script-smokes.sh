@@ -17,6 +17,7 @@ tasks=(
   script-smoke-scene-qt6
   script-smoke-scene-cells-qt6
   script-smoke-scene-columns-qt6
+  script-smoke-scene-column-edges-qt6
   script-smoke-scene-cell-fids-qt6
   script-smoke-scene-cell-object-edges-qt6
   script-smoke-scene-edges-qt6

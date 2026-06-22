@@ -566,6 +566,10 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_cells.too
 description = "Run the Qt 6 app bundle against Scene column insert/delete cell-shift behavior."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_columns.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-columns-before 2 2 qt6_scene_column_a qt6_scene_column_b|qt-script-scene-columns-after-insert 2 3 qt6_scene_column_a true qt6_scene_column_b|qt-script-scene-columns-after-delete 2 2 true qt6_scene_column_b true|qt-script-scene-columns-final 2 1 qt6_scene_column_b true' bash scripts/qt6/run-script-smoke.sh"
 
+[tasks.script-smoke-scene-column-edges-qt6]
+description = "Run the Qt 6 app bundle against Scene column argument and disposed-wrapper edge cases."
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_column_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-column-edges-chain true true 0 0|qt-script-scene-column-edges-errors [true,true,true,true,true,true,true,true,true,true] 0 0|qt-script-scene-column-edges-disposed -1 [true,true]' bash scripts/qt6/run-script-smoke.sh"
+
 [tasks.script-smoke-scene-cell-fids-qt6]
 description = "Run the Qt 6 app bundle against Scene getCell frame-id type parity."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_cell_fids.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-cell-fids number true string true 2 1' bash scripts/qt6/run-script-smoke.sh"

@@ -657,8 +657,10 @@ Already covered:
   `Scene.setCell()` assignment by level wrapper and level name, clear through
   explicit `undefined`, disposed-level object rejection, strict Scene
   constructor arity, strict method arity for non-rendering Scene load/save,
-  cell, level, and load-level APIs, integer-only row/column index enforcement
-  for Scene column/cell APIs, backend negative row/column errors, plus legacy
+  cell, column, level, and load-level APIs, `Scene.insertColumn()` /
+  `Scene.deleteColumn()` return chaining, integer-only row/column index
+  enforcement for Scene column/cell APIs, backend negative row/column errors,
+  disposed-scene column mutation rejection, plus legacy
   frame-id-before-level-argument error precedence. The scene mutation workflow
   smoke now also covers duplicate level-name rejection, level-name based cell
   insertion, clearing and shifting cells through column deletion, missing-level

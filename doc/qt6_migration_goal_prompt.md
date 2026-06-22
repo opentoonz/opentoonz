@@ -2032,6 +2032,13 @@ branch.
   column insertion/deletion behavior: populated cells shift across inserted
   columns, deleted columns remove their cells, remaining columns shift left, and
   frame/column counts remain consistent.
+- A Scene column edge-case Qt 6 script fixture exists at
+  `toonz/sources/tests/scriptengine/scene_column_edges.toonzscript` and is run
+  by `mise run script-smoke-scene-column-edges-qt6`. It validates
+  `Scene.insertColumn()` / `Scene.deleteColumn()` return chaining, strict
+  arity, numeric/integer column argument rejection, backend negative-column
+  errors, and disposed-scene wrapper rejection without entering viewer,
+  offscreen GL, or renderer paths.
 - A Scene cell frame-id type Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/scene_cell_fids.toonzscript` and is run by
   `mise run script-smoke-scene-cell-fids-qt6`. It validates the legacy
@@ -2403,7 +2410,7 @@ branch.
 - The script smoke can run in bounded mode or natural-exit mode. The basic,
   `run()` error, FilePath, FilePath edges, FilePath files edge,
   FilePath metadata, path-argument,
-  Scene, Scene cells, Scene columns,
+  Scene, Scene cells, Scene columns, Scene column edge,
   Scene cell frame-id type, Scene cell object edge, Scene edges,
   Scene argument edges,
   Scene lifecycle edges, Scene load-level, Scene load-level sequence,
@@ -2605,7 +2612,8 @@ The next slice should make the Qt 6 app useful enough to run and diagnose:
    preservation,
    Scene save-icon, Scene save-icon variants,
    Scene frame-id
-   handling, Scene cell frame-id type, Scene argument edge cases,
+   handling, Scene column edge cases, Scene cell frame-id type,
+   Scene argument edge cases,
    Scene lifecycle edge cases, Scene mutation workflow, `Image`, Image edge-case,
    Image level-first-frame,
    `ImageBuilder`, ImageBuilder edge-case, Transform edge-case,
@@ -2629,8 +2637,9 @@ The next slice should make the Qt 6 app useful enough to run and diagnose:
    confirmation, lip-sync preview/timing, camera preview, and still-capture
    checks before calling multimedia product-ready.
 5. Keep the basic, `run()` error, FilePath, FilePath-edge, FilePath metadata,
-   path-argument, Scene, Scene cells, Scene columns,
-   Scene cell frame-id type, Scene edges, Scene argument edges,
+   path-argument, Scene, Scene cells, Scene columns, Scene column edge,
+   Scene cell frame-id type, Scene cell object edge, Scene edges,
+   Scene argument edges,
    Scene lifecycle edges, Scene load-level, Scene load-level sequence,
    Scene save/reopen,
    Scene reload edge, Scene failed-load,
