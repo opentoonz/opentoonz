@@ -793,8 +793,9 @@ Already covered:
   boundary: `QSound` must not reappear, and Qt 5 video-surface APIs must remain
   confined to the legacy 32-bit Qt 5 `penciltestpopup_qt.*` fallback. It also
   keeps Qt 6-removed `QAudioFormat::setCodec("audio/pcm")` confined to the
-  audited Qt 5-only audio-format branches in sound playback, audio recording,
-  and sound-column format negotiation. The
+  audited audio-format files and verifies each remaining hit is inside a
+  Qt 5-only branch for sound playback, audio recording, and sound-column format
+  negotiation. The
   `toonz` CMake source split now explicitly keeps that fallback out of every
   Qt 6 lane by selecting the modern stop-motion/Pencil Test sources whenever
   `OPENTOONZ_QT_MAJOR` is 6, even if an unusual non-64-bit Qt 6 configuration
