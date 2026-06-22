@@ -15,7 +15,11 @@
 #include "toonzqt/menubarcommand.h"
 #include "toonz/tframehandle.h"
 #include "toonz/tobjecthandle.h"
+#include "toonz/tcolumnhandle.h"
 #include "toonz/txsheethandle.h"
+#include "toonz/txshlevelhandle.h"
+#include "toonz/txshleveltypes.h"
+#include "toonz/txsheet.h"
 #include "toonz/tstageobjecttree.h"
 
 // ToonzLib includes
@@ -78,6 +82,7 @@
 #include <QMenu>
 #include <QContextMenuEvent>
 #include <QIcon>
+#include <QObject>
 #include <QPixmap>
 #include <QPainter>
 #include <QStyleOptionToolButton>
@@ -369,6 +374,18 @@ void ToolPropertiesPanel::connectSignals() {
     connect(m_toolHandle, SIGNAL(toolChanged()), this, SLOT(onToolChanged()));
     connect(m_toolHandle, SIGNAL(toolComboBoxListChanged(std::string)), this,
             SLOT(onToolComboBoxListChanged(std::string)));
+    connect(m_toolHandle, SIGNAL(toolOptionsBoxChanged()), this,
+            SLOT(onSceneContextChanged()));
+  }
+
+  TApplication *app = TApp::instance();
+  if (app) {
+    connect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this,
+            SLOT(onSceneContextChanged()));
+    connect(app->getCurrentLevel(), SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+            SLOT(onSceneContextChanged()));
+    connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
+            SLOT(onSceneContextChanged()));
   }
 }
 
@@ -378,6 +395,18 @@ void ToolPropertiesPanel::disconnectSignals() {
     disconnect(m_toolHandle, SIGNAL(toolChanged()), this, SLOT(onToolChanged()));
     disconnect(m_toolHandle, SIGNAL(toolComboBoxListChanged(std::string)), this,
                SLOT(onToolComboBoxListChanged(std::string)));
+    disconnect(m_toolHandle, SIGNAL(toolOptionsBoxChanged()), this,
+               SLOT(onSceneContextChanged()));
+  }
+
+  TApplication *app = TApp::instance();
+  if (app) {
+    disconnect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this,
+               SLOT(onSceneContextChanged()));
+    disconnect(app->getCurrentLevel(), SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+               SLOT(onSceneContextChanged()));
+    disconnect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
+               SLOT(onSceneContextChanged()));
   }
 }
 
@@ -458,65 +487,262 @@ TTool* ToolPropertiesPanel::getCurrentTool() {
   return m_toolHandle->getTool();
 }
 
+QString ToolPropertiesPanel::displayNameForToolId(const QString &toolId) const {
+  if (toolId == T_Brush) return tr("Brush tool");
+  if (toolId == T_Fill) return tr("Fill tool");
+  if (toolId == T_PaintBrush) return tr("Paint Brush tool");
+  if (toolId == T_Finger) return tr("Finger tool");
+  if (toolId == T_Type) return tr("Type tool");
+  if (toolId == T_EditAssistants) return tr("Edit Assistants tool");
+  if (toolId == T_Eraser) return tr("Eraser tool");
+  if (toolId == T_Selection) return tr("Selection tool");
+  if (toolId == T_Geometric) return tr("Geometric tool");
+  if (toolId == T_Edit) return tr("Animate tool");
+  if (toolId == T_Tape) return tr("Tape tool");
+  if (toolId == T_Cutter) return tr("Cutter tool");
+  if (toolId == T_StylePicker) return tr("Style Picker tool");
+  if (toolId == T_RGBPicker) return tr("RGB Picker tool");
+  if (toolId == T_ControlPointEditor) return tr("Control Point Editor tool");
+  if (toolId == T_Pinch) return tr("Pinch tool");
+  if (toolId == T_Pump) return tr("Pump tool");
+  if (toolId == T_Magnet) return tr("Magnet tool");
+  if (toolId == T_Bender) return tr("Bender tool");
+  if (toolId == T_Iron) return tr("Iron tool");
+  if (toolId == T_Skeleton) return tr("Skeleton tool");
+  if (toolId == T_Tracker) return tr("Tracker tool");
+  if (toolId == T_Hook) return tr("Hook tool");
+  if (toolId == T_Plastic) return tr("Plastic tool");
+  if (toolId == T_Zoom) return tr("Zoom tool");
+  if (toolId == T_Rotate) return tr("Rotate tool");
+  if (toolId == T_Hand) return tr("Hand tool");
+  if (toolId == T_Ruler) return tr("Ruler tool");
+  if (toolId == T_HideLine) return tr("Hide Line tool");
+  return toolId;
+}
+
 //-----------------------------------------------------------------------------
 // Properties Display
 //-----------------------------------------------------------------------------
 
+namespace {
+
+struct LevelTypeDesc {
+  int levelType;
+  TTool::ToolTargetType targetType;
+  const char *name;
+};
+
+const LevelTypeDesc kLevelTypes[] = {
+    {PLI_XSHLEVEL, TTool::VectorImage, QT_TR_NOOP("Toonz Vector Level")},
+    {TZP_XSHLEVEL, TTool::ToonzImage, QT_TR_NOOP("Toonz Raster Level")},
+    {OVL_XSHLEVEL, TTool::RasterImage, QT_TR_NOOP("Raster Level")},
+    {MESH_XSHLEVEL, TTool::MeshImage, QT_TR_NOOP("Mesh Level")},
+    {META_XSHLEVEL, TTool::MetaImage, QT_TR_NOOP("Assistants Level")},
+};
+
+bool isPlaceholderTool(TTool *tool) {
+  return tool && tool->getName() == "T_Dummy";
+}
+
+bool propertyGroupHasAdjustableProps(TPropertyGroup *props) {
+  if (!props || props->getPropertyCount() == 0) return false;
+
+  std::set<std::string> seenNames;
+  for (int i = 0; i < props->getPropertyCount(); ++i) {
+    TProperty *prop = props->getProperty(i);
+    if (!prop) continue;
+
+    const std::string name = prop->getName();
+    if (seenNames.count(name)) continue;
+    seenNames.insert(name);
+
+    if (auto *ep = dynamic_cast<TEnumProperty *>(prop)) {
+      if (!ep->getItems().empty()) return true;
+    } else if (dynamic_cast<TBoolProperty *>(prop) ||
+               dynamic_cast<TIntProperty *>(prop) ||
+               dynamic_cast<TDoubleProperty *>(prop) ||
+               dynamic_cast<TStringProperty *>(prop) ||
+               dynamic_cast<TDoublePairProperty *>(prop) ||
+               dynamic_cast<TIntPairProperty *>(prop)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool toolInstanceHasAdjustableProperties(TTool *tool) {
+  if (!tool || isPlaceholderTool(tool)) return false;
+  return propertyGroupHasAdjustableProps(tool->getProperties(0)) ||
+         propertyGroupHasAdjustableProps(tool->getProperties(1));
+}
+
+int detectCurrentLevelType(TApplication *app) {
+  if (!app) return NO_XSHLEVEL;
+
+  TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+  const int columnIndex = app->getCurrentColumn()->getColumnIndex();
+  const int rowIndex    = app->getCurrentFrame()->getFrame();
+
+  TXshColumn *column =
+      (columnIndex >= 0) ? xsh->getColumn(columnIndex) : nullptr;
+
+  TXshLevel *xl       = app->getCurrentLevel()->getLevel();
+  TXshSimpleLevel *sl = xl ? xl->getSimpleLevel() : nullptr;
+  int levelType       = sl ? sl->getType() : NO_XSHLEVEL;
+
+  if (levelType == NO_XSHLEVEL &&
+      !app->getCurrentFrame()->isEditingLevel()) {
+    if (!column || !column->getSoundColumn()) {
+      TXshCell cell = xsh->getCell(rowIndex, columnIndex);
+      sl            = cell.isEmpty() ? nullptr : cell.getSimpleLevel();
+      levelType     = cell.isEmpty() ? NO_XSHLEVEL : cell.m_level->getType();
+    }
+  }
+
+  return levelType;
+}
+
+bool isToolSupportedOnLevelType(const std::string &toolName, int levelType) {
+  for (const LevelTypeDesc &desc : kLevelTypes) {
+    if (levelType != desc.levelType) continue;
+    TTool *tool = TTool::getTool(toolName, desc.targetType);
+    return tool && !isPlaceholderTool(tool) &&
+           (tool->getTargetType() & desc.targetType);
+  }
+  return false;
+}
+
+QStringList compatibleLevelNamesWithProperties(const std::string &toolName) {
+  QStringList names;
+  for (const LevelTypeDesc &desc : kLevelTypes) {
+    TTool *tool = TTool::getTool(toolName, desc.targetType);
+    if (!tool || isPlaceholderTool(tool)) continue;
+    if (!(tool->getTargetType() & desc.targetType)) continue;
+    if (!toolInstanceHasAdjustableProperties(tool)) continue;
+    names << QObject::tr(desc.name);
+  }
+  return names;
+}
+
+QStringList compatibleLevelNamesForToolUse(const std::string &toolName) {
+  QStringList names;
+  for (const LevelTypeDesc &desc : kLevelTypes) {
+    TTool *tool = TTool::getTool(toolName, desc.targetType);
+    if (!tool || isPlaceholderTool(tool)) continue;
+    if (!(tool->getTargetType() & desc.targetType)) continue;
+    names << QObject::tr(desc.name);
+  }
+  return names;
+}
+
+QString formatLevelHintMessage(const QString &singleLineTemplate,
+                               const QString &listTemplate,
+                               const QStringList &levels) {
+  if (levels.isEmpty()) return QString();
+  if (levels.size() == 1) return singleLineTemplate.arg(levels.first());
+  return listTemplate.arg(levels.join(QObject::tr(", ")));
+}
+
+bool hasNoActiveLevelContext(TApplication *app) {
+  if (!app) return true;
+  if (app->getCurrentFrame()->isEditingLevel()) return false;
+  return detectCurrentLevelType(app) == NO_XSHLEVEL;
+}
+
+constexpr const char *kTppPropPtrKey = "tppPropPtr";
+
+void storeTppPropertyPtr(QWidget *w, TProperty *prop) {
+  if (w && prop) {
+    w->setProperty(kTppPropPtrKey,
+                   QVariant::fromValue<quintptr>(reinterpret_cast<quintptr>(prop)));
+  }
+}
+
+TProperty *tppPropertyFromWidget(const QWidget *w) {
+  if (!w) return nullptr;
+  const QVariant v = w->property(kTppPropPtrKey);
+  if (!v.isValid()) return nullptr;
+  return reinterpret_cast<TProperty *>(v.value<quintptr>());
+}
+
+TProperty *resolveTppProperty(TTool *tool, const QWidget *w, int propGroup,
+                              const std::string &propName) {
+  if (TProperty *direct = tppPropertyFromWidget(w)) return direct;
+  if (!tool) return nullptr;
+  TPropertyGroup *props = tool->getProperties(propGroup);
+  if (!props) return nullptr;
+  return props->getProperty(propName);
+}
+
+}  // namespace
+
+int ToolPropertiesPanel::propertyWidgetCount() const {
+  if (!m_propertiesLayout) return 0;
+
+  int count = 0;
+  for (int i = 0; i < m_propertiesLayout->count(); ++i) {
+    QLayoutItem *item = m_propertiesLayout->itemAt(i);
+    if (item && item->widget()) ++count;
+  }
+  return count;
+}
+
+void ToolPropertiesPanel::showEmptyPropertiesHint(
+    const QString &requestedToolId) {
+  const std::string toolName = requestedToolId.toStdString();
+  if (toolName.empty()) return;
+
+  TApplication *app = TApp::instance();
+  if (hasNoActiveLevelContext(app)) return;
+
+  const QStringList propertyLevels =
+      compatibleLevelNamesWithProperties(toolName);
+  const QStringList usableLevels = compatibleLevelNamesForToolUse(toolName);
+  const int levelType           = detectCurrentLevelType(app);
+  const bool supportedOnCurrent = isToolSupportedOnLevelType(toolName, levelType);
+
+  QString message;
+  if (!usableLevels.isEmpty() && !supportedOnCurrent) {
+    if (!propertyLevels.isEmpty()) {
+      message = formatLevelHintMessage(
+          tr("This tool's properties are only available on %1."),
+          tr("This tool's properties are only available on: %1"), propertyLevels);
+    } else {
+      message = formatLevelHintMessage(
+          tr("This tool can only be used on %1."),
+          tr("This tool can only be used on: %1"), usableLevels);
+    }
+  } else {
+    message = tr("No adjustable properties for this tool.");
+  }
+
+  QLabel *hint = new QLabel(message, this);
+  hint->setAlignment(Qt::AlignCenter);
+  hint->setWordWrap(true);
+  hint->setStyleSheet("color: gray; padding: 20px;");
+  m_propertiesLayout->addWidget(hint);
+}
+
 void ToolPropertiesPanel::refreshProperties() {
   QString toolId = detectCurrentToolId();
-  QString toolType = detectCurrentToolType();
-  
-  // Clear existing properties
-  clearProperties();
-  
-  m_currentToolId = toolId;
-  m_currentToolType = toolType;
-  
-  // Update header with official tool display name
-  TTool *tool = getCurrentTool();
-  if (tool) {
-    // Map internal tool ID → human-readable display name
-    // (built each call to respect runtime language changes)
-    QString displayName;
-    if      (toolId == T_Brush)              displayName = tr("Brush tool");
-    else if (toolId == T_Fill)               displayName = tr("Fill tool");
-    else if (toolId == T_PaintBrush)         displayName = tr("Paint Brush tool");
-    else if (toolId == T_Finger)             displayName = tr("Finger tool");
-    else if (toolId == T_Type)               displayName = tr("Type tool");
-    else if (toolId == T_EditAssistants)     displayName = tr("Edit Assistants tool");
-    else if (toolId == T_Eraser)             displayName = tr("Eraser tool");
-    else if (toolId == T_Selection)          displayName = tr("Selection tool");
-    else if (toolId == T_Geometric)          displayName = tr("Geometric tool");
-    else if (toolId == T_Edit)               displayName = tr("Animate tool");
-    else if (toolId == T_Tape)               displayName = tr("Tape tool");
-    else if (toolId == T_Cutter)             displayName = tr("Cutter tool");
-    else if (toolId == T_StylePicker)        displayName = tr("Style Picker tool");
-    else if (toolId == T_RGBPicker)          displayName = tr("RGB Picker tool");
-    else if (toolId == T_ControlPointEditor) displayName = tr("Control Point Editor tool");
-    else if (toolId == T_Pinch)              displayName = tr("Pinch tool");
-    else if (toolId == T_Pump)               displayName = tr("Pump tool");
-    else if (toolId == T_Magnet)             displayName = tr("Magnet tool");
-    else if (toolId == T_Bender)             displayName = tr("Bender tool");
-    else if (toolId == T_Iron)               displayName = tr("Iron tool");
-    else if (toolId == T_Skeleton)           displayName = tr("Skeleton tool");
-    else if (toolId == T_Tracker)            displayName = tr("Tracker tool");
-    else if (toolId == T_Hook)               displayName = tr("Hook tool");
-    else if (toolId == T_Plastic)            displayName = tr("Plastic tool");
-    else if (toolId == T_Zoom)               displayName = tr("Zoom tool");
-    else if (toolId == T_Rotate)             displayName = tr("Rotate tool");
-    else if (toolId == T_Hand)               displayName = tr("Hand tool");
-    else if (toolId == T_Ruler)              displayName = tr("Ruler tool");
-    else if (toolId == T_HideLine)           displayName = tr("Hide Line tool");
-    // fallback only when toolId is unknown
-    else displayName = QString::fromStdString(tool->getName());  // fallback
-    m_toolNameLabel->setText(displayName);
-  } else {
+  if (toolId.isEmpty()) {
+    clearProperties();
+    m_currentToolId   = QString();
+    m_currentToolType = QString();
     m_toolNameLabel->setText(tr("Tool Properties"));
-    // No active tool, display nothing
     m_propertiesLayout->addStretch(1);
     return;
   }
-  
+
+  QString toolType = detectCurrentToolType();
+
+  clearProperties();
+
+  m_currentToolId   = toolId;
+  m_currentToolType = toolType;
+
+  m_toolNameLabel->setText(displayNameForToolId(toolId));
+
   // Create properties based on tool type
   if (toolType == "brush") {
     createBrushProperties();
@@ -543,6 +769,9 @@ void ToolPropertiesPanel::refreshProperties() {
   } else if (toolType == "edit") {
     createAnimateProperties();
 
+  } else if (toolType == "assistant") {
+    createEditAssistantsProperties();
+
   } else {
     // All remaining tools (Tape, Cutter, StylePicker, RGBPicker, ControlPointEditor,
     // Pinch, Pump, Magnet, Bender, Iron, Skeleton, Tracker, Hook, Plastic,
@@ -556,30 +785,22 @@ void ToolPropertiesPanel::refreshProperties() {
     TPropertyGroup *g1 = t ? t->getProperties(1) : nullptr;
     const bool sameGroup = (g0 && g1 && g0 == g1);
 
-    bool hasGroup0 = createGenericProperties(0);
+    createGenericProperties(0);
 
     // Group 1 holds outline/cap/join options for some vector tools.
     // Only add it when it is a DISTINCT group (different pointer than group 0).
-    bool hasGroup1 = false;
     if (!sameGroup && g1 && g1->getPropertyCount() > 0) {
       QFrame *sep = new QFrame(this);
       sep->setFrameShape(QFrame::HLine);
       sep->setFrameShadow(QFrame::Sunken);
       sep->setStyleSheet("color: #555; margin: 4px 0;");
       m_propertiesLayout->addWidget(sep);
-      hasGroup1 = createGenericProperties(1);
-    }
-
-    // If no widgets were added at all, the tool has no adjustable properties.
-    if (!hasGroup0 && !hasGroup1) {
-      QLabel *noProps = new QLabel(tr("No adjustable properties for this tool."), this);
-      noProps->setAlignment(Qt::AlignCenter);
-      noProps->setWordWrap(true);
-      noProps->setStyleSheet("color: gray; padding: 20px;");
-      m_propertiesLayout->addWidget(noProps);
+      createGenericProperties(1);
     }
   }
-  
+
+  if (propertyWidgetCount() == 0) showEmptyPropertiesHint(toolId);
+
   attachAllPropertySyncListeners();
 
   // Add stretch at the end
@@ -2171,20 +2392,12 @@ QWidget* ToolPropertiesPanel::createSliderWithLabel(const QString &label, int mi
         container->property("propName").toString().toStdString();
     const int propGroup = container->property("propGroup").toInt();
 
-    TPropertyGroup *props = tool->getProperties(propGroup);
-    if (!props) return;
-    
-    for (int i = 0; i < props->getPropertyCount(); ++i) {
-      TProperty *prop = props->getProperty(i);
-      if (prop && prop->getName() == propName) {
-        TIntProperty *intProp = dynamic_cast<TIntProperty*>(prop);
-        if (intProp) {
-          intProp->setValue(val);
-          tool->onPropertyChanged(propName);
-          if (m_toolHandle) m_toolHandle->notifyToolChanged();
-        }
-        break;
-      }
+    TProperty *prop = resolveTppProperty(tool, container, propGroup, propName);
+    if (auto *intProp = dynamic_cast<TIntProperty *>(prop)) {
+      intProp->setValue(val);
+      tool->onPropertyChanged(propName, true);
+      intProp->notifyListeners();
+      if (m_toolHandle) m_toolHandle->notifyToolChanged();
     }
   });
   
@@ -2252,7 +2465,7 @@ QWidget* ToolPropertiesPanel::createDoubleSliderWithLabel(const QString &label, 
   connect(slider, &QSlider::valueChanged, [this, container](int val) {
     const double newValue =
         static_cast<double>(val) / kTppDoubleSliderFactor;
-    
+
     TTool *tool = getCurrentTool();
     if (!tool) return;
 
@@ -2260,20 +2473,12 @@ QWidget* ToolPropertiesPanel::createDoubleSliderWithLabel(const QString &label, 
         container->property("propName").toString().toStdString();
     const int propGroup = container->property("propGroup").toInt();
 
-    TPropertyGroup *props = tool->getProperties(propGroup);
-    if (!props) return;
-    
-    for (int i = 0; i < props->getPropertyCount(); ++i) {
-      TProperty *prop = props->getProperty(i);
-      if (prop && prop->getName() == propName) {
-        TDoubleProperty *doubleProp = dynamic_cast<TDoubleProperty*>(prop);
-        if (doubleProp) {
-          doubleProp->setValue(newValue);
-          tool->onPropertyChanged(propName);
-          if (m_toolHandle) m_toolHandle->notifyToolChanged();
-        }
-        break;
-      }
+    TProperty *prop = resolveTppProperty(tool, container, propGroup, propName);
+    if (auto *doubleProp = dynamic_cast<TDoubleProperty *>(prop)) {
+      doubleProp->setValue(newValue);
+      tool->onPropertyChanged(propName, true);
+      doubleProp->notifyListeners();
+      if (m_toolHandle) m_toolHandle->notifyToolChanged();
     }
   });
   
@@ -2296,21 +2501,12 @@ QWidget* ToolPropertiesPanel::createCheckBox(const QString &label, bool checked,
         checkBox->property("propName").toString().toStdString();
     const int propGroup = checkBox->property("propGroup").toInt();
 
-    TPropertyGroup *props = tool->getProperties(propGroup);
-    if (!props) return;
-    
-    for (int i = 0; i < props->getPropertyCount(); ++i) {
-      TProperty *prop = props->getProperty(i);
-      if (prop && prop->getName() == propName) {
-        TBoolProperty *boolProp = dynamic_cast<TBoolProperty*>(prop);
-        if (boolProp) {
-          boolProp->setValue(checked);
-          tool->onPropertyChanged(propName);
-          boolProp->notifyListeners();
-          if (m_toolHandle) m_toolHandle->notifyToolChanged();
-        }
-        break;
-      }
+    TProperty *prop = resolveTppProperty(tool, checkBox, propGroup, propName);
+    if (auto *boolProp = dynamic_cast<TBoolProperty *>(prop)) {
+      boolProp->setValue(checked);
+      tool->onPropertyChanged(propName, true);
+      boolProp->notifyListeners();
+      if (m_toolHandle) m_toolHandle->notifyToolChanged();
     }
   });
   
@@ -2333,27 +2529,22 @@ QWidget *ToolPropertiesPanel::createTextProperty(const QString &label,
   lineEdit->setText(QString::fromStdWString(prop->getValue()));
   lineEdit->setProperty("propName", QString::fromStdString(propName));
   lineEdit->setProperty("propGroup", propGroup);
+  storeTppPropertyPtr(container, prop);
   layout->addWidget(lineEdit);
 
-  connect(lineEdit, &QLineEdit::editingFinished, [this, lineEdit]() {
+  connect(lineEdit, &QLineEdit::editingFinished, [this, container, lineEdit]() {
     TTool *tool = getCurrentTool();
     if (!tool) return;
 
     const std::string name =
         lineEdit->property("propName").toString().toStdString();
     const int group = lineEdit->property("propGroup").toInt();
-    TPropertyGroup *props = tool->getProperties(group);
-    if (!props) return;
-
-    for (int i = 0; i < props->getPropertyCount(); ++i) {
-      TProperty *p = props->getProperty(i);
-      if (!p || p->getName() != name) continue;
-      if (auto *sp = dynamic_cast<TStringProperty *>(p)) {
-        sp->setValue(lineEdit->text().toStdWString());
-        tool->onPropertyChanged(name);
-        if (m_toolHandle) m_toolHandle->notifyToolChanged();
-      }
-      break;
+    TProperty *p = resolveTppProperty(tool, container, group, name);
+    if (auto *sp = dynamic_cast<TStringProperty *>(p)) {
+      sp->setValue(lineEdit->text().toStdWString());
+      tool->onPropertyChanged(name, true);
+      sp->notifyListeners();
+      if (m_toolHandle) m_toolHandle->notifyToolChanged();
     }
   });
 
@@ -2479,28 +2670,22 @@ QWidget* ToolPropertiesPanel::createCollapsibleEnum(const QString &label,
           [this, valueLabel, items, container, onChanged](int id) {
     // Update value label
     valueLabel->setText(items.value(id, ""));
-    
+
     // Update tool property
     std::string propName = container->property("propName").toString().toStdString();
     int propGroup = container->property("propGroup").toInt();
-    
+
     TTool *tool = getCurrentTool();
     if (!tool) return;
-    
-    TPropertyGroup *props = tool->getProperties(propGroup);
-    if (!props) return;
-    
-    for (int k = 0; k < props->getPropertyCount(); ++k) {
-      TProperty *prop = props->getProperty(k);
-      if (prop && prop->getName() == propName) {
-        TEnumProperty *enumProp = dynamic_cast<TEnumProperty*>(prop);
-        if (enumProp) {
-          enumProp->setIndex(id);
-          tool->onPropertyChanged(propName);
-          if (m_toolHandle) m_toolHandle->notifyToolChanged();
-        }
-        break;
-      }
+
+    TProperty *prop = resolveTppProperty(tool, container, propGroup, propName);
+    if (auto *enumProp = dynamic_cast<TEnumProperty *>(prop)) {
+      enumProp->setIndex(id);
+      tool->onPropertyChanged(propName, true);
+      enumProp->notifyListeners();
+      if (m_toolHandle) m_toolHandle->notifyToolChanged();
+      if (tool->getName() == T_EditAssistants && propName == "AssistantType")
+        refreshProperties();
     }
 
     if (onChanged) onChanged(id);
@@ -2609,13 +2794,11 @@ QWidget *ToolPropertiesPanel::createCollapsibleIntSlider(
     const std::string name =
         container->property("propName").toString().toStdString();
     const int group = container->property("propGroup").toInt();
-    TPropertyGroup *props = tool->getProperties(group);
-    if (!props) return;
-
-    if (auto *intProp =
-            dynamic_cast<TIntProperty *>(props->getProperty(name))) {
+    TProperty *prop = resolveTppProperty(tool, container, group, name);
+    if (auto *intProp = dynamic_cast<TIntProperty *>(prop)) {
       intProp->setValue(val);
-      tool->onPropertyChanged(name);
+      tool->onPropertyChanged(name, true);
+      intProp->notifyListeners();
       if (m_toolHandle) m_toolHandle->notifyToolChanged();
     }
   };
@@ -3265,6 +3448,7 @@ QWidget *ToolPropertiesPanel::createEnumIconGridPanel(
   QWidget *container = new QWidget(host);
   container->setProperty("propName", QString::fromStdString(propName));
   container->setProperty("propGroup", propGroup);
+  storeTppPropertyPtr(container, enumProp);
   container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
   QVBoxLayout *outerLayout = new QVBoxLayout(container);
@@ -3338,19 +3522,16 @@ QWidget *ToolPropertiesPanel::createEnumIconGridPanel(
             if (!tool) return;
 
             const int group = container->property("propGroup").toInt();
-            TPropertyGroup *props = tool->getProperties(group);
-            if (!props) return;
-
-            for (int k = 0; k < props->getPropertyCount(); ++k) {
-              TProperty *prop = props->getProperty(k);
-              if (!prop || prop->getName() != propName) continue;
-
-              if (TEnumProperty *ep = dynamic_cast<TEnumProperty *>(prop)) {
-                ep->setIndex(id);
-                tool->onPropertyChanged(propName);
-                if (m_toolHandle) m_toolHandle->notifyToolChanged();
-              }
-              break;
+            TProperty *prop =
+                resolveTppProperty(tool, container, group, propName);
+            if (auto *ep = dynamic_cast<TEnumProperty *>(prop)) {
+              ep->setIndex(id);
+              tool->onPropertyChanged(propName, true);
+              ep->notifyListeners();
+              if (m_toolHandle) m_toolHandle->notifyToolChanged();
+              if (tool->getName() == T_EditAssistants &&
+                  propName == "AssistantType")
+                refreshProperties();
             }
 
             if (onChanged) onChanged(id);
@@ -3384,7 +3565,10 @@ QWidget *ToolPropertiesPanel::createCollapsibleEnumForProperty(
                                    parentWidget);
   }
 
-  if (widget) widget->setProperty("propGroup", propGroup);
+  if (widget) {
+    widget->setProperty("propGroup", propGroup);
+    storeTppPropertyPtr(widget, enumProp);
+  }
   return widget;
 }
 
@@ -3601,6 +3785,7 @@ bool ToolPropertiesPanel::createGenericProperties(int propGroup,
 
     if (w) {
       w->setProperty("propGroup", propGroup);
+      storeTppPropertyPtr(w, prop);
       layout->addWidget(w);
       if (plasticAlignedFields) uniformPlasticFieldWidget(w);
       addedAny = true;
@@ -3634,8 +3819,15 @@ void ToolPropertiesPanel::createRulerProperties() {
   }
 
   m_rulerOptionsBox->resetValues();
-  m_rulerOptionsBox->show();
-  m_propertiesLayout->addWidget(m_rulerOptionsBox);
+  m_rulerOptionsBox->hide();
+  // Keep registered for live measurement updates, but do not show in the panel:
+  // the ruler has no adjustable properties (same message as Iron / Zoom).
+}
+
+void ToolPropertiesPanel::createEditAssistantsProperties() {
+  // EditAssistantsTool::getProperties() rebuilds its group on every call and
+  // must not be invoked from change handlers — store direct TProperty* on widgets.
+  createGenericProperties(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -5172,15 +5364,16 @@ void ToolPropertiesPanel::onToolSwitched() {
   refreshProperties();
 }
 
+void ToolPropertiesPanel::onSceneContextChanged() {
+  refreshProperties();
+}
+
 void ToolPropertiesPanel::onToolChanged() {
-  // Check if tool type has changed (e.g., from "brush" to "mypaint")
-  // This can happen when user changes brush style from standard to MyPaint
-  QString currentType = detectCurrentToolType();
-  if (currentType != m_currentToolType) {
-    // Tool type changed, need to refresh entire properties display
+  const QString currentId   = detectCurrentToolId();
+  const QString currentType = detectCurrentToolType();
+  if (currentId != m_currentToolId || currentType != m_currentToolType) {
     refreshProperties();
   } else {
-    // Same tool type, just update property values (synchronization from ToolOptionsBar)
     updatePropertyValues();
   }
 }
@@ -5296,11 +5489,12 @@ void ToolPropertiesPanel::attachAllPropertySyncListeners() {
         widget->property("propName").toString().toStdString();
     const int propGroup = widget->property("propGroup").toInt();
 
-    TPropertyGroup *props = tool->getProperties(propGroup);
-    if (!props && propGroup > 0) props = tool->getProperties(0);
-    if (!props) continue;
-
-    TProperty *prop = props->getProperty(propName);
+    TProperty *prop = tppPropertyFromWidget(widget);
+    if (!prop) {
+      TPropertyGroup *props = tool->getProperties(propGroup);
+      if (!props && propGroup > 0) props = tool->getProperties(0);
+      if (props) prop = props->getProperty(propName);
+    }
     if (!prop) continue;
 
     new PropertyWidgetSync(this, widget, prop, widget);
@@ -5317,24 +5511,15 @@ void ToolPropertiesPanel::updateWidgetFromProperty(QWidget *widget) {
   
   std::string propName = propNameVariant.toString().toStdString();
   int propGroup = widget->property("propGroup").toInt();
-  
+
   TTool *tool = getCurrentTool();
   if (!tool) return;
-  
-  TPropertyGroup *props = tool->getProperties(propGroup);
-  if (!props && propGroup > 0) {
-    // Fallback to group 0 if specified group doesn't exist
-    props = tool->getProperties(0);
-  }
-  if (!props) return;
-  
-  // Find the property
-  for (int i = 0; i < props->getPropertyCount(); ++i) {
-    TProperty *prop = props->getProperty(i);
-    if (!prop || prop->getName() != propName) continue;
 
-    // Collapsible text field (Plastic vertex name) — before generic line edits.
-    if (auto *strProp = dynamic_cast<TStringProperty *>(prop)) {
+  TProperty *prop = resolveTppProperty(tool, widget, propGroup, propName);
+  if (!prop) return;
+
+  // Collapsible text field (Plastic vertex name) — before generic line edits.
+  if (auto *strProp = dynamic_cast<TStringProperty *>(prop)) {
       if (QLineEdit *directEdit = qobject_cast<QLineEdit *>(widget)) {
         const QString newText = QString::fromStdWString(strProp->getValue());
         directEdit->blockSignals(true);
@@ -5537,9 +5722,6 @@ void ToolPropertiesPanel::updateWidgetFromProperty(QWidget *widget) {
         return;
       }
     }
-    
-    break;
-  }
 }
 
 void ToolPropertiesPanel::onSizeChanged(int value) {
