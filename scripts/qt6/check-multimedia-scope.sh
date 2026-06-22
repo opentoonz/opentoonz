@@ -8,8 +8,9 @@ qt_qsound_boundary='(^|[^[:alnum:]_])QSound([^[:alnum:]_]|$)'
 qt_video_surface_boundary='(^|[^[:alnum:]_])(QAbstractVideoSurface|QVideoSurfaceFormat)([^[:alnum:]_]|$)'
 legacy_penciltest_condition='if\(\(PLATFORM EQUAL 64\) OR \(OPENTOONZ_QT_MAJOR EQUAL 6\)\)'
 qt_audio_format_codec='(^|[^[:alnum:]_])setCodec[[:space:]]*\([[:space:]]*"audio/pcm"[[:space:]]*\)'
+qt5_audio_format_methods='(^|[^[:alnum:]_])(format|qFormat)[[:space:]]*\.[[:space:]]*(setCodec[[:space:]]*\([[:space:]]*"audio/pcm"[[:space:]]*\)|setSampleSize[[:space:]]*\(|setSampleType[[:space:]]*\(|setByteOrder[[:space:]]*\(|sampleSize[[:space:]]*\(|sampleType[[:space:]]*\()'
 
-require_qt5_only_audio_codec_scope() {
+require_qt5_only_audio_format_scope() {
   local file="$1"
   awk '
     /^[[:space:]]*#[[:space:]]*if/ {
@@ -28,7 +29,7 @@ require_qt5_only_audio_codec_scope() {
         stack[depth] = 1
     }
 
-    /(^|[^[:alnum:]_])setCodec[[:space:]]*\([[:space:]]*"audio\/pcm"[[:space:]]*\)/ {
+    /(^|[^[:alnum:]_])(format|qFormat)[[:space:]]*\.[[:space:]]*(setCodec[[:space:]]*\([[:space:]]*"audio\/pcm"[[:space:]]*\)|setSampleSize[[:space:]]*\(|setSampleType[[:space:]]*\(|setByteOrder[[:space:]]*\(|sampleSize[[:space:]]*\(|sampleType[[:space:]]*\()/ {
       qt5_only = 0
       for (i = 1; i <= depth; ++i) {
         if (stack[i] == -1)
@@ -94,6 +95,19 @@ if [[ -n "$unexpected_audio_format_codec" ]]; then
   exit 1
 fi
 
+unexpected_qt5_audio_format_methods="$(
+  git grep -nE "$qt5_audio_format_methods" -- \
+    'toonz/sources' \
+    ':!toonz/sources/common/tsound/tsound_qt.cpp' \
+    ':!toonz/sources/toonz/audiorecordingpopup.cpp' \
+    ':!toonz/sources/toonzlib/txshsoundcolumn.cpp' || true
+)"
+if [[ -n "$unexpected_qt5_audio_format_methods" ]]; then
+  printf '%s\n' "$unexpected_qt5_audio_format_methods"
+  echo "error: Qt 5 QAudioFormat size/type/codec/byte-order APIs were removed in Qt 6; keep them confined to audited Qt 5-only audio branches" >&2
+  exit 1
+fi
+
 for expected_audio_format_codec in \
   'toonz/sources/common/tsound/tsound_qt.cpp:[0-9]+:.*format\.setCodec\("audio/pcm"\)' \
   'toonz/sources/toonz/audiorecordingpopup.cpp:[0-9]+:.*format\.setCodec\("audio/pcm"\)' \
@@ -108,8 +122,8 @@ for audio_format_codec_file in \
   toonz/sources/common/tsound/tsound_qt.cpp \
   toonz/sources/toonz/audiorecordingpopup.cpp \
   toonz/sources/toonzlib/txshsoundcolumn.cpp; do
-  if ! require_qt5_only_audio_codec_scope "$audio_format_codec_file"; then
-    echo "error: QAudioFormat::setCodec() was removed in Qt 6; audited audio/pcm codec setup must stay inside Qt 5-only branches" >&2
+  if ! require_qt5_only_audio_format_scope "$audio_format_codec_file"; then
+    echo "error: Qt 5 QAudioFormat size/type/codec/byte-order APIs were removed in Qt 6; audited audio-format usage must stay inside Qt 5-only branches" >&2
     exit 1
   fi
 done
