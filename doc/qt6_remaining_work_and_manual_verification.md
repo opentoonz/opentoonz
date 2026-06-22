@@ -592,6 +592,9 @@ Already covered:
 - The basic script smoke now covers `print`, `warning`, the legacy `dummy()`
   helper, the legacy `void` result object, `run()` library lookup, `run()`
   return values, and child-script global variable/function persistence.
+- The global-output edge smoke now covers `print()` / `warning()` formatting
+  for strings, numbers, booleans, `undefined`, `null`, and arrays, plus the
+  legacy `void` return object, `dummy()`, and `ToonzVersion` type/value.
 - `mise run check-qt6-script-scope` now guards the CMake boundary between the
   legacy Qt Script implementation and the Qt 6 `QJSEngine` facade, keeping
   `Qt5::Script` and legacy `scriptbinding_*` compilation inside Qt 5-only
