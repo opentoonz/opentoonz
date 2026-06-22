@@ -155,10 +155,13 @@ private:
   QString detectCurrentToolId();
   QString detectCurrentToolType();
   TTool* getCurrentTool();
+  QString displayNameForToolId(const QString &toolId) const;
   
   // Properties display
   void refreshProperties();
   void clearProperties();
+  void showEmptyPropertiesHint(const QString &requestedToolId);
+  int propertyWidgetCount() const;
   void updatePropertyValues();
   void updateWidgetFromProperty(QWidget *widget);
   void updatePropertyWidgetsIn(QWidget *root);
@@ -208,12 +211,11 @@ private:
                                 int propGroup = 0);
 
   // Generic property builder — iterates all TProperty in a group dynamically.
-  // Works for any tool without hardcoding property names.
-  // Returns true if at least one widget was added.
-  // When targetLayout is set, widgets are added there instead of the main panel.
   bool createGenericProperties(int propGroup = 0,
                                QVBoxLayout *targetLayout = nullptr,
                                bool plasticAlignedFields = false);
+
+  void createEditAssistantsProperties();
 
   // Ruler / Plastic need bespoke layouts (no or multi-mode property groups).
   void createRulerProperties();
@@ -304,6 +306,7 @@ private:
   
 private slots:
   void onToolSwitched();
+  void onSceneContextChanged();
   void onToolChanged();
   void onToolComboBoxListChanged(const std::string &id);
   
