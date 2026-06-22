@@ -674,6 +674,10 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/level_lifecycle
 description = "Run the Qt 6 app bundle against the basic Image and Level frame headless script binding fixture."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_basic.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-image-loaded Raster 32 32 Raster image ( 32 x 32 ) true|qt-script-image-saved true Raster 32 32|qt-script-image-level Raster 1 0001 Raster 32 32' bash scripts/qt6/run-script-smoke.sh"
 
+[tasks.script-smoke-image-load-edges-qt6]
+description = "Run the Qt 6 app bundle against Image.load replacement and chaining behavior."
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_load_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-image-load-edges-first true Raster 32 32 Raster image ( 32 x 32 )|qt-script-image-load-edges-second true Raster 35 30 Raster image ( 35 x 30 )|qt-script-image-load-edges-save true true Raster 35 30' bash scripts/qt6/run-script-smoke.sh"
+
 [tasks.script-smoke-image-edges-qt6]
 description = "Run the Qt 6 app bundle against Image constructor, load, and save edge cases."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-image-edges-empty Empty 0 0 0 Empty image true|qt-script-image-edges-load true true true Empty 0 0|qt-script-image-edges-arity true true true true|qt-script-image-edges-save true true true ToonzRaster 9 7' bash scripts/qt6/run-script-smoke.sh"

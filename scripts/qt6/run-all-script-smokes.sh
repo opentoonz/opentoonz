@@ -44,6 +44,7 @@ tasks=(
   script-smoke-level-path-edges-qt6
   script-smoke-level-lifecycle-edges-qt6
   script-smoke-image-qt6
+  script-smoke-image-load-edges-qt6
   script-smoke-image-edges-qt6
   script-smoke-image-lifecycle-edges-qt6
   script-smoke-image-level-first-frame-qt6

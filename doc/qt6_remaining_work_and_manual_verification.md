@@ -640,8 +640,10 @@ Already covered:
   including the QApplication-backed Rasterizer and Renderer fixtures.
 - The Image smoke coverage now includes post-dispose rejection for metadata
   access, string conversion, `load()`, and `save()`, in addition to load/save,
-  first-frame sequence loading, incompatible save error coverage, and strict
-  Image method arity for load and save calls.
+  `Image.load()` return chaining and loaded-image replacement with a second
+  raster image of different dimensions, first-frame sequence loading,
+  incompatible save error coverage, and strict Image method arity for load and
+  save calls.
 - The FilePath smoke coverage now includes mutable property setters,
   `withParentDirectory()` parent conversion, `exists`, `isDirectory`, and
   `lastModified` JS `Date` exposure, plus `valueOf()`, `String(filePath)`,

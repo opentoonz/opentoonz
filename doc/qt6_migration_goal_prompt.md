@@ -2415,6 +2415,12 @@ branch.
   rejection, missing-image load errors that clear the image handle, incompatible
   raster/ToonzRaster save rejection, unrecognized output type errors, and
   strict Image method arity for load and save calls.
+- An Image load edge-case Qt 6 script fixture exists at
+  `toonz/sources/tests/scriptengine/image_load_edges.toonzscript` and is run by
+  `mise run script-smoke-image-load-edges-qt6`. It validates `Image.load()`
+  return chaining, replacing a loaded image with a second bundled raster image
+  of different dimensions, and saving/reloading the replacement result through
+  the Qt 6 script facade.
 - An Image lifecycle edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/image_lifecycle_edges.toonzscript` and is
   run by `mise run script-smoke-image-lifecycle-edges-qt6`. It validates that
@@ -2438,8 +2444,8 @@ branch.
   Scene lifecycle edges, Scene load-level, Scene load-level sequence,
   Scene save/reopen, Scene reload edge,
   Scene failed-load, Scene save-icon, Scene save-icon variants, Scene frame-id,
-  Level, Level I/O, Level edge-case, Level I/O types, Image, Image edge-case,
-  Image level-first-frame, ImageBuilder, ImageBuilder edge-case,
+  Level, Level I/O, Level edge-case, Level I/O types, Image, Image load edge,
+  Image edge-case, Image level-first-frame, ImageBuilder, ImageBuilder edge-case,
   Transform edge-case, ToonzRasterConverter,
   ToonzRasterConverter level conversion, ToonzRasterConverter edge-case,
   OutlineVectorizer,
@@ -2670,7 +2676,7 @@ The next slice should make the Qt 6 app useful enough to run and diagnose:
    Level,
    Level edge-case, Level name edge, Level I/O, Level path,
    level transformer, Image,
-   Image edge-case, Image level-first-frame, ImageBuilder,
+   Image load edge, Image edge-case, Image level-first-frame, ImageBuilder,
    ImageBuilder edge-case, Transform edge-case,
    Level I/O types,
    ToonzRasterConverter, ToonzRasterConverter level conversion,
