@@ -1,0 +1,10 @@
+var childPath = new FilePath("run_filepath_child.toonzscript");
+var first = run(childPath);
+var second = run(new FilePath(childPath));
+
+print("qt-script-run-filepath-values", first, second,
+      qtScriptRunFilePathCounter);
+print("qt-script-run-filepath-global", qtScriptRunFilePathGlobal,
+      qtScriptRunFilePathCounter === 2);
+
+"qt-script-run-filepath-result";

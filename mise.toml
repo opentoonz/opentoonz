@@ -526,6 +526,10 @@ run = "OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-smoke 3 [true,ok]|qt-script-v
 description = "Run the Qt 6 app bundle against run() argument, child-error, and missing-script error parity."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/run_errors.toonzscript OPENTOONZ_SCRIPT_LIBRARY_FIXTURE=toonz/sources/tests/scriptengine/run_error_child.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-run-errors [true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
 
+[tasks.script-smoke-run-filepath-qt6]
+description = "Run the Qt 6 app bundle against run(FilePath) return values and global persistence."
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/run_filepath.toonzscript OPENTOONZ_SCRIPT_LIBRARY_FIXTURE=toonz/sources/tests/scriptengine/run_filepath_child.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-run-filepath-child 1|qt-script-run-filepath-child 2|qt-script-run-filepath-values [filepath-child,1,true] [filepath-child,2,true] 2|qt-script-run-filepath-global filepath-child-global true' bash scripts/qt6/run-script-smoke.sh"
+
 [tasks.script-smoke-global-output-edges-qt6]
 description = "Run the Qt 6 app bundle against global print/warning formatting and void return behavior."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/global_output_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-global-output-print text 3 true false undefined null [1,two,false]|qt-script-global-output-warning warn 4 true null|qt-script-global-output-return true true object 0|qt-script-global-output-version 7.1 string' bash scripts/qt6/run-script-smoke.sh"

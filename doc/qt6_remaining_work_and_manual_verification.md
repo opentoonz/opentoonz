@@ -619,6 +619,10 @@ Already covered:
   smoke.
 - The `run()` error smoke covers missing/extra arguments, bad path arguments,
   missing script files, and child-script exception propagation.
+- The `run(FilePath)` smoke covers child-script lookup through a `FilePath`
+  wrapper and copied `FilePath`, returned array values, child-script print
+  output, and global variable persistence across repeated child script
+  execution in the same Qt 6 `QJSEngine`.
 - The smoke suite covers the current facades for file/path, scene, level,
   image, image builder, rasterizer, vectorizers, renderer, wrapper id, binding
   lifecycle, and several edge cases.

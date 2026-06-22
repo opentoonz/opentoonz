@@ -1988,6 +1988,12 @@ branch.
   non-file-path arguments, missing script files, and child-script exceptions
   from `toonz/sources/tests/scriptengine/run_error_child.toonzscript` instead
   of silently returning `undefined`.
+- A `run(FilePath)` parity fixture exists at
+  `toonz/sources/tests/scriptengine/run_filepath.toonzscript` and is run by
+  `mise run script-smoke-run-filepath-qt6`. It validates child-script lookup
+  through a `FilePath` wrapper and a copied `FilePath`, returned array values,
+  child-script print output, and global variable persistence across repeated
+  child script execution in the same Qt 6 `QJSEngine`.
 - A global output edge fixture exists at
   `toonz/sources/tests/scriptengine/global_output_edges.toonzscript` and is
   run by `mise run script-smoke-global-output-edges-qt6`. It validates
@@ -2423,7 +2429,7 @@ branch.
   fallback, explicit frame-2 path loading, Raster type reporting, size, DPI,
   and string reporting.
 - The script smoke can run in bounded mode or natural-exit mode. The basic,
-  `run()` error, global-output edge, FilePath, FilePath edges,
+  `run()` error, `run(FilePath)`, global-output edge, FilePath, FilePath edges,
   FilePath files edge,
   FilePath metadata, path-argument,
   Scene, Scene cells, Scene columns, Scene column edge,
@@ -2652,7 +2658,7 @@ The next slice should make the Qt 6 app useful enough to run and diagnose:
    Record Audio UI Save and Insert column insertion, audible playback
    confirmation, lip-sync preview/timing, camera preview, and still-capture
    checks before calling multimedia product-ready.
-5. Keep the basic, `run()` error, global-output edge, FilePath,
+5. Keep the basic, `run()` error, `run(FilePath)`, global-output edge, FilePath,
    FilePath-edge, FilePath metadata,
    path-argument, Scene, Scene cells, Scene columns, Scene column edge,
    Scene cell frame-id type, Scene cell object edge, Scene edges,

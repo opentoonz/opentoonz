@@ -7,6 +7,7 @@ cd "$repo_root"
 tasks=(
   script-smoke-qt6
   script-smoke-run-errors-qt6
+  script-smoke-run-filepath-qt6
   script-smoke-global-output-edges-qt6
   script-smoke-filepath-qt6
   script-smoke-filepath-coercion-qt6
