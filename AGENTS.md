@@ -97,6 +97,39 @@ area:
 When a full local build is not feasible, state that explicitly in the final
 handoff and include the configure/build command that should be run.
 
+## Durable Feedback Loops
+
+For long-running migration work, improve the project through evidence-backed
+feedback loops rather than ad hoc prompt mutation. Treat repeated CI failures,
+recurring local build warnings, manual QA gaps, brittle smoke coverage, and
+ambiguous handoffs as signals to strengthen the right durable layer.
+
+- Keep default build behavior stable unless the task explicitly changes it.
+- Preserve the current Qt 5 lane while adding or hardening Qt 6 behavior.
+- Do not promote a one-off observation into durable guidance. Require repeated
+  failure, clear missing coverage, or explicit evidence from a build, smoke,
+  CI run, or manual verification pass.
+- When the same mistake or ambiguity appears twice, write a short retrospective
+  and propose the smallest durable update in the right layer:
+  - `AGENTS.md` for always-on repository conventions.
+  - `doc/qt6_migration_goal_prompt.md` for Qt 6 migration sequencing,
+    validation, and reporting rules.
+  - `doc/qt6_remaining_work_and_manual_verification.md` for QA checklists,
+    remaining gaps, and manual verification procedure.
+  - `mise.toml` and `scripts/qt6/` for mechanical guardrails and repeatable
+    local checks.
+  - `.github/workflows/` for CI coverage once the local loop is stable.
+- Use hooks or guard scripts only for mechanical checks such as forbidden Qt
+  APIs, task registry drift, path hygiene, and expected artifact shape. Do not
+  encode subjective judgment in hooks.
+- Add scheduled automations only after the manual workflow is stable and the
+  automation prompt has been tested manually.
+
+End long-running migration turns with enough retrospective context to improve
+the next run: what failed or was ambiguous, what evidence was collected, whether
+durable guidance changed, and what should be updated next if the same issue
+repeats.
+
 ## Formatting And Style
 
 - C++ code is formatted with `toonz/sources/.clang-format`.

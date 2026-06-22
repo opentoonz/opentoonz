@@ -49,6 +49,53 @@ but do not defer Qt 6 rendering work solely because a Metal draft exists.
 - Keep changes small enough that another agent can continue from the result.
 - In final handoffs, list changed files and validation actually run.
 
+## Self-Improvement Protocol
+
+Use a durable feedback loop for the Qt 6 migration. The goal prompt may evolve,
+but only through evidence-backed updates in the right repository layer. Do not
+make the migration "self-improving" by recursively rewriting this prompt from a
+single run's uncertainty.
+
+Treat these as learning signals:
+
+- repeated CI failures with the same root cause;
+- repeated local build or compiler-warning frontiers;
+- smoke tasks or fixtures that drift out of aggregate registries;
+- manual QA gaps that block a parity claim;
+- confusing handoffs that force the next agent to rediscover state;
+- fragile scripts, docs, or workflow assumptions found during validation.
+
+When a learning signal appears, follow this loop:
+
+1. Record the observation in the final handoff or an implementation note with
+   concrete evidence: command output, CI run, smoke result, manual QA result, or
+   file path.
+2. Classify the durable layer before editing:
+   - `AGENTS.md` for always-on repository workflow rules.
+   - This goal prompt for Qt 6 sequencing, scope, validation, and reporting.
+   - `doc/qt6_remaining_work_and_manual_verification.md` for QA checklists,
+     release gaps, and manual verification procedure.
+   - `mise.toml` and `scripts/qt6/` for mechanical guardrails and local checks.
+   - `.github/workflows/` for CI coverage after the local loop is stable.
+   - Script fixtures or GUI smoke actions for behavior that must not regress.
+3. Prefer shadow or advisory evidence before enforcing new behavior. For
+   example, run a grep/check locally and confirm the current tree is clean
+   before wiring the check into the preflight.
+4. Add the smallest durable update that would have prevented the repeated
+   mistake or made the missing evidence obvious.
+5. Validate the durable update itself. Documentation changes need path-hygiene
+   and command-list consistency checks; guard scripts need direct runs and, when
+   practical, synthetic good/bad self-tests; source changes need both Qt lanes or
+   a clearly stated limitation.
+6. End the turn with a short retrospective when a durable update was considered:
+   what failed or was ambiguous, whether guidance changed, what evidence
+   justified it, and what should change next if the pattern repeats.
+
+Do not update durable guidance for a one-off preference, an unverified guess, or
+a transient local environment problem. Keep the loop evidence-driven and
+reviewable so future agents can trust the prompts instead of inheriting stale
+advice.
+
 ## Current Branch Status
 
 As of June 2, 2026, the initial Qt 6 runway is already implemented in this
@@ -2913,6 +2960,9 @@ Every handoff must include:
 - remaining known blockers
 - whether any touched files affect viewer/rendering parity and how they were
   validated in both Qt lanes
+- when a durable guidance, guardrail, workflow, or checklist update was made or
+  considered: the retrospective evidence, the chosen layer, and any follow-up
+  recommendation if the same pattern repeats
 
 Do not claim Qt 6 support until the Qt 6 lane configures, compiles, packages,
 launches, and passes the relevant GUI/hardware smoke checks.
