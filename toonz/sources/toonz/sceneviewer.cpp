@@ -86,6 +86,7 @@
 #include <QInputMethod>
 #include <QOpenGLFramebufferObject>
 #include <QMainWindow>
+#include <QElapsedTimer>
 
 #include "sceneviewer.h"
 
@@ -2046,7 +2047,7 @@ void SceneViewer::paintGL() {
 #endif
 
 #ifdef FPS_HISTOGRAM
-  QTime time;
+  QElapsedTimer time;
   time.start();
 #endif
 

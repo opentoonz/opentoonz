@@ -63,7 +63,7 @@ maximum
 #endif
 
 #ifdef TIPC_DEBUG
-#include <QTime>
+#include <QElapsedTimer>
 #endif
 
 //********************************************************
@@ -676,7 +676,7 @@ retry:
 */
 bool tipc::writeShMemBuffer(Stream& stream, Message& msg, int bufSize,
                             ShMemWriter* dataWriter) {
-  tipc_debug(QTime time; time.start());
+  tipc_debug(QElapsedTimer time; time.start());
   tipc_debug(qDebug("tipc::writeShMemBuffer entry"));
 
   static QSemaphore sem(tipc::shm_maxSegmentCount());
@@ -695,7 +695,7 @@ bool tipc::writeShMemBuffer(Stream& stream, Message& msg, int bufSize,
     int chunkData, remainingData = bufSize;
     while (remainingData > 0) {
       // Write to the shared memory segment
-      tipc_debug(QTime xchTime; xchTime.start());
+      tipc_debug(QElapsedTimer xchTime; xchTime.start());
       shmem.lock();
       chunkData = dataWriter->write(
           reinterpret_cast<char*>(shmem.data()),
@@ -733,7 +733,7 @@ err:
 */
 bool tipc::readShMemBuffer(Stream& stream, Message& msg,
                            ShMemReader* dataReader) {
-  tipc_debug(QTime time; time.start(););
+  tipc_debug(QElapsedTimer time; time.start(););
   tipc_debug(qDebug("tipc::readShMemBuffer entry"));
 
   // Read the id from stream
@@ -761,7 +761,7 @@ bool tipc::readShMemBuffer(Stream& stream, Message& msg,
   while (true) {
     msg >> chunkData;
 
-    tipc_debug(QTime xchTime; xchTime.start());
+    tipc_debug(QElapsedTimer xchTime; xchTime.start());
     shmem.lock();
     remainingData -= dataReader->read(
         reinterpret_cast<const char*>(shmem.data()), chunkData);

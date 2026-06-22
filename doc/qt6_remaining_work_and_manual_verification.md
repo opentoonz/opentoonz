@@ -513,6 +513,9 @@ Already covered:
 - `mise run check-qt6-qiodevice-open-scope` now guards the warning frontier for
   ignored Qt I/O open results by failing on bare `QIODevice` / `QFile`
   `open()` calls whose return values are not checked.
+- `mise run check-qt6-qtime-elapsed-scope` now keeps deprecated
+  `QTime::start()` / `QTime::elapsed()` timing probes out of the source tree;
+  use `QElapsedTimer` for elapsed-time diagnostics and wait loops.
 - `mise run check-qt6-guardrail-docs` now guards the durable feedback loop by
   failing when Qt 6 preflight checks are not listed in the goal prompt and
   manual-verification guardrail command lists.
@@ -1017,6 +1020,7 @@ mise run check-qt6-gui-smoke-registry
 mise run check-qt6-fontmetrics-scope
 mise run check-qt6-qtextstream-scope
 mise run check-qt6-qiodevice-open-scope
+mise run check-qt6-qtime-elapsed-scope
 mise run check-qt6-guardrail-docs
 mise run check-qt6-fontdatabase-scope
 mise run check-qt6-highdpi-attribute-scope

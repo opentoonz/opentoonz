@@ -62,6 +62,10 @@ run = "bash scripts/qt6/check-qtextstream-scope.sh"
 description = "Fail if QIODevice/QFile open results are ignored."
 run = "bash scripts/qt6/check-qiodevice-open-scope.sh"
 
+[tasks.check-qt6-qtime-elapsed-scope]
+description = "Fail if deprecated QTime start()/elapsed() timing APIs reappear."
+run = "bash scripts/qt6/check-qtime-elapsed-scope.sh"
+
 [tasks.check-qt6-qiodevice-open-scope-selftest]
 description = "Self-test the Qt I/O open-result guard against synthetic good and bad source snippets."
 run = "bash scripts/qt6/test-check-qiodevice-open-scope.sh"

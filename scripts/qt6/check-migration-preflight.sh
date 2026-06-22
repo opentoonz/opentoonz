@@ -15,6 +15,7 @@ checks=(
   scripts/qt6/check-fontmetrics-scope.sh
   scripts/qt6/check-qtextstream-scope.sh
   scripts/qt6/check-qiodevice-open-scope.sh
+  scripts/qt6/check-qtime-elapsed-scope.sh
   scripts/qt6/check-guardrail-docs.sh
   scripts/qt6/check-fontdatabase-scope.sh
   scripts/qt6/check-highdpi-attribute-scope.sh
