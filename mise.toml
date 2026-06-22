@@ -194,6 +194,10 @@ run = "nix develop path:. --command bash -lc 'bash scripts/qt6/check-migration-p
 description = "Configure the Qt 5 lane with Qt APIs deprecated through 5.15 disabled."
 run = "nix develop path:. --command bash -lc 'bash scripts/qt6/check-migration-preflight.sh && bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-deprecated-api'"
 
+[tasks.build-deprecated-api]
+description = "Build the Qt 5 lane with Qt APIs deprecated through 5.15 disabled."
+run = "nix develop path:. --command bash -lc 'bash scripts/qt6/check-migration-preflight.sh && bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-deprecated-api && cmake --build toonz/build/nix-deprecated-api --target OpenToonz --parallel'"
+
 [tasks.configure-qt6]
 description = "Configure the RelWithDebInfo Ninja build with the Qt 6 Nix dependency set."
 run = "nix develop path:.#qt6 --command bash -lc 'bash scripts/qt6/check-migration-preflight.sh && bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-relwithdebinfo'"

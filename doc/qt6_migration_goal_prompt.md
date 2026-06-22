@@ -636,6 +636,11 @@ branch.
 - `mise run check-qt6-guardrail-docs` now guards the durable feedback loop by
   failing when Qt 6 preflight checks are not listed in the goal prompt and
   manual-verification guardrail command lists.
+- `mise run build-deprecated-api` now exposes the Qt 5
+  `QT_DISABLE_DEPRECATED_UP_TO=0x050F00` lane as a repeatable local build task,
+  not just a configure check. On June 22, 2026, that lane configured and built
+  the `OpenToonz` target successfully after the guardrail-doc script was made
+  portable to the Bash version used inside the Nix shell.
 - User-activated real `QComboBox` index and text handling now routes through
   `QtCompat::connectComboBoxActivatedIndex()` and
   `QtCompat::connectComboBoxTextActivated()`, which use `textActivated` and

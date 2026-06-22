@@ -38,7 +38,10 @@ map_check_to_task() {
   esac
 }
 
-readarray -t check_paths < <(
+check_paths=()
+while IFS= read -r check_path; do
+  check_paths+=("$check_path")
+done < <(
   awk '
     /^[[:space:]]*checks=\(/ { in_checks = 1; next }
     in_checks && /^[[:space:]]*\)/ { in_checks = 0; next }
