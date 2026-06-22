@@ -92,6 +92,16 @@
       "cacheVariables": {
         "WITH_TRANSLATION": "ON"
       }
+    },
+    {
+      "name": "nix-qt6-deprecated-api",
+      "displayName": "Nix Qt 6 Deprecated Qt API Check",
+      "description": "Isolated Qt 6 configure lane that disables APIs deprecated through Qt 6.0.",
+      "inherits": "nix-qt6-relwithdebinfo",
+      "binaryDir": "${sourceDir}/../build/nix-qt6-deprecated-api",
+      "cacheVariables": {
+        "OPENTOONZ_QT_DEPRECATED_ERRORS": "ON"
+      }
     }
   ],
   "buildPresets": [
@@ -118,6 +128,10 @@
     {
       "name": "nix-qt6-translation-check",
       "configurePreset": "nix-qt6-translation-check"
+    },
+    {
+      "name": "nix-qt6-deprecated-api",
+      "configurePreset": "nix-qt6-deprecated-api"
     }
   ]
 }
