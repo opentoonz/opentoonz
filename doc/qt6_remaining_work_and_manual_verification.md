@@ -525,6 +525,20 @@ Already covered:
   not just a configure check. On June 22, 2026, that lane configured and built
   the `OpenToonz` target successfully after the guardrail-doc script was made
   portable to the Bash version used inside the Nix shell.
+- `mise run build-qt6-deprecated-api` now extends that deprecation-floor lane to
+  the Qt 6 build. `OPENTOONZ_QT_DEPRECATED_ERRORS` is Qt-major-aware: the Qt 5
+  lane keeps the `QT_DISABLE_DEPRECATED_UP_TO=0x050F00` (Qt 5.15) floor, while
+  the Qt 6 lane raises it to `0x060000` (Qt 6.0), so any Qt-6.0-deprecated API
+  use becomes a hard compile error and the remaining Qt 6 deprecation frontier
+  surfaces as build evidence. The isolated `nix-qt6-deprecated-api` preset and
+  `toonz/build/nix-qt6-deprecated-api` build directory keep the lane advisory,
+  beside the default Qt 6 build. On June 21, 2026, a clean
+  `build-qt6-deprecated-api` build compiled and linked the `OpenToonz`
+  executable with no Qt deprecation errors and no Qt-related deprecated-API
+  warnings; the only 38 remaining warnings are pre-existing legacy macOS Carbon
+  warnings in the `common/twain/*.c` scanner module, unrelated to Qt. This is a
+  strong signal that the compiled `OpenToonz` Qt 6 target carries no remaining
+  Qt-6.0-deprecated API usage, complementing the grep-based scope guards.
 - Legacy `toonzfarm/tfarm/tbaseserver.cpp` Windows socket diagnostic messages
   now use bounded `snprintf()` formatting instead of unbounded `wsprintf()`,
   and the non-Windows send failure message is initialized before throwing.
