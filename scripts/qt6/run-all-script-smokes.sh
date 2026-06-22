@@ -23,6 +23,7 @@ tasks=(
   script-smoke-scene-cell-fids-qt6
   script-smoke-scene-cell-object-edges-qt6
   script-smoke-scene-edges-qt6
+  script-smoke-scene-level-name-edges-qt6
   script-smoke-scene-argument-edges-qt6
   script-smoke-scene-lifecycle-edges-qt6
   script-smoke-scene-level-wrappers-qt6

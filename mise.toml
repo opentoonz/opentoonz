@@ -590,6 +590,10 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_cell_obje
 description = "Run the Qt 6 app bundle against Scene level and cell error edge cases."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-edges-level-types Raster ToonzRaster Vector 3 true|qt-script-scene-edges-errors true true true true true true true true true|qt-script-scene-edges-load-errors true true' bash scripts/qt6/run-script-smoke.sh"
 
+[tasks.script-smoke-scene-level-name-edges-qt6]
+description = "Run the Qt 6 app bundle against Scene level-name coercion and lookup behavior."
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_level_name_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-level-name-edges-values 123 null qt6_scene_level_object 3|qt-script-scene-level-name-edges-lookups 123 null qt6_scene_level_object true [true,true,true]' bash scripts/qt6/run-script-smoke.sh"
+
 [tasks.script-smoke-scene-argument-edges-qt6]
 description = "Run the Qt 6 app bundle against Scene row, column, and frame-id argument edge cases."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_argument_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-argument-edges-valid true true true true|qt-script-scene-argument-edges-errors [true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
