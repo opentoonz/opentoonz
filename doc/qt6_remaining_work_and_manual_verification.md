@@ -673,9 +673,12 @@ Already covered:
   current failed path reload behavior for missing target paths, and
   post-dispose rejection across the Level public surface. It also covers the
   legacy non-image `Level.setFrame()` error path and frame-id-before-image
-  error precedence, integer-only `Level.getFrameByIndex()` enforcement, plus
-  strict Level method arity for constructor, frame access, frame assignment,
-  load, and save calls.
+  error precedence, integer-only `Level.getFrameByIndex()` enforcement,
+  `Level.name` JavaScript `String()` coercion for numeric/null/object values,
+  `Scene.getLevels()` visibility after wrapper-property renames, the current
+  non-updating `Scene.getLevel(newName)` lookup behavior after those renames,
+  plus strict Level method arity for constructor, frame access, frame
+  assignment, load, and save calls.
 - The ToonzRasterConverter smoke coverage now includes legacy bool coercion for
   `flatSource`, instance `dispose()` behavior, static conversion after instance
   disposal, strict constructor arity, strict `foo()` helper arity, and

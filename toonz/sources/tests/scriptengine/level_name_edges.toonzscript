@@ -1,0 +1,34 @@
+var scene = new Scene();
+var level = scene.newLevel("Raster", "qt6_level_name_original");
+
+level.name = 123;
+var numericName = level.name;
+var numericLookup = scene.getLevel("123");
+var oldLookupAfterNumeric = scene.getLevel("qt6_level_name_original");
+
+level.name = null;
+var nullName = level.name;
+var nullLookup = scene.getLevel("null");
+var numericLookupAfterNull = scene.getLevel("123");
+
+level.name = { toString: function() { return "qt6_level_name_object"; } };
+var objectName = level.name;
+var objectLookup = scene.getLevel("qt6_level_name_object");
+var levels = scene.getLevels();
+
+print("qt-script-level-name-edges-values", numericName, nullName, objectName,
+      level.toString());
+print("qt-script-level-name-edges-lookups",
+      numericLookup instanceof Level, oldLookupAfterNumeric === undefined,
+      nullLookup instanceof Level, numericLookupAfterNull === undefined,
+      objectLookup instanceof Level, levels.length, levels[0].name);
+
+if (numericLookup) numericLookup.dispose();
+if (nullLookup) nullLookup.dispose();
+if (objectLookup) objectLookup.dispose();
+for (var i = 0; i < levels.length; ++i)
+  levels[i].dispose();
+level.dispose();
+scene.dispose();
+
+"qt-script-level-name-edges-result";

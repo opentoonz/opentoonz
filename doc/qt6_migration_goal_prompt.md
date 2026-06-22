@@ -2394,6 +2394,14 @@ branch.
   incompatible save rejection, missing-level load errors, and strict Level
   method arity for constructor, frame access, frame assignment, load, and save
   calls.
+- A Level name edge-case Qt 6 script fixture exists at
+  `toonz/sources/tests/scriptengine/level_name_edges.toonzscript` and is run by
+  `mise run script-smoke-level-name-edges-qt6`. It validates legacy
+  `Level.name` setter coercion through JavaScript `String()`, string reporting
+  after numeric/null/object renames, current `Scene.getLevels()` visibility of
+  the renamed scene-owned level, and the current lookup-table behavior where
+  `Scene.getLevel(newName)` does not resolve a level renamed only through the
+  wrapper property.
 - An Image edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/image_edges.toonzscript` and is run by
   `mise run script-smoke-image-edges-qt6`. It validates empty image metadata
@@ -2654,7 +2662,7 @@ The next slice should make the Qt 6 app useful enough to run and diagnose:
    Scene reload edge, Scene failed-load,
    Scene save-icon, Scene save-icon variants, Scene frame-id,
    Level,
-   Level edge-case, Level I/O, Level path,
+   Level edge-case, Level name edge, Level I/O, Level path,
    level transformer, Image,
    Image edge-case, Image level-first-frame, ImageBuilder,
    ImageBuilder edge-case, Transform edge-case,

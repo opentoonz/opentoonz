@@ -642,6 +642,10 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/level_basic.too
 description = "Run the Qt 6 app bundle against Level frame and I/O edge cases."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/level_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-level-edges-empty Empty 0 true true true true true true|qt-script-level-edges-frame-access Raster 1 true true true true true|qt-script-level-edges-errors true true true true true true|qt-script-level-edges-arity true true true true true true true true true true true true' bash scripts/qt6/run-script-smoke.sh"
 
+[tasks.script-smoke-level-name-edges-qt6]
+description = "Run the Qt 6 app bundle against Level.name coercion, lookup, and listing behavior."
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/level_name_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-level-name-edges-values 123 null qt6_level_name_object Raster level (qt6_level_name_object, 0 frames)|qt-script-level-name-edges-lookups false false false true false 1 qt6_level_name_object' bash scripts/qt6/run-script-smoke.sh"
+
 [tasks.script-smoke-level-io-qt6]
 description = "Run the Qt 6 app bundle against the Level load/save and empty-level setFrame fixture."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/level_io.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-level-io-empty Empty 0|qt-script-level-io-saved Raster 1 0001 32|qt-script-level-io-loaded Raster 1 0001 Raster 32 32' bash scripts/qt6/run-script-smoke.sh"

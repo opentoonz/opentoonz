@@ -36,6 +36,7 @@ tasks=(
   script-smoke-scene-frameids-qt6
   script-smoke-level-qt6
   script-smoke-level-edges-qt6
+  script-smoke-level-name-edges-qt6
   script-smoke-level-io-qt6
   script-smoke-level-io-types-qt6
   script-smoke-level-path-qt6
