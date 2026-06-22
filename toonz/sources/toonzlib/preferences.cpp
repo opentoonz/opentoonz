@@ -520,6 +520,7 @@ void Preferences::definePreferenceItems() {
   // Drawing
   define(DefRasterFormat, "DefRasterFormat", QMetaType::QString, "tif");
   define(DefLevelType, "DefLevelType", QMetaType::Int, TZP_XSHLEVEL);
+  define(DefAssistantType, "DefAssistantType", QMetaType::QString, "");
   define(newLevelSizeToCameraSizeEnabled, "newLevelSizeToCameraSizeEnabled",
          QMetaType::Bool, false);
   define(DefLevelWidth, "DefLevelWidth", QMetaType::Double,

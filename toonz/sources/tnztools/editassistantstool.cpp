@@ -1,6 +1,7 @@
 
 // TnzTools includes
 #include <tools/tool.h>
+#include <tools/editassistantstool.h>
 #include <tools/toolutils.h>
 #include <tools/toolhandle.h>
 #include <tools/cursors.h>
@@ -10,6 +11,7 @@
 
 // TnzLib includes
 #include <toonz/tapplication.h>
+#include <toonz/preferences.h>
 #include <toonz/txshlevelhandle.h>
 #include <toonz/txsheethandle.h>
 #include <toonz/tscenehandle.h>
@@ -31,6 +33,7 @@
 
 // For Qt translation support
 #include <QCoreApplication>
+#include <QSettings>
 
 #include <map>
 
@@ -207,6 +210,7 @@ protected:
 
   TPropertyGroup m_allProperties;
   TPropertyGroup m_toolProperties;
+  TBoolProperty m_autoSwitchAndKeep;
   TEnumProperty m_assistantType;
   TIntProperty m_replicatorIndex;
   TStringId m_newAssisnantType;
@@ -246,6 +250,8 @@ protected:
 public:
   EditAssistantsTool():
     TTool("T_EditAssistants"),
+    m_autoSwitchAndKeep("AutoSwitchAndKeep",
+                       isEditAssistantsAutoSwitchAndKeepEnabled()),
     m_assistantType("AssistantType"),
     m_replicatorIndex("ReplicatorIndex", 1, 10, 1, false),
     m_dragging(),
@@ -263,6 +269,7 @@ public:
     selection = new Selection(*this);
     // also assign assistants to the "brush" button in toolbar
     bind(MetaImage | EmptyTarget, "T_Brush");
+    m_assistantType.setId("AssistantType");
     m_toolProperties.bind(m_assistantType);
     m_replicatorIndex.setSpinner();
     updateTranslation();
@@ -316,11 +323,22 @@ public:
       for(int i = 0; i < assistantProperties.getPropertyCount(); ++i)
         m_allProperties.bind( *assistantProperties.getProperty(i) );
     }
+    m_allProperties.bind(m_autoSwitchAndKeep);
     return &m_allProperties;
   }
 
   void onActivate() override {
     updateAssistantTypes();
+    m_autoSwitchAndKeep.setValue(isEditAssistantsAutoSwitchAndKeepEnabled());
+    // Restore last used assistant type only when Auto-Switch & Keep is enabled
+    if (m_autoSwitchAndKeep.getValue()) {
+      QString defType = Preferences::instance()->getDefAssistantType();
+      if (!defType.isEmpty()) {
+        std::wstring wDefType = defType.toStdWString();
+        if (m_assistantType.indexOf(wDefType) >= 0)
+          m_assistantType.setValue(wDefType);
+      }
+    }
     loadHistory();
   }
 
@@ -328,8 +346,9 @@ public:
     { resetCurrentPoint(true, false); }
 
   void updateTranslation() override {
-    m_assistantType.setQStringName( tr("Assistant Type") );
-    m_replicatorIndex.setQStringName( tr("Order") );
+    m_autoSwitchAndKeep.setQStringName(tr("Auto-Switch && Keep"));
+    m_assistantType.setQStringName(tr("Assistant Type"));
+    m_replicatorIndex.setQStringName(tr("Order"));
     updateAssistantTypes();
     if (Closer closer = read(ModeAssistant))
       m_readAssistant->updateTranslation();
@@ -338,9 +357,17 @@ public:
   bool onPropertyChanged(std::string name, bool addToUndo) override {
     if (m_replicatorIndex.getName() == name) {
       writeReplicatorIndex(m_replicatorIndex.getValue());
-    } else
-    if (name == m_assistantType.getName()) {
+    } else if (name == m_autoSwitchAndKeep.getName()) {
+      QSettings().setValue("EditAssistantsTool/AutoSwitchAndKeep",
+                          m_autoSwitchAndKeep.getValue());
+    } else if (name == m_assistantType.getName()) {
       m_newAssisnantType = TStringId::find( to_string(m_assistantType.getValue()) );
+      // Persist assistant type only when Auto-Switch & Keep is enabled
+      if (m_autoSwitchAndKeep.getValue() && m_assistantType.getIndex() != 0) {
+        Preferences::instance()->setValue(
+            PreferencesItemId::DefAssistantType,
+            QString::fromStdWString(m_assistantType.getValue()));
+      }
     } else {
       if (Closer closer = write(ModeAssistant, true))
         m_writeAssistant->propertyChanged(TStringId::find(name));
@@ -702,37 +729,45 @@ public:
     apply();
     m_dragging = true;
     m_dragAllPoints = false;
-    if (m_newAssisnantType) {
-      // create assistant
-      resetCurrentPoint(false);
-      if (Closer closer = write(ModeImage)) {
-        TMetaObjectP object(new TMetaObject(m_newAssisnantType));
-        if (TAssistantBase *assistant = object->getHandler<TAssistantBase>()) {
-          assistant->setDefaults();
-          assistant->move(position);
-          assistant->selectAll();
-          m_currentImage.set(m_writeImage);
-          m_dragAllPoints = true;
-          m_currentAssistantCreated = true;
-          m_currentAssistantChanged = true;
-          m_currentAssistantIndex = (int)(*m_writer)->size();
-          m_currentAssistant = object;
-          m_currentPointName = assistant->getBasePoint().name;
-          m_currentPointOffset = TPointD();
-          m_currentAssistantBackup = assistant->data();
-          (*m_writer)->push_back(object);
-        }
-      }
-      updateOptionsBox();
-      m_newAssisnantType.reset();
-    } else {
-      findCurrentPoint(position, getViewer()->getPixelSize());
+    bool hitAssistant = findCurrentPoint(position, getViewer()->getPixelSize());
+    if (hitAssistant) {
+      // Click on existing assistant: select only (same as Choose to create)
       if (event.isShiftPressed())
         if (Closer closer = read(ModePoint)) {
           m_currentPointName = m_readAssistant->getBasePoint().name;
           m_currentPointOffset = m_readAssistant->getBasePoint().position - position;
           m_dragAllPoints = true;
         }
+    } else {
+      // Click on empty space: create assistant if type selected
+      if (m_autoSwitchAndKeep.getValue() && m_assistantType.getIndex() != 0 &&
+          !m_newAssisnantType) {
+        m_newAssisnantType =
+            TStringId::find(to_string(m_assistantType.getValue()));
+      }
+      if (m_newAssisnantType) {
+        resetCurrentPoint(false);
+        if (Closer closer = write(ModeImage)) {
+          TMetaObjectP object(new TMetaObject(m_newAssisnantType));
+          if (TAssistantBase *assistant = object->getHandler<TAssistantBase>()) {
+            assistant->setDefaults();
+            assistant->move(position);
+            assistant->selectAll();
+            m_currentImage.set(m_writeImage);
+            m_dragAllPoints = true;
+            m_currentAssistantCreated = true;
+            m_currentAssistantChanged = true;
+            m_currentAssistantIndex = (int)(*m_writer)->size();
+            m_currentAssistant = object;
+            m_currentPointName = assistant->getBasePoint().name;
+            m_currentPointOffset = TPointD();
+            m_currentAssistantBackup = assistant->data();
+            (*m_writer)->push_back(object);
+          }
+        }
+        updateOptionsBox();
+        m_newAssisnantType.reset();
+      }
     }
 
     m_currentPosition = position;
@@ -765,7 +800,8 @@ public:
     }
 
     apply();
-    m_assistantType.setIndex(0);
+    // Reset to "Choose to create" only when Auto-Switch & Keep is disabled
+    if (!m_autoSwitchAndKeep.getValue()) m_assistantType.setIndex(0);
     getApplication()->getCurrentTool()->notifyToolChanged();
     TTool::getApplication()->getCurrentSelection()->setSelection( getSelection() );
     m_currentPosition = position;
