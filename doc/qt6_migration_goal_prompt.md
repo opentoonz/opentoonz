@@ -532,7 +532,8 @@ branch.
   `QTranslator::load()` results. After this cleanup, the current app-target
   warning frontier in `main.cpp` is limited to OpenGL/GLUT deprecation output.
 - `mise run check-qt6-highdpi-attribute-scope` now guards that startup cleanup:
-  `AA_EnableHighDpiScaling` and `AA_UseHighDpiPixmaps` must remain inside
+  `AA_EnableHighDpiScaling`, `AA_UseHighDpiPixmaps`, and the Windows preview
+  host's `AA_DisableHighDpiScaling` must remain inside
   `QT_VERSION < QT_VERSION_CHECK(6, 0, 0)` blocks. It runs before the normal
   local configure, build, and translation-build tasks.
 - On June 10, 2026, macOS SDK detection in `nix/opentoonz-env.nix` and

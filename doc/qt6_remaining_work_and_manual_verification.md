@@ -483,8 +483,9 @@ Already covered:
   file.
 - `mise run check-qt6-highdpi-attribute-scope` now guards that the Qt 5-only
   high-DPI startup attributes `AA_EnableHighDpiScaling` and
-  `AA_UseHighDpiPixmaps` stay inside
-  `QT_VERSION < QT_VERSION_CHECK(6, 0, 0)` blocks.
+  `AA_UseHighDpiPixmaps`, plus the Windows preview host's
+  `AA_DisableHighDpiScaling`, stay inside `QT_VERSION < QT_VERSION_CHECK(6, 0,
+  0)` blocks.
 - User-activated real combo-box index and text handling now routes through
   `QtCompat::connectComboBoxActivatedIndex()` and
   `QtCompat::connectComboBoxTextActivated()` instead of direct

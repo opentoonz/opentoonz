@@ -176,7 +176,9 @@ void EnsureQtApplication() {
         std::string dllDirNarrow = WideToNarrow(dllDir);
         DebugLog("DLL directory: " + dllDirNarrow);
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         QCoreApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
+#endif
         QCoreApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
 
         DebugLog("Creating QCoreApplication...");

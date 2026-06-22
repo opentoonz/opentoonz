@@ -54,4 +54,9 @@ require_inside_qt5_cpp_block \
   'AA_UseHighDpiPixmaps' \
   'Qt 5 high-DPI pixmap startup attribute'
 
+require_inside_qt5_cpp_block \
+  toonz/sources/toonzpreview/toonzpreview.cpp \
+  'AA_DisableHighDpiScaling' \
+  'Qt 5 preview high-DPI disable startup attribute'
+
 echo "qt6-highdpi-attribute-scope-check ok"
