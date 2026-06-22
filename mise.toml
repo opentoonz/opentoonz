@@ -66,6 +66,10 @@ run = "bash scripts/qt6/check-qiodevice-open-scope.sh"
 description = "Self-test the Qt I/O open-result guard against synthetic good and bad source snippets."
 run = "bash scripts/qt6/test-check-qiodevice-open-scope.sh"
 
+[tasks.check-qt6-guardrail-docs]
+description = "Fail if documented Qt 6 guardrail command lists drift from aggregate preflight."
+run = "bash scripts/qt6/check-guardrail-docs.sh"
+
 [tasks.check-qt6-fontdatabase-scope]
 description = "Fail if deprecated direct QFontDatabase or QTextCharFormat font-family APIs reappear."
 run = "bash scripts/qt6/check-fontdatabase-scope.sh"
