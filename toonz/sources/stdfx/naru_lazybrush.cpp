@@ -1,13 +1,48 @@
-#include "trop.h"
+Ôªø#include "trop.h"
 #include "tfxparam.h"
 #include <math.h>
 #include "stdfx.h"
-
-#include "naru_graph.h"
+#include <cstdlib>
+#include <memory>
 
 #include "tparamset.h"
 #include "trasterfx.h"
 #include "tpixelutils.h"
+
+#include "naru_graph.h"
+#include <opencv2/opencv.hpp>
+
+using namespace std;
+using GraphType = reimpls::Graph2<int, int, int>;
+using namespace cv;
+
+struct RenderContext {
+  int mode;
+  int scribbleType;
+  int width, height, rasSize;
+  float s, K, lambda, weightSoft;
+  float autoScribbleTh;
+  int terminalCap;
+  bool enableAutoScribble;
+  bool enableAutoBgScribble;
+
+  int minX, minY, maxX, maxY;
+
+  TPixelF refBGColor;
+  TPixelF autoScribbleColor;
+  vector<TPixelF> colorPalette;
+
+  vector<float> procImgData;
+  vector<float> refImgData;
+  Mat refMat;
+  vector<int> scribbleData;
+  vector<int> mincutData;
+
+  unique_ptr<GraphType> graph;
+  int bgClusterId = 0;
+  int autoScribbleId = 1;
+  int blendMode;
+};
 
 class naru_lazybrush final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(naru_lazybrush)
@@ -16,75 +51,59 @@ class naru_lazybrush final : public TStandardRasterFx {
   TRasterFxPort m_ref;
 
   TIntEnumParamP m_mode;
-  TPixelParamP m_maskcolor;
-  TIntEnumParamP m_scrtype;
+  TPixelParamP m_bg_color;
 
-  TDoubleParamP m_minlightness;
-  TDoubleParamP m_logs;
-  TDoubleParamP m_sigma;
+  TBoolParamP m_enable_auto_scribble;
+  TPixelParamP m_auto_scribble_color;
+  TDoubleParamP m_auto_scribble_threshold;
+
+  TIntEnumParamP m_scribble_type;
+  TDoubleParamP m_log_scale;
   TDoubleParamP m_lambda;
-  TDoubleParamP m_alpha;
-  TDoubleParamP m_autoscrlen;
-  TDoubleParamP m_autoscrthresh;
-  TDoubleParamP m_lineweight;
-  TBoolParamP m_fillHole;
-  TIntEnumParamP m_sinkpos;
-  TBoolParamP m_autoScribble;
+  TIntEnumParamP m_blend_mode;
+  TBoolParamP m_enable_auto_bg_scribble;
 
 public:
   naru_lazybrush()
       : m_mode(new TIntEnumParam(0, "Mask+Line"))
-      , m_maskcolor(TPixel32(200, 200, 200, 255))
-      , m_scrtype(new TIntEnumParam(0, "Soft"))
-      , m_minlightness(0.02f)
-      , m_logs(0.05f)
-      , m_sigma(1.5f)
-      , m_lambda(0.6f)
-      , m_alpha(100.f)
-      , m_autoscrlen(4.f)
-      , m_autoscrthresh(0.1f)
-      , m_lineweight(4.f)
-      , m_fillHole(true)
-      , m_sinkpos(new TIntEnumParam(0, "All"))
-      , m_autoScribble(true) {
+      , m_bg_color(TPixel32(0, 0, 255))
+      , m_enable_auto_scribble(true)
+      , m_auto_scribble_color(TPixel32(200, 200, 200))
+      , m_auto_scribble_threshold(0.5f)
+      , m_scribble_type(new TIntEnumParam(0, "Soft"))
+      , m_log_scale(10.0f)
+      , m_lambda(0.05f)
+      , m_blend_mode(new TIntEnumParam(0, "Multiply"))
+      , m_enable_auto_bg_scribble(true) {
     bindParam(this, "mode", m_mode);
-    bindParam(this, "mask_color", m_maskcolor);
-    bindParam(this, "scr_type", m_scrtype);
-
-    bindParam(this, "min_lightness", m_minlightness);
-    bindParam(this, "log_scale", m_logs);
-    bindParam(this, "sigma", m_sigma);
-    bindParam(this, "lambda", m_lambda);
-    bindParam(this, "alpha", m_alpha);
-    bindParam(this, "auto_scribble_length", m_autoscrlen);
-    bindParam(this, "auto_scribble_threshold", m_autoscrthresh);
-    bindParam(this, "line_weight", m_lineweight);
-    bindParam(this, "undef_is_sink", m_fillHole);
-    bindParam(this, "sink_pos", m_sinkpos);
-    bindParam(this, "auto_scribble", m_autoScribble);
 
     this->m_mode->addItem(1, "Mask");
     this->m_mode->addItem(2, "LoG Filter");
-    this->m_mode->addItem(3, "Capacity Map");
-    this->m_mode->addItem(4, "Scribble Map");
-    this->m_scrtype->addItem(1, "Hard");
+    this->m_mode->addItem(4, "Scribble");
 
-    this->m_sinkpos->addItem(1, "Bottom-Left");
-    this->m_sinkpos->addItem(2, "Bottom-Center");
-    this->m_sinkpos->addItem(3, "Bottom-Right");
-    this->m_sinkpos->addItem(4, "Center-Right");
-    this->m_sinkpos->addItem(5, "Top-Right");
-    this->m_sinkpos->addItem(6, "Top-Center");
-    this->m_sinkpos->addItem(7, "Top-Left");
-    this->m_sinkpos->addItem(8, "Center-Left");
+    bindParam(this, "blend_mode", m_blend_mode);
+    this->m_blend_mode->addItem(1, "Normal");
+    this->m_blend_mode->addItem(2, "Screen");
+    this->m_blend_mode->addItem(3, "Overlay");
+    this->m_blend_mode->addItem(4, "Darken");
+    this->m_blend_mode->addItem(5, "Lighten");
 
-    this->m_minlightness->setValueRange(0.f, 1.f);
-    this->m_logs->setValueRange(0.f, 5.f);
-    this->m_sigma->setValueRange(0.f, 5.f);
-    this->m_lambda->setValueRange(0.5f, 5.f);
-    this->m_alpha->setValueRange(1.f, 10000.f);
-    this->m_autoscrlen->setValueRange(1.f, 10.f);
-    this->m_autoscrthresh->setValueRange(0.f, 1.f);
+    bindParam(this, "enable_auto_scribble", m_enable_auto_scribble);
+    bindParam(this, "auto_scribble_color", m_auto_scribble_color);
+    bindParam(this, "enable_auto_bg_scribble", m_enable_auto_bg_scribble);
+    bindParam(this, "ref_bgcolor", m_bg_color);
+    bindParam(this, "auto_scribble_threshold", m_auto_scribble_threshold);
+    this->m_auto_scribble_threshold->setValueRange(0.f, 1.f);
+
+
+    bindParam(this, "scr_type", m_scribble_type);
+    this->m_scribble_type->addItem(1, "Hard");
+
+    bindParam(this, "log_scale", m_log_scale);
+    this->m_log_scale->setValueRange(0.f, 100.f);
+
+    bindParam(this, "lambda", m_lambda);
+    this->m_lambda->setValueRange(0.0f, 1.f);
 
     addInputPort("Source", m_input);
     addInputPort("Reference", m_ref);
@@ -111,536 +130,750 @@ public:
   }
 
 private:
-  const float gauKernel[3][3] = {
-      {1, 2, 1},
-      {2, 4, 2},
-      {1, 2, 1},
-  };
-  const float weightSum       = 16.f;
-  const float lapKernel[3][3] = {
-      {0, 1, 0},
-      {1, -4, 1},
-      {0, 1, 0},
-  };
+  //// Params
+  array<array<float, 5>, 5> gauKernel = {{
+    { 1.f / 256.f,  4.f / 256.f,  6.f / 256.f,  4.f / 256.f, 1.f / 256.f },
+    { 4.f / 256.f, 16.f / 256.f, 24.f / 256.f, 16.f / 256.f, 4.f / 256.f },
+    { 6.f / 256.f, 24.f / 256.f, 36.f / 256.f, 24.f / 256.f, 6.f / 256.f },
+    { 4.f / 256.f, 16.f / 256.f, 24.f / 256.f, 16.f / 256.f, 4.f / 256.f },
+    { 1.f / 256.f,  4.f / 256.f,  6.f / 256.f,  4.f / 256.f, 1.f / 256.f }
+  }};
 
-  int mode = 0;       // 0:Mask+Line, 1:Mask, 2:LoG Filter, 3:Scribble Map
-  TPixelF maskColor;  // É}ÉXÉNÇÃêF
+  array<array<float, 3>, 3> lapKernel = {{
+    { 0.f,  1.f, 0.f },
+    { 1.f, -4.f, 1.f },
+    { 0.f,  1.f, 0.f }
+  }};
 
-  const float LoG_draw_scale = 20.f;   // LoGÉtÉBÉãÉ^ÇÃï`âÊÉXÉPÅ[Éã
-  float LoG_s                = 0.05f;  // LoGÉtÉBÉãÉ^ÇÃÉXÉPÅ[Éã
+  //// functions
+  // generate Kernel Functions
+  template <size_t N>
+  void convolve(vector<float>& data, const array<array<float, N>, N>& kernel, const RenderContext& ctx);
+  void logFilter(vector<float>& data, RenderContext& ctx);
 
-  int idx(int x, int y, int w) { return y * w + x; }
+  // Intensity Culc
+  // I_f = 1 - max(0, s * LoG(I))
+  void I_f(vector<float>& arg, const RenderContext& ctx) { // arg = LoG result
+    for (int i = 0; i < ctx.rasSize; ++i) {
+      arg[i] = fmax(0, 1.f - fmax(0, ctx.s * arg[i]));
+    }
+  }
+
+  // I_p = K * (I_f ^ 2) + 1
+  void I_p(vector<float>& arg, const RenderContext& ctx) { // arg = I_f result
+    for (int i = 0; i < ctx.rasSize; ++i) {
+      arg[i] = ctx.K * arg[i] * arg[i] + 1.f;
+    }
+  }
 
   //-------------------------------------------------------------------
 
+  void initRasters(TRasterP& fullRas, TRasterP& refRas, TTile& fullTile,
+                   TTile& tile, const TRenderSettings& ri, double frame);
+
   template <typename PIXEL>
-  void doDraw(TRasterPT<PIXEL> ras, std::vector<float>& r,
-              std::vector<float>& g, std::vector<float>& b,
-              std::vector<float>& a);
+  void createScribbleIndexMap(TRasterPT<PIXEL>, RenderContext& ctx);
   template <typename PIXEL>
-  void doGrayScale(TRasterPT<PIXEL> ras, double frame,
-                   std::vector<float>& temp);
+  void setMat(TRasterPT<PIXEL>, Mat&, const RenderContext& ctx);
+  inline int colorToInt(const Vec4f& pix) {
+    int r = static_cast<int>(pix[0] * 255 + 0.5f);
+    int g = static_cast<int>(pix[1] * 255 + 0.5f);
+    int b = static_cast<int>(pix[2] * 255 + 0.5f);
+    int a = static_cast<int>(pix[3] * 255 + 0.5f);
+    return (r << 24) | (g << 16) | (b << 8) | a;
+  }
+  void createPalette(const Mat&, RenderContext& ctx);
+
   template <typename PIXEL>
-  void doLoG(TRasterPT<PIXEL> ras, double frame, std::vector<float>& gray,
-             std::vector<float>& lap);
+  void rasterToGrayVector(TRasterPT<PIXEL> ras, vector<float>& vec, const RenderContext& ctx);
+
+  void setBaundaryScribble(RenderContext& ctx);
+  void autoScribble(RenderContext& ctx);
+  void autoScribbleScan(int x, int y, int dx, int dy, RenderContext& ctx);
+
+  void setCapacity(RenderContext& ctx);
+  void setTerminalCapacity(int refInd, RenderContext& ctx);
+  void updateMincutData(int refInd, RenderContext& ctx);
+
   template <typename PIXEL>
-  void doGraph(TRasterPT<PIXEL> ras, double frame, TRasterPT<PIXEL> refRas,
-               bool refer_sw, std::vector<float>& lap, Graph& g);
+  void setMask(TRasterPT<PIXEL>& mask, const RenderContext& ctx);
+
   template <typename PIXEL>
-  void doColorize(TRasterPT<PIXEL> ras, double frame, Graph& g,
-                  std::vector<float>& gray);
+  void drawImgFromInt(TRasterPT<PIXEL> ras, const vector<int>& data, const RenderContext& ctx);
+
   template <typename PIXEL>
-  void process(TRasterPT<PIXEL> ras, double frame, TRasterPT<PIXEL> refRas,
-               bool refer_sw);
+  void drawImgFromFloat(TRasterPT<PIXEL> ras, const vector<float>& data, const RenderContext& ctx);
+
+  template <typename PIXEL>
+  void drawMaskAndLine(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> mask, const RenderContext& ctx);
+
+  template <typename PIXEL>
+  void process(TRasterPT<PIXEL> ras, double frame, RenderContext& ctx);
+
+  // utils
+  int idx(int x, int y, const RenderContext& ctx) { return max(0, min(y * ctx.width + x, ctx.rasSize - 1)); }
+
+  template <typename PIXEL>
+  inline float pixelToNormalizedGray(const PIXEL& pix) {
+    float invMax = 1.f / (float)PIXEL::maxChannelValue;
+    float L_premult = (0.299f * pix.r + 0.587f * pix.g + 0.114f * pix.b) * invMax;
+    float m = (float)pix.m * invMax;
+    return L_premult + 1.f - m;
+  }
 };
 
-template <typename PIXEL>
-void naru_lazybrush::doDraw(TRasterPT<PIXEL> ras, std::vector<float>& r,
-                            std::vector<float>& g, std::vector<float>& b,
-                            std::vector<float>& a) {
-  int width  = ras->getLx();
-  int height = ras->getLy();
-
-  ras->lock();
-  for (int y = 0; y < height; ++y) {
-    PIXEL* pix = ras->pixels(y);
-    for (int x = 0; x < width; ++x) {
-      int p  = idx(x, y, width);
-      pix->r = (typename PIXEL::Channel)(maskColor.m * maskColor.r *
-                                         fmin(r[p], 1.f) *
-                                         (float)PIXEL::maxChannelValue);
-      pix->g = (typename PIXEL::Channel)(maskColor.m * maskColor.g *
-                                         fmin(g[p], 1.f) *
-                                         (float)PIXEL::maxChannelValue);
-      pix->b = (typename PIXEL::Channel)(maskColor.m * maskColor.b *
-                                         fmin(b[p], 1.f) *
-                                         (float)PIXEL::maxChannelValue);
-      pix->m = (typename PIXEL::Channel)(maskColor.m * fmin(a[p], 1.f) *
-                                         (float)PIXEL::maxChannelValue);
-      pix++;
-    }
-  }
-  ras->unlock();
-}
-
-template <typename PIXEL>
-void naru_lazybrush::doGrayScale(TRasterPT<PIXEL> ras, double frame,
-                                 std::vector<float>& gray) {
-  int width  = ras->getLx();
-  int height = ras->getLy();
-
-  float minLightness = m_minlightness->getValue(frame);
-
-  ras->lock();
-  for (int y = 0; y < height; ++y) {
-    PIXEL* pix = ras->pixels(y);
-    for (int x = 0; x < width; ++x) {
-      float m = (float)pix->m / (float)PIXEL::maxChannelValue;
-      if (m != 0) {
-        float r = (float)pix->r / (m * (float)PIXEL::maxChannelValue);
-        float g = (float)pix->g / (m * (float)PIXEL::maxChannelValue);
-        float b = (float)pix->b / (m * (float)PIXEL::maxChannelValue);
-        gray[idx(x, y, width)] =
-            fmax(0.299f * r + 0.587f * g + 0.114f * b, minLightness);
-      } else {
-        gray[idx(x, y, width)] = 1.0f;
-      }
-      pix++;
-    }
-  }
-  ras->unlock();
-}
-
-template <typename PIXEL>
-void naru_lazybrush::doLoG(TRasterPT<PIXEL> ras, double frame,
-                           std::vector<float>& gray, std::vector<float>& lap) {
-  int width  = ras->getLx();
-  int height = ras->getLy();
-
-  // ÉKÉEÉVÉAÉìÉtÉBÉãÉ^
-  std::vector<float> blurred(width * height, 0.0f);
-  for (int y = 1; y < height - 1; ++y) {
-    for (int x = 1; x < width - 1; ++x) {
-      float sum = 0.f;
-      for (int dy = -1; dy <= 1; ++dy) {
-        for (int dx = -1; dx <= 1; ++dx) {
-          sum += gray[idx(x + dx, y + dy, width)] * gauKernel[dy + 1][dx + 1];
-        }
-      }
-      blurred[idx(x, y, width)] = sum / weightSum;
-    }
-  }
-
-  // ã´äEílÇê›íË
-  for (int x = 0; x < width; ++x) {
-    blurred[idx(x, 0, width)]          = blurred[idx(x, 1, width)];
-    blurred[idx(x, height - 1, width)] = blurred[idx(x, height - 2, width)];
-  }
-  for (int y = 0; y < height; ++y) {
-    blurred[idx(0, y, width)]         = blurred[idx(1, y, width)];
-    blurred[idx(width - 1, y, width)] = blurred[idx(width - 2, y, width)];
-  }
-
-  // ÉâÉvÉâÉVÉAÉìÉtÉBÉãÉ^
-  for (int y = 1; y < height - 1; ++y) {
-    for (int x = 1; x < width - 1; ++x) {
-      float sum = 0.f;
-      for (int dy = -1; dy <= 1; ++dy) {
-        for (int dx = -1; dx <= 1; ++dx) {
-          sum +=
-              blurred[idx(x + dx, y + dy, width)] * lapKernel[dy + 1][dx + 1];
-        }
-      }
-      lap[idx(x, y, width)] = fmax(LoG_s * sum, 0.0f);
-    }
-  }
-
-  for (int x = 0; x < width; ++x) {
-    lap[idx(x, 0, width)]          = lap[idx(x, 1, width)];
-    lap[idx(x, height - 1, width)] = lap[idx(x, height - 2, width)];
-  }
-  for (int y = 0; y < height; ++y) {
-    lap[idx(0, y, width)]         = lap[idx(1, y, width)];
-    lap[idx(width - 1, y, width)] = lap[idx(width - 2, y, width)];
-  }
-}
-
-template <typename PIXEL>
-void naru_lazybrush::doGraph(TRasterPT<PIXEL> ras, double frame,
-                             TRasterPT<PIXEL> refRas, bool refer_sw,
-                             std::vector<float>& lap, Graph& g) {
-  int width   = ras->getLx();
-  int height  = ras->getLy();
-  int rasSize = width * height;
-
-  // LoG to intensity
-  std::vector<float> intensity(rasSize, 0.0f);
-  float K = 2.f * (width + height);
-  for (int y = 0; y < height; ++y) {
-    for (int x = 0; x < width; ++x) {
-      int p        = idx(x, y, width);
-      intensity[p] = K * lap[p] + 1.f;
-      lap[p]       = lap[p] * LoG_draw_scale;
-    }
-  }
-
-  // set capasity
-  std::vector<float> weights(rasSize, 0.0f);
-  std::vector<float> capacity(rasSize, 0.0f);
-  float alpha        = m_alpha->getValue(frame);
-  float sigma        = m_sigma->getValue(frame);
-  float inv_sigmaSq2 = 1.0 / (2 * sigma * sigma);
-  for (int y = 0; y < height; ++y) {
-    for (int x = 0; x < width; ++x) {
-      int p = idx(x, y, width);
-      if (x < width - 1) {
-        int q = idx(x + 1, y, width);
-        float weight =
-            alpha * exp(-(intensity[p] + intensity[q]) * inv_sigmaSq2);
-        g.addEdge(p, q, weight, weight);
-      }
-      if (y < height - 1) {
-        int q = idx(x, y + 1, width);
-        float weight =
-            alpha * exp(-(intensity[p] + intensity[q]) * inv_sigmaSq2);
-        g.addEdge(p, q, weight, weight);
-      }
-      weights[p]  = intensity[p] / (K * LoG_s);
-      capacity[p] = exp(-intensity[p] * inv_sigmaSq2);
-    }
-  }
-
-  // Scribble
-  std::vector<float> refR(rasSize, 0.0f);
-  std::vector<float> refG(rasSize, 0.0f);
-  std::vector<float> refB(rasSize, 0.0f);
-  std::vector<float> scribbleR(rasSize, 0.0f);
-  std::vector<float> scribbleB(rasSize, 0.0f);
-  float lambda       = m_lambda->getValue(frame);
-  float softCapacity = floorf(lambda * alpha);
-  int scribbleType = m_scrtype->getValue();  // ÉXÉNÉäÉuÉãÉ^ÉCÉv 0:Soft, 1:Hard
-  int tLinkCap     = scribbleType == 0 ? softCapacity : K;
-  int sLinkCap     = scribbleType == 0 ? alpha - softCapacity : 0;
-  // Exist Reference
-  if (refer_sw) {
-    refRas->lock();
-    for (int y = 0; y < height; ++y) {
-      PIXEL* pix = refRas->pixels(y);
-      for (int x = 0; x < width; ++x) {
-        int p   = idx(x, y, width);
-        refR[p] = (float)pix->r / (float)PIXEL::maxChannelValue;
-        refG[p] = (float)pix->g / (float)PIXEL::maxChannelValue;
-        refB[p] = (float)pix->b / (float)PIXEL::maxChannelValue;
-        pix++;
-      }
-    }
-    refRas->unlock();
-    for (int y = 0; y < height; ++y) {
-      for (int x = 0; x < width; ++x) {
-        int p = idx(x, y, width);
-        if (refR[p] > 0.5f && refG[p] < 0.5f && refB[p] < 0.5f) {
-          g.addTerminal(p, tLinkCap - sLinkCap);
-          scribbleR[p] = 1.f;
-        } else if (refR[p] < 0.5f && refG[p] < 0.5f && refB[p] > 0.5f) {
-          g.addTerminal(p, sLinkCap - tLinkCap);
-          scribbleB[p] = 1.f;
-        }
-      }
-    }
-  }
-
-  float autoScribbleLength    = m_autoscrlen->getValue(frame);
-  float autoScribbleThreshold = m_autoscrthresh->getValue(frame);
-  float lineWeight            = m_lineweight->getValue(frame);
-  int sinkPos                 = m_sinkpos->getValue();
-  bool autoScribble           = m_autoScribble->getValue();
-  if (autoScribble) {
-    // Auto Scribble
-    for (int i = 0; i < width + height; ++i) {
-      float fcx0, fcx1, fcy0, fcy1, dx, dy;
-      if (i < width) {
-        fcx0 = i;
-        fcy0 = 0;
-        fcx1 = i;
-        fcy1 = height - 1;
-        dx   = 0;
-        dy   = 1;
-      } else {
-        fcx0 = 0;
-        fcy0 = i - width + 1;
-        fcx1 = width - 1;
-        fcy1 = i - width + 1;
-        dx   = 1;
-        dy   = 0;
-      }
-      bool onLine, pOnLine;
-      onLine  = false;
-      pOnLine = false;
-      fcx0 += dx * autoScribbleLength;
-      fcy0 += dy * autoScribbleLength;
-      for (int i = 0; i < 10000; ++i) {
-        fcx0 += dx;
-        fcy0 += dy;
-        int cx = fcx0;
-        int cy = fcy0;
-        if (cx < 0 || cx >= width - 1 || cy < 0 || cy >= height - 1) break;
-        int cp = idx(cx, cy, width);
-        if (weights[cp] > autoScribbleThreshold) {
-          fcx0 += dx * lineWeight;
-          fcy0 += dy * lineWeight;
-          onLine = true;
-        } else
-          onLine = false;
-        if (!onLine && pOnLine) {
-          g.addTerminal(cp, tLinkCap - sLinkCap);
-          scribbleR[cp] = 1.f;
-          break;
-        }
-        pOnLine = onLine;
-      }
-
-      onLine  = false;
-      pOnLine = false;
-      fcx1 -= dx * autoScribbleLength;
-      fcy1 -= dy * autoScribbleLength;
-      for (int i = 0; i < 10000; ++i) {
-        fcx1 -= dx;
-        fcy1 -= dy;
-        int cx = fcx1;
-        int cy = fcy1;
-        if (cx < 0 || cx >= width - 1 || cy < 0 || cy >= height - 1) break;
-        int cp = idx(cx, cy, width);
-        if (weights[cp] > autoScribbleThreshold) {
-          fcx1 -= dx * lineWeight;
-          fcy1 -= dy * lineWeight;
-          onLine = true;
-        } else
-          onLine = false;
-        if (!onLine && pOnLine) {
-          g.addTerminal(cp, tLinkCap - sLinkCap);
-          scribbleR[cp] = 1.f;
-          break;
-        }
-        pOnLine = onLine;
-      }
-    }
-  }
-
-  // ã´äEílÇê›íË
-  int bdSize     = 2 * (width + height - 2);
-  int initInds[] = {0,
-                    width / 2,
-                    width,
-                    width + height / 2,
-                    width + height,
-                    width * 3 / 2 + height,
-                    width * 2 + height,
-                    width * 2 + height * 3 / 2};
-  std::vector<int> bdIdx(bdSize, false);
-  // 1 "Bottom-Left"
-  // 2 "Bottom-Center"
-  // 3 "Bottom-Right"
-  // 4 "Center-Right"
-  // 5 "Top-Right"
-  // 6 "Top-Center"
-  // 7 "Top-Left"
-  // 8 "Center-Left"
-  for (int i = 0; i < bdSize; ++i) {
-    int p;
-    if (i < width - 1)
-      p = idx(i, 0, width);
-    else if (i < width + height - 2)
-      p = idx(width - 1, i - width + 1, width);
-    else if (i < 2 * width + height - 3)
-      p = idx(width - 1 - (i - width - height + 2), height - 1, width);
-    else
-      p = idx(0, height - 1 - (i - 2 * width - height + 3), width);
-    bdIdx[i] = p;
-  }
-
-  if (sinkPos == 0) {
-    for (int i = 0; i < bdSize; ++i) {
-      int p = bdIdx[i];
-      g.addTerminal(p, -K);
-      scribbleB[p] = 1.f;
-    }
-  } else {
-    int initIdx = initInds[(sinkPos - 1)];
-    bool inside = false;
-    for (int i = 0; i < bdSize; ++i) {
-      int p = bdIdx[(initIdx + i + bdSize) % bdSize];
-      if (scribbleR[p] == 1.f) {
-        inside = true;
-        break;
-      }
-      g.addTerminal(p, -K);
-      scribbleB[p] = 1.f;
-    }
-    if (inside) {
-      for (int i = 0; i < bdSize; ++i) {
-        int p = bdIdx[(initIdx - i + bdSize) % bdSize];
-        if (scribbleR[p] == 1.f) break;
-        g.addTerminal(p, -K);
-        scribbleB[p] = 1.f;
-      }
-    }
-  }
-
-  std::vector<float> drawZero(rasSize, 0.0f);
-  std::vector<float> drawOne(rasSize, 1.0f);
-  if (mode == 2) {  // Draw LoG Filter
-    doDraw(ras, lap, lap, lap, drawOne);
-  } else if (mode == 3) {  // Draw Capacity Map
-    doDraw(ras, capacity, capacity, capacity, drawOne);
-  } else if (mode == 4) {  // Draw Scribble Map
-    doDraw(ras, scribbleR, drawZero, scribbleB, drawOne);
-  }
-}
-
-template <typename PIXEL>
-void naru_lazybrush::doColorize(TRasterPT<PIXEL> ras, double frame, Graph& g,
-                                std::vector<float>& gray) {
-  int width  = ras->getLx();
-  int height = ras->getLy();
-
-  bool fillHole = m_fillHole->getValue();
-  g.mincut();
-  std::vector<float> maskR(width * height, 0.0f);
-  std::vector<float> maskG(width * height, 0.0f);
-  std::vector<float> maskB(width * height, 0.0f);
-  std::vector<float> maskM(width * height, 0.0f);
-  // Mask
-  for (int y = 0; y < height; ++y) {
-    for (int x = 0; x < width; ++x) {
-      int p = idx(x, y, width);
-      if (!g.getSegment(p, fillHole ? g.SOURCE : g.SINK)) {  // SOURCE
-        maskR[p] = maskColor.m * maskColor.r;
-        maskG[p] = maskColor.m * maskColor.g;
-        maskB[p] = maskColor.m * maskColor.b;
-        maskM[p] = maskColor.m;
-      }
-    }
-  }
-
-  std::vector<float> lineR(width * height, 0.0f);
-  std::vector<float> lineG(width * height, 0.0f);
-  std::vector<float> lineB(width * height, 0.0f);
-  std::vector<float> lineM(width * height, 0.0f);
-  // Line
-  if (mode == 0) {
-    // line => (r, g, b, 1.), noLine => (r, g, b, 0.)
-    ras->lock();
-    for (int y = 0; y < height; ++y) {
-      PIXEL* pix = ras->pixels(y);
-      for (int x = 0; x < width; ++x) {
-        int p   = idx(x, y, width);
-        float m = (float)pix->m / (float)PIXEL::maxChannelValue;
-        if (m != 0) {
-          float r  = (float)pix->r / (float)PIXEL::maxChannelValue;
-          float g  = (float)pix->g / (float)PIXEL::maxChannelValue;
-          float b  = (float)pix->b / (float)PIXEL::maxChannelValue;
-          lineM[p] = (1.f - fmin(fmin(r, g), b)) * m;
-          lineR[p] = r;
-          lineG[p] = g;
-          lineB[p] = b;
-        }
-        pix++;
-      }
-    }
-    ras->unlock();
-  }
-  ras->lock();
-
-  // result => line + mask
-  for (int y = 0; y < height; ++y) {
-    PIXEL* pix = ras->pixels(y);
-    for (int x = 0; x < width; ++x) {
-      int p  = idx(x, y, width);
-      pix->r = (typename PIXEL::Channel)(
-          (maskR[p] * (1.f - lineM[p]) + lineM[p] * lineR[p]) *
-          (float)PIXEL::maxChannelValue);
-      pix->g = (typename PIXEL::Channel)(
-          (maskG[p] * (1.f - lineM[p]) + lineM[p] * lineG[p]) *
-          (float)PIXEL::maxChannelValue);
-      pix->b = (typename PIXEL::Channel)(
-          (maskB[p] * (1.f - lineM[p]) + lineM[p] * lineB[p]) *
-          (float)PIXEL::maxChannelValue);
-      pix->m = (typename PIXEL::Channel)(fmax(maskM[p], lineM[p]) *
-                                         (float)PIXEL::maxChannelValue);
-      pix++;
-    }
-    ras->unlock();
-  }
-}
 
 //------------------------------------------------------------------------------
-
-template <typename PIXEL>
-void naru_lazybrush::process(TRasterPT<PIXEL> ras, double frame,
-                             TRasterPT<PIXEL> refRas, bool refer_sw) {
-  int width   = ras->getLx();
-  int height  = ras->getLy();
-  int rasSize = width * height;
-  std::vector<float> gray(rasSize);
-  std::vector<float> lap(rasSize);
-
-  // params
-  mode      = m_mode->getValue();
-  maskColor = toPixelF(m_maskcolor->getValueD(frame));
-  LoG_s     = m_logs->getValue(frame);
-
-  // create graph
-  Graph g = Graph(rasSize);
-
-  doGrayScale<PIXEL>(ras, frame, gray);
-  doLoG<PIXEL>(ras, frame, gray, lap);
-  doGraph<PIXEL>(ras, frame, refRas, refer_sw, lap, g);
-  if (mode == 0 || mode == 1) {
-    doColorize<PIXEL>(ras, frame, g, gray);
-  }
-}
 
 void naru_lazybrush::doCompute(TTile& tile, double frame,
                                const TRenderSettings& ri) {
   if (!m_input.isConnected()) return;
 
-  // 1. å≥âÊëúëSàÊÇÃBBoxÇéÊìæ
-  TRectD fullBBox;
-  m_input->getBBox(frame, fullBBox, ri);
-
-  // 2. å≥âÊëúëSëÃÉâÉXÉ^Çämï€
-  TDimension size(0, 0);
-  size.lx = tceil(fullBBox.getLx());
-  size.ly = tceil(fullBBox.getLy());
-  TTile fullTile;
-  m_input->allocateAndCompute(fullTile, fullBBox.getP00(), size,
-                              tile.getRaster(), frame, ri);
-  TRasterP fullRas = fullTile.getRaster();
-
-  // 3. ÉOÉâÉtèàóùÇÉtÉãÉâÉXÉ^Ç≈é¿çs
+  TRasterP fullRas;
   TRasterP refRas;
-  bool refer_sw = false;
+  TTile fullTile;
+  initRasters(fullRas, refRas, fullTile, tile, ri, frame);
+
+  RenderContext ctx;
+  ctx.width   = fullRas->getLx();
+  ctx.height  = fullRas->getLy();
+  ctx.rasSize = ctx.width * ctx.height;
+  ctx.mode    = m_mode->getValue();
+
+  ctx.refBGColor         = toPixelF(m_bg_color->getValueD(frame));
+  ctx.enableAutoScribble = m_enable_auto_scribble->getValue();
+  ctx.autoScribbleColor  = toPixelF(m_auto_scribble_color->getValueD(frame));
+  ctx.blendMode          = m_blend_mode->getValue();
+  ctx.enableAutoBgScribble = m_enable_auto_bg_scribble->getValue();
+
+  ctx.scribbleData.resize(ctx.rasSize, -1);
+
+  // default ColorPalette
+  ctx.bgClusterId = 0;
+  ctx.autoScribbleId = 1;
+  ctx.colorPalette.clear();
+  ctx.colorPalette.resize(2);
+  ctx.colorPalette[0] = TPixelF(0, 0, 0, 0);
+  ctx.colorPalette[1] = ctx.autoScribbleColor;
+
+  // pre process reference scribble data
   if (m_ref.isConnected()) {
-    refer_sw = true;
-    TTile refTile;
-    m_ref->allocateAndCompute(refTile, fullBBox.getP00(), size, fullRas, frame,
-                              ri);
-    refRas = refTile.getRaster();
+    if (TRaster32P ras32 = refRas)
+      createScribbleIndexMap<TPixel32>(ras32, ctx);
+    else if (TRaster64P ras64 = refRas)
+      createScribbleIndexMap<TPixel64>(ras64, ctx);
+    else if (TRasterFP rasF = refRas)
+      createScribbleIndexMap<TPixelF>(rasF, ctx);
+    else
+      throw TException("unsupported Pixel Type");
   }
 
+  // main process
   if (TRaster32P ras32 = fullRas)
-    process<TPixel32>(ras32, frame, refRas, refer_sw);
+    process<TPixel32>(ras32, frame, ctx);
   else if (TRaster64P ras64 = fullRas)
-    process<TPixel64>(ras64, frame, refRas, refer_sw);
+    process<TPixel64>(ras64, frame, ctx);
   else if (TRasterFP rasF = fullRas)
-    process<TPixelF>(rasF, frame, refRas, refer_sw);
+    process<TPixelF>(rasF, frame, ctx);
   else
     throw TException("unsupported Pixel Type");
 
-  // 4. tile Ç…åãâ ÇÉRÉsÅ[
+  // copy result to tile
   TRasterP tileRas      = tile.getRaster();
   TPoint startTilingPos = convert(fullTile.m_pos - tile.m_pos);
   tileRas->copy(fullRas, startTilingPos);
+}
+
+template <typename PIXEL>
+void naru_lazybrush::process(TRasterPT<PIXEL> ras, double frame, RenderContext& ctx) {
+  ctx.K                     = 2 * (ctx.width + ctx.height);
+  ctx.s                     = m_log_scale->getValue(frame);
+  ctx.lambda                = m_lambda->getValue(frame);
+  ctx.autoScribbleTh        = 1.0f - m_auto_scribble_threshold->getValue(frame);
+  ctx.scribbleType          = m_scribble_type->getValue();
+  ctx.weightSoft            = floorf((1.0f - ctx.lambda) * ctx.K);
+  ctx.terminalCap           = ctx.scribbleType == 0 ? 4 * ctx.weightSoft : 5 * ctx.K;
+  ctx.procImgData.resize(ctx.rasSize, 0.f);
+  ctx.refImgData.resize(ctx.rasSize, 0.f);
+
+  //// process image data
+  // Gray scale [I]
+  rasterToGrayVector(ras, ctx.procImgData, ctx);
+
+  // LoG Filter [LoG(I)]
+  logFilter(ctx.procImgData, ctx);
+
+  // [max(0, 1 - max(0, s * LoG))]
+  I_f(ctx.procImgData, ctx);
+
+  // Draw LoG Filter
+  if (ctx.mode == 2) {
+    drawImgFromFloat(ras, ctx.procImgData, ctx);
+    return;
+  }
+
+  // --- BBox„ÅÆË®àÁÆóÔºÅEÁ´Ø„Åã„Çâ„ÅÆÈ´òÈÄüÊé¢Á¥¢ ÔøΩEÔøΩE„É™„Éï„Ç°„É¨„É≥„Çπ„Çπ„ÇØ„É™„Éñ„É´„Å®„ÅÆÂíåÈõÜÂêàÔºÅE---
+  ctx.minX = ctx.width;
+  ctx.minY = ctx.height;
+  ctx.maxX = -1;
+  ctx.maxY = -1;
+
+  // 1. ‰∏äÁ´Ø (minY) „ÅÆÊé¢Á¥¢
+  bool found = false;
+  for (int y = 0; y < ctx.height; ++y) {
+    for (int x = 0; x < ctx.width; ++x) {
+      int p = idx(x, y, ctx);
+      if ((ctx.procImgData[p] < ctx.autoScribbleTh) || (ctx.scribbleData[p] >= 1)) {
+        ctx.minY = y;
+        found = true;
+        break;
+      }
+    }
+    if (found) break;
+  }
+
+  if (found) {
+    // 2. ‰∏ãÁ´Ø (maxY) „ÅÆÊé¢Á¥¢
+    found = false;
+    for (int y = ctx.height - 1; y >= 0; --y) {
+      for (int x = 0; x < ctx.width; ++x) {
+        int p = idx(x, y, ctx);
+        if ((ctx.procImgData[p] < ctx.autoScribbleTh) || (ctx.scribbleData[p] >= 1)) {
+          ctx.maxY = y;
+          found = true;
+          break;
+        }
+      }
+      if (found) break;
+    }
+
+    // 3. Â∑¶Á´Ø (minX) „ÅÆÊé¢Á¥¢
+    found = false;
+    for (int x = 0; x < ctx.width; ++x) {
+      for (int y = 0; y < ctx.height; ++y) {
+        int p = idx(x, y, ctx);
+        if ((ctx.procImgData[p] < ctx.autoScribbleTh) || (ctx.scribbleData[p] >= 1)) {
+          ctx.minX = x;
+          found = true;
+          break;
+        }
+      }
+      if (found) break;
+    }
+
+    // 4. Âè≥Á´Ø (maxX) „ÅÆÊé¢Á¥¢
+    found = false;
+    for (int x = ctx.width - 1; x >= 0; --x) {
+      for (int y = 0; y < ctx.height; ++y) {
+        int p = idx(x, y, ctx);
+        if ((ctx.procImgData[p] < ctx.autoScribbleTh) || (ctx.scribbleData[p] >= 1)) {
+          ctx.maxX = x;
+          found = true;
+          break;
+        }
+      }
+      if (found) break;
+    }
+  } else {
+    // „Çø„Éº„Ç≤„ÉÅEÔøΩÔøΩ„ÅåÂ≠òÂú®„Åó„Å™„ÅÅEÔøΩÔøΩÂêà„ÄÅBBox„ÅØÁÑ°Âäπ
+    ctx.minX = ctx.width;
+    ctx.minY = ctx.height;
+    ctx.maxX = -1;
+    ctx.maxY = -1;
+  }
+
+  // Auto ScribbleÔøΩEÔøΩE_p ÈÅ©Áî®Ââç„Å´ÂÆüË°å„Åó„Å¶„ÄÅÁ¥îÁ≤ã„Å™ I_f „Å´ÂØæ„Åó„Å¶Âà§ÂÆöÔºÅE
+  if (ctx.enableAutoScribble) {
+    autoScribble(ctx);
+  }
+  // Set Baundary Scribble
+  if (ctx.enableAutoBgScribble) {
+    setBaundaryScribble(ctx);
+  }
+
+  // [K * (1 - max(0, s * LoG(I))) ^ 2 + 1]
+  I_p(ctx.procImgData, ctx);
+
+  // Draw Capacity Mode
+  if (ctx.mode == 3) {
+    vector<float> capDisp(ctx.rasSize, 0.f);
+    for (int i = 0; i < ctx.rasSize; ++i) {
+      capDisp[i] = (ctx.procImgData[i] - 1.f) / ctx.K;
+    }
+    drawImgFromFloat(ras, capDisp, ctx);
+    return;
+  }
+
+  // Draw Scribble Map
+  if (ctx.mode == 4) {
+    drawImgFromInt(ras, ctx.scribbleData, ctx);
+    return;
+  }
+
+  //// alpha expansion
+  ctx.mincutData.assign(ctx.rasSize, ctx.bgClusterId);
+  for (int t = 0; t < ctx.colorPalette.size(); ++t) {
+    if (t == ctx.bgClusterId) continue;
+    // Init Graph
+    ctx.graph = make_unique<GraphType>(ctx.rasSize, ctx.rasSize * 4);
+    ctx.graph->add_node(ctx.rasSize);
+
+    // Capacity
+    setCapacity(ctx);
+
+    // Set Terminal Capacity
+    setTerminalCapacity(t, ctx);
+
+    // Process Graph Algorithm
+    ctx.graph->init_maxflow();
+    int flow = ctx.graph->maxflow();
+
+    // update mincut data
+    updateMincutData(t, ctx);
+  }
+
+  // Set Mask
+  TRasterPT<PIXEL> mask = TRasterPT<PIXEL>(ctx.width, ctx.height);
+  setMask<PIXEL>(mask, ctx);
+
+  // draw
+  if (ctx.mode == 0) {
+    drawMaskAndLine(ras, mask, ctx);
+  } else {
+    ras->copy(mask);
+  }
+}
+
+
+//-------------------------------------------------------------------
+void naru_lazybrush::initRasters(TRasterP &fullRas, TRasterP& refRas,
+                                 TTile &fullTile, TTile& tile,
+                                 const TRenderSettings& ri,
+                                 double frame) {
+  // get BBox of the input image
+  TRectD fullBBox;
+  m_input->getBBox(frame, fullBBox, ri);
+
+  // get input raster
+  TDimension size(0, 0);
+  size.lx = tceil(fullBBox.getLx());
+  size.ly = tceil(fullBBox.getLy());
+  m_input->allocateAndCompute(fullTile, fullBBox.getP00(), size,
+                              tile.getRaster(), frame, ri);
+  fullRas = fullTile.getRaster();
+
+  // get reference raster
+  if (m_ref.isConnected()) {
+    TTile refTile;
+    m_ref->allocateAndCompute(refTile, fullBBox.getP00(), size,
+                              fullRas, frame, ri);
+    refRas = refTile.getRaster();
+  }
+}
+
+template <typename PIXEL>
+void naru_lazybrush::createScribbleIndexMap(TRasterPT<PIXEL> refRas, RenderContext& ctx) {
+  // Cast refColors to refMat
+  setMat(refRas, ctx.refMat, ctx);
+
+  // Create Palette
+  createPalette(ctx.refMat, ctx);
+}
+
+template <typename PIXEL>
+void naru_lazybrush::setMat(TRasterPT<PIXEL> ras, Mat& mat, const RenderContext& ctx) {
+  mat.create(ctx.rasSize, 1, CV_32FC4);
+  ras->lock();
+  for (int y = 0; y < ctx.height; ++y) {
+    PIXEL* pix = ras->pixels(y);
+    for (int x = 0; x < ctx.width; ++x) {
+      int i       = idx(x, y, ctx);
+      float alpha = (float)pix[x].m / (float)PIXEL::maxChannelValue;
+      if (alpha < 1.f) {
+        mat.at<Vec4f>(i) = Vec4f(0.f, 0.f, 0.f, 0.f);
+      } else {
+        mat.at<Vec4f>(i) = Vec4f(
+            (float)pix[x].r / (float)PIXEL::maxChannelValue,
+            (float)pix[x].g / (float)PIXEL::maxChannelValue,
+            (float)pix[x].b / (float)PIXEL::maxChannelValue,
+            1.f
+        );
+      }
+    }
+  }
+  ras->unlock();
+}
+
+void naru_lazybrush::createPalette(const Mat& mat, RenderContext& ctx) {
+  ctx.colorPalette.clear();
+  vector<int> colorInts;
+
+  // Define BG Color
+  ctx.bgClusterId = 0;
+  Vec4f bgColor(ctx.refBGColor.r, ctx.refBGColor.g, ctx.refBGColor.b, 1.f);
+  colorInts.push_back(colorToInt(bgColor));
+  ctx.colorPalette.push_back(TPixelF(0,0,0,0));
+
+  // Define Auto Scribble Color
+  if (ctx.enableAutoScribble) {
+    ctx.autoScribbleId = 1;
+    Vec4f asColor(ctx.autoScribbleColor.r, ctx.autoScribbleColor.g, ctx.autoScribbleColor.b,
+                  1.f);
+    int cInt = colorToInt(asColor);
+    if (colorInts.size() == 0 || colorInts[0] != cInt) {
+      colorInts.push_back(cInt);
+      ctx.colorPalette.push_back(TPixelF(ctx.autoScribbleColor));
+    }
+  }
+  
+  // Define Scribble Colors from Reference
+  int pos = 0;
+  for (int pi = 0; pi < ctx.rasSize; ++pi) {
+    Vec4f p = mat.at<Vec4f>(pi, 0);
+    if (p[3] == 0) continue;
+    p[3] = 1.f;
+
+    int cInt = colorToInt(p);
+
+    // Exist in Palette
+    int found = -1;
+    for (size_t i = 0; i < colorInts.size(); ++i) {
+      if (colorInts[i] == cInt) {
+        found = static_cast<int>(i);
+        break;
+      }
+    }
+
+    if (found == -1) {
+      // New Color
+      ctx.colorPalette.push_back(
+          TPixelF(p[0], p[1], p[2], 1.f));
+      colorInts.push_back(cInt);
+      found = static_cast<int>(colorInts.size() - 1);
+    }
+    ctx.scribbleData[pi] = found;
+  }
+}
+
+template <typename PIXEL>
+void naru_lazybrush::rasterToGrayVector(TRasterPT<PIXEL> ras,
+                                        vector<float>& vec,
+                                        const RenderContext& ctx) {
+  ras->lock();
+  for (int y = 0; y < ctx.height; ++y) {
+    PIXEL* pix = ras->pixels(y);
+    for (int x = 0; x < ctx.width; ++x) {
+      vec[idx(x, y, ctx)] = pixelToNormalizedGray<PIXEL>(pix[x]);
+    }
+  }
+  ras->unlock();
+}
+
+template<size_t N>
+void naru_lazybrush::convolve(vector<float>& data,
+                              const array<array<float, N>, N>& kernel,
+                              const RenderContext& ctx) {
+  int kSize = kernel.size();
+  int half  = kSize / 2;
+  vector<float> inputData = data;
+  for (int y = 0; y < ctx.height; ++y) {
+    for (int x = 0; x < ctx.width; ++x) {
+      float sum = 0.f;
+      for (int ky = -half; ky <= half; ++ky) {
+        for (int kx = -half; kx <= half; ++kx) {
+          int ix = std::min(std::max(x + kx, 0), ctx.width - 1);
+          int iy = std::min(std::max(y + ky, 0), ctx.height - 1);
+          sum += inputData[idx(ix, iy, ctx)] * kernel[ky + half][kx + half];
+        }
+      }
+      data[idx(x, y, ctx)] = sum;
+    }
+  }
+}
+
+void naru_lazybrush::logFilter(vector<float>& data, RenderContext& ctx) {
+  // Gaussian filter
+  convolve(data, gauKernel, ctx);
+
+  // Laplacian filter
+  convolve(data, lapKernel, ctx);
+}
+
+void naru_lazybrush::setCapacity(RenderContext& ctx) {
+  for (int y = 0; y < ctx.height; ++y) {
+    for (int x = 0; x < ctx.width; ++x) {
+      int p = idx(x, y, ctx);
+      if (x < ctx.width - 1) {
+        int q = idx(x + 1, y, ctx);
+        float weight = (ctx.procImgData[p] + ctx.procImgData[q]) * 0.5f;
+        ctx.graph->add_edge(p, q, weight, weight);
+      }
+      if (y < ctx.height - 1) {
+        int q = idx(x, y + 1, ctx);
+        float weight = (ctx.procImgData[p] + ctx.procImgData[q]) * 0.5f;
+        ctx.graph->add_edge(p, q, weight, weight);
+      }
+    }
+  }
+}
+
+void naru_lazybrush::autoScribble(RenderContext& ctx) {
+  // BBox„ÅåÂ≠òÂú®„Åô„ÇãÂ†¥Âêà„Å´„ÅÆ„ÅøËµ∞Êüª„Åô„Çã
+  if (ctx.maxX >= 0 && ctx.maxY >= 0) {
+    // BBox„ÅÆÂõõËæ∫„Åã„ÇâÂÜÅEÔøΩE„Å´Âêë„Åë„Å¶Ëµ∞Êüª„Åô„Çã
+    // ‰∏äËæ∫„Åã„Çâ‰∏ã„Å∏
+    for (int x = ctx.minX; x <= ctx.maxX; ++x) {
+      autoScribbleScan(x, ctx.minY, 0, 1, ctx);
+    }
+    // ‰∏ãËæ∫„Åã„Çâ‰∏ä„Å∏
+    for (int x = ctx.minX; x <= ctx.maxX; ++x) {
+      autoScribbleScan(x, ctx.maxY, 0, -1, ctx);
+    }
+    // Â∑¶Ëæ∫„Åã„ÇâÂè≥„Å∏
+    for (int y = ctx.minY; y <= ctx.maxY; ++y) {
+      autoScribbleScan(ctx.minX, y, 1, 0, ctx);
+    }
+    // Âè≥Ëæ∫„Åã„ÇâÂ∑¶„Å∏
+    for (int y = ctx.minY; y <= ctx.maxY; ++y) {
+      autoScribbleScan(ctx.maxX, y, -1, 0, ctx);
+    }
+  }
+}
+
+void naru_lazybrush::autoScribbleScan(int x, int y, int dx, int dy, RenderContext& ctx) {
+  bool foundLine = false;
+  while (x >= 0 && x < ctx.width && y >= 0 && y < ctx.height) {
+    int cp = idx(x, y, ctx);
+    bool isLine = ctx.procImgData[cp] < ctx.autoScribbleTh;
+    if (isLine) {
+      foundLine = true;
+    } else if (foundLine) {
+      // „Åô„Åß„Å´Á∑ö„ÇíÈÄöÈÅé„Åó„ÄÅÔøΩE„Å≥ threshold ‰ª•‰∏äÔºÅEsLine „ÅÅEfalseÔøΩEÔøΩ„Å´„Å™„Å£„ÅüÂ†¥ÊâÄÔøΩEÔøΩÔøΩEÂÅ¥ÔøΩEÔøΩE
+      ctx.scribbleData[cp] = ctx.autoScribbleId;
+      break;
+    }
+    x += dx;
+    y += dy;
+  }
+}
+
+void naru_lazybrush::setBaundaryScribble(RenderContext& ctx) {
+  int padding = 3;
+  if (ctx.maxX >= 0 && ctx.maxY >= 0) {
+    // extend Bounding Box by padding
+    int minX = ctx.minX - padding;
+    int minY = ctx.minY - padding;
+    int maxX = ctx.maxX + padding;
+    int maxY = ctx.maxY + padding;
+
+    // set scribble
+    for (int y = minY; y <= maxY; ++y) {
+      for (int x = minX; x <= maxX; ++x) {
+        if (x < 0 || x >= ctx.width || y < 0 || y >= ctx.height) continue;
+        bool isBBEdge = (x == minX || x == maxX || y == minY || y == maxY);
+        if (isBBEdge) {
+          int p = idx(x, y, ctx);
+          ctx.scribbleData[p] = -2;
+        }
+      }
+    }
+  }
+}
+
+void naru_lazybrush::setTerminalCapacity(int refInd, RenderContext& ctx) {
+  int hardCap = 5 * ctx.K;
+  for (int y = 0; y < ctx.height; ++y) {
+    for (int x = 0; x < ctx.width; ++x) {
+      int p = idx(x, y, ctx);
+      if (ctx.scribbleData[p] == -2) {
+        // scribbleData[p] == -2 „ÅØ„ÄåÁîªÂÉèÂ§ñÂë®„Äç„ÇíË°®„ÅÅE
+        // HardÔøΩEÔøΩÁ¢∫ÂÆü„Å™Âà∂Á¥ÅEÔøΩÔøΩ„Å®„Åó„Å¶„Ç∑„É≥„ÇØ(T)„Å´ÁµêÂêà
+        ctx.graph->add_tweights(p, 0, hardCap);
+      } else if (ctx.scribbleData[p] == -1) {
+        // Scribble„Å™„ÅóÔºöt-link„ÅÆËøΩÂä†„ÅØ‰∏çË¶ÅE
+        continue;
+      } else if (ctx.scribbleData[p] == refInd) {
+        // Ê≥®ÁõÆ„Åó„Å¶„ÅÅEÔøΩÔøΩËâ≤„ÅÆScribbleÔøΩEÔøΩ„ÇΩ„Éº„Çπ(S)„Å´Êé•Á∂ÅE
+        ctx.graph->add_tweights(p, ctx.terminalCap, 0);
+      } else {
+        // „Åù„Çå‰ª•Â§ñÔøΩEËâ≤„ÅÆScribbleÔøΩEÔøΩ„Ç∑„É≥„ÇØ(T)„Å´‰∏ÄÊã¨Êé•Á∂ÅE
+        ctx.graph->add_tweights(p, 0, ctx.terminalCap);
+      }
+    }
+  }
+}
+
+void naru_lazybrush::updateMincutData(int refInd, RenderContext& ctx) {
+  for (int y = 0; y < ctx.height; ++y) {
+    for (int x = 0; x < ctx.width; ++x) {
+      int p = idx(x, y, ctx);
+      if (ctx.graph->what_segment(p, ctx.graph->SOURCE) ==
+          ctx.graph->SOURCE) {
+        ctx.mincutData[p] = refInd;
+      }
+    }
+  }
+}
+
+template <typename PIXEL>
+void naru_lazybrush::setMask(TRasterPT<PIXEL>& mask, const RenderContext& ctx) {
+  mask->lock();
+  for (int y = 0; y < ctx.height; ++y) {
+    PIXEL* maskPix = mask->pixels(y);
+    for (int x = 0; x < ctx.width; ++x) {
+      int p = idx(x, y, ctx);
+      TPixelF c = ctx.colorPalette[ctx.mincutData[p]];
+
+      maskPix[x].r =
+          (typename PIXEL::Channel)(c.r * (float)PIXEL::maxChannelValue);
+      maskPix[x].g =
+          (typename PIXEL::Channel)(c.g * (float)PIXEL::maxChannelValue);
+      maskPix[x].b =
+          (typename PIXEL::Channel)(c.b * (float)PIXEL::maxChannelValue);
+      maskPix[x].m =
+          (typename PIXEL::Channel)(c.m * (float)PIXEL::maxChannelValue);
+
+      if (maskPix[x].m == 0) {
+        maskPix[x].r = 0;
+        maskPix[x].g = 0;
+        maskPix[x].b = 0;
+      }
+    }
+  }
+  mask->unlock();
+}
+
+template <typename PIXEL>
+void naru_lazybrush::drawImgFromFloat(TRasterPT<PIXEL> ras, const vector<float>& data, const RenderContext& ctx) {
+  ras->lock();
+  for (int y = 0; y < ctx.height; ++y) {
+    PIXEL* pix = ras->pixels(y);
+    for (int x = 0; x < ctx.width; ++x) {
+      int p    = idx(x, y, ctx);
+      pix[x].r = (typename PIXEL::Channel)(fmin(data[p], 1.f) *
+                                           (float)PIXEL::maxChannelValue);
+      pix[x].g = (typename PIXEL::Channel)(fmin(data[p], 1.f) *
+                                           (float)PIXEL::maxChannelValue);
+      pix[x].b = (typename PIXEL::Channel)(fmin(data[p], 1.f) *
+                                           (float)PIXEL::maxChannelValue);
+      pix[x].m = (typename PIXEL::Channel)(1.f * (float)PIXEL::maxChannelValue);
+    }
+  }
+  ras->unlock();
+}
+
+template <typename PIXEL>
+void naru_lazybrush::drawImgFromInt(TRasterPT<PIXEL> ras, const vector<int>& data, const RenderContext& ctx) {
+  ras->lock();
+  for (int y = 0; y < ctx.height; ++y) {
+    PIXEL* pix = ras->pixels(y);
+    for (int x = 0; x < ctx.width; ++x) {
+      int p    = idx(x, y, ctx);
+      TPixelF c;
+      if (data[p] == -2 || data[p] == ctx.bgClusterId)
+        c = ctx.refBGColor;
+      else if (data[p] == -1)
+        c = TPixelF(1.f, 1.f, 1.f, 1.f);
+      else if (data[p] < ctx.colorPalette.size())
+        c = ctx.colorPalette[data[p]];
+      else
+        c = TPixelF(1.f, 0, 1.f, 1.f);
+      pix[x].r = (typename PIXEL::Channel)(c.r * (float)PIXEL::maxChannelValue);
+      pix[x].g = (typename PIXEL::Channel)(c.g * (float)PIXEL::maxChannelValue);
+      pix[x].b = (typename PIXEL::Channel)(c.b * (float)PIXEL::maxChannelValue);
+      pix[x].m = (typename PIXEL::Channel)(c.m * (float)PIXEL::maxChannelValue);
+    }
+  }
+  ras->unlock();
+}
+
+template <typename PIXEL>
+void naru_lazybrush::drawMaskAndLine(TRasterPT<PIXEL> ras,
+                                     TRasterPT<PIXEL> mask,
+                                     const RenderContext& ctx) {
+  ras->lock();
+  mask->lock();
+  for (int y = 0; y < ctx.height; ++y) {
+    PIXEL* basePix = ras->pixels(y);
+    PIXEL* maskPix = mask->pixels(y);
+
+    for (int x = 0; x < ctx.width; ++x) {
+      // 1. Get original color and normalize to [0, 1]
+      float br = (float)basePix[x].r / (float)PIXEL::maxChannelValue;
+      float bg = (float)basePix[x].g / (float)PIXEL::maxChannelValue;
+      float bb = (float)basePix[x].b / (float)PIXEL::maxChannelValue;
+      float ba = (float)basePix[x].m / (float)PIXEL::maxChannelValue;
+
+      // 2. Get mask color and normalize to [0, 1]
+      float mr = (float)maskPix[x].r / (float)PIXEL::maxChannelValue;
+      float mg = (float)maskPix[x].g / (float)PIXEL::maxChannelValue;
+      float mb = (float)maskPix[x].b / (float)PIXEL::maxChannelValue;
+      float ma = (float)maskPix[x].m / (float)PIXEL::maxChannelValue;
+
+      // 3. Compute original image line alpha
+      float a_line = ba;
+
+      // 4. Calculate output alpha
+      float a_out = a_line + ma * (1.f - a_line);
+
+      // 5. Apply blend mode f(C_b, C_s) where C_b = mask (bottom), C_s = original (top)
+      float r_blend = 0.f, g_blend = 0.f, b_blend = 0.f;
+
+      switch (ctx.blendMode) {
+      case 0: // Multiply
+        r_blend = mr * br;
+        g_blend = mg * bg;
+        b_blend = mb * bb;
+        break;
+      case 1: // Normal
+        r_blend = br;
+        g_blend = bg;
+        b_blend = bb;
+        break;
+      case 2: // Screen
+        r_blend = mr + br - mr * br;
+        g_blend = mg + bg - mg * bg;
+        b_blend = mb + bb - mb * bb;
+        break;
+      case 3: // Overlay
+        r_blend = (mr < 0.5f) ? (2.f * mr * br) : (1.f - 2.f * (1.f - mr) * (1.f - br));
+        g_blend = (mg < 0.5f) ? (2.f * mg * bg) : (1.f - 2.f * (1.f - mg) * (1.f - bg));
+        b_blend = (mb < 0.5f) ? (2.f * mb * bb) : (1.f - 2.f * (1.f - mb) * (1.f - bb));
+        break;
+      case 4: // Darken
+        r_blend = fmin(mr, br);
+        g_blend = fmin(mg, bg);
+        b_blend = fmin(mb, bb);
+        break;
+      case 5: // Lighten
+        r_blend = fmax(mr, br);
+        g_blend = fmax(mg, bg);
+        b_blend = fmax(mb, bb);
+        break;
+      default:
+        r_blend = br;
+        g_blend = bg;
+        b_blend = bb;
+        break;
+      }
+
+      // 6. Composite with alpha
+      float r_out = 0.f, g_out = 0.f, b_out = 0.f;
+      if (a_out > 0.f) {
+        r_out = (a_line * (1.f - ma) * br + ma * (1.f - a_line) * mr + a_line * ma * r_blend) / a_out;
+        g_out = (a_line * (1.f - ma) * bg + ma * (1.f - a_line) * mg + a_line * ma * g_blend) / a_out;
+        b_out = (a_line * (1.f - ma) * bb + ma * (1.f - a_line) * mb + a_line * ma * b_blend) / a_out;
+      }
+
+      // Clamp and write back
+      basePix[x].r = static_cast<typename PIXEL::Channel>(fmax(0.f, fmin(r_out, 1.f)) * (float)PIXEL::maxChannelValue);
+      basePix[x].g = static_cast<typename PIXEL::Channel>(fmax(0.f, fmin(g_out, 1.f)) * (float)PIXEL::maxChannelValue);
+      basePix[x].b = static_cast<typename PIXEL::Channel>(fmax(0.f, fmin(b_out, 1.f)) * (float)PIXEL::maxChannelValue);
+      basePix[x].m = static_cast<typename PIXEL::Channel>(fmax(0.f, fmin(a_out, 1.f)) * (float)PIXEL::maxChannelValue);
+    }
+  }
+  ras->unlock();
+  mask->unlock();
 }
 
 //------------------------------------------------------------------
