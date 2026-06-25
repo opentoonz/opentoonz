@@ -1,4 +1,4 @@
-﻿#include "trop.h"
+#include "trop.h"
 #include "tfxparam.h"
 #include <math.h>
 #include "stdfx.h"
@@ -8,6 +8,7 @@
 #include "tparamset.h"
 #include "trasterfx.h"
 #include "tpixelutils.h"
+#include "tdoublekeyframe.h"
 
 #include "naru_graph.h"
 #include <opencv2/opencv.hpp>
@@ -63,6 +64,16 @@ class naru_lazybrush final : public TStandardRasterFx {
   TIntEnumParamP m_blend_mode;
   TBoolParamP m_enable_auto_bg_scribble;
 
+  // Obsolete parameters for backward compatibility
+  TPixelParamP m_mask_color;
+  TDoubleParamP m_sigma;
+  TDoubleParamP m_alpha;
+  TDoubleParamP m_autoscrlen;
+  TDoubleParamP m_lineweight;
+  TBoolParamP m_fillHole;
+  TIntEnumParamP m_sinkpos;
+  TBoolParamP m_autoScribble;
+
 public:
   naru_lazybrush()
       : m_mode(new TIntEnumParam(0, "Mask+Line"))
@@ -74,7 +85,15 @@ public:
       , m_log_scale(10.0f)
       , m_lambda(0.05f)
       , m_blend_mode(new TIntEnumParam(0, "Multiply"))
-      , m_enable_auto_bg_scribble(true) {
+      , m_enable_auto_bg_scribble(true)
+      , m_mask_color(TPixel32(0, 0, 0))
+      , m_sigma(0.0)
+      , m_alpha(0.0)
+      , m_autoscrlen(0.0)
+      , m_lineweight(0.0)
+      , m_fillHole(false)
+      , m_sinkpos(new TIntEnumParam(0, "All"))
+      , m_autoScribble(false) {
     bindParam(this, "mode", m_mode);
 
     this->m_mode->addItem(1, "Mask");
@@ -105,6 +124,26 @@ public:
     bindParam(this, "lambda", m_lambda);
     this->m_lambda->setValueRange(0.0f, 1.f);
 
+    bindParam(this, "mask_color", m_mask_color, true, true);
+    bindParam(this, "sigma", m_sigma, true, true);
+    bindParam(this, "alpha", m_alpha, true, true);
+    bindParam(this, "auto_scribble_length", m_autoscrlen, true, true);
+    bindParam(this, "line_weight", m_lineweight, true, true);
+    bindParam(this, "undef_is_sink", m_fillHole, true, true);
+    bindParam(this, "sink_pos", m_sinkpos, true, true);
+    bindParam(this, "auto_scribble", m_autoScribble, true, true);
+
+    this->m_sinkpos->addItem(1, "Bottom-Left");
+    this->m_sinkpos->addItem(2, "Bottom-Center");
+    this->m_sinkpos->addItem(3, "Bottom-Right");
+    this->m_sinkpos->addItem(4, "Center-Right");
+    this->m_sinkpos->addItem(5, "Top-Right");
+    this->m_sinkpos->addItem(6, "Top-Center");
+    this->m_sinkpos->addItem(7, "Top-Left");
+    this->m_sinkpos->addItem(8, "Center-Left");
+
+    setFxVersion(2);
+
     addInputPort("Source", m_input);
     addInputPort("Reference", m_ref);
     enableComputeInFloat(true);
@@ -128,6 +167,10 @@ public:
   bool canHandle(const TRenderSettings& info, double frame) override {
     return false;
   }
+
+  void loadData(TIStream &is) override;
+  void onObsoleteParamLoaded(const std::string &paramName) override;
+  void onFxVersionSet() override;
 
 private:
   //// Params
@@ -875,6 +918,36 @@ void naru_lazybrush::drawMaskAndLine(TRasterPT<PIXEL> ras,
   ras->unlock();
   mask->unlock();
 }
+
+//------------------------------------------------------------------
+
+void naru_lazybrush::onObsoleteParamLoaded(const std::string &paramName) {
+  if (paramName == "mask_color") {
+    m_auto_scribble_color->copy(m_mask_color.getPointer());
+  } else if (paramName == "auto_scribble") {
+    m_enable_auto_scribble->setValue(m_autoScribble->getValue());
+  }
+}
+
+void naru_lazybrush::loadData(TIStream &is) {
+  TStandardRasterFx::loadData(is);
+  if (getFxVersion() < 2) {
+    if (m_log_scale->getKeyframeCount() > 0) {
+      for (int i = 0; i < m_log_scale->getKeyframeCount(); ++i) {
+        TDoubleKeyframe k = m_log_scale->getKeyframe(i);
+        k.m_value *= 200.0;
+        k.m_speedIn.y *= 200.0;
+        k.m_speedOut.y *= 200.0;
+        m_log_scale->setKeyframe(i, k);
+      }
+    } else {
+      m_log_scale->setDefaultValue(m_log_scale->getDefaultValue() * 200.0);
+    }
+    setFxVersion(2);
+  }
+}
+
+void naru_lazybrush::onFxVersionSet() {}
 
 //------------------------------------------------------------------
 
