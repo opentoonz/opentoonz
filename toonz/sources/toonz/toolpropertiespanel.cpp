@@ -183,7 +183,8 @@ void ToolPropertyButton::paintEvent(QPaintEvent *event) {
   QStyleOptionToolButton opt;
   initStyleOption(&opt);
 
-  const bool isHovered = opt.state.testFlag(QStyle::State_MouseOver);
+  const bool isHovered =
+      m_hoverEnabled && opt.state.testFlag(QStyle::State_MouseOver);
   const bool isChecked = opt.state.testFlag(QStyle::State_On);
   const bool isPressed = opt.state.testFlag(QStyle::State_Sunken);
   const bool useThemeState = isHovered || isChecked || isPressed;
@@ -2189,6 +2190,33 @@ void styleCollapsibleField(QWidget *field) {
   field->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 }
 
+QWidget *replacePlasticSkeletonEmptyLineEdit(QWidget *picker, bool showBorders,
+                                             bool showBackgrounds) {
+  if (!picker) return nullptr;
+  QLineEdit *emptyField = picker->findChild<QLineEdit *>("pickerEmptyField");
+  if (!emptyField) return nullptr;
+
+  QWidget *content = emptyField->parentWidget();
+  if (!content) return nullptr;
+  auto *contentLayout = qobject_cast<QVBoxLayout *>(content->layout());
+  if (!contentLayout) return nullptr;
+
+  contentLayout->removeWidget(emptyField);
+  delete emptyField;
+
+  ToolPropertyButton *emptySlot = new ToolPropertyButton(QString(), content);
+  emptySlot->setObjectName("plasticSkelEmptySlot");
+  emptySlot->setCursor(Qt::ArrowCursor);
+  emptySlot->setCheckable(false);
+  emptySlot->setHoverEnabled(false);
+  emptySlot->setFocusPolicy(Qt::NoFocus);
+  styleCollapsibleField(emptySlot);
+  emptySlot->setShowBorders(showBorders);
+  emptySlot->setShowBackgrounds(showBackgrounds);
+  contentLayout->insertWidget(0, emptySlot);
+  return emptySlot;
+}
+
 void uniformPlasticFieldWidget(QWidget *widget) {
   if (!widget) return;
   for (QLineEdit *lineEdit : widget->findChildren<QLineEdit *>())
@@ -3839,7 +3867,7 @@ void ToolPropertiesPanel::updatePlasticSkeletonPicker() {
   if (!plastic) return;
 
   QStringList items;
-  int currentIndex = 0;
+  int currentIndex = -1;
   const SkDP &sd = plastic->deformation();
   if (sd) {
     const int curId = plastic->currentSkeletonId();
@@ -3851,7 +3879,43 @@ void ToolPropertiesPanel::updatePlasticSkeletonPicker() {
     }
   }
 
+  // After removal the skelIds curve can still reference a deleted id — realign.
+  if (currentIndex < 0 && !items.isEmpty()) {
+    plastic->editSkelId_undo(items[0].toInt());
+    return;
+  }
+
+  const int storedCount = m_plasticSkelPicker->property("pickerItemCount").toInt();
+  if (storedCount != items.size()) {
+    rebuildPlasticSkeletonPicker();
+    return;
+  }
+
+  if (items.isEmpty()) {
+    if (QLabel *valueLabel =
+            m_plasticSkelPicker->findChild<QLabel *>("pickerValueLabel"))
+      valueLabel->clear();
+    if (auto *group =
+            m_plasticSkelPicker->findChild<QButtonGroup *>("pickerButtonGroup")) {
+      if (QAbstractButton *checked = group->checkedButton()) {
+        group->setExclusive(false);
+        checked->setChecked(false);
+        group->setExclusive(true);
+      }
+    }
+    m_plasticSkelPicker->setProperty("pickerCurrentIndex", -1);
+    m_plasticSkelPicker->setProperty("pickerCurrentSkelId", -1);
+    return;
+  }
+
+  if (m_plasticSkelPicker->property("pickerCurrentSkelId").toInt() ==
+          plastic->currentSkeletonId() &&
+      m_plasticSkelPicker->property("pickerCurrentIndex").toInt() == currentIndex)
+    return;
+
   syncCollapsiblePicker(m_plasticSkelPicker, currentIndex);
+  m_plasticSkelPicker->setProperty("pickerCurrentSkelId",
+                                    plastic->currentSkeletonId());
 }
 
 //-----------------------------------------------------------------------------
@@ -3889,6 +3953,22 @@ void ToolPropertiesPanel::rebuildPlasticSkeletonPicker() {
   auto *plastic = dynamic_cast<PlasticTool *>(getCurrentTool());
   if (!plastic || !m_propertiesLayout) return;
 
+  if (const SkDP &sd = plastic->deformation()) {
+    QStringList items;
+    int currentIndex = -1;
+    const int curId = plastic->currentSkeletonId();
+    SkD::skelId_iterator st, sEnd;
+    sd->skeletonIds(st, sEnd);
+    for (int i = 0; st != sEnd; ++st, ++i) {
+      items << QString::number(*st);
+      if (*st == curId) currentIndex = i;
+    }
+    if (currentIndex < 0 && !items.isEmpty()) {
+      plastic->editSkelId_undo(items[0].toInt());
+      return;
+    }
+  }
+
   if (m_plasticSkelPicker) {
     m_propertiesLayout->removeWidget(m_plasticSkelPicker);
     delete m_plasticSkelPicker;
@@ -3916,7 +3996,7 @@ void ToolPropertiesPanel::rebuildPlasticSkeletonPicker() {
 
 QWidget *ToolPropertiesPanel::buildPlasticSkeletonPicker(PlasticTool *plastic) {
   QStringList items;
-  int currentIndex = 0;
+  int currentIndex = -1;
 
   const SkDP &sd = plastic->deformation();
   if (sd) {
@@ -3929,9 +4009,13 @@ QWidget *ToolPropertiesPanel::buildPlasticSkeletonPicker(PlasticTool *plastic) {
     }
   }
 
+  const int pickerIndex = currentIndex >= 0 ? currentIndex : 0;
+  const QString headerValue =
+      currentIndex >= 0 ? items.value(currentIndex) : QString();
+
   QWidget *picker = createCollapsiblePicker(
-      tr("Skeleton:"), items, currentIndex, "plastic_skeleton",
-      [this, plastic](int index) {
+      tr("Skeleton:"), items, pickerIndex, "plastic_skeleton",
+      [plastic](int index) {
         if (!plastic->deformation()) return;
         QStringList skelItems;
         SkD::skelId_iterator st, sEnd;
@@ -3943,6 +4027,16 @@ QWidget *ToolPropertiesPanel::buildPlasticSkeletonPicker(PlasticTool *plastic) {
         plastic->editSkelId_undo(skelId);
       });
   picker->setObjectName("plasticSkelPicker");
+  picker->setProperty("pickerItemCount", items.size());
+  picker->setProperty("pickerCurrentSkelId",
+                       currentIndex >= 0 ? plastic->currentSkeletonId() : -1);
+  picker->setProperty("pickerCurrentIndex", currentIndex);
+
+  if (QLabel *valueLabel = picker->findChild<QLabel *>("pickerValueLabel"))
+    valueLabel->setText(headerValue);
+
+  if (items.isEmpty())
+    replacePlasticSkeletonEmptyLineEdit(picker, m_showBorders, m_showBackgrounds);
 
   // Keep [-][+] on the header row (outside expanded list), fixed on the right.
   if (auto *mainLayout = qobject_cast<QVBoxLayout *>(picker->layout())) {
@@ -3959,19 +4053,20 @@ QWidget *ToolPropertiesPanel::buildPlasticSkeletonPicker(PlasticTool *plastic) {
           removeSkelBtn->setFixedSize(20, 20);
           addSkelBtn->setFixedSize(20, 20);
 
+          // TPP header order [-][+] (reversed vs TOB [+][-]).
           btnLayout->addWidget(removeSkelBtn);
           btnLayout->addWidget(addSkelBtn);
           btnHost->setFixedWidth(CollapsibleStyle::kHeaderRightSlot);
           headerLayout->addWidget(btnHost);
 
-          QObject::connect(addSkelBtn, &QPushButton::released, [plastic]() {
-            if (plastic->isEnabled())
-              plastic->addSkeleton_undo(PlasticSkeletonP(new PlasticSkeleton));
-          });
           QObject::connect(removeSkelBtn, &QPushButton::released, [plastic]() {
             if (plastic->isEnabled() && plastic->deformation())
               plastic->removeSkeleton_withKeyframes_undo(
                   plastic->currentSkeletonId());
+          });
+          QObject::connect(addSkelBtn, &QPushButton::released, [plastic]() {
+            if (plastic->isEnabled())
+              plastic->addSkeleton_undo(PlasticSkeletonP(new PlasticSkeleton));
           });
         }
       }
@@ -4190,7 +4285,7 @@ void ToolPropertiesPanel::createPlasticProperties() {
   TPropertyGroup *modeGroup = tool->getProperties(PlasticTool::MODES_COUNT);
   if (!modeGroup) return;
 
-  // 2. Skeleton — collapsible picker (aligned triangle with Mode / Vertex).
+  // 2. Skeleton — collapsible picker (TPP layout, button list).
   m_plasticSkelPicker = buildPlasticSkeletonPicker(plastic);
   m_propertiesLayout->addWidget(m_plasticSkelPicker);
 
@@ -5365,6 +5460,11 @@ void ToolPropertiesPanel::onToolSwitched() {
 }
 
 void ToolPropertiesPanel::onSceneContextChanged() {
+  TApplication *app = TApp::instance();
+  if (app && app->getCurrentFrame()->isPlaying()) {
+    updatePropertyValues();
+    return;
+  }
   refreshProperties();
 }
 

@@ -27,6 +27,7 @@ class ToolPropertyButton : public QToolButton {
   
   bool m_showBorders;
   bool m_showBackgrounds;
+  bool m_hoverEnabled = true;
   int m_compactIconSize = 0;  // >0: highlight/hover only around icon (px)
   
 public:
@@ -34,6 +35,7 @@ public:
   
   void setShowBorders(bool show) { m_showBorders = show; update(); }
   void setShowBackgrounds(bool show) { m_showBackgrounds = show; update(); }
+  void setHoverEnabled(bool enabled) { m_hoverEnabled = enabled; update(); }
   // Compact highlight: keeps hit area, draws theme state on a smaller centered rect.
   void setCompactIconHighlight(int iconSize) {
     m_compactIconSize = iconSize;
