@@ -355,13 +355,13 @@ void naru_lazybrush::process(TRasterPT<PIXEL> ras, double frame, RenderContext& 
     return;
   }
 
-  // --- BBoxの計算！E端からの高速探索 �E�Eリファレンススクリブルとの和集合！E---
+  // --- BBox calculation: fast search from the boundaries & union with reference scribbles ---
   ctx.minX = ctx.width;
   ctx.minY = ctx.height;
   ctx.maxX = -1;
   ctx.maxY = -1;
 
-  // 1. 上端 (minY) の探索
+  // 1. Search from the top edge (minY)
   bool found = false;
   for (int y = 0; y < ctx.height; ++y) {
     for (int x = 0; x < ctx.width; ++x) {
@@ -376,7 +376,7 @@ void naru_lazybrush::process(TRasterPT<PIXEL> ras, double frame, RenderContext& 
   }
 
   if (found) {
-    // 2. 下端 (maxY) の探索
+    // 2. Search from the bottom edge (maxY)
     found = false;
     for (int y = ctx.height - 1; y >= 0; --y) {
       for (int x = 0; x < ctx.width; ++x) {
@@ -390,7 +390,7 @@ void naru_lazybrush::process(TRasterPT<PIXEL> ras, double frame, RenderContext& 
       if (found) break;
     }
 
-    // 3. 左端 (minX) の探索
+    // 3. Search from the left edge (minX)
     found = false;
     for (int x = 0; x < ctx.width; ++x) {
       for (int y = 0; y < ctx.height; ++y) {
@@ -404,7 +404,7 @@ void naru_lazybrush::process(TRasterPT<PIXEL> ras, double frame, RenderContext& 
       if (found) break;
     }
 
-    // 4. 右端 (maxX) の探索
+    // 4. Search from the right edge (maxX)
     found = false;
     for (int x = ctx.width - 1; x >= 0; --x) {
       for (int y = 0; y < ctx.height; ++y) {
@@ -418,14 +418,14 @@ void naru_lazybrush::process(TRasterPT<PIXEL> ras, double frame, RenderContext& 
       if (found) break;
     }
   } else {
-    // ターゲチE��が存在しなぁE��合、BBoxは無効
+    // If no target is detected, the BBox is considered invalid.
     ctx.minX = ctx.width;
     ctx.minY = ctx.height;
     ctx.maxX = -1;
     ctx.maxY = -1;
   }
 
-  // Auto Scribble�E�E_p 適用前に実行して、純粋な I_f に対して判定！E
+  // Execute the auto-scribble process prior to applying I_p, and evaluate it against the unmodified I_f.
   if (ctx.enableAutoScribble) {
     autoScribble(ctx);
   }
@@ -661,22 +661,22 @@ void naru_lazybrush::setCapacity(RenderContext& ctx) {
 }
 
 void naru_lazybrush::autoScribble(RenderContext& ctx) {
-  // BBoxが存在する場合にのみ走査する
+  // Perform scanning only when a valid bounding box exists.
   if (ctx.maxX >= 0 && ctx.maxY >= 0) {
-    // BBoxの四辺から冁E�Eに向けて走査する
-    // 上辺から下へ
+    // Scan inward from the four boundaries of the bounding box.
+    // From the top edge downward
     for (int x = ctx.minX; x <= ctx.maxX; ++x) {
       autoScribbleScan(x, ctx.minY, 0, 1, ctx);
     }
-    // 下辺から上へ
+    // From the bottom edge upward
     for (int x = ctx.minX; x <= ctx.maxX; ++x) {
       autoScribbleScan(x, ctx.maxY, 0, -1, ctx);
     }
-    // 左辺から右へ
+    // From the left edge rightward
     for (int y = ctx.minY; y <= ctx.maxY; ++y) {
       autoScribbleScan(ctx.minX, y, 1, 0, ctx);
     }
-    // 右辺から左へ
+    // From the right edge leftward
     for (int y = ctx.minY; y <= ctx.maxY; ++y) {
       autoScribbleScan(ctx.maxX, y, -1, 0, ctx);
     }
@@ -691,7 +691,7 @@ void naru_lazybrush::autoScribbleScan(int x, int y, int dx, int dy, RenderContex
     if (isLine) {
       foundLine = true;
     } else if (foundLine) {
-      // すでに線を通過し、�Eび threshold 以上！EsLine ぁEfalse�E�になった場所�E��E側�E�E
+      // Mark the inner region once the scan has crossed the stroke boundary and the intensity returns above the threshold (i.e., isLine becomes false).
       ctx.scribbleData[cp] = ctx.autoScribbleId;
       break;
     }
@@ -729,17 +729,17 @@ void naru_lazybrush::setTerminalCapacity(int refInd, RenderContext& ctx) {
     for (int x = 0; x < ctx.width; ++x) {
       int p = idx(x, y, ctx);
       if (ctx.scribbleData[p] == -2) {
-        // scribbleData[p] == -2 は「画像外周」を表ぁE
-        // Hard�E�確実な制紁E��としてシンク(T)に結合
+        // scribbleData[p] == -2 represents the outer boundary of the image.
+        // Connect to the sink (T) to establish a strict boundary constraint.
         ctx.graph->add_tweights(p, 0, hardCap);
       } else if (ctx.scribbleData[p] == -1) {
-        // Scribbleなし：t-linkの追加は不要E
+        // No scribble present: addition of a t-link is not required.
         continue;
       } else if (ctx.scribbleData[p] == refInd) {
-        // 注目してぁE��色のScribble�E�ソース(S)に接綁E
+        // Connect the target scribble color to the source (S).
         ctx.graph->add_tweights(p, ctx.terminalCap, 0);
       } else {
-        // それ以外�E色のScribble�E�シンク(T)に一括接綁E
+        // Connect all other scribble colors to the sink (T) collectively.
         ctx.graph->add_tweights(p, 0, ctx.terminalCap);
       }
     }
