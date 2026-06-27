@@ -556,7 +556,7 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/file_path_metad
 
 [tasks.script-smoke-filepath-mutation-metadata-qt6]
 description = "Run the Qt 6 app bundle against FilePath mutable properties, parent conversion, and metadata values."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/file_path_mutation_metadata.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-filepath-mutation-setters renamed png delta \"gamma/delta/renamed.png\"|qt-script-filepath-mutation-parent renamed png zeta parent \"string/parent/source.txt\"|qt-script-filepath-mutation-errors true \"gamma/delta/renamed.png\"|qt-script-filepath-metadata-values true true true false false true true' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/file_path_mutation_metadata.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-filepath-mutation-setters renamed png delta \"gamma/delta/renamed.png\"|qt-script-filepath-mutation-parent renamed png zeta parent \"string/parent/source.txt\"|qt-script-filepath-mutation-errors true \"gamma/delta/renamed.png\"|qt-script-filepath-mutation-copy \"gamma/delta/renamed.png\" \"gamma/delta/copies/copy.tlv\" copy tlv copies|qt-script-filepath-metadata-values true true true false false true true' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-path-arguments-qt6]
 description = "Run the Qt 6 app bundle against file-path argument validation parity cases."

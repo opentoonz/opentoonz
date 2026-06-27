@@ -646,9 +646,10 @@ Already covered:
   save calls.
 - The FilePath smoke coverage now includes mutable property setters,
   `withParentDirectory()` parent conversion, `exists`, `isDirectory`, and
-  `lastModified` JS `Date` exposure, plus `valueOf()`, `String(filePath)`,
-  copy construction, JavaScript string concatenation, strict constructor arity,
-  and strict method arity for path mutation/listing helpers.
+  `lastModified` JS `Date` exposure, plus copy construction after mutable
+  setters with independent follow-up mutation, `valueOf()`, `String(filePath)`,
+  JavaScript string concatenation, strict constructor arity, and strict method
+  arity for path mutation/listing helpers.
 - FilePath directory-listing coverage now also verifies that `files()` returns
   reusable `FilePath` wrappers, that returned entries preserve
   name/extension/parent/exists metadata, that wrapper copy construction and

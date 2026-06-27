@@ -2013,8 +2013,9 @@ branch.
   `toonz/sources/tests/scriptengine/file_path_mutation_metadata.toonzscript`
   and is run by `mise run script-smoke-filepath-mutation-metadata-qt6`. It
   validates mutable `extension`, `name`, and `parentDirectory` properties,
-  `withParentDirectory()` string/FilePath conversion, `exists`, `isDirectory`,
-  and `lastModified` exposure as a JS `Date`.
+  `withParentDirectory()` string/FilePath conversion, copy construction after
+  mutation with independent follow-up mutation, `exists`, `isDirectory`, and
+  `lastModified` exposure as a JS `Date`.
 - A third Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/scene_basic.toonzscript` and is run by
   `mise run script-smoke-scene-qt6`. It validates the first narrow `Scene`
@@ -2444,7 +2445,7 @@ branch.
 - The script smoke can run in bounded mode or natural-exit mode. The basic,
   `run()` error, `run(FilePath)`, global-output edge, FilePath, FilePath edges,
   FilePath files edge,
-  FilePath metadata, path-argument,
+  FilePath mutation metadata, FilePath metadata, path-argument,
   Scene, Scene cells, Scene columns, Scene column edge,
   Scene cell frame-id type, Scene cell object edge, Scene edges,
   Scene level-name edge, Scene argument edges,
@@ -2672,7 +2673,7 @@ The next slice should make the Qt 6 app useful enough to run and diagnose:
    confirmation, lip-sync preview/timing, camera preview, and still-capture
    checks before calling multimedia product-ready.
 5. Keep the basic, `run()` error, `run(FilePath)`, global-output edge, FilePath,
-   FilePath-edge, FilePath metadata,
+   FilePath-edge, FilePath mutation metadata, FilePath metadata,
    path-argument, Scene, Scene cells, Scene columns, Scene column edge,
    Scene cell frame-id type, Scene cell object edge, Scene edges,
    Scene level-name edge, Scene argument edges,

@@ -33,6 +33,14 @@ try {
 
 print("qt-script-filepath-mutation-errors", invalidParentError, fp.toString());
 
+var copy = new FilePath(fp);
+copy.name = "copy";
+copy.extension = "tlv";
+copy.parentDirectory = fp.parentDirectory.concat("copies");
+
+print("qt-script-filepath-mutation-copy", fp.toString(), copy.toString(),
+      copy.name, copy.extension, copy.parentDirectory.name);
+
 var resources = new FilePath("toonz/sources/tnztools/Resources");
 var brush = resources.concat("brush.png");
 var missing = resources.concat("missing-file-for-qt6-script-smoke.png");
