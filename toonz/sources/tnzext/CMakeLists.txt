@@ -111,7 +111,7 @@ endif()
 
 if(BUILD_ENV_MSVC)
     target_link_libraries(tnzext
-        Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Network
+        ${QT_CORE_LINK_TARGETS} ${QT_GUI_TARGET} ${QT_OPENGL_LINK_TARGETS} ${QT_NETWORK_TARGET}
         ${GLUT_LIB} ${GL_LIB} ${SUPERLU_LIB} ${OPENBLAS_LIB} ${EXTRA_LIBS}
         tnzcore tnzbase
     )
@@ -122,14 +122,14 @@ elseif(BUILD_ENV_APPLE)
     )
 
     target_link_libraries(tnzext
-        Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Network
+        ${QT_CORE_LINK_TARGETS} ${QT_GUI_TARGET} ${QT_OPENGL_LINK_TARGETS} ${QT_NETWORK_TARGET}
         ${ACCE_LIB} ${GLUT_LIB} ${GL_LIB} ${SUPERLU_LIB} ${EXTRA_LIBS}
     )
 elseif(BUILD_ENV_UNIXLIKE)
     _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase")
 
     target_link_libraries(tnzext
-        Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Network
+        ${QT_CORE_LINK_TARGETS} ${QT_GUI_TARGET} ${QT_OPENGL_LINK_TARGETS} ${QT_NETWORK_TARGET}
         ${GLUT_LIB} ${GL_LIB} ${SUPERLU_LIB} ${OPENBLAS_LIB} ${EXTRA_LIBS}
     )
 endif()

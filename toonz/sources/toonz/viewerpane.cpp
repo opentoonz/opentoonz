@@ -34,6 +34,7 @@
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/gutil.h"
 #include "toonzqt/imageutils.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzTools includes
 #include "tools/toolhandle.h"
@@ -52,6 +53,7 @@
 #include <QPainter>
 #include <QVBoxLayout>
 #include <QAction>
+#include <QActionGroup>
 #include <QDialogButtonBox>
 #include <QAbstractButton>
 #include <QMouseEvent>
@@ -188,7 +190,7 @@ void BaseViewerPanel::updateShowHide() {
 void BaseViewerPanel::contextMenuEvent(QContextMenuEvent *event) {
   QMenu *menu = new QMenu(this);
   addShowHideContextMenu(menu);
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 //-----------------------------------------------------------------------------

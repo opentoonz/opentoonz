@@ -1,0 +1,64 @@
+var redBuilder = new ImageBuilder(32, 24, "Raster");
+redBuilder.fill("#ff0000");
+var redImage = redBuilder.image;
+
+var greenBuilder = new ImageBuilder(32, 24, "Raster");
+greenBuilder.fill("#00ff00");
+var greenImage = greenBuilder.image;
+
+var scene = new Scene();
+var redLevel = scene.newLevel("Raster", "qt6_renderer_frames_columns_red");
+var greenLevel = scene.newLevel("Raster", "qt6_renderer_frames_columns_green");
+
+redLevel.setFrame("1", redImage);
+redLevel.setFrame("2", redImage);
+greenLevel.setFrame("1", greenImage);
+greenLevel.setFrame("2", greenImage);
+
+scene.setCell(0, 0, redLevel, "1");
+scene.setCell(1, 0, redLevel, "2");
+scene.setCell(0, 1, greenLevel, "1");
+scene.setCell(1, 1, greenLevel, "2");
+
+var renderer = new Renderer();
+renderer.frames = [0, 1];
+renderer.columns = [1];
+
+var selectedLevel = renderer.renderScene(scene);
+var selectedFrameIds = selectedLevel.getFrameIds();
+var selectedFirstFrame = selectedLevel.getFrame("1");
+var selectedSecondFrame = selectedLevel.getFrame("2");
+print("qt-script-renderer-frames-columns-selection", scene.frameCount,
+      scene.columnCount, renderer.frames.join(","), renderer.columns.join(","),
+      selectedLevel.type, selectedLevel.frameCount, selectedFrameIds.join(","),
+      selectedFirstFrame.type, selectedFirstFrame.width > 0,
+      selectedSecondFrame.height > 0);
+
+var selectedFrame = renderer.renderFrame(scene, 1);
+print("qt-script-renderer-frames-columns-frame", selectedFrame.type,
+      selectedFrame.width > 0, selectedFrame.height > 0);
+
+renderer.frames = [];
+renderer.columns = [];
+var defaultLevel = renderer.renderScene(scene);
+var defaultFrame = defaultLevel.getFrame("2");
+print("qt-script-renderer-frames-columns-default", defaultLevel.frameCount,
+      defaultLevel.getFrameIds().join(","), defaultFrame.type,
+      defaultFrame.width > 0);
+
+defaultFrame.dispose();
+defaultLevel.dispose();
+selectedFrame.dispose();
+selectedSecondFrame.dispose();
+selectedFirstFrame.dispose();
+selectedLevel.dispose();
+renderer.dispose();
+greenLevel.dispose();
+redLevel.dispose();
+scene.dispose();
+greenImage.dispose();
+redImage.dispose();
+greenBuilder.dispose();
+redBuilder.dispose();
+
+"qt-script-renderer-frames-columns-result";

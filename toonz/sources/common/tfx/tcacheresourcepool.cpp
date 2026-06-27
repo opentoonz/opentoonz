@@ -130,8 +130,7 @@ TCacheResourcePool *TCacheResourcePool::instance() {
 //----------------------------------------------------------------------
 
 TCacheResourcePool::TCacheResourcePool()
-    : m_memMutex(QMutex::Recursive)
-    , m_searchCount(0)
+    : m_searchCount(0)
     , m_foundIterator(false)
     , m_searchIterator(m_memResources.end())
     , m_hdPool(0)

@@ -1,9 +1,4 @@
-set(MOC_HEADERS
-    ../include/toonz/fullcolorpalette.h
-    ../include/toonz/movierenderer.h
-    ../include/toonz/multimediarenderer.h
-    ../include/toonz/palettecontroller.h
-    ../include/toonz/preferences.h
+set(SCRIPT_BINDING_HEADERS
     ../include/toonz/scriptbinding.h
     ../include/toonz/scriptbinding_centerline_vectorizer.h
     ../include/toonz/scriptbinding_files.h
@@ -15,6 +10,28 @@ set(MOC_HEADERS
     ../include/toonz/scriptbinding_renderer.h
     ../include/toonz/scriptbinding_scene.h
     ../include/toonz/scriptbinding_toonz_raster_converter.h
+)
+
+set(SCRIPT_BINDING_SOURCES
+    scriptbinding.cpp
+    scriptbinding_centerline_vectorizer.cpp
+    scriptbinding_files.cpp
+    scriptbinding_image.cpp
+    scriptbinding_image_builder.cpp
+    scriptbinding_level.cpp
+    scriptbinding_outline_vectorizer.cpp
+    scriptbinding_rasterizer.cpp
+    scriptbinding_renderer.cpp
+    scriptbinding_scene.cpp
+    scriptbinding_toonz_raster_converter.cpp
+)
+
+set(MOC_HEADERS
+    ../include/toonz/fullcolorpalette.h
+    ../include/toonz/movierenderer.h
+    ../include/toonz/multimediarenderer.h
+    ../include/toonz/palettecontroller.h
+    ../include/toonz/preferences.h
     ../include/toonz/scriptengine.h
     ../include/toonz/stylemanager.h
     ../include/toonz/tcenterlinevectorizer.h
@@ -31,6 +48,10 @@ set(MOC_HEADERS
     ../include/toonz/txshsimplelevel.h
     ../include/toonz/txshsoundcolumn.h
 )
+
+if(OPENTOONZ_QT_MAJOR EQUAL 5)
+    list(APPEND MOC_HEADERS ${SCRIPT_BINDING_HEADERS})
+endif()
 
 set(HEADERS
     ${MOC_HEADERS}
@@ -213,17 +234,6 @@ set(SOURCES
     scenefx.cpp
     sceneproperties.cpp
     sceneresources.cpp
-    scriptbinding.cpp
-    scriptbinding_centerline_vectorizer.cpp
-    scriptbinding_files.cpp
-    scriptbinding_image.cpp
-    scriptbinding_image_builder.cpp
-    scriptbinding_level.cpp
-    scriptbinding_outline_vectorizer.cpp
-    scriptbinding_rasterizer.cpp
-    scriptbinding_renderer.cpp
-    scriptbinding_scene.cpp
-    scriptbinding_toonz_raster_converter.cpp
     scriptengine.cpp
     skeleton.cpp
     skeletonlut.cpp
@@ -328,13 +338,17 @@ set(SOURCES
     navigationtags.cpp
 )
 
+if(OPENTOONZ_QT_MAJOR EQUAL 5)
+    list(APPEND SOURCES ${SCRIPT_BINDING_SOURCES})
+endif()
+
 if(BUILD_TARGET_WIN)
     set(SOURCES ${SOURCES}
         avicodecrestrictions.cpp
     )
 endif()
 
-qt5_wrap_cpp(SOURCES ${MOC_HEADERS})
+opentoonz_qt_wrap_cpp(SOURCES ${MOC_HEADERS})
 
 add_library(toonzlib SHARED ${HEADERS} ${SOURCES})
 
@@ -371,7 +385,7 @@ include_directories(
 
 if(BUILD_ENV_MSVC)
     target_link_libraries(toonzlib
-        Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Script Qt5::Multimedia
+        ${QT_CORE_LINK_TARGETS} ${QT_CORE5COMPAT_LINK_TARGETS} ${QT_GUI_TARGET} ${QT_OPENGL_LINK_TARGETS} ${QT_SCRIPT_TARGET} ${QT_QML_TARGET} ${QT_MULTIMEDIA_TARGET}
         ${GLUT_LIB} ${GL_LIB} ${MYPAINT_LIB_LDFLAGS} ${GLEW_LIB} vfw32.lib
         tnzcore tnzbase tnzext
     )
@@ -384,7 +398,7 @@ elseif(BUILD_ENV_APPLE)
         ${MYPAINT_LIB_LDFLAGS}
     )
 
-    target_link_libraries(toonzlib Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Script Qt5::Multimedia ${GLUT_LIB} ${GL_LIB} ${GLEW_LIB} ${EXTRA_LIBS})
+    target_link_libraries(toonzlib ${QT_CORE_LINK_TARGETS} ${QT_CORE5COMPAT_LINK_TARGETS} ${QT_GUI_TARGET} ${QT_OPENGL_LINK_TARGETS} ${QT_SCRIPT_TARGET} ${QT_QML_TARGET} ${QT_MULTIMEDIA_TARGET} ${GLUT_LIB} ${GL_LIB} ${GLEW_LIB} ${EXTRA_LIBS})
 elseif(BUILD_ENV_UNIXLIKE)
     _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;tnzext")
 
@@ -392,5 +406,5 @@ elseif(BUILD_ENV_UNIXLIKE)
         set(EXTRA_LIBS ${EXTRA_LIBS} -lvfw32)
     endif()
 
-    target_link_libraries(toonzlib Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Script Qt5::Multimedia ${GLUT_LIB} ${GL_LIB} ${GLEW_LIB} ${EXTRA_LIBS} ${MYPAINT_LIB_LDFLAGS})
+    target_link_libraries(toonzlib ${QT_CORE_LINK_TARGETS} ${QT_CORE5COMPAT_LINK_TARGETS} ${QT_GUI_TARGET} ${QT_OPENGL_LINK_TARGETS} ${QT_SCRIPT_TARGET} ${QT_QML_TARGET} ${QT_MULTIMEDIA_TARGET} ${GLUT_LIB} ${GL_LIB} ${GLEW_LIB} ${EXTRA_LIBS} ${MYPAINT_LIB_LDFLAGS})
 endif()

@@ -1,0 +1,127 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e.message || e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var renderer = new Renderer();
+var scene = new Scene();
+var disposedScene = new Scene();
+disposedScene.dispose();
+
+var errors = [
+  hasError(function() { new Renderer(0); },
+           "Renderer constructor expected no arguments"),
+  hasError(function() { renderer.renderScene(); },
+           "Renderer.renderScene expected one scene argument"),
+  hasError(function() { renderer.renderScene(42); },
+           "First argument must be a scene"),
+  hasError(function() { renderer.renderScene(scene, 0); },
+           "Renderer.renderScene expected one scene argument"),
+  hasError(function() { renderer.renderScene(disposedScene); },
+           "Invalid Scene"),
+  hasError(function() { renderer.renderFrame(); },
+           "Renderer.renderFrame expected a scene and frame"),
+  hasError(function() { renderer.renderFrame(scene, 0, 1); },
+           "Renderer.renderFrame expected a scene and frame"),
+  hasError(function() { renderer.renderFrame(scene); },
+           "Renderer.renderFrame expected a scene and frame"),
+  hasError(function() { renderer.renderFrame(scene, "1"); },
+           "Second argument must be a frame number"),
+  hasError(function() { renderer.renderFrame(scene, 0.5); },
+           "Second argument must be a frame number"),
+  hasError(function() { renderer.renderFrame(scene, 0); },
+           "Renderer.renderFrame"),
+  hasError(function() { renderer.renderScene(scene); },
+           "Renderer.renderScene"),
+  hasError(function() { renderer.dumpCache(0); },
+           "Renderer.dumpCache expected no arguments")
+];
+
+print("qt-script-renderer-edges-errors", errors);
+
+var builder = new ImageBuilder(16, 12, "Raster");
+builder.fill("#ff0000");
+var level = scene.newLevel("Raster", "qt6_renderer_edges_raster");
+level.setFrame("1", builder.image);
+scene.setCell(0, 0, level, "1");
+
+renderer.columns = ["bad"];
+var badColumnTypeError = hasError(function() {
+  renderer.renderFrame(scene, 0);
+}, "Renderer.columns must contain frame or column numbers");
+renderer.columns = [-1];
+var negativeColumnError = hasError(function() {
+  renderer.renderFrame(scene, 0);
+}, "Renderer.columns values must be non-negative");
+renderer.columns = [0.5];
+var fractionalColumnError = hasError(function() {
+  renderer.renderFrame(scene, 0);
+}, "Renderer.columns must contain frame or column numbers");
+renderer.columns = [Infinity];
+var infiniteColumnError = hasError(function() {
+  renderer.renderFrame(scene, 0);
+}, "Renderer.columns must contain frame or column numbers");
+renderer.columns = [0, , 1];
+var sparseColumnError = hasError(function() {
+  renderer.renderFrame(scene, 0);
+}, "Renderer.columns must contain frame or column numbers");
+
+renderer.columns = [];
+renderer.frames = ["bad"];
+var badFrameTypeError = hasError(function() {
+  renderer.renderScene(scene);
+}, "Renderer.frames must contain frame or column numbers");
+renderer.frames = [-1];
+var negativeFrameError = hasError(function() {
+  renderer.renderScene(scene);
+}, "Renderer.frames values must be non-negative");
+renderer.frames = [0.5];
+var fractionalFrameError = hasError(function() {
+  renderer.renderScene(scene);
+}, "Renderer.frames must contain frame or column numbers");
+renderer.frames = [0 / 0];
+var nanFrameError = hasError(function() {
+  renderer.renderScene(scene);
+}, "Renderer.frames must contain frame or column numbers");
+renderer.frames = [0, , 1];
+var sparseFrameError = hasError(function() {
+  renderer.renderScene(scene);
+}, "Renderer.frames must contain frame or column numbers");
+
+print("qt-script-renderer-list-edges-errors", [
+  badColumnTypeError, negativeColumnError, fractionalColumnError,
+  infiniteColumnError, sparseColumnError, badFrameTypeError,
+  negativeFrameError, fractionalFrameError, nanFrameError, sparseFrameError
+]);
+
+renderer.frames = undefined;
+renderer.columns = null;
+var nonArrayFrameError = hasError(function() {
+  renderer.renderFrame(new Scene(), 0);
+}, "Renderer.renderFrame");
+var nonArraySceneError = hasError(function() {
+  renderer.renderScene(new Scene());
+}, "Renderer.renderScene");
+print("qt-script-renderer-list-edges-non-arrays", nonArrayFrameError,
+      nonArraySceneError);
+
+var frameSelection = [0];
+var columnSelection = [0];
+renderer.frames = frameSelection;
+renderer.columns = columnSelection;
+frameSelection.push(1);
+columnSelection.push(1);
+print("qt-script-renderer-list-edges-array-identity",
+      renderer.frames === frameSelection, renderer.frames.join(","),
+      renderer.columns === columnSelection, renderer.columns.join(","));
+
+level.dispose();
+builder.dispose();
+scene.dispose();
+renderer.dispose();
+
+"qt-script-renderer-edges-result";

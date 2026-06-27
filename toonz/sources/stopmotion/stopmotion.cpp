@@ -30,13 +30,12 @@
 
 #include <QApplication>
 #include <QCamera>
-#include <QCameraInfo>
 #include <QCoreApplication>
-#include <QDesktopWidget>
 #include <QDialog>
 #include <QFile>
 #include <QString>
 #include <QTimer>
+#include <QUrl>
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 
@@ -230,7 +229,8 @@ StopMotion::StopMotion() {
   m_intervalTimer      = new QTimer(this);
   m_countdownTimer     = new QTimer(this);
   m_webcamOverlayTimer = new QTimer(this);
-  m_camSnapSound       = new QSound(":Resources/camera_snap.wav");
+  m_camSnapSound       = new QSoundEffect(this);
+  m_camSnapSound->setSource(QUrl("qrc:/Resources/camera_snap.wav"));
 
   // Make the interval timer single-shot. When the capture finished, restart
   // timer for next frame.
@@ -1913,7 +1913,7 @@ void StopMotion::saveXmlFile() {
   TFilePath tempFile     = parentDir + TFilePath(levelName + L".xml");
   QString xmlFileName    = tempFile.getQString();
   QFile xmlFile(xmlFileName);
-  xmlFile.open(QIODevice::WriteOnly);
+  if (!xmlFile.open(QIODevice::WriteOnly)) return;
   QXmlStreamWriter xmlWriter(&xmlFile);
   xmlWriter.setAutoFormatting(true);
   xmlWriter.writeStartDocument();
@@ -1986,7 +1986,7 @@ bool StopMotion::loadXmlFile() {
   QString xmlFileName    = tempFile.getQString();
   QFile xmlFile(xmlFileName);
   if (!xmlFile.exists()) return false;
-  xmlFile.open(QIODevice::ReadOnly);
+  if (!xmlFile.open(QIODevice::ReadOnly)) return false;
 
   QXmlStreamReader xmlReader;
   xmlReader.setDevice(&xmlFile);
@@ -2000,10 +2000,11 @@ bool StopMotion::loadXmlFile() {
       if (xmlReader.name() == "CameraName") {
         text = xmlReader.readElementText();
         if (webcam) {
-          QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
+          QList<StopMotionCamera::Info> cameras =
+              StopMotionCamera::availableCameras();
           if (cameras.size() > 0) {
             for (int i = 0; i < cameras.size(); i++) {
-              if (cameras.at(i).description() == text) {
+              if (StopMotionCamera::description(cameras.at(i)) == text) {
                 changeCameras(i + 1);
                 foundCamera = true;
                 break;
@@ -2596,10 +2597,11 @@ void StopMotion::refreshCameraList() {
   }
 #endif
   if (m_usingWebcam) {
-    QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
+    QList<StopMotionCamera::Info> cameras = StopMotionCamera::availableCameras();
     if (m_usingWebcam && cameras.size() > 0) {
       for (int i = 0; i < cameras.size(); i++) {
-        if (cameras.at(i).description() == m_webcam->getWebcamDescription()) {
+        if (StopMotionCamera::description(cameras.at(i)) ==
+            m_webcam->getWebcamDescription()) {
           hasCamera = true;
           camera    = m_webcam->getWebcamDescription();
           break;
@@ -2616,7 +2618,7 @@ void StopMotion::refreshCameraList() {
 void StopMotion::changeCameras(int index) {
   // note: index is negative if this is called to load DSLR from load settings
 
-  QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
+  QList<StopMotionCamera::Info> cameras = StopMotionCamera::availableCameras();
 
   // if selected the non-connected state, then disconnect the current camera
   if (index == 0) {
@@ -2630,7 +2632,8 @@ void StopMotion::changeCameras(int index) {
 
   // first see if the index didn't actually change
   if (cameras.size() > 0 && index < cameras.size() && index >= 0) {
-    if (cameras.at(index).deviceName() == m_webcam->getWebcamDeviceName()) {
+    if (StopMotionCamera::deviceName(cameras.at(index)) ==
+        m_webcam->getWebcamDeviceName()) {
       return;
     }
   }
@@ -2662,11 +2665,13 @@ void StopMotion::changeCameras(int index) {
 #endif
 
     m_webcam->setWebcam(new QCamera(cameras.at(index)));
-    m_webcam->setWebcamDeviceName(cameras.at(index).deviceName());
-    m_webcam->setWebcamDescription(cameras.at(index).description());
+    m_webcam->setWebcamDeviceName(StopMotionCamera::deviceName(cameras.at(index)));
+    m_webcam->setWebcamDescription(StopMotionCamera::description(cameras.at(index)));
 
     // loading new camera
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     m_webcam->getWebcam()->load();
+#endif
 
     m_webcam->refreshWebcamResolutions();
 
@@ -2691,7 +2696,9 @@ void StopMotion::changeCameras(int index) {
       sizeCount = webcamResolutions.indexOf(QSize(res.lx, res.ly));
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     m_webcam->getWebcam()->unload();
+#endif
 
     setWebcamResolution(
         QString(QString::number(width) + " x " + QString::number(height)));

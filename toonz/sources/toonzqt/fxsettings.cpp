@@ -2,6 +2,7 @@
 
 #include "toonzqt/fxsettings.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/keyframenavigator.h"
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/fxhistogramrender.h"
@@ -34,6 +35,7 @@
 #include <QToolBar>
 #include <QIcon>
 #include <QAction>
+#include <QActionGroup>
 #include <QStackedWidget>
 #include <QLabel>
 #include <QMap>
@@ -43,8 +45,6 @@
 
 #include <QDesktopServices>
 #include <QUrl>
-#include <QGuiApplication>
-#include <QScreen>
 
 using namespace DVGui;
 
@@ -682,10 +682,11 @@ QSize ParamsPage::getPreferredSize() {
 
   updateMaximumPageSize(m_mainLayout, maxLabelWidth, maxWidgetWidth,
                         fieldsHeight);
+  const QMargins margins = m_mainLayout->contentsMargins();
   return QSize(maxLabelWidth + maxWidgetWidth +
                    m_mainLayout->horizontalSpacing() +
-                   2 * m_mainLayout->margin(),
-               fieldsHeight + 2 * m_mainLayout->margin() +
+                   margins.left() + margins.right(),
+               fieldsHeight + margins.top() + margins.bottom() +
                    31 /* spacing for the swatch */);
 }
 
@@ -1007,7 +1008,7 @@ void ParamsPageSet::openHelpFile() {
   // QProcess process;
   // process.start(command);
   QDesktopServices::openUrl(
-      QUrl::fromLocalFile(QString::fromStdWString(helpFp.getWideString())));
+      QtCompat::localFileUrl(QString::fromStdWString(helpFp.getWideString())));
 }
 
 void ParamsPageSet::openHelpUrl() {
@@ -1664,8 +1665,7 @@ void FxSettings::onPreferredSizeChanged(QSize pvBestSize) {
 
   QSize popupBestSize = pvBestSize;
 
-  static int maximumHeight =
-      (QGuiApplication::primaryScreen()->geometry().height()) * 0.9;
+  static int maximumHeight = getScreenGeometry(popup).height() * 0.9;
 
   // Set minimum size, just in case
   popupBestSize.setHeight(

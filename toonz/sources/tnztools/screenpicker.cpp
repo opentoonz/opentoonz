@@ -5,6 +5,7 @@
 #include "toonzqt/pickrgbutils.h"
 #include "toonzqt/screenboard.h"
 #include "toonzqt/menubarcommand.h"
+#include "toonzqt/qtcompat.h"
 
 #include "tools/RGBpicker.h"
 #include "tools/cursors.h"
@@ -57,7 +58,7 @@ void ScreenPicker::event(QWidget *widget, QEvent *e) {
 
 void ScreenPicker::mousePressEvent(QWidget *widget, QMouseEvent *me) {
   m_mousePressed = true;
-  m_start        = widget->mapToGlobal(me->pos());
+  m_start        = widget->mapToGlobal(QtCompat::mouseEventPosition(me));
 
   m_geometry = QRect(m_start, QSize(1, 1));
   DVGui::ScreenBoard::instance()->update();
@@ -70,7 +71,7 @@ void ScreenPicker::mouseMoveEvent(QWidget *widget, QMouseEvent *me) {
   // assert(m_mouseGrabbed); - can cause a crash
   if (!m_mousePressed || !m_mouseGrabbed) return;
 
-  QPoint pos(widget->mapToGlobal(me->pos()));
+  QPoint pos(widget->mapToGlobal(QtCompat::mouseEventPosition(me)));
   m_geometry = QRect(QRect(m_start, QSize(1, 1)) | QRect(pos, QSize(1, 1)));
 
   DVGui::ScreenBoard::instance()->update();
@@ -91,7 +92,7 @@ void ScreenPicker::mouseReleaseEvent(QWidget *widget, QMouseEvent *me) {
   screenBoard->releaseMouse();
   screenBoard->update();
 
-  QPoint pos(widget->mapToGlobal(me->pos()));
+  QPoint pos(widget->mapToGlobal(QtCompat::mouseEventPosition(me)));
   m_geometry = QRect(QRect(m_start, QSize(1, 1)) | QRect(pos, QSize(1, 1)));
 
   // TimerEvents execution is delayed until all other events have been

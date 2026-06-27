@@ -12,6 +12,7 @@
 #include "toonzqt/functionsheet.h"
 #include "toonzqt/functionpanel.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/doubleparamcmd.h"
@@ -1042,8 +1043,9 @@ FunctionSegmentViewer::FunctionSegmentViewer(QWidget *parent,
   bool ret = true;
   ret      = ret && connect(m_typeCombo, SIGNAL(currentIndexChanged(int)),
                        m_parametersPanel, SLOT(setCurrentIndex(int)));
-  ret      = ret && connect(m_typeCombo, SIGNAL(activated(int)), this,
-                       SLOT(onSegmentTypeChanged(int)));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_typeCombo, this,
+                   [this](int index) { onSegmentTypeChanged(index); }));
   ret      = ret && connect(applyButton, SIGNAL(clicked()), this,
                        SLOT(onApplyButtonPressed()));
   ret      = ret && connect(m_prevCurveButton, SIGNAL(clicked()), this,

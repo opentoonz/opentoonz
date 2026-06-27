@@ -828,10 +828,11 @@ bool Canon::downloadImage(EdsBaseRef object) {
 
   if (m_useScaledImages) {
     QFile fullImage(StopMotion::instance()->m_tempFile);
-    fullImage.open(QIODevice::WriteOnly);
-    QDataStream dataStream(&fullImage);
-    dataStream.writeRawData((const char*)data, mySize);
-    fullImage.close();
+    if (fullImage.open(QIODevice::WriteOnly)) {
+      QDataStream dataStream(&fullImage);
+      dataStream.writeRawData((const char*)data, mySize);
+      fullImage.close();
+    }
   }
 
   EdsRelease(stream);

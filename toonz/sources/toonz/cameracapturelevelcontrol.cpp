@@ -2,6 +2,7 @@
 
 #include "toonzqt/intfield.h"
 #include "toonzqt/doublefield.h"
+#include "toonzqt/qtcompat.h"
 
 #include <QPainter>
 #include <QMouseEvent>
@@ -142,7 +143,7 @@ void CameraCaptureLevelHistogram::paintEvent(QPaintEvent* event) {
 void CameraCaptureLevelHistogram::mousePressEvent(QMouseEvent* event) {
   if (event->button() != Qt::LeftButton) return;
   if (m_currentItem == None) return;
-  QPoint pos = event->pos();
+  QPoint pos = QtCompat::mouseEventPosition(event);
   if (m_currentItem == BlackSlider)
     m_offset = pos.x() - SIDE_MARGIN - m_black;
   else if (m_currentItem == GammaSlider)
@@ -156,7 +157,7 @@ void CameraCaptureLevelHistogram::mousePressEvent(QMouseEvent* event) {
 //-----------------------------------------------------------------------------
 
 void CameraCaptureLevelHistogram::mouseMoveEvent(QMouseEvent* event) {
-  QPoint pos = event->pos();
+  QPoint pos = QtCompat::mouseEventPosition(event);
   if (event->buttons() & Qt::LeftButton) {
     if (m_currentItem == None) return;
 

@@ -3,6 +3,7 @@
 #include "tools/cursormanager.h"
 #include "tools/tool.h"
 #include "tools/cursors.h"
+#include "toonzqt/qtcompat.h"
 
 #ifdef TOONZQT_EXPORTS
 #include "toonz/preferences.h"
@@ -232,7 +233,8 @@ public:
 
       if (useLeft) {
         QImage target = (&data.pixmap)->toImage();
-        (&data.pixmap)->convertFromImage(target.mirrored(true, false));
+        (&data.pixmap)
+            ->convertFromImage(QtCompat::mirroredImage(target, true, false));
         data.x = data.pixmap.width() - data.x - 1;
         it     = m_cursorsLeft.insert(std::make_pair(cursorType, data)).first;
       } else
@@ -256,7 +258,8 @@ public:
           data.y = cursorInfo[i].y;
           if (useLeft && cursorInfo[i].flippable) {
             QImage target = (&data.pixmap)->toImage();
-            (&data.pixmap)->convertFromImage(target.mirrored(true, false));
+            (&data.pixmap)
+                ->convertFromImage(QtCompat::mirroredImage(target, true, false));
             data.x = data.pixmap.width() - cursorInfo[i].x - 1;
           }
           if (decorationsFlag != 0)

@@ -97,10 +97,10 @@ public:
   void setPoint(int index, const TPointD &p);
 
   FourPoints enlarge(double d);
-  bool isEmpty();
+  DVAPI bool isEmpty();
   void empty();
   bool contains(TPointD p);
-  TRectD getBox() const;
+  DVAPI TRectD getBox() const;
   FourPoints &operator=(const TRectD &r);
   bool operator==(const FourPoints &p) const;
   FourPoints operator*(const TAffine &aff) const;
@@ -412,11 +412,11 @@ public:
 
   ToolType getToolType() const override { return TTool::LevelWriteTool; }
 
-  TPointD getCenter(int index = 0) const;
+  DVAPI TPointD getCenter(int index = 0) const;
   void setCenter(const TPointD &center, int index = 0);
 
-  int getBBoxsCount() const;
-  DragSelectionTool::FourPoints getBBox(int index = 0) const;
+  DVAPI int getBBoxsCount() const;
+  DVAPI DragSelectionTool::FourPoints getBBox(int index = 0) const;
   virtual void setBBox(const DragSelectionTool::FourPoints &points,
                        int index = 0);
 

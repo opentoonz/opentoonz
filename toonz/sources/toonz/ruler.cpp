@@ -5,6 +5,7 @@
 #include "tapp.h"
 #include "toonz/tscenehandle.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 #include "toonz/toonzscene.h"
 #include "toonz/stage.h"
@@ -253,8 +254,9 @@ double Ruler::posToValue(const QPoint &p) const {
 
 void Ruler::mousePressEvent(QMouseEvent *e) {
   if (e->button() != Qt::LeftButton && e->button() != Qt::RightButton) return;
+  QPoint pos      = QtCompat::mouseEventPosition(e);
   Guides &guides  = getGuides();
-  double v        = posToValue(e->pos());
+  double v        = posToValue(pos);
   m_hiding        = false;
   m_moving        = false;
   int selected    = -1;
@@ -296,9 +298,10 @@ void Ruler::mousePressEvent(QMouseEvent *e) {
 //-----------------------------------------------------------------------------
 
 void Ruler::mouseMoveEvent(QMouseEvent *e) {
+  QPoint pos = QtCompat::mouseEventPosition(e);
   if (m_moving) {
-    m_hiding           = m_vertical ? (e->pos().x() < 0) : (e->pos().y() < 0);
-    getGuides().back() = posToValue(e->pos()) * m_viewer->getDevPixRatio();
+    m_hiding           = m_vertical ? (pos.x() < 0) : (pos.y() < 0);
+    getGuides().back() = posToValue(pos) * m_viewer->getDevPixRatio();
     // aggiorna sprop!!!!
     update();
     m_viewer->update();
@@ -306,7 +309,7 @@ void Ruler::mouseMoveEvent(QMouseEvent *e) {
   }
 
   Guides &guides = getGuides();
-  double v       = posToValue(e->pos());
+  double v       = posToValue(pos);
   m_hiding       = false;
   m_moving       = false;
 

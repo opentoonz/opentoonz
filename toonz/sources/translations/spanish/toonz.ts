@@ -135,9 +135,9 @@
         <translation> </translation>
     </message>
     <message>
-        <source>The microphone is not available: 
+        <source>The microphone is not available:
 Please select a different device or check the microphone.</source>
-        <translation type="vanished">El micrófono no está disponible: 
+        <translation type="vanished">El micrófono no está disponible:
 Por favor seleccionar un dispositivo diferente o comprobar el micrófono.</translation>
     </message>
     <message>
@@ -221,9 +221,9 @@ Por favor seleccionar un dispositivo diferente o comprobar el micrófono.</trans
         <translation>Refrescar la lista de dispositivos de entrada de audio conectados</translation>
     </message>
     <message>
-        <source>Record failed: 
+        <source>Record failed:
 Make sure there&apos;s XSheet or Timeline in the room.</source>
-        <translation>Falló la grabación: 
+        <translation>Falló la grabación:
 Asegurarse de que haya una planilla o línea de tiempo en el espacio de trabajo.</translation>
     </message>
     <message>
@@ -318,9 +318,9 @@ Se utilizará internamente el formato más cercano.</translation>
         <translation>El nivel seleccionado no contiene fotogramas entre Desde y Hasta.</translation>
     </message>
     <message>
-        <source>Setting this value 0 will automatically 
+        <source>Setting this value 0 will automatically
 pick up all frames in the selected level.</source>
-        <translation>Definir este valor en 0 hará que se tomen 
+        <translation>Definir este valor en 0 hará que se tomen
 todos los fotogramas del nivel seleccionado.</translation>
     </message>
     <message>
@@ -455,15 +455,15 @@ Usar los números de fotograma como referencia.</translation>
         <translation>Por favor escoger un archivo de datos de sincro labial para continuar.</translation>
     </message>
     <message>
-        <source>Cannot find the file specified. 
+        <source>Cannot find the file specified.
 Please choose a valid lip sync data file to continue.</source>
-        <translation>No es posible encontrar el archivo especificado. 
+        <translation>No es posible encontrar el archivo especificado.
 Por favor escoger un archivo válido de sincronización labial para continuar.</translation>
     </message>
     <message>
-        <source>Unable to open the file: 
+        <source>Unable to open the file:
 </source>
-        <translation>No es posible abrir el archivo: 
+        <translation>No es posible abrir el archivo:
 </translation>
     </message>
     <message>
@@ -2261,14 +2261,14 @@ What do you want to do? </source>
     </message>
     <message>
         <source>When activated, styles of the default palette
-($TOONZSTUDIOPALETTE\cleanup_default.tpl) will 
-be appended to the palette after conversion in 
-order to save the effort of creating styles 
+($TOONZSTUDIOPALETTE\cleanup_default.tpl) will
+be appended to the palette after conversion in
+order to save the effort of creating styles
 before color designing.</source>
         <translation type="vanished">Si esta activa, los estilos de la paleta predefinida
-($TOONZSTUDIOPALETTE\cleanup_default.tpl) serán 
-anexados a la paleta, luego de la conversión para 
-ahorrar el esfuerzo de tener que crear estilos antes 
+($TOONZSTUDIOPALETTE\cleanup_default.tpl) serán
+anexados a la paleta, luego de la conversión para
+ahorrar el esfuerzo de tener que crear estilos antes
 de diseñar el color.</translation>
     </message>
     <message>
@@ -2288,12 +2288,12 @@ de diseñar el color.</translation>
         <translation>PPP personalizado</translation>
     </message>
     <message>
-        <source>Specify the policy for setting DPI of converted tlv. 
-If you select the &quot;Image DPI&quot; option and the source image does not 
+        <source>Specify the policy for setting DPI of converted tlv.
+If you select the &quot;Image DPI&quot; option and the source image does not
 contain the dpi information, then the current camera dpi will be used.
 </source>
-        <translation>Especifica la política para definir los PPP del nivel TLV generado. 
-Si se selecciona la opción &quot;PPP de imagen&quot; y la imagen original no 
+        <translation>Especifica la política para definir los PPP del nivel TLV generado.
+Si se selecciona la opción &quot;PPP de imagen&quot; y la imagen original no
 contuviera información de PPP, entonces se usarán los de la cámara actual.
 </translation>
     </message>
@@ -2307,14 +2307,14 @@ contuviera información de PPP, entonces se usarán los de la cámara actual.
     </message>
     <message>
         <source>When activated, styles of the default palette
-($TOONZSTUDIOPALETTE\Global Palettes\Default Palettes\Cleanup_Palette.tpl) will 
-be appended to the palette after conversion in 
-order to save the effort of creating styles 
+($TOONZSTUDIOPALETTE\Global Palettes\Default Palettes\Cleanup_Palette.tpl) will
+be appended to the palette after conversion in
+order to save the effort of creating styles
 before color designing.</source>
         <translation>Cuendo esté activado, los estilos de la paleta predefinida
-($TOONZSTUDIOPALETTE\Global Palettes\Default Palettes\Cleanup_Palette.tpl) 
-serán anexados a la paleta luego de la conversión 
-para ahorrar el esfuerzo de tener que crear estilos 
+($TOONZSTUDIOPALETTE\Global Palettes\Default Palettes\Cleanup_Palette.tpl)
+serán anexados a la paleta luego de la conversión
+para ahorrar el esfuerzo de tener que crear estilos
 antes del disieño de color.</translation>
     </message>
     <message>
@@ -4819,9 +4819,9 @@ Usar los números de fotograma como referencia.</translation>
         <translation>Dibujo en sub-planilla </translation>
     </message>
     <message>
-        <source>Unable to open the file: 
+        <source>Unable to open the file:
 </source>
-        <translation>No es posible abrir el archivo: 
+        <translation>No es posible abrir el archivo:
 </translation>
     </message>
     <message>
@@ -9202,9 +9202,9 @@ WARNING : Image size mismatch. The existing level size is %1 x %2.</source>
 ADVERTENCIA : Tamaño de imagen no coincidente. El tamaño del nivel ya existente es %1 x %2.</translation>
     </message>
     <message>
-        <source>WARNING : Level name conflicts. There already is a level %1 in the scene with the path                        
+        <source>WARNING : Level name conflicts. There already is a level %1 in the scene with the path
           %2.</source>
-        <translation>ADVERTENCIA : Conflicto en el nombre del nivel. Ya existe un nivel %1 en la escena con la ruta                        
+        <translation>ADVERTENCIA : Conflicto en el nombre del nivel. Ya existe un nivel %1 en la escena con la ruta
           %2.</translation>
     </message>
     <message>
@@ -9214,9 +9214,9 @@ WARNING : Image size mismatch. The size of level with the same name is is %1 x %
 ADVERTENCIA : Tamaño de imagen no coincidente. El tamaño del nivel con ese nombre es %1 x %2.</translation>
     </message>
     <message>
-        <source>WARNING : Level path conflicts. There already is a level with the path %1                        
+        <source>WARNING : Level path conflicts. There already is a level with the path %1
           in the scene with the name %2.</source>
-        <translation>ADVERTENCIA : Conflicto en la ruta del nivel. Ya existe un nivel con la ruta %1                        
+        <translation>ADVERTENCIA : Conflicto en la ruta del nivel. Ya existe un nivel con la ruta %1
           en la escena llamada %2.</translation>
     </message>
     <message>
@@ -10652,10 +10652,10 @@ contengan píxeles transparentes en formatos de imagen sin soporte para canal al
     </message>
     <message>
         <source>Use Qt&apos;s Native Windows Ink Support*
-(CAUTION: This options is for maintenance purpose. 
+(CAUTION: This options is for maintenance purpose.
  Do not activate this option or the tablet won&apos;t work properly.)</source>
         <translation>Usar soporte nativo de Qt para Windows Ink*
-(PRECAUCIÓN: Esta opción es para propósitos de mantenimiento. 
+(PRECAUCIÓN: Esta opción es para propósitos de mantenimiento.
  No activarla o la tableta dejará de funcionar correctamente.)</translation>
     </message>
     <message>
@@ -10687,9 +10687,9 @@ contengan píxeles transparentes en formatos de imagen sin soporte para canal al
         <translation>Mostrar nombres de nivel:</translation>
     </message>
     <message>
-        <source>Number of Frames to Play 
+        <source>Number of Frames to Play
 for Short Play:</source>
-        <translation type="vanished">Cantidad de fotogramas de 
+        <translation type="vanished">Cantidad de fotogramas de
 Reproducción breve:</translation>
     </message>
     <message>
@@ -10713,9 +10713,9 @@ Reproducción breve:</translation>
         <translation>Comprobar disponibilidad</translation>
     </message>
     <message>
-        <source>Enabling multi-thread rendering will render significantly faster 
+        <source>Enabling multi-thread rendering will render significantly faster
 but a random crash might occur, use at your own risk.</source>
-        <translation>Habilitar el procesamiento multi-hilo posibilitará una velocidad siginificativamente mayor 
+        <translation>Habilitar el procesamiento multi-hilo posibilitará una velocidad siginificativamente mayor
 pero es posible que se produzcan ocasionales cuelgues; usar a propio riesgo.</translation>
     </message>
     <message>
@@ -10929,9 +10929,9 @@ Este comportamiento podría ser modificado en el futuro.</translation>
         <translation>Usar reproductor predefinido para formatos de película</translation>
     </message>
     <message>
-        <source>Number of Frames to Play 
+        <source>Number of Frames to Play
 for Short Play Command:</source>
-        <translation>Cantidad de fotogramas a reproducir 
+        <translation>Cantidad de fotogramas a reproducir
 con el comando Reproducción breve: </translation>
     </message>
     <message>
@@ -11087,9 +11087,9 @@ Proyecto -&gt; alias de carpetas del proyecto (+drawing, etc.)</translation>
         <translation>Miniaturas en Explorador de Windows (integración con el SO)</translation>
     </message>
     <message>
-        <source>Enable thumbnails for OpenToonz files (.tnz, .pli, .tlv) in Windows Explorer. 
+        <source>Enable thumbnails for OpenToonz files (.tnz, .pli, .tlv) in Windows Explorer.
 Administrator privileges are required; you may need to restart Explorer for changes to take effect.</source>
-        <translation>Habilita la visualización de miniaturas para archivos de OpenToonz (.tnz, .pli, .tlv) en el Explorador de Windows. 
+        <translation>Habilita la visualización de miniaturas para archivos de OpenToonz (.tnz, .pli, .tlv) en el Explorador de Windows.
 Se necesitarán privilegios de Administrador; es posible que sea necesario reiniciar el sistema para que los cambios surtan efecto.</translation>
     </message>
     <message>
@@ -12702,9 +12702,9 @@ Are you sure to </source>
         <translation>Pegar celdas (sobrescribir)</translation>
     </message>
     <message>
-        <source>Cannot paste data 
+        <source>Cannot paste data
  Nothing to paste</source>
-        <translation>No es posible pegar datos 
+        <translation>No es posible pegar datos
  Nada que pegar</translation>
     </message>
     <message>
@@ -13066,12 +13066,12 @@ Save the scene first.</source>
 Guardar primero la escena.</translation>
     </message>
     <message>
-        <source>A prior save of Scene &apos;%1&apos; was critically interupted. 
+        <source>A prior save of Scene &apos;%1&apos; was critically interupted.
 
 A partial save file was generated and changes may be manually salvaged from &apos;%2&apos;.
 
 Do you wish to continue loading the last good save or stop and try to salvage the prior save?</source>
-        <translation type="vanished">Una operación de guardado anterior de la escena &apos;%1&apos; fue interrumpida de forma crítica. 
+        <translation type="vanished">Una operación de guardado anterior de la escena &apos;%1&apos; fue interrumpida de forma crítica.
 
 Se generó un archivo parcialmente guardado, siendo posible rescatar los cambios de forma manual desde &apos;%2&apos;.
 
@@ -13188,9 +13188,9 @@ en las Preferencias, para poder usar esta opción en la planilla o línea de tie
         <translation>Siempre sobreescribir en esta escena</translation>
     </message>
     <message>
-        <source>    + %1 more level(s) 
+        <source>    + %1 more level(s)
 </source>
-        <translation>    + %1 nivel(es) más 
+        <translation>    + %1 nivel(es) más
 </translation>
     </message>
     <message>
@@ -13749,12 +13749,12 @@ Do you want to create it?</source>
         <translation>Se removieron los niveles no usados de los Componentes de la escena. (Este comportamiento puede ser deshabilitado en las Preferencias.)</translation>
     </message>
     <message>
-        <source>A prior save of Scene &apos;%1&apos; was critically interrupted. 
+        <source>A prior save of Scene &apos;%1&apos; was critically interrupted.
 
 A partial save file was generated and changes may be manually salvaged from &apos;%2&apos;.
 
 Do you wish to continue loading the last good save or stop and try to salvage the prior save?</source>
-        <translation>Una acción de guardado anterior de la escena &apos;%1&apos; fue interrumpida de forma crítica. 
+        <translation>Una acción de guardado anterior de la escena &apos;%1&apos; fue interrumpida de forma crítica.
 
 Se generó un archivo parcial y los cambios pueden ser guardados manualmente a partir de &apos;%2&apos;.
 
@@ -14011,11 +14011,11 @@ What do you want to do?</source>
         <translation>Símbolo de intermedio 2 (*):</translation>
     </message>
     <message>
-        <source>The visibility toggles of following columns are modified 
-due to &quot;Unify Preview and Camstand Visibility Toggles&quot; preference option : 
+        <source>The visibility toggles of following columns are modified
+due to &quot;Unify Preview and Camstand Visibility Toggles&quot; preference option :
   %1</source>
-        <translation>Los interruptores de visibilidad de las siguientes columnas se modificaron debido a la opción 
-&quot;Unificar interruptores de visibilidad en mesa de trabajo y procesamiento&quot; en las preferencias: 
+        <translation>Los interruptores de visibilidad de las siguientes columnas se modificaron debido a la opción
+&quot;Unificar interruptores de visibilidad en mesa de trabajo y procesamiento&quot; en las preferencias:
   %1</translation>
     </message>
     <message>
@@ -14133,7 +14133,7 @@ Detalles:
     <message>
         <source>%1
 
-is an image sequence that can be converted into a TLV format 
+is an image sequence that can be converted into a TLV format
 Would you like to convert it?</source>
         <translation>%1
 
@@ -14145,16 +14145,16 @@ es una secuencia de imágenes que puede ser convertida a formato TLV
         <translation>No, usarla tal como está</translation>
     </message>
     <message>
-        <source>Image sequence detected, but the filenames are missing a separator: 
-OpenToonz requires a separator (such as an underscore (_) or dot (.) 
+        <source>Image sequence detected, but the filenames are missing a separator:
+OpenToonz requires a separator (such as an underscore (_) or dot (.)
 between the name and the frame number to recognize sequences properly.
 Example: A0001.png → A.0001.png
 
 Would you like OpenToonz to automatically add a dot to fix the sequence format?
 
 %1 (and similar files)</source>
-        <translation>Secuencia de imágenes detectada, sin embargo a los nombres de archivo les falta un separador: 
-OpenToonz requiere un separador (como un guion bajo (_) o un punto (.) ) 
+        <translation>Secuencia de imágenes detectada, sin embargo a los nombres de archivo les falta un separador:
+OpenToonz requiere un separador (como un guion bajo (_) o un punto (.) )
 entre el nombre base y el número de fotograma, para poder reconocer secuencias apropiadamente.
 Ejemplo: A0001.png → A.0001.png
 
@@ -16839,9 +16839,9 @@ Assign shortcut sequence anyway?</source>
         <translation>Preajuste de cámara incorrecto</translation>
     </message>
     <message>
-        <source>&apos;%1&apos; doesn&apos;t seem to be a well formed camera preset. 
+        <source>&apos;%1&apos; doesn&apos;t seem to be a well formed camera preset.
 Possibly the preset file has been corrupted</source>
-        <translation>&apos;%1&apos; no parece ser un preajuste de cámara bien formado. 
+        <translation>&apos;%1&apos; no parece ser un preajuste de cámara bien formado.
 Es posible que el archivo del preajuste esté corrupto</translation>
     </message>
     <message>
@@ -17009,9 +17009,9 @@ WARNING : Image size mismatch. The existing level size is %1 x %2.</source>
 ADVERTENCIA : Tamaño de imagen no coincidente. El tamaño del nivel ya existente es %1 x %2.</translation>
     </message>
     <message>
-        <source>WARNING : Level name conflicts. There already is a level %1 in the scene with the path                        
+        <source>WARNING : Level name conflicts. There already is a level %1 in the scene with the path
           %2.</source>
-        <translation>ADVERTENCIA : Conflicto en el nombre del nivel. Ya existe un nivel %1 en la escena con la ruta                        
+        <translation>ADVERTENCIA : Conflicto en el nombre del nivel. Ya existe un nivel %1 en la escena con la ruta
           %2.</translation>
     </message>
     <message>
@@ -17021,9 +17021,9 @@ WARNING : Image size mismatch. The size of level with the same name is is %1 x %
 ADVERTENCIA : Tamaño de imagen no coincidente. El tamaño del nivel con ese nombre es %1 x %2.</translation>
     </message>
     <message>
-        <source>WARNING : Level path conflicts. There already is a level with the path %1                        
+        <source>WARNING : Level path conflicts. There already is a level with the path %1
           in the scene with the name %2.</source>
-        <translation>ADVERTENCIA : Conflicto en la ruta del nivel. Ya existe un nivel con la ruta %1                        
+        <translation>ADVERTENCIA : Conflicto en la ruta del nivel. Ya existe un nivel con la ruta %1
           en la escena llamada %2.</translation>
     </message>
     <message>
@@ -17561,9 +17561,9 @@ División = Comprobar foco</translation>
 <context>
     <name>SubSheetBar</name>
     <message>
-        <source>Sub-scene controls: 
+        <source>Sub-scene controls:
 Click the arrow button to create a new sub-xsheet</source>
-        <translation type="vanished">Controles de sub-escena: 
+        <translation type="vanished">Controles de sub-escena:
 Clic en el botón con la flecha para crear una nueva sub-planilla</translation>
     </message>
     <message>
@@ -18550,10 +18550,10 @@ Por favor ver la guía de usuario para obtener más detalles.</translation>
     </message>
     <message>
         <source>When activated, styles of the default palette
-($TOONZSTUDIOPALETTE\Global Palettes\Default Palettes\Cleanup_Palette.tpl) will 
+($TOONZSTUDIOPALETTE\Global Palettes\Default Palettes\Cleanup_Palette.tpl) will
 be appended to the palette after conversion</source>
         <translation>Cuando esté activa, los estilos de la paleta predefinida
-($TOONZSTUDIOPALETTE\Global Palettes\Default Palettes\Cleanup_Palette.tpl) 
+($TOONZSTUDIOPALETTE\Global Palettes\Default Palettes\Cleanup_Palette.tpl)
 serán anexados a la paleta, luego de la conversión</translation>
     </message>
     <message>

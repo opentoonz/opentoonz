@@ -5,6 +5,7 @@
 #include "xsheetviewer.h"
 #include "xshcolumnviewer.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 //-----------------------------------------------------------------------------
 
@@ -179,7 +180,7 @@ void LayerFooterPanel::contextMenuEvent(QContextMenuEvent* event) {
     action->setData(frame);
     connect(action, SIGNAL(triggered()), this, SLOT(onFramesPerPageSelected()));
   }
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 //-----------------------------------------------------------------------------

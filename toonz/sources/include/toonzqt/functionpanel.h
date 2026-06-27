@@ -5,6 +5,7 @@
 
 #include "tcommon.h"
 #include "functiontreeviewer.h"
+#include "toonzqt/qtcompat.h"
 
 #include <QDialog>
 #include <set>
@@ -66,7 +67,10 @@ public:
     EaseIn,
     EaseOut,
     EaseInPercentage,
-    EaseOutPercentage
+    EaseOutPercentage,
+    GroupPoint = 100,
+    GroupSpeedOut,
+    GroupSpeedIn
   };
 
 private:
@@ -220,7 +224,7 @@ protected:
   void openContextMenu(QMouseEvent *e);
 
   void keyPressEvent(QKeyEvent *e) override;
-  void enterEvent(QEvent *) override;
+  void enterEvent(QtCompat::EnterEvent *) override;
   void leaveEvent(QEvent *) override;
 
   void showEvent(QShowEvent *) override;

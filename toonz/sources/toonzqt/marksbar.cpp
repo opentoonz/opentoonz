@@ -5,6 +5,7 @@
 #include <QPainter>
 
 #include "toonzqt/marksbar.h"
+#include "toonzqt/qtcompat.h"
 
 //*****************************************************************************
 //    Local namespace stuff
@@ -117,7 +118,7 @@ void MarksBar::conformValues(bool preferRollDown) {
 void MarksBar::mousePressEvent(QMouseEvent *me) {
   int newDist, currDist = (std::numeric_limits<int>::max)();
 
-  int val = posToVal(me->x());
+  int val = posToVal(QtCompat::mouseEventPosition(me).x());
 
   // Select the nearest mark. If the distance is too great, select none.
   int i, size = m_values.size();
@@ -134,7 +135,8 @@ void MarksBar::mousePressEvent(QMouseEvent *me) {
 void MarksBar::mouseMoveEvent(QMouseEvent *me) {
   if (m_selectedMark < 0) return;
 
-  int newVal = tcrop(posToVal(me->x()), m_min, m_max);
+  int newVal = tcrop(posToVal(QtCompat::mouseEventPosition(me).x()), m_min,
+                     m_max);
   bool left  = newVal < m_values[m_selectedMark];
 
   m_values[m_selectedMark] = newVal;

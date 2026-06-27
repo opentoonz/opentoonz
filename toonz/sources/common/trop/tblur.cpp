@@ -511,11 +511,9 @@ inline void blur_code_SSE2(BlurPixel<P> *row1, T *row2, int length, float coeff,
 template <class T>
 void store_colRgb(T *buffer, int wrap, int r_ly, T *col, int ly, int x, int dy,
                   int backlit, double blur) {
-  int val = T::maxChannelValue;
-
-  if (val == 255)
+  if constexpr (sizeof(typename T::Channel) == 1)
     STORE_COL_CODE(204)
-  else if (val == 65535)
+  else if constexpr (sizeof(typename T::Channel) == 2)
     STORE_COL_CODE(204 * 257)
   else
     assert(false);

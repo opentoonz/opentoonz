@@ -110,7 +110,7 @@ public:
 
 //------------------------------------------------------------------------------
 
-class TaskConfigPanel final : public TWidget {
+class TaskConfigPanel : public TWidget {
 public:
   TaskConfigPanel(TWidget *parent) : TWidget(parent) {}
 

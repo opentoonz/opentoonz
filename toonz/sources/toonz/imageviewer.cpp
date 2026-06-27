@@ -21,6 +21,7 @@
 #include "toonzqt/viewcommandids.h"
 #include "toonzqt/imageutils.h"
 #include "toonzqt/lutcalibrator.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/tscenehandle.h"
@@ -338,7 +339,8 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event) {
     bool addedSep = false;
 
     if (m_isHistogramEnable &&
-        visibleRegion().contains(event->pos() * getDevPixRatio())) {
+        visibleRegion().contains(QtCompat::contextMenuEventPosition(event) *
+                                 getDevPixRatio())) {
       menu->addSeparator();
       addedSep = true;
       action   = menu->addAction(tr("Show Histogram"));
@@ -361,7 +363,7 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event) {
     }
   }
 
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
 
   if (m_flipbook) {
     action = CommandManager::instance()->getAction(MI_LoadRecentImage);
@@ -827,12 +829,12 @@ void ImageViewer::hideEvent(QHideEvent *) {
 void ImageViewer::mouseMoveEvent(QMouseEvent *event) {
   if (!m_image) return;
 
-  if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen &&
+  if (m_gestureActive && m_touchDevice == QtCompat::TouchScreen &&
       !m_stylusUsed) {
     return;
   }
 
-  QPoint curQPos = event->pos() * getDevPixRatio();
+  QPoint curQPos = QtCompat::mouseEventPosition(event) * getDevPixRatio();
 
   TPoint curPos = TPoint(curQPos.x(), curQPos.y());
 
@@ -960,7 +962,7 @@ void ImageViewer::pickColor(QMouseEvent *event, bool putValueToStyleEditor) {
   if (!m_isHistogramEnable) return;
   if (!m_histogramPopup->isVisible()) return;
 
-  QPointF curPos = event->localPos() * getDevPixRatio();
+  QPointF curPos = QtCompat::mouseEventPositionF(event) * getDevPixRatio();
 
   // avoid to pick outside of the flip
   if ((!m_image) || !rect().contains(curPos.toPoint())) {
@@ -993,7 +995,8 @@ void ImageViewer::pickColor(QMouseEvent *event, bool putValueToStyleEditor) {
   } else if (!img->raster()) {  // vector image
     // For unknown reasons, glReadPixels is covering the entire window not the
     // OpenGL widget.
-    QPointF winPos = event->windowPos() * getDevPixRatio();
+    QPointF winPos =
+        QtCompat::mouseEventWindowPositionF(event) * getDevPixRatio();
     TPointD mousePos =
         TPointD(winPos.x(), (double)(window()->height()) - winPos.y());
     TRectD area  = TRectD(mousePos.x, mousePos.y, mousePos.x, mousePos.y);
@@ -1171,17 +1174,18 @@ void ImageViewer::mousePressEvent(QMouseEvent *event) {
   if (!m_image) return;
 
   // qDebug() << "[mousePressEvent]";
-  if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen &&
+  if (m_gestureActive && m_touchDevice == QtCompat::TouchScreen &&
       !m_stylusUsed) {
     return;
   }
 
-  m_pos                   = event->pos() * getDevPixRatio();
+  m_pos = QtCompat::mouseEventPosition(event) * getDevPixRatio();
   m_pressedMousePos       = TPoint(m_pos.x(), m_pos.y());
   m_mouseButton           = event->button();
   m_draggingZoomSelection = false;
 
-  QPointF winPosMousePos = event->windowPos() * getDevPixRatio() - m_pos;
+  QPointF winPosMousePos =
+      QtCompat::mouseEventWindowPositionF(event) * getDevPixRatio() - m_pos;
   m_winPosMousePosOffset = TPointD(winPosMousePos.x(), winPosMousePos.y());
 
   if (m_mouseButton != Qt::LeftButton) {
@@ -1272,17 +1276,17 @@ void ImageViewer::wheelEvent(QWheelEvent *event) {
   switch (event->source()) {
   case Qt::MouseEventNotSynthesized: {
     if (event->modifiers() & Qt::AltModifier)
-      delta = event->angleDelta().x();
+      delta = QtCompat::wheelEventAngleDelta(event).x();
     else
-      delta = event->angleDelta().y();
+      delta = QtCompat::wheelEventAngleDeltaY(event);
     break;
   }
 
   case Qt::MouseEventSynthesizedBySystem: {
-    QPoint numPixels  = event->pixelDelta();
-    QPoint numDegrees = event->angleDelta() / 8;
+    QPoint numPixels  = QtCompat::wheelEventPixelDelta(event);
+    QPoint numDegrees = QtCompat::wheelEventAngleDelta(event) / 8;
     if (!numPixels.isNull()) {
-      delta = event->pixelDelta().y();
+      delta = numPixels.y();
     } else if (!numDegrees.isNull()) {
       QPoint numSteps = numDegrees / 15;
       delta           = numSteps.y();
@@ -1303,11 +1307,12 @@ void ImageViewer::wheelEvent(QWheelEvent *event) {
 
   if (delta != 0) {
     if ((m_gestureActive == true &&
-         m_touchDevice == QTouchDevice::TouchScreen) ||
+         m_touchDevice == QtCompat::TouchScreen) ||
         m_gestureActive == false) {
       int d = delta > 0 ? 120 : -120;
-      QPoint center(event->position().x() * getDevPixRatio() - width() / 2,
-                    -event->position().y() * getDevPixRatio() + height() / 2);
+      const QPoint eventPos = QtCompat::wheelEventPosition(event);
+      QPoint center(eventPos.x() * getDevPixRatio() - width() / 2,
+                    -eventPos.y() * getDevPixRatio() + height() / 2);
       zoomQt(center, exp(0.001 * d));
     }
   }
@@ -1487,7 +1492,7 @@ void ImageViewer::onPreferenceChanged(const QString &prefName) {
 void ImageViewer::tabletEvent(QTabletEvent *e) {
   // qDebug() << "[tabletEvent]";
   if (e->type() == QTabletEvent::TabletPress) {
-    m_stylusUsed = e->pointerType() ? true : false;
+    m_stylusUsed = QtCompat::isStylusPointer(e);
   } else if (e->type() == QTabletEvent::TabletRelease) {
     m_stylusUsed = false;
   }
@@ -1507,7 +1512,7 @@ void ImageViewer::gestureEvent(QGestureEvent *e) {
     QPinchGesture *gesture = static_cast<QPinchGesture *>(pinch);
     QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
     QPoint firstCenter                     = gesture->centerPoint().toPoint();
-    if (m_touchDevice == QTouchDevice::TouchScreen)
+    if (m_touchDevice == QtCompat::TouchScreen)
       firstCenter = mapFromGlobal(firstCenter);
 
     if (gesture->state() == Qt::GestureStarted) {
@@ -1562,21 +1567,22 @@ void ImageViewer::gestureEvent(QGestureEvent *e) {
 
 void ImageViewer::touchEvent(QTouchEvent *e, int type) {
   // qDebug() << "[touchEvent]";
+  const auto &touchPoints = QtCompat::touchPoints(e);
   if (type == QEvent::TouchBegin) {
     m_touchActive   = true;
-    m_firstPanPoint = e->touchPoints().at(0).pos();
+    m_firstPanPoint = QtCompat::touchPointPosition(touchPoints.at(0));
     // obtain device type
-    m_touchDevice = e->device()->type();
+    m_touchDevice = QtCompat::touchDeviceType(e);
   } else if (m_touchActive) {
     // touchpads must have 2 finger panning for tools and navigation to be
     // functional on other devices, 1 finger panning is preferred
-    if ((e->touchPoints().count() == 2 &&
-         m_touchDevice == QTouchDevice::TouchPad) ||
-        (e->touchPoints().count() == 1 &&
-         m_touchDevice == QTouchDevice::TouchScreen)) {
-      QTouchEvent::TouchPoint panPoint = e->touchPoints().at(0);
+    if ((touchPoints.count() == 2 && m_touchDevice == QtCompat::TouchPad) ||
+        (touchPoints.count() == 1 &&
+         m_touchDevice == QtCompat::TouchScreen)) {
+      const auto panPoint = touchPoints.at(0);
       if (!m_panning) {
-        QPointF deltaPoint = panPoint.pos() - m_firstPanPoint;
+        QPointF deltaPoint =
+            QtCompat::touchPointPosition(panPoint) - m_firstPanPoint;
         // minimize accidental and jerky zooming/rotating during 2 finger
         // panning
         if ((deltaPoint.manhattanLength() > 100) && !m_zooming) {
@@ -1584,8 +1590,10 @@ void ImageViewer::touchEvent(QTouchEvent *e, int type) {
         }
       }
       if (m_panning) {
-        QPoint curPos      = panPoint.pos().toPoint() * getDevPixRatio();
-        QPoint lastPos     = panPoint.lastPos().toPoint() * getDevPixRatio();
+        QPoint curPos = QtCompat::touchPointPosition(panPoint).toPoint() *
+                         getDevPixRatio();
+        QPoint lastPos = QtCompat::touchPointLastPosition(panPoint).toPoint() *
+                         getDevPixRatio();
         QPoint centerDelta = curPos - lastPos;
         panQt(centerDelta);
       }
@@ -1664,7 +1672,7 @@ public:
     QAction *act = CommandManager::instance()->getAction(MI_LoadRecentImage);
 
     /*--- 右クリックで呼ばれないとここにWidgetが入らない ---*/
-    FlipBook *flip = qobject_cast<FlipBook *>(act->parentWidget());
+    FlipBook *flip = qobject_cast<FlipBook *>(act->parent());
     if (!flip) return;
 
     DVMenuAction *menu = dynamic_cast<DVMenuAction *>(act->menu());

@@ -7,6 +7,7 @@
 #include "toonzqt/filefield.h"
 #include "historytypes.h"
 #include "toonzqt/lutcalibrator.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/txshlevel.h"
@@ -42,6 +43,7 @@
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include <QPainter>
+#include <QActionGroup>
 #include <QButtonGroup>
 #include <QMouseEvent>
 #include <QLabel>
@@ -58,6 +60,11 @@
 #include <QOpenGLFramebufferObject>
 
 namespace {
+bool haveSameColorStyleType(const TColorStyle *lhs, const TColorStyle *rhs) {
+  assert(lhs && rhs);
+  return typeid(*lhs) == typeid(*rhs);
+}
+
 enum ColorSliderAppearance {
   RelativeColoredTriangleHandle,
   AbsoluteColoredLineHandle
@@ -820,7 +827,7 @@ void HexagonalColorWheel::mousePressEvent(QMouseEvent *event) {
 
   // check whether the mouse cursor is in the wheel or in the triangle (or
   // nothing).
-  QPoint curPos = event->pos() * getDevPixRatio();
+  QPoint curPos = QtCompat::mouseEventPosition(event) * getDevPixRatio();
 
   QPolygonF wheelPolygon;
   // in the case of the wheel
@@ -855,10 +862,10 @@ void HexagonalColorWheel::mouseMoveEvent(QMouseEvent *event) {
   case none:
     break;
   case leftWheel:
-    clickLeftWheel(event->pos() * getDevPixRatio());
+    clickLeftWheel(QtCompat::mouseEventPosition(event) * getDevPixRatio());
     break;
   case rightTriangle:
-    clickRightTriangle(event->pos() * getDevPixRatio());
+    clickRightTriangle(QtCompat::mouseEventPosition(event) * getDevPixRatio());
     break;
   }
 }
@@ -969,13 +976,15 @@ void SquaredColorWheel::click(const QPoint &pos) {
 //-----------------------------------------------------------------------------
 
 void SquaredColorWheel::mousePressEvent(QMouseEvent *event) {
-  if (event->buttons() & Qt::LeftButton) click(event->pos());
+  if (event->buttons() & Qt::LeftButton)
+    click(QtCompat::mouseEventPosition(event));
 }
 
 //-----------------------------------------------------------------------------
 
 void SquaredColorWheel::mouseMoveEvent(QMouseEvent *event) {
-  if (event->buttons() & Qt::LeftButton) click(event->pos());
+  if (event->buttons() & Qt::LeftButton)
+    click(QtCompat::mouseEventPosition(event));
 }
 
 //-----------------------------------------------------------------------------
@@ -1113,7 +1122,8 @@ void ColorSlider::paintEvent(QPaintEvent *event) {
 //-----------------------------------------------------------------------------
 
 void ColorSlider::mousePressEvent(QMouseEvent *event) {
-  chandleMouse(event->pos().x(), event->pos().y());
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
+  chandleMouse(eventPos.x(), eventPos.y());
 }
 
 //-----------------------------------------------------------------------------
@@ -1125,7 +1135,8 @@ void ColorSlider::mouseReleaseEvent(QMouseEvent *event) {
 //-----------------------------------------------------------------------------
 
 void ColorSlider::mouseMoveEvent(QMouseEvent *event) {
-  chandleMouse(event->pos().x(), event->pos().y());
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
+  chandleMouse(eventPos.x(), eventPos.y());
 }
 
 //-----------------------------------------------------------------------------
@@ -1532,7 +1543,7 @@ void ColorParameterSelector::clear() {
 //-----------------------------------------------------------------------------
 
 void ColorParameterSelector::mousePressEvent(QMouseEvent *event) {
-  QPoint pos = event->pos() - m_chipOrigin;
+  QPoint pos = QtCompat::mouseEventPosition(event) - m_chipOrigin;
   int index  = pos.x() / m_chipDelta.x();
   QRect chipRect(index * m_chipDelta, m_chipSize);
   if (chipRect.contains(pos)) {
@@ -1688,8 +1699,6 @@ PlainColorPage::PlainColorPage(QWidget *parent)
   // SLOT(onWheelSliderReleased()));
   // connect( m_verticalSlider,		SIGNAL(sliderReleased()),	this,
   // SLOT(onWheelSliderReleased()));
-  // connect(channelButtonGroup, SIGNAL(buttonClicked(int)), this,
-  // SLOT(setWheelChannel(int)));
 }
 
 //-----------------------------------------------------------------------------
@@ -2010,7 +2019,7 @@ int StyleChooserPage::posToIndex(const QPoint &pos) const {
 //-----------------------------------------------------------------------------
 
 void StyleChooserPage::mousePressEvent(QMouseEvent *event) {
-  QPoint pos       = event->pos();
+  QPoint pos       = QtCompat::mouseEventPosition(event);
   int currentIndex = posToIndex(pos);
   if (currentIndex < 0) return;
   // m_currentIndex = currentIndex;
@@ -2022,7 +2031,7 @@ void StyleChooserPage::mousePressEvent(QMouseEvent *event) {
 //-----------------------------------------------------------------------------
 
 void StyleChooserPage::mouseMoveEvent(QMouseEvent *event) {
-  QPoint pos       = event->pos();
+  QPoint pos       = QtCompat::mouseEventPosition(event);
   int currentIndex = posToIndex(pos);
   if (currentIndex >= 0 && currentIndex < getChipCount())
     setCursor(Qt::PointingHandCursor);
@@ -2037,7 +2046,7 @@ void StyleChooserPage::mouseReleaseEvent(QMouseEvent *event) {}
 //-----------------------------------------------------------------------------
 
 void StyleChooserPage::contextMenuEvent(QContextMenuEvent *event) {
-  QPoint pos       = event->pos();
+  QPoint pos       = QtCompat::contextMenuEventPosition(event);
   int currentIndex = posToIndex(pos);
   if (currentIndex < 0) return;
 
@@ -2061,7 +2070,7 @@ void StyleChooserPage::contextMenuEvent(QContextMenuEvent *event) {
   // QMenu *menuvis = menu.addMenu("Visible Brushes");
   // menuvis->addAction(m_setPinsToTopAct);
   // menuvis->addAction(m_clrPinsToTopAct);
-  menu.exec(event->globalPos());
+  menu.exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 //-----------------------------------------------------------------------------
@@ -2073,7 +2082,8 @@ bool StyleChooserPage::event(QEvent *e) {
   // see StyleChooserPage::paintEvent
   QHelpEvent *he = static_cast<QHelpEvent *>(e);
 
-  int chipIdx = posToIndex(he->pos()), chipCount = getChipCount();
+  int chipIdx = posToIndex(QtCompat::helpEventPosition(he));
+  int chipCount = getChipCount();
   if (chipIdx < 0 || chipIdx >= chipCount) {
     QToolTip::hideText();
     return false;
@@ -2083,7 +2093,7 @@ bool StyleChooserPage::event(QEvent *e) {
   if (toolTip.isEmpty())
     QToolTip::hideText();
   else
-    QToolTip::showText(he->globalPos(), toolTip);
+    QToolTip::showText(QtCompat::helpEventGlobalPosition(he), toolTip);
 
   return true;
 }
@@ -2516,8 +2526,9 @@ SettingsPage::SettingsPage(QWidget *parent)
   paramsContainerLayout->addWidget(m_autoFillCheckBox, 0,
                                    Qt::AlignLeft | Qt::AlignVCenter);
 
-  ret = connect(m_autoFillCheckBox, SIGNAL(stateChanged(int)), this,
-                SLOT(onAutofillChanged()));
+  ret = static_cast<bool>(QtCompat::connectCheckStateChanged(
+      m_autoFillCheckBox, this,
+      [this](Qt::CheckState) { onAutofillChanged(); }));
   assert(ret);
 
   // Prepare the style parameters layout
@@ -2556,12 +2567,12 @@ void SettingsPage::setStyle(const TColorStyleP &editedStyle) {
   // function may be invoked when signals emitted from this function are still
   // "flying"...
 
+  const TColorStyle *currentStyle = m_editedStyle.getPointer();
+  const TColorStyle *newStyle = editedStyle.getPointer();
   bool clearLayout =
-      m_editedStyle &&
-      !(editedStyle && typeid(*m_editedStyle) == typeid(*editedStyle));
+      currentStyle && !(newStyle && haveSameColorStyleType(currentStyle, newStyle));
   bool buildLayout =
-      editedStyle &&
-      !(m_editedStyle && typeid(*m_editedStyle) == typeid(*editedStyle));
+      newStyle && !(currentStyle && haveSameColorStyleType(currentStyle, newStyle));
 
   m_editedStyle = editedStyle;
 
@@ -3838,7 +3849,7 @@ bool StyleEditor::setStyle(TColorStyle *currentStyle) {
   // if(!gname.isEmpty() && gname == "ColorFieldSimpleColor")
   //	isStyleNull = true;
   // else
-  if (!gname.isEmpty() && gname[0] != L'-') {
+  if (!gname.isEmpty() && gname[0] != QChar('-')) {
     currentStyle = 0;
     isStyleNull  = true;
   }
@@ -4033,12 +4044,12 @@ void StyleEditor::save(QSettings &settings) const {
 }
 void StyleEditor::load(QSettings &settings) {
   QVariant isVertical = settings.value("isVertical");
-  if (isVertical.canConvert(QVariant::Bool)) {
+  if (isVertical.canConvert<bool>()) {
     m_colorPageIsVertical = isVertical.toBool();
     m_plainColorPage->setIsVertical(m_colorPageIsVertical);
   }
   QVariant visibleParts = settings.value("visibleParts");
-  if (visibleParts.canConvert(QVariant::Int)) {
+  if (visibleParts.canConvert<int>()) {
     int visiblePartsInt = visibleParts.toInt();
 
     if (visiblePartsInt & 0x01)
@@ -4067,7 +4078,7 @@ void StyleEditor::load(QSettings &settings) {
       m_searchAction->setChecked(false);
   }
   QVariant splitterState = settings.value("splitterState");
-  if (splitterState.canConvert(QVariant::ByteArray))
+  if (splitterState.canConvert<QByteArray>())
     m_plainColorPage->setSplitterState(splitterState.toByteArray());
 }
 

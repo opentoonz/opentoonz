@@ -728,6 +728,8 @@ void Iwa_FlowPaintBrushFx::computeBrushVertices(
     // 大きい方が配列で前、すなわち先（下）に描かれるようにする
     for (auto &stroke : brushStrokes) {
       switch (stackMode) {
+      case NoSort:
+        break;
       case Smaller:
         stroke.stack = stroke.length * stroke.widthHalf;
         break;

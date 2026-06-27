@@ -14,7 +14,6 @@
 #endif
 
 #include <QCamera>
-#include <QCameraInfo>
 #include <QApplication>
 
 TEnv::IntVar StopMotionUseDirectShow("StopMotionUseDirectShow", 1);
@@ -32,9 +31,9 @@ Webcam::~Webcam() {}
 
 //-----------------------------------------------------------------
 
-QList<QCameraInfo> Webcam::getWebcams() {
+QList<StopMotionCamera::Info> Webcam::getWebcams() {
   m_webcams.clear();
-  m_webcams = QCameraInfo::availableCameras();
+  m_webcams = StopMotionCamera::availableCameras();
   return m_webcams;
 }
 
@@ -178,7 +177,18 @@ void Webcam::clearWebcamResolutions() { m_webcamResolutions.clear(); }
 
 void Webcam::refreshWebcamResolutions() {
   clearWebcamResolutions();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  const QList<StopMotionCamera::Info> cameras =
+      StopMotionCamera::availableCameras();
+  for (const StopMotionCamera::Info& camera : cameras) {
+    if (StopMotionCamera::deviceName(camera) == m_webcamDeviceName) {
+      m_webcamResolutions = StopMotionCamera::resolutions(camera);
+      return;
+    }
+  }
+#else
   m_webcamResolutions = getWebcam()->supportedViewfinderResolutions();
+#endif
 }
 
 //-----------------------------------------------------------------

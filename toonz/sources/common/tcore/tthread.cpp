@@ -15,6 +15,7 @@
 // STL includes
 #include <set>
 #include <deque>
+#include <iterator>
 
 // tcg includes
 #include "tcg/tcg_pool.h"
@@ -738,12 +739,11 @@ void Executor::shutdown() {
     }
 
     // Finally, deal with the global queue tasks
-    QMutableMapIterator<int, RunnableP> jt(globalImp->m_tasks);
-    while (jt.hasNext()) {
-      jt.next();
+    for (QMultiMap<int, RunnableP>::iterator jt = globalImp->m_tasks.begin();
+         jt != globalImp->m_tasks.end();) {
       RunnableP task = jt.value();
       Q_EMIT task->canceled(task);
-      jt.remove();
+      jt = globalImp->m_tasks.erase(jt);
     }
 
     // Now, send the terminate() signal to all active tasks
@@ -873,13 +873,14 @@ void Executor::cancelAll() {
   // Finally, clear the global tasks list from all tasks inserted by this
   // executor
   // NOTE: An easier way here?
-  QMutableMapIterator<int, RunnableP> jt(globalImp->m_tasks);
-  while (jt.hasNext()) {
-    jt.next();
+  for (QMultiMap<int, RunnableP>::iterator jt = globalImp->m_tasks.begin();
+       jt != globalImp->m_tasks.end();) {
     if (jt.value()->m_id == m_id) {
       RunnableP task = jt.value();
       Q_EMIT task->canceled(task);
-      jt.remove();
+      jt = globalImp->m_tasks.erase(jt);
+    } else {
+      ++jt;
     }
   }
 }
@@ -1028,19 +1029,22 @@ void ExecutorImp::refreshAssignments() {
   memset(&m_waitingFlagsPool.front(), 0, m_waitingFlagsPool.size());
 
   // c) Try with the global queue
-  int e, executorsCount = m_executorIdPool.acquiredSize();
+  int e = 0, executorsCount = m_executorIdPool.acquiredSize();
 
-  int i, tasksCount = m_tasks.size();
-  QMultiMap<int, RunnableP>::iterator it;
-  for (i = 0, e = 0, it = m_tasks.end() - 1;
-       i < tasksCount && e < executorsCount; ++i, --it) {
+  int i = 0, tasksCount = m_tasks.size();
+  QMultiMap<int, RunnableP>::iterator it = m_tasks.end();
+  while (i < tasksCount && e < executorsCount && it != m_tasks.begin()) {
+    --it;
     // std::cout<< "global tasks-refreshAss" << std::endl;
     // Take the task
     RunnableP task = it.value();
     task->m_load   = task->taskLoad();
 
     UCHAR &idWaitingForAnotherTask = m_waitingFlagsPool[task->m_id->m_id];
-    if (idWaitingForAnotherTask) continue;
+    if (idWaitingForAnotherTask) {
+      ++i;
+      continue;
+    }
 
     if (!isExecutable(task)) break;
 
@@ -1051,6 +1055,8 @@ void ExecutorImp::refreshAssignments() {
       task->m_id->newWorker(task);
       it = m_tasks.erase(it);
     }
+
+    ++i;
   }
 }
 
@@ -1098,19 +1104,23 @@ inline void Worker::takeTask() {
   assert(waitingFlagsPool.size() == globalImp->m_executorIdPool.size());
   memset(&waitingFlagsPool.front(), 0, waitingFlagsPool.size());
 
-  int e, executorsCount = executorIdPool.acquiredSize();
+  int e = 0, executorsCount = executorIdPool.acquiredSize();
 
-  int i, tasksCount = globalImp->m_tasks.size();
-  QMultiMap<int, RunnableP>::iterator it;
-  for (i = 0, e = 0, it = globalImp->m_tasks.end() - 1;
-       i < tasksCount && e < executorsCount; ++i, --it) {
+  int i = 0, tasksCount = globalImp->m_tasks.size();
+  QMultiMap<int, RunnableP>::iterator it = globalImp->m_tasks.end();
+  while (i < tasksCount && e < executorsCount &&
+         it != globalImp->m_tasks.begin()) {
+    --it;
     // std::cout<< "global tasks-takeTask" << std::endl;
     // Take the first task
     RunnableP task = it.value();
     task->m_load   = task->taskLoad();
 
     UCHAR &idWaitingForAnotherTask = waitingFlagsPool[task->m_id->m_id];
-    if (idWaitingForAnotherTask) continue;
+    if (idWaitingForAnotherTask) {
+      ++i;
+      continue;
+    }
 
     if (!globalImp->isExecutable(task)) break;
 
@@ -1133,5 +1143,7 @@ inline void Worker::takeTask() {
       globalImpSlots->emitRefreshAssignments();
       break;
     }
+
+    ++i;
   }
 }

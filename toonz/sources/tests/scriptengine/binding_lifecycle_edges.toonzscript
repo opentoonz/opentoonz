@@ -1,0 +1,96 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e.message || e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var source = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var outline = new OutlineVectorizer();
+var centerline = new CenterlineVectorizer();
+var rasterizer = new Rasterizer();
+var converter = new ToonzRasterConverter();
+
+outline.accuracy = 11;
+outline.despeckling = 2;
+outline.preservePaintedAreas = true;
+outline.transparentColor = "#00ff80";
+outline.toneThreshold = 64;
+
+centerline.threshold = 4;
+centerline.maxThickness = 120;
+centerline.eir = true;
+
+rasterizer.colorMapped = true;
+rasterizer.xres = 64;
+rasterizer.yres = 48;
+rasterizer.dpi = 144;
+rasterizer.antialiasing = false;
+
+print("qt-script-binding-lifecycle-properties", outline.accuracy,
+      outline.despeckling, outline.preservePaintedAreas,
+      outline.transparentColor, outline.toneThreshold, centerline.threshold,
+      centerline.maxThickness, centerline.eir, rasterizer.colorMapped,
+      rasterizer.xres, rasterizer.yres, rasterizer.dpi,
+      rasterizer.antialiasing, converter.foo(9));
+
+outline.preservePaintedAreas = 1;
+var outlineTruthy = outline.preservePaintedAreas;
+outline.preservePaintedAreas = "";
+var outlineFalsey = outline.preservePaintedAreas;
+centerline.addBorder = 1;
+var centerlineTruthy = centerline.addBorder;
+centerline.addBorder = "";
+var centerlineFalsey = centerline.addBorder;
+rasterizer.colorMapped = 1;
+var rasterizerTruthy = rasterizer.colorMapped;
+rasterizer.colorMapped = "";
+var rasterizerFalsey = rasterizer.colorMapped;
+
+print("qt-script-binding-lifecycle-bool-coercion", outlineTruthy,
+      outlineFalsey, centerlineTruthy, centerlineFalsey, rasterizerTruthy,
+      rasterizerFalsey);
+
+var badColor = hasError(function() {
+  outline.transparentColor = "#gggggg";
+}, "not a valid color");
+var vectorImage = outline.vectorize(source);
+
+outline.dispose();
+centerline.dispose();
+rasterizer.dispose();
+converter.dispose();
+
+var disposedErrors = [
+  hasError(function() { outline.toString(); },
+           "Invalid OutlineVectorizer object"),
+  hasError(function() { var value = outline.accuracy; },
+           "Invalid OutlineVectorizer object"),
+  hasError(function() { outline.vectorize(source); },
+           "Invalid OutlineVectorizer object"),
+  hasError(function() { centerline.toString(); },
+           "Invalid CenterlineVectorizer object"),
+  hasError(function() { centerline.threshold = 8; },
+           "Invalid CenterlineVectorizer object"),
+  hasError(function() { centerline.vectorize(source); },
+           "Invalid CenterlineVectorizer object"),
+  hasError(function() { rasterizer.toString(); },
+           "Invalid Rasterizer object"),
+  hasError(function() { rasterizer.colorMapped = false; },
+           "Invalid Rasterizer object"),
+  hasError(function() { rasterizer.rasterize(vectorImage); },
+           "Invalid Rasterizer object"),
+  hasError(function() { converter.convert(source); },
+           "Invalid ToonzRasterConverter object"),
+  hasError(function() { converter.foo(9); },
+           "Invalid ToonzRasterConverter object")
+];
+
+print("qt-script-binding-lifecycle-errors", badColor, disposedErrors);
+
+vectorImage.dispose();
+source.dispose();
+
+"qt-script-binding-lifecycle-result";

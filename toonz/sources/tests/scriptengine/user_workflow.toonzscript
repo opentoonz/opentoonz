@@ -1,0 +1,104 @@
+var redBuilder = new ImageBuilder(64, 48, "Raster");
+redBuilder.fill("#ff0000");
+var redImage = redBuilder.image;
+
+var greenBuilder = new ImageBuilder(64, 48, "Raster");
+greenBuilder.fill("#00ff00");
+var greenImage = greenBuilder.image;
+
+var scene = new Scene();
+var rasterLevel = scene.newLevel("Raster", "qt6_user_workflow_raster");
+rasterLevel.setFrame("1", redImage);
+rasterLevel.setFrame("2", greenImage);
+scene.setCell(0, 0, rasterLevel, "1");
+scene.setCell(1, 0, rasterLevel, "2");
+
+var vectorizer = new OutlineVectorizer();
+vectorizer.accuracy = 6;
+vectorizer.toneThreshold = 96;
+var vectorLevel = vectorizer.vectorize(rasterLevel);
+vectorLevel.name = "qt6_user_workflow_vector";
+
+var rasterizer = new Rasterizer();
+rasterizer.colorMapped = false;
+rasterizer.xres = 80;
+rasterizer.yres = 60;
+rasterizer.dpi = 96;
+var rerasterizedLevel = rasterizer.rasterize(vectorLevel);
+rerasterizedLevel.name = "qt6_user_workflow_rerasterized";
+var sceneRerasterizedLevel =
+    scene.newLevel("Raster", "qt6_user_workflow_rerasterized_scene");
+var rerasterizedFrameIds = rerasterizedLevel.getFrameIds();
+for (var i = 0; i < rerasterizedFrameIds.length; ++i) {
+  var rerasterizedFrame = rerasterizedLevel.getFrame(rerasterizedFrameIds[i]);
+  sceneRerasterizedLevel.setFrame(rerasterizedFrameIds[i], rerasterizedFrame);
+  rerasterizedFrame.dispose();
+}
+
+scene.insertColumn(1);
+scene.setCell(0, 1, sceneRerasterizedLevel, "1");
+scene.setCell(1, 1, sceneRerasterizedLevel, "2");
+
+var scenePath = new FilePath("user_workflow_scene_" + (new Date()).getTime() + ".tnz");
+scene.save(scenePath);
+var reopenedScene = new Scene(scenePath);
+var reopenedFirstCell = reopenedScene.getCell(0, 0);
+var reopenedSecondColumnCell = reopenedScene.getCell(1, 1);
+
+print("qt-script-user-workflow-scene", scene.frameCount, scene.columnCount,
+      scene.getLevels().length >= 2, reopenedScene.frameCount,
+      reopenedScene.columnCount, reopenedFirstCell.level.name,
+      reopenedFirstCell.fid, reopenedSecondColumnCell.level.type,
+      reopenedSecondColumnCell.fid);
+
+var renderer = new Renderer();
+renderer.frames = [0, 1];
+renderer.columns = [0, 1];
+var renderedLevel = renderer.renderScene(scene);
+var renderedIds = renderedLevel.getFrameIds();
+var renderedFrameTwo = renderedLevel.getFrame("2");
+var renderedLevelPath =
+    new FilePath("toonz/build/qt6-script-smoke/user_workflow_rendered..tif");
+renderedLevel.save(renderedLevelPath);
+var reloadedRenderedLevel = new Level(renderedLevelPath);
+var reloadedRenderedFrame = reloadedRenderedLevel.getFrame("2");
+
+print("qt-script-user-workflow-render-scene", renderedLevel.type,
+      renderedLevel.frameCount, renderedIds.join(","),
+      renderedFrameTwo.type, renderedFrameTwo.width > 0,
+      renderedFrameTwo.height > 0, renderedLevelPath.exists,
+      reloadedRenderedLevel.frameCount, reloadedRenderedFrame.type);
+
+var renderedFrame = renderer.renderFrame(scene, 1);
+var renderedFramePath =
+    new FilePath("toonz/build/qt6-script-smoke/user_workflow_frame.png");
+renderedFrame.save(renderedFramePath);
+var reloadedRenderedFrameImage = new Image(renderedFramePath);
+
+print("qt-script-user-workflow-render-frame", renderedFrame.type,
+      renderedFrame.width > 0, renderedFrame.height > 0,
+      renderedFramePath.exists, reloadedRenderedFrameImage.type);
+
+reloadedRenderedFrameImage.dispose();
+renderedFrame.dispose();
+reloadedRenderedFrame.dispose();
+reloadedRenderedLevel.dispose();
+renderedFrameTwo.dispose();
+renderedLevel.dispose();
+renderer.dispose();
+reopenedFirstCell.level.dispose();
+reopenedSecondColumnCell.level.dispose();
+reopenedScene.dispose();
+sceneRerasterizedLevel.dispose();
+rerasterizedLevel.dispose();
+rasterizer.dispose();
+vectorLevel.dispose();
+vectorizer.dispose();
+rasterLevel.dispose();
+scene.dispose();
+greenImage.dispose();
+greenBuilder.dispose();
+redImage.dispose();
+redBuilder.dispose();
+
+"qt-script-user-workflow-result";

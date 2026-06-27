@@ -20,6 +20,7 @@
 #include "tundo.h"
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 #define ACCEL_KEY(k)                                                           \
   (!QCoreApplication::testAttribute(Qt::AA_DontShowShortcutsInContextMenus)    \
@@ -178,7 +179,7 @@ void SchematicName::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
   actionDelete->setEnabled(cursor.hasSelection());
   actionSelectAll->setEnabled(cursor.selectedText() != toPlainText());
 
-  popup->popup(cme->screenPos());
+  popup->popup(QtCompat::graphicsSceneContextMenuEventGlobalPosition(cme));
 }
 
 //--------------------------------------------------------
@@ -483,7 +484,7 @@ void SchematicToggle::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
     menu.addAction(cmdManager->getAction("MI_ToggleColumnsActivation"));
   }
 
-  menu.exec(cme->screenPos());
+  menu.exec(QtCompat::graphicsSceneContextMenuEventGlobalPosition(cme));
 }
 
 //========================================================
@@ -557,7 +558,8 @@ void SchematicHandleSpinBox::paint(QPainter *painter,
 void SchematicHandleSpinBox::mouseMoveEvent(QGraphicsSceneMouseEvent *me) {
   if (m_buttonState == Qt::LeftButton) {
     bool increase = false;
-    int delta     = me->screenPos().y() - me->lastScreenPos().y();
+    int delta = QtCompat::graphicsSceneMouseEventScreenPosition(me).y() -
+                QtCompat::graphicsSceneMouseEventLastScreenPosition(me).y();
     if (delta < 0) increase = true;
     m_delta += std::abs(delta);
     if (m_delta > 5) {
@@ -889,7 +891,7 @@ void SchematicPort::mousePressEvent(QGraphicsSceneMouseEvent *me) {
       && getType() != 105)  // eStageChildGroupPort
   {
     m_buttonState = Qt::LeftButton;
-    QPointF endPos(me->pos());
+    QPointF endPos(QtCompat::graphicsSceneMouseEventPositionF(me));
 
     // Enable to connect multiple links from all selected nodes
     // only when ( Ctrl + ) dragging from the eStageParentPort.

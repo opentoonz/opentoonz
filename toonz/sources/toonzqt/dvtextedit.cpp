@@ -2,6 +2,7 @@
 
 #include "toonzqt/dvtextedit.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 #include <QLabel>
 #include <QLineEdit>
@@ -10,6 +11,7 @@
 #include <QToolBar>
 #include <QFontComboBox>
 #include <QAction>
+#include <QActionGroup>
 #include <QMouseEvent>
 #include <QTextCursor>
 #include <QColorDialog>
@@ -65,7 +67,8 @@ DvMiniToolBar::~DvMiniToolBar() {}
 
 void DvMiniToolBar::mousePressEvent(QMouseEvent *e) {
   if (e->button() == Qt::LeftButton)
-    m_dragPos = e->globalPos() - frameGeometry().topLeft();
+    m_dragPos =
+        QtCompat::mouseEventGlobalPosition(e) - frameGeometry().topLeft();
 
   QWidget::mousePressEvent(e);
 }
@@ -73,7 +76,8 @@ void DvMiniToolBar::mousePressEvent(QMouseEvent *e) {
 //-----------------------------------------------------------------------------
 
 void DvMiniToolBar::mouseMoveEvent(QMouseEvent *e) {
-  if (e->buttons() == Qt::LeftButton) move(e->globalPos() - m_dragPos);
+  if (e->buttons() == Qt::LeftButton)
+    move(QtCompat::mouseEventGlobalPosition(e) - m_dragPos);
 
   QWidget::mouseMoveEvent(e);
 }
@@ -197,20 +201,20 @@ void DvTextEdit::createMiniToolBar() {
   m_fontComboBox->setMaximumHeight(20);
   m_fontComboBox->setMinimumWidth(140);
 
-  connect(m_fontComboBox, SIGNAL(activated(const QString &)), this,
-          SLOT(setTextFamily(const QString &)));
+  QtCompat::connectComboBoxTextActivated(
+      m_fontComboBox, this,
+      [this](const QString &family) { setTextFamily(family); });
 
   m_sizeComboBox = new QComboBox(toolBarUp);
   m_sizeComboBox->setEditable(true);
   m_sizeComboBox->setMaximumHeight(20);
   m_sizeComboBox->setMinimumWidth(44);
 
-  QFontDatabase db;
-  for (int size : db.standardSizes())
+  for (int size : QFontDatabase::standardSizes())
     m_sizeComboBox->addItem(QString::number(size));
 
-  connect(m_sizeComboBox, SIGNAL(activated(const QString &)), this,
-          SLOT(setTextSize(const QString &)));
+  QtCompat::connectComboBoxTextActivated(
+      m_sizeComboBox, this, [this](const QString &size) { setTextSize(size); });
 
   toolBarUp->addWidget(m_fontComboBox);
   toolBarUp->addWidget(m_sizeComboBox);
@@ -272,7 +276,7 @@ void DvTextEdit::mousePressEvent(QMouseEvent *e) {
 void DvTextEdit::mouseMoveEvent(QMouseEvent *event) {
   QTextEdit::mouseMoveEvent(event);
 
-  m_mousePos = event->pos();
+  m_mousePos = QtCompat::mouseEventPosition(event);
 }
 
 //-----------------------------------------------------------------------------
@@ -366,7 +370,7 @@ void DvTextEdit::setTextColor(const TPixel32 &color, bool isDragging) {
 
 void DvTextEdit::setTextFamily(const QString &f) {
   QTextCharFormat fmt;
-  fmt.setFontFamily(f);
+  fmt.setFontFamilies(QStringList() << f);
   mergeFormatOnWordOrSelection(fmt);
 }
 

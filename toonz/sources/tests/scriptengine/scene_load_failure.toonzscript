@@ -1,0 +1,40 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e.message || e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var image = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var scene = new Scene();
+var level = scene.newLevel("Raster", "qt6_scene_load_failure");
+level.setFrame("1", image);
+scene.setCell(0, 0, level, "1");
+scene.save(new FilePath("qt6_scene_load_failure_seed.tnz"));
+image.save(new FilePath(
+  "stuff/sandbox/scenes/qt6_scene_load_failure_non_scene.png"));
+
+var levelWrapper = scene.getLevel("qt6_scene_load_failure");
+var failedLoadError = hasError(function() {
+  scene.load(new FilePath("qt6_scene_load_failure_non_scene.png"));
+}, "Can't load this kind of file as a scene");
+var wrapperStillValid = !hasError(function() {
+  levelWrapper.setFrame("2", image);
+}, "Invalid Level object");
+var cell = scene.getCell(0, 0);
+var levelByName = scene.getLevel("qt6_scene_load_failure");
+
+print("qt-script-scene-load-failure-preserve", failedLoadError,
+      scene.frameCount, scene.columnCount, cell.level.name, cell.fid,
+      wrapperStillValid, levelWrapper.frameCount, levelByName.name);
+
+cell.level.dispose();
+levelByName.dispose();
+levelWrapper.dispose();
+level.dispose();
+scene.dispose();
+image.dispose();
+
+"qt-script-scene-load-failure-result";

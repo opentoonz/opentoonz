@@ -16,6 +16,7 @@
 #include "toonzqt/lineedit.h"
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/icongenerator.h"
+#include "toonzqt/qtcompat.h"
 
 // ToonzLib includes
 #include "toonz/toonzscene.h"
@@ -1439,8 +1440,8 @@ CleanupPopup::OverwriteDialog::OverwriteDialog()
     : DVGui::ValidatedChoiceDialog(TApp::instance()->getMainWindow()) {
   setWindowTitle(tr("Warning!"));
 
-  bool ret = connect(m_buttonGroup, SIGNAL(buttonClicked(int)),
-                     SLOT(onButtonClicked(int)));
+  bool ret = QtCompat::connectButtonGroupIdClicked(
+      m_buttonGroup, this, &OverwriteDialog::onButtonClicked);
   assert(ret);
 
   // Option 1: OVERWRITE

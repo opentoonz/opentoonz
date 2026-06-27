@@ -83,11 +83,10 @@
 // Qt includes
 #include <QMenu>
 #include <QApplication>
-#include <QScreen>
 #include <QInputMethod>
-#include <QGLContext>
 #include <QOpenGLFramebufferObject>
 #include <QMainWindow>
+#include <QElapsedTimer>
 
 #include "sceneviewer.h"
 
@@ -2048,7 +2047,7 @@ void SceneViewer::paintGL() {
 #endif
 
 #ifdef FPS_HISTOGRAM
-  QTime time;
+  QElapsedTimer time;
   time.start();
 #endif
 
@@ -2703,8 +2702,8 @@ double SceneViewer::getZoomScaleFittingWithScreen() {
 
   // add small margin on the edge of the image
   int margin = 20;
-  // get the desktop resolution
-  QRect rec = QApplication::primaryScreen()->geometry();
+  // get the viewer screen resolution
+  QRect rec = getScreenGeometry(this);
 
   // fit to either direction
   int moni_x = rec.width() - (margin * 2);

@@ -1,0 +1,74 @@
+var firstBuilder = new ImageBuilder(18, 14, "Raster");
+firstBuilder.fill("#ff0000");
+var firstImage = firstBuilder.image;
+
+var secondBuilder = new ImageBuilder(22, 16, "Raster");
+secondBuilder.fill("#00ff00");
+var secondImage = secondBuilder.image;
+
+var sourceLevel = new Level();
+sourceLevel.setFrame("1", firstImage);
+sourceLevel.setFrame("2", secondImage);
+
+var stamp = (new Date()).getTime() + "_" +
+            Math.floor(Math.random() * 1000000);
+var levelPath =
+    new FilePath("toonz/build/qt6-script-smoke/scene_load_level_sequence_" +
+                 stamp + "..tif");
+sourceLevel.save(levelPath);
+
+var scene = new Scene();
+var loaded = scene.loadLevel("qt6_scene_loaded_sequence", levelPath);
+var levels = scene.getLevels();
+var levelByName = scene.getLevel("qt6_scene_loaded_sequence");
+var loadedFirst = loaded.getFrame("1");
+var loadedSecond = loaded.getFrame("2");
+
+print("qt-script-scene-loadlevel-sequence-loaded", loaded.type, loaded.name,
+      loaded.frameCount, loaded.getFrameIds().join(","), levels.length,
+      levelByName.name, loadedFirst.type, loadedFirst.width,
+      loadedSecond.type, loadedSecond.width);
+
+scene.setCell(0, 0, "qt6_scene_loaded_sequence", "1");
+scene.setCell(1, 0, { level: loaded, fid: "2" });
+var firstCell = scene.getCell(0, 0);
+var secondCell = scene.getCell(1, 0);
+
+print("qt-script-scene-loadlevel-sequence-cells", scene.frameCount,
+      scene.columnCount, firstCell.level.name, firstCell.fid,
+      secondCell.level.name, secondCell.fid);
+
+var scenePath =
+    new FilePath("scene_load_level_sequence_" + stamp + ".tnz");
+scene.save(scenePath);
+var reopened = new Scene(scenePath);
+var reopenedFirst = reopened.getCell(0, 0);
+var reopenedSecond = reopened.getCell(1, 0);
+var reopenedLevels = reopened.getLevels();
+
+print("qt-script-scene-loadlevel-sequence-reopened", reopened.frameCount,
+      reopened.columnCount, reopenedLevels.length,
+      reopenedFirst.level.name, reopenedFirst.fid, reopenedSecond.level.name,
+      reopenedSecond.fid);
+
+reopenedFirst.level.dispose();
+reopenedSecond.level.dispose();
+for (var i = 0; i < reopenedLevels.length; ++i)
+  reopenedLevels[i].dispose();
+reopened.dispose();
+firstCell.level.dispose();
+secondCell.level.dispose();
+loadedFirst.dispose();
+loadedSecond.dispose();
+levelByName.dispose();
+for (var i = 0; i < levels.length; ++i)
+  levels[i].dispose();
+loaded.dispose();
+scene.dispose();
+sourceLevel.dispose();
+firstImage.dispose();
+secondImage.dispose();
+firstBuilder.dispose();
+secondBuilder.dispose();
+
+"qt-script-scene-loadlevel-sequence-result";

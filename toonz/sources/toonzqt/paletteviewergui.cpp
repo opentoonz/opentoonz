@@ -7,6 +7,7 @@
 #include "toonzqt/trepetitionguard.h"
 #include "toonzqt/gutil.h"
 #include "toonzqt/paletteviewer.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/selectioncommandids.h"
 #include "toonzqt/stylenameeditor.h"
 #include "toonzqt/viewcommandids.h"
@@ -956,7 +957,7 @@ void PageViewer::resizeEvent(QResizeEvent *) { computeSize(); }
 void PageViewer::mousePressEvent(QMouseEvent *event) {
   if (!m_page) return;
   TPalette *palette = m_page->getPalette();
-  QPoint pos        = event->pos();
+  QPoint pos        = QtCompat::mouseEventPosition(event);
   int indexInPage   = posToIndex(pos);
   m_startDrag       = false;
   if (!m_page) return;
@@ -1043,12 +1044,13 @@ void PageViewer::mouseMoveEvent(QMouseEvent *event) {
 
   // Se spingo ctrl mentre mi sto muovendo con almeno un item selezionato
   // abilito la possibilita' di fare drag.
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
   if (!m_startDrag && event->modifiers() == Qt::ControlModifier &&
       !m_styleSelection->isEmpty() &&
-      (event->pos() - m_dragStartPosition).manhattanLength() > 12)
+      (eventPos - m_dragStartPosition).manhattanLength() > 12)
     m_startDrag = true;
   // faccio partire il drag&drop solo se mi sono mosso di una certa quantita'
-  if ((event->pos() - m_dragStartPosition).manhattanLength() > 20 &&
+  if ((eventPos - m_dragStartPosition).manhattanLength() > 20 &&
       m_startDrag) {
     assert(m_styleSelection && !m_styleSelection->isEmpty());
     startDragDrop();
@@ -1060,7 +1062,7 @@ void PageViewer::mouseMoveEvent(QMouseEvent *event) {
 void PageViewer::mouseReleaseEvent(QMouseEvent *event) {
   if (!m_page) return;
   TPalette *palette = m_page->getPalette();
-  QPoint pos        = event->pos();
+  QPoint pos        = QtCompat::mouseEventPosition(event);
   int indexInPage   = posToIndex(pos);
   if (m_startDrag && m_dropPositionIndex == -1 &&
       event->modifiers() == Qt::ControlModifier)
@@ -1074,7 +1076,8 @@ void PageViewer::mouseReleaseEvent(QMouseEvent *event) {
    editor.
                 */
 void PageViewer::mouseDoubleClickEvent(QMouseEvent *e) {
-  int index = posToIndex(e->pos());
+  const QPoint eventPos = QtCompat::mouseEventPosition(e);
+  int index             = posToIndex(eventPos);
   if (index < 0 || index >= getChipCount()) return;
   TColorStyle *style = m_page->getStyle(index);
   if (!style) return;
@@ -1083,7 +1086,7 @@ void PageViewer::mouseDoubleClickEvent(QMouseEvent *e) {
 
   if (m_viewMode != SmallChips) {
     QRect nameRect = getColorNameRect(index);
-    if (nameRect.contains(e->pos())) {
+    if (nameRect.contains(eventPos)) {
       std::wstring styleName = style->getName();
       LineEdit *fld          = m_renameTextField;
       fld->setText(QString::fromStdWString(styleName));
@@ -1176,7 +1179,7 @@ void PageViewer::contextMenuEvent(QContextMenuEvent *event) {
 
   // Verifica se lo stile e' link.
   // Abilita e disabilita le voci di menu' in base a dove si e' cliccato.
-  int index     = posToIndex(event->pos());
+  int index     = posToIndex(QtCompat::contextMenuEventPosition(event));
   int indexPage = m_page ? m_page->getIndex() : -1;
 
   bool isLocked = m_page ? m_page->getPalette()->isLocked() : false;
@@ -1225,7 +1228,7 @@ void PageViewer::contextMenuEvent(QContextMenuEvent *event) {
     connect(newPage, SIGNAL(triggered()), SLOT(addNewPage()));
   }
 
-  menu.exec(event->globalPos());
+  menu.exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 //-----------------------------------------------------------------------------
@@ -1244,7 +1247,7 @@ void PageViewer::dragEnterEvent(QDragEnterEvent *event) {
       event->ignore();
       return;
     }
-    int index = posToIndex(event->pos());
+    int index = posToIndex(QtCompat::dropEventPosition(event));
     // non si puo' spostare qualcosa nelle prime due posizioni di pagina 0
     // (occupate da BG e FG)
     if (m_page->getIndex() == 0 && index < 2) index = 2;
@@ -1264,7 +1267,7 @@ void PageViewer::dragEnterEvent(QDragEnterEvent *event) {
                 */
 void PageViewer::dragMoveEvent(QDragMoveEvent *event) {
   if (!m_page) return;
-  int index = posToIndex(event->pos());
+  int index = posToIndex(QtCompat::dropEventPosition(event));
   if (index != m_dropPositionIndex) {
     if ((m_page->getStyleId(0) == 0 || m_page->getStyleId(1) == 1) && index < 2)
       index = 2;
@@ -1380,7 +1383,7 @@ bool PageViewer::event(QEvent *e) {
   if (m_page && e->type() == QEvent::ToolTip) {
     QHelpEvent *helpEvent = dynamic_cast<QHelpEvent *>(e);
     QString toolTip;
-    QPoint pos      = helpEvent->pos();
+    QPoint pos      = QtCompat::helpEventPosition(helpEvent);
     int indexInPage = posToIndex(pos);
     if (0 <= indexInPage && indexInPage < m_page->getStyleCount()) {
       TColorStyle *style = m_page->getStyle(indexInPage);
@@ -1399,7 +1402,7 @@ bool PageViewer::event(QEvent *e) {
       toolTip = tr("New Style");
     }
     if (toolTip != "")
-      QToolTip::showText(helpEvent->globalPos(), toolTip);
+      QToolTip::showText(QtCompat::helpEventGlobalPosition(helpEvent), toolTip);
     else
       QToolTip::hideText();
     e->accept();
@@ -1423,9 +1426,10 @@ void PageViewer::select(int indexInPage, QMouseEvent *event) {
   bool wasSelected = m_styleSelection->isSelected(pageIndex, indexInPage);
   if (event->modifiers() == Qt::NoModifier)
     m_styleSelection->selectNone();
-  else if (event->modifiers() == Qt::CTRL && wasSelected)
+  else if (event->modifiers() == Qt::ControlModifier && wasSelected)
     on = false;
-  else if (event->modifiers() == Qt::SHIFT && !m_styleSelection->isEmpty()) {
+  else if (event->modifiers() == Qt::ShiftModifier &&
+           !m_styleSelection->isEmpty()) {
     // premuto shift. la selezione si estende fino ai piu' vicini colori
     // selezionati (prima e dopo)
     // a e' b diventeranno gli estremi della selezione
@@ -1577,10 +1581,11 @@ void PaletteTabBar::mouseMoveEvent(QMouseEvent *event) {
       event->modifiers() == Qt::ControlModifier &&
       !m_pageViewer->getPage()->getPalette()->isLocked()) {
     int srcIndex = currentIndex();
-    int dstIndex = tabAt(event->pos());
+    const QPoint eventPos = QtCompat::mouseEventPosition(event);
+    int dstIndex          = tabAt(eventPos);
     if (dstIndex >= 0 && dstIndex < count() && dstIndex != srcIndex) {
       QRect rect = tabRect(srcIndex);
-      int x      = event->pos().x();
+      int x      = eventPos.x();
       if (x < rect.left() || x > rect.right()) {
         emit movePage(srcIndex, dstIndex);
       }
@@ -1595,7 +1600,7 @@ void PaletteTabBar::mouseMoveEvent(QMouseEvent *event) {
 void PaletteTabBar::mouseDoubleClickEvent(QMouseEvent *event) {
   if (!m_hasPageCommand) return;
   if (m_pageViewer->getPage()->getPalette()->isLocked()) return;
-  int index = tabAt(event->pos());
+  int index = tabAt(QtCompat::mouseEventPosition(event));
   if (index < 0) return;
   m_renameTabIndex = index;
   LineEdit *fld    = m_renameTextField;
@@ -1637,7 +1642,7 @@ void PaletteTabBar::dragMoveEvent(QDragMoveEvent *event) {
   if (paletteData->getPalette() == m_pageViewer->getPage()->getPalette() &&
       paletteData->hasOnlyPalette())
     return;
-  int tabIndex = tabAt(event->pos());
+  int tabIndex = tabAt(QtCompat::dropEventPosition(event));
   if (0 <= tabIndex && tabIndex < count())
     setCurrentIndex(tabIndex);
   else
@@ -1713,7 +1718,7 @@ void PaletteIconWidget::mousePressEvent(QMouseEvent *me) {
     return;
   }
 
-  m_mousePressPos = me->pos();
+  m_mousePressPos = QtCompat::mouseEventPosition(me);
   m_dragged       = false;
 
   me->accept();
@@ -1722,7 +1727,9 @@ void PaletteIconWidget::mousePressEvent(QMouseEvent *me) {
 //-----------------------------------------------------------------------------
 
 void PaletteIconWidget::mouseMoveEvent(QMouseEvent *me) {
-  if ((me->pos() - m_mousePressPos).manhattanLength() > 20 && !m_dragged) {
+  if ((QtCompat::mouseEventPosition(me) - m_mousePressPos).manhattanLength() >
+          20 &&
+      !m_dragged) {
     m_dragged = true;
     emit startDrag();
   }
@@ -1732,7 +1739,9 @@ void PaletteIconWidget::mouseMoveEvent(QMouseEvent *me) {
 
 //-----------------------------------------------------------------------------
 
-void PaletteIconWidget::enterEvent(QEvent *event) { m_isOver = true; }
+void PaletteIconWidget::enterEvent(QtCompat::EnterEvent *event) {
+  m_isOver = true;
+}
 
 //-----------------------------------------------------------------------------
 

@@ -6,6 +6,7 @@
 
 #include "toonzqt/doublefield.h"
 #include "toonzqt/dvdialog.h"
+#include "toonzqt/qtcompat.h"
 #include "tunit.h"
 
 #include <QDoubleValidator>
@@ -49,7 +50,7 @@ void DoubleValueLineEdit::focusOutEvent(QFocusEvent *e) {
 
 void DoubleValueLineEdit::mousePressEvent(QMouseEvent *e) {
   if (e->buttons() == Qt::MiddleButton) {
-    m_xMouse           = e->x();
+    m_xMouse           = QtCompat::mouseEventPosition(e).x();
     m_mouseDragEditing = true;
     e->accept();
   } else {
@@ -65,8 +66,9 @@ void DoubleValueLineEdit::mousePressEvent(QMouseEvent *e) {
 
 void DoubleValueLineEdit::mouseMoveEvent(QMouseEvent *e) {
   if (m_mouseDragEditing && (e->buttons() & Qt::MiddleButton)) {
-    setValue(getValue() + ((e->x() - m_xMouse) / 2));
-    m_xMouse = e->x();
+    const int mouseX = QtCompat::mouseEventPosition(e).x();
+    setValue(getValue() + ((mouseX - m_xMouse) / 2));
+    m_xMouse = mouseX;
     emit valueChanged();
     e->accept();
   } else {
@@ -625,7 +627,7 @@ void MeasuredDoubleLineEdit::timerEvent(QTimerEvent *) {
 
 void MeasuredDoubleLineEdit::mousePressEvent(QMouseEvent *e) {
   if ((e->buttons() == Qt::MiddleButton) || m_labelClicked) {
-    m_xMouse           = e->x();
+    m_xMouse           = QtCompat::mouseEventPosition(e).x();
     m_mouseDragEditing = true;
     e->accept();
   } else {
@@ -643,8 +645,9 @@ void MeasuredDoubleLineEdit::mouseMoveEvent(QMouseEvent *e) {
   if ((m_mouseDragEditing && (e->buttons() & Qt::MiddleButton)) ||
       m_labelClicked) {
     int precision = getDecimals();
-    m_value->modifyValue((e->x() - m_xMouse) / 2, precision);
-    m_xMouse = e->x();
+    const int mouseX = QtCompat::mouseEventPosition(e).x();
+    m_value->modifyValue((mouseX - m_xMouse) / 2, precision);
+    m_xMouse = mouseX;
     valueToText();
     m_modified = false;
     e->accept();

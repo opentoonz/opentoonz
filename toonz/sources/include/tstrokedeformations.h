@@ -270,6 +270,10 @@ Use this constructor with increasePoints.
   virtual ~TStrokeTwirlDeformation();
 
   TThickPoint getDisplacement(const TStroke &, double s) const override;
+  TThickPoint getDisplacementForControlPoint(const TStroke &stroke,
+                                             UINT n) const override;
+  TThickPoint getDisplacementForControlPointLen(const TStroke &stroke,
+                                                double cpLen) const override;
   double getDelta(const TStroke &, double) const override;
   double getMaxDiff() const override;
 };

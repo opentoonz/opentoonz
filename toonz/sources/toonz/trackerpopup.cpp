@@ -223,8 +223,9 @@ bool TrackerPopup::apply() {
   m_tracker =
       new Tracker(threshold, sensitivity, activeBackground, manageOcclusion,
                   variationWindow, frameStart, framesNumber);
-  if (m_tracker->getLastError() != 0) {
-    DVGui::warning(m_tracker->getLastError());
+  QString lastError = m_tracker->getLastError();
+  if (!lastError.isEmpty()) {
+    DVGui::warning(lastError);
     return false;
   }
 

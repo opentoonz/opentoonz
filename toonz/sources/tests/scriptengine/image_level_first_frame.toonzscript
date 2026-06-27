@@ -1,0 +1,34 @@
+var firstBuilder = new ImageBuilder(32, 32, "Raster");
+firstBuilder.fill("#ff0000");
+var secondBuilder = new ImageBuilder(21, 17, "Raster");
+secondBuilder.fill("#00ff00");
+
+var rasterLevel = new Level();
+rasterLevel.setFrame("1", firstBuilder.image);
+rasterLevel.setFrame("2", secondBuilder.image);
+
+var baseName = "image_level_first_frame_" + (new Date()).getTime();
+var output = new FilePath(baseName + "..tif");
+rasterLevel.save(output);
+
+var savedLevelPath = new FilePath(
+  "toonz/build/qt6-script-smoke/stuff/sandbox/" + baseName + "..tif");
+var firstImage = new Image(savedLevelPath);
+var secondFramePath = new FilePath(
+  "toonz/build/qt6-script-smoke/stuff/sandbox/" + baseName + ".0002.tif");
+var secondImage = new Image(secondFramePath);
+
+print("qt-script-image-level-first-frame", firstImage.type,
+      rasterLevel.frameCount, savedLevelPath.exists, firstImage.width,
+      firstImage.height, firstImage.dpi >= 0, firstImage.toString());
+print("qt-script-image-level-explicit-frame", secondFramePath.exists,
+      secondImage.type, secondImage.width, secondImage.height,
+      secondImage.toString());
+
+secondImage.dispose();
+firstImage.dispose();
+rasterLevel.dispose();
+secondBuilder.dispose();
+firstBuilder.dispose();
+
+"qt-script-image-level-first-frame-result";

@@ -1,0 +1,137 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "nix-common",
+      "hidden": true,
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_C_COMPILER": "$env{OPENTOONZ_CMAKE_C_COMPILER}",
+        "CMAKE_CXX_COMPILER": "$env{OPENTOONZ_CMAKE_CXX_COMPILER}",
+        "CMAKE_OSX_SYSROOT": "$env{OPENTOONZ_MACOS_SDKROOT}",
+        "CMAKE_FRAMEWORK_PATH": "$env{OPENTOONZ_MACOS_FRAMEWORK_PATH}",
+        "WITH_TRANSLATION": "OFF",
+        "WITH_SYSTEM_LZO": "ON",
+        "WITH_SYSTEM_SUPERLU": "ON",
+        "QT_PATH": "$env{OPENTOONZ_QT_PATH}",
+        "BOOST_ROOT": "$env{OPENTOONZ_BOOST_ROOT}",
+        "Boost_NO_BOOST_CMAKE": "ON",
+        "LZO_INCLUDE_DIR": "$env{OPENTOONZ_LZO_INCLUDE_DIR}",
+        "LZO_LIBRARY": "$env{OPENTOONZ_LZO_LIBRARY}",
+        "SUPERLU_INCLUDE_DIR": "$env{OPENTOONZ_SUPERLU_INCLUDE_DIR}",
+        "SUPERLU_LIBRARY": "$env{OPENTOONZ_SUPERLU_LIBRARY}"
+      }
+    },
+    {
+      "name": "nix-relwithdebinfo",
+      "displayName": "Nix RelWithDebInfo",
+      "description": "RelWithDebInfo Ninja build using dependencies from the Nix flake dev shell.",
+      "inherits": "nix-common",
+      "binaryDir": "${sourceDir}/../build/nix-relwithdebinfo",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "OPENTOONZ_QT_MAJOR": "5",
+        "Qt5_DIR": "$env{OPENTOONZ_QT5_DIR}",
+        "_Qt5UiTools_RELEASE_AGL_PATH": "$env{OPENTOONZ_QT5_AGL_COMPAT_PATH}"
+      }
+    },
+    {
+      "name": "nix-debug",
+      "displayName": "Nix Debug",
+      "description": "Debug Ninja build using dependencies from the Nix flake dev shell.",
+      "inherits": "nix-relwithdebinfo",
+      "binaryDir": "${sourceDir}/../build/nix-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "nix-deprecated-api",
+      "displayName": "Nix Deprecated Qt API Check",
+      "description": "Qt 5 configure lane that disables APIs deprecated through Qt 5.15.",
+      "inherits": "nix-relwithdebinfo",
+      "binaryDir": "${sourceDir}/../build/nix-deprecated-api",
+      "cacheVariables": {
+        "OPENTOONZ_QT_DEPRECATED_ERRORS": "ON"
+      }
+    },
+    {
+      "name": "nix-qt6-relwithdebinfo",
+      "displayName": "Nix Qt 6 RelWithDebInfo",
+      "description": "RelWithDebInfo Ninja configure lane using the Qt 6 Nix dev shell.",
+      "inherits": "nix-common",
+      "binaryDir": "${sourceDir}/../build/nix-qt6-relwithdebinfo",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "OPENTOONZ_QT_MAJOR": "6",
+        "Qt6_DIR": "$env{OPENTOONZ_QT6_DIR}"
+      }
+    },
+    {
+      "name": "nix-qt6-debug",
+      "displayName": "Nix Qt 6 Debug",
+      "description": "Debug Ninja configure lane using the Qt 6 Nix dev shell.",
+      "inherits": "nix-qt6-relwithdebinfo",
+      "binaryDir": "${sourceDir}/../build/nix-qt6-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "nix-qt6-translation-check",
+      "displayName": "Nix Qt 6 Translation Check",
+      "description": "Isolated Qt 6 configure lane with translation target generation enabled.",
+      "inherits": "nix-qt6-relwithdebinfo",
+      "binaryDir": "${sourceDir}/../build/nix-qt6-translation-check",
+      "cacheVariables": {
+        "WITH_TRANSLATION": "ON"
+      }
+    },
+    {
+      "name": "nix-qt6-deprecated-api",
+      "displayName": "Nix Qt 6 Deprecated Qt API Check",
+      "description": "Isolated Qt 6 configure lane that disables APIs deprecated through Qt 6.0.",
+      "inherits": "nix-qt6-relwithdebinfo",
+      "binaryDir": "${sourceDir}/../build/nix-qt6-deprecated-api",
+      "cacheVariables": {
+        "OPENTOONZ_QT_DEPRECATED_ERRORS": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "nix-relwithdebinfo",
+      "configurePreset": "nix-relwithdebinfo"
+    },
+    {
+      "name": "nix-debug",
+      "configurePreset": "nix-debug"
+    },
+    {
+      "name": "nix-deprecated-api",
+      "configurePreset": "nix-deprecated-api"
+    },
+    {
+      "name": "nix-qt6-relwithdebinfo",
+      "configurePreset": "nix-qt6-relwithdebinfo"
+    },
+    {
+      "name": "nix-qt6-debug",
+      "configurePreset": "nix-qt6-debug"
+    },
+    {
+      "name": "nix-qt6-translation-check",
+      "configurePreset": "nix-qt6-translation-check"
+    },
+    {
+      "name": "nix-qt6-deprecated-api",
+      "configurePreset": "nix-qt6-deprecated-api"
+    }
+  ]
+}

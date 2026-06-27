@@ -3,6 +3,7 @@
 // TnzCore includes
 #include "tsystem.h"
 #include "tpalette.h"
+#include "tthreadmessage.h"
 #include "tvectorimage.h"
 #include "tropcm.h"
 #include "timage_io.h"
@@ -180,7 +181,7 @@ private:
 
 private:
   std::deque<StrokeThicknesses> m_thicknessesBackup;
-  QMutexLocker m_mutexLocker;
+  TThread::MutexLocker m_mutexLocker;
 };
 
 //---------------------------------------------------------------------------

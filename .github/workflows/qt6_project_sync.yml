@@ -1,0 +1,64 @@
+name: Qt 6 Project Sync
+
+on:
+  workflow_run:
+    workflows:
+      - Linux Build
+      - MacOS Build
+      - Windows Build
+      - Qt 6 Experimental Binary Builds
+    types:
+      - requested
+      - in_progress
+      - completed
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: Reason for the manual sync
+        required: false
+        type: string
+  push:
+    branches:
+      - master
+    paths:
+      - .github/qt6-validation/**
+      - .github/workflows/qt6_project_sync.yml
+      - scripts/qt6/sync-github-project.mjs
+  schedule:
+    - cron: '37 */6 * * *'
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  sync:
+    name: Sync validation project
+    if: >-
+      github.repository == 'bgyss/opentoonz' &&
+      (
+        github.event_name != 'workflow_run' ||
+        github.event.workflow_run.head_branch == 'codex/qt-6-port' ||
+        github.event.workflow_run.name == 'Qt 6 Experimental Binary Builds'
+      )
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Sync GitHub Project
+        env:
+          QT6_PROJECT_TOKEN: ${{ secrets.QT6_PROJECT_TOKEN }}
+        run: |
+          if [ -z "${QT6_PROJECT_TOKEN:-}" ]; then
+            {
+              echo "## Qt 6 Project Sync"
+              echo
+              echo "Skipped: repository secret \`QT6_PROJECT_TOKEN\` is not set."
+              echo
+              echo "Create a fine-grained token that can update the bgyss user Project and store it as this repository secret."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          export GH_PROJECT_TOKEN="$QT6_PROJECT_TOKEN"
+          node scripts/qt6/sync-github-project.mjs

@@ -41,7 +41,7 @@ public:
   int m_lx;
   int m_ly;
   RasType m_rasType;
-  Header(void *mem) { memcpy(this, mem, sizeof(Header)); }
+  Header(void *mem) { memcpy(static_cast<void *>(this), mem, sizeof(Header)); }
 
 private:
   Header();  // not implemented

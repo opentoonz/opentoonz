@@ -1,0 +1,47 @@
+var image = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var scene = new Scene();
+var levelA = scene.newLevel("Raster", "qt6_scene_column_a");
+var levelB = scene.newLevel("Raster", "qt6_scene_column_b");
+levelA.setFrame("1", image);
+levelB.setFrame("1", image);
+
+scene.setCell(0, 0, levelA, "1");
+scene.setCell(1, 1, levelB, "1");
+
+var beforeA = scene.getCell(0, 0);
+var beforeB = scene.getCell(1, 1);
+print("qt-script-scene-columns-before", scene.frameCount, scene.columnCount,
+      beforeA.level.name, beforeB.level.name);
+
+scene.insertColumn(1);
+var insertA = scene.getCell(0, 0);
+var insertBlank = scene.getCell(1, 1);
+var insertB = scene.getCell(1, 2);
+print("qt-script-scene-columns-after-insert", scene.frameCount,
+      scene.columnCount, insertA.level.name, insertBlank === undefined,
+      insertB.level.name);
+
+scene.deleteColumn(0);
+var deleteBlank = scene.getCell(0, 0);
+var deleteB = scene.getCell(1, 1);
+print("qt-script-scene-columns-after-delete", scene.frameCount,
+      scene.columnCount, deleteBlank === undefined, deleteB.level.name,
+      scene.getCell(0, 1) === undefined);
+
+scene.deleteColumn(0);
+var finalB = scene.getCell(1, 0);
+print("qt-script-scene-columns-final", scene.frameCount, scene.columnCount,
+      finalB.level.name, scene.getCell(0, 0) === undefined);
+
+beforeA.level.dispose();
+beforeB.level.dispose();
+insertA.level.dispose();
+insertB.level.dispose();
+deleteB.level.dispose();
+finalB.level.dispose();
+levelA.dispose();
+levelB.dispose();
+scene.dispose();
+image.dispose();
+
+"qt-script-scene-columns-result";

@@ -1536,7 +1536,7 @@ void TRop::ropmin(const TRasterP &rup, const TRasterP &rdown,
 
       FOR_EACH_PIXEL_64_END_LOOP
     } else {
-      FOR_EACH_PIXEL_32_BEGIN_LOOP
+      FOR_EACH_PIXEL_64_BEGIN_LOOP
       if (upPix->m >= 65535) {
         outPix->r = upPix->r < downPix->r ? upPix->r : downPix->r;
         outPix->g = upPix->g < downPix->g ? upPix->g : downPix->g;
@@ -1544,7 +1544,7 @@ void TRop::ropmin(const TRasterP &rup, const TRasterP &rdown,
         outPix->m = upPix->m < downPix->m ? upPix->m : downPix->m;
 
       } else if (upPix->m) {
-        TPixel32 tmp;
+        TPixel64 tmp;
         tmp.r = upPix->r < downPix->r ? upPix->r : downPix->r;
         tmp.g = upPix->g < downPix->g ? upPix->g : downPix->g;
         tmp.b = upPix->b < downPix->b ? upPix->b : downPix->b;
@@ -1555,7 +1555,7 @@ void TRop::ropmin(const TRasterP &rup, const TRasterP &rdown,
         outPix->m = upPix->m * (tmp.m - downPix->m) / 65535.0 + downPix->m;
       } else
         *outPix = *downPix;
-      FOR_EACH_PIXEL_32_END_LOOP
+      FOR_EACH_PIXEL_64_END_LOOP
     }
     return;
   }

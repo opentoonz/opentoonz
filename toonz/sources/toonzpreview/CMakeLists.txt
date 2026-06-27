@@ -23,7 +23,7 @@ target_include_directories(toonzpreview PRIVATE
     ../include/toonzqt
     ../include/toonz
     ../include/tcg
-    ${Qt5Widgets_INCLUDE_DIRS}
+    ${OPENTOONZ_QT_WIDGETS_INCLUDE_DIRS}
 )
 
 target_link_libraries(toonzpreview PRIVATE
@@ -31,7 +31,7 @@ target_link_libraries(toonzpreview PRIVATE
     toonzqt
     shlwapi
     tnzcore
-    Qt5::Core
+    ${QT_CORE_LINK_TARGETS}
     ${OpenCV_LIBS}
 )
 

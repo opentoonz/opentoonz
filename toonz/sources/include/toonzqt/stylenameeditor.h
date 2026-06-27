@@ -4,6 +4,7 @@
 #define STYLENAMEEDITOR_H
 
 #include "dvdialog.h"
+#include "toonzqt/qtcompat.h"
 
 #include <QWidget>
 #include <QStringList>
@@ -81,7 +82,7 @@ public:
   EasyInputArea(QWidget *parent = 0);
 
 protected:
-  void enterEvent(QEvent *) override;
+  void enterEvent(QtCompat::EnterEvent *) override;
   void resizeEvent(QResizeEvent *) override;
 
 protected slots:
@@ -112,7 +113,7 @@ public:
 protected:
   void showEvent(QShowEvent *) override;
   void hideEvent(QHideEvent *) override;
-  void enterEvent(QEvent *) override;
+  void enterEvent(QtCompat::EnterEvent *) override;
 
 protected slots:
   void onStyleSwitched();

@@ -626,12 +626,11 @@ void MovieRenderer::Imp::doRenderRasterCompleted(const RenderData &renderData) {
       // Unlock the mutex only in case this is NOT a movie type. Single images
       // can be saved concurrently.
       struct MutexUnlocker {
-        QMutexLocker *m_locker;
+        decltype(locker) *m_locker;
         ~MutexUnlocker() {
           if (m_locker) m_locker->relock();
         }
-      } unlocker = {requireSeq ? (QMutexLocker *)0
-                               : (locker.unlock(), &locker)};
+      } unlocker = {requireSeq ? 0 : (locker.unlock(), &locker)};
 
       savedFrame = saveFrame(frame, rasters);
     }

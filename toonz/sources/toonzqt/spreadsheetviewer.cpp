@@ -2,6 +2,7 @@
 
 #include "toonzqt/spreadsheetviewer.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 #include "toonz/preferences.h"
 #include "toonz/toonzfolders.h"
 #include "toonz/tframehandle.h"
@@ -234,10 +235,10 @@ PanTool::PanTool(Spreadsheet::GenericPanel *panel)
     : m_panel(panel), m_viewer(panel->getViewer()), m_lastPos() {}
 
 void PanTool::click(int row, int col, QMouseEvent *e) {
-  m_lastPos = e->pos();  // m_panel->mapToGlobal(e->pos());
+  m_lastPos = QtCompat::mouseEventPosition(e);
 }
 void PanTool::drag(int row, int col, QMouseEvent *e) {
-  QPoint pos = e->pos();  // m_panel->mapToGlobal(e->pos());
+  QPoint pos = QtCompat::mouseEventPosition(e);
   // QPoint delta = p - m_lastPos;
   // m_lastPos = p;
   // QToolTip::showText(p,"delta="+QString::number(delta.x())+","+QString::number(delta.y()));
@@ -295,14 +296,16 @@ void GenericPanel::mousePressEvent(QMouseEvent *e) {
   else
     m_dragTool = createDragTool(e);
 
-  CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
+  const QPoint eventPos     = QtCompat::mouseEventPosition(e);
+  CellPosition cellPosition = getViewer()->xyToPosition(eventPos);
   int row                   = cellPosition.frame();
   int col                   = cellPosition.layer();
   if (m_dragTool) m_dragTool->click(row, col, e);
 }
 
 void GenericPanel::mouseReleaseEvent(QMouseEvent *e) {
-  CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
+  const QPoint eventPos     = QtCompat::mouseEventPosition(e);
+  CellPosition cellPosition = getViewer()->xyToPosition(eventPos);
   int row                   = cellPosition.frame();
   int col                   = cellPosition.layer();
   m_viewer->stopAutoPan();
@@ -314,14 +317,15 @@ void GenericPanel::mouseReleaseEvent(QMouseEvent *e) {
 }
 
 void GenericPanel::mouseMoveEvent(QMouseEvent *e) {
-  CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
+  const QPoint eventPos     = QtCompat::mouseEventPosition(e);
+  CellPosition cellPosition = getViewer()->xyToPosition(eventPos);
   int row                   = cellPosition.frame();
   int col                   = cellPosition.layer();
   if (e->buttons() != 0 && m_dragTool != 0) {
     if ((e->buttons() & Qt::LeftButton) != 0 &&
-        !visibleRegion().contains(e->pos())) {
+        !visibleRegion().contains(eventPos)) {
       QRect bounds = visibleRegion().boundingRect();
-      m_viewer->setAutoPanSpeed(bounds, e->pos());
+      m_viewer->setAutoPanSpeed(bounds, eventPos);
     } else
       m_viewer->stopAutoPan();
     m_dragTool->drag(row, col, e);
@@ -882,12 +886,13 @@ degli scrollbar.
 void SpreadsheetViewer::wheelEvent(QWheelEvent *event) {
   switch (event->source()) {
   case Qt::MouseEventNotSynthesized: {
-    if (event->angleDelta().x() == 0) {  // vertical scroll
-      int scrollPixels = (event->angleDelta().y() > 0 ? 1 : -1) *
+    const QPoint angleDelta = QtCompat::wheelEventAngleDelta(event);
+    if (angleDelta.x() == 0) {  // vertical scroll
+      int scrollPixels = (angleDelta.y() > 0 ? 1 : -1) *
                          m_markRowDistance * m_rowHeight;
       scroll(QPoint(0, -scrollPixels));
     } else {  // horizontal scroll
-      int scrollPixels = (event->angleDelta().x() > 0 ? 1 : -1) * m_columnWidth;
+      int scrollPixels = (angleDelta.x() > 0 ? 1 : -1) * m_columnWidth;
       scroll(QPoint(-scrollPixels, 0));
     }
     break;
@@ -895,8 +900,8 @@ void SpreadsheetViewer::wheelEvent(QWheelEvent *event) {
 
   case Qt::MouseEventSynthesizedBySystem:  // macbook touch-pad
   {
-    QPoint numPixels  = event->pixelDelta();
-    QPoint numDegrees = event->angleDelta() / 8;
+    QPoint numPixels  = QtCompat::wheelEventPixelDelta(event);
+    QPoint numDegrees = QtCompat::wheelEventAngleDelta(event) / 8;
     if (!numPixels.isNull()) {
       scroll(-numPixels);
     } else if (!numDegrees.isNull()) {
@@ -923,13 +928,6 @@ void SpreadsheetViewer::timerEvent(QTimerEvent *e) {
   if (!isAutoPanning()) return;
   scroll(m_autoPanSpeed);
   m_lastAutoPanPos += m_autoPanSpeed;
-  /*
-if(m_dragTool)
-{
-QMouseEvent mouseEvent(QEvent::MouseMove, m_lastAutoPanPos, Qt::NoButton, 0, 0);
-m_dragTool->onDrag(&mouseEvent);
-}
-*/
 }
 
 void SpreadsheetViewer::keyPressEvent(QKeyEvent *e) {

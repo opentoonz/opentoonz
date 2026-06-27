@@ -3,6 +3,11 @@
 #ifndef TVER_INCLUDED
 #define TVER_INCLUDED
 
+#include "tbuildinfo.h"
+
+#include <cstdlib>
+#include <string>
+
 namespace TVER {
 
 class ToonzVersion {
@@ -13,16 +18,17 @@ public:
   std::string getAppNote(void);
   std::string getSystemVarPrefix(void);
   bool hasAppNote(void);
+  bool hasAppRevision(void);
   std::string getAppVersionString(void);
   std::string getAppRevisionString(void);
+  std::string getAppFullVersionString(void);
   std::string getAppVersionInfo(std::string msg);
 
 private:
-  const char *applicationName     = "OpenToonz";
-  const float applicationVersion  = 1.8f;
-  const float applicationRevision = 0;
-  const char *applicationNote     = "";
-  const char *systemVarPrefix     = "TOONZ";
+  const char *applicationName    = "OpenToonz";
+  const char *applicationVersion = OPENTOONZ_APP_VERSION;
+  const char *applicationNote    = "";
+  const char *systemVarPrefix    = "TOONZ";
 };
 
 std::string ToonzVersion::getAppName(void) {
@@ -30,12 +36,10 @@ std::string ToonzVersion::getAppName(void) {
   return appname;
 }
 float ToonzVersion::getAppVersion(void) {
-  float appver = applicationVersion;
-  return appver;
+  return static_cast<float>(std::atof(getAppVersionString().c_str()));
 }
 float ToonzVersion::getAppRevision(void) {
-  float apprev = applicationRevision;
-  return apprev;
+  return static_cast<float>(std::atof(getAppRevisionString().c_str()));
 }
 std::string ToonzVersion::getAppNote(void) {
   std::string appnote = applicationNote;
@@ -46,23 +50,37 @@ std::string ToonzVersion::getSystemVarPrefix(void) {
   return prefix;
 }
 bool ToonzVersion::hasAppNote(void) { return *applicationNote != 0; }
+bool ToonzVersion::hasAppRevision(void) {
+  return !getAppRevisionString().empty();
+}
 std::string ToonzVersion::getAppVersionString(void) {
-  char buffer[50];
-  snprintf(buffer, sizeof(buffer), "%.1f", applicationVersion);
-  std::string appver = std::string(buffer);
-  return appver;
+  std::string fullVersion = applicationVersion;
+  std::string::size_type firstDot = fullVersion.find('.');
+  if (firstDot == std::string::npos) return fullVersion;
+
+  std::string::size_type secondDot = fullVersion.find('.', firstDot + 1);
+  if (secondDot == std::string::npos) return fullVersion;
+
+  return fullVersion.substr(0, secondDot);
 }
 std::string ToonzVersion::getAppRevisionString(void) {
-  char buffer[50];
-  snprintf(buffer, sizeof(buffer), "%g", applicationRevision);
-  std::string apprev = std::string(buffer);
-  return apprev;
+  std::string fullVersion = applicationVersion;
+  std::string::size_type firstDot = fullVersion.find('.');
+  if (firstDot == std::string::npos) return "";
+
+  std::string::size_type secondDot = fullVersion.find('.', firstDot + 1);
+  if (secondDot == std::string::npos || secondDot + 1 == fullVersion.size())
+    return "";
+
+  return fullVersion.substr(secondDot + 1);
+}
+std::string ToonzVersion::getAppFullVersionString(void) {
+  return std::string(applicationVersion);
 }
 std::string ToonzVersion::getAppVersionInfo(std::string msg) {
   std::string appinfo = std::string(applicationName);
   appinfo += " " + msg + " v";
-  appinfo += getAppVersionString();
-  appinfo += "." + getAppRevisionString();
+  appinfo += getAppFullVersionString();
   if (hasAppNote()) appinfo += " " + std::string(applicationNote);
   return appinfo;
 }

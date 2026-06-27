@@ -2,6 +2,7 @@
 
 // TnzQt includes
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/toonzfolders.h"
@@ -105,7 +106,7 @@ void WordButton::contextMenuEvent(QContextMenuEvent* event) {
   QAction* removeAct = new QAction(tr("Remove %1").arg(text()), &menu);
   bool ret = connect(removeAct, SIGNAL(triggered()), this, SLOT(onRemove()));
   menu.addAction(removeAct);
-  menu.exec(event->globalPos());
+  menu.exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 //------------------------------------------------------------
@@ -324,7 +325,7 @@ void EasyInputArea::onRemoveWord(const QString& word) {
 
 //------------------------------------------------------------
 
-void EasyInputArea::enterEvent(QEvent*) { emit mouseEnter(); }
+void EasyInputArea::enterEvent(QtCompat::EnterEvent*) { emit mouseEnter(); }
 
 //------------------------------------------------------------
 
@@ -521,7 +522,7 @@ void StyleNameEditor::onCancelPressed() { close(); }
 
 //-------
 // focus when the mouse enters
-void StyleNameEditor::enterEvent(QEvent* e) {
+void StyleNameEditor::enterEvent(QtCompat::EnterEvent* e) {
   activateWindow();
   m_styleName->setFocus();
 }

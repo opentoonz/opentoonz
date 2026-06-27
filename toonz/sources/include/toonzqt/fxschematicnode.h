@@ -39,7 +39,6 @@ class FxSchematicOutputNode;
 
 class FxColumnPainter final : public QObject, public QGraphicsItem {
   Q_OBJECT
-  Q_INTERFACES(QGraphicsItem)
 
   FxSchematicColumnNode *m_parent;
   double m_width, m_height;
@@ -72,7 +71,6 @@ protected:
 
 class FxPalettePainter final : public QObject, public QGraphicsItem {
   Q_OBJECT
-  Q_INTERFACES(QGraphicsItem)
 
   FxSchematicPaletteNode *m_parent;
   double m_width, m_height;
@@ -98,7 +96,6 @@ protected:
 
 class FxPainter final : public QObject, public QGraphicsItem {
   Q_OBJECT
-  Q_INTERFACES(QGraphicsItem)
 
   FxSchematicNode *m_parent;
   double m_width, m_height;
@@ -130,7 +127,6 @@ protected:
 
 class FxXSheetPainter final : public QObject, public QGraphicsItem {
   Q_OBJECT
-  Q_INTERFACES(QGraphicsItem)
 
   double m_width, m_height;
 
@@ -154,7 +150,6 @@ protected:
 
 class FxOutputPainter final : public QObject, public QGraphicsItem {
   Q_OBJECT
-  Q_INTERFACES(QGraphicsItem)
 
   double m_width, m_height;
   bool m_isActive;
@@ -609,7 +604,6 @@ protected slots:
 class FxSchematicPassThroughNode;
 class FxPassThroughPainter final : public QObject, public QGraphicsItem {
   Q_OBJECT
-  Q_INTERFACES(QGraphicsItem)
 
   double m_width, m_height;
   QString m_name;

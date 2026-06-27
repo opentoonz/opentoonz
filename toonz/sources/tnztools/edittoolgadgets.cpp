@@ -24,7 +24,6 @@
 #include "toonz/tcamera.h"
 
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QVector2D>
 
 using namespace EditToolGadgets;

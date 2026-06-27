@@ -3,6 +3,7 @@
 #include "toonzqt/intfield.h"
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 #include <QIntValidator>
 #include <QSlider>
@@ -79,7 +80,7 @@ void RollerField::paintEvent(QPaintEvent *e) {
 
 void RollerField::mousePressEvent(QMouseEvent *e) {
   if (e->buttons() == Qt::LeftButton) {
-    m_xPos = e->pos().x();
+    m_xPos = QtCompat::mouseEventPosition(e).x();
     e->accept();
   }
 }
@@ -88,11 +89,12 @@ void RollerField::mousePressEvent(QMouseEvent *e) {
 
 void RollerField::mouseMoveEvent(QMouseEvent *e) {
   if (e->buttons() == Qt::LeftButton) {
-    if (m_xPos < e->pos().x())
+    const int mouseX = QtCompat::mouseEventPosition(e).x();
+    if (m_xPos < mouseX)
       addValue(true);
-    else if (m_xPos > e->pos().x())
+    else if (m_xPos > mouseX)
       removeValue(true);
-    m_xPos = e->pos().x();
+    m_xPos = mouseX;
     e->accept();
   }
 }
@@ -229,7 +231,7 @@ void IntLineEdit::setLineEditBackgroundColor(QColor color) {
 
 void IntLineEdit::mousePressEvent(QMouseEvent *e) {
   if (e->buttons() == Qt::MiddleButton) {
-    m_xMouse           = e->x();
+    m_xMouse           = QtCompat::mouseEventPosition(e).x();
     m_mouseDragEditing = true;
   } else {
     QLineEdit::mousePressEvent(e);
@@ -244,8 +246,9 @@ void IntLineEdit::mousePressEvent(QMouseEvent *e) {
 
 void IntLineEdit::mouseMoveEvent(QMouseEvent *e) {
   if (e->buttons() == Qt::MiddleButton) {
-    setValue(getValue() + ((e->x() - m_xMouse) / 2));
-    m_xMouse = e->x();
+    const int mouseX = QtCompat::mouseEventPosition(e).x();
+    setValue(getValue() + ((mouseX - m_xMouse) / 2));
+    m_xMouse = mouseX;
   } else
     QLineEdit::mouseMoveEvent(e);
 }

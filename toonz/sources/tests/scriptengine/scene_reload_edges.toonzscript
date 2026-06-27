@@ -1,0 +1,65 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e.message || e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var image = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var stamp = (new Date()).getTime();
+var scenePathA = new FilePath("scene_reload_a_" + stamp + ".tnz");
+var scenePathB = new FilePath("scene_reload_b_" + stamp + ".tnz");
+
+var scene = new Scene();
+var levelA = scene.newLevel("Raster", "qt6_scene_reload_a");
+levelA.setFrame("1", image);
+scene.setCell(0, 0, levelA, "1");
+var levelAWrapper = scene.getLevel("qt6_scene_reload_a");
+var cellA = scene.getCell(0, 0);
+print("qt-script-scene-reload-first", scene.frameCount, scene.columnCount,
+      scene.getLevels().length, cellA.level.name, cellA.fid);
+scene.save(scenePathA);
+
+var otherScene = new Scene();
+var levelB = otherScene.newLevel("Raster", "qt6_scene_reload_b");
+levelB.setFrame("1", image);
+otherScene.setCell(0, 0, levelB, "1");
+otherScene.save(scenePathB);
+
+scene.load(scenePathB);
+var cellB = scene.getCell(0, 0);
+var levelAInvalid = hasError(function() {
+  levelAWrapper.setFrame("2", image);
+}, "Invalid Level object");
+print("qt-script-scene-reload-second", scene.frameCount, scene.columnCount,
+      scene.getLevels().length,
+      scene.getLevel("qt6_scene_reload_a") === undefined,
+      cellB.level.name, cellB.fid, levelAWrapper.type,
+      levelAWrapper.frameCount, levelAWrapper.toString(),
+      levelAWrapper.name === "", levelAInvalid);
+
+var levelBWrapper = cellB.level;
+scene.load(scenePathA);
+var cellAReloaded = scene.getCell(0, 0);
+var levelBInvalid = hasError(function() {
+  levelBWrapper.load(new FilePath("missing_level..tif"));
+}, "Invalid Level object");
+print("qt-script-scene-reload-third", scene.frameCount, scene.columnCount,
+      scene.getLevels().length,
+      scene.getLevel("qt6_scene_reload_b") === undefined,
+      cellAReloaded.level.name, cellAReloaded.fid, levelBWrapper.type,
+      levelBWrapper.frameCount, levelBInvalid);
+
+cellA.level.dispose();
+levelAWrapper.dispose();
+levelA.dispose();
+cellB.level.dispose();
+levelB.dispose();
+otherScene.dispose();
+cellAReloaded.level.dispose();
+scene.dispose();
+image.dispose();
+
+"qt-script-scene-reload-result";

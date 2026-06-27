@@ -108,7 +108,11 @@ void JpgConverter::saveJpg(TRaster32P image, TFilePath path) {
   if (success) {
     /* Write the JPEG image to disk. */
     QFile fullImage(path.getQString());
-    fullImage.open(QIODevice::WriteOnly);
+    if (!fullImage.open(QIODevice::WriteOnly)) {
+      tjFree(jpegBuf);
+      jpegBuf = NULL;
+      return;
+    }
     QDataStream dataStream(&fullImage);
     dataStream.writeRawData((const char*)jpegBuf, jpegSize);
     fullImage.close();

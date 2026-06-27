@@ -11,6 +11,7 @@
 #include "toonzqt/gutil.h"
 #include "toonzqt/fxselection.h"
 #include "toonzqt/tselectionhandle.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/pluginloader.h"  // inter-module plugin loader accessor
 
 // TnzLib includes
@@ -571,7 +572,7 @@ void InsertFxPopup::contextMenuEvent(QContextMenuEvent *event) {
         menu->addAction(remove);
       }
     }
-    menu->exec(event->globalPos());
+    menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
   }
 }
 

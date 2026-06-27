@@ -1,0 +1,9 @@
+if (typeof qtScriptRunFilePathCounter === "undefined")
+  qtScriptRunFilePathCounter = 0;
+
+qtScriptRunFilePathCounter += 1;
+qtScriptRunFilePathGlobal = "filepath-child-global";
+
+print("qt-script-run-filepath-child", qtScriptRunFilePathCounter);
+
+["filepath-child", qtScriptRunFilePathCounter, true];

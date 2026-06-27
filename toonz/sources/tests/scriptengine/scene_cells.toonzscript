@@ -1,0 +1,32 @@
+var image = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var scene = new Scene();
+var level = scene.newLevel("Raster", "qt6_cell_raster");
+level.setFrame("1", image);
+
+scene.setCell(0, 0, level, "1");
+var first = scene.getCell(0, 0);
+print("qt-script-scene-cell-first", scene.frameCount, scene.columnCount,
+      first.level.type, first.level.name, first.fid);
+
+scene.setCell(1, 0, first);
+var copied = scene.getCell(1, 0);
+print("qt-script-scene-cell-copy", scene.frameCount, copied.level.name,
+      copied.fid);
+
+scene.setCell(2, 0, "qt6_cell_raster", "1");
+var byName = scene.getCell(2, 0);
+print("qt-script-scene-cell-name", scene.frameCount, byName.level.name,
+      byName.fid);
+
+scene.setCell(0, 0);
+print("qt-script-scene-cell-clear", scene.getCell(0, 0) === undefined,
+      scene.getCell(1, 0).fid);
+
+first.level.dispose();
+copied.level.dispose();
+byName.level.dispose();
+level.dispose();
+scene.dispose();
+image.dispose();
+
+"qt-script-scene-cell-result";

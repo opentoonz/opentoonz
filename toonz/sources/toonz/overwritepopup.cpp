@@ -11,6 +11,7 @@
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/lineedit.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/toonzscene.h"
@@ -55,8 +56,8 @@ OverwriteDialog::OverwriteDialog()
 
   QButtonGroup *buttonGroup = new QButtonGroup(this);
   buttonGroup->setExclusive(true);
-  bool ret = connect(buttonGroup, SIGNAL(buttonClicked(int)), this,
-                     SLOT(onButtonClicked(int)));
+  bool ret = QtCompat::connectButtonGroupIdClicked(
+      buttonGroup, this, &OverwriteDialog::onButtonClicked);
 
   beginVLayout();
 

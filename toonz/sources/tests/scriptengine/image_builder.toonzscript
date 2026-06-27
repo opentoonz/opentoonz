@@ -1,0 +1,60 @@
+var source = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+
+var identity = new Transform();
+var shifted = identity.translate(4, 6);
+var rotated = identity.rotate(90);
+var scaled = identity.scale(2);
+var nonUniformScaled = identity.scale(2, 3);
+var shiftedRotated = shifted.rotate(90);
+print("qt-script-imagebuilder-transform", identity.toString(),
+      shifted.toString());
+print("qt-script-imagebuilder-transform-variants", rotated.toString(),
+      scaled.toString(), nonUniformScaled.toString(),
+      shiftedRotated.toString());
+
+var builder = new ImageBuilder(source.width + 8, source.height + 6);
+builder.add(source, shifted);
+
+var composite = builder.image;
+var output = new FilePath("toonz/build/qt6-script-smoke/image_builder.png");
+composite.save(output);
+
+var reloaded = new Image(output);
+print("qt-script-imagebuilder-composite", builder.toString(), composite.type,
+      composite.width, composite.height, output.exists, reloaded.width,
+      reloaded.height);
+
+var clearReturn = builder.clear();
+builder.fill("#FF8800");
+var filled = builder.image;
+print("qt-script-imagebuilder-filled", builder.toString(), filled.type,
+      filled.width, filled.height, clearReturn === undefined);
+
+var typed = new ImageBuilder(12, 10, "Raster");
+typed.fill("transparent");
+var typedImage = typed.image;
+print("qt-script-imagebuilder-typed", typed.toString(), typedImage.type,
+      typedImage.width, typedImage.height);
+
+var typedToonz = new ImageBuilder(9, 7, "ToonzRaster");
+var typedToonzImage = typedToonz.image;
+print("qt-script-imagebuilder-typed-toonz", typedToonz.toString(),
+      typedToonzImage.type, typedToonzImage.width, typedToonzImage.height);
+
+typedToonzImage.dispose();
+typedToonz.dispose();
+typedImage.dispose();
+typed.dispose();
+filled.dispose();
+reloaded.dispose();
+composite.dispose();
+builder.dispose();
+shiftedRotated.dispose();
+nonUniformScaled.dispose();
+scaled.dispose();
+rotated.dispose();
+shifted.dispose();
+identity.dispose();
+source.dispose();
+
+"qt-script-imagebuilder-result";

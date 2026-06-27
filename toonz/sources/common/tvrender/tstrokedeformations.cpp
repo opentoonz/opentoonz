@@ -558,6 +558,25 @@ TThickPoint TStrokeTwirlDeformation::getDisplacement(const TStroke &stroke,
 
 //-----------------------------------------------------------------------------
 
+TThickPoint TStrokeTwirlDeformation::getDisplacementForControlPoint(
+    const TStroke &stroke, UINT n) const {
+  double outVal = 0;
+
+  double distance2 = tdistance2(convert(stroke.getControlPoint(n)), m_center);
+
+  if (distance2 <= m_innerRadius2)
+    outVal = wyvillPotential(distance2, m_innerRadius2);
+
+  return TThickPoint(m_vectorOfMovement * outVal, 0);
+}
+
+TThickPoint TStrokeTwirlDeformation::getDisplacementForControlPointLen(
+    const TStroke &stroke, double cpLen) const {
+  return getDisplacement(stroke, stroke.getParameterAtLength(cpLen));
+}
+
+//-----------------------------------------------------------------------------
+
 double TStrokeTwirlDeformation::getDelta(const TStroke &stroke,
                                          double s) const {
   /*

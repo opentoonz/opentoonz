@@ -38,6 +38,7 @@
 
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/icongenerator.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/selection.h"
 #include "toonzqt/gutil.h"
 
@@ -47,7 +48,7 @@
 
 #include <QPainter>
 #include <QPainterPath>
-#include <QGLWidget>  // for QGLWidget::convertToGLFormat
+#include <QImage>
 #include <QFont>
 #include <QFontMetrics>
 
@@ -1684,7 +1685,7 @@ void ToolUtils::drawBalloon(const TPointD &pos, std::string text,
   p.setFont(font);
   p.drawText(textRect, Qt::AlignCenter | Qt::TextDontClip, qText);
 
-  QImage texture = QGLWidget::convertToGLFormat(label);
+  QImage texture = QtCompat::convertToGLFormat(label);
 
   glRasterPos2f(pos.x, pos.y);
   glBitmap(0, 0, 0, 0, 0, -size.height() + (y + delta.y), NULL);  //
@@ -1738,7 +1739,7 @@ void ToolUtils::drawHook(const TPointD &pos, ToolUtils::HookType type,
     painter.drawLine(r, 0, r, d);
   }
 
-  QImage texture = QGLWidget::convertToGLFormat(image);
+  QImage texture = QtCompat::convertToGLFormat(image);
   glRasterPos2f(pos.x, pos.y);
   glBitmap(0, 0, 0, 0, -r * devPixRatio, -r * devPixRatio, NULL);
   glEnable(GL_BLEND);

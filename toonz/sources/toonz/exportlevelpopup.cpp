@@ -21,6 +21,7 @@
 #include "toonzqt/planeviewer.h"
 #include "toonzqt/framenavigator.h"
 #include "toonzqt/imageutils.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/txsheet.h"
@@ -337,7 +338,11 @@ ExportLevelPopup::ExportLevelPopup()
   ret      = connect(m_format, SIGNAL(currentIndexChanged(const QString &)),
                      SLOT(onformatChanged(const QString &))) &&
         ret;
-  ret = connect(m_retas, SIGNAL(stateChanged(int)), SLOT(onRetas(int))) && ret;
+  ret = static_cast<bool>(QtCompat::connectCheckStateChanged(
+            m_retas, this, [this](Qt::CheckState state) {
+              onRetas(static_cast<int>(state));
+            })) &&
+        ret;
   ret = connect(m_formatOptions, SIGNAL(clicked()), SLOT(onOptionsClicked())) &&
         ret;
   ret = connect(&m_levelFrameIndexHandle, SIGNAL(frameSwitched()),
@@ -692,10 +697,7 @@ bool ExportLevelPopup::execute() {
       QString("%1 Levels Exported").arg(m_levelExportedCount), buttons);
   if (tmp == 2) {
     TFilePath folderPath = TFilePath(m_browser->getFolder());
-    if (TSystem::isUNC(folderPath))
-      QDesktopServices::openUrl(QUrl(folderPath.getQString()));
-    else
-      QDesktopServices::openUrl(QUrl::fromLocalFile(folderPath.getQString()));
+    QDesktopServices::openUrl(QtCompat::localFileUrl(folderPath.getQString()));
   }
   // Reuse END
 

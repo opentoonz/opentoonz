@@ -11,6 +11,7 @@
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/tscenehandle.h"
@@ -143,7 +144,7 @@ void CommandBar::contextMenuEvent(QContextMenuEvent *event) {
   QAction *customizeCommandBar = menu->addAction(tr("Customize Command Bar"));
   connect(customizeCommandBar, SIGNAL(triggered()),
           SLOT(doCustomizeCommandBar()));
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 //-----------------------------------------------------------------------------

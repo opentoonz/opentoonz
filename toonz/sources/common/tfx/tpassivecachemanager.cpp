@@ -432,7 +432,6 @@ TPassiveCacheManager::TPassiveCacheManager()
 #endif
     , m_enabled(true)
     , m_descriptorCallback(0)
-    , m_mutex(QMutex::Recursive)
     , m_resources(new ResourcesContainer) {
   reset();
 }

@@ -1,6 +1,7 @@
 
 
 #include "docklayout.h"
+#include "toonzqt/gutil.h"
 
 #include <assert.h>
 #include <math.h>
@@ -8,7 +9,7 @@
 
 #include <QTextStream>
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QIODevice>
 
 //========================================================
 // TO DO:
@@ -1524,7 +1525,7 @@ bool DockLayout::restoreState(const State &state) {
     }
 
   // Recover available geometry infos
-  // QRect availableRect= QApplication::desktop()->availableGeometry();
+  // QRect availableRect = getAvailableScreenGeometry();
   int recoverX = 0, recoverY = 0;
 
   // Deal with floating panels
@@ -1534,8 +1535,7 @@ bool DockLayout::restoreState(const State &state) {
     if (item->m_saveIndex > 0) {
       // Ensure that floating panels are not placed in
       // unavailable positions
-      if ((geoms[j] & QApplication::desktop()->availableGeometry(item))
-              .isEmpty())
+      if ((geoms[j] & getAvailableScreenGeometry(item)).isEmpty())
         item->move(recoverX += 50, recoverY += 50);
 
       // Set floating appearances

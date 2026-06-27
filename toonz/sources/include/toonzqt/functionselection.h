@@ -32,6 +32,7 @@ class TFrameHandle;
 
 class ColumnToCurveMapper {
 public:
+  virtual ~ColumnToCurveMapper() {}
   virtual TDoubleParam *getCurve(int columnIndex) const = 0;
 };
 

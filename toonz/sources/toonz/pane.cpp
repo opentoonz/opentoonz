@@ -10,6 +10,7 @@
 #include "custompanelmanager.h"
 
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/preferences.h"
@@ -23,6 +24,7 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include <QMainWindow>
+#include <QActionGroup>
 #include <QSettings>
 #include <QMap>
 #include <QMenu>
@@ -32,7 +34,6 @@
 #include <QDialog>
 #include <QLineEdit>
 #include <QTextEdit>
-#include <QScreen>
 #include <QGlobalStatic>
 #include <memory>
 #include <utility>
@@ -156,7 +157,7 @@ void TPanel::onCustomContextMenuRequested(const QPoint &pos) {
 //-----------------------------------------------------------------------------
 /*! activate the panel and set focus specified widget when mouse enters
  */
-void TPanel::enterEvent(QEvent *event) {
+void TPanel::enterEvent(QtCompat::EnterEvent *event) {
   // Only when Toonz application is active
   QWidget *w = QApplication::activeWindow();
   if (w) {
@@ -212,15 +213,7 @@ void TPanel::restoreFloatingPanelState() {
 
   QRect geom = settings.value(QStringLiteral("geometry"), geometry()).toRect();
 
-  // Check if the geometry is visible on any available screen (modern API)
-  bool visible = false;
-  for (QScreen *screen : QGuiApplication::screens()) {
-    if (screen->availableGeometry().intersects(geom)) {
-      visible = true;
-      break;
-    }
-  }
-  if (visible) setGeometry(geom);
+  if (intersectsAvailableScreenGeometry(geom)) setGeometry(geom);
 
   // load optional settings
   if (auto *persistent = dynamic_cast<SaveLoadQSettings *>(widget()))
@@ -233,24 +226,9 @@ void TPanel::restoreFloatingPanelState() {
 void TPanel::zoomContentsAndFitGeometry(bool forward) {
   if (!isFloating()) return;
 
-  auto getScreen = [&]() -> QScreen * {
-    QScreen *ret = nullptr;
-    ret          = QGuiApplication::screenAt(geometry().topLeft());
-    if (ret) return ret;
-    ret = QGuiApplication::screenAt(geometry().topRight());
-    if (ret) return ret;
-    ret = QGuiApplication::screenAt(geometry().center());
-    if (ret) return ret;
-    ret = QGuiApplication::screenAt(geometry().bottomLeft());
-    if (ret) return ret;
-    ret = QGuiApplication::screenAt(geometry().bottomRight());
-    return ret;
-  };
-
   // Get screen geometry
-  QScreen *screen = getScreen();
-  if (!screen) return;
-  const QRect screenGeom = screen->availableGeometry();
+  const QRect screenGeom = getAvailableScreenGeometry(geometry(), this);
+  if (screenGeom.isEmpty()) return;
 
   QSize newSize;
   if (forward)
@@ -538,7 +516,7 @@ void TPanelTitleBarButton::mouseMoveEvent(QMouseEvent *event) {}
 
 //-----------------------------------------------------------------------------
 
-void TPanelTitleBarButton::enterEvent(QEvent *) {
+void TPanelTitleBarButton::enterEvent(QtCompat::EnterEvent *) {
   if (!m_rollover) {
     m_rollover = true;
     if (!m_pressed) update();
@@ -660,7 +638,7 @@ void TPanelTitleBarButtonForSafeArea::contextMenuEvent(QContextMenuEvent *e) {
     }
   }
 
-  menu.exec(e->globalPos());
+  menu.exec(QtCompat::contextMenuEventGlobalPosition(e));
 }
 
 //-----------------------------------------------------------------------------
@@ -716,7 +694,7 @@ void TPanelTitleBarButtonForPreview::contextMenuEvent(QContextMenuEvent *e) {
     if (i == EnvViewerPreviewBehavior) action->setChecked(true);
   }
 
-  menu.exec(e->globalPos());
+  menu.exec(QtCompat::contextMenuEventGlobalPosition(e));
 }
 
 //-----------------------------------------------------------------------------
@@ -859,7 +837,7 @@ void TPanelTitleBar::leaveEvent(QEvent *) {
 void TPanelTitleBar::mousePressEvent(QMouseEvent *event) {
   auto *dw = static_cast<TDockWidget *>(parentWidget());
 
-  const QPoint pos = event->pos();
+  const QPoint pos = QtCompat::mouseEventPosition(event);
 
   if (dw->isFloating()) {
     const QRect rect = this->rect();
@@ -881,7 +859,7 @@ void TPanelTitleBar::mouseMoveEvent(QMouseEvent *event) {
   auto *dw = static_cast<TDockWidget *>(parentWidget());
 
   if (dw->isFloating()) {
-    const QPoint pos = event->pos();
+    const QPoint pos = QtCompat::mouseEventPosition(event);
     const QRect rect = this->rect();
     const QRect closeButtonRect(rect.right() - 18, rect.top() + 1, 18, 18);
 

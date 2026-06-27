@@ -3,7 +3,7 @@
 #include "tparamuiconcept.h"
 #include "iwa_fresnel.h"
 
-#include <QMatrix>
+#include <QTransform>
 
 namespace {
 
@@ -508,7 +508,7 @@ inline void Iwa_FloorBumpFx::initVars(FloorBumpVars &vars, TTile &tile,
   // distance from the Eye (P) to the center of the projection plane (T)
   vars.d_PT = vars.H / (2.0 * tan(angle_halfFov));
 
-  QMatrix cam_tilt;
+  QTransform cam_tilt;
   cam_tilt.rotate(-vars.angle_el / M_PI_180);
   // Z-Y position of the center of top edge of the projection plane (A)
   vars.A =

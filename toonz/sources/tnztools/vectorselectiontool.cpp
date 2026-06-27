@@ -1260,7 +1260,7 @@ public:
 
   ~UndoReorderStrokes() {}
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Sort Vector Strokes With Palette Order Level : %1")
         .arg(QString::fromStdWString(m_level->getName()));
   }

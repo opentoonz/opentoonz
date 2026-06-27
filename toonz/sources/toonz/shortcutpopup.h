@@ -9,6 +9,7 @@
 #include <QKeySequenceEdit>
 #include "filebrowserpopup.h"
 #include "toonzqt/dvdialog.h"
+#include "toonzqt/qtcompat.h"
 
 // forward declaration
 class QPushButton;
@@ -34,7 +35,7 @@ public:
   ~ShortcutViewer();
 
 protected:
-  void enterEvent(QEvent *event) override;
+  void enterEvent(QtCompat::EnterEvent *event) override;
   void leaveEvent(QEvent *event) override;
   void keyPressEvent(QKeyEvent *event) override;
 

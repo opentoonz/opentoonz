@@ -3,6 +3,7 @@
 #include "toonzqt/intpairfield.h"
 
 #include "toonzqt/dvdialog.h"
+#include "toonzqt/qtcompat.h"
 
 #include "tcommon.h"
 
@@ -250,7 +251,7 @@ void IntPairField::getRange(int &minValue, int &maxValue) {
 
 void IntPairField::mousePressEvent(QMouseEvent *event) {
   if (event->button() == Qt::LeftButton) {
-    int x = event->pos().x();
+    int x = QtCompat::mouseEventPosition(event).x();
     int cur0, cur1;
     if (m_values.first > m_maxValue)
       cur0 = value2pos(m_maxValue) - 5;
@@ -288,7 +289,7 @@ void IntPairField::mousePressEvent(QMouseEvent *event) {
 void IntPairField::mouseMoveEvent(QMouseEvent *event) {
   if (event->buttons()) {
     std::pair<int, int> oldValues = m_values;
-    int x                         = event->pos().x() + m_grabOffset;
+    int x = QtCompat::mouseEventPosition(event).x() + m_grabOffset;
     setValue(pos2value(x));
     if (oldValues == m_values) return;
 

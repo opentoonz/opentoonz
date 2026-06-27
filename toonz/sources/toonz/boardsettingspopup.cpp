@@ -9,6 +9,7 @@
 #include "toonzqt/filefield.h"
 #include "toonzqt/colorfield.h"
 #include "toonzqt/intfield.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toutputproperties.h"
@@ -182,6 +183,7 @@ void BoardView::resizeEvent(QResizeEvent* event) {
 }
 
 void BoardView::mouseMoveEvent(QMouseEvent* event) {
+  QPointF eventPos = QtCompat::mouseEventPosition(event);
   // mouse move - change drag item
   if (!(event->buttons() & Qt::LeftButton)) {
     if (!currentBoardItem()) {
@@ -190,7 +192,7 @@ void BoardView::mouseMoveEvent(QMouseEvent* event) {
       return;
     }
 
-    QPointF posOnImg = QPointF(event->pos()) - m_boardImgRect.topLeft();
+    QPointF posOnImg = eventPos - m_boardImgRect.topLeft();
 
     QRectF itemRect =
         currentBoardItem()->getItemRect(m_boardImgRect.size().toSize());
@@ -247,7 +249,7 @@ void BoardView::mouseMoveEvent(QMouseEvent* event) {
 
   if (m_dragStartItemRect.isNull()) return;
 
-  QPointF posOnImg = QPointF(event->pos()) - m_boardImgRect.topLeft();
+  QPointF posOnImg = eventPos - m_boardImgRect.topLeft();
   QPointF ratioPos = QPointF(posOnImg.x() / m_boardImgRect.width(),
                              posOnImg.y() / m_boardImgRect.height());
 
@@ -330,7 +332,8 @@ void BoardView::mousePressEvent(QMouseEvent* event) {
   if (event->button() != Qt::LeftButton) return;
   // store the current item rect and mouse pos, relative to the image size
   m_dragStartItemRect = currentBoardItem()->getRatioRect();
-  QPointF posOnImg    = QPointF(event->pos()) - m_boardImgRect.topLeft();
+  QPointF posOnImg =
+      QPointF(QtCompat::mouseEventPosition(event)) - m_boardImgRect.topLeft();
   m_dragStartPos      = QPointF(posOnImg.x() / m_boardImgRect.width(),
                                 posOnImg.y() / m_boardImgRect.height());
 }
@@ -469,8 +472,9 @@ ItemInfoView::ItemInfoView(QWidget* parent) : QStackedWidget(parent) {
                             SLOT(onNameEdited()));
   ret      = ret && connect(m_maxFontSizeEdit, SIGNAL(editingFinished()), this,
                             SLOT(onMaxFontSizeEdited()));
-  ret      = ret && connect(m_typeCombo, SIGNAL(activated(int)), this,
-                            SLOT(onTypeComboActivated(int)));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_typeCombo, this,
+                   [this](int index) { onTypeComboActivated(index); }));
   ret      = ret && connect(m_textEdit, SIGNAL(textChanged()), this,
                             SLOT(onFreeTextChanged()));
   ret      = ret && connect(m_imgPathField, SIGNAL(pathChanged()), this,
@@ -484,8 +488,9 @@ ItemInfoView::ItemInfoView(QWidget* parent) : QStackedWidget(parent) {
   ret = ret &&
         connect(m_fontColorField, SIGNAL(colorChanged(const TPixel32&, bool)),
                 this, SLOT(onFontColorChanged(const TPixel32&, bool)));
-  ret = ret && connect(m_imgARModeCombo, SIGNAL(activated(int)), this,
-                       SLOT(onImgARModeComboActivated()));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_imgARModeCombo, this,
+                   [this](int) { onImgARModeComboActivated(); }));
   assert(ret);
 }
 
@@ -1220,7 +1225,7 @@ void BoardSettingsPopup::onExportBoardImage() {
     iw->setProperties(outputSettings->getFileFormatProperties(fp.getType()));
 
     TRaster32P raster(boardImg.width(), boardImg.height());
-    convertImageToRaster(raster, boardImg.mirrored(true, true));
+    convertImageToRaster(raster, QtCompat::mirroredImage(boardImg, true, true));
 
     TRasterImageP ri(raster);
 

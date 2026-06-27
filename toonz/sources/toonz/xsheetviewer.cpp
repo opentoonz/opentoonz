@@ -17,6 +17,7 @@
 #include "toutputproperties.h"
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/icongenerator.h"
+#include "toonzqt/qtcompat.h"
 #include "cellselection.h"
 #include "keyframeselection.h"
 #include "cellkeyframeselection.h"
@@ -734,8 +735,10 @@ void XsheetViewer::timerEvent(QTimerEvent *) {
   if (!isAutoPanning()) return;
   scroll(m_autoPanSpeed);
   if (!m_dragTool) return;
-  QMouseEvent mouseEvent(QEvent::MouseMove, m_lastAutoPanPos - m_autoPanSpeed,
-                         Qt::NoButton, Qt::MouseButtons(), m_qtModifiers);
+  const QPoint mousePos = m_lastAutoPanPos - m_autoPanSpeed;
+  QMouseEvent mouseEvent = QtCompat::makeMouseEvent(
+      QEvent::MouseMove, mousePos, mapToGlobal(mousePos), Qt::NoButton,
+      Qt::MouseButtons(), m_qtModifiers);
   m_dragTool->onDrag(&mouseEvent);
   m_lastAutoPanPos += m_autoPanSpeed;
 }
@@ -1205,14 +1208,16 @@ void XsheetViewer::wheelEvent(QWheelEvent *event) {
   switch (event->source()) {
   case Qt::MouseEventNotSynthesized: {
     if (0 != (event->modifiers() & Qt::ControlModifier) &&
-        event->angleDelta().y() != 0) {
-      QPoint pos(event->position().x() - m_columnArea->geometry().width() +
+        QtCompat::wheelEventAngleDeltaY(event) != 0) {
+      const QPoint eventPos = QtCompat::wheelEventPosition(event);
+      QPoint pos(eventPos.x() - m_columnArea->geometry().width() +
                      m_cellArea->visibleRegion().boundingRect().left(),
-                 event->position().y());
+                 eventPos.y());
       int targetFrame = xyToPosition(pos).frame();
 
       int newFactor =
-          getFrameZoomFactor() + ((event->angleDelta().y() > 0 ? 1 : -1) * 10);
+          getFrameZoomFactor() +
+          ((QtCompat::wheelEventAngleDeltaY(event) > 0 ? 1 : -1) * 10);
       if (newFactor > XsheetGUI::ZOOM_FACTOR_MAX)
         newFactor = XsheetGUI::ZOOM_FACTOR_MAX;
       else if (newFactor < XsheetGUI::ZOOM_FACTOR_MIN)
@@ -1230,14 +1235,15 @@ void XsheetViewer::wheelEvent(QWheelEvent *event) {
         ->getProperties()
         ->getMarkers(markerDistance, markerOffset, secDistance);
 
-    if (event->angleDelta().x() == 0) {  // vertical scroll
+    const QPoint angleDelta = QtCompat::wheelEventAngleDelta(event);
+    if (angleDelta.x() == 0) {  // vertical scroll
       if (!orientation()->isVerticalTimeline()) markerDistance = 1;
-      int scrollPixels = (event->angleDelta().y() > 0 ? 1 : -1) *
+      int scrollPixels = (angleDelta.y() > 0 ? 1 : -1) *
                          markerDistance * orientation()->cellHeight();
       scroll(QPoint(0, -scrollPixels));
     } else {  // horizontal scroll
       if (orientation()->isVerticalTimeline()) markerDistance = 1;
-      int scrollPixels = (event->angleDelta().x() > 0 ? 1 : -1) *
+      int scrollPixels = (angleDelta.x() > 0 ? 1 : -1) *
                          markerDistance * orientation()->cellWidth();
       scroll(QPoint(-scrollPixels, 0));
     }
@@ -1246,8 +1252,8 @@ void XsheetViewer::wheelEvent(QWheelEvent *event) {
 
   case Qt::MouseEventSynthesizedBySystem:  // macbook touch-pad
   {
-    QPoint numPixels  = event->pixelDelta();
-    QPoint numDegrees = event->angleDelta() / 8;
+    QPoint numPixels  = QtCompat::wheelEventPixelDelta(event);
+    QPoint numDegrees = QtCompat::wheelEventAngleDelta(event) / 8;
     if (!numPixels.isNull()) {
       scroll(-numPixels);
     } else if (!numDegrees.isNull()) {
@@ -1420,7 +1426,7 @@ void XsheetViewer::keyReleaseEvent(QKeyEvent *event) {
   }
 }
 
-void XsheetViewer::enterEvent(QEvent *) {
+void XsheetViewer::enterEvent(QtCompat::EnterEvent *) {
   m_cellArea->onControlPressed(false);
   m_columnArea->onControlPressed(false);
   TApp *app = TApp::instance();
@@ -1888,12 +1894,12 @@ void XsheetViewer::load(QSettings &settings) {
   QVariant zoomFactor = settings.value("frameZoomFactor");
   QVariant name       = settings.value("orientation");
 
-  if (zoomFactor.canConvert(QVariant::Int)) {
+  if (zoomFactor.canConvert<int>()) {
     m_frameZoomFactor = zoomFactor.toInt();
     m_layerFooterPanel->setZoomSliderValue(m_frameZoomFactor);
   }
 
-  if (name.canConvert(QVariant::String)) {
+  if (name.canConvert<QString>()) {
     m_orientation = Orientations::byName(name.toString());
     emit orientationChanged(orientation());
   }

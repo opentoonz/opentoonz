@@ -1,0 +1,31 @@
+var source = new FilePath("toonz/sources/tnztools/Resources/brush.png");
+var image = new Image(source);
+
+print("qt-script-image-loaded", image.type, image.width, image.height,
+      image.toString(), image.dpi >= 0);
+
+var output = new FilePath("toonz/build/qt6-script-smoke/image_basic_saved.png");
+image.save(output);
+var reloaded = new Image(output);
+print("qt-script-image-saved", output.exists, reloaded.type, reloaded.width,
+      reloaded.height);
+
+var scene = new Scene();
+var level = scene.newLevel("Raster", "qt6_image_raster");
+level.setFrame("1", image);
+
+var frame = level.getFrame("1");
+var frameByIndex = level.getFrameByIndex(0);
+var frameIds = level.getFrameIds();
+
+print("qt-script-image-level", level.type, level.frameCount, frameIds[0],
+      frame.type, frame.width, frameByIndex.height);
+
+frame.dispose();
+frameByIndex.dispose();
+level.dispose();
+scene.dispose();
+reloaded.dispose();
+image.dispose();
+
+"qt-script-image-result";

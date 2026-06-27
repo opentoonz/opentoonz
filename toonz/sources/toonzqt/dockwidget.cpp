@@ -2,13 +2,14 @@
 
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
+#include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 #include "docklayout.h"
 
 // Qt includes
 #include <QEvent>
 #include <QMouseEvent>
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QScreen>
 
 // STD includes
@@ -79,9 +80,7 @@ inline QRect toRect(const QRectF &rect) {
 
 //========================================================
 
-// Forward declaration
 namespace {
-QDesktopWidget *desktop;
 void getClosestAvailableMousePosition(QPoint &globalPos);
 }  // namespace
 
@@ -128,8 +127,6 @@ DockWidget::DockWidget(QWidget *parent, Qt::WindowFlags flags)
 
   m_decoAllocator = new DockDecoAllocator;
 
-  // Make sure the desktop is initialized and known
-  desktop = qApp->desktop();
 }
 
 //-------------------------------------
@@ -221,7 +218,7 @@ void DockWidget::hoverMoveEvent(QHoverEvent *he) {
   if (m_floating && !m_resizing && !m_undocking) {
     QCursor newCursor = Qt::ArrowCursor;
 
-    if ((m_marginType = isResizeGrip(he->pos()))) {
+    if ((m_marginType = isResizeGrip(QtCompat::hoverEventPosition(he)))) {
       // Hovering a margin - update cursor shape
       if (m_marginType & leftMargin) {
         if (m_marginType & topMargin)
@@ -254,7 +251,8 @@ void DockWidget::hoverMoveEvent(QHoverEvent *he) {
 
 //! b)  Trigger a window drag if press is over a drag grip
 void DockWidget::mousePressEvent(QMouseEvent *me) {
-  if ((m_marginType = m_floating ? isResizeGrip(me->pos()) : 0)) {
+  const QPoint mousePos = QtCompat::mouseEventPosition(me);
+  if ((m_marginType = m_floating ? isResizeGrip(mousePos) : 0)) {
     // Resize begins
 
     // NOTE: It is better to assume that resize grips dominate over drag grips:
@@ -262,12 +260,13 @@ void DockWidget::mousePressEvent(QMouseEvent *me) {
     // that mouse cursor changes are always consistent with resize events.
 
     m_resizing            = true;
-    m_dragMouseInitialPos = me->globalPos();  // Re-used as old position
-  } else if (isDragGrip(me->pos())) {
+    m_dragMouseInitialPos =
+        QtCompat::mouseEventGlobalPosition(me);  // Re-used as old position
+  } else if (isDragGrip(mousePos)) {
     // Dragging begins
     DockingCheck *lock = DockingCheck::instance();  // Docking system lock
 
-    m_dragMouseInitialPos = me->globalPos();
+    m_dragMouseInitialPos = QtCompat::mouseEventGlobalPosition(me);
     m_dragInitialPos      = pos();
     // Grab mouse inputs - useful if widget gets under placeholders
     if (me->type() == QEvent::NonClientAreaMouseButtonPress)
@@ -291,7 +290,7 @@ void DockWidget::mousePressEvent(QMouseEvent *me) {
 //-------------------------------------
 
 void DockWidget::mouseMoveEvent(QMouseEvent *me) {
-  QPoint correctedGlobalPos(me->globalPos());
+  QPoint correctedGlobalPos(QtCompat::mouseEventGlobalPosition(me));
   getClosestAvailableMousePosition(correctedGlobalPos);
 
   if (m_resizing) {
@@ -322,7 +321,8 @@ void DockWidget::mouseMoveEvent(QMouseEvent *me) {
     move(m_dragInitialPos + correctedGlobalPos - m_dragMouseInitialPos);
     selectDockPlaceholder(me);
   } else if (m_undocking) {
-    int distance = absoluteDistance(me->globalPos(), m_dragMouseInitialPos);
+    int distance = absoluteDistance(QtCompat::mouseEventGlobalPosition(me),
+                                    m_dragMouseInitialPos);
     if (distance > 8) {
       m_undocking = false;
 
@@ -380,7 +380,7 @@ void DockWidget::mouseReleaseEvent(QMouseEvent *me) {
 //! DockWidgets respond to title bar double clicks maximizing the widget in
 //! layout's contents rect.
 void DockWidget::mouseDoubleClickEvent(QMouseEvent *me) {
-  if (!m_floating && isDragGrip(me->pos())) {
+  if (!m_floating && isDragGrip(QtCompat::mouseEventPosition(me))) {
     parentLayout()->setMaximized(this, !m_maximized);
   }
 }
@@ -399,10 +399,10 @@ void DockWidget::wheelEvent(QWheelEvent *we) {
   if (m_dragging) {
     if (m_selectedPlace) {
       DockPlaceholder *newSelected =
-          (we->angleDelta().y() > 0)
+          (QtCompat::wheelEventAngleDeltaY(we) > 0)
               ? m_selectedPlace->parentPlaceholder()
               : m_selectedPlace->childPlaceholder(parentWidget()->mapFromGlobal(
-                    we->globalPosition().toPoint()));
+                    QtCompat::wheelEventGlobalPosition(we)));
       if (newSelected != m_selectedPlace) {
         m_selectedPlace->hide();
         newSelected->show();
@@ -426,7 +426,8 @@ void DockWidget::wheelEvent(QWheelEvent *we) {
 QWidget *DockWidget::hoveredWidget(QMouseEvent *me) {
   if (!m_parentLayout) return 0;
 
-  QPoint point = parentWidget()->mapFromGlobal(me->globalPos());
+  QPoint point =
+      parentWidget()->mapFromGlobal(QtCompat::mouseEventGlobalPosition(me));
   return m_parentLayout->containerOf(point);
 }
 
@@ -488,9 +489,10 @@ void DockWidget::selectDockPlaceholder(QMouseEvent *me) {
   DockPlaceholder *selected = 0;
 
   // Search placeholders containing mouse position
+  const QPoint globalPos = QtCompat::mouseEventGlobalPosition(me);
   unsigned int i;
   for (i = 0; i < m_placeholders.size(); ++i) {
-    if (m_placeholders[i]->geometry().contains(me->globalPos())) {
+    if (m_placeholders[i]->geometry().contains(globalPos)) {
       selected = m_placeholders[i];
     }
   }
@@ -779,7 +781,7 @@ DockSeparator::DockSeparator(DockLayout *owner, bool orientation,
 void DockSeparator::mousePressEvent(QMouseEvent *me) {
   m_pressed = true;
 
-  m_oldPos = me->globalPos();
+  m_oldPos = QtCompat::mouseEventGlobalPosition(me);
 
   const std::deque<DockSeparator *> &sepList = m_parentRegion->separators();
   const std::deque<Region *> &childList      = m_parentRegion->getChildList();
@@ -843,9 +845,10 @@ inline void DockSeparator::mouseReleaseEvent(QMouseEvent *me) {
 void DockSeparator::mouseMoveEvent(QMouseEvent *me) {
   if (m_pressed) {
     double movedPosition, newPosition;
+    const QPoint globalPos = QtCompat::mouseEventGlobalPosition(me);
 
     if (m_orientation == Region::horizontal) {
-      double dx = me->globalX() - m_oldPos.x();
+      double dx = globalPos.x() - m_oldPos.x();
       movedPosition =
           getParentRegion()->childRegion(m_index)->getGeometry().right() + dx;
       newPosition =
@@ -895,7 +898,7 @@ void DockSeparator::mouseMoveEvent(QMouseEvent *me) {
         m_owner->update();
       }
     } else {
-      double dy = me->globalY() - m_oldPos.y();
+      double dy = globalPos.y() - m_oldPos.y();
       movedPosition =
           getParentRegion()->childRegion(m_index)->getGeometry().bottom() + dy;
       newPosition =
@@ -943,7 +946,7 @@ void DockSeparator::mouseMoveEvent(QMouseEvent *me) {
       }
     }
 
-    m_oldPos = QPoint(me->globalX(), me->globalY());
+    m_oldPos = globalPos;
   }
 }
 

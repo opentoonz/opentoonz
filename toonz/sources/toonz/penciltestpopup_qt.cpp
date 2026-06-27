@@ -15,6 +15,7 @@
 #include "toonzqt/filefield.h"
 #include "toonzqt/intfield.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 // Tnzlib includes
 #include "toonz/tproject.h"
@@ -65,13 +66,13 @@
 #include <QGridLayout>
 #include <QToolButton>
 #include <QDateTime>
-#include <QMultimedia>
 #include <QPainter>
 #include <QKeyEvent>
 #include <QCommonStyle>
 #include <QTimer>
 #include <QIntValidator>
-#include <QRegExpValidator>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 
 #include <QVideoSurfaceFormat>
 #include <QThreadPool>
@@ -726,9 +727,10 @@ void MyVideoWidget::drawSubCamera(QPainter& p) {
 
 void MyVideoWidget::mouseMoveEvent(QMouseEvent* event) {
   int d = 10;
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
 
   auto isNearBy = [&](QPoint handlePos) -> bool {
-    return (handlePos - event->pos()).manhattanLength() <= d * 2;
+    return (handlePos - eventPos).manhattanLength() <= d * 2;
   };
 
   auto isNearEdge = [&](int handlePos, int mousePos) -> bool {
@@ -742,9 +744,9 @@ void MyVideoWidget::mouseMoveEvent(QMouseEvent* event) {
   if (event->buttons() == Qt::NoButton) {
     QRect vidSubRect    = m_surface->transform().mapRect(m_subCameraRect);
     SUBHANDLE preHandle = m_activeSubHandle;
-    if (!vidSubRect.adjusted(-d, -d, d, d).contains(event->pos()))
+    if (!vidSubRect.adjusted(-d, -d, d, d).contains(eventPos))
       m_activeSubHandle = HandleNone;
-    else if (vidSubRect.adjusted(d, d, -d, -d).contains(event->pos()))
+    else if (vidSubRect.adjusted(d, d, -d, -d).contains(eventPos))
       m_activeSubHandle = HandleFrame;
     else if (isNearBy(vidSubRect.topLeft()))
       m_activeSubHandle = HandleTopLeft;
@@ -754,13 +756,13 @@ void MyVideoWidget::mouseMoveEvent(QMouseEvent* event) {
       m_activeSubHandle = HandleBottomLeft;
     else if (isNearBy(vidSubRect.bottomRight()))
       m_activeSubHandle = HandleBottomRight;
-    else if (isNearEdge(vidSubRect.left(), event->pos().x()))
+    else if (isNearEdge(vidSubRect.left(), eventPos.x()))
       m_activeSubHandle = HandleLeft;
-    else if (isNearEdge(vidSubRect.top(), event->pos().y()))
+    else if (isNearEdge(vidSubRect.top(), eventPos.y()))
       m_activeSubHandle = HandleTop;
-    else if (isNearEdge(vidSubRect.right(), event->pos().x()))
+    else if (isNearEdge(vidSubRect.right(), eventPos.x()))
       m_activeSubHandle = HandleRight;
-    else if (isNearEdge(vidSubRect.bottom(), event->pos().y()))
+    else if (isNearEdge(vidSubRect.bottom(), eventPos.y()))
       m_activeSubHandle = HandleBottom;
     else
       m_activeSubHandle = HandleNone;
@@ -805,7 +807,7 @@ void MyVideoWidget::mouseMoveEvent(QMouseEvent* event) {
     int minimumSize = 100;
 
     QPoint offset =
-        m_surface->transform().inverted().map(event->pos()) - m_dragStartPos;
+        m_surface->transform().inverted().map(eventPos) - m_dragStartPos;
     if (m_activeSubHandle >= HandleTopLeft &&
         m_activeSubHandle <= HandleBottomRight) {
       QSize offsetSize = m_preSubCameraRect.size();
@@ -871,7 +873,8 @@ void MyVideoWidget::mousePressEvent(QMouseEvent* event) {
 
   // record the original sub camera size
   m_preSubCameraRect = m_subCameraRect;
-  m_dragStartPos     = m_surface->transform().inverted().map(event->pos());
+  m_dragStartPos =
+      m_surface->transform().inverted().map(QtCompat::mouseEventPosition(event));
 
   // temporary stop the camera
   emit stopCamera();
@@ -898,14 +901,16 @@ FrameNumberLineEdit::FrameNumberLineEdit(QWidget* parent, TFrameId fId,
     : LineEdit(parent) {
   if (acceptLetter) {
     QString regExpStr   = QString("^%1$").arg(TFilePath::fidRegExpStr());
-    m_regexpValidator   = new QRegExpValidator(QRegExp(regExpStr), this);
+    m_regexpValidator =
+        new QRegularExpressionValidator(QRegularExpression(regExpStr), this);
     TProjectManager* pm = TProjectManager::instance();
     pm->addListener(this);
   } else
-    m_regexpValidator = new QRegExpValidator(QRegExp("^\\d{1,4}$"), this);
+    m_regexpValidator = new QRegularExpressionValidator(
+        QRegularExpression("^\\d{1,4}$"), this);
 
-  m_regexpValidator_alt =
-      new QRegExpValidator(QRegExp("^\\d{1,3}[A-Ia-i]?$"), this);
+  m_regexpValidator_alt = new QRegularExpressionValidator(
+      QRegularExpression("^\\d{1,3}[A-Ia-i]?$"), this);
 
   updateValidator();
   updateSize();
@@ -971,22 +976,23 @@ TFrameId FrameNumberLineEdit::getValue() {
     return TFrameId(f);
   } else {
     QString regExpStr = QString("^%1$").arg(TFilePath::fidRegExpStr());
-    QRegExp rx(regExpStr);
-    int pos = rx.indexIn(text());
-    if (pos < 0) return TFrameId();
-    if (rx.cap(2).isEmpty())
-      return TFrameId(rx.cap(1).toInt());
+    QRegularExpression rx(regExpStr);
+    QRegularExpressionMatch match = rx.match(text());
+    if (!match.hasMatch()) return TFrameId();
+    if (match.captured(2).isEmpty())
+      return TFrameId(match.captured(1).toInt());
     else
-      return TFrameId(rx.cap(1).toInt(), rx.cap(2));
+      return TFrameId(match.captured(1).toInt(), match.captured(2));
   }
 }
 
 //-----------------------------------------------------------------------------
 
 void FrameNumberLineEdit::onProjectSwitched() {
-  QRegExpValidator* oldValidator = m_regexpValidator;
+  QRegularExpressionValidator* oldValidator = m_regexpValidator;
   QString regExpStr = QString("^%1$").arg(TFilePath::fidRegExpStr());
-  m_regexpValidator = new QRegExpValidator(QRegExp(regExpStr), this);
+  m_regexpValidator =
+      new QRegularExpressionValidator(QRegularExpression(regExpStr), this);
   updateValidator();
   if (oldValidator) delete oldValidator;
 }
@@ -1012,8 +1018,8 @@ LevelNameLineEdit::LevelNameLineEdit(QWidget* parent)
     : QLineEdit(parent), m_textOnFocusIn("") {
   // Exclude all character which cannot fit in a filepath (Win).
   // Dots are also prohibited since they are internally managed by Toonz.
-  QRegExp rx("[^\\\\/:?*.\"<>|]+");
-  setValidator(new QRegExpValidator(rx, this));
+  QRegularExpression rx("[^\\\\/:?*.\"<>|]+");
+  setValidator(new QRegularExpressionValidator(rx, this));
   setObjectName("LargeSizedText");
 
   connect(this, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
@@ -1146,11 +1152,11 @@ PencilTestSaveInFolderPopup::PencilTestSaveInFolderPopup(QWidget* parent)
   addButtonBarWidget(okBtn, cancelBtn);
 
   //---- layout
-  m_topLayout->setMargin(10);
+  m_topLayout->setContentsMargins(10, 10, 10, 10);
   m_topLayout->setSpacing(10);
   {
     QGridLayout* saveInLay = new QGridLayout();
-    saveInLay->setMargin(0);
+    saveInLay->setContentsMargins(0, 0, 0, 0);
     saveInLay->setHorizontalSpacing(3);
     saveInLay->setVerticalSpacing(0);
     {
@@ -1166,11 +1172,11 @@ PencilTestSaveInFolderPopup::PencilTestSaveInFolderPopup(QWidget* parent)
     m_topLayout->addWidget(m_subFolderCB, 0, Qt::AlignLeft);
 
     QVBoxLayout* subFolderLay = new QVBoxLayout();
-    subFolderLay->setMargin(0);
+    subFolderLay->setContentsMargins(0, 0, 0, 0);
     subFolderLay->setSpacing(10);
     {
       QGridLayout* infoLay = new QGridLayout();
-      infoLay->setMargin(10);
+      infoLay->setContentsMargins(10, 10, 10, 10);
       infoLay->setHorizontalSpacing(3);
       infoLay->setVerticalSpacing(10);
       {
@@ -1192,7 +1198,7 @@ PencilTestSaveInFolderPopup::PencilTestSaveInFolderPopup(QWidget* parent)
       subFolderLay->addWidget(infoGroupBox, 0);
 
       QGridLayout* subNameLay = new QGridLayout();
-      subNameLay->setMargin(10);
+      subNameLay->setContentsMargins(10, 10, 10, 10);
       subNameLay->setHorizontalSpacing(3);
       subNameLay->setVerticalSpacing(10);
       {
@@ -1289,7 +1295,7 @@ QString formatString(QString inStr, int charNum) {
 
   QString numStr, postStr;
   // find the first non-digit character
-  int index = inStr.indexOf(QRegExp("[^0-9]"), 0);
+  int index = inStr.indexOf(QRegularExpression("[^0-9]"), 0);
 
   if (index == -1)  // only digits
     numStr = inStr;
@@ -1375,7 +1381,9 @@ void PencilTestSaveInFolderPopup::onOkPressed() {
     return;
   }
 
-  int index = subFolderName.indexOf(QRegExp("[\\]:;|=,\\[\\*\\.\"/\\\\]"), 0);
+  int index =
+      subFolderName.indexOf(QRegularExpression("[\\]:;|=,\\[\\*\\.\"/\\\\]"),
+                            0);
   if (index >= 0) {
     DVGui::MsgBox(WARNING, tr("Subfolder name should not contain following "
                               "characters:  * . \" / \\ [ ] : ; | = , "));
@@ -1549,7 +1557,9 @@ PencilTestPopup::PencilTestPopup()
 
   //----
 
-  m_resolutionCombo->setMaximumWidth(fontMetrics().width("0000 x 0000") + 25);
+  m_resolutionCombo->setMaximumWidth(
+      QtCompat::fontMetricsHorizontalAdvance(fontMetrics(), "0000 x 0000") +
+      25);
   m_fileTypeCombo->addItems({"jpg", "png", "tga", "tif"});
   m_fileTypeCombo->setCurrentIndex(0);
 
@@ -1620,11 +1630,11 @@ PencilTestPopup::PencilTestPopup()
   subCamWidget->setHidden(true);
 
   //---- layout ----
-  m_topLayout->setMargin(10);
+  m_topLayout->setContentsMargins(10, 10, 10, 10);
   m_topLayout->setSpacing(10);
   {
     QHBoxLayout* camLay = new QHBoxLayout();
-    camLay->setMargin(0);
+    camLay->setContentsMargins(0, 0, 0, 0);
     camLay->setSpacing(3);
     {
       camLay->addWidget(new QLabel(tr("Camera:"), this), 0);
@@ -1642,7 +1652,7 @@ PencilTestPopup::PencilTestPopup()
       camLay->addSpacing(10);
       camLay->addWidget(m_subcameraButton, 0);
       QHBoxLayout* subCamLay = new QHBoxLayout();
-      subCamLay->setMargin(0);
+      subCamLay->setContentsMargins(0, 0, 0, 0);
       subCamLay->setSpacing(3);
       {
         subCamLay->addWidget(m_subWidthFld, 0);
@@ -1664,28 +1674,28 @@ PencilTestPopup::PencilTestPopup()
     m_topLayout->addLayout(camLay, 0);
 
     QHBoxLayout* bottomLay = new QHBoxLayout();
-    bottomLay->setMargin(0);
+    bottomLay->setContentsMargins(0, 0, 0, 0);
     bottomLay->setSpacing(10);
     {
       bottomLay->addWidget(m_videoWidget, 1);
 
       QVBoxLayout* rightLay = new QVBoxLayout();
-      rightLay->setMargin(0);
+      rightLay->setContentsMargins(0, 0, 0, 0);
       rightLay->setSpacing(5);
       {
         QVBoxLayout* fileLay = new QVBoxLayout();
-        fileLay->setMargin(8);
+        fileLay->setContentsMargins(8, 8, 8, 8);
         fileLay->setSpacing(5);
         {
           QGridLayout* levelLay = new QGridLayout();
-          levelLay->setMargin(0);
+          levelLay->setContentsMargins(0, 0, 0, 0);
           levelLay->setHorizontalSpacing(3);
           levelLay->setVerticalSpacing(5);
           {
             levelLay->addWidget(new QLabel(tr("Name:"), this), 0, 0,
                                 Qt::AlignRight);
             QHBoxLayout* nameLay = new QHBoxLayout();
-            nameLay->setMargin(0);
+            nameLay->setContentsMargins(0, 0, 0, 0);
             nameLay->setSpacing(2);
             {
               nameLay->addWidget(m_previousLevelButton, 0);
@@ -1698,7 +1708,7 @@ PencilTestPopup::PencilTestPopup()
                                 Qt::AlignRight);
 
             QHBoxLayout* frameLay = new QHBoxLayout();
-            frameLay->setMargin(0);
+            frameLay->setContentsMargins(0, 0, 0, 0);
             frameLay->setSpacing(2);
             {
               frameLay->addWidget(m_frameNumberEdit, 1);
@@ -1711,7 +1721,7 @@ PencilTestPopup::PencilTestPopup()
           fileLay->addLayout(levelLay, 0);
 
           QHBoxLayout* fileTypeLay = new QHBoxLayout();
-          fileTypeLay->setMargin(0);
+          fileTypeLay->setContentsMargins(0, 0, 0, 0);
           fileTypeLay->setSpacing(3);
           {
             fileTypeLay->addWidget(new QLabel(tr("File Type:"), this), 0);
@@ -1727,7 +1737,7 @@ PencilTestPopup::PencilTestPopup()
         rightLay->addWidget(fileFrame, 0);
 
         QGridLayout* imageLay = new QGridLayout();
-        imageLay->setMargin(8);
+        imageLay->setContentsMargins(8, 8, 8, 8);
         imageLay->setHorizontalSpacing(3);
         imageLay->setVerticalSpacing(5);
         {
@@ -1752,7 +1762,7 @@ PencilTestPopup::PencilTestPopup()
         rightLay->addWidget(imageFrame, 0);
 
         QGridLayout* displayLay = new QGridLayout();
-        displayLay->setMargin(8);
+        displayLay->setContentsMargins(8, 8, 8, 8);
         displayLay->setHorizontalSpacing(3);
         displayLay->setVerticalSpacing(5);
         {
@@ -1769,7 +1779,7 @@ PencilTestPopup::PencilTestPopup()
         rightLay->addWidget(displayFrame);
 
         QGridLayout* timerLay = new QGridLayout();
-        timerLay->setMargin(8);
+        timerLay->setContentsMargins(8, 8, 8, 8);
         timerLay->setHorizontalSpacing(3);
         timerLay->setVerticalSpacing(5);
         {
@@ -1800,10 +1810,14 @@ PencilTestPopup::PencilTestPopup()
   bool ret = true;
   ret      = ret && connect(refreshCamListButton, SIGNAL(pressed()), this,
                             SLOT(refreshCameraList()));
-  ret      = ret && connect(m_cameraListCombo, SIGNAL(activated(int)), this,
-                            SLOT(onCameraListComboActivated(int)));
-  ret = ret && connect(m_resolutionCombo, SIGNAL(activated(const QString&)),
-                       this, SLOT(onResolutionComboActivated(const QString&)));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_cameraListCombo, this,
+                   [this](int index) { onCameraListComboActivated(index); }));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxTextActivated(
+                   m_resolutionCombo, this,
+                   [this](const QString &resolution) {
+                     onResolutionComboActivated(resolution);
+                   }));
   ret = ret && connect(m_fileFormatOptionButton, SIGNAL(pressed()), this,
                        SLOT(onFileFormatOptionButtonPressed()));
   ret = ret && connect(m_levelNameEdit, SIGNAL(levelNameEdited()), this,
@@ -1841,8 +1855,9 @@ PencilTestPopup::PencilTestPopup()
                        SLOT(openSaveInFolderPopup()));
   ret = ret && connect(m_saveInFileFld, SIGNAL(pathChanged()), this,
                        SLOT(onSaveInPathEdited()));
-  ret = ret && connect(m_fileTypeCombo, SIGNAL(activated(int)), this,
-                       SLOT(refreshFrameInfo()));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_fileTypeCombo, this,
+                   [this](int) { refreshFrameInfo(); }));
   ret = ret && connect(m_frameNumberEdit, SIGNAL(editingFinished()), this,
                        SLOT(refreshFrameInfo()));
 
@@ -1917,7 +1932,9 @@ void PencilTestPopup::refreshCameraList() {
   for (int c = 0; c < cameras.size(); c++) {
     QString camDesc = cameras.at(c).description();
     m_cameraListCombo->addItem(camDesc);
-    maxTextLength = std::max(maxTextLength, fontMetrics().width(camDesc));
+    maxTextLength = std::max(
+        maxTextLength,
+        QtCompat::fontMetricsHorizontalAdvance(fontMetrics(), camDesc));
   }
   m_cameraListCombo->setMaximumWidth(maxTextLength + 25);
   m_cameraListCombo->setEnabled(true);
@@ -2210,7 +2227,7 @@ void PencilTestPopup::onFrameCaptured(QImage& image) {
         QVideoSurfaceFormat::BottomToTop;
     bool upsideDown = m_upsideDownCB->isChecked();
 
-    image = image.mirrored(upsideDown, upsideDown != scanBtoT);
+    image = QtCompat::mirroredImage(image, upsideDown, upsideDown != scanBtoT);
 
     if (importImage(image)) {
       m_videoWidget->setPreviousImage(image.copy());
@@ -2684,7 +2701,7 @@ bool PencilTestPopup::importImage(QImage image) {
   TPointD levelDpi = sl->getDpi();
   /* create the raster */
   TRaster32P raster(image.width(), image.height());
-  convertImageToRaster(raster, image.mirrored(true, true));
+  convertImageToRaster(raster, QtCompat::mirroredImage(image, true, true));
 
   TRasterImageP ri(raster);
   ri->setDpi(levelDpi.x, levelDpi.y);

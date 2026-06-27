@@ -5,7 +5,6 @@
 #include <math.h>
 
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QTextStream>
 #include <QFile>
 

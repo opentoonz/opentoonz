@@ -12,6 +12,7 @@
 
 // TnzQt includes
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 // ToonzLib
 #include "toonz/toonzfolders.h"
@@ -122,7 +123,7 @@ bool CustomPanelUIField::setCommand(const QString& commandId) {
   return true;
 }
 
-void CustomPanelUIField::enterEvent(QEvent* event) {
+void CustomPanelUIField::enterEvent(QtCompat::EnterEvent* event) {
   Q_UNUSED(event);
   emit highlight(m_id);
 }
@@ -256,7 +257,7 @@ void UiPreviewWidget::onMove(const QPoint& pos) {
 }
 
 void UiPreviewWidget::mouseMoveEvent(QMouseEvent* event) {
-  onMove(event->pos());
+  onMove(QtCompat::mouseEventPosition(event));
 }
 
 void UiPreviewWidget::dragEnterEvent(QDragEnterEvent* event) {
@@ -268,7 +269,7 @@ void UiPreviewWidget::dragEnterEvent(QDragEnterEvent* event) {
 }
 
 void UiPreviewWidget::dragMoveEvent(QDragMoveEvent* event) {
-  onMove(event->pos());
+  onMove(QtCompat::dropEventPosition(event));
 
   if (m_highlightUiId < 0) {
     event->ignore();
@@ -765,7 +766,7 @@ void CustomPanelEditorPopup::onRegister() {
   }
 
   QTextStream stream(&file);
-  stream.setCodec("UTF-8");
+  QtCompat::setTextStreamUtf8(stream);
   stream << doc.toString();
   file.close();
 

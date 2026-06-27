@@ -30,6 +30,7 @@
 #include "toonzqt/filefield.h"
 #include "toonzqt/intfield.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 // Tnzlib includes
 #include "toonz/tproject.h"
@@ -59,13 +60,18 @@
 
 // Qt includes
 #include <QMainWindow>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QCameraDevice>
+#include <QCameraFormat>
+#include <QMediaDevices>
+#else
 #include <QCameraInfo>
-#include <QCamera>
-#include <QCameraImageCapture>
 #include <QCameraViewfinderSettings>
 #ifdef MACOSX
 #include <QCameraViewfinder>
 #endif
+#endif
+#include <QCamera>
 
 #include <QComboBox>
 #include <QPushButton>
@@ -80,7 +86,6 @@
 #include <QGridLayout>
 #include <QToolButton>
 #include <QDateTime>
-#include <QMultimedia>
 #include <QPainter>
 #include <QKeyEvent>
 #include <QCommonStyle>
@@ -88,7 +93,6 @@
 #include <QIntValidator>
 #include <QRegularExpressionValidator>
 
-#include <QVideoSurfaceFormat>
 #include <QThreadPool>
 #include <QHostInfo>
 #include <QDesktopServices>
@@ -129,6 +133,58 @@ TEnv::DoubleVar CamCapCustomDpi("CamCapDpiForNewLevel", 120.0);
 TEnv::StringVar CamCapFileType("CamCapFileType", "jpg");
 
 namespace {
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+using ToonzCameraInfo = QCameraDevice;
+#else
+using ToonzCameraInfo = QCameraInfo;
+#endif
+
+QList<ToonzCameraInfo> availableCameras() {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return QMediaDevices::videoInputs();
+#else
+  return QCameraInfo::availableCameras();
+#endif
+}
+
+ToonzCameraInfo defaultCamera() {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return QMediaDevices::defaultVideoInput();
+#else
+  return QCameraInfo::defaultCamera();
+#endif
+}
+
+bool isNullCamera(const ToonzCameraInfo& camera) { return camera.isNull(); }
+
+QString cameraDescription(const ToonzCameraInfo& camera) {
+  return camera.description();
+}
+
+QString cameraDeviceName(const ToonzCameraInfo& camera) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return QString::fromUtf8(camera.id());
+#else
+  return camera.deviceName();
+#endif
+}
+
+QList<QSize> cameraResolutions(QCamera* camera,
+                               const ToonzCameraInfo& cameraInfo) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  Q_UNUSED(camera)
+  QList<QSize> sizes;
+  for (const QCameraFormat& format : cameraInfo.videoFormats()) {
+    const QSize size = format.resolution();
+    if (size.isValid() && !sizes.contains(size)) sizes.append(size);
+  }
+  return sizes;
+#else
+  Q_UNUSED(cameraInfo)
+  return camera->supportedViewfinderResolutions();
+#endif
+}
 
 void convertImageToRaster(TRaster32P dstRas, const QImage& srcImg) {
   dstRas->lock();
@@ -592,10 +648,11 @@ void MyVideoWidget::drawSubCamera(QPainter& p) {
 }
 
 void MyVideoWidget::mouseMoveEvent(QMouseEvent* event) {
-  int d = 10;
+  int d                 = 10;
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
 
   auto isNearBy = [&](QPoint handlePos) -> bool {
-    return (handlePos - event->pos()).manhattanLength() <= d * 2;
+    return (handlePos - eventPos).manhattanLength() <= d * 2;
   };
 
   auto isNearEdge = [&](int handlePos, int mousePos) -> bool {
@@ -609,9 +666,9 @@ void MyVideoWidget::mouseMoveEvent(QMouseEvent* event) {
   if (event->buttons() == Qt::NoButton) {
     QRect vidSubRect    = m_S2V_Transform.mapRect(m_subCameraRect);
     SUBHANDLE preHandle = m_activeSubHandle;
-    if (!vidSubRect.adjusted(-d, -d, d, d).contains(event->pos()))
+    if (!vidSubRect.adjusted(-d, -d, d, d).contains(eventPos))
       m_activeSubHandle = HandleNone;
-    else if (vidSubRect.adjusted(d, d, -d, -d).contains(event->pos()))
+    else if (vidSubRect.adjusted(d, d, -d, -d).contains(eventPos))
       m_activeSubHandle = HandleFrame;
     else if (isNearBy(vidSubRect.topLeft()))
       m_activeSubHandle = HandleTopLeft;
@@ -621,13 +678,13 @@ void MyVideoWidget::mouseMoveEvent(QMouseEvent* event) {
       m_activeSubHandle = HandleBottomLeft;
     else if (isNearBy(vidSubRect.bottomRight()))
       m_activeSubHandle = HandleBottomRight;
-    else if (isNearEdge(vidSubRect.left(), event->pos().x()))
+    else if (isNearEdge(vidSubRect.left(), eventPos.x()))
       m_activeSubHandle = HandleLeft;
-    else if (isNearEdge(vidSubRect.top(), event->pos().y()))
+    else if (isNearEdge(vidSubRect.top(), eventPos.y()))
       m_activeSubHandle = HandleTop;
-    else if (isNearEdge(vidSubRect.right(), event->pos().x()))
+    else if (isNearEdge(vidSubRect.right(), eventPos.x()))
       m_activeSubHandle = HandleRight;
-    else if (isNearEdge(vidSubRect.bottom(), event->pos().y()))
+    else if (isNearEdge(vidSubRect.bottom(), eventPos.y()))
       m_activeSubHandle = HandleBottom;
     else
       m_activeSubHandle = HandleNone;
@@ -671,8 +728,7 @@ void MyVideoWidget::mouseMoveEvent(QMouseEvent* event) {
 
     int minimumSize = 100;
 
-    QPoint offset =
-        m_S2V_Transform.inverted().map(event->pos()) - m_dragStartPos;
+    QPoint offset = m_S2V_Transform.inverted().map(eventPos) - m_dragStartPos;
     if (m_activeSubHandle >= HandleTopLeft &&
         m_activeSubHandle <= HandleBottomRight) {
       QSize offsetSize = m_preSubCameraRect.size();
@@ -738,7 +794,8 @@ void MyVideoWidget::mousePressEvent(QMouseEvent* event) {
 
   // Record the original sub camera size
   m_preSubCameraRect = m_subCameraRect;
-  m_dragStartPos     = m_S2V_Transform.inverted().map(event->pos());
+  m_dragStartPos =
+      m_S2V_Transform.inverted().map(QtCompat::mouseEventPosition(event));
 
   // Temporary stop the camera
   emit stopCamera();
@@ -1480,7 +1537,7 @@ void SubCameraButton::contextMenuEvent(QContextMenuEvent* event) {
 
   m_settings->endGroup();
 
-  menu.exec(event->globalPos());
+  menu.exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 void SubCameraButton::onSubCameraAct() {
@@ -1983,11 +2040,12 @@ PencilTestPopup::PencilTestPopup()
   connect(refreshCamListButton, &QPushButton::pressed, this,
           &PencilTestPopup::refreshCameraList);
 
-  connect(m_cameraListCombo, QOverload<int>::of(&QComboBox::activated), this,
-          &PencilTestPopup::onCameraListComboActivated);
+  QtCompat::connectComboBoxActivatedIndex(
+      m_cameraListCombo, this,
+      [this](int index) { onCameraListComboActivated(index); });
 
-  connect(m_resolutionCombo, QOverload<int>::of(&QComboBox::activated), this,
-          &PencilTestPopup::onResolutionComboActivated);
+  QtCompat::connectComboBoxActivatedIndex(
+      m_resolutionCombo, this, [this](int) { onResolutionComboActivated(); });
 
   connect(m_fileFormatOptionButton, &QPushButton::pressed, this,
           &PencilTestPopup::onFileFormatOptionButtonPressed);
@@ -2044,11 +2102,10 @@ PencilTestPopup::PencilTestPopup()
 
   // File type changed (usando lambda porque atualiza variável global + chama
   // função)
-  connect(m_fileTypeCombo, QOverload<int>::of(&QComboBox::activated), this,
-          [this](int) {
-            CamCapFileType = m_fileTypeCombo->currentText().toStdString();
-            refreshFrameInfo();
-          });
+  QtCompat::connectComboBoxActivatedIndex(m_fileTypeCombo, this, [this](int) {
+    CamCapFileType = m_fileTypeCombo->currentText().toStdString();
+    refreshFrameInfo();
+  });
 
   connect(m_frameNumberEdit, &QLineEdit::editingFinished, this,
           &PencilTestPopup::refreshFrameInfo);
@@ -2118,9 +2175,9 @@ PencilTestPopup::PencilTestPopup()
       QString::fromStdString(CamCapCameraName.getValue()));
   // If previous camera is not found, then try to activate the connected default
   // camera
-  if (startupCamIndex <= 0 && !QCameraInfo::defaultCamera().isNull()) {
+  if (startupCamIndex <= 0 && !isNullCamera(defaultCamera())) {
     startupCamIndex =
-        m_cameraListCombo->findText(QCameraInfo::defaultCamera().description());
+        m_cameraListCombo->findText(cameraDescription(defaultCamera()));
   }
   if (startupCamIndex > 0) {
     m_cameraListCombo->setCurrentIndex(startupCamIndex);
@@ -2210,7 +2267,7 @@ QMenu* PencilTestPopup::createOptionsMenu() {
 void PencilTestPopup::refreshCameraList() {
   m_cameraListCombo->clear();
 
-  QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
+  QList<ToonzCameraInfo> cameras = availableCameras();
   if (cameras.empty()) {
     m_cameraListCombo->addItem(tr("No camera found"));
     m_cameraListCombo->setMaximumWidth(250);
@@ -2221,7 +2278,7 @@ void PencilTestPopup::refreshCameraList() {
   // Add non-connected state as default
   m_cameraListCombo->addItem(tr("- Select camera -"));
   for (int c = 0; c < cameras.size(); c++) {
-    QString camDesc = cameras.at(c).description();
+    QString camDesc = cameraDescription(cameras.at(c));
     m_cameraListCombo->addItem(camDesc);
     maxTextLength =
         std::max(maxTextLength, fontMetrics().horizontalAdvance(camDesc));
@@ -2234,7 +2291,7 @@ void PencilTestPopup::refreshCameraList() {
 //-----------------------------------------------------------------------------
 
 void PencilTestPopup::onCameraListComboActivated(int comboIndex) {
-  QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
+  QList<ToonzCameraInfo> cameras = availableCameras();
   if (cameras.size() != m_cameraListCombo->count() - 1) return;
 
   m_cvWebcam.release();
@@ -2252,17 +2309,19 @@ void PencilTestPopup::onCameraListComboActivated(int comboIndex) {
 
   int index = comboIndex - 1;
   // In case the camera is not changed (just click the combobox)
-  if (cameras.at(index).deviceName() == m_deviceName) return;
+  if (cameraDeviceName(cameras.at(index)) == m_deviceName) return;
 
   m_currentCamera = new QCamera(cameras.at(index), this);
-  m_deviceName    = cameras.at(index).deviceName();
+  m_deviceName    = cameraDeviceName(cameras.at(index));
 
   // Loading new camera
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   m_currentCamera->load();
+#endif
 
   // Refresh resolution
   m_resolutionCombo->clear();
-  QList<QSize> sizes = m_currentCamera->supportedViewfinderResolutions();
+  QList<QSize> sizes = cameraResolutions(m_currentCamera, cameras.at(index));
   // Simple workaround because Qt fails to auto-detect the camera resolutions
   // https://forum.qt.io/topic/68904/how-to-get-the-supported-resolution-of-a-qcamera/5
   if (sizes.size() == 0) {
@@ -2282,7 +2341,9 @@ void PencilTestPopup::onCameraListComboActivated(int comboIndex) {
     sizes.push_back(QSize(3840, 2160));
   }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   m_currentCamera->unload();
+#endif
   for (const QSize size : sizes) {
     m_resolutionCombo->addItem(
         QString("%1 x %2").arg(size.width()).arg(size.height()), size);
@@ -3218,7 +3279,7 @@ bool PencilTestPopup::importImage(QImage image) {
   TPointD levelDpi = sl->getDpi();
   /* Create the raster */
   TRaster32P raster(image.width(), image.height());
-  convertImageToRaster(raster, image.mirrored(true, true));
+  convertImageToRaster(raster, QtCompat::mirroredImage(image, true, true));
 
   TRasterImageP ri(raster);
   ri->setDpi(levelDpi.x, levelDpi.y);
@@ -3299,11 +3360,11 @@ bool PencilTestPopup::importImage(QImage image) {
 void PencilTestPopup::onCaptureFilterSettingsBtnPressed() {
   if (!m_currentCamera || m_deviceName.isNull()) return;
 
-  QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
+  QList<ToonzCameraInfo> cameras = availableCameras();
   for (int c = 0; c < cameras.size(); c++) {
-    if (cameras.at(c).deviceName() == m_deviceName) {
+    if (cameraDeviceName(cameras.at(c)) == m_deviceName) {
 #ifdef _WIN32
-      openCaptureFilterSettings(this, cameras.at(c).description());
+      openCaptureFilterSettings(this, cameraDescription(cameras.at(c)));
 #endif
       return;
     }
@@ -3863,10 +3924,7 @@ void PencilTestPopup::onCalibReadme() {
   TFilePath readmeFp =
       ToonzFolder::getLibraryFolder() + "camera calibration" + "readme.txt";
   if (!TFileStatus(readmeFp).doesExist()) return;
-  if (TSystem::isUNC(readmeFp))
-    QDesktopServices::openUrl(QUrl(readmeFp.getQString()));
-  else
-    QDesktopServices::openUrl(QUrl::fromLocalFile(readmeFp.getQString()));
+  QDesktopServices::openUrl(QtCompat::localFileUrl(readmeFp.getQString()));
 }
 //-----------------------------------------------------------------------------
 

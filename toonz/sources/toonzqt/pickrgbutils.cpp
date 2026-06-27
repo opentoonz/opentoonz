@@ -1,12 +1,12 @@
 
 
 #include "tgl.h"
+#include "toonzqt/gutil.h"
 
 // Qt includes
 #include <QPixmap>
 #include <QImage>
 #include <QOpenGLWidget>
-#include <QDesktopWidget>
 #include <QApplication>
 #include <QScreen>
 
@@ -56,7 +56,8 @@ QRgb pickRGB(QWidget *widget, const QRect &rect) {
 //------------------------------------------------------------------------------
 
 QRgb pickScreenRGB(const QRect &rect) {
-  QWidget *widget = QApplication::desktop();
+  QScreen *screen = getScreenForWidget();
+  if (!screen) return 0;
 
 #ifdef MACOSX
 
@@ -68,7 +69,7 @@ QRgb pickScreenRGB(const QRect &rect) {
   // the workaround is to trivially grab the smallest rect including the
   // requested one and a part of the primary screen.
 
-  const QRect &screen0Geom = QApplication::desktop()->screenGeometry(0);
+  const QRect &screen0Geom = getScreenGeometry(0);
 
   int left   = std::min(rect.left(), screen0Geom.right());
   int top    = std::min(rect.top(), screen0Geom.bottom());
@@ -83,9 +84,8 @@ QRgb pickScreenRGB(const QRect &rect) {
 
 #endif
 
-  QImage img(widget->screen()
-                 ->grabWindow(widget->winId(), theRect.x(), theRect.y(),
-                              theRect.width(), theRect.height())
+  QImage img(screen->grabWindow(0, theRect.x(), theRect.y(), theRect.width(),
+                                theRect.height())
                  .toImage());
   return meanColor(
       img, QRect(rect.left() - theRect.left(), rect.top() - theRect.top(),

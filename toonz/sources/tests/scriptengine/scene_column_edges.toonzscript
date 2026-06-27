@@ -1,0 +1,52 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e.message || e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var scene = new Scene();
+
+var returnedInsert = scene.insertColumn(0);
+var returnedDelete = scene.deleteColumn(0);
+print("qt-script-scene-column-edges-chain", returnedInsert === scene,
+      returnedDelete === scene, scene.frameCount, scene.columnCount);
+
+var errors = [
+  hasError(function() { scene.insertColumn(); },
+           "Scene.insertColumn expected one column argument"),
+  hasError(function() { scene.insertColumn(0, 1); },
+           "Scene.insertColumn expected one column argument"),
+  hasError(function() { scene.insertColumn("0"); },
+           "Column argument must be a number"),
+  hasError(function() { scene.insertColumn(0.5); },
+           "Column argument must be an integer"),
+  hasError(function() { scene.insertColumn(-1); },
+           "Bad column value"),
+  hasError(function() { scene.deleteColumn(); },
+           "Scene.deleteColumn expected one column argument"),
+  hasError(function() { scene.deleteColumn(0, 1); },
+           "Scene.deleteColumn expected one column argument"),
+  hasError(function() { scene.deleteColumn("0"); },
+           "Column argument must be a number"),
+  hasError(function() { scene.deleteColumn(0.5); },
+           "Column argument must be an integer"),
+  hasError(function() { scene.deleteColumn(-1); },
+           "Bad column value")
+];
+
+print("qt-script-scene-column-edges-errors", errors, scene.frameCount,
+      scene.columnCount);
+
+scene.dispose();
+
+var disposedErrors = [
+  hasError(function() { scene.insertColumn(0); }, "Invalid Scene object"),
+  hasError(function() { scene.deleteColumn(0); }, "Invalid Scene object")
+];
+
+print("qt-script-scene-column-edges-disposed", scene.id, disposedErrors);
+
+"qt-script-scene-column-edges-result";

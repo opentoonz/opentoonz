@@ -18,6 +18,7 @@
 
 // TnzQt includes
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzTools includes
 #include "tools/tool.h"
@@ -33,6 +34,7 @@
 #include <QVBoxLayout>
 #include <QMouseEvent>
 #include <QAction>
+#include <QActionGroup>
 #include <QLabel>
 #include <QMainWindow>
 #include <QButtonGroup>
@@ -318,10 +320,12 @@ ToolOptionCombo::ToolOptionCombo(TTool *tool, TEnumProperty *property,
   m_property->addListener(this);
   loadEntries();
   setSizeAdjustPolicy(QComboBox::AdjustToContents);
-  connect(this, SIGNAL(activated(int)), this, SLOT(onActivated(int)));
+  QtCompat::connectComboBoxActivatedIndex(
+      this, this, [this](int index) { onActivated(index); });
   // synchronize the state with the same widgets in other tool option bars
   if (toolHandle) {
-    connect(this, SIGNAL(activated(int)), toolHandle, SIGNAL(toolChanged()));
+    QtCompat::connectComboBoxActivatedIndex(
+        this, toolHandle, [toolHandle](int) { emit toolHandle->toolChanged(); });
   }
 }
 
@@ -402,10 +406,12 @@ ToolOptionFontCombo::ToolOptionFontCombo(TTool *tool, TEnumProperty *property,
   setMaximumWidth(250);
   m_property->addListener(this);
   setSizeAdjustPolicy(QFontComboBox::AdjustToContents);
-  connect(this, SIGNAL(activated(int)), this, SLOT(onActivated(int)));
+  QtCompat::connectComboBoxActivatedIndex(
+      this, this, [this](int index) { onActivated(index); });
   // synchronize the state with the same widgets in other tool option bars
   if (toolHandle)
-    connect(this, SIGNAL(activated(int)), toolHandle, SIGNAL(toolChanged()));
+    QtCompat::connectComboBoxActivatedIndex(
+        this, toolHandle, [toolHandle](int) { emit toolHandle->toolChanged(); });
 
   updateStatus();
 }
@@ -828,7 +834,7 @@ void MeasuredValueField::setPrecision(int precision) {
 void MeasuredValueField::mousePressEvent(QMouseEvent *e) {
   if (!isEnabled()) return;
   if ((e->buttons() == Qt::MiddleButton) || m_labelClicked) {
-    m_xMouse        = e->x();
+    m_xMouse        = QtCompat::mouseEventPosition(e).x();
     m_mouseEdit     = true;
     m_originalValue = m_value->getValue(TMeasuredValue::CurrentUnit);
   } else {
@@ -845,9 +851,10 @@ void MeasuredValueField::mousePressEvent(QMouseEvent *e) {
 void MeasuredValueField::mouseMoveEvent(QMouseEvent *e) {
   if (!isEnabled()) return;
   if ((e->buttons() == Qt::MiddleButton) || m_labelClicked) {
-    m_value->modifyValue((e->x() - m_xMouse) / 2);
+    const int mouseX = QtCompat::mouseEventPosition(e).x();
+    m_value->modifyValue((mouseX - m_xMouse) / 2);
     setText(QString::fromStdWString(m_value->toWideString(m_precision)));
-    m_xMouse = e->x();
+    m_xMouse = mouseX;
     // measuredValueChanged to update the UI, but don't add to undo
     emit measuredValueChanged(m_value, false);
   } else

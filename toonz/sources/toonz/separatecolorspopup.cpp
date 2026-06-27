@@ -925,16 +925,15 @@ SeparateColorsPopup::SeparateColorsPopup()
 
   //----- reproduce UI
 
-  QColor paperCol, mainCol, sub1Col, sub2Col, sub3Col;
-  paperCol.setNamedColor(
+  QColor paperCol(
       QString::fromStdString(SeparateColorsPopup_PaperColor.getValue()));
-  mainCol.setNamedColor(
+  QColor mainCol(
       QString::fromStdString(SeparateColorsPopup_MainColor.getValue()));
-  sub1Col.setNamedColor(
+  QColor sub1Col(
       QString::fromStdString(SeparateColorsPopup_SubColor1.getValue()));
-  sub2Col.setNamedColor(
+  QColor sub2Col(
       QString::fromStdString(SeparateColorsPopup_SubColor2.getValue()));
-  sub3Col.setNamedColor(
+  QColor sub3Col(
       QString::fromStdString(SeparateColorsPopup_SubColor3.getValue()));
 
   m_paperColorField->setColor(
@@ -1866,8 +1865,7 @@ void SeparateColorsPopup::doLoadSettings(const TFilePath& fp, bool loadAll) {
 
   auto loadColor = [&](const QString key, DVGui::ColorField* field) {
     if (!keys.contains(key)) return;
-    QColor color;
-    color.setNamedColor(settings.value(key).toString());
+    QColor color(settings.value(key).toString());
     field->setColor(TPixel32(color.red(), color.green(), color.blue()));
   };
   auto loadDouble = [&](const QString key, DVGui::DoubleField* field) {

@@ -8,6 +8,7 @@
 #include "toonzqt/gutil.h"
 #include "toonzqt/flipconsoleowner.h"
 #include "toonzqt/lineedit.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/preferences.h"
@@ -37,11 +38,12 @@
 #include <QMouseEvent>
 #include <QIcon>
 #include <QAction>
+#include <QActionGroup>
 #include <QWidgetAction>
 #include <QStyle>
 #include <QStylePainter>
 #include <QStyleOption>
-#include <QStyleOptionFrameV3>
+#include <QStyleOptionFrame>
 #include <QSettings>
 #include <QPushButton>
 #include <QScrollBar>
@@ -376,8 +378,9 @@ inline int FlipSlider::pageStepVal(int val) {
 //     the side of cursor pos
 void FlipSlider::mousePressEvent(QMouseEvent *me) {
   emit flipSliderPressed();
+  const QPoint eventPos = QtCompat::mouseEventPosition(me);
   int cursorValue = sliderValueFromPosition(minimum(), maximum(), singleStep(),
-                                            me->pos().x(), width());
+                                            eventPos.x(), width());
   if (me->button() == Qt::MiddleButton)
     if (cursorValue == value())
       setSliderDown(true);
@@ -394,8 +397,9 @@ void FlipSlider::mousePressEvent(QMouseEvent *me) {
 
 void FlipSlider::mouseMoveEvent(QMouseEvent *me) {
   if (isSliderDown() || me->buttons() & Qt::LeftButton) {
+    const QPoint eventPos = QtCompat::mouseEventPosition(me);
     int cursorValue = sliderValueFromPosition(
-        minimum(), maximum(), singleStep(), me->pos().x(), width());
+        minimum(), maximum(), singleStep(), eventPos.x(), width());
     setValue(cursorValue);
   }
 }
@@ -635,7 +639,7 @@ protected:
     QRect firstActionRect(0, 0, LX, LY / 2);
     QRect secondActionRect(0, LY / 2 + 1, LX, LY / 2);
 
-    QPoint pos = e->pos();
+    QPoint pos = QtCompat::mouseEventPosition(e);
     if (firstActionRect.contains(pos)) {
       m_firstAction->trigger();
     } else {
@@ -645,7 +649,7 @@ protected:
   }
 
   void mouseMoveEvent(QMouseEvent *e) override {
-    QPoint pos = e->pos();
+    QPoint pos = QtCompat::mouseEventPosition(e);
     QRect firstActionRect(0, 0, LX, LY / 2);
     QRect secondActionRect(0, LY / 2 + 1, LX, LY / 2);
 

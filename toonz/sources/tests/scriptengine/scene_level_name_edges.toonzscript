@@ -1,0 +1,51 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e.message || e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var scene = new Scene();
+var numeric = scene.newLevel("Raster", 123);
+var nullLevel = scene.newLevel("Raster", null);
+var objectLevel = scene.newLevel("Vector", {
+  toString: function() { return "qt6_scene_level_object"; }
+});
+
+var numericLookup = scene.getLevel(123);
+var nullLookup = scene.getLevel(null);
+var objectLookup = scene.getLevel({
+  toString: function() { return "qt6_scene_level_object"; }
+});
+var missingLookup = scene.getLevel({ toString: function() { return "missing"; } });
+
+var duplicateErrors = [
+  hasError(function() { scene.newLevel("Raster", "123"); },
+           "name(123) is already used"),
+  hasError(function() { scene.newLevel("Raster", "null"); },
+           "name(null) is already used"),
+  hasError(function() { scene.newLevel("Vector", "qt6_scene_level_object"); },
+           "name(qt6_scene_level_object) is already used")
+];
+
+var levels = scene.getLevels();
+
+print("qt-script-scene-level-name-edges-values",
+      numeric.name, nullLevel.name, objectLevel.name, levels.length);
+print("qt-script-scene-level-name-edges-lookups",
+      numericLookup.name, nullLookup.name, objectLookup.name,
+      missingLookup === undefined, duplicateErrors);
+
+numericLookup.dispose();
+nullLookup.dispose();
+objectLookup.dispose();
+for (var i = 0; i < levels.length; ++i)
+  levels[i].dispose();
+numeric.dispose();
+nullLevel.dispose();
+objectLevel.dispose();
+scene.dispose();
+
+"qt-script-scene-level-name-edges-result";

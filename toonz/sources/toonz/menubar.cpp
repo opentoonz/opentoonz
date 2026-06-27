@@ -14,6 +14,7 @@
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/toonzscene.h"
@@ -41,15 +42,9 @@
 #include <QHBoxLayout>
 #include <QMenuBar>
 #include <QShortcut>
-#include <QDesktopServices>
 #include <QCheckBox>
 #include <QtDebug>
 #include <QXmlStreamReader>
-
-void UrlOpener::open() { QDesktopServices::openUrl(m_url); }
-
-UrlOpener dvHome(QUrl("http://www.toonz.com/"));
-UrlOpener manual(QUrl("file:///C:/gmt/butta/M&C in EU.pdf"));
 
 TEnv::IntVar LockRoomTabToggle("LockRoomTabToggle", 0);
 
@@ -89,7 +84,7 @@ void RoomTabWidget::swapIndex(int firstIndex, int secondIndex) {
 void RoomTabWidget::mousePressEvent(QMouseEvent *event) {
   m_renameTextField->hide();
   if (event->button() == Qt::LeftButton) {
-    m_clickedTabIndex = tabAt(event->pos());
+    m_clickedTabIndex = tabAt(QtCompat::mouseEventPosition(event));
     if (m_clickedTabIndex < 0) return;
     setCurrentIndex(m_clickedTabIndex);
   }
@@ -100,7 +95,7 @@ void RoomTabWidget::mousePressEvent(QMouseEvent *event) {
 void RoomTabWidget::mouseMoveEvent(QMouseEvent *event) {
   if (m_isLocked) return;
   if (event->buttons()) {
-    int tabIndex = tabAt(event->pos());
+    int tabIndex = tabAt(QtCompat::mouseEventPosition(event));
     if (tabIndex == m_clickedTabIndex || tabIndex < 0 || tabIndex >= count() ||
         m_clickedTabIndex < 0)
       return;
@@ -120,7 +115,7 @@ void RoomTabWidget::mouseReleaseEvent(QMouseEvent *event) {
  */
 void RoomTabWidget::mouseDoubleClickEvent(QMouseEvent *event) {
   if (m_isLocked) return;
-  int index = tabAt(event->pos());
+  int index = tabAt(QtCompat::mouseEventPosition(event));
   if (index < 0) return;
   m_renameTabIndex     = index;
   DVGui::LineEdit *fld = m_renameTextField;
@@ -140,7 +135,7 @@ void RoomTabWidget::contextMenuEvent(QContextMenuEvent *event) {
   QAction *newRoom   = menu->addAction(tr("New Room"));
   connect(newRoom, SIGNAL(triggered()), SLOT(addNewTab()));
 
-  int index = tabAt(event->pos());
+  int index = tabAt(QtCompat::contextMenuEventPosition(event));
   if (index >= 0) {
     m_tabToDeleteIndex = index;
     if (index != currentIndex()) {
@@ -155,7 +150,7 @@ void RoomTabWidget::contextMenuEvent(QContextMenuEvent *event) {
     connect(customizeMenuBar, SIGNAL(triggered()), SLOT(onCustomizeMenuBar()));
 #endif
   }
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 //-----------------------------------------------------------------------------

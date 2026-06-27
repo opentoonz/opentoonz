@@ -1,0 +1,25 @@
+var image = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var level = new Level();
+
+print("qt-script-level-io-empty", level.type, level.frameCount);
+
+level.setFrame("1", image);
+var output = new FilePath("toonz/build/qt6-script-smoke/level_io..tif");
+level.save(output);
+
+print("qt-script-level-io-saved", level.type, level.frameCount,
+      level.getFrameIds()[0], level.getFrame("1").width);
+
+var loaded = new Level(output);
+var loadedFrame = loaded.getFrameByIndex(0);
+
+print("qt-script-level-io-loaded", loaded.type, loaded.frameCount,
+      loaded.getFrameIds()[0], loadedFrame.type, loadedFrame.width,
+      loadedFrame.height);
+
+loadedFrame.dispose();
+loaded.dispose();
+level.dispose();
+image.dispose();
+
+"qt-script-level-io-result";

@@ -4,6 +4,7 @@
 // #include "menubarcommandids.h"
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 #include "toonz/toonzfolders.h"
 #include "tsystem.h"
 #include <assert.h>
@@ -247,7 +248,7 @@ int CommandManager::getKeyFromShortcut(const std::string &shortcut) {
 
   QKeySequence ks(qShortcut);
   assert(ks.count() == 1);
-  return ks[0];
+  return QtCompat::keySequenceEntryToInt(ks, 0);
 }
 
 //---------------------------------------------------------

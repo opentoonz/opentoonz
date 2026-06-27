@@ -1129,9 +1129,6 @@ void TRop::releaseRaster46(_RASTER *&r, bool doReleaseBuffer) {
     // delete [] r->cmap.colbuffer;
   }
 
-  if (doReleaseBuffer && r->native_buffer == r->buffer)
-    delete r->buffer;  // Should not happen
-
   // Unlock if locked, and remove the cache reference
   if (r->buffer) unlockRaster(r);
   TImageCache::instance()->remove(std::string(r->cacheId, r->cacheIdLength));

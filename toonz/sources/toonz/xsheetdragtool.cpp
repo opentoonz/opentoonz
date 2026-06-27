@@ -24,6 +24,7 @@
 // TnzQt includes
 #include "toonzqt/tselectionhandle.h"
 #include "historytypes.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/tscenehandle.h"
@@ -89,7 +90,7 @@ void XsheetGUI::DragTool::refreshRowsArea() { getViewer()->updateRows(); }
 //-----------------------------------------------------------------------------
 
 void XsheetGUI::DragTool::onClick(const QMouseEvent *event) {
-  QPoint xy        = event->pos();
+  QPoint xy        = QtCompat::mouseEventPosition(event);
   CellPosition pos = getViewer()->xyToPosition(xy);
   onClick(pos);
 }
@@ -97,7 +98,7 @@ void XsheetGUI::DragTool::onClick(const QMouseEvent *event) {
 //-----------------------------------------------------------------------------
 
 void XsheetGUI::DragTool::onDrag(const QMouseEvent *event) {
-  QPoint xy        = event->pos();
+  QPoint xy        = QtCompat::mouseEventPosition(event);
   CellPosition pos = getViewer()->xyToPosition(xy);
   onDrag(pos);
 }
@@ -105,7 +106,7 @@ void XsheetGUI::DragTool::onDrag(const QMouseEvent *event) {
 //-----------------------------------------------------------------------------
 
 void XsheetGUI::DragTool::onRelease(const QMouseEvent *event) {
-  QPoint xy        = event->pos();
+  QPoint xy        = QtCompat::mouseEventPosition(event);
   CellPosition pos = getViewer()->xyToPosition(xy);
   onRelease(pos);
 }
@@ -124,7 +125,8 @@ public:
   // activate when clicked the cell
   void onClick(const QMouseEvent *event) override {
     m_modifier       = event->modifiers();
-    CellPosition pos = getViewer()->xyToPosition(event->pos());
+    CellPosition pos =
+        getViewer()->xyToPosition(QtCompat::mouseEventPosition(event));
     int row          = pos.frame();
     int col          = pos.layer();
     m_firstCol       = col;
@@ -1291,7 +1293,7 @@ public:
     m_startPos         = notes->getNotePos(currentIndex);
     m_startRow         = notes->getNoteRow(currentIndex);
     m_startCol         = notes->getNoteCol(currentIndex);
-    QPoint p           = e->pos();
+    QPoint p           = QtCompat::mouseEventPosition(e);
     TPointD mousePos(p.x(), p.y());
     QPoint xy = getViewer()->positionToXY(CellPosition(m_startRow, m_startCol));
     TPointD cellTopLeft(xy.x(), xy.y());
@@ -1324,13 +1326,13 @@ public:
   }
 
   void onDrag(const QMouseEvent *event) override {
-    QPoint p = event->pos();
+    QPoint p = QtCompat::mouseEventPosition(event);
     onChange(TPointD(p.x(), p.y()));
     refreshCellsArea();
   }
 
   void onRelease(const QMouseEvent *event) override {
-    QPoint p = event->pos();
+    QPoint p = QtCompat::mouseEventPosition(event);
     onChange(TPointD(p.x(), p.y()));
 
     TXshNoteSet *notes = getViewer()->getXsheet()->getNotes();
@@ -1558,7 +1560,8 @@ public:
 
   void onClick(const QMouseEvent *event) override {
     TColumnSelection *selection = getViewer()->getColumnSelection();
-    CellPosition cellPosition   = getViewer()->xyToPosition(event->pos());
+    CellPosition cellPosition =
+        getViewer()->xyToPosition(QtCompat::mouseEventPosition(event));
     int col                     = cellPosition.layer();
     m_firstColumn               = col;
     bool isSelected             = selection->isColumnSelected(col);
@@ -1698,7 +1701,7 @@ public:
       , m_origOffset(0) {}
 
   void onClick(const QMouseEvent *event) override {
-    QPoint xy                   = event->pos();
+    QPoint xy                   = QtCompat::mouseEventPosition(event);
     CellPosition pos            = getViewer()->xyToPosition(xy);
     int col                     = pos.layer();
     TColumnSelection *selection = getViewer()->getColumnSelection();
@@ -1935,12 +1938,13 @@ public:
     const Orientation *o = getViewer()->orientation();
     QRect track          = o->rect(PredefinedRect::VOLUME_TRACK);
     NumberRange range    = o->frameSide(track);
-    int frameAxis        = o->frameAxis(event->pos());
+    const QPoint eventPos = QtCompat::mouseEventPosition(event);
+    int frameAxis         = o->frameAxis(eventPos);
     if (o->isVerticalTimeline() &&
         !o->flag(PredefinedFlag::VOLUME_AREA_VERTICAL)) {
       range = o->layerSide(track);
       frameAxis =
-          o->layerAxis(event->pos()) - getViewer()->columnToLayerAxis(m_index);
+          o->layerAxis(eventPos) - getViewer()->columnToLayerAxis(m_index);
     }
 
     double v = range.ratio(frameAxis);
@@ -2145,15 +2149,17 @@ public:
     refreshCellsArea();
   }
   void onDrag(const QDropEvent *e) override {
-    TPoint pos(e->pos().x(), e->pos().y());
-    CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
+    const QPoint eventPos     = QtCompat::dropEventPosition(e);
+    TPoint pos(eventPos.x(), eventPos.y());
+    CellPosition cellPosition = getViewer()->xyToPosition(eventPos);
     int row                   = cellPosition.frame();
     int col                   = cellPosition.layer();
 
     m_valid = true;
-    if (e->keyboardModifiers() & Qt::ShiftModifier)
+    const Qt::KeyboardModifiers modifiers = QtCompat::dropEventModifiers(e);
+    if (modifiers & Qt::ShiftModifier)
       m_type = INSERT_CELLS;
-    else if (e->keyboardModifiers() & Qt::AltModifier)
+    else if (modifiers & Qt::AltModifier)
       m_valid = canChange(row, col);
     else
       m_type = OVERWRITE_CELLS;
@@ -2161,8 +2167,9 @@ public:
     refreshCellsArea();
   }
   void onRelease(const QDropEvent *e) override {
-    TPoint pos(e->pos().x(), e->pos().y());
-    CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
+    const QPoint eventPos     = QtCompat::dropEventPosition(e);
+    TPoint pos(eventPos.x(), eventPos.y());
+    CellPosition cellPosition = getViewer()->xyToPosition(eventPos);
     int row                   = cellPosition.frame();
     int col                   = cellPosition.layer();
     if (m_type != NO_MOVEMENT && !m_valid) return;

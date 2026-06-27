@@ -1,0 +1,25 @@
+var builder = new ImageBuilder(48, 32, "Raster");
+builder.fill("#ff0000");
+
+var scene = new Scene();
+var level = scene.newLevel("Raster", "qt6_scene_icon_source");
+level.setFrame("1", builder.image);
+scene.setCell(0, 0, level, "1");
+
+var scenePath = new FilePath("qt6_scene_save_icon.tnz");
+scene.save(scenePath);
+
+var iconPath = new FilePath(
+  "toonz/build/qt6-script-smoke/stuff/sandbox/scenes/sceneIcons/" +
+  scenePath.name + " .png");
+var icon = new Image(iconPath);
+
+print("qt-script-scene-save-icon", iconPath.exists, icon.type,
+      icon.width > 0, icon.height > 0);
+
+icon.dispose();
+level.dispose();
+scene.dispose();
+builder.dispose();
+
+"qt-script-scene-save-icon-result";

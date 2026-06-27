@@ -1,6 +1,7 @@
 #include "navtageditorpopup.h"
 
 #include "../toonz/tapp.h"
+#include "toonzqt/qtcompat.h"
 
 #include <QPushButton>
 #include <QMainWindow>
@@ -92,8 +93,9 @@ NavTagEditorPopup::NavTagEditorPopup(int frame, QString label, QColor color)
 
   ret = ret &&
         connect(m_labelFld, SIGNAL(editingFinished()), SLOT(onLabelChanged()));
-  ret = ret &&
-        connect(m_colorCB, SIGNAL(activated(int)), SLOT(onColorChanged(int)));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_colorCB, this,
+                   [this](int index) { onColorChanged(index); }));
 
   QPushButton *okBtn = new QPushButton(tr("Ok"), this);
   okBtn->setDefault(true);

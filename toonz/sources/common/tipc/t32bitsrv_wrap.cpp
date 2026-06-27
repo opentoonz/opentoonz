@@ -25,7 +25,7 @@ int t32bitsrv::BufferExchanger::write(char *dstBuf, int len) {
 template <typename PIXEL>
 int t32bitsrv::RasterExchanger<PIXEL>::read(const char *srcBuf, int len) {
   if (m_ras->getWrap() == m_ras->getLx()) {
-    memcpy(m_pix, srcBuf, len);
+    memcpy(static_cast<void *>(m_pix), srcBuf, len);
     m_pix = (PIXEL *)((UCHAR *)m_pix + len);
   } else {
     int xStart         = (m_pix - m_ras->pixels(0)) % m_ras->getWrap();
@@ -37,7 +37,7 @@ int t32bitsrv::RasterExchanger<PIXEL>::read(const char *srcBuf, int len) {
     for (; remainingData > 0;
          m_pix += (m_ras->getWrap() - xStart), remainingData -= lineDataToRead,
          lineDataToRead = std::min(lineData, remainingData), xStart = 0)
-      memcpy(m_pix, srcBuf, lineDataToRead);
+      memcpy(static_cast<void *>(m_pix), srcBuf, lineDataToRead);
   }
 
   return len;

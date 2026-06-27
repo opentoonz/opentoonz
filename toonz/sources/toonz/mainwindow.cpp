@@ -28,6 +28,7 @@
 #include "toonzqt/viewcommandids.h"
 #include "toonzqt/updatechecker.h"
 #include "toonzqt/paletteviewer.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/seethroughwindow.h"
 
 // TnzLib includes
@@ -41,6 +42,7 @@
 
 // TnzBase includes
 #include "tenv.h"
+#include "tbuildinfo.h"
 
 // TnzCore includes
 #include "tsystem.h"
@@ -51,7 +53,10 @@
 #include <QStackedWidget>
 #include <QSettings>
 #include <QApplication>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QGLPixelBuffer>
+#endif
+#include <QActionGroup>
 #include <QDebug>
 #include <QDesktopServices>
 #include <QButtonGroup>
@@ -62,6 +67,18 @@
 #include <QtPlatformHeaders/QWindowsWindowFunctions>
 #endif
 #include <docklayout.h>
+
+namespace {
+
+bool hasRasterizePliOpenGLSupport() {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+  return QGLPixelBuffer::hasOpenGLPbuffers();
+#else
+  return true;
+#endif
+}
+
+}  // namespace
 
 TEnv::IntVar ViewCameraToggleAction("ViewCameraToggleAction", 1);
 TEnv::IntVar ViewTableToggleAction("ViewTableToggleAction", 1);
@@ -211,13 +228,20 @@ void makePrivate(std::vector<Room *> &rooms) {
 // major version  :  7 bits
 // minor version  :  8 bits
 // revision number: 16 bits
+int get_version_component_from(std::string component) {
+  std::string::size_type nonDigit = component.find_first_not_of("0123456789");
+  if (nonDigit == 0) return 0;
+  if (nonDigit != std::string::npos) component = component.substr(0, nonDigit);
+  return std::stoi(component);
+}
+
 int get_version_code_from(std::string ver) {
   int version = 0;
 
   // major version: assume that the major version is less than 127.
   std::string::size_type const a = ver.find('.');
   std::string const major = (a == std::string::npos) ? ver : ver.substr(0, a);
-  version += std::stoi(major) << 24;
+  version += get_version_component_from(major) << 24;
   if ((a == std::string::npos) || (a + 1 == ver.length())) {
     return version;
   }
@@ -227,13 +251,13 @@ int get_version_code_from(std::string ver) {
   std::string const minor        = (b == std::string::npos)
                                        ? ver.substr(a + 1)
                                        : ver.substr(a + 1, b - a - 1);
-  version += std::stoi(minor) << 16;
+  version += get_version_component_from(minor) << 16;
   if ((b == std::string::npos) || (b + 1 == ver.length())) {
     return version;
   }
 
   // revision number: assume that the revision number is less than 32767.
-  version += std::stoi(ver.substr(b + 1));
+  version += get_version_component_from(ver.substr(b + 1));
 
   return version;
 }
@@ -363,7 +387,7 @@ void Room::load(const TFilePath &fp, RoomLoadParams &params) {
 
     // Retrieve panel name
     QVariant name = m_settings->value("name");
-    if (name.canConvert(QVariant::String)) {
+    if (name.canConvert<QString>()) {
       // Allocate panel
       paneObjectName          = name.toString();
       std::string paneStrName = paneObjectName.toStdString();
@@ -570,7 +594,7 @@ void MainWindow::changeWindowTitle() {
                  QString::fromStdString(TEnv::getApplicationFullName());
 
   if (ShowBuildDateInTitle) {
-    name += " (built " __DATE__ " " __TIME__ ")";
+    name += " (built " OPENTOONZ_BUILD_TIMESTAMP ")";
   }
   setWindowTitle(name);
 }
@@ -1076,17 +1100,18 @@ void MainWindow::onAbout() {
   QHBoxLayout *hLay = new QHBoxLayout();
   {
     QString name = QString::fromStdString(TEnv::getApplicationFullName());
-    name += " (built " __DATE__ " " __TIME__ ")";
+    name += " (built " OPENTOONZ_BUILD_TIMESTAMP ")";
     hLay->addWidget(new QLabel(name, dialog));
 
     QCheckBox *showDateCheckBox =
         new QCheckBox(tr("Show build date in title"), dialog);
     showDateCheckBox->setChecked(ShowBuildDateInTitle);
-    connect(showDateCheckBox, &QCheckBox::stateChanged, [=](int state) {
-      bool show            = (state == Qt::Checked);
-      ShowBuildDateInTitle = show;
-      changeWindowTitle();
-    });
+    QtCompat::connectCheckStateChanged(
+        showDateCheckBox, dialog, [=](Qt::CheckState state) {
+          bool show            = (state == Qt::Checked);
+          ShowBuildDateInTitle = show;
+          changeWindowTitle();
+        });
     hLay->addWidget(showDateCheckBox);
   }
   dialog->addLayout(hLay);
@@ -1477,7 +1502,7 @@ void MainWindow::onMenuCheckboxChanged() {
   else if (cm->getAction(MI_FieldGuide) == action)
     FieldGuideToggleAction = isChecked;
   else if (cm->getAction(MI_RasterizePli) == action) {
-    if (!QGLPixelBuffer::hasOpenGLPbuffers()) isChecked = 0;
+    if (!hasRasterizePliOpenGLSupport()) isChecked = 0;
     RasterizePliToggleAction = isChecked;
   } else if (cm->getAction(MI_SafeArea) == action)
     SafeAreaToggleAction = isChecked;
@@ -1571,7 +1596,8 @@ void MainWindow::onUpdateCheckerDone(bool error) {
     dialog->deleteLater();
     if (ret == 1) {
       // Write the new last date to file
-      QDesktopServices::openUrl(QObject::tr("https://opentoonz.github.io/e/"));
+      QDesktopServices::openUrl(
+          QUrl(QObject::tr("https://opentoonz.github.io/e/")));
     }
   }
 
@@ -2468,7 +2494,7 @@ void MainWindow::defineActions() {
   createToggle(MI_VectorGuidedDrawing, QT_TR_NOOP("Vector Guided Drawing"), "",
                Preferences::instance()->isGuidedDrawingEnabled(),
                MenuViewCommandType, "view_guided_drawing");
-  if (QGLPixelBuffer::hasOpenGLPbuffers())
+  if (hasRasterizePliOpenGLSupport())
     createToggle(MI_RasterizePli, QT_TR_NOOP("&Visualize Vector As Raster"), "",
                  RasterizePliToggleAction ? 1 : 0, MenuViewCommandType,
                  "view_vector_as_raster");

@@ -36,6 +36,7 @@
 
 // Qt includes
 #include <QMenu>
+#include <QActionGroup>
 
 SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
     : QMenu(parent), m_viewer(parent), m_groupIndexToBeEntered(-1) {

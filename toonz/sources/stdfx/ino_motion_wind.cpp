@@ -100,7 +100,7 @@ public:
     this->m_length_bias->setValueRange(0.1 * ino::param_range(),
                                        10.0 * ino::param_range()); /* gamma値 */
     this->m_length_seed->setValueRange(
-        0, std::numeric_limits<unsigned long>::max());
+        0, static_cast<double>((std::numeric_limits<unsigned long>::max)()));
 
     this->m_force_min->setValueRange(0.1 * ino::param_range(),
                                      10.0 * ino::param_range()); /* gamma値 */
@@ -109,7 +109,7 @@ public:
     this->m_force_bias->setValueRange(0.1 * ino::param_range(),
                                       10.0 * ino::param_range()); /* gamma値 */
     this->m_force_seed->setValueRange(
-        0, std::numeric_limits<unsigned long>::max());
+        0, static_cast<double>((std::numeric_limits<unsigned long>::max)()));
 
     this->m_density_min->setValueRange(0.0 * ino::param_range(),
                                        100.0 * ino::param_range());
@@ -118,7 +118,7 @@ public:
     this->m_density_bias->setValueRange(
         0.1 * ino::param_range(), 10.0 * ino::param_range()); /* gamma値 */
     this->m_density_seed->setValueRange(
-        0, std::numeric_limits<unsigned long>::max());
+        0, static_cast<double>((std::numeric_limits<unsigned long>::max)()));
 
     this->m_ref_mode->addItem(1, "Green");
     this->m_ref_mode->addItem(2, "Blue");

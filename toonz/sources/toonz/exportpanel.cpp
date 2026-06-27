@@ -20,6 +20,7 @@
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/gutil.h"
 #include "toonzqt/dvdialog.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/tscenehandle.h"
@@ -667,12 +668,12 @@ void ClipListViewer::dragEnterEvent(QDragEnterEvent *event) {
       TFilePath fp(url.toLocalFile().toStdString());
       if (fp.getType() != "tnz") return;
     }
-    setDropInsertionPoint(event->pos());
+    setDropInsertionPoint(QtCompat::dropEventPosition(event));
     event->setDropAction(Qt::CopyAction);
     event->acceptProposedAction();
     update();
   } else if (event->mimeData()->hasFormat(m_mimeFormat)) {
-    setDropInsertionPoint(event->pos());
+    setDropInsertionPoint(QtCompat::dropEventPosition(event));
     event->setDropAction(Qt::MoveAction);
     event->acceptProposedAction();
     update();
@@ -683,7 +684,7 @@ void ClipListViewer::dragEnterEvent(QDragEnterEvent *event) {
 
 void ClipListViewer::dragMoveEvent(QDragMoveEvent *event) {
   int oldDropInsertionPoint = m_dropInsertionPoint;
-  setDropInsertionPoint(event->pos());
+  setDropInsertionPoint(QtCompat::dropEventPosition(event));
   if (oldDropInsertionPoint != m_dropInsertionPoint) update();
 }
 

@@ -23,6 +23,7 @@
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/fxselection.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/tscenehandle.h"
@@ -546,10 +547,13 @@ LevelSettingsPopup::LevelSettingsPopup()
   //----signal/slot connections
   connect(m_nameFld, SIGNAL(editingFinished()), SLOT(onNameChanged()));
   connect(m_pathFld, SIGNAL(pathChanged()), SLOT(onPathChanged()));
-  connect(m_dpiTypeOm, SIGNAL(activated(int)), SLOT(onDpiTypeChanged(int)));
+  QtCompat::connectComboBoxActivatedIndex(
+      m_dpiTypeOm, this, [this](int index) { onDpiTypeChanged(index); });
   connect(m_dpiFld, SIGNAL(editingFinished()), SLOT(onDpiFieldChanged()));
-  connect(m_squarePixCB, SIGNAL(stateChanged(int)),
-          SLOT(onSquarePixelChanged(int)));
+  QtCompat::connectCheckStateChanged(
+      m_squarePixCB, this, [this](Qt::CheckState state) {
+        onSquarePixelChanged(static_cast<int>(state));
+      });
   connect(m_widthFld, SIGNAL(valueChanged()), SLOT(onWidthFieldChanged()));
   connect(m_heightFld, SIGNAL(valueChanged()), SLOT(onHeightFieldChanged()));
   connect(m_useCameraDpiBtn, SIGNAL(clicked()), SLOT(useCameraDpi()));

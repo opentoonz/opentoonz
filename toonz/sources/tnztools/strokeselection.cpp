@@ -370,7 +370,7 @@ public:
 
   ~OrderStrokesUndo() {}
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr(
                "Sort Vector Strokes With Palette Order Level : %1 Frame : %2")
         .arg(QString::fromStdWString(m_level->getName()))

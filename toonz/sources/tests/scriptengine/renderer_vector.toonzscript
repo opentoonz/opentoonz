@@ -1,0 +1,40 @@
+var source = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var vectorizer = new OutlineVectorizer();
+var vector = vectorizer.vectorize(source);
+
+var scene = new Scene();
+var vectorLevel = scene.newLevel("Vector", "qt6_renderer_vector_source");
+vectorLevel.setFrame("1", vector);
+scene.setCell(0, 0, vectorLevel, "1");
+
+var renderer = new Renderer();
+renderer.frames = [0];
+renderer.columns = [0];
+
+var renderedFrame = renderer.renderFrame(scene, 0);
+var framePath = new FilePath("toonz/build/qt6-script-smoke/renderer_vector_frame.png");
+renderedFrame.save(framePath);
+var reloadedFrame = new Image(framePath);
+print("qt-script-renderer-vector-frame", vector.type, renderedFrame.type,
+      renderedFrame.width > 0, renderedFrame.height > 0, framePath.exists,
+      reloadedFrame.type);
+
+var renderedLevel = renderer.renderScene(scene);
+var renderedLevelFrame = renderedLevel.getFrame("1");
+print("qt-script-renderer-vector-scene", renderedLevel.type,
+      renderedLevel.frameCount, renderedLevel.getFrameIds()[0],
+      renderedLevelFrame.type, renderedLevelFrame.width > 0,
+      renderedLevelFrame.height > 0);
+
+renderedLevelFrame.dispose();
+renderedLevel.dispose();
+reloadedFrame.dispose();
+renderedFrame.dispose();
+renderer.dispose();
+vectorLevel.dispose();
+scene.dispose();
+vector.dispose();
+vectorizer.dispose();
+source.dispose();
+
+"qt-script-renderer-vector-result";

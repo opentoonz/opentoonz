@@ -63,7 +63,7 @@ public:
                                1.0 * ino::param_range());
 
     this->m_random_seed->setValueRange(
-        0, std::numeric_limits<unsigned long>::max());
+        0, static_cast<double>((std::numeric_limits<unsigned long>::max)()));
     this->m_near_blur->setValueRange(0.0 * ino::param_range(),
                                      1.0 * ino::param_range());
     this->m_term_effective->setValueRange(0.0 * ino::param_range(),

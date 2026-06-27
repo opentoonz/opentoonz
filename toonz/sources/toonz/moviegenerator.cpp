@@ -120,6 +120,10 @@ public:
     if (p->getName() == "Resolution")
       m_alphaEnabled = p->getValue() == L"32 bits";
   }
+  void visit(TDoublePairProperty *p) override {}
+  void visit(TIntPairProperty *p) override {}
+  void visit(TStyleIndexProperty *p) override {}
+  void visit(TPointerProperty *p) override {}
 };
 
 //=============================================================================

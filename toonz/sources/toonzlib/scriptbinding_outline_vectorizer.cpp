@@ -172,8 +172,7 @@ QString OutlineVectorizer::getTransparentColor() const {
 }
 //----------------------------------------------------------
 void OutlineVectorizer::setTransparentColor(const QString &colorName) {
-  QColor color;
-  color.setNamedColor(colorName);
+  QColor color(colorName);
   if (color.isValid()) {
     m_parameters->m_transparentColor =
         TPixel32(color.red(), color.green(), color.blue(), color.alpha());

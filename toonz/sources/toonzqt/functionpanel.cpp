@@ -8,6 +8,7 @@
 #include "toonzqt/imageutils.h"
 #include "functionpaneltools.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/tframehandle.h"
@@ -836,8 +837,7 @@ void FunctionPanel::updateGadgets(TDoubleParam *curve) {
     double frame = it->first;  // redundant, already in the key... oh well
     QPointF p(frameToX(frame), groupHandleY);
 
-    Gadget gadget((FunctionPanel::Handle)100, -1, p, 6,
-                  6);  // No idea what the '100' type value mean...
+    Gadget gadget(FunctionPanel::GroupPoint, -1, p, 6, 6);
     gadget.m_keyframePosition = frame;
 
     m_gadgets.push_back(gadget);
@@ -870,7 +870,7 @@ void FunctionPanel::updateGadgets(TDoubleParam *curve) {
          kf.m_type == TDoubleKeyframe::EaseInOut) &&
         kf.m_speedOut.x != 0) {
       QPointF p(frameToX(frame + kf.m_speedOut.x), groupHandleY);
-      Gadget gadget((FunctionPanel::Handle)101, -1, p, 6, 15);  // type value...
+      Gadget gadget(FunctionPanel::GroupSpeedOut, -1, p, 6, 15);
       gadget.m_keyframePosition = frame;
       m_gadgets.push_back(gadget);
     }
@@ -879,7 +879,7 @@ void FunctionPanel::updateGadgets(TDoubleParam *curve) {
          kf.m_prevType == TDoubleKeyframe::EaseInOut) &&
         kf.m_speedIn.x != 0) {
       QPointF p(frameToX(frame + kf.m_speedIn.x), groupHandleY);
-      Gadget gadget((FunctionPanel::Handle)102, -1, p, 6, 15);  // type value...
+      Gadget gadget(FunctionPanel::GroupSpeedIn, -1, p, 6, 15);
       gadget.m_keyframePosition = frame;
       m_gadgets.push_back(gadget);
     }
@@ -949,7 +949,7 @@ void FunctionPanel::drawCurrentCurve(QPainter &painter) {
   painter.setPen(solidPen);
   for (int j = 0; j < (int)m_gadgets.size() - 1; j++)
     if (m_gadgets[j].m_handle == Point && m_gadgets[j + 1].m_handle &&
-        m_gadgets[j + 1].m_handle != 100 &&
+        m_gadgets[j + 1].m_handle != GroupPoint &&
         m_gadgets[j].m_pos.x() == m_gadgets[j + 1].m_pos.x())
       painter.drawLine(m_gadgets[j].m_pos, m_gadgets[j + 1].m_pos);
 
@@ -1043,15 +1043,15 @@ void FunctionPanel::drawGroupKeyframes(QPainter &painter) {
     int d = 2;
     int h = 4;
     switch (g.m_handle) {
-    case 100:
+    case GroupPoint:
       drawSquare(painter, p, r);
       y = p.y();
       keyframes.push_back(p.x());
       break;
-    case 101:
+    case GroupSpeedOut:
       d = -d;
     // Note: NO break!
-    case 102:
+    case GroupSpeedIn:
       painter.setBrush(Qt::NoBrush);
       painter.setPen(isHighlighted ? QColor(255, 126, 0) : m_textColor);
       pp.moveTo(p + QPointF(d, -h));
@@ -1187,10 +1187,11 @@ void FunctionPanel::mousePressEvent(QMouseEvent *e) {
     m_dragTool = nullptr;
   }
 
+  const QPoint eventPos = QtCompat::mouseEventPosition(e);
   if (e->button() == Qt::MiddleButton) {
     // mid mouse click => panning
-    bool xLocked = e->pos().x() <= m_valueAxisX;
-    bool yLocked = e->pos().y() <= m_valueAxisX;
+    bool xLocked = eventPos.x() <= m_valueAxisX;
+    bool yLocked = eventPos.y() <= m_valueAxisX;
     m_dragTool   = new PanDragTool(this, xLocked, yLocked);
     m_dragTool->click(e);
     return;
@@ -1200,16 +1201,17 @@ void FunctionPanel::mousePressEvent(QMouseEvent *e) {
     return;
   }
 
-  QPoint winPos         = e->pos();
+  QPoint winPos         = eventPos;
   Handle handle         = None;
   const int maxDistance = 20;
-  int closestGadgetId   = findClosestGadget(e->pos(), handle, maxDistance);
+  int closestGadgetId   = findClosestGadget(eventPos, handle, maxDistance);
 
-  if (e->pos().x() > m_valueAxisX && e->pos().y() < m_frameAxisY &&
+  if (eventPos.x() > m_valueAxisX && eventPos.y() < m_frameAxisY &&
       closestGadgetId < 0 && (e->modifiers() & Qt::ControlModifier) == 0) {
     // click on topbar => frame zoom
     m_dragTool = new ZoomDragTool(this, ZoomDragTool::FrameZoom);
-  } else if (e->pos().x() < m_valueAxisX && e->pos().y() > m_graphViewportY) {
+  } else if (eventPos.x() < m_valueAxisX &&
+             eventPos.y() > m_graphViewportY) {
     // click on topbar => value zoom
     m_dragTool = new ZoomDragTool(this, ZoomDragTool::ValueZoom);
   } else if (m_currentFrameStatus == 1 && m_frameHandle != 0 &&
@@ -1220,12 +1222,12 @@ void FunctionPanel::mousePressEvent(QMouseEvent *e) {
   }
 
   if (0 <= closestGadgetId && closestGadgetId < (int)m_gadgets.size()) {
-    if (handle == 100)  // group move gadget
+    if (handle == GroupPoint)  // group move gadget
     {
       MovePointDragTool *dragTool = new MovePointDragTool(this, 0);
       dragTool->selectKeyframes(m_gadgets[closestGadgetId].m_keyframePosition);
       m_dragTool = dragTool;
-    } else if (handle == 101 || handle == 102) {
+    } else if (handle == GroupSpeedOut || handle == GroupSpeedIn) {
       m_dragTool = new MoveGroupHandleDragTool(
           this, m_gadgets[closestGadgetId].m_keyframePosition, handle);
     }
@@ -1390,30 +1392,31 @@ void FunctionPanel::mouseMoveEvent(QMouseEvent *e) {
   if (e->buttons()) {
     if (m_dragTool) m_dragTool->drag(e);
   } else {
-    m_cursor.frame   = xToFrame(e->pos().x());
+    const QPoint eventPos = QtCompat::mouseEventPosition(e);
+    m_cursor.frame   = xToFrame(eventPos.x());
     m_cursor.value   = 0;
     m_cursor.visible = true;
 
     TDoubleParam *currentCurve = getCurrentCurve();
     if (currentCurve) {
       Handle handle = None;
-      int gIndex    = findClosestGadget(e->pos(), handle, 20);
+      int gIndex    = findClosestGadget(eventPos, handle, 20);
       if (m_highlighted.handle != handle || m_highlighted.gIndex != gIndex) {
         m_highlighted.handle = handle;
         m_highlighted.gIndex = gIndex;
       }
-      m_cursor.value = yToValue(currentCurve, e->pos().y());
+      m_cursor.value = yToValue(currentCurve, eventPos.y());
     }
 
     double currentFrame = m_frameHandle ? m_frameHandle->getFrame() : 0;
     if (m_highlighted.handle == None &&
-        std::abs(e->pos().x() - frameToX(currentFrame)) < 5)
+        std::abs(eventPos.x() - frameToX(currentFrame)) < 5)
       m_currentFrameStatus = 1;
     else
       m_currentFrameStatus = 0;
 
     FunctionTreeModel::Channel *closestChannel =
-        findClosestChannel(e->pos(), 20);
+        findClosestChannel(eventPos, 20);
     if (closestChannel && m_highlighted.handle == None) {
       TDoubleParam *curve = closestChannel->getParam();
       if (m_functionTreeModel->getActiveChannelCount() <= 1)
@@ -1451,7 +1454,7 @@ void FunctionPanel::keyPressEvent(QKeyEvent *e) {
 
 //-----------------------------------------------------------------------------
 
-void FunctionPanel::enterEvent(QEvent *) {
+void FunctionPanel::enterEvent(QtCompat::EnterEvent *) {
   m_cursor.visible = true;
   update();
 }
@@ -1466,8 +1469,8 @@ void FunctionPanel::leaveEvent(QEvent *) {
 //-----------------------------------------------------------------------------
 
 void FunctionPanel::wheelEvent(QWheelEvent *e) {
-  double factor = exp(0.002 * (double)e->angleDelta().y());
-  zoom(factor, factor, e->position().toPoint());
+  double factor = exp(0.002 * (double)QtCompat::wheelEventAngleDeltaY(e));
+  zoom(factor, factor, QtCompat::wheelEventPosition(e));
 }
 
 //-----------------------------------------------------------------------------
@@ -1584,12 +1587,13 @@ void FunctionPanel::openContextMenu(QMouseEvent *e) {
   int segmentIndex    = -1;
   if (!curve) return;
   TDoubleKeyframe kf;
-  double frame = xToFrame(e->pos().x());
+  const QPoint eventPos = QtCompat::mouseEventPosition(e);
+  double frame = xToFrame(eventPos.x());
 
   // build menu
   QMenu menu(0);
   if (m_highlighted.handle == Point && m_highlighted.gIndex >= 0 &&
-      m_gadgets[m_highlighted.gIndex].m_handle != 100) {
+      m_gadgets[m_highlighted.gIndex].m_handle != GroupPoint) {
     kf = curve->getKeyframe(m_gadgets[m_highlighted.gIndex].m_kIndex);
     if (kf.m_linkedHandles)
       menu.addAction(&unlinkHandlesAction);
@@ -1667,17 +1671,16 @@ void FunctionPanel::openContextMenu(QMouseEvent *e) {
   Highlighted highlighted(m_highlighted);
 
   // execute menu
-  QAction *action = menu.exec(e->globalPos());  // Will process events, possibly
-                                                // altering m_highlighted
-                                                // (MAC-verified)
+  QAction *action = menu.exec(QtCompat::mouseEventGlobalPosition(e));
+  // Will process events, possibly altering m_highlighted (MAC-verified).
   if (action == &linkHandlesAction)  // Let's just *hope* that doesn't happen to
                                      // m_gadgets though...  :/
   {
-    if (m_gadgets[highlighted.gIndex].m_handle != 100)
+    if (m_gadgets[highlighted.gIndex].m_handle != GroupPoint)
       KeyframeSetter(curve, m_gadgets[highlighted.gIndex].m_kIndex)
           .linkHandles();
   } else if (action == &unlinkHandlesAction) {
-    if (m_gadgets[highlighted.gIndex].m_handle != 100)
+    if (m_gadgets[highlighted.gIndex].m_handle != GroupPoint)
       KeyframeSetter(curve, m_gadgets[highlighted.gIndex].m_kIndex)
           .unlinkHandles();
   } else if (action == &resetHandlesAction) {
