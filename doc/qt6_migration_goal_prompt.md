@@ -2073,6 +2073,13 @@ branch.
   rejection of non-string, non-`Level` cell level arguments, four-argument
   undefined level rejection, bad row/column errors, and load-level
   missing-file/duplicate-name errors.
+- A Scene level-name edge-case Qt 6 script fixture exists at
+  `toonz/sources/tests/scriptengine/scene_level_name_edges.toonzscript` and is
+  run by `mise run script-smoke-scene-level-name-edges-qt6`. It validates
+  `Scene.newLevel()` / `Scene.getLevel()` JavaScript `String()` coercion for
+  numeric, null, and object names, lookup through equivalent coerced values,
+  missing lookup returning `undefined`, and duplicate-level rejection after name
+  coercion.
 - A Scene argument edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/scene_argument_edges.toonzscript` and is
   run by `mise run script-smoke-scene-argument-edges-qt6`. It validates
@@ -2440,7 +2447,7 @@ branch.
   FilePath metadata, path-argument,
   Scene, Scene cells, Scene columns, Scene column edge,
   Scene cell frame-id type, Scene cell object edge, Scene edges,
-  Scene argument edges,
+  Scene level-name edge, Scene argument edges,
   Scene lifecycle edges, Scene load-level, Scene load-level sequence,
   Scene save/reopen, Scene reload edge,
   Scene failed-load, Scene save-icon, Scene save-icon variants, Scene frame-id,
@@ -2668,7 +2675,7 @@ The next slice should make the Qt 6 app useful enough to run and diagnose:
    FilePath-edge, FilePath metadata,
    path-argument, Scene, Scene cells, Scene columns, Scene column edge,
    Scene cell frame-id type, Scene cell object edge, Scene edges,
-   Scene argument edges,
+   Scene level-name edge, Scene argument edges,
    Scene lifecycle edges, Scene load-level, Scene load-level sequence,
    Scene save/reopen,
    Scene reload edge, Scene failed-load,

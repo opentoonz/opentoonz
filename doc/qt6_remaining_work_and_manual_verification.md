@@ -674,7 +674,11 @@ Already covered:
   smoke now also covers duplicate level-name rejection, level-name based cell
   insertion, clearing and shifting cells through column deletion, missing-level
   lookup behavior, save/reopen of a mutated scene, and stale scene-owned level
-  wrapper behavior after a subsequent scene reload.
+  wrapper behavior after a subsequent scene reload. Scene level-name edge
+  coverage also verifies `Scene.newLevel()` / `Scene.getLevel()` JavaScript
+  `String()` coercion for numeric, null, and object names, lookup through
+  equivalent coerced values, missing lookup returning `undefined`, and
+  duplicate-level rejection after name coercion.
 - The Level smoke coverage now includes `Level.path` bad setter rejection, the
   current failed path reload behavior for missing target paths, and
   post-dispose rejection across the Level public surface. It also covers the
