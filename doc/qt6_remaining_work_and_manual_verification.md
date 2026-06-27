@@ -731,8 +731,8 @@ Already covered:
   integer-only integral-property assignment and finite-number DPI validation
   before native numeric conversion.
 - The Transform smoke covers post-dispose rejection for `toString()`,
-  `translate()`, `rotate()`, and `scale()`, plus finite-number argument
-  validation.
+  `translate()`, `rotate()`, and `scale()`, non-mutating transform chaining
+  with fresh wrapper ids, plus finite-number argument validation.
 - The focused QApplication scene-icon script smokes now pass under
   `QT_QPA_PLATFORM=offscreen`; the Qt 6 offscreen path writes a valid
   background-filled icon instead of entering the unsupported offscreen

@@ -2163,10 +2163,11 @@ branch.
   `toString()`, `image`, `clear()`, `fill()`, and `add()`.
 - A Transform edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/transform_edges.toonzscript` and is run by
-  `mise run script-smoke-transform-edges-qt6`. It validates finite-number
-  argument rejection for `translate()`, `rotate()`, and `scale()`, strict
-  constructor arity, plus disposed `toString()`, `translate()`, `rotate()`,
-  and `scale()` rejection without entering rendering paths.
+  `mise run script-smoke-transform-edges-qt6`. It validates non-mutating
+  transform chaining with fresh wrapper ids, finite-number argument rejection
+  for `translate()`, `rotate()`, and `scale()`, strict constructor arity, plus
+  disposed `toString()`, `translate()`, `rotate()`, and `scale()` rejection
+  without entering rendering paths.
 - A tenth Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/toonz_raster_converter.toonzscript` and is
   run by `mise run script-smoke-toonz-raster-converter-qt6`. It validates the

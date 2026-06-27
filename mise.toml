@@ -700,7 +700,7 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/image_builder.t
 
 [tasks.script-smoke-transform-edges-qt6]
 description = "Run the Qt 6 app bundle against Transform argument and disposal edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/transform_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-transform-edges-valid Translation(-2,3) Rotation(-45) Scale(50%) Scale(50%, 125%)|qt-script-transform-edges-errors [true,true,true,true,true,true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/transform_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-transform-edges-valid Translation(-2,3) Rotation(-45) Scale(50%) Scale(50%, 125%)|qt-script-transform-edges-chain Identity Translation(-2,3) Translation(-1,4) true true|qt-script-transform-edges-errors [true,true,true,true,true,true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-image-builder-edges-qt6]
 description = "Run the Qt 6 app bundle against ImageBuilder constructor, fill, add, and disposal edge cases."

@@ -12,9 +12,13 @@ var shifted = transform.translate(-2, 3);
 var rotated = transform.rotate(-45);
 var scaled = transform.scale(0.5);
 var nonUniformScaled = transform.scale(0.5, 1.25);
+var shiftedAgain = shifted.translate(1, 1);
 
 print("qt-script-transform-edges-valid", shifted.toString(),
       rotated.toString(), scaled.toString(), nonUniformScaled.toString());
+print("qt-script-transform-edges-chain", transform.toString(),
+      shifted.toString(), shiftedAgain.toString(),
+      transform.id !== shifted.id, shifted.id !== shiftedAgain.id);
 
 var disposed = new Transform();
 disposed.dispose();
@@ -36,5 +40,7 @@ var errors = [
   hasError(function() { disposed.scale(2); }, "Invalid Transform")
 ];
 print("qt-script-transform-edges-errors", errors);
+
+shiftedAgain.dispose();
 
 "qt-script-transform-edges-result";
