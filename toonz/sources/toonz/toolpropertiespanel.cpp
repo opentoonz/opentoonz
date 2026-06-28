@@ -717,10 +717,14 @@ void ToolPropertiesPanel::showEmptyPropertiesHint(
     message = tr("No adjustable properties for this tool.");
   }
 
-  QLabel *hint = new QLabel(message, this);
+  QLabel *hint = new QLabel(message, m_propertiesContainer);
   hint->setAlignment(Qt::AlignCenter);
   hint->setWordWrap(true);
-  hint->setStyleSheet("color: gray; padding: 20px;");
+  QPalette pal = hint->palette();
+  pal.setColor(QPalette::WindowText,
+               palette().color(QPalette::Disabled, QPalette::WindowText));
+  hint->setPalette(pal);
+  hint->setStyleSheet("padding: 20px;");
   m_propertiesLayout->addWidget(hint);
 }
 
