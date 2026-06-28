@@ -1,5 +1,9 @@
 # OpenToonz
 
+## ⚠️ **Important**
+
+**OFFICIAL SOURCE ONLY:** The only official websites for OpenToonz are [**opentoonz.github.io**](https://opentoonz.github.io/) and this [GitHub repository](https://github.com/opentoonz/opentoonz). To ensure your security, please avoid downloading OpenToonz from any other domain, as there are no other official mirrors or partner sites.
+
 [日本語](./doc/README_ja.md) [简体中文](./doc/README_chs.md)
 
 [![](https://ci.appveyor.com/api/projects/status/oa5l5pc964h8fv49/branch/master?svg=true)](https://ci.appveyor.com/project/opentoonz/opentoonz)
