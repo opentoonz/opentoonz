@@ -9,10 +9,19 @@ print("qt-script-level-transformers-source", rasterLevel.type,
 var outlineVectorizer = new OutlineVectorizer();
 outlineVectorizer.accuracy = 6;
 var outlineLevel = outlineVectorizer.vectorize(rasterLevel);
+var outlineLevelAgain = outlineVectorizer.vectorize(rasterLevel);
+var outlineLevelId = outlineLevel.id;
 var outlineFrame = outlineLevel.getFrame("2");
 print("qt-script-level-transformers-outline", outlineLevel.type,
       outlineLevel.frameCount, outlineLevel.getFrameIds().join(","),
       outlineFrame.type);
+outlineFrame.dispose();
+outlineLevel.dispose();
+var outlineLevelAgainFrameIds = outlineLevelAgain.getFrameIds().join(",");
+print("qt-script-level-transformers-outline-wrappers",
+      outlineLevelId > 0, outlineLevelAgain.id != outlineLevelId,
+      outlineLevelAgain.type, outlineLevelAgain.frameCount,
+      outlineLevelAgainFrameIds);
 
 var centerlineVectorizer = new CenterlineVectorizer();
 centerlineVectorizer.threshold = 6;
@@ -27,7 +36,7 @@ rasterizer.colorMapped = true;
 rasterizer.xres = 40;
 rasterizer.yres = 30;
 rasterizer.dpi = 120;
-var toonzLevel = rasterizer.rasterize(outlineLevel);
+var toonzLevel = rasterizer.rasterize(outlineLevelAgain);
 var toonzFrame = toonzLevel.getFrame("2");
 print("qt-script-level-transformers-rasterizer", toonzLevel.type,
       toonzLevel.frameCount, toonzLevel.getFrameIds().join(","),
@@ -39,8 +48,7 @@ rasterizer.dispose();
 centerlineFrame.dispose();
 centerlineLevel.dispose();
 centerlineVectorizer.dispose();
-outlineFrame.dispose();
-outlineLevel.dispose();
+outlineLevelAgain.dispose();
 outlineVectorizer.dispose();
 rasterLevel.dispose();
 source.dispose();

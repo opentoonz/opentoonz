@@ -772,7 +772,7 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/renderer_lifecy
 
 [tasks.script-smoke-level-transformers-qt6]
 description = "Run the Qt 6 app bundle against level-wide vectorizer and rasterizer binding fixtures."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/level_transformers.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-level-transformers-source Raster 2 0001,0002|qt-script-level-transformers-outline Vector 2 0001,0002 Vector|qt-script-level-transformers-centerline Vector 2 0001,0002 Vector|qt-script-level-transformers-rasterizer ToonzRaster 2 0001,0002 ToonzRaster 40 30' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/level_transformers.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-level-transformers-source Raster 2 0001,0002|qt-script-level-transformers-outline Vector 2 0001,0002 Vector|qt-script-level-transformers-outline-wrappers true true Vector 2 0001,0002|qt-script-level-transformers-centerline Vector 2 0001,0002 Vector|qt-script-level-transformers-rasterizer ToonzRaster 2 0001,0002 ToonzRaster 40 30' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-user-workflow-qt6]
 description = "Run the Qt 6 app bundle against an end-to-end user-style script workflow."

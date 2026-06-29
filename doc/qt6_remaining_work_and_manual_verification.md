@@ -688,8 +688,9 @@ Already covered:
   `Level.name` JavaScript `String()` coercion for numeric/null/object values,
   `Scene.getLevels()` visibility after wrapper-property renames, the current
   non-updating `Scene.getLevel(newName)` lookup behavior after those renames,
-  plus strict Level method arity for constructor, frame access, frame
-  assignment, load, and save calls.
+  strict Level method arity for constructor, frame access, frame assignment,
+  load, and save calls, plus fresh returned `Level` wrapper ids and independent
+  returned-level lifetime for repeated level-wide vectorization.
 - The ToonzRasterConverter smoke coverage now includes legacy bool coercion for
   `flatSource`, instance `dispose()` behavior, fresh converted image wrapper
   ids with independent returned-image wrapper lifetime, static conversion after
