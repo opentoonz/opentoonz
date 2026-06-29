@@ -2335,9 +2335,9 @@ branch.
   by `mise run script-smoke-level-transformers-qt6`. It validates level-wide
   non-rendering transformer parity for `OutlineVectorizer.vectorize(Level)`,
   `CenterlineVectorizer.vectorize(Level)`, and `Rasterizer.rasterize(Level)`,
-  including repeated level-wide vectorization returning fresh `Level` wrapper
-  ids whose returned-level lifetime remains independent after disposing the
-  first returned wrapper.
+  including repeated level-wide vectorization and rasterization returning fresh
+  `Level` wrapper ids whose returned-level lifetime remains independent after
+  disposing the first returned wrapper.
 - A seventeenth Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/file_path_edges.toonzscript` and is run by
   `mise run script-smoke-filepath-edges-qt6`. It validates FilePath edge-case

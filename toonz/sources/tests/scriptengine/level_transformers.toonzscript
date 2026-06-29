@@ -26,10 +26,19 @@ print("qt-script-level-transformers-outline-wrappers",
 var centerlineVectorizer = new CenterlineVectorizer();
 centerlineVectorizer.threshold = 6;
 var centerlineLevel = centerlineVectorizer.vectorize(rasterLevel);
+var centerlineLevelAgain = centerlineVectorizer.vectorize(rasterLevel);
+var centerlineLevelId = centerlineLevel.id;
 var centerlineFrame = centerlineLevel.getFrame("1");
 print("qt-script-level-transformers-centerline", centerlineLevel.type,
       centerlineLevel.frameCount, centerlineLevel.getFrameIds().join(","),
       centerlineFrame.type);
+centerlineFrame.dispose();
+centerlineLevel.dispose();
+var centerlineLevelAgainFrameIds = centerlineLevelAgain.getFrameIds().join(",");
+print("qt-script-level-transformers-centerline-wrappers",
+      centerlineLevelId > 0, centerlineLevelAgain.id != centerlineLevelId,
+      centerlineLevelAgain.type, centerlineLevelAgain.frameCount,
+      centerlineLevelAgainFrameIds);
 
 var rasterizer = new Rasterizer();
 rasterizer.colorMapped = true;
@@ -37,16 +46,26 @@ rasterizer.xres = 40;
 rasterizer.yres = 30;
 rasterizer.dpi = 120;
 var toonzLevel = rasterizer.rasterize(outlineLevelAgain);
+var toonzLevelAgain = rasterizer.rasterize(outlineLevelAgain);
+var toonzLevelId = toonzLevel.id;
 var toonzFrame = toonzLevel.getFrame("2");
 print("qt-script-level-transformers-rasterizer", toonzLevel.type,
       toonzLevel.frameCount, toonzLevel.getFrameIds().join(","),
       toonzFrame.type, toonzFrame.width, toonzFrame.height);
-
 toonzFrame.dispose();
 toonzLevel.dispose();
+var toonzLevelAgainFrameIds = toonzLevelAgain.getFrameIds().join(",");
+var toonzFrameAgain = toonzLevelAgain.getFrame("1");
+print("qt-script-level-transformers-rasterizer-wrappers",
+      toonzLevelId > 0, toonzLevelAgain.id != toonzLevelId,
+      toonzLevelAgain.type, toonzLevelAgain.frameCount,
+      toonzLevelAgainFrameIds, toonzFrameAgain.type,
+      toonzFrameAgain.width, toonzFrameAgain.height);
+
+toonzFrameAgain.dispose();
+toonzLevelAgain.dispose();
 rasterizer.dispose();
-centerlineFrame.dispose();
-centerlineLevel.dispose();
+centerlineLevelAgain.dispose();
 centerlineVectorizer.dispose();
 outlineLevelAgain.dispose();
 outlineVectorizer.dispose();
