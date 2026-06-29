@@ -679,7 +679,9 @@ Already covered:
   coverage also verifies `Scene.newLevel()` / `Scene.getLevel()` JavaScript
   `String()` coercion for numeric, null, and object names, lookup through
   equivalent coerced values, missing lookup returning `undefined`, and
-  duplicate-level rejection after name coercion.
+  duplicate-level rejection after name coercion. Scene I/O edge coverage also
+  validates `Scene.save()` / `Scene.load()` chain-return behavior for both
+  `FilePath` and string paths, with scene cell contents surviving each reload.
 - The Level smoke coverage now includes `Level.path` bad setter rejection, the
   current failed path reload behavior for missing target paths, and
   post-dispose rejection across the Level public surface. It also covers the

@@ -30,6 +30,7 @@ tasks=(
   script-smoke-scene-loadlevel-qt6
   script-smoke-scene-loadlevel-sequence-qt6
   script-smoke-scene-save-reopen-qt6
+  script-smoke-scene-io-edges-qt6
   script-smoke-scene-reload-edges-qt6
   script-smoke-scene-mutation-workflow-qt6
   script-smoke-scene-load-failure-qt6

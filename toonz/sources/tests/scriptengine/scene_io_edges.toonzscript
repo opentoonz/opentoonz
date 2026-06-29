@@ -1,0 +1,39 @@
+var image = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var suffix = (new Date()).getTime();
+
+var scene = new Scene();
+var loaded = scene.newLevel("Raster", "qt6_scene_io_edges_raster");
+loaded.setFrame("1", image);
+scene.setCell(0, 0, loaded, "1");
+
+var filePathScenePath =
+    new FilePath("scene_io_edges_file_" + suffix + ".tnz");
+var filePathSaveReturn = scene.save(filePathScenePath);
+var filePathLoaded = new Scene();
+var filePathLoadReturn = filePathLoaded.load(filePathScenePath);
+var filePathCell = filePathLoaded.getCell(0, 0);
+print("qt-script-scene-io-edges-filepath",
+      filePathSaveReturn === scene, filePathLoadReturn === filePathLoaded,
+      filePathLoaded.frameCount, filePathLoaded.columnCount,
+      filePathCell.level.name, filePathCell.fid);
+
+var stringScenePath =
+    "scene_io_edges_string_" + suffix + ".tnz";
+var stringSaveReturn = filePathLoaded.save(stringScenePath);
+var stringLoaded = new Scene();
+var stringLoadReturn = stringLoaded.load(stringScenePath);
+var stringCell = stringLoaded.getCell(0, 0);
+print("qt-script-scene-io-edges-string",
+      stringSaveReturn === filePathLoaded, stringLoadReturn === stringLoaded,
+      stringLoaded.frameCount, stringLoaded.columnCount,
+      stringCell.level.name, stringCell.fid);
+
+filePathCell.level.dispose();
+stringCell.level.dispose();
+stringLoaded.dispose();
+filePathLoaded.dispose();
+loaded.dispose();
+scene.dispose();
+image.dispose();
+
+"qt-script-scene-io-edges-result";

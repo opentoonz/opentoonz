@@ -2378,6 +2378,11 @@ branch.
   saved raster level. The Qt 6 script save path deliberately skips scene-icon
   generation in this headless mode, so this fixture does not claim scene icon,
   viewer, offscreen GL, or renderer parity.
+- A Scene I/O edge Qt 6 script fixture exists at
+  `toonz/sources/tests/scriptengine/scene_io_edges.toonzscript` and is run by
+  `mise run script-smoke-scene-io-edges-qt6`. It validates `Scene.save()` and
+  `Scene.load()` chain-return behavior for both `FilePath` and string paths,
+  while confirming the saved scene cell survives reload through each path form.
 - A twentieth Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/scene_save_icon.toonzscript` and is run by
   `mise run script-smoke-scene-save-icon-qt6`. It validates the
@@ -2459,7 +2464,7 @@ branch.
   Scene cell frame-id type, Scene cell object edge, Scene edges,
   Scene level-name edge, Scene argument edges,
   Scene lifecycle edges, Scene load-level, Scene load-level sequence,
-  Scene save/reopen, Scene reload edge,
+  Scene save/reopen, Scene I/O edge, Scene reload edge,
   Scene failed-load, Scene save-icon, Scene save-icon variants, Scene frame-id,
   Level, Level I/O, Level edge-case, Level I/O types, Image, Image load edge,
   Image edge-case, Image level-first-frame, ImageBuilder, ImageBuilder edge-case,
@@ -2655,7 +2660,7 @@ The next slice should make the Qt 6 app useful enough to run and diagnose:
    ToonzRaster reload frame access, scene load-level sequence,
    scene data save/reopen, Scene reload edge, Scene failed-load wrapper
    preservation,
-   Scene save-icon, Scene save-icon variants,
+   Scene I/O edge cases, Scene save-icon, Scene save-icon variants,
    Scene frame-id
    handling, Scene column edge cases, Scene cell frame-id type,
    Scene argument edge cases,
@@ -2687,7 +2692,7 @@ The next slice should make the Qt 6 app useful enough to run and diagnose:
    Scene cell frame-id type, Scene cell object edge, Scene edges,
    Scene level-name edge, Scene argument edges,
    Scene lifecycle edges, Scene load-level, Scene load-level sequence,
-   Scene save/reopen,
+   Scene save/reopen, Scene I/O edge,
    Scene reload edge, Scene failed-load,
    Scene save-icon, Scene save-icon variants, Scene frame-id,
    Level,
@@ -2917,6 +2922,7 @@ mise run script-smoke-scene-level-wrappers-qt6
 mise run script-smoke-scene-loadlevel-qt6
 mise run script-smoke-scene-loadlevel-sequence-qt6
 mise run script-smoke-scene-save-reopen-qt6
+mise run script-smoke-scene-io-edges-qt6
 mise run script-smoke-scene-reload-edges-qt6
 mise run script-smoke-scene-mutation-workflow-qt6
 mise run script-smoke-scene-load-failure-qt6
@@ -2977,6 +2983,7 @@ OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-level-wrappers
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-loadlevel-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-loadlevel-sequence-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-save-reopen-qt6
+OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-io-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-reload-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-mutation-workflow-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-scene-load-failure-qt6

@@ -618,6 +618,10 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_load_leve
 description = "Run the Qt 6 app bundle against the Scene save/reopen headless script binding fixture."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_save_reopen.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-save-before 1 1 1 qt6_scene_saved_raster 1|qt-script-scene-save-loaded 1 1 1 qt6_scene_saved_raster 1' bash scripts/qt6/run-script-smoke.sh"
 
+[tasks.script-smoke-scene-io-edges-qt6]
+description = "Run the Qt 6 app bundle against Scene load/save return and path coercion behavior."
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_io_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-io-edges-filepath true true 1 1 qt6_scene_io_edges_raster 1|qt-script-scene-io-edges-string true true 1 1 qt6_scene_io_edges_raster 1' bash scripts/qt6/run-script-smoke.sh"
+
 [tasks.script-smoke-scene-reload-edges-qt6]
 description = "Run the Qt 6 app bundle against Scene load replacement and stale wrapper invalidation."
 run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/scene_reload_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-scene-reload-first 1 1 1 qt6_scene_reload_a 1|qt-script-scene-reload-second 1 1 1 true qt6_scene_reload_b 1 Empty 0 Empty level true true|qt-script-scene-reload-third 1 1 1 true qt6_scene_reload_a 1 Empty 0 true' bash scripts/qt6/run-script-smoke.sh"
