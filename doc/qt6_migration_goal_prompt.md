@@ -2196,8 +2196,9 @@ branch.
   `mise run script-smoke-toonz-raster-converter-lifecycle-edges-qt6`. It
   validates disposed id reporting, post-dispose rejection for instance
   `toString()`, `flatSource` reads/writes, and `convert()`, legacy bool
-  coercion for the `flatSource` property before disposal, and continued static
-  `ToonzRasterConverter.convert()` behavior.
+  coercion for the `flatSource` property before disposal, fresh converted image
+  wrapper ids with independent returned-image wrapper lifetime, and continued
+  static `ToonzRasterConverter.convert()` behavior.
 - An eleventh Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/outline_vectorizer.toonzscript` and is run
   by `mise run script-smoke-outline-vectorizer-qt6`. It validates the first

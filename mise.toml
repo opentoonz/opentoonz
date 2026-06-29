@@ -720,7 +720,7 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/toonz_raster_co
 
 [tasks.script-smoke-toonz-raster-converter-lifecycle-edges-qt6]
 description = "Run the Qt 6 app bundle against ToonzRasterConverter dispose and static conversion behavior."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/toonz_raster_converter_lifecycle_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-toonz-raster-converter-lifecycle-before true ToonzRasterConverter true false true ToonzRaster 32 32|qt-script-toonz-raster-converter-lifecycle-after -1 true ToonzRaster 32 32 true true true' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/toonz_raster_converter_lifecycle_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-toonz-raster-converter-lifecycle-before true ToonzRasterConverter true false true ToonzRaster 32 32|qt-script-toonz-raster-converter-lifecycle-wrappers true true|qt-script-toonz-raster-converter-lifecycle-after -1 true ToonzRaster 32 32 true true true' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-outline-vectorizer-qt6]
 description = "Run the Qt 6 app bundle against the OutlineVectorizer headless script binding fixture."

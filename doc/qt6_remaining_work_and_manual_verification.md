@@ -691,8 +691,9 @@ Already covered:
   plus strict Level method arity for constructor, frame access, frame
   assignment, load, and save calls.
 - The ToonzRasterConverter smoke coverage now includes legacy bool coercion for
-  `flatSource`, instance `dispose()` behavior, static conversion after instance
-  disposal, strict constructor arity, strict `foo()` helper arity, and
+  `flatSource`, instance `dispose()` behavior, fresh converted image wrapper
+  ids with independent returned-image wrapper lifetime, static conversion after
+  instance disposal, strict constructor arity, strict `foo()` helper arity, and
   post-dispose rejection for instance `toString()`, `flatSource` reads/writes,
   `convert()`, and `foo()` calls.
 - The vectorizer/rasterizer lifecycle smoke coverage now includes disposed

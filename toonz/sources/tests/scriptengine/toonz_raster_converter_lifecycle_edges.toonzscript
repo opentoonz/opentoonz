@@ -17,10 +17,17 @@ var falseyFlatSource = converter.flatSource;
 converter.flatSource = true;
 
 var before = converter.convert(source);
+var beforeAgain = converter.convert(source);
+var convertedWrapperIdsDiffer = before.id !== beforeAgain.id;
 print("qt-script-toonz-raster-converter-lifecycle-before",
       converter.id > 0, converter.toString(), truthyFlatSource,
       falseyFlatSource, converter.flatSource, before.type, before.width,
       before.height);
+before.dispose();
+var convertedWrapperStillValid = beforeAgain.type === "ToonzRaster" &&
+    beforeAgain.width === source.width && beforeAgain.height === source.height;
+print("qt-script-toonz-raster-converter-lifecycle-wrappers",
+      convertedWrapperIdsDiffer, convertedWrapperStillValid);
 
 converter.dispose();
 
@@ -44,7 +51,7 @@ print("qt-script-toonz-raster-converter-lifecycle-after", converter.id,
       flatSourceWriteError);
 
 staticAfterDispose.dispose();
-before.dispose();
+beforeAgain.dispose();
 source.dispose();
 
 "qt-script-toonz-raster-converter-lifecycle-result";
