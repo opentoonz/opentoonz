@@ -2159,8 +2159,9 @@ branch.
   native `int` conversion, bad image type rejection, invalid fill color,
   empty-image add errors, non-`Transform` add argument rejection, ToonzRaster
   fill rejection, image type mismatch errors, strict ImageBuilder method arity
-  for `clear()`, `fill()`, and `add()`, and disposed builder rejection for
-  `toString()`, `image`, `clear()`, `fill()`, and `add()`.
+  for `clear()`, `fill()`, and `add()`, fresh `image` wrapper ids with
+  independent returned-image wrapper lifetime, and disposed builder rejection
+  for `toString()`, `image`, `clear()`, `fill()`, and `add()`.
 - A Transform edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/transform_edges.toonzscript` and is run by
   `mise run script-smoke-transform-edges-qt6`. It validates non-mutating

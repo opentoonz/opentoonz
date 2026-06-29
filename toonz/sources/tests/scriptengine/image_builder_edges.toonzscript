@@ -67,6 +67,12 @@ var badTransformError = hasError(function() {
 }, "should be a Transformation");
 
 builder.add(source);
+var builderImageA = builder.image;
+var builderImageB = builder.image;
+var imageWrapperIdsDiffer = builderImageA.id !== builderImageB.id;
+builderImageA.dispose();
+var builderImageStillValid = builderImageB.width === 8 &&
+    builderImageB.height === 6 && builder.image.width === 8;
 
 var toonzBuilder = new ImageBuilder(9, 7, "ToonzRaster");
 var toonzImage = toonzBuilder.image;
@@ -100,9 +106,12 @@ print("qt-script-imagebuilder-edges-arity", badClearExtraArityError,
       badFillMissingArityError, badFillExtraArityError,
       badAddMissingArityError, badAddExtraArityError);
 print("qt-script-imagebuilder-edges-colors", !transparentFillError);
+print("qt-script-imagebuilder-edges-image-wrappers", imageWrapperIdsDiffer,
+      builderImageStillValid);
 
 disposedBuilder.dispose();
 transform.dispose();
+builderImageB.dispose();
 toonzImage.dispose();
 toonzBuilder.dispose();
 builder.dispose();

@@ -711,7 +711,8 @@ Already covered:
 - The ImageBuilder smoke covers legacy `ImageBuilder.clear()` returning
   `undefined`, clear/fill behavior, strict Transform constructor arity, strict
   ImageBuilder method arity for `clear()`, `fill()`, and `add()`,
-  integer-only width/height validation before native `int` conversion, and
+  integer-only width/height validation before native `int` conversion, fresh
+  `image` wrapper ids with independent returned-image wrapper lifetime, and
   post-dispose rejection for `toString()`, `image`, `clear()`, `fill()`, and
   `add()`. It also confirms that the Qt 6 color path accepts the legacy
   `transparent` color name.
