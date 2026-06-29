@@ -731,8 +731,9 @@ Already covered:
   missing-property error behavior.
 - The Rasterizer edge smoke covers strict `Rasterizer` constructor arity and
   strict `rasterize()` method arity for missing/extra arguments, plus
-  integer-only integral-property assignment and finite-number DPI validation
-  before native numeric conversion.
+  fresh rasterized image wrapper ids with independent returned-image wrapper
+  lifetime, integer-only integral-property assignment, and finite-number DPI
+  validation before native numeric conversion.
 - The Transform smoke covers post-dispose rejection for `toString()`,
   `translate()`, `rotate()`, and `scale()`, non-mutating transform chaining
   with fresh wrapper ids, plus finite-number argument validation.

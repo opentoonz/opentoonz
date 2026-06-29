@@ -2255,8 +2255,9 @@ branch.
   `mise run script-smoke-rasterizer-edges-qt6`. It validates legacy-style
   `Rasterizer.rasterize()` argument and type rejection for missing/extra
   arguments, non-image/non-level values, Raster/ToonzRaster images,
-  Raster/Empty levels, strict `Rasterizer` constructor arity, and bad
-  full-color resolution/DPI rejection while keeping the color-mapped path
+  Raster/Empty levels, fresh rasterized image wrapper ids with independent
+  returned-image wrapper lifetime, strict `Rasterizer` constructor arity, and
+  bad full-color resolution/DPI rejection while keeping the color-mapped path
   green. It also validates integer-only integral Rasterizer properties and
   finite-number DPI assignment before native numeric conversion.
 - A Qt 6 Renderer fixture exists at

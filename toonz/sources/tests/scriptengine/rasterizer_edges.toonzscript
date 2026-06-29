@@ -25,6 +25,13 @@ rasterizer.xres = 720;
 var rasterized = rasterizer.rasterize(vector);
 print("qt-script-rasterizer-edges-success", badFullColorGeometryError,
       rasterized.type, rasterized.width, rasterized.height);
+var rasterizedAgain = rasterizer.rasterize(vector);
+var rasterizedWrapperIdsDiffer = rasterized.id !== rasterizedAgain.id;
+rasterized.dispose();
+var rasterizedWrapperStillValid = rasterizedAgain.type === "ToonzRaster" &&
+    rasterizedAgain.width === 720 && rasterizedAgain.height === 576;
+print("qt-script-rasterizer-edges-wrappers", rasterizedWrapperIdsDiffer,
+      rasterizedWrapperStillValid);
 
 var errors = [
   hasError(function() { new Rasterizer(0); },
@@ -50,7 +57,7 @@ var errors = [
 ];
 print("qt-script-rasterizer-edges-errors", errors);
 
-rasterized.dispose();
+rasterizedAgain.dispose();
 rasterizer.dispose();
 emptyLevel.dispose();
 rasterLevel.dispose();
