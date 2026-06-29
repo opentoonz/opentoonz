@@ -2218,8 +2218,10 @@ branch.
   `mise run script-smoke-vectorizer-edges-qt6`. It validates legacy-style
   `OutlineVectorizer.vectorize()` and `CenterlineVectorizer.vectorize()`
   argument and type rejection for missing/extra arguments, non-image/non-level
-  values, Vector images, empty Raster levels, and Vector levels, plus strict
-  `OutlineVectorizer`/`CenterlineVectorizer` constructor arity, without
+  values, Vector images, empty Raster levels, and Vector levels, fresh
+  vectorized image wrapper ids with independent returned-image wrapper
+  lifetime, plus strict `OutlineVectorizer`/`CenterlineVectorizer`
+  constructor arity, without
   entering renderer paths.
 - A vectorizer property edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/vectorizer_property_edges.toonzscript` and

@@ -15,6 +15,16 @@ var outlineRaster = outline.vectorize(source);
 var centerlineRaster = centerline.vectorize(source);
 print("qt-script-vectorizer-edges-raster", outlineRaster.type,
       centerlineRaster.type);
+var outlineRasterAgain = outline.vectorize(source);
+var centerlineRasterAgain = centerline.vectorize(source);
+var vectorizedWrapperIdsDiffer = outlineRaster.id !== outlineRasterAgain.id &&
+    centerlineRaster.id !== centerlineRasterAgain.id;
+outlineRaster.dispose();
+centerlineRaster.dispose();
+var vectorizedWrappersStillValid = outlineRasterAgain.type === "Vector" &&
+    centerlineRasterAgain.type === "Vector";
+print("qt-script-vectorizer-edges-wrappers", vectorizedWrapperIdsDiffer,
+      vectorizedWrappersStillValid);
 
 var scene = new Scene();
 var emptyRasterLevel = scene.newLevel("Raster", "qt6_vectorizer_empty_raster");
@@ -37,9 +47,9 @@ var errors = [
            "should be an Image or a Level"),
   hasError(function() { centerline.vectorize(42); },
            "should be an Image or a Level"),
-  hasError(function() { outline.vectorize(outlineRaster); },
+  hasError(function() { outline.vectorize(outlineRasterAgain); },
            "Can't vectorize a Vector image"),
-  hasError(function() { centerline.vectorize(outlineRaster); },
+  hasError(function() { centerline.vectorize(outlineRasterAgain); },
            "Can't vectorize a Vector image"),
   hasError(function() { outline.vectorize(emptyRasterLevel); },
            "Can't vectorize a level with no frames"),
@@ -55,8 +65,8 @@ print("qt-script-vectorizer-edges-errors", errors);
 vectorLevel.dispose();
 emptyRasterLevel.dispose();
 scene.dispose();
-centerlineRaster.dispose();
-outlineRaster.dispose();
+centerlineRasterAgain.dispose();
+outlineRasterAgain.dispose();
 centerline.dispose();
 outline.dispose();
 source.dispose();

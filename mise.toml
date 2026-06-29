@@ -732,7 +732,7 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/centerline_vect
 
 [tasks.script-smoke-vectorizer-edges-qt6]
 description = "Run the Qt 6 app bundle against vectorizer argument and type edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/vectorizer_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-vectorizer-edges-raster Vector Vector|qt-script-vectorizer-edges-errors [true,true,true,true,true,true,true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/vectorizer_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-vectorizer-edges-raster Vector Vector|qt-script-vectorizer-edges-wrappers true true|qt-script-vectorizer-edges-errors [true,true,true,true,true,true,true,true,true,true,true,true,true,true]' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-vectorizer-property-edges-qt6]
 description = "Run the Qt 6 app bundle against vectorizer property conversion edge cases."

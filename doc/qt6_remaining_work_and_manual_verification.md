@@ -721,7 +721,8 @@ Already covered:
   round-tripping and invalid transparent-color rejection with the legacy
   Qt Script-style color error. The vectorizer edge smoke also covers strict
   `OutlineVectorizer`/`CenterlineVectorizer` constructor arity and strict
-  `vectorize()` method arity for missing/extra arguments.
+  `vectorize()` method arity for missing/extra arguments, plus fresh vectorized
+  image wrapper ids with independent returned-image wrapper lifetime.
 - The vectorizer property edge smoke now covers `OutlineVectorizer` corner
   tuning property roundtrips, transparent-color parsing, numeric string
   coercion for `toneThreshold`, `CenterlineVectorizer` numeric and bool
