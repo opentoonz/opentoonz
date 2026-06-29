@@ -2292,7 +2292,7 @@ branch.
   fractional, non-finite, sparse, or otherwise malformed JavaScript values
   cannot be truncated at the native Qt boundary, while preserving the legacy
   behavior that assigned `frames` / `columns` arrays stay mutable by reference
-  and non-array `frames` / `columns` properties are treated as empty selection
+  and non-array `frames` / `columns` properties are exposed as empty selection
   lists.
 - A Renderer lifecycle edge-case Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/renderer_lifecycle_edges.toonzscript` and
@@ -2300,7 +2300,7 @@ branch.
   that `Renderer.toString()`, `frames`, `columns`, `renderScene()`,
   `renderFrame()`, and `dumpCache()` reject use after `Renderer.dispose()`.
   Before disposal, `frames` and `columns` still keep legacy list behavior,
-  including treating non-array assignment as an empty selection list.
+  including treating non-array assignment as an empty exposed selection list.
 - A fourteenth Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/wrapper_id.toonzscript` and is run by
   `mise run script-smoke-wrapper-id-qt6`. It validates inherited Wrapper `id`

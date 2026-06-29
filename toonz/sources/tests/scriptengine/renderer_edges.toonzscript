@@ -100,14 +100,18 @@ print("qt-script-renderer-list-edges-errors", [
 
 renderer.frames = undefined;
 renderer.columns = null;
+var nonArrayFrameScene = new Scene();
+var nonArrayScene = new Scene();
+var nonArrayFramesLength = renderer.frames.length;
+var nonArrayColumnsLength = renderer.columns.length;
 var nonArrayFrameError = hasError(function() {
-  renderer.renderFrame(new Scene(), 0);
+  renderer.renderFrame(nonArrayFrameScene, 0);
 }, "Renderer.renderFrame");
 var nonArraySceneError = hasError(function() {
-  renderer.renderScene(new Scene());
+  renderer.renderScene(nonArrayScene);
 }, "Renderer.renderScene");
 print("qt-script-renderer-list-edges-non-arrays", nonArrayFrameError,
-      nonArraySceneError);
+      nonArraySceneError, nonArrayFramesLength, nonArrayColumnsLength);
 
 var frameSelection = [0];
 var columnSelection = [0];
@@ -121,6 +125,8 @@ print("qt-script-renderer-list-edges-array-identity",
 
 level.dispose();
 builder.dispose();
+nonArrayScene.dispose();
+nonArrayFrameScene.dispose();
 scene.dispose();
 renderer.dispose();
 

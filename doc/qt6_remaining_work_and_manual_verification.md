@@ -704,9 +704,10 @@ Already covered:
   `dumpCache()` arity, post-dispose error behavior for `toString()`,
   `frames`, `columns`, `renderScene()`, `renderFrame()`, and `dumpCache()`,
   plus legacy pre-dispose `frames` / `columns` array identity, non-array
-  `frames` / `columns` handling, and integer-only frame/column selection
-  validation that rejects fractional, non-finite, sparse, or otherwise
-  malformed JavaScript list values before native integer conversion.
+  `frames` / `columns` empty exposed-list handling, and integer-only
+  frame/column selection validation that rejects fractional, non-finite,
+  sparse, or otherwise malformed JavaScript list values before native integer
+  conversion.
 - The ImageBuilder smoke covers legacy `ImageBuilder.clear()` returning
   `undefined`, clear/fill behavior, strict Transform constructor arity, strict
   ImageBuilder method arity for `clear()`, `fill()`, and `add()`,

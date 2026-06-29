@@ -764,7 +764,7 @@ run = "OPENTOONZ_SCRIPT_USE_QAPPLICATION=1 OPENTOONZ_SCRIPT_FIXTURE=toonz/source
 
 [tasks.script-smoke-renderer-edges-qt6]
 description = "Run the Qt 6 app bundle against Renderer argument edge cases."
-run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/renderer_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-renderer-edges-errors [true,true,true,true,true,true,true,true,true,true,true,true,true]|qt-script-renderer-list-edges-errors [true,true,true,true,true,true,true,true,true,true]|qt-script-renderer-list-edges-non-arrays true true|qt-script-renderer-list-edges-array-identity true 0,1 true 0,1' bash scripts/qt6/run-script-smoke.sh"
+run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/renderer_edges.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-renderer-edges-errors [true,true,true,true,true,true,true,true,true,true,true,true,true]|qt-script-renderer-list-edges-errors [true,true,true,true,true,true,true,true,true,true]|qt-script-renderer-list-edges-non-arrays true true 0 0|qt-script-renderer-list-edges-array-identity true 0,1 true 0,1' bash scripts/qt6/run-script-smoke.sh"
 
 [tasks.script-smoke-renderer-lifecycle-edges-qt6]
 description = "Run the Qt 6 app bundle against Renderer dispose and post-dispose error behavior."
