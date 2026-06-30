@@ -2890,10 +2890,17 @@ void IoCmd::convertNAARaster2TLV(
       }
       IoCmd::ConvertingPopup convertingPopup(TApp::instance()->getMainWindow(),
                                              path);
-      /*convertingPopup.show();
-      ImageUtils::convertNaa2Tlv(path, dstPath, from, to,
-      convertingPopup.getNotifier(), 0, true, dpi); convertingPopup.hide(); path
-      = convertingPopup.getResultPath();*/
+      if (ImageUtils::isPaintedImage(first)) {
+        convertingPopup.setMaximum(to - from + 1);
+        convertingPopup.show();
+        ImageUtils::convertNaa2Tlv(path, dstPath, from, to,
+                                   convertingPopup.getNotifier(), 0, true, dpi);
+        convertingPopup.hide();
+        if (!convertingPopup.wasCanceled())
+          rd = LoadResourceArguments::ResourceData(dstPath);
+        return;
+      }
+
       Convert2Tlv converter(path, TFilePath(), dstPath.getParentDir(),
                             QString::fromStdWString(dstPath.getWideName()),
                             from, to, false, TFilePath(), 0, 0, 50, true, true,
