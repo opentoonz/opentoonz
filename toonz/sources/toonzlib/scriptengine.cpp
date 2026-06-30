@@ -503,8 +503,9 @@ QString imageBuilderTypeName(TImage* image) {
 }
 
 QString scriptColorErrorMessage(const QString& colorName) {
-  return QObject::tr("%1 is not a valid color (valid color names are 'red', "
-                     "'transparent', '#FF8800', etc.)")
+  return QObject::tr(
+             "%1 is not a valid color (valid color names are 'red', "
+             "'transparent', '#FF8800', etc.)")
       .arg(colorName);
 }
 
@@ -635,7 +636,7 @@ bool isRasterizerProperty(const QString& name) {
 
 bool doubleFromVariant(const QVariant& value, double& result, QString& error,
                        const QString& name) {
-  bool ok       = false;
+  bool ok             = false;
   const double number = value.toDouble(&ok);
   if (!ok || !std::isfinite(number)) {
     error = QObject::tr("%1 must be a finite number").arg(name);
@@ -661,8 +662,9 @@ bool intFromVariant(const QVariant& value, int& result, QString& error,
   return true;
 }
 
-bool intListFromVariantList(const QVariantList& values, std::vector<int>& result,
-                            QString& error, const QString& name) {
+bool intListFromVariantList(const QVariantList& values,
+                            std::vector<int>& result, QString& error,
+                            const QString& name) {
   result.clear();
   for (const QVariant& value : values) {
     double number = 0.0;
@@ -727,7 +729,7 @@ public:
                      std::vector<bool>& oldStatus) {
     if (columns.empty()) return;
 
-    TXsheet* xsheet = scene->getXsheet();
+    TXsheet* xsheet       = scene->getXsheet();
     const int columnCount = xsheet->getColumnCount();
     oldStatus.reserve(columnCount);
     std::vector<bool> newStatus(columnCount, false);
@@ -798,8 +800,8 @@ public:
     mutex.unlock();
 
     if (m_failed) {
-      error = m_error.isEmpty() ? QObject::tr("Renderer render failed")
-                                : m_error;
+      error =
+          m_error.isEmpty() ? QObject::tr("Renderer render failed") : m_error;
       return false;
     }
 
@@ -896,9 +898,9 @@ bool frameIdFromString(const QString& value, TFrameId& fid, QString& error) {
 
   const int number     = match.captured(1).toInt();
   const QString letter = match.captured(2);
-  fid = letter.length() == 1
-            ? TFrameId(number, static_cast<wchar_t>(letter[0].unicode()))
-            : TFrameId(number);
+  fid                  = letter.length() == 1
+                             ? TFrameId(number, static_cast<wchar_t>(letter[0].unicode()))
+                             : TFrameId(number);
   error.clear();
   return true;
 }
@@ -907,6 +909,8 @@ QVariant scriptFrameIdValue(const TFrameId& fid) {
   if (fid.getLetter().isEmpty()) return fid.getNumber();
   return QString::fromStdString(fid.expand());
 }
+
+TFilePath resolveScriptLevelPath(ToonzScene* scene, const TFilePath& path);
 
 TImageP loadScriptLevelFrame(TXshSimpleLevel* level, const TFrameId& frameId) {
   if (!level) return TImageP();
@@ -917,20 +921,18 @@ TImageP loadScriptLevelFrame(TXshSimpleLevel* level, const TFrameId& frameId) {
   TFilePath path = level->getPath();
   if (path == TFilePath()) return TImageP();
 
-  if (ToonzScene* scene = level->getScene()) {
-    path = scene->decodeFilePath(path);
-  }
+  path = resolveScriptLevelPath(level->getScene(), path);
 
   try {
     TLevelReaderP reader(path);
-    TLevelP levelInfo = reader->loadInfo();
+    TLevelP levelInfo      = reader->loadInfo();
     TFrameId readerFrameId = frameId;
     if (levelInfo) {
       bool matchedFrameId = false;
       for (TLevel::Iterator it = levelInfo->begin(); it != levelInfo->end();
            ++it) {
         if (it->first == frameId) {
-          readerFrameId = it->first;
+          readerFrameId  = it->first;
           matchedFrameId = true;
           break;
         }
@@ -946,6 +948,93 @@ TImageP loadScriptLevelFrame(TXshSimpleLevel* level, const TFrameId& frameId) {
   }
 
   return image;
+}
+
+TFilePath resolveScriptLevelPath(ToonzScene* scene, const TFilePath& path) {
+  if (!scene || path.isAbsolute()) return path;
+
+  const TFilePath parentDir = path.getParentDir();
+  if (!parentDir.isEmpty() && TFileStatus(parentDir).doesExist()) return path;
+
+  return scene->decodeFilePath(path);
+}
+
+TXshSimpleLevel* loadScriptLevelFrames(ToonzScene* scene, const TFilePath& path,
+                                       const QString& name, QString& error) {
+  error.clear();
+  if (!scene) {
+    error = QObject::tr("Invalid Scene object");
+    return nullptr;
+  }
+
+  try {
+    TLevelReaderP reader(path);
+    TLevelP levelInfo = reader->loadInfo();
+    if (!levelInfo || levelInfo->getFrameCount() == 0) {
+      error = QObject::tr("%1 contains no frames")
+                  .arg(QString::fromStdWString(path.getWideString()));
+      return nullptr;
+    }
+
+    TXshSimpleLevel* simpleLevel = nullptr;
+    for (TLevel::Iterator it = levelInfo->begin(); it != levelInfo->end();
+         ++it) {
+      const TFrameId& fid = it->first;
+      TImageP image       = reader->getFrameReader(fid)->load();
+      if (!image) {
+        error = QObject::tr("Could not read frame %1")
+                    .arg(QString::fromStdString(fid.expand()));
+        return nullptr;
+      }
+
+      if (!simpleLevel) {
+        const int levelType = levelTypeFromImage(image.getPointer());
+        if (levelType == NO_XSHLEVEL) {
+          error = QObject::tr("cannot insert a %1 image into a level")
+                      .arg(imageTypeName(image.getPointer()));
+          return nullptr;
+        }
+
+        TXshLevel* xshLevel =
+            name.isEmpty()
+                ? scene->createNewLevel(levelType)
+                : scene->createNewLevel(levelType, name.toStdWString());
+        simpleLevel = xshLevel ? xshLevel->getSimpleLevel() : nullptr;
+        if (!simpleLevel) {
+          error = QObject::tr("Could not create a %1 level")
+                      .arg(imageTypeName(image.getPointer()));
+          return nullptr;
+        }
+
+        simpleLevel->setPath(path);
+        simpleLevel->setPalette(image->getPalette());
+        if (levelType != PLI_XSHLEVEL) {
+          LevelProperties* properties = simpleLevel->getProperties();
+          double dpix = 0.0, dpiy = 0.0;
+          if (TRasterImageP rasterImage = image) {
+            rasterImage->getDpi(dpix, dpiy);
+          } else if (TToonzImageP toonzImage = image) {
+            toonzImage->getDpi(dpix, dpiy);
+          }
+          properties->setDpiPolicy(LevelProperties::DP_ImageDpi);
+          properties->setDpi(dpix);
+          properties->setImageDpi(TPointD(dpix, dpiy));
+          const TRectD bbox = image->getBBox();
+          properties->setImageRes(TDimension(static_cast<int>(bbox.getLx()),
+                                             static_cast<int>(bbox.getLy())));
+        }
+      }
+
+      simpleLevel->setFrame(fid, image->cloneImage());
+    }
+
+    simpleLevel->setDirtyFlag(false);
+    return simpleLevel;
+  } catch (...) {
+    error = QObject::tr("Exception reading %1")
+                .arg(QString::fromStdWString(path.getWideString()));
+    return nullptr;
+  }
 }
 
 const char kBootstrapScript[] = R"JS(
@@ -2206,8 +2295,7 @@ void installBootstrap(QJSEngine* engine, ScriptEngine* scriptEngine) {
 }
 
 bool isVoidResult(QJSEngine* engine, const QJSValue& result) {
-  QJSValue voidValue =
-      engine->globalObject().property(QStringLiteral("void"));
+  QJSValue voidValue = engine->globalObject().property(QStringLiteral("void"));
   return voidValue.isObject() && result.strictlyEquals(voidValue);
 }
 
@@ -2305,7 +2393,8 @@ QJSValue ScriptEngine::evaluateScriptContent(const QString& content,
 QString ScriptEngine::runScriptFile(const QString& path) {
   const QVariantMap script = readScriptFile(path);
   if (!script.value(QStringLiteral("ok")).toBool()) {
-    emitOutput(ExecutionError, script.value(QStringLiteral("error")).toString());
+    emitOutput(ExecutionError,
+               script.value(QStringLiteral("error")).toString());
     return QString();
   }
 
@@ -2841,7 +2930,7 @@ QVariantMap ScriptEngine::sceneLoadLevel(int sceneId, const QString& name,
   }
 
   TFilePath fp(path.toStdWString());
-  const TFilePath decodedPath = scene->decodeFilePath(fp);
+  const TFilePath decodedPath = resolveScriptLevelPath(scene, fp);
   const TFileType::Type type  = TFileType::getInfo(fp);
   if ((type & TFileType::VIEWABLE) == 0) {
     return levelResult(
@@ -2853,10 +2942,21 @@ QVariantMap ScriptEngine::sceneLoadLevel(int sceneId, const QString& name,
       return levelResult(-1, tr("File %1 doesn't exist").arg(path));
     }
 
-    TXshLevel* level = scene->loadLevel(fp, nullptr, name.toStdWString());
-    TXshSimpleLevel* simpleLevel = level ? level->getSimpleLevel() : nullptr;
-    if (!simpleLevel) {
-      return levelResult(-1, tr("Could not load level %1").arg(path));
+    TXshSimpleLevel* simpleLevel = nullptr;
+    if ((type & TFileType::CMAPPED_IMAGE) == 0) {
+      try {
+        TXshLevel* level =
+            scene->loadLevel(decodedPath, nullptr, name.toStdWString());
+        simpleLevel = level ? level->getSimpleLevel() : nullptr;
+      } catch (...) {
+        simpleLevel = nullptr;
+      }
+    }
+    if (!simpleLevel || simpleLevel->getFrameCount() == 0) {
+      QString fallbackError;
+      simpleLevel =
+          loadScriptLevelFrames(scene, decodedPath, name, fallbackError);
+      if (!simpleLevel) return levelResult(-1, fallbackError);
     }
 
     return levelResult(levelCreate(simpleLevel, sceneId));
@@ -3065,7 +3165,7 @@ QString ScriptEngine::levelLoad(int levelId, const QString& path) {
 
   TFilePath fp(path.toStdWString());
   try {
-    const TFilePath decodedPath = scene->decodeFilePath(fp);
+    const TFilePath decodedPath = resolveScriptLevelPath(scene, fp);
     if (!TSystem::doesExistFileOrLevel(decodedPath)) {
       return tr("File %1 doesn't exist").arg(path);
     }
@@ -3077,9 +3177,21 @@ QString ScriptEngine::levelLoad(int levelId, const QString& path) {
       return tr("File %1 is unsupported").arg(path);
     }
 
-    TXshLevel* level             = scene->loadLevel(fp);
-    TXshSimpleLevel* simpleLevel = level ? level->getSimpleLevel() : nullptr;
-    if (!simpleLevel) return tr("Could not load level %1").arg(path);
+    TXshSimpleLevel* simpleLevel = nullptr;
+    if ((fileType & TFileType::CMAPPED_IMAGE) == 0) {
+      try {
+        TXshLevel* level = scene->loadLevel(decodedPath);
+        simpleLevel      = level ? level->getSimpleLevel() : nullptr;
+      } catch (...) {
+        simpleLevel = nullptr;
+      }
+    }
+    if (!simpleLevel || simpleLevel->getFrameCount() == 0) {
+      QString fallbackError;
+      simpleLevel =
+          loadScriptLevelFrames(scene, decodedPath, QString(), fallbackError);
+      if (!simpleLevel) return fallbackError;
+    }
 
     levelAssign(levelId, simpleLevel);
   } catch (...) {
@@ -3117,7 +3229,7 @@ QString ScriptEngine::levelSave(int levelId, const QString& path) const {
   try {
     TFilePath outputPath = fp;
     if (ToonzScene* scene = level->getScene()) {
-      outputPath = scene->decodeFilePath(outputPath);
+      outputPath = resolveScriptLevelPath(scene, outputPath);
     }
 
     std::vector<TFrameId> fids;
@@ -3128,8 +3240,8 @@ QString ScriptEngine::levelSave(int levelId, const QString& path) const {
     for (const TFrameId& fid : fids) {
       TImageP image = loadScriptLevelFrame(level, fid);
       if (!image) {
-        return tr("Could not read frame %1").arg(
-            QString::fromStdString(fid.expand()));
+        return tr("Could not read frame %1")
+            .arg(QString::fromStdString(fid.expand()));
       }
       if (TToonzImageP toonzImage = image) {
         if (TRasterCM32P raster = toonzImage->getRaster()) {
@@ -3693,8 +3805,9 @@ QString ScriptEngine::centerlineVectorizerSetProperty(
              name == QStringLiteral("thicknessCalibration")) {
     double number = 0.0;
     QString error;
-    if (!doubleFromVariant(value, number, error,
-                           QStringLiteral("CenterlineVectorizer.%1").arg(name))) {
+    if (!doubleFromVariant(
+            value, number, error,
+            QStringLiteral("CenterlineVectorizer.%1").arg(name))) {
       return error;
     }
     state.insert(name, number);
@@ -3829,9 +3942,9 @@ QVariantMap ScriptEngine::rasterizerRasterizeImage(int rasterizerId,
   }
 
   const QVariantMap state = rasterizerState(rasterizerId);
-  const int xres   = state.value(QStringLiteral("xres"), 720).toInt();
-  const int yres   = state.value(QStringLiteral("yres"), 576).toInt();
-  const double dpi = state.value(QStringLiteral("dpi"), 72.0).toDouble();
+  const int xres          = state.value(QStringLiteral("xres"), 720).toInt();
+  const int yres          = state.value(QStringLiteral("yres"), 576).toInt();
+  const double dpi        = state.value(QStringLiteral("dpi"), 72.0).toDouble();
   if (xres <= 0 || yres <= 0 || dpi <= 0.0) {
     return imageResult(-1, tr("Bad Rasterizer resolution or dpi"));
   }
@@ -3945,10 +4058,9 @@ QVariantMap ScriptEngine::rendererRenderScene(int rendererId, int sceneId,
 
   const int levelId = levelCreate(nullptr, -1);
   for (const auto& frame : renderedFrames) {
-    const int imageId = imageCreate(frame.second.getPointer());
-    QString setFrameError =
-        levelSetFrame(levelId, QString::fromStdString(frame.first.expand()),
-                      imageId);
+    const int imageId     = imageCreate(frame.second.getPointer());
+    QString setFrameError = levelSetFrame(
+        levelId, QString::fromStdString(frame.first.expand()), imageId);
     imageDelete(imageId);
     if (!setFrameError.isEmpty()) {
       levelDelete(levelId);

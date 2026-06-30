@@ -2110,7 +2110,10 @@ branch.
   `mise run script-smoke-level-io-qt6`. It validates standalone empty
   `Level()` frame creation through `Level.setFrame()`, `Level.save()` to a real
   raster level path, and `Level.load()`/`new Level(path)` loading that saved
-  level back through scene-decoded OpenToonz level I/O.
+  level back through scene-decoded OpenToonz level I/O. The Qt 6 script backend
+  now preserves explicit filesystem-style parent paths before falling back to
+  scene project decoding, and it has a frame-reader fallback for script-saved
+  raster sequences that `ToonzScene::loadLevel()` cannot load directly.
 - An eighth Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/scene_load_level.toonzscript` and is run by
   `mise run script-smoke-scene-loadlevel-qt6`. It validates
@@ -2370,7 +2373,8 @@ branch.
   saving and reloading a Vector level with frame-image access and a ToonzRaster
   level with type/frame metadata plus `Level.getFrame()` and
   `Level.getFrameByIndex()` access after reloading the saved ToonzRaster
-  level.
+  level. The same explicit-path resolver and frame-reader fallback keep
+  `Scene.loadLevel()` and `Level.load()` aligned for script-created levels.
 - A nineteenth Qt 6 script fixture exists at
   `toonz/sources/tests/scriptengine/scene_save_reopen.toonzscript` and is run
   by `mise run script-smoke-scene-save-reopen-qt6`. It validates a headless
