@@ -543,6 +543,9 @@ Already covered:
 - Sprite sheet sidecar metadata writing now checks the `QFile::open()` result
   before constructing the text stream, removing that Qt 6 build warning without
   changing the successful `.txt` metadata output path.
+- The Apple Silicon macOS and Nix/mise build docs now mark the default Qt 5
+  package as the legacy bridge and route active Qt 6 validation through the
+  dedicated Qt 6 lane instead of describing Qt 6 as deferred.
 
 Still needed:
 
@@ -580,8 +583,6 @@ Still needed:
 - Promote the new `qt-6-experimental` binary-build workflow into release-quality
   Qt 6 CI coverage once its platform artifacts and deployment behavior are
   validated.
-- Make any remaining Qt 5 specific setup in documentation conditional or
-  clearly marked as Qt 5 only.
 
 ### 3. Qt Script To QJSEngine Productization
 

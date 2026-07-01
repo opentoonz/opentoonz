@@ -43,18 +43,19 @@ read-only seed for signing and notarization. At runtime, OpenToonz creates and
 uses `~/Library/Application Support/OpenToonz/stuff` for writable profiles,
 projects, and sandbox files so the app bundle is not modified after signing.
 
-The Nix workflow currently pins Qt 5.15.18 as a short-term bridge for native
-Apple Silicon builds. Qt 6 migration, OpenGL/AGL removal, and Metal rendering
-work are separate follow-up projects. The Nix shell also selects a macOS 15 SDK
-with `AGL.framework` when available because Qt 5 still references AGL during
-configuration.
+The default macOS package lane still uses Qt 5.15.18 as the native Apple
+Silicon bridge. The active Qt 6 migration is maintained as a separate Nix/mise
+lane so the Qt 5 build remains available while the Qt 6 port is validated. The
+Qt 5 Nix shell also selects a macOS 15 SDK with `AGL.framework` when available
+because Qt 5 still references AGL during configuration.
 
 The Nix setup is described in more detail in
 [Building With Nix And Mise](./how_to_build_nix_mise.md). That document also
 tracks the current Apple Silicon parity gaps compared with the previous Intel
-macOS artifact. In short, the default package is arm64-only, Canon DSLR support
-is disabled in public builds, pull request artifacts are ad hoc signed rather
-than notarized, and Qt 6/Metal work is deferred.
+macOS artifact. In short, the default Qt 5 package is arm64-only, Canon DSLR
+support is disabled in public builds, pull request artifacts are ad hoc signed
+rather than notarized, and Qt 6 validation uses the dedicated Qt 6 lane until it
+is ready to replace the Qt 5 bridge.
 
 ### Download and install Xcode from Apple
 
@@ -217,7 +218,9 @@ against the last Intel macOS artifact are:
 - Canon DSLR capture is disabled in public builds
 - release-grade Developer ID signing and notarization require maintainer
   secrets and are not present on pull request artifacts
-- Qt 6, Metal rendering, and removal of the legacy OpenGL/AGL stack are not in
-  this pass
+- Qt 6 validation is in the dedicated Nix/mise Qt 6 lane and is not part of the
+  default Qt 5 Apple Silicon package pass
+- Metal rendering and full removal of the legacy OpenGL/AGL stack remain
+  separate follow-up work after the Qt 6 port reaches parity
 - scanner, tablet, webcam, and stop-motion hardware need real-device regression
   testing before declaring full parity

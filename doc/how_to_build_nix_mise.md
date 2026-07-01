@@ -160,9 +160,11 @@ version and macOS bundle version. The displayed build timestamp is generated at
 configure time and can be overridden with `-DOPENTOONZ_BUILD_DATE=...` and
 `-DOPENTOONZ_BUILD_TIME=...`.
 
-Qt 5.15.18 is the short-term bridge for the Apple Silicon release. Moving to
-Qt 6, replacing deprecated OpenGL/AGL paths, or introducing a Metal rendering
-backend is a separate migration project.
+Qt 5.15.18 remains the default Apple Silicon package bridge. Qt 6 work uses the
+separate Nix/mise Qt 6 lane so it can be validated without removing the Qt 5
+lane prematurely. Replacing the remaining legacy OpenGL/AGL paths is part of
+the Qt 6 parity work where it affects the port. Metal rendering remains a
+separate follow-up after the Qt 6 port reaches visual and workflow parity.
 
 Canon DSLR support is disabled by default through `WITH_CANON=OFF`. Canon's
 newer EDSDK may provide arm64 support, but the SDK is gated and should not be
@@ -191,9 +193,10 @@ Known differences from the last Intel macOS package or CI artifact:
   artifacts. Developer ID signing, hardened runtime signing, notarization, and
   stapling require maintainer Apple credentials and only run on guarded release
   steps.
-- The renderer and Qt stack are still Qt 5 and OpenGL-based. The arm64 port
-  removes the Intel/Rosetta requirement but does not migrate OpenToonz to Qt 6
-  or Metal.
+- The default arm64 package remains Qt 5 and OpenGL-based. The arm64 port
+  removes the Intel/Rosetta requirement, while Qt 6 validation continues in the
+  dedicated Qt 6 lane. Metal is deferred until the Qt 6 port reaches visual and
+  workflow parity.
 - Hardware integrations need focused retesting on Apple Silicon. Webcam and
   non-Canon stop-motion paths build into the arm64 app, but scanner devices,
   tablets, and camera capture should be checked on real hardware before calling
