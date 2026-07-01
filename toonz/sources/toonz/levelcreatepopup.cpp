@@ -7,6 +7,7 @@
 #include "tapp.h"
 #include "levelcommand.h"
 #include "formatsettingspopups.h"
+#include "toonz/stage.h"
 
 // TnzTools includes
 #include "tools/toolhandle.h"
@@ -58,6 +59,7 @@
 #include <QMainWindow>
 #include <QRegularExpressionValidator>
 #include <QRegularExpression>
+#include "layoutUtils.h"
 
 using namespace DVGui;
 
@@ -716,18 +718,26 @@ void LevelCreatePopup::update() {
     m_widthFld->setMeasure("level.lx");
     m_heightFld->setMeasure("level.ly");
   }
-
-  if (pref->isNewLevelSizeToCameraSizeEnabled()) {
-    TCamera *currCamera =
-        TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera();
-    TDimensionD camSize = currCamera->getSize();
-    m_widthFld->setValue(camSize.lx);
-    m_heightFld->setValue(camSize.ly);
-    m_dpiFld->setValue(currCamera->getDpi().x);
-  } else {
-    m_widthFld->setValue(pref->getDefLevelWidth());
-    m_heightFld->setValue(pref->getDefLevelHeight());
-    m_dpiFld->setValue(pref->getDefLevelDpi());
+  int policy = pref->getDefLevelSizePolicy();
+  if (policy == 2) {
+    TDimensionD res = layoutUtils::getLayoutSize();
+    m_widthFld->setValue(res.lx);
+    m_heightFld->setValue(res.ly);
+    m_dpiFld->setValue(Stage::standardDpi);
+  }
+  if (m_widthFld->getValue() == 0 || m_heightFld->getValue() == 0) {
+    if (policy == 1) {
+      TCamera *currCamera =
+          TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera();
+      TDimensionD camSize = currCamera->getSize();
+      m_widthFld->setValue(camSize.lx);
+      m_heightFld->setValue(camSize.ly);
+      m_dpiFld->setValue(currCamera->getDpi().x);
+    } else {
+      m_widthFld->setValue(pref->getDefLevelWidth());
+      m_heightFld->setValue(pref->getDefLevelHeight());
+      m_dpiFld->setValue(pref->getDefLevelDpi());
+    }
   }
 
   int levelType = pref->getDefLevelType();
