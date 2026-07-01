@@ -283,6 +283,7 @@ void ScriptEngine::onTerminated() {
 #include "toonz/toonzfolders.h"
 #include "toonz/levelset.h"
 #include "toonz/levelproperties.h"
+#include "toonz/trasterimageutils.h"
 #include "toonz/tcamera.h"
 #include "toonz/tcenterlinevectorizer.h"
 #include "toonz/scenefx.h"
@@ -3976,19 +3977,25 @@ QVariantMap ScriptEngine::rasterizerRasterizeImage(int rasterizerId,
       return imageResult(imageCreate(toonzImage.getPointer()));
     }
 
-    TOfflineGL glContext(res);
-    glContext.makeCurrent();
-
     TVectorRenderData renderData(TVectorRenderData::ProductionSettings(),
                                  camera.getStageToCameraRef(), TRect(),
                                  palette);
     renderData.m_antiAliasing =
         state.value(QStringLiteral("antialiasing"), true).toBool();
 
-    glContext.clear(TPixel32::White);
-    glContext.draw(vectorImage, renderData);
+    TRasterImageP rasterImage;
+    try {
+      TOfflineGL glContext(res);
+      glContext.makeCurrent();
+      glContext.clear(TPixel32::White);
+      glContext.draw(vectorImage, renderData);
+      rasterImage = TRasterImageP(glContext.getRaster());
+    } catch (...) {
+      rasterImage = TRasterImageUtils::vectorToFullColorImage(
+          vectorImage, camera.getStageToCameraRef(), palette, TPointD(), res);
+    }
+    if (!rasterImage) return imageResult(-1, tr("Rasterization failed"));
 
-    TRasterImageP rasterImage(glContext.getRaster());
     const TPointD imageDpi = camera.getDpi();
     rasterImage->setDpi(imageDpi.x, imageDpi.y);
     return imageResult(imageCreate(rasterImage.getPointer()));

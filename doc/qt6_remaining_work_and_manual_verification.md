@@ -772,6 +772,12 @@ Already covered:
   focused-smoke races while `qt.conf` or bundled frameworks are hidden. The
   aggregate Qt 6 script smoke suite now passes in bounded and natural-exit
   modes, including full-color Rasterizer and Renderer fixtures.
+- The Qt 6 `Rasterizer` binding now falls back from `TOfflineGL` to
+  `TRasterImageUtils::vectorToFullColorImage()` when Qt's forced offscreen
+  platform cannot create a platform OpenGL context. This keeps normal
+  platform sessions on the existing OpenGL path while allowing
+  `mise run script-smoke-rasterizer-offscreen-qt6` to validate full-color
+  Rasterizer `Image` and `Level` output under `QT_QPA_PLATFORM=offscreen`.
 - Aggregate script smoke tasks exist in both bounded and natural-exit modes.
 
 Still needed:
@@ -783,17 +789,13 @@ Still needed:
 - Verify legacy script-visible behavior for object lifetime, invalid argument
   handling, property conversion, arrays, frame ids, paths, scene mutation, and
   renderer output.
-- Resolve the remaining forced-offscreen OpenGL gap for full-color Rasterizer
-  and Renderer fixtures. A normal macOS LaunchServices-started QApplication
-  script smoke pass validates those fixtures with a real platform OpenGL
-  context, but a forced
-  `QT_QPA_PLATFORM=offscreen` aggregate run currently reaches
-  `script-smoke-rasterizer-qt6`, completes the color-mapped checks, then exits
-  with `Rasterization failed` when full-color Rasterizer output enters
-  `TOfflineGL` and Qt reports that the offscreen platform cannot create a
-  platform OpenGL context. `QtOfflineGL` now treats failed offscreen surface,
-  context, current-context, and framebuffer creation as normal C++ failures, so
-  this unsupported path is reported quickly instead of hanging in GL setup.
+- Resolve the remaining forced-offscreen OpenGL gap for Renderer fixtures. A
+  forced `QT_QPA_PLATFORM=offscreen` Renderer smoke currently reaches the
+  renderer state prints, then times out after Qt reports that the offscreen
+  platform cannot create platform OpenGL contexts. The Rasterizer half of this
+  gap now has a CPU fallback and focused smoke coverage; Renderer still needs
+  either an equivalent non-OpenGL fallback or a clearer product decision that
+  forced-offscreen scene rendering is unsupported.
 - Design any future script-debugger UI as new Qt 6 tooling if it is still a
   product requirement. The current Qt 6 replacement story is Script Console and
   `Run Script...` execution without the orphaned `QScriptEngineDebugger` popup.
@@ -865,7 +867,7 @@ Already covered by focused smokes:
 - FX Preview full-frame and sub-camera saved-frame export.
 - Final-render PNG output for basic raster, background, sequence, composite,
   vector, Toonz Raster, and a basic FX path.
-- Several offscreen/script renderer and rasterizer slices.
+- Several offscreen/script renderer slices.
 - Focused scene-icon script save checks under Qt's offscreen platform.
 
 Still needed:

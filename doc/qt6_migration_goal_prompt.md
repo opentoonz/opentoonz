@@ -2499,15 +2499,16 @@ branch.
 - On 2026-06-04, the focused scene-icon fixtures passed under
   `QT_QPA_PLATFORM=offscreen` after packaging the Qt 6 app bundle:
   `mise run script-smoke-scene-save-icon-qt6` and
-  `mise run script-smoke-scene-save-icon-variants-qt6`. The broader aggregate
-  run with forced `QT_QPA_PLATFORM=offscreen` still fails at
-  `script-smoke-rasterizer-qt6` when full-color Rasterizer output enters
-  `TOfflineGL` and Qt reports that the offscreen platform does not support
-  `createPlatformOpenGLContext`. `QtOfflineGL` now validates failed offscreen
-  surface, context, current-context, and framebuffer creation, so this path
-  exits quickly with `Rasterization failed` instead of timing out in GL setup.
-  Treat full-color Rasterizer/Renderer offscreen OpenGL behavior as an open
-  Qt 6 validation/implementation gap, not as closed by the scene-icon fallback.
+  `mise run script-smoke-scene-save-icon-variants-qt6`. The full-color
+  Rasterizer fixture now also passes under forced offscreen mode through
+  `mise run script-smoke-rasterizer-offscreen-qt6`; the Qt 6 `Rasterizer`
+  binding keeps normal platform sessions on `TOfflineGL` and falls back to
+  `TRasterImageUtils::vectorToFullColorImage()` only when Qt's forced
+  offscreen platform cannot create a platform OpenGL context. The broader
+  aggregate run with forced `QT_QPA_PLATFORM=offscreen` still fails in Renderer
+  coverage when scene rendering reaches OpenGL context creation. Treat
+  forced-offscreen Renderer behavior as an open Qt 6 validation/implementation
+  gap, not as closed by the scene-icon or Rasterizer fallbacks.
 - The Qt 6 Script Console now restores the legacy GUI-only `view()` helper for
   `Image` and `Level` values by injecting a console bridge on top of the
   `QJSEngine` facade. The flipbook UI path remains in the `toonz` app layer,
@@ -2957,6 +2958,7 @@ mise run script-smoke-vectorizer-edges-qt6
 mise run script-smoke-vectorizer-property-edges-qt6
 mise run script-smoke-binding-lifecycle-edges-qt6
 mise run script-smoke-rasterizer-qt6
+mise run script-smoke-rasterizer-offscreen-qt6
 mise run script-smoke-rasterizer-edges-qt6
 mise run script-smoke-renderer-qt6
 mise run script-smoke-renderer-frames-columns-qt6
@@ -3018,6 +3020,7 @@ OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-vectorizer-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-vectorizer-property-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-binding-lifecycle-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-rasterizer-qt6
+mise run script-smoke-rasterizer-offscreen-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-rasterizer-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-renderer-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-renderer-frames-columns-qt6
