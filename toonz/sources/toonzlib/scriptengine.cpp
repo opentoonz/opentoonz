@@ -775,6 +775,91 @@ public:
     return renderData;
   }
 
+  TImageP renderSimpleOffscreenFrame(ToonzScene* scene, int row,
+                                     const std::vector<int>& columns,
+                                     QString& error) {
+    TCamera* camera = scene ? scene->getCurrentCamera() : nullptr;
+    TXsheet* xsheet = scene ? scene->getXsheet() : nullptr;
+    if (!camera || !xsheet) {
+      error = QObject::tr("Renderer.renderFrame requires a scene");
+      return TImageP();
+    }
+
+    const TDimension cameraRes = camera->getRes();
+    TRaster32P output(cameraRes.lx, cameraRes.ly);
+    output->fill(TPixel32::White);
+
+    std::vector<int> renderColumns = columns;
+    if (renderColumns.empty()) {
+      const int columnCount = xsheet->getColumnCount();
+      for (int column = 0; column < columnCount; ++column) {
+        TXshColumn* xsheetColumn = xsheet->getColumn(column);
+        if (!xsheetColumn || xsheetColumn->isPreviewVisible()) {
+          renderColumns.push_back(column);
+        }
+      }
+    }
+
+    for (int column : renderColumns) {
+      if (column < 0 || column >= xsheet->getColumnCount()) continue;
+
+      const TXshCell& cell = xsheet->getCell(row, column);
+      if (cell.isEmpty()) continue;
+
+      TImageP image = cell.getImage(false);
+      if (!image) continue;
+
+      TRasterImageP rasterImage = image;
+      if (!rasterImage) {
+        if (TVectorImageP vectorImage = image) {
+          TPalette* palette = vectorImage->getPalette();
+          rasterImage       = TRasterImageUtils::vectorToFullColorImage(
+              vectorImage, TAffine(), palette, TPointD(), cameraRes);
+        }
+      }
+      if (!rasterImage) {
+        error = QObject::tr(
+            "Renderer offscreen fallback supports only simple "
+            "raster and vector cells");
+        return TImageP();
+      }
+
+      TRasterP source = rasterImage->getRaster();
+      if (!source) continue;
+
+      const TPoint delta = output->getCenter() - source->getCenter();
+      TRop::over(output, source, delta);
+    }
+
+    TRasterImageP rendered(output);
+    const TPointD cameraDpi = camera->getDpi();
+    rendered->setDpi(cameraDpi.x, cameraDpi.y);
+    error.clear();
+    return rendered;
+  }
+
+  bool renderSimpleOffscreen(ToonzScene* scene, const std::vector<int>& rows,
+                             const std::vector<int>& columns, QString& error) {
+    if (!setRenderAreaFromScene(scene, error)) return false;
+    if (rows.empty()) {
+      error = QObject::tr("Renderer.renderScene requires a non-empty scene");
+      return false;
+    }
+
+    m_outputImage = TImageP();
+    m_outputFrames.clear();
+
+    for (int row : rows) {
+      TImageP image = renderSimpleOffscreenFrame(scene, row, columns, error);
+      if (!image) return false;
+      if (!m_outputImage) m_outputImage = image;
+      m_outputFrames.push_back(std::make_pair(TFrameId(row + 1), image));
+    }
+
+    error.clear();
+    return true;
+  }
+
   bool render(ToonzScene* scene, const std::vector<int>& rows,
               const std::vector<int>& columns, QString& error) {
     if (!setRenderAreaFromScene(scene, error)) return false;
@@ -788,6 +873,10 @@ public:
     m_error.clear();
     m_outputImage = TImageP();
     m_outputFrames.clear();
+
+    if (QApplication::platformName() == QStringLiteral("offscreen")) {
+      return renderSimpleOffscreen(scene, rows, columns, error);
+    }
 
     QMutex mutex;
     mutex.lock();

@@ -762,6 +762,10 @@ run = "OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/rasterizer_edge
 description = "Run the Qt 6 app bundle against the Renderer renderFrame/renderScene script binding fixture."
 run = "OPENTOONZ_SCRIPT_USE_QAPPLICATION=1 OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/renderer_basic.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-renderer-basic Renderer true true 0 true 0|qt-script-renderer-state 2 0 2 1 1|qt-script-renderer-frame Raster true true true Raster|qt-script-renderer-scene Raster 1 0001 Raster true true|qt-script-renderer-renderframe-error true|qt-script-renderer-renderscene-error true|qt-script-renderer-dumpcache true txt opentoonz-script-renderer-cache|qt-script-renderer-disposed -1' bash scripts/qt6/run-script-smoke.sh"
 
+[tasks.script-smoke-renderer-offscreen-qt6]
+description = "Run the Qt 6 Renderer fixture through Qt's forced offscreen platform."
+run = "QT_QPA_PLATFORM=offscreen OPENTOONZ_SCRIPT_SMOKE_DIRECT_EXEC=1 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 OPENTOONZ_SCRIPT_USE_QAPPLICATION=1 OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/renderer_basic.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-renderer-basic Renderer true true 0 true 0|qt-script-renderer-state 2 0 2 1 1|qt-script-renderer-frame Raster true true true Raster|qt-script-renderer-scene Raster 1 0001 Raster true true|qt-script-renderer-renderframe-error true|qt-script-renderer-renderscene-error true|qt-script-renderer-dumpcache true txt opentoonz-script-renderer-cache|qt-script-renderer-disposed -1' bash scripts/qt6/run-script-smoke.sh"
+
 [tasks.script-smoke-renderer-frames-columns-qt6]
 description = "Run the Qt 6 app bundle against Renderer frame and column selection behavior."
 run = "OPENTOONZ_SCRIPT_USE_QAPPLICATION=1 OPENTOONZ_SCRIPT_FIXTURE=toonz/sources/tests/scriptengine/renderer_frames_columns.toonzscript OPENTOONZ_SCRIPT_EXPECTED_OUTPUT='qt-script-renderer-frames-columns-selection 2 2 0,1 1 Raster 2 0001,0002 Raster true true|qt-script-renderer-frames-columns-frame Raster true true|qt-script-renderer-frames-columns-default 2 0001,0002 Raster true' bash scripts/qt6/run-script-smoke.sh"

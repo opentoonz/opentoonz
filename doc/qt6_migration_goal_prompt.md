@@ -2504,11 +2504,14 @@ branch.
   `mise run script-smoke-rasterizer-offscreen-qt6`; the Qt 6 `Rasterizer`
   binding keeps normal platform sessions on `TOfflineGL` and falls back to
   `TRasterImageUtils::vectorToFullColorImage()` only when Qt's forced
-  offscreen platform cannot create a platform OpenGL context. The broader
-  aggregate run with forced `QT_QPA_PLATFORM=offscreen` still fails in Renderer
-  coverage when scene rendering reaches OpenGL context creation. Treat
-  forced-offscreen Renderer behavior as an open Qt 6 validation/implementation
-  gap, not as closed by the scene-icon or Rasterizer fallbacks.
+  offscreen platform cannot create a platform OpenGL context. The Qt 6
+  `Renderer` binding now also has a forced-offscreen fallback for simple
+  script-created raster/vector cells; normal platform sessions still use
+  `TRenderer`, while the offscreen platform uses a camera-sized raster
+  compositor for the script binding. `mise run
+  script-smoke-renderer-offscreen-qt6` validates the basic Renderer fixture,
+  and forced-offscreen runs of the frame/column and vector Renderer fixtures
+  pass with the same fallback.
 - The Qt 6 Script Console now restores the legacy GUI-only `view()` helper for
   `Image` and `Level` values by injecting a console bridge on top of the
   `QJSEngine` facade. The flipbook UI path remains in the `toonz` app layer,
@@ -2961,6 +2964,7 @@ mise run script-smoke-rasterizer-qt6
 mise run script-smoke-rasterizer-offscreen-qt6
 mise run script-smoke-rasterizer-edges-qt6
 mise run script-smoke-renderer-qt6
+mise run script-smoke-renderer-offscreen-qt6
 mise run script-smoke-renderer-frames-columns-qt6
 mise run script-smoke-renderer-vector-qt6
 mise run script-smoke-renderer-edges-qt6
@@ -3023,6 +3027,7 @@ OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-rasterizer-qt6
 mise run script-smoke-rasterizer-offscreen-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-rasterizer-edges-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-renderer-qt6
+mise run script-smoke-renderer-offscreen-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-renderer-frames-columns-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-renderer-vector-qt6
 OPENTOONZ_SCRIPT_SMOKE_REQUIRE_EXIT=1 mise run script-smoke-renderer-edges-qt6

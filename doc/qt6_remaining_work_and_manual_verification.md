@@ -778,6 +778,13 @@ Already covered:
   platform sessions on the existing OpenGL path while allowing
   `mise run script-smoke-rasterizer-offscreen-qt6` to validate full-color
   Rasterizer `Image` and `Level` output under `QT_QPA_PLATFORM=offscreen`.
+- The Qt 6 `Renderer` binding now has a forced-offscreen fallback for simple
+  script-created raster/vector cells. Normal platform sessions still use
+  `TRenderer`, while Qt's forced offscreen platform uses a camera-sized raster
+  compositor for the script binding. `mise run
+  script-smoke-renderer-offscreen-qt6` validates the basic Renderer fixture,
+  and forced-offscreen runs of the frame/column and vector Renderer fixtures
+  pass with the same fallback.
 - Aggregate script smoke tasks exist in both bounded and natural-exit modes.
 
 Still needed:
@@ -789,13 +796,6 @@ Still needed:
 - Verify legacy script-visible behavior for object lifetime, invalid argument
   handling, property conversion, arrays, frame ids, paths, scene mutation, and
   renderer output.
-- Resolve the remaining forced-offscreen OpenGL gap for Renderer fixtures. A
-  forced `QT_QPA_PLATFORM=offscreen` Renderer smoke currently reaches the
-  renderer state prints, then times out after Qt reports that the offscreen
-  platform cannot create platform OpenGL contexts. The Rasterizer half of this
-  gap now has a CPU fallback and focused smoke coverage; Renderer still needs
-  either an equivalent non-OpenGL fallback or a clearer product decision that
-  forced-offscreen scene rendering is unsupported.
 - Design any future script-debugger UI as new Qt 6 tooling if it is still a
   product requirement. The current Qt 6 replacement story is Script Console and
   `Run Script...` execution without the orphaned `QScriptEngineDebugger` popup.
@@ -867,7 +867,7 @@ Already covered by focused smokes:
 - FX Preview full-frame and sub-camera saved-frame export.
 - Final-render PNG output for basic raster, background, sequence, composite,
   vector, Toonz Raster, and a basic FX path.
-- Several offscreen/script renderer slices.
+- Focused forced-offscreen script Rasterizer and Renderer slices.
 - Focused scene-icon script save checks under Qt's offscreen platform.
 
 Still needed:
