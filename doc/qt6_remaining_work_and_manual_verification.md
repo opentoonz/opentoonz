@@ -532,12 +532,10 @@ Already covered:
   use becomes a hard compile error and the remaining Qt 6 deprecation frontier
   surfaces as build evidence. The isolated `nix-qt6-deprecated-api` preset and
   `toonz/build/nix-qt6-deprecated-api` build directory keep the lane advisory,
-  beside the default Qt 6 build. On June 21, 2026, a clean
-  `build-qt6-deprecated-api` build compiled and linked the `OpenToonz`
-  executable with no Qt deprecation errors and no Qt-related deprecated-API
-  warnings; the only 38 remaining warnings are pre-existing legacy macOS Carbon
-  warnings in the `common/twain/*.c` scanner module, unrelated to Qt. This is a
-  strong signal that the compiled `OpenToonz` Qt 6 target carries no remaining
+  beside the default Qt 6 build. On July 1, 2026, a clean
+  `mise run build-qt6-deprecated-api` build compiled and linked the
+  `OpenToonz` executable with no Qt deprecation errors. This is a strong signal
+  that the compiled `OpenToonz` Qt 6 target carries no remaining
   Qt-6.0-deprecated API usage, complementing the grep-based scope guards.
 - Legacy `toonzfarm/tfarm/tbaseserver.cpp` Windows socket diagnostic messages
   now use bounded `snprintf()` formatting instead of unbounded `wsprintf()`,
@@ -557,8 +555,9 @@ Still needed:
   `GL_SILENCE_DEPRECATION` at the CMake compile-definition boundary, so known
   legacy OpenGL/GLUT deprecation-warning noise should no longer obscure newer
   Qt 6 build diagnostics.
-  Updated local Qt 6 build evidence: `mise run build-qt6` passed on June 21,
-  2026, after the latest master merge recovery.
+  Updated local Qt 6 build evidence: `mise run build-qt6` passed on July 1,
+  2026, after the script level I/O and forced-offscreen Rasterizer/Renderer
+  fallback slices.
   Latest targeted app-target rebuild evidence after the combo-box activation,
   QImage mirrored/flipped, checkbox state-change, QWheelEvent pixel-delta, and
   QGLFormat scope slices: on June 5, 2026,

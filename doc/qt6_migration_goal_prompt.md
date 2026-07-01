@@ -655,12 +655,11 @@ branch.
   that the grep-based scope guards cannot see — as build evidence. The lane is
   advisory: an isolated `nix-qt6-deprecated-api` preset and
   `toonz/build/nix-qt6-deprecated-api` build directory keep it beside, not
-  inside, the default Qt 6 build. On June 21, 2026, a clean
-  `build-qt6-deprecated-api` build compiled and linked the `OpenToonz`
-  executable with no Qt deprecation errors and no Qt-related deprecated-API
-  warnings; the only 38 remaining warnings are pre-existing legacy macOS Carbon
-  warnings in the `common/twain/*.c` scanner module (`HUnlock`, `DisposeHandle`,
-  `NewHandle`, `SetFrontProcess`), which are unrelated to Qt and out of scope.
+  inside, the default Qt 6 build. On July 1, 2026, a clean
+  `mise run build-qt6-deprecated-api` build compiled and linked the
+  `OpenToonz` executable with no Qt deprecation errors, confirming that the
+  compiled Qt 6 target still carries no Qt-6.0-deprecated API usage after the
+  script level I/O and forced-offscreen Rasterizer/Renderer fallback slices.
 - User-activated real `QComboBox` index and text handling now routes through
   `QtCompat::connectComboBoxActivatedIndex()` and
   `QtCompat::connectComboBoxTextActivated()`, which use `textActivated` and
