@@ -163,6 +163,7 @@ static void initToonzEnv(QHash<QString, QString> &argPathValues) {
 
   QCoreApplication::setOrganizationName("OpenToonz");
   QCoreApplication::setOrganizationDomain("");
+  QGuiApplication::setDesktopFileName("io.github.OpenToonz");
   QCoreApplication::setApplicationName(
       QString::fromStdString(TEnv::getApplicationName()));
 
