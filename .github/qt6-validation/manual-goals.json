@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "source": "OpenToonz Qt 6 Port Progress Reports",
-  "updated_at": "2026-06-29",
-  "baseline": "OpenToonz 1.7.1 / Qt 5; codex/qt-6-port reviewed at c4d5daf48; regular Linux, macOS, and Windows branch CI green on 2026-06-27; latest Qt 6 Experimental Binary Builds result still failed on 2026-06-22 with Windows CMake and Linux compile blockers while macOS arm64 packaged; Project Sync skips until QT6_PROJECT_TOKEN is configured",
+  "updated_at": "2026-07-06",
+  "baseline": "OpenToonz 1.7.1 / Qt 5; codex/qt-6-port reviewed at 419ef986f; latest visible regular Linux, macOS, and Windows branch CI green on 2026-07-01 for source-changing commit a115837f5; latest Qt 6 Experimental Binary Builds result failed on 2026-06-29 with Windows CMake and Linux compile blockers while macOS arm64 packaged; Project Sync still skips until QT6_PROJECT_TOKEN is configured",
   "goals": [
     {
       "title": "Restore macOS Qt 6 CI guard preflight",
-      "body": "Superseded by later regular branch CI. Linux, macOS, and Windows builds were green at codex/qt-6-port commit b49ed0df5 in the latest observed runs, so the prior macOS rg preflight blocker is accepted unless it regresses.",
+      "body": "Superseded by later regular branch CI. Linux, macOS, and Windows builds were green at codex/qt-6-port source-changing commit a115837f5 in the latest observed runs, so the prior macOS rg preflight blocker is accepted unless it regresses.",
       "area": "Build/package",
       "platform": "macOS arm64",
       "validation_type": "CI build",
@@ -17,7 +17,7 @@
     },
     {
       "title": "Validate latest local Qt 6 branch commit",
-      "body": "codex/qt-6-port was reviewed at c4d5daf48, and the latest observed regular branch CI for Linux, macOS, and Windows succeeded for that commit on 2026-06-27.",
+      "body": "codex/qt-6-port was reviewed at 419ef986f. The latest visible regular branch CI for Linux, macOS, and Windows succeeded for source-changing commit a115837f5 on 2026-07-01; later commits 3756c93d8 and 419ef986f are documentation and build-evidence updates.",
       "area": "Build/package",
       "platform": "Cross-platform",
       "validation_type": "CI build",
@@ -28,7 +28,7 @@
     },
     {
       "title": "Verify Qt 6 Experimental Binary Builds after aqt module fix",
-      "body": "The latest observed Qt 6 Experimental Binary Builds workflow result failed on 2026-06-22. The earlier Linux aqt module-list blocker is no longer the current failure: Windows x64 still fails during CMake configuration because the requested Visual Studio 17 2022 generator is not found on the scheduled runner, and Linux x86_64 AppImage fails compiling iwa_bokehreffx.cpp because UCHAR_MAX is used without the header that defines it. macOS arm64 built, verified, created a DMG, and uploaded an artifact, but the workflow still failed overall and skipped prerelease publication.",
+      "body": "The latest observed Qt 6 Experimental Binary Builds workflow result failed on 2026-06-29. Windows x64 still fails during CMake configuration because the requested Visual Studio 17 2022 generator is not found on the scheduled runner, and Linux x86_64 AppImage fails compiling iwa_bokehreffx.cpp because UCHAR_MAX is used without the header that defines it. macOS arm64 built, verified, created a DMG, and uploaded an artifact, but the workflow still failed overall and skipped prerelease publication.",
       "area": "Build/package",
       "platform": "Cross-platform",
       "validation_type": "CI build",
@@ -39,7 +39,7 @@
     },
     {
       "title": "Fix Linux Qt 6 experimental bokeh reference compile",
-      "body": "Linux x86_64 AppImage packaging failed in the latest experimental workflow while compiling iwa_bokehreffx.cpp because UCHAR_MAX is used without including the header that defines it. The current Qt 6 branch still lacks that include. Add the missing include and rerun the experimental package workflow.",
+      "body": "Linux x86_64 AppImage packaging failed in the latest experimental workflow while compiling iwa_bokehreffx.cpp because UCHAR_MAX is used without including the header that defines it. The current Qt 6 branch at 419ef986f still lacks that include. Add the missing include and rerun the experimental package workflow.",
       "area": "Build/package",
       "platform": "Linux x64",
       "validation_type": "CI build",
@@ -50,7 +50,7 @@
     },
     {
       "title": "Land Qt 6 experimental workflow runner fix on master",
-      "body": "The scheduled experimental workflow runs from the default-branch workflow file. The latest run failed Windows CMake configuration when Visual Studio 17 2022 could not be found on the scheduled runner. The current Qt 6 branch workflow uses the Windows 2022 runner and expanded Qt module list, while master still differs. Land the runner or generator fix on master before expecting scheduled Windows packages to pass.",
+      "body": "The scheduled experimental workflow runs from the default-branch workflow file. The 2026-06-29 run failed Windows CMake configuration when Visual Studio 17 2022 could not be found on the scheduled runner. The current Qt 6 branch workflow uses the Windows 2022 runner and expanded Qt module list, while origin/master still differs. Land the runner or generator fix on master before expecting scheduled Windows packages to pass.",
       "area": "Build/package",
       "platform": "Windows x64",
       "validation_type": "Regression follow-up",
@@ -61,7 +61,7 @@
     },
     {
       "title": "Maintain Qt deprecated API build lanes",
-      "body": "Keep the Qt 5 deprecated-API build guard and the Qt 6 deprecated-API build lane reproducible. Branch documentation records that the Qt 6 lane compiled and linked OpenToonz without Qt deprecation errors or Qt-related deprecated-API warnings; rerun after shared source changes.",
+      "body": "Keep the Qt 5 deprecated-API build guard and the Qt 6 deprecated-API build lane reproducible. Branch documentation records that on 2026-07-01 a clean mise run build-qt6-deprecated-api build compiled and linked OpenToonz with no Qt deprecation errors after the script level I/O and forced-offscreen Rasterizer/Renderer fallback slices; rerun after shared source changes.",
       "area": "Build/package",
       "platform": "Cross-platform",
       "validation_type": "CI build",
@@ -72,7 +72,7 @@
     },
     {
       "title": "Enable Qt 6 Project Sync token",
-      "body": "The Qt 6 Project Sync workflow is present and scheduled, and it reads manual-goals JSON, but current runs still skip Project updates because QT6_PROJECT_TOKEN is not configured. Add the repository secret before treating GitHub Project status as live.",
+      "body": "The Qt 6 Project Sync workflow is present and scheduled, and it reads manual-goals JSON, but the latest observed 2026-07-06 run still skipped Project updates because QT6_PROJECT_TOKEN is not configured. Add the repository secret before treating GitHub Project status as live.",
       "area": "Documentation",
       "platform": "Cross-platform",
       "validation_type": "Regression follow-up",
@@ -83,7 +83,7 @@
     },
     {
       "title": "Smoke-test macOS arm64 Qt 6 experimental DMG",
-      "body": "The latest observed experimental workflow produced a macOS arm64 DMG artifact even though Windows and Linux failed. Smoke-test package mechanics, app launch, runtime data, Qt plugins, multimedia backends, and basic scene lifecycle from that artifact, but do not treat it as cross-platform release readiness.",
+      "body": "The 2026-06-29 experimental workflow produced a macOS arm64 DMG artifact even though Windows and Linux failed. Smoke-test package mechanics, app launch, runtime data, Qt plugins, multimedia backends, and basic scene lifecycle from that artifact, but do not treat it as cross-platform release readiness.",
       "area": "Cross-platform packaging",
       "platform": "macOS arm64",
       "validation_type": "Human smoke",
@@ -94,7 +94,7 @@
     },
     {
       "title": "Startup/workspace smoke: isolated profile launch",
-      "body": "Launch the packaged Qt 6 app with an isolated runtime profile, confirm the intended instance is under test, create and save a scene, relaunch, reopen it, switch rooms, and capture startup/workspace screenshots once a current package or local bundle is available. Report docs: doc/qt6_port_progress/2026-06-29-functional-gaps.md and doc/qt6_port_progress/2026-06-29-manual-verification-checklist.md.",
+      "body": "Launch the packaged Qt 6 app with an isolated runtime profile, confirm the intended instance is under test, create and save a scene, relaunch, reopen it, switch rooms, and capture startup/workspace screenshots once a current package or local bundle is available. Report docs: doc/qt6_port_progress/2026-07-06-functional-gaps.md and doc/qt6_port_progress/2026-07-06-manual-verification-checklist.md.",
       "area": "Startup/workspace",
       "platform": "Cross-platform",
       "validation_type": "Codex GUI smoke",
@@ -116,7 +116,7 @@
     },
     {
       "title": "Viewer/rendering parity: default scene and viewer crop",
-      "body": "Compare the Qt 6 viewer against the Qt 5 baseline for default scene display, blank/nonblank viewer behavior, stale framebuffer behavior, high-DPI alignment, and screenshot or pixel crop evidence on representative raster, vector, Toonz Raster, composite, and FX-heavy scenes.",
+      "body": "Compare the Qt 6 viewer against the Qt 5 baseline for default scene display, blank/nonblank viewer behavior, stale framebuffer behavior, high-DPI alignment, and screenshot or pixel crop evidence on representative raster, vector, Toonz Raster, composite, and FX-heavy scenes. Forced-offscreen Rasterizer and Renderer script fallbacks are useful evidence but do not replace real viewer parity checks.",
       "area": "Viewer/rendering",
       "platform": "Cross-platform",
       "validation_type": "Codex GUI smoke",
@@ -124,6 +124,17 @@
       "risk": "P1 high",
       "automation_candidate": "Codex GUI",
       "requires_build": true
+    },
+    {
+      "title": "Track forced-offscreen Rasterizer and Renderer fallback evidence",
+      "body": "Branch documentation records focused forced-offscreen Rasterizer and Renderer script-smoke coverage. Rasterizer now falls back to TRasterImageUtils::vectorToFullColorImage() under QT_QPA_PLATFORM=offscreen, and Renderer uses a camera-sized raster compositor for simple script-created raster/vector cells under the forced-offscreen platform while normal platform sessions keep the existing rendering path.",
+      "area": "Viewer/rendering",
+      "platform": "Cross-platform",
+      "validation_type": "Codex report review",
+      "validation_status": "Codex evidence ready",
+      "risk": "P2 medium",
+      "automation_candidate": "QTest",
+      "requires_build": false
     },
     {
       "title": "Verify manual Preview and FX Preview UI workflows",
@@ -215,7 +226,7 @@
     },
     {
       "title": "Expand and maintain QJSEngine script compatibility evidence",
-      "body": "Keep the current bounded and natural-exit script-smoke fixtures green while maintaining the script-smoke registry guard, GUI-smoke registry guard, and strict Qt 6 script guards. Recent coverage includes global-output formatting, run(FilePath), FilePath mutation and metadata, Scene column and level-name cases, Level name coercion, Image load replacement, and Transform chaining/validation. Add coverage for remaining advanced scene APIs, additional object bindings, and external scripts users depend on.",
+      "body": "Keep the current bounded and natural-exit script-smoke fixtures green while maintaining the script-smoke registry guard, GUI-smoke registry guard, and strict Qt 6 script guards. Recent coverage includes the user-style workflow fixture, Scene I/O edges, level path loading, level transformer wrapper lifetime, ImageBuilder edge behavior, ToonzRasterConverter lifecycle behavior, vectorizer properties, Rasterizer edges, Renderer edges/lifecycle behavior, and forced-offscreen Rasterizer/Renderer fallbacks. Add coverage for remaining advanced scene APIs, additional object bindings, and external scripts users depend on.",
       "area": "Scripting",
       "platform": "Cross-platform",
       "validation_type": "Codex report review",
@@ -226,7 +237,7 @@
     },
     {
       "title": "Verify real user scripts against Qt 6 QJSEngine",
-      "body": "Run representative studio or user scripts against the Qt 6 QJSEngine runtime, not only synthetic smoke fixtures. Include path-heavy, scene-mutation, renderer, wrapper-lifetime, and expected-error scripts where possible, and compare behavior with Qt 5 where practical.",
+      "body": "Run representative studio or user scripts against the Qt 6 QJSEngine runtime. The branch now has a synthetic user-style workflow fixture, but this does not replace external scripts users actually depend on. Include path-heavy, scene-mutation, renderer, wrapper-lifetime, and expected-error scripts where possible, and compare behavior with Qt 5 where practical.",
       "area": "Scripting",
       "platform": "Cross-platform",
       "validation_type": "Human smoke",
@@ -237,7 +248,7 @@
     },
     {
       "title": "Verify Script Console GUI workflows",
-      "body": "Open the Script Console and verify broader interactive command editing, run() GUI-console error paths, view(Image), view(Level), invalid argument cases, FlipBook cleanup, visible error reporting, repeated console sessions, stale-state cleanup, and external script behavior against Qt 5 where practical.",
+      "body": "Open the Script Console and verify broader interactive command editing, run() GUI-console error paths, view(Image), view(Level), invalid argument cases, FlipBook cleanup, visible error reporting, repeated console sessions, stale-state cleanup, and external script behavior against Qt 5 where practical. App-side smoke now covers print, warning, a run() happy path with child output/return/global persistence, expected view() error display, and one Up-arrow history recall path.",
       "area": "Scripting",
       "platform": "Cross-platform",
       "validation_type": "Human smoke",
@@ -281,7 +292,7 @@
     },
     {
       "title": "Validate Linux Windows and macOS Qt 6 release packages",
-      "body": "Validate Linux AppImage, Windows package, macOS DMG, deploy-tool arguments, Qt module lists, plugins, multimedia backends, runtime library paths, helper executables, OpenGL behavior, and file associations after the Qt 6 Experimental Binary Builds workflow produces fresh cross-platform artifacts. The latest observed run packaged macOS arm64 but failed Windows and Linux, so release-package validation remains blocked.",
+      "body": "Validate Linux AppImage, Windows package, macOS DMG, deploy-tool arguments, Qt module lists, plugins, multimedia backends, runtime library paths, helper executables, OpenGL behavior, and file associations after the Qt 6 Experimental Binary Builds workflow produces fresh cross-platform artifacts. The latest observed 2026-06-29 run packaged macOS arm64 but failed Windows and Linux, so release-package validation remains blocked.",
       "area": "Cross-platform packaging",
       "platform": "Cross-platform",
       "validation_type": "Human smoke",
