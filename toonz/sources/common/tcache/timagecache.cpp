@@ -525,7 +525,12 @@ CompressedOnDiskCacheItem::CompressedOnDiskCacheItem(
 
 CompressedOnDiskCacheItem::~CompressedOnDiskCacheItem() {
   delete m_imageInfo;
-  TSystem::deleteFile(m_fp);
+  if (m_fp.isEmpty()) return;
+  try {
+    TSystem::deleteFile(m_fp);
+  } catch (...) {
+    // Ignore any error do not let it escape the destructor.
+  }
 }
 
 //------------------------------------------------------------------------------
@@ -629,7 +634,12 @@ UncompressedOnDiskCacheItem::UncompressedOnDiskCacheItem(const TFilePath &fp,
 
 UncompressedOnDiskCacheItem::~UncompressedOnDiskCacheItem() {
   delete m_imageInfo;
-  TSystem::deleteFile(m_fp);
+  if (m_fp.isEmpty()) return;
+  try {
+    TSystem::deleteFile(m_fp);
+  } catch (...) {
+    // Ignore any error do not let it escape the destructor.
+  }
 }
 
 //------------------------------------------------------------------------------
