@@ -519,7 +519,7 @@ SceneSettingsPopup::SceneSettingsPopup()
     mainLayout->addWidget(m_frameRateFld, 0, 1, 1, 4,
                           Qt::AlignLeft | Qt::AlignVCenter);
     // Camera BG color
-    mainLayout->addWidget(new QLabel(tr("Camera BG Color:"), this), 1, 0,
+    mainLayout->addWidget(new QLabel(tr("Camera/Layout BG Color:"), this), 1, 0,
                           Qt::AlignRight | Qt::AlignVCenter);
     mainLayout->addWidget(m_bgColorFld, 1, 1, 1, 4);
     // Field Guide Size - A/R

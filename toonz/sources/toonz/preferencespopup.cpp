@@ -632,7 +632,7 @@ void PreferencesPopup::onColorCalibrationChanged() {
 
 void PreferencesPopup::onDefLevelTypeChanged() {
   bool isRaster = m_pref->getIntValue(DefLevelType) != PLI_XSHLEVEL &&
-                  !m_pref->getBoolValue(newLevelSizeToCameraSizeEnabled);
+                  m_pref->getIntValue(DefLevelSizePolicy) == 0;
   m_controlIdMap.key(DefLevelWidth)->setEnabled(isRaster);
   m_controlIdMap.key(DefLevelHeight)->setEnabled(isRaster);
   if (!m_pref->getBoolValue(pixelsOnly))
@@ -1285,8 +1285,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {DefRasterFormat, tr("Default Raster / Scan Level Format:")},
       //{scanLevelType, tr("Scan File Format:")},
       {DefLevelType, tr("Default Level Type:")},
-      {newLevelSizeToCameraSizeEnabled,
-       tr("New Levels Default to the Current Camera Size")},
+      {DefLevelSizePolicy, tr("Default Level Size Priority:")},
       {DefLevelWidth, tr("Width:")},
       {DefLevelHeight, tr("Height:")},
       {DefLevelDpi, tr("DPI:")},
@@ -1488,6 +1487,10 @@ QList<ComboBoxItem> PreferencesPopup::getComboItemList(
        {{tr("Toonz Vector Level"), PLI_XSHLEVEL},
         {tr("Toonz Raster Level"), TZP_XSHLEVEL},
         {tr("Raster Level"), OVL_XSHLEVEL}}},
+      {DefLevelSizePolicy,
+       {{tr("Custom"), 0},
+        {tr("Current Camera Size"), 1},
+        {tr("Current Layout Template Size"), 2}}},
       {NumberingSystem,
        {{tr("Incremental"), 0}, {tr("Use Xsheet as Animation Sheet"), 1}}},
       {vectorSnappingTarget,
@@ -2047,9 +2050,8 @@ QWidget* PreferencesPopup::createDrawingPage() {
   {
     insertDualUIs(DefLevelWidth, DefLevelHeight, defaultLevelSizeLay);
     insertUI(DefLevelDpi, defaultLevelSizeLay);
-    insertUI(newLevelSizeToCameraSizeEnabled, defaultLevelSizeLay);
+    insertUI(DefLevelSizePolicy, defaultLevelSizeLay, getComboItemList(DefLevelSizePolicy));
   }
-
   QGridLayout* autoCreationLay = insertGroupBoxUI(EnableAutocreation, lay);
   {
     insertUI(NumberingSystem, autoCreationLay,
@@ -2067,7 +2069,7 @@ QWidget* PreferencesPopup::createDrawingPage() {
 
   m_onEditedFuncMap.insert(DefLevelType,
                            &PreferencesPopup::onDefLevelTypeChanged);
-  m_onEditedFuncMap.insert(newLevelSizeToCameraSizeEnabled,
+  m_onEditedFuncMap.insert(DefLevelSizePolicy,
                            &PreferencesPopup::onDefLevelTypeChanged);
 
   onDefLevelTypeChanged();
