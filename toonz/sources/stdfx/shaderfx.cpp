@@ -253,7 +253,6 @@ Suggestions are welcome as this is a tad beyond ridiculous...
                ->thread());  // Parent object must be in the same thread,
     // setParent(mainScopeBoundObject);  // otherwise reparenting fails
     m_surface.reset(new QOffscreenSurface());
-    m_surface->create();
     m_shadingContext.reset(new ShadingContext(m_surface.get()));
   }
 

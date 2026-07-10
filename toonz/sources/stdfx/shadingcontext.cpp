@@ -111,8 +111,11 @@ void ShadingContext::Imp::initMatrix(int lx, int ly) {
 
 ShadingContext::ShadingContext(QOffscreenSurface *surface) : m_imp(new Imp) {
   m_imp->m_surface = surface;
-  m_imp->m_surface->create();
-  QSurfaceFormat format;
+  const QSurfaceFormat format = m_imp->format();
+  if (!m_imp->m_surface->isValid()) {
+    m_imp->m_surface->setFormat(format);
+    m_imp->m_surface->create();
+  }
   m_imp->m_context->setFormat(format);
   m_imp->m_context->create();
   m_imp->m_context->makeCurrent(m_imp->m_surface);

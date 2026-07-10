@@ -871,6 +871,12 @@ Already covered by focused smokes:
   vector, Toonz Raster, and a basic FX path.
 - Focused forced-offscreen script Rasterizer and Renderer slices.
 - Focused scene-icon script save checks under Qt's offscreen platform.
+- The GPU shader-FX offscreen surface now receives the same requested
+  `QSurfaceFormat` as its `QOpenGLContext` before it is created. On macOS this
+  preserves the renderer's requested OpenGL 3.2 compatibility profile for its
+  legacy immediate-mode shader drawing path. The Qt 5 and Qt 6 build lanes,
+  the Qt 6 high-DPI raster viewer stale-frame smoke, and the Qt 6 final-render
+  FX smoke passed after the change.
 
 Still needed:
 
@@ -880,6 +886,7 @@ Still needed:
 - Live sub-camera dragging and visual framing.
 - Manual preview-save popup, overwrite, warning, and cancellation behavior.
 - Production FX-heavy preview scenes.
+- Real shader-FX rendering with bundled and user-provided GLSL programs.
 - Broader final-render parity against Qt 5 using real scenes.
 - Broader vector rendering parity.
 - Full-color Rasterizer/Renderer validation under a real OpenGL-capable
