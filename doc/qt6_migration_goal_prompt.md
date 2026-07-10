@@ -647,19 +647,19 @@ branch.
   the `OpenToonz` target successfully after the guardrail-doc script was made
   portable to the Bash version used inside the Nix shell.
 - `mise run build-qt6-deprecated-api` now extends that deprecation-floor lane to
-  the Qt 6 build. `OPENTOONZ_QT_DEPRECATED_ERRORS` is now Qt-major-aware: the
+  the Qt 6 build. `OPENTOONZ_QT_DEPRECATED_ERRORS` is Qt-major-aware: the
   Qt 5 lane keeps the `QT_DISABLE_DEPRECATED_UP_TO=0x050F00` (Qt 5.15) floor,
-  while the Qt 6 lane raises it to `0x060000` (Qt 6.0), turning use of any
-  Qt-6.0-deprecated API into a hard compile error. This surfaces the remaining
-  Qt 6 deprecation frontier — including overload-resolution-level deprecations
-  that the grep-based scope guards cannot see — as build evidence. The lane is
+  while the Qt 6 lane raises it to `0x060900` (Qt 6.9), turning use of any
+  Qt-6.9-or-earlier-deprecated API into a hard compile error. This surfaces the
+  remaining Qt 6 deprecation frontier, including overload-resolution-level
+  deprecations that the grep-based scope guards cannot see, as build evidence.
+  The lane is
   advisory: an isolated `nix-qt6-deprecated-api` preset and
   `toonz/build/nix-qt6-deprecated-api` build directory keep it beside, not
-  inside, the default Qt 6 build. On July 1, 2026, a clean
+  inside, the default Qt 6 build. On July 10, 2026, a clean
   `mise run build-qt6-deprecated-api` build compiled and linked the
   `OpenToonz` executable with no Qt deprecation errors, confirming that the
-  compiled Qt 6 target still carries no Qt-6.0-deprecated API usage after the
-  script level I/O and forced-offscreen Rasterizer/Renderer fallback slices.
+  compiled Qt 6 target carries no Qt-6.9-or-earlier-deprecated API usage.
 - User-activated real `QComboBox` index and text handling now routes through
   `QtCompat::connectComboBoxActivatedIndex()` and
   `QtCompat::connectComboBoxTextActivated()`, which use `textActivated` and

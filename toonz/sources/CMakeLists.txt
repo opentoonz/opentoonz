@@ -185,7 +185,7 @@ option(WITH_TRANSLATION "Generate translation projects as well" ON)
 option(WITH_WINTAB "(Windows only) Build with customized Qt with WinTab support. https://github.com/shun-iwasawa/qt5/releases/tag/v5.15.2_wintab" OFF)
 set(OPENTOONZ_QT_MAJOR "5" CACHE STRING "Qt major version to build against")
 set_property(CACHE OPENTOONZ_QT_MAJOR PROPERTY STRINGS 5 6)
-option(OPENTOONZ_QT_DEPRECATED_ERRORS "Fail when using Qt APIs deprecated through the lane's Qt version (Qt 5.15 on the Qt 5 lane, Qt 6.0 on the Qt 6 lane)" OFF)
+option(OPENTOONZ_QT_DEPRECATED_ERRORS "Fail when using Qt APIs deprecated through the lane's Qt version (Qt 5.15 on the Qt 5 lane, Qt 6.9 on the Qt 6 lane)" OFF)
 
 if(NOT OPENTOONZ_QT_MAJOR MATCHES "^[56]$")
     message(FATAL_ERROR "OPENTOONZ_QT_MAJOR must be 5 or 6, got ${OPENTOONZ_QT_MAJOR}")
@@ -201,11 +201,11 @@ endif()
 if(OPENTOONZ_QT_DEPRECATED_ERRORS)
     # Disable Qt APIs deprecated up to the lane's own Qt version so their use
     # becomes a hard compile error instead of warning noise. The Qt 5 lane keeps
-    # the historical Qt 5.15 floor; the Qt 6 lane raises it to Qt 6.0 so the
+    # the historical Qt 5.15 floor; the Qt 6 lane raises it to Qt 6.9 so the
     # remaining Qt 6 deprecation frontier (including overload-resolution-level
     # deprecations that grep guards cannot see) surfaces as build evidence.
     if(OPENTOONZ_QT_MAJOR STREQUAL "6")
-        add_compile_definitions(QT_DISABLE_DEPRECATED_UP_TO=0x060000)
+        add_compile_definitions(QT_DISABLE_DEPRECATED_UP_TO=0x060900)
     else()
         add_compile_definitions(QT_DISABLE_DEPRECATED_UP_TO=0x050F00)
     endif()
