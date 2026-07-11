@@ -130,6 +130,15 @@ class ToolPropertiesPanel : public TPanel {
   QList<QWidget *> m_animateXYRowWidgets;
   QList<MeasuredValueField *> m_animateMeasuredFields;
 
+  // Shift && Trace (Edit Shift pseudo-tool only).
+  QWidget   *m_shiftTraceGhostPicker     = nullptr;
+  QWidget   *m_shiftTraceBBoxPicker      = nullptr;
+  QCheckBox *m_shiftTraceNoShiftChk      = nullptr;
+  ToolPropertyButton *m_shiftTraceNoShiftIconBtn    = nullptr;
+  ToolPropertyButton *m_shiftTraceResetShiftIconBtn = nullptr;
+  QPushButton *m_shiftTraceResetPrevBtn    = nullptr;
+  QPushButton *m_shiftTraceResetFollowingBtn = nullptr;
+
   bool m_useSingleMaxSlider;   // false = DoublePairField (native double cursor), true = single slider (max only)
   bool m_showLabels;           // Show/hide property labels
   bool m_showNumericFields;    // Show/hide numeric fields
@@ -218,6 +227,8 @@ private:
                                bool plasticAlignedFields = false);
 
   void createEditAssistantsProperties();
+  void createShiftTraceProperties();
+  void updateShiftTraceWidgets();
 
   // Ruler / Plastic need bespoke layouts (no or multi-mode property groups).
   void createRulerProperties();
@@ -327,6 +338,7 @@ private slots:
   void onShowHideActionTriggered();
   void rebuildPlasticSkeletonPicker();
   void updatePlasticSkeletonPicker();
+  void onShiftTraceCommandChanged();
 };
 
 #endif // TOOLPROPERTIESPANEL_H
