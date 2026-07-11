@@ -825,6 +825,13 @@ class SettingsPage final : public QScrollArea {
   bool
       m_updating;  //!< Whether the page is copying style content to its widget,
                    //!  to be displayed.
+  bool m_compactMode;
+
+  void applyCompactMetrics();
+  void rebuildParamLayout();
+  void applyCompactEditorLayout();
+  int paramEditorRow(int p) const { return m_compactMode ? (p * 2 + 1) : p; }
+
 private:
   int getParamIndex(const QWidget *widget);
 
@@ -835,11 +842,15 @@ public:
   void updateValues();
 
   void enableAutopaintToggle(bool enabled);
+  bool isCompactMode() const { return m_compactMode; }
 
 signals:
 
   void paramStyleChanged(
       bool isDragging);  //!< Signals that the edited style has changed.
+
+public slots:
+  void setCompactMode(bool compact);
 
 private slots:
 
@@ -908,6 +919,7 @@ class DVAPI StyleEditor final : public QWidget, public SaveLoadQSettings {
   QAction *m_rgbAction;
   QAction *m_hexAction;
   QAction *m_searchAction;
+  QAction *m_compactSettingsAction;
   QActionGroup *m_sliderAppearanceAG;
   QAction *m_hexEditorAction;
 

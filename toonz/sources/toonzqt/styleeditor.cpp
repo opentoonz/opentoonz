@@ -50,7 +50,10 @@
 #include <QRadioButton>
 #include <QComboBox>
 #include <QScrollArea>
+#include <QLineEdit>
+#include <QSlider>
 #include <QStackedWidget>
+#include <algorithm>
 #include <QStyleOptionSlider>
 #include <QToolTip>
 #include <QSplitter>
@@ -2492,8 +2495,115 @@ m_index) == value)
 //    SettingsPage  implementation
 //*****************************************************************************
 
+namespace {
+
+int textWidthForCompactField(const QFontMetrics &fm, const QString &text) {
+  return fm.horizontalAdvance(text.isEmpty() ? QStringLiteral("0") : text);
+}
+
+int compactNumericFieldWidth(QLineEdit *lineEdit, const TColorStyleP &style,
+                             int paramIdx) {
+  if (!lineEdit) return 0;
+
+  const QFontMetrics fm(lineEdit->font());
+  const int padding = 12;
+  int width         = textWidthForCompactField(fm, lineEdit->text());
+
+  if (style && 0 <= paramIdx && paramIdx < style->getParamCount()) {
+    switch (style->getParamType(paramIdx)) {
+    case TColorStyle::INT: {
+      int minV = 0, maxV = 0;
+      style->getParamRange(paramIdx, minV, maxV);
+      width = std::max(width, textWidthForCompactField(fm, QString::number(minV)));
+      width = std::max(width, textWidthForCompactField(fm, QString::number(maxV)));
+      break;
+    }
+    case TColorStyle::DOUBLE: {
+      double minV = 0.0, maxV = 0.0;
+      style->getParamRange(paramIdx, minV, maxV);
+      int decimals = 2;
+      if (DVGui::DoubleLineEdit *doubleLineEdit =
+              qobject_cast<DVGui::DoubleLineEdit *>(lineEdit))
+        decimals = doubleLineEdit->getDecimals();
+
+      const auto format = [&](double value) {
+        return QString::number(value, 'f', decimals);
+      };
+
+      width = std::max(width, textWidthForCompactField(fm, format(minV)));
+      width = std::max(width, textWidthForCompactField(fm, format(maxV)));
+      width = std::max(
+          width,
+          textWidthForCompactField(
+              fm, format(style->getParamValue(TColorStyle::double_tag(),
+                                              paramIdx))));
+      break;
+    }
+    default:
+      break;
+    }
+  }
+
+  return width + padding;
+}
+
+void setUniformCompactFieldWidth(QWidget *editorWidget, int width) {
+  if (!editorWidget || width <= 0) return;
+
+  for (QLineEdit *lineEdit : editorWidget->findChildren<QLineEdit *>()) {
+    lineEdit->setFixedWidth(width);
+    if (QWidget *wrapper = lineEdit->parentWidget())
+      wrapper->setFixedWidth(width);
+  }
+}
+
+void configureCompactEditorRow(QWidget *editorWidget) {
+  if (!editorWidget) return;
+
+  editorWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+  QHBoxLayout *hbox = qobject_cast<QHBoxLayout *>(editorWidget->layout());
+  if (!hbox) return;
+
+  QWidget *valueWrapper = nullptr;
+  for (QLineEdit *lineEdit : editorWidget->findChildren<QLineEdit *>()) {
+    QWidget *wrapper = lineEdit->parentWidget();
+    if (wrapper && wrapper->parentWidget() == editorWidget)
+      valueWrapper = wrapper;
+  }
+
+  for (int i = 0; i < hbox->count(); ++i) {
+    QWidget *child = hbox->itemAt(i)->widget();
+    if (!child) continue;
+
+    if (qobject_cast<QSlider *>(child)) {
+      hbox->setStretch(i, 1);
+      child->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+      continue;
+    }
+
+    if (child == valueWrapper) {
+      hbox->setStretch(i, 0);
+      continue;
+    }
+
+    if (!child->isVisible()) {
+      hbox->setStretch(i, 0);
+      continue;
+    }
+
+    // DoubleValueField trailing spacer — hide so the slider fills the row.
+    if (!child->findChild<QLineEdit *>()) {
+      child->hide();
+      hbox->setStretch(i, 0);
+    }
+  }
+}
+
+}  // namespace
+
 SettingsPage::SettingsPage(QWidget *parent)
-    : QScrollArea(parent), m_updating(false) {
+    : QScrollArea(parent), m_updating(false), m_compactMode(false) {
   bool ret = true;
 
   setObjectName("styleEditorPage");  // It is necessary for the styleSheet
@@ -2528,6 +2638,111 @@ SettingsPage::SettingsPage(QWidget *parent)
   paramsContainerLayout->addLayout(m_paramsLayout);
 
   paramsContainerLayout->addStretch(1);
+}
+
+//-----------------------------------------------------------------------------
+
+void SettingsPage::applyCompactMetrics() {
+  QWidget *container = m_paramsLayout ? m_paramsLayout->parentWidget() : nullptr;
+  QVBoxLayout *containerLayout =
+      container ? qobject_cast<QVBoxLayout *>(container->layout()) : nullptr;
+  if (!containerLayout || !m_paramsLayout) return;
+
+  if (m_compactMode) {
+    containerLayout->setContentsMargins(6, 6, 6, 6);
+    containerLayout->setSpacing(4);
+    m_paramsLayout->setContentsMargins(0, 8, 0, 0);
+    m_paramsLayout->setVerticalSpacing(4);
+    m_paramsLayout->setHorizontalSpacing(4);
+    m_paramsLayout->setColumnStretch(0, 1);
+    m_paramsLayout->setColumnStretch(1, 1);
+    m_paramsLayout->setColumnStretch(2, 0);
+  } else {
+    containerLayout->setContentsMargins(10, 10, 10, 10);
+    containerLayout->setSpacing(10);
+    m_paramsLayout->setContentsMargins(0, 0, 0, 0);
+    m_paramsLayout->setVerticalSpacing(8);
+    m_paramsLayout->setHorizontalSpacing(5);
+    m_paramsLayout->setColumnStretch(0, 0);
+    m_paramsLayout->setColumnStretch(1, 0);
+    m_paramsLayout->setColumnStretch(2, 0);
+  }
+
+  setProperty("compactSettings", m_compactMode);
+}
+
+//-----------------------------------------------------------------------------
+
+void SettingsPage::applyCompactEditorLayout() {
+  if (!m_compactMode || !m_editedStyle) return;
+
+  const int pCount = m_editedStyle->getParamCount();
+  int unifiedWidth = 0;
+
+  // Unified numeric column width (aligned across all rows).
+  for (int p = 0; p < pCount; ++p) {
+    const TColorStyle::ParamType type = m_editedStyle->getParamType(p);
+    if (type != TColorStyle::INT && type != TColorStyle::DOUBLE) continue;
+
+    QLayoutItem *item = m_paramsLayout->itemAtPosition(paramEditorRow(p), 0);
+    if (!item || !item->widget()) continue;
+
+    for (QLineEdit *lineEdit :
+         item->widget()->findChildren<QLineEdit *>()) {
+      unifiedWidth = std::max(
+          unifiedWidth, compactNumericFieldWidth(lineEdit, m_editedStyle, p));
+    }
+  }
+
+  if (unifiedWidth > 0) {
+    for (int p = 0; p < pCount; ++p) {
+      const TColorStyle::ParamType type = m_editedStyle->getParamType(p);
+      if (type != TColorStyle::INT && type != TColorStyle::DOUBLE) continue;
+
+      QLayoutItem *item = m_paramsLayout->itemAtPosition(paramEditorRow(p), 0);
+      if (!item || !item->widget()) continue;
+      setUniformCompactFieldWidth(item->widget(), unifiedWidth);
+    }
+  }
+
+  // Expand every editor row so sliders/combos fill the panel width.
+  for (int p = 0; p < pCount; ++p) {
+    QLayoutItem *item = m_paramsLayout->itemAtPosition(paramEditorRow(p), 0);
+    if (!item || !item->widget()) continue;
+    configureCompactEditorRow(item->widget());
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void SettingsPage::setCompactMode(bool compact) {
+  if (m_compactMode == compact) return;
+  m_compactMode = compact;
+  applyCompactMetrics();
+  if (m_editedStyle) rebuildParamLayout();
+}
+
+//-----------------------------------------------------------------------------
+
+void SettingsPage::rebuildParamLayout() {
+  struct locals {
+    inline static void clearLayout(QLayout *layout) {
+      QLayoutItem *item;
+      while ((item = layout->takeAt(0)) != 0) {
+        delete item->layout();
+        delete item->spacerItem();
+        delete item->widget();
+        delete item;
+      }
+    }
+  };  // locals
+
+  if (!m_editedStyle) return;
+
+  TColorStyleP style = m_editedStyle;
+  locals::clearLayout(m_paramsLayout);
+  m_editedStyle = TColorStyleP();
+  setStyle(style);
 }
 
 //-----------------------------------------------------------------------------
@@ -2575,103 +2790,194 @@ void SettingsPage::setStyle(const TColorStyleP &editedStyle) {
 
     int p, pCount = editedStyle->getParamCount();
     for (p = 0; p != pCount; ++p) {
-      // Assign label
-      QLabel *label = new QLabel(editedStyle->getParamNames(p));
-      m_paramsLayout->addWidget(label, p, 0);
+      if (m_compactMode) {
+        const int labelRow  = p * 2;
+        const int editorRow = p * 2 + 1;
 
-      // Assign parameter
-      switch (editedStyle->getParamType(p)) {
-      case TColorStyle::BOOL: {
-        QCheckBox *checkBox = new QCheckBox;
-        m_paramsLayout->addWidget(checkBox, p, 1);
+        QLabel *label = new QLabel(editedStyle->getParamNames(p));
+        m_paramsLayout->addWidget(label, labelRow, 0, 1, 3);
 
-        ret = QObject::connect(checkBox, SIGNAL(toggled(bool)), this,
-                               SLOT(onValueChanged())) &&
-              ret;
+        QWidget *editorWidget = 0;
+        switch (editedStyle->getParamType(p)) {
+        case TColorStyle::BOOL: {
+          QCheckBox *checkBox = new QCheckBox;
+          editorWidget        = checkBox;
 
-        break;
-      }
+          ret = QObject::connect(checkBox, SIGNAL(toggled(bool)), this,
+                                 SLOT(onValueChanged())) &&
+                ret;
+          break;
+        }
+        case TColorStyle::INT: {
+          DVGui::IntField *intField = new DVGui::IntField;
+          editorWidget              = intField;
 
-      case TColorStyle::INT: {
-        DVGui::IntField *intField = new DVGui::IntField;
-        m_paramsLayout->addWidget(intField, p, 1);
+          int min, max;
+          m_editedStyle->getParamRange(p, min, max);
+          intField->setRange(min, max);
 
-        int min, max;
-        m_editedStyle->getParamRange(p, min, max);
+          ret = QObject::connect(intField, SIGNAL(valueChanged(bool)), this,
+                                 SLOT(onValueChanged(bool))) &&
+                ret;
+          break;
+        }
+        case TColorStyle::ENUM: {
+          QComboBox *comboBox = new QComboBox;
+          editorWidget        = comboBox;
 
-        intField->setRange(min, max);
+          QStringList items;
+          m_editedStyle->getParamRange(p, items);
+          comboBox->addItems(items);
 
-        ret = QObject::connect(intField, SIGNAL(valueChanged(bool)), this,
-                               SLOT(onValueChanged(bool))) &&
-              ret;
+          ret = QObject::connect(comboBox, SIGNAL(currentIndexChanged(int)),
+                                 this, SLOT(onValueChanged())) &&
+                ret;
+          break;
+        }
+        case TColorStyle::DOUBLE: {
+          DVGui::DoubleField *doubleField = new DVGui::DoubleField;
+          editorWidget                    = doubleField;
 
-        break;
-      }
+          double min, max;
+          m_editedStyle->getParamRange(p, min, max);
+          doubleField->setRange(min, max);
 
-      case TColorStyle::ENUM: {
-        QComboBox *comboBox = new QComboBox;
-        m_paramsLayout->addWidget(comboBox, p, 1);
+          ret = QObject::connect(doubleField, SIGNAL(valueChanged(bool)), this,
+                                 SLOT(onValueChanged(bool))) &&
+                ret;
+          break;
+        }
+        case TColorStyle::FILEPATH: {
+          DVGui::FileField *fileField = new DVGui::FileField;
+          editorWidget                = fileField;
 
-        QStringList items;
-        m_editedStyle->getParamRange(p, items);
+          QStringList extensions;
+          m_editedStyle->getParamRange(p, extensions);
 
-        comboBox->addItems(items);
+          fileField->setFileMode(QFileDialog::AnyFile);
+          fileField->setFilters(extensions);
+          fileField->setPath(QString::fromStdWString(
+              editedStyle->getParamValue(TColorStyle::TFilePath_tag(), p)
+                  .getWideString()));
 
-        ret = QObject::connect(comboBox, SIGNAL(currentIndexChanged(int)), this,
-                               SLOT(onValueChanged())) &&
-              ret;
+          ret = QObject::connect(fileField, SIGNAL(pathChanged()), this,
+                                 SLOT(onValueChanged())) &&
+                ret;
+          break;
+        }
+        }
 
-        break;
-      }
+        m_paramsLayout->addWidget(editorWidget, editorRow, 0, 1, 2);
 
-      case TColorStyle::DOUBLE: {
-        DVGui::DoubleField *doubleField = new DVGui::DoubleField;
-        m_paramsLayout->addWidget(doubleField, p, 1);
+        if (m_editedStyle->hasParamDefault(p)) {
+          QPushButton *pushButton = new QPushButton;
+          pushButton->setToolTip(tr("Reset to default"));
+          pushButton->setIcon(createQIcon("delete"));
+          pushButton->setFixedSize(20, 20);
+          m_paramsLayout->addWidget(pushButton, editorRow, 2);
+          ret = QObject::connect(pushButton, SIGNAL(clicked(bool)), this,
+                                 SLOT(onValueReset())) &&
+                ret;
+        }
+      } else {
+        // Assign label
+        QLabel *label = new QLabel(editedStyle->getParamNames(p));
+        m_paramsLayout->addWidget(label, p, 0);
 
-        double min, max;
-        m_editedStyle->getParamRange(p, min, max);
+        // Assign parameter
+        switch (editedStyle->getParamType(p)) {
+        case TColorStyle::BOOL: {
+          QCheckBox *checkBox = new QCheckBox;
+          m_paramsLayout->addWidget(checkBox, p, 1);
 
-        doubleField->setRange(min, max);
+          ret = QObject::connect(checkBox, SIGNAL(toggled(bool)), this,
+                                 SLOT(onValueChanged())) &&
+                ret;
 
-        ret = QObject::connect(doubleField, SIGNAL(valueChanged(bool)), this,
-                               SLOT(onValueChanged(bool))) &&
-              ret;
+          break;
+        }
 
-        break;
-      }
+        case TColorStyle::INT: {
+          DVGui::IntField *intField = new DVGui::IntField;
+          m_paramsLayout->addWidget(intField, p, 1);
 
-      case TColorStyle::FILEPATH: {
-        DVGui::FileField *fileField = new DVGui::FileField;
-        m_paramsLayout->addWidget(fileField, p, 1);
+          int min, max;
+          m_editedStyle->getParamRange(p, min, max);
 
-        QStringList extensions;
-        m_editedStyle->getParamRange(p, extensions);
+          intField->setRange(min, max);
 
-        fileField->setFileMode(QFileDialog::AnyFile);
-        fileField->setFilters(extensions);
+          ret = QObject::connect(intField, SIGNAL(valueChanged(bool)), this,
+                                 SLOT(onValueChanged(bool))) &&
+                ret;
 
-        fileField->setPath(QString::fromStdWString(
-            editedStyle->getParamValue(TColorStyle::TFilePath_tag(), p)
-                .getWideString()));
+          break;
+        }
 
-        ret = QObject::connect(fileField, SIGNAL(pathChanged()), this,
-                               SLOT(onValueChanged())) &&
-              ret;
+        case TColorStyle::ENUM: {
+          QComboBox *comboBox = new QComboBox;
+          m_paramsLayout->addWidget(comboBox, p, 1);
 
-        break;
-      }
-      }
+          QStringList items;
+          m_editedStyle->getParamRange(p, items);
 
-      // "reset to default" button
-      if (m_editedStyle->hasParamDefault(p)) {
-        QPushButton *pushButton = new QPushButton;
-        pushButton->setToolTip(tr("Reset to default"));
-        pushButton->setIcon(createQIcon("delete"));
-        pushButton->setFixedSize(24, 24);
-        m_paramsLayout->addWidget(pushButton, p, 2);
-        ret = QObject::connect(pushButton, SIGNAL(clicked(bool)), this,
-                               SLOT(onValueReset())) &&
-              ret;
+          comboBox->addItems(items);
+
+          ret = QObject::connect(comboBox, SIGNAL(currentIndexChanged(int)),
+                                 this, SLOT(onValueChanged())) &&
+                ret;
+
+          break;
+        }
+
+        case TColorStyle::DOUBLE: {
+          DVGui::DoubleField *doubleField = new DVGui::DoubleField;
+          m_paramsLayout->addWidget(doubleField, p, 1);
+
+          double min, max;
+          m_editedStyle->getParamRange(p, min, max);
+
+          doubleField->setRange(min, max);
+
+          ret = QObject::connect(doubleField, SIGNAL(valueChanged(bool)), this,
+                                 SLOT(onValueChanged(bool))) &&
+                ret;
+
+          break;
+        }
+
+        case TColorStyle::FILEPATH: {
+          DVGui::FileField *fileField = new DVGui::FileField;
+          m_paramsLayout->addWidget(fileField, p, 1);
+
+          QStringList extensions;
+          m_editedStyle->getParamRange(p, extensions);
+
+          fileField->setFileMode(QFileDialog::AnyFile);
+          fileField->setFilters(extensions);
+
+          fileField->setPath(QString::fromStdWString(
+              editedStyle->getParamValue(TColorStyle::TFilePath_tag(), p)
+                  .getWideString()));
+
+          ret = QObject::connect(fileField, SIGNAL(pathChanged()), this,
+                                 SLOT(onValueChanged())) &&
+                ret;
+
+          break;
+        }
+        }
+
+        // "reset to default" button
+        if (m_editedStyle->hasParamDefault(p)) {
+          QPushButton *pushButton = new QPushButton;
+          pushButton->setToolTip(tr("Reset to default"));
+          pushButton->setIcon(createQIcon("delete"));
+          pushButton->setFixedSize(24, 24);
+          m_paramsLayout->addWidget(pushButton, p, 2);
+          ret = QObject::connect(pushButton, SIGNAL(clicked(bool)), this,
+                                 SLOT(onValueReset())) &&
+                ret;
+        }
       }
 
       assert(ret);
@@ -2679,6 +2985,8 @@ void SettingsPage::setStyle(const TColorStyleP &editedStyle) {
   }
 
   updateValues();
+
+  if (m_compactMode && buildLayout) applyCompactEditorLayout();
 }
 
 //-----------------------------------------------------------------------------
@@ -2698,10 +3006,13 @@ void SettingsPage::updateValues() {
 
   int p, pCount = m_editedStyle->getParamCount();
   for (p = 0; p != pCount; ++p) {
+    const int editorRow = paramEditorRow(p);
+    const int editorCol = m_compactMode ? 0 : 1;
+
     // Update state of "reset to default" button
     if (m_editedStyle->hasParamDefault(p)) {
       QPushButton *pushButton = static_cast<QPushButton *>(
-          m_paramsLayout->itemAtPosition(p, 2)->widget());
+          m_paramsLayout->itemAtPosition(editorRow, 2)->widget());
       pushButton->setEnabled(m_editedStyle->isParamDefault(p));
     }
 
@@ -2709,7 +3020,7 @@ void SettingsPage::updateValues() {
     switch (m_editedStyle->getParamType(p)) {
     case TColorStyle::BOOL: {
       QCheckBox *checkBox = static_cast<QCheckBox *>(
-          m_paramsLayout->itemAtPosition(p, 1)->widget());
+          m_paramsLayout->itemAtPosition(editorRow, editorCol)->widget());
 
       checkBox->setChecked(
           m_editedStyle->getParamValue(TColorStyle::bool_tag(), p));
@@ -2719,7 +3030,7 @@ void SettingsPage::updateValues() {
 
     case TColorStyle::INT: {
       DVGui::IntField *intField = static_cast<DVGui::IntField *>(
-          m_paramsLayout->itemAtPosition(p, 1)->widget());
+          m_paramsLayout->itemAtPosition(editorRow, editorCol)->widget());
 
       intField->setValue(
           m_editedStyle->getParamValue(TColorStyle::int_tag(), p));
@@ -2729,7 +3040,7 @@ void SettingsPage::updateValues() {
 
     case TColorStyle::ENUM: {
       QComboBox *comboBox = static_cast<QComboBox *>(
-          m_paramsLayout->itemAtPosition(p, 1)->widget());
+          m_paramsLayout->itemAtPosition(editorRow, editorCol)->widget());
 
       comboBox->setCurrentIndex(
           m_editedStyle->getParamValue(TColorStyle::int_tag(), p));
@@ -2739,7 +3050,7 @@ void SettingsPage::updateValues() {
 
     case TColorStyle::DOUBLE: {
       DVGui::DoubleField *doubleField = static_cast<DVGui::DoubleField *>(
-          m_paramsLayout->itemAtPosition(p, 1)->widget());
+          m_paramsLayout->itemAtPosition(editorRow, editorCol)->widget());
 
       doubleField->setValue(
           m_editedStyle->getParamValue(TColorStyle::double_tag(), p));
@@ -2749,7 +3060,7 @@ void SettingsPage::updateValues() {
 
     case TColorStyle::FILEPATH: {
       DVGui::FileField *fileField = static_cast<DVGui::FileField *>(
-          m_paramsLayout->itemAtPosition(p, 1)->widget());
+          m_paramsLayout->itemAtPosition(editorRow, editorCol)->widget());
 
       fileField->setPath(QString::fromStdWString(
           m_editedStyle->getParamValue(TColorStyle::TFilePath_tag(), p)
@@ -2773,6 +3084,19 @@ void SettingsPage::onAutofillChanged() {
 //-----------------------------------------------------------------------------
 
 int SettingsPage::getParamIndex(const QWidget *widget) {
+  if (m_compactMode) {
+    const int pCount = m_editedStyle ? m_editedStyle->getParamCount()
+                                     : (m_paramsLayout->rowCount() + 1) / 2;
+    for (int p = 0; p != pCount; ++p) {
+      const int row = paramEditorRow(p);
+      for (int c = 0; c < 3; ++c) {
+        if (QLayoutItem *item = m_paramsLayout->itemAtPosition(row, c))
+          if (item->widget() == widget) return p;
+      }
+    }
+    return -1;
+  }
+
   int p, pCount = m_paramsLayout->rowCount();
   for (p = 0; p != pCount; ++p)
     for (int c = 0; c < 3; ++c)
@@ -2874,6 +3198,7 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
     , m_paletteHandle(paletteController->getCurrentPalette())
     , m_cleanupPaletteHandle(paletteController->getCurrentCleanupPalette())
     , m_toolBar(0)
+    , m_compactSettingsAction(0)
     , m_enabled(false)
     , m_enabledOnlyFirstTab(false)
     , m_enabledFirstAndLastTab(false)
@@ -3049,6 +3374,7 @@ QFrame *StyleEditor::createBottomWidget() {
   m_rgbAction    = new QAction(tr("RGB"), this);
   m_hexAction    = new QAction(tr("Hex"), this);
   m_searchAction = new QAction(tr("Search"), this);
+  m_compactSettingsAction = new QAction(tr("Compact Settings"), this);
 
   m_wheelAction->setCheckable(true);
   m_hsvAction->setCheckable(true);
@@ -3056,18 +3382,24 @@ QFrame *StyleEditor::createBottomWidget() {
   m_rgbAction->setCheckable(true);
   m_hexAction->setCheckable(true);
   m_searchAction->setCheckable(true);
+  m_compactSettingsAction->setCheckable(true);
+  m_compactSettingsAction->setToolTip(
+      tr("Use a denser layout for the Settings page."));
   m_wheelAction->setChecked(true);
   m_hsvAction->setChecked(true);
   m_alphaAction->setChecked(true);
   m_rgbAction->setChecked(true);
   m_hexAction->setChecked(false);
   m_searchAction->setChecked(false);
+  m_compactSettingsAction->setChecked(m_settingsPage->isCompactMode());
   menu->addAction(m_wheelAction);
   menu->addAction(m_hsvAction);
   menu->addAction(m_alphaAction);
   menu->addAction(m_rgbAction);
   menu->addAction(m_hexAction);
   menu->addAction(m_searchAction);
+  menu->addSeparator();
+  menu->addAction(m_compactSettingsAction);
 
   m_sliderAppearanceAG = new QActionGroup(this);
   QAction *relColorAct =
@@ -3169,6 +3501,8 @@ QFrame *StyleEditor::createBottomWidget() {
                        SLOT(setVisible(bool)));
   ret = ret && connect(m_searchAction, SIGNAL(toggled(bool)), this,
                        SLOT(onSearchVisible(bool)));
+  ret = ret && connect(m_compactSettingsAction, SIGNAL(toggled(bool)),
+                       m_settingsPage, SLOT(setCompactMode(bool)));
   ret = ret && connect(m_hexLineEdit, SIGNAL(editingFinished()), this,
                        SLOT(onHexChanged()));
   ret = ret && connect(m_hexEditorAction, SIGNAL(triggered()), this,
@@ -4029,6 +4363,7 @@ void StyleEditor::save(QSettings &settings) const {
   if (m_hexAction->isChecked()) visibleParts |= 0x10;
   if (m_searchAction->isChecked()) visibleParts |= 0x20;
   settings.setValue("visibleParts", visibleParts);
+  settings.setValue("settingsPageCompact", m_settingsPage->isCompactMode());
   settings.setValue("splitterState", m_plainColorPage->getSplitterState());
 }
 void StyleEditor::load(QSettings &settings) {
@@ -4066,6 +4401,16 @@ void StyleEditor::load(QSettings &settings) {
     else
       m_searchAction->setChecked(false);
   }
+  QVariant settingsPageCompact = settings.value("settingsPageCompact");
+  if (settingsPageCompact.canConvert(QVariant::Bool)) {
+    bool compact = settingsPageCompact.toBool();
+    m_settingsPage->setCompactMode(compact);
+    if (m_compactSettingsAction) {
+      bool blocked = m_compactSettingsAction->blockSignals(true);
+      m_compactSettingsAction->setChecked(compact);
+      m_compactSettingsAction->blockSignals(blocked);
+    }
+  }
   QVariant splitterState = settings.value("splitterState");
   if (splitterState.canConvert(QVariant::ByteArray))
     m_plainColorPage->setSplitterState(splitterState.toByteArray());
@@ -4098,5 +4443,10 @@ void StyleEditor::onPopupMenuAboutToShow() {
     int appearanceId = action->data().toInt(&ok);
     if (ok && appearanceId == StyleEditorColorSliderAppearance)
       action->setChecked(true);
+  }
+  if (m_compactSettingsAction) {
+    bool blocked = m_compactSettingsAction->blockSignals(true);
+    m_compactSettingsAction->setChecked(m_settingsPage->isCompactMode());
+    m_compactSettingsAction->blockSignals(blocked);
   }
 }
