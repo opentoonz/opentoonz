@@ -51,6 +51,11 @@
 #include "plastictool.h"
 #include "ext/plasticskeleton.h"
 #include "tools/tooloptions.h"
+#include "shifttracetool.h"
+
+#include "menubarcommandids.h"
+#include "toonz/onionskinmask.h"
+#include "toonz/tonionskinmaskhandle.h"
 
 // Qt includes
 #include <QVBoxLayout>
@@ -387,6 +392,8 @@ void ToolPropertiesPanel::connectSignals() {
             SLOT(onSceneContextChanged()));
     connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
             SLOT(onSceneContextChanged()));
+    connect(app->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()), this,
+            SLOT(onSceneContextChanged()));
   }
 }
 
@@ -408,6 +415,8 @@ void ToolPropertiesPanel::disconnectSignals() {
                SLOT(onSceneContextChanged()));
     disconnect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
                SLOT(onSceneContextChanged()));
+    disconnect(app->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()), this,
+               SLOT(onSceneContextChanged()));
   }
 }
 
@@ -422,7 +431,9 @@ QString ToolPropertiesPanel::detectCurrentToolId() {
 
 QString ToolPropertiesPanel::detectCurrentToolType() {
   QString toolId = detectCurrentToolId();
-  
+
+  if (toolId == T_ShiftTrace) return QStringLiteral("shifttrace");
+
   // Identify tool types
   if (toolId == T_Brush) {
     // Check if it's a MyPaint brush (similar to BrushPresetPanel logic)
@@ -518,6 +529,7 @@ QString ToolPropertiesPanel::displayNameForToolId(const QString &toolId) const {
   if (toolId == T_Hand) return tr("Hand tool");
   if (toolId == T_Ruler) return tr("Ruler tool");
   if (toolId == T_HideLine) return tr("Hide Line tool");
+  if (toolId == T_ShiftTrace) return tr("Shift and Trace");
   return toolId;
 }
 
@@ -777,14 +789,10 @@ void ToolPropertiesPanel::refreshProperties() {
   } else if (toolType == "assistant") {
     createEditAssistantsProperties();
 
-  } else {
-    // All remaining tools (Tape, Cutter, StylePicker, RGBPicker, ControlPointEditor,
-    // Pinch, Pump, Magnet, Bender, Iron, Skeleton, Tracker, Hook, Plastic,
-    // Zoom, Rotate, Hand, Ruler, HideLine …) use the generic builder.
-    // It iterates TPropertyGroup 0 dynamically → no hardcoded property names needed.
+  } else if (toolType == "shifttrace") {
+    createShiftTraceProperties();
 
-    // Many tools return &m_prop for ALL targetType values (0, 1, 2…).
-    // Pre-compare pointers so we never create the same group's widgets twice.
+  } else {
     TTool *t = getCurrentTool();
     TPropertyGroup *g0 = t ? t->getProperties(0) : nullptr;
     TPropertyGroup *g1 = t ? t->getProperties(1) : nullptr;
@@ -792,8 +800,6 @@ void ToolPropertiesPanel::refreshProperties() {
 
     createGenericProperties(0);
 
-    // Group 1 holds outline/cap/join options for some vector tools.
-    // Only add it when it is a DISTINCT group (different pointer than group 0).
     if (!sameGroup && g1 && g1->getPropertyCount() > 0) {
       QFrame *sep = new QFrame(this);
       sep->setFrameShape(QFrame::HLine);
@@ -808,7 +814,8 @@ void ToolPropertiesPanel::refreshProperties() {
 
   attachAllPropertySyncListeners();
 
-  // Add stretch at the end
+  if (toolType == QStringLiteral("shifttrace")) updateShiftTraceWidgets();
+
   m_propertiesLayout->addStretch(1);
 }
 
@@ -852,6 +859,14 @@ void ToolPropertiesPanel::clearProperties() {
   m_selXLabel = m_selYLabel = nullptr;
   m_selScaleLinkIcon        = nullptr;
   m_typeStyleWidget         = nullptr;
+
+  m_shiftTraceGhostPicker       = nullptr;
+  m_shiftTraceBBoxPicker        = nullptr;
+  m_shiftTraceNoShiftChk        = nullptr;
+  m_shiftTraceNoShiftIconBtn    = nullptr;
+  m_shiftTraceResetShiftIconBtn = nullptr;
+  m_shiftTraceResetPrevBtn      = nullptr;
+  m_shiftTraceResetFollowingBtn = nullptr;
 
   if (TTool *tool = getCurrentTool()) {
     if (auto *plastic = dynamic_cast<PlasticTool *>(tool))
@@ -3862,6 +3877,275 @@ void ToolPropertiesPanel::createEditAssistantsProperties() {
   createGenericProperties(0);
 }
 
+namespace {
+
+void resetShiftTraceGhost(int index) {
+  TApplication *app = TApp::instance();
+  if (!app) return;
+  OnionSkinMask osm = app->getCurrentOnionSkin()->getOnionSkinMask();
+  osm.setShiftTraceGhostCenter(index, TPointD());
+  osm.setShiftTraceGhostAff(index, TAffine());
+  app->getCurrentOnionSkin()->setOnionSkinMask(osm);
+  app->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
+  if (TTool *tool = app->getCurrentTool()->getTool()) tool->reset();
+}
+
+bool shiftTraceGhostHasShift(int index) {
+  TApplication *app = TApp::instance();
+  if (!app) return false;
+  const OnionSkinMask osm =
+      app->getCurrentOnionSkin()->getOnionSkinMask();
+  return !(osm.getShiftTraceGhostAff(index).isIdentity() &&
+           osm.getShiftTraceGhostCenter(index) == TPointD());
+}
+
+ShiftTraceTool *activeShiftTraceTool() {
+  if (TTool *tool = TApp::instance()->getCurrentTool()->getTool())
+    return dynamic_cast<ShiftTraceTool *>(tool);
+  return dynamic_cast<ShiftTraceTool *>(
+      TTool::getTool(T_ShiftTrace, TTool::ToonzImage));
+}
+
+void setShiftTraceGhostIndex(int index) {
+  if (ShiftTraceTool *st = activeShiftTraceTool()) {
+    st->setCurrentGhostIndex(index);
+    return;
+  }
+  CommandManager *cm = CommandManager::instance();
+  if (!cm) return;
+  if (index == 0)
+    cm->execute(MI_ShiftTraceSelectPrevGhost);
+  else
+    cm->execute(MI_ShiftTraceSelectNextGhost);
+}
+
+QCheckBox *addShiftTraceToggleRow(QVBoxLayout *layout, QWidget *parent,
+                                  QAction *action,
+                                  QCheckBox **storedPtr) {
+  if (!layout || !parent || !action) return nullptr;
+  QCheckBox *checkBox = new QCheckBox(action->text(), parent);
+  checkBox->setChecked(action->isChecked());
+  checkBox->setEnabled(action->isEnabled());
+  layout->addWidget(checkBox);
+  QObject::connect(checkBox, &QCheckBox::clicked, action, &QAction::trigger);
+  QObject::connect(action, &QAction::toggled, checkBox, &QCheckBox::setChecked);
+  QObject::connect(action, &QAction::changed, checkBox, [checkBox, action]() {
+    checkBox->setEnabled(action->isEnabled());
+  });
+  if (storedPtr) *storedPtr = checkBox;
+  return checkBox;
+}
+
+}  // namespace
+
+void ToolPropertiesPanel::createShiftTraceProperties() {
+  CommandManager *cm = CommandManager::instance();
+  if (!cm) return;
+
+  QAction *noShiftAct    = cm->getAction(MI_NoShift);
+  QAction *resetShiftAct = cm->getAction(MI_ResetShift);
+  if (!noShiftAct || !resetShiftAct) return;
+
+  ShiftTraceTool *stTool = activeShiftTraceTool();
+  const int ghostIndex   = stTool ? stTool->getCurrentGhostIndex() : 0;
+
+  const QStringList ghostItems{tr("Previous Drawing"), tr("Following Drawing")};
+  m_shiftTraceGhostPicker =
+      createCollapsibleEnum(tr("Drawing"), ghostItems, ghostIndex,
+                            "shift_trace_ghost", QString(),
+                            [](int index) { setShiftTraceGhostIndex(index); });
+  if (m_shiftTraceGhostPicker) {
+    m_shiftTraceGhostPicker->setObjectName("shiftTraceGhostPicker");
+    m_propertiesLayout->addWidget(m_shiftTraceGhostPicker);
+  }
+
+  QWidget *resetRow = new QWidget(m_propertiesContainer);
+  QHBoxLayout *resetLayout = new QHBoxLayout(resetRow);
+  resetLayout->setContentsMargins(0, 0, 0, 0);
+  resetLayout->setSpacing(CollapsibleStyle::kHeaderSpacing);
+
+  m_shiftTraceResetPrevBtn = new QPushButton(tr("Reset Previous"), resetRow);
+  m_shiftTraceResetFollowingBtn =
+      new QPushButton(tr("Reset Following"), resetRow);
+  m_shiftTraceResetPrevBtn->setSizePolicy(QSizePolicy::Expanding,
+                                          QSizePolicy::Fixed);
+  m_shiftTraceResetFollowingBtn->setSizePolicy(QSizePolicy::Expanding,
+                                               QSizePolicy::Fixed);
+  resetLayout->addWidget(m_shiftTraceResetPrevBtn);
+  resetLayout->addWidget(m_shiftTraceResetFollowingBtn);
+  m_propertiesLayout->addWidget(resetRow);
+
+  QObject::connect(m_shiftTraceResetPrevBtn, &QPushButton::clicked, []() {
+    resetShiftTraceGhost(0);
+  });
+  QObject::connect(m_shiftTraceResetFollowingBtn, &QPushButton::clicked, []() {
+    resetShiftTraceGhost(1);
+  });
+
+  TApplication *app = TApp::instance();
+  const int levelType = detectCurrentLevelType(app);
+  if (levelType == TZP_XSHLEVEL || levelType == OVL_XSHLEVEL ||
+      levelType == TZI_XSHLEVEL) {
+    const QStringList bboxItems{tr("Full raster bounding box"), tr("Savebox"),
+                                tr("Content (alpha)")};
+    const int bboxIdx = static_cast<int>(ShiftTraceTool::getGhostBBoxMode());
+    m_shiftTraceBBoxPicker = createCollapsibleEnum(
+        tr("Ghost Reference"), bboxItems, bboxIdx, "shift_trace_bbox", QString(),
+        [](int index) {
+          ShiftTraceTool::setGhostBBoxMode(
+              static_cast<ShiftTraceTool::GhostBBoxMode>(index));
+        });
+    if (m_shiftTraceBBoxPicker) {
+      m_shiftTraceBBoxPicker->setObjectName("shiftTraceBBoxPicker");
+      m_propertiesLayout->addWidget(m_shiftTraceBBoxPicker);
+    }
+  }
+
+  m_propertiesLayout->addSpacing(CollapsibleStyle::kBlockGap);
+
+  if (m_showIcons) {
+    QWidget *iconRow = new QWidget(m_propertiesContainer);
+    QHBoxLayout *iconLayout = new QHBoxLayout(iconRow);
+    iconLayout->setContentsMargins(0, 0, 0, 0);
+    iconLayout->setSpacing(CollapsibleStyle::kHeaderSpacing);
+
+    m_shiftTraceNoShiftIconBtn = new ToolPropertyButton(QString(), iconRow);
+    m_shiftTraceNoShiftIconBtn->setCheckable(true);
+    m_shiftTraceNoShiftIconBtn->setCursor(Qt::PointingHandCursor);
+    m_shiftTraceNoShiftIconBtn->setToolTip(noShiftAct->text());
+    m_shiftTraceNoShiftIconBtn->setIcon(createQIcon("shift_and_trace_no_shift"));
+    m_shiftTraceNoShiftIconBtn->setIconSize(QSize(20, 20));
+    m_shiftTraceNoShiftIconBtn->setFixedSize(32, 32);
+    m_shiftTraceNoShiftIconBtn->setShowBorders(m_showBorders);
+    m_shiftTraceNoShiftIconBtn->setShowBackgrounds(m_showBackgrounds);
+    m_shiftTraceNoShiftIconBtn->setChecked(noShiftAct->isChecked());
+    m_shiftTraceNoShiftIconBtn->setEnabled(noShiftAct->isEnabled());
+    iconLayout->addWidget(m_shiftTraceNoShiftIconBtn);
+
+    m_shiftTraceResetShiftIconBtn =
+        new ToolPropertyButton(QString(), iconRow);
+    m_shiftTraceResetShiftIconBtn->setCursor(Qt::PointingHandCursor);
+    m_shiftTraceResetShiftIconBtn->setToolTip(resetShiftAct->text());
+    m_shiftTraceResetShiftIconBtn->setIcon(createQIcon("shift_and_trace_reset"));
+    m_shiftTraceResetShiftIconBtn->setIconSize(QSize(20, 20));
+    m_shiftTraceResetShiftIconBtn->setFixedSize(32, 32);
+    m_shiftTraceResetShiftIconBtn->setShowBorders(m_showBorders);
+    m_shiftTraceResetShiftIconBtn->setShowBackgrounds(m_showBackgrounds);
+    m_shiftTraceResetShiftIconBtn->setEnabled(resetShiftAct->isEnabled());
+    iconLayout->addWidget(m_shiftTraceResetShiftIconBtn);
+    iconLayout->addStretch(1);
+    m_propertiesLayout->addWidget(iconRow);
+
+    QObject::connect(m_shiftTraceNoShiftIconBtn, &QToolButton::clicked,
+                     noShiftAct, &QAction::trigger);
+    QObject::connect(noShiftAct, &QAction::toggled, m_shiftTraceNoShiftIconBtn,
+                     &QToolButton::setChecked);
+    QObject::connect(m_shiftTraceResetShiftIconBtn, &QToolButton::clicked,
+                     resetShiftAct, &QAction::trigger);
+  } else {
+    m_shiftTraceNoShiftChk =
+        addShiftTraceToggleRow(m_propertiesLayout, m_propertiesContainer,
+                               noShiftAct, &m_shiftTraceNoShiftChk);
+
+    QPushButton *resetShiftBtn = new QPushButton(resetShiftAct->text(),
+                                                 m_propertiesContainer);
+    resetShiftBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    resetShiftBtn->setEnabled(resetShiftAct->isEnabled());
+    QObject::connect(resetShiftBtn, &QPushButton::clicked, resetShiftAct,
+                     &QAction::trigger);
+    QObject::connect(resetShiftAct, &QAction::changed, resetShiftBtn,
+                     [resetShiftBtn, resetShiftAct]() {
+                       resetShiftBtn->setEnabled(resetShiftAct->isEnabled());
+                     });
+    m_propertiesLayout->addWidget(resetShiftBtn);
+  }
+
+  connect(noShiftAct, &QAction::toggled, this,
+          &ToolPropertiesPanel::onShiftTraceCommandChanged);
+  connect(noShiftAct, &QAction::changed, this,
+          &ToolPropertiesPanel::onShiftTraceCommandChanged);
+  connect(resetShiftAct, &QAction::toggled, this,
+          &ToolPropertiesPanel::onShiftTraceCommandChanged);
+  connect(resetShiftAct, &QAction::changed, this,
+          &ToolPropertiesPanel::onShiftTraceCommandChanged);
+
+  updateShiftTraceWidgets();
+}
+
+void ToolPropertiesPanel::updateShiftTraceWidgets() {
+  if (m_currentToolType != QStringLiteral("shifttrace")) return;
+
+  CommandManager *cm = CommandManager::instance();
+  if (!cm) return;
+
+  auto syncCheckableAction = [](QAction *act, QCheckBox *chk,
+                                ToolPropertyButton *iconBtn) {
+    if (!act) return;
+    if (chk) {
+      if (chk->isChecked() != act->isChecked()) {
+        chk->blockSignals(true);
+        chk->setChecked(act->isChecked());
+        chk->blockSignals(false);
+      }
+      chk->setEnabled(act->isEnabled());
+    }
+    if (iconBtn) {
+      if (iconBtn->isChecked() != act->isChecked()) {
+        iconBtn->blockSignals(true);
+        iconBtn->setChecked(act->isChecked());
+        iconBtn->blockSignals(false);
+      }
+      iconBtn->setEnabled(act->isEnabled());
+    }
+  };
+
+  syncCheckableAction(cm->getAction(MI_NoShift), m_shiftTraceNoShiftChk,
+                      m_shiftTraceNoShiftIconBtn);
+
+  auto syncCollapsibleEnum = [](QWidget *container, int index,
+                                const QStringList &items) {
+    if (!container || index < 0 || index >= items.size()) return;
+    if (QLabel *valueLabel = container->findChild<QLabel *>("valueLabel"))
+      valueLabel->setText(items.value(index));
+    if (auto *group = container->findChild<QButtonGroup *>()) {
+      if (QAbstractButton *btn = group->button(index)) {
+        group->blockSignals(true);
+        btn->setChecked(true);
+        group->blockSignals(false);
+      }
+    }
+  };
+
+  ShiftTraceTool *stTool = activeShiftTraceTool();
+  const int ghostIndex   = stTool ? stTool->getCurrentGhostIndex() : 0;
+
+  if (m_shiftTraceGhostPicker) {
+    syncCollapsibleEnum(m_shiftTraceGhostPicker, ghostIndex,
+                        {tr("Previous Drawing"), tr("Following Drawing")});
+  }
+
+  if (m_shiftTraceBBoxPicker) {
+    syncCollapsibleEnum(
+        m_shiftTraceBBoxPicker,
+        static_cast<int>(ShiftTraceTool::getGhostBBoxMode()),
+        {tr("Full raster bounding box"), tr("Savebox"), tr("Content (alpha)")});
+  }
+
+  if (m_shiftTraceResetPrevBtn)
+    m_shiftTraceResetPrevBtn->setEnabled(shiftTraceGhostHasShift(0));
+  if (m_shiftTraceResetFollowingBtn)
+    m_shiftTraceResetFollowingBtn->setEnabled(shiftTraceGhostHasShift(1));
+
+  if (QAction *act = cm->getAction(MI_ResetShift)) {
+    if (m_shiftTraceResetShiftIconBtn)
+      m_shiftTraceResetShiftIconBtn->setEnabled(act->isEnabled());
+  }
+}
+
+void ToolPropertiesPanel::onShiftTraceCommandChanged() {
+  updateShiftTraceWidgets();
+}
+
 //-----------------------------------------------------------------------------
 
 void ToolPropertiesPanel::updatePlasticSkeletonPicker() {
@@ -5545,6 +5829,8 @@ void ToolPropertiesPanel::updatePropertyValues() {
     updatePlasticVertexField();
     updatePlasticRelayFields();
   }
+
+  if (m_currentToolType == "shifttrace") updateShiftTraceWidgets();
 
   if (m_currentToolType == "type") {
     updateToolOptionControlsIn(m_propertiesContainer);
