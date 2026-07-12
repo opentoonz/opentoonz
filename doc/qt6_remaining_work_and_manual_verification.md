@@ -891,11 +891,11 @@ Still needed:
 - Manual preview-save popup, overwrite, warning, and cancellation behavior.
 - Production FX-heavy preview scenes.
 - Real shader-FX rendering with bundled and user-provided GLSL programs. A
-  July 12, 2026 Qt 6 probe reached `ShaderFx::doCompute`, but shader program
-  creation failed in the render worker and the crash handler attempted to show
-  an AppKit dialog from that worker thread. Before adding this to the aggregate
-  smoke suite, shader compile/link failure must be reported without worker
-  thread UI and the bundled `SHADER_HSLBlendGPU` path must render successfully.
+  July 12, 2026 Qt 6 probe reached `ShaderFx::doCompute` without crashing after
+  transform-feedback buffer/query calls moved onto Qt OpenGL functions, but the
+  bundled `SHADER_HSLBlendGPU` path produced a valid all-black 320x240 output.
+  Before adding this to the aggregate smoke suite, shader output must produce
+  the expected pixels and shader compile/link failures must remain worker-safe.
 - Broader final-render parity against Qt 5 using real scenes.
 - Broader vector rendering parity.
 - Full-color Rasterizer/Renderer validation under a real OpenGL-capable

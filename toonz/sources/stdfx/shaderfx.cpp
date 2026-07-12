@@ -25,6 +25,7 @@
 #include <QOpenGLShaderProgram>
 #include <QCoreApplication>
 #include <QOffscreenSurface>
+#include <QDebug>
 
 // Glew include
 #include <GL/glew.h>
@@ -627,6 +628,7 @@ bool ShaderFx::doGetBBox(double frame, TRectD &bbox,
     const GLchar *varyingNames[] = {"outputBBox"};
     prog = touchShaderProgram(sd, context, 1, &varyingNames[0]);
   }
+  if (!prog) return true;
 
   int pCount = getInputPortCount();
 
@@ -719,12 +721,15 @@ QOpenGLShaderProgram *ShaderFx::touchShaderProgram(
   CompiledShader cs = context.shaderData(sd.m_name);
   if (!cs.first || ::isObsolete(sd.m_path, cs.second)) {
     cs = m_shaderInterface->makeProgram(sd, varyingsCount, varyings);
-    context.addShaderProgram(sd.m_name, cs.first, cs.second);
-
-    locals::logCompilation(cs.first);
+    if (cs.first) {
+      context.addShaderProgram(sd.m_name, cs.first, cs.second);
+      locals::logCompilation(cs.first);
+    } else {
+      qWarning().noquote() << "OpenToonz could not create shader program:"
+                           << sd.m_name;
+    }
   }
 
-  assert(cs.first);
   return cs.first;
 }
 
@@ -890,6 +895,8 @@ void ShaderFx::getInputData(const TRectD &rect, double frame,
                               &varyingNames[0]);
   }
 
+  if (!prog) return;
+
   {
     ProgramBinder progBinder(prog);
 
@@ -1052,6 +1059,7 @@ void ShaderFx::doCompute(TTile &tile, double frame,
 
     QOpenGLShaderProgram *program =
         touchShaderProgram(m_shaderInterface->mainShader(), context);
+    if (!program) return;
     {
       ProgramBinder binder(program);
 

@@ -14,6 +14,14 @@
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLContext>
+#include <QOpenGLExtraFunctions>
+
+#ifdef glGetQueryObjectiv
+#undef glGetQueryObjectiv
+#endif
+#ifdef glGetBufferSubData
+#undef glGetBufferSubData
+#endif
 #include <QOffscreenSurface>
 #include <QOpenGLWidget>
 
@@ -269,7 +277,8 @@ std::pair<QOpenGLShaderProgram *, QDateTime> ShadingContext::shaderData(
 //--------------------------------------------------------
 
 GLuint ShadingContext::loadTexture(const TRasterP &src, GLuint texUnit) {
-  glActiveTexture(GL_TEXTURE0 + texUnit);
+  QOpenGLContext::currentContext()->extraFunctions()->glActiveTexture(
+      GL_TEXTURE0 + texUnit);
 
   GLuint texId;
   glGenTextures(1, &texId);
@@ -355,51 +364,56 @@ void ShadingContext::draw(const TRasterP &dst) {
 void ShadingContext::transformFeedback(int varyingsCount,
                                        const GLsizeiptr *varyingSizes,
                                        GLvoid **bufs) {
+  QOpenGLExtraFunctions *functions =
+      QOpenGLContext::currentContext()->extraFunctions();
+
   // Generate buffer objects
   std::vector<GLuint> bufferObjectNames(varyingsCount, 0);
 
-  glGenBuffers(varyingsCount, &bufferObjectNames[0]);
+  functions->glGenBuffers(varyingsCount, &bufferObjectNames[0]);
 
   for (int v = 0; v != varyingsCount; ++v) {
-    glBindBuffer(GL_ARRAY_BUFFER, bufferObjectNames[v]);
-    glBufferData(GL_ARRAY_BUFFER, varyingSizes[v], bufs[v], GL_STATIC_READ);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    functions->glBindBuffer(GL_ARRAY_BUFFER, bufferObjectNames[v]);
+    functions->glBufferData(GL_ARRAY_BUFFER, varyingSizes[v], bufs[v],
+                            GL_STATIC_READ);
+    functions->glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, v, bufferObjectNames[v]);
+    functions->glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, v,
+                                bufferObjectNames[v]);
   }
 
   // Draw
   GLuint Query = 0;
 
-  glGenQueries(1, &Query);
+  functions->glGenQueries(1, &Query);
   {
     // Disable rasterization, vertices processing only!
-    glEnable(GL_RASTERIZER_DISCARD);
-    glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, Query);
+    functions->glEnable(GL_RASTERIZER_DISCARD);
+    functions->glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, Query);
 
-    glBeginTransformFeedback(GL_POINTS);
+    functions->glBeginTransformFeedback(GL_POINTS);
     glBegin(GL_POINTS);
     glVertex2f(0.0f, 0.0f);
     glEnd();
-    glEndTransformFeedback();
+    functions->glEndTransformFeedback();
 
-    glEndQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN);
-    glDisable(GL_RASTERIZER_DISCARD);
+    functions->glEndQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN);
+    functions->glDisable(GL_RASTERIZER_DISCARD);
   }
 
   GLint count = 0;
-  glGetQueryObjectiv(Query, GL_QUERY_RESULT, &count);
+  __glewGetQueryObjectiv(Query, GL_QUERY_RESULT, &count);
 
-  glDeleteQueries(1, &Query);
+  functions->glDeleteQueries(1, &Query);
 
   // Retrieve transformed data
   for (int v = 0; v != varyingsCount; ++v) {
-    glBindBuffer(GL_ARRAY_BUFFER, bufferObjectNames[v]);
-    glGetBufferSubData(GL_ARRAY_BUFFER, 0, varyingSizes[v], bufs[v]);
+    functions->glBindBuffer(GL_ARRAY_BUFFER, bufferObjectNames[v]);
+    __glewGetBufferSubData(GL_ARRAY_BUFFER, 0, varyingSizes[v], bufs[v]);
   }
 
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  functions->glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   // Delete buffer objects
-  glDeleteBuffers(varyingsCount, &bufferObjectNames[0]);
+  functions->glDeleteBuffers(varyingsCount, &bufferObjectNames[0]);
 }

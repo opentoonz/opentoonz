@@ -233,6 +233,10 @@ branch.
   each `QOpenGLContext`. This preserves the requested macOS OpenGL 3.2
   compatibility profile for legacy immediate-mode shader drawing, including
   context recreation, while keeping the Qt 5 and Qt 6 implementations aligned.
+- Shader transform-feedback setup now uses Qt's `QOpenGLExtraFunctions` for
+  the buffer/query operations that are available there, and shader compile/link
+  failures no longer assert or route diagnostics through worker-thread UI. The
+  bundled shader runtime still needs pixel-correct output validation.
 - `mise run check-qt6-shader-assets` verifies that every bundled shader XML
   declaration references an existing GLSL program file. This is a packaging
   integrity guard, not a substitute for real GPU shader-FX rendering.
