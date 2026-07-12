@@ -890,7 +890,12 @@ Still needed:
 - Live sub-camera dragging and visual framing.
 - Manual preview-save popup, overwrite, warning, and cancellation behavior.
 - Production FX-heavy preview scenes.
-- Real shader-FX rendering with bundled and user-provided GLSL programs.
+- Real shader-FX rendering with bundled and user-provided GLSL programs. A
+  July 12, 2026 Qt 6 probe reached `ShaderFx::doCompute`, but shader program
+  creation failed in the render worker and the crash handler attempted to show
+  an AppKit dialog from that worker thread. Before adding this to the aggregate
+  smoke suite, shader compile/link failure must be reported without worker
+  thread UI and the bundled `SHADER_HSLBlendGPU` path must render successfully.
 - Broader final-render parity against Qt 5 using real scenes.
 - Broader vector rendering parity.
 - Full-color Rasterizer/Renderer validation under a real OpenGL-capable
