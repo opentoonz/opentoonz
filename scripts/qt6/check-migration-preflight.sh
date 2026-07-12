@@ -41,6 +41,7 @@ checks=(
   scripts/qt6/check-qimage-mirrored-scope.sh
   scripts/qt6/check-qglformat-scope.sh
   scripts/qt6/check-qgllegacy-scope.sh
+  scripts/qt6/check-shader-assets.sh
   scripts/qt6/check-appkit-event-scope.sh
   scripts/qt6/check-modern-qt-macros.sh
 )

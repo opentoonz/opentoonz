@@ -877,6 +877,10 @@ Already covered by focused smokes:
   legacy immediate-mode shader drawing path, including context recreation. The
   Qt 5 and Qt 6 build lanes, the Qt 6 high-DPI raster viewer stale-frame smoke,
   and the Qt 6 final-render FX smoke passed after the change.
+- The bundled shader library has a mechanical integrity guard:
+  `mise run check-qt6-shader-assets` checks all shader XML program references
+  against files under `stuff/library/shaders`. This does not prove shader
+  compilation or runtime rendering.
 
 Still needed:
 

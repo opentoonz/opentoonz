@@ -233,6 +233,9 @@ branch.
   each `QOpenGLContext`. This preserves the requested macOS OpenGL 3.2
   compatibility profile for legacy immediate-mode shader drawing, including
   context recreation, while keeping the Qt 5 and Qt 6 implementations aligned.
+- `mise run check-qt6-shader-assets` verifies that every bundled shader XML
+  declaration references an existing GLSL program file. This is a packaging
+  integrity guard, not a substitute for real GPU shader-FX rendering.
 - `QWheelEvent` pixel-delta access is now centralized behind
   `QtCompat::wheelEventPixelDelta()` alongside the existing wheel position and
   angle-delta helpers. `mise run check-qt6-wheelevent-scope` keeps direct

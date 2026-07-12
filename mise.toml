@@ -170,6 +170,10 @@ run = "bash scripts/qt6/check-qglformat-scope.sh"
 description = "Fail if legacy QGLContext or QGLPixelBuffer APIs escape the Qt 5-only OpenGL compatibility scope."
 run = "bash scripts/qt6/check-qgllegacy-scope.sh"
 
+[tasks.check-qt6-shader-assets]
+description = "Fail if bundled shader XML declarations reference missing GLSL programs."
+run = "bash scripts/qt6/check-shader-assets.sh"
+
 [tasks.check-qt6-appkit-event-scope]
 description = "Fail if deprecated AppKit NS*Mouse* event constants reappear."
 run = "bash scripts/qt6/check-appkit-event-scope.sh"
