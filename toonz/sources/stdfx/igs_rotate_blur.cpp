@@ -227,7 +227,7 @@ public:
   }
 
 private:
-  // disable 
+  // disable
   Rotator() = delete;
   Rotator(const Rotator&) = delete;
   Rotator& operator=(const Rotator&) = delete;
