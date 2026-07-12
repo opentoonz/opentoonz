@@ -6,24 +6,34 @@
 #include "dvitemview.h"
 #include "tfilepath.h"
 
+// Qt includes
+#include <QList>
+#include <QPointer>
+
 class InfoViewer;
-class ExportScenePopup;
 
 //=============================================================================
-// FileSelection
-//-----------------------------------------------------------------------------
-
+// FileSelection: Manages file selection commands in FileBrowser
+// Uses QPointer for InfoViewer to auto-nullify when deleted.
+// Copy/move is prohibited to prevent dangling pointers.
+//=============================================================================
 class FileSelection final : public DvItemSelection {
-  QList<InfoViewer *> m_infoViewers;
-  ExportScenePopup *m_exportScenePopup;
+  QList<QPointer<InfoViewer>> m_infoViewers;  // automatically nullified
 
 public:
   FileSelection();
-  ~FileSelection();
+  ~FileSelection() override;
 
-  void getSelectedFiles(std::vector<TFilePath> &files);
+  // Disable copy and move operations
+  FileSelection(const FileSelection&)            = delete;
+  FileSelection& operator=(const FileSelection&) = delete;
+  FileSelection(FileSelection&&)                 = delete;
+  FileSelection& operator=(FileSelection&&)      = delete;
 
-  // commands
+  // Retrieve currently selected files
+  void getSelectedFiles(std::vector<TFilePath>& files);
+
+  // Commands
   void enableCommands() override;
 
   void duplicateFiles();
@@ -34,7 +44,6 @@ public:
   void viewFileInfo();
   void viewFile();
   void convertFiles();
-
   void premultiplyFiles();
 
   void addToBatchRenderList();

@@ -138,11 +138,11 @@ TMessageViewer::TMessageViewer(QWidget *parent) : QFrame(parent) {
   setFrameStyle(QFrame::StyledPanel);
   setObjectName("OnePixelMarginFrame");
   QVBoxLayout *vLayout = new QVBoxLayout();
-  vLayout->setMargin(0);
+  vLayout->setContentsMargins(0, 0, 0, 0);
   QFrame *fr = new QFrame();
 
   QHBoxLayout *hLayout = new QHBoxLayout();
-  hLayout->setMargin(0);
+  hLayout->setContentsMargins(0, 0, 0, 0);
   fr->setLayout(hLayout);
   fr->setFixedHeight(24);
   fr->setStyleSheet("background-color: rgb(210,210,210); color: black;");

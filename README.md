@@ -3,9 +3,11 @@
 [日本語](./doc/README_ja.md) [简体中文](./doc/README_chs.md)
 
 [![](https://ci.appveyor.com/api/projects/status/oa5l5pc964h8fv49/branch/master?svg=true)](https://ci.appveyor.com/project/opentoonz/opentoonz)
-[![](https://travis-ci.org/opentoonz/opentoonz.svg?branch=master)](https://travis-ci.org/opentoonz/opentoonz)
-[![](https://github.com/opentoonz/opentoonz/workflows/Build/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions)
+[![Build Windows](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_windows.yml/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_windows.yml)
+[![Build macOS](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_macos.yml/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_macos.yml)
+[![Build Linux](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_linux.yml/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_linux.yml)
 [![Translation status](https://hosted.weblate.org/widgets/opentoonz/-/svg-badge.svg)](https://hosted.weblate.org/engage/opentoonz/)
+
 ## What is OpenToonz?
 
 OpenToonz is a 2D animation software published by 
@@ -22,12 +24,12 @@ Please refer to the OpenToonz site at <https://opentoonz.github.io/e/index.html>
 
 Please download and install OpenToonz from the latest installer at <https://opentoonz.github.io/e/index.html>.
 
-Older versions and unstable nightly build are also available at <https://github.com/opentoonz/opentoonz/releases>.
+Older versions and unstable nightly builds are also available at <https://github.com/opentoonz/opentoonz/releases>.
 
 ## How to Build Locally
 
 - [Windows](./doc/how_to_build_win.md)
-- [OS X](./doc/how_to_build_macosx.md)
+- [macOS](./doc/how_to_build_macosx.md)
 - [Linux](./doc/how_to_build_linux.md)
 - [BSD](./doc/how_to_build_bsd.md)
 
@@ -56,4 +58,4 @@ Can't develop but still want to help? Help us test individual Pull Requests befo
 
 ### Special Thanks
 
-This Open Source Program is developed from Toonz, a software originally created by Digital Video, S.p.A., Rome Italy
+This open-source program is developed from Toonz, a software originally created by Digital Video, S.p.A., Rome, Italy

@@ -15,18 +15,17 @@
 #include <QRunnable>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QRegularExpressionValidator>
 
 // forward decl.
 class QCamera;
 class QCameraImageCapture;
-
 class QComboBox;
 class QSlider;
 class QCheckBox;
 class QVideoFrame;
 class QTimer;
 class QIntValidator;
-class QRegExpValidator;
 class QLabel;
 class QGroupBox;
 class QRadioButton;
@@ -77,7 +76,7 @@ class MyVideoWidget : public QWidget {
   void drawSubCamera(QPainter&);
 
 public:
-  MyVideoWidget(QWidget* parent = 0);
+  MyVideoWidget(QWidget* parent = nullptr);
 
   void setImage(const QImage& image) {
     m_image = image;
@@ -106,7 +105,7 @@ protected:
   void mousePressEvent(QMouseEvent* event) override;
   void mouseReleaseEvent(QMouseEvent* event) override;
 
-protected slots:
+public slots:
   void onUpsideDownChecked(bool on) { m_upsideDown = on; }
 
 signals:
@@ -117,23 +116,22 @@ signals:
 
 //=============================================================================
 // FrameNumberLineEdit
-// a special Line Edit which accepts imputting alphabets if the preference
-// option
-// "Show ABC Appendix to the Frame Number in Xsheet Cell" is active.
+// Special Line Edit which accepts alphabets input if the preference option
+// "Show ABC Appendix to the Frame Number in Xsheet Cell" is active
 //-----------------------------------------------------------------------------
 
 class FrameNumberLineEdit : public DVGui::LineEdit,
                             public TProjectManager::Listener {
   Q_OBJECT
-  /* having two validators and switch them according to the preferences*/
-  QRegExpValidator *m_regexpValidator, *m_regexpValidator_alt;
+
+  QRegularExpressionValidator *m_regexpValidator, *m_regexpValidator_alt;
 
   void updateValidator();
   void updateSize();
   QString m_textOnFocusIn;
 
 public:
-  FrameNumberLineEdit(QWidget* parent = 0, TFrameId fId = TFrameId(1),
+  FrameNumberLineEdit(QWidget* parent = nullptr, TFrameId fId = TFrameId(1),
                       bool acceptLetter = true);
   ~FrameNumberLineEdit() {}
 
@@ -148,7 +146,7 @@ public:
 
 protected:
   /*! If focus is lost and current text value is out of range emit signal
-  \b editingFinished.*/
+   * \b editingFinished.*/
   void focusInEvent(QFocusEvent*) override;
   void focusOutEvent(QFocusEvent*) override;
   void showEvent(QShowEvent* event) override { updateValidator(); }
@@ -161,7 +159,7 @@ class LevelNameLineEdit : public QLineEdit {
   QString m_textOnFocusIn;
 
 public:
-  LevelNameLineEdit(QWidget* parent = 0);
+  LevelNameLineEdit(QWidget* parent = nullptr);
 
 protected:
   void focusInEvent(QFocusEvent* e);
@@ -202,7 +200,7 @@ class PencilTestSaveInFolderPopup : public DVGui::Dialog {
   void createSceneInFolder();
 
 public:
-  PencilTestSaveInFolderPopup(QWidget* parent = 0);
+  PencilTestSaveInFolderPopup(QWidget* parent = nullptr);
   QString getPath();
   QString getParentPath();
   void updateParentFolder();
@@ -233,19 +231,21 @@ class SubCameraButton : public QPushButton {
   double m_currentDpi;
 
 public:
-  SubCameraButton(const QString& text, QWidget* parent = 0);
+  SubCameraButton(const QString& text, QWidget* parent = nullptr);
   void setCurResolution(const QSize& size) { m_curResolution = size; }
   void setCurSubCamera(const QRect& rect) { m_curSubCamera = rect; }
   void setCurDpi(const double& dpi) { m_currentDpi = dpi; }
 
 protected:
   void contextMenuEvent(QContextMenuEvent* event) override;
+
 protected slots:
   void onSubCameraAct();
   void onSaveSubCamera();
   void onDeletePreset();
+
 signals:
-  void subCameraPresetSelected(const QRect&, const double dpi);
+  void subCameraPresetSelected(const QRect&, double dpi);
 };
 
 //=============================================================================
@@ -329,17 +329,12 @@ class PencilTestPopup : public DVGui::Dialog {
   QLineEdit* m_customDpiField;
 
   void captureCalibrationRefImage(cv::Mat& procImage);
-
   void processImage(cv::Mat& procImage);
   bool importImage(QImage image);
-
   void setToNextNewLevel();
   void updateLevelNameAndFrame(std::wstring levelName);
-
   void getWebcamImage();
-
   QMenu* createOptionsMenu();
-
   int translateIndex(int camIndex);
   void loadImageAdjustDefault();
 
@@ -359,7 +354,6 @@ protected:
   void showEvent(QShowEvent* event) override;
   void hideEvent(QHideEvent* event) override;
   void keyPressEvent(QKeyEvent* event) override;
-
   bool event(QEvent* e) override;
 
 protected slots:
@@ -379,23 +373,17 @@ protected slots:
   void onTimerCBToggled(bool);
   void onCaptureTimerTimeout();
   void onCountDown();
-
   void onCaptureButtonClicked(bool);
   void onCaptureFilterSettingsBtnPressed();
-
   void refreshFrameInfo();
-
   void onSaveInPathEdited();
   void onFileTypeChanged();
   void onSceneSwitched();
-
   void onSubCameraToggled(bool);
   void onSubCameraChanged(bool isDragging);
   void onSubCameraRectEdited();
-  void onSubCameraPresetSelected(const QRect&, const double);
-
+  void onSubCameraPresetSelected(const QRect&, double);
   void onTimeout();
-
   void onCalibCapBtnClicked();
   void onCalibNewBtnClicked();
   void resetCalibSettingsFromFile();
@@ -403,7 +391,6 @@ protected slots:
   void onCalibExportBtnClicked();
   void onCalibReadme();
   void onPreferenceChanged(const QString&);
-
   void saveImageAdjustDefault();
 
 public slots:
@@ -432,4 +419,4 @@ protected:
   void showEvent(QShowEvent*) override;
 };
 
-#endif
+#endif  // PENCILTESTPOPUP_H

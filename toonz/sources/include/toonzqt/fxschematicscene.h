@@ -199,6 +199,25 @@ signals:
   void doExplodeChild(const QList<TFxP> &);
   void editObject();
 
+public slots:
+  void requestDisconnectFromXSheet() { onDisconnectFromXSheet(); }
+  void requestConnectToXSheet() { onConnectToXSheet(); }
+  void requestPreview() { onPreview(); }
+  void requestCacheFx() { onCacheFx(); }
+  void requestUncacheFx() { onUncacheFx(); }
+  void requestDeleteFx() { onDeleteFx(); }
+  void requestDuplicateFx() { onDuplicateFx(); }
+  void requestUnlinkFx() { onUnlinkFx(); }
+  void requestMacroFx() { onMacroFx(); }
+  void requestExplodeMacroFx() { onExplodeMacroFx(); }
+  void requestOpenMacroFx() { onOpenMacroFx(); }
+  void requestSavePresetFx() { onSavePresetFx(); }
+  void requestActivateOutput() { onActivateOutput(); }
+  void requestInsertPaste() { onInsertPaste(); }
+  void requestAddPaste() { onAddPaste(); }
+  void requestReplacePaste() { onReplacePaste(); }
+  void requestEditGroup() { onEditGroup(); }
+
 protected slots:
   void onSelectionSwitched(TSelection *oldSel, TSelection *newSel) override;
   void onSelectionChanged();

@@ -39,7 +39,7 @@
     </message>
     <message>
         <source>Skipping frame.</source>
-        <translation>跳帧。</translation>
+        <translation type="vanished">跳帧。</translation>
     </message>
     <message>
         <source>Malformed frame name</source>

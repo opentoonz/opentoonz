@@ -30,6 +30,8 @@ private:
   Table *m_table;
   TPalette *m_palette;
 
+  bool m_partialLoad;
+
 public:
   TLevel();
   ~TLevel();
@@ -66,6 +68,9 @@ public:
 
   TPalette *getPalette();
   void setPalette(TPalette *);
+
+  void setPartialLoad(bool partial) { m_partialLoad = partial; }
+  bool isPartialLoad() { return m_partialLoad; }
 };
 
 //-------------------------------------------------------------------

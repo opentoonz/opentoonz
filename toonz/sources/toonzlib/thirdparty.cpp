@@ -11,6 +11,8 @@
 #include <QCoreApplication>
 #include <QEventLoop>
 #include <QTimer>
+#include <QRegularExpression>
+#include <QDir>
 
 namespace ThirdParty {
 
@@ -80,9 +82,57 @@ bool checkFFmpeg() {
 
 //-----------------------------------------------------------------------------
 
+QString autodetectFFmpegViaPath() {
+  QString command;
+  QStringList arguments;
+
+#ifdef _WIN32
+  command = "where";
+  arguments << "ffmpeg";
+#else
+  command = "which";
+  arguments << "ffmpeg";
+#endif
+
+  QProcess process;
+  process.start(command, arguments);
+
+  if (!process.waitForFinished(3000)) {
+    if (process.state() == QProcess::Running) {
+      process.terminate();
+      process.waitForFinished(500);
+    }
+    return "";
+  }
+
+  if (process.exitCode() != 0) {
+    return "";
+  }
+
+  QString output = QString::fromUtf8(process.readAllStandardOutput()).trimmed();
+
+  QStringList paths =
+      output.split(QRegularExpression("[\\n\\r]+"), Qt::SkipEmptyParts);
+
+  if (!paths.isEmpty()) {
+    QString fullPath = paths.first().trimmed();
+
+    QString pathDir = QFileInfo(fullPath).dir().path();
+
+    if (findFFmpeg(pathDir)) {
+      return pathDir;
+    }
+  }
+
+  return "";
+}
+
 QString autodetectFFmpeg() {
   QString dir = Preferences::instance()->getFfmpegPath();
   if (findFFmpeg(dir)) return dir;
+
+  QString pathDir = autodetectFFmpegViaPath();
+  if (!pathDir.isEmpty()) return pathDir;
 
   if (findFFmpeg(".")) return ".";
   if (findFFmpeg("./ffmpeg")) return "./ffmpeg";

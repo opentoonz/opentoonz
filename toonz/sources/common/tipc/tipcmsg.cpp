@@ -14,7 +14,6 @@
 
 // tipc includes
 #include "tipc.h"
-
 #include "tipcmsg.h"
 
 //---------------------------------------------------------------------
@@ -24,7 +23,7 @@
 namespace {
 QHash<QString, QSharedMemory *> sharedMemories;
 QHash<QString, QString> temporaryFiles;
-}
+}  // namespace
 
 //---------------------------------------------------------------------
 
@@ -150,12 +149,12 @@ QString DefaultMessageParser<QUIT_ON_ERROR>::header() const {
 
 template <>
 void DefaultMessageParser<QUIT_ON_ERROR>::operator()(Message &msg) {
-  QObject::connect(socket(), SIGNAL(error(QLocalSocket::LocalSocketError)),
-                   QCoreApplication::instance(), SLOT(quit()));
+  QObject::connect(socket(), &QLocalSocket::errorOccurred,
+                   QCoreApplication::instance(), &QCoreApplication::quit);
   // In Qt 5.5 originating process's termination emits 'disconnected' instead of
   // 'error'
-  QObject::connect(socket(), SIGNAL(disconnected()),
-                   QCoreApplication::instance(), SLOT(quit()));
+  QObject::connect(socket(), &QLocalSocket::disconnected,
+                   QCoreApplication::instance(), &QCoreApplication::quit);
 
   msg << clr << QString("ok");
 }

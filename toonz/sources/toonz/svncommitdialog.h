@@ -71,7 +71,7 @@ class SVNCommitDialog final : public DVGui::Dialog {
 public:
   SVNCommitDialog(QWidget *parent, const QString &workingDir,
                   const QStringList &files, bool folderOnly = false,
-                  int m_sceneIconAdded = 0);
+                  int sceneIconAdded = 0);  // Fixed parameter name
 
   void checkFiles(bool isExternalFiles = false);
 
@@ -91,7 +91,7 @@ private:
 
   void initTreeWidget();
 
-protected slots:
+private slots:  // Changed from protected slots to private slots
 
   void onCommitButtonClicked();
 
@@ -108,7 +108,8 @@ protected slots:
   void onStatusRetrievedAfterAdd(const QString &);
   void onResourcesStatusRetrieved(const QString &);
 
-  void onCommiSceneContentsToggled(bool);
+  void onCommitSceneContentsToggled(
+      bool);  // Fixed typo: was onCommiSceneContentsToggled
 
 signals:
   void done(const QStringList &);
@@ -155,17 +156,16 @@ public:
 
 private:
   void switchToCloseButton();
+  void commit();  // Added private method declaration
 
-protected slots:
+private slots:  // Changed from protected slots to private slots
   void onError(const QString &);
   void onPropGetDone(const QString &);
   void onPropSetDone();
 
   void onHookFileAdded();
 
-  void onPutButtonClicked();
-
-  void commit();
+  void onCommitButtonClicked();  // Renamed from onPutButtonClicked
 
   void onCommitDone();
   void onUpdateDone();

@@ -1285,7 +1285,7 @@
   <item>"STD_iwa_SpectrumFx.loopSpectrumFadeWidth"	"Loop Spectrum Fade Width"	</item>
   <item>"STD_iwa_SpectrumFx.spectrumShift"	"Spectrum Shift"	</item>
   <item>"STD_iwa_SpectrumFx.lensFactor"	"Lens Factor"	</item>
-  <item>"STD_iwa_SpectrumFx.lightThres"	"Light Threshod"</item>
+  <item>"STD_iwa_SpectrumFx.lightThres"	"Light Threshold"</item>
   <item>"STD_iwa_SpectrumFx.lightIntensity"	"Light Intensity"</item>
 
   <item>"STD_iwa_TileFx"	"Tile Iwa"</item>
@@ -1628,6 +1628,10 @@
   <item>"STD_iwa_MotionFlowFx.normalizeType" "Normalize"	</item>
   <item>"STD_iwa_MotionFlowFx.normalizeRange" "Maximum Length"	</item>
 
+  <item>"STD_iwa_SmootherFx"	"Smoother Iwa"	</item>
+  <item>"STD_iwa_SmootherFx.threshold"	"Threshold"	</item>
+  <item>"STD_iwa_SmootherFx.softness"	"Softness"	</item>
+  
  <!------------------------------ Tiled Particles Iwa ------------------------------------------->
 
   <item>STD_iwa_TiledParticlesFx "Tiled Particles Iwa" </item>
@@ -1719,5 +1723,20 @@
   <item>"STD_iwa_TiledParticlesFx.fadeout_color_fade"		"Fade-out Intensity"		</item>
   <item>"STD_iwa_TiledParticlesFx.source_gradation"		"Use Control Image Gradation"		</item>
   <item>"STD_iwa_TiledParticlesFx.pick_color_for_every_frame"	"Pick Control Image's Color for Every Frame"	</item>
+
+  <!------------------------------ Naru FXs ------------------------------------------->
+  
+  <item>"STD_naru_LazyBrushFx" 	"LazyBrush Naru" 		</item>
+  <item>"STD_naru_LazyBrushFx.mode" 		"Mode" 			</item>
+  <item>"STD_naru_LazyBrushFx.blend_mode"	 	"Blend Mode"		</item>
+  <item>"STD_naru_LazyBrushFx.enable_auto_scribble" 	"Enable Auto Scribble"	</item>
+  <item>"STD_naru_LazyBrushFx.auto_scribble_color" 	"Color"	</item>
+  <item>"STD_naru_LazyBrushFx.enable_auto_bg_scribble" 	"Enable Auto BG Scribble" 	</item>
+  <item>"STD_naru_LazyBrushFx.ref_bgcolor" 	"BG Reference" 	</item>
+  <item>"STD_naru_LazyBrushFx.auto_scribble_threshold" 	"Threshold"	</item>
+  <item>"STD_naru_LazyBrushFx.log_scale" 	"LoG Scale"		</item>
+  <item>"STD_naru_LazyBrushFx.scr_type" 	"Scribble Type"		</item>
+  <item>"STD_naru_LazyBrushFx.lambda"	 	"Scribble Softness"		</item>
+
 </stringtable> 
 

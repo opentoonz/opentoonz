@@ -104,11 +104,15 @@ public:
   void setOrientation(bool direction = vertical);
   bool getOrientation() const;
 
+protected:
+  // Subclasses may override these to react to dock/float state changes.
+  // They are called on all code paths: interactive dock/undock AND workspace restore.
+  void setFloatingAppearance() override;
+  void setDockedAppearance() override;
+
 private:
   QSize getDockedMinimumSize() override;
   QSize getDockedMaximumSize() override;
-  void setFloatingAppearance() override;
-  void setDockedAppearance() override;
 
   void selectDockPlaceholder(QMouseEvent *me) override;
 

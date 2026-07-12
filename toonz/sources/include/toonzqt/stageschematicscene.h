@@ -59,7 +59,7 @@ public:
   //! Sort the children container.
   //! The sorting follows this rules:\n
   //! \li TableNode < CameraNode < PegbarNode < ColumnNode
-  //! \li if two nodes are of the same type, they are odered using indexes
+  //! \li if two nodes are of the same type, they are ordered using indexes
   void sortChildren(int startIndex, int lastIndex);
   void reverseChildren() { std::reverse(m_cildren.begin(), m_cildren.end()); }
 };
@@ -110,7 +110,7 @@ public:
   //! Clear all item an regenerate the Stage Schematic graph.
   void updateScene() override;
 
-  //! Reurns the current node.
+  //! Returns the current node.
   QGraphicsItem *getCurrentNode() override;
 
   //! Replace all nodes in the scene.
@@ -197,6 +197,17 @@ signals:
   void editObject();
   void doCollapse(QList<TStageObjectId>);
   void doExplodeChild(QList<TStageObjectId>);
+
+public slots:
+  // Public wrapper slots for modern Qt5 connection syntax
+  void onResetCenterPublic() { onResetCenter(); }
+  void onEditGroupPublic() { onEditGroup(); }
+  void onCameraActivatePublic() { onCameraActivate(); }
+  void onRemoveSplinePublic() { onRemoveSpline(); }
+  void onSaveSplinePublic() { onSaveSpline(); }
+  void onLoadSplinePublic() { onLoadSpline(); }
+  void onPathToggledPublic(int state) { onPathToggled(state); }
+  void onCpToggledPublic(bool toggled) { onCpToggled(toggled); }
 
 protected slots:
   void onSelectionSwitched(TSelection *oldSel, TSelection *newSel) override;

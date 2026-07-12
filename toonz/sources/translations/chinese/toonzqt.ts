@@ -199,6 +199,20 @@ Possibly the preset file has been corrupted</source>
         <source>pixel</source>
         <translation>像素</translation>
     </message>
+    <message>
+        <source>Deleting &quot;%1&quot;.
+Are you sure?</source>
+        <translation type="unfinished">删除 &quot;%1&quot;.
+你确定吗？</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">删除</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">取消</translation>
+    </message>
 </context>
 <context>
     <name>ChannelHisto</name>
@@ -514,7 +528,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Error importing color names XML</source>
-        <translation>导入颜色名错误 XML</translation>
+        <translation type="vanished">导入颜色名错误 XML</translation>
     </message>
     <message>
         <source>Save Color Names</source>
@@ -527,6 +541,42 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>Error exporting color names XML</source>
         <translation>导出颜色名错误 XML</translation>
+    </message>
+    <message>
+        <source>Color name is not valid.
+The following characters cannot be used: \ # &lt; &gt; &quot; &apos;</source>
+        <translation type="unfinished">无效的颜色名
+以下字符被禁止使用：\ # &lt; &gt; &quot; &apos;</translation>
+    </message>
+    <message>
+        <source>Color name already exists.
+Please use another name.</source>
+        <translation>颜色名已被占用。
+请使用其他名字。</translation>
+    </message>
+    <message>
+        <source>Invalid hex color format.</source>
+        <translation>无效的颜色格式</translation>
+    </message>
+    <message>
+        <source>Error importing color names XML:
+File not found or invalid format</source>
+        <translation type="unfinished">从XML中导入颜色名字时出错：
+未找到文件或格式错误</translation>
+    </message>
+    <message>
+        <source>Error importing color names XML:
+The file may be corrupt or have invalid format.</source>
+        <translation type="unfinished">从XML中导入颜色名字时出错：
+文件损坏或格式错误</translation>
+    </message>
+    <message>
+        <source>An unexpected error occurred while importing colors.</source>
+        <translation type="unfinished">导入颜色时发生了一个意外错误</translation>
+    </message>
+    <message>
+        <source>Failed to save user color names file.</source>
+        <translation type="unfinished">未能保存用户的颜色名文件。</translation>
     </message>
 </context>
 <context>
@@ -913,6 +963,14 @@ Gain is shown as an f-stop and the &quot;neutral&quot; or 1.0 gain f-stop is f/8
     <message>
         <source> (gain %1)</source>
         <translation> 增益%1</translation>
+    </message>
+    <message>
+        <source>&amp;Rotate Left</source>
+        <translation>向左旋转(&amp;R)</translation>
+    </message>
+    <message>
+        <source>&amp;Rotate Right</source>
+        <translation>向右旋转(&amp;R)</translation>
     </message>
 </context>
 <context>
@@ -2267,7 +2325,7 @@ and tone may be slightly discretized.</source>
     </message>
     <message>
         <source>It is not possible to delete the style #</source>
-        <translation>无法删除样式 #</translation>
+        <translation type="vanished">无法删除样式 #</translation>
     </message>
     <message>
         <source>It is not possible to delete styles #0 and #1.</source>
@@ -2336,7 +2394,7 @@ and tone may be slightly discretized.</source>
     <message>
         <source>Deleting &quot;%1&quot;.
 Are you sure?</source>
-        <translation>删除 &quot;%1&quot;.
+        <translation type="vanished">删除 &quot;%1&quot;.
 你确定吗？</translation>
     </message>
     <message>
@@ -2345,19 +2403,19 @@ Are you sure?</source>
     </message>
     <message>
         <source>Paste Style  in Palette : %1</source>
-        <translation>粘贴样式到调色板 %1</translation>
+        <translation type="vanished">粘贴样式到调色板 %1</translation>
     </message>
     <message>
         <source>Delete Style  from Palette : %1</source>
-        <translation>从调色板 %1 中删除样式</translation>
+        <translation type="vanished">从调色板 %1 中删除样式</translation>
     </message>
     <message>
         <source>Cut Style  from Palette : %1</source>
-        <translation>从调色板 %1 中剪切样式</translation>
+        <translation type="vanished">从调色板 %1 中剪切样式</translation>
     </message>
     <message>
         <source>  to Palette : %1</source>
-        <translation>  到调色板: %1</translation>
+        <translation type="vanished">  到调色板: %1</translation>
     </message>
     <message>
         <source>Paste Color &amp;&amp; Name%1</source>
@@ -2377,11 +2435,11 @@ Are you sure?</source>
     </message>
     <message>
         <source>Blend Colors  in Palette : %1</source>
-        <translation>在调色板 %1 中混合颜色</translation>
+        <translation type="vanished">在调色板 %1 中混合颜色</translation>
     </message>
     <message>
         <source>Toggle Link  in Palette : %1</source>
-        <translation>启用/停用链接调色板 %1</translation>
+        <translation type="vanished">启用/停用链接调色板 %1</translation>
     </message>
     <message>
         <source>Remove Link  in Palette : %1</source>
@@ -2495,7 +2553,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Remove Reference  in Palette : %1</source>
-        <translation>移除调色板%1中的引用</translation>
+        <translation type="vanished">移除调色板%1中的引用</translation>
     </message>
     <message>
         <source>It is not possible to assign a shortcut with modifiers to the visualization commands.</source>
@@ -2632,6 +2690,46 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <source>Sample Type: </source>
         <translation>采样类型: </translation>
+    </message>
+    <message>
+        <source>It is not possible to delete style #</source>
+        <translation>无法删除样式 #</translation>
+    </message>
+    <message>
+        <source>Paste Style to Palette: %1</source>
+        <translation>粘贴样式到调色板 %1</translation>
+    </message>
+    <message>
+        <source>Delete Style from Palette: %1</source>
+        <translation type="unfinished">从调色板 %1 中删除样式</translation>
+    </message>
+    <message>
+        <source>Cut Style from Palette: %1</source>
+        <translation type="unfinished">从调色板 %1 中剪切样式</translation>
+    </message>
+    <message>
+        <source> to Palette: %1</source>
+        <translation type="unfinished"> 到调色板: %1</translation>
+    </message>
+    <message>
+        <source>Blend Colors in Palette: %1</source>
+        <translation type="unfinished">在调色板 %1 中混合颜色</translation>
+    </message>
+    <message>
+        <source>Toggle Link in Palette: %1</source>
+        <translation type="unfinished">启用/停用调色板中的链接 %1</translation>
+    </message>
+    <message>
+        <source>Remove Reference in Palette: %1</source>
+        <translation type="unfinished">移除调色板%1中的引用</translation>
+    </message>
+    <message>
+        <source>Set As...</source>
+        <translation type="unfinished">设为...</translation>
+    </message>
+    <message>
+        <source>Delete Lines and Areas</source>
+        <translation>删除线条和填充</translation>
     </message>
 </context>
 <context>
@@ -3013,6 +3111,14 @@ Are you sure ?</source>
     <message>
         <source>Failed to save palette.</source>
         <translation>保存调色板失败。</translation>
+    </message>
+    <message>
+        <source>Set As...</source>
+        <translation>设为...</translation>
+    </message>
+    <message>
+        <source>Refresh</source>
+        <translation>刷新</translation>
     </message>
 </context>
 <context>

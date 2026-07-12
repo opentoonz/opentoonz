@@ -366,7 +366,7 @@ HistogramView::HistogramView(QWidget *parent, QColor color)
   setMinimumHeight(120 + 10 * 2 + 2);  // 10 == margin of internal widget
 
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setSpacing(7);
 
   m_histogramGraph = new HistogramGraph(this, color);
@@ -518,7 +518,7 @@ Histogram::Histogram(QWidget *parent) : QWidget(parent) {
   setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
 
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setSpacing(0);
   setLayout(mainLayout);
 

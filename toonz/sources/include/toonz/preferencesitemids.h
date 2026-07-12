@@ -13,6 +13,7 @@ enum PreferencesItemId {
   projectRoot,
   customProjectRoot,
   pathAliasPriority,
+  lazyLoadRooms,
 
   //----------
   // Interface
@@ -39,6 +40,7 @@ enum PreferencesItemId {
   colorCalibrationEnabled,
   colorCalibrationLutPaths,
   showIconsInMenu,
+  showRoomBindButtons,
   displayIn30bit,
   viewerIndicatorEnabled,
 
@@ -81,6 +83,7 @@ enum PreferencesItemId {
   ffmpegTimeout,
   fastRenderPath,
   ffmpegMultiThread,
+  quickTimeBackend,
   rhubarbPath,
   rhubarbTimeout,
 
@@ -89,6 +92,7 @@ enum PreferencesItemId {
   DefRasterFormat,
   // scanLevelType,// deprecated
   DefLevelType,
+  DefAssistantType,
   newLevelSizeToCameraSizeEnabled,
   DefLevelWidth,
   DefLevelHeight,
@@ -122,6 +126,8 @@ enum PreferencesItemId {
   useStrokeEndCursor,
   clickTwiceToCreateArcs,
   tempToolSwitchTimer,
+  animateToolHandleSize,
+  animateToolColor,
 
   //----------
   // Xsheet
@@ -136,7 +142,7 @@ enum PreferencesItemId {
   showKeyframesOnXsheetCellArea,
   showXsheetCameraColumn,
   useArrowKeyToShiftCellSelection,
-  inputCellsWithoutDoubleClickingEnabled,
+  cellInputMethod,
   shortcutCommandsWhileRenamingCellEnabled,
   showXSheetToolbar,
   showXsheetBreadcrumbs,
@@ -164,7 +170,7 @@ enum PreferencesItemId {
   blankColor,
   rewindAfterPlayback,
   previewAlwaysOpenNewFlip,
-  fitToFlipbook,
+  fitToFlipbookWhenPreview,
   generatedMovieViewEnabled,
   shortPlayFrameCount,
 
@@ -189,6 +195,9 @@ enum PreferencesItemId {
   transpCheckInkOnWhite,
   transpCheckInkOnBlack,
   transpCheckPaint,
+  inkCheckColor,
+  ink1CheckColor,
+  paintCheckColor,
 
   //----------
   // Version Control

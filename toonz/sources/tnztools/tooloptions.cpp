@@ -91,13 +91,13 @@ ToolOptionsBox::ToolOptionsBox(QWidget *parent, bool isScrollable)
   setFixedHeight(26);
 
   m_layout = new QHBoxLayout;
-  m_layout->setMargin(0);
+  m_layout->setContentsMargins(0, 0, 0, 0);
   m_layout->setSpacing(5);
   m_layout->addSpacing(5);
 
   if (isScrollable) {
     QHBoxLayout *hLayout = new QHBoxLayout;
-    hLayout->setMargin(0);
+    hLayout->setContentsMargins(0, 0, 0, 0);
     hLayout->setSpacing(0);
     setLayout(hLayout);
 
@@ -395,6 +395,7 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
   EditTool *editTool = dynamic_cast<EditTool *>(tool);
 
   m_axisOptionWidgets = new QWidget *[AllAxis];
+  m_axisIcons         = new QWidget *[AllAxis];
 
   /* --- General Parts --- */
 
@@ -592,7 +593,7 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
 
     // Pick combobox only available on "All" axis mode
     QHBoxLayout *pickLay = new QHBoxLayout();
-    pickLay->setMargin(0);
+    pickLay->setContentsMargins(0, 0, 0, 0);
     pickLay->setSpacing(0);
     {
       pickLay->addSpacing(5);
@@ -608,12 +609,13 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
       // Position
       QFrame *posFrame    = new QFrame(this);
       QHBoxLayout *posLay = new QHBoxLayout();
-      posLay->setMargin(0);
+      posLay->setContentsMargins(0, 0, 0, 0);
       posLay->setSpacing(0);
       posFrame->setLayout(posLay);
       {
-        posLay->addWidget(
-            new SimpleIconViewField("edit_position", tr("Position"), this), 0);
+        m_axisIcons[Position] =
+            new SimpleIconViewField("edit_position", tr("Position"), this);
+        posLay->addWidget(m_axisIcons[Position], 0);
         posLay->addSpacing(LABEL_SPACING * 2);
         posLay->addWidget(m_motionPathPosLabel, 0);
         posLay->addWidget(m_motionPathPosField, 0);
@@ -656,12 +658,13 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
       // Rotation
       QFrame *rotFrame    = new QFrame(this);
       QHBoxLayout *rotLay = new QHBoxLayout();
-      rotLay->setMargin(0);
+      rotLay->setContentsMargins(0, 0, 0, 0);
       rotLay->setSpacing(0);
       rotFrame->setLayout(rotLay);
       {
-        rotLay->addWidget(
-            new SimpleIconViewField("edit_rotation", tr("Rotation"), this), 0);
+        m_axisIcons[Rotation] =
+            new SimpleIconViewField("edit_rotation", tr("Rotation"), this);
+        rotLay->addWidget(m_axisIcons[Rotation], 0);
         rotLay->addSpacing(LABEL_SPACING * 2);
         rotLay->addWidget(m_rotationLabel, 0);
         rotLay->addSpacing(LABEL_SPACING);
@@ -680,12 +683,13 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
       // Scale
       QFrame *scaleFrame    = new QFrame(this);
       QHBoxLayout *scaleLay = new QHBoxLayout();
-      scaleLay->setMargin(0);
+      scaleLay->setContentsMargins(0, 0, 0, 0);
       scaleLay->setSpacing(0);
       scaleFrame->setLayout(scaleLay);
       {
-        scaleLay->addWidget(
-            new SimpleIconViewField("edit_scale", tr("Scale"), this), 0);
+        m_axisIcons[Scale] =
+            new SimpleIconViewField("edit_scale", tr("Scale"), this);
+        scaleLay->addWidget(m_axisIcons[Scale], 0);
         scaleLay->addSpacing(LABEL_SPACING * 2);
 
         scaleLay->addWidget(m_globalScaleLabel, 0);
@@ -725,12 +729,13 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
       // Shear
       QFrame *shearFrame    = new QFrame(this);
       QHBoxLayout *shearLay = new QHBoxLayout();
-      shearLay->setMargin(0);
+      shearLay->setContentsMargins(0, 0, 0, 0);
       shearLay->setSpacing(0);
       shearFrame->setLayout(shearLay);
       {
-        shearLay->addWidget(
-            new SimpleIconViewField("edit_shear", tr("Shear"), this), 0);
+        m_axisIcons[Shear] =
+            new SimpleIconViewField("edit_shear", tr("Shear"), this);
+        shearLay->addWidget(m_axisIcons[Shear], 0);
         shearLay->addSpacing(LABEL_SPACING * 2);
 
         shearLay->addWidget(m_shearHLabel, 0);
@@ -757,13 +762,13 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
       // Center Position
       QFrame *centerPosFrame    = new QFrame(this);
       QHBoxLayout *centerPosLay = new QHBoxLayout();
-      centerPosLay->setMargin(0);
+      centerPosLay->setContentsMargins(0, 0, 0, 0);
       centerPosLay->setSpacing(0);
       centerPosFrame->setLayout(centerPosLay);
       {
-        centerPosLay->addWidget(
-            new SimpleIconViewField("edit_center", tr("Center Position"), this),
-            0);
+        m_axisIcons[CenterPosition] =
+            new SimpleIconViewField("edit_center", tr("Center Position"), this);
+        centerPosLay->addWidget(m_axisIcons[CenterPosition], 0);
         centerPosLay->addSpacing(LABEL_SPACING * 2);
 
         centerPosLay->addWidget(m_ewCenterLabel, 0);
@@ -1035,8 +1040,10 @@ void ArrowToolOptionsBox::onCurrentStageObjectComboActivated(int index) {
 
 void ArrowToolOptionsBox::onCurrentAxisChanged(int axisId) {
   // Show the specified axis options, hide all the others
-  for (int a = 0; a != AllAxis; ++a)
+  for (int a = 0; a != AllAxis; ++a) {
     m_axisOptionWidgets[a]->setVisible(a == axisId || axisId == AllAxis);
+    m_axisIcons[a]->setVisible(axisId == AllAxis);
+  }
 
   m_pickWidget->setVisible(axisId == AllAxis);
 }
@@ -1680,12 +1687,20 @@ PaintbrushToolOptionsBox::PaintbrushToolOptionsBox(QWidget *parent, TTool *tool,
   m_colorMode = dynamic_cast<ToolOptionCombo *>(m_controls.value("Mode:"));
   m_selectiveMode =
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Selective"));
+  m_emptyOnlyMode =
+      dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Empty Only"));
+
   m_lockAlphaMode =
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Lock Alpha"));
+  m_FillingMode =
+      dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Paint by Filling"));
 
   if (m_colorMode->getProperty()->getValue() == L"Lines") {
     m_selectiveMode->setVisible(false);
+    m_emptyOnlyMode->setVisible(false);
+
     m_lockAlphaMode->setVisible(false);
+    m_FillingMode->setVisible(false);
   }
 
   bool ret = connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
@@ -1707,7 +1722,9 @@ void PaintbrushToolOptionsBox::onColorModeChanged(int index) {
   const TEnumProperty::Range &range = m_colorMode->getProperty()->getRange();
   bool enabled                      = range[index] != L"Lines";
   m_selectiveMode->setVisible(enabled);
+  m_emptyOnlyMode->setVisible(enabled);
   m_lockAlphaMode->setVisible(enabled);
+  m_FillingMode->setVisible(enabled);
 }
 
 //=============================================================================
@@ -1753,8 +1770,8 @@ FillToolOptionsBox::FillToolOptionsBox(QWidget *parent, TTool *tool,
 
   m_toolType  = dynamic_cast<ToolOptionCombo *>(m_controls.value("Type:"));
   m_colorMode = dynamic_cast<ToolOptionCombo *>(m_controls.value("Mode:"));
-  m_selectiveMode =
-      dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Selective"));
+  m_emptyOnly =
+      dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Empty Only"));
   m_fillDepthField =
       dynamic_cast<ToolOptionPairSlider *>(m_controls.value("Fill Depth"));
   if (m_fillDepthField)
@@ -1771,6 +1788,11 @@ FillToolOptionsBox::FillToolOptionsBox(QWidget *parent, TTool *tool,
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Close Gap"));
   m_referFill =
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Refer Fill"));
+  m_gapCloseDistance = dynamic_cast<ToolOptionIntSlider *>(
+      m_controls.value("Gap Close Distance:"));
+  m_extendFill =
+      dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Extend Fill"));
+
   bool ret = connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
                      SLOT(onColorModeChanged(int)));
   ret      = ret && connect(m_toolType, SIGNAL(currentIndexChanged(int)), this,
@@ -1779,6 +1801,10 @@ FillToolOptionsBox::FillToolOptionsBox(QWidget *parent, TTool *tool,
                             SLOT(onOnionModeToggled(bool)));
   ret      = ret && connect(m_multiFrameMode, SIGNAL(toggled(bool)), this,
                             SLOT(onMultiFrameModeToggled(bool)));
+  if (m_closeGap)
+    ret = ret && connect(m_closeGap, &ToolOptionCheckbox::toggled,
+                         m_gapCloseDistance, &QWidget::setEnabled);
+
   assert(ret);
   onColorModeChanged(m_colorMode->getProperty()->getIndex());
   onToolTypeChanged(m_toolType->getProperty()->getIndex());
@@ -1798,8 +1824,7 @@ void FillToolOptionsBox::updateStatus() {
 void FillToolOptionsBox::onColorModeChanged(int index) {
   const TEnumProperty::Range &range = m_colorMode->getProperty()->getRange();
   bool enabled                      = range[index] != L"Lines";
-  m_multiFrameMode->setEnabled(enabled);
-  m_selectiveMode->setEnabled(enabled);
+  m_emptyOnly->setEnabled(enabled);
   if (m_autopaintMode) m_autopaintMode->setEnabled(enabled);
   if (m_fillDepthLabel && m_fillDepthField) {
     m_fillDepthLabel->setEnabled(enabled);
@@ -1812,8 +1837,6 @@ void FillToolOptionsBox::onColorModeChanged(int index) {
   }
   enabled = range[index] != L"Lines" && !m_multiFrameMode->isChecked();
   m_onionMode->setEnabled(enabled);
-  if(m_referFill) m_referFill->setEnabled(enabled);
-  if(m_closeGap) m_closeGap->setEnabled(enabled);
 }
 
 //-----------------------------------------------------------------------------
@@ -1827,15 +1850,14 @@ void FillToolOptionsBox::onToolTypeChanged(int index) {
   enabled = enabled || (m_colorMode->getProperty()->getValue() != L"Lines" &&
                         !m_multiFrameMode->isChecked());
   m_onionMode->setEnabled(enabled);
-  enabled = range[index] != L"Polyline";
-  if (m_referFill) m_referFill->setEnabled(enabled);
-  if (m_closeGap) m_closeGap->setEnabled(enabled);
 }
 
 //-----------------------------------------------------------------------------
 
 void FillToolOptionsBox::onOnionModeToggled(bool value) {
   m_multiFrameMode->setEnabled(!value);
+  if (m_referFill) m_referFill->setEnabled(!value);
+  if (m_closeGap) m_closeGap->setEnabled(!value);
 }
 
 //-----------------------------------------------------------------------------
@@ -1973,7 +1995,8 @@ void BrushToolOptionsBox::filterControls() {
        it != m_labels.end(); it++) {
     bool isModifier = (it.key().substr(0, 8) == "Modifier");
     bool isCommon   = (it.key() == "Lock Alpha" || it.key() == "Pressure" ||
-                     it.key() == "Assistants" || it.key() == "Preset:");
+                     it.key() == "Assistants" || it.key() == "Preset:" ||
+                     it.key() == "Smooth:");
     bool visible    = isCommon || (isModifier == showModifiers);
     it.value()->setVisible(visible);
   }
@@ -1982,7 +2005,8 @@ void BrushToolOptionsBox::filterControls() {
        it != m_controls.end(); it++) {
     bool isModifier = (it.key().substr(0, 8) == "Modifier");
     bool isCommon   = (it.key() == "Lock Alpha" || it.key() == "Pressure" ||
-                     it.key() == "Assistants" || it.key() == "Preset:");
+                     it.key() == "Assistants" || it.key() == "Preset:" ||
+                     it.key() == "Smooth:");
     bool visible    = isCommon || (isModifier == showModifiers);
     if (QWidget *widget = dynamic_cast<QWidget *>(it.value()))
       widget->setVisible(visible);
@@ -2172,34 +2196,37 @@ void EraserToolOptionsBox::onColorModeChanged(int index) {
 //
 //=============================================================================
 
-FingerToolOptionsBox::FingerToolOptionsBox(QWidget* parent, TTool* tool, TPaletteHandle* pltHandle, ToolHandle* toolHandle)
-: ToolOptionsBox(parent), m_colorMode(0), m_invertMode(0){
-    TPropertyGroup* props = tool->getProperties(0);
-    assert(props->getPropertyCount() > 0);
+FingerToolOptionsBox::FingerToolOptionsBox(QWidget *parent, TTool *tool,
+                                           TPaletteHandle *pltHandle,
+                                           ToolHandle *toolHandle)
+    : ToolOptionsBox(parent), m_colorMode(0), m_invertMode(0) {
+  TPropertyGroup *props = tool->getProperties(0);
+  assert(props->getPropertyCount() > 0);
 
-    ToolOptionControlBuilder builder(this, tool, pltHandle, toolHandle);
-    if (tool && tool->getProperties(0)) tool->getProperties(0)->accept(builder);
+  ToolOptionControlBuilder builder(this, tool, pltHandle, toolHandle);
+  if (tool && tool->getProperties(0)) tool->getProperties(0)->accept(builder);
 
-    hLayout()->addStretch(1);
+  hLayout()->addStretch(1);
 
-    m_colorMode = dynamic_cast<ToolOptionCombo*>(m_controls.value("Mode:"));
-    m_invertMode = dynamic_cast<ToolOptionCheckbox*>(m_controls.value("Invert"));
-    m_selectiveMode = dynamic_cast<ToolOptionCheckbox*>(m_controls.value("Selective"));
+  m_colorMode  = dynamic_cast<ToolOptionCombo *>(m_controls.value("Mode:"));
+  m_invertMode = dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Invert"));
+  m_selectiveMode =
+      dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Selective"));
 
-    bool ret = true;
-    if (m_colorMode) {
-        ret = ret && connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
-            SLOT(onColorModeChanged(int)));
-        if (m_invertMode)
-            m_invertMode->setEnabled(m_colorMode->currentIndex() == 0);//INK
-        if (m_selectiveMode)
-            m_selectiveMode->setEnabled(m_colorMode->currentIndex() == 1);//PAINT
-    }
+  bool ret = true;
+  if (m_colorMode) {
+    ret = ret && connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
+                         SLOT(onColorModeChanged(int)));
+    if (m_invertMode)
+      m_invertMode->setEnabled(m_colorMode->currentIndex() == 0);  // INK
+    if (m_selectiveMode)
+      m_selectiveMode->setEnabled(m_colorMode->currentIndex() == 1);  // PAINT
+  }
 }
 
 void FingerToolOptionsBox::onColorModeChanged(int i) {
-    if (m_invertMode) m_invertMode->setEnabled(i == 0);
-    if (m_selectiveMode) m_selectiveMode->setEnabled(i == 1);
+  if (m_invertMode) m_invertMode->setEnabled(i == 0);
+  if (m_selectiveMode) m_selectiveMode->setEnabled(i == 1);
 }
 //=============================================================================
 //
@@ -2274,7 +2301,7 @@ RulerToolOptionsBox::RulerToolOptionsBox(QWidget *parent, TTool *tool)
 
   // layout
   QHBoxLayout *lay = new QHBoxLayout();
-  lay->setMargin(0);
+  lay->setContentsMargins(0, 0, 0, 0);
   lay->setSpacing(3);
   {
     lay->addWidget(new QLabel(tr("X:", "ruler tool option"), this), 0);
@@ -2598,13 +2625,20 @@ StylePickerToolOptionsBox::StylePickerToolOptionsBox(
   // into rightmost of the tool option bar
   ToolOptionCheckbox *organizePaletteCB =
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Organize Palette"));
+  ToolOptionCheckbox *replaceStyleCB =
+      dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Replace Style"));
   m_layout->removeWidget(organizePaletteCB);
+  m_layout->removeWidget(replaceStyleCB);
   // m_layout->addWidget(new ToolOptionsBarSeparator(this), 0);
+  m_layout->addWidget(replaceStyleCB);
   m_layout->addWidget(organizePaletteCB);
   m_layout->addSpacing(5);
+  replaceStyleCB->setToolTip(
+      tr("With this option being activated, the picked style will replace\n"
+         "the current style in current level."));
   organizePaletteCB->setToolTip(
       tr("With this option being activated, the picked style will be\nmoved to "
-         "the end of the first page of the palette."));
+         "the end of the current style's page of the palette."));
 
   if (m_realTimePickMode) {
     connect(m_realTimePickMode, SIGNAL(toggled(bool)), m_currentStyleLabel,
@@ -2662,9 +2696,11 @@ ShiftTraceToolOptionBox::ShiftTraceToolOptionBox(QWidget *parent, TTool *tool)
 
   m_prevFrame->setFixedSize(10, 21);
   m_afterFrame->setFixedSize(10, 21);
-  int buttonWidth = fontMetrics().horizontalAdvance(m_resetPrevGhostBtn->text()) + 10;
+  int buttonWidth =
+      fontMetrics().horizontalAdvance(m_resetPrevGhostBtn->text()) + 10;
   m_resetPrevGhostBtn->setFixedWidth(buttonWidth);
-  buttonWidth = fontMetrics().horizontalAdvance(m_resetAfterGhostBtn->text()) + 10;
+  buttonWidth =
+      fontMetrics().horizontalAdvance(m_resetAfterGhostBtn->text()) + 10;
   m_resetAfterGhostBtn->setFixedWidth(buttonWidth);
 
   m_layout->addWidget(m_prevFrame, 0);
@@ -2813,6 +2849,12 @@ RotateToolOptionsBox::RotateToolOptionsBox(QWidget *parent, TTool *tool,
   setFrameStyle(QFrame::StyledPanel);
   setFixedHeight(26);
 
+  TPropertyGroup *props = tool->getProperties(0);
+  assert(props->getPropertyCount() > 0);
+
+  ToolOptionControlBuilder builder(this, tool, pltHandle, toolHandle);
+  if (tool && tool->getProperties(0)) tool->getProperties(0)->accept(builder);
+
   QAction *resetRotationAction =
       CommandManager::instance()->getAction(VB_RotateReset);
 
@@ -2862,7 +2904,7 @@ HandToolOptionsBox::HandToolOptionsBox(QWidget *parent, TTool *tool,
 
 ToolOptions::ToolOptions() : m_panel(0) {
   QHBoxLayout *mainLayout = new QHBoxLayout();
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setSpacing(0);
   setLayout(mainLayout);
 }
@@ -2932,8 +2974,8 @@ void ToolOptions::onToolSwitched() {
   ToolHandle *currTool    = app->getCurrentTool();
   TTool *tool             = currTool->getTool();
 
-    // Skip panel updates if we're in navigation mode
-  if (currTool && currTool->isSpacePressed()) {
+  // Skip panel updates if we're in navigation mode
+  if (currTool && currTool->isViewerNavigationToolSelected()) {
     return;
   }
 
@@ -2956,55 +2998,52 @@ void ToolOptions::onToolSwitched() {
 
     if (it == m_panels.end()) {
       // Create new panel if one doesn't exist for this tool
-        if (tool->getName() == T_Edit) {
-            TPropertyGroup* pg = tool->getProperties(0);
-            panel = new ArrowToolOptionsBox(0, tool, pg, currFrame, currObject,
-                currXsheet, currTool);
-        }
-        else if (tool->getName() == T_Selection)
-            panel = new SelectionToolOptionsBox(0, tool, currPalette, currTool);
-        else if (tool->getName() == T_Geometric)
-            panel = new GeometricToolOptionsBox(0, tool, currPalette, currTool);
-        else if (tool->getName() == T_Type)
-            panel = new TypeToolOptionsBox(0, tool, currPalette, currTool);
-        else if (tool->getName() == T_PaintBrush)
-            panel = new PaintbrushToolOptionsBox(0, tool, currPalette, currTool);
-        else if (tool->getName() == T_Fill) {
-            if (tool->getTargetType() & TTool::RasterImage)
-                panel =
-                new FullColorFillToolOptionsBox(0, tool, currPalette, currTool);
-            else
-                panel = new FillToolOptionsBox(0, tool, currPalette, currTool);
-        }
-        else if (tool->getName() == T_Eraser)
-            panel = new EraserToolOptionsBox(0, tool, currPalette, currTool);
-        else if (tool->getName() == T_Tape)
-            panel = new TapeToolOptionsBox(0, tool, currPalette, currTool);
-        else if (tool->getName() == T_RGBPicker)
-            panel = new RGBPickerToolOptionsBox(0, tool, currPalette, currTool,
-                app->getPaletteController());
-        else if (tool->getName() == T_Ruler) {
-            RulerToolOptionsBox* p = new RulerToolOptionsBox(0, tool);
-            panel = p;
-            RulerTool* rt = dynamic_cast<RulerTool*>(tool);
-            if (rt) rt->setToolOptionsBox(p);
-        }
-        else if (tool->getName() == T_StylePicker)
-            panel = new StylePickerToolOptionsBox(0, tool, currPalette, currTool,
-                app->getPaletteController());
-        else if (tool->getName() == "T_ShiftTrace")
-            panel = new ShiftTraceToolOptionBox(this, tool);
-        else if (tool->getName() == T_Zoom)
-            panel = new ZoomToolOptionsBox(0, tool, currPalette, currTool);
-        else if (tool->getName() == T_Rotate)
-            panel = new RotateToolOptionsBox(0, tool, currPalette, currTool);
-        else if (tool->getName() == T_Hand)
-            panel = new HandToolOptionsBox(0, tool, currPalette, currTool);
-        else if (tool->getName() == "T_Finger")
-            panel = new FingerToolOptionsBox(0, tool, currPalette, currTool);
+      if (tool->getName() == T_Edit) {
+        TPropertyGroup *pg = tool->getProperties(0);
+        panel = new ArrowToolOptionsBox(0, tool, pg, currFrame, currObject,
+                                        currXsheet, currTool);
+      } else if (tool->getName() == T_Selection)
+        panel = new SelectionToolOptionsBox(0, tool, currPalette, currTool);
+      else if (tool->getName() == T_Geometric)
+        panel = new GeometricToolOptionsBox(0, tool, currPalette, currTool);
+      else if (tool->getName() == T_Type)
+        panel = new TypeToolOptionsBox(0, tool, currPalette, currTool);
+      else if (tool->getName() == T_PaintBrush)
+        panel = new PaintbrushToolOptionsBox(0, tool, currPalette, currTool);
+      else if (tool->getName() == T_Fill) {
+        if (tool->getTargetType() & TTool::RasterImage)
+          panel =
+              new FullColorFillToolOptionsBox(0, tool, currPalette, currTool);
         else
-            panel = tool->createOptionsBox();  // Future: Use this virtual method
-        // for all tools
+          panel = new FillToolOptionsBox(0, tool, currPalette, currTool);
+      } else if (tool->getName() == T_Eraser)
+        panel = new EraserToolOptionsBox(0, tool, currPalette, currTool);
+      else if (tool->getName() == T_Tape)
+        panel = new TapeToolOptionsBox(0, tool, currPalette, currTool);
+      else if (tool->getName() == T_RGBPicker)
+        panel = new RGBPickerToolOptionsBox(0, tool, currPalette, currTool,
+                                            app->getPaletteController());
+      else if (tool->getName() == T_Ruler) {
+        RulerToolOptionsBox *p = new RulerToolOptionsBox(0, tool);
+        panel                  = p;
+        RulerTool *rt          = dynamic_cast<RulerTool *>(tool);
+        if (rt) rt->setToolOptionsBox(p);
+      } else if (tool->getName() == T_StylePicker)
+        panel = new StylePickerToolOptionsBox(0, tool, currPalette, currTool,
+                                              app->getPaletteController());
+      else if (tool->getName() == "T_ShiftTrace")
+        panel = new ShiftTraceToolOptionBox(this, tool);
+      else if (tool->getName() == T_Zoom)
+        panel = new ZoomToolOptionsBox(0, tool, currPalette, currTool);
+      else if (tool->getName() == T_Rotate)
+        panel = new RotateToolOptionsBox(0, tool, currPalette, currTool);
+      else if (tool->getName() == T_Hand)
+        panel = new HandToolOptionsBox(0, tool, currPalette, currTool);
+      else if (tool->getName() == "T_Finger")
+        panel = new FingerToolOptionsBox(0, tool, currPalette, currTool);
+      else
+        panel = tool->createOptionsBox();  // Future: Use this virtual method
+      // for all tools
 
       m_panels[tool] = panel;
       layout()->addWidget(panel);

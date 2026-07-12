@@ -279,7 +279,7 @@ QMenuBar *StackedMenuBar::loadMenuBar(const TFilePath &fp) {
           /*- Menu title will be translated if the title is registered in
            * translation file -*/
           QMenu *menu = new QMenu(tr(title.toStdString().c_str()));
-
+          menu->setToolTipsVisible(true);
           if (readMenuRecursive(reader, menu))
             menuBar->addMenu(menu);
           else {
@@ -289,12 +289,13 @@ QMenuBar *StackedMenuBar::loadMenuBar(const TFilePath &fp) {
         } else if (reader.name() == "command") {
           // Read the optional 'label' attribute for display
           QString displayLabel = reader.attributes().value("label").toString();
-          QString cmdName = reader.readElementText();
+          QString cmdName      = reader.readElementText();
 
           QAction *action = CommandManager::instance()->getAction(
               cmdName.toStdString().c_str());
           if (action) {
-            // Override the QAction text if a custom 'label' attribute is provided
+            // Override the QAction text if a custom 'label' attribute is
+            // provided
             if (!displayLabel.isEmpty()) {
               action->setText(tr(displayLabel.toStdString().c_str()));
             }
@@ -324,7 +325,7 @@ QMenuBar *StackedMenuBar::loadMenuBar(const TFilePath &fp) {
 bool StackedMenuBar::readMenuRecursive(QXmlStreamReader &reader, QMenu *menu) {
   while (reader.readNextStartElement()) {
     if (reader.name() == "menu") {
-      QString title = reader.attributes().value("title").toString();
+      QString title  = reader.attributes().value("title").toString();
       QMenu *subMenu = new QMenu(tr(title.toStdString().c_str()));
 
       if (readMenuRecursive(reader, subMenu))
@@ -336,9 +337,9 @@ bool StackedMenuBar::readMenuRecursive(QXmlStreamReader &reader, QMenu *menu) {
       }
     } else if (reader.name() == "command") {
       QString displayLabel = reader.attributes().value("label").toString();
-      QString cmdName = reader.readElementText();
-      QAction *action = CommandManager::instance()->getAction(
-          cmdName.toStdString().c_str());
+      QString cmdName      = reader.readElementText();
+      QAction *action =
+          CommandManager::instance()->getAction(cmdName.toStdString().c_str());
       if (action) {
         if (!displayLabel.isEmpty()) {
           action->setText(tr(displayLabel.toStdString().c_str()));
@@ -348,9 +349,9 @@ bool StackedMenuBar::readMenuRecursive(QXmlStreamReader &reader, QMenu *menu) {
     } else if (reader.name() == "command_debug") {
 #ifndef NDEBUG
       QString displayLabel = reader.attributes().value("label").toString();
-      QString cmdName = reader.readElementText();
-      QAction *action = CommandManager::instance()->getAction(
-          cmdName.toStdString().c_str());
+      QString cmdName      = reader.readElementText();
+      QAction *action =
+          CommandManager::instance()->getAction(cmdName.toStdString().c_str());
       if (action) {
         if (!displayLabel.isEmpty()) {
           action->setText(tr(displayLabel.toStdString().c_str()));
@@ -437,6 +438,7 @@ QMenuBar *StackedMenuBar::createCleanupMenuBar() {
   addMenuItem(editMenu, MI_PasteInto);
   editMenu->addSeparator();
   addMenuItem(editMenu, MI_Clear);
+  addMenuItem(editMenu, MI_ClearViewerContent);
   addMenuItem(editMenu, MI_Insert);
   addMenuItem(editMenu, MI_InsertAbove);
   addMenuItem(editMenu, MI_SelectAll);
@@ -466,6 +468,8 @@ QMenuBar *StackedMenuBar::createCleanupMenuBar() {
     addMenuItem(otherWindowsMenu, MI_OpenToolbar);
     addMenuItem(otherWindowsMenu, MI_OpenToolOptionBar);
     addMenuItem(otherWindowsMenu, MI_OpenHistoryPanel);
+    addMenuItem(otherWindowsMenu, MI_OpenBrushPresetPanel);
+    addMenuItem(otherWindowsMenu, MI_OpenToolPropertiesPanel);
     addMenuItem(otherWindowsMenu, MI_OpenTMessage);
   }
 
@@ -587,6 +591,7 @@ QMenuBar *StackedMenuBar::createPltEditMenuBar() {
   addMenuItem(editMenu, MI_PasteInto);
   editMenu->addSeparator();
   addMenuItem(editMenu, MI_Clear);
+  addMenuItem(editMenu, MI_ClearViewerContent);
   addMenuItem(editMenu, MI_Insert);
   addMenuItem(editMenu, MI_InsertAbove);
   addMenuItem(editMenu, MI_SelectAll);
@@ -634,6 +639,8 @@ QMenuBar *StackedMenuBar::createPltEditMenuBar() {
     addMenuItem(otherWindowsMenu, MI_OpenToolbar);
     addMenuItem(otherWindowsMenu, MI_OpenToolOptionBar);
     addMenuItem(otherWindowsMenu, MI_OpenHistoryPanel);
+    addMenuItem(otherWindowsMenu, MI_OpenBrushPresetPanel);
+    addMenuItem(otherWindowsMenu, MI_OpenToolPropertiesPanel);
     addMenuItem(otherWindowsMenu, MI_OpenTMessage);
   }
 
@@ -770,6 +777,7 @@ QMenuBar *StackedMenuBar::createInknPaintMenuBar() {
   addMenuItem(editMenu, MI_PasteInto);
   editMenu->addSeparator();
   addMenuItem(editMenu, MI_Clear);
+  addMenuItem(editMenu, MI_ClearViewerContent);
   addMenuItem(editMenu, MI_Insert);
   addMenuItem(editMenu, MI_InsertAbove);
   addMenuItem(editMenu, MI_SelectAll);
@@ -811,6 +819,8 @@ QMenuBar *StackedMenuBar::createInknPaintMenuBar() {
     addMenuItem(otherWindowsMenu, MI_OpenSchematic);
     addMenuItem(otherWindowsMenu, MI_OpenTasks);
     addMenuItem(otherWindowsMenu, MI_OpenHistoryPanel);
+    addMenuItem(otherWindowsMenu, MI_OpenBrushPresetPanel);
+    addMenuItem(otherWindowsMenu, MI_OpenToolPropertiesPanel);
     addMenuItem(otherWindowsMenu, MI_OpenTMessage);
   }
 
@@ -948,6 +958,7 @@ QMenuBar *StackedMenuBar::createXsheetMenuBar() {
   addMenuItem(editMenu, MI_PasteInto);
   editMenu->addSeparator();
   addMenuItem(editMenu, MI_Clear);
+  addMenuItem(editMenu, MI_ClearViewerContent);
   addMenuItem(editMenu, MI_Insert);
   addMenuItem(editMenu, MI_InsertAbove);
   addMenuItem(editMenu, MI_SelectAll);
@@ -994,6 +1005,8 @@ QMenuBar *StackedMenuBar::createXsheetMenuBar() {
     addMenuItem(otherWindowsMenu, MI_OpenToolbar);
     addMenuItem(otherWindowsMenu, MI_OpenToolOptionBar);
     addMenuItem(otherWindowsMenu, MI_OpenHistoryPanel);
+    addMenuItem(otherWindowsMenu, MI_OpenBrushPresetPanel);
+    addMenuItem(otherWindowsMenu, MI_OpenToolPropertiesPanel);
     addMenuItem(otherWindowsMenu, MI_OpenTMessage);
   }
 
@@ -1131,8 +1144,8 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   }
   fileMenu->addSeparator();
   QMenu *importMenu = fileMenu->addMenu(tr("Import"));
-  { 
-    addMenuItem(importMenu, MI_ImportMagpieFile); 
+  {
+    addMenuItem(importMenu, MI_ImportMagpieFile);
     addMenuItem(importMenu, MI_ImportOCA);
   }
   QMenu *exportMenu = fileMenu->addMenu(tr("Export"));
@@ -1140,6 +1153,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
     addMenuItem(exportMenu, MI_ExportCurrentScene);
     addMenuItem(exportMenu, MI_SoundTrack);
     addMenuItem(exportMenu, MI_ExportXDTS);
+    addMenuItem(exportMenu, MI_ExportSXF);
     addMenuItem(exportMenu, MI_ExportOCA);
     addMenuItem(exportMenu, MI_ExportXsheetPDF);
 #if defined(x64)
@@ -1181,6 +1195,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(editMenu, MI_Insert);
   addMenuItem(editMenu, MI_InsertAbove);
   addMenuItem(editMenu, MI_Clear);
+  addMenuItem(editMenu, MI_ClearViewerContent);
   editMenu->addSeparator();
   addMenuItem(editMenu, MI_SelectAll);
   addMenuItem(editMenu, MI_InvertSelection);
@@ -1229,6 +1244,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
     addMenuItem(newMenu, MI_NewToonzRasterLevel);
     addMenuItem(newMenu, MI_NewVectorLevel);
     addMenuItem(newMenu, MI_NewRasterLevel);
+    addMenuItem(newMenu, MI_NewMetaLevel);
     addMenuItem(newMenu, MI_NewNoteLevel);
   }
   addMenuItem(levelMenu, MI_LoadLevel);
@@ -1436,6 +1452,8 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(windowsMenu, MI_OpenCommandToolbar);
   addMenuItem(windowsMenu, MI_OpenToolbar);
   addMenuItem(windowsMenu, MI_OpenToolOptionBar);
+  addMenuItem(windowsMenu, MI_OpenBrushPresetPanel);
+  addMenuItem(windowsMenu, MI_OpenToolPropertiesPanel);
   windowsMenu->addSeparator();
   addMenuItem(windowsMenu, MI_OpenStyleControl);
   addMenuItem(windowsMenu, MI_OpenPalette);
@@ -1596,11 +1614,11 @@ TopBar::TopBar(QWidget *parent) : QToolBar(parent) {
 
   QHBoxLayout *mainLayout = new QHBoxLayout();
   mainLayout->setSpacing(0);
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   {
     QVBoxLayout *menuLayout = new QVBoxLayout();
     menuLayout->setSpacing(0);
-    menuLayout->setMargin(0);
+    menuLayout->setContentsMargins(0, 0, 0, 0);
     {
       menuLayout->addStretch(1);
       menuLayout->addWidget(m_stackedMenuBar, 0);

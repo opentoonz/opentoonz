@@ -6,6 +6,7 @@
 #include "tgrammar.h"
 #include <QWidget>
 #include <QTextEdit>
+#include <memory>  // for std::unique_ptr
 
 #undef DVAPI
 #undef DVVAR
@@ -42,7 +43,7 @@ class DVAPI ExpressionField final : public QTextEdit {
   const TSyntax::Grammar *m_grammar;
 
   class SyntaxHighlighter;
-  SyntaxHighlighter *m_syntaxHighlighter;
+  std::unique_ptr<SyntaxHighlighter> m_syntaxHighlighter;
 
   QListView *m_completerPopup;
   int m_completerStartPos;
@@ -86,4 +87,4 @@ signals:
 }  // namespace DVGui
 //-----------------------------------------------------------------------------
 
-#endif  // FILEFIELD_H
+#endif  // EXPRESSIONFIELD_H

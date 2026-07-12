@@ -21,9 +21,11 @@
 #include "versioncontrol.h"
 #include "cachefxcommand.h"
 #include "xdtsio.h"
+#include "sxfio.h"
 #include "expressionreferencemanager.h"
 #include "levelcommand.h"
 #include "columncommand.h"
+#include "tstreamexception.h"
 
 // TnzTools includes
 #include "tools/toolhandle.h"
@@ -1369,8 +1371,8 @@ void IoCmd::newScene() {
   app->getCurrentObject()->setIsSpline(false);
   app->getCurrentColumn()->setColumnIndex(0);
 
-  // CleanupParameters *cp = scene->getProperties()->getCleanupParameters();
-  // CleanupParameters::GlobalParameters.assign(cp);
+  CleanupParameters *cp = scene->getProperties()->getCleanupParameters();
+  CleanupParameters::GlobalParameters.assign(cp);
   // CleanupSettingsModel::onSceneSwitched()
 
   // updateCleanupSettingsPopup();
@@ -1381,7 +1383,7 @@ void IoCmd::newScene() {
 
   if (!TApp::instance()->isApplicationStarting())
     QApplication::clipboard()->clear();
-  TSelection::setCurrent(0);
+  TSelection::setCurrent(nullptr);
   TUndoManager::manager()->reset();
 
   bool exist = TSystem::doesExistFileOrLevel(
@@ -1501,9 +1503,12 @@ bool IoCmd::saveScene(const TFilePath &path, int flags) {
 
   // Don't store current cleanup parameters to scene's parameters' cache if
   // autosave (would save to scene file) .
+  CleanupParameters *cp = scene->getProperties()->getCleanupParameters();
+  CleanupParameters keepCP(*cp);
   if (!isAutosave) {
-    CleanupParameters::GlobalParameters.assign(
-        scene->getProperties()->getCleanupParameters());
+    // In case of a .cln file be loaded into GlobalParemeters,
+    // we should also write these info into .tnz (scene file)
+    cp->assign(&CleanupParameters::GlobalParameters, false);
   }
 
   // Must wait for current save to finish, just in case
@@ -1518,6 +1523,13 @@ bool IoCmd::saveScene(const TFilePath &path, int flags) {
     DVGui::error(QObject::tr("Couldn't save %1").arg(toQString(scenePath)));
   }
   TApp::instance()->setSaveInProgress(false);
+
+  cp->assign(&keepCP);
+  // Make sure that the current cleanup palette is set to currentParams' palette
+  TApp::instance()
+      ->getPaletteController()
+      ->getCurrentCleanupPalette()
+      ->setPalette(cp->m_cleanupPalette.getPointer());
 
   // in case of saving subxsheet, revert the level paths after saving
   revertOrgLevelPaths();
@@ -1862,8 +1874,9 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
   assert(!path.isEmpty());
   TFilePath scenePath = path;
   bool isXdts         = scenePath.getType() == "xdts";
+  bool isSxf          = scenePath.getType() == "sxf";
   if (scenePath.getType() == "") scenePath = scenePath.withType("tnz");
-  if (scenePath.getType() != "tnz" && !isXdts) {
+  if (scenePath.getType() != "tnz" && !isXdts && !isSxf) {
     QString msg;
     msg = QObject::tr("File %1 doesn't look like a TOONZ Scene")
               .arg(QString::fromStdWString(scenePath.getWideString()));
@@ -1959,6 +1972,8 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
   try {
     if (isXdts)
       XdtsIo::loadXdtsScene(scene, scenePath);
+    else if (isSxf)
+      SxfIo::loadSxfScene(scene, scenePath);
     else
       /*-- プログレス表示を行いながらLoad --*/
       scene->load(scenePath);
@@ -1975,6 +1990,17 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
       scene->setProject(currentProject);
     }
     VersionControlManager::instance()->setFrameRange(scene->getLevelSet());
+  } catch (TException &e) {
+    printf("%s:%s TException ...:\n", __FILE__, __FUNCTION__);
+
+    QString detailMsg = QString::fromStdWString(e.getMessage());
+
+    QString msg =
+        QObject::tr("There were problems loading the scene %1.\nDetails:\n\n%2")
+            .arg(QString::fromStdWString(scenePath.getWideString()))
+            .arg(detailMsg);
+
+    DVGui::warning(msg);
   } catch (...) {
     printf("%s:%s Exception ...:\n", __FILE__, __FUNCTION__);
     QString msg;
@@ -2003,8 +2029,8 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
   PreviewFxManager::instance()->reset();
   // updateCleanupSettingsPopup();
   /*- CleanupParameterの更新 -*/  // CleanupSettingsModel::onSceneSwitched()
-  // CleanupParameters *cp = scene->getProperties()->getCleanupParameters();
-  // CleanupParameters::GlobalParameters.assign(cp);
+  CleanupParameters *cp = scene->getProperties()->getCleanupParameters();
+  CleanupParameters::GlobalParameters.assign(cp);
   CacheFxCommand::instance()->onSceneLoaded();
 
 #ifdef USE_SQLITE_HDPOOL
@@ -2455,7 +2481,7 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
     if (importDialog.aborted()) break;
 
     LoadResourceArguments::ResourceData rd(args.resourceDatas[r]);
-    TFilePath &path  = rd.m_path;
+    TFilePath path   = rd.m_path;
     QString origName = path.withoutParentDir().getQString();
 
     if (!path.isLevelName())
@@ -2463,8 +2489,13 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
 
     // duplicate check
     auto isDuplicate =
-        [&rd](const IoCmd::LoadResourceArguments::ResourceData &existingRd) {
-          return existingRd.m_path == rd.m_path;
+        [&path,
+         scene](const IoCmd::LoadResourceArguments::ResourceData &existingRd) {
+          if (!existingRd.m_path.isAbsolute() || !path.isAbsolute())
+            return scene->decodeFilePath(existingRd.m_path) ==
+                   scene->decodeFilePath(path);
+          else
+            return existingRd.m_path == path;
         };
     if (std::find_if(rds.begin(), rds.end(), isDuplicate) != rds.end()) {
       if (!all) {
@@ -2760,6 +2791,7 @@ bool IoCmd::importLipSync(TFilePath levelPath, QList<TFrameId> frameList,
                      .arg(toQString(levelPath)));
     return false;
   }
+  return true;
 }
 
 // Use double value DPI as policy
@@ -2829,7 +2861,7 @@ void IoCmd::convertNAARaster2TLV(
   TApp *app                           = TApp::instance();
   ToonzScene *scene                   = app->getCurrentScene()->getScene();
   for (auto &rd : rds) {
-    TFilePath &path = rd.m_path;
+    TFilePath path = rd.m_path;
     if (path.getDots() == ".." &&
         rasterExts.contains(QString::fromStdString(path.getType()).toLower())) {
       if (!path.isAbsolute()) path = scene->decodeFilePath(path);
@@ -2858,14 +2890,21 @@ void IoCmd::convertNAARaster2TLV(
       }
       IoCmd::ConvertingPopup convertingPopup(TApp::instance()->getMainWindow(),
                                              path);
-      /*convertingPopup.show();
-      ImageUtils::convertNaa2Tlv(path, dstPath, from, to,
-      convertingPopup.getNotifier(), 0, true, dpi); convertingPopup.hide(); path
-      = convertingPopup.getResultPath();*/
+      if (ImageUtils::isPaintedImage(first)) {
+        convertingPopup.setMaximum(to - from + 1);
+        convertingPopup.show();
+        ImageUtils::convertNaa2Tlv(path, dstPath, from, to,
+                                   convertingPopup.getNotifier(), 0, true, dpi);
+        convertingPopup.hide();
+        if (!convertingPopup.wasCanceled())
+          rd = LoadResourceArguments::ResourceData(dstPath);
+        return;
+      }
+
       Convert2Tlv converter(path, TFilePath(), dstPath.getParentDir(),
                             QString::fromStdWString(dstPath.getWideName()),
-                            from, to, false, TFilePath(), 20, 0, 50, false,
-                            true, dpi);
+                            from, to, false, TFilePath(), 0, 0, 50, true, true,
+                            dpi);
 
       std::string e;
       converter.init(e);
@@ -2888,7 +2927,8 @@ void IoCmd::convertNAARaster2TLV(
           }
         }
         convertingPopup.hide();
-        if (!convertingPopup.wasCanceled()) path = scene->codeFilePath(dstPath);
+        if (!convertingPopup.wasCanceled())
+          rd = LoadResourceArguments::ResourceData(dstPath);
       }
     }
   }

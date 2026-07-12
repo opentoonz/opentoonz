@@ -660,11 +660,11 @@ SeparateColorsPopup::SeparateColorsPopup()
   //----
   {
     QVBoxLayout* leftLay = new QVBoxLayout();
-    leftLay->setMargin(5);
+    leftLay->setContentsMargins(5, 5, 5, 5);
     leftLay->setSpacing(5);
     {
       QHBoxLayout* previewLay = new QHBoxLayout();
-      previewLay->setMargin(0);
+      previewLay->setContentsMargins(0, 0, 0, 0);
       previewLay->setSpacing(5);
       {
         previewLay->addWidget(new QLabel(tr("Preview Frame:"), this), 0,
@@ -690,11 +690,11 @@ SeparateColorsPopup::SeparateColorsPopup()
     mainSplitter->addWidget(leftWidget);
 
     QVBoxLayout* rightLay = new QVBoxLayout();
-    rightLay->setMargin(10);
+    rightLay->setContentsMargins(10, 10, 10, 10);
     rightLay->setSpacing(10);
     {
       QGridLayout* upperLay = new QGridLayout();
-      upperLay->setMargin(0);
+      upperLay->setContentsMargins(0, 0, 0, 0);
       upperLay->setHorizontalSpacing(5);
       upperLay->setVerticalSpacing(10);
       {
@@ -722,7 +722,7 @@ SeparateColorsPopup::SeparateColorsPopup()
         upperLay->addWidget(m_borderSmoothnessFld, 6, 1);
 
         QGridLayout* maskLay = new QGridLayout();
-        maskLay->setMargin(10);
+        maskLay->setContentsMargins(10, 10, 10, 10);
         maskLay->setHorizontalSpacing(5);
         maskLay->setVerticalSpacing(10);
         {
@@ -744,14 +744,14 @@ SeparateColorsPopup::SeparateColorsPopup()
       rightLay->addLayout(upperLay, 0);
 
       QGridLayout* middleLay = new QGridLayout();
-      middleLay->setMargin(0);
+      middleLay->setContentsMargins(0, 0, 0, 0);
       middleLay->setHorizontalSpacing(5);
       middleLay->setVerticalSpacing(10);
       {
         middleLay->addWidget(new QLabel(tr("Start:"), this), 0, 0,
                              Qt::AlignRight);
         QHBoxLayout* rangeLay = new QHBoxLayout();
-        rangeLay->setMargin(0);
+        rangeLay->setContentsMargins(0, 0, 0, 0);
         rangeLay->setSpacing(5);
         {
           rangeLay->addWidget(m_fromFld, 0);
@@ -796,7 +796,7 @@ SeparateColorsPopup::SeparateColorsPopup()
       rightLay->addSpacing(10);
 
       QHBoxLayout* saveLoadLay = new QHBoxLayout();
-      saveLoadLay->setMargin(0);
+      saveLoadLay->setContentsMargins(0, 0, 0, 0);
       saveLoadLay->setSpacing(0);
       {
         saveLoadLay->addWidget(saveSettingsBtn, 1);
@@ -807,7 +807,7 @@ SeparateColorsPopup::SeparateColorsPopup()
       rightLay->addSpacing(10);
 
       QHBoxLayout* buttonLay = new QHBoxLayout();
-      buttonLay->setMargin(0);
+      buttonLay->setContentsMargins(0, 0, 0, 0);
       buttonLay->setSpacing(0);
       {
         buttonLay->addWidget(m_autoBtn, 0);

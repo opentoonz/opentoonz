@@ -1,3 +1,5 @@
+
+
 #include <memory>
 
 #include "tmachine.h"
@@ -20,8 +22,8 @@ TSoundTrackReaderMp3::TSoundTrackReaderMp3(const TFilePath &fp)
 //------------------------------------------------------------------------------
 
 TSoundTrackP TSoundTrackReaderMp3::load() {
-  FfmpegAudio *ffmepegAudio = new FfmpegAudio();
-  TFilePath tempFile        = ffmepegAudio->getRawAudio(m_path);
+  std::unique_ptr<FfmpegAudio> ffmepegAudio = std::make_unique<FfmpegAudio>();
+  TFilePath tempFile                        = ffmepegAudio->getRawAudio(m_path);
 
   Tifstream is(tempFile);
 
@@ -53,9 +55,24 @@ void FfmpegAudio::runFfmpeg(QStringList args) {
   QProcess ffmpeg;
   ThirdParty::runFFmpeg(ffmpeg, args);
   ffmpeg.waitForFinished(30000);
+
+  // Check if process completed successfully
+  if (ffmpeg.exitStatus() != QProcess::NormalExit) {
+    throw TException(L"FFmpeg process did not exit normally");
+  }
+
   QString results = ffmpeg.readAllStandardError();
   results += ffmpeg.readAllStandardOutput();
+
+  // Check exit code for errors (0 means success)
   int exitCode = ffmpeg.exitCode();
+  if (exitCode != 0) {
+    std::string errorMsg = results.toStdString();
+    throw TException(L"FFmpeg failed with exit code: " +
+                     std::to_wstring(exitCode) + L"\n" +
+                     QString::fromStdString(errorMsg).toStdWString());
+  }
+
   ffmpeg.close();
   std::string strResults = results.toStdString();
 }
@@ -65,6 +82,12 @@ TFilePath FfmpegAudio::getRawAudio(TFilePath path) {
   TFilePath outPath      = getFfmpegCache() + TFilePath(name + ".raw");
   std::string strPath    = path.getQString().toStdString();
   std::string strOutPath = outPath.getQString().toStdString();
+
+  // Check if file already exists in cache
+  if (TSystem::doesExistFileOrLevel(outPath)) {
+    TSystem::deleteFile(outPath);
+  }
+
   QStringList args;
   args << "-i";
   args << path.getQString();
@@ -76,6 +99,14 @@ TFilePath FfmpegAudio::getRawAudio(TFilePath path) {
   args << "44100";
   args << "-y";
   args << outPath.getQString();
+
   runFfmpeg(args);
+
+  // Verify the output file was created
+  if (!TSystem::doesExistFileOrLevel(outPath)) {
+    throw TException(L"FFmpeg failed to create output file: " +
+                     outPath.getWideString());
+  }
+
   return outPath;
 }

@@ -1,0 +1,6 @@
+<fxlayout>
+	<page name="Smoother Iwa">
+		<control>threshold</control>
+		<control>softness</control>
+	</page>
+</fxlayout>

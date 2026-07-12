@@ -276,13 +276,13 @@ IntField::IntField(QWidget *parent, bool isMaxRangeLimited, bool isRollerHide,
     , m_isLinearSlider(true) {
   setObjectName("IntField");
   QHBoxLayout *layout = new QHBoxLayout(this);
-  layout->setMargin(0);
+  layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(5);
 
   QWidget *field = new QWidget(this);
   field->setMaximumWidth(43);
   QVBoxLayout *vLayout = new QVBoxLayout(field);
-  vLayout->setMargin(0);
+  vLayout->setContentsMargins(0, 0, 0, 0);
   vLayout->setSpacing(0);
 
   m_lineEdit = new DVGui::IntLineEdit(field);

@@ -192,7 +192,7 @@ bool Particles_Engine::port_is_used_for_gradient(
          (values.speeda_ctrl_val == i && values.speeda_use_gradient_val);
 }
 /*-----------------------------------------------------------------*/
-/*-- Startフレームからカレントフレームまで順番に回す関数 --*/
+/*-- Function to iterate sequentially from Start frame to Current frame --*/
 void Particles_Engine::roll_particles(
     TTile *tile, std::map<int, TTile *> porttiles, const TRenderSettings &ri,
     std::list<Particle> &myParticles, struct particles_values &values, float cx,
@@ -201,7 +201,7 @@ void Particles_Engine::roll_particles(
   particles_ranges ranges;
   int i, newparticles;
   float xgravity, ygravity, windx, windy;
-  /*-- 風の強さ／重力の強さをX,Y成分に分ける --*/
+  /*-- Separate wind strength/gravity strength into X,Y components --*/
   windx    = values.windint_val * sin(values.windangle_val);
   windy    = values.windint_val * cos(values.windangle_val);
   xgravity = values.gravity_val * sin(values.g_angle_val);
@@ -211,23 +211,21 @@ void Particles_Engine::roll_particles(
 
   std::vector<std::vector<TPointD>> myregions;
 
-  /*-- [1〜255]
-   * そのIndexに対応するアルファ値を持つピクセルのインデックス値を保存。 [0]
-   * 使用せず --*/
+  /*-- [1~255] Store index values of pixels with corresponding alpha values at
+   * that index. [0] not used --*/
   std::vector<std::vector<int>> myHistogram;
-  /*--
-   * アルファ値255から下がっていき、ピクセル数×重み又はアルファ値を次々足した値を格納
-   * --*/
+  /*-- Store cumulative value of pixel count � weight or alpha value going down
+   * from alpha 255 --*/
   std::vector<float> myWeight;
 
   std::map<int, TTile *>::iterator it = porttiles.find(values.source_ctrl_val);
-  /*-- Perspective
-   * DistributionがONのとき、Sizeに刺さったControlImageが粒子の発生分布を決める
-   * --*/
+  /*-- When Perspective Distribution is ON, ControlImage connected to Size
+     determines particle generation distribution. If Control is connected to
+     Source, it is used as mask --*/
   std::map<int, TTile *>::iterator sizeIt =
       porttiles.find(values.scale_ctrl_val);
   if (values.perspective_distribution_val && (sizeIt != porttiles.end())) {
-    /*-- ソース画像にコントロールが付いていた場合、そのアルファ値をマスクに使う
+    /*-- If there is control attached to source image, use its alpha as mask
      * --*/
     if (values.source_ctrl_val && (it != porttiles.end()))
       fill_regions_with_size_map(myregions, myHistogram, sizeIt->second,
@@ -235,32 +233,33 @@ void Particles_Engine::roll_particles(
     else
       fill_regions_with_size_map(myregions, myHistogram, sizeIt->second, 0,
                                  values.bright_thres_val);
-    /*- パーティクルを作る前に myregion内の候補数を合計する--*/
+    /*- Count candidate points in myregion before creating particles --*/
     if ((int)myHistogram.size() == 256) {
       for (int m = 255; m >= 0; m--) {
-        /*-- 明度からサイズ サイズから重みを出す --*/
+        /*-- Get weight from brightness to size, size to weight --*/
         float scale =
             values.scale_val.first + ranges.scale_range * (float)m / 255.0f;
         float weight = 1.0f / (scale * scale);
 
         float tmpSum = weight * (float)myHistogram[m].size();
         int index    = 255 - m;
-        if (index > 0) /*-- これまでの合計に追加する --*/
+        if (index > 0) /*-- Add to previous total --*/
           tmpSum += myWeight[index - 1];
         myWeight.push_back(tmpSum);
       }
     }
   } else {
-    /*- ソース画像にコントロールが付いていた場合 -*/
+    /*- If there is control attached to source image -*/
     if (values.source_ctrl_val && (it != porttiles.end()))
-      /*-- 入力画像のアルファ値に比例して発生濃度を変える --*/
+      /*-- Vary generation density proportional to alpha value of input image
+       * --*/
       fill_regions(1, myregions, it->second, values.multi_source_val,
                    values.bright_thres_val, values.source_gradation_val,
                    myHistogram);
 
-    /*- パーティクルを作る前に myregion内の候補数を合計する--*/
-    /*-- myWeight
-     * の中には、アルファ255から0まで、各アルファ値×ポイント数を足しこんでいったものが格納される。--*/
+    /*- Count candidate points in myregion before creating particles --*/
+    /*-- myWeight stores cumulative sum of each alpha value � point count from
+     * alpha 255 to 0 --*/
     if ((int)myHistogram.size() == 256) {
       for (int m = 255; m > 0; m--) {
         float tmpSum = (float)(m * (int)myHistogram[m].size());
@@ -271,14 +270,15 @@ void Particles_Engine::roll_particles(
     }
   }
 
-  /*- birth rate を格納 -*/
+  /*- Store birth rate -*/
   newparticles = (int)values.maxnum_val;
   if (myParticles.empty() && newparticles)  // Initial creation
   {
-    /*- 新たに作るパーティクルの数だけ繰り返す -*/
+    /*- Repeat for number of new particles to create -*/
     for (i = 0; i < newparticles; i++) {
-      int seed  = (int)((std::numeric_limits<int>::max)() *
-                       values.random_val->getFloat());
+      int seed = static_cast<int>(
+          static_cast<double>(std::numeric_limits<int>::max()) *
+          values.random_val->getFloat());
       int level = (int)(values.random_val->getFloat() * level_n);
 
       int lifetime = 0;
@@ -313,8 +313,9 @@ void Particles_Engine::roll_particles(
     switch (values.toplayer_val) {
     case ParticlesFx::TOP_YOUNGER:
       for (i = 0; i < newparticles; i++) {
-        int seed  = (int)((std::numeric_limits<int>::max)() *
-                         values.random_val->getFloat());
+        int seed = static_cast<int>(
+            static_cast<double>(std::numeric_limits<int>::max()) *
+            values.random_val->getFloat());
         int level = (int)(values.random_val->getFloat() * level_n);
 
         int lifetime = 0;
@@ -339,11 +340,11 @@ void Particles_Engine::roll_particles(
       for (i = 0; i < newparticles; i++) {
         double tmp = values.random_val->getFloat() * myParticles.size();
         std::list<Particle>::iterator it = myParticles.begin();
-        for (int j = 0; j < tmp; j++, it++)
-          ;
+        std::advance(it, static_cast<int>(tmp));
         {
-          int seed     = (int)((std::numeric_limits<int>::max)() *
-                           values.random_val->getFloat());
+          int seed = static_cast<int>(
+              static_cast<double>(std::numeric_limits<int>::max()) *
+              values.random_val->getFloat());
           int level    = (int)(values.random_val->getFloat() * level_n);
           int lifetime = 0;
 
@@ -366,8 +367,9 @@ void Particles_Engine::roll_particles(
 
     default:
       for (i = 0; i < newparticles; i++) {
-        int seed     = (int)((std::numeric_limits<int>::max)() *
-                         values.random_val->getFloat());
+        int seed = static_cast<int>(
+            static_cast<double>(std::numeric_limits<int>::max()) *
+            values.random_val->getFloat());
         int level    = (int)(values.random_val->getFloat() * level_n);
         int lifetime = 0;
 
@@ -450,12 +452,12 @@ void Particles_Engine::render_particles(
         (renderer && renderer.isPrecomputingEnabled()) ? true : false;
   }
 
-  memset(&values, 0, sizeof(values));
-  /*- 現在のフレームでの各種パラメータを得る -*/
+  // memset(&values, 0, sizeof(values));
+  /*- Get various parameters for current frame -*/
   fill_value_struct(values, m_frame);
-  /*- 不透明度の範囲（透明〜不透明を 0〜1 に正規化）-*/
+  /*- Opacity range (normalize transparent~opaque to 0~1) -*/
   opacity_range = (values.opacity_val.second - values.opacity_val.first) * 0.01;
-  /*- 開始フレーム -*/
+  /*- Start frame -*/
   startframe = (int)values.startpos_val;
   if (values.unit_val == ParticlesFx::UNIT_SMALL_INCH)
     dpicorr_shrinked = dpicorr / shrink;
@@ -486,19 +488,21 @@ void Particles_Engine::render_particles(
     myRandom       = particlesData->m_random;
     totalparticles = particlesData->m_totalParticles;
   }
-  /*- スタートからカレントフレームまでループ -*/
+  /*- Loop from start to current frame -*/
   for (frame = startframe - 1; frame <= curr_frame; ++frame) {
     int dist_frame = curr_frame - frame;
     /*-
-     * ループ内の現在のフレームでのパラメータを取得。スタートが負ならフレーム=0のときの値を格納
+     * Get parameters for current frame within loop. If start is negative, store
+     * values for frame=0
      * -*/
     fill_value_struct(values, frame < 0 ? 0 : frame * values.step_val);
-    /*- パラメータの正規化 -*/
+    /*- Parameter normalization -*/
     normalize_values(values, ri);
-    /*- maxnum_valは"birth_rate"のパラメータ -*/
+    /*- maxnum_val is the "birth_rate" parameter -*/
     intpart = (int)values.maxnum_val;
     /*-
-     * /birth_rateが小数だったとき、各フレームの小数部分を足しこんだ結果の整数部分をintpartに渡す。
+     * When birth_rate is decimal, pass integer part resulting from accumulating
+     * decimal parts of each frame to intpart.
      * -*/
     fractpart = fractpart + values.maxnum_val - intpart;
     if ((int)fractpart) {
@@ -509,12 +513,12 @@ void Particles_Engine::render_particles(
     std::map<int, TTile *> porttiles;
 
     // Perform the roll
-    /*- RenderSettingsを複製して現在のフレームの計算用にする -*/
+    /*- Duplicate RenderSettings for current frame calculation -*/
     TRenderSettings riAux(ri);
     riAux.m_affine           = TAffine();
     riAux.m_bpp              = 32;
     riAux.m_linearColorSpace = false;
-    // control image using its gradient is computed in 64bpp
+    // control image using its gradient is computed in 64bpc
     TRenderSettings riAux64(riAux);
     riAux64.m_bpp = 64;
 
@@ -523,7 +527,7 @@ void Particles_Engine::render_particles(
       r_frame = 0;
     else
       r_frame = frame;
-    /*- 出力画像のバウンディングボックス -*/
+    /*- Bounding box of output image -*/
     TRectD outTileBBox(tile->m_pos, TDimensionD(tile->getRaster()->getLx(),
                                                 tile->getRaster()->getLy()));
 
@@ -544,15 +548,15 @@ void Particles_Engine::render_particles(
     }
     bboxForInifiniteSource += sourceBbox;
 
-    /*- Controlに刺さっている各ポートについて -*/
+    /*- For each port connected to Control -*/
     for (std::map<int, TRasterFxPort *>::iterator it = ctrl_ports.begin();
          it != ctrl_ports.end(); ++it) {
       TTile *tmp;
-      /*- ポートが接続されていて、Fx内で実際に使用されていたら -*/
+      /*- If port is connected and actually used within Fx -*/
       if ((it->second)->isConnected() && port_is_used(it->first, values)) {
         TRectD bbox;
         (*(it->second))->getBBox(r_frame, bbox, riAux);
-        /*- 素材が存在する場合、portTilesにコントロール画像タイルを格納 -*/
+        /*- If material exists, store control image tile in portTiles -*/
         if (!bbox.isEmpty()) {
           if (bbox == TConsts::infiniteRectD)  // There could be an infinite
                                                // bbox - deal with it
@@ -713,7 +717,7 @@ void Particles_Engine::render_particles(
 }
 
 //-----------------------------------------------------------------
-/*- render_particles から呼ばれる。粒子の数だけ繰り返し -*/
+/*- Called from render_particles. Repeat for each particle -*/
 void Particles_Engine::do_render(
     Particle *part, TTile *tile, std::vector<TRasterFxPort *> part_ports,
     std::map<int, TTile *> porttiles, const TRenderSettings &ri,
@@ -778,7 +782,7 @@ void Particles_Engine::do_render(
   riNew.m_affine           = TScale(partScale);
   bbox                     = riNew.m_affine * bbox;
   riNew.m_linearColorSpace = false;
-  /*- 縮小済みのParticleのサイズ -*/
+  /*- Size of scaled down Particle -*/
   partResolution = TDimensionD(tceil(bbox.getLx()), tceil(bbox.getLy()));
 
   TRasterP ras;
@@ -842,7 +846,7 @@ void Particles_Engine::do_render(
       part->set_Opacity(porttiles, values, opacity_range, dist_frame);
   if (curr_opacity != 1.0 || part->gencol.fadecol || part->fincol.fadecol ||
       part->foutcol.fadecol) {
-    /*- 毎フレーム現在位置のピクセル色を参照 -*/
+    /*- Reference pixel color at current position every frame -*/
     if (values.pick_color_for_every_frame_val && values.gencol_ctrl_val &&
         (porttiles.find(values.gencol_ctrl_val) != porttiles.end()))
       part->get_image_reference(porttiles[values.gencol_ctrl_val], values,
@@ -1076,7 +1080,7 @@ bool Particles_Engine::do_render_motion_blur(
             framePosRatio = 1.0f;
           }
         }
-        /* If the distance is farther than (√ 2 + 1) / 2, continue
+        /* If the distance is farther than (? 2 + 1) / 2, continue
          * Because it is a comparison with dist2, the value is squared */
         if (dist2 > 1.4571f) continue;
 
@@ -1149,7 +1153,7 @@ bool Particles_Engine::do_render_motion_blur(
       float countRatio = (float)count / 256.0f;
 
       /* The brightness of the filter value is inversely proportional
-       * to the area of ​​the line of width 1 made by the vector.
+       * to the area of ??the line of width 1 made by the vector.
        *
        * Since there are semicircular caps with radius 0.5
        * before and after the vector, it will never be 0-divide
@@ -1396,7 +1400,7 @@ void Particles_Engine::normalize_array(
 }
 
 /*-----------------------------------------------------------------*/
-/*- multiがONのときのSource画像（ctrl1）の領域を分析 -*/
+/*- Analyze source image (ctrl1) regions when multi is ON -*/
 void Particles_Engine::fill_subregions(
     int cont_index, std::vector<std::vector<TPointD>> &myregions, TTile *ctrl1,
     int thres) {
@@ -1419,13 +1423,13 @@ void Particles_Engine::fill_subregions(
 }
 
 /*-----------------------------------------------------------------*/
-/*- 入力画像のアルファ値に比例して発生濃度を変える。各Pointにウェイトを持たせる
- * -*/
+/*- Vary emission density proportional to alpha value of input image. Give
+ * weight to each Point -*/
 void Particles_Engine::fill_single_region(
     std::vector<std::vector<TPointD>> &myregions, TTile *ctrl1, int threshold,
     bool do_source_gradation, std::vector<std::vector<int>> &myHistogram) {
   TRaster32P raster32 = ctrl1->getRaster();
-  assert(raster32);  // per ora gestisco solo i Raster32
+  assert(raster32);  // for now only handle Raster32
                      //  int lx=raster32->getLx();
                      //  int ly=raster32->getLy();
   int j;
@@ -1435,7 +1439,7 @@ void Particles_Engine::fill_single_region(
   int icc = 0;
   raster32->lock();
 
-  if (!do_source_gradation) /*- 2階調の場合 -*/
+  if (!do_source_gradation) /*- Two-tone case -*/
   {
     for (j = 0; j < raster32->getLy(); j++) {
       TPixel32 *pix    = raster32->pixels(j);
@@ -1469,8 +1473,8 @@ void Particles_Engine::fill_single_region(
       int i            = 0;
       while (pix < endPix) {
         cc++;
-        /*-- アルファの濃度に比例してパーティクルを発生させるための、
-                シンプルな方法。そのピクセルのアルファ値の数だけ「立候補」させる。
+        /*-- Simple method to generate particles proportional to alpha density:
+                "nominate" as many times as the alpha value of that pixel.
         --*/
         if (pix->m > 0) {
           icc++;
@@ -1479,9 +1483,9 @@ void Particles_Engine::fill_single_region(
           tmp.x = i;
           tmp += ctrl1->m_pos;
 
-          /*- Histogramの登録 -*/
+          /*- Histogram registration -*/
           myHistogram[(int)pix->m].push_back((int)myregions[0].size());
-          /*-  各Pointにウェイトを持たせる -*/
+          /*- Give weight to each Point -*/
           myregions[0].push_back(tmp);
         } else {
         }
@@ -1496,7 +1500,8 @@ void Particles_Engine::fill_single_region(
 
 /*-----------------------------------------------------------------*/
 /*-
- * 入力画像のアルファ値に比例して発生濃度を変える。Histogramを格納しながら領域を登録
+ * Vary emission density proportional to alpha value of input image. Register
+ * regions while storing Histogram
  * -*/
 void Particles_Engine::fill_regions(
     int frame, std::vector<std::vector<TPointD>> &myregions, TTile *ctrl1,
@@ -1519,9 +1524,9 @@ void Particles_Engine::fill_regions(
 }
 
 //----------------------------------------------------------------
-/*-- Perspective
-DistributionがONのとき、Sizeに刺さったControlImageが粒子の発生分布を決める。
-        そのとき、SourceのControlが刺さっている場合は、マスクとして用いられる
+/*-- When Perspective Distribution is ON, ControlImage connected to Size
+determines particle generation distribution. When Control is connected to
+Source, it is used as mask
 --*/
 
 void Particles_Engine::fill_regions_with_size_map(
@@ -1565,12 +1570,14 @@ void Particles_Engine::fill_regions_with_size_map(
         sourcePix = 0;
 
       /*-
-       * Source画像があって、ピクセルがバウンディング外またはアルファが０なら抜かす。
+       * If source image exists and pixel is outside bounding or alpha is 0,
+       * skip.
        * -*/
       if (sourceRas && (!sourcePix || sourcePix->m <= thres)) {
       }
       /*-
-         明度に比例してパーティクルを発生させる。そのピクセルのアルファ値の数だけ「立候補」させる。-*/
+          Generate particles proportional to brightness. "Nominate" as many
+         times as the alpha value of that pixel.*/
       else {
         TPointD tmp;
         tmp.y = j;
@@ -1579,10 +1586,10 @@ void Particles_Engine::fill_regions_with_size_map(
 
         int val = (int)TPixelGR8::from(*pix).value;
 
-        /*- Histogramの登録 -*/
+        /*- Histogram registration -*/
         myHistogram[val].push_back((int)myregions[0].size());
 
-        /*- 各Pointにウェイトを持たせる -*/
+        /*- Give weight to each Point -*/
         myregions[0].push_back(tmp);
       }
 

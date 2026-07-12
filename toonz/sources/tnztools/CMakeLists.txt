@@ -52,6 +52,7 @@ set(HEADERS
     ../include/tools/track.h
     ../include/tools/inputmanager.h
     ../include/tools/assistant.h
+    ../include/tools/editassistantstool.h
     ../include/tools/replicator.h
     ../include/tools/modifiers/modifierassistants.h
     ../include/tools/modifiers/modifierclone.h
@@ -161,13 +162,15 @@ set(RESOURCES tnztools.qrc)
 
 qt5_add_resources(SOURCES ${RESOURCES})
 
-if(WITH_TRANSLATION)
-    add_translation(tnztools ${HEADERS} ${SOURCES})
-endif()
-
 qt5_wrap_cpp(SOURCES ${MOC_HEADERS})
 
 add_library(tnztools SHARED ${HEADERS} ${SOURCES} ${RESOURCES})
+
+if(WITH_TRANSLATION)
+    add_translation(tnztools ${HEADERS} ${SOURCES})
+    add_compile_translations_command(tnztools tnztools)
+endif()
+
 add_definitions(
     -DTNZTOOLS_EXPORTS
 )

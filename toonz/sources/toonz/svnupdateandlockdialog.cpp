@@ -46,7 +46,7 @@ SVNUpdateAndLockDialog::SVNUpdateAndLockDialog(QWidget *parent,
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->setAlignment(Qt::AlignHCenter);
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
 
   QHBoxLayout *hLayout = new QHBoxLayout;
 

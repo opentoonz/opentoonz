@@ -1,51 +1,64 @@
 
 
 #include "filmstripcommand.h"
+
+// Tnz6 includes
 #include "tapp.h"
+#include "tundo.h"
+#include "historytypes.h"
+#include "drawingdata.h"
+#include "tinbetween.h"
+#include "timagecache.h"
+
+#include "tools/toolhandle.h"
+#include "tools/toolutils.h"
+#include "tools/rasterselection.h"
+
+// TnzQt includes
+#include "toonzqt/selection.h"
+#include "toonzqt/dvdialog.h"
+#include "toonzqt/strokesdata.h"
+#include "toonzqt/rasterimagedata.h"
+#include "toonzqt/icongenerator.h"
+#include "toonzqt/gutil.h"
+
+// TnzLib includes
 #include "toonz/palettecontroller.h"
+
 #include "toonz/txshlevelhandle.h"
 #include "toonz/txsheethandle.h"
 #include "toonz/tscenehandle.h"
 #include "toonz/tpalettehandle.h"
 #include "toonz/tframehandle.h"
-#include "tinbetween.h"
-#include "tvectorimage.h"
-#include "ttoonzimage.h"
-#include "toonzqt/selection.h"
-#include "toonzqt/dvdialog.h"
-#include "drawingdata.h"
-#include "toonzqt/strokesdata.h"
-#include "toonzqt/rasterimagedata.h"
-#include "timagecache.h"
-#include "tools/toolhandle.h"
-#include "tools/toolutils.h"
-#include "tools/rasterselection.h"
-#include "toonzqt/icongenerator.h"
 
-#include "tundo.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/txshchildlevel.h"
 #include "toonz/txshsoundlevel.h"
 #include "toonz/txshpalettelevel.h"
 #include "toonz/txshpalettecolumn.h"
 #include "toonz/txshsoundcolumn.h"
+
 #include "toonz/txsheet.h"
 #include "toonz/txshcell.h"
 #include "toonz/toonzscene.h"
 #include "toonz/levelset.h"
 #include "toonz/txshleveltypes.h"
+
 #include "toonz/toonzimageutils.h"
 #include "toonz/trasterimageutils.h"
 #include "toonz/tcamera.h"
 #include "toonz/preferences.h"
+
+// TnzCore includes
 #include "trop.h"
 
-#include "toonzqt/gutil.h"
-
-#include "historytypes.h"
-
+// Qt includes
 #include <QApplication>
 #include <QClipboard>
+
+// C++ includes
+#include <memory>
+#include <algorithm>
 
 //=============================================================================
 
@@ -115,33 +128,26 @@ static void updateXSheet(TXshSimpleLevel *sl, std::vector<TFrameId> oldFids,
 
 //=============================================================================
 // makeSpaceForFid
-// se necessario renumera gli altri fid del livello in modo che
-// framesToInsert siano liberi
-// n.b. modifica
+// TODO: If necessary, renumber other frame IDs in the level
+// before inserting framesToInsert, so that the IDs are free.
 //-----------------------------------------------------------------------------
 
 void makeSpaceForFids(TXshSimpleLevel *sl,
                       const std::set<TFrameId> &framesToInsert) {
-  std::vector<TFrameId> fids;
-  std::vector<TFrameId> oldFids;
+  std::vector<TFrameId> fids, oldFids;
   sl->getFids(fids);
-  sl->getFids(oldFids);
-  std::set<TFrameId>::const_iterator it;
+  oldFids = fids;
   std::set<TFrameId> touchedFids;
-  for (it = framesToInsert.begin(); it != framesToInsert.end(); ++it) {
-    // devo inserire fid
-    TFrameId fid(*it);
-    std::vector<TFrameId>::iterator j;
-    // controllo che non ci sia gia'
-    j = fids.begin();
-    while (j = std::find(j, fids.end(), fid), j != fids.end()) {
-      // c'e' gia' un fid. faccio fid -> fid + 1
+  for (const TFrameId &fidBase : framesToInsert) {
+    TFrameId fid = fidBase;
+    auto j       = fids.begin();
+    while ((j = std::find(j, fids.end(), fid)) != fids.end()) {
       touchedFids.insert(fid);
       fid = fid + 1;
       touchedFids.insert(fid);
       *j = fid;
-      // adesso devo controllare che il nuovo fid non ci sia gia' nella
-      // parte restante dell'array fids
+ // Now I need to check that the new fid is not already
+// in the remaining part of the fids array
       ++j;
     }
   }
@@ -155,12 +161,10 @@ void makeSpaceForFids(TXshSimpleLevel *sl,
 
 //=============================================================================
 namespace {
-//-----------------------------------------------------------------------------
 
 void copyFramesWithoutUndo(TXshSimpleLevel *sl, std::set<TFrameId> &frames) {
   QClipboard *clipboard = QApplication::clipboard();
-  TXsheet *xsh          = TApp::instance()->getCurrentXsheet()->getXsheet();
-  DrawingData *data     = new DrawingData();
+  auto *data            = new DrawingData();
   data->setLevelFrames(sl, frames);
   clipboard->setMimeData(data, QClipboard::Clipboard);
 }
@@ -168,20 +172,19 @@ void copyFramesWithoutUndo(TXshSimpleLevel *sl, std::set<TFrameId> &frames) {
 //-----------------------------------------------------------------------------
 // frames is a selected frames in the film strip
 bool pasteAreasWithoutUndo(const QMimeData *data, TXshSimpleLevel *sl,
-                           std::set<TFrameId> &frames, TTileSet **tileSet,
+                           std::set<TFrameId> &frames,
+                           std::unique_ptr<TTileSet> &tileSet,
                            std::map<TFrameId, std::set<int>> &indices) {
   // paste between the same level must keep the palette unchanged
   // Not emitting PaletteChanged signal can avoid the update of color model
   bool paletteHasChanged = true;
 
-  if (const StrokesData *strokesData =
-          dynamic_cast<const StrokesData *>(data)) {
-    std::set<TFrameId>::iterator it;
-    for (it = frames.begin(); it != frames.end(); ++it) {
-      TImageP img = sl->getFrame(*it, true);
+  if (const auto *strokesData = dynamic_cast<const StrokesData *>(data)) {
+    for (const TFrameId &fid : frames) {
+      TImageP img = sl->getFrame(fid, true);
       if (!img) {
         img = sl->createEmptyFrame();
-        sl->setFrame(*it, img);
+        sl->setFrame(fid, img);
       }
       TVectorImageP vi = img;
       TToonzImageP ti  = img;
@@ -189,10 +192,11 @@ bool pasteAreasWithoutUndo(const QMimeData *data, TXshSimpleLevel *sl,
       if (vi) {
         std::set<int> imageIndices;
         strokesData->getImage(vi, imageIndices, true);
-        indices[*it] = imageIndices;
+        indices[fid] = imageIndices;
       } else if (ti) {
-        ToonzImageData *toonzImageData = strokesData->toToonzImageData(ti);
-        return pasteAreasWithoutUndo(toonzImageData, sl, frames, tileSet,
+        std::unique_ptr<ToonzImageData> toonzImageData(
+            strokesData->toToonzImageData(ti));
+        return pasteAreasWithoutUndo(toonzImageData.get(), sl, frames, tileSet,
                                      indices);
       } else if (ri) {
         double dpix, dpiy;
@@ -203,43 +207,35 @@ bool pasteAreasWithoutUndo(const QMimeData *data, TXshSimpleLevel *sl,
           dpiy        = dpi.y;
           ri->setDpi(dpix, dpiy);
         }
-        FullColorImageData *fullColorImageData =
-            strokesData->toFullColorImageData(ri);
-        return pasteAreasWithoutUndo(fullColorImageData, sl, frames, tileSet,
-                                     indices);
+        std::unique_ptr<FullColorImageData> fullColorImageData(
+            strokesData->toFullColorImageData(ri));
+        return pasteAreasWithoutUndo(fullColorImageData.get(), sl, frames,
+                                     tileSet, indices);
       }
     }
-  }
-  // when pasting the copied area selected with the selection tool
-  else if (const RasterImageData *rasterImageData =
-               dynamic_cast<const RasterImageData *>(data)) {
-    std::set<TFrameId>::iterator it;
-    for (it = frames.begin(); it != frames.end(); ++it) {
+  } else if (const auto *rasterImageData =
+                 dynamic_cast<const RasterImageData *>(data)) {
+    for (const TFrameId &fid : frames) {
       if ((sl->getType() == PLI_XSHLEVEL || sl->getType() == TZP_XSHLEVEL) &&
           dynamic_cast<const FullColorImageData *>(rasterImageData)) {
         DVGui::error(QObject::tr(
             "The copied selection cannot be pasted in the current drawing."));
         return false;
       }
-      // obtain the image data to be pasted
-      TImageP img = sl->getFrame(*it, true);
+      TImageP img = sl->getFrame(fid, true);
       if (!img) {
         img = sl->createEmptyFrame();
-        sl->setFrame(*it, img);
+        sl->setFrame(fid, img);
       }
       TToonzImageP ti  = img;
       TRasterImageP ri = img;
       TVectorImageP vi = img;
-      // pasting TLV
       if (ti) {
         TRasterP ras;
         double dpiX, dpiY;
         std::vector<TRectD> rects;
-        std::vector<TStroke> strokes;
-        std::vector<TStroke> originalStrokes;
+        std::vector<TStroke> strokes, originalStrokes;
         TAffine affine;
-
-        // style will be merged in getData() if the palettes are different
         int styleCountBeforePasteImage = ti->getPalette()->getStyleCount();
 
         rasterImageData->getData(ras, dpiX, dpiY, rects, strokes,
@@ -252,12 +248,12 @@ bool pasteAreasWithoutUndo(const QMimeData *data, TXshSimpleLevel *sl,
         ti->getDpi(imgDpiX, imgDpiY);
         TScale sc(imgDpiX / dpiX, imgDpiY / dpiY);
         affine *= sc;
-        int i;
+
         TRectD boxD;
-        if (rects.size() > 0) boxD = rects[0];
-        if (strokes.size() > 0) boxD = strokes[0].getBBox();
-        for (i = 0; i < rects.size(); i++) boxD += rects[i];
-        for (i = 0; i < strokes.size(); i++) boxD += strokes[i].getBBox();
+        if (!rects.empty()) boxD = rects[0];
+        if (!strokes.empty()) boxD = strokes[0].getBBox();
+        for (const auto &r : rects) boxD += r;
+        for (const auto &s : strokes) boxD += s.getBBox();
         boxD       = affine * boxD;
         TRect box  = ToonzImageUtils::convertWorldToRaster(boxD, ti);
         TPoint pos = box.getP00();
@@ -265,37 +261,29 @@ bool pasteAreasWithoutUndo(const QMimeData *data, TXshSimpleLevel *sl,
         if (pos.x < 0) pos.x = 0;
         if (pos.y < 0) pos.y = 0;
 
-        if (*tileSet == 0)
-          *tileSet = new TTileSetCM32(ti->getRaster()->getSize());
+        if (!tileSet)
+          tileSet = std::make_unique<TTileSetCM32>(ti->getRaster()->getSize());
         if (box.overlaps(ti->getRaster()->getBounds()))
-          (*tileSet)->add(ti->getRaster(), box);
+          tileSet->add(ti->getRaster(), box);
         else
-          (*tileSet)->add(0);
+          tileSet->add(nullptr);
         TRasterCM32P app = ras;
         if (app) {
           TRop::over(ti->getRaster(), app, pos, affine);
-          ToolUtils::updateSaveBox(sl, *it);
+          ToolUtils::updateSaveBox(sl, fid);
         }
       } else if (ri) {
         TRasterP ras;
-        double dpiX = 0, dpiY = 0;
-        double imgDpiX = 0, imgDpiY = 0;
+        double dpiX = 0, dpiY = 0, imgDpiX = 0, imgDpiY = 0;
         std::vector<TRectD> rects;
-        std::vector<TStroke> strokes;
-        std::vector<TStroke> originalStrokes;
+        std::vector<TStroke> strokes, originalStrokes;
         TAffine affine;
 
-        TPointD cameraDpi;
-
         ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
-        if (scene) {
-          TCamera *camera = scene->getCurrentCamera();
-          cameraDpi       = camera->getDpi();
-          if (cameraDpi.x == 0.0 ||
-              cameraDpi.y == 0.0)  // it should never happen. just in case...
-            return false;
-        } else
-          return false;
+        if (!scene) return false;
+        TCamera *camera   = scene->getCurrentCamera();
+        TPointD cameraDpi = camera->getDpi();
+        if (cameraDpi.x == 0.0 || cameraDpi.y == 0.0) return false;
 
         rasterImageData->getData(ras, dpiX, dpiY, rects, strokes,
                                  originalStrokes, affine, ri->getPalette());
@@ -303,7 +291,6 @@ bool pasteAreasWithoutUndo(const QMimeData *data, TXshSimpleLevel *sl,
           dpiX = cameraDpi.x;
           dpiY = cameraDpi.y;
         }
-
         ri->getDpi(imgDpiX, imgDpiY);
         if (imgDpiX == 0 || imgDpiY == 0) {
           imgDpiX = cameraDpi.x;
@@ -311,30 +298,34 @@ bool pasteAreasWithoutUndo(const QMimeData *data, TXshSimpleLevel *sl,
         }
         TScale sc(imgDpiX / dpiX, imgDpiY / dpiY);
         affine *= sc;
-        int i;
+
         TRectD boxD;
-        if (rects.size() > 0) boxD = rects[0];
-        if (strokes.size() > 0) boxD = strokes[0].getBBox();
-        for (i = 0; i < rects.size(); i++) boxD += rects[i];
-        for (i = 0; i < strokes.size(); i++) boxD += strokes[i].getBBox();
+        if (!rects.empty()) boxD = rects[0];
+        if (!strokes.empty()) boxD = strokes[0].getBBox();
+        for (const auto &r : rects) boxD += r;
+        for (const auto &s : strokes) boxD += s.getBBox();
         boxD       = affine * boxD;
         TRect box  = TRasterImageUtils::convertWorldToRaster(boxD, ri);
         TPoint pos = box.getP00();
-        if (*tileSet == 0)
-          *tileSet = new TTileSetFullColor(ri->getRaster()->getSize());
+
+        if (!tileSet)
+          tileSet =
+              std::make_unique<TTileSetFullColor>(ri->getRaster()->getSize());
         if (box.overlaps(ri->getRaster()->getBounds()))
-          (*tileSet)->add(ri->getRaster(), box);
+          tileSet->add(ri->getRaster(), box);
         else
-          (*tileSet)->add(0);
+          tileSet->add(nullptr);
+
         TRasterCM32P app = ras;
         if (app)
           TRop::over(ri->getRaster(), app, ri->getPalette(), pos, affine);
         else
           TRop::over(ri->getRaster(), ras, pos, affine);
       } else if (vi) {
-        StrokesData *strokesData =
-            rasterImageData->toStrokesData(sl->getScene());
-        return pasteAreasWithoutUndo(strokesData, sl, frames, tileSet, indices);
+        std::unique_ptr<StrokesData> strokesData(
+            rasterImageData->toStrokesData(sl->getScene()));
+        return pasteAreasWithoutUndo(strokesData.get(), sl, frames, tileSet,
+                                     indices);
       }
     }
   } else
@@ -354,11 +345,11 @@ bool pasteAreasWithoutUndo(const QMimeData *data, TXshSimpleLevel *sl,
 }
 
 //-----------------------------------------------------------------------------
-// Se insert == true incolla i frames nel livello inserendoli, se necessario
-// spostando
-// verso il basso i preesistenti. Altrimenti incolla i frames sostituendoli.
-// il parametro clone images si mette a false quando questa funzione viene usata
-// per un undo/redo.
+// If insert == true, paste the frames into the level by inserting them,
+// moving the existing frames downward if necessary.
+// Otherwise, paste the frames by replacing existing ones.
+// The parameter cloneImages is set to false when this function
+// is used for undo/redo operations.
 
 bool pasteFramesWithoutUndo(const DrawingData *data, TXshSimpleLevel *sl,
                             std::set<TFrameId> &frames,
@@ -390,28 +381,24 @@ bool pasteFramesWithoutUndo(const DrawingData *data, TXshSimpleLevel *sl,
 
 //-----------------------------------------------------------------------------
 
-// "Svuota" i frames: i frames vengono buttati e al loro posto
-// vengono inseriti frames vuoti.
+// "Clear" the frames: the existing frames are discarded
+// and replaced with empty frames.
 std::map<TFrameId, QString> clearFramesWithoutUndo(
     const TXshSimpleLevelP &sl, const std::set<TFrameId> &frames) {
   std::map<TFrameId, QString> clearedFrames;
   if (!sl || frames.empty()) return clearedFrames;
 
-  std::set<TFrameId>::const_iterator it;
-  for (it = frames.begin(); it != frames.end(); ++it) {
-    TFrameId frameId = *it;
-    /* UINT にキャストしたらだめだろ */
-    // QString id =
-    // "clearFrames"+QString::number((UINT)sl.getPointer())+"-"+QString::number(it->getNumber());
+  for (const TFrameId &frameId : frames) {
+/* You shouldn’t cast to UINT */
+// QString id =
+// "clearFrames"+QString::number((UINT)sl.getPointer())+"-"+QString::number(it->getNumber());
     QString id = "clearFrames" + QString::number((uintptr_t)sl.getPointer()) +
-                 "-" + QString::number(it->getNumber());
+                 "-" + QString::number(frameId.getNumber());
     TImageCache::instance()->add(id, sl->getFrame(frameId, false));
     clearedFrames[frameId] = id;
-    // empty frame must be created BEFORE erasing frame or it may initialize
-    // palette.
-    TImageP emptyFrame = sl->createEmptyFrame();
+    TImageP emptyFrame     = sl->createEmptyFrame();
     sl->eraseFrame(frameId);
-    sl->setFrame(*it, emptyFrame);
+    sl->setFrame(frameId, emptyFrame);
   }
   invalidateIcons(sl.getPointer(), frames);
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
@@ -421,12 +408,10 @@ std::map<TFrameId, QString> clearFramesWithoutUndo(
 
 //-----------------------------------------------------------------------------
 
-// Rimuove i frames dal livello
 void removeFramesWithoutUndo(const TXshSimpleLevelP &sl,
                              const std::set<TFrameId> &frames) {
   if (!sl || frames.empty()) return;
-  std::set<TFrameId>::const_iterator it;
-  for (it = frames.begin(); it != frames.end(); ++it) sl->eraseFrame(*it);
+  for (const TFrameId &fid : frames) sl->eraseFrame(fid);
   removeIcons(sl.getPointer(), frames);
   sl->setDirtyFlag(true);
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
@@ -439,34 +424,25 @@ void cutFramesWithoutUndo(TXshSimpleLevel *sl, std::set<TFrameId> &frames) {
 
   HookSet *levelHooks   = sl->getHookSet();
   int currentFrameIndex = TApp::instance()->getCurrentFrame()->getFrameIndex();
-  std::set<TFrameId>::const_iterator it;
-  int i = 0;
-  for (it = frames.begin(); it != frames.end(); ++it, i++) {
-    TFrameId frameId = *it;
-    // QString id =
-    // "cutFrames"+QString::number((UINT)sl)+"-"+QString::number(it->getNumber());
+  int i                 = 0;
+  for (const TFrameId &frameId : frames) {
     QString id = "cutFrames" + QString::number((uintptr_t)sl) + "-" +
-                 QString::number(it->getNumber());
+                 QString::number(frameId.getNumber());
     TImageCache::instance()->add(id, sl->getFrame(frameId, false));
     imageSet[frameId] = id;
   }
   removeIcons(sl, frames);
-
   sl->setDirtyFlag(true);
 
   QClipboard *clipboard = QApplication::clipboard();
-  DrawingData *data     = new DrawingData();
+  auto *data            = new DrawingData();
   data->setFrames(imageSet, sl, *levelHooks);
   clipboard->setMimeData(data, QClipboard::Clipboard);
 
-  for (it = frames.begin(); it != frames.end(); ++it, i++) {
-    sl->eraseFrame(*it);
-  }
+  for (const TFrameId &fid : frames) sl->eraseFrame(fid);
 
   std::vector<TFrameId> newFids;
   sl->getFids(newFids);
-  // Devo settare i nuovi fids al frame handle prima di mandare la notifica di
-  // cambiamento del livello
   TApp::instance()->getCurrentFrame()->setFrameIds(newFids);
   TApp::instance()->getCurrentFrame()->setFrameIndex(currentFrameIndex);
   TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
@@ -482,16 +458,15 @@ void insertNotEmptyframes(const TXshSimpleLevelP &sl,
   std::vector<TFrameId> fids;
   sl->getFids(fids);
   std::set<TFrameId> frames;
-  for (auto const &frame : framesToInsert) {
-    frames.insert(frame.first);
-  }
+  for (const auto &[fid, _] : framesToInsert) frames.insert(fid);
+
   makeSpaceForFids(sl.getPointer(), frames);
 
-  for (auto const &frame : framesToInsert) {
-    TImageP img = TImageCache::instance()->get(frame.second, false);
-    TImageCache::instance()->remove(frame.second);
+  for (const auto &[fid, cacheId] : framesToInsert) {
+    TImageP img = TImageCache::instance()->get(cacheId, false);
+    TImageCache::instance()->remove(cacheId);
     assert(img);
-    sl->setFrame(frame.first, img);
+    sl->setFrame(fid, img);
   }
   invalidateIcons(sl.getPointer(), frames);
   sl->setDirtyFlag(true);
@@ -505,8 +480,8 @@ void insertNotEmptyframes(const TXshSimpleLevelP &sl,
 class PasteRasterAreasUndo final : public TUndo {
   TXshSimpleLevelP m_level;
   std::set<TFrameId> m_frames;
-  TTileSet *m_tiles;
-  RasterImageData *m_data;
+  std::unique_ptr<TTileSet> m_tiles;
+  std::unique_ptr<RasterImageData> m_data;
   TPaletteP m_oldPalette;
   TPaletteP m_newPalette;
   bool m_isFrameInserted;
@@ -515,19 +490,13 @@ public:
   PasteRasterAreasUndo(TXshSimpleLevel *sl, const std::set<TFrameId> &frames,
                        TTileSet *tiles, RasterImageData *data, TPalette *plt,
                        bool isFrameInserted)
-      : TUndo()
-      , m_level(sl)
+      : m_level(sl)
       , m_frames(frames)
       , m_tiles(tiles)
+      , m_data(data->clone())
       , m_oldPalette(plt->clone())
       , m_isFrameInserted(isFrameInserted) {
-    m_data = data->clone();
     assert(m_tiles->getTileCount() == m_frames.size());
-  }
-
-  ~PasteRasterAreasUndo() {
-    if (m_tiles) delete m_tiles;
-    if (m_data) delete m_data;
   }
 
   void onAdd() override { m_newPalette = m_level->getPalette()->clone(); }
@@ -537,38 +506,45 @@ public:
     std::set<TFrameId> frames = m_frames;
 
     if (m_isFrameInserted) {
-      // Faccio remove dei frame incollati
       removeFramesWithoutUndo(m_level, frames);
     } else {
-      std::set<TFrameId>::const_iterator it;
-      int i                        = 0;
-      TTileSetCM32 *tileSetCM      = dynamic_cast<TTileSetCM32 *>(m_tiles);
-      TTileSetFullColor *tileSetFC = dynamic_cast<TTileSetFullColor *>(m_tiles);
-      for (it = m_frames.begin(); it != m_frames.end(); it++, i++) {
-        TImageP image = m_level->getFrame(*it, true);
+      int i = 0;
+      const TTileSetCM32 *tileSetCM =
+          dynamic_cast<const TTileSetCM32 *>(m_tiles.get());
+      const TTileSetFullColor *tileSetFC =
+          dynamic_cast<const TTileSetFullColor *>(m_tiles.get());
+      for (const TFrameId &fid : m_frames) {
+        TImageP image = m_level->getFrame(fid, true);
         if (!image) continue;
         TRasterImageP ri(image);
         TToonzImageP ti(image);
         if (tileSetCM) {
           const TTileSetCM32::Tile *tile = tileSetCM->getTile(i);
-          if (!tile) continue;
+          if (!tile) {
+            ++i;
+            continue;
+          }
           TRasterCM32P tileRas;
           tile->getRaster(tileRas);
           assert(ti);
           ti->getRaster()->copy(tileRas, tile->m_rasterBounds.getP00());
-          ToolUtils::updateSaveBox(m_level, *it);
+          ToolUtils::updateSaveBox(m_level, fid);
         } else if (tileSetFC) {
           const TTileSetFullColor::Tile *tile = tileSetFC->getTile(i);
-          if (!tile) continue;
+          if (!tile) {
+            ++i;
+            continue;
+          }
           TRasterP tileRas;
           tile->getRaster(tileRas);
           assert(ri);
           ri->getRaster()->copy(tileRas, tile->m_rasterBounds.getP00());
         }
+        ++i;
       }
     }
-    // Setto la vecchia paletta al livello
-    if (m_oldPalette.getPointer()) {
+
+    if (m_oldPalette) {
       m_level->getPalette()->assign(m_oldPalette->clone());
       TApp::instance()
           ->getPaletteController()
@@ -588,19 +564,15 @@ public:
       m_level->setFrame(*m_frames.begin(), img);
     }
 
-    std::set<TFrameId> frames = m_frames;
-
-    std::set<TFrameId>::const_iterator it;
-    for (it = m_frames.begin(); it != m_frames.end(); it++) {
-      TImageP image    = m_level->getFrame(*it, true);
+    for (const TFrameId &fid : m_frames) {
+      TImageP image    = m_level->getFrame(fid, true);
       TRasterImageP ri = image;
       TToonzImageP ti  = image;
       if (ti) {
         TRasterP ras;
         double dpiX, dpiY;
         std::vector<TRectD> rects;
-        std::vector<TStroke> strokes;
-        std::vector<TStroke> originalStrokes;
+        std::vector<TStroke> strokes, originalStrokes;
         TAffine affine;
         m_data->getData(ras, dpiX, dpiY, rects, strokes, originalStrokes,
                         affine, ti->getPalette());
@@ -609,24 +581,23 @@ public:
         TScale sc(imgDpiX / dpiX, imgDpiY / dpiY);
         affine *= sc;
 
-        int i;
         TRectD boxD;
-        if (rects.size() > 0) boxD = rects[0];
-        if (strokes.size() > 0) boxD = strokes[0].getBBox();
-        for (i = 0; i < rects.size(); i++) boxD += rects[i];
-        for (i = 0; i < strokes.size(); i++) boxD += strokes[i].getBBox();
-        boxD             = affine * boxD;
-        TRect box        = ToonzImageUtils::convertWorldToRaster(boxD, ti);
-        TPoint pos       = box.getP00();
+        if (!rects.empty()) boxD = rects[0];
+        if (!strokes.empty()) boxD = strokes[0].getBBox();
+        for (const auto &r : rects) boxD += r;
+        for (const auto &s : strokes) boxD += s.getBBox();
+        boxD       = affine * boxD;
+        TRect box  = ToonzImageUtils::convertWorldToRaster(boxD, ti);
+        TPoint pos = box.getP00();
+
         TRasterCM32P app = ras;
         TRop::over(ti->getRaster(), app, pos, affine);
-        ToolUtils::updateSaveBox(m_level, *it);
+        ToolUtils::updateSaveBox(m_level, fid);
       } else if (ri) {
         TRasterP ras;
         double dpiX, dpiY;
         std::vector<TRectD> rects;
-        std::vector<TStroke> strokes;
-        std::vector<TStroke> originalStrokes;
+        std::vector<TStroke> strokes, originalStrokes;
         TAffine affine;
         m_data->getData(ras, dpiX, dpiY, rects, strokes, originalStrokes,
                         affine, ri->getPalette());
@@ -644,15 +615,16 @@ public:
         ri->getDpi(imgDpiX, imgDpiY);
         TScale sc(imgDpiX / dpiX, imgDpiY / dpiY);
         affine *= sc;
-        int i;
+
         TRectD boxD;
-        if (rects.size() > 0) boxD = rects[0];
-        if (strokes.size() > 0) boxD = strokes[0].getBBox();
-        for (i = 0; i < rects.size(); i++) boxD += rects[i];
-        for (i = 0; i < strokes.size(); i++) boxD += strokes[i].getBBox();
-        boxD             = affine * boxD;
-        TRect box        = TRasterImageUtils::convertWorldToRaster(boxD, ri);
-        TPoint pos       = box.getP00();
+        if (!rects.empty()) boxD = rects[0];
+        if (!strokes.empty()) boxD = strokes[0].getBBox();
+        for (const auto &r : rects) boxD += r;
+        for (const auto &s : strokes) boxD += s.getBBox();
+        boxD       = affine * boxD;
+        TRect box  = TRasterImageUtils::convertWorldToRaster(boxD, ri);
+        TPoint pos = box.getP00();
+
         TRasterCM32P app = ras;
         if (app)
           TRop::over(ri->getRaster(), app, ri->getPalette(), pos, affine);
@@ -661,7 +633,7 @@ public:
       }
     }
 
-    if (m_newPalette.getPointer()) {
+    if (m_newPalette) {
       m_level->getPalette()->assign(m_newPalette->clone());
       TApp::instance()
           ->getPaletteController()
@@ -680,16 +652,18 @@ public:
   QString getHistoryString() override {
     QString str = QObject::tr("Paste  : Level %1 : Frame ")
                       .arg(QString::fromStdWString(m_level->getName()));
-
-    std::set<TFrameId>::const_iterator it;
-    for (it = m_frames.begin(); it != m_frames.end(); it++) {
-      if (it != m_frames.begin()) str += QString(", ");
-      str += QString::number((*it).getNumber());
+    bool first = true;
+    for (const TFrameId &fid : m_frames) {
+      if (!first) str += QString(", ");
+      first = false;
+      str += QString::number(fid.getNumber());
     }
-
     return str;
   }
   int getHistoryType() override { return HistoryType::FilmStrip; }
+
+private:
+  Q_DISABLE_COPY_MOVE(PasteRasterAreasUndo);
 };
 
 //=============================================================================
@@ -700,7 +674,7 @@ class PasteVectorAreasUndo final : public TUndo {
   TXshSimpleLevelP m_level;
   std::set<TFrameId> m_frames;
   std::map<TFrameId, std::set<int>> m_indices;
-  StrokesData *m_data;
+  std::unique_ptr<StrokesData> m_data;
   TPaletteP m_oldPalette;
   TPaletteP m_newPalette;
   bool m_isFrameInserted;
@@ -709,50 +683,35 @@ public:
   PasteVectorAreasUndo(TXshSimpleLevel *sl, const std::set<TFrameId> &frames,
                        std::map<TFrameId, std::set<int>> &indices,
                        StrokesData *data, TPalette *plt, bool isFrameInserted)
-      : TUndo()
-      , m_level(sl)
+      : m_level(sl)
       , m_frames(frames)
       , m_indices(indices)
+      , m_data(data->clone())
       , m_oldPalette(plt->clone())
-      , m_isFrameInserted(isFrameInserted) {
-    m_data = data->clone();
-  }
-
-  ~PasteVectorAreasUndo() {
-    if (m_data) delete m_data;
-  }
+      , m_isFrameInserted(isFrameInserted) {}
 
   void onAdd() override { m_newPalette = m_level->getPalette()->clone(); }
 
   void undo() const override {
     if (!m_level || m_frames.empty()) return;
 
-    std::set<TFrameId> frames = m_frames;
-
     if (m_isFrameInserted) {
-      // Faccio remove dei frame incollati
-      removeFramesWithoutUndo(m_level, frames);
+      removeFramesWithoutUndo(m_level, m_frames);
     } else {
-      std::set<TFrameId>::const_iterator it;
-      for (it = m_frames.begin(); it != m_frames.end(); it++) {
-        TVectorImageP img = m_level->getFrame(*it, true);
-        assert(img);
+      for (const TFrameId &fid : m_frames) {
+        TVectorImageP img = m_level->getFrame(fid, true);
         if (!img) continue;
-        std::map<TFrameId, std::set<int>>::const_iterator mapIt =
-            m_indices.find(*it);
-        if (mapIt == m_indices.end()) continue;
-        std::set<int> imageIndices = mapIt->second;
-        ;
-        std::set<int>::const_iterator it2 = imageIndices.end();
-        while (it2 != imageIndices.begin()) {
-          it2--;
+        auto it = m_indices.find(fid);
+        if (it == m_indices.end()) continue;
+        const std::set<int> &imageIndices = it->second;
+        // remove strokes in reverse order
+        for (auto it2 = imageIndices.rbegin(); it2 != imageIndices.rend();
+             ++it2)
           img->removeStroke(*it2);
-        }
       }
     }
 
-    // Setto la vecchia paletta al livello
-    if (m_oldPalette.getPointer()) {
+    if (m_oldPalette) {
       m_level->getPalette()->assign(m_oldPalette->clone());
       TApp::instance()
           ->getPaletteController()
@@ -773,17 +732,15 @@ public:
       m_level->setFrame(*m_frames.begin(), img);
     }
 
-    std::set<TFrameId> frames = m_frames;
-    std::set<TFrameId>::const_iterator it;
-    for (it = m_frames.begin(); it != m_frames.end(); it++) {
-      TVectorImageP img = m_level->getFrame(*it, true);
+    for (const TFrameId &fid : m_frames) {
+      TVectorImageP img = m_level->getFrame(fid, true);
       assert(img);
       if (!img) continue;
       std::set<int> app;
       m_data->getImage(img, app, true);
     }
 
-    if (m_newPalette.getPointer()) {
+    if (m_newPalette) {
       m_level->getPalette()->assign(m_newPalette->clone());
       TApp::instance()
           ->getPaletteController()
@@ -800,136 +757,19 @@ public:
   QString getHistoryString() override {
     QString str = QObject::tr("Paste  : Level %1 : Frame ")
                       .arg(QString::fromStdWString(m_level->getName()));
-
-    std::set<TFrameId>::const_iterator it;
-    for (it = m_frames.begin(); it != m_frames.end(); it++) {
-      if (it != m_frames.begin()) str += QString(", ");
-      str += QString::number((*it).getNumber());
+    bool first = true;
+    for (const TFrameId &fid : m_frames) {
+      if (!first) str += QString(", ");
+      first = false;
+      str += QString::number(fid.getNumber());
     }
-
     return str;
   }
   int getHistoryType() override { return HistoryType::FilmStrip; }
+
+private:
+  Q_DISABLE_COPY_MOVE(PasteVectorAreasUndo);
 };
-
-/*//=============================================================================
-// PasteAreasUndo
-//-----------------------------------------------------------------------------
-
-class PasteAreasUndo final : public TUndo
-{
-  TXshSimpleLevelP m_level;
-  std::set<TFrameId> m_frames;
-        TPaletteP m_oldPalette;
-        TPaletteP m_newPalette;
-        bool m_isFrameInserted;
-
-public:
-  PasteAreasUndo(TXshSimpleLevel *sl, const std::set<TFrameId> &frames, bool
-isFrameInserted)
-      : TUndo()
-      , m_level(sl)
-                        , m_frames(frames)
-                        , m_isFrameInserted(isFrameInserted)
-        {
-                m_oldPalette = m_level->getPalette()->clone();
-                if(!m_isFrameInserted)
-                {
-                        std::set<TFrameId>::iterator it;
-                        for(it=m_frames.begin(); it!=m_frames.end(); it++)
-                        {
-                                TImageP img = m_level->getFrame(*it,true);
-                                TImageCache::instance()->add("PasteAreasUndoOld"+QString::number((UINT)this)+QString::number((*it).getNumber()),
-img->cloneImage());
-                        }
-                }
-  }
-
-        void onAdd()
-        {
-                m_newPalette = m_level->getPalette()->clone();
-                std::set<TFrameId>::iterator it;
-                for(it=m_frames.begin(); it!=m_frames.end(); it++)
-                {
-                        TImageP img = m_level->getFrame(*it,true);
-                        TImageCache::instance()->add("PasteAreasUndoNew"+QString::number((UINT)this)+QString::number((*it).getNumber()),
-img->cloneImage());
-                }
-        }
-
-  ~PasteAreasUndo() {
-                std::set<TFrameId>::const_iterator it;
-
-                if(!m_isFrameInserted)
-                {
-                        for(it=m_frames.begin(); it!=m_frames.end(); it++)
-                                TImageCache::instance()->remove("PasteAreasUndoOld"+QString::number((UINT)this)+QString::number((*it).getNumber()));
-                }
-                for(it=m_frames.begin(); it!=m_frames.end(); it++)
-                        TImageCache::instance()->remove("PasteAreasUndoNew"+QString::number((UINT)this)+QString::number((*it).getNumber()));
-  }
-
-        void undo() const
-        {
-                std::set<TFrameId> frames = m_frames;
-
-                if(m_isFrameInserted)
-                {
-                        // Faccio remove dei frame incollati
-                        removeFramesWithoutUndo(m_level, frames);
-                }
-                else
-                {
-                        std::set<TFrameId>::const_iterator it;
-                        for(it=m_frames.begin(); it!=m_frames.end(); it++)
-                        {
-                                TImageP img =
-TImageCache::instance()->get("PasteAreasUndoOld"+QString::number((UINT)this)+QString::number((*it).getNumber()),true);
-                                assert(img);
-                                m_level->setFrame(*it,img);
-                        }
-                }
-
-                //Setto la vecchia paletta al livello
-                if(m_oldPalette.getPointer())
-                {
-                        m_level->getPalette()->assign(m_oldPalette->clone());
-      TApp::instance()->getPaletteController()->getCurrentLevelPalette()->notifyPaletteChanged();
-                }
-
-    invalidateIcons(m_level.getPointer(), m_frames);
-                TApp::instance()->getCurrentLevel()->notifyLevelChange();
-  }
-
-  void redo() const
-        {
-                if(!m_level || m_frames.empty()) return;
-
-    std::set<TFrameId> frames = m_frames;
-
-                std::set<TFrameId>::const_iterator it;
-                for(it=m_frames.begin(); it!=m_frames.end(); it++)
-                {
-                        TImageP img =
-TImageCache::instance()->get("PasteAreasUndoNew"+QString::number((UINT)this)+QString::number((*it).getNumber()),true);
-                        if(!img) continue;
-                        m_level->setFrame(*it, img, true);
-                }
-
-                if(m_newPalette.getPointer())
-                {
-      m_level->getPalette()->assign(m_newPalette->clone());
-      TApp::instance()->getPaletteController()->getCurrentLevelPalette()->notifyPaletteChanged();
-                }
-
-                invalidateIcons(m_level.getPointer(), m_frames);
-                TApp::instance()->getCurrentLevel()->notifyLevelChange();
-  }
-
-  int getSize() const{
-    return sizeof(*this);
-  }
-};*/
 
 //=============================================================================
 // PasteFramesUndo
@@ -940,10 +780,10 @@ class PasteFramesUndo final : public TUndo {
   std::set<TFrameId> m_frames;
   std::vector<TFrameId> m_oldLevelFrameId;
   TPaletteP m_oldPalette;
-  DrawingData *m_oldData;
-  DrawingData *m_newData;
+  std::unique_ptr<DrawingData> m_oldData;
+  std::unique_ptr<DrawingData> m_newData;
   DrawingData::ImageSetType m_setType;
-  HookSet *m_oldLevelHooks;
+  std::unique_ptr<HookSet> m_oldLevelHooks;
   bool m_updateXSheet;
   bool m_keepOriginalPalette;
 
@@ -952,18 +792,18 @@ public:
                   const std::vector<TFrameId> &oldLevelFrameId,
                   TPaletteP oldPalette, DrawingData::ImageSetType setType,
                   HookSet *oldLevelHooks, bool keepOriginalPalette,
-                  DrawingData *oldData = 0)
+                  DrawingData *oldData = nullptr)
       : m_sl(sl)
       , m_frames(frames)
       , m_oldLevelFrameId(oldLevelFrameId)
       , m_oldPalette(oldPalette)
-      , m_setType(setType)
-      , m_keepOriginalPalette(keepOriginalPalette)
       , m_oldData(oldData)
-      , m_oldLevelHooks(oldLevelHooks) {
+      , m_setType(setType)
+      , m_oldLevelHooks(oldLevelHooks)
+      , m_keepOriginalPalette(keepOriginalPalette) {
     QClipboard *clipboard = QApplication::clipboard();
     QMimeData *data       = cloneData(clipboard->mimeData());
-    m_newData             = dynamic_cast<DrawingData *>(data);
+    m_newData.reset(dynamic_cast<DrawingData *>(data));
     assert(m_newData);
     m_updateXSheet =
         Preferences::instance()->isSyncLevelRenumberWithXsheetEnabled();
@@ -971,7 +811,7 @@ public:
 
   ~PasteFramesUndo() {
     if (m_oldData) m_oldData->releaseData();
-    if (m_newData) m_newData->releaseData();
+    // m_newData automatically deleted by unique_ptr
   }
 
   void undo() const override {
@@ -979,11 +819,9 @@ public:
     if (selection) selection->selectNone();
     std::set<TFrameId> frames = m_frames;
 
-    // Faccio remove dei frame incollati
     if (m_setType != DrawingData::OVER_SELECTION)
       removeFramesWithoutUndo(m_sl, frames);
 
-    // Renumero i frame con i vecchi fids
     if (m_setType == DrawingData::INSERT) {
       assert(m_sl->getFrameCount() == m_oldLevelFrameId.size());
       if (m_updateXSheet) {
@@ -1000,19 +838,15 @@ public:
       TApp::instance()->getCurrentLevel()->notifyLevelChange();
     }
 
-    // Reinserisco i vecchi frame che ho sovrascritto
-    if (m_setType != DrawingData::INSERT) {
+    if (m_setType != DrawingData::INSERT && m_oldData) {
       std::set<TFrameId> framesToModify;
       m_oldData->getFrames(framesToModify);
-
       bool dummy = true;
-      // Incollo i frames sovrascrivendoli
-      pasteFramesWithoutUndo(m_oldData, m_sl.getPointer(), framesToModify,
+      pasteFramesWithoutUndo(m_oldData.get(), m_sl.getPointer(), framesToModify,
                              DrawingData::OVER_SELECTION, true, dummy);
     }
 
-    // Setto la vecchia paletta al livello
-    if (m_oldPalette.getPointer()) {
+    if (m_oldPalette) {
       TPalette *levelPalette = m_sl->getPalette();
       if (levelPalette) levelPalette->assign(m_oldPalette.getPointer());
 
@@ -1038,8 +872,8 @@ public:
     std::set<TFrameId> frames = m_frames;
 
     bool keepOriginalPalette = m_keepOriginalPalette;
-    pasteFramesWithoutUndo(m_newData, m_sl.getPointer(), frames, m_setType,
-                           true, keepOriginalPalette, true);
+    pasteFramesWithoutUndo(m_newData.get(), m_sl.getPointer(), frames,
+                           m_setType, true, keepOriginalPalette, true);
   }
 
   int getSize() const override { return sizeof(*this); }
@@ -1047,16 +881,18 @@ public:
   QString getHistoryString() override {
     QString str = QObject::tr("Paste  : Level %1 : Frame ")
                       .arg(QString::fromStdWString(m_sl->getName()));
-
-    std::set<TFrameId>::const_iterator it;
-    for (it = m_frames.begin(); it != m_frames.end(); it++) {
-      if (it != m_frames.begin()) str += QString(", ");
-      str += QString::number((*it).getNumber());
+    bool first = true;
+    for (const TFrameId &fid : m_frames) {
+      if (!first) str += QString(", ");
+      first = false;
+      str += QString::number(fid.getNumber());
     }
-
     return str;
   }
   int getHistoryType() override { return HistoryType::FilmStrip; }
+
+private:
+  Q_DISABLE_COPY_MOVE(PasteFramesUndo);
 };
 
 //=============================================================================
@@ -1066,53 +902,46 @@ public:
 class DeleteFramesUndo final : public TUndo {
   TXshSimpleLevel *m_sl;
   std::set<TFrameId> m_frames;
-  DrawingData *m_oldData;
-  DrawingData *m_newData;
+  std::unique_ptr<DrawingData> m_oldData;
+  std::unique_ptr<DrawingData> m_newData;
 
 public:
   DeleteFramesUndo(TXshSimpleLevel *sl, std::set<TFrameId> &frames,
                    DrawingData *oldData, DrawingData *newData)
       : m_sl(sl), m_frames(frames), m_oldData(oldData), m_newData(newData) {}
 
-  ~DeleteFramesUndo() {
-    if (m_oldData) m_oldData->releaseData();
-    if (m_newData) m_newData->releaseData();
-  }
-
   void pasteFramesFromData(const DrawingData *data) const {
     std::set<TFrameId> frames = m_frames;
-
-    bool dummy = true;
-    // Incollo i frames sovrascrivendoli
+    bool dummy                = true;
     pasteFramesWithoutUndo(data, m_sl, frames, DrawingData::OVER_SELECTION,
                            true, dummy);
   }
 
-  void undo() const override { pasteFramesFromData(m_oldData); }
+  void undo() const override { pasteFramesFromData(m_oldData.get()); }
+  // NOTE: I cannot use the method "clearFramesWithoutUndo(...)" because
+// it creates a NEW empty frame, discarding the previous one
+// and any modifications that may have been made to it afterwards.
 
-  // OSS.: Non posso usare il metodo "clearFramesWithoutUndo(...)" perche'
-  //  genera un NUOVO frame vuoto, perdendo quello precedente e le eventuali
-  //  modifiche che ad esso possono essere state fatte successivamente.
-  void redo() const override { pasteFramesFromData(m_newData); }
+  void redo() const override { pasteFramesFromData(m_newData.get()); }
 
   int getSize() const override { return sizeof(*this); }
 
   QString getHistoryString() override {
     QString str = QObject::tr("Delete Frames  : Level %1 : Frame ")
                       .arg(QString::fromStdWString(m_sl->getName()));
-
-    std::set<TFrameId>::const_iterator it;
-    for (it = m_frames.begin(); it != m_frames.end(); it++) {
-      if (it != m_frames.begin()) str += QString(", ");
-      str += QString::number((*it).getNumber());
+    bool first = true;
+    for (const TFrameId &fid : m_frames) {
+      if (!first) str += QString(", ");
+      first = false;
+      str += QString::number(fid.getNumber());
     }
-
     return str;
   }
   int getHistoryType() override { return HistoryType::FilmStrip; }
-};
 
-//=============================================================================
+private:
+  Q_DISABLE_COPY_MOVE(DeleteFramesUndo);
+};
 
 //-----------------------------------------------------------------------------
 
@@ -1120,7 +949,7 @@ class CutFramesUndo final : public TUndo {
   TXshSimpleLevel *m_sl;
   std::set<TFrameId> m_framesCutted;
   std::vector<TFrameId> m_oldFrames;
-  DrawingData *m_newData;
+  std::unique_ptr<DrawingData> m_newData;
 
 public:
   CutFramesUndo(TXshSimpleLevel *sl, std::set<TFrameId> &framesCutted,
@@ -1128,32 +957,26 @@ public:
       : m_sl(sl), m_framesCutted(framesCutted), m_oldFrames(oldFrames) {
     QClipboard *clipboard = QApplication::clipboard();
     QMimeData *data       = cloneData(clipboard->mimeData());
-    m_newData             = dynamic_cast<DrawingData *>(data);
+    m_newData.reset(dynamic_cast<DrawingData *>(data));
     assert(m_newData);
-  }
-
-  ~CutFramesUndo() {
-    if (m_newData) m_newData->releaseData();
   }
 
   void undo() const override {
     std::set<TFrameId> frames = m_framesCutted;
     bool dummy                = true;
-    pasteFramesWithoutUndo(m_newData, m_sl, frames, DrawingData::OVER_SELECTION,
-                           true, dummy);
+    pasteFramesWithoutUndo(m_newData.get(), m_sl, frames,
+                           DrawingData::OVER_SELECTION, true, dummy);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
   void redo() const override {
-    // Prendo il clipboard corrente.
-    QClipboard *clipboard  = QApplication::clipboard();
-    QMimeData *currentData = cloneData(clipboard->mimeData());
+    QClipboard *clipboard = QApplication::clipboard();
+    std::unique_ptr<QMimeData> currentData(cloneData(clipboard->mimeData()));
 
     std::set<TFrameId> frames = m_framesCutted;
     cutFramesWithoutUndo(m_sl, frames);
 
-    // Setto il clipboard corrente
-    clipboard->setMimeData(currentData, QClipboard::Clipboard);
+    clipboard->setMimeData(currentData.release(), QClipboard::Clipboard);
   }
 
   int getSize() const override { return sizeof(*this); }
@@ -1161,16 +984,18 @@ public:
   QString getHistoryString() override {
     QString str = QObject::tr("Cut Frames  : Level %1 : Frame ")
                       .arg(QString::fromStdWString(m_sl->getName()));
-
-    std::set<TFrameId>::const_iterator it;
-    for (it = m_framesCutted.begin(); it != m_framesCutted.end(); it++) {
-      if (it != m_framesCutted.begin()) str += QString(", ");
-      str += QString::number((*it).getNumber());
+    bool first = true;
+    for (const TFrameId &fid : m_framesCutted) {
+      if (!first) str += QString(", ");
+      first = false;
+      str += QString::number(fid.getNumber());
     }
-
     return str;
   }
   int getHistoryType() override { return HistoryType::FilmStrip; }
+
+private:
+  Q_DISABLE_COPY_MOVE(CutFramesUndo);
 };
 
 //-----------------------------------------------------------------------------
@@ -1178,22 +1003,18 @@ public:
 class RemoveFramesUndo final : public TUndo {
   TXshSimpleLevel *m_sl;
   std::set<TFrameId> m_framesRemoved;
-  DrawingData *m_oldData;
+  std::unique_ptr<DrawingData> m_oldData;
 
 public:
   RemoveFramesUndo(TXshSimpleLevel *sl, std::set<TFrameId> &framesRemoved,
                    DrawingData *oldData)
       : m_sl(sl), m_framesRemoved(framesRemoved), m_oldData(oldData) {}
 
-  ~RemoveFramesUndo() {
-    if (m_oldData) m_oldData->releaseData();
-  }
-
   void undo() const override {
     std::set<TFrameId> frames = m_framesRemoved;
     bool dummy                = true;
-    pasteFramesWithoutUndo(m_oldData, m_sl, frames, DrawingData::OVER_SELECTION,
-                           true, dummy);
+    pasteFramesWithoutUndo(m_oldData.get(), m_sl, frames,
+                           DrawingData::OVER_SELECTION, true, dummy);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
@@ -1207,26 +1028,27 @@ public:
   QString getHistoryString() override {
     QString str = QObject::tr("Remove Frames  : Level %1 : Frame ")
                       .arg(QString::fromStdWString(m_sl->getName()));
-
-    std::set<TFrameId>::const_iterator it;
-    for (it = m_framesRemoved.begin(); it != m_framesRemoved.end(); it++) {
-      if (it != m_framesRemoved.begin()) str += QString(", ");
-      str += QString::number((*it).getNumber());
+    bool first = true;
+    for (const TFrameId &fid : m_framesRemoved) {
+      if (!first) str += QString(", ");
+      first = false;
+      str += QString::number(fid.getNumber());
     }
-
     return str;
   }
   int getHistoryType() override { return HistoryType::FilmStrip; }
+
+private:
+  Q_DISABLE_COPY_MOVE(RemoveFramesUndo);
 };
 
 }  // namespace
 
 //=============================================================================
-
+// AddFramesUndo
 //-----------------------------------------------------------------------------
 
 namespace {
-//-----------------------------------------------------------------------------
 
 class AddFramesUndo final : public TUndo {
   TXshSimpleLevelP m_level;
@@ -1236,9 +1058,11 @@ class AddFramesUndo final : public TUndo {
 
 public:
   AddFramesUndo(const TXshSimpleLevelP &level,
-                const std::set<TFrameId> insertedFids,
+                const std::set<TFrameId> &insertedFids,
                 std::vector<TFrameId> oldFids)
-      : m_level(level), m_insertedFids(insertedFids), m_oldFids(oldFids) {
+      : m_level(level)
+      , m_insertedFids(insertedFids)
+      , m_oldFids(std::move(oldFids)) {
     m_updateXSheet =
         Preferences::instance()->isSyncLevelRenumberWithXsheetEnabled();
   }
@@ -1261,7 +1085,7 @@ public:
   void redo() const override {
     makeSpaceForFids(m_level.getPointer(), m_insertedFids);
 
-    for (auto const &fid : m_insertedFids) {
+    for (const TFrameId &fid : m_insertedFids) {
       m_level->setFrame(fid, m_level->createEmptyFrame());
       IconGenerator::instance()->invalidate(m_level.getPointer(), fid);
     }
@@ -1277,16 +1101,18 @@ public:
   QString getHistoryString() override {
     QString str = QObject::tr("Add Frames  : Level %1 : Frame ")
                       .arg(QString::fromStdWString(m_level->getName()));
-
-    std::set<TFrameId>::const_iterator it;
-    for (it = m_insertedFids.begin(); it != m_insertedFids.end(); it++) {
-      if (it != m_insertedFids.begin()) str += QString(", ");
-      str += QString::number((*it).getNumber());
+    bool first = true;
+    for (const TFrameId &fid : m_insertedFids) {
+      if (!first) str += QString(", ");
+      first = false;
+      str += QString::number(fid.getNumber());
     }
-
     return str;
   }
   int getHistoryType() override { return HistoryType::FilmStrip; }
+
+private:
+  Q_DISABLE_COPY_MOVE(AddFramesUndo);
 };
 
 }  // namespace
@@ -1308,20 +1134,20 @@ void FilmstripCmd::addFrames(TXshSimpleLevel *sl, int start, int end,
   if (!oldFids.empty()) tmplFid = oldFids.front();
 
   std::set<TFrameId> fidsToInsert;
-  int frame = 0;
-  for (frame = start; frame <= end; frame += step)
+  for (int frame = start; frame <= end; frame += step) {
     fidsToInsert.insert(TFrameId(frame, "", tmplFid.getZeroPadding(),
                                  tmplFid.getStartSeqInd()));
+  }
 
   makeSpaceForFids(sl, fidsToInsert);
 
-  for (auto const &fid : fidsToInsert) {
+  for (const TFrameId &fid : fidsToInsert) {
     sl->setFrame(fid, sl->createEmptyFrame());
     IconGenerator::instance()->invalidate(sl, fid);
   }
   sl->setDirtyFlag(true);
 
-  AddFramesUndo *undo = new AddFramesUndo(sl, fidsToInsert, oldFids);
+  auto *undo = new AddFramesUndo(sl, fidsToInsert, std::move(oldFids));
   TUndoManager::manager()->add(undo);
 
   TApp *app = TApp::instance();
@@ -1339,7 +1165,7 @@ class RenumberUndo final : public TUndo {
   TXshSimpleLevelP m_level;
   std::vector<TFrameId> m_fids;
   std::map<TFrameId, TFrameId> m_mapOldFrameId;
-  bool m_updateXSheet = false;
+  bool m_updateXSheet;
 
 public:
   RenumberUndo(const TXshSimpleLevelP &level, const std::vector<TFrameId> &fids,
@@ -1349,14 +1175,14 @@ public:
     std::vector<TFrameId> oldFids;
     m_level->getFids(oldFids);
     assert(oldFids.size() == m_fids.size());
-    int i;
-    for (i = 0; i < m_fids.size(); i++) {
+    for (size_t i = 0; i < m_fids.size(); ++i) {
       if (m_fids[i] != oldFids[i]) m_mapOldFrameId[m_fids[i]] = oldFids[i];
     }
     m_updateXSheet =
         Preferences::instance()->isSyncLevelRenumberWithXsheetEnabled() ||
         forceCallUpdateXSheet;
   }
+
   void renumber(std::vector<TFrameId> fids) const {
     if (m_updateXSheet) {
       std::vector<TFrameId> oldFrames;
@@ -1369,24 +1195,22 @@ public:
     m_level->setDirtyFlag(true);
     TApp::instance()->getCurrentLevel()->notifyLevelChange();
   }
+
   void undo() const override {
     std::vector<TFrameId> fids;
     m_level->getFids(fids);
     assert(fids.size() == m_fids.size());
-    int i;
-    for (i = 0; i < fids.size(); i++) {
-      if (m_mapOldFrameId.count(fids[i]) > 0) {
-        std::map<TFrameId, TFrameId>::const_iterator it;
-        it = m_mapOldFrameId.find(fids[i]);
-        assert(it != m_mapOldFrameId.end());
-        if (it != m_mapOldFrameId.end()) fids[i] = TFrameId(it->second);
-      }
+    for (size_t i = 0; i < fids.size(); ++i) {
+      auto it = m_mapOldFrameId.find(fids[i]);
+      if (it != m_mapOldFrameId.end()) fids[i] = TFrameId(it->second);
     }
     renumber(fids);
   }
+
   void redo() const override { renumber(m_fids); }
+
   int getSize() const override {
-    return sizeof(*this) + sizeof(TFrameId) * m_fids.size();
+    return sizeof(*this) + int(sizeof(TFrameId) * m_fids.size());
   }
 
   QString getHistoryString() override {
@@ -1394,18 +1218,18 @@ public:
         .arg(QString::fromStdWString(m_level->getName()));
   }
   int getHistoryType() override { return HistoryType::FilmStrip; }
+
+private:
+  Q_DISABLE_COPY_MOVE(RenumberUndo);
 };
 
 QString getNextLetter(const QString &letter) {
-  // 空なら a を返す
   if (letter.isEmpty()) return QString('a');
-  // 1文字かつ z または Z ならEmptyを返す
   if (letter == 'z' || letter == 'Z') return QString();
   QByteArray byteArray = letter.toUtf8();
-  // それ以外の場合、最後の文字をとにかく１進めて返す
-  byteArray.data()[byteArray.size() - 1]++;
+  ++byteArray.data()[byteArray.size() - 1];
   return QString::fromUtf8(byteArray);
-};
+}
 
 }  // namespace
 
@@ -1420,52 +1244,40 @@ void FilmstripCmd::renumber(
   if (!sl || sl->isSubsequence() || sl->isReadOnly()) return;
   if (table.empty()) return;
 
-  // table:src->dst; check that src is a fid of the level
-  std::vector<std::pair<TFrameId, TFrameId>>::const_iterator it;
-  for (it = table.begin(); it != table.end(); ++it) {
-    TFrameId srcFid = it->first;
-    if (!sl->isFid(srcFid)) {
-      // todo: error messages
-      return;
-    }
+  for (const auto &[srcFid, dstFid] : table) {
+    if (!sl->isFid(srcFid)) return;
   }
 
-  // tmp contains all the level fids that are not affected by the renumbering
-  std::vector<TFrameId> fids, rfids, oldFrames;
-  sl->getFids(fids);
+  std::vector<TFrameId> fids, oldFrames;
   sl->getFids(oldFrames);
-  std::set<TFrameId> tmp;
-  for (int i = 0; i < (int)fids.size(); i++) tmp.insert(fids[i]);
-  for (it = table.begin(); it != table.end(); ++it) tmp.erase(it->first);
+  fids = oldFrames;
+  std::set<TFrameId> tmp(fids.begin(), fids.end());
+  for (const auto &[srcFid, _] : table) tmp.erase(srcFid);
 
-  // fids contain the new numbering of all the level drawings
-  // (note: fids can be not ordered)
-  for (int i = 0; i < (int)fids.size(); i++) {
+  for (size_t i = 0; i < fids.size(); ++i) {
     TFrameId srcFid = fids[i];
-    for (it = table.begin(); it != table.end() && it->first != srcFid; ++it) {
-    }
+    auto it =
+        std::find_if(table.begin(), table.end(),
+                     [&srcFid](const auto &p) { return p.first == srcFid; });
     if (it != table.end()) {
-      // srcFid is affected by the renumbering
       TFrameId tarFid = it->second;
-      // make sure that srcFid has not been used. add a letter if this is needed
       if (tmp.count(tarFid) > 0) {
         do {
           tarFid =
               TFrameId(tarFid.getNumber(), getNextLetter(tarFid.getLetter()),
                        tarFid.getZeroPadding(), tarFid.getStartSeqInd());
         } while (!tarFid.getLetter().isEmpty() && tmp.count(tarFid) > 0);
-        if (tarFid.getLetter().isEmpty()) {
-          // todo: error message
-          return;
-        }
+        if (tarFid.getLetter().isEmpty()) return;
       }
       tmp.insert(tarFid);
       fids[i] = tarFid;
     }
   }
 
+  TXshSimpleLevelP slP(sl);
   TUndoManager::manager()->add(
-      new RenumberUndo(sl, fids, forceCallUpdateXSheet));
+      new RenumberUndo(slP, fids, forceCallUpdateXSheet));
+
   if (Preferences::instance()->isSyncLevelRenumberWithXsheetEnabled() ||
       forceCallUpdateXSheet) {
     updateXSheet(sl, oldFrames, fids);
@@ -1473,17 +1285,6 @@ void FilmstripCmd::renumber(
   sl->renumber(fids);
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
-
-  /*
-int i;
-std::set<TFrameId>::iterator it2;
-it2=frames.begin();
-std::set<TFrameId> newFrames;
-for (i=0; i<frames.size(); i++, it2++)
-newFrames.insert(TFrameId(startFrame+(i*stepFrame),it2->getLetter()));
-assert(frames.size()==newFrames.size());
-frames.swap(newFrames);
-*/
 }
 
 //-----------------------------------------------------------------------------
@@ -1494,37 +1295,30 @@ void FilmstripCmd::renumber(TXshSimpleLevel *sl, std::set<TFrameId> &frames,
   assert(startFrame > 0 && stepFrame > 0);
   if (startFrame <= 0 || stepFrame <= 0 || frames.empty()) return;
 
-  std::vector<TFrameId> fids;
-  std::vector<TFrameId> oldFrames;
+  std::vector<TFrameId> fids, oldFrames;
   sl->getFids(oldFrames);
-  sl->getFids(fids);
+  fids = oldFrames;
 
   std::set<TFrameId> modifiedFids;
-
-  // tmp contiene i frames del livello, meno quelli da renumerare
   std::set<TFrameId> tmp(fids.begin(), fids.end());
-  std::set<TFrameId>::const_iterator it;
-  for (it = frames.begin(); it != frames.end(); ++it) tmp.erase(*it);
+  for (const TFrameId &fid : frames) tmp.erase(fid);
 
-  int frame                         = startFrame;
-  std::vector<TFrameId>::iterator j = fids.begin();
-  for (it = frames.begin(); it != frames.end(); ++it) {
-    TFrameId srcFid(*it);
+  int frame = startFrame;
+  auto j    = fids.begin();
+  for (const TFrameId &srcFid : frames) {
     TFrameId dstFid(frame, "", srcFid.getZeroPadding(),
                     srcFid.getStartSeqInd());
     frame += stepFrame;
-    // faccio il controllo su tmp e non su fids. considera:
-    // fids = [1,2,3,4], renumber = [2->3,3->5]
+    // I perform the check on tmp instead of fids. Consider:
+// fids = [1,2,3,4], renumber = [2->3, 3->5]
     if (tmp.count(dstFid) > 0) {
       DVGui::error(("can't renumber: frame conflict"));
       return;
     }
     j = std::find(j, fids.end(), srcFid);
-    // i frames selezionati fanno parte del livello sl. Quindi:
     assert(j != fids.end());
-    assert(srcFid == *j);
-    if (j == fids.end()) continue;  // per sicurezza
-    int k = std::distance(fids.begin(), j);
+    if (j == fids.end()) continue;
+    int k = int(std::distance(fids.begin(), j));
     if (srcFid != dstFid) {
       modifiedFids.insert(srcFid);
       modifiedFids.insert(dstFid);
@@ -1532,20 +1326,24 @@ void FilmstripCmd::renumber(TXshSimpleLevel *sl, std::set<TFrameId> &frames,
       ++j;
     }
   }
-  TUndoManager::manager()->add(new RenumberUndo(sl, fids));
+
+  TXshSimpleLevelP slP(sl);
+  TUndoManager::manager()->add(new RenumberUndo(slP, fids));
+
   if (Preferences::instance()->isSyncLevelRenumberWithXsheetEnabled()) {
     updateXSheet(sl, oldFrames, fids);
   }
   sl->renumber(fids);
   sl->setDirtyFlag(true);
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
-  int i;
-  std::set<TFrameId>::iterator it2;
-  it2 = frames.begin();
+
   std::set<TFrameId> newFrames;
-  for (i = 0; i < frames.size(); i++, it2++)
-    newFrames.insert(TFrameId(startFrame + (i * stepFrame), it2->getLetter(),
-                              it2->getZeroPadding(), it2->getStartSeqInd()));
+  int i = 0;
+  for (const TFrameId &fid : frames) {
+    newFrames.insert(TFrameId(startFrame + (i * stepFrame), fid.getLetter(),
+                              fid.getZeroPadding(), fid.getStartSeqInd()));
+    ++i;
+  }
   assert(frames.size() == newFrames.size());
   frames.swap(newFrames);
 
@@ -1575,109 +1373,103 @@ void FilmstripCmd::paste(TXshSimpleLevel *sl, std::set<TFrameId> &frames) {
   if (TPalette *pal = sl->getPalette()) oldPalette = pal->clone();
 
   QClipboard *clipboard = QApplication::clipboard();
-  QMimeData *data       = cloneData(clipboard->mimeData());
-  // when pasting the filmstrip frames
-  DrawingData *drawingData = dynamic_cast<DrawingData *>(data);
-  if (drawingData) {
+  std::unique_ptr<QMimeData> data(cloneData(clipboard->mimeData()));
+
+  if (auto *drawingData = dynamic_cast<DrawingData *>(data.get())) {
     if (sl->isSubsequence()) return;
 
-    // keep the chosen option of "Keep Original Palette" and reproduce it in
-    // undo
     bool keepOriginalPalette;
-
-    HookSet *oldLevelHooks = new HookSet();
-    *oldLevelHooks         = *sl->getHookSet();
+    auto *oldLevelHooks = new HookSet();
+    *oldLevelHooks      = *sl->getHookSet();
 
     bool isPaste =
         pasteFramesWithoutUndo(drawingData, sl, frames, DrawingData::INSERT,
                                true, keepOriginalPalette);
-    if (!isPaste) return;
+    if (!isPaste) {
+      delete oldLevelHooks;
+      return;
+    }
     TUndoManager::manager()->add(new PasteFramesUndo(
         sl, frames, oldLevelFrameId, oldPalette, DrawingData::INSERT,
         oldLevelHooks, keepOriginalPalette));
+    return;
   }
-  // when pasting the copied part of the image which is selected with the
-  // selection tool
-  else {
-    bool isFrameToInsert =
-        (frames.size() == 1) ? !sl->isFid((*frames.begin())) : false;
-    TTileSet *tileSet = 0;
-    std::map<TFrameId, std::set<int>> indices;
-    TUndo *undo      = 0;
-    TPaletteP plt    = sl->getPalette()->clone();
-    QImage clipImage = clipboard->image();
 
-    FullColorImageData *fullColorData =
-        dynamic_cast<FullColorImageData *>(data);
+  bool isFrameToInsert =
+      (frames.size() == 1) ? !sl->isFid(*frames.begin()) : false;
+  std::unique_ptr<TTileSet> tileSet;
+  std::map<TFrameId, std::set<int>> indices;
+  std::unique_ptr<TUndo> undo;
+  TPaletteP plt    = sl->getPalette()->clone();
+  QImage clipImage = clipboard->image();
 
-    if ((!clipImage.isNull() || fullColorData) &&
-        sl->getType() != OVL_XSHLEVEL) {
-      DVGui::error(QObject::tr(
-          "Can't paste full raster data on a non full raster level."));
-      return;
+  auto *fullColorData = dynamic_cast<FullColorImageData *>(data.get());
+
+  if ((!clipImage.isNull() || fullColorData) && sl->getType() != OVL_XSHLEVEL) {
+    DVGui::error(QObject::tr(
+        "Can't paste full raster data on a non full raster level."));
+    return;
+  }
+
+  if (sl->getType() == OVL_XSHLEVEL && !clipImage.isNull()) {
+    if (sl->getResolution().lx < clipImage.width() ||
+        sl->getResolution().ly < clipImage.height()) {
+      clipImage = clipImage.scaled(sl->getResolution().lx,
+                                   sl->getResolution().ly, Qt::KeepAspectRatio);
     }
 
-    if (sl->getType() == OVL_XSHLEVEL && !clipImage.isNull()) {
-      // This stuff is only if we have a pasted image from outside OpenToonz
+    std::vector<TRectD> rects;
+    const std::vector<TStroke> strokes, originalStrokes;
+    TAffine aff;
+    TRasterP ras = rasterFromQImage(clipImage);
+    rects.emplace_back(0.0 - clipImage.width() / 2,
+                       0.0 - clipImage.height() / 2, clipImage.width() / 2,
+                       clipImage.height() / 2);
+    auto *qimageData = new FullColorImageData();
+    TDimension dim   = sl->getResolution();
+    qimageData->setData(ras, plt, 120.0, 120.0, dim, rects, strokes,
+                        originalStrokes, aff);
+    data.reset(qimageData);
+  }
 
-      if (sl->getResolution().lx < clipImage.width() ||
-          sl->getResolution().ly < clipImage.height()) {
-        clipImage =
-            clipImage.scaled(sl->getResolution().lx, sl->getResolution().ly,
-                             Qt::KeepAspectRatio);
-      }
-
-      // create variables to go into the Full Color Image data
-      std::vector<TRectD> rects;
-      const std::vector<TStroke> strokes;
-      const std::vector<TStroke> originalStrokes;
-      TAffine aff;
-      TRasterP ras = rasterFromQImage(clipImage);
-      rects.push_back(TRectD(0.0 - clipImage.width() / 2,
-                             0.0 - clipImage.height() / 2,
-                             clipImage.width() / 2, clipImage.height() / 2));
-      FullColorImageData *qimageData = new FullColorImageData();
-
-      TDimension dim = sl->getResolution();
-
-      qimageData->setData(ras, plt, 120.0, 120.0, dim, rects, strokes,
-                          originalStrokes, aff);
-      data = qimageData;
-      // end of pasted from outside OpenToonz stuff
-      // data holds all the info either way now.
-    }
-
-    if (sl && sl->getType() == OVL_XSHLEVEL) {
-      // make selection always work on new raster cells
-      ToolHandle *toolHandle = TApp::instance()->getCurrentTool();
-      if (toolHandle->getTool()->getName() == "T_Selection") {
-        TSelection *ts      = toolHandle->getTool()->getSelection();
-        RasterSelection *rs = dynamic_cast<RasterSelection *>(ts);
-        if (rs) {
-          toolHandle->getTool()->onDeactivate();
-          toolHandle->getTool()->onActivate();
-          rs->pasteSelection();
-          return;
-        }
+  if (sl && sl->getType() == OVL_XSHLEVEL) {
+    ToolHandle *toolHandle = TApp::instance()->getCurrentTool();
+    if (toolHandle->getTool()->getName() == "T_Selection") {
+      TSelection *ts = toolHandle->getTool()->getSelection();
+      if (auto *rs = dynamic_cast<RasterSelection *>(ts)) {
+        toolHandle->getTool()->onDeactivate();
+        toolHandle->getTool()->onActivate();
+        rs->pasteSelection();
+        return;
       }
     }
+  }
 
-    bool isPaste = pasteAreasWithoutUndo(data, sl, frames, &tileSet, indices);
-    RasterImageData *rasterImageData = dynamic_cast<RasterImageData *>(data);
-    StrokesData *strokesData         = dynamic_cast<StrokesData *>(data);
-    if (rasterImageData && tileSet)
-      undo = new PasteRasterAreasUndo(sl, frames, tileSet, rasterImageData,
-                                      plt.getPointer(), isFrameToInsert);
-    if (strokesData && tileSet) {
+  bool isPaste =
+      pasteAreasWithoutUndo(data.get(), sl, frames, tileSet, indices);
+  if (!isPaste) return;
+
+  if (auto *rasterImageData = dynamic_cast<RasterImageData *>(data.get())) {
+    if (tileSet) {
+      undo = std::make_unique<PasteRasterAreasUndo>(
+          sl, frames, tileSet.release(), rasterImageData, plt.getPointer(),
+          isFrameToInsert);
+    }
+    if (!indices.empty()) {
+      undo = std::make_unique<PasteVectorAreasUndo>(
+          sl, frames, indices, rasterImageData->toStrokesData(sl->getScene()),
+          plt.getPointer(), isFrameToInsert);
+    }
+  } else if (auto *strokesData = dynamic_cast<StrokesData *>(data.get())) {
+    if (tileSet) {
       TImageP img      = sl->getFrame(*frames.begin(), false);
       TRasterImageP ri = img;
       TToonzImageP ti  = img;
-      assert(img);
-      if (ti)
-        undo = new PasteRasterAreasUndo(sl, frames, tileSet,
-                                        strokesData->toToonzImageData(ti),
-                                        plt.getPointer(), isFrameToInsert);
-      else if (ri) {
+      if (ti) {
+        undo = std::make_unique<PasteRasterAreasUndo>(
+            sl, frames, tileSet.release(), strokesData->toToonzImageData(ti),
+            plt.getPointer(), isFrameToInsert);
+      } else if (ri) {
         double dpix, dpiy;
         ri->getDpi(dpix, dpiy);
         if (dpix == 0 || dpiy == 0) {
@@ -1686,20 +1478,19 @@ void FilmstripCmd::paste(TXshSimpleLevel *sl, std::set<TFrameId> &frames) {
           dpiy        = dpi.y;
           ri->setDpi(dpix, dpiy);
         }
-        undo = new PasteRasterAreasUndo(sl, frames, tileSet,
-                                        strokesData->toFullColorImageData(ri),
-                                        plt.getPointer(), isFrameToInsert);
+        undo = std::make_unique<PasteRasterAreasUndo>(
+            sl, frames, tileSet.release(),
+            strokesData->toFullColorImageData(ri), plt.getPointer(),
+            isFrameToInsert);
       }
+    } else if (!indices.empty()) {
+      undo = std::make_unique<PasteVectorAreasUndo>(
+          sl, frames, indices, strokesData, plt.getPointer(), isFrameToInsert);
     }
-    if (strokesData && !indices.empty())
-      undo = new PasteVectorAreasUndo(sl, frames, indices, strokesData,
-                                      plt.getPointer(), isFrameToInsert);
-    if (rasterImageData && !indices.empty())
-      undo = new PasteVectorAreasUndo(
-          sl, frames, indices, rasterImageData->toStrokesData(sl->getScene()),
-          plt.getPointer(), isFrameToInsert);
-    if (!isPaste) return;
-    if (undo) TUndoManager::manager()->add(undo);
+  }
+
+  if (undo) {
+    TUndoManager::manager()->add(undo.release());
   }
 }
 
@@ -1716,20 +1507,24 @@ void FilmstripCmd::merge(TXshSimpleLevel *sl, std::set<TFrameId> &frames) {
   std::set<TFrameId> frameIdToChange;
 
   QClipboard *clipboard = QApplication::clipboard();
-  if (const DrawingData *drawingData =
+  if (const auto *drawingData =
           dynamic_cast<const DrawingData *>(clipboard->mimeData())) {
     drawingData->getFrames(frameIdToChange);
-    DrawingData *data = new DrawingData();
+    auto *data = new DrawingData();
     data->setLevelFrames(sl, frameIdToChange);
-    HookSet *oldLevelHooks = new HookSet();
-    *oldLevelHooks         = *sl->getHookSet();
+    auto *oldLevelHooks = new HookSet();
+    *oldLevelHooks      = *sl->getHookSet();
 
     bool keepOriginalPalette = true;
 
     bool isPaste = pasteFramesWithoutUndo(drawingData, sl, frames,
                                           DrawingData::OVER_FRAMEID, true,
                                           keepOriginalPalette);
-    if (!isPaste) return;
+    if (!isPaste) {
+      delete data;
+      delete oldLevelHooks;
+      return;
+    }
     TUndoManager::manager()->add(new PasteFramesUndo(
         sl, frames, oldLevelFrameId, oldPalette, DrawingData::OVER_FRAMEID,
         oldLevelHooks, keepOriginalPalette, data));
@@ -1750,19 +1545,23 @@ void FilmstripCmd::pasteInto(TXshSimpleLevel *sl, std::set<TFrameId> &frames) {
   if (TPalette *pal = sl->getPalette()) oldPalette = pal->clone();
 
   QClipboard *clipboard = QApplication::clipboard();
-  if (const DrawingData *drawingData =
+  if (const auto *drawingData =
           dynamic_cast<const DrawingData *>(clipboard->mimeData())) {
-    DrawingData *data = new DrawingData();
+    auto *data = new DrawingData();
     data->setLevelFrames(sl, frames);
 
-    HookSet *oldLevelHooks = new HookSet();
-    *oldLevelHooks         = *sl->getHookSet();
+    auto *oldLevelHooks = new HookSet();
+    *oldLevelHooks      = *sl->getHookSet();
 
     bool keepOriginalPalette = true;
     bool isPaste             = pasteFramesWithoutUndo(drawingData, sl, frames,
                                                       DrawingData::OVER_SELECTION, true,
                                                       keepOriginalPalette);
-    if (!isPaste) return;
+    if (!isPaste) {
+      delete data;
+      delete oldLevelHooks;
+      return;
+    }
 
     TUndoManager::manager()->add(new PasteFramesUndo(
         sl, frames, oldLevelFrameId, oldPalette, DrawingData::OVER_SELECTION,
@@ -1794,11 +1593,7 @@ void FilmstripCmd::clear(TXshSimpleLevel *sl, std::set<TFrameId> &frames) {
   if (sl->isReadOnly()) {
     std::set<TFrameId> editableFrames = sl->getEditableRange();
     if (editableFrames.empty()) return;
-
-    // Browser all the frames and return if some frames are not editable
-    std::set<TFrameId>::const_iterator it;
-    for (it = frames.begin(); it != frames.end(); ++it) {
-      TFrameId frameId = *it;
+    for (const TFrameId &frameId : frames) {
       if (editableFrames.count(frameId) == 0) return;
     }
   }
@@ -1807,9 +1602,9 @@ void FilmstripCmd::clear(TXshSimpleLevel *sl, std::set<TFrameId> &frames) {
   std::set<TFrameId> oldFrames = frames;
   std::map<TFrameId, QString> clearedFrames =
       clearFramesWithoutUndo(sl, frames);
-  DrawingData *oldData = new DrawingData();
+  auto *oldData = new DrawingData();
   oldData->setFrames(clearedFrames, sl, *levelHooks);
-  DrawingData *newData = new DrawingData();
+  auto *newData = new DrawingData();
   newData->setLevelFrames(sl, frames);
   frames.clear();
   TUndoManager::manager()->add(
@@ -1817,24 +1612,22 @@ void FilmstripCmd::clear(TXshSimpleLevel *sl, std::set<TFrameId> &frames) {
 }
 
 //=============================================================================
-// clear
+// remove
 //-----------------------------------------------------------------------------
 
 void FilmstripCmd::remove(TXshSimpleLevel *sl, std::set<TFrameId> &frames) {
   if (!sl || frames.empty() || sl->isSubsequence() || sl->isReadOnly()) return;
 
   std::map<TFrameId, QString> imageSet;
-  std::set<TFrameId>::const_iterator it;
   int i = 0;
-  for (it = frames.begin(); it != frames.end(); ++it, i++) {
-    TFrameId frameId = *it;
-    QString id       = "removeFrames" + QString::number((uintptr_t)sl) + "-" +
-                 QString::number(it->getNumber());
+  for (const TFrameId &frameId : frames) {
+    QString id = "removeFrames" + QString::number((uintptr_t)sl) + "-" +
+                 QString::number(frameId.getNumber());
     TImageCache::instance()->add(id, sl->getFrame(frameId, false));
     imageSet[frameId] = id;
   }
-  HookSet *levelHooks  = sl->getHookSet();
-  DrawingData *oldData = new DrawingData();
+  HookSet *levelHooks = sl->getHookSet();
+  auto *oldData       = new DrawingData();
   oldData->setFrames(imageSet, sl, *levelHooks);
 
   removeFramesWithoutUndo(sl, frames);
@@ -1843,18 +1636,14 @@ void FilmstripCmd::remove(TXshSimpleLevel *sl, std::set<TFrameId> &frames) {
 
 //-----------------------------------------------------------------------------
 namespace {
-//-----------------------------------------------------------------------------
 
 void insertEmptyFilmstripFrames(const TXshSimpleLevelP &sl,
                                 const std::set<TFrameId> &frames) {
   if (!sl || frames.empty()) return;
   makeSpaceForFids(sl.getPointer(), frames);
-  std::set<TFrameId>::const_iterator it;
-  for (it = frames.begin(); it != frames.end(); ++it)
-    sl->setFrame(*it, sl->createEmptyFrame());
+  for (const TFrameId &fid : frames) sl->setFrame(fid, sl->createEmptyFrame());
   invalidateIcons(sl.getPointer(), frames);
   sl->setDirtyFlag(true);
-  //  TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
 }
 
@@ -1870,13 +1659,12 @@ public:
   UndoInsertEmptyFrames(const TXshSimpleLevelP &level,
                         std::set<TFrameId> frames,
                         std::vector<TFrameId> oldFrames)
-      : m_level(level), m_frames(frames), m_oldFrames(oldFrames) {
+      : m_level(level)
+      , m_frames(std::move(frames))
+      , m_oldFrames(std::move(oldFrames)) {
     if (m_level->getType() == TZP_XSHLEVEL) {
-      std::set<TFrameId>::iterator it;
-      for (it = m_frames.begin(); it != m_frames.end(); it++) {
-        TToonzImageP img = m_level->getFrame(*it, true);
-        // TImageCache::instance()->add("UndoInsertEmptyFrames"+QString::number((UINT)this),
-        // img);
+      for (const TFrameId &fid : m_frames) {
+        TToonzImageP img = m_level->getFrame(fid, true);
         TImageCache::instance()->add(
             "UndoInsertEmptyFrames" + QString::number((uintptr_t)this), img);
       }
@@ -1886,7 +1674,6 @@ public:
   }
 
   ~UndoInsertEmptyFrames() {
-    // TImageCache::instance()->remove("UndoInsertEmptyFrames"+QString::number((UINT)this));
     TImageCache::instance()->remove("UndoInsertEmptyFrames" +
                                     QString::number((uintptr_t)this));
   }
@@ -1906,19 +1693,14 @@ public:
 
   void redo() const override {
     if (!m_level || m_frames.empty()) return;
-    if (m_level->getType() == PLI_XSHLEVEL)
+    if (m_level->getType() == PLI_XSHLEVEL) {
       FilmstripCmd::insert(m_level.getPointer(), m_frames, false);
-    else if (m_level->getType() == TZP_XSHLEVEL) {
+    } else if (m_level->getType() == TZP_XSHLEVEL) {
       makeSpaceForFids(m_level.getPointer(), m_frames);
-      std::set<TFrameId>::const_iterator it;
-      // TToonzImageP image =
-      // (TToonzImageP)TImageCache::instance()->get("UndoInsertEmptyFrames"+QString::number((UINT)this),
-      // true);
       TToonzImageP image = (TToonzImageP)TImageCache::instance()->get(
           "UndoInsertEmptyFrames" + QString::number((uintptr_t)this), true);
       if (!image) return;
-      for (it = m_frames.begin(); it != m_frames.end(); ++it)
-        m_level->setFrame(*it, image);
+      for (const TFrameId &fid : m_frames) m_level->setFrame(fid, image);
       invalidateIcons(m_level.getPointer(), m_frames);
       m_level->setDirtyFlag(true);
       TApp::instance()->getCurrentLevel()->notifyLevelChange();
@@ -1932,6 +1714,9 @@ public:
         .arg(QString::fromStdWString(m_level->getName()));
   }
   int getHistoryType() override { return HistoryType::FilmStrip; }
+
+private:
+  Q_DISABLE_COPY_MOVE(UndoInsertEmptyFrames);
 };
 
 }  // namespace
@@ -1949,7 +1734,7 @@ void FilmstripCmd::insert(TXshSimpleLevel *sl, const std::set<TFrameId> &frames,
   insertEmptyFilmstripFrames(sl, frames);
   if (withUndo)
     TUndoManager::manager()->add(
-        new UndoInsertEmptyFrames(sl, frames, oldFrames));
+        new UndoInsertEmptyFrames(sl, frames, std::move(oldFrames)));
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
 }
 
@@ -1957,31 +1742,28 @@ void FilmstripCmd::insert(TXshSimpleLevel *sl, const std::set<TFrameId> &frames,
 
 //-----------------------------------------------------------------------------
 namespace {
-//-----------------------------------------------------------------------------
 
 void performReverse(const TXshSimpleLevelP &sl,
                     const std::set<TFrameId> &frames) {
   if (!sl || frames.empty()) return;
 
-  std::vector<TFrameId> fids;
-  std::vector<TFrameId> oldFrames;
+  std::vector<TFrameId> fids, oldFrames;
   sl->getFids(oldFrames);
-  sl->getFids(fids);
-  int i = 0, j = (int)fids.size() - 1;
+  fids  = oldFrames;
+  int i = 0, j = int(fids.size()) - 1;
   for (;;) {
-    while (i < j && frames.count(fids[i]) == 0) i++;
-    while (i < j && frames.count(fids[j]) == 0) j--;
+    while (i < j && frames.count(fids[i]) == 0) ++i;
+    while (i < j && frames.count(fids[j]) == 0) --j;
     if (i >= j) break;
     std::swap(fids[i], fids[j]);
-    i++;
-    j--;
+    ++i;
+    --j;
   }
   if (Preferences::instance()->isSyncLevelRenumberWithXsheetEnabled()) {
     updateXSheet(sl.getPointer(), oldFrames, fids);
   }
   sl->renumber(fids);
   sl->setDirtyFlag(true);
-  //  TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
 }
 
@@ -1993,17 +1775,20 @@ class FilmstripReverseUndo final : public TUndo {
 
 public:
   FilmstripReverseUndo(TXshSimpleLevelP level, std::set<TFrameId> frames)
-      : m_level(level), m_frames(frames) {}
+      : m_level(std::move(level)), m_frames(std::move(frames)) {}
 
   void undo() const override { performReverse(m_level, m_frames); }
   void redo() const override { performReverse(m_level, m_frames); }
-  int getSize() const override { return sizeof *this; }
+  int getSize() const override { return sizeof(*this); }
 
   QString getHistoryString() override {
     return QObject::tr("Reverse  : Level %1")
         .arg(QString::fromStdWString(m_level->getName()));
   }
   int getHistoryType() override { return HistoryType::FilmStrip; }
+
+private:
+  Q_DISABLE_COPY_MOVE(FilmstripReverseUndo);
 };
 
 }  // namespace
@@ -2023,36 +1808,31 @@ void FilmstripCmd::reverse(TXshSimpleLevel *sl, std::set<TFrameId> &frames) {
 
 //-----------------------------------------------------------------------------
 namespace {
-//-----------------------------------------------------------------------------
 
 void performSwing(const TXshSimpleLevelP &sl,
                   const std::set<TFrameId> &frames) {
   if (!sl) return;
-  int count = frames.size() - 1;
-  if (count <= 0) return;  // niente swing con un solo frame
+  int count = int(frames.size()) - 1;
+  if (count <= 0) return;
   TFrameId lastFid     = *frames.rbegin();
   TFrameId insertPoint = lastFid + 1;
   std::set<TFrameId> framesToInsert;
-  int i;
-  for (i = 0; i < count; i++) framesToInsert.insert(insertPoint + i);
+  for (int i = 0; i < count; ++i) framesToInsert.insert(insertPoint + i);
 
-  std::vector<TImage *> clonedImages;
-  std::set<TFrameId>::const_reverse_iterator k;
-  k = frames.rbegin();
-  for (++k; k != frames.rend(); ++k) {
+  std::vector<TImageP> clonedImages;
+  for (auto k = frames.rbegin(); k != frames.rend(); ++k) {
     TImageP img = sl->getFrame(*k, false);
-    clonedImages.push_back(img ? img->cloneImage() : 0);
+    clonedImages.push_back(img ? img->cloneImage() : nullptr);
   }
 
   makeSpaceForFids(sl.getPointer(), framesToInsert);
   assert(count == (int)clonedImages.size());
-  for (i = 0; i < count && (int)i < (int)clonedImages.size(); i++) {
-    TImage *img = clonedImages[i];
+  for (int i = 0; i < count; ++i) {
+    TImage *img = clonedImages[i].getPointer();
     if (img) sl->setFrame(insertPoint + i, img);
   }
   invalidateIcons(sl.getPointer(), framesToInsert);
   sl->setDirtyFlag(true);
-  //  TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
 }
 
@@ -2067,13 +1847,11 @@ public:
   FilmstripSwingUndo(const TXshSimpleLevelP &level,
                      const std::set<TFrameId> &frames)
       : m_level(level), m_frames(frames) {
-    int count = frames.size() - 1;
-    if (count <= 0) return;  // niente swing con un solo frame
+    int count = int(frames.size()) - 1;
+    if (count <= 0) return;
     TFrameId lastFid     = *frames.rbegin();
     TFrameId insertPoint = lastFid + 1;
-    std::set<TFrameId> framesToInsert;
-    int i;
-    for (i = 0; i < count; i++) m_newFrames.insert(insertPoint + i);
+    for (int i = 0; i < count; ++i) m_newFrames.insert(insertPoint + i);
   }
 
   void undo() const override {
@@ -2086,13 +1864,16 @@ public:
     if (selection) selection->selectNone();
     performSwing(m_level, m_frames);
   }
-  int getSize() const override { return sizeof *this; }
+  int getSize() const override { return sizeof(*this); }
 
   QString getHistoryString() override {
     return QObject::tr("Swing  : Level %1")
         .arg(QString::fromStdWString(m_level->getName()));
   }
   int getHistoryType() override { return HistoryType::FilmStrip; }
+
+private:
+  Q_DISABLE_COPY_MOVE(FilmstripSwingUndo);
 };
 
 }  // namespace
@@ -2112,19 +1893,17 @@ void FilmstripCmd::swing(TXshSimpleLevel *sl, std::set<TFrameId> &frames) {
 
 //-----------------------------------------------------------------------------
 namespace {
-//-----------------------------------------------------------------------------
 
 void stepFilmstripFrames(const TXshSimpleLevelP &sl,
                          const std::set<TFrameId> &frames, int step = 2) {
   if (!sl || frames.empty() || step < 2) return;
-  std::vector<TFrameId> fids;
+  std::vector<TFrameId> fids, oldFrames;
+  sl->getFids(oldFrames);
+  fids = oldFrames;
   std::set<TFrameId> changedFids;
   std::vector<int> insertIndices;
-  std::vector<TFrameId> oldFrames;
-  sl->getFids(oldFrames);
-  sl->getFids(fids);
-  int i, offset = 0;
-  for (i = 0; i < (int)fids.size(); i++) {
+  int offset = 0;
+  for (size_t i = 0; i < fids.size(); ++i) {
     bool frameToStep = (frames.count(fids[i]) > 0);
     if (offset > 0) {
       changedFids.insert(fids[i]);
@@ -2132,7 +1911,7 @@ void stepFilmstripFrames(const TXshSimpleLevelP &sl,
       changedFids.insert(fids[i]);
     }
     if (frameToStep) {
-      insertIndices.push_back(i);
+      insertIndices.push_back(int(i));
       offset += step - 1;
     }
   }
@@ -2140,13 +1919,11 @@ void stepFilmstripFrames(const TXshSimpleLevelP &sl,
     updateXSheet(sl.getPointer(), oldFrames, fids);
   }
   sl->renumber(fids);
-  for (i = 0; i < (int)insertIndices.size(); i++) {
-    int j        = insertIndices[i];
-    TFrameId fid = fids[j];
+  for (int idx : insertIndices) {
+    TFrameId fid = fids[idx];
     TImageP img  = sl->getFrame(fid, false);
     if (img) {
-      int h;
-      for (h = 1; h < step; h++) {
+      for (int h = 1; h < step; ++h) {
         sl->setFrame(fid + h, img->cloneImage());
         changedFids.insert(fid + h);
       }
@@ -2174,16 +1951,15 @@ public:
     assert(m_level);
     m_level->getFids(m_oldFrames);
     int d = 0;
-    std::set<TFrameId>::const_iterator it;
-    for (it = frames.begin(); it != frames.end(); ++it)
-      for (int j = 1; j < step; j++) m_insertedFrames.insert(*it + (++d));
+    for (const TFrameId &fid : frames) {
+      for (int j = 1; j < step; ++j) m_insertedFrames.insert(fid + (++d));
+    }
     m_updateXSheet =
         Preferences::instance()->isSyncLevelRenumberWithXsheetEnabled();
   }
 
   void undo() const override {
     removeFramesWithoutUndo(m_level, m_insertedFrames);
-    std::set<TFrameId>::const_iterator it = m_frames.begin();
     if (m_updateXSheet) {
       std::vector<TFrameId> newFrames;
       m_level->getFids(newFrames);
@@ -2200,7 +1976,7 @@ public:
     if (selection) selection->selectNone();
     stepFilmstripFrames(m_level, m_frames, m_step);
   }
-  int getSize() const override { return sizeof *this; }
+  int getSize() const override { return sizeof(*this); }
 
   QString getHistoryString() override {
     return QObject::tr("Step %1  : Level %2")
@@ -2208,6 +1984,9 @@ public:
         .arg(QString::fromStdWString(m_level->getName()));
   }
   int getHistoryType() override { return HistoryType::FilmStrip; }
+
+private:
+  Q_DISABLE_COPY_MOVE(StepFilmstripUndo);
 };
 
 }  // namespace
@@ -2220,7 +1999,7 @@ void FilmstripCmd::step(TXshSimpleLevel *sl, std::set<TFrameId> &frames,
                         int step) {
   if (!sl || sl->isSubsequence() || sl->isReadOnly()) return;
   QApplication::setOverrideCursor(Qt::WaitCursor);
-  StepFilmstripUndo *undo = new StepFilmstripUndo(sl, frames, step);
+  auto *undo = new StepFilmstripUndo(sl, frames, step);
   stepFilmstripFrames(sl, frames, step);
   TUndoManager::manager()->add(undo);
   frames.clear();
@@ -2232,35 +2011,29 @@ void FilmstripCmd::step(TXshSimpleLevel *sl, std::set<TFrameId> &frames,
 
 //-----------------------------------------------------------------------------
 namespace {
-//-----------------------------------------------------------------------------
 
 std::map<TFrameId, QString> eachFilmstripFrames(
     const TXshSimpleLevelP &sl, const std::set<TFrameId> &frames, int each) {
-  if (frames.empty() || !sl || each < 2) return std::map<TFrameId, QString>();
+  if (frames.empty() || !sl || each < 2) return {};
   std::vector<TFrameId> framesToDelete;
-  std::set<TFrameId>::const_iterator it;
   int k = 0;
-  for (it = frames.begin(); it != frames.end(); ++it, ++k)
-    if ((k % each) > 0) framesToDelete.push_back(*it);
-  int i = 0;
-  std::vector<TFrameId>::reverse_iterator fit;
+  for (const TFrameId &fid : frames) {
+    if ((k % each) > 0) framesToDelete.push_back(fid);
+    ++k;
+  }
   std::map<TFrameId, QString> cutFrames;
-
-  for (fit = framesToDelete.rbegin(); fit != framesToDelete.rend(); ++fit) {
+  for (auto fit = framesToDelete.rbegin(); fit != framesToDelete.rend();
+       ++fit) {
     TImageP img = sl->getFrame(*fit, false);
     if (img) {
-      // QString id =
-      // "eachFrames"+QString::number((UINT)sl.getPointer())+"-"+QString::number(fit->getNumber());
       QString id = "eachFrames" + QString::number((uintptr_t)sl.getPointer()) +
                    "-" + QString::number(fit->getNumber());
       TImageCache::instance()->add(id, img);
-
       cutFrames[*fit] = id;
     }
-    sl->eraseFrame(*fit);  // toglie da cache?
+    sl->eraseFrame(*fit);
     IconGenerator::instance()->remove(sl.getPointer(), *fit);
   }
-
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
   return cutFrames;
 }
@@ -2278,13 +2051,11 @@ public:
                     const std::set<TFrameId> &frames,
                     std::map<TFrameId, QString> deletedFrames)
       : m_level(level)
-      , m_cutFrames(deletedFrames)
+      , m_cutFrames(std::move(deletedFrames))
       , m_each(each)
       , m_frames(frames) {}
   ~EachFilmstripUndo() {
-    std::map<TFrameId, QString>::iterator it = m_cutFrames.begin();
-    for (; it != m_cutFrames.end(); ++it)
-      TImageCache::instance()->remove(it->second);
+    for (const auto &[_, id] : m_cutFrames) TImageCache::instance()->remove(id);
   }
   void undo() const override {
     TSelection *selection = TSelection::getCurrent();
@@ -2296,7 +2067,7 @@ public:
     if (selection) selection->selectNone();
     eachFilmstripFrames(m_level, m_frames, m_each);
   }
-  int getSize() const override { return sizeof *this; }
+  int getSize() const override { return sizeof(*this); }
 
   QString getHistoryString() override {
     return QObject::tr("Each %1  : Level %2")
@@ -2304,6 +2075,9 @@ public:
         .arg(QString::fromStdWString(m_level->getName()));
   }
   int getHistoryType() override { return HistoryType::FilmStrip; }
+
+private:
+  Q_DISABLE_COPY_MOVE(EachFilmstripUndo);
 };
 
 }  // namespace
@@ -2318,7 +2092,7 @@ void FilmstripCmd::each(TXshSimpleLevel *sl, std::set<TFrameId> &frames,
   std::map<TFrameId, QString> deletedFrames =
       eachFilmstripFrames(sl, frames, each);
   TUndoManager::manager()->add(
-      new EachFilmstripUndo(sl, each, frames, deletedFrames));
+      new EachFilmstripUndo(sl, each, frames, std::move(deletedFrames)));
   frames.clear();
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
 }
@@ -2327,7 +2101,6 @@ void FilmstripCmd::each(TXshSimpleLevel *sl, std::set<TFrameId> &frames,
 
 //-----------------------------------------------------------------------------
 namespace {
-//-----------------------------------------------------------------------------
 
 class UndoDuplicateDrawing final : public TUndo {
   TXshSimpleLevelP m_level;
@@ -2338,13 +2111,13 @@ class UndoDuplicateDrawing final : public TUndo {
 
 public:
   UndoDuplicateDrawing(const TXshSimpleLevelP &level,
-                       const std::vector<TFrameId> oldFrames,
+                       const std::vector<TFrameId> &oldFrames,
                        std::set<TFrameId> frameInserted,
                        std::set<TFrameId> framesForRedo)
       : m_level(level)
       , m_oldFrames(oldFrames)
-      , m_frameInserted(frameInserted)
-      , m_framesForRedo(framesForRedo) {
+      , m_frameInserted(std::move(frameInserted))
+      , m_framesForRedo(std::move(framesForRedo)) {
     m_updateXSheet =
         Preferences::instance()->isSyncLevelRenumberWithXsheetEnabled();
   }
@@ -2372,6 +2145,9 @@ public:
         .arg(QString::fromStdWString(m_level->getName()));
   }
   int getHistoryType() override { return HistoryType::FilmStrip; }
+
+private:
+  Q_DISABLE_COPY_MOVE(UndoDuplicateDrawing);
 };
 
 }  // namespace
@@ -2387,19 +2163,20 @@ void FilmstripCmd::duplicateFrameWithoutUndo(TXshSimpleLevel *sl,
   if (srcFrame.isEmptyFrame()) return;
 
   std::set<TFrameId> frames;
-
   frames.insert(srcFrame);
-  DrawingData *data = new DrawingData();
+  auto *data = new DrawingData();
   data->setLevelFrames(sl, frames);
 
   frames.clear();
   frames.insert(targetFrame);
 
   bool keepOriginalPalette = true;
-
   pasteFramesWithoutUndo(data, sl, frames, DrawingData::OVER_SELECTION, true,
                          keepOriginalPalette);
+  delete data;
 }
+
+//-----------------------------------------------------------------------------
 
 void FilmstripCmd::duplicate(TXshSimpleLevel *sl, std::set<TFrameId> &frames,
                              bool withUndo) {
@@ -2410,15 +2187,15 @@ void FilmstripCmd::duplicate(TXshSimpleLevel *sl, std::set<TFrameId> &frames,
   std::map<TFrameId, QString> framesToInsert;
   std::set<TFrameId> newFrames;
   int i = 0;
-  for (auto const &fid : frames) {
+  for (const TFrameId &fid : frames) {
     TImageP img      = sl->getFrame(fid, false);
-    TImageP imgClone = (img) ? img->cloneImage() : 0;
+    TImageP imgClone = (img) ? img->cloneImage() : nullptr;
     QString id       = "dupFrames" + QString::number((uintptr_t)sl) + "-" +
                  QString::number(fid.getNumber());
     TImageCache::instance()->add(id, imgClone);
     framesToInsert[insertPoint + i] = id;
     newFrames.insert(insertPoint + i);
-    i++;
+    ++i;
   }
   std::vector<TFrameId> oldFrames;
   sl->getFids(oldFrames);
@@ -2433,7 +2210,6 @@ void FilmstripCmd::duplicate(TXshSimpleLevel *sl, std::set<TFrameId> &frames,
 
 //-----------------------------------------------------------------------------
 namespace {
-//-----------------------------------------------------------------------------
 
 void moveToSceneFrames(TXshLevel *level, const std::set<TFrameId> &frames) {
   if (frames.empty() || !level) return;
@@ -2442,13 +2218,12 @@ void moveToSceneFrames(TXshLevel *level, const std::set<TFrameId> &frames) {
   TXsheet *xsh      = xh->getXsheet();
   int row           = 0;
   int col           = xsh->getFirstFreeColumnIndex();
-  std::set<TFrameId>::const_iterator it;
   if (level->getPaletteLevel()) {
-    TXshPaletteColumn *column = new TXshPaletteColumn;
+    auto *column = new TXshPaletteColumn;
     xsh->insertColumn(col, column);
   }
-  for (it = frames.begin(); it != frames.end(); ++it) {
-    xsh->setCell(row, col, TXshCell(level, *it));
+  for (const TFrameId &fid : frames) {
+    xsh->setCell(row, col, TXshCell(level, fid));
     ++row;
   }
   xh->notifyXsheetChanged();
@@ -2463,7 +2238,9 @@ class MoveLevelToSceneUndo final : public TUndo {
 
 public:
   MoveLevelToSceneUndo(std::wstring levelName, int col, std::set<TFrameId> fids)
-      : m_levelName(levelName), m_col(col), m_fids(fids) {}
+      : m_levelName(std::move(levelName))
+      , m_col(col)
+      , m_fids(std::move(fids)) {}
 
   void undo() const override {
     TApp *app         = TApp::instance();
@@ -2471,7 +2248,7 @@ public:
     ToonzScene *scene = app->getCurrentScene()->getScene();
     TXshLevel *xl     = scene->getLevelSet()->getLevel(m_levelName);
     if (xl->getPaletteLevel()) xsh->removeColumn(m_col);
-    xsh->clearCells(0, m_col, m_fids.size());
+    xsh->clearCells(0, m_col, int(m_fids.size()));
     app->getCurrentXsheet()->notifyXsheetChanged();
   }
   void redo() const override {
@@ -2481,13 +2258,16 @@ public:
     if (!xl) return;
     moveToSceneFrames(xl, m_fids);
   }
-  int getSize() const override { return sizeof *this; }
+  int getSize() const override { return sizeof(*this); }
 
   QString getHistoryString() override {
     return QObject::tr("Move Level to Scene  : Level %1")
         .arg(QString::fromStdWString(m_levelName));
   }
   int getHistoryType() override { return HistoryType::FilmStrip; }
+
+private:
+  Q_DISABLE_COPY_MOVE(MoveLevelToSceneUndo);
 };
 
 }  // namespace
@@ -2503,9 +2283,8 @@ void FilmstripCmd::moveToScene(TXshLevel *sl, std::set<TFrameId> &frames) {
   TXsheet *xsh      = xh->getXsheet();
   int row           = 0;
   int col           = xsh->getFirstFreeColumnIndex();
-  std::set<TFrameId>::const_iterator it;
-  for (it = frames.begin(); it != frames.end(); ++it) {
-    xsh->setCell(row, col, TXshCell(sl, *it));
+  for (const TFrameId &fid : frames) {
+    xsh->setCell(row, col, TXshCell(sl, fid));
     ++row;
   }
   xh->notifyXsheetChanged();
@@ -2530,20 +2309,19 @@ void FilmstripCmd::moveToScene(TXshPaletteLevel *pl) {
   std::set<TFrameId> fidsSet;
   fidsSet.insert(TFrameId(1));
 
-  TXsheetHandle *xh         = TApp::instance()->getCurrentXsheet();
-  TXsheet *xsh              = xh->getXsheet();
-  int row                   = 0;
-  int col                   = xsh->getFirstFreeColumnIndex();
-  TXshPaletteColumn *column = new TXshPaletteColumn;
+  TXsheetHandle *xh = TApp::instance()->getCurrentXsheet();
+  TXsheet *xsh      = xh->getXsheet();
+  int row           = 0;
+  int col           = xsh->getFirstFreeColumnIndex();
+  auto *column      = new TXshPaletteColumn;
   xsh->insertColumn(col, column);
-  std::set<TFrameId>::const_iterator it;
-  for (it = fidsSet.begin(); it != fidsSet.end(); ++it) {
-    xsh->setCell(row, col, TXshCell(pl, *it));
+  for (const TFrameId &fid : fidsSet) {
+    xsh->setCell(row, col, TXshCell(pl, fid));
     ++row;
   }
   xh->notifyXsheetChanged();
   TUndoManager::manager()->add(
-      new MoveLevelToSceneUndo(pl->getName(), col, fidsSet));
+      new MoveLevelToSceneUndo(pl->getName(), col, std::move(fidsSet)));
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
 }
 
@@ -2571,37 +2349,33 @@ class UndoInbetween final : public TUndo {
 public:
   UndoInbetween(TXshSimpleLevel *xl, std::vector<TFrameId> fids,
                 FilmstripCmd::InbetweenInterpolation interpolation)
-      : m_level(xl), m_fids(fids), m_interpolation(interpolation) {
-    std::vector<TFrameId>::iterator it = fids.begin();
-    // mi salvo tutte le immagine
-    for (; it != fids.end(); ++it)
+      : m_level(xl), m_fids(std::move(fids)), m_interpolation(interpolation) {
+    for (const TFrameId &fid : m_fids) {
       m_images.push_back(m_level->getFrame(
-          *it, false));  // non si fa clone perche' il livello subito dopo
-                         // rilascia queste immagini a causa dell'inbetweener
+          fid, false));  // no clone, level releases these images
+    }
   }
 
   void undo() const override {
-    UINT levelSize = m_fids.size() - 1;
-    for (UINT count = 1; count != levelSize; count++) {
+    for (size_t count = 1; count < m_fids.size(); ++count) {
       TVectorImageP vImage = m_images[count];
       m_level->setFrame(m_fids[count], vImage);
       IconGenerator::instance()->invalidate(m_level.getPointer(),
                                             m_fids[count]);
     }
-
     TApp::instance()->getCurrentLevel()->notifyLevelChange();
   }
 
   void redo() const override {
-    TFrameId fid0 = *m_fids.begin();
-    TFrameId fid1 = *(--m_fids.end());
+    TFrameId fid0 = m_fids.front();
+    TFrameId fid1 = m_fids.back();
     FilmstripCmd::inbetweenWithoutUndo(m_level.getPointer(), fid0, fid1,
                                        m_interpolation);
   }
 
   int getSize() const override {
     assert(!m_images.empty());
-    return m_images.size() * m_images.front()->getStrokeCount() * 100;
+    return int(m_images.size() * m_images.front()->getStrokeCount() * 100);
   }
 
   QString getHistoryString() override {
@@ -2624,6 +2398,9 @@ public:
     return str;
   }
   int getHistoryType() override { return HistoryType::FilmStrip; }
+
+private:
+  Q_DISABLE_COPY_MOVE(UndoInbetween);
 };
 
 }  // namespace
@@ -2638,20 +2415,19 @@ void FilmstripCmd::inbetweenWithoutUndo(
   if (!sl) return;
   std::vector<TFrameId> fids;
   sl->getFids(fids);
-  std::vector<TFrameId>::iterator it;
-  it = std::find(fids.begin(), fids.end(), fid0);
-  if (it == fids.end()) return;
-  int ia = std::distance(fids.begin(), it);
-  it     = std::find(fids.begin(), fids.end(), fid1);
-  if (it == fids.end()) return;
-  int ib = std::distance(fids.begin(), it);
+  auto it0 = std::find(fids.begin(), fids.end(), fid0);
+  if (it0 == fids.end()) return;
+  int ia   = int(std::distance(fids.begin(), it0));
+  auto it1 = std::find(fids.begin(), fids.end(), fid1);
+  if (it1 == fids.end()) return;
+  int ib = int(std::distance(fids.begin(), it1));
   if (ib - ia < 2) return;
 
   TVectorImageP img0 = sl->getFrame(fid0, false);
   TVectorImageP img1 = sl->getFrame(fid1, false);
   if (!img0 || !img1) return;
 
-  enum TInbetween::TweenAlgorithm algorithm;
+  TInbetween::TweenAlgorithm algorithm;
   switch (interpolation) {
   case II_Linear:
     algorithm = TInbetween::LinearInterpolation;
@@ -2668,11 +2444,9 @@ void FilmstripCmd::inbetweenWithoutUndo(
   }
 
   TInbetween inbetween(img0, img1);
-  int i;
-  for (i = ia + 1; i < ib; i++) {
-    double t = (double)(i - ia) / (double)(ib - ia);
-    double s = TInbetween::interpolation(t, algorithm);
-
+  for (int i = ia + 1; i < ib; ++i) {
+    double t         = double(i - ia) / double(ib - ia);
+    double s         = TInbetween::interpolation(t, algorithm);
     TVectorImageP vi = inbetween.tween(s);
     sl->setFrame(fids[i], vi);
     IconGenerator::instance()->invalidate(sl, fids[i]);
@@ -2689,7 +2463,7 @@ void FilmstripCmd::inbetween(
   std::vector<TFrameId> fids;
   std::vector<TFrameId> levelFids;
   sl->getFids(levelFids);
-  for (auto const &fid : levelFids) {
+  for (const TFrameId &fid : levelFids) {
     int curFid = fid.getNumber();
     if (fid0.getNumber() <= curFid && curFid <= fid1.getNumber())
       fids.push_back(fid);
@@ -2706,12 +2480,10 @@ void FilmstripCmd::inbetween(
 void FilmstripCmd::renumberDrawing(TXshSimpleLevel *sl, const TFrameId &oldFid,
                                    const TFrameId &desiredNewFid) {
   if (oldFid == desiredNewFid) return;
-  std::vector<TFrameId> fids;
-  std::vector<TFrameId> oldFrames;
+  std::vector<TFrameId> fids, oldFrames;
   sl->getFids(oldFrames);
-  sl->getFids(fids);
-  std::vector<TFrameId>::iterator it =
-      std::find(fids.begin(), fids.end(), oldFid);
+  fids    = oldFrames;
+  auto it = std::find(fids.begin(), fids.end(), oldFid);
   if (it == fids.end()) return;
   TFrameId newFid = desiredNewFid;
   while (std::find(fids.begin(), fids.end(), newFid) != fids.end()) {

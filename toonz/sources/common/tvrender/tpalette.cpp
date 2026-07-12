@@ -727,7 +727,7 @@ void TPalette::saveData(TOStream &os) {
     os.closeChild();
   }
 
-  // salvo gli shortcuts solo se sono non standard
+  // save the shortcuts only if they are non-standard
   int i;
   for (i = 0; i < 10; ++i)
     if (getShortcutValue('0' + i) != i) break;
@@ -784,7 +784,7 @@ void TPalette::loadData(TIStream &is) {
     } else if (tagName == "stylepages") {
       while (!is.eos()) {
         if (!is.openChild(tagName) || tagName != "page")
-          throw TException("palette, expected tag <stylepage>");
+          throw TException("palette, expected tag <page>");
         {
           std::wstring pageName;
 
@@ -864,14 +864,6 @@ void TPalette::loadData(TIStream &is) {
         }
         is.closeChild();
       }
-    } else if (tagName == "stylepages") {
-      int key = '0';
-      while (!is.eos()) {
-        int styleId = 0;
-        is >> styleId;
-
-        if (key <= '9') setShortcutValue(key, styleId);
-      }
     } else if (tagName == "shortcuts") {
       for (int i = 0; i < 10; ++i) {
         int v;
@@ -907,9 +899,9 @@ void TPalette::assign(const TPalette *src, bool isFromStudioPalette) {
     TColorStyle *srcStyle = src->getStyle(i);
     TColorStyle *dstStyle = srcStyle->clone();
     dstStyle->setName(
-        srcStyle->getName());  // per un baco del TColorStyle::clone()
+        srcStyle->getName());  // due to a bug in TColorStyle::clone()
     dstStyle->setGlobalName(
-        srcStyle->getGlobalName());  // per un baco del TColorStyle::clone()
+        srcStyle->getGlobalName());  // due to a bug in TColorStyle::clone()
 
     // if the style is copied from studio palette, put its name to the original
     // name.

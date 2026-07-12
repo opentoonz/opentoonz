@@ -329,7 +329,7 @@ SpectrumField::SpectrumField(QWidget *parent, TPixel32 color)
   setFixedHeight(60);
 
   QVBoxLayout *layout = new QVBoxLayout();
-  layout->setMargin(m_margin);
+  layout->setContentsMargins(m_margin, m_margin, m_margin, m_margin);
   layout->setSpacing(m_spacing);
 
   m_spectrumbar = new SpectrumBar(this, color);

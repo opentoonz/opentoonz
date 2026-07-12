@@ -16,7 +16,7 @@
 //    Diagnostics stuff
 //*******************************************************************************
 
-//#define TIPC_DEBUG
+// #define TIPC_DEBUG
 
 #ifdef TIPC_DEBUG
 #define tipc_debug(expr) expr
@@ -40,10 +40,7 @@ void tipc::SocketController::onReadyRead() {
 //-----------------------------------------------------------------------
 
 void tipc::SocketController::onDisconnected() {
-  m_socket->QObject::disconnect(SIGNAL(readyRead()));
-
-  // Auto-delete this
-  delete this;
+  // Automatically deleted by parent socket; no deleteLater() needed
 }
 
 //*******************************************************************************
@@ -51,7 +48,7 @@ void tipc::SocketController::onDisconnected() {
 //*******************************************************************************
 
 tipc::Server::Server() : m_lock(false) {
-  connect(this, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
+  connect(this, &QLocalServer::newConnection, this, &Server::onNewConnection);
 
   // Add default parsers
   addParser(new DefaultMessageParser<SHMEM_REQUEST>);
@@ -65,8 +62,10 @@ tipc::Server::Server() : m_lock(false) {
 
 tipc::Server::~Server() {
   // Release parsers
-  QHash<QString, MessageParser *>::iterator it;
-  for (it = m_parsers.begin(); it != m_parsers.end(); ++it) delete it.value();
+  for (auto it = m_parsers.begin(); it != m_parsers.end(); ++it) {
+    delete it.value();
+  }
+  m_parsers.clear();
 }
 
 //-----------------------------------------------------------------------
@@ -79,7 +78,7 @@ void tipc::Server::addParser(MessageParser *parser) {
 
 void tipc::Server::removeParser(QString header) {
   MessageParser *parser = m_parsers.take(header);
-  if (parser) delete parser;
+  delete parser;  // delete is safe even if parser is nullptr
 }
 
 //-----------------------------------------------------------------------
@@ -89,18 +88,21 @@ void tipc::Server::onNewConnection() {
 
   // Accept the connection
   QLocalSocket *socket = nextPendingConnection();
+  if (!socket) return;
 
-  // Allocate a controller for the socket
-  SocketController *controller = new SocketController;
-  controller->m_server         = this;
-  controller->m_socket         = socket;
+  // Controller is parented to the socket and deleted automatically with it
+  SocketController *controller =
+      new SocketController(socket);  // Pass socket as parent
+  controller->m_server = this;
+  controller->m_socket = socket;
 
-  // Connect the controller to the socket's signals
-  connect(socket, SIGNAL(readyRead()), controller, SLOT(onReadyRead()));
-  connect(socket, SIGNAL(disconnected()), controller, SLOT(onDisconnected()));
-  connect(socket, SIGNAL(disconnected()), socket, SLOT(deleteLater()));
-  connect(socket, SIGNAL(error(QLocalSocket::LocalSocketError)), this,
-          SLOT(onError(QLocalSocket::LocalSocketError)));
+  connect(socket, &QLocalSocket::readyRead, controller,
+          &SocketController::onReadyRead);
+  connect(socket, &QLocalSocket::disconnected, controller,
+          &SocketController::onDisconnected);
+  // Socket will self-delete when disconnected
+  connect(socket, &QLocalSocket::disconnected, socket, &QObject::deleteLater);
+  connect(socket, &QLocalSocket::errorOccurred, this, &Server::onError);
 }
 
 //-----------------------------------------------------------------------
@@ -113,7 +115,7 @@ void tipc::Server::onError(QLocalSocket::LocalSocketError error) {
 
 void tipc::Server::dispatchSocket(QLocalSocket *socket) {
   // The lock is established when a message is currently being processed.
-  // Returning if the lock is set avoids having recursive message processing;
+  // Returning if the lock is set avoids recursive message processing;
   // which is possible if a parser expects further message packets.
   if (m_lock) return;
 
@@ -124,16 +126,15 @@ void tipc::Server::dispatchSocket(QLocalSocket *socket) {
     if (!stream.messageReady()) return;
 
     Message msg;
-
     stream >> msg;
     msg >> header;
     assert(!header.isEmpty());
 
-    tipc_debug(qDebug() << header << endl);
+    tipc_debug(qDebug() << header);
 
-    QHash<QString, MessageParser *>::iterator it = m_parsers.find(header);
+    auto it = m_parsers.find(header);
     if (it == m_parsers.end()) {
-      tipc_debug(qDebug() << "Error: Unrecognized command" << endl);
+      tipc_debug(qDebug() << "Error: Unrecognized command");
       continue;
     }
 
@@ -142,11 +143,11 @@ void tipc::Server::dispatchSocket(QLocalSocket *socket) {
     MessageParser *parser = it.value();
     parser->m_socket      = socket;
     parser->m_stream      = &stream;
-    parser->operator()(msg);
+    (*parser)(msg);
 
     m_lock = false;
 
     // The Message has been read and processed. Send the reply.
-    if (msg.ba().size() > 0) stream << msg;
+    if (!msg.ba().isEmpty()) stream << msg;
   }
 }

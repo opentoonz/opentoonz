@@ -190,14 +190,14 @@ ConvertResultPopup::ConvertResultPopup(QString log, TFilePath path)
   edit->setReadOnly(true);
 
   QVBoxLayout* mainLay = new QVBoxLayout();
-  mainLay->setMargin(5);
+  mainLay->setContentsMargins(5, 5, 5, 5);
   mainLay->setSpacing(10);
   {
     mainLay->addWidget(edit, 1);
     mainLay->addWidget(new QLabel(tr("Do you want to save the log?")), 0);
 
     QHBoxLayout* buttonsLay = new QHBoxLayout();
-    buttonsLay->setMargin(0);
+    buttonsLay->setContentsMargins(0, 0, 0, 0);
     buttonsLay->setSpacing(10);
     buttonsLay->setAlignment(Qt::AlignCenter);
     {
@@ -253,11 +253,11 @@ ConvertFolderPopup::ConvertFolderPopup()
   m_progressDialog->setWindowModality(Qt::WindowModal);
 
   //----layout
-  m_topLayout->setMargin(5);
+  m_topLayout->setContentsMargins(5, 5, 5, 5);
   m_topLayout->setSpacing(5);
   {
     QHBoxLayout* folderLay = new QHBoxLayout();
-    folderLay->setMargin(0);
+    folderLay->setContentsMargins(0, 0, 0, 0);
     folderLay->setSpacing(5);
     {
       folderLay->addWidget(new QLabel(tr("Folder to convert:"), this), 0);
@@ -266,11 +266,11 @@ ConvertFolderPopup::ConvertFolderPopup()
     m_topLayout->addLayout(folderLay, 0);
 
     QHBoxLayout* mainLay = new QHBoxLayout();
-    mainLay->setMargin(0);
+    mainLay->setContentsMargins(0, 0, 0, 0);
     mainLay->setSpacing(5);
     {
       QVBoxLayout* leftLay = new QVBoxLayout();
-      leftLay->setMargin(0);
+      leftLay->setContentsMargins(0, 0, 0, 0);
       leftLay->setSpacing(5);
       {
         leftLay->addWidget(m_skip, 0);
@@ -283,7 +283,7 @@ ConvertFolderPopup::ConvertFolderPopup()
     }
     m_topLayout->addLayout(mainLay, 1);
   }
-  m_buttonLayout->setMargin(0);
+  m_buttonLayout->setContentsMargins(0, 0, 0, 0);
   m_buttonLayout->setSpacing(20);
   {
     m_buttonLayout->addWidget(m_okBtn);

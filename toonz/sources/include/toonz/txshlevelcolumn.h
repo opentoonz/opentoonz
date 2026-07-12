@@ -15,8 +15,7 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-//=============================================================================
-// forward declarations
+// Forward declarations
 class TLevelColumnFx;
 class TXshCell;
 class TXshLevel;
@@ -24,82 +23,76 @@ class TXshLevel;
 //=============================================================================
 //! The TXshLevelColumn class provides a column of levels in xsheet and allows
 //! its management.
-/*!Inherits \b TXshCellColumn.
-\n The class defines column of levels getLevelColumn(), more than \b
-TXshCellColumn has
-   a pointer to \b TLevelColumnFx getLevelColumnFx() and a \b string to identify
-icon.
-   The string is an icon identification helpful to level icon management,
-getIcon()
-   updateIcon().
+/*!
+Inherits \b TXshCellColumn.
+
+The class defines column of levels getLevelColumn(), more than \b TXshCellColumn
+has a pointer to \b TLevelColumnFx getLevelColumnFx().
+
+Note: Previously had an icon identification string for level icon management,
+but it has been removed in the current implementation.
 */
 //=============================================================================
 
 class DVAPI TXshLevelColumn final : public TXshCellColumn {
   PERSIST_DECLARATION(TXshLevelColumn)
-  TLevelColumnFx *m_fx;
-  std::string m_iconId;
 
+  TLevelColumnFx *m_fx;
   bool m_iconVisible;
 
 public:
-  bool isIconVisible() { return m_iconVisible; }
+  // Icon visibility management
+  bool isIconVisible() const { return m_iconVisible; }
   void setIconVisible(bool visible) { m_iconVisible = visible; }
 
-  /*!
-Constructs a TXshLevelColumn with default value.
-*/
+  // Construction/Destruction
   TXshLevelColumn();
-  /*!
-Destroys the TXshLevelColumn object.
-*/
-  ~TXshLevelColumn();
+  ~TXshLevelColumn() override;
 
+  // Type information
   TXshColumn::ColumnType getColumnType() const override;
 
-  /*!
-Return true if \b cell is empty or level of \b cell isn't a \b
-TXshZeraryFxLevel.
-*/
+  // Cell validation
   bool canSetCell(const TXshCell &cell) const override;
 
-  /*!
-Return \b TXshLevelColumn.
-*/
+  // Column type casting
   TXshLevelColumn *getLevelColumn() override { return this; }
 
-  /*!
-Clone column and return a pointer to the new \b TXshColumn cloned.
-*/
+  // Cloning
   TXshColumn *clone() const override;
 
+  // Serialization
   void loadData(TIStream &is) override;
   void saveData(TOStream &os) override;
 
-  /*!
-Return a pointer to \b TLevelColumnFx \b m_fx.
-*/
+  // Effects access
   TLevelColumnFx *getLevelColumnFx() const;
-
-  /*!
-Return \b TFx.
-*/
   TFx *getFx() const override;
 
+  // Cell operations
   // Used in TCellData::getNumbers
+  // reservedLevel can be nonzero if the preferences option
+  // "LinkColumnNameWithLevel" is ON and the column name is the same as some
+  // level in the scene cast.
   bool setNumbers(int row, int rowCount, const TXshCell cells[],
-                  TXshLevel *reservedLevel);
+                  TXshLevel *reservedLevel = nullptr);
+
+  // Disable copying and moving
+  TXshLevelColumn(const TXshLevelColumn &)            = delete;
+  TXshLevelColumn &operator=(const TXshLevelColumn &) = delete;
+
+  TXshLevelColumn(TXshLevelColumn &&)            = delete;
+  TXshLevelColumn &operator=(TXshLevelColumn &&) = delete;
 
 private:
-  // not implemented
-  TXshLevelColumn(const TXshLevelColumn &);
-  TXshLevelColumn &operator=(const TXshLevelColumn &);
+  // Private helper methods if needed
 };
 
 #ifdef _WIN32
 template class DV_EXPORT_API TSmartPointerT<TXshLevelColumn>;
 #endif
 
+// Smart pointer typedef for TXshLevelColumn
 typedef TSmartPointerT<TXshLevelColumn> TXshLevelColumnP;
 
-#endif
+#endif  // TXSHLEVELCOLUMN_INCLUDED

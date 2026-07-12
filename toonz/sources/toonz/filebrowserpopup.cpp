@@ -114,13 +114,13 @@ FileBrowserPopup::FileBrowserPopup(const QString &title, Options options,
   // layout
   if (!(options & CUSTOM_LAYOUT)) {
     QVBoxLayout *mainLayout = new QVBoxLayout();
-    mainLayout->setMargin(0);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setSpacing(3);
     {
       mainLayout->addWidget(m_browser, 1);
 
       QHBoxLayout *bottomLay = new QHBoxLayout();
-      bottomLay->setMargin(5);
+      bottomLay->setContentsMargins(5, 5, 5, 5);
       bottomLay->setSpacing(3);
       {
         bottomLay->addWidget(m_nameFieldLabel, 0);
@@ -131,7 +131,7 @@ FileBrowserPopup::FileBrowserPopup(const QString &title, Options options,
       if (m_customWidget) mainLayout->addWidget(m_customWidget);
 
       QHBoxLayout *buttonsLay = new QHBoxLayout();
-      buttonsLay->setMargin(5);
+      buttonsLay->setContentsMargins(5, 5, 5, 5);
       buttonsLay->setSpacing(15);
       {
         buttonsLay->addStretch();
@@ -334,7 +334,7 @@ void FileBrowserPopup::onFilePathClicked(const TFilePath &fp) {
 void FileBrowserPopup::onFilePathsSelected(
     const std::set<TFilePath> &paths,
     const std::list<std::vector<TFrameId>> &fIds) {
-  if (paths.size() == 0 && m_forSaving) return;
+  if (paths.size() == 0 && (m_forSaving || m_isDirectoryOnly)) return;
 
   m_selectedPaths  = paths;
   m_currentFIdsSet = fIds;
@@ -512,6 +512,7 @@ LoadScenePopup::LoadScenePopup() : FileBrowserPopup(tr("Load Scene")) {
   setOkText(tr("Load"));
   addFilterType("tnz");
   addFilterType("xdts");
+  addFilterType("sxf");
 
   // set the initial current path according to the current module
   setInitialFolderByCurrentRoom();
@@ -525,7 +526,8 @@ bool LoadScenePopup::execute() {
 
   const TFilePath &fp = *m_selectedPaths.begin();
 
-  if (fp.getType() != "tnz" && fp.getType() != "xdts") {
+  if (fp.getType() != "tnz" && fp.getType() != "xdts" &&
+      fp.getType() != "sxf") {
     DVGui::error(toQString(fp) + tr(" is not a scene file."));
     return false;
   }
@@ -772,13 +774,13 @@ LoadLevelPopup::LoadLevelPopup()
   //----layout
   auto createVBoxLayout = [](int margin, int spacing) {
     QVBoxLayout *layout = new QVBoxLayout();
-    layout->setMargin(margin);
+    layout->setContentsMargins(margin, margin, margin, margin);
     layout->setSpacing(spacing);
     return layout;
   };
   auto createHBoxLayout = [](int margin, int spacing) {
     QHBoxLayout *layout = new QHBoxLayout();
-    layout->setMargin(margin);
+    layout->setContentsMargins(margin, margin, margin, margin);
     layout->setSpacing(spacing);
     return layout;
   };
@@ -832,7 +834,7 @@ LoadLevelPopup::LoadLevelPopup()
     QHBoxLayout *bottomLay = createHBoxLayout(0, 10);
     {
       QGridLayout *levelLay = new QGridLayout();
-      levelLay->setMargin(5);
+      levelLay->setContentsMargins(5, 5, 5, 5);
       levelLay->setSpacing(5);
       {
         levelLay->addWidget(new QLabel(tr("Level Name:"), this), 0, 0,
@@ -866,7 +868,7 @@ LoadLevelPopup::LoadLevelPopup()
       bottomLay->addWidget(m_levelPropertiesFrame, 0);
 
       QGridLayout *arrLay = new QGridLayout();
-      arrLay->setMargin(5);
+      arrLay->setContentsMargins(5, 5, 5, 5);
       arrLay->setSpacing(5);
       {
         arrLay->addWidget(new QLabel(tr("From:"), this), 0, 0,
@@ -1212,10 +1214,10 @@ bool LoadLevelPopup::execute() {
     args.row0 = m_posFrom->text().toInt() - 1;
 
     args.frameCount = m_posTo->text().toInt() - m_posFrom->text().toInt() + 1;
-    
+
     std::list<std::vector<TFrameId>> fidsSet = getCurrentFIdsSet();
     if (!fidsSet.empty()) {
-        args.resourceDatas[0].m_frameIdSet = std::move(fidsSet.front());
+      args.resourceDatas[0].m_frameIdSet = std::move(fidsSet.front());
     }
 
     else if (m_notExistLabel->isVisible()) {
@@ -1269,12 +1271,12 @@ bool LoadLevelPopup::execute() {
       args.resourceDatas.push_back(*it);
 
     std::list<std::vector<TFrameId>> fIdsSet = getCurrentFIdsSet();
-    auto fIdIt = fIdsSet.begin();
-    auto rdIt = args.resourceDatas.begin();
+    auto fIdIt                               = fIdsSet.begin();
+    auto rdIt                                = args.resourceDatas.begin();
     while (fIdIt != fIdsSet.end() && rdIt != args.resourceDatas.end()) {
-        rdIt->m_frameIdSet = std::move(*fIdIt);
-        ++fIdIt;
-        ++rdIt;
+      rdIt->m_frameIdSet = std::move(*fIdIt);
+      ++fIdIt;
+      ++rdIt;
     }
     args.cachingBehavior = IoCmd::LoadResourceArguments::CacheRasterBehavior(
         m_rasterCacheBehaviorComboBox->currentData().toInt());
@@ -1932,7 +1934,7 @@ LoadColorModelPopup::LoadColorModelPopup()
 
   // layout
   QHBoxLayout *mainLayout = new QHBoxLayout();
-  mainLayout->setMargin(5);
+  mainLayout->setContentsMargins(5, 5, 5, 5);
   mainLayout->setSpacing(5);
   {
     mainLayout->addStretch(1);
@@ -2271,8 +2273,6 @@ void ImportMagpieFilePopup::showEvent(QShowEvent *e) {
 
 BrowserPopup::BrowserPopup() : FileBrowserPopup("") {
   setOkText(tr("Choose"));
-  // DIRTY FIX!!!! this should never cause crash
-  m_browser->enableGlobalSelection(true);
 }
 
 bool BrowserPopup::execute() {

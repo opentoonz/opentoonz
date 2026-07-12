@@ -263,7 +263,7 @@ BatchServersViewer::BatchServersViewer(QWidget *parent, Qt::WindowFlags flags)
   setObjectName("OnePixelMarginFrame");
 
   QGridLayout *layout = new QGridLayout();
-  layout->setMargin(15);
+  layout->setContentsMargins(15, 15, 15, 15);
   layout->setSpacing(8);
 
   layout->addWidget(new QLabel(tr("Process with:")), row, 0, Qt::AlignRight);

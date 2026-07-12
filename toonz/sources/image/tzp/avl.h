@@ -72,7 +72,7 @@ extern double Avl_Dummy[];
 #define AVL_DUP_USH (AVL_NODUP_USH | 1)
 #define AVL_DUP_CHR (AVL_NODUP_CHR | 1)
 
-#define AVL_AVLCMP (int (*)())0
+#define AVL_AVLCMP (int (*)(void *, void *))0
 
 #define avl_tree_nodup(usrcmp) avl__tree(AVL_NODUP_MBR, (unsigned)0, (usrcmp))
 #define avl_tree_nodup_mbr(structure, member, usrcmp)                          \
@@ -163,7 +163,7 @@ struct avl_path {
 typedef struct avl_tree {
   unsigned short keyinfo;
   unsigned short keyoffs;
-  int (*usrcmp)();
+  int (*usrcmp)(void *, void *);
   long nodes;
   struct avl_node *root;
   struct avl_path *path;
@@ -223,7 +223,7 @@ TNZAPI int avl_porting_problems();
 
 #else
 
-TNZAPI TREE *avl__tree(int treetype, unsigned keyoffs, int (*usrcmp)());
+TNZAPI TREE *avl__tree(int treetype, unsigned keyoffs, int (*usrcmp)(void *, void *));
 TNZAPI TREE *avl_copy(TREE *tree);
 
 TNZAPI int avl_insert(TREE *tree, void *data);
@@ -236,7 +236,7 @@ TNZAPI void *avl_locate_first(TREE *tree);
 TNZAPI void *avl_locate_last(TREE *tree);
 TNZAPI void *avl__remove(TREE *tree, long keyval);
 
-TNZAPI void avl__scan(TREE *tree, void (*usrfun)(), int back);
+TNZAPI void avl__scan(TREE *tree, void (*usrfun)(void *), int back);
 
 TNZAPI void *avl_first(TREE *tree);
 TNZAPI void *avl_last(TREE *tree);
@@ -247,7 +247,7 @@ TNZAPI void avl_stop(TREE *tree);
 
 TNZAPI void *avl__link(TREE *tree, unsigned ptroffs, int back);
 
-TNZAPI void avl_release(TREE *tree, void (*usrfun)());
+TNZAPI void avl_release(TREE *tree, void (*usrfun)(void *));
 TNZAPI void avl_reset(TREE *tree);
 TNZAPI void avl_close(TREE *tree);
 

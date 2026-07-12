@@ -259,7 +259,7 @@ Return parameter for a control point
 */
   double getParameterAtControlPoint(int n) const;
 
-  //! Return the stroke leght at passed control point
+  //! Return the stroke lenght at passed control point
   double getLengthAtControlPoint(int) const;
 
   //! Freeze parameter of a stroke in last valid status

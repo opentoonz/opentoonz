@@ -333,6 +333,8 @@
 
 #define MI_OpenComboViewer "MI_OpenComboViewer"
 #define MI_OpenHistoryPanel "MI_OpenHistoryPanel"
+#define MI_OpenBrushPresetPanel "MI_OpenBrushPresetPanel"
+#define MI_OpenToolPropertiesPanel "MI_OpenToolPropertiesPanel"
 #define MI_ReplaceParentDirectory "MI_ReplaceParentDirectory"
 #define MI_Reframe1 "MI_Reframe1"
 #define MI_Reframe2 "MI_Reframe2"
@@ -352,6 +354,18 @@
 #define MI_SelectionRectangular "MI_SelectionRectangular"
 #define MI_SelectionFreehand "MI_SelectionFreehand"
 #define MI_SelectionPolyline "MI_SelectionPolyline"
+
+#define MI_AssistantNextType "MI_AssistantNextType"
+#define MI_AssistantLine "MI_AssistantLine"
+#define MI_AssistantEllipse "MI_AssistantEllipse"
+#define MI_AssistantPerspective "MI_AssistantPerspective"
+#define MI_AssistantVanishingPoint "MI_AssistantVanishingPoint"
+#define MI_AssistantFisheye "MI_AssistantFisheye"
+#define MI_AssistantReplicatorStar "MI_AssistantReplicatorStar"
+#define MI_AssistantReplicatorMirror "MI_AssistantReplicatorMirror"
+#define MI_AssistantReplicatorJitter "MI_AssistantReplicatorJitter"
+#define MI_AssistantReplicatorGrid "MI_AssistantReplicatorGrid"
+#define MI_AssistantReplicatorAffine "MI_AssistantReplicatorAffine"
 
 #define MI_GeometricNextShape "MI_GeometricNextShape"
 #define MI_GeometricRectangle "MI_GeometricRectangle"
@@ -458,6 +472,7 @@
 #define MI_OpenReportABug "MI_OpenReportABug"
 
 #define MI_ClearCacheFolder "MI_ClearCacheFolder"
+#define MI_ClearViewerContent "MI_ClearViewerContent"
 
 #define MI_VectorGuidedDrawing "MI_VectorGuidedDrawing"
 #define MI_OpenGuidedDrawingControls "MI_OpenGuidedDrawingControls"
@@ -474,6 +489,7 @@
 #define MI_FlipPrevGuideStroke "MI_FlipPrevGuideStroke"
 
 #define MI_ExportXDTS "MI_ExportXDTS"
+#define MI_ExportSXF "MI_ExportSXF"
 #define MI_ExportOCA "MI_ExportOCA"
 #define MI_ImportOCA "MI_ImportOCA"
 #define MI_ExportTvpJson "MI_ExportTvpJson"

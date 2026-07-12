@@ -205,7 +205,7 @@ FunctionSheetButtonArea::FunctionSheetButtonArea(QWidget *parent)
   m_syncSizeBtn->setToolTip(tr("Toggle synchronizing zoom with xsheet"));
 
   QVBoxLayout *layout = new QVBoxLayout();
-  layout->setMargin(2);
+  layout->setContentsMargins(2, 2, 2, 2);
   layout->setSpacing(0);
   {
     layout->addStretch();

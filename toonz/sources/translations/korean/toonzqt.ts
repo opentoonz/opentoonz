@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ko" sourcelanguage="en">
+<TS version="2.1" language="ko" sourcelanguage="en">
 <context>
     <name>AddFxContextMenu</name>
     <message>
@@ -165,6 +165,19 @@ Possibly the preset file has been corrupted</source>
         <source>pixel</source>
         <translation>픽셀</translation>
     </message>
+    <message>
+        <source>Deleting &quot;%1&quot;.
+Are you sure?</source>
+        <translation type="unfinished">&quot;%1&quot;을 삭제합니다. 확실합니까?</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">삭제</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">취소</translation>
+    </message>
 </context>
 <context>
     <name>ChannelHisto</name>
@@ -204,7 +217,7 @@ Possibly the preset file has been corrupted</source>
     <name>ColorChannelControl</name>
     <message>
         <source>H</source>
-        <translation>수평</translation>
+        <translation type="vanished">수평</translation>
     </message>
 </context>
 <context>
@@ -264,11 +277,11 @@ Possibly the preset file has been corrupted</source>
     <name>DVGui</name>
     <message>
         <source>OK</source>
-        <translation>네</translation>
+        <translation type="vanished">네</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>취소</translation>
+        <translation type="vanished">취소</translation>
     </message>
 </context>
 <context>
@@ -431,7 +444,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Error importing color names XML</source>
-        <translation>색상 이름 XML을 가져오는 중 오류 발생</translation>
+        <translation type="vanished">색상 이름 XML을 가져오는 중 오류 발생</translation>
     </message>
     <message>
         <source>Save Color Names</source>
@@ -445,12 +458,44 @@ Possibly the preset file has been corrupted</source>
         <source>Error exporting color names XML</source>
         <translation>색 이름 XML 내보내기 오류</translation>
     </message>
+    <message>
+        <source>Color name is not valid.
+The following characters cannot be used: \ # &lt; &gt; &quot; &apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Color name already exists.
+Please use another name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid hex color format.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error importing color names XML:
+File not found or invalid format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error importing color names XML:
+The file may be corrupt or have invalid format.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An unexpected error occurred while importing colors.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to save user color names file.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DVGui::LineEdit</name>
     <message>
         <source>A file name cannot contains any of the following chracters: /\:*?&quot;&lt;&gt;|.</source>
-        <translation>파일 이름에는 다음 문자 중 어느 것도 포함될 수 없음: /\:*?&quot;&lt;&gt;|.</translation>
+        <translation type="vanished">파일 이름에는 다음 문자 중 어느 것도 포함될 수 없음: /\:*?&quot;&lt;&gt;|.</translation>
     </message>
     <message>
         <source>A file name cannot contains any of the following characters: /\:*?&quot;&lt;&gt;|.</source>
@@ -516,27 +561,27 @@ Possibly the preset file has been corrupted</source>
     <name>DvTextEdit</name>
     <message>
         <source>Bold</source>
-        <translation>볼드</translation>
+        <translation type="vanished">볼드</translation>
     </message>
     <message>
         <source>Italic</source>
-        <translation>이탤릭체</translation>
+        <translation type="vanished">이탤릭체</translation>
     </message>
     <message>
         <source>Underline</source>
-        <translation>밑줄</translation>
+        <translation type="vanished">밑줄</translation>
     </message>
     <message>
         <source>Align Left</source>
-        <translation>왼쪽 정렬</translation>
+        <translation type="vanished">왼쪽 정렬</translation>
     </message>
     <message>
         <source>Align Center</source>
-        <translation>중심 정렬</translation>
+        <translation type="vanished">중심 정렬</translation>
     </message>
     <message>
         <source>Align Right</source>
-        <translation>오른쪽 정렬</translation>
+        <translation type="vanished">오른쪽 정렬</translation>
     </message>
 </context>
 <context>
@@ -688,7 +733,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>&amp;Next frame</source>
-        <translation>다음 프레임(&amp;N)</translation>
+        <translation type="vanished">다음 프레임(&amp;N)</translation>
     </message>
     <message>
         <source>&amp;Last Frame</source>
@@ -811,6 +856,14 @@ Gain is shown as an f-stop and the &quot;neutral&quot; or 1.0 gain f-stop is f/8
     <message>
         <source> (gain %1)</source>
         <translation>(dlemr %1)</translation>
+    </message>
+    <message>
+        <source>&amp;Rotate Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Rotate Right</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1125,19 +1178,19 @@ Gain is shown as an f-stop and the &quot;neutral&quot; or 1.0 gain f-stop is f/8
     </message>
     <message>
         <source>Step 1</source>
-        <translation>1단계</translation>
+        <translation type="vanished">1단계</translation>
     </message>
     <message>
         <source>Step 2</source>
-        <translation>2단계</translation>
+        <translation type="vanished">2단계</translation>
     </message>
     <message>
         <source>Step 3</source>
-        <translation>3단계</translation>
+        <translation type="vanished">3단계</translation>
     </message>
     <message>
         <source>Step 4</source>
-        <translation>4단계</translation>
+        <translation type="vanished">4단계</translation>
     </message>
     <message>
         <source>Activate Cycle</source>
@@ -1545,14 +1598,14 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <name>LineEdit</name>
     <message>
         <source>A file name cannot contains any of the following chracters: /\:*?&quot;&lt;&gt;|.</source>
-        <translation>파일 이름에는 다음 문자 중 어느 것도 포함될 수 없음: /\:*?&quot;&lt;&gt;|.</translation>
+        <translation type="vanished">파일 이름에는 다음 문자 중 어느 것도 포함될 수 없음: /\:*?&quot;&lt;&gt;|.</translation>
     </message>
 </context>
 <context>
     <name>MyPaintBrushStyleChooserPage</name>
     <message>
         <source>Plain color</source>
-        <translation>일반 색상</translation>
+        <translation type="vanished">일반 색상</translation>
     </message>
 </context>
 <context>
@@ -1574,19 +1627,19 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <name>PageViewer</name>
     <message>
         <source>- No Styles -</source>
-        <translation>- 스타일 없음 -</translation>
+        <translation type="vanished">- 스타일 없음 -</translation>
     </message>
     <message>
         <source>Name Editor</source>
-        <translation>이름 편집기</translation>
+        <translation type="vanished">이름 편집기</translation>
     </message>
     <message>
         <source>New Style</source>
-        <translation>새로운 스타일</translation>
+        <translation type="vanished">새로운 스타일</translation>
     </message>
     <message>
         <source>New Page</source>
-        <translation>새로운 페이지</translation>
+        <translation type="vanished">새로운 페이지</translation>
     </message>
 </context>
 <context>
@@ -1797,7 +1850,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <name>ParamsPageSet</name>
     <message>
         <source>Fx Help</source>
-        <translation>Fx 도움말</translation>
+        <translation type="vanished">Fx 도움말</translation>
     </message>
     <message>
         <source>View help page</source>
@@ -1844,7 +1897,7 @@ and tone may be slightly discretized.</source>
     <name>ProgressDialog</name>
     <message>
         <source>OpenToonz</source>
-        <translation>오픈툰즈</translation>
+        <translation type="vanished">오픈툰즈</translation>
     </message>
 </context>
 <context>
@@ -1852,7 +1905,7 @@ and tone may be slightly discretized.</source>
     <message>
         <source>Deleting &quot;%1&quot;.
 Are you sure?</source>
-        <translation>&quot;%1&quot;을 삭제합니다. 확실합니까?</translation>
+        <translation type="vanished">&quot;%1&quot;을 삭제합니다. 확실합니까?</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -1864,19 +1917,19 @@ Are you sure?</source>
     </message>
     <message>
         <source>It is not possible to delete the style #</source>
-        <translation># 스타일을 삭제할 수 없음</translation>
+        <translation type="vanished"># 스타일을 삭제할 수 없음</translation>
     </message>
     <message>
         <source>Paste Style  in Palette : %1</source>
-        <translation>팔레트의 붙여넣기 스타일:%1</translation>
+        <translation type="vanished">팔레트의 붙여넣기 스타일:%1</translation>
     </message>
     <message>
         <source>Delete Style  from Palette : %1</source>
-        <translation>팔레트에서 스타일 삭제: %1</translation>
+        <translation type="vanished">팔레트에서 스타일 삭제: %1</translation>
     </message>
     <message>
         <source>Cut Style  from Palette : %1</source>
-        <translation>팔레트에서 잘라낸 스타일: %1</translation>
+        <translation type="vanished">팔레트에서 잘라낸 스타일: %1</translation>
     </message>
     <message>
         <source>It is not possible to delete styles #0 and #1.</source>
@@ -1888,7 +1941,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>  to Palette : %1</source>
-        <translation>팔레트: %1</translation>
+        <translation type="vanished">팔레트: %1</translation>
     </message>
     <message>
         <source>Paste Color &amp;&amp; Name%1</source>
@@ -1920,15 +1973,15 @@ Are you sure?</source>
     </message>
     <message>
         <source>Blend Colors  in Palette : %1</source>
-        <translation>팔레트의 혼합색상: %1</translation>
+        <translation type="vanished">팔레트의 혼합색상: %1</translation>
     </message>
     <message>
         <source>Toggle Link  in Palette : %1</source>
-        <translation>팔레트에서 링크전환: %1</translation>
+        <translation type="vanished">팔레트에서 링크전환: %1</translation>
     </message>
     <message>
         <source>Remove Reference  in Palette : %1</source>
-        <translation>팔레트에서 참조 제거: %1</translation>
+        <translation type="vanished">팔레트에서 참조 제거: %1</translation>
     </message>
     <message>
         <source>Get Color from Studio Palette</source>
@@ -1988,23 +2041,23 @@ Are you sure?</source>
     </message>
     <message>
         <source>Save</source>
-        <translation>저장</translation>
+        <translation type="vanished">저장</translation>
     </message>
     <message>
         <source>Discard</source>
-        <translation>삭제</translation>
+        <translation type="vanished">삭제</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation>네</translation>
+        <translation type="vanished">네</translation>
     </message>
     <message>
         <source>No</source>
-        <translation>아니요</translation>
+        <translation type="vanished">아니요</translation>
     </message>
     <message>
         <source>Replace</source>
-        <translation>교체</translation>
+        <translation type="vanished">교체</translation>
     </message>
     <message>
         <source>Modify Fx Param : %1</source>
@@ -2052,7 +2105,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Palette</source>
-        <translation>팔레트</translation>
+        <translation type="vanished">팔레트</translation>
     </message>
     <message>
         <source>Overwrite</source>
@@ -2240,7 +2293,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>OpenToonz 1.3</source>
-        <translation>오픈툰즈 1.3</translation>
+        <translation type="vanished">오픈툰즈 1.3</translation>
     </message>
     <message>
         <source>Information</source>
@@ -2364,7 +2417,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <source>Custom Texture</source>
         <comment>TextureStyleChooserPage</comment>
-        <translation>사용자 지정 텍스처</translation>
+        <translation type="vanished">사용자 지정 텍스처</translation>
     </message>
     <message>
         <source>Plain color</source>
@@ -2421,6 +2474,46 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
         <source>Sample Type: </source>
         <translation>샘플 유형:</translation>
     </message>
+    <message>
+        <source>It is not possible to delete style #</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paste Style to Palette: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Style from Palette: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cut Style from Palette: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> to Palette: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blend Colors in Palette: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Link in Palette: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Reference in Palette: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set As...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Lines and Areas</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QPushButton</name>
@@ -2433,7 +2526,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <name>RadioButtonDialog</name>
     <message>
         <source>OpenToonz</source>
-        <translation>오픈툰즈</translation>
+        <translation type="vanished">오픈툰즈</translation>
     </message>
 </context>
 <context>
@@ -2510,7 +2603,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     </message>
     <message>
         <source>&amp;Swtich output port display mode</source>
-        <translation>스위치 출력 포트 표시모드(&amp;S)</translation>
+        <translation type="vanished">스위치 출력 포트 표시모드(&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Toggle node icons</source>
@@ -2571,7 +2664,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <name>SettingsPage</name>
     <message>
         <source>Reset to default</source>
-        <translation>기본값으로 재설정</translation>
+        <translation type="vanished">기본값으로 재설정</translation>
     </message>
 </context>
 <context>
@@ -2597,7 +2690,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <name>SpecialStyleChooserPage</name>
     <message>
         <source>Plain color</source>
-        <translation>일반 색상</translation>
+        <translation type="vanished">일반 색상</translation>
     </message>
 </context>
 <context>
@@ -2774,6 +2867,14 @@ Are you sure ?</source>
         <source>Failed to save palette.</source>
         <translation>팔레트를 저장하지 못했습니다.</translation>
     </message>
+    <message>
+        <source>Set As...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refresh</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StyleEditor</name>
@@ -2811,7 +2912,7 @@ Are you sure ?</source>
     </message>
     <message>
         <source>Toggle orientation of the Color Page.</source>
-        <translation>색상 페이지의 방향 전환.</translation>
+        <translation type="vanished">색상 페이지의 방향 전환.</translation>
     </message>
     <message>
         <source>Auto</source>
@@ -2871,15 +2972,15 @@ Are you sure ?</source>
     </message>
     <message>
         <source>[CLEANUP]  </source>
-        <translation>[정리]</translation>
+        <translation type="vanished">[정리]</translation>
     </message>
     <message>
         <source>[STUDIO]  </source>
-        <translation>[스튜디오]</translation>
+        <translation type="vanished">[스튜디오]</translation>
     </message>
     <message>
         <source>[LEVEL]  </source>
-        <translation>[레벨]</translation>
+        <translation type="vanished">[레벨]</translation>
     </message>
     <message>
         <source>Cleanup </source>
@@ -2987,7 +3088,7 @@ Are you sure ?</source>
     <name>StyleIndexLineEdit</name>
     <message>
         <source>current</source>
-        <translation>현재</translation>
+        <translation type="vanished">현재</translation>
     </message>
 </context>
 <context>
@@ -3070,14 +3171,14 @@ Are you sure ?</source>
     <name>ToneCurveField</name>
     <message>
         <source>Channel:</source>
-        <translation>채널:</translation>
+        <translation type="vanished">채널:</translation>
     </message>
 </context>
 <context>
     <name>VectorBrushStyleChooserPage</name>
     <message>
         <source>Plain color</source>
-        <translation>일반 색상</translation>
+        <translation type="vanished">일반 색상</translation>
     </message>
 </context>
 <context>

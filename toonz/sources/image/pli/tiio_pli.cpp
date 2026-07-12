@@ -811,7 +811,17 @@ TLevelP TLevelReaderPli::loadInfo() {
         (majorVersionNumber != 5 || minorVersionNumber < 5))
       return m_level;
     TPalette *palette = 0;
-    m_pli->loadInfo(m_readPalette, palette, m_contentHistory);
+        try {
+      m_pli->loadInfo(m_readPalette, palette, m_contentHistory);
+    } catch (TException &e) {
+      QString msg = QString::fromStdString(::to_string(e.getMessage()));
+      if (msg.contains("Not all frames loaded"))
+        m_level->setPartialLoad(true);
+      else
+        throw e;
+    } catch (...) {
+      throw;
+    }
     if (palette) m_level->setPalette(palette);
 
     for (int i = 0; i < m_pli->getFrameCount(); i++)

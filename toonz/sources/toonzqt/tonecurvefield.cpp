@@ -890,11 +890,11 @@ ToneCurveField::ToneCurveField(QWidget *parent,
   //------ layout
 
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setSpacing(0);
   {
     QHBoxLayout *channelListLayout = new QHBoxLayout();
-    channelListLayout->setMargin(0);
+    channelListLayout->setContentsMargins(0, 0, 0, 0);
     channelListLayout->setSpacing(0);
     channelListLayout->setAlignment(Qt::AlignCenter);
     {
@@ -910,12 +910,12 @@ ToneCurveField::ToneCurveField(QWidget *parent,
     mainLayout->addLayout(channelListLayout, 0);
 
     QGridLayout *bottomLayout = new QGridLayout();
-    bottomLayout->setMargin(0);
+    bottomLayout->setContentsMargins(0, 0, 0, 0);
     bottomLayout->setHorizontalSpacing(5);
     bottomLayout->setVerticalSpacing(0);
     {
       QVBoxLayout *currentValLayout = new QVBoxLayout();
-      currentValLayout->setMargin(0);
+      currentValLayout->setContentsMargins(0, 0, 0, 0);
       currentValLayout->setSpacing(0);
       currentValLayout->setAlignment(Qt::AlignLeft);
       {

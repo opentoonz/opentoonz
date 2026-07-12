@@ -39,8 +39,6 @@
 #undef checkErrorsByGL
 #define checkErrorsByGL
 
-using namespace std;
-
 //-----------------------------------------------------------------------------
 /*
 DV_EXPORT_API void mylog(std::string s)
@@ -75,7 +73,7 @@ bool checkQuadraticDistance(TStroke *stroke, bool checkThickness) {
   const TThickQuadratic *q;
   TThickPoint p1, p2, p3;
 
-  // se i punti coincidono e' una stroke puntiforme ed e' ammessa
+  // if the points coincide it's a point-like stroke and it's allowed
   if (qCount == 1) return true;
 
   for (i = 0; i != qCount; i++) {
@@ -258,11 +256,10 @@ void tglDraw(const TVectorRenderData &rd, TRegion *r, bool pushAttribs) {
   int colorCount = 0;
 
   TColorStyleP style;
-  if (rd.m_paintCheckEnabled && r->getStyle() == rd.m_colorCheckIndex) {
-    static TSolidColorStyle *redColor = new TSolidColorStyle();
-    redColor->addRef();
-    redColor->setMainColor(TPixel::Red);
-    style = redColor;
+  if (rd.m_paintCheckEnabled && r->getStyle() == rd.m_paintIndex) {
+    TSolidColorStyle *colorStyle = new TSolidColorStyle();
+    colorStyle->setMainColor(rd.m_paintCheckColor);
+    style = colorStyle;
   } else if (rd.m_tcheckEnabled) {
     static TSolidColorStyle *color = new TSolidColorStyle();
     color->addRef();
@@ -284,7 +281,7 @@ void tglDraw(const TVectorRenderData &rd, TRegion *r, bool pushAttribs) {
   }
   if (visible) {
     TRegionProp *prop = r->getProp(/*rd.m_palette*/);
-    /// questo codice satva dentro tregion::getprop/////
+    /// this code was inside tregion::getprop/////
     int styleId = r->getStyle();
     if (styleId) {
       // TColorStyle * style = rd.m_palette->getStyle(styleId);
@@ -304,7 +301,7 @@ void tglDraw(const TVectorRenderData &rd, TRegion *r, bool pushAttribs) {
       if (pushAttribs) glPushAttrib(GL_ALL_ATTRIB_BITS);
 
       tglEnableLineSmooth(true);
-//#define DRAW_EDGE_NUMBERS
+// #define DRAW_EDGE_NUMBERS
 #ifdef DRAW_EDGE_NUMBERS
       glPushMatrix();
       tglMultMatrix(rd.m_aff);
@@ -389,7 +386,7 @@ void tglDraw(const TVectorRenderData &rd, TRegion *r, bool pushAttribs) {
 
         glColorMask(red, green, blue, alpha);
       } else {
-        // pezza: in render, le aree fillate dei custom styles sparivano.
+        // workaround: in render, the filled areas of custom styles disappeared.
         if (!rd.m_isOfflineRender || !rd.m_isImagePattern)
           tglRgbOnlyColorMask();  // RGB components only
 
@@ -448,17 +445,13 @@ void tglDraw(const TVectorRenderData &rd, const TStroke *s, bool pushAttribs) {
     TColorStyleP style;
     TStroke *stroke = const_cast<TStroke *>(s);
     if (rd.m_inkCheckEnabled && s->getStyle() == rd.m_colorCheckIndex) {
-      static TSolidColorStyle *redColor = new TSolidColorStyle();
-      redColor->addRef();
-      redColor->setMainColor(TPixel::Red);
-      style = redColor;
+      TSolidColorStyle *colorStyle = new TSolidColorStyle();
+      colorStyle->setMainColor(rd.m_inkCheckColor);
+      style = colorStyle;
     } else if (rd.m_ink1CheckEnabled && s->getStyle() == 1) {
-      // Ink #1 Check.
-      // Could possibly merge with above.
-      static TSolidColorStyle *redColor = new TSolidColorStyle();
-      redColor->addRef();
-      redColor->setMainColor(TPixel::Red);
-      style = redColor;
+      TSolidColorStyle *colorStyle = new TSolidColorStyle();
+      colorStyle->setMainColor(rd.m_ink1CheckColor);
+      style = colorStyle;
     } else if (rd.m_tcheckEnabled) {
       static TSolidColorStyle *color = new TSolidColorStyle();
       color->addRef();
@@ -474,12 +467,12 @@ void tglDraw(const TVectorRenderData &rd, const TStroke *s, bool pushAttribs) {
         && !rd.m_tcheckEnabled)  // I wonder why this?
       return;
 
-    // const TStroke& stroke = *s;  //serve???
+    // const TStroke& stroke = *s;   // is it needed?
 
     assert(rd.m_palette);
 
     prop = s->getProp(/*rd.m_palette*/);
-    /////questo codice stava dentro tstroke::getprop/////////
+    /////this code was inside tstroke::getprop/////////
     if (prop) prop->getMutex()->lock();
 
     if (!style->isStrokeStyle() || style->isEnabled() == false) {
@@ -508,8 +501,8 @@ void tglDraw(const TVectorRenderData &rd, const TStroke *s, bool pushAttribs) {
     bool alphaChannel = rd.m_alphaChannel, antialias = rd.m_antiAliasing;
     TVectorImagePatternStrokeProp *aux =
         dynamic_cast<TVectorImagePatternStrokeProp *>(prop);
-    if (aux)  // gli image pattern vettoriali tornano in questa funzione....non
-              // facendo il corpo dell'else'si evita di disegnarli due volte!
+    if (aux)  // the vector image patterns return to this function....by not
+              // executing the else body, we avoid drawing them twice!
       prop->draw(rd);
     else {
       if (antialias)
@@ -642,15 +635,13 @@ void doDraw(const TVectorImage *vim, const TVectorRenderData &_rd,
 
   TVectorRenderData rdRegions = rd;
 
-  /*if (rd.m_drawRegions && rd.m_isImagePattern)//gli image pattern hanno
-bisogno dell'antialiasig per le linee, ma sulle aree ci sarebbero un sacco di
-assert
+  /*if (rd.m_drawRegions && rd.m_isImagePattern)// the image patterns need
+antialiasing for lines, but on the areas there would be a lot of asserts
 rdRegions.m_alphaChannel = rdRegions.m_antiAliasing = false;*/
   UINT strokeIndex = 0;
   Index            = 0;
 
-  while (strokeIndex <
-         vim->getStrokeCount())  // ogni ciclo di while disegna un gruppo
+  while (strokeIndex < vim->getStrokeCount())  // each while loop draws a group
   {
     int currStrokeIndex = strokeIndex;
     if (!rd.m_isIcon && vim->isInsideGroup() > 0 &&
@@ -720,6 +711,3 @@ void tglDraw(const TVectorRenderData &rd, const TVectorImage *vim,
   checkErrorsByGL;
   // mylog("tglDraw stop");
 }
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------

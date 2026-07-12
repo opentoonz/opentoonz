@@ -152,7 +152,7 @@ PeggingWidget::PeggingWidget(QWidget *parent)
 
   QGridLayout *gridLayout = new QGridLayout(this);
   gridLayout->setSpacing(1);
-  gridLayout->setMargin(1);
+  gridLayout->setContentsMargins(1, 1, 1, 1);
 
   m_buttonGroup = new QButtonGroup();
   m_buttonGroup->setExclusive(true);

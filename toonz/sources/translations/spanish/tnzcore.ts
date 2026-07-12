@@ -39,7 +39,7 @@
     </message>
     <message>
         <source>Skipping frame.</source>
-        <translation>Omitiendo fotograma.</translation>
+        <translation type="vanished">Omitiendo fotograma.</translation>
     </message>
     <message>
         <source>Malformed frame name</source>

@@ -708,7 +708,7 @@ TFilePath StudioPaletteCmd::createPalette(const TFilePath &folderName,
         folderName.getParentDir());
   }
   // StudioPalette::setPalette() and createPalette() may throw exception on
-  // saving, it will be caught in the upper functions as wel
+  // saving, it will be caught in the upper functions as well
   palettePath =
       StudioPalette::instance()->createPalette(folderName, paletteName);
   if (palette)

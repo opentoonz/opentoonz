@@ -45,7 +45,7 @@ namespace {
 //=============================================================================
 // TrackerRegionSelection
 //-----------------------------------------------------------------------------
-// Ancora da definire.
+// Still to be defined.
 // under construction
 class TrackerRegionSelection final : public TSelection {
   TXshLevelP m_level;
@@ -54,7 +54,7 @@ class TrackerRegionSelection final : public TSelection {
   TrackerTool *m_tool;
 
 public:
-  TrackerRegionSelection() : m_tool(0) {}
+  TrackerRegionSelection() : m_tool(nullptr) {}
 
   void setTool(TrackerTool *tool) { m_tool = tool; }
 
@@ -85,7 +85,7 @@ public:
   HookSet *getHookSet() const {
     TXshLevel *xl = TTool::getApplication()->getCurrentLevel()->getLevel();
     // TXshLevel *xl = m_level.getPointer();
-    if (!xl) return 0;
+    if (!xl) return nullptr;
     return xl->getHookSet();
   }
 
@@ -112,7 +112,7 @@ hook->setAPos(fid, hook->getBPos(fid));
 }
     makeCurrent();
 return TDataP(); */
-    return (NULL);
+    return TDataP();
   }
 
   TDataP pasteData(const TDataP &data) { return TDataP(); }
@@ -148,9 +148,8 @@ class TrackerTool final : public TTool {
   int m_hookSelectedIndex;
   int m_lastHookSelectedIndex;
   bool m_deselectArmed;
-  bool m_newObjectAdded;  // serve al buttonUp per sapere se l'ultima tracker
-                          // region
-                          // aggiunta è un oggetto nuovo oppure no
+  bool m_newObjectAdded;  // used in buttonUp to know if the last tracker region
+                          // added is a new object or not
 
   TPropertyGroup m_prop;
   TDoubleProperty m_toolSizeWidth;
@@ -162,7 +161,7 @@ class TrackerTool final : public TTool {
   bool m_buttonDown;
   bool m_dragged;
   bool m_picked;
-  TPointD m_pos;  // posizione del mouse
+  TPointD m_pos;  // mouse position
   TPointD m_oldPos;
 
   int m_what;
@@ -262,12 +261,13 @@ void TrackerTool::updateTranslation() {
 
 TrackerObjectsSet *TrackerTool::getTrackerObjectsSet() const {
   HookSet *hookSet = getHookSet();
-  if (!hookSet) return 0;
+  if (!hookSet) return nullptr;
   return hookSet->getTrackerObjectsSet();
 }
+
 HookSet *TrackerTool::getHookSet() const {
   TXshLevel *xl = TTool::getApplication()->getCurrentLevel()->getLevel();
-  if (!xl) return 0;
+  if (!xl) return nullptr;
   return xl->getHookSet();
 }
 
@@ -285,8 +285,8 @@ void TrackerTool::draw() {
         hookSet->getHook(m_hookSelectedIndex)->getTrackerObjectId();
   else
     selectedObjectId = -1;
-  int i              = 0;
-  double pixelSize   = getPixelSize();
+  int i            = 0;
+  double pixelSize = getPixelSize();
 
   std::vector<TRectD> balloons;  // this is used to avoid balloons overlapping
   // draw hooks
@@ -294,7 +294,7 @@ void TrackerTool::draw() {
     Hook *hook = hookSet->getHook(i);
     if (!hook || hook->isEmpty()) continue;
     assert(hook);
-    // Se l'Hook ha una TrackerRegion allora la disegno
+    // If the Hook has a TrackerRegion then draw it
     if (hook->getTrackerObjectId() >= 0) {
       TRectD rect;
       rect = hook->getTrackerRegion(fid);
@@ -305,11 +305,11 @@ void TrackerTool::draw() {
         if (m_hookSelectedIndex == i) {
           TPixel32 frameColor(127, 127, 127);
           drawSquare(0.5 * (rect.getP01() + rect.getP11()), pixelSize * 4,
-                     frameColor);  // scalaY
+                     frameColor);  // scaleY
           drawSquare(0.5 * (rect.getP11() + rect.getP10()), pixelSize * 4,
-                     frameColor);                                // scalaX
-          drawSquare(rect.getP00(), pixelSize * 4, frameColor);  // scala
-          drawSquare(rect.getP10(), pixelSize * 4, frameColor);  // ridimensiona
+                     frameColor);                                // scaleX
+          drawSquare(rect.getP00(), pixelSize * 4, frameColor);  // scale
+          drawSquare(rect.getP10(), pixelSize * 4, frameColor);  // resize
           trackerObjectColor = TPixel32(183, 227, 0);
           textColor          = TPixel32(155, 213, 219);
         } else {
@@ -365,14 +365,14 @@ bool TrackerTool::pick(int &hookIndex, const TPointD &pos) {
     Hook *hook = hookSet->getHook(i);
     if (!hook || hook->isEmpty()) continue;
     int trackerObjectId = hook->getTrackerObjectId();
-    if (trackerObjectId < 0)  // se non è una trackeRregion
+    if (trackerObjectId < 0)  // if it's not a tracker region
     {
       TPointD hookPos = hook->getPos(fid);
       TRectD overArea =
           TRectD(hookPos.x - 20 * pixelSize, hookPos.y - 20 * pixelSize,
                  hookPos.x + 20 * pixelSize, hookPos.y + 20 * pixelSize);
       if (overArea.contains(pos)) {
-        hookIndex = i;  // setto l'indice dell'hook
+        hookIndex = i;  // set the hook index
         m_what    = NormalHook;
         return true;
       }
@@ -393,7 +393,7 @@ bool TrackerTool::pick(int &hookIndex, const TPointD &pos) {
       TRectD overArea   = TRectD(
           rect.getP00().x - 4 * pixelSize, rect.getP00().y - 4 * pixelSize,
           rect.getP11().x + 4 * pixelSize, rect.getP11().y + 4 * pixelSize);
-      // se pos è all'interno del'area sensibile del rettangolo
+      // if pos is inside the sensitive area of the rectangle
       if (overArea.contains(pos)) {
         if (distance < minDistance || minDistance == -1) {
           minDistance = distance;
@@ -403,15 +403,15 @@ bool TrackerTool::pick(int &hookIndex, const TPointD &pos) {
 
           // scale Y Area
           double x =
-              0.5 * (rect.getP01().x + rect.getP11().x);  // ascissa punto medio
+              0.5 * (rect.getP01().x + rect.getP11().x);  // midpoint abscissa
           TPointD my = TPointD(x, rect.getP11().y);
           TRectD scaleYArea =
               TRectD(my.x - 4 * pixelSize, my.y - 4 * pixelSize,
                      my.x + 4 * pixelSize, my.y + 4 * pixelSize);
           if (scaleYArea.contains(pos)) m_what = PM1;
           // scale X Area
-          double y = 0.5 * (rect.getP11().y +
-                            rect.getP10().y);  // ordinata punto medio
+          double y =
+              0.5 * (rect.getP11().y + rect.getP10().y);  // midpoint ordinate
           TPointD mx = TPointD(rect.getP10().x, y);
           TRectD scaleXArea =
               TRectD(mx.x - 4 * pixelSize, mx.y - 4 * pixelSize,
@@ -439,11 +439,19 @@ bool TrackerTool::pick(int &hookIndex, const TPointD &pos) {
 //-----------------------------------------------------------------------------
 
 void TrackerTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
-  m_buttonDown  = true;
-  m_picked      = true;
-  TXshLevel *xl = TTool::getApplication()->getCurrentLevel()->getLevel();
-  if (!xl) return;
-  m_selection.setLevel(xl);
+  m_buttonDown = true;
+  m_picked     = true;
+  // Get level as smart pointer to prevent use-after-free
+  TXshLevelP level = TTool::getApplication()->getCurrentLevel()->getLevel();
+  if (!level) return;
+
+  // Store the level in selection - this keeps a reference
+  m_selection.setLevel(level);
+
+  // Get raw pointer for local use (safe because level is kept alive by the
+  // smart pointer)
+  TXshLevel *xl = level.getPointer();
+
   m_firstPos = m_lastPos = pos;
 
   m_deselectArmed = false;
@@ -451,6 +459,7 @@ void TrackerTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
   m_oldPos         = pos;
   double pixelSize = getPixelSize();
 
+  // Now get hookSet using the level (safe because level is alive)
   HookSet *hookSet = xl->getHookSet();
   if (!hookSet) return;
   TrackerObjectsSet *trackerObjectsSet = getTrackerObjectsSet();
@@ -480,36 +489,35 @@ void TrackerTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
       TFrameId fid = getCurrentFid();
       m_what       = P10;
 
-      // Se non è selezionato alcun oggetto allora aggiungo un nuovo oggetto e a
-      // questo
-      // aggiungo una trackerRegion
+      // If no object is selected then add a new object and
+      // add a trackerRegion to it
       int trackerObjectId;
       if (m_hookSelectedIndex == -1 ||
-          hookSet->getHook(m_hookSelectedIndex) == 0) {
+          hookSet->getHook(m_hookSelectedIndex) == nullptr) {
         trackerObjectId  = trackerObjectsSet->addObject();
         m_newObjectAdded = true;
       } else
         trackerObjectId =
             hookSet->getHook(m_hookSelectedIndex)->getTrackerObjectId();
-      // se l'oggetto selezionato è un semplice Hook (senza region)
-      // allora creo un nuovo hook con region
+      // if the selected object is a simple Hook (without region)
+      // then create a new hook with region
       if (trackerObjectId == -1) {
         trackerObjectId  = trackerObjectsSet->addObject();
         m_newObjectAdded = true;
       }
 
-      // aggiungo un Hook all'oggetto selezionato
+      // add a Hook to the selected object
       Hook *newHook = hookSet->addHook();
       if (newHook) {
         newHook->setTrackerObjectId(trackerObjectId);
         newHook->setAPos(fid, pos);
         newHook->setTrackerRegionHeight(pixelSize * 10);
         newHook->setTrackerRegionWidth(pixelSize * 10);
-        // setto l'indice della trackerRegion corrente
+        // set the current trackerRegion index
         m_hookSelectedIndex = newHook->getId();  // hookSet->getHookCount()-1;
       } else {
         if (hookSet->getHookCount() >= 20)
-          QMessageBox::warning(0, "TrackerTool Error",
+          QMessageBox::warning(nullptr, "TrackerTool Error",
                                "Hooks number must be at most 20");
         m_hookSelectedIndex = -1;
       }
@@ -527,24 +535,25 @@ void TrackerTool::leftButtonDrag(const TPointD &pp, const TMouseEvent &e) {
   if (m_hookSelectedIndex < 0 && m_what != NormalHook) return;
   HookSet *hookSet = getHookSet();
   if (!hookSet) return;
-  assert(hookSet->getHook(m_hookSelectedIndex) != 0);
+  assert(hookSet->getHook(m_hookSelectedIndex) != nullptr);
   TrackerObjectsSet *trackerObjectsSet = getTrackerObjectsSet();
   TFrameId fid                         = getCurrentFid();
   if (!trackerObjectsSet) return;
 
-  if (m_dragged == false) {
+  if (!m_dragged) {
     m_dragged = true;
   }
 
   TXshLevel *xl = TTool::getApplication()->getCurrentLevel()->getLevel();
-  if (xl->getSimpleLevel() && xl->getSimpleLevel()->isReadOnly() &&
+  if (xl && xl->getSimpleLevel() && xl->getSimpleLevel()->isReadOnly() &&
       m_what != Inside && m_what != NormalHook)
     return;
 
-  if (m_dragged == true) {
-    Hook *hook = new Hook();
-    hook       = getHookSet()->getHook(m_hookSelectedIndex);
+  if (m_dragged) {
+    // Get existing hook - don't create a new one!
+    Hook *hook = hookSet->getHook(m_hookSelectedIndex);
     if (!hook || hook->isEmpty()) return;
+
     TPointD deltaPos = pp - m_oldPos;
     m_oldPos         = pp;
     double newWidth  = hook->getTrackerRegionWidth();
@@ -555,16 +564,16 @@ void TrackerTool::leftButtonDrag(const TPointD &pp, const TMouseEvent &e) {
     double a             = norm2(pp - posCenter);
     double b             = norm2(pp - deltaPos - posCenter);
     switch (m_what) {
-    case Inside:  // Traslazione
+    case Inside:  // Translation
       hook->setAPos(fid, hook->getPos(fid) + deltaPos);
       break;
-    case NormalHook:  // Traslazione Hook
+    case NormalHook:  // Hook Translation
     {
       hook->setAPos(fid, hook->getPos(fid) + deltaPos);
       invalidate();
       return;
     }
-    case P00:  // Scalatura
+    case P00:  // Scaling
     {
       if (a <= epsilon || b <= epsilon) return;
       aff         = TScale(posCenter, sqrt(a / b));
@@ -578,12 +587,12 @@ void TrackerTool::leftButtonDrag(const TPointD &pp, const TMouseEvent &e) {
       newHeight = rect.getLy();
       break;
     }
-    case P10:  // Scalatura X e Y
+    case P10:  // Scaling X and Y
     {
-      TPointD pos                = hook->getPos(fid);
-      TPointD diffPos            = pp - pos;
-      int signumx                = 1;
-      int signumy                = 1;
+      TPointD pos     = hook->getPos(fid);
+      TPointD diffPos = pp - pos;
+      int signumx     = 1;
+      int signumy     = 1;
       if (diffPos.x < 0) signumx = -1;
       if (diffPos.y < 0) signumy = -1;
       newWidth = fabs(hook->getTrackerRegionWidth() + 2 * signumx * deltaPos.x);
@@ -593,14 +602,14 @@ void TrackerTool::leftButtonDrag(const TPointD &pp, const TMouseEvent &e) {
       // double newHeight = fabs(2*diffPos.y-fabs(2*signumy*deltaPos.y));
       break;
     }
-    case P1M:  // Ridimensiono X
+    case P1M:  // Resize X
     {
       TRectD rect = hook->getTrackerRegion(fid);
       rect        = rect.enlarge(deltaPos.x, 0);
       newWidth    = rect.getLx();
       break;
     }
-    case PM1:  // Ridimensiono Y
+    case PM1:  // Resize Y
     {
       TRectD rect = hook->getTrackerRegion(fid);
       rect        = rect.enlarge(0, deltaPos.y);
@@ -635,10 +644,9 @@ void TrackerTool::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
   // note: apparently sometimes (when the user triple-clicks) we receive this
   // event twice
   if (!m_buttonDown) return;
-  // se clicco su una TrackerRegion già selezionato lo deseleziono (per
-  // permettere
-  // poi l'aggiunta di un nuovo TrackerObject
-  if (m_dragged == false && m_hookSelectedIndex == m_lastHookSelectedIndex) {
+  // if I click on an already selected TrackerRegion, deselect it (to allow
+  // then the addition of a new TrackerObject
+  if (!m_dragged && m_hookSelectedIndex == m_lastHookSelectedIndex) {
     m_hookSelectedIndex = -1;
   }
   if (m_newObjectAdded) {
@@ -665,7 +673,7 @@ void TrackerTool::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
 void TrackerTool::deleteSelectedTrackerRegion() {
   TTool::Application *app = TTool::getApplication();
   TXshLevel *xl           = app->getCurrentLevel()->getLevel();
-  HookSet *hookSet        = xl->getHookSet();
+  HookSet *hookSet        = xl ? xl->getHookSet() : nullptr;
   if (!xl || !xl->getSimpleLevel() || !hookSet ||
       xl->getSimpleLevel()->isReadOnly())
     return;
@@ -716,8 +724,8 @@ invalidate(); */
 
 void TrackerTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
   m_picked = true;
-  if (m_dragged == false) {
-    int hookSelectedIndex;
+  if (!m_dragged) {
+    int hookSelectedIndex = -1;  // Initialize to prevent garbage value
     pick(hookSelectedIndex, pos);
     if (hookSelectedIndex < 0) {
       m_pos    = pos;
@@ -728,6 +736,7 @@ void TrackerTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 }
 
 //-----------------------------------------------------------------------------
+
 bool TrackerTool::onPropertyChanged(std::string propertyName) {
   HookSet *hookSet = getHookSet();
   if (!hookSet || m_hookSelectedIndex < 0) return false;
@@ -757,7 +766,9 @@ bool TrackerTool::onPropertyChanged(std::string propertyName) {
   invalidate();
   return true;
 }
+
 void TrackerTool::reset() { m_hookSelectedIndex = -1; }
+
 int TrackerTool::getCursorId() const {
   switch (m_what) {
   case Outside:
@@ -783,6 +794,7 @@ int TrackerTool::getCursorId() const {
   }
   return ToolCursor::TrackerCursor;
 }
+
 bool TrackerTool::keyDown(QKeyEvent *event) {
   TXshLevel *xl = TTool::getApplication()->getCurrentLevel()->getLevel();
   if (!xl) return false;
@@ -808,10 +820,10 @@ bool TrackerTool::keyDown(QKeyEvent *event) {
   case Qt::Key_0:
     delta.x = 1;
     break;
-  case Qt::Key_PageUp:  // converto in Hook
+  case Qt::Key_PageUp:  // convert to Hook
     hook->setTrackerObjectId(-1);
     break;
-  case Qt::Key_PageDown:  // converto in trackerRegion
+  case Qt::Key_PageDown:  // convert to trackerRegion
   {
     TrackerObjectsSet *trackerObjectsSet = getTrackerObjectsSet();
     if (!trackerObjectsSet) return false;
@@ -834,6 +846,7 @@ bool TrackerTool::keyDown(QKeyEvent *event) {
 
   return true;
 }
+
 // bool moveCursor(const TPointD &pos){}
 void TrackerTool::onEnter() {
   HookSet *hookSet = getHookSet();

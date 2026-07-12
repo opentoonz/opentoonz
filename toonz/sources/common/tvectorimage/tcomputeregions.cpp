@@ -1944,6 +1944,7 @@ void autoclose(double factor, vector<VIStroke *> &s, int ii, int jj,
 //-----------------------------------------------------------------------------
 
 TPointD inline getTangent(const IntersectedStroke &item) {
+  if (!item.m_edge.m_s) return TPointD();
   return (item.m_gettingOut ? 1 : -1) *
          item.m_edge.m_s->getSpeed(item.m_edge.m_w0, item.m_gettingOut);
 }
@@ -2485,6 +2486,7 @@ static TRegion *findRegion(VIList<Intersection> &intList, Intersection *p1,
       }
 
     } while (!p2->m_nextIntersection);
+    if (!p2->m_edge.m_s) continue;
 
     nextp1 = p2->m_nextIntersection;
     nextp2 = p2->m_nextStroke;

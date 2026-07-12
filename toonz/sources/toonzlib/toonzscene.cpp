@@ -50,7 +50,7 @@ TOfflineGL *currentOfflineGL = 0;
 
 #include <QProgressDialog>
 
-#ifdef MACOSX
+#if defined(MACOSX) || defined(LINUX) || defined(FREEBSD)
 #include <QSurfaceFormat>
 #include <QOffscreenSurface>
 #include <QOpenGLContext>
@@ -385,11 +385,9 @@ int ToonzScene::loadFrameCount(const TFilePath &fp) {
 void ToonzScene::loadNoResources(const TFilePath &fp) {
   clear();
 
-  TProjectManager *pm = TProjectManager::instance(); 
-  bool sceneStandAlone = false;
-  auto sceneProject   = pm->loadSceneProject(fp, &sceneStandAlone);
+  TProjectManager *pm = TProjectManager::instance();
+  auto sceneProject   = pm->loadSceneProject(fp, &m_standAlone);
   if (!sceneProject) return;
-  if (sceneStandAlone) m_standAlone = true;
 
   loadTnzFile(fp);
   getXsheet()->updateFrameCount();
@@ -586,6 +584,9 @@ void ToonzScene::save(const TFilePath &fp, TXsheet *subxsh) {
   TFilePath oldScenePath = getScenePath();
   TFilePath newScenePath = fp;
 
+  if (newScenePath != oldScenePath)
+    TProjectManager::instance()->loadSceneProject(fp, &m_standAlone);
+
   CameraRedirection redir(this, subxsh);
 
   bool wasUntitled = isUntitled();
@@ -776,7 +777,7 @@ void ToonzScene::renderFrame(const TRaster32P &ras, int row, const TXsheet *xsh,
   TRect clipRect(ras->getBounds());
 
 // fix for plastic tool applied to subxsheet
-#ifdef MACOSX
+#if defined(MACOSX) || defined(LINUX) || defined(FREEBSD)
   QSurfaceFormat format;
   format.setProfile(QSurfaceFormat::CompatibilityProfile);
 
@@ -793,7 +794,7 @@ void ToonzScene::renderFrame(const TRaster32P &ras, int row, const TXsheet *xsh,
   ogl.makeCurrent();
 #endif
   {
-#ifdef MACOSX
+#if defined(MACOSX) || defined(LINUX) || defined(FREEBSD)
     std::unique_ptr<QOpenGLFramebufferObject> fb(
         new QOpenGLFramebufferObject(ras->getLx(), ras->getLy()));
 
@@ -824,7 +825,7 @@ void ToonzScene::renderFrame(const TRaster32P &ras, int row, const TXsheet *xsh,
 
     painter.flushRasterImages();
     glFlush();
-#ifdef MACOSX
+#if defined(MACOSX) || defined(LINUX) || defined(FREEBSD)
     QImage img =
         fb->toImage().scaled(QSize(ras->getLx(), ras->getLy()),
                              Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
@@ -843,7 +844,7 @@ void ToonzScene::renderFrame(const TRaster32P &ras, int row, const TXsheet *xsh,
     TRop::over(ras, ogl.getRaster());
 #endif
   }
-#ifdef MACOSX
+#if defined(MACOSX) || defined(LINUX) || defined(FREEBSD)
   glMatrixMode(GL_MODELVIEW), glPopMatrix();
   glMatrixMode(GL_PROJECTION), glPopMatrix();
 
@@ -1056,7 +1057,7 @@ TFilePath ToonzScene::getImportedLevelPath(const TFilePath path) const {
 
 //-----------------------------------------------------------------------------
 
-/* tzp,tzu->tlv */
+/* tzp,tzu->tlv, svg->pli */
 bool ToonzScene::convertLevelIfNeeded(TFilePath &levelPath) {
   LevelType ltype = getLevelType(levelPath);
   TFilePath fp    = levelPath;

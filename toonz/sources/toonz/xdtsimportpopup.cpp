@@ -1,11 +1,17 @@
+
+
 #include "xdtsimportpopup.h"
 
 #include "tapp.h"
 #include "tsystem.h"
+#include "iocommand.h"
 #include "toonzqt/filefield.h"
 #include "toonz/toonzscene.h"
 #include "toonz/tscenehandle.h"
 #include "toonz/sceneproperties.h"
+#include "toonz/tcamera.h"
+#include "convertpopup.h"
+#include "tfiletype.h"
 
 #include <QMainWindow>
 #include <QTableView>
@@ -15,212 +21,331 @@
 #include <QLabel>
 #include <QComboBox>
 #include <QGroupBox>
+#include <QCoreApplication>
 
 using namespace DVGui;
 
 namespace {
-QIcon getColorChipIcon(TPixel32 color) {
-  QPixmap pm(15, 15);
-  pm.fill(QColor(color.r, color.g, color.b));
-  return QIcon(pm);
+
+// Helper function to create color chip icon for cell marks
+QIcon createColorChipIcon(TPixel32 color) {
+  QPixmap pixmap(15, 15);
+  pixmap.fill(QColor(color.r, color.g, color.b));
+  return QIcon(pixmap);
 }
 
-bool matchSequencePattern(const TFilePath& path) {
-    QRegularExpression pattern(
-        R"(
-  ^                           # Match the start of the string
-  .*?                         # Optional prefix
-  \d+                         # allow aFilePrefix<number>.ext
-  \.                          # Match a dot (.)
-  (png|jpg|jpeg|bmp|tga|tiff) # Image extensions
-  $                           # Match the end of the string
-)",
-QRegularExpression::CaseInsensitiveOption |
-QRegularExpression::ExtendedPatternSyntaxOption);
-    return pattern.match(QString::fromStdString(path.getLevelName()))
-        .hasMatch();
-};
+// Check if filename matches sequence pattern (digits before extension)
+bool matchesSequencePattern(const TFilePath& path) {
+  static const QRegularExpression pattern(
+      R"(.*?\d+\.(png|jpg|jpeg|bmp|tga|tiff)$)",
+      QRegularExpression::CaseInsensitiveOption);
 
-bool isSharingSameParam(QString name1,
-    QString name2) {
-    std::wstring str1 = name1.toStdWString();
-    std::wstring str2 = name2.toStdWString();
+  return pattern.match(QString::fromStdString(path.getLevelName())).hasMatch();
+}
 
-    str1.erase(std::remove_if(str1.begin(), str1.end(), ::iswdigit),
-        str1.end());
-    str2.erase(std::remove_if(str2.begin(), str2.end(), ::iswdigit),
-        str2.end());
+// Check if two filenames share same base name (without digits)
+bool sharesSameBaseName(const QString& name1, const QString& name2) {
+  std::wstring str1 = name1.toStdWString();
+  std::wstring str2 = name2.toStdWString();
 
-    return str1 == str2;
+  // Remove digits from both strings
+  str1.erase(std::remove_if(str1.begin(), str1.end(), ::iswdigit), str1.end());
+  str2.erase(std::remove_if(str2.begin(), str2.end(), ::iswdigit), str2.end());
+
+  return str1 == str2;
+}
+
+// Fetch sequence files and add them to resource data list
+void fetchSequenceFiles(
+    std::vector<IoCmd::LoadResourceArguments::ResourceData>& resources) {
+  for (size_t i = 0; i < resources.size(); ++i) {
+    const TFilePath currentPath = resources[i].m_path;
+    if (!matchesSequencePattern(currentPath)) continue;
+
+    const TFilePath parentDir = currentPath.getParentDir();
+    QDir directory(parentDir.getQString());
+
+    const QString searchPattern =
+        "*" + QString::fromStdString(currentPath.getDottedType());
+    const QStringList foundFiles =
+        directory.entryList({searchPattern}, QDir::Files);
+
+    if (foundFiles.isEmpty()) continue;
+
+    const QString currentFile = currentPath.withoutParentDir().getQString();
+
+    for (const QString& foundFile : foundFiles) {
+      if (currentFile == foundFile) continue;
+
+      if (sharesSameBaseName(currentFile, foundFile)) {
+        IoCmd::LoadResourceArguments::ResourceData newData;
+        newData.m_path = parentDir + foundFile.toStdWString();
+        resources.insert(resources.begin() + (++i), newData);
+      }
+    }
+  }
 }
 
 }  // namespace
 
 //=============================================================================
+// XDTSImportPopup implementation
+//-----------------------------------------------------------------------------
 
 XDTSImportPopup::XDTSImportPopup(QStringList levelNames, ToonzScene* scene,
-                                 TFilePath scenePath, bool isUextVersion)
+                                 TFilePath scenePath, bool isUextVersion,
+                                 bool isSXF)
     : m_scene(scene)
     , m_isUext(isUextVersion)
-    , DVGui::Dialog(TApp::instance()->getMainWindow(), true, false,
-                    "XDTSImport") {
-  setWindowTitle(tr("Importing XDTS file %1")
-                     .arg(QString::fromStdString(scenePath.getLevelName())));
-  QPushButton* loadButton   = new QPushButton(tr("Load"), this);
-  QPushButton* cancelButton = new QPushButton(tr("Cancel"), this);
+    , Dialog(TApp::instance()->getMainWindow(), true, false, "XDTSImport") {
+  // Set dialog properties
+  const QString fileType = isSXF ? "SXF" : "XDTS";
+  setWindowTitle(
+      tr("Importing %1 file %2")
+          .arg(fileType, QString::fromStdString(scenePath.getLevelName())));
 
-  m_tick1Combo             = new QComboBox(this);
-  m_tick2Combo             = new QComboBox(this);
-  QList<QComboBox*> combos = {m_tick1Combo, m_tick2Combo};
+  // Create buttons
+  auto loadButton   = new QPushButton(tr("Load"), this);
+  auto cancelButton = new QPushButton(tr("Cancel"), this);
 
+  // Create combo boxes for cell marks
+  m_tick1Combo                 = new QComboBox(this);
+  m_tick2Combo                 = new QComboBox(this);
+  QList<QComboBox*> comboBoxes = {m_tick1Combo, m_tick2Combo};
+
+  // Create rename checkbox
+  m_renameCheckBox = new QCheckBox(tr("Rename Image Sequence"), this);
+  m_renameCheckBox->setChecked(true);
+
+  // Create conversion combo box
+  m_convertCombo             = new QComboBox(this);
+  QStringList convertOptions = {
+      tr("Do not Convert"), tr("Convert Every Level with Settings Popup"),
+      tr("Convert Unpainted Aliasing Raster(Inks Only)")};
+  m_convertCombo->addItems(convertOptions);
+  m_convertCombo->setCurrentIndex(0);
+
+  // Create NAA conversion widget (only visible for 3rd option)
+  auto convertNAAWidget = new QWidget(this);
+  convertNAAWidget->setVisible(false);
+  auto convertNAALayout = new QHBoxLayout;
+
+  m_paletteCheckBox = new QCheckBox(tr("Append Default Palette"), this);
+  m_paletteCheckBox->setChecked(true);
+  m_paletteCheckBox->setToolTip(
+      tr("When activated, styles of the default "
+         "palette\n($TOONZSTUDIOPALETTE\\Global Palettes\\Default "
+         "Palettes\\Cleanup_Palette.tpl) will \nbe "
+         "appended to the palette after conversion"));
+
+  QStringList dpiModes = {tr("Image DPI"), tr("Current Camera DPI"),
+                          tr("Custom DPI")};
+
+  m_dpiMode = new QComboBox(this);
+  m_dpiMode->addItems(dpiModes);
+
+  m_dpiFld = new DoubleLineEdit(this);
+  m_dpiFld->setValue(120.0);
+  m_dpiFld->setDisabled(true);
+
+  // Connect DPI mode change
+  connect(m_dpiMode, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+          [this](int index) {
+            m_dpiFld->setEnabled(index == 2);  // Custom DPI
+          });
+
+  convertNAALayout->addWidget(m_paletteCheckBox);
+  convertNAALayout->addStretch();
+  convertNAALayout->addWidget(new QLabel(tr("DPI:")));
+  convertNAALayout->addWidget(m_dpiMode);
+  convertNAALayout->addWidget(m_dpiFld);
+  convertNAAWidget->setLayout(convertNAALayout);
+
+  // Connect conversion mode change
+  connect(m_convertCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+          this, [=](int index) {
+            convertNAAWidget->setVisible(index == 2);
+            adjustSize();
+          });
+
+  // Create additional combo boxes for UEXT version
   if (m_isUext) {
     m_keyFrameCombo       = new QComboBox(this);
     m_referenceFrameCombo = new QComboBox(this);
-    combos << m_keyFrameCombo << m_referenceFrameCombo;
+    comboBoxes << m_keyFrameCombo << m_referenceFrameCombo;
   }
 
-  QList<TSceneProperties::CellMark> marks = TApp::instance()
-                                                ->getCurrentScene()
-                                                ->getScene()
-                                                ->getProperties()
-                                                ->getCellMarks();
-  for (auto combo : combos) {
-    combo->addItem(tr("None"), -1);
-    int curId = 0;
-    for (auto mark : marks) {
-      QString label = QString("%1: %2").arg(curId).arg(mark.name);
-      combo->addItem(getColorChipIcon(mark.color), label, curId);
-      curId++;
+  // Populate combo boxes with cell marks
+  const auto cellMarks = TApp::instance()
+                             ->getCurrentScene()
+                             ->getScene()
+                             ->getProperties()
+                             ->getCellMarks();
+
+  for (auto comboBox : comboBoxes) {
+    comboBox->addItem(tr("None"), -1);
+    int currentId = 0;
+
+    for (const auto& mark : cellMarks) {
+      const QString label = QString("%1: %2").arg(currentId).arg(mark.name);
+      comboBox->addItem(createColorChipIcon(mark.color), label, currentId);
+      ++currentId;
     }
   }
+
+  // Set default selections
   m_tick1Combo->setCurrentIndex(m_tick1Combo->findData(6));
   m_tick2Combo->setCurrentIndex(m_tick2Combo->findData(8));
+
   if (m_isUext) {
     m_keyFrameCombo->setCurrentIndex(m_keyFrameCombo->findData(0));
     m_referenceFrameCombo->setCurrentIndex(m_referenceFrameCombo->findData(4));
   }
 
-  QString description =
+  // Create description label
+  const QString description =
       tr("Please specify the level locations. Suggested paths "
          "are input in the fields with blue border.");
 
-  m_topLayout->addWidget(new QLabel(description, this), 0);
+  m_topLayout->addWidget(new QLabel(description, this));
   m_topLayout->addSpacing(15);
 
-  QScrollArea* fieldsArea = new QScrollArea(this);
+  // Create scroll area for file fields
+  auto fieldsArea = new QScrollArea(this);
   fieldsArea->setWidgetResizable(true);
 
-  QWidget* fieldsWidget = new QWidget(this);
+  auto fieldsWidget = new QWidget(this);
+  auto fieldsLayout = new QGridLayout();
+  fieldsLayout->setContentsMargins(0, 0, 0, 0);
+  fieldsLayout->setHorizontalSpacing(10);
+  fieldsLayout->setVerticalSpacing(10);
 
-  QGridLayout* fieldsLay = new QGridLayout();
-  fieldsLay->setMargin(0);
-  fieldsLay->setHorizontalSpacing(10);
-  fieldsLay->setVerticalSpacing(10);
-  fieldsLay->addWidget(new QLabel(tr("Level Name"), this), 0, 0,
-                       Qt::AlignLeft | Qt::AlignVCenter);
-  fieldsLay->addWidget(new QLabel(tr("Level Path"), this), 0, 1,
-                       Qt::AlignLeft | Qt::AlignVCenter);
-  for (QString& levelName : levelNames) {
-    int row = fieldsLay->rowCount();
-    fieldsLay->addWidget(new QLabel(levelName, this), row, 0,
-                         Qt::AlignRight | Qt::AlignVCenter);
-    FileField* fileField = new FileField(this);
-    fieldsLay->addWidget(fileField, row, 1);
+  // Add column headers
+  fieldsLayout->addWidget(new QLabel(tr("Level Name"), this), 0, 0,
+                          Qt::AlignLeft | Qt::AlignVCenter);
+  fieldsLayout->addWidget(new QLabel(tr("Level Path"), this), 0, 1,
+                          Qt::AlignLeft | Qt::AlignVCenter);
+
+  // Create file field for each level name
+  for (const QString& levelName : levelNames) {
+    const int row = fieldsLayout->rowCount();
+    fieldsLayout->addWidget(new QLabel(levelName, this), row, 0,
+                            Qt::AlignRight | Qt::AlignVCenter);
+
+    auto fileField = new FileField(this);
+    fieldsLayout->addWidget(fileField, row, 1);
+
     m_fields.insert(levelName, fileField);
     fileField->setFileMode(QFileDialog::AnyFile);
     fileField->setObjectName("SuggestiveFileField");
-    connect(fileField, SIGNAL(pathChanged()), this, SLOT(onPathChanged()));
-  }
-  fieldsLay->setColumnStretch(1, 1);
-  fieldsLay->setRowStretch(fieldsLay->rowCount(), 1);
 
-  fieldsWidget->setLayout(fieldsLay);
+    // Connect path changed signal
+    connect(fileField, &FileField::pathChanged, this,
+            &XDTSImportPopup::onPathChanged);
+  }
+
+  fieldsLayout->setColumnStretch(1, 1);
+  fieldsLayout->setRowStretch(fieldsLayout->rowCount(), 1);
+
+  fieldsWidget->setLayout(fieldsLayout);
   fieldsArea->setWidget(fieldsWidget);
   m_topLayout->addWidget(fieldsArea, 1);
 
-  // —ˆT Œ´‰æ^’†Š„ŽQl‚ÌƒRƒ}ƒ}[ƒN‚ÌƒŒƒCƒAƒEƒg‚©‚çI
+  // Create cell mark group box
+  auto cellMarkGroupBox =
+      new QGroupBox(tr("Cell marks for %1 symbols").arg(fileType));
 
-  // cell mark area
-  QGroupBox* cellMarkGroupBox =
-      new QGroupBox(tr("Cell marks for XDTS symbols"));
-  QGridLayout* markLay = new QGridLayout();
-  markLay->setMargin(10);
-  markLay->setVerticalSpacing(10);
-  markLay->setHorizontalSpacing(5);
+  auto markLayout = new QGridLayout();
+  markLayout->setContentsMargins(10, 10, 10, 10);
+  markLayout->setVerticalSpacing(10);
+  markLayout->setHorizontalSpacing(5);
+
   {
-    markLay->addWidget(new QLabel(tr("Inbetween Symbol1 (O):"), this), 0, 0,
-                       Qt::AlignRight | Qt::AlignVCenter);
-    markLay->addWidget(m_tick1Combo, 0, 1);
-    markLay->addItem(new QSpacerItem(10, 1), 0, 2);
-    markLay->addWidget(new QLabel(tr("Inbetween Symbol2 (*)"), this), 0, 3,
-                       Qt::AlignRight | Qt::AlignVCenter);
-    markLay->addWidget(m_tick2Combo, 0, 4);
+    // Inbetween symbols: â—‹ (0x25CB) and â— (0x25CF)
+    markLayout->addWidget(
+        new QLabel(tr("Inbetween Symbol1 (%1):").arg(QChar(0x25CB)), this), 0,
+        0, Qt::AlignRight | Qt::AlignVCenter);
+    markLayout->addWidget(m_tick1Combo, 0, 1);
+    markLayout->addItem(new QSpacerItem(10, 1), 0, 2);
+    markLayout->addWidget(
+        new QLabel(tr("Inbetween Symbol2 (%1):").arg(QChar(0x25CF)), this), 0,
+        3, Qt::AlignRight | Qt::AlignVCenter);
+    markLayout->addWidget(m_tick2Combo, 0, 4);
 
     if (m_isUext) {
-      markLay->addWidget(new QLabel(QObject::tr("Keyframe Symbol:")), 1, 0,
-                         Qt::AlignRight | Qt::AlignVCenter);
-      markLay->addWidget(m_keyFrameCombo, 1, 1);
-      markLay->addWidget(new QLabel(QObject::tr("Reference Frame Symbol:")), 1,
-                         3, Qt::AlignRight | Qt::AlignVCenter);
-      markLay->addWidget(m_referenceFrameCombo, 1, 4);
+      markLayout->addWidget(new QLabel(tr("Keyframe Symbol:"), this), 1, 0,
+                            Qt::AlignRight | Qt::AlignVCenter);
+      markLayout->addWidget(m_keyFrameCombo, 1, 1);
+      markLayout->addWidget(new QLabel(tr("Reference Frame Symbol:"), this), 1,
+                            3, Qt::AlignRight | Qt::AlignVCenter);
+      markLayout->addWidget(m_referenceFrameCombo, 1, 4);
     }
   }
-  cellMarkGroupBox->setLayout(markLay);
 
+  cellMarkGroupBox->setLayout(markLayout);
   m_topLayout->addWidget(cellMarkGroupBox, 0, Qt::AlignRight);
 
-  connect(loadButton, SIGNAL(clicked()), this, SLOT(accept()));
-  connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+  // Create conversion options layout
+  auto checkBoxLayout = new QHBoxLayout;
+  checkBoxLayout->addWidget(new QLabel(tr("Convert Raster to TLV : ")));
+  checkBoxLayout->addWidget(m_convertCombo);
+  checkBoxLayout->addStretch();
+  checkBoxLayout->addWidget(m_renameCheckBox);
+
+  m_topLayout->addLayout(checkBoxLayout);
+  m_topLayout->addWidget(convertNAAWidget);
+
+  // Connect buttons using modern signal/slot syntax
+  connect(loadButton, &QPushButton::clicked, this, &QDialog::accept);
+  connect(cancelButton, &QPushButton::clicked, this, &QDialog::reject);
 
   addButtonBarWidget(loadButton, cancelButton);
-
+  adjustSize();
   updateSuggestions(scenePath.getQString());
 }
 
 //-----------------------------------------------------------------------------
 
 void XDTSImportPopup::onPathChanged() {
-  FileField* fileField = dynamic_cast<FileField*>(sender());
+  auto fileField = qobject_cast<FileField*>(sender());
   if (!fileField) return;
-  QString levelName = m_fields.key(fileField);
-  // make the fields non-suggestive
+
+  const QString levelName = m_fields.key(fileField);
+
+  // Remove level from suggested list since user changed it
   m_pathSuggestedLevels.removeAll(levelName);
 
-  // if the path is specified under the sub-folder with the same name as the
-  // level, then try to make suggestions from the parent folder of it
-  TFilePath fp =
-      m_scene->decodeFilePath(TFilePath(fileField->getPath())).getParentDir();
-  if (QDir(fp.getQString()).dirName() == levelName)
-    updateSuggestions(fp.getQString());
+  // Check if path is in sub-folder with same name as level
+  // (common in CSP exports like foo/A/A.tlv)
+  const TFilePath currentPath =
+      m_scene->decodeFilePath(TFilePath(fileField->getPath()));
+  const TFilePath parentDir = currentPath.getParentDir();
+
+  QDir directory(parentDir.getQString());
+  if (directory.dirName() == levelName) {
+    updateSuggestions(parentDir.getQString());
+  }
 
   updateSuggestions(fileField->getPath());
 }
 
 //-----------------------------------------------------------------------------
 
-void XDTSImportPopup::updateSuggestions(const QString samplePath) {
-  TFilePath fp(samplePath);
-  fp = m_scene->decodeFilePath(fp).getParentDir();
-  QDir suggestFolder(fp.getQString());
-  QStringList filters;
-  filters << "*.bmp"
-          << "*.jpg"
-          << "*.jpeg"
-          << "*.nol"
-          << "*.pic"
-          << "*.pict"
-          << "*.pct"
-          << "*.png"
-          << "*.rgb"
-          << "*.sgi"
-          << "*.tga"
-          << "*.tif"
-          << "*.tiff"
-          << "*.tlv"
-          << "*.pli"
-          << "*.psd";
+void XDTSImportPopup::updateSuggestions(const QString& samplePath) {
+  TFilePath filePath(samplePath);
+  filePath = m_scene->decodeFilePath(filePath).getParentDir();
+
+  QDir suggestFolder(filePath.getQString());
+
+  // Supported image file extensions
+  static const QStringList filters = {"*.bmp",  "*.jpg",  "*.jpeg", "*.nol",
+                                      "*.pic",  "*.pict", "*.pct",  "*.png",
+                                      "*.rgb",  "*.sgi",  "*.tga",  "*.tif",
+                                      "*.tiff", "*.tlv",  "*.pli",  "*.psd"};
+
   suggestFolder.setNameFilters(filters);
   suggestFolder.setFilter(QDir::Files);
+
   TFilePathSet pathSet;
   try {
     TSystem::readDirectory(pathSet, suggestFolder, true);
@@ -228,29 +353,34 @@ void XDTSImportPopup::updateSuggestions(const QString samplePath) {
     return;
   }
 
-  QMap<QString, FileField*>::iterator fieldsItr = m_fields.begin();
+  auto fieldsItr = m_fields.begin();
   bool suggested = false;
+
   while (fieldsItr != m_fields.end()) {
-    QString levelName    = fieldsItr.key();
-    FileField* fileField = fieldsItr.value();
-    // check if the field can be filled with suggestion
+    const QString levelName = fieldsItr.key();
+    FileField* fileField    = fieldsItr.value();
+
+    // Check if field can be filled with suggestion
     if (fileField->getPath().isEmpty() ||
         m_pathSuggestedLevels.contains(levelName)) {
-      // input suggestion if there is a file with the same level name
       bool found = false;
-      for (TFilePath path : pathSet) {
+
+      // Look for file with same name as level in current folder
+      for (const auto& path : pathSet) {
         if (path.getName() == levelName.toStdString()) {
-          TFilePath codedPath = m_scene->codeFilePath(path);
+          const TFilePath codedPath = m_scene->codeFilePath(path);
           fileField->setPath(codedPath.getQString());
-          if (!m_pathSuggestedLevels.contains(levelName))
+
+          if (!m_pathSuggestedLevels.contains(levelName)) {
             m_pathSuggestedLevels.append(levelName);
+          }
+
           found = true;
           break;
         }
       }
-      // Not found in the current folder.
-      // Then check if there is a sub-folder with the same name as the level
-      // (like foo/A/A.tlv), as CSP exports levels like that.
+
+      // If not found, check sub-folder with same name as level
       if (!found && suggestFolder.cd(levelName)) {
         TFilePathSet subPathSet;
         try {
@@ -258,136 +388,233 @@ void XDTSImportPopup::updateSuggestions(const QString samplePath) {
         } catch (...) {
           return;
         }
-        for (TFilePath path : subPathSet) {
+
+        for (const auto& path : subPathSet) {
           if (path.getName() == levelName.toStdString()) {
-            suggested = true;
-            TFilePath codedPath = m_scene->codeFilePath(path);
+            suggested                 = true;
+            const TFilePath codedPath = m_scene->codeFilePath(path);
             fileField->setPath(codedPath.getQString());
-            if (!m_pathSuggestedLevels.contains(levelName))
+
+            if (!m_pathSuggestedLevels.contains(levelName)) {
               m_pathSuggestedLevels.append(levelName);
+            }
+
             break;
           }
         }
-        // back to parent folder
-        suggestFolder.cdUp();
+
+        suggestFolder.cdUp();  // Return to parent folder
       }
+
       if (found) suggested = true;
     }
+
     ++fieldsItr;
   }
 
-  // fallBack search
+  // Fallback search if no suggestions found
   if (!suggested) {
-      updateSuggestions(fp);
-      return;
+    updateSuggestions(filePath);
   }
 
-  // repaint fields
+  // Update field styles based on suggestion status
   fieldsItr = m_fields.begin();
   while (fieldsItr != m_fields.end()) {
-    if (m_pathSuggestedLevels.contains(fieldsItr.key()))
-      fieldsItr.value()->setStyleSheet(
-          QString("#SuggestiveFileField "
-                  "QLineEdit{border-color:#2255aa;border-width:2px;}"));
-    else
-      fieldsItr.value()->setStyleSheet(QString(""));
-    ++fieldsItr;
-  }
-}
+    FileField* field = fieldsItr.value();
 
-//-----------------------------------------------------------------------------
-// FALL BACK
-void XDTSImportPopup::updateSuggestions(const TFilePath &path) {
-    QMap<QString, FileField*>::iterator fieldsItr = m_fields.begin();
-    QStringList filters;
-    filters << "*.bmp"
-        << "*.jpg"
-        << "*.jpeg"
-        << "*.nol"
-        << "*.pic"
-        << "*.pict"
-        << "*.pct"
-        << "*.png"
-        << "*.rgb"
-        << "*.sgi"
-        << "*.tga"
-        << "*.tif"
-        << "*.tiff";
-    bool suggestFolderFound = false;
-    QDir suggestFolder(path.getQString());
-    auto assignMatchingFiles = [&](QStringList& files) {
-        QMap<QString, FileField*>::iterator it = m_fields.begin();
-        while (it != m_fields.end()) {
-            QString levelName = it.key();
-            FileField* fileField = it.value();
-            if (fileField->getPath().isEmpty() ||
-                m_pathSuggestedLevels.contains(levelName)) {
-                QString filePattern = ".*" + levelName + ".*" + ".{3,4}$";
-                int index = files.indexOf(QRegExp(filePattern));
-                if (index != -1) {
-                    suggestFolderFound = true;
-                    TFilePath foundPath(suggestFolder.filePath(files[index]));
-                    TFilePath codedPath = m_scene->codeFilePath(foundPath);
-                    fileField->setPath(codedPath.getQString());
-                    files.removeAt(index);
-                    m_pathSuggestedLevels.append(levelName);
-                }
-            }
-            ++it;
-        }
-        };
-    
-    // Relative Paths
-    QStringList relPaths = suggestFolder.entryList(filters, QDir::Files | QDir::Readable | QDir::NoDotAndDotDot);
-    assignMatchingFiles(relPaths);
+    if (m_pathSuggestedLevels.contains(fieldsItr.key())) {
+      // Highlight suggested fields with blue border
+      field->setStyleSheet(
+          "#SuggestiveFileField QLineEdit {"
+          "border-color: #2255aa;"
+          "border-width: 2px;"
+          "}");
+    } else {
+      // Clear styling for non-suggested fields
+      field->setStyleSheet("");
 
-    if (!suggestFolderFound) {
-        relPaths.clear();
-        QStringList subDirs = suggestFolder.entryList(QDir::Dirs | QDir::Readable | QDir::NoDotAndDotDot);
-        for (const QString& subDirName : subDirs) {
-            QDir subDir = suggestFolder;
-            if (!subDir.cd(subDirName)) continue;
-
-            QStringList filesInSubDir = subDir.entryList(filters, QDir::Files | QDir::Readable | QDir::NoDotAndDotDot);
-            for (const QString& file : filesInSubDir) {
-                relPaths.append(subDirName + "/" + file);
-            }
-        }
-        assignMatchingFiles(relPaths);
+      // Set default path but clear displayed text
+      if (field->getPath().isEmpty()) {
+        field->setPath(m_scene->getScenePath().getParentDir().getQString());
+        field->getField()->clear();
+      }
     }
 
-  // repaint fields
-  fieldsItr = m_fields.begin();
-  while (fieldsItr != m_fields.end()) {
-    if (m_pathSuggestedLevels.contains(fieldsItr.key()))
-      fieldsItr.value()->setStyleSheet(
-          QString("#SuggestiveFileField "
-                  "QLineEdit{border-color:#2255aa;border-width:2px;}"));
-    else
-      fieldsItr.value()->setStyleSheet(QString(""));
     ++fieldsItr;
   }
 }
 
 //-----------------------------------------------------------------------------
 
-QString XDTSImportPopup::getLevelPath(QString levelName) {
-  FileField* field = m_fields.value(levelName);
-  if (!field) return QString();
-  return field->getPath();
+void XDTSImportPopup::updateSuggestions(const TFilePath& path) {
+  static const QStringList filters = {
+      "*.bmp", "*.jpg", "*.jpeg", "*.nol", "*.pic", "*.pict", "*.pct",
+      "*.png", "*.rgb", "*.sgi",  "*.tga", "*.tif", "*.tiff"};
+
+  bool suggestFolderFound = false;
+  QDir suggestFolder(path.getQString());
+
+  auto assignMatchingFiles = [&](QStringList& files) {
+    auto it = m_fields.begin();
+    while (it != m_fields.end()) {
+      const QString levelName = it.key();
+      FileField* fileField    = it.value();
+
+      if (fileField->getPath().isEmpty() ||
+          m_pathSuggestedLevels.contains(levelName)) {
+        // Create regex pattern to match level name with any extension
+        const QString filePattern =
+            QString(".*%1.*\\.[a-zA-Z0-9]{3,4}$").arg(levelName);
+        const QRegularExpression regex(filePattern);
+
+        const int index = files.indexOf(regex);
+        if (index != -1) {
+          suggestFolderFound = true;
+          const TFilePath foundPath(suggestFolder.filePath(files[index]));
+          const TFilePath codedPath = m_scene->codeFilePath(foundPath);
+
+          fileField->setPath(codedPath.getQString());
+          files.removeAt(index);
+          m_pathSuggestedLevels.append(levelName);
+        }
+      }
+      ++it;
+    }
+  };
+
+  // Search in relative paths
+  QStringList relativePaths = suggestFolder.entryList(
+      filters, QDir::Files | QDir::Readable | QDir::NoDotAndDotDot);
+
+  assignMatchingFiles(relativePaths);
+
+  if (!suggestFolderFound) {
+    relativePaths.clear();
+
+    // Search in subdirectories
+    const QStringList subDirs = suggestFolder.entryList(
+        QDir::Dirs | QDir::Readable | QDir::NoDotAndDotDot);
+
+    for (const QString& subDirName : subDirs) {
+      QDir subDir = suggestFolder;
+      if (!subDir.cd(subDirName)) continue;
+
+      const QStringList filesInSubDir = subDir.entryList(
+          filters, QDir::Files | QDir::Readable | QDir::NoDotAndDotDot);
+
+      for (const QString& file : filesInSubDir) {
+        relativePaths.append(subDirName + "/" + file);
+      }
+    }
+
+    assignMatchingFiles(relativePaths);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+QString XDTSImportPopup::getLevelPath(const QString& levelName) const {
+  auto field = m_fields.value(levelName);
+  return field ? field->getPath() : QString();
 }
 
 //-----------------------------------------------------------------------------
 
 void XDTSImportPopup::getMarkerIds(int& tick1Id, int& tick2Id, int& keyFrameId,
-                                   int& referenceFrameId) {
+                                   int& referenceFrameId) const {
   tick1Id = m_tick1Combo->currentData().toInt();
   tick2Id = m_tick2Combo->currentData().toInt();
+
   if (m_isUext) {
     keyFrameId       = m_keyFrameCombo->currentData().toInt();
     referenceFrameId = m_referenceFrameCombo->currentData().toInt();
   } else {
     keyFrameId       = -1;
     referenceFrameId = -1;
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void XDTSImportPopup::accept() {
+  QDialog::accept();
+
+  std::vector<IoCmd::LoadResourceArguments::ResourceData> resourceData;
+
+  // Collect resource data from fields
+  for (auto it = m_fields.constBegin(); it != m_fields.constEnd(); ++it) {
+    IoCmd::LoadResourceArguments::ResourceData data;
+    data.m_path = TFilePath(it.value()->getPath());
+    resourceData.push_back(data);
+  }
+
+  // Fetch sequence files if available
+  fetchSequenceFiles(resourceData);
+
+  // Rename resources if checkbox is checked
+  if (m_renameCheckBox->isChecked()) {
+    IoCmd::renameResources(resourceData, false);
+  }
+
+  // Handle conversion based on selected option
+  const int conversionOption = m_convertCombo->currentIndex();
+
+  if (conversionOption == 1) {
+    // Convert each level individually with settings popup
+    ConvertPopup popup;
+
+    for (auto& data : resourceData) {
+      const TFileType::Type fileType = TFileType::getInfo(data.m_path);
+      if (!TFileType::isFullColor(fileType)) continue;
+
+      popup.setWindowModality(Qt::ApplicationModal);
+      popup.setFiles({data.m_path});
+      popup.setFormat("tlv");
+      popup.adjustSize();
+      popup.show();
+
+      // Wait for conversion to complete
+      while (popup.isVisible() || popup.isConverting()) {
+        QCoreApplication::processEvents(QEventLoop::AllEvents |
+                                        QEventLoop::WaitForMoreEvents);
+      }
+
+      const TFilePath convertedPath = popup.getConvertedPath(data.m_path);
+      if (!convertedPath.isEmpty()) {
+        data.m_path = convertedPath;
+      }
+    }
+  } else if (conversionOption == 2) {
+    // Convert NAA Unpainted raster to TLV
+    double dpi         = 0.0;
+    const int dpiIndex = m_dpiMode->currentIndex();
+
+    if (dpiIndex == 1) {
+      // Use current camera DPI
+      if (const auto camera = TApp::instance()
+                                  ->getCurrentScene()
+                                  ->getScene()
+                                  ->getCurrentCamera()) {
+        dpi = camera->getDpi().x;
+      }
+    } else if (dpiIndex == 2) {
+      // Use custom DPI
+      dpi = m_dpiFld->getValue();
+    }
+
+    IoCmd::convertNAARaster2TLV(
+        resourceData,
+        false,  // not generating paints, only inks
+        dpi,
+        m_paletteCheckBox->isChecked()  // append default palette
+    );
+  }
+
+  // Update fields with potentially converted paths
+  int index = 0;
+  for (auto it = m_fields.begin(); it != m_fields.end(); ++it, ++index) {
+    if (index < static_cast<int>(resourceData.size())) {
+      it.value()->setPath(resourceData[index].m_path.getQString());
+    }
   }
 }

@@ -636,7 +636,7 @@ ParamField::ParamField(QWidget *parent, QString paramName, const TParamP &param,
     , m_description(QString::fromStdString(param->getDescription())) {
   QString str;
   m_layout = new QHBoxLayout(this);
-  m_layout->setMargin(0);
+  m_layout->setContentsMargins(0, 0, 0, 0);
   m_layout->setSpacing(5);
 }
 
@@ -1130,7 +1130,7 @@ RgbLinkButtons::RgbLinkButtons(QString str1, QString str2, QWidget *parent,
   swapButton->setFixedHeight(21);
 
   QHBoxLayout *lay = new QHBoxLayout();
-  lay->setMargin(0);
+  lay->setContentsMargins(0, 0, 0, 0);
   lay->setSpacing(5);
   {
     lay->addWidget(copyButton, 0);

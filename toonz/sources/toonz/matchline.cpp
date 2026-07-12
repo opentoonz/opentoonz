@@ -396,11 +396,11 @@ MatchlinesDialog::MatchlinesDialog()
 
   //----layout
 
-  m_topLayout->setMargin(5);
+  m_topLayout->setContentsMargins(5, 5, 5, 5);
   m_topLayout->setSpacing(5);
   {
     QGridLayout *inkUsageLay = new QGridLayout();
-    inkUsageLay->setMargin(5);
+    inkUsageLay->setContentsMargins(5, 5, 5, 5);
     inkUsageLay->setSpacing(5);
     {
       inkUsageLay->addWidget(m_button1, 0, 0, 1, 2);
@@ -414,11 +414,11 @@ MatchlinesDialog::MatchlinesDialog()
     m_topLayout->addWidget(inkUsageGroupBox);
 
     QVBoxLayout *lineOrderLay = new QVBoxLayout();
-    lineOrderLay->setMargin(5);
+    lineOrderLay->setContentsMargins(5, 5, 5, 5);
     lineOrderLay->setSpacing(5);
     {
       QGridLayout *buttonsLay = new QGridLayout();
-      buttonsLay->setMargin(0);
+      buttonsLay->setContentsMargins(0, 0, 0, 0);
       buttonsLay->setSpacing(5);
       {
         buttonsLay->addWidget(new QLabel(tr("L-Up R-Down"), this), 0, 1);
@@ -441,7 +441,7 @@ MatchlinesDialog::MatchlinesDialog()
       lineOrderLay->addLayout(buttonsLay, 1);
 
       QHBoxLayout *inkPrevalenceLay = new QHBoxLayout();
-      inkPrevalenceLay->setMargin(0);
+      inkPrevalenceLay->setContentsMargins(0, 0, 0, 0);
       inkPrevalenceLay->setSpacing(5);
       {
         inkPrevalenceLay->addWidget(new QLabel(tr("Line Prevalence"), this), 0);
@@ -455,7 +455,7 @@ MatchlinesDialog::MatchlinesDialog()
     m_topLayout->addStretch();
   }
 
-  m_buttonLayout->setMargin(0);
+  m_buttonLayout->setContentsMargins(0, 0, 0, 0);
   m_buttonLayout->setSpacing(10);
   {
     m_buttonLayout->addWidget(okBtn);
@@ -992,11 +992,11 @@ DeleteInkDialog::DeleteInkDialog(const QString &str, int inkIndex)
   okBtn->setDefault(true);
 
   //--- layout
-  m_topLayout->setMargin(5);
+  m_topLayout->setContentsMargins(5, 5, 5, 5);
   m_topLayout->setSpacing(10);
   {
     QGridLayout *upperLay = new QGridLayout();
-    upperLay->setMargin(0);
+    upperLay->setContentsMargins(0, 0, 0, 0);
     upperLay->setSpacing(5);
     {
       upperLay->addWidget(new QLabel(tr("Style Index:"), this), 0, 0,
@@ -1010,7 +1010,7 @@ DeleteInkDialog::DeleteInkDialog(const QString &str, int inkIndex)
     m_topLayout->addLayout(upperLay);
   }
 
-  m_buttonLayout->setMargin(0);
+  m_buttonLayout->setContentsMargins(0, 0, 0, 0);
   m_buttonLayout->setSpacing(10);
   {
     m_buttonLayout->addWidget(okBtn);

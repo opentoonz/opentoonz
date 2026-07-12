@@ -367,7 +367,8 @@ TRasterP putSingleInkInRasterGR8(TRasterCM32P &rasIn, int inkId) {
     if (rasOut) pixOut = rasOut->pixels(y);
 
     while (pixIn < endPix) {
-      if (pixIn->getInk() == inkId) {
+      if (pixIn->getTone() != TPixelCM32::getMaxTone() &&
+          pixIn->getInk() == inkId) {
         assert(TPixelCM32::getMaxTone() == 0xff);
         if (!rasOut) {
           rasOut = TRasterGR8P(rasIn->getLx(), rasIn->getLy());
@@ -399,7 +400,8 @@ TRasterP putSingleInkInRasterRGBM(TRasterCM32P &rasIn, int inkId) {
     if (rasOut) pixOut = rasOut->pixels(y);
 
     while (pixIn < endPix) {
-      if (pixIn->getInk() == inkId) {
+      if (pixIn->getTone() != TPixelCM32::getMaxTone() &&
+          pixIn->getInk() == inkId) {
         assert(TPixelCM32::getMaxTone() == 0xff);
         if (!rasOut) {
           rasOut = TRaster32P(rasIn->getLx(), rasIn->getLy());

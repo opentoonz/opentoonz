@@ -571,7 +571,7 @@ TImage *TTool::touchImage() {
   // autoCreate is enabled: we must create a new level
   
   // select one from supported level types
-  // default level type is preffered
+  // default level type is preferred
   int levelType = pref->getDefLevelType();
   int toolLevelType = UNKNOWN_XSHLEVEL;
   bool found = false;

@@ -778,7 +778,7 @@ bool JunctionArea::calculateReconstruction() {
 
 // EXPLANATION: We have to insure that connecting entering sequences to the
 // new junction point happens *smoothly*. In order to do this, wh withdraw
-// entering sequences along the enterin road, until the angle given by the
+// entering sequences along the entering road, until the angle given by the
 // connecting line and the entering direction is small.
 // However, sequence pull back can be done only under some constraints:
 //  * we have to remain inside a road axis

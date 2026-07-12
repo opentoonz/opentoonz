@@ -31,7 +31,7 @@ AddFilmstripFramesPopup::AddFilmstripFramesPopup()
   m_cancelBtn = new QPushButton(tr("Cancel"), this);
 
   QGridLayout *upperLay = new QGridLayout();
-  upperLay->setMargin(0);
+  upperLay->setContentsMargins(0, 0, 0, 0);
   upperLay->setSpacing(5);
   {
     upperLay->addWidget(new QLabel(tr("From Frame:"), this), 0, 0,
@@ -50,7 +50,7 @@ AddFilmstripFramesPopup::AddFilmstripFramesPopup()
   upperLay->setColumnStretch(1, 1);
   m_topLayout->addLayout(upperLay, 1);
 
-  m_buttonLayout->setMargin(0);
+  m_buttonLayout->setContentsMargins(0, 0, 0, 0);
   m_buttonLayout->setSpacing(10);
   {
     m_buttonLayout->addWidget(m_okBtn);

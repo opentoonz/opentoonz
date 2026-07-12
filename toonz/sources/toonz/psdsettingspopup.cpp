@@ -185,7 +185,7 @@ PsdSettingsPopup::PsdSettingsPopup()
 
   QGridLayout *gridMode = new QGridLayout();
   gridMode->setColumnMinimumWidth(0, 65);
-  gridMode->setMargin(0);
+  gridMode->setContentsMargins(0, 0, 0, 0);
   gridMode->addWidget(modeLbl, 0, 0, Qt::AlignRight);
   gridMode->addWidget(m_loadMode, 0, 1, Qt::AlignLeft);
   gridMode->addWidget(m_modeDescription, 1, 1, Qt::AlignLeft);

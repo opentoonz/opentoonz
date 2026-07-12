@@ -163,57 +163,57 @@ void XsheetViewer::getButton(const int &btype, QColor &bgColor,
   switch (btype) {
   case PREVIEW_ON_XSHBUTTON:
     bgColor   = (isTimeline) ? getTimelinePreviewButtonBgOnColor()
-                             : getXsheetPreviewButtonBgOnColor();
+                               : getXsheetPreviewButtonBgOnColor();
     svgIconPath = (isTimeline) ? getTimelinePreviewButtonOnImage()
-                             : getXsheetPreviewButtonOnImage();
+                               : getXsheetPreviewButtonOnImage();
     break;
   case PREVIEW_OFF_XSHBUTTON:
     bgColor   = (isTimeline) ? getTimelinePreviewButtonBgOffColor()
-                             : getXsheetPreviewButtonBgOffColor();
+                               : getXsheetPreviewButtonBgOffColor();
     svgIconPath = (isTimeline) ? getTimelinePreviewButtonOffImage()
-                             : getXsheetPreviewButtonOffImage();
+                               : getXsheetPreviewButtonOffImage();
     break;
   case CAMSTAND_ON_XSHBUTTON:
     bgColor   = (isTimeline) ? getTimelineCamstandButtonBgOnColor()
-                             : getXsheetCamstandButtonBgOnColor();
+                               : getXsheetCamstandButtonBgOnColor();
     svgIconPath = (isTimeline) ? getTimelineCamstandButtonOnImage()
-                             : getXsheetCamstandButtonOnImage();
+                               : getXsheetCamstandButtonOnImage();
     break;
   case CAMSTAND_TRANSP_XSHBUTTON:
     bgColor   = (isTimeline) ? getTimelineCamstandButtonBgOnColor()
-                             : getXsheetCamstandButtonBgOnColor();
+                               : getXsheetCamstandButtonBgOnColor();
     svgIconPath = (isTimeline) ? getTimelineCamstandButtonTranspImage()
-                             : getXsheetCamstandButtonTranspImage();
+                               : getXsheetCamstandButtonTranspImage();
     break;
   case CAMSTAND_OFF_XSHBUTTON:
     bgColor   = (isTimeline) ? getTimelineCamstandButtonBgOffColor()
-                             : getXsheetCamstandButtonBgOffColor();
+                               : getXsheetCamstandButtonBgOffColor();
     svgIconPath = (isTimeline) ? getTimelineCamstandButtonOffImage()
-                             : getXsheetCamstandButtonOffImage();
+                               : getXsheetCamstandButtonOffImage();
     break;
   case LOCK_ON_XSHBUTTON:
     bgColor   = (isTimeline) ? getTimelineLockButtonBgOnColor()
-                             : getXsheetLockButtonBgOnColor();
+                               : getXsheetLockButtonBgOnColor();
     svgIconPath = (isTimeline) ? getTimelineLockButtonOnImage()
-                             : getXsheetLockButtonOnImage();
+                               : getXsheetLockButtonOnImage();
     break;
   case LOCK_OFF_XSHBUTTON:
     bgColor   = (isTimeline) ? getTimelineLockButtonBgOffColor()
-                             : getXsheetLockButtonBgOffColor();
+                               : getXsheetLockButtonBgOffColor();
     svgIconPath = (isTimeline) ? getTimelineLockButtonOffImage()
-                             : getXsheetLockButtonOffImage();
+                               : getXsheetLockButtonOffImage();
     break;
   case CONFIG_XSHBUTTON:
     bgColor   = (isTimeline) ? getTimelineConfigButtonBgColor()
-                             : getXsheetConfigButtonBgColor();
+                               : getXsheetConfigButtonBgColor();
     svgIconPath = (isTimeline) ? getTimelineConfigButtonImage()
-                             : getXsheetConfigButtonImage();
+                               : getXsheetConfigButtonImage();
     break;
   case UNIFIED_TRANSP_XSHBUTTON:
     bgColor   = (isTimeline) ? getTimelinePreviewButtonBgOnColor()
-                             : getXsheetPreviewButtonBgOnColor();
+                               : getXsheetPreviewButtonBgOnColor();
     svgIconPath = (isTimeline) ? getTimelineUnifiedButtonTranspImage()
-                             : getXsheetUnifiedButtonTranspImage();
+                               : getXsheetUnifiedButtonTranspImage();
     break;
   default:
     bgColor = grey210;
@@ -415,7 +415,7 @@ void XsheetViewer::positionSections() {
 
   if (Preferences::instance()->isShowXSheetToolbarEnabled()) {
     m_toolbar->showToolbar(true);
-    int w = visibleRegion().boundingRect().width();
+    int w = geometry().width();
     m_toolbarScrollArea->setGeometry(0, 0, w, XsheetGUI::TOOLBAR_HEIGHT);
     m_toolbar->setFixedWidth(w);
     if (o->isVerticalTimeline()) {
@@ -434,7 +434,7 @@ void XsheetViewer::positionSections() {
 
   if (Preferences::instance()->isShowXsheetBreadcrumbsEnabled()) {
     m_breadcrumbArea->showBreadcrumbs(true);
-    int w = visibleRegion().boundingRect().width();
+    int w = geometry().width();
     if (o->isVerticalTimeline())
       m_breadcrumbScrollArea->setGeometry(0, headerFrame.from(), w,
                                           XsheetGUI::BREADCRUMB_HEIGHT);
@@ -1398,14 +1398,15 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event) {
       }
       break;
     default:
-      if ((key >= Qt::Key_1 && key <= Qt::Key_9)) {
-        int number = key - Qt::Key_1 + 1;
+      if (Preferences::instance()->isInputCellsUsingNumpad() &&
+          key >= Qt::Key_0 && key <= Qt::Key_9) {
+        int number = key - Qt::Key_0;
         m_cellArea->onNumberPressed(number);
       }
       break;
     }
-      break;
-    }
+    break;
+  }
   }
 }
 
@@ -1781,7 +1782,7 @@ void XsheetViewer::changeWindowTitle() {
   TApp *app         = TApp::instance();
   ToonzScene *scene = app->getCurrentScene()->getScene();
   if (!scene || !app->getCurrentFrame()->isEditingScene()) return;
-  auto project = scene->getProject();
+  auto project      = scene->getProject();
   QString sceneName = QString::fromStdWString(scene->getSceneName());
   if (sceneName.isEmpty()) sceneName = tr("Untitled");
   if (app->getCurrentScene()->getDirtyFlag()) sceneName += QString("*");

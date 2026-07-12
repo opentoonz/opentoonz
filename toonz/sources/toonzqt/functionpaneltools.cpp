@@ -637,7 +637,7 @@ void StretchPointDragTool::drag(QMouseEvent *e) {
       }
 
       // evaluate errors with two candidate - insert key at round down or round
-      // up postions. inserting the key may push out the existing key.
+      // up positions. inserting the key may push out the existing key.
       int f1 = (int)std::floor(stretchedKeyPlacement.value(info.kIndex));
       int f2 = f1 + 1;
       {

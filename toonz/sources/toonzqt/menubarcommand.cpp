@@ -418,10 +418,6 @@ void CommandManager::enlargeIcon(CommandId id, const QSize dstSize) {
 
 // In menubarcommand.cpp
 void CommandManager::loadShortcuts() {
-  // Define reserved navigation shortcuts
-  const std::vector<std::string> reservedKeys = {"Space", "Shift+Space",
-                                                 "Ctrl+Space"};
-
   // Load shortcuts file
   TFilePath fp = ToonzFolder::getMyModuleDir() + TFilePath("shortcuts.ini");
 
@@ -443,25 +439,7 @@ void CommandManager::loadShortcuts() {
     std::string id   = ids.at(i).toStdString();
     QString shortcut = settings.value(ids.at(i), "").toString();
 
-    // Check if this is a reserved navigation shortcut
-    bool isReserved = false;
-    for (const std::string &reserved : reservedKeys) {
-      if (shortcut.toStdString() == reserved) {
-        isReserved = true;
-        break;
-      }
-    }
-
     QAction *action = getAction(&id[0], false);
-
-    if (isReserved) {
-      // Remove reserved shortcuts
-      settings.remove(ids.at(i));
-      if (action) {
-        action->setShortcut(QKeySequence());
-      }
-      continue;
-    }
 
     // Process non-reserved shortcuts
     if (action) {

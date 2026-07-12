@@ -49,21 +49,22 @@
 #include <QScrollBar>
 #include <QMouseEvent>
 #include <QDesktopServices>
+#include <QRegularExpression>  // Added for QRegularExpression
 
 using namespace DVGui;
 
 namespace {
 
-// the first value in the preset list
+// The first value in the preset list
 const QString custom = QObject::tr("<custom>");
 
 void removeAll(QLayout *layout) {
   QLayoutItem *child;
   while (layout->count() != 0) {
     child = layout->takeAt(0);
-    if (child->layout() != 0) {
+    if (child->layout() != nullptr) {
       removeAll(child->layout());
-    } else if (child->widget() != 0) {
+    } else if (child->widget() != nullptr) {
       delete child->widget();
     }
 
@@ -143,10 +144,11 @@ StartupPopup::StartupPopup()
 
   m_existingList = new StartupScenesList(this, QSize(96, 54));
 
-  // Exclude all character which cannot fit in a filepath (Win).
+  // Exclude all characters which cannot fit in a filepath (Windows).
   // Dots are also prohibited since they are internally managed by Toonz.
-  QRegExp rx("[^\\\\/:?*.\"<>|]+");
-  m_nameFld->setValidator(new QRegExpValidator(rx, this));
+  // Migration to QRegularExpression
+  QRegularExpression rx("[^\\\\/:?*.\"<>|]+");
+  m_nameFld->setValidator(new QRegularExpressionValidator(rx, this));
 
   m_widthFld->setMeasure("camera.lx");
   m_heightFld->setMeasure("camera.ly");
@@ -183,7 +185,7 @@ StartupPopup::StartupPopup()
   m_buttonFrame->setFixedHeight(34);
 
   //--- layout
-  m_topLayout->setMargin(0);
+  m_topLayout->setContentsMargins(0, 0, 0, 0);
   m_topLayout->setSpacing(0);
   {
     QGridLayout *guiLay      = new QGridLayout();
@@ -191,7 +193,7 @@ StartupPopup::StartupPopup()
     QGridLayout *newSceneLay = new QGridLayout();
     QWidget *newSceneWidget  = new QWidget();
     m_recentSceneLay         = new QVBoxLayout();
-    guiLay->setMargin(10);
+    guiLay->setContentsMargins(10, 10, 10, 10);
     guiLay->setVerticalSpacing(10);
     guiLay->setHorizontalSpacing(10);
 
@@ -199,7 +201,7 @@ StartupPopup::StartupPopup()
 
     //--- Project
     projectLay->setSpacing(8);
-    projectLay->setMargin(8);
+    projectLay->setContentsMargins(8, 8, 8, 8);
     {
       projectLay->addWidget(m_projectsCB, 0, 0, 1, 3);
       projectLay->addWidget(newProjectButton, 1, 0);
@@ -213,7 +215,7 @@ StartupPopup::StartupPopup()
     m_scenesTab->addTab(m_existingList, tr("Open Existing Scene"));
 
     //--- New scene
-    newSceneLay->setMargin(8);
+    newSceneLay->setContentsMargins(8, 8, 8, 8);
     newSceneLay->setVerticalSpacing(8);
     newSceneLay->setHorizontalSpacing(8);
     {
@@ -230,7 +232,7 @@ StartupPopup::StartupPopup()
                              Qt::AlignRight | Qt::AlignVCenter);
       QHBoxLayout *resListLay = new QHBoxLayout();
       resListLay->setSpacing(3);
-      resListLay->setMargin(1);
+      resListLay->setContentsMargins(1, 1, 1, 1);
       {
         resListLay->addWidget(m_presetCombo, 1);
         resListLay->addWidget(m_addPresetBtn, 0);
@@ -267,7 +269,7 @@ StartupPopup::StartupPopup()
     guiLay->addWidget(m_scenesTab, 2, 0, 4, 1, Qt::AlignTop);
 
     //--- Recent scenes
-    m_recentSceneLay->setMargin(5);
+    m_recentSceneLay->setContentsMargins(5, 5, 5, 5);
     m_recentSceneLay->setSpacing(2);
     {
       // Recent Scene List
@@ -279,7 +281,7 @@ StartupPopup::StartupPopup()
     m_topLayout->addLayout(guiLay, 0);
   }
 
-  m_buttonLayout->setMargin(0);
+  m_buttonLayout->setContentsMargins(0, 0, 0, 0);
   m_buttonLayout->setSpacing(10);
   {
     m_buttonLayout->addWidget(m_showAtStartCB, Qt::AlignLeft);
@@ -295,51 +297,54 @@ StartupPopup::StartupPopup()
   TSceneHandle *sceneHandle = app->getCurrentScene();
 
   //---- signal-slot connections
-  bool ret = true;
-  ret      = ret && connect(sceneHandle, SIGNAL(sceneChanged()), this,
-                            SLOT(onSceneChanged()));
-  ret      = ret && connect(sceneHandle, SIGNAL(sceneSwitched()), this,
-                            SLOT(onSceneChanged()));
-  ret      = ret && connect(newProjectButton, SIGNAL(clicked()), this,
-                            SLOT(onNewProjectButtonPressed()));
-  ret      = ret && connect(openProjectButton, SIGNAL(clicked()), this,
-                            SLOT(onOpenProjectButtonPressed()));
-  ret      = ret && connect(exploreProjectButton, SIGNAL(clicked()), this,
-                            SLOT(onExploreProjectButtonPressed()));
-  ret      = ret && connect(loadOtherSceneButton, SIGNAL(clicked()), this,
-                            SLOT(onLoadSceneButtonPressed()));
-  ret      = ret && connect(m_projectsCB, SIGNAL(currentIndexChanged(int)),
-                            SLOT(onProjectChanged(int)));
-  ret      = ret &&
-        connect(createButton, SIGNAL(clicked()), this, SLOT(onCreateButton()));
-  ret = ret && connect(m_showAtStartCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onShowAtStartChanged(int)));
-  ret = ret && connect(m_widthFld, SIGNAL(valueChanged()), this,
-                       SLOT(updateResolution()));
-  ret = ret && connect(m_heightFld, SIGNAL(valueChanged()), this,
-                       SLOT(updateResolution()));
-  ret = ret &&
-        connect(m_resXFld, SIGNAL(valueChanged()), this, SLOT(updateSize()));
-  ret = ret &&
-        connect(m_resYFld, SIGNAL(valueChanged()), this, SLOT(updateSize()));
-  ret = ret && connect(m_dpiFld, SIGNAL(editingFinished()), this,
-                       SLOT(onDpiChanged()));
-  ret = ret && connect(m_presetCombo, SIGNAL(activated(const QString &)),
-                       SLOT(onPresetSelected(const QString &)));
-  ret = ret && connect(m_addPresetBtn, SIGNAL(clicked()), SLOT(addPreset()));
-  ret = ret && connect(m_unitsCB, SIGNAL(currentIndexChanged(int)),
-                       SLOT(onCameraUnitChanged(int)));
-  ret = ret &&
-        connect(m_removePresetBtn, SIGNAL(clicked()), SLOT(removePreset()));
-  ret = ret && connect(m_nameFld, SIGNAL(returnPressedNow()), createButton,
-                       SLOT(animateClick()));
-  ret = ret && connect(m_autoSaveOnCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onAutoSaveOnChanged(int)));
-  ret = ret && connect(m_autoSaveTimeFld, SIGNAL(editingFinished()), this,
-                       SLOT(onAutoSaveTimeChanged()));
-  ret = ret && connect(m_existingList, SIGNAL(itemClicked(int)), this,
-                       SLOT(onExistingSceneClicked(int)));
-  assert(ret);
+  // Using modern Qt connection syntax
+  connect(sceneHandle, &TSceneHandle::sceneChanged, this,
+          &StartupPopup::onSceneChanged);
+  connect(sceneHandle, &TSceneHandle::sceneSwitched, this,
+          &StartupPopup::onSceneChanged);
+  connect(newProjectButton, &QPushButton::clicked, this,
+          &StartupPopup::onNewProjectButtonPressed);
+  connect(openProjectButton, &QPushButton::clicked, this,
+          &StartupPopup::onOpenProjectButtonPressed);
+  connect(exploreProjectButton, &QPushButton::clicked, this,
+          &StartupPopup::onExploreProjectButtonPressed);
+  connect(loadOtherSceneButton, &QPushButton::clicked, this,
+          &StartupPopup::onLoadSceneButtonPressed);
+  connect(m_projectsCB, QOverload<int>::of(&QComboBox::currentIndexChanged),
+          this, &StartupPopup::onProjectChanged);
+  connect(createButton, &QPushButton::clicked, this,
+          &StartupPopup::onCreateButton);
+  connect(m_showAtStartCB, &QCheckBox::stateChanged, this,
+          &StartupPopup::onShowAtStartChanged);
+  connect(m_widthFld, &MeasuredDoubleLineEdit::valueChanged, this,
+          &StartupPopup::updateResolution);
+  connect(m_heightFld, &MeasuredDoubleLineEdit::valueChanged, this,
+          &StartupPopup::updateResolution);
+  connect(m_resXFld, &DoubleLineEdit::valueChanged, this,
+          &StartupPopup::updateSize);
+  connect(m_resYFld, &DoubleLineEdit::valueChanged, this,
+          &StartupPopup::updateSize);
+  connect(m_dpiFld, &DoubleLineEdit::editingFinished, this,
+          &StartupPopup::onDpiChanged);
+  connect(m_presetCombo, QOverload<int>::of(&QComboBox::activated), this,
+          [this](int index) {
+            if (index < 0) return;
+            onPresetSelected(m_presetCombo->itemText(index));
+          });
+  connect(m_addPresetBtn, &QPushButton::clicked, this,
+          &StartupPopup::addPreset);
+  connect(m_unitsCB, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+          &StartupPopup::onCameraUnitChanged);
+  connect(m_removePresetBtn, &QPushButton::clicked, this,
+          &StartupPopup::removePreset);
+  connect(m_nameFld, &LineEdit::returnPressedNow, this,
+          [createButton]() { createButton->animateClick(); });
+  connect(m_autoSaveOnCB, &QCheckBox::stateChanged, this,
+          &StartupPopup::onAutoSaveOnChanged);
+  connect(m_autoSaveTimeFld, &IntLineEdit::editingFinished, this,
+          &StartupPopup::onAutoSaveTimeChanged);
+  connect(m_existingList, &StartupScenesList::itemClicked, this,
+          &StartupPopup::onExistingSceneClicked);
 }
 
 //-----------------------------------------------------------------------------
@@ -411,17 +416,18 @@ void StartupPopup::showEvent(QShowEvent *) {
   m_autoSaveOnCB->setChecked(Preferences::instance()->isAutosaveEnabled());
   m_autoSaveTimeFld->setEnabled(m_autoSaveOnCB->isChecked());
   m_autoSaveTimeFld->setValue(Preferences::instance()->getAutosavePeriod());
-  // update recent scenes
-  // clear items if they exist first
+  // Update recent scenes
+  // Clear items if they exist first
   refreshRecentScenes();
   refreshExistingScenes();
-  // center window
-  QScreen *screen = QGuiApplication::screenAt(TApp::instance()->getMainWindow()->pos());
+  // Center window
+  QScreen *screen =
+      QGuiApplication::screenAt(TApp::instance()->getMainWindow()->pos());
   if (!screen) {
     screen = QGuiApplication::primaryScreen();
   }
-  QPoint activeMonitorCenter = screen->availableGeometry().center();
-  QPoint thisPopupCenter = this->rect().center();
+  QPoint activeMonitorCenter     = screen->availableGeometry().center();
+  QPoint thisPopupCenter         = this->rect().center();
   QPoint centeredOnActiveMonitor = activeMonitorCenter - thisPopupCenter;
   this->move(centeredOnActiveMonitor);
 }
@@ -442,9 +448,9 @@ void StartupPopup::refreshRecentScenes() {
   } else {
     int i = 0;
     for (QString name : m_sceneNames) {
-      if (i > 9) break;  // box can hold 10 scenes
+      if (i > 9) break;  // Box can hold 10 scenes
       QString fileName =
-          name.remove(0, name.indexOf(" ") + 1);  // remove "#. " prefix
+          name.remove(0, name.indexOf(" ") + 1);  // Remove "#. " prefix
       QString projectName = RecentFiles::instance()->getFileProject(fileName);
       QString justName = QString::fromStdString(TFilePath(fileName).getName()) +
                          (projectName != "-" ? " [" + projectName + "]" : "");
@@ -454,13 +460,11 @@ void StartupPopup::refreshRecentScenes() {
       i++;
     }
   }
-  bool ret = true;
   for (int i = 0;
        i < m_recentNamesLabels.count() && i < RECENT_SCENES_MAX_COUNT; i++) {
-    ret = ret && connect(m_recentNamesLabels[i], SIGNAL(wasClicked(int)), this,
-                         SLOT(onRecentSceneClicked(int)));
+    connect(m_recentNamesLabels[i], &StartupLabel::wasClicked, this,
+            &StartupPopup::onRecentSceneClicked);
   }
-  assert(ret);
   m_recentSceneLay->addStretch(1);
 }
 
@@ -566,9 +570,8 @@ void StartupPopup::onCreateButton() {
         "\nDo you want to overwrite it?");
     int ret = DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"), 0);
     if (ret == 0 || ret == 2) {
-      // no (or closed message box window)
+      // No (or closed message box window)
       return;
-      ;
     }
   }
   CommandManager::instance()->execute(MI_NewScene);
@@ -587,9 +590,9 @@ void StartupPopup::onCreateButton() {
       size);
   TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera()->setRes(
       res);
-  // save the scene right away
+  // Save the scene right away
   IoCmd::saveScene();
-  // this makes sure the scene viewers update to the right fps
+  // This makes sure the scene viewers update to the right fps
   TApp::instance()->getCurrentScene()->notifySceneSwitched();
   TApp::instance()->getCurrentScene()->notifyNameSceneChange();
 
@@ -787,7 +790,7 @@ void StartupPopup::removePreset() {
   int index = m_presetCombo->currentIndex();
   if (index <= 0) return;
 
-  // confirmation dialog
+  // Confirmation dialog
   int ret = DVGui::MsgBox(QObject::tr("Deleting \"%1\".\nAre you sure?")
                               .arg(m_presetCombo->currentText()),
                           QObject::tr("Delete"), QObject::tr("Cancel"));
@@ -818,7 +821,7 @@ void StartupPopup::onPresetSelected(const QString &str) {
     // m_widthFld->setValue(m_heightFld->getValue() * ar);
     // m_dpiFld->setValue(m_xRes / m_widthFld->getValue());
 
-    // here is the system that preserves dpi
+    // Here is the system that preserves dpi
     m_widthFld->setValue((double)xres / (double)m_dpi);
     m_heightFld->setValue((double)yres / (double)m_dpi);
     if (Preferences::instance()->getPixelsOnly()) {
@@ -845,12 +848,13 @@ bool StartupPopup::parsePresetString(const QString &str, QString &name,
                                      QString &yoffset, double &ar,
                                      bool forCleanup) {
   /*
-  parsing preset string with QString::split().
+  Parsing preset string with QString::split().
   !NOTE! fx/fy (camera size in inch) and xoffset/yoffset (camera offset used in
   cleanup camera) are optional,
   in order to keep compatibility with default (Harlequin's) reslist.txt
   */
 
+  // Migration to Qt::SkipEmptyParts (no change needed for Qt 5.15)
   QStringList tokens = str.split(",", Qt::SkipEmptyParts);
 
   if (!(tokens.count() == 3 ||
@@ -982,7 +986,7 @@ void StartupPopup::onExploreProjectButtonPressed() {
 //-----------------------------------------------------------------------------
 
 void StartupPopup::onSceneChanged() {
-  // close the box if a recent scene has been selected
+  // Close the box if a recent scene has been selected
   if (!TApp::instance()->getCurrentScene()->getScene()->isUntitled()) {
     hide();
   } else {
@@ -1021,7 +1025,7 @@ void StartupPopup::onRecentSceneClicked(int index) {
     RecentFiles::instance()->refreshRecentFilesMenu(RecentFiles::Scene);
     for (int i = 0;
          i < m_recentNamesLabels.count() && i < RECENT_SCENES_MAX_COUNT; i++) {
-      disconnect(m_recentNamesLabels[i]);
+      disconnect(m_recentNamesLabels[i], nullptr, nullptr, nullptr);
     }
     QString msg = QObject::tr("The selected scene could not be found.");
     DVGui::warning(msg);
@@ -1061,12 +1065,8 @@ void StartupPopup::onRecentSceneClicked(int index) {
 void StartupPopup::onCameraUnitChanged(int index) {
   Preferences *pref = Preferences::instance();
   QStringList type;
-  // preference value should not be translated
-  type << "pixel"
-       << "cm"
-       << "mm"
-       << "inch"
-       << "field";
+  // Preference value should not be translated
+  type << "pixel" << "cm" << "mm" << "inch" << "field";
 
   double width  = m_widthFld->getValue();
   double height = m_heightFld->getValue();
@@ -1194,9 +1194,9 @@ StartupScenesList::StartupScenesList(QWidget *parent, const QSize &iconSize)
   horizontalScrollBar()->setCursor(Qt::ArrowCursor);
   verticalScrollBar()->setCursor(Qt::ArrowCursor);
 
-  bool ret = connect(this, SIGNAL(itemClicked(QListWidgetItem *)), this,
-                     SLOT(onItemClicked(QListWidgetItem *)));
-  assert(ret);
+  // Modern Qt connection
+  connect(this, &QListWidget::itemClicked, this,
+          &StartupScenesList::onItemClicked);
 
   clear();
 }
@@ -1210,14 +1210,14 @@ QPixmap StartupScenesList::createScenePreview(const QString &name,
     QPixmap scenePreview(iconPath.getQString());
     if (!scenePreview.isNull()) {
       QPixmap pixmap(m_iconSize);
-      pixmap.fill(Qt::transparent);
+      pixmap.fill(Qt::white);
       QPainter painter(&pixmap);
       QPixmap scaledPixmap =
           scenePreview.scaled(m_iconSize, Qt::AspectRatioMode::KeepAspectRatio);
       painter.drawPixmap((m_iconSize.width() - scaledPixmap.width()) / 2,
                          (m_iconSize.height() - scaledPixmap.height()) / 2,
                          scaledPixmap);
-      QPen pen(Qt::black);
+      QPen pen(palette().text().color());
       pen.setStyle(Qt::DotLine);
       painter.setPen(pen);
       painter.drawRect((m_iconSize.width() - scaledPixmap.width()) / 2,

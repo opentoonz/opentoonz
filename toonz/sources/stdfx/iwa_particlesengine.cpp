@@ -1,3 +1,5 @@
+
+
 //------------------------------------------------------------------
 // Iwa_Particles_Engine for Marnie
 // based on Particles_Engine by Digital Video
@@ -39,7 +41,6 @@ void printTime(TStopWatch &sw, std::string name) {
   TSystem::outputDebug(ss.str());
 }
 };  // namespace
-//----
 
 /*-----------------------------------------------------------------*/
 
@@ -107,16 +108,16 @@ void Iwa_Particles_Engine::fill_value_struct(struct particles_values &myvalues,
   myvalues.animation_val      = m_parent->animation_val->getValue();
   myvalues.step_val           = m_parent->step_val->getValue();
 
-  myvalues.gencol_val         = m_parent->gencol_val->getValue(frame);
+  const TSpectrum &gencol     = m_parent->gencol_val->getValue(frame);
   myvalues.gencol_ctrl_val    = m_parent->gencol_ctrl_val->getValue();
   myvalues.gencol_spread_val  = m_parent->gencol_spread_val->getValue(frame);
   myvalues.genfadecol_val     = m_parent->genfadecol_val->getValue(frame);
-  myvalues.fincol_val         = m_parent->fincol_val->getValue(frame);
+  const TSpectrum &fincol     = m_parent->fincol_val->getValue(frame);
   myvalues.fincol_ctrl_val    = m_parent->fincol_ctrl_val->getValue();
   myvalues.fincol_spread_val  = m_parent->fincol_spread_val->getValue(frame);
   myvalues.finrangecol_val    = m_parent->finrangecol_val->getValue(frame);
   myvalues.finfadecol_val     = m_parent->finfadecol_val->getValue(frame);
-  myvalues.foutcol_val        = m_parent->foutcol_val->getValue(frame);
+  const TSpectrum &foutcol    = m_parent->foutcol_val->getValue(frame);
   myvalues.foutcol_ctrl_val   = m_parent->foutcol_ctrl_val->getValue();
   myvalues.foutcol_spread_val = m_parent->foutcol_spread_val->getValue(frame);
   myvalues.foutrangecol_val   = m_parent->foutrangecol_val->getValue(frame);
@@ -125,30 +126,31 @@ void Iwa_Particles_Engine::fill_value_struct(struct particles_values &myvalues,
   myvalues.source_gradation_val = m_parent->source_gradation_val->getValue();
   myvalues.pick_color_for_every_frame_val =
       m_parent->pick_color_for_every_frame_val->getValue();
-  /*- 計算モード （背景＋粒子／粒子／背景／照明された粒子） -*/
+  /*- Rendering mode (background+particles/particles/background/illuminated
+   * particles) -*/
   myvalues.iw_rendermode_val = m_parent->iw_rendermode_val->getValue();
-  /*- 粒子に貼られる絵の素材 -*/
+  /*- Image material to be applied to particles -*/
   myvalues.base_ctrl_val = m_parent->base_ctrl_val->getValue();
-  /*- カールノイズ的な動きを与える -*/
+  /*- Add curl noise-like movement -*/
   myvalues.curl_val        = m_parent->curl_val->getValue(frame);
   myvalues.curl_ctrl_1_val = m_parent->curl_ctrl_1_val->getValue();
   myvalues.curl_ctrl_2_val = m_parent->curl_ctrl_2_val->getValue();
-  /*- 粒子敷き詰め。粒子を正三角形で敷き詰めたときの、
-          正三角形の一辺の長さをインチで指定する -*/
+  /*- Particle tiling. When particles are arranged in equilateral triangles,
+          specify the side length of the equilateral triangle in inches -*/
   myvalues.iw_triangleSize = m_parent->iw_triangleSize->getValue(frame);
-  /*- ひらひら回転 -*/
+  /*- Fluttering rotation -*/
   myvalues.flap_ctrl_val = m_parent->flap_ctrl_val->getValue();
   myvalues.iw_flap_velocity_val =
       m_parent->iw_flap_velocity_val->getValue(frame);
   myvalues.iw_flap_dir_sensitivity_val =
       m_parent->iw_flap_dir_sensitivity_val->getValue(frame);
-  /*- ひらひら粒子に照明を当てる normalize_values()内で Degree → Radian 化する
-   * -*/
+  /*- Illuminate fluttering particles. Convert Degree to Radian inside
+   * normalize_values() -*/
   myvalues.iw_light_theta_val = m_parent->iw_light_theta_val->getValue(frame);
   myvalues.iw_light_phi_val   = m_parent->iw_light_phi_val->getValue(frame);
-  /*- 読み込みマージン -*/
+  /*- Loading margin -*/
   myvalues.margin_val = m_parent->margin_val->getValue(frame);
-  /*- 重力を徐々に与えるためのフレーム長 -*/
+  /*- Frame length for gradually applying gravity -*/
   myvalues.iw_gravityBufferFrame_val =
       m_parent->iw_gravityBufferFrame_val->getValue();
 }
@@ -190,30 +192,31 @@ bool Iwa_Particles_Engine::port_is_used(int i,
 }
 /*-----------------------------------------------------------------*/
 
-//-------------
-/*-  Startフレームからカレントフレームまで順番に回す関数 生成もここで -*/
+/*- Function to iterate sequentially from Start frame to Current frame.
+ * Generation also happens here -*/
 void Iwa_Particles_Engine::roll_particles(
-    TTile *tile,                      /*-結果を格納するTile-*/
-    std::map<int, TTile *> porttiles, /*-コントロール画像のポート番号／タイル-*/
-    const TRenderSettings &ri, /*-現在のフレームの計算用RenderSettings-*/
-    std::list<Iwa_Particle> &myParticles, /*-パーティクルのリスト-*/
-    struct particles_values &values, /*-現在のフレームでのパラメータ-*/
-    float cx,                        /*- 0 で入ってくる-*/
-    float cy,                        /*- 0 で入ってくる-*/
-    int frame,          /*-現在のフレーム値（forで回す値）-*/
-    int curr_frame,     /*-カレントフレーム-*/
-    int level_n,        /*-テクスチャ素材画像の数-*/
-    bool *random_level, /*-ループの最初にfalseで入ってくる-*/
-    float dpi,          /*- 1 で入ってくる-*/
-    std::vector<int> lastframe, /*-テクスチャ素材のそれぞれのカラム長-*/
+    TTile *tile,                      /*- Tile to store the result -*/
+    std::map<int, TTile *> porttiles, /*- Port number/tile of control images -*/
+    const TRenderSettings
+        &ri, /*- Current frame's calculation RenderSettings -*/
+    std::list<Iwa_Particle> &myParticles, /*- List of particles -*/
+    struct particles_values &values, /*- Parameters for the current frame -*/
+    float cx,                        /*- Comes in as 0 -*/
+    float cy,                        /*- Comes in as 0 -*/
+    int frame, /*- Current frame value (value being iterated in for loop) -*/
+    int curr_frame,     /*- Current frame -*/
+    int level_n,        /*- Number of texture material images -*/
+    bool *random_level, /*- Comes in as false at the beginning of the loop -*/
+    float dpi,          /*- Comes in as 1 -*/
+    std::vector<int> lastframe, /*- Column length of each texture material -*/
     int &totalparticles, QList<ParticleOrigin> &particleOrigins,
-    int genPartNum /*- 実際に生成したい粒子数 -*/
-    ) {
+    int genPartNum /*- Actual number of particles to generate -*/
+) {
   particles_ranges ranges;
   int i;
   float xgravity, ygravity, windx, windy;
 
-  /*- 風の強さ／重力の強さをX,Y成分に分ける -*/
+  /*- Separate wind strength/gravity strength into X,Y components -*/
   windx    = values.windint_val * sin(values.windangle_val);
   windy    = values.windint_val * cos(values.windangle_val);
   xgravity = values.gravity_val * sin(values.g_angle_val);
@@ -226,17 +229,17 @@ void Iwa_Particles_Engine::roll_particles(
 
   std::map<int, TTile *>::iterator it = porttiles.find(values.source_ctrl_val);
 
-  /*- ソース画像にコントロールが付いていた場合 -*/
+  /*- If there's a control attached to the source image -*/
   if (values.source_ctrl_val && (it != porttiles.end()) &&
       it->second->getRaster())
-    /*- 入力画像のアルファ値に比例して発生濃度を変える -*/
+    /*- Vary emission density proportional to alpha value of input image -*/
     fill_single_region(myregions, it->second, values.bright_thres_val,
                        values.source_gradation_val, myHistogram,
                        particleOrigins);
 
-  /*- 粒子が出きったらもう出さない -*/
+  /*- Once particles are exhausted, stop emitting -*/
   int actualBirthParticles = std::min(genPartNum, particleOrigins.size());
-  /*- 出発する粒子のインデックス -*/
+  /*- Index of particles that will depart -*/
   QList<int> leavingPartIndex;
   if (myregions.size() &&
       porttiles.find(values.source_ctrl_val) != porttiles.end()) {
@@ -246,71 +249,73 @@ void Iwa_Particles_Engine::roll_particles(
 
       int potential_sum = 0;
       QList<int> myWeight;
-      /*- 各濃度のポテンシャルの大きさmyWeightと、合計ポテンシャルを計算 -*/
+      /*- Calculate potential magnitude myWeight and total potential for each
+       * intensity -*/
       for (int m = 0; m < 256; m++) {
         int pot = myHistogram[m].size() * m;
         myWeight.append(pot);
         potential_sum += pot;
       }
-      /*- 各濃度について(濃い方から) -*/
+      /*- For each intensity (from darkest to lightest) -*/
       for (int m = 255; m > 0; m--) {
-        /*- 割り当てを計算（切り上げ） -*/
+        /*- Calculate allocation (round up) -*/
         int wariate = tceil((float)(myWeight[m]) * (float)(partLeft) /
                             (float)potential_sum);
-        /*- 実際にこのポテンシャルから出発する粒子数 -*/
+        /*- Actual number of particles departing from this potential -*/
         int leaveNum = std::min(myHistogram.at(m).size(), wariate);
-        /*- 割り当てられた粒子を頭から登録 -*/
+        /*- Register allocated particles from the beginning -*/
         for (int lp = 0; lp < leaveNum; lp++) {
-          /*- Histogramから減らしながら追加 -*/
+          /*- Add while reducing from Histogram -*/
           leavingPartIndex.append(myHistogram[m].takeFirst());
-          /*- 残数を減らす -*/
+          /*- Reduce remaining count -*/
           partLeft--;
           if (partLeft == 0) break;
         }
         if (partLeft == 0) break;
       }
 
-      /*- ひとつも出発出来なければbreak -*/
+      /*- If no particles can depart, break -*/
       if (partLeft == PrePartLeft) break;
     }
-    /*- 実際に飛び出せた粒子数 -*/
+    /*- Actual number of particles that could take off -*/
     actualBirthParticles = leavingPartIndex.size();
-  } else /*- 何も刺さっていなければ、ランダムに発生させる -*/
+  } else /*- If nothing is connected, generate randomly -*/
   {
     for (int i = 0; i < actualBirthParticles; i++) leavingPartIndex.append(i);
   }
 
-  /*- 動かす粒子も生まれる粒子も無い -*/
+  /*- No particles to move nor to be born -*/
   if (myParticles.empty() && actualBirthParticles == 0) {
     std::cout << "no particles generated nor alive. returning function"
               << std::endl;
     return;
   }
 
-  /*- 背景だけを描画するモードのときは、particlesOriginを更新するだけでOK -*/
+  /*- When in background-only rendering mode, just update particleOrigins -*/
   if (values.iw_rendermode_val == Iwa_TiledParticlesFx::REND_BG) {
-    /*- インデックスを小さい順にならべる -*/
+    /*- Sort indexes in ascending order -*/
     std::sort(leavingPartIndex.begin(), leavingPartIndex.end());
-    /*- インデックス大きい方から消していく -*/
+    /*- Remove from larger indexes -*/
     for (int lp = leavingPartIndex.size() - 1; lp >= 0; lp--)
       particleOrigins.removeAt(leavingPartIndex.at(lp));
     return;
   }
 
-  /*- 新規粒子の生成 -*/
-  /*- 新規粒子しかない場合 -*/
+  /*- New particle generation -*/
+  /*- When there are only new particles -*/
   if (myParticles.empty() && actualBirthParticles)  // Initial creation
   {
-    /*- 新たに作るパーティクルの数だけループ -*/
+    /*- Loop for the number of new particles to create -*/
     for (i = 0; i < actualBirthParticles; i++) {
-      /*- 出発する粒子 -*/
+      /*- Departing particle -*/
       ParticleOrigin po = particleOrigins.at(leavingPartIndex.at(i));
 
-      /*-  どのTextureレベルを使うか -*/
-      int seed = (int)((std::numeric_limits<int>::max)() *
-                       values.random_val->getFloat());
+      /*-  Which texture level to use -*/
+      int seed = static_cast<int>(
+          static_cast<double>(std::numeric_limits<int>::max()) *
+          values.random_val->getFloat());
 
-      /*-  Lifetimeを得る -*/
+      /*-  Get lifetime -*/
       int lifetime = 0;
       if (values.column_lifetime_val)
         lifetime = lastframe[po.level];
@@ -318,22 +323,21 @@ void Iwa_Particles_Engine::roll_particles(
         lifetime = (int)(values.lifetime_val.first +
                          ranges.lifetime_range * values.random_val->getFloat());
       }
-      /*-
-       * この粒子が、レンダリングするフレームでも生きているか判断し、生きているなら生成
-       * -*/
+      /*- Determine if this particle is alive at the frame being rendered, and
+       * generate if alive -*/
       if (lifetime > curr_frame - frame) {
         myParticles.push_back(Iwa_Particle(
             lifetime, seed, porttiles, values, ranges, totalparticles, 0,
             (int)po.level, lastframe[po.level], po.pos[0],
-            po.pos[1],               /*- 座標を指定して発生 -*/
-            po.isUpward,             /*- orientation を追加 -*/
-            (int)po.initSourceFrame) /*- 素材内の初期フレーム位置 -*/
-                              );
+            po.pos[1],                /*- Specify coordinates for generation -*/
+            po.isUpward,              /*- Add orientation -*/
+            (int)po.initSourceFrame,  // Material initial frame
+            m_parent));
       }
       totalparticles++;
     }
   }
-  /*- 既存粒子を動かし、かつ新規粒子を作る -*/
+  /*- Move existing particles and create new ones -*/
   else {
     std::list<Iwa_Particle>::iterator it;
     for (it = myParticles.begin(); it != myParticles.end();) {
@@ -354,11 +358,12 @@ void Iwa_Particles_Engine::roll_particles(
     switch (values.toplayer_val) {
     case Iwa_TiledParticlesFx::TOP_YOUNGER:
       for (i = 0; i < actualBirthParticles; i++) {
-        /*- 出発する粒子 -*/
+        /*- Departing particle -*/
         ParticleOrigin po = particleOrigins.at(leavingPartIndex.at(i));
 
-        int seed = (int)((std::numeric_limits<int>::max)() *
-                         values.random_val->getFloat());
+        int seed = static_cast<int>(
+            static_cast<double>(std::numeric_limits<int>::max()) *
+            values.random_val->getFloat());
 
         int lifetime = 0;
         if (values.column_lifetime_val)
@@ -373,8 +378,9 @@ void Iwa_Particles_Engine::roll_particles(
               lifetime, seed, porttiles, values, ranges, totalparticles, 0,
               (int)po.level, lastframe[po.level], po.pos[0], po.pos[1],
               po.isUpward,
-              (int)po.initSourceFrame) /*- 素材内の初期フレーム位置 -*/
-                                 );
+              (int)po.initSourceFrame,  // Material initial frame
+              m_parent                  // pointer
+              ));
         }
         totalparticles++;
       }
@@ -384,14 +390,15 @@ void Iwa_Particles_Engine::roll_particles(
       for (i = 0; i < actualBirthParticles; i++) {
         double tmp = values.random_val->getFloat() * myParticles.size();
         std::list<Iwa_Particle>::iterator it = myParticles.begin();
-        for (int j = 0; j < tmp; j++, it++)
-          ;
+        std::advance(it, static_cast<int>(tmp));
         {
-          /*- 出発する粒子 -*/
+          /*- Departing particle -*/
           ParticleOrigin po = particleOrigins.at(leavingPartIndex.at(i));
 
-          int seed = (int)((std::numeric_limits<int>::max)() *
-                           values.random_val->getFloat());
+          int seed = static_cast<int>(
+              static_cast<double>(std::numeric_limits<int>::max()) *
+              values.random_val->getFloat());
+
           int lifetime = 0;
 
           if (values.column_lifetime_val)
@@ -403,13 +410,13 @@ void Iwa_Particles_Engine::roll_particles(
           }
           if (lifetime > curr_frame - frame) {
             myParticles.insert(
-                it,
-                Iwa_Particle(
-                    lifetime, seed, porttiles, values, ranges, totalparticles,
-                    0, (int)po.level, lastframe[po.level], po.pos[0], po.pos[1],
-                    po.isUpward,
-                    (int)po.initSourceFrame) /*- 素材内の初期フレーム位置 -*/
-                );
+                it, Iwa_Particle(
+                        lifetime, seed, porttiles, values, ranges,
+                        totalparticles, 0, (int)po.level, lastframe[po.level],
+                        po.pos[0], po.pos[1], po.isUpward,
+                        (int)po.initSourceFrame,  // Material initial frame
+                        m_parent                  // pointer
+                        ));
           }
           totalparticles++;
         }
@@ -418,11 +425,13 @@ void Iwa_Particles_Engine::roll_particles(
 
     default:
       for (i = 0; i < actualBirthParticles; i++) {
-        /*- 出発する粒子 -*/
+        /*- Departing particle -*/
         ParticleOrigin po = particleOrigins.at(leavingPartIndex.at(i));
 
-        int seed = (int)((std::numeric_limits<int>::max)() *
-                         values.random_val->getFloat());
+        int seed = static_cast<int>(
+            static_cast<double>(std::numeric_limits<int>::max()) *
+            values.random_val->getFloat());
+
         int lifetime = 0;
 
         if (values.column_lifetime_val)
@@ -436,8 +445,9 @@ void Iwa_Particles_Engine::roll_particles(
               lifetime, seed, porttiles, values, ranges, totalparticles, 0,
               (int)po.level, lastframe[po.level], po.pos[0], po.pos[1],
               po.isUpward,
-              (int)po.initSourceFrame) /*-  素材内の初期フレーム位置  -*/
-                                );
+              (int)po.initSourceFrame,  // Material initial frame
+              m_parent                  // pointer
+              ));
         }
         totalparticles++;
       }
@@ -445,10 +455,10 @@ void Iwa_Particles_Engine::roll_particles(
     }
   }
 
-  /*- すでに発生したparticleOriginを消去する
-          インデックスを小さい順にならべる -*/
+  /*- Delete already generated particleOrigins
+          Sort indexes in ascending order -*/
   std::sort(leavingPartIndex.begin(), leavingPartIndex.end());
-  /*- インデックス大きい方から消していく -*/
+  /*- Remove from larger indexes -*/
   for (int lp = leavingPartIndex.size() - 1; lp >= 0; lp--)
     particleOrigins.removeAt(leavingPartIndex.at(lp));
 }
@@ -487,56 +497,53 @@ void Iwa_Particles_Engine::normalize_values(struct particles_values &values,
   (values.speeda_val.first)        = (values.speeda_val.first) * M_PI_180;
   (values.speeda_val.second)       = (values.speeda_val.second) * M_PI_180;
   if (values.step_val < 1) values.step_val = 1;
-  values.genfadecol_val                    = (values.genfadecol_val) * 0.01;
-  values.finfadecol_val                    = (values.finfadecol_val) * 0.01;
-  values.foutfadecol_val                   = (values.foutfadecol_val) * 0.01;
-  (values.curl_val)                        = (values.curl_val) * dpicorr * 0.1;
-  /*- ひらひら粒子に照明を当てる normalize_values()内で Degree → Radian 化する
-   * -*/
+  values.genfadecol_val  = (values.genfadecol_val) * 0.01;
+  values.finfadecol_val  = (values.finfadecol_val) * 0.01;
+  values.foutfadecol_val = (values.foutfadecol_val) * 0.01;
+  (values.curl_val)      = (values.curl_val) * dpicorr * 0.1;
+  /*- Illuminate fluttering particles. Convert Degree to Radian inside
+   * normalize_values() -*/
   (values.iw_light_theta_val) = (values.iw_light_theta_val) * M_PI_180;
   (values.iw_light_phi_val)   = (values.iw_light_phi_val) * M_PI_180;
-  /*- 読み込みマージン -*/
+  /*- Loading margin -*/
   (values.margin_val) = (values.margin_val) * dpicorr;
 }
 
 /*-----------------------------------------------------------------*/
 
 void Iwa_Particles_Engine::render_particles(
-    TTile *tile,                             /*- 結果を格納するTile -*/
-    std::vector<TRasterFxPort *> part_ports, /*- テクスチャ素材画像のポート -*/
+    TTile *tile, /*- Tile to store the result -*/
+    std::vector<TRasterFxPort *>
+        part_ports, /*- Ports of texture material images -*/
     const TRenderSettings &ri,
-    TDimension
-        &p_size,       /*- テクスチャ素材のバウンディングボックスの足し合わさったもの
-                          -*/
-    TPointD &p_offset, /*- バウンディングボックス左下の座標 -*/
+    TDimension &p_size, /*- Combined bounding box of texture materials -*/
+    TPointD &p_offset,  /*- Bottom-left coordinates of bounding box -*/
     std::map<int, TRasterFxPort *>
-        ctrl_ports, /*- コントロール画像のポート番号／ポート -*/
-    std::vector<TLevelP>
-        partLevel, /*- テクスチャ素材のリスト -*/
-    float dpi,     /*- 1 が入ってくる -*/
-    int curr_frame,
-    int shrink,                  /*- 1 が入ってくる -*/
-    double startx,               /*- 0 が入ってくる -*/
-    double starty,               /*- 0 が入ってくる -*/
-    double endx,                 /*- 0 が入ってくる -*/
-    double endy,                 /*- 0 が入ってくる -*/
-    std::vector<int> last_frame, /*- テクスチャ素材のそれぞれのカラム長 -*/
+        ctrl_ports,                 /*- Port number/port of control images -*/
+    std::vector<TLevelP> partLevel, /*- List of texture materials -*/
+    float dpi,                      /*- Comes in as 1 -*/
+    int curr_frame, int shrink,     /*- Comes in as 1 -*/
+    double startx,                  /*- Comes in as 0 -*/
+    double starty,                  /*- Comes in as 0 -*/
+    double endx,                    /*- Comes in as 0 -*/
+    double endy,                    /*- Comes in as 0 -*/
+    std::vector<int> last_frame, /*- Column length of each texture material -*/
     unsigned long fxId) {
-  /*- 各種パーティクルのパラメータ -*/
+  /*- Various particle parameters -*/
   struct particles_values values;
-  memset(&values, 0, sizeof(values));
-  /*- 現在のフレームでの各パラメータを得る -*/
+  // memset(&values, 0, sizeof(values));
+  /*- Get each parameter for the current frame -*/
   fill_value_struct(values, m_frame);
 
   int frame, intpart = 0;
 
   int level_n = part_ports.size();
-  /*- 開始フレーム -*/
+  /*- Start frame -*/
   int startframe = (int)values.startpos_val;
 
   float dpicorr = dpi * 0.01f, fractpart = 0;
 
-  /*- 不透明度の範囲（透明～不透明を 0～1 に正規化） -*/
+  /*- Opacity range (normalize transparent~opaque to 0~1) -*/
   float opacity_range =
       (values.opacity_val.second - values.opacity_val.first) * 0.01f;
 
@@ -549,7 +556,7 @@ void Iwa_Particles_Engine::render_particles(
         (renderer && renderer.isPrecomputingEnabled()) ? true : false;
   }
 
-  /*- シュリンクしている場合 -*/
+  /*- When shrunk -*/
   float dpicorr_shrinked;
   if (values.unit_val == Iwa_TiledParticlesFx::UNIT_SMALL_INCH)
     dpicorr_shrinked = dpicorr / shrink;
@@ -558,7 +565,7 @@ void Iwa_Particles_Engine::render_particles(
 
   std::map<std::pair<int, int>, float> partScales;
 
-  /*- 現在のフレームをステップ値にする -*/
+  /*- Make current frame the step value -*/
   curr_frame = curr_frame / values.step_val;
 
   Iwa_ParticlesManager *pc = Iwa_ParticlesManager::instance();
@@ -574,16 +581,16 @@ void Iwa_Particles_Engine::render_particles(
 
   int totalparticles = 0;
 
-  /*- 規則正しく並んだ（まだ出発していない）粒子情報 -*/
+  /*- Regularly arranged (not yet departed) particle information -*/
   QList<ParticleOrigin> particleOrigins;
-  /*- 出力画像のバウンディングボックス -*/
+  /*- Bounding box of output image -*/
   TRectD outTileBBox(tile->m_pos, TDimensionD(tile->getRaster()->getLx(),
                                               tile->getRaster()->getLy()));
 
-  /*- 現在取っておいてあるデータのフレーム番号 -*/
+  /*- Frame number of currently stored data -*/
   int pcFrame = particlesData->m_frame;
 
-  /*- マージンをピクセル単位に換算する -*/
+  /*- Convert margin to pixel units -*/
   double pixelMargin;
   {
     TPointD vect(values.margin_val, 0.0);
@@ -592,18 +599,18 @@ void Iwa_Particles_Engine::render_particles(
     vect              = aff * vect;
     pixelMargin       = sqrt(vect.x * vect.x + vect.y * vect.y);
   }
-  /*- 外側にマージンを取って粒子を生成 -*/
+  /*- Generate particles with margin outside -*/
   TRectD resourceTileBBox = outTileBBox.enlarge(pixelMargin);
 
-  /*- 初期粒子量。これが変わっていなければ、BGはそのまま描く -*/
+  /*- Initial particle count. If unchanged, BG can be drawn as is -*/
   int initialOriginsSize;
   if (pcFrame > curr_frame) {
-    /*- データを初期化 -*/
+    /*- Initialize data -*/
     // Clear stored particlesData
     particlesData->clear();
     pcFrame = particlesData->m_frame;
 
-    /*- まだ出発していない粒子情報を初期化 -*/
+    /*- Initialize not-yet-departed particle information -*/
     initParticleOrigins(resourceTileBBox, particleOrigins, curr_frame,
                         ri.m_affine, values, level_n, last_frame, pixelMargin);
     initialOriginsSize = particleOrigins.size();
@@ -617,28 +624,30 @@ void Iwa_Particles_Engine::render_particles(
     particleOrigins    = particlesData->m_particleOrigins;
     initialOriginsSize = -1;
   } else {
-    /*- まだ出発していない粒子情報を初期化 -*/
+    /*- Initialize not-yet-departed particle information -*/
     initParticleOrigins(resourceTileBBox, particleOrigins, curr_frame,
                         ri.m_affine, values, level_n, last_frame, pixelMargin);
     initialOriginsSize = particleOrigins.size();
   }
 
-  /*- スタートからカレントフレームまでループ -*/
+  /*- Loop from start to current frame -*/
   for (frame = startframe - 1; frame <= curr_frame; ++frame) {
-    /*-  参照画像はキャッシュされてるフレームでは必要ないのでは？ -*/
+    /*-  Reference images are not needed for frames already cached? -*/
     if (frame <= pcFrame) continue;
 
     int dist_frame = curr_frame - frame;
     /*-
-     * ループ内の現在のフレームでのパラメータを取得。スタートが負ならフレーム=0のときの値を格納。
+     * Get parameters for current frame within loop. If start is negative, store
+     * values for frame=0.
      * -*/
     fill_value_struct(values, frame < 0 ? 0 : frame * values.step_val);
-    /*- パラメータの正規化 -*/
+    /*- Parameter normalization -*/
     normalize_values(values, ri);
-    /*- maxnum_valは"birth_rate"のパラメータ -*/
+    /*- maxnum_val is the "birth_rate" parameter -*/
     intpart = (int)values.maxnum_val;
     /*-
-     * birth_rateが小数だったとき、各フレームの小数部分を足しこんだ結果の整数部分をintpartに渡す
+     * When birth_rate is decimal, add the decimal parts of each frame and pass
+     * the integer result to intpart
      * -*/
     fractpart = fractpart + values.maxnum_val - intpart;
     if ((int)fractpart) {
@@ -649,10 +658,10 @@ void Iwa_Particles_Engine::render_particles(
     std::map<int, TTile *> porttiles;
 
     // Perform the roll
-    /*- RenderSettingsを複製して現在のフレームの計算用にする -*/
+    /*- Duplicate RenderSettings for current frame calculation -*/
     TRenderSettings riAux(ri);
 
-    /*- 64bitにする -*/
+    /*- Make 64bit -*/
     riAux.m_bpp = 64;
     // riAux.m_bpp = 32;
 
@@ -662,15 +671,15 @@ void Iwa_Particles_Engine::render_particles(
     else
       r_frame = frame;
 
-    /*- コントロールに刺さっている各ポートについて -*/
+    /*- For each port connected to control -*/
     for (std::map<int, TRasterFxPort *>::iterator it = ctrl_ports.begin();
          it != ctrl_ports.end(); ++it) {
       TTile *tmp;
-      /*- ポートが接続されていて、Fx内で実際に使用されていたら -*/
+      /*- If port is connected and actually used within Fx -*/
       if ((it->second)->isConnected() && port_is_used(it->first, values)) {
         TRectD bbox = resourceTileBBox;
 
-        /*- 素材が存在する場合、portTilesにコントロール画像タイルを格納 -*/
+        /*- If material exists, store control image tile in portTiles -*/
         if (!bbox.isEmpty()) {
           if (frame <= pcFrame) {
             // This frame will not actually be rolled. However, it was
@@ -711,8 +720,9 @@ void Iwa_Particles_Engine::render_particles(
         ctrl_ports.at(values.base_ctrl_val)->isConnected() &&
         port_is_used(values.base_ctrl_val, values) &&
         values.iw_rendermode_val !=
-            Iwa_TiledParticlesFx::
-                REND_ILLUMINATED) /*- 照明モードなら、BG素材は要らない -*/
+            Iwa_TiledParticlesFx::REND_ILLUMINATED) /*- In illumination mode, BG
+                                                       material is not needed
+                                                       -*/
     {
       std::string alias =
           "BG_CTRL: " +
@@ -722,7 +732,7 @@ void Iwa_Particles_Engine::render_particles(
         baseImgTile.m_pos = tile->m_pos;
         baseImgTile.setRaster(rimg->getRaster());
       } else {
-        /*- 出力と同じbpcにする -*/
+        /*- Make same bpc as output -*/
         (*ctrl_ports.at(values.base_ctrl_val))
             ->allocateAndCompute(baseImgTile, tile->m_pos,
                                  convert(resourceTileBBox).getSize(),
@@ -736,8 +746,8 @@ void Iwa_Particles_Engine::render_particles(
     roll_particles(tile, porttiles, riAux, myParticles, values, 0, 0, frame,
                    curr_frame, level_n, &random_level, 1, last_frame,
                    totalparticles, particleOrigins,
-                   intpart /*- 実際に生成したい粒子数 -*/
-                   );
+                   intpart /*- Actual number of particles to generate -*/
+    );
 
     // Store the rolled data in the particles manager
     if (!particlesData->m_calculated ||
@@ -753,14 +763,15 @@ void Iwa_Particles_Engine::render_particles(
 
     // Render the particles if the distance from current frame is a trail
     // multiple
-    /*- さしあたり、trailは無視する -*/
+    /*- For now, ignore trail -*/
     if (dist_frame == 0) {
       //--------
       // Store the maximum particle size before the do_render cycle
-      /*- 表示されている粒子のうち、各素材について最大サイズのものを記録しておく
-              条件にあわせ、飛んでいる粒子と飛び立つ前の粒子の両方で記録を行う
+      /*- Among displayed particles, record the maximum size for each material
+              Record for both flying particles and pre-departure particles
+         according to conditions
          -*/
-      /*-	①飛んでいる粒子 -*/
+      /*- ① Flying particles -*/
       if (values.iw_rendermode_val != Iwa_TiledParticlesFx::REND_BG) {
         std::list<Iwa_Particle>::iterator pt;
         for (pt = myParticles.begin(); pt != myParticles.end(); ++pt) {
@@ -777,7 +788,8 @@ void Iwa_Particles_Engine::render_particles(
             partScales[ndxPair] = part.scale;
         }
       }
-      /*- ②飛び立つ前の粒子がひとつでもあった場合、最大値でおきかえる -*/
+      /*- ② If there's at least one pre-departure particle, replace with maximum
+       * value -*/
       if (values.iw_rendermode_val == Iwa_TiledParticlesFx::REND_ALL ||
           values.iw_rendermode_val == Iwa_TiledParticlesFx::REND_BG) {
         for (int lev = 0; lev < level_n; lev++) {
@@ -790,13 +802,11 @@ void Iwa_Particles_Engine::render_particles(
             partScales[ndxPair] = values.scale_val.second;
         }
       }
-      //--------
-
-      /*- ここで、出発した粒子の分、穴を開けた背景を描く -*/
-      /*- スイッチがONなら -*/
+      /*- Here, draw background with holes for departed particles -*/
+      /*- If switch is ON -*/
       if (values.iw_rendermode_val == Iwa_TiledParticlesFx::REND_ALL ||
           values.iw_rendermode_val == Iwa_TiledParticlesFx::REND_BG) {
-        /*- まだ粒子が飛び立っていない場合、そのまま背景を描く -*/
+        /*- If no particles have taken off yet, draw background as is -*/
         if (initialOriginsSize == particleOrigins.size()) {
           TRop::resample(tile->getRaster(), baseImgTile.getRaster(), TAffine());
         } else {
@@ -805,7 +815,7 @@ void Iwa_Particles_Engine::render_particles(
         }
       }
 
-      /*- 粒子の描画。もし、背景モードなら描かない -*/
+      /*- Particle rendering. If in background mode, don't render -*/
       if (values.iw_rendermode_val != Iwa_TiledParticlesFx::REND_BG) {
         if (values.toplayer_val == Iwa_TiledParticlesFx::TOP_SMALLER ||
             values.toplayer_val == Iwa_TiledParticlesFx::TOP_BIGGER)
@@ -849,7 +859,7 @@ void Iwa_Particles_Engine::render_particles(
           }
         }
       }
-      /*- 粒子の描画 ここまで -*/
+      /*- End of particle rendering -*/
     }
 
     std::map<int, TTile *>::iterator it;
@@ -864,8 +874,8 @@ void Iwa_Particles_Engine::render_particles(
 }
 
 /*-----------------------------------------------------------------
- render_particles から来る
- 粒子の数だけ繰り返し
+ Comes from render_particles
+ Repeat for each particle
 -----------------------------------------------------------------*/
 
 void Iwa_Particles_Engine::do_render(
@@ -875,13 +885,12 @@ void Iwa_Particles_Engine::do_render(
     std::vector<TLevelP> partLevel, struct particles_values &values,
     float opacity_range, int dist_frame,
     std::map<std::pair<int, int>, float> &partScales, TTile *baseImgTile) {
-  /*- カメラに対してタテになっている粒子を描かずに飛ばす -*/
+  /*- Skip particles that are vertical relative to camera without rendering -*/
   if (std::abs(cosf(part->flap_phi * 3.14159f / 180.0f)) < 0.03f) {
     return;
   }
   // Retrieve the particle frame - that is, the *column frame* from which we are
-  // picking
-  // the particle to be rendered.
+  // picking the particle to be rendered.
   int ndx = part->frame % lastframe;
 
   TRasterP tileRas(tile->getRaster());
@@ -893,13 +902,12 @@ void Iwa_Particles_Engine::do_render(
     aim_angle    = arctan * M_180_PI;
   }
 
-  /*- 粒子の回転、スケールをアフィン行列に入れる -*/
-  // Calculate the rotational and scale components we have to apply on the
-  // particle
+  /*- Put particle rotation and scale into affine matrix -*/
+  // Calculate rotation & scale for particle
   TRotation rotM(part->angle + aim_angle);
   TScale scaleM(part->scale);
 
-  /*- ひらひら -*/
+  /*- Fluttering -*/
   TAffine testAff;
   float illuminant;
   {
@@ -914,15 +922,15 @@ void Iwa_Particles_Engine::do_render(
     testAff.a12 = -k * cosT * sinT;
     testAff.a22 = 1.0f - k * sinT * sinT;
 
-    /*- ここで、照明モードのとき、その明るさを計算する -*/
+    /*- Here, calculate brightness for illumination mode -*/
     if (values.iw_rendermode_val == Iwa_TiledParticlesFx::REND_ILLUMINATED) {
-      float liTheta  = values.iw_light_theta_val;
-      float liPhi    = values.iw_light_phi_val;
-      float3 normVec = {sinf(theta) * sinf(phi), cosf(theta) * sinf(phi),
-                        cosf(phi)};
+      float liTheta   = values.iw_light_theta_val;
+      float liPhi     = values.iw_light_phi_val;
+      float3 normVec  = {sinf(theta) * sinf(phi), cosf(theta) * sinf(phi),
+                         cosf(phi)};
       float3 lightVec = {sinf(liTheta) * sinf(liPhi),
                          cosf(liTheta) * sinf(liPhi), cosf(liPhi)};
-      /*- 法線ベクトルと光源ベクトルの内積の絶対値 -*/
+      /*- Absolute value of dot product of normal vector and light vector -*/
       illuminant = std::abs(normVec.x * lightVec.x + normVec.y * lightVec.y +
                             normVec.z * lightVec.z);
     }
@@ -948,13 +956,11 @@ void Iwa_Particles_Engine::do_render(
     (*part_ports[part->level])->getBBox(ndx, bbox, riIdentity);
 
     // A particle's bbox MUST be finite. Gradients and such which have an
-    // infinite bbox
-    // are just NOT rendered.
+    // infinite bbox are just NOT rendered.
 
     // NOTE: No fx returns half-planes or similar (ie if any coordinate is
-    // either
-    // (std::numeric_limits<double>::max)() or its opposite, then the rect IS
-    // THE infiniteRectD)
+    // either (std::numeric_limits<double>::max)() or its opposite, then the
+    // rect IS THE infiniteRectD)
     if (bbox == TConsts::infiniteRectD) return;
   }
 
@@ -963,7 +969,7 @@ void Iwa_Particles_Engine::do_render(
   standardRefBBox = bbox;
   riNew.m_affine  = TScale(partScale);
   bbox            = riNew.m_affine * bbox;
-  /*- 縮小済みのParticleのサイズ -*/
+  /*- Size of scaled down Particle -*/
   partResolution = TDimensionD(tceil(bbox.getLx()), tceil(bbox.getLy()));
 
   TRasterP ras;
@@ -988,16 +994,14 @@ void Iwa_Particles_Engine::do_render(
   }
 
   // We are interested in making the relation between scale and (integer)
-  // resolution
-  // bijective - since we shall cache by using resolution as a partial
-  // identification parameter.
-  // Therefore, we find the current bbox Lx and take a unique scale out of it.
+  // resolution bijective - since we shall cache by using resolution as a
+  // partial identification parameter. Therefore, we find the current bbox Lx
+  // and take a unique scale out of it.
   partScale      = partResolution.lx / standardRefBBox.getLx();
   riNew.m_affine = TScale(partScale);
   bbox           = riNew.m_affine * standardRefBBox;
 
-  // If no image was retrieved from the cache (or it was not scaled enough),
-  // calculate it
+  // Compute image if missing or underscaled
   if (!ras) {
     TTile auxTile;
     (*part_ports[part->level])
@@ -1031,13 +1035,13 @@ void Iwa_Particles_Engine::do_render(
     rfinalpart = ras;
 
   TRasterP rfinalpart2;
-  /*- 照明モードのとき、その明るさを色に格納 -*/
+  /*- In illumination mode, store brightness in color -*/
   if (values.iw_rendermode_val == Iwa_TiledParticlesFx::REND_ILLUMINATED) {
     rfinalpart2 = rfinalpart->clone();
     part->set_illuminated_colors(illuminant, rfinalpart2);
   } else if (baseImgTile->getRaster() && !baseImgTile->getRaster()->isEmpty()) {
     rfinalpart2 = rfinalpart->clone();
-    /*- サイズが小さい場合は、単に色を拾う -*/
+    /*- If size is small, simply pick color -*/
     if (partResolution.lx <= 4.0 && partResolution.ly <= 4.0)
       part->get_base_image_color(baseImgTile, values, rfinalpart2, bbox, ri);
     else
@@ -1045,12 +1049,9 @@ void Iwa_Particles_Engine::do_render(
   } else
     rfinalpart2 = rfinalpart;
 
-  // Now, let's build the particle transform before it is overed on the output
-  // tile
+  // Build particle transform before output tile
 
-  // First, complete the transform by adding the rotational and scale
-  // components from
-  // Particles parameters
+  // Incorporate rotation/scale from particle parameters
   M = ri.m_affine * M * TScale(1.0 / partScale);
 
   // Then, retrieve the particle position in current reference.
@@ -1074,19 +1075,18 @@ void Iwa_Particles_Engine::do_render(
 /*-----------------------------------------------------------------*/
 
 void Iwa_Particles_Engine::fill_array(
-    TTile *ctrl1,     /*- ソース画像のTile -*/
-    int &regioncount, /*- 領域数を返す -*/
-    std::vector<int>
-        &myarray, /*- インデックスを返すと思われる。サイズはソースTileの縦横 -*/
-    std::vector<int> &lista,
-    std::vector<int> &listb, int threshold) {
+    TTile *ctrl1,     /*- Source image Tile -*/
+    int &regioncount, /*- Returns region count -*/
+    std::vector<int> &
+        myarray, /*- Returns indexes. Size is source Tile's width and height -*/
+    std::vector<int> &lista, std::vector<int> &listb, int threshold) {
   int pr = 0;
   int i, j;
   int lx, ly;
   lx = ctrl1->getRaster()->getLx();
   ly = ctrl1->getRaster()->getLy();
 
-  /*prima riga*/
+  /*first row*/
   TRaster32P raster32 = ctrl1->getRaster();
   raster32->lock();
   TPixel32 *pix = raster32->pixels(0);
@@ -1115,7 +1115,7 @@ void Iwa_Particles_Engine::fill_array(
           mask[1] = myarray[i - 1 + lx * (j - 1)];
         }
         if (i != lx - 1) mask[3] = myarray[i + 1 + lx * (j - 1)];
-        mask[2]                  = myarray[i + lx * (j - 1)];
+        mask[2] = myarray[i + lx * (j - 1)];
         if (!mask[0] && !mask[1] && !mask[2] && !mask[3]) {
           (regioncount)++;
           myarray[i + lx * j] = (regioncount);
@@ -1149,7 +1149,7 @@ void Iwa_Particles_Engine::fill_array(
 void Iwa_Particles_Engine::normalize_array(
     std::vector<std::vector<TPointD>> &myregions, TPointD pos, int lx, int ly,
     int regioncounter, std::vector<int> &myarray, std::vector<int> &lista,
-    std::vector<int> &listb, std::vector<int> & final) {
+    std::vector<int> &listb, std::vector<int> &final) {
   int i, j, k, l;
 
   std::vector<int> tmp;
@@ -1162,16 +1162,16 @@ void Iwa_Particles_Engine::normalize_array(
     j = lista[l];
     /*TMSG_INFO("j vale %d\n", j);*/
     while (final[j] != j) j = final[j];
-    k                       = listb[l];
+    k = listb[l];
     /*TMSG_INFO("k vale %d\n", k);*/
     while (final[k] != k) k = final[k];
-    if (j != k) final[j]    = k;
+    if (j != k) final[j] = k;
   }
   // TMSG_INFO("esco dal for\n");
-  for (j                                         = 1; j <= regioncounter; j++)
+  for (j = 1; j <= regioncounter; j++)
     while (final[j] != final[final[j]]) final[j] = final[final[j]];
 
-  /*conto quante cavolo di regioni sono*/
+  /*count how many damn regions there are*/
 
   tmp.push_back(final[1]);
   maxregioncounter = 1;
@@ -1212,7 +1212,7 @@ void Iwa_Particles_Engine::normalize_array(
 
 /*-----------------------------------------------------------------*/
 
-/*- multiがONのときのSource画像（ctrl1）の領域を分析 -*/
+/*- Analyze source image (ctrl1) regions when multi is ON -*/
 void Iwa_Particles_Engine::fill_subregions(
     int cont_index, std::vector<std::vector<TPointD>> &myregions, TTile *ctrl1,
     int thres) {
@@ -1236,8 +1236,8 @@ void Iwa_Particles_Engine::fill_subregions(
 
 /*-----------------------------------------------------------------*/
 
-/*- 入力画像のアルファ値に比例して発生濃度を変える 各Pointにウェイトを持たせる
- * -*/
+/*- Vary emission density proportional to alpha value of input image. Give
+ * weight to each Point -*/
 void Iwa_Particles_Engine::fill_single_region(
     std::vector<TPointD> &myregions, TTile *ctrl1, int threshold,
     bool do_source_gradation, QList<QList<int>> &myHistogram,
@@ -1246,19 +1246,19 @@ void Iwa_Particles_Engine::fill_single_region(
 
   TRaster32P raster32(ctrl1->getRaster()->getSize());
   TRop::convert(raster32, ctrl1->getRaster());
-  assert(raster32);  // per ora gestisco solo i Raster32
+  assert(raster32);  // for now only handle Raster32
 
   myregions.clear();
 
   raster32->lock();
 
-  /*- 初期化 -*/
+  /*- Initialize -*/
   for (int i = 0; i < 256; i++) {
     QList<int> tmpVec;
     myHistogram.push_back(tmpVec);
   }
 
-  if (!do_source_gradation) /*- 1階調の場合 -*/
+  if (!do_source_gradation) /*- Single tone case -*/
   {
     for (int po = 0; po < particleOrigins.size(); po++) {
       int index_x = (int)particleOrigins.at(po).pixPos[0];
@@ -1302,7 +1302,7 @@ void Iwa_Particles_Engine::fill_single_region(
       TPixel32 *pix = raster32->pixels(index_y);
       pix += index_x;
       if (pix->m > 0) {
-        /*-  Histogramの登録 -*/
+        /*- Histogram registration -*/
         myHistogram[(int)pix->m].push_back(po);
         myregions.push_back(TPointD(particleOrigins.at(po).pos[0],
                                     particleOrigins.at(po).pos[1]));
@@ -1314,7 +1314,7 @@ void Iwa_Particles_Engine::fill_single_region(
 }
 
 /*----------------------------------------------------------------
- まだ出発していない粒子情報を初期化
+ Initialize not-yet-departed particle information
 ----------------------------------------------------------------*/
 
 static bool potentialLessThan(const ParticleOrigin &po1,
@@ -1325,9 +1325,10 @@ static bool potentialLessThan(const ParticleOrigin &po1,
 void Iwa_Particles_Engine::initParticleOrigins(
     TRectD &resourceTileBBox, QList<ParticleOrigin> &particleOrigins,
     const double frame, const TAffine affine, struct particles_values &values,
-    int level_n, std::vector<int> &lastframe, /*- 素材カラムのフレーム長 -*/
+    int level_n,
+    std::vector<int> &lastframe, /*- Frame length of material column -*/
     double pixelMargin) {
-  /*- 敷き詰め三角形の一辺の長さをピクセル単位に換算する -*/
+  /*- Convert side length of tiling triangle to pixel units -*/
   TPointD vect(values.iw_triangleSize, 0.0);
   TAffine aff(affine);
   aff.a13 = aff.a23 = 0;
@@ -1336,14 +1337,15 @@ void Iwa_Particles_Engine::initParticleOrigins(
 
   double pix2Inch = values.iw_triangleSize / triPixSize;
 
-  /*- 横方向の移動距離 -*/
+  /*- Horizontal movement distance -*/
   double d_hori = values.iw_triangleSize * 0.5;
-  /*- 縦方向の移動距離 -*/
+  /*- Vertical movement distance -*/
   double d_vert = values.iw_triangleSize * 0.8660254;
-  /*- 正三角形を横に上下交互に並べたときの、中心位置のオフセット -*/
+  /*- Offset of center position when equilateral triangles are arranged
+   * horizontally alternating up and down -*/
   double vOffset = values.iw_triangleSize * 0.14433758;
 
-  /*- ピクセル位置の方も格納する -*/
+  /*- Also store pixel position -*/
   double d_hori_pix  = triPixSize * 0.5;
   double d_vert_pix  = triPixSize * 0.8660254;
   double vOffset_pix = triPixSize * 0.14433758;
@@ -1351,16 +1353,16 @@ void Iwa_Particles_Engine::initParticleOrigins(
   TRectD inchBBox(
       resourceTileBBox.x0 * pix2Inch, resourceTileBBox.y0 * pix2Inch,
       resourceTileBBox.x1 * pix2Inch, resourceTileBBox.y1 * pix2Inch);
-  /*- インチ位置のスタート -*/
+  /*- Start position in inches -*/
   double curr_y = inchBBox.y0;
-  /*- 行の1列目のタテのオフセット値 -*/
+  /*- Vertical offset value for first column of row -*/
   double startOff = -vOffset;
 
-  /*- ピクセル位置のスタート -*/
+  /*- Start position in pixels -*/
   double curr_y_pix   = 0.0;
   double startOff_pix = -vOffset_pix;
 
-  /*- メモリの見積もり -*/
+  /*- Memory estimation -*/
   int gridSize;
   {
     int ySize = 0;
@@ -1379,22 +1381,23 @@ void Iwa_Particles_Engine::initParticleOrigins(
   curr_y = inchBBox.y0;
   particleOrigins.reserve(gridSize);
 
-  /*- タテでループ -*/
-  while (curr_y <=
-         inchBBox.y1 +
-             d_vert *
-                 0.5) /* ←d_vert * 0.5 は最後の一行を敷き詰めるための追加分 -*/
+  /*- Loop vertically -*/
+  while (
+      curr_y <=
+      inchBBox.y1 +
+          d_vert *
+              0.5) /* ← d_vert * 0.5 is additional for tiling the last row -*/
   {
     double curr_x = inchBBox.x0;
     double off    = startOff;
-    /*- 三角形が上下どっちを向いているかのフラグ -*/
+    /*- Flag for whether triangle is facing up or down -*/
     bool isUp = (off < 0);
 
-    /*- ピクセル位置のスタート -*/
+    /*- Start position in pixels -*/
     double curr_x_pix = 0.0;
     double off_pix    = startOff_pix;
 
-    /*- ヨコでループ -*/
+    /*- Loop horizontally -*/
     while (curr_x <= inchBBox.x1 + d_hori * 0.5) {
       unsigned char level =
           (unsigned char)(values.random_val->getFloat() * level_n);
@@ -1419,7 +1422,7 @@ void Iwa_Particles_Engine::initParticleOrigins(
     curr_y_pix += d_vert_pix;
   }
 
-  /*- 粒子をランダム値の大きい順に並べる -*/
+  /*- Sort particles in descending order of random value -*/
   std::sort(particleOrigins.begin(), particleOrigins.end(), potentialLessThan);
 }
 
@@ -1443,7 +1446,7 @@ unsigned char Iwa_Particles_Engine::getInitSourceFrame(
 }
 
 /*--------------------------------------------------
- ここで、出発した粒子の分、穴を開けた背景を描く
+ Here, draw background with holes for departed particles
 --------------------------------------------------*/
 void Iwa_Particles_Engine::renderBackground(
     TTile *tile, QList<ParticleOrigin> &origins,
@@ -1453,13 +1456,13 @@ void Iwa_Particles_Engine::renderBackground(
   TRasterP tileRas(tile->getRaster());
   int unit = 1 + (int)origins.size() / 100;
 
-  /*- まだ残っている粒子源について -*/
+  /*- For remaining particle sources -*/
   for (int po = 0; po < origins.size(); po++) {
     ParticleOrigin origin = origins.at(po);
 
     int ndx = origin.initSourceFrame;
 
-    /*- 粒子の回転、スケール -*/
+    /*- Particle rotation and scale -*/
     TRotation rotM((origin.isUpward) ? 0.0 : 180.0);
     TAffine M(rotM);
     // Particles deal with dpi affines on their own
@@ -1484,7 +1487,7 @@ void Iwa_Particles_Engine::renderBackground(
     standardRefBBox = bbox;
     riNew.m_affine  = TScale(partScale);
     bbox            = riNew.m_affine * bbox;
-    /*- 縮小済みのParticleのサイズ -*/
+    /*- Size of scaled down Particle -*/
     partResolution = TDimensionD(tceil(bbox.getLx()), tceil(bbox.getLy()));
 
     TRasterP ras;
@@ -1509,11 +1512,8 @@ void Iwa_Particles_Engine::renderBackground(
       }
     }
 
-    // We are interested in making the relation between scale and (integer)
-    // resolution
-    // bijective - since we shall cache by using resolution as a partial
-    // identification parameter.
-    // Therefore, we find the current bbox Lx and take a unique scale out of it.
+    // Ensure a bijective relation between scale and integer resolution for
+    // caching by deriving a unique scale from the current bbox Lx.
     partScale      = partResolution.lx / standardRefBBox.getLx();
     riNew.m_affine = TScale(partScale);
     bbox           = riNew.m_affine * standardRefBBox;
@@ -1544,7 +1544,7 @@ void Iwa_Particles_Engine::renderBackground(
     else if (TRaster64P myras64 = tile->getRaster())
       TRop::over(tileRas, ras, M);
   }
-  /*- サイズ縮める操作をいれる -*/
+  /*- Include size reduction operation -*/
   TRasterP resizedBGRas;
   if (TRaster32P myBgRas32 = baseImgTile->getRaster())
     resizedBGRas = TRaster32P(tileRas->getSize());
@@ -1553,10 +1553,9 @@ void Iwa_Particles_Engine::renderBackground(
   else
     return;
   TAffine aff;
-  /*- リサンプル -*/
+  /*- Resample -*/
   TRop::resample(resizedBGRas, baseImgTile->getRaster(), aff);
 
   TRop::ropin(resizedBGRas, tileRas, tileRas);
 
-  std::cout << std::endl;
 }

@@ -2,6 +2,9 @@
 
 #include "toonzrasterbrushtool.h"
 
+// Standard library
+#include <algorithm>
+
 // TnzTools includes
 #include "tools/toolhandle.h"
 #include "tools/toolutils.h"
@@ -30,6 +33,7 @@
 #include "toonz/preferences.h"
 #include "toonz/tpalettehandle.h"
 #include "toonz/mypaintbrushstyle.h"
+#include "toonz/toonzfolders.h"
 
 // TnzCore includes
 #include "tstream.h"
@@ -38,6 +42,7 @@
 #include "tenv.h"
 #include "tregion.h"
 #include "tinbetween.h"
+#include "tsystem.h"
 
 #include "tgl.h"
 #include "trop.h"
@@ -731,7 +736,7 @@ static void Smooth(std::vector<TThickPoint> &points, const int radius,
 ToonzRasterBrushTool::ToonzRasterBrushTool(std::string name, int targetType)
     : TTool(name)
     , m_rasThickness("Size", 1, 1000, 1, 5)
-    , m_smooth("Smooth:", 0, 50, 0)
+    , m_smooth("Smooth:", 0, 500, 0)
     , m_hardness("Hardness:", 0, 100, 100)
     , m_preset("Preset:")
     , m_drawOrder("Draw Order:")
@@ -752,10 +757,11 @@ ToonzRasterBrushTool::ToonzRasterBrushTool(std::string name, int targetType)
   m_smooth.setNonLinearSlider();
 
   m_prop[0].bind(m_rasThickness);
+  m_prop[0].bind(m_modifierSize);
+
   m_prop[0].bind(m_hardness);
   m_prop[0].bind(m_smooth);
   m_prop[0].bind(m_drawOrder);
-  m_prop[0].bind(m_modifierSize);
   m_prop[0].bind(m_modifierLockAlpha);
   m_prop[0].bind(m_pencil);
   m_prop[0].bind(m_assistants);
@@ -773,6 +779,7 @@ ToonzRasterBrushTool::ToonzRasterBrushTool(std::string name, int targetType)
   m_preset.addValue(CUSTOM_WSTR);
   m_pressure.setId("PressureSensitivity");
   m_modifierLockAlpha.setId("LockAlpha");
+  m_smooth.setId("Smooth");
 
   m_inputmanager.setHandler(this);
   m_modifierLine               = new TModifierLine();
@@ -935,8 +942,6 @@ void ToonzRasterBrushTool::drawEmptyCircle(TPointD pos, int thick,
   if (!isPencil)
     tglDrawCircle(pos, (thick + 1) * 0.5);
   else {
-    pos.x = floor(pos.x) + 0.5;
-    pos.y = floor(pos.y) + 0.5;
     int x = 0, y = tround((thick * 0.5) - 0.5);
     int d           = 3 - 2 * (int)(thick * 0.5);
     bool horizontal = true, isDecimal = thick % 2 != 0;
@@ -1052,7 +1057,7 @@ bool ToonzRasterBrushTool::askWrite(const TRect &rect) {
 //---------------------------------------------------------------------------------------------------
 
 void ToonzRasterBrushTool::updateModifiers() {
-  int smoothRadius                = (int)round(m_smooth.getValue());
+  int smoothRadius                = m_smooth.getValue();
   m_modifierAssistants->magnetism = m_assistants.getValue() ? 1 : 0;
   m_inputmanager.drawPreview      = false;  //! m_modifierAssistants->drawOnly;
 
@@ -1102,11 +1107,15 @@ bool ToonzRasterBrushTool::preLeftButtonDown() {
 void ToonzRasterBrushTool::handleMouseEvent(MouseEventType type,
                                             const TPointD &pos,
                                             const TMouseEvent &e) {
-  TTimerTicks t = TToolTimer::ticks();
-  bool alt      = e.getModifiersMask() & TMouseEvent::ALT_KEY;
-  bool shift    = e.getModifiersMask() & TMouseEvent::SHIFT_KEY;
-  bool control  = e.getModifiersMask() & TMouseEvent::CTRL_KEY;
-
+  TTimerTicks t    = TToolTimer::ticks();
+  bool alt         = e.getModifiersMask() & TMouseEvent::ALT_KEY;
+  bool shift       = e.getModifiersMask() & TMouseEvent::SHIFT_KEY;
+  bool control     = e.getModifiersMask() & TMouseEvent::CTRL_KEY;
+  TPointD fixedPos = pos;
+  if (m_pencil.getValue()) {
+    fixedPos = getCenteredCursorPos(pos);
+    fixedPos = TPointD(tround(fixedPos.x), tround(fixedPos.y));
+  }
   if (shift && type == ME_DOWN && e.button() == Qt::LeftButton &&
       !m_painting.active) {
     m_modifierAssistants->magnetism = 0;
@@ -1128,7 +1137,7 @@ void ToonzRasterBrushTool::handleMouseEvent(MouseEventType type,
     m_inputmanager.keyEvent(control, TKey::control, t, nullptr);
 
   if (type == ME_MOVE) {
-    THoverList hovers(1, pos);
+    THoverList hovers(1, fixedPos);
     m_inputmanager.hoverEvent(hovers);
   } else {
     int deviceId       = e.isTablet() ? 1 : 0;
@@ -1136,7 +1145,7 @@ void ToonzRasterBrushTool::handleMouseEvent(MouseEventType type,
     bool hasPressure   = e.isTablet();
     double pressure    = hasPressure ? e.m_pressure : defPressure;
     bool final         = type == ME_UP;
-    m_inputmanager.trackEvent(deviceId, 0, pos, pressure, TPointD(),
+    m_inputmanager.trackEvent(deviceId, 0, fixedPos, pressure, TPointD(),
                               hasPressure, false, final, t);
     m_inputmanager.processTracks();
   }
@@ -1299,7 +1308,7 @@ void ToonzRasterBrushTool::inputPaintTrackPoint(const TTrackPoint &point,
   TToonzImageP ri(img);
   TRasterCM32P ras = ri->getRaster();
   if (!ras) return;
-  TPointD rasCenter     = ras->getCenterD();
+  TPointD rasCenter     = convert(ras->getCenter());
   TPointD fixedPosition = getCenteredCursorPos(point.position);
 
   TRectD invalidateRect;
@@ -1437,8 +1446,7 @@ void ToonzRasterBrushTool::inputPaintTrackPoint(const TTrackPoint &point,
         TRectD(m_brushPos - thickOffset, m_brushPos + thickOffset);
     invalidateRect +=
         TRectD(fixedPosition - thickOffset, fixedPosition + thickOffset);
-    m_mousePos = point.position;
-    m_brushPos = fixedPosition;
+    m_brushPos = m_mousePos = point.position;
   }
 
   if (!invalidateRect.isEmpty()) invalidate(invalidateRect.enlarge(20));
@@ -1495,8 +1503,7 @@ void ToonzRasterBrushTool::inputMouseMove(const TPointD &position,
                              m_brushPos + TPointD(radius, radius));
 
   } else {
-    m_mousePos = position;
-    m_brushPos = getCenteredCursorPos(position);
+    m_brushPos = m_mousePos = position;
 
     invalidateRect += TRectD(position - halfThick, position + halfThick);
   }
@@ -1521,7 +1528,10 @@ void ToonzRasterBrushTool::draw() {
 
   TImageP img = getImage(false, 1);
 
+  // If is Spline Object, no need to draw
   if (getApplication()->getCurrentObject()->isSpline()) return;
+
+  // Whether to draw cursor at stroke end
   if (Preferences::instance()->isUseStrokeEndCursor())
     ToolUtils::drawCursor(m_viewer, this, m_brushPos, ToolCursor::PenCursor,
                           true);
@@ -1529,15 +1539,14 @@ void ToonzRasterBrushTool::draw() {
   // If toggled off, don't draw brush outline
   if (!Preferences::instance()->isCursorOutlineEnabled()) return;
 
-  // Draw the brush outline - change color when the Ink / Paint check is
-  // activated
-  if ((ToonzCheck::instance()->getChecks() & ToonzCheck::eInk) ||
-      (ToonzCheck::instance()->getChecks() & ToonzCheck::ePaint) ||
-      (ToonzCheck::instance()->getChecks() & ToonzCheck::eInk1))
-    glColor3d(0.5, 0.8, 0.8);
-  // normally draw in red
-  else
-    glColor3d(1.0, 0.0, 0.0);
+  // If in Ink / Paint mode, draw in cyan
+  int checks = ToonzCheck::instance()->getChecks();
+  if ((checks & ToonzCheck::eInk) || (checks & ToonzCheck::ePaint) ||
+      (checks & ToonzCheck::eInk1)) {
+    glColor3d(0.5, 0.8, 0.8);  // Cyan
+  } else {
+    glColor3d(1.0, 0.0, 0.0);  // Red
+  }
 
   if (m_isMyPaintStyleSelected) {
     tglDrawCircle(m_brushPos, (m_minCursorThick + 1) * 0.5);
@@ -1760,6 +1769,39 @@ void ToonzRasterBrushTool::loadPreset() {
     m_maxThick = m_rasThickness.getValue().second;
 
     m_brushPad = ToolUtils::getBrushPad(preset.m_max, preset.m_hardness * 0.01);
+    
+    // CRITICAL: Restore MyPaint style from preset (strict state restoration)
+    // Only applies to NEW presets (version >= 1) that have style information
+    if (preset.m_styleInfoVersion >= 1) {
+      TApplication *app = getApplication();
+      if (app && app->getCurrentPalette()) {
+        TPalette *palette = app->getCurrentPalette()->getPalette();
+        if (palette) {
+          int styleIndex = app->getCurrentLevelStyleIndex();
+          TColorStyle *currentStyle = palette->getStyle(styleIndex);
+          
+          if (preset.m_hasMyPaint) {
+            // Preset was created WITH MyPaint: load the specific MyPaint brush
+            TFilePath myPaintPath(preset.m_myPaintPath);
+            TMyPaintBrushStyle *newStyle = new TMyPaintBrushStyle(myPaintPath);
+            if (currentStyle) {
+              newStyle->setMainColor(currentStyle->getMainColor());
+            }
+            palette->setStyle(styleIndex, newStyle);
+            app->getCurrentPalette()->notifyColorStyleChanged(false);
+          } else {
+            // Preset was created WITHOUT MyPaint: replace any existing MyPaint with solid color
+            if (dynamic_cast<TMyPaintBrushStyle*>(currentStyle)) {
+              TSolidColorStyle *newStyle = new TSolidColorStyle(
+                currentStyle ? currentStyle->getMainColor() : TPixel32::Black);
+              palette->setStyle(styleIndex, newStyle);
+              app->getCurrentPalette()->notifyColorStyleChanged(false);
+            }
+          }
+        }
+      }
+    }
+    // OLD presets (version 0): do nothing - leave the current style unchanged
   } catch (...) {
   }
 }
@@ -1781,6 +1823,22 @@ void ToonzRasterBrushTool::addPreset(QString name) {
   preset.m_modifierSize      = m_modifierSize.getValue();
   preset.m_modifierLockAlpha = m_modifierLockAlpha.getValue();
   preset.m_assistants        = m_assistants.getValue();
+  
+  // Capture MyPaint style information (CRITICAL for strict preset restoration)
+  preset.m_styleInfoVersion = 1;  // Mark as new preset with style information
+  
+  TApplication *app = getApplication();
+  if (app) {
+    TColorStyle *style = app->getCurrentLevelStyle();
+    if (TMyPaintBrushStyle *mpStyle = dynamic_cast<TMyPaintBrushStyle*>(style)) {
+      preset.m_hasMyPaint = true;
+      std::wstring wpath = mpStyle->getPath().getWideString();
+      preset.m_myPaintPath = std::string(wpath.begin(), wpath.end());
+    } else {
+      preset.m_hasMyPaint = false;
+      preset.m_myPaintPath = "";
+    }
+  }
 
   // Pass the preset to the manager
   m_presetsManager.addPreset(preset);
@@ -1941,7 +1999,10 @@ BrushData::BrushData(const std::wstring &name)
     , m_modifierOpacity(0.0)
     , m_modifierEraser(0.0)
     , m_modifierLockAlpha(0.0)
-    , m_assistants(false) {}
+    , m_assistants(false)
+    , m_hasMyPaint(false)
+    , m_myPaintPath("")
+    , m_styleInfoVersion(0) {}
 
 //----------------------------------------------------------------------------------------------------------
 
@@ -1985,6 +2046,17 @@ void BrushData::saveData(TOStream &os) {
   os.openChild("Assistants");
   os << (int)m_assistants;
   os.closeChild();
+  os.openChild("StyleInfoVersion");
+  os << 1;  // Version 1 = has style information
+  os.closeChild();
+  os.openChild("HasMyPaint");
+  os << (int)m_hasMyPaint;
+  os.closeChild();
+  if (m_hasMyPaint) {
+    os.openChild("MyPaintPath");
+    os << m_myPaintPath;
+    os.closeChild();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------
@@ -2022,9 +2094,18 @@ void BrushData::loadData(TIStream &is) {
       is >> val, m_modifierLockAlpha = val, is.matchEndTag();
     else if (tagName == "Assistants")
       is >> val, m_assistants = val, is.matchEndTag();
+    else if (tagName == "StyleInfoVersion")
+      is >> m_styleInfoVersion, is.matchEndTag();
+    else if (tagName == "HasMyPaint")
+      is >> val, m_hasMyPaint = val, is.matchEndTag();
+    else if (tagName == "MyPaintPath")
+      is >> m_myPaintPath, is.matchEndTag();
     else
       is.skipCurrentTag();
   }
+  
+  // If StyleInfoVersion is missing, this is an old preset (version 0)
+  // Old presets don't have style information, so we leave m_styleInfoVersion at 0
 }
 
 //----------------------------------------------------------------------------------------------------------

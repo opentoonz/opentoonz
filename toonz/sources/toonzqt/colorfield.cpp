@@ -85,8 +85,8 @@ void CommonChessboard::update() {
                 with a style \b TColorStyle, \b getStyle(), using setStyle().
                 You can pass to constructor square size.
 
-                StyleSample permit to manage click event, it's possile to enable
-   this
+                StyleSample permit to manage click event, it's possible to
+   enable this
                 feature setting enableClick(bool on) to true.
                 If it is enable when click in square class emit the signal
                 clicked(const TColorStyle &style).
@@ -299,7 +299,7 @@ ChannelField::ChannelField(QWidget *parent, const QString &string, int value,
 
   //----layout
   QGridLayout *mainLayout = new QGridLayout(this);
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setSpacing(3);
   {
     mainLayout->addWidget(channelName, 0, 0);
@@ -447,7 +447,7 @@ ColorField::ColorField(QWidget *parent, bool isAlphaActive, TPixel32 color,
     , m_useStyleEditor(useStyleEditor) {
   setMaximumHeight(squareSize);
   QHBoxLayout *layout = new QHBoxLayout(this);
-  layout->setMargin(0);
+  layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(5);
 
   layout->setSizeConstraint(QLayout::SetFixedSize);
@@ -839,13 +839,13 @@ CleanupColorField::CleanupColorField(QWidget *parent,
   //---- layout
 
   QHBoxLayout *mainLay = new QHBoxLayout();
-  mainLay->setMargin(8);
+  mainLay->setContentsMargins(8, 8, 8, 8);
   mainLay->setSpacing(5);
   {
     mainLay->addWidget(m_colorSample, 0);
 
     QVBoxLayout *paramLay = new QVBoxLayout();
-    paramLay->setMargin(0);
+    paramLay->setContentsMargins(0, 0, 0, 0);
     paramLay->setSpacing(3);
     {
       paramLay->addWidget(m_brightnessChannel);

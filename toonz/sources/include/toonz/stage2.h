@@ -82,6 +82,7 @@ public:
                             bool ignoreAP) {
     autoCloseSettings =
         AutocloseSettings(distance, angle, opacity, ignoreAP);
+    TAutocloser::clearSegmentCache();
   }
 
   private : int m_mask;

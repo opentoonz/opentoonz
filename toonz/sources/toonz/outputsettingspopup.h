@@ -118,7 +118,7 @@ protected slots:
   void onFrameFldEditFinished();
   void onResampleChanged(int type);
   void onChannelWidthChanged(int type);
-  void onLinearColorSpaceChecked(int state);
+  void onLinearColorSpaceClicked(bool checked);
   void onColorSpaceGammaEdited();
   void onGammaFldEditFinished();
   void onDominantFieldChanged(int type);

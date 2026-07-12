@@ -7,6 +7,7 @@
 
 #include "tcommon.h"
 #include <QString>
+#include <string>
 
 class TFilePath;
 

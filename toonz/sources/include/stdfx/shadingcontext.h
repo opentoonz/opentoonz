@@ -13,6 +13,7 @@
 
 // Qt includes
 #include <QDateTime>
+#include <QString>
 #include <QOpenGLFramebufferObjectFormat>
 #include <QOpenGLWidget>
 
@@ -30,9 +31,7 @@
 
 //    Forward declarations
 
-class QObject;
 class QOpenGLShaderProgram;
-class QDateTime;
 class QOffscreenSurface;
 
 //=========================================================
@@ -54,12 +53,13 @@ public:
   void doneCurrent();
 
   /*!
-Resizes the output buffer to the specified size. Requires that
-the context is made current before invocation. In case lx or ly are 0,
-the context's output buffer is destroyed.
-*/
-  void resize(int lx, int ly, const QOpenGLFramebufferObjectFormat &fmt =
-                                  QOpenGLFramebufferObjectFormat());
+  Resizes the output buffer to the specified size. Requires that
+  the context is made current before invocation. In case lx or ly are 0,
+  the context's output buffer is destroyed.
+  */
+  void resize(int lx, int ly,
+              const QOpenGLFramebufferObjectFormat &fmt =
+                  QOpenGLFramebufferObjectFormat());
 
   QOpenGLFramebufferObjectFormat format() const;
   TDimension size() const;
@@ -79,12 +79,12 @@ the context's output buffer is destroyed.
   std::pair<QOpenGLShaderProgram *, QDateTime> shaderData(
       const QString &shaderName) const;
 
-  GLuint loadTexture(const TRasterP &src, GLuint texUnit);  //!< Loads a texture
-                                                            //! and binds it to
-  //! the specified
-  //! texture unit.
-  //!  \return  The OpenGL texture id of the loaded texture.      \param src
-  //!  Loaded texture.  \param texUnit  Unit the texture will be bound to.
+  GLuint loadTexture(const TRasterP &src,
+                     GLuint texUnit);  //!< Loads a texture and binds it to
+                                       //! the specified texture unit.
+  //!  \return  The OpenGL texture id of the loaded texture.
+  //!  \param src  Loaded texture.
+  //!  \param texUnit  Unit the texture will be bound to.
   void unloadTexture(GLuint texId);  //!< Releases the specified texture id.
 
   //! Renders the active shader program to the specified raster.
@@ -103,7 +103,7 @@ private:
   ShadingContext &operator=(const ShadingContext &);
 };
 
-class TQOpenGLWidget : public QOpenGLWidget {
+class DVAPI TQOpenGLWidget : public QOpenGLWidget {
 public:
   TQOpenGLWidget();
   void initializeGL() override;

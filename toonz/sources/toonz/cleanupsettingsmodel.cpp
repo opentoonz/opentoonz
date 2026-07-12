@@ -127,7 +127,7 @@ public:
       return false;
     }
 
-    CleanupSettingsModel::instance()->loadSettings(loadPath);
+    CleanupSettingsModel::instance()->loadSettings(loadPath, true);
     return true;
   }
 };
@@ -346,6 +346,12 @@ void CleanupSettingsModel::commitChanges(int action) {
     m_backupParams.assign(currentParams, false);
 
     currentParams->setDirtyFlag(true);
+
+    // Deal with scene stuff
+    if (m_clnPath.isEmpty()) {
+      CleanupParameters::GlobalParameters.assign(currentParams);
+    }
+
     TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   }
 
@@ -353,7 +359,7 @@ void CleanupSettingsModel::commitChanges(int action) {
   int maxAction =
       std::max(action, m_action);  // Add previuosly required actions
   action   = std::min(maxAction,
-                    m_allowedActions);  // But only up to the allowed action
+                      m_allowedActions);  // But only up to the allowed action
   m_action = (action == maxAction)
                  ? NONE
                  : maxAction;  // Then, update the previously required action
@@ -451,7 +457,7 @@ void CleanupSettingsModel::onSceneSwitched() {
   // copy them there.
   CleanupParameters *params = getCurrentParameters();
   CleanupParameters::GlobalParameters.assign(params);
-  
+
   // The cleanupper always uses current cleanup parameters. It has to be
   // specified somewhere,
   // so let's do it once here.
@@ -567,11 +573,7 @@ bool CleanupSettingsModel::saveSettingsIfNeeded() {
     int ret = DVGui::MsgBox(question, QObject::tr("Save"),
                             QObject::tr("Discard"), QObject::tr("Cancel"), 0);
     if (ret == 1) {
-      // WARNING: This is legacy behavior, but is it really needed? I think
-      // there should be no further
-      // request of user interaction - why invoking the popup to choose the save
-      // path?
-      promptSave();
+      saveSettings(m_clnPath);
     } else if (ret == 3)
       return false;
   }
@@ -663,7 +665,8 @@ bool CleanupSettingsModel::loadSettings(CleanupParameters *params,
 
 //-----------------------------------------------------------------------------
 
-bool CleanupSettingsModel::loadSettings(const TFilePath &clnPath) {
+bool CleanupSettingsModel::loadSettings(const TFilePath &clnPath,
+                                        bool isCalledFromLoadSettingsPopup) {
   CleanupParameters *cp = getCurrentParameters();
   if (!loadSettings(cp, clnPath)) return false;
 
@@ -672,6 +675,12 @@ bool CleanupSettingsModel::loadSettings(const TFilePath &clnPath) {
       ->getCurrentCleanupPalette()
       ->setPalette(cp->m_cleanupPalette.getPointer());
 
+  // When this function is called from LoadSettingsPopup, store the loaded
+  // parameters in the Global settings
+  if (isCalledFromLoadSettingsPopup && m_clnPath.isEmpty()) {
+    CleanupParameters::GlobalParameters.assign(
+        cp);  // The global settings are being changed
+  }
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   m_backupParams.assign(cp, false);
 

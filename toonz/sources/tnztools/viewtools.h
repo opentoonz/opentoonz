@@ -19,12 +19,18 @@ class RotateTool final : public QObject, public TTool {
   TPointD m_center;
   bool m_dragging;
   double m_angle;
+  bool m_isCtrlPressed;
+  bool m_isAltPressed;
   TPointD m_oldMousePos;
   TBoolProperty m_cameraCentered;
+  TBoolProperty m_rotateByStep;
+  TDoubleProperty m_rotateStepAngle;
+  TDoubleProperty m_rotateCommandAngle;
   TPropertyGroup m_prop;
+  bool m_firstTime = true;
 
 public:
-  RotateTool();
+  RotateTool(std::string name);
 
   ToolType getToolType() const override { return TTool::GenericTool; }
   void updateMatrix() override { return setMatrix(TAffine()); }
@@ -37,8 +43,14 @@ public:
 
   int getCursorId() const override;
 
+  void onActivate() override;
+  bool onPropertyChanged(std::string propertyName, bool addToUndo) override;
+
   void updateTranslation() override {
     m_cameraCentered.setQStringName(tr("Rotate On Camera Center"));
+    m_rotateByStep.setQStringName(tr("Rotate by Step"));
+    m_rotateStepAngle.setQStringName(tr("Step Angle:"));
+    m_rotateCommandAngle.setQStringName(tr("Rotate Left/Right Angle:"));
   }
 };
 

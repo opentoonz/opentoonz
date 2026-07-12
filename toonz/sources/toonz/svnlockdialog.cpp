@@ -58,7 +58,7 @@ SVNLockDialog::SVNLockDialog(QWidget *parent, const QString &workingDir,
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->setAlignment(Qt::AlignHCenter);
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
 
   QHBoxLayout *hLayout = new QHBoxLayout;
 
@@ -93,7 +93,7 @@ SVNLockDialog::SVNLockDialog(QWidget *parent, const QString &workingDir,
   formLayout->setLabelAlignment(Qt::AlignRight);
   formLayout->setFormAlignment(Qt::AlignHCenter | Qt::AlignTop);
   formLayout->setSpacing(10);
-  formLayout->setMargin(0);
+  formLayout->setContentsMargins(0, 0, 0, 0);
 
   m_commentTextEdit = new QPlainTextEdit;
   m_commentTextEdit->setMaximumHeight(50);
@@ -454,7 +454,7 @@ SVNLockInfoDialog::SVNLockInfoDialog(QWidget *parent, const SVNStatus &status)
   setMinimumSize(300, 150);
 
   QFormLayout *mainLayout = new QFormLayout;
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setLabelAlignment(Qt::AlignLeft);
 
   mainLayout->addRow(tr("<b>Edited By:</b>"), new QLabel(m_status.m_lockOwner));

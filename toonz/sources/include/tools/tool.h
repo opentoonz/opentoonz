@@ -305,8 +305,8 @@ public:
 
   enum ToolHints  //!  Misc flags related with tool
   { HintNone                 = 0,
-    HintAssistants           = 1 << 0, //!< Draw asistants when tool active
-    HintAssistantsGuidelines = 1 << 1, //!< Draw asistant guidelines
+    HintAssistants           = 1 << 0, //!< Draw assistants when tool active
+    HintAssistantsGuidelines = 1 << 1, //!< Draw assistant guidelines
     HintAssistantsEnabled    = 1 << 2, //!< Mark active assistants
     HintReplicators          = 1 << 3, //!< Draw replicators
     HintReplicatorsPoints    = 1 << 4, //!< Draw replicated points

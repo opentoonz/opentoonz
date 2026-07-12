@@ -3,8 +3,9 @@
 [English](../README.md) [日本語](./README_ja.md) 
 
 [![](https://ci.appveyor.com/api/projects/status/oa5l5pc964h8fv49/branch/master?svg=true)](https://ci.appveyor.com/project/opentoonz/opentoonz)
-[![](https://travis-ci.org/opentoonz/opentoonz.svg?branch=master)](https://travis-ci.org/opentoonz/opentoonz)
-[![](https://github.com/opentoonz/opentoonz/workflows/Build/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions)
+[![Build Windows](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_windows.yml/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_windows.yml)
+[![Build macOS](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_macos.yml/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_macos.yml)
+[![Build Linux](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_linux.yml/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_linux.yml)
 [![Translation status](https://hosted.weblate.org/widgets/opentoonz/-/svg-badge.svg)](https://hosted.weblate.org/engage/opentoonz/)
 
 ## 关于OpenToonz
@@ -28,7 +29,7 @@ OpenToonz 是一个由[DWANGO](http://dwango.co.jp/english/)公开发布的二�
 ## 如何在本地构建
 
 - [Windows](./how_to_build_win_chs.md)
-- [OS X](./how_to_build_macosx.md)
+- [macOS](./how_to_build_macosx.md)
 - [Linux](./how_to_build_linux.md)
 - [BSD](./how_to_build_bsd.md)
 
@@ -43,7 +44,7 @@ OpenToonz 是一个由[DWANGO](http://dwango.co.jp/english/)公开发布的二�
 
 ## 许可证
 
-- 对于`thirdparty` 以及`stuff/library/mypaint brushes` 文件夹以外的内容基于Modified BSD License分发。
+- 对于`thirdparty` 以及`stuff/library/mypaint brushes` 文件夹以外的内容基于Modified BSD License分发
   - [modified BSD license](../LICENSE.txt).
   - 基于该许可证，该软件可以被自由用于个人或商业目的使用或修改。
 - 对于 `thirdparty` 文件夹内的内容：

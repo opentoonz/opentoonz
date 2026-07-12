@@ -790,7 +790,7 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WindowFlags flags)
   box->setStyleSheet("#exportPanel { margin: 1px; border: 0px; }");
 
   QVBoxLayout *mainLayout = new QVBoxLayout();
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setSpacing(0);
   mainLayout->setAlignment(Qt::AlignTop);
   // ClipList
@@ -806,7 +806,7 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WindowFlags flags)
   settingsBox->setObjectName("settingsBox");
   settingsBox->setFrameStyle(QFrame::StyledPanel);
   QVBoxLayout *settingsLayout = new QVBoxLayout();
-  settingsLayout->setMargin(15);
+  settingsLayout->setContentsMargins(15, 15, 15, 15);
   settingsLayout->setSpacing(5);
   settingsLayout->setAlignment(Qt::AlignTop);
 
@@ -817,7 +817,7 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WindowFlags flags)
 
   // Label + saveInFileFld
   QHBoxLayout *saveIn = new QHBoxLayout;
-  saveIn->setMargin(0);
+  saveIn->setContentsMargins(0, 0, 0, 0);
   saveIn->setSpacing(5);
   m_saveInFileFld = new DVGui::FileField(settingsBox);
   m_saveInFileFld->setPath(QString::fromStdWString(scenePath.getWideString()));
@@ -829,7 +829,7 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WindowFlags flags)
 
   // Label + m_fileNameFld
   QHBoxLayout *fileNname = new QHBoxLayout;
-  fileNname->setMargin(0);
+  fileNname->setContentsMargins(0, 0, 0, 0);
   fileNname->setSpacing(5);
   m_fileNameFld =
       new DVGui::LineEdit(QString::fromStdWString(sceneName), settingsBox);

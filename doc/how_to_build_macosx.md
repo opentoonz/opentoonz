@@ -5,7 +5,7 @@
 - git
 - brew
 - Xcode
-- cmake (3.2.2 or later)
+- cmake (3.10 or later)
 - Qt 5.x (5.15 or later)
 - boost (1.55.0 or later)
 

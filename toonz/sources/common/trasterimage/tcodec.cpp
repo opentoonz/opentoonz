@@ -570,7 +570,17 @@ void TRasterCodecLz4::decompress(const TRasterP &compressedRas,
 namespace {
 
 bool lzoCompress(const QByteArray src, QByteArray &dst) {
+#ifdef _WIN32
+  QDir exeDir;
+  if (QCoreApplication::applicationName() == "ToonzPreview") {
+    QStringList paths = QCoreApplication::libraryPaths();
+    exeDir            = QDir(paths.first());
+  } else
+    exeDir = QDir(QCoreApplication::applicationDirPath());
+#else
   QDir exeDir(QCoreApplication::applicationDirPath());
+#endif  // _WIN32
+
   QString compressExe = exeDir.filePath("lzocompress");
   QProcess process;
   process.start(compressExe, QStringList() << QString::number(src.size()));
@@ -582,7 +592,17 @@ bool lzoCompress(const QByteArray src, QByteArray &dst) {
 }
 
 bool lzoDecompress(const QByteArray src, int dstSize, QByteArray &dst) {
+#ifdef _WIN32
+  QDir exeDir;
+  if (QCoreApplication::applicationName() == "ToonzPreview") {
+    QStringList paths = QCoreApplication::libraryPaths();
+    exeDir            = QDir(paths.first());
+    exeDir.cdUp();
+  } else
+    exeDir = QDir(QCoreApplication::applicationDirPath());
+#else
   QDir exeDir(QCoreApplication::applicationDirPath());
+#endif  // _WIN32
   QString decompressExe = exeDir.filePath("lzodecompress");
   QProcess process;
   process.start(decompressExe, QStringList() << QString::number(dstSize)
@@ -593,7 +613,7 @@ bool lzoDecompress(const QByteArray src, int dstSize, QByteArray &dst) {
   dst = process.readAll();
   return process.exitCode() == 0 && dst.size() == dstSize;
 }
-}
+}  // namespace
 
 //------------------------------------------------------------------------------
 

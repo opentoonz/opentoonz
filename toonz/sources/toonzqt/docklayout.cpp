@@ -11,59 +11,48 @@
 #include <QDesktopWidget>
 
 //========================================================
-
 // TO DO:
-//  * Usa la macro QWIDGETSIZE_MAX per max grandezza settabile per una widget
-//      => Dopodiche', basterebbe troncare tutte le somme che eccedono quel
-//      valore... Comunque...
-//  * Il ricalcolo delle extremal sizes e' inutile nei resize events... Cerca di
-//  tagliare cose di questo tipo - ottimizza!
-//      => Pero' e' sensato in generale che redistribute possa ricalcolarle -
-//      forse si potrebbe fare una redistribute
-//         con un bool di ingresso. Se l'operazione contenitrice non puo'
-//         cambiare le extremal sizes, allora metti false..
-//  * Implementa gli stretch factors
-
-//  * Nascondere le finestre dockate...? Molto rognoso...
-
-//  * Una dock widget potrebbe non avere i soli stati docked e floating... Che
-//  succede se e' una subwindow
-//    non dockata in un dockLayout??
-//  * Spezzare tdockwindows.h in tmainwindow.h e tdockwidget.h, come in Qt?
-//  * Muovere o fare operazioni su una dockWidget allo stato attuale non e'
-//  sicuro se quella non e' assegnata ad
-//    un DockLayout!! Comunque, si puo' assumere che il parente di una
-//    DockWidget non sia nemmeno una QWidget
-//    che implementa un DockLayout. Questa cosa puo' venire meno in
-//    un'implementazione specifica come TDockWidget?
-//      Esempio: vedi calculateDockPlaceholders ad un drag, viene lanciato
-//      comunque...
-//  * Ha senso mettere DockLayout e DockWidget nella DVAPI? Forse se definissi
-//  delle inline opportune in TDockWidget...
-//  * Quanto contenuto in DockSeparator::mousePress e mouseMove dovrebbe essere
-//  reso pubblico. Anche la geometria
-//    delle regioni potrebbe essere editabile dall'utente... ma prima si
-//    dovrebbero fare gli stretch factors!!
-//      > Ossia: se si vuole esplicitamente settare la geometria di una regione,
-//      si potrebbe fare che quella
-//        si prende stretch factor infinito (o quasi), e gli altri 1...
-//  * Dovrebbe esistere un modo per specificare la posizione dei separatori da
-//  codice?
-//    Rognoso. Comunque, ora basta specificare la geometria delle widget prima
-//    del dock;
-//    la redistribute cerca di adattarsi.
-//  * Capita spesso di considerare l'ipotetica nuova radice della struttura.
-//  Perche' non metterla direttamente??
-
-//  X Non e' possibile coprire tutte le possibilita' di docking con il sistema
-//  attuale, anche se e' comunque piu'
-//    esteso di quello di Qt.
-//      Esempio:           |
+//  * Use the macro QWIDGETSIZE_MAX for the maximum settable size for a widget
+//      => After that, it would be enough to truncate all sums that exceed that
+//      value... Anyway...
+//  * Recalculating extremal sizes is useless in resize events... Try to cut
+//  such things - optimize!
+//      => However, it generally makes sense for redistribute to recalculate
+//      them - maybe we could make a redistribute with a bool input.
+//      If the containing operation cannot change the
+//      extremal sizes, then set false..
+//  * Implement stretch factors
+//  * Hiding docked windows...? Very tricky...
+//  * A dock widget might not only have docked and floating states... What
+//  happens if it is a subwindow not docked in a dockLayout??
+//  * Split tdockwindows.h into tmainwindow.h and tdockwidget.h, as in Qt?
+//  * Moving or performing operations on a dockWidget in its current state is
+//  not safe if it is not assigned to a DockLayout!! However, it can be
+//  assumed that the parent of a DockWidget is not even a QWidget
+//  that implements a DockLayout. This assumption may break in a specific
+//  implementation like TDockWidget?
+//      Example: see calculateDockPlaceholders on drag, it gets called anyway...
+//  * Does it make sense to put DockLayout and DockWidget in DVAPI? Perhaps if I
+//  defined appropriate inlines in TDockWidget...
+//  * What is contained in DockSeparator::mousePress and mouseMove should be
+//  made public. Also the geometry of the regions could be
+//  user-editable... but first stretch factors should be done!!
+//      > I.e., if you explicitly want to set the geometry of a region, you
+//      could do that by setting
+//        that region's stretch factor to infinity (or almost), and the others
+//        to 1...
+//  * There should be a way to specify the position of separators from code?
+//    Tricky. However, now it's enough to specify the geometry of widgets before
+//    docking; redistribute tries to adapt.
+//  * It often happens to consider the hypothetical new root of the structure.
+//  Why not put it directly??
+//  X It is not possible to cover all docking possibilities with the current
+//  system, even if it is more extensive than Qt's.
+//      Example:           |
 //                    -----|
 //                      |  |        => !!
 //                      |-----
 //                      |
-
 //========================================================
 
 //------------------------
@@ -71,10 +60,8 @@
 //------------------------
 
 // QRectF::toRect seems to work in the commented way inside the following
-// function.
-// Of course that way the rect borders are *not* approximated to the nearest
-// integer
-// coordinates:
+// function. Of course that way the rect borders are
+// *not* approximated to the nearest integer coordinates:
 //  e.g.:   topLeft= (1/3, 1/3); width= 4/3, height= 4/3 => left= top= right=
 //  bottom= 0.
 inline QRect toRect(const QRectF &rect) {
@@ -83,8 +70,6 @@ inline QRect toRect(const QRectF &rect) {
   return QRect(rect.topLeft().toPoint(),
                rect.bottomRight().toPoint() -= QPoint(1, 1));
 }
-
-//========================================================
 
 //-----------------
 //    Dock Layout
@@ -126,17 +111,15 @@ void DockLayout::addItem(QLayoutItem *item) {
   // Check if item is already under layout's control. If so, quit.
   if (find(addedItem)) return;
 
-  // Force reparentation. This is required in order to ensure that all items
-  // possess
+  // Force reparenting to unify the coordinate system for all items.
   // the same geometry() reference. Also store parentLayout for convenience.
   addedItem->m_parentLayout = this;
   addedItem->setParent(parentWidget());
 
   // Remember that reparenting a widget produces a window flags reset if the new
   // parent is not the current one (see Qt's manual). So, first reassign
-  // standard
-  // floating flags, then call for custom appearance (which may eventually
-  // reassign the flags).
+  // standard floating flags, then call for
+  // custom appearance (which may eventually reassign the flags).
   addedItem->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint);
   addedItem->setFloatingAppearance();
 
@@ -213,8 +196,6 @@ QSize DockLayout::sizeHint() const {
 
   // return QSize(0,0);
 }
-
-//-------------------------------------
 
 //----------------------
 //    Custom methods
@@ -294,8 +275,6 @@ void DockLayout::setMaximized(DockWidget *item, bool state) {
     }
   }
 }
-
-//======================================================================
 
 //======================================
 //      Layout Geometry Handler
@@ -480,8 +459,8 @@ void DockLayout::redistribute() {
     std::vector<QSize> maxSizes;
 
     // Recompute extremal region sizes
-    // NOTA: Sarebbe da fare solo se un certo flag lo richiede; altrimenti tipo
-    // per resize events e' inutile...
+    // NOTE: This should only be done if a certain flag requires it;
+    // otherwise, for things like resize events, it is useless...
 
     // let's force the width of the film strip / style editor not to change
     // check recursively from the root region, if the widgets can be fixed.
@@ -508,8 +487,16 @@ void DockLayout::redistribute() {
     if (m_regions.front()->getMinimumSize(Region::horizontal) > parentWidth ||
         m_regions.front()->getMinimumSize(Region::vertical) > parentHeight ||
         m_regions.front()->getMaximumSize(Region::horizontal) < parentWidth ||
-        m_regions.front()->getMaximumSize(Region::vertical) < parentHeight)
+        m_regions.front()->getMaximumSize(Region::vertical) < parentHeight) {
+      // Restore original sizes before returning
+      if (!fromDocking && widgetsCanBeFixedWidth) {
+        for (int i = 0; i < widgets.size(); ++i) {
+          widgets[i]->setMinimumSize(minSizes[i]);
+          widgets[i]->setMaximumSize(maxSizes[i]);
+        }
+      }
       return;
+    }
 
     // Recompute Layout geometry
     m_regions.front()->setGeometry(contentsRect());
@@ -532,8 +519,6 @@ void DockLayout::redistribute() {
   // Finally, apply Region geometries found
   applyGeometry();
 }
-
-//======================================================================
 
 //=============================
 //    Region implementation
@@ -744,15 +729,12 @@ void DockLayout::dockItem(DockWidget *item, DockWidget *target,
 //------------------------------------------------------
 
 //! Docks input \b item into Region \b r, at position \b idx; returns region
-//! corresponding to
-//! newly inserted item.
+//! corresponding to newly inserted item.
 
 //!\b NOTE: Unlike dockItem(DockWidget*,DockPlaceholder*) and undockItem, this
 //! method is supposedly called directly into application code; therefore, no \b
-//! redistribution
-//! is done after a single dock - you are supposed to manually call
-//! redistribute() after
-//! all widgets have been docked.
+//! redistribution is done after a single dock you are supposed to manually call
+//! redistribute() after all widgets have been docked.
 Region *DockLayout::dockItem(DockWidget *item, Region *r, int idx) {
   item->setWindowFlags(Qt::SubWindow);
   item->show();
@@ -762,10 +744,8 @@ Region *DockLayout::dockItem(DockWidget *item, Region *r, int idx) {
 //------------------------------------------------------
 
 // Internal docking function. Contains raw docking code, excluded reparenting
-// (setWindowFlags)
-// which may slow down a bit - should be done only after a redistribute() and a
-// repaint() on
-// real-time docking.
+// (setWindowFlags)  which may slow down a bit should be done only
+// after a redistribute() and a repaint() on real-time docking.
 Region *DockLayout::dockItemPrivate(DockWidget *item, Region *r, int idx) {
   // hide minimize button in FlipboolPanel
   item->onDock(true);
@@ -817,7 +797,7 @@ Region *DockLayout::dockItemPrivate(DockWidget *item, Region *r, int idx) {
 //! A region is empty, if contains no item and no children.
 static bool isEmptyRegion(Region *r) {
   if ((!r->getItem()) && (r->getChildList().size() == 0)) {
-    delete r;  // Be', e' un po' improprio, ma funziona...
+    delete r;  // Well, it's a bit improper, but it works...
     return true;
   }
   return false;
@@ -849,9 +829,7 @@ void Region::removeItem(DockWidget *item) {
             remainingSon->setItem(0);
           } else {
             // remainingSon is a branch: append remainingSon childList to parent
-            // one and
-            // sign this and remainingSon nodes for destruction.
-
+            // one and sign this and remainingSon nodes for destruction.
             // First find this position in parent
             unsigned int j = parent->find(this);
 
@@ -890,9 +868,8 @@ void Region::removeItem(DockWidget *item) {
 //! Undocks \b item and updates geometry.
 
 //!\b NOTE: Window flags are reset to floating appearance (thus hiding the
-//! widget). Since the geometry
-//! reference changes a geometry() update may be needed - so item's show() is
-//! not forced here. You should
+//! widget). Since the geometry reference changes a geometry() update
+//! may be needed - so item's show() is not forced here. You should
 //! eventually remember to call it manually after this.
 bool DockLayout::undockItem(DockWidget *item) {
   // Find item's region index in m_regions
@@ -913,9 +890,8 @@ bool DockLayout::undockItem(DockWidget *item) {
       return false;
   }
 
-  // Remove region in regions list
-  // m_regions.erase(i);   //Don't - m_regions is cleaned before the end by
-  // remove_if
+  // Remove region in regions list m_regions.erase(i);
+  // Don't - m_regions is cleaned before the end by remove_if
   itemCarrier->setItem(0);
 
   std::deque<Region *>::iterator j;
@@ -925,10 +901,9 @@ bool DockLayout::undockItem(DockWidget *item) {
   // Update status
   // qDebug("Undock");
   item->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint);
-  // NOTA: Usando la flag Qt::Window il focus viene automaticamente riassegnato,
-  // con un po' di ritardo.
-  // Usando Tool questo non accade. In questo caso, i placeholder devono essere
-  // disattivati...
+  // NOTE: Using the Qt::Window flag, focus is automatically reassigned, with a
+  // slight delay. Using Tool this does not happen.
+  // In this case, placeholders must be disabled...
 
   item->setFloatingAppearance();
   item->m_floating = true;
@@ -952,8 +927,7 @@ static void calculateNearest(std::vector<double> target,
                              std::vector<double> &nearest,
                              std::vector<std::pair<int, int>> intervals,
                              double sum) {
-  // Solving a small Lagrange multipliers problem to find solution on constraint
-  // (2)
+  // Solve Lagrange for constraint (2)
   assert(target.size() == intervals.size());
 
   unsigned int i;
@@ -967,14 +941,11 @@ static void calculateNearest(std::vector<double> target,
   for (i = 0; i < target.size(); ++i) nearest[i] = target[i] + multiplier;
 
   // Now, constraint (1) is not met; however, satisfying also (2) yields a
-  // hyperRect
-  // on which we must find the nearest point to our above partial solution. In
-  // particular,
-  // it can be demonstrated that at least one coordinate of the current partial
-  // solution is related
+  // hyperRect on which we must find the nearest point to our above
+  // partial solution. In particular, it can be demonstrated that at
+  // least one coordinate of the current partial solution is related
   // to the final one (...). This mean that we may have to solve sub-problems of
-  // this same kind,
-  // with less variable coordinates.
+  // this same kind, with less variable coordinates.
 
   unsigned int max;
   double distance, maxDistance = 0;
@@ -1125,8 +1096,7 @@ int Region::calculateMinimumSize(bool direction, bool recalcChildren) {
   }
 
   // If m_orientation is coherent with input direction, minimum occupied space
-  // is the sum
-  // of childs' minimumSizes. Otherwise, the maximum is taken.
+  // is the sum of childs' minimumSizes. Otherwise, the maximum is taken.
   if (m_orientation == direction) {
     return m_minimumSize[direction] = sumMinSizes;
   } else {
@@ -1168,8 +1138,7 @@ int Region::calculateMaximumSize(bool direction, bool recalcChildren) {
   }
 
   // If m_orientation is coherent with input direction, maximum occupied space
-  // is the sum
-  // of childs' maximumSizes. Otherwise, the minimum is taken.
+  // is the sum of childs' maximumSizes. Otherwise, the minimum is taken.
   if (m_orientation == direction) {
     return m_maximumSize[direction] = sumMaxSizes;
   } else {
@@ -1387,8 +1356,6 @@ bool DockLayout::isPossibleRemoval(DockWidget *item, Region *parentRegion,
   return result;
 }
 
-//========================================================
-
 //===================
 //    Save & Load
 //===================
@@ -1595,23 +1562,19 @@ bool DockLayout::restoreState(const State &state) {
   // redistribute();
 
   // NOTE: The previous might be tempting to ensure all is right -
-  // unfortunately, it may
-  // be that the main window's content rect is not yet defined before it is
-  // shown the first
-  // time (like on MAC), and that is needed to redistribute. Se we force the
-  // saved values
-  //(assuming they are right)...
+  // unfortunately, it may be that the main window's content rect
+  // is not yet defined before it is shown the first
+  // time (like on MAC), and that is needed to redistribute. So we force the
+  // saved values (assuming they are right)...
   applyGeometry();
 
   // Finally, set maximized dock widget
   if (maximizedItem != -1) {
     item = static_cast<DockWidget *>(m_items[maximizedItem]->widget());
 
-    // Problema: Puo' essere, in fase di caricamento dati, che la contentsRect
-    // del layout
-    // venga sballata! (vv. lo ctor di TMainWindow) Allora, evitiamo il
-    // controllo fatto
-    // in setMazimized, e assumiamo sia per forza corretto...
+    // Problem: During data loading, the contentsRect of the layout
+    // may be off! (see TMainWindow ctor) So, we skip the check performed
+    // in setMaximized, and assume it is correct...
     // setMaximized(item, true);
 
     m_maximizedDock   = item;
@@ -1659,8 +1622,6 @@ void Region::restoreGeometry() {
 
   return;
 }
-
-//========================================================================
 
 //---------------------------
 //    Dock Deco Allocator

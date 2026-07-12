@@ -6,6 +6,7 @@
 #include "toonzqt/selection.h"
 #include "tgeometry.h"
 #include <set>
+#include <QList>
 
 class TimeStretchPopup;
 class ReframePopup;
@@ -55,12 +56,12 @@ public:
   void cutCells();
   void cutCells(bool withoutCopy);
 
-  /*- セルの上書きペースト -*/
+  /*- Overwrite paste cells -*/
   void overWritePasteCells();
   // paste cell numbers only
   void overwritePasteNumbers();
 
-  //! \note: puo' anche essere r0>r1 o c0>c1
+  //! \note: r0, c0, r1, c1 can be in any order (r0>r1 or c0>c1)
   void selectCells(int r0, int c0, int r1, int c1);
   void selectCell(int row, int col);
   void selectNone() override;
@@ -127,7 +128,7 @@ public:
 
   static bool isEnabledCommand(std::string commandId);
 
-  void createBlankDrawing(int row, int col, bool inRange);
+  void createBlankDrawing(int row, int col, bool multiple);
   void createBlankDrawings();
   void fillEmptyCell();
   int getResizePivotRow() const { return m_resizePivotRow; }

@@ -55,18 +55,22 @@ enum CommandType {
   MenuRenderCommandType,
   MenuViewCommandType,
   MenuWindowsCommandType,
+  CustomPanelCommandType,
   MenuHelpCommandType,
   PlaybackCommandType,
   RGBACommandType,
   FillCommandType,
   ToolCommandType,
   ToolModifierCommandType,
+  BrushPresetCommandType,
+  BrushSizeCommandType,
   ZoomCommandType,
   MiscCommandType,
   StopMotionCommandType,
   CellMarkCommandType,
   MenuCommandType,
   VisualizationButtonCommandType,
+  SpecialModifierKeyType,
   HiddenCommandType
 };
 

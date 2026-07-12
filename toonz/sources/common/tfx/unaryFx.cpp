@@ -142,7 +142,37 @@ TFx *NaAffineFx::clone(bool recursive) const {
 
 //--------------------------------------------------
 
+void NaAffineFx::doDryCompute(TRectD &rect, double frame,
+                              const TRenderSettings &info) {
+  // keep the level column dpi affine for an fx which need to be applied to the
+  // full sampled image (see Iwa_SmootherFx)
+  if (getName() == L"LevelColumn AffineFx") {
+    for (auto data : info.m_data) {
+      LevelColumnAffineFxRenderData *levelColumnData =
+          dynamic_cast<LevelColumnAffineFxRenderData *>(data.getPointer());
+      if (levelColumnData && levelColumnData->m_isSet == false) {
+        levelColumnData->m_aff   = getPlacement(frame);
+        levelColumnData->m_isSet = true;
+      }
+    }
+  }
+  TRasterFx::doDryCompute(rect, frame, info);
+}
+
+//--------------------------------------------------
+
 FX_IDENTIFIER_IS_HIDDEN(NaAffineFx, "naAffineFx")
+
+//==================================================================
+// LevelColumnAffineFxRenderData implementation
+//==================================================================
+
+bool LevelColumnAffineFxRenderData::operator==(
+    const TRasterFxRenderData &data) const {
+  const LevelColumnAffineFxRenderData *theData =
+      dynamic_cast<const LevelColumnAffineFxRenderData *>(&data);
+  return theData->m_aff == m_aff && theData->m_isSet == m_isSet;
+}
 
 //==================================================================
 //  ColumnColorFilterFx
@@ -226,7 +256,7 @@ public:
     enableComputeInFloat(true);
   };
 
-  ~InvertFx(){};
+  ~InvertFx() {};
 
   bool canHandle(const TRenderSettings &info, double frame) override {
     return true;

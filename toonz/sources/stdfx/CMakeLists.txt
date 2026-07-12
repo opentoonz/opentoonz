@@ -91,6 +91,7 @@ set(HEADERS
     iwa_flowblurfx.h
     iwa_flowpaintbrushfx.h
     iwa_motionflowfx.h
+    naru_graph.h
 )
 
 if(OpenCV_FOUND)
@@ -270,8 +271,8 @@ set(SOURCES
     iwa_noise1234.cpp
     iwa_pnperspectivefx.cpp
     iwa_soapbubblefx.cpp
-    ${SDKROOT}/kiss_fft130/kiss_fft.c
-    ${SDKROOT}/kiss_fft130/tools/kiss_fftnd.c
+    ${SDKROOT}/kiss_fft/kiss_fft.c
+    ${SDKROOT}/kiss_fft/kiss_fftnd.c
     iwa_bokehfx.cpp
     iwa_timecodefx.cpp
     iwa_bokehreffx.cpp
@@ -290,6 +291,8 @@ set(SOURCES
     iwa_flowblurfx.cpp
     iwa_flowpaintbrushfx.cpp
     iwa_motionflowfx.cpp
+    iwa_smootherfx.cpp
+    naru_lazybrush.cpp
 )
 
 if(OpenCV_FOUND)
@@ -326,7 +329,7 @@ else()
 endif()
 
 include_directories(
-    ${SDKROOT}/kiss_fft130
+    ${SDKROOT}/kiss_fft
 )
 
 _find_toonz_library(TNZLIBS "tnzcore;tnzbase;toonzlib")

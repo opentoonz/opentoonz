@@ -414,7 +414,7 @@ void ExportOCACommand::execute() {
     rasVectors->setChecked(true);
 
     QGridLayout *customLay = new QGridLayout();
-    customLay->setMargin(5);
+    customLay->setContentsMargins(5, 5, 5, 5);
     customLay->setSpacing(5);
     customLay->addWidget(exrImageFormat, 0, 0);
     customLay->addWidget(rasVectors, 1, 0);

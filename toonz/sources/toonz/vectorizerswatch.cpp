@@ -414,7 +414,7 @@ VectorizerSwatchArea::VectorizerSwatchArea(QWidget *parent) {
   setLayout(lay);
   lay->addWidget(m_leftSwatch);
   lay->addWidget(m_rightSwatch);
-  lay->setMargin(0);
+  lay->setContentsMargins(0, 0, 0, 0);
 
   setMinimumHeight(150);
 

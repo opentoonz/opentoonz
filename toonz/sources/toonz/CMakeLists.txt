@@ -1,4 +1,4 @@
-set(VERSION 1.7.1)
+set(VERSION 1.8)
 
 set(MOC_HEADERS
     addfilmstripframespopup.h
@@ -90,6 +90,8 @@ set(MOC_HEADERS
     sceneviewer.h
     sceneviewercontextmenu.h
     scriptconsolepanel.h
+    brushpresetpanel.h
+    toolpropertiespanel.h
     separatecolorspopup.h
     separatecolorsswatch.h
     shortcutpopup.h
@@ -131,6 +133,7 @@ set(MOC_HEADERS
     tooloptionsshortcutinvoker.h
     exportxsheetpdf.h
     custompanelmanager.h
+    toolpresetcommandmanager.h
     custompaneleditorpopup.h
     convertfolderpopup.h
     exportcameratrackpopup.h
@@ -202,6 +205,7 @@ set(HEADERS
     ../include/orientation.h
     ../include/saveloadqsettings.h
     xdtsio.h
+    sxfio.h
     levelcommand.h
 # Tracker file
     ObjectTracker.h
@@ -300,6 +304,8 @@ set(SOURCES
     sceneviewercontextmenu.cpp
     scenesettingspopup.cpp
     scriptconsolepanel.cpp
+    brushpresetpanel.cpp
+    toolpropertiespanel.cpp
     shortcutpopup.cpp
     soundtrackexport.cpp
     startuppopup.cpp
@@ -322,6 +328,7 @@ set(SOURCES
     filmstripcommand.cpp
     iocommand.cpp
     levelcommand.cpp
+    viewercommand.cpp
     print.cpp
     subscenecommand.cpp
     svncleanupdialog.cpp
@@ -383,6 +390,7 @@ set(SOURCES
     separatecolorsswatch.cpp
     separatecolorspopup.cpp
     xdtsio.cpp
+    sxfio.cpp
     ocaio.cpp
     xdtsimportpopup.cpp
     expressionreferencemanager.cpp
@@ -390,6 +398,7 @@ set(SOURCES
     tvpjson_io.cpp
     exportxsheetpdf.cpp
     custompanelmanager.cpp
+    toolpresetcommandmanager.cpp
     custompaneleditorpopup.cpp
     convertfolderpopup.cpp
     exportcameratrackpopup.cpp
@@ -425,9 +434,6 @@ else()
     )
 endif()
 
-if(WITH_TRANSLATION)
-    add_translation(toonz ${HEADERS} ${SOURCES})
-endif()
 
 set(OBJCSOURCES filebrowsermodel.cpp)
 
@@ -462,6 +468,11 @@ else()
     #    -DTAPPTOOLS_EXPORTS
     #    -DTTEST_EXPORTS
     #)
+endif()
+
+if(WITH_TRANSLATION)
+    add_translation(toonz ${HEADERS} ${SOURCES})
+    add_compile_translations_command(OpenToonz toonz)
 endif()
 
 if(BUILD_TARGET_WIN)
@@ -530,7 +541,7 @@ elseif(BUILD_ENV_APPLE)
 
     _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;toonzlib;colorfx;tnzext;image;sound;toonzqt;tnztools")
 
-    # 変なところにライブラリ生成するカスども
+    # Workaround for non-standard library output locations
     set(EXTRA_LIBS ${EXTRA_LIBS} "$<TARGET_FILE:tnzstdfx>" "$<TARGET_FILE:tfarm>")
     set(X64ONLY_LIBS)
     if(PLATFORM EQUAL 64)
@@ -540,11 +551,14 @@ elseif(BUILD_ENV_APPLE)
         endif()
     endif()
 
+    target_link_directories(OpenToonz PRIVATE ${MYPAINT_LIB_LIBRARY_DIRS})
+
     target_link_libraries(OpenToonz
         Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml
         Qt5::Script Qt5::Widgets Qt5::PrintSupport Qt5::Multimedia Qt5::MultimediaWidgets Qt5::UiTools
         ${GL_LIB} ${GLUT_LIB}
         ${COCOA_LIB} ${EXTRA_LIBS} ${X64ONLY_LIBS} mousedragfilter
+        ${MYPAINT_LIB_LIBRARIES}
     )
 
     # ADDED/UPDATED: Expanded dependencies for all libs and utilities (ensures build order)
@@ -563,7 +577,7 @@ elseif(BUILD_ENV_APPLE)
 elseif(BUILD_ENV_UNIXLIKE)
     _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;toonzlib;colorfx;tnzext;image;sound;toonzqt;tnztools")
 
-    # 変なところにライブラリ生成するカスども
+    # Workaround for non-standard library output locations
     set(EXTRA_LIBS ${EXTRA_LIBS} "$<TARGET_FILE:tnzstdfx>" "$<TARGET_FILE:tfarm>")
 
     set(EXTRA_LIBS ${EXTRA_LIBS} ${Boost_LIBRARIES} ${OPENBLAS_LIB} ${EXECINFO_LIBRARY})
@@ -585,7 +599,7 @@ endif()
 
 if(BUILD_ENV_APPLE)
     # CMAKE_RUNTIME_OUTPUT_DIRECTORY should be equivalent to usage on windows despite empty
-    # OSX だと CMAKE_RUNTIME_OUTPUT_DIRECTORY が空だが Windows 版と同じ使い方ができるようにしておく
+    # On OSX, CMAKE_RUNTIME_OUTPUT_DIRECTORY is empty; ensuring it can be used the same way as the Windows version.
     # Removed: get_target_property(bin OpenToonz LOCATION)
     # Use generator expression for runtime directory
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "$<TARGET_FILE_DIR:OpenToonz>")

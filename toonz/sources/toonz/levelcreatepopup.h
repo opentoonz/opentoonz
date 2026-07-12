@@ -8,10 +8,19 @@
 #include "toonzqt/intfield.h"
 #include "toonzqt/filefield.h"
 
-// forward declaration
+// Qt forward declarations
+#include <QObject>
+#include <QString>
+
 class QLabel;
 class QComboBox;
-// class DVGui::MeasuredDoubleLineEdit;
+class QPushButton;
+class QShowEvent;
+
+namespace DVGui {
+class LineEdit;
+class MeasuredDoubleLineEdit;
+}  // namespace DVGui
 
 //=============================================================================
 // LevelCreatePopup
@@ -20,13 +29,16 @@ class QComboBox;
 class LevelCreatePopup final : public DVGui::Dialog {
   Q_OBJECT
 
+  // UI Widgets
   DVGui::LineEdit *m_nameFld;
   DVGui::IntLineEdit *m_fromFld;
   DVGui::IntLineEdit *m_toFld;
-  QComboBox *m_levelTypeOm;
   DVGui::IntLineEdit *m_stepFld;
   DVGui::IntLineEdit *m_incFld;
+
+  QComboBox *m_levelTypeOm;
   DVGui::FileField *m_pathFld;
+
   QLabel *m_widthLabel;
   QLabel *m_heightLabel;
   QLabel *m_dpiLabel;
@@ -39,27 +51,37 @@ class LevelCreatePopup final : public DVGui::Dialog {
   QPushButton *m_frameFormatBtn;
 
 public:
-  LevelCreatePopup();
+  explicit LevelCreatePopup();
 
+  // Disable copying
+  LevelCreatePopup(const LevelCreatePopup &)            = delete;
+  LevelCreatePopup &operator=(const LevelCreatePopup &) = delete;
+
+  // Widget state control
   void setSizeWidgetEnable(bool isEnable);
   void setRasterWidgetVisible(bool isVisible);
 
+  // Getters
   int getLevelType() const;
 
+  // Operations
   void update();
   bool apply();
 
 protected:
-  // set m_pathFld to the default path
+  // Set m_pathFld to the default path
   void updatePath();
   void nextName();
-  void showEvent(QShowEvent *) override;
-  bool levelExists(std::wstring levelName);
 
-public slots:
+  // Event handlers
+  void showEvent(QShowEvent *event) override;
+
+  // Validation
+  bool levelExists(const std::wstring &levelName);
+
+public Q_SLOTS:
   void onLevelTypeChanged(int index);
   void onOkBtn();
-
   void onApplyButton();
   void onFrameFormatButton();
 };

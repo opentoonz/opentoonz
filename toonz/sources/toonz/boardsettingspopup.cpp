@@ -385,7 +385,7 @@ ItemInfoView::ItemInfoView(QWidget* parent) : QStackedWidget(parent) {
   //----- layout
 
   QGridLayout* mainLay = new QGridLayout();
-  mainLay->setMargin(5);
+  mainLay->setContentsMargins(5, 5, 5, 5);
   mainLay->setHorizontalSpacing(3);
   mainLay->setVerticalSpacing(10);
   {
@@ -398,13 +398,13 @@ ItemInfoView::ItemInfoView(QWidget* parent) : QStackedWidget(parent) {
     mainLay->addWidget(m_typeCombo, 1, 1);
 
     QVBoxLayout* extraInfoLay = new QVBoxLayout();
-    extraInfoLay->setMargin(0);
+    extraInfoLay->setContentsMargins(0, 0, 0, 0);
     extraInfoLay->setSpacing(0);
     {
       extraInfoLay->addWidget(m_textEdit, 1);
 
       QGridLayout* imgPropLay = new QGridLayout();
-      imgPropLay->setMargin(0);
+      imgPropLay->setContentsMargins(0, 0, 0, 0);
       imgPropLay->setHorizontalSpacing(3);
       imgPropLay->setVerticalSpacing(10);
       {
@@ -425,7 +425,7 @@ ItemInfoView::ItemInfoView(QWidget* parent) : QStackedWidget(parent) {
       extraInfoLay->addSpacing(5);
 
       QGridLayout* fontPropLay = new QGridLayout();
-      fontPropLay->setMargin(0);
+      fontPropLay->setContentsMargins(0, 0, 0, 0);
       fontPropLay->setHorizontalSpacing(3);
       fontPropLay->setVerticalSpacing(10);
       {
@@ -701,11 +701,11 @@ ItemListView::ItemListView(QWidget* parent) : QWidget(parent) {
   m_list->setMaximumWidth(225);
 
   QHBoxLayout* mainLay = new QHBoxLayout();
-  mainLay->setMargin(5);
+  mainLay->setContentsMargins(5, 5, 5, 5);
   mainLay->setSpacing(5);
   {
     QVBoxLayout* buttonsLay = new QVBoxLayout();
-    buttonsLay->setMargin(0);
+    buttonsLay->setContentsMargins(0, 0, 0, 0);
     buttonsLay->setSpacing(3);
     {
       buttonsLay->addWidget(newItemBtn, 0);
@@ -890,15 +890,15 @@ BoardSettingsPopup::BoardSettingsPopup(QWidget* parent)
   //--- layout
 
   QHBoxLayout* mainLay = new QHBoxLayout();
-  mainLay->setMargin(0);
+  mainLay->setContentsMargins(0, 0, 0, 0);
   mainLay->setSpacing(10);
   {
     QVBoxLayout* leftLay = new QVBoxLayout();
-    leftLay->setMargin(0);
+    leftLay->setContentsMargins(0, 0, 0, 0);
     leftLay->setSpacing(0);
     {
       QHBoxLayout* leftTopLay = new QHBoxLayout();
-      leftTopLay->setMargin(5);
+      leftTopLay->setContentsMargins(5, 5, 5, 5);
       leftTopLay->setSpacing(3);
       {
         leftTopLay->addWidget(new QLabel(tr("Duration (frames):"), this), 0);
@@ -924,7 +924,7 @@ BoardSettingsPopup::BoardSettingsPopup(QWidget* parent)
     mainLay->addLayout(leftLay, 1);
 
     QVBoxLayout* rightLay = new QVBoxLayout();
-    rightLay->setMargin(0);
+    rightLay->setContentsMargins(0, 0, 0, 0);
     rightLay->setSpacing(15);
     {
       rightLay->addWidget(m_itemInfoView, 0);

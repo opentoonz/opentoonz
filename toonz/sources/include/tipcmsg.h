@@ -35,6 +35,9 @@ class MessageParser {
   tipc::Stream *m_stream;
 
 public:
+  // Virtual destructor ensures proper cleanup of derived classes
+  virtual ~MessageParser() = default;
+
   virtual QString header() const        = 0;
   virtual void operator()(Message &msg) = 0;
 

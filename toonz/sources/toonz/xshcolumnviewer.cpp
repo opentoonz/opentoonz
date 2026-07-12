@@ -1949,14 +1949,14 @@ m_value->setFont(font);*/
   }
 
   QGridLayout *mainLayout = new QGridLayout();
-  mainLayout->setMargin(3);
+  mainLayout->setContentsMargins(3, 3, 3, 3);
   mainLayout->setHorizontalSpacing(6);
   mainLayout->setVerticalSpacing(6);
   {
     mainLayout->addWidget(new QLabel(tr("Opacity:"), this), 0, 0,
                           Qt::AlignRight | Qt::AlignVCenter);
     QHBoxLayout *hlayout = new QHBoxLayout;
-    hlayout->setMargin(0);
+    hlayout->setContentsMargins(0, 0, 0, 0);
     hlayout->setSpacing(3);
     {
       hlayout->addWidget(m_slider);
@@ -1972,7 +1972,7 @@ m_value->setFont(font);*/
 
     if (m_lockBtn) {
       QHBoxLayout *lockLay = new QHBoxLayout();
-      lockLay->setMargin(0);
+      lockLay->setContentsMargins(0, 0, 0, 0);
       lockLay->setSpacing(3);
       {
         lockLay->addWidget(m_lockBtn, 0);
@@ -2122,12 +2122,12 @@ SoundColumnPopup::SoundColumnPopup(QWidget *parent)
   QLabel *sliderLabel = new QLabel(tr("Volume:"), this);
 
   QVBoxLayout *mainLayout = new QVBoxLayout();
-  mainLayout->setMargin(3);
+  mainLayout->setContentsMargins(3, 3, 3, 3);
   mainLayout->setSpacing(3);
   {
     QHBoxLayout *hlayout = new QHBoxLayout;
     // hlayout->setContentsMargins(0, 3, 0, 3);
-    hlayout->setMargin(0);
+    hlayout->setContentsMargins(0, 0, 0, 0);
     hlayout->setSpacing(3);
     hlayout->addWidget(sliderLabel, 0);
     hlayout->addWidget(m_slider);
@@ -3080,23 +3080,25 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
     if (!xsh->isColumnEmpty(col)) {
       menu.addAction(cmdManager->getAction(MI_ReplaceLevel));
       menu.addAction(cmdManager->getAction(MI_ReplaceParentDirectory));
+    }
 
-      // if (containsVectorLevel(col)) {
-      //  menu.addSeparator();
-      //  QAction *setMask =
-      //      new QAction(tr("Temporary Mask (Not in final render)"), this);
-      //  setMask->setCheckable(true);
-      //  setMask->setChecked(xsh->getColumn(col)->isMask());
-      //  setMask->setToolTip(
-      //      tr("Only Toonz Vector levels can be used as masks. \n Masks don't
-      //      "
-      //         "show up in final renders."));
-      //  bool ret = true;
-      //  ret      = ret &&
-      //        connect(setMask, &QAction::toggled, [=]() { onSetMask(col); });
-      //  assert(ret);
-      //  menu.addAction(setMask);
-      //}
+    if (o->isVerticalTimeline()) {
+      menu.addSeparator();
+      QAction *showParentColors =
+          new QAction(tr("Show Column Parent Colors"), this);
+      showParentColors->setCheckable(true);
+      showParentColors->setChecked(
+          Preferences::instance()->isParentColorsInXsheetColumnEnabled());
+      showParentColors->setToolTip(
+          tr("Show the column parent's color in the Xsheet"));
+
+      connect(showParentColors, &QAction::toggled, [=]() {
+        Preferences::instance()->setValue(
+            parentColorsInXsheetColumn,
+            showParentColors->isChecked() ? true : false);
+      });
+      menu.addAction(showParentColors);
+   
     }
   }
 

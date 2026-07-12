@@ -41,7 +41,7 @@ FileField::FileField(QWidget *parent, QString path, bool readOnly,
   setFocusProxy(m_field);
 
   QHBoxLayout *mainLayout = new QHBoxLayout();
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setSpacing(1);
   {
     mainLayout->addWidget(m_field, 5);

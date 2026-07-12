@@ -4,17 +4,17 @@
 <context>
     <name>Preferences</name>
     <message>
-        <location filename="../../toonzlib/preferences.cpp" line="101"/>
+        <location filename="../../toonzlib/preferences.cpp" line="100"/>
         <source>Retas Level Format</source>
         <translation>Formát úrovně RETAS</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/preferences.cpp" line="107"/>
+        <location filename="../../toonzlib/preferences.cpp" line="110"/>
         <source>Adobe Photoshop</source>
         <translation>Adobe Photoshop</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/preferences.cpp" line="207"/>
+        <location filename="../../toonzlib/preferences.cpp" line="213"/>
         <source>PNG</source>
         <translation>PNG</translation>
     </message>
@@ -22,34 +22,34 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../toonzlib/avicodecrestrictions.cpp" line="86"/>
+        <location filename="../../toonzlib/avicodecrestrictions.cpp" line="99"/>
         <source>No restrictions for uncompressed avi video</source>
         <translation>Žádná omezení pro nezabalený obrazový záznam AVI</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/avicodecrestrictions.cpp" line="93"/>
+        <location filename="../../toonzlib/avicodecrestrictions.cpp" line="106"/>
         <source>It is not possible to communicate with the codec.
  Probably the codec cannot work correctly.</source>
         <translation>Není možné komunikovat s kodekem.
 Pravděpodobně kodek nemůže pracovat řádně.</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/avicodecrestrictions.cpp" line="125"/>
+        <location filename="../../toonzlib/avicodecrestrictions.cpp" line="138"/>
         <source>video width must be a multiple of %1</source>
         <translation>Šířka obrazu musí být násobkem %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/avicodecrestrictions.cpp" line="139"/>
+        <location filename="../../toonzlib/avicodecrestrictions.cpp" line="152"/>
         <source>video length must be a multiple of %1</source>
         <translation>Délka obrazu musí být násobkem %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/avicodecrestrictions.cpp" line="145"/>
+        <location filename="../../toonzlib/avicodecrestrictions.cpp" line="158"/>
         <source>No restrictions for this codec</source>
         <translation>Žádná omezení pro tento kodek</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/avicodecrestrictions.cpp" line="147"/>
+        <location filename="../../toonzlib/avicodecrestrictions.cpp" line="160"/>
         <source>Resolution restrictions:</source>
         <translation>Omezení pro rozlišení:</translation>
     </message>
@@ -159,62 +159,67 @@ Pravděpodobně kodek nemůže pracovat řádně.</translation>
         <translation>Přesunout složku se studiovou paletou: %1 : %2 &gt; %3</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="251"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="250"/>
         <source>Arrange Styles  in Palette %1</source>
         <translation>Uspořádat styly v paletě: %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="322"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="321"/>
         <source>Create Style#%1  in Palette %2</source>
         <translation>Vytvořit styl #%1 v paletě %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="453"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="452"/>
         <source>Add Style  to Palette %1</source>
         <translation>Přidat styl do palety %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="671"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="672"/>
         <source>Add Page %1 to Palette %2</source>
         <translation>Přidat stranu %1 do palety %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="736"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="737"/>
         <source>Delete Page %1 from Palette %2</source>
         <translation>Smazat stranu %1 z palety %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="791"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="792"/>
         <source>Load Color Model %1  to Palette %2</source>
         <translation>Nahrát barevný model %1 do palety %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="889"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="890"/>
         <source>color model</source>
         <translation>Barevný model</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="1057"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="1058"/>
         <source>Move Page</source>
         <translation>Přesunout stranu</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="1108"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="1109"/>
         <source>Rename Page  %1 &gt; %2</source>
         <translation>Přejmenovat stranu %1 &gt; %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="1172"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="1173"/>
         <source>Rename Style#%1 in Palette%2  : %3 &gt; %4</source>
         <translation>Přejmenovat styl #%1 v paletě %2 : %3 &gt; %4</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="1237"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="1238"/>
         <source>Set Picked Position of Style#%1 in Palette%2 : %3,%4</source>
         <translation>Nastavit zvolenou polohu stylu #%1 v paletě %2 : %3,%4</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="1316"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="1269"/>
+        <source>Set Current Style from #%1 to %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/palettecmd.cpp" line="1358"/>
         <source>Update Colors by Using Picked Positions in Palette %1</source>
         <translation>Obnovit barvy použitím vybraných poloh v paletě %1</translation>
     </message>
@@ -280,37 +285,37 @@ Pravděpodobně kodek nemůže pracovat řádně.</translation>
         <translation>Smazat uzel efektu: %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="2740"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="2723"/>
         <source>Paste Fx  :  </source>
         <translation>Vložit efekt:  </translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3109"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3092"/>
         <source>Disconnect Fx</source>
         <translation>Odpojit od efekt</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3361"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3344"/>
         <source>Connect Fx : %1 - %2</source>
         <translation>Spojit efekt: %1 - %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3543"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3526"/>
         <source>Rename Fx : %1 &gt; %2</source>
         <translation>Přejmenovat efekt: %1 - %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3595"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3578"/>
         <source>Group Fx</source>
         <translation>Seskupit efekt</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3699"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3682"/>
         <source>Ungroup Fx</source>
         <translation>Zrušit seskupení efektu</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3801"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3784"/>
         <source>Rename Group  : %1 &gt; %2</source>
         <translation>Přejmenovat skupinu: %1 &gt; %2</translation>
     </message>
@@ -454,13 +459,13 @@ Pravděpodobně kodek nemůže pracovat řádně.</translation>
         <translation>Nelze zpracovat prázdný záběr</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_outline_vectorizer.cpp" line="41"/>
+        <location filename="../../toonzlib/scriptbinding_outline_vectorizer.cpp" line="44"/>
         <location filename="../../toonzlib/scriptbinding_centerline_vectorizer.cpp" line="43"/>
         <source>Vectorization failed</source>
         <translation>Vektorizace selhala</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="231"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="282"/>
         <source>Argument &apos;%1&apos; does not look like a FrameId</source>
         <translation>Argument &apos;%1&apos; nevypadá jako ID snímku</translation>
     </message>
@@ -475,24 +480,24 @@ Pravděpodobně kodek nemůže pracovat řádně.</translation>
         <translation>Argument nevypadá jako souborová cesta: %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding.cpp" line="75"/>
+        <location filename="../../toonzlib/scriptbinding.cpp" line="85"/>
         <source>%1-%2</source>
         <translation>%1-%2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding.cpp" line="77"/>
+        <location filename="../../toonzlib/scriptbinding.cpp" line="87"/>
         <source>%1</source>
         <translation>%1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding.cpp" line="79"/>
+        <location filename="../../toonzlib/scriptbinding.cpp" line="91"/>
         <source>Expected %1 argument(s) in %2, got %3</source>
         <translation>Očekáván(o) %1 argument(ů) v %2, obdrženo %3</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding.cpp" line="95"/>
-        <source>%1 is not a valid color (valid color names are &apos;red&apos;, &apos;transparent&apos;, &apos;#FF8800&apos;, ecc.)</source>
-        <translation></translation>
+        <location filename="../../toonzlib/scriptbinding.cpp" line="106"/>
+        <source>%1 is not a valid color (valid color names are &apos;red&apos;, &apos;transparent&apos;, &apos;#FF8800&apos;, etc.)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../toonzlib/sceneresources.cpp" line="447"/>
@@ -500,12 +505,12 @@ Pravděpodobně kodek nemůže pracovat řádně.</translation>
         <translation>Nelze uložit</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/sceneresources.cpp" line="521"/>
+        <location filename="../../toonzlib/sceneresources.cpp" line="532"/>
         <source>and %1 more item(s).</source>
         <translation>a %1 další položku(y).</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/sceneresources.cpp" line="524"/>
+        <location filename="../../toonzlib/sceneresources.cpp" line="535"/>
         <source>Failed to save the following resources:
 </source>
         <translation>Nepodařilo se uložit následující zdroje:
@@ -621,22 +626,22 @@ Pravděpodobně kodek nemůže pracovat řádně.</translation>
 <context>
     <name>TScriptBinding::CenterlineVectorizer</name>
     <message>
-        <location filename="../../toonzlib/scriptbinding_centerline_vectorizer.cpp" line="69"/>
+        <location filename="../../toonzlib/scriptbinding_centerline_vectorizer.cpp" line="70"/>
         <source>Can&apos;t vectorize a %1 level</source>
         <translation>Nelze vektorizovat úroveň %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_centerline_vectorizer.cpp" line="72"/>
+        <location filename="../../toonzlib/scriptbinding_centerline_vectorizer.cpp" line="73"/>
         <source>Can&apos;t vectorize a level with no frames</source>
         <translation>Nelze vektorizovat úroveň bez snímků</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_centerline_vectorizer.cpp" line="77"/>
+        <location filename="../../toonzlib/scriptbinding_centerline_vectorizer.cpp" line="78"/>
         <source>Can&apos;t vectorize a %1 image</source>
         <translation>Nelze vektorizovat obrázek %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_centerline_vectorizer.cpp" line="83"/>
+        <location filename="../../toonzlib/scriptbinding_centerline_vectorizer.cpp" line="84"/>
         <source>Bad argument (%1): should be an Image or a Level</source>
         <translation>Špatný argument (%1): měl by to být obrázek nebo úroveň</translation>
     </message>
@@ -724,107 +729,132 @@ Pravděpodobně kodek nemůže pracovat řádně.</translation>
 <context>
     <name>TScriptBinding::Level</name>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="67"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="86"/>
         <source>%1 frames</source>
         <translation>%1 snímků</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="122"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="140"/>
+        <source>Cannot set path on empty level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="153"/>
         <source>Bad argument (%1). It should be FilePath or string</source>
         <translation>Špatný argument (%1): má to být souborová cesta nebo řetězec</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="130"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="163"/>
         <source>Exception loading level (%1)</source>
         <translation>Výjimka při nahrávání úrovně (%1)</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="151"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="189"/>
         <source>File %1 doesn&apos;t exist</source>
         <translation>Soubor %1 neexistuje</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="161"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="200"/>
         <source>File %1 is unsupported</source>
         <translation>Soubor %1 není podporován</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="170"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="211"/>
         <source>Exception reading %1</source>
         <translation>Výjimka při čtení %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="176"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="217"/>
         <source>Can&apos;t save an empty level</source>
         <translation>Nelze uložit prázdnou úroveň</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="196"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="240"/>
+        <source>Unrecognized file type: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="245"/>
+        <source>Can&apos;t save a %1 level to this file type: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="364"/>
+        <source>cannot insert a %1 image into a level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="389"/>
+        <source>cannot insert a %1 image to a %2 level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Unrecognized file type :</source>
-        <translation>Nerozpoznaný typ souboru:</translation>
+        <translation type="vanished">Nerozpoznaný typ souboru:</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="200"/>
         <source>Can&apos;t save a %1 level to this file type : %2</source>
-        <translation>Nelze uložit %1 úroveň do tohoto typu souboru: %2</translation>
+        <translation type="vanished">Nelze uložit %1 úroveň do tohoto typu souboru: %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="209"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="253"/>
         <source>Exception writing %1</source>
         <translation>Výjimka při zápisu %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="264"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="318"/>
         <source>frame index (%1) must be a number</source>
         <translation>Číslo snímku (%1) musí být číslo</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="268"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="323"/>
         <source>frame index (%1) is out of range (0-%2)</source>
         <translation>Číslo snímku (%1) je mimo rozsah (0-%2)</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="291"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="350"/>
         <source>second argument (%1) is not an image</source>
         <translation>druhýý argument (%1) není obrázkem</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="304"/>
         <source>can not insert a %1 image into a level</source>
-        <translation>nelze vložit %1 obrázek do úrovně</translation>
+        <translation type="vanished">nelze vložit %1 obrázek do úrovně</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="325"/>
         <source>can not insert a %1 image to a %2 level</source>
-        <translation>nelze vložit %1 obrázek do %2 úrovně</translation>
+        <translation type="vanished">nelze vložit %1 obrázek do %2 úrovně</translation>
     </message>
 </context>
 <context>
     <name>TScriptBinding::OutlineVectorizer</name>
     <message>
-        <location filename="../../toonzlib/scriptbinding_outline_vectorizer.cpp" line="62"/>
+        <location filename="../../toonzlib/scriptbinding_outline_vectorizer.cpp" line="70"/>
         <source>Can&apos;t vectorize a %1 level</source>
         <translation>Nelze vektorizovat úroveň %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_outline_vectorizer.cpp" line="65"/>
+        <location filename="../../toonzlib/scriptbinding_outline_vectorizer.cpp" line="73"/>
         <source>Can&apos;t vectorize a level with no frames</source>
         <translation>Nelze vektorizovat úroveň bez snímků</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_outline_vectorizer.cpp" line="70"/>
+        <location filename="../../toonzlib/scriptbinding_outline_vectorizer.cpp" line="78"/>
         <source>Can&apos;t vectorize a %1 image</source>
         <translation>Nelze vektorizovat obrázek %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_outline_vectorizer.cpp" line="76"/>
+        <location filename="../../toonzlib/scriptbinding_outline_vectorizer.cpp" line="84"/>
         <source>Bad argument (%1): should be an Image or a Level</source>
         <translation>Špatný argument (%1): měl by to být obrázek nebo úroveň</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_outline_vectorizer.cpp" line="175"/>
+        <location filename="../../toonzlib/scriptbinding_outline_vectorizer.cpp" line="182"/>
+        <source>Invalid color: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Invalid color : </source>
-        <translation>Neplatná barva: </translation>
+        <translation type="vanished">Neplatná barva: </translation>
     </message>
 </context>
 <context>

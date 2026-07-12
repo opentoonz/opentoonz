@@ -404,6 +404,10 @@ signals:
   void currentColumnChanged(int index);
   void editObject();
 
+public slots:
+  // Public wrapper slots for modern Qt5 connection syntax
+  void onHandleReleasedPublic() { onHandleReleased(); }
+
 protected slots:
   void onHandleReleased();
 };
@@ -567,7 +571,7 @@ protected slots:
 
 //========================================================
 //
-// class StageSchematicSplineNode
+// class StageSchematicGroupNode
 //
 //========================================================
 

@@ -3,8 +3,10 @@
 [English](../README.md)
 
 [![](https://ci.appveyor.com/api/projects/status/oa5l5pc964h8fv49/branch/master?svg=true)](https://ci.appveyor.com/project/opentoonz/opentoonz)
-[![](https://travis-ci.org/opentoonz/opentoonz.svg?branch=master)](https://travis-ci.org/opentoonz/opentoonz)
-[![](https://github.com/opentoonz/opentoonz/workflows/Build/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions)
+[![Build Windows](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_windows.yml/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_windows.yml)
+[![Build macOS](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_macos.yml/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_macos.yml)
+[![Build Linux](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_linux.yml/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_linux.yml)
+[![Translation status](https://hosted.weblate.org/widgets/opentoonz/-/svg-badge.svg)](https://hosted.weblate.org/engage/opentoonz/)
 
 ## これは何？
 
@@ -24,7 +26,13 @@
 ## ビルド方法
 
 - [Windows](./how_to_build_win_ja.md)
-- [OS X](./how_to_build_macosx_ja.md)
+- [macOS](./how_to_build_macosx_ja.md)
+- [Linux](./how_to_build_linux.md)（英語）
+- [BSD](./how_to_build_bsd.md)（英語）
+
+スタイルシートのビルド方法は[こちら](./how_to_stylesheet.md)（英語）をご覧ください。
+
+開発はできないけれど協力したい方は、[こちらの手順](./how_to_test_prs.md)（英語）でマージ前のプルリクエストのテストにご協力いただけます。
 
 ### ライセンス
 
@@ -35,4 +43,4 @@
   - 各ディレクトリ内の README やソースコードに記載されたライセンスに従ってください
 
 ### Special Thanks
-This Open Source Program is developed from Toonz, a software originally created by Digital Video, S.p.A., Rome Italy
+This open-source program is developed from Toonz, a software originally created by Digital Video, S.p.A., Rome, Italy

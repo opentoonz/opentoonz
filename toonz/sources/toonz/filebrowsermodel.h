@@ -6,6 +6,7 @@
 #include <QAbstractItemModel>
 #include <QPixmap>
 #include <QMap>
+#include <QRegularExpression>
 #include "tfilepath.h"
 #include "toonz/toonzfolders.h"
 
@@ -44,7 +45,7 @@ public:
 
   void removeChildren(int row, int count);
   void addChild(DvDirModelNode *child);
-  virtual void visualizeContent(FileBrowser *browser) {}  // ?????????????
+  virtual void visualizeContent(FileBrowser *browser) {}
 
   virtual QPixmap getPixmap(bool isOpen) const;
 
@@ -54,25 +55,25 @@ public:
   virtual void refreshChildren() = 0;
   virtual bool hasChildren();
 
-  virtual int rowByName(const std::wstring &name) const {
-    return -1;
-  }  // ?????????????
+  virtual int rowByName(const std::wstring &name) const { return -1; }
 
   void enableRename(bool enabled) { m_renameEnabled = enabled; }
   bool isRenameEnabled() const { return m_renameEnabled; }
 
-  virtual bool isFolder(const TFilePath &folderPath) const {
-    return false;
-  }  // ?????????????
+  virtual bool isFolder(const TFilePath &folderPath) const { return false; }
   virtual bool isFolder() const { return false; }
 
-  bool areChildrenValid() const { return m_childrenValid; }  // ?????????????
+  bool areChildrenValid() const { return m_childrenValid; }
 
   std::string getNodeType() const { return m_nodeType; }
 
-  virtual DvDirModelNode *getNodeByPath(const TFilePath &path) { return 0; }
+  virtual DvDirModelNode *getNodeByPath(const TFilePath &path) {
+    return nullptr;
+  }
 
-  virtual DvDirVersionControlRootNode *getVersionControlRootNode() { return 0; }
+  virtual DvDirVersionControlRootNode *getVersionControlRootNode() {
+    return nullptr;
+  }
 };
 
 //-----------------------------------------------------------------------------
@@ -94,7 +95,7 @@ public:
 
   QPixmap getPixmap(bool isOpen) const override;
   TFilePath getPath() const { return m_path; }
-  void visualizeContent(FileBrowser *browser) override;  //?????????????
+  void visualizeContent(FileBrowser *browser) override;
 
   void refreshChildren() override;
   bool hasChildren() override;
@@ -175,7 +176,8 @@ public:
   void getChildrenNames(std::vector<std::wstring> &names) const override;
 
   QList<TFilePath> getMissingFiles() const;
-  QStringList getMissingFiles(const QRegExp &filter) const;
+  QStringList getMissingFiles(
+      const QRegularExpression &filter) const;  // Updated from QRegExp
   QList<TFilePath> getMissingFolders() const;
 
   void insertVersionControlStatus(const QString &fileName, SVNStatus status);
@@ -272,7 +274,7 @@ class DvDirModelDayNode final : public DvDirModelNode {
 public:
   DvDirModelDayNode(DvDirModelNode *parent, std::wstring dayDateString);
   void refreshChildren() override {}
-  void visualizeContent(FileBrowser *browser) override;  //??????????????????
+  void visualizeContent(FileBrowser *browser) override;
   QPixmap getPixmap(bool isOpen) const override;
 };
 

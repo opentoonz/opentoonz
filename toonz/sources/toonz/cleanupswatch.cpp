@@ -23,7 +23,7 @@ CleanupSwatch::CleanupSwatch(QWidget *parent, int lx, int ly)
 {
   setStyleSheet("background: transparent");
   QHBoxLayout *layout = new QHBoxLayout(this);
-  layout->setMargin(0);
+  layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(0);
 
   m_leftSwatch = new CleanupSwatchArea(this, true);

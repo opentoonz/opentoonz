@@ -227,10 +227,10 @@ public:
   }
 
 private:
-  // disable
-  Rotator();
-  Rotator(const Rotator&);
-  Rotator& operator=(const Rotator&) {return *this;}
+  // disable 
+  Rotator() = delete;
+  Rotator(const Rotator&) = delete;
+  Rotator& operator=(const Rotator&) = delete;
 };
 //------------------------------------------------------------------
 

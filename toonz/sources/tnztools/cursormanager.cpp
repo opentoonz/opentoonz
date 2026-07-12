@@ -63,6 +63,7 @@ const struct {
     {ToolCursor::LevelSelectCursor, "level_select", 7, 3, true},
     {ToolCursor::MagnetCursor, "magnet", 18, 18, true},
     {ToolCursor::PanCursor, "pan", 17, 17, true},
+    {ToolCursor::ScrubCursor, "scrub", 17, 17, false},
 
     {ToolCursor::PickerCursorLine, "", 0, 0, false},
     {ToolCursor::PickerCursorLineBase, "picker_style", 7, 22, true},

@@ -92,7 +92,7 @@ public:
                 This class is used to store and retrieve the id associated to an
    object.
                 \sa TPersist::getStreamTag().
-                The class is istantiated by the macro  PERSIST_DECLARATION(T).
+                The class is instantiated by the macro PERSIST_DECLARATION(T).
         */
 class DVAPI TPersistDeclaration {
   std::string m_id;

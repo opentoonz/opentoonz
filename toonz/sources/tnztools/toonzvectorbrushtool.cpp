@@ -976,7 +976,7 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
       }
     } else
     if (m_firstFrameId == getFrameId()) {
-      // painted of first frame agein, so
+      // painted of first frame again, so
       // just replace the remembered strokes for first frame
       copyStrokes(m_firstStrokes, strokes);
       m_rangeTracks = m_tracks;

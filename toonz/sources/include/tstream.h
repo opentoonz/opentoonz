@@ -4,6 +4,9 @@
 #define TSTREAM_H
 
 #include <memory>
+#include <utility>
+#include <map>
+#include <string>
 
 // TnzCore includes
 #include "tpixel.h"
@@ -30,9 +33,10 @@
 class TPersist;
 class TFilePath;
 
-typedef std::pair<int, int>
-    VersionNumber;  //!< Integer pair storing the major and minor
-                    //!  application version numbers.
+// use using instead of typedef
+using VersionNumber =
+    std::pair<int, int>;  //!< Integer pair storing the major and minor
+                          //!  application version numbers.
 
 //===================================================================
 
@@ -60,8 +64,13 @@ public:
   TIStream(const TFilePath &is);  //!< Opens the document at the specified path
   ~TIStream();                    //!< Destroys the stream
 
-  //! \sa std::basic_istream::operator void*().
-  operator bool() const;  //!< Returns whether the stream has a valid status.
+  // Add move operations
+  TIStream(TIStream &&other) noexcept;
+  TIStream &operator=(TIStream &&other) noexcept;
+
+  // Explicit bool conversion
+  explicit operator bool()
+      const;  //!< Returns whether the stream has a valid status.
 
   TIStream &operator>>(int &v);           //!< Reads an integer from the stream
   TIStream &operator>>(double &v);        //!< Reads a double from the stream
@@ -72,14 +81,14 @@ public:
   TIStream &operator>>(TPixel64 &v);      //!< Reads a TPixel64 from the stream
 
 #ifndef TNZCORE_LIGHT
-  TIStream &operator>>(QString &v);  //!< Reads an integer from the stream
+  TIStream &operator>>(QString &v);  //!< Reads a QString from the stream
 #endif
 
   /*! \detail
 This function dispatches the loading process to the derived class'
 reimplementation of the TPersist::loadData() function.
 
-\note Unlinke operator>>(TPersist*&), this function \a requires that
+\note Unlike operator>>(TPersist*&), this function \a requires that
     the passed object is of the \b correct type to read the current tag.
 */
   TIStream &operator>>(
@@ -88,11 +97,11 @@ reimplementation of the TPersist::loadData() function.
                                        //! derived object data from the stream.
   //!  \sa operator>>(TPersist&)
 
-  //!  \deprecated
+  //!  \deprecated Use string extraction operators instead
   std::string
   getString();  //!< Returns the stream content as a string, up to the next tag.
 
-  //!  \deprecated
+  //!  \deprecated Use matchEndTag() instead
   bool eos();  //!< \brief Returns \e true in case of end of string (a
                //! StreamTag::EndTag
   //!  is encountered or the string is empty).
@@ -116,25 +125,25 @@ reimplementation of the TPersist::loadData() function.
 \return           Whether the tag attribute was found.
 */
   bool getTagParam(std::string paramName, std::string &value);
-  bool getTagParam(std::string paramName,
-                   int &value);  //!< \sa getTagParam(string, string&)
+  bool getTagParam(std::string paramName, int &value);
 
   bool isBeginEndTag();  //!< Returns whether current tag is of type
                          //! StreamTag::BeginEndTag.
 
-  bool openChild(
-      std::string &tagName);  //!< \deprecated Use matchTag(string&) instead.
-  void closeChild();          //!< \deprecated Use matchEndTag() instead.
+  //! \deprecated Use matchTag() instead
+  bool openChild(std::string &tagName);
+  //! \deprecated Use matchEndTag() instead
+  void closeChild();
 
-  bool match(char c) const;  //! \deprecated
+  //! \deprecated
+  bool match(char c) const;
 
-  std::string getTagAttribute(
-      std::string name) const;  //!< \sa getTagParam(string, string&),
-  //!  TOStream::openChild(string, const map<std::string, string>&).
+  std::string getTagAttribute(std::string name) const;
 
   TFilePath getFilePath();  //!< Returns the stream's path (i.e. the opened
                             //! filename associated to the input stream).
-  TFilePath getRepositoryPath();  //!< \deprecated
+  //! \deprecated
+  TFilePath getRepositoryPath();
 
   int getLine()
       const;  //!< Returns the line number of the stream <TT><B>+1</B></TT>.
@@ -144,10 +153,10 @@ reimplementation of the TPersist::loadData() function.
       const;  //!< Returns the currently stored version of the opened document.
               //!  \sa setVersion()
 
-  void setVersion(const VersionNumber &version);  //!< Returns the currently
+  void setVersion(const VersionNumber &version);  //!< Sets the currently
                                                   //! stored version of the
   //! opened document.
-  //!  \sa setVersion()
+  //!  \sa getVersion()
   /*!
 \note After skipping the tag content, the stream is positioned immediately
     after the end tag.
@@ -158,18 +167,35 @@ reimplementation of the TPersist::loadData() function.
   std::string getCurrentTagName();
 
 private:
-  // Not copyable
-  TIStream(const TIStream &);             //!< Not implemented
-  TIStream &operator=(const TIStream &);  //!< Not implemented
+  // Delete copy operations instead of declaring without implementation
+  TIStream(const TIStream &)            = delete;
+  TIStream &operator=(const TIStream &) = delete;
 };
 
 //-------------------------------------------------------------------
 
+// Fix memory leak in template function
 template <class T>
 TIStream &operator>>(TIStream &is, T *&v) {
-  TPersist *persist = 0;
+  TPersist *persist = nullptr;
   is >> persist;
-  v = persist ? dynamic_cast<T *>(persist) : 0;
+
+  // Use unique_ptr for automatic cleanup if cast fails
+  std::unique_ptr<TPersist> persistGuard(persist);
+
+  if (persistGuard) {
+    v = dynamic_cast<T *>(persistGuard.get());
+    if (v) {
+      // Cast succeeded, release ownership
+      persistGuard.release();
+    } else {
+      // Cast failed, unique_ptr will automatically delete
+      v = nullptr;
+    }
+  } else {
+    v = nullptr;
+  }
+
   return is;
 }
 
@@ -187,12 +213,6 @@ class DVAPI TOStream {
   class Imp;
   std::shared_ptr<Imp> m_imp;
 
-private:
-  explicit TOStream(std::shared_ptr<Imp> imp);  //!< deprecated
-
-  TOStream(TOStream &&);
-  TOStream &operator=(TOStream &&);
-
 public:
   /*!
 \param fp           Output file path
@@ -209,8 +229,12 @@ public:
            bool compressed = false);  //!< Opens the specified file for write
   ~TOStream();  //!< Closes the file and destroys the stream
 
-  //! \sa std::basic_ostream::operator void*().
-  operator bool() const;  //!< Returns whether the stream has a valid status.
+  TOStream(TOStream &&other);
+  TOStream &operator=(TOStream &&other);
+
+  // Explicit bool conversion
+  explicit operator bool()
+      const;  //!< Returns whether the stream has a valid status.
 
   TOStream &operator<<(int v);           //!< Writes an int to the stream.
   TOStream &operator<<(double v);        //!< Writes a double to the stream.
@@ -227,38 +251,32 @@ public:
   TOStream &operator<<(QString v);  //!< Writes a QString to the stream.
 #endif
 
-  TOStream &operator<<(
-      TPersist *v);  //!< deprecated Use operator<<(TPersist&) instead.
+  //! \deprecated Use operator<<(TPersist&) instead
+  TOStream &operator<<(TPersist *v);
+
   TOStream &operator<<(TPersist &v);  //!< Saves data to the stream according
   //!  to the reimplemented TPersist::saveData.
 
   //! \deprecated Use openChild(string) instead
   TOStream child(std::string tagName);
 
-  void openChild(std::string tagName);  //!< Writes a <tagName> to the stream,
-                                        //! opening a tag.
-  void openChild(
-      std::string tagName,
-      const std::map<std::string, std::string>
-          &attributes);  //!< \brief Writes a <tagName attribute1="value1" ..>
-  //!  to the stream, opening a tag with embedded attributes.
+  void openChild(std::string tagName);
+  void openChild(std::string tagName,
+                 const std::map<std::string, std::string> &attributes);
   void openCloseChild(std::string tagName,
-                      const std::map<std::string, std::string>
-                          &attributes);  //!< \brief Writes a tag <tagName
-                                         //! attribute1="value1" ../>
-  //!  to the stream, opening a tag with embedded attributes
-  //!  which is immediately closed.
+                      const std::map<std::string, std::string> &attributes);
 
   void closeChild();  //!< Closes current tag, writing </currentTagName> to the
                       //! stream.
 
-  void cr();  //!< Writes carriage return to the stream. \deprecated
+  void cr();  //!< Writes carriage return to the stream.
 
-  void tab(int dt);  //!< \deprecated
+  void tab(int dt);  //!< Adjusts indentation.
 
   TFilePath getFilePath();  //!< Returns the file path of the file associated to
                             //! this output stream.
-  TFilePath getRepositoryPath();  //!< \deprecated
+  //! \deprecated
+  TFilePath getRepositoryPath();
 
   /*! \detail
 This function is similar to operator bool(), but \b flushes the stream before
@@ -271,9 +289,12 @@ checking the status.
   std::string getCurrentTagName();
 
 private:
+  // Keep deprecated constructor private
+  explicit TOStream(std::shared_ptr<Imp> imp);
+
   // Not copyable
-  TOStream(const TOStream &) = delete;             //!< Not implemented
-  TOStream &operator=(const TOStream &) = delete;  //!< Not implemented
+  TOStream(const TOStream &)            = delete;
+  TOStream &operator=(const TOStream &) = delete;
 };
 
 #endif  // TSTREAM_H

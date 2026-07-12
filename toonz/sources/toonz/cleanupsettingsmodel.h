@@ -143,7 +143,8 @@ public:
   void setCommitMask(CommitMask allowedProcessing);
 
   void saveSettings(const TFilePath &clnPath);
-  bool loadSettings(const TFilePath &clnPath);
+  bool loadSettings(const TFilePath &clnPath,
+                    bool isCalledFromLoadSettingsPopup = false);
 
   //! Prompts to save current settings in case they have been modified. Returns
   //! false if the

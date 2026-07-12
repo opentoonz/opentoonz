@@ -322,11 +322,11 @@ ChannelHisto::ChannelHisto(int channelIndex, bool *showComparePtr,
 
   // layout
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setSpacing(2);
   {
     QHBoxLayout *titleLay = new QHBoxLayout();
-    titleLay->setMargin(0);
+    titleLay->setContentsMargins(0, 0, 0, 0);
     titleLay->setSpacing(2);
     {
       titleLay->addWidget(new QLabel(label, this), 0);
@@ -510,13 +510,13 @@ ComboHistogram::ComboHistogram(QWidget *parent)
 
   // layout
   QVBoxLayout *mainLayout = new QVBoxLayout();
-  mainLayout->setMargin(5);
+  mainLayout->setContentsMargins(5, 5, 5, 5);
   mainLayout->setSpacing(5);
   {
     mainLayout->addWidget(m_histograms[4]);  // RGB
 
     QHBoxLayout *labelLay = new QHBoxLayout();
-    labelLay->setMargin(0);
+    labelLay->setContentsMargins(0, 0, 0, 0);
     labelLay->setSpacing(0);
     {
       labelLay->addWidget(new QLabel(tr("Picked Color"), this), 0);
@@ -532,7 +532,7 @@ ComboHistogram::ComboHistogram(QWidget *parent)
     mainLayout->addWidget(m_rectAverageRgbLabel, 0, Qt::AlignCenter);
 
     QHBoxLayout *infoParamLay = new QHBoxLayout();
-    infoParamLay->setMargin(5);
+    infoParamLay->setContentsMargins(5, 5, 5, 5);
     infoParamLay->setSpacing(3);
     {
       infoParamLay->addWidget(new QLabel(tr("X:"), this), 1,
@@ -544,7 +544,7 @@ ComboHistogram::ComboHistogram(QWidget *parent)
 
       // range control
       QHBoxLayout *rangeLay = new QHBoxLayout();
-      rangeLay->setMargin(0);
+      rangeLay->setContentsMargins(0, 0, 0, 0);
       rangeLay->setSpacing(0);
       {
         rangeLay->addWidget(m_rangeUpBtn, 0);

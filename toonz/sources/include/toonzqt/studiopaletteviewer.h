@@ -121,8 +121,7 @@ protected slots:
 
   void onCurrentItemChanged(QTreeWidgetItem *current,
                             QTreeWidgetItem *previous);
-  /*! When expand a tree, prepare the child items of it */
-  void onTreeItemExpanded(QTreeWidgetItem *);
+
   /*! Refresh tree only when this widget has focus*/
   void onRefreshTreeShortcutTriggered();
 
@@ -166,10 +165,10 @@ protected:
 
   /*! Return current item path. */
   TFilePath getCurrentFolderPath();
-  /*! Return item identified by \b path; if it doesn't exist return 0. */
+  /*! Return item identified by \b path; if it doesn't exist return nullptr. */
   QTreeWidgetItem *getItem(const TFilePath path);
   /*! Return item child of \b parent identified by \b path; if it doesn't exist
-   * return 0. */
+   * return nullptr. */
   QTreeWidgetItem *getFolderItem(QTreeWidgetItem *parent, const TFilePath path);
 
   void resetDropItem();
@@ -177,10 +176,6 @@ protected:
   void paintEvent(QPaintEvent *event) override;
   /*! Open a context menu considering current item data role \b Qt::UserRole. */
   void contextMenuEvent(QContextMenuEvent *event) override;
-  /*! Add an action to menu \b menu; the action has text \b name and its
-                  \b triggered() signal is connetted with \b slot. */
-  void createMenuAction(QMenu &menu, const char *id, QString name,
-                        const char *slot);
   /*! If button left is pressed start drag and drop. */
   void mousePressEvent(QMouseEvent *event) override;
   void mouseMoveEvent(QMouseEvent *event) override;
@@ -196,7 +191,7 @@ protected:
   /*! Execute drop event. If dropped palette is in studio palette folder move
                   palette, otherwise copy palette in current folder. */
   void dropEvent(QDropEvent *event) override;
-  /*! Set dropItem to 0 and update the tree. */
+  /*! Set dropItem to nullptr and update the tree. */
   void dragLeaveEvent(QDragLeaveEvent *event) override;
 };
 

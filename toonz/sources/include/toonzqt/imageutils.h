@@ -106,6 +106,8 @@ void DVAPI convert(
 
 bool DVAPI isAAImage(TFilePath path);
 
+bool DVAPI isPaintedImage(TFilePath path);
+
 void DVAPI convertNaa2Tlv(
     const TFilePath &source,  //!< Level path to convert from.
     const TFilePath &dest,    //!< Level path to convert to.
@@ -216,7 +218,7 @@ public:
   ShortcutZoomer(
       QWidget *viewerWidget);  //!< Constructs on the specified viewer widget.
 
-  virtual ~ShortcutZoomer() { }
+  virtual ~ShortcutZoomer() {}
 
   QWidget *getWidget() {
     return m_widget;
@@ -242,6 +244,9 @@ protected:
   virtual bool setFlipY() {
     return false;
   }  //!< Handler for 'flip viewer horizontally' commands.
+  // Handler for 'rotate viewer left/right' commands.
+  virtual bool rotateLeft() { return false; }
+  virtual bool rotateRight() { return false; }
   virtual bool resetZoom() {
     return false;
   }  //!< Handler for 'reset zoom' commands.

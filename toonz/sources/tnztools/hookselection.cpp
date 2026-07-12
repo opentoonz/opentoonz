@@ -221,11 +221,12 @@ void HookSelection::deleteSelectedHooks() {
   TTool::Application *app = TTool::getApplication();
   TTool *tool             = app->getCurrentTool()->getTool();
   if (!app) return;
-  TXshLevel *xl    = app->getCurrentLevel()->getLevel();
-  HookSet *hookSet = xl->getHookSet();
-  if (!xl || !xl->getSimpleLevel() || !hookSet ||
-      xl->getSimpleLevel()->isReadOnly())
+  TXshLevel *xl = app->getCurrentLevel()->getLevel();
+  if (!xl || !xl->getSimpleLevel() || xl->getSimpleLevel()->isReadOnly())
     return;
+
+  HookSet *hookSet = xl->getHookSet();
+  if (!hookSet) return;
 
   HookUndo *undo = new HookUndo(xl->getSimpleLevel());
   TFrameId fid   = tool->getCurrentFid();
@@ -266,20 +267,30 @@ void HookSelection::copySelectedHooks() {
 
 void HookSelection::cutSelectedHooks() {
   copySelectedHooks();
-  TXshLevel *xl    = TTool::getApplication()->getCurrentLevel()->getLevel();
-  TUndo *undo      = new HookUndo(xl);
+  TTool::Application *app = TTool::getApplication();
+  if (!app) return;
+
+  TXshLevel *xl = app->getCurrentLevel()->getLevel();
+  if (!xl) return;
+
   HookSet *hookSet = xl->getHookSet();
+  if (!hookSet) return;
+
+  TUndo *undo = new HookUndo(xl);
   std::set<std::pair<int, int>>::iterator it;
-  for (it = m_hooks.begin(); it != m_hooks.end(); it++) {
+
+  for (it = m_hooks.begin(); it != m_hooks.end(); ++it) {
     Hook *hook = hookSet->getHook(it->first);
-    assert(hook);
-    if (!hook) return;
-    TFrameId fid =
-        TTool::getApplication()->getCurrentTool()->getTool()->getCurrentFid();
+    if (!hook) {
+      // Delete the undo object if a hook is null to prevent memory leak
+      delete undo;
+      return;
+    }
+    TFrameId fid = app->getCurrentTool()->getTool()->getCurrentFid();
     hook->eraseFrame(fid);
   }
   TUndoManager::manager()->add(undo);
-  TTool::getApplication()->getCurrentTool()->getTool()->invalidate();
+  app->getCurrentTool()->getTool()->invalidate();
 }
 
 //---------------------------------------------------------------------------
@@ -288,9 +299,28 @@ void HookSelection::pasteSelectedHooks() {
   const QMimeData *data      = QApplication::clipboard()->mimeData();
   const HooksData *hooksData = dynamic_cast<const HooksData *>(data);
   if (!hooksData) return;
-  TXshLevel *xl = TTool::getApplication()->getCurrentLevel()->getLevel();
-  TUndo *undo   = new HookUndo(xl);
+
+  TTool::Application *app = TTool::getApplication();
+  if (!app) return;
+
+  TXshLevel *xl = app->getCurrentLevel()->getLevel();
+  if (!xl) return;
+
+  // Check if hooks can be restored before creating undo
+  TXshLevelP level = app->getCurrentLevel()->getLevel();
+  if (!level || level->getSimpleLevel()->isReadOnly()) return;
+
+  HookSet *hookSet = level->getHookSet();
+  if (!hookSet) return;
+
+  // Check if there are hooks to restore using the public method
+  if (!hooksData->hasStoredHooks()) {
+    return;  // Nothing to restore
+  }
+
+  TUndo *undo = new HookUndo(xl);
+
   hooksData->restoreHookPositions();
   TUndoManager::manager()->add(undo);
-  TTool::getApplication()->getCurrentTool()->getTool()->invalidate();
+  app->getCurrentTool()->getTool()->invalidate();
 }

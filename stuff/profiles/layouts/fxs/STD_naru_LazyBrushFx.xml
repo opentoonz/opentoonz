@@ -1,0 +1,18 @@
+<fxlayout>
+  <page name="LazyBrush Config">
+    <control>mode</control>
+    <control>blend_mode</control>
+
+    <separator label="Auto Scribble Settings"/>
+    <control>enable_auto_scribble</control>
+    <control>auto_scribble_color</control>
+    <control>enable_auto_bg_scribble</control>
+    <control>ref_bgcolor</control>
+    <control>auto_scribble_threshold</control>
+
+   	<separator label="Advanced"/>
+    <control>log_scale</control>
+    <control>scr_type</control>
+    <control>lambda</control>
+  </page>
+</fxlayout>

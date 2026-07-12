@@ -334,13 +334,15 @@ if(BUILD_TARGET_WIN)
     )
 endif()
 
-if(WITH_TRANSLATION)
-    add_translation(toonzlib ${HEADERS} ${SOURCES})
-endif()
-
 qt5_wrap_cpp(SOURCES ${MOC_HEADERS})
 
 add_library(toonzlib SHARED ${HEADERS} ${SOURCES})
+
+if(WITH_TRANSLATION)
+    add_translation(toonzlib ${HEADERS} ${SOURCES})
+    add_compile_translations_command(toonzlib toonzlib)
+endif()
+
 if(BUILD_ENV_APPLE)
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-install_name,@executable_path/libtoonzlib.dylib")
     add_dependencies(toonzlib tnzcore tnzbase tnzext)

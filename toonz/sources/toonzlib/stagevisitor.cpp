@@ -129,7 +129,7 @@ QImage rasterToQImage(const TRasterP &ras) {
 
 //! Draw orthogonal projection of \b bbox onto x-axis and y-axis.
 void draw3DShadow(const TRectD &bbox, double z, double phi) {
-  // bruttino assai, ammetto
+  // Not the most elegant solution
 
   double a = bigBoxSize[0];
   double b = bigBoxSize[1];
@@ -207,6 +207,28 @@ void onPlasticDeformedImage(TStageObject *playerObj,
                             const Stage::Player &player,
                             const ImagePainter::VisualSettings &vs,
                             const TAffine &viewAff);
+
+//----------------------------------------------------------------
+// Transparency Check helper
+//----------------------------------------------------------------
+
+// High-tone empty pixels (paint = 0) blended with ink, causing dark gray.
+// Force tone = 255 so quickPut treats them as fully transparent.
+inline void forceHighToneEmptyPixels(TRasterCM32P &ras, int threshold) {
+  if (!ras) return;
+
+  ras->lock();
+  TPixelCM32 *pix    = ras->pixels();
+  TPixelCM32 *endPix = pix + ras->getLx() * ras->getLy();
+
+  for (; pix < endPix; ++pix) {
+    if (pix->getPaint() == 0 && pix->getTone() >= threshold) {
+      pix->setTone(255);
+    }
+  }
+
+  ras->unlock();
+}
 
 }  // namespace
 
@@ -373,27 +395,27 @@ RasterPainter::RasterPainter(const TDimension &dim, const TAffine &viewAff,
 
 //-----------------------------------------------------------------------------
 
-//! Utilizzato solo per TAB Pro
+//! Used only for TAB Pro
 void RasterPainter::beginMask() {
-  flushRasterImages();  // per evitare che venga fatto dopo il beginMask
+  flushRasterImages();  // to avoid doing it after beginMask
   ++m_maskLevel;
   TStencilControl::instance()->beginMask();
 }
-//! Utilizzato solo per TAB Pro
+//! Used only for TAB Pro
 void RasterPainter::endMask() {
-  flushRasterImages();  // se ci sono delle immagini raster nella maschera
-                        // devono uscire ora
+  flushRasterImages();  // if there are raster images in the mask, they must
+                        // come out now
   --m_maskLevel;
   TStencilControl::instance()->endMask();
 }
-//! Utilizzato solo per TAB Pro
+//! Used only for TAB Pro
 void RasterPainter::enableMask() {
   TStencilControl::instance()->enableMask(TStencilControl::SHOW_INSIDE);
 }
-//! Utilizzato solo per TAB Pro
+//! Used only for TAB Pro
 void RasterPainter::disableMask() {
-  flushRasterImages();  // se ci sono delle immagini raster mascherate devono
-                        // uscire ora
+  flushRasterImages();  // if there are masked raster images, they must come out
+                        // now
   TStencilControl::instance()->disableMask();
 }
 
@@ -424,7 +446,7 @@ TRasterP RasterPainter::getRaster(int index, QTransform &matrix) {
   rect = rect * TRect(0, 0, m_dim.lx - 1, m_dim.ly - 1);
 
   TAffine aff = TTranslation(-rect.x0, -rect.y0) * m_nodes[index].m_aff;
-  matrix      = QTransform(aff.a11, aff.a21, aff.a12, aff.a22, aff.a13, aff.a23);
+  matrix = QTransform(aff.a11, aff.a21, aff.a12, aff.a22, aff.a13, aff.a23);
 
   return m_nodes[index].m_raster;
 }
@@ -432,13 +454,10 @@ TRasterP RasterPainter::getRaster(int index, QTransform &matrix) {
 //-----------------------------------------------------------------------------
 
 /*! Make frame visualization.
-\n	If onon-skin is active, create a new raster with dimension containing
-all
-                frame with onion-skin; recall \b TRop::quickPut with argument
-each frame
-                with onion-skin and new raster. If onion-skin is not active
-recall
-                \b TRop::quickPut with argument current frame and new raster.
+\n If onion-skin is active, create a new raster with dimension containing
+all frame with onion-skin; recall \b TRop::quickPut with argument
+each frame with onion-skin and new raster. If onion-skin is not active
+recall \b TRop::quickPut with argument current frame and new raster.
 */
 
 namespace {
@@ -464,9 +483,8 @@ void RasterPainter::flushRasterImages() {
   int lx = rect.getLx(), ly = rect.getLy();
   TDimension dim(lx, ly);
 
-  // this is needed since a stop motion live view
-  // doesn't register as a node correctly
-  // there is probably a better way to do this.
+  // this is needed since a stop motion live view doesn't register
+  // as a node correctly there is probably a better way to do this.
   if (rect.getLx() == 0 && lx == 0) {
     rect = m_clipRect;
     dim  = m_dim;
@@ -494,8 +512,7 @@ void RasterPainter::flushRasterImages() {
   // Clear the buffer - it will hold all the stacked nodes content to be overed
   // on top of the OpenGL buffer through a glDrawPixel()
   ras->lock();
-
-  ras->clear();  // ras is typically reused - and we need it transparent first
+  ras->clear();  // ras is typically reused and we need it transparent first
 
   TRect r                 = rect - rect.getP00();
   TRaster32P viewedRaster = ras->extract(r);
@@ -558,42 +575,68 @@ void RasterPainter::flushRasterImages() {
 
       TPaletteP plt;
       int gapCheckIndex = -1;
+      TRasterCM32P aux;
       if ((tc & ToonzCheck::eGap || tc & ToonzCheck::eAutoclose) &&
           m_nodes[i].m_isCurrentColumn) {
-        srcCm      = srcCm->clone();
-        plt        = m_nodes[i].m_palette->clone();
+        aux           = srcCm->clone();
+        srcCm         = Preferences::instance()->getFillOnlySavebox()
+                            ? (TRasterCM32P)aux->extract(m_nodes[i].m_savebox)
+                            : aux;
+        plt           = m_nodes[i].m_palette->clone();
         gapCheckIndex = plt->addStyle(TPixel::Magenta);
-        if (tc & ToonzCheck::eGap)
-          AreaFiller(srcCm).rectFill(m_nodes[i].m_savebox,TRect(), 1, true, true,
-                                     false);
-        if (tc & ToonzCheck::eAutoclose && m_nodes[i].m_onionMode == Node::eOnionSkinNone) {
-          auto settings = ToonzCheck::instance()->getAutocloseSettings();
+        if (srcCm && srcCm->getLx() > 0 && srcCm->getLy() > 0) {
+          if (tc & ToonzCheck::eGap)
+            AreaFiller(srcCm).rectFastFill(m_nodes[i].m_savebox, 1);
+        }
+        if (tc & ToonzCheck::eAutoclose &&
+            m_nodes[i].m_onionMode == Node::eOnionSkinNone) {
+          auto autocloseSettings =
+              ToonzCheck::instance()->getAutocloseSettings();
           std::set<int> autoPaints;
-          if (settings.m_ignoreAPInks) {
-            for (int i = 0; i < plt->getStyleCount(); i++)
-              if (plt->getStyle(i)->getFlags() != 0)
-                  autoPaints.insert(i);
+          if (autocloseSettings.m_ignoreAPInks) {
+            for (int styleIdx = 0; styleIdx < plt->getStyleCount(); ++styleIdx)
+              if (plt->getStyle(styleIdx)->getFlags() != 0) autoPaints.insert(styleIdx);
           }
-          TAutocloser ac(srcCm, gapCheckIndex,settings, std::move(autoPaints));
-          if (ac.hasSegmentCache(m_currentImageId))
-            ac.draw(ac.getSegmentCache(m_currentImageId));
-          else
-            ac.exec(m_currentImageId);
+          TAutocloser ac(srcCm, gapCheckIndex, autocloseSettings,
+                         std::move(autoPaints));
+
+          if (srcCm && srcCm->getLx() > 0 && srcCm->getLy() > 0) {
+            bool hasContent = false;
+            srcCm->lock();
+            TPixelCM32 *pix = srcCm->pixels();
+            TPixelCM32 *end = pix + srcCm->getLx() * srcCm->getLy();
+            for (; pix < end; ++pix) {
+              if (pix->getInk() != 0 || pix->getPaint() != 0) {
+                hasContent = true;
+                break;
+              }
+            }
+            srcCm->unlock();
+            if (hasContent) {
+              if (ac.hasSegmentCache(m_currentImageId))
+                ac.draw(ac.getSegmentCache(m_currentImageId));
+              else
+                ac.exec(m_currentImageId);
+            }
+          }
           if (tc & ToonzCheck::eGap) {
-            int gapFillIndex =
-                plt->addStyle(TPixelRGBM32(244, 186, 148, 0xff));  // orange
+            int gapFillIndex = plt->addStyle(TPixelRGBM32(244, 186, 148, 0xff));
             plt->getStyle(gapFillIndex)->setFlags(1);
-            AreaFiller(srcCm).rectFill(m_nodes[i].m_savebox,TRect(), gapFillIndex,
-                                       true, true, false);
+            if (srcCm && srcCm->getLx() > 0 && srcCm->getLy() > 0) {
+              AreaFiller(srcCm).rectFastFill(m_nodes[i].m_savebox,
+                                             gapFillIndex);
+            }
           }
         }
-      } else
+        srcCm = aux;
+      } else {
         plt = m_nodes[i].m_palette;
+      }
 
       if (tc == 0 || tc == ToonzCheck::eBlackBg ||
-          !m_nodes[i].m_isCurrentColumn)
+          !m_nodes[i].m_isCurrentColumn) {
         TRop::quickPut(viewedRaster, srcCm, plt, aff, colorscale, inksOnly);
-      else {
+      } else {
         TRop::CmappedQuickputSettings settings;
 
         settings.m_globalColorScale = colorscale;
@@ -601,15 +644,16 @@ void RasterPainter::flushRasterImages() {
         settings.m_transparencyCheck =
             tc & (ToonzCheck::eTransparency | ToonzCheck::eGap);
         settings.m_blackBgCheck = tc & ToonzCheck::eBlackBg;
-        /*-- InkCheck, Ink#1Check, PaintCheckはカレントカラムにのみ有効 --*/
-        settings.m_inkIndex =
-            m_nodes[i].m_isCurrentColumn
-                ? (tc & ToonzCheck::eInk ? index
-                                         : (tc & ToonzCheck::eInk1 ? 1 : -1))
-                : -1;
+
+        settings.m_inkIndex = m_nodes[i].m_isCurrentColumn ? index : -1;
+
         settings.m_paintIndex = m_nodes[i].m_isCurrentColumn
                                     ? (tc & ToonzCheck::ePaint ? index : -1)
                                     : -1;
+
+        settings.m_inkCheckEnabled   = (tc & ToonzCheck::eInk) != 0;
+        settings.m_ink1CheckEnabled  = (tc & ToonzCheck::eInk1) != 0;
+        settings.m_paintCheckEnabled = (tc & ToonzCheck::ePaint) != 0;
 
         Preferences::instance()->getTranspCheckData(
             settings.m_transpCheckBg, settings.m_transpCheckInk,
@@ -618,17 +662,39 @@ void RasterPainter::flushRasterImages() {
         settings.m_isOnionSkin = m_nodes[i].m_onionMode != Node::eOnionSkinNone;
         settings.m_gapCheckIndex = gapCheckIndex;
 
-        TRop::quickPut(viewedRaster, srcCm, plt, aff, settings);
+        settings.m_inkCheckColor = Preferences::instance()->getInkCheckColor();
+        settings.m_ink1CheckColor =
+            Preferences::instance()->getInk1CheckColor();
+        settings.m_paintCheckColor =
+            Preferences::instance()->getPaintCheckColor();
+
+        // ==============================================================
+        // Transparency Check: (see helper above)
+        // Apply high-tone empty pixel fix
+        // ==============================================================
+        TRasterCM32P rasterToUse = srcCm;
+
+        if (settings.m_transparencyCheck) {
+          const int threshold = 80;  // Minimum tone for "false" high antialias
+
+          // Clone and adjust high-tone empty pixels
+          rasterToUse = srcCm->clone();
+          forceHighToneEmptyPixels(rasterToUse, threshold);
+        }
+
+        // Final render using original OpenToonz quickPut behavior
+        TRop::quickPut(viewedRaster, rasterToUse, plt, aff, settings);
+        // Temporary clone automatically destroyed when leaving scope
       }
 
       srcCm = TRasterCM32P();
       plt   = TPaletteP();
 
       m_nodes[i].m_palette->setFrame(oldframe);
-    } else
+    } else {
       assert(!"Cannot use quickput with this raster combination!");
+    }
   }
-
   if (m_vs.m_colorMask != 0) {
     TRop::setChannel(ras, ras, m_vs.m_colorMask, false);
     TRop::quickPut(ras2, ras, TAffine());
@@ -640,13 +706,13 @@ void RasterPainter::flushRasterImages() {
   glEnable(GL_BLEND);
   glBlendFunc(GL_ONE,
               GL_ONE_MINUS_SRC_ALPHA);  // The raster buffer is intended in
-  // premultiplied form - thus the GL_ONE on src
+  // premultiplied form thus the GL_ONE on src
   glDisable(GL_DEPTH_TEST);
   glDisable(GL_DITHER);
   glDisable(GL_LOGIC_OP);
 
-/* disable, since these features are never enabled, and cause OpenGL to assert
- * on systems that don't support them: see #591 */
+  /* disable, since these features are never enabled, and cause OpenGL to assert
+   * on systems that don't support them: see #591 */
 #if 0
 #ifdef GL_EXT_convolution
   if( GLEW_EXT_convolution ) {
@@ -677,8 +743,8 @@ void RasterPainter::flushRasterImages() {
   glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-  glDrawPixels(ras2->getLx(), ras2->getLy(),            // Perform the over
-               TGL_FMT, TGL_TYPE, ras2->getRawData());  //
+  glDrawPixels(ras2->getLx(), ras2->getLy(), TGL_FMT, TGL_TYPE,
+               ras2->getRawData());
 
   ras->unlock();
   glPopMatrix();
@@ -690,7 +756,8 @@ void RasterPainter::flushRasterImages() {
     glLoadIdentity();
     tglColor(TPixel(200, 200, 200));
     tglMultMatrix(m_nodes[current].m_aff);
-    tglDrawRect(m_nodes[current].m_raster->getBounds());
+    tglDrawRect(TRect(0, 0, m_nodes[current].m_raster->getLx(),
+                      m_nodes[current].m_raster->getLy()));
     glPopMatrix();
   }
 
@@ -700,7 +767,7 @@ void RasterPainter::flushRasterImages() {
 //-----------------------------------------------------------------------------
 /*! Make frame visualization in QPainter.
 \n	Draw in painter mode just raster image in m_nodes.
-\n  Onon-skin or channel mode are not considered.
+\n  Onion-skin or channel mode are not considered.
 */
 void RasterPainter::drawRasterImages(QPainter &p, QPolygon cameraPol) {
   if (m_nodes.empty()) return;
@@ -724,7 +791,8 @@ void RasterPainter::drawRasterImages(QPainter &p, QPolygon cameraPol) {
     p.resetTransform();
     TRasterP ras = m_nodes[i].m_raster;
     TAffine aff  = TTranslation(-rect.x0, -rect.y0) * flipY * m_nodes[i].m_aff;
-    QTransform matrix(aff.a11, aff.a12, aff.a21, aff.a22, aff.a13, aff.a23); // Updated line
+    QTransform matrix(aff.a11, aff.a12, aff.a21, aff.a22, aff.a13,
+                      aff.a23);  // Updated line
     QImage image = rasterToQImage(ras);
     if (image.isNull()) continue;
     p.setWorldTransform(matrix);
@@ -783,10 +851,8 @@ static void drawAutocloses(TVectorImage *vi, TVectorRenderData &rd) {
 //-----------------------------------------------------------------------------
 
 /*! Take image from \b Stage::Player \b data and recall the right method for
-                this kind of image, for vector image recall \b onVectorImage(),
-   for raster
-                image recall \b onRasterImage() for toonz image recall \b
-   onToonzImage().
+this kind of image, for vector image recall \b onVectorImage(),for raster
+image recall \b onRasterImage() for toonz image    recall \b onToonzImage().
 */
 void RasterPainter::onImage(const Stage::Player &player) {
   if (m_singleColumnEnabled && !player.m_isCurrentColumn) return;
@@ -824,18 +890,16 @@ void RasterPainter::onImage(const Stage::Player &player) {
 //-----------------------------------------------------------------------------
 /*! View a vector cell images.
 \n	If onion-skin is active compute \b TOnionFader value.
-                Create and boot a \b TVectorRenderData and recall \b tglDraw().
+Create and boot a \b TVectorRenderData and recall \b tglDraw().
 */
 void RasterPainter::onVectorImage(TVectorImage *vi,
                                   const Stage::Player &player) {
   flushRasterImages();
 
-  // When loaded, vectorimages needs to have regions recomputed, but doing that
-  // while loading them
-  // is quite slow (think about loading whole scenes!..). They are recomputed
-  // the first time they
-  // are selected and shown on screen...except when playing back, to avoid
-  // slowness!
+  // When loaded, vectorimages needs to have regions recomputed, but doing
+  // that while loading them is quite slow (think about loading whole
+  // scenes!..). They are recomputed the first time they are selected and
+  // shown on screen...except when playing back, to avoid slowness!
 
   // (Daniele) This function should *NOT* be responsible of that.
   //           It's the *image itself* that should recalculate or initialize
@@ -899,6 +963,10 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
   rd.m_paintCheckEnabled     = tc & ToonzCheck::ePaint;
   rd.m_blackBgEnabled        = tc & ToonzCheck::eBlackBg;
   rd.m_colorCheckIndex       = ToonzCheck::instance()->getColorIndex();
+  rd.m_paintIndex            = ToonzCheck::instance()->getColorIndex();
+  rd.m_inkCheckColor         = Preferences::instance()->getInkCheckColor();
+  rd.m_ink1CheckColor        = Preferences::instance()->getInk1CheckColor();
+  rd.m_paintCheckColor       = Preferences::instance()->getPaintCheckColor();
   rd.m_show0ThickStrokes     = prefs.getShow0ThickLines();
   rd.m_regionAntialias       = prefs.getRegionAntialias();
   rd.m_animatedGuidedDrawing = prefs.getAnimatedGuidedDrawing();
@@ -911,8 +979,8 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
         (player.m_isGuidedDrawingEnabled == 2 &&  // show guides on farthest
          (player.m_onionSkinDistance == player.m_onionSkinBackSize ||
           player.m_onionSkinDistance == player.m_onionSkinFrontSize)) ||
-        (player.m_isEditingLevel &&  // fix for level editing mode sending extra
-                                     // players
+        (player.m_isEditingLevel &&  // fix for level editing mode sending
+                                     // extra players
          player.m_isGuidedDrawingEnabled == 2 &&
          player.m_onionSkinDistance == player.m_lastBackVisibleSkin)) {
       rd.m_showGuidedDrawing = player.m_isGuidedDrawingEnabled > 0;
@@ -1004,11 +1072,11 @@ void RasterPainter::onRasterImage(TRasterImage *ri,
 
   TAffine aff;
   aff = m_viewAff * player.m_placement * player.m_dpiAff;
-  
+
   aff = TTranslation(m_dim.lx * 0.5, m_dim.ly * 0.5) * aff *
         TTranslation(-r->getCenterD() +
                      convert(ri->getOffset()));  // this offset is !=0 only if
-                                                 // in cleanup camera test mode 
+                                                 // in cleanup camera test mode
 
   TRectD bbox = TRectD(0, 0, m_dim.lx, m_dim.ly);
   bbox *= convert(m_clipRect);
@@ -1017,11 +1085,10 @@ void RasterPainter::onRasterImage(TRasterImage *ri,
   int alpha                 = 255;
   Node::OnionMode onionMode = Node::eOnionSkinNone;
   if (player.m_onionSkinDistance != c_noOnionSkin) {
-    // GetOnionSkinFade va bene per il vettoriale mentre il raster funziona al
-    // contrario
-    // 1 opaco -> 0 completamente trasparente
-    // inverto quindi il risultato della funzione stando attento al caso 0
-    // (in cui era scolpito il valore 0.9)
+    // GetOnionSkinFade is good for vector while raster works the opposite way
+    // 1 opaque -> 0 completely transparent
+    // So I invert the result of the function, being careful about case 0
+    // (where the value 0.9 was carved)
     double onionSkiFade = player.m_onionSkinDistance == 0
                               ? 0.9
                               : (1.0 - OnionSkinMask::getOnionSkinFade(
@@ -1343,8 +1410,8 @@ TStageObject *plasticDeformedObj(const Stage::Player &player,
   };  // locals
 
   if (pvs.m_applyPlasticDeformation && player.m_column >= 0) {
-    // Check whether the player's column is a direct stage-schematic child of a
-    // mesh object
+    // Check whether the player's column is a direct stage-schematic child of
+    // a mesh object
     TStageObject *playerObj =
         player.m_xsh->getStageObject(TStageObjectId::ColumnId(player.m_column));
     assert(playerObj);
@@ -1579,8 +1646,8 @@ void onPlasticDeformedImage(TStageObject *playerObj,
   const DrawableTextureDataP &texData = player.texture();
   if (!texData) return;
 
-  // Retrieve the associated plastic deformers data (this may eventually update
-  // the deforms)
+  // Retrieve the associated plastic deformers data (this may eventually
+  // update the deforms)
   const PlasticDeformerDataGroup *dataGroup =
       PlasticDeformerStorage::instance()->process(
           sdFrame, mi.getPointer(), deformation.getPointer(),
@@ -1610,8 +1677,7 @@ void onPlasticDeformedImage(TStageObject *playerObj,
     glBlendFunc(GL_ONE, GL_ONE);
 
     // Add Onion skin color. Observe that this way we don't consider blending
-    // with the texture's
-    // alpha - to obtain that, there is no simple way...
+    // with the texture's alpha to obtain that, there is no simple way...
 
     double k = (1.0 - pixScale[3]);
     glColor4d(k * pixScale[0], k * pixScale[1], k * pixScale[2], 0.0);

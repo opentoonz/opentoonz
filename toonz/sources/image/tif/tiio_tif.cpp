@@ -23,15 +23,6 @@ extern "C" {
 #include "tiffio.h"
 }
 
-// Fix for libtiff 4.0+ compatibility: Map _64 variants to standard functions (preserves 64-bit support via internal offsets)
-#if !defined(TIFFReadRGBATile_64)
-#define TIFFReadRGBATile_64 TIFFReadRGBATile
-#endif
-#if !defined(TIFFReadRGBAStrip_64)
-#define TIFFReadRGBAStrip_64 TIFFReadRGBAStrip
-#endif
-#include <cstdint>  // adde: for uint32_t/uint64_t (resolve casts)
-
 #include "tiio_tif.h"
 
 #ifdef _MSC_VER
@@ -458,18 +449,20 @@ void TifReader::readLine(short *buffer, int x0, int x1, int shrink) {
       TIFFGetField(m_tiff, TIFFTAG_TILELENGTH, &tileHeight);
       assert(tileWidth > 0 && tileHeight > 0);
 
-      // Allocate a sufficient buffer to store a single tile (use uint32 for RGBA compatibility)
+      // Allocate a sufficient buffer to store a single tile
       int tileSize = tileWidth * tileHeight;
-      std::unique_ptr<uint32[]> tile(new uint32[tileSize]); // Changed from uint64_t[] to uint32_t[] (BigTIFF 64-bit offsets remain unaffected)
+      std::unique_ptr<uint64[]> tile(new uint64[tileSize]);
+
       int x = 0;
       int y = tileHeight * m_stripIndex;
 
-      // In case it's the last tiles row, the tile size might exceed the image bounds
+      // In case it's the last tiles row, the tile size might exceed the image
+      // bounds
       int lastTy = std::min((int)tileHeight, m_info.m_ly - y);
 
       // Traverse the tiles row
       while (x < m_info.m_lx) {
-        int ret = TIFFReadRGBATile_64(m_tiff, static_cast<uint32_t>(x), static_cast<uint32_t>(y), reinterpret_cast<uint32_t *>(tile.get()));  // change: Cast for uint32_t * (resolve parameter init error)
+        int ret = TIFFReadRGBATile_64(m_tiff, x, y, tile.get());
         assert(ret);
 
         int tileRowSize = std::min((int)tileWidth, m_info.m_lx - x) * pixelSize;
@@ -477,14 +470,14 @@ void TifReader::readLine(short *buffer, int x0, int x1, int shrink) {
         // Copy the tile rows in the corresponding output strip rows
         for (int ty = 0; ty < lastTy; ++ty) {
           memcpy(m_stripBuffer + (ty * m_rowLength + x) * pixelSize,
-                (UCHAR *)tile.get() + ty * tileWidth * pixelSize, tileRowSize);
+                 (UCHAR *)tile.get() + ty * tileWidth * pixelSize, tileRowSize);
         }
 
         x += tileWidth;
       }
     } else {
       int y  = m_rowsPerStrip * m_stripIndex;
-      int ok = TIFFReadRGBAStrip_64(m_tiff, static_cast<uint32_t>(y), reinterpret_cast<uint32_t *>(m_stripBuffer));  // change: Cast for uint32_t * (resolve parameter init error)
+      int ok = TIFFReadRGBAStrip_64(m_tiff, y, (uint64 *)m_stripBuffer);
       assert(ok);
     }
   }

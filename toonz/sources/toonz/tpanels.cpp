@@ -7,6 +7,8 @@
 #include "viewerpane.h"
 #include "exportpanel.h"
 #include "scriptconsolepanel.h"
+#include "brushpresetpanel.h"
+#include "toolpropertiespanel.h"
 
 #include "floatingpanelcommand.h"
 #include "subscenecommand.h"
@@ -191,8 +193,7 @@ void SchematicScenePanel::onCollapse(QList<TStageObjectId> objects) {
 //-----------------------------------------------------------------------------
 
 void SchematicScenePanel::onExplodeChild(const QList<TFxP> &fxs) {
-  int i;
-  for (i = 0; i < fxs.size(); i++) {
+  for (int i = 0; i < fxs.size(); i++) {
     TLevelColumnFx *lcFx = dynamic_cast<TLevelColumnFx *>(fxs[i].getPointer());
     if (lcFx) SubsceneCmd::explode(lcFx->getColumnIndex());
   }
@@ -201,8 +202,7 @@ void SchematicScenePanel::onExplodeChild(const QList<TFxP> &fxs) {
 //-----------------------------------------------------------------------------
 
 void SchematicScenePanel::onExplodeChild(QList<TStageObjectId> ids) {
-  int i;
-  for (i = 0; i < ids.size(); i++) {
+  for (int i = 0; i < ids.size(); i++) {
     TStageObjectId id = ids[i];
     if (id.isColumn()) SubsceneCmd::explode(id.getIndex());
   }
@@ -257,9 +257,12 @@ void SchematicScenePanel::onDeleteStageObjects(
     return;
 
   TApp *app = TApp::instance();
+  // Safe conversion QList → std::vector (avoids std::length_error crash)
+  const QList<TStageObjectId> objList = selection->getObjects();
+  std::vector<TStageObjectId> objects(objList.begin(), objList.end());
+
   TStageObjectCmd::deleteSelection(
-      std::vector<TStageObjectId>(selection->getObjects().toVector().begin(),
-                                  selection->getObjects().toVector().end()),
+      objects,
       std::list<QPair<TStageObjectId, TStageObjectId>>(
           selection->getLinks().begin(), selection->getLinks().end()),
       std::list<int>(selection->getSplines().begin(),
@@ -361,7 +364,7 @@ OpenFloatingPanel openSchematicSceneViewerCommand(MI_OpenSchematic, "Schematic",
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
-/*-- ショートカットキーでPreviewFxを実行するためのコマンド --*/
+// Command to preview the current Fx via shortcut key
 class FxPreviewCommand {
 public:
   FxPreviewCommand() {
@@ -374,10 +377,8 @@ public:
       DVGui::warning("Preview Fx : No Current Fx !");
       return;
     }
-    /*--
-     TLevelColumnFx,TZeraryColumnFx,TXsheetFx,通常のFxで使用可能
-     TPaletteColumnFx, TOutputFxではPreviewは使用不可
-     --*/
+    // Preview is available for level column, zerary column, xsheet and normal
+    // Fx. Not available for palette column Fx and output Fx.
     TPaletteColumnFx *pfx = dynamic_cast<TPaletteColumnFx *>(currentFx);
     TOutputFx *ofx        = dynamic_cast<TOutputFx *>(currentFx);
     if (pfx || ofx) {
@@ -578,8 +579,8 @@ void PaletteViewerPanel::onFreezeButtonToggled(bool frozen) {
 
   TApp *app          = TApp::instance();
   TPaletteHandle *ph = app->getPaletteController()->getCurrentLevelPalette();
-  // Se sono sulla palette del livello corrente e le palette e' vuota non
-  // consento di bloccare il pannello.
+  // If we are on the current level palette and it is empty, don't allow
+  // freezing
   if (!isFrozen() && !ph->getPalette()) {
     m_freezeButton->setPressed(false);
     return;
@@ -588,7 +589,7 @@ void PaletteViewerPanel::onFreezeButtonToggled(bool frozen) {
   setFrozen(frozen);
   m_paletteViewer->enableSaveAction(!frozen);
 
-  // Cambio il livello corrente
+  // Switch current level when unfreezing
   if (!frozen) {
     m_frozenPalette = nullptr;
     std::set<TXshSimpleLevel *> levels;
@@ -596,16 +597,14 @@ void PaletteViewerPanel::onFreezeButtonToggled(bool frozen) {
     int row, column;
     findPaletteLevels(levels, row, column, m_paletteHandle->getPalette(),
                       xsheet);
-    // Se non trovo livelli riferiti alla palette setto il palette viewer alla
-    // palette del livello corrente.
+    // If no levels reference this palette, revert to the current level palette
     if (levels.empty()) {
       m_paletteViewer->setPaletteHandle(ph);
       update();
       return;
     }
     TXshSimpleLevel *level = *levels.begin();
-    // Se sto editando l'xsheet devo settare come corrente anche la colonna e il
-    // frame.
+    // When editing the scene, also update current column and frame
     if (app->getCurrentFrame()->isEditingScene()) {
       int currentColumn = app->getCurrentColumn()->getColumnIndex();
       if (currentColumn != column)
@@ -632,13 +631,13 @@ void PaletteViewerPanel::onFreezeButtonToggled(bool frozen) {
 //-----------------------------------------------------------------------------
 
 void PaletteViewerPanel::onSceneSwitched() {
-  // Se e' il paletteHandle del livello corrente l'aggiornamento viene fatto
-  // grazie all'aggiornamento del livello.
+  // If the current palette handle belongs to the level palette, it will be
+  // updated automatically
   if (!isFrozen()) return;
 
-  // Setto a zero la palette del "paletteHandle bloccato".
+  // Clear the frozen palette handle
   m_paletteHandle->setPalette(0);
-  // Sblocco il viewer nel caso in cui il e' bloccato.
+  // Unfreeze if currently frozen
   if (isFrozen()) {
     setFrozen(false);
     m_freezeButton->setPressed(false);
@@ -797,11 +796,11 @@ void ColorFieldEditorController::edit(DVGui::ColorField *colorField) {
   m_currentColorField = colorField;
   m_currentColorField->setIsEditing(true);
 
-  // Setto come stile corrente quello del colorField
+  // Use the color field's style as the current one (style index 1)
   TColorStyle *style = m_palette->getStyle(1);
   style->setMainColor(m_currentColorField->getColor());
 
-  // Setto m_colorFieldHandle come paletteHandle corrente.
+  // Set our internal palette handle as the current one
   TApp::instance()->getPaletteController()->setCurrentPalette(
       m_colorFieldHandle);
 
@@ -867,7 +866,7 @@ void CleanupColorFieldEditorController::edit(
   if (!colorField) return;
   m_currentColorField->setIsEditing(true);
 
-  // Setto come stile corrente quello del colorField
+  // Use the color field's style as the current one (style index 1)
   TColorStyle *fieldStyle = colorField->getStyle();
 
   m_blackColor = dynamic_cast<TBlackCleanupStyle *>(fieldStyle);
@@ -882,7 +881,7 @@ void CleanupColorFieldEditorController::edit(
     style->setColorParamValue(1, fieldStyle->getColorParamValue(1));
   }
 
-  // Setto m_colorFieldHandle come paletteHandle corrente.
+  // Set our internal palette handle as the current one
   TApp::instance()->getPaletteController()->setCurrentPalette(
       m_colorFieldHandle);
 
@@ -923,7 +922,7 @@ CleanupColorFieldEditorController cleanupColorFieldEditorController;
 //-----------------------------------------------------------------------------
 
 //=============================================================================
-// style editor
+// Style editor
 //-----------------------------------------------------------------------------
 
 StyleEditorPanel::StyleEditorPanel(QWidget *parent) : TPanel(parent) {
@@ -1068,8 +1067,8 @@ void FlipbookBasePanel::zoomContentsAndFitGeometry(bool forward) {
     TPanel::zoomContentsAndFitGeometry(forward);
     return;
   }
-  // resize the window leaving the top-left corner position unchanged
-  // in order to gain consistency with Photoshop
+  // Resize the window keeping the top-left corner fixed (Photoshop-like
+  // behavior)
   auto getScreen = [&]() {
     QScreen *ret = nullptr;
     ret          = QGuiApplication::screenAt(geometry().topLeft());
@@ -1109,7 +1108,7 @@ void FlipbookBasePanel::zoomContentsAndFitGeometry(bool forward) {
 FlipbookPanel::FlipbookPanel(QWidget *parent) : FlipbookBasePanel(parent) {
   m_flipbook = new FlipBook(this);
   setWidget(m_flipbook);
-  // minimize button and safearea toggle
+  // Minimize button and safe area toggle
   initializeTitleBar(getTitleBar());
 
   MainWindow *mw =
@@ -1130,7 +1129,7 @@ void FlipbookPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   int x         = -91;
   int iconWidth = 20;
 
-  // safe area button
+  // Safe area button
   TPanelTitleBarButtonForSafeArea *safeAreaButton =
       new TPanelTitleBarButtonForSafeArea(titleBar, "safearea");
   safeAreaButton->setToolTip(tr("Safe Area (Right Click to Select)"));
@@ -1141,12 +1140,12 @@ void FlipbookPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   ret = ret && connect(CommandManager::instance()->getAction(MI_SafeArea),
                        SIGNAL(triggered(bool)), safeAreaButton,
                        SLOT(setPressed(bool)));
-  // sync the initial state
+  // Synchronize initial state
   safeAreaButton->setPressed(
       CommandManager::instance()->getAction(MI_SafeArea)->isChecked());
 
   x += 28 + iconWidth;
-  // minimize button
+  // Minimize button
   m_button = new TPanelTitleBarButton(titleBar, "minimize");
   m_button->setToolTip(tr("Minimize"));
   m_button->setPressed(false);
@@ -1367,8 +1366,6 @@ public:
     ScriptConsolePanel *panel = new ScriptConsolePanel(parent);
     panel->setObjectName(getPanelType());
 
-    // panel->setWindowTitle(QObject::tr("Function Editor"));
-    // panel->setMinimumSize(220, 200);
     return panel;
   }
 
@@ -1394,11 +1391,11 @@ ComboViewerPanelContainer::ComboViewerPanelContainer(QWidget *parent)
                      this, SLOT(updateTabFocus()));
   assert(ret);
 }
-// reimplementation of TPanel::widgetInThisPanelIsFocused
+// Reimplementation of TPanel::widgetInThisPanelIsFocused
 bool ComboViewerPanelContainer::widgetInThisPanelIsFocused() {
   return m_comboViewer->hasFocus();
 }
-// reimplementation of TPanel::widgetFocusOnEnter
+// Reimplementation of TPanel::widgetFocusOnEnter
 void ComboViewerPanelContainer::widgetFocusOnEnter() {
   m_comboViewer->onEnterPanel();
 }
@@ -1438,11 +1435,11 @@ SceneViewerPanelContainer::SceneViewerPanelContainer(QWidget *parent)
 
   m_sceneViewer->initializeTitleBar(getTitleBar());
 }
-// reimplementation of TPanel::widgetInThisPanelIsFocused
+// Reimplementation of TPanel::widgetInThisPanelIsFocused
 bool SceneViewerPanelContainer::widgetInThisPanelIsFocused() {
   return m_sceneViewer->hasFocus();
 }
-// reimplementation of TPanel::widgetFocusOnEnter
+// Reimplementation of TPanel::widgetFocusOnEnter
 void SceneViewerPanelContainer::widgetFocusOnEnter() {
   m_sceneViewer->onEnterPanel();
 }
@@ -1463,6 +1460,7 @@ public:
     panel->setMinimumSize(220, 280);
     return panel;
   }
+
   void initialize(TPanel *panel) override { assert(0); }
 } sceneViewerFactory;
 
@@ -1514,7 +1512,7 @@ OpenFloatingPanel openHistoryPanelCommand(MI_OpenHistoryPanel, "HistoryPanel",
 
 #if defined(x64)
 //=============================================================================
-// StopMotion Controller
+// Stop Motion Controller
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
@@ -1539,6 +1537,66 @@ OpenFloatingPanel openStopMotionPanelCommand(
 //-----------------------------------------------------------------------------
 
 #endif  // x64
+
+//=============================================================================
+// BrushPresetPanel - Dynamic brush preset management panel
+//-----------------------------------------------------------------------------
+
+class BrushPresetPanelFactory final : public TPanelFactory {
+public:
+  BrushPresetPanelFactory() : TPanelFactory("BrushPreset") {}
+
+  TPanel *createPanel(QWidget *parent) override {
+    BrushPresetPanel *panel = new BrushPresetPanel(parent);
+    panel->setObjectName(getPanelType());
+    panel->setWindowTitle(QObject::tr("Brush Presets") +
+                          QObject::tr(" [WIP]"));  // Temporarily add WIP label
+    panel->setIsMaximizable(false);
+
+    // Enable room binding feature
+    panel->addRoomBindButton();
+
+    return panel;
+  }
+
+  void initialize(TPanel *panel) override { assert(0); }
+} brushPresetPanelFactory;
+
+//=============================================================================
+OpenFloatingPanel openBrushPresetPanelCommand(MI_OpenBrushPresetPanel,
+                                              "BrushPreset",
+                                              QObject::tr("Brush Presets"));
+//-----------------------------------------------------------------------------
+
+//=============================================================================
+// Tool Properties Panel
+//-----------------------------------------------------------------------------
+
+class ToolPropertiesPanelFactory final : public TPanelFactory {
+public:
+  ToolPropertiesPanelFactory() : TPanelFactory("ToolProperties") {}
+
+  TPanel *createPanel(QWidget *parent) override {
+    ToolPropertiesPanel *panel = new ToolPropertiesPanel(parent);
+    panel->setObjectName(getPanelType());
+    panel->setWindowTitle(QObject::tr("Tool Properties") +
+                          QObject::tr(" [WIP]"));  // Temporarily add WIP label
+    panel->setIsMaximizable(false);
+
+    // Enable room binding feature
+    panel->addRoomBindButton();
+
+    return panel;
+  }
+
+  void initialize(TPanel *panel) override { assert(0); }
+} toolPropertiesPanelFactory;
+
+//=============================================================================
+OpenFloatingPanel openToolPropertiesPanelCommand(
+    MI_OpenToolPropertiesPanel, "ToolProperties",
+    QObject::tr("Tool Properties"));
+//-----------------------------------------------------------------------------
 
 //=============================================================================
 // FxSettings
@@ -1576,7 +1634,7 @@ void FxSettingsPanel::restoreFloatingPanelState() {
   settings.beginGroup("FxSettings");
 
   QRect geom = settings.value("geometry", saveGeometry()).toRect();
-  // check if it can be visible in the current screen
+  // Check if it can be visible in the current screen
   if (!(geom & this->screen()->availableGeometry()).isEmpty())
     move(geom.topLeft());
 

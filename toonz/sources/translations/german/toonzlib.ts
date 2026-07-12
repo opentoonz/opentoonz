@@ -58,7 +58,7 @@ Wahrscheinlich funktioniert der Codec nicht korrekt.</translation>
     </message>
     <message>
         <source>%1 is not a valid color (valid color names are &apos;red&apos;, &apos;transparent&apos;, &apos;#FF8800&apos;, ecc.)</source>
-        <translation>%1 ist keine gültige Farbe (gültige Farbeb sind &apos;rot&apos;, &apos;transparent&apos;, &apos;#FF8800&apos;, usw.)</translation>
+        <translation type="vanished">%1 ist keine gültige Farbe (gültige Farbeb sind &apos;rot&apos;, &apos;transparent&apos;, &apos;#FF8800&apos;, usw.)</translation>
     </message>
     <message>
         <source>Vectorization failed</source>
@@ -494,6 +494,14 @@ Wahrscheinlich funktioniert der Codec nicht korrekt.</translation>
         <comment>TextureStyleChooserPage</comment>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Set Current Style from #%1 to %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 is not a valid color (valid color names are &apos;red&apos;, &apos;transparent&apos;, &apos;#FF8800&apos;, etc.)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TScriptBinding::CenterlineVectorizer</name>
@@ -611,11 +619,11 @@ Wahrscheinlich funktioniert der Codec nicht korrekt.</translation>
     </message>
     <message>
         <source>Unrecognized file type :</source>
-        <translation>Unbekannter Dateityp :</translation>
+        <translation type="vanished">Unbekannter Dateityp :</translation>
     </message>
     <message>
         <source>Can&apos;t save a %1 level to this file type : %2</source>
-        <translation>Kann keine %1 Ebene zu diesem Dateityp speichen : %2</translation>
+        <translation type="vanished">Kann keine %1 Ebene zu diesem Dateityp speichen : %2</translation>
     </message>
     <message>
         <source>Exception writing %1</source>
@@ -635,11 +643,31 @@ Wahrscheinlich funktioniert der Codec nicht korrekt.</translation>
     </message>
     <message>
         <source>can not insert a %1 image into a level</source>
-        <translation>kann kein %1 Bild in eine Ebene einfügen</translation>
+        <translation type="vanished">kann kein %1 Bild in eine Ebene einfügen</translation>
     </message>
     <message>
         <source>can not insert a %1 image to a %2 level</source>
-        <translation>kann kein %1 Bild in eine %2 Ebene einfügen</translation>
+        <translation type="vanished">kann kein %1 Bild in eine %2 Ebene einfügen</translation>
+    </message>
+    <message>
+        <source>Cannot set path on empty level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unrecognized file type: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can&apos;t save a %1 level to this file type: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cannot insert a %1 image into a level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cannot insert a %1 image to a %2 level</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -662,7 +690,11 @@ Wahrscheinlich funktioniert der Codec nicht korrekt.</translation>
     </message>
     <message>
         <source>Invalid color : </source>
-        <translation>Ungültige Farbe : </translation>
+        <translation type="vanished">Ungültige Farbe : </translation>
+    </message>
+    <message>
+        <source>Invalid color: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

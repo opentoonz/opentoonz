@@ -30,6 +30,7 @@
             <command>MI_ExportCurrentScene</command>		
             <command>MI_SoundTrack</command>
             <command>MI_ExportXDTS</command>
+            <command>MI_ExportSXF</command>
             <command>MI_ExportOCA</command>
             <command>MI_StopMotionExportImageSequence</command>
             <command>MI_ExportTvpJson</command>
@@ -65,6 +66,7 @@
         <command>MI_Insert</command>
         <command>MI_InsertAbove</command>
         <command>MI_Clear</command>
+        <command>MI_ClearViewerContent</command>
         <separator/>
         <command>MI_SelectAll</command>
         <command>MI_InvertSelection</command>
@@ -106,6 +108,7 @@
             <command>MI_NewToonzRasterLevel</command>
             <command>MI_NewVectorLevel</command>
             <command>MI_NewRasterLevel</command>
+            <command>MI_NewMetaLevel</command>
             <command>MI_NewNoteLevel</command>
         </menu>
         <command>MI_LoadLevel</command>
@@ -298,6 +301,8 @@
         <command>MI_OpenCommandToolbar</command>
         <command>MI_OpenToolbar</command>
         <command>MI_OpenToolOptionBar</command>
+        <command>MI_OpenBrushPresetPanel</command>
+        <command>MI_OpenToolPropertiesPanel</command>
         <separator/>
         <command>MI_OpenStyleControl</command>
         <command>MI_OpenPalette</command>

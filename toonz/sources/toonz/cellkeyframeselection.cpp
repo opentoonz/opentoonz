@@ -18,6 +18,9 @@
 #include <QApplication>
 #include <QClipboard>
 
+// C++ includes
+#include <memory>
+
 //=============================================================================
 //  TCellKeyframeSelection
 //-----------------------------------------------------------------------------
@@ -26,14 +29,7 @@ TCellKeyframeSelection::TCellKeyframeSelection(
     TCellSelection *cellSelection, TKeyframeSelection *keyframeSelection)
     : m_cellSelection(cellSelection)
     , m_keyframeSelection(keyframeSelection)
-    , m_xsheetHandle(0) {}
-
-//-----------------------------------------------------------------------------
-
-TCellKeyframeSelection::~TCellKeyframeSelection() {
-  delete m_cellSelection;
-  delete m_keyframeSelection;
-}
+    , m_xsheetHandle(nullptr) {}
 
 //-----------------------------------------------------------------------------
 
@@ -53,32 +49,37 @@ bool TCellKeyframeSelection::isEmpty() const {
 //-----------------------------------------------------------------------------
 
 void TCellKeyframeSelection::copyCellsKeyframes() {
-  TCellKeyframeData *data = new TCellKeyframeData();
-  // Copy cells
+  auto data    = std::make_unique<TCellKeyframeData>();
+  bool hasData = false;
+
   int r0, c0, r1, c1;
   m_cellSelection->getSelectedCells(r0, c0, r1, c1);
-  if (!isEmpty()) {
+  if (!m_cellSelection->isEmpty()) {
     int colCount = c1 - c0 + 1;
     int rowCount = r1 - r0 + 1;
-    if (colCount <= 0 || rowCount <= 0) return;
-    TXsheet *xsh        = m_xsheetHandle->getXsheet();
-    TCellData *cellData = new TCellData();
-    cellData->setCells(xsh, r0, c0, r1, c1);
-    data->setCellData(cellData);
+    if (colCount > 0 && rowCount > 0) {
+      TXsheet *xsh   = m_xsheetHandle->getXsheet();
+      auto *cellData = new TCellData();
+      cellData->setCells(xsh, r0, c0, r1, c1);
+      data->setCellData(cellData);
+      hasData = true;
+    }
   }
-  // Copy keyframes
-  if (!isEmpty()) {
-    QClipboard *clipboard       = QApplication::clipboard();
-    TXsheet *xsh                = m_xsheetHandle->getXsheet();
-    TKeyframeData *keyframeData = new TKeyframeData();
+
+  if (!m_keyframeSelection->isEmpty()) {
+    TXsheet *xsh       = m_xsheetHandle->getXsheet();
+    auto *keyframeData = new TKeyframeData();
     TKeyframeData::Position startPos(r0, c0);
     keyframeData->setKeyframes(m_keyframeSelection->getSelection(), xsh,
                                startPos);
     data->setKeyframeData(keyframeData);
+    hasData = true;
   }
-  // Set the clipboard
-  QClipboard *clipboard = QApplication::clipboard();
-  clipboard->setMimeData(data, QClipboard::Clipboard);
+
+  if (hasData) {
+    QApplication::clipboard()->setMimeData(data.release(),
+                                           QClipboard::Clipboard);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -94,7 +95,7 @@ void TCellKeyframeSelection::deleteCellsKeyframes() {
   // clear cells without shifting
   // TODO: behavior of deleting cell+keyframe should also follow the preference
   // option.
-  m_cellSelection->deleteCells(false);
+  m_cellSelection->deleteCells(false);  // clear without shifting
   m_keyframeSelection->deleteKeyframes();
   TUndoManager::manager()->endBlock();
 }
@@ -103,8 +104,9 @@ void TCellKeyframeSelection::deleteCellsKeyframes() {
 
 void TCellKeyframeSelection::cutCellsKeyframes() {
   copyCellsKeyframes();
+
   TUndoManager::manager()->beginBlock();
-  int r0, r1, c0, c1;
+  int r0, c0, r1, c1;
   m_cellSelection->getSelectedCells(r0, c0, r1, c1);
   m_cellSelection->cutCells(true);
   m_keyframeSelection->deleteKeyframesWithShift(r0, r1, c0, c1);
@@ -117,19 +119,18 @@ void TCellKeyframeSelection::selectCellsKeyframes(int r0, int c0, int r1,
                                                   int c1) {
   m_cellSelection->selectCells(r0, c0, r1, c1);
   TXsheet *xsh = m_xsheetHandle->getXsheet();
-  m_xsheetHandle->getXsheet();
   if (r1 < r0) std::swap(r0, r1);
   if (c1 < c0) std::swap(c0, c1);
   m_keyframeSelection->clear();
-  int r, c;
-  for (c = c0; c <= c1; c++)
-    for (r = r0; r <= r1; r++) {
-      TStageObjectId id =
-          c < 0 ? TStageObjectId::CameraId(xsh->getCameraColumnIndex())
+  for (int c = c0; c <= c1; ++c) {
+    TStageObjectId id =
+        (c < 0) ? TStageObjectId::CameraId(xsh->getCameraColumnIndex())
                 : TStageObjectId::ColumnId(c);
-      TStageObject *stObj = xsh->getStageObject(id);
+    TStageObject *stObj = xsh->getStageObject(id);
+    for (int r = r0; r <= r1; ++r) {
       if (stObj->isKeyframe(r)) m_keyframeSelection->select(r, c);
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -138,8 +139,8 @@ void TCellKeyframeSelection::selectCellKeyframe(int row, int col) {
   m_cellSelection->selectCell(row, col);
   TXsheet *xsh = m_xsheetHandle->getXsheet();
   TStageObjectId id =
-      col < 0 ? TStageObjectId::CameraId(xsh->getCameraColumnIndex())
-              : TStageObjectId::ColumnId(col);
+      (col < 0) ? TStageObjectId::CameraId(xsh->getCameraColumnIndex())
+                : TStageObjectId::ColumnId(col);
   TStageObject *stObj = xsh->getStageObject(id);
   m_keyframeSelection->clear();
   if (stObj->isKeyframe(row)) m_keyframeSelection->select(row, col);

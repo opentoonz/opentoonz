@@ -154,7 +154,7 @@ class DVAPI ParamsPageSet final : public QWidget {
   /*-- ヘルプボタンで開くURL --*/
   std::string m_helpUrl;
   QPushButton *m_helpButton;
-  // waring mark appears when the current fx does not support
+  // warning mark appears when the current fx does not support
   // float / linear render settings
   QLabel *m_warningMark;
 

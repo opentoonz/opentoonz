@@ -57,7 +57,6 @@
 #include <QMessageBox>
 #include <QDesktopServices>
 
-
 //********************************************************************************
 //    Export callbacks  definition
 //********************************************************************************
@@ -119,15 +118,19 @@ public:
 //    ExportAllLevelsPopup  implementation
 //********************************************************************************
 
-ExportAllLevelsPopup::ExportAllLevelsPopup(){
+ExportAllLevelsPopup::ExportAllLevelsPopup() {
   setWindowTitle(QString("Exporting All Levels..."));
-  m_browser->setFolder(TApp::instance()->getCurrentScene()->getScene()->getProject()->getProjectFolder());
+  m_browser->setFolder(TApp::instance()
+                           ->getCurrentScene()
+                           ->getScene()
+                           ->getProject()
+                           ->getProjectFolder());
 
   // Export Options Tab
   m_exportOptions->m_createlevelfolder->setChecked(true);
   m_exportOptions->m_noAntialias->setChecked(true);
 
-    // Export All checkbox
+  // Export All checkbox
   m_exportAll = new DVGui::CheckBox(tr("Export All"), this);
   m_exportAll->setChecked(true);
   m_nameField->setDisabled(true);
@@ -152,47 +155,43 @@ ExportAllLevelsPopup::ExportAllLevelsPopup(){
                 SLOT(onExportAll(bool))) &&
         ret;
   initFolder();
-  }
+}
 
-ExportAllLevelsPopup::~ExportAllLevelsPopup() {
-    QWidget().setLayout(layout());
-  }
+ExportAllLevelsPopup::~ExportAllLevelsPopup() { QWidget().setLayout(layout()); }
 
 //------------------------------------
 
 void ExportAllLevelsPopup::showEvent(QShowEvent *se) {
+  collectSelectedSimpleLevels();  // also init level_to_foldername,and sort
+                                  // them
 
-    collectSelectedSimpleLevels();  // also init level_to_foldername,and sort
-                                    // them
+  if (outputLevels.empty()) {
+    DVGui::error(tr("No level found in the camera view or levels are null!!"));
+    QTimer::singleShot(0, this, &ExportAllLevelsPopup::hide);
+    return;
+  }
 
-    if (outputLevels.empty()) {
-      DVGui::error(
-          tr("No level found in the camera view or levels are null!!"));
-      QTimer::singleShot(0, this, &ExportAllLevelsPopup::hide);
-      return;
-    }
+  if (Preferences::instance()->getPixelsOnly()) {
+    m_exportOptions->m_widthFld->hide();
+    m_exportOptions->m_heightFld->hide();
+    m_exportOptions->m_widthLabel->hide();
+    m_exportOptions->m_heightLabel->hide();
+    m_exportOptions->m_dpiLabel->hide();
+  } else {
+    m_exportOptions->m_widthFld->show();
+    m_exportOptions->m_heightFld->show();
+    m_exportOptions->m_widthLabel->show();
+    m_exportOptions->m_heightLabel->show();
+    m_exportOptions->m_dpiLabel->show();
+  }
 
-    if (Preferences::instance()->getPixelsOnly()) {
-      m_exportOptions->m_widthFld->hide();
-      m_exportOptions->m_heightFld->hide();
-      m_exportOptions->m_widthLabel->hide();
-      m_exportOptions->m_heightLabel->hide();
-      m_exportOptions->m_dpiLabel->hide();
-    } else {
-      m_exportOptions->m_widthFld->show();
-      m_exportOptions->m_heightFld->show();
-      m_exportOptions->m_widthLabel->show();
-      m_exportOptions->m_heightLabel->show();
-      m_exportOptions->m_dpiLabel->show();
-    }
+  onExportAll(m_isExportAll);
+  updateOnSelection();
 
-    onExportAll(m_isExportAll);
-    updateOnSelection();
-
-    QDialog::showEvent(se);
+  QDialog::showEvent(se);
 }
 
-void ExportAllLevelsPopup::hideEvent(QHideEvent* he) {
+void ExportAllLevelsPopup::hideEvent(QHideEvent *he) {
   QDialog::hideEvent(he);
 
   outputLevels        = std::vector<TXshSimpleLevel *>();
@@ -204,7 +203,7 @@ void ExportAllLevelsPopup::hideEvent(QHideEvent* he) {
 bool ExportAllLevelsPopup::execute() {
   // Get Folder
   TFilePath FolderPath = TFilePath(m_browser->getFolder());
-  TFilePath FilePath = FolderPath;
+  TFilePath FilePath   = FolderPath;
 
   // Do Path Checks
   if (FolderPath.isEmpty()) {
@@ -218,7 +217,11 @@ bool ExportAllLevelsPopup::execute() {
   const std::string &ext                = m_format->currentText().toStdString();
   const IoCmd::ExportLevelOptions &opts = getOptions(ext);
 
-  TFrameId tmplFId  = TApp::instance()->getCurrentScene()->getScene()->getProperties()->formatTemplateFIdForInput();
+  TFrameId tmplFId = TApp::instance()
+                         ->getCurrentScene()
+                         ->getScene()
+                         ->getProperties()
+                         ->formatTemplateFIdForInput();
 
   // Start to export
   bool ret = true;
@@ -230,8 +233,8 @@ bool ExportAllLevelsPopup::execute() {
     MultiExportOverwriteCB overwriteCB;
 
     while (!outputLevels.empty()) {
-      if (progressCB.canceled()) break; 
-      sl         = outputLevels.back()->getSimpleLevel();
+      if (progressCB.canceled()) break;
+      sl = outputLevels.back()->getSimpleLevel();
 
       // if Need to Create Folder
       if (createFolder) {
@@ -246,8 +249,10 @@ bool ExportAllLevelsPopup::execute() {
         }
       }
       ret = IoCmd::exportLevel(
-                TFilePath(FilePath.getWideString() + L"\\" + level_to_foldername.find(sl->getName())->second)
-                    .withType(ext).withFrame(tmplFId),
+                TFilePath(FilePath.getWideString() + L"\\" +
+                          level_to_foldername.find(sl->getName())->second)
+                    .withType(ext)
+                    .withFrame(tmplFId),
                 sl, opts, &overwriteCB, &progressCB) &&
             ret;
       if (ret) {
@@ -255,7 +260,7 @@ bool ExportAllLevelsPopup::execute() {
       } else {
         DVGui::error(
             tr("Export failed,please delete exported files and try again."));
-        return ret; 
+        return ret;
       }
       outputLevels.pop_back();
     }
@@ -273,8 +278,7 @@ bool ExportAllLevelsPopup::execute() {
     if (!isValidFileName_message(FileName)) {
       return false;
     }
-    if (isReservedFileName_message(FileName))
-      return false;
+    if (isReservedFileName_message(FileName)) return false;
 
     // if Need to Create Folder
     if (createFolder) {
@@ -290,7 +294,10 @@ bool ExportAllLevelsPopup::execute() {
     }
 
     TXshSimpleLevel *sl = outputLevels.back()->getSimpleLevel();
-    ret = IoCmd::exportLevel(TFilePath(FilePath.getWideString() + L"\\" + m_nameField->text().toStdWString()).withType(ext).withFrame(tmplFId),
+    ret = IoCmd::exportLevel(TFilePath(FilePath.getWideString() + L"\\" +
+                                       m_nameField->text().toStdWString())
+                                 .withType(ext)
+                                 .withFrame(tmplFId),
                              sl, opts) &&
           ret;
 
@@ -313,7 +320,7 @@ bool ExportAllLevelsPopup::execute() {
 
 void ExportAllLevelsPopup::collectSelectedSimpleLevels() {
   // get output Levels
-  TXsheet *xsh             = TApp::instance()->getCurrentXsheet()->getXsheet();
+  TXsheet *xsh  = TApp::instance()->getCurrentXsheet()->getXsheet();
   int col_count = xsh->getColumnCount();
   int r0, r1;  // cell start point and end point
   TXshSimpleLevel *sl;
@@ -325,18 +332,18 @@ void ExportAllLevelsPopup::collectSelectedSimpleLevels() {
 
   // get output level names
   for (int index = 0; index < col_count; ++index) {
-    TXshColumn *col = xsh->getColumn(index);//start from a not camera column
+    TXshColumn *col = xsh->getColumn(index);  // start from a not camera column
     assert(col);
-    if (col->isEmpty() || !col->isPreviewVisible()) continue;// Not empty and visible
+    if (col->isEmpty() || !col->isPreviewVisible())
+      continue;  // Not empty and visible
     if (col->getColumnType()) continue;
     if (col->getRange(r0, r1)) sl = xsh->getCell(r0, index).getSimpleLevel();
     if (!sl) continue;
     int type = sl->getType();
-    if
-      (!(type == PLI_XSHLEVEL ||  // ToonzVector
-        type == TZP_XSHLEVEL ||  // ToonzRaster
-        type == OVL_XSHLEVEL))    // Raster
-          continue;
+    if (!(type == PLI_XSHLEVEL ||  // ToonzVector
+          type == TZP_XSHLEVEL ||  // ToonzRaster
+          type == OVL_XSHLEVEL))   // Raster
+      continue;
     outputLevels.push_back(sl);
 
     pegbar    = xsh->getStageObject(TStageObjectId::ColumnId(index));
@@ -344,6 +351,11 @@ void ExportAllLevelsPopup::collectSelectedSimpleLevels() {
     levelname = sl->getName();
     level_to_foldername[sl->getName()] = backFolderName(colname, levelname);
   }
+
+  // Remove the duplicate levels
+  std::sort(outputLevels.begin(), outputLevels.end());
+  outputLevels.erase(std::unique(outputLevels.begin(), outputLevels.end()),
+                     outputLevels.end());
 
   // sort
   auto *p = &level_to_foldername;
@@ -382,64 +394,64 @@ void ExportAllLevelsPopup::onExportAll(bool toggled) {
 }
 
 void ExportAllLevelsPopup::updateOnSelection() {
-    TXshSimpleLevel *sl = outputLevels.back()->getSimpleLevel();
-    assert(sl);
+  TXshSimpleLevel *sl = outputLevels.back()->getSimpleLevel();
+  assert(sl);
 
-    // Enable tlv output in case all inputs are pli
-    int tlvIdx = m_format->findText("tlv");
-        //export all mode
-    if (m_isExportAll) {
-      bool allPli = true;
-      for (auto sl : outputLevels) {
-        allPli = (sl && (sl->getType() == PLI_XSHLEVEL)) &&
-                     allPli;
-      }
-      if (allPli) {
-        if (tlvIdx < 0) m_format->addItem("tlv");
-      } else {
-        if (tlvIdx > 0) m_format->removeItem(tlvIdx);
-      }
+  // Enable tlv output in case all inputs are pli
+  int tlvIdx = m_format->findText("tlv");
+  // export all mode
+  if (m_isExportAll) {
+    bool allPli = true;
+    for (auto sl : outputLevels) {
+      allPli = (sl && (sl->getType() == PLI_XSHLEVEL)) && allPli;
     }
-        //export one by one mode
-    else {
-      if (sl->getType() == PLI_XSHLEVEL || sl->getType() == TZP_XSHLEVEL) {
-        if (tlvIdx < 0) m_format->addItem("tlv");
-      } else {
-        if (tlvIdx > 0) m_format->removeItem(tlvIdx);
-      }
-    }
-
-    //whether be abel to set PliOptions
-    if (sl->getType() == PLI_XSHLEVEL) {
-      m_exportOptions->pliOptionsVisible =true;
-        m_exportOptions->m_pliOptions->setEnabled(true); 
+    if (allPli) {
+      if (tlvIdx < 0) m_format->addItem("tlv");
     } else {
-      m_exportOptions->pliOptionsVisible = false;
-      m_exportOptions->m_pliOptions->setEnabled(false); 
+      if (tlvIdx > 0) m_format->removeItem(tlvIdx);
     }
-    updatePreview();
-    return;
+  }
+  // export one by one mode
+  else {
+    if (sl->getType() == PLI_XSHLEVEL || sl->getType() == TZP_XSHLEVEL) {
+      if (tlvIdx < 0) m_format->addItem("tlv");
+    } else {
+      if (tlvIdx > 0) m_format->removeItem(tlvIdx);
+    }
+  }
+
+  // whether be abel to set PliOptions
+  if (sl->getType() == PLI_XSHLEVEL) {
+    m_exportOptions->pliOptionsVisible = true;
+    m_exportOptions->m_pliOptions->setEnabled(true);
+  } else {
+    m_exportOptions->pliOptionsVisible = false;
+    m_exportOptions->m_pliOptions->setEnabled(false);
+  }
+  updatePreview();
+  return;
 }
 
 std::wstring ExportAllLevelsPopup::backFolderName(std::string colname,
                                                   std::wstring levelname) {
-  if (!colname.empty() && colname[0] == '#'){
+  if (!colname.empty() && colname[0] == '#') {
     colname.erase(std::remove(colname.begin(), colname.end(), '#'),
                   colname.end());
-    if (colname.find('_') != std::string::npos)//  '_'
-        return to_wstring(colname);
+    if (colname.find('_') != std::string::npos)  //  '_'
+      return to_wstring(colname);
   }
   return levelname;
 }
 
 bool ExportAllLevelsPopup::isAllLevelsExported() {
   if (outputLevels.empty()) {  // no more level to export
-    // Reused code from xdtsio.cpp. 
+    // Reused code from xdtsio.cpp.
     // Encountered a modal bug when using QMessage:
     // the dialog doesn't appear correctly with DVGui::info.
     std::vector<QString> buttons = {QObject::tr("OK"),
                                     QObject::tr("Open containing folder")};
-    int ret = DVGui::MsgBox(DVGui::INFORMATION,
+    int ret                      = DVGui::MsgBox(
+        DVGui::INFORMATION,
         QString("%1 Levels Exported").arg(m_levelExportedCount), buttons);
     if (ret == 2) {
       TFilePath folderPath = TFilePath(m_browser->getFolder());
@@ -448,7 +460,7 @@ bool ExportAllLevelsPopup::isAllLevelsExported() {
       else
         QDesktopServices::openUrl(QUrl::fromLocalFile(folderPath.getQString()));
     }
-    //Reuse END
+    // Reuse END
     m_levelExportedCount = 0;
     return true;
   } else {  // move to next level
@@ -472,23 +484,24 @@ void ExportAllLevelsPopup::skip() {
   }
 }
 
-QString ExportAllLevelsPopup::getLevelTypeName(int type) { 
-    switch (type){
+QString ExportAllLevelsPopup::getLevelTypeName(int type) {
+  switch (type) {
   case PLI_XSHLEVEL:
-     return QString("ToonzVector");
+    return QString("ToonzVector");
   case TZP_XSHLEVEL:
-     return QString("ToonzRaster");
+    return QString("ToonzRaster");
   case OVL_XSHLEVEL:
-     return QString("Raster");
+    return QString("Raster");
   case LEVELCOLUMN_XSHLEVEL:
-     return QString("Picture");
+    return QString("Picture");
   default:
-      return QString("");
-    }
+    return QString("");
+  }
 }
 
 //********************************************************************************
 //    Export All Levels Command  instantiation
 //********************************************************************************
 
-OpenPopupCommandHandler<ExportAllLevelsPopup> exportAllLevelsPopupCommand(MI_ExportAllLevels);
+OpenPopupCommandHandler<ExportAllLevelsPopup> exportAllLevelsPopupCommand(
+    MI_ExportAllLevels);

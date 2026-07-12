@@ -60,6 +60,8 @@ protected:
   void mousePressEvent(QMouseEvent *) override;
   void mouseMoveEvent(QMouseEvent *) override;
   void mouseReleaseEvent(QMouseEvent *) override;
+  // Override the keyPressEvent to allow users to type a comma as a decimal separator.
+  void keyPressEvent(QKeyEvent *event) override;
 
 signals:
   /*! To emit when value change. */

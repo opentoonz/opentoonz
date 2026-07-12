@@ -93,6 +93,7 @@ using namespace DVGui;
 
 TEnv::IntVar EnvSoftwareCurrentFontSize("SoftwareCurrentFontSize", 12);
 
+// These are the same as the default values. See tenv.cpp and tversion.h
 const char *rootVarName     = "TOONZROOT";
 const char *systemVarPrefix = "TOONZ";
 
@@ -162,6 +163,8 @@ static void initToonzEnv(QHash<QString, QString> &argPathValues) {
 
   QCoreApplication::setOrganizationName("OpenToonz");
   QCoreApplication::setOrganizationDomain("");
+  QGuiApplication::setDesktopFileName("io.github.OpenToonz");
+  QGuiApplication::setWindowIcon(QIcon::fromTheme("io.github.OpenToonz"));
   QCoreApplication::setApplicationName(
       QString::fromStdString(TEnv::getApplicationName()));
 
@@ -179,6 +182,9 @@ static void initToonzEnv(QHash<QString, QString> &argPathValues) {
   else if (!TFileStatus(stuffDir).isDirectory())
     fatalError("Folder \"" + toQString(stuffDir) +
                "\" not found or not readable");
+
+  // Setup third party
+  ThirdParty::initialize();
 
   Tiio::defineStd();
   initImageIo();
@@ -441,9 +447,22 @@ int main(int argc, char *argv[]) {
 
   TEnv::setApplicationFileName(argv[0]);
 
-  // splash screen
-  QPixmap splashPixmap = QIcon(":Resources/splash.svg").pixmap(QSize(610, 344));
+  // splash screen (override with local file if present)
+  QString exeDir          = QCoreApplication::applicationDirPath();
+  QString localSplashPath = QDir(exeDir).filePath("splash.svg");
 
+  QPixmap splashPixmap;
+
+  if (QFileInfo(localSplashPath).exists() &&
+      QFileInfo(localSplashPath).isFile()) {
+    splashPixmap = QIcon(localSplashPath).pixmap(QSize(610, 344));
+    if (splashPixmap.isNull()) {
+      // fallback if loading fails
+      splashPixmap = QIcon(":Resources/splash.svg").pixmap(QSize(610, 344));
+    }
+  } else {
+    splashPixmap = QIcon(":Resources/splash.svg").pixmap(QSize(610, 344));
+  }
 #ifdef _WIN32
   QFont font("Segoe UI", -1);
 #else
@@ -489,9 +508,6 @@ int main(int argc, char *argv[]) {
 
   // Toonz environment
   initToonzEnv(argumentPathValues);
-
-  // Setup third party
-  ThirdParty::initialize();
 
   // prepare for 30bit display
   if (Preferences::instance()->is30bitDisplayEnabled()) {
@@ -707,13 +723,13 @@ int main(int argc, char *argv[]) {
     QWindowsWindowFunctions::setHasBorderInFullScreen(w.windowHandle(), true);
 #endif
 
-    // Qt have started to support Windows Ink from 5.12.
-    // Unlike WinTab API used in Qt 5.9 the tablet behaviors are different and
-    // are (at least, for OT) problematic. The customized Qt5.15.2 are made with
-    // cherry-picking the WinTab feature to be officially introduced from 6.0.
-    // See https://github.com/shun-iwasawa/qt5/releases/tag/v5.15.2_wintab for
-    // details. The following feature can only be used with the customized Qt,
-    // with WITH_WINTAB build option, and in Windows-x64 build.
+  // Qt have started to support Windows Ink from 5.12.
+  // Unlike WinTab API used in Qt 5.9 the tablet behaviors are different and
+  // are (at least, for OT) problematic. The customized Qt5.15.2 are made with
+  // cherry-picking the WinTab feature to be officially introduced from 6.0.
+  // See https://github.com/shun-iwasawa/qt5/releases/tag/v5.15.2_wintab for
+  // details. The following feature can only be used with the customized Qt,
+  // with WITH_WINTAB build option, and in Windows-x64 build.
 
 #ifdef WITH_WINTAB
   bool useQtNativeWinInk = Preferences::instance()->isQtNativeWinInkEnabled();
@@ -731,7 +747,7 @@ int main(int argc, char *argv[]) {
   // Parse inital stylesheet in ThemeManager
   themeManager.parseCustomPropertiesFromStylesheet(currentStyle);
 
-  //w.setWindowTitle(QString::fromStdString(TEnv::getApplicationFullName()));
+  // w.setWindowTitle(QString::fromStdString(TEnv::getApplicationFullName()));
   w.changeWindowTitle();
   if (TEnv::getIsPortable()) {
     splash.showMessage(offsetStr + "Starting OpenToonz Portable ...",

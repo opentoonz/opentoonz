@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ko" sourcelanguage="en">
+<TS version="2.1" language="ko" sourcelanguage="en">
 <context>
     <name>APngWriterProperties</name>
     <message>
@@ -113,7 +113,7 @@
     </message>
     <message>
         <source>Generate Palette</source>
-        <translation>팔레트 생성</translation>
+        <translation type="vanished">팔레트 생성</translation>
     </message>
     <message>
         <source>Global Palette</source>
@@ -208,6 +208,90 @@ Please try raising the FFmpeg timeout in Preferences.</source>
     <message>
         <source>FFmpeg returned error-code: %1</source>
         <translation>FFmpeg 시간초과 오류 코드: %1</translation>
+    </message>
+    <message>
+        <source>Cannot create FFmpeg cache directory: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot save non-raster image to FFmpeg</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid or empty raster for FFmpeg</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to clone raster for FFmpeg</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to allocate 32-bit raster for FFmpeg</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to convert raster to 32-bit ARGB (after clamp)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to create QImage for intermediate file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to save intermediate image: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FFmpeg process failed for: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open audio file for writing: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to write audio data to file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size error: %1
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frame rate error: %1
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frame count error: %1
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to retrieve %1 from video via ffprobe.
+Error details:
+%2Using available data and fallback values where necessary.
+Note: Zero values in dimensions, frame count or frame rate indicate that the information could not be retrieved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to determine frame count for: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FFmpeg failed to extract frames from: %1
+Check file and codec support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to delete file: %1
+%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to extract frames from movie: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -433,11 +517,83 @@ Please try raising the FFmpeg timeout in Preferences.</source>
     <name>WebmWriterProperties</name>
     <message>
         <source>Quality</source>
-        <translation>품질</translation>
+        <translation type="vanished">품질</translation>
     </message>
     <message>
         <source>Scale</source>
         <translation>비율</translation>
+    </message>
+    <message>
+        <source>Placebo (Smallest File)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Very Slow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Slower</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Slow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation type="unfinished">중간</translation>
+    </message>
+    <message>
+        <source>Fast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Faster</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Very Fast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ultra Fast (Largest File)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Every Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Every Second</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Every 2 Seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Every 5 Seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Every 10 Seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Encoding Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keyframe Interval</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preserve Alpha</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lossless</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

@@ -210,7 +210,7 @@ FlipBook::FlipBook(QWidget *parent, QString viewerTitle,
 
   // layout
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setSpacing(0);
   {
     mainLayout->addWidget(fsWidget, 1);
@@ -386,7 +386,7 @@ LoadImagesPopup::LoadImagesPopup(FlipBook *flip)
 
   // layout
   QHBoxLayout *frameRangeLayout = new QHBoxLayout();
-  frameRangeLayout->setMargin(5);
+  frameRangeLayout->setContentsMargins(5, 5, 5, 5);
   frameRangeLayout->setSpacing(5);
   {
     frameRangeLayout->addStretch(1);

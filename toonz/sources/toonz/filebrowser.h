@@ -10,11 +10,11 @@
 #include <QCheckBox>
 #include <QList>
 #include <QModelIndex>
+
 #include "dvitemview.h"
 #include "tfilepath.h"
 #include "toonzqt/dvdialog.h"
 #include "versioncontrol.h"
-
 #include "tthread.h"
 
 class QLineEdit;
@@ -27,16 +27,13 @@ class QFileSystemWatcher;
 //-----------------------------------------------------------------------------
 
 //! FrameCountReader is the class responsible for calculation of levels' frame
-//! counts
-//! in the file browser. Since on many file formats this requires to open the
-//! level file
-//! and scan each frame (MOV-like), and on some machine configurations such a
-//! task
-//! can be time consuming, we dedicate a separate thread for it - just like the
-//! icon
-//! generator does. Calculated frame counts are also stored for quick lookup
-//! once they
-//! have been calculated the first time.
+//! counts in the file browser. Since on many file formats this requires to open
+//! the level file and scan each frame (MOV-like), and on some machine
+//! configurations such a task can be time consuming, we dedicate a separate
+//! thread for it - just like the icon generator does. Calculated frame counts
+//! are also stored for quick lookup once they have been calculated the first
+//! time.
+
 class FrameCountReader final : public QObject {
   Q_OBJECT
 
@@ -50,8 +47,10 @@ public:
   void stopReading();
 
 signals:
-
   void calculatedFrameCount();
+
+private:
+  Q_DISABLE_COPY_MOVE(FrameCountReader);
 };
 
 //-----------------------------------------------------------------------------
@@ -60,8 +59,10 @@ class FileBrowser final : public QFrame, public DvItemListModel {
   Q_OBJECT
 
 public:
-  FileBrowser(QWidget *parent, Qt::WindowFlags flags = Qt::WindowFlags(),
-              bool noContextMenu = false, bool multiSelectionEnabled = false);
+  explicit FileBrowser(QWidget *parent,
+                       Qt::WindowFlags flags      = Qt::WindowFlags(),
+                       bool noContextMenu         = false,
+                       bool multiSelectionEnabled = false);
   ~FileBrowser();
 
   void sortByDataModel(DataType dataType, bool isDiscendent) override;
@@ -105,11 +106,10 @@ types to be displayed in the file browser.
   std::string getDayDateString() const { return m_dayDateString; }
 
   static void refreshFolder(const TFilePath &folder);
-
   static void updateItemViewerPanel();
 
-  // ritorna true se il file e' stato rinominato. dopo la chiamata fp contiene
-  // il nuovo path
+  // Returns true if the file was renamed. After the call, fp contains the new
+  // path.
   static bool renameFile(TFilePath &fp, QString newName);
 
   void makeCurrentProjectVisible();
@@ -148,13 +148,10 @@ protected:
   void refreshHistoryButtons();
 
 public slots:
-
   void onTreeFolderChanged();
 
 protected slots:
-
   void refresh();
-
   void changeFolder(const QModelIndex &index);
   void onDataChanged(const QModelIndex &topLeft,
                      const QModelIndex &bottomRight);
@@ -172,6 +169,7 @@ protected slots:
   void clearHistory();
 
   void renameAsToonzLevel();
+  void renameFolder();
   void updateAndEditVersionControl();
   void editVersionControl();
   void unlockVersionControl();
@@ -193,14 +191,12 @@ protected slots:
   void getRevisionHistory();
 
   void onVersionControlCommandDone(const QStringList &files);
-
   void onFileSystemChanged(const QString &folderPath);
 
   // If filePath is a valid scene file, open it. Otherwise do nothing.
   void tryToOpenScene(const TFilePath &filePath);
 
 signals:
-
   void filePathClicked(const TFilePath &);
   void filePathDoubleClicked(const TFilePath &);
   // reuse the list of TFrameId in order to skip loadInfo() when loading the
@@ -251,7 +247,7 @@ private:
 
   // folder history
   QList<QModelIndex> m_indexHistoryList;
-  int m_currentPosition;
+  int m_currentPosition = 0;
 
   std::vector<Item> m_items;
   TFilePath m_folder;
@@ -262,36 +258,33 @@ private:
 private:
   void readFrameCount(Item &item);
   void readInfo(Item &item);
-
   void refreshCurrentFolderItems();
 
-  DvItemListModel::Status getItemVersionControlStatus(
-      const FileBrowser::Item &item);
+  DvItemListModel::Status getItemVersionControlStatus(const Item &item);
+
+  Q_DISABLE_COPY_MOVE(FileBrowser);
 };
 
 //--------------------------------------------------------------------
 class RenameAsToonzPopup final : public DVGui::Dialog {
   Q_OBJECT
+
   QPushButton *m_okBtn, *m_cancelBtn;
   DVGui::LineEdit *m_name;
   QCheckBox *m_overwrite;
 
 public:
-  RenameAsToonzPopup(const QString name = "", int frames = -1);
+  explicit RenameAsToonzPopup(const QString &name = QString(), int frames = -1,
+                              bool isFolder = false);
 
-  bool doOverwrite() { return m_overwrite->isChecked(); }
-  QString getName() { return m_name->text(); }
+  bool doOverwrite() const { return m_overwrite->isChecked(); }
+  QString getName() const { return m_name->text(); }
+
+private slots:
+  void onOk();
 
 private:
-  // TPropertyGroup* getFormatProperties(const std::string &ext);
-
-public slots:
-  //! Starts the conversion.
-  // void onConvert();
-  // void onOptionsClicked();
-  void onOk();
+  Q_DISABLE_COPY_MOVE(RenameAsToonzPopup);
 };
 
-//-----------------------------------------------------------
-
-#endif
+#endif  // FILEBROWSER_INCLUDED

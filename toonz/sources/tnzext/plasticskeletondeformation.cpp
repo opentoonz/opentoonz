@@ -188,7 +188,7 @@ public:
 
   // NOTE: There \a is a deformation even for a skeleton's root node. This is
   // now required due to the
-  // onwership of \a multiple skeletons at once. However, its angle and distance
+  // ownership of \a multiple skeletons at once. However, its angle and distance
   // params will be unused.
 
 public:

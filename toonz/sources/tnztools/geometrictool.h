@@ -9,15 +9,22 @@
 #include "tools/cursors.h"
 #include "mypainttoonzbrush.h"
 #include "trasterimage.h"
-#include <QObject>
+#include "trastercm.h"
 
 // For Qt translation support
 #include <QCoreApplication>
+#include <map>
+#include <memory>
 
 class Primitive;
 class FullColorGeometricToolNotifier;
 class TTileSaverFullColor;
 class TTileSaverCM32;
+class TStroke;
+class TVectorImage;
+class TToonzImage;
+class TXshSimpleLevel;
+class TFrameId;
 
 //-----------------------------------------------------------------------------
 
@@ -35,7 +42,7 @@ public:
   TBoolProperty m_autogroup;
   TBoolProperty m_autofill;
   TBoolProperty m_smooth;
-  TBoolProperty m_selective;
+  TBoolProperty m_emptyOnly;
   TBoolProperty m_pencil;
   TEnumProperty m_capStyle;
   TEnumProperty m_joinStyle;
@@ -60,6 +67,7 @@ public:
 
   void updateTranslation();
 };
+
 //=============================================================================
 // Geometric Tool
 //-----------------------------------------------------------------------------

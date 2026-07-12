@@ -619,6 +619,9 @@ void StrokeSelection::selectAll() {
   StrokeSelection *selection = dynamic_cast<StrokeSelection *>(
       TTool::getApplication()->getCurrentSelection()->getSelection());
   if (selection) selection->notifyView();
+  TTool::getApplication()
+      ->getCurrentTool()
+      ->notifyToolChanged();  // Refreshes toolbar values
 }
 
 //=============================================================================

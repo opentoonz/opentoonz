@@ -1,9 +1,8 @@
-#pragma once
-
 //------------------------------------------------------------------
 // Iwa_Particles_Engine for Marnie
 // based on Particles_Engine by Digital Video
 //------------------------------------------------------------------
+#pragma once
 
 #ifndef IWA_PARTICLESENGINE_H
 #define IWA_PARTICLESENGINE_H
@@ -19,18 +18,18 @@ struct float3 {
 class Iwa_Particle;
 
 //--------------------
-/* 粒子を規則正しく配する、その位置情報と
- （剥がれるきっかけとなる）現在のポテンシャルを格納 -*/
+/* Stores the position information for particles arranged regularly and
+   the current potential (which triggers peeling off) */
 struct ParticleOrigin {
   float pos[2];
   float potential;
-  /*- 上を向いているかどうか -*/
+  /*- Whether it is facing upward -*/
   bool isUpward;
-  /*- どのテクスチャ素材を使うか -*/
+  /*- Which texture material to use -*/
   unsigned char level;
-  /*- 何番目のフレームを使うか -*/
+  /*- Which frame number to use -*/
   unsigned char initSourceFrame;
-  /*- ピクセル位置 -*/
+  /*- Pixel position -*/
   short int pixPos[2];
 
   ParticleOrigin(float x, float y, float _potential, bool _isUpward,
@@ -111,24 +110,24 @@ public:
   void normalize_array(std::vector<std::vector<TPointD>> &myregions,
                        TPointD pos, int lx, int ly, int regioncounter,
                        std::vector<int> &myarray, std::vector<int> &lista,
-                       std::vector<int> &listb, std::vector<int> & final);
+                       std::vector<int> &listb, std::vector<int> &final);
 
   void fill_array(TTile *ctrl1, int &regioncount, std::vector<int> &myarray,
                   std::vector<int> &lista, std::vector<int> &listb, int thres);
 
-  /*- 敷き詰めのため。まだ出発していない粒子情報を初期化 -*/
+  /*- For tiling. Initializes particle information that has not yet departed -*/
   void initParticleOrigins(TRectD &outTileBBox,
                            QList<ParticleOrigin> &particleOrigins,
                            const double frame, const TAffine affine,
                            struct particles_values &values, int level_n,
                            std::vector<int> &lastframe, double pixelMargin);
 
-  /*- Particle::create_Animationと同じ。粒子発生前に
-          あらかじめ計算してparticesOriginに持たせるため -*/
+  /*- Same as Particle::create_Animation. To pre-calculate and hold in
+   * particlesOrigin before particle generation -*/
   unsigned char getInitSourceFrame(const particles_values &values, int first,
                                    int last);
 
-  /*- ここで、出発した粒子の分、穴を開けた背景を描く -*/
+  /*- Draw background with holes where particles have departed -*/
   void renderBackground(TTile *tile, QList<ParticleOrigin> &origins,
                         std::vector<TRasterFxPort *> part_ports,
                         const TRenderSettings &ri,

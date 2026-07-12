@@ -549,7 +549,7 @@ void LevelMoverTool::onClick(const QMouseEvent *e) {
   CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
   int row                   = cellPosition.frame();
   int col                   = cellPosition.layer();
-
+  TXsheet *xsh              = getViewer()->getXsheet();
   int r0, c0, r1, c1;
   getViewer()->getCellSelection()->getSelectedCells(r0, c0, r1, c1);
 
@@ -559,10 +559,12 @@ void LevelMoverTool::onClick(const QMouseEvent *e) {
   if ((e->modifiers() == (Qt::ControlModifier | Qt::AltModifier)))
     m_qualifiers |= CellsMover::eCopyCells;
   if (e->modifiers() & Qt::ShiftModifier ||
-      // Or Dragging Frame Cell
-      (r0 == r1 && c0 == c1) &&
-      getViewer()->getXsheet()->getCell(cellPosition)
-      != getViewer()->getXsheet()->getCell(row - 1, col))
+      // Or Dragging the Frame Cell
+      Preferences::instance()->isAlwaysDragFrameCell() &&
+          (r0 == r1 && c0 == c1) &&
+          xsh->getCell(row, col) != xsh->getCell(row - 1, col) &&
+          !(xsh->getCell(row + 1, col).isEmpty() &&
+            xsh->getCell(row - 1, col).isEmpty()))
     m_qualifiers |= CellsMover::eInsertCells;
   if (e->modifiers() & Qt::AltModifier)
     m_qualifiers |= CellsMover::eOverwriteCells;
@@ -599,8 +601,6 @@ void LevelMoverTool::onClick(const QMouseEvent *e) {
   m_grabOffset = m_startPos - (o->isVerticalTimeline() ? TPoint(col, row)
                                                        : TPoint(row, col));
 
-  TXsheet *xsh = getViewer()->getXsheet();
-
   // move
   m_validPos                      = true;
   m_lastPos                       = m_startPos;
@@ -628,8 +628,7 @@ void LevelMoverTool::onCellChange(int row, int col) {
   if (pos.x < 0) pos.x = 0;
 
   TPoint delta = pos - m_aimedPos;
-  int dCol     = delta.x;
-  if (!o->isVerticalTimeline()) dCol = delta.y;
+  int dCol     = (o->isVerticalTimeline()) ? delta.x : delta.y;
 
   CellsMover *cellsMover = m_undo->getCellsMover();
   std::set<int> ii;
@@ -639,9 +638,7 @@ void LevelMoverTool::onCellChange(int row, int col) {
     int newBegin = currSelection.y0 + dCol;
     int newEnd   = currSelection.y1 + dCol;
 
-    if (newBegin < 0 ||
-        (!getViewer()->orientation()->isVerticalTimeline() && newEnd > currEnd))
-      return;
+    if (newBegin < 0 || newEnd > currEnd) return;
   }
 
   if (pos == m_aimedPos) return;

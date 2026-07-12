@@ -350,8 +350,8 @@ signals:
 };
 
 //=============================================================================
-/*! \brief The ChannelLineEdit is a cutomized version of IntLineEdit for channel
-   value.
+/*! \brief The ChannelLineEdit is a cutomized version of IntLineEdit for
+   channel value.
     It calls selectAll() at the moment of the first click.
 */
 class ChannelLineEdit final : public DVGui::IntLineEdit {

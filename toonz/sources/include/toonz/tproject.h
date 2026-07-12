@@ -151,7 +151,7 @@ public:
   TFilePath getProjectPathByProjectFolder(const TFilePath &projectFolder);
 
   std::shared_ptr<TProject> loadSceneProject(const TFilePath &scenePath, 
-      bool* sceneStandAlone = 0);
+      bool* notFound = 0);
   void getFolderNames(std::vector<std::string> &names);
 
   void addListener(Listener *listener);

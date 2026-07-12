@@ -27,7 +27,7 @@ class TreeView;
 
 //! generic tree model. It maintains internally a tree structure
 //! of TreeModel::Item's. Each QModelIndex created by the TreeModel
-//! points internally to the corrispondent TreeModel::Item
+//! points internally to the correspondent TreeModel::Item
 class DVAPI TreeModel : public QAbstractItemModel {
   Q_OBJECT
 

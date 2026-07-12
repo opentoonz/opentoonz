@@ -107,7 +107,7 @@ private:
   QWidget* createVisualizationPage();
   QWidget* createLoadingPage();
   QWidget* createSavingPage();
-  QWidget* createImportExportPage();
+  QWidget* createCodecPage();
   QWidget* createAutoLipSyncPage();
   QWidget* createDrawingPage();
   QWidget* createToolsPage();
@@ -118,7 +118,9 @@ private:
   QWidget* createColorsPage();
   QWidget* createVersionControlPage();
   QWidget* createTouchTabletPage();
-
+#ifdef _WIN32
+  QWidget* createAddonsPage();
+#endif
   //--- callbacks ---
   // General
   void onAutoSaveChanged();
@@ -161,6 +163,8 @@ private:
 private slots:
   void onChange();
   void onColorFieldChanged(const TPixel32&, bool);
+
+  void onAnimateToolChanged();
 
   void onAutoSaveExternallyChanged();
   void onAutoSavePeriodExternallyChanged();

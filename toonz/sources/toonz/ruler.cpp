@@ -93,10 +93,14 @@ void Ruler::getIndices(double origin, double iunit, int size, int &i0, int &i1,
 //-----------------------------------------------------------------------------
 
 double Ruler::getZoomScale() const {
-  if (m_viewer->is3DView())
+  if (m_viewer->is3DView()) {
     return m_viewer->getZoomScale3D();
-  else
-    return m_viewer->getViewMatrix().a11;
+  } else {
+    TAffine viewMatrix = m_viewer->getViewMatrix();
+
+    return std::sqrt(viewMatrix.a11 * viewMatrix.a11 +
+                     viewMatrix.a21 * viewMatrix.a21);
+  }
 }
 
 //-----------------------------------------------------------------------------
