@@ -154,7 +154,7 @@ void ShadingContext::makeCurrent() {
   m_imp->m_context->moveToThread(QThread::currentThread());
   // Not create new context, use existing one
   if (!m_imp->m_context->isValid()) {
-    QSurfaceFormat format;
+    const QSurfaceFormat format = m_imp->format();
     m_imp->m_context->setFormat(format);
     m_imp->m_context->create();
   }

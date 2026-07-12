@@ -874,9 +874,9 @@ Already covered by focused smokes:
 - The GPU shader-FX offscreen surface now receives the same requested
   `QSurfaceFormat` as its `QOpenGLContext` before it is created. On macOS this
   preserves the renderer's requested OpenGL 3.2 compatibility profile for its
-  legacy immediate-mode shader drawing path. The Qt 5 and Qt 6 build lanes,
-  the Qt 6 high-DPI raster viewer stale-frame smoke, and the Qt 6 final-render
-  FX smoke passed after the change.
+  legacy immediate-mode shader drawing path, including context recreation. The
+  Qt 5 and Qt 6 build lanes, the Qt 6 high-DPI raster viewer stale-frame smoke,
+  and the Qt 6 final-render FX smoke passed after the change.
 
 Still needed:
 

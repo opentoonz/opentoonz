@@ -231,8 +231,8 @@ branch.
 - The separate GPU shader-FX path now applies its requested `QSurfaceFormat`
   to the shared offscreen surface before creating it and reuses that format for
   each `QOpenGLContext`. This preserves the requested macOS OpenGL 3.2
-  compatibility profile for legacy immediate-mode shader drawing while keeping
-  the Qt 5 and Qt 6 implementations aligned.
+  compatibility profile for legacy immediate-mode shader drawing, including
+  context recreation, while keeping the Qt 5 and Qt 6 implementations aligned.
 - `QWheelEvent` pixel-delta access is now centralized behind
   `QtCompat::wheelEventPixelDelta()` alongside the existing wheel position and
   angle-delta helpers. `mise run check-qt6-wheelevent-scope` keeps direct
