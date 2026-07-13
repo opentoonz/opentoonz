@@ -395,14 +395,21 @@ void ExportLevelPopup::showEvent(QShowEvent *se) {
   }
 
   // WARNING: What happens it the restored selection is NO MORE VALID ?
-  //
-  // This Problem is caused because the global selection of dvitemview
-  // is on for default browserpopup , which whould cause the global
-  // selection to be cleared
   //          Consider that this popup is NOT MODAL !!
   //
   //          The same applies to all the other popups in
   //          filebrowserpopup.cpp...
+  //
+  // This Problem was caused because the global selection of dvitemview
+  // is on for default browserpopup , which whould cause the global
+  // selection to be cleared when filebrowser first initialized
+
+  // To resolve this problem:
+  // 1. when class initializing: m_browser->enableGlobalSelection(false);
+  // £¨this changed was not made since currently the change of broswer item
+  // won't trigger signal `selectionChanged`
+  // but only trigger signal `selectionSwitched` ( makeCurrent() ))
+  // 2. DO NOT overwrite global selection when classs is initialing
 
   updateOnSelection();  // Here the selection is used
 
