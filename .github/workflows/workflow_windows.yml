@@ -28,7 +28,7 @@ jobs:
       QT_PATH: ${{ github.workspace }}\thirdparty\qt\5.15.2_wintab\msvc2019_64  # Path to custom Qt
 
       # Visual Studio related variables
-      MSVCVERSION: "Visual Studio 17 2022"  # Visual Studio version
+      MSVCVERSION: "Visual Studio 18 2026"  # Visual Studio version
       
       # Boost-related variables      
       BOOST_TOOLSET: "14.3"                 # Boost MSVC Toolset version

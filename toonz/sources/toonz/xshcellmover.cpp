@@ -628,8 +628,7 @@ void LevelMoverTool::onCellChange(int row, int col) {
   if (pos.x < 0) pos.x = 0;
 
   TPoint delta = pos - m_aimedPos;
-  int dCol     = delta.x;
-  if (!o->isVerticalTimeline()) dCol = delta.y;
+  int dCol     = (o->isVerticalTimeline()) ? delta.x : delta.y;
 
   CellsMover *cellsMover = m_undo->getCellsMover();
   std::set<int> ii;
@@ -639,9 +638,7 @@ void LevelMoverTool::onCellChange(int row, int col) {
     int newBegin = currSelection.y0 + dCol;
     int newEnd   = currSelection.y1 + dCol;
 
-    if (newBegin < 0 ||
-        (!getViewer()->orientation()->isVerticalTimeline() && newEnd > currEnd))
-      return;
+    if (newBegin < 0 || newEnd > currEnd) return;
   }
 
   if (pos == m_aimedPos) return;

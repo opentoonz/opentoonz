@@ -172,11 +172,11 @@ QToolBar#FlipConsolePlayToolBar {
       max-width: @size;
 
       &:hover {
-        background-color: lighten(@slider-handle-bg-color, 8% * @hover-adjust-amount);
+        background-color: lighten(@slider-handle-bg-color, @hover-amount);
       }
 
       &:pressed {
-        background-color: darken(@slider-handle-bg-color, 8% * @pressed-adjust-amount);
+        background-color: darken(@slider-handle-bg-color, @pressed-amount);
       }
     }
   }
