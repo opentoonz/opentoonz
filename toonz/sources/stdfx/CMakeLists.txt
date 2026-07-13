@@ -293,7 +293,6 @@ set(SOURCES
     iwa_motionflowfx.cpp
     iwa_smootherfx.cpp
     naru_lazybrush.cpp
-    naru_maxflow.cpp
 )
 
 if(OpenCV_FOUND)

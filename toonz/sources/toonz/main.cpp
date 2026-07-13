@@ -163,6 +163,8 @@ static void initToonzEnv(QHash<QString, QString> &argPathValues) {
 
   QCoreApplication::setOrganizationName("OpenToonz");
   QCoreApplication::setOrganizationDomain("");
+  QGuiApplication::setDesktopFileName("io.github.OpenToonz");
+  QGuiApplication::setWindowIcon(QIcon::fromTheme("io.github.OpenToonz"));
   QCoreApplication::setApplicationName(
       QString::fromStdString(TEnv::getApplicationName()));
 
@@ -180,6 +182,9 @@ static void initToonzEnv(QHash<QString, QString> &argPathValues) {
   else if (!TFileStatus(stuffDir).isDirectory())
     fatalError("Folder \"" + toQString(stuffDir) +
                "\" not found or not readable");
+
+  // Setup third party
+  ThirdParty::initialize();
 
   Tiio::defineStd();
   initImageIo();
@@ -442,21 +447,22 @@ int main(int argc, char *argv[]) {
 
   TEnv::setApplicationFileName(argv[0]);
 
-// splash screen (override with local file if present)
-QString exeDir = QCoreApplication::applicationDirPath();
-QString localSplashPath = QDir(exeDir).filePath("splash.svg");
+  // splash screen (override with local file if present)
+  QString exeDir          = QCoreApplication::applicationDirPath();
+  QString localSplashPath = QDir(exeDir).filePath("splash.svg");
 
-QPixmap splashPixmap;
+  QPixmap splashPixmap;
 
-if (QFileInfo(localSplashPath).exists() && QFileInfo(localSplashPath).isFile()) {
-  splashPixmap = QIcon(localSplashPath).pixmap(QSize(610, 344));
-  if (splashPixmap.isNull()) {
-    // fallback if loading fails
+  if (QFileInfo(localSplashPath).exists() &&
+      QFileInfo(localSplashPath).isFile()) {
+    splashPixmap = QIcon(localSplashPath).pixmap(QSize(610, 344));
+    if (splashPixmap.isNull()) {
+      // fallback if loading fails
+      splashPixmap = QIcon(":Resources/splash.svg").pixmap(QSize(610, 344));
+    }
+  } else {
     splashPixmap = QIcon(":Resources/splash.svg").pixmap(QSize(610, 344));
   }
-} else {
-  splashPixmap = QIcon(":Resources/splash.svg").pixmap(QSize(610, 344));
-}
 #ifdef _WIN32
   QFont font("Segoe UI", -1);
 #else
@@ -499,9 +505,6 @@ if (QFileInfo(localSplashPath).exists() && QFileInfo(localSplashPath).isFile()) 
   // Install run out of contiguous memory callback
   TBigMemoryManager::instance()->setRunOutOfContiguousMemoryHandler(
       &toonzRunOutOfContMemHandler);
-
-  // Setup third party
-  ThirdParty::initialize();
 
   // Toonz environment
   initToonzEnv(argumentPathValues);

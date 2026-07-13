@@ -12,6 +12,7 @@
 #include "tools/tool.h"
 #include "tools/toolhandle.h"
 #include "tools/toolcommandids.h"
+#include "tools/editassistantstool.h"
 
 // TnzQt includes
 #include "toonzqt/tselectionhandle.h"
@@ -422,7 +423,30 @@ void TApp::onSceneSwitched() {
 //-----------------------------------------------------------------------------
 
 void TApp::onImageChanged() {
-  m_currentTool->onImageChanged((TImage::Type)getCurrentImageType());
+  // Assistant level auto-switch (only when "Auto-Switch & Keep" is enabled):
+  // switch to Edit Assistants tool when selecting an Assistant level, restore
+  // previous tool when leaving. Must run before ToolHandle::onImageChanged.
+  int imageType = getCurrentImageType();
+  bool isAssistantLevel = (imageType == TImage::META);
+  QString currentToolName = m_currentTool->getRequestedToolName();
+
+  if (isEditAssistantsAutoSwitchAndKeepEnabled()) {
+    if (isAssistantLevel) {
+      if (currentToolName != T_EditAssistants) {
+        m_toolBeforeAssistantLevel = currentToolName;
+        m_currentTool->setTool(T_EditAssistants);
+      }
+    } else {
+      if (!m_toolBeforeAssistantLevel.isEmpty() &&
+          currentToolName == T_EditAssistants) {
+        QString toolToRestore = m_toolBeforeAssistantLevel;
+        m_toolBeforeAssistantLevel.clear();
+        m_currentTool->setTool(toolToRestore);
+      }
+    }
+  }
+
+  m_currentTool->onImageChanged((TImage::Type)imageType);
 }
 
 //-----------------------------------------------------------------------------
