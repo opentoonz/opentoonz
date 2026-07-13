@@ -19,6 +19,7 @@
 #include "tgl.h"
 #include "tapp.h"
 #include "tenv.h"
+#include "tbuildinfo.h"
 #include "tconvert.h"
 #include "texception.h"
 #include "tfilepath_io.h"
@@ -40,6 +41,7 @@
 #include <QLabel>
 #include <QTextEdit>
 #include <QPushButton>
+#include <QProcess>
 
 static QWidget *s_parentWindow = NULL;
 static bool s_reportProjInfo   = false;
@@ -275,25 +277,33 @@ LONG WINAPI exceptionHandler(PEXCEPTION_POINTERS info) {
 
 #ifndef _WIN32
 
-static bool sh(std::string &out, const char *cmd) {
-  char buffer[128];
-  FILE *p = popen(cmd, "r");
-  if (p == NULL) return false;
-  while (fgets(buffer, 128, p)) out.append(buffer);
-  pclose(p);
-  return true;
+static bool runSymbolizer(std::string &out, const QString &program,
+                          const QStringList &arguments) {
+  QProcess process;
+  process.setProcessChannelMode(QProcess::MergedChannels);
+  process.start(program, arguments);
+  if (!process.waitForStarted()) return false;
+  if (!process.waitForFinished(30000)) {
+    process.kill();
+    process.waitForFinished();
+    return false;
+  }
+  out = process.readAll().toStdString();
+  return process.exitStatus() == QProcess::NormalExit && process.exitCode() == 0;
 }
 
 //-----------------------------------------------------------------------------
 
 static bool addr2line(std::string &out, const char *exepath, const char *addr) {
-  char cmd[512];
 #ifdef MACOSX
-  sprintf(cmd, "atos -o \"%.400s\" %s 2>&1", exepath, addr);
+  return runSymbolizer(out, "atos",
+                       {"-o", QString::fromLocal8Bit(exepath),
+                        QString::fromLocal8Bit(addr)});
 #else
-  sprintf(cmd, "addr2line -f -p -e \"%.400s\" %s 2>&1", exepath, addr);
+  return runSymbolizer(out, "addr2line",
+                       {"-f", "-p", "-e", QString::fromLocal8Bit(exepath),
+                        QString::fromLocal8Bit(addr)});
 #endif
-  return sh(out, cmd);
 }
 
 //-----------------------------------------------------------------------------
@@ -553,7 +563,8 @@ bool CrashHandler::trigger(const QString reason, bool showDialog) {
 
   // Generate report
   try {
-    out.append(TEnv::getApplicationFullName() + "  (Build " + __DATE__ ")\n");
+    out.append(TEnv::getApplicationFullName() + "  (Build " +
+               OPENTOONZ_BUILD_DATE + ")\n");
     out.append("\nReport Date: ");
     out.append(dateName);
     out.append("\nCrash Reason: ");
