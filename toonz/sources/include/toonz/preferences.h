@@ -300,6 +300,9 @@ public:
   QString getDefRasterFormat() const { return getStringValue(DefRasterFormat); }
   // QString getScanLevelType() const { return getStringValue(scanLevelType); }
   int getDefLevelType() const { return getIntValue(DefLevelType); }
+  QString getDefAssistantType() const {
+    return getStringValue(DefAssistantType);
+  }
   bool isNewLevelSizeToCameraSizeEnabled() const {
     return getBoolValue(newLevelSizeToCameraSizeEnabled);
   }
