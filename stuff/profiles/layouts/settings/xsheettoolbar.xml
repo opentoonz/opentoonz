@@ -3,6 +3,7 @@
     <command>MI_NewToonzRasterLevel</command>
     <command>MI_NewRasterLevel</command>
     <command>MI_NewVectorLevel</command>
+    <command>MI_NewMetaLevel</command>
     <separator/>
     <command>MI_Collapse</command>
     <command>MI_OpenChild</command>
