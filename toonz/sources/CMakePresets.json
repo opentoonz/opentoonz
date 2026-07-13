@@ -1,0 +1,56 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "nix-relwithdebinfo",
+      "displayName": "Nix RelWithDebInfo",
+      "description": "RelWithDebInfo Ninja build using dependencies from the Nix flake dev shell.",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/../build/nix-relwithdebinfo",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_C_COMPILER": "$env{OPENTOONZ_CMAKE_C_COMPILER}",
+        "CMAKE_CXX_COMPILER": "$env{OPENTOONZ_CMAKE_CXX_COMPILER}",
+        "CMAKE_OSX_SYSROOT": "$env{OPENTOONZ_MACOS_SDKROOT}",
+        "CMAKE_FRAMEWORK_PATH": "$env{OPENTOONZ_MACOS_FRAMEWORK_PATH}",
+        "WITH_TRANSLATION": "OFF",
+        "WITH_SYSTEM_LZO": "ON",
+        "WITH_SYSTEM_SUPERLU": "ON",
+        "QT_PATH": "$env{OPENTOONZ_QT_PATH}",
+        "Qt5_DIR": "$env{OPENTOONZ_QT5_DIR}",
+        "BOOST_ROOT": "$env{OPENTOONZ_BOOST_ROOT}",
+        "Boost_NO_BOOST_CMAKE": "ON",
+        "LZO_INCLUDE_DIR": "$env{OPENTOONZ_LZO_INCLUDE_DIR}",
+        "LZO_LIBRARY": "$env{OPENTOONZ_LZO_LIBRARY}",
+        "SUPERLU_INCLUDE_DIR": "$env{OPENTOONZ_SUPERLU_INCLUDE_DIR}",
+        "SUPERLU_LIBRARY": "$env{OPENTOONZ_SUPERLU_LIBRARY}"
+      }
+    },
+    {
+      "name": "nix-debug",
+      "displayName": "Nix Debug",
+      "description": "Debug Ninja build using dependencies from the Nix flake dev shell.",
+      "inherits": "nix-relwithdebinfo",
+      "binaryDir": "${sourceDir}/../build/nix-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "nix-relwithdebinfo",
+      "configurePreset": "nix-relwithdebinfo"
+    },
+    {
+      "name": "nix-debug",
+      "configurePreset": "nix-debug"
+    }
+  ]
+}

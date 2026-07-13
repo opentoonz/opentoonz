@@ -19,6 +19,7 @@
 #include "tgl.h"
 #include "tapp.h"
 #include "tenv.h"
+#include "tbuildinfo.h"
 #include "tconvert.h"
 #include "texception.h"
 #include "tfilepath_io.h"
@@ -553,7 +554,8 @@ bool CrashHandler::trigger(const QString reason, bool showDialog) {
 
   // Generate report
   try {
-    out.append(TEnv::getApplicationFullName() + "  (Build " + __DATE__ ")\n");
+    out.append(TEnv::getApplicationFullName() + "  (Build " +
+               OPENTOONZ_BUILD_DATE + ")\n");
     out.append("\nReport Date: ");
     out.append(dateName);
     out.append("\nCrash Reason: ");
