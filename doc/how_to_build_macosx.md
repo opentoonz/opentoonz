@@ -3,13 +3,58 @@
 ## Necessary Software
 
 - git
-- brew
+- Nix and mise for the preferred Apple Silicon build
+- brew for the Homebrew fallback
 - Xcode
 - cmake (3.10 or later)
 - Qt 5.x (5.15 or later)
 - boost (1.55.0 or later)
 
 ## Building on macOS
+
+### Apple Silicon recommended path
+
+For modern macOS and M-series Macs, use the pinned Nix + mise workflow:
+
+```sh
+mise run doctor
+mise run configure
+mise run build
+mise run package-macos
+mise run check-macos-arm64
+mise run dmg-macos
+```
+
+The build output is
+`toonz/build/nix-relwithdebinfo/toonz/OpenToonz.app`. The architecture check
+verifies the main binary, helper tools, and bundled Mach-O libraries are
+`arm64` and not x86_64-only.
+
+The default development version for this lane is `1.7.99`, a numeric
+placeholder for a 1.7-series Apple Silicon build. Maintainers can choose the
+final release number by passing `-DOPENTOONZ_APP_VERSION=...` during configure.
+The About dialog build timestamp is generated at configure time instead of
+using compiler `__DATE__`, which avoids reproducible-build epochs such as
+January 1, 1980.
+
+Packaged builds include default `stuff` data in
+`OpenToonz.app/Contents/Resources/portablestuff`. That bundled copy is a
+read-only seed for signing and notarization. At runtime, OpenToonz creates and
+uses `~/Library/Application Support/OpenToonz/stuff` for writable profiles,
+projects, and sandbox files so the app bundle is not modified after signing.
+
+The Nix workflow currently pins Qt 5.15.18 as a short-term bridge for native
+Apple Silicon builds. Qt 6 migration, OpenGL/AGL removal, and Metal rendering
+work are separate follow-up projects. The Nix shell also selects a macOS 15 SDK
+with `AGL.framework` when available because Qt 5 still references AGL during
+configuration.
+
+The Nix setup is described in more detail in
+[Building With Nix And Mise](./how_to_build_nix_mise.md). That document also
+tracks the current Apple Silicon parity gaps compared with the previous Intel
+macOS artifact. In short, the default package is arm64-only, Canon DSLR support
+is disabled in public builds, pull request artifacts are ad hoc signed rather
+than notarized, and Qt 6/Metal work is deferred.
 
 ### Download and install Xcode from Apple
 
@@ -20,6 +65,10 @@ Apple Store usually provides for the most recent macOS version.  For older versi
 After installing the application, you will need to start it in order to complete the installation.
 
 ### Install Homebrew from https://brew.sh
+
+Homebrew remains a fallback for local development. Prefer `brew --prefix`
+instead of hard-coded `/usr/local` or `/opt/homebrew` paths because Intel and
+Apple Silicon installations use different prefixes.
 
 Check site for any changes in installation instructions, but they will probably just be this:
 
@@ -39,13 +88,17 @@ git lfs install
 
 NOTE: This will install the latest version of QT v5.x which may not be compatible with older OS versions.
 
+Homebrew `qt@5` is deprecated upstream, which is one reason the reproducible
+Apple Silicon build uses the pinned Nix dependency set for CI and release
+artifacts.
+
 If you cannot use the most recent version, download the online installer from https://www.qt.io/download and install the appropriate `macOS` version (min 5.15).  If installing via this method, be sure to install the `Qt Script (Deprecated)` libraries.
 
 ### Remove incompatible symbolic directory
 Check to see if this symbolic glew directory exists. If so, remove it:
 ```sh
-ls -l /usr/local/lib/cmake/glew
-rm /usr/local/lib/cmake/glew
+ls -l "$(brew --prefix)/lib/cmake/glew"
+rm "$(brew --prefix)/lib/cmake/glew"
 ```
 
 ### Set up OpenToonz repository
@@ -69,7 +122,7 @@ mv ~/Downloads/boost_1_72_0.tar.bz2 .   #or whatever the boost filename you down
 tar xvjf boost_1_72_0.tar.bz2
 ```
 
-### Configure environment and Build OpenToonz
+### Configure environment and Build OpenToonz with Homebrew
 
 1. Create the build directory with the following:
 ```sh
@@ -80,22 +133,32 @@ cd build
 2. Include libjpeg-turbo path to PKG_CONFIG_PATH
 
 ```sh
-export PKG_CONFIG_PATH="/opt/homebrew/opt/jpeg-turbo/lib/pkgconfig:$PKG_CONFIG_PATH"
+export PKG_CONFIG_PATH="$(brew --prefix jpeg-turbo)/lib/pkgconfig:$PKG_CONFIG_PATH"
 ```
 
 3. Set up build environment
 
 To build from command line, do the following:
 ```sh
-cmake ../sources -DQT_PATH='/opt/homebrew/opt/qt@5/lib'  #replace QT path with your installed QT version#
-make
+cmake ../sources -G Ninja \
+  -DQT_PATH="$(brew --prefix qt@5)/lib" \
+  -DQt5_DIR="$(brew --prefix qt@5)/lib/cmake/Qt5" \
+  -DCMAKE_PREFIX_PATH="$(brew --prefix qt@5)/lib/cmake/Qt5" \
+  -DWITH_CANON=OFF \
+  -DWITH_TRANSLATION=OFF
+ninja
 ```
 - If you downloaded the QT installer and installed to `/Users/yourlogin/Qt` instead of by using homebrew, your lib path may look something like this: `~/Qt/5.12.2/clang_64/lib` or `~/Qt/5.12.2/clang_32/lib`
 
 To build using Xcode, do the following:
 ```sh
 sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
-cmake -G Xcode ../sources -B. -DQT_PATH='/opt/homebrew/opt/qt@5/lib' -DWITH_TRANSLATION=OFF   #replace QT path with your installed QT version#
+cmake -G Xcode ../sources -B. \
+  -DQT_PATH="$(brew --prefix qt@5)/lib" \
+  -DQt5_DIR="$(brew --prefix qt@5)/lib/cmake/Qt5" \
+  -DCMAKE_PREFIX_PATH="$(brew --prefix qt@5)/lib/cmake/Qt5" \
+  -DWITH_CANON=OFF \
+  -DWITH_TRANSLATION=OFF
 ```
 - Note that the option `-DWITH_TRANSLATION=OFF` is needed to avoid error when using XCode 12+ which does not allow to add the same source to multiple targets.
 - Open Xcode app and open project /Users/yourlogin/Documents/opentoonz/toonz/build/OpenToonz.xcodeproj
@@ -126,7 +189,7 @@ sudo chmod -R 777 /Applications/OpenToonz
 
 - If built using command line, run the following:
 ```sh
-open ~/Documents/opentoonz/build/toonz/OpenToonz.app
+open ~/Documents/opentoonz/toonz/build/toonz/OpenToonz.app
 ```
 
 - If built using Xcode, do the following:
@@ -136,3 +199,25 @@ open ~/Documents/opentoonz/build/toonz/OpenToonz.app
     - Run in Debug mode: Product -> Run
 
     - To open with command line or from Finder window, the application is found in `/Users/yourlogin/Documents/opentoonz/toonz/build/Debug/OpenToonz.app`
+
+### Canon DSLR camera support
+
+Canon support is intentionally disabled for public macOS arm64 builds with
+`WITH_CANON=OFF`. The Canon EDSDK is gated and should not be committed to the
+repository or required for CI. Maintainers with access to an arm64-capable EDSDK
+can add a separate private build lane later.
+
+### Current Apple Silicon feature gaps
+
+The native arm64 build is meant to cover normal OpenToonz drawing, scene,
+xsheet, FX, render, file I/O, and helper-tool workflows. The current known gaps
+against the last Intel macOS artifact are:
+
+- the default artifact is arm64-only, not Universal 2
+- Canon DSLR capture is disabled in public builds
+- release-grade Developer ID signing and notarization require maintainer
+  secrets and are not present on pull request artifacts
+- Qt 6, Metal rendering, and removal of the legacy OpenGL/AGL stack are not in
+  this pass
+- scanner, tablet, webcam, and stop-motion hardware need real-device regression
+  testing before declaring full parity
