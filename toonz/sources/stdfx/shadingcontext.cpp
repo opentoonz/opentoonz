@@ -296,7 +296,10 @@ GLuint ShadingContext::loadTexture(const TRasterP &src, GLuint texUnit) {
   glPixelStorei(GL_UNPACK_ROW_LENGTH, src->getWrap());
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-  GLenum chanType = TRaster32P(src) ? GL_UNSIGNED_BYTE : GL_UNSIGNED_SHORT;
+  // The packed 32-bit channel order is platform-dependent.  In particular,
+  // macOS uses MRBG storage, which requires GL_UNSIGNED_INT_8_8_8_8_REV with
+  // the corresponding TGL_FMT value rather than GL_UNSIGNED_BYTE.
+  GLenum chanType = TRaster32P(src) ? TGL_TYPE : TGL_TYPE16;
 
   glTexImage2D(GL_TEXTURE_2D,
                0,             // one level only

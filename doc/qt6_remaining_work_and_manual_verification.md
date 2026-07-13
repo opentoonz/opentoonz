@@ -881,6 +881,12 @@ Already covered by focused smokes:
   `mise run check-qt6-shader-assets` checks all shader XML program references
   against files under `stuff/library/shaders`. This does not prove shader
   compilation or runtime rendering.
+- The shader texture upload now uses the platform-defined packed pixel type
+  (`TGL_TYPE` for 32-bit rasters and `TGL_TYPE16` for 64-bit rasters). This is
+  required on macOS, where `MRGB` storage pairs `GL_BGRA` with
+  `GL_UNSIGNED_INT_8_8_8_8_REV`; the previous unconditional
+  `GL_UNSIGNED_BYTE` upload could make the sampler receive an unloadable
+  texture. Both the Qt 5 and Qt 6 OpenToonz targets rebuilt after this fix.
 
 Still needed:
 
@@ -894,8 +900,14 @@ Still needed:
   July 12, 2026 Qt 6 probe reached `ShaderFx::doCompute` without crashing after
   transform-feedback buffer/query calls moved onto Qt OpenGL functions, but the
   bundled `SHADER_HSLBlendGPU` path produced a valid all-black 320x240 output.
-  Before adding this to the aggregate smoke suite, shader output must produce
-  the expected pixels and shader compile/link failures must remain worker-safe.
+  The subsequent texture-upload fix addresses the macOS packed-pixel type
+  mismatch, but the probe must be rerun and must produce expected nonzero
+  pixels before this is added to the aggregate smoke suite. Shader
+  compile/link failures must also remain worker-safe. The current managed
+  macOS session could not complete that probe: LaunchServices could not
+  resolve the app on the first attempt, and direct execution lacked the
+  pasteboard/services required for the GUI smoke harness. This is an
+  environment limitation, not evidence of a passing or failing shader result.
 - Broader final-render parity against Qt 5 using real scenes.
 - Broader vector rendering parity.
 - Full-color Rasterizer/Renderer validation under a real OpenGL-capable
