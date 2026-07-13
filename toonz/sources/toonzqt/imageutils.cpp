@@ -699,6 +699,111 @@ bool isAAImage(TFilePath path) {
   return ratio > value;
 }
 
+bool isPaintedImage(TFilePath path) {
+  QImage img(path.getQString());
+  if (img.isNull()) return false;
+  const uint16_t width       = img.width();
+  const uint16_t height      = img.height();
+  const QRgb *imgData        = reinterpret_cast<const QRgb *>(img.bits());
+  const uint32_t totalPixels = width * height;
+
+  std::unordered_map<uint32_t, uint32_t> colorCount;
+
+  for (int y = 0; y < height; ++y) {
+    for (int x = 0; x < width; ++x) {
+      QRgb color = imgData[y * width + x];
+      colorCount[color]++;
+    }
+  }
+
+  uint32_t maxCount    = 0;
+  QRgb backgroundColor = 0;
+  for (const auto &pair : colorCount) {
+    if (pair.second > maxCount) {
+      maxCount        = pair.second;
+      backgroundColor = pair.first;
+    }
+  }
+
+  std::vector<uint8_t> visited(totalPixels, 0);
+  std::vector<uint32_t> stack;
+  stack.reserve(totalPixels / 4);  
+
+  uint32_t outerBackgroundCount = 0;  
+
+  auto tryPush = [&](uint16_t x, uint16_t y) {
+    uint32_t idx = y * width + x;
+    if (!visited[idx] && imgData[idx] == backgroundColor) {
+      visited[idx] = 1;
+      outerBackgroundCount++;
+      stack.push_back((static_cast<uint32_t>(y) << 16) | x);
+    }
+  };
+
+  for (uint16_t x = 0; x < width; ++x) {
+    tryPush(x, 0);
+    tryPush(x, height - 1);
+  }
+  for (uint16_t y = 1; y < height - 1; ++y) {
+    tryPush(0, y);
+    tryPush(width - 1, y);
+  }
+
+  // DFS
+  while (!stack.empty()) {
+    uint32_t packed = stack.back();
+    stack.pop_back();
+
+    uint16_t y   = packed >> 16;
+    uint16_t x   = packed & 0xFFFF;
+    uint32_t idx = y * width + x;
+
+    if (y > 0) {  
+      uint32_t nidx = idx - width;
+      if (!visited[nidx] && imgData[nidx] == backgroundColor) {
+        visited[nidx] = 1;
+        outerBackgroundCount++;
+        stack.push_back((static_cast<uint32_t>(y - 1) << 16) | x);
+      }
+    }
+    if (y < height - 1) {  
+      uint32_t nidx = idx + width;
+      if (!visited[nidx] && imgData[nidx] == backgroundColor) {
+        visited[nidx] = 1;
+        outerBackgroundCount++;
+        stack.push_back((static_cast<uint32_t>(y + 1) << 16) | x);
+      }
+    }
+    if (x > 0) {  
+      uint32_t nidx = idx - 1;
+      if (!visited[nidx] && imgData[nidx] == backgroundColor) {
+        visited[nidx] = 1;
+        outerBackgroundCount++;
+        stack.push_back((static_cast<uint32_t>(y) << 16) | (x - 1));
+      }
+    }
+    if (x < width - 1) {  
+      uint32_t nidx = idx + 1;
+      if (!visited[nidx] && imgData[nidx] == backgroundColor) {
+        visited[nidx] = 1;
+        outerBackgroundCount++;
+        stack.push_back((static_cast<uint32_t>(y) << 16) | (x + 1));
+      }
+    }
+  }
+
+  uint32_t objectColorCount = totalPixels - maxCount;
+  uint32_t innerBackgroundCount =
+      maxCount - outerBackgroundCount;
+
+  if (objectColorCount == 0) return 0.0;
+
+  double ratio =
+      double(objectColorCount) / (innerBackgroundCount + objectColorCount);
+
+  return ratio > 0.3;
+}
+
 void convertNaa2Tlv(const TFilePath &source, const TFilePath &dest,
                     const TFrameId &from, const TFrameId &to,
                     FrameTaskNotifier *frameNotifier, TPalette *palette,
@@ -764,7 +869,7 @@ void convertNaa2Tlv(const TFilePath &source, const TFilePath &dest,
     } catch (...) {
     }
 
-    frameNotifier->notifyFrameCompleted(100 * (f + 1) / frames.size());
+    frameNotifier->notifyFrameCompleted(f+1);
   }
 
   if (removeUnusedStyles) converter.removeUnusedStyles(usedStyleIds);
