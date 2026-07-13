@@ -565,7 +565,11 @@ elseif(BUILD_ENV_APPLE)
     add_dependencies(OpenToonz tnzcore tnzbase toonzlib colorfx tnzext image sound toonzqt tnztools tnzstdfx tfarm tcomposer tcleanup tconverter tfarmcontroller tfarmserver)
 
     # ADDED/UPDATED: Configure Info.plist for bundle (retina support etc.)
-    set_target_properties(OpenToonz PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/../cmake/BundleInfo.plist.in)
+    set_target_properties(OpenToonz PROPERTIES
+        MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/../cmake/BundleInfo.plist.in
+        MACOSX_BUNDLE_SHORT_VERSION_STRING "${OPENTOONZ_EFFECTIVE_BUNDLE_SHORT_VERSION}"
+        MACOSX_BUNDLE_BUNDLE_VERSION "${OPENTOONZ_EFFECTIVE_BUNDLE_VERSION}"
+    )
 
     # ADDED/UPDATED: Merged RPATH command (single one with both paths; || true for CI; COMMENT for logs)
     add_custom_command(TARGET OpenToonz POST_BUILD

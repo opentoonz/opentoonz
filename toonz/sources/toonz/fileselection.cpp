@@ -33,6 +33,7 @@
 #include "toonz/palettecontroller.h"
 #include "toonz/tpalettehandle.h"
 #include "toonz/tscenehandle.h"
+#include "toonz/txshsimplelevel.h"
 
 // TnzCore includes
 #include "tfiletype.h"
@@ -330,7 +331,14 @@ void FileSelection::deleteFiles() {
     if (TFileStatus(fp).isDirectory())
       QFile(fp.getQString()).moveToTrash();
     else {
-      TSystem::moveFileOrLevelToRecycleBin(fp);
+      const TFileType::Type fileType = TFileType::getInfo(fp);
+      if (fileType == TFileType::RASTER_LEVEL ||
+          fileType == TFileType::VECTOR_LEVEL ||
+          fileType == TFileType::CMAPPED_LEVEL ||
+          fileType == TFileType::MESH_LEVEL)
+        TXshSimpleLevel::removeFiles(fp);
+      else
+        TSystem::moveFileOrLevelToRecycleBin(fp);
       IconGenerator::instance()->remove(fp);
     }
   }
