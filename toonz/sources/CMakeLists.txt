@@ -10,6 +10,81 @@ message(STATUS "C++ standard: ${CMAKE_CXX_STANDARD}")
 project(OpenToonz LANGUAGES C CXX)
 
 #-----------------------------------------------------------------------------
+# Application Build Metadata
+
+set(OPENTOONZ_APP_VERSION "1.8.0" CACHE STRING "OpenToonz application version")
+set(OPENTOONZ_BUNDLE_SHORT_VERSION "" CACHE STRING "Override macOS CFBundleShortVersionString")
+set(OPENTOONZ_BUNDLE_VERSION "" CACHE STRING "Override macOS CFBundleVersion")
+set(OPENTOONZ_BUILD_DATE "" CACHE STRING "Override the displayed build date")
+set(OPENTOONZ_BUILD_TIME "" CACHE STRING "Override the displayed build time")
+
+if(OPENTOONZ_BUNDLE_SHORT_VERSION STREQUAL "")
+    set(OPENTOONZ_EFFECTIVE_BUNDLE_SHORT_VERSION "${OPENTOONZ_APP_VERSION}")
+else()
+    set(OPENTOONZ_EFFECTIVE_BUNDLE_SHORT_VERSION "${OPENTOONZ_BUNDLE_SHORT_VERSION}")
+endif()
+
+if(OPENTOONZ_BUNDLE_VERSION STREQUAL "")
+    set(OPENTOONZ_EFFECTIVE_BUNDLE_VERSION "${OPENTOONZ_APP_VERSION}")
+else()
+    set(OPENTOONZ_EFFECTIVE_BUNDLE_VERSION "${OPENTOONZ_BUNDLE_VERSION}")
+endif()
+
+if(OPENTOONZ_BUILD_DATE STREQUAL "")
+    if(WIN32)
+        execute_process(
+            COMMAND powershell -NoProfile -Command "Get-Date -Format yyyy-MM-dd"
+            OUTPUT_VARIABLE OPENTOONZ_EFFECTIVE_BUILD_DATE
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            RESULT_VARIABLE OPENTOONZ_BUILD_DATE_RESULT
+          )
+    else()
+        execute_process(
+            COMMAND date "+%Y-%m-%d"
+            OUTPUT_VARIABLE OPENTOONZ_EFFECTIVE_BUILD_DATE
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            RESULT_VARIABLE OPENTOONZ_BUILD_DATE_RESULT
+          )
+    endif()
+    if(NOT OPENTOONZ_BUILD_DATE_RESULT EQUAL 0 OR OPENTOONZ_EFFECTIVE_BUILD_DATE STREQUAL "")
+        string(TIMESTAMP OPENTOONZ_EFFECTIVE_BUILD_DATE "%Y-%m-%d")
+    endif()
+else()
+    set(OPENTOONZ_EFFECTIVE_BUILD_DATE "${OPENTOONZ_BUILD_DATE}")
+endif()
+
+if(OPENTOONZ_BUILD_TIME STREQUAL "")
+    if(WIN32)
+        execute_process(
+            COMMAND powershell -NoProfile -Command "Get-Date -Format HH:mm:ss"
+            OUTPUT_VARIABLE OPENTOONZ_EFFECTIVE_BUILD_TIME
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            RESULT_VARIABLE OPENTOONZ_BUILD_TIME_RESULT
+          )
+    else()
+        execute_process(
+            COMMAND date "+%H:%M:%S"
+            OUTPUT_VARIABLE OPENTOONZ_EFFECTIVE_BUILD_TIME
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            RESULT_VARIABLE OPENTOONZ_BUILD_TIME_RESULT
+          )
+    endif()
+    if(NOT OPENTOONZ_BUILD_TIME_RESULT EQUAL 0 OR OPENTOONZ_EFFECTIVE_BUILD_TIME STREQUAL "")
+        string(TIMESTAMP OPENTOONZ_EFFECTIVE_BUILD_TIME "%H:%M:%S")
+    endif()
+else()
+    set(OPENTOONZ_EFFECTIVE_BUILD_TIME "${OPENTOONZ_BUILD_TIME}")
+endif()
+
+set(OPENTOONZ_BUILD_TIMESTAMP "${OPENTOONZ_EFFECTIVE_BUILD_DATE} ${OPENTOONZ_EFFECTIVE_BUILD_TIME}")
+
+configure_file(
+    "${CMAKE_SOURCE_DIR}/include/tbuildinfo.h.in"
+    "${CMAKE_BINARY_DIR}/generated/include/tbuildinfo.h"
+    @ONLY
+  )
+
+#-----------------------------------------------------------------------------
 # Platform Specific Defaults
 
 # list of var-names
@@ -212,7 +287,6 @@ elseif(BUILD_ENV_APPLE)
 
     add_definitions(
         -DMACOSX
-        -Di386
         -D__MACOS__
       )
     if(PLATFORM EQUAL 64)
@@ -277,6 +351,7 @@ if(BUILD_ENV_APPLE)
 endif()
 
 include_directories(
+    ${CMAKE_BINARY_DIR}/generated/include
     include
   )
 
