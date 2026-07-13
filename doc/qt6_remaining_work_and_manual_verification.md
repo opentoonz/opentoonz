@@ -1,12 +1,15 @@
 # Qt 6 Remaining Work And Manual Verification Guide
 
 Prepared: June 2, 2026
+Last audited: July 13, 2026 at commit `82a9a8e58`
 
-This document consolidates the current Qt 5 to Qt 6 port status into a working
-implementation checklist and a manual verification guide. It is intentionally
-separate from `doc/qt6_migration_study.md` and
-`doc/qt6_migration_goal_prompt.md`: those files hold the detailed study and
-goal prompt, while this file is meant to be used during implementation and QA.
+This document owns the Qt 6 requirement/evidence checklist and the manual
+verification procedure. The current branch verdict and evidence provenance are
+in `doc/qt6_port_progress/2026-07-13-branch-audit.md`; the stable architecture
+and primary research are in `doc/qt6_migration_study.md`; the ordered execution
+contract is in `doc/qt6_migration_goal_prompt.md`. Older detailed entries below
+remain useful historical context, but the requirement matrix in this document
+and the latest dated audit control current status.
 
 ## Scope And Current Baseline
 
@@ -14,19 +17,44 @@ The active strategy is to finish the Qt 6 port before revisiting the separate
 Metal migration. The Qt 5 lane must remain buildable until Qt 6 has reached
 release-quality behavior and maintainers intentionally retire Qt 5 support.
 
-Current useful baseline:
+Audited baseline:
 
-- The default Qt 5 lane still exists.
-- A separate Qt 6 lane exists through CMake, Nix, CMake presets, and mise.
-- The macOS Qt 6 app bundle builds, packages, launches through focused smokes,
-  and passes the current arm64 Mach-O bundle check.
-- The Qt 6 branch has substantial automated smoke coverage for startup, scene
-  create/open, high DPI, viewer rendering, final render, FX Preview, tools,
-  overlays, Qt Multimedia backend probes, and the current QJSEngine script
-  compatibility slices.
-- The automated smoke suite is still not a substitute for manual product
-  parity. Most remaining risk is in real workflows, real OS input delivery,
-  production scenes, cross-platform packaging, and release polish.
+- The default Qt 5 and separate Qt 6 lanes both configure in the local Nix
+  environment. On July 13 they resolved Qt 5.15.18 and Qt 6.11.0 respectively.
+- The full mechanical migration preflight passes at `82a9a8e58`.
+- No complete build or runtime smoke was run during the July 13 documentation
+  audit. Do not inherit older local build claims as current-tip proof.
+- The latest inspected Qt 6 package workflow was one commit behind and failed
+  overall: macOS arm64 succeeded, while Linux and Windows failed. Regular
+  platform workflows are Qt 5 evidence.
+- The branch has substantial automated smoke infrastructure, but it does not
+  establish real-workflow, hardware, packaged-runtime, or studio parity.
+
+### Authoritative Requirement Matrix
+
+Use stable IDs in progress reports, manual records, CI summaries, and future
+machine-readable projections. “Blocked” means release-blocking evidence is
+absent; it does not mean implementation has not progressed.
+
+| ID | Severity | State on July 13 | Acceptance criterion | Next evidence |
+|---|---|---|---|---|
+| `QT6-INT-01` | P0 | Blocked | Live `master` integrated; overlapping paths reviewed; final delta has a draft PR or accepted merge plan | Post-integration commit plus review/build record |
+| `QT6-VER-01` | P0 | Failing contract | Minimum, release, and latest Qt lanes are explicit, source-compatible, and tested | Decide 6.5 versus 6.9+; align CI and deprecation gates |
+| `QT6-BLD-01` | P0 | Partial | Qt 5, Qt 6, strict-deprecation, and required translation builds pass from one candidate commit | Fresh retained build logs after integration |
+| `QT6-API-01` | P1 | Advanced | Removed/deprecated APIs are absent or confined to documented compatibility boundaries on every declared Qt lane | Floor/release/latest builds plus guarded bridge exit criteria |
+| `QT6-SCR-01` | P0 | Blocked | Qt 6 Script Console stays responsive; bounded interruption passes; supported binding surface is explicit | Interactive cancellation proof plus all script aggregates |
+| `QT6-REN-01` | P0 | Blocked | Bundled shader FX produces expected nonzero/reference pixels and failure handling is worker-safe | Rerun the packed-pixel fix on the current candidate |
+| `QT6-PKG-01` | P0 | Blocked | Every supported package builds, launches cleanly, finds plugins/runtime data, and is published from one commit | Fix Linux/Windows; decide macOS x64; packaged smokes |
+| `QT6-MED-01` | P1 | Partial | Playback, recording, camera, and stop-motion pass real-device and unsupported-format matrices | Hardware/platform evidence |
+| `QT6-INP-01` | P1 | Partial | Real OS/tablet input and fractional mixed-DPI behavior pass on supported platforms | Hardware/display evidence |
+| `QT6-TRN-01` | P1 | Partial | Translation-enabled candidate packages contain reproducible, intended locale assets | Decide tracked `.qm` policy and test packages |
+| `QT6-QA-01` | P0 | Blocked | Named Qt 5 baseline/corpus, platform matrix, thresholds, reviewers, and waivers are defined and satisfied | Publish the comparison and signoff contract |
+| `QT6-DOC-01` | P2 | Advanced | Goal, study, verification guide, dated reports, and machine projection have single responsibilities and agree on IDs/current evidence | Keep guards green; synchronize JSON schema/projection in a later non-doc turn |
+
+Every row must eventually record owner, exact commit, date, platform, compiler,
+exact Qt version, fixture/corpus revision, command, result, retained artifact,
+blocker, and waiver. The July 13 audit contains the evidence and rationale
+behind these states.
 
 ## Implementation Work Remaining
 
@@ -55,6 +83,25 @@ release signoff that covers:
 - Known unsupported behavior, if any.
 
 ### 2. Build, Dependencies, And Compatibility Debt
+
+Open release-contract issues:
+
+- `QT6-INT-01`: the audited branch is 111 commits ahead of and 12 behind live
+  `master`, changes 506 files, and has no pull request. Integrate live
+  `master`, review the eight overlapping paths listed in the dated audit, and
+  freeze a candidate before expanding the port.
+- `QT6-VER-01`: CMake accepts Qt 6.5, but `QtCompat` calls
+  `QImage::flipped()` for all Qt 6 builds even though Qt introduced it in 6.9.
+  Experimental CI uses 6.9.3 and local Nix currently resolves 6.11.0, masking
+  the floor violation. Either raise the floor to 6.9 or guard newer APIs and
+  add a real 6.5 build.
+- The strict lane disables APIs deprecated through Qt 6.9 while the current
+  local toolchain is Qt 6.11. A clean strict build therefore does not establish
+  deprecation cleanliness against the actual toolchain. Record minimum,
+  release, and latest Qt policies separately and align the macro/CI matrix.
+- The parity baseline is unresolved. Current machine-readable metadata names
+  OpenToonz 1.7.1, source declares 1.8.0, and Qt 5 versions differ by platform.
+  Record an exact commit, package, Qt version, compiler, and fixture corpus.
 
 Already covered:
 
@@ -588,6 +635,25 @@ Still needed:
 
 ### 3. Qt Script To QJSEngine Productization
 
+Open P0 behavior gate (`QT6-SCR-01`):
+
+- Qt 5 console evaluation starts a worker `Executor`; the Qt 6 implementation
+  currently calls `QJSEngine::evaluate()` synchronously from
+  `ScriptEngine::evaluate()`. `ScriptConsole` invokes that call inline, while
+  Ctrl-Y interruption is itself handled by the UI event loop. A long or
+  infinite script can therefore prevent the interrupt UI from running.
+- An unused Qt 6 `Executor` class is present, but restoring the old call without
+  an ownership design is not sufficient: `QJSEngine` and QObject wrappers have
+  thread-affinity constraints. Define the engine/worker model explicitly.
+- Add a bounded responsiveness/cancellation acceptance test. Existing fixture
+  and aggregate counts do not exercise the interactive console event loop.
+- Run and retain `mise run script-smoke-user-workflow-qt6`,
+  `mise run script-smokes-qt6`, and
+  `mise run script-smokes-natural-exit-qt6` after the design is corrected.
+- Derive a supported-binding matrix from the Qt 5 public script surface. The
+  console's current generic “partial” warning and fixture names are not a
+  compatibility specification.
+
 Already covered:
 
 - Qt 6 has a QJSEngine-based runtime shell for the app's script system.
@@ -812,6 +878,18 @@ Still needed:
 
 ### 4. Qt Multimedia, Audio, Camera, And Stop-Motion
 
+Open P1 format risk (`QT6-MED-01`):
+
+- The Qt 6 playback path selects a device's preferred format when the requested
+  format is unsupported, then currently copies the original raw audio bytes
+  unchanged. A different rate, channel count, or sample representation can
+  make the selected device interpret those bytes incorrectly. Add a focused
+  unsupported-format conversion test and treat any mismatch as product work,
+  not only a manual QA note.
+- Real-device evidence must cover default and non-default devices, permissions,
+  hotplug, pause/resume, long sessions, packaged backends, live camera formats,
+  capture, and stop-motion on each supported platform.
+
 Already covered:
 
 - Qt 6 API migration work exists for audio playback, audio recording, active
@@ -854,6 +932,17 @@ Still needed:
   API and still needs real live-camera workflow validation.
 
 ### 5. Viewer, OpenGL, Rendering, And Visual Parity
+
+Open P0 shader gate (`QT6-REN-01`):
+
+- The packed-pixel upload fix has no successful current-tip runtime rerun.
+  Require exact expected nonzero/reference pixels before calling the bundled
+  shader path correct or registering it in the aggregate GUI suite.
+- Capture OpenGL context version/profile, vendor, renderer, driver, Qt version,
+  device-pixel ratio, upload/readback format/type, fixture, and output artifact.
+- Audit context `create()`/`makeCurrent()` failures and remaining raw raster
+  upload/readback channel-order assumptions. Asset presence and crash-free
+  execution are not pixel evidence.
 
 Already covered by focused smokes:
 
@@ -982,19 +1071,42 @@ Still needed:
 
 ### 8. Packaging, Deployment, And CI
 
-macOS already covered:
+Current P0 package state (`QT6-PKG-01`):
+
+- The July 13 experimental Qt 6 workflow ran at `ee69d8b72`, one commit behind
+  the audited tip. macOS arm64 built and packaged; Windows failed during CMake
+  configuration, before generation/build, because the scheduled default-branch
+  workflow/runner did not provide the requested VS 2022 instance; Linux failed
+  on a missing `<climits>` dependency for `UCHAR_MAX`.
+- Six consecutive scheduled Qt 6 workflow runs have failed overall. No rolling
+  experimental tag/release exists, so publication language must remain
+  conditional until a release is visible.
+- Regular Linux, macOS, and Windows workflows are Qt 5 lanes. They must not be
+  reported as Qt 6 CI.
+- Scheduled workflow definitions come from the default branch even when jobs
+  checkout the migration branch. Branch-only workflow fixes cannot correct the
+  scheduled runner definition until integrated appropriately.
+- No workflow currently runs the strict Qt 6 deprecation build or the aggregate
+  Qt 6 script and GUI smokes. Add current-candidate evidence rather than relying
+  only on the weekly schedule.
+- The checklist and workflow disagree about macOS x64 support. Add the lane or
+  remove it from the supported matrix through an explicit decision.
+
+Historical macOS evidence (through commit `3670d9878e` on June 15, 2026; not
+current-candidate acceptance):
 
 - The Qt 6 app bundle packages.
 - Qt 6 multimedia and SVG/icon plugins are included.
 - Qt plugin framework references are rewritten into the bundle.
-- The current arm64 bundle check passes.
+- A dated arm64 bundle check passed for the then-current package.
 - Packaged macOS Qt 6 app-side high-DPI and Script Console GUI smokes pass when
   run through the LaunchServices wrapper outside the sandbox.
 - The bounded Qt 6 script-engine smoke suite, including the QApplication-backed
   scene icon, rasterizer, and renderer fixtures, passes when the app bundle is
   launched outside the sandbox.
-- The full app-side `gui-smokes-app-qt6` aggregate passes outside the sandbox.
-  The current run covered startup, scene creation, high-DPI, Script Console,
+- The full app-side `gui-smokes-app-qt6` aggregate passed outside the sandbox
+  in the retained June evidence. That run covered startup, scene creation,
+  high-DPI, Script Console,
   multimedia device enumeration, camera-format no-camera handling, audio
   playback/output, xsheet scrub, raster/vector viewer framebuffers, preview/FX
   preview/final render outputs, onion skin, safe-area/field-guide/ruler-guide
@@ -1007,16 +1119,14 @@ macOS already covered:
   not a child of this shell` failures when a fast app-side smoke completes
   before the shell reaches the final early-exit path. The rerun passed the full
   aggregate with the documented microphone-related structured timeout skips.
-- On the current machine/session, the audio-input and audio-recording WAV
-  smokes report structured `timeout` skips rather than failures. Treat those as
+- In that machine/session, the audio-input and audio-recording WAV smokes
+  reported structured `timeout` skips rather than failures. This was
   environment-limited microphone capture coverage, not proof of microphone
   recording parity.
-- The `qt-6-experimental` GitHub Actions workflow builds Qt 6 Linux, Windows,
-  and macOS artifacts from `codex/qt-6-port` on `bgyss/opentoonz`, runs weekly
-  on Mondays at 10:00 UTC or by manual dispatch, and publishes them to the
-  rolling `qt-6-experimental` prerelease. `mise run release-qt6-experimental`
-  retags the current clean branch and pushes the tag to refresh that rolling
-  prerelease manually.
+- The experimental workflow is designed to build Linux, Windows, and macOS
+  artifacts and conditionally publish a rolling prerelease. As recorded above,
+  the latest inspected run failed overall and no rolling tag/release existed;
+  the workflow design is not publication evidence.
 
 macOS still needed:
 
@@ -1387,43 +1497,64 @@ If no hardware is available:
 Use this template for each manual pass:
 
 ```text
+Requirement ID:
 Date:
 Commit:
+Dirty/clean state:
+Reviewer or automation:
 Platform:
-Qt lane:
+OS build:
+Architecture:
+Compiler and SDK:
+Exact Qt version:
 Build command:
 Package command:
-App bundle:
-Display scale:
+Candidate package path and checksum:
+Fixture/corpus revision:
+Expected result and threshold:
+Observed result:
+Display topology and scale factors:
+GPU, driver, OpenGL vendor/renderer/profile:
 Input devices:
 Audio devices:
 Camera devices:
 
 Automated preflight run:
 Manual areas covered:
-Qt 5 baseline used:
+Exact Qt 5 baseline package/commit/toolchain:
 Passes:
 Failures:
 Deferred because hardware unavailable:
-Artifacts:
+Retained logs/images/packages/CI links:
+What this evidence proves:
+What this evidence does not prove:
 Release-blocking issues:
 Follow-up owner:
+Waiver, rationale, approver, and expiry:
 ```
 
 ## Definition Of Done For The Qt 6 Port
 
 The port is done only when all of the following are true:
 
-- Qt 6 builds and packages on every supported release platform.
-- Qt 5 remains green until maintainers intentionally retire it.
-- Qt Script replacement is product-ready or remaining incompatibilities are
-  explicitly accepted.
-- Multimedia and stop-motion workflows are verified on real hardware.
-- Viewer, drawing, selection, overlays, preview, FX Preview, final render, and
-  script-render paths match the Qt 5 baseline closely enough for release.
-- Real OS-level input and tablet/stylus behavior are verified or explicitly
-  documented as unsupported.
-- Release packaging, signing, deployment, runtime data, translations, and docs
-  are updated.
-- The remaining known gaps are small enough to ship with documented release
-  notes.
+- The supported OS/compiler/architecture matrix and minimum, release, and
+  latest Qt versions are explicit; every required lane is green.
+- Live `master` is integrated and the final delta has a reviewable PR or an
+  accepted merge plan.
+- Required Qt 5, Qt 6, strict-deprecation, translation, package, smoke, and
+  manual evidence comes from the same release-candidate commit.
+- Every P0 and P1 requirement has current acceptance evidence or an approved,
+  owned, scoped, time-bounded waiver.
+- `QT6-SCR-01` proves responsive Script Console evaluation, bounded
+  interruption, and a documented supported binding surface.
+- `QT6-REN-01` proves expected nonzero/reference pixels for bundled shader FX
+  and the named Qt 5/Qt 6 render corpus.
+- Real input/tablet, fractional/mixed DPI, audio, camera, and stop-motion tests
+  pass on the supported hardware/platform matrix.
+- Every candidate package launches on a clean machine with platform and
+  multimedia plugins, runtime data, translations, relocation, checksums,
+  signing, and notarization verified as applicable.
+- The release/tag/artifacts have actually been published; a conditional
+  workflow step is not publication evidence.
+- Every remaining known issue has severity, owner, scope, release disposition,
+  and release-note text where needed.

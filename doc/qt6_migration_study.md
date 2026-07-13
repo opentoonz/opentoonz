@@ -1,6 +1,12 @@
 # OpenToonz Qt 6 Migration Study
 
 Prepared: May 24, 2026
+Research and contract review: July 13, 2026
+
+This is the stable architecture and research record. Its original baseline and
+phase narratives are historical, not a current branch dashboard. Use
+`doc/qt6_port_progress/2026-07-13-branch-audit.md` for current state and
+`doc/qt6_migration_goal_prompt.md` for ordered execution.
 
 ## Executive Recommendation
 
@@ -38,7 +44,7 @@ documentation:
 
 - Qt Porting Guide: <https://doc.qt.io/qt-6/portingguide.html>
 - Qt 5 and Qt 6 CMake compatibility:
-  <https://doc.qt.io/qt-6/cmake-qt5-and-qt6-compatibility.html>
+  <https://doc.qt.io/archives/qt-6.9/cmake-qt5-and-qt6-compatibility.html>
 - Qt 6 Clazy porting checks:
   <https://doc.qt.io/qt-6/porting-to-qt6-using-clazy.html>
 - Qt 6 removed modules:
@@ -55,8 +61,108 @@ documentation:
   <https://doc.qt.io/qt-6/qtcore5-index.html>
 - `qt_add_executable`:
   <https://doc.qt.io/qt-6/qt-add-executable.html>
+- Qt release and support table:
+  <https://doc.qt.io/qt-6/qt-releases.html>
+- Qt deprecation markers:
+  <https://doc.qt.io/qt-6/qtdeprecationmarkers.html>
+- `QImage`, including API introduction versions:
+  <https://doc.qt.io/qt-6/qimage.html>
+- `QJSEngine` and application scripting:
+  <https://doc.qt.io/qt-6/qjsengine.html>
+  and <https://doc.qt.io/qt-6/qtjavascript.html>
+- `QOpenGLContext` and `QOpenGLWidget`:
+  <https://doc.qt.io/qt-6/qopenglcontext.html>
+  and <https://doc.qt.io/qt-6/qopenglwidget.html>
+- High-DPI behavior:
+  <https://doc.qt.io/qt-6/highdpi.html>
+- Deployment overview and platform guidance:
+  <https://doc.qt.io/qt-6/deployment.html>,
+  <https://doc.qt.io/qt-6/linux-deployment.html>,
+  <https://doc.qt.io/qt-6/windows-deployment.html>, and
+  <https://doc.qt.io/qt-6/macos-deployment.html>
+- Supported platforms:
+  <https://doc.qt.io/qt-6/supported-platforms.html>
+- Qt Test overview:
+  <https://doc.qt.io/qt-6/qtest-overview.html>
 
-## Current Checkout Baseline
+The July 13 review used current official Qt 6 documentation for architectural
+claims. Dated CI and repository evidence belongs in the branch audit rather
+than this study.
+
+## July 13, 2026 Research And Contract Update
+
+The implementation has advanced far beyond the study's original baseline, but
+the research now points to several precise decisions that must precede release
+claims.
+
+### Define three Qt version lanes
+
+The project needs separate definitions for:
+
+1. **minimum supported Qt**, which all active source must compile against;
+2. **primary release Qt**, used for candidate packages and release evidence;
+3. **forward-compatibility/latest Qt**, used to expose newer deprecations and
+   behavioral drift.
+
+The current source contract is inconsistent. CMake accepts Qt 6.5,
+experimental CI pins 6.9.3, local Nix resolves 6.11.0, and the strict build
+disables APIs deprecated only through 6.9. More concretely, the shared image
+compatibility helper calls `QImage::flipped()` for every Qt 6 build, while Qt
+documents that API as introduced in 6.9. Either raise the minimum to 6.9 or
+retain 6.5 with a guarded fallback and an actual floor build.
+
+`QT_DISABLE_DEPRECATED_UP_TO` should match the intended policy. It is a useful
+compile contract, but a 6.9 threshold on a 6.11 toolchain does not prove the
+source is clean of APIs deprecated in 6.10 or 6.11. Keep the threshold and the
+tested Qt version visible in evidence.
+
+### Treat QJSEngine cancellation as an ownership problem
+
+Output-compatible fixtures do not prove an interactive scripting runtime. The
+Qt 6 Script Console currently calls evaluation synchronously even though its
+interrupt command is delivered by that same UI event loop. The replacement
+design must specify which thread owns `QJSEngine`, how exposed QObjects cross
+thread boundaries, how main-thread application operations are marshalled, and
+how cancellation is observed. Acceptance must include UI responsiveness and a
+bounded interruption test, not only returned values.
+
+### Treat OpenGL evidence as context- and pixel-specific
+
+Qt's OpenGL guidance makes context format, sharing, thread affinity,
+`makeCurrent()`, and default-framebuffer behavior part of correctness. Retained
+render evidence should include context version/profile, vendor, renderer,
+driver, device-pixel ratio, upload/readback format and type, fixture, and output
+pixels. A crash-free shader invocation or a valid all-black image does not
+establish visual correctness.
+
+High-DPI acceptance must include fractional scaling and mixed-display movement.
+Qt 6 enables high-DPI behavior by default, and lower-level rendering code must
+use device-pixel-aware framebuffer dimensions and coordinates.
+
+### Turn deployment guidance into a package matrix
+
+Qt deployment is more than copying the main libraries. Each platform record
+should enumerate executable dependencies, platform and multimedia plugins,
+runtime `stuff`, translations, relocation behavior, signing/notarization,
+checksums, and clean-machine launch. Use `windeployqt`/`macdeployqt` and the
+platform CMake deployment APIs as inputs to the project-specific matrix, then
+verify the result rather than assuming the tool copied everything required.
+
+### Separate deterministic tests from OS and hardware evidence
+
+Qt Test is appropriate for focused widget, signal, and synthetic event
+behavior. The branch's app-side smoke surface has become large enough that a
+future implementation plan should give it a test-only compilation or target
+boundary. Synthetic tests must remain separate from real tablet drivers,
+window-system events, cameras, audio devices, GPUs, signing, and clean-machine
+packages.
+
+## Historical Study Baseline And Accumulated Snapshots
+
+The following section begins with the May 24, 2026 starting point and retains
+later implementation snapshots accumulated by the study. Those snapshots are
+historical even when their original prose uses present tense. They must not be
+used as current branch, CI, package, or toolchain evidence.
 
 This repository is a C++17, CMake-based Qt 5 desktop application. The main
 CMake entry point is `toonz/sources/CMakeLists.txt`. The Nix/mise path is the
@@ -204,7 +310,7 @@ The Nix file should introduce a Qt 6 dependency set next to the existing Qt 5
 set rather than replacing it immediately. This allows the project to prove
 configuration and partial compilation while preserving the known Qt 5 build.
 
-Current branch status:
+Historical branch snapshot (superseded by the July 13 audit):
 
 - The default lane remains Qt 5. A separate `OPENTOONZ_QT_MAJOR=6` lane now
   exists in CMake, Nix, CMake presets, and mise tasks.
@@ -1383,7 +1489,7 @@ Migration design:
 6. Decide what to do with the debugger path. `QScriptEngineDebugger` has no
    direct drop-in equivalent in the target Qt 6 API set.
 
-Current branch status:
+Historical branch snapshot (superseded by the July 13 audit):
 
 - Qt 5 still builds the existing `QScriptEngine` runtime and binding classes.
 - Qt 6 builds a first `QJSEngine` runtime shell for `ScriptEngine`, including
@@ -2047,7 +2153,7 @@ hardware smoke tests:
 - audio playback and lip-sync preview
 - device hotplug or refresh behavior where supported
 
-Current branch status:
+Historical branch snapshot (superseded by the July 13 audit):
 
 - The Qt 6 app target compiles with the refactored audio playback, audio
   recording, auto lip-sync playback, active pencil-test camera, and stop-motion
@@ -2151,7 +2257,7 @@ Qt 6 rendering work is now allowed to touch files such as:
 - `toonz/sources/include/qtofflinegl.h`
 - `toonz/sources/stdfx/shader*`
 
-Current branch status:
+Historical branch snapshot (superseded by the July 13 audit):
 
 - The Qt 6 app target links while still using the existing OpenGL-heavy viewer
   and FX code. This proves the Qt 6 widget/build integration is viable, but it
@@ -2929,7 +3035,7 @@ macOS:
 - Verify whether Qt 6 rendering, multimedia, or helper-process changes require
   bundled framework or entitlement updates.
 
-Current branch status:
+Historical branch snapshot (superseded by the July 13 audit):
 
 - `OPENTOONZ_QT_PLUGIN_DIRS` now includes the QtSvg plugin root in addition to
   QtBase and QtMultimedia. This is needed for SVG image/icon plugins during
@@ -3006,6 +3112,12 @@ Expected changes:
   when intentionally updating packaged localization.
 
 ## Proposed Migration Plan
+
+This phase plan records the study's original sequencing. The branch has already
+implemented substantial work across every phase. Current ordering and open
+gates are controlled by `doc/qt6_migration_goal_prompt.md` and the latest dated
+audit; do not restart these phases or infer completion from this historical
+plan.
 
 ### Phase 0: Freeze The Baseline And Qt 6 Scope
 
@@ -3230,7 +3342,11 @@ priority, and Metal should be revisited only after the Qt 6 port reaches
 product parity. Qt 6 rendering work should proceed directly against the current
 OpenToonz behavior.
 
-## Recommended Next Implementation Slice
+## Historical Recommended Next Implementation Slice
+
+This section preserves the implementation slice recommended during the
+original study. It is not the current next action. Use the ordered critical
+path in `doc/qt6_migration_goal_prompt.md`.
 
 The first infrastructure slice has now been achieved in this branch: the dual
 Qt lane exists and both Qt 5 and Qt 6 can compile/link the `OpenToonz` app
@@ -3336,6 +3452,10 @@ milestone while keeping the Qt 6 port focused on product parity.
 
 ## Validation Matrix
 
+This is the broad architectural validation inventory. Current requirement IDs,
+acceptance evidence, and manual record fields live in
+`doc/qt6_remaining_work_and_manual_verification.md`.
+
 During migration, every completed slice should state exactly which checks were
 run.
 
@@ -3357,16 +3477,17 @@ mise run build-qt6
 cmake --build toonz/build/nix-qt6-relwithdebinfo --target OpenToonz
 ```
 
-Current verified compile/link checks in this branch:
+Historical compile/link checks retained by this study:
 
 ```sh
 cmake --build toonz/build/nix-relwithdebinfo --target OpenToonz --parallel
 cmake --build toonz/build/nix-qt6-relwithdebinfo --target OpenToonz --parallel
 ```
 
-These commands prove the app target links in both lanes. They do not replace
-launch, packaging, GUI, scripting, audio, camera, or renderer smoke validation.
-The latest local Qt 6 build evidence is `mise run build-qt6` on June 5, 2026.
+These commands proved the app target linked in both lanes at the recorded June
+commits. They do not replace current launch, packaging, GUI, scripting, audio,
+camera, or renderer smoke validation. The last local Qt 6 build evidence
+retained by this study is `mise run build-qt6` on June 5, 2026.
 It passed with the expanded local preflight chain enabled: Windows MSVC ABI,
 QRegExp, Core5Compat scope, multimedia scope, script scope, font metrics scope,
 and high-DPI startup attribute scope. The remaining compiler warnings in that
