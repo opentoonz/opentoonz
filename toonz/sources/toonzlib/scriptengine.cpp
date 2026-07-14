@@ -4207,21 +4207,9 @@ QVariantMap ScriptEngine::rendererDumpCache(int rendererId) {
 void ScriptEngine::evaluate(const QString& cmd) {
   if (m_qjsEvaluating) return;
   m_qjsEvaluating = true;
-
-  m_engine->setInterrupted(false);
-  m_engine->collectGarbage();
-  QJSValue result = m_engine->evaluate(cmd);
-  if (result.isError()) {
-    emitOutput(ScriptEngine::SyntaxError, formatError(result, ""));
-  } else if (isVoidResult(m_engine, result)) {
-  } else if (result.isUndefined()) {
-    emitOutput(ScriptEngine::UndefinedEvaluationResult, "undefined");
-  } else {
-    emitOutput(ScriptEngine::EvaluationResult, print(result, true));
-  }
-
-  m_qjsEvaluating = false;
-  emit evaluationDone();
+  m_executor = new Executor(this, cmd);
+  connect(m_executor, SIGNAL(finished()), this, SLOT(onTerminated()));
+  m_executor->start();
 }
 
 bool ScriptEngine::wait(unsigned long time) {
@@ -4237,6 +4225,7 @@ void ScriptEngine::onMainThreadEvaluationPosted() {}
 
 void ScriptEngine::onTerminated() {
   if (!m_executor) return;
+  m_qjsEvaluating = false;
   emit evaluationDone();
   delete m_executor;
   m_executor = 0;
