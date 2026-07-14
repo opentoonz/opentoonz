@@ -664,7 +664,7 @@ if(WITH_TRANSLATION)
       )
 
     set(LANG_DISPLAY_NAMES
-    "日本語" "Italiano" "Français" "Español" "中文" "Deutsch" "Русский" "한국어" "Čeština" "Portuguese (Brazil)"
+    "日本語" "Italiano" "Français" "Español" "中文" "Deutsch" "Русский" "한국어" "Čeština" "Portuguese"
       )
 
     list(LENGTH LANG_CODES CODE_COUNT)
