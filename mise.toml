@@ -26,6 +26,10 @@ run = "nix develop path:. --command bash scripts/qt6/check-textcodec.sh qt5"
 description = "Compile and run the Qt 6 legacy text-codec adapter regression check."
 run = "nix develop path:.#qt6 --command bash scripts/qt6/check-textcodec.sh qt6"
 
+[tasks.check-qt6-version-policy]
+description = "Fail if the Qt 6 floor, release pin, strict threshold, or documented lanes drift apart."
+run = "bash scripts/qt6/check-version-policy.sh"
+
 [tasks.check-no-qregexp]
 description = "Fail if removed Qt 5 QRegExp APIs reappear under toonz/sources."
 run = "bash scripts/qt6/check-no-qregexp.sh"
@@ -207,11 +211,11 @@ description = "Build the Qt 5 lane with Qt APIs deprecated through 5.15 disabled
 run = "nix develop path:. --command bash -lc 'bash scripts/qt6/check-migration-preflight.sh && bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-deprecated-api && cmake --build toonz/build/nix-deprecated-api --target OpenToonz --parallel'"
 
 [tasks.configure-qt6-deprecated-api]
-description = "Configure the Qt 6 lane with Qt APIs deprecated through 6.9 disabled."
+description = "Configure the Qt 6 lane with Qt APIs deprecated through the Qt 6.10 release policy disabled."
 run = "nix develop path:.#qt6 --command bash -lc 'bash scripts/qt6/check-migration-preflight.sh && bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-deprecated-api'"
 
 [tasks.build-qt6-deprecated-api]
-description = "Build the Qt 6 lane with Qt APIs deprecated through 6.9 disabled."
+description = "Build the Qt 6 lane with Qt APIs deprecated through the Qt 6.10 release policy disabled."
 run = "nix develop path:.#qt6 --command bash -lc 'bash scripts/qt6/check-migration-preflight.sh && bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-deprecated-api && cmake --build toonz/build/nix-qt6-deprecated-api --target OpenToonz --parallel'"
 
 [tasks.configure-qt6]

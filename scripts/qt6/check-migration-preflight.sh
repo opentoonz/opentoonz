@@ -6,6 +6,7 @@ cd "$repo_root"
 
 checks=(
   scripts/windows/check-msvc-abi.sh
+  scripts/qt6/check-version-policy.sh
   scripts/qt6/check-no-qregexp.sh
   scripts/qt6/check-core5compat-scope.sh
   scripts/qt6/check-multimedia-scope.sh

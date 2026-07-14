@@ -3,7 +3,7 @@
 Use this prompt to start or continue an implementation session in the
 OpenToonz repository root.
 
-Last audited: July 13, 2026
+Last audited: July 14, 2026
 Authoritative audit commit: `82a9a8e58f88aabdd3c6fad32d4adcf86cac48c0`
 
 ## Goal
@@ -44,10 +44,10 @@ As audited on July 13, 2026:
 
 | Workstream | State | Next proof |
 |---|---|---|
-| `QT6-INT-01` Branch integration | Blocked | Integrate live `master`; review eight overlapping paths; establish a draft PR or accepted slicing plan |
+| `QT6-INT-01` Branch integration | Integrated locally | Merge commit `991804f3e`; eight overlap decisions and the subsystem review map are recorded in the July 14 delta; draft PR remains |
 | `QT6-BLD-01` Dual Qt lane | Advanced | Same-commit Qt 5, Qt 6, and strict Qt 6 builds after integration |
-| `QT6-VER-01` Qt version policy | Failing contract | Decide whether the minimum is 6.5 or 6.9+; align CI, source guards, and the deprecation lane |
-| `QT6-API-01` Deprecated/removed APIs | Advanced | Test the declared minimum and actual release Qt; do not infer 6.11 cleanliness from a 6.9 gate |
+| `QT6-VER-01` Qt version policy | Adopted, evidence pending | Qt 6.9 floor, Qt 6.10.3 release, Qt 6.11.x forward; prove all lanes |
+| `QT6-API-01` Deprecated/removed APIs | Advanced | Test the 6.9 floor and 6.10 release Qt; strict gate disables through 6.10 |
 | `QT6-SCR-01` QJSEngine migration | Advanced but blocked | Prove Script Console responsiveness and bounded interruption; publish a supported-binding matrix |
 | `QT6-REN-01` Viewer/render/shader | Advanced but blocked | Rerun the current-tip bundled shader probe and require expected nonzero pixels |
 | `QT6-MED-01` Multimedia/hardware | Partial | Real device, unsupported-format, permission, hotplug, long-session, and packaged-backend matrix |
@@ -90,10 +90,13 @@ Record one authoritative matrix containing:
 - exact Qt 5 parity baseline by commit, Qt version, platform, and package;
 - named scene, script, media, and input corpus revisions.
 
-The current contract is internally inconsistent: CMake accepts Qt 6.5,
-`QImage::flipped()` requires Qt 6.9, experimental CI pins 6.9.3, local Nix
-resolves 6.11.0, and the strict deprecation build disables APIs only through
-6.9. Resolve this before calling any build matrix representative.
+The adopted contract is Qt 6.9.0 as the API floor (tested with 6.9.3), Qt
+6.10.3 for release packages, and the Nixpkgs Qt 6.11.x lane for forward
+compatibility. The strict build disables APIs deprecated through 6.10.
+Supported release artifacts are Linux x86_64, Windows x86_64, and macOS arm64;
+macOS x86_64 is best-effort source compatibility rather than a release gate.
+Use the same-candidate Qt 5 build as the primary baseline and
+`qt6-parity-corpus-v1` as the named comparison corpus.
 
 Exit criterion: every declared floor/release/latest lane has a command or CI
 job, and source does not require an API newer than the declared floor.
@@ -252,6 +255,7 @@ and guidance drift is visible:
 
 ```sh
 mise run check-windows-msvc-abi
+mise run check-qt6-version-policy
 mise run check-no-qregexp
 mise run check-core5compat-scope
 mise run check-qt6-multimedia-scope

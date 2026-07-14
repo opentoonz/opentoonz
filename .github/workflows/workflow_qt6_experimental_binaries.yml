@@ -18,7 +18,9 @@ permissions:
 env:
   QT6_EXPERIMENTAL_BRANCH: codex/qt-6-port
   QT6_EXPERIMENTAL_LABEL: qt-6-experimental
-  QT6_EXPERIMENTAL_QT_VERSION: 6.9.3
+  # Primary release/package Qt. The 6.9 compatibility floor is enforced by
+  # CMake; the pinned Nix lane remains the forward-compatibility check.
+  QT6_EXPERIMENTAL_QT_VERSION: 6.10.3
 
 jobs:
   Linux:
@@ -131,7 +133,7 @@ jobs:
     runs-on: windows-2022
     timeout-minutes: 180
     env:
-      QT_PATH: ${{ github.workspace }}\Qt\6.9.3\msvc2022_64
+      QT_PATH: ${{ github.workspace }}\Qt\6.10.3\msvc2022_64
       MSVCVERSION: "Visual Studio 17 2022"
       BOOST_TOOLSET: "14.3"
       BOOST_VERSION: "1.87.0"

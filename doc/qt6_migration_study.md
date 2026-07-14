@@ -1,7 +1,7 @@
 # OpenToonz Qt 6 Migration Study
 
 Prepared: May 24, 2026
-Research and contract review: July 13, 2026
+Research and contract review: July 14, 2026
 
 This is the stable architecture and research record. Its original baseline and
 phase narratives are historical, not a current branch dashboard. Use
@@ -89,6 +89,54 @@ The July 13 review used current official Qt 6 documentation for architectural
 claims. Dated CI and repository evidence belongs in the branch audit rather
 than this study.
 
+## July 14, 2026 Support Contract
+
+The release contract is now:
+
+| Lane | Qt | Purpose |
+|---|---|---|
+| Compatibility floor | 6.9.0 API floor, tested with 6.9.3 | Oldest supported Qt 6 source contract. CMake rejects older Qt 6 installations. |
+| Primary release | 6.10.3 | Cross-platform candidate packages and release evidence. This is pinned in the experimental package workflow. |
+| Forward compatibility | Nixpkgs Qt 6.11.x (6.11.0 on July 14) | Advisory/local frontier for newer compiler and deprecation drift. |
+
+Qt 6.9 is the floor because active source uses `QImage::flipped()`, introduced
+in Qt 6.9. Qt 6.9.3 is no longer the release package choice because its
+standard support has ended. The strict build disables APIs deprecated through
+Qt 6.10, matching the primary release policy; its evidence must also record
+the actual Qt version used to compile it.
+
+The supported candidate package matrix is:
+
+| Platform | Architecture | Release environment |
+|---|---|---|
+| Linux | x86_64 | Ubuntu 24.04, GCC 13, AppImage |
+| Windows | x86_64 | Windows 10 1809 or newer / Windows 11, MSVC 2022, Windows 10 SDK |
+| macOS | arm64 | macOS 12 or newer, AppleClang from Xcode 16, macOS 15 SDK, DMG |
+
+macOS x86_64 is retired from the Qt 6 release artifact matrix. Source builds
+may remain best-effort, but x86_64 is not a release gate and arm64 evidence
+must not be described as universal. This does not retire the Qt 5 lane.
+
+The primary parity baseline is a Qt 5 build from the exact same candidate
+commit, using Qt 5.15.18 in the reproducible Nix lane on macOS arm64 and the
+regular platform Qt 5 lanes elsewhere. OpenToonz 1.7.1 remains a secondary
+historical regression reference, not the primary baseline.
+
+The named comparison corpus is `qt6-parity-corpus-v1`:
+
+- generated raster, vector, and Toonz Raster scene lifecycle fixtures from the
+  app-side GUI smoke registry;
+- `toonz/sources/tests/scriptengine/user_workflow.toonzscript` and the complete
+  registered script aggregate;
+- bundled `SHADER_HSLBlendGPU` with a nonzero/reference-pixel assertion;
+- representative Preview, FX Preview, final-render, overlay, schematic,
+  timeline, and mixed-DPI GUI smoke actions;
+- release-record attachments for audio output/input, camera, stop-motion,
+  real mouse/keyboard/tablet input, and the 1.0/1.25/1.5/1.75/2.0 DPI matrix.
+
+Hardware rows remain explicit manual corpus items until artifacts, checksums,
+expected results, and reviewers are attached to the release record.
+
 ## July 13, 2026 Research And Contract Update
 
 The implementation has advanced far beyond the study's original baseline, but
@@ -97,21 +145,19 @@ claims.
 
 ### Define three Qt version lanes
 
-The project needs separate definitions for:
+The project uses separate definitions for:
 
 1. **minimum supported Qt**, which all active source must compile against;
 2. **primary release Qt**, used for candidate packages and release evidence;
 3. **forward-compatibility/latest Qt**, used to expose newer deprecations and
    behavioral drift.
 
-The current source contract is inconsistent. CMake accepts Qt 6.5,
-experimental CI pins 6.9.3, local Nix resolves 6.11.0, and the strict build
-disables APIs deprecated only through 6.9. More concretely, the shared image
-compatibility helper calls `QImage::flipped()` for every Qt 6 build, while Qt
-documents that API as introduced in 6.9. Either raise the minimum to 6.9 or
-retain 6.5 with a guarded fallback and an actual floor build.
+The July 13 source contract was inconsistent: CMake accepted Qt 6.5,
+experimental CI pinned 6.9.3, local Nix resolved 6.11.0, and the strict build
+disabled APIs deprecated only through 6.9. The July 14 contract above resolves
+that inconsistency.
 
-`QT_DISABLE_DEPRECATED_UP_TO` should match the intended policy. It is a useful
+`QT_DISABLE_DEPRECATED_UP_TO` matches the primary release policy. It is a useful
 compile contract, but a 6.9 threshold on a 6.11 toolchain does not prove the
 source is clean of APIs deprecated in 6.10 or 6.11. Keep the threshold and the
 tested Qt version visible in evidence.

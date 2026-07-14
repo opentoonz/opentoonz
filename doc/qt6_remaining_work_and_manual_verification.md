@@ -1,7 +1,7 @@
 # Qt 6 Remaining Work And Manual Verification Guide
 
 Prepared: June 2, 2026
-Last audited: July 13, 2026 at commit `82a9a8e58`
+Last audited: July 14, 2026; integrated candidate starts at `991804f3e`
 
 This document owns the Qt 6 requirement/evidence checklist and the manual
 verification procedure. The current branch verdict and evidence provenance are
@@ -30,6 +30,21 @@ Audited baseline:
 - The branch has substantial automated smoke infrastructure, but it does not
   establish real-workflow, hardware, packaged-runtime, or studio parity.
 
+Adopted release contract:
+
+- Qt 6.9.0 is the source/API floor and 6.9.3 is the floor-test toolchain.
+- Qt 6.10.3 is the primary release/package toolchain.
+- Nixpkgs Qt 6.11.x is the forward-compatibility lane (6.11.0 on July 14).
+- The strict lane disables APIs deprecated through Qt 6.10.
+- Release packages target Ubuntu 24.04 x86_64/GCC 13, Windows x86_64/MSVC
+  2022, and macOS arm64/Xcode 16/macOS 15 SDK. macOS x86_64 is retired from
+  the Qt 6 release artifact matrix and remains best-effort source support.
+- The primary parity baseline is a same-commit Qt 5 build (Qt 5.15.18 in the
+  macOS Nix lane); OpenToonz 1.7.1 is secondary historical evidence.
+- The named comparison corpus is `qt6-parity-corpus-v1`, defined in
+  `doc/qt6_migration_study.md` and instantiated in each release evidence
+  record with exact fixture revisions and hardware artifacts.
+
 ### Authoritative Requirement Matrix
 
 Use stable IDs in progress reports, manual records, CI summaries, and future
@@ -38,8 +53,8 @@ absent; it does not mean implementation has not progressed.
 
 | ID | Severity | State on July 13 | Acceptance criterion | Next evidence |
 |---|---|---|---|---|
-| `QT6-INT-01` | P0 | Blocked | Live `master` integrated; overlapping paths reviewed; final delta has a draft PR or accepted merge plan | Post-integration commit plus review/build record |
-| `QT6-VER-01` | P0 | Failing contract | Minimum, release, and latest Qt lanes are explicit, source-compatible, and tested | Decide 6.5 versus 6.9+; align CI and deprecation gates |
+| `QT6-INT-01` | P0 | Integrated locally | Live `master` integrated; overlapping paths reviewed; final delta has a draft PR or accepted merge plan | Draft PR plus same-commit cross-platform evidence |
+| `QT6-VER-01` | P0 | Contract adopted | Minimum, release, and latest Qt lanes are explicit, source-compatible, and tested | Prove Qt 6.9.3 floor, 6.10.3 release packages, and 6.11.x forward lane |
 | `QT6-BLD-01` | P0 | Partial | Qt 5, Qt 6, strict-deprecation, and required translation builds pass from one candidate commit | Fresh retained build logs after integration |
 | `QT6-API-01` | P1 | Advanced | Removed/deprecated APIs are absent or confined to documented compatibility boundaries on every declared Qt lane | Floor/release/latest builds plus guarded bridge exit criteria |
 | `QT6-SCR-01` | P0 | Blocked | Qt 6 Script Console stays responsive; bounded interruption passes; supported binding surface is explicit | Interactive cancellation proof plus all script aggregates |
@@ -86,22 +101,13 @@ release signoff that covers:
 
 Open release-contract issues:
 
-- `QT6-INT-01`: the audited branch is 111 commits ahead of and 12 behind live
-  `master`, changes 506 files, and has no pull request. Integrate live
-  `master`, review the eight overlapping paths listed in the dated audit, and
-  freeze a candidate before expanding the port.
-- `QT6-VER-01`: CMake accepts Qt 6.5, but `QtCompat` calls
-  `QImage::flipped()` for all Qt 6 builds even though Qt introduced it in 6.9.
-  Experimental CI uses 6.9.3 and local Nix currently resolves 6.11.0, masking
-  the floor violation. Either raise the floor to 6.9 or guard newer APIs and
-  add a real 6.5 build.
-- The strict lane disables APIs deprecated through Qt 6.9 while the current
-  local toolchain is Qt 6.11. A clean strict build therefore does not establish
-  deprecation cleanliness against the actual toolchain. Record minimum,
-  release, and latest Qt policies separately and align the macro/CI matrix.
-- The parity baseline is unresolved. Current machine-readable metadata names
-  OpenToonz 1.7.1, source declares 1.8.0, and Qt 5 versions differ by platform.
-  Record an exact commit, package, Qt version, compiler, and fixture corpus.
+- `QT6-INT-01`: live master was integrated at `991804f3e`; all eight overlap
+  decisions and a subsystem review map are recorded in the July 14 delta. A
+  draft pull request and same-commit cross-platform evidence remain.
+- `QT6-VER-01`: the policy decision is complete in source and documentation;
+  floor/release/forward build evidence remains required.
+- The parity baseline and corpus are named, but every candidate record must
+  still attach exact package/commit/toolchain and fixture/hardware revisions.
 
 Already covered:
 
@@ -1200,6 +1206,7 @@ affected target and record the limitation.
 Run compatibility guardrails:
 
 ```sh
+mise run check-qt6-version-policy
 mise run check-no-qregexp
 mise run check-core5compat-scope
 mise run check-qt6-multimedia-scope

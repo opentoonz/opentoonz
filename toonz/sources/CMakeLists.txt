@@ -185,7 +185,7 @@ option(WITH_TRANSLATION "Generate translation projects as well" ON)
 option(WITH_WINTAB "(Windows only) Build with customized Qt with WinTab support. https://github.com/shun-iwasawa/qt5/releases/tag/v5.15.2_wintab" OFF)
 set(OPENTOONZ_QT_MAJOR "5" CACHE STRING "Qt major version to build against")
 set_property(CACHE OPENTOONZ_QT_MAJOR PROPERTY STRINGS 5 6)
-option(OPENTOONZ_QT_DEPRECATED_ERRORS "Fail when using Qt APIs deprecated through the lane's Qt version (Qt 5.15 on the Qt 5 lane, Qt 6.9 on the Qt 6 lane)" OFF)
+option(OPENTOONZ_QT_DEPRECATED_ERRORS "Fail when using Qt APIs deprecated through the lane's release policy (Qt 5.15 on the Qt 5 lane, Qt 6.10 on the Qt 6 lane)" OFF)
 
 if(NOT OPENTOONZ_QT_MAJOR MATCHES "^[56]$")
     message(FATAL_ERROR "OPENTOONZ_QT_MAJOR must be 5 or 6, got ${OPENTOONZ_QT_MAJOR}")
@@ -201,11 +201,12 @@ endif()
 if(OPENTOONZ_QT_DEPRECATED_ERRORS)
     # Disable Qt APIs deprecated up to the lane's own Qt version so their use
     # becomes a hard compile error instead of warning noise. The Qt 5 lane keeps
-    # the historical Qt 5.15 floor; the Qt 6 lane raises it to Qt 6.9 so the
-    # remaining Qt 6 deprecation frontier (including overload-resolution-level
-    # deprecations that grep guards cannot see) surfaces as build evidence.
+    # the historical Qt 5.15 floor; the Qt 6 lane raises it to the Qt 6.10
+    # release policy so the remaining Qt 6 deprecation frontier (including
+    # overload-resolution-level deprecations that grep guards cannot see)
+    # surfaces as build evidence.
     if(OPENTOONZ_QT_MAJOR STREQUAL "6")
-        add_compile_definitions(QT_DISABLE_DEPRECATED_UP_TO=0x060900)
+        add_compile_definitions(QT_DISABLE_DEPRECATED_UP_TO=0x060A00)
     else()
         add_compile_definitions(QT_DISABLE_DEPRECATED_UP_TO=0x050F00)
     endif()
@@ -413,8 +414,15 @@ else()
     list(APPEND OPENTOONZ_QT_COMPONENTS OpenGLWidgets Core5Compat Qml)
 endif()
 
-# Find the Qt library set.
-find_package(${OPENTOONZ_QT_PACKAGE} REQUIRED COMPONENTS ${OPENTOONZ_QT_COMPONENTS})
+# Find the Qt library set. Qt 6.9 is the compatibility floor because active
+# feature code uses APIs introduced in that minor release.
+if(OPENTOONZ_QT_MAJOR EQUAL 5)
+    set(OPENTOONZ_QT_MINIMUM_VERSION 5.15.0)
+else()
+    set(OPENTOONZ_QT_MINIMUM_VERSION 6.9.0)
+endif()
+find_package(${OPENTOONZ_QT_PACKAGE} ${OPENTOONZ_QT_MINIMUM_VERSION} REQUIRED
+             COMPONENTS ${OPENTOONZ_QT_COMPONENTS})
 
 set(_opentoonz_qt_core_found_var "${OPENTOONZ_QT_PACKAGE}Core_FOUND")
 set(_opentoonz_qt_core_version_var "${OPENTOONZ_QT_PACKAGE}Core_VERSION")
@@ -425,16 +433,10 @@ if(NOT ${_opentoonz_qt_core_found_var})
 endif()
 message(STATUS "${OPENTOONZ_QT_PACKAGE} Modules: ${OPENTOONZ_QT_CORE_VERSION}")
 
-if(OPENTOONZ_QT_MAJOR EQUAL 5)
-    set(QT_MINIMUM_VERSION 5.5.0)
-else()
-    set(QT_MINIMUM_VERSION 6.5.0)
-endif()
-if(OPENTOONZ_QT_CORE_VERSION VERSION_LESS QT_MINIMUM_VERSION)
-    MESSAGE(FATAL_ERROR "Minimum supported Qt version: ${QT_MINIMUM_VERSION}.
+if(OPENTOONZ_QT_CORE_VERSION VERSION_LESS OPENTOONZ_QT_MINIMUM_VERSION)
+    MESSAGE(FATAL_ERROR "Minimum supported Qt version: ${OPENTOONZ_QT_MINIMUM_VERSION}.
     Installed version: ${OPENTOONZ_QT_CORE_VERSION}")
 endif()
-unset(QT_MINIMUM_VERSION)
 
 set(QT_CORE_TARGET Qt${OPENTOONZ_QT_MAJOR}::Core)
 set(QT_GUI_TARGET Qt${OPENTOONZ_QT_MAJOR}::Gui)
