@@ -11,11 +11,25 @@
 #include "tfxparam.h"
 #include "tstream.h"
 
+#include <QProcess>
+
 namespace {
 
 TFilePath getExternFxPath() {
   return TSystem::getBinDir() + "plugins" + "externFxs";
 }
+
+bool runExternalProgram(const TFilePath &executablePath,
+                        const std::string &args) {
+  QProcess process;
+  process.setProgram(QString::fromStdWString(executablePath.getWideString()));
+  process.setArguments(QProcess::splitCommand(QString::fromStdString(args)));
+  process.start();
+  if (!process.waitForStarted()) return false;
+  if (!process.waitForFinished(-1)) return false;
+  return process.exitStatus() == QProcess::NormalExit && process.exitCode() == 0;
+}
+
 }
 
 //=========================================================
@@ -199,8 +213,7 @@ void TExternalProgramFx::doCompute(TTile &tile, double frame,
                                    const TRenderSettings &ri) {
   TRaster32P ras = tile.getRaster();
   if (!ras) return;
-  std::string args           = m_args;
-  std::string executablePath = ::to_string(m_executablePath);
+  std::string args = m_args;
   std::map<std::string, TFilePath> tmpFiles;  // portname --> file
   TFilePath outputTmpFile;
 
@@ -267,43 +280,7 @@ void TExternalProgramFx::doCompute(TTile &tile, double frame,
   // chiamare "m_executablePath args"
   // e leggere l'immagine scritta in outputTmpFile
   // poi cancellare tutto
-  std::string expandedargs;
-  char buffer[1024];
-#ifdef _WIN32
-  ExpandEnvironmentStrings(args.c_str(), buffer, 1024);
-
-  STARTUPINFO si;
-  PROCESS_INFORMATION pinfo;
-
-  GetStartupInfo(&si);
-
-  BOOL ret = CreateProcess(
-      (char *)executablePath.c_str(),           // name of executable module
-      buffer,                                   // command line string
-      NULL,                                     // SD
-      NULL,                                     // SD
-      TRUE,                                     // handle inheritance option
-      CREATE_NO_WINDOW, /*CREATE_NEW_CONSOLE*/  // creation flags
-      NULL,                                     // new environment block
-      NULL,                                     // current directory name
-      &si,                                      // startup information
-      &pinfo                                    // process information
-      );
-
-  if (!ret) DWORD err = GetLastError();
-
-  // aspetta che il processo termini
-  WaitForSingleObject(pinfo.hProcess, INFINITE);
-
-  DWORD exitCode;
-  ret = GetExitCodeProcess(pinfo.hProcess,  // handle to the process
-                           &exitCode);      // termination status
-
-#else
-  std::string cmdline = executablePath + buffer;
-  //    int exitCode =
-  system(cmdline.c_str());
-#endif
+  runExternalProgram(m_executablePath, args);
   /*
 string name = m_executablePath.getName();
 TPixel32 color;

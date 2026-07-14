@@ -9,6 +9,10 @@ GeneratedFiles
 *.suo
 *.user
 build*
+/toonz/build/
+/.direnv/
+/result
+/result-*
 Thumbs.db
 
 # bundled thirdparty libraries
@@ -23,6 +27,7 @@ Thumbs.db
 lzo-2.09
 
 .clang_complete
+.direnv/
 Debug/
 Debug Library/
 Release/
