@@ -10,6 +10,12 @@ The current authoritative snapshot is:
 - `2026-07-13-branch-audit.md` — full branch, implementation, CI/package,
   documentation-contract, and primary-research audit at `82a9a8e58`.
 
+The implementation-sequencing companion is:
+
+- `../qt6_implementation_recommendations.md` — ordered work packages,
+  dependencies, parallelization rules, exit gates, and the recommended first
+  turn before resuming the main goal prompt.
+
 Reports dated July 6 or earlier are historical snapshots. They remain useful
 for chronology and provenance, but they must not override a newer report or be
 quoted as current without refreshing the relevant repository and CI evidence.

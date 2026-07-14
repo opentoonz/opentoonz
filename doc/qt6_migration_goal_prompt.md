@@ -21,16 +21,17 @@ and visual-parity work is in scope when it closes an identified requirement.
 
 1. `AGENTS.md`
 2. `doc/qt6_port_progress/2026-07-13-branch-audit.md`
-3. `doc/qt6_remaining_work_and_manual_verification.md`
-4. `doc/qt6_migration_study.md`
-5. `doc/how_to_build_nix_mise.md`
-6. `toonz/sources/CMakeLists.txt`
-7. `toonz/sources/CMakePresets.json`
-8. `nix/opentoonz-env.nix`
-9. `mise.toml`
-10. `scripts/qt6/check-migration-preflight.sh`
-11. `.github/workflows/workflow_qt6_experimental_binaries.yml`
-12. the regular Linux, macOS, and Windows workflows relevant to the change
+3. `doc/qt6_implementation_recommendations.md`
+4. `doc/qt6_remaining_work_and_manual_verification.md`
+5. `doc/qt6_migration_study.md`
+6. `doc/how_to_build_nix_mise.md`
+7. `toonz/sources/CMakeLists.txt`
+8. `toonz/sources/CMakePresets.json`
+9. `nix/opentoonz-env.nix`
+10. `mise.toml`
+11. `scripts/qt6/check-migration-preflight.sh`
+12. `.github/workflows/workflow_qt6_experimental_binaries.yml`
+13. the regular Linux, macOS, and Windows workflows relevant to the change
 
 Treat the dated audit as the current snapshot. Treat older dated progress
 reports as historical evidence, not current truth. If the branch tip, live
