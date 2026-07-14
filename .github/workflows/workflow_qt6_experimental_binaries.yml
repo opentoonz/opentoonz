@@ -92,6 +92,7 @@ jobs:
 
           cp "$appdir"/usr/share/applications/*.desktop "$appdir"
           cp "$appdir"/usr/share/icons/hicolor/*/apps/*.png "$appdir"
+          bash scripts/qt6/check-packaged-runtime.sh "$appdir/usr/share/opentoonz" "$appdir/usr/bin/OpenToonz"
 
           mkdir "$artifact_dir"
           mv "$appdir/usr/share/opentoonz/stuff" "$artifact_dir/portablestuff"

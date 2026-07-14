@@ -178,6 +178,10 @@ run = "bash scripts/qt6/check-qgllegacy-scope.sh"
 description = "Fail if bundled shader XML declarations reference missing GLSL programs."
 run = "bash scripts/qt6/check-shader-assets.sh"
 
+[tasks.check-qt6-packaged-runtime]
+description = "Verify packaged Qt 6 runtime data and translation inputs."
+run = "bash scripts/qt6/check-packaged-runtime.sh . toonz/build/nix-qt6-relwithdebinfo/toonz/OpenToonz.app/Contents/MacOS/OpenToonz"
+
 [tasks.check-qt6-appkit-event-scope]
 description = "Fail if deprecated AppKit NS*Mouse* event constants reappear."
 run = "bash scripts/qt6/check-appkit-event-scope.sh"
