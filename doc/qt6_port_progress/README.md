@@ -7,8 +7,11 @@ Qt 6 migration.
 
 The current authoritative snapshot is:
 
-- `2026-07-13-branch-audit.md` — full branch, implementation, CI/package,
-  documentation-contract, and primary-research audit at `82a9a8e58`.
+- `2026-07-14-integration-delta.md` — refreshed live state, explicit overlap
+  decisions, integration commit, and local preflight/configure evidence.
+- `2026-07-13-branch-audit.md` — preceding full branch, implementation,
+  CI/package, documentation-contract, and primary-research audit at
+  `82a9a8e58`.
 
 The implementation-sequencing companion is:
 
