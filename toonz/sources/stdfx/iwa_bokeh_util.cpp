@@ -1,6 +1,8 @@
 
 #include "iwa_bokeh_util.h"
 
+#include <climits>
+
 #include "trop.h"
 #include "tparamcontainer.h"
 

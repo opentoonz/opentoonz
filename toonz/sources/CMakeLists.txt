@@ -899,10 +899,14 @@ if(WITH_TRANSLATION)
             list(GET LANG_CODES ${idx} lang)
             list(GET LANG_DISPLAY_NAMES ${idx} lang_disp_name)
             set(ts_file "${CMAKE_SOURCE_DIR}/translations/${lang}/${ts_name}.ts")
-            set(qm_dir  "${CMAKE_BINARY_DIR}/../../stuff/config/loc/${lang_disp_name}")
+            # Runtime data lives at the repository root. Anchoring generated
+            # translations to the source tree keeps build-directory layout
+            # changes from silently creating a second, unpackaged stuff tree.
+            set(qm_root "${CMAKE_SOURCE_DIR}/../../stuff/config/loc")
+            set(qm_dir  "${qm_root}/${lang_disp_name}")
             set(qm_file "${qm_dir}/${ts_name}.qm")
             # Temporarily generate qm files directly under loc, then rename them to respective language folders
-            set(qm_tmp_dir  "${CMAKE_BINARY_DIR}/../../stuff/config/loc")
+            set(qm_tmp_dir  "${qm_root}")
             set(qm_tmp_file "${qm_tmp_dir}/${lang}_${ts_name}.qm")
 
             # Ensure output directory exists at configure time (safe for parallel builds)

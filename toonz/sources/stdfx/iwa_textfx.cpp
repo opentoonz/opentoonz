@@ -1,5 +1,7 @@
 #include "iwa_textfx.h"
 
+#include <climits>
+
 #include "tparamuiconcept.h"
 #include <QFontMetrics>
 #include <QImage>

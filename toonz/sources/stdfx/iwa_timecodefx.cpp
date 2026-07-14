@@ -1,5 +1,7 @@
 #include "iwa_timecodefx.h"
 
+#include <climits>
+
 #include "tparamuiconcept.h"
 
 #include <QFont>

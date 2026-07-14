@@ -228,7 +228,7 @@ run = "nix develop path:.#qt6 --command bash -lc 'bash scripts/qt6/check-migrati
 
 [tasks.build-qt6-translations]
 description = "Build the isolated Qt 6 translation lane and verify generated .qm files."
-run = "nix develop path:.#qt6 --command bash -lc 'bash scripts/qt6/check-migration-preflight.sh && bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-translation-check && cmake --build toonz/build/nix-qt6-translation-check --target OpenToonz --parallel && count=$(find toonz/stuff/config/loc -mindepth 2 -maxdepth 2 -name \"*.qm\" | wc -l | tr -d \" \"); test \"$count\" = 63'"
+run = "nix develop path:.#qt6 --command bash -lc 'bash scripts/qt6/check-migration-preflight.sh && bash scripts/nix/prepare-tiff.sh && cmake -S toonz/sources --preset nix-qt6-translation-check && cmake --build toonz/build/nix-qt6-translation-check --target OpenToonz --parallel && count=$(find stuff/config/loc -mindepth 2 -maxdepth 2 -name \"*.qm\" | wc -l | tr -d \" \"); test \"$count\" = 63'"
 
 [tasks.build]
 description = "Configure and build OpenToonz with Ninja in toonz/build/nix-relwithdebinfo."
