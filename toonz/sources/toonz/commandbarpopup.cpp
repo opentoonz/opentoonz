@@ -10,6 +10,7 @@
 // TnzQt includes
 #include "toonzqt/gutil.h"
 #include "toonzqt/qtcompat.h"
+#include "toonzqt/menubarcommand.h"
 
 // TnzLib includes
 #include "toonz/toonzfolders.h"
@@ -38,6 +39,9 @@
 #include <QLineEdit>
 #include <QMenu>
 #include <QRegularExpression>
+
+// STD includes
+#include <string>
 
 //=============================================================================
 // CommandItem
@@ -254,6 +258,16 @@ QTreeWidgetItem* CommandListTree::addFolder(const QString& title,
                                          actions);
 
   for (QAction* action : actions) {
+    // Skip invisible actions (deleted/removed commands should not appear)
+    if (!action->isVisible()) continue;
+
+    // Skip AssistantType tool options - duplicates of Tools/MI_Assistant*
+    if (commandType == ToolModifierCommandType) {
+      std::string id =
+          CommandManager::instance()->getIdFromAction(action);
+      if (id.find("A_ToolOption_AssistantType") == 0) continue;
+    }
+
     CommandItem* item = new CommandItem(folder, action);
     item->setToolTip(0, QObject::tr("[Drag&Drop] to copy command to %1")
                             .arg(m_dropTargetString));
