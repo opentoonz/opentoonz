@@ -120,7 +120,21 @@ async function rest(pathname) {
   if (!response.ok) {
     throw new Error(`REST ${pathname} failed: ${response.status} ${text}`);
   }
-  return JSON.parse(text);
+  const projection = JSON.parse(text);
+  if (projection.schema_version !== 2 ||
+      !projection.source_report ||
+      !/^[0-9a-f]{7,40}$/i.test(projection.source_commit || "")) {
+    throw new Error("manual-goals.json must be schema 2 with source_report and source_commit");
+  }
+  return projection;
+}
+
+function projectionId(title) {
+  return String(title)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 }
 
 async function graphql(query, variables = {}) {
@@ -308,8 +322,10 @@ function normalizeManualGoal(goal, ci, baseline) {
   const evidenceUrl = goal.evidence_url || (blockedByCi ? ci.evidenceUrl : "");
 
   return {
+    projection_id: goal.projection_id || projectionId(goal.title),
     title: goal.title,
     body: [
+      "Projection ID: " + (goal.projection_id || projectionId(goal.title)),
       goal.body || "",
       "",
       `Source: ${goal.source || "manual-goals.json"}`,
@@ -514,22 +530,32 @@ async function setGoalFields(item, goal, ci, baseline) {
 
 async function upsertGoals(goals, ci, baseline) {
   const existingItems = await loadProjectItems();
-  const byTitle = new Map(
+  const byProjectionId = new Map(
     existingItems
-      .map((item) => [item.content?.title, item])
-      .filter(([title]) => typeof title === "string" && title.length > 0),
+      .map((item) => {
+        const body = item.content?.body || "";
+        const marker = body.match(/^Projection ID: ([a-z0-9-]+)$/m);
+        return [marker?.[1] || projectionId(item.content?.title || ""), item];
+      })
+      .filter(([id]) => id.length > 0),
   );
 
   const synced = [];
   for (const goal of goals) {
-    let item = byTitle.get(goal.title);
+    const stableId = goal.projection_id || projectionId(goal.title);
+    const syncGoal = {
+      ...goal,
+      projection_id: stableId,
+      body: "Projection ID: " + stableId + "\n" + (goal.body || ""),
+    };
+    let item = byProjectionId.get(stableId);
     if (!item) {
-      item = await createDraftItem(goal);
+      item = await createDraftItem(syncGoal);
     } else {
-      await updateDraftContent(item, goal);
+      await updateDraftContent(item, syncGoal);
     }
 
-    await setGoalFields(item, goal, ci, baseline);
+    await setGoalFields(item, syncGoal, ci, baseline);
     synced.push(goal.title);
     console.log(`synced: ${goal.title}`);
   }

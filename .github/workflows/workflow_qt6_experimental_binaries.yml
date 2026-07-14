@@ -65,8 +65,14 @@ jobs:
             -DQT_PATH="$QT_PATH" \
             -DQt6_DIR="$QT_PATH/lib/cmake/Qt6" \
             -DCMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH" \
-            -DWITH_TRANSLATION=OFF
+            -DWITH_TRANSLATION=ON
           cmake --build toonz/build/qt6-experimental-linux --parallel
+
+      - name: Verify translation and runtime data inputs
+        run: |
+          test "$(find stuff/config/loc -mindepth 2 -maxdepth 2 -name '*.qm' | wc -l)" -eq 63
+          test -f stuff/config/qss/toonz.qss
+          test -d stuff/library/shaders
 
       - name: Create AppImage artifact
         run: |
@@ -196,7 +202,7 @@ jobs:
           mkdir build
           cd build
 
-          cmake ..\sources -G "%MSVCVERSION%" -Ax64 -DOPENTOONZ_QT_MAJOR=6 -DQT_PATH="%QT_PATH%" -DQt6_DIR="%QT_PATH%\lib\cmake\Qt6" -DBOOST_ROOT="%BOOST_ROOT%" -DOpenCV_DIR="%OpenCV_DIR%" -DWITH_TRANSLATION=OFF
+          cmake ..\sources -G "%MSVCVERSION%" -Ax64 -DOPENTOONZ_QT_MAJOR=6 -DQT_PATH="%QT_PATH%" -DQt6_DIR="%QT_PATH%\lib\cmake\Qt6" -DBOOST_ROOT="%BOOST_ROOT%" -DOpenCV_DIR="%OpenCV_DIR%" -DWITH_TRANSLATION=ON
         shell: cmd
 
       - name: Build OpenToonz
@@ -205,6 +211,14 @@ jobs:
           cd toonz\build
           msbuild /p:Configuration=RelWithDebInfo /m /verbosity:minimal ALL_BUILD.vcxproj
         shell: cmd
+
+      - name: Verify translation and runtime data inputs
+        shell: pwsh
+        run: |
+          $qmCount = (Get-ChildItem -Recurse -File stuff/config/loc -Filter *.qm).Count
+          if ($qmCount -ne 63) { throw "Expected 63 translation files, found $qmCount" }
+          if (-not (Test-Path stuff/config/qss/toonz.qss)) { throw "Missing QSS runtime data" }
+          if (-not (Test-Path stuff/library/shaders)) { throw "Missing shader runtime data" }
 
       - name: Create package
         run: |
@@ -300,6 +314,7 @@ jobs:
           artifact_dir="toonz/build/qt6-experimental-macos"
           mkdir -p "$artifact_dir"
           cp toonz/build/nix-qt6-relwithdebinfo/toonz/OpenToonz.dmg "$artifact_dir/$artifact_name.dmg"
+          shasum -a 256 "$artifact_dir/$artifact_name.dmg" > "$artifact_dir/$artifact_name.dmg.sha256"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v6
@@ -326,6 +341,13 @@ jobs:
         uses: actions/download-artifact@v6
         with:
           path: dist
+
+      - name: Record source commit and checksums
+        run: |
+          git rev-parse HEAD > dist/source-commit.txt
+          find dist -type f -not -name '*.sha256' -not -name source-commit.txt -print0 |
+            sort -z |
+            xargs -0 shasum -a 256 > dist/SHA256SUMS
 
       - name: Refresh rolling release tag
         if: github.event_name != 'push'
