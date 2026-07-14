@@ -129,7 +129,7 @@ bool PaletteRead = false;
 int ComboInkIndex[256];  // a bad patch....
 
 void PltReader::open(FILE *file) {
-  char *data;
+  char *data = 0;
   uint32 count;
   int i;
   for (i = 0; i < 256; i++) ComboInkIndex[i] = -1;
@@ -219,10 +219,11 @@ void PltReader::open(FILE *file) {
   }
 
   std::string colorNames;
-  if (TIFFGetField(m_tiff, TIFFTAG_TOONZCOLORNAMES, &count, &data))
+  if (TIFFGetField(m_tiff, TIFFTAG_TOONZCOLORNAMES, &count, &data) && data)
     colorNames = data;
 
-  TREE *names = cdb_decode_all(data, Tcm_24_default_info);
+  TREE *names =
+      cdb_decode_all(const_cast<char *>(colorNames.c_str()), Tcm_24_default_info);
 
   CDB_TREE_ITEM *item;
 
