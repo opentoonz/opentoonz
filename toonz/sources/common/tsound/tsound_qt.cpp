@@ -213,9 +213,23 @@ public:
       break;
     }
 
+    const QAudioFormat requestedFormat = format;
     QAudioDevice info(QMediaDevices::defaultAudioOutput());
     if (!info.isNull() && !info.isFormatSupported(format))
       format = info.preferredFormat();
+
+    // QAudioSink consumes bytes according to the format supplied to it.  The
+    // soundtrack buffer below is still encoded in the requested format, so
+    // silently substituting the device's preferred format would reinterpret
+    // the samples (for example, stereo 16-bit PCM as mono float PCM).  Qt
+    // does not perform this conversion for a raw QIODevice.  Refuse the
+    // playback request until a real conversion path is provided instead.
+    if (format != requestedFormat) {
+      throw TSoundDeviceException(
+          TSoundDeviceException::UnsupportedFormat,
+          "The audio device does not support the soundtrack format; playback "
+          "was not started because Qt 6 cannot convert raw PCM automatically.");
+    }
 #else
     format.setSampleSize(st->getBitPerSample());
     format.setCodec("audio/pcm");
