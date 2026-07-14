@@ -660,11 +660,11 @@ if(WITH_TRANSLATION)
     # Language data and display names
     # ---------------------------------------------------------------------
     set(LANG_CODES
-    japanese italian french spanish chinese german russian korean czech
+    japanese italian french spanish chinese german russian korean czech portuguese_brazil
       )
 
     set(LANG_DISPLAY_NAMES
-    "日本語" "Italiano" "Français" "Español" "中文" "Deutsch" "Русский" "한국어" "Čeština"
+    "日本語" "Italiano" "Français" "Español" "中文" "Deutsch" "Русский" "한국어" "Čeština" "Português (Brasil)"
       )
 
     list(LENGTH LANG_CODES CODE_COUNT)
