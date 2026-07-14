@@ -15,6 +15,7 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLContext>
 #include <QOpenGLExtraFunctions>
+#include <QDebug>
 
 #ifdef glGetQueryObjectiv
 #undef glGetQueryObjectiv
@@ -126,7 +127,14 @@ ShadingContext::ShadingContext(QOffscreenSurface *surface) : m_imp(new Imp) {
   }
   m_imp->m_context->setFormat(format);
   m_imp->m_context->create();
-  m_imp->m_context->makeCurrent(m_imp->m_surface);
+  if (!m_imp->m_context->makeCurrent(m_imp->m_surface)) {
+    qWarning().noquote()
+        << "OpenToonz shader context could not make the offscreen surface current"
+        << "contextValid=" << m_imp->m_context->isValid()
+        << "surfaceValid=" << m_imp->m_surface->isValid()
+        << "contextFormat=" << m_imp->m_context->format()
+        << "surfaceFormat=" << m_imp->m_surface->format();
+  }
 
   makeCurrent();
   if (GLEW_VERSION_3_2) {
@@ -166,7 +174,14 @@ void ShadingContext::makeCurrent() {
     m_imp->m_context->setFormat(format);
     m_imp->m_context->create();
   }
-  m_imp->m_context->makeCurrent(m_imp->m_surface);
+  if (!m_imp->m_context->makeCurrent(m_imp->m_surface)) {
+    qWarning().noquote()
+        << "OpenToonz shader context makeCurrent failed"
+        << "contextValid=" << m_imp->m_context->isValid()
+        << "surfaceValid=" << m_imp->m_surface->isValid()
+        << "contextFormat=" << m_imp->m_context->format()
+        << "surfaceFormat=" << m_imp->m_surface->format();
+  }
 }
 
 //--------------------------------------------------------
@@ -189,7 +204,13 @@ void ShadingContext::resize(int lx, int ly,
   } else {
     QOpenGLContext *currContext = QOpenGLContext::currentContext();
     m_imp->m_fbo.reset(new QOpenGLFramebufferObject(lx, ly, fmt));
-    assert(m_imp->m_fbo->isValid());
+    if (!m_imp->m_fbo->isValid()) {
+      qWarning().noquote() << "OpenToonz shader framebuffer is invalid"
+                           << "size=" << lx << "x" << ly
+                           << "contextValid=" << isValid();
+      m_imp->m_fbo.reset();
+      return;
+    }
 
     m_imp->m_fbo->bind();
   }
