@@ -121,9 +121,16 @@ void TPanel::onCloseButtonPressed() {
 
 void TPanel::onCustomContextMenuRequested(const QPoint &pos) {
   QMenu menu(this);
+  appendRoomBindMenuAction(&menu);
+  menu.exec(mapToGlobal(pos));
+}
 
-  // Add "Bind to Current Room" option
-  QAction *bindAction = menu.addAction(tr("Bind to Current Room"));
+//-----------------------------------------------------------------------------
+
+void TPanel::appendRoomBindMenuAction(QMenu *menu) {
+  if (!menu) return;
+
+  QAction *bindAction = menu->addAction(tr("Bind to Current Room"));
   bindAction->setCheckable(true);
   bindAction->setChecked(m_isRoomBound);
 
@@ -134,23 +141,15 @@ void TPanel::onCustomContextMenuRequested(const QPoint &pos) {
     Room *currentRoom = mw->getCurrentRoom();
     if (!currentRoom) return;
 
-    // Update binding state
     setRoomBound(checked);
     if (checked) {
-      // Bind panel to current room
       setBoundRoomName(currentRoom->getName());
-      // Update visibility immediately for all bound panels
       mw->updatePanelVisibility();
     } else {
-      // Unbind panel from room
       setBoundRoomName(QString());
-      // Show panel if it was hidden
       if (isHidden()) show();
     }
   });
-
-  menu.exec(mapToGlobal(pos));
-  // menu is automatically deleted by unique_ptr
 }
 
 //-----------------------------------------------------------------------------

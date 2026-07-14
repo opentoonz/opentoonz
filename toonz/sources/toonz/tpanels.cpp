@@ -257,7 +257,7 @@ void SchematicScenePanel::onDeleteStageObjects(
     return;
 
   TApp *app = TApp::instance();
-  // Safe conversion QList → std::vector (avoids std::length_error crash)
+  // Safe conversion QList ? std::vector (avoids std::length_error crash)
   const QList<TStageObjectId> objList = selection->getObjects();
   std::vector<TStageObjectId> objects(objList.begin(), objList.end());
 
@@ -931,6 +931,8 @@ StyleEditorPanel::StyleEditorPanel(QWidget *parent) : TPanel(parent) {
   setWidget(m_styleEditor);
 
   m_styleEditor->setLevelHandle(TApp::instance()->getCurrentLevel());
+  connect(m_styleEditor, SIGNAL(wheelContextMenuAboutToShow(QMenu *)), this,
+          SLOT(onWheelContextMenuAboutToShow(QMenu *)));
   setMinimumWidth(200);
   resize(340, 630);
 }
@@ -952,6 +954,13 @@ void StyleEditorPanel::hideEvent(QHideEvent *) {
 void StyleEditorPanel::onPreferenceChanged(const QString &prefName) {
   if (prefName == "ColorCalibration") m_styleEditor->updateColorCalibration();
 }
+
+//-----------------------------------------------------------------------------
+
+void StyleEditorPanel::onWheelContextMenuAboutToShow(QMenu *menu) {
+  appendRoomBindMenuAction(menu);
+}
+
 //-----------------------------------------------------------------------------
 
 class StyleEditorFactory final : public TPanelFactory {

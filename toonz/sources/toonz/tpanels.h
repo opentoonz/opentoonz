@@ -111,6 +111,7 @@ protected:
   void hideEvent(QHideEvent *) override;
 protected slots:
   void onPreferenceChanged(const QString &prefName);
+  void onWheelContextMenuAboutToShow(QMenu *menu);
 };
 
 //=========================================================

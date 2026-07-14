@@ -17,6 +17,7 @@
 class TPanelTitleBarButtonSet;
 class TPanelTitleBarButton;
 class Room;
+class QMenu;
 
 //-----------------------------------------------------------------------------
 //! icon buttons placed on the panel titlebar (cfr. viewerpane.h)
@@ -307,6 +308,7 @@ public:
   // Add room binding toggle button to the title bar
   // This enables the "Bind to Room" feature for any panel
   void addRoomBindButton();
+  void appendRoomBindMenuAction(QMenu *menu);
 
   // Virtuals that may be overridden
   virtual void reset() {}
