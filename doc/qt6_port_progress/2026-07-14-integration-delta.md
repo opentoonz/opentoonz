@@ -96,3 +96,6 @@ Qt 6 script/audio/viewer build also passed. This is macOS arm64 evidence only;
 Linux/Windows packages, clean packaged launch, real shader pixels, interactive
 script cancellation, hardware input/audio/camera, and signoff remain external
 gates.
+
+The final local candidate for these four build lanes is 73ca7efac; the
+machine-readable projection points to that candidate and the report above.
