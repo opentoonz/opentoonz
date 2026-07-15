@@ -162,6 +162,7 @@ private:
   void updateTabVisibility(Region *region);
   void updateJoinHighlightGeometry();
   void restoreSingleDockedPanel(DockWidget *item);
+  Region *detachTabGroupAsSubRegion(Region *region);
   bool removeFromTabGroup(DockWidget *item, Region *region,
                           bool deferStripDestroy = false);
   bool undockFromTabGroup(DockWidget *item, Region *region,

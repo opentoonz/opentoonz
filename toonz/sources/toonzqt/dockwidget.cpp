@@ -150,10 +150,15 @@ DockWidget::~DockWidget() {
 //! Clears dock placeholders for this dockwidget. This is automatically called
 //! at drag ends.
 void DockWidget::clearDockPlaceholders() {
+  // Layout may already have been destroyed during application shutdown.
   if (m_parentLayout) m_parentLayout->clearJoinHighlight();
 
-  unsigned int i;
-  for (i = 0; i < m_placeholders.size(); ++i) delete m_placeholders[i];
+  // Placeholders are child widgets; hide first so a partially torn-down
+  // parent does not touch them again while we delete.
+  for (unsigned int i = 0; i < m_placeholders.size(); ++i) {
+    if (m_placeholders[i]) m_placeholders[i]->hide();
+  }
+  for (unsigned int i = 0; i < m_placeholders.size(); ++i) delete m_placeholders[i];
   m_placeholders.clear();
 }
 

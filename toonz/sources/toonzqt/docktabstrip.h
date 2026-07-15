@@ -54,6 +54,7 @@ public:
 
   DockTabStrip(DockLayout *layout, Region *region, QWidget *parent);
   void syncFromRegion();
+  void rebindRegion(Region *region) { m_region = region; }
 
 public slots:
   void onCurrentChanged(int index);

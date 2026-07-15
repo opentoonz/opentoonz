@@ -94,6 +94,14 @@ DockLayout::DockLayout()
 DockLayout::~DockLayout() {
   clearJoinHighlight();
   delete m_joinHighlight;
+  m_joinHighlight = 0;
+
+  // Dock widgets may outlive this layout during application shutdown. Clear
+  // their back-pointer so ~DockWidget does not call into a destroyed layout.
+  for (unsigned int i = 0; i < m_items.size(); ++i) {
+    if (DockWidget *dw = static_cast<DockWidget *>(m_items[i]->widget()))
+      dw->m_parentLayout = 0;
+  }
 
   // Deleting Regions (separators are Widgets with parent, so they are
   // recursively deleted)
@@ -314,14 +322,18 @@ void DockLayout::updateSeparatorCursors() {
   Region *r, *child;
 
   unsigned int i, j;
-  int k, jInt;
+  int jInt, k;
   for (i = 0; i < m_regions.size(); ++i) {
-    r                = m_regions[i];
+    r = m_regions[i];
+    if (r->isTabbed()) continue;
+
+    const unsigned int childCount = r->getChildList().size();
+    const unsigned int sepCount   = r->separators().size();
+    if (!childCount || !sepCount) continue;
+
     bool orientation = r->getOrientation();
 
     // If region geometry is minimal or maximal, its separators are blocked
-    // NOTE: If this update follows only from a dock/undock, this should be
-    // disabled 'til 'Otherwise'
     QSize size = toRect(r->getGeometry()).size();
     bool isExtremeSize =
         (orientation == Region::horizontal)
@@ -330,34 +342,34 @@ void DockLayout::updateSeparatorCursors() {
             : size.height() == r->getMinimumSize(Region::vertical) ||
                   size.height() == r->getMaximumSize(Region::vertical);
     if (isExtremeSize) {
-      for (j = 0; j < r->separators().size(); ++j)
-        r->separator(j)->setCursor(Qt::ArrowCursor);
+      for (j = 0; j < sepCount; ++j) r->separator(j)->setCursor(Qt::ArrowCursor);
       continue;
     }
 
-    // Otherwise...
-
     // Arrowize all separators as long as the preceding region has equal
     // maximum and minimum sizes
-    for (j = 0; j < r->getChildList().size(); ++j) {
+    for (j = 0; j < childCount; ++j) {
       child = r->childRegion(j);
 
       if (child->getMaximumSize(orientation) ==
-          child->getMinimumSize(orientation))
-        r->separator(j)->setCursor(Qt::ArrowCursor);
-      else
+          child->getMinimumSize(orientation)) {
+        if (j < sepCount) r->separator(j)->setCursor(Qt::ArrowCursor);
+      } else
         break;
     }
 
-    jInt = j;
+    jInt = static_cast<int>(j);
     // The same as above in reverse order
-    for (k = r->getChildList().size() - 1; k > jInt; --k) {
+    k = static_cast<int>(childCount) - 1;
+    for (; k > jInt; --k) {
       child = r->childRegion(k);
 
       if (child->getMaximumSize(orientation) ==
-          child->getMinimumSize(orientation))
-        r->separator(k - 1)->setCursor(Qt::ArrowCursor);
-      else
+          child->getMinimumSize(orientation)) {
+        const int sepIdx = k - 1;
+        if (sepIdx >= 0 && static_cast<unsigned int>(sepIdx) < sepCount)
+          r->separator(sepIdx)->setCursor(Qt::ArrowCursor);
+      } else
         break;
     }
 
@@ -365,7 +377,10 @@ void DockLayout::updateSeparatorCursors() {
     Qt::CursorShape shape = (orientation == Region::horizontal)
                                 ? Qt::SplitHCursor
                                 : Qt::SplitVCursor;
-    for (; jInt < k; ++jInt) r->separator(jInt)->setCursor(shape);
+    for (; jInt < k; ++jInt) {
+      if (static_cast<unsigned int>(jInt) < sepCount)
+        r->separator(jInt)->setCursor(shape);
+    }
   }
 }
 
@@ -400,6 +415,9 @@ void DockLayout::applyGeometry() {
           tabs[j]->setGeometry(contentRect);
           tabs[j]->show();
         } else {
+          // Keep hidden tabs aligned so switching tabs after restore does not
+          // jump, and saveState sees a consistent geometry next time.
+          tabs[j]->setGeometry(contentRect);
           tabs[j]->hide();
         }
       }
@@ -919,12 +937,21 @@ bool DockLayout::beginTabDragOut(DockWidget *item, Region *region,
 
   clearJoinHighlight();
 
-  // Destroy the hidden tab strip after this mouse handler returns.
+  // Destroy the hidden tab strip after this mouse handler returns. Detach
+  // ownership from the region first so Region::~Region and a late timer
+  // callback cannot both delete the same widget.
   if (!region->isTabbed() && region->m_tabStripContainer) {
-    Region *r = region;
-    QTimer::singleShot(0, [this, r]() {
-      if (!r->isTabbed() && r->m_tabStripContainer) destroyTabStrip(r);
-    });
+    TabBarContainter *stripContainer = region->m_tabStripContainer;
+    region->m_tabStripContainer      = 0;
+    region->m_tabStrip                 = 0;
+    stripContainer->hide();
+
+    QWidget *host = parentWidget();
+    if (host) {
+      QTimer::singleShot(0, host, [stripContainer]() { delete stripContainer; });
+    } else {
+      delete stripContainer;
+    }
   }
 
   item->show();
@@ -1077,6 +1104,12 @@ void DockLayout::calculateDockPlaceholders(DockWidget *item) {
   // If the DockLayout's owner widget is hidden, avoid
   if (!parentWidget()->isVisible()) return;
 
+  // Drop stale region references before deleting placeholder widgets.
+  for (unsigned int ri = 0; ri < m_regions.size(); ++ri)
+    m_regions[ri]->m_placeholders.clear();
+
+  item->clearDockPlaceholders();
+
   if (!m_regions.size()) {
     if (isPossibleInsertion(item, 0, 0)) {
       // Then insert a root placeholder only
@@ -1203,6 +1236,7 @@ void DockLayout::dockItem(DockWidget *item, DockPlaceholder *place) {
   } else {
     dockItemPrivate(item, place->m_region, place->m_idx);
     redistribute();
+    clearJoinHighlight();
     item->setWindowFlags(Qt::SubWindow);
     item->show();
   }
@@ -1253,6 +1287,29 @@ Region *DockLayout::dockItem(DockWidget *item, Region *r, int idx) {
 
 //------------------------------------------------------
 
+Region *DockLayout::detachTabGroupAsSubRegion(Region *region) {
+  if (!region || !region->isTabbed()) return 0;
+
+  Region *child = new Region(this);
+  child->m_tabItems.swap(region->m_tabItems);
+  child->m_activeTabIndex    = region->m_activeTabIndex;
+  child->m_tabStrip          = region->m_tabStrip;
+  child->m_tabStripContainer = region->m_tabStripContainer;
+  child->m_item              = child->activeTab();
+
+  region->m_tabItems.clear();
+  region->m_activeTabIndex    = 0;
+  region->m_tabStrip          = 0;
+  region->m_tabStripContainer = 0;
+  region->m_item              = 0;
+
+  if (child->m_tabStrip) child->m_tabStrip->rebindRegion(child);
+
+  return child;
+}
+
+//------------------------------------------------------
+
 // Internal docking function. Contains raw docking code, excluded reparenting
 // (setWindowFlags)  which may slow down a bit should be done only
 // after a redistribute() and a repaint() on real-time docking.
@@ -1281,6 +1338,14 @@ Region *DockLayout::dockItemPrivate(DockWidget *item, Region *r, int idx) {
     newRoot->insertSubRegion(m_regions[1], 0);
 
     r = newRoot;
+  } else if (r->isTabbed()) {
+    // Split-dock beside/above a tab group: move the whole group as one unit,
+    // not just the active tab (which would orphan the other tabs and corrupt
+    // the region tree).
+    Region *regionForTabs = detachTabGroupAsSubRegion(r);
+    regionForTabs->setSize(toRect(r->getGeometry()).size());
+    r->insertSubRegion(regionForTabs, 0);
+    m_regions.push_back(regionForTabs);
   } else if (r->getItem()) {
     // Then the Layout gets further subdived - r's item has to be moved
     Region *regionForOldItem = r->insertItem(r->getItem(), 0);
@@ -2139,6 +2204,19 @@ bool DockLayout::restoreState(const State &state) {
     }
   }
 
+  // Hidden tabs may have been saved with stale geometries from before they
+  // were merged. Align every tab in a group to the active tab before the
+  // region tree is rebuilt from leaf widget rects.
+  for (j = 0; j < m_regions.size(); ++j) {
+    Region *region = m_regions[j];
+    if (!region->isTabbed()) continue;
+    DockWidget *active = region->activeTab();
+    if (!active) continue;
+    const QRect ref = active->geometry();
+    const std::vector<DockWidget *> &tabs = region->tabItems();
+    for (unsigned int t = 0; t < tabs.size(); ++t) tabs[t]->setGeometry(ref);
+  }
+
   // Calculate regions' geometry starting from leaves (items)
   if (m_regions.size()) m_regions[0]->restoreGeometry();
 
@@ -2186,6 +2264,20 @@ bool DockLayout::restoreState(const State &state) {
 void Region::restoreGeometry() {
   // Applying a head-recursive algorithm to update the geometry of a Region
   // after those of its children have been updated
+  if (isTabbed()) {
+    DockWidget *active = activeTab();
+    if (!active) return;
+
+    // applyGeometry() stores panel widgets below the tab strip. Saved
+    // geometries therefore describe the content rect, not the full region.
+    // Expand upward so restore + applyGeometry land the strip and panels
+    // where they were when the layout was saved.
+    QRect g = active->geometry();
+    g.setTop(g.top() - m_owner->tabStripHeight());
+    setGeometry(g);
+    return;
+  }
+
   if (m_item) {
     // Place item's geometry
     setGeometry(m_item->geometry());
