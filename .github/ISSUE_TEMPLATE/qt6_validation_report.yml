@@ -1,0 +1,142 @@
+name: Qt 6 validation report
+description: Record manual, Codex, or CI evidence for Qt 6 migration validation.
+title: "[Qt6 validation]: "
+labels: ["qt6-validation", "manual-verification"]
+projects: ["bgyss/1"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to record validation evidence for the Qt 5 to Qt 6 migration.
+        Build/package status and GUI/UX validation should be recorded separately.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Validation area
+      options:
+        - Build/package
+        - Startup/workspace
+        - Viewer/rendering
+        - Drawing/input
+        - Timeline/xsheet
+        - Palette/styles
+        - File IO
+        - Preferences
+        - Scripting
+        - Tablet/input
+        - Cross-platform packaging
+        - Documentation
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - macOS arm64
+        - macOS x64
+        - Windows x64
+        - Linux x64
+        - Cross-platform
+    validations:
+      required: true
+
+  - type: dropdown
+    id: validation_type
+    attributes:
+      label: Validation type
+      options:
+        - CI build
+        - Codex GUI smoke
+        - Codex report review
+        - Human smoke
+        - Studio field test
+        - Regression follow-up
+    validations:
+      required: true
+
+  - type: dropdown
+    id: result
+    attributes:
+      label: Result
+      options:
+        - Blocked by build
+        - Ready for Codex smoke
+        - Codex evidence ready
+        - Needs human pass
+        - Failed
+        - Accepted
+        - Studio field test
+    validations:
+      required: true
+
+  - type: dropdown
+    id: risk
+    attributes:
+      label: Risk
+      options:
+        - P0 blocker
+        - P1 high
+        - P2 medium
+        - P3 low
+    validations:
+      required: true
+
+  - type: input
+    id: build_sha
+    attributes:
+      label: Build SHA
+      description: Commit SHA or release artifact identifier under test.
+      placeholder: 8482a0053d6eb7b03811cdd454988c1a918d0b2c
+    validations:
+      required: true
+
+  - type: input
+    id: baseline
+    attributes:
+      label: Baseline
+      description: Baseline used for comparison.
+      placeholder: OpenToonz 1.7.1 / Qt 5
+    validations:
+      required: true
+
+  - type: textarea
+    id: scenario
+    attributes:
+      label: Scenario or workflow under test
+      description: Describe the workflow, starting state, and acceptance criteria.
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Link CI runs, artifacts, screenshots, videos, logs, or Codex reports.
+      placeholder: Paste links or drag files here.
+    validations:
+      required: false
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes and differences from baseline
+      description: Record visual, interaction, performance, packaging, or workflow differences.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: validation_boundaries
+    attributes:
+      label: Validation boundaries
+      options:
+        - label: I separated build/package status from GUI/UX validation.
+          required: true
+        - label: I included enough evidence for another tester to repeat or review this validation.
+          required: false

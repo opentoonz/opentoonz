@@ -30,15 +30,14 @@
 #include "toonzqt/intfield.h"
 #include "toonzqt/doublefield.h"
 #include "toonzqt/menubarcommand.h"
+#include "toonzqt/qtcompat.h"
 
 // Qt includes
 #include <QAction>
 #include <QApplication>
-#include <QCameraInfo>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QCommonStyle>
-#include <QDesktopWidget>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -950,10 +949,14 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
   // Control Page
   ret = ret && connect(refreshCamListButton, SIGNAL(clicked()), this,
                        SLOT(refreshCameraListCalled()));
-  ret = ret && connect(m_cameraListCombo, SIGNAL(activated(int)), this,
-                       SLOT(onCameraListComboActivated(int)));
-  ret = ret && connect(m_resolutionCombo, SIGNAL(activated(const QString &)),
-                       this, SLOT(onResolutionComboActivated(const QString &)));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_cameraListCombo, this,
+                   [this](int index) { onCameraListComboActivated(index); }));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxTextActivated(
+                   m_resolutionCombo, this,
+                   [this](const QString &resolution) {
+                     onResolutionComboActivated(resolution);
+                   }));
   if (m_captureFilterSettingsBtn)
     ret = ret && connect(m_captureFilterSettingsBtn, SIGNAL(clicked()), this,
                          SLOT(onCaptureFilterSettingsBtnPressed()));
@@ -989,8 +992,9 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
   //                     SLOT(openSaveInFolderPopup()));
   ret = ret && connect(m_saveInFileFld, SIGNAL(pathChanged()), this,
                        SLOT(onSaveInPathEdited()));
-  ret = ret && connect(m_fileTypeCombo, SIGNAL(activated(int)), this,
-                       SLOT(onFileTypeActivated()));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_fileTypeCombo, this,
+                   [this](int) { onFileTypeActivated(); }));
   ret = ret && connect(m_frameNumberEdit, SIGNAL(editingFinished()), this,
                        SLOT(onFrameNumberChanged()));
   ret = ret && connect(m_xSheetFrameNumberEdit, SIGNAL(editingFinished()), this,
@@ -1018,22 +1022,37 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
                        SLOT(onOpacityChanged(int)));
 
   // Options Page
-  ret = ret && connect(m_useScaledFullSizeImages, SIGNAL(stateChanged(int)),
-                       this, SLOT(onScaleFullSizeImagesChanged(int)));
-  ret = ret && connect(m_liveViewOnAllFramesCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onLiveViewOnAllFramesChanged(int)));
+  ret = ret && QtCompat::connectCheckStateChanged(
+                   m_useScaledFullSizeImages, this,
+                   [this](Qt::CheckState state) {
+                     onScaleFullSizeImagesChanged(static_cast<int>(state));
+                   });
+  ret = ret && QtCompat::connectCheckStateChanged(
+                   m_liveViewOnAllFramesCB, this, [this](Qt::CheckState state) {
+                     onLiveViewOnAllFramesChanged(static_cast<int>(state));
+                   });
   ret = ret && connect(m_playSound, SIGNAL(toggled(bool)), this,
                        SLOT(onPlaySoundToggled(bool)));
-  ret = ret && connect(m_placeOnXSheetCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onPlaceOnXSheetChanged(int)));
-  ret = ret && connect(m_directShowCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onUseDirectShowChanged(int)));
-  ret = ret && connect(m_useMjpgCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onUseMjpgChanged(int)));
-  ret = ret && connect(m_useNumpadCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onUseNumpadChanged(int)));
-  ret = ret && connect(m_drawBeneathCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onDrawBeneathChanged(int)));
+  ret = ret && QtCompat::connectCheckStateChanged(
+                   m_placeOnXSheetCB, this, [this](Qt::CheckState state) {
+                     onPlaceOnXSheetChanged(static_cast<int>(state));
+                   });
+  ret = ret && QtCompat::connectCheckStateChanged(
+                   m_directShowCB, this, [this](Qt::CheckState state) {
+                     onUseDirectShowChanged(static_cast<int>(state));
+                   });
+  ret = ret && QtCompat::connectCheckStateChanged(
+                   m_useMjpgCB, this, [this](Qt::CheckState state) {
+                     onUseMjpgChanged(static_cast<int>(state));
+                   });
+  ret = ret && QtCompat::connectCheckStateChanged(
+                   m_useNumpadCB, this, [this](Qt::CheckState state) {
+                     onUseNumpadChanged(static_cast<int>(state));
+                   });
+  ret = ret && QtCompat::connectCheckStateChanged(
+                   m_drawBeneathCB, this, [this](Qt::CheckState state) {
+                     onDrawBeneathChanged(static_cast<int>(state));
+                   });
   ret = ret && connect(m_postCaptureReviewFld, SIGNAL(valueEditedByHand()),
                        this, SLOT(onCaptureReviewFldEdited()));
   ret = ret && connect(m_postCaptureReviewFld, SIGNAL(valueChanged(bool)), this,
@@ -1219,8 +1238,10 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
   ret =
       ret && connect(m_stopMotion->m_light, SIGNAL(screen3OverlayChanged(bool)),
                      this, SLOT(onScreen3OverlayChanged(bool)));
-  ret = ret && connect(m_blackScreenForCapture, SIGNAL(stateChanged(int)), this,
-                       SLOT(onBlackScreenForCaptureChanged(int)));
+  ret = ret && QtCompat::connectCheckStateChanged(
+                   m_blackScreenForCapture, this, [this](Qt::CheckState state) {
+                     onBlackScreenForCaptureChanged(static_cast<int>(state));
+                   });
   ret = ret && connect(m_stopMotion->m_light, SIGNAL(blackCaptureSignal(bool)),
                        this, SLOT(onBlackCaptureSignal(bool)));
 
@@ -1598,7 +1619,7 @@ void StopMotionController::refreshCameraList(QString activeCamera) {
   m_cameraListCombo->blockSignals(true);
   m_cameraListCombo->clear();
   m_cameraStatusLabel->hide();
-  QList<QCameraInfo> webcams = m_stopMotion->m_webcam->getWebcams();
+  QList<StopMotionCamera::Info> webcams = m_stopMotion->m_webcam->getWebcams();
   int count                  = webcams.count();
 #ifdef WITH_CANON
   count += m_stopMotion->m_canon->getCameraCount();
@@ -1616,10 +1637,12 @@ void StopMotionController::refreshCameraList(QString activeCamera) {
     m_cameraListCombo->addItem(tr("- Select camera -"));
     if (webcams.count() > 0) {
       for (int c = 0; c < webcams.size(); c++) {
-        std::string name = webcams.at(c).deviceName().toStdString();
-        QString camDesc  = webcams.at(c).description();
+        std::string name = StopMotionCamera::deviceName(webcams.at(c)).toStdString();
+        QString camDesc  = StopMotionCamera::description(webcams.at(c));
         m_cameraListCombo->addItem(camDesc);
-        maxTextLength = std::max(maxTextLength, fontMetrics().horizontalAdvance(camDesc));
+        maxTextLength = std::max(
+            maxTextLength,
+            QtCompat::fontMetricsHorizontalAdvance(fontMetrics(), camDesc));
       }
     }
 #ifdef WITH_CANON
@@ -1632,7 +1655,9 @@ void StopMotionController::refreshCameraList(QString activeCamera) {
       if (!open) m_stopMotion->m_canon->closeCameraSession();
       m_cameraSettingsLabel->setText(name);
       m_cameraListCombo->addItem(name);
-      maxTextLength = std::max(maxTextLength, fontMetrics().width(name));
+      maxTextLength = std::max(
+          maxTextLength,
+          QtCompat::fontMetricsHorizontalAdvance(fontMetrics(), name));
     }
 #endif
     m_cameraListCombo->setMaximumWidth(maxTextLength + 25);
@@ -1794,12 +1819,16 @@ void StopMotionController::refreshExposureList() {
   m_exposureCombo->addItems(options);
   int maxTextLength = 0;
   for (int i = 0; i < options.size(); i++) {
-    maxTextLength = std::max(maxTextLength, fontMetrics().width(options.at(i)));
+    maxTextLength = std::max(
+        maxTextLength,
+        QtCompat::fontMetricsHorizontalAdvance(fontMetrics(), options.at(i)));
   }
   if (m_exposureCombo->count() == 0) {
     m_exposureCombo->addItem(tr("Disabled"));
     m_exposureCombo->setDisabled(true);
-    m_exposureCombo->setMaximumWidth(fontMetrics().width(tr("Disabled")) + 25);
+    m_exposureCombo->setMaximumWidth(
+        QtCompat::fontMetricsHorizontalAdvance(fontMetrics(), tr("Disabled")) +
+        25);
   } else {
     m_exposureCombo->setEnabled(true);
     m_exposureCombo->setCurrentText(
@@ -1821,13 +1850,16 @@ void StopMotionController::refreshWhiteBalanceList() {
   m_whiteBalanceCombo->addItems(options);
   int maxTextLength = 0;
   for (int i = 0; i < options.size(); i++) {
-    maxTextLength = std::max(maxTextLength, fontMetrics().width(options.at(i)));
+    maxTextLength = std::max(
+        maxTextLength,
+        QtCompat::fontMetricsHorizontalAdvance(fontMetrics(), options.at(i)));
   }
   if (m_whiteBalanceCombo->count() == 0) {
     m_whiteBalanceCombo->addItem(tr("Disabled"));
     m_whiteBalanceCombo->setDisabled(true);
-    m_whiteBalanceCombo->setMaximumWidth(fontMetrics().width(tr("Disabled")) +
-                                         25);
+    m_whiteBalanceCombo->setMaximumWidth(
+        QtCompat::fontMetricsHorizontalAdvance(fontMetrics(), tr("Disabled")) +
+        25);
   } else {
     m_whiteBalanceCombo->setEnabled(true);
     m_whiteBalanceCombo->setCurrentText(
@@ -1877,13 +1909,16 @@ void StopMotionController::refreshImageQualityList() {
   m_imageQualityCombo->addItems(options);
   int maxTextLength = 0;
   for (int i = 0; i < options.size(); i++) {
-    maxTextLength = std::max(maxTextLength, fontMetrics().width(options.at(i)));
+    maxTextLength = std::max(
+        maxTextLength,
+        QtCompat::fontMetricsHorizontalAdvance(fontMetrics(), options.at(i)));
   }
   if (m_imageQualityCombo->count() == 0) {
     m_imageQualityCombo->addItem(tr("Disabled"));
     m_imageQualityCombo->setDisabled(true);
-    m_imageQualityCombo->setMaximumWidth(fontMetrics().width(tr("Disabled")) +
-                                         25);
+    m_imageQualityCombo->setMaximumWidth(
+        QtCompat::fontMetricsHorizontalAdvance(fontMetrics(), tr("Disabled")) +
+        25);
   } else {
     m_imageQualityCombo->setEnabled(true);
     m_imageQualityCombo->setCurrentText(
@@ -1906,13 +1941,16 @@ void StopMotionController::refreshPictureStyleList() {
       m_stopMotion->m_canon->getPictureStyleOptions());
   int maxTextLength = 0;
   for (int i = 0; i < options.size(); i++) {
-    maxTextLength = std::max(maxTextLength, fontMetrics().width(options.at(i)));
+    maxTextLength = std::max(
+        maxTextLength,
+        QtCompat::fontMetricsHorizontalAdvance(fontMetrics(), options.at(i)));
   }
   if (m_pictureStyleCombo->count() == 0) {
     m_pictureStyleCombo->addItem(tr("Disabled"));
     m_pictureStyleCombo->setDisabled(true);
-    m_pictureStyleCombo->setMaximumWidth(fontMetrics().width(tr("Disabled")) +
-                                         25);
+    m_pictureStyleCombo->setMaximumWidth(
+        QtCompat::fontMetricsHorizontalAdvance(fontMetrics(), tr("Disabled")) +
+        25);
   } else {
     m_pictureStyleCombo->setEnabled(true);
     m_pictureStyleCombo->setCurrentText(
@@ -1926,7 +1964,7 @@ void StopMotionController::refreshPictureStyleList() {
 //-----------------------------------------------------------------------------
 
 void StopMotionController::onCameraListComboActivated(int comboIndex) {
-  QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
+  QList<StopMotionCamera::Info> cameras = StopMotionCamera::availableCameras();
   int cameraCount            = cameras.size();
 #ifdef WITH_CANON
   cameraCount += m_stopMotion->m_canon->getCameraCount();
@@ -2087,9 +2125,9 @@ void StopMotionController::onCaptureFilterSettingsBtnPressed() {
       m_stopMotion->m_webcam->getWebcamDeviceName().isNull())
     return;
 
-  QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
+  QList<StopMotionCamera::Info> cameras = StopMotionCamera::availableCameras();
   for (int c = 0; c < cameras.size(); c++) {
-    if (cameras.at(c).deviceName() ==
+    if (StopMotionCamera::deviceName(cameras.at(c)) ==
         m_stopMotion->m_webcam->getWebcamDeviceName()) {
 #ifdef _WIN32
       m_stopMotion->m_webcam->openSettingsWindow();

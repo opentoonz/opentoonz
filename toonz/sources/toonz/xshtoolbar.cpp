@@ -6,6 +6,9 @@
 #include "menubarcommandids.h"
 #include "commandbarpopup.h"
 
+// TnzQt includes
+#include "toonzqt/qtcompat.h"
+
 // TnzLib includes
 #include "toonz/preferences.h"
 #include "toonz/toonzscene.h"
@@ -65,7 +68,7 @@ void XSheetToolbar::contextMenuEvent(QContextMenuEvent *event) {
       menu->addAction(tr("Customize XSheet Toolbar"));
   connect(customizeCommandBar, SIGNAL(triggered()),
           SLOT(doCustomizeCommandBar()));
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 //-----------------------------------------------------------------------------

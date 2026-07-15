@@ -21,7 +21,7 @@ class BreadcrumbClickableLabel : public QLabel {
   Q_OBJECT
 
 public:
-  BreadcrumbClickableLabel(QString labelName, QWidget *parent = Q_NULLPTR,
+  BreadcrumbClickableLabel(QString labelName, QWidget *parent = nullptr,
                            Qt::WindowFlags f = Qt::WindowFlags());
   ~BreadcrumbClickableLabel();
 

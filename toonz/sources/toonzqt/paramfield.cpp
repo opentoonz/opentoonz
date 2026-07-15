@@ -10,6 +10,7 @@
 #include "toonzqt/tonecurvefield.h"
 #include "toonzqt/checkbox.h"
 #include "toonzqt/menubarcommand.h"
+#include "toonzqt/qtcompat.h"
 
 #include "tdoubleparam.h"
 #include "tnotanimatableparam.h"
@@ -763,7 +764,7 @@ void ParamFieldKeyToggle::mousePressEvent(QMouseEvent *e) { emit keyToggled(); }
 
 //-----------------------------------------------------------------------------
 
-void ParamFieldKeyToggle::enterEvent(QEvent *) {
+void ParamFieldKeyToggle::enterEvent(QtCompat::EnterEvent *) {
   m_highlighted = true;
   update();
 }
@@ -1312,10 +1313,9 @@ ModeSensitiveBox::ModeSensitiveBox(QWidget *parent,
 ModeSensitiveBox::ModeSensitiveBox(QWidget *parent, QCheckBox *checkBox)
     : QWidget(parent) {
   m_modes << 1;
-  connect(
-      checkBox, &QCheckBox::stateChanged, this,
-      [=]() { onModeChanged(checkBox->isChecked() ? 1 : 0); },
-      Qt::AutoConnection);
+  QtCompat::connectCheckStateChanged(
+      checkBox, this,
+      [=](Qt::CheckState) { onModeChanged(checkBox->isChecked() ? 1 : 0); });
 }
 
 //-----------------------------------------------------------------------------
@@ -1349,8 +1349,8 @@ EnumParamField::EnumParamField(QWidget *parent, QString name,
     QString str;
     m_om->addItem(str.fromStdString(caption));
   }
-  connect(m_om, SIGNAL(activated(const QString &)), this,
-          SLOT(onChange(const QString &)));
+  QtCompat::connectComboBoxTextActivated(
+      m_om, this, [this](const QString &text) { onChange(text); });
   m_layout->addWidget(m_om);
 
   m_layout->addStretch();
@@ -1695,10 +1695,10 @@ FontParamField::FontParamField(QWidget *parent, QString name,
   setLayout(m_layout);
 
   bool ret = true;
-  ret = ret && connect(m_fontCombo, SIGNAL(activated(const QString &)), this,
-                       SLOT(onChange()));
-  ret = ret && connect(m_styleCombo, SIGNAL(activated(const QString &)), this,
-                       SLOT(onChange()));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxTextActivated(
+                   m_fontCombo, this, [this](const QString &) { onChange(); }));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxTextActivated(
+                   m_styleCombo, this, [this](const QString &) { onChange(); }));
   ret = ret && connect(m_sizeField, SIGNAL(valueChanged(bool)), this,
                        SLOT(onSizeChange(bool)));
   assert(ret);
@@ -1709,11 +1709,10 @@ FontParamField::FontParamField(QWidget *parent, QString name,
 //-----------------------------------------------------------------------------
 
 void FontParamField::findStyles(const QFont &font) {
-  QFontDatabase fontDatabase;
   QString currentItem = m_styleCombo->currentText();
   m_styleCombo->clear();
 
-  for (const QString &style : fontDatabase.styles(font.family()))
+  for (const QString &style : QtCompat::fontDatabaseStyles(font.family()))
     m_styleCombo->addItem(style);
 
   int styleIndex = m_styleCombo->findText(currentItem);
@@ -1748,8 +1747,7 @@ void FontParamField::onChange() {
   m_sizeField->getRange(min, max);
   if (size < min) size = min;
 
-  QFontDatabase fontDatabase;
-  QFont font = fontDatabase.font(family, style, 10);
+  QFont font = QtCompat::fontDatabaseFont(family, style, 10);
   font.setPixelSize(size);
 
   TUndo *undo = 0;
@@ -2364,7 +2362,9 @@ CheckBox_bool::CheckBox_bool(QWidget *parent, QString name,
   value_ = new QCheckBox(this);
   value_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-  connect(value_, SIGNAL(stateChanged(int)), this, SLOT(update_value(int)));
+  QtCompat::connectCheckStateChanged(value_, this, [this](Qt::CheckState state) {
+    update_value(static_cast<int>(state));
+  });
 
   m_layout->addWidget(value_);
 
@@ -2426,7 +2426,8 @@ RadioButton_enum::RadioButton_enum(QWidget *parent, QString name,
     m_layout->addWidget(button);
   }
 
-  connect(value_, SIGNAL(buttonClicked(int)), this, SLOT(update_value(int)));
+  QtCompat::connectButtonGroupIdClicked(value_, this,
+                                        &RadioButton_enum::update_value);
 
   setLayout(m_layout);
 }

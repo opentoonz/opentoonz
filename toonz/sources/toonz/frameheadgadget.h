@@ -65,7 +65,7 @@ public:
   bool eventFilter(QObject *obj, QEvent *event) override;
 };
 
-class XsheetFrameHeadGadget final : public FrameHeadGadget {
+class XsheetFrameHeadGadget : public FrameHeadGadget {
 public:
 };
 

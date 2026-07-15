@@ -1,0 +1,74 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var source = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var outline = new OutlineVectorizer();
+var centerline = new CenterlineVectorizer();
+
+var outlineRaster = outline.vectorize(source);
+var centerlineRaster = centerline.vectorize(source);
+print("qt-script-vectorizer-edges-raster", outlineRaster.type,
+      centerlineRaster.type);
+var outlineRasterAgain = outline.vectorize(source);
+var centerlineRasterAgain = centerline.vectorize(source);
+var vectorizedWrapperIdsDiffer = outlineRaster.id !== outlineRasterAgain.id &&
+    centerlineRaster.id !== centerlineRasterAgain.id;
+outlineRaster.dispose();
+centerlineRaster.dispose();
+var vectorizedWrappersStillValid = outlineRasterAgain.type === "Vector" &&
+    centerlineRasterAgain.type === "Vector";
+print("qt-script-vectorizer-edges-wrappers", vectorizedWrapperIdsDiffer,
+      vectorizedWrappersStillValid);
+
+var scene = new Scene();
+var emptyRasterLevel = scene.newLevel("Raster", "qt6_vectorizer_empty_raster");
+var vectorLevel = scene.newLevel("Vector", "qt6_vectorizer_vector");
+
+var errors = [
+  hasError(function() { new OutlineVectorizer(0); },
+           "OutlineVectorizer constructor expected no arguments"),
+  hasError(function() { new CenterlineVectorizer(0); },
+           "CenterlineVectorizer constructor expected no arguments"),
+  hasError(function() { outline.vectorize(); },
+           "OutlineVectorizer.vectorize expected one argument"),
+  hasError(function() { outline.vectorize(source, source); },
+           "OutlineVectorizer.vectorize expected one argument"),
+  hasError(function() { centerline.vectorize(); },
+           "CenterlineVectorizer.vectorize expected one argument"),
+  hasError(function() { centerline.vectorize(source, source); },
+           "CenterlineVectorizer.vectorize expected one argument"),
+  hasError(function() { outline.vectorize(42); },
+           "should be an Image or a Level"),
+  hasError(function() { centerline.vectorize(42); },
+           "should be an Image or a Level"),
+  hasError(function() { outline.vectorize(outlineRasterAgain); },
+           "Can't vectorize a Vector image"),
+  hasError(function() { centerline.vectorize(outlineRasterAgain); },
+           "Can't vectorize a Vector image"),
+  hasError(function() { outline.vectorize(emptyRasterLevel); },
+           "Can't vectorize a level with no frames"),
+  hasError(function() { centerline.vectorize(emptyRasterLevel); },
+           "Can't vectorize a level with no frames"),
+  hasError(function() { outline.vectorize(vectorLevel); },
+           "Can't vectorize a Vector level"),
+  hasError(function() { centerline.vectorize(vectorLevel); },
+           "Can't vectorize a Vector level")
+];
+print("qt-script-vectorizer-edges-errors", errors);
+
+vectorLevel.dispose();
+emptyRasterLevel.dispose();
+scene.dispose();
+centerlineRasterAgain.dispose();
+outlineRasterAgain.dispose();
+centerline.dispose();
+outline.dispose();
+source.dispose();
+
+"qt-script-vectorizer-edges-result";

@@ -13,6 +13,7 @@
 #include "toonzqt/filefield.h"
 #include "toonzqt/colorfield.h"
 #include "toonzqt/intfield.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/tscenehandle.h"
@@ -188,7 +189,8 @@ void decoTimeInfo(QPainter& painter, QRect rect,
     font.setPixelSize(rect.height() / 2 - mm2px(1));
     font.setLetterSpacing(QFont::PercentageSpacing, 100);
     while (font.pixelSize() > mm2px(2)) {
-      if (QFontMetrics(font).boundingRect(plusStr).width() < rect.width() / 12)
+      if (QtCompat::fontMetricsHorizontalAdvance(QFontMetrics(font),
+                                                 plusStr) < rect.width() / 12)
         break;
       font.setPixelSize(font.pixelSize() - mm2px(0.2));
     }
@@ -234,7 +236,8 @@ void doDecoSheetInfo(QPainter& painter, QRect rect,
     font.setPixelSize(rect.height() / 2 - mm2px(1));
     font.setLetterSpacing(QFont::PercentageSpacing, 100);
     while (font.pixelSize() > mm2px(2)) {
-      if (QFontMetrics(font).boundingRect(totStr).width() < rect.width() / 6)
+      if (QtCompat::fontMetricsHorizontalAdvance(QFontMetrics(font), totStr) <
+          rect.width() / 6)
         break;
       font.setPixelSize(font.pixelSize() - mm2px(0.2));
     }
@@ -381,16 +384,19 @@ QComboBox* createTickMarkCombo(QWidget* parent) {
 
 void doDrawText(QPainter& p, const QString& str, const QRect rect) {
   QFontMetrics fm(p.font());
-  int spaceWidth = fm.boundingRect('A').width();
+  int spaceWidth = QtCompat::fontMetricsHorizontalAdvance(fm, QString("A"));
   // check if spaces can be iserted between letters
-  int textWidth = fm.boundingRect(str).width() + spaceWidth * (str.count() - 1);
+  int textWidth =
+      QtCompat::fontMetricsHorizontalAdvance(fm, str) +
+      spaceWidth * (str.size() - 1);
   if (rect.width() - spaceWidth * 2 <= textWidth) {
     p.drawText(rect, Qt::AlignCenter, str);
     return;
   }
   // check if spaces can be doubled
   int textWidth_s2 =
-      fm.boundingRect(str).width() + spaceWidth * 2 * (str.count() - 1);
+      QtCompat::fontMetricsHorizontalAdvance(fm, str) +
+      spaceWidth * 2 * (str.size() - 1);
   if (rect.width() - spaceWidth * 4 > textWidth_s2) textWidth = textWidth_s2;
   QRect textRect(rect.center().x() - textWidth / 2, rect.y(), textWidth,
                  rect.height());
@@ -405,8 +411,9 @@ void setFontFittingRectWidth(QPainter& p, const QString& str, const QRect rect,
   int pixelSize = rect.height() - mm2px(vmargin);
   while (1) {
     font.setPixelSize(pixelSize);
-    if (pixelSize <= mm2px(2) || QFontMetrics(font).boundingRect(str).width() <=
-                                     rect.width() - mm2px(hmargin))
+    if (pixelSize <= mm2px(2) ||
+        QtCompat::fontMetricsHorizontalAdvance(QFontMetrics(font), str) <=
+            rect.width() - mm2px(hmargin))
       break;
     pixelSize -= mm2px(0.1);
   }
@@ -713,7 +720,8 @@ void XSheetPDFTemplate::drawDialogBlock(QPainter& painter, const int framePage,
   QString serifLabel =
       (param(TranslateBodyLabel, 1) == 1) ? QObject::tr("S", "XSheetPDF") : "S";
   while (font.pixelSize() > mm2px(1)) {
-    if (QFontMetrics(font).boundingRect(serifLabel).width() <
+    if (QtCompat::fontMetricsHorizontalAdvance(QFontMetrics(font),
+                                               serifLabel) <
         labelRect.width() - mm2px(1))
       break;
     font.setPixelSize(font.pixelSize() - mm2px(0.5));
@@ -1034,7 +1042,8 @@ void XSheetPDFTemplate::drawLevelName(QPainter& painter, QRect rect,
   painter.setFont(font);
 
   // if it can fit in the rect, then just draw it
-  if (QFontMetrics(font).boundingRect(name).width() < rect.width()) {
+  if (QtCompat::fontMetricsHorizontalAdvance(QFontMetrics(font), name) <
+      rect.width()) {
     painter.drawText(rect, Qt::AlignCenter, name);
     return;
   }
@@ -1042,7 +1051,8 @@ void XSheetPDFTemplate::drawLevelName(QPainter& painter, QRect rect,
   // if it can fit with 90% sized font
   QFont altFont(font);
   altFont.setPixelSize(font.pixelSize() * 0.9);
-  if (QFontMetrics(altFont).boundingRect(name).width() < rect.width()) {
+  if (QtCompat::fontMetricsHorizontalAdvance(QFontMetrics(altFont), name) <
+      rect.width()) {
     painter.setFont(altFont);
     painter.drawText(rect, Qt::AlignCenter, name);
     return;
@@ -1077,7 +1087,8 @@ void XSheetPDFTemplate::drawLogo(QPainter& painter) {
     QFont font = painter.font();
     font.setPixelSize(logoRect.height() - mm2px(2));
     while (1) {
-      if (QFontMetrics(font).boundingRect(m_info.logoText).width() <
+      if (QtCompat::fontMetricsHorizontalAdvance(QFontMetrics(font),
+                                                 m_info.logoText) <
               logoRect.width() &&
           QFontMetrics(font).boundingRect(m_info.logoText).height() <
               logoRect.height())
@@ -1226,7 +1237,7 @@ void XSheetPDFTemplate::drawDialogue(QPainter& painter, int framePage) {
 
       QString text = cell.getSoundTextLevel()->getFrameText(
           cell.m_frameId.getNumber() - 1);
-      int textCount = text.count();
+      int textCount = text.size();
       // separate text if it overflows the body
       if (row < drawStart) {
         int partialBlockLength = rowTo - drawStart + 1;
@@ -1263,11 +1274,12 @@ void XSheetPDFTemplate::drawDialogue(QPainter& painter, int framePage) {
         continue;
       }
 
-      int normalLettersPerChunk = textCount * m_soundCellRects[0].width() /
-                                  QFontMetrics(font).boundingRect(text).width();
+      int normalLettersPerChunk =
+          textCount * m_soundCellRects[0].width() /
+          QtCompat::fontMetricsHorizontalAdvance(QFontMetrics(font), text);
       int maxLettersPerChunk =
           textCount * m_soundCellRects[0].width() /
-          QFontMetrics(smallFont).boundingRect(text).width();
+          QtCompat::fontMetricsHorizontalAdvance(QFontMetrics(smallFont), text);
 
       int lettersPerChunk =
           (int)std::ceil((double)textCount / ((double)blockLength));
@@ -1480,8 +1492,8 @@ void XSheetPDFTemplate::drawXsheetContents(QPainter& painter, int framePage,
     if (m_dataRects.contains(Data_Memo) && !m_info.memoText.isEmpty() &&
         framePage == 0) {
       // define the preferable font size
-      int lines =
-          std::max(m_info.memoText.count("\n") + 1, param(MemoLinesAmount));
+      int lines = std::max(static_cast<int>(m_info.memoText.count("\n")) + 1,
+                           param(MemoLinesAmount));
       int lineSpacing = m_dataRects.value(Data_Memo).height() / lines;
       int pixelSize   = lineSpacing;
       while (1) {
@@ -1804,21 +1816,22 @@ void XsheetPdfPreviewPane::fitScaleTo(QSize size) {
 
 //-----------------------------------------------------------------------------
 void XsheetPdfPreviewArea::mousePressEvent(QMouseEvent* e) {
-  m_mousePos = e->pos();
+  m_mousePos = QtCompat::mouseEventPosition(e);
 }
 
 void XsheetPdfPreviewArea::mouseMoveEvent(QMouseEvent* e) {
-  QPoint d = m_mousePos - e->pos();
+  QPoint pos = QtCompat::mouseEventPosition(e);
+  QPoint d   = m_mousePos - pos;
   horizontalScrollBar()->setValue(horizontalScrollBar()->value() + d.x());
   verticalScrollBar()->setValue(verticalScrollBar()->value() + d.y());
-  m_mousePos = e->pos();
+  m_mousePos = pos;
 }
 
 void XsheetPdfPreviewArea::contextMenuEvent(QContextMenuEvent* event) {
   QMenu* menu        = new QMenu(this);
   QAction* fitAction = menu->addAction(tr("Fit To Window"));
   connect(fitAction, SIGNAL(triggered()), this, SLOT(fitToWindow()));
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 void XsheetPdfPreviewArea::fitToWindow() {
@@ -1829,13 +1842,13 @@ void XsheetPdfPreviewArea::wheelEvent(QWheelEvent* event) {
   int delta = 0;
   switch (event->source()) {
   case Qt::MouseEventNotSynthesized: {
-    delta = event->angleDelta().y();
+    delta = QtCompat::wheelEventAngleDeltaY(event);
   }
   case Qt::MouseEventSynthesizedBySystem: {
-    QPoint numPixels  = event->pixelDelta();
-    QPoint numDegrees = event->angleDelta() / 8;
+    QPoint numPixels  = QtCompat::wheelEventPixelDelta(event);
+    QPoint numDegrees = QtCompat::wheelEventAngleDelta(event) / 8;
     if (!numPixels.isNull()) {
-      delta = event->pixelDelta().y();
+      delta = numPixels.y();
     } else if (!numDegrees.isNull()) {
       QPoint numSteps = numDegrees / 15;
       delta           = numSteps.y();
@@ -2146,12 +2159,13 @@ ExportXsheetPdfPopup::ExportXsheetPdfPopup()
 
   connect(m_durationFld, SIGNAL(editingFinished()), this,
           SLOT(onDurationEdited()));
-  connect(m_templateCombo, SIGNAL(activated(int)), this, SLOT(initTemplate()));
+  QtCompat::connectComboBoxActivatedIndex(
+      m_templateCombo, this, [this](int) { initTemplate(); });
 
-  connect(m_exportAreaCombo, SIGNAL(activated(int)), this,
-          SLOT(updatePreview()));
-  connect(m_continuousLineCombo, SIGNAL(activated(int)), this,
-          SLOT(updatePreview()));
+  QtCompat::connectComboBoxActivatedIndex(
+      m_exportAreaCombo, this, [this](int) { updatePreview(); });
+  QtCompat::connectComboBoxActivatedIndex(
+      m_continuousLineCombo, this, [this](int) { updatePreview(); });
   connect(m_lineColorFld, SIGNAL(colorChanged(const TPixel32&, bool)), this,
           SLOT(updatePreview()));
   connect(m_templateFontCB, SIGNAL(currentFontChanged(const QFont&)), this,
@@ -2168,8 +2182,8 @@ ExportXsheetPdfPopup::ExportXsheetPdfPopup()
   connect(m_drawDialogueCB, SIGNAL(clicked(bool)), this, SLOT(updatePreview()));
   connect(m_drawDialogueCB, SIGNAL(clicked(bool)), m_dialogueColCombo,
           SLOT(setEnabled(bool)));
-  connect(m_dialogueColCombo, SIGNAL(activated(int)), this,
-          SLOT(updatePreview()));
+  QtCompat::connectComboBoxActivatedIndex(
+      m_dialogueColCombo, this, [this](int) { updatePreview(); });
   connect(m_addSceneNameCB, SIGNAL(clicked(bool)), this, SLOT(updatePreview()));
   connect(m_addSceneNameCB, SIGNAL(clicked(bool)), m_sceneNameEdit,
           SLOT(setEnabled(bool)));
@@ -2188,15 +2202,16 @@ ExportXsheetPdfPopup::ExportXsheetPdfPopup()
   connect(m_prev, SIGNAL(clicked(bool)), this, SLOT(onPrev()));
   connect(m_next, SIGNAL(clicked(bool)), this, SLOT(onNext()));
 
-  connect(m_tick1IdCombo, SIGNAL(activated(int)), this,
-          SLOT(onTickIdComboActivated()));
-  connect(m_tick2IdCombo, SIGNAL(activated(int)), this,
-          SLOT(onTickIdComboActivated()));
-  connect(m_keyIdCombo, SIGNAL(activated(int)), this, SLOT(updatePreview()));
-  connect(m_tick1MarkCombo, SIGNAL(activated(int)), this,
-          SLOT(updatePreview()));
-  connect(m_tick2MarkCombo, SIGNAL(activated(int)), this,
-          SLOT(updatePreview()));
+  QtCompat::connectComboBoxActivatedIndex(
+      m_tick1IdCombo, this, [this](int) { onTickIdComboActivated(); });
+  QtCompat::connectComboBoxActivatedIndex(
+      m_tick2IdCombo, this, [this](int) { onTickIdComboActivated(); });
+  QtCompat::connectComboBoxActivatedIndex(
+      m_keyIdCombo, this, [this](int) { updatePreview(); });
+  QtCompat::connectComboBoxActivatedIndex(
+      m_tick1MarkCombo, this, [this](int) { updatePreview(); });
+  QtCompat::connectComboBoxActivatedIndex(
+      m_tick2MarkCombo, this, [this](int) { updatePreview(); });
 
   // The following lines are "translation word book" listing the words which may
   // appear in the template
@@ -2612,7 +2627,11 @@ void ExportXsheetPdfPopup::onExport() {
 
   QFile pdfFile(fp.getQString());
 
-  pdfFile.open(QIODevice::WriteOnly);
+  if (!pdfFile.open(QIODevice::WriteOnly)) {
+    DVGui::MsgBoxInPopup(DVGui::CRITICAL,
+                         tr("Failed to open %1.").arg(fp.getQString()));
+    return;
+  }
   QPdfWriter writer(&pdfFile);
 
   initTemplate();
@@ -2840,10 +2859,7 @@ void ExportXsheetPdfPopup::onExportFinished(const TFilePath& fp) {
 
   if (ret == 2) {
     TFilePath folderPath = fp.getParentDir();
-    if (TSystem::isUNC(folderPath))
-      QDesktopServices::openUrl(QUrl(folderPath.getQString()));
-    else
-      QDesktopServices::openUrl(QUrl::fromLocalFile(folderPath.getQString()));
+    QDesktopServices::openUrl(QtCompat::localFileUrl(folderPath.getQString()));
   }
 }
 

@@ -1,0 +1,71 @@
+var renderer = new Renderer();
+
+print("qt-script-renderer-basic", renderer.toString(), renderer.id > 0,
+      Array.isArray(renderer.frames), renderer.frames.length,
+      Array.isArray(renderer.columns), renderer.columns.length);
+
+renderer.frames.push(0);
+renderer.frames.push(2);
+renderer.columns.push(1);
+
+print("qt-script-renderer-state", renderer.frames.length, renderer.frames[0],
+      renderer.frames[1], renderer.columns.length, renderer.columns[0]);
+
+var builder = new ImageBuilder(32, 24, "Raster");
+builder.fill("#ff0000");
+var sourceImage = builder.image;
+var scene = new Scene();
+var sourceLevel = scene.newLevel("Raster", "qt6_renderer_source");
+sourceLevel.setFrame("1", sourceImage);
+scene.setCell(0, 0, sourceLevel, "1");
+
+renderer.frames = [0];
+renderer.columns = [0];
+
+var renderedFrame = renderer.renderFrame(scene, 0);
+var framePath = new FilePath("toonz/build/qt6-script-smoke/renderer_frame.png");
+renderedFrame.save(framePath);
+var reloadedFrame = new Image(framePath);
+print("qt-script-renderer-frame", renderedFrame.type,
+      renderedFrame.width > 0, renderedFrame.height > 0,
+      framePath.exists, reloadedFrame.type);
+
+var renderedLevel = renderer.renderScene(scene);
+var renderedLevelFrame = renderedLevel.getFrame("1");
+print("qt-script-renderer-scene", renderedLevel.type,
+      renderedLevel.frameCount, renderedLevel.getFrameIds()[0],
+      renderedLevelFrame.type, renderedLevelFrame.width > 0,
+      renderedLevelFrame.height > 0);
+
+try {
+  renderer.renderFrame(new Scene(), 0);
+} catch (e) {
+  print("qt-script-renderer-renderframe-error",
+        String(e).indexOf("Renderer.renderFrame") >= 0);
+}
+
+try {
+  renderer.renderScene(new Scene());
+} catch (e) {
+  print("qt-script-renderer-renderscene-error",
+        String(e).indexOf("Renderer.renderScene") >= 0);
+}
+
+var cacheDumpPath = renderer.dumpCache();
+print("qt-script-renderer-dumpcache", cacheDumpPath.exists,
+      cacheDumpPath.extension, cacheDumpPath.name);
+
+renderer.dispose();
+
+print("qt-script-renderer-disposed", renderer.id);
+
+renderedLevelFrame.dispose();
+renderedLevel.dispose();
+reloadedFrame.dispose();
+renderedFrame.dispose();
+scene.dispose();
+sourceLevel.dispose();
+sourceImage.dispose();
+builder.dispose();
+
+"qt-script-renderer-result";

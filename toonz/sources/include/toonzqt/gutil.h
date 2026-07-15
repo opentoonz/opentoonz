@@ -8,6 +8,8 @@
 #include <QFrame>
 #include <QIconEngine>
 #include <QColor>
+#include <QPoint>
+#include <QRect>
 #include "traster.h"
 #include "toonz/preferences.h"
 
@@ -27,6 +29,7 @@ class QMouseEvent;
 class QTabletEvent;
 class QKeyEvent;
 class QUrl;
+class QScreen;
 class TFilePath;
 
 //=============================================================================
@@ -120,6 +123,18 @@ svgToImage(const QString &svgFilePath, QSize size = QSize(),
 // ratio) for high DPI monitors. Setting "Display > Set custom text size(DPI)"
 // for Windows corresponds to this ratio.
 int DVAPI getDevicePixelRatio(const QWidget *widget = nullptr);
+
+//-----------------------------------------------------------------------------
+
+QScreen DVAPI *getScreenForWidget(const QWidget *widget = nullptr);
+QRect DVAPI getScreenGeometry(const QWidget *widget = nullptr);
+QRect DVAPI getScreenGeometry(int screenIndex);
+QRect DVAPI getAvailableScreenGeometry(const QWidget *widget = nullptr);
+QRect DVAPI getAvailableScreenGeometry(const QPoint &globalPos,
+                                        const QWidget *fallbackWidget = nullptr);
+QRect DVAPI getAvailableScreenGeometry(const QRect &globalRect,
+                                        const QWidget *fallbackWidget = nullptr);
+bool DVAPI intersectsAvailableScreenGeometry(const QRect &globalRect);
 
 //-----------------------------------------------------------------------------
 

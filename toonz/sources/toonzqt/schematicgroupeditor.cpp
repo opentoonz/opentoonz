@@ -7,6 +7,7 @@
 #include "toonzqt/stageschematicscene.h"
 #include "toonzqt/schematicnode.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 #include "toonz/fxcommand.h"
 #include "toonz/tstageobjectcmd.h"
 #include "toonz/tstageobject.h"
@@ -101,13 +102,13 @@ void SchematicWindowEditor::mousePressEvent(QGraphicsSceneMouseEvent *e) {
   QRectF bRect = boundingRect();
   QRectF rect  = QRectF(0, 0, 11, 11);
   rect.moveTopLeft(QPointF(bRect.width() - 13, 2));
-  if (rect.contains(e->pos())) {
+  if (rect.contains(QtCompat::graphicsSceneMouseEventPositionF(e))) {
     closeEditor();
     return;
   }
 
   rect = QRectF(0, 0, bRect.width(), 15);
-  if (rect.contains(e->pos())) {
+  if (rect.contains(QtCompat::graphicsSceneMouseEventPositionF(e))) {
     m_button  = e->button();
     m_lastPos = e->scenePos();
   }
@@ -142,7 +143,7 @@ void SchematicWindowEditor::mouseReleaseEvent(QGraphicsSceneMouseEvent *e) {
 void SchematicWindowEditor::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *e) {
   QRectF bRect = boundingRect();
   QRectF rect  = QRectF(2, 0, bRect.width() - 15, 15);
-  if (rect.contains(e->pos())) {
+  if (rect.contains(QtCompat::graphicsSceneMouseEventPositionF(e))) {
     m_nameItem->setPlainText(m_groupName);
     m_nameItem->show();
     m_nameItem->setFocus();
@@ -156,7 +157,7 @@ void SchematicWindowEditor::contextMenuEvent(
     QGraphicsSceneContextMenuEvent *e) {
   QRectF bRect = boundingRect();
   QRectF rect(0, 0, bRect.width(), 15);
-  if (!rect.contains(e->pos())) {
+  if (!rect.contains(QtCompat::graphicsSceneContextMenuEventPositionF(e))) {
     e->ignore();
     return;
   }
@@ -165,7 +166,7 @@ void SchematicWindowEditor::contextMenuEvent(
   connect(close, SIGNAL(triggered()), this, SLOT(closeEditor()));
 
   menu.addAction(close);
-  menu.exec(e->screenPos());
+  menu.exec(QtCompat::graphicsSceneContextMenuEventGlobalPosition(e));
 }
 
 //=====================================================

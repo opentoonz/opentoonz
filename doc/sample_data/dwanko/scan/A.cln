@@ -1,0 +1,60 @@
+<version>
+  1 19 
+</version>
+<cleanupCamera>
+  <cameraSize>
+    8.24667 5.38 
+  </cameraSize>
+  <cameraRes>
+    1237 807 
+  </cameraRes>
+  <cameraXPrevalence>
+    1 
+  </cameraXPrevalence>
+  <interestRect>
+    0 0 -1 -1 
+  </interestRect>
+  </cleanupCamera>
+<cleanupPalette>
+  <version>
+    71 0 
+  </version>
+  <styles>
+    <style>
+      color_0 3 255 255 255 0 
+    </style>
+    <style>
+      color_1 2002 0 0 0 255 0 0 0 255 0 50 66 28 
+    </style>
+    <style>
+      color 2001 187 117 134 255 255 0 0 255 0 50 72 89 
+    </style>
+    <style>
+      color 2001 119 153 203 255 0 0 255 255 0 50 60 80 
+    </style>
+    </styles>
+  <stylepages>
+    <page>
+      <name>
+        colors 
+      </name>
+      <indices>
+        0 1 2 3 
+      </indices>
+      </page>
+    </stylepages>
+  <shortcuts>
+    -1 0 1 2 3 -1 -1 -1 -1 -1 
+  </shortcuts>
+  </cleanupPalette>
+<transform yoff="-0.487500"/>
+<lineProcessing autoAdjust="0" mode="color" sharpness="80.650000"/>
+<noAntialias/>
+<MLAA/>
+<despeckling value="1"/>
+<aaValue value="70"/>
+<closestField value="999.000000"/>
+<fdg name="fld_10_4mm_acme"/>
+<path>
+  "$scenefolder\\dwanko"
+</path>

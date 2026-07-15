@@ -21,6 +21,7 @@
 #include "toonzqt/infoviewer.h"
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 #include "historytypes.h"
 #include "toonzqt/menubarcommand.h"
 
@@ -390,16 +391,8 @@ void FileSelection::showFolderContents() {
     if (!model) return;
     folderPath = model->getFolder();
   }
-  if (TSystem::isUNC(folderPath)) {
-    bool ok = QDesktopServices::openUrl(
-        QUrl(QString::fromStdWString(folderPath.getWideString())));
-    if (ok) return;
-    // If the above fails, then try opening UNC path with the same way as the
-    // local files.. QUrl::fromLocalFile() seems to work for UNC path as well in
-    // our environment. (8/10/2021 shun-iwasawa)
-  }
-  QDesktopServices::openUrl(
-      QUrl::fromLocalFile(QString::fromStdWString(folderPath.getWideString())));
+  QDesktopServices::openUrl(QtCompat::localFileUrl(
+      QString::fromStdWString(folderPath.getWideString())));
 }
 
 //------------------------------------------------------------------------
@@ -452,7 +445,7 @@ void FileSelection::viewFile() {
     if (Preferences::instance()->isDefaultViewerEnabled() &&
         (fp.getType() == "mov" || fp.getType() == "avi" ||
          fp.getType() == "3gp"))
-      QDesktopServices::openUrl(QUrl("file:///" + toQString(fp)));
+      QDesktopServices::openUrl(QtCompat::localFileUrl(toQString(fp)));
     else if (fp.getType() == "tpl") {
       viewedPalette = StudioPalette::instance()->getPalette(fp, false);
       TApp::instance()

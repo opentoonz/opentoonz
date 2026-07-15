@@ -1,0 +1,72 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e.message || e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var empty = new Image();
+var emptySaveError = hasError(function() {
+  empty.save(new FilePath("toonz/build/qt6-script-smoke/image_edges_empty.png"));
+}, "Can't save an empty image");
+
+print("qt-script-image-edges-empty", empty.type, empty.width, empty.height,
+      empty.dpi, empty.toString(), emptySaveError);
+
+var badCtorCountError = hasError(function() {
+  new Image("one.png", "two.png");
+}, "Bad argument count");
+var badCtorPathError = hasError(function() {
+  new Image({});
+}, "Argument doesn't look like a file path");
+
+var image = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var badLoadMissingArityError = hasError(function() {
+  image.load();
+}, "Image.load expected one path argument");
+var badLoadExtraArityError = hasError(function() {
+  image.load(new FilePath("toonz/sources/tnztools/Resources/brush.png"), 0);
+}, "Image.load expected one path argument");
+var badSaveMissingArityError = hasError(function() {
+  image.save();
+}, "Image.save expected one path argument");
+var badSaveExtraArityError = hasError(function() {
+  image.save(new FilePath("toonz/build/qt6-script-smoke/image_edges_extra.png"), 0);
+}, "Image.save expected one path argument");
+var missingLoadError = hasError(function() {
+  image.load(new FilePath("toonz/build/qt6-script-smoke/missing_image.png"));
+}, "doesn't exist");
+
+print("qt-script-image-edges-load", badCtorCountError, badCtorPathError,
+      missingLoadError, image.type, image.width, image.height);
+print("qt-script-image-edges-arity", badLoadMissingArityError,
+      badLoadExtraArityError, badSaveMissingArityError,
+      badSaveExtraArityError);
+
+var raster = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var rasterPliSaveError = hasError(function() {
+  raster.save(new FilePath("toonz/build/qt6-script-smoke/image_edges_raster.pli"));
+}, "Can't save a Raster image to this file type");
+var rasterUnknownSaveError = hasError(function() {
+  raster.save(new FilePath("toonz/build/qt6-script-smoke/image_edges_raster.unknown"));
+}, "Unrecognized file type");
+
+var builder = new ImageBuilder(9, 7, "ToonzRaster");
+var toonzImage = builder.image;
+var toonzPngSaveError = hasError(function() {
+  toonzImage.save(new FilePath("toonz/build/qt6-script-smoke/image_edges_toonz.png"));
+}, "Can't save a ToonzRaster image to this file type");
+
+print("qt-script-image-edges-save", rasterPliSaveError,
+      rasterUnknownSaveError, toonzPngSaveError, toonzImage.type,
+      toonzImage.width, toonzImage.height);
+
+toonzImage.dispose();
+builder.dispose();
+raster.dispose();
+image.dispose();
+empty.dispose();
+
+"qt-script-image-edges-result";

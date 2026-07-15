@@ -24,6 +24,7 @@
 // TnzQt includes
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/styleselection.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzTools includes
 #include "tools/cursors.h"
@@ -76,9 +77,10 @@ namespace {
 
 void initToonzEvent(TMouseEvent &toonzEvent, QMouseEvent *event,
                     int widgetHeight, double pressure, int devPixRatio) {
-  toonzEvent.m_pos      = TPointD(event->pos().x() * devPixRatio,
-                                  widgetHeight - 1 - event->pos().y() * devPixRatio);
-  toonzEvent.m_mousePos = event->pos();
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
+  toonzEvent.m_pos      = TPointD(eventPos.x() * devPixRatio,
+                                  widgetHeight - 1 - eventPos.y() * devPixRatio);
+  toonzEvent.m_mousePos = eventPos;
   toonzEvent.m_pressure = 1.0;
 
   toonzEvent.setModifiers(event->modifiers() & Qt::ShiftModifier,
@@ -95,10 +97,11 @@ void initToonzEvent(TMouseEvent &toonzEvent, QMouseEvent *event,
 void initToonzEvent(TMouseEvent &toonzEvent, QTabletEvent *event,
                     int widgetHeight, double pressure, int devPixRatio,
                     bool isHighFrequent = false) {
+  const QPointF eventPos = QtCompat::tabletEventPositionF(event);
   toonzEvent.m_pos = TPointD(
-      event->posF().x() * (float)devPixRatio,
-      (float)widgetHeight - 1.0f - event->posF().y() * (float)devPixRatio);
-  toonzEvent.m_mousePos = event->posF();
+      eventPos.x() * (float)devPixRatio,
+      (float)widgetHeight - 1.0f - eventPos.y() * (float)devPixRatio);
+  toonzEvent.m_mousePos = eventPos;
   toonzEvent.m_pressure = pressure;
 
   toonzEvent.setModifiers(event->modifiers() & Qt::ShiftModifier,
@@ -261,7 +264,7 @@ void SceneViewer::tabletEvent(QTabletEvent *e) {
   m_tabletMove  = false;
   // Management of the Eraser pointer
   ToolHandle *toolHandle = TApp::instance()->getCurrentTool();
-  if (e->pointerType() == QTabletEvent::Eraser) {
+  if (QtCompat::isEraserPointer(e)) {
     if (!m_eraserPointerOn) {
       if (toolHandle->getTool()->getName() != T_Eraser) {
         // Save the current tool
@@ -292,7 +295,8 @@ void SceneViewer::tabletEvent(QTabletEvent *e) {
     // create context menu on right click here
     if (e->button() == Qt::RightButton) {
       m_mouseButton = Qt::NoButton;
-      onContextMenu(e->pos(), e->globalPos());
+      onContextMenu(QtCompat::tabletEventPosition(e),
+                    QtCompat::tabletEventGlobalPosition(e));
     }
 #else
     // for Windows, use tabletEvent only for the left Button
@@ -322,7 +326,8 @@ void SceneViewer::tabletEvent(QTabletEvent *e) {
     // could possibly merge with OSX code above
     if (e->button() == Qt::RightButton) {
       m_mouseButton = Qt::NoButton;
-      onContextMenu(e->pos(), e->globalPos());
+      onContextMenu(QtCompat::tabletEventPosition(e),
+                    QtCompat::tabletEventGlobalPosition(e));
     }
 #endif
 
@@ -353,7 +358,8 @@ void SceneViewer::tabletEvent(QTabletEvent *e) {
     // for now OSX seems to fail to call enter/leaveEvent properly while
     // the tablet is floating
     bool isHoveringInsideViewer =
-        !rect().marginsRemoved(QMargins(5, 5, 5, 5)).contains(e->pos());
+        !rect().marginsRemoved(QMargins(5, 5, 5, 5))
+             .contains(QtCompat::tabletEventPosition(e));
     // call the fake enter event
     if (isHoveringInsideViewer) onEnter();
 #else
@@ -364,7 +370,7 @@ void SceneViewer::tabletEvent(QTabletEvent *e) {
     }
 #endif
 
-    QPointF curPos = e->posF() * getDevPixRatio();
+    QPointF curPos = QtCompat::tabletEventPositionF(e) * getDevPixRatio();
 #if defined(_WIN32)
     // Use the application attribute Qt::AA_CompressTabletEvents instead of the
     // delay timer
@@ -440,7 +446,7 @@ void SceneViewer::onLeave() {
 
 //-----------------------------------------------------------------------------
 
-void SceneViewer::enterEvent(QEvent *) { onEnter(); }
+void SceneViewer::enterEvent(QtCompat::EnterEvent *) { onEnter(); }
 
 //-----------------------------------------------------------------------------
 
@@ -492,7 +498,7 @@ void SceneViewer::mouseMoveEvent(QMouseEvent *event) {
   // if this is called just after tabletEvent, skip the execution
   if (m_tabletEvent) return;
   // and touchscreens but not touchpads...
-  if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen) {
+  if (m_gestureActive && m_touchDevice == QtCompat::TouchScreen) {
     return;
   }
   // Strangely, mouseMoveEvent seems to be called once just after releasing
@@ -730,7 +736,7 @@ void SceneViewer::mousePressEvent(QMouseEvent *event) {
   // if this is called just after tabletEvent, skip the execution
   if (m_tabletEvent) return;
   // and touchscreens but not touchpads...
-  if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen) {
+  if (m_gestureActive && m_touchDevice == QtCompat::TouchScreen) {
     return;
   }
   // For now OSX has a critical problem that mousePressEvent is called just
@@ -891,7 +897,7 @@ void SceneViewer::mouseReleaseEvent(QMouseEvent *event) {
     return;
   }
   // for touchscreens but not touchpads...
-  if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen) {
+  if (m_gestureActive && m_touchDevice == QtCompat::TouchScreen) {
     m_gestureActive = false;
     m_rotating      = false;
     m_zooming       = false;
@@ -1015,17 +1021,17 @@ void SceneViewer::wheelEvent(QWheelEvent *event) {
   switch (event->source()) {
   case Qt::MouseEventNotSynthesized: {
     if (event->modifiers() & Qt::AltModifier)
-      delta = event->angleDelta().x();
+      delta = QtCompat::wheelEventAngleDelta(event).x();
     else
-      delta = event->angleDelta().y();
+      delta = QtCompat::wheelEventAngleDeltaY(event);
     break;
   }
 
   case Qt::MouseEventSynthesizedBySystem: {
-    QPoint numPixels  = event->pixelDelta();
-    QPoint numDegrees = event->angleDelta() / 8;
+    QPoint numPixels  = QtCompat::wheelEventPixelDelta(event);
+    QPoint numDegrees = QtCompat::wheelEventAngleDelta(event) / 8;
     if (!numPixels.isNull()) {
-      delta = event->pixelDelta().y();
+      delta = numPixels.y();
     } else if (!numDegrees.isNull()) {
       QPoint numSteps = numDegrees / 15;
       delta           = numSteps.y();
@@ -1044,7 +1050,7 @@ void SceneViewer::wheelEvent(QWheelEvent *event) {
 
   }  // end switch
 
-  if (abs(delta) > 0 || m_touchDevice == QTouchDevice::TouchPad) {
+  if (abs(delta) > 0 || m_touchDevice == QtCompat::TouchPad) {
     // scrub with mouse wheel
     if ((event->modifiers() & Qt::AltModifier) &&
         (event->modifiers() & Qt::ShiftModifier) &&
@@ -1068,18 +1074,19 @@ void SceneViewer::wheelEvent(QWheelEvent *event) {
       } else if (delta > 0) {
         CommandManager::instance()->execute("MI_PrevDrawing");
       }
-    } else if (m_touchDevice == QTouchDevice::TouchPad) {
+    } else if (m_touchDevice == QtCompat::TouchPad) {
       QPointF centerDelta =
-          QPointF(event->angleDelta().x(), event->angleDelta().y());
+          QPointF(QtCompat::wheelEventAngleDelta(event).x(),
+                  QtCompat::wheelEventAngleDeltaY(event));
       panQt(centerDelta.toPoint());
       m_panning = true;
     }
     // Mouse wheel zoom interfered with touchpad panning (touch enabled)
     // Now if touch is enabled, touchpads ignore the mouse wheel zoom
     else if ((m_gestureActive == true &&
-              m_touchDevice == QTouchDevice::TouchScreen) ||
+              m_touchDevice == QtCompat::TouchScreen) ||
              m_gestureActive == false) {
-      zoomQt(event->position().toPoint() * getDevPixRatio(),
+      zoomQt(QtCompat::wheelEventPosition(event) * getDevPixRatio(),
              exp(0.001 * delta));
       m_panning = false;
     }
@@ -1100,7 +1107,7 @@ void SceneViewer::gestureEvent(QGestureEvent *e) {
     QPinchGesture *gesture = static_cast<QPinchGesture *>(pinch);
     QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
     QPoint firstCenter                     = gesture->centerPoint().toPoint();
-    if (m_touchDevice == QTouchDevice::TouchScreen)
+    if (m_touchDevice == QtCompat::TouchScreen)
       firstCenter = mapFromGlobal(firstCenter);
 
     if (gesture->state() == Qt::GestureStarted) {
@@ -1170,23 +1177,24 @@ void SceneViewer::gestureEvent(QGestureEvent *e) {
 }
 
 void SceneViewer::touchEvent(QTouchEvent *e, int type) {
+  const auto &touchPoints = QtCompat::touchPoints(e);
   if (type == QEvent::TouchBegin) {
     if (m_tabletEvent) return;
 
     m_touchActive   = true;
-    m_firstPanPoint = e->touchPoints().at(0).pos();
+    m_firstPanPoint = QtCompat::touchPointPosition(touchPoints.at(0));
     m_undoPoint     = m_firstPanPoint;
     // obtain device type
-    m_touchDevice = e->device()->type();
+    m_touchDevice = QtCompat::touchDeviceType(e);
   } else if (m_touchActive) {
     // touchpads must have 2 finger panning for tools and navigation to be
     // functional
     // on other devices, 1 finger panning is preferred
-    if (e->touchPoints().count() == 1 &&
-        m_touchDevice == QTouchDevice::TouchScreen) {
-      QTouchEvent::TouchPoint panPoint = e->touchPoints().at(0);
+    if (touchPoints.count() == 1 && m_touchDevice == QtCompat::TouchScreen) {
+      const auto panPoint = touchPoints.at(0);
       if (!m_panning) {
-        QPointF deltaPoint = panPoint.pos() - m_firstPanPoint;
+        QPointF deltaPoint =
+            QtCompat::touchPointPosition(panPoint) - m_firstPanPoint;
         // minimize accidental and jerky zooming/rotating during 2 finger
         // panning
         if ((deltaPoint.manhattanLength() > 100) && !m_zooming && !m_rotating) {
@@ -1194,12 +1202,13 @@ void SceneViewer::touchEvent(QTouchEvent *e, int type) {
         }
       }
       if (m_panning) {
-        QPointF centerDelta = (panPoint.pos() * getDevPixRatio()) -
-                              (panPoint.lastPos() * getDevPixRatio());
+        QPointF centerDelta =
+            (QtCompat::touchPointPosition(panPoint) * getDevPixRatio()) -
+            (QtCompat::touchPointLastPosition(panPoint) * getDevPixRatio());
         panQt(centerDelta.toPoint());
       }
-    } else if (e->touchPoints().count() == 3) {
-      QPointF newPoint = e->touchPoints().at(0).pos();
+    } else if (touchPoints.count() == 3) {
+      QPointF newPoint = QtCompat::touchPointPosition(touchPoints.at(0));
       if (m_undoPoint.x() - newPoint.x() > 100) {
         CommandManager::instance()->execute("MI_Undo");
         m_undoPoint = newPoint;
@@ -1304,9 +1313,8 @@ bool SceneViewer::event(QEvent *e) {
       TApp::instance()->getCurrentTool()->storeTool();
     }
 
-    std::string keyStr = QKeySequence(keyEvent->key() + keyEvent->modifiers())
-                             .toString()
-                             .toStdString();
+    std::string keyStr =
+        QtCompat::keySequence(keyEvent).toString().toStdString();
     QAction *action = CommandManager::instance()->getActionFromShortcut(keyStr);
     std::string actionId = CommandManager::instance()->getIdFromAction(action);
 
@@ -1740,8 +1748,9 @@ void SceneViewer::mouseDoubleClickEvent(QMouseEvent *event) {
   if (!tool || !tool->isEnabled()) return;
   TMouseEvent toonzEvent;
   initToonzEvent(toonzEvent, event, height(), 1.0, getDevPixRatio());
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
   TPointD pos =
-      tool->getMatrix().inv() * winToWorld(event->pos() * getDevPixRatio());
+      tool->getMatrix().inv() * winToWorld(eventPos * getDevPixRatio());
   TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
   if ((tool->getToolType() & TTool::LevelTool) && !objHandle->isSpline()) {
     pos.x /= m_dpiScale.x;
@@ -1768,13 +1777,16 @@ void SceneViewer::contextMenuEvent(QContextMenuEvent *e) {
   /* On windows the widget receive the release event before the menu
      is shown, on linux and osx the release event is lost, never
      received by the widget */
-  QMouseEvent fakeRelease(QEvent::MouseButtonRelease, e->pos(), Qt::RightButton,
-                          Qt::NoButton, Qt::NoModifier);
+  QMouseEvent fakeRelease = QtCompat::makeMouseEvent(
+      QEvent::MouseButtonRelease, QtCompat::contextMenuEventPosition(e),
+      QtCompat::contextMenuEventGlobalPosition(e), Qt::RightButton,
+      Qt::NoButton, Qt::NoModifier);
 
   QApplication::instance()->sendEvent(this, &fakeRelease);
 #endif
 
-  onContextMenu(e->pos(), e->globalPos());
+  onContextMenu(QtCompat::contextMenuEventPosition(e),
+                QtCompat::contextMenuEventGlobalPosition(e));
 }
 
 //-----------------------------------------------------------------------------

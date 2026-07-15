@@ -14,7 +14,13 @@
 #include "toonz/preferences.h"
 
 #include <QAudioFormat>
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QAudioDevice>
+#include <QMediaDevices>
+#else
 #include <QAudioDeviceInfo>
+#endif
 
 //=============================================================================
 
@@ -147,6 +153,53 @@ namespace {
 bool lessThan(const ColumnLevel *s1, const ColumnLevel *s2) {
   return s1->getVisibleStartFrame() < s2->getVisibleStartFrame();
 }
+
+//-----------------------------------------------------------------------------
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+QAudioFormat::SampleFormat toQtSampleFormat(
+    const TSoundTrackFormat &format) {
+  switch (format.m_sampleType) {
+  case TSound::INT:
+    return format.m_bitPerSample <= 16 ? QAudioFormat::Int16
+                                       : QAudioFormat::Int32;
+  case TSound::UINT:
+    return format.m_bitPerSample <= 8 ? QAudioFormat::UInt8
+                                      : QAudioFormat::Int16;
+  case TSound::FLOAT:
+    return QAudioFormat::Float;
+  default:
+    return QAudioFormat::Int16;
+  }
+}
+
+void updateFromQtFormat(TSoundTrackFormat &format,
+                        const QAudioFormat &qFormat) {
+  format.m_channelCount = qFormat.channelCount();
+  format.m_sampleRate   = qFormat.sampleRate();
+
+  switch (qFormat.sampleFormat()) {
+  case QAudioFormat::UInt8:
+    format.m_bitPerSample = 8;
+    format.m_sampleType   = TSound::UINT;
+    break;
+  case QAudioFormat::Int16:
+    format.m_bitPerSample = 16;
+    format.m_sampleType   = TSound::INT;
+    break;
+  case QAudioFormat::Int32:
+    format.m_bitPerSample = 32;
+    format.m_sampleType   = TSound::INT;
+    break;
+  case QAudioFormat::Float:
+    format.m_bitPerSample = 32;
+    format.m_sampleType   = TSound::FLOAT;
+    break;
+  default:
+    break;
+  }
+}
+#endif
 
 //-----------------------------------------------------------------------------
 }  // namespace
@@ -979,6 +1032,22 @@ TSoundTrackP TXshSoundColumn::getOverallSoundTrack(int fromFrame, int toFrame,
 #ifdef _WIN32
   if (format.m_sampleRate > 48000) format.m_sampleRate = 48000;
 #else
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  QAudioDevice info(QMediaDevices::defaultAudioOutput());
+  if (info.isNull())
+    throw TSoundDeviceException(TSoundDeviceException::NoDevice,
+                                "No device found, check QAudio backends");
+
+  QAudioFormat qFormat;
+  qFormat.setSampleRate(format.m_sampleRate);
+  qFormat.setChannelCount(format.m_channelCount);
+  qFormat.setSampleFormat(toQtSampleFormat(format));
+
+  if (!info.isFormatSupported(qFormat)) {
+    qFormat = info.preferredFormat();
+    updateFromQtFormat(format, qFormat);
+  }
+#else
   QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
   if (info.deviceName().length() == 0)
     throw TSoundDeviceException(TSoundDeviceException::NoDevice,
@@ -1023,6 +1092,7 @@ TSoundTrackP TXshSoundColumn::getOverallSoundTrack(int fromFrame, int toFrame,
       break;
     }
   }
+#endif
 #endif
   // Create the soundTrack
   double samplePerFrame = format.m_sampleRate / fps;

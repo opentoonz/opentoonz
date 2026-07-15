@@ -16,8 +16,8 @@ if(BUILD_TARGET_WIN)
 endif()
 
 target_link_libraries(t32bitsrv
-    Qt5::Core
-    Qt5::Network
+    ${QT_CORE_LINK_TARGETS}
+    ${QT_NETWORK_TARGET}
     tnzcore
     image
 )

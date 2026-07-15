@@ -26,6 +26,7 @@
 #include "toonzqt/gutil.h"
 #include "toonzqt/dvscrollwidget.h"
 #include "toonzqt/lutcalibrator.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/viewcommandids.h"
 
 // TnzLib includes
@@ -803,8 +804,9 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
           SLOT(onCurrentAxisChanged(int)));
   // when the current stage object is changed via combo box, then switch the
   // current stage object in the scene
-  connect(m_currentStageObjectCombo, SIGNAL(activated(int)), this,
-          SLOT(onCurrentStageObjectComboActivated(int)));
+  QtCompat::connectComboBoxActivatedIndex(
+      m_currentStageObjectCombo, this,
+      [this](int index) { onCurrentStageObjectComboActivated(index); });
 
   if (scaleConstraintProp) {
     m_scaleHField->onScaleTypeChanged(m_maintainCombo->currentIndex());
@@ -1523,8 +1525,8 @@ GeometricToolOptionsBox::GeometricToolOptionsBox(QWidget *parent, TTool *tool,
                            TStroke::OutlineOptions::MITER_JOIN);
 
   assert(m_joinStyle && m_miterField);
-  connect(m_joinStyle, SIGNAL(activated(int)), this,
-          SLOT(onJoinStyleChanged(int)));
+  ret = ret && connect(m_joinStyle, SIGNAL(activated(int)), this,
+                       SLOT(onJoinStyleChanged(int)));
 
   assert(ret);
 
@@ -1646,8 +1648,9 @@ TypeToolOptionsBox::TypeToolOptionsBox(QWidget *parent, TTool *tool,
 
   ToolOptionCheckbox *orientationField = dynamic_cast<ToolOptionCheckbox *>(
       m_controls.value("Vertical Orientation"));
-  ret = ret && connect(orientationField, SIGNAL(stateChanged(int)), this,
-                       SLOT(onFieldChanged()));
+  ret = ret && QtCompat::connectCheckStateChanged(
+                   orientationField, this,
+                   [this](Qt::CheckState) { onFieldChanged(); });
 
   assert(ret);
 }

@@ -22,6 +22,7 @@
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/filefield.h"
 #include "toonzqt/lutcalibrator.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/txsheethandle.h"
@@ -58,6 +59,9 @@
 #include <QStringList>
 #include <QListWidget>
 #include <QGroupBox>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QKeyCombination>
+#endif
 #include <QKeySequence>
 
 using namespace DVGui;
@@ -972,7 +976,8 @@ QWidget* PreferencesPopup::createUI(PreferencesItemId id,
   {
     CheckBox* cb = new CheckBox(getUIString(id), this);
     cb->setChecked(item.value.toBool());
-    connect(cb, &CheckBox::stateChanged, this, &PreferencesPopup::onChange);
+    QtCompat::connectCheckStateChanged(
+        cb, this, [this](Qt::CheckState) { onChange(); });
     widget = cb;
   } break;
 
@@ -1185,8 +1190,17 @@ void PreferencesPopup::insertFootNote(QGridLayout* layout) {
 
 QString PreferencesPopup::getUIString(PreferencesItemId id) {
   auto CtrlAltStr = []() {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     QString str =
-        QKeySequence(Qt::CTRL + Qt::ALT).toString(QKeySequence::NativeText);
+        QKeySequence(QKeyCombination(Qt::ControlModifier | Qt::AltModifier,
+                                     Qt::Key_A))
+            .toString(QKeySequence::NativeText);
+    str.chop(1);
+#else
+    QString str =
+        QKeySequence(Qt::ControlModifier + Qt::AltModifier)
+            .toString(QKeySequence::NativeText);
+#endif
     if (str.endsWith("+")) str.chop(1);
     return str;
   };
@@ -1712,21 +1726,20 @@ QWidget* PreferencesPopup::createGeneralPage() {
   pathAliasPriorityCB->setItemData(3, autoBySceneToolTip, Qt::ToolTipRole);
 
   QCheckBox* lazyLoadRoomsCheckBox = getUI<QCheckBox*>(lazyLoadRooms);
-  connect(lazyLoadRoomsCheckBox, &QCheckBox::stateChanged,
-          [lazyLoadRoomsCheckBox](int state) {
-            QString status = Preferences::instance()->isLazyLoadRoomsEnabled()
-                                 ? tr("enabled")
-                                 : tr("disabled");
-            QString description =
-                Preferences::instance()->isLazyLoadRoomsEnabled()
-                    ? tr("rooms will load on demand")
-                    : tr("all rooms load at startup");
-            QString lazyLoadRoomsToolTip =
-                tr("Lazy loading %1 - %2").arg(status).arg(description);
-            lazyLoadRoomsCheckBox->setToolTip(lazyLoadRoomsToolTip);
-          });
-  lazyLoadRoomsCheckBox->stateChanged(
-      Preferences::instance()->isLazyLoadRoomsEnabled());
+  auto updateLazyLoadRoomsToolTip = [lazyLoadRoomsCheckBox](Qt::CheckState) {
+    QString status = Preferences::instance()->isLazyLoadRoomsEnabled()
+                         ? tr("enabled")
+                         : tr("disabled");
+    QString description = Preferences::instance()->isLazyLoadRoomsEnabled()
+                              ? tr("rooms will load on demand")
+                              : tr("all rooms load at startup");
+    QString lazyLoadRoomsToolTip =
+        tr("Lazy loading %1 - %2").arg(status).arg(description);
+    lazyLoadRoomsCheckBox->setToolTip(lazyLoadRoomsToolTip);
+  };
+  QtCompat::connectCheckStateChanged(lazyLoadRoomsCheckBox, this,
+                                     updateLazyLoadRoomsToolTip);
+  updateLazyLoadRoomsToolTip(lazyLoadRoomsCheckBox->checkState());
 
   m_onEditedFuncMap.insert(autosaveEnabled,
                            &PreferencesPopup::onAutoSaveChanged);
@@ -1746,12 +1759,15 @@ QWidget* PreferencesPopup::createGeneralPage() {
   connect(m_pref, &Preferences::autoSavePeriodChanged, this,
           &PreferencesPopup::onAutoSavePeriodExternallyChanged);
 
-  connect(m_projectRootDocuments, &QCheckBox::stateChanged, this,
-          &PreferencesPopup::onProjectRootChanged);
-  connect(m_projectRootDesktop, &QCheckBox::stateChanged, this,
-          &PreferencesPopup::onProjectRootChanged);
-  connect(m_projectRootCustom, &QCheckBox::stateChanged, this,
-          &PreferencesPopup::onProjectRootChanged);
+  QtCompat::connectCheckStateChanged(
+      m_projectRootDocuments, this,
+      [this](Qt::CheckState) { onProjectRootChanged(); });
+  QtCompat::connectCheckStateChanged(
+      m_projectRootDesktop, this,
+      [this](Qt::CheckState) { onProjectRootChanged(); });
+  QtCompat::connectCheckStateChanged(
+      m_projectRootCustom, this,
+      [this](Qt::CheckState) { onProjectRootChanged(); });
   connect(m_projectRootCustom, &QCheckBox::clicked, customField,
           &QWidget::setVisible);
 
@@ -2557,7 +2573,7 @@ QWidget* PreferencesPopup::createAddonsPage() {
   QGroupBox* groupBox =
       new QGroupBox(tr("Windows Explorer Thumbnails (Shell Extension)"));
   QVBoxLayout* gbLayout = new QVBoxLayout(groupBox);
-  gbLayout->setMargin(10);
+  gbLayout->setContentsMargins(10, 10, 10, 10);
 
   QLabel* infoLabel =
       new QLabel(tr("Enable thumbnails for OpenToonz files (.tnz, .pli, .tlv) "

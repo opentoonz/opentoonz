@@ -1,13 +1,13 @@
 
 
 #include <QPaintEvent>
-#include <QDesktopWidget>
 #include <QApplication>
 #include <QMetaObject>
 #include <QCursor>
 #include <QPainter>
 
 #include "toonzqt/screenboard.h"
+#include "toonzqt/qtcompat.h"
 
 using namespace DVGui;
 
@@ -103,7 +103,7 @@ protected:
     if (screenBoard->m_grabbing) screenBoard->ensureMouseOnAScreen();
   }
 
-  void enterEvent(QEvent *e) override {
+  void enterEvent(QtCompat::EnterEvent *e) override {
     m_mouseOnScreen                           = true;
     ScreenBoard::instance()->m_mouseOnAScreen = true;
   }
@@ -178,8 +178,6 @@ void ScreenBoard::releaseMouse() {
 
 // Refresh the screen widgets pool, depending on stored drawings
 void ScreenBoard::reallocScreenWidgets() {
-  QDesktopWidget *desktop = QApplication::desktop();
-
   int i;
   int screensCount = QGuiApplication::screens().count();
 

@@ -12,7 +12,6 @@ class StageSchematicColumnNode;
 class StageSchematicNodeDock;
 class TStageObject;
 class QPixmap;
-class QRegExpValidator;
 class TStageObjectId;
 class TStageObjectSpline;
 class StageSchematicSplineDock;
@@ -41,7 +40,6 @@ enum eStageSchematicPortType {
 
 class ColumnPainter final : public QObject, public QGraphicsItem {
   Q_OBJECT
-  Q_INTERFACES(QGraphicsItem)
 
   StageSchematicColumnNode *m_parent;
   double m_width, m_height;
@@ -76,7 +74,6 @@ public slots:
 
 class GroupPainter final : public QObject, public QGraphicsItem {
   Q_OBJECT
-  Q_INTERFACES(QGraphicsItem)
 
   StageSchematicGroupNode *m_parent;
   double m_width, m_height;
@@ -103,7 +100,6 @@ protected:
 
 class PegbarPainter final : public QObject, public QGraphicsItem {
   Q_OBJECT
-  Q_INTERFACES(QGraphicsItem)
 
   StageSchematicPegbarNode *m_parent;
   double m_width, m_height;
@@ -130,7 +126,6 @@ protected:
 
 class CameraPainter final : public QObject, public QGraphicsItem {
   Q_OBJECT
-  Q_INTERFACES(QGraphicsItem)
 
   StageSchematicCameraNode *m_parent;
   double m_width, m_height;
@@ -158,7 +153,6 @@ protected:
 
 class TablePainter final : public QObject, public QGraphicsItem {
   Q_OBJECT
-  Q_INTERFACES(QGraphicsItem)
 
   StageSchematicTableNode *m_parent;
   double m_width, m_height;
@@ -182,7 +176,6 @@ protected:
 
 class SplinePainter final : public QObject, public QGraphicsItem {
   Q_OBJECT
-  Q_INTERFACES(QGraphicsItem)
 
   StageSchematicSplineNode *m_parent;
   double m_width, m_height;
@@ -283,7 +276,6 @@ protected:
 class StageSchematicNodeDock final : public QObject, public QGraphicsItem {
   Q_OBJECT
 #ifndef MACOSX
-  Q_INTERFACES(QGraphicsItem)
 #endif
 
   StageSchematicNode *m_parent;
@@ -334,7 +326,6 @@ protected slots:
 class StageSchematicSplineDock final : public QObject, public QGraphicsItem {
   Q_OBJECT
 #ifndef MACOSX
-  Q_INTERFACES(QGraphicsItem)
 #endif
   SchematicNode *m_parent;
   StageSchematicSplinePort *m_port;

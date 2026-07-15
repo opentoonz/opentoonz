@@ -1,6 +1,8 @@
 
 
 #include "tdockwindows.h"
+#include "toonzqt/qtcompat.h"
+
 #include <QBoxLayout>
 #include <QVBoxLayout>
 
@@ -192,7 +194,7 @@ void TDockWidget::setFloatingAppearance() {
   if (m_titlebar) {
     // If has a custom title bar, impose a margin to the layout
     // to provide a frame.
-    layout()->setMargin(m_margin);
+    layout()->setContentsMargins(m_margin, m_margin, m_margin, m_margin);
 
     if (!m_floating)  // was docked
     {
@@ -212,7 +214,7 @@ void TDockWidget::setFloatingAppearance() {
 
 void TDockWidget::setDockedAppearance() {
   // No layout margin is visible when docked
-  layout()->setMargin(0);
+  layout()->setContentsMargins(0, 0, 0, 0);
 
   if (m_floating)  // was floating
   {
@@ -240,8 +242,9 @@ int TDockWidget::isResizeGrip(QPoint p) {
 
   int marginType = 0;
   QRect geom(QPoint(0, 0), QPoint(width(), height()));
-  int margin = layout()->margin();
-  QRect contGeom(geom.adjusted(margin, margin, -margin, -margin));
+  const QMargins margins = layout()->contentsMargins();
+  QRect contGeom(geom.adjusted(margins.left(), margins.top(), -margins.right(),
+                               -margins.bottom()));
 
   if (geom.contains(p) && !contGeom.contains(p)) {
     if (p.x() < 15) marginType |= leftMargin;
@@ -466,7 +469,8 @@ void TDockWidget::selectDockPlaceholder(QMouseEvent *me) {
   if (m_placeholders.size() && m_placeholders[0]->isRoot()) {
     DockPlaceholder *selected = 0;
 
-    QPoint pos = parentWidget()->mapFromGlobal(me->globalPos());
+    QPoint pos =
+        parentWidget()->mapFromGlobal(QtCompat::mouseEventGlobalPosition(me));
     if (parentLayout()->contentsRect().contains(pos))
       selected = m_placeholders[0];
 

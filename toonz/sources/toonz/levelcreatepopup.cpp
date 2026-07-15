@@ -211,7 +211,6 @@ LevelCreatePopup::LevelCreatePopup()
   auto *cancelBtn = new QPushButton(tr("Cancel"), this);
   auto *applyBtn  = new QPushButton(tr("Apply"), this);
 
-  // Replace QRegExp with QRegularExpression
   // Exclude all characters which cannot fit in a filepath (Windows).
   // Dots are also prohibited since they are internally managed by Toonz.
   QRegularExpression rx(R"([^\\/:?*."<>|]+)");

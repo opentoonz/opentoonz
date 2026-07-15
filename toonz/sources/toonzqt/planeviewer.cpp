@@ -5,6 +5,7 @@
 // TnzQt includes
 #include "toonzqt/imageutils.h"
 #include "toonzqt/menubarcommand.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/viewcommandids.h"
 
 #include "../toonz/menubarcommandids.h"
@@ -184,12 +185,12 @@ void PlaneViewer::resizeGL(int width, int height) {
 //=========================================================================================
 
 void PlaneViewer::mouseMoveEvent(QMouseEvent *event) {
-  if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen &&
+  if (m_gestureActive && m_touchDevice == QtCompat::TouchScreen &&
       !m_stylusUsed) {
     return;
   }
 
-  QPoint curPos = event->pos() * getDevPixRatio();
+  QPoint curPos = QtCompat::mouseEventPosition(event) * getDevPixRatio();
   if (event->buttons() & Qt::MiddleButton)
     moveView(curPos.x() - m_xpos, height() - curPos.y() - m_ypos);
 
@@ -200,13 +201,15 @@ void PlaneViewer::mouseMoveEvent(QMouseEvent *event) {
 
 void PlaneViewer::mousePressEvent(QMouseEvent *event) {
   // qDebug() << "[mousePressEvent]";
-  if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen &&
+  if (m_gestureActive && m_touchDevice == QtCompat::TouchScreen &&
       !m_stylusUsed) {
     return;
   }
 
-  m_xpos = event->x() * getDevPixRatio();
-  m_ypos = height() - event->y() * getDevPixRatio();
+  const QPoint pos = QtCompat::mouseEventPosition(event);
+  const double devPixRatio = getDevPixRatio();
+  m_xpos = pos.x() * devPixRatio;
+  m_ypos = height() - pos.y() * devPixRatio;
 }
 
 //------------------------------------------------------
@@ -236,17 +239,17 @@ void PlaneViewer::wheelEvent(QWheelEvent *event) {
   switch (event->source()) {
   case Qt::MouseEventNotSynthesized: {
     if (event->modifiers() & Qt::AltModifier)
-      delta = event->angleDelta().x();
+      delta = QtCompat::wheelEventAngleDelta(event).x();
     else
-      delta = event->angleDelta().y();
+      delta = QtCompat::wheelEventAngleDeltaY(event);
     break;
   }
 
   case Qt::MouseEventSynthesizedBySystem: {
-    QPoint numPixels  = event->pixelDelta();
-    QPoint numDegrees = event->angleDelta() / 8;
+    QPoint numPixels  = QtCompat::wheelEventPixelDelta(event);
+    QPoint numDegrees = QtCompat::wheelEventAngleDelta(event) / 8;
     if (!numPixels.isNull()) {
-      delta = event->pixelDelta().y();
+      delta = numPixels.y();
     } else if (!numDegrees.isNull()) {
       QPoint numSteps = numDegrees / 15;
       delta           = numSteps.y();
@@ -267,11 +270,12 @@ void PlaneViewer::wheelEvent(QWheelEvent *event) {
 
   if (abs(delta) > 0) {
     if ((m_gestureActive == true &&
-         m_touchDevice == QTouchDevice::TouchScreen) ||
+         m_touchDevice == QtCompat::TouchScreen) ||
         m_gestureActive == false) {
-      TPointD pos(event->position().x() * getDevPixRatio(),
-                  height() - event->position().y() * getDevPixRatio());
-      double zoom_par = 1 + event->angleDelta().y() * 0.001;
+      const QPointF eventPos = QtCompat::wheelEventPositionF(event);
+      TPointD pos(eventPos.x() * getDevPixRatio(),
+                  height() - eventPos.y() * getDevPixRatio());
+      double zoom_par = 1 + QtCompat::wheelEventAngleDeltaY(event) * 0.001;
 
       zoomView(pos.x, pos.y, zoom_par);
     }
@@ -311,7 +315,7 @@ void PlaneViewer::contextMenuEvent(QContextMenuEvent *event) {
       QKeySequence(CommandManager::instance()->getKeyFromId(V_ZoomFit)));
   connect(fit, SIGNAL(triggered()), SLOT(fitView()));
 
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
 
   delete menu;
   update();
@@ -322,7 +326,7 @@ void PlaneViewer::contextMenuEvent(QContextMenuEvent *event) {
 void PlaneViewer::tabletEvent(QTabletEvent *e) {
   // qDebug() << "[tabletEvent]";
   if (e->type() == QTabletEvent::TabletPress) {
-    m_stylusUsed = e->pointerType() ? true : false;
+    m_stylusUsed = QtCompat::isStylusPointer(e);
   } else if (e->type() == QTabletEvent::TabletRelease) {
     m_stylusUsed = false;
   }
@@ -344,7 +348,7 @@ void PlaneViewer::gestureEvent(QGestureEvent *e) {
     QPinchGesture *gesture = static_cast<QPinchGesture *>(pinch);
     QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
     QPoint firstCenter                     = gesture->centerPoint().toPoint();
-    if (m_touchDevice == QTouchDevice::TouchScreen)
+    if (m_touchDevice == QtCompat::TouchScreen)
       firstCenter = mapFromGlobal(firstCenter);
 
     if (gesture->state() == Qt::GestureStarted) {
@@ -397,21 +401,22 @@ void PlaneViewer::gestureEvent(QGestureEvent *e) {
 
 void PlaneViewer::touchEvent(QTouchEvent *e, int type) {
   // qDebug() << "[touchEvent]";
+  const auto &touchPoints = QtCompat::touchPoints(e);
   if (type == QEvent::TouchBegin) {
     m_touchActive   = true;
-    m_firstPanPoint = e->touchPoints().at(0).pos();
+    m_firstPanPoint = QtCompat::touchPointPosition(touchPoints.at(0));
     // obtain device type
-    m_touchDevice = e->device()->type();
+    m_touchDevice = QtCompat::touchDeviceType(e);
   } else if (m_touchActive) {
     // touchpads must have 2 finger panning for tools and navigation to be
     // functional on other devices, 1 finger panning is preferred
-    if ((e->touchPoints().count() == 2 &&
-         m_touchDevice == QTouchDevice::TouchPad) ||
-        (e->touchPoints().count() == 1 &&
-         m_touchDevice == QTouchDevice::TouchScreen)) {
-      QTouchEvent::TouchPoint panPoint = e->touchPoints().at(0);
+    if ((touchPoints.count() == 2 && m_touchDevice == QtCompat::TouchPad) ||
+        (touchPoints.count() == 1 &&
+         m_touchDevice == QtCompat::TouchScreen)) {
+      const auto panPoint = touchPoints.at(0);
       if (!m_panning) {
-        QPointF deltaPoint = panPoint.pos() - m_firstPanPoint;
+        QPointF deltaPoint =
+            QtCompat::touchPointPosition(panPoint) - m_firstPanPoint;
         // minimize accidental and jerky zooming/rotating during 2 finger
         // panning
         if ((deltaPoint.manhattanLength() > 100) && !m_zooming) {
@@ -419,8 +424,10 @@ void PlaneViewer::touchEvent(QTouchEvent *e, int type) {
         }
       }
       if (m_panning) {
-        QPoint curPos      = panPoint.pos().toPoint() * getDevPixRatio();
-        QPoint lastPos     = panPoint.lastPos().toPoint() * getDevPixRatio();
+        QPoint curPos = QtCompat::touchPointPosition(panPoint).toPoint() *
+                         getDevPixRatio();
+        QPoint lastPos = QtCompat::touchPointLastPosition(panPoint).toPoint() *
+                         getDevPixRatio();
         QPoint centerDelta = curPos - lastPos;
         moveView(centerDelta.x(), -centerDelta.y());
       }

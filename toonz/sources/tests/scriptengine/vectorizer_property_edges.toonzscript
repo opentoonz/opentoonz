@@ -1,0 +1,60 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e.message || e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var outline = new OutlineVectorizer();
+var centerline = new CenterlineVectorizer();
+
+outline.cornerAdherence = 12.5;
+outline.cornerAngle = 33.25;
+outline.cornerCurveRadius = 4.75;
+outline.maxColors = 3;
+outline.transparentColor = "#123456";
+outline.toneThreshold = "72";
+
+centerline.threshold = "5";
+centerline.accuracy = "6";
+centerline.despeckling = "7";
+centerline.maxThickness = "140";
+centerline.thicknessCalibration = "70";
+centerline.preservePaintedAreas = 1;
+centerline.addBorder = "non-empty";
+centerline.eir = "";
+
+print("qt-script-vectorizer-property-edges-values",
+      outline.cornerAdherence, outline.cornerAngle, outline.cornerCurveRadius,
+      outline.maxColors, outline.transparentColor, outline.toneThreshold,
+      centerline.threshold, centerline.accuracy, centerline.despeckling,
+      centerline.maxThickness, centerline.thicknessCalibration,
+      centerline.preservePaintedAreas, centerline.addBorder, centerline.eir);
+
+var errors = [
+  hasError(function() { outline.transparentColor = "#xyzxyz"; },
+           "not a valid color"),
+  hasError(function() { outline.maxColors = 3.5; },
+           "OutlineVectorizer.maxColors must be an integer"),
+  hasError(function() { outline.toneThreshold = Infinity; },
+           "OutlineVectorizer.toneThreshold must be a finite number"),
+  hasError(function() { centerline.threshold = 0 / 0; },
+           "CenterlineVectorizer.threshold must be a finite number"),
+  hasError(function() { centerline.maxThickness = Infinity; },
+           "CenterlineVectorizer.maxThickness must be a finite number"),
+  hasError(function() { var value = outline.missingProperty.deep; },
+           "Cannot read"),
+  hasError(function() { new OutlineVectorizer(1); },
+           "OutlineVectorizer constructor expected no arguments"),
+  hasError(function() { new CenterlineVectorizer(1); },
+           "CenterlineVectorizer constructor expected no arguments")
+];
+
+print("qt-script-vectorizer-property-edges-errors", errors);
+
+centerline.dispose();
+outline.dispose();
+
+"qt-script-vectorizer-property-edges-result";

@@ -19,6 +19,7 @@
 
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 #include "tapp.h"
 #include "menubarcommandids.h"
@@ -969,10 +970,6 @@ void ExportXDTSCommand::execute() {
 
   if (ret == 2) {
     const TFilePath folderPath = fp.getParentDir();
-    if (TSystem::isUNC(folderPath)) {
-      QDesktopServices::openUrl(QUrl(folderPath.getQString()));
-    } else {
-      QDesktopServices::openUrl(QUrl::fromLocalFile(folderPath.getQString()));
-    }
+    QDesktopServices::openUrl(QtCompat::localFileUrl(folderPath.getQString()));
   }
 }

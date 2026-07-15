@@ -1,0 +1,6 @@
+print("qt-script-run-child", ToonzVersion);
+qtScriptRunChildGlobal = "child-global";
+function qtScriptRunChildFunction() {
+  return "child-function";
+}
+"qt-script-run-child-result";

@@ -62,7 +62,6 @@
 #include <QEvent>
 #include <QCoreApplication>
 #include <QApplication>
-#include <QDesktopWidget>
 
 //===================================================================
 

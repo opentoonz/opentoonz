@@ -9,6 +9,7 @@
 
 // TnzQt includes
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/menubarcommand.h"
 
 // TnzLib includes
@@ -277,8 +278,9 @@ QTreeWidgetItem* CommandListTree::addFolder(const QString& title,
 //-----------------------------------------------------------------------------
 
 void CommandListTree::mousePressEvent(QMouseEvent* event) {
-  setCurrentItem(itemAt(event->pos()));
-  QTreeWidgetItem* clickedItem = itemAt(event->pos());
+  QPoint pos = QtCompat::mouseEventPosition(event);
+  setCurrentItem(itemAt(pos));
+  QTreeWidgetItem* clickedItem = itemAt(pos);
 
   CommandItem* commandItem     = dynamic_cast<CommandItem*>(clickedItem);
   SeparatorItem* separatorItem = dynamic_cast<SeparatorItem*>(clickedItem);
@@ -581,7 +583,7 @@ QStringList CommandBarTree::mimeTypes() const {
 //-----------------------------------------------------------------------------
 
 void CommandBarTree::contextMenuEvent(QContextMenuEvent* event) {
-  QTreeWidgetItem* item = itemAt(event->pos());
+  QTreeWidgetItem* item = itemAt(QtCompat::contextMenuEventPosition(event));
   if (item != currentItem()) {
     setCurrentItem(item);
   }
@@ -595,7 +597,7 @@ void CommandBarTree::contextMenuEvent(QContextMenuEvent* event) {
             &CommandBarTree::removeItem);
   }
 
-  menu.exec(event->globalPos());
+  menu.exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 //-----------------------------------------------------------------------------

@@ -1,5 +1,7 @@
 #include "iwa_bokehreffx.h"
 
+#include <climits>
+
 #include "trop.h"
 
 #include <QReadWriteLock>

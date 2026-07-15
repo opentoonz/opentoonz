@@ -7,6 +7,7 @@
 #include "tfarmstuff.h"
 #include "batches.h"
 #include "tsystem.h"
+#include "toonzqt/qtcompat.h"
 
 #include <QGridLayout>
 #include <QLabel>
@@ -121,7 +122,8 @@ void FarmServerListView::openContextMenu(const QPoint &p) {
 void FarmServerListView::mousePressEvent(QMouseEvent *event) {
   QListWidget::mousePressEvent(event);
 
-  if (event->button() == Qt::RightButton) openContextMenu(event->globalPos());
+  if (event->button() == Qt::RightButton)
+    openContextMenu(QtCompat::mouseEventGlobalPosition(event));
 }
 
 //-----------------------------------------------------------------------------

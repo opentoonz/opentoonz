@@ -11,6 +11,7 @@
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/combohistogram.h"
+#include "toonzqt/gutil.h"
 
 // TnzLib includes
 #include "toonz/tframehandle.h"
@@ -23,9 +24,7 @@
 // Qt includes
 #include <QTimer>
 #include <QMainWindow>
-#include <QDesktopWidget>
 #include <QFocusEvent>
-#include <QScreen>
 
 using namespace DVGui;
 
@@ -126,7 +125,8 @@ void HistogramPopup::moveNextToWidget(QWidget *widget) {
   if (minimumSize().isEmpty()) grab();
   QSize popupSize = frameSize();
 
-  QRect screenRect = widget->screen()->availableGeometry();
+  QRect screenRect = getAvailableScreenGeometry(widget);
+  if (screenRect.isEmpty()) return;
   QRect viewerRect = widget->rect();
   viewerRect.moveTo(widget->mapToGlobal(QPoint(0, 0)));
   // decide which side to open the popup

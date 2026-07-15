@@ -1,0 +1,45 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e.message || e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var source = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var path = new FilePath("toonz/build/qt6-script-smoke/level_path_edges..tif");
+var level = new Level();
+level.setFrame("1", source);
+level.save(path);
+
+var loaded = new Level(path);
+var beforeName = loaded.path.name;
+var beforeExtension = loaded.path.extension;
+var beforeFrameCount = loaded.frameCount;
+
+var badObjectError = hasError(function() {
+  loaded.path = {};
+}, "Argument doesn't look like a file path");
+print("qt-script-level-path-edges-bad-object", badObjectError,
+      loaded.path.name, loaded.path.extension, loaded.frameCount);
+
+var missingFileError = hasError(function() {
+  loaded.path =
+      "toonz/build/qt6-script-smoke/missing_level_path_edges..tif";
+}, "Exception loading level");
+print("qt-script-level-path-edges-missing", missingFileError,
+      loaded.path.name, loaded.path.extension, loaded.frameCount,
+      beforeName, beforeExtension, beforeFrameCount);
+
+var emptyAfterMissingError = hasError(function() {
+  loaded.getFrameByIndex(0);
+}, "An empty level has no frames");
+print("qt-script-level-path-edges-after-missing", loaded.type,
+      loaded.frameCount, emptyAfterMissingError, loaded.toString());
+
+loaded.dispose();
+level.dispose();
+source.dispose();
+
+"qt-script-level-path-edges-result";

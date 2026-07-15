@@ -1,0 +1,68 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e.message || e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var image = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var level = new Level();
+level.setFrame(1, image);
+level.setFrame("2A", image);
+level.setFrame("3B", image);
+
+var frameByString = level.getFrame("2A");
+var frameByIndex = level.getFrameByIndex(1);
+print("qt-script-scene-frameids-level", level.type, level.frameCount,
+      level.getFrameIds().join(","), frameByString.type, frameByIndex.type);
+
+var badLevelFrameError = hasError(function() {
+  level.setFrame("bad", image);
+}, "does not look like a FrameId");
+
+var levelPath = new FilePath("toonz/build/qt6-script-smoke/scene_frameids_level_" +
+                             (new Date()).getTime() + "..tif");
+level.save(levelPath);
+
+var scene = new Scene();
+var loaded = scene.loadLevel("qt6_scene_frameids_raster", levelPath);
+scene.setCell(0, 0, loaded, "2A");
+scene.setCell(1, 0, { level: loaded, fid: "3B" });
+
+var first = scene.getCell(0, 0);
+var second = scene.getCell(1, 0);
+print("qt-script-scene-frameids-cells", scene.frameCount, scene.columnCount,
+      first.fid, second.fid, first.level.name, second.level.name);
+
+var badSceneFrameError = hasError(function() {
+  scene.setCell(2, 0, loaded, "bad");
+}, "does not look like a FrameId");
+
+var scenePath = new FilePath("scene_frameids_" + (new Date()).getTime() + ".tnz");
+scene.save(scenePath);
+
+var reopened = new Scene(scenePath);
+var reopenedFirst = reopened.getCell(0, 0);
+var reopenedSecond = reopened.getCell(1, 0);
+print("qt-script-scene-frameids-reopened", reopened.frameCount,
+      reopened.columnCount, reopenedFirst.fid, reopenedSecond.fid,
+      reopenedFirst.level.name);
+
+print("qt-script-scene-frameids-errors", badLevelFrameError,
+      badSceneFrameError);
+
+frameByString.dispose();
+frameByIndex.dispose();
+first.level.dispose();
+second.level.dispose();
+reopenedFirst.level.dispose();
+reopenedSecond.level.dispose();
+reopened.dispose();
+loaded.dispose();
+scene.dispose();
+level.dispose();
+image.dispose();
+
+"qt-script-scene-frameids-result";

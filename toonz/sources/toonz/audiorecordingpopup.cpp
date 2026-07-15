@@ -9,6 +9,8 @@
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/flipconsole.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtmediacompat.h"
+#include "toonzqt/qtcompat.h"
 
 // Tnzlib includes
 #include "toonz/tproject.h"
@@ -32,9 +34,17 @@
 // Qt includes
 #include <QMainWindow>
 #include <QAudio>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QAudioDevice>
+#include <QAudioOutput>
+#include <QAudioSource>
+#include <QMediaDevices>
+#else
 #include <QMediaRecorder>
 #include <QAudioProbe>
 #include <QAudioRecorder>
+#include <QAudioDeviceInfo>
+#endif
 #include <QAudioFormat>
 #include <QWidget>
 #include <QAudioBuffer>
@@ -48,7 +58,6 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGridLayout>
-#include <QMultimedia>
 #include <QPainter>
 #include <QElapsedTimer>
 #include <QMenu>
@@ -60,6 +69,103 @@
 #ifndef WAVE_FORMAT_IEEE_FLOAT
 #define WAVE_FORMAT_IEEE_FLOAT 3
 #endif
+
+namespace {
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+using ToonzAudioDeviceInfo = QAudioDevice;
+#else
+using ToonzAudioDeviceInfo = QAudioDeviceInfo;
+#endif
+
+int sampleSize(const QAudioFormat &format) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return format.bytesPerSample() * 8;
+#else
+  return format.sampleSize();
+#endif
+}
+
+bool isFloatSampleFormat(const QAudioFormat &format) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return format.sampleFormat() == QAudioFormat::Float;
+#else
+  return format.sampleType() == QAudioFormat::Float;
+#endif
+}
+
+QString audioDeviceName(const ToonzAudioDeviceInfo &deviceInfo) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return deviceInfo.description();
+#else
+  return deviceInfo.deviceName();
+#endif
+}
+
+ToonzAudioDeviceInfo defaultInputDevice() {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return QMediaDevices::defaultAudioInput();
+#else
+  return QAudioDeviceInfo::defaultInputDevice();
+#endif
+}
+
+QList<ToonzAudioDeviceInfo> availableInputDevices() {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return QMediaDevices::audioInputs();
+#else
+  return QAudioDeviceInfo::availableDevices(QAudio::AudioInput);
+#endif
+}
+
+void setAudioFormatSampleSize(QAudioFormat &format, int bitdepth) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  if (bitdepth == 32)
+    format.setSampleFormat(QAudioFormat::Float);
+  else if (bitdepth == 8)
+    format.setSampleFormat(QAudioFormat::UInt8);
+  else
+    format.setSampleFormat(QAudioFormat::Int16);
+#else
+  format.setSampleSize(bitdepth);
+  if (bitdepth == 32)
+    format.setSampleType(QAudioFormat::Float);
+  else if (bitdepth == 8)
+    format.setSampleType(QAudioFormat::UnSignedInt);
+  else
+    format.setSampleType(QAudioFormat::SignedInt);
+  format.setByteOrder(QAudioFormat::LittleEndian);
+  format.setCodec("audio/pcm");
+#endif
+}
+
+QAudioFormat supportedFormat(const ToonzAudioDeviceInfo &deviceInfo,
+                             const QAudioFormat &format) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return deviceInfo.isFormatSupported(format) ? format
+                                              : deviceInfo.preferredFormat();
+#else
+  return deviceInfo.isFormatSupported(format) ? format
+                                              : deviceInfo.nearestFormat(format);
+#endif
+}
+
+bool isFormatSupported(const ToonzAudioDeviceInfo &deviceInfo,
+                       const QAudioFormat &format) {
+  return deviceInfo.isFormatSupported(format);
+}
+
+ToonzAudioInput *makeAudioInput(const ToonzAudioDeviceInfo &deviceInfo,
+                                const QAudioFormat &format, QObject *parent) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  return new QAudioSource(deviceInfo, format, parent);
+#else
+  Q_UNUSED(parent)
+  return new QAudioInput(deviceInfo, format);
+#endif
+}
+
+}  // namespace
 
 //=============================================================================
 
@@ -85,7 +191,14 @@ AudioRecordingPopup::AudioRecordingPopup()
   m_playXSheetCB         = new QCheckBox(tr("Sync with XSheet/Timeline"), this);
   m_timer                = new QElapsedTimer();
   m_recordedLevels       = QMap<qint64, double>();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  m_audioOutput          = new QAudioOutput(this);
+  m_audioOutput->setVolume(0.5);
+#endif
   m_player               = new QMediaPlayer(this);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  m_player->setAudioOutput(m_audioOutput);
+#endif
   m_console              = FlipConsole::getCurrent();
 
   m_labelDevice     = new QLabel(tr("Device: "));
@@ -147,18 +260,15 @@ AudioRecordingPopup::AudioRecordingPopup()
 
   // Enumerate devices and initialize default device
   enumerateAudioDevices("");
-  QAudioDeviceInfo m_audioDeviceInfo = QAudioDeviceInfo::defaultInputDevice();
+  ToonzAudioDeviceInfo m_audioDeviceInfo = defaultInputDevice();
   QAudioFormat format;
   format.setSampleRate(44100);
   format.setChannelCount(1);
-  format.setSampleSize(16);
-  format.setSampleType(QAudioFormat::SignedInt);
-  format.setByteOrder(QAudioFormat::LittleEndian);
-  format.setCodec("audio/pcm");
-  if (!m_audioDeviceInfo.isFormatSupported(format)) {
-    format = m_audioDeviceInfo.nearestFormat(format);
+  setAudioFormatSampleSize(format, 16);
+  if (!isFormatSupported(m_audioDeviceInfo, format)) {
+    format = supportedFormat(m_audioDeviceInfo, format);
   }
-  m_audioInput = new QAudioInput(m_audioDeviceInfo, format);
+  m_audioInput = makeAudioInput(m_audioDeviceInfo, format, this);
 
   // WAV Writter
   m_audioWriterWAV = new AudioWriterWAV(format);
@@ -240,8 +350,10 @@ AudioRecordingPopup::AudioRecordingPopup()
 
   m_playXSheetCB->setChecked(true);
 
-  bool ret = connect(m_playXSheetCB, SIGNAL(stateChanged(int)), this,
-                     SLOT(onPlayXSheetCBChanged(int)));
+  bool ret = static_cast<bool>(QtCompat::connectCheckStateChanged(
+      m_playXSheetCB, this, [this](Qt::CheckState state) {
+        onPlayXSheetCBChanged(static_cast<int>(state));
+      }));
 
   ret = ret && connect(m_saveButton, SIGNAL(clicked()), this,
                        SLOT(onSaveButtonPressed()));
@@ -313,7 +425,7 @@ void AudioRecordingPopup::contextMenuEvent(QContextMenuEvent *event) {
     }
   });
   
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
   delete menu;
 }
 
@@ -329,10 +441,13 @@ void AudioRecordingPopup::onRecordButtonPressed() {
     }
     // clear the player in case the file is open there
     // can't record to an opened file
-    if (m_player->mediaStatus() != QMediaPlayer::NoMedia) {
+    if (QtCompat::mediaPlayerHasMedia(m_player)) {
       m_player->stop();
       delete m_player;
       m_player = new QMediaPlayer(this);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+      m_player->setAudioOutput(m_audioOutput);
+#endif
     }
     // I tried using a temp file in the cache, but copying and inserting
     // (rarely)
@@ -447,14 +562,19 @@ void AudioRecordingPopup::updatePlaybackDuration(qint64 duration) {
 //-----------------------------------------------------------------------------
 
 void AudioRecordingPopup::onPlayButtonPressed() {
-  if (m_player->state() == QMediaPlayer::StoppedState) {
-    m_player->setMedia(QUrl::fromLocalFile(m_filePath.getQString()));
+  if (QtCompat::mediaPlayerState(m_player) == QMediaPlayer::StoppedState) {
+    QtCompat::setMediaPlayerSource(
+        m_player, QtCompat::localFileUrl(m_filePath.getQString()));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    m_audioOutput->setVolume(0.5);
+#else
     m_player->setVolume(50);
     m_player->setNotifyInterval(20);
-    connect(m_player, SIGNAL(positionChanged(qint64)), this,
-            SLOT(updatePlaybackDuration(qint64)));
-    connect(m_player, SIGNAL(stateChanged(QMediaPlayer::State)), this,
-            SLOT(onMediaStateChanged(QMediaPlayer::State)));
+#endif
+    connect(m_player, &QMediaPlayer::positionChanged, this,
+            &AudioRecordingPopup::updatePlaybackDuration);
+    QtCompat::connectMediaPlayerStateChanged(
+        m_player, this, &AudioRecordingPopup::onMediaStateChanged);
     m_playButton->setIcon(m_stopIcon);
     m_recordButton->setDisabled(true);
     m_saveButton->setDisabled(true);
@@ -513,9 +633,9 @@ void AudioRecordingPopup::onPauseRecordingButtonPressed() {
 //-----------------------------------------------------------------------------
 
 void AudioRecordingPopup::onPausePlaybackButtonPressed() {
-  if (m_player->state() == QMediaPlayer::StoppedState) {
+  if (QtCompat::mediaPlayerState(m_player) == QMediaPlayer::StoppedState) {
     return;
-  } else if (m_player->state() == QMediaPlayer::PausedState) {
+  } else if (QtCompat::mediaPlayerState(m_player) == QMediaPlayer::PausedState) {
     m_player->play();
     m_pausePlaybackButton->setIcon(m_pauseIcon);
     if (m_syncPlayback && !m_isPlaying && !m_stoppedAtEnd) {
@@ -534,7 +654,12 @@ void AudioRecordingPopup::onPausePlaybackButtonPressed() {
 
 //-----------------------------------------------------------------------------
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+void AudioRecordingPopup::onMediaStateChanged(
+    QMediaPlayer::PlaybackState state) {
+#else
 void AudioRecordingPopup::onMediaStateChanged(QMediaPlayer::State state) {
+#endif
   // stopping can happen through the stop button or the file ending
   if (state == QMediaPlayer::StoppedState) {
     m_audioLevelsDisplay->setLevel(-1, -1);
@@ -570,11 +695,11 @@ void AudioRecordingPopup::onPlayXSheetCBChanged(int status) {
 //-----------------------------------------------------------------------------
 
 void AudioRecordingPopup::onRefreshButtonPressed() {
-  QAudioDeviceInfo m_audioDeviceInfo =
+  ToonzAudioDeviceInfo m_audioDeviceInfo =
       m_deviceListCB->itemData(m_deviceListCB->currentIndex())
-          .value<QAudioDeviceInfo>();
+          .value<ToonzAudioDeviceInfo>();
 
-  enumerateAudioDevices(m_audioDeviceInfo.deviceName());
+  enumerateAudioDevices(audioDeviceName(m_audioDeviceInfo));
 }
 
 //-----------------------------------------------------------------------------
@@ -592,7 +717,7 @@ void AudioRecordingPopup::onSaveButtonPressed() {
     m_audioInput->stop();
     m_audioLevelsDisplay->setLevel(-1, -1);
   }
-  if (m_player->state() != QMediaPlayer::StoppedState) {
+  if (QtCompat::mediaPlayerState(m_player) != QMediaPlayer::StoppedState) {
     m_player->stop();
     m_audioLevelsDisplay->setLevel(-1, -1);
   }
@@ -682,12 +807,15 @@ void AudioRecordingPopup::hideEvent(QHideEvent *event) {
     m_audioInput->stop();
     m_audioWriterWAV->stop();
   }
-  if (m_player->state() != QMediaPlayer::StoppedState) {
+  if (QtCompat::mediaPlayerState(m_player) != QMediaPlayer::StoppedState) {
     m_player->stop();
   }
   // make sure the file is freed before deleting
   delete m_player;
   m_player = new QMediaPlayer(this);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  m_player->setAudioOutput(m_audioOutput);
+#endif
   // this should only remove files that haven't been used in the scene
   // make paths checks to only create path names that don't exist yet.
   if (TSystem::doesExistFileOrLevel(TFilePath(m_filePath.getQString()))) {
@@ -701,19 +829,17 @@ void AudioRecordingPopup::hideEvent(QHideEvent *event) {
 
 void AudioRecordingPopup::enumerateAudioDevices(
     const QString &selectedDeviceName) {
-  const QAudioDeviceInfo &defaultDeviceInfo =
-      QAudioDeviceInfo::defaultInputDevice();
+  const ToonzAudioDeviceInfo defaultDeviceInfo = defaultInputDevice();
 
   m_blockAudioSettings = true;
   m_deviceListCB->clear();
-  m_deviceListCB->addItem(defaultDeviceInfo.deviceName(),
+  m_deviceListCB->addItem(audioDeviceName(defaultDeviceInfo),
                           QVariant::fromValue(defaultDeviceInfo));
 
-  for (auto &deviceInfo :
-       QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
+  for (const auto &deviceInfo : availableInputDevices()) {
     if (deviceInfo != defaultDeviceInfo &&
-        m_deviceListCB->findText(deviceInfo.deviceName()) == -1) {
-      m_deviceListCB->addItem(deviceInfo.deviceName(),
+        m_deviceListCB->findText(audioDeviceName(deviceInfo)) == -1) {
+      m_deviceListCB->addItem(audioDeviceName(deviceInfo),
                               QVariant::fromValue(deviceInfo));
     }
   }
@@ -728,9 +854,9 @@ void AudioRecordingPopup::enumerateAudioDevices(
 void AudioRecordingPopup::reinitAudioInput() {
   if (m_blockAudioSettings) return;
 
-  QAudioDeviceInfo m_audioDeviceInfo =
+  ToonzAudioDeviceInfo m_audioDeviceInfo =
       m_deviceListCB->itemData(m_deviceListCB->currentIndex())
-          .value<QAudioDeviceInfo>();
+          .value<ToonzAudioDeviceInfo>();
   int samplerate =
       m_comboSamplerate->itemData(m_comboSamplerate->currentIndex())
           .value<int>();
@@ -742,24 +868,16 @@ void AudioRecordingPopup::reinitAudioInput() {
   QAudioFormat format;
   format.setSampleRate(samplerate);
   format.setChannelCount(channels);
-  format.setSampleSize(bitdepth);
-  if (bitdepth == 32)
-    format.setSampleType(QAudioFormat::Float);
-  else if (bitdepth == 8)
-    format.setSampleType(QAudioFormat::UnSignedInt);
-  else
-    format.setSampleType(QAudioFormat::SignedInt);
-  format.setByteOrder(QAudioFormat::LittleEndian);
-  format.setCodec("audio/pcm");
-  if (!m_audioDeviceInfo.isFormatSupported(format)) {
+  setAudioFormatSampleSize(format, bitdepth);
+  if (!isFormatSupported(m_audioDeviceInfo, format)) {
     DVGui::warning(tr(
         "Audio format unsupported:\nNearest format will be internally used."));
-    format = m_audioDeviceInfo.nearestFormat(format);
+    format = supportedFormat(m_audioDeviceInfo, format);
   }
 
   // Recreate input
   delete m_audioInput;
-  m_audioInput = new QAudioInput(m_audioDeviceInfo, format);
+  m_audioInput = makeAudioInput(m_audioDeviceInfo, format, this);
   m_audioWriterWAV->reset(format);
 }
 
@@ -786,11 +904,11 @@ bool AudioWriterWAV::reset(const QAudioFormat &format) {
   m_format = format;
 
   int samplesPerSec = m_format.sampleRate() * m_format.channelCount();
-  if (m_format.sampleSize() == 8) {
+  if (sampleSize(m_format) == 8) {
     m_rbytesms = 1000.0 / samplesPerSec;
-  } else if (m_format.sampleSize() == 16) {
+  } else if (sampleSize(m_format) == 16) {
     m_rbytesms = 1000.0 / 2.0 / samplesPerSec;
-  } else if (m_format.sampleSize() == 24) {
+  } else if (sampleSize(m_format) == 24) {
     m_rbytesms = 1000.0 / 3.0 / samplesPerSec;
   } else {  // 32-bits
     m_rbytesms = 1000.0 / 4.0 / samplesPerSec;
@@ -865,7 +983,7 @@ bool AudioWriterWAV::stop() {
 void AudioWriterWAV::writeWAVHeader(QFile &file) {
   quint16 channels   = m_format.channelCount();
   quint32 samplerate = m_format.sampleRate();
-  quint16 bitrate    = m_format.sampleSize();
+  quint16 bitrate    = sampleSize(m_format);
 
   qint64 pos = file.pos();
   file.seek(0);
@@ -876,7 +994,8 @@ void AudioWriterWAV::writeWAVHeader(QFile &file) {
   out << (quint32)(m_wrRawB + AWWAV_HEADER_SIZE);
   out.writeRawData("WAVEfmt ", 8);
   out << (quint32)16;  // Chunk size
-  out << (quint16)(bitrate == 32 ? WAVE_FORMAT_IEEE_FLOAT : WAVE_FORMAT_PCM);
+  out << (quint16)(isFloatSampleFormat(m_format) ? WAVE_FORMAT_IEEE_FLOAT
+                                                 : WAVE_FORMAT_PCM);
   out << channels << samplerate;
   out << quint32(samplerate * channels * bitrate / 8);
   out << quint16(channels * bitrate / 8);
@@ -895,7 +1014,7 @@ qint64 AudioWriterWAV::writeData(const char *data, qint64 len) {
   int tmp, peak = 0.0;
 
   // Measure peak
-  if (m_format.sampleSize() == 8) {
+  if (sampleSize(m_format) == 8) {
     const quint8 *sdata = (const quint8 *)data;
     int slen            = len;
     for (int i = 0; i < slen; ++i) {
@@ -903,7 +1022,7 @@ qint64 AudioWriterWAV::writeData(const char *data, qint64 len) {
       if (tmp > peak) peak = tmp;
     }
     m_level = qreal(peak) / 127.0;
-  } else if (m_format.sampleSize() == 16) {
+  } else if (sampleSize(m_format) == 16) {
     const qint16 *sdata = (const qint16 *)data;
     int slen            = len / 2;
     for (int i = 0; i < slen; ++i) {
@@ -911,7 +1030,7 @@ qint64 AudioWriterWAV::writeData(const char *data, qint64 len) {
       if (tmp > peak) peak = tmp;
     }
     m_level = qreal(peak) / 32767.0;
-  } else if (m_format.sampleSize() == 24) {
+  } else if (sampleSize(m_format) == 24) {
     const qint8 *sdata = (const qint8 *)data;
     int slen           = len / 3;
     for (int i = 0; i < slen; ++i) {
@@ -920,13 +1039,23 @@ qint64 AudioWriterWAV::writeData(const char *data, qint64 len) {
     }
     m_level = qreal(peak) / 127.0;
   } else {  // 32-bits
-    const float *sdata = (const float *)data;
-    int slen           = len / 4;
-    for (int i = 0; i < slen; ++i) {
-      tmp = qAbs<int>(sdata[i] * 32767.0f);
-      if (tmp > peak) peak = tmp;
+    if (isFloatSampleFormat(m_format)) {
+      const float *sdata = (const float *)data;
+      int slen           = len / 4;
+      for (int i = 0; i < slen; ++i) {
+        tmp = qAbs<int>(sdata[i] * 32767.0f);
+        if (tmp > peak) peak = tmp;
+      }
+      m_level = peak;
+    } else {
+      const qint32 *sdata = (const qint32 *)data;
+      int slen            = len / 4;
+      for (int i = 0; i < slen; ++i) {
+        tmp = qAbs<int>(sdata[i] >> 16);
+        if (tmp > peak) peak = tmp;
+      }
+      m_level = qreal(peak) / 32767.0;
     }
-    m_level = peak;
   }
   if (m_level > m_peakL) m_peakL = m_level;
 

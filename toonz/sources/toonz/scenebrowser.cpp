@@ -20,6 +20,7 @@
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/trepetitionguard.h"
 
 // TnzLib includes
@@ -55,11 +56,10 @@
 #include <QDateTime>
 #include <QInputDialog>
 #include <QDesktopServices>
-#include <QDirModel>
 #include <QDir>
 #include <QPixmap>
 #include <QUrl>
-#include <QRegularExpression>  // Updated from QRegExp
+#include <QRegularExpression>
 #include <QScrollBar>
 #include <QMap>
 #include <QPushButton>
@@ -1288,7 +1288,7 @@ void SceneBrowser::startDragDrop() {
   QList<QUrl> urls;
   for (int i = 0; i < (int)files.size(); i++) {
     if (TSystem::doesExistFileOrLevel(files[i]))
-      urls.append(QUrl::fromLocalFile(
+      urls.append(QtCompat::localFileUrl(
           QString::fromStdWString(files[i].getWideString())));
   }
   if (urls.isEmpty()) return;

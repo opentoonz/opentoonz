@@ -3,6 +3,7 @@
 #include "toonzqt/swatchviewer.h"
 #include "toonzqt/gutil.h"
 #include "toonzqt/menubarcommand.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/viewcommandids.h"
 
 #include "../toonz/menubarcommandids.h"
@@ -633,12 +634,13 @@ void SwatchViewer::resizeEvent(QResizeEvent *re) {
 
 void SwatchViewer::mousePressEvent(QMouseEvent *event) {
   // qDebug() << "[mousePressEvent]";
-  if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen &&
+  if (m_gestureActive && m_touchDevice == QtCompat::TouchScreen &&
       !m_stylusUsed) {
     return;
   }
 
-  TPoint pos    = TPoint(event->pos().x(), event->pos().y());
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
+  TPoint pos            = TPoint(eventPos.x(), eventPos.y());
   m_mouseButton = event->button();
   if (m_mouseButton == Qt::LeftButton) {
     m_selectedPoint = -1;
@@ -696,12 +698,13 @@ void SwatchViewer::mousePressEvent(QMouseEvent *event) {
 //-----------------------------------------------------------------------------
 
 void SwatchViewer::mouseMoveEvent(QMouseEvent *event) {
-  if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen &&
+  if (m_gestureActive && m_touchDevice == QtCompat::TouchScreen &&
       !m_stylusUsed) {
     return;
   }
 
-  TPoint pos = TPoint(event->pos().x(), event->pos().y());
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
+  TPoint pos            = TPoint(eventPos.x(), eventPos.y());
   if (m_mouseButton == Qt::LeftButton) {
     if (m_selectedPoint < 0 || m_selectedPoint >= (int)m_points.size()) return;
     TPointD p = win2world(pos) + m_pointPosDelta;
@@ -731,7 +734,8 @@ void SwatchViewer::mouseMoveEvent(QMouseEvent *event) {
 void SwatchViewer::mouseReleaseEvent(QMouseEvent *event) {
   m_mouseButton   = Qt::NoButton;
   m_selectedPoint = -1;
-  TPoint pos      = TPoint(event->pos().x(), event->pos().y());
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
+  TPoint pos            = TPoint(eventPos.x(), eventPos.y());
   if (event->button() == Qt::MiddleButton) {
     if (!m_oldContent || !m_curContent) return;
     TPointD p = convert(pos - m_pos);
@@ -751,17 +755,17 @@ void SwatchViewer::wheelEvent(QWheelEvent *event) {
   switch (event->source()) {
   case Qt::MouseEventNotSynthesized: {
     if (event->modifiers() & Qt::AltModifier)
-      delta = event->angleDelta().x();
+      delta = QtCompat::wheelEventAngleDelta(event).x();
     else
-      delta = event->angleDelta().y();
+      delta = QtCompat::wheelEventAngleDeltaY(event);
     break;
   }
 
   case Qt::MouseEventSynthesizedBySystem: {
-    QPoint numPixels  = event->pixelDelta();
-    QPoint numDegrees = event->angleDelta() / 8;
+    QPoint numPixels  = QtCompat::wheelEventPixelDelta(event);
+    QPoint numDegrees = QtCompat::wheelEventAngleDelta(event) / 8;
     if (!numPixels.isNull()) {
-      delta = event->pixelDelta().y();
+      delta = numPixels.y();
     } else if (!numDegrees.isNull()) {
       QPoint numSteps = numDegrees / 15;
       delta           = numSteps.y();
@@ -782,11 +786,12 @@ void SwatchViewer::wheelEvent(QWheelEvent *event) {
 
   if (abs(delta) > 0) {
     if ((m_gestureActive == true &&
-         m_touchDevice == QTouchDevice::TouchScreen) ||
+         m_touchDevice == QtCompat::TouchScreen) ||
         m_gestureActive == false) {
-      TPoint center(event->position().x() - width() / 2,
-                    -event->position().y() + height() / 2);
-      zoom(center, exp(0.001 * event->angleDelta().y()));
+      const QPoint eventPos = QtCompat::wheelEventPosition(event);
+      TPoint center(eventPos.x() - width() / 2,
+                    -eventPos.y() + height() / 2);
+      zoom(center, exp(0.001 * QtCompat::wheelEventAngleDeltaY(event)));
     }
   }
   event->accept();
@@ -796,8 +801,7 @@ void SwatchViewer::wheelEvent(QWheelEvent *event) {
 
 void SwatchViewer::keyPressEvent(QKeyEvent *event) {
   int key = event->key();
-  std::string keyStr =
-      QKeySequence(key + event->modifiers()).toString().toStdString();
+  std::string keyStr = QtCompat::keySequence(event).toString().toStdString();
   QAction *action = CommandManager::instance()->getActionFromShortcut(keyStr);
   if (action) {
     std::string actionId = CommandManager::instance()->getIdFromAction(action);
@@ -848,7 +852,7 @@ void SwatchViewer::contextMenuEvent(QContextMenuEvent *event) {
       QKeySequence(CommandManager::instance()->getKeyFromId(V_ZoomFit)));
   connect(fit, SIGNAL(triggered()), SLOT(fitView()));
 
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
 
   delete menu;
   update();
@@ -859,7 +863,7 @@ void SwatchViewer::contextMenuEvent(QContextMenuEvent *event) {
 void SwatchViewer::tabletEvent(QTabletEvent *e) {
   // qDebug() << "[tabletEvent]";
   if (e->type() == QTabletEvent::TabletPress) {
-    m_stylusUsed = e->pointerType() ? true : false;
+    m_stylusUsed = QtCompat::isStylusPointer(e);
   } else if (e->type() == QTabletEvent::TabletRelease) {
     m_stylusUsed = false;
   }
@@ -881,7 +885,7 @@ void SwatchViewer::gestureEvent(QGestureEvent *e) {
     QPinchGesture *gesture = static_cast<QPinchGesture *>(pinch);
     QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
     QPoint firstCenter                     = gesture->centerPoint().toPoint();
-    if (m_touchDevice == QTouchDevice::TouchScreen)
+    if (m_touchDevice == QtCompat::TouchScreen)
       firstCenter = mapFromGlobal(firstCenter);
 
     if (gesture->state() == Qt::GestureStarted) {
@@ -935,21 +939,22 @@ void SwatchViewer::gestureEvent(QGestureEvent *e) {
 
 void SwatchViewer::touchEvent(QTouchEvent *e, int type) {
   // qDebug() << "[touchEvent]";
+  const auto &touchPoints = QtCompat::touchPoints(e);
   if (type == QEvent::TouchBegin) {
     m_touchActive   = true;
-    m_firstPanPoint = e->touchPoints().at(0).pos();
+    m_firstPanPoint = QtCompat::touchPointPosition(touchPoints.at(0));
     // obtain device type
-    m_touchDevice = e->device()->type();
+    m_touchDevice = QtCompat::touchDeviceType(e);
   } else if (m_touchActive) {
     // touchpads must have 2 finger panning for tools and navigation to be
     // functional on other devices, 1 finger panning is preferred
-    if ((e->touchPoints().count() == 2 &&
-         m_touchDevice == QTouchDevice::TouchPad) ||
-        (e->touchPoints().count() == 1 &&
-         m_touchDevice == QTouchDevice::TouchScreen)) {
-      QTouchEvent::TouchPoint panPoint = e->touchPoints().at(0);
+    if ((touchPoints.count() == 2 && m_touchDevice == QtCompat::TouchPad) ||
+        (touchPoints.count() == 1 &&
+         m_touchDevice == QtCompat::TouchScreen)) {
+      const auto panPoint = touchPoints.at(0);
       if (!m_panning) {
-        QPointF deltaPoint = panPoint.pos() - m_firstPanPoint;
+        QPointF deltaPoint =
+            QtCompat::touchPointPosition(panPoint) - m_firstPanPoint;
         // minimize accidental and jerky zooming/rotating during 2 finger
         // panning
         if ((deltaPoint.manhattanLength() > 100) && !m_zooming) {
@@ -957,8 +962,8 @@ void SwatchViewer::touchEvent(QTouchEvent *e, int type) {
         }
       }
       if (m_panning) {
-        QPoint curPos  = panPoint.pos().toPoint();
-        QPoint lastPos = panPoint.lastPos().toPoint();
+        QPoint curPos  = QtCompat::touchPointPosition(panPoint).toPoint();
+        QPoint lastPos = QtCompat::touchPointLastPosition(panPoint).toPoint();
         TPoint centerDelta =
             TPoint(curPos.x(), curPos.y()) - TPoint(lastPos.x(), lastPos.y());
         pan(centerDelta);

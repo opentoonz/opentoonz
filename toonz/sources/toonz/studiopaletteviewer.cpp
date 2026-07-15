@@ -9,6 +9,7 @@
 #include "toonz/tpalettehandle.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonzqt/paletteviewer.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzutil.h"
 #include "tconvert.h"
 
@@ -593,7 +594,8 @@ void StudioPaletteTreeViewer::contextMenuEvent(QContextMenuEvent *event) {
 
   // Verify if click position is in a row containing an item.
   QRect rect = visualItemRect(currentItem());
-  if (!QRect(0, rect.y(), width(), rect.height()).contains(event->pos()))
+  const QPoint eventPos = QtCompat::contextMenuEventPosition(event);
+  if (!QRect(0, rect.y(), width(), rect.height()).contains(eventPos))
     return;
 
   bool isLevelFolder =
@@ -641,7 +643,7 @@ void StudioPaletteTreeViewer::contextMenuEvent(QContextMenuEvent *event) {
     menu.addSeparator();
     createMenuAction(menu, tr("Search for Palettes"), "searchForPlt()");
   }
-  menu.exec(event->globalPos());
+  menu.exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 //-----------------------------------------------------------------------------
@@ -709,7 +711,7 @@ void StudioPaletteTreeViewer::dragEnterEvent(QDragEnterEvent *event) {
 /*! Find item folder nearest to current position.
 */
 void StudioPaletteTreeViewer::dragMoveEvent(QDragMoveEvent *event) {
-  QTreeWidgetItem *item = itemAt(event->pos());
+  QTreeWidgetItem *item = itemAt(QtCompat::dropEventPosition(event));
   TFilePath newPath     = getFolderPath(item);
 
   if (newPath.getType() == "tpl") {
@@ -836,14 +838,14 @@ StudioPaletteViewer::StudioPaletteViewer(QWidget *parent,
   setAcceptDrops(true);
 
   QVBoxLayout *layout = new QVBoxLayout(this);
-  layout->setMargin(0);
+  layout->setContentsMargins(0, 0, 0, 0);
   QSplitter *splitter = new QSplitter(this);
   splitter->setOrientation(Qt::Vertical);
 
   // First Splitter Widget
   QWidget *treeWidget      = new QWidget(this);
   QVBoxLayout *treeVLayout = new QVBoxLayout(treeWidget);
-  treeVLayout->setMargin(0);
+  treeVLayout->setContentsMargins(0, 0, 0, 0);
   treeVLayout->setSpacing(0);
 
   StudioPaletteTreeViewer *studioPltTreeViewer = new StudioPaletteTreeViewer(
@@ -856,7 +858,7 @@ StudioPaletteViewer::StudioPaletteViewer(QWidget *parent,
   QWidget *treeToolbarWidget = new QWidget(this);
   treeToolbarWidget->setFixedHeight(22);
   QHBoxLayout *treeToolbarLayout = new QHBoxLayout(treeToolbarWidget);
-  treeToolbarLayout->setMargin(0);
+  treeToolbarLayout->setContentsMargins(0, 0, 0, 0);
   treeToolbarLayout->setSpacing(0);
 
   QToolBar *newToolbar = new QToolBar(treeToolbarWidget);

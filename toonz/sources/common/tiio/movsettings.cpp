@@ -398,10 +398,9 @@ bool Tiio::isQuicktimeInstalled() {
 
 #include "movsettings.h"
 
-// MAC-Specific includes
-#ifdef MACOSX
-#include <ApplicationServices/ApplicationServices.h>
-#endif
+// Qt includes
+#include <QApplication>
+#include <QWidget>
 
 //---------------------------------------------------------------------------
 
@@ -441,8 +440,20 @@ void openMovSettingsPopup(TPropertyGroup *props, bool unused) {
 #ifdef MACOSX
 
   // Bring this application back to front
-  ProcessSerialNumber psn = {0, kCurrentProcess};
-  SetFrontProcess(&psn);
+  QWidget *window = QApplication::activeWindow();
+  if (!window) {
+    const QWidgetList topLevelWidgets = QApplication::topLevelWidgets();
+    for (QWidget *widget : topLevelWidgets) {
+      if (widget && widget->isVisible()) {
+        window = widget;
+        break;
+      }
+    }
+  }
+  if (window) {
+    window->raise();
+    window->activateWindow();
+  }
 
 #endif  // MACOSX
 

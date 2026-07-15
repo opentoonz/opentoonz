@@ -9,6 +9,7 @@
 
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/styleselection.h"
 #include "toonzqt/tselectionhandle.h"
 #include "historytypes.h"
@@ -113,7 +114,7 @@ public:
     int n = std::min(styles.size(), colors.size());
     for (int i = 0; i < n; i++) {
       QString gname = QString::fromStdWString(styles[i]->getGlobalName());
-      if (!gname.isEmpty() && gname[0] != L'-') continue;
+      if (!gname.isEmpty() && gname[0] != QChar('-')) continue;
       styles[i]->setMainColor(colors[i]);
       styles[i]->setIsEditedFlag(flags[i]);
       styles[i]->invalidateIcon();
@@ -727,7 +728,7 @@ void PltGizmoPopup::contextMenuEvent(QContextMenuEvent *event) {
     }
   });
   
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
   delete menu;
 }
 

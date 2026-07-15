@@ -303,6 +303,7 @@ bool StylePickerTool::onPropertyChanged(std::string propertyName) {
     } else {
       std::cout << "End Organize Palette" << std::endl;
     }
+    return true;
   } else if (propertyName == m_replaceStyle.getName()) {
     if (m_replaceStyle.getValue()) {
       if (!getPal()) {
@@ -321,6 +322,7 @@ bool StylePickerTool::onPropertyChanged(std::string propertyName) {
     }
     return true;
   }
+  return true;
 }
 
 /* Check if the organizing operation is available */

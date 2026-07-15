@@ -6,6 +6,7 @@
 // TODO: change the file name to tpanel.h
 
 #include "../toonzqt/tdockwindows.h"
+#include "toonzqt/qtcompat.h"
 
 #include <QMap>
 #include <QStringList>
@@ -71,7 +72,7 @@ signals:
 protected:
   void paintEvent(QPaintEvent *event) override;
   void mouseMoveEvent(QMouseEvent *event) override;
-  void enterEvent(QEvent *) override;
+  void enterEvent(QtCompat::EnterEvent *) override;
   void leaveEvent(QEvent *) override;
   void mousePressEvent(QMouseEvent *event) override;
 
@@ -320,7 +321,7 @@ public:
 
 protected:
   void paintEvent(QPaintEvent *) override;
-  void enterEvent(QEvent *) override;
+  void enterEvent(QtCompat::EnterEvent *) override;
   void leaveEvent(QEvent *) override;
 
   // BTR grip visibility follows floating/docked state (dock + workspace restore).

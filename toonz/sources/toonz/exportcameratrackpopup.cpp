@@ -12,6 +12,7 @@
 #include "toonzqt/colorfield.h"
 #include "toonzqt/filefield.h"
 #include "toonzqt/doublefield.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/txsheet.h"
@@ -208,14 +209,15 @@ void CameraTrackPreviewPane::fitScaleTo(QSize size) {
 
 //-----------------------------------------------------------------------------
 void CameraTrackPreviewArea::mousePressEvent(QMouseEvent* e) {
-  m_mousePos = e->pos();
+  m_mousePos = QtCompat::mouseEventPosition(e);
 }
 
 void CameraTrackPreviewArea::mouseMoveEvent(QMouseEvent* e) {
-  QPoint d = m_mousePos - e->pos();
+  QPoint pos = QtCompat::mouseEventPosition(e);
+  QPoint d   = m_mousePos - pos;
   horizontalScrollBar()->setValue(horizontalScrollBar()->value() + d.x());
   verticalScrollBar()->setValue(verticalScrollBar()->value() + d.y());
-  m_mousePos = e->pos();
+  m_mousePos = pos;
 }
 
 void CameraTrackPreviewArea::contextMenuEvent(QContextMenuEvent* event) {
@@ -223,7 +225,7 @@ void CameraTrackPreviewArea::contextMenuEvent(QContextMenuEvent* event) {
   QAction* fitAction = menu->addAction(tr("Fit To Window"));
   connect(fitAction, &QAction::triggered, this,
           &CameraTrackPreviewArea::fitToWindow);
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 void CameraTrackPreviewArea::fitToWindow() {
@@ -231,8 +233,8 @@ void CameraTrackPreviewArea::fitToWindow() {
 }
 
 void CameraTrackPreviewArea::wheelEvent(QWheelEvent* event) {
-  QPoint numPixels  = event->pixelDelta();
-  QPoint numDegrees = event->angleDelta() / 8;
+  QPoint numPixels  = QtCompat::wheelEventPixelDelta(event);
+  QPoint numDegrees = QtCompat::wheelEventAngleDelta(event) / 8;
 
   int delta = 0;
 
@@ -438,8 +440,9 @@ ExportCameraTrackPopup::ExportCameraTrackPopup()
 
   loadSettings();
 
-  connect(m_targetColumnCombo, QOverload<int>::of(&QComboBox::activated), this,
-          &ExportCameraTrackPopup::updatePreview);
+  QtCompat::connectComboBoxActivatedIndex(
+      m_targetColumnCombo, this,
+      [this](int) { ExportCameraTrackPopup::updatePreview(); });
   connect(m_bgOpacityField, &DVGui::DoubleField::valueEditedByHand, this,
           &ExportCameraTrackPopup::updatePreview);
   connect(m_lineColorFld, &DVGui::ColorField::colorChanged, this,
@@ -460,11 +463,13 @@ ExportCameraTrackPopup::ExportCameraTrackPopup()
           &ExportCameraTrackPopup::updatePreview);
   connect(m_lineBR_CB, &QCheckBox::clicked, this,
           &ExportCameraTrackPopup::updatePreview);
-  connect(m_graduationIntervalCombo, QOverload<int>::of(&QComboBox::activated),
-          this, &ExportCameraTrackPopup::updatePreview);
+  QtCompat::connectComboBoxActivatedIndex(
+      m_graduationIntervalCombo, this,
+      [this](int) { ExportCameraTrackPopup::updatePreview(); });
 
-  connect(m_numberAtCombo, QOverload<int>::of(&QComboBox::activated), this,
-          &ExportCameraTrackPopup::updatePreview);
+  QtCompat::connectComboBoxActivatedIndex(m_numberAtCombo, this, [this](int) {
+    ExportCameraTrackPopup::updatePreview();
+  });
   connect(m_numbersOnLineCB, &QCheckBox::clicked, this,
           &ExportCameraTrackPopup::updatePreview);
   connect(m_fontCombo, &QFontComboBox::currentFontChanged, this,
@@ -611,7 +616,7 @@ QImage ExportCameraTrackPopup::generateCameraTrackImg(
   QImage colImg(imgRas->getRawData(), imgRes.lx, imgRes.ly,
                 QImage::Format_ARGB32_Premultiplied);
 
-  QImage img = colImg.mirrored(false, true);
+  QImage img = QtCompat::mirroredImage(colImg, false, true);
 
   TPointD imgDpi = sl->getImageDpi();
   if (imgDpi != TPointD()) {

@@ -14,6 +14,15 @@
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLContext>
+#include <QOpenGLExtraFunctions>
+#include <QDebug>
+
+#ifdef glGetQueryObjectiv
+#undef glGetQueryObjectiv
+#endif
+#ifdef glGetBufferSubData
+#undef glGetBufferSubData
+#endif
 #include <QOffscreenSurface>
 #include <QOpenGLWidget>
 
@@ -111,11 +120,21 @@ void ShadingContext::Imp::initMatrix(int lx, int ly) {
 
 ShadingContext::ShadingContext(QOffscreenSurface *surface) : m_imp(new Imp) {
   m_imp->m_surface = surface;
-  m_imp->m_surface->create();
-  QSurfaceFormat format;
+  const QSurfaceFormat format = m_imp->format();
+  if (!m_imp->m_surface->isValid()) {
+    m_imp->m_surface->setFormat(format);
+    m_imp->m_surface->create();
+  }
   m_imp->m_context->setFormat(format);
   m_imp->m_context->create();
-  m_imp->m_context->makeCurrent(m_imp->m_surface);
+  if (!m_imp->m_context->makeCurrent(m_imp->m_surface)) {
+    qWarning().noquote()
+        << "OpenToonz shader context could not make the offscreen surface current"
+        << "contextValid=" << m_imp->m_context->isValid()
+        << "surfaceValid=" << m_imp->m_surface->isValid()
+        << "contextFormat=" << m_imp->m_context->format()
+        << "surfaceFormat=" << m_imp->m_surface->format();
+  }
 
   makeCurrent();
   if (GLEW_VERSION_3_2) {
@@ -151,11 +170,18 @@ void ShadingContext::makeCurrent() {
   m_imp->m_context->moveToThread(QThread::currentThread());
   // Not create new context, use existing one
   if (!m_imp->m_context->isValid()) {
-    QSurfaceFormat format;
+    const QSurfaceFormat format = m_imp->format();
     m_imp->m_context->setFormat(format);
     m_imp->m_context->create();
   }
-  m_imp->m_context->makeCurrent(m_imp->m_surface);
+  if (!m_imp->m_context->makeCurrent(m_imp->m_surface)) {
+    qWarning().noquote()
+        << "OpenToonz shader context makeCurrent failed"
+        << "contextValid=" << m_imp->m_context->isValid()
+        << "surfaceValid=" << m_imp->m_surface->isValid()
+        << "contextFormat=" << m_imp->m_context->format()
+        << "surfaceFormat=" << m_imp->m_surface->format();
+  }
 }
 
 //--------------------------------------------------------
@@ -178,7 +204,13 @@ void ShadingContext::resize(int lx, int ly,
   } else {
     QOpenGLContext *currContext = QOpenGLContext::currentContext();
     m_imp->m_fbo.reset(new QOpenGLFramebufferObject(lx, ly, fmt));
-    assert(m_imp->m_fbo->isValid());
+    if (!m_imp->m_fbo->isValid()) {
+      qWarning().noquote() << "OpenToonz shader framebuffer is invalid"
+                           << "size=" << lx << "x" << ly
+                           << "contextValid=" << isValid();
+      m_imp->m_fbo.reset();
+      return;
+    }
 
     m_imp->m_fbo->bind();
   }
@@ -266,7 +298,8 @@ std::pair<QOpenGLShaderProgram *, QDateTime> ShadingContext::shaderData(
 //--------------------------------------------------------
 
 GLuint ShadingContext::loadTexture(const TRasterP &src, GLuint texUnit) {
-  glActiveTexture(GL_TEXTURE0 + texUnit);
+  QOpenGLContext::currentContext()->extraFunctions()->glActiveTexture(
+      GL_TEXTURE0 + texUnit);
 
   GLuint texId;
   glGenTextures(1, &texId);
@@ -284,7 +317,10 @@ GLuint ShadingContext::loadTexture(const TRasterP &src, GLuint texUnit) {
   glPixelStorei(GL_UNPACK_ROW_LENGTH, src->getWrap());
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-  GLenum chanType = TRaster32P(src) ? GL_UNSIGNED_BYTE : GL_UNSIGNED_SHORT;
+  // The packed 32-bit channel order is platform-dependent.  In particular,
+  // macOS uses MRBG storage, which requires GL_UNSIGNED_INT_8_8_8_8_REV with
+  // the corresponding TGL_FMT value rather than GL_UNSIGNED_BYTE.
+  GLenum chanType = TRaster32P(src) ? TGL_TYPE : TGL_TYPE16;
 
   glTexImage2D(GL_TEXTURE_2D,
                0,             // one level only
@@ -352,51 +388,56 @@ void ShadingContext::draw(const TRasterP &dst) {
 void ShadingContext::transformFeedback(int varyingsCount,
                                        const GLsizeiptr *varyingSizes,
                                        GLvoid **bufs) {
+  QOpenGLExtraFunctions *functions =
+      QOpenGLContext::currentContext()->extraFunctions();
+
   // Generate buffer objects
   std::vector<GLuint> bufferObjectNames(varyingsCount, 0);
 
-  glGenBuffers(varyingsCount, &bufferObjectNames[0]);
+  functions->glGenBuffers(varyingsCount, &bufferObjectNames[0]);
 
   for (int v = 0; v != varyingsCount; ++v) {
-    glBindBuffer(GL_ARRAY_BUFFER, bufferObjectNames[v]);
-    glBufferData(GL_ARRAY_BUFFER, varyingSizes[v], bufs[v], GL_STATIC_READ);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    functions->glBindBuffer(GL_ARRAY_BUFFER, bufferObjectNames[v]);
+    functions->glBufferData(GL_ARRAY_BUFFER, varyingSizes[v], bufs[v],
+                            GL_STATIC_READ);
+    functions->glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, v, bufferObjectNames[v]);
+    functions->glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, v,
+                                bufferObjectNames[v]);
   }
 
   // Draw
   GLuint Query = 0;
 
-  glGenQueries(1, &Query);
+  functions->glGenQueries(1, &Query);
   {
     // Disable rasterization, vertices processing only!
-    glEnable(GL_RASTERIZER_DISCARD);
-    glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, Query);
+    functions->glEnable(GL_RASTERIZER_DISCARD);
+    functions->glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, Query);
 
-    glBeginTransformFeedback(GL_POINTS);
+    functions->glBeginTransformFeedback(GL_POINTS);
     glBegin(GL_POINTS);
     glVertex2f(0.0f, 0.0f);
     glEnd();
-    glEndTransformFeedback();
+    functions->glEndTransformFeedback();
 
-    glEndQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN);
-    glDisable(GL_RASTERIZER_DISCARD);
+    functions->glEndQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN);
+    functions->glDisable(GL_RASTERIZER_DISCARD);
   }
 
   GLint count = 0;
-  glGetQueryObjectiv(Query, GL_QUERY_RESULT, &count);
+  __glewGetQueryObjectiv(Query, GL_QUERY_RESULT, &count);
 
-  glDeleteQueries(1, &Query);
+  functions->glDeleteQueries(1, &Query);
 
   // Retrieve transformed data
   for (int v = 0; v != varyingsCount; ++v) {
-    glBindBuffer(GL_ARRAY_BUFFER, bufferObjectNames[v]);
-    glGetBufferSubData(GL_ARRAY_BUFFER, 0, varyingSizes[v], bufs[v]);
+    functions->glBindBuffer(GL_ARRAY_BUFFER, bufferObjectNames[v]);
+    __glewGetBufferSubData(GL_ARRAY_BUFFER, 0, varyingSizes[v], bufs[v]);
   }
 
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  functions->glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   // Delete buffer objects
-  glDeleteBuffers(varyingsCount, &bufferObjectNames[0]);
+  functions->glDeleteBuffers(varyingsCount, &bufferObjectNames[0]);
 }

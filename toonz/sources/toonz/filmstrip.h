@@ -6,6 +6,7 @@
 // TnzQt includes
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/selection.h"
+#include "toonzqt/qtcompat.h"
 #include "saveloadqsettings.h"
 
 // Qt includes
@@ -145,7 +146,7 @@ protected:
   void mousePressEvent(QMouseEvent *event) override;
   void mouseReleaseEvent(QMouseEvent *event) override;
   void mouseMoveEvent(QMouseEvent *) override;
-  void enterEvent(QEvent *event) override;
+  void enterEvent(QtCompat::EnterEvent *event) override;
   void keyPressEvent(QKeyEvent *event) override;
   void wheelEvent(QWheelEvent *event) override;
 

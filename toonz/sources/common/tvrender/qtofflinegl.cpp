@@ -4,6 +4,8 @@
 #include <traster.h>
 #include <tconvert.h>
 
+#include <stdexcept>
+
 //-----------------------------------------------------------------------------
 
 #if 0  // was _WIN32, this function not used
@@ -125,56 +127,35 @@ void QtOfflineGL::createContext(TDimension rasterSize,
 
 */
 
-  QGLFormat fmt;
-
-#if defined(_WIN32)
-  fmt.setAlphaBufferSize(8);
-  fmt.setAlpha(true);
-  fmt.setRgba(true);
-  fmt.setDepthBufferSize(32);
-  fmt.setDepth(true);
-  fmt.setStencilBufferSize(32);
-  fmt.setStencil(true);
-  fmt.setAccum(false);
-  fmt.setPlane(0);
-#elif defined(MACOSX)
-  fmt = QGLFormat::defaultFormat();
-  // printf("GL Version: %s\n",glGetString(GL_VERSION));
-  fmt.setVersion(2, 1); /* 3.2 might not work on OSX10.8 */
-#if 0
-  fmt.setAlphaBufferSize(8);
-  fmt.setAlpha(true);
-  fmt.setRgba(true);
-  fmt.setDepthBufferSize(32);
-  fmt.setDepth(true);
-  fmt.setStencilBufferSize(8);
-  fmt.setStencil(true);
-  fmt.setAccum(false);
-  fmt.setPlane(0);
-  fmt.setDirectRendering(false);
-#endif
-#elif defined(LINUX) || defined(FREEBSD)
-  fmt = QGLFormat::defaultFormat();
-  // printf("GL Version: %s\n",glGetString(GL_VERSION));
-  fmt.setVersion(2, 1); /* XXX? */
-#endif
-
   QSurfaceFormat format;
   format.setProfile(QSurfaceFormat::CompatibilityProfile);
+#if defined(MACOSX) || defined(LINUX) || defined(FREEBSD)
+  format.setVersion(2, 1);
+#endif
 
   m_surface = std::make_shared<QOffscreenSurface>();
   m_surface->setFormat(format);
   m_surface->create();
+  if (!m_surface->isValid()) {
+    throw std::runtime_error("Failed to create Qt offscreen OpenGL surface");
+  }
 
   m_context = std::make_shared<QOpenGLContext>();
   m_context->setFormat(format);
-  m_context->create();
-  m_context->makeCurrent(m_surface.get());
+  if (!m_context->create()) {
+    throw std::runtime_error("Failed to create Qt offscreen OpenGL context");
+  }
+  if (!m_context->makeCurrent(m_surface.get())) {
+    throw std::runtime_error("Failed to make Qt offscreen OpenGL context current");
+  }
 
   QOpenGLFramebufferObjectFormat fbo_format;
   fbo_format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
   m_fbo = std::make_shared<QOpenGLFramebufferObject>(rasterSize.lx,
                                                      rasterSize.ly, fbo_format);
+  if (!m_fbo->isValid()) {
+    throw std::runtime_error("Failed to create Qt offscreen OpenGL framebuffer");
+  }
   m_fbo->bind();
 
   printf("create context:%p [thread:0x%x]\n", m_context.get(),
@@ -189,7 +170,10 @@ void QtOfflineGL::createContext(TDimension rasterSize,
 void QtOfflineGL::makeCurrent() {
   if (m_context) {
     m_context->moveToThread(QThread::currentThread());
-    m_context->makeCurrent(m_surface.get());
+    if (!m_context->makeCurrent(m_surface.get())) {
+      throw std::runtime_error(
+          "Failed to make Qt offscreen OpenGL context current");
+    }
   }
 }
 
@@ -236,6 +220,8 @@ void QtOfflineGL::getRaster(TRaster32P raster) {
 //=============================================================================
 // QtOfflineGLPBuffer : implem. offlineGL usando QT e PBuffer
 //-----------------------------------------------------------------------------
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 
 QtOfflineGLPBuffer::QtOfflineGLPBuffer(TDimension rasterSize)
     : TOfflineGL::Imp(rasterSize.lx, rasterSize.ly), m_context(0) {
@@ -325,6 +311,13 @@ SPECIFICHE  MAC = depth_size 24, stencil_size 8, alpha_size 1
 
 //-----------------------------------------------------------------------------
 
+void QtOfflineGLPBuffer::createContext(TDimension rasterSize,
+                                       std::shared_ptr<TOfflineGL::Imp>) {
+  createContext(rasterSize);
+}
+
+//-----------------------------------------------------------------------------
+
 void QtOfflineGLPBuffer::makeCurrent() {
   if (m_context) {
     m_context->makeCurrent();
@@ -372,3 +365,5 @@ void QtOfflineGLPBuffer::getRaster(TRaster32P raster) {
   }
   raster->unlock();
 }
+
+#endif

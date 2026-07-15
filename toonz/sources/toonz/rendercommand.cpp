@@ -52,8 +52,9 @@
 // Qt includes
 #include <QObject>
 #include <QDesktopServices>
+#include <QStandardPaths>
 #include <QUrl>
-#include <QRegularExpression>  // Added to replace QRegExp
+#include <QRegularExpression>
 
 //---------------------------------------------------------
 
@@ -842,7 +843,6 @@ void RenderCommand::doRender(bool isPreview) {
     QString levelName = QString::fromStdWString(m_fp.getWideName());
     QString levelType = QString::fromStdString(m_fp.getType());
 
-    // Replace QRegExp with QRegularExpression
     QString exp = QRegularExpression::escape(levelName) + "\\.[0-9]{1,4}\\." +
                   QRegularExpression::escape(levelType);
     QRegularExpression regExp(exp);

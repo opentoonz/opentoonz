@@ -19,6 +19,7 @@
 #include "toonzqt/doublefield.h"
 #include "toonzqt/filefield.h"
 #include "toonzqt/cleanupcamerasettingswidget.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/toonzfolders.h"
@@ -157,18 +158,24 @@ CleanupTab::CleanupTab() {
 
   //  Connections
   bool ret = true;
-  ret      = ret && connect(m_autoCenter, SIGNAL(stateChanged(int)),
-                       SLOT(onGenericSettingsChange()));
-  ret = ret && connect(m_pegHolesOm, SIGNAL(activated(int)),
-                       SLOT(onGenericSettingsChange()));
-  ret = ret && connect(m_fieldGuideOm, SIGNAL(activated(int)),
-                       SLOT(onGenericSettingsChange()));
-  ret = ret && connect(m_rotateOm, SIGNAL(activated(int)),
-                       SLOT(onGenericSettingsChange()));
-  ret = ret && connect(m_flipX, SIGNAL(stateChanged(int)),
-                       SLOT(onGenericSettingsChange()));
-  ret = ret && connect(m_flipY, SIGNAL(stateChanged(int)),
-                       SLOT(onGenericSettingsChange()));
+  ret = ret && static_cast<bool>(QtCompat::connectCheckStateChanged(
+                   m_autoCenter, this,
+                   [this](Qt::CheckState) { onGenericSettingsChange(); }));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_pegHolesOm, this,
+                   [this](int) { onGenericSettingsChange(); }));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_fieldGuideOm, this,
+                   [this](int) { onGenericSettingsChange(); }));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_rotateOm, this,
+                   [this](int) { onGenericSettingsChange(); }));
+  ret = ret && static_cast<bool>(QtCompat::connectCheckStateChanged(
+                   m_flipX, this,
+                   [this](Qt::CheckState) { onGenericSettingsChange(); }));
+  ret = ret && static_cast<bool>(QtCompat::connectCheckStateChanged(
+                   m_flipY, this,
+                   [this](Qt::CheckState) { onGenericSettingsChange(); }));
   ret =
       ret && connect(m_pathField, SIGNAL(pathChanged()), SLOT(onPathChange()));
 
@@ -346,12 +353,15 @@ ProcessingTab::ProcessingTab() {
   bool ret = true;
   ret      = ret && connect(m_sharpness, SIGNAL(valueChanged(bool)),
                        SLOT(onSharpnessChange(bool)));
-  ret = ret && connect(m_lineProcessing, SIGNAL(activated(int)),
-                       SLOT(onGenericSettingsChange()));
-  ret = ret && connect(m_antialias, SIGNAL(activated(int)),
-                       SLOT(onGenericSettingsChange()));
-  ret = ret && connect(m_autoadjustOm, SIGNAL(activated(int)),
-                       SLOT(onGenericSettingsChange()));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_lineProcessing, this,
+                   [this](int) { onGenericSettingsChange(); }));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_antialias, this,
+                   [this](int) { onGenericSettingsChange(); }));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_autoadjustOm, this,
+                   [this](int) { onGenericSettingsChange(); }));
   ret = ret && connect(m_despeckling, SIGNAL(valueChanged(bool)),
                        SLOT(onGenericSettingsChange()));
   ret = ret && connect(m_aaValue, SIGNAL(valueChanged(bool)),

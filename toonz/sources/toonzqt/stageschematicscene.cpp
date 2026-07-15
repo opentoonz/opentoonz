@@ -9,6 +9,7 @@
 #include "toonzqt/schematicgroupeditor.h"
 #include "stageobjectselection.h"
 #include "toonzqt/icongenerator.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/txsheet.h"
@@ -1157,7 +1158,7 @@ void StageSchematicScene::contextMenuEvent(
   menu.addSeparator();
   menu.addAction(paste);
   m_selection->setPastePosition(TPointD(scenePos.x(), scenePos.y()));
-  menu.exec(cme->screenPos());
+  menu.exec(QtCompat::graphicsSceneContextMenuEventGlobalPosition(cme));
 }
 
 //------------------------------------------------------------------

@@ -7,6 +7,7 @@
 #include "toonz/tscenehandle.h"
 
 #include "toonzqt/menubarcommand.h"
+#include "toonzqt/qtcompat.h"
 
 #include <QComboBox>
 #include <QCheckBox>
@@ -35,8 +36,9 @@ VectorGuidedDrawingPane::VectorGuidedDrawingPane(QWidget *parent,
   m_autoInbetween = new QCheckBox(tr("Auto Inbetween"), this);
   m_autoInbetween->setChecked(
       Preferences::instance()->getGuidedAutoInbetween());
-  connect(m_autoInbetween, SIGNAL(stateChanged(int)), this,
-          SLOT(onAutoInbetweenChanged()));
+  QtCompat::connectCheckStateChanged(
+      m_autoInbetween, this,
+      [this](Qt::CheckState) { onAutoInbetweenChanged(); });
 
   m_interpolationTypeCB = new QComboBox();
   inputs.clear();

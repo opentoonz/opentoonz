@@ -116,9 +116,9 @@
         <translation>Preajuste de cámara defectuoso</translation>
     </message>
     <message>
-        <source>&apos;%1&apos; doesn&apos;t seem a well formed camera preset. 
+        <source>&apos;%1&apos; doesn&apos;t seem a well formed camera preset.
 Possibly the preset file has been corrupted</source>
-        <translation>&apos;%1&apos; no parece ser un preajuste de cámara con un formato correcto. 
+        <translation>&apos;%1&apos; no parece ser un preajuste de cámara con un formato correcto.
 Es posible que el archivo de dicho preajuste se encuentre corrupto.</translation>
     </message>
     <message>
@@ -3026,9 +3026,9 @@ de la paleta de estudio ha sido modificada. ¿Guardar los cambios?</translation>
         <translation>Descartar</translation>
     </message>
     <message>
-        <source>Convert %1 to Studio Palette and Overwrite. 
+        <source>Convert %1 to Studio Palette and Overwrite.
 Are you sure ?</source>
-        <translation>Convertir %1 en una Paleta de Estudio y sobreescribirla. 
+        <translation>Convertir %1 en una Paleta de Estudio y sobreescribirla.
 ¿Seguro?</translation>
     </message>
     <message>
@@ -3040,15 +3040,15 @@ Are you sure ?</source>
         <translation type="obsolete">No</translation>
     </message>
     <message>
-        <source>Replacing all selected palettes with the palette &quot;%1&quot;. 
+        <source>Replacing all selected palettes with the palette &quot;%1&quot;.
 Are you sure ?</source>
-        <translation>Reemplazar todas las paletas seleccionadas con la paleta &quot;%1&quot;. 
+        <translation>Reemplazar todas las paletas seleccionadas con la paleta &quot;%1&quot;.
 ¿Seguro?</translation>
     </message>
     <message>
-        <source>Replacing the palette &quot;%1&quot; with the palette &quot;%2&quot;. 
+        <source>Replacing the palette &quot;%1&quot; with the palette &quot;%2&quot;.
 Are you sure ?</source>
-        <translation>Reemplazar la paleta &quot;%1&quot; con la paleta &quot;%2&quot;. 
+        <translation>Reemplazar la paleta &quot;%1&quot; con la paleta &quot;%2&quot;.
 ¿Seguro?</translation>
     </message>
     <message>
@@ -3142,7 +3142,7 @@ Are you sure ?</source>
         <translation>Opciones</translation>
     </message>
     <message>
-        <source>Auto  
+        <source>Auto
 Apply</source>
         <translation type="vanished">Aplicar
 Autom</translation>

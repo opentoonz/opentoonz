@@ -6,6 +6,7 @@
 #include "toonzqt/gutil.h"
 #include "toonzqt/keyframenavigator.h"
 #include "toonzqt/trepetitionguard.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/dvscrollwidget.h"
 #include "toonzqt/studiopaletteviewer.h"
@@ -43,6 +44,7 @@
 #include <QApplication>
 #include <QLabel>
 #include <QDrag>
+#include <QActionGroup>
 
 TEnv::IntVar ShowNewStyleButton("ShowNewStyleButton", 1);
 using namespace PaletteViewerGUI;
@@ -289,7 +291,7 @@ void PaletteViewer::load(QSettings &settings) {
 
   int visibleParts;
   QVariant visibleVar = settings.value("toolbarVisibleMsk");
-  if (visibleVar.canConvert(QVariant::Int)) {
+  if (visibleVar.canConvert<int>()) {
     visibleParts = visibleVar.toInt();
   } else {
     visibleParts = 3;  // Show keyframes and new style/page
@@ -801,7 +803,7 @@ void PaletteViewer::setChangeStyleCommand(
  */
 void PaletteViewer::contextMenuEvent(QContextMenuEvent *event) {
   m_indexPageToDelete = -1;
-  QPoint pos          = event->pos();
+  QPoint pos          = QtCompat::contextMenuEventPosition(event);
   if (!getPalette() || !m_tabBarContainer->geometry().contains(pos)) return;
 
   QMenu *menu = new QMenu(this);
@@ -842,7 +844,7 @@ void PaletteViewer::contextMenuEvent(QContextMenuEvent *event) {
         CommandManager::instance()->getAction("MI_EraseUnusedStyles"));
   }
 
-  menu->exec(event->globalPos());
+  menu->exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 //-----------------------------------------------------------------------------
@@ -938,7 +940,8 @@ void PaletteViewer::dropEvent(QDropEvent *event) {
   const QMimeData *mimeData = event->mimeData();
   if (!mimeData) return;
 
-  QPoint tollBarPos      = m_savePaletteToolBar->mapFrom(this, event->pos());
+  QPoint tollBarPos = m_savePaletteToolBar->mapFrom(
+      this, QtCompat::dropEventPosition(event));
   QAction *currentAction = m_savePaletteToolBar->actionAt(tollBarPos);
   bool loadPalette =
       currentAction && currentAction->text() == QString(tr("&Move Palette"));

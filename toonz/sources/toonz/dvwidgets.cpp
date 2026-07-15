@@ -3,6 +3,7 @@
 #include "dvwidgets.h"
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/checkbox.h"
+#include "toonzqt/qtcompat.h"
 
 #include <QLayout>
 #include <QLabel>
@@ -49,7 +50,9 @@ void PropertyComboBox::onPropertyChanged() {
 PropertyCheckBox::PropertyCheckBox(const QString &text, QWidget *parent,
                                    TBoolProperty *prop)
     : CheckBox(text, parent), PropertyWidget(prop) {
-  connect(this, SIGNAL(stateChanged(int)), this, SLOT(onStateChanged(int)));
+  QtCompat::connectCheckStateChanged(this, this, [this](Qt::CheckState state) {
+    onStateChanged(static_cast<int>(state));
+  });
   setMaximumHeight(WidgetHeight);
 }
 

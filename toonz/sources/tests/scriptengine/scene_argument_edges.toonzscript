@@ -1,0 +1,104 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e.message || e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var scene = new Scene();
+var level = scene.newLevel("Raster", "qt6_scene_argument_edges_raster");
+
+scene.insertColumn(0);
+scene.deleteColumn(0);
+scene.setCell(0, 0, level, "1");
+var cell = scene.getCell(0, 0);
+var validCell = cell.level.type === "Raster" && cell.fid === 1;
+cell.level.dispose();
+scene.setCell(0, 0);
+var clearedCell = scene.getCell(0, 0) === undefined;
+
+print("qt-script-scene-argument-edges-valid", validCell, clearedCell,
+      scene.frameCount >= 0, scene.columnCount >= 0);
+
+var errors = [
+  hasError(function() { new Scene(new FilePath("missing.tnz"), 0); },
+           "Scene constructor expected zero or one path argument"),
+  hasError(function() { scene.load(); },
+           "Scene.load expected one path argument"),
+  hasError(function() { scene.load(new FilePath("missing.tnz"), 0); },
+           "Scene.load expected one path argument"),
+  hasError(function() { scene.save(); },
+           "Scene.save expected one path argument"),
+  hasError(function() { scene.save(new FilePath("missing.tnz"), 0); },
+           "Scene.save expected one path argument"),
+  hasError(function() { scene.insertColumn(); },
+           "Scene.insertColumn expected one column argument"),
+  hasError(function() { scene.insertColumn(0, 1); },
+           "Scene.insertColumn expected one column argument"),
+  hasError(function() { scene.insertColumn("0"); }, "Column argument"),
+  hasError(function() { scene.insertColumn(Infinity); }, "Column argument"),
+  hasError(function() { scene.insertColumn(0.5); }, "Column argument"),
+  hasError(function() { scene.insertColumn(-1); }, "Bad column value"),
+  hasError(function() { scene.deleteColumn(); },
+           "Scene.deleteColumn expected one column argument"),
+  hasError(function() { scene.deleteColumn(0, 1); },
+           "Scene.deleteColumn expected one column argument"),
+  hasError(function() { scene.deleteColumn("0"); }, "Column argument"),
+  hasError(function() { scene.deleteColumn(0.5); }, "Column argument"),
+  hasError(function() { scene.deleteColumn(-1); }, "Bad column value"),
+  hasError(function() { scene.getCell(); },
+           "Scene.getCell expected row and column arguments"),
+  hasError(function() { scene.getCell(0, 0, 1); },
+           "Scene.getCell expected row and column arguments"),
+  hasError(function() { scene.getCell("0", 0); }, "Row argument"),
+  hasError(function() { scene.getCell(0, "0"); }, "Column argument"),
+  hasError(function() { scene.getCell(0.5, 0); }, "Row argument"),
+  hasError(function() { scene.getCell(0, 0.5); }, "Column argument"),
+  hasError(function() { scene.getCell(-1, 0); }, "Bad row/col values"),
+  hasError(function() { scene.setCell(); },
+           "Scene.setCell expected row, column, and optional cell arguments"),
+  hasError(function() { scene.setCell(0); },
+           "Scene.setCell expected row, column, and optional cell arguments"),
+  hasError(function() { scene.setCell(0, 0, level, "1", "extra"); },
+           "Scene.setCell expected row, column, and optional cell arguments"),
+  hasError(function() { scene.setCell("0", 0); }, "Row argument"),
+  hasError(function() { scene.setCell(0, "0"); }, "Column argument"),
+  hasError(function() { scene.setCell(0.5, 0, level, "1"); },
+           "Row argument"),
+  hasError(function() { scene.setCell(0, 0.5, level, "1"); },
+           "Column argument"),
+  hasError(function() { scene.setCell(-1, 0, level, "1"); },
+           "Bad row/col values"),
+  hasError(function() { scene.setCell(0, 0, level, "bad"); },
+           "does not look like a FrameId"),
+  hasError(function() { scene.setCell(0, 0, 42, "bad"); },
+           "does not look like a FrameId"),
+  hasError(function() { scene.setCell(0, 0, "missing_level", "bad"); },
+           "does not look like a FrameId"),
+  hasError(function() { scene.getLevels(0); },
+           "Scene.getLevels expected no arguments"),
+  hasError(function() { scene.getLevel(); },
+           "Scene.getLevel expected one name argument"),
+  hasError(function() { scene.getLevel("qt6_scene_argument_edges_raster", 0); },
+           "Scene.getLevel expected one name argument"),
+  hasError(function() { scene.newLevel("Raster"); },
+           "Scene.newLevel expected type and name arguments"),
+  hasError(function() {
+    scene.newLevel("Raster", "qt6_scene_argument_edges_extra", 0);
+  }, "Scene.newLevel expected type and name arguments"),
+  hasError(function() { scene.loadLevel("qt6_scene_argument_edges_load"); },
+           "Scene.loadLevel expected name and path arguments"),
+  hasError(function() {
+    scene.loadLevel("qt6_scene_argument_edges_load",
+                    new FilePath("missing.tif"), 0);
+  }, "Scene.loadLevel expected name and path arguments")
+];
+
+print("qt-script-scene-argument-edges-errors", errors);
+
+level.dispose();
+scene.dispose();
+
+"qt-script-scene-argument-edges-result";

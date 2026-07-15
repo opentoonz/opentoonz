@@ -9,6 +9,7 @@
 #include "toonzqt/gutil.h"
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/intfield.h"
+#include "toonzqt/qtcompat.h"
 #include "palettesscanpopup.h"
 #include "palettedata.h"
 
@@ -1021,7 +1022,8 @@ void StudioPaletteTreeViewer::contextMenuEvent(QContextMenuEvent *event) {
   if (count == 1) {
     // Verify if click position is in a row containing an item.
     QRect rect = visualItemRect(currentItem());
-    if (!QRect(0, rect.y(), width(), rect.height()).contains(event->pos()))
+    const QPoint eventPos = QtCompat::contextMenuEventPosition(event);
+    if (!QRect(0, rect.y(), width(), rect.height()).contains(eventPos))
       return;
 
     bool isFolder = (studioPalette->isFolder(path));
@@ -1098,7 +1100,7 @@ void StudioPaletteTreeViewer::contextMenuEvent(QContextMenuEvent *event) {
       connect(refreshAct, &QAction::triggered, this,
               &StudioPaletteTreeViewer::refresh);
     }
-    menu.exec(event->globalPos());
+    menu.exec(QtCompat::contextMenuEventGlobalPosition(event));
     return;
   }
 
@@ -1106,11 +1108,12 @@ void StudioPaletteTreeViewer::contextMenuEvent(QContextMenuEvent *event) {
   // Verify if click position is in a row containing an item.
   bool areAllPalette      = true;
   bool isClickInSelection = false;
+  const QPoint eventPos   = QtCompat::contextMenuEventPosition(event);
   int i;
   for (i = 0; i < count; i++) {
     QTreeWidgetItem *item = items[i];
     QRect rect            = visualItemRect(item);
-    if (QRect(0, rect.y(), width(), rect.height()).contains(event->pos()))
+    if (QRect(0, rect.y(), width(), rect.height()).contains(eventPos))
       isClickInSelection = true;
     TFilePath path = getItemPath(item);
     if (studioPalette->isFolder(path)) areAllPalette = false;
@@ -1138,7 +1141,7 @@ void StudioPaletteTreeViewer::contextMenuEvent(QContextMenuEvent *event) {
   connect(deleteAct, &QAction::triggered, this,
           &StudioPaletteTreeViewer::deleteItems);
 
-  menu.exec(event->globalPos());
+  menu.exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 
 //-----------------------------------------------------------------------------
@@ -1146,7 +1149,8 @@ void StudioPaletteTreeViewer::contextMenuEvent(QContextMenuEvent *event) {
 void StudioPaletteTreeViewer::mousePressEvent(QMouseEvent *event) {
   QTreeWidget::mousePressEvent(event);
   // If left button is not pressed return
-  if (event->button() == Qt::LeftButton) m_startPos = event->pos();
+  if (event->button() == Qt::LeftButton)
+    m_startPos = QtCompat::mouseEventPosition(event);
 }
 
 //-----------------------------------------------------------------------------
@@ -1154,8 +1158,9 @@ void StudioPaletteTreeViewer::mousePressEvent(QMouseEvent *event) {
 void StudioPaletteTreeViewer::mouseMoveEvent(QMouseEvent *event) {
   // If left button is not pressed return; is not drag event.
   if (!(event->buttons() & Qt::LeftButton)) return;
-  if (!m_startPos.isNull() && (m_startPos - event->pos()).manhattanLength() >=
-                                  QApplication::startDragDistance())
+  if (!m_startPos.isNull() &&
+      (m_startPos - QtCompat::mouseEventPosition(event)).manhattanLength() >=
+          QApplication::startDragDistance())
     startDragDrop();
 }
 
@@ -1227,7 +1232,7 @@ void StudioPaletteTreeViewer::dragEnterEvent(QDragEnterEvent *event) {
 //-----------------------------------------------------------------------------
 
 void StudioPaletteTreeViewer::dragMoveEvent(QDragMoveEvent *event) {
-  QTreeWidgetItem *item = itemAt(event->pos());
+  QTreeWidgetItem *item = itemAt(QtCompat::dropEventPosition(event));
   TFilePath newPath     = getItemPath(item);
 
   if (item) {

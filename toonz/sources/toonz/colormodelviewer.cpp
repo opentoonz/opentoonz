@@ -23,6 +23,7 @@
 #include "toonzqt/gutil.h"
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/styleselection.h"
+#include "toonzqt/qtcompat.h"
 // TnzLib includes
 #include "toonz/palettecmd.h"
 #include "toonz/txshlevelhandle.h"
@@ -210,7 +211,7 @@ void ColorModelViewer::contextMenuEvent(QContextMenuEvent *event) {
   connect(loadCurrentFrame, SIGNAL(triggered()), SLOT(loadCurrentFrame()));
   menu.addAction(loadCurrentFrame);
   if (!m_imageViewer->getImage()) {
-    menu.exec(event->globalPos());
+    menu.exec(QtCompat::contextMenuEventGlobalPosition(event));
     return;
   }
   QAction *removeColorModel =
@@ -237,21 +238,21 @@ void ColorModelViewer::contextMenuEvent(QContextMenuEvent *event) {
       CommandManager::instance()->getShortcutFromId(V_ZoomFit));
   QAction *fit = menu.addAction(tr("Fit to Window") + "\t" + shortcut);
   connect(fit, SIGNAL(triggered()), m_imageViewer, SLOT(fitView()));
-  menu.exec(event->globalPos());
+  menu.exec(QtCompat::contextMenuEventGlobalPosition(event));
 }
 //-----------------------------------------------------------------------------
 /*! If left button is pressed recall \b pick() in event pos.
  */
 void ColorModelViewer::mousePressEvent(QMouseEvent *event) {
   if (event->button() == Qt::LeftButton)
-    pick(event->pos() * getDevicePixelRatio(this));
+    pick(QtCompat::mouseEventPosition(event) * getDevicePixelRatio(this));
 }
 //-----------------------------------------------------------------------------
 /*! If left button is moved recall \b pick() in event pos.
  */
 void ColorModelViewer::mouseMoveEvent(QMouseEvent *event) {
   if (event->buttons() & Qt::LeftButton)
-    pick(event->pos() * getDevicePixelRatio(this));
+    pick(QtCompat::mouseEventPosition(event) * getDevicePixelRatio(this));
 }
 //-----------------------------------------------------------------------------
 /*! Pick color from image and set it as current style.

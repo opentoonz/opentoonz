@@ -53,7 +53,7 @@ public:
   struct CellMark {
     QString name;
     TPixel32 color;
-    bool operator==(const CellMark &cm) {
+    bool operator==(const CellMark &cm) const {
       return name == cm.name && color == cm.color;
     }
   };
@@ -61,7 +61,7 @@ public:
   struct ColorFilter {
     QString name;
     TPixel32 color;
-    bool operator==(const ColorFilter &cf) {
+    bool operator==(const ColorFilter &cf) const {
       return name == cf.name && color == cf.color;
     }
   };

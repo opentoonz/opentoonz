@@ -588,7 +588,7 @@ static inline void get_flt_fun_rad(TRop::ResampleFilterType flt_type,
     fun = flt_gauss;
     rad = fltradGauss;
     break;
-  case 101:
+  case TRop::W1:
     fun = flt_w_1;
     rad = fltradW1;
     break;

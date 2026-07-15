@@ -1,0 +1,48 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e.message || e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+function findByName(files, name, extension) {
+  for (var i = 0; i < files.length; ++i) {
+    if (files[i].name === name && files[i].extension === extension)
+      return files[i];
+  }
+  return undefined;
+}
+
+var root = new FilePath("toonz/sources/tests/scriptengine");
+var files = root.files();
+var basic = findByName(files, "basic", "toonzscript");
+var filePath = findByName(files, "file_path", "toonzscript");
+var missing = findByName(files, "missing-file-does-not-exist", "toonzscript");
+
+print("qt-script-filepath-files-entries", root.isDirectory, files.length > 0,
+      basic instanceof FilePath, basic.exists, basic.isDirectory,
+      basic.parentDirectory.name, filePath instanceof FilePath,
+      missing === undefined);
+
+var copiedBasic = new FilePath(basic);
+var sibling = basic.parentDirectory.concat("file_path.toonzscript");
+var childViaFilePath = root.concat(new FilePath("file_path_edges.toonzscript"));
+
+print("qt-script-filepath-files-roundtrip", copiedBasic.name,
+      copiedBasic.extension, copiedBasic.toString() === basic.toString(),
+      sibling.exists, sibling.name, childViaFilePath.exists,
+      childViaFilePath.name);
+
+var arityErrors = [
+  hasError(function() { root.files("extra"); },
+           "FilePath.files expected no arguments"),
+  hasError(function() { root.concat(new FilePath("/absolute.txt")); },
+           "can't concatenate an absolute path"),
+  hasError(function() { basic.files(); }, "is not a directory")
+];
+
+print("qt-script-filepath-files-errors", arityErrors);
+
+"qt-script-filepath-files-edges-result";

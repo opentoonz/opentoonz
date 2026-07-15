@@ -34,6 +34,7 @@
 #include "toonzqt/doublefield.h"
 #include "toonzqt/checkbox.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 #include <QPushButton>
 #include <QComboBox>
@@ -308,10 +309,14 @@ void ScanSettingsPopup::connectAll() {
   ret      = ret &&
         connect(m_paperFormatOm, SIGNAL(currentIndexChanged(const QString &)),
                 SLOT(onPaperChanged(const QString &)));
-  ret = ret && connect(m_reverseOrderCB, SIGNAL(stateChanged(int)),
-                       SLOT(onToggle(int)));
-  ret = ret && connect(m_paperFeederCB, SIGNAL(stateChanged(int)),
-                       SLOT(onToggle(int)));
+  ret = ret && static_cast<bool>(QtCompat::connectCheckStateChanged(
+                   m_reverseOrderCB, this, [this](Qt::CheckState state) {
+                     onToggle(static_cast<int>(state));
+                   }));
+  ret = ret && static_cast<bool>(QtCompat::connectCheckStateChanged(
+                   m_paperFeederCB, this, [this](Qt::CheckState state) {
+                     onToggle(static_cast<int>(state));
+                   }));
   ret = ret &&
         connect(m_dpi, SIGNAL(valueChanged(bool)), SLOT(onValueChanged(bool)));
   ret = ret && connect(m_brightness, SIGNAL(valueChanged(bool)),

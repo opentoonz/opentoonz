@@ -43,6 +43,8 @@ struct VectorizationContext;
 #include <QMouseEvent>
 #include <QWheelEvent>
 
+#include "toonzqt/qtcompat.h"
+
 class SSDebugger final : public QWidget {
 public:
   VectorizationContext &m_context;
@@ -1948,12 +1950,12 @@ void SSDebugger::keyPressEvent(QKeyEvent *event) { m_loop.exit(); }
 //------------------------------------------------------
 
 void SSDebugger::mouseMoveEvent(QMouseEvent *event) {
-  m_pos = event->pos();
+  m_pos = QtCompat::mouseEventPosition(event);
 
   if (event->buttons() == Qt::MiddleButton) {
-    m_transform.translate((event->x() - m_pressPos.x()) / m_scale,
-                          (m_pressPos.y() - event->y()) / m_scale);
-    m_pressPos = event->pos();
+    m_transform.translate((m_pos.x() - m_pressPos.x()) / m_scale,
+                          (m_pressPos.y() - m_pos.y()) / m_scale);
+    m_pressPos = m_pos;
   }
 
   update();
@@ -1962,7 +1964,7 @@ void SSDebugger::mouseMoveEvent(QMouseEvent *event) {
 //------------------------------------------------------
 
 void SSDebugger::mousePressEvent(QMouseEvent *event) {
-  m_pressPos = m_pos = event->pos();
+  m_pressPos = m_pos = QtCompat::mouseEventPosition(event);
 }
 
 //------------------------------------------------------
@@ -1991,11 +1993,12 @@ QPointF SSDebugger::winToWorldF(int x, int y) {
 
 void SSDebugger::wheelEvent(QWheelEvent *event) {
   QPoint w_coords;
-  double zoom_par = 1 + event->delta() * 0.001;
+  double zoom_par = 1 + QtCompat::wheelEventAngleDeltaY(event) * 0.001;
 
   m_scale *= zoom_par;
 
-  w_coords = winToWorld(event->x(), event->y());
+  const QPoint eventPos = QtCompat::wheelEventPosition(event);
+  w_coords              = winToWorld(eventPos.x(), eventPos.y());
 
   m_transform.translate(w_coords.x(), w_coords.y());
   m_transform.scale(zoom_par, zoom_par);

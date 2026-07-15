@@ -1,6 +1,7 @@
 
 
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 #include "toonz/preferences.h"
 
 // TnzQt includes
@@ -27,12 +28,12 @@
 #include <QIconEngine>
 #include <QString>
 #include <QApplication>
+#include <QGuiApplication>
 #include <QMouseEvent>
 #include <QTabletEvent>
 #include <QKeyEvent>
 #include <QUrl>
 #include <QFileInfo>
-#include <QDesktopWidget>
 #include <QSvgRenderer>
 #include <QRegularExpression>
 #include <QScreen>
@@ -46,7 +47,8 @@ inline bool hasScreensWithDifferentDevPixRatio() {
   static bool ret     = false;
   static bool checked = false;
   if (!checked) {  // check once
-    int dpr = QApplication::desktop()->devicePixelRatio();
+    QScreen *primaryScreen = QGuiApplication::primaryScreen();
+    int dpr = primaryScreen ? (int)primaryScreen->devicePixelRatio() : 1;
     for (auto screen : QGuiApplication::screens()) {
       if ((int)screen->devicePixelRatio() != dpr) {
         ret = true;
@@ -89,7 +91,7 @@ QImage rasterToQImage(const TRasterP &ras, bool premultiplied, bool mirrored) {
     QImage image(ras->getRawData(), ras->getLx(), ras->getLy(),
                  premultiplied ? QImage::Format_ARGB32_Premultiplied
                                : QImage::Format_ARGB32);
-    if (mirrored) return image.mirrored();
+    if (mirrored) return QtCompat::mirroredImage(image);
     return image;
   } else if (TRasterGR8P ras8 = ras) {
     QImage image(ras->getRawData(), ras->getLx(), ras->getLy(), ras->getWrap(),
@@ -100,7 +102,7 @@ QImage rasterToQImage(const TRasterP &ras, bool premultiplied, bool mirrored) {
       for (i = 0; i < 256; i++) colorTable.append(QColor(i, i, i).rgb());
     }
     image.setColorTable(colorTable);
-    if (mirrored) return image.mirrored();
+    if (mirrored) return QtCompat::mirroredImage(image);
     return image;
   }
   return QImage();
@@ -123,7 +125,7 @@ TRaster32P rasterFromQImage(
     QImage image, bool premultiply,
     bool mirror)  // no need of const& - Qt uses implicit sharing...
 {
-  QImage copyImage = mirror ? image.mirrored() : image;
+  QImage copyImage = mirror ? QtCompat::mirroredImage(image) : image;
   TRaster32P ras(image.width(), image.height(), image.width(),
                  (TPixelRGBM32 *)copyImage.bits(), false);
   if (premultiply) TRop::premultiply(ras);
@@ -190,11 +192,92 @@ QPixmap scalePixmapKeepingAspectRatio(QPixmap pixmap, QSize size,
 
 //-----------------------------------------------------------------------------
 
+QScreen *getScreenForWidget(const QWidget *widget) {
+  if (widget) {
+    if (QWindow *window = widget->windowHandle()) {
+      if (window->screen()) return window->screen();
+    }
+
+    if (const QWidget *topLevel = widget->window()) {
+      if (QWindow *window = topLevel->windowHandle()) {
+        if (window->screen()) return window->screen();
+      }
+    }
+
+    const QPoint globalCenter = widget->mapToGlobal(widget->rect().center());
+    for (QScreen *screen : QGuiApplication::screens()) {
+      if (screen->geometry().contains(globalCenter)) return screen;
+    }
+  }
+
+  return QGuiApplication::primaryScreen();
+}
+
+//-----------------------------------------------------------------------------
+
+QRect getScreenGeometry(const QWidget *widget) {
+  QScreen *screen = getScreenForWidget(widget);
+  return screen ? screen->geometry() : QRect();
+}
+
+//-----------------------------------------------------------------------------
+
+QRect getScreenGeometry(int screenIndex) {
+  const QList<QScreen *> screens = QGuiApplication::screens();
+  if (0 <= screenIndex && screenIndex < screens.size())
+    return screens.at(screenIndex)->geometry();
+  return getScreenGeometry();
+}
+
+//-----------------------------------------------------------------------------
+
+QRect getAvailableScreenGeometry(const QWidget *widget) {
+  QScreen *screen = getScreenForWidget(widget);
+  return screen ? screen->availableGeometry() : QRect();
+}
+
+//-----------------------------------------------------------------------------
+
+QRect getAvailableScreenGeometry(const QPoint &globalPos,
+                                 const QWidget *fallbackWidget) {
+  for (QScreen *screen : QGuiApplication::screens()) {
+    if (screen->geometry().contains(globalPos))
+      return screen->availableGeometry();
+  }
+  return getAvailableScreenGeometry(fallbackWidget);
+}
+
+//-----------------------------------------------------------------------------
+
+QRect getAvailableScreenGeometry(const QRect &globalRect,
+                                 const QWidget *fallbackWidget) {
+  const QPoint positions[] = {globalRect.topLeft(), globalRect.topRight(),
+                              globalRect.center(), globalRect.bottomLeft(),
+                              globalRect.bottomRight()};
+  for (const QPoint &position : positions) {
+    QRect screenGeometry = getAvailableScreenGeometry(position, nullptr);
+    if (!screenGeometry.isEmpty()) return screenGeometry;
+  }
+  return getAvailableScreenGeometry(fallbackWidget);
+}
+
+//-----------------------------------------------------------------------------
+
+bool intersectsAvailableScreenGeometry(const QRect &globalRect) {
+  for (QScreen *screen : QGuiApplication::screens()) {
+    if (screen->availableGeometry().intersects(globalRect)) return true;
+  }
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+
 int getDevicePixelRatio(const QWidget *widget) {
   if (hasScreensWithDifferentDevPixRatio() && widget) {
-    return widget->screen()->devicePixelRatio();
+    QScreen *screen = getScreenForWidget(widget);
+    return screen ? (int)screen->devicePixelRatio() : 1;
   }
-  static int devPixRatio = QApplication::desktop()->devicePixelRatio();
+  static int devPixRatio = getHighestDevicePixelRatio();
   return devPixRatio;
 }
 

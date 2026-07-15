@@ -7,6 +7,7 @@
 
 // TnzQt includes
 #include "toonzqt/checkbox.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/toonzscene.h"
@@ -228,8 +229,9 @@ PsdSettingsPopup::PsdSettingsPopup()
   ret = ret && connect(m_loadMode, SIGNAL(currentIndexChanged(const QString &)),
                        SLOT(onModeChanged()));
   assert(ret);
-  ret = ret && connect(m_psdFolderOptions, SIGNAL(buttonClicked(int)), this,
-                       SLOT(onFolderOptionChange(int)));
+  ret = ret && QtCompat::connectButtonGroupIdClicked(
+                   m_psdFolderOptions, this,
+                   &PsdSettingsPopup::onFolderOptionChange);
   assert(ret);
   m_okBtn     = new QPushButton(tr("OK"), this);
   m_cancelBtn = new QPushButton(tr("Cancel"), this);

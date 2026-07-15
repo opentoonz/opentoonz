@@ -56,7 +56,7 @@
 #endif
 
 #ifdef TIPC_DEBUG
-#include <QTime>
+#include <QElapsedTimer>
 #endif
 
 //---------------------------------------------------
@@ -494,7 +494,8 @@ void LRTimecodeParser::operator()(Message &msg) {
 //************************************************************************
 
 void LRImageReadParser::operator()(Message &msg) {
-  tipc_debug(QTime fTime; QTime irTime; QTime shTime; fTime.start(););
+  tipc_debug(QElapsedTimer fTime; QElapsedTimer irTime; QElapsedTimer shTime;
+             fTime.start(););
 
   {
     unsigned int id;
@@ -544,7 +545,7 @@ err:
 //************************************************************************
 
 void LRImageReadSHMParser::operator()(Message &msg) {
-  tipc_debug(QTime fTime; QTime irTime; fTime.start(););
+  tipc_debug(QElapsedTimer fTime; QElapsedTimer irTime; fTime.start(););
 
   unsigned int id;
   int lx, ly, frameIdx;

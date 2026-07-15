@@ -1,0 +1,75 @@
+var source = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var rasterLevel = new Level();
+rasterLevel.setFrame("1", source);
+rasterLevel.setFrame("2", source);
+
+print("qt-script-level-transformers-source", rasterLevel.type,
+      rasterLevel.frameCount, rasterLevel.getFrameIds().join(","));
+
+var outlineVectorizer = new OutlineVectorizer();
+outlineVectorizer.accuracy = 6;
+var outlineLevel = outlineVectorizer.vectorize(rasterLevel);
+var outlineLevelAgain = outlineVectorizer.vectorize(rasterLevel);
+var outlineLevelId = outlineLevel.id;
+var outlineFrame = outlineLevel.getFrame("2");
+print("qt-script-level-transformers-outline", outlineLevel.type,
+      outlineLevel.frameCount, outlineLevel.getFrameIds().join(","),
+      outlineFrame.type);
+outlineFrame.dispose();
+outlineLevel.dispose();
+var outlineLevelAgainFrameIds = outlineLevelAgain.getFrameIds().join(",");
+print("qt-script-level-transformers-outline-wrappers",
+      outlineLevelId > 0, outlineLevelAgain.id != outlineLevelId,
+      outlineLevelAgain.type, outlineLevelAgain.frameCount,
+      outlineLevelAgainFrameIds);
+
+var centerlineVectorizer = new CenterlineVectorizer();
+centerlineVectorizer.threshold = 6;
+var centerlineLevel = centerlineVectorizer.vectorize(rasterLevel);
+var centerlineLevelAgain = centerlineVectorizer.vectorize(rasterLevel);
+var centerlineLevelId = centerlineLevel.id;
+var centerlineFrame = centerlineLevel.getFrame("1");
+print("qt-script-level-transformers-centerline", centerlineLevel.type,
+      centerlineLevel.frameCount, centerlineLevel.getFrameIds().join(","),
+      centerlineFrame.type);
+centerlineFrame.dispose();
+centerlineLevel.dispose();
+var centerlineLevelAgainFrameIds = centerlineLevelAgain.getFrameIds().join(",");
+print("qt-script-level-transformers-centerline-wrappers",
+      centerlineLevelId > 0, centerlineLevelAgain.id != centerlineLevelId,
+      centerlineLevelAgain.type, centerlineLevelAgain.frameCount,
+      centerlineLevelAgainFrameIds);
+
+var rasterizer = new Rasterizer();
+rasterizer.colorMapped = true;
+rasterizer.xres = 40;
+rasterizer.yres = 30;
+rasterizer.dpi = 120;
+var toonzLevel = rasterizer.rasterize(outlineLevelAgain);
+var toonzLevelAgain = rasterizer.rasterize(outlineLevelAgain);
+var toonzLevelId = toonzLevel.id;
+var toonzFrame = toonzLevel.getFrame("2");
+print("qt-script-level-transformers-rasterizer", toonzLevel.type,
+      toonzLevel.frameCount, toonzLevel.getFrameIds().join(","),
+      toonzFrame.type, toonzFrame.width, toonzFrame.height);
+toonzFrame.dispose();
+toonzLevel.dispose();
+var toonzLevelAgainFrameIds = toonzLevelAgain.getFrameIds().join(",");
+var toonzFrameAgain = toonzLevelAgain.getFrame("1");
+print("qt-script-level-transformers-rasterizer-wrappers",
+      toonzLevelId > 0, toonzLevelAgain.id != toonzLevelId,
+      toonzLevelAgain.type, toonzLevelAgain.frameCount,
+      toonzLevelAgainFrameIds, toonzFrameAgain.type,
+      toonzFrameAgain.width, toonzFrameAgain.height);
+
+toonzFrameAgain.dispose();
+toonzLevelAgain.dispose();
+rasterizer.dispose();
+centerlineLevelAgain.dispose();
+centerlineVectorizer.dispose();
+outlineLevelAgain.dispose();
+outlineVectorizer.dispose();
+rasterLevel.dispose();
+source.dispose();
+
+"qt-script-level-transformers-result";

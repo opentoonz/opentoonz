@@ -1,0 +1,22 @@
+function hasErrorMessage(fn, message) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e).indexOf(message) >= 0;
+  }
+  return false;
+}
+
+var missingScript = "missing_" + (new Date()).getTime() + ".toonzscript";
+var errors = [
+  hasErrorMessage(function() { run(); }, "expected one parameter"),
+  hasErrorMessage(function() { run("basic.toonzscript", "extra"); },
+                  "expected one parameter"),
+  hasErrorMessage(function() { run(42); }, "file path"),
+  hasErrorMessage(function() { run(missingScript); }, "can't read file"),
+  hasErrorMessage(function() { run("run_error_child.toonzscript"); },
+                  "qt-script-run-child-error")
+];
+print("qt-script-run-errors", errors);
+
+"qt-script-run-errors-result";

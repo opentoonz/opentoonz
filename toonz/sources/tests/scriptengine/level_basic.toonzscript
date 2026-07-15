@@ -1,0 +1,26 @@
+var empty = new Level();
+print("qt-script-level-empty", empty.type, empty.frameCount,
+      empty.toString(), empty.getFrameIds().length);
+
+var scene = new Scene();
+var level = scene.newLevel("Vector", "qt6_vector");
+var fetched = scene.getLevel("qt6_vector");
+var levels = scene.getLevels();
+
+print("qt-script-level-created", level.type, level.name, level.frameCount,
+      level.toString());
+print("qt-script-level-get", fetched.type, fetched.name);
+print("qt-script-level-list", levels.length, levels[0].type, levels[0].name);
+print("qt-script-level-frames", level.getFrameIds().length);
+
+level.name = "qt6_vector_renamed";
+print("qt-script-level-renamed", level.name);
+
+empty.dispose();
+level.dispose();
+fetched.dispose();
+for (var i = 0; i < levels.length; ++i)
+  levels[i].dispose();
+scene.dispose();
+
+"qt-script-level-result";

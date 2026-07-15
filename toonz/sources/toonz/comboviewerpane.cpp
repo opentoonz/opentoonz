@@ -11,6 +11,7 @@
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include <QAction>
+#include <QActionGroup>
 #include <QMenu>
 #include <QSettings>
 

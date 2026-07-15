@@ -8,6 +8,8 @@
 #include "tapp.h"
 #include "toolpresetcommandmanager.h"
 
+#include "toonzqt/qtcompat.h"
+
 // ToonzLib
 #include "toonz/toonzfolders.h"
 // ToonzCore
@@ -59,13 +61,15 @@ void MyScroller::paintEvent(QPaintEvent*) {
 }
 
 void MyScroller::mousePressEvent(QMouseEvent* event) {
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
   m_anchorPos =
-      (m_orientation == Qt::Horizontal) ? event->pos().x() : event->pos().y();
+      (m_orientation == Qt::Horizontal) ? eventPos.x() : eventPos.y();
 }
 
 void MyScroller::mouseMoveEvent(QMouseEvent* event) {
+  const QPoint eventPos = QtCompat::mouseEventPosition(event);
   int currentPos =
-      (m_orientation == Qt::Horizontal) ? event->pos().x() : event->pos().y();
+      (m_orientation == Qt::Horizontal) ? eventPos.x() : eventPos.y();
   static int threshold = 5;
   if (m_anchorPos - currentPos >= threshold && m_actions[0]) {
     m_actions[0]->trigger();
@@ -142,14 +146,17 @@ TPanel* CustomPanelManager::createCustomPanel(const QString panelName,
   QUiLoader loader;
   QFile file(customPanelsFp.getQString());
 
-  file.open(QFile::ReadOnly);
-  QWidget* customWidget = loader.load(&file, panel);
-  file.close();
-
-  initializeControl(customWidget);
-
   panel->setWindowTitle(panelName);
-  panel->setWidget(customWidget);
+
+  if (file.open(QFile::ReadOnly)) {
+    QWidget* customWidget = loader.load(&file, panel);
+    file.close();
+
+    if (customWidget) {
+      initializeControl(customWidget);
+      panel->setWidget(customWidget);
+    }
+  }
 
   // Enable room binding feature (handled by TPanel base class)
   panel->addRoomBindButton();

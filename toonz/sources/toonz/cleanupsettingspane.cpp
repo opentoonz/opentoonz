@@ -12,6 +12,7 @@
 // ToonzQt includes
 #include "toonzqt/gutil.h"
 #include "toonzqt/doublefield.h"
+#include "toonzqt/qtcompat.h"
 
 // Toonz includes
 #include "tapp.h"
@@ -279,13 +280,16 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
   bool ret = true;
   ret      = ret && connect(m_autocenterBox, SIGNAL(clicked(bool)),
                             SLOT(onGenericSettingsChange()));
-  ret      = ret && connect(m_pegHolesOm, SIGNAL(activated(int)),
-                            SLOT(onGenericSettingsChange()));
-  ret      = ret && connect(m_fieldGuideOm, SIGNAL(activated(int)),
-                            SLOT(onGenericSettingsChange()));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_pegHolesOm, this,
+                   [this](int) { onGenericSettingsChange(); }));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_fieldGuideOm, this,
+                   [this](int) { onGenericSettingsChange(); }));
 
-  ret = ret && connect(m_rotateOm, SIGNAL(activated(int)),
-                       SLOT(onGenericSettingsChange()));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_rotateOm, this,
+                   [this](int) { onGenericSettingsChange(); }));
   ret = ret && connect(m_flipX, SIGNAL(clicked(bool)),
                        SLOT(onGenericSettingsChange()));
   ret = ret && connect(m_flipY, SIGNAL(clicked(bool)),
@@ -294,12 +298,15 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
       ret && connect(m_pathField, SIGNAL(pathChanged()), SLOT(onPathChange()));
   ret = ret && connect(m_sharpness, SIGNAL(valueChanged(bool)),
                        SLOT(onSharpnessChange(bool)));
-  ret = ret && connect(m_antialias, SIGNAL(activated(int)),
-                       SLOT(onGenericSettingsChange()));
-  ret = ret && connect(m_lineProcessing, SIGNAL(activated(int)),
-                       SLOT(onGenericSettingsChange()));
-  ret = ret && connect(m_lpNoneFormat, SIGNAL(activated(int)),
-                       SLOT(onGenericSettingsChange()));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_antialias, this,
+                   [this](int) { onGenericSettingsChange(); }));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_lineProcessing, this,
+                   [this](int) { onGenericSettingsChange(); }));
+  ret = ret && static_cast<bool>(QtCompat::connectComboBoxActivatedIndex(
+                   m_lpNoneFormat, this,
+                   [this](int) { onGenericSettingsChange(); }));
   ret = ret && connect(m_despeckling, SIGNAL(valueChanged(bool)),
                        SLOT(onGenericSettingsChange()));
   ret = ret && connect(m_aaValue, SIGNAL(valueChanged(bool)),

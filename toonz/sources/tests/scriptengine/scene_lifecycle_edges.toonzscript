@@ -1,0 +1,79 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return String(e.message || e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var image = new Image(new FilePath("toonz/sources/tnztools/Resources/brush.png"));
+var sceneA = new Scene();
+var sceneB = new Scene();
+var levelA = sceneA.newLevel("Raster", "qt6_scene_lifecycle_a");
+var levelB = sceneB.newLevel("Raster", "qt6_scene_lifecycle_b");
+
+levelA.setFrame("1", image);
+levelB.setFrame("1", image);
+
+var crossSceneLevelError = hasError(function() {
+  sceneB.setCell(0, 0, levelA, "1");
+}, "not included in the scene");
+
+print("qt-script-scene-lifecycle-isolation", sceneA.getLevels().length,
+      sceneB.getLevels().length, crossSceneLevelError,
+      sceneA.getLevel("qt6_scene_lifecycle_b") === undefined,
+      sceneB.getLevel("qt6_scene_lifecycle_a") === undefined);
+
+sceneA.setCell(0, 0, levelA, "1");
+var cellA = sceneA.getCell(0, 0);
+print("qt-script-scene-lifecycle-before-dispose", sceneA.frameCount,
+      sceneA.columnCount, cellA.level.name, cellA.fid);
+
+cellA.level.dispose();
+sceneA.dispose();
+
+var sceneErrors = [
+  hasError(function() { sceneA.toString(); }, "Invalid Scene object"),
+  hasError(function() { var value = sceneA.frameCount; },
+           "Invalid Scene object"),
+  hasError(function() { var value = sceneA.columnCount; },
+           "Invalid Scene object"),
+  hasError(function() { sceneA.getLevels(); }, "Invalid Scene object"),
+  hasError(function() { sceneA.load(new FilePath("missing_scene.tnz")); },
+           "Invalid Scene object"),
+  hasError(function() { sceneA.save(new FilePath("disposed_scene.tnz")); },
+           "Invalid Scene object"),
+  hasError(function() { sceneA.insertColumn(0); }, "Invalid Scene object"),
+  hasError(function() { sceneA.deleteColumn(0); }, "Invalid Scene object"),
+  hasError(function() { sceneA.getCell(0, 0); }, "Invalid Scene object"),
+  hasError(function() { sceneA.setCell(0, 0, levelA, "1"); },
+           "Invalid Scene object"),
+  hasError(function() { sceneA.getLevel("qt6_scene_lifecycle_a"); },
+           "Invalid Scene object"),
+  hasError(function() { sceneA.newLevel("Raster", "qt6_scene_lifecycle_c"); },
+           "Invalid Scene object"),
+  hasError(function() {
+    sceneA.loadLevel("qt6_scene_lifecycle_c",
+                     new FilePath("missing_level..tif"));
+  }, "Invalid Scene object")
+];
+
+var levelErrors = [
+  hasError(function() { levelA.setFrame("2", image); },
+           "Invalid Level object"),
+  hasError(function() { levelA.load(new FilePath("missing_level..tif")); },
+           "Invalid Level object")
+];
+
+print("qt-script-scene-lifecycle-after-dispose", sceneA.id,
+      levelA.type, levelA.frameCount, levelA.toString(), levelA.name === "");
+
+print("qt-script-scene-lifecycle-errors", sceneErrors, levelErrors);
+
+levelA.dispose();
+levelB.dispose();
+sceneB.dispose();
+image.dispose();
+
+"qt-script-scene-lifecycle-result";

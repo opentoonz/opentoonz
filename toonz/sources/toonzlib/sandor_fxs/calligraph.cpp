@@ -35,7 +35,6 @@ using namespace std;
 extern "C" {
 #endif
 
-#define P(d) tmsg_info(" - %d -\n", d)
 #define COPY_RASTER(inr, outr, border)                                         \
   tP.copy_raster(inr, outr, border, border, inr->lx - border - 1,              \
                  inr->ly - border - 1, 0, 0)

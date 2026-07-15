@@ -1,0 +1,46 @@
+function hasError(fn, needle) {
+  try {
+    fn();
+  } catch (e) {
+    return needle === undefined || String(e).indexOf(needle) >= 0;
+  }
+  return false;
+}
+
+var transform = new Transform();
+var shifted = transform.translate(-2, 3);
+var rotated = transform.rotate(-45);
+var scaled = transform.scale(0.5);
+var nonUniformScaled = transform.scale(0.5, 1.25);
+var shiftedAgain = shifted.translate(1, 1);
+
+print("qt-script-transform-edges-valid", shifted.toString(),
+      rotated.toString(), scaled.toString(), nonUniformScaled.toString());
+print("qt-script-transform-edges-chain", transform.toString(),
+      shifted.toString(), shiftedAgain.toString(),
+      transform.id !== shifted.id, shifted.id !== shiftedAgain.id);
+
+var disposed = new Transform();
+disposed.dispose();
+
+var errors = [
+  hasError(function() { new Transform(0); },
+           "Transform constructor expected no arguments"),
+  hasError(function() { transform.translate(1); }, "Transform.translate"),
+  hasError(function() { transform.translate("1", 2); }, "Transform.translate"),
+  hasError(function() { transform.rotate(); }, "Transform.rotate"),
+  hasError(function() { transform.rotate("90"); }, "Transform.rotate"),
+  hasError(function() { transform.scale(); }, "Transform.scale"),
+  hasError(function() { transform.scale("2"); }, "Transform.scale"),
+  hasError(function() { transform.scale(2, "3"); }, "Transform.scale"),
+  hasError(function() { transform.scale(1, 2, 3); }, "Transform.scale"),
+  hasError(function() { disposed.toString(); }, "Invalid Transform"),
+  hasError(function() { disposed.translate(1, 2); }, "Invalid Transform"),
+  hasError(function() { disposed.rotate(90); }, "Invalid Transform"),
+  hasError(function() { disposed.scale(2); }, "Invalid Transform")
+];
+print("qt-script-transform-edges-errors", errors);
+
+shiftedAgain.dispose();
+
+"qt-script-transform-edges-result";

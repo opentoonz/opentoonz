@@ -4,6 +4,7 @@
 #define FLIPBOOK_H
 
 #include "toonzqt/flipconsole.h"
+#include "toonzqt/qtcompat.h"
 #include "imageviewer.h"
 
 #include "tlevel_io.h"
@@ -176,6 +177,7 @@ protected:
   TLevelReaderP m_lr;
   TXshSimpleLevel *m_xl;
   int m_currentFrameToSave;
+  bool m_showSaveImagesCompletionInfo;
   SaveImagesPopup *m_savePopup;
   LoadImagesPopup *m_loadPopup;
 
@@ -208,7 +210,7 @@ public:
                 int currentFrame = 1, TSoundTrack *snd = 0);
   void setLevel(TXshSimpleLevel *xl);
   void onPlayCompleted() override {}
-  bool doSaveImages(TFilePath fp);
+  bool doSaveImages(TFilePath fp, bool showCompletionInfo = true);
   int getCurrentFrame() { return m_flipConsole->getCurrentFrame(); }
   QString getLevelZoomTitle() const { return m_title1 + m_title; }
   void setTitle(const QString &title);
@@ -284,7 +286,9 @@ protected:
   void focusInEvent(QFocusEvent *e) override;
   void resizeEvent(QResizeEvent *e) override;
 
-  void enterEvent(QEvent *e) override { m_flipConsole->makeCurrent(); }
+  void enterEvent(QtCompat::EnterEvent *e) override {
+    m_flipConsole->makeCurrent();
+  }
 
 signals:
 

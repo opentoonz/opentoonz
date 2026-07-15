@@ -2,6 +2,7 @@
 #include "trasterimage.h"
 #include "timageinfo.h"
 #if (defined(x64) || defined(__LP64__))
+#include "ttextcodec.h"
 #include "toonz/preferences.h"
 #include <QtCore>
 #endif
@@ -44,11 +45,11 @@ TLevelReaderPsd::TLevelReaderPsd(const TFilePath &path)
 #ifdef REF_LAYER_BY_NAME
 #if (defined(x64) || defined(__LP64__))
     if (layerStr != "frames") {
-      QTextCodec *layerNameCodec = QTextCodec::codecForName(
-          Preferences::instance()->getLayerNameEncoding().c_str());
       TPSDParser psdparser(m_path);
       m_layerId = psdparser.getLevelIdByName(
-          layerNameCodec->fromUnicode(layerStr).toStdString());
+          TTextCodec::fromUnicode(
+              Preferences::instance()->getLayerNameEncoding().c_str(), layerStr)
+              .toStdString());
     } else {
       m_layerId = layerStr.toInt();
     }

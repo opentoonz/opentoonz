@@ -11,6 +11,7 @@
 #include "trop.h"
 #include "tregion.h"
 #include "tcolorstyles.h"
+#include "toonzqt/qtcompat.h"
 
 #include <QPainter>
 #include <QColor>
@@ -24,7 +25,7 @@ QImage rasterToQImage(const TRasterP &ras, bool premultiplied, bool mirrored) {
     QImage image(ras->getRawData(), ras->getLx(), ras->getLy(),
                  premultiplied ? QImage::Format_ARGB32_Premultiplied
                                : QImage::Format_ARGB32);
-    if (mirrored) return image.mirrored();
+    if (mirrored) return QtCompat::mirroredImage(image);
     return image;
   } else if (TRasterGR8P ras8 = ras) {
     QImage image(ras->getRawData(), ras->getLx(), ras->getLy(), ras->getWrap(),
@@ -35,7 +36,7 @@ QImage rasterToQImage(const TRasterP &ras, bool premultiplied, bool mirrored) {
       for (i = 0; i < 256; i++) colorTable.append(QColor(i, i, i).rgb());
     }
     image.setColorTable(colorTable);
-    if (mirrored) return image.mirrored();
+    if (mirrored) return QtCompat::mirroredImage(image);
     return image;
   }
   return QImage();

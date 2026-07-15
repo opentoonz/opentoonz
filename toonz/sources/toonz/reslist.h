@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <map>
+#include <string>
 
 #include <QObject>
 
@@ -49,7 +50,7 @@ public:
         , m_xoffset("")
         , m_yoffset("") {}
     Res(std::string name, int xres, int yres, double ar, double fx = 0,
-        double fy = 0, std::string xoffset = 0, std::string yoffset = 0)
+        double fy = 0, std::string xoffset = "", std::string yoffset = "")
         : m_name(name)
         , m_xres(xres)
         , m_yres(yres)
@@ -79,8 +80,8 @@ public:
   const Res *getRes(const std::string &name) const;
 
   const Res *add(std::string name, int xres, int yres, double ar, double fx = 0,
-                 double fy = 0, std::string xoffset = 0,
-                 std::string yoffset = 0);
+                 double fy = 0, std::string xoffset = "",
+                 std::string yoffset = "");
   void remove(const std::string &name);
 
 signals:

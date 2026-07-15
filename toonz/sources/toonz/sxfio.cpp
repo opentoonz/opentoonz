@@ -15,8 +15,10 @@
 #include "toonz/txshleveltypes.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/preferences.h"
+#include "ttextcodec.h"
 
 #include "toonzqt/menubarcommand.h"
+#include "toonzqt/qtcompat.h"
 #include "menubarcommandids.h"
 
 #include <QFile>
@@ -24,7 +26,6 @@
 #include <QRegularExpression>
 #include <QUrl>
 #include <QDebug>
-#include <QTextCodec>
 #include <QByteArray>
 #include <QDataStream>
 #include <stdexcept>
@@ -46,6 +47,17 @@ int _exportArea       = 1;  // ACTION =0,CELL =1, ALL=2
 QString _directText   = QString();
 bool _bigFont         = false;
 int _textEncoding     = 0;  // 0: UTF-8, 1: SHIFT-JIS, 2: GBK
+
+const char *currentTextCodecName() {
+  switch (_textEncoding) {
+  case 1:
+    return "Shift-JIS";
+  case 2:
+    return "GBK";
+  default:
+    return "UTF-8";
+  }
+}
 
 int checkLanguage() {
   QString lang = Preferences::instance()->getCurrentLanguage();
@@ -172,19 +184,7 @@ void SxfProperty::write(QDataStream& stream) {
 
 quint32 SxfDirection::getSize() {
   QByteArray contentBytes;
-  QTextCodec* codec = nullptr;
-  switch (_textEncoding) {
-  case 1:
-    codec = QTextCodec::codecForName("Shift-JIS");
-    break;
-  case 2:
-    codec = QTextCodec::codecForName("GBK");
-    break;
-  default:
-    codec = QTextCodec::codecForName("UTF-8");
-    break;
-  }
-  contentBytes = codec->fromUnicode(content);
+  contentBytes = TTextCodec::fromUnicode(currentTextCodecName(), content);
 
   quint16 contentSize = static_cast<quint16>(contentBytes.size());
   return 2 + contentSize + 4;
@@ -203,19 +203,7 @@ void SxfDirection::read(QDataStream& stream) {
   contentBytes.resize(contentSize);
   stream.readRawData(contentBytes.data(), contentSize);
 
-  QTextCodec* codec = nullptr;
-  switch (_textEncoding) {
-  case 1:
-    codec = QTextCodec::codecForName("Shift-JIS");
-    break;
-  case 2:
-    codec = QTextCodec::codecForName("GBK");
-    break;
-  default:
-    codec = QTextCodec::codecForName("UTF-8");
-    break;
-  }
-  content = codec->toUnicode(contentBytes);
+  content = TTextCodec::toUnicode(currentTextCodecName(), contentBytes);
 
   stream >> bigFont;
 }
@@ -226,19 +214,7 @@ void SxfDirection::write(QDataStream& stream) {
   stream << getSize();
 
   QByteArray contentBytes;
-  QTextCodec* codec = nullptr;
-  switch (_textEncoding) {
-  case 1:
-    codec = QTextCodec::codecForName("Shift-JIS");
-    break;
-  case 2:
-    codec = QTextCodec::codecForName("GBK");
-    break;
-  default:
-    codec = QTextCodec::codecForName("UTF-8");
-    break;
-  }
-  contentBytes = codec->fromUnicode(content);
+  contentBytes = TTextCodec::fromUnicode(currentTextCodecName(), content);
 
   quint16 contentSize = static_cast<quint16>(contentBytes.size());
   stream << contentSize;
@@ -906,13 +882,13 @@ void ExportXDTSCommand::execute() {
 
     // leftLay
     {
-      leftLay->setMargin(5);
+      leftLay->setContentsMargins(5, 5, 5, 5);
       leftLay->setSpacing(10);
       // 1. Direction
       QGroupBox* textEditGroupBox = new QGroupBox(QObject::tr("Direction"));
 
       QVBoxLayout* textEditLay = new QVBoxLayout();
-      textEditLay->setMargin(10);
+      textEditLay->setContentsMargins(10, 10, 10, 10);
       textEditLay->setSpacing(8);
 
       {
@@ -929,7 +905,7 @@ void ExportXDTSCommand::execute() {
 
         bigFont->setText(QObject::tr("Large Font"));
 
-        QObject::connect(bigFont, &QCheckBox::stateChanged, [&](int state) {
+        auto updateDirectionFont = [&](Qt::CheckState state) {
           QFont font = directTextEdit->font();
           if (state == Qt::Checked) {
             font.setPointSize(14);  // Big Font
@@ -937,7 +913,10 @@ void ExportXDTSCommand::execute() {
             font.setPointSize(9);  // Normal Font
           }
           directTextEdit->setFont(font);
-        });
+        };
+
+        QtCompat::connectCheckStateChanged(bigFont, bigFont,
+                                           updateDirectionFont);
 
         optionsLay->addWidget(bigFont);
 
@@ -967,7 +946,7 @@ void ExportXDTSCommand::execute() {
     }
     // rightLay - Cell Marks and Export Settings
     {
-      rightLay->setMargin(5);
+      rightLay->setContentsMargins(5, 5, 5, 5);
       rightLay->setSpacing(10);
 
       // 2. Cell Marks
@@ -975,7 +954,7 @@ void ExportXDTSCommand::execute() {
           new QGroupBox(QObject::tr("Cell marks for SXF symbols"));
 
       QGridLayout* cellMarkLay = new QGridLayout();
-      cellMarkLay->setMargin(10);
+      cellMarkLay->setContentsMargins(10, 10, 10, 10);
       cellMarkLay->setVerticalSpacing(10);
       cellMarkLay->setHorizontalSpacing(5);
 
@@ -994,7 +973,7 @@ void ExportXDTSCommand::execute() {
 
       // 3. Export Settings
       QHBoxLayout* settingsLay = new QHBoxLayout();
-      settingsLay->setMargin(0);
+      settingsLay->setContentsMargins(0, 0, 0, 0);
       settingsLay->setSpacing(15);
 
       settingsLay->addStretch();
@@ -1078,10 +1057,7 @@ void ExportXDTSCommand::execute() {
   // Open containing folder
   if (ret == 2) {
     TFilePath folderPath = fp.getParentDir();
-    if (TSystem::isUNC(folderPath))
-      QDesktopServices::openUrl(QUrl(folderPath.getQString()));
-    else
-      QDesktopServices::openUrl(QUrl::fromLocalFile(folderPath.getQString()));
+    QDesktopServices::openUrl(QtCompat::localFileUrl(folderPath.getQString()));
   }
 }
 }  // namespace SxfIo

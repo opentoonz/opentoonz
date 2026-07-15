@@ -6,6 +6,7 @@
 // TnzQt includes
 #include "toonzqt/selection.h"
 #include "toonzqt/lineedit.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzCore includes
 #include "tpalette.h"
@@ -358,7 +359,7 @@ signals:
 protected:
   void paintEvent(QPaintEvent *) override;
 
-  void enterEvent(QEvent *event) override;
+  void enterEvent(QtCompat::EnterEvent *event) override;
   void leaveEvent(QEvent *event) override;
 
   void mousePressEvent(QMouseEvent *event) override;

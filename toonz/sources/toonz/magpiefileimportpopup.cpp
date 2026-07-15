@@ -31,7 +31,7 @@ MagpieInfo::MagpieInfo(TFilePath path)
     line = textStream.readLine();
     // E' la prima riga
     if (line == QString("Toonz")) continue;
-    if (!line.contains(L'|')) {
+    if (!line.contains(QChar('|'))) {
       if (!line.isEmpty()) m_actsIdentifier.append(line);
       continue;
     }

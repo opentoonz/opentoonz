@@ -18,6 +18,7 @@
 #include "toonzqt/planeviewer.h"
 #include "toonzqt/framenavigator.h"
 #include "toonzqt/imageutils.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/txsheet.h"
@@ -455,10 +456,7 @@ bool ExportAllLevelsPopup::isAllLevelsExported() {
         QString("%1 Levels Exported").arg(m_levelExportedCount), buttons);
     if (ret == 2) {
       TFilePath folderPath = TFilePath(m_browser->getFolder());
-      if (TSystem::isUNC(folderPath))
-        QDesktopServices::openUrl(QUrl(folderPath.getQString()));
-      else
-        QDesktopServices::openUrl(QUrl::fromLocalFile(folderPath.getQString()));
+      QDesktopServices::openUrl(QtCompat::localFileUrl(folderPath.getQString()));
     }
     // Reuse END
     m_levelExportedCount = 0;

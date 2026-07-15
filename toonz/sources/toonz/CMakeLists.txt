@@ -1,4 +1,7 @@
-set(VERSION 1.8)
+set(VERSION "${OPENTOONZ_APP_VERSION}")
+
+option(OPENTOONZ_ENABLE_GUI_SMOKE_HARNESS
+       "Compile the in-process GUI smoke harness used by scripts/qt6" ON)
 
 set(MOC_HEADERS
     addfilmstripframespopup.h
@@ -42,7 +45,6 @@ set(MOC_HEADERS
     filebrowser.h
     filebrowsermodel.h
     filebrowserpopup.h
-    fileinfopopup.h
     filmstrip.h
     flipbook.h
     formatsettingspopups.h
@@ -139,7 +141,7 @@ set(MOC_HEADERS
     exportcameratrackpopup.h
 )
 
-if(PLATFORM EQUAL 64)
+if((PLATFORM EQUAL 64) OR (OPENTOONZ_QT_MAJOR EQUAL 6))
     set(MOC_HEADERS
         ${MOC_HEADERS}
         ../stopmotion/stopmotion.h
@@ -409,7 +411,7 @@ set(SOURCES
     predict3d.cpp
 )
 
-if(PLATFORM EQUAL 64)
+if((PLATFORM EQUAL 64) OR (OPENTOONZ_QT_MAJOR EQUAL 6))
     set(SOURCES
         ${SOURCES}
         ../stopmotion/stopmotion.cpp
@@ -444,14 +446,14 @@ if(BUILD_ENV_MSVC)
     set(RC_FILE toonz.rc)
 endif()
 
-qt5_add_resources(SOURCES ${RESOURCES})
+opentoonz_qt_add_resources(SOURCES ${RESOURCES})
 
 if(BUILD_ENV_APPLE)
     #set_source_files_properties(${OBJCSOURCES} PROPERTIES LANGUAGE OBJCXX)
     set_source_files_properties(${OBJCSOURCES} PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif()
 
-qt5_wrap_cpp(SOURCES ${MOC_HEADERS})
+opentoonz_qt_wrap_cpp(SOURCES ${MOC_HEADERS})
 
 if(BUILD_ENV_MSVC)
     add_executable(OpenToonz WIN32 ${HEADERS} ${SOURCES} ${OBJCSOURCES} ${RESOURCES} ${RC_FILE})
@@ -480,6 +482,10 @@ if(BUILD_TARGET_WIN)
         -DUNICODE
         -D_UNICODE
     )
+endif()
+
+if(OPENTOONZ_ENABLE_GUI_SMOKE_HARNESS)
+    add_definitions(-DOPENTOONZ_ENABLE_GUI_SMOKE_HARNESS=1)
 endif()
 
 message("subdir: toonz")
@@ -524,14 +530,14 @@ if(BUILD_ENV_MSVC)
         target_compile_options(OpenToonz PRIVATE /EHsc) # Enable C++ Exceptions in Debug Mode.
     endif()
     if(PLATFORM EQUAL 64)
-        set(EXTRA_LIBS ${EXTRA_LIBS} Qt5::SerialPort ${TURBOJPEG_LIB} ${OpenCV_LIBS})
+        set(EXTRA_LIBS ${EXTRA_LIBS} ${QT_SERIALPORT_TARGET} ${TURBOJPEG_LIB} ${OpenCV_LIBS})
         if(WITH_CANON)
             set(EXTRA_LIBS ${EXTRA_LIBS} ${CANON_LIB})
         endif()
     endif()
     target_link_libraries(OpenToonz
-        Qt5::WinMain Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml
-        Qt5::Script Qt5::Widgets Qt5::PrintSupport Qt5::Multimedia Qt5::UiTools
+        ${QT_WINMAIN_TARGET} ${QT_CORE_LINK_TARGETS} ${QT_CORE5COMPAT_LINK_TARGETS} ${QT_GUI_TARGET} ${QT_NETWORK_TARGET} ${QT_OPENGL_LINK_TARGETS} ${QT_SVG_TARGET} ${QT_XML_TARGET}
+        ${QT_SCRIPT_TARGET} ${QT_WIDGETS_TARGET} ${QT_PRINTSUPPORT_TARGET} ${QT_MULTIMEDIA_TARGET} ${QT_UITOOLS_TARGET}
         ${GL_LIB} ${GLUT_LIB}
         ${EXTRA_LIBS} strmiids
         tnzcore tnzbase toonzlib colorfx tnzext image sound toonzqt tnztools tnzstdfx tfarm
@@ -545,7 +551,7 @@ elseif(BUILD_ENV_APPLE)
     set(EXTRA_LIBS ${EXTRA_LIBS} "$<TARGET_FILE:tnzstdfx>" "$<TARGET_FILE:tfarm>")
     set(X64ONLY_LIBS)
     if(PLATFORM EQUAL 64)
-        set(X64ONLY_LIBS ${X64ONLY_LIBS} Qt5::SerialPort ${TURBOJPEG_LIB} ${OpenCV_LIBS})
+        set(X64ONLY_LIBS ${X64ONLY_LIBS} ${QT_SERIALPORT_TARGET} ${TURBOJPEG_LIB} ${OpenCV_LIBS})
         if(WITH_CANON)
             set(X64ONLY_LIBS ${X64ONLY_LIBS} ${CANON_LIB})
         endif()
@@ -554,8 +560,8 @@ elseif(BUILD_ENV_APPLE)
     target_link_directories(OpenToonz PRIVATE ${MYPAINT_LIB_LIBRARY_DIRS})
 
     target_link_libraries(OpenToonz
-        Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml
-        Qt5::Script Qt5::Widgets Qt5::PrintSupport Qt5::Multimedia Qt5::MultimediaWidgets Qt5::UiTools
+        ${QT_CORE_LINK_TARGETS} ${QT_CORE5COMPAT_LINK_TARGETS} ${QT_GUI_TARGET} ${QT_NETWORK_TARGET} ${QT_OPENGL_LINK_TARGETS} ${QT_SVG_TARGET} ${QT_XML_TARGET}
+        ${QT_SCRIPT_TARGET} ${QT_WIDGETS_TARGET} ${QT_PRINTSUPPORT_TARGET} ${QT_MULTIMEDIA_TARGET} ${QT_MULTIMEDIA_WIDGETS_TARGET} ${QT_UITOOLS_TARGET}
         ${GL_LIB} ${GLUT_LIB}
         ${COCOA_LIB} ${EXTRA_LIBS} ${X64ONLY_LIBS} mousedragfilter
         ${MYPAINT_LIB_LIBRARIES}
@@ -565,7 +571,11 @@ elseif(BUILD_ENV_APPLE)
     add_dependencies(OpenToonz tnzcore tnzbase toonzlib colorfx tnzext image sound toonzqt tnztools tnzstdfx tfarm tcomposer tcleanup tconverter tfarmcontroller tfarmserver)
 
     # ADDED/UPDATED: Configure Info.plist for bundle (retina support etc.)
-    set_target_properties(OpenToonz PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/../cmake/BundleInfo.plist.in)
+    set_target_properties(OpenToonz PROPERTIES
+        MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/../cmake/BundleInfo.plist.in
+        MACOSX_BUNDLE_SHORT_VERSION_STRING "${OPENTOONZ_EFFECTIVE_BUNDLE_SHORT_VERSION}"
+        MACOSX_BUNDLE_BUNDLE_VERSION "${OPENTOONZ_EFFECTIVE_BUNDLE_VERSION}"
+    )
 
     # ADDED/UPDATED: Merged RPATH command (single one with both paths; || true for CI; COMMENT for logs)
     add_custom_command(TARGET OpenToonz POST_BUILD
@@ -582,16 +592,16 @@ elseif(BUILD_ENV_UNIXLIKE)
 
     set(EXTRA_LIBS ${EXTRA_LIBS} ${Boost_LIBRARIES} ${OPENBLAS_LIB} ${EXECINFO_LIBRARY})
     if(PLATFORM EQUAL 64)
-        set(EXTRA_LIBS ${EXTRA_LIBS} Qt5::SerialPort ${TURBOJPEG_LIB} ${OpenCV_LIBS})
+        set(EXTRA_LIBS ${EXTRA_LIBS} ${QT_SERIALPORT_TARGET} ${TURBOJPEG_LIB} ${OpenCV_LIBS})
     endif()
 
     if(BUILD_TARGET_WIN)
-        set(EXTRA_LIBS ${EXTRA_LIBS} Qt5::WinMain -lstrmiids -mwindows)
+        set(EXTRA_LIBS ${EXTRA_LIBS} ${QT_WINMAIN_TARGET} -lstrmiids -mwindows)
     endif()
 
     target_link_libraries(
-        OpenToonz Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml
-        Qt5::Script Qt5::Widgets Qt5::PrintSupport Qt5::Multimedia Qt5::UiTools
+        OpenToonz ${QT_CORE_LINK_TARGETS} ${QT_CORE5COMPAT_LINK_TARGETS} ${QT_GUI_TARGET} ${QT_NETWORK_TARGET} ${QT_OPENGL_LINK_TARGETS} ${QT_SVG_TARGET} ${QT_XML_TARGET}
+        ${QT_SCRIPT_TARGET} ${QT_WIDGETS_TARGET} ${QT_PRINTSUPPORT_TARGET} ${QT_MULTIMEDIA_TARGET} ${QT_UITOOLS_TARGET}
         ${GL_LIB} ${GLUT_LIB} ${GLU_LIB}
         ${EXTRA_LIBS}
     )

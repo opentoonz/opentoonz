@@ -1,0 +1,13 @@
+var scriptGlobal = (function() { return this; })();
+var voidValue = scriptGlobal["void"];
+
+var printResult = print("qt-script-global-output-print", "text", 3, true,
+                        false, undefined, null, [1, "two", false]);
+var warningResult = warning("qt-script-global-output-warning", "warn", 4,
+                            true, null);
+
+print("qt-script-global-output-return", printResult === voidValue,
+      warningResult === voidValue, typeof voidValue, dummy());
+print("qt-script-global-output-version", ToonzVersion, typeof ToonzVersion);
+
+"qt-script-global-output-edges-result";

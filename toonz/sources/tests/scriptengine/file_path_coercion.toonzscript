@@ -1,0 +1,16 @@
+var fp = new FilePath("alpha/beta/test.tif");
+var parent = fp.parentDirectory;
+var copied = new FilePath(fp);
+
+print("qt-script-filepath-coercion-values", fp.valueOf(), String(fp),
+      fp + "", "" + fp, copied.valueOf());
+
+print("qt-script-filepath-coercion-parent", parent.valueOf(),
+      parent + "/child.txt", parent.concat("child.txt").valueOf());
+
+var renamed = fp.withName("renamed");
+var changedType = renamed.withExtension("png");
+print("qt-script-filepath-coercion-chain", renamed.valueOf(),
+      changedType.valueOf(), changedType.toString());
+
+"qt-script-filepath-coercion-result";

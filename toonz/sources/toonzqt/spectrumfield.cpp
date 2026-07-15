@@ -5,6 +5,7 @@
 #include "tconvert.h"
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 
 #include "tcolorstyles.h"
 
@@ -191,7 +192,7 @@ void SpectrumBar::paintEvent(QPaintEvent *e) {
    position.
 */
 void SpectrumBar::mousePressEvent(QMouseEvent *e) {
-  QPoint pos = e->pos();
+  QPoint pos = QtCompat::mouseEventPosition(e);
   int x      = pos.x();
 
   // Verifico se esiste una key vicino alla posizione in cui ho cliccato
@@ -216,7 +217,7 @@ void SpectrumBar::mousePressEvent(QMouseEvent *e) {
                 erase current key; otherwise move current key position.
 */
 void SpectrumBar::mouseMoveEvent(QMouseEvent *e) {
-  QPoint pos = e->pos();
+  QPoint pos = QtCompat::mouseEventPosition(e);
   int x      = pos.x();
   int y      = pos.y();
   if (x < m_x0 || x > width() - m_x0 - 1) return;
@@ -246,7 +247,7 @@ void SpectrumBar::mouseMoveEvent(QMouseEvent *e) {
 
 void SpectrumBar::mouseReleaseEvent(QMouseEvent *e) {
   if (m_currentKeyIndex == -1) return;
-  QPoint pos = e->pos();
+  QPoint pos = QtCompat::mouseEventPosition(e);
   int x      = pos.x();
   int y      = pos.y();
   if (x < m_x0 || x > width() - m_x0 - 1) return;

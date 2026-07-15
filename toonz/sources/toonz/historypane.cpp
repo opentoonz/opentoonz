@@ -1,5 +1,7 @@
 #include "historypane.h"
 
+#include "toonzqt/qtcompat.h"
+
 #include "tundo.h"
 #include "historytypes.h"
 
@@ -157,7 +159,7 @@ int HistoryField::index2y(int index) const {
 //-----------------------------------------------------------------------------
 
 void HistoryField::mousePressEvent(QMouseEvent *event) {
-  int index        = y2index(event->pos().y());
+  int index        = y2index(QtCompat::mouseEventPosition(event).y());
   int historyCount = TUndoManager::manager()->getHistoryCount();
 
   if (index > historyCount || index <= 0) return;

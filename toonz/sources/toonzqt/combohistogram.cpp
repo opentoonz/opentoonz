@@ -12,6 +12,7 @@
 #include "toonz/preferences.h"
 #include "toonzqt/lutcalibrator.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 #include "timagecache.h"
 #include "trasterimage.h"
 
@@ -566,8 +567,8 @@ ComboHistogram::ComboHistogram(QWidget *parent)
 
   m_rectAverageRgbLabel->setColorAndUpdate(Qt::transparent);
 
-  connect(m_displayModeCombo, SIGNAL(activated(int)), this,
-          SLOT(onDisplayModeChanged()));
+  QtCompat::connectComboBoxActivatedIndex(
+      m_displayModeCombo, this, [this](int) { onDisplayModeChanged(); });
   connect(m_histograms[3], SIGNAL(showButtonToggled(bool)), this,
           SLOT(onShowAlphaButtonToggled(bool)));
   connect(m_rangeUpBtn, SIGNAL(clicked()), this, SLOT(onRangeUp()));

@@ -55,7 +55,8 @@ bool TGeometryFx::doGetBBox(double frame, TRectD &bBox,
     TRasterFxP fx = input->getFx();
     assert(fx);
     bool ret = fx->doGetBBox(frame, bBox, info);
-    if (getActiveTimeRegion().contains(frame))
+    if (getActiveTimeRegion().contains(frame) &&
+        bBox != TConsts::infiniteRectD)
       bBox = getPlacement(frame) * bBox;
     return ret;
   } else {

@@ -10,7 +10,10 @@
 // Qt includes
 #include <QOpenGLShaderProgram>
 #include <QOpenGLShader>
+#include <QOpenGLContext>
+#include <QOpenGLExtraFunctions>
 #include <QDir>
+#include <QDebug>
 
 #include "stdfx/shaderinterface.h"
 
@@ -175,15 +178,29 @@ std::pair<QOpenGLShaderProgram *, QDateTime> ShaderInterface::makeProgram(
 
   result.first = new QOpenGLShaderProgram;
 
-  ::loadShader(sd.m_type, sd.m_path, result);
+  if (!::loadShader(sd.m_type, sd.m_path, result)) {
+    qWarning().noquote() << "OpenToonz shader compilation failed:"
+                         << sd.m_path.getQString();
+    qWarning().noquote() << result.first->log();
+    delete result.first;
+    result.first = nullptr;
+    return result;
+  }
 
   if (varyingsCount > 0)
-    glTransformFeedbackVaryings(result.first->programId(), varyingsCount,
-                                varyingNames, GL_INTERLEAVED_ATTRIBS);
+    QOpenGLContext::currentContext()->extraFunctions()->
+        glTransformFeedbackVaryings(result.first->programId(), varyingsCount,
+                                    varyingNames, GL_INTERLEAVED_ATTRIBS);
   // NOTE: Since we'll be drawing a single vertex, GL_INTERLEAVED_ATTRIBS is
   // less restrictive than GL_SEPARATE_ATTRIBS.
 
-  result.first->link();
+  if (!result.first->link()) {
+    qWarning().noquote() << "OpenToonz shader link failed:"
+                         << sd.m_path.getQString();
+    qWarning().noquote() << result.first->log();
+    delete result.first;
+    result.first = nullptr;
+  }
 
   return result;
 }

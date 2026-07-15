@@ -11,6 +11,7 @@
 #include "toonzqt/schematicgroupeditor.h"
 #include "toonzqt/swatchviewer.h"
 #include "toonzqt/tselectionhandle.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/txsheet.h"
@@ -991,7 +992,7 @@ void FxSchematicScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
   if (cme->modifiers() & Qt::ControlModifier) {
     menu.addAction(m_addFxContextMenu.getAgainCommand(AddFxContextMenu::Add));
     if (!menu.actions().isEmpty()) {
-      menu.exec(cme->screenPos());
+      menu.exec(QtCompat::graphicsSceneContextMenuEventGlobalPosition(cme));
       return;
     }
   }
@@ -1020,7 +1021,7 @@ void FxSchematicScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
   menu.addAction(cut);
   menu.addAction(paste);
   m_selection->setPastePosition(TPointD(scenePos.x(), scenePos.y()));
-  menu.exec(cme->screenPos());
+  menu.exec(QtCompat::graphicsSceneContextMenuEventGlobalPosition(cme));
   m_selection->setPastePosition(TConst::nowhere);
 }
 

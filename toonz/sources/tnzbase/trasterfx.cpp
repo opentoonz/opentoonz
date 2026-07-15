@@ -560,8 +560,8 @@ TAffine TRasterFx::handledAffine(const TRenderSettings &info, double frame) {
 bool TRasterFx::getBBox(double frame, TRectD &bBox,
                         const TRenderSettings &info) {
   bool ret = doGetBBox(frame, bBox, info);
-  if (!bBox.isEmpty()) {  // TODO: check if bbox can always be empty when ret ==
-                          // false
+  if (!bBox.isEmpty() && bBox != TConsts::infiniteRectD) {
+    // TODO: check if bbox can always be empty when ret == false
     bBox = info.m_affine * bBox;
     enlargeToI(bBox);
   }
@@ -713,7 +713,7 @@ void TRasterFx::dryCompute(TRectD &rect, double frame,
     // faccia
     // diventare TRectD() non vuoto!!
     getBBox(frame, bbox, info);
-    enlargeToI(bbox);
+    if (bbox != TConsts::infiniteRectD) enlargeToI(bbox);
 
     TRectD interestingRect(rect * bbox);
     if (myIsEmpty(interestingRect)) return;
@@ -725,7 +725,7 @@ void TRasterFx::dryCompute(TRectD &rect, double frame,
   } else {
     TRectD bbox;
     getBBox(frame, bbox, info);
-    enlargeToI(bbox);
+    if (bbox != TConsts::infiniteRectD) enlargeToI(bbox);
 
     TRectD interestingRect(rect * bbox);
     if (myIsEmpty(interestingRect)) return;
@@ -893,7 +893,7 @@ void TRasterFx::compute(TTile &tile, double frame,
 
   TRectD bbox;
   getBBox(frame, bbox, info);
-  enlargeToI(bbox);
+  if (bbox != TConsts::infiniteRectD) enlargeToI(bbox);
 
   TRectD interestingRect(tilePlacement * bbox);
   if (myIsEmpty(interestingRect)) return;

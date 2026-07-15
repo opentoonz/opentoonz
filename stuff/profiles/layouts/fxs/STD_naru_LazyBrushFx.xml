@@ -10,7 +10,7 @@
     <control>ref_bgcolor</control>
     <control>auto_scribble_threshold</control>
 
-   	<separator label="Advanced"/>
+    <separator label="Advanced"/>
     <control>log_scale</control>
     <control>scr_type</control>
     <control>lambda</control>

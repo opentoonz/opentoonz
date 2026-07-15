@@ -7,6 +7,6 @@ add_executable(tfarmcontroller
 )
 
 target_link_libraries(tfarmcontroller
-    Qt5::Core
+    ${QT_CORE_LINK_TARGETS}
     tfarm
 )

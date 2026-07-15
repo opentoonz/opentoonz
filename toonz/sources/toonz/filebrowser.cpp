@@ -19,6 +19,7 @@
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/qtcompat.h"
 #include "toonzqt/trepetitionguard.h"
 
 // TnzLib includes
@@ -54,7 +55,6 @@
 #include <QDateTime>
 #include <QInputDialog>
 #include <QDesktopServices>
-#include <QDirModel>
 #include <QDir>
 #include <QPixmap>
 #include <QUrl>
@@ -1411,7 +1411,7 @@ void FileBrowser::startDragDrop() {
   for (const TFilePath &f : files) {
     if (TSystem::doesExistFileOrLevel(f))
       urls.append(
-          QUrl::fromLocalFile(QString::fromStdWString(f.getWideString())));
+          QtCompat::localFileUrl(QString::fromStdWString(f.getWideString())));
   }
   if (urls.isEmpty()) return;
 

@@ -33,7 +33,6 @@
 
 #include <QDebug>
 #include <QApplication>
-#include <QDesktopWidget>
 
 //=============================================================================
 // Scale Constraints

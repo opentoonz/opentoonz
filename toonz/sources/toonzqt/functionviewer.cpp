@@ -807,7 +807,7 @@ void FunctionViewer::save(QSettings &settings) const {
 
 void FunctionViewer::load(QSettings &settings) {
   QVariant toggleStatus = settings.value("toggleStatus");
-  if (toggleStatus.canConvert(QVariant::Int)) {
+  if (toggleStatus.canConvert<int>()) {
     m_toggleStatus = toggleStatus.toInt();
   }
 

@@ -19,6 +19,7 @@
 #include "tgl.h"
 #include "tapp.h"
 #include "tenv.h"
+#include "tbuildinfo.h"
 #include "tconvert.h"
 #include "texception.h"
 #include "tfilepath_io.h"
@@ -26,6 +27,9 @@
 #include "toonz/tproject.h"
 #include "toonz/tscenehandle.h"
 #include "toonz/toonzscene.h"
+#include "toonzqt/qtcompat.h"
+
+#include <cstdio>
 
 #include <QOperatingSystemVersion>
 #include <QDesktopServices>
@@ -152,7 +156,7 @@ static void printBacktrace(std::string &out) {
     if (frameStack++ < frameSkip) continue;
     char numStr[32];
     memset(numStr, 0, sizeof(numStr));
-    sprintf(numStr, "%3i> ", frameStack - frameSkip);
+    snprintf(numStr, sizeof(numStr), "%3i> ", frameStack - frameSkip);
     out.append(numStr);
 
     sourceSym->SizeOfStruct  = sizeof(IMAGEHLP_SYMBOL64);
@@ -181,7 +185,8 @@ static void printBacktrace(std::string &out) {
         out.append("}");
       } else {
         memset(numStr, 0, sizeof(numStr));
-        sprintf(numStr, " [0x%" PRIx64 "]", stackframe.AddrPC.Offset);
+        snprintf(numStr, sizeof(numStr), " [0x%" PRIx64 "]",
+                 stackframe.AddrPC.Offset);
         out.append(numStr);
       }
       out.append(" <");
@@ -289,9 +294,10 @@ static bool sh(std::string &out, const char *cmd) {
 static bool addr2line(std::string &out, const char *exepath, const char *addr) {
   char cmd[512];
 #ifdef MACOSX
-  sprintf(cmd, "atos -o \"%.400s\" %s 2>&1", exepath, addr);
+  snprintf(cmd, sizeof(cmd), "atos -o \"%.400s\" %s 2>&1", exepath, addr);
 #else
-  sprintf(cmd, "addr2line -f -p -e \"%.400s\" %s 2>&1", exepath, addr);
+  snprintf(cmd, sizeof(cmd), "addr2line -f -p -e \"%.400s\" %s 2>&1", exepath,
+           addr);
 #endif
   return sh(out, cmd);
 }
@@ -330,7 +336,7 @@ static void printBacktrace(std::string &out) {
       if (frameStack++ < frameSkip) continue;
       char numStr[32];
       memset(numStr, 0, sizeof(numStr));
-      sprintf(numStr, "%3i> ", frameStack - frameSkip);
+      snprintf(numStr, sizeof(numStr), "%3i> ", frameStack - frameSkip);
       out.append(numStr);
 
       std::string sym = bts[i];
@@ -495,7 +501,7 @@ void CrashHandler::openWebpage() {
 
 void CrashHandler::openFolder() {
   TFilePath fp = ToonzFolder::getCrashReportFolder();
-  QDesktopServices::openUrl(QUrl("file:///" + fp.getQString()));
+  QDesktopServices::openUrl(QtCompat::localFileUrl(fp.getQString()));
 }
 
 //-----------------------------------------------------------------------------
@@ -553,7 +559,8 @@ bool CrashHandler::trigger(const QString reason, bool showDialog) {
 
   // Generate report
   try {
-    out.append(TEnv::getApplicationFullName() + "  (Build " + __DATE__ ")\n");
+    out.append(TEnv::getApplicationFullName() + "  (Build " +
+               OPENTOONZ_BUILD_DATE + ")\n");
     out.append("\nReport Date: ");
     out.append(dateName);
     out.append("\nCrash Reason: ");

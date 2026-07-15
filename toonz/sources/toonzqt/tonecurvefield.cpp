@@ -5,6 +5,7 @@
 #include "toonzqt/doublepairfield.h"
 #include "toonzqt/checkbox.h"
 #include "toonzqt/doublefield.h"
+#include "toonzqt/qtcompat.h"
 #include <QPainter>
 #include <QPainterPath>
 #include <QStackedWidget>
@@ -708,7 +709,7 @@ void ChennelCurveEditor::paintEvent(QPaintEvent *e) {
 //-----------------------------------------------------------------------------
 
 void ChennelCurveEditor::mouseMoveEvent(QMouseEvent *e) {
-  QPointF posF = viewToStrokePoint(QPointF(e->pos()));
+  QPointF posF = viewToStrokePoint(QtCompat::mouseEventPositionF(e));
   if (m_mouseButton == Qt::LeftButton && m_currentControlPointIndex != -1) {
     moveCurrentControlPoint(posF - m_preMousePos);
     m_preMousePos = posF;
@@ -722,7 +723,7 @@ void ChennelCurveEditor::mousePressEvent(QMouseEvent *e) {
   m_mouseButton = e->button();
   setFocus();
   if (m_mouseButton == Qt::LeftButton) {
-    QPointF posF = viewToStrokePoint(QPointF(e->pos()));
+    QPointF posF = viewToStrokePoint(QtCompat::mouseEventPositionF(e));
     double minDistance;
     int controlPointIndex = getClosestPointIndex(posF, minDistance);
 

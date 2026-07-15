@@ -1340,8 +1340,9 @@ TFxP buildSceneFx(ToonzScene *scene, TXsheet *xsh, double row, int whichLevels,
   fx = TFxUtil::makeAffine(fx, aff);
   if (fx) fx->setName(L"CameraDPI and Shrink NAffineFx");
 
-  fx = TFxUtil::makeOver(
-      TFxUtil::makeColorCard(scene->getProperties()->getBgColor()), fx);
+  const TPixel32 bgColor = scene->getProperties()->getBgColor();
+  if (bgColor.m > 0)
+    fx = TFxUtil::makeOver(TFxUtil::makeColorCard(bgColor), fx);
   return fx;
 }
 

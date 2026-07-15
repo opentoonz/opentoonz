@@ -16,6 +16,7 @@
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/checkbox.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/txshcell.h"
@@ -248,11 +249,15 @@ m_contrastField->setValue(0);
   // SLOT(onValuesChanged(bool)));
   // ret = ret && connect(m_contrastField,   SIGNAL(valueChanged(bool)), this,
   // SLOT(onValuesChanged(bool)));
-  ret = ret && connect(m_previewChk, SIGNAL(stateChanged(int)), this,
-                       SLOT(onPreviewCheckboxChanged(int)));
+  ret = ret && static_cast<bool>(QtCompat::connectCheckStateChanged(
+                   m_previewChk, this, [this](Qt::CheckState state) {
+                     onPreviewCheckboxChanged(static_cast<int>(state));
+                   }));
 
-  ret = ret && connect(m_alphaChk, SIGNAL(stateChanged(int)), this,
-                       SLOT(onAlphaCheckboxChanged(int)));
+  ret = ret && static_cast<bool>(QtCompat::connectCheckStateChanged(
+                   m_alphaChk, this, [this](Qt::CheckState state) {
+                     onAlphaCheckboxChanged(static_cast<int>(state));
+                   }));
 
   assert(ret);
 

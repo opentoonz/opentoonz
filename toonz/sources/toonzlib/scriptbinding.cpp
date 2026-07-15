@@ -100,7 +100,7 @@ QScriptValue checkArgumentCount(QScriptContext *context, const QString &name,
 
 QScriptValue checkColor(QScriptContext *context, const QString &colorName,
                         QColor &color) {
-  color.setNamedColor(colorName);
+  color = QColor(colorName);
   if (!color.isValid()) {
     return context->throwError(
         QObject::tr("%1 is not a valid color (valid color names are 'red', "

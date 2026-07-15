@@ -5,6 +5,7 @@
 // Tnz6 includes
 #include "tapp.h"
 #include "dvwidgets.h"
+#include "toonzqt/qtcompat.h"
 
 // TnzLib includes
 #include "toonz/tscenehandle.h"
@@ -150,10 +151,10 @@ FormatSettingsPopup::FormatSettingsPopup(QWidget *parent,
 
     m_mainLayout->addWidget(frameFormatGB, currentRow + 1, 0, 1, 2);
 
-    connect(m_sepCharCB, SIGNAL(activated(int)), this,
-            SLOT(onSepCharCBChanged()));
-    connect(m_paddingCB, SIGNAL(activated(int)), this,
-            SLOT(onPaddingCBChanged()));
+    QtCompat::connectComboBoxActivatedIndex(
+        m_sepCharCB, this, [this](int) { onSepCharCBChanged(); });
+    QtCompat::connectComboBoxActivatedIndex(
+        m_paddingCB, this, [this](int) { onPaddingCBChanged(); });
   }
 
   QPushButton *closeButton = new QPushButton(tr("Close"));

@@ -16,8 +16,6 @@
 //#pragma warning(disable: 4786)
 //#include "tmsg.h"
 
-#define P(d) tmsg_info(" - %d -\n", d)
-
 class CYOMBParam {
 public:
   bool m_isRandomSampling;

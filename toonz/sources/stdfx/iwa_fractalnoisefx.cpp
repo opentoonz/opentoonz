@@ -620,6 +620,11 @@ void Iwa_FractalNoiseFx::convert(double *buf, const FNParam &param) {
     return;
 
   switch (param.fractalType) {
+  case Basic:
+  case Dynamic:
+  case DynamicTwist:
+  case FractalTypeCount:
+    return;
   case TurbulentSmooth:
     *buf = std::pow(std::abs(*buf - 0.5), 2.0) * 3.75;
     *buf = to_linear_color_space(*buf, 1.0, turbulentGamma);
