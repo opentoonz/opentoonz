@@ -33,6 +33,9 @@ class DockWidget;
 class DockPlaceholder;
 class DockSeparator;
 class DockDecoAllocator;
+class DockTabStrip;
+class DockJoinHighlight;
+class TabBarContainter;
 
 class Region;
 
@@ -80,9 +83,14 @@ class DVAPI DockLayout final : public QLayout {
   // Decoration-related allocator (separators)
   DockDecoAllocator *m_decoAllocator;
 
+  DockJoinHighlight *m_joinHighlight;
+  Region *m_joinHighlightRegion;
+
 public:
   DockLayout();
   virtual ~DockLayout();
+
+  static bool canParticipateInTabGroup(const DockWidget *widget);
 
   // QLayout item handling (see Qt reference)
   int count(void) const override;
@@ -113,6 +121,19 @@ public:
   bool undockItem(DockWidget *item);
   void calculateDockPlaceholders(DockWidget *item);
 
+  // Hover-join (tabify) support
+  void tabifyItem(DockWidget *item, Region *region);
+  void tabifyWithTarget(DockWidget *item, DockWidget *target);
+  void setActiveTab(Region *region, int index);
+  void moveTab(Region *region, int fromIndex, int toIndex);
+  bool beginTabDragOut(DockWidget *item, Region *region,
+                       const QPoint &globalPos,
+                       const QPoint &grabOffsetInTab);
+  void setJoinHighlight(Region *region);
+  void clearJoinHighlight();
+  DockWidget *dockWidgetTitleBarAt(const QPoint &globalPos) const;
+  int tabStripHeight() const;
+
   // Query methods
   Region *rootRegion() const {
     return m_regions.size() ? m_regions.front() : 0;
@@ -135,6 +156,16 @@ private:
   void applyGeometry();
   inline void updateSeparatorCursors();
   Region *dockItemPrivate(DockWidget *item, Region *r, int idx);
+
+  void ensureTabStrip(Region *region);
+  void destroyTabStrip(Region *region);
+  void updateTabVisibility(Region *region);
+  void updateJoinHighlightGeometry();
+  void restoreSingleDockedPanel(DockWidget *item);
+  bool removeFromTabGroup(DockWidget *item, Region *region,
+                          bool deferStripDestroy = false);
+  bool undockFromTabGroup(DockWidget *item, Region *region,
+                          bool deferStripDestroy = false);
 
   // Insertion and removal check - called internally by dock/undockItem
   bool isPossibleInsertion(DockWidget *item, Region *parentRegion,
@@ -176,7 +207,7 @@ public:
       fixed = 1,     // to be used with setFixedWidth()
       sizeable = 2   // allow panel to be sizeable but doesn't auto resize
   };
-  int getFixWidthMode() { return m_modeFixWidth; }
+  int getFixWidthMode() const { return m_modeFixWidth; }
   void setFixWidthMode(int fixedmode) { m_modeFixWidth = fixedmode; }
 
 protected:
@@ -206,6 +237,12 @@ protected:
 private:
   QPoint m_dragInitialPos;
   QPoint m_dragMouseInitialPos;
+  // Click offset relative to the title bar's (or drag grip's) own top-left,
+  // captured at press time. Used to re-anchor the panel precisely under the
+  // cursor right after a docked->floating transition, whose layout may shift
+  // the grip widget (e.g. a frame margin appearing around custom title
+  // bars).
+  QPoint m_dragGripPressOffset;
 
   // Widget and Layout links
   DockLayout *m_parentLayout;
@@ -280,6 +317,7 @@ public:
 
   // Placeholders-related methods
   virtual void selectDockPlaceholder(QMouseEvent *me);
+  DockPlaceholder *tabifyPlaceholderAt(const QPoint &globalPos) const;
   void clearDockPlaceholders();
 
   // Decorations allocator
@@ -445,7 +483,8 @@ public:
     bottom  = 3,
     sepHor  = 4,
     sepVert = 5,
-    root    = 6
+    root    = 6,
+    tabify  = 7
   };
   int getAttribute() const { return m_attributes; }
   void setAttribute(int attribute) { m_attributes = attribute; }
@@ -495,7 +534,6 @@ class Region {
   friend class DockLayout;     // Layout is the main operating class over
                                // rectangular regions - need full access
   friend class DockSeparator;  // Separators need access to extremal sizes
-                               // methods when moving themselves
 
   DockLayout *m_owner;
   DockWidget *m_item;
@@ -513,9 +551,21 @@ class Region {
 
   int m_saveIndex;
 
+  // Tab group state (hover-join). Empty when the region hosts a single panel.
+  std::vector<DockWidget *> m_tabItems;
+  int m_activeTabIndex;
+  DockTabStrip *m_tabStrip;
+  TabBarContainter *m_tabStripContainer;
+
 public:
   Region(DockLayout *owner, DockWidget *item = 0)
-      : m_owner(owner), m_item(item), m_parent(0), m_orientation(0) {}
+      : m_owner(owner)
+      , m_item(item)
+      , m_parent(0)
+      , m_orientation(0)
+      , m_activeTabIndex(0)
+      , m_tabStrip(0)
+      , m_tabStripContainer(0) {}
   ~Region();
 
   enum { inf = 1000000 };
@@ -528,6 +578,13 @@ public:
   QSizeF getSize() const { return QSizeF(m_rect.width(), m_rect.height()); }
   Region *getParent() const { return m_parent; }
   DockWidget *getItem() const { return m_item; }
+
+  bool isTabbed() const { return m_tabItems.size() > 1; }
+  const std::vector<DockWidget *> &tabItems() const { return m_tabItems; }
+  int activeTabIndex() const { return m_activeTabIndex; }
+  DockWidget *activeTab() const;
+  DockTabStrip *tabStrip() const { return m_tabStrip; }
+  TabBarContainter *tabStripContainer() const { return m_tabStripContainer; }
 
   const std::deque<Region *> &getChildList() const { return m_childList; }
   Region *childRegion(int i) const { return m_childList[i]; }

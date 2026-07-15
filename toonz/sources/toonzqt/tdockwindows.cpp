@@ -356,9 +356,13 @@ TDockPlaceholder::TDockPlaceholder(DockWidget *owner, Region *r, int idx,
     : DockPlaceholder(owner, r, idx, attributes) {
   setAutoFillBackground(true);
 
-  setObjectName("TDockPlaceholder");
+  if (attributes == DockPlaceholder::tabify)
+    setObjectName("TDockTabifyPlaceholder");
+  else
+    setObjectName("TDockPlaceholder");
 
-  setWindowOpacity(0.8);
+  // Tabify targets are highlighted on the panel itself; keep hit area invisible.
+  setWindowOpacity(attributes == DockPlaceholder::tabify ? 0.0 : 0.8);
 }
 
 //----------------------------------------
@@ -474,6 +478,8 @@ void TDockWidget::selectDockPlaceholder(QMouseEvent *me) {
       if (m_selectedPlace) m_selectedPlace->hide();
       if (selected) selected->show();
     }
+
+    if (parentLayout()) parentLayout()->clearJoinHighlight();
 
     m_selectedPlace = selected;
   } else

@@ -788,7 +788,11 @@ void TPanelTitleBar::paintEvent(QPaintEvent *) {
         dw->windowTitle(), Qt::ElideRight, rect.width() - 50);
 
     painter.setBrush(Qt::NoBrush);
-    painter.setPen(isPanelActive ? m_activeTitleColor : m_titleColor);
+    // Title text attenuation is reserved for inactive tabs within a
+    // hover-join tab group (see DockTabStrip::updateTabTextColors); a
+    // standalone or floating panel's own title bar always stays fully
+    // opaque, regardless of focus.
+    painter.setPen(m_activeTitleColor);
     painter.drawText(QPointF(8, 13), titleText);
   }
 
