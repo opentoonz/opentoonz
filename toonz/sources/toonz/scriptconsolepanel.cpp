@@ -29,6 +29,8 @@
 #include <QScriptEngine>
 #endif
 #include <QFile>
+#include <QMetaObject>
+#include <QThread>
 #include <QTextStream>
 
 #include "timage.h"
@@ -199,6 +201,13 @@ ScriptConsolePanel::~ScriptConsolePanel() {}
 #if OPENTOONZ_QT_MAJOR >= 6
 
 QString ScriptConsolePanel::viewScriptImage(int imageId) {
+  if (QThread::currentThread() != thread()) {
+    QString result;
+    QMetaObject::invokeMethod(
+        this, [this, imageId, &result]() { result = viewScriptImage(imageId); },
+        Qt::BlockingQueuedConnection);
+    return result;
+  }
   ScriptEngine *engine = m_scriptConsole ? m_scriptConsole->getEngine() : 0;
   TImage *image        = engine ? engine->scriptImageForView(imageId) : 0;
   if (!image) return tr("Can't view an empty image");
@@ -212,6 +221,13 @@ QString ScriptConsolePanel::viewScriptImage(int imageId) {
 }
 
 QString ScriptConsolePanel::viewScriptLevel(int levelId) {
+  if (QThread::currentThread() != thread()) {
+    QString result;
+    QMetaObject::invokeMethod(
+        this, [this, levelId, &result]() { result = viewScriptLevel(levelId); },
+        Qt::BlockingQueuedConnection);
+    return result;
+  }
   ScriptEngine *engine   = m_scriptConsole ? m_scriptConsole->getEngine() : 0;
   TXshSimpleLevel *level = engine ? engine->scriptLevelForView(levelId) : 0;
   if (!level) return tr("Can't view an empty level");
