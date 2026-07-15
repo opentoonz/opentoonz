@@ -67,3 +67,32 @@ not release-complete: a draft PR and cross-platform same-commit build evidence
 remain outstanding. R2 support-policy work and R3 builds must use descendants
 of `991804f3e`.
 
+## R2-R6 implementation delta
+
+The support contract and build frontier are now implemented on descendants of
+the integration merge:
+
+- bf7e97b11 records the Qt 6.9 API floor, Qt 6.10.3 release pin, Qt 6.11
+  forward lane, strict deprecation threshold, platform matrix, parity baseline,
+  and named corpus.
+- 118c3046f fixes the translation output root and removes the tracked generated
+  toonz/stuff/config/loc tree; the translation lane now produces 63 QMs under
+  the packaged root.
+- a258f4f2e adds controlled Qt 6 OpenGL context and framebuffer diagnostics.
+  The interactive shader pixel smoke remains headless-blocked on this host.
+- 75500a1d3 moves Qt 6 evaluation through the existing executor thread;
+  9b4c1991e marshals Script Console viewer operations to the GUI thread.
+  Persistent QJSEngine ownership remains an explicit follow-up, documented in
+  2026-07-14-script-runtime-boundary.md.
+- bc518f17e rejects unsupported Qt 6 audio format substitutions instead of
+  reinterpreting unchanged PCM bytes.
+- 839ed9dc0 and acb7c27c8 enable translation/package runtime checks,
+  checksums/source-commit recording, and stable manual-goal projections.
+
+Fresh same-commit local evidence is retained under
+toonz/build/qt6-evidence/: Qt 5, Qt 6, strict Qt 6.10 deprecation, and
+translation-enabled builds passed with Qt 5.15.18 / Qt 6.11.0. The incremental
+Qt 6 script/audio/viewer build also passed. This is macOS arm64 evidence only;
+Linux/Windows packages, clean packaged launch, real shader pixels, interactive
+script cancellation, hardware input/audio/camera, and signoff remain external
+gates.
