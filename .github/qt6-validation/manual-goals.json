@@ -3,7 +3,7 @@
   "source": "OpenToonz Qt 6 Port Progress Reports",
   "updated_at": "2026-07-14",
   "source_report": "doc/qt6_port_progress/2026-07-14-integration-delta.md",
-  "source_commit": "118c3046f",
+  "source_commit": "5e9bfc492",
   "baseline": "OpenToonz 1.7.1 / Qt 5; codex/qt-6-port reviewed at 419ef986f; latest visible regular Linux, macOS, and Windows branch CI green on 2026-07-01 for source-changing commit a115837f5; latest Qt 6 Experimental Binary Builds result failed on 2026-06-29 with Windows CMake and Linux compile blockers while macOS arm64 packaged; Project Sync still skips until QT6_PROJECT_TOKEN is configured",
   "goals": [
     {
