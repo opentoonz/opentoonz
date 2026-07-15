@@ -28,6 +28,13 @@ Audited baseline:
   overall: macOS arm64 succeeded, while Linux and Windows failed. Regular
   platform workflows are Qt 5 evidence.
 - The branch has substantial automated smoke infrastructure, but it does not
+
+The in-process GUI smoke hooks in `toonz/sources/toonz/main.cpp` are behind the
+explicit `OPENTOONZ_ENABLE_GUI_SMOKE_HARNESS` CMake option. It defaults to
+`ON` to preserve existing smoke behavior; minimal or production builds may set
+it to `OFF`, which removes the test-only hook block while leaving normal
+startup unchanged. GUI smoke runners must use a build configured with the
+option enabled.
   establish real-workflow, hardware, packaged-runtime, or studio parity.
 
 Adopted release contract:
@@ -55,14 +62,14 @@ absent; it does not mean implementation has not progressed.
 |---|---|---|---|---|
 | `QT6-INT-01` | P0 | Integrated locally | Live `master` integrated; overlapping paths reviewed; final delta has a draft PR or accepted merge plan | Draft PR plus same-commit cross-platform evidence |
 | `QT6-VER-01` | P0 | Contract adopted | Minimum, release, and latest Qt lanes are explicit, source-compatible, and tested | Prove Qt 6.9.3 floor, 6.10.3 release packages, and 6.11.x forward lane |
-| `QT6-BLD-01` | P0 | Partial | Qt 5, Qt 6, strict-deprecation, and required translation builds pass from one candidate commit | Fresh retained build logs after integration |
+| `QT6-BLD-01` | P0 | Accepted locally | Qt 5, Qt 6, strict-deprecation, and required translation builds pass from one candidate commit | Cross-platform same-commit package evidence |
 | `QT6-API-01` | P1 | Advanced | Removed/deprecated APIs are absent or confined to documented compatibility boundaries on every declared Qt lane | Floor/release/latest builds plus guarded bridge exit criteria |
-| `QT6-SCR-01` | P0 | Blocked | Qt 6 Script Console stays responsive; bounded interruption passes; supported binding surface is explicit | Interactive cancellation proof plus all script aggregates |
-| `QT6-REN-01` | P0 | Blocked | Bundled shader FX produces expected nonzero/reference pixels and failure handling is worker-safe | Rerun the packed-pixel fix on the current candidate |
-| `QT6-PKG-01` | P0 | Blocked | Every supported package builds, launches cleanly, finds plugins/runtime data, and is published from one commit | Fix Linux/Windows; decide macOS x64; packaged smokes |
-| `QT6-MED-01` | P1 | Partial | Playback, recording, camera, and stop-motion pass real-device and unsupported-format matrices | Hardware/platform evidence |
+| `QT6-SCR-01` | P0 | Implementation advanced; interactive proof blocked | Qt 6 Script Console stays responsive; bounded interruption passes; supported binding surface is explicit | Interactive cancellation proof plus all script aggregates |
+| `QT6-REN-01` | P0 | Failure handling implemented; pixel proof blocked | Bundled shader FX produces expected nonzero/reference pixels and failure handling is worker-safe | Real-context packed-pixel probe |
+| `QT6-PKG-01` | P0 | Automation advanced; cross-platform package proof blocked | Every supported package builds, launches cleanly, finds plugins/runtime data, and is published from one commit | Linux/Windows/macOS package runs and publication |
+| `QT6-MED-01` | P1 | Format safety implemented; hardware partial | Playback, recording, camera, and stop-motion pass real-device and unsupported-format matrices | Hardware/platform evidence |
 | `QT6-INP-01` | P1 | Partial | Real OS/tablet input and fractional mixed-DPI behavior pass on supported platforms | Hardware/display evidence |
-| `QT6-TRN-01` | P1 | Partial | Translation-enabled candidate packages contain reproducible, intended locale assets | Decide tracked `.qm` policy and test packages |
+| `QT6-TRN-01` | P1 | Reproducible locally | Translation-enabled candidate packages contain reproducible, intended locale assets | Verify package language switching |
 | `QT6-QA-01` | P0 | Blocked | Named Qt 5 baseline/corpus, platform matrix, thresholds, reviewers, and waivers are defined and satisfied | Publish the comparison and signoff contract |
 | `QT6-DOC-01` | P2 | Advanced | Goal, study, verification guide, dated reports, and machine projection have single responsibilities and agree on IDs/current evidence | Keep guards green; synchronize JSON schema/projection in a later non-doc turn |
 

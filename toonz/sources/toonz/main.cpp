@@ -405,6 +405,7 @@ static int run_script(const TFilePath& loadFilePath) {
   return gScriptHadError.load() ? 1 : 0;
 }
 
+#if defined(OPENTOONZ_ENABLE_GUI_SMOKE_HARNESS)
 static void write_gui_smoke_status(const QString& action, const QString& status,
                                    const QStringList& details = QStringList()) {
   QString statusPath = qEnvironmentVariable("OPENTOONZ_GUI_SMOKE_STATUS_FILE");
@@ -15156,6 +15157,8 @@ static void run_gui_smoke_hook(const QString& action,
 
 //-----------------------------------------------------------------------------
 
+#endif  // OPENTOONZ_ENABLE_GUI_SMOKE_HARNESS
+
 int main(int argc, char* argv[]) {
 #ifdef Q_OS_WIN
   // Enable standard input/output on Windows Platform for debug
@@ -15750,7 +15753,11 @@ w.show();
 log_gui_smoke_progress("main-window-shown");
 
 QString guiSmokeAction = qEnvironmentVariable("OPENTOONZ_GUI_SMOKE_ACTION");
-if (!guiSmokeAction.isEmpty()) {
+bool guiSmokeEnabled = false;
+#if defined(OPENTOONZ_ENABLE_GUI_SMOKE_HARNESS)
+guiSmokeEnabled = !guiSmokeAction.isEmpty();
+#endif
+if (guiSmokeEnabled) {
   log_gui_smoke_progress("hook-starting");
   if (!loadFilePath.isEmpty() && TFileStatus(loadFilePath).doesExist())
     IoCmd::loadScene(loadFilePath);

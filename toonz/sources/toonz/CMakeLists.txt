@@ -1,5 +1,8 @@
 set(VERSION "${OPENTOONZ_APP_VERSION}")
 
+option(OPENTOONZ_ENABLE_GUI_SMOKE_HARNESS
+       "Compile the in-process GUI smoke harness used by scripts/qt6" ON)
+
 set(MOC_HEADERS
     addfilmstripframespopup.h
     adjustlevelspopup.h
@@ -479,6 +482,10 @@ if(BUILD_TARGET_WIN)
         -DUNICODE
         -D_UNICODE
     )
+endif()
+
+if(OPENTOONZ_ENABLE_GUI_SMOKE_HARNESS)
+    add_definitions(-DOPENTOONZ_ENABLE_GUI_SMOKE_HARNESS=1)
 endif()
 
 message("subdir: toonz")
