@@ -43,6 +43,12 @@ class DVAPI DockTabStrip final : public QTabBar {
   QPoint m_globalPressPos;
   bool m_dragOutStarted;
   bool m_reordering;
+  // Whether the active theme's own stylesheet fails to visually
+  // distinguish a selected tab's text from an unselected one (measured at
+  // runtime, see updateTabTextColors()), and if so, the tab's own sampled
+  // background tone used to wash its text down a bit.
+  bool m_dimInactiveTabs;
+  QColor m_dimWashColor;
 
   bool isOutsideTabStrip(const QPoint &globalPos) const;
   void tryBeginDragOut(const QPoint &globalPos);
@@ -63,6 +69,9 @@ protected:
   void mousePressEvent(QMouseEvent *event) override;
   void mouseMoveEvent(QMouseEvent *event) override;
   void mouseReleaseEvent(QMouseEvent *event) override;
+  void mouseDoubleClickEvent(QMouseEvent *event) override;
+  void paintEvent(QPaintEvent *event) override;
+  QSize tabSizeHint(int index) const override;
 };
 
 #endif  // DOCKTABSTRIP_H

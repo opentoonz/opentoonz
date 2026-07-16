@@ -161,7 +161,9 @@ private:
   void destroyTabStrip(Region *region);
   void updateTabVisibility(Region *region);
   void updateJoinHighlightGeometry();
+  void restorePanelTitleBar(DockWidget *item);
   void restoreSingleDockedPanel(DockWidget *item);
+  void refreshTabbedRegionsVisibility();
   Region *detachTabGroupAsSubRegion(Region *region);
   bool removeFromTabGroup(DockWidget *item, Region *region,
                           bool deferStripDestroy = false);

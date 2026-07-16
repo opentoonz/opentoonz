@@ -546,7 +546,7 @@ void DockWidget::selectDockPlaceholder(QMouseEvent *me) {
 
   if (!selected) selected = tabifyPlaceholderAt(me->globalPos());
 
-  // In order to avoid flickering
+  // Never show a split deco and a join highlight at the same time.
   if (m_selectedPlace != selected) {
     if (m_selectedPlace) m_selectedPlace->hide();
     if (selected && selected->getAttribute() != DockPlaceholder::tabify)
@@ -554,10 +554,16 @@ void DockWidget::selectDockPlaceholder(QMouseEvent *me) {
   }
 
   if (m_parentLayout) {
-    if (selected && selected->getAttribute() == DockPlaceholder::tabify)
+    if (selected && selected->getAttribute() == DockPlaceholder::tabify) {
+      // Hide any leftover visible split deco before drawing the join band.
+      for (i = 0; i < m_placeholders.size(); ++i) {
+        if (m_placeholders[i]->getAttribute() != DockPlaceholder::tabify)
+          m_placeholders[i]->hide();
+      }
       m_parentLayout->setJoinHighlight(selected->getParentRegion());
-    else
+    } else {
       m_parentLayout->clearJoinHighlight();
+    }
   }
 
   m_selectedPlace = selected;
@@ -632,11 +638,13 @@ inline void DockPlaceholder::buildGeometry() {
           height = std::max(24, target->titleBarWidget()->height());
       }
 
-      // Restrict hover-join to the title/tab strip center band so that
-      // top/bottom/left/right split placeholders keep working as before.
-      const int hMargin = std::max(12, width / 5);
+      // Start below the top split band (sepWidth) so classic top docking and
+      // hover-join never share the same hit pixels / preview frames.
+      const int topInset = sepWidth + 2;
+      const int hMargin  = std::max(12, width / 5);
       relativeToMainRect =
-          QRect(left + hMargin, top + 2, width - 2 * hMargin, height - 2);
+          QRect(left + hMargin, top + topInset, width - 2 * hMargin,
+                std::max(12, height - topInset));
     } else if (getParentRegion() == 0 ||
                getParentRegion() == layout->rootRegion()) {
       // Outer insertion case

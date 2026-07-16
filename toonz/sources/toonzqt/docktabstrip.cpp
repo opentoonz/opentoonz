@@ -3,12 +3,15 @@
 #include "docktabstrip.h"
 
 #include "docklayout.h"
+#include "toonzqt/gutil.h"
 
+#include <QApplication>
 #include <QImage>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPixmap>
 #include <QStyle>
+#include <QStyleOptionTab>
 #include <QStyleOptionToolButton>
 #include <QToolButton>
 #include <algorithm>
@@ -54,6 +57,123 @@ QColor dockThemeAccentColor() {
   return kFallback;
 }
 
+// QTabBar::initStyleOption() is protected; this tiny subclass exposes it
+// so the probe functions below can build a QStyleOptionTab that exactly
+// matches what the real tab bar would hand to the style/stylesheet.
+class ProbeTabBar final : public QTabBar {
+public:
+  using QTabBar::QTabBar;
+  void initOption(QStyleOptionTab *opt, int index) const {
+    initStyleOption(opt, index);
+  }
+};
+
+// Renders a single tab's text label through the live style/stylesheet onto
+// a transparent surface (CE_TabBarTabLabel paints only the label, not the
+// tab background), so the returned color is whatever the active theme
+// actually resolves for that state - no theme is ever assumed or hardcoded.
+QColor probeTabTextColor(ProbeTabBar &probe, int index) {
+  QStyleOptionTab opt;
+  probe.initOption(&opt, index);
+
+  QImage img(opt.rect.size(), QImage::Format_ARGB32_Premultiplied);
+  img.fill(Qt::transparent);
+  QPainter painter(&img);
+  painter.translate(-opt.rect.topLeft());
+  probe.style()->drawControl(QStyle::CE_TabBarTabLabel, &opt, &painter,
+                             &probe);
+  painter.end();
+
+  long long r = 0, g = 0, b = 0, n = 0;
+  for (int y = 0; y < img.height(); ++y) {
+    for (int x = 0; x < img.width(); ++x) {
+      const QColor c = img.pixelColor(x, y);
+      if (c.alpha() < 40) continue;  // skip anti-aliased/background pixels.
+      r += c.red();
+      g += c.green();
+      b += c.blue();
+      ++n;
+    }
+  }
+  if (n == 0) return QColor();
+  return QColor(int(r / n), int(g / n), int(b / n));
+}
+
+// Renders just a tab's background/border (CE_TabBarTabShape, no label)
+// through the live style, then samples a corner pixel far from any text -
+// this is the true background tone that theme paints for that tab, used as
+// the fallback wash color instead of any assumed/hardcoded value.
+QColor probeTabBackgroundColor(ProbeTabBar &probe, int index) {
+  QStyleOptionTab opt;
+  probe.initOption(&opt, index);
+
+  QImage img(opt.rect.size(), QImage::Format_ARGB32_Premultiplied);
+  img.fill(Qt::transparent);
+  QPainter painter(&img);
+  painter.translate(-opt.rect.topLeft());
+  probe.style()->drawControl(QStyle::CE_TabBarTabShape, &opt, &painter,
+                             &probe);
+  painter.end();
+
+  const int x = std::min(4, img.width() - 1);
+  const int y = std::max(img.height() - 4, 0);
+  const QColor sampled = img.pixelColor(x, y);
+  return sampled.alpha() > 0 ? sampled : QColor(Qt::transparent);
+}
+
+// Measures - by actually rendering through the live stylesheet, not by
+// assuming anything about any particular theme - whether the current theme
+// already gives a selected tab's text a visibly different color from an
+// unselected one. Bundled themes mostly do (dimmed alpha vs. opaque), but a
+// couple leave both states identical; this only kicks in for those, using a
+// wash color sampled from that same theme rather than a fixed hardcoded hue.
+struct TabTextContrast {
+  bool needsWash = false;
+  QColor washColor;
+};
+
+const TabTextContrast &dockTabTextContrast() {
+  static QString cachedStyleSheet;
+  static TabTextContrast cached;
+
+  const QString liveStyleSheet = qApp ? qApp->styleSheet() : QString();
+  if (!cachedStyleSheet.isNull() && liveStyleSheet == cachedStyleSheet)
+    return cached;
+  cachedStyleSheet = liveStyleSheet;
+
+  TabBarContainter container;
+  container.setAttribute(Qt::WA_DontShowOnScreen);
+  container.resize(160, 28);
+
+  ProbeTabBar probe(&container);
+  probe.setDrawBase(false);
+  probe.setDocumentMode(true);
+  probe.addTab(QStringLiteral("Ag"));
+  probe.addTab(QStringLiteral("Ag"));
+  probe.resize(160, 28);
+  probe.setCurrentIndex(0);  // Tab 0 selected, tab 1 is the plain state.
+  container.ensurePolished();
+  probe.ensurePolished();
+
+  const QColor selectedColor   = probeTabTextColor(probe, 0);
+  const QColor unselectedColor = probeTabTextColor(probe, 1);
+
+  if (!selectedColor.isValid() || !unselectedColor.isValid()) {
+    cached.needsWash = false;
+  } else {
+    const int distance = std::abs(selectedColor.red() - unselectedColor.red()) +
+                         std::abs(selectedColor.green() - unselectedColor.green()) +
+                         std::abs(selectedColor.blue() - unselectedColor.blue());
+    cached.needsWash = distance < 24;  // near-identical: theme doesn't dim.
+  }
+  // Wash toward the tab's own (unselected) background tone, sampled live,
+  // so the fallback still adapts to whatever theme triggered it.
+  const QColor bg = probeTabBackgroundColor(probe, 1);
+  cached.washColor = bg.alpha() > 0 ? bg : container.palette().color(QPalette::Window);
+
+  return cached;
+}
+
 }  // namespace
 
 const int DockTabStrip::kHeight              = 26;
@@ -93,12 +213,13 @@ DockTabStrip::DockTabStrip(DockLayout *layout, Region *region, QWidget *parent)
     , m_region(region)
     , m_pressIndex(-1)
     , m_dragOutStarted(false)
-    , m_reordering(false) {
+    , m_reordering(false)
+    , m_dimInactiveTabs(false) {
   setObjectName("DockTabStrip");
   setDrawBase(false);
   setDocumentMode(true);
   setMovable(false);
-  setExpanding(false);
+  setExpanding(true);
   setUsesScrollButtons(true);
   setElideMode(Qt::ElideRight);
 
@@ -136,21 +257,22 @@ void DockTabStrip::syncFromRegion() {
 
 //-------------------------------------
 
-// Dims inactive tab titles so the active tab (left at full theme opacity)
-// stands out clearly. Only the inactive color is overridden here, so the
-// active tab keeps whatever accent color the current theme's QSS assigns
-// to QTabBar::tab:selected (which may vary per theme).
+// Dim inactive tab titles with an opaque blend so Light/Neutral themes
+// (whose QSS forces solid black) still show a clear contrast. Alpha alone
+// is often ignored or invisible against light tab backgrounds.
 void DockTabStrip::updateTabTextColors() {
-  const int current = currentIndex();
-  for (int i = 0; i < count(); ++i) {
-    if (i == current) {
-      setTabTextColor(i, QColor());  // Reset override: use theme's :selected color.
-      continue;
-    }
-    QColor dimmed = palette().color(QPalette::WindowText);
-    dimmed.setAlphaF(0.6);
-    setTabTextColor(i, dimmed);
-  }
+  // The active theme's stylesheet always wins over setTabTextColor() for a
+  // styled #TabBarContainer QTabBar::tab, so this never fights the theme:
+  // it only measures (see dockTabTextContrast()) whether that theme's own
+  // :selected rule is actually visible, and if not, remembers a wash color
+  // - sampled from that same theme - for paintEvent() to apply as a subtle
+  // fallback. Themes that already differentiate are left untouched.
+  const TabTextContrast &contrast = dockTabTextContrast();
+  m_dimInactiveTabs                = contrast.needsWash;
+  m_dimWashColor                   = contrast.washColor;
+
+  for (int i = 0; i < count(); ++i) setTabTextColor(i, QColor());
+  update();
 }
 
 //-------------------------------------
@@ -159,6 +281,59 @@ void DockTabStrip::onCurrentChanged(int index) {
   updateTabTextColors();
   if (!m_layout || !m_region || index < 0 || m_dragOutStarted) return;
   m_layout->setActiveTab(m_region, index);
+}
+
+//-------------------------------------
+
+// Force every tab to share the strip's width equally (Qt's setExpanding
+// only scales sizeHint-based widths, which keeps long titles wide and short
+// ones squeezed). A floor keeps many tabs readable and lets the strip's
+// scroll buttons take over instead of shrinking tabs further.
+QSize DockTabStrip::tabSizeHint(int index) const {
+  QSize hint          = QTabBar::tabSizeHint(index);
+  const int tabCount  = count();
+  const int stripWidth = width();
+  if (tabCount > 0 && stripWidth > 0) {
+    const int minTabWidth = 60;
+    hint.setWidth(std::max(minTabWidth, stripWidth / tabCount));
+  }
+  return hint;
+}
+
+//-------------------------------------
+
+// Mirrors the standalone-panel title-bar double-click-to-maximize behavior
+// (see DockWidget::mouseDoubleClickEvent), since a tabbed panel's own title
+// bar is hidden and replaced by this strip.
+void DockTabStrip::mouseDoubleClickEvent(QMouseEvent *event) {
+  if (m_layout && m_region) {
+    if (DockWidget *active = m_region->activeTab())
+      m_layout->setMaximized(active, !active->isMaximized());
+  }
+  event->accept();
+}
+
+//-------------------------------------
+
+// Fallback for themes whose stylesheet does not itself distinguish a
+// selected tab's text from an unselected one (see dockTabTextContrast());
+// washes inactive tabs toward their own sampled background tone so their
+// text loses some contrast without any theme-specific color being assumed.
+void DockTabStrip::paintEvent(QPaintEvent *event) {
+  QTabBar::paintEvent(event);
+  if (!m_dimInactiveTabs || !m_dimWashColor.isValid()) return;
+
+  QPainter painter(this);
+  QColor wash = m_dimWashColor;
+  wash.setAlphaF(0.45);
+  const int current = currentIndex();
+  for (int i = 0; i < count(); ++i) {
+    if (i == current) continue;
+    QRect r = tabRect(i);
+    if (!r.isValid()) continue;
+    r.adjust(1, 1, -1, -1);
+    painter.fillRect(r, wash);
+  }
 }
 
 //-------------------------------------
