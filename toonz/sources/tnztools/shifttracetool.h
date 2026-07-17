@@ -64,6 +64,8 @@ private:
   int m_row[2];
   TAffine m_aff[2];
   TPointD m_center[2];
+  //! Pivot at reset / mode change: center of m_ghostBox in local space.
+  TPointD m_defaultCenter[2];
 
   TAffine m_oldAff;
 
@@ -86,6 +88,8 @@ private:
   //! Fills m_ghostBox[0..1] and m_dpiAffPerGhost from m_row and current edit
   //! context. Called from updateData() each draw.
   void updateAllGhostBoxes();
+  //! Keeps m_center on m_defaultCenter when the ghost transform is still default.
+  void syncDefaultGhostCenters();
   //! Padding in local units for outer pick frame; matches enlarge(3 * pad) in
   //! draw and getGadget.
   double pickerPadLocal() const;
@@ -127,4 +131,8 @@ public:
 
   int getCurrentGhostIndex() { return m_ghostIndex; }
   void setCurrentGhostIndex(int index);
+
+  //! True when ghost shift/scale/rotation and pivot match the default for the
+  //! current reference rectangle (bbox mode, frame, etc.).
+  bool isGhostAtDefault(int ghostIndex) const;
 };

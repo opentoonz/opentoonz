@@ -2801,22 +2801,19 @@ void ShiftTraceToolOptionBox::updateColors() {
 
 void ShiftTraceToolOptionBox::updateStatus() {
   TTool::Application *app = TTool::getApplication();
-  OnionSkinMask osm       = app->getCurrentOnionSkin()->getOnionSkinMask();
-  if (osm.getShiftTraceGhostAff(0).isIdentity() &&
-      osm.getShiftTraceGhostCenter(0) == TPointD())
+  ShiftTraceTool *stTool = (ShiftTraceTool *)m_tool;
+  if (!stTool) return;
+  if (stTool->isGhostAtDefault(0))
     m_resetPrevGhostBtn->setDisabled(true);
   else
     m_resetPrevGhostBtn->setEnabled(true);
 
-  if (osm.getShiftTraceGhostAff(1).isIdentity() &&
-      osm.getShiftTraceGhostCenter(1) == TPointD())
+  if (stTool->isGhostAtDefault(1))
     m_resetAfterGhostBtn->setDisabled(true);
   else
     m_resetAfterGhostBtn->setEnabled(true);
 
   // Check the ghost index
-  ShiftTraceTool *stTool = (ShiftTraceTool *)m_tool;
-  if (!stTool) return;
   if (stTool->getCurrentGhostIndex() == 0)
     m_prevRadioBtn->setChecked(true);
   else  // ghostIndex == 1

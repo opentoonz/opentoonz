@@ -63,6 +63,13 @@ static bool circumCenter(TPointD &out, const TPointD &a, const TPointD &b,
   return true;
 }
 
+namespace {
+TPointD ghostBoxCenter(const TRectD &box) {
+  if (box.isEmpty()) return TPointD();
+  return TPointD((box.x0 + box.x1) * 0.5, (box.y0 + box.y1) * 0.5);
+}
+}  // namespace
+
 //=============================================================================
 
 // Persisted combo index for toolbar: 0 = full raster bounds, 1 = savebox,
@@ -83,6 +90,7 @@ ShiftTraceTool::ShiftTraceTool()
     m_contentBBoxCacheValid[i]     = false;
     m_dpiAffPerGhost[i]            = TAffine();
     m_ghostBox[i]                  = TRectD();
+    m_defaultCenter[i]             = TPointD();
   }
   s_instance = this;
   bind(TTool::AllTargets);  // Deals with tool deactivation internally
@@ -158,6 +166,7 @@ void ShiftTraceTool::clearData() {
     m_row[i]    = -1;
     m_aff[i]    = TAffine();
     m_center[i] = TPointD();
+    m_defaultCenter[i] = TPointD();
   }
 }
 
@@ -214,6 +223,29 @@ void ShiftTraceTool::updateAllGhostBoxes() {
       m_ghostBox[gi] = vi->getBBox();
     }
   }
+  syncDefaultGhostCenters();
+}
+
+void ShiftTraceTool::syncDefaultGhostCenters() {
+  bool centerChanged = false;
+  for (int gi = 0; gi < 2; gi++) {
+    const TPointD newDefault = ghostBoxCenter(m_ghostBox[gi]);
+    if (m_aff[gi].isIdentity() &&
+        (m_center[gi] == m_defaultCenter[gi] || m_center[gi] == TPointD())) {
+      if (m_center[gi] != newDefault) {
+        m_center[gi] = newDefault;
+        centerChanged = true;
+      }
+    }
+    m_defaultCenter[gi] = newDefault;
+  }
+  if (centerChanged) updateGhost();
+}
+
+bool ShiftTraceTool::isGhostAtDefault(int ghostIndex) const {
+  if (ghostIndex < 0 || ghostIndex > 1) return true;
+  return m_aff[ghostIndex].isIdentity() &&
+         m_center[ghostIndex] == m_defaultCenter[ghostIndex];
 }
 
 void ShiftTraceTool::updateData() {
