@@ -933,8 +933,7 @@ class DVAPI StyleEditor final : public QWidget, public SaveLoadQSettings {
   bool m_enabled;
   bool m_enabledOnlyFirstTab;
   bool m_enabledFirstAndLastTab;
-  bool m_colorPageIsVertical   = true;
-  bool m_bottomInitialized     = false;
+  bool m_colorPageIsVertical = true;
 
 public:
   StyleEditor(PaletteController *, QWidget *parent = 0);
@@ -996,6 +995,8 @@ protected:
 protected:
   void showEvent(QShowEvent *) override;
   void hideEvent(QHideEvent *) override;
+  void resizeEvent(QResizeEvent *) override;
+  bool eventFilter(QObject *watched, QEvent *event) override;
 
 protected slots:
 
@@ -1057,6 +1058,10 @@ private:
   QFrame *createVectorPage();
   QFrame *createMyPaintPage();
   void updateTabBar();
+  // Restore the pre-collapsible bottom-bar height (min 60 + QSS content).
+  void restoreBottomBarExpandedSize();
+  int bottomBarNaturalHeight() const;
+  void setBottomBarExpandedConstraints(bool expanded);
 
   void copyEditedStyleToPalette(bool isDragging);
 };
