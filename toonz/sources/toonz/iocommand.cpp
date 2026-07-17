@@ -1524,12 +1524,12 @@ bool IoCmd::saveScene(const TFilePath &path, int flags) {
   }
   TApp::instance()->setSaveInProgress(false);
 
-  cp->assign(&keepCP);
-  // Make sure that the current cleanup palette is set to currentParams' palette
-  TApp::instance()
-      ->getPaletteController()
-      ->getCurrentCleanupPalette()
-      ->setPalette(cp->m_cleanupPalette.getPointer());
+  if (!isAutosave) {
+    // Restore the cleanup settings without replacing the palette object.
+    // Palette handles keep raw pointers to it, and resetting the cleanup handle
+    // here would also make the cleanup palette current.
+    cp->assign(&keepCP, false);
+  }
 
   // in case of saving subxsheet, revert the level paths after saving
   revertOrgLevelPaths();
