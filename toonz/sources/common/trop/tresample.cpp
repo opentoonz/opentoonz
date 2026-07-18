@@ -27,6 +27,7 @@ using namespace TConsts;
 #endif
 
 #include <memory>
+#include <type_traits>
 
 //===========================================================================
 /*
@@ -4857,18 +4858,21 @@ void rop_resample_rgbm_2(TRasterPT<T> rout, const TRasterCM32P &rin,
   }
 
 #if defined(USE_SSE2)
-  TRaster32P rout32 = rout;
-  if ((TSystem::getCPUExtensions() & TSystem::CpuSupportsSse2) && rout32)
-    resample_main_cm32_rgbm_SSE2<TPixel32>(
-        rout32, rin, aff_xy2uv, aff0_uv2fg, min_pix_ref_u, min_pix_ref_v,
-        max_pix_ref_u, max_pix_ref_v, n_pix, pix_ref_u.get(), pix_ref_v.get(),
-        pix_ref_f.get(), pix_ref_g.get(), filter, palette);
-  else
+  if constexpr (std::is_same_v<T, TPixel32>) {
+    TRaster32P rout32 = rout;
+    if ((TSystem::getCPUExtensions() & TSystem::CpuSupportsSse2) && rout32) {
+      resample_main_cm32_rgbm_SSE2<TPixel32>(
+          rout32, rin, aff_xy2uv, aff0_uv2fg, min_pix_ref_u, min_pix_ref_v,
+          max_pix_ref_u, max_pix_ref_v, n_pix, pix_ref_u.get(), pix_ref_v.get(),
+          pix_ref_f.get(), pix_ref_g.get(), filter, palette);
+      return;
+    }
+  }
 #endif
-    resample_main_cm32_rgbm<T>(
-        rout, rin, aff_xy2uv, aff0_uv2fg, min_pix_ref_u, min_pix_ref_v,
-        max_pix_ref_u, max_pix_ref_v, n_pix, pix_ref_u.get(), pix_ref_v.get(),
-        pix_ref_f.get(), pix_ref_g.get(), filter, palette);
+  resample_main_cm32_rgbm<T>(
+      rout, rin, aff_xy2uv, aff0_uv2fg, min_pix_ref_u, min_pix_ref_v,
+      max_pix_ref_u, max_pix_ref_v, n_pix, pix_ref_u.get(), pix_ref_v.get(),
+      pix_ref_f.get(), pix_ref_g.get(), filter, palette);
 }
 
 //-----------------------------------------------------------------------------

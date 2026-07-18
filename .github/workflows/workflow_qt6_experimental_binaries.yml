@@ -36,7 +36,7 @@ jobs:
       - name: Install libraries
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential cmake pkg-config ninja-build ccache python3-pip wget libboost-all-dev libsuperlu-dev liblz4-dev libusb-1.0-0-dev liblzo2-dev libpng-dev libjpeg-dev libglew-dev freeglut3-dev libfreetype6-dev libjson-c-dev libmypaint-dev libopencv-dev libturbojpeg-dev libomp-dev libfuse2 libxcb-cursor0 libxcb-xinerama0 libxcb-xinput0 libxkbcommon-x11-0
+          sudo apt-get install -y build-essential cmake pkg-config ninja-build ccache python3-pip wget libboost-all-dev libsuperlu-dev liblz4-dev libusb-1.0-0-dev liblzo2-dev libpng-dev libjpeg-dev libglew-dev freeglut3-dev libfreetype6-dev libjson-c-dev libmypaint-dev libopencv-dev libturbojpeg-dev libomp-dev libfuse2 libpulse0 libxcb-cursor0 libxcb-xinerama0 libxcb-xinput0 libxkbcommon-x11-0
 
       - name: Install Qt 6
         run: |
