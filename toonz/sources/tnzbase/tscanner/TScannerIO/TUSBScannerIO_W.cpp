@@ -41,7 +41,7 @@ TUSBScannerIO::TUSBScannerIO() : m_data(new TUSBScannerIOPD()) {}
 //-----------------------------------------------------------------------------
 
 bool TUSBScannerIO::open() {
-  m_data->m_handle = CreateFile("\\\\.\\usbscan0", GENERIC_WRITE | GENERIC_READ,
+  m_data->m_handle = CreateFileW(L"\\\\.\\usbscan0", GENERIC_WRITE | GENERIC_READ,
                                 FILE_SHARE_WRITE | FILE_SHARE_READ, NULL,
                                 OPEN_EXISTING, 0, NULL);
   if (m_data->m_handle == INVALID_HANDLE_VALUE) return false;
