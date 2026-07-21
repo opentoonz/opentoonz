@@ -371,8 +371,8 @@ void TLevelWriterAvi::save(const TImageP &img, int frameIndex) {
     DWORD num = DWORD(tround(m_frameRate * 100.0));
     DWORD den = 100;
 
-    AVISTREAMINFO psi;
-    memset(&psi, 0, sizeof(AVISTREAMINFO));
+    AVISTREAMINFOA psi;
+    memset(&psi, 0, sizeof(AVISTREAMINFOA));
     psi.fccType = streamtypeVIDEO;
     if (m_hic) {
       ICINFO icinfo;
@@ -387,7 +387,7 @@ void TLevelWriterAvi::save(const TImageP &img, int frameIndex) {
     ::strcpy(psi.szName, m_path.getName().c_str());
     int rc;
 
-    if (AVIFileCreateStream(m_aviFile, &(m_videoStream), &(psi)))
+    if (AVIFileCreateStreamA(m_aviFile, &(m_videoStream), &(psi)))
       throw TImageException(getFilePath(), "Unable to create video stream");
 
     if (!m_hic) {

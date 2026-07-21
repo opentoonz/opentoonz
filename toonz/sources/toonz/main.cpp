@@ -183,7 +183,9 @@
 #ifndef x64
 #include <float.h>
 #endif
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QtPlatformHeaders/QWindowsWindowFunctions>
+#endif
 #endif
 
 using namespace DVGui;
@@ -15679,7 +15681,7 @@ if (isRunScript) {
   return run_script(loadFilePath);
 }
 
-#ifdef _WIN32
+#if defined(_WIN32) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 // http://doc.qt.io/qt-5/windows-issues.html#fullscreen-opengl-based-windows
 if (w.windowHandle())
   QWindowsWindowFunctions::setHasBorderInFullScreen(w.windowHandle(), true);
@@ -15693,7 +15695,7 @@ if (w.windowHandle())
 // details. The following feature can only be used with the customized Qt,
 // with WITH_WINTAB build option, and in Windows-x64 build.
 
-#ifdef WITH_WINTAB
+#if defined(WITH_WINTAB) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 bool useQtNativeWinInk = Preferences::instance()->isQtNativeWinInkEnabled();
 QWindowsWindowFunctions::setWinTabEnabled(!useQtNativeWinInk);
 #endif

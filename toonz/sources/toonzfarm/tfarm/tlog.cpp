@@ -65,29 +65,28 @@ int Level2XPriority(LEVEL level) {
 
 void notify(LEVEL level, const QString &msg) {
 #ifdef _WIN32
-  TCHAR buf[_MAX_PATH + 1];
+  char buf[_MAX_PATH + 1];
 
-  GetModuleFileName(0, buf, _MAX_PATH);
+  GetModuleFileNameA(0, buf, _MAX_PATH);
 
   HANDLE handle =
-      RegisterEventSource(NULL,  // uses local computer
-                          TFilePath(buf).getName().c_str());  // source name
+      RegisterEventSourceA(NULL,  // uses local computer
+                           TFilePath(buf).getName().c_str());  // source name
 
-  LPCTSTR lpszStrings[2];
-  TCHAR szMsg[256];
+  LPCSTR lpszStrings[2];
   DWORD dwErr = 1;
-  _stprintf(szMsg, TEXT("%s error: %d"), "appname", dwErr);
+  std::string text = msg.toStdString();
 
-  lpszStrings[0] = lpszStrings[1] = (LPCTSTR)msg.data();
-  ReportEvent(handle,                     // event log handle
-              Level2WinEventType(level),  // event type
-              0,                          // category zero
-              dwErr,                      // event identifier
-              NULL,                       // no user security identifier
-              1,                          // one substitution string
-              0,                          // no data
-              lpszStrings,                // pointer to string array
-              NULL);                      // pointer to data
+  lpszStrings[0] = lpszStrings[1] = text.c_str();
+  ReportEventA(handle,                     // event log handle
+               Level2WinEventType(level),  // event type
+               0,                          // category zero
+               dwErr,                      // event identifier
+               NULL,                       // no user security identifier
+               1,                          // one substitution string
+               0,                          // no data
+               lpszStrings,                // pointer to string array
+               NULL);                      // pointer to data
 
   DeregisterEventSource(handle);
 

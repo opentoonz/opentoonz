@@ -27,22 +27,21 @@
 
 //------------------------------------------------------------------------------
 
-static LPTSTR GetLastErrorText(LPTSTR lpszBuf, DWORD dwSize) {
+static LPSTR GetLastErrorText(LPSTR lpszBuf, DWORD dwSize) {
   DWORD dwRet;
-  LPTSTR lpszTemp = NULL;
+  LPSTR lpszTemp = NULL;
 
-  dwRet = FormatMessage(
+  dwRet = FormatMessageA(
       FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
           FORMAT_MESSAGE_ARGUMENT_ARRAY,
-      NULL, GetLastError(), LANG_NEUTRAL, (LPTSTR)&lpszTemp, 0, NULL);
+      NULL, GetLastError(), LANG_NEUTRAL, (LPSTR)&lpszTemp, 0, NULL);
 
   // supplied buffer is not long enough
   if (!dwRet || ((long)dwSize < (long)dwRet + 14))
-    lpszBuf[0] = TEXT('\0');
+    lpszBuf[0] = '\0';
   else {
-    lpszTemp[lstrlen(lpszTemp) - 2] =
-        TEXT('\0');  // remove cr and newline character
-    _stprintf(lpszBuf, TEXT("%s (0x%x)"), lpszTemp, GetLastError());
+    lpszTemp[lstrlenA(lpszTemp) - 2] = '\0';  // remove cr and newline character
+    sprintf(lpszBuf, "%s (0x%lx)", lpszTemp, GetLastError());
   }
 
   if (lpszTemp) LocalFree((HLOCAL)lpszTemp);
@@ -76,7 +75,7 @@ public:
   Imp() {}
 
 #ifdef _WIN32
-  static void WINAPI serviceMain(DWORD dwArgc, LPTSTR *lpszArgv);
+  static void WINAPI serviceMain(DWORD dwArgc, LPSTR *lpszArgv);
   static void WINAPI serviceCtrl(DWORD dwCtrlCode);
 
   static BOOL WINAPI controlHandler(DWORD dwCtrlType);
@@ -190,10 +189,10 @@ void WINAPI TService::Imp::serviceCtrl(DWORD dwCtrlCode) {
 
 //------------------------------------------------------------------------------
 
-void WINAPI TService::Imp::serviceMain(DWORD dwArgc, LPTSTR *lpszArgv) {
+void WINAPI TService::Imp::serviceMain(DWORD dwArgc, LPSTR *lpszArgv) {
   // register our service control handler:
   //
-  m_hService = RegisterServiceCtrlHandler(
+  m_hService = RegisterServiceCtrlHandlerA(
       TService::instance()->getName().c_str(), TService::Imp::serviceCtrl);
 
   if (m_hService == 0) goto cleanup;
@@ -252,8 +251,8 @@ BOOL WINAPI TService::Imp::controlHandler(DWORD dwCtrlType) {
 
   case CTRL_BREAK_EVENT:  // use Ctrl+C or Ctrl+Break to simulate
   case CTRL_C_EVENT:      // SERVICE_CONTROL_STOP in debug mode
-    _tprintf(TEXT("Stopping %s.\n"),
-             TService::instance()->getDisplayName().c_str());
+    printf("Stopping %s.\n",
+           TService::instance()->getDisplayName().c_str());
 
     TService::instance()->onStop();
     return TRUE;
@@ -361,25 +360,24 @@ void TService::run(int argc, char *argv[], bool console) {
 
 #ifdef _WIN32
   if (console) {
-    _tprintf(TEXT("Starting %s.\n"),
-             TService::instance()->getDisplayName().c_str());
+    printf("Starting %s.\n", TService::instance()->getDisplayName().c_str());
 
     SetConsoleCtrlHandler(TService::Imp::controlHandler, TRUE);
     TService::instance()->onStart(argc, argv);
   } else {
-    SERVICE_TABLE_ENTRY dispatchTable[2];
+    SERVICE_TABLE_ENTRYA dispatchTable[2];
 
     std::string name = TService::instance()->getName().c_str();
 
-    dispatchTable[0].lpServiceName = (char *)name.c_str();
+    dispatchTable[0].lpServiceName = name.data();
     dispatchTable[0].lpServiceProc =
-        (LPSERVICE_MAIN_FUNCTION)TService::Imp::serviceMain;
+        (LPSERVICE_MAIN_FUNCTIONA)TService::Imp::serviceMain;
 
     dispatchTable[1].lpServiceName = NULL;
     dispatchTable[1].lpServiceProc = NULL;
 
-    if (!StartServiceCtrlDispatcher(dispatchTable))
-      TService::addToMessageLog(QString(TEXT("Service start failed.")));
+    if (!StartServiceCtrlDispatcherA(dispatchTable))
+      TService::addToMessageLog(QString("Service start failed."));
   }
 #else
   TService::instance()->onStart(argc, argv);
@@ -406,12 +404,12 @@ void TService::install(const std::string &name, const std::string &displayName,
   SC_HANDLE schService;
   SC_HANDLE schSCManager;
 
-  schSCManager = OpenSCManager(NULL,  // machine (NULL == local)
-                               NULL,  // database (NULL == default)
-                               SC_MANAGER_ALL_ACCESS);  // access required
+  schSCManager = OpenSCManagerA(NULL,  // machine (NULL == local)
+                                NULL,  // database (NULL == default)
+                                SC_MANAGER_ALL_ACCESS);  // access required
 
   if (schSCManager) {
-    schService = CreateService(
+    schService = CreateServiceA(
         schSCManager,                                  // SCManager database
         name.c_str(),                                  // name of service
         displayName.c_str(),                           // name to display
@@ -422,20 +420,20 @@ void TService::install(const std::string &name, const std::string &displayName,
         ::to_string(appPath.getWideString()).c_str(),  // service's binary
         NULL,                                          // no load ordering group
         NULL,                                          // no tag identifier
-        TEXT(SZDEPENDENCIES),                          // dependencies
+        SZDEPENDENCIES,                                // dependencies
         NULL,                                          // LocalSystem account
         NULL);                                         // no password
 
     if (schService) {
-      _tprintf(TEXT("%s installed.\n"), displayName.c_str());
+      printf("%s installed.\n", displayName.c_str());
       CloseServiceHandle(schService);
     } else {
-      _tprintf(TEXT("CreateService failed - %s\n"), getLastErrorText().c_str());
+      printf("CreateService failed - %s\n", getLastErrorText().c_str());
     }
 
     CloseServiceHandle(schSCManager);
   } else
-    _tprintf(TEXT("OpenSCManager failed - %s\n"), getLastErrorText().c_str());
+    printf("OpenSCManager failed - %s\n", getLastErrorText().c_str());
 #endif
 }
 
@@ -448,49 +446,48 @@ void TService::remove(const std::string &name) {
   SC_HANDLE schService;
   SC_HANDLE schSCManager;
 
-  schSCManager = OpenSCManager(NULL,  // machine (NULL == local)
-                               NULL,  // database (NULL == default)
-                               SC_MANAGER_ALL_ACCESS);  // access required
+  schSCManager = OpenSCManagerA(NULL,  // machine (NULL == local)
+                                NULL,  // database (NULL == default)
+                                SC_MANAGER_ALL_ACCESS);  // access required
 
   if (schSCManager) {
-    schService = OpenService(schSCManager, name.c_str(), SERVICE_ALL_ACCESS);
+    schService = OpenServiceA(schSCManager, name.c_str(), SERVICE_ALL_ACCESS);
 
     if (schService) {
       SERVICE_STATUS ssStatus;  // current status of the service
 
       // try to stop the service
       if (ControlService(schService, SERVICE_CONTROL_STOP, &ssStatus)) {
-        _tprintf(TEXT("Stopping %s."), displayName.c_str());
+        printf("Stopping %s.", displayName.c_str());
         Sleep(1000);
 
         while (QueryServiceStatus(schService, &ssStatus)) {
           if (ssStatus.dwCurrentState == SERVICE_STOP_PENDING) {
-            _tprintf(TEXT("."));
+            printf(".");
             Sleep(1000);
           } else
             break;
         }
 
         if (ssStatus.dwCurrentState == SERVICE_STOPPED)
-          _tprintf(TEXT("\n%s stopped.\n"), displayName.c_str());
+          printf("\n%s stopped.\n", displayName.c_str());
         else
-          _tprintf(TEXT("\n%s failed to stop.\n"), displayName.c_str());
+          printf("\n%s failed to stop.\n", displayName.c_str());
       }
 
       // now remove the service
       if (DeleteService(schService))
-        _tprintf(TEXT("%s removed.\n"), displayName.c_str());
+        printf("%s removed.\n", displayName.c_str());
       else
-        _tprintf(TEXT("DeleteService failed - %s\n"),
-                 getLastErrorText().c_str());
+        printf("DeleteService failed - %s\n", getLastErrorText().c_str());
 
       CloseServiceHandle(schService);
     } else
-      _tprintf(TEXT("OpenService failed - %s\n"), getLastErrorText().c_str());
+      printf("OpenService failed - %s\n", getLastErrorText().c_str());
 
     CloseServiceHandle(schSCManager);
   } else
-    _tprintf(TEXT("OpenSCManager failed - %s\n"), getLastErrorText().c_str());
+    printf("OpenSCManager failed - %s\n", getLastErrorText().c_str());
 #endif
 }
 
@@ -502,9 +499,9 @@ void TService::addToMessageLog(const QString &msg) {
 
 void TService::addToMessageLog(const std::string &msg) {
 #ifdef _WIN32
-  TCHAR szMsg[256];
+  char szMsg[256];
   HANDLE hEventSource;
-  LPCTSTR lpszStrings[2];
+  LPCSTR lpszStrings[2];
 
   if (!TService::Imp::m_console) {
     TService::Imp::m_dwErr = GetLastError();
@@ -512,23 +509,23 @@ void TService::addToMessageLog(const std::string &msg) {
     // Use event logging to log the error.
     //
     hEventSource =
-        RegisterEventSource(NULL, TService::instance()->getName().c_str());
+        RegisterEventSourceA(NULL, TService::instance()->getName().c_str());
 
-    _stprintf(szMsg, TEXT("%s error: %d"),
-              TService::instance()->getName().c_str(), TService::Imp::m_dwErr);
+    sprintf(szMsg, "%s error: %lu", TService::instance()->getName().c_str(),
+            TService::Imp::m_dwErr);
     lpszStrings[0] = szMsg;
     lpszStrings[1] = msg.c_str();
 
     if (hEventSource != NULL) {
-      ReportEvent(hEventSource,         // handle of event source
-                  EVENTLOG_ERROR_TYPE,  // event type
-                  0,                    // event category
-                  0,                    // event ID
-                  NULL,                 // current user's SID
-                  2,                    // strings in lpszStrings
-                  0,                    // no bytes of raw data
-                  lpszStrings,          // array of error strings
-                  NULL);                // no raw data
+      ReportEventA(hEventSource,         // handle of event source
+                   EVENTLOG_ERROR_TYPE,  // event type
+                   0,                    // event category
+                   0,                    // event ID
+                   NULL,                 // current user's SID
+                   2,                    // strings in lpszStrings
+                   0,                    // no bytes of raw data
+                   lpszStrings,          // array of error strings
+                   NULL);                // no raw data
 
       (VOID) DeregisterEventSource(hEventSource);
     }

@@ -39,7 +39,8 @@ const bool igs::resource::thread_was_done(const HANDLE thread_id) {
   DWORD exit_code = 0;
   if (0 == ::GetExitCodeThread(thread_id, &exit_code)) {
     throw std::domain_error(
-        igs_resource_msg_from_err("GetExitCodeThread(-)", ::GetLastError()));
+        igs_resource_msg_from_err(TEXT("GetExitCodeThread(-)"),
+                                  ::GetLastError()));
   }
   if (exit_code == STILL_ACTIVE) {
     return false;

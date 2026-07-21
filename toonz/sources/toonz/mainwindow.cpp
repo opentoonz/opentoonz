@@ -63,7 +63,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QMessageBox>
-#ifdef _WIN32
+#if defined(_WIN32) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QtPlatformHeaders/QWindowsWindowFunctions>
 #endif
 #include <docklayout.h>
@@ -1232,7 +1232,7 @@ void MainWindow::fullScreenWindow() {
     else
       showNormal();
   } else {
-#if defined(_WIN32)
+#if defined(_WIN32) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     // http://doc.qt.io/qt-5/windows-issues.html#fullscreen-opengl-based-windows
     this->winId();
     QWindowsWindowFunctions::setHasBorderInFullScreen(this->windowHandle(),

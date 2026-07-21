@@ -1537,8 +1537,8 @@ void FlipConsole::onLoadBox(bool isDefine) {
 
   if (shrink != 1) {
 #ifdef _WIN32
-    MessageBox(0, "Cannot use loading box with a shrink factor! ", "Warning",
-               MB_OK);
+    MessageBoxA(0, "Cannot use loading box with a shrink factor! ", "Warning",
+                MB_OK);
 #endif
     setChecked(eUseLoadBox, false);
     setChecked(eDefineLoadBox, false);
