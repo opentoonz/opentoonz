@@ -270,24 +270,24 @@ void TExternalProgramFx::doCompute(TTile &tile, double frame,
   std::string expandedargs;
   char buffer[1024];
 #ifdef _WIN32
-  ExpandEnvironmentStrings(args.c_str(), buffer, 1024);
+  ExpandEnvironmentStringsA(args.c_str(), buffer, 1024);
 
-  STARTUPINFO si;
+  STARTUPINFOA si;
   PROCESS_INFORMATION pinfo;
 
-  GetStartupInfo(&si);
+  GetStartupInfoA(&si);
 
-  BOOL ret = CreateProcess(
-      (char *)executablePath.c_str(),           // name of executable module
-      buffer,                                   // command line string
-      NULL,                                     // SD
-      NULL,                                     // SD
-      TRUE,                                     // handle inheritance option
-      CREATE_NO_WINDOW, /*CREATE_NEW_CONSOLE*/  // creation flags
-      NULL,                                     // new environment block
-      NULL,                                     // current directory name
-      &si,                                      // startup information
-      &pinfo                                    // process information
+  BOOL ret =
+      CreateProcessA(executablePath.c_str(),  // name of executable module
+                     buffer,                  // command line string
+                     NULL,                    // SD
+                     NULL,                    // SD
+                     TRUE,                    // handle inheritance option
+                     CREATE_NO_WINDOW, /*CREATE_NEW_CONSOLE*/  // creation flags
+                     NULL,   // new environment block
+                     NULL,   // current directory name
+                     &si,    // startup information
+                     &pinfo  // process information
       );
 
   if (!ret) DWORD err = GetLastError();

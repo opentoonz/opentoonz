@@ -73,7 +73,7 @@ jobs:
       - name: Verify translation and runtime data inputs
         run: |
           test "$(find stuff/config/loc -mindepth 2 -maxdepth 2 -name '*.qm' | wc -l)" -eq 63
-          test -f stuff/config/qss/toonz.qss
+          test -f stuff/config/qss/Default/Default.qss
           test -d stuff/library/shaders
 
       - name: Create AppImage artifact
@@ -222,7 +222,7 @@ jobs:
         run: |
           $qmCount = (Get-ChildItem -Recurse -File stuff/config/loc -Filter *.qm).Count
           if ($qmCount -ne 63) { throw "Expected 63 translation files, found $qmCount" }
-          if (-not (Test-Path stuff/config/qss/toonz.qss)) { throw "Missing QSS runtime data" }
+          if (-not (Test-Path stuff/config/qss/Default/Default.qss)) { throw "Missing default QSS runtime data" }
           if (-not (Test-Path stuff/library/shaders)) { throw "Missing shader runtime data" }
 
       - name: Create package
