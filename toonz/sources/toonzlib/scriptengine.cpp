@@ -1127,6 +1127,7 @@ TXshSimpleLevel* loadScriptLevelFrames(ToonzScene* scene, const TFilePath& path,
   }
 }
 
+// Keep each adjacent raw literal below MSVC's per-literal size limit.
 const char kBootstrapScript[] = R"JS(
 (function(global) {
   var nextFilePathId = 0;
@@ -1507,6 +1508,8 @@ const char kBootstrapScript[] = R"JS(
       result.push(new FilePath(paths[i]));
     return result;
   };
+)JS"
+R"JS(
 
   global.Image = function(path) {
     if (arguments.length > 1)
@@ -1919,6 +1922,8 @@ const char kBootstrapScript[] = R"JS(
   defineCenterlineVectorizerProperty("preservePaintedAreas");
   defineCenterlineVectorizerProperty("addBorder");
   defineCenterlineVectorizerProperty("eir");
+)JS"
+R"JS(
 
   function defineRasterizerProperty(name) {
     Object.defineProperty(Rasterizer.prototype, name, {
@@ -3666,7 +3671,7 @@ QString ScriptEngine::imageBuilderAdd(int imageBuilderId, int imageId,
     imageBuilderAssign(imageBuilderId, clone.getPointer());
   } else if (image->getType() == TImage::VECTOR) {
     if (!builderImage) {
-      TVectorImageP vectorImage = image->cloneImage();
+      TVectorImageP vectorImage{TImageP(image->cloneImage())};
       vectorImage->transform(aff);
       imageBuilderAssign(imageBuilderId, vectorImage.getPointer());
     } else {
