@@ -28,10 +28,22 @@ jobs:
     if: github.repository == 'bgyss/opentoonz' && !(github.event_name == 'push' && github.actor == 'github-actions[bot]')
     runs-on: ubuntu-24.04
     timeout-minutes: 180
+    env:
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
+      CCACHE_BASEDIR: ${{ github.workspace }}
     steps:
       - uses: actions/checkout@v6
         with:
           ref: ${{ github.event_name == 'push' && github.ref || env.QT6_EXPERIMENTAL_BRANCH }}
+
+      - name: Restore Linux compiler cache
+        id: restore-linux-ccache
+        uses: actions/cache/restore@v5
+        with:
+          path: .ccache
+          key: qt6-${{ runner.os }}-${{ runner.arch }}-ccache-${{ env.QT6_EXPERIMENTAL_QT_VERSION }}-${{ github.sha }}
+          restore-keys: |
+            qt6-${{ runner.os }}-${{ runner.arch }}-ccache-${{ env.QT6_EXPERIMENTAL_QT_VERSION }}-
 
       - name: Install libraries
         run: |
@@ -55,11 +67,11 @@ jobs:
         run: |
           export QT_PATH="$PWD/Qt/${QT6_EXPERIMENTAL_QT_VERSION}/gcc_64"
           export CMAKE_PREFIX_PATH="$QT_PATH/lib/cmake"
-          export CC="ccache gcc"
-          export CXX="ccache g++"
-          mkdir -p /home/runner/.ccache
+          ccache --max-size 1G
+          ccache --zero-stats
 
           cmake -S toonz/sources -B toonz/build/qt6-experimental-linux -G Ninja \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DCMAKE_CXX_COMPILER=g++ \
             -DCMAKE_C_COMPILER=gcc \
@@ -69,6 +81,10 @@ jobs:
             -DCMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH" \
             -DWITH_TRANSLATION=ON
           cmake --build toonz/build/qt6-experimental-linux --parallel
+
+      - name: Show Linux compiler cache stats
+        if: always()
+        run: ccache --show-stats
 
       - name: Verify translation and runtime data inputs
         run: |
@@ -136,6 +152,13 @@ jobs:
           name: OpenToonz-${{ env.QT6_EXPERIMENTAL_LABEL }}-linux-x86_64
           path: toonz/build/qt6-experimental-linux/OpenToonz-${{ env.QT6_EXPERIMENTAL_LABEL }}-linux-x86_64.tar.gz
 
+      - name: Save Linux compiler cache
+        if: always() && steps.restore-linux-ccache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: qt6-${{ runner.os }}-${{ runner.arch }}-ccache-${{ env.QT6_EXPERIMENTAL_QT_VERSION }}-${{ github.sha }}
+
   Windows:
     name: Windows x64
     if: github.repository == 'bgyss/opentoonz' && !(github.event_name == 'push' && github.actor == 'github-actions[bot]')
@@ -155,6 +178,17 @@ jobs:
         with:
           ref: ${{ github.event_name == 'push' && github.ref || env.QT6_EXPERIMENTAL_BRANCH }}
           lfs: false
+
+      - name: Restore Windows incremental build
+        id: restore-windows-build
+        uses: actions/cache/restore@v5
+        with:
+          path: |
+            toonz/build
+            stuff/config/loc/**/*.qm
+          key: qt6-${{ runner.os }}-${{ runner.arch }}-msvc2022-build-${{ env.QT6_EXPERIMENTAL_QT_VERSION }}-${{ github.sha }}
+          restore-keys: |
+            qt6-${{ runner.os }}-${{ runner.arch }}-msvc2022-build-${{ env.QT6_EXPERIMENTAL_QT_VERSION }}-
 
       - name: Cache OpenCV and Boost
         id: cache-deps
@@ -203,8 +237,7 @@ jobs:
           copy /Y libpng-1.6.21\scripts\pnglibconf.h.prebuilt libpng-1.6.21\pnglibconf.h
 
           cd ../toonz
-          rmdir /S /Q build
-          mkdir build
+          if not exist build mkdir build
           cd build
 
           cmake ..\sources -G "%MSVCVERSION%" -Ax64 -DOPENTOONZ_QT_MAJOR=6 -DQT_PATH="%QT_PATH%" -DQt6_DIR="%QT_PATH%\lib\cmake\Qt6" -DBOOST_ROOT="%BOOST_ROOT%" -DOpenCV_DIR="%OpenCV_DIR%" -DWITH_TRANSLATION=ON
@@ -213,6 +246,7 @@ jobs:
       - name: Build OpenToonz
         run: |
           @echo on
+          echo Incremental build cache exact hit: ${{ steps.restore-windows-build.outputs.cache-hit }}
           cd toonz\build
           msbuild /p:Configuration=RelWithDebInfo /m /verbosity:minimal ALL_BUILD.vcxproj
         shell: cmd
@@ -263,6 +297,20 @@ jobs:
           name: OpenToonz-${{ env.QT6_EXPERIMENTAL_LABEL }}-windows-x64
           path: OpenToonz-${{ env.QT6_EXPERIMENTAL_LABEL }}-windows-x64.zip
 
+      - name: Trim Windows incremental cache
+        if: always()
+        shell: pwsh
+        run: Remove-Item -Recurse -Force toonz/build/Opentoonz -ErrorAction SilentlyContinue
+
+      - name: Save Windows incremental build
+        if: always() && steps.restore-windows-build.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: |
+            toonz/build
+            stuff/config/loc/**/*.qm
+          key: qt6-${{ runner.os }}-${{ runner.arch }}-msvc2022-build-${{ env.QT6_EXPERIMENTAL_QT_VERSION }}-${{ github.sha }}
+
   macOS:
     name: macOS Apple Silicon arm64
     if: github.repository == 'bgyss/opentoonz' && !(github.event_name == 'push' && github.actor == 'github-actions[bot]')
@@ -273,11 +321,22 @@ jobs:
       OPENTOONZ_DMG: toonz/build/nix-qt6-relwithdebinfo/toonz/OpenToonz.dmg
       OPENTOONZ_REQUIRED_ARCH: arm64
       OPENTOONZ_ALLOW_UNIVERSAL: '0'
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
+      CCACHE_BASEDIR: ${{ github.workspace }}
 
     steps:
       - uses: actions/checkout@v6
         with:
           ref: ${{ github.event_name == 'push' && github.ref || env.QT6_EXPERIMENTAL_BRANCH }}
+
+      - name: Restore macOS compiler cache
+        id: restore-macos-ccache
+        uses: actions/cache/restore@v5
+        with:
+          path: .ccache
+          key: qt6-${{ runner.os }}-${{ runner.arch }}-ccache-${{ env.QT6_EXPERIMENTAL_QT_VERSION }}-${{ github.sha }}
+          restore-keys: |
+            qt6-${{ runner.os }}-${{ runner.arch }}-ccache-${{ env.QT6_EXPERIMENTAL_QT_VERSION }}-
 
       - name: Install Nix
         uses: cachix/install-nix-action@v31
@@ -302,7 +361,15 @@ jobs:
         run: mise run doctor-qt6
 
       - name: Build OpenToonz with Qt 6
-        run: mise run build-qt6
+        run: |
+          nix develop path:.#qt6 --command ccache --max-size 1G
+          nix develop path:.#qt6 --command ccache --zero-stats
+          mise run build-qt6
+
+      - name: Show macOS compiler cache stats
+        if: always()
+        continue-on-error: true
+        run: nix develop path:.#qt6 --command ccache --show-stats
 
       - name: Bundle Qt 6 app
         run: mise run package-macos-qt6
@@ -326,6 +393,13 @@ jobs:
         with:
           name: OpenToonz-${{ env.QT6_EXPERIMENTAL_LABEL }}-macos-arm64
           path: toonz/build/qt6-experimental-macos/OpenToonz-${{ env.QT6_EXPERIMENTAL_LABEL }}-macos-arm64.dmg
+
+      - name: Save macOS compiler cache
+        if: always() && steps.restore-macos-ccache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: qt6-${{ runner.os }}-${{ runner.arch }}-ccache-${{ env.QT6_EXPERIMENTAL_QT_VERSION }}-${{ github.sha }}
 
   publish-release:
     name: Publish qt-6-experimental prerelease
