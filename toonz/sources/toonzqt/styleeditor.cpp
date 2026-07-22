@@ -650,7 +650,8 @@ void HexagonalColorWheel::initializeGL() {
   if (m_firstInitialized)
     m_firstInitialized = false;
   else {
-    resizeGL(width(), height());
+    // Logical size: resizeGL multiplies by DPR once.
+    resizeGL(QOpenGLWidget::width(), QOpenGLWidget::height());
     update();
   }
 }
@@ -826,9 +827,16 @@ void HexagonalColorWheel::updateLayout(int w, int h) {
 void HexagonalColorWheel::setDisplayMode(ColorWheelDisplayMode mode) {
   if (m_displayMode == mode) return;
   m_displayMode = mode;
-  int lw = width() * getDevPixRatio();
-  int lh = height() * getDevPixRatio();
-  if (lw > 0 && lh > 0) updateLayout(lw, lh);
+  // GLWidgetForHighDpi::width()/height() already include the device pixel
+  // ratio. Pass the logical QOpenGLWidget size into resizeGL so DPR is
+  // applied only once (same contract as Qt's resizeGL callback).
+  const int logicalW = QOpenGLWidget::width();
+  const int logicalH = QOpenGLWidget::height();
+  if (logicalW > 0 && logicalH > 0 && isValid()) {
+    makeCurrent();
+    resizeGL(logicalW, logicalH);
+    doneCurrent();
+  }
   update();
 }
 
