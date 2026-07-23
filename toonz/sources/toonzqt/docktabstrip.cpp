@@ -214,6 +214,7 @@ DockTabStrip::DockTabStrip(DockLayout *layout, Region *region, QWidget *parent)
     , m_pressIndex(-1)
     , m_dragOutStarted(false)
     , m_reordering(false)
+    , m_dropGapIndex(-1)
     , m_dimInactiveTabs(false) {
   setObjectName("DockTabStrip");
   setDrawBase(false);
@@ -321,18 +322,33 @@ void DockTabStrip::mouseDoubleClickEvent(QMouseEvent *event) {
 // text loses some contrast without any theme-specific color being assumed.
 void DockTabStrip::paintEvent(QPaintEvent *event) {
   QTabBar::paintEvent(event);
-  if (!m_dimInactiveTabs || !m_dimWashColor.isValid()) return;
 
   QPainter painter(this);
-  QColor wash = m_dimWashColor;
-  wash.setAlphaF(0.45);
-  const int current = currentIndex();
-  for (int i = 0; i < count(); ++i) {
-    if (i == current) continue;
-    QRect r = tabRect(i);
-    if (!r.isValid()) continue;
-    r.adjust(1, 1, -1, -1);
-    painter.fillRect(r, wash);
+  if (m_dimInactiveTabs && m_dimWashColor.isValid()) {
+    QColor wash = m_dimWashColor;
+    wash.setAlphaF(0.45);
+    const int current = currentIndex();
+    for (int i = 0; i < count(); ++i) {
+      if (i == current) continue;
+      QRect r = tabRect(i);
+      if (!r.isValid()) continue;
+      r.adjust(1, 1, -1, -1);
+      painter.fillRect(r, wash);
+    }
+  }
+
+  // Vertical insertion mark while reordering (gap before tab i, or after last).
+  if (m_reordering && m_dropGapIndex >= 0 && m_dropGapIndex <= count() &&
+      count() > 0) {
+    int x = 0;
+    if (m_dropGapIndex < count())
+      x = tabRect(m_dropGapIndex).left();
+    else
+      x = tabRect(count() - 1).right();
+
+    const int barW = 3;
+    QRect bar(x - barW / 2, 2, barW, height() - 4);
+    painter.fillRect(bar, dockThemeAccentColor());
   }
 }
 
@@ -360,6 +376,8 @@ void DockTabStrip::tryBeginDragOut(const QPoint &globalPos) {
   // once the panel shows its own title bar instead of the tab.
   const QPoint grabOffsetInTab = m_pressPos - tabRect(m_pressIndex).topLeft();
 
+  clearDropIndicator();
+  m_reordering     = false;
   m_dragOutStarted = true;
   releaseMouse();
 
@@ -371,13 +389,63 @@ void DockTabStrip::tryBeginDragOut(const QPoint &globalPos) {
 
 //-------------------------------------
 
+// Gap index under the cursor: 0 = before first tab, count() = after last.
+int DockTabStrip::dropGapAt(const QPoint &pos) const {
+  const int n = count();
+  if (n <= 0) return -1;
+
+  if (pos.x() < tabRect(0).center().x()) return 0;
+  for (int i = 0; i < n; ++i) {
+    const QRect r = tabRect(i);
+    if (!r.isValid()) continue;
+    if (pos.x() < r.center().x()) return i;
+  }
+  return n;
+}
+
+//-------------------------------------
+
+void DockTabStrip::setDropGapIndex(int gap) {
+  if (gap == m_dropGapIndex) return;
+  m_dropGapIndex = gap;
+  update();
+}
+
+//-------------------------------------
+
+void DockTabStrip::clearDropIndicator() {
+  if (m_dropGapIndex < 0) return;
+  m_dropGapIndex = -1;
+  update();
+}
+
+//-------------------------------------
+
+void DockTabStrip::commitTabReorder() {
+  if (!m_layout || !m_region || !m_reordering) return;
+  if (m_pressIndex < 0 || m_pressIndex >= count()) return;
+  if (m_dropGapIndex < 0 || m_dropGapIndex > count()) return;
+
+  // Dropping in the gaps immediately before/after the source is a no-op.
+  if (m_dropGapIndex == m_pressIndex || m_dropGapIndex == m_pressIndex + 1)
+    return;
+
+  // Convert insertion gap → destination index for moveTab (erase then insert).
+  int toIndex = m_dropGapIndex;
+  if (toIndex > m_pressIndex) --toIndex;
+  m_layout->moveTab(m_region, m_pressIndex, toIndex);
+}
+
+//-------------------------------------
+
 void DockTabStrip::mousePressEvent(QMouseEvent *event) {
   if (event->button() == Qt::LeftButton) {
-    m_pressIndex      = tabAt(event->pos());
-    m_pressPos        = event->pos();
-    m_globalPressPos  = event->globalPos();
-    m_dragOutStarted  = false;
-    m_reordering      = false;
+    m_pressIndex     = tabAt(event->pos());
+    m_pressPos       = event->pos();
+    m_globalPressPos = event->globalPos();
+    m_dragOutStarted = false;
+    m_reordering     = false;
+    clearDropIndicator();
 
     if (m_pressIndex >= 0) {
       grabMouse();
@@ -408,7 +476,7 @@ void DockTabStrip::mouseMoveEvent(QMouseEvent *event) {
         std::abs(delta.y()) > std::abs(delta.x());
 
     // Same spirit as docked title-bar undock: any significant move can detach.
-    // Horizontal moves inside the strip reorder tabs instead.
+    // Horizontal moves inside the strip preview a reorder instead.
     if (outsideStrip || verticalIntent) {
       tryBeginDragOut(event->globalPos());
       event->accept();
@@ -425,19 +493,17 @@ void DockTabStrip::mouseMoveEvent(QMouseEvent *event) {
       return;
     }
 
-    int srcIndex = m_pressIndex;
-    if (srcIndex < 0 || srcIndex >= count()) {
+    if (m_pressIndex < 0 || m_pressIndex >= count()) {
       QTabBar::mouseMoveEvent(event);
       return;
     }
 
-    int dstIndex = tabAt(event->pos());
-    if (dstIndex >= 0 && dstIndex < count() && dstIndex != srcIndex) {
-      QRect srcRect = tabRect(srcIndex);
-      int x         = event->pos().x();
-      if (x < srcRect.left() || x > srcRect.right())
-        m_layout->moveTab(m_region, srcIndex, dstIndex);
-    }
+    // Preview only: update the insertion bar, commit on mouse release.
+    const int gap = dropGapAt(event->pos());
+    if (gap == m_pressIndex || gap == m_pressIndex + 1)
+      clearDropIndicator();
+    else
+      setDropGapIndex(gap);
   }
 
   event->accept();
@@ -446,13 +512,18 @@ void DockTabStrip::mouseMoveEvent(QMouseEvent *event) {
 //-------------------------------------
 
 void DockTabStrip::mouseReleaseEvent(QMouseEvent *event) {
-  const bool wasClick =
-      !m_dragOutStarted && m_pressIndex >= 0 && m_pressIndex < count();
+  const bool wasReorder =
+      m_reordering && !m_dragOutStarted && m_pressIndex >= 0;
+  const bool wasClick = !m_dragOutStarted && !m_reordering &&
+                        m_pressIndex >= 0 && m_pressIndex < count();
+
+  if (wasReorder) commitTabReorder();
 
   releaseMouse();
 
   if (wasClick) setCurrentIndex(m_pressIndex);
 
+  clearDropIndicator();
   m_pressIndex     = -1;
   m_dragOutStarted = false;
   m_reordering     = false;

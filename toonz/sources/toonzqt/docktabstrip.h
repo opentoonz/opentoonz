@@ -43,6 +43,9 @@ class DVAPI DockTabStrip final : public QTabBar {
   QPoint m_globalPressPos;
   bool m_dragOutStarted;
   bool m_reordering;
+  // Insertion gap while reordering: 0 .. count() (gap after last tab).
+  // -1 means no drop target / indicator hidden.
+  int m_dropGapIndex;
   // Whether the active theme's own stylesheet fails to visually
   // distinguish a selected tab's text from an unselected one (measured at
   // runtime, see updateTabTextColors()), and if so, the tab's own sampled
@@ -53,6 +56,10 @@ class DVAPI DockTabStrip final : public QTabBar {
   bool isOutsideTabStrip(const QPoint &globalPos) const;
   void tryBeginDragOut(const QPoint &globalPos);
   void updateTabTextColors();
+  int dropGapAt(const QPoint &pos) const;
+  void setDropGapIndex(int gap);
+  void clearDropIndicator();
+  void commitTabReorder();
 
 public:
   static const int kHeight;
