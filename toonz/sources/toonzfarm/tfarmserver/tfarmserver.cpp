@@ -1032,7 +1032,7 @@ void FarmServerService::mountDisks() {
     std::string drive      = it->first;
     std::string remoteName = it->second;
 
-    NETRESOURCE NetResource;
+    NETRESOURCEA NetResource;
     NetResource.dwType      = RESOURCETYPE_DISK;
     NetResource.lpLocalName = (LPSTR)drive.c_str();  // "O:";
     NetResource.lpRemoteName =
@@ -1040,10 +1040,10 @@ void FarmServerService::mountDisks() {
     NetResource.lpProvider = NULL;
 
     DWORD res =
-        WNetAddConnection2(&NetResource,  // connection details
-                           0,             // password
-                           TSystem::getUserName().toUtf8(),  // user name
-                           0);  // connection options
+        WNetAddConnection2A(&NetResource,  // connection details
+                            0,             // password
+                            TSystem::getUserName().toUtf8().constData(),
+                            0);  // connection options
 
     if (res == NO_ERROR) m_disksMounted.push_back(drive);
 
@@ -1055,11 +1055,11 @@ void FarmServerService::mountDisks() {
       char nameBuf[1024];
 
       DWORD rett =
-          WNetGetLastError(&dwLastError,      // error code
-                           errorBuf,          // error description buffer
-                           sizeof(errorBuf),  // size of description buffer
-                           nameBuf,           // buffer for provider name
-                           sizeof(nameBuf));  // size of provider name buffer
+          WNetGetLastErrorA(&dwLastError,      // error code
+                            errorBuf,          // error description buffer
+                            sizeof(errorBuf),  // size of description buffer
+                            nameBuf,           // buffer for provider name
+                            sizeof(nameBuf));  // size of provider name buffer
 
       std::string errorMessage("Unable to map ");
       errorMessage += NetResource.lpRemoteName;
@@ -1076,9 +1076,9 @@ void FarmServerService::mountDisks() {
 void FarmServerService::unmountDisks() {
   for (auto const &drive : m_disksMounted) {
     DWORD res =
-        WNetCancelConnection2(drive.c_str(),           // resource name
-                              CONNECT_UPDATE_PROFILE,  // connection type
-                              TRUE);  // unconditional disconnect option
+        WNetCancelConnection2A(drive.c_str(),           // resource name
+                               CONNECT_UPDATE_PROFILE,  // connection type
+                               TRUE);  // unconditional disconnect option
 
     if (res != NO_ERROR && res != ERROR_NOT_CONNECTED) {
       std::string errorMessage("Unable to unmap ");
@@ -1122,7 +1122,7 @@ int main(int argc, char **argv) {
       if (installQualifier.getValue() != "")
         serviceDisplayName = installQualifier.getValue();
 
-      if (GetModuleFileName(NULL, szPath, 512) == 0) {
+      if (GetModuleFileNameA(NULL, szPath, 512) == 0) {
         std::cout << "Unable to install";
         std::cout << serviceName << " - ";
         std::cout << getLastErrorText().c_str() << std::endl << std::endl;
