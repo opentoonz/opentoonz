@@ -695,6 +695,15 @@ int main(int argc, char *argv[]) {
   TEnv::setSystemVarPrefix(systemVarPrefix);
   TEnv::setApplicationFileName(argv[0]);
 
+  // Seed the per-user config dir from the installed "stuff" on first run
+  // (Linux/*BSD), so the tool works without the launcher script. No-op
+  // elsewhere and when already seeded.
+  {
+    TFilePath exeDir(QCoreApplication::applicationDirPath().toStdWString());
+    TEnv::initUserStuffDir(exeDir.getParentDir() + "share" + "opentoonz" +
+                           "stuff");
+  }
+
   QCoreApplication::setOrganizationName("OpenToonz");
   QCoreApplication::setOrganizationDomain("");
   QCoreApplication::setApplicationName(
