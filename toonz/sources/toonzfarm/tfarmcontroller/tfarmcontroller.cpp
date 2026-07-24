@@ -2403,7 +2403,7 @@ int main(int argc, char **argv) {
       if (installQualifier.getValue() != "")
         serviceDisplayName = installQualifier.getValue();
 
-      if (GetModuleFileName(NULL, szPath, 512) == 0) {
+      if (GetModuleFileNameA(NULL, szPath, 512) == 0) {
         std::cout << "Unable to install";
         std::cout << serviceName << " - ";
         std::cout << getLastErrorText().c_str() << std::endl << std::endl;
