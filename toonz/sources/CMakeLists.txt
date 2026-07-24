@@ -643,6 +643,20 @@ elseif(BUILD_ENV_UNIXLIKE)
     if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
         set(CMAKE_INSTALL_PREFIX "/opt/opentoonz" CACHE PATH "OpenToonz install prefix" FORCE)
     endif()
+
+    # Locate bundled libraries relative to each binary's own location via an
+    # $ORIGIN-relative RPATH, so installed binaries run without relying on the
+    # launcher's LD_LIBRARY_PATH and stay relocatable for packagers
+    # (Flatpak / RPM / deb / AppImage).
+    #   executables in <prefix>/bin           -> ../lib/opentoonz
+    #   libraries   in <prefix>/lib/opentoonz -> . (siblings)
+    # The build tree mirrors the install layout (bin/ + lib/opentoonz/), so the
+    # same RPATH is valid in both; build directly with the install RPATH (no
+    # relink on install). This also fixes the install(FILES|PROGRAMS
+    # $<TARGET_FILE:...>) copies below, which otherwise retain an absolute
+    # build-tree RPATH that does not exist on the target machine.
+    set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib/opentoonz:$ORIGIN")
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 endif()
 
 if(BUILD_ENV_MSVC AND MSVC_VERSION EQUAL 1800)
