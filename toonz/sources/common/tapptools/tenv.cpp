@@ -616,6 +616,53 @@ TFilePath TEnv::getConfigDir() {
   return configDir;
 }
 
+void TEnv::initUserStuffDir(const TFilePath &installedStuffDir) {
+#if defined(LINUX) || defined(FREEBSD)
+  EnvGlobals *eg = EnvGlobals::instance();
+
+  // portable builds carry their own stuff; nothing to seed
+  if (eg->getIsPortable()) return;
+
+  // respect an explicit -TOONZROOT command-line override
+  if (eg->getArgPathValue(eg->getRootVarName()) != "") return;
+
+  // per-user config dir: ~/.config/<AppName> (matches getSystemVarPath())
+  QString configDirStr = QDir::homePath() + "/.config/" +
+                         QString::fromStdString(eg->getApplicationName());
+  QDir().mkpath(configDirStr);
+
+  TFilePath configDir(configDirStr.toStdWString());
+  TFilePath userStuffDir  = configDir + "stuff";
+  TFilePath systemVarFile = configDir + "SystemVar.ini";
+
+  // 1. Seed the writable stuff tree from the installed read-only copy.
+  if (!TFileStatus(userStuffDir).doesExist()) {
+    if (!TFileStatus(installedStuffDir).isDirectory())
+      return;  // nothing to copy from (e.g. running from the build tree)
+    try {
+      TSystem::copyDir(userStuffDir, installedStuffDir);
+    } catch (...) {
+      return;
+    }
+  }
+
+  // Folders the app expects to be able to write into but which may be absent
+  // from the packaged stuff tree (mkpath creates parents and is a no-op if
+  // they already exist).
+  QDir().mkpath((userStuffDir + "projects" + "library").getQString());
+  QDir().mkpath((userStuffDir + "projects" + "fxs").getQString());
+
+  // 2. Write a minimal SystemVar.ini. Only the root variable is required;
+  //    every other path falls back to <stuff>/<subdir> in TEnv/ToonzFolder.
+  if (!TFileStatus(systemVarFile).doesExist()) {
+    QSettings settings(systemVarFile.getQString(), QSettings::IniFormat);
+    settings.setValue(QString::fromStdString(eg->getRootVarName()),
+                      userStuffDir.getQString());
+    settings.sync();
+  }
+#endif
+}
+
 /*TFilePath TEnv::getProfilesDir()
 {
   TFilePath fp(getStuffDir());

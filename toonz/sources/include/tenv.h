@@ -137,6 +137,14 @@ DVAPI TFilePath getStuffDir();
 DVAPI TFilePath getConfigDir();
 // DVAPI TFilePath getProfilesDir();
 
+// Linux/*BSD first-run setup. If the per-user config dir does not yet contain
+// a "stuff" folder, seed it by copying the read-only installed copy
+// (installedStuffDir, e.g. <prefix>/share/opentoonz/stuff) and write a minimal
+// SystemVar.ini pointing the root variable at it. This lets a plain installed
+// binary run without the generated launcher script pre-populating the config.
+// No-op on Windows/macOS, in portable mode, or when already seeded.
+DVAPI void initUserStuffDir(const TFilePath &installedStuffDir);
+
 // per l'utilizzo di ToonzLib senza che sia definita una TOONZROOT
 // bisogna chiamare TEnv::setStuffDir(stuffdir) prima di ogni altra operazione
 DVAPI void setStuffDir(const TFilePath &stuffDir);
