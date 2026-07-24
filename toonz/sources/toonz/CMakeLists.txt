@@ -733,54 +733,15 @@ elseif(BUILD_ENV_UNIXLIKE AND NOT BUILD_TARGET_WIN)
         DESTINATION bin
     )
 
-    # Shell script that copies files to the home directory as needed
-    # and sets the library preload path.
-    file(WRITE ${CMAKE_BINARY_DIR}/bin/opentoonz
-"#!/bin/sh
-OPENTOONZ_BASE=\$(dirname \"\$0\")/..
-
-if [ ! -d \$HOME/.config/OpenToonz ]; then
-    mkdir -p \$HOME/.config/OpenToonz
-fi
-
-if [ ! -d \$HOME/.config/OpenToonz/stuff ]; then
-    cp -r \$OPENTOONZ_BASE/share/opentoonz/stuff \$HOME/.config/OpenToonz
-fi
-
-if [ ! -d \$HOME/.config/OpenToonz/stuff/projects/library ]; then
-    mkdir -p \$HOME/.config/OpenToonz/stuff/projects/library
-fi
-
-if [ ! -d \$HOME/.config/OpenToonz/stuff/projects/fxs ]; then
-    mkdir -p \$HOME/.config/OpenToonz/stuff/projects/fxs
-fi
-
-if [ ! -e \$HOME/.config/OpenToonz/SystemVar.ini ]; then
-    cat << EOF > $HOME/.config/OpenToonz/SystemVar.ini
-[General]
-OPENTOONZROOT=\"\$HOME/.config/OpenToonz/stuff\"
-OpenToonzPROFILES=\"\$HOME/.config/OpenToonz/stuff/profiles\"
-TOONZCACHEROOT=\"\$HOME/.config/OpenToonz/stuff/cache\"
-TOONZCONFIG=\"\$HOME/.config/OpenToonz/stuff/config\"
-TOONZFXPRESETS=\"\$HOME/.config/OpenToonz/stuff/fxs\"
-TOONZLIBRARY=\"\$HOME/.config/OpenToonz/stuff/library\"
-TOONZPROFILES=\"\$HOME/.config/OpenToonz/stuff/profiles\"
-TOONZPROJECTS=\"$HOME/.config/OpenToonz/stuff/projects\"
-TOONZROOT=\"\$HOME/.config/OpenToonz/stuff\"
-TOONZSTUDIOPALETTE=\"\$HOME/.config/OpenToonz/stuff/studiopalette\"
-EOF
-fi
-
-export ${PRELOAD_VARIABLE}=\${OPENTOONZ_BASE}/lib/opentoonz:\${${PRELOAD_VARIABLE}}
-
-exec \$OPENTOONZ_BASE/bin/OpenToonz \"\$@\"
-")
-    # only needed for executing without installing
-    execute_process(COMMAND chmod +x ${CMAKE_BINARY_DIR}/bin/opentoonz)
-
+    # First-run config seeding and library lookup were previously handled by a
+    # generated bin/opentoonz launcher shell script. That is no longer needed:
+    # the application seeds ~/.config/OpenToonz itself (TEnv::initUserStuffDir,
+    # in the GUI and the CLI tools) and locates its bundled libraries through an
+    # $ORIGIN-relative RPATH. Install the real binaries directly and add a
+    # lowercase "opentoonz" symlink to OpenToonz so the .desktop file's
+    # "Exec=opentoonz" keeps working.
     install(
         PROGRAMS
-            ${CMAKE_BINARY_DIR}/bin/opentoonz
             "$<TARGET_FILE:tcleanup>"
             "$<TARGET_FILE:tcomposer>"
             "$<TARGET_FILE:tconverter>"
@@ -788,6 +749,13 @@ exec \$OPENTOONZ_BASE/bin/OpenToonz \"\$@\"
             "$<TARGET_FILE:tfarmserver>"
         DESTINATION bin
     )
+
+    install(CODE "
+      file(REMOVE \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/bin/opentoonz\")
+      execute_process(COMMAND \"${CMAKE_COMMAND}\" -E create_symlink
+                      OpenToonz
+                      \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/bin/opentoonz\")
+    ")
 
     if(LZODRIVER_FOUND)
         install(
