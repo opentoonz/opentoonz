@@ -630,9 +630,9 @@ int FarmServer::addTask(const QString &id, const QString &cmdline) {
 
 int FarmServer::terminateTask(const QString &taskid) {
 #ifdef _WIN32
-  HANDLE hJob = OpenJobObject(MAXIMUM_ALLOWED,   // access right
-                              TRUE,              // inheritance state
-                              taskid.toUtf8());  // job name
+  HANDLE hJob = OpenJobObjectA(MAXIMUM_ALLOWED,       // access right
+                               TRUE,                  // inheritance state
+                               taskid.toUtf8().constData());  // job name
 
   if (hJob != NULL) {
     BOOL res = TerminateJobObject(hJob,  // handle to job
