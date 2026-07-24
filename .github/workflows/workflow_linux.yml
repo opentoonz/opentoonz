@@ -25,6 +25,9 @@ on:
 jobs:
   Ubuntu:
     runs-on: ubuntu-24.04
+    # Needed so the tag-triggered step can attach the AppImage to the Release.
+    permissions:
+      contents: write
     strategy:
       matrix:
         compiler: [gcc, clang]
@@ -116,3 +119,60 @@ jobs:
       with:
         name: Opentoonz-${{ runner.os }}-${{ matrix.compiler }}-${{ github.sha }}
         path: toonz/build/Opentoonz-${{ runner.os }}-${{ matrix.compiler }}-${{ github.sha }}.tar.gz
+
+    # Attach the AppImage to the GitHub Release when a tag is pushed, so there
+    # is an official Linux binary for users and for downstream packagers such
+    # as Flathub. Only the gcc build is published to avoid duplicate assets.
+    - name: Prepare release asset
+      if: startsWith(github.ref, 'refs/tags/') && matrix.compiler == 'gcc'
+      run: |
+        cp "toonz/build/Opentoonz-${{ runner.os }}-${{ matrix.compiler }}-${{ github.sha }}/OpenToonz.AppImage" \
+           "OpenToonz-${{ github.ref_name }}-x86_64.AppImage"
+
+    - name: Publish AppImage to GitHub Release
+      if: startsWith(github.ref, 'refs/tags/') && matrix.compiler == 'gcc'
+      uses: softprops/action-gh-release@v2
+      with:
+        files: OpenToonz-${{ github.ref_name }}-x86_64.AppImage
+        fail_on_unmatched_files: true
+
+  # Compile-only regression check on a current Fedora release. OpenToonz builds
+  # and runs on Fedora, but only Ubuntu was covered by CI, so Fedora-specific
+  # breakage (package renames, newer GCC/Qt) went unnoticed. This job does not
+  # build an AppImage; it exists to catch build regressions on a modern distro.
+  Fedora:
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:latest
+    steps:
+    # git and tar are required by actions/checkout and are not in the base image
+    - name: Install prerequisites
+      run: dnf install -y git tar gzip
+
+    - uses: actions/checkout@v6
+
+    - name: Install libraries
+      run: |
+        dnf install -y gcc gcc-c++ automake libtool make git cmake ninja-build \
+          boost boost-devel SuperLU SuperLU-devel lz4-devel xz-devel \
+          libusb1-devel lzo-devel libjpeg-turbo-devel turbojpeg-devel \
+          glew glew-devel freeglut freeglut-devel freetype-devel libpng-devel \
+          blas blas-devel json-c-devel opencv-devel libmypaint-devel \
+          qt5-qtbase-devel qt5-qtsvg qt5-qtsvg-devel qt5-qtscript qt5-qtscript-devel \
+          qt5-qttools qt5-qttools-devel qt5-qttools-static qt5-qtmultimedia \
+          qt5-qtmultimedia-devel qt5-qtserialport-devel qt5-qtwayland \
+          pkgconf-pkg-config
+
+    - name: Build libtiff
+      run: |
+        cd thirdparty/tiff-4.0.3
+        CFLAGS='-fPIC' CXXFLAGS='-fPIC' ./configure --disable-jbig
+        make -j $(nproc)
+
+    - name: Build
+      run: |
+        cd toonz
+        mkdir build
+        cd build
+        cmake ../sources -G Ninja -DWITH_TRANSLATION=OFF
+        ninja
