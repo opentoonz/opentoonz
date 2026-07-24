@@ -233,6 +233,18 @@ hd->biPad = 0;
   if (m_header.biBitCount < 16) {
     int cmaplen =
         (m_header.biClrUsed) ? m_header.biClrUsed : 1 << m_header.biBitCount;
+    // Proposed by Claude Opus 4.8 — REQUIRES MAINTAINER CODE REVIEW.
+    // Security fix (heap buffer overflow): cmaplen is derived from unvalidated
+    // header fields — biClrUsed is read straight from the file, and when it is
+    // zero the fallback 1<<biBitCount can be as large as 1<<15 (the guard above
+    // is only biBitCount < 16). The colormap is a fixed 256-entry buffer
+    // (new TPixel[256]) and the loop below writes cmaplen entries into it, so a
+    // crafted BMP overflows the heap. The previous sole guard, assert(cmaplen
+    // <= 256), is compiled out in release builds (NDEBUG). Clamp to the buffer
+    // capacity; valid indexed BMPs never exceed 256 palette entries, so this
+    // does not change behaviour for well-formed input. Malformed files may
+    // decode to a garbled image, but no longer corrupt memory.
+    if (cmaplen < 0 || cmaplen > 256) cmaplen = 256;
     assert(cmaplen <= 256);
     m_cmap.reset(new TPixel[256]);
     TPixel32 *pix = m_cmap.get();
