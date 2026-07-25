@@ -1752,7 +1752,7 @@ void ToolUtils::drawHook(const TPointD &pos, ToolUtils::HookType type,
 //---------------------------------------------------------------------------------------------
 
 bool ToolUtils::isJustCreatedSpline(TImage *image) {
-  TVectorImageP vi = image;
+  TVectorImageP vi(image);
   if (!vi) return false;
   if (vi->getStrokeCount() != 1) return false;
   TStroke *stroke = vi->getStroke(0);
