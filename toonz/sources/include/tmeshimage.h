@@ -211,9 +211,10 @@ public:
   TMeshImageP() {}
   TMeshImageP(TMeshImage *image) : DerivedSmartPointer(image) {}
   TMeshImageP(TImageP image) : DerivedSmartPointer(image) {}
-#if !defined(_WIN32)
+  // Needed on every platform: copy-initializing from a TImage* would otherwise
+  // require two user-defined conversions (TImage* -> TImageP -> TMeshImageP),
+  // which conforming compilers reject.
   TMeshImageP(TImage *image) : DerivedSmartPointer(TImageP(image)) {}
-#endif
   operator TImageP() { return TImageP(m_pointer); }
 };
 

@@ -424,9 +424,10 @@ public:
   TVectorImageP() {}
   TVectorImageP(TVectorImage *image) : DerivedSmartPointer(image) {}
   TVectorImageP(TImageP image) : DerivedSmartPointer(image) {}
-#if !defined(_WIN32)
+  // Needed on every platform: copy-initializing from a TImage* would otherwise
+  // require two user-defined conversions (TImage* -> TImageP -> TVectorImageP),
+  // which conforming compilers reject.
   TVectorImageP(TImage *image) : DerivedSmartPointer(TImageP(image)) {}
-#endif
   operator TImageP() { return TImageP(m_pointer); }
 };
 
