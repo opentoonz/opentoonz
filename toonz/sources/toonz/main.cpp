@@ -13895,7 +13895,11 @@ static QStringList gui_smoke_audio_playback_wav_details() {
   if (outputInstalled && wavLoadOk && loadedTrack) {
     try {
       TSoundOutputDevice player;
+#ifndef _WIN32
+      // TSoundOutputDevice exposes the volume API only off Windows
+      // (see the #ifndef _WIN32 block in tsound.h).
       player.setVolume(0.10);
+#endif
       playbackOpenOk = player.open(loadedTrack);
       player.play(loadedTrack, 0, loadedTrack->getSampleCount() - 1, false,
                   false);
