@@ -424,9 +424,16 @@ jobs:
       - name: Record source commit and checksums
         run: |
           git rev-parse HEAD > dist/source-commit.txt
-          find dist -type f -not -name '*.sha256' -not -name source-commit.txt -print0 |
+          # Release assets download flat, so record basenames rather than the
+          # dist/<artifact-dir>/<file> layout, and build the list outside dist
+          # so the checksum file cannot hash itself mid-write.
+          : > "${RUNNER_TEMP}/SHA256SUMS"
+          find dist -type f -not -name '*.sha256' -not -name source-commit.txt -not -name SHA256SUMS -print0 |
             sort -z |
-            xargs -0 shasum -a 256 > dist/SHA256SUMS
+            while IFS= read -r -d '' artifact; do
+              ( cd "$(dirname "$artifact")" && shasum -a 256 "$(basename "$artifact")" ) >> "${RUNNER_TEMP}/SHA256SUMS"
+            done
+          mv "${RUNNER_TEMP}/SHA256SUMS" dist/SHA256SUMS
 
       - name: Refresh rolling release tag
         if: github.event_name != 'push'
