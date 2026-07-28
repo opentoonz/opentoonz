@@ -528,7 +528,6 @@ QString ToolPropertiesPanel::displayNameForToolId(const QString &toolId) const {
   if (toolId == T_Rotate) return tr("Rotate tool");
   if (toolId == T_Hand) return tr("Hand tool");
   if (toolId == T_Ruler) return tr("Ruler tool");
-  if (toolId == T_HideLine) return tr("Hide Line tool");
   if (toolId == T_ShiftTrace) return tr("Shift and Trace");
   return toolId;
 }
@@ -3907,16 +3906,8 @@ ShiftTraceTool *activeShiftTraceTool() {
 }
 
 void setShiftTraceGhostIndex(int index) {
-  if (ShiftTraceTool *st = activeShiftTraceTool()) {
+  if (ShiftTraceTool *st = activeShiftTraceTool())
     st->setCurrentGhostIndex(index);
-    return;
-  }
-  CommandManager *cm = CommandManager::instance();
-  if (!cm) return;
-  if (index == 0)
-    cm->execute(MI_ShiftTraceSelectPrevGhost);
-  else
-    cm->execute(MI_ShiftTraceSelectNextGhost);
 }
 
 QCheckBox *addShiftTraceToggleRow(QVBoxLayout *layout, QWidget *parent,
@@ -3981,25 +3972,6 @@ void ToolPropertiesPanel::createShiftTraceProperties() {
   QObject::connect(m_shiftTraceResetFollowingBtn, &QPushButton::clicked, []() {
     resetShiftTraceGhost(1);
   });
-
-  TApplication *app = TApp::instance();
-  const int levelType = detectCurrentLevelType(app);
-  if (levelType == TZP_XSHLEVEL || levelType == OVL_XSHLEVEL ||
-      levelType == TZI_XSHLEVEL) {
-    const QStringList bboxItems{tr("Full raster bounding box"), tr("Savebox"),
-                                tr("Content (alpha)")};
-    const int bboxIdx = static_cast<int>(ShiftTraceTool::getGhostBBoxMode());
-    m_shiftTraceBBoxPicker = createCollapsibleEnum(
-        tr("Ghost Reference"), bboxItems, bboxIdx, "shift_trace_bbox", QString(),
-        [](int index) {
-          ShiftTraceTool::setGhostBBoxMode(
-              static_cast<ShiftTraceTool::GhostBBoxMode>(index));
-        });
-    if (m_shiftTraceBBoxPicker) {
-      m_shiftTraceBBoxPicker->setObjectName("shiftTraceBBoxPicker");
-      m_propertiesLayout->addWidget(m_shiftTraceBBoxPicker);
-    }
-  }
 
   m_propertiesLayout->addSpacing(CollapsibleStyle::kBlockGap);
 
@@ -4122,13 +4094,6 @@ void ToolPropertiesPanel::updateShiftTraceWidgets() {
   if (m_shiftTraceGhostPicker) {
     syncCollapsibleEnum(m_shiftTraceGhostPicker, ghostIndex,
                         {tr("Previous Drawing"), tr("Following Drawing")});
-  }
-
-  if (m_shiftTraceBBoxPicker) {
-    syncCollapsibleEnum(
-        m_shiftTraceBBoxPicker,
-        static_cast<int>(ShiftTraceTool::getGhostBBoxMode()),
-        {tr("Full raster bounding box"), tr("Savebox"), tr("Content (alpha)")});
   }
 
   if (m_shiftTraceResetPrevBtn)
