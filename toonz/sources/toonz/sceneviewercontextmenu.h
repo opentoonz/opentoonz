@@ -6,6 +6,7 @@
 #include <QMenu>
 #include "tgeometry.h"
 
+class QMenuBar;
 class TStageObjectId;
 class SceneViewer;
 class TXshColumn;
