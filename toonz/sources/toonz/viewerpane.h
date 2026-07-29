@@ -10,11 +10,7 @@
 #include "saveloadqsettings.h"
 
 #include <QFrame>
-<<<<<<< HEAD
-=======
-#include <QContextMenuEvent>
 #include <array>
->>>>>>> 37c40d2d3 (feat: persist viewer zoom/pan and reference mode across sessions)
 
 class SceneViewer;
 class QPoint;
