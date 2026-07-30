@@ -247,6 +247,19 @@ protected slots:
   void toggleRGBPickerFreehand();
   void toggleRGBPickerPolyline();
 
+  /*-- Edit Assistants tool + type switching shortcuts --*/
+  void toggleAssistantNextType();
+  void toggleAssistantLine();
+  void toggleAssistantEllipse();
+  void toggleAssistantPerspective();
+  void toggleAssistantVanishingPoint();
+  void toggleAssistantFisheye();
+  void toggleAssistantReplicatorStar();
+  void toggleAssistantReplicatorMirror();
+  void toggleAssistantReplicatorJitter();
+  void toggleAssistantReplicatorGrid();
+  void toggleAssistantReplicatorAffine();
+
   /*-- Skeleton tool + mode switching shortcuts --*/
   void ToggleSkeletonNextMode();
   void ToggleSkeletonBuildSkeleton();

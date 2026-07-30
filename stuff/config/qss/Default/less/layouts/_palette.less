@@ -72,6 +72,11 @@ PaletteViewer {
       background-color: @lockbutton-bg-color-checked-hover;
       border-color: @lockbutton-bg-color-checked-hover;
     }
+
+    &:disabled {
+      background-color: fade(@lockbutton-bg-color-checked, @disabled-amount);
+      border-color: fade(@lockbutton-border-color-checked, @disabled-amount);
+    }
   }
 }
 

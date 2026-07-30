@@ -599,6 +599,30 @@ void ToolOptionsShortcutInvoker::initialize() {
                     &ToolOptionsShortcutInvoker::TogglePlasticBuildSkeleton);
   setCommandHandler(MI_PlasticAnimate, this,
                     &ToolOptionsShortcutInvoker::TogglePlasticAnimate);
+
+  /*-- Edit Assistants tool + type switching shortcuts --*/
+  setCommandHandler(MI_AssistantNextType, this,
+                    &ToolOptionsShortcutInvoker::toggleAssistantNextType);
+  setCommandHandler(MI_AssistantLine, this,
+                    &ToolOptionsShortcutInvoker::toggleAssistantLine);
+  setCommandHandler(MI_AssistantEllipse, this,
+                    &ToolOptionsShortcutInvoker::toggleAssistantEllipse);
+  setCommandHandler(MI_AssistantPerspective, this,
+                    &ToolOptionsShortcutInvoker::toggleAssistantPerspective);
+  setCommandHandler(MI_AssistantVanishingPoint, this,
+                    &ToolOptionsShortcutInvoker::toggleAssistantVanishingPoint);
+  setCommandHandler(MI_AssistantFisheye, this,
+                    &ToolOptionsShortcutInvoker::toggleAssistantFisheye);
+  setCommandHandler(MI_AssistantReplicatorStar, this,
+                    &ToolOptionsShortcutInvoker::toggleAssistantReplicatorStar);
+  setCommandHandler(MI_AssistantReplicatorMirror, this,
+                    &ToolOptionsShortcutInvoker::toggleAssistantReplicatorMirror);
+  setCommandHandler(MI_AssistantReplicatorJitter, this,
+                    &ToolOptionsShortcutInvoker::toggleAssistantReplicatorJitter);
+  setCommandHandler(MI_AssistantReplicatorGrid, this,
+                    &ToolOptionsShortcutInvoker::toggleAssistantReplicatorGrid);
+  setCommandHandler(MI_AssistantReplicatorAffine, this,
+                    &ToolOptionsShortcutInvoker::toggleAssistantReplicatorAffine);
 }
 
 //-----------------------------------------------------------------------------
@@ -800,6 +824,89 @@ void ToolOptionsShortcutInvoker::toggleGeometricPolygon() {
       ->getAction("A_ToolOption_GeometricShape:Polygon")
       ->trigger();
 }
+
+//---------------------------------------------------------------------------------------
+/*-- Edit Assistants tool + type switching shortcuts --*/
+void ToolOptionsShortcutInvoker::toggleAssistantNextType() {
+  if (TApp::instance()->getCurrentTool()->getTool()->getName() ==
+      T_EditAssistants)
+    CommandManager::instance()
+        ->getAction("A_ToolOption_AssistantType")
+        ->trigger();
+  else
+    CommandManager::instance()->getAction(T_EditAssistants)->trigger();
+}
+
+void ToolOptionsShortcutInvoker::toggleAssistantLine() {
+  CommandManager::instance()->getAction(T_EditAssistants)->trigger();
+  CommandManager::instance()
+      ->getAction("A_ToolOption_AssistantType:assistantLine")
+      ->trigger();
+}
+
+void ToolOptionsShortcutInvoker::toggleAssistantEllipse() {
+  CommandManager::instance()->getAction(T_EditAssistants)->trigger();
+  CommandManager::instance()
+      ->getAction("A_ToolOption_AssistantType:assistantEllipse")
+      ->trigger();
+}
+
+void ToolOptionsShortcutInvoker::toggleAssistantPerspective() {
+  CommandManager::instance()->getAction(T_EditAssistants)->trigger();
+  CommandManager::instance()
+      ->getAction("A_ToolOption_AssistantType:assistantPerspective")
+      ->trigger();
+}
+
+void ToolOptionsShortcutInvoker::toggleAssistantVanishingPoint() {
+  CommandManager::instance()->getAction(T_EditAssistants)->trigger();
+  CommandManager::instance()
+      ->getAction("A_ToolOption_AssistantType:assistantVanishingPoint")
+      ->trigger();
+}
+
+void ToolOptionsShortcutInvoker::toggleAssistantFisheye() {
+  CommandManager::instance()->getAction(T_EditAssistants)->trigger();
+  CommandManager::instance()
+      ->getAction("A_ToolOption_AssistantType:assistantFisheye")
+      ->trigger();
+}
+
+void ToolOptionsShortcutInvoker::toggleAssistantReplicatorStar() {
+  CommandManager::instance()->getAction(T_EditAssistants)->trigger();
+  CommandManager::instance()
+      ->getAction("A_ToolOption_AssistantType:replicatorStar")
+      ->trigger();
+}
+
+void ToolOptionsShortcutInvoker::toggleAssistantReplicatorMirror() {
+  CommandManager::instance()->getAction(T_EditAssistants)->trigger();
+  CommandManager::instance()
+      ->getAction("A_ToolOption_AssistantType:replicatorMirror")
+      ->trigger();
+}
+
+void ToolOptionsShortcutInvoker::toggleAssistantReplicatorJitter() {
+  CommandManager::instance()->getAction(T_EditAssistants)->trigger();
+  CommandManager::instance()
+      ->getAction("A_ToolOption_AssistantType:replicatorJitter")
+      ->trigger();
+}
+
+void ToolOptionsShortcutInvoker::toggleAssistantReplicatorGrid() {
+  CommandManager::instance()->getAction(T_EditAssistants)->trigger();
+  CommandManager::instance()
+      ->getAction("A_ToolOption_AssistantType:replicatorGrid")
+      ->trigger();
+}
+
+void ToolOptionsShortcutInvoker::toggleAssistantReplicatorAffine() {
+  CommandManager::instance()->getAction(T_EditAssistants)->trigger();
+  CommandManager::instance()
+      ->getAction("A_ToolOption_AssistantType:replicatorAffine")
+      ->trigger();
+}
+
 //---------------------------------------------------------------------------------------
 /*-- Type tool + mode switching shortcuts --*/
 void ToolOptionsShortcutInvoker::toggleTypeNextStyle() {

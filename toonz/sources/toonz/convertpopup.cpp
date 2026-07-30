@@ -210,13 +210,14 @@ void ConvertPopup::Converter::convertLevel(
   if (popup->m_fileFormat->currentText() == TlvExtension) {
     // convert to TLV
     if (!(m_parent->getTlvMode().compare(m_parent->TlvMode_PaintedFromNonAA))) {
-      // no AA source (retas)
+      // no AA source (retas painted)
       TPaletteP palette = popup->readUserProvidedPalette();
       ImageUtils::convertNaa2Tlv(sourceFileFullPath, dstFileFullPath, from, to,
                                  m_parent->m_notifier, palette.getPointer(),
                                  m_parent->m_removeUnusedStyles->isChecked(),
                                  m_parent->m_dpiFld->getValue());
     } else {
+      // other 3 cases
       convertLevelWithConvert2Tlv(sourceFileFullPath);
     }
   } else if (popup->m_fileFormat->currentText() == OldLevelToTlvExtension) {

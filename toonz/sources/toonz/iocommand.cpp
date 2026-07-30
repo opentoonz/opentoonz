@@ -1383,7 +1383,7 @@ void IoCmd::newScene() {
 
   if (!TApp::instance()->isApplicationStarting())
     QApplication::clipboard()->clear();
-  TSelection::setCurrent(0);
+  TSelection::setCurrent(nullptr);
   TUndoManager::manager()->reset();
 
   bool exist = TSystem::doesExistFileOrLevel(
@@ -1524,12 +1524,12 @@ bool IoCmd::saveScene(const TFilePath &path, int flags) {
   }
   TApp::instance()->setSaveInProgress(false);
 
-  cp->assign(&keepCP);
-  // Make sure that the current cleanup palette is set to currentParams' palette
-  TApp::instance()
-      ->getPaletteController()
-      ->getCurrentCleanupPalette()
-      ->setPalette(cp->m_cleanupPalette.getPointer());
+  if (!isAutosave) {
+    // Restore the cleanup settings without replacing the palette object.
+    // Palette handles keep raw pointers to it, and resetting the cleanup handle
+    // here would also make the cleanup palette current.
+    cp->assign(&keepCP, false);
+  }
 
   // in case of saving subxsheet, revert the level paths after saving
   revertOrgLevelPaths();
@@ -2890,10 +2890,17 @@ void IoCmd::convertNAARaster2TLV(
       }
       IoCmd::ConvertingPopup convertingPopup(TApp::instance()->getMainWindow(),
                                              path);
-      /*convertingPopup.show();
-      ImageUtils::convertNaa2Tlv(path, dstPath, from, to,
-      convertingPopup.getNotifier(), 0, true, dpi); convertingPopup.hide(); path
-      = convertingPopup.getResultPath();*/
+      if (ImageUtils::isPaintedImage(first)) {
+        convertingPopup.setMaximum(to - from + 1);
+        convertingPopup.show();
+        ImageUtils::convertNaa2Tlv(path, dstPath, from, to,
+                                   convertingPopup.getNotifier(), 0, true, dpi);
+        convertingPopup.hide();
+        if (!convertingPopup.wasCanceled())
+          rd = LoadResourceArguments::ResourceData(dstPath);
+        return;
+      }
+
       Convert2Tlv converter(path, TFilePath(), dstPath.getParentDir(),
                             QString::fromStdWString(dstPath.getWideName()),
                             from, to, false, TFilePath(), 0, 0, 50, true, true,

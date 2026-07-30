@@ -16,35 +16,58 @@
 
 // SETTINGS --------------------------------------------------------------------
 
-@ui-contrast: 1.0; // multiplier
-@border-contrast: 1.0; // multiplier
+// Adjust Contrast (Multiplier)
+@dark-contrast:   1.0;
+@light-contrast:  1.0;
+@border-contrast: 1.0;
 
-@hover-adjust-amount: 1.0; // multiplier
-@pressed-adjust-amount: 1.0; // multiplier
-@disabled-amount: 40%; // percentage range: 0-100%
+// Adjust Pseudo States (Percentage)
+@hover-amount:    10%; // lighten
+@pressed-amount:  10%; // darken
+@disabled-amount: 40%; // opacity
 
-@bold-titlebar-text: true; // bool
-@bold-label-text: true; // bool
-@bold-fxlabel-text: false; // bool
+// Toggles
+@bold-titlebar-text: true;
+@bold-fxlabel-text:  false;
+@bold-label-text:    true;
+@bold-list-text:     false;
 
 // COLORS ----------------------------------------------------------------------
 
+// Base colors
 @bg-color: #484848;
+@bg-color-hover: lighten(@bg-color, @hover-amount);
+@bg-color-pressed: darken(@bg-color, @pressed-amount);
+
+@dark-color-1:  darken(@bg-color, 5% * @dark-contrast);
+@dark-color-2:  darken(@bg-color, 10% * @dark-contrast);
+@dark-color-3:  darken(@bg-color, 16% * @dark-contrast);
+@dark-color-4:  darken(@bg-color, 22% * @dark-contrast);
+@dark-color-5:  darken(@bg-color, 28% * @dark-contrast);
+
+@light-color-0: lighten(@bg-color, 5% * @light-contrast);
+@light-color-1: lighten(@bg-color, 10% * @light-contrast);
+@light-color-2: lighten(@bg-color, 15% * @light-contrast);
+@light-color-3: lighten(@bg-color, 20% * @light-contrast);
+@light-color-4: lighten(@bg-color, 25% * @light-contrast);
+@light-color-5: lighten(@bg-color, 35% * @light-contrast);
 
 // Border
-@border-color: darken(@bg-color, 16% * @border-contrast);
-@dock-color: darken(@bg-color, 22%);
+@border-color: darken(@bg-color, 18% * @border-contrast);
+
+@dock-color: @dark-color-4;
 @dock-placeholder-color: #1aff00;
 
 // Text
 @text-color: #dfdfdf;
 @text-color-active: rgb(239, 239, 239);
-@text-color-inactive: fade(@text-color, 60%);
+@text-color-inactive: fade(@text-color, 50%);
 @text-color-disabled: fade(@text-color, @disabled-amount);
 
 // Highlight
 @hl-color: #4f7bc7;
 @hl-text-color: white;
+
 @lock-color: #d44a4a;
 @preview-color: #C8C864;
 
@@ -64,9 +87,9 @@
 @icon-base-opacity: 0.8;
 @icon-disabled-opacity: 0.3;
 @icon-base-color: @text-color;
-@icon-active-color: white;
-@icon-selected-color: @icon-active-color;
-@icon-on-color: @icon-active-color;
+@icon-active-color: if(lightness(@text-color) > 50%, white, black); // hover
+@icon-selected-color: @icon-active-color; // list
+@icon-on-color: @icon-active-color; // toolbar
 
 // Individual Icon Colors
 @icon-preview-color: if(lightness(@preview-color) > 50%, black, white);
@@ -79,7 +102,7 @@
 // -----------------------------------------------------------------------------
 // Tabs
 // -----------------------------------------------------------------------------
-@tabbar-bg-color: darken(@bg-color, 5% * @ui-contrast);
+@tabbar-bg-color: @dark-color-1;
 
 // Tab
 @tab-bg-color: @tabbar-bg-color;
@@ -87,20 +110,22 @@
 @tab-border-color: @border-color;
 
 // Hover
-@tab-bg-color-hover: lighten(@tab-bg-color, 8% * @hover-adjust-amount);
+@tab-bg-color-hover: lighten(@tab-bg-color, @hover-amount);
 @tab-text-color-hover: @text-color-active;
 
 // Selected
 @tab-bg-color-selected: @bg-color;
 @tab-text-color-selected: @text-color-active;
+@tab-accent-img: 'misc/transparent_16x16.png'; // intended as a top border (aligned top-left)
 
 // -----------------------------------------------------------------------------
 // Top Menubar / Rooms
 // -----------------------------------------------------------------------------
 @topbar-bg-color: @bg-color;
 
+@menubar-item-text-color-selected: @hl-text-color;
 @menubar-item-bg-color-selected: @hl-color;
-@menubar-item-bg-color-hover: lighten(@topbar-bg-color, 8% * @hover-adjust-amount);
+@menubar-item-bg-color-hover: lighten(@topbar-bg-color, @hover-amount);
 
 // Rooms
 @rooms-tab-bg-color: @tab-bg-color;
@@ -108,13 +133,13 @@
 @rooms-tab-text-color: @tab-text-color;
 
 // Hover
-@rooms-tab-bg-color-hover: lighten(@rooms-tab-bg-color, 8% * @hover-adjust-amount);
+@rooms-tab-bg-color-hover: lighten(@rooms-tab-bg-color, @hover-amount);
 @rooms-tab-text-color-hover: @tab-text-color-hover;
 
 // Selected
 @rooms-tab-bg-color-selected: @hl-color;
 @rooms-tab-text-color-selected: @hl-text-color;
-@rooms-tab-bg-color-selected-hover: lighten(@rooms-tab-bg-color-selected, 8% * @hover-adjust-amount);
+@rooms-tab-bg-color-selected-hover: lighten(@rooms-tab-bg-color-selected, @hover-amount);
 
 // -----------------------------------------------------------------------------
 // Context Menu
@@ -158,28 +183,28 @@
 @button-v-padding: 2px;
 
 @button-text-color: @text-color;
-@button-bg-color: lighten(@bg-color, 10%);
+@button-bg-color: @light-color-1;
 
 @button-border-color: @button-bg-color;
 @button-border-radius: 2px;
 
 // Hover
 @button-text-color-hover: @button-text-color;
-@button-bg-color-hover: lighten(@button-bg-color, 8% * @hover-adjust-amount);
+@button-bg-color-hover: lighten(@button-bg-color, @hover-amount);
 @button-border-color-hover: @button-bg-color-hover;
 
 // Pressed
 @button-text-color-pressed: @button-text-color;
-@button-bg-color-pressed: darken(@bg-color, 8% * @pressed-adjust-amount);
+@button-bg-color-pressed: @dark-color-2;
 @button-border-color-pressed: @button-border-color;
 
 // Checked
 @button-text-color-checked: @normal-label-color;
-@button-bg-color-checked: darken(@bg-color, 8% * @pressed-adjust-amount);
+@button-bg-color-checked: @dark-color-2;
 @button-border-color-checked: @button-border-color;
 
 // Checked Hover
-@button-bg-color-checked-hover: lighten(@button-bg-color-checked, 8% * @hover-adjust-amount);
+@button-bg-color-checked-hover: lighten(@button-bg-color-checked, @hover-amount);
 
 // Focus
 @button-text-color-focus: @hl-text-color;
@@ -187,7 +212,7 @@
 @button-border-color-focus: @button-bg-color-focus;
 
 // Focus Hover
-@button-bg-color-focus-hover: lighten(@button-bg-color-focus, 8% * @hover-adjust-amount);
+@button-bg-color-focus-hover: lighten(@button-bg-color-focus, @hover-amount);
 @button-border-color-focus-hover: @button-bg-color-focus-hover;
 
 // Disabled
@@ -201,7 +226,7 @@
 @scroll-button-border-color-disabled: @scroll-button-border-color;
 
 // Dialog Popup
-@popup-dialog-button-frame-bg-color: @tabbar-bg-color;
+@popup-dialog-button-frame-bg-color: @dark-color-1;
 
 // -----------------------------------------------------------------------------
 // ComboBox
@@ -233,11 +258,11 @@
 @toolbutton-border-color-checked: @toolbutton-bg-color-checked;
 
 // Checked Hover
-@toolbutton-bg-color-checked-hover: lighten(@toolbutton-bg-color-checked, 8% * @hover-adjust-amount);
+@toolbutton-bg-color-checked-hover: lighten(@toolbutton-bg-color-checked, @hover-amount);
 @toolbutton-border-color-checked-hover: @toolbutton-bg-color-checked-hover;
 
 // Checked Pressed
-@toolbutton-bg-color-checked-pressed: darken(@toolbutton-bg-color-checked, 8% * @pressed-adjust-amount);
+@toolbutton-bg-color-checked-pressed: darken(@toolbutton-bg-color-checked, @pressed-amount);
 
 // Disabled
 @toolbutton-bg-color-disabled: @toolbutton-bg-color;
@@ -252,11 +277,11 @@
 @lockbutton-border-color-checked: @lockbutton-bg-color-checked;
 
 // Hover
-@lockbutton-bg-color-checked-hover: lighten(@lockbutton-bg-color-checked, 8% * @hover-adjust-amount);
+@lockbutton-bg-color-checked-hover: lighten(@lockbutton-bg-color-checked, @hover-amount);
 @lockbutton-border-color-checked-hover: @lockbutton-bg-color-checked-hover;
 
 // Hover Pressed
-@lockbutton-bg-color-checked-pressed: darken(@lockbutton-bg-color-checked, 8% * @hover-adjust-amount);
+@lockbutton-bg-color-checked-pressed: darken(@lockbutton-bg-color-checked, @hover-amount);
 
 // Img
 @lock-img-on: 'lock_on.svg';
@@ -264,15 +289,15 @@
 // -----------------------------------------------------------------------------
 // Scrollbars [sb]
 // -----------------------------------------------------------------------------
-@sb-bg-color: darken(@bg-color, 8% * @ui-contrast);
+@sb-bg-color: @dark-color-2;
 
 // Handle
 @sb-handle-radius: 5px;
 @sb-handle-margin: 2px;
 
 @sb-handle-bg-color: @button-bg-color;
-@sb-handle-bg-color-hover: lighten(@sb-handle-bg-color, 8% * @hover-adjust-amount);
-@sb-handle-bg-color-pressed: lighten(@sb-handle-bg-color-hover, 8% * @hover-adjust-amount);
+@sb-handle-bg-color-hover: lighten(@sb-handle-bg-color, @hover-amount);
+@sb-handle-bg-color-pressed: lighten(@sb-handle-bg-color-hover, @hover-amount);
 @sb-handle-border-color: @sb-handle-bg-color;
 @sb-handle-border-color-hover: @sb-handle-bg-color-hover;
 @sb-handle-border-color-pressed: @sb-handle-bg-color-pressed;
@@ -281,7 +306,7 @@
 // Textfield
 // -----------------------------------------------------------------------------
 @input-text-color: @text-color;
-@input-bg-color: darken(@bg-color, 15%);
+@input-bg-color: @dark-color-3;
 @input-border-color: @input-bg-color;
 @input-border-radius: 2px;
 
@@ -311,8 +336,8 @@
 // -----------------------------------------------------------------------------
 // CheckBox
 // -----------------------------------------------------------------------------
-@checkbox-text-color-hover: white;
-@checkbox-text-bg-color-hover: lighten(@bg-color, 8% * @hover-adjust-amount);
+@checkbox-text-color-hover: @text-color-active;
+@checkbox-text-bg-color-hover: @bg-color-hover;
 
 // Checkbox
 @checkbox-bg-color: @input-bg-color;
@@ -320,8 +345,8 @@
 @checkbox-border-radius: 2px;
 
 // Hover
-@checkbox-bg-color-hover: lighten(@checkbox-bg-color, 8% * @hover-adjust-amount);
-@checkbox-border-color-hover: @checkbox-bg-color-hover;
+@checkbox-bg-color-hover: lighten(@checkbox-bg-color, @hover-amount);
+@checkbox-border-color-hover: @light-color-5;
 
 // Checked
 @checkbox-img-checked: 'checkmark/checkmark.svg';
@@ -333,7 +358,7 @@
 @checkbox-border-color-checked: @checkbox-bg-color-checked;
 
 // Checked Hover
-@checkbox-bg-color-checked-hover: lighten(@checkbox-bg-color-checked, 8% * @hover-adjust-amount);
+@checkbox-bg-color-checked-hover: lighten(@checkbox-bg-color-checked, @hover-amount);
 @checkbox-border-color-checked-hover: @checkbox-bg-color-checked-hover;
 
 // Disabled
@@ -346,7 +371,7 @@
 // Single Slider: Groove
 @slider-v-margin: 8px;
 @slider-groove-img: 'slider/slider-groove.svg'; // viewer fps slider
-@slider-groove-color: darken(@bg-color, 20%);
+@slider-groove-color: @dark-color-4;
 @slider-groove-value-color: @slider-groove-color;
 @slider-groove-border-color: @slider-groove-color;
 
@@ -363,7 +388,7 @@
 @slider-v-handle-img-disabled: 'slider/slider-handle-v-rectangle_disabled.svg';
 
 // Only for #ViewerFpsSlider (should mimic the slider-handle images)
-@slider-handle-bg-color: lighten(@bg-color, 35%);
+@slider-handle-bg-color: @light-color-5;
 @slider-handle-border-color: @slider-handle-bg-color;
 
 // -----------------------------------------------------------------------------
@@ -371,20 +396,27 @@
 // -----------------------------------------------------------------------------
 
 @titlebar-border-radius: 0px;
-@titlebar-bg-color: @tabbar-bg-color;
+@titlebar-bg-color: @dark-color-1;
 @titlebar-bg-color-hover: @titlebar-bg-color;
 @titlebar-text-color: @text-color-inactive;
 @titlebar-text-color-active: @text-color-active;
 
 // Icon BG Colors
 @titlebar-button-off-bg-color: @titlebar-bg-color;
-@titlebar-button-rollover-bg-color: lighten(@titlebar-bg-color, 15% * @hover-adjust-amount);
+@titlebar-button-rollover-bg-color: @button-bg-color-hover;
 @titlebar-button-pressed-bg-color: @hl-color;
 @titlebar-button-freeze-bg-color: @lock-color;
 @titlebar-button-preview-bg-color: @preview-color;
 
 // Close Button BG Color
 @titlebar-close-bg-color: @lock-color;
+
+// Border IMG
+//! We'll use a transparent image to hide it for themes that don't require them
+@title-docked-border-img: 'other/transparent_16x16.png';
+@title-docked-active-border-img: 'other/transparent_16x16.png';
+@title-float-border-img: 'other/transparent_16x16.png';
+@title-float-active-border-img: 'other/transparent_16x16.png';
 
 // -----------------------------------------------------------------------------
 // Palette Window
@@ -414,25 +446,28 @@
 @browser-right-pane-bg-color: @bg-color;
 
 // Treeviews
-@tree-bg-color: darken(@bg-color, 5% * @ui-contrast);
+@tree-bg-color: @dark-color-1;
 @tree-bg-color-alt-row: rgba(0, 0, 0, 0.15);
 
-@tree-item-bg-color-hover: lighten(@bg-color, 8% * @hover-adjust-amount);
+@tree-item-bg-color-selected: @hl-color;
+@tree-item-text-color-selected: @hl-text-color;
 
 // Lists
 @list-bg-color: @tree-bg-color;
+@prefs-list-bg-color: @list-bg-color;
 
 // All Panes
 @browser-selected-item-bg-color: @hl-color;
 @browser-selected-text-color: @hl-text-color;
 @browser-text-color: @text-color;
+@browser-text-color-selected: @hl-text-color;
 @browser-folder-text-color: @normal-label-color;
 @browser-folder-text-color-selected: @hl-text-color;
 
-// Right Pane Column Bar
-@browser-itemview-col-color: @tree-bg-color;
-@browser-itemview-col-color-sorted: @browser-itemview-col-color;
-@browser-itemview-col-text-color: @text-color;
+// Listview Header (Sort Columns)
+@browser-itemview-col-color: @button-bg-color;
+@browser-itemview-col-color-sorted: @button-bg-color;
+@browser-itemview-col-text-color: @button-text-color;
 @browser-itemview-col-border-color: @border-color;
 @browser-itemview-col-relief-color: @browser-itemview-col-color;
 
@@ -441,7 +476,7 @@
 // -----------------------------------------------------------------------------
 @flipmarker-img: 'flipslider/flipmarker.svg';
 @flipslider-img: 'flipslider/flipslider.svg';
-@flipslider-base-color: darken(@bg-color, 10% * @ui-contrast);
+@flipslider-base-color: @dark-color-2;
 @flipslider-notstarted-color: hsl(0, 32%, 42%);
 @flipslider-started-color: hsl(118, 38%, 45%);
 @flipslider-finished-color: @flipslider-base-color;
@@ -467,8 +502,8 @@
 // -----------------------------------------------------------------------------
 // Custom Panels
 // -----------------------------------------------------------------------------
-@custompanel-scroller-bg-color: darken(@bg-color, 16% * @ui-contrast);
-@custompanel-scroller-border-color: lighten(@custompanel-scroller-bg-color, 30% * @border-contrast);
+@custompanel-scroller-bg-color: @dark-color-3;
+@custompanel-scroller-border-color: @light-color-5;
 
 // [xsh] =======================================================================
 //       :::    :::  ::::::::  :::    ::: :::::::::: :::::::::: ::::::::::: 
@@ -484,24 +519,26 @@
 
 @xsh-color: @bg-color;
 
-@xsh-contrast: 1.0; // multiplier
-@xsh-border-contrast: 1.0; // multiplier
-@xsh-mono-icons: false; // bool
+// Adjust Contrast (Multiplier)
+@xsh-contrast:        1.0;
+@xsh-border-contrast: 1.0;
 
-// Cell
-@xsh-cell-lighten-amount: 0%;
-@xsh-cell-sat-amount: 0%;
+// Toggles
+@xsh-mono-icons: false;
 
+// Adjust Cell Colors (Percentage)
+@xsh-cell-lighten-amount: 3%;
+@xsh-cell-sat-amount:     0%;
+
+// Adjust Cell Drag Border Colors (Percentage)
 @xsh-border-darken-amount: 12%;
-@xsh-border-sat-amount: 0%;
+@xsh-border-sat-amount:     0%;
 
-@xsh-hl-mix-color: hsl(hue(@hl-color), 50%, 50%);
-@xsh-hl-mix-amount: 74%;
-@xsh-hl-lighten-amount: 10%;
+// Adjust Cell Highlight Colors (Percentage)
+@xsh-hl-lighten-amount: 15%;
+@xsh-hl-sat-amount:      8%;
 
-// -----------------------------------------------------------------------------
-
-// Level Colors
+// LEVEL COLORS ----------------------------------------------------------------
 @xsh-toonzraster-color: hsl(134, 25%, 33%);
 @xsh-raster-color: hsl(206, 25%, 42%);
 @xsh-vector-color: hsl(60, 25%, 39%);
@@ -510,54 +547,48 @@
 @xsh-sub-color: hsl(285, 20%, 36%);
 @xsh-mesh-color: hsl(246, 22%, 41%);
 @xsh-assistants-color: @xsh-palette-color;
-@xsh-reference-color: rgb(114, 114, 114);
+@xsh-reference-color: rgb(114, 114, 114); // disconnected, etc.
 
-// Notes
 @xsh-notes-color: #9e9e9e;
 @xsh-notes-border-color: darken(@xsh-notes-color, 22%);
-@xsh-notes-hl-color: mix(lighten(@xsh-notes-color, @xsh-hl-lighten-amount), @xsh-hl-mix-color, @xsh-hl-mix-amount);
+@xsh-notes-hl-color: lighten(@xsh-notes-color, @xsh-hl-lighten-amount);
 
-// Sound Level
 @xsh-sound-color: @xsh-palette-color;
 @xsh-sound-track-color: hsl(0, 0%, 0%);
 
-// Other
 @xsh-camera-active-color: hsl(209, 55%, 42%);
 @xsh-camera-other-color: hsl(179, 37%, 36%);
+
 @xsh-xsheet-color: hsl(240, 27%, 49%);
 @xsh-peg-color: hsl(30, 42%, 41%);
 
-// -----------------------------------------------------------------------------
+// SPREADSHEET LINES -----------------------------------------------------------
+@xsh-horizontal-row-line-color: rgba(0, 0, 0, min(max(0.45 * @xsh-border-contrast, 0), 1));
+@xsh-vertical-column-line-color: rgba(0, 0, 0, min(max(0.6 * @xsh-border-contrast, 0), 1));
 
-// Spreadsheet Lines
-@xsh-horizontal-row-line-color: rgba(0, 0, 0, min(max(0.3 * @xsh-border-contrast, 0), 1));
-@xsh-vertical-column-line-color: rgba(0, 0, 0, min(max(0.4 * @xsh-border-contrast, 0), 1));
-
-// Marker Lines
+// SEC MARKER LINES ------------------------------------------------------------
 @xsh-marker-line-color: rgba(255, 255, 255, 0.2);
 @xsh-selected-marker-line-color: rgba(255, 255, 255, 0.5);
 @xsh-sec-marker-line-color: rgba(255, 255, 255, 0.4);
 @xsh-current-time-indicator-color: hsl(0, 100%, 64%);
 
-// Folded Columns
+// FOLDED COLUMNS --------------------------------------------------------------
 @xsh-folded-column-bg-color: rgba(255, 255, 255, 0.45);
 
-// -----------------------------------------------------------------------------
-
-// Spreadsheet Cells
-@xsh-empty-column-color: darken(@xsh-color, 5% * @xsh-contrast);
+// SPREADSHEET CELL AREA -------------------------------------------------------
+@xsh-empty-column-color: darken(@xsh-color, 2.5% * @xsh-contrast);
 @xsh-empty-column-range-color: @xsh-color;
-@xsh-empty-cell-color-selected: fade(mix(lighten(@xsh-empty-column-range-color, (@xsh-hl-lighten-amount * 2)), @xsh-hl-mix-color, @xsh-hl-mix-amount), 50%);
+@xsh-empty-cell-color-selected: fade(lighten(@xsh-empty-column-color, (@xsh-hl-lighten-amount * 2)), 50%);
 
 @xsh-cell-text-color: rgba(255, 255, 255, 0.85);
 @xsh-cell-text-color-selected: rgba(@xsh-cell-text-color, 1.0);
 
 @xsh-current-cell-border-color: cyan;
 
-// Onion Skin Area
-@xsh-onionskin-column-bg-color: @xsh-empty-column-color;
+// ONION SKIN AREA -------------------------------------------------------------
+@xsh-onionskin-column-bg-color: darken(@xsh-empty-column-color, 2.5%);
 
-// Framenumber Area
+// FRAMENUMBER AREA ------------------------------------------------------------
 @xsh-framenumber-column-text-color: @xsh-cell-text-color;
 @xsh-framenumber-column-bg-color: @xsh-color;
 
@@ -567,19 +598,17 @@
 @xsh-framenumber-current-text-color: rgb(255, 255, 255);
 @xsh-framenumber-current-bg-color: fade(@hl-color, 60%);
 
-// Column Header Colors
+// COLUMN HEADER AREA ----------------------------------------------------------
 @xsh-column-header-empty-color: @bg-color;
 @xsh-column-header-border-color: @border-color;
-@xsh-column-header-selected-color: fade(tint(@xsh-hl-mix-color, 70%), 50%);
+@xsh-column-header-selected-color: fade(white, 30%);
 @xsh-column-header-dragbar-hl-color: @xsh-column-header-selected-color;
 
 @xsh-button-preview-bg-on-color: #C8C864;
 @xsh-button-camstand-bg-on-color: #EB906B;
 @xsh-button-lock-bg-on-color: @lock-color;
 
-// -----------------------------------------------------------------------------
-
-// Icons
+// TIMELINE VIEW ---------------------------------------------------------------
 @timeline-column-header-border-color: @border-color;
 
 @timeline-preview-button-bg-on-color: @bg-color;
@@ -611,15 +640,13 @@
 // SETTINGS --------------------------------------------------------------------
 
 @node-text-color: @xsh-cell-text-color;
-@node-viewer-bg-color: darken(@bg-color, 5% * @ui-contrast);
+@node-viewer-bg-color: @dark-color-1;
 
 // Use Xsheet values by default, add another value to tweak if required
 @node-lighten-amount: @xsh-cell-lighten-amount - 0%;
 @node-sat-amount: @xsh-cell-sat-amount + 0%;
 
-// -----------------------------------------------------------------------------
-
-// Nodes
+// NODE COLORS -----------------------------------------------------------------
 @node-selected-border-color: white;
 
 @node-table-color: @xsh-xsheet-color;
@@ -631,18 +658,16 @@
 @node-layer-blending-fx-color: hsl(190, 28%, 32%);
 @node-matte-fx-color: hsl(0, 23%, 42%);
 
-// Splines
+// SPLINE LINE COLORS ----------------------------------------------------------
 @node-link-color: rgb(223, 223, 223);
 @node-selected-link-color: cyan;
 @node-motion-path-link-color: #94ee1e;
 @node-motion-path-selected-link-color: yellow;
 
-// -----------------------------------------------------------------------------
-
-// Keyframes
+// KEYFRAME COLORS -------------------------------------------------------------
 @keyframe-total-color: #e08a21;
 @keyframe-total-border-color: @keyframe-total-color;
-@keyframe-total-color-hover: lighten(@keyframe-total-color, 8% * @hover-adjust-amount);
+@keyframe-total-color-hover: lighten(@keyframe-total-color, @hover-amount);
 @keyframe-total-border-color-hover: @keyframe-total-border-color;
 
 @keyframe-inbetween-color: #807e75;
@@ -668,21 +693,24 @@
 
 @fe-text-color: white;
 
+@fe-kf-lighten-amount: @xsh-cell-lighten-amount;
+@fe-kf-sat-amount: @xsh-cell-sat-amount;
 @fe-kf-border-darken-amount: -31%;
 @fe-kf-border-sat-amount: 0%;
 @fe-kf-hl-lighten-amount: 37%;
-@fe-kf-hl-mix-amount: 100%;
-@fe-kf-hl-mix-color: @hl-color;
+@fe-kf-hl-sat-amount: 5%;
 
 @fe-ib-border-darken-amount: -62%;
 @fe-ib-border-sat-amount: 0%;
 @fe-ib-hl-lighten-amount: 22%;
-@fe-ib-hl-mix-amount: 90%;
-@fe-ib-hl-mix-color: @hl-color;
+@fe-ib-hl-sat-amount: 5%;
 
-// -----------------------------------------------------------------------------
+@fe-current-row-bg-alpha: 80%;
 
-// Cell Colors
+// HEADER AREA -----------------------------------------------------------------
+@fe-header-border-color: @border-color;
+
+// CELL COLORS -----------------------------------------------------------------
 @fe-keyframe-color: #925d24;
 @fe-ignored-keyframe-color: #ac2a39;
 @fe-inbetween-color: #666250;
@@ -691,15 +719,15 @@
 @fe-empty-color: @xsh-empty-cell-color-selected;
 @fe-empty-range-color-selected: @xsh-empty-cell-color-selected;
 
-// -----------------------------------------------------------------------------
-
-// Curves Viewer
-@fe-panel-line-color: white; // grid line color
-@fe-panel-line-tone: 12%; // strength of grid line color (0 = invisible)
+// CURVES VIEWER ---------------------------------------------------------------
+// Note: Using a white (light) grid line color competes for attention with the
+// curves, for the best UX a black (dark) grid line color is recommended here.
+@fe-panel-line-color: rgb(0, 0, 0); // grid line color
+@fe-panel-line-tone: 30%; // opacity of grid line color (0 = invisible)
 
 @fe-panel-text-color: @text-color;
-@fe-panel-bg-color: darken(@bg-color, 6% * @ui-contrast);
-@fe-panel-ruler-bg-color: darken(@fe-panel-bg-color, 4% * @ui-contrast);
+@fe-panel-bg-color: @bg-color;
+@fe-panel-ruler-bg-color: darken(@fe-panel-bg-color, 5%);
 
 @fe-panel-curve-color: rgba(255, 255, 255, 0.6); // all curves color
 @fe-panel-curve-color-hover: #FFA500; // when mouse over a curve

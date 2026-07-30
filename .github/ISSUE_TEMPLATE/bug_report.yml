@@ -1,12 +1,12 @@
 name: Bug report
-description: Help us improve by reporting a bug.
+description: Help us improve by reporting a bug
 body:
   - type: markdown
     attributes:
       value: |
         ⚠️ **Before you start:**
         - Check for [existing issues](https://github.com/opentoonz/opentoonz/issues?q=is%3Aopen+is%3Aissue) to avoid duplicates.
-        - Try the latest [nightly build](https://github.com/opentoonz/opentoonz_nightlies/releases) — many bugs are fixed there.
+        - Test the latest [nightly build](https://github.com/opentoonz/opentoonz_nightlies/releases) — your bug may already be fixed.
         - Update your GPU and tablet drivers if you're seeing visual or input issues.
 
         Reports missing key details may be closed if we can't reproduce the problem. Help us help you!
@@ -50,8 +50,8 @@ body:
       description: Found in Help > About.
       multiple: false
       options:
+        - 1.8
         - 1.7
-        - 1.6
         - Nightly (specify below)
         - Other (specify below)
     validations:
@@ -76,8 +76,8 @@ body:
 
   - type: dropdown
     attributes:
-      label: GPU Brand
-      description: Check that your graphics drivers are up to date.
+      label: GPU
+      description: Please check that your graphics drivers are up to date.
       multiple: false
       options:
         - NVIDIA
@@ -102,4 +102,3 @@ body:
         - Monoprice
         - Parblo
         - Other
-        - Not using one

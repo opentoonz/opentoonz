@@ -4,6 +4,7 @@
 #define TAPP_H
 
 #include <QObject>
+#include <QString>
 
 #include "tools/tool.h"
 
@@ -90,6 +91,10 @@ class TApp final : public QObject,
   bool m_autosaveSuspended;
   bool m_saveInProgress;
   QTimer *m_autosaveTimer;
+
+  // Assistant level auto-switch: stores tool name when auto-switching to
+  // T_EditAssistants, restored when leaving assistant level
+  QString m_toolBeforeAssistantLevel;
 
   TApp();
 

@@ -52,6 +52,7 @@ set(HEADERS
     ../include/tools/track.h
     ../include/tools/inputmanager.h
     ../include/tools/assistant.h
+    ../include/tools/editassistantstool.h
     ../include/tools/replicator.h
     ../include/tools/modifiers/modifierassistants.h
     ../include/tools/modifiers/modifierclone.h
