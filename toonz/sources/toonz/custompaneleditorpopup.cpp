@@ -1633,20 +1633,6 @@ CustomPanelEditorPopup::CustomPanelEditorPopup()
   m_templateHeader->installEventFilter(this);
   m_templateToggle->installEventFilter(this);
 
-  // Refresh folder / branch accents when the theme (@hl-color) changes
-  connect(ThemePropertiesNotifier::instance(),
-          &ThemePropertiesNotifier::propertiesChanged, this, [this]() {
-            if (!m_templateTree) return;
-            applyTemplateTreeBranchAccent(m_templateTree);
-            applyTemplateToggleAccent(
-                m_templateToggle,
-                m_templateBrowser && m_templateBrowser->isVisible());
-            const QIcon folderIcon = templateFolderIcon();
-            for (int i = 0; i < m_templateTree->topLevelItemCount(); ++i)
-              applyFolderIconRecursive(m_templateTree->topLevelItem(i),
-                                       folderIcon);
-          });
-
   // Load template
   if (!loadTemplateList()) {
     // Handle template loading failure if needed
