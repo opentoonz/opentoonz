@@ -1658,10 +1658,13 @@ bool TCellSelection::isEmpty() const { return m_range.isEmpty(); }
 void TCellSelection::selectCells(int r0, int c0, int r1, int c1) {
   if (r0 > r1) std::swap(r0, r1);
   if (c0 > c1) std::swap(c0, c1);
-  m_range.m_r0            = r0;
-  m_range.m_c0            = c0;
-  m_range.m_r1            = r1;
-  m_range.m_c1            = c1;
+  m_range.m_r0 = r0;
+  m_range.m_c0 = c0;
+  m_range.m_r1 = r1;
+  m_range.m_c1 = c1;
+  // cell selection won't contain the camera column
+  if (m_range.m_c0 < 0) m_range.m_c0 = 0;
+
   bool onlyOneRasterLevel = containsOnlyOneRasterLevel(r0, c0, r1, c1);
   // set the nearest row
   m_resizePivotRow =

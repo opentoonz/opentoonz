@@ -1,5 +1,9 @@
 name: MacOS Build
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: ${{ github.head_ref != '' }}
+
 on:
   push:
     paths:
@@ -59,7 +63,7 @@ jobs:
 
           brew update
 
-          checkPkgAndInstall pkg-config glew lz4 libjpeg libpng lzo boost libusb libmypaint ccache jpeg-turbo ninja opencv openjph openexr
+          checkPkgAndInstall pkg-config glew lz4 libjpeg libpng lzo boost libusb libmypaint ccache jpeg-turbo ninja opencv@4 openjph openexr
 
           brew list --formula | grep '^qt' | grep -v '@5' | xargs -n1 brew unlink || true
 
@@ -95,6 +99,7 @@ jobs:
             -DQT_PATH=$(brew --prefix qt@5)/lib \
             -DQt5_DIR=$(brew --prefix qt@5)/lib/cmake/Qt5 \
             -DCMAKE_PREFIX_PATH=$(brew --prefix qt@5)/lib/cmake/Qt5 \
+            -DOpenCV_DIR=$(brew --prefix opencv@4)/lib/cmake/opencv4 \
             -DWITH_TRANSLATION=OFF
           ninja -j $(sysctl -n hw.ncpu)
       - name: Introduce Libraries and Stuff

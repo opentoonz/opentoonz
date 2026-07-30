@@ -106,6 +106,8 @@ void DVAPI convert(
 
 bool DVAPI isAAImage(TFilePath path);
 
+bool DVAPI isPaintedImage(TFilePath path);
+
 void DVAPI convertNaa2Tlv(
     const TFilePath &source,  //!< Level path to convert from.
     const TFilePath &dest,    //!< Level path to convert to.

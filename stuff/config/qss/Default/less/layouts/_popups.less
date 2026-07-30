@@ -48,8 +48,8 @@ QDialog {
 
 #PreferencesPopup, #OutputSettingsPopup {
   & QListWidget {
-    background-color: @list-bg-color;
-    alternate-background-color: @list-bg-color;
+    background-color: @prefs-list-bg-color;
+    alternate-background-color: @prefs-list-bg-color;
     border: 1 solid @groupbox-border-color;
     font-size: 13px;
 
@@ -58,13 +58,17 @@ QDialog {
       padding: 3;
 
       &:hover {
-        background-color: lighten(@tree-bg-color, 8% * @hover-adjust-amount);
+        background-color: lighten(@prefs-list-bg-color, @hover-amount);
         color: @hl-text-color;
       }
 
       &:selected {
-        background-color: @menubar-item-bg-color-selected;
-        color: @menu-item-text-color-selected;
+        background-color: @tree-item-bg-color-selected;
+        color: @tree-item-text-color-selected;
+
+        &:hover {
+          background-color: lighten(@tree-item-bg-color-selected, @hover-amount);
+        }
       }
     }
   }
