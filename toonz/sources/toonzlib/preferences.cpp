@@ -420,6 +420,8 @@ void Preferences::definePreferenceItems() {
          QMetaType::Bool, true);
   define(actualPixelViewOnSceneEditingMode, "actualPixelViewOnSceneEditingMode",
          QMetaType::Bool, false);
+  define(syncSceneAndLevelView, "syncSceneAndLevelView", QMetaType::Bool,
+         false);
   define(showRasterImagesDarkenBlendedInViewer,
          "showRasterImagesDarkenBlendedInViewer", QMetaType::Bool, false);
   define(iconSize, "iconSize", QMetaType::QSize, QSize(80, 45), QSize(10, 10),

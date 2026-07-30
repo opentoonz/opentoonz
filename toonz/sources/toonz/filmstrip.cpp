@@ -11,6 +11,7 @@
 #include "filmstripselection.h"
 #include "onionskinmaskgui.h"
 #include "comboviewerpane.h"
+#include "sceneviewer.h"
 
 // TnzQt includes
 #include "toonzqt/icongenerator.h"
@@ -1291,16 +1292,33 @@ void FilmstripFrames::contextMenuEvent(QContextMenuEvent *event) {
   QAction *hideComboBox = panelMenu->addAction(tr("Show/Hide Drop Down Menu"));
   QAction *hideNavigator =
       panelMenu->addAction(tr("Show/Hide Level Navigator"));
+  QAction *syncSceneLevelView =
+      panelMenu->addAction(tr("Sync Scene and Level View (zoom / pan)"));
   hideComboBox->setCheckable(true);
   hideComboBox->setChecked(m_showComboBox);
   hideNavigator->setCheckable(true);
   hideNavigator->setChecked(m_showNavigator);
+  syncSceneLevelView->setCheckable(true);
+  Preferences *pref = Preferences::instance();
+  syncSceneLevelView->setChecked(pref->isSyncSceneAndLevelViewEnabled());
+  syncSceneLevelView->setToolTip(
+      tr("Keep the same zoom and pan when switching between scene editing "
+         "(Xsheet) and level editing (Level Strip)."));
   connect(toggleOrientation, SIGNAL(triggered(bool)), this,
           SLOT(orientationToggled(bool)));
   connect(hideComboBox, SIGNAL(triggered(bool)), this,
           SLOT(comboBoxToggled(bool)));
   connect(hideNavigator, SIGNAL(triggered(bool)), this,
           SLOT(navigatorToggled(bool)));
+  connect(syncSceneLevelView, &QAction::triggered, this, [pref](bool on) {
+    pref->setValue(syncSceneAndLevelView, on);
+    if (on) {
+      if (SceneViewer *viewer = TApp::instance()->getActiveViewer())
+        viewer->syncSceneAndLevelViewIfEnabled();
+    }
+    TApp::instance()->getCurrentScene()->notifyPreferenceChanged(
+        "SyncSceneAndLevelView");
+  });
 
   menu->exec(event->globalPos());
 }

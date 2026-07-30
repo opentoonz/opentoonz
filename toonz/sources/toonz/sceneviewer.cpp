@@ -1300,6 +1300,10 @@ void SceneViewer::onPreferenceChanged(const QString &prefName) {
       doneCurrent();
     }
     update();
+  } else if (prefName == "SyncSceneAndLevelView") {
+    syncSceneAndLevelViewIfEnabled();
+    invalidateAll();
+    emit refreshNavi();
   }
 }
 
@@ -2466,6 +2470,21 @@ void SceneViewer::setViewMatrix(const TAffine &aff, int viewMode) {
 
 //-----------------------------------------------------------------------------
 
+void SceneViewer::syncSceneAndLevelViewIfEnabled() {
+  if (!Preferences::instance()->isSyncSceneAndLevelViewEnabled()) return;
+  if (is3DView()) return;
+
+  const int viewMode = TApp::instance()->getCurrentFrame()->isEditingLevel()
+                           ? LEVEL_VIEWMODE
+                           : SCENE_VIEWMODE;
+  m_viewMode                       = viewMode;
+  const int other                  = 1 - viewMode;
+  m_viewAff[other]                 = m_viewAff[viewMode];
+  m_rotationAngle[other]           = m_rotationAngle[viewMode];
+}
+
+//-----------------------------------------------------------------------------
+
 bool SceneViewer::is3DView() const {
   bool isCameraTest = CameraTestCheck::instance()->isEnabled();
   return (m_referenceMode == CAMERA3D_REFERENCE && !isCameraTest);
@@ -2528,10 +2547,14 @@ void SceneViewer::panQt(const QPointF &delta) {
   if (is3DView())
     m_pan3D += TPointD(delta.x(), -delta.y());
   else {
+    m_viewMode = TApp::instance()->getCurrentFrame()->isEditingLevel()
+                     ? LEVEL_VIEWMODE
+                     : SCENE_VIEWMODE;
     // TAffine &viewAff = m_viewAff[m_viewMode];
     // viewAff = TTranslation(delta.x(), -delta.y()) * viewAff;
     setViewMatrix(TTranslation(delta.x(), -delta.y()) * m_viewAff[m_viewMode],
                   m_viewMode);
+    syncSceneAndLevelViewIfEnabled();
   }
   invalidateAll();
   emit refreshNavi();
@@ -2567,9 +2590,16 @@ void SceneViewer::zoomQt(bool forward, bool reset) {
         zoomScaleFittingWithScreen = getZoomScaleFittingWithScreen();
     }
 
+    m_viewMode = TApp::instance()->getCurrentFrame()->isEditingLevel()
+                     ? LEVEL_VIEWMODE
+                     : SCENE_VIEWMODE;
+    const bool syncView =
+        Preferences::instance()->isSyncSceneAndLevelViewEnabled();
+
     int i;
 
     for (i = 0; i < 2; i++) {
+      if (syncView && i != m_viewMode) continue;
       TAffine &viewAff = m_viewAff[i];
       if (m_isFlippedX) viewAff = viewAff * TScale(-1, 1);
       if (m_isFlippedX) viewAff = viewAff * TScale(1, -1);
@@ -2598,6 +2628,7 @@ void SceneViewer::zoomQt(bool forward, bool reset) {
                         i);
       }
     }
+    syncSceneAndLevelViewIfEnabled();
   }
 
   GLInvalidateAll();
@@ -2728,8 +2759,14 @@ void SceneViewer::zoomQt(const QPoint &center, double factor) {
       m_pan3D = -(m_zoomScale3D / oldZoomScale) * (delta - m_pan3D) + delta;
     }
   } else {
+    m_viewMode = TApp::instance()->getCurrentFrame()->isEditingLevel()
+                     ? LEVEL_VIEWMODE
+                     : SCENE_VIEWMODE;
+    const bool syncView =
+        Preferences::instance()->isSyncSceneAndLevelViewEnabled();
     int i;
     for (i = 0; i < 2; i++) {
+      if (syncView && i != m_viewMode) continue;
       TAffine &viewAff = m_viewAff[i];
       double scale2    = fabs(viewAff.det());
       if ((scale2 < 100000 || factor < 1) &&
@@ -2746,6 +2783,7 @@ void SceneViewer::zoomQt(const QPoint &center, double factor) {
         }
       }
     }
+    syncSceneAndLevelViewIfEnabled();
   }
 
   GLInvalidateAll();
@@ -2845,10 +2883,14 @@ void SceneViewer::zoomOut() {
 void SceneViewer::rotate(const TPointD &center, double angle) {
   if (angle == 0) return;
   if (m_isFlippedX != m_isFlippedY) angle = -angle;
+  m_viewMode = TApp::instance()->getCurrentFrame()->isEditingLevel()
+                   ? LEVEL_VIEWMODE
+                   : SCENE_VIEWMODE;
   m_rotationAngle[m_viewMode] += angle;
   TPointD realCenter = m_viewAff[m_viewMode] * center;
   setViewMatrix(TRotation(realCenter, angle) * m_viewAff[m_viewMode],
                 m_viewMode);
+  syncSceneAndLevelViewIfEnabled();
   invalidateAll();
 }
 
@@ -3007,6 +3049,9 @@ void SceneViewer::resetSceneViewer() {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::resetZoom() {
+  m_viewMode = TApp::instance()->getCurrentFrame()->isEditingLevel()
+                   ? LEVEL_VIEWMODE
+                   : SCENE_VIEWMODE;
   TPointD realCenter(m_viewAff[m_viewMode].a13, m_viewAff[m_viewMode].a23);
   TAffine aff =
       getNormalZoomScale() * TRotation(realCenter, m_rotationAngle[m_viewMode]);
@@ -3015,6 +3060,7 @@ void SceneViewer::resetZoom() {
   if (m_isFlippedX) aff = aff * TScale(-1, 1);
   if (m_isFlippedY) aff = aff * TScale(1, -1);
   setViewMatrix(aff, m_viewMode);
+  syncSceneAndLevelViewIfEnabled();
   invalidateAll();
   emit onZoomChanged();
 }
@@ -3039,8 +3085,12 @@ void SceneViewer::resetRotation() {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::resetPosition() {
+  m_viewMode = TApp::instance()->getCurrentFrame()->isEditingLevel()
+                   ? LEVEL_VIEWMODE
+                   : SCENE_VIEWMODE;
   m_viewAff[m_viewMode].a13 = 0.0;
   m_viewAff[m_viewMode].a23 = 0.0;
+  syncSceneAndLevelViewIfEnabled();
   invalidateAll();
 }
 

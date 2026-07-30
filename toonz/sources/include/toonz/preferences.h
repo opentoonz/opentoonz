@@ -217,6 +217,11 @@ public:
   bool isActualPixelViewOnSceneEditingModeEnabled() const {
     return getBoolValue(actualPixelViewOnSceneEditingMode);
   }
+  //! When true, Scene edit and Level edit share the same zoom/pan/rotation
+  //! view (m_viewAff[0] and m_viewAff[1] stay aligned).
+  bool isSyncSceneAndLevelViewEnabled() const {
+    return getBoolValue(syncSceneAndLevelView);
+  }
   bool isShowRasterImagesDarkenBlendedInViewerEnabled() const {
     return getBoolValue(showRasterImagesDarkenBlendedInViewer);
   }

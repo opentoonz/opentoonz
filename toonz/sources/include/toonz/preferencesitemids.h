@@ -29,6 +29,7 @@ enum PreferencesItemId {
   functionEditorToggle,
   moveCurrentFrameByClickCellArea,
   actualPixelViewOnSceneEditingMode,
+  syncSceneAndLevelView,
   showRasterImagesDarkenBlendedInViewer,
   iconSize,
   viewShrink,
