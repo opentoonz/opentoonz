@@ -733,13 +733,9 @@ elseif(BUILD_ENV_UNIXLIKE AND NOT BUILD_TARGET_WIN)
         DESTINATION bin
     )
 
-    # First-run config seeding and library lookup were previously handled by a
-    # generated bin/opentoonz launcher shell script. That is no longer needed:
-    # the application seeds ~/.config/OpenToonz itself (TEnv::initUserStuffDir,
-    # in the GUI and the CLI tools) and locates its bundled libraries through an
-    # $ORIGIN-relative RPATH. Install the real binaries directly and add a
-    # lowercase "opentoonz" symlink to OpenToonz so the .desktop file's
-    # "Exec=opentoonz" keeps working.
+    # No launcher script needed anymore (see RPATH/seeding changes above);
+    # install the real binaries and symlink opentoonz -> OpenToonz so the
+    # .desktop file's Exec=opentoonz keeps working.
     install(
         PROGRAMS
             "$<TARGET_FILE:tcleanup>"

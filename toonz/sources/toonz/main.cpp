@@ -175,10 +175,7 @@ static void initToonzEnv(QHash<QString, QString> &argPathValues) {
         Check if the xxxroot is defined and corresponds to an existing folder
   --*/
 
-  // On Linux/*BSD, seed the per-user config dir from the installed read-only
-  // "stuff" on first run so a plain installed binary works without the
-  // launcher script. Installed layout is <prefix>/bin/OpenToonz alongside
-  // <prefix>/share/opentoonz/stuff; a no-op elsewhere and when already seeded.
+  // Installed layout: <prefix>/bin/OpenToonz alongside <prefix>/share/opentoonz/stuff.
   {
     TFilePath exeDir(QCoreApplication::applicationDirPath().toStdWString());
     TEnv::initUserStuffDir(exeDir.getParentDir() + "share" + "opentoonz" +
