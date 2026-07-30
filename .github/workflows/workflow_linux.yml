@@ -116,3 +116,42 @@ jobs:
       with:
         name: Opentoonz-${{ runner.os }}-${{ matrix.compiler }}-${{ github.sha }}
         path: toonz/build/Opentoonz-${{ runner.os }}-${{ matrix.compiler }}-${{ github.sha }}.tar.gz
+
+  # Compile-only: catches Fedora-specific breakage (package renames, newer
+  # GCC/Qt) that the Ubuntu job cannot. Deliberately builds no AppImage.
+  Fedora:
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:latest
+    steps:
+    - name: Install prerequisites
+      # actions/checkout needs git and tar, absent from the base image
+      run: dnf install -y git tar gzip
+
+    - uses: actions/checkout@v6
+
+    - name: Install libraries
+      run: |
+        dnf install -y gcc gcc-c++ automake libtool make git cmake ninja-build \
+          boost boost-devel SuperLU SuperLU-devel lz4-devel xz-devel \
+          libusb1-devel lzo-devel libjpeg-turbo-devel turbojpeg-devel \
+          glew glew-devel freeglut freeglut-devel freetype-devel libpng-devel \
+          blas blas-devel json-c-devel opencv-devel libmypaint-devel \
+          qt5-qtbase-devel qt5-qtsvg qt5-qtsvg-devel qt5-qtscript qt5-qtscript-devel \
+          qt5-qttools qt5-qttools-devel qt5-qttools-static qt5-qtmultimedia \
+          qt5-qtmultimedia-devel qt5-qtserialport-devel qt5-qtwayland \
+          pkgconf-pkg-config
+
+    - name: Build libtiff
+      run: |
+        cd thirdparty/tiff-4.0.3
+        CFLAGS='-fPIC' CXXFLAGS='-fPIC' ./configure --disable-jbig
+        make -j $(nproc)
+
+    - name: Build
+      run: |
+        cd toonz
+        mkdir build
+        cd build
+        cmake ../sources -G Ninja -DWITH_TRANSLATION=OFF
+        ninja
