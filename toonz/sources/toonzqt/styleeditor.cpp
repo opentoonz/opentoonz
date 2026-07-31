@@ -1004,12 +1004,14 @@ bool HexagonalColorWheel::svTriangleBarycentric(const QPointF &p,
   float dot11 = QPointF::dotProduct(v1, v1);
   float dot12 = QPointF::dotProduct(v1, v2);
   float denom = dot00 * dot11 - dot01 * dot01;
+  // Only fail for a degenerate triangle. Outside points still get weights so
+  // callers can clamp/renormalize onto the triangle instead of jumping to black.
   if (fabs(denom) < 1e-6f) return false;
   float invDenom = 1.0f / denom;
   wWhite         = (dot11 * dot02 - dot01 * dot12) * invDenom;
   wBlack         = (dot00 * dot12 - dot01 * dot02) * invDenom;
   wHue           = 1.0f - wWhite - wBlack;
-  return wHue >= -0.02f && wBlack >= -0.02f && wWhite >= -0.02f;
+  return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -1019,7 +1021,10 @@ void HexagonalColorWheel::svFromTrianglePoint(const QPointF &localPos, int &s,
   float wHue, wBlack, wWhite;
   if (!svTriangleBarycentric(localPos, m_leftp[0], m_leftp[1], m_leftp[2], wHue,
                              wBlack, wWhite)) {
-    wHue = wBlack = wWhite = 0.0f;
+    // Degenerate triangle: keep the current color.
+    s = m_color.getValue(eSaturation);
+    v = m_color.getValue(eValue);
+    return;
   }
   wHue   = std::max(0.0f, wHue);
   wBlack = std::max(0.0f, wBlack);
