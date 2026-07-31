@@ -67,6 +67,7 @@ class QPushButton;
 class QTabWidget;
 class QToolBar;
 class QOpenGLFramebufferObject;
+class QMenu;
 
 class ColorSquaredWheel;
 class TabBarContainter;
@@ -231,6 +232,7 @@ protected:
   void showEvent(QShowEvent *) override;
 signals:
   void colorChanged(const ColorModel &color, bool isDragging);
+  void contextMenuRequested(const QPoint &globalPos);
 
 public slots:
   void onContextAboutToBeDestroyed();
@@ -541,6 +543,7 @@ public:
 
   void updateColorCalibration();
   void setColorWheelDisplayMode(ColorWheelDisplayMode mode);
+  bool connectWheelContextMenu(const QObject *receiver, const char *member);
 
 protected:
   void resizeEvent(QResizeEvent *) override;
@@ -1009,6 +1012,9 @@ public:
 
   void updateColorCalibration();
 
+signals:
+  void wheelContextMenuAboutToShow(QMenu *menu);
+
 protected:
   /*! Return false if style is linked and style must be set to null.*/
   bool setStyle(TColorStyle *currentStyle);
@@ -1081,6 +1087,7 @@ protected slots:
 
   void onSliderAppearanceSelected(QAction *);
   void onColorWheelDisplayModeSelected(QAction *);
+  void onWheelContextMenu(const QPoint &globalPos);
   void onPopupMenuAboutToShow();
 
   void onTextureSearch(const QString &);

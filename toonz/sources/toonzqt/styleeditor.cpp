@@ -1184,6 +1184,10 @@ bool HexagonalColorWheel::isInTriangle(const QPoint &pos) const {
 //-----------------------------------------------------------------------------
 
 void HexagonalColorWheel::mousePressEvent(QMouseEvent *event) {
+  if (event->button() == Qt::RightButton) {
+    emit contextMenuRequested(event->globalPos());
+    return;
+  }
   if (~event->buttons() & Qt::LeftButton) return;
 
   QPoint curPos = event->pos() * getDevPixRatio();
@@ -2178,6 +2182,14 @@ void PlainColorPage::updateColorCalibration() {
 
 void PlainColorPage::setColorWheelDisplayMode(ColorWheelDisplayMode mode) {
   m_hexagonalColorWheel->setDisplayMode(mode);
+}
+
+//-----------------------------------------------------------------------------
+
+bool PlainColorPage::connectWheelContextMenu(const QObject *receiver,
+                                             const char *member) {
+  return connect(m_hexagonalColorWheel, SIGNAL(contextMenuRequested(QPoint)),
+                 receiver, member);
 }
 
 //-----------------------------------------------------------------------------
@@ -3374,6 +3386,8 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
   ret = ret && connect(m_plainColorPage,
                        SIGNAL(colorChanged(const ColorModel &, bool)), this,
                        SLOT(onColorChanged(const ColorModel &, bool)));
+  ret = ret && m_plainColorPage->connectWheelContextMenu(
+                       this, SLOT(onWheelContextMenu(QPoint)));
   assert(ret);
   /* ------- initial conditions ------- */
   enable(false, false, false);
@@ -4523,6 +4537,27 @@ void StyleEditor::onColorWheelDisplayModeSelected(QAction *action) {
   if (displayId == (int)StyleEditorColorWheelDisplayMode) return;
   StyleEditorColorWheelDisplayMode = displayId;
   m_plainColorPage->setColorWheelDisplayMode((ColorWheelDisplayMode)displayId);
+}
+
+//-----------------------------------------------------------------------------
+
+void StyleEditor::onWheelContextMenu(const QPoint &globalPos) {
+  if (!m_colorWheelDisplayModeAG) return;
+
+  for (auto action : m_colorWheelDisplayModeAG->actions()) {
+    bool ok       = true;
+    int displayId = action->data().toInt(&ok);
+    if (ok && displayId == (int)StyleEditorColorWheelDisplayMode)
+      action->setChecked(true);
+  }
+
+  QMenu menu(this);
+  QMenu *wheelShapeMenu = menu.addMenu(tr("Wheel Shape"));
+  for (auto action : m_colorWheelDisplayModeAG->actions())
+    wheelShapeMenu->addAction(action);
+  // Panels can append extra actions (e.g. Bind to Current Room) here.
+  emit wheelContextMenuAboutToShow(&menu);
+  menu.exec(globalPos);
 }
 
 //-----------------------------------------------------------------------------
