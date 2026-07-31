@@ -175,12 +175,7 @@ static void initToonzEnv(QHash<QString, QString> &argPathValues) {
         Check if the xxxroot is defined and corresponds to an existing folder
   --*/
 
-  // Installed layout: <prefix>/bin/OpenToonz alongside <prefix>/share/opentoonz/stuff.
-  {
-    TFilePath exeDir(QCoreApplication::applicationDirPath().toStdWString());
-    TEnv::initUserStuffDir(exeDir.getParentDir() + "share" + "opentoonz" +
-                           "stuff");
-  }
+  TEnv::initUserStuffDir();
 
   TFilePath stuffDir = TEnv::getStuffDir();
   if (stuffDir == TFilePath())

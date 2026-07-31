@@ -463,12 +463,7 @@ int main(int argc, char *argv[]) {
   TEnv::setSystemVarPrefix(systemVarPrefix);
   TEnv::setApplicationFileName(argv[0]);
 
-  // Installed layout: <prefix>/bin alongside <prefix>/share/opentoonz/stuff.
-  {
-    TFilePath exeDir(QCoreApplication::applicationDirPath().toStdWString());
-    TEnv::initUserStuffDir(exeDir.getParentDir() + "share" + "opentoonz" +
-                           "stuff");
-  }
+  TEnv::initUserStuffDir();
 
   std::string msg;
 

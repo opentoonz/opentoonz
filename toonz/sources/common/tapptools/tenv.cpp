@@ -4,6 +4,7 @@
 #include "tfilepath_io.h"
 #include "tversion.h"
 
+#include <QCoreApplication>
 #include <QDir>
 #include <QSettings>
 #include <QStandardPaths>
@@ -616,7 +617,7 @@ TFilePath TEnv::getConfigDir() {
   return configDir;
 }
 
-void TEnv::initUserStuffDir(const TFilePath &installedStuffDir) {
+void TEnv::initUserStuffDir() {
 #if defined(LINUX) || defined(FREEBSD)
   EnvGlobals *eg = EnvGlobals::instance();
 
@@ -625,6 +626,12 @@ void TEnv::initUserStuffDir(const TFilePath &installedStuffDir) {
 
   // respect an explicit -TOONZROOT command-line override
   if (eg->getArgPathValue(eg->getRootVarName()) != "") return;
+
+  // installed layout: <prefix>/bin/<exe> alongside
+  // <prefix>/share/opentoonz/stuff
+  TFilePath exeDir(QCoreApplication::applicationDirPath().toStdWString());
+  TFilePath installedStuffDir =
+      exeDir.getParentDir() + "share" + "opentoonz" + "stuff";
 
   // per-user config dir: ~/.config/<AppName> (matches getSystemVarPath())
   QString configDirStr = QDir::homePath() + "/.config/" +
