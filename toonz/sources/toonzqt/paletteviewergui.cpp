@@ -870,12 +870,12 @@ void PageViewer::paintEvent(QPaintEvent *e) {
       p.setFont(tmpFont);
       if (ShowStyleIndex == 1) {
         int indexWidth = fontMetrics().width(QString().setNum(styleIndex)) + 4;
-        QRect indexRect(chipRect.bottomRight() + QPoint(-indexWidth, -14),
+      QRect indexRect(chipRect.bottomRight() + QPoint(-indexWidth, -14),
                         chipRect.bottomRight());
-        p.setPen(Qt::black);
-        p.setBrush(Qt::white);
-        p.drawRect(indexRect);
-        p.drawText(indexRect, Qt::AlignCenter, QString().setNum(styleIndex));
+      p.setPen(Qt::black);
+      p.setBrush(Qt::white);
+      p.drawRect(indexRect);
+      p.drawText(indexRect, Qt::AlignCenter, QString().setNum(styleIndex));
       }
       // draw "Autopaint for lines" indicator
       int offset = 0;
