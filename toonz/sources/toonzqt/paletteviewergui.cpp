@@ -42,6 +42,8 @@ TEnv::IntVar EnvSoftwareCurrentFontSize_StyleName(
     "SoftwareCurrentFontSize_StyleName", 11);
 extern TEnv::IntVar ShowNewStyleButton;
 
+TEnv::IntVar ShowStyleIndex("ShowStyleIndex", 0);
+
 using namespace PaletteViewerGUI;
 using namespace DVGui;
 
@@ -228,6 +230,20 @@ int PageViewer::getCurrentStyleIndex() const {
 }
 
 //-----------------------------------------------------------------------------
+
+void PageViewer::toggleShowStyleIndex() {
+  if (ShowStyleIndex == 1) {
+    ShowStyleIndex = 0;
+  } else {
+    ShowStyleIndex = 1;
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+bool PageViewer::getShowStyleIndex() { return ShowStyleIndex == 1; }
+
+//-----------------------------------------------------------------------------/*! Set current page to \b page and update view.
 /*! Set current page to \b page and update view.
  */
 void PageViewer::setPage(TPalette::Page *page) {
@@ -852,15 +868,15 @@ void PageViewer::paintEvent(QPaintEvent *e) {
       tmpFont.setPointSize(9);
       tmpFont.setItalic(false);
       p.setFont(tmpFont);
-      int indexWidth =
-          fontMetrics().horizontalAdvance(QString().setNum(styleIndex)) + 4;
-      QRect indexRect(chipRect.bottomRight() + QPoint(-indexWidth, -14),
-                      chipRect.bottomRight());
-      p.setPen(Qt::black);
-      p.setBrush(Qt::white);
-      p.drawRect(indexRect);
-      p.drawText(indexRect, Qt::AlignCenter, QString().setNum(styleIndex));
-
+      if (ShowStyleIndex == 1) {
+        int indexWidth = fontMetrics().width(QString().setNum(styleIndex)) + 4;
+        QRect indexRect(chipRect.bottomRight() + QPoint(-indexWidth, -14),
+                        chipRect.bottomRight());
+        p.setPen(Qt::black);
+        p.setBrush(Qt::white);
+        p.drawRect(indexRect);
+        p.drawText(indexRect, Qt::AlignCenter, QString().setNum(styleIndex));
+      }
       // draw "Autopaint for lines" indicator
       int offset = 0;
       if (style->getFlags() != 0) {
@@ -911,7 +927,7 @@ void PageViewer::paintEvent(QPaintEvent *e) {
     // draw new style chip
     if (ShowNewStyleButton && !m_page->getPalette()->isLocked()) {
       i              = getChipCount();
-      QRect chipRect = getItemRect(i).adjusted(4, 4, -5, -5);
+      QRect chipRect = getItemRect(i).adjusted(0, -1, 0, -1);
       p.setPen(
           QColor(textColor.red(), textColor.green(), textColor.blue(), 128));
       p.fillRect(chipRect, QBrush(QColor(0, 0, 0, 64)));

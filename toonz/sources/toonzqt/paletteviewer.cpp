@@ -496,23 +496,19 @@ void PaletteViewer::createPaletteToolBar() {
   addViewAction(tr("&Large Thumbnails View"), PageViewer::LargeChips);
   addViewAction(tr("&List View"), PageViewer::List);
 
-  viewMode->addSeparator();
-
-  QActionGroup *nameDisplayModeGroup = new QActionGroup(viewMode);
-  nameDisplayModeGroup->setExclusive(true);
-  connect(nameDisplayModeGroup, &QActionGroup::triggered, this,
-          &PaletteViewer::onNameDisplayMode);
-
-  auto addNameDisplayAction = [&](const QString &label,
-                                  PageViewer::NameDisplayMode mode) {
-    QAction *nameDisplayAction = new QAction(label, viewMode);
-    nameDisplayAction->setData(mode);
-    nameDisplayAction->setCheckable(true);
-    if (m_pageViewer->getNameDisplayMode() == mode)
-      nameDisplayAction->setChecked(true);
-    nameDisplayModeGroup->addAction(nameDisplayAction);
-    viewMode->addAction(nameDisplayAction);
-  };
+  m_viewMode->addSeparator();
+  QAction *showStyleIndex = new QAction(tr("Show Style Index"), this);
+  showStyleIndex->setCheckable(true);
+  if (m_pageViewer)
+    showStyleIndex->setChecked(m_pageViewer->getShowStyleIndex());
+  connect(showStyleIndex, &QAction::toggled, [=](bool checked) {
+    if (m_pageViewer) m_pageViewer->toggleShowStyleIndex();
+    if (m_pageViewer) m_pageViewer->update();
+    bool setChecked              = false;
+    if (m_pageViewer) setChecked = m_pageViewer->getShowStyleIndex();
+    showStyleIndex->setChecked(setChecked);
+  });
+  m_viewMode->addAction(showStyleIndex);
 
   addNameDisplayAction(tr("Style Name"), PageViewer::Style);
   addNameDisplayAction(tr("StudioPalette Name"), PageViewer::Original);
