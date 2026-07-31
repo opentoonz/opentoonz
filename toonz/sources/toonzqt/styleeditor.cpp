@@ -70,6 +70,21 @@ TEnv::IntVar StyleEditorColorWheelDisplayMode(
 
 using namespace StyleEditorGUI;
 
+namespace {
+
+ColorWheelDisplayMode normalizedColorWheelMode(int displayId) {
+  switch (displayId) {
+  case CompactNestedWheelDisplay:
+  case ExtendedCorrectedWheelDisplay:
+    return static_cast<ColorWheelDisplayMode>(displayId);
+  case ClassicWheelDisplay:
+  default:
+    return ClassicWheelDisplay;
+  }
+}
+
+}  // namespace
+
 //*****************************************************************************
 //    UndoPaletteChange  definition
 //*****************************************************************************
@@ -2186,6 +2201,12 @@ void PlainColorPage::setColorWheelDisplayMode(ColorWheelDisplayMode mode) {
 }
 
 //-----------------------------------------------------------------------------
+
+ColorWheelDisplayMode PlainColorPage::colorWheelDisplayMode() const {
+  return m_hexagonalColorWheel->displayMode();
+}
+
+//-----------------------------------------------------------------------------
 /*
 void PlainColorPage::setWheelChannel(int channel)
 {
@@ -3917,6 +3938,11 @@ void StyleEditor::showEvent(QShowEvent *) {
   onSearchVisible(m_searchAction->isChecked());
   updateOrientationButton();
   assert(ret);
+
+  // Keep this pane's wheel shape in sync with the user preference (TEnv),
+  // e.g. after room switches or when another Style Editor changed the mode.
+  m_plainColorPage->setColorWheelDisplayMode(normalizedColorWheelMode(
+      static_cast<int>(StyleEditorColorWheelDisplayMode)));
 }
 
 //-----------------------------------------------------------------------------
@@ -4522,12 +4548,15 @@ void StyleEditor::onSliderAppearanceSelected(QAction *action) {
 //-----------------------------------------------------------------------------
 
 void StyleEditor::onColorWheelDisplayModeSelected(QAction *action) {
-  bool ok       = true;
+  bool ok       = false;
   int displayId = action->data().toInt(&ok);
   if (!ok) return;
-  if (displayId == (int)StyleEditorColorWheelDisplayMode) return;
-  StyleEditorColorWheelDisplayMode = displayId;
-  m_plainColorPage->setColorWheelDisplayMode((ColorWheelDisplayMode)displayId);
+
+  // Always apply to this pane, even if TEnv already stores the same mode
+  // (another Style Editor may still be showing a different shape).
+  const ColorWheelDisplayMode mode = normalizedColorWheelMode(displayId);
+  StyleEditorColorWheelDisplayMode = static_cast<int>(mode);
+  m_plainColorPage->setColorWheelDisplayMode(mode);
 }
 
 //-----------------------------------------------------------------------------
@@ -4540,10 +4569,11 @@ void StyleEditor::onPopupMenuAboutToShow() {
     if (ok && appearanceId == StyleEditorColorSliderAppearance)
       action->setChecked(true);
   }
+  // Wheel Shape: reflect this pane's current wheel, not only TEnv.
+  const int paneMode = (int)m_plainColorPage->colorWheelDisplayMode();
   for (auto action : m_colorWheelDisplayModeAG->actions()) {
     bool ok       = true;
     int displayId = action->data().toInt(&ok);
-    if (ok && displayId == (int)StyleEditorColorWheelDisplayMode)
-      action->setChecked(true);
+    if (ok && displayId == paneMode) action->setChecked(true);
   }
 }

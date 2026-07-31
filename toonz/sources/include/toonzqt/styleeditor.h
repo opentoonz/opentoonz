@@ -541,6 +541,7 @@ public:
 
   void updateColorCalibration();
   void setColorWheelDisplayMode(ColorWheelDisplayMode mode);
+  ColorWheelDisplayMode colorWheelDisplayMode() const;
 
 protected:
   void resizeEvent(QResizeEvent *) override;
