@@ -1030,16 +1030,23 @@ void HexagonalColorWheel::svFromTrianglePoint(const QPointF &localPos, int &s,
     wBlack /= sum;
     wWhite /= sum;
   }
-  s = (int)(std::min(std::max(wHue, 0.0f), 1.0f) * 100.0f + 0.5f);
-  v = (int)(std::min(std::max(wHue + wWhite, 0.0f), 1.0f) * 100.0f + 0.5f);
+  // HSV from triangle weights: Value = wHue + wWhite, Saturation = wHue / Value
+  const float value = std::min(std::max(wHue + wWhite, 0.0f), 1.0f);
+  const float saturation =
+      (value > 1e-6f) ? std::min(std::max(wHue / value, 0.0f), 1.0f) : 0.0f;
+  s = (int)(saturation * 100.0f + 0.5f);
+  v = (int)(value * 100.0f + 0.5f);
 }
 
 //-----------------------------------------------------------------------------
 
 QPointF HexagonalColorWheel::svTriangleMarkerPos(float s, float v) const {
-  float wHue   = s / 100.0f;
-  float wWhite = std::max(0.0f, v / 100.0f - wHue);
-  float wBlack = std::max(0.0f, 1.0f - wHue - wWhite);
+  const float S = s / 100.0f;
+  const float V = v / 100.0f;
+  // Full-hue / white / black triangle weights for HSV (S, V)
+  const float wHue   = S * V;
+  const float wWhite = (1.0f - S) * V;
+  const float wBlack = 1.0f - V;
   return wHue * m_leftp[0] + wBlack * m_leftp[1] + wWhite * m_leftp[2];
 }
 
