@@ -144,8 +144,15 @@ private:
   void updateControls(
       QWidget* customWidget);  // Update widget using current entries
 
+  static CustomPanelEditorPopup* s_instance;
+
 public:
   CustomPanelEditorPopup();
+  ~CustomPanelEditorPopup();
+  
+  // Refresh the command list tree if the popup is currently open.
+  // Call this after preset commands are added/removed so the tree stays in sync.
+  static void refreshCommandTreeIfOpen();
   
 protected:
   void showEvent(QShowEvent* event) override;
@@ -157,6 +164,7 @@ protected slots:
   void onPreviewClicked(int id);
   void onPreviewDropped(int id, const QString& cmdId, bool fromTree);
   void onRegister();
+  void onRemove();
   void onSearchTextChanged(const QString& text);
 };
 
