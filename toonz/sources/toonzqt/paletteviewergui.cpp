@@ -42,7 +42,7 @@ TEnv::IntVar EnvSoftwareCurrentFontSize_StyleName(
     "SoftwareCurrentFontSize_StyleName", 11);
 extern TEnv::IntVar ShowNewStyleButton;
 
-TEnv::IntVar ShowStyleIndex("ShowStyleIndex", 0);
+TEnv::IntVar ShowStyleIndex("ShowStyleIndex", 1);
 
 using namespace PaletteViewerGUI;
 using namespace DVGui;
