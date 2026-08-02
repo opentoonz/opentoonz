@@ -66,7 +66,7 @@ enum ColorSliderAppearance {
 TEnv::IntVar StyleEditorColorSliderAppearance(
     "StyleEditorColorSliderAppearance", RelativeColoredTriangleHandle);
 TEnv::IntVar StyleEditorColorWheelDisplayMode(
-    "StyleEditorColorWheelDisplayMode", ClassicWheelDisplay);
+    "StyleEditorColorWheelDisplayMode", static_cast<int>(ColorWheelDisplayMode::Classic));
 
 using namespace StyleEditorGUI;
 
@@ -74,12 +74,12 @@ namespace {
 
 ColorWheelDisplayMode normalizedColorWheelMode(int displayId) {
   switch (displayId) {
-  case CompactNestedWheelDisplay:
-  case ExtendedCorrectedWheelDisplay:
+  case static_cast<int>(ColorWheelDisplayMode::Round):
+  case static_cast<int>(ColorWheelDisplayMode::Hexagonal):
     return static_cast<ColorWheelDisplayMode>(displayId);
-  case ClassicWheelDisplay:
+  case static_cast<int>(ColorWheelDisplayMode::Classic):
   default:
-    return ClassicWheelDisplay;
+    return ColorWheelDisplayMode::Classic;
   }
 }
 
@@ -769,7 +769,7 @@ void HexagonalColorWheel::computeClassicLayout(int w, int h) {
 
 //-----------------------------------------------------------------------------
 
-void HexagonalColorWheel::computeCompactSVTriangle() {
+void HexagonalColorWheel::computeRoundSVTriangle() {
   float R  = m_innerRadius;
   float cx = m_circleCenter.x();
   float cy = m_circleCenter.y();
@@ -788,7 +788,7 @@ void HexagonalColorWheel::computeCompactSVTriangle() {
 
 //-----------------------------------------------------------------------------
 
-void HexagonalColorWheel::computeCompactLayout(int w, int h) {
+void HexagonalColorWheel::computeRoundLayout(int w, int h) {
   float avail = std::min((float)w, (float)h);
   float margin = avail * 0.03f;
   m_outerRadius = (avail - margin * 2.0f) * 0.5f;
@@ -803,12 +803,12 @@ void HexagonalColorWheel::computeCompactLayout(int w, int h) {
   m_circleCenter.setY(m_outerRadius);
   m_wp[0] = m_circleCenter;
 
-  computeCompactSVTriangle();
+  computeRoundSVTriangle();
 }
 
 //-----------------------------------------------------------------------------
 
-void HexagonalColorWheel::computeExtendedLayout(int w, int h) {
+void HexagonalColorWheel::computeHexagonalLayout(int w, int h) {
   computeClassicLayout(w, h);
   m_ringInnerScale = 0.72f;
 }
@@ -817,14 +817,14 @@ void HexagonalColorWheel::computeExtendedLayout(int w, int h) {
 
 void HexagonalColorWheel::updateLayout(int w, int h) {
   switch (m_displayMode) {
-  case CompactNestedWheelDisplay:
-    computeCompactLayout(w, h);
+  case ColorWheelDisplayMode::Round:
+    computeRoundLayout(w, h);
     break;
-  case ExtendedCorrectedWheelDisplay:
-    computeExtendedLayout(w, h);
+  case ColorWheelDisplayMode::Hexagonal:
+    computeHexagonalLayout(w, h);
     computeInnerHexVertices();
     break;
-  case ClassicWheelDisplay:
+  case ColorWheelDisplayMode::Classic:
   default:
     computeClassicLayout(w, h);
     break;
@@ -977,16 +977,16 @@ void HexagonalColorWheel::paintGL() {
   glTranslatef(m_wheelPosition.rx(), m_wheelPosition.ry(), 0.0f);
 
   switch (m_displayMode) {
-  case CompactNestedWheelDisplay:
+  case ColorWheelDisplayMode::Round:
     drawCircularHueRing();
     drawSatValueTriangle();
     break;
-  case ExtendedCorrectedWheelDisplay:
+  case ColorWheelDisplayMode::Hexagonal:
     drawHueRing();
     drawInnerHexBackground();
     drawSatValueTriangle();
     break;
-  case ClassicWheelDisplay:
+  case ColorWheelDisplayMode::Classic:
   default:
     drawClassicHexWheel(v);
     drawSatValueTriangle();
@@ -1109,7 +1109,7 @@ void HexagonalColorWheel::drawCurrentColorMark() {
   int hue = m_color.getValue(eHue);
 
   // draw marker (in the wheel or hue ring)
-  if (m_displayMode == ClassicWheelDisplay) {
+  if (m_displayMode == ColorWheelDisplayMode::Classic) {
     glPushMatrix();
     float phi = (float)(h % 60 - 30) / 180.0f * 3.1415f;
     float d   = s * m_hexTriHeight / cosf(phi);
@@ -1124,7 +1124,7 @@ void HexagonalColorWheel::drawCurrentColorMark() {
     glVertex2f(-3, 3);
     glEnd();
     glPopMatrix();
-  } else if (m_displayMode == CompactNestedWheelDisplay) {
+  } else if (m_displayMode == ColorWheelDisplayMode::Round) {
     drawHueRingBaton(hue, m_innerRadius, m_outerRadius, m_circleCenter);
   } else {
     float phi    = (float)(h % 60 - 30) / 180.0f * 3.1415f;
@@ -1179,9 +1179,9 @@ bool HexagonalColorWheel::isInCircularHueRing(const QPoint &pos) const {
 
 bool HexagonalColorWheel::isInHueRing(const QPoint &pos) const {
   if (isInTriangle(pos)) return false;
-  if (m_displayMode == CompactNestedWheelDisplay)
+  if (m_displayMode == ColorWheelDisplayMode::Round)
     return isInCircularHueRing(pos);
-  if (m_displayMode == ClassicWheelDisplay) return isInClassicWheel(pos);
+  if (m_displayMode == ColorWheelDisplayMode::Classic) return isInClassicWheel(pos);
 
   if (!isInClassicWheel(pos)) return false;
 
@@ -1214,7 +1214,7 @@ void HexagonalColorWheel::mousePressEvent(QMouseEvent *event) {
     return;
   }
 
-  if (m_displayMode == ClassicWheelDisplay) {
+  if (m_displayMode == ColorWheelDisplayMode::Classic) {
     if (isInClassicWheel(curPos)) {
       m_currentWheel = leftWheel;
       clickLeftWheel(curPos);
@@ -1237,7 +1237,7 @@ void HexagonalColorWheel::mouseMoveEvent(QMouseEvent *event) {
   case none:
     break;
   case leftWheel:
-    if (m_displayMode == ClassicWheelDisplay)
+    if (m_displayMode == ColorWheelDisplayMode::Classic)
       clickLeftWheel(event->pos() * getDevPixRatio());
     else
       clickHueRing(event->pos() * getDevPixRatio());
@@ -1258,12 +1258,12 @@ void HexagonalColorWheel::mouseReleaseEvent(QMouseEvent *event) {
 //-----------------------------------------------------------------------------
 
 void HexagonalColorWheel::clickHueRing(const QPoint &pos) {
-  QPointF center = (m_displayMode == CompactNestedWheelDisplay)
+  QPointF center = (m_displayMode == ColorWheelDisplayMode::Round)
                        ? m_circleCenter + m_wheelPosition
                        : m_wp[0] + m_wheelPosition;
 
   int hue;
-  if (m_displayMode == CompactNestedWheelDisplay) {
+  if (m_displayMode == ColorWheelDisplayMode::Round) {
     QPointF d = QPointF(pos) - center;
     float theta = atan2f(-d.y(), d.x()) * 180.0f / 3.1415f;
     if (theta < 0.0f) theta += 360.0f;
@@ -3509,35 +3509,35 @@ QFrame *StyleEditor::createBottomWidget() {
 
   m_colorWheelDisplayModeAG = new QActionGroup(this);
   QAction *classicWheelAct = new QAction(tr("Classic"), this);
-  QAction *compactWheelAct = new QAction(tr("Round"), this);
-  QAction *extendedWheelAct = new QAction(tr("Hexagonal"), this);
-  classicWheelAct->setData(ClassicWheelDisplay);
-  compactWheelAct->setData(CompactNestedWheelDisplay);
-  extendedWheelAct->setData(ExtendedCorrectedWheelDisplay);
+  QAction *roundWheelAct = new QAction(tr("Round"), this);
+  QAction *hexagonalWheelAct = new QAction(tr("Hexagonal"), this);
+  classicWheelAct->setData(static_cast<int>(ColorWheelDisplayMode::Classic));
+  roundWheelAct->setData(static_cast<int>(ColorWheelDisplayMode::Round));
+  hexagonalWheelAct->setData(static_cast<int>(ColorWheelDisplayMode::Hexagonal));
   classicWheelAct->setCheckable(true);
-  compactWheelAct->setCheckable(true);
-  extendedWheelAct->setCheckable(true);
+  roundWheelAct->setCheckable(true);
+  hexagonalWheelAct->setCheckable(true);
   switch ((ColorWheelDisplayMode)(int)StyleEditorColorWheelDisplayMode) {
-  case CompactNestedWheelDisplay:
-    compactWheelAct->setChecked(true);
+  case ColorWheelDisplayMode::Round:
+    roundWheelAct->setChecked(true);
     break;
-  case ExtendedCorrectedWheelDisplay:
-    extendedWheelAct->setChecked(true);
+  case ColorWheelDisplayMode::Hexagonal:
+    hexagonalWheelAct->setChecked(true);
     break;
-  case ClassicWheelDisplay:
+  case ColorWheelDisplayMode::Classic:
   default:
     classicWheelAct->setChecked(true);
     break;
   }
   m_colorWheelDisplayModeAG->addAction(classicWheelAct);
-  m_colorWheelDisplayModeAG->addAction(compactWheelAct);
-  m_colorWheelDisplayModeAG->addAction(extendedWheelAct);
+  m_colorWheelDisplayModeAG->addAction(roundWheelAct);
+  m_colorWheelDisplayModeAG->addAction(hexagonalWheelAct);
   m_colorWheelDisplayModeAG->setExclusive(true);
   menu->addSeparator();
   QMenu *wheelDisplaySubMenu = menu->addMenu(tr("Wheel Shape"));
   wheelDisplaySubMenu->addAction(classicWheelAct);
-  wheelDisplaySubMenu->addAction(compactWheelAct);
-  wheelDisplaySubMenu->addAction(extendedWheelAct);
+  wheelDisplaySubMenu->addAction(roundWheelAct);
+  wheelDisplaySubMenu->addAction(hexagonalWheelAct);
 
   m_toggleOrientationAction =
       new QAction(createQIcon("orientation_h"), tr("Toggle Orientation"), this);

@@ -135,10 +135,10 @@ public:
 
 enum CurrentWheel { none, leftWheel, rightTriangle };
 
-enum ColorWheelDisplayMode {
-  ClassicWheelDisplay,
-  CompactNestedWheelDisplay,
-  ExtendedCorrectedWheelDisplay
+enum class ColorWheelDisplayMode {
+  Classic = 0,
+  Round   = 1,
+  Hexagonal = 2
 };
 
 class DVAPI HexagonalColorWheel final : public GLWidgetForHighDpi {
@@ -161,7 +161,7 @@ class DVAPI HexagonalColorWheel final : public GLWidgetForHighDpi {
   float m_innerRadius;
   float m_ringInnerScale = 0.72f;
 
-  ColorWheelDisplayMode m_displayMode = ClassicWheelDisplay;
+  ColorWheelDisplayMode m_displayMode = ColorWheelDisplayMode::Classic;
   CurrentWheel m_currentWheel;
 
   // used for color calibration with 3DLUT
@@ -175,8 +175,8 @@ private:
   void computeHexVertices();
   void computeInnerHexVertices();
   void computeClassicLayout(int w, int h);
-  void computeCompactLayout(int w, int h);
-  void computeExtendedLayout(int w, int h);
+  void computeRoundLayout(int w, int h);
+  void computeHexagonalLayout(int w, int h);
   void updateLayout(int w, int h);
   void drawClassicHexWheel(float v);
   void drawHueRing();
@@ -186,7 +186,7 @@ private:
   void drawCurrentColorMark();
   void drawHueRingBaton(int hue, float innerDist, float outerDist,
                         const QPointF &center);
-  void computeCompactSVTriangle();
+  void computeRoundSVTriangle();
   QPointF svTriangleMarkerPos(float s, float v) const;
   static bool svTriangleBarycentric(const QPointF &p, const QPointF &hueV,
                                     const QPointF &blackV,
