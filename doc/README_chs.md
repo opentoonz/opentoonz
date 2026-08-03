@@ -1,5 +1,9 @@
 # OpenToonz
 
+## ⚠️ **重要提示**
+
+**请仅从官方来源下载：** OpenToonz 的官方网站只有 [**opentoonz.github.io**](https://opentoonz.github.io/) 和此 [GitHub 仓库](https://github.com/opentoonz/opentoonz)。为保障安全，请勿从其他域名下载 OpenToonz；OpenToonz 没有其他官方镜像或合作下载站点。
+
 [English](../README.md) [日本語](./README_ja.md) 
 
 [![](https://ci.appveyor.com/api/projects/status/oa5l5pc964h8fv49/branch/master?svg=true)](https://ci.appveyor.com/project/opentoonz/opentoonz)
