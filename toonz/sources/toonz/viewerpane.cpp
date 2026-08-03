@@ -64,6 +64,7 @@
 #include <QToolBar>
 #include <QMainWindow>
 #include <QSettings>
+#include <QTimer>
 
 #include "viewerpane.h"
 
@@ -356,6 +357,20 @@ void BaseViewerPanel::showEvent(QShowEvent *event) {
   // refresh
   onSceneChanged();
   changeWindowTitle();
+
+  // Deferred restore of saved session view state. singleShot(0) ensures this
+  // runs after SceneViewer::showEvent() has called fitToCamera().
+  if (m_hasPendingViewRestore) {
+    m_hasPendingViewRestore = false;
+    std::array<TAffine, 2> affs = m_pendingViewAffs;
+    int refMode                 = m_pendingReferenceMode;
+    SceneViewer *sv             = m_sceneViewer;
+    QTimer::singleShot(0, this, [sv, affs, refMode]() {
+      for (int m = 0; m < 2; ++m)
+        sv->setViewMatrix(affs[m], m);
+      if (refMode >= 0) sv->setReferenceMode(refMode);
+    });
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -736,6 +751,7 @@ void BaseViewerPanel::onSceneSwitched() {
                                   ->getFrameRate());
   m_sceneViewer->setEditPreviewSubcamera(false);
   onSceneChanged();
+
 }
 
 //-----------------------------------------------------------------------------
@@ -856,6 +872,22 @@ void BaseViewerPanel::setVisiblePartsFlag(UINT flag) {
 // SaveLoadQSettings
 void BaseViewerPanel::save(QSettings &settings) const {
   settings.setValue("viewerVisibleParts", m_visiblePartsFlag);
+
+  // Save both view matrices (scene mode and level mode)
+  for (int m = 0; m < 2; ++m) {
+    TAffine a = m_sceneViewer->getViewAffine(m);
+    settings.beginGroup(QString("viewAff%1").arg(m));
+    settings.setValue("a11", a.a11);
+    settings.setValue("a12", a.a12);
+    settings.setValue("a13", a.a13);
+    settings.setValue("a21", a.a21);
+    settings.setValue("a22", a.a22);
+    settings.setValue("a23", a.a23);
+    settings.endGroup();
+  }
+
+  // Reference mode (Normal / Camera / Camera3D)
+  settings.setValue("referenceMode", m_sceneViewer->getReferenceMode());
 }
 
 void BaseViewerPanel::load(QSettings &settings) {
@@ -863,6 +895,31 @@ void BaseViewerPanel::load(QSettings &settings) {
   m_visiblePartsFlag =
       settings.value("viewerVisibleParts", m_visiblePartsFlag).toUInt();
   updateShowHide();
+
+  // Store view matrices for deferred restore (applied after the first
+  // sceneSwitched signal resets the viewer via resetSceneViewer())
+  for (int m = 0; m < 2; ++m) {
+    QString groupKey = QString("viewAff%1").arg(m);
+    if (settings.childGroups().contains(groupKey)) {
+      settings.beginGroup(groupKey);
+      TAffine a;
+      a.a11 = settings.value("a11", 1.0).toDouble();
+      a.a12 = settings.value("a12", 0.0).toDouble();
+      a.a13 = settings.value("a13", 0.0).toDouble();
+      a.a21 = settings.value("a21", 0.0).toDouble();
+      a.a22 = settings.value("a22", 1.0).toDouble();
+      a.a23 = settings.value("a23", 0.0).toDouble();
+      settings.endGroup();
+      m_pendingViewAffs[m]     = a;
+      m_hasPendingViewRestore  = true;
+    }
+  }
+
+  // Reference mode
+  if (settings.contains("referenceMode")) {
+    m_pendingReferenceMode  = settings.value("referenceMode").toInt();
+    m_hasPendingViewRestore = true;
+  }
 }
 
 //-----------------------------------------------------------------------------

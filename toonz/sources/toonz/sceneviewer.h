@@ -260,6 +260,10 @@ public:
   TPointD getPan3D() const { return m_pan3D; }
   double getZoomScale3D() const { return m_zoomScale3D; }
 
+  // Accessors for session state persistence
+  TAffine getViewAffine(int viewMode) const { return m_viewAff[viewMode]; }
+  int getReferenceMode() const { return m_referenceMode; }
+
   double projectToZ(const TPointD &delta) override;
 
   TPointD getDpiScale() const override { return m_dpiScale; }
