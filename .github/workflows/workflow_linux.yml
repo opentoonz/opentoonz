@@ -82,8 +82,11 @@ jobs:
         cp appdir/usr/share/icons/hicolor/*/apps/*.png appdir
 
         mkdir artifact
-        mv appdir/usr/share/opentoonz/stuff artifact/portablestuff
-        rmdir appdir/usr/share/opentoonz
+        # Copy rather than move: the AppImage keeps its own
+        # usr/share/opentoonz/stuff so it can seed a config when run on its
+        # own, while the tarball still ships portablestuff next to it for
+        # portable-mode testing.
+        cp -r appdir/usr/share/opentoonz/stuff artifact/portablestuff
 
         wget -q -c 'https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage'
         wget -q -c 'https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage'
