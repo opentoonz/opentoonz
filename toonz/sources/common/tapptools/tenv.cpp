@@ -71,29 +71,34 @@ public:
     return &_instance;
   }
 
+#ifndef _WIN32
+  // Location of the ini file holding the system variables. Split out of
+  // getSystemVarPath() so that first-run seeding writes the file where this
+  // reads it, instead of duplicating the per-platform layout.
+  QString getSystemVarFile() {
+#ifdef MACOSX
+    return QString::fromStdString(getApplicationFileName()) + QString(".app") +
+           QString("/Contents/Resources/SystemVar.ini");
+#elif defined(HAIKU)
+    return QStandardPaths::writableLocation(
+               QStandardPaths::AppConfigLocation) +
+           "/SystemVar.ini";
+#else /* Generic Unix */
+    // TODO: use QStandardPaths::ConfigLocation when we drop Qt4
+    QString settingsPath = QDir::homePath();
+    settingsPath.append("/.config/");
+    settingsPath.append(getApplicationName().c_str());
+    settingsPath.append("/SystemVar.ini");
+    return settingsPath;
+#endif
+  }
+#endif
+
   TFilePath getSystemVarPath(std::string varName) {
 #ifdef _WIN32
     return m_registryRoot + varName;
 #else
-    QString settingsPath;
-
-#ifdef MACOSX
-    settingsPath = QString::fromStdString(getApplicationFileName()) +
-                   QString(".app") +
-                   QString("/Contents/Resources/SystemVar.ini");
-#else
-#ifdef HAIKU
-    settingsPath =
-        QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) +
-        "/SystemVar.ini";
-#else /* Generic Unix */
-    // TODO: use QStandardPaths::ConfigLocation when we drop Qt4
-    settingsPath = QDir::homePath();
-    settingsPath.append("/.config/");
-    settingsPath.append(getApplicationName().c_str());
-    settingsPath.append("/SystemVar.ini");
-#endif
-#endif
+    QString settingsPath = getSystemVarFile();
 
     QSettings settings(settingsPath, QSettings::IniFormat);
     QString qStr      = QString::fromStdString(varName);
@@ -618,7 +623,10 @@ TFilePath TEnv::getConfigDir() {
 }
 
 void TEnv::initUserStuffDir() {
-#if defined(LINUX) || defined(FREEBSD)
+// Matches the platforms whose install rules drop the launcher script that used
+// to do this (BUILD_ENV_UNIXLIKE AND NOT BUILD_TARGET_WIN): every Unix except
+// macOS, which ships a bundle and keeps its own layout.
+#if !defined(_WIN32) && !defined(MACOSX)
   EnvGlobals *eg = EnvGlobals::instance();
 
   // portable builds carry their own stuff; nothing to seed
@@ -633,14 +641,15 @@ void TEnv::initUserStuffDir() {
   TFilePath installedStuffDir =
       exeDir.getParentDir() + "share" + "opentoonz" + "stuff";
 
-  // per-user config dir: ~/.config/<AppName> (matches getSystemVarPath())
-  QString configDirStr = QDir::homePath() + "/.config/" +
-                         QString::fromStdString(eg->getApplicationName());
-  QDir().mkpath(configDirStr);
+  // Derive both paths from the file TEnv actually reads, so this stays correct
+  // wherever getSystemVarFile() places it (Haiku, for one, does not use
+  // ~/.config).
+  QString systemVarFileStr = eg->getSystemVarFile();
+  TFilePath systemVarFile(systemVarFileStr.toStdWString());
+  TFilePath configDir    = systemVarFile.getParentDir();
+  TFilePath userStuffDir = configDir + "stuff";
 
-  TFilePath configDir(configDirStr.toStdWString());
-  TFilePath userStuffDir  = configDir + "stuff";
-  TFilePath systemVarFile = configDir + "SystemVar.ini";
+  if (!QDir().mkpath(configDir.getQString())) return;
 
   // 1. Seed the writable stuff tree from the installed read-only copy.
   if (!TFileStatus(userStuffDir).doesExist()) {
@@ -662,7 +671,7 @@ void TEnv::initUserStuffDir() {
   // 2. Write a minimal SystemVar.ini. Only the root variable is required;
   //    every other path falls back to <stuff>/<subdir> in TEnv/ToonzFolder.
   if (!TFileStatus(systemVarFile).doesExist()) {
-    QSettings settings(systemVarFile.getQString(), QSettings::IniFormat);
+    QSettings settings(systemVarFileStr, QSettings::IniFormat);
     settings.setValue(QString::fromStdString(eg->getRootVarName()),
                       userStuffDir.getQString());
     settings.sync();
