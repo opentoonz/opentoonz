@@ -157,5 +157,9 @@ jobs:
         cd toonz
         mkdir build
         cd build
-        cmake ../sources -G Ninja -DWITH_TRANSLATION=OFF
+        # -Werror=return-type mirrors the distro %optflags that RPM packagers
+        # build with. A missing return is only a warning in our default build,
+        # so it survives review and breaks packaging instead (see #6940).
+        cmake ../sources -G Ninja -DWITH_TRANSLATION=OFF \
+          -DCMAKE_CXX_FLAGS=-Werror=return-type
         ninja
