@@ -6,8 +6,12 @@
 
 #include <QCoreApplication>
 #include <QDir>
+#include <QFile>
+#include <QFileInfo>
 #include <QSettings>
 #include <QStandardPaths>
+
+#include <iostream>
 
 #ifdef LEVO_MACOSX
 
@@ -622,6 +626,34 @@ TFilePath TEnv::getConfigDir() {
   return configDir;
 }
 
+#if !defined(_WIN32) && !defined(MACOSX)
+namespace {
+
+// Recursive copy that reports failure. TSystem::copyDir() ignores the result of
+// every mkdir/QFile::copy and never throws, so a partially copied tree would
+// otherwise look like a successful one.
+bool copyDirOrFail(const QString &dst, const QString &src) {
+  if (!QDir().mkpath(dst)) return false;
+
+  const QFileInfoList entries =
+      QDir(src).entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot |
+                              QDir::Hidden | QDir::System);
+  for (const QFileInfo &fi : entries) {
+    const QString target = dst + "/" + fi.fileName();
+    // symlinks are copied as plain files rather than followed, so a cyclic
+    // link in the packaged tree cannot send this into infinite recursion
+    if (fi.isDir() && !fi.isSymLink()) {
+      if (!copyDirOrFail(target, fi.filePath())) return false;
+    } else if (!QFile::copy(fi.filePath(), target)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+}  // namespace
+#endif
+
 void TEnv::initUserStuffDir() {
 // Matches the platforms whose install rules drop the launcher script that used
 // to do this (BUILD_ENV_UNIXLIKE AND NOT BUILD_TARGET_WIN): every Unix except
@@ -651,13 +683,27 @@ void TEnv::initUserStuffDir() {
 
   if (!QDir().mkpath(configDir.getQString())) return;
 
-  // 1. Seed the writable stuff tree from the installed read-only copy.
+  // 1. Seed the writable stuff tree from the installed read-only copy. Stage it
+  //    under a temporary name and rename into place only once the whole tree
+  //    copied, so an interrupted or failed copy (out of space, permissions)
+  //    leaves nothing behind that a later run would mistake for a complete
+  //    "stuff" and skip. On failure the staging dir is removed and we bail out
+  //    without writing SystemVar.ini, so the next launch retries from scratch.
   if (!TFileStatus(userStuffDir).doesExist()) {
     if (!TFileStatus(installedStuffDir).isDirectory())
       return;  // nothing to copy from (e.g. running from the build tree)
-    try {
-      TSystem::copyDir(userStuffDir, installedStuffDir);
-    } catch (...) {
+
+    const QString userStuffDirStr = userStuffDir.getQString();
+    const QString stagingDirStr   = userStuffDirStr + ".incomplete";
+
+    QDir(stagingDirStr).removeRecursively();  // leftovers from a failed attempt
+    if (!copyDirOrFail(stagingDirStr, installedStuffDir.getQString()) ||
+        !QDir().rename(stagingDirStr, userStuffDirStr)) {
+      QDir(stagingDirStr).removeRecursively();
+      std::cerr << "Failed to initialize "
+                << userStuffDirStr.toStdString()
+                << " from " << installedStuffDir.getQString().toStdString()
+                << std::endl;
       return;
     }
   }
