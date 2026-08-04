@@ -34,17 +34,16 @@ Notes:
 * For Qt, MyPaint and OpenCV, you can alternatively build and install from source.
 
 ### Installing Dependencies on Fedora
-(it may include some useless packages)
+
+This is the same dependency set used by the `Fedora` job in
+`.github/workflows/workflow_linux.yml`, so it is verified on every push.
 
 ```
-$ sudo dnf install gcc gcc-c++ automake git cmake boost boost-devel SuperLU SuperLU-devel lz4-devel lzma libusb-devel lzo-devel libjpeg-turbo-devel libGLEW glew-devel freeglut-devel freeglut freetype-devel libpng-devel qt5-qtbase-devel qt5-qtsvg qt5-qtsvg-devel qt5-qtscript qt5-qtscript-devel qt5-qttools qt5-qttools-devel qt5-qtmultimedia-devel blas blas-devel json-c-devel libtool intltool make qt5-qtmultimedia turbojpeg-devel opencv-devel qt5-qttools-static qt5-qtserialport-devel
+$ sudo dnf install gcc gcc-c++ automake libtool make git cmake ninja-build boost boost-devel SuperLU SuperLU-devel lz4-devel xz-devel libusb1-devel lzo-devel libjpeg-turbo-devel turbojpeg-devel glew glew-devel freeglut freeglut-devel freetype-devel libpng-devel blas blas-devel json-c-devel opencv-devel libmypaint-devel qt5-qtbase-devel qt5-qtsvg qt5-qtsvg-devel qt5-qtscript qt5-qtscript-devel qt5-qttools qt5-qttools-devel qt5-qttools-static qt5-qtmultimedia qt5-qtmultimedia-devel qt5-qtserialport-devel qt5-qtwayland pkgconf-pkg-config
 ```
 
-For newest versions of OS you may install libmypaint from repository and don't need to build it from source:
-
-```
-$ sudo dnf install libmypaint-devel
-```
+`libmypaint-devel` is included above, so there is no need to build libmypaint
+from source on Fedora.
 
 
 ### Installing Dependencies on ArchLinux
@@ -135,14 +134,14 @@ $ cmake ../sources
 $ make -j$(nproc)
 ```
 
-The build takes a lot of time, be patient. CMake may not pick up all the required dependencies. On Fedora 30, it can be helpful to use 
+The build takes a lot of time, be patient.
+
+CMake may not pick up all the required dependencies. If SuperLU is not found,
+point CMake at it explicitly:
 ```
-$cmake ../sources/ -DSUPERLU_INCLUDE_DIR=/usr/include/SuperLU
+$ cmake ../sources/ -DSUPERLU_INCLUDE_DIR=/usr/include/SuperLU
 ```
-instead of just
-```
-$cmake ../sources/
-```
+On current Fedora this is not needed; SuperLU is detected automatically.
 
 ### Troubleshooting Build Errors
 
