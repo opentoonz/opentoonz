@@ -595,7 +595,8 @@ void RasterPainter::flushRasterImages() {
           std::set<int> autoPaints;
           if (autocloseSettings.m_ignoreAPInks) {
             for (int styleIdx = 0; styleIdx < plt->getStyleCount(); ++styleIdx)
-              if (plt->getStyle(styleIdx)->getFlags() != 0) autoPaints.insert(styleIdx);
+              if (plt->getStyle(styleIdx)->getFlags() != 0)
+                autoPaints.insert(styleIdx);
           }
           TAutocloser ac(srcCm, gapCheckIndex, autocloseSettings,
                          std::move(autoPaints));
@@ -671,10 +672,12 @@ void RasterPainter::flushRasterImages() {
         // ==============================================================
         // Transparency Check: (see helper above)
         // Apply high-tone empty pixel fix
+        // When "Inks Only" check is ON, the high-tone modification will not be
+        // applied
         // ==============================================================
         TRasterCM32P rasterToUse = srcCm;
 
-        if (settings.m_transparencyCheck) {
+        if (settings.m_transparencyCheck && !settings.m_inksOnly) {
           const int threshold = 80;  // Minimum tone for "false" high antialias
 
           // Clone and adjust high-tone empty pixels
