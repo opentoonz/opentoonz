@@ -1,0 +1,905 @@
+From e519635f45e36ea5ed76ebda36b56063c08ef5b0 Mon Sep 17 00:00:00 2001
+From: manongjohn <19245851+manongjohn@users.noreply.github.com>
+Date: Tue, 14 May 2024 22:03:31 -0400
+Subject: [PATCH 1/2] Onion Skin Opacity control
+
+---
+ toonz/sources/include/toonz/onionskinmask.h |  16 +-
+ toonz/sources/include/toonz/stageplayer.h   |   1 +
+ toonz/sources/toonz/sceneviewer.cpp         |   1 +
+ toonz/sources/toonz/xshcolumnviewer.cpp     |   1 +
+ toonz/sources/toonz/xshrowviewer.cpp        | 292 +++++++++++++++++++-
+ toonz/sources/toonz/xshrowviewer.h          |  33 +++
+ toonz/sources/toonzlib/onionskinmask.cpp    |  95 +++++--
+ toonz/sources/toonzlib/stage.cpp            |  21 +-
+ toonz/sources/toonzlib/stageplayer.cpp      |   1 +
+ toonz/sources/toonzlib/stagevisitor.cpp     |  56 ++--
+ 10 files changed, 459 insertions(+), 58 deletions(-)
+
+diff --git a/toonz/sources/include/toonz/onionskinmask.h b/toonz/sources/include/toonz/onionskinmask.h
+index 428af3600..2f13008fc 100644
+--- a/toonz/sources/include/toonz/onionskinmask.h
++++ b/toonz/sources/include/toonz/onionskinmask.h
+@@ -62,12 +62,12 @@ class DVAPI OnionSkinMask {
+ 
+   int getMos(int index) const {
+     assert(0 <= index && index < (int)m_mos.size());
+-    return m_mos[index];
++    return m_mos[index].first;
+   }
+ 
+   int getFos(int index) const {
+     assert(0 <= index && index < (int)m_fos.size());
+-    return m_fos[index];
++    return m_fos[index].first;
+   }
+ 
+   void setMos(int drow, bool on);  //!< Sets a Mobile OS frame shifted by drow
+@@ -75,8 +75,13 @@ class DVAPI OnionSkinMask {
+   void setFos(int row,
+               bool on);  //!< Sets a Fixed OS frame to the specified xsheet row
+ 
+-  bool isMos(int drow) const;
+-  bool isFos(int row) const;
++  void setMosOpacity(int drow, double opacity);
++  double getMosOpacity(int drow);
++  void setFosOpacity(int row, double opacity);
++  double getFosOpacity(int row);
++
++  bool isMos(int drow);
++  bool isFos(int row);
+ 
+   bool getMosRange(int &drow0, int &drow1) const;
+ 
+@@ -146,7 +151,8 @@ since underlying onion-skinned drawings must be visible.
+   void clearGhostFlipKey() { m_ghostFlipKeys.clear(); }
+ 
+ private:
+-  std::vector<int> m_fos, m_mos;  //!< Fixed and Mobile Onion Skin indices
++  std::vector<std::pair<int, double>> m_fos,
++      m_mos;                      //!< Fixed and Mobile Onion Skin indices and opacity
+   bool m_enabled;                 //!< Whether onion skin is enabled
+   bool m_wholeScene;              //!< Whether the OS works on the entire scene
+   bool m_everyFrame;              //!< Whether the OS renders every frame or only on new exposures.
+diff --git a/toonz/sources/include/toonz/stageplayer.h b/toonz/sources/include/toonz/stageplayer.h
+index a0eb08f6c..d302f5bf4 100644
+--- a/toonz/sources/include/toonz/stageplayer.h
++++ b/toonz/sources/include/toonz/stageplayer.h
+@@ -76,6 +76,7 @@ class DVAPI Player {
+ 
+   int m_onionSkinDistance;  //!< Temporal distance from an onion skin
+                             //!'companion' (supposedly)
++  double m_fade;            //! Onion skin opacity to use. -1 = autocalculated
+ 
+   int m_ancestorColumnIndex;  //!< Index of this object's hierarchycal root
+                               //!(top-most column)
+diff --git a/toonz/sources/toonz/sceneviewer.cpp b/toonz/sources/toonz/sceneviewer.cpp
+index ec560b60a..df07e0cf0 100644
+--- a/toonz/sources/toonz/sceneviewer.cpp
++++ b/toonz/sources/toonz/sceneviewer.cpp
+@@ -2474,6 +2474,7 @@ void SceneViewer::drawSceneOverlay() {
+   player.m_guidedBackStroke       = -1;
+   player.m_isVisibleinOSM         = false;
+   player.m_onionSkinDistance      = c_noOnionSkin;
++  player.m_fade                   = -1.0;
+   player.m_dpiAff                 = getDpiAffine(sl, frameId);
+   player.m_ancestorColumnIndex    = -1;
+   player.m_opacity                = scene->getOverlayOpacity();
+diff --git a/toonz/sources/toonz/xshcolumnviewer.cpp b/toonz/sources/toonz/xshcolumnviewer.cpp
+index bc0542bef..c84360a68 100644
+--- a/toonz/sources/toonz/xshcolumnviewer.cpp
++++ b/toonz/sources/toonz/xshcolumnviewer.cpp
+@@ -2683,6 +2683,7 @@ void ColumnTransparencyPopup::onSliderChange(int val) {
+   m_value->setText(QString::number(val));
+   connect(m_value, SIGNAL(textChanged(const QString &)), this,
+           SLOT(onValueChanged(const QString &)));
++  onSliderReleased();
+ }
+ 
+ //----------------------------------------------------------------
+diff --git a/toonz/sources/toonz/xshrowviewer.cpp b/toonz/sources/toonz/xshrowviewer.cpp
+index 228bed397..a02cb1231 100644
+--- a/toonz/sources/toonz/xshrowviewer.cpp
++++ b/toonz/sources/toonz/xshrowviewer.cpp
+@@ -37,6 +37,206 @@
+ 
+ namespace XsheetGUI {
+ 
++OnionSkinPopup::OnionSkinPopup(QWidget *parent, bool isVertical)
++    : QWidget(parent, Qt::Popup) {
++  if (isVertical) {
++    setMaximumWidth(75);
++    m_slider = new QSlider(Qt::Vertical, this);
++  } else
++    m_slider = new QSlider(Qt::Horizontal, this);
++  m_slider->setMinimum(1);
++  m_slider->setMaximum(100);
++
++  m_value = new DVGui::IntLineEdit(this, 1, 1, 100);
++
++  m_autoCB = new QCheckBox(tr("Auto"), this);
++  m_autoCB->setChecked(true);
++
++  QGridLayout *mainLayout = new QGridLayout();
++  mainLayout->setMargin(3);
++  mainLayout->setHorizontalSpacing(6);
++  mainLayout->setVerticalSpacing(6);
++  {
++    if (isVertical) {
++      QVBoxLayout *vlayout = new QVBoxLayout;
++      vlayout->setMargin(0);
++      vlayout->setSpacing(3);
++      {
++        vlayout->addWidget(new QLabel(tr("Opacity"), this), 0,
++                           Qt::AlignHCenter);
++        QHBoxLayout *hlayout = new QHBoxLayout;
++        hlayout->setMargin(0);
++        hlayout->setSpacing(3);
++        hlayout->setAlignment(Qt::AlignHCenter);
++        {
++          hlayout->addStretch(1);
++          hlayout->addWidget(m_value);
++          hlayout->addWidget(new QLabel("%"));
++          hlayout->addStretch(1);
++        }
++        vlayout->addLayout(hlayout, 0);
++        vlayout->addWidget(m_slider, 0, Qt::AlignHCenter);
++        vlayout->addWidget(m_autoCB, 0, Qt::AlignHCenter);
++      }
++      mainLayout->addLayout(vlayout, 0, 1);
++    } else {
++      mainLayout->addWidget(new QLabel(tr("Opacity:"), this), 0, 0,
++                            Qt::AlignRight | Qt::AlignVCenter);
++      QHBoxLayout *hlayout = new QHBoxLayout;
++      hlayout->setMargin(0);
++      hlayout->setSpacing(3);
++      {
++        hlayout->addWidget(m_slider);
++        hlayout->addWidget(m_value);
++        hlayout->addWidget(new QLabel("%"));
++        hlayout->addWidget(m_autoCB, 0);
++      }
++      mainLayout->addLayout(hlayout, 0, 1);
++    }
++  }
++  setLayout(mainLayout);
++
++  bool ret = connect(m_slider, SIGNAL(sliderReleased()), this,
++                     SLOT(onSliderReleased()));
++  ret = ret && connect(m_slider, SIGNAL(sliderMoved(int)), this,
++                       SLOT(onSliderChange(int)));
++  ret = ret && connect(m_slider, SIGNAL(valueChanged(int)), this,
++                       SLOT(onSliderValueChanged(int)));
++  ret = ret && connect(m_value, SIGNAL(textChanged(const QString &)), this,
++                       SLOT(onValueChanged(const QString &)));
++  ret = ret && connect(m_autoCB, SIGNAL(clicked(bool)), this,
++                       SLOT(onAutoClicked(bool)));
++
++  assert(ret);
++}
++
++//----------------------------------------------------------------
++bool descending(int i, int j) { return (i > j); }
++
++void OnionSkinPopup::setOnionSkinData(int currentRow, int os, bool isFixed) {
++  OnionSkinMask osMask =
++      TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
++
++  bool autoOpacity = false;
++
++  m_os       = os;
++  m_isFixed  = isFixed;
++  m_distance = 0;
++
++  std::vector<int> rows;
++  osMask.getAll(currentRow, rows);
++  std::vector<int>::iterator it = rows.begin();
++  while (it != rows.end() && *it < currentRow) it++;
++  std::sort(rows.begin(), it, descending);
++
++  int frontPos = 0, backPos = 0;
++  for (int i = 0; i < (int)rows.size(); i++) {
++    if (rows[i] == currentRow) continue;
++    if (osMask.isEveryFrame()) {
++      m_distance = (rows[i] - currentRow) < 0 ? --backPos : ++frontPos;
++    }
++    if ((m_isFixed && m_os == rows[i]) || (!m_isFixed && (rows[i] - currentRow) == os)) break;
++  }
++
++  double opacity =
++      isFixed ? osMask.getFosOpacity(os) : osMask.getMosOpacity(os);
++
++  if (opacity == -1.0) {
++    autoOpacity = true;
++    opacity     = OnionSkinMask::getOnionSkinFade(m_distance);
++  }
++
++  // Adjust for slider
++  opacity = 100.0 - (opacity * 100.0);
++
++  m_initializing = true;
++  m_slider->setValue((int)opacity);
++  m_autoCB->setChecked(autoOpacity);
++  m_initializing = false;
++}
++
++//----------------------------------------------------------------
++
++void OnionSkinPopup::onSliderReleased() {
++  if (m_initializing) return;
++
++  OnionSkinMask osMask =
++      TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
++
++  double opacity =
++      m_autoCB->isChecked() ? -1.0 : (100 - m_slider->value()) / 100.0;
++
++  if (m_isFixed)
++    osMask.setFosOpacity(m_os, opacity);
++  else
++    osMask.setMosOpacity(m_os, opacity);
++
++  TApp::instance()->getCurrentOnionSkin()->setOnionSkinMask(osMask);
++
++  TApp::instance()->getCurrentScene()->notifySceneChanged();
++  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
++}
++
++//-----------------------------------------------------------------------
++
++void OnionSkinPopup::onSliderValueChanged(int val) {
++  if (m_slider->isSliderDown()) return;
++  m_value->setText(QString::number(val));
++  onSliderReleased();
++}
++
++//-----------------------------------------------------------------------
++
++void OnionSkinPopup::onSliderChange(int val) {
++  if (m_autoCB->isChecked()) m_autoCB->setChecked(false);
++
++  disconnect(m_value, SIGNAL(textChanged(const QString &)), 0, 0);
++  m_value->setText(QString::number(val));
++  connect(m_value, SIGNAL(textChanged(const QString &)), this,
++          SLOT(onValueChanged(const QString &)));
++  onSliderReleased();
++}
++
++//----------------------------------------------------------------
++
++void OnionSkinPopup::onValueChanged(const QString &str) {
++  if (m_autoCB->isChecked()) m_autoCB->setChecked(false);
++
++  int val = str.toInt();
++  m_slider->setValue(val);
++}
++
++//-----------------------------------------------------------------------
++
++void OnionSkinPopup::onAutoClicked(bool checked) {
++  if (m_initializing || m_slider->isSliderDown()) return;
++
++  if (checked) {
++    // Go back to automatic calculation
++    double opacity = OnionSkinMask::getOnionSkinFade(m_distance);
++
++    // Adjust for slider
++    opacity = 100.0 - (opacity * 100.0);
++
++    m_slider->blockSignals(true);
++    m_value->blockSignals(true);
++
++    m_slider->setValue((int)opacity);
++    m_value->setText(QString::number((int)opacity));
++
++    m_slider->blockSignals(false);
++    m_value->blockSignals(false);
++  }
++
++  onSliderReleased();
++}
++
++//-----------------------------------------------------------------------
++
++void OnionSkinPopup::mouseReleaseEvent(QMouseEvent *e) {
++  // hide();
++}
++
+ //=============================================================================
+ // RowArea
+ //-----------------------------------------------------------------------------
+@@ -54,7 +254,8 @@ RowArea::RowArea(XsheetViewer *parent, Qt::WindowFlags flags)
+     , m_r1(5)
+     , m_isPanning(false)
+     , m_contextMenuRow(-1)
+-    , m_editTagEnabled(false) {
++    , m_editTagEnabled(false)
++    , m_onionSkinPopup(0) {
+   setFocusPolicy(Qt::NoFocus);
+   setMouseTracking(true);
+ 
+@@ -641,9 +842,11 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
+     if (m_showOnionToSet == Mos && currentRow + mos == m_row) continue;
+ 
+     p.setPen(mos < 0 ? backDotOutlineColor : frontDotOutlineColor);
+-    if (osMask.isEnabled())
+-      p.setBrush(mos < 0 ? backDotColor : frontDotColor);
+-    else
++    if (osMask.isEnabled()) {
++      QColor dotColor = mos < 0 ? backDotColor : frontDotColor;
++      if (osMask.getMosOpacity(mos) != -1.0) dotColor = dotColor.darker(200);
++      p.setBrush(dotColor);
++    } else
+       p.setBrush(Qt::NoBrush);
+     QPoint topLeft = m_viewer->positionToXY(CellPosition(currentRow + mos, -1));
+     if (!m_viewer->orientation()->isVerticalTimeline())
+@@ -669,12 +872,14 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
+       p.setPen(QColor(25, 118, 170, 255));
+     else
+       p.setPen(QColor(0, 255, 255, 128));
+-    if (osMask.isEnabled())
++    if (osMask.isEnabled()) {
++      QColor dotColor(0, 255, 255, 148);
+       // Depending on the brightness, make sure dot can be seen on onion area
+       if (m_viewer->getOnionSkinAreaBgColor().value() > 128)
+-        p.setBrush(QBrush(QColor(0, 165, 255, 148)));
+-      else
+-        p.setBrush(QBrush(QColor(0, 255, 255, 148)));
++        dotColor = QColor(0, 165, 255, 148);
++      if (osMask.getFosOpacity(fos) != -1.0) dotColor = dotColor.darker(200);
++      p.setBrush(dotColor);
++    }
+     else
+       p.setBrush(Qt::NoBrush);
+     QPoint topLeft = m_viewer->positionToXY(CellPosition(fos, -1));
+@@ -1324,9 +1529,9 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
+     else
+       m_tooltip = tr("Current Frame");
+   } else if (m_showOnionToSet == Fos)
+-    m_tooltip = tr("Fixed Onion Skin Toggle");
++    m_tooltip = tr("Fixed Onion Skin Toggle\nRight-Click to adjust opacity");
+   else if (m_showOnionToSet == Mos)
+-    m_tooltip = tr("Relative Onion Skin Toggle");
++    m_tooltip = tr("Relative Onion Skin Toggle\nRight-Click to adjust opacity");
+   else
+     m_tooltip = tr("%1+Click\t- Set Playback Start Marker\n%2+Click \t- Set "
+                    "Playback End Marker\n%3+Click\t- Remove Playback Markers")
+@@ -1361,13 +1566,76 @@ void RowArea::mouseReleaseEvent(QMouseEvent *event) {
+ //-----------------------------------------------------------------------------
+ 
+ void RowArea::contextMenuEvent(QContextMenuEvent *event) {
++  const Orientation *o = m_viewer->orientation();
++
+   if (m_resetMenuTimer) m_resetMenuTimer->stop();
+ 
+   TPoint pos(event->pos().x(), event->pos().y());
+   m_contextMenuRow = m_viewer->xyToPosition(pos).frame();
+ 
+-  OnionSkinMask osMask =
+-      TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
++  // Check if we're over onion skin marker
++  int currentRow = TApp::instance()->getCurrentFrame()->getFrame();
++  QPoint topLeft = m_viewer->positionToXY(CellPosition(m_contextMenuRow, -1));
++  if (!m_viewer->orientation()->isVerticalTimeline())
++    topLeft.setY(0);
++  else
++    topLeft.setX(0);
++  QPoint mouseInCell = event->pos() - topLeft;
++  QPoint frameAdj    = m_viewer->getFrameZoomAdjustment();
++
++  if (!CommandManager::instance()->getAction(MI_ShiftTrace)->isChecked() &&
++      Preferences::instance()->isOnionSkinEnabled() &&
++      o->rect(PredefinedRect::ONION_AREA)
++          .adjusted(0, 0, -frameAdj.x(), -frameAdj.y())
++          .contains(mouseInCell) &&
++      m_contextMenuRow != currentRow) {
++    OnionSkinMask osMask =
++        TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
++
++    if (o->rect(PredefinedRect::ONION_FIXED_DOT_AREA)
++            .adjusted(0, 0, -frameAdj.x(), -frameAdj.y())
++            .contains(mouseInCell)) {
++      int fosCount = osMask.getFosCount();
++      int fos;
++      for (int i = 0; i < fosCount; i++) {
++        fos = osMask.getFos(i);
++        if (fos == m_contextMenuRow) {
++          if (!m_onionSkinPopup)
++            m_onionSkinPopup = new OnionSkinPopup(
++                this, !m_viewer->orientation()->isVerticalTimeline());
++
++          m_onionSkinPopup->move(event->globalPos().x(),
++                                 event->globalPos().y());
++          m_onionSkinPopup->setOnionSkinData(currentRow, fos, true);
++          m_onionSkinPopup->show();
++
++          event->accept();
++          return;
++        }
++      }
++    } else if (o->rect(PredefinedRect::ONION_DOT_AREA)
++                   .adjusted(0, 0, -frameAdj.x(), -frameAdj.y())
++                   .contains(mouseInCell)) {
++      int mosCount = osMask.getMosCount();
++      int mos;
++      for (int i = 0; i < mosCount; i++) {
++        // mos : frame offset from the current frame
++        mos = osMask.getMos(i);
++        if (currentRow + mos == m_contextMenuRow) {
++          if (!m_onionSkinPopup)
++            m_onionSkinPopup = new OnionSkinPopup(
++                this, !m_viewer->orientation()->isVerticalTimeline());
++
++          m_onionSkinPopup->move(event->globalPos().x(),
++                                 event->globalPos().y());
++          m_onionSkinPopup->setOnionSkinData(currentRow, mos, false);
++          m_onionSkinPopup->show();
++          event->accept();
++          return;
++        }
++      }
++    }
++  }
+ 
+   QMenu *menu             = new QMenu(this);
+   menu->addAction(CommandManager::instance()->getAction(MI_SetStartMarker));
+diff --git a/toonz/sources/toonz/xshrowviewer.h b/toonz/sources/toonz/xshrowviewer.h
+index 1493687ee..46e6b3d4e 100644
+--- a/toonz/sources/toonz/xshrowviewer.h
++++ b/toonz/sources/toonz/xshrowviewer.h
+@@ -4,6 +4,9 @@
+ #define XSHROWVIEWER_H
+ 
+ #include <QWidget>
++#include <QLineEdit>
++#include <QSlider>
++#include <QCheckBox>
+ 
+ // forward declaration
+ class XsheetViewer;
+@@ -16,6 +19,34 @@ class DragTool;
+ //=============================================================================
+ // RowArea
+ //-----------------------------------------------------------------------------
++class OnionSkinPopup final : public QWidget {
++  Q_OBJECT
++
++  QSlider *m_slider;
++  QLineEdit *m_value;
++  QCheckBox *m_autoCB;
++
++  int m_os;
++  bool m_isFixed;
++  int m_distance;
++
++  bool m_initializing;
++
++public:
++  OnionSkinPopup(QWidget *parent, bool isVertical = true);
++  void setOnionSkinData(int currentRow, int os, bool isFixed);
++
++protected:
++  void mouseReleaseEvent(QMouseEvent *e) override;
++
++protected slots:
++  void onSliderReleased();
++  void onSliderChange(int val);
++  void onSliderValueChanged(int);
++  void onValueChanged(const QString &);
++  void onAutoClicked(bool);
++};
+ 
+ //! La classe si occupa della visualizzazione dell'area che gestisce le righe.
+ class RowArea final : public QWidget {
+@@ -48,6 +79,8 @@ class RowArea final : public QWidget {
+   int m_contextMenuRow;
+   bool m_editTagEnabled;
+ 
++  OnionSkinPopup *m_onionSkinPopup;
++
+   // returns true if the frame area can have extra space
+   bool checkExpandFrameArea();
+   void drawRows(QPainter &p, int r0, int r1);
+diff --git a/toonz/sources/toonzlib/onionskinmask.cpp b/toonz/sources/toonzlib/onionskinmask.cpp
+index 1f0a0738b..3361080d2 100644
+--- a/toonz/sources/toonzlib/onionskinmask.cpp
++++ b/toonz/sources/toonzlib/onionskinmask.cpp
+@@ -85,12 +85,13 @@ void OnionSkinMask::getAll(int currentRow, std::vector<int> &output) const {
+   output.clear();
+   output.reserve(m_fos.size() + m_mos.size());
+ 
+-  std::vector<int>::const_iterator fosIt, fosEnd(m_fos.end());
+-  std::vector<int>::const_iterator mosIt, mosEnd(m_mos.end());
++  std::vector<std::pair<int, double>>::const_iterator fosIt, fosEnd(m_fos.end());
++  std::vector<std::pair<int, double>>::const_iterator mosIt,
++      mosEnd(m_mos.end());
+ 
+   for (fosIt = m_fos.begin(), mosIt = m_mos.begin();
+        fosIt != fosEnd && mosIt != mosEnd;) {
+-    int fos = *fosIt, mos = *mosIt + currentRow;
++    int fos = fosIt->first, mos = mosIt->first + currentRow;
+ 
+     if (fos < mos) {
+       if (fos != currentRow) output.push_back(fos);
+@@ -104,10 +105,10 @@ void OnionSkinMask::getAll(int currentRow, std::vector<int> &output) const {
+   }
+ 
+   for (; fosIt != fosEnd; ++fosIt)
+-    if (*fosIt != currentRow) output.push_back(*fosIt);
++    if (fosIt->first != currentRow) output.push_back(fosIt->first);
+ 
+   for (; mosIt != mosEnd; ++mosIt) {
+-    int mos = *mosIt + currentRow;
++    int mos = mosIt->first + currentRow;
+     if (mos != currentRow) output.push_back(mos);
+   }
+ }
+@@ -117,39 +118,97 @@ void OnionSkinMask::getAll(int currentRow, std::vector<int> &output) const {
+ void OnionSkinMask::setMos(int drow, bool on) {
+   assert(drow != 0);
+ 
+-  typedef std::vector<int>::iterator Iter;
+-  std::pair<Iter, Iter> r = std::equal_range(m_mos.begin(), m_mos.end(), drow);
++  std::vector<std::pair<int, double>>::iterator r;
++  for (r = m_mos.begin(); r != m_mos.end(); r++) {
++    if (r->first >= drow) break;
++  }
+ 
+   if (on) {
+-    if (r.first == r.second) m_mos.insert(r.first, drow);
++    if (r == m_mos.end() || r->first != drow)
++      m_mos.insert(r, std::make_pair(drow, -1));
+   } else {
+-    if (r.first != r.second) m_mos.erase(r.first, r.second);
++    if (r != m_mos.end()) m_mos.erase(r);
+   }
+ }
+ 
+ //-------------------------------------------------------------------
+ 
+ void OnionSkinMask::setFos(int row, bool on) {
+-  typedef std::vector<int>::iterator Iter;
+-  std::pair<Iter, Iter> r = std::equal_range(m_fos.begin(), m_fos.end(), row);
++  std::vector<std::pair<int, double>>::iterator r;
++  for (r = m_fos.begin(); r != m_fos.end(); r++) {
++    if (r->first >= row) break;
++  }
+ 
+   if (on) {
+-    if (r.first == r.second) m_fos.insert(r.first, row);
++    if (r == m_fos.end() || r->first != row)
++      m_fos.insert(r, std::make_pair(row, -1));
+   } else {
+-    if (r.first != r.second) m_fos.erase(r.first, r.second);
++    if (r != m_fos.end()) m_fos.erase(r);
++  }
++}
++
++//-------------------------------------------------------------------
++
++void OnionSkinMask::setMosOpacity(int drow, double opacity) {
++  std::vector<std::pair<int, double>>::iterator r;
++  for (r = m_mos.begin(); r != m_mos.end(); r++) {
++    if (r->first == drow) {
++      r->second = opacity;
++      break;
++    }
++  }
++}
++
++//-------------------------------------------------------------------
++
++double OnionSkinMask::getMosOpacity(int drow) {
++  std::vector<std::pair<int, double>>::iterator r;
++  for (r = m_mos.begin(); r != m_mos.end(); r++)
++    if (r->first == drow) return r->second;
++
++  return -1.0;
++}
++
++//-------------------------------------------------------------------
++
++void OnionSkinMask::setFosOpacity(int row, double opacity) {
++  std::vector<std::pair<int, double>>::iterator r;
++  for (r = m_fos.begin(); r != m_fos.end(); r++) {
++    if (r->first == row) {
++      r->second = opacity;
++      break;
++    }
+   }
+ }
+ 
+ //-------------------------------------------------------------------
+ 
+-bool OnionSkinMask::isFos(int row) const {
+-  return std::binary_search(m_fos.begin(), m_fos.end(), row);
++double OnionSkinMask::getFosOpacity(int drow) {
++  std::vector<std::pair<int, double>>::iterator r;
++  for (r = m_fos.begin(); r != m_fos.end(); r++)
++    if (r->first == drow) return r->second;
++
++  return -1.0;
+ }
+ 
+ //-------------------------------------------------------------------
+ 
+-bool OnionSkinMask::isMos(int drow) const {
+-  return std::binary_search(m_mos.begin(), m_mos.end(), drow);
++bool OnionSkinMask::isFos(int row) {
++  std::vector<std::pair<int, double>>::iterator r;
++  for (r = m_fos.begin(); r != m_fos.end(); r++)
++    if (r->first == row) return true;
++
++  return false;
++}
++
++//-------------------------------------------------------------------
++
++bool OnionSkinMask::isMos(int drow) {
++  std::vector<std::pair<int, double>>::iterator r;
++  for (r = m_mos.begin(); r != m_mos.end(); r++)
++    if (r->first == drow) return true;
++
++  return false;
+ }
+ 
+ //-------------------------------------------------------------------
+@@ -159,7 +218,7 @@ bool OnionSkinMask::getMosRange(int &drow0, int &drow1) const {
+     drow0 = 0, drow1 = -1;
+     return false;
+   } else {
+-    drow0 = m_mos.front(), drow1 = m_mos.back();
++    drow0 = m_mos.front().first, drow1 = m_mos.back().first;
+     return true;
+   }
+ }
+diff --git a/toonz/sources/toonzlib/stage.cpp b/toonz/sources/toonzlib/stage.cpp
+index 74c3551bf..016dd1421 100644
+--- a/toonz/sources/toonzlib/stage.cpp
++++ b/toonz/sources/toonzlib/stage.cpp
+@@ -274,7 +274,7 @@ StageBuilder::StageBuilder()
+     , m_camera3d(false)
+     , m_currentColumnIndex(-1)
+     , m_ancestorColumnIndex(-1)
+-    , m_fade(0)
++    , m_fade(-1.0)
+     , m_shiftTraceGhostId(NO_GHOST)
+     , m_editingShift(false)
+     , m_showShiftOrigin(false)
+@@ -412,6 +412,7 @@ void StageBuilder::addCell(PlayerSet &players, ToonzScene *scene, TXsheet *xsh,
+     player.m_guidedBackStroke       = m_guidedBackStroke;
+     player.m_dpiAff = sl ? getDpiAffine(sl, cell.m_frameId) : TAffine();
+     player.m_onionSkinDistance = m_onionSkinDistance;
++    player.m_fade              = m_fade;
+     // when visiting the subxsheet, valuate the subxsheet column index
+     bool isCurrent               = (subSheetColIndex >= 0)
+                                        ? (subSheetColIndex == m_currentColumnIndex)
+@@ -647,15 +648,21 @@ void StageBuilder::addCellWithOnionSkin(PlayerSet &players, ToonzScene *scene,
+       if (m_onionSkinMask.isEveryFrame() ||
+           !alreadyAdded(xsh, row, i, rows, col)) {
+         m_onionSkinDistance = (rows[i] - row) < 0 ? --backPos : ++frontPos;
++
++        m_fade = m_onionSkinMask.getFosOpacity(rows[i]);
++        if (m_fade == -1.0)
++          m_fade = m_onionSkinMask.getMosOpacity(rows[i] - row);
+         addCell(players, scene, xsh, rows[i], col, level, subSheetColIndex);
+       }
+ #endif
+     }
+ 
+     m_onionSkinDistance = 0;
++    m_fade              = 0.0;
+     addCell(players, scene, xsh, row, col, level, subSheetColIndex);
+ 
+     m_onionSkinDistance = c_noOnionSkin;
++    m_fade              = -1.0;
+   } else
+     addCell(players, scene, xsh, row, col, level, subSheetColIndex);
+ }
+@@ -747,6 +754,7 @@ void StageBuilder::addSimpleLevelFrame(PlayerSet &players,
+     player.m_guidedBackStroke       = m_guidedBackStroke;
+     player.m_isVisibleinOSM         = ghostRow >= 0;
+     player.m_onionSkinDistance      = m_onionSkinDistance;
++    player.m_fade                   = m_fade;
+     player.m_dpiAff                 = getDpiAffine(level, ghostFid);
+     player.m_ancestorColumnIndex    = -1;
+ 
+@@ -808,6 +816,7 @@ void StageBuilder::addSimpleLevelFrame(PlayerSet &players,
+     while (it != rows.end() && *it < row) ++it;
+     std::sort(rows.begin(), it, descending);
+     m_onionSkinDistance = 0;
++    m_fade              = 0.0;
+     int frontPos = 0, backPos = 0;
+ 
+     for (int i = 0; i < (int)rows.size(); i++) {
+@@ -830,6 +839,10 @@ void StageBuilder::addSimpleLevelFrame(PlayerSet &players,
+       player.m_onionSkinDistance = rows[i] - row;
+ #else
+       player.m_onionSkinDistance = rows[i] - row < 0 ? --backPos : ++frontPos;
++
++      player.m_fade = m_onionSkinMask.getFosOpacity(rows[i]);
++      if (player.m_fade == -1.0)
++        player.m_fade = m_onionSkinMask.getMosOpacity(rows[i] - row);
+ #endif
+       player.m_dpiAff = getDpiAffine(level, fid2);
+     }
+@@ -839,8 +852,10 @@ void StageBuilder::addSimpleLevelFrame(PlayerSet &players,
+   player.m_sl    = level;
+   player.m_frame = level->guessIndex(fid);
+   player.m_fid   = fid;
+-  if (!m_onionSkinMask.isEmpty() && m_onionSkinMask.isEnabled())
+-    player.m_onionSkinDistance  = 0;
++  if (!m_onionSkinMask.isEmpty() && m_onionSkinMask.isEnabled()) {
++    player.m_onionSkinDistance = 0;
++    player.m_fade              = 0.0;
++  }
+   player.m_isCurrentColumn      = true;
+   player.m_isCurrentXsheetLevel = true;
+   player.m_isEditingLevel       = true;
+diff --git a/toonz/sources/toonzlib/stageplayer.cpp b/toonz/sources/toonzlib/stageplayer.cpp
+index ebd9f9267..c46e237de 100644
+--- a/toonz/sources/toonzlib/stageplayer.cpp
++++ b/toonz/sources/toonzlib/stageplayer.cpp
+@@ -36,6 +36,7 @@ Stage::Player::Player()
+     , m_dpiAff()
+     , m_z(0)
+     , m_onionSkinDistance(c_noOnionSkin)
++    , m_fade(-1.0)
+     , m_ancestorColumnIndex(-1)
+     , m_isCurrentColumn(false)
+     , m_isCurrentXsheetLevel(false)
+diff --git a/toonz/sources/toonzlib/stagevisitor.cpp b/toonz/sources/toonzlib/stagevisitor.cpp
+index e3fc35014..dff42fc6b 100644
+--- a/toonz/sources/toonzlib/stagevisitor.cpp
++++ b/toonz/sources/toonzlib/stagevisitor.cpp
+@@ -876,10 +876,12 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
+     double m[4] = {1.0, 1.0, 1.0, 1.0}, c[4];
+ 
+     // Weighted addition to RGB and matte multiplication
+-    m[3] = 1.0 -
+-           ((player.m_onionSkinDistance == 0)
+-                ? 0.1
+-                : OnionSkinMask::getOnionSkinFade(player.m_onionSkinDistance));
++    m[3] =
++        1.0 - ((player.m_onionSkinDistance == 0)
++                   ? 0.1
++                   : (player.m_fade != -1.0 ? player.m_fade
++                                            : OnionSkinMask::getOnionSkinFade(
++                                                  player.m_onionSkinDistance)));
+     if (player.m_isLightTableEnabled && !player.m_isCurrentColumn) m[3] *= 0.30;
+ 
+     c[0] = (1.0 - m[3]) * bgColor.r, c[1] = (1.0 - m[3]) * bgColor.g,
+@@ -943,11 +945,12 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
+ 
+         double guidedM[4] = {1.0, 1.0, 1.0, 1.0}, guidedC[4];
+         TPixel32 bgColor  = TPixel32::Blue;
+-        guidedM[3] =
+-            1.0 -
+-            ((player.m_onionSkinDistance == 0)
+-                 ? 0.1
+-                 : OnionSkinMask::getOnionSkinFade(player.m_onionSkinDistance));
++        guidedM[3]        = 1.0 - ((player.m_onionSkinDistance == 0)
++                                ? 0.1
++                                : (player.m_fade != -1.0
++                                       ? player.m_fade
++                                       : OnionSkinMask::getOnionSkinFade(
++                                             player.m_onionSkinDistance)));
+ 
+         guidedC[0] = (1.0 - guidedM[3]) * bgColor.r,
+         guidedC[1] = (1.0 - guidedM[3]) * bgColor.g,
+@@ -1030,10 +1033,12 @@ void RasterPainter::onRasterImage(TRasterImage *ri,
+     // 1 opaco -> 0 completamente trasparente
+     // inverto quindi il risultato della funzione stando attento al caso 0
+     // (in cui era scolpito il valore 0.9)
+-    double onionSkiFade = player.m_onionSkinDistance == 0
+-                              ? 0.9
+-                              : (1.0 - OnionSkinMask::getOnionSkinFade(
+-                                           player.m_onionSkinDistance));
++    double onionSkiFade =
++        player.m_onionSkinDistance == 0
++            ? 0.9
++            : (1.0 - (player.m_fade != -1.0 ? player.m_fade
++                                            : OnionSkinMask::getOnionSkinFade(
++                                                  player.m_onionSkinDistance)));
+     if (player.m_isLightTableEnabled && !player.m_isCurrentColumn)
+       onionSkiFade *= 0.30;
+     alpha               = tcrop(tround(onionSkiFade * 255.0), 0, 255);
+@@ -1099,10 +1104,12 @@ void RasterPainter::onToonzImage(TToonzImage *ti, const Stage::Player &player) {
+     //    I therefore reverse the result of the function by being attentive to
+     //    case 0
+     //    (where the value 0.9 was carved)
+-    double onionSkiFade = player.m_onionSkinDistance == 0
+-                              ? 0.9
+-                              : (1.0 - OnionSkinMask::getOnionSkinFade(
+-                                           player.m_onionSkinDistance));
++    double onionSkiFade =
++        player.m_onionSkinDistance == 0
++            ? 0.9
++            : (1.0 - (player.m_fade != -1.0 ? player.m_fade
++                                            : OnionSkinMask::getOnionSkinFade(
++                                                  player.m_onionSkinDistance)));
+     if (player.m_isLightTableEnabled && !player.m_isCurrentColumn)
+       onionSkiFade *= 0.30;
+     alpha               = tcrop(tround(onionSkiFade * 255.0), 0, 255);
+@@ -1201,7 +1208,9 @@ void OpenGlPainter::onVectorImage(TVectorImage *vi,
+   if (player.m_onionSkinDistance != c_noOnionSkin) {
+     TPixel32 bgColor = TPixel32::White;
+     fader            = TOnionFader(
+-        bgColor, OnionSkinMask::getOnionSkinFade(player.m_onionSkinDistance));
++        bgColor, (player.m_fade != -1.0 ? player.m_fade
++                                        : OnionSkinMask::getOnionSkinFade(
++                                              player.m_onionSkinDistance)));
+     cf = &fader;
+   }
+ 
+@@ -1256,7 +1265,11 @@ void OpenGlPainter::onRasterImage(TRasterImage *ri,
+ 
+   if (c_noOnionSkin != player.m_onionSkinDistance) {
+     double fade =
+-        0.5 - 0.45 * (1 - 1 / (1 + 0.15 * abs(player.m_onionSkinDistance)));
++        (player.m_fade != -1.0
++             ? player.m_fade
++             : 0.5 -
++                   0.45 *
++                       (1 - 1 / (1 + 0.15 * abs(player.m_onionSkinDistance))));
+     if ((int)matteChan.size() < r->getLx() * r->getLy())
+       matteChan.resize(r->getLx() * r->getLy());
+ 
+@@ -1537,7 +1550,10 @@ void onPlasticDeformedImage(TStageObject *playerObj,
+           (player.m_onionSkinDistance < 0) ? backOnionColor : frontOnionColor;
+ 
+       pixScale[3] =
+-          1.0 - OnionSkinMask::getOnionSkinFade(player.m_onionSkinDistance);
++          1.0 -
++          (player.m_fade != -1.0
++               ? player.m_fade
++               : OnionSkinMask::getOnionSkinFade(player.m_onionSkinDistance));
+       pixScale[0] =
+           (refColor.r / 255.0) * pixScale[3];  // refColor is not premultiplied
+       pixScale[1] = (refColor.g / 255.0) * pixScale[3];
+
+From 8bf7d3766e9f79a6c84c8d8e100657fa10e6bbf2 Mon Sep 17 00:00:00 2001
+From: manongjohn <19245851+manongjohn@users.noreply.github.com>
+Date: Tue, 14 May 2024 23:10:02 -0400
+Subject: [PATCH 2/2] Prioritize higher opacity w/ overlapping onion skin
+ markers
+
+---
+ toonz/sources/toonzlib/stage.cpp | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
+
+diff --git a/toonz/sources/toonzlib/stage.cpp b/toonz/sources/toonzlib/stage.cpp
+index 016dd1421..f48f00d65 100644
+--- a/toonz/sources/toonzlib/stage.cpp
++++ b/toonz/sources/toonzlib/stage.cpp
+@@ -649,9 +649,11 @@ void StageBuilder::addCellWithOnionSkin(PlayerSet &players, ToonzScene *scene,
+           !alreadyAdded(xsh, row, i, rows, col)) {
+         m_onionSkinDistance = (rows[i] - row) < 0 ? --backPos : ++frontPos;
+ 
+-        m_fade = m_onionSkinMask.getFosOpacity(rows[i]);
+-        if (m_fade == -1.0)
+-          m_fade = m_onionSkinMask.getMosOpacity(rows[i] - row);
++        double fosFade = m_onionSkinMask.getFosOpacity(rows[i]);
++        double mosFade = m_onionSkinMask.getMosOpacity(rows[i] - row);
++        m_fade         = fosFade == -1.0
++                     ? mosFade
++                     : (mosFade == -1 ? fosFade : std::min(fosFade, mosFade));
+         addCell(players, scene, xsh, rows[i], col, level, subSheetColIndex);
+       }
+ #endif
+@@ -840,9 +842,12 @@ void StageBuilder::addSimpleLevelFrame(PlayerSet &players,
+ #else
+       player.m_onionSkinDistance = rows[i] - row < 0 ? --backPos : ++frontPos;
+ 
+-      player.m_fade = m_onionSkinMask.getFosOpacity(rows[i]);
+-      if (player.m_fade == -1.0)
+-        player.m_fade = m_onionSkinMask.getMosOpacity(rows[i] - row);
++      double fosFade = m_onionSkinMask.getFosOpacity(rows[i]);
++      double mosFade = m_onionSkinMask.getMosOpacity(rows[i] - row);
++      player.m_fade =
++          fosFade == -1.0
++              ? mosFade
++              : (mosFade == -1 ? fosFade : std::min(fosFade, mosFade));
+ #endif
+       player.m_dpiAff = getDpiAffine(level, fid2);
+     }

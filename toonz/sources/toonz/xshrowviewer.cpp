@@ -8,6 +8,7 @@
 #include "toonz/tonionskinmaskhandle.h"
 #include "xsheetdragtool.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/intfield.h"
 #include "onionskinmaskgui.h"
 #include "cellselection.h"
 #include "menubarcommandids.h"
@@ -32,12 +33,202 @@
 
 #include <QPainter>
 #include <QMouseEvent>
+#include <QContextMenuEvent>
 #include <QMenu>
 #include <QToolTip>
+#include <QCheckBox>
+#include <QGridLayout>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QSignalBlocker>
+#include <QSlider>
+#include <QVBoxLayout>
 
 //=============================================================================
 
 namespace XsheetGUI {
+
+//=============================================================================
+// OnionSkinOpacityPopup
+//-----------------------------------------------------------------------------
+
+OnionSkinOpacityPopup::OnionSkinOpacityPopup(QWidget *parent, bool vertical)
+    : QWidget(parent, Qt::Popup)
+    , m_slider(new QSlider(vertical ? Qt::Vertical : Qt::Horizontal, this))
+    , m_value(new DVGui::IntLineEdit(this, 1, 1, 100))
+    , m_autoCheckBox(new QCheckBox(tr("Auto"), this))
+    , m_marker(0)
+    , m_distance(0)
+    , m_isFixed(false)
+    , m_initializing(false) {
+  if (vertical) setMaximumWidth(75);
+
+  m_slider->setRange(1, 100);
+  m_autoCheckBox->setChecked(true);
+
+  QGridLayout *mainLayout = new QGridLayout;
+  mainLayout->setContentsMargins(3, 3, 3, 3);
+  mainLayout->setHorizontalSpacing(6);
+  mainLayout->setVerticalSpacing(6);
+
+  if (vertical) {
+    QVBoxLayout *valueLayout = new QVBoxLayout;
+    valueLayout->setContentsMargins(0, 0, 0, 0);
+    valueLayout->setSpacing(3);
+    valueLayout->addWidget(new QLabel(tr("Opacity"), this), 0,
+                           Qt::AlignHCenter);
+
+    QHBoxLayout *percentLayout = new QHBoxLayout;
+    percentLayout->setContentsMargins(0, 0, 0, 0);
+    percentLayout->setSpacing(3);
+    percentLayout->addStretch();
+    percentLayout->addWidget(m_value);
+    percentLayout->addWidget(new QLabel("%", this));
+    percentLayout->addStretch();
+
+    valueLayout->addLayout(percentLayout);
+    valueLayout->addWidget(m_slider, 0, Qt::AlignHCenter);
+    valueLayout->addWidget(m_autoCheckBox, 0, Qt::AlignHCenter);
+    mainLayout->addLayout(valueLayout, 0, 0);
+  } else {
+    mainLayout->addWidget(new QLabel(tr("Opacity:"), this), 0, 0,
+                          Qt::AlignRight | Qt::AlignVCenter);
+    QHBoxLayout *valueLayout = new QHBoxLayout;
+    valueLayout->setContentsMargins(0, 0, 0, 0);
+    valueLayout->setSpacing(3);
+    valueLayout->addWidget(m_slider);
+    valueLayout->addWidget(m_value);
+    valueLayout->addWidget(new QLabel("%", this));
+    valueLayout->addWidget(m_autoCheckBox);
+    mainLayout->addLayout(valueLayout, 0, 1);
+  }
+
+  setLayout(mainLayout);
+
+  connect(m_slider, &QSlider::sliderReleased, this,
+          &OnionSkinOpacityPopup::commitOpacity);
+  connect(m_slider, &QSlider::sliderMoved, this,
+          &OnionSkinOpacityPopup::onSliderMoved);
+  connect(m_slider, &QSlider::valueChanged, this,
+          &OnionSkinOpacityPopup::onSliderValueChanged);
+  connect(m_value, &QLineEdit::textChanged, this,
+          &OnionSkinOpacityPopup::onValueChanged);
+  connect(m_autoCheckBox, &QCheckBox::clicked, this,
+          &OnionSkinOpacityPopup::onAutoClicked);
+}
+
+//-----------------------------------------------------------------------------
+
+void OnionSkinOpacityPopup::setMarker(int currentRow, int marker,
+                                      bool isFixed) {
+  OnionSkinMask mask =
+      TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
+  int markerRow = isFixed ? marker : currentRow + marker;
+
+  m_marker   = marker;
+  m_isFixed  = isFixed;
+  m_distance = markerRow - currentRow;
+
+  if (Preferences::instance()->isAnimationSheetEnabled()) {
+    std::vector<int> rows;
+    mask.getAll(currentRow, rows);
+    std::vector<int>::iterator firstFront = rows.begin();
+    while (firstFront != rows.end() && *firstFront < currentRow) ++firstFront;
+    std::sort(rows.begin(), firstFront,
+              [](int first, int second) { return first > second; });
+
+    int frontDistance = 0;
+    int backDistance  = 0;
+    for (int row : rows) {
+      int distance = row < currentRow ? --backDistance : ++frontDistance;
+      if (row == markerRow) {
+        m_distance = distance;
+        break;
+      }
+    }
+  }
+
+  double opacity = isFixed ? mask.getFosOpacity(marker)
+                           : mask.getMosOpacity(marker);
+  bool automatic = opacity < 0.0;
+  if (automatic)
+    opacity = 1.0 - OnionSkinMask::getOnionSkinFade(m_distance);
+  int percent = tcrop(tround(opacity * 100.0), 1, 100);
+
+  m_initializing = true;
+  const QSignalBlocker sliderBlocker(m_slider);
+  const QSignalBlocker valueBlocker(m_value);
+  const QSignalBlocker autoBlocker(m_autoCheckBox);
+  m_slider->setValue(percent);
+  m_value->setText(QString::number(percent));
+  m_autoCheckBox->setChecked(automatic);
+  m_initializing = false;
+}
+
+//-----------------------------------------------------------------------------
+
+void OnionSkinOpacityPopup::commitOpacity() {
+  if (m_initializing) return;
+
+  OnionSkinMask mask =
+      TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
+  double opacity =
+      m_autoCheckBox->isChecked() ? -1.0 : m_slider->value() / 100.0;
+  if (m_isFixed)
+    mask.setFosOpacity(m_marker, opacity);
+  else
+    mask.setMosOpacity(m_marker, opacity);
+
+  TOnionSkinMaskHandle *handle = TApp::instance()->getCurrentOnionSkin();
+  handle->setOnionSkinMask(mask);
+  handle->notifyOnionSkinMaskChanged();
+}
+
+//-----------------------------------------------------------------------------
+
+void OnionSkinOpacityPopup::onSliderMoved(int value) {
+  m_autoCheckBox->setChecked(false);
+  const QSignalBlocker valueBlocker(m_value);
+  m_value->setText(QString::number(value));
+  commitOpacity();
+}
+
+//-----------------------------------------------------------------------------
+
+void OnionSkinOpacityPopup::onSliderValueChanged(int value) {
+  if (m_initializing || m_slider->isSliderDown()) return;
+  m_autoCheckBox->setChecked(false);
+  const QSignalBlocker valueBlocker(m_value);
+  m_value->setText(QString::number(value));
+  commitOpacity();
+}
+
+//-----------------------------------------------------------------------------
+
+void OnionSkinOpacityPopup::onValueChanged(const QString &text) {
+  if (m_initializing) return;
+  m_autoCheckBox->setChecked(false);
+  const QSignalBlocker sliderBlocker(m_slider);
+  m_slider->setValue(text.toInt());
+  commitOpacity();
+}
+
+//-----------------------------------------------------------------------------
+
+void OnionSkinOpacityPopup::onAutoClicked(bool checked) {
+  if (m_initializing) return;
+  if (checked) {
+    int percent = tcrop(
+        tround((1.0 - OnionSkinMask::getOnionSkinFade(m_distance)) * 100.0),
+        1, 100);
+    const QSignalBlocker sliderBlocker(m_slider);
+    const QSignalBlocker valueBlocker(m_value);
+    m_slider->setValue(percent);
+    m_value->setText(QString::number(percent));
+  }
+  commitOpacity();
+}
 
 //=============================================================================
 // RowArea
@@ -54,7 +245,8 @@ RowArea::RowArea(XsheetViewer *parent, Qt::WindowFlags flags)
     , m_tooltip(tr(""))
     , m_r0(0)
     , m_r1(5)
-    , m_isPanning(false) {
+    , m_isPanning(false)
+    , m_onionSkinOpacityPopup(nullptr) {
   setFocusPolicy(Qt::NoFocus);
   setMouseTracking(true);
   connect(TApp::instance()->getCurrentOnionSkin(),
@@ -631,9 +823,11 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
     if (m_showOnionToSet == Mos && currentRow + mos == m_row) continue;
 
     p.setPen(mos < 0 ? backDotOutlineColor : frontDotOutlineColor);
-    if (osMask.isEnabled())
-      p.setBrush(mos < 0 ? backDotColor : frontDotColor);
-    else
+    if (osMask.isEnabled()) {
+      QColor dotColor = mos < 0 ? backDotColor : frontDotColor;
+      if (osMask.getMosOpacity(mos) >= 0.0) dotColor = dotColor.darker(200);
+      p.setBrush(dotColor);
+    } else
       p.setBrush(Qt::NoBrush);
     QPoint topLeft = m_viewer->positionToXY(CellPosition(currentRow + mos, -1));
     if (!m_viewer->orientation()->isVerticalTimeline())
@@ -659,13 +853,16 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
       p.setPen(QColor(25, 118, 170, 255));
     else
       p.setPen(QColor(0, 255, 255, 128));
-    if (osMask.isEnabled())
+    if (osMask.isEnabled()) {
       // Depending on the brightness, make sure dot can be seen on onion area
+      QColor dotColor;
       if (m_viewer->getOnionSkinAreaBgColor().value() > 128)
-        p.setBrush(QBrush(QColor(0, 165, 255, 148)));
+        dotColor = QColor(0, 165, 255, 148);
       else
-        p.setBrush(QBrush(QColor(0, 255, 255, 148)));
-    else
+        dotColor = QColor(0, 255, 255, 148);
+      if (osMask.getFosOpacity(fos) >= 0.0) dotColor = dotColor.darker(200);
+      p.setBrush(dotColor);
+    } else
       p.setBrush(Qt::NoBrush);
     QPoint topLeft = m_viewer->positionToXY(CellPosition(fos, -1));
     if (!m_viewer->orientation()->isVerticalTimeline())
@@ -1322,10 +1519,21 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
       m_tooltip = tr("Double Click to Toggle Onion Skin");
     else
       m_tooltip = tr("Current Frame");
-  } else if (m_showOnionToSet == Fos)
-    m_tooltip = tr("Fixed Onion Skin Toggle");
-  else if (m_showOnionToSet == Mos)
-    m_tooltip = tr("Relative Onion Skin Toggle");
+  } else if (m_showOnionToSet == Fos) {
+    OnionSkinMask mask =
+        TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
+    m_tooltip = mask.isFos(row)
+                    ? tr("Fixed Onion Skin Toggle\n"
+                         "Right-click to adjust opacity")
+                    : tr("Fixed Onion Skin Toggle");
+  } else if (m_showOnionToSet == Mos) {
+    OnionSkinMask mask =
+        TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
+    m_tooltip = mask.isMos(row - currentRow)
+                    ? tr("Relative Onion Skin Toggle\n"
+                         "Right-click to adjust opacity")
+                    : tr("Relative Onion Skin Toggle");
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1347,6 +1555,8 @@ void RowArea::mouseReleaseEvent(QMouseEvent *event) {
 //-----------------------------------------------------------------------------
 
 void RowArea::contextMenuEvent(QContextMenuEvent *event) {
+  if (showOnionSkinOpacityPopup(event)) return;
+
   OnionSkinMask osMask =
       TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
 
@@ -1423,6 +1633,52 @@ void RowArea::contextMenuEvent(QContextMenuEvent *event) {
   menu->addAction(cmdManager->getAction(MI_PrevTaggedFrame));
 
   menu->exec(event->globalPos());
+}
+
+//-----------------------------------------------------------------------------
+
+bool RowArea::showOnionSkinOpacityPopup(QContextMenuEvent *event) {
+  if (CommandManager::instance()->getAction(MI_ShiftTrace)->isChecked() ||
+      !Preferences::instance()->isOnionSkinEnabled())
+    return false;
+
+  int currentRow = TApp::instance()->getCurrentFrame()->getFrame();
+  int row        = m_viewer->xyToPosition(event->pos()).frame();
+  if (row < 0 || row == currentRow) return false;
+
+  const Orientation *orientation = m_viewer->orientation();
+  QPoint topLeft = m_viewer->positionToXY(CellPosition(row, -1));
+  if (orientation->isVerticalTimeline())
+    topLeft.setX(0);
+  else
+    topLeft.setY(0);
+
+  QPoint frameAdjustment = m_viewer->getFrameZoomAdjustment();
+  QPoint mouseInCell     = event->pos() - topLeft;
+  auto containsMouse = [&](PredefinedRect rect) {
+    return orientation->rect(rect)
+        .adjusted(0, 0, -frameAdjustment.x(), -frameAdjustment.y())
+        .contains(mouseInCell);
+  };
+
+  OnionSkinMask mask =
+      TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
+  bool isFixed = containsMouse(PredefinedRect::ONION_FIXED_DOT_AREA);
+  int marker   = isFixed ? row : row - currentRow;
+  bool markerExists =
+      isFixed ? mask.isFos(marker)
+              : containsMouse(PredefinedRect::ONION_DOT_AREA) &&
+                    mask.isMos(marker);
+  if (!markerExists) return false;
+
+  if (!m_onionSkinOpacityPopup)
+    m_onionSkinOpacityPopup = new OnionSkinOpacityPopup(
+        this, !orientation->isVerticalTimeline());
+  m_onionSkinOpacityPopup->setMarker(currentRow, marker, isFixed);
+  m_onionSkinOpacityPopup->move(event->globalPos());
+  m_onionSkinOpacityPopup->show();
+  event->accept();
+  return true;
 }
 
 //-----------------------------------------------------------------------------
