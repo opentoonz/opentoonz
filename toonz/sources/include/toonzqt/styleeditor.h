@@ -135,6 +135,12 @@ public:
 
 enum CurrentWheel { none, leftWheel, rightTriangle };
 
+enum class ColorWheelDisplayMode {
+  Classic = 0,
+  Round   = 1,
+  Hexagonal = 2
+};
+
 class DVAPI HexagonalColorWheel final : public GLWidgetForHighDpi {
   Q_OBJECT
 
@@ -147,7 +153,15 @@ class DVAPI HexagonalColorWheel final : public GLWidgetForHighDpi {
   float m_triEdgeLen;
   float m_triHeight;
   QPointF m_wp[7], m_leftp[3];
+  QPointF m_innerWp[7];
+  QPointF m_circleCenter;
+  float m_hexEdgeLen;
+  float m_hexTriHeight;
+  float m_outerRadius;
+  float m_innerRadius;
+  float m_ringInnerScale = 0.72f;
 
+  ColorWheelDisplayMode m_displayMode = ColorWheelDisplayMode::Classic;
   CurrentWheel m_currentWheel;
 
   // used for color calibration with 3DLUT
@@ -158,9 +172,36 @@ class DVAPI HexagonalColorWheel final : public GLWidgetForHighDpi {
   bool m_cuedCalibrationUpdate = false;
 
 private:
+  void computeHexVertices();
+  void computeInnerHexVertices();
+  void computeClassicLayout(int w, int h);
+  void computeRoundLayout(int w, int h);
+  void computeHexagonalLayout(int w, int h);
+  void updateLayout(int w, int h);
+  void drawClassicHexWheel(float v);
+  void drawHueRing();
+  void drawCircularHueRing();
+  void drawInnerHexBackground();
+  void drawSatValueTriangle();
   void drawCurrentColorMark();
+  void drawHueRingBaton(int hue, float innerDist, float outerDist,
+                        const QPointF &center);
+  void computeRoundSVTriangle();
+  QPointF svTriangleMarkerPos(float s, float v) const;
+  static bool svTriangleBarycentric(const QPointF &p, const QPointF &hueV,
+                                    const QPointF &blackV,
+                                    const QPointF &whiteV, float &wHue,
+                                    float &wBlack, float &wWhite);
+  void svFromTrianglePoint(const QPointF &localPos, int &s, int &v) const;
   void clickLeftWheel(const QPoint &pos);
+  void clickHueRing(const QPoint &pos);
   void clickRightTriangle(const QPoint &pos);
+  bool isInHueRing(const QPoint &pos) const;
+  bool isInCircularHueRing(const QPoint &pos) const;
+  bool isInClassicWheel(const QPoint &pos) const;
+  bool isInTriangle(const QPoint &pos) const;
+  static void hexCornerColor(int cornerIndex, float v, float &r, float &g,
+                             float &b);
 
 public:
   HexagonalColorWheel(QWidget *parent);
@@ -170,6 +211,9 @@ public:
 
   void setBGColor(const QColor &color) { m_bgColor = color; }
   QColor getBGColor() const { return m_bgColor; }
+
+  void setDisplayMode(ColorWheelDisplayMode mode);
+  ColorWheelDisplayMode displayMode() const { return m_displayMode; }
 
   void updateColorCalibration();
   void cueCalibrationUpdate() { m_cuedCalibrationUpdate = true; }
@@ -496,6 +540,8 @@ public:
   void setSplitterState(QByteArray state);
 
   void updateColorCalibration();
+  void setColorWheelDisplayMode(ColorWheelDisplayMode mode);
+  ColorWheelDisplayMode colorWheelDisplayMode() const;
 
 protected:
   void resizeEvent(QResizeEvent *) override;
@@ -909,6 +955,7 @@ class DVAPI StyleEditor final : public QWidget, public SaveLoadQSettings {
   QAction *m_hexAction;
   QAction *m_searchAction;
   QActionGroup *m_sliderAppearanceAG;
+  QActionGroup *m_colorWheelDisplayModeAG;
   QAction *m_hexEditorAction;
 
   QFrame *m_textureSearchFrame;
@@ -1034,6 +1081,7 @@ protected slots:
   void onVectorBrushButtonToggled(bool on);
 
   void onSliderAppearanceSelected(QAction *);
+  void onColorWheelDisplayModeSelected(QAction *);
   void onPopupMenuAboutToShow();
 
   void onTextureSearch(const QString &);
