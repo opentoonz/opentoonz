@@ -288,11 +288,18 @@ PreferencesPopup::AdditionalStyleEdit::AdditionalStyleEdit(
     : DVGui::Dialog(parent, true, false, "AdditionalStyleEdit") {
   setWindowTitle(tr("Additional Style Sheet"));
   setModal(true);
+  setMinimumWidth(460);
 
-  m_edit                   = new QTextEdit(this);
+  m_edit                    = new QTextEdit(this);
+  QPushButton* loadButton  = new QPushButton(tr("Load..."), this);
+  QPushButton* saveButton  = new QPushButton(tr("Save..."), this);
   QPushButton* okButton    = new QPushButton(tr("OK"), this);
   QPushButton* applyButton = new QPushButton(tr("Apply"), this);
   QPushButton* closeButton = new QPushButton(tr("Close"), this);
+
+  loadButton->setToolTip(tr("Load a CSS, QSS, or formatted theme file."));
+  saveButton->setToolTip(
+      tr("Save the current style sheet as a CSS, QSS, or theme file."));
 
   QString placeHolderTxt(
       "/* Type additional style sheet here to customize GUI. \n"
@@ -303,8 +310,43 @@ PreferencesPopup::AdditionalStyleEdit::AdditionalStyleEdit(
 
   m_topLayout->addWidget(m_edit);
 
-  addButtonBarWidget(okButton, applyButton, closeButton);
+  addButtonBarWidget(loadButton, saveButton, okButton, applyButton);
+  addButtonBarWidget(closeButton);
 
+  connect(loadButton, &QPushButton::pressed, this, [this]() {
+    const QString filter =
+        tr("Style Sheets (*.qss *.css *.theme);;Theme Files (*.qss *.css *.theme *.txt);;All Files (*)");
+    const QString fileName = QFileDialog::getOpenFileName(
+        this, tr("Load Style Sheet"), QString(), filter);
+    if (fileName.isEmpty()) return;
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      DVGui::warning(
+          tr("Could not load the style sheet:\n%1").arg(file.errorString()));
+      return;
+    }
+    m_edit->setPlainText(QString::fromUtf8(file.readAll()));
+  });
+  connect(saveButton, &QPushButton::pressed, this, [this]() {
+    const QString filter =
+        tr("Style Sheets (*.qss *.css *.theme);;Theme Files (*.qss *.css *.theme *.txt);;All Files (*)");
+    const QString fileName = QFileDialog::getSaveFileName(
+        this, tr("Save Style Sheet"), tr("additional-style-sheet.qss"),
+        filter);
+    if (fileName.isEmpty()) return;
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+      DVGui::warning(
+          tr("Could not save the style sheet:\n%1").arg(file.errorString()));
+      return;
+    }
+    if (file.write(m_edit->toPlainText().toUtf8()) < 0) {
+      DVGui::warning(
+          tr("Could not save the style sheet:\n%1").arg(file.errorString()));
+    }
+  });
   connect(okButton, &QPushButton::pressed, this, &AdditionalStyleEdit::onOK);
   connect(applyButton, &QPushButton::pressed, this,
           &AdditionalStyleEdit::onApply);
