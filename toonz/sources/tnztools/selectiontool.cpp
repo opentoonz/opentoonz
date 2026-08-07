@@ -19,6 +19,33 @@ using namespace ToolUtils;
 using namespace DragSelectionTool;
 
 TEnv::StringVar SelectionType("SelectionType", "Rectangular");
+TEnv::IntVar SelectionScaleLink("SelectionScaleLink", 0);
+
+bool selectionScaleLinkIsEnabled() { return SelectionScaleLink != 0; }
+
+void setSelectionScaleLinkEnabled(bool linked) {
+  const int v = linked ? 1 : 0;
+  if ((int)SelectionScaleLink == v) return;
+  SelectionScaleLink = v;
+
+  TTool *tool =
+      TTool::getApplication()
+          ? TTool::getApplication()->getCurrentTool()->getTool()
+          : nullptr;
+  if (SelectionTool *st = dynamic_cast<SelectionTool *>(tool))
+    emit st->scaleHVLinkChanged(linked);
+
+  if (TTool::getApplication())
+    TTool::getApplication()->getCurrentTool()->notifyToolChanged();
+}
+
+bool SelectionTool::isScaleHVLinked() const {
+  return selectionScaleLinkIsEnabled();
+}
+
+void SelectionTool::setScaleHVLinked(bool linked) {
+  setSelectionScaleLinkEnabled(linked);
+}
 
 //-----------------------------------------------------------------------------
 

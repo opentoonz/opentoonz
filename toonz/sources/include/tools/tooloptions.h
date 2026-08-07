@@ -98,7 +98,7 @@ public:
 //    ToolOptionsBox  declaration
 //***********************************************************************************************
 
-class ToolOptionsBox : public QFrame {
+class DVAPI ToolOptionsBox : public QFrame {
   Q_OBJECT
 
 protected:
@@ -637,7 +637,7 @@ protected slots:
 //
 //=============================================================================
 
-class RulerToolOptionsBox final : public ToolOptionsBox {
+class DVAPI RulerToolOptionsBox final : public ToolOptionsBox {
   Q_OBJECT
 
   MeasuredValueField *m_Xfld;
@@ -655,7 +655,8 @@ class RulerToolOptionsBox final : public ToolOptionsBox {
   TTool *m_tool;
 
 public:
-  RulerToolOptionsBox(QWidget *parent, TTool *tool);
+  RulerToolOptionsBox(QWidget *parent, TTool *tool,
+                      bool verticalLayout = false);
 
   void updateValues(bool isRasterLevelEditing, double X, double Y, double W,
                     double H, double A, double L, int Xpix = 0, int Ypix = 0,
