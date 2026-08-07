@@ -7,11 +7,13 @@
 #include "tstrokeutil.h"
 #include "tvectorrenderdata.h"
 #include "tvectorimage.h"
+#include "thidelinesegment.h"
 #include "tpalette.h"
 #include "tcolorfunctions.h"
 #include "tsimplecolorstyles.h"
 #include "tthreadmessage.h"
 #include "tstrokeprop.h"
+#include "drawutil.h"
 
 #include "tconvert.h"
 #include "tcurves.h"
@@ -618,6 +620,41 @@ static bool tglDoDraw(const TVectorRenderData &rd, const TStroke *s) {
 
 namespace {
 
+void drawHideLineSegmentsOverlay(const TVectorRenderData &rd,
+                                 const TStroke *stroke,
+                                 const std::vector<THideLineSegment> &segments) {
+  if (!stroke || segments.empty()) return;
+
+  glPushAttrib(GL_ENABLE_BIT | GL_LINE_BIT | GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT);
+  glDisable(GL_DEPTH_TEST);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glEnable(GL_LINE);
+
+  glPushMatrix();
+  tglMultMatrix(rd.m_aff);
+
+  const double pixelSize = std::max(0.1, sqrt(tglGetPixelSize2()));
+
+  for (const THideLineSegment &seg : segments) {
+    if (seg.m_mode == THideLineMode::Hidden) {
+      glLineWidth(1.5f);
+      glColor4f(80.0f / 255.0f, 200.0f / 255.0f, 100.0f / 255.0f, 0.95f);
+      glEnable(GL_LINE_STIPPLE);
+      glLineStipple(1, 0x00FF);
+      drawStrokeCenterline(*stroke, pixelSize, seg.m_w0, seg.m_w1);
+      glDisable(GL_LINE_STIPPLE);
+    } else {
+      glLineWidth(1.25f);
+      glColor4f(255.0f / 255.0f, 140.0f / 255.0f, 50.0f / 255.0f, 0.9f);
+      drawStrokeCenterline(*stroke, pixelSize, seg.m_w0, seg.m_w1);
+    }
+  }
+
+  glPopMatrix();
+  glPopAttrib();
+}
+
 void doDraw(const TVectorImage *vim, const TVectorRenderData &_rd,
             bool drawEnteredGroup, TStroke **guidedStroke = 0) {
   static TOnionFader *fade = new TOnionFader(TPixel::White, 0.5);
@@ -669,8 +706,29 @@ rdRegions.m_alphaChannel = rdRegions.m_antiAliasing = false;*/
       CurrStrokeIndex = strokeIndex;
       CurrVimg        = vim;
 #endif
-      bool isGuided = tglDoDraw(rd, vim->getStroke(strokeIndex));
-      if (isGuided && guidedStroke) *guidedStroke = vim->getStroke(strokeIndex);
+      bool isGuided = false;
+      if (vim->hasHideLineSegments(strokeIndex)) {
+        std::vector<DoublePair> visible =
+            getVisibleStrokeRanges(vim->getHideLineSegments(strokeIndex));
+        std::vector<TStroke> portions;
+        portions.reserve(visible.size());
+        const TStroke *src = vim->getStroke(strokeIndex);
+        for (const DoublePair &range : visible)
+          portions.push_back(
+              extractStrokePortion(*src, range.first, range.second));
+        for (TStroke &portion : portions) {
+          if (tglDoDraw(rd, &portion)) {
+            isGuided = true;
+            if (guidedStroke) *guidedStroke = vim->getStroke(strokeIndex);
+          }
+        }
+        if (rd.m_showHideLineStrokes)
+          drawHideLineSegmentsOverlay(rd, src,
+                                      vim->getHideLineSegments(strokeIndex));
+      } else {
+        isGuided = tglDoDraw(rd, vim->getStroke(strokeIndex));
+        if (isGuided && guidedStroke) *guidedStroke = vim->getStroke(strokeIndex);
+      }
       strokeIndex++;
     }
   }

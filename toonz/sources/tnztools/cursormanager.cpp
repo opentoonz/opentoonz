@@ -109,6 +109,7 @@ const struct {
     {ToolCursor::FillCursorL, "karasu", 7, 25, true},
     {ToolCursor::RulerModifyCursor, "ruler_modify", 7, 7, true},
     {ToolCursor::RulerNewCursor, "ruler_new", 7, 7, true},
+    {ToolCursor::HideLineCursor, "hide_line", 7, 7, true},
     {ToolCursor::PickPrevCursor, "", 13, 4, false},
     {ToolCursor::PickNextCursor, "", 13, 4, false},
     {0, 0, 0, 0, false}};

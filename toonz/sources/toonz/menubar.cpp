@@ -8,6 +8,7 @@
 #include "cellselection.h"
 #include "mainwindow.h"
 #include "menubarpopup.h"
+#include "sceneviewercontextmenu.h"
 
 // TnzQt includes
 #include "toonzqt/tselectionhandle.h"
@@ -317,6 +318,7 @@ QMenuBar *StackedMenuBar::loadMenuBar(const TFilePath &fp) {
     qDebug() << "XML error:" << reader.errorString();
     return 0;
   }
+  HideLineStrokeGui::ensureViewMenuEntry(menuBar);
   return menuBar;
 }
 
@@ -1438,6 +1440,9 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(viewMenu, MI_ResetShift);
   viewMenu->addSeparator();
   addMenuItem(viewMenu, MI_VectorGuidedDrawing);
+  addMenuItem(viewMenu, MI_ShowHideLineStrokes);
+  connect(viewMenu, &QMenu::aboutToShow,
+          []() { HideLineStrokeGui::syncCommandActionLabel(); });
   viewMenu->addSeparator();
   addMenuItem(viewMenu, MI_RasterizePli);
 

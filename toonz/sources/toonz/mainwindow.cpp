@@ -17,6 +17,7 @@
 #include "custompanelmanager.h"
 #include "audiorecordingpopup.h"
 #include "pltgizmopopup.h"
+#include "sceneviewercontextmenu.h"
 #include "shortcutpopup.h"
 
 // TnzTools includes
@@ -2677,6 +2678,11 @@ void MainWindow::defineActions() {
   createToggle(MI_VectorGuidedDrawing, QT_TR_NOOP("Vector Guided Drawing"), "",
                Preferences::instance()->isGuidedDrawingEnabled(),
                MenuViewCommandType, "view_guided_drawing");
+  createToggle(MI_ShowHideLineStrokes,
+               QT_TR_NOOP("Hide Line: Show Invisible/Hidden Strokes"), "Shift+K",
+               Preferences::instance()->getShowHideLineStrokes(),
+               MenuViewCommandType);
+  HideLineStrokeGui::syncCommandActionLabel();
   if (QGLPixelBuffer::hasOpenGLPbuffers())
     createToggle(MI_RasterizePli, QT_TR_NOOP("&Visualize Vector As Raster"), "",
                  RasterizePliToggleAction ? 1 : 0, MenuViewCommandType,
@@ -2992,6 +2998,8 @@ void MainWindow::defineActions() {
   createToolAction(T_PaintBrush, "paintbrush", QT_TR_NOOP("Paint Brush Tool"),
                    "");
   createToolAction(T_Eraser, "eraser", QT_TR_NOOP("Eraser Tool"), "E");
+  createToolAction(T_HideLine, "hide_line", QT_TR_NOOP("Hide Line Tool"),
+                   "K");
   createToolAction(T_Tape, "tape", QT_TR_NOOP("Tape Tool"), "T");
   createToolAction(T_StylePicker, "stylepicker",
                    QT_TR_NOOP("Style Picker Tool"), "I");
@@ -3128,6 +3136,26 @@ void MainWindow::defineActions() {
                ToolCommandType, "eraser_polyline");
   createAction(MI_EraserSegment, QT_TR_NOOP("Eraser Tool - Segment"), "",
                ToolCommandType, "eraser_segment");
+
+  /*-- Hide Line tool + type/mode/unhide switching shortcuts --*/
+  createAction(MI_HideLineNextType, QT_TR_NOOP("Hide Line Tool - Next Type"),
+               "", ToolCommandType);
+  createAction(MI_HideLineNormal, QT_TR_NOOP("Hide Line Tool - Normal"), "",
+               ToolCommandType);
+  createAction(MI_HideLineSegment, QT_TR_NOOP("Hide Line Tool - Segment"), "",
+               ToolCommandType);
+  createAction(MI_HideLineFreehand, QT_TR_NOOP("Hide Line Tool - Freehand"),
+               "", ToolCommandType);
+  createAction(MI_HideLineNextMode, QT_TR_NOOP("Hide Line Tool - Next Mode"),
+               "", ToolCommandType);
+  createAction(MI_HideLineInvisible,
+               QT_TR_NOOP("Hide Line Tool - Mode: Invisible"), "",
+               ToolCommandType);
+  createAction(MI_HideLineHidden, QT_TR_NOOP("Hide Line Tool - Mode: Hidden"),
+               "", ToolCommandType);
+  createAction(MI_HideLineToggleUnhide,
+               QT_TR_NOOP("Hide Line Tool - Toggle Unhide"), "",
+               ToolCommandType);
 
   /*-- Tape tool + type/mode switching shortcuts --*/
   createAction(MI_TapeNextType, QT_TR_NOOP("Tape Tool - Next Type"), "",
@@ -3370,6 +3398,11 @@ void MainWindow::defineActions() {
                           QT_TR_NOOP("Mode - Endpoint to Line"), "");
   createToolOptionsAction("A_ToolOption_Mode:Line to Line",
                           QT_TR_NOOP("Mode - Line to Line"), "");
+  createToolOptionsAction("A_ToolOption_Mode:Invisible",
+                          QT_TR_NOOP("Mode - Invisible"), "");
+  createToolOptionsAction("A_ToolOption_Mode:Hidden",
+                          QT_TR_NOOP("Mode - Hidden"), "");
+  createToolOptionsAction("A_ToolOption_Unhide", QT_TR_NOOP("Unhide"), "");
   createToolOptionsAction("A_ToolOption_Type", QT_TR_NOOP("Type"), "");
 
   menuAct =

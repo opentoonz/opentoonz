@@ -6,6 +6,8 @@
 #include "trop.h"
 #include "tools/tool.h"
 #include "tstroke.h"
+#include "tmathutil.h"
+#include "tregion.h"
 #include "timageinfo.h"
 #include "timagecache.h"
 #include "tgl.h"
@@ -1939,4 +1941,244 @@ bool ToolUtils::renumberForInsertFId(TXshSimpleLevel *sl, const TFrameId &fid,
   sl->renumber(fids);
 
   return true;
+}
+
+//-----------------------------------------------------------------------------
+
+namespace {
+
+bool doublePairCompare(DoublePair p1, DoublePair p2) {
+  return p1.first < p2.first;
+}
+
+}  // namespace
+
+std::vector<ToolUtils::StrokeSegmentRanges> ToolUtils::computeSegmentTouchRanges(
+    const TVectorImageP &vi, TStroke *lineStroke, bool selective,
+    int colorStyle) {
+  std::vector<StrokeSegmentRanges> result;
+  if (!vi || !lineStroke) return result;
+
+  int strokeNumber = vi->getStrokeCount();
+  std::vector<int> touchedStrokeIndex;
+  std::vector<std::vector<double>> touchedStrokeW;
+  std::vector<std::vector<DoublePair>> touchedStrokeRanges;
+
+  for (int i = 0; i < strokeNumber; ++i) {
+    std::vector<DoublePair> intersections;
+    std::vector<double> ws;
+    TStroke *stroke = vi->getStroke(i);
+    bool touched    = false;
+
+    if (selective && stroke->getStyle() != colorStyle) continue;
+
+    intersect(lineStroke, stroke, intersections, false);
+
+    for (auto &intersection : intersections) {
+      touched = true;
+      ws.push_back(intersection.second);
+    }
+
+    if (touched) {
+      touchedStrokeIndex.push_back(i);
+      touchedStrokeW.push_back(ws);
+    }
+  }
+
+  if (touchedStrokeIndex.empty()) return result;
+
+  for (int i = 0; i < (int)touchedStrokeIndex.size(); ++i) {
+    std::vector<DoublePair> range;
+    for (auto w : touchedStrokeW[i]) {
+      std::vector<DoublePair> intersections;
+      double lowerW = 0.0, higherW = 1.0;
+      double higherW0 = 1.0, lowerW1 = 0.0;
+
+      int strokeIndex = touchedStrokeIndex[i];
+      TStroke *stroke = vi->getStroke(strokeIndex);
+
+      intersect(stroke, stroke, intersections, false);
+      for (auto &intersection : intersections) {
+        if (areAlmostEqual(intersection.first, 0, 1e-6)) continue;
+        if (areAlmostEqual(intersection.second, 1, 1e-6)) continue;
+
+        if (intersection.first < w)
+          lowerW = std::max(lowerW, intersection.first);
+        else
+          higherW = std::min(higherW, intersection.first);
+
+        if (intersection.second < w)
+          lowerW = std::max(lowerW, intersection.second);
+        else
+          higherW = std::min(higherW, intersection.second);
+
+        lowerW1  = std::max(lowerW1, intersection.first);
+        higherW0 = std::min(higherW0, intersection.first);
+        lowerW1  = std::max(lowerW1, intersection.second);
+        higherW0 = std::min(higherW0, intersection.second);
+      }
+
+      for (int j = 0; j < strokeNumber; ++j) {
+        if (j == strokeIndex) continue;
+
+        TStroke *intersectedStroke = vi->getStroke(j);
+        intersect(stroke, intersectedStroke, intersections, false);
+        for (auto &intersection : intersections) {
+          if (intersection.first < w)
+            lowerW = std::max(lowerW, intersection.first);
+          else
+            higherW = std::min(higherW, intersection.first);
+          lowerW1  = std::max(lowerW1, intersection.first);
+          higherW0 = std::min(higherW0, intersection.first);
+        }
+      }
+
+      range.push_back(std::make_pair(lowerW, higherW));
+      if (stroke->isSelfLoop()) {
+        if (lowerW == 0.0) range.push_back(std::make_pair(lowerW1, 1.0));
+        if (higherW == 1.0) range.push_back(std::make_pair(0.0, higherW0));
+      }
+    }
+    touchedStrokeRanges.push_back(range);
+  }
+
+  for (auto &ranges : touchedStrokeRanges) {
+    std::vector<DoublePair> merged;
+    if (ranges.empty()) continue;
+
+    std::sort(ranges.begin(), ranges.end(), doublePairCompare);
+    merged.push_back(ranges[0]);
+    for (auto &range : ranges) {
+      if (merged.back().second < range.first &&
+          !areAlmostEqual(merged.back().second, range.first, 1e-3)) {
+        merged.push_back(range);
+      } else if (merged.back().second < range.second) {
+        merged.back().second = range.second;
+      }
+    }
+    ranges = merged;
+  }
+
+  for (int i = 0; i < (int)touchedStrokeIndex.size(); ++i) {
+    if (touchedStrokeRanges[i].empty()) continue;
+    StrokeSegmentRanges item;
+    item.strokeIndex = touchedStrokeIndex[i];
+    item.ranges      = touchedStrokeRanges[i];
+    result.push_back(item);
+  }
+
+  return result;
+}
+
+//-----------------------------------------------------------------------------
+
+namespace {
+
+std::vector<DoublePair> complementWRanges(
+    const std::vector<DoublePair> &keepRanges) {
+  std::vector<DoublePair> hidden;
+  double last = 0.0;
+  for (const DoublePair &range : keepRanges) {
+    if (!areAlmostEqual(last, range.first, 1e-3))
+      hidden.push_back(DoublePair(last, range.first));
+    last = range.second;
+  }
+  if (!areAlmostEqual(last, 1.0, 1e-3)) hidden.push_back(DoublePair(last, 1.0));
+  return hidden;
+}
+
+}  // namespace
+
+std::vector<DoublePair> ToolUtils::computeBrushHiddenRanges(
+    const TStroke *stroke, const TPointD &pos, double pointSize) {
+  std::vector<DoublePair> hidden;
+  if (!stroke) return hidden;
+
+  double pointSize2 = pointSize * pointSize;
+  double rectEdge2  = pointSize * M_SQRT1_2;
+
+  TRectD circumscribedSquare(pos.x - pointSize, pos.y - pointSize,
+                             pos.x + pointSize, pos.y + pointSize);
+  if (!circumscribedSquare.overlaps(stroke->getBBox())) return hidden;
+
+  TRectD inscribedSquare(pos.x - rectEdge2, pos.y - rectEdge2,
+                           pos.x + rectEdge2, pos.y + rectEdge2);
+
+  if (inscribedSquare.contains(stroke->getBBox())) {
+    hidden.push_back(DoublePair(0.0, 1.0));
+    return hidden;
+  }
+
+  std::vector<double> intersections;
+  intersect(*stroke, pos, pointSize, intersections);
+
+  if (intersections.empty()) {
+    if (tdistance2(stroke->getPoint(0), pos) < pointSize2 &&
+        tdistance2(stroke->getPoint(1), pos) < pointSize2)
+      hidden.push_back(DoublePair(0.0, 1.0));
+    return hidden;
+  }
+
+  if (intersections.size() == 1) {
+    if (stroke->isSelfLoop()) return hidden;
+    double w0 = intersections[0];
+    if (tdistance2(stroke->getPoint(0), pos) < pointSize2)
+      hidden.push_back(DoublePair(0.0, w0));
+    else if (tdistance2(stroke->getPoint(1), pos) < pointSize2)
+      hidden.push_back(DoublePair(w0, 1.0));
+    return hidden;
+  }
+
+  if (intersections.size() == 2 && intersections[0] == intersections[1])
+    return hidden;
+
+  if (tdistance2(stroke->getPoint(0), pos) > pointSize2) {
+    if (areAlmostEqual(intersections[0], 0.0, 1e-6))
+      intersections.erase(intersections.begin());
+    else
+      intersections.insert(intersections.begin(), 0.0);
+  }
+
+  if (intersections.empty() || !areAlmostEqual(intersections.back(), 1.0, 1e-6))
+    intersections.push_back(1.0);
+
+  std::vector<DoublePair> keepRanges;
+  keepRanges.reserve(intersections.size() / 2);
+  for (UINT j = 0; j + 1 < intersections.size(); j += 2)
+    keepRanges.push_back(
+        DoublePair(intersections[j], intersections[j + 1]));
+
+  return complementWRanges(keepRanges);
+}
+
+//-----------------------------------------------------------------------------
+
+std::vector<int> ToolUtils::findStrokesInClosedRegion(
+    const TVectorImageP &vi, const TStroke *boundaryStroke, bool selective,
+    int colorStyle) {
+  std::vector<int> result;
+  if (!vi || !boundaryStroke) return result;
+
+  TVectorImage regionImg;
+  TStroke *regionStroke = new TStroke(*boundaryStroke);
+  regionImg.addStroke(regionStroke);
+  regionImg.findRegions();
+
+  for (int strokeIndex = 0; strokeIndex < (int)vi->getStrokeCount();
+       ++strokeIndex) {
+    if (!vi->inCurrentGroup(strokeIndex)) continue;
+    TStroke *currentStroke = vi->getStroke(strokeIndex);
+    if (selective && currentStroke->getStyle() != colorStyle) continue;
+
+    for (UINT regionIndex = 0; regionIndex < regionImg.getRegionCount();
+         ++regionIndex) {
+      TRegion *region = regionImg.getRegion(regionIndex);
+      if (region->contains(*currentStroke, true)) {
+        result.push_back(strokeIndex);
+        break;
+      }
+    }
+  }
+
+  return result;
 }

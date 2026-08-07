@@ -41,7 +41,7 @@ struct {
                     {T_Geometric, false, 0},   {T_Type, true, 0},
                     {T_Fill, false, 0},        {T_PaintBrush, false, 0},
                     {"Separator_2", false, 0}, {T_Eraser, false, 0},
-                    {T_Tape, false, 0},        {T_Finger, false, 0},
+                    {T_HideLine, true, 0},     {T_Tape, false, 0},        {T_Finger, false, 0},
                     {"Separator_3", false, 0}, {T_StylePicker, false, 0},
                     {T_RGBPicker, false, 0},   {T_Ruler, false, 0},
                     {T_EditAssistants, false, 0},
