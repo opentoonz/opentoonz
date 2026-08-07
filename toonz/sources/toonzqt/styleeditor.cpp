@@ -3435,6 +3435,7 @@ void StyleEditor::onMyPaintClearSearch() {
 //-----------------------------------------------------------------------------
 
 void StyleEditor::updateTabBar() {
+  m_styleBar->blockSignals(true);
   m_styleBar->clearTabBar();
   if (m_enabled && !m_enabledOnlyFirstTab && !m_enabledFirstAndLastTab) {
     m_styleBar->addSimpleTab(tr("Color"));
@@ -3442,17 +3443,55 @@ void StyleEditor::updateTabBar() {
     m_styleBar->addSimpleTab(tr("Vector"));
     m_styleBar->addSimpleTab(tr("Raster"));
     m_styleBar->addSimpleTab(tr("Settings"));
-  } else if (m_enabled && m_enabledOnlyFirstTab && !m_enabledFirstAndLastTab)
+  } else if (m_enabled && m_enabledOnlyFirstTab && !m_enabledFirstAndLastTab) {
     m_styleBar->addSimpleTab(tr("Color"));
-  else if (m_enabled && !m_enabledOnlyFirstTab && m_enabledFirstAndLastTab) {
+  } else if (m_enabled && !m_enabledOnlyFirstTab && m_enabledFirstAndLastTab) {
     m_styleBar->addSimpleTab(tr("Color"));
     m_styleBar->addSimpleTab(tr("Settings"));
   } else {
+    m_styleBar->blockSignals(false);
     m_styleChooser->setCurrentIndex(m_styleChooser->count() - 1);
     return;
   }
   m_tabBarContainer->layout()->update();
-  m_styleChooser->setCurrentIndex(0);
+
+  // Determine target page: prefer pending (from load()), else keep last known page.
+  int targetPage = m_currentPageIndex;
+  if (m_pendingPageIndex >= 0) targetPage = m_pendingPageIndex;
+
+  // Map stacked-widget page index to tab-bar index for the current mode.
+  // Full (5 tabs): direct 0-4.  Color+Settings: 0→0, 4→1.  Color only: 0→0.
+  int tabIndex = -1;
+  if (!m_enabledOnlyFirstTab && !m_enabledFirstAndLastTab) {
+    if (targetPage >= 0 && targetPage <= 4) tabIndex = targetPage;
+  } else if (m_enabledFirstAndLastTab) {
+    if (targetPage == 0)
+      tabIndex = 0;
+    else if (targetPage == 4)
+      tabIndex = 1;
+  } else {
+    if (targetPage == 0) tabIndex = 0;
+  }
+
+  // Only consume pending when the page was actually mapped; if the page is
+  // unavailable in the current (possibly restricted) mode, keep pending alive
+  // so it can be applied later when the full tab set becomes available.
+  if (tabIndex >= 0 && m_pendingPageIndex >= 0) m_pendingPageIndex = -1;
+
+  bool isFallback = (tabIndex < 0);
+  if (tabIndex < 0) tabIndex = 0;
+
+  m_styleBar->setCurrentIndex(tabIndex);
+  m_styleBar->blockSignals(false);
+
+  if (!isFallback) {
+    setPage(tabIndex);
+  } else {
+    // Restricted mode can't show the saved page; display Color temporarily
+    // but preserve m_currentPageIndex so it is restored when the full tab
+    // set becomes available (e.g. after a room switch or palette change).
+    m_styleChooser->setCurrentIndex(0);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -3571,6 +3610,17 @@ void StyleEditor::onStyleSwitched() {
   } else {
     m_parent->setWindowTitle(tr("Style Editor - No Valid Style Selected"));
   }
+  // When the saved or current page requires full-mode tabs
+  // (Texture / Vector / Raster), suppress palette-driven restrictions so the
+  // user's chosen tab stays visible across room switches and startup.
+  // The override lifts naturally when the user selects Color (0) or
+  // Settings (4), which are available in every restricted mode.
+  if ((m_pendingPageIndex >= 1 && m_pendingPageIndex <= 3) ||
+      (m_currentPageIndex >= 1 && m_currentPageIndex <= 3)) {
+    isColorInField   = false;
+    isCleanUpPalette = false;
+  }
+
   enable(!isStyleNull && isValidIndex, isColorInField, isCleanUpPalette);
 
   updateStylePages();
@@ -3778,6 +3828,9 @@ void StyleEditor::onNewStyleClicked() { applyButtonClicked(); }
 void StyleEditor::setPage(int index) {
   if (!m_enabledFirstAndLastTab) {
     m_styleChooser->setCurrentIndex(index);
+    if (index >= 0 && index < m_styleChooser->count() - 1) {
+      m_currentPageIndex = index;
+    }
     return;
   }
 
@@ -3787,6 +3840,9 @@ void StyleEditor::setPage(int index) {
     index = m_styleChooser->count() -
             2;  // 2 because at the end there is a blank page.
   m_styleChooser->setCurrentIndex(index);
+  if (index >= 0 && index < m_styleChooser->count() - 1) {
+    m_currentPageIndex = index;
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -4030,6 +4086,7 @@ void StyleEditor::save(QSettings &settings) const {
   if (m_searchAction->isChecked()) visibleParts |= 0x20;
   settings.setValue("visibleParts", visibleParts);
   settings.setValue("splitterState", m_plainColorPage->getSplitterState());
+  settings.setValue("currentPage", m_currentPageIndex);
 }
 void StyleEditor::load(QSettings &settings) {
   QVariant isVertical = settings.value("isVertical");
@@ -4069,6 +4126,13 @@ void StyleEditor::load(QSettings &settings) {
   QVariant splitterState = settings.value("splitterState");
   if (splitterState.canConvert(QVariant::ByteArray))
     m_plainColorPage->setSplitterState(splitterState.toByteArray());
+  QVariant currentPage = settings.value("currentPage");
+  if (currentPage.canConvert(QVariant::Int)) {
+    int page = currentPage.toInt();
+    if (page >= 0 && page < m_styleChooser->count() - 1) {
+      m_pendingPageIndex = page;
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
