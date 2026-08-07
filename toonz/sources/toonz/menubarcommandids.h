@@ -195,6 +195,8 @@
 #define MI_EditShift "MI_EditShift"
 #define MI_NoShift "MI_NoShift"
 #define MI_ResetShift "MI_ResetShift"
+#define MI_ShiftTraceSelectPrevGhost "MI_ShiftTraceSelectPrevGhost"
+#define MI_ShiftTraceSelectNextGhost "MI_ShiftTraceSelectNextGhost"
 #define MI_ShowShiftOrigin "MI_ShowShiftOrigin"
 #define MI_Histogram "MI_Histogram"
 #define MI_ViewerHistogram "MI_ViewerHistogram"

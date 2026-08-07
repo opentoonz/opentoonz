@@ -2712,9 +2712,9 @@ void StylePickerToolOptionsBox::updateRealTimePickLabel(const int ink,
 //-----------------------------------------------------------------------------
 
 ShiftTraceToolOptionBox::ShiftTraceToolOptionBox(QWidget *parent, TTool *tool)
-    : ToolOptionsBox(parent), m_tool(tool) {
+    : ToolOptionsBox(parent), m_ghostBBoxCombo(0), m_tool(tool) {
   setFrameStyle(QFrame::StyledPanel);
-  setFixedHeight(26);
+  setMinimumHeight(26);
 
   m_prevFrame  = new QFrame(this);
   m_afterFrame = new QFrame(this);
@@ -2744,6 +2744,28 @@ ShiftTraceToolOptionBox::ShiftTraceToolOptionBox(QWidget *parent, TTool *tool)
   m_layout->addWidget(m_afterRadioBtn, 0);
   m_layout->addWidget(m_resetAfterGhostBtn, 0);
 
+  m_layout->addWidget(new DVGui::Separator("", this, false));
+
+  // Raster / toonz-raster ghost handle reference (ShiftTraceGhostBBoxMode TEnv).
+  // Vector levels use stroke bbox only; see ShiftTraceTool::GhostBBoxMode.
+  m_ghostBBoxCombo = new QComboBox(this);
+  m_ghostBBoxCombo->setToolTip(tr(
+      "Reference rectangle for Shift & Trace handles on raster levels: full "
+      "raster bounding box, savebox, or content bounds."));
+  m_ghostBBoxCombo->addItem(
+      tr("Full raster bounding box"),
+      (int)ShiftTraceTool::GhostBBoxMode::FullRaster);
+  m_ghostBBoxCombo->addItem(tr("Savebox"),
+                            (int)ShiftTraceTool::GhostBBoxMode::Savebox);
+  m_ghostBBoxCombo->addItem(tr("Content (alpha)"),
+                            (int)ShiftTraceTool::GhostBBoxMode::ContentAlpha);
+  {
+    int idx = m_ghostBBoxCombo->findData((int)ShiftTraceTool::getGhostBBoxMode());
+    if (idx < 0) idx = 0;
+    m_ghostBBoxCombo->setCurrentIndex(idx);
+  }
+  m_layout->addWidget(m_ghostBBoxCombo, 0);
+
   m_layout->addStretch(1);
 
   connect(m_resetPrevGhostBtn, SIGNAL(clicked(bool)), this,
@@ -2754,6 +2776,8 @@ ShiftTraceToolOptionBox::ShiftTraceToolOptionBox(QWidget *parent, TTool *tool)
           SLOT(onPrevRadioBtnClicked()));
   connect(m_afterRadioBtn, SIGNAL(clicked(bool)), this,
           SLOT(onAfterRadioBtnClicked()));
+  connect(m_ghostBBoxCombo, SIGNAL(currentIndexChanged(int)), this,
+          SLOT(onGhostBBoxComboChanged(int)));
 
   updateStatus();
 }
@@ -2808,26 +2832,41 @@ void ShiftTraceToolOptionBox::updateColors() {
 
 void ShiftTraceToolOptionBox::updateStatus() {
   TTool::Application *app = TTool::getApplication();
-  OnionSkinMask osm       = app->getCurrentOnionSkin()->getOnionSkinMask();
-  if (osm.getShiftTraceGhostAff(0).isIdentity() &&
-      osm.getShiftTraceGhostCenter(0) == TPointD())
+  ShiftTraceTool *stTool = (ShiftTraceTool *)m_tool;
+  if (!stTool) return;
+  if (stTool->isGhostAtDefault(0))
     m_resetPrevGhostBtn->setDisabled(true);
   else
     m_resetPrevGhostBtn->setEnabled(true);
 
-  if (osm.getShiftTraceGhostAff(1).isIdentity() &&
-      osm.getShiftTraceGhostCenter(1) == TPointD())
+  if (stTool->isGhostAtDefault(1))
     m_resetAfterGhostBtn->setDisabled(true);
   else
     m_resetAfterGhostBtn->setEnabled(true);
 
   // Check the ghost index
-  ShiftTraceTool *stTool = (ShiftTraceTool *)m_tool;
-  if (!stTool) return;
   if (stTool->getCurrentGhostIndex() == 0)
     m_prevRadioBtn->setChecked(true);
   else  // ghostIndex == 1
     m_afterRadioBtn->setChecked(true);
+
+  if (m_ghostBBoxCombo) {
+    int idx = m_ghostBBoxCombo->findData((int)ShiftTraceTool::getGhostBBoxMode());
+    if (idx < 0) idx = 0;
+    if (m_ghostBBoxCombo->currentIndex() != idx) {
+      m_ghostBBoxCombo->blockSignals(true);
+      m_ghostBBoxCombo->setCurrentIndex(idx);
+      m_ghostBBoxCombo->blockSignals(false);
+    }
+  }
+}
+
+void ShiftTraceToolOptionBox::onGhostBBoxComboChanged(int index) {
+  if (!m_ghostBBoxCombo || index < 0) return;
+  QVariant v = m_ghostBBoxCombo->itemData(index);
+  if (!v.isValid()) return;
+  ShiftTraceTool::setGhostBBoxMode(
+      (ShiftTraceTool::GhostBBoxMode)v.toInt());
 }
 
 void ShiftTraceToolOptionBox::onPrevRadioBtnClicked() {
