@@ -1,6 +1,14 @@
 
 
 #include "docklayout.h"
+#include "docktabstrip.h"
+#include "tdockwindows.h"
+#include "toonzqt/gutil.h"
+
+#include <QApplication>
+#include <QHBoxLayout>
+#include <QMouseEvent>
+#include <QTimer>
 
 #include <assert.h>
 #include <math.h>
@@ -76,11 +84,25 @@ inline QRect toRect(const QRectF &rect) {
 //-----------------
 
 DockLayout::DockLayout()
-    : m_maximizedDock(0), m_decoAllocator(new DockDecoAllocator()) {}
+    : m_maximizedDock(0)
+    , m_decoAllocator(new DockDecoAllocator())
+    , m_joinHighlight(0)
+    , m_joinHighlightRegion(0) {}
 
 //-------------------------------------
 
 DockLayout::~DockLayout() {
+  clearJoinHighlight();
+  delete m_joinHighlight;
+  m_joinHighlight = 0;
+
+  // Dock widgets may outlive this layout during application shutdown. Clear
+  // their back-pointer so ~DockWidget does not call into a destroyed layout.
+  for (unsigned int i = 0; i < m_items.size(); ++i) {
+    if (DockWidget *dw = static_cast<DockWidget *>(m_items[i]->widget()))
+      dw->m_parentLayout = 0;
+  }
+
   // Deleting Regions (separators are Widgets with parent, so they are
   // recursively deleted)
   unsigned int i;
@@ -207,10 +229,16 @@ QWidget *DockLayout::containerOf(QPoint point) const {
   unsigned int j;
   for (i = m_regions.size() - 1; i >= 0; --i) {
     Region *currRegion = m_regions[i];
-    DockWidget *item   = currRegion->getItem();
+
+    if (currRegion->isTabbed() && currRegion->tabStripContainer() &&
+        currRegion->tabStripContainer()->geometry().contains(point))
+      return currRegion->tabStripContainer();
+
+    DockWidget *item = currRegion->getItem();
+    if (!item && currRegion->isTabbed()) item = currRegion->activeTab();
 
     // First check if item contains it
-    if (item && item->geometry().contains(point)) return currRegion->getItem();
+    if (item && item->geometry().contains(point)) return item;
 
     // Then, search among separators
     for (j = 0; j < currRegion->separators().size(); ++j)
@@ -248,6 +276,14 @@ void DockLayout::setMaximized(DockWidget *item, bool state) {
         item->m_maximized = true;
         m_maximizedDock   = item;
 
+        // If item is (or was) the active tab of a merged group, its own
+        // title bar is normally hidden in favor of the tab strip - which
+        // stays behind at the group's old, now-covered location. Without
+        // its own title bar shown while maximized, there is no visible/
+        // clickable spot left to double-click back to normal size (see
+        // the matching restore below).
+        restorePanelTitleBar(item);
+
         // Hide all the other docked widgets (no need to update them. Moreover,
         // doing so
         // could eventually result in painting over the newly maximized widget)
@@ -266,12 +302,19 @@ void DockLayout::setMaximized(DockWidget *item, bool state) {
       m_maximizedDock->m_maximized = false;
       m_maximizedDock              = 0;
 
-      // Show all other docked widgets
+      // Show docked widgets again, but keep inactive tabs in tab groups hidden.
       DockWidget *currWidget;
       for (int i = 0; i < count(); ++i) {
         currWidget = (DockWidget *)itemAt(i)->widget();
         if (currWidget != item && !currWidget->isFloating()) currWidget->show();
       }
+      refreshTabbedRegionsVisibility();
+
+      // If the un-maximized item still belongs to a merged tab group, hand
+      // its title bar back to being hidden in favor of the tab strip (see
+      // the matching show-on-maximize above) instead of leaving both
+      // visible on top of each other.
+      if (r && r->isTabbed()) updateTabVisibility(r);
     }
   }
 }
@@ -294,14 +337,18 @@ void DockLayout::updateSeparatorCursors() {
   Region *r, *child;
 
   unsigned int i, j;
-  int k, jInt;
+  int jInt, k;
   for (i = 0; i < m_regions.size(); ++i) {
-    r                = m_regions[i];
+    r = m_regions[i];
+    if (r->isTabbed()) continue;
+
+    const unsigned int childCount = r->getChildList().size();
+    const unsigned int sepCount   = r->separators().size();
+    if (!childCount || !sepCount) continue;
+
     bool orientation = r->getOrientation();
 
     // If region geometry is minimal or maximal, its separators are blocked
-    // NOTE: If this update follows only from a dock/undock, this should be
-    // disabled 'til 'Otherwise'
     QSize size = toRect(r->getGeometry()).size();
     bool isExtremeSize =
         (orientation == Region::horizontal)
@@ -310,34 +357,34 @@ void DockLayout::updateSeparatorCursors() {
             : size.height() == r->getMinimumSize(Region::vertical) ||
                   size.height() == r->getMaximumSize(Region::vertical);
     if (isExtremeSize) {
-      for (j = 0; j < r->separators().size(); ++j)
-        r->separator(j)->setCursor(Qt::ArrowCursor);
+      for (j = 0; j < sepCount; ++j) r->separator(j)->setCursor(Qt::ArrowCursor);
       continue;
     }
 
-    // Otherwise...
-
     // Arrowize all separators as long as the preceding region has equal
     // maximum and minimum sizes
-    for (j = 0; j < r->getChildList().size(); ++j) {
+    for (j = 0; j < childCount; ++j) {
       child = r->childRegion(j);
 
       if (child->getMaximumSize(orientation) ==
-          child->getMinimumSize(orientation))
-        r->separator(j)->setCursor(Qt::ArrowCursor);
-      else
+          child->getMinimumSize(orientation)) {
+        if (j < sepCount) r->separator(j)->setCursor(Qt::ArrowCursor);
+      } else
         break;
     }
 
-    jInt = j;
+    jInt = static_cast<int>(j);
     // The same as above in reverse order
-    for (k = r->getChildList().size() - 1; k > jInt; --k) {
+    k = static_cast<int>(childCount) - 1;
+    for (; k > jInt; --k) {
       child = r->childRegion(k);
 
       if (child->getMaximumSize(orientation) ==
-          child->getMinimumSize(orientation))
-        r->separator(k - 1)->setCursor(Qt::ArrowCursor);
-      else
+          child->getMinimumSize(orientation)) {
+        const int sepIdx = k - 1;
+        if (sepIdx >= 0 && static_cast<unsigned int>(sepIdx) < sepCount)
+          r->separator(sepIdx)->setCursor(Qt::ArrowCursor);
+      } else
         break;
     }
 
@@ -345,7 +392,10 @@ void DockLayout::updateSeparatorCursors() {
     Qt::CursorShape shape = (orientation == Region::horizontal)
                                 ? Qt::SplitHCursor
                                 : Qt::SplitVCursor;
-    for (; jInt < k; ++jInt) r->separator(jInt)->setCursor(shape);
+    for (; jInt < k; ++jInt) {
+      if (static_cast<unsigned int>(jInt) < sepCount)
+        r->separator(jInt)->setCursor(shape);
+    }
   }
 }
 
@@ -353,14 +403,40 @@ void DockLayout::updateSeparatorCursors() {
 
 //! Applies Regions geometry to dock widgets and separators.
 void DockLayout::applyGeometry() {
-  // Update docked window's geometries
   unsigned int i, j;
+  const int stripHeight = tabStripHeight();
   for (i = 0; i < m_regions.size(); ++i) {
     Region *r                             = m_regions[i];
     const std::deque<Region *> &childList = r->getChildList();
     std::deque<DockSeparator *> &sepList  = r->m_separators;
 
-    if (m_regions[i]->getItem()) {
+    if (r->isTabbed()) {
+      QRect regionRect = toRect(r->getGeometry());
+      if (r->tabStripContainer()) {
+        r->tabStripContainer()->setGeometry(
+            QRect(regionRect.left(), regionRect.top(), regionRect.width(),
+                  stripHeight));
+        r->tabStripContainer()->show();
+        r->tabStripContainer()->raise();
+      }
+
+      QRect contentRect = regionRect;
+      contentRect.setTop(regionRect.top() + stripHeight);
+
+      const std::vector<DockWidget *> &tabs = r->tabItems();
+      DockWidget *active                    = r->activeTab();
+      for (j = 0; j < tabs.size(); ++j) {
+        if (tabs[j] == active) {
+          tabs[j]->setGeometry(contentRect);
+          tabs[j]->show();
+        } else {
+          // Keep hidden tabs aligned so switching tabs after restore does not
+          // jump, and saveState sees a consistent geometry next time.
+          tabs[j]->setGeometry(contentRect);
+          tabs[j]->hide();
+        }
+      }
+    } else if (m_regions[i]->getItem()) {
       m_regions[i]->getItem()->setGeometry(toRect(m_regions[i]->getGeometry()));
     } else {
       for (j = 0; j < sepList.size(); ++j) {
@@ -389,6 +465,9 @@ void DockLayout::applyGeometry() {
 
   // Finally, update separator cursors.
   updateSeparatorCursors();
+
+  if (m_joinHighlight && m_joinHighlightRegion)
+    updateJoinHighlightGeometry();
 }
 
 //------------------------------------------------------
@@ -525,6 +604,9 @@ void DockLayout::redistribute() {
 //=============================
 
 Region::~Region() {
+  delete m_tabStripContainer;
+  m_tabStrip         = 0;
+  m_tabStripContainer = 0;
   // Delete separators
   unsigned int i;
   for (i = 0; i < m_separators.size(); ++i) delete m_separators[i];
@@ -578,10 +660,509 @@ unsigned int Region::find(const Region *subRegion) const {
 //------------------------------------------------------
 
 Region *DockLayout::find(DockWidget *item) const {
-  unsigned int i;
+  unsigned int i, j;
 
-  for (i = 0; i < m_regions.size(); ++i)
-    if (m_regions[i]->getItem() == item) return m_regions[i];
+  for (i = 0; i < m_regions.size(); ++i) {
+    Region *r = m_regions[i];
+    if (r->getItem() == item) return r;
+
+    if (r->isTabbed()) {
+      const std::vector<DockWidget *> &tabs = r->tabItems();
+      for (j = 0; j < tabs.size(); ++j)
+        if (tabs[j] == item) return r;
+    }
+  }
+
+  return 0;
+}
+
+//------------------------------------------------------
+
+int DockLayout::tabStripHeight() const { return DockTabStrip::kHeight; }
+
+//------------------------------------------------------
+
+bool DockLayout::canParticipateInTabGroup(const DockWidget *widget) {
+  if (!widget) return false;
+
+  const QString name = widget->objectName();
+  if (name == QLatin1String("ToolBar") ||
+      name == QLatin1String("CommandBar") ||
+      name == QLatin1String("ToolOptions"))
+    return false;
+
+  if (widget->getFixWidthMode() == DockWidget::fixed) return false;
+
+  // Thin vertical strips that cannot be resized (e.g. main toolbar).
+  if (widget->minimumWidth() == widget->maximumWidth() &&
+      widget->maximumWidth() <= 60)
+    return false;
+
+  // Thin horizontal bars that cannot be resized (command / tool option bars).
+  if (widget->minimumHeight() == widget->maximumHeight() &&
+      widget->maximumHeight() <= 48)
+    return false;
+
+  return true;
+}
+
+//------------------------------------------------------
+
+DockWidget *Region::activeTab() const {
+  if (isTabbed()) {
+    if (m_activeTabIndex >= 0 && m_activeTabIndex < (int)m_tabItems.size())
+      return m_tabItems[m_activeTabIndex];
+    return m_tabItems.empty() ? 0 : m_tabItems.front();
+  }
+  return m_item;
+}
+
+//------------------------------------------------------
+
+void DockLayout::ensureTabStrip(Region *region) {
+  if (!region || !parentWidget()) return;
+
+  if (!region->m_tabStripContainer) {
+    region->m_tabStripContainer = new TabBarContainter(parentWidget());
+    // Reuse the Style Editor / Palette tab styling from the active theme.
+    region->m_tabStripContainer->setObjectName("TabBarContainer");
+
+    QHBoxLayout *tabLayout = new QHBoxLayout(region->m_tabStripContainer);
+    tabLayout->setContentsMargins(6, 0, 0, 0);
+    tabLayout->setSpacing(0);
+
+    region->m_tabStrip =
+        new DockTabStrip(this, region, region->m_tabStripContainer);
+    // Let the strip fill the container so expanding tabs share width equally.
+    tabLayout->addWidget(region->m_tabStrip, 1);
+
+    region->m_tabStripContainer->setFixedHeight(tabStripHeight());
+    region->m_tabStripContainer->hide();
+  }
+  region->m_tabStrip->syncFromRegion();
+}
+
+//------------------------------------------------------
+
+void DockLayout::destroyTabStrip(Region *region) {
+  if (!region || !region->m_tabStripContainer) return;
+  delete region->m_tabStripContainer;
+  region->m_tabStripContainer = 0;
+  region->m_tabStrip          = 0;
+}
+
+//------------------------------------------------------
+
+void DockLayout::updateTabVisibility(Region *region) {
+  if (!region) return;
+
+  const bool tabbed = region->isTabbed();
+  const std::vector<DockWidget *> &tabs = region->tabItems();
+  DockWidget *active                    = region->activeTab();
+
+  for (unsigned int i = 0; i < tabs.size(); ++i) {
+    DockWidget *tab = tabs[i];
+    tab->setDockedAppearance();
+
+    TDockWidget *tdw = qobject_cast<TDockWidget *>(tab);
+    if (tdw && tdw->titleBarWidget())
+      tdw->titleBarWidget()->setVisible(!tabbed);
+
+    if (tabs[i] == active) {
+      if (tabbed) {
+        tabs[i]->show();
+        tabs[i]->raise();
+      }
+    } else if (tabbed) {
+      tabs[i]->hide();
+    }
+  }
+
+  if (tabbed)
+    ensureTabStrip(region);
+  else
+    destroyTabStrip(region);
+}
+
+//------------------------------------------------------
+
+void DockLayout::setActiveTab(Region *region, int index) {
+  if (!region || !region->isTabbed()) return;
+  if (index < 0 || index >= (int)region->tabItems().size()) return;
+
+  region->m_activeTabIndex = index;
+  region->m_item           = region->activeTab();
+  updateTabVisibility(region);
+  applyGeometry();
+  parentWidget()->repaint();
+}
+
+//------------------------------------------------------
+
+void DockLayout::moveTab(Region *region, int fromIndex, int toIndex) {
+  if (!region || !region->isTabbed()) return;
+
+  std::vector<DockWidget *> &tabs = region->m_tabItems;
+  if (fromIndex < 0 || toIndex < 0 || fromIndex >= (int)tabs.size() ||
+      toIndex >= (int)tabs.size() || fromIndex == toIndex)
+    return;
+
+  DockWidget *moved = tabs[fromIndex];
+  tabs.erase(tabs.begin() + fromIndex);
+  tabs.insert(tabs.begin() + toIndex, moved);
+
+  if (region->m_activeTabIndex == fromIndex)
+    region->m_activeTabIndex = toIndex;
+  else if (fromIndex < region->m_activeTabIndex &&
+           toIndex >= region->m_activeTabIndex)
+    region->m_activeTabIndex--;
+  else if (fromIndex > region->m_activeTabIndex &&
+           toIndex <= region->m_activeTabIndex)
+    region->m_activeTabIndex++;
+
+  region->m_item = region->activeTab();
+  if (region->m_tabStrip) region->m_tabStrip->syncFromRegion();
+  updateTabVisibility(region);
+  applyGeometry();
+}
+
+//------------------------------------------------------
+
+void DockLayout::setJoinHighlight(Region *region) {
+  if (!parentWidget() || !region) return;
+
+  m_joinHighlightRegion = region;
+  if (!m_joinHighlight) {
+    // Tool overlay so the frame paints above SubWindow dock panels.
+    m_joinHighlight =
+        new DockJoinHighlight(parentWidget());
+  }
+
+  updateJoinHighlightGeometry();
+  m_joinHighlight->show();
+  m_joinHighlight->raise();
+  m_joinHighlight->update();
+}
+
+//------------------------------------------------------
+
+void DockLayout::clearJoinHighlight() {
+  m_joinHighlightRegion = 0;
+  if (m_joinHighlight) m_joinHighlight->hide();
+}
+
+//------------------------------------------------------
+
+void DockLayout::updateJoinHighlightGeometry() {
+  if (!m_joinHighlight || !m_joinHighlightRegion || !parentWidget()) return;
+
+  // Show the full panel/region size that will actually result from the
+  // merge (matches the pre-tabify behavior), while the underlying hit-test
+  // placeholder (see DockPlaceholder::buildGeometry, tabify case) stays a
+  // narrow title/tab-strip band so it never overlaps the classic split
+  // drop zones. Only this visual frame is enlarged.
+  const QRect local = toRect(m_joinHighlightRegion->getGeometry());
+  m_joinHighlight->setGeometry(
+      QRect(parentWidget()->mapToGlobal(local.topLeft()), local.size()));
+}
+
+//------------------------------------------------------
+
+void DockLayout::restorePanelTitleBar(DockWidget *item) {
+  if (!item) return;
+  TDockWidget *tdw = qobject_cast<TDockWidget *>(item);
+  if (tdw && tdw->titleBarWidget()) {
+    tdw->titleBarWidget()->setVisible(true);
+    tdw->titleBarWidget()->raise();
+  }
+}
+
+//------------------------------------------------------
+
+void DockLayout::restoreSingleDockedPanel(DockWidget *item) {
+  if (!item) return;
+
+  item->setWindowFlags(Qt::SubWindow);
+  item->setDockedAppearance();
+  item->m_floating = false;
+  item->onDock(true);
+
+  // setWindowFlags can re-hide children on Windows; restore title last and
+  // force a visible, raised docked panel so it never stays grey/inert.
+  restorePanelTitleBar(item);
+  if (QLayout *l = item->layout()) l->activate();
+  item->show();
+  item->raise();
+  item->update();
+}
+
+//------------------------------------------------------
+
+void DockLayout::refreshTabbedRegionsVisibility() {
+  for (unsigned int i = 0; i < m_regions.size(); ++i) {
+    if (m_regions[i]->isTabbed()) updateTabVisibility(m_regions[i]);
+  }
+  applyGeometry();
+}
+
+//------------------------------------------------------
+
+bool DockLayout::removeFromTabGroup(DockWidget *item, Region *region,
+                                    bool deferStripDestroy) {
+  if (!region || !region->isTabbed()) return false;
+
+  std::vector<DockWidget *> &tabs = region->m_tabItems;
+  auto it = std::find(tabs.begin(), tabs.end(), item);
+  if (it == tabs.end()) return false;
+
+  int removedIndex = static_cast<int>(it - tabs.begin());
+  tabs.erase(it);
+
+  // Always restore the removed panel's title bar; only undockFromTabGroup
+  // used to do this, leaving orphaned panels without a drag grip.
+  restorePanelTitleBar(item);
+  item->setDockedAppearance();
+  item->show();
+
+  if (tabs.size() <= 1) {
+    DockWidget *remaining = tabs.empty() ? 0 : tabs.front();
+    tabs.clear();
+    region->m_activeTabIndex = 0;
+    region->setItem(remaining);
+    if (deferStripDestroy) {
+      if (region->m_tabStripContainer) region->m_tabStripContainer->hide();
+    } else {
+      destroyTabStrip(region);
+    }
+    if (remaining) restoreSingleDockedPanel(remaining);
+    applyGeometry();
+    if (parentWidget()) parentWidget()->repaint();
+    return true;
+  }
+
+  if (region->m_activeTabIndex > removedIndex)
+    region->m_activeTabIndex--;
+  if (region->m_activeTabIndex >= (int)tabs.size())
+    region->m_activeTabIndex = tabs.size() - 1;
+  if (region->m_activeTabIndex < 0) region->m_activeTabIndex = 0;
+
+  region->m_item = region->activeTab();
+  if (region->m_tabStrip) region->m_tabStrip->syncFromRegion();
+  updateTabVisibility(region);
+  applyGeometry();
+  if (parentWidget()) parentWidget()->repaint();
+  return true;
+}
+
+//------------------------------------------------------
+
+bool DockLayout::undockFromTabGroup(DockWidget *item, Region *region,
+                                    bool deferStripDestroy) {
+  if (!removeFromTabGroup(item, region, deferStripDestroy)) return false;
+
+  restorePanelTitleBar(item);
+
+  item->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint);
+  item->setFloatingAppearance();
+  item->m_floating = true;
+  item->onDock(false);
+  // Title bar can be reset by setWindowFlags on Windows.
+  restorePanelTitleBar(item);
+
+  setMaximized(item, false);
+  redistribute();
+  applyGeometry();
+  if (parentWidget()) parentWidget()->repaint();
+  return true;
+}
+
+//------------------------------------------------------
+
+bool DockLayout::beginTabDragOut(DockWidget *item, Region *region,
+                                 const QPoint &globalPos,
+                                 const QPoint &grabOffsetInTab) {
+  if (!item || !region || !parentWidget()) return false;
+  if (!region->isTabbed()) return false;
+
+  for (int i = 0; i < (int)region->tabItems().size(); ++i) {
+    if (region->tabItems()[i] == item && region->activeTabIndex() != i) {
+      setActiveTab(region, i);
+      break;
+    }
+  }
+
+  if (!undockFromTabGroup(item, region, true)) return false;
+
+  clearJoinHighlight();
+
+  // Destroy the hidden tab strip after this mouse handler returns. Detach
+  // ownership from the region first so Region::~Region and a late timer
+  // callback cannot both delete the same widget.
+  if (!region->isTabbed() && region->m_tabStripContainer) {
+    TabBarContainter *stripContainer = region->m_tabStripContainer;
+    region->m_tabStripContainer      = 0;
+    region->m_tabStrip                 = 0;
+    stripContainer->hide();
+
+    QWidget *host = parentWidget();
+    if (host) {
+      QTimer::singleShot(0, host, [stripContainer]() { delete stripContainer; });
+    } else {
+      delete stripContainer;
+    }
+  }
+
+  item->show();
+  item->raise();
+
+  // The panel's floating appearance (custom title bar + frame margin) is
+  // only fully in place once its layout has been activated. Read the drag
+  // grip's *actual*, current position afterwards - rather than assuming a
+  // fixed margin - so the point grabbed on the tab lands under the cursor
+  // with no drift, however the appearance transition shifted things.
+  if (QLayout *l = item->layout()) l->activate();
+  QWidget *grip = item;
+  if (TDockWidget *tdw = qobject_cast<TDockWidget *>(item))
+    if (QWidget *titleBar = tdw->titleBarWidget()) grip = titleBar;
+  const QPoint gripOffsetInWidget =
+      grip->mapToGlobal(QPoint(0, 0)) - item->mapToGlobal(QPoint(0, 0));
+
+  // Hand off to DockWidget's native floating drag (same as title-bar undock).
+  item->m_undocking           = false;
+  item->m_dragging            = true;
+  item->m_dragMouseInitialPos = globalPos;
+  item->m_dragInitialPos = globalPos - grabOffsetInTab - gripOffsetInWidget;
+  item->move(item->m_dragInitialPos);
+  item->grabMouse();
+
+  if (!getMaximized() && !DockingCheck::instance()->isEnabled())
+    calculateDockPlaceholders(item);
+
+  return true;
+}
+
+//------------------------------------------------------
+
+void DockLayout::tabifyItem(DockWidget *item, Region *region) {
+  if (!item || !region) return;
+  if (!canParticipateInTabGroup(item)) return;
+
+  // Validate before mutating window flags / appearance so a failed join
+  // cannot leave the panel without a title bar or docked margins.
+  if (!region->isTabbed()) {
+    DockWidget *existing = region->getItem();
+    if (!existing || existing == item) return;
+    if (!canParticipateInTabGroup(existing)) return;
+  }
+
+  item->onDock(true);
+  item->setDockedAppearance();
+  item->m_floating    = false;
+  item->m_wasFloating = true;
+  item->setWindowFlags(Qt::SubWindow);
+
+  if (region->isTabbed()) {
+    region->m_tabItems.push_back(item);
+    region->m_activeTabIndex = region->m_tabItems.size() - 1;
+  } else {
+    DockWidget *existing = region->getItem();
+    existing->setDockedAppearance();
+    existing->setWindowFlags(Qt::SubWindow);
+    existing->m_floating = false;
+
+    region->m_tabItems.push_back(existing);
+    region->m_tabItems.push_back(item);
+    region->m_activeTabIndex = 1;
+    region->setItem(0);
+  }
+
+  // Hide title bars and normalize appearance for every member so switching
+  // tabs does not jump between top/bottom content offsets.
+  for (unsigned int t = 0; t < region->m_tabItems.size(); ++t) {
+    DockWidget *tab = region->m_tabItems[t];
+    tab->setDockedAppearance();
+    TDockWidget *tdw = qobject_cast<TDockWidget *>(tab);
+    if (tdw && tdw->titleBarWidget()) tdw->titleBarWidget()->setVisible(false);
+  }
+
+  region->m_item = region->activeTab();
+  ensureTabStrip(region);
+  updateTabVisibility(region);
+  applyGeometry();
+  item->show();
+}
+
+//------------------------------------------------------
+
+void DockLayout::tabifyWithTarget(DockWidget *item, DockWidget *target) {
+  if (!item || !target || item == target) return;
+  if (!canParticipateInTabGroup(item) || !canParticipateInTabGroup(target))
+    return;
+
+  Region *region = find(target);
+
+  // When the target is still floating, dock it beside the panel under its center.
+  if (!region && target->isFloating()) {
+    QPoint layoutPt =
+        parentWidget()->mapFromGlobal(target->geometry().center());
+    DockWidget *anchor = dynamic_cast<DockWidget *>(containerOf(layoutPt));
+    if (anchor && anchor != target) {
+      region = find(anchor);
+      if (region) {
+        if (find(target)) undockItem(target);
+        else {
+          target->onDock(true);
+          target->setDockedAppearance();
+          target->m_floating    = false;
+          target->m_wasFloating = true;
+          target->setWindowFlags(Qt::SubWindow);
+        }
+        tabifyItem(target, region);
+        region = find(target);
+      }
+    }
+
+    if (!region) {
+      dockItemPrivate(target, 0, 0);
+      region = find(target);
+    }
+  }
+
+  if (!region) return;
+
+  Region *itemRegion = find(item);
+  if (itemRegion == region) {
+    const std::vector<DockWidget *> &tabs = region->tabItems();
+    for (unsigned int t = 0; t < tabs.size(); ++t)
+      if (tabs[t] == item) return;
+  }
+
+  if (itemRegion) {
+    if (itemRegion->isTabbed())
+      removeFromTabGroup(item, itemRegion);
+    else if (itemRegion != region)
+      undockItem(item);
+  }
+
+  tabifyItem(item, region);
+  clearJoinHighlight();
+  redistribute();
+  applyGeometry();
+  if (parentWidget()) parentWidget()->repaint();
+}
+
+//------------------------------------------------------
+
+DockWidget *DockLayout::dockWidgetTitleBarAt(const QPoint &globalPos) const {
+  if (!parentWidget()) return 0;
+
+  for (int i = count() - 1; i >= 0; --i) {
+    DockWidget *dw = static_cast<DockWidget *>(itemAt(i)->widget());
+    if (!dw || !canParticipateInTabGroup(dw)) continue;
+
+    QPoint localPos = dw->mapFromGlobal(globalPos);
+    if (dw->rect().contains(localPos) && dw->isDragGrip(localPos)) return dw;
+  }
 
   return 0;
 }
@@ -601,6 +1182,12 @@ void DockLayout::calculateDockPlaceholders(DockWidget *item) {
 
   // If the DockLayout's owner widget is hidden, avoid
   if (!parentWidget()->isVisible()) return;
+
+  // Drop stale region references before deleting placeholder widgets.
+  for (unsigned int ri = 0; ri < m_regions.size(); ++ri)
+    m_regions[ri]->m_placeholders.clear();
+
+  item->clearDockPlaceholders();
 
   if (!m_regions.size()) {
     if (isPossibleInsertion(item, 0, 0)) {
@@ -679,6 +1266,31 @@ void DockLayout::calculateDockPlaceholders(DockWidget *item) {
     }
   }
 
+  // Hover-join placeholders on leaf regions (title bar / tab strip targets).
+  for (i = 0; i < m_regions.size(); ++i) {
+    Region *r = m_regions[i];
+    if (!r->getChildList().empty()) continue;
+    if (!r->getItem() && !r->isTabbed()) continue;
+    if (r->getItem() == item) continue;
+
+    DockWidget *targetWidget =
+        r->isTabbed() ? r->activeTab() : r->getItem();
+    if (!canParticipateInTabGroup(item) ||
+        !canParticipateInTabGroup(targetWidget))
+      continue;
+
+    bool alreadyMember = false;
+    if (r->isTabbed()) {
+      const std::vector<DockWidget *> &tabs = r->tabItems();
+      for (unsigned int t = 0; t < tabs.size(); ++t)
+        if (tabs[t] == item) alreadyMember = true;
+    }
+    if (alreadyMember) continue;
+
+    item->m_placeholders.push_back(item->m_decoAllocator->newPlaceBuilt(
+        item, r, 0, DockPlaceholder::tabify));
+  }
+
   // Disable all placeholders
   // for(i=0; i<item->m_placeholders.size(); ++i)
   //  item->m_placeholders[i]->setDisabled(true);
@@ -693,11 +1305,23 @@ void DockLayout::calculateDockPlaceholders(DockWidget *item) {
 void DockLayout::dockItem(DockWidget *item, DockPlaceholder *place) {
   place->hide();
   item->hide();
-  dockItemPrivate(item, place->m_region, place->m_idx);
-  redistribute();
+
+  if (place->getAttribute() == DockPlaceholder::tabify) {
+    Region *region = place->getParentRegion();
+    DockWidget *target =
+        region ? (region->isTabbed() ? region->activeTab() : region->getItem())
+               : 0;
+    clearJoinHighlight();
+    if (target) tabifyWithTarget(item, target);
+  } else {
+    dockItemPrivate(item, place->m_region, place->m_idx);
+    redistribute();
+    clearJoinHighlight();
+    item->setWindowFlags(Qt::SubWindow);
+    item->show();
+  }
+
   parentWidget()->repaint();
-  item->setWindowFlags(Qt::SubWindow);
-  item->show();
 }
 
 //------------------------------------------------------
@@ -743,6 +1367,29 @@ Region *DockLayout::dockItem(DockWidget *item, Region *r, int idx) {
 
 //------------------------------------------------------
 
+Region *DockLayout::detachTabGroupAsSubRegion(Region *region) {
+  if (!region || !region->isTabbed()) return 0;
+
+  Region *child = new Region(this);
+  child->m_tabItems.swap(region->m_tabItems);
+  child->m_activeTabIndex    = region->m_activeTabIndex;
+  child->m_tabStrip          = region->m_tabStrip;
+  child->m_tabStripContainer = region->m_tabStripContainer;
+  child->m_item              = child->activeTab();
+
+  region->m_tabItems.clear();
+  region->m_activeTabIndex    = 0;
+  region->m_tabStrip          = 0;
+  region->m_tabStripContainer = 0;
+  region->m_item              = 0;
+
+  if (child->m_tabStrip) child->m_tabStrip->rebindRegion(child);
+
+  return child;
+}
+
+//------------------------------------------------------
+
 // Internal docking function. Contains raw docking code, excluded reparenting
 // (setWindowFlags)  which may slow down a bit should be done only
 // after a redistribute() and a repaint() on real-time docking.
@@ -771,6 +1418,14 @@ Region *DockLayout::dockItemPrivate(DockWidget *item, Region *r, int idx) {
     newRoot->insertSubRegion(m_regions[1], 0);
 
     r = newRoot;
+  } else if (r->isTabbed()) {
+    // Split-dock beside/above a tab group: move the whole group as one unit,
+    // not just the active tab (which would orphan the other tabs and corrupt
+    // the region tree).
+    Region *regionForTabs = detachTabGroupAsSubRegion(r);
+    regionForTabs->setSize(toRect(r->getGeometry()).size());
+    r->insertSubRegion(regionForTabs, 0);
+    m_regions.push_back(regionForTabs);
   } else if (r->getItem()) {
     // Then the Layout gets further subdived - r's item has to be moved
     Region *regionForOldItem = r->insertItem(r->getItem(), 0);
@@ -796,6 +1451,7 @@ Region *DockLayout::dockItemPrivate(DockWidget *item, Region *r, int idx) {
 
 //! A region is empty, if contains no item and no children.
 static bool isEmptyRegion(Region *r) {
+  if (r->isTabbed()) return false;
   if ((!r->getItem()) && (r->getChildList().size() == 0)) {
     delete r;  // Well, it's a bit improper, but it works...
     return true;
@@ -823,10 +1479,31 @@ void Region::removeItem(DockWidget *item) {
         if (parent) {
           Region *remainingSon = m_childList[0];
           if (!remainingSon->m_childList.size()) {
-            // remainingSon is a leaf: better keep this and move son's item and
-            // childList
-            setItem(remainingSon->getItem());
-            remainingSon->setItem(0);
+            if (remainingSon->isTabbed()) {
+              // remainingSon is itself a tab group, not a plain single-item
+              // leaf: absorb its whole tab-group state into `this` instead
+              // of just grabbing its active tab. Otherwise the other tabs
+              // and the live tab strip widget become an orphaned "zombie"
+              // Region that keeps lingering in DockLayout::m_regions (seen
+              // as a ghost duplicate/empty tab strip, vanished separators,
+              // and dangling pointers on further docking manipulation).
+              m_tabItems          = remainingSon->m_tabItems;
+              m_activeTabIndex    = remainingSon->m_activeTabIndex;
+              m_tabStrip          = remainingSon->m_tabStrip;
+              m_tabStripContainer = remainingSon->m_tabStripContainer;
+              m_item              = activeTab();
+              if (m_tabStrip) m_tabStrip->rebindRegion(this);
+
+              remainingSon->m_tabItems.clear();
+              remainingSon->m_tabStrip          = 0;
+              remainingSon->m_tabStripContainer = 0;
+              remainingSon->setItem(0);
+            } else {
+              // remainingSon is a plain leaf: better keep this and move
+              // son's item and childList
+              setItem(remainingSon->getItem());
+              remainingSon->setItem(0);
+            }
           } else {
             // remainingSon is a branch: append remainingSon childList to parent
             // one and sign this and remainingSon nodes for destruction.
@@ -874,6 +1551,9 @@ void Region::removeItem(DockWidget *item) {
 bool DockLayout::undockItem(DockWidget *item) {
   // Find item's region index in m_regions
   Region *itemCarrier = find(item);
+  if (!itemCarrier) return false;
+
+  if (itemCarrier->isTabbed()) return undockFromTabGroup(item, itemCarrier);
 
   Region *parent = itemCarrier->getParent();
   if (parent) {
@@ -1072,7 +1752,17 @@ void Region::calculateExtremalSizes() {
 int Region::calculateMinimumSize(bool direction, bool recalcChildren) {
   int sumMinSizes = 0, maxMinSizes = 0;
 
-  if (m_item) {
+  if (isTabbed()) {
+    unsigned int t;
+    int tabBarExtra = (direction == vertical) ? m_owner->tabStripHeight() : 0;
+    for (t = 0; t < m_tabItems.size(); ++t) {
+      int w = m_tabItems[t]->minimumSize().width();
+      int h = m_tabItems[t]->minimumSize().height();
+      if (maxMinSizes < (direction == horizontal ? w : h))
+        maxMinSizes = (direction == horizontal ? w : h);
+    }
+    sumMinSizes = maxMinSizes + tabBarExtra;
+  } else if (m_item) {
     sumMinSizes = maxMinSizes = (direction == horizontal)
                                     ? m_item->minimumSize().width()
                                     : m_item->minimumSize().height();
@@ -1114,7 +1804,17 @@ int Region::calculateMaximumSize(bool direction, bool recalcChildren) {
 
   int sumMaxSizes = 0, minMaxSizes = inf;
 
-  if (m_item) {
+  if (isTabbed()) {
+    unsigned int t;
+    int tabBarExtra = (direction == vertical) ? m_owner->tabStripHeight() : 0;
+    for (t = 0; t < m_tabItems.size(); ++t) {
+      int w = m_tabItems[t]->maximumSize().width();
+      int h = m_tabItems[t]->maximumSize().height();
+      if (minMaxSizes > (direction == horizontal ? w : h))
+        minMaxSizes = (direction == horizontal ? w : h);
+    }
+    sumMaxSizes = minMaxSizes + tabBarExtra;
+  } else if (m_item) {
     sumMaxSizes = minMaxSizes = (direction == horizontal)
                                     ? m_item->maximumSize().width()
                                     : m_item->maximumSize().height();
@@ -1404,6 +2104,16 @@ DockLayout::State DockLayout::saveState() {
 //------------------------------------------------------
 
 void DockLayout::writeRegion(Region *r, QString &hierarchy) {
+  if (r->isTabbed()) {
+    hierarchy.append("{ ");
+    const std::vector<DockWidget *> &tabs = r->tabItems();
+    for (unsigned int t = 0; t < tabs.size(); ++t)
+      hierarchy.append(QString::number(tabs[t]->m_saveIndex) + " ");
+    hierarchy.append("@" + QString::number(r->activeTabIndex()) + " ");
+    hierarchy.append("} ");
+    return;
+  }
+
   DockWidget *item = static_cast<DockWidget *>(r->getItem());
 
   // If Region has item, write it.
@@ -1462,6 +2172,32 @@ bool DockLayout::restoreState(const State &state) {
       if (vars[i] == "]") {
         // End region and get parent
         r = r->getParent();
+      } else if (vars[i] == "{") {
+        newRegion = new Region(this);
+        newHierarchy.push_back(newRegion);
+        newRegion->m_orientation = !orientation;
+        if (r) r->insertSubRegion(newRegion, r->getChildList().size());
+
+        std::vector<int> tabIndices;
+        int activeTab = 0;
+        ++i;
+        while (i < vars.size() && vars[i] != "}") {
+          if (vars[i].startsWith(QLatin1Char('@')))
+            activeTab = vars[i].mid(1).toInt();
+          else
+            tabIndices.push_back(vars[i].toInt());
+          ++i;
+        }
+
+        for (unsigned int t = 0; t < tabIndices.size(); ++t) {
+          DockWidget *tabItem = static_cast<DockWidget *>(
+              m_items[tabIndices[t]]->widget());
+          newRegion->m_tabItems.push_back(tabItem);
+        }
+        newRegion->m_activeTabIndex = activeTab;
+        if (newRegion->m_activeTabIndex >= (int)newRegion->m_tabItems.size())
+          newRegion->m_activeTabIndex = 0;
+        newRegion->m_item = newRegion->activeTab();
       } else {
         // Allocate new Region
         newRegion = new Region(this);
@@ -1514,14 +2250,29 @@ bool DockLayout::restoreState(const State &state) {
   }
 
   // Docked widgets are found in hierarchy
-  for (j = 0; j < m_regions.size(); ++j)
-    if ((item = m_regions[j]->m_item)) {
+  for (j = 0; j < m_regions.size(); ++j) {
+    Region *region = m_regions[j];
+    if (region->isTabbed()) {
+      const std::vector<DockWidget *> &tabs = region->tabItems();
+      for (unsigned int t = 0; t < tabs.size(); ++t) {
+        item = tabs[t];
+        item->setWindowFlags(Qt::SubWindow);
+        item->setDockedAppearance();
+        item->m_floating  = false;
+        item->m_saveIndex = -1;
+        item->show();
+      }
+      ensureTabStrip(region);
+      updateTabVisibility(region);
+    } else if ((item = region->m_item)) {
       item->setWindowFlags(Qt::SubWindow);
       item->setDockedAppearance();
       item->m_floating  = false;
       item->m_saveIndex = -1;
+      restorePanelTitleBar(item);
       item->show();
     }
+  }
 
   // Recover available geometry infos
   // QRect availableRect= QApplication::desktop()->availableGeometry();
@@ -1531,7 +2282,7 @@ bool DockLayout::restoreState(const State &state) {
   for (j = 0; j < m_items.size(); ++j) {
     item = static_cast<DockWidget *>(m_items[j]->widget());
 
-    if (item->m_saveIndex > 0) {
+    if (item->m_saveIndex >= 0) {
       // Ensure that floating panels are not placed in
       // unavailable positions
       if ((geoms[j] & QApplication::desktop()->availableGeometry(item))
@@ -1542,6 +2293,7 @@ bool DockLayout::restoreState(const State &state) {
       item->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint);
       item->setFloatingAppearance();
       item->m_floating = true;
+      restorePanelTitleBar(item);
     }
   }
 
@@ -1553,6 +2305,19 @@ bool DockLayout::restoreState(const State &state) {
       r->insertSeparator(
           m_decoAllocator->newSeparator(this, r->getOrientation(), r));
     }
+  }
+
+  // Hidden tabs may have been saved with stale geometries from before they
+  // were merged. Align every tab in a group to the active tab before the
+  // region tree is rebuilt from leaf widget rects.
+  for (j = 0; j < m_regions.size(); ++j) {
+    Region *region = m_regions[j];
+    if (!region->isTabbed()) continue;
+    DockWidget *active = region->activeTab();
+    if (!active) continue;
+    const QRect ref = active->geometry();
+    const std::vector<DockWidget *> &tabs = region->tabItems();
+    for (unsigned int t = 0; t < tabs.size(); ++t) tabs[t]->setGeometry(ref);
   }
 
   // Calculate regions' geometry starting from leaves (items)
@@ -1602,6 +2367,20 @@ bool DockLayout::restoreState(const State &state) {
 void Region::restoreGeometry() {
   // Applying a head-recursive algorithm to update the geometry of a Region
   // after those of its children have been updated
+  if (isTabbed()) {
+    DockWidget *active = activeTab();
+    if (!active) return;
+
+    // applyGeometry() stores panel widgets below the tab strip. Saved
+    // geometries therefore describe the content rect, not the full region.
+    // Expand upward so restore + applyGeometry land the strip and panels
+    // where they were when the layout was saved.
+    QRect g = active->geometry();
+    g.setTop(g.top() - m_owner->tabStripHeight());
+    setGeometry(g);
+    return;
+  }
+
   if (m_item) {
     // Place item's geometry
     setGeometry(m_item->geometry());

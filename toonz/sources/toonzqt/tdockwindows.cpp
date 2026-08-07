@@ -230,7 +230,12 @@ void TDockWidget::setDockedAppearance() {
 bool TDockWidget::isDragGrip(QPoint p) {
   if (!m_titlebar) return DockWidget::isDragGrip(p);
 
-  return m_titlebar->geometry().contains(p);
+  if (m_titlebar->isVisible()) return m_titlebar->geometry().contains(p);
+
+  // Recovery path: a tab-group bug may leave the title bar hidden on a
+  // standalone / floating panel. Keep the top strip draggable so the panel
+  // is not permanently stuck without a grip.
+  return QRect(0, 0, width(), 18).contains(p);
 }
 
 //----------------------------------------
@@ -356,9 +361,13 @@ TDockPlaceholder::TDockPlaceholder(DockWidget *owner, Region *r, int idx,
     : DockPlaceholder(owner, r, idx, attributes) {
   setAutoFillBackground(true);
 
-  setObjectName("TDockPlaceholder");
+  if (attributes == DockPlaceholder::tabify)
+    setObjectName("TDockTabifyPlaceholder");
+  else
+    setObjectName("TDockPlaceholder");
 
-  setWindowOpacity(0.8);
+  // Tabify targets are highlighted on the panel itself; keep hit area invisible.
+  setWindowOpacity(attributes == DockPlaceholder::tabify ? 0.0 : 0.8);
 }
 
 //----------------------------------------
@@ -474,6 +483,8 @@ void TDockWidget::selectDockPlaceholder(QMouseEvent *me) {
       if (m_selectedPlace) m_selectedPlace->hide();
       if (selected) selected->show();
     }
+
+    if (parentLayout()) parentLayout()->clearJoinHighlight();
 
     m_selectedPlace = selected;
   } else
