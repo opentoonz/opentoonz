@@ -65,8 +65,25 @@ enum ColorSliderAppearance {
 }
 TEnv::IntVar StyleEditorColorSliderAppearance(
     "StyleEditorColorSliderAppearance", RelativeColoredTriangleHandle);
+TEnv::IntVar StyleEditorColorWheelDisplayMode(
+    "StyleEditorColorWheelDisplayMode", static_cast<int>(ColorWheelDisplayMode::Classic));
 
 using namespace StyleEditorGUI;
+
+namespace {
+
+ColorWheelDisplayMode normalizedColorWheelMode(int displayId) {
+  switch (displayId) {
+  case static_cast<int>(ColorWheelDisplayMode::Round):
+  case static_cast<int>(ColorWheelDisplayMode::Hexagonal):
+    return static_cast<ColorWheelDisplayMode>(displayId);
+  case static_cast<int>(ColorWheelDisplayMode::Classic):
+  default:
+    return ColorWheelDisplayMode::Classic;
+  }
+}
+
+}  // namespace
 
 //*****************************************************************************
 //    UndoPaletteChange  definition
@@ -576,6 +593,8 @@ HexagonalColorWheel::HexagonalColorWheel(QWidget *parent)
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   setFocusPolicy(Qt::NoFocus);
   m_currentWheel = none;
+  m_displayMode =
+      (ColorWheelDisplayMode)(int)StyleEditorColorWheelDisplayMode;
   if (Preferences::instance()->isColorCalibrationEnabled())
     m_lutCalibrator = new LutCalibrator();
 }
@@ -648,9 +667,80 @@ void HexagonalColorWheel::initializeGL() {
 
 //-----------------------------------------------------------------------------
 
-void HexagonalColorWheel::resizeGL(int w, int h) {
-  w *= getDevPixRatio();
-  h *= getDevPixRatio();
+void HexagonalColorWheel::hexCornerColor(int cornerIndex, float v, float &r,
+                                         float &g, float &b) {
+  switch (cornerIndex) {
+  case 1:
+    r = 0.0f;
+    g = v;
+    b = 0.0f;
+    break;
+  case 2:
+    r = 0.0f;
+    g = v;
+    b = v;
+    break;
+  case 3:
+    r = 0.0f;
+    g = 0.0f;
+    b = v;
+    break;
+  case 4:
+    r = v;
+    g = 0.0f;
+    b = v;
+    break;
+  case 5:
+    r = v;
+    g = 0.0f;
+    b = 0.0f;
+    break;
+  case 6:
+    r = v;
+    g = v;
+    b = 0.0f;
+    break;
+  default:
+    r = g = b = v;
+    break;
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void HexagonalColorWheel::computeHexVertices() {
+  m_hexTriHeight = m_hexEdgeLen * 0.866f;
+  m_wp[0].setX(m_hexEdgeLen);
+  m_wp[0].setY(m_hexTriHeight);
+  m_wp[1].setX(m_hexEdgeLen * 0.5f);
+  m_wp[1].setY(0.0f);
+  m_wp[2].setX(0.0f);
+  m_wp[2].setY(m_hexTriHeight);
+  m_wp[3].setX(m_hexEdgeLen * 0.5f);
+  m_wp[3].setY(m_hexTriHeight * 2.0f);
+  m_wp[4].setX(m_hexEdgeLen * 1.5f);
+  m_wp[4].setY(m_hexTriHeight * 2.0f);
+  m_wp[5].setX(m_hexEdgeLen * 2.0f);
+  m_wp[5].setY(m_hexTriHeight);
+  m_wp[6].setX(m_hexEdgeLen * 1.5f);
+  m_wp[6].setY(0.0f);
+}
+
+//-----------------------------------------------------------------------------
+
+void HexagonalColorWheel::computeInnerHexVertices() {
+  for (int i = 0; i < 7; ++i) {
+    if (i == 0) {
+      m_innerWp[0] = m_wp[0];
+      continue;
+    }
+    m_innerWp[i] = m_wp[0] + (m_wp[i] - m_wp[0]) * m_ringInnerScale;
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void HexagonalColorWheel::computeClassicLayout(int w, int h) {
   float d                 = (w - 5.0f) / 2.5f;
   bool isHorizontallyLong = ((d * 1.732f) < h) ? false : true;
 
@@ -666,21 +756,8 @@ void HexagonalColorWheel::resizeGL(int w, int h) {
     m_wheelPosition.setY(((float)h - (m_triHeight * 2.0f)) / 2.0f);
   }
 
-  // set all vertices positions
-  m_wp[0].setX(m_triEdgeLen);
-  m_wp[0].setY(m_triHeight);
-  m_wp[1].setX(m_triEdgeLen * 0.5f);
-  m_wp[1].setY(0.0f);
-  m_wp[2].setX(0.0f);
-  m_wp[2].setY(m_triHeight);
-  m_wp[3].setX(m_triEdgeLen * 0.5f);
-  m_wp[3].setY(m_triHeight * 2.0f);
-  m_wp[4].setX(m_triEdgeLen * 1.5f);
-  m_wp[4].setY(m_triHeight * 2.0f);
-  m_wp[5].setX(m_triEdgeLen * 2.0f);
-  m_wp[5].setY(m_triHeight);
-  m_wp[6].setX(m_triEdgeLen * 1.5f);
-  m_wp[6].setY(0.0f);
+  m_hexEdgeLen = m_triEdgeLen;
+  computeHexVertices();
 
   m_leftp[0].setX(m_wp[6].x() + 5.0f);
   m_leftp[0].setY(0.0f);
@@ -688,6 +765,90 @@ void HexagonalColorWheel::resizeGL(int w, int h) {
   m_leftp[1].setY(m_triHeight * 2.0f);
   m_leftp[2].setX(m_leftp[1].x());
   m_leftp[2].setY(0.0f);
+}
+
+//-----------------------------------------------------------------------------
+
+void HexagonalColorWheel::computeRoundSVTriangle() {
+  float R  = m_innerRadius;
+  float cx = m_circleCenter.x();
+  float cy = m_circleCenter.y();
+  auto onCircle = [&](float deg) {
+    float rad = deg / 180.0f * 3.1415f;
+    return QPointF(cx + R * cosf(rad), cy - R * sinf(rad));
+  };
+  // OpenToonz SV corners on the inner circle, symmetric equilateral layout:
+  // hue top-left, white top-right, black bottom (like AdvancedColorSelector)
+  m_leftp[0] = onCircle(150.0f);
+  m_leftp[2] = onCircle(30.0f);
+  m_leftp[1] = onCircle(270.0f);
+  m_triEdgeLen = (float)QLineF(m_leftp[0], m_leftp[2]).length();
+  m_triHeight  = (float)QLineF(m_leftp[1], m_circleCenter).length();
+}
+
+//-----------------------------------------------------------------------------
+
+void HexagonalColorWheel::computeRoundLayout(int w, int h) {
+  float avail = std::min((float)w, (float)h);
+  float margin = avail * 0.03f;
+  m_outerRadius = (avail - margin * 2.0f) * 0.5f;
+  // ring band ~15% of outer radius
+  m_innerRadius = m_outerRadius * 0.85f;
+
+  float localSize = m_outerRadius * 2.0f;
+  m_wheelPosition.setX((w - localSize) * 0.5f);
+  m_wheelPosition.setY((h - localSize) * 0.5f);
+
+  m_circleCenter.setX(m_outerRadius);
+  m_circleCenter.setY(m_outerRadius);
+  m_wp[0] = m_circleCenter;
+
+  computeRoundSVTriangle();
+}
+
+//-----------------------------------------------------------------------------
+
+void HexagonalColorWheel::computeHexagonalLayout(int w, int h) {
+  computeClassicLayout(w, h);
+  m_ringInnerScale = 0.72f;
+}
+
+//-----------------------------------------------------------------------------
+
+void HexagonalColorWheel::updateLayout(int w, int h) {
+  switch (m_displayMode) {
+  case ColorWheelDisplayMode::Round:
+    computeRoundLayout(w, h);
+    break;
+  case ColorWheelDisplayMode::Hexagonal:
+    computeHexagonalLayout(w, h);
+    computeInnerHexVertices();
+    break;
+  case ColorWheelDisplayMode::Classic:
+  default:
+    computeClassicLayout(w, h);
+    break;
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void HexagonalColorWheel::setDisplayMode(ColorWheelDisplayMode mode) {
+  if (m_displayMode == mode) return;
+  m_displayMode = mode;
+  int lw = width() * getDevPixRatio();
+  int lh = height() * getDevPixRatio();
+  if (lw > 0 && lh > 0) updateLayout(lw, lh);
+  update();
+}
+
+//-----------------------------------------------------------------------------
+
+void HexagonalColorWheel::resizeGL(int w, int h) {
+  w *= getDevPixRatio();
+  h *= getDevPixRatio();
+
+  updateLayout(w, h);
 
   // GL settings
   glViewport(0, 0, w, h);
@@ -700,6 +861,100 @@ void HexagonalColorWheel::resizeGL(int w, int h) {
     if (m_fbo) delete m_fbo;
     m_fbo = new QOpenGLFramebufferObject(w, h);
   }
+}
+
+//-----------------------------------------------------------------------------
+
+void HexagonalColorWheel::drawClassicHexWheel(float v) {
+  glBegin(GL_TRIANGLE_FAN);
+  glColor3f(v, v, v);
+  glVertex2f(m_wp[0].x(), m_wp[0].y());
+
+  for (int i = 1; i <= 6; ++i) {
+    float r, g, b;
+    hexCornerColor(i, v, r, g, b);
+    glColor3f(r, g, b);
+    glVertex2f(m_wp[i].x(), m_wp[i].y());
+  }
+  float r, g, b;
+  hexCornerColor(1, v, r, g, b);
+  glColor3f(r, g, b);
+  glVertex2f(m_wp[1].x(), m_wp[1].y());
+  glEnd();
+}
+
+//-----------------------------------------------------------------------------
+
+void HexagonalColorWheel::drawCircularHueRing() {
+  const int segs = 120;
+  float cx = m_circleCenter.x();
+  float cy = m_circleCenter.y();
+  for (int i = 0; i < segs; ++i) {
+    float a0 = (float)i / (float)segs * 360.0f;
+    float a1 = (float)(i + 1) / (float)segs * 360.0f;
+    QColor c0 = QColor::fromHsv((int)a0 % 360, 255, 255);
+    QColor c1 = QColor::fromHsv((int)a1 % 360, 255, 255);
+    float r0 = a0 / 180.0f * 3.1415f;
+    float r1 = a1 / 180.0f * 3.1415f;
+    glBegin(GL_QUADS);
+    glColor3f(c0.redF(), c0.greenF(), c0.blueF());
+    glVertex2f(cx + m_outerRadius * cosf(r0), cy - m_outerRadius * sinf(r0));
+    glColor3f(c1.redF(), c1.greenF(), c1.blueF());
+    glVertex2f(cx + m_outerRadius * cosf(r1), cy - m_outerRadius * sinf(r1));
+    glColor3f(c1.redF(), c1.greenF(), c1.blueF());
+    glVertex2f(cx + m_innerRadius * cosf(r1), cy - m_innerRadius * sinf(r1));
+    glColor3f(c0.redF(), c0.greenF(), c0.blueF());
+    glVertex2f(cx + m_innerRadius * cosf(r0), cy - m_innerRadius * sinf(r0));
+    glEnd();
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void HexagonalColorWheel::drawHueRing() {
+  for (int i = 1; i <= 6; ++i) {
+    int next = (i == 6) ? 1 : i + 1;
+    float r0, g0, b0, r1, g1, b1;
+    hexCornerColor(i, 1.0f, r0, g0, b0);
+    hexCornerColor(next, 1.0f, r1, g1, b1);
+    glBegin(GL_QUADS);
+    glColor3f(r0, g0, b0);
+    glVertex2f(m_wp[i].x(), m_wp[i].y());
+    glColor3f(r1, g1, b1);
+    glVertex2f(m_wp[next].x(), m_wp[next].y());
+    glColor3f(r1, g1, b1);
+    glVertex2f(m_innerWp[next].x(), m_innerWp[next].y());
+    glColor3f(r0, g0, b0);
+    glVertex2f(m_innerWp[i].x(), m_innerWp[i].y());
+    glEnd();
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void HexagonalColorWheel::drawInnerHexBackground() {
+  QColor const color = getBGColor();
+  glColor4f(color.redF(), color.greenF(), color.blueF(), color.alphaF());
+  glBegin(GL_TRIANGLE_FAN);
+  glVertex2f(m_innerWp[0].x(), m_innerWp[0].y());
+  for (int i = 1; i <= 6; ++i)
+    glVertex2f(m_innerWp[i].x(), m_innerWp[i].y());
+  glVertex2f(m_innerWp[1].x(), m_innerWp[1].y());
+  glEnd();
+}
+
+//-----------------------------------------------------------------------------
+
+void HexagonalColorWheel::drawSatValueTriangle() {
+  QColor hueCol = QColor().fromHsv(m_color.getValue(eHue), 255, 255);
+  glBegin(GL_TRIANGLES);
+  glColor3f(hueCol.redF(), hueCol.greenF(), hueCol.blueF());
+  glVertex2f(m_leftp[0].x(), m_leftp[0].y());
+  glColor3f(0.0f, 0.0f, 0.0f);
+  glVertex2f(m_leftp[1].x(), m_leftp[1].y());
+  glColor3f(1.0f, 1.0f, 1.0f);
+  glVertex2f(m_leftp[2].x(), m_leftp[2].y());
+  glEnd();
 }
 
 //-----------------------------------------------------------------------------
@@ -719,48 +974,119 @@ void HexagonalColorWheel::paintGL() {
   float v = (float)m_color.getValue(eValue) / 100.0f;
 
   glPushMatrix();
-
-  // draw hexagonal color wheel
   glTranslatef(m_wheelPosition.rx(), m_wheelPosition.ry(), 0.0f);
-  glBegin(GL_TRIANGLE_FAN);
-  glColor3f(v, v, v);
-  glVertex2f(m_wp[0].x(), m_wp[0].y());
 
-  glColor3f(0.0f, v, 0.0f);
-  glVertex2f(m_wp[1].x(), m_wp[1].y());
-  glColor3f(0.0f, v, v);
-  glVertex2f(m_wp[2].x(), m_wp[2].y());
-  glColor3f(0.0f, 0.0f, v);
-  glVertex2f(m_wp[3].x(), m_wp[3].y());
-  glColor3f(v, 0.0f, v);
-  glVertex2f(m_wp[4].x(), m_wp[4].y());
-  glColor3f(v, 0.0f, 0.0f);
-  glVertex2f(m_wp[5].x(), m_wp[5].y());
-  glColor3f(v, v, 0.0f);
-  glVertex2f(m_wp[6].x(), m_wp[6].y());
-  glColor3f(0.0f, v, 0.0f);
-  glVertex2f(m_wp[1].x(), m_wp[1].y());
-  glEnd();
+  switch (m_displayMode) {
+  case ColorWheelDisplayMode::Round:
+    drawCircularHueRing();
+    drawSatValueTriangle();
+    break;
+  case ColorWheelDisplayMode::Hexagonal:
+    drawHueRing();
+    drawInnerHexBackground();
+    drawSatValueTriangle();
+    break;
+  case ColorWheelDisplayMode::Classic:
+  default:
+    drawClassicHexWheel(v);
+    drawSatValueTriangle();
+    break;
+  }
 
-  QColor leftCol = QColor().fromHsv(m_color.getValue(eHue), 255, 255);
-
-  // draw triangle color picker
-  glBegin(GL_TRIANGLES);
-  glColor3f(leftCol.redF(), leftCol.greenF(), leftCol.blueF());
-  glVertex2f(m_leftp[0].x(), m_leftp[0].y());
-  glColor3f(0.0f, 0.0f, 0.0f);
-  glVertex2f(m_leftp[1].x(), m_leftp[1].y());
-  glColor3f(1.0f, 1.0f, 1.0f);
-  glVertex2f(m_leftp[2].x(), m_leftp[2].y());
-  glEnd();
-
-  // draw small quad at current color position
   drawCurrentColorMark();
-
   glPopMatrix();
 
   if (m_lutCalibrator && m_lutCalibrator->isValid())
     m_lutCalibrator->onEndDraw(m_fbo);
+}
+
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+
+bool HexagonalColorWheel::svTriangleBarycentric(const QPointF &p,
+                                                const QPointF &hueV,
+                                                const QPointF &blackV,
+                                                const QPointF &whiteV,
+                                                float &wHue, float &wBlack,
+                                                float &wWhite) {
+  QPointF v0 = whiteV - hueV;
+  QPointF v1 = blackV - hueV;
+  QPointF v2 = p - hueV;
+  float dot00 = QPointF::dotProduct(v0, v0);
+  float dot01 = QPointF::dotProduct(v0, v1);
+  float dot02 = QPointF::dotProduct(v0, v2);
+  float dot11 = QPointF::dotProduct(v1, v1);
+  float dot12 = QPointF::dotProduct(v1, v2);
+  float denom = dot00 * dot11 - dot01 * dot01;
+  // Only fail for a degenerate triangle. Outside points still get weights so
+  // callers can clamp/renormalize onto the triangle instead of jumping to black.
+  if (fabs(denom) < 1e-6f) return false;
+  float invDenom = 1.0f / denom;
+  wWhite         = (dot11 * dot02 - dot01 * dot12) * invDenom;
+  wBlack         = (dot00 * dot12 - dot01 * dot02) * invDenom;
+  wHue           = 1.0f - wWhite - wBlack;
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+
+void HexagonalColorWheel::svFromTrianglePoint(const QPointF &localPos, int &s,
+                                              int &v) const {
+  float wHue, wBlack, wWhite;
+  if (!svTriangleBarycentric(localPos, m_leftp[0], m_leftp[1], m_leftp[2], wHue,
+                             wBlack, wWhite)) {
+    // Degenerate triangle: keep the current color.
+    s = m_color.getValue(eSaturation);
+    v = m_color.getValue(eValue);
+    return;
+  }
+  wHue   = std::max(0.0f, wHue);
+  wBlack = std::max(0.0f, wBlack);
+  wWhite = std::max(0.0f, wWhite);
+  float sum = wHue + wBlack + wWhite;
+  if (sum > 0.0f) {
+    wHue /= sum;
+    wBlack /= sum;
+    wWhite /= sum;
+  }
+  // HSV from triangle weights: Value = wHue + wWhite, Saturation = wHue / Value
+  const float value = std::min(std::max(wHue + wWhite, 0.0f), 1.0f);
+  const float saturation =
+      (value > 1e-6f) ? std::min(std::max(wHue / value, 0.0f), 1.0f) : 0.0f;
+  s = (int)(saturation * 100.0f + 0.5f);
+  v = (int)(value * 100.0f + 0.5f);
+}
+
+//-----------------------------------------------------------------------------
+
+QPointF HexagonalColorWheel::svTriangleMarkerPos(float s, float v) const {
+  const float S = s / 100.0f;
+  const float V = v / 100.0f;
+  // Full-hue / white / black triangle weights for HSV (S, V)
+  const float wHue   = S * V;
+  const float wWhite = (1.0f - S) * V;
+  const float wBlack = 1.0f - V;
+  return wHue * m_leftp[0] + wBlack * m_leftp[1] + wWhite * m_leftp[2];
+}
+
+//-----------------------------------------------------------------------------
+
+void HexagonalColorWheel::drawHueRingBaton(int hue, float innerDist,
+                                           float outerDist,
+                                           const QPointF &center) {
+  float rad       = (float)hue / 180.0f * 3.1415f;
+  float halfAngle = 2.2f / std::max(outerDist, 1.0f);
+  float r0        = rad - halfAngle;
+  float r1        = rad + halfAngle;
+  float cx        = center.x();
+  float cy        = center.y();
+  glBegin(GL_LINE_LOOP);
+  glVertex2f(cx + innerDist * cosf(r0), cy - innerDist * sinf(r0));
+  glVertex2f(cx + outerDist * cosf(r0), cy - outerDist * sinf(r0));
+  glVertex2f(cx + outerDist * cosf(r1), cy - outerDist * sinf(r1));
+  glVertex2f(cx + innerDist * cosf(r1), cy - innerDist * sinf(r1));
+  glEnd();
 }
 
 //-----------------------------------------------------------------------------
@@ -775,35 +1101,53 @@ void HexagonalColorWheel::drawCurrentColorMark() {
   s = (float)m_color.getValue(eSaturation) / 100.0f;
   v = (float)m_color.getValue(eValue) / 100.0f;
 
-  // d is a distance from a center of the wheel
-  float d, phi;
-  phi = (float)(h % 60 - 30) / 180.0f * 3.1415f;
-  d   = s * m_triHeight / cosf(phi);
-
-  // set marker color
   if (v > 0.4f)
     glColor3f(0.0f, 0.0f, 0.0f);
   else
     glColor3f(1.0f, 1.0f, 1.0f);
 
-  // draw marker (in the wheel)
-  glPushMatrix();
-  glTranslatef(m_wp[0].x(), m_wp[0].y(), 0.1f);
-  glRotatef(h, 0.0, 0.0, 1.0);
-  glTranslatef(d, 0.0f, 0.0f);
-  glRotatef(-h, 0.0, 0.0, 1.0);
-  glBegin(GL_LINE_LOOP);
-  glVertex2f(-3, -3);
-  glVertex2f(3, -3);
-  glVertex2f(3, 3);
-  glVertex2f(-3, 3);
-  glEnd();
-  glPopMatrix();
+  int hue = m_color.getValue(eHue);
+
+  // draw marker (in the wheel or hue ring)
+  if (m_displayMode == ColorWheelDisplayMode::Classic) {
+    glPushMatrix();
+    float phi = (float)(h % 60 - 30) / 180.0f * 3.1415f;
+    float d   = s * m_hexTriHeight / cosf(phi);
+    glTranslatef(m_wp[0].x(), m_wp[0].y(), 0.1f);
+    glRotatef(h, 0.0, 0.0, 1.0);
+    glTranslatef(d, 0.0f, 0.0f);
+    glRotatef(-h, 0.0, 0.0, 1.0);
+    glBegin(GL_LINE_LOOP);
+    glVertex2f(-3, -3);
+    glVertex2f(3, -3);
+    glVertex2f(3, 3);
+    glVertex2f(-3, 3);
+    glEnd();
+    glPopMatrix();
+  } else if (m_displayMode == ColorWheelDisplayMode::Round) {
+    drawHueRingBaton(hue, m_innerRadius, m_outerRadius, m_circleCenter);
+  } else {
+    float phi    = (float)(h % 60 - 30) / 180.0f * 3.1415f;
+    float outerD = m_hexTriHeight / cosf(phi);
+    float innerD = outerD * m_ringInnerScale;
+    glPushMatrix();
+    glTranslatef(m_wp[0].x(), m_wp[0].y(), 0.1f);
+    glRotatef(h, 0.0, 0.0, 1.0);
+    glBegin(GL_LINE_LOOP);
+    glVertex2f(innerD, -3.5f);
+    glVertex2f(outerD, -3.5f);
+    glVertex2f(outerD, 3.5f);
+    glVertex2f(innerD, 3.5f);
+    glEnd();
+    glPopMatrix();
+  }
 
   // draw marker (in the triangle)
+  QPointF marker =
+      svTriangleMarkerPos((float)m_color.getValue(eSaturation),
+                          (float)m_color.getValue(eValue));
   glPushMatrix();
-  glTranslatef(m_leftp[1].x(), m_leftp[1].y(), 0.1f);
-  glTranslatef(-m_triEdgeLen * v * s, -m_triHeight * v * 2.0f, 0.0f);
+  glTranslatef(marker.x(), marker.y(), 0.1f);
   glBegin(GL_LINE_LOOP);
   glVertex2f(-3, -3);
   glVertex2f(3, -3);
@@ -815,35 +1159,73 @@ void HexagonalColorWheel::drawCurrentColorMark() {
 
 //-----------------------------------------------------------------------------
 
-void HexagonalColorWheel::mousePressEvent(QMouseEvent *event) {
-  if (~event->buttons() & Qt::LeftButton) return;
-
-  // check whether the mouse cursor is in the wheel or in the triangle (or
-  // nothing).
-  QPoint curPos = event->pos() * getDevPixRatio();
-
+bool HexagonalColorWheel::isInClassicWheel(const QPoint &pos) const {
   QPolygonF wheelPolygon;
-  // in the case of the wheel
   wheelPolygon << m_wp[1] << m_wp[2] << m_wp[3] << m_wp[4] << m_wp[5]
                << m_wp[6];
   wheelPolygon.translate(m_wheelPosition);
-  if (wheelPolygon.toPolygon().containsPoint(curPos, Qt::OddEvenFill)) {
-    m_currentWheel = leftWheel;
-    clickLeftWheel(curPos);
-    return;
-  }
+  return wheelPolygon.toPolygon().containsPoint(pos, Qt::OddEvenFill);
+}
 
-  wheelPolygon.clear();
-  // in the case of the triangle
-  wheelPolygon << m_leftp[0] << m_leftp[1] << m_leftp[2];
-  wheelPolygon.translate(m_wheelPosition);
-  if (wheelPolygon.toPolygon().containsPoint(curPos, Qt::OddEvenFill)) {
+//-----------------------------------------------------------------------------
+
+bool HexagonalColorWheel::isInCircularHueRing(const QPoint &pos) const {
+  QPointF local = QPointF(pos) - m_wheelPosition;
+  float dist    = QLineF(m_circleCenter, local).length();
+  return dist >= m_innerRadius && dist <= m_outerRadius;
+}
+
+//-----------------------------------------------------------------------------
+
+bool HexagonalColorWheel::isInHueRing(const QPoint &pos) const {
+  if (isInTriangle(pos)) return false;
+  if (m_displayMode == ColorWheelDisplayMode::Round)
+    return isInCircularHueRing(pos);
+  if (m_displayMode == ColorWheelDisplayMode::Classic) return isInClassicWheel(pos);
+
+  if (!isInClassicWheel(pos)) return false;
+
+  QPolygonF innerPolygon;
+  innerPolygon << m_innerWp[1] << m_innerWp[2] << m_innerWp[3] << m_innerWp[4]
+               << m_innerWp[5] << m_innerWp[6];
+  innerPolygon.translate(m_wheelPosition);
+  return !innerPolygon.toPolygon().containsPoint(pos, Qt::OddEvenFill);
+}
+
+//-----------------------------------------------------------------------------
+
+bool HexagonalColorWheel::isInTriangle(const QPoint &pos) const {
+  QPolygonF triPolygon;
+  triPolygon << m_leftp[0] << m_leftp[1] << m_leftp[2];
+  triPolygon.translate(m_wheelPosition);
+  return triPolygon.toPolygon().containsPoint(pos, Qt::OddEvenFill);
+}
+
+//-----------------------------------------------------------------------------
+
+void HexagonalColorWheel::mousePressEvent(QMouseEvent *event) {
+  if (~event->buttons() & Qt::LeftButton) return;
+
+  QPoint curPos = event->pos() * getDevPixRatio();
+
+  if (isInTriangle(curPos)) {
     m_currentWheel = rightTriangle;
     clickRightTriangle(curPos);
     return;
   }
 
-  //... or, in the case of nothing
+  if (m_displayMode == ColorWheelDisplayMode::Classic) {
+    if (isInClassicWheel(curPos)) {
+      m_currentWheel = leftWheel;
+      clickLeftWheel(curPos);
+      return;
+    }
+  } else if (isInHueRing(curPos)) {
+    m_currentWheel = leftWheel;
+    clickHueRing(curPos);
+    return;
+  }
+
   m_currentWheel = none;
 }
 
@@ -855,7 +1237,10 @@ void HexagonalColorWheel::mouseMoveEvent(QMouseEvent *event) {
   case none:
     break;
   case leftWheel:
-    clickLeftWheel(event->pos() * getDevPixRatio());
+    if (m_displayMode == ColorWheelDisplayMode::Classic)
+      clickLeftWheel(event->pos() * getDevPixRatio());
+    else
+      clickHueRing(event->pos() * getDevPixRatio());
     break;
   case rightTriangle:
     clickRightTriangle(event->pos() * getDevPixRatio());
@@ -871,6 +1256,33 @@ void HexagonalColorWheel::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 //-----------------------------------------------------------------------------
+
+void HexagonalColorWheel::clickHueRing(const QPoint &pos) {
+  QPointF center = (m_displayMode == ColorWheelDisplayMode::Round)
+                       ? m_circleCenter + m_wheelPosition
+                       : m_wp[0] + m_wheelPosition;
+
+  int hue;
+  if (m_displayMode == ColorWheelDisplayMode::Round) {
+    QPointF d = QPointF(pos) - center;
+    float theta = atan2f(-d.y(), d.x()) * 180.0f / 3.1415f;
+    if (theta < 0.0f) theta += 360.0f;
+    hue = (int)(theta + 0.5f);
+  } else {
+    QLineF p(center, QPointF(pos));
+    QLineF horizontal(0, 0, 1, 0);
+    float theta =
+        (p.dy() >= 0) ? horizontal.angleTo(p) : 360 - p.angleTo(horizontal);
+    hue = (int)theta;
+  }
+  if (hue > 359) hue = 359;
+
+  m_color.setValue(eHue, hue);
+  emit colorChanged(m_color, true);
+}
+
+//-----------------------------------------------------------------------------
+
 /*! compute hue and saturation position. saturation value must be clamped
  */
 void HexagonalColorWheel::clickLeftWheel(const QPoint &pos) {
@@ -882,7 +1294,7 @@ void HexagonalColorWheel::clickLeftWheel(const QPoint &pos) {
   while (phi >= 60.0f) phi -= 60.0f;
   phi -= 30.0f;
   // d is a length from center to edge of the wheel when saturation = 100
-  float d = m_triHeight / cosf(phi / 180.0f * 3.1415f);
+  float d = m_hexTriHeight / cosf(phi / 180.0f * 3.1415f);
 
   int h = (int)theta;
   if (h > 359) h = 359;
@@ -897,18 +1309,11 @@ void HexagonalColorWheel::clickLeftWheel(const QPoint &pos) {
 //-----------------------------------------------------------------------------
 
 void HexagonalColorWheel::clickRightTriangle(const QPoint &pos) {
+  QPointF local = QPointF(pos) - m_wheelPosition;
   int s, v;
-  QPointF p = m_leftp[1] + m_wheelPosition - QPointF(pos);
-  if (p.ry() <= 0.0f) {
-    s = 0;
-    v = 0;
-  } else {
-    float v_ratio = std::min((float)(p.ry() / (m_triHeight * 2.0f)), 1.0f);
-    float s_f     = p.rx() / (m_triEdgeLen * v_ratio);
-    v             = (int)(v_ratio * 100.0f);
-    s             = (int)(std::min(std::max(s_f, 0.0f), 1.0f) * 100.0f);
-  }
-  m_color.setValues(eHue, s, v);
+  svFromTrianglePoint(local, s, v);
+  m_color.setValue(eSaturation, s);
+  m_color.setValue(eValue, v);
   emit colorChanged(m_color, true);
 }
 
@@ -1787,6 +2192,18 @@ void PlainColorPage::updateColorCalibration() {
     m_hexagonalColorWheel->updateColorCalibration();
   else
     m_hexagonalColorWheel->cueCalibrationUpdate();
+}
+
+//-----------------------------------------------------------------------------
+
+void PlainColorPage::setColorWheelDisplayMode(ColorWheelDisplayMode mode) {
+  m_hexagonalColorWheel->setDisplayMode(mode);
+}
+
+//-----------------------------------------------------------------------------
+
+ColorWheelDisplayMode PlainColorPage::colorWheelDisplayMode() const {
+  return m_hexagonalColorWheel->displayMode();
 }
 
 //-----------------------------------------------------------------------------
@@ -3090,6 +3507,38 @@ QFrame *StyleEditor::createBottomWidget() {
   appearanceSubMenu->addAction(relColorAct);
   appearanceSubMenu->addAction(absColorAct);
 
+  m_colorWheelDisplayModeAG = new QActionGroup(this);
+  QAction *classicWheelAct = new QAction(tr("Classic"), this);
+  QAction *roundWheelAct = new QAction(tr("Round"), this);
+  QAction *hexagonalWheelAct = new QAction(tr("Hexagonal"), this);
+  classicWheelAct->setData(static_cast<int>(ColorWheelDisplayMode::Classic));
+  roundWheelAct->setData(static_cast<int>(ColorWheelDisplayMode::Round));
+  hexagonalWheelAct->setData(static_cast<int>(ColorWheelDisplayMode::Hexagonal));
+  classicWheelAct->setCheckable(true);
+  roundWheelAct->setCheckable(true);
+  hexagonalWheelAct->setCheckable(true);
+  switch ((ColorWheelDisplayMode)(int)StyleEditorColorWheelDisplayMode) {
+  case ColorWheelDisplayMode::Round:
+    roundWheelAct->setChecked(true);
+    break;
+  case ColorWheelDisplayMode::Hexagonal:
+    hexagonalWheelAct->setChecked(true);
+    break;
+  case ColorWheelDisplayMode::Classic:
+  default:
+    classicWheelAct->setChecked(true);
+    break;
+  }
+  m_colorWheelDisplayModeAG->addAction(classicWheelAct);
+  m_colorWheelDisplayModeAG->addAction(roundWheelAct);
+  m_colorWheelDisplayModeAG->addAction(hexagonalWheelAct);
+  m_colorWheelDisplayModeAG->setExclusive(true);
+  menu->addSeparator();
+  QMenu *wheelDisplaySubMenu = menu->addMenu(tr("Wheel Shape"));
+  wheelDisplaySubMenu->addAction(classicWheelAct);
+  wheelDisplaySubMenu->addAction(roundWheelAct);
+  wheelDisplaySubMenu->addAction(hexagonalWheelAct);
+
   m_toggleOrientationAction =
       new QAction(createQIcon("orientation_h"), tr("Toggle Orientation"), this);
   menu->addAction(m_toggleOrientationAction);
@@ -3179,6 +3628,8 @@ QFrame *StyleEditor::createBottomWidget() {
                        SLOT(updateOrientationButton()));
   ret = ret && connect(m_sliderAppearanceAG, SIGNAL(triggered(QAction *)), this,
                        SLOT(onSliderAppearanceSelected(QAction *)));
+  ret = ret && connect(m_colorWheelDisplayModeAG, SIGNAL(triggered(QAction *)),
+                       this, SLOT(onColorWheelDisplayModeSelected(QAction *)));
   ret = ret && connect(menu, SIGNAL(aboutToShow()), this,
                        SLOT(onPopupMenuAboutToShow()));
   assert(ret);
@@ -3487,6 +3938,11 @@ void StyleEditor::showEvent(QShowEvent *) {
   onSearchVisible(m_searchAction->isChecked());
   updateOrientationButton();
   assert(ret);
+
+  // Keep this pane's wheel shape in sync with the user preference (TEnv),
+  // e.g. after room switches or when another Style Editor changed the mode.
+  m_plainColorPage->setColorWheelDisplayMode(normalizedColorWheelMode(
+      static_cast<int>(StyleEditorColorWheelDisplayMode)));
 }
 
 //-----------------------------------------------------------------------------
@@ -4091,6 +4547,20 @@ void StyleEditor::onSliderAppearanceSelected(QAction *action) {
 
 //-----------------------------------------------------------------------------
 
+void StyleEditor::onColorWheelDisplayModeSelected(QAction *action) {
+  bool ok       = false;
+  int displayId = action->data().toInt(&ok);
+  if (!ok) return;
+
+  // Always apply to this pane, even if TEnv already stores the same mode
+  // (another Style Editor may still be showing a different shape).
+  const ColorWheelDisplayMode mode = normalizedColorWheelMode(displayId);
+  StyleEditorColorWheelDisplayMode = static_cast<int>(mode);
+  m_plainColorPage->setColorWheelDisplayMode(mode);
+}
+
+//-----------------------------------------------------------------------------
+
 void StyleEditor::onPopupMenuAboutToShow() {
   // sync radio button state to the current user env settings
   for (auto action : m_sliderAppearanceAG->actions()) {
@@ -4098,5 +4568,12 @@ void StyleEditor::onPopupMenuAboutToShow() {
     int appearanceId = action->data().toInt(&ok);
     if (ok && appearanceId == StyleEditorColorSliderAppearance)
       action->setChecked(true);
+  }
+  // Wheel Shape: reflect this pane's current wheel, not only TEnv.
+  const int paneMode = (int)m_plainColorPage->colorWheelDisplayMode();
+  for (auto action : m_colorWheelDisplayModeAG->actions()) {
+    bool ok       = true;
+    int displayId = action->data().toInt(&ok);
+    if (ok && displayId == paneMode) action->setChecked(true);
   }
 }
