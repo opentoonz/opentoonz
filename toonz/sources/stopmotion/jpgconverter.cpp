@@ -120,29 +120,32 @@ void JpgConverter::saveJpg(TRaster32P image, TFilePath path) {
 //-----------------------------------------------------------------------------
 
 bool JpgConverter::loadJpg(TFilePath path, TRaster32P& image) {
-  long size;
-  int inSubsamp, inColorspace, width, height;
+  long size = 0;
+  int inSubsamp, inColorspace, width = 0, height = 0;
   unsigned long jpegSize;
-  unsigned char* jpegBuf;
-  FILE* jpegFile;
-  QString qPath      = path.getQString();
-  QByteArray ba      = qPath.toLocal8Bit();
-  const char* c_path = ba.data();
-  bool success       = true;
-  tjhandle tjInstance;
+  unsigned char* jpegBuf = NULL;
+  FILE* jpegFile         = NULL;
+  QString qPath          = path.getQString();
+  QByteArray ba          = qPath.toLocal8Bit();
+  const char* c_path     = ba.data();
+  bool success           = true;
+  tjhandle tjInstance    = NULL;
 
   /* Read the JPEG file into memory. */
   if ((jpegFile = fopen(c_path, "rb")) == NULL) success = false;
-  if (success && fseek(jpegFile, 0, SEEK_END) < 0 ||
-      ((size = ftell(jpegFile)) < 0) || fseek(jpegFile, 0, SEEK_SET) < 0)
+  if (success &&
+      (fseek(jpegFile, 0, SEEK_END) < 0 || (size = ftell(jpegFile)) < 0 ||
+       fseek(jpegFile, 0, SEEK_SET) < 0))
     success = false;
   if (success && size == 0) success = false;
   jpegSize = (unsigned long)size;
   if (success && (jpegBuf = (unsigned char*)tjAlloc(jpegSize)) == NULL)
     success = false;
   if (success && fread(jpegBuf, jpegSize, 1, jpegFile) < 1) success = false;
-  fclose(jpegFile);
-  jpegFile = NULL;
+  if (jpegFile) {
+    fclose(jpegFile);
+    jpegFile = NULL;
+  }
 
   if (success && (tjInstance = tjInitDecompress()) == NULL) success = false;
 
@@ -161,19 +164,28 @@ bool JpgConverter::loadJpg(TFilePath path, TRaster32P& image) {
   if (success && tjDecompress2(tjInstance, jpegBuf, jpegSize, imgBuf, width, 0,
                                height, pixelFormat, flags) < 0)
     success = false;
-  tjFree(jpegBuf);
-  jpegBuf = NULL;
-  tjDestroy(tjInstance);
-  tjInstance = NULL;
+  if (jpegBuf) {
+    tjFree(jpegBuf);
+    jpegBuf = NULL;
+  }
+  if (tjInstance) {
+    tjDestroy(tjInstance);
+    tjInstance = NULL;
+  }
 
-  image = TRaster32P(width, height);
-  image->lock();
-  uchar* rawData = image->getRawData();
-  memcpy(rawData, imgBuf, width * height * tjPixelSize[pixelFormat]);
-  image->unlock();
+  // width/height and imgBuf are only meaningful once decoding succeeded
+  if (success) {
+    image = TRaster32P(width, height);
+    image->lock();
+    uchar* rawData = image->getRawData();
+    memcpy(rawData, imgBuf, width * height * tjPixelSize[pixelFormat]);
+    image->unlock();
+  }
 
-  tjFree(imgBuf);
-  imgBuf = NULL;
+  if (imgBuf) {
+    tjFree(imgBuf);
+    imgBuf = NULL;
+  }
 
   return success;
 }
