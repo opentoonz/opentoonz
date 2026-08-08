@@ -297,7 +297,7 @@ void SVNTimeline::onLogDone(const QString &xmlResponse) {
         // Create the sceneIcons folder
         QDir d(QDir::tempPath());
         d.mkdir("sceneIcons");
-        QString tmpFileName = QDir::tempPath() + QString("/sceneicons/") +
+        QString tmpFileName = QDir::tempPath() + QString("/sceneIcons/") +
                               "svn_temp_img_" + QString::number(i) + " .png";
         m_auxTempFiles.append(new QTemporaryFile());
         m_auxTempFiles.at(m_auxTempFiles.size() - 1)->setFileName(tmpFileName);
