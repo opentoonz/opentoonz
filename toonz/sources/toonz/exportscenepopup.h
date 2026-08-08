@@ -17,6 +17,7 @@
 class QLabel;
 class ExportSceneTreeView;
 class QRadioButton;
+class QCheckBox;
 
 //=============================================================================
 // ExportSceneDvDirModelFileFolderNode
@@ -173,6 +174,7 @@ class ExportScenePopup final : public DVGui::Dialog {
   QRadioButton *m_lonelyModeButton;
   QLabel *m_lonelyModePathLabel;
   DVGui::FileField *m_lonelyModePathFld;
+  QCheckBox *m_createZipCheckBox;
 
 public:
   ExportScenePopup(std::vector<TFilePath> scenes);
