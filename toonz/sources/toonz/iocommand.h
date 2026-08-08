@@ -264,7 +264,7 @@ bool saveLevel(TXshSimpleLevel *sl);
 
 bool saveAll(int flags = 0);
 
-void saveNonSceneFiles();
+bool saveNonSceneFiles(int flags = 0);
 
 bool saveSound(const TFilePath &fp, TXshSoundLevel *sc, bool overwrite);
 bool saveSound(TXshSoundLevel *sc);

@@ -107,6 +107,22 @@ TXshLevel *getLevelByPath(ToonzScene *scene, const TFilePath &actualPath);
 // forward declaration
 class RenderingSuspender;
 
+class SaveInProgressGuard {
+  bool m_acquired;
+
+public:
+  SaveInProgressGuard()
+      : m_acquired(!TApp::instance()->isSaveInProgress()) {
+    if (m_acquired) TApp::instance()->setSaveInProgress(true);
+  }
+
+  ~SaveInProgressGuard() {
+    if (m_acquired) TApp::instance()->setSaveInProgress(false);
+  }
+
+  bool acquired() const { return m_acquired; }
+};
+
 //===========================================================================
 // class ResourceImportDialog
 //---------------------------------------------------------------------------
@@ -1406,20 +1422,23 @@ bool IoCmd::saveScene(const TFilePath &path, int flags) {
   TFilePath scenePath = path;
   if (scenePath.getType() == "") scenePath = scenePath.withType("tnz");
   if (scenePath.getType() != "tnz") {
-    error(
-        QObject::tr("%1 has an invalid file extension.").arg(toQString(path)));
+    if (!isAutosave)
+      error(QObject::tr("%1 has an invalid file extension.")
+                .arg(toQString(path)));
     return false;
   }
   TFileStatus dirStatus(scenePath.getParentDir());
   if (!(dirStatus.doesExist() && dirStatus.isWritable())) {
-    error(QObject::tr("%1 is an invalid path.")
-              .arg(toQString(scenePath.getParentDir())));
+    if (!isAutosave)
+      error(QObject::tr("%1 is an invalid path.")
+                .arg(toQString(scenePath.getParentDir())));
     return false;
   }
 
-  // notify user if the scene will be saved including any "broken" expression
-  // reference
-  if (!ExpressionReferenceManager::instance()->askIfParamIsIgnoredOnSave(
+  // Autosave must not enter a modal decision state. Broken-expression
+  // references are still reported when the user explicitly saves.
+  if (!isAutosave &&
+      !ExpressionReferenceManager::instance()->askIfParamIsIgnoredOnSave(
           saveSubxsheet))
     return false;
 
@@ -1438,6 +1457,9 @@ bool IoCmd::saveScene(const TFilePath &path, int flags) {
 
   TXsheet *xsheet = 0;
   if (saveSubxsheet) xsheet = TApp::instance()->getCurrentXsheet()->getXsheet();
+
+  SaveInProgressGuard saveGuard;
+  if (!saveGuard.acquired()) return false;
 
   // Automatically remove unused levels
   if (!saveSubxsheet && !isAutosave &&
@@ -1483,7 +1505,7 @@ bool IoCmd::saveScene(const TFilePath &path, int flags) {
   TFilePath oldFullPath = scene->decodeFilePath(scene->getScenePath());
   TFilePath newFullPath = scene->decodeFilePath(scenePath);
 
-  QApplication::setOverrideCursor(Qt::WaitCursor);
+  if (!isAutosave) QApplication::setOverrideCursor(Qt::WaitCursor);
   if (app->getCurrentScene()->getDirtyFlag())
     scene->getContentHistory(true)->modifiedNow();
 
@@ -1511,18 +1533,18 @@ bool IoCmd::saveScene(const TFilePath &path, int flags) {
     cp->assign(&CleanupParameters::GlobalParameters, false);
   }
 
-  // Must wait for current save to finish, just in case
-  while (TApp::instance()->isSaveInProgress());
-
-  TApp::instance()->setSaveInProgress(true);
+  bool saveSucceeded = true;
   try {
-    scene->save(scenePath, xsheet);
+    scene->save(scenePath, xsheet, !isAutosave);
   } catch (const TSystemException &se) {
-    DVGui::warning(QString::fromStdWString(se.getMessage()));
+    if (!isAutosave)
+      DVGui::warning(QString::fromStdWString(se.getMessage()));
+    saveSucceeded = false;
   } catch (...) {
-    DVGui::error(QObject::tr("Couldn't save %1").arg(toQString(scenePath)));
+    if (!isAutosave)
+      DVGui::error(QObject::tr("Couldn't save %1").arg(toQString(scenePath)));
+    saveSucceeded = false;
   }
-  TApp::instance()->setSaveInProgress(false);
 
   if (!isAutosave) {
     // Restore the cleanup settings without replacing the palette object.
@@ -1533,6 +1555,11 @@ bool IoCmd::saveScene(const TFilePath &path, int flags) {
 
   // in case of saving subxsheet, revert the level paths after saving
   revertOrgLevelPaths();
+
+  if (!saveSucceeded) {
+    if (!isAutosave) QApplication::restoreOverrideCursor();
+    return false;
+  }
 
   if (!overwrite && !saveSubxsheet)
     app->getCurrentScene()->notifyNameSceneChange();
@@ -1556,7 +1583,7 @@ bool IoCmd::saveScene(const TFilePath &path, int flags) {
                                  ->getName()
                                  .getName()));
 
-  QApplication::restoreOverrideCursor();
+  if (!isAutosave) QApplication::restoreOverrideCursor();
 
   bool exist = TSystem::doesExistFileOrLevel(
       scene->decodeFilePath(scene->getScenePath()));
@@ -1575,6 +1602,8 @@ bool IoCmd::saveScene(int flags) {
       TApp::instance()->getCurrentSelection()->getSelection();
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
   if (scene->isUntitled()) {
+    if (flags & AUTO_SAVE) return false;
+
     static SaveSceneAsPopup *popup = 0;
     if (!popup) popup = new SaveSceneAsPopup();
     int ret = popup->exec();
@@ -1739,39 +1768,43 @@ bool IoCmd::saveAll(int flags) {
   // try to save as much as possible
   // if anything is wrong, return false
 
+  bool isAutosave     = (flags & AUTO_SAVE) != 0;
   QMainWindow *parent = TApp::instance()->getMainWindow();
-  QLabel *Label       = new QLabel("Saving...", parent);
-  Label->setStyleSheet(
-      "font-size: 20px;"
-      "background-color: black; color: white; "
-      "font-weight: bold; padding: 5px;");
-  Label->adjustSize();
-  QPoint pos = parent->rect().bottomRight();
-  Label->move(pos.x() - Label->width() - 40, pos.y() - Label->height() - 30);
-  Label->show();
-
-  // NOTE: saveScene already check saveInProgress
-  bool result = saveScene(flags);
-
-  saveNonSceneFiles();
-
-  // End Label Notice
-  if (result) {
-    Label->setText("Saved All");
+  QLabel *Label       = nullptr;
+  if (!isAutosave) {
+    Label = new QLabel("Saving...", parent);
     Label->setStyleSheet(
         "font-size: 20px;"
-        "background-color: black; color: green; "
+        "background-color: black; color: white; "
         "font-weight: bold; padding: 5px;");
-  } else {
-    Label->setText("Save All Failed");
-    Label->setStyleSheet(
-        "font-size: 20px;"
-        "background-color: black; color: red; "
-        "font-weight: bold; padding: 5px;");
+    Label->adjustSize();
+    QPoint pos = parent->rect().bottomRight();
+    Label->move(pos.x() - Label->width() - 40,
+                pos.y() - Label->height() - 30);
+    Label->show();
   }
-  Label->adjustSize();
 
-  QTimer::singleShot(2500, Label, &QLabel::deleteLater);
+  bool sceneSaved     = saveScene(flags);
+  bool resourcesSaved = saveNonSceneFiles(flags);
+  bool result         = sceneSaved && resourcesSaved;
+
+  if (Label) {
+    if (result) {
+      Label->setText("Saved All");
+      Label->setStyleSheet(
+          "font-size: 20px;"
+          "background-color: black; color: green; "
+          "font-weight: bold; padding: 5px;");
+    } else {
+      Label->setText("Save All Failed");
+      Label->setStyleSheet(
+          "font-size: 20px;"
+          "background-color: black; color: red; "
+          "font-weight: bold; padding: 5px;");
+    }
+    Label->adjustSize();
+    QTimer::singleShot(2500, Label, &QLabel::deleteLater);
+  }
   return result;
 }
 
@@ -1779,23 +1812,34 @@ bool IoCmd::saveAll(int flags) {
 // IoCmd::saveNonSceneFiles()
 //---------------------------------------------------------------------------
 // This command should not change any content in scene!
-void IoCmd::saveNonSceneFiles() {
+bool IoCmd::saveNonSceneFiles(int flags) {
   // try to save non scene files
 
+  bool isAutosave   = (flags & AUTO_SAVE) != 0;
   TApp *app         = TApp::instance();
   ToonzScene *scene = app->getCurrentScene()->getScene();
   SceneResources resources(scene, 0);
-  // Must wait for current save to finish, just in case
-  while (TApp::instance()->isSaveInProgress());
+  SaveInProgressGuard saveGuard;
+  if (!saveGuard.acquired()) {
+    app->getCurrentScene()->setDirtyFlag(true);
+    return false;
+  }
 
-  TApp::instance()->setSaveInProgress(true);
-  resources.save(scene->getScenePath());
-  TApp::instance()->setSaveInProgress(false);
-  resources.updatePaths();
+  bool result = false;
+  try {
+    result = resources.save(scene->getScenePath(), !isAutosave);
+    if (result) resources.updatePaths();
+  } catch (...) {
+    if (!isAutosave)
+      DVGui::error(QObject::tr("Couldn't save all scene resources."));
+  }
+
+  if (!result) app->getCurrentScene()->setDirtyFlag(true);
 
   // for update title bar
   app->getCurrentLevel()->notifyLevelTitleChange();
   app->getCurrentPalette()->notifyPaletteTitleChanged();
+  return result;
 }
 
 //===========================================================================

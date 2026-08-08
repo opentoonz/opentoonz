@@ -711,7 +711,7 @@ void TApp::autosave() {
   } else if (pref->isAutosaveSceneEnabled()) {
     IoCmd::saveScene(IoCmd::AUTO_SAVE);
   } else if (pref->isAutosaveOtherFilesEnabled()) {
-    IoCmd::saveNonSceneFiles();
+    IoCmd::saveNonSceneFiles(IoCmd::AUTO_SAVE);
   }
 }
 
