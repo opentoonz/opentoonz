@@ -24,7 +24,11 @@ on:
 
 jobs:
   Ubuntu:
-    runs-on: ubuntu-24.04
+    # Build on the oldest supported LTS: glibc/libstdc++ symbol versioning is
+    # backward compatible only, so an AppImage built on 24.04 requires
+    # GLIBC_2.38 / GLIBCXX_3.4.32 and will not start on 22.04 (see #7001).
+    # Modern-toolchain coverage comes from the Fedora job below.
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         compiler: [gcc, clang]
