@@ -1028,8 +1028,8 @@ bool ShortcutZoomer::exec(QKeyEvent *event) {
   if (key == Qt::Key_Control || key == Qt::Key_Shift || key == Qt::Key_Alt)
     return false;
 
-  key = key | event->modifiers() &
-                  (~0xf0000000);  // Ignore if the key is a numpad key
+  key = key | (event->modifiers() &
+               (~0xf0000000));  // Ignore if the key is a numpad key
 
   return (key == showHideFullScreenKey) ? toggleFullScreen()
          : (key == Qt::Key_Escape)      ? toggleFullScreen(true)
