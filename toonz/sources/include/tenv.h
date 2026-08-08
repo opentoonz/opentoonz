@@ -137,6 +137,13 @@ DVAPI TFilePath getStuffDir();
 DVAPI TFilePath getConfigDir();
 // DVAPI TFilePath getProfilesDir();
 
+// Linux/*BSD: if the per-user config dir has no "stuff" folder yet, seed it
+// from the installed copy (located relative to the running executable) and
+// write a minimal SystemVar.ini pointing the root variable at it. Must be
+// called after the Q*Application object exists. No-op on Windows/macOS, in
+// portable mode, or when already seeded.
+DVAPI void initUserStuffDir();
+
 // per l'utilizzo di ToonzLib senza che sia definita una TOONZROOT
 // bisogna chiamare TEnv::setStuffDir(stuffdir) prima di ogni altra operazione
 DVAPI void setStuffDir(const TFilePath &stuffDir);

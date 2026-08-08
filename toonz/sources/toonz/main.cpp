@@ -175,6 +175,8 @@ static void initToonzEnv(QHash<QString, QString> &argPathValues) {
         Check if the xxxroot is defined and corresponds to an existing folder
   --*/
 
+  TEnv::initUserStuffDir();
+
   TFilePath stuffDir = TEnv::getStuffDir();
   if (stuffDir == TFilePath())
     fatalError("Undefined or empty: \"" + toQString(TEnv::getRootVarPath()) +

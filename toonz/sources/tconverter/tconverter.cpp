@@ -463,6 +463,8 @@ int main(int argc, char *argv[]) {
   TEnv::setSystemVarPrefix(systemVarPrefix);
   TEnv::setApplicationFileName(argv[0]);
 
+  TEnv::initUserStuffDir();
+
   std::string msg;
 
   // Initialize qualifiers
