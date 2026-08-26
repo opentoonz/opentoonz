@@ -3687,6 +3687,12 @@ void StyleEditor::onStyleSwitched() {
     m_colorParameterSelector->clear();
     m_oldStyle    = TColorStyleP();
     m_editedStyle = TColorStyleP();
+    m_settingsPage->setStyle(TColorStyleP());
+    TSolidColorStyle emptyStyle(TPixel32::Transparent);
+    m_plainColorPage->setColor(emptyStyle, 0);
+    m_oldColor->setColor(TPixel32::Transparent);
+    m_newColor->setColor(TPixel32::Transparent);
+    m_hexLineEdit->setStyle(emptyStyle, 0);
     m_parent->setWindowTitle(tr("No Style Selected"));
     if (Preferences::instance()->isRestoreStyleEditorTabEnabled()) {
       enable(true, false, false);
@@ -3889,6 +3895,14 @@ void StyleEditor::enable(bool enabled, bool enabledOnlyFirstTab,
   bool flagsChanged =
       m_enabled != enabled || m_enabledOnlyFirstTab != enabledOnlyFirstTab ||
       m_enabledFirstAndLastTab != enabledFirstAndLastTab;
+  bool rememberTabs =
+      Preferences::instance()->isRestoreStyleEditorTabEnabled();
+  bool alreadyFullTabs =
+      m_enabled && !m_enabledOnlyFirstTab && !m_enabledFirstAndLastTab;
+  bool enteringFullTabs =
+      enabled && !enabledOnlyFirstTab && !enabledFirstAndLastTab;
+  if (!rememberTabs && enteringFullTabs && !alreadyFullTabs)
+    m_currentPageIndex = 0;
   if (flagsChanged) {
     m_enabled                = enabled;
     m_enabledOnlyFirstTab    = enabledOnlyFirstTab;
@@ -4203,13 +4217,15 @@ void StyleEditor::save(QSettings &settings) const {
   if (m_searchAction->isChecked()) visibleParts |= 0x20;
   settings.setValue("visibleParts", visibleParts);
   settings.setValue("splitterState", m_plainColorPage->getSplitterState());
-  settings.setValue("currentPage", m_currentPageIndex);
-  if (m_specialButton) {
-    int vectorParts = 0;
-    if (m_specialButton->isChecked()) vectorParts |= 0x01;
-    if (m_customButton->isChecked()) vectorParts |= 0x02;
-    if (m_vectorBrushButton->isChecked()) vectorParts |= 0x04;
-    settings.setValue("vectorParts", vectorParts);
+  if (Preferences::instance()->isRestoreStyleEditorTabEnabled()) {
+    settings.setValue("currentPage", m_currentPageIndex);
+    if (m_specialButton) {
+      int vectorParts = 0;
+      if (m_specialButton->isChecked()) vectorParts |= 0x01;
+      if (m_customButton->isChecked()) vectorParts |= 0x02;
+      if (m_vectorBrushButton->isChecked()) vectorParts |= 0x04;
+      settings.setValue("vectorParts", vectorParts);
+    }
   }
 }
 void StyleEditor::load(QSettings &settings) {
@@ -4250,20 +4266,22 @@ void StyleEditor::load(QSettings &settings) {
   QVariant splitterState = settings.value("splitterState");
   if (splitterState.canConvert(QVariant::ByteArray))
     m_plainColorPage->setSplitterState(splitterState.toByteArray());
-  QVariant currentPage = settings.value("currentPage");
-  if (currentPage.canConvert(QVariant::Int)) {
-    int page = currentPage.toInt();
-    if (page >= 0 && page < m_styleChooser->count() - 1)
-      m_currentPageIndex = page;
+  if (Preferences::instance()->isRestoreStyleEditorTabEnabled()) {
+    QVariant currentPage = settings.value("currentPage");
+    if (currentPage.canConvert(QVariant::Int)) {
+      int page = currentPage.toInt();
+      if (page >= 0 && page < m_styleChooser->count() - 1)
+        m_currentPageIndex = page;
+    }
+    QVariant vectorParts = settings.value("vectorParts");
+    if (vectorParts.canConvert(QVariant::Int) && m_specialButton) {
+      int v = vectorParts.toInt();
+      m_specialButton->setChecked(v & 0x01);
+      m_customButton->setChecked(v & 0x02);
+      m_vectorBrushButton->setChecked(v & 0x04);
+    }
+    applySavedPage();
   }
-  QVariant vectorParts = settings.value("vectorParts");
-  if (vectorParts.canConvert(QVariant::Int) && m_specialButton) {
-    int v = vectorParts.toInt();
-    m_specialButton->setChecked(v & 0x01);
-    m_customButton->setChecked(v & 0x02);
-    m_vectorBrushButton->setChecked(v & 0x04);
-  }
-  applySavedPage();
 }
 
 //-----------------------------------------------------------------------------

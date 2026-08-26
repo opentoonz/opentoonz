@@ -23,7 +23,8 @@ PaletteController::PaletteController()
     , m_originalCurrentPalette(0)
     , m_currentPalette(0)
     , m_colorAutoApplyEnabled(PaletteControllerAutoApplyState != 0)
-    , m_colorSample() {
+    , m_colorSample()
+    , m_skipCleanupEdit(false) {
   m_currentLevelPalette   = new TPaletteHandle;
   m_currentCleanupPalette = new TPaletteHandle;
   m_currentPalette        = new TPaletteHandle;
@@ -98,6 +99,7 @@ void PaletteController::editLevelPalette() {
 //-----------------------------------------------------------------------------
 
 void PaletteController::editCleanupPalette() {
+  if (m_skipCleanupEdit) return;
   setCurrentPalette(m_currentCleanupPalette);
 }
 
@@ -111,9 +113,9 @@ void PaletteController::assignCleanupPalette(TPalette *palette) {
 
   const bool editingCleanup =
       (m_originalCurrentPalette == m_currentCleanupPalette);
-  m_currentCleanupPalette->blockSignals(true);
+  m_skipCleanupEdit = true;
   m_currentCleanupPalette->setPalette(palette);
-  m_currentCleanupPalette->blockSignals(false);
+  m_skipCleanupEdit = false;
   if (editingCleanup)
     editCleanupPalette();
   else if (!m_originalCurrentPalette)

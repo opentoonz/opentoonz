@@ -50,6 +50,7 @@ class DVAPI PaletteController final : public QObject {
   //!  the last setCurrentPalette() invocation.
   TPixel32 m_colorSample;
   bool m_colorAutoApplyEnabled;
+  bool m_skipCleanupEdit;
 
 public:
   PaletteController();
