@@ -3892,11 +3892,10 @@ void StyleEditor::onColorChanged(const ColorModel &color, bool isDragging) {
 
 void StyleEditor::enable(bool enabled, bool enabledOnlyFirstTab,
                          bool enabledFirstAndLastTab) {
-  bool flagsChanged =
-      m_enabled != enabled || m_enabledOnlyFirstTab != enabledOnlyFirstTab ||
-      m_enabledFirstAndLastTab != enabledFirstAndLastTab;
-  bool rememberTabs =
-      Preferences::instance()->isRestoreStyleEditorTabEnabled();
+  bool flagsChanged = m_enabled != enabled ||
+                      m_enabledOnlyFirstTab != enabledOnlyFirstTab ||
+                      m_enabledFirstAndLastTab != enabledFirstAndLastTab;
+  bool rememberTabs = Preferences::instance()->isRestoreStyleEditorTabEnabled();
   bool alreadyFullTabs =
       m_enabled && !m_enabledOnlyFirstTab && !m_enabledFirstAndLastTab;
   bool enteringFullTabs =
