@@ -1368,7 +1368,7 @@ void IoCmd::newScene() {
                           ->getCleanupParameters()
                           ->m_cleanupPalette.getPointer();
   PaletteController *paletteController = app->getPaletteController();
-  paletteController->getCurrentCleanupPalette()->setPalette(palette, -1);
+  paletteController->assignCleanupPalette(palette);
 
   TFilePath scenePath = scene->getScenePath();
   DvDirModel::instance()->refreshFolder(scenePath.getParentDir());

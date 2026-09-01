@@ -1914,6 +1914,7 @@ void StyleChooserPage::applyFilter(const QString text) {
 //-----------------------------------------------------------------------------
 
 void StyleChooserPage::paintEvent(QPaintEvent *) {
+  if (!parentWidget()) return;
   if (loadIfNeeded() || m_pinsToTopDirty) {
     m_pinsToTopDirty = false;
     applyFilter();
@@ -2181,6 +2182,7 @@ void CustomStyleChooserPage::onSelect(int index) {
 //-----------------------------------------------------------------------------
 
 bool CustomStyleChooserPage::isSameStyle(const TColorStyleP style, int index) {
+  if (!style) return false;
   return style->getBrushIdHash() == m_manager->getData(index).hash;
 }
 
@@ -2230,6 +2232,7 @@ void VectorBrushStyleChooserPage::onSelect(int index) {
 
 bool VectorBrushStyleChooserPage::isSameStyle(const TColorStyleP style,
                                               int index) {
+  if (!style) return false;
   if (index > 0) {
     auto &data = m_manager->getData(index - 1);
     if (!data.isVector) return false;  // must be Vector
@@ -2284,6 +2287,7 @@ void TextureStyleChooserPage::onSelect(int index) {
 //-----------------------------------------------------------------------------
 
 bool TextureStyleChooserPage::isSameStyle(const TColorStyleP style, int index) {
+  if (!style) return false;
   if (index > 0)
     return style->getBrushIdHash() == m_manager->getData(index - 1).hash;
   else
@@ -2333,6 +2337,7 @@ void MyPaintBrushStyleChooserPage::onSelect(int index) {
 
 bool MyPaintBrushStyleChooserPage::isSameStyle(const TColorStyleP style,
                                                int index) {
+  if (!style) return false;
   if (index > 0)
     return style->getBrushIdHash() == getBrush(index - 1).getBrushIdHash();
   else
@@ -2384,6 +2389,7 @@ void SpecialStyleChooserPage::onSelect(int index) {
 //-----------------------------------------------------------------------------
 
 bool SpecialStyleChooserPage::isSameStyle(const TColorStyleP style, int index) {
+  if (!style) return false;
   if (index > 0)
     return style->getBrushIdHash() == m_manager->getData(index - 1).hash;
   else
@@ -3349,9 +3355,9 @@ QFrame *StyleEditor::createVectorPage() {
   QFrame *vectorOutsideFrame = new QFrame();
   vectorOutsideFrame->setMinimumWidth(50);
 
-  QPushButton *specialButton     = new QPushButton(tr("Generated"));
-  QPushButton *customButton      = new QPushButton(tr("Trail"));
-  QPushButton *vectorBrushButton = new QPushButton(tr("Vector Brush"));
+  m_specialButton     = new QPushButton(tr("Generated"));
+  m_customButton      = new QPushButton(tr("Trail"));
+  m_vectorBrushButton = new QPushButton(tr("Vector Brush"));
 
   m_vectorsSearchFrame = new QFrame();
   m_vectorsSearchText  = new QLineEdit();
@@ -3360,12 +3366,12 @@ QFrame *StyleEditor::createVectorPage() {
   m_vectorsSearchClear->setSizePolicy(QSizePolicy::Minimum,
                                       QSizePolicy::Preferred);
 
-  specialButton->setCheckable(true);
-  customButton->setCheckable(true);
-  vectorBrushButton->setCheckable(true);
-  specialButton->setChecked(true);
-  customButton->setChecked(true);
-  vectorBrushButton->setChecked(true);
+  m_specialButton->setCheckable(true);
+  m_customButton->setCheckable(true);
+  m_vectorBrushButton->setCheckable(true);
+  m_specialButton->setChecked(true);
+  m_customButton->setChecked(true);
+  m_vectorBrushButton->setChecked(true);
 
   /* ------ layout ------ */
   QVBoxLayout *vectorOutsideLayout = new QVBoxLayout();
@@ -3376,9 +3382,9 @@ QFrame *StyleEditor::createVectorPage() {
     QHBoxLayout *vectorButtonLayout = new QHBoxLayout();
     vectorButtonLayout->setSizeConstraint(QLayout::SetNoConstraint);
     {
-      vectorButtonLayout->addWidget(specialButton);
-      vectorButtonLayout->addWidget(customButton);
-      vectorButtonLayout->addWidget(vectorBrushButton);
+      vectorButtonLayout->addWidget(m_specialButton);
+      vectorButtonLayout->addWidget(m_customButton);
+      vectorButtonLayout->addWidget(m_vectorBrushButton);
     }
     vectorOutsideLayout->addLayout(vectorButtonLayout);
 
@@ -3413,11 +3419,11 @@ QFrame *StyleEditor::createVectorPage() {
 
   /* ------ signal-slot connections ------ */
   bool ret = true;
-  ret      = ret && connect(specialButton, SIGNAL(toggled(bool)), this,
+  ret      = ret && connect(m_specialButton, SIGNAL(toggled(bool)), this,
                             SLOT(onSpecialButtonToggled(bool)));
-  ret      = ret && connect(customButton, SIGNAL(toggled(bool)), this,
+  ret      = ret && connect(m_customButton, SIGNAL(toggled(bool)), this,
                             SLOT(onCustomButtonToggled(bool)));
-  ret      = ret && connect(vectorBrushButton, SIGNAL(toggled(bool)), this,
+  ret      = ret && connect(m_vectorBrushButton, SIGNAL(toggled(bool)), this,
                             SLOT(onVectorBrushButtonToggled(bool)));
   ret =
       ret && connect(m_vectorsSearchText, SIGNAL(textChanged(const QString &)),
@@ -3536,7 +3542,48 @@ void StyleEditor::onMyPaintClearSearch() {
 
 //-----------------------------------------------------------------------------
 
+int StyleEditor::tabIndexForPage(int page) const {
+  if (!m_enabledOnlyFirstTab && !m_enabledFirstAndLastTab)
+    return (page >= 0 && page <= 4) ? page : -1;
+  if (m_enabledFirstAndLastTab) {
+    if (page == 0) return 0;
+    return (page == m_styleChooser->count() - 2) ? 1 : -1;
+  }
+  return (page == 0) ? 0 : -1;
+}
+
+//-----------------------------------------------------------------------------
+
+void StyleEditor::rememberPage(int page) {
+  if (page < 0 || page >= m_styleChooser->count() - 1) return;
+
+  // Do not replace the stored page.
+  bool fullTabSet = !m_enabledOnlyFirstTab && !m_enabledFirstAndLastTab;
+  if (!fullTabSet && page != m_styleChooser->count() - 2) return;
+
+  m_currentPageIndex = page;
+}
+
+//-----------------------------------------------------------------------------
+
+void StyleEditor::applySavedPage() {
+  if (!m_enabled) return;
+  int tab = tabIndexForPage(m_currentPageIndex);
+  if (tab < 0) return;
+  if (m_styleChooser->currentIndex() == m_currentPageIndex &&
+      m_styleBar->currentIndex() == tab)
+    return;
+
+  m_styleBar->blockSignals(true);
+  m_styleBar->setCurrentIndex(tab);
+  m_styleBar->blockSignals(false);
+  m_styleChooser->setCurrentIndex(m_currentPageIndex);
+}
+
+//-----------------------------------------------------------------------------
+
 void StyleEditor::updateTabBar() {
+  m_styleBar->blockSignals(true);
   m_styleBar->clearTabBar();
   if (m_enabled && !m_enabledOnlyFirstTab && !m_enabledFirstAndLastTab) {
     m_styleBar->addSimpleTab(tr("Color"));
@@ -3544,24 +3591,34 @@ void StyleEditor::updateTabBar() {
     m_styleBar->addSimpleTab(tr("Vector"));
     m_styleBar->addSimpleTab(tr("Raster"));
     m_styleBar->addSimpleTab(tr("Settings"));
-  } else if (m_enabled && m_enabledOnlyFirstTab && !m_enabledFirstAndLastTab)
+  } else if (m_enabled && m_enabledOnlyFirstTab && !m_enabledFirstAndLastTab) {
     m_styleBar->addSimpleTab(tr("Color"));
-  else if (m_enabled && !m_enabledOnlyFirstTab && m_enabledFirstAndLastTab) {
+  } else if (m_enabled && !m_enabledOnlyFirstTab && m_enabledFirstAndLastTab) {
     m_styleBar->addSimpleTab(tr("Color"));
     m_styleBar->addSimpleTab(tr("Settings"));
   } else {
+    m_styleBar->blockSignals(false);
     m_styleChooser->setCurrentIndex(m_styleChooser->count() - 1);
     return;
   }
   m_tabBarContainer->layout()->update();
-  m_styleChooser->setCurrentIndex(0);
+
+  int tab = tabIndexForPage(m_currentPageIndex);
+  if (tab < 0) {
+    m_styleBar->setCurrentIndex(0);
+    m_styleBar->blockSignals(false);
+    m_styleChooser->setCurrentIndex(0);
+    return;
+  }
+
+  m_styleBar->blockSignals(false);
+  applySavedPage();
 }
 
 //-----------------------------------------------------------------------------
 
 void StyleEditor::showEvent(QShowEvent *) {
   m_autoButton->setChecked(m_paletteController->isColorAutoApplyEnabled());
-  onStyleSwitched();
   bool ret = true;
   ret      = ret && connect(m_paletteHandle, SIGNAL(colorStyleSwitched()),
                             SLOT(onStyleSwitched()));
@@ -3589,6 +3646,7 @@ void StyleEditor::showEvent(QShowEvent *) {
   onSearchVisible(m_searchAction->isChecked());
   updateOrientationButton();
   assert(ret);
+  QMetaObject::invokeMethod(this, "onStyleSwitched", Qt::QueuedConnection);
 }
 
 //-----------------------------------------------------------------------------
@@ -3626,14 +3684,21 @@ void StyleEditor::onStyleSwitched() {
   TPalette *palette = getPalette();
 
   if (!palette) {
-    // set the current page to empty
-    m_styleChooser->setCurrentIndex(m_styleChooser->count() - 1);
-    enable(false);
     m_colorParameterSelector->clear();
     m_oldStyle    = TColorStyleP();
     m_editedStyle = TColorStyleP();
-
     m_parent->setWindowTitle(tr("No Style Selected"));
+    if (Preferences::instance()->isRestoreStyleEditorTabEnabled()) {
+      enable(true, false, false);
+      m_autoButton->setEnabled(false);
+      m_applyButton->setEnabled(false);
+      m_oldColor->setEnable(false);
+      m_newColor->setEnable(false);
+      m_hexLineEdit->setEnabled(false);
+    } else {
+      m_styleChooser->setCurrentIndex(m_styleChooser->count() - 1);
+      enable(false);
+    }
     return;
   }
 
@@ -3821,8 +3886,10 @@ void StyleEditor::onColorChanged(const ColorModel &color, bool isDragging) {
 
 void StyleEditor::enable(bool enabled, bool enabledOnlyFirstTab,
                          bool enabledFirstAndLastTab) {
-  if (m_enabled != enabled || m_enabledOnlyFirstTab != enabledOnlyFirstTab ||
-      m_enabledFirstAndLastTab != enabledFirstAndLastTab) {
+  bool flagsChanged =
+      m_enabled != enabled || m_enabledOnlyFirstTab != enabledOnlyFirstTab ||
+      m_enabledFirstAndLastTab != enabledFirstAndLastTab;
+  if (flagsChanged) {
     m_enabled                = enabled;
     m_enabledOnlyFirstTab    = enabledOnlyFirstTab;
     m_enabledFirstAndLastTab = enabledFirstAndLastTab;
@@ -3836,6 +3903,8 @@ void StyleEditor::enable(bool enabled, bool enabledOnlyFirstTab,
       m_oldColor->setColor(TPixel32::Transparent);
       m_newColor->setColor(TPixel32::Transparent);
     }
+  } else if (m_enabled) {
+    applySavedPage();
   }
 
   // lock button behavior
@@ -3880,6 +3949,7 @@ void StyleEditor::onNewStyleClicked() { applyButtonClicked(); }
 void StyleEditor::setPage(int index) {
   if (!m_enabledFirstAndLastTab) {
     m_styleChooser->setCurrentIndex(index);
+    rememberPage(index);
     return;
   }
 
@@ -3889,6 +3959,7 @@ void StyleEditor::setPage(int index) {
     index = m_styleChooser->count() -
             2;  // 2 because at the end there is a blank page.
   m_styleChooser->setCurrentIndex(index);
+  rememberPage(index);
 }
 
 //-----------------------------------------------------------------------------
@@ -4132,6 +4203,14 @@ void StyleEditor::save(QSettings &settings) const {
   if (m_searchAction->isChecked()) visibleParts |= 0x20;
   settings.setValue("visibleParts", visibleParts);
   settings.setValue("splitterState", m_plainColorPage->getSplitterState());
+  settings.setValue("currentPage", m_currentPageIndex);
+  if (m_specialButton) {
+    int vectorParts = 0;
+    if (m_specialButton->isChecked()) vectorParts |= 0x01;
+    if (m_customButton->isChecked()) vectorParts |= 0x02;
+    if (m_vectorBrushButton->isChecked()) vectorParts |= 0x04;
+    settings.setValue("vectorParts", vectorParts);
+  }
 }
 void StyleEditor::load(QSettings &settings) {
   QVariant isVertical = settings.value("isVertical");
@@ -4171,6 +4250,20 @@ void StyleEditor::load(QSettings &settings) {
   QVariant splitterState = settings.value("splitterState");
   if (splitterState.canConvert(QVariant::ByteArray))
     m_plainColorPage->setSplitterState(splitterState.toByteArray());
+  QVariant currentPage = settings.value("currentPage");
+  if (currentPage.canConvert(QVariant::Int)) {
+    int page = currentPage.toInt();
+    if (page >= 0 && page < m_styleChooser->count() - 1)
+      m_currentPageIndex = page;
+  }
+  QVariant vectorParts = settings.value("vectorParts");
+  if (vectorParts.canConvert(QVariant::Int) && m_specialButton) {
+    int v = vectorParts.toInt();
+    m_specialButton->setChecked(v & 0x01);
+    m_customButton->setChecked(v & 0x02);
+    m_vectorBrushButton->setChecked(v & 0x04);
+  }
+  applySavedPage();
 }
 
 //-----------------------------------------------------------------------------

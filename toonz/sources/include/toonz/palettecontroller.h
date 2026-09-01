@@ -25,6 +25,7 @@
 //    Forward declarations
 
 class TPaletteHandle;
+class TPalette;
 
 //=====================================================
 
@@ -63,6 +64,9 @@ public:
   TPaletteHandle *getCurrentPalette() const { return m_currentPalette; }
 
   void setCurrentPalette(TPaletteHandle *paletteHandle);
+
+  // Load cleanup without selecting it.
+  void assignCleanupPalette(TPalette *palette);
 
   // centralized handling of color auto-apply. see StyleEditor.
   // when ColorAutoApply is disabled then changes should made on the ColorSample
