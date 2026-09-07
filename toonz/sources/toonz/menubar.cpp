@@ -1,6 +1,7 @@
 
 
 #include "menubar.h"
+#include "customhelplink.h"
 
 // Tnz6 includes
 #include "menubarcommandids.h"
@@ -35,6 +36,7 @@
 #include "tsystem.h"
 
 // Qt includes
+#include <QCoreApplication>
 #include <QIcon>
 #include <QPainter>
 #include <QMouseEvent>
@@ -52,6 +54,67 @@ UrlOpener dvHome(QUrl("http://www.toonz.com/"));
 UrlOpener manual(QUrl("file:///C:/gmt/butta/M&C in EU.pdf"));
 
 TEnv::IntVar LockRoomTabToggle("LockRoomTabToggle", 0);
+
+namespace {
+
+void ensureQuicklinkAction(QMenu *helpMenu) {
+  QAction *quicklink = CommandManager::instance()->getAction(MI_Quicklink);
+  if (!quicklink || helpMenu->actions().contains(quicklink)) return;
+
+  const QList<QAction *> actions = helpMenu->actions();
+  QAction *whatsNew = CommandManager::instance()->getAction(MI_OpenWhatsNew);
+  int whatsNewIndex = actions.indexOf(whatsNew);
+  if (whatsNewIndex >= 0) {
+    QAction *before = whatsNewIndex + 1 < actions.size()
+                          ? actions.at(whatsNewIndex + 1)
+                          : nullptr;
+    if (before)
+      helpMenu->insertAction(before, quicklink);
+    else
+      helpMenu->addAction(quicklink);
+    return;
+  }
+
+  QAction *about = CommandManager::instance()->getAction(MI_About);
+  if (actions.contains(about))
+    helpMenu->insertAction(about, quicklink);
+  else
+    helpMenu->addAction(quicklink);
+}
+
+void enableQuicklinkEditing(QMenu *helpMenu) {
+  const char *propertyName = "quicklinkEditingEnabled";
+  if (helpMenu->property(propertyName).toBool()) return;
+  helpMenu->setProperty(propertyName, true);
+  helpMenu->setContextMenuPolicy(Qt::CustomContextMenu);
+
+  QObject::connect(
+      helpMenu, &QWidget::customContextMenuRequested, helpMenu,
+      [helpMenu](const QPoint &pos) {
+        QAction *quicklink =
+            CommandManager::instance()->getAction(MI_Quicklink);
+        if (helpMenu->actionAt(pos) != quicklink) return;
+
+        QMenu editMenu(helpMenu);
+        QAction *editLink = editMenu.addAction(
+            QCoreApplication::translate("MainWindow", "Edit Link..."));
+        if (editMenu.exec(helpMenu->mapToGlobal(pos)) != editLink) return;
+
+        bool ok      = false;
+        QString link = DVGui::getText(
+            QCoreApplication::translate("MainWindow", "Edit Quicklink"),
+            QCoreApplication::translate("MainWindow", "Link:"),
+            CustomHelpLink::current(), &ok);
+        if (ok) CustomHelpLink::set(link);
+      });
+}
+
+void ensureHelpActions(QMenu *helpMenu) {
+  ensureQuicklinkAction(helpMenu);
+  enableQuicklinkEditing(helpMenu);
+}
+
+}  // namespace
 
 //=============================================================================
 // RoomTabWidget
@@ -280,9 +343,12 @@ QMenuBar *StackedMenuBar::loadMenuBar(const TFilePath &fp) {
            * translation file -*/
           QMenu *menu = new QMenu(tr(title.toStdString().c_str()));
           menu->setToolTipsVisible(true);
-          if (readMenuRecursive(reader, menu))
+          if (readMenuRecursive(reader, menu)) {
+            // Older Windows profiles keep private menu XML files. Add the new
+            // built-in command without replacing the user's customized menu.
+            if (title == QStringLiteral("Help")) ensureHelpActions(menu);
             menuBar->addMenu(menu);
-          else {
+          } else {
             reader.raiseError(tr("Failed to load menu %1").arg(title));
             delete menu;
           }
@@ -500,6 +566,7 @@ QMenuBar *StackedMenuBar::createCleanupMenuBar() {
   //----Help Menu
   QMenu *helpMenu = addMenu(tr("Help"), cleanupMenuBar);
   addMenuItem(helpMenu, MI_About);
+  ensureHelpActions(helpMenu);
 
   return cleanupMenuBar;
 }
@@ -670,6 +737,7 @@ QMenuBar *StackedMenuBar::createPltEditMenuBar() {
   //---Help Menu
   QMenu *helpMenu = addMenu(tr("Help"), pltEditMenuBar);
   addMenuItem(helpMenu, MI_About);
+  ensureHelpActions(helpMenu);
 
   return pltEditMenuBar;
 }
@@ -850,6 +918,7 @@ QMenuBar *StackedMenuBar::createInknPaintMenuBar() {
   //---Help Menu
   QMenu *helpMenu = addMenu(tr("Help"), inknPaintMenuBar);
   addMenuItem(helpMenu, MI_About);
+  ensureHelpActions(helpMenu);
 
   return inknPaintMenuBar;
 }
@@ -1037,6 +1106,7 @@ QMenuBar *StackedMenuBar::createXsheetMenuBar() {
   //---Help Menu
   QMenu *helpMenu = addMenu(tr("Help"), xsheetMenuBar);
   addMenuItem(helpMenu, MI_About);
+  ensureHelpActions(helpMenu);
 
   return xsheetMenuBar;
 }
@@ -1073,6 +1143,7 @@ QMenuBar *StackedMenuBar::createBatchesMenuBar() {
   //---Help Menu
   QMenu *helpMenu = addMenu(tr("Help"), batchesMenuBar);
   addMenuItem(helpMenu, MI_About);
+  ensureHelpActions(helpMenu);
 
   return batchesMenuBar;
 }
@@ -1110,6 +1181,7 @@ QMenuBar *StackedMenuBar::createBrowserMenuBar() {
   //---Help Menu
   QMenu *helpMenu = addMenu(tr("Help"), browserMenuBar);
   addMenuItem(helpMenu, MI_About);
+  ensureHelpActions(helpMenu);
 
   return browserMenuBar;
 }
@@ -1499,11 +1571,13 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   QMenu *helpMenu = addMenu(tr("Help"), fullMenuBar);
   addMenuItem(helpMenu, MI_OpenOnlineManual);
   addMenuItem(helpMenu, MI_OpenWhatsNew);
+  addMenuItem(helpMenu, MI_Quicklink);
   addMenuItem(helpMenu, MI_OpenCommunityForum);
   helpMenu->addSeparator();
   addMenuItem(helpMenu, MI_OpenReportABug);
   helpMenu->addSeparator();
   addMenuItem(helpMenu, MI_About);
+  enableQuicklinkEditing(helpMenu);
 
 // addMenuItem(fileMenu, MI_TestAnimation);
 // fileMenu->addSeparator();

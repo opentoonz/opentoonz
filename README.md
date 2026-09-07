@@ -30,6 +30,11 @@ Please download and install OpenToonz from the latest installer at <https://open
 
 Older versions and unstable nightly builds are also available at <https://github.com/opentoonz/opentoonz/releases>.
 
+## Development
+
+- [Development checklist (draft)](./doc/development_checklist.md)
+- [AI-assisted development checklist (draft)](./doc/ai_assisted_development_checklist.md)
+
 ## How to Build Locally
 
 - [Windows](./doc/how_to_build_win.md)

@@ -2466,6 +2466,34 @@ void SceneViewer::setViewMatrix(const TAffine &aff, int viewMode) {
 
 //-----------------------------------------------------------------------------
 
+void SceneViewer::setViewZoomPan(int viewMode, const TAffine &aff) {
+  if (viewMode < 0 || viewMode >= (int)m_viewAff.size()) return;
+  m_viewAff[viewMode]       = aff;
+  m_rotationAngle[viewMode] = 0.0;
+  if (m_isFlippedX || m_isFlippedY) {
+    m_isFlippedX = false;
+    m_isFlippedY = false;
+    emit onFlipHChanged(false);
+    emit onFlipVChanged(false);
+  }
+  if (m_previewMode != NO_PREVIEW) requestTimedRefresh();
+  emit onZoomChanged();
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::setCamera3DViewState(const TPointD &pan, double zoom,
+                                       double phi, double theta) {
+  m_pan3D       = pan;
+  m_zoomScale3D = zoom;
+  m_phi3D       = (float)tcrop(phi, -90.0, 90.0);
+  m_theta3D     = (float)tcrop(theta, 0.0, 90.0);
+  invalidateAll();
+  emit onZoomChanged();
+}
+
+//-----------------------------------------------------------------------------
+
 bool SceneViewer::is3DView() const {
   bool isCameraTest = CameraTestCheck::instance()->isEnabled();
   return (m_referenceMode == CAMERA3D_REFERENCE && !isCameraTest);

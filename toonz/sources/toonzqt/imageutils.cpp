@@ -727,9 +727,9 @@ bool isPaintedImage(TFilePath path) {
 
   std::vector<uint8_t> visited(totalPixels, 0);
   std::vector<uint32_t> stack;
-  stack.reserve(totalPixels / 4);  
+  stack.reserve(totalPixels / 4);
 
-  uint32_t outerBackgroundCount = 0;  
+  uint32_t outerBackgroundCount = 0;
 
   auto tryPush = [&](uint16_t x, uint16_t y) {
     uint32_t idx = y * width + x;
@@ -758,7 +758,7 @@ bool isPaintedImage(TFilePath path) {
     uint16_t x   = packed & 0xFFFF;
     uint32_t idx = y * width + x;
 
-    if (y > 0) {  
+    if (y > 0) {
       uint32_t nidx = idx - width;
       if (!visited[nidx] && imgData[nidx] == backgroundColor) {
         visited[nidx] = 1;
@@ -766,7 +766,7 @@ bool isPaintedImage(TFilePath path) {
         stack.push_back((static_cast<uint32_t>(y - 1) << 16) | x);
       }
     }
-    if (y < height - 1) {  
+    if (y < height - 1) {
       uint32_t nidx = idx + width;
       if (!visited[nidx] && imgData[nidx] == backgroundColor) {
         visited[nidx] = 1;
@@ -774,7 +774,7 @@ bool isPaintedImage(TFilePath path) {
         stack.push_back((static_cast<uint32_t>(y + 1) << 16) | x);
       }
     }
-    if (x > 0) {  
+    if (x > 0) {
       uint32_t nidx = idx - 1;
       if (!visited[nidx] && imgData[nidx] == backgroundColor) {
         visited[nidx] = 1;
@@ -782,7 +782,7 @@ bool isPaintedImage(TFilePath path) {
         stack.push_back((static_cast<uint32_t>(y) << 16) | (x - 1));
       }
     }
-    if (x < width - 1) {  
+    if (x < width - 1) {
       uint32_t nidx = idx + 1;
       if (!visited[nidx] && imgData[nidx] == backgroundColor) {
         visited[nidx] = 1;
@@ -792,9 +792,8 @@ bool isPaintedImage(TFilePath path) {
     }
   }
 
-  uint32_t objectColorCount = totalPixels - maxCount;
-  uint32_t innerBackgroundCount =
-      maxCount - outerBackgroundCount;
+  uint32_t objectColorCount     = totalPixels - maxCount;
+  uint32_t innerBackgroundCount = maxCount - outerBackgroundCount;
 
   if (objectColorCount == 0) return 0.0;
 
@@ -807,7 +806,8 @@ bool isPaintedImage(TFilePath path) {
 void convertNaa2Tlv(const TFilePath &source, const TFilePath &dest,
                     const TFrameId &from, const TFrameId &to,
                     FrameTaskNotifier *frameNotifier, TPalette *palette,
-                    bool removeUnusedStyles, double dpi) {
+                    bool removeUnusedStyles, double dpi,
+                    bool allowOnlyWhiteBG) {
   // std::string dstExt = dest.getType(), srcExt = source.getType();
   if (TSystem::doesExistFileOrLevel(dest.withType("tpl")))
     TSystem::deleteFile(dest.withType("tpl"));
@@ -827,6 +827,7 @@ void convertNaa2Tlv(const TFilePath &source, const TFilePath &dest,
 
   Naa2TlvConverter converter;
   converter.setPalette(palette);
+  converter.setAllowOnlyWhiteBG(allowOnlyWhiteBG);
 
   QList<int> usedStyleIds({0});
 
@@ -869,7 +870,7 @@ void convertNaa2Tlv(const TFilePath &source, const TFilePath &dest,
     } catch (...) {
     }
 
-    frameNotifier->notifyFrameCompleted(f+1);
+    frameNotifier->notifyFrameCompleted(f + 1);
   }
 
   if (removeUnusedStyles) converter.removeUnusedStyles(usedStyleIds);

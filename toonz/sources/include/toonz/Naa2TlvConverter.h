@@ -108,6 +108,7 @@ public:
   double m_inkThickness;
   TPalette *m_palette;
   bool m_valid;
+  bool m_allowOnlyWhiteBG;
 
   Naa2TlvConverter();
   ~Naa2TlvConverter();
@@ -154,6 +155,8 @@ public:
   TVectorImageP vectorize();
 
   void removeUnusedStyles(const QList<int> &styleIds);
+
+  void setAllowOnlyWhiteBG(bool on) { m_allowOnlyWhiteBG = on; }
 };
 
 #endif

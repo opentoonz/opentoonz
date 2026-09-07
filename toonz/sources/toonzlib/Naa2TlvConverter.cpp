@@ -48,8 +48,7 @@ Naa2TlvConverter::Naa2TlvConverter()
     , m_inkThickness(0)
     , m_palette(0)
     , m_valid(false)
-
-{}
+    , m_allowOnlyWhiteBG(false) {}
 
 Naa2TlvConverter::~Naa2TlvConverter() {
   delete m_regionRas;
@@ -343,8 +342,10 @@ void Naa2TlvConverter::findBackgroundRegions() {
   int maxV         = 0;
   for (int i = 0; i < m_colors.count(); i++) {
     TPixel color = m_colors.at(i);
-    int v        = color.r + color.g + color.b;
-    int a        = std::min({color.r, color.g, color.b});
+    if (m_allowOnlyWhiteBG && color != TPixel::White) continue;
+
+    int v = color.r + color.g + color.b;
+    int a = std::min({color.r, color.g, color.b});
     if (a < 230) continue;
     if (v > maxV) {
       bgColorIndex = i;
@@ -547,7 +548,8 @@ void Naa2TlvConverter::findThinInks() {
   if (!m_regionRas || !m_borderRas || m_regions.empty()) return;
   for (int i = 0; i < m_regions.count(); i++) {
     RegionInfo &region = m_regions[i];
-    if (region.type != RegionInfo::Unknown) continue; // Skip already classified regions
+    if (region.type != RegionInfo::Unknown)
+      continue;  // Skip already classified regions
 
     QList<int> &bs = region.boundaries;
 
@@ -555,19 +557,21 @@ void Naa2TlvConverter::findThinInks() {
       // If there are exactly 2 boundaries, classify as ThinInk
       region.type = RegionInfo::ThinInk;
     } else if (bs.count() == 3) {
-      // If there are exactly 3 boundaries, classify as ThinInk if bs[2] is small compared to bs[1]
+      // If there are exactly 3 boundaries, classify as ThinInk if bs[2] is
+      // small compared to bs[1]
       if (bs[2] * 5 < bs[1]) {
         region.type = RegionInfo::ThinInk;
       }
     } else {
-      // For other cases, calculate a threshold and classify as ThinInk if conditions are met
+      // For other cases, calculate a threshold and classify as ThinInk if
+      // conditions are met
       int k = 1;
       int s = 0;
       while (k < bs.count() && s * 100 < region.pixelCount * 90) {
         s += bs[k++];
       }
       if (region.pixelCount > 100 && k <= 3) {
-        region.type = RegionInfo::ThinInk; // was Ink for some reason
+        region.type = RegionInfo::ThinInk;  // was Ink for some reason
       }
     }
   }

@@ -30,11 +30,15 @@
 #include "toonz/toonzscene.h"
 #include "toonz/sceneproperties.h"
 #include "toonz/tframehandle.h"
+#include "toonz/customvectorbrushexporter.h"
+#include "toonz/toonzfolders.h"
+#include "toonz/txshlevel.h"
 
 // TnzCore includes
 #include "tthreadmessage.h"
 #include "tundo.h"
 #include "tstroke.h"
+#include "tsystem.h"
 #include "tvectorimage.h"
 #include "tcolorstyles.h"
 #include "tpalette.h"
@@ -42,9 +46,73 @@
 // Qt includes
 #include <QApplication>
 #include <QClipboard>
+#include <QFileDialog>
+#include <QInputDialog>
+#include <QLineEdit>
+#include <QMutexLocker>
 
 //=============================================================================
 namespace {
+
+// Warn about unusually large brushes without preventing their use.
+constexpr TINT64 RecommendedCustomVectorBrushBytes = 32 * 1024;
+
+QString normalizeBrushName(QString name) {
+  name = name.trimmed();
+  if (name.endsWith(".pli", Qt::CaseInsensitive)) {
+    name.chop(4);
+    name = name.trimmed();
+  }
+  return name;
+}
+
+QString validateBrushName(const QString &name) {
+  if (name.isEmpty()) return QObject::tr("Please enter a brush name.");
+  if (name == "." || name == "..")
+    return QObject::tr("Please enter a valid brush name.");
+  if (name.endsWith('.') || name.endsWith(' '))
+    return QObject::tr("A brush name cannot end with a dot or a space.");
+
+  const QString invalidCharacters = "\\/:*?\"<>|";
+  for (const QChar character : name) {
+    if (character.unicode() < 32 || invalidCharacters.contains(character))
+      return QObject::tr(
+          "A brush name cannot contain \\ / : * ? \" < > | or control "
+          "characters.");
+  }
+
+  const QString deviceName = name.section('.', 0, 0).toUpper();
+  if (deviceName == "CON" || deviceName == "PRN" || deviceName == "AUX" ||
+      deviceName == "NUL" ||
+      ((deviceName.startsWith("COM") || deviceName.startsWith("LPT")) &&
+       deviceName.size() == 4 && deviceName.at(3) >= '1' &&
+       deviceName.at(3) <= '9'))
+    return QObject::tr("That brush name is reserved by the operating system.");
+
+  if (!TFilePath(name + ".pli").getFrame().isNoFrame())
+    return QObject::tr("A brush name cannot end with a numbered frame suffix.");
+
+  return QString();
+}
+
+QString suggestedBrushName() {
+  TXshLevel *level = TTool::getApplication()->getCurrentLevel()->getLevel();
+  QString name = level ? QString::fromStdWString(level->getName()) : QString();
+
+  QString sanitized;
+  const QString invalidCharacters = "\\/:*?\"<>|";
+  sanitized.reserve(name.size());
+  for (const QChar character : name) {
+    sanitized.append(character.unicode() < 32 ||
+                             invalidCharacters.contains(character)
+                         ? QChar('_')
+                         : character);
+  }
+  sanitized = sanitized.trimmed();
+  while (sanitized.endsWith('.')) sanitized.chop(1);
+  if (sanitized.isEmpty()) sanitized = QStringLiteral("custom");
+  return sanitized + QStringLiteral("_brush");
+}
 
 void vectorizeToonzImageData(const TVectorImageP &image,
                              const ToonzImageData *tiData,
@@ -682,6 +750,156 @@ void StrokeSelection::copy() {
 
 //=============================================================================
 //
+// StrokeSelection::saveAsCustomVectorBrush()
+//
+//-----------------------------------------------------------------------------
+
+void StrokeSelection::saveAsCustomVectorBrush() {
+  saveSelectedVectors(QApplication::keyboardModifiers() & Qt::ShiftModifier);
+}
+
+//-----------------------------------------------------------------------------
+
+void StrokeSelection::saveVectorSelectionAs() { saveSelectedVectors(true); }
+
+//-----------------------------------------------------------------------------
+
+void StrokeSelection::saveSelectedVectors(bool chooseDestination) {
+  if (!m_vi || m_indexes.empty()) return;
+
+  std::vector<int> indexes(m_indexes.begin(), m_indexes.end());
+  for (int index : indexes) {
+    if (index < 0 || index >= static_cast<int>(m_vi->getStrokeCount())) {
+      DVGui::error(QObject::tr(
+          "The vector selection is no longer valid. Please select it again."));
+      return;
+    }
+  }
+
+  TVectorImageP selectedImage;
+  {
+    QMutexLocker lock(m_vi->getMutex());
+    selectedImage = m_vi->splitImage(indexes, false);
+  }
+  if (!selectedImage || selectedImage->getStrokeCount() == 0) return;
+
+  QWidget *parent = QApplication::activeWindow();
+  const TFilePath brushFolder =
+      ToonzFolder::getLibraryFolder() + "vector brushes";
+  TFilePath destination;
+
+  if (chooseDestination) {
+    TFilePath initialFolder = brushFolder;
+    TXshLevel *level = TTool::getApplication()->getCurrentLevel()->getLevel();
+    if (level && !level->getPath().isEmpty()) {
+      TFilePath levelPath = level->getPath();
+      if (m_sceneHandle && m_sceneHandle->getScene())
+        levelPath = m_sceneHandle->getScene()->decodeFilePath(levelPath);
+      if (!levelPath.isEmpty()) initialFolder = levelPath.getParentDir();
+    }
+
+    const TFilePath initialPath =
+        initialFolder + TFilePath(suggestedBrushName() + ".pli");
+    QString fileName = QFileDialog::getSaveFileName(
+        parent, QObject::tr("Save Vector Selection As"),
+        initialPath.getQString(), QObject::tr("OpenToonz Vector Level (*.pli)"),
+        nullptr, QFileDialog::DontConfirmOverwrite);
+    if (fileName.isEmpty()) return;
+
+    destination = TFilePath(fileName);
+    if (QString::fromStdString(destination.getType())
+            .compare("pli", Qt::CaseInsensitive) != 0)
+      destination = TFilePath(destination.getWideString() + L".pli");
+  } else {
+    QString proposedName = suggestedBrushName();
+    QString brushName;
+    while (brushName.isEmpty()) {
+      bool accepted = false;
+      QString input = QInputDialog::getText(
+          parent, QObject::tr("Save as Custom Vector Brush"),
+          QObject::tr("Brush name:"), QLineEdit::Normal, proposedName,
+          &accepted);
+      if (!accepted) return;
+
+      input               = normalizeBrushName(input);
+      const QString error = validateBrushName(input);
+      if (!error.isEmpty()) {
+        DVGui::warning(error);
+        proposedName = input;
+        continue;
+      }
+      brushName = input;
+    }
+    destination = brushFolder + TFilePath(brushName + ".pli");
+  }
+
+  bool appendToDestination = false;
+  if (TFileStatus(destination).doesExist()) {
+    const QString question =
+        chooseDestination
+            ? QObject::tr("The file '%1' already exists.")
+                  .arg(destination.getQString())
+            : QObject::tr("The custom vector brush '%1' already exists.")
+                  .arg(QString::fromStdWString(destination.getWideName()));
+    const int choice =
+        DVGui::MsgBox(question, QObject::tr("Overwrite"), QObject::tr("Append"),
+                      QObject::tr("Cancel"), 2, parent);
+    if (choice != 1 && choice != 2) return;
+    appendToDestination = choice == 2;
+  }
+
+  const TFilePath destinationFolder = destination.getParentDir();
+  const bool installsCustomBrush    = destinationFolder == brushFolder;
+
+  TTool *tool = TTool::getApplication()->getCurrentTool()->getTool();
+  const TFrameId sourceFrameId = tool ? tool->getCurrentFid() : TFrameId(1);
+
+  CustomVectorBrushExporter::Source source;
+  source.preferredFirstFrame = sourceFrameId;
+  source.frames.emplace_back(sourceFrameId, selectedImage);
+
+  CustomVectorBrushExporter::PreparedFile prepared;
+  QString errorMessage;
+  if (!CustomVectorBrushExporter::prepare(source, destinationFolder, prepared,
+                                          errorMessage)) {
+    DVGui::error(errorMessage);
+    return;
+  }
+
+  if (installsCustomBrush &&
+      prepared.serializedBytes > RecommendedCustomVectorBrushBytes) {
+    const TINT64 sizeInKilobytes = (prepared.serializedBytes + 1023) / 1024;
+    const QString question =
+        QObject::tr(
+            "This custom vector brush is %1 KB, above the recommended size "
+            "of 32 KB. Large vector brushes may reduce drawing and rendering "
+            "performance. Continue?")
+            .arg(sizeInKilobytes);
+    if (DVGui::MsgBox(question, QObject::tr("Continue"), QObject::tr("Cancel"),
+                      1, parent) != 1) {
+      CustomVectorBrushExporter::discard(prepared);
+      return;
+    }
+  }
+
+  if (appendToDestination && !CustomVectorBrushExporter::prepareAppend(
+                                 source, destination, prepared, errorMessage)) {
+    CustomVectorBrushExporter::discard(prepared);
+    DVGui::error(errorMessage);
+    return;
+  }
+
+  if (!CustomVectorBrushExporter::commit(prepared, destination, errorMessage)) {
+    CustomVectorBrushExporter::discard(prepared);
+    DVGui::error(errorMessage);
+    return;
+  }
+
+  FolderListenerManager::instance()->notifyFolderChanged(destinationFolder);
+}
+
+//=============================================================================
+//
 // StrokeSelection::paste()
 //
 //-----------------------------------------------------------------------------
@@ -788,6 +1006,8 @@ void StrokeSelection::enableCommands() {
   enableCommand(this, MI_Cut, &StrokeSelection::cut);
   enableCommand(this, MI_Copy, &StrokeSelection::copy);
   enableCommand(this, MI_Paste, &StrokeSelection::paste);
+  enableCommand(this, MI_SaveAsCustomVectorBrush,
+                &StrokeSelection::saveAsCustomVectorBrush);
 
   enableCommand(m_groupCommand.get(), MI_Group, &TGroupCommand::group);
   enableCommand(m_groupCommand.get(), MI_Ungroup, &TGroupCommand::ungroup);

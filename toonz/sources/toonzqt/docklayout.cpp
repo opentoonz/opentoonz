@@ -296,7 +296,12 @@ void DockLayout::updateSeparatorCursors() {
   unsigned int i, j;
   int k, jInt;
   for (i = 0; i < m_regions.size(); ++i) {
-    r                = m_regions[i];
+    r = m_regions[i];
+
+    const int childCount     = static_cast<int>(r->getChildList().size());
+    const int separatorCount = static_cast<int>(r->separators().size());
+    if (childCount == 0 || separatorCount == 0) continue;
+
     bool orientation = r->getOrientation();
 
     // If region geometry is minimal or maximal, its separators are blocked
@@ -319,7 +324,7 @@ void DockLayout::updateSeparatorCursors() {
 
     // Arrowize all separators as long as the preceding region has equal
     // maximum and minimum sizes
-    for (j = 0; j < r->getChildList().size(); ++j) {
+    for (j = 0; j < static_cast<unsigned int>(separatorCount); ++j) {
       child = r->childRegion(j);
 
       if (child->getMaximumSize(orientation) ==
@@ -331,7 +336,8 @@ void DockLayout::updateSeparatorCursors() {
 
     jInt = j;
     // The same as above in reverse order
-    for (k = r->getChildList().size() - 1; k > jInt; --k) {
+    k = std::min(childCount - 1, separatorCount);
+    for (; k > jInt; --k) {
       child = r->childRegion(k);
 
       if (child->getMaximumSize(orientation) ==
@@ -1513,6 +1519,17 @@ bool DockLayout::restoreState(const State &state) {
     item->m_saveIndex = j;
   }
 
+  // Allocate region separators before showing docked widgets. Showing a widget
+  // can synchronously activate the layout and reach updateSeparatorCursors().
+  unsigned int k;
+  for (j = 0; j < m_regions.size(); ++j) {
+    Region *r = m_regions[j];
+    for (k = 1; k < r->m_childList.size(); ++k) {
+      r->insertSeparator(
+          m_decoAllocator->newSeparator(this, r->getOrientation(), r));
+    }
+  }
+
   // Docked widgets are found in hierarchy
   for (j = 0; j < m_regions.size(); ++j)
     if ((item = m_regions[j]->m_item)) {
@@ -1542,16 +1559,6 @@ bool DockLayout::restoreState(const State &state) {
       item->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint);
       item->setFloatingAppearance();
       item->m_floating = true;
-    }
-  }
-
-  // Allocate region separators
-  unsigned int k;
-  for (j = 0; j < m_regions.size(); ++j) {
-    Region *r = m_regions[j];
-    for (k = 1; k < r->m_childList.size(); ++k) {
-      r->insertSeparator(
-          m_decoAllocator->newSeparator(this, r->getOrientation(), r));
     }
   }
 
@@ -1659,8 +1666,8 @@ DockPlaceholder *DockDecoAllocator::newPlaceBuilt(DockWidget *owner, Region *r,
 
 //------------------------------------------------------
 
-//! Sets current deco allocator to decoAllocator. A default deco allocator
-//! is already provided at construction.
+//! Sets current deco allocator to decoAllocator. A default deco allocator is
+//! already provided at construction.
 
 //!\b NOTE: DockLayout takes ownership of the allocator.
 void DockLayout::setDecoAllocator(DockDecoAllocator *decoAllocator) {
@@ -1673,8 +1680,8 @@ void DockLayout::setDecoAllocator(DockDecoAllocator *decoAllocator) {
 
 //------------------------------------------------------
 
-//! Sets current deco allocator to decoAllocator. A default deco allocator
-//! is already provided at construction.
+//! Sets current deco allocator to decoAllocator. A default deco allocator is
+//! already provided at construction.
 
 //!\b NOTE: DockWidget takes ownership of the allocator.
 void DockWidget::setDecoAllocator(DockDecoAllocator *decoAllocator) {

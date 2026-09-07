@@ -2132,7 +2132,16 @@ void BrushToolOptionsBox::onRemovePreset() {
 EraserToolOptionsBox::EraserToolOptionsBox(QWidget *parent, TTool *tool,
                                            TPaletteHandle *pltHandle,
                                            ToolHandle *toolHandle)
-    : ToolOptionsBox(parent), m_pencilMode(0), m_colorMode(0) {
+    : ToolOptionsBox(parent)
+    , m_pencilMode(nullptr)
+    , m_invertMode(nullptr)
+    , m_multiFrameMode(nullptr)
+    , m_eraseOnlySavebox(nullptr)
+    , m_toolType(nullptr)
+    , m_colorMode(nullptr)
+    , m_hardnessLabel(nullptr)
+    , m_colorModeLabel(nullptr)
+    , m_hardnessField(nullptr) {
   TPropertyGroup *props = tool->getProperties(0);
   assert(props->getPropertyCount() > 0);
 
@@ -2147,11 +2156,15 @@ EraserToolOptionsBox::EraserToolOptionsBox(QWidget *parent, TTool *tool,
   if (m_hardnessField)
     m_hardnessLabel = m_labels.value(m_hardnessField->propertyName());
   m_colorMode  = dynamic_cast<ToolOptionCombo *>(m_controls.value("Mode:"));
+  if (m_colorMode)
+    m_colorModeLabel = m_labels.value(m_colorMode->propertyName());
   m_invertMode = dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Invert"));
   m_multiFrameMode =
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Frame Range"));
   m_pencilMode =
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Pencil Mode"));
+  m_eraseOnlySavebox =
+      dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Savebox"));
 
   bool ret = true;
   if (m_pencilMode) {
@@ -2174,6 +2187,13 @@ EraserToolOptionsBox::EraserToolOptionsBox(QWidget *parent, TTool *tool,
     m_invertMode->setEnabled(false);
     m_multiFrameMode->setEnabled(false);
   }
+
+  bool isSegment =
+      m_toolType && m_toolType->getProperty()->getValue() == L"Segment";
+  if (m_colorMode) m_colorMode->setDisabled(isSegment);
+  if (m_colorModeLabel) m_colorModeLabel->setDisabled(isSegment);
+  if (isSegment && m_invertMode) m_invertMode->setEnabled(false);
+  if (m_eraseOnlySavebox) m_eraseOnlySavebox->setEnabled(isSegment);
 
   if (m_colorMode && m_colorMode->getProperty()->getValue() == L"Areas") {
     assert(m_hardnessField && m_hardnessLabel && m_pencilMode);
@@ -2205,8 +2225,12 @@ void EraserToolOptionsBox::onPencilModeToggled(bool value) {
 void EraserToolOptionsBox::onToolTypeChanged(int index) {
   const TEnumProperty::Range &range = m_toolType->getProperty()->getRange();
   bool value                        = range[index] != L"Normal";
-  m_invertMode->setEnabled(value);
+  bool isSegment                    = range[index] == L"Segment";
+  m_invertMode->setEnabled(value && !isSegment);
   m_multiFrameMode->setEnabled(value);
+  if (m_colorMode) m_colorMode->setDisabled(isSegment);
+  if (m_colorModeLabel) m_colorModeLabel->setDisabled(isSegment);
+  if (m_eraseOnlySavebox) m_eraseOnlySavebox->setEnabled(isSegment);
 }
 
 //-----------------------------------------------------------------------------

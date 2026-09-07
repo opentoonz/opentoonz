@@ -83,6 +83,7 @@ class PngReader final : public Tiio::Reader {
   int m_y;
   bool m_is16bitEnabled;
   std::unique_ptr<unsigned char[]> m_rowBuffer;
+  std::vector<unsigned char> m_imageBuffer;
   int m_canDelete;
   int m_channels;
   int m_rowBytes;
@@ -246,7 +247,7 @@ public:
 #error "unknown channel order"
 #endif
 
-    // Handle interlacing if present - let libpng handle it
+    // Register libpng's Adam7 pass handling before updating output info.
     if (m_interlace_type == PNG_INTERLACE_ADAM7) {
       png_set_interlace_handling(m_png_ptr);
     }
@@ -259,6 +260,7 @@ public:
     m_rowBytes = png_get_rowbytes(m_png_ptr, m_info_ptr);
     png_get_IHDR(m_png_ptr, m_info_ptr, &lx, &ly, &m_bit_depth, &m_color_type,
                  &m_interlace_type, &m_compression_type, &m_filter_type);
+    m_info.m_bitsPerSample  = m_bit_depth;
     m_info.m_samplePerPixel = m_channels;
 
     // Validate dimensions
@@ -270,6 +272,23 @@ public:
     m_rowBuffer.reset(new unsigned char[m_rowBytes]);
     if (!m_rowBuffer) {
       throw TException("Memory allocation failed for row buffer");
+    }
+
+    // Adam7 PNG data is stored pass-by-pass, not row-by-row. The Tiio reader
+    // API asks for completed rows sequentially, so reading one libpng row per
+    // readLine() returns only the current Adam7 pass and produces the familiar
+    // sparse/glitchy image. Decode interlaced PNGs completely here, then serve
+    // completed rows from the cached image.
+    if (m_interlace_type == PNG_INTERLACE_ADAM7) {
+      const size_t imageBytes =
+          static_cast<size_t>(m_rowBytes) * static_cast<size_t>(m_info.m_ly);
+      m_imageBuffer.resize(imageBytes);
+
+      std::vector<png_bytep> rows(m_info.m_ly);
+      for (int y = 0; y < m_info.m_ly; ++y) {
+        rows[y] = m_imageBuffer.data() + static_cast<size_t>(y) * m_rowBytes;
+      }
+      png_read_image(m_png_ptr, rows.data());
     }
   }
 
@@ -300,7 +319,13 @@ public:
       return;
     }
 
-    png_read_row(m_png_ptr, m_rowBuffer.get(), nullptr);
+    if (!m_imageBuffer.empty()) {
+      memcpy(m_rowBuffer.get(),
+             m_imageBuffer.data() + static_cast<size_t>(m_y) * m_rowBytes,
+             m_rowBytes);
+    } else {
+      png_read_row(m_png_ptr, m_rowBuffer.get(), nullptr);
+    }
     writeRow(buffer, x0, x1);
     m_y++;
   }
@@ -331,7 +356,13 @@ public:
       return;
     }
 
-    png_read_row(m_png_ptr, m_rowBuffer.get(), nullptr);
+    if (!m_imageBuffer.empty()) {
+      memcpy(m_rowBuffer.get(),
+             m_imageBuffer.data() + static_cast<size_t>(m_y) * m_rowBytes,
+             m_rowBytes);
+    } else {
+      png_read_row(m_png_ptr, m_rowBuffer.get(), nullptr);
+    }
     writeRow(buffer, x0, x1);
     m_y++;
   }
@@ -342,6 +373,12 @@ public:
     int skipped = 0;
     for (int i = 0; i < lineCount; ++i) {
       if (m_y >= m_info.m_ly) break;
+
+      if (!m_imageBuffer.empty()) {
+        m_y++;
+        skipped++;
+        continue;
+      }
 
       if (setjmp(png_jmpbuf(m_png_ptr))) {
         break;  // Stop on error

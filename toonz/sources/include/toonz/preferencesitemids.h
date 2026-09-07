@@ -41,8 +41,10 @@ enum PreferencesItemId {
   colorCalibrationLutPaths,
   showIconsInMenu,
   showRoomBindButtons,
+  customHelpLink,
   displayIn30bit,
   viewerIndicatorEnabled,
+  restoreViewerViewFromLastSession,
 
   //----------
   // Visualization

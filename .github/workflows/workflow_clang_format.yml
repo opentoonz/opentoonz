@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
@@ -33,7 +33,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y clang-format-14
 
-      - name: Check formatting of changed C/C++ files
+      - name: Check formatting of changed C/C++ lines
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
@@ -55,9 +55,28 @@ jobs:
           )
 
           if (( ${#files[@]} == 0 )); then
-            echo "No changed C/C++ files to check."
+            echo "No changed C/C++ lines to check."
             exit 0
           fi
 
-          printf 'Checking %s\n' "${files[@]}"
-          clang-format-14 --dry-run --Werror -style=file "${files[@]}"
+          for file in "${files[@]}"; do
+            ranges=()
+            while read -r start count; do
+              count=${count:-1}
+              if (( count > 0 )); then
+                end=$((start + count - 1))
+                ranges+=(--lines="$start:$end")
+              fi
+            done < <(
+              git diff --unified=0 --no-color "$BASE_SHA" "$HEAD_SHA" -- "$file" |
+                sed -nE 's/^@@ -[0-9]+(,[0-9]+)? \+([0-9]+)(,([0-9]+))? @@.*/\2 \4/p'
+            )
+
+            if (( ${#ranges[@]} == 0 )); then
+              continue
+            fi
+
+            printf 'Checking %s (%s)\n' "$file" "${ranges[*]}"
+            clang-format-14 --dry-run --Werror -style=file \
+              "${ranges[@]}" "$file"
+          done

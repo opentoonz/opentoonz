@@ -50,6 +50,8 @@ jobs:
           brew link --overwrite --force python@3.14 || true
 
       - name: Install libraries
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
         run: |
           checkPkgAndInstall() {
             for pkg in "$@"; do
@@ -60,8 +62,6 @@ jobs:
               fi
             done
           }
-
-          brew update
 
           checkPkgAndInstall pkg-config glew lz4 libjpeg libpng lzo boost libusb libmypaint ccache jpeg-turbo ninja opencv@4 openjph openexr
 

@@ -47,6 +47,10 @@
 #include "toonzqt/icongenerator.h"
 
 #include <QCoreApplication>
+#include <algorithm>
+#include <deque>
+#include <map>
+#include <vector>
 
 //=============================================================================
 
@@ -63,6 +67,8 @@ TDimension FilmstripIconSize(0, 0);
 // Access name-based storage
 std::set<std::string> iconsMap;
 typedef std::set<std::string>::iterator IconIterator;
+std::map<std::string, std::deque<std::string>> responsiveIconKeys;
+const int kMaxResponsiveIconSizes = 3;
 
 //-----------------------------------------------------------------------------
 
@@ -165,6 +171,44 @@ void removeIcon(const std::string &iconName) {
 
 //-----------------------------------------------------------------------------
 
+std::string responsiveIconKey(const std::string &baseId,
+                              const TDimension &size) {
+  return baseId + "_r_" + std::to_string(size.lx) + "x" +
+         std::to_string(size.ly);
+}
+
+std::string filmstripIconBaseId(TXshSimpleLevel *sl, const TFrameId &fid) {
+  const int status = sl->getFrameStatus(fid);
+  if (sl->getType() == TZP_XSHLEVEL &&
+      status & TXshSimpleLevel::CleanupPreview) {
+    sl->setFrameStatus(fid, status & ~TXshSimpleLevel::CleanupPreview);
+    std::string id = sl->getIconId(fid);
+    sl->setFrameStatus(fid, status);
+    return id;
+  }
+  return sl->getIconId(fid);
+}
+
+void removeResponsiveSizedIcons(const std::string &baseId) {
+  auto it = responsiveIconKeys.find(baseId);
+  if (it == responsiveIconKeys.end()) return;
+  for (const std::string &key : it->second) removeIcon(key);
+  responsiveIconKeys.erase(it);
+}
+
+void retainResponsiveIcon(const std::string &baseId, const std::string &key) {
+  std::deque<std::string> &keys = responsiveIconKeys[baseId];
+  auto found                    = std::find(keys.begin(), keys.end(), key);
+  if (found != keys.end()) keys.erase(found);
+  keys.push_back(key);
+  while ((int)keys.size() > kMaxResponsiveIconSizes) {
+    removeIcon(keys.front());
+    keys.pop_front();
+  }
+}
+
+//-----------------------------------------------------------------------------
+
 bool isUnpremultiplied(const TRaster32P &r) {
   int lx = r->getLx();
   int y  = r->getLy();
@@ -225,7 +269,8 @@ TRaster32P convertToIcon(TVectorImageP vimage, int frame,
   if (!plt) return TRaster32P();
   plt->setFrame(frame);
 
-  TOfflineGL *glContext = IconGenerator::instance()->getOfflineGLContext();
+  TOfflineGL *glContext =
+      IconGenerator::instance()->getOfflineGLContext(iconSize);
 
   // Image bounding box with a small margin to prevent issues with empty images
   TRectD imageBox;
@@ -387,8 +432,9 @@ TRaster32P convertToIcon(TMeshImageP mi, int frame, const TDimension &iconSize,
                          const IconGenerator::Settings &settings) {
   if (!mi) return TRaster32P();
 
-  TOfflineGL *glContext = IconGenerator::instance()->getOfflineGLContext();
-  TRectD imageBox       = mi->getBBox().enlarge(.1);
+  TOfflineGL *glContext =
+      IconGenerator::instance()->getOfflineGLContext(iconSize);
+  TRectD imageBox = mi->getBBox().enlarge(.1);
   TPointD imageCenter(0.5 * (imageBox.getP00() + imageBox.getP11()));
 
   const int margin = 10;
@@ -616,7 +662,8 @@ public:
 TRaster32P SplineIconRenderer::generateRaster(
     const TDimension &iconSize) const {
   // get the glContext
-  TOfflineGL *glContext = IconGenerator::instance()->getOfflineGLContext();
+  TOfflineGL *glContext =
+      IconGenerator::instance()->getOfflineGLContext(iconSize);
   glContext->makeCurrent();
   glContext->clear(TPixel32::White);
 
@@ -1381,23 +1428,22 @@ TDimension IconGenerator::getIconSize() const { return FilmstripIconSize; }
 
 //-----------------------------------------------------------------------------
 
-TOfflineGL *IconGenerator::getOfflineGLContext() {
+TOfflineGL *IconGenerator::getOfflineGLContext(const TDimension &minSize) {
+  const TDimension requiredSize(
+      std::max(minSize.lx, std::max(FilmstripIconSize.lx, IconSize.lx)),
+      std::max(minSize.ly, std::max(FilmstripIconSize.ly, IconSize.ly)));
+
   TOfflineGL *context = m_contexts.localData();
   // One context per rendering thread
   if (!context) {
-    context =
-        new TOfflineGL(TDimension(std::max(FilmstripIconSize.lx, IconSize.lx),
-                                  std::max(FilmstripIconSize.ly, IconSize.ly)));
+    context = new TOfflineGL(requiredSize);
     m_contexts.setLocalData(context);
     return context;
   }
-  TDimension requiredSize(std::max(FilmstripIconSize.lx, IconSize.lx),
-                          std::max(FilmstripIconSize.ly, IconSize.ly));
-  TDimension actualSize = context->getSize();
 
+  const TDimension actualSize = context->getSize();
   if (actualSize.lx < requiredSize.lx || actualSize.ly < requiredSize.ly) {
     context = new TOfflineGL(requiredSize);
-
     m_contexts.setLocalData(context);
   }
 
@@ -1585,12 +1631,27 @@ QPixmap IconGenerator::getSizedIcon(TXshLevel *xl, const TFrameId &fid,
 
 //-----------------------------------------------------------------------------
 
+QPixmap IconGenerator::getResponsiveIcon(TXshLevel *xl, const TFrameId &fid,
+                                         const TDimension &dim) {
+  if (!xl) return QPixmap();
+  TXshSimpleLevel *sl = xl->getSimpleLevel();
+  if (!sl) return QPixmap();
+
+  const std::string baseId = filmstripIconBaseId(sl, fid);
+  const std::string key    = responsiveIconKey(baseId, dim);
+  retainResponsiveIcon(baseId, key);
+  return getSizedIcon(xl, fid, key.substr(baseId.size()), dim);
+}
+
+//-----------------------------------------------------------------------------
+
 void IconGenerator::invalidate(TXshLevel *xl, const TFrameId &fid,
                                bool onlyFilmStrip) {
   if (!xl) return;
 
   if (TXshSimpleLevel *sl = xl->getSimpleLevel()) {
     std::string id = sl->getIconId(fid);
+    removeResponsiveSizedIcons(filmstripIconBaseId(sl, fid));
 
     int type = sl->getType();
 
@@ -1678,6 +1739,7 @@ void IconGenerator::remove(TXshLevel *xl, const TFrameId &fid,
     std::string id(sl->getIconId(fid));
 
     removeIcon(id);
+    removeResponsiveSizedIcons(filmstripIconBaseId(sl, fid));
     if (!onlyFilmStrip) removeIcon(id + "_small");
   } else {
     TXshChildLevel *cl = xl->getChildLevel();

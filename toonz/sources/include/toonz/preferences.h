@@ -238,6 +238,9 @@ public:
   bool isViewerIndicatorEnabled() const {
     return getBoolValue(viewerIndicatorEnabled);
   }
+  bool isRestoreViewerViewFromLastSessionEnabled() const {
+    return getBoolValue(restoreViewerViewFromLastSession);
+  }
 
   // Visualization  tab
   bool getShow0ThickLines() const { return getBoolValue(show0ThickLines); }
@@ -581,6 +584,7 @@ Q_SIGNALS:
   void stopAutoSave();
   void startAutoSave();
   void autoSavePeriodChanged();
+  void fillOnlySaveboxChanged(bool enabled);
 
 private:
   std::unique_ptr<QSettings> m_settings;

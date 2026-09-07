@@ -1,6 +1,7 @@
 
 
 #include "mainwindow.h"
+#include "customhelplink.h"
 
 // Tnz6 includes
 #include "menubar.h"
@@ -29,6 +30,7 @@
 #include "toonzqt/viewcommandids.h"
 #include "toonzqt/updatechecker.h"
 #include "toonzqt/paletteviewer.h"
+#include "toonzqt/lutcalibrator.h"
 #include "toonzqt/seethroughwindow.h"
 
 // TnzLib includes
@@ -59,6 +61,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QMessageBox>
+#include <QTimer>
 #ifdef _WIN32
 #include <QtPlatformHeaders/QWindowsWindowFunctions>
 #endif
@@ -419,7 +422,28 @@ void Room::load(const TFilePath &fp, RoomLoadParams &params) {
 
   layout->restoreState(state);
 
+  // Store layout state for deferred re-apply after the first show.
+  // Without this, TMainWindow::resizeEvent → redistribute() recalculates
+  // panel sizes before the window has reached its final geometry.
+  m_pendingLayoutState        = state;
+  m_hasPendingLayoutRestore   = true;
+
   m_initialized = true;
+}
+
+//-----------------------------------------------------------------------------
+
+void Room::showEvent(QShowEvent *event) {
+  TMainWindow::showEvent(event);
+
+  if (m_hasPendingLayoutRestore) {
+    m_hasPendingLayoutRestore = false;
+    DockLayout::State savedState = m_pendingLayoutState;
+    DockLayout *layout           = dockLayout();
+    QTimer::singleShot(0, this, [layout, savedState]() {
+      layout->restoreState(savedState);
+    });
+  }
 }
 
 //=============================================================================
@@ -510,6 +534,7 @@ centralWidget->setLayout(centralWidgetLayout);*/
   setCommandHandler(MI_About, this, &MainWindow::onAbout);
   setCommandHandler(MI_OpenOnlineManual, this, &MainWindow::onOpenOnlineManual);
   setCommandHandler(MI_OpenWhatsNew, this, &MainWindow::onOpenWhatsNew);
+  setCommandHandler(MI_Quicklink, this, &MainWindow::onOpenQuicklink);
   setCommandHandler(MI_OpenCommunityForum, this,
                     &MainWindow::onOpenCommunityForum);
   setCommandHandler(MI_OpenReportABug, this, &MainWindow::onOpenReportABug);
@@ -1113,6 +1138,10 @@ void MainWindow::onOpenWhatsNew() {
   QDesktopServices::openUrl(
       QUrl(tr("https://github.com/opentoonz/opentoonz/releases/latest")));
 }
+
+//-----------------------------------------------------------------------------
+
+void MainWindow::onOpenQuicklink() { CustomHelpLink::open(); }
 
 //-----------------------------------------------------------------------------
 
@@ -2617,6 +2646,18 @@ void MainWindow::defineActions() {
 
   // Menu - View
 
+  menuAct =
+      createToggle(MI_ToggleColorCalibration, QT_TR_NOOP("Toggle Active LUT"),
+                   "", Preferences::instance()->isColorCalibrationEnabled(),
+                   MenuViewCommandType);
+  connect(menuAct, &QAction::triggered, this, [](bool enabled) {
+    Preferences::instance()->setValue(colorCalibrationEnabled, enabled);
+    LutManager::instance()->update();
+    TApp::instance()->getCurrentScene()->notifyPreferenceChanged(
+        "ColorCalibration");
+  });
+  menuAct->setEnabled(true);
+
   createToggle(MI_ViewCamera, QT_TR_NOOP("&Camera Box"), "",
                ViewCameraToggleAction ? 1 : 0, MenuViewCommandType);
   createToggle(MI_ViewTable, QT_TR_NOOP("&Table"), "",
@@ -2784,6 +2825,7 @@ void MainWindow::defineActions() {
                        "F1", "manual");
   createMenuHelpAction(MI_OpenWhatsNew, QT_TR_NOOP("&What's New..."), "",
                        "web");
+  createMenuHelpAction(MI_Quicklink, QT_TR_NOOP("&Quicklink"), "", "web");
   createMenuHelpAction(MI_OpenCommunityForum, QT_TR_NOOP("&Community Forum..."),
                        "", "web");
   createMenuHelpAction(MI_OpenReportABug, QT_TR_NOOP("&Report a Bug..."), "",
@@ -2813,6 +2855,8 @@ void MainWindow::defineActions() {
   CommandManager::instance()->setToggleTexts(
       MI_FreezePreview, tr("Freeze Preview"), tr("Unfreeze Preview"));
   createRightClickMenuAction(MI_SavePreset, QT_TR_NOOP("&Save As Preset"), "");
+  createRightClickMenuAction(MI_SaveAsCustomVectorBrush,
+                             QT_TR_NOOP("Save as Custom Vector Brush..."), "");
   createRightClickMenuAction(MI_PreviewFx, QT_TR_NOOP("Preview Fx"), "");
   createRightClickMenuAction(MI_PasteValues, QT_TR_NOOP("&Paste Color && Name"),
                              "", "paste_color_and_name");
