@@ -634,8 +634,8 @@ elseif(BUILD_ENV_APPLE)
 elseif(BUILD_ENV_UNIXLIKE)
     set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
-    # Mirror relative bin/lib location for installation
-    # so the generated shell script works in both cases.
+    # Mirror relative bin/lib location so the build tree and the installed
+    # layout match.
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/opentoonz)
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/opentoonz)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -643,6 +643,13 @@ elseif(BUILD_ENV_UNIXLIKE)
     if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
         set(CMAKE_INSTALL_PREFIX "/opt/opentoonz" CACHE PATH "OpenToonz install prefix" FORCE)
     endif()
+
+    # $ORIGIN-relative RPATH: executables in <prefix>/bin find libraries in
+    # ../lib/opentoonz; libraries there find siblings directly. The build tree
+    # mirrors this layout, so building with the install RPATH keeps both
+    # working without a relink step.
+    set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib/opentoonz:$ORIGIN")
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 endif()
 
 if(BUILD_ENV_MSVC AND MSVC_VERSION EQUAL 1800)
