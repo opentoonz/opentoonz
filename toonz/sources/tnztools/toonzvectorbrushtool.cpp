@@ -554,12 +554,6 @@ ToonzVectorBrushTool::ToonzVectorBrushTool(std::string name, int targetType)
     , m_miterJoinLimit("Miter:", 0, 100, 4)
     , m_assistants("Assistants", true)
     , m_styleId()
-    , m_trailFrameOffset()
-    , m_trailFrameCount()
-    , m_trailFrameStep(1)
-    , m_trailFrameLast()
-    , m_trailStyleId(-1)
-    , m_trailPalette()
     , m_minThick()
     , m_maxThick()
     , m_col()
@@ -576,8 +570,6 @@ ToonzVectorBrushTool::ToonzVectorBrushTool(std::string name, int targetType)
     , m_isPath()
     , m_presetsLoaded()
     , m_firstFrameRange(true)
-    , m_trailCycleActive()
-    , m_trailHasStamped()
     , m_propertyUpdating() {
   bind(targetType);
 
@@ -847,6 +839,18 @@ void ToonzVectorBrushTool::copyStrokes(StrokeList &dst, const StrokeList &src) {
 
 //--------------------------------------------------------------------------------------------------
 
+bool ToonzVectorBrushTool::isTrailCycleAvailable() const {
+  if (m_frameRange.getIndex()) return false;
+  TTool::Application *app = TTool::getApplication();
+  if (!app) return false;
+  TColorStyle *style = app->getCurrentLevelStyle();
+  if (auto *trail = dynamic_cast<TVectorImagePatternStrokeStyle *>(style))
+    return trail->getLevelFrameCount() > 1;
+  if (auto *trail = dynamic_cast<TRasterImagePatternStrokeStyle *>(style))
+    return trail->getLevelFrameCount() > 1;
+  return false;
+}
+
 void ToonzVectorBrushTool::inputSetBusy(bool busy) {
   if (m_active == busy) return;
   
@@ -856,7 +860,8 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
     
     m_styleId = 0;
     m_tracks.clear();
-    m_trailCycleActive = false;
+    m_trailSelection      = TrailCycle::Selection();
+    m_trailGesturePalette = TPaletteP();
 
     TTool::Application *app = TTool::getApplication();
     if (!app)
@@ -888,7 +893,6 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
       m_currentColor = cs->getAverageColor();
       m_currentColor.m = 255;
 
-      m_trailCycleActive  = false;
       int trailFrameCount = 0;
       if (TVectorImagePatternStrokeStyle *trailStyle =
               dynamic_cast<TVectorImagePatternStrokeStyle *>(cs))
@@ -896,42 +900,18 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
       else if (TRasterImagePatternStrokeStyle *trailStyle =
                    dynamic_cast<TRasterImagePatternStrokeStyle *>(cs))
         trailFrameCount = trailStyle->getLevelFrameCount();
-      if (!m_frameRange.getIndex() && m_trailCycle.getIndex() != 0 &&
-          trailFrameCount > 1) {
-        // Forward advances the cycle, Backward backtracks it, Repeat holds
-        // it - and a Repeat stroke stores step 0, freezing its frame along
-        // the whole stroke.
-        const int cycleIndex = m_trailCycle.getIndex();
-        m_trailFrameStep     = cycleIndex == 2 ? -1 : cycleIndex == 3 ? 0 : 1;
-
-        // All cycle modes share one position in the source level, so cycling
-        // forward, backtracking and freezing act on the same cursor.  Only a
-        // different Trail style starts the cycle over; switching modes or
-        // drawing with other styles in between leaves the position alone.
-        const TPalette *palette = app->getCurrentPalette()
-                                      ? app->getCurrentPalette()->getPalette()
-                                      : nullptr;
-        if (m_trailStyleId != m_styleId || m_trailPalette != palette ||
-            m_trailFrameCount != trailFrameCount) {
-          m_trailStyleId    = m_styleId;
-          m_trailPalette    = palette;
-          m_trailFrameCount = trailFrameCount;
-          m_trailHasStamped = false;
-        }
-
-        if (m_trailHasStamped) {
-          m_trailFrameOffset =
-              (m_trailFrameLast + m_trailFrameStep) % trailFrameCount;
-          if (m_trailFrameOffset < 0) m_trailFrameOffset += trailFrameCount;
-        } else {
-          m_trailFrameOffset = m_trailFrameStep < 0 ? trailFrameCount - 1 : 0;
-        }
-        m_trailCycleActive = true;
-      }
+      TVectorImageP trailImage = getImage(true);
+      m_trailGesturePalette    = trailImage->getPalette();
+      const TrailCycle::StyleKey key{m_trailGesturePalette.getPointer(),
+                                     m_styleId, cs->getBrushIdName()};
+      const auto mode =
+          m_frameRange.getIndex()
+              ? TrailCycle::Mode::Off
+              : static_cast<TrailCycle::Mode>(m_trailCycle.getIndex());
+      m_trailSelection = m_trailState.begin(mode, key, trailFrameCount);
     } else {
       m_styleId          = 1;
       m_currentColor     = TPixel32::Black;
-      m_trailCycleActive = false;
     }
 
     m_active = true;
@@ -1013,9 +993,9 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
     options.m_capStyle   = m_capStyle.getIndex();
     options.m_joinStyle  = m_joinStyle.getIndex();
     options.m_miterUpper = m_miterJoinLimit.getValue();
-    if (m_trailCycleActive) {
-      options.m_patternFrameOffset = m_trailFrameOffset;
-      options.m_patternFrameStep   = m_trailFrameStep;
+    if (m_trailSelection.active) {
+      options.m_patternFrameOffset = m_trailSelection.offset;
+      options.m_patternFrameStep   = m_trailSelection.step;
     }
 
     if ( stroke->getControlPointCount() == 3
@@ -1105,11 +1085,14 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
   } else {
     // regular paint strokes
     TUndoManager::manager()->beginBlock();
+    bool strokeCommitted = false;
     for(StrokeList::iterator i = strokes.begin(); i != strokes.end(); ++i) {
       TStroke *stroke = *i;
+      const int previousCount = vi->getStrokeCount();
       addStrokeToImage(app, vi, stroke, (DrawOrder)m_drawOrder.getIndex(),
                        m_breakAngles.getValue(),
                       false, false, m_isFrameCreated, m_isLevelCreated);
+      strokeCommitted = strokeCommitted || vi->getStrokeCount() > previousCount;
 
       if ((Preferences::instance()->getGuidedDrawingType() == 1 ||
           Preferences::instance()->getGuidedDrawingType() == 2) &&
@@ -1126,9 +1109,9 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
     }
     TUndoManager::manager()->endBlock();
 
-    if (m_trailCycleActive && !strokes.empty()) {
-      m_trailFrameLast  = m_trailFrameOffset;
-      m_trailHasStamped = true;
+    if (m_trailSelection.active && strokeCommitted) {
+      m_trailPalette = m_trailGesturePalette;
+      m_trailState.commit(m_trailSelection, true);
     }
   }
   

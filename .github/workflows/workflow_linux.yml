@@ -75,6 +75,15 @@ jobs:
         cmake ../sources -G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} -DCMAKE_C_COMPILER=${{ matrix.cc }} -DWITH_TRANSLATION=OFF
         ninja
 
+    - name: Test Trail rendering and persistence logic
+      run: |
+        set -euo pipefail
+        cmake -S toonz/tests -B toonz/trail-tests -G Ninja \
+          -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} \
+          -DTNZCORE_LIBRARY="$PWD/toonz/build/tnzcore/libtnzcore.so"
+        cmake --build toonz/trail-tests
+        ctest --test-dir toonz/trail-tests -LE opengl --output-on-failure
+
     - name: Create Artifact
       run: |
         cd toonz/build

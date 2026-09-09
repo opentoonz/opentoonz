@@ -540,7 +540,7 @@ ParsedPliImp::ParsedPliImp(const TFilePath &filename, bool readInfo)
   TagElem *tagElem;
   UCHAR maxThickness;
 
-  // cerr<<m_filePath<<endl;
+  m_filePath = filename;
 
   //#ifdef _WIN32
   m_iChan.open(filename);
@@ -1414,6 +1414,9 @@ PliTag *ParsedPliImp::readStyleTag() {
 /*=====================================================================*/
 
 PliTag *ParsedPliImp::readOutlineOptionsTag() {
+  const TUINT32 baseLength = 2 + 2 * m_currDynamicTypeBytesNum;
+  if (m_tagLength < baseLength)
+    throw TImageException(m_filePath, "Truncated PLI stroke outline options");
   TUINT32 bufOffs = 0;
   TINT32 d;
 
@@ -1436,7 +1439,6 @@ PliTag *ParsedPliImp::readOutlineOptionsTag() {
   // PLI readers that predate this extension consume the original four fields
   // and ignore the remaining bytes in this tag.  Keep the extra data at the
   // end for that compatibility.
-  const TUINT32 baseLength = 2 + 2 * m_currDynamicTypeBytesNum;
   if (m_tagLength >= baseLength + 2 * m_currDynamicTypeBytesNum) {
     TINT32 frameOffset, frameStep;
     readDynamicData(frameOffset, bufOffs);
@@ -2437,8 +2439,8 @@ TUINT32 ParsedPliImp::writeOutlineOptionsTag(StrokeOutlineOptionsTag *tag) {
   TINT32 frameStep               = tag->m_options.m_patternFrameStep;
   const bool hasPatternFrameData = frameOffset != 0 || frameStep != 1;
 
-  int minValue = std::min((int)(scale * miterLower), (int)(scale * miterUpper));
-  int maxValue = std::max((int)(scale * miterLower), (int)(scale * miterUpper));
+  int minValue = std::min(miterLower, miterUpper);
+  int maxValue = std::max(miterLower, miterUpper);
   if (hasPatternFrameData) {
     minValue = std::min({minValue, (int)frameOffset, (int)frameStep});
     maxValue = std::max({maxValue, (int)frameOffset, (int)frameStep});

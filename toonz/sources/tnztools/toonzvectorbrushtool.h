@@ -8,6 +8,8 @@
 #include <trasterimage.h>
 #include <ttoonzimage.h>
 #include <tstroke.h>
+#include <tpalette.h>
+#include "trailcyclestate.h"
 #include <toonz/strokegenerator.h>
 #include "toonz/preferences.h"
 #include <tools/tool.h>
@@ -169,6 +171,7 @@ public:
   TPropertyGroup *getProperties(int targetType) override;
   bool onPropertyChanged(std::string propertyName) override;
   void resetFrameRange();
+  bool isTrailCycleAvailable() const;
 
   void initPresets();
   void loadPreset();
@@ -244,12 +247,10 @@ protected:
   TFrameId m_firstFrameId, m_veryFirstFrameId;
   TPixel32 m_currentColor;
   int m_styleId;
-  int m_trailFrameOffset;
-  int m_trailFrameCount;
-  int m_trailFrameStep;
-  int m_trailFrameLast;
-  int m_trailStyleId;
-  const TPalette *m_trailPalette;  // identity only, never dereferenced
+  TrailCycle::State m_trailState;
+  TrailCycle::Selection m_trailSelection;
+  TPaletteP m_trailPalette;
+  TPaletteP m_trailGesturePalette;
   double m_minThick, m_maxThick;
 
   // for snapping and framerange
@@ -267,8 +268,7 @@ protected:
   VectorBrushPresetManager
       m_presetsManager;  //!< Manager for presets of this tool instance
 
-  bool m_active, m_firstTime, m_isPath, m_presetsLoaded, m_firstFrameRange,
-      m_trailCycleActive, m_trailHasStamped;
+  bool m_active, m_firstTime, m_isPath, m_presetsLoaded, m_firstFrameRange;
 
   bool m_propertyUpdating;
   double m_cameraDpi;
