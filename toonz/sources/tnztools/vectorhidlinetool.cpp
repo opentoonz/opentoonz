@@ -59,11 +59,12 @@ namespace {
 const double minDistance2 = 16.0;
 
 const TPixel32 rangeGuideColors[] = {
-    TPixel32(255, 70, 70),   TPixel32(90, 255, 100), TPixel32(80, 210, 255),
-    TPixel32(255, 210, 50),  TPixel32(255, 100, 255), TPixel32(50, 255, 230)};
+    TPixel32(255, 70, 70),  TPixel32(90, 255, 100),  TPixel32(80, 210, 255),
+    TPixel32(255, 210, 50), TPixel32(255, 100, 255), TPixel32(50, 255, 230)};
 
 TPixel32 rangeGuideColor(int index) {
-  const int count = (int)(sizeof(rangeGuideColors) / sizeof(rangeGuideColors[0]));
+  const int count =
+      (int)(sizeof(rangeGuideColors) / sizeof(rangeGuideColors[0]));
   return rangeGuideColors[index % count];
 }
 
@@ -73,7 +74,8 @@ void deleteRangeGuides(std::vector<TStroke *> &guides) {
 }
 
 THideLineMode toHideLineMode(const std::wstring &value) {
-  return value == HIDDEN_MODE ? THideLineMode::Hidden : THideLineMode::Invisible;
+  return value == HIDDEN_MODE ? THideLineMode::Hidden
+                              : THideLineMode::Invisible;
 }
 
 double brushRadiusFromToolSize(double toolSize) {
@@ -267,9 +269,9 @@ class HideLineTool final : public TTool {
     if (!app || !app->getCurrentFrame()) return;
     m_veryFirstFrameId = getCurrentFid();
     if (app->getCurrentFrame()->isEditingScene() && app->getCurrentColumn())
-      m_currCell = std::pair<int, int>(
-          app->getCurrentColumn()->getColumnIndex(),
-          app->getCurrentFrame()->getFrame());
+      m_currCell =
+          std::pair<int, int>(app->getCurrentColumn()->getColumnIndex(),
+                              app->getCurrentFrame()->getFrame());
   }
 
   double overlayPixelSize() const {
@@ -539,13 +541,9 @@ class HideLineTool final : public TTool {
 
   bool isUnhideMode() const { return m_unhide.getValue(); }
 
-  bool isNormalType() const {
-    return m_hideType.getValue() == NORMAL_HIDE;
-  }
+  bool isNormalType() const { return m_hideType.getValue() == NORMAL_HIDE; }
 
-  bool isLassoMode() const {
-    return isNormalType() && m_lasso.getValue();
-  }
+  bool isLassoMode() const { return isNormalType() && m_lasso.getValue(); }
 
   int livePairIndex() const {
     if (!hasPendingRange()) return 0;
@@ -572,7 +570,7 @@ class HideLineTool final : public TTool {
 
   void hideAtBrushUnlocked(const TVectorImageP &vi, const TPointD &pos,
                            double radius) {
-    int colorStyle = TTool::getApplication()->getCurrentLevelStyleIndex();
+    int colorStyle     = TTool::getApplication()->getCurrentLevelStyleIndex();
     THideLineMode mode = toHideLineMode(m_hideMode.getValue());
 
     TRectD circumscribedSquare(pos.x - radius, pos.y - radius, pos.x + radius,
@@ -695,7 +693,7 @@ class HideLineTool final : public TTool {
 
     const int count = (int)fids.size();
     for (int i = 0; i < count; ++i) {
-      const TFrameId fid = fids[i];
+      const TFrameId fid  = fids[i];
       TVectorImageP image = m_rangeLevel->getFrame(fid, true);
       if (!image) continue;
 
@@ -848,7 +846,7 @@ class HideLineTool final : public TTool {
     if (m_track.isEmpty()) return nullptr;
     if (closeLoop) closeFreehandTrack();
 
-    double error = (30.0 / 11) * sqrt(getPixelSize() * getPixelSize());
+    double error    = (30.0 / 11) * sqrt(getPixelSize() * getPixelSize());
     TStroke *stroke = m_track.makeStroke(error);
     if (stroke) stroke->setStyle(1);
     return stroke;
@@ -934,8 +932,9 @@ public:
   ToolType getToolType() const override { return TTool::LevelWriteTool; }
 
   ToolOptionsBox *createOptionsBox() override {
-    TPaletteHandle *currPalette =
-        TTool::getApplication()->getPaletteController()->getCurrentLevelPalette();
+    TPaletteHandle *currPalette = TTool::getApplication()
+                                      ->getPaletteController()
+                                      ->getCurrentLevelPalette();
     ToolHandle *currTool = TTool::getApplication()->getCurrentTool();
     return new HideLineToolOptionsBox(0, this, currPalette, currTool,
                                       &m_hideType);
@@ -1114,8 +1113,8 @@ public:
   }
 
   void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override {
-    m_active              = true;
-    m_rangeCtrl           = e.isCtrlPressed();
+    m_active    = true;
+    m_rangeCtrl = e.isCtrlPressed();
     m_brushPos = m_mousePos = pos;
 
     if (isNormalType()) {
@@ -1157,7 +1156,7 @@ public:
 
   void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override {
     if (!m_active) return;
-    m_active              = false;
+    m_active   = false;
     m_brushPos = m_mousePos = pos;
 
     TVectorImageP vi = getImage(true);
@@ -1241,8 +1240,7 @@ public:
     TTool::Application *app = TTool::getApplication();
     if (!app || !app->getCurrentLevel()) return;
     TXshSimpleLevel *level = app->getCurrentLevel()->getSimpleLevel();
-    if (hasPendingRange() && m_rangeLevel &&
-        m_rangeLevel.getPointer() != level)
+    if (hasPendingRange() && m_rangeLevel && m_rangeLevel.getPointer() != level)
       resetFrameRange();
   }
 

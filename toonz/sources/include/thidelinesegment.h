@@ -57,8 +57,7 @@ DVAPI bool strokeParticipatesInFill(
     const std::vector<THideLineSegment> &hideSegments);
 
 DVAPI bool isIntervalFullyHiddenForFill(
-    double w0, double w1,
-    const std::vector<THideLineSegment> &hideSegments);
+    double w0, double w1, const std::vector<THideLineSegment> &hideSegments);
 
 DVAPI std::vector<THideLineSegment> interpolateHideLineSegments(
     const std::vector<THideLineSegment> &seg1,

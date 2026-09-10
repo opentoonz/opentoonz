@@ -1990,9 +1990,9 @@ assert(m_strokes[strokeIndex-wSize+1]->m_edgeList.empty());*/
     insertStrokeAt(subV, strokeIndex);
     subV->m_s->setStyle(styleId);
     subV->m_s->outlineOptions() = oOptions;
-    subV->m_hideLineSegments    = remapHideLineSegments(
-        vs->m_hideLineSegments, *vs->m_s, *subV->m_s, sortedWRanges[i].first,
-        sortedWRanges[i].second);
+    subV->m_hideLineSegments =
+        remapHideLineSegments(vs->m_hideLineSegments, *vs->m_s, *subV->m_s,
+                              sortedWRanges[i].first, sortedWRanges[i].second);
   }
 
   clearPointerContainer(origEdgeList);
@@ -2017,9 +2017,9 @@ assert(m_strokes[strokeIndex-wSize+1]->m_edgeList.empty());*/
     {
       std::vector<THideLineSegment> joined = remapHideLineSegments(
           s0->m_hideLineSegments, *s0->m_s, *s->m_s, 0.0, 1.0);
-      std::vector<THideLineSegment> fromS1 = remapHideLineSegments(
-          s1->m_hideLineSegments, *s1->m_s, *s->m_s, 0.0, 1.0,
-          s0->m_s->getLength());
+      std::vector<THideLineSegment> fromS1 =
+          remapHideLineSegments(s1->m_hideLineSegments, *s1->m_s, *s->m_s, 0.0,
+                                1.0, s0->m_s->getLength());
       joined.insert(joined.end(), fromS1.begin(), fromS1.end());
       mergeHideLineSegments(joined);
       s->m_hideLineSegments = joined;

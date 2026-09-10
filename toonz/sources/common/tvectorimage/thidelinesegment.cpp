@@ -30,7 +30,7 @@ void mergeHideLineSegments(std::vector<THideLineSegment> &segments) {
   merged.push_back(segments[0]);
 
   for (size_t i = 1; i < segments.size(); ++i) {
-    THideLineSegment &last = merged.back();
+    THideLineSegment &last      = merged.back();
     const THideLineSegment &cur = segments[i];
     if (last.m_mode == cur.m_mode && cur.m_w0 <= last.m_w1 + 1e-3) {
       last.m_w1 = std::max(last.m_w1, cur.m_w1);
@@ -56,10 +56,8 @@ void replaceHideLineSegmentsInRange(std::vector<THideLineSegment> &segments,
       result.push_back(seg);
       continue;
     }
-    if (seg.m_w0 < w0 - 1e-3)
-      result.emplace_back(seg.m_w0, w0, seg.m_mode);
-    if (seg.m_w1 > w1 + 1e-3)
-      result.emplace_back(w1, seg.m_w1, seg.m_mode);
+    if (seg.m_w0 < w0 - 1e-3) result.emplace_back(seg.m_w0, w0, seg.m_mode);
+    if (seg.m_w1 > w1 + 1e-3) result.emplace_back(w1, seg.m_w1, seg.m_mode);
   }
 
   result.emplace_back(w0, w1, mode);
@@ -76,7 +74,7 @@ void addHideLineSegments(VIStroke *vs, const std::vector<DoublePair> &ranges,
 
   for (const DoublePair &range : ranges) {
     replaceHideLineSegmentsInRange(vs->m_hideLineSegments, range.first,
-                                 range.second, mode);
+                                   range.second, mode);
   }
   mergeHideLineSegments(vs->m_hideLineSegments);
 }
@@ -86,7 +84,7 @@ void addHideLineSegments(VIStroke *vs, const std::vector<DoublePair> &ranges,
 namespace {
 
 void removeHideLineSegmentsInRange(std::vector<THideLineSegment> &segments,
-                                    double w0, double w1) {
+                                   double w0, double w1) {
   if (w1 <= w0 + 1e-6) return;
 
   std::vector<THideLineSegment> result;
@@ -97,10 +95,8 @@ void removeHideLineSegmentsInRange(std::vector<THideLineSegment> &segments,
       result.push_back(seg);
       continue;
     }
-    if (seg.m_w0 < w0 - 1e-3)
-      result.emplace_back(seg.m_w0, w0, seg.m_mode);
-    if (seg.m_w1 > w1 + 1e-3)
-      result.emplace_back(w1, seg.m_w1, seg.m_mode);
+    if (seg.m_w0 < w0 - 1e-3) result.emplace_back(seg.m_w0, w0, seg.m_mode);
+    if (seg.m_w1 > w1 + 1e-3) result.emplace_back(w1, seg.m_w1, seg.m_mode);
   }
 
   segments.swap(result);
@@ -116,7 +112,7 @@ void removeHideLineSegments(VIStroke *vs,
 
   for (const DoublePair &range : ranges)
     removeHideLineSegmentsInRange(vs->m_hideLineSegments, range.first,
-                                range.second);
+                                  range.second);
   mergeHideLineSegments(vs->m_hideLineSegments);
 }
 
@@ -151,7 +147,8 @@ std::vector<DoublePair> getVisibleStrokeRanges(
       visible.push_back(DoublePair(last, range.first));
     last = range.second;
   }
-  if (!areAlmostEqual(last, 1.0, 1e-3)) visible.push_back(DoublePair(last, 1.0));
+  if (!areAlmostEqual(last, 1.0, 1e-3))
+    visible.push_back(DoublePair(last, 1.0));
 
   return visible;
 }
@@ -216,8 +213,7 @@ bool strokeParticipatesInFill(
 //-----------------------------------------------------------------------------
 
 bool isIntervalFullyHiddenForFill(
-    double w0, double w1,
-    const std::vector<THideLineSegment> &hideSegments) {
+    double w0, double w1, const std::vector<THideLineSegment> &hideSegments) {
   if (w1 < w0) std::swap(w0, w1);
   if (w1 <= w0 + 1e-6) return false;
 

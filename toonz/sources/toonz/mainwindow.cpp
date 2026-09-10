@@ -3039,8 +3039,7 @@ void MainWindow::defineActions() {
   createToolAction(T_PaintBrush, "paintbrush", QT_TR_NOOP("Paint Brush Tool"),
                    "");
   createToolAction(T_Eraser, "eraser", QT_TR_NOOP("Eraser Tool"), "E");
-  createToolAction(T_HideLine, "hide_line", QT_TR_NOOP("Hide Line Tool"),
-                   "K");
+  createToolAction(T_HideLine, "hide_line", QT_TR_NOOP("Hide Line Tool"), "K");
   createToolAction(T_Tape, "tape", QT_TR_NOOP("Tape Tool"), "T");
   createToolAction(T_StylePicker, "stylepicker",
                    QT_TR_NOOP("Style Picker Tool"), "I");
@@ -3185,8 +3184,8 @@ void MainWindow::defineActions() {
                ToolCommandType);
   createAction(MI_HideLineSegment, QT_TR_NOOP("Hide Line Tool - Segment"), "",
                ToolCommandType);
-  createAction(MI_HideLineFreehand, QT_TR_NOOP("Hide Line Tool - Freehand"),
-               "", ToolCommandType);
+  createAction(MI_HideLineFreehand, QT_TR_NOOP("Hide Line Tool - Freehand"), "",
+               ToolCommandType);
   createAction(MI_HideLineNextMode, QT_TR_NOOP("Hide Line Tool - Next Mode"),
                "", ToolCommandType);
   createAction(MI_HideLineInvisible,

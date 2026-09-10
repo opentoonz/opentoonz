@@ -1033,8 +1033,7 @@ static void findNearestIntersection(VIList<Intersection> &interList,
             double delta = versus * (pp2->m_edge.m_w0 - p2->m_edge.m_w0);
 
             if (delta > 0 && delta < minDelta) {
-              if (p2->m_edge.m_index >= 0 &&
-                  p2->m_edge.m_index < strokeSize &&
+              if (p2->m_edge.m_index >= 0 && p2->m_edge.m_index < strokeSize &&
                   p2->m_edge.m_index == pp2->m_edge.m_index &&
                   isIntervalFullyHiddenForFill(
                       p2->m_edge.m_w0, pp2->m_edge.m_w0,

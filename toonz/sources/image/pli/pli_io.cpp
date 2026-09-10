@@ -1456,10 +1456,10 @@ PliTag *ParsedPliImp::readHideLineSegmentsTag() {
     readDynamicData(d, bufOffs);
     w0 = scale * d;
     readDynamicData(d, bufOffs);
-    w1 = scale * d;
+    w1       = scale * d;
     int mode = m_buf[bufOffs++];
-    segments.emplace_back(w0, w1,
-                          mode ? THideLineMode::Hidden : THideLineMode::Invisible);
+    segments.emplace_back(
+        w0, w1, mode ? THideLineMode::Hidden : THideLineMode::Invisible);
   }
 
   return new HideLineSegmentsTag(segments);
@@ -2487,8 +2487,7 @@ TUINT32 ParsedPliImp::writeHideLineSegmentsTag(HideLineSegmentsTag *tag) {
 
   setDynamicTypeBytesNum(0, maxValue);
   const UINT dataBytes = m_currDynamicTypeBytesNum;
-  const UINT tagLength =
-      dataBytes + count * (2 * dataBytes + sizeof(UCHAR));
+  const UINT tagLength = dataBytes + count * (2 * dataBytes + sizeof(UCHAR));
   const TUINT32 offset =
       writeTagHeader((UCHAR)PliTag::HIDE_LINE_SEGMENTS_GOBJ, tagLength);
 

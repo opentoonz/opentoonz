@@ -541,7 +541,8 @@ DVAPI std::vector<DoublePair> computeBrushHiddenRanges(const TStroke *stroke,
 
 DVAPI std::vector<int> findStrokesInClosedRegion(const TVectorImageP &vi,
                                                  const TStroke *boundaryStroke,
-                                                 bool selective, int colorStyle);
+                                                 bool selective,
+                                                 int colorStyle);
 
 DVAPI std::vector<StrokeSegmentRanges> computeRegionPortionRanges(
     const TVectorImageP &vi, const TStroke *boundaryStroke, bool selective,

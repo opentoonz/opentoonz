@@ -1953,9 +1953,10 @@ bool doublePairCompare(DoublePair p1, DoublePair p2) {
 
 }  // namespace
 
-std::vector<ToolUtils::StrokeSegmentRanges> ToolUtils::computeSegmentTouchRanges(
-    const TVectorImageP &vi, TStroke *lineStroke, bool selective,
-    int colorStyle) {
+std::vector<ToolUtils::StrokeSegmentRanges>
+ToolUtils::computeSegmentTouchRanges(const TVectorImageP &vi,
+                                     TStroke *lineStroke, bool selective,
+                                     int colorStyle) {
   std::vector<StrokeSegmentRanges> result;
   if (!vi || !lineStroke) return result;
 
@@ -2102,7 +2103,7 @@ std::vector<DoublePair> ToolUtils::computeBrushHiddenRanges(
   if (!circumscribedSquare.overlaps(stroke->getBBox())) return hidden;
 
   TRectD inscribedSquare(pos.x - rectEdge2, pos.y - rectEdge2,
-                           pos.x + rectEdge2, pos.y + rectEdge2);
+                         pos.x + rectEdge2, pos.y + rectEdge2);
 
   if (inscribedSquare.contains(stroke->getBBox())) {
     hidden.push_back(DoublePair(0.0, 1.0));
@@ -2145,8 +2146,7 @@ std::vector<DoublePair> ToolUtils::computeBrushHiddenRanges(
   std::vector<DoublePair> keepRanges;
   keepRanges.reserve(intersections.size() / 2);
   for (UINT j = 0; j + 1 < intersections.size(); j += 2)
-    keepRanges.push_back(
-        DoublePair(intersections[j], intersections[j + 1]));
+    keepRanges.push_back(DoublePair(intersections[j], intersections[j + 1]));
 
   return complementWRanges(keepRanges);
 }
@@ -2188,9 +2188,10 @@ std::vector<int> ToolUtils::findStrokesInClosedRegion(
 
 //-----------------------------------------------------------------------------
 
-std::vector<ToolUtils::StrokeSegmentRanges> ToolUtils::computeRegionPortionRanges(
-    const TVectorImageP &vi, const TStroke *boundaryStroke, bool selective,
-    int colorStyle) {
+std::vector<ToolUtils::StrokeSegmentRanges>
+ToolUtils::computeRegionPortionRanges(const TVectorImageP &vi,
+                                      const TStroke *boundaryStroke,
+                                      bool selective, int colorStyle) {
   std::vector<StrokeSegmentRanges> result;
   if (!vi || !boundaryStroke) return result;
   if (boundaryStroke->getControlPointCount() < 3 ||

@@ -408,10 +408,11 @@ existing stroke. this method is used for undoing removeEndpoints . */
                               THideLineMode mode);
   void removeHideLineSegments(UINT index,
                               const std::vector<DoublePair> &ranges);
-  void appendHideLineSegmentsDuringEdit(
-      UINT index, const std::vector<DoublePair> &ranges, THideLineMode mode);
-  void removeHideLineSegmentsDuringEdit(
-      UINT index, const std::vector<DoublePair> &ranges);
+  void appendHideLineSegmentsDuringEdit(UINT index,
+                                        const std::vector<DoublePair> &ranges,
+                                        THideLineMode mode);
+  void removeHideLineSegmentsDuringEdit(UINT index,
+                                        const std::vector<DoublePair> &ranges);
   void notifyHideLineFillChanged(const std::vector<int> &strokeIndices);
   bool hasHideLineSegments(UINT index) const;
 

@@ -620,12 +620,13 @@ static bool tglDoDraw(const TVectorRenderData &rd, const TStroke *s) {
 
 namespace {
 
-void drawHideLineSegmentsOverlay(const TVectorRenderData &rd,
-                                 const TStroke *stroke,
-                                 const std::vector<THideLineSegment> &segments) {
+void drawHideLineSegmentsOverlay(
+    const TVectorRenderData &rd, const TStroke *stroke,
+    const std::vector<THideLineSegment> &segments) {
   if (!stroke || segments.empty()) return;
 
-  glPushAttrib(GL_ENABLE_BIT | GL_LINE_BIT | GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT);
+  glPushAttrib(GL_ENABLE_BIT | GL_LINE_BIT | GL_CURRENT_BIT |
+               GL_COLOR_BUFFER_BIT);
   glDisable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -727,7 +728,8 @@ rdRegions.m_alphaChannel = rdRegions.m_antiAliasing = false;*/
                                       vim->getHideLineSegments(strokeIndex));
       } else {
         isGuided = tglDoDraw(rd, vim->getStroke(strokeIndex));
-        if (isGuided && guidedStroke) *guidedStroke = vim->getStroke(strokeIndex);
+        if (isGuided && guidedStroke)
+          *guidedStroke = vim->getStroke(strokeIndex);
       }
       strokeIndex++;
     }

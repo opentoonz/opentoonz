@@ -24,9 +24,7 @@ namespace {
 
 QString menuLabel() { return QObject::tr("Hide Line Indicators"); }
 
-QString menuToolTip() {
-  return QObject::tr("Show Invisible/Hidden Strokes");
-}
+QString menuToolTip() { return QObject::tr("Show Invisible/Hidden Strokes"); }
 
 bool menuContainsAction(QMenu *menu, QAction *action) {
   if (!menu || !action) return false;
@@ -55,8 +53,7 @@ QMenu *findMenuContainingCommand(QMenu *menu, const char *cmdId) {
 QMenu *findViewMenu(QMenuBar *menuBar) {
   if (!menuBar) return nullptr;
   for (QAction *top : menuBar->actions()) {
-    if (QMenu *found =
-            findMenuContainingCommand(top->menu(), MI_RasterizePli))
+    if (QMenu *found = findMenuContainingCommand(top->menu(), MI_RasterizePli))
       return found;
     if (QMenu *found =
             findMenuContainingCommand(top->menu(), MI_VectorGuidedDrawing))
@@ -69,8 +66,7 @@ void refreshViewer(SceneViewer *viewer) {
   TApp *app = TApp::instance();
   if (!app) return;
   if (TSceneHandle *sh = app->getCurrentScene()) sh->notifySceneChanged(false);
-  if (TXshLevelHandle *lh = app->getCurrentLevel())
-    lh->notifyLevelViewChange();
+  if (TXshLevelHandle *lh = app->getCurrentLevel()) lh->notifyLevelViewChange();
   if (viewer)
     viewer->GLInvalidateAll();
   else if (SceneViewer *active = app->getActiveViewer())

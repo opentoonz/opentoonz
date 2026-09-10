@@ -381,9 +381,8 @@ void ToolOptionCombo::updateStatus() {
   QString value = QString::fromStdWString(m_property->getValue());
   int index     = findData(value);
   if (index >= 0 && index != currentIndex()) setCurrentIndex(index);
-  const QString itemTip = (index >= 0)
-                              ? itemData(index, Qt::ToolTipRole).toString()
-                              : QString();
+  const QString itemTip =
+      (index >= 0) ? itemData(index, Qt::ToolTipRole).toString() : QString();
   setToolTip(itemTip);
 }
 

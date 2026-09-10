@@ -86,13 +86,13 @@ public:
                             //! rendered anyway.
       m_showHideLineStrokes,  //!< Whether hide-line masked segments are shown
                               //! as editor overlay (orange/green).
-      m_regionAntialias,    //!< Whether regions should be rendered with
-                            //! antialiasing at boundaries.
-      m_isOfflineRender,    //!< Whether image rendering is in render or
-                            //! camera-stand (preview) mode.
-      m_showGuidedDrawing,  // Whether this image is being used for guided
-                            // drawing
-      m_highLightNow;       // Show highlight on active stroke
+      m_regionAntialias,      //!< Whether regions should be rendered with
+                              //! antialiasing at boundaries.
+      m_isOfflineRender,      //!< Whether image rendering is in render or
+                              //! camera-stand (preview) mode.
+      m_showGuidedDrawing,    // Whether this image is being used for guided
+                              // drawing
+      m_highLightNow;         // Show highlight on active stroke
   bool m_animatedGuidedDrawing = false;
   //!  \deprecated  Use the above individual options instead.
   //!  \todo  Remove it ASAP.
@@ -125,7 +125,7 @@ public:
       , m_isIcon(false)    // Not an icon by default
       , m_is3dView(false)  // Standard view by default
       , m_show0ThickStrokes(
-            true)                 // Wanna see every stroke, even invisible ones
+            true)  // Wanna see every stroke, even invisible ones
       , m_showHideLineStrokes(false)
       , m_regionAntialias(false)  // No need for pretty region boundaries,
                                   // typically shadowed by strokes
