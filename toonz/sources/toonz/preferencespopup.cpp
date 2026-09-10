@@ -59,6 +59,7 @@
 #include <QListWidget>
 #include <QGroupBox>
 #include <QKeySequence>
+#include <QSignalBlocker>
 
 using namespace DVGui;
 
@@ -288,11 +289,18 @@ PreferencesPopup::AdditionalStyleEdit::AdditionalStyleEdit(
     : DVGui::Dialog(parent, true, false, "AdditionalStyleEdit") {
   setWindowTitle(tr("Additional Style Sheet"));
   setModal(true);
+  setMinimumWidth(460);
 
-  m_edit                   = new QTextEdit(this);
+  m_edit                    = new QTextEdit(this);
+  QPushButton* loadButton  = new QPushButton(tr("Load..."), this);
+  QPushButton* saveButton  = new QPushButton(tr("Save..."), this);
   QPushButton* okButton    = new QPushButton(tr("OK"), this);
   QPushButton* applyButton = new QPushButton(tr("Apply"), this);
   QPushButton* closeButton = new QPushButton(tr("Close"), this);
+
+  loadButton->setToolTip(tr("Load a CSS, QSS, or formatted theme file."));
+  saveButton->setToolTip(
+      tr("Save the current style sheet as a CSS, QSS, or theme file."));
 
   QString placeHolderTxt(
       "/* Type additional style sheet here to customize GUI. \n"
@@ -303,8 +311,43 @@ PreferencesPopup::AdditionalStyleEdit::AdditionalStyleEdit(
 
   m_topLayout->addWidget(m_edit);
 
-  addButtonBarWidget(okButton, applyButton, closeButton);
+  addButtonBarWidget(loadButton, saveButton, okButton, applyButton);
+  addButtonBarWidget(closeButton);
 
+  connect(loadButton, &QPushButton::pressed, this, [this]() {
+    const QString filter =
+        tr("Style Sheets (*.qss *.css *.theme);;Theme Files (*.qss *.css *.theme *.txt);;All Files (*)");
+    const QString fileName = QFileDialog::getOpenFileName(
+        this, tr("Load Style Sheet"), QString(), filter);
+    if (fileName.isEmpty()) return;
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      DVGui::warning(
+          tr("Could not load the style sheet:\n%1").arg(file.errorString()));
+      return;
+    }
+    m_edit->setPlainText(QString::fromUtf8(file.readAll()));
+  });
+  connect(saveButton, &QPushButton::pressed, this, [this]() {
+    const QString filter =
+        tr("Style Sheets (*.qss *.css *.theme);;Theme Files (*.qss *.css *.theme *.txt);;All Files (*)");
+    const QString fileName = QFileDialog::getSaveFileName(
+        this, tr("Save Style Sheet"), tr("additional-style-sheet.qss"),
+        filter);
+    if (fileName.isEmpty()) return;
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+      DVGui::warning(
+          tr("Could not save the style sheet:\n%1").arg(file.errorString()));
+      return;
+    }
+    if (file.write(m_edit->toPlainText().toUtf8()) < 0) {
+      DVGui::warning(
+          tr("Could not save the style sheet:\n%1").arg(file.errorString()));
+    }
+  });
   connect(okButton, &QPushButton::pressed, this, &AdditionalStyleEdit::onOK);
   connect(applyButton, &QPushButton::pressed, this,
           &AdditionalStyleEdit::onApply);
@@ -623,6 +666,8 @@ void PreferencesPopup::beforeRoomChoiceChanged() {
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onColorCalibrationChanged() {
+  CommandManager::instance()->setChecked(MI_ToggleColorCalibration,
+                                         m_pref->isColorCalibrationEnabled());
   LutManager::instance()->update();
   TApp::instance()->getCurrentScene()->notifyPreferenceChanged(
       "ColorCalibration");
@@ -1026,6 +1071,16 @@ QWidget* PreferencesPopup::createUI(PreferencesItemId id,
           combo, &QFontComboBox::currentFontChanged, this,
           [this](const QFont& font) { onInterfaceFontChanged(font.family()); });
       widget = combo;
+    } else if (id == customHelpLink) {
+      DVGui::FileField* field =
+          new DVGui::FileField(this, item.value.toString());
+      field->setFileMode(QFileDialog::ExistingFile);
+      field->setFilters(QStringList() << "html"
+                                      << "htm"
+                                      << "pdf");
+      connect(field, &FileField::pathChanged, this,
+              &PreferencesPopup::onChange);
+      widget = field;
     } else if (!comboItems.isEmpty()) {  // create QComboBox
       QComboBox* combo = new QComboBox(this);
       for (const ComboBoxItem& item : comboItems)
@@ -1064,12 +1119,13 @@ QWidget* PreferencesPopup::createUI(PreferencesItemId id,
   case QMetaType::QVariantMap:  // used in colorCalibrationLutPaths
   {
     DVGui::FileField* field = new DVGui::FileField(
-        this, QString("- Please specify 3DLUT file (.3dl) -"), false, true);
+        this, QString("- Please specify 3D LUT file (.3dl or .cube) -"), false,
+        true);
     QString lutPath = m_pref->getColorCalibrationLutPath(
         LutManager::instance()->getMonitorName());
     if (!lutPath.isEmpty()) field->setPath(lutPath);
     field->setFileMode(QFileDialog::ExistingFile);
-    QStringList lutFileTypes = {"3dl"};
+    QStringList lutFileTypes = {"3dl", "cube"};
     field->setFilters(lutFileTypes);
     connect(field, &FileField::pathChanged, this,
             &PreferencesPopup::onLutPathChanged);
@@ -1243,7 +1299,10 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {displayIn30bit, tr("30bit Display*")},
       {showIconsInMenu, tr("Show Icons In Menu*")},
       {showRoomBindButtons, tr("Show Room Bind Buttons*")},
+      {customHelpLink, tr("Quicklink URL:")},
       {viewerIndicatorEnabled, tr("Show Viewer Indicators")},
+      {restoreViewerViewFromLastSession,
+       tr("Restore Viewer Zoom and Pan from Last Session")},
 
       // Visualization
       {show0ThickLines, tr("Show Lines with Thickness 0")},
@@ -1312,7 +1371,8 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       // Tools
       // {dropdownShortcutsCycleOptions, tr("Dropdown Shortcuts:")}, //
       // removed
-      {FillOnlysavebox, tr("Use the TLV Savebox to Limit Filling Operations")},
+      {FillOnlysavebox,
+       tr("Use the TLV Savebox to Limit Fill and Segment Eraser Operations")},
       {DefRegionWithPaint,
        tr("Define Filling Region Using both Lines and Areas")},
       {ReferFillPrevailing, tr("Paint Under Lines in Refer Fill")},
@@ -1635,12 +1695,16 @@ PreferencesPopup::PreferencesPopup()
   }
   setLayout(mainLayout);
 
-#ifdef MACOSX
-  setWindowFlags(Qt::Tool);
-#endif
 
   connect(categoryList, &QListWidget::currentRowChanged, stackedWidget,
           &QStackedWidget::setCurrentIndex);
+  connect(m_pref, &Preferences::fillOnlySaveboxChanged, this,
+          [this](bool enabled) {
+            CheckBox *saveboxCheck = getUI<CheckBox *>(FillOnlysavebox);
+            if (!saveboxCheck || saveboxCheck->isChecked() == enabled) return;
+            QSignalBlocker blocker(saveboxCheck);
+            saveboxCheck->setChecked(enabled);
+          });
 }
 
 //-----------------------------------------------------------------------------
@@ -1808,11 +1872,19 @@ QWidget* PreferencesPopup::createInterfacePage() {
 
   QGridLayout* colorCalibLay = insertGroupBoxUI(colorCalibrationEnabled, lay);
   { insertUI(colorCalibrationLutPaths, colorCalibLay); }
+  connect(CommandManager::instance()->getAction(MI_ToggleColorCalibration),
+          &QAction::triggered, getUI<QGroupBox*>(colorCalibrationEnabled),
+          &QGroupBox::setChecked);
   insertUI(displayIn30bit, lay);
   row = lay->rowCount();
   lay->addWidget(check30bitBtn, row - 1, 2, Qt::AlignRight);
   insertUI(showIconsInMenu, lay);
   insertUI(showRoomBindButtons, lay);
+  insertUI(customHelpLink, lay);
+  getUI<FileField*>(customHelpLink)
+      ->setToolTip(
+          tr("Leave blank to use the local OpenToonz documentation index. "
+             "To open a PDF at a specific page, append #page=12."));
 
   lay->setRowStretch(lay->rowCount(), 1);
   insertFootNote(lay);
@@ -2276,6 +2348,7 @@ QWidget* PreferencesPopup::createPreviewPage() {
     insertUI(actualPixelViewOnSceneEditingMode, viewerLay);
     insertUI(showRasterImagesDarkenBlendedInViewer, viewerLay);
     insertUI(viewerIndicatorEnabled, viewerLay);
+    insertUI(restoreViewerViewFromLastSession, viewerLay);
   }
   QGridLayout* palyControlLay = insertGroupBox(tr("Play Control"), lay);
   {

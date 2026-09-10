@@ -172,6 +172,7 @@ set(HEADERS
     cellselection.h
     columncommand.h
     columnselection.h
+    customhelplink.h
     curveio.h
     drawingdata.h
     exportlevelcommand.h
@@ -226,6 +227,7 @@ set(SOURCES
     loadfolderpopup.cpp
     main.cpp
     mainwindow.cpp
+    customhelplink.cpp
     matchline.cpp
     menubar.cpp
     menubarpopup.cpp

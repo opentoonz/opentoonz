@@ -455,6 +455,7 @@ void Preferences::definePreferenceItems() {
 #endif
   define(showIconsInMenu, "showIconsInMenu", QMetaType::Bool, defIconsVisible);
   define(showRoomBindButtons, "showRoomBindButtons", QMetaType::Bool, true);
+  define(customHelpLink, "customHelpLink", QMetaType::QString, "");
 
   setCallBack(pixelsOnly, &Preferences::setPixelsOnly);
   setCallBack(linearUnits, &Preferences::setUnits);
@@ -462,6 +463,8 @@ void Preferences::definePreferenceItems() {
 
   define(viewerIndicatorEnabled, "viewerIndicatorEnabled", QMetaType::Bool,
          true);
+  define(restoreViewerViewFromLastSession, "restoreViewerViewFromLastSession",
+         QMetaType::Bool, false);
 
   // Visualization
   define(show0ThickLines, "show0ThickLines", QMetaType::Bool, true);
@@ -699,6 +702,8 @@ void Preferences::definePreferenceItems() {
   define(useQtNativeWinInk, "useQtNativeWinInk", QMetaType::Bool, false);
 
   // Others (not appearing in the popup)
+  // Tape Tool: 0 = ask, 1 = continue, 2 = cancel.
+  define(tapeToolFillRiskPolicy, "tapeToolFillRiskPolicy", QMetaType::Int, 0);
   // Shortcut popup settings
   define(shortcutPreset, "shortcutPreset", QMetaType::QString, "defopentoonz");
   // Viewer context menu
@@ -941,6 +946,7 @@ void Preferences::setValue(const PreferencesItemId id, QVariant value,
                            bool saveToFile) {
   assert(m_items.contains(id));
   if (!m_items.contains(id)) return;
+  bool valueChanged = m_items[id].value != value;
   m_items[id].value = value;
   if (saveToFile) {
     if (m_items[id].type ==
@@ -956,6 +962,8 @@ void Preferences::setValue(const PreferencesItemId id, QVariant value,
 
   // Execute callback
   if (m_items[id].onEditedFunc) (this->*(m_items[id].onEditedFunc))();
+  if (valueChanged && id == FillOnlysavebox)
+    emit fillOnlySaveboxChanged(value.toBool());
 }
 
 //-----------------------------------------------------------------

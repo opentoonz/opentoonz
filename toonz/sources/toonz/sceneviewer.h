@@ -259,6 +259,16 @@ public:
 
   TPointD getPan3D() const { return m_pan3D; }
   double getZoomScale3D() const { return m_zoomScale3D; }
+  double getPhi3D() const { return m_phi3D; }
+  double getTheta3D() const { return m_theta3D; }
+
+  TAffine getViewAffine(int viewMode) const { return m_viewAff[viewMode]; }
+  int getReferenceMode() const { return m_referenceMode; }
+
+  //! Restores zoom/pan only: clears rotation and flips for that view mode.
+  void setViewZoomPan(int viewMode, const TAffine &aff);
+  void setCamera3DViewState(const TPointD &pan, double zoom, double phi,
+                            double theta);
 
   double projectToZ(const TPointD &delta) override;
 

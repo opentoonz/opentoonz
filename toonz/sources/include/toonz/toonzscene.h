@@ -100,9 +100,9 @@ public:
   void clear();  //!< Clears the scene.
 
   void save(
-      const TFilePath &path,
-      TXsheet *subxsheet = 0);  //!< Saves the scene (or a sub-xsheet) at the
-                                //!  specified path.
+      const TFilePath &path, TXsheet *subxsheet = 0,
+      bool saveSceneIcon = true);  //!< Saves the scene (or a sub-xsheet) at the
+                                    //!  specified path.
   void loadTnzFile(
       const TFilePath &path);  //!< Loads scene data from file, \a excluding the
                                //!  associated project and the scene resources.

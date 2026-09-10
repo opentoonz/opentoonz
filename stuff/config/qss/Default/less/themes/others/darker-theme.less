@@ -1,0 +1,237 @@
+// out: "../../../../Darker/Darker.qss"
+
+//! The above line is for EasyLESS (VSCode extension) compile output location
+
+// -----------------------------------------------------------------------------
+// DARKER THEME
+// Original design by Soda-Popz JP
+// Variable-driven theme using OpenToonz's shared LESS architecture.
+// -----------------------------------------------------------------------------
+
+// Theme to inherit/override
+@import '../default/default-theme.less';
+
+// Image path relative to where this *.qss is output
+@img-url: '../Default/imgs/white';
+
+// SETTINGS --------------------------------------------------------------------
+
+@pressed-amount: 8%;
+
+// Base palette
+@bg-color: #242424;
+@bg-color-hover: @dark-color-1;
+@border-color: #414245;
+
+@dark-color-1: #333333;
+@dark-color-2: #424c61;
+@dark-color-3: #38393c;
+@dark-color-4: #696a6f;
+@darker-muted-accent-color: #495368;
+
+@dock-color: #3e4042;
+
+// Text and highlights
+@text-color: #d3d3d3;
+@text-color-active: #ffffff;
+@text-color-inactive: fade(@text-color, 60%);
+
+@hl-color: #6378a6;
+@hl-text-color: @text-color-active;
+@preview-color: #8caaba;
+@normal-label-color: @hl-color;
+@icon-base-color: #cecece;
+
+// Tabs, menubar, and rooms
+@tab-bg-color-hover: #505050;
+
+@menubar-item-text-color-selected: @text-color;
+@menubar-item-bg-color-selected: @dark-color-1;
+@menubar-item-bg-color-hover: @dark-color-2;
+
+@rooms-tab-bg-color-hover: @hl-color;
+@rooms-tab-bg-color-selected: @dark-color-2;
+@rooms-tab-bg-color-selected-hover: @dark-color-2;
+
+// Menus
+@menu-bg-color: @dark-color-1;
+@menu-border-color: @bg-color;
+@menu-separator-color: @dark-color-1;
+@menu-item-bg-color-selected: @darker-muted-accent-color;
+@menu-item-bg-color-checked: #3d3d40;
+@menu-item-text-color-checked: @text-color-active;
+@menu-checkbox-border-color-hover: @bg-color;
+@menu-checkbox-border-color-checked: @hl-color;
+@menu-checkbox-border-color-checked-selected: @hl-color;
+@menu-icon-checked-border-color: @darker-muted-accent-color;
+
+// Push buttons
+@button-bg-color: @dark-color-2;
+@button-border-radius: 4px;
+
+@button-text-color-hover: #e8e8e8;
+@button-bg-color-hover: @hl-color;
+@button-border-color-hover: #050202;
+@button-bg-color-focus-hover: @hl-color;
+
+@button-text-color-pressed: @dark-color-2;
+@button-border-color-pressed: @darker-muted-accent-color;
+
+@button-text-color-checked: #d6d6d6;
+@button-bg-color-checked: @bg-color;
+@button-border-color-checked: @darker-muted-accent-color;
+@button-bg-color-checked-hover: @darker-muted-accent-color;
+
+@button-bg-color-disabled: #404040;
+@button-border-color-disabled: rgba(120, 121, 127, 0.4);
+
+// Tool buttons
+
+@toolbutton-text-color-hover: @text-color;
+@toolbutton-bg-color-hover: @border-color;
+@toolbutton-border-color-hover: #505050;
+
+@toolbutton-border-color-pressed: @dark-color-2;
+
+@toolbutton-bg-color-checked: @dark-color-2;
+@toolbutton-bg-color-checked-hover: @dark-color-2;
+@toolbutton-border-color-checked-hover: @hl-color;
+@toolbutton-bg-color-checked-pressed: @hl-color;
+@toolbutton-bg-color-checked-disabled: @dark-color-2;
+@toolbutton-border-color-checked-disabled: @darker-muted-accent-color;
+
+// Lock controls keep the original theme's slightly softer hover/press ramp.
+@lockbutton-bg-color-checked-hover: #dc6b6b;
+@lockbutton-bg-color-checked-pressed: #c62f2f;
+
+// Checkboxes
+@checkbox-bg-color: @dark-color-1;
+@checkbox-bg-color-hover: #4c4d51;
+@checkbox-border-color-hover: #4c4d51;
+@checkbox-bg-color-checked: @dark-color-2;
+@checkbox-bg-color-checked-hover: @hl-color;
+@checkbox-bg-color-checked-disabled: @dark-color-2;
+
+@checkbox-img-disabled: 'checkmark/checkmark_disabled_black.svg';
+@checkbox-img-partially: 'checkmark/checkpartially_black.svg';
+@checkbox-img-partially-disabled: 'checkmark/checkpartially_disabled_black.svg';
+
+// Scrollbars
+@sb-bg-color: #202020;
+@sb-handle-bg-color: #404040;
+@sb-handle-bg-color-hover: #535353;
+@sb-handle-bg-color-pressed: #535353;
+@sb-handle-border-color-hover: @bg-color;
+@sb-handle-border-color-pressed: @bg-color;
+
+// Inputs
+@input-bg-color: @bg-color;
+@input-border-color: #828389;
+@input-bg-color-hover: @dark-color-3;
+@input-bg-color-focus: @dark-color-1;
+@input-border-color-focus: @bg-color;
+@input-text-color-disabled: #88888b;
+@input-bg-color-disabled: #56565a;
+@input-selection-bg-color: @hl-color;
+
+// Sliders
+@slider-groove-img: 'slider/slider-groove-dark.svg';
+@slider-handle-bg-color: #898989;
+
+// Panel titlebars
+@titlebar-bg-color: ~"qlineargradient(x1:1, y1:0, x2:1, y2:1, stop:0 #242424, stop:0.1 #333333, stop:0.9 #242424, stop:1 #242424)";
+@titlebar-bg-color-hover: ~"qlineargradient(x1:1, y1:0, x2:1, y2:1, stop:0 #77787b, stop:0.1 #333333, stop:0.9 #454547, stop:1 #2d2d2f)";
+@titlebar-button-off-bg-color: transparent;
+@titlebar-button-rollover-bg-color: #7d7e84;
+
+// Current titlebar layouts include four transparent border pixmaps. Point them
+// at the existing shared transparent asset instead of the stale "other" path.
+@title-docked-border-img: 'misc/transparent_16x16.png';
+@title-docked-active-border-img: 'misc/transparent_16x16.png';
+@title-float-border-img: 'misc/transparent_16x16.png';
+@title-float-active-border-img: 'misc/transparent_16x16.png';
+
+// Palette and browser
+@palette-SeparatorColor: @dock-color;
+@palette-SelectedCellColor: @dark-color-2;
+@palette-CurrentCellColor: fade(@palette-SelectedCellColor, 50%);
+@palette-PinnedChipBoxColor: @dark-color-1;
+@palette-SolidChipBoxColor: @border-color;
+
+@browser-window-bg-color: @dark-color-1;
+@tree-bg-color: @bg-color;
+@tree-bg-color-alt-row: @bg-color;
+@prefs-list-bg-color: @dark-color-1;
+@browser-selected-item-bg-color: @dark-color-2;
+@browser-folder-text-color: @preview-color;
+@browser-itemview-col-color: @dark-color-1;
+@browser-itemview-col-color-sorted: @dark-color-1;
+@browser-itemview-col-border-color: @bg-color;
+
+// Viewer and progress controls
+@flipmarker-img: 'flipslider/flipmarker-blue.svg';
+@flipslider-img: 'flipslider/flipslider-dark-hc.svg';
+@flipslider-base-color: #46474a;
+@flipslider-notstarted-color: hsl(0, 47%, 38%);
+@flipslider-started-color: hsl(118, 50%, 52%);
+
+@viewer-ruler-border-color: @bg-color;
+@viewer-ruler-handle-color: cyan;
+@viewer-ruler-handle-drag-color: #87ffa7;
+
+@progressbar-border-color: #171717;
+@custompanel-scroller-bg-color: #313234;
+@custompanel-scroller-border-color: #7c7d83;
+
+// Xsheet and timeline
+@xsh-color: #424242;
+@xsh-cell-lighten-amount: -8%;
+@xsh-cell-sat-amount: 4%;
+@xsh-border-darken-amount: 18%;
+@xsh-border-contrast: 0.8;
+@xsh-current-time-indicator-color: hsl(52, 100%, 64%);
+@xsh-folded-column-bg-color: rgba(151, 151, 157, 0.45);
+
+@xsh-empty-column-color: @dark-color-1;
+@xsh-empty-column-range-color: #292929;
+@xsh-empty-cell-color-selected: #424242;
+@xsh-current-cell-border-color: #9b4141;
+@xsh-onionskin-column-bg-color: @dark-color-1;
+
+@xsh-framenumber-column-range-text-color: #b8d9e0;
+@xsh-framenumber-column-range-bg-color: @bg-color;
+@xsh-framenumber-current-text-color: #e3e3e3;
+@xsh-framenumber-current-bg-color: @dark-color-2;
+
+@xsh-column-header-empty-color: @dark-color-1;
+@xsh-column-header-border-color: #0f0f0f;
+@xsh-column-header-selected-color: rgba(130, 131, 135, 0.5);
+@xsh-column-header-dragbar-hl-color: rgba(198, 223, 236, 0.5);
+
+@xsh-button-preview-bg-on-color: #61aebf;
+@xsh-button-camstand-bg-on-color: #90bfa6;
+
+@timeline-column-header-border-color: #7d7e85;
+
+// These assets are bundled with Darker; the standard lock icon is reused.
+@timeline-preview-icon: '../../../Darker/imgs/timeline/preview_small-colorSP.svg';
+@timeline-preview-trans-icon: '../../../Darker/imgs/timeline/preview_trans_small-color-cyberpunk.svg';
+@timeline-table-icon: '../../../Darker/imgs/timeline/table_on_SP.svg';
+@timeline-table-trans-icon: '../../../Darker/imgs/timeline/trans_small-colorSP.svg';
+
+// Schematic and Function Editor
+@node-viewer-bg-color: #212121;
+
+@keyframe-total-color-hover: #e59d45;
+
+@fe-header-border-color: @bg-color;
+@fe-kf-lighten-amount: 0%;
+@fe-kf-sat-amount: 0%;
+@fe-kf-hl-sat-amount: 0%;
+@fe-ignored-keyframe-color: @darker-muted-accent-color;
+@fe-empty-color: rgba(57, 66, 84, 0.5);
+@fe-empty-range-color-selected: rgba(97, 110, 131, 0.5);
+@fe-panel-bg-color: @dark-color-1;
+@fe-panel-ruler-bg-color: #636368;
+@fe-panel-curve-color-hover: @hl-color;
+@fe-current-row-bg-alpha: 100%;

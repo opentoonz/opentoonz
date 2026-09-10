@@ -43,6 +43,8 @@
 #include <QGridLayout>
 #include <QPainter>
 #include <QButtonGroup>
+#include <QDir>
+#include <QFileDialog>
 #include <QMouseEvent>
 #include <QLabel>
 #include <QCheckBox>
@@ -55,6 +57,7 @@
 #include <QToolTip>
 #include <QSplitter>
 #include <QMenu>
+#include <QMessageBox>
 #include <QOpenGLFramebufferObject>
 
 namespace {
@@ -2528,6 +2531,25 @@ SettingsPage::SettingsPage(QWidget *parent)
   paramsContainerLayout->addLayout(m_paramsLayout);
 
   paramsContainerLayout->addStretch(1);
+
+  m_revertMyPaintButton = new QPushButton(tr("Revert"), this);
+  m_revertMyPaintButton->hide();
+  m_saveMyPaintButton = new QPushButton(tr("Save As..."), this);
+  m_saveMyPaintButton->hide();
+
+  QHBoxLayout *myPaintButtonsLayout = new QHBoxLayout;
+  myPaintButtonsLayout->addStretch(1);
+  myPaintButtonsLayout->addWidget(m_revertMyPaintButton);
+  myPaintButtonsLayout->addWidget(m_saveMyPaintButton);
+  paramsContainerLayout->addLayout(myPaintButtonsLayout);
+
+  ret = connect(m_revertMyPaintButton, SIGNAL(clicked(bool)), this,
+                SLOT(onMyPaintRevert())) &&
+        ret;
+  ret = connect(m_saveMyPaintButton, SIGNAL(clicked(bool)), this,
+                SLOT(onMyPaintSaveAs())) &&
+        ret;
+  assert(ret);
 }
 
 //-----------------------------------------------------------------------------
@@ -2564,6 +2586,10 @@ void SettingsPage::setStyle(const TColorStyleP &editedStyle) {
       !(m_editedStyle && typeid(*m_editedStyle) == typeid(*editedStyle));
 
   m_editedStyle = editedStyle;
+  m_revertMyPaintButton->setVisible(
+      dynamic_cast<TMyPaintBrushStyle *>(m_editedStyle.getPointer()));
+  m_saveMyPaintButton->setVisible(
+      dynamic_cast<TMyPaintBrushStyle *>(m_editedStyle.getPointer()));
 
   if (clearLayout) locals::clearLayout(m_paramsLayout);
 
@@ -2696,6 +2722,11 @@ void SettingsPage::updateValues() {
   // Deal with the autofill
   m_autoFillCheckBox->setChecked(m_editedStyle->getFlags() & 1);
 
+  TMyPaintBrushStyle *myPaintStyle =
+      dynamic_cast<TMyPaintBrushStyle *>(m_editedStyle.getPointer());
+  if (myPaintStyle)
+    m_revertMyPaintButton->setEnabled(!myPaintStyle->getBaseValues().empty());
+
   int p, pCount = m_editedStyle->getParamCount();
   for (p = 0; p != pCount; ++p) {
     // Update state of "reset to default" button
@@ -2792,9 +2823,64 @@ void SettingsPage::onValueReset() {
 
   assert(0 <= p && p < m_editedStyle->getParamCount());
   m_editedStyle->setParamDefault(p);
+  if (dynamic_cast<TMyPaintBrushStyle *>(m_editedStyle.getPointer()))
+    updateValues();
 
   // Forward the signal to the style editor
   if (!m_updating) emit paramStyleChanged(false);
+}
+
+//-----------------------------------------------------------------------------
+
+void SettingsPage::onMyPaintRevert() {
+  TMyPaintBrushStyle *myPaintStyle =
+      dynamic_cast<TMyPaintBrushStyle *>(m_editedStyle.getPointer());
+  assert(myPaintStyle);
+
+  myPaintStyle->resetBaseValues();
+  updateValues();
+
+  if (!m_updating) emit paramStyleChanged(false);
+}
+
+//-----------------------------------------------------------------------------
+
+void SettingsPage::onMyPaintSaveAs() {
+  TMyPaintBrushStyle *myPaintStyle =
+      dynamic_cast<TMyPaintBrushStyle *>(m_editedStyle.getPointer());
+  assert(myPaintStyle);
+
+  const TFilePath customDir =
+      ToonzFolder::getLibraryFolder() + "mypaint brushes" + "Custom";
+  if (!QDir().mkpath(customDir.getQString())) {
+    QMessageBox::warning(
+        this, tr("Save MyPaint Brush As"),
+        tr("The Custom MyPaint brush folder could not be created: %1")
+            .arg(customDir.getQString()));
+    return;
+  }
+
+  QString brushName = QString::fromStdString(myPaintStyle->getPath().getName());
+  if (brushName.isEmpty()) brushName = tr("Custom Brush");
+  QFileDialog saveDialog(this, tr("Save MyPaint Brush As"),
+                         customDir.getQString(), tr("MyPaint Brush (*.myb)"));
+  saveDialog.setAcceptMode(QFileDialog::AcceptSave);
+  saveDialog.setFileMode(QFileDialog::AnyFile);
+  saveDialog.setDefaultSuffix("myb");
+  saveDialog.selectFile(brushName + " Copy.myb");
+  if (saveDialog.exec() != QDialog::Accepted) return;
+
+  const QStringList selectedFiles = saveDialog.selectedFiles();
+  if (selectedFiles.isEmpty()) return;
+
+  QString errorMessage;
+  if (!myPaintStyle->saveBrushAs(TFilePath(selectedFiles.front()),
+                                 errorMessage)) {
+    QMessageBox::warning(this, tr("Save MyPaint Brush As"), errorMessage);
+    return;
+  }
+
+  emit myPaintBrushSaved();
 }
 
 //-----------------------------------------------------------------------------
@@ -2833,6 +2919,11 @@ void SettingsPage::onValueChanged(bool isDragging) {
     break;
   }
   }
+
+  TMyPaintBrushStyle *myPaintStyle =
+      dynamic_cast<TMyPaintBrushStyle *>(m_editedStyle.getPointer());
+  if (myPaintStyle)
+    m_revertMyPaintButton->setEnabled(!myPaintStyle->getBaseValues().empty());
 
   // Forward the signal to the style editor
   if (!m_updating) emit paramStyleChanged(isDragging);
@@ -2980,6 +3071,8 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
                        SLOT(selectStyle(const TColorStyle &)));
   ret = ret && connect(m_settingsPage, SIGNAL(paramStyleChanged(bool)), this,
                        SLOT(onParamStyleChanged(bool)));
+  ret = ret && connect(m_settingsPage, SIGNAL(myPaintBrushSaved()), this,
+                       SLOT(onMyPaintBrushSaved()));
   ret = ret && connect(m_plainColorPage,
                        SIGNAL(colorChanged(const ColorModel &, bool)), this,
                        SLOT(onColorChanged(const ColorModel &, bool)));
@@ -2993,6 +3086,15 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
 //-----------------------------------------------------------------------------
 
 StyleEditor::~StyleEditor() {}
+
+//-----------------------------------------------------------------------------
+
+void StyleEditor::onMyPaintBrushSaved() {
+  static_cast<MyPaintBrushStyleChooserPage *>(m_mypaintBrushesStylePage)
+      ->reloadItems();
+}
+
+//-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
 /*

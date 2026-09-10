@@ -983,6 +983,8 @@ public:
     panel->setFixWidthMode(TPanel::fixed);
     panel->setWidget(toolbar);
     panel->setIsMaximizable(false);
+    // A tab strip would not fit this bar (see DockLayout::supportsTabGrouping)
+    panel->setProperty("canJoinDockTabs", false);
     // panel->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
     panel->setFixedWidth(44);  // 35
     toolbar->setFixedWidth(34);
@@ -1009,6 +1011,8 @@ public:
   TPanel *createPanel(QWidget *parent) override {
     TPanel *panel = new CommandBarPanel(parent);
     panel->setObjectName(getPanelType());
+    // A tab strip would not fit this bar (see DockLayout::supportsTabGrouping)
+    panel->setProperty("canJoinDockTabs", false);
     return panel;
   }
   void initialize(TPanel *panel) override {}
@@ -1047,6 +1051,8 @@ public:
     panel->setObjectName(getPanelType());
     panel->setWindowTitle(getPanelType());
     panel->resize(600, panel->height());
+    // A tab strip would not fit this bar (see DockLayout::supportsTabGrouping)
+    panel->setProperty("canJoinDockTabs", false);
     return panel;
   }
   void initialize(TPanel *panel) override { assert(0); }

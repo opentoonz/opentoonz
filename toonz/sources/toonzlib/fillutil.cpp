@@ -12,6 +12,7 @@
 #include "tpixelutils.h"
 #include "tropcm.h"
 #include "tenv.h"
+#include <cstdlib>
 #include <stack>
 
 #include "toonz/preferences.h"
@@ -652,6 +653,14 @@ const int damInk = TPixelCM32::getMaxInk() - 1;
 //-----------------------------------------------------------------------------
 
 class InkSegmenter {
+  struct BoundaryPixel {
+    TPoint m_point;
+    TPixelCM32 m_original;
+    bool m_restore;
+  };
+
+  using Boundary = std::vector<BoundaryPixel>;
+
   int m_lx, m_ly, m_wrap;
   int m_displaceVector[8];
   TPixelCM32 *m_buf;
@@ -659,9 +668,12 @@ class InkSegmenter {
   TRasterCM32P m_r;
   TTileSaverCM32 *m_saver;
   float m_growFactor;
+  bool m_clearInk;
+  bool m_clearChanged;
 
 public:
-  InkSegmenter(const TRasterCM32P &r, float growFactor, TTileSaverCM32 *saver)
+  InkSegmenter(const TRasterCM32P &r, float growFactor, TTileSaverCM32 *saver,
+               bool clearInk)
       : m_r(r)
       , m_lx(r->getLx())
       , m_ly(r->getLy())
@@ -669,7 +681,9 @@ public:
       , m_buf((TPixelCM32 *)r->getRawData())
       , m_bBox(r->getBounds())
       , m_saver(saver)
-      , m_growFactor(growFactor) {
+      , m_growFactor(growFactor)
+      , m_clearInk(clearInk)
+      , m_clearChanged(false) {
     m_displaceVector[0] = -m_wrap - 1;
     m_displaceVector[1] = -m_wrap;
     m_displaceVector[2] = -m_wrap + 1;
@@ -701,7 +715,7 @@ public:
     pix = m_buf + p.y * m_wrap + p.x;
 
     /*-- If the same ink is used, RETURN --*/
-    if (pix->getInk() == ink) return false;
+    if (pix->getInk() == ink && !m_clearInk) return false;
 
     if (!ConnectionTable[neighboursCode(pix, p)]) {
       master = slave = pix;
@@ -719,23 +733,43 @@ public:
 
     // vector<pair<TPixelCM32*, int> > oldInks;
 
-    drawSegment(d1p1, d1p2, damInk, m_saver);
-    drawSegment(d2p1, d2p2, damInk, m_saver);
+    Boundary firstBoundary;
+    Boundary secondBoundary;
+    if (m_clearInk) {
+      firstBoundary  = collectBoundary(d1p1, d1p2);
+      secondBoundary = collectBoundary(d2p1, d2p2);
+      markBoundary(firstBoundary);
+      markBoundary(secondBoundary);
+    } else {
+      drawSegment(d1p1, d1p2, damInk, m_saver);
+      drawSegment(d2p1, d2p2, damInk, m_saver);
+    }
 
     inkSegmentFill(p, ink, isSelective, m_saver);
 
     // UINT i;
-
-    drawSegment(d1p1, d1p2, ink, m_saver);
-    drawSegment(d2p1, d2p2, ink, m_saver);
+    if (m_clearInk)
+      finishBoundaries(firstBoundary, secondBoundary, ink);
+    else {
+      drawSegment(d1p1, d1p2, ink, m_saver);
+      drawSegment(d2p1, d2p2, ink, m_saver);
+    }
 
     /*	for (i=0; i<oldInks.size(); i++)
     (oldInks[i].first)->setInk(ink);*/
 
-    return true;
+    return m_clearInk ? m_clearChanged : true;
   }
 
 private:
+  Boundary collectBoundary(const TPoint &p0, const TPoint &p1) const;
+  void markBoundary(const Boundary &boundary);
+  bool boundaryHasConnectedInk(const Boundary &boundary) const;
+  void mergeBoundary(Boundary &merged, const Boundary &boundary,
+                     bool restore) const;
+  void finishBoundaries(const Boundary &first, const Boundary &second, int ink);
+  void clearPixel(TPixelCM32 &pixel, int ink);
+
   void drawSegment(
       const TPoint &p0, const TPoint &p1, int ink,
       /*vector<pair<TPixelCM32*, int> >& oldInks,*/ TTileSaverCM32 *saver);
@@ -794,6 +828,126 @@ private:
             ((n && e) ? ((!nePix(seed)->isPurePaint()) << 7) : 0));
   }
 };
+
+//-----------------------------------------------------------------------------
+
+InkSegmenter::Boundary InkSegmenter::collectBoundary(const TPoint &p0,
+                                                      const TPoint &p1) const {
+  Boundary boundary;
+  int x0 = p0.x;
+  int y0 = p0.y;
+  int x1 = p1.x;
+  int y1 = p1.y;
+  if (x0 > x1) {
+    std::swap(x0, x1);
+    std::swap(y0, y1);
+  }
+
+  const int xDistance = x1 - x0;
+  const int yDistance = std::abs(y1 - y0);
+  const int yStep     = y0 <= y1 ? 1 : -1;
+  const bool xMajor   = yDistance <= xDistance;
+  const int majorSize = xMajor ? xDistance : yDistance;
+  const int minorSize = xMajor ? yDistance : xDistance;
+  int decision        = 2 * minorSize - majorSize;
+  int major = 0;
+  int minor = 0;
+
+  while (major <= majorSize) {
+    const int x = x0 + (xMajor ? major : minor);
+    const int y = y0 + yStep * (xMajor ? minor : major);
+    const TPoint point(x, y);
+    if (m_bBox.contains(point))
+      boundary.push_back({point, m_r->pixels(y)[x], false});
+    if (decision <= 0)
+      decision += 2 * minorSize;
+    else {
+      decision += 2 * (minorSize - majorSize);
+      ++minor;
+    }
+    ++major;
+  }
+
+  return boundary;
+}
+
+//-----------------------------------------------------------------------------
+
+void InkSegmenter::markBoundary(const Boundary &boundary) {
+  for (const BoundaryPixel &boundaryPixel : boundary) {
+    if (m_saver) m_saver->save(boundaryPixel.m_point);
+    m_r->pixels(boundaryPixel.m_point.y)[boundaryPixel.m_point.x].setInk(
+        damInk);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+bool InkSegmenter::boundaryHasConnectedInk(const Boundary &boundary) const {
+  for (const BoundaryPixel &boundaryPixel : boundary) {
+    for (int y = boundaryPixel.m_point.y - 1;
+         y <= boundaryPixel.m_point.y + 1; ++y) {
+      for (int x = boundaryPixel.m_point.x - 1;
+           x <= boundaryPixel.m_point.x + 1; ++x) {
+        const TPoint neighbor(x, y);
+        if (neighbor == boundaryPixel.m_point || !m_bBox.contains(neighbor))
+          continue;
+        const TPixelCM32 &pixel = m_r->pixels(y)[x];
+        if (pixel.getInk() != damInk && !pixel.isPurePaint()) return true;
+      }
+    }
+  }
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+
+void InkSegmenter::mergeBoundary(Boundary &merged, const Boundary &boundary,
+                                 bool restore) const {
+  for (const BoundaryPixel &boundaryPixel : boundary) {
+    Boundary::iterator found = merged.begin();
+    while (found != merged.end() && found->m_point != boundaryPixel.m_point)
+      ++found;
+
+    if (found == merged.end()) {
+      BoundaryPixel mergedPixel = boundaryPixel;
+      mergedPixel.m_restore      = restore;
+      merged.push_back(mergedPixel);
+    } else if (restore) {
+      found->m_restore = true;
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void InkSegmenter::finishBoundaries(const Boundary &first,
+                                    const Boundary &second, int ink) {
+  Boundary merged;
+  merged.reserve(first.size() + second.size());
+  mergeBoundary(merged, first, boundaryHasConnectedInk(first));
+  mergeBoundary(merged, second, boundaryHasConnectedInk(second));
+
+  for (const BoundaryPixel &boundaryPixel : merged) {
+    TPixelCM32 &pixel =
+        m_r->pixels(boundaryPixel.m_point.y)[boundaryPixel.m_point.x];
+    if (boundaryPixel.m_restore)
+      pixel = boundaryPixel.m_original;
+    else {
+      pixel = boundaryPixel.m_original;
+      clearPixel(pixel, ink);
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void InkSegmenter::clearPixel(TPixelCM32 &pixel, int ink) {
+  if (pixel.getInk() != ink || pixel.getTone() != TPixelCM32::getMaxTone())
+    m_clearChanged = true;
+  pixel.setInk(ink);
+  pixel.setTone(TPixelCM32::getMaxTone());
+}
 
 //-----------------------------------------------------------------------------
 
@@ -887,7 +1041,7 @@ void InkSegmenter::inkSegmentFill(const TPoint &p, int ink, bool isSelective,
   TPixelCM32 *pix    = pixels + p.y * m_wrap + x;
   int oldInk;
 
-  if (pix->isPurePaint() || pix->getInk() == ink) return;
+  if (pix->isPurePaint() || (pix->getInk() == ink && !m_clearInk)) return;
 
   if (isSelective) oldInk = pix->getInk();
 
@@ -901,13 +1055,16 @@ void InkSegmenter::inkSegmentFill(const TPoint &p, int ink, bool isSelective,
     x               = seed.x;
     y               = seed.y;
     TPixelCM32 *pix = pixels + (y * m_wrap + x);
-    if (pix->isPurePaint() || pix->getInk() == ink || pix->getInk() == damInk ||
-        (isSelective && pix->getInk() != oldInk))
+    if (pix->isPurePaint() || (pix->getInk() == ink && !m_clearInk) ||
+        pix->getInk() == damInk || (isSelective && pix->getInk() != oldInk))
       continue;
 
     if (saver) saver->save(seed);
 
-    pix->setInk(ink);
+    if (m_clearInk)
+      clearPixel(*pix, ink);
+    else
+      pix->setInk(ink);
 
     if (x > 0) seeds.push(TPoint(x - 1, y));
     if (y > 0) seeds.push(TPoint(x, y - 1));
@@ -1368,9 +1525,10 @@ int InkSegmenter::nextPointIsGoodRev(TPoint mp, TPoint sp, TPixelCM32 *slave,
 //-----------------------------------------------------------------------------
 
 bool inkSegment(const TRasterCM32P &r, const TPoint &p, int ink,
-                float growFactor, bool isSelective, TTileSaverCM32 *saver) {
+                float growFactor, bool isSelective, TTileSaverCM32 *saver,
+                bool clearInk) {
   r->lock();
-  InkSegmenter is(r, growFactor, saver);
+  InkSegmenter is(r, growFactor, saver, clearInk);
   bool ret = is.compute(p, ink, isSelective);
   r->unlock();
   return ret;

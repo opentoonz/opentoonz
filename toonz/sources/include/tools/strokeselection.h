@@ -86,6 +86,8 @@ public:
   void copy();
   void cut();
   void paste();
+  void saveAsCustomVectorBrush();
+  void saveVectorSelectionAs();
 
   void removeEndpoints();
   void sortWithPaletteOrder();
@@ -95,6 +97,8 @@ public:
   void selectAll();
 
 private:
+  void saveSelectedVectors(bool chooseDestination);
+
   TVectorImageP m_vi;          //!< Selected vector image.
   IndexesContainer m_indexes;  //!< Selected stroke indexes in m_vi.
 

@@ -94,6 +94,8 @@ public:
   void setCurrentFrame(int index) const override;
   int getCurrentFrame() const override;
 
+  void updateFrameMetrics();
+
   bool eventFilter(QObject *obj, QEvent *event) override;
   bool shiftTraceEventFilter(QObject *obj, QEvent *event);
 };

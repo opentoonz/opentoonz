@@ -41,8 +41,10 @@ enum PreferencesItemId {
   colorCalibrationLutPaths,
   showIconsInMenu,
   showRoomBindButtons,
+  customHelpLink,
   displayIn30bit,
   viewerIndicatorEnabled,
+  restoreViewerViewFromLastSession,
 
   //----------
   // Visualization
@@ -235,6 +237,9 @@ enum PreferencesItemId {
   // textureSize, // set to 0
   // LineTestFpsCapture,
   // guidedDrawingType,
+
+  // Tape Tool confirmation (stored only; no Preferences popup control)
+  tapeToolFillRiskPolicy,
 
   PreferencesItemCount
 };

@@ -85,6 +85,7 @@
 #include <QKeyEvent>
 #include <QCommonStyle>
 #include <QTimer>
+#include <QSound>
 #include <QIntValidator>
 #include <QRegularExpressionValidator>
 
@@ -127,6 +128,7 @@ TEnv::RectVar CamCapSubCameraRect("CamCapSubCameraRect", TRect());
 TEnv::IntVar CamCapDoAutoDpi("CamCapDoAutoDpi", 1);
 TEnv::DoubleVar CamCapCustomDpi("CamCapDpiForNewLevel", 120.0);
 TEnv::StringVar CamCapFileType("CamCapFileType", "jpg");
+TEnv::IntVar CamCapPlayCaptureSound("CamCapPlayCaptureSound", 0);
 
 namespace {
 
@@ -1648,8 +1650,13 @@ PencilTestPopup::PencilTestPopup()
   m_captureButton          = new QPushButton(tr("Capture\n[Return key]"), this);
   QPushButton* closeButton = new QPushButton(tr("Close"), this);
 
+#if defined(WIN32) || defined(MACOSX)
+  QPushButton* captureOptionsButton = new QPushButton(this);
+#else
+  QPushButton* captureOptionsButton = nullptr;
+#endif
 #ifdef WIN32
-  m_captureFilterSettingsBtn = new QPushButton(this);
+  m_captureFilterSettingsBtn = captureOptionsButton;
 #else
   m_captureFilterSettingsBtn = nullptr;
 #endif
@@ -1714,14 +1721,12 @@ PencilTestPopup::PencilTestPopup()
   m_onionSkinGBox->setChecked(false);
   m_onionOpacityFld->setRange(1, 100);
   m_onionOpacityFld->setValue(50);
-  m_onionOpacityFld->setDisabled(true);
 
   m_timerGBox->setObjectName("CleanupSettingsFrame");
   m_timerGBox->setCheckable(true);
   m_timerGBox->setChecked(false);
   m_timerIntervalFld->setRange(0, 60);
   m_timerIntervalFld->setValue(10);
-  m_timerIntervalFld->setDisabled(true);
   // Make the interval timer single-shot. When the capture finished, restart
   // timer for next frame.
   // This is because capturing and saving the image needs some time.
@@ -1732,13 +1737,13 @@ PencilTestPopup::PencilTestPopup()
   QCommonStyle style;
   m_captureButton->setIcon(style.standardIcon(QStyle::SP_DialogOkButton));
   m_captureButton->setIconSize(QSize(30, 30));
-  if (m_captureFilterSettingsBtn) {
-    m_captureFilterSettingsBtn->setObjectName("GearButton");
-    m_captureFilterSettingsBtn->setFixedSize(24, 24);
-    m_captureFilterSettingsBtn->setIconSize(QSize(16, 16));
-    m_captureFilterSettingsBtn->setIcon(createQIcon("gear"));
-    m_captureFilterSettingsBtn->setToolTip(tr("Options"));
-    m_captureFilterSettingsBtn->setMenu(createOptionsMenu());
+  if (captureOptionsButton) {
+    captureOptionsButton->setObjectName("GearButton");
+    captureOptionsButton->setFixedSize(24, 24);
+    captureOptionsButton->setIconSize(QSize(16, 16));
+    captureOptionsButton->setIcon(createQIcon("gear"));
+    captureOptionsButton->setToolTip(tr("Options"));
+    captureOptionsButton->setMenu(createOptionsMenu());
   }
 
   subfolderButton->setObjectName("SubfolderButton");
@@ -1787,9 +1792,9 @@ PencilTestPopup::PencilTestPopup()
       camLay->addWidget(new QLabel(tr("Resolution:"), this), 0);
       camLay->addWidget(m_resolutionCombo, 1);
 
-      if (m_captureFilterSettingsBtn) {
+      if (captureOptionsButton) {
         camLay->addSpacing(10);
-        camLay->addWidget(m_captureFilterSettingsBtn);
+        camLay->addWidget(captureOptionsButton);
       }
 
       camLay->addSpacing(10);
@@ -2169,8 +2174,8 @@ PencilTestPopup::~PencilTestPopup() { m_cvWebcam.release(); }
 
 QMenu* PencilTestPopup::createOptionsMenu() {
   QMenu* menu = new QMenu();
-  bool ret    = true;
 #ifdef _WIN32
+  bool ret = true;
   auto* settingsAct = menu->addAction(tr("Video Capture Filter Settings..."));
   connect(settingsAct, &QAction::triggered, this,
           &PencilTestPopup::onCaptureFilterSettingsBtnPressed);
@@ -2187,7 +2192,7 @@ QMenu* PencilTestPopup::createOptionsMenu() {
           CamCapUseDirectShow = checked;
           m_timer->start(40);
         });
-#endif
+
   QAction* useMjpgAct = menu->addAction(tr("Use MJPG with Webcam"));
   useMjpgAct->setCheckable(true);
   useMjpgAct->setChecked(m_useMjpg);
@@ -2200,6 +2205,16 @@ QMenu* PencilTestPopup::createOptionsMenu() {
     m_useMjpg     = checked;
     CamCapUseMjpg = checked;
     m_timer->start(40);
+  });
+
+  menu->addSeparator();
+#endif
+
+  QAction* playSoundAct = menu->addAction(tr("Play Sound on Capture"));
+  playSoundAct->setCheckable(true);
+  playSoundAct->setChecked(CamCapPlayCaptureSound != 0);
+  connect(playSoundAct, &QAction::toggled, [](bool checked) {
+    CamCapPlayCaptureSound = checked ? 1 : 0;
   });
 
   return menu;
@@ -2660,6 +2675,8 @@ void PencilTestPopup::onFrameCaptured(cv::Mat& image) {
     m_captureCue = false;
 
     if (importImage(qimg)) {
+      if (CamCapPlayCaptureSound != 0)
+        QSound::play(":Resources/camera_snap.wav");
       m_videoWidget->setPreviousImage(qimg.copy());
       if (Preferences::instance()->isShowFrameNumberWithLettersEnabled()) {
         TFrameId fId = m_frameNumberEdit->getValue();
