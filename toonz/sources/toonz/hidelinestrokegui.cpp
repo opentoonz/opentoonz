@@ -22,9 +22,10 @@
 
 namespace {
 
-QString menuLabel(bool showOn) {
-  return showOn ? QObject::tr("Hide Line: Show Invisible/Hidden Strokes")
-                : QObject::tr("Hide Line: Show Invisible/Hidden Strokes");
+QString menuLabel() { return QObject::tr("Hide Line Indicators"); }
+
+QString menuToolTip() {
+  return QObject::tr("Show Invisible/Hidden Strokes");
 }
 
 bool menuContainsAction(QMenu *menu, QAction *action) {
@@ -86,7 +87,8 @@ void syncCommandActionLabel() {
   if (!action) return;
   const bool on = Preferences::instance()->getShowHideLineStrokes();
   action->setCheckable(true);
-  action->setText(menuLabel(on));
+  action->setText(menuLabel());
+  action->setToolTip(menuToolTip());
   if (action->isChecked() != on) {
     action->blockSignals(true);
     action->setChecked(on);

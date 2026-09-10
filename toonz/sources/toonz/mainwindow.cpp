@@ -2678,9 +2678,8 @@ void MainWindow::defineActions() {
   createToggle(MI_VectorGuidedDrawing, QT_TR_NOOP("Vector Guided Drawing"), "",
                Preferences::instance()->isGuidedDrawingEnabled(),
                MenuViewCommandType, "view_guided_drawing");
-  createToggle(MI_ShowHideLineStrokes,
-               QT_TR_NOOP("Hide Line: Show Invisible/Hidden Strokes"), "Shift+K",
-               Preferences::instance()->getShowHideLineStrokes(),
+  createToggle(MI_ShowHideLineStrokes, QT_TR_NOOP("Hide Line Indicators"),
+               "Shift+K", Preferences::instance()->getShowHideLineStrokes(),
                MenuViewCommandType);
   HideLineStrokeGui::syncCommandActionLabel();
   if (QGLPixelBuffer::hasOpenGLPbuffers())

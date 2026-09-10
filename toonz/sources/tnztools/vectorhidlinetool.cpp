@@ -991,6 +991,8 @@ public:
     m_hideMode.setQStringName(tr("Mode:"));
     m_hideMode.setItemUIName(INVISIBLE_MODE, tr("Invisible"));
     m_hideMode.setItemUIName(HIDDEN_MODE, tr("Hidden"));
+    m_hideMode.setItemToolTip(INVISIBLE_MODE, tr("Fill-block"));
+    m_hideMode.setItemToolTip(HIDDEN_MODE, tr("Fill-through"));
     m_unhide.setQStringName(tr("Unhide"));
     m_selective.setQStringName(tr("Selective"));
     m_frameRange.setQStringName(tr("Frame Range"));
