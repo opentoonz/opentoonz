@@ -1988,7 +1988,7 @@ BrushToolOptionsBox::BrushToolOptionsBox(QWidget *parent, TTool *tool,
     }
     if (auto *range =
             dynamic_cast<ToolOptionCombo *>(m_controls.value("Range:")))
-      connect(range, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+      connect(range, QOverload<int>::of(&QComboBox::activated), this,
               &BrushToolOptionsBox::updateStatus);
   }
   hLayout()->addStretch(1);

@@ -18,6 +18,8 @@ Review padded Trail assets before adopting this version for an existing producti
   frame count starts a new cursor. Cancellation does not replace the old cursor.
 - Symmetry replicas share one selection and advance the cursor once per gesture.
 - Trail Cycle is available only for multi-frame Trail styles with Frame Range off.
+- Frame Range selections reach the brush property before the toolbar refreshes,
+  so choosing a range mode does not reset it to Off.
 
 ## Raster preparation and caching
 
@@ -69,7 +71,7 @@ cmake --build /tmp/trail-tests
 ctest --test-dir /tmp/trail-tests --output-on-failure
 ```
 
-For all suites, build `tnzcore` from the same checkout, supply `TNZCORE_LIBRARY`,
+For the core-backed suites, build `tnzcore` from the same checkout, supply `TNZCORE_LIBRARY`,
 and make Qt 5 and PNG discoverable through the normal CMake search path:
 
 ```sh
@@ -85,9 +87,22 @@ Use `build/lib/opentoonz/libtnzcore.so` on Linux. The tests and core library mus
 use the same build configuration: select `Debug` when linking a Debug core.
 `TSmartObject` has a different layout depending on `NDEBUG`, so mixing build types
 can corrupt raster access and crash PLI tests. Both builds default to Release.
+
+On Linux and macOS, also supply `TNZTOOLS_LIBRARY` to test the actual Vector Brush
+options panel. This requires a matching `tnztools` build, Qt Test and Boost headers.
+Use `build/lib/opentoonz/libtnztools.so` on Linux or
+`build/tnztools/libtnztools.dylib` on macOS. On macOS, set `DYLD_LIBRARY_PATH` to the
+absolute `build/toonz/OpenToonz.app/Contents/MacOS` directory before running CTest
+so the toolbar test can load the application's dependent libraries.
+
+The `brushoptions` suite sends Qt key events through the actual Range control,
+checks every mode and the return to Off, and checks selection after a property
+refresh. It runs without a stylesheet and with Default and Darker, using Qt's
+offscreen platform without an OpenGL context.
+
 The `opengl`-labelled test requires a working display
 and OpenGL context. `ctest -LE opengl` explicitly excludes that test for headless
-runners. The Linux and macOS build workflows run the four headless suites; they do
+runners. The Linux and macOS build workflows run the five headless suites; they do
 not claim OpenGL coverage.
 
 ## Local evidence and remaining checks
@@ -104,6 +119,9 @@ rebuilt for arm64:
   fail; restoring 64 MiB makes it pass.
 - Forward/Backward/Repeat transitions, cancellation, replacement, inactive styles
   and shared replica selection.
+- Vector Brush Frame Range selection through the real toolbar under Default,
+  Darker and no stylesheet. The test fails against the previous toolbar library
+  when the first selection resets to Off, and passes with the signal-order fix.
 - Actual PLI reader/writer combinations, partial/trailing tags, malformed base
   payloads, format limits, and stroke copy/split/transform metadata retention.
 - Actual offscreen OpenGL output for PNG, vector and rasterized-vector sources,
@@ -116,6 +134,8 @@ AddressSanitizer could not run: the installed Apple runtime deadlocks during its
 initialization before `main`, including in the dependency-light state test.
 The full application build emits existing legacy/OpenGL deprecation warnings;
 the regression-test translation units compile with warnings treated as errors.
+The toolbar library also emits existing path-initialization diagnostics before
+the test configures `TOONZROOT`; these occur with both the old and fixed library.
 
 Interactive toolbar enablement, real viewer/preview/column-icon parity, undo/redo
 across scene switches, and a released older application's open/save cycle still
