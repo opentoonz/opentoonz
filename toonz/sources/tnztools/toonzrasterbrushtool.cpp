@@ -1034,6 +1034,7 @@ void ToonzRasterBrushTool::onActivate() {
 
   updateModifiers();
   m_brushTimer.start();
+  m_skipStrokeUntilDown = false;
   // TODO:app->editImageOrSpline();
 }
 
@@ -1041,9 +1042,10 @@ void ToonzRasterBrushTool::onActivate() {
 
 void ToonzRasterBrushTool::onDeactivate() {
   m_inputmanager.finishTracks();
-  m_enabled   = false;
-  m_workRas   = TRaster32P();
-  m_backupRas = TRasterCM32P();
+  m_enabled             = false;
+  m_workRas             = TRaster32P();
+  m_backupRas           = TRasterCM32P();
+  m_skipStrokeUntilDown = false;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1142,6 +1144,13 @@ void ToonzRasterBrushTool::handleMouseEvent(MouseEventType type,
   if (control != m_inputmanager.state.isKeyPressed(TKey::control))
     m_inputmanager.keyEvent(control, TKey::control, t, nullptr);
 
+  if (m_skipStrokeUntilDown) {
+    if (type == ME_DOWN)
+      m_skipStrokeUntilDown = false;
+    else if (type != ME_MOVE)
+      return;
+  }
+
   if (type == ME_MOVE) {
     THoverList hovers(1, fixedPos);
     m_inputmanager.hoverEvent(hovers);
@@ -1178,6 +1187,7 @@ void ToonzRasterBrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 //--------------------------------------------------------------------------------------------------
 
 void ToonzRasterBrushTool::inputSetBusy(bool busy) {
+  if (m_skipStrokeUntilDown && busy) return;
   if (m_painting.active == busy) return;
 
   if (busy) {
@@ -1210,10 +1220,14 @@ void ToonzRasterBrushTool::inputSetBusy(bool busy) {
     }
 
     m_painting.frameId = getFrameId();
+    m_painting.level   = TXshSimpleLevelP();
+    if (TXshLevelHandle *lh = app->getCurrentLevel()) {
+      if (TXshLevel *xl = lh->getLevel())
+        m_painting.level = xl->getSimpleLevel();
+    }
 
-    TImageP img = getImage(true);
-    TToonzImageP ri(img);
-    TRasterCM32P ras = ri->getRaster();
+    TToonzImageP ri(getImage(true));
+    TRasterCM32P ras = ri ? ri->getRaster() : TRasterCM32P();
     if (!ras) {
       m_painting.active = false;
       return;
@@ -1255,51 +1269,7 @@ void ToonzRasterBrushTool::inputSetBusy(bool busy) {
     }
 
   } else {
-    // finish painting
-
-    if (m_painting.myPaint.isActive) {
-      // finish myPaint drawing
-      m_workRas->unlock();
-    }
-
-    delete m_painting.tileSaver;
-    m_painting.tileSaver = nullptr;
-
-    // add undo record
-    TFrameId frameId = m_painting.frameId.isEmptyFrame() ? getCurrentFid()
-                                                         : m_painting.frameId;
-    if (m_painting.tileSet->getTileCount() > 0) {
-      TTool::Application *app   = TTool::getApplication();
-      TXshLevel *level          = app->getCurrentLevel()->getLevel();
-      TXshSimpleLevelP simLevel = level->getSimpleLevel();
-      TRasterCM32P ras          = TToonzImageP(getImage(true))->getRaster();
-      TRasterCM32P subras = ras->extract(m_painting.affectedRect)->clone();
-      TUndoManager::manager()->add(new MyPaintBrushUndo(
-          m_painting.tileSet, simLevel.getPointer(), frameId, m_isFrameCreated,
-          m_isLevelCreated, subras, m_painting.affectedRect.getP00()));
-      // MyPaintBrushUndo will delete tileSet by it self
-    } else {
-      // delete tileSet here because MyPaintBrushUndo will not do it
-      delete m_painting.tileSet;
-    }
-    m_painting.tileSet = nullptr;
-
-    // Restore gap/autoclose Fill Check
-    int tc = ToonzCheck::instance()->getChecks();
-    if (tc & ToonzCheck::eGap || tc & ToonzCheck::eAutoclose) invalidate();
-
-    /*-- 作業中のフレームをリセット --*/
-    m_painting.frameId = TFrameId();
-
-    m_painting.myPaint.isActive = false;
-    m_painting.pencil.isActive  = false;
-    m_painting.blured.isActive  = false;
-    m_painting.active           = false;
-
-    /*-- FIdを指定して、描画中にフレームが動いても、
-      描画開始時のFidのサムネイルが更新されるようにする。--*/
-    notifyImageChanged(frameId);
-    ToolUtils::updateSaveBox();
+    commitPainting();
   }
 }
 
@@ -1310,9 +1280,8 @@ void ToonzRasterBrushTool::inputPaintTrackPoint(const TTrackPoint &point,
                                                 bool firstTrack, bool preview) {
   if (!m_painting.active || preview) return;
 
-  TImageP img = getImage(true);
-  TToonzImageP ri(img);
-  TRasterCM32P ras = ri->getRaster();
+  TToonzImageP ri(getImage(true));
+  TRasterCM32P ras = ri ? ri->getRaster() : TRasterCM32P();
   if (!ras) return;
   TPointD rasCenter     = convert(ras->getCenter());
   TPointD fixedPosition = getCenteredCursorPos(point.position);
@@ -1562,6 +1531,7 @@ void ToonzRasterBrushTool::draw() {
 
   if (TToonzImageP ti = img) {
     TRasterP ras = ti->getRaster();
+    if (!ras) return;
     int lx       = ras->getLx();
     int ly       = ras->getLy();
     drawEmptyCircle(m_brushPos, tround(m_minThick), lx % 2 == 0, ly % 2 == 0,
@@ -1603,7 +1573,55 @@ TPropertyGroup *ToonzRasterBrushTool::getProperties(int idx) {
 
 //----------------------------------------------------------------------------------------------------------
 
+void ToonzRasterBrushTool::commitPainting() {
+  if (!m_painting.active) return;
+
+  if (m_painting.myPaint.isActive && m_workRas) m_workRas->unlock();
+
+  delete m_painting.tileSaver;
+  m_painting.tileSaver = nullptr;
+
+  TFrameId frameId =
+      m_painting.frameId.isEmptyFrame() ? getCurrentFid() : m_painting.frameId;
+  TXshSimpleLevel *sl = m_painting.level.getPointer();
+
+  TToonzImageP ti =
+      sl ? TToonzImageP(sl->getFrame(frameId, true)) : TToonzImageP();
+  TRasterCM32P ras = ti ? ti->getRaster() : TRasterCM32P();
+
+  if (m_painting.tileSet && m_painting.tileSet->getTileCount() > 0 && ras &&
+      sl) {
+    TRasterCM32P subras = ras->extract(m_painting.affectedRect)->clone();
+    TUndoManager::manager()->add(new MyPaintBrushUndo(
+        m_painting.tileSet, sl, frameId, m_isFrameCreated, m_isLevelCreated,
+        subras, m_painting.affectedRect.getP00()));
+  } else {
+    delete m_painting.tileSet;
+  }
+  m_painting.tileSet = nullptr;
+
+  int tc = ToonzCheck::instance()->getChecks();
+  if (tc & ToonzCheck::eGap || tc & ToonzCheck::eAutoclose) invalidate();
+
+  m_painting.frameId          = TFrameId();
+  m_painting.level            = TXshSimpleLevelP();
+  m_painting.myPaint.isActive = false;
+  m_painting.pencil.isActive  = false;
+  m_painting.blured.isActive  = false;
+  m_painting.active           = false;
+
+  if (sl) notifyImageChanged(frameId, sl);
+  ToolUtils::updateSaveBox();
+}
+
+//----------------------------------------------------------------------------------------------------------
+
 void ToonzRasterBrushTool::onImageChanged() {
+  m_inputmanager.reset();
+  if (m_painting.active) {
+    commitPainting();
+    m_skipStrokeUntilDown = true;
+  }
   if (!isEnabled()) return;
   setWorkAndBackupImages();
 }
@@ -1613,7 +1631,8 @@ void ToonzRasterBrushTool::onImageChanged() {
 void ToonzRasterBrushTool::setWorkAndBackupImages() {
   TToonzImageP ti = (TToonzImageP)getImage(false, 1);
   if (!ti) return;
-  TRasterP ras   = ti->getRaster();
+  TRasterP ras = ti->getRaster();
+  if (!ras) return;
   TDimension dim = ras->getSize();
 
   if (!m_workRas || m_workRas->getLx() < dim.lx || m_workRas->getLy() < dim.ly)
