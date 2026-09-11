@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.16)
 project(TrailTests LANGUAGES CXX)
 
+# TSmartObject's layout depends on NDEBUG. Match the main build's default;
+# callers linking a Debug core must explicitly select Debug here as well.
+if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type matching tnzcore" FORCE)
+endif()
+
 enable_testing()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

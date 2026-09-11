@@ -74,13 +74,18 @@ and make Qt 5 and PNG discoverable through the normal CMake search path:
 
 ```sh
 cmake -S toonz/tests -B /tmp/trail-tests \
+  -DCMAKE_BUILD_TYPE=Release \
   -DTNZCORE_LIBRARY=/absolute/path/to/build/tnzcore/libtnzcore.dylib \
   -DCMAKE_PREFIX_PATH=/absolute/path/to/qt5
 cmake --build /tmp/trail-tests
 ctest --test-dir /tmp/trail-tests --output-on-failure
 ```
 
-Use the `.so` library on Linux. The `opengl`-labelled test requires a working display
+Use `build/lib/opentoonz/libtnzcore.so` on Linux. The tests and core library must
+use the same build configuration: select `Debug` when linking a Debug core.
+`TSmartObject` has a different layout depending on `NDEBUG`, so mixing build types
+can corrupt raster access and crash PLI tests. Both builds default to Release.
+The `opengl`-labelled test requires a working display
 and OpenGL context. `ctest -LE opengl` explicitly excludes that test for headless
 runners. The Linux and macOS build workflows run the four headless suites; they do
 not claim OpenGL coverage.

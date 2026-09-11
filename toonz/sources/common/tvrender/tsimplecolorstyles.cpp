@@ -72,7 +72,7 @@ namespace {
 //-----------------------------------------------------------------------------
 
 constexpr int kMaxRasterPatternTextureSize = PatternTextures::maxSourceSide;
-constexpr int kRasterPatternTextureDetail = 2;
+constexpr int kRasterPatternTextureDetail  = 2;
 
 int previousPowerOfTwo(int value) {
   int power = 1;
@@ -1180,7 +1180,7 @@ TRaster32P loadPatternRaster(const TLevelReaderP &reader, const TFrameId &fid,
 
 void TRasterImagePatternStrokeStyle::loadLevel(const std::string &patternName) {
   m_level = TLevelP();
-  m_name = patternName;
+  m_name  = patternName;
   updateVersionNumber();
   TFilePathSet paths;
   TSystem::readDirectory(paths, getRootDir());

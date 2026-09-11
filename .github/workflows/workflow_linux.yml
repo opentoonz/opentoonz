@@ -79,8 +79,9 @@ jobs:
       run: |
         set -euo pipefail
         cmake -S toonz/tests -B toonz/trail-tests -G Ninja \
+          -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} \
-          -DTNZCORE_LIBRARY="$PWD/toonz/build/tnzcore/libtnzcore.so"
+          -DTNZCORE_LIBRARY="$PWD/toonz/build/lib/opentoonz/libtnzcore.so"
         cmake --build toonz/trail-tests
         ctest --test-dir toonz/trail-tests -LE opengl --output-on-failure
 

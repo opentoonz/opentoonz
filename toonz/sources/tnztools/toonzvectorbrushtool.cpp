@@ -910,8 +910,8 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
               : static_cast<TrailCycle::Mode>(m_trailCycle.getIndex());
       m_trailSelection = m_trailState.begin(mode, key, trailFrameCount);
     } else {
-      m_styleId          = 1;
-      m_currentColor     = TPixel32::Black;
+      m_styleId      = 1;
+      m_currentColor = TPixel32::Black;
     }
 
     m_active = true;

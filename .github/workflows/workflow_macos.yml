@@ -106,6 +106,7 @@ jobs:
         run: |
           set -euo pipefail
           cmake -S toonz/tests -B toonz/trail-tests -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_PREFIX_PATH="$(brew --prefix qt@5)" \
             -DTNZCORE_LIBRARY="$PWD/toonz/build/tnzcore/libtnzcore.dylib"
           cmake --build toonz/trail-tests
