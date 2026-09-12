@@ -39,7 +39,15 @@ void ToolHandle::setTool(QString name) {
 
   TTool *tool = TTool::getTool(m_toolName.toStdString(),
                                (TTool::ToolTargetType)m_toolTargetType);
-  if (tool == m_tool) return;
+  if (tool == m_tool) {
+    // Same tool instance (e.g. shared placeholder on incompatible levels):
+    // m_toolName may still have changed — notify listeners to refresh UI.
+    if (m_tool) {
+      m_tool->onActivate();
+      emit toolSwitched();
+    }
+    return;
+  }
 
   if (m_tool) m_tool->onDeactivate();
 

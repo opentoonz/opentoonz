@@ -116,6 +116,7 @@ void ToolOptionCheckbox::nextCheckState() {
   QAbstractButton::nextCheckState();
   m_property->setValue(checkState() == Qt::Checked);
   notifyTool();
+  if (m_toolHandle) m_toolHandle->notifyToolChanged();
 }
 
 //=============================================================================
