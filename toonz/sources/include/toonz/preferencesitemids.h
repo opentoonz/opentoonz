@@ -130,6 +130,8 @@ enum PreferencesItemId {
   tempToolSwitchTimer,
   animateToolHandleSize,
   animateToolColor,
+  defaultStartupTool,
+  defaultNewSceneTool,
 
   //----------
   // Xsheet

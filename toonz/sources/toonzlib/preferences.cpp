@@ -577,6 +577,12 @@ void Preferences::definePreferenceItems() {
          1.0, 5.0);
   define(animateToolColor, "animateToolColor", QMetaType::QColor,
          QColor(250, 127, 240));
+  // The Preferences dialog updates both keys together. Advanced users may set
+  // these command IDs independently in preferences.ini.
+  define(defaultStartupTool, "defaultStartupTool", QMetaType::QString,
+         "T_Hand");
+  define(defaultNewSceneTool, "defaultNewSceneTool", QMetaType::QString,
+         "T_Hand");
 
   // Xsheet
   define(xsheetLayoutPreference, "xsheetLayoutPreference", QMetaType::QString,
