@@ -79,13 +79,20 @@ std::vector<TFxP> sortFxs(const std::vector<TFxP> &fxs) {
 
 // raccoglie tutti i parametri dai vari TFx e li assegna anche alla macro
 void collectParams(TMacroFx *macroFx) {
-  int k;
-  for (k = 0; k < (int)macroFx->m_fxs.size(); k++) {
-    TFxP fx = macroFx->m_fxs[k];
+  const std::vector<TFxP>& fxs = macroFx->getFxs();
+  for (int k = 0; k < (int)fxs.size(); k++) {
+    TFxP fx = fxs[k];
     int j;
     for (j = 0; j < fx->getParams()->getParamCount(); j++)
       macroFx->getParams()->add(fx->getParams()->getParamVar(j)->clone());
   }
+}
+
+bool isMemberFx(const TMacroFx* macroFx, const TFx* fx) {
+  const std::vector<TFxP>& fxs = macroFx->getFxs();
+  return std::find_if(fxs.begin(), fxs.end(), [fx](const TFxP& candidate) {
+           return candidate.getPointer() == fx;
+         }) != fxs.end();
 }
 
 }  // anonymous namespace
@@ -254,6 +261,7 @@ TFx *TMacroFx::clone(bool recursive) const {
   TMacroFx *clone = TMacroFx::create(clones);
   clone->setName(getName());
   clone->setFxId(getFxId());
+  clone->m_exposedParams = m_exposedParams;
 
   // Copy the index of the passive cache manager.
   clone->getAttributes()->passiveCacheDataIdx() =
@@ -321,6 +329,70 @@ TFx *TMacroFx::getFxById(const std::wstring &id) const {
 //--------------------------------------------------
 
 const std::vector<TFxP> &TMacroFx::getFxs() const { return m_fxs; }
+
+//--------------------------------------------------
+
+const std::vector<TMacroFx::ExposedParam>& TMacroFx::getExposedParams() const {
+  return m_exposedParams;
+}
+
+//--------------------------------------------------
+
+bool TMacroFx::isParamExposed(const TFx* fx,
+                              const std::string& paramName) const {
+  if (!fx) return false;
+
+  return std::find_if(m_exposedParams.begin(), m_exposedParams.end(),
+                      [fx, &paramName](const ExposedParam& param) {
+                        return param.m_fxId == fx->getFxId() &&
+                               param.m_paramName == paramName;
+                      }) != m_exposedParams.end();
+}
+
+//--------------------------------------------------
+
+void TMacroFx::setParamExposed(const TFx* fx, const std::string& paramName,
+                               bool exposed) {
+  if (!fx || !isMemberFx(this, fx) || !fx->getParams()->getParam(paramName))
+    return;
+
+  auto found = std::find_if(m_exposedParams.begin(), m_exposedParams.end(),
+                            [fx, &paramName](const ExposedParam& param) {
+                              return param.m_fxId == fx->getFxId() &&
+                                     param.m_paramName == paramName;
+                            });
+  if (exposed) {
+    if (found == m_exposedParams.end())
+      m_exposedParams.push_back({fx->getFxId(), paramName});
+  } else if (found != m_exposedParams.end()) {
+    m_exposedParams.erase(found);
+  }
+}
+
+//--------------------------------------------------
+
+std::string TMacroFx::getExposedParamKey() const {
+  std::string key;
+  for (int i = 0; i < (int)m_fxs.size(); ++i) {
+    const TFxP& fx         = m_fxs[i];
+    const std::string name = ::to_string(fx->getName());
+    const std::string type = fx->getFxType();
+    key += std::to_string(i) + ":" + std::to_string(name.size()) + ":" + name;
+    key += ":" + std::to_string(type.size()) + ":" + type + "{";
+    for (const ExposedParam& param : m_exposedParams) {
+      if (param.m_fxId != fx->getFxId()) continue;
+      key += std::to_string(param.m_paramName.size()) + ":" + param.m_paramName;
+      key += ";";
+    }
+    key += "}";
+    if (const TMacroFx* childMacro =
+            dynamic_cast<const TMacroFx*>(fx.getPointer())) {
+      const std::string childKey = childMacro->getExposedParamKey();
+      key += "[" + std::to_string(childKey.size()) + ":" + childKey + "]";
+    }
+  }
+  return key;
+}
 
 //--------------------------------------------------
 
@@ -540,6 +612,14 @@ void TMacroFx::loadData(TIStream &is) {
         } else
           throw TException("unexpected tag " + tagName);
       }
+    } else if (tagName == "exposedparams") {
+      while (is.matchTag(tagName)) {
+        if (tagName != "param") throw TException("unexpected tag " + tagName);
+        const std::string fxId      = is.getTagAttribute("fx_id");
+        const std::string paramName = is.getTagAttribute("name");
+        if (TFx* fx = getFxById(::to_wstring(fxId)))
+          setParamExposed(fx, paramName, true);
+      }
     } else if (tagName == "super") {
       TRasterFx::loadData(is);
     } else
@@ -571,6 +651,16 @@ void TMacroFx::saveData(TOStream &os) {
     os.openCloseChild("port", attr);
   }
   os.closeChild();
+  if (!m_exposedParams.empty()) {
+    os.openChild("exposedparams");
+    for (const ExposedParam& param : m_exposedParams) {
+      std::map<std::string, std::string> attr;
+      attr["fx_id"] = ::to_string(param.m_fxId);
+      attr["name"]  = param.m_paramName;
+      os.openCloseChild("param", attr);
+    }
+    os.closeChild();
+  }
   os.openChild("super");
   TRasterFx::saveData(os);
   os.closeChild();
