@@ -1,6 +1,8 @@
 
 
 #include "mainwindow.h"
+#include "convertlinestoareascommand.h"
+#include "reducecolorscommand.h"
 #include "customhelplink.h"
 
 // Tnz6 includes
@@ -2643,6 +2645,13 @@ void MainWindow::defineActions() {
   createRightClickMenuAction(MI_EraseUnusedStyles,
                              QT_TR_NOOP("&Delete Unused Styles"), "",
                              "delete_unused_styles");
+  initConvertLineAreaCommands(
+      createRightClickMenuAction(MI_ConvertLinesToAreas,
+                                 QT_TR_NOOP("Convert Lines to Areas"), ""),
+      createRightClickMenuAction(MI_ConvertAreasToLines,
+                                 QT_TR_NOOP("Convert Areas to Lines"), ""));
+  initReduceColorsCommand(createRightClickMenuAction(
+      MI_ReduceColors, QT_TR_NOOP("Reduce Colors..."), ""));
 
   // Menu - View
 
