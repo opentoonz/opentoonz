@@ -478,7 +478,12 @@ void FullColorBrushTool::inputMouseMove(const TPointD &position,
     }
   } locals = {this};
 
-  if (state.isKeyPressed(TKey::control) && state.isKeyPressed(TKey::alt)) {
+  const bool resizeBrush =
+      Preferences::instance()->useCtrlAltToResizeBrushEnabled() &&
+      state.isKeyPressed(TKey::control) && state.isKeyPressed(TKey::alt) &&
+      !state.isKeyPressed(TKey::shift);
+
+  if (resizeBrush) {
     const TPointD &diff = position - m_mousePos;
     if (getBrushStyle()) {
       locals.add(m_modifierSize, 0.01 * diff.x);

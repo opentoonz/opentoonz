@@ -1466,12 +1466,15 @@ void ToonzRasterBrushTool::inputMouseMove(const TPointD &position,
   struct Locals {
     ToonzRasterBrushTool *m_this;
 
+    void notify(TProperty &prop) {
+      m_this->onPropertyChanged(prop.getName());
+      TTool::getApplication()->getCurrentTool()->notifyToolChanged();
+    }
+
     void setValue(TDoublePairProperty &prop,
                   const TDoublePairProperty::Value &value) {
       prop.setValue(value);
-
-      m_this->onPropertyChanged(prop.getName());
-      TTool::getApplication()->getCurrentTool()->notifyToolChanged();
+      notify(prop);
     }
 
     void addMinMax(TDoublePairProperty &prop, double min, double max) {
@@ -1487,6 +1490,14 @@ void ToonzRasterBrushTool::inputMouseMove(const TPointD &position,
 
       setValue(prop, value);
     }
+
+    void add(TDoubleProperty &prop, double amount) {
+      if (amount == 0.0) return;
+      const TDoubleProperty::Range &range = prop.getRange();
+      prop.setValue(
+          tcrop<double>(prop.getValue() + amount, range.first, range.second));
+      notify(prop);
+    }
   } locals = {this};
 
   double thickness =
@@ -1494,25 +1505,31 @@ void ToonzRasterBrushTool::inputMouseMove(const TPointD &position,
   TPointD halfThick(thickness * 0.5, thickness * 0.5);
   TRectD invalidateRect(m_brushPos - halfThick, m_brushPos + halfThick);
 
-  if (Preferences::instance()->useCtrlAltToResizeBrushEnabled() &&
+  const bool resizeBrush =
+      Preferences::instance()->useCtrlAltToResizeBrushEnabled() &&
       state.isKeyPressed(TKey::control) && state.isKeyPressed(TKey::alt) &&
-      !state.isKeyPressed(TKey::shift)) {
+      !state.isKeyPressed(TKey::shift);
+
+  if (resizeBrush) {
     // Resize the brush if CTRL+ALT is pressed and the preference is enabled.
     const TPointD &diff = position - m_mousePos;
-    double max          = diff.x / 2;
-    double min          = diff.y / 2;
-
-    locals.addMinMax(m_rasThickness, min, max);
-
-    double radius = m_rasThickness.getValue().second * 0.5;
+    double radius;
+    if (m_isMyPaintStyleSelected) {
+      locals.add(m_modifierSize, 0.01 * diff.x);
+      radius = (m_maxCursorThick + 1) * 0.5;
+    } else {
+      locals.addMinMax(m_rasThickness, diff.y / 2, diff.x / 2);
+      radius = m_rasThickness.getValue().second * 0.5;
+    }
     invalidateRect += TRectD(m_brushPos - TPointD(radius, radius),
                              m_brushPos + TPointD(radius, radius));
-
   } else {
-    m_brushPos = m_mousePos = position;
+    m_brushPos = position;
 
     invalidateRect += TRectD(position - halfThick, position + halfThick);
   }
+
+  m_mousePos = position;
 
   invalidate(invalidateRect.enlarge(20));
 
@@ -1699,6 +1716,8 @@ bool ToonzRasterBrushTool::onPropertyChanged(std::string propertyName) {
   RasterBrushModifierSize  = m_modifierSize.getValue();
   BrushLockAlpha           = m_modifierLockAlpha.getValue();
   RasterBrushAssistants    = m_assistants.getValue();
+
+  if (propertyName == m_modifierSize.getName()) updateCurrentStyle();
 
   // Recalculate/reset based on changed settings
   if (propertyName == m_rasThickness.getName()) {
