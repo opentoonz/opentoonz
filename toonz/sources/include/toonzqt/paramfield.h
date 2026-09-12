@@ -624,9 +624,10 @@ signals:
 };
 };  // namespace component
 
-class DVAPI StringParamField final : public ParamField {
+class DVAPI StringParamField : public ParamField {
   Q_OBJECT
 
+protected:
   TStringParamP m_currentParam, m_actualParam;
   DVGui::LineEdit *m_textFld            = nullptr;
   component::MyTextEdit *m_multiTextFld = nullptr;
@@ -645,7 +646,22 @@ public:
       return QSize(100, 80);
   }
 protected slots:
-  void onChange();
+  virtual void onChange();
+};
+
+//=============================================================================
+// FilePathParamField
+//-----------------------------------------------------------------------------
+
+class DVAPI FilePathParamField : public StringParamField {
+  Q_OBJECT
+
+public:
+  FilePathParamField(QWidget *parent, QString name,
+                     const TFilePathParamP &param);
+
+  void setPath(const QString &path);
+  QSize getPreferredSize() override { return QSize(260, 24); }
 };
 
 //=============================================================================
