@@ -3317,6 +3317,8 @@ void MainWindow::defineActions() {
                           QT_TR_NOOP("Break sharp angles"), "");
   createToolOptionsAction("A_ToolOption_FrameRange", QT_TR_NOOP("Frame range"),
                           "F6");
+  createToolOptionsAction("A_ToolOption_TrailCycle", QT_TR_NOOP("Trail cycle"),
+                          "");
   createToolOptionsAction("A_ToolOption_IK", QT_TR_NOOP("Inverse Kinematics"),
                           "");
   createToolOptionsAction("A_ToolOption_Invert", QT_TR_NOOP("Invert"), "");

@@ -3776,13 +3776,19 @@ TStroke::OutlineOptions::OutlineOptions()
     : m_capStyle(ROUND_CAP)
     , m_joinStyle(ROUND_JOIN)
     , m_miterLower(0.0)
-    , m_miterUpper(4.0) {}
+    , m_miterUpper(4.0)
+    , m_patternFrameOffset(0)
+    , m_patternFrameStep(1) {}
 
 //-----------------------------------------------------------------------------
 
 TStroke::OutlineOptions::OutlineOptions(UCHAR capStyle, UCHAR joinStyle,
-                                        double lower, double upper)
+                                        double lower, double upper,
+                                        int patternFrameOffset,
+                                        int patternFrameStep)
     : m_capStyle(capStyle)
     , m_joinStyle(joinStyle)
     , m_miterLower(lower)
-    , m_miterUpper(upper) {}
+    , m_miterUpper(upper)
+    , m_patternFrameOffset(patternFrameOffset)
+    , m_patternFrameStep(patternFrameStep) {}
