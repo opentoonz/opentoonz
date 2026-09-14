@@ -222,8 +222,8 @@ void PltReader::open(FILE *file) {
   if (TIFFGetField(m_tiff, TIFFTAG_TOONZCOLORNAMES, &count, &data) && data)
     colorNames = data;
 
-  TREE *names =
-      cdb_decode_all(const_cast<char *>(colorNames.c_str()), Tcm_24_default_info);
+  TREE *names = cdb_decode_all(const_cast<char *>(colorNames.c_str()),
+                               Tcm_24_default_info);
 
   CDB_TREE_ITEM *item;
 
