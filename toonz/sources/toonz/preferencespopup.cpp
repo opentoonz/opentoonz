@@ -1319,6 +1319,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {viewerIndicatorEnabled, tr("Show Viewer Indicators")},
       {restoreViewerViewFromLastSession,
        tr("Restore Viewer Zoom and Pan from Last Session")},
+      {togglePanelWithShortcut, tr("Toggle Panels with Shortcut")},
 
       // Visualization
       {show0ThickLines, tr("Show Lines with Thickness 0")},
@@ -1950,6 +1951,7 @@ QWidget* PreferencesPopup::createInterfacePage() {
       ->setToolTip(
           tr("Leave blank to use the local OpenToonz documentation index. "
              "To open a PDF at a specific page, append #page=12."));
+  insertUI(togglePanelWithShortcut, lay);
 
   lay->setRowStretch(lay->rowCount(), 1);
   insertFootNote(lay);

@@ -7,6 +7,8 @@
 
 #include "pane.h"
 
+#include "toonz/preferences.h"
+#include "toonz/preferencesitemids.h"
 #include "toonzqt/styleeditor.h"
 
 #include <QMainWindow>
@@ -43,6 +45,21 @@ void OpenFloatingPanel::execute() {
   if (m_panelType == "FlipBook") {
     FlipBookPool::instance()->pop();
     return;
+  }
+
+  if (Preferences::instance()->getBoolValue(togglePanelWithShortcut)) {
+    TMainWindow *currentRoom = TApp::instance()->getCurrentRoom();
+    if (currentRoom) {
+      bool closedAny = false;
+      const QList<TPanel *> panels = currentRoom->findChildren<TPanel *>();
+      for (TPanel *panel : panels) {
+        if (panel->getPanelType() == m_panelType && !panel->isHidden()) {
+          panel->close();
+          closedAny = true;
+        }
+      }
+      if (closedAny) return;
+    }
   }
 
   getOrOpenFloatingPanel(m_panelType);
