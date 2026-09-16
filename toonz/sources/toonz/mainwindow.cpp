@@ -2500,6 +2500,9 @@ void MainWindow::defineActions() {
                          "insert_frame");
   createMenuXsheetAction(MI_RemoveSceneFrame, QT_TR_NOOP("Remove Frame"), "",
                          "remove_frame");
+  createMenuXsheetAction(MI_RemoveSelectedSceneFrames,
+                         QT_TR_NOOP("Remove Selected Frames"), "",
+                         "remove_frame");
   createMenuXsheetAction(MI_InsertGlobalKeyframe,
                          QT_TR_NOOP("Insert Multiple Keys"), "",
                          "insert_multiple_keys");

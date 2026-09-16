@@ -4053,6 +4053,13 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected, TXshCell cell,
     }
   }
 
+  int r0, c0, r1, c1;
+  m_viewer->getCellSelection()->getSelectedCells(r0, c0, r1, c1);
+  if (r1 > r0) {
+    menu.addSeparator();
+    menu.addAction(cmdManager->getAction(MI_RemoveSelectedSceneFrames));
+  }
+
   // cell mark menu
   TXshCellColumn *cellColumn =
       (m_viewer->getXsheet()->getColumn(col))
