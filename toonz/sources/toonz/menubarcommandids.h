@@ -472,6 +472,7 @@
 
 #define MI_OpenOnlineManual "MI_OpenOnlineManual"
 #define MI_OpenWhatsNew "MI_OpenWhatsNew"
+#define MI_Quicklink "MI_Quicklink"
 #define MI_OpenCommunityForum "MI_OpenCommunityForum"
 #define MI_OpenReportABug "MI_OpenReportABug"
 

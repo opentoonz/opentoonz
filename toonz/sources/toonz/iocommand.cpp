@@ -29,6 +29,7 @@
 
 // TnzTools includes
 #include "tools/toolhandle.h"
+#include "tools/toolcommandids.h"
 
 // ToonzQt includes
 #include "toonzqt/gutil.h"
@@ -39,6 +40,7 @@
 #include "toonzqt/imageutils.h"
 
 // ToonzLib includes
+#include "toonz/preferences.h"
 #include "toonz/palettecontroller.h"
 #include "toonz/tscenehandle.h"
 #include "toonz/tobjecthandle.h"
@@ -86,6 +88,7 @@
 // Qt includes
 #include <QLabel>
 #include <QApplication>
+#include <QByteArray>
 #include <QClipboard>
 #include <QDirIterator>
 
@@ -1378,7 +1381,12 @@ void IoCmd::newScene() {
   ToolHandle *toolH = TApp::instance()->getCurrentTool();
   if (toolH && toolH->getTool()) toolH->getTool()->reset();
 
-  CommandManager::instance()->execute("T_Hand");
+  const QByteArray defaultNewSceneTool =
+      Preferences::instance()->getDefaultNewSceneTool().toLatin1();
+  if (CommandManager::instance()->getAction(defaultNewSceneTool.constData()))
+    CommandManager::instance()->execute(defaultNewSceneTool.constData());
+  else
+    CommandManager::instance()->execute(T_Hand);
 
   CommandManager::instance()->enable(MI_SaveSubxsheetAs, false);
 

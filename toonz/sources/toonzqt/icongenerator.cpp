@@ -1443,6 +1443,8 @@ TOfflineGL *IconGenerator::getOfflineGLContext(const TDimension &minSize) {
 
   const TDimension actualSize = context->getSize();
   if (actualSize.lx < requiredSize.lx || actualSize.ly < requiredSize.ly) {
+    // Destroy the old FBO before the replacement context becomes current.
+    m_contexts.setLocalData(nullptr);
     context = new TOfflineGL(requiredSize);
     m_contexts.setLocalData(context);
   }

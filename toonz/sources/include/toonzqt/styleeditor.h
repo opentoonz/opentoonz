@@ -761,6 +761,11 @@ public:
       return false;
   }
 
+  void reloadItems() {
+    m_manager->loadItems();
+    patternAdded();
+  }
+
   TMyPaintBrushStyle &getBrush(int index) {
     return m_mypManager->getBrush(index);
   }
@@ -818,6 +823,8 @@ class SettingsPage final : public QScrollArea {
   QGridLayout *m_paramsLayout;
 
   QCheckBox *m_autoFillCheckBox;
+  QPushButton *m_revertMyPaintButton;
+  QPushButton *m_saveMyPaintButton;
 
   TColorStyleP m_editedStyle;  //!< A copy of the current style being edited by
                                //! the Style Editor.
@@ -840,12 +847,15 @@ signals:
 
   void paramStyleChanged(
       bool isDragging);  //!< Signals that the edited style has changed.
+  void myPaintBrushSaved();
 
 private slots:
 
   void onAutofillChanged();
   void onValueChanged(bool isDragging = false);
   void onValueReset();
+  void onMyPaintRevert();
+  void onMyPaintSaveAs();
 };
 
 //=============================================================================
@@ -1023,6 +1033,7 @@ protected slots:
   void onColorParamChanged();
 
   void onParamStyleChanged(bool isDragging);
+  void onMyPaintBrushSaved();
 
   void onHexChanged();
   void onHexEditor();

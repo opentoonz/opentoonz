@@ -119,6 +119,7 @@ public:
   void onAbout();
   void onOpenOnlineManual();
   void onOpenWhatsNew();
+  void onOpenQuicklink();
   void onOpenCommunityForum();
   void onOpenReportABug();
   void checkForUpdates();

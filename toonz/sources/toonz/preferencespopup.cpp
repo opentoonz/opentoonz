@@ -40,6 +40,7 @@
 
 // TnzTools includes
 #include "tools/toolhandle.h"
+#include "tools/toolcommandids.h"
 
 #include "kis_tablet_support_win8.h"
 
@@ -734,6 +735,13 @@ void PreferencesPopup::onLevelBasedToolsDisplayChanged() {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onDefaultStartupToolChanged() {
+  m_pref->setValue(defaultNewSceneTool,
+                   m_pref->getStringValue(defaultStartupTool));
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onShowKeyframesOnCellAreaChanged() {
   TApp::instance()->getCurrentScene()->notifyPreferenceChanged("XsheetCamera");
 }
@@ -1071,6 +1079,16 @@ QWidget* PreferencesPopup::createUI(PreferencesItemId id,
           combo, &QFontComboBox::currentFontChanged, this,
           [this](const QFont& font) { onInterfaceFontChanged(font.family()); });
       widget = combo;
+    } else if (id == customHelpLink) {
+      DVGui::FileField* field =
+          new DVGui::FileField(this, item.value.toString());
+      field->setFileMode(QFileDialog::ExistingFile);
+      field->setFilters(QStringList() << "html"
+                                      << "htm"
+                                      << "pdf");
+      connect(field, &FileField::pathChanged, this,
+              &PreferencesPopup::onChange);
+      widget = field;
     } else if (!comboItems.isEmpty()) {  // create QComboBox
       QComboBox* combo = new QComboBox(this);
       for (const ComboBoxItem& item : comboItems)
@@ -1289,6 +1307,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {displayIn30bit, tr("30bit Display*")},
       {showIconsInMenu, tr("Show Icons In Menu*")},
       {showRoomBindButtons, tr("Show Room Bind Buttons*")},
+      {customHelpLink, tr("Quicklink URL:")},
       {viewerIndicatorEnabled, tr("Show Viewer Indicators")},
       {restoreViewerViewFromLastSession,
        tr("Restore Viewer Zoom and Pan from Last Session")},
@@ -1380,6 +1399,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
        tr("Switch Tool Temporarily Keypress Length (ms):")},
       {animateToolHandleSize, tr("Handle Size (%):")},
       {animateToolColor, tr("Handle Color:")},
+      {defaultStartupTool, tr("Default Startup and New Scene Tool:")},
 
       // Xsheet
       {xsheetLayoutPreference, tr("Column Header Layout*:")},
@@ -1564,6 +1584,35 @@ QList<ComboBoxItem> PreferencesPopup::getComboItemList(
        {{tr("Default"), 0},
         {tr("Enable Tools For Level Only"), 1},
         {tr("Show Tools For Level Only"), 2}}},
+      {defaultStartupTool,
+       {{tr("Edit Tool"), T_Edit},
+        {tr("Selection Tool"), T_Selection},
+        {tr("Brush Tool"), T_Brush},
+        {tr("Geometric Tool"), T_Geometric},
+        {tr("Type Tool"), T_Type},
+        {tr("Fill Tool"), T_Fill},
+        {tr("Paint Brush Tool"), T_PaintBrush},
+        {tr("Eraser Tool"), T_Eraser},
+        {tr("Tape Tool"), T_Tape},
+        {tr("Style Picker Tool"), T_StylePicker},
+        {tr("RGB Picker Tool"), T_RGBPicker},
+        {tr("Control Point Editor Tool"), T_ControlPointEditor},
+        {tr("Pinch Tool"), T_Pinch},
+        {tr("Pump Tool"), T_Pump},
+        {tr("Magnet Tool"), T_Magnet},
+        {tr("Bender Tool"), T_Bender},
+        {tr("Iron Tool"), T_Iron},
+        {tr("Cutter Tool"), T_Cutter},
+        {tr("Hook Tool"), T_Hook},
+        {tr("Skeleton Tool"), T_Skeleton},
+        {tr("Tracker Tool"), T_Tracker},
+        {tr("Plastic Tool"), T_Plastic},
+        {tr("Zoom Tool"), T_Zoom},
+        {tr("Rotate Tool"), T_Rotate},
+        {tr("Hand Tool"), T_Hand},
+        {tr("Ruler Tool"), T_Ruler},
+        {tr("Finger Tool"), T_Finger},
+        {tr("Edit Assistants Tool"), T_EditAssistants}}},
       {xsheetLayoutPreference,
        {{tr("Classic"), "Classic"},
         {tr("Classic-revised"), "Classic-revised"},
@@ -1869,6 +1918,11 @@ QWidget* PreferencesPopup::createInterfacePage() {
   lay->addWidget(check30bitBtn, row - 1, 2, Qt::AlignRight);
   insertUI(showIconsInMenu, lay);
   insertUI(showRoomBindButtons, lay);
+  insertUI(customHelpLink, lay);
+  getUI<FileField*>(customHelpLink)
+      ->setToolTip(
+          tr("Leave blank to use the local OpenToonz documentation index. "
+             "To open a PDF at a specific page, append #page=12."));
 
   lay->setRowStretch(lay->rowCount(), 1);
   insertFootNote(lay);
@@ -2148,6 +2202,15 @@ QWidget* PreferencesPopup::createToolsPage() {
   //         getComboItemList(dropdownShortcutsCycleOptions));
   insertUI(levelBasedToolsDisplay, lay,
            getComboItemList(levelBasedToolsDisplay));
+  insertUI(defaultStartupTool, lay, getComboItemList(defaultStartupTool));
+  QComboBox* defaultToolCombo = getUI<QComboBox*>(defaultStartupTool);
+  defaultToolCombo->setToolTip(
+      tr("This menu sets both events. To set them independently, edit "
+         "preferences.ini and use:\n"
+         "defaultStartupTool=T_Hand\n"
+         "defaultNewSceneTool=T_Brush"));
+  m_onEditedFuncMap.insert(defaultStartupTool,
+                           &PreferencesPopup::onDefaultStartupToolChanged);
   QGridLayout* fillToolOptionsLay =
       insertGroupBox(tr("Fill Tool Options (Toonz Raster Level)"), lay);
   {

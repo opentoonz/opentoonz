@@ -474,7 +474,7 @@ QPushButton:hover {
 QPushButton:pressed {
   background-color: #424c61;
   border-color: #495368;
-  color: #424c61;
+  color: #d3d3d3;
 }
 QPushButton:checked {
   background-color: #242424;
@@ -515,7 +515,7 @@ QPushButton:disabled {
 #CustomPanelButton:pressed {
   background-color: #424c61;
   border-color: #495368;
-  color: #424c61;
+  color: #d3d3d3;
 }
 #CustomPanelButton:checked {
   background-color: #242424;
@@ -558,7 +558,7 @@ QComboBox:checked {
 QComboBox:pressed {
   background-color: #424c61;
   border-color: #6378a6;
-  color: #424c61;
+  color: #d3d3d3;
 }
 QComboBox:pressed:focus {
   background-color: #424c61;
@@ -1857,7 +1857,7 @@ PaletteViewer QToolBar #keyFrameNavigator #KeyTotal {
 #WordButton:pressed {
   background-color: #424c61;
   border-color: #495368;
-  color: #424c61;
+  color: #d3d3d3;
 }
 #WordButton:checked {
   background-color: #242424;
@@ -1966,7 +1966,7 @@ QDialog #dialogButtonFrame QPushButton:focus:hover {
 QDialog #dialogButtonFrame QPushButton:focus:pressed {
   background-color: #424c61;
   border-color: #495368;
-  color: #424c61;
+  color: #d3d3d3;
 }
 /* -----------------------------------------------------------------------------
    Scene Settings
@@ -2099,7 +2099,7 @@ ProjectPopup QLabel {
 #toolOptionsPanel QPushButton:pressed {
   background-color: #424c61;
   border-color: #495368;
-  color: #424c61;
+  color: #d3d3d3;
 }
 #toolOptionsPanel QPushButton:checked {
   background-color: #242424;
@@ -2572,7 +2572,7 @@ Ruler {
 #enableBlankFrameButton:pressed {
   background-color: #424c61;
   border-color: #495368;
-  color: #424c61;
+  color: #d3d3d3;
 }
 #enableBlankFrameButton:checked {
   background-color: #242424;

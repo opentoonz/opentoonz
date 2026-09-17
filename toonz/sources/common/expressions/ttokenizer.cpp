@@ -81,15 +81,17 @@ void Tokenizer::setBuffer(std::string buffer) {
         token.append(1, s[i++]);
 
         while (isascii(s[i]) && isdigit(s[i])) token.append(1, s[i++]);
+      }
 
-        if ((s[i] == 'e' || s[i] == 'E') &&
-            (((isascii(s[i + 1]) && isdigit(s[i + 1])) ||
-             s[i + 1] == '-' || s[i + 1] == '+') && isascii(s[i + 2]) &&
-                 isdigit(s[i + 2]))) {
-          token.append(1, s[i++]);
+      if (token != "." && (s[i] == 'e' || s[i] == 'E')) {
+        // Only consume the exponent if its optional sign is followed by a
+        // digit.
+        int exponent = i + 1;
+        if (s[exponent] == '-' || s[exponent] == '+') ++exponent;
 
-          if (s[i] == '-' || s[i] == '+') token.append(1, s[i++]);
-
+        if (isascii(s[exponent]) && isdigit(s[exponent])) {
+          token.append(s + i, exponent - i);
+          i = exponent;
           while (isascii(s[i]) && isdigit(s[i])) token.append(1, s[i++]);
         }
       }

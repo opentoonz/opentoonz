@@ -1,6 +1,7 @@
 
 
 #include "mainwindow.h"
+#include "customhelplink.h"
 
 // Tnz6 includes
 #include "menubar.h"
@@ -440,7 +441,7 @@ void Room::showEvent(QShowEvent *event) {
     DockLayout::State savedState = m_pendingLayoutState;
     DockLayout *layout           = dockLayout();
     QTimer::singleShot(0, this, [layout, savedState]() {
-      layout->restoreState(savedState);
+      if (layout->restoreState(savedState)) layout->redistribute();
     });
   }
 }
@@ -533,6 +534,7 @@ centralWidget->setLayout(centralWidgetLayout);*/
   setCommandHandler(MI_About, this, &MainWindow::onAbout);
   setCommandHandler(MI_OpenOnlineManual, this, &MainWindow::onOpenOnlineManual);
   setCommandHandler(MI_OpenWhatsNew, this, &MainWindow::onOpenWhatsNew);
+  setCommandHandler(MI_Quicklink, this, &MainWindow::onOpenQuicklink);
   setCommandHandler(MI_OpenCommunityForum, this,
                     &MainWindow::onOpenCommunityForum);
   setCommandHandler(MI_OpenReportABug, this, &MainWindow::onOpenReportABug);
@@ -1136,6 +1138,10 @@ void MainWindow::onOpenWhatsNew() {
   QDesktopServices::openUrl(
       QUrl(tr("https://github.com/opentoonz/opentoonz/releases/latest")));
 }
+
+//-----------------------------------------------------------------------------
+
+void MainWindow::onOpenQuicklink() { CustomHelpLink::open(); }
 
 //-----------------------------------------------------------------------------
 
@@ -2819,6 +2825,7 @@ void MainWindow::defineActions() {
                        "F1", "manual");
   createMenuHelpAction(MI_OpenWhatsNew, QT_TR_NOOP("&What's New..."), "",
                        "web");
+  createMenuHelpAction(MI_Quicklink, QT_TR_NOOP("&Quicklink"), "", "web");
   createMenuHelpAction(MI_OpenCommunityForum, QT_TR_NOOP("&Community Forum..."),
                        "", "web");
   createMenuHelpAction(MI_OpenReportABug, QT_TR_NOOP("&Report a Bug..."), "",

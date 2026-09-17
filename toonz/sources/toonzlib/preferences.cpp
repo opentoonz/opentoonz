@@ -455,6 +455,7 @@ void Preferences::definePreferenceItems() {
 #endif
   define(showIconsInMenu, "showIconsInMenu", QMetaType::Bool, defIconsVisible);
   define(showRoomBindButtons, "showRoomBindButtons", QMetaType::Bool, true);
+  define(customHelpLink, "customHelpLink", QMetaType::QString, "");
 
   setCallBack(pixelsOnly, &Preferences::setPixelsOnly);
   setCallBack(linearUnits, &Preferences::setUnits);
@@ -576,6 +577,12 @@ void Preferences::definePreferenceItems() {
          1.0, 5.0);
   define(animateToolColor, "animateToolColor", QMetaType::QColor,
          QColor(250, 127, 240));
+  // The Preferences dialog updates both keys together. Advanced users may set
+  // these command IDs independently in preferences.ini.
+  define(defaultStartupTool, "defaultStartupTool", QMetaType::QString,
+         "T_Hand");
+  define(defaultNewSceneTool, "defaultNewSceneTool", QMetaType::QString,
+         "T_Hand");
 
   // Xsheet
   define(xsheetLayoutPreference, "xsheetLayoutPreference", QMetaType::QString,
@@ -701,6 +708,8 @@ void Preferences::definePreferenceItems() {
   define(useQtNativeWinInk, "useQtNativeWinInk", QMetaType::Bool, false);
 
   // Others (not appearing in the popup)
+  // Tape Tool: 0 = ask, 1 = continue, 2 = cancel.
+  define(tapeToolFillRiskPolicy, "tapeToolFillRiskPolicy", QMetaType::Int, 0);
   // Shortcut popup settings
   define(shortcutPreset, "shortcutPreset", QMetaType::QString, "defopentoonz");
   // Viewer context menu
