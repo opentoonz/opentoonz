@@ -539,6 +539,24 @@ void ToolOptionsShortcutInvoker::initialize() {
   setCommandHandler(MI_EraserMultiArc, this,
                     &ToolOptionsShortcutInvoker::toggleEraserMultiArc);
 
+  /*-- Hide Line tool + type/mode/unhide switching shortcuts --*/
+  setCommandHandler(MI_HideLineNextType, this,
+                    &ToolOptionsShortcutInvoker::toggleHideLineNextType);
+  setCommandHandler(MI_HideLineNormal, this,
+                    &ToolOptionsShortcutInvoker::toggleHideLineNormal);
+  setCommandHandler(MI_HideLineSegment, this,
+                    &ToolOptionsShortcutInvoker::toggleHideLineSegment);
+  setCommandHandler(MI_HideLineFreehand, this,
+                    &ToolOptionsShortcutInvoker::toggleHideLineFreehand);
+  setCommandHandler(MI_HideLineNextMode, this,
+                    &ToolOptionsShortcutInvoker::toggleHideLineNextMode);
+  setCommandHandler(MI_HideLineInvisible, this,
+                    &ToolOptionsShortcutInvoker::toggleHideLineInvisible);
+  setCommandHandler(MI_HideLineHidden, this,
+                    &ToolOptionsShortcutInvoker::toggleHideLineHidden);
+  setCommandHandler(MI_HideLineToggleUnhide, this,
+                    &ToolOptionsShortcutInvoker::toggleHideLineToggleUnhide);
+
   /*-- Tape tool + type/mode switching shortcuts --*/
   setCommandHandler(MI_TapeNextType, this,
                     &ToolOptionsShortcutInvoker::toggleTapeNextType);
@@ -1090,6 +1108,58 @@ void ToolOptionsShortcutInvoker::toggleEraserMultiArc() {
       ->getAction("A_ToolOption_Type:MultiArc")
       ->trigger();
 }
+//---------------------------------------------------------------------------------------
+/*-- Hide Line tool + type/mode/unhide switching shortcuts --*/
+void ToolOptionsShortcutInvoker::toggleHideLineNextType() {
+  if (TApp::instance()->getCurrentTool()->getTool()->getName() == T_HideLine)
+    CommandManager::instance()->getAction("A_ToolOption_Type")->trigger();
+  else
+    CommandManager::instance()->getAction(T_HideLine)->trigger();
+}
+
+void ToolOptionsShortcutInvoker::toggleHideLineNormal() {
+  CommandManager::instance()->getAction(T_HideLine)->trigger();
+  CommandManager::instance()->getAction("A_ToolOption_Type:Normal")->trigger();
+}
+
+void ToolOptionsShortcutInvoker::toggleHideLineSegment() {
+  CommandManager::instance()->getAction(T_HideLine)->trigger();
+  CommandManager::instance()->getAction("A_ToolOption_Type:Normal")->trigger();
+  CommandManager::instance()->getAction("A_ToolOption_Type:Segment")->trigger();
+}
+
+void ToolOptionsShortcutInvoker::toggleHideLineFreehand() {
+  CommandManager::instance()->getAction(T_HideLine)->trigger();
+  CommandManager::instance()->getAction("A_ToolOption_Type:Normal")->trigger();
+  CommandManager::instance()
+      ->getAction("A_ToolOption_Type:Freehand")
+      ->trigger();
+}
+
+void ToolOptionsShortcutInvoker::toggleHideLineNextMode() {
+  if (TApp::instance()->getCurrentTool()->getTool()->getName() == T_HideLine)
+    CommandManager::instance()->getAction("A_ToolOption_Mode")->trigger();
+  else
+    CommandManager::instance()->getAction(T_HideLine)->trigger();
+}
+
+void ToolOptionsShortcutInvoker::toggleHideLineInvisible() {
+  CommandManager::instance()->getAction(T_HideLine)->trigger();
+  CommandManager::instance()
+      ->getAction("A_ToolOption_Mode:Invisible")
+      ->trigger();
+}
+
+void ToolOptionsShortcutInvoker::toggleHideLineHidden() {
+  CommandManager::instance()->getAction(T_HideLine)->trigger();
+  CommandManager::instance()->getAction("A_ToolOption_Mode:Hidden")->trigger();
+}
+
+void ToolOptionsShortcutInvoker::toggleHideLineToggleUnhide() {
+  CommandManager::instance()->getAction(T_HideLine)->trigger();
+  CommandManager::instance()->getAction("A_ToolOption_Unhide")->trigger();
+}
+
 //---------------------------------------------------------------------------------------
 /*-- Tape tool + type/mode switching shortcuts --*/
 void ToolOptionsShortcutInvoker::toggleTapeNextType() {

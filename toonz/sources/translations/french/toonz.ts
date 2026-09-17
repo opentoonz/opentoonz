@@ -4076,6 +4076,10 @@ Please use the frame numbers for reference.</source>
         <translation>&amp;Contrôle des Trous</translation>
     </message>
     <message>
+        <source>Hide Line Indicators</source>
+        <translation>Indicateurs Hide Line</translation>
+    </message>
+    <message>
         <source>&amp;Visualize Vector As Raster</source>
         <translation>&amp;Visualiser les Vecteur comme Raster</translation>
     </message>
@@ -7992,6 +7996,14 @@ Voulez-vous le remplacer?</translation>
 </context>
 <context>
     <name>QObject</name>
+    <message>
+        <source>Hide Line Indicators</source>
+        <translation>Indicateurs Hide Line</translation>
+    </message>
+    <message>
+        <source>Show Invisible/Hidden Strokes</source>
+        <translation>Afficher les traits Invisible/Hidden</translation>
+    </message>
     <message>
         <source>System date tampered.</source>
         <translation type="vanished">Date de système altéré.</translation>

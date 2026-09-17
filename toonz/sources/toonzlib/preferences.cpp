@@ -725,6 +725,8 @@ void Preferences::definePreferenceItems() {
   define(shmall, "shmall", QMetaType::Int, -1);
   define(shmmni, "shmmni", QMetaType::Int, -1);
 #endif
+  // Viewer / context menu (not in Preferences popup)
+  define(showHideLineStrokes, "showHideLineStrokes", QMetaType::Bool, false);
 }
 
 //-----------------------------------------------------------------
