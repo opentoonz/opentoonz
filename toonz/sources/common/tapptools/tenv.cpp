@@ -694,15 +694,12 @@ bool seedStuffTreeIfMissing(const TFilePath &userStuffDir) {
   return true;
 }
 
-// Only the root variable is required; every other path falls back to
-// <stuff>/<subdir> in TEnv/ToonzFolder.
-void writeInitialSystemVarIfMissing(EnvGlobals *eg,
-                                    const TFilePath &userStuffDir) {
-  QString systemVarFileStr = eg->getSystemVarFile();
-  if (TFileStatus(TFilePath(systemVarFileStr.toStdWString())).doesExist())
-    return;
-
-  QSettings settings(systemVarFileStr, QSettings::IniFormat);
+// Only the root variable is required; the rest falls back to <stuff>/<subdir>
+// in TEnv/ToonzFolder. Keyed off a missing root rather than a missing file:
+// setValue() merges, so an ini left without one keeps its other keys and
+// still gets a root.
+void writeRootVar(EnvGlobals *eg, const TFilePath &userStuffDir) {
+  QSettings settings(eg->getSystemVarFile(), QSettings::IniFormat);
   settings.setValue(QString::fromStdString(eg->getRootVarName()),
                     userStuffDir.getQString());
   settings.sync();
@@ -722,9 +719,17 @@ void TEnv::initUserStuffDir() {
   if (eg->getArgPathValue(eg->getRootVarName()) != "") return;
 
   TFilePath userStuffDir = getUserStuffDir(eg);
+
+  // A root configured elsewhere is left alone whether or not it exists: a
+  // missing one is usually an unmounted volume, and the startup error naming
+  // it beats seeding a default the ini would ignore. Plain compare, so an
+  // equivalent spelling (symlinked $HOME) also counts as elsewhere.
+  TFilePath configuredRoot = eg->getRootVarPath();
+  if (!configuredRoot.isEmpty() && configuredRoot != userStuffDir) return;
+
   if (!QDir().mkpath(userStuffDir.getParentDir().getQString())) return;
   if (!seedStuffTreeIfMissing(userStuffDir)) return;
-  writeInitialSystemVarIfMissing(eg, userStuffDir);
+  if (configuredRoot.isEmpty()) writeRootVar(eg, userStuffDir);
 #endif
 }
 
