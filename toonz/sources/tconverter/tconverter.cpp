@@ -460,8 +460,7 @@ int main(int argc, char *argv[]) {
 #if defined(LINUX) || defined(FREEBSD)
   QGuiApplication app(argc, argv);
 #elif !defined(_WIN32) && !defined(MACOSX)
-  // initUserStuffDir() locates the installed stuff tree through
-  // applicationDirPath(), which returns nothing without an instance.
+  // initUserStuffDir() needs applicationDirPath(), so an instance must exist.
   // QCoreApplication needs no display, unlike QGuiApplication.
   QCoreApplication app(argc, argv);
 #endif

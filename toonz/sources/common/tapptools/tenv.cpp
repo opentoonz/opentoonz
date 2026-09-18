@@ -628,8 +628,7 @@ TFilePath TEnv::getConfigDir() {
 #if !defined(_WIN32) && !defined(MACOSX)
 namespace {
 
-// Recursive copy that reports failure, unlike TSystem::copyDir(), which
-// ignores mkdir/QFile::copy failures and never throws.
+// TSystem::copyDir() ignores mkdir/copy failures, so recurse and report here.
 bool copyDirOrFail(const QString &dst, const QString &src) {
   if (!QDir().mkpath(dst)) return false;
 
@@ -637,8 +636,7 @@ bool copyDirOrFail(const QString &dst, const QString &src) {
       QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System);
   for (const QFileInfo &fi : entries) {
     const QString target = dst + "/" + fi.fileName();
-    // symlinks are copied as plain files rather than followed, so a cyclic
-    // link in the packaged tree cannot send this into infinite recursion
+    // copy symlinks as files: following them could recurse forever
     if (fi.isDir() && !fi.isSymLink()) {
       if (!copyDirOrFail(target, fi.filePath())) return false;
     } else if (!QFile::copy(fi.filePath(), target)) {
@@ -648,15 +646,13 @@ bool copyDirOrFail(const QString &dst, const QString &src) {
   return true;
 }
 
-// installed layout: <prefix>/bin/<exe> alongside
-// <prefix>/share/opentoonz/stuff
+// installed layout: <prefix>/bin/<exe>, <prefix>/share/opentoonz/stuff
 TFilePath getInstalledStuffDir() {
   TFilePath exeDir(QCoreApplication::applicationDirPath().toStdWString());
   return exeDir.getParentDir() + "share" + "opentoonz" + "stuff";
 }
 
-// Derived from the file TEnv actually reads, so this stays correct wherever
-// getSystemVarFile() places it (Haiku, for one, does not use ~/.config).
+// Derived from the ini TEnv reads; not every platform uses ~/.config.
 TFilePath getUserStuffDir(EnvGlobals *eg) {
   TFilePath systemVarFile(eg->getSystemVarFile().toStdWString());
   return systemVarFile.getParentDir() + "stuff";
@@ -667,15 +663,13 @@ bool seedStuffTreeIfMissing(const TFilePath &userStuffDir) {
 
   TFilePath installedStuffDir = getInstalledStuffDir();
   if (!TFileStatus(installedStuffDir).isDirectory())
-    return false;  // nothing to copy from (e.g. running from the build tree)
+    return false;  // build tree: nothing to copy from
 
   const QString userStuffDirStr = userStuffDir.getQString();
   const QString stagingDirStr   = userStuffDirStr + ".incomplete";
 
-  // Stage under a temporary name and rename into place only once the whole
-  // tree copied, so an interrupted or failed copy (out of space, permissions)
-  // leaves nothing behind that a later run would mistake for a complete
-  // "stuff" and skip.
+  // Rename into place only after a complete copy, so a failed one leaves
+  // nothing a later run would mistake for finished stuff.
   QDir(stagingDirStr).removeRecursively();  // leftovers from a failed attempt
   if (!copyDirOrFail(stagingDirStr, installedStuffDir.getQString()) ||
       !QDir().rename(stagingDirStr, userStuffDirStr)) {
@@ -686,18 +680,14 @@ bool seedStuffTreeIfMissing(const TFilePath &userStuffDir) {
     return false;
   }
 
-  // Folders the app expects to be able to write into but which may be absent
-  // from the packaged stuff tree (mkpath creates parents and is a no-op if
-  // they already exist).
+  // writable dirs the app expects, possibly absent from the packaged tree
   QDir().mkpath((userStuffDir + "projects" + "library").getQString());
   QDir().mkpath((userStuffDir + "projects" + "fxs").getQString());
   return true;
 }
 
-// Only the root variable is required; the rest falls back to <stuff>/<subdir>
-// in TEnv/ToonzFolder. Keyed off a missing root rather than a missing file:
-// setValue() merges, so an ini left without one keeps its other keys and
-// still gets a root.
+// Only the root is required; the rest falls back to <stuff>/<subdir>.
+// setValue() merges, so an ini missing just the root keeps its other keys.
 void writeRootVar(EnvGlobals *eg, const TFilePath &userStuffDir) {
   QSettings settings(eg->getSystemVarFile(), QSettings::IniFormat);
   settings.setValue(QString::fromStdString(eg->getRootVarName()),
@@ -720,10 +710,9 @@ void TEnv::initUserStuffDir() {
 
   TFilePath userStuffDir = getUserStuffDir(eg);
 
-  // A root configured elsewhere is left alone whether or not it exists: a
-  // missing one is usually an unmounted volume, and the startup error naming
-  // it beats seeding a default the ini would ignore. Plain compare, so an
-  // equivalent spelling (symlinked $HOME) also counts as elsewhere.
+  // Leave a root configured elsewhere alone even when it is gone: usually an
+  // unmounted volume, and the ini is not rewritten either way. String compare,
+  // so an equivalent spelling also counts as elsewhere.
   TFilePath configuredRoot = eg->getRootVarPath();
   if (!configuredRoot.isEmpty() && configuredRoot != userStuffDir) return;
 

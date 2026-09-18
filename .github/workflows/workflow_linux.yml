@@ -124,9 +124,7 @@ jobs:
         tar zcf ${ARTIFACT_NAME}.tar.gz ${ARTIFACT_NAME}
 
     - name: Smoke test the installed tree
-      # The launcher script this PR drops used to seed ~/.config and set
-      # LD_LIBRARY_PATH. Nothing else in CI runs a built binary, so this is the
-      # only check that an install starts unaided. tconverter seeds before it
+      # Nothing else in CI runs a built binary. tconverter seeds before it
       # parses arguments, so a bare invocation does the work and exits 1.
       run: |
         set -eu
