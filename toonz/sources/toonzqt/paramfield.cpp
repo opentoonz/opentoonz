@@ -23,6 +23,7 @@
 #include <QComboBox>
 #include <QFontComboBox>
 #include <QKeyEvent>
+#include <QFileDialog>
 
 using namespace DVGui;
 
@@ -1665,6 +1666,32 @@ void StringParamField::update(int frame) {
 }
 
 //=============================================================================
+// FilePathParamField
+//-----------------------------------------------------------------------------
+
+FilePathParamField::FilePathParamField(QWidget *parent, QString name,
+                                       const TFilePathParamP &param)
+    : StringParamField(parent, name, TStringParamP(param.getPointer())) {
+  auto browse = new QPushButton(tr("Browse..."), this);
+  m_layout->addWidget(browse);
+  connect(browse, &QPushButton::clicked, this, [this]() {
+    TFilePathParamP pathParam(m_actualParam.getPointer());
+    if (!pathParam) return;
+    const QString path = QFileDialog::getOpenFileName(
+        this, tr("Select File"), m_textFld->text(),
+        QString::fromStdString(pathParam->getFileFilter()));
+    if (!path.isEmpty()) setPath(path);
+  });
+}
+
+//-----------------------------------------------------------------------------
+
+void FilePathParamField::setPath(const QString &path) {
+  m_textFld->setText(path);
+  onChange();
+}
+
+//=============================================================================
 // FontParamField
 //-----------------------------------------------------------------------------
 
@@ -2003,6 +2030,8 @@ ParamField *ParamField::create(QWidget *parent, QString name,
     return new BoolParamField(parent, name, boolParam);
   else if (TSpectrumParamP spectrumParam = param)
     return new SpectrumParamField(parent, name, spectrumParam);
+  else if (TFilePathParamP filePathParam = param)
+    return new FilePathParamField(parent, name, filePathParam);
   else if (TStringParamP stringParam = param)
     return new StringParamField(parent, name, stringParam);
   else if (TToneCurveParamP toneCurveParam = param)
