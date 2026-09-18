@@ -1000,6 +1000,48 @@ void EditTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
 }
 
 //-----------------------------------------------------------------------------
+
+bool EditTool::keyDown(QKeyEvent *event) {
+  if (!event || !doesApply() || m_dragTool || getSpline() ||
+      (m_activeAxis.getValue() != L"Position" &&
+       m_activeAxis.getValue() != L"All"))
+    return false;
+
+  TPointD delta;
+  switch (event->key()) {
+  case Qt::Key_Up:
+    delta.y = 1.0;
+    break;
+  case Qt::Key_Down:
+    delta.y = -1.0;
+    break;
+  case Qt::Key_Left:
+    delta.x = -1.0;
+    break;
+  case Qt::Key_Right:
+    delta.x = 1.0;
+    break;
+  default:
+    return false;
+  }
+
+  if (event->modifiers() & Qt::ShiftModifier) delta *= 10.0;
+
+  TMouseEvent mouseEvent;
+  DragPositionTool dragTool(m_lockPositionX.getValue(),
+                            m_lockPositionY.getValue(),
+                            m_globalKeyframes.getValue());
+  TUndoManager::manager()->beginBlock();
+  dragTool.leftButtonDown(TPointD(), mouseEvent);
+  dragTool.leftButtonDrag(delta, mouseEvent);
+  dragTool.leftButtonUp();
+  TUndoManager::manager()->endBlock();
+  TTool::getApplication()->getCurrentObject()->notifyObjectIdChanged(false);
+  invalidate();
+  return true;
+}
+
+//-----------------------------------------------------------------------------
 namespace {
 //-----------------------------------------------------------------------------
 
