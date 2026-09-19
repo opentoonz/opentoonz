@@ -5,17 +5,22 @@
 
 #include "toonzqt/dvdialog.h"
 #include "toonz/txshsimplelevel.h"
+#include "tgeometry.h"
 #include <QPixmap>
 
-// forward declaration
 class QButtonGroup;
 class QComboBox;
+class QHideEvent;
+class QLabel;
 class TMeasure;
+class TXshLevel;
 
 namespace DVGui {
 class DoubleLineEdit;
 class CheckBox;
 }
+
+void updateCanvasSizeCommandEnabled();
 
 //=============================================================================
 
@@ -39,6 +44,7 @@ class PeggingWidget final : public QWidget {
 public:
   PeggingWidget(QWidget *parent = 0);
   PeggingPositions getPeggingPosition() const { return m_pegging; }
+  void setPeggingPosition(PeggingPositions position);
   void resetWidget();
   void cutLx(bool value) { m_cutLx = value; }
   void cutLy(bool value) { m_cutLy = value; }
@@ -49,6 +55,9 @@ private:
 
 protected:
   void paintEvent(QPaintEvent *) override;
+
+signals:
+  void peggingChanged();
 
 public slots:
   void on00();
@@ -77,21 +86,50 @@ class CanvasSizePopup final : public DVGui::Dialog {
   DVGui::DoubleLineEdit *m_xSizeFld;
   DVGui::DoubleLineEdit *m_ySizeFld;
   DVGui::CheckBox *m_relative;
+  DVGui::CheckBox *m_updateCamera;
   PeggingWidget *m_pegging;
 
   TMeasure *m_xMeasure, *m_yMeasure;
 
+  TRectD m_currentRect, m_proposedRect;
+  TDimension m_currentDim;
+  bool m_sessionActive;
+  bool m_ignoreSync;
+  bool m_fromTool;
+
 public:
   CanvasSizePopup();
 
+  static CanvasSizePopup *instance();
+
+  bool isSessionActive() const { return m_sessionActive; }
+  TRectD currentCanvasRect() const { return m_currentRect; }
+  TRectD proposedCanvasRect() const { return m_proposedRect; }
+  PeggingPositions peggingPosition() const;
+
+  void openSession();
+  void cancelFromOutside();
+  void setProposedRectFromTool(const TRectD &rect, PeggingPositions peg);
+
 protected:
   void showEvent(QShowEvent *e) override;
+  void hideEvent(QHideEvent *e) override;
+
+  TDimension proposedPixelSize() const;
+  void initFromLevel();
+  void endSession();
+  void updateProposedFromFields();
+  void syncFieldsFromRect();
+  void refreshOverlay(bool wholeViewer = false);
 
 public slots:
   void onOkBtn();
   void onSizeChanged();
   void onRelative(bool);
   void onUnitChanged(int);
+  void onPeggingChanged();
+  void onLevelSwitched(TXshLevel *);
+  void onReset();
 };
 
 #endif  // CANVASSIZEPOPUP_H
