@@ -3049,6 +3049,7 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
       if (cell.m_level && cell.m_level->getChildLevel()) {
         menu.addAction(cmdManager->getAction(MI_Resequence));
         menu.addAction(cmdManager->getAction(MI_CloneChild));
+        menu.addAction(cmdManager->getAction(MI_FullCloneChild));
         menu.addAction(cmdManager->getAction(MI_ExplodeChild));
       }
       menu.addSeparator();
