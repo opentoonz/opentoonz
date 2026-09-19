@@ -27,6 +27,7 @@ class DVAPI FilePathProperties {
   bool m_useStandard;
   bool m_acceptNonAlphabetSuffix;
   int m_letterCountForSuffix;
+  bool m_noSeparatorFormatAllowed;
 
 public:
   FilePathProperties();
@@ -39,6 +40,9 @@ public:
 
   int letterCountForSuffix() { return m_letterCountForSuffix; }
   void setLetterCountForSuffix(int val) { m_letterCountForSuffix = val; }
+
+  bool noSeparatorFormatAllowed() { return m_noSeparatorFormatAllowed; }
+  void setNoSeparatorFormatAllowed(bool on) { m_noSeparatorFormatAllowed = on; }
 
   void saveData(TOStream& os) const;
   void loadData(TIStream& is);

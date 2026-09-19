@@ -599,9 +599,9 @@ int main(int argc, char *argv[]) {
 
   // update TFilePath condition on loading the current project
   FilePathProperties *fpProp = project->getFilePathProperties();
-  TFilePath::setFilePathProperties(fpProp->useStandard(),
-                                   fpProp->acceptNonAlphabetSuffix(),
-                                   fpProp->letterCountForSuffix());
+  TFilePath::setFilePathProperties(
+      fpProp->useStandard(), fpProp->acceptNonAlphabetSuffix(),
+      fpProp->letterCountForSuffix(), fpProp->noSeparatorFormatAllowed());
 
   TFilePath fp = srcName;
 
@@ -630,7 +630,7 @@ int main(int argc, char *argv[]) {
   else {
     try {
       TProjectManager *pm = TProjectManager::instance();
-      auto sceneProject = pm->loadSceneProject(fp);
+      auto sceneProject   = pm->loadSceneProject(fp);
       if (!sceneProject) {
         cerr << "can't open project." << endl;
         return -3;

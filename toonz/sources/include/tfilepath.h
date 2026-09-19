@@ -44,8 +44,11 @@ public:
     NO_PAD,
     UNDERSCORE_FOUR_ZEROS,  // pippo_0001.tif
     UNDERSCORE_NO_PAD,
+    NO_SEP_FOUR_ZEROS,  // pippo0001.tif
+    NO_SEP_NO_PAD,
     CUSTOM_PAD,
     UNDERSCORE_CUSTOM_PAD,
+    NOS_SEP_CUSTOM_PAD,
     USE_CURRENT_FORMAT
   };  // pippo_1.tif
 
@@ -134,6 +137,7 @@ inline std::ostream &operator<<(std::ostream &out, const TFrameId &f) {
    constructor.*/
 class DVAPI TFilePath {
   static bool m_underscoreFormatAllowed;
+  static bool m_noSeparatorFormatAllowed;
 
   // Specifies file path condition for sequential images per project.
   // See filepathproperties.h
@@ -146,7 +150,7 @@ class DVAPI TFilePath {
   struct TFilePathInfo {
     QString parentDir;  // with slash
     QString levelName;
-    QChar sepChar;  // either "." or "_"
+    QChar sepChar;  // either "." or "_", or "#" (indicates no separator)
     TFrameId fId;
     QString extension;
   };
@@ -159,18 +163,23 @@ public:
   static void setUnderscoreFormatAllowed(bool state) {
     m_underscoreFormatAllowed = state;
   }
-
+  static void setNoSeparatorFormatAllowed(bool state) {
+    m_noSeparatorFormatAllowed = state;
+  }
   // Called from TProjectManager::getCurrentProject() and
   // ProjectPopup::updateProjectFromFields Returns true if something changed
   static bool setFilePathProperties(bool useStandard, bool acceptNonAlphaSuffix,
-                                    int letterCountForSuffix) {
+                                    int letterCountForSuffix,
+                                    bool allowNoSeparatorFormat) {
     if (m_useStandard == useStandard &&
         m_acceptNonAlphabetSuffix == acceptNonAlphaSuffix &&
-        m_letterCountForSuffix == letterCountForSuffix)
+        m_letterCountForSuffix == letterCountForSuffix &&
+        m_noSeparatorFormatAllowed == allowNoSeparatorFormat)
       return false;
-    m_useStandard             = useStandard;
-    m_acceptNonAlphabetSuffix = acceptNonAlphaSuffix;
-    m_letterCountForSuffix    = letterCountForSuffix;
+    m_useStandard              = useStandard;
+    m_acceptNonAlphabetSuffix  = acceptNonAlphaSuffix;
+    m_letterCountForSuffix     = letterCountForSuffix;
+    m_noSeparatorFormatAllowed = allowNoSeparatorFormat;
     return true;
   }
   static bool useStandard() { return m_useStandard; }

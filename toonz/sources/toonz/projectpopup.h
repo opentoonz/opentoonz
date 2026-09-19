@@ -121,6 +121,7 @@ protected:
 
   // file path settings
   QButtonGroup *m_rulePreferenceBG;
+  DVGui::CheckBox *m_allowNoSeparatorFormatCB;
   DVGui::CheckBox *m_acceptNonAlphabetSuffixCB;
   QComboBox *m_letterCountCombo;
 

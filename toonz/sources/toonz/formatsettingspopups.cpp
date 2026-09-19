@@ -12,6 +12,8 @@
 #include "toonz/toonzscene.h"
 #include "toonz/tcamera.h"
 #include "toutputproperties.h"
+#include "toonz/filepathproperties.h"
+#include "toonz/tproject.h"
 
 #ifdef _WIN32
 #include "avicodecrestrictions.h"
@@ -117,6 +119,13 @@ FormatSettingsPopup::FormatSettingsPopup(QWidget *parent,
 
     m_sepCharCB->addItem(tr(". (period)"), QChar('.'));
     m_sepCharCB->addItem(tr("_ (underscore)"), QChar('_'));
+
+    FilePathProperties *fpProp = TProjectManager::instance()
+                                     ->getCurrentProject()
+                                     ->getFilePathProperties();
+    if (!fpProp->useStandard() && fpProp->noSeparatorFormatAllowed())
+      m_sepCharCB->addItem(tr("(no separator)"), QChar('#'));
+
     m_sepCharCB->setCurrentIndex(m_sepCharCB->findData(
         QChar::fromLatin1(tmplFrameId->getStartSeqInd())));
 

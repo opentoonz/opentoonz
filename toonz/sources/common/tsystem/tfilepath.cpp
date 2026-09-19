@@ -29,7 +29,8 @@ const wchar_t wauxslash = L'\\';
 #include <QObject>
 #include <QRegularExpression>
 
-bool TFilePath::m_underscoreFormatAllowed = true;
+bool TFilePath::m_underscoreFormatAllowed  = true;
+bool TFilePath::m_noSeparatorFormatAllowed = false;
 
 // specifies file path condition for sequential image for each project.
 // See filepathproperties.h
@@ -128,12 +129,14 @@ std::string TFrameId::expand(FrameFormat format) const {
   else if (m_frame == NO_FRAME)
     return "-";
   std::ostringstream o_buff;
-  if (format == FOUR_ZEROS || format == UNDERSCORE_FOUR_ZEROS) {
+  if (format == FOUR_ZEROS || format == UNDERSCORE_FOUR_ZEROS ||
+      format == NO_SEP_FOUR_ZEROS) {
     o_buff.fill('0');
     o_buff.width(4);
     o_buff << m_frame;
     o_buff.width(0);
-  } else if (format == CUSTOM_PAD || format == UNDERSCORE_CUSTOM_PAD) {
+  } else if (format == CUSTOM_PAD || format == UNDERSCORE_CUSTOM_PAD ||
+             format == NOS_SEP_CUSTOM_PAD) {
     o_buff.fill('0');
     o_buff.width(m_zeroPadding);
     o_buff << m_frame;
@@ -863,7 +866,9 @@ TFilePath TFilePath::withName(const std::wstring &name) const {
 
     QString ret = info.parentDir + QString::fromStdWString(name);
     if (info.fId.getNumber() != TFrameId::NO_FRAME) {
-      QString sepChar = (info.sepChar.isNull()) ? "." : QString(info.sepChar);
+      QString sepChar = (info.sepChar.isNull())        ? "."
+                        : (info.sepChar == QChar('#')) ? ""
+                                                       : QString(info.sepChar);
       ret += sepChar + QString::fromStdString(
                            info.fId.expand(info.fId.getCurrentFormat()));
     }
@@ -928,7 +933,10 @@ TFilePath TFilePath::withFrame(const TFrameId &frame,
       return TFilePath(info.parentDir + info.levelName + "." + info.extension);
     }
     QString sepChar = (info.sepChar.isNull()) ? QString(frame.getStartSeqInd())
-                                              : QString(info.sepChar);
+                      : (info.sepChar == QChar('#') &&
+                         frame.getNumber() != TFrameId::EMPTY_FRAME)
+                          ? QString("")
+                          : QString(info.sepChar);
 
     return TFilePath(info.parentDir + info.levelName + sepChar +
                      QString::fromStdString(frame.expand(format)) + "." +
@@ -1085,7 +1093,9 @@ QString TFilePath::fidRegExpStr() {
   QString countLetter  = (m_letterCountForSuffix == 0)
                              ? "{0,}"
                              : (QString("{0,%1}").arg(m_letterCountForSuffix));
-  return QString("(\\d+)(%1%2)").arg(suffixLetter).arg(countLetter);
+  return QString("(?<framenum>\\d+)(?<suffix>%1%2)")
+      .arg(suffixLetter)
+      .arg(countLetter);
   // const QString fIdRegExp("(\\d+)([a-zA-Z]?)");
 }
 
@@ -1114,14 +1124,15 @@ TFilePath::TFilePathInfo TFilePath::analyzePath() const {
   QString fileName = QString::fromStdWString(str);
 
   // Level Name : letters other than  \/:,;*?"<>|
-  const QString levelNameRegExp("([^\\\\/:,;*?\"<>|]+)");
+  QString levelNameRegExp("(?<levelname>[^\\\\/:,;*?\"<>|]+)");
   // Sep Char : period or underscore
-  const QString sepCharRegExp("([\\._])");
+  const QString sepCharRegExp("(?<sepchar>[\\._])");
+
   // Frame Number and Suffix
   QString fIdRegExp = TFilePath::fidRegExpStr();
 
   // Extension: letters other than "._" or  \/:,;*?"<>|  or " "(space)
-  const QString extensionRegExp("([^\\._ \\\\/:,;*?\"<>|]+)");
+  const QString extensionRegExp("(?<extension>[^\\._ \\\\/:,;*?\"<>|]+)");
 
   // Modern QRegularExpression implementation
   QRegularExpression rx("^(?:" + levelNameRegExp + ")?" + sepCharRegExp +
@@ -1130,20 +1141,23 @@ TFilePath::TFilePathInfo TFilePath::analyzePath() const {
   QRegularExpressionMatch match = rx.match(fileName);
 
   if (match.hasMatch()) {
-    info.levelName = match.captured(1);
-    info.sepChar =
-        match.captured(2).isEmpty() ? QChar() : match.captured(2).at(0);
-    info.extension = match.captured(5);
+    info.levelName = match.captured("levelname");
+    info.sepChar   = match.captured("sepchar").isEmpty()
+                         ? QChar()
+                         : match.captured("sepchar").at(0);
+    info.extension = match.captured("extension");
 
     // ignore frame numbers on non-sequential (i.e. movie) extension case
     if (!checkForSeqNum(info.extension)) {
-      info.levelName = match.captured(1) + match.captured(2);
-      if (!match.captured(3).isEmpty()) info.levelName += match.captured(3);
-      if (!match.captured(4).isEmpty()) info.levelName += match.captured(4);
+      info.levelName = match.captured("levelname") + match.captured("sepchar");
+      if (!match.captured("framenum").isEmpty())
+        info.levelName += match.captured("framenum");
+      if (!match.captured("suffix").isEmpty())
+        info.levelName += match.captured("suffix");
       info.sepChar = QChar();
       info.fId = TFrameId(TFrameId::NO_FRAME, 0, 0);  // initialize with NO_PAD
     } else {
-      QString numberStr = match.captured(3);
+      QString numberStr = match.captured("framenum");
       if (numberStr.isEmpty()) {  // empty frame case : hogehoge..jpg
         info.fId =
             TFrameId(TFrameId::EMPTY_FRAME, 0, 4, info.sepChar.toLatin1());
@@ -1154,11 +1168,59 @@ TFilePath::TFilePathInfo TFilePath::analyzePath() const {
           padding = numberStr.length();
         }
         QString suffix;
-        if (!match.captured(4).isEmpty()) suffix = match.captured(4);
+        if (!match.captured("suffix").isEmpty())
+          suffix = match.captured("suffix");
         info.fId = TFrameId(number, suffix, padding, info.sepChar.toLatin1());
       }
     }
     return info;
+  }
+  // check no-separator sequencial images case (hogehoge0001.jpg /
+  // hogehoge#.jpg)
+  if (m_noSeparatorFormatAllowed) {
+    // level name must be ended with non-digit
+    QString levelNameRegExp_nosep =
+        QString("(?<levelname>[^\\\\/:,;*?\"<>|]*[^\\d\\\\/:,;*?\"<>|])");
+    // check again without separator
+    QRegularExpression rx_nosep("^(?:" + levelNameRegExp_nosep + ")?" +
+                                "(?:(?<sepchar>#)|(?:" + fIdRegExp + "))" +
+                                "\\." + extensionRegExp + "$");
+    match = rx_nosep.match(fileName);
+
+    if (match.hasMatch()) {
+      info.levelName = match.captured("levelname");
+      info.sepChar   = QChar('#');
+      info.extension = match.captured("extension");
+
+      // ignore frame numbers on non-sequential (i.e. movie) extension case
+      if (!checkForSeqNum(info.extension)) {
+        info.levelName = match.captured("levelname");
+        if (!match.captured("framenum").isEmpty())
+          info.levelName += match.captured("framenum");
+        if (!match.captured("suffix").isEmpty())
+          info.levelName += match.captured("suffix");
+        info.sepChar = QChar();
+        info.fId =
+            TFrameId(TFrameId::NO_FRAME, 0, 0);  // initialize with NO_PAD
+      } else {
+        QString numberStr = match.captured("framenum");
+        if (numberStr.isEmpty()) {  // empty frame case : hogehoge#.jpg
+          info.fId =
+              TFrameId(TFrameId::EMPTY_FRAME, 0, 4, info.sepChar.toLatin1());
+        } else {
+          int number  = numberStr.toInt();
+          int padding = 0;
+          if (!numberStr.isEmpty() && numberStr[0] == '0') {  // with padding
+            padding = numberStr.length();
+          }
+          QString suffix;
+          if (!match.captured("suffix").isEmpty())
+            suffix = match.captured("suffix");
+          info.fId = TFrameId(number, suffix, padding, info.sepChar.toLatin1());
+        }
+      }
+      return info;
+    }
   }
 
   // no frame case : hogehoge.jpg
@@ -1167,10 +1229,11 @@ TFilePath::TFilePathInfo TFilePath::analyzePath() const {
                            extensionRegExp + "$");
   match = rx_nf.match(fileName);
   if (match.hasMatch()) {
-    if (!match.captured(1).isEmpty()) info.levelName = match.captured(1);
+    if (!match.captured("levelname").isEmpty())
+      info.levelName = match.captured("levelname");
     info.sepChar = QChar();
     info.fId = TFrameId(TFrameId::NO_FRAME, 0, 0);  // initialize with NO_PAD
-    info.extension = match.captured(2);
+    info.extension = match.captured("extension");
     return info;
   }
 
