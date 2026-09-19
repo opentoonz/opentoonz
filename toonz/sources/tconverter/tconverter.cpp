@@ -31,6 +31,8 @@
 
 #if defined(LINUX) || defined(FREEBSD)
 #include <QGuiApplication>
+#elif !defined(_WIN32) && !defined(MACOSX)
+#include <QCoreApplication>
 #endif
 
 // Add memory header for smart pointers
@@ -457,11 +459,17 @@ void convert(const TFilePath &source, const TFilePath &dest,
 int main(int argc, char *argv[]) {
 #if defined(LINUX) || defined(FREEBSD)
   QGuiApplication app(argc, argv);
+#elif !defined(_WIN32) && !defined(MACOSX)
+  // initUserStuffDir() needs applicationDirPath(), so an instance must exist.
+  // QCoreApplication needs no display, unlike QGuiApplication.
+  QCoreApplication app(argc, argv);
 #endif
 
   TEnv::setRootVarName(rootVarName);
   TEnv::setSystemVarPrefix(systemVarPrefix);
   TEnv::setApplicationFileName(argv[0]);
+
+  TEnv::initUserStuffDir();
 
   std::string msg;
 
