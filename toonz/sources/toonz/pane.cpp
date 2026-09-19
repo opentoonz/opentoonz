@@ -748,6 +748,16 @@ void TPanelTitleBarButtonSet::select(TPanelTitleBarButton *button) {
   emit selected(button->getId());
 }
 
+bool TPanelTitleBarButtonSet::select(int id) {
+  for (auto *btn : m_buttons) {
+    if (btn->getId() == id) {
+      select(btn);
+      return true;
+    }
+  }
+  return false;
+}
+
 //=============================================================================
 // PaneTitleBar
 //-----------------------------------------------------------------------------

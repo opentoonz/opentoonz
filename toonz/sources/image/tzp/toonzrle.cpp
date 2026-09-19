@@ -202,25 +202,25 @@ start_from_in0:
       break;
 
     case 0xA:
-      outval = outval & not_colmask | GET_IN0 << col_offs;
+      outval = (outval & not_colmask) | (GET_IN0 << col_offs);
       goto start_from_in1;
 
       break;
 
     case 0xB:
-      outval = outval & not_penmask | GET_IN0 << pen_offs;
+      outval = (outval & not_penmask) | (GET_IN0 << pen_offs);
       goto start_from_in1;
 
       break;
 
     case 0xC:
-      outval = outval & not_colmask | *in++ << col_offs;
+      outval = (outval & not_colmask) | (*in++ << col_offs);
       goto start_from_in0;
 
       break;
 
     case 0xD:
-      outval = outval & not_penmask | *in++ << pen_offs;
+      outval = (outval & not_penmask) | (*in++ << pen_offs);
       goto start_from_in0;
 
       break;
@@ -334,27 +334,27 @@ start_from_in1:
       break;
 
     case 0xA:
-      outval = outval & not_colmask | in1 << col_offs;
+      outval = (outval & not_colmask) | (in1 << col_offs);
       goto start_from_in0;
 
       break;
 
     case 0xB:
-      outval = outval & not_penmask | in1 << pen_offs;
+      outval = (outval & not_penmask) | (in1 << pen_offs);
       goto start_from_in0;
 
       break;
 
     case 0xC:
       tmp    = in1 << 4;
-      outval = outval & not_colmask | (tmp | GET_IN0) << col_offs;
+      outval = (outval & not_colmask) | ((tmp | GET_IN0) << col_offs);
       goto start_from_in1;
 
       break;
 
     case 0xD:
       tmp    = in1 << 4;
-      outval = outval & not_penmask | (tmp | GET_IN0) << pen_offs;
+      outval = (outval & not_penmask) | ((tmp | GET_IN0) << pen_offs);
       goto start_from_in1;
 
       break;
@@ -423,7 +423,7 @@ static int tif_toonz1_decode_cm24(UCHAR* buf_in, int* buf_in_len,
     inval = *in++;
     switch (inval) {
     case 0xF6:
-      outval = outval & not_xubmask | *in++ << xub_offs;
+      outval = (outval & not_xubmask) | (*in++ << xub_offs);
 
       break;
 
@@ -459,12 +459,12 @@ static int tif_toonz1_decode_cm24(UCHAR* buf_in, int* buf_in_len,
       break;
 
     case 0xFC:
-      outval = outval & not_colmask | *in++ << col_offs;
+      outval = (outval & not_colmask) | (*in++ << col_offs);
 
       break;
 
     case 0xFD:
-      outval = outval & not_penmask | *in++ << pen_offs;
+      outval = (outval & not_penmask) | (*in++ << pen_offs);
 
       break;
 

@@ -328,6 +328,13 @@ int FilmstripFrameHeadGadget::getCurrentFrame() const {
 
 //-----------------------------------------------------------------------------
 
+void FilmstripFrameHeadGadget::updateFrameMetrics() {
+  m_dy = m_filmstrip->getOneFrameHeight();
+  m_dx = m_filmstrip->getOneFrameWidth();
+}
+
+//-----------------------------------------------------------------------------
+
 void FilmstripFrameHeadGadget::drawOnionSkinSelection(QPainter &p,
                                                       const QColor &lightColor,
                                                       const QColor &darkColor) {

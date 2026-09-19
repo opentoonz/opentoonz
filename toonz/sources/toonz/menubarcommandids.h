@@ -183,6 +183,7 @@
 #define MI_ViewColorcard "MI_ViewColorcard"
 #define MI_ViewGuide "MI_ViewGuide"
 #define MI_ViewRuler "MI_ViewRuler"
+#define MI_ToggleColorCalibration "MI_ToggleColorCalibration"
 #define MI_TCheck "MI_TCheck"
 #define MI_ICheck "MI_ICheck"
 #define MI_Ink1Check "MI_Ink1Check"
@@ -334,6 +335,9 @@
 #define MI_OpenComboViewer "MI_OpenComboViewer"
 #define MI_OpenHistoryPanel "MI_OpenHistoryPanel"
 #define MI_OpenBrushPresetPanel "MI_OpenBrushPresetPanel"
+#define MI_AddBrushPreset "MI_AddBrushPreset"
+#define MI_RemoveBrushPreset "MI_RemoveBrushPreset"
+#define MI_RemoveBrushPresetByName "MI_RemoveBrushPresetByName"
 #define MI_OpenToolPropertiesPanel "MI_OpenToolPropertiesPanel"
 #define MI_ReplaceParentDirectory "MI_ReplaceParentDirectory"
 #define MI_Reframe1 "MI_Reframe1"
@@ -468,6 +472,7 @@
 
 #define MI_OpenOnlineManual "MI_OpenOnlineManual"
 #define MI_OpenWhatsNew "MI_OpenWhatsNew"
+#define MI_Quicklink "MI_Quicklink"
 #define MI_OpenCommunityForum "MI_OpenCommunityForum"
 #define MI_OpenReportABug "MI_OpenReportABug"
 

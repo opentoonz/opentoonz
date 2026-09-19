@@ -243,6 +243,7 @@ class CustomStyleManager::StyleLoaderTask final : public TThread::Runnable {
   TFilePath m_fp;
   ChipData m_data;
   std::shared_ptr<QOffscreenSurface> m_offScreenSurface;
+  int m_loadGeneration;
 
 public:
   StyleLoaderTask(CustomStyleManager *manager, const TFilePath &fp);
@@ -256,7 +257,9 @@ public:
 
 CustomStyleManager::StyleLoaderTask::StyleLoaderTask(
     CustomStyleManager *manager, const TFilePath &fp)
-    : m_manager(manager), m_fp(fp) {
+    : m_manager(manager)
+    , m_fp(fp)
+    , m_loadGeneration(manager->m_loadGeneration) {
   connect(this, SIGNAL(finished(TThread::RunnableP)), this,
           SLOT(onFinished(TThread::RunnableP)));
 
@@ -278,7 +281,8 @@ void CustomStyleManager::StyleLoaderTask::run() {
 void CustomStyleManager::StyleLoaderTask::onFinished(
     TThread::RunnableP sender) {
   // On the main thread...
-  if (!m_data.image.isNull())  // Everything went ok
+  if (m_loadGeneration == m_manager->m_loadGeneration &&
+      !m_data.image.isNull())  // Everything went ok
   {
     m_manager->m_chips.append(m_data);
     emit m_manager->patternAdded();
@@ -296,8 +300,30 @@ CustomStyleManager::CustomStyleManager(std::string rasterIdName,
     : BaseStyleManager(stylesFolder, filters, chipSize)
     , m_started(false)
     , m_rasterIdName(rasterIdName)
-    , m_vectorIdName(vectorIdName) {
+    , m_vectorIdName(vectorIdName)
+    , m_loadGeneration(0) {
   m_executor.setMaxActiveTasks(1);
+  FolderListenerManager::instance()->addListener(this);
+}
+
+//-----------------------------------------------------------------------------
+
+CustomStyleManager::~CustomStyleManager() {
+  FolderListenerManager::instance()->removeListener(this);
+  m_executor.cancelAll();
+}
+
+//-----------------------------------------------------------------------------
+
+void CustomStyleManager::onFolderChanged(const TFilePath &path) {
+  if (path != getRootPath() + m_stylesFolder) return;
+
+  ++m_loadGeneration;
+  m_executor.cancelAll();
+  m_chips.clear();
+  m_indexes.clear();
+  emit patternAdded();
+  loadItems();
 }
 
 //-----------------------------------------------------------------------------

@@ -564,6 +564,12 @@ private:
   class PresetNamePopup;
   PresetNamePopup *m_presetNamePopup;
   void filterControls();
+  // Guard: skip redundant setVisible() calls — and the Qt layout recalculation
+  // they trigger — when the modifier-visibility state has not changed.
+  // Each BrushToolOptionsBox is cached per TTool* by ToolOptions, so switching
+  // back to a previously-seen level type is a no-op after the first visit.
+  bool m_lastShowModifiers = false;
+  bool m_filterInitialized = false;
 
 public:
   BrushToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
@@ -587,9 +593,10 @@ protected slots:
 class EraserToolOptionsBox final : public ToolOptionsBox {
   Q_OBJECT
 
-  ToolOptionCheckbox *m_pencilMode, *m_invertMode, *m_multiFrameMode;
+  ToolOptionCheckbox *m_pencilMode, *m_invertMode, *m_multiFrameMode,
+      *m_eraseOnlySavebox;
   ToolOptionCombo *m_toolType, *m_colorMode;
-  QLabel *m_hardnessLabel;
+  QLabel *m_hardnessLabel, *m_colorModeLabel;
   ToolOptionSlider *m_hardnessField;
 
 public:

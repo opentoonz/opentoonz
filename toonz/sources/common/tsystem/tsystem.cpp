@@ -4,6 +4,7 @@
 
 #include <set>
 #include <atomic>
+#include <cstdio>
 #include "tfilepath_io.h"
 #include "tconvert.h"
 
@@ -28,6 +29,7 @@
 #include <QHostInfo>
 
 #ifdef _WIN32
+#include <windows.h>
 #include <shlobj.h>
 #include <shellapi.h>
 #include <winnt.h>
@@ -452,6 +454,29 @@ void TSystem::renameFile(const TFilePath &dst, const TFilePath &src,
 
   if (!QFile::rename(toQString(src), qDst))
     throw TSystemException(dst, "can't rename file!");
+}
+
+//------------------------------------------------------------
+
+void TSystem::replaceFile(const TFilePath &dst,
+                          const TFilePath &src) {
+  if (dst.isEmpty())
+    throw TSystemException(dst, "Destination path is empty!");
+
+  if (dst == src) return;
+
+#ifdef _WIN32
+  const std::wstring srcPath = src.getWideString();
+  const std::wstring dstPath = dst.getWideString();
+  if (!MoveFileExW(srcPath.c_str(), dstPath.c_str(),
+                   MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH))
+    throw TSystemException(dst, "can't replace file!");
+#else
+  const QByteArray srcPath = QFile::encodeName(toQString(src));
+  const QByteArray dstPath = QFile::encodeName(toQString(dst));
+  if (std::rename(srcPath.constData(), dstPath.constData()) != 0)
+    throw TSystemException(dst, "can't replace file!");
+#endif
 }
 
 //------------------------------------------------------------

@@ -64,13 +64,13 @@ void RollerField::getRange(double &minValue, double &maxValue) {
 
 void RollerField::paintEvent(QPaintEvent *e) {
   QPainter p(this);
+  const QColor color = palette().color(QPalette::WindowText);
 
   int w = width();
 
-  drawArrow(p, QPointF(3, 3), QPointF(5, 5), QPointF(5, 1), true, Qt::black,
-            Qt::black);
+  drawArrow(p, QPointF(3, 3), QPointF(5, 5), QPointF(5, 1), true, color, color);
   drawArrow(p, QPointF(w - 4, 3), QPointF(w - 6, 5), QPointF(w - 6, 1), true,
-            Qt::black, Qt::black);
+            color, color);
 
   p.drawLine(QPoint(3, 3), QPoint(w - 4, 3));
 }

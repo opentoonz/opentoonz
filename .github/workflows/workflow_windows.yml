@@ -1,5 +1,9 @@
 name: Windows Build
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: ${{ github.head_ref != '' }}
+
 on:
   push:
     branches:
@@ -84,7 +88,7 @@ jobs:
 
       # Add msbuild to PATH for build process
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v2
+        uses: microsoft/setup-msbuild@v3
 
       # CMake configuration step
       - name: CMake configuration

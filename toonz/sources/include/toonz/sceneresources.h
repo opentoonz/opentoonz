@@ -101,7 +101,7 @@ Destroys the SceneResource object.
 
   //! save the resource to the disk using the updated path. Note: it calls
   //! SceneResource::updatePath(fp) before
-  virtual void save() = 0;
+  virtual bool save() = 0;
   //! change the resource internal path, according to the scene
   virtual void updatePath() = 0;
   //! change back the resource internal path to its original value
@@ -144,7 +144,7 @@ Constructs SceneLevel with \b ToonzScene \b scene and \b TXshPaletteLevel \b pl.
   /*!
 Save simple level in right path.
 */
-  void save() override;
+  bool save() override;
   /*!
 Update simple level path.
 */
@@ -190,7 +190,7 @@ Constructs SceneLevel with \b ToonzScene \b scene and \b TXshSimpleLevel \b sl.
   /*!
 Save simple level in right path.
 */
-  void save() override;
+  bool save() override;
   /*!
 Update simple level path.
 */
@@ -234,7 +234,7 @@ sl.
   /*!
 Save sound column in right path.
 */
-  void save() override;
+  bool save() override;
   /*!
 Update sound track path.
 */
@@ -249,7 +249,7 @@ Set sound track path to old path.
   }
 
   bool isDirty() override { return false; }
-  QStringList getResourceName() override { return QStringList(); }
+  QStringList getResourceName() override;
 };
 
 //=============================================================================
@@ -298,7 +298,7 @@ old save path.
 If pointer to subXsheet is different from zero save only resources
 used in subXsheet.
 */
-  void save(const TFilePath newScenePath);
+  bool save(const TFilePath newScenePath, bool showWarnings = true);
 
   /*!
 Update all resources paths.

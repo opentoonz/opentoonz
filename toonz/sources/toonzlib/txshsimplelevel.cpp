@@ -1869,6 +1869,9 @@ void TXshSimpleLevel::initializePalette() {
   ToonzScene* scene = getScene();
   assert(scene);
 
+  bool hasPalettesAlias =
+      (scene->getProject()->getFolderIndex("palettes") >= 0);
+
   TFilePath fullPath;
   TPalette* palette = nullptr;
   int type          = getType();
@@ -1876,7 +1879,7 @@ void TXshSimpleLevel::initializePalette() {
   case TZP_XSHLEVEL:
     fullPath =
         scene->decodeFilePath(TFilePath("+palettes\\Toonz_Raster_Palette.tpl"));
-    if (TSystem::doesExistFileOrLevel(fullPath)) {
+    if (hasPalettesAlias && TSystem::doesExistFileOrLevel(fullPath)) {
       palette = new TPalette();
       TIStream is(fullPath);
       is >> palette;
@@ -1889,14 +1892,14 @@ void TXshSimpleLevel::initializePalette() {
         palette = new TPalette();
         TIStream is(globalPath);
         is >> palette;
-        TSystem::copyFile(fullPath, globalPath);
+        if (hasPalettesAlias) TSystem::copyFile(fullPath, globalPath);
       }
     }
     break;
   case PLI_XSHLEVEL:
     fullPath =
         scene->decodeFilePath(TFilePath("+palettes\\Toonz_Vector_Palette.tpl"));
-    if (TSystem::doesExistFileOrLevel(fullPath)) {
+    if (hasPalettesAlias && TSystem::doesExistFileOrLevel(fullPath)) {
       palette = new TPalette();
       TIStream is(fullPath);
       is >> palette;
@@ -1909,7 +1912,7 @@ void TXshSimpleLevel::initializePalette() {
         palette = new TPalette();
         TIStream is(globalPath);
         is >> palette;
-        TSystem::copyFile(fullPath, globalPath);
+        if (hasPalettesAlias) TSystem::copyFile(fullPath, globalPath);
       }
     }
     break;

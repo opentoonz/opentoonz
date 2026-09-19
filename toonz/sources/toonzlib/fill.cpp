@@ -575,7 +575,7 @@ bool extendNormalFill(const TRasterCM32P &r, const TPoint &p, bool right,
     bool toneDown = false;
     int pixPaint  = pixel->getPaint();
     while (tone != 0 && (pixPaint == paintAtClickedPos ||
-                         pixPaint == paint && !DEF_REGION_WITH_PAINT)) {
+                         (pixPaint == paint && !DEF_REGION_WITH_PAINT))) {
       points.push_back(TPoint(x, y));
       ++pixelCount;
       if (pixel->isPurePaint()) ++rowPixelCount;

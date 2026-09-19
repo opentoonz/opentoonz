@@ -12,6 +12,7 @@ QToolBar * {
 }
 :TOONZCOLORS {
   -bg-color: #d1d1d1;
+  -hl-color: #7098f0;
   -icon-base-opacity: 0.8;
   -icon-disabled-opacity: 0.3;
   -icon-base-color: black;

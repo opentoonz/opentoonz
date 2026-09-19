@@ -161,6 +161,7 @@ public:
 
   void add(TPanelTitleBarButton *button);
   void select(TPanelTitleBarButton *button);
+  bool select(int id);
 
 signals:
   //! emitted when the current button changes. id is the button identifier

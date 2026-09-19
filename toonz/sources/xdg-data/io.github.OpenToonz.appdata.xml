@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<component type="desktop">
+<component type="desktop-application">
   <id>io.github.OpenToonz</id>
   <launchable type="desktop-id">io.github.OpenToonz.desktop</launchable>
   <name>OpenToonz</name>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>BSD-3-Clause</project_license>
-  <developer_name>DWANGO Co., Ltd.</developer_name>
+  <developer id="jp.co.dwango">
+    <name>DWANGO Co., Ltd.</name>
+  </developer>
   <summary>2D animation</summary>
   <description>
     <p>
-      This is software for producing a 2D animation.
+      OpenToonz is a complete 2D animation package for producing hand drawn
+      and cut out animation. It combines drawing and painting tools, an xsheet
+      and timeline for timing, a node based compositing system with a large
+      library of effects, and scanning and cleanup tools for traditional
+      pencil on paper workflows.
     </p>
     <p>
       It is based on the software "Toonz", which was developed
@@ -23,11 +29,12 @@
   <url type="bugtracker">https://github.com/opentoonz/opentoonz/issues</url>
   <screenshots>
     <screenshot type="default">
+      <caption>The main window, with the scene viewer, level strip, xsheet and palette</caption>
       <image>https://raw.githubusercontent.com/flathub/io.github.OpenToonz/master/screenshot1.png</image>
     </screenshot>
   </screenshots>
   <content_rating type="oars-1.1" />
   <releases>
-    <release version="1.8.0" date="2026-06-15"></release>
+    <release version="1.8.0" date="2026-06-15" type="stable" />
   </releases>
 </component>

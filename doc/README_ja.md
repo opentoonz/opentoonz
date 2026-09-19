@@ -1,5 +1,9 @@
 # OpenToonz
 
+## ⚠️ **重要**
+
+**公式配布元からのみダウンロードしてください：** OpenToonz の公式ウェブサイトは [**opentoonz.github.io**](https://opentoonz.github.io/) と、この [GitHub リポジトリ](https://github.com/opentoonz/opentoonz) のみです。安全のため、その他のドメインから OpenToonz をダウンロードしないでください。公式のミラーサイトや提携ダウンロードサイトはほかにありません。
+
 [English](../README.md)
 
 [![](https://ci.appveyor.com/api/projects/status/oa5l5pc964h8fv49/branch/master?svg=true)](https://ci.appveyor.com/project/opentoonz/opentoonz)

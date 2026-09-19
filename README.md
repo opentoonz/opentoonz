@@ -1,5 +1,9 @@
 # OpenToonz
 
+## ⚠️ **Important**
+
+**OFFICIAL SOURCE ONLY:** The only official websites for OpenToonz are [**opentoonz.github.io**](https://opentoonz.github.io/) and this [GitHub repository](https://github.com/opentoonz/opentoonz). To ensure your security, please avoid downloading OpenToonz from any other domain, as there are no other official mirrors or partner sites.
+
 [日本語](./doc/README_ja.md) [简体中文](./doc/README_chs.md)
 
 [![](https://ci.appveyor.com/api/projects/status/oa5l5pc964h8fv49/branch/master?svg=true)](https://ci.appveyor.com/project/opentoonz/opentoonz)
@@ -25,6 +29,11 @@ Please refer to the OpenToonz site at <https://opentoonz.github.io/e/index.html>
 Please download and install OpenToonz from the latest installer at <https://opentoonz.github.io/e/index.html>.
 
 Older versions and unstable nightly builds are also available at <https://github.com/opentoonz/opentoonz/releases>.
+
+## Development
+
+- [Development checklist (draft)](./doc/development_checklist.md)
+- [AI-assisted development checklist (draft)](./doc/ai_assisted_development_checklist.md)
 
 ## How to Build Locally
 

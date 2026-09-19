@@ -3,6 +3,7 @@ set(MOC_HEADERS
     pluginhost.h
     stageobjectselection.h
     tdockwindows.h
+    docktabstrip.h
     ../include/toonzqt/addfxcontextmenu.h
     ../include/toonzqt/camerasettingswidget.h
     ../include/toonzqt/checkbox.h
@@ -110,6 +111,7 @@ set(SOURCES
     checkbox.cpp
     colorfield.cpp
     docklayout.cpp
+    docktabstrip.cpp
     dockwidget.cpp
     doublefield.cpp
     doublepairfield.cpp
@@ -134,6 +136,7 @@ set(SOURCES
     keyframenavigator.cpp
     lineedit.cpp
     menubarcommand.cpp
+    brushpresetbridge.cpp
     palettesscanpopup.cpp
     paletteviewer.cpp
     paletteviewergui.cpp

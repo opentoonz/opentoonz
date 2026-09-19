@@ -111,17 +111,20 @@ struct TUndoManager::TUndoManagerImp {
   UndoList m_undoList;
   UndoListIterator m_current;
   bool m_skipped;
+  bool m_inUndoRedo;
   int m_undoMemorySize;  // in bytes
 
   std::vector<TUndoBlock *> m_blockStack;
 
 public:
-  TUndoManagerImp() : m_skipped(false), m_undoMemorySize(0) {
+  TUndoManagerImp()
+      : m_skipped(false), m_inUndoRedo(false), m_undoMemorySize(0) {
     m_current = m_undoList.end();
   }
   ~TUndoManagerImp() {}
 
   void add(TUndo *undo);
+  void discardRedoHistory();
 
 public:
   static struct ManagerPtr {
@@ -179,11 +182,26 @@ void TUndoManager::TUndoManagerImp::add(TUndo *undo) {
 
 //-----------------------------------------------------------------------------
 
+void TUndoManager::TUndoManagerImp::discardRedoHistory() {
+  if (m_current == m_undoList.end()) return;
+
+  // Move the abandoned redo branch out of the live history before deleting it.
+  // Destructors for individual undo items may release sizeable drawing data or
+  // trigger other cleanup. Keeping the manager's iterator state consistent
+  // first makes rapid "draw -> undo -> draw" workflows less vulnerable to
+  // re-entrant observers seeing a half-pruned history list.
+  UndoList discarded;
+  discarded.insert(discarded.end(), m_current, m_undoList.end());
+  m_undoList.erase(m_current, m_undoList.end());
+  m_current = m_undoList.end();
+
+  std::for_each(discarded.begin(), discarded.end(), deleteUndo);
+}
+
+//-----------------------------------------------------------------------------
+
 void TUndoManager::TUndoManagerImp::doAdd(TUndo *undo) {
-  if (m_current != m_undoList.end()) {
-    std::for_each(m_current, m_undoList.end(), deleteUndo);
-    m_undoList.erase(m_current, m_undoList.end());
-  }
+  discardRedoHistory();
 
   int i, memorySize = 0, count = m_undoList.size();
   for (i = 0; i < count; i++) memorySize += m_undoList[i]->getSize();
@@ -207,10 +225,7 @@ void TUndoManager::TUndoManagerImp::doAdd(TUndo *undo) {
 //-----------------------------------------------------------------------------
 
 void TUndoManager::beginBlock() {
-  if (m_imp->m_current != m_imp->m_undoList.end()) {
-    std::for_each(m_imp->m_current, m_imp->m_undoList.end(), deleteUndo);
-    m_imp->m_undoList.erase(m_imp->m_current, m_imp->m_undoList.end());
-  }
+  m_imp->discardRedoHistory();
 
   TUndoBlock *undoBlock = new TUndoBlock;
   m_imp->m_blockStack.push_back(undoBlock);
@@ -238,38 +253,48 @@ void TUndoManager::endBlock() {
 
 bool TUndoManager::undo() {
   assert(m_imp->m_blockStack.empty());
-  UndoListIterator &it = m_imp->m_current;
-  if (it != m_imp->m_undoList.begin()) {
+  if (m_imp->m_inUndoRedo) return false;
+
+  m_imp->m_inUndoRedo = true;
+  bool changed        = false;
+
+  while (m_imp->m_current != m_imp->m_undoList.begin()) {
     m_imp->m_skipped = false;
-    --it;
-    (*it)->undo();
+    --m_imp->m_current;
+    (*m_imp->m_current)->undo();
+    changed = true;
     emit historyChanged();
-    if (m_imp->m_skipped) {
-      m_imp->m_skipped = false;
-      return undo();
-    }
-    return true;
-  } else
-    return false;
+
+    if (!m_imp->m_skipped) break;
+  }
+
+  m_imp->m_skipped    = false;
+  m_imp->m_inUndoRedo = false;
+  return changed;
 }
 
 //-----------------------------------------------------------------------------
 
 bool TUndoManager::redo() {
   assert(m_imp->m_blockStack.empty());
-  UndoListIterator &it = m_imp->m_current;
-  if (it != m_imp->m_undoList.end()) {
+  if (m_imp->m_inUndoRedo) return false;
+
+  m_imp->m_inUndoRedo = true;
+  bool changed        = false;
+
+  while (m_imp->m_current != m_imp->m_undoList.end()) {
     m_imp->m_skipped = false;
-    (*it)->redo();
-    ++it;
+    (*m_imp->m_current)->redo();
+    ++m_imp->m_current;
+    changed = true;
     emit historyChanged();
-    if (m_imp->m_skipped) {
-      m_imp->m_skipped = false;
-      return redo();
-    }
-    return true;
-  } else
-    return false;
+
+    if (!m_imp->m_skipped) break;
+  }
+
+  m_imp->m_skipped    = false;
+  m_imp->m_inUndoRedo = false;
+  return changed;
 }
 
 //-----------------------------------------------------------------------------

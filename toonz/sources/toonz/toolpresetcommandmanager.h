@@ -22,6 +22,9 @@ class ToolPresetCommandManager : public QObject {  // singleton
   QSet<QString> m_registeredPresetIds;
   QSet<QString> m_registeredSizeIds;
   bool m_initialized;
+  // True when presets were added/removed and commands need rebuilding.
+  // Prevents redundant full re-registration on every room switch.
+  bool m_commandsDirty;
   
   // Action groups for mutual exclusivity
   QActionGroup* m_presetActionGroup;
@@ -39,7 +42,12 @@ public:
   // Registers universal size commands
   void registerSizeCommands();
   
-  // Refreshes preset commands (called when presets are added/removed)
+  // Marks commands as dirty so the next refreshPresetCommands() call
+  // rebuilds them.  Call this when presets are actually added or removed.
+  void markCommandsDirty();
+  
+  // Refreshes preset commands only when the preset list has changed.
+  // Safe to call frequently (e.g. on panel show) without performance cost.
   void refreshPresetCommands();
   
   // Refreshes size commands (called when shortcut popup is opened)

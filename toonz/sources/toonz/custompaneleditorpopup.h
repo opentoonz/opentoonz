@@ -11,16 +11,20 @@
 #include <QTreeWidgetItem>
 #include <QMap>
 #include <QPair>
+#include <QSet>
 #include <QLabel>
 
 #include <QScrollArea>
 #include <QDomElement>
-#include <QComboBox>
 #include <QLineEdit>
 
 // Forward declarations
 class CustomPanelUIField;
 class CommandListTree;
+class TFilePath;
+class QToolButton;
+class QFrame;
+class QWidget;
 
 enum UiType { Button = 0, Scroller_Back, Scroller_Fore, TypeCount };
 
@@ -130,10 +134,20 @@ class CustomPanelEditorPopup final : public DVGui::Dialog {
 private:
   CommandListTree* m_commandListTree;
   QWidget* m_UiFieldsContainer;
+  QScrollArea* m_fieldsScrollArea;
   UiPreviewArea* m_previewArea;
-  QComboBox* m_templateCombo;
+  QWidget* m_templateHeader;
+  QToolButton* m_templateToggle;
+  QLabel* m_templateValueLabel;
+  QFrame* m_templateBrowser;
+  QTreeWidget* m_templateTree;
+  QLineEdit* m_templateSearchEdit;
   QLineEdit* m_panelNameEdit;
   QList<UiEntry> m_uiEntries;
+  QString m_currentTemplatePath;
+  // Expand/collapse snapshot while a search filter is active
+  QSet<QString> m_templateExpandStateBeforeSearch;
+  bool m_templateSearchActive = false;
 
   // Helper methods
   QList<int> entryIdByObjName(const QString& objName);
@@ -143,20 +157,46 @@ private:
   void buildEntries(QWidget* customWidget);  // Create entries from UI file
   void updateControls(
       QWidget* customWidget);  // Update widget using current entries
+  QString currentTemplatePath() const;
+  QString templateDisplayNameForItem(QTreeWidgetItem* item) const;
+  void updateTemplateValueLabel();
+  void setTemplateBrowserVisible(bool visible);
+  void filterTemplateTree(const QString& searchWord);
+  void populateTemplateFolder(QTreeWidgetItem* parent, const TFilePath& folder,
+                              int depth, bool isEditSection,
+                              const QIcon& folderIcon);
+  QTreeWidgetItem* findFirstTemplateItem(QTreeWidgetItem* parent) const;
+  QTreeWidgetItem* findTemplateItemByPath(const QString& path) const;
+  static QString templateTreeItemKey(QTreeWidgetItem* item);
+  void saveTemplateTreeExpandState();
+  void restoreTemplateTreeExpandState();
+  void expandTemplateTreeAncestors(QTreeWidgetItem* item);
+
+  static CustomPanelEditorPopup* s_instance;
 
 public:
   CustomPanelEditorPopup();
-  
+  ~CustomPanelEditorPopup();
+
+  // Refresh the command list tree if the popup is currently open.
+  // Call this after preset commands are added/removed so the tree stays in sync.
+  static void refreshCommandTreeIfOpen();
+
 protected:
   void showEvent(QShowEvent* event) override;
-  
+  bool eventFilter(QObject* watched, QEvent* event) override;
+
 protected slots:
   void onTemplateSwitched();
+  void onTemplateHeaderClicked();
+  void onTemplateItemClicked(QTreeWidgetItem* item, int column);
+  void onTemplateSearchTextChanged(const QString& text);
   void onHighlight(int id);
   void onCommandChanged(const QString& oldCmdId, const QString& newCmdId);
   void onPreviewClicked(int id);
   void onPreviewDropped(int id, const QString& cmdId, bool fromTree);
   void onRegister();
+  void onRemove();
   void onSearchTextChanged(const QString& text);
 };
 

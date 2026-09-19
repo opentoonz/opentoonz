@@ -6,6 +6,7 @@
 #include "toonzqt/menubarcommand.h"
 
 #include <QString>
+#include <QStringList>
 #include <QWidget>
 #include <QList>
 
@@ -47,8 +48,10 @@ protected:
 
 class CustomPanelManager {  // singleton
   CustomPanelManager(){};
-  
+
   QList<QString> m_registeredPanelIds;
+  // Parallel to Custom Panels menu leaf actions (data = index).
+  QStringList m_menuPanelIds;
 
 public:
   static CustomPanelManager* instance();
@@ -58,6 +61,8 @@ public:
   TPanel* createCustomPanel(const QString panelName, QWidget* parent);
 
   void initializeControl(QWidget* customWidget);
+
+  QString menuPanelIdAt(int index) const;
 };
 
 #endif
