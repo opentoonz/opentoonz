@@ -235,14 +235,15 @@ public:
   QColor getCloseOverColor() const;
   void setCloseOverColor(const QColor &color);
 
+  void setCompact(bool compact);
+
 signals:
   void closeButtonPressed();
   void doubleClick(QMouseEvent *me);
 
 protected:
   void resizeEvent(QResizeEvent *e) override;
-  void contextMenuEvent(QContextMenuEvent *) override {
-  }  // disable default menu
+  void contextMenuEvent(QContextMenuEvent *event) override;
   void paintEvent(QPaintEvent *event) override;
   void leaveEvent(QEvent *) override;
   void mouseMoveEvent(QMouseEvent *event) override;
@@ -251,6 +252,7 @@ protected:
 
 private:
   bool m_closeButtonHighlighted;
+  bool m_compact;
   std::vector<std::pair<QPoint, QWidget *>> m_buttons;
 
   QPixmap m_borderPm, m_activeBorderPm, m_floatBorderPm, m_floatActiveBorderPm;
@@ -309,6 +311,13 @@ public:
   // This enables the "Bind to Room" feature for any panel
   void addRoomBindButton();
 
+  bool isCustomPanel() const;
+  bool compactFloating() const { return m_compactFloating; }
+  void setCompactFloating(bool on);
+  void loadCompactFloating();
+  void watchContextMenu(QWidget *root);
+  void execContextMenu(const QPoint &globalPos);
+
   // Virtuals that may be overridden
   virtual void reset() {}
   virtual int getViewType() { return -1; }
@@ -321,6 +330,8 @@ public:
 
 protected:
   void paintEvent(QPaintEvent *) override;
+  void resizeEvent(QResizeEvent *event) override;
+  bool eventFilter(QObject *watched, QEvent *event) override;
   void enterEvent(QEvent *) override;
   void leaveEvent(QEvent *) override;
 
@@ -359,6 +370,20 @@ private:
   bool m_isRoomBound;
   QString m_boundRoomName;
   TPanelTitleBarButton *m_roomBindButton;
+  bool m_compactFloating;
+  bool m_titleOverlay;
+  bool m_contentFrozen;
+  bool m_hasCompactSnapshot;
+  QSize m_frozenContentSize;
+  QSizePolicy m_savedContentPolicy;
+  QSize m_savedContentMin;
+  QSize m_savedContentMax;
+  QSize m_savedPanelMin;
+  QSize m_savedPanelMax;
+  QRect m_geometryBeforeCompact;
+
+  void applyCompactTitle(bool overlay);
+  void saveCompactFloating() const;
 };
 
 //-----------------------------------------------------------------------------
