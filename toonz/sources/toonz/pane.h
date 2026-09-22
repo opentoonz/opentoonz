@@ -11,6 +11,7 @@
 #include <QStringList>
 #include <QtGlobal>
 #include <QColor>
+#include <QPointer>
 #include <vector>
 #include <utility>
 
@@ -371,9 +372,14 @@ private:
   QString m_boundRoomName;
   TPanelTitleBarButton *m_roomBindButton;
   bool m_compactFloating;
+  bool m_showTitleBar;
   bool m_titleOverlay;
   bool m_contentFrozen;
   bool m_hasCompactSnapshot;
+  bool m_contentPress;
+  bool m_forwardingMouse;
+  QPoint m_contentPressGlobal;
+  QPointer<QWidget> m_contentPressWidget;
   QSize m_frozenContentSize;
   QSizePolicy m_savedContentPolicy;
   QSize m_savedContentMin;
@@ -384,6 +390,10 @@ private:
 
   void applyCompactTitle(bool overlay);
   void saveCompactFloating() const;
+  void setShowTitleBar(bool on);
+  bool compactDragExempt(QWidget *widget) const;
+  bool handleCompactDrag(QObject *watched, QEvent *event);
+  bool beginCompactDrag(const QPoint &globalPos);
 };
 
 //-----------------------------------------------------------------------------

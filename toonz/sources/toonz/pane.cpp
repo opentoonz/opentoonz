@@ -32,6 +32,13 @@
 #include <QDialog>
 #include <QLineEdit>
 #include <QTextEdit>
+#include <QPlainTextEdit>
+#include <QAbstractSlider>
+#include <QAbstractSpinBox>
+#include <QComboBox>
+#include <QAbstractItemView>
+#include <QActionGroup>
+#include <QChildEvent>
 #include <QBoxLayout>
 #include <QContextMenuEvent>
 #include <QResizeEvent>
@@ -59,9 +66,12 @@ TPanel::TPanel(QWidget *parent, Qt::WindowFlags flags,
     , m_boundRoomName("")
     , m_roomBindButton(nullptr)
     , m_compactFloating(false)
+    , m_showTitleBar(true)
     , m_titleOverlay(false)
     , m_contentFrozen(false)
-    , m_hasCompactSnapshot(false) {
+    , m_hasCompactSnapshot(false)
+    , m_contentPress(false)
+    , m_forwardingMouse(false) {
   m_panelTitleBar = new TPanelTitleBar(this, orientation);
   setTitleBarWidget(m_panelTitleBar);
   connect(m_panelTitleBar, &TPanelTitleBar::doubleClick, this,
@@ -165,11 +175,41 @@ void TPanel::execContextMenu(const QPoint &globalPos) {
   });
 
   if (isCustomPanel() && isFloating()) {
-    QAction *compactAction = menu.addAction(tr("Compact Mode"));
-    compactAction->setCheckable(true);
-    compactAction->setChecked(m_compactFloating);
-    connect(compactAction, &QAction::triggered, [this](bool checked) {
-      setCompactFloating(checked);
+    QMenu *compactMenu = menu.addMenu(tr("Compact Mode"));
+    QActionGroup *compactGroup = new QActionGroup(compactMenu);
+    compactGroup->setExclusive(true);
+
+    QAction *offAction = compactMenu->addAction(tr("Off"));
+    QAction *miniAction = compactMenu->addAction(tr("Mini Title Bar"));
+    QAction *noBarAction = compactMenu->addAction(tr("No Title Bar"));
+    for (QAction *action : {offAction, miniAction, noBarAction}) {
+      action->setCheckable(true);
+      compactGroup->addAction(action);
+    }
+    if (!m_compactFloating)
+      offAction->setChecked(true);
+    else if (m_showTitleBar)
+      miniAction->setChecked(true);
+    else
+      noBarAction->setChecked(true);
+
+    connect(offAction, &QAction::triggered, [this](bool) {
+      setCompactFloating(false);
+    });
+    connect(miniAction, &QAction::triggered, [this](bool) {
+      setShowTitleBar(true);
+      setCompactFloating(true);
+    });
+    connect(noBarAction, &QAction::triggered, [this](bool) {
+      setShowTitleBar(false);
+      setCompactFloating(true);
+    });
+
+    menu.addSeparator();
+    QAction *closeAction = menu.addAction(tr("Close"));
+    connect(closeAction, &QAction::triggered, [this](bool) {
+      hide();
+      onCloseButtonPressed();
     });
   }
 
@@ -188,10 +228,19 @@ void TPanel::watchContextMenu(QWidget *root) {
 //-----------------------------------------------------------------------------
 
 bool TPanel::eventFilter(QObject *watched, QEvent *event) {
+  if (m_forwardingMouse) return TDockWidget::eventFilter(watched, event);
+
+  if (event->type() == QEvent::ChildAdded && isCustomPanel()) {
+    if (auto *child =
+            qobject_cast<QWidget *>(static_cast<QChildEvent *>(event)->child()))
+      watchContextMenu(child);
+  }
+
   if (event->type() == QEvent::ContextMenu && isCustomPanel()) {
     execContextMenu(static_cast<QContextMenuEvent *>(event)->globalPos());
     return true;
   }
+  if (handleCompactDrag(watched, event)) return true;
   return TDockWidget::eventFilter(watched, event);
 }
 
@@ -205,6 +254,8 @@ void TPanel::loadCompactFloating() {
                      QSettings::IniFormat);
   settings.beginGroup(QStringLiteral("Panels"));
   settings.beginGroup(QString::fromStdString(m_panelType));
+  m_showTitleBar =
+      settings.value(QStringLiteral("showTitleBar"), true).toBool();
   if (!settings.contains(QStringLiteral("compactFloating"))) return;
   setCompactFloating(settings.value(QStringLiteral("compactFloating")).toBool());
 }
@@ -219,6 +270,7 @@ void TPanel::saveCompactFloating() const {
   settings.beginGroup(QStringLiteral("Panels"));
   settings.beginGroup(QString::fromStdString(m_panelType));
   settings.setValue(QStringLiteral("compactFloating"), m_compactFloating);
+  settings.setValue(QStringLiteral("showTitleBar"), m_showTitleBar);
 }
 
 //-----------------------------------------------------------------------------
@@ -259,14 +311,16 @@ void TPanel::applyCompactTitle(bool overlay) {
     const int gap  = 4;
     m_panelTitleBar->setFixedSize(barW, barH);
     m_titleOverlay = true;
+    const bool showBar = m_showTitleBar;
     if (m_contentFrozen) {
-      if (layout()) layout()->setContentsMargins(0, barH + gap, 0, 0);
-      setFixedSize(qMax(m_frozenContentSize.width(), barW),
-                   m_frozenContentSize.height() + barH + gap);
+      const int top = showBar ? barH + gap : 0;
+      if (layout()) layout()->setContentsMargins(0, top, 0, 0);
+      setFixedSize(qMax(m_frozenContentSize.width(), showBar ? barW : 1),
+                   m_frozenContentSize.height() + top);
     }
     m_panelTitleBar->move(qMax(0, width() - m_panelTitleBar->width()), 0);
-    m_panelTitleBar->show();
-    m_panelTitleBar->raise();
+    m_panelTitleBar->setVisible(showBar);
+    if (showBar) m_panelTitleBar->raise();
   } else if (m_titleOverlay || m_contentFrozen) {
     if (content && m_contentFrozen) {
       content->setMinimumSize(m_savedContentMin);
@@ -283,6 +337,7 @@ void TPanel::applyCompactTitle(bool overlay) {
       if (layout()->indexOf(m_panelTitleBar) < 0)
         static_cast<QBoxLayout *>(layout())->insertWidget(0, m_panelTitleBar);
     }
+    m_panelTitleBar->show();
     if (m_savedPanelMin.isValid()) setMinimumSize(m_savedPanelMin);
     if (m_savedPanelMax.isValid()) setMaximumSize(m_savedPanelMax);
     m_titleOverlay = false;
@@ -313,6 +368,123 @@ void TPanel::setCompactFloating(bool on) {
     setGeometry(m_geometryBeforeCompact);
     m_hasCompactSnapshot = false;
   }
+}
+
+//-----------------------------------------------------------------------------
+
+void TPanel::setShowTitleBar(bool on) {
+  if (!isCustomPanel() || on == m_showTitleBar) return;
+  m_showTitleBar = on;
+  m_contentPress = false;
+  m_contentPressWidget.clear();
+  saveCompactFloating();
+  if (isFloating() && m_compactFloating) applyCompactTitle(true);
+}
+
+//-----------------------------------------------------------------------------
+
+bool TPanel::compactDragExempt(QWidget *widget) const {
+  return qobject_cast<MyScroller *>(widget) ||
+         qobject_cast<QAbstractSlider *>(widget) ||
+         qobject_cast<QAbstractSpinBox *>(widget) ||
+         qobject_cast<QLineEdit *>(widget) ||
+         qobject_cast<QTextEdit *>(widget) ||
+         qobject_cast<QPlainTextEdit *>(widget) ||
+         qobject_cast<QComboBox *>(widget) ||
+         qobject_cast<QAbstractItemView *>(widget);
+}
+
+//-----------------------------------------------------------------------------
+
+bool TPanel::beginCompactDrag(const QPoint &globalPos) {
+  if (!m_panelTitleBar || !m_panelTitleBar->geometry().isValid()) return false;
+  const QPoint grip = m_panelTitleBar->geometry().center();
+  m_forwardingMouse = true;
+  QMouseEvent press(QEvent::MouseButtonPress, grip, globalPos, Qt::LeftButton,
+                    Qt::LeftButton, Qt::NoModifier);
+  QApplication::sendEvent(this, &press);
+  m_forwardingMouse = false;
+  if (!m_dragging) return false;
+  grabMouse();
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+
+bool TPanel::handleCompactDrag(QObject *watched, QEvent *event) {
+  const bool armed =
+      isCustomPanel() && isFloating() && m_titleOverlay && !m_showTitleBar;
+  if (!armed) {
+    m_contentPress = false;
+    m_contentPressWidget.clear();
+    return false;
+  }
+
+  auto *widget = qobject_cast<QWidget *>(watched);
+  if (!widget) return false;
+
+  if (event->type() == QEvent::MouseButtonPress) {
+    auto *me = static_cast<QMouseEvent *>(event);
+    if (me->button() != Qt::LeftButton || compactDragExempt(widget))
+      return false;
+    m_contentPress       = true;
+    m_contentPressGlobal = me->globalPos();
+    m_contentPressWidget = widget;
+    return true;
+  }
+
+  if (!m_contentPress) return false;
+
+  if (event->type() == QEvent::MouseMove) {
+    auto *me = static_cast<QMouseEvent *>(event);
+    if (!(me->buttons() & Qt::LeftButton)) {
+      m_contentPress = false;
+      m_contentPressWidget.clear();
+      return false;
+    }
+    if ((me->globalPos() - m_contentPressGlobal).manhattanLength() <
+        QApplication::startDragDistance())
+      return true;
+
+    const QPoint global              = me->globalPos();
+    const Qt::KeyboardModifiers mods = me->modifiers();
+    const Qt::MouseButtons buttons   = me->buttons();
+    const QPoint pressGlobal         = m_contentPressGlobal;
+    m_contentPress                   = false;
+    m_contentPressWidget.clear();
+    if (!beginCompactDrag(pressGlobal)) return true;
+
+    m_forwardingMouse = true;
+    QMouseEvent move(QEvent::MouseMove, mapFromGlobal(global), global,
+                     Qt::NoButton, buttons, mods);
+    QApplication::sendEvent(this, &move);
+    m_forwardingMouse = false;
+    return true;
+  }
+
+  if (event->type() == QEvent::MouseButtonRelease) {
+    auto *me = static_cast<QMouseEvent *>(event);
+    if (me->button() != Qt::LeftButton) return false;
+    QWidget *target          = m_contentPressWidget;
+    const QPoint pressGlobal = m_contentPressGlobal;
+    m_contentPress           = false;
+    m_contentPressWidget.clear();
+    if (!target) return true;
+
+    m_forwardingMouse = true;
+    QMouseEvent press(QEvent::MouseButtonPress,
+                      target->mapFromGlobal(pressGlobal), pressGlobal,
+                      Qt::LeftButton, Qt::LeftButton, me->modifiers());
+    QMouseEvent release(QEvent::MouseButtonRelease,
+                        target->mapFromGlobal(me->globalPos()), me->globalPos(),
+                        Qt::LeftButton, Qt::NoButton, me->modifiers());
+    QApplication::sendEvent(target, &press);
+    QApplication::sendEvent(target, &release);
+    m_forwardingMouse = false;
+    return true;
+  }
+
+  return false;
 }
 
 //-----------------------------------------------------------------------------
