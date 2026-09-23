@@ -11,7 +11,9 @@
 #include <QStringList>
 #include <QtGlobal>
 #include <QColor>
+#include <QPalette>
 #include <QPointer>
+#include <QVector>
 #include <vector>
 #include <utility>
 
@@ -375,6 +377,19 @@ private:
   TPanelTitleBarButton *m_roomBindButton;
   bool m_compactFloating;
   bool m_showTitleBar;
+  bool m_compactTransparentBg;
+  bool m_transparentLookApplied;
+  bool m_savedContentAutoFill;
+  QString m_savedPanelStyleSheet;
+  QString m_savedContentStyleSheet;
+  struct CompactSurface {
+    QPointer<QWidget> widget;
+    QPalette palette;
+    bool autoFillBackground;
+    bool translucentBackground;
+    bool noSystemBackground;
+  };
+  QVector<CompactSurface> m_compactSurfaces;
   bool m_titleOverlay;
   bool m_contentFrozen;
   bool m_hasCompactSnapshot;
@@ -400,6 +415,9 @@ private:
   void updateCompactResizeCursor(QWidget *widget, int marginType) const;
   void saveCompactFloating() const;
   void setShowTitleBar(bool on, bool keepUsefulSize = false);
+  void setCompactTransparentBackground(bool on);
+  void syncCompactTransparentLook();
+  void clearCompactSurfaces();
   bool compactDragExempt(QWidget *widget) const;
   bool handleCompactDrag(QObject *watched, QEvent *event);
   bool beginCompactDrag(const QPoint &globalPos);

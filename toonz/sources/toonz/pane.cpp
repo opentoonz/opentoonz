@@ -45,12 +45,29 @@
 #include <QHoverEvent>
 #include <QResizeEvent>
 #include <QScreen>
+#include <QVariant>
 #include <QGlobalStatic>
 #include <memory>
 #include <utility>
 
 extern TEnv::StringVar EnvSafeAreaName;
 extern TEnv::IntVar EnvViewerPreviewBehavior;
+
+namespace {
+
+bool compactSurfaceExempt(const QWidget *widget) {
+  return qobject_cast<const TPanelTitleBar *>(widget) ||
+         qobject_cast<const TPanelTitleBarButton *>(widget) ||
+         qobject_cast<const QAbstractSlider *>(widget) ||
+         qobject_cast<const QAbstractSpinBox *>(widget) ||
+         qobject_cast<const QLineEdit *>(widget) ||
+         qobject_cast<const QTextEdit *>(widget) ||
+         qobject_cast<const QPlainTextEdit *>(widget) ||
+         qobject_cast<const QComboBox *>(widget) ||
+         qobject_cast<const QAbstractItemView *>(widget);
+}
+
+}  // namespace
 
 //=============================================================================
 // TPanel
@@ -69,6 +86,9 @@ TPanel::TPanel(QWidget *parent, Qt::WindowFlags flags,
     , m_roomBindButton(nullptr)
     , m_compactFloating(false)
     , m_showTitleBar(true)
+    , m_compactTransparentBg(false)
+    , m_transparentLookApplied(false)
+    , m_savedContentAutoFill(false)
     , m_titleOverlay(false)
     , m_contentFrozen(false)
     , m_hasCompactSnapshot(false)
@@ -208,6 +228,16 @@ void TPanel::execContextMenu(const QPoint &globalPos) {
       setCompactFloating(true, true);
     });
 
+    compactMenu->addSeparator();
+    QAction *transparentAction =
+        compactMenu->addAction(tr("Transparent Background"));
+    transparentAction->setCheckable(true);
+    transparentAction->setChecked(m_compactTransparentBg);
+    transparentAction->setEnabled(m_compactFloating);
+    connect(transparentAction, &QAction::triggered, [this](bool checked) {
+      setCompactTransparentBackground(checked);
+    });
+
     menu.addSeparator();
     QAction *closeAction = menu.addAction(tr("Close"));
     connect(closeAction, &QAction::triggered, [this](bool) {
@@ -289,6 +319,8 @@ void TPanel::loadCompactFloating() {
   settings.beginGroup(QString::fromStdString(m_panelType));
   m_showTitleBar =
       settings.value(QStringLiteral("showTitleBar"), true).toBool();
+  m_compactTransparentBg =
+      settings.value(QStringLiteral("compactTransparentBg"), false).toBool();
   if (!settings.contains(QStringLiteral("compactFloating"))) return;
   setCompactFloating(settings.value(QStringLiteral("compactFloating")).toBool());
 }
@@ -304,6 +336,8 @@ void TPanel::saveCompactFloating() const {
   settings.beginGroup(QString::fromStdString(m_panelType));
   settings.setValue(QStringLiteral("compactFloating"), m_compactFloating);
   settings.setValue(QStringLiteral("showTitleBar"), m_showTitleBar);
+  settings.setValue(QStringLiteral("compactTransparentBg"),
+                    m_compactTransparentBg);
 }
 
 //-----------------------------------------------------------------------------
@@ -465,7 +499,125 @@ void TPanel::applyCompactTitle(bool overlay, bool keepContentSize,
     m_titleOverlay    = false;
     m_compactTopInset = 0;
   }
+  syncCompactTransparentLook();
   update();
+}
+
+//-----------------------------------------------------------------------------
+
+void TPanel::setCompactTransparentBackground(bool on) {
+  if (!isCustomPanel() || on == m_compactTransparentBg) return;
+  m_compactTransparentBg = on;
+  saveCompactFloating();
+  syncCompactTransparentLook();
+  update();
+}
+
+//-----------------------------------------------------------------------------
+
+void TPanel::clearCompactSurfaces() {
+  for (const CompactSurface &saved : m_compactSurfaces) {
+    QWidget *w = saved.widget.data();
+    if (!w) continue;
+    w->setAutoFillBackground(saved.autoFillBackground);
+    w->setPalette(saved.palette);
+    w->setAttribute(Qt::WA_TranslucentBackground, saved.translucentBackground);
+    w->setAttribute(Qt::WA_NoSystemBackground, saved.noSystemBackground);
+    w->update();
+  }
+  m_compactSurfaces.clear();
+}
+
+//-----------------------------------------------------------------------------
+
+void TPanel::syncCompactTransparentLook() {
+  const bool want = isCustomPanel() && isFloating() && m_titleOverlay &&
+                    m_compactFloating && m_compactTransparentBg;
+  if (want == m_transparentLookApplied) return;
+
+  const QRect geom       = geometry();
+  QWidget *content       = widget();
+  const QSize contentSz  = content ? content->size() : QSize();
+
+  auto polish = [](QWidget *w) {
+    if (!w || !w->style()) return;
+    w->style()->unpolish(w);
+    w->style()->polish(w);
+    w->update();
+  };
+
+  if (want) {
+    m_savedPanelStyleSheet = styleSheet();
+    setProperty("compactTransparent", true);
+    QString panelSheet = m_savedPanelStyleSheet;
+    if (!panelSheet.isEmpty() && !panelSheet.endsWith(QLatin1Char('\n')))
+      panelSheet += QLatin1Char('\n');
+    panelSheet += QStringLiteral(
+        "TPanel[compactTransparent=\"true\"] {"
+        " background: transparent; background-color: transparent; }\n");
+    setStyleSheet(panelSheet);
+    setAutoFillBackground(false);
+    polish(this);
+
+    if (content) {
+      m_savedContentStyleSheet = content->styleSheet();
+      m_savedContentAutoFill   = content->autoFillBackground();
+      content->setProperty("compactTransparent", true);
+      QString contentSheet = m_savedContentStyleSheet;
+      if (!contentSheet.isEmpty() && !contentSheet.endsWith(QLatin1Char('\n')))
+        contentSheet += QLatin1Char('\n');
+      contentSheet += QStringLiteral(
+          "QWidget[compactTransparent=\"true\"] {"
+          " background: transparent; background-color: transparent; }\n");
+      content->setStyleSheet(contentSheet);
+      content->setAutoFillBackground(false);
+      polish(content);
+
+      QList<QWidget *> targets;
+      const QList<QWidget *> children =
+          content->findChildren<QWidget *>(QString(), Qt::FindChildrenRecursively);
+      for (QWidget *child : children) {
+        if (!compactSurfaceExempt(child)) targets.append(child);
+      }
+      for (QWidget *target : targets) {
+        CompactSurface saved;
+        saved.widget                = target;
+        saved.palette               = target->palette();
+        saved.autoFillBackground    = target->autoFillBackground();
+        saved.translucentBackground = target->testAttribute(Qt::WA_TranslucentBackground);
+        saved.noSystemBackground    = target->testAttribute(Qt::WA_NoSystemBackground);
+        m_compactSurfaces.append(saved);
+
+        target->setAutoFillBackground(false);
+        target->setAttribute(Qt::WA_TranslucentBackground, true);
+        target->setAttribute(Qt::WA_NoSystemBackground, true);
+        QPalette pal = target->palette();
+        pal.setColor(QPalette::Window, Qt::transparent);
+        pal.setColor(QPalette::Base, Qt::transparent);
+        pal.setColor(QPalette::Button, Qt::transparent);
+        target->setPalette(pal);
+        target->update();
+      }
+    }
+    m_transparentLookApplied = true;
+  } else {
+    setProperty("compactTransparent", QVariant());
+    setStyleSheet(m_savedPanelStyleSheet);
+    polish(this);
+    if (content) {
+      content->setProperty("compactTransparent", QVariant());
+      content->setStyleSheet(m_savedContentStyleSheet);
+      content->setAutoFillBackground(m_savedContentAutoFill);
+      polish(content);
+    }
+    clearCompactSurfaces();
+    m_transparentLookApplied = false;
+  }
+
+  if (geom.isValid() && geometry() != geom) setGeometry(geom);
+  if (content && m_contentFrozen && contentSz.isValid() &&
+      content->size() != contentSz)
+    content->setFixedSize(contentSz);
 }
 
 //-----------------------------------------------------------------------------
