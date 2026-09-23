@@ -22,6 +22,7 @@
 // Qt includes
 #include <QPainter>
 #include <QMouseEvent>
+#include <QShowEvent>
 #include <QMainWindow>
 #include <QSettings>
 #include <QMap>
@@ -41,6 +42,7 @@
 #include <QChildEvent>
 #include <QBoxLayout>
 #include <QContextMenuEvent>
+#include <QHoverEvent>
 #include <QResizeEvent>
 #include <QScreen>
 #include <QGlobalStatic>
@@ -71,7 +73,8 @@ TPanel::TPanel(QWidget *parent, Qt::WindowFlags flags,
     , m_contentFrozen(false)
     , m_hasCompactSnapshot(false)
     , m_contentPress(false)
-    , m_forwardingMouse(false) {
+    , m_forwardingMouse(false)
+    , m_compactTopInset(0) {
   m_panelTitleBar = new TPanelTitleBar(this, orientation);
   setTitleBarWidget(m_panelTitleBar);
   connect(m_panelTitleBar, &TPanelTitleBar::doubleClick, this,
@@ -194,15 +197,15 @@ void TPanel::execContextMenu(const QPoint &globalPos) {
       noBarAction->setChecked(true);
 
     connect(offAction, &QAction::triggered, [this](bool) {
-      setCompactFloating(false);
+      setCompactFloating(false, true);
     });
     connect(miniAction, &QAction::triggered, [this](bool) {
-      setShowTitleBar(true);
-      setCompactFloating(true);
+      setShowTitleBar(true, true);
+      setCompactFloating(true, true);
     });
     connect(noBarAction, &QAction::triggered, [this](bool) {
-      setShowTitleBar(false);
-      setCompactFloating(true);
+      setShowTitleBar(false, true);
+      setCompactFloating(true, true);
     });
 
     menu.addSeparator();
@@ -220,9 +223,14 @@ void TPanel::execContextMenu(const QPoint &globalPos) {
 
 void TPanel::watchContextMenu(QWidget *root) {
   if (!root) return;
-  root->installEventFilter(this);
+  const auto watch = [this](QWidget *widget) {
+    widget->installEventFilter(this);
+    widget->setMouseTracking(true);
+    widget->setAttribute(Qt::WA_Hover, true);
+  };
+  watch(root);
   const QList<QWidget *> children = root->findChildren<QWidget *>();
-  for (QWidget *child : children) child->installEventFilter(this);
+  for (QWidget *child : children) watch(child);
 }
 
 //-----------------------------------------------------------------------------
@@ -239,6 +247,31 @@ bool TPanel::eventFilter(QObject *watched, QEvent *event) {
   if (event->type() == QEvent::ContextMenu && isCustomPanel()) {
     execContextMenu(static_cast<QContextMenuEvent *>(event)->globalPos());
     return true;
+  }
+  if (auto *widget = qobject_cast<QWidget *>(watched)) {
+    if (event->type() == QEvent::MouseMove ||
+        event->type() == QEvent::HoverMove ||
+        event->type() == QEvent::MouseButtonPress) {
+      const QPoint local =
+          event->type() == QEvent::HoverMove
+              ? static_cast<QHoverEvent *>(event)->pos()
+              : static_cast<QMouseEvent *>(event)->pos();
+      const int marginType = compactResizeMargin(widget->mapTo(this, local));
+      updateCompactResizeCursor(widget, marginType);
+      if (marginType && event->type() == QEvent::MouseButtonPress) {
+        auto *me = static_cast<QMouseEvent *>(event);
+        if (me->button() == Qt::LeftButton) {
+          const QPoint panelPos = widget->mapTo(this, me->pos());
+          m_forwardingMouse     = true;
+          QMouseEvent press(QEvent::MouseButtonPress, panelPos, me->globalPos(),
+                            Qt::LeftButton, Qt::LeftButton, me->modifiers());
+          QApplication::sendEvent(this, &press);
+          m_forwardingMouse = false;
+          if (m_resizing) grabMouse();
+          return true;
+        }
+      }
+    }
   }
   if (handleCompactDrag(watched, event)) return true;
   return TDockWidget::eventFilter(watched, event);
@@ -275,29 +308,114 @@ void TPanel::saveCompactFloating() const {
 
 //-----------------------------------------------------------------------------
 
-void TPanel::applyCompactTitle(bool overlay) {
-  if (!m_panelTitleBar) return;
+void TPanel::ensureCompactTranslucency(bool on) {
+  if (!isCustomPanel()) return;
+  if (testAttribute(Qt::WA_TranslucentBackground) == on &&
+      testAttribute(Qt::WA_NoSystemBackground) == on)
+    return;
+  setAttribute(Qt::WA_TranslucentBackground, on);
+  setAttribute(Qt::WA_NoSystemBackground, on);
+  if (!testAttribute(Qt::WA_WState_Created)) return;
+  const QRect geom = geometry();
+  const bool vis   = isVisible();
+  setWindowFlags(windowFlags());
+  if (geom.isValid() && geom.width() > 1 && geom.height() > 1) setGeometry(geom);
+  if (vis) show();
+}
+
+//-----------------------------------------------------------------------------
+
+void TPanel::rememberOffContentFloor(QWidget *content) {
+  if (m_offContentFloor.isValid() || !content) return;
+  const QSize floor =
+      content->minimumSize().expandedTo(content->minimumSizeHint());
+  if (floor.width() >= 8 && floor.height() >= 8) m_offContentFloor = floor;
+}
+
+//-----------------------------------------------------------------------------
+
+QSize TPanel::offContentFloor() const {
+  if (m_offContentFloor.isValid()) return m_offContentFloor;
+  return QSize(qMax(1, m_savedContentMin.width()),
+               qMax(1, m_savedContentMin.height()));
+}
+
+//-----------------------------------------------------------------------------
+
+int TPanel::compactResizeMargin(const QPoint &panelPos) const {
+  if (!isCustomPanel() || !m_titleOverlay || !isFloating()) return 0;
+  const int grip = 8;
+  if (panelPos.x() < 0 || panelPos.y() < 0 || panelPos.x() >= width() ||
+      panelPos.y() >= height())
+    return 0;
+  int marginType = 0;
+  if (panelPos.x() < grip) marginType |= leftMargin;
+  if (panelPos.y() < grip) marginType |= topMargin;
+  if (panelPos.x() >= width() - grip) marginType |= rightMargin;
+  if (panelPos.y() >= height() - grip) marginType |= bottomMargin;
+  return marginType;
+}
+
+//-----------------------------------------------------------------------------
+
+void TPanel::updateCompactResizeCursor(QWidget *widget, int marginType) const {
+  if (!widget) return;
+  if (!marginType) {
+    widget->unsetCursor();
+    return;
+  }
+  const bool left       = marginType & leftMargin;
+  const bool top        = marginType & topMargin;
+  const bool horizontal = marginType & (leftMargin | rightMargin);
+  const bool vertical   = marginType & (topMargin | bottomMargin);
+  Qt::CursorShape shape = Qt::ArrowCursor;
+  if (horizontal && vertical)
+    shape = (left == top) ? Qt::SizeFDiagCursor : Qt::SizeBDiagCursor;
+  else if (horizontal)
+    shape = Qt::SizeHorCursor;
+  else
+    shape = Qt::SizeVerCursor;
+  widget->setCursor(shape);
+}
+
+//-----------------------------------------------------------------------------
+
+void TPanel::applyCompactTitle(bool overlay, bool keepContentSize,
+                               bool keepUsefulSize) {
+  if (!isCustomPanel() || !m_panelTitleBar) return;
+  ensureCompactTranslucency(overlay);
   m_panelTitleBar->setCompact(overlay);
-  setAttribute(Qt::WA_TranslucentBackground, overlay);
-  setAttribute(Qt::WA_NoSystemBackground, overlay);
 
   QWidget *content = widget();
   if (overlay) {
     if (!m_hasCompactSnapshot) {
-      m_geometryBeforeCompact = geometry();
-      m_savedPanelMin         = minimumSize();
-      m_savedPanelMax         = maximumSize();
-      m_hasCompactSnapshot    = true;
+      m_savedPanelMin      = minimumSize();
+      m_savedPanelMax      = maximumSize();
+      m_hasCompactSnapshot = true;
     }
+    int barW = 28;
+    if (m_roomBindButton) barW += m_roomBindButton->width();
+    const int barH = 18;
+    const int gap  = 4;
+    const bool showBar = m_showTitleBar;
+    const int top      = showBar ? barH + gap : 0;
+    const int oldTop   = m_compactTopInset;
+
     if (content && !m_contentFrozen && content->width() > 0 &&
         content->height() > 0) {
+      rememberOffContentFloor(content);
       m_frozenContentSize  = content->size();
       m_savedContentPolicy = content->sizePolicy();
       m_savedContentMin    = content->minimumSize();
       m_savedContentMax    = content->maximumSize();
+      m_contentFrozen      = true;
+    }
+    if (!keepUsefulSize && content && m_contentFrozen && isFloating() &&
+        !m_resizing && width() > 0 && height() > top)
+      m_frozenContentSize = QSize(width(), height() - top);
+    if (content && m_contentFrozen) {
       content->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
       content->setFixedSize(m_frozenContentSize);
-      m_contentFrozen = true;
     }
     if (layout()) {
       if (layout()->indexOf(m_panelTitleBar) >= 0)
@@ -305,28 +423,32 @@ void TPanel::applyCompactTitle(bool overlay) {
       if (content)
         layout()->setAlignment(content, Qt::AlignLeft | Qt::AlignTop);
     }
-    int barW = 28;
-    if (m_roomBindButton) barW += m_roomBindButton->width();
-    const int barH = 18;
-    const int gap  = 4;
     m_panelTitleBar->setFixedSize(barW, barH);
-    m_titleOverlay = true;
-    const bool showBar = m_showTitleBar;
+    if (layout()) layout()->setContentsMargins(0, top, 0, 0);
     if (m_contentFrozen) {
-      const int top = showBar ? barH + gap : 0;
-      if (layout()) layout()->setContentsMargins(0, top, 0, 0);
-      setFixedSize(qMax(m_frozenContentSize.width(), showBar ? barW : 1),
-                   m_frozenContentSize.height() + top);
+      const QSize floor = offContentFloor();
+      const int panelW  = qMax(m_frozenContentSize.width(), floor.width());
+      const int panelH  = qMax(m_frozenContentSize.height(), floor.height()) + top;
+      setMinimumSize(floor.width(), floor.height() + top);
+      setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+      if (keepUsefulSize || (!m_titleOverlay && isVisible()))
+        resize(panelW, panelH);
+      else if (m_titleOverlay && oldTop != top)
+        resize(width(), m_frozenContentSize.height() + top);
     }
+    m_compactTopInset = top;
+    m_titleOverlay    = true;
     m_panelTitleBar->move(qMax(0, width() - m_panelTitleBar->width()), 0);
     m_panelTitleBar->setVisible(showBar);
     if (showBar) m_panelTitleBar->raise();
   } else if (m_titleOverlay || m_contentFrozen) {
-    if (content && m_contentFrozen) {
+    if (content && m_contentFrozen && !keepContentSize) {
       content->setMinimumSize(m_savedContentMin);
       content->setMaximumSize(m_savedContentMax);
       content->setSizePolicy(m_savedContentPolicy);
       m_contentFrozen = false;
+    } else if (content && m_contentFrozen && m_frozenContentSize.isValid()) {
+      content->setFixedSize(m_frozenContentSize);
     }
     m_panelTitleBar->setMinimumSize(20, 18);
     m_panelTitleBar->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
@@ -340,45 +462,77 @@ void TPanel::applyCompactTitle(bool overlay) {
     m_panelTitleBar->show();
     if (m_savedPanelMin.isValid()) setMinimumSize(m_savedPanelMin);
     if (m_savedPanelMax.isValid()) setMaximumSize(m_savedPanelMax);
-    m_titleOverlay = false;
+    m_titleOverlay    = false;
+    m_compactTopInset = 0;
   }
   update();
 }
 
 //-----------------------------------------------------------------------------
 
-void TPanel::setCompactFloating(bool on) {
+void TPanel::setCompactFloating(bool on, bool keepUsefulSize) {
   if (!isCustomPanel() || on == m_compactFloating) return;
   m_compactFloating = on;
   saveCompactFloating();
   if (!isFloating()) return;
 
   if (on) {
+    if (!m_contentFrozen) {
+      if (QWidget *content = widget()) {
+        if (content->width() > 0 && content->height() > 0) {
+          rememberOffContentFloor(content);
+          m_frozenContentSize  = content->size();
+          m_savedContentPolicy = content->sizePolicy();
+          m_savedContentMin    = content->minimumSize();
+          m_savedContentMax    = content->maximumSize();
+          content->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+          content->setFixedSize(m_frozenContentSize);
+          m_contentFrozen = true;
+        }
+      }
+    }
     setFloatingMargin(0);
-    applyCompactTitle(true);
+    applyCompactTitle(true, false, keepUsefulSize);
     return;
   }
 
-  applyCompactTitle(false);
+  const QSize contentSize = m_frozenContentSize;
+  applyCompactTitle(false, true);
   setFloatingMargin(5);
   if (layout()) layout()->setMargin(5);
-  if (m_hasCompactSnapshot && m_geometryBeforeCompact.isValid()) {
-    setMinimumSize(m_savedPanelMin);
-    setMaximumSize(m_savedPanelMax);
-    setGeometry(m_geometryBeforeCompact);
-    m_hasCompactSnapshot = false;
+  if (contentSize.isValid() && widget() && m_panelTitleBar) {
+    const int margin = 5;
+    const int titleH = qMax(18, m_panelTitleBar->minimumSizeHint().height());
+    const int panelW = contentSize.width() + 2 * margin;
+    const int panelH = contentSize.height() + titleH + 2 * margin;
+    QSize minSz = m_savedPanelMin.isValid() ? m_savedPanelMin : minimumSize();
+    if (minSz.width() > panelW) minSz.setWidth(panelW);
+    if (minSz.height() > panelH) minSz.setHeight(panelH);
+    setMinimumSize(minSz);
+    setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+    resize(panelW, panelH);
+    QSize maxSz = m_savedContentMax;
+    if (!maxSz.isValid() || maxSz.width() < contentSize.width() ||
+        maxSz.height() < contentSize.height())
+      maxSz = QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+    widget()->setMinimumSize(m_savedContentMin);
+    widget()->setMaximumSize(maxSz);
+    widget()->setSizePolicy(m_savedContentPolicy);
+    m_contentFrozen = false;
   }
+  m_hasCompactSnapshot = false;
 }
 
 //-----------------------------------------------------------------------------
 
-void TPanel::setShowTitleBar(bool on) {
+void TPanel::setShowTitleBar(bool on, bool keepUsefulSize) {
   if (!isCustomPanel() || on == m_showTitleBar) return;
   m_showTitleBar = on;
   m_contentPress = false;
   m_contentPressWidget.clear();
   saveCompactFloating();
-  if (isFloating() && m_compactFloating) applyCompactTitle(true);
+  if (isFloating() && m_compactFloating)
+    applyCompactTitle(true, false, keepUsefulSize);
 }
 
 //-----------------------------------------------------------------------------
@@ -489,10 +643,37 @@ bool TPanel::handleCompactDrag(QObject *watched, QEvent *event) {
 
 //-----------------------------------------------------------------------------
 
+void TPanel::showEvent(QShowEvent *event) {
+  TDockWidget::showEvent(event);
+  if (!isCustomPanel() || !m_compactFloating || !isFloating() || m_resizing)
+    return;
+  if (!m_titleOverlay) return;
+  applyCompactTitle(true);
+}
+
+//-----------------------------------------------------------------------------
+
 void TPanel::resizeEvent(QResizeEvent *event) {
   QWidget::resizeEvent(event);
+  if (m_titleOverlay && m_contentFrozen && m_resizing) {
+    if (QWidget *content = widget()) {
+      const QSize floor = offContentFloor();
+      const QSize sz(qMax(floor.width(), width()),
+                     qMax(floor.height(), height() - m_compactTopInset));
+      content->setFixedSize(sz);
+      m_frozenContentSize = sz;
+    }
+  }
   if (m_titleOverlay && m_panelTitleBar)
     m_panelTitleBar->move(qMax(0, width() - m_panelTitleBar->width()), 0);
+}
+
+//-----------------------------------------------------------------------------
+
+int TPanel::isResizeGrip(QPoint p) {
+  if (!isCustomPanel() || !m_titleOverlay || !isFloating() || m_dragging)
+    return TDockWidget::isResizeGrip(p);
+  return compactResizeMargin(p);
 }
 
 //-----------------------------------------------------------------------------
@@ -700,6 +881,7 @@ void TPanel::setDockedAppearance() {
   TDockWidget::setDockedAppearance();
   setFloatingMargin(5);
   if (m_roomBindButton) m_roomBindButton->setVisible(false);
+  if (!isCustomPanel()) return;
   applyCompactTitle(false);
   m_hasCompactSnapshot = false;
 }

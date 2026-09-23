@@ -109,6 +109,7 @@ protected:
   // They are called on all code paths: interactive dock/undock AND workspace restore.
   void setFloatingAppearance() override;
   void setDockedAppearance() override;
+  int isResizeGrip(QPoint p) override;
 
 private:
   QSize getDockedMinimumSize() override;
@@ -117,7 +118,6 @@ private:
   void selectDockPlaceholder(QMouseEvent *me) override;
 
   bool isDragGrip(QPoint p) override;
-  int isResizeGrip(QPoint p) override;
 
   void windowTitleEvent(QEvent *e) override;
 };

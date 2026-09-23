@@ -314,7 +314,7 @@ public:
 
   bool isCustomPanel() const;
   bool compactFloating() const { return m_compactFloating; }
-  void setCompactFloating(bool on);
+  void setCompactFloating(bool on, bool keepUsefulSize = false);
   void loadCompactFloating();
   void watchContextMenu(QWidget *root);
   void execContextMenu(const QPoint &globalPos);
@@ -332,6 +332,7 @@ public:
 protected:
   void paintEvent(QPaintEvent *) override;
   void resizeEvent(QResizeEvent *event) override;
+  void showEvent(QShowEvent *event) override;
   bool eventFilter(QObject *watched, QEvent *event) override;
   void enterEvent(QEvent *) override;
   void leaveEvent(QEvent *) override;
@@ -339,6 +340,7 @@ protected:
   // BTR grip visibility follows floating/docked state (dock + workspace restore).
   void setFloatingAppearance() override;
   void setDockedAppearance() override;
+  int isResizeGrip(QPoint p) override;
 
   virtual bool isActivatableOnEnter() { return false; }
 
@@ -381,16 +383,23 @@ private:
   QPoint m_contentPressGlobal;
   QPointer<QWidget> m_contentPressWidget;
   QSize m_frozenContentSize;
+  QSize m_offContentFloor;
   QSizePolicy m_savedContentPolicy;
   QSize m_savedContentMin;
   QSize m_savedContentMax;
   QSize m_savedPanelMin;
   QSize m_savedPanelMax;
-  QRect m_geometryBeforeCompact;
+  int m_compactTopInset;
 
-  void applyCompactTitle(bool overlay);
+  void applyCompactTitle(bool overlay, bool keepContentSize = false,
+                         bool keepUsefulSize = false);
+  void ensureCompactTranslucency(bool on);
+  int compactResizeMargin(const QPoint &panelPos) const;
+  void rememberOffContentFloor(QWidget *content);
+  QSize offContentFloor() const;
+  void updateCompactResizeCursor(QWidget *widget, int marginType) const;
   void saveCompactFloating() const;
-  void setShowTitleBar(bool on);
+  void setShowTitleBar(bool on, bool keepUsefulSize = false);
   bool compactDragExempt(QWidget *widget) const;
   bool handleCompactDrag(QObject *watched, QEvent *event);
   bool beginCompactDrag(const QPoint &globalPos);
