@@ -136,6 +136,7 @@
 #define MI_DeleteInk "MI_DeleteInk"
 #define MI_InsertSceneFrame "MI_InsertSceneFrame"
 #define MI_RemoveSceneFrame "MI_RemoveSceneFrame"
+#define MI_RemoveSelectedSceneFrames "MI_RemoveSelectedSceneFrames"
 
 #define MI_InsertGlobalKeyframe "MI_InsertGlobalKeyframe"
 #define MI_RemoveGlobalKeyframe "MI_RemoveGlobalKeyframe"
