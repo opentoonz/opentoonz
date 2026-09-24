@@ -245,6 +245,7 @@ class SchematicLink : public QObject, public QGraphicsItem {
   QPainterPath m_path, m_hitPath;
   bool m_lineShaped;
   bool m_highlighted;
+  bool m_dropHighlighted;
 
 public:
   SchematicLink(QGraphicsItem *parent, QGraphicsScene *scene);
@@ -298,6 +299,9 @@ public:
 
   bool isHighlighted() { return m_highlighted; }
   void setHighlighted(bool value) { m_highlighted = value; }
+
+  bool isDropHighlighted() const { return m_dropHighlighted; }
+  void setDropHighlighted(bool value) { m_dropHighlighted = value; }
 
 protected:
   void mousePressEvent(QGraphicsSceneMouseEvent *me) override;
@@ -451,6 +455,8 @@ protected:
   Qt::MouseButton m_buttonState;
   QMap<int, SchematicPort *> m_ports;
 
+  bool m_dropHighlighted;
+
 public:
   SchematicNode(SchematicScene *scene);
   ~SchematicNode() override;
@@ -470,6 +476,9 @@ public:
 
   void updateLinksGeometry();
   virtual void onClicked(){};
+
+  bool isDropHighlighted() const { return m_dropHighlighted; }
+  void setDropHighlighted(bool value) { m_dropHighlighted = value; }
 
 protected:
   void mouseMoveEvent(QGraphicsSceneMouseEvent *me) override;
