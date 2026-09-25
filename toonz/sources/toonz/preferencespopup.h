@@ -142,6 +142,7 @@ private:
   void onDefaultStartupToolChanged();
   // Xsheet
   void onShowKeyframesOnCellAreaChanged();
+  void onCurrentCellColorChanged();
   void onShowXSheetToolbarClicked();
   void onUnifyColumnVisibilityTogglesChanged();
   void onShowXsheetBreadcrumbsClicked();

@@ -746,6 +746,11 @@ void PreferencesPopup::onShowKeyframesOnCellAreaChanged() {
   TApp::instance()->getCurrentScene()->notifyPreferenceChanged("XsheetCamera");
 }
 
+void PreferencesPopup::onCurrentCellColorChanged() {
+  TApp::instance()->getCurrentScene()->notifyPreferenceChanged(
+      "CurrentCellColor");
+}
+
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onShowXSheetToolbarClicked() {
@@ -1118,7 +1123,8 @@ QWidget* PreferencesPopup::createUI(PreferencesItemId id,
   case QMetaType::QColor:  // create ColorField
   {
     ColorField* field =
-        new ColorField(this, false, colorToTPixel(item.value.value<QColor>()));
+        new ColorField(this, false, colorToTPixel(item.value.value<QColor>()),
+                       24, true, 44, true);
     connect(field, &ColorField::colorChanged, this,
             &PreferencesPopup::onColorFieldChanged);
     widget = field;
@@ -1431,7 +1437,9 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {syncLevelRenumberWithXsheet,
        tr("Sync Level Strip Drawing Number Changes with the Xsheet")},
       {currentTimelineEnabled, tr("Show Current Time Indicator")},
-      {currentColumnColor, tr("Current Column Color:")},
+      {currentColumnColor, tr("Current Column Text Color:")},
+      {customCurrentCellColorEnabled, tr("Custom")},
+      {currentCellColor, tr("Active Cell/Column Outlines:")},
       //{ levelNameOnEachMarkerEnabled, tr("Display Level Name on Each
       // Marker")
       //},
@@ -2309,6 +2317,30 @@ QWidget* PreferencesPopup::createXsheetPage() {
     insertUI(showColumnNumbers, xshColHeaderLay);
     insertUI(unifyColumnVisibilityToggles, xshColHeaderLay);
     insertUI(parentColorsInXsheetColumn, xshColHeaderLay);
+    insertUI(currentColumnColor, xshColHeaderLay);
+
+    // Reuse the existing color row so the Xsheet page does not grow taller.
+    QCheckBox* customColorCheck =
+        qobject_cast<QCheckBox*>(createUI(customCurrentCellColorEnabled));
+    QWidget* outlineColorField = createUI(currentCellColor);
+    outlineColorField->setEnabled(customColorCheck->isChecked());
+    connect(customColorCheck, &QCheckBox::toggled, outlineColorField,
+            &QWidget::setEnabled);
+
+    QHBoxLayout* outlineLayout = new QHBoxLayout();
+    outlineLayout->setContentsMargins(0, 0, 0, 0);
+    outlineLayout->setSpacing(5);
+    QLabel* outlineLabel = new QLabel(tr("Cell/Column Outlines:"), this);
+    outlineLabel->setToolTip(
+        tr("The active cell and column use the same outline color."));
+    outlineLayout->addWidget(outlineLabel);
+    outlineLayout->addWidget(customColorCheck);
+    outlineLayout->addWidget(outlineColorField);
+    outlineLayout->addStretch(1);
+    xshColHeaderLay->addLayout(outlineLayout, xshColHeaderLay->rowCount() - 1,
+                               2);
+    customColorCheck->setToolTip(
+        tr("When unchecked, both outlines use the current theme color."));
   }
   QGridLayout* xshCellAreaLay = insertGroupBox(tr("Xsheet Cell Area"), lay);
   {
@@ -2331,7 +2363,6 @@ QWidget* PreferencesPopup::createXsheetPage() {
   insertUI(useArrowKeyToShiftCellSelection, lay);
   insertUI(shortcutCommandsWhileRenamingCellEnabled, lay);
   insertUI(syncLevelRenumberWithXsheet, lay);
-  insertUI(currentColumnColor, lay);
 
   lay->setRowStretch(lay->rowCount(), 1);
   insertFootNote(lay);
@@ -2341,6 +2372,10 @@ QWidget* PreferencesPopup::createXsheetPage() {
                            &PreferencesPopup::onShowKeyframesOnCellAreaChanged);
   m_onEditedFuncMap.insert(showXsheetCameraColumn,
                            &PreferencesPopup::onShowKeyframesOnCellAreaChanged);
+  m_onEditedFuncMap.insert(customCurrentCellColorEnabled,
+                           &PreferencesPopup::onCurrentCellColorChanged);
+  m_onEditedFuncMap.insert(currentCellColor,
+                           &PreferencesPopup::onCurrentCellColorChanged);
   m_onEditedFuncMap.insert(
       unifyColumnVisibilityToggles,
       &PreferencesPopup::onUnifyColumnVisibilityTogglesChanged);

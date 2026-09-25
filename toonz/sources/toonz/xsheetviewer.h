@@ -915,7 +915,7 @@ public:
 
   // Cell focus
   void setCellFocusColor(const QColor &color) { m_cellFocusColor = color; }
-  QColor getCellFocusColor() const { return m_cellFocusColor; }
+  QColor getCellFocusColor() const;
 
   // Play range
   QColor getPlayRangeColor() const { return m_playRangeColor; }

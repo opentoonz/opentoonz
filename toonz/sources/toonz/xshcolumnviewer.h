@@ -371,6 +371,7 @@ public:
   void drawSoundColumnHead(QPainter &p, int col);
   void drawPaletteColumnHead(QPainter &p, int col);
   void drawSoundTextColumnHead(QPainter &p, int col);
+  void drawCurrentColumnFocus(QPainter &p, int col);
 
   QPixmap getColumnIcon(int columnIndex);
 
