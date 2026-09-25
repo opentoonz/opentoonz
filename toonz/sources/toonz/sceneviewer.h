@@ -180,6 +180,9 @@ class SceneViewer final : public TToolViewer, public Previewer::Listener {
   bool m_isStyleShortcutSwitchable;
 
   bool m_isBusyOnTabletMove;
+  qint64 m_tabletTimestampAnchor = -1;  // Stroke source clock.
+  TTimerTicks m_tabletTickAnchor = 0;   // Mapped clock anchor.
+  TTimerTicks m_lastTabletTime   = 0;   // Last mapped time.
 
   QMatrix4x4 m_projectionMatrix;
 
