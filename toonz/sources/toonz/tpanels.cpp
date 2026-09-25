@@ -89,6 +89,8 @@
 
 #include "../../toonz/locatorpopup.h"
 
+#include "toonzqt/insertfxpopup.h"
+
 // TnzBase includes
 #include "trasterfx.h"
 #include "toutputproperties.h"
@@ -1726,12 +1728,6 @@ public:
 } zoomInAndFitPanel;
 
 //=============================================================================
-OpenFloatingPanel openFxBrowserCommand(MI_InsertFx, "FxBrowser",
-                                       QObject::tr("Fx Browser"));
-
-//-----------------------------------------------------------------------------
-
-//=============================================================================
 // LocatorPanel
 //-----------------------------------------------------------------------------
 
@@ -1765,3 +1761,41 @@ public:
 //=============================================================================
 OpenFloatingPanel openLocatorCommand(MI_OpenLocator, "Locator",
                                      QObject::tr("Locator"));
+
+//-----------------------------------------------------------------------------
+
+//=============================================================================
+// FxBrowserPanel
+//-----------------------------------------------------------------------------
+
+FxBrowserPanel::FxBrowserPanel(QWidget *parent) : TPanel(parent) {
+  m_fxBrowser = new InsertFxPopup(this);
+  m_fxBrowser->setApplication(TApp::instance());
+
+  setWidget(m_fxBrowser);
+}
+
+//=============================================================================
+// FxBrowserFactory
+//-----------------------------------------------------------------------------
+
+class FxBrowserFactory final : public TPanelFactory {
+public:
+  FxBrowserFactory() : TPanelFactory("FxBrowser") {}
+
+  TPanel *createPanel(QWidget *parent) override {
+    FxBrowserPanel *panel = new FxBrowserPanel(parent);
+    panel->move(qApp->desktop()->screenGeometry(panel).center());
+    panel->setObjectName(getPanelType());
+    panel->setWindowTitle(QObject::tr("FX Browser"));
+    panel->setMinimumWidth(233);
+    return panel;
+  }
+
+  void initialize(TPanel *panel) override { assert(0); }
+
+} FxBrowserFactory;
+
+//=============================================================================
+OpenFloatingPanel openFxBrowserCommand(MI_InsertFx, "FxBrowser",
+                                       QObject::tr("FX Browser"));

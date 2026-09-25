@@ -51,7 +51,6 @@ set(MOC_HEADERS
     histogrampopup.h
     historypane.h
     imageviewer.h
-    insertfxpopup.h
     layerfooterpanel.h
     layerheaderpanel.h
     levelcreatepopup.h
@@ -283,7 +282,6 @@ set(SOURCES
     formatsettingspopups.cpp
     fxparameditorpopup.cpp
     histogrampopup.cpp
-    insertfxpopup.cpp
     layerfooterpanel.cpp
     layerheaderpanel.cpp
     levelcreatepopup.cpp

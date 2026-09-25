@@ -64,7 +64,7 @@ DVAPI void insertFx(TFx *newFx, const QList<TFxP> &fxs,
                     const QList<Link> &links, TApplication *app, int colunIndex,
                     int rowIndex);
 DVAPI void addFx(TFx *newFx, const QList<TFxP> &fxs, TApplication *app,
-                 int colunIndex, int rowIndex);
+                 int colunIndex, int rowIndex, bool attachSource = true);
 DVAPI void replaceFx(TFx *newFx, const QList<TFxP> &fxs,
                      TXsheetHandle *xshHandle, TFxHandle *fxHandle);
 DVAPI void duplicateFx(TFx *src, TXsheetHandle *xshHandle, TFxHandle *fxHandle);
