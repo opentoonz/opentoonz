@@ -11,6 +11,7 @@
 #include <toonz/strokegenerator.h>
 #include <toonz/rasterstrokegenerator.h>
 #include "toonz/preferences.h"
+#include "toonz/txshsimplelevel.h"
 #include <tools/tool.h>
 #include <tools/cursors.h>
 
@@ -196,6 +197,7 @@ public:
 
 private:
   void updateModifiers();
+  void commitPainting();
 
   enum MouseEventType { ME_DOWN, ME_DRAG, ME_UP, ME_MOVE };
   void handleMouseEvent(MouseEventType type, const TPointD &pos,
@@ -253,6 +255,7 @@ protected:
     // 作業中のFrameIdをクリック時に保存し、マウスリリース時（Undoの登録時）に別のフレームに
     // 移動していたときの不具合を修正する。
     TFrameId frameId;
+    TXshSimpleLevelP level;
 
     // common variables
     TTileSetCM32 *tileSet     = nullptr;
@@ -314,7 +317,8 @@ protected:
   QElapsedTimer m_brushTimer;
   int m_minCursorThick, m_maxCursorThick;
 
-  bool m_propertyUpdating = false;
+  bool m_propertyUpdating    = false;
+  bool m_skipStrokeUntilDown = false;
 
 protected:
   static void drawLine(const TPointD &point, const TPointD &centre,
