@@ -49,6 +49,8 @@
 #include <QComboBox>
 #include <QFontComboBox>
 #include <QLabel>
+#include <QScreen>
+#include <QScrollArea>
 #include <QStackedWidget>
 #include <QLineEdit>
 #include <QFileDialog>
@@ -1707,24 +1709,33 @@ PreferencesPopup::PreferencesPopup()
   categoryList->setAlternatingRowColors(true);
 
   QStackedWidget* stackedWidget = new QStackedWidget(this);
-  stackedWidget->addWidget(createGeneralPage());
-  stackedWidget->addWidget(createInterfacePage());
-  stackedWidget->addWidget(createPreviewPage());
-  stackedWidget->addWidget(createLoadingPage());
-  stackedWidget->addWidget(createSavingPage());
-  stackedWidget->addWidget(createCodecPage());
-  stackedWidget->addWidget(createDrawingPage());
-  stackedWidget->addWidget(createToolsPage());
-  stackedWidget->addWidget(createXsheetPage());
-  stackedWidget->addWidget(createOnionSkinPage());
-  stackedWidget->addWidget(createAnimationPage());
-  stackedWidget->addWidget(createAutoLipSyncPage());
-  stackedWidget->addWidget(createColorsPage());
-  stackedWidget->addWidget(createVisualizationPage());
-  stackedWidget->addWidget(createVersionControlPage());
-  stackedWidget->addWidget(createTouchTabletPage());
+  auto addPage                  = [stackedWidget](QWidget* page) {
+    QScrollArea* scrollArea = new QScrollArea(stackedWidget);
+    scrollArea->setFrameShape(QFrame::NoFrame);
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    scrollArea->setWidget(page);
+    stackedWidget->addWidget(scrollArea);
+  };
+  addPage(createGeneralPage());
+  addPage(createInterfacePage());
+  addPage(createPreviewPage());
+  addPage(createLoadingPage());
+  addPage(createSavingPage());
+  addPage(createCodecPage());
+  addPage(createDrawingPage());
+  addPage(createToolsPage());
+  addPage(createXsheetPage());
+  addPage(createOnionSkinPage());
+  addPage(createAnimationPage());
+  addPage(createAutoLipSyncPage());
+  addPage(createColorsPage());
+  addPage(createVisualizationPage());
+  addPage(createVersionControlPage());
+  addPage(createTouchTabletPage());
 #ifdef _WIN32
-  stackedWidget->addWidget(createAddonsPage());
+  addPage(createAddonsPage());
 #endif  // WIN32
 
   QHBoxLayout* mainLayout = new QHBoxLayout();
@@ -1741,6 +1752,12 @@ PreferencesPopup::PreferencesPopup()
   }
   setLayout(mainLayout);
 
+  // Keep the dialog within the current screen so overflowing pages can scroll.
+  QSize preferredSize = sizeHint().expandedTo(QSize(1060, 860));
+  if (QScreen* currentScreen = parentWidget()->screen())
+    preferredSize = preferredSize.boundedTo(
+        currentScreen->availableGeometry().size() - QSize(40, 60));
+  resize(preferredSize);
 
   connect(categoryList, &QListWidget::currentRowChanged, stackedWidget,
           &QStackedWidget::setCurrentIndex);
