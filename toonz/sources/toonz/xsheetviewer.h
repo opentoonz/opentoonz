@@ -919,7 +919,7 @@ public:
   // Cell focus
   void setCellFocusColor(const QColor &color) { m_cellFocusColor = color; }
   QColor getCellFocusColor() const;
-  void setColumnFocusColor(const QColor& color) { m_columnFocusColor = color; }
+  void setColumnFocusColor(const QColor &color) { m_columnFocusColor = color; }
   QColor getColumnFocusColor() const;
 
   // Play range

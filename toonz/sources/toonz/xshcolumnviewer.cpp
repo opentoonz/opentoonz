@@ -1914,7 +1914,7 @@ void ColumnArea::drawCurrentColumnFocus(QPainter &p, int col) {
   QPoint origin = m_viewer->positionToXY(CellPosition(0, col));
   QRect rect    = o->rect((col < 0) ? PredefinedRect::CAMERA_LAYER_NAME
                                     : PredefinedRect::LAYER_NAME)
-                      .translated(origin);
+                   .translated(origin);
   if (rect.isEmpty()) return;
 
   QColor color = m_viewer->getColumnFocusColor();

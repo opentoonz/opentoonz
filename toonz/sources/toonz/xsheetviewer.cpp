@@ -2038,7 +2038,7 @@ QColor XsheetViewer::getCellFocusColor() const {
 }
 
 QColor XsheetViewer::getColumnFocusColor() const {
-  Preferences* preferences = Preferences::instance();
+  Preferences *preferences = Preferences::instance();
   if (!preferences->isCustomCurrentColumnOutlineColorEnabled())
     return m_columnFocusColor;
 

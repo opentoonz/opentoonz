@@ -460,7 +460,7 @@ public:
   bool isCustomCurrentColumnOutlineColorEnabled() const {
     return getBoolValue(customCurrentColumnOutlineColorEnabled);
   }
-  void getCurrentColumnOutlineColor(TPixel& color) const {
+  void getCurrentColumnOutlineColor(TPixel &color) const {
     color = getColorValue(currentColumnOutlineColor);
   }
 
