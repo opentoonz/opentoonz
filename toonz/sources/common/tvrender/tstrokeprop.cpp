@@ -112,8 +112,12 @@ void TRasterImagePatternStrokeProp::draw(
                                     ridefinire questo metodo e
                                     serbve che non sia const*/
 {
+  // The stamps reach past the stroke outline, so the style's bbox is the one
+  // that decides whether this stroke touches the clipping rect.  The stroke
+  // outline alone drops stamps that lean into a neighbouring render tile.
   if (rd.m_clippingRect != TRect() && !rd.m_is3dView &&
-      !convert(rd.m_aff * m_stroke->getBBox()).overlaps(rd.m_clippingRect))
+      !convert(rd.m_aff * m_colorStyle->getStrokeBBox(m_stroke))
+           .overlaps(rd.m_clippingRect))
     return;
 
   if (m_strokeChanged ||
