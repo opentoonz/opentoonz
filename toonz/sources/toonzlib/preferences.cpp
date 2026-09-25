@@ -631,6 +631,10 @@ void Preferences::definePreferenceItems() {
          QMetaType::Bool, false);
   define(currentCellColor, "currentCellColor", QMetaType::QColor,
          QColor(Qt::cyan));
+  define(customCurrentColumnOutlineColorEnabled,
+         "customCurrentColumnOutlineColorEnabled", QMetaType::Bool, false);
+  define(currentColumnOutlineColor, "currentColumnOutlineColor",
+         QMetaType::QColor, QColor(105, 168, 223));
   define(levelNameDisplayType, "levelNameDisplayType", QMetaType::Int,
          0);  // default
   define(showFrameNumberWithLetters, "showFrameNumberWithLetters",

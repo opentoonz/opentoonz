@@ -160,6 +160,8 @@ enum PreferencesItemId {
   currentColumnColor,
   customCurrentCellColorEnabled,
   currentCellColor,
+  customCurrentColumnOutlineColorEnabled,
+  currentColumnOutlineColor,
   levelNameDisplayType,
   showFrameNumberWithLetters,
   linkColumnNameWithLevel,

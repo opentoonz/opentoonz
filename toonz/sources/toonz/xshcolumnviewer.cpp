@@ -1914,15 +1914,16 @@ void ColumnArea::drawCurrentColumnFocus(QPainter &p, int col) {
   QPoint origin = m_viewer->positionToXY(CellPosition(0, col));
   QRect rect    = o->rect((col < 0) ? PredefinedRect::CAMERA_LAYER_NAME
                                     : PredefinedRect::LAYER_NAME)
-                   .translated(origin)
-                   .adjusted(1, 1, -2, -2);
+                      .translated(origin);
   if (rect.isEmpty()) return;
 
-  QColor color = m_viewer->getCellFocusColor();
+  QColor color = m_viewer->getColumnFocusColor();
   if (color.alpha() == 0) return;
-  p.setPen(QPen(color, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+  p.save();
+  p.setPen(color);
   p.setBrush(Qt::NoBrush);
-  p.drawRect(rect);
+  for (int i = 0; i < 2; ++i) p.drawRect(rect.adjusted(i, i, -i, -i));
+  p.restore();
 }
 
 //-----------------------------------------------------------------------------

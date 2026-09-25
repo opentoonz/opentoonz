@@ -1441,7 +1441,9 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {currentTimelineEnabled, tr("Show Current Time Indicator")},
       {currentColumnColor, tr("Current Column Text Color:")},
       {customCurrentCellColorEnabled, tr("Custom")},
-      {currentCellColor, tr("Active Cell/Column Outlines:")},
+      {currentCellColor, tr("Current Cell Outline:")},
+      {customCurrentColumnOutlineColorEnabled, tr("Custom")},
+      {currentColumnOutlineColor, tr("Current Header Outline:")},
       //{ levelNameOnEachMarkerEnabled, tr("Display Level Name on Each
       // Marker")
       //},
@@ -2317,6 +2319,25 @@ QWidget* PreferencesPopup::createXsheetPage() {
   QGridLayout* lay = new QGridLayout();
   setupLayout(lay);
 
+  auto createOutlineControls = [this](PreferencesItemId enabledId,
+                                      PreferencesItemId colorId,
+                                      const QString& label) {
+    QCheckBox* customCheck = qobject_cast<QCheckBox*>(createUI(enabledId));
+    QWidget* colorField    = createUI(colorId);
+    colorField->setEnabled(customCheck->isChecked());
+    connect(customCheck, &QCheckBox::toggled, colorField, &QWidget::setEnabled);
+    customCheck->setToolTip(tr("When unchecked, use the theme color."));
+
+    QHBoxLayout* controls = new QHBoxLayout();
+    controls->setContentsMargins(0, 0, 0, 0);
+    controls->setSpacing(5);
+    controls->addWidget(new QLabel(label, this));
+    controls->addWidget(customCheck);
+    controls->addWidget(colorField);
+    controls->addStretch(1);
+    return controls;
+  };
+
   insertUI(xsheetLayoutPreference, lay,
            getComboItemList(xsheetLayoutPreference));
   insertUI(levelNameDisplayType, lay, getComboItemList(levelNameDisplayType));
@@ -2336,34 +2357,22 @@ QWidget* PreferencesPopup::createXsheetPage() {
     insertUI(parentColorsInXsheetColumn, xshColHeaderLay);
     insertUI(currentColumnColor, xshColHeaderLay);
 
-    // Reuse the existing color row so the Xsheet page does not grow taller.
-    QCheckBox* customColorCheck =
-        qobject_cast<QCheckBox*>(createUI(customCurrentCellColorEnabled));
-    QWidget* outlineColorField = createUI(currentCellColor);
-    outlineColorField->setEnabled(customColorCheck->isChecked());
-    connect(customColorCheck, &QCheckBox::toggled, outlineColorField,
-            &QWidget::setEnabled);
-
-    QHBoxLayout* outlineLayout = new QHBoxLayout();
-    outlineLayout->setContentsMargins(0, 0, 0, 0);
-    outlineLayout->setSpacing(5);
-    QLabel* outlineLabel = new QLabel(tr("Cell/Column Outlines:"), this);
-    outlineLabel->setToolTip(
-        tr("The active cell and column use the same outline color."));
-    outlineLayout->addWidget(outlineLabel);
-    outlineLayout->addWidget(customColorCheck);
-    outlineLayout->addWidget(outlineColorField);
-    outlineLayout->addStretch(1);
-    xshColHeaderLay->addLayout(outlineLayout, xshColHeaderLay->rowCount() - 1,
-                               2);
-    customColorCheck->setToolTip(
-        tr("When unchecked, both outlines use the current theme color."));
+    // The header outline control shares the existing column text color row.
+    xshColHeaderLay->addLayout(
+        createOutlineControls(customCurrentColumnOutlineColorEnabled,
+                              currentColumnOutlineColor,
+                              tr("Current Header Outline:")),
+        xshColHeaderLay->rowCount() - 1, 2);
   }
   QGridLayout* xshCellAreaLay = insertGroupBox(tr("Xsheet Cell Area"), lay);
   {
     insertUI(highlightLineEverySecond, xshCellAreaLay);
     insertUI(currentTimelineEnabled, xshCellAreaLay);
     insertUI(showFrameNumberWithLetters, xshCellAreaLay);
+    xshCellAreaLay->addLayout(
+        createOutlineControls(customCurrentCellColorEnabled, currentCellColor,
+                              tr("Current Cell Outline:")),
+        xshCellAreaLay->rowCount(), 0, 1, 3);
   }
 
   QGridLayout* showKeyLay =
@@ -2392,6 +2401,10 @@ QWidget* PreferencesPopup::createXsheetPage() {
   m_onEditedFuncMap.insert(customCurrentCellColorEnabled,
                            &PreferencesPopup::onCurrentCellColorChanged);
   m_onEditedFuncMap.insert(currentCellColor,
+                           &PreferencesPopup::onCurrentCellColorChanged);
+  m_onEditedFuncMap.insert(customCurrentColumnOutlineColorEnabled,
+                           &PreferencesPopup::onCurrentCellColorChanged);
+  m_onEditedFuncMap.insert(currentColumnOutlineColor,
                            &PreferencesPopup::onCurrentCellColorChanged);
   m_onEditedFuncMap.insert(
       unifyColumnVisibilityToggles,
