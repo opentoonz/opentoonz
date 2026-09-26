@@ -300,6 +300,8 @@ ProjectPopup::ProjectPopup(bool isModal)
   QRadioButton *standardRB = new QRadioButton(tr("Standard"), this);
   QRadioButton *customRB =
       new QRadioButton(QString("[Experimental]  ") + tr("Custom"), this);
+  m_allowNoSeparatorFormatCB =
+      new CheckBox(tr("Allow No Separator Before Frame Number"), this);
   m_acceptNonAlphabetSuffixCB =
       new CheckBox(tr("Accept Non-alphabet Suffix"), this);
   m_letterCountCombo = new QComboBox(this);
@@ -407,10 +409,11 @@ Note that this mode uses regular expression for file name validation and may slo
       customLay->setHorizontalSpacing(10);
       customLay->setVerticalSpacing(10);
       {
-        customLay->addWidget(m_acceptNonAlphabetSuffixCB, 0, 0, 1, 2);
+        customLay->addWidget(m_allowNoSeparatorFormatCB, 0, 0, 1, 2);
+        customLay->addWidget(m_acceptNonAlphabetSuffixCB, 1, 0, 1, 2);
         customLay->addWidget(
-            new QLabel(tr("Maximum Letter Count For Suffix"), this), 1, 0);
-        customLay->addWidget(m_letterCountCombo, 1, 1);
+            new QLabel(tr("Maximum Letter Count For Suffix"), this), 2, 0);
+        customLay->addWidget(m_letterCountCombo, 2, 1);
       }
       customLay->setColumnStretch(2, 1);
       fpLayout->addLayout(customLay, 0);
@@ -494,12 +497,14 @@ void ProjectPopup::updateFieldsFromProject(std::shared_ptr<TProject> project) {
   }
 
   // file path
-  FilePathProperties *fpProp = project->getFilePathProperties();
-  bool useStandard           = fpProp->useStandard();
-  bool acceptNonAlphabet     = fpProp->acceptNonAlphabetSuffix();
-  int letterCount            = fpProp->letterCountForSuffix();
+  FilePathProperties *fpProp    = project->getFilePathProperties();
+  bool useStandard              = fpProp->useStandard();
+  bool acceptNonAlphabet        = fpProp->acceptNonAlphabetSuffix();
+  int letterCount               = fpProp->letterCountForSuffix();
+  bool noSeparatorFormatAllowed = fpProp->noSeparatorFormatAllowed();
   m_rulePreferenceBG->button((useStandard) ? Rule_Standard : Rule_Custom)
       ->setChecked(true);
+  m_allowNoSeparatorFormatCB->setChecked(noSeparatorFormatAllowed);
   m_acceptNonAlphabetSuffixCB->setChecked(acceptNonAlphabet);
   m_letterCountCombo->setCurrentIndex(
       m_letterCountCombo->findData(letterCount));
@@ -526,12 +531,14 @@ void ProjectPopup::updateProjectFromFields(std::shared_ptr<TProject> project) {
   bool useStandard           = m_rulePreferenceBG->checkedId() == Rule_Standard;
   bool acceptNonAlphabet     = m_acceptNonAlphabetSuffixCB->isChecked();
   int letterCount            = m_letterCountCombo->currentData().toInt();
+  bool allowNoSeparatorFormat = m_allowNoSeparatorFormatCB->isChecked();
   fpProp->setUseStandard(useStandard);
   fpProp->setAcceptNonAlphabetSuffix(acceptNonAlphabet);
   fpProp->setLetterCountForSuffix(letterCount);
+  fpProp->setNoSeparatorFormatAllowed(allowNoSeparatorFormat);
 
   if (TFilePath::setFilePathProperties(useStandard, acceptNonAlphabet,
-                                       letterCount))
+                                       letterCount, allowNoSeparatorFormat))
     DvDirModel::instance()->refreshFolderChild(QModelIndex());  // refresh all
 
   TProjectManager::instance()->notifyProjectChanged();
@@ -559,6 +566,7 @@ void ProjectPopup::showEvent(QShowEvent *) {
 //-----------------------------------------------------------------------------
 
 void ProjectPopup::onRulePreferenceToggled(int id, bool on) {
+  m_allowNoSeparatorFormatCB->setEnabled((id == Rule_Custom) == on);
   m_acceptNonAlphabetSuffixCB->setEnabled((id == Rule_Custom) == on);
   m_letterCountCombo->setEnabled((id == Rule_Custom) == on);
 }
@@ -596,6 +604,8 @@ ProjectSettingsPopup::ProjectSettingsPopup() : ProjectPopup(false) {
 
   // file path settings
   connect(m_rulePreferenceBG, SIGNAL(idClicked(int)), this,
+          SLOT(onSomethingChanged()));
+  connect(m_allowNoSeparatorFormatCB, SIGNAL(clicked(bool)), this,
           SLOT(onSomethingChanged()));
   connect(m_acceptNonAlphabetSuffixCB, SIGNAL(clicked(bool)), this,
           SLOT(onSomethingChanged()));
@@ -769,6 +779,7 @@ void ProjectCreatePopup::showEvent(QShowEvent *) {
 
   // default file path settings
   m_rulePreferenceBG->button(Rule_Standard)->setChecked(true);
+  m_allowNoSeparatorFormatCB->setChecked(false);
   m_acceptNonAlphabetSuffixCB->setChecked(false);
   m_letterCountCombo->setCurrentIndex(m_letterCountCombo->findData(1));
 }

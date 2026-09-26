@@ -1022,9 +1022,9 @@ std::shared_ptr<TProject> TProjectManager::getCurrentProject() {
 
     // update TFilePath condition on loading the current project
     FilePathProperties *fpProp = currentProject->getFilePathProperties();
-    TFilePath::setFilePathProperties(fpProp->useStandard(),
-                                     fpProp->acceptNonAlphabetSuffix(),
-                                     fpProp->letterCountForSuffix());
+    TFilePath::setFilePathProperties(
+        fpProp->useStandard(), fpProp->acceptNonAlphabetSuffix(),
+        fpProp->letterCountForSuffix(), fpProp->noSeparatorFormatAllowed());
   }
   return currentProject;
 }
