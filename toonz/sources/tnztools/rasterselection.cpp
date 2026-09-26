@@ -32,12 +32,164 @@
 
 #include <QApplication>
 #include <QClipboard>
+#include <QDataStream>
+#include <QFile>
+#include <QTemporaryDir>
 
 #include "timage_io.h"
 #include "tropcm.h"
+#include "tstream.h"
 
 //=============================================================================
 namespace {
+TStroke getStrokeByRect(TRectD r);
+
+const char *const DrawingClipboardFormat =
+    "application/x-opentoonz-raster-selection-v1";
+
+// Keep the palette in the payload, so a Toonz raster selection can be pasted
+// into another process without relying on pointers owned by the first one.
+QByteArray paletteBytes(const TPaletteP &palette) {
+  if (!palette) return QByteArray();
+  QTemporaryDir dir;
+  if (!dir.isValid()) return QByteArray();
+  QString name = dir.filePath("selection.tpl");
+  {
+    TOStream os(TFilePath(name.toStdWString()));
+    os << palette.getPointer();
+  }
+  QFile file(name);
+  return file.open(QIODevice::ReadOnly) ? file.readAll() : QByteArray();
+}
+
+TPaletteP paletteFromBytes(const QByteArray &bytes) {
+  if (bytes.isEmpty()) return TPaletteP();
+  QTemporaryDir dir;
+  if (!dir.isValid()) return TPaletteP();
+  QString name = dir.filePath("selection.tpl");
+  QFile file(name);
+  if (!file.open(QIODevice::WriteOnly) || file.write(bytes) != bytes.size())
+    return TPaletteP();
+  file.close();
+  TPersist *persist = nullptr;
+  try {
+    TIStream is(TFilePath(name.toStdWString()));
+    is >> persist;
+  } catch (...) {
+    delete persist;
+    return TPaletteP();
+  }
+  TPalette *palette = dynamic_cast<TPalette *>(persist);
+  if (!palette) delete persist;
+  return TPaletteP(palette);
+}
+
+QImage clipboardImage(const TRasterP &raster, const TPaletteP &palette) {
+  if (!raster) return QImage();
+  TRaster32P rgba = raster;
+  if (!rgba) {
+    rgba = TRaster32P(raster->getSize());
+    if (TRasterCM32P cm = raster)
+      TRop::convert(rgba, cm, palette);
+    else
+      TRop::convert(rgba, raster);
+  }
+  // The QImage returned by rasterToQImage borrows the raster's storage.
+  return rasterToQImage(rgba).copy();
+}
+
+QByteArray encodeDrawing(const TRasterP &raster, const TPaletteP &palette,
+                         double dpiX, double dpiY, const TRectD &bounds,
+                         const TAffine &affine) {
+  if (!raster || raster->getLx() <= 0 || raster->getLy() <= 0)
+    return QByteArray();
+  const bool cm          = (TRasterCM32P)raster;
+  QByteArray paletteData = cm ? paletteBytes(palette) : QByteArray();
+  if (cm && paletteData.isEmpty()) return QByteArray();
+  QByteArray bytes;
+  QDataStream stream(&bytes, QIODevice::WriteOnly);
+  stream.setVersion(QDataStream::Qt_5_15);
+  stream << quint32(1) << cm << dpiX << dpiY << bounds.x0 << bounds.y0
+         << bounds.x1 << bounds.y1 << affine.a11 << affine.a12 << affine.a13
+         << affine.a21 << affine.a22 << affine.a23 << paletteData;
+  if (cm) {
+    TRasterCM32P ras = raster;
+    QByteArray pixels;
+    QDataStream pixelStream(&pixels, QIODevice::WriteOnly);
+    for (int y = 0; y < ras->getLy(); ++y)
+      for (int x = 0; x < ras->getLx(); ++x)
+        pixelStream << quint32(ras->pixels(y)[x].getValue());
+    stream << ras->getLx() << ras->getLy() << qCompress(pixels);
+  } else {
+    stream << clipboardImage(raster, palette);
+  }
+  return stream.status() == QDataStream::Ok ? bytes : QByteArray();
+}
+
+std::unique_ptr<RasterImageData> decodeDrawing(const QMimeData *mime) {
+  if (!mime || !mime->hasFormat(DrawingClipboardFormat)) return nullptr;
+  QByteArray bytes = mime->data(DrawingClipboardFormat);
+  if (bytes.isEmpty() || bytes.size() > 256 * 1024 * 1024) return nullptr;
+  QDataStream stream(&bytes, QIODevice::ReadOnly);
+  stream.setVersion(QDataStream::Qt_5_15);
+  quint32 version;
+  bool cm;
+  double dpiX, dpiY, x0, y0, x1, y1, a11, a12, a13, a21, a22, a23;
+  QByteArray paletteData;
+  stream >> version >> cm >> dpiX >> dpiY >> x0 >> y0 >> x1 >> y1 >> a11 >>
+      a12 >> a13 >> a21 >> a22 >> a23 >> paletteData;
+  if (stream.status() != QDataStream::Ok || version != 1) return nullptr;
+  TPaletteP palette =
+      cm ? paletteFromBytes(paletteData) : TPaletteP(new TPalette);
+  if (!palette) return nullptr;
+  TRasterP raster;
+  if (cm) {
+    int width, height;
+    QByteArray compressed;
+    stream >> width >> height >> compressed;
+    if (stream.status() != QDataStream::Ok || width <= 0 || height <= 0 ||
+        width > 16384 || height > 16384 ||
+        qint64(width) * height * 4 > 256 * 1024 * 1024)
+      return nullptr;
+    if (compressed.size() < 4) return nullptr;
+    const auto *header =
+        reinterpret_cast<const unsigned char *>(compressed.constData());
+    const quint32 expandedSize = (quint32(header[0]) << 24) |
+                                 (quint32(header[1]) << 16) |
+                                 (quint32(header[2]) << 8) | header[3];
+    if (expandedSize != qint64(width) * height * 4) return nullptr;
+    QByteArray pixels = qUncompress(compressed);
+    if (pixels.size() != qint64(width) * height * 4) return nullptr;
+    QDataStream pixelStream(&pixels, QIODevice::ReadOnly);
+    TRasterCM32P cmRaster(width, height);
+    for (int y = 0; y < height; ++y)
+      for (int x = 0; x < width; ++x) {
+        quint32 value;
+        pixelStream >> value;
+        cmRaster->pixels(y)[x] = TPixelCM32(value);
+      }
+    raster = cmRaster;
+  } else {
+    QImage image;
+    stream >> image;
+    if (image.isNull() || image.width() > 16384 || image.height() > 16384 ||
+        qint64(image.width()) * image.height() * 4 > 256 * 1024 * 1024)
+      return nullptr;
+    raster = rasterFromQImage(image.convertToFormat(QImage::Format_ARGB32));
+  }
+  if (stream.status() != QDataStream::Ok || !raster) return nullptr;
+  TRectD bounds(x0, y0, x1, y1);
+  if (bounds.isEmpty()) return nullptr;
+  std::vector<TStroke> strokes(1, getStrokeByRect(bounds));
+  std::vector<TRectD> rects;
+  TAffine affine(a11, a12, a13, a21, a22, a23);
+  std::unique_ptr<RasterImageData> result(
+      cm ? static_cast<RasterImageData *>(new ToonzImageData)
+         : static_cast<RasterImageData *>(new FullColorImageData));
+  result->setData(raster, palette, dpiX, dpiY, raster->getSize(), rects,
+                  strokes, strokes, affine);
+  return result;
+}
 //-----------------------------------------------------------------------------
 
 TRasterP getRaster(const TImageP image) {
@@ -1149,18 +1301,33 @@ void RasterSelection::copySelection() {
 
   double dpix, dpiy;
   std::vector<TRectD> rect;
+  TRectD bounds;
+  for (const TStroke &stroke : m_strokes) bounds += stroke.getBBox();
+  if (bounds.isEmpty())
+    bounds = TRectD(-ras->getLx() / 2.0, -ras->getLy() / 2.0,
+                    ras->getLx() / 2.0, ras->getLy() / 2.0);
   if (TToonzImageP ti = (TToonzImageP)(m_currentImage)) {
-    ToonzImageData *data = new ToonzImageData();
+    std::unique_ptr<ToonzImageData> data(new ToonzImageData());
     ti->getDpi(dpix, dpiy);
     data->setData(ras, ti->getPalette(), dpix, dpiy, ti->getSize(), rect,
                   m_strokes, m_originalStrokes, m_affine);
-    QApplication::clipboard()->setMimeData(cloneData(data));
+    data->setImageData(clipboardImage(ras, ti->getPalette()));
+    QByteArray payload =
+        encodeDrawing(ras, ti->getPalette(), dpix, dpiy, bounds, m_affine);
+    if (!payload.isEmpty())
+      data->QMimeData::setData(DrawingClipboardFormat, payload);
+    QApplication::clipboard()->setMimeData(data.release());
   } else if (TRasterImageP ri = (TRasterImageP)(m_currentImage)) {
-    FullColorImageData *data = new FullColorImageData();
+    std::unique_ptr<FullColorImageData> data(new FullColorImageData());
     ri->getDpi(dpix, dpiy);
     data->setData(ras, ri->getPalette(), dpix, dpiy, ri->getRaster()->getSize(),
                   rect, m_strokes, m_originalStrokes, m_affine);
-    QApplication::clipboard()->setMimeData(cloneData(data));
+    data->setImageData(clipboardImage(ras, ri->getPalette()));
+    QByteArray payload =
+        encodeDrawing(ras, ri->getPalette(), dpix, dpiy, bounds, m_affine);
+    if (!payload.isEmpty())
+      data->QMimeData::setData(DrawingClipboardFormat, payload);
+    QApplication::clipboard()->setMimeData(data.release());
   }
 }
 
@@ -1243,6 +1410,16 @@ void RasterSelection::pasteSelection() {
       dynamic_cast<const RasterImageData *>(clipboard->mimeData());
   const StrokesData *stData =
       dynamic_cast<const StrokesData *>(clipboard->mimeData());
+  std::unique_ptr<StrokesData> transferredStrokes;
+  if (!stData && !riData) {
+    transferredStrokes.reset(StrokesData::fromClipboard(clipboard->mimeData()));
+    stData = transferredStrokes.get();
+  }
+  std::unique_ptr<RasterImageData> transferredData;
+  if (!riData && !stData) {
+    transferredData = decodeDrawing(clipboard->mimeData());
+    riData          = transferredData.get();
+  }
   QImage clipImage = clipboard->image();
   if (!riData && !stData && clipImage.height() == 0) return;
   if (isFloating()) pasteFloatingSelection();
@@ -1286,8 +1463,9 @@ void RasterSelection::pasteSelection() {
     }
   }
 
-  if (clipImage.height() > 0 && (levelType == OVL_XSHLEVEL ||
-                                 m_currentImage->getType() == OVL_XSHLEVEL)) {
+  if (!riData && clipImage.height() > 0 &&
+      (levelType == OVL_XSHLEVEL ||
+       m_currentImage->getType() == OVL_XSHLEVEL)) {
     // An image was pasted from outside OpenToonz
 
     // Set up variables
@@ -1314,7 +1492,7 @@ void RasterSelection::pasteSelection() {
       m_originalStrokes.push_back(stroke);
     }
     // pack up the data to send to the next pasteSelection
-    FullColorImageData *qimageData = new FullColorImageData();
+    std::unique_ptr<FullColorImageData> qimageData(new FullColorImageData());
 
     qimageData->setData(ras, ri->getPalette(), 120.0, 120.0,
                         ri->getRaster()->getSize(), rects, m_strokes,
@@ -1323,7 +1501,8 @@ void RasterSelection::pasteSelection() {
                             0.0 - clipImage.height() / 2, clipImage.width() / 2,
                             clipImage.height() / 2));
 
-    riData = qimageData;
+    riData          = qimageData.get();
+    transferredData = std::move(qimageData);
   }
 
   if (!riData) return;
