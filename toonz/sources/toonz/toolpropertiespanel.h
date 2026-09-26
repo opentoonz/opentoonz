@@ -63,6 +63,7 @@ class SelectionRotationField;
 class SelectionMoveField;
 class ThickChangeField;
 class MeasuredValueField;
+class PegbarChannelField;
 class ClickableLabel;
 class SelectionTool;
 class PlasticTool;
@@ -129,6 +130,11 @@ class ToolPropertiesPanel : public TPanel {
   QList<QWidget *> m_animateSplineRowWidgets;
   QList<QWidget *> m_animateXYRowWidgets;
   QList<MeasuredValueField *> m_animateMeasuredFields;
+  QWidget *m_animateAxisFieldsHost = nullptr;
+  QList<QWidget *> m_animateAxisSections;
+  int m_animateVisibleAxis = -1;
+  PegbarChannelField *m_animateScaleHField = nullptr;
+  PegbarChannelField *m_animateScaleVField = nullptr;
 
   // Shift && Trace (Edit Shift pseudo-tool only).
   QWidget   *m_shiftTraceGhostPicker     = nullptr;
@@ -240,6 +246,8 @@ private:
   void updatePlasticRelayFields();
   void createAnimateProperties();
   void updateAnimateColumnPicker();
+  void syncAnimateAxisFromTool();
+  void updateAnimateActiveAxisVisibility();
   QWidget *createEnumIconGridPanel(
       const QString &label, TEnumProperty *enumProp, const std::string &propName,
       int propGroup = 0, QWidget *parentWidget = nullptr,
@@ -262,10 +270,10 @@ private:
   void refreshTypeStyleWidget();
 
   // Helper methods
-  void createDoublePairSlider(const QString &label, void *prop, 
-                              const std::string &propName);
-  void createIntPairSlider(const QString &label, void *prop, 
-                           const std::string &propName);
+  void createDoublePairSlider(const QString &label, void *prop,
+                              const std::string &propName, int propGroup = 0);
+  void createIntPairSlider(const QString &label, void *prop,
+                           const std::string &propName, int propGroup = 0);
   QWidget* createSliderWithLabel(const QString &label, int min, int max, int value, 
                                  const std::string &propName);
   QWidget* createDoubleSliderWithLabel(const QString &label, double min, double max, 

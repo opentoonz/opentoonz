@@ -18,6 +18,8 @@
 #include "tconst.h"
 #include "toonz/tframehandle.h"
 
+#include <algorithm>
+
 //----------------------------------------------------------------------------------------------
 
 RulerTool::RulerTool()
@@ -34,6 +36,13 @@ RulerTool::RulerTool()
 
 void RulerTool::setToolOptionsBox(RulerToolOptionsBox *toolOptionsBox) {
   m_toolOptionsBox.push_back(toolOptionsBox);
+}
+
+void RulerTool::unsetToolOptionsBox(RulerToolOptionsBox *toolOptionsBox) {
+  m_toolOptionsBox.erase(
+      std::remove(m_toolOptionsBox.begin(), m_toolOptionsBox.end(),
+                  toolOptionsBox),
+      m_toolOptionsBox.end());
 }
 
 //----------------------------------------------------------------------------------------------
