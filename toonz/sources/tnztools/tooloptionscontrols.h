@@ -97,6 +97,7 @@ protected:
 public:
   ToolOptionCheckbox(TTool *tool, TBoolProperty *property,
                      ToolHandle *toolHandle = 0, QWidget *parent = 0);
+  ~ToolOptionCheckbox() override;
   void updateStatus() override;
 
 protected:
@@ -188,6 +189,7 @@ protected:
 public:
   ToolOptionCombo(TTool *tool, TEnumProperty *property,
                   ToolHandle *toolHandle = 0);
+  ~ToolOptionCombo();
   void updateStatus() override;
 
   TEnumProperty *getProperty() const { return m_property; }
@@ -210,6 +212,7 @@ protected:
 public:
   ToolOptionFontCombo(TTool *tool, TEnumProperty *property,
                       ToolHandle *toolHandle = 0);
+  ~ToolOptionFontCombo();
   void updateStatus() override;
 
   TEnumProperty *getProperty() const { return m_property; }
@@ -247,11 +250,13 @@ protected:
   TStringProperty *m_property;
 
 public:
-  ToolOptionTextField(TTool *tool, TStringProperty *property);
+  ToolOptionTextField(TTool *tool, TStringProperty *property,
+                      ToolHandle *toolHandle = 0);
   void updateStatus() override;
 
 public slots:
 
+  void onLiveTextChanged(const QString &);
   void onValueChanged();
 };
 

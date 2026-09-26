@@ -296,6 +296,14 @@ ToolPropertiesPanel::ToolPropertiesPanel(QWidget *parent)
 }
 
 ToolPropertiesPanel::~ToolPropertiesPanel() {
+  if (m_rulerOptionsBox && m_rulerOptionsBoxRegistered) {
+    if (auto *ruler = dynamic_cast<RulerTool *>(getCurrentTool()))
+      ruler->unsetToolOptionsBox(m_rulerOptionsBox);
+    else if (auto *ruler = dynamic_cast<RulerTool *>(
+                 TTool::getTool("T_Ruler", TTool::ToonzImage)))
+      ruler->unsetToolOptionsBox(m_rulerOptionsBox);
+    m_rulerOptionsBoxRegistered = false;
+  }
   disconnectSignals();
 }
 
@@ -376,24 +384,32 @@ void ToolPropertiesPanel::connectSignals() {
   }
   
   if (m_toolHandle) {
-    connect(m_toolHandle, SIGNAL(toolSwitched()), this, SLOT(onToolSwitched()));
-    connect(m_toolHandle, SIGNAL(toolChanged()), this, SLOT(onToolChanged()));
+    connect(m_toolHandle, SIGNAL(toolSwitched()), this, SLOT(onToolSwitched()),
+            Qt::UniqueConnection);
+    connect(m_toolHandle, SIGNAL(toolChanged()), this, SLOT(onToolChanged()),
+            Qt::UniqueConnection);
     connect(m_toolHandle, SIGNAL(toolComboBoxListChanged(std::string)), this,
-            SLOT(onToolComboBoxListChanged(std::string)));
+            SLOT(onToolComboBoxListChanged(std::string)), Qt::UniqueConnection);
     connect(m_toolHandle, SIGNAL(toolOptionsBoxChanged()), this,
-            SLOT(onSceneContextChanged()));
+            SLOT(onSceneContextChanged()), Qt::UniqueConnection);
   }
 
   TApplication *app = TApp::instance();
   if (app) {
     connect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this,
-            SLOT(onSceneContextChanged()));
+            SLOT(onSceneContextChanged()), Qt::UniqueConnection);
     connect(app->getCurrentLevel(), SIGNAL(xshLevelSwitched(TXshLevel *)), this,
-            SLOT(onSceneContextChanged()));
+            SLOT(onSceneContextChanged()), Qt::UniqueConnection);
     connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
-            SLOT(onSceneContextChanged()));
+            SLOT(onSceneContextChanged()), Qt::UniqueConnection);
     connect(app->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()), this,
-            SLOT(onSceneContextChanged()));
+            SLOT(onSceneContextChanged()), Qt::UniqueConnection);
+    if (TObjectHandle *objHandle = app->getCurrentObject()) {
+      connect(objHandle, SIGNAL(objectChanged(bool)), this,
+              SLOT(onToolChanged()), Qt::UniqueConnection);
+      connect(objHandle, SIGNAL(objectSwitched()), this, SLOT(onToolChanged()),
+              Qt::UniqueConnection);
+    }
   }
 }
 
@@ -417,6 +433,12 @@ void ToolPropertiesPanel::disconnectSignals() {
                SLOT(onSceneContextChanged()));
     disconnect(app->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()), this,
                SLOT(onSceneContextChanged()));
+    if (TObjectHandle *objHandle = app->getCurrentObject()) {
+      disconnect(objHandle, SIGNAL(objectChanged(bool)), this,
+                 SLOT(onToolChanged()));
+      disconnect(objHandle, SIGNAL(objectSwitched()), this,
+                 SLOT(onToolChanged()));
+    }
   }
 }
 
@@ -826,6 +848,12 @@ void ToolPropertiesPanel::clearProperties() {
       QWidget *w = item->widget();
       // Ruler measurements are owned by the panel, not rebuilt each refresh.
       if (w == m_rulerOptionsBox) {
+        if (m_rulerOptionsBoxRegistered) {
+          if (auto *ruler = dynamic_cast<RulerTool *>(
+                  TTool::getTool("T_Ruler", TTool::ToonzImage)))
+            ruler->unsetToolOptionsBox(m_rulerOptionsBox);
+          m_rulerOptionsBoxRegistered = false;
+        }
         m_rulerOptionsBox->hide();
         m_rulerOptionsBox->setParent(this);
         delete item;
@@ -846,6 +874,11 @@ void ToolPropertiesPanel::clearProperties() {
   m_animateSplineRowWidgets.clear();
   m_animateXYRowWidgets.clear();
   m_animateMeasuredFields.clear();
+  m_animateAxisFieldsHost = nullptr;
+  m_animateAxisSections.clear();
+  m_animateVisibleAxis    = -1;
+  m_animateScaleHField    = nullptr;
+  m_animateScaleVField    = nullptr;
 
   m_selScaleX = m_selScaleY = nullptr;
   m_selRotation             = nullptr;
@@ -2262,6 +2295,30 @@ void uniformPlasticFieldWidget(QWidget *widget) {
 }
 
 void syncPlasticRelayField(MeasuredValueField *field,
+                           TDoubleParamRelayProperty *relay);
+
+class PlasticRelayFieldSync final : public QObject,
+                                    public TProperty::Listener {
+  QPointer<MeasuredValueField> m_field;
+  TDoubleParamRelayProperty *m_relay;
+
+public:
+  PlasticRelayFieldSync(MeasuredValueField *field,
+                        TDoubleParamRelayProperty *relay, QObject *parent)
+      : QObject(parent), m_field(field), m_relay(relay) {
+    if (m_relay) m_relay->addListener(this);
+  }
+
+  ~PlasticRelayFieldSync() override {
+    if (m_relay) m_relay->removeListener(this);
+  }
+
+  void onPropertyChanged() override {
+    if (m_field && m_relay) syncPlasticRelayField(m_field, m_relay);
+  }
+};
+
+void syncPlasticRelayField(MeasuredValueField *field,
                            TDoubleParamRelayProperty *relay) {
   if (!field || !relay) return;
 
@@ -2577,6 +2634,8 @@ QWidget *ToolPropertiesPanel::createTextProperty(const QString &label,
                                                  const std::string &propName,
                                                  int propGroup) {
   QWidget *container = new QWidget(this);
+  container->setProperty("propName", QString::fromStdString(propName));
+  container->setProperty("propGroup", propGroup);
   QVBoxLayout *layout = new QVBoxLayout(container);
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(2);
@@ -2586,22 +2645,35 @@ QWidget *ToolPropertiesPanel::createTextProperty(const QString &label,
 
   QLineEdit *lineEdit = new QLineEdit(container);
   lineEdit->setText(QString::fromStdWString(prop->getValue()));
-  lineEdit->setProperty("propName", QString::fromStdString(propName));
-  lineEdit->setProperty("propGroup", propGroup);
   storeTppPropertyPtr(container, prop);
   layout->addWidget(lineEdit);
 
-  connect(lineEdit, &QLineEdit::editingFinished, [this, container, lineEdit]() {
+  connect(lineEdit, &QLineEdit::editingFinished, [this, container, lineEdit,
+                                                   propName, propGroup]() {
     TTool *tool = getCurrentTool();
     if (!tool) return;
 
-    const std::string name =
-        lineEdit->property("propName").toString().toStdString();
-    const int group = lineEdit->property("propGroup").toInt();
-    TProperty *p = resolveTppProperty(tool, container, group, name);
+    TProperty *p = resolveTppProperty(tool, container, propGroup, propName);
     if (auto *sp = dynamic_cast<TStringProperty *>(p)) {
       sp->setValue(lineEdit->text().toStdWString());
-      tool->onPropertyChanged(name, true);
+      tool->onPropertyChanged(propName, true);
+      sp->notifyListeners();
+      if (m_toolHandle) m_toolHandle->notifyToolChanged();
+    }
+  });
+
+  connect(lineEdit, &QLineEdit::textChanged, [this, container, lineEdit, propName,
+                                              propGroup]() {
+    if (!lineEdit->hasFocus()) return;
+
+    TTool *tool = getCurrentTool();
+    if (!tool) return;
+
+    TProperty *p = resolveTppProperty(tool, container, propGroup, propName);
+    if (auto *sp = dynamic_cast<TStringProperty *>(p)) {
+      const std::wstring w = lineEdit->text().toStdWString();
+      if (sp->getValue() == w) return;
+      sp->setValue(w);
       sp->notifyListeners();
       if (m_toolHandle) m_toolHandle->notifyToolChanged();
     }
@@ -3699,12 +3771,12 @@ void ToolPropertiesPanel::createDoublePairByName(const QString &label,
 
     TDoublePairProperty *dp = dynamic_cast<TDoublePairProperty *>(prop);
     if (dp) {
-      createDoublePairSlider(label, dp, propName);
+      createDoublePairSlider(label, dp, propName, propGroup);
       return;
     }
     TIntPairProperty *ip = dynamic_cast<TIntPairProperty *>(prop);
     if (ip) {
-      createIntPairSlider(label, ip, propName);
+      createIntPairSlider(label, ip, propName, propGroup);
       return;
     }
     return;
@@ -3836,7 +3908,7 @@ bool ToolPropertiesPanel::createGenericProperties(int propGroup,
       continue;
 
     } else if (dynamic_cast<TIntPairProperty *>(prop)) {
-      createIntPairSlider(label, prop, name);
+      createIntPairSlider(label, prop, name, propGroup);
       addedAny = true;
       continue;
     }
@@ -3859,15 +3931,16 @@ bool ToolPropertiesPanel::createGenericProperties(int propGroup,
 void ToolPropertiesPanel::createRulerProperties() {
   TTool *tool = getCurrentTool();
   auto *ruler = dynamic_cast<RulerTool *>(tool);
+  if (!ruler)
+    ruler = dynamic_cast<RulerTool *>(TTool::getTool("T_Ruler", TTool::ToonzImage));
   if (!ruler) return;
+  if (!tool) tool = ruler;
 
-  // RulerTool has no TPropertyGroup — it pushes live measurements to registered
-  // RulerToolOptionsBox instances (same mechanism as the horizontal options bar).
   if (!m_rulerOptionsBox) {
-    // Vertical layout for the side properties panel (toolbar keeps horizontal).
-    m_rulerOptionsBox = new RulerToolOptionsBox(this, tool, true);
-    m_rulerOptionsBox->setSizePolicy(QSizePolicy::Preferred,
-                                     QSizePolicy::Minimum);
+    m_rulerOptionsBox =
+        new RulerToolOptionsBox(m_propertiesContainer, tool, true);
+    m_rulerOptionsBox->setSizePolicy(QSizePolicy::Expanding,
+                                     QSizePolicy::Preferred);
   } else {
     m_rulerOptionsBox->setParent(m_propertiesContainer);
   }
@@ -3878,9 +3951,8 @@ void ToolPropertiesPanel::createRulerProperties() {
   }
 
   m_rulerOptionsBox->resetValues();
-  m_rulerOptionsBox->hide();
-  // Keep registered for live measurement updates, but do not show in the panel:
-  // the ruler has no adjustable properties (same message as Iron / Zoom).
+  m_rulerOptionsBox->show();
+  m_propertiesLayout->addWidget(m_rulerOptionsBox);
 }
 
 void ToolPropertiesPanel::createEditAssistantsProperties() {
@@ -4491,9 +4563,7 @@ void ToolPropertiesPanel::createPlasticAnimateModeProperties(
     relayGrid->addWidget(field, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
     connectClickableLabel(label, field);
 
-    QObject::connect(field, &QLineEdit::editingFinished, [this]() {
-      if (m_toolHandle) m_toolHandle->notifyToolChanged();
-    });
+    new PlasticRelayFieldSync(field, relay, field);
   };
 
   addRelayRow(0, tr("Distance"), &plastic->distanceRelayProperty(),
@@ -4580,22 +4650,39 @@ void ToolPropertiesPanel::createPlasticProperties() {
       const QString vertexLabel =
           sp->getQStringName().isEmpty() ? tr("Vertex Name")
                                          : sp->getQStringName();
+      auto commitVertexName = [this](const QString &text) {
+        TTool *t = getCurrentTool();
+        if (!t) return;
+        TPropertyGroup *pg = t->getProperties(PlasticTool::MODES_COUNT);
+        if (!pg) return;
+        if (auto *vp =
+                dynamic_cast<TStringProperty *>(pg->getProperty("vertexName"))) {
+          if (QString::fromStdWString(vp->getValue()) == text) return;
+          vp->setValue(text.toStdWString());
+          t->onPropertyChanged("vertexName");
+          vp->notifyListeners();
+          if (m_toolHandle) m_toolHandle->notifyToolChanged();
+        }
+      };
       m_plasticVertexWidget = createCollapsibleTextField(
           vertexLabel, QString::fromStdWString(sp->getValue()),
           "plastic_vertex", "vertexName", PlasticTool::MODES_COUNT,
-          [this](const QString &text) {
-            TTool *t = getCurrentTool();
-            if (!t) return;
-            TPropertyGroup *pg = t->getProperties(PlasticTool::MODES_COUNT);
-            if (!pg) return;
-            if (auto *vp =
-                    dynamic_cast<TStringProperty *>(pg->getProperty("vertexName"))) {
-              vp->setValue(text.toStdWString());
-              t->onPropertyChanged("vertexName");
-              if (m_toolHandle) m_toolHandle->notifyToolChanged();
-            }
-          },
-          true);
+          commitVertexName, true);
+      m_plasticVertexWidget->setProperty("propName", QStringLiteral("vertexName"));
+      m_plasticVertexWidget->setProperty("propGroup",
+                                         PlasticTool::MODES_COUNT);
+      storeTppPropertyPtr(m_plasticVertexWidget, sp);
+      if (QLineEdit *vertexEdit = m_plasticVertexWidget->findChild<QLineEdit *>(
+              "collapsibleTextEdit")) {
+        QObject::connect(vertexEdit, &QLineEdit::textChanged, this,
+                         [commitVertexName, this](const QString &text) {
+                           commitVertexName(text);
+                           if (QLabel *valueLabel =
+                                   m_plasticVertexWidget->findChild<QLabel *>(
+                                       "textValueLabel"))
+                             valueLabel->setText(text);
+                         });
+      }
       m_propertiesLayout->addWidget(m_plasticVertexWidget);
     }
   }
@@ -4619,8 +4706,21 @@ namespace {
 
 void updateToolOptionControlsIn(QWidget *root) {
   if (!root) return;
+
+  for (PegbarChannelField *field :
+       root->findChildren<PegbarChannelField *>())
+    field->updateStatus();
+  for (PegbarCenterField *field : root->findChildren<PegbarCenterField *>())
+    field->updateStatus();
+  for (NoScaleField *field : root->findChildren<NoScaleField *>())
+    field->updateStatus();
+
   const QList<QWidget *> widgets = root->findChildren<QWidget *>();
   for (QWidget *w : widgets) {
+    if (qobject_cast<PegbarChannelField *>(w) ||
+        qobject_cast<PegbarCenterField *>(w) ||
+        qobject_cast<NoScaleField *>(w))
+      continue;
     if (auto *c = dynamic_cast<ToolOptionControl *>(w)) c->updateStatus();
   }
 }
@@ -5043,6 +5143,42 @@ void addTypeToolComboRow(QWidget *parent, QVBoxLayout *layout,
 
 }  // namespace
 
+namespace {
+
+constexpr int kAnimateAxisSectionCount = 5;
+constexpr int kAnimateAllAxisIndex     = 5;
+
+QPushButton *animateAuxIconButton(QWidget *parent, const char *iconName,
+                                  const QString &tip) {
+  auto *btn = new QPushButton(parent);
+  btn->setFixedSize(20, CollapsibleStyle::kFieldHeight);
+  btn->setIcon(createQIcon(iconName));
+  btn->setIconSize(QSize(20, 20));
+  btn->setToolTip(tip);
+  btn->setFlat(true);
+  return btn;
+}
+
+void animateGridAddFieldWithAux(QGridLayout *grid, int row, int fieldCol,
+                                QWidget *parent, MeasuredValueField *field,
+                                QWidget *aux) {
+  styleAnimateGridField(field);
+  if (!aux) {
+    grid->addWidget(field, row, fieldCol);
+    return;
+  }
+  QWidget *cell = new QWidget(parent);
+  cell->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+  QHBoxLayout *hl = new QHBoxLayout(cell);
+  hl->setContentsMargins(0, 0, 0, 0);
+  hl->setSpacing(4);
+  hl->addWidget(field, 1);
+  hl->addWidget(aux, 0);
+  grid->addWidget(cell, row, fieldCol);
+}
+
+}  // namespace
+
 void ToolPropertiesPanel::createAnimateProperties() {
   TTool *tool = getCurrentTool();
   if (!tool || detectCurrentToolId() != T_Edit) return;
@@ -5059,7 +5195,6 @@ void ToolPropertiesPanel::createAnimateProperties() {
 
   tool->updateTranslation();
 
-  // 1–2. Collapsible capsules — full panel width so triangles align
   m_animateColumnWidget = createAnimateColumnPicker(xshHandle, objHandle);
   m_animateColumnWidget->setSizePolicy(QSizePolicy::Expanding,
                                        QSizePolicy::Fixed);
@@ -5069,76 +5204,415 @@ void ToolPropertiesPanel::createAnimateProperties() {
           dynamic_cast<TEnumProperty *>(pg->getProperty("Active Axis"))) {
     QWidget *axisWidget = createCollapsibleEnumForProperty(
         activeAxisProp->getQStringName(), activeAxisProp,
-        activeAxisProp->getName());
+        activeAxisProp->getName(), 0, QString(),
+        [this](int) { syncAnimateAxisFromTool(); });
     if (axisWidget) {
       axisWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
       m_propertiesLayout->addWidget(axisWidget);
     }
   }
 
-  // Position / X-Y / Z / SO — full-width grid, adaptive fields
-  QWidget *fieldBlock = new QWidget(m_propertiesContainer);
-  fieldBlock->setMinimumWidth(0);
-  fieldBlock->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-  QGridLayout *fieldGrid = new QGridLayout(fieldBlock);
-  initAnimateFieldGrid(fieldGrid);
-  QWidget *gridHost = fieldBlock;
+  m_animateAxisFieldsHost = new QWidget(m_propertiesContainer);
+  m_animateAxisFieldsHost->setMinimumWidth(0);
+  m_animateAxisFieldsHost->setSizePolicy(QSizePolicy::Expanding,
+                                         QSizePolicy::Preferred);
+  QVBoxLayout *axisSectionsLayout = new QVBoxLayout(m_animateAxisFieldsHost);
+  axisSectionsLayout->setContentsMargins(0, 0, 0, 0);
+  axisSectionsLayout->setSpacing(CollapsibleStyle::kBlockGap);
 
-  QList<QWidget *> splineRowWidgets;
-  QList<QWidget *> xyRowWidgets;
+  m_animateAxisSections.clear();
+  m_animateSplineRowWidgets.clear();
+  m_animateXYRowWidgets.clear();
+  m_animateScaleHField = nullptr;
+  m_animateScaleVField = nullptr;
 
-  int row = 0;
+  // --- Position ---
+  {
+    QWidget *section = new QWidget(m_animateAxisFieldsHost);
+    section->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    QVBoxLayout *sectionLay = new QVBoxLayout(section);
+    sectionLay->setContentsMargins(0, 0, 0, 0);
+    sectionLay->setSpacing(0);
 
-  auto *motionPathField = new PegbarChannelField(
-      tool, TStageObject::T_Path, "field", frameHandle, objHandle, xshHandle,
-      gridHost);
-  gridAddLabeledField(fieldGrid, row, 0, 1, gridHost, tr("Position:"),
-                      motionPathField, &splineRowWidgets);
-  gridAddColumnSpacer(fieldGrid, row, gridHost, 3, 4, &splineRowWidgets);
+    QWidget *fieldBlock = new QWidget(section);
+    QGridLayout *fieldGrid = new QGridLayout(fieldBlock);
+    initAnimateFieldGrid(fieldGrid);
 
-  ++row;
-  auto *ewPosField = new PegbarChannelField(tool, TStageObject::T_X, "field",
-                                            frameHandle, objHandle, xshHandle,
-                                            gridHost);
-  auto *nsPosField = new PegbarChannelField(tool, TStageObject::T_Y, "field",
-                                            frameHandle, objHandle, xshHandle,
-                                            gridHost);
-  gridAddLabeledField(fieldGrid, row, 0, 1, gridHost, tr("X:"), ewPosField,
-                      &xyRowWidgets);
-  gridAddLabeledField(fieldGrid, row, 3, 4, gridHost, tr("Y:"), nsPosField,
-                      &xyRowWidgets);
+    QList<QWidget *> splineRowWidgets;
+    QList<QWidget *> xyRowWidgets;
+    int row = 0;
 
-  ++row;
-  auto *zField = new PegbarChannelField(tool, TStageObject::T_Z, "field",
-                                        frameHandle, objHandle, xshHandle,
-                                        gridHost);
-  zField->setPrecision(4);
-  auto *noScaleZField = new NoScaleField(tool, "field");
-  noScaleZField->setParent(gridHost);
-  noScaleZField->setPrecision(4);
-  gridAddLabeledField(fieldGrid, row, 0, 1, gridHost, tr("Z:"), zField);
-  gridAddLabeledField(fieldGrid, row, 3, 4, gridHost, QString(), noScaleZField);
+    auto *motionPathField = new PegbarChannelField(
+        tool, TStageObject::T_Path, "field", frameHandle, objHandle, xshHandle,
+        fieldBlock);
+    gridAddLabeledField(fieldGrid, row, 0, 1, fieldBlock, tr("Position:"),
+                        motionPathField, &splineRowWidgets);
+    gridAddColumnSpacer(fieldGrid, row, fieldBlock, 3, 4, &splineRowWidgets);
 
-  ++row;
-  auto *soField = new PegbarChannelField(tool, TStageObject::T_SO, "field",
-                                         frameHandle, objHandle, xshHandle,
-                                         gridHost);
-  gridAddLabeledField(fieldGrid, row, 0, 1, gridHost, tr("SO:"), soField);
-  gridAddColumnSpacer(fieldGrid, row, gridHost, 3, 4);
+    ++row;
+    auto *ewPosField = new PegbarChannelField(tool, TStageObject::T_X, "field",
+                                              frameHandle, objHandle, xshHandle,
+                                              fieldBlock);
+    auto *nsPosField = new PegbarChannelField(tool, TStageObject::T_Y, "field",
+                                              frameHandle, objHandle, xshHandle,
+                                              fieldBlock);
+    gridAddLabeledField(fieldGrid, row, 0, 1, fieldBlock, tr("X:"), ewPosField,
+                        &xyRowWidgets);
+    gridAddLabeledField(fieldGrid, row, 3, 4, fieldBlock, tr("Y:"), nsPosField,
+                        &xyRowWidgets);
 
-  m_propertiesLayout->addWidget(fieldBlock);
+    ++row;
+    auto *zField = new PegbarChannelField(tool, TStageObject::T_Z, "field",
+                                          frameHandle, objHandle, xshHandle,
+                                          fieldBlock);
+    zField->setPrecision(4);
+    auto *noScaleZField = new NoScaleField(tool, "field");
+    noScaleZField->setParent(fieldBlock);
+    noScaleZField->setPrecision(4);
+    gridAddLabeledField(fieldGrid, row, 0, 1, fieldBlock, tr("Z:"), zField);
+    gridAddLabeledField(fieldGrid, row, 3, 4, fieldBlock, QString(),
+                        noScaleZField);
 
-  m_animateSplineRowWidgets = splineRowWidgets;
-  m_animateXYRowWidgets     = xyRowWidgets;
-  m_animateMeasuredFields     = fieldBlock->findChildren<MeasuredValueField *>();
+    ++row;
+    auto *soField = new PegbarChannelField(tool, TStageObject::T_SO, "field",
+                                           frameHandle, objHandle, xshHandle,
+                                           fieldBlock);
+    gridAddLabeledField(fieldGrid, row, 0, 1, fieldBlock, tr("SO:"), soField);
+    gridAddColumnSpacer(fieldGrid, row, fieldBlock, 3, 4);
+
+    sectionLay->addWidget(fieldBlock);
+    m_animateSplineRowWidgets = splineRowWidgets;
+    m_animateXYRowWidgets     = xyRowWidgets;
+    m_animateAxisSections.append(section);
+    axisSectionsLayout->addWidget(section);
+  }
+
+  // --- Rotation ---
+  {
+    QWidget *section = new QWidget(m_animateAxisFieldsHost);
+    QGridLayout *fieldGrid = new QGridLayout(section);
+    initAnimateFieldGrid(fieldGrid);
+
+    auto *rotField =
+        new PegbarChannelField(tool, TStageObject::T_Angle, "field", frameHandle,
+                               objHandle, xshHandle, section);
+    gridAddLabeledField(fieldGrid, 0, 0, 1, section, tr("Rotation:"), rotField);
+
+    QPushButton *rotL = animateAuxIconButton(section, "rotateleft",
+                                             tr("Rotate Object Left"));
+    QPushButton *rotR = animateAuxIconButton(section, "rotateright",
+                                             tr("Rotate Object Right"));
+    fieldGrid->addWidget(rotL, 0, 3, Qt::AlignLeft | Qt::AlignVCenter);
+    fieldGrid->addWidget(rotR, 0, 4, Qt::AlignLeft | Qt::AlignVCenter);
+
+    QObject::connect(rotL, &QPushButton::clicked, [rotField]() {
+      rotField->setValue(rotField->getValue() + 90);
+      emit rotField->measuredValueChanged(rotField->getMeasuredValue());
+    });
+    QObject::connect(rotR, &QPushButton::clicked, [rotField]() {
+      rotField->setValue(rotField->getValue() - 90);
+      emit rotField->measuredValueChanged(rotField->getMeasuredValue());
+    });
+
+    m_animateAxisSections.append(section);
+    axisSectionsLayout->addWidget(section);
+  }
+
+  // --- Scale ---
+  {
+    QWidget *section = new QWidget(m_animateAxisFieldsHost);
+    QVBoxLayout *sectionLay = new QVBoxLayout(section);
+    sectionLay->setContentsMargins(0, 0, 0, 0);
+    sectionLay->setSpacing(CollapsibleStyle::kItemSpacing);
+
+    QWidget *fieldBlock = new QWidget(section);
+    QGridLayout *fieldGrid = new QGridLayout(fieldBlock);
+    initAnimateFieldGrid(fieldGrid);
+
+    auto *globalField = new PegbarChannelField(
+        tool, TStageObject::T_Scale, "field", frameHandle, objHandle, xshHandle,
+        fieldBlock);
+    m_animateScaleHField = new PegbarChannelField(
+        tool, TStageObject::T_ScaleX, "field", frameHandle, objHandle, xshHandle,
+        fieldBlock);
+    m_animateScaleVField = new PegbarChannelField(
+        tool, TStageObject::T_ScaleY, "field", frameHandle, objHandle, xshHandle,
+        fieldBlock);
+
+    QPushButton *flipH = animateAuxIconButton(
+        fieldBlock, "fliphoriz", tr("Flip Object Horizontally"));
+    QPushButton *flipV = animateAuxIconButton(fieldBlock, "flipvert",
+                                              tr("Flip Object Vertically"));
+
+    ToolOptionCheckbox *lockH = nullptr;
+    ToolOptionCheckbox *lockV = nullptr;
+    if (auto *lockProp =
+            dynamic_cast<TBoolProperty *>(pg->getProperty("Lock Scale H")))
+      lockH = new ToolOptionCheckbox(tool, lockProp, m_toolHandle, fieldBlock);
+    if (auto *lockProp =
+            dynamic_cast<TBoolProperty *>(pg->getProperty("Lock Scale V")))
+      lockV = new ToolOptionCheckbox(tool, lockProp, m_toolHandle, fieldBlock);
+    if (lockH) {
+      lockH->setObjectName("EditToolLockButton");
+      lockH->setText("");
+      lockH->setFixedSize(20, CollapsibleStyle::kFieldHeight);
+    }
+    if (lockV) {
+      lockV->setObjectName("EditToolLockButton");
+      lockV->setText("");
+      lockV->setFixedSize(20, CollapsibleStyle::kFieldHeight);
+    }
+
+    gridAddLabeledField(fieldGrid, 0, 0, 1, fieldBlock, tr("Global:"),
+                        globalField);
+    gridAddColumnSpacer(fieldGrid, 0, fieldBlock, 3, 4);
+
+    QWidget *hAux = new QWidget(fieldBlock);
+    QHBoxLayout *hAuxLay = new QHBoxLayout(hAux);
+    hAuxLay->setContentsMargins(0, 0, 0, 0);
+    hAuxLay->setSpacing(2);
+    hAuxLay->addWidget(flipH);
+    if (lockH) hAuxLay->addWidget(lockH);
+
+    QWidget *vAux = new QWidget(fieldBlock);
+    QHBoxLayout *vAuxLay = new QHBoxLayout(vAux);
+    vAuxLay->setContentsMargins(0, 0, 0, 0);
+    vAuxLay->setSpacing(2);
+    vAuxLay->addWidget(flipV);
+    if (lockV) vAuxLay->addWidget(lockV);
+
+    {
+      auto *hLabel = new ClickableLabel(tr("H:"), fieldBlock);
+      hLabel->setFixedSize(kGridLabelWidth, 20);
+      fieldGrid->addWidget(hLabel, 1, 0, Qt::AlignRight | Qt::AlignVCenter);
+      connectClickableLabel(hLabel, m_animateScaleHField);
+      animateGridAddFieldWithAux(fieldGrid, 1, 1, fieldBlock, m_animateScaleHField,
+                                 hAux);
+      gridAddColumnSpacer(fieldGrid, 1, fieldBlock, 3, 4);
+    }
+    {
+      auto *vLabel = new ClickableLabel(tr("V:"), fieldBlock);
+      vLabel->setFixedSize(kGridLabelWidth, 20);
+      fieldGrid->addWidget(vLabel, 2, 0, Qt::AlignRight | Qt::AlignVCenter);
+      connectClickableLabel(vLabel, m_animateScaleVField);
+      animateGridAddFieldWithAux(fieldGrid, 2, 1, fieldBlock, m_animateScaleVField,
+                                 vAux);
+      gridAddColumnSpacer(fieldGrid, 2, fieldBlock, 3, 4);
+    }
+
+    QObject::connect(flipH, &QPushButton::clicked, [this]() {
+      if (!m_animateScaleHField) return;
+      m_animateScaleHField->setValue(m_animateScaleHField->getValue() * -1);
+      emit m_animateScaleHField->measuredValueChanged(
+          m_animateScaleHField->getMeasuredValue());
+    });
+    QObject::connect(flipV, &QPushButton::clicked, [this]() {
+      if (!m_animateScaleVField) return;
+      m_animateScaleVField->setValue(m_animateScaleVField->getValue() * -1);
+      emit m_animateScaleVField->measuredValueChanged(
+          m_animateScaleVField->getMeasuredValue());
+    });
+
+    sectionLay->addWidget(fieldBlock);
+
+    if (TEnumProperty *scaleConstraintProp =
+            dynamic_cast<TEnumProperty *>(pg->getProperty("Scale Constraint:"))) {
+      const int maintainIdx = scaleConstraintProp->getIndex();
+      m_animateScaleHField->onScaleTypeChanged(maintainIdx);
+      m_animateScaleVField->onScaleTypeChanged(maintainIdx);
+      QWidget *maintainWidget = createCollapsibleEnumForProperty(
+          scaleConstraintProp->getQStringName(), scaleConstraintProp,
+          scaleConstraintProp->getName(), 0, QString(),
+          [this](int idx) {
+            if (m_animateScaleHField)
+              m_animateScaleHField->onScaleTypeChanged(idx);
+            if (m_animateScaleVField)
+              m_animateScaleVField->onScaleTypeChanged(idx);
+          });
+      if (maintainWidget) sectionLay->addWidget(maintainWidget);
+    }
+
+    m_animateAxisSections.append(section);
+    axisSectionsLayout->addWidget(section);
+  }
+
+  // --- Shear ---
+  {
+    QWidget *section = new QWidget(m_animateAxisFieldsHost);
+    QGridLayout *fieldGrid = new QGridLayout(section);
+    initAnimateFieldGrid(fieldGrid);
+
+    auto *shearH = new PegbarChannelField(tool, TStageObject::T_ShearX, "field",
+                                          frameHandle, objHandle, xshHandle,
+                                          section);
+    auto *shearV = new PegbarChannelField(tool, TStageObject::T_ShearY, "field",
+                                          frameHandle, objHandle, xshHandle,
+                                          section);
+
+    ToolOptionCheckbox *lockH = nullptr;
+    ToolOptionCheckbox *lockV = nullptr;
+    if (auto *lockProp =
+            dynamic_cast<TBoolProperty *>(pg->getProperty("Lock Shear H")))
+      lockH = new ToolOptionCheckbox(tool, lockProp, m_toolHandle, section);
+    if (auto *lockProp =
+            dynamic_cast<TBoolProperty *>(pg->getProperty("Lock Shear V")))
+      lockV = new ToolOptionCheckbox(tool, lockProp, m_toolHandle, section);
+    if (lockH) {
+      lockH->setObjectName("EditToolLockButton");
+      lockH->setText("");
+      lockH->setFixedSize(20, CollapsibleStyle::kFieldHeight);
+    }
+    if (lockV) {
+      lockV->setObjectName("EditToolLockButton");
+      lockV->setText("");
+      lockV->setFixedSize(20, CollapsibleStyle::kFieldHeight);
+    }
+
+    QWidget *shearHCell = new QWidget(section);
+    QHBoxLayout *shearHL = new QHBoxLayout(shearHCell);
+    shearHL->setContentsMargins(0, 0, 0, 0);
+    shearHL->setSpacing(2);
+    styleAnimateGridField(shearH);
+    shearHL->addWidget(shearH, 1);
+    if (lockH) shearHL->addWidget(lockH);
+
+    QWidget *shearVCell = new QWidget(section);
+    QHBoxLayout *shearVL = new QHBoxLayout(shearVCell);
+    shearVL->setContentsMargins(0, 0, 0, 0);
+    shearVL->setSpacing(2);
+    styleAnimateGridField(shearV);
+    shearVL->addWidget(shearV, 1);
+    if (lockV) shearVL->addWidget(lockV);
+
+    auto *shearHLabel = new ClickableLabel(tr("H:"), section);
+    shearHLabel->setFixedSize(kGridLabelWidth, 20);
+    fieldGrid->addWidget(shearHLabel, 0, 0, Qt::AlignRight | Qt::AlignVCenter);
+    connectClickableLabel(shearHLabel, shearH);
+    fieldGrid->addWidget(shearHCell, 0, 1);
+
+    auto *shearVLabel = new ClickableLabel(tr("V:"), section);
+    shearVLabel->setFixedSize(kGridLabelWidth, 20);
+    fieldGrid->addWidget(shearVLabel, 0, 3, Qt::AlignRight | Qt::AlignVCenter);
+    connectClickableLabel(shearVLabel, shearV);
+    fieldGrid->addWidget(shearVCell, 0, 4);
+
+    m_animateAxisSections.append(section);
+    axisSectionsLayout->addWidget(section);
+  }
+
+  // --- Center position ---
+  {
+    QWidget *section = new QWidget(m_animateAxisFieldsHost);
+    QGridLayout *fieldGrid = new QGridLayout(section);
+    initAnimateFieldGrid(fieldGrid);
+
+    auto *centerX = new PegbarCenterField(tool, 0, "field", objHandle, xshHandle,
+                                          section);
+    auto *centerY = new PegbarCenterField(tool, 1, "field", objHandle, xshHandle,
+                                          section);
+
+    ToolOptionCheckbox *lockX = nullptr;
+    ToolOptionCheckbox *lockY = nullptr;
+    if (auto *lockProp =
+            dynamic_cast<TBoolProperty *>(pg->getProperty("Lock Center X")))
+      lockX = new ToolOptionCheckbox(tool, lockProp, m_toolHandle, section);
+    if (auto *lockProp =
+            dynamic_cast<TBoolProperty *>(pg->getProperty("Lock Center Y")))
+      lockY = new ToolOptionCheckbox(tool, lockProp, m_toolHandle, section);
+    if (lockX) {
+      lockX->setObjectName("EditToolLockButton");
+      lockX->setText("");
+      lockX->setFixedSize(20, CollapsibleStyle::kFieldHeight);
+    }
+    if (lockY) {
+      lockY->setObjectName("EditToolLockButton");
+      lockY->setText("");
+      lockY->setFixedSize(20, CollapsibleStyle::kFieldHeight);
+    }
+
+    QWidget *centerXCell = new QWidget(section);
+    QHBoxLayout *centerXL = new QHBoxLayout(centerXCell);
+    centerXL->setContentsMargins(0, 0, 0, 0);
+    centerXL->setSpacing(2);
+    styleAnimateGridField(centerX);
+    centerXL->addWidget(centerX, 1);
+    if (lockX) centerXL->addWidget(lockX);
+
+    QWidget *centerYCell = new QWidget(section);
+    QHBoxLayout *centerYL = new QHBoxLayout(centerYCell);
+    centerYL->setContentsMargins(0, 0, 0, 0);
+    centerYL->setSpacing(2);
+    styleAnimateGridField(centerY);
+    centerYL->addWidget(centerY, 1);
+    if (lockY) centerYL->addWidget(lockY);
+
+    auto *centerXLabel = new ClickableLabel(tr("X:"), section);
+    centerXLabel->setFixedSize(kGridLabelWidth, 20);
+    fieldGrid->addWidget(centerXLabel, 0, 0, Qt::AlignRight | Qt::AlignVCenter);
+    connectClickableLabel(centerXLabel, centerX);
+    fieldGrid->addWidget(centerXCell, 0, 1);
+
+    auto *centerYLabel = new ClickableLabel(tr("Y:"), section);
+    centerYLabel->setFixedSize(kGridLabelWidth, 20);
+    fieldGrid->addWidget(centerYLabel, 0, 3, Qt::AlignRight | Qt::AlignVCenter);
+    connectClickableLabel(centerYLabel, centerY);
+    fieldGrid->addWidget(centerYCell, 0, 4);
+
+    m_animateAxisSections.append(section);
+    axisSectionsLayout->addWidget(section);
+  }
+
+  m_propertiesLayout->addWidget(m_animateAxisFieldsHost);
+
+  createBoolProperty(tr("Global Key"), "Global Key");
+
+  m_animateMeasuredFields =
+      m_animateAxisFieldsHost->findChildren<MeasuredValueField *>();
   for (MeasuredValueField *field : m_animateMeasuredFields)
     styleAnimateGridField(field);
+
+  m_animateVisibleAxis = -1;
+  syncAnimateAxisFromTool();
 
   TStageObjectId objId = objHandle->getObjectId();
   bool splined =
       xshHandle->getXsheet()->getStageObject(objId)->getSpline() != 0;
-  setGridRowVisible(splineRowWidgets, splined);
-  setGridRowVisible(xyRowWidgets, !splined);
+  setGridRowVisible(m_animateSplineRowWidgets, splined);
+  setGridRowVisible(m_animateXYRowWidgets, !splined);
+}
+
+void ToolPropertiesPanel::syncAnimateAxisFromTool() {
+  if (m_currentToolType != "edit" ||
+      m_animateAxisSections.size() != kAnimateAxisSectionCount)
+    return;
+
+  TTool *tool = getCurrentTool();
+  if (!tool) return;
+  TPropertyGroup *pg = tool->getProperties(0);
+  if (!pg) return;
+
+  TEnumProperty *axisProp =
+      dynamic_cast<TEnumProperty *>(pg->getProperty("Active Axis"));
+  if (!axisProp) return;
+
+  const int axisId = axisProp->getIndex();
+  if (axisId == m_animateVisibleAxis) return;
+
+  m_animateVisibleAxis = axisId;
+  updateAnimateActiveAxisVisibility();
+}
+
+void ToolPropertiesPanel::updateAnimateActiveAxisVisibility() {
+  if (m_animateAxisSections.size() != kAnimateAxisSectionCount) return;
+
+  const int axisId =
+      m_animateVisibleAxis >= 0 ? m_animateVisibleAxis : kAnimateAllAxisIndex;
+  const bool showAll = axisId == kAnimateAllAxisIndex;
+
+  for (int a = 0; a < kAnimateAxisSectionCount; ++a) {
+    QWidget *section = m_animateAxisSections[a];
+    if (section) section->setVisible(showAll || axisId == a);
+  }
 }
 
 void ToolPropertiesPanel::updateAnimateColumnPicker() {
@@ -5572,21 +6046,9 @@ void ToolPropertiesPanel::createSelectionProperties() {
   if (rasTool) {
     TBoolProperty *modSaveProp = rasTool->getModifySaveboxProperty();
     if (modSaveProp) {
-      QWidget    *w    = createCheckBox(tr("Modify Savebox"),
-                                       modSaveProp->getValue(), "ModifySavebox");
-      QCheckBox  *cb   = w ? w->findChild<QCheckBox *>() : nullptr;
-      if (!cb) cb      = qobject_cast<QCheckBox *>(w);
-      if (cb) {
-        connect(cb, &QCheckBox::toggled, [rasTool](bool checked) {
-          TBoolProperty *p = rasTool->getModifySaveboxProperty();
-          if (p) {
-            p->setValue(checked);
-            // Call via TTool* (DVAPI base) — virtual dispatch reaches
-            // RasterSelectionTool::onPropertyChanged at runtime
-            static_cast<TTool *>(rasTool)->onPropertyChanged("ModifySavebox");
-          }
-        });
-      }
+      QWidget *w = createCheckBox(tr("Modify Savebox"),
+                                  modSaveProp->getValue(), "ModifySavebox");
+      storeTppPropertyPtr(w, modSaveProp);
       m_propertiesLayout->addWidget(w);
     }
   }
@@ -5815,6 +6277,7 @@ void ToolPropertiesPanel::updatePropertyValues() {
   }
 
   if (m_currentToolType == "edit") {
+    syncAnimateAxisFromTool();
     updateAnimateColumnPicker();
     updateToolOptionControlsIn(m_propertiesContainer);
     for (MeasuredValueField *field : m_animateMeasuredFields)
@@ -5904,6 +6367,15 @@ void ToolPropertiesPanel::updateWidgetFromProperty(QWidget *widget) {
         if (QLabel *valueLabel =
                 widget->findChild<QLabel *>("textValueLabel")) {
           valueLabel->setText(newText);
+        }
+        return;
+      }
+      if (QLineEdit *lineEdit = widget->findChild<QLineEdit *>()) {
+        const QString newText = QString::fromStdWString(strProp->getValue());
+        if (lineEdit->text() != newText) {
+          lineEdit->blockSignals(true);
+          lineEdit->setText(newText);
+          lineEdit->blockSignals(false);
         }
         return;
       }
@@ -6142,7 +6614,8 @@ void ToolPropertiesPanel::onPressureChanged(bool checked) {
 
 void ToolPropertiesPanel::createDoublePairSlider(const QString &label, 
                                                   void *propPtr, 
-                                                  const std::string &propName) {
+                                                  const std::string &propName,
+                                                  int propGroup) {
   TDoublePairProperty *prop = static_cast<TDoublePairProperty*>(propPtr);
   double rangeMin = prop->getRange().first;
   double rangeMax = prop->getRange().second;
@@ -6151,7 +6624,8 @@ void ToolPropertiesPanel::createDoublePairSlider(const QString &label,
   
   QWidget *container = new QWidget(this);
   container->setProperty("propName", QString::fromStdString(propName));
-  container->setProperty("propGroup", 0);
+  container->setProperty("propGroup", propGroup);
+  storeTppPropertyPtr(container, prop);
   
   QVBoxLayout *layout = new QVBoxLayout(container);
   layout->setMargin(0);
@@ -6295,7 +6769,8 @@ void ToolPropertiesPanel::createDoublePairSlider(const QString &label,
 
 void ToolPropertiesPanel::createIntPairSlider(const QString &label, 
                                                void *propPtr, 
-                                               const std::string &propName) {
+                                               const std::string &propName,
+                                               int propGroup) {
   TIntPairProperty *prop = static_cast<TIntPairProperty*>(propPtr);
   int rangeMin = prop->getRange().first;
   int rangeMax = prop->getRange().second;
@@ -6304,7 +6779,8 @@ void ToolPropertiesPanel::createIntPairSlider(const QString &label,
   
   QWidget *container = new QWidget(this);
   container->setProperty("propName", QString::fromStdString(propName));
-  container->setProperty("propGroup", 0);
+  container->setProperty("propGroup", propGroup);
+  storeTppPropertyPtr(container, prop);
   
   QVBoxLayout *layout = new QVBoxLayout(container);
   layout->setMargin(0);

@@ -654,6 +654,7 @@ class DVAPI RulerToolOptionsBox final : public ToolOptionsBox {
   QLabel *m_HpixelFld;
 
   TTool *m_tool;
+  bool m_verticalLayout;
 
 public:
   RulerToolOptionsBox(QWidget *parent, TTool *tool,

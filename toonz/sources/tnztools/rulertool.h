@@ -29,6 +29,7 @@ public:
   RulerTool();
 
   void setToolOptionsBox(RulerToolOptionsBox *toolOptionsBox);
+  void unsetToolOptionsBox(RulerToolOptionsBox *toolOptionsBox);
 
   ToolType getToolType() const override { return TTool::GenericTool; }
 
