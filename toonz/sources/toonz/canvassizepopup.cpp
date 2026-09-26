@@ -228,7 +228,8 @@ void updateCanvasSizeCommandEnabled() {
     return;
   }
   CommandManager::instance()->enable(
-      MI_CanvasSize, isRasterCanvasLevel(app->getCurrentLevel()->getSimpleLevel()));
+      MI_CanvasSize,
+      isRasterCanvasLevel(app->getCurrentLevel()->getSimpleLevel()));
 }
 
 namespace {
@@ -300,8 +301,8 @@ TDimension dimFromRect(const TRectD &rect) {
 TRectD rectUnion(const TRectD &a, const TRectD &b) {
   if (a.isEmpty()) return b;
   if (b.isEmpty()) return a;
-  return TRectD(std::min(a.x0, b.x0), std::min(a.y0, b.y0), std::max(a.x1, b.x1),
-                std::max(a.y1, b.y1));
+  return TRectD(std::min(a.x0, b.x0), std::min(a.y0, b.y0),
+                std::max(a.x1, b.x1), std::max(a.y1, b.y1));
 }
 
 //-----------------------------------------------------------------------------
@@ -739,18 +740,7 @@ class CanvasSizeTool final : public TTool {
   int m_handle;
   bool m_dragging;
 
-  enum {
-    hNone,
-    hMove,
-    h00,
-    h01,
-    h10,
-    h11,
-    hM0,
-    h1M,
-    hM1,
-    h0M
-  };
+  enum { hNone, hMove, h00, h01, h10, h11, hM0, h1M, hM1, h0M };
 
 public:
   static CanvasSizeTool *instance() { return s_instance; }
@@ -810,10 +800,14 @@ int CanvasSizeTool::pickHandle(const TPointD &p, const TRectD &r) const {
   if (TRectD(r.getP01() - size, r.getP01() + size).contains(p)) return h01;
   if (TRectD(r.getP11() - size, r.getP11() + size).contains(p)) return h11;
   if (TRectD(r.getP10() - size, r.getP10() + size).contains(p)) return h10;
-  if (isCloseToSegment(p, TSegment(r.getP00(), r.getP10()), maxDist)) return hM0;
-  if (isCloseToSegment(p, TSegment(r.getP10(), r.getP11()), maxDist)) return h1M;
-  if (isCloseToSegment(p, TSegment(r.getP11(), r.getP01()), maxDist)) return hM1;
-  if (isCloseToSegment(p, TSegment(r.getP01(), r.getP00()), maxDist)) return h0M;
+  if (isCloseToSegment(p, TSegment(r.getP00(), r.getP10()), maxDist))
+    return hM0;
+  if (isCloseToSegment(p, TSegment(r.getP10(), r.getP11()), maxDist))
+    return h1M;
+  if (isCloseToSegment(p, TSegment(r.getP11(), r.getP01()), maxDist))
+    return hM1;
+  if (isCloseToSegment(p, TSegment(r.getP01(), r.getP00()), maxDist))
+    return h0M;
   if (r.contains(p)) return hMove;
   return hNone;
 }
@@ -857,9 +851,10 @@ PeggingPositions CanvasSizeTool::pegForHandle(int handle) const {
 
 //-----------------------------------------------------------------------------
 
-TRectD CanvasSizeTool::dragRect(const TPointD &pos, const TMouseEvent &e) const {
-  TRectD r             = m_dragStartRect;
-  TPointD delta        = pos - m_firstPos;
+TRectD CanvasSizeTool::dragRect(const TPointD &pos,
+                                const TMouseEvent &e) const {
+  TRectD r      = m_dragStartRect;
+  TPointD delta = pos - m_firstPos;
 
   if (m_handle == hMove) {
     if (e.isShiftPressed()) {
@@ -875,10 +870,10 @@ TRectD CanvasSizeTool::dragRect(const TPointD &pos, const TMouseEvent &e) const 
     return r;
   }
 
-  const bool uniform   = e.isShiftPressed();
+  const bool uniform    = e.isShiftPressed();
   const bool fromCenter = e.isAltPressed();
-  double W             = r.x1 - r.x0;
-  double H             = r.y1 - r.y0;
+  double W              = r.x1 - r.x0;
+  double H              = r.y1 - r.y0;
   if (W < 1.0) W = 1.0;
   if (H < 1.0) H = 1.0;
   const double ar = W / H;
@@ -1031,10 +1026,10 @@ void CanvasSizeTool::leftButtonDown(const TPointD &pos, const TMouseEvent &) {
   CanvasSizePopup *popup = CanvasSizePopup::instance();
   if (!popup || !popup->isSessionActive()) return;
 
-  m_firstPos       = pos;
-  m_dragStartRect  = popup->proposedCanvasRect();
-  m_handle         = pickHandle(pos, m_dragStartRect);
-  m_dragging       = m_handle != hNone;
+  m_firstPos      = pos;
+  m_dragStartRect = popup->proposedCanvasRect();
+  m_handle        = pickHandle(pos, m_dragStartRect);
+  m_dragging      = m_handle != hNone;
 }
 
 //-----------------------------------------------------------------------------
@@ -1044,7 +1039,7 @@ void CanvasSizeTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
   CanvasSizePopup *popup = CanvasSizePopup::instance();
   if (!popup || !popup->isSessionActive()) return;
 
-  TRectD next = dragRect(pos, e);
+  TRectD next          = dragRect(pos, e);
   PeggingPositions peg = popup->peggingPosition();
   if (m_handle != hMove)
     peg = e.isAltPressed() ? ::e11 : pegForHandle(m_handle);
@@ -1122,8 +1117,9 @@ void CanvasSizeTool::refresh(bool wholeViewer) {
     return;
   }
 
-  TRectD box = rectUnion(popup->currentCanvasRect(), popup->proposedCanvasRect());
-  box        = box.enlarge(24.0 * getPixelSize());
+  TRectD box =
+      rectUnion(popup->currentCanvasRect(), popup->proposedCanvasRect());
+  box          = box.enlarge(24.0 * getPixelSize());
   TRectD dirty = rectUnion(m_lastInvalidateRect, box);
   if (!dirty.isEmpty()) invalidate(dirty);
   m_lastInvalidateRect = box;
@@ -1151,11 +1147,11 @@ CanvasSizePopup::CanvasSizePopup()
     , m_sessionActive(false)
     , m_ignoreSync(false)
     , m_fromTool(false) {
-  s_canvasSizePopup = this;
+  s_canvasSizePopup   = this;
   TXshLevelHandle *lh = TApp::instance()->getCurrentLevel();
   m_sl                = lh ? lh->getSimpleLevel() : TXshSimpleLevelP();
   TDimension dim      = m_sl ? m_sl->getResolution() : TDimension(1, 1);
-  m_currentDim      = dim;
+  m_currentDim        = dim;
   m_currentRect = m_proposedRect = worldRectFromDim(dim);
 
   setModal(false);
@@ -1272,7 +1268,8 @@ void CanvasSizePopup::cancelFromOutside() {
 //-----------------------------------------------------------------------------
 
 void CanvasSizePopup::refreshOverlay(bool wholeViewer) {
-  if (CanvasSizeTool::instance()) CanvasSizeTool::instance()->refresh(wholeViewer);
+  if (CanvasSizeTool::instance())
+    CanvasSizeTool::instance()->refresh(wholeViewer);
 }
 
 //-----------------------------------------------------------------------------
@@ -1282,16 +1279,14 @@ void CanvasSizePopup::initFromLevel() {
   m_sl                = lh ? lh->getSimpleLevel() : TXshSimpleLevelP();
   if (!isRasterCanvasLevel(m_sl.getPointer())) return;
 
-  m_currentDim     = m_sl->getResolution();
-  m_currentRect    = worldRectFromDim(m_currentDim);
-  m_proposedRect   = m_currentRect;
+  m_currentDim   = m_sl->getResolution();
+  m_currentRect  = worldRectFromDim(m_currentDim);
+  m_proposedRect = m_currentRect;
 
   TPointD dpi  = m_sl->getDpi();
   QString unit = m_unit->currentData().toString();
-  double dimLx =
-      getMeasuredLength(m_currentDim.lx, m_xMeasure, dpi.x, unit);
-  double dimLy =
-      getMeasuredLength(m_currentDim.ly, m_yMeasure, dpi.y, unit);
+  double dimLx = getMeasuredLength(m_currentDim.lx, m_xMeasure, dpi.x, unit);
+  double dimLy = getMeasuredLength(m_currentDim.ly, m_yMeasure, dpi.y, unit);
 
   m_ignoreSync = true;
   m_currentXSize->setText(QString::number(dimLx));
@@ -1357,9 +1352,9 @@ TDimension CanvasSizePopup::proposedPixelSize() const {
 
 void CanvasSizePopup::updateProposedFromFields() {
   if (!m_sl) return;
-  TDimension newDim  = proposedPixelSize();
-  m_proposedRect     = proposedRectFromPeg(
-      m_currentRect, newDim.lx, newDim.ly, m_pegging->getPeggingPosition());
+  TDimension newDim = proposedPixelSize();
+  m_proposedRect    = proposedRectFromPeg(m_currentRect, newDim.lx, newDim.ly,
+                                          m_pegging->getPeggingPosition());
   m_pegging->cutLx(m_currentDim.lx > newDim.lx);
   m_pegging->cutLy(m_currentDim.ly > newDim.ly);
   m_ignoreSync = true;
@@ -1460,10 +1455,8 @@ void CanvasSizePopup::onUnitChanged(int index) {
     m_yMeasure->setCurrentUnit(measureUnit);
   }
   TPointD dpi  = m_sl->getDpi();
-  double dimLx =
-      getMeasuredLength(m_currentDim.lx, m_xMeasure, dpi.x, unit);
-  double dimLy =
-      getMeasuredLength(m_currentDim.ly, m_yMeasure, dpi.y, unit);
+  double dimLx = getMeasuredLength(m_currentDim.lx, m_xMeasure, dpi.x, unit);
+  double dimLy = getMeasuredLength(m_currentDim.ly, m_yMeasure, dpi.y, unit);
   m_ignoreSync = true;
   m_currentXSize->setText(QString::number(dimLx));
   m_currentYSize->setText(QString::number(dimLy));
