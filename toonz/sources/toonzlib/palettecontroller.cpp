@@ -6,6 +6,7 @@
 #include "toonz/tscenehandle.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/txshlevel.h"
+#include "toonz/preferences.h"
 
 // TnzBase includes
 #include "tenv.h"
@@ -22,7 +23,8 @@ PaletteController::PaletteController()
     , m_originalCurrentPalette(0)
     , m_currentPalette(0)
     , m_colorAutoApplyEnabled(PaletteControllerAutoApplyState != 0)
-    , m_colorSample() {
+    , m_colorSample()
+    , m_skipCleanupEdit(false) {
   m_currentLevelPalette   = new TPaletteHandle;
   m_currentCleanupPalette = new TPaletteHandle;
   m_currentPalette        = new TPaletteHandle;
@@ -97,7 +99,27 @@ void PaletteController::editLevelPalette() {
 //-----------------------------------------------------------------------------
 
 void PaletteController::editCleanupPalette() {
+  if (m_skipCleanupEdit) return;
   setCurrentPalette(m_currentCleanupPalette);
+}
+
+//-----------------------------------------------------------------------------
+
+void PaletteController::assignCleanupPalette(TPalette *palette) {
+  if (!Preferences::instance()->isRestoreStyleEditorTabEnabled()) {
+    m_currentCleanupPalette->setPalette(palette);
+    return;
+  }
+
+  const bool editingCleanup =
+      (m_originalCurrentPalette == m_currentCleanupPalette);
+  m_skipCleanupEdit = true;
+  m_currentCleanupPalette->setPalette(palette);
+  m_skipCleanupEdit = false;
+  if (editingCleanup)
+    editCleanupPalette();
+  else if (!m_originalCurrentPalette)
+    editLevelPalette();
 }
 
 //-----------------------------------------------------------------------------
