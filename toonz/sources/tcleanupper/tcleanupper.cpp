@@ -630,7 +630,7 @@ int main(int argc, char *argv[]) {
   else {
     try {
       TProjectManager *pm = TProjectManager::instance();
-      auto sceneProject = pm->loadSceneProject(fp);
+      auto sceneProject   = pm->loadSceneProject(fp);
       if (!sceneProject) {
         cerr << "can't open project." << endl;
         return -3;
