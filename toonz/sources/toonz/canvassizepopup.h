@@ -129,6 +129,7 @@ public slots:
   void onUnitChanged(int);
   void onPeggingChanged();
   void onLevelSwitched(TXshLevel *);
+  void onSceneSwitched();
   void onReset();
 };
 

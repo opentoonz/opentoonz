@@ -51,6 +51,7 @@
 #include <QApplication>
 #include <QMainWindow>
 #include <QHideEvent>
+#include <QKeyEvent>
 #include <algorithm>
 
 namespace {
@@ -729,7 +730,7 @@ void PeggingWidget::setPeggingPosition(PeggingPositions position) {
 }
 
 //=============================================================================
-// CanvasSizeTool - viewer overlay for Canvas Size
+// CanvasSizeTool
 //-----------------------------------------------------------------------------
 
 class CanvasSizeTool final : public TTool {
@@ -740,6 +741,7 @@ class CanvasSizeTool final : public TTool {
 
   enum {
     hNone,
+    hMove,
     h00,
     h01,
     h10,
@@ -768,9 +770,9 @@ public:
 
   QString updateEnabled(int, int) override {
     TTool::Application *app = getApplication();
-    if (!app) return (enable(false), QString());
-    TXshSimpleLevel *sl = app->getCurrentLevel()->getSimpleLevel();
-    if (isRasterCanvasLevel(sl)) return (enable(true), QString());
+    if (!app || !app->getCurrentLevel()) return (enable(false), QString());
+    if (isRasterCanvasLevel(app->getCurrentLevel()->getSimpleLevel()))
+      return (enable(true), QString());
     return (enable(false), QString());
   }
 
@@ -782,6 +784,7 @@ public:
   int getCursorId() const override;
   void onActivate() override;
   void onDeactivate() override;
+  bool isEventAcceptable(QEvent *e) override;
 
   void refresh(bool wholeViewer);
 
@@ -811,6 +814,7 @@ int CanvasSizeTool::pickHandle(const TPointD &p, const TRectD &r) const {
   if (isCloseToSegment(p, TSegment(r.getP10(), r.getP11()), maxDist)) return h1M;
   if (isCloseToSegment(p, TSegment(r.getP11(), r.getP01()), maxDist)) return hM1;
   if (isCloseToSegment(p, TSegment(r.getP01(), r.getP00()), maxDist)) return h0M;
+  if (r.contains(p)) return hMove;
   return hNone;
 }
 
@@ -856,6 +860,21 @@ PeggingPositions CanvasSizeTool::pegForHandle(int handle) const {
 TRectD CanvasSizeTool::dragRect(const TPointD &pos, const TMouseEvent &e) const {
   TRectD r             = m_dragStartRect;
   TPointD delta        = pos - m_firstPos;
+
+  if (m_handle == hMove) {
+    if (e.isShiftPressed()) {
+      if (fabs(delta.x) > fabs(delta.y))
+        delta.y = 0;
+      else
+        delta.x = 0;
+    }
+    r.x0 += delta.x;
+    r.x1 += delta.x;
+    r.y0 += delta.y;
+    r.y1 += delta.y;
+    return r;
+  }
+
   const bool uniform   = e.isShiftPressed();
   const bool fromCenter = e.isAltPressed();
   double W             = r.x1 - r.x0;
@@ -1026,8 +1045,9 @@ void CanvasSizeTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
   if (!popup || !popup->isSessionActive()) return;
 
   TRectD next = dragRect(pos, e);
-  PeggingPositions peg =
-      e.isAltPressed() ? ::e11 : pegForHandle(m_handle);
+  PeggingPositions peg = popup->peggingPosition();
+  if (m_handle != hMove)
+    peg = e.isAltPressed() ? ::e11 : pegForHandle(m_handle);
   popup->setProposedRectFromTool(next, peg);
 }
 
@@ -1043,6 +1063,8 @@ void CanvasSizeTool::leftButtonUp(const TPointD &, const TMouseEvent &) {
 
 int CanvasSizeTool::getCursorId() const {
   switch (m_handle) {
+  case hMove:
+    return ToolCursor::MoveCursor;
   case h11:
   case h00:
     return ToolCursor::ScaleCursor;
@@ -1067,14 +1089,27 @@ void CanvasSizeTool::onActivate() { refresh(true); }
 //-----------------------------------------------------------------------------
 
 void CanvasSizeTool::onDeactivate() {
+  if (m_dragging) return;
   CanvasSizePopup *popup = CanvasSizePopup::instance();
   if (!popup || !popup->isSessionActive()) return;
 
   TTool::Application *app = getApplication();
-  if (!app) return;
+  if (!app || !app->getCurrentTool()) return;
   QString next = app->getCurrentTool()->getRequestedToolName();
   if (isNavigationToolName(next) || next == T_CanvasSize) return;
   popup->cancelFromOutside();
+}
+
+//-----------------------------------------------------------------------------
+
+bool CanvasSizeTool::isEventAcceptable(QEvent *e) {
+  CanvasSizePopup *popup = CanvasSizePopup::instance();
+  if (!popup || !popup->isSessionActive()) return false;
+  if (e->type() != QEvent::KeyPress && e->type() != QEvent::ShortcutOverride)
+    return false;
+  int key = static_cast<QKeyEvent *>(e)->key();
+  return key == Qt::Key_Shift || key == Qt::Key_Alt || key == Qt::Key_AltGr ||
+         key == Qt::Key_Control;
 }
 
 //-----------------------------------------------------------------------------
@@ -1117,8 +1152,9 @@ CanvasSizePopup::CanvasSizePopup()
     , m_ignoreSync(false)
     , m_fromTool(false) {
   s_canvasSizePopup = this;
-  m_sl              = TApp::instance()->getCurrentLevel()->getSimpleLevel();
-  TDimension dim    = m_sl ? m_sl->getResolution() : TDimension(1, 1);
+  TXshLevelHandle *lh = TApp::instance()->getCurrentLevel();
+  m_sl                = lh ? lh->getSimpleLevel() : TXshSimpleLevelP();
+  TDimension dim      = m_sl ? m_sl->getResolution() : TDimension(1, 1);
   m_currentDim      = dim;
   m_currentRect = m_proposedRect = worldRectFromDim(dim);
 
@@ -1205,6 +1241,8 @@ CanvasSizePopup::CanvasSizePopup()
   connect(TApp::instance()->getCurrentLevel(),
           SIGNAL(xshLevelSwitched(TXshLevel *)), this,
           SLOT(onLevelSwitched(TXshLevel *)));
+  connect(TApp::instance()->getCurrentScene(), SIGNAL(sceneSwitched()), this,
+          SLOT(onSceneSwitched()));
   updateCanvasSizeCommandEnabled();
 }
 
@@ -1215,7 +1253,9 @@ void CanvasSizePopup::openSession() {
     hide();
     return;
   }
-  TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
+  TApp *app = TApp::instance();
+  if (!app || !app->getCurrentLevel()) return;
+  TXshSimpleLevel *sl = app->getCurrentLevel()->getSimpleLevel();
   if (!isRasterCanvasLevel(sl)) return;
   show();
   raise();
@@ -1225,7 +1265,7 @@ void CanvasSizePopup::openSession() {
 //-----------------------------------------------------------------------------
 
 void CanvasSizePopup::cancelFromOutside() {
-  m_sessionActive = false;
+  if (!isVisible()) return;
   hide();
 }
 
@@ -1238,7 +1278,8 @@ void CanvasSizePopup::refreshOverlay(bool wholeViewer) {
 //-----------------------------------------------------------------------------
 
 void CanvasSizePopup::initFromLevel() {
-  m_sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
+  TXshLevelHandle *lh = TApp::instance()->getCurrentLevel();
+  m_sl                = lh ? lh->getSimpleLevel() : TXshSimpleLevelP();
   if (!isRasterCanvasLevel(m_sl.getPointer())) return;
 
   m_currentDim     = m_sl->getResolution();
@@ -1269,6 +1310,7 @@ void CanvasSizePopup::endSession() {
   m_sessionActive = false;
   ToolHandle *th  = TApp::instance()->getCurrentTool();
   if (th && th->getRequestedToolName() == T_CanvasSize) th->unsetPseudoTool();
+  if (th) th->storeTool();
   refreshOverlay(true);
 }
 
@@ -1285,6 +1327,7 @@ void CanvasSizePopup::showEvent(QShowEvent *e) {
   ToolHandle *th  = TApp::instance()->getCurrentTool();
   if (th && th->getRequestedToolName() != T_CanvasSize)
     th->setPseudoTool(T_CanvasSize);
+  if (th) th->storeTool();
   refreshOverlay(true);
 }
 
@@ -1433,10 +1476,15 @@ void CanvasSizePopup::onUnitChanged(int index) {
 void CanvasSizePopup::onLevelSwitched(TXshLevel *) {
   updateCanvasSizeCommandEnabled();
   if (!m_sessionActive) return;
-  TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
+  TXshLevelHandle *lh = TApp::instance()->getCurrentLevel();
+  TXshSimpleLevel *sl = lh ? lh->getSimpleLevel() : 0;
   if (sl == m_sl.getPointer() && isRasterCanvasLevel(sl)) return;
   hide();
 }
+
+//-----------------------------------------------------------------------------
+
+void CanvasSizePopup::onSceneSwitched() { cancelFromOutside(); }
 
 //-----------------------------------------------------------------------------
 
