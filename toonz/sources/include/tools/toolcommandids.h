@@ -11,6 +11,7 @@
 #define T_Fill "T_Fill"
 #define T_PaintBrush "T_PaintBrush"
 #define T_Eraser "T_Eraser"
+#define T_HideLine "T_HideLine"
 #define T_Tape "T_Tape"
 #define T_StylePicker "T_StylePicker"
 #define T_RGBPicker "T_RGBPicker"
