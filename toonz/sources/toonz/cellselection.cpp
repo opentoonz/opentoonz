@@ -15,6 +15,7 @@
 #include "xsheetviewer.h"
 #include "levelcommand.h"
 #include "columncommand.h"
+#include "canvassizepopup.h"
 
 // TnzTools includes
 #include "tools/toolutils.h"
@@ -77,22 +78,6 @@
 
 //=============================================================================
 namespace {
-//-----------------------------------------------------------------------------
-
-// Check if the selection contains only one raster level
-bool containsOnlyOneRasterLevel(int r0, int c0, int r1, int c1) {
-  TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
-  int r, c;
-  TXshLevelP xl = xsh->getCell(r0, c0).m_level;
-  for (r = r0; r <= r1; r++) {
-    for (c = c0; c <= c1; c++)
-      if (xsh->getCell(r, c).m_level.getPointer() != xl.getPointer())
-        return false;
-  }
-  return xl && (xl->getType() == TZP_XSHLEVEL ||
-                xl->getType() == OVL_XSHLEVEL || xl->getType() == TZI_XSHLEVEL);
-}
-
 //-----------------------------------------------------------------------------
 
 // Copy cells to clipboard without undo
@@ -1665,24 +1650,22 @@ void TCellSelection::selectCells(int r0, int c0, int r1, int c1) {
   // cell selection won't contain the camera column
   if (m_range.m_c0 < 0) m_range.m_c0 = 0;
 
-  bool onlyOneRasterLevel = containsOnlyOneRasterLevel(r0, c0, r1, c1);
   // set the nearest row
   m_resizePivotRow =
       (std::abs(r0 - m_resizePivotRow) < std::abs(r1 - m_resizePivotRow)) ? r0
                                                                           : r1;
-  CommandManager::instance()->enable(MI_CanvasSize, onlyOneRasterLevel);
+  updateCanvasSizeCommandEnabled();
 }
 
 //-----------------------------------------------------------------------------
 
 void TCellSelection::selectCell(int row, int col) {
-  m_range.m_r0            = row;
-  m_range.m_c0            = col;
-  m_range.m_r1            = row;
-  m_range.m_c1            = col;
-  bool onlyOneRasterLevel = containsOnlyOneRasterLevel(row, col, row, col);
-  m_resizePivotRow        = row;
-  CommandManager::instance()->enable(MI_CanvasSize, onlyOneRasterLevel);
+  m_range.m_r0     = row;
+  m_range.m_c0     = col;
+  m_range.m_r1     = row;
+  m_range.m_c1     = col;
+  m_resizePivotRow = row;
+  updateCanvasSizeCommandEnabled();
 }
 
 //-----------------------------------------------------------------------------
@@ -1690,7 +1673,7 @@ void TCellSelection::selectCell(int row, int col) {
 void TCellSelection::selectNone() {
   m_range          = Range();
   m_resizePivotRow = -1;
-  CommandManager::instance()->enable(MI_CanvasSize, false);
+  updateCanvasSizeCommandEnabled();
 }
 
 //-----------------------------------------------------------------------------
