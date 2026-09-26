@@ -15,6 +15,7 @@
 #include <QPushButton>
 #include <QList>
 #include <QMap>
+#include <QStackedWidget>
 #include <QString>
 #include <functional>
 
@@ -131,6 +132,12 @@ class ToolPropertiesPanel : public TPanel {
   QList<QWidget *> m_animateXYRowWidgets;
   QList<MeasuredValueField *> m_animateMeasuredFields;
   QWidget *m_animateAxisFieldsHost = nullptr;
+  QStackedWidget *m_animateAxisStack = nullptr;
+  QList<QWidget *> m_animateAxisStackPages;
+  QWidget *m_animateAllModeHost = nullptr;
+  QVBoxLayout *m_animateAllModeLayout = nullptr;
+  bool m_animateSectionsInAllLayout = false;
+  QList<QWidget *> m_animateAxisSectionHeaders;
   QList<QWidget *> m_animateAxisSections;
   int m_animateVisibleAxis = -1;
   PegbarChannelField *m_animateScaleHField = nullptr;
@@ -248,6 +255,8 @@ private:
   void updateAnimateColumnPicker();
   void syncAnimateAxisFromTool();
   void updateAnimateActiveAxisVisibility();
+  void reparentAnimateSectionsToAllMode();
+  void reparentAnimateSectionsToAxisStack();
   QWidget *createEnumIconGridPanel(
       const QString &label, TEnumProperty *enumProp, const std::string &propName,
       int propGroup = 0, QWidget *parentWidget = nullptr,

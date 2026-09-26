@@ -172,6 +172,37 @@ QColor tppCollapsibleCellPanelBackground(const QWidget *widget) {
 
 }  // namespace
 
+class AnimateAxisStackWidget final : public QStackedWidget {
+public:
+  explicit AnimateAxisStackWidget(QWidget *parent = nullptr)
+      : QStackedWidget(parent) {
+    connect(this, &QStackedWidget::currentChanged, this, [this](int) {
+      updateGeometry();
+      if (QWidget *host = parentWidget()) host->updateGeometry();
+    });
+  }
+
+  QSize sizeHint() const override { return axisAwareSizeHint(&QWidget::sizeHint); }
+  QSize minimumSizeHint() const override {
+    return axisAwareSizeHint(&QWidget::minimumSizeHint);
+  }
+
+private:
+  using HintFn = QSize (QWidget::*)() const;
+
+  QSize axisAwareSizeHint(HintFn hint) const {
+    int maxW = 0;
+    for (int i = 0; i < count(); ++i) {
+      if (QWidget *page = widget(i)) maxW = qMax(maxW, (page->*hint)().width());
+    }
+    QWidget *cur = currentWidget();
+    if (!cur) return QStackedWidget::sizeHint();
+    QSize sh = (cur->*hint)();
+    sh.setWidth(qMax(sh.width(), maxW));
+    return sh;
+  }
+};
+
 //=============================================================================
 // ToolPropertyButton - Custom button with theme-aware painting
 //=============================================================================
@@ -875,6 +906,12 @@ void ToolPropertiesPanel::clearProperties() {
   m_animateXYRowWidgets.clear();
   m_animateMeasuredFields.clear();
   m_animateAxisFieldsHost = nullptr;
+  m_animateAxisStack      = nullptr;
+  m_animateAxisStackPages.clear();
+  m_animateAllModeHost    = nullptr;
+  m_animateAllModeLayout  = nullptr;
+  m_animateSectionsInAllLayout = false;
+  m_animateAxisSectionHeaders.clear();
   m_animateAxisSections.clear();
   m_animateVisibleAxis    = -1;
   m_animateScaleHField    = nullptr;
@@ -5087,7 +5124,7 @@ void setGridRowVisible(const QList<QWidget *> &rowWidgets, bool visible) {
 }
 
 void initAnimateFieldGrid(QGridLayout *grid) {
-  grid->setContentsMargins(0, 4, 0, 4);
+  grid->setContentsMargins(0, 0, 0, 4);
   grid->setHorizontalSpacing(kGridLabelGap);
   grid->setVerticalSpacing(kGridRowVSpacing);
   for (int col = 0; col < 5; ++col) grid->setColumnStretch(col, 0);
@@ -5134,6 +5171,67 @@ namespace {
 
 constexpr int kAnimateAxisSectionCount = 5;
 constexpr int kAnimateAllAxisIndex     = 5;
+constexpr int kAnimateLockButtonW      = 22;
+constexpr int kAnimateAllSectionHeaderH = 18;
+
+void styleAnimateLockCheckbox(ToolOptionCheckbox *lock) {
+  if (!lock) return;
+  lock->setObjectName("EditToolLockButton");
+  lock->setText("");
+  lock->setFixedSize(kAnimateLockButtonW, CollapsibleStyle::kFieldHeight);
+  lock->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+}
+
+QWidget *makeAnimateLockSlotPlaceholder(QWidget *parent) {
+  QWidget *slot = new QWidget(parent);
+  slot->setFixedSize(kAnimateLockButtonW, CollapsibleStyle::kFieldHeight);
+  slot->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  slot->setAttribute(Qt::WA_TransparentForMouseEvents);
+  return slot;
+}
+
+QWidget *makeAnimateFieldHBoxCell(QWidget *parent, MeasuredValueField *field,
+                                  QWidget *trailing,
+                                  bool reserveLockSlot = false) {
+  QWidget *cell = new QWidget(parent);
+  cell->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+  QHBoxLayout *lay = new QHBoxLayout(cell);
+  lay->setContentsMargins(0, 0, 1, 0);
+  lay->setSpacing(2);
+  styleAnimateGridField(field);
+  lay->addWidget(field, 1);
+  if (trailing)
+    lay->addWidget(trailing, 0);
+  else if (reserveLockSlot)
+    lay->addWidget(makeAnimateLockSlotPlaceholder(cell), 0);
+  return cell;
+}
+
+QLabel *makeAnimateAllModeSectionHeader(QWidget *parent, const QString &text) {
+  auto *label = new QLabel(text, parent);
+  label->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+  QFont f = label->font();
+  f.setBold(true);
+  label->setFont(f);
+  label->setContentsMargins(CollapsibleStyle::kContentLeftIndent, 0, 0, 0);
+  label->setFixedHeight(kAnimateAllSectionHeaderH);
+  label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+  label->setVisible(false);
+  return label;
+}
+
+QWidget *makeAnimateAxisStackPage(QWidget *parent, QWidget *section) {
+  QWidget *page = new QWidget(parent);
+  QVBoxLayout *lay = new QVBoxLayout(page);
+  lay->setContentsMargins(0, 0, 0, 0);
+  lay->setSpacing(0);
+  QWidget *topPad = new QWidget(page);
+  topPad->setFixedHeight(kAnimateAllSectionHeaderH);
+  topPad->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  lay->addWidget(topPad);
+  lay->addWidget(section);
+  return page;
+}
 
 QPushButton *animateAuxIconButton(QWidget *parent, const char *iconName,
                                   const QString &tip) {
@@ -5157,7 +5255,7 @@ void animateGridAddFieldWithAux(QGridLayout *grid, int row, int fieldCol,
   QWidget *cell = new QWidget(parent);
   cell->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   QHBoxLayout *hl = new QHBoxLayout(cell);
-  hl->setContentsMargins(0, 0, 0, 0);
+  hl->setContentsMargins(0, 0, 1, 0);
   hl->setSpacing(4);
   hl->addWidget(field, 1);
   hl->addWidget(aux, 0);
@@ -5187,6 +5285,12 @@ void ToolPropertiesPanel::createAnimateProperties() {
                                        QSizePolicy::Fixed);
   m_propertiesLayout->addWidget(m_animateColumnWidget);
 
+  QWidget *activeAxisBlock = new QWidget(m_propertiesContainer);
+  activeAxisBlock->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+  QVBoxLayout *activeAxisBlockLayout = new QVBoxLayout(activeAxisBlock);
+  activeAxisBlockLayout->setContentsMargins(0, 0, 0, 0);
+  activeAxisBlockLayout->setSpacing(0);
+
   if (TEnumProperty *activeAxisProp =
           dynamic_cast<TEnumProperty *>(pg->getProperty("Active Axis"))) {
     QWidget *axisWidget = createCollapsibleEnumForProperty(
@@ -5195,23 +5299,50 @@ void ToolPropertiesPanel::createAnimateProperties() {
         [this](int) { syncAnimateAxisFromTool(); });
     if (axisWidget) {
       axisWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-      m_propertiesLayout->addWidget(axisWidget);
+      activeAxisBlockLayout->addWidget(axisWidget);
     }
   }
 
-  m_animateAxisFieldsHost = new QWidget(m_propertiesContainer);
+  m_animateAxisFieldsHost = new QWidget(activeAxisBlock);
   m_animateAxisFieldsHost->setMinimumWidth(0);
   m_animateAxisFieldsHost->setSizePolicy(QSizePolicy::Expanding,
                                          QSizePolicy::Preferred);
-  QVBoxLayout *axisSectionsLayout = new QVBoxLayout(m_animateAxisFieldsHost);
-  axisSectionsLayout->setContentsMargins(0, 0, 0, 0);
-  axisSectionsLayout->setSpacing(CollapsibleStyle::kBlockGap);
+  QVBoxLayout *axisHostLayout = new QVBoxLayout(m_animateAxisFieldsHost);
+  axisHostLayout->setContentsMargins(0, 0, 0, 0);
+  axisHostLayout->setSpacing(0);
 
+  m_animateAxisStack = new AnimateAxisStackWidget(m_animateAxisFieldsHost);
+  m_animateAxisStack->setSizePolicy(QSizePolicy::Expanding,
+                                    QSizePolicy::Preferred);
+
+  m_animateAllModeHost = new QWidget(m_animateAxisFieldsHost);
+  m_animateAllModeLayout = new QVBoxLayout(m_animateAllModeHost);
+  m_animateAllModeLayout->setContentsMargins(0, 0, 0, 0);
+  m_animateAllModeLayout->setSpacing(0);
+  m_animateAllModeHost->hide();
+
+  axisHostLayout->addWidget(m_animateAxisStack);
+  axisHostLayout->addWidget(m_animateAllModeHost);
+
+  m_animateSectionsInAllLayout = false;
+  m_animateAxisStackPages.clear();
+  m_animateAxisSectionHeaders.clear();
   m_animateAxisSections.clear();
   m_animateSplineRowWidgets.clear();
   m_animateXYRowWidgets.clear();
   m_animateScaleHField = nullptr;
   m_animateScaleVField = nullptr;
+
+  auto appendAnimateAxisSection = [&](const QString &allModeTitle,
+                                      QWidget *section) {
+    QLabel *header =
+        makeAnimateAllModeSectionHeader(m_animateAllModeHost, allModeTitle);
+    QWidget *page = makeAnimateAxisStackPage(m_animateAxisStack, section);
+    m_animateAxisStack->addWidget(page);
+    m_animateAxisStackPages.append(page);
+    m_animateAxisSectionHeaders.append(header);
+    m_animateAxisSections.append(section);
+  };
 
   // --- Position ---
   {
@@ -5243,10 +5374,39 @@ void ToolPropertiesPanel::createAnimateProperties() {
     auto *nsPosField = new PegbarChannelField(tool, TStageObject::T_Y, "field",
                                               frameHandle, objHandle, xshHandle,
                                               fieldBlock);
-    gridAddLabeledField(fieldGrid, row, 0, 1, fieldBlock, tr("X:"), ewPosField,
-                        &xyRowWidgets);
-    gridAddLabeledField(fieldGrid, row, 3, 4, fieldBlock, tr("Y:"), nsPosField,
-                        &xyRowWidgets);
+
+    ToolOptionCheckbox *lockPosX = nullptr;
+    ToolOptionCheckbox *lockPosY = nullptr;
+    if (auto *lockProp =
+            dynamic_cast<TBoolProperty *>(pg->getProperty("Lock Position X")))
+      lockPosX = new ToolOptionCheckbox(tool, lockProp, m_toolHandle, fieldBlock);
+    if (auto *lockProp =
+            dynamic_cast<TBoolProperty *>(pg->getProperty("Lock Position Y")))
+      lockPosY = new ToolOptionCheckbox(tool, lockProp, m_toolHandle, fieldBlock);
+    styleAnimateLockCheckbox(lockPosX);
+    styleAnimateLockCheckbox(lockPosY);
+
+    QWidget *posXCell =
+        makeAnimateFieldHBoxCell(fieldBlock, ewPosField, lockPosX);
+    QWidget *posYCell =
+        makeAnimateFieldHBoxCell(fieldBlock, nsPosField, lockPosY);
+
+    auto *xLabel = new ClickableLabel(tr("X:"), fieldBlock);
+    xLabel->setFixedSize(kGridLabelWidth, 20);
+    fieldGrid->addWidget(xLabel, row, 0, Qt::AlignRight | Qt::AlignVCenter);
+    connectClickableLabel(xLabel, ewPosField);
+    fieldGrid->addWidget(posXCell, row, 1);
+
+    auto *yLabel = new ClickableLabel(tr("Y:"), fieldBlock);
+    yLabel->setFixedSize(kGridLabelWidth, 20);
+    fieldGrid->addWidget(yLabel, row, 3, Qt::AlignRight | Qt::AlignVCenter);
+    connectClickableLabel(yLabel, nsPosField);
+    fieldGrid->addWidget(posYCell, row, 4);
+
+    xyRowWidgets.append(xLabel);
+    xyRowWidgets.append(posXCell);
+    xyRowWidgets.append(yLabel);
+    xyRowWidgets.append(posYCell);
 
     ++row;
     auto *zField = new PegbarChannelField(tool, TStageObject::T_Z, "field",
@@ -5256,22 +5416,40 @@ void ToolPropertiesPanel::createAnimateProperties() {
     auto *noScaleZField = new NoScaleField(tool, "field");
     noScaleZField->setParent(fieldBlock);
     noScaleZField->setPrecision(4);
-    gridAddLabeledField(fieldGrid, row, 0, 1, fieldBlock, tr("Z:"), zField);
-    gridAddLabeledField(fieldGrid, row, 3, 4, fieldBlock, QString(),
-                        noScaleZField);
+
+    QWidget *zCell =
+        makeAnimateFieldHBoxCell(fieldBlock, zField, nullptr, true);
+    QWidget *noScaleZCell =
+        makeAnimateFieldHBoxCell(fieldBlock, noScaleZField, nullptr, true);
+
+    auto *zLabel = new ClickableLabel(tr("Z:"), fieldBlock);
+    zLabel->setFixedSize(kGridLabelWidth, 20);
+    fieldGrid->addWidget(zLabel, row, 0, Qt::AlignRight | Qt::AlignVCenter);
+    connectClickableLabel(zLabel, zField);
+    fieldGrid->addWidget(zCell, row, 1);
+
+    auto *zRightLabelSpacer = new QWidget(fieldBlock);
+    zRightLabelSpacer->setFixedSize(kGridLabelWidth, 20);
+    fieldGrid->addWidget(zRightLabelSpacer, row, 3);
+    fieldGrid->addWidget(noScaleZCell, row, 4);
 
     ++row;
     auto *soField = new PegbarChannelField(tool, TStageObject::T_SO, "field",
                                            frameHandle, objHandle, xshHandle,
                                            fieldBlock);
-    gridAddLabeledField(fieldGrid, row, 0, 1, fieldBlock, tr("SO:"), soField);
+    QWidget *soCell =
+        makeAnimateFieldHBoxCell(fieldBlock, soField, nullptr, true);
+    auto *soLabel = new ClickableLabel(tr("SO:"), fieldBlock);
+    soLabel->setFixedSize(kGridLabelWidth, 20);
+    fieldGrid->addWidget(soLabel, row, 0, Qt::AlignRight | Qt::AlignVCenter);
+    connectClickableLabel(soLabel, soField);
+    fieldGrid->addWidget(soCell, row, 1);
     gridAddColumnSpacer(fieldGrid, row, fieldBlock, 3, 4);
 
     sectionLay->addWidget(fieldBlock);
     m_animateSplineRowWidgets = splineRowWidgets;
     m_animateXYRowWidgets     = xyRowWidgets;
-    m_animateAxisSections.append(section);
-    axisSectionsLayout->addWidget(section);
+    appendAnimateAxisSection(tr("Position"), section);
   }
 
   // --- Rotation ---
@@ -5283,14 +5461,29 @@ void ToolPropertiesPanel::createAnimateProperties() {
     auto *rotField =
         new PegbarChannelField(tool, TStageObject::T_Angle, "field", frameHandle,
                                objHandle, xshHandle, section);
-    gridAddLabeledField(fieldGrid, 0, 0, 1, section, tr("Rotation:"), rotField);
 
     QPushButton *rotL = animateAuxIconButton(section, "rotateleft",
                                              tr("Rotate Object Left"));
     QPushButton *rotR = animateAuxIconButton(section, "rotateright",
                                              tr("Rotate Object Right"));
-    fieldGrid->addWidget(rotL, 0, 3, Qt::AlignLeft | Qt::AlignVCenter);
-    fieldGrid->addWidget(rotR, 0, 4, Qt::AlignLeft | Qt::AlignVCenter);
+    QWidget *rotBtnCell = new QWidget(section);
+    QHBoxLayout *rotBtnLay = new QHBoxLayout(rotBtnCell);
+    rotBtnLay->setContentsMargins(0, 0, 0, 0);
+    rotBtnLay->setSpacing(2);
+    rotBtnLay->addWidget(rotL);
+    rotBtnLay->addWidget(rotR);
+
+    QWidget *rotLabelSpacer = new QWidget(section);
+    rotLabelSpacer->setFixedSize(kGridLabelWidth, 20);
+    fieldGrid->addWidget(rotLabelSpacer, 0, 0);
+    QWidget *rotCell =
+        makeAnimateFieldHBoxCell(section, rotField, nullptr, true);
+    fieldGrid->addWidget(rotCell, 0, 1);
+    fieldGrid->addWidget(rotBtnCell, 0, 3, Qt::AlignRight | Qt::AlignVCenter);
+    auto *rotFieldSpacer = new QWidget(section);
+    rotFieldSpacer->setMinimumWidth(kAnimateUniformFieldW);
+    rotFieldSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    fieldGrid->addWidget(rotFieldSpacer, 0, 4);
 
     QObject::connect(rotL, &QPushButton::clicked, [rotField]() {
       rotField->setValue(rotField->getValue() + 90);
@@ -5301,8 +5494,7 @@ void ToolPropertiesPanel::createAnimateProperties() {
       emit rotField->measuredValueChanged(rotField->getMeasuredValue());
     });
 
-    m_animateAxisSections.append(section);
-    axisSectionsLayout->addWidget(section);
+    appendAnimateAxisSection(tr("Rotation"), section);
   }
 
   // --- Scale ---
@@ -5339,52 +5531,47 @@ void ToolPropertiesPanel::createAnimateProperties() {
     if (auto *lockProp =
             dynamic_cast<TBoolProperty *>(pg->getProperty("Lock Scale V")))
       lockV = new ToolOptionCheckbox(tool, lockProp, m_toolHandle, fieldBlock);
-    if (lockH) {
-      lockH->setObjectName("EditToolLockButton");
-      lockH->setText("");
-      lockH->setFixedSize(20, CollapsibleStyle::kFieldHeight);
+    styleAnimateLockCheckbox(lockH);
+    styleAnimateLockCheckbox(lockV);
+
+    {
+      auto *globalLabel = new ClickableLabel(tr("Global:"), fieldBlock);
+      globalLabel->setFixedSize(kGridLabelWidth, 20);
+      fieldGrid->addWidget(globalLabel, 0, 0, Qt::AlignRight | Qt::AlignVCenter);
+      connectClickableLabel(globalLabel, globalField);
+      QWidget *globalCell =
+          makeAnimateFieldHBoxCell(fieldBlock, globalField, nullptr, true);
+      fieldGrid->addWidget(globalCell, 0, 1);
+      gridAddColumnSpacer(fieldGrid, 0, fieldBlock, 3, 4);
     }
-    if (lockV) {
-      lockV->setObjectName("EditToolLockButton");
-      lockV->setText("");
-      lockV->setFixedSize(20, CollapsibleStyle::kFieldHeight);
-    }
-
-    gridAddLabeledField(fieldGrid, 0, 0, 1, fieldBlock, tr("Global:"),
-                        globalField);
-    gridAddColumnSpacer(fieldGrid, 0, fieldBlock, 3, 4);
-
-    QWidget *hAux = new QWidget(fieldBlock);
-    QHBoxLayout *hAuxLay = new QHBoxLayout(hAux);
-    hAuxLay->setContentsMargins(0, 0, 0, 0);
-    hAuxLay->setSpacing(2);
-    hAuxLay->addWidget(flipH);
-    if (lockH) hAuxLay->addWidget(lockH);
-
-    QWidget *vAux = new QWidget(fieldBlock);
-    QHBoxLayout *vAuxLay = new QHBoxLayout(vAux);
-    vAuxLay->setContentsMargins(0, 0, 0, 0);
-    vAuxLay->setSpacing(2);
-    vAuxLay->addWidget(flipV);
-    if (lockV) vAuxLay->addWidget(lockV);
 
     {
       auto *hLabel = new ClickableLabel(tr("H:"), fieldBlock);
       hLabel->setFixedSize(kGridLabelWidth, 20);
       fieldGrid->addWidget(hLabel, 1, 0, Qt::AlignRight | Qt::AlignVCenter);
       connectClickableLabel(hLabel, m_animateScaleHField);
-      animateGridAddFieldWithAux(fieldGrid, 1, 1, fieldBlock, m_animateScaleHField,
-                                 hAux);
-      gridAddColumnSpacer(fieldGrid, 1, fieldBlock, 3, 4);
+      QWidget *hCell =
+          makeAnimateFieldHBoxCell(fieldBlock, m_animateScaleHField, lockH);
+      fieldGrid->addWidget(hCell, 1, 1);
+      fieldGrid->addWidget(flipH, 1, 3, Qt::AlignRight | Qt::AlignVCenter);
+      auto *hFieldSpacer = new QWidget(fieldBlock);
+      hFieldSpacer->setMinimumWidth(kAnimateUniformFieldW);
+      hFieldSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+      fieldGrid->addWidget(hFieldSpacer, 1, 4);
     }
     {
       auto *vLabel = new ClickableLabel(tr("V:"), fieldBlock);
       vLabel->setFixedSize(kGridLabelWidth, 20);
       fieldGrid->addWidget(vLabel, 2, 0, Qt::AlignRight | Qt::AlignVCenter);
       connectClickableLabel(vLabel, m_animateScaleVField);
-      animateGridAddFieldWithAux(fieldGrid, 2, 1, fieldBlock, m_animateScaleVField,
-                                 vAux);
-      gridAddColumnSpacer(fieldGrid, 2, fieldBlock, 3, 4);
+      QWidget *vCell =
+          makeAnimateFieldHBoxCell(fieldBlock, m_animateScaleVField, lockV);
+      fieldGrid->addWidget(vCell, 2, 1);
+      fieldGrid->addWidget(flipV, 2, 3, Qt::AlignRight | Qt::AlignVCenter);
+      auto *vFieldSpacer = new QWidget(fieldBlock);
+      vFieldSpacer->setMinimumWidth(kAnimateUniformFieldW);
+      vFieldSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+      fieldGrid->addWidget(vFieldSpacer, 2, 4);
     }
 
     QObject::connect(flipH, &QPushButton::clicked, [this]() {
@@ -5419,8 +5606,7 @@ void ToolPropertiesPanel::createAnimateProperties() {
       if (maintainWidget) sectionLay->addWidget(maintainWidget);
     }
 
-    m_animateAxisSections.append(section);
-    axisSectionsLayout->addWidget(section);
+    appendAnimateAxisSection(tr("Scale"), section);
   }
 
   // --- Shear ---
@@ -5444,32 +5630,11 @@ void ToolPropertiesPanel::createAnimateProperties() {
     if (auto *lockProp =
             dynamic_cast<TBoolProperty *>(pg->getProperty("Lock Shear V")))
       lockV = new ToolOptionCheckbox(tool, lockProp, m_toolHandle, section);
-    if (lockH) {
-      lockH->setObjectName("EditToolLockButton");
-      lockH->setText("");
-      lockH->setFixedSize(20, CollapsibleStyle::kFieldHeight);
-    }
-    if (lockV) {
-      lockV->setObjectName("EditToolLockButton");
-      lockV->setText("");
-      lockV->setFixedSize(20, CollapsibleStyle::kFieldHeight);
-    }
+    styleAnimateLockCheckbox(lockH);
+    styleAnimateLockCheckbox(lockV);
 
-    QWidget *shearHCell = new QWidget(section);
-    QHBoxLayout *shearHL = new QHBoxLayout(shearHCell);
-    shearHL->setContentsMargins(0, 0, 0, 0);
-    shearHL->setSpacing(2);
-    styleAnimateGridField(shearH);
-    shearHL->addWidget(shearH, 1);
-    if (lockH) shearHL->addWidget(lockH);
-
-    QWidget *shearVCell = new QWidget(section);
-    QHBoxLayout *shearVL = new QHBoxLayout(shearVCell);
-    shearVL->setContentsMargins(0, 0, 0, 0);
-    shearVL->setSpacing(2);
-    styleAnimateGridField(shearV);
-    shearVL->addWidget(shearV, 1);
-    if (lockV) shearVL->addWidget(lockV);
+    QWidget *shearHCell = makeAnimateFieldHBoxCell(section, shearH, lockH);
+    QWidget *shearVCell = makeAnimateFieldHBoxCell(section, shearV, lockV);
 
     auto *shearHLabel = new ClickableLabel(tr("H:"), section);
     shearHLabel->setFixedSize(kGridLabelWidth, 20);
@@ -5483,8 +5648,7 @@ void ToolPropertiesPanel::createAnimateProperties() {
     connectClickableLabel(shearVLabel, shearV);
     fieldGrid->addWidget(shearVCell, 0, 4);
 
-    m_animateAxisSections.append(section);
-    axisSectionsLayout->addWidget(section);
+    appendAnimateAxisSection(tr("Shear"), section);
   }
 
   // --- Center position ---
@@ -5506,32 +5670,11 @@ void ToolPropertiesPanel::createAnimateProperties() {
     if (auto *lockProp =
             dynamic_cast<TBoolProperty *>(pg->getProperty("Lock Center Y")))
       lockY = new ToolOptionCheckbox(tool, lockProp, m_toolHandle, section);
-    if (lockX) {
-      lockX->setObjectName("EditToolLockButton");
-      lockX->setText("");
-      lockX->setFixedSize(20, CollapsibleStyle::kFieldHeight);
-    }
-    if (lockY) {
-      lockY->setObjectName("EditToolLockButton");
-      lockY->setText("");
-      lockY->setFixedSize(20, CollapsibleStyle::kFieldHeight);
-    }
+    styleAnimateLockCheckbox(lockX);
+    styleAnimateLockCheckbox(lockY);
 
-    QWidget *centerXCell = new QWidget(section);
-    QHBoxLayout *centerXL = new QHBoxLayout(centerXCell);
-    centerXL->setContentsMargins(0, 0, 0, 0);
-    centerXL->setSpacing(2);
-    styleAnimateGridField(centerX);
-    centerXL->addWidget(centerX, 1);
-    if (lockX) centerXL->addWidget(lockX);
-
-    QWidget *centerYCell = new QWidget(section);
-    QHBoxLayout *centerYL = new QHBoxLayout(centerYCell);
-    centerYL->setContentsMargins(0, 0, 0, 0);
-    centerYL->setSpacing(2);
-    styleAnimateGridField(centerY);
-    centerYL->addWidget(centerY, 1);
-    if (lockY) centerYL->addWidget(lockY);
+    QWidget *centerXCell = makeAnimateFieldHBoxCell(section, centerX, lockX);
+    QWidget *centerYCell = makeAnimateFieldHBoxCell(section, centerY, lockY);
 
     auto *centerXLabel = new ClickableLabel(tr("X:"), section);
     centerXLabel->setFixedSize(kGridLabelWidth, 20);
@@ -5545,11 +5688,11 @@ void ToolPropertiesPanel::createAnimateProperties() {
     connectClickableLabel(centerYLabel, centerY);
     fieldGrid->addWidget(centerYCell, 0, 4);
 
-    m_animateAxisSections.append(section);
-    axisSectionsLayout->addWidget(section);
+    appendAnimateAxisSection(tr("Center"), section);
   }
 
-  m_propertiesLayout->addWidget(m_animateAxisFieldsHost);
+  activeAxisBlockLayout->addWidget(m_animateAxisFieldsHost);
+  m_propertiesLayout->addWidget(activeAxisBlock);
 
   createBoolProperty(tr("Global Key"), "Global Key");
 
@@ -5589,16 +5732,85 @@ void ToolPropertiesPanel::syncAnimateAxisFromTool() {
   updateAnimateActiveAxisVisibility();
 }
 
+void ToolPropertiesPanel::reparentAnimateSectionsToAllMode() {
+  if (!m_animateAxisStack || !m_animateAllModeLayout ||
+      m_animateAxisSections.size() != kAnimateAxisSectionCount)
+    return;
+
+  while (m_animateAxisStack->count() > 0) {
+    QWidget *page = m_animateAxisStack->widget(0);
+    m_animateAxisStack->removeWidget(page);
+  }
+
+  for (int a = 0; a < kAnimateAxisSectionCount; ++a) {
+    QLabel *header = qobject_cast<QLabel *>(m_animateAxisSectionHeaders.value(a));
+    QWidget *section = m_animateAxisSections.value(a);
+    QWidget *page    = m_animateAxisStackPages.value(a);
+    if (page && section && section->parentWidget() == page) {
+      if (auto *pageLay = qobject_cast<QVBoxLayout *>(page->layout()))
+        pageLay->removeWidget(section);
+    }
+    if (header) {
+      header->setVisible(true);
+      m_animateAllModeLayout->addWidget(header);
+    }
+    if (section) {
+      section->setVisible(true);
+      m_animateAllModeLayout->addWidget(section);
+    }
+  }
+  m_animateSectionsInAllLayout = true;
+}
+
+void ToolPropertiesPanel::reparentAnimateSectionsToAxisStack() {
+  if (!m_animateAxisStack || !m_animateAllModeLayout ||
+      m_animateAxisSections.size() != kAnimateAxisSectionCount)
+    return;
+
+  for (int a = 0; a < kAnimateAxisSectionCount; ++a) {
+    QWidget *section = m_animateAxisSections.value(a);
+    QWidget *header  = m_animateAxisSectionHeaders.value(a);
+    QWidget *page    = m_animateAxisStackPages.value(a);
+    if (section) m_animateAllModeLayout->removeWidget(section);
+    if (header) {
+      m_animateAllModeLayout->removeWidget(header);
+      header->setVisible(false);
+    }
+    if (page && section) {
+      if (auto *pageLay = qobject_cast<QVBoxLayout *>(page->layout()))
+        pageLay->insertWidget(1, section);
+      m_animateAxisStack->insertWidget(a, page);
+    }
+  }
+  m_animateSectionsInAllLayout = false;
+}
+
 void ToolPropertiesPanel::updateAnimateActiveAxisVisibility() {
-  if (m_animateAxisSections.size() != kAnimateAxisSectionCount) return;
+  if (m_animateAxisSections.size() != kAnimateAxisSectionCount ||
+      !m_animateAxisStack || !m_animateAllModeHost)
+    return;
 
   const int axisId =
       m_animateVisibleAxis >= 0 ? m_animateVisibleAxis : kAnimateAllAxisIndex;
   const bool showAll = axisId == kAnimateAllAxisIndex;
 
-  for (int a = 0; a < kAnimateAxisSectionCount; ++a) {
-    QWidget *section = m_animateAxisSections[a];
-    if (section) section->setVisible(showAll || axisId == a);
+  if (showAll) {
+    if (!m_animateSectionsInAllLayout) reparentAnimateSectionsToAllMode();
+    m_animateAxisStack->hide();
+    m_animateAllModeHost->show();
+    m_animateAllModeHost->updateGeometry();
+    m_animateAxisFieldsHost->updateGeometry();
+    return;
+  }
+
+  if (m_animateSectionsInAllLayout) reparentAnimateSectionsToAxisStack();
+
+  m_animateAllModeHost->hide();
+  m_animateAxisStack->show();
+  if (axisId >= 0 && axisId < m_animateAxisStack->count()) {
+    m_animateAxisStack->setCurrentIndex(axisId);
+    m_animateAxisStack->updateGeometry();
+    m_animateAxisFieldsHost->updateGeometry();
   }
 }
 
