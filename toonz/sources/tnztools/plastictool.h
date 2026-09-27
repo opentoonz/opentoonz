@@ -57,9 +57,9 @@
 //****************************************************************************************
 
 class DVAPI PlasticTool final : public QObject,
-                          public TTool,
-                          public TParamObserver,
-                          public TSelection::View {
+                                public TTool,
+                                public TParamObserver,
+                                public TSelection::View {
   Q_OBJECT
 
   friend class PlasticToolOptionsBox;

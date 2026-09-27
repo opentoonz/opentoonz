@@ -303,7 +303,7 @@ protected slots:
 class DraggableIconView : public QWidget {
   Q_OBJECT
 public:
-  DraggableIconView(QWidget *parent = 0) : QWidget(parent) {};
+  DraggableIconView(QWidget *parent = 0) : QWidget(parent){};
 
 protected:
   // these are used for dragging on the icon to
@@ -477,7 +477,7 @@ class PaintbrushToolOptionsBox final : public ToolOptionsBox {
 
   ToolOptionCombo *m_colorMode;
   ToolOptionCheckbox *m_selectiveMode;
-  ToolOptionCheckbox* m_emptyOnlyMode;
+  ToolOptionCheckbox *m_emptyOnlyMode;
 
   ToolOptionCheckbox *m_lockAlphaMode;
   ToolOptionCheckbox *m_FillingMode;
@@ -520,10 +520,10 @@ class FillToolOptionsBox final : public ToolOptionsBox {
   QLabel *m_fillDepthLabel;
   ToolOptionCombo *m_colorMode, *m_toolType;
   ToolOptionCheckbox *m_emptyOnly, *m_segmentMode, *m_onionMode,
-      *m_multiFrameMode, *m_autopaintMode,*m_referFill, * m_closeGap,
+      *m_multiFrameMode, *m_autopaintMode, *m_referFill, *m_closeGap,
       *m_extendFill;
   ToolOptionPairSlider *m_fillDepthField;
-  ToolOptionIntSlider* m_gapCloseDistance;
+  ToolOptionIntSlider *m_gapCloseDistance;
 
 public:
   FillToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,

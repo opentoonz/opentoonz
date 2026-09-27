@@ -88,7 +88,7 @@ public:
 //***********************************************************************************
 
 class DVAPI ToolOptionCheckbox final : public DVGui::CheckBox,
-                                 public ToolOptionControl {
+                                       public ToolOptionControl {
   Q_OBJECT
 
 protected:
@@ -243,7 +243,7 @@ public slots:
 //-----------------------------------------------------------------------------
 
 class DVAPI ToolOptionTextField final : public DVGui::LineEdit,
-                                  public ToolOptionControl {
+                                        public ToolOptionControl {
   Q_OBJECT
 
 protected:
@@ -295,8 +295,9 @@ public slots:
   the edited one)
   \li Undo/Redo of user interactions.
 */
-class DVAPI ToolOptionParamRelayField final : public DVGui::MeasuredDoubleLineEdit,
-                                        public ToolOptionControl {
+class DVAPI ToolOptionParamRelayField final
+    : public DVGui::MeasuredDoubleLineEdit,
+      public ToolOptionControl {
   Q_OBJECT
 
   TDoubleParamP m_param;  //!< Cached property param
@@ -365,9 +366,9 @@ public:
 
   void setValue(double v);
   double getValue() const;
-  
+
   bool isLabelClicked() const { return m_labelClicked; }
- 
+
   void setPrecision(int precision);
   int getPrecision() { return m_precision; }
 
@@ -390,7 +391,7 @@ signals:
 //-----------------------------------------------------------------------------
 
 class DVAPI PegbarChannelField final : public MeasuredValueField,
-                                 public ToolOptionControl {
+                                       public ToolOptionControl {
   Q_OBJECT
 
   const enum TStageObject::Channel m_actionId;
@@ -450,7 +451,8 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class DVAPI NoScaleField final : public MeasuredValueField, public ToolOptionControl {
+class DVAPI NoScaleField final : public MeasuredValueField,
+                                 public ToolOptionControl {
   Q_OBJECT
 
 public:

@@ -2265,7 +2265,7 @@ public:
 };
 
 RulerToolOptionsBox::RulerToolOptionsBox(QWidget *parent, TTool *tool,
-                                           bool verticalLayout)
+                                         bool verticalLayout)
     : ToolOptionsBox(parent, !verticalLayout)
     , m_tool(tool)
     , m_verticalLayout(verticalLayout) {

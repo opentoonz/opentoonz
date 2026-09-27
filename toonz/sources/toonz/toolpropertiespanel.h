@@ -20,29 +20,40 @@
 #include <functional>
 
 //=============================================================================
-// Custom button that respects Cells Borders/Backgrounds while preserving theme colors
+// Custom button that respects Cells Borders/Backgrounds while preserving theme
+// colors
 //=============================================================================
 
 class ToolPropertyButton : public QToolButton {
   Q_OBJECT
-  
+
   bool m_showBorders;
   bool m_showBackgrounds;
-  bool m_hoverEnabled = true;
+  bool m_hoverEnabled   = true;
   int m_compactIconSize = 0;  // >0: highlight/hover only around icon (px)
-  
+
 public:
   ToolPropertyButton(const QString &text, QWidget *parent = nullptr);
-  
-  void setShowBorders(bool show) { m_showBorders = show; update(); }
-  void setShowBackgrounds(bool show) { m_showBackgrounds = show; update(); }
-  void setHoverEnabled(bool enabled) { m_hoverEnabled = enabled; update(); }
-  // Compact highlight: keeps hit area, draws theme state on a smaller centered rect.
+
+  void setShowBorders(bool show) {
+    m_showBorders = show;
+    update();
+  }
+  void setShowBackgrounds(bool show) {
+    m_showBackgrounds = show;
+    update();
+  }
+  void setHoverEnabled(bool enabled) {
+    m_hoverEnabled = enabled;
+    update();
+  }
+  // Compact highlight: keeps hit area, draws theme state on a smaller centered
+  // rect.
   void setCompactIconHighlight(int iconSize) {
     m_compactIconSize = iconSize;
     update();
   }
-  
+
 protected:
   void paintEvent(QPaintEvent *event) override;
 };
@@ -70,7 +81,9 @@ class SelectionTool;
 class PlasticTool;
 class RulerToolOptionsBox;
 class ToolOptionTextField;
-namespace DVGui { class CheckBox; }
+namespace DVGui {
+class CheckBox;
+}
 
 //=============================================================================
 // Tool Properties Panel - Tool properties panel
@@ -88,82 +101,84 @@ class ToolPropertiesPanel : public TPanel {
   QWidget *m_propertiesContainer;
   QVBoxLayout *m_propertiesLayout;
   QLabel *m_toolNameLabel;
-  
+
   // Tool management
   ToolHandle *m_toolHandle;
   QString m_currentToolId;
   QString m_currentToolType;  // "brush", "fill", "eraser", etc.
 
   // Selection tool transform fields (valid only while selection tool is active)
-  SelectionScaleField    *m_selScaleX    = nullptr;
-  SelectionScaleField    *m_selScaleY    = nullptr;
-  SelectionRotationField *m_selRotation  = nullptr;
-  SelectionMoveField     *m_selMoveX     = nullptr;
-  SelectionMoveField     *m_selMoveY     = nullptr;
-  ThickChangeField       *m_selThick     = nullptr;
-  DVGui::CheckBox        *m_selScaleLink = nullptr;
-  QPushButton            *m_selFlipH     = nullptr;
-  QPushButton            *m_selFlipV     = nullptr;
-  QPushButton            *m_selRotL      = nullptr;
-  QPushButton            *m_selRotR      = nullptr;
-  ClickableLabel         *m_selHLabel    = nullptr;
-  ClickableLabel         *m_selVLabel    = nullptr;
-  ClickableLabel         *m_selXLabel    = nullptr;
-  ClickableLabel         *m_selYLabel    = nullptr;
-  QLabel                 *m_selScaleLinkIcon = nullptr;
+  SelectionScaleField *m_selScaleX      = nullptr;
+  SelectionScaleField *m_selScaleY      = nullptr;
+  SelectionRotationField *m_selRotation = nullptr;
+  SelectionMoveField *m_selMoveX        = nullptr;
+  SelectionMoveField *m_selMoveY        = nullptr;
+  ThickChangeField *m_selThick          = nullptr;
+  DVGui::CheckBox *m_selScaleLink       = nullptr;
+  QPushButton *m_selFlipH               = nullptr;
+  QPushButton *m_selFlipV               = nullptr;
+  QPushButton *m_selRotL                = nullptr;
+  QPushButton *m_selRotR                = nullptr;
+  ClickableLabel *m_selHLabel           = nullptr;
+  ClickableLabel *m_selVLabel           = nullptr;
+  ClickableLabel *m_selXLabel           = nullptr;
+  ClickableLabel *m_selYLabel           = nullptr;
+  QLabel *m_selScaleLinkIcon            = nullptr;
 
-  // Type tool — Style capsule rebuilt when font changes (toolComboBoxListChanged).
+  // Type tool — Style capsule rebuilt when font changes
+  // (toolComboBoxListChanged).
   QWidget *m_typeStyleWidget = nullptr;
 
   // Ruler tool: persistent read-only measurement strip (no TPropertyGroup).
-  RulerToolOptionsBox *m_rulerOptionsBox           = nullptr;
-  bool                 m_rulerOptionsBoxRegistered = false;
+  RulerToolOptionsBox *m_rulerOptionsBox = nullptr;
+  bool m_rulerOptionsBoxRegistered       = false;
 
   // Plastic tool persistent widgets (synced with tool options bar).
-  QWidget      *m_plasticModeContainer = nullptr;
-  QVBoxLayout  *m_plasticModeLayout    = nullptr;
-  QWidget      *m_plasticSkelPicker    = nullptr;
-  QWidget      *m_plasticVertexWidget  = nullptr;
-  int           m_plasticVisibleMode   = -1;
+  QWidget *m_plasticModeContainer  = nullptr;
+  QVBoxLayout *m_plasticModeLayout = nullptr;
+  QWidget *m_plasticSkelPicker     = nullptr;
+  QWidget *m_plasticVertexWidget   = nullptr;
+  int m_plasticVisibleMode         = -1;
 
   // Animate (Edit) tool persistent widgets.
-  QWidget *m_animateColumnWidget   = nullptr;
+  QWidget *m_animateColumnWidget = nullptr;
   QList<QWidget *> m_animateSplineRowWidgets;
   QList<QWidget *> m_animateXYRowWidgets;
   QList<MeasuredValueField *> m_animateMeasuredFields;
-  QWidget *m_animateAxisFieldsHost = nullptr;
+  QWidget *m_animateAxisFieldsHost   = nullptr;
   QStackedWidget *m_animateAxisStack = nullptr;
   QList<QWidget *> m_animateAxisStackPages;
-  QWidget *m_animateAllModeHost = nullptr;
+  QWidget *m_animateAllModeHost       = nullptr;
   QVBoxLayout *m_animateAllModeLayout = nullptr;
-  bool m_animateSectionsInAllLayout = false;
+  bool m_animateSectionsInAllLayout   = false;
   QList<QWidget *> m_animateAxisSectionHeaders;
   QList<QWidget *> m_animateAxisSections;
-  int m_animateVisibleAxis = -1;
+  int m_animateVisibleAxis                 = -1;
   PegbarChannelField *m_animateScaleHField = nullptr;
   PegbarChannelField *m_animateScaleVField = nullptr;
 
   // Shift && Trace (Edit Shift pseudo-tool only).
-  QWidget   *m_shiftTraceGhostPicker     = nullptr;
-  QCheckBox *m_shiftTraceNoShiftChk      = nullptr;
+  QWidget *m_shiftTraceGhostPicker                  = nullptr;
+  QCheckBox *m_shiftTraceNoShiftChk                 = nullptr;
   ToolPropertyButton *m_shiftTraceNoShiftIconBtn    = nullptr;
   ToolPropertyButton *m_shiftTraceResetShiftIconBtn = nullptr;
-  QPushButton *m_shiftTraceResetPrevBtn    = nullptr;
-  QPushButton *m_shiftTraceResetFollowingBtn = nullptr;
+  QPushButton *m_shiftTraceResetPrevBtn             = nullptr;
+  QPushButton *m_shiftTraceResetFollowingBtn        = nullptr;
 
-  bool m_useSingleMaxSlider;   // false = DoublePairField (native double cursor), true = single slider (max only)
-  bool m_showLabels;           // Show/hide property labels
-  bool m_showNumericFields;    // Show/hide numeric fields
-  bool m_showBorders;          // Show/hide option borders in collapsible menus
-  bool m_showBackgrounds;      // Show/hide option backgrounds in collapsible menus
-  bool m_showIcons;            // Icon grid replaces collapsible enums when possible
-  
+  bool m_useSingleMaxSlider;  // false = DoublePairField (native double cursor),
+                              // true = single slider (max only)
+  bool m_showLabels;          // Show/hide property labels
+  bool m_showNumericFields;   // Show/hide numeric fields
+  bool m_showBorders;         // Show/hide option borders in collapsible menus
+  bool m_showBackgrounds;  // Show/hide option backgrounds in collapsible menus
+  bool m_showIcons;        // Icon grid replaces collapsible enums when possible
+
 public:
   ToolPropertiesPanel(QWidget *parent = nullptr);
   ~ToolPropertiesPanel();
-  
+
   void reset() override;
-  
+
 protected:
   void showEvent(QShowEvent *e) override;
   void hideEvent(QHideEvent *e) override;
@@ -173,13 +188,13 @@ private:
   void initializeUI();
   void connectSignals();
   void disconnectSignals();
-  
+
   // Tool detection
   QString detectCurrentToolId();
   QString detectCurrentToolType();
-  TTool* getCurrentTool();
+  TTool *getCurrentTool();
   QString displayNameForToolId(const QString &toolId) const;
-  
+
   // Properties display
   void refreshProperties();
   void clearProperties();
@@ -189,7 +204,7 @@ private:
   void updateWidgetFromProperty(QWidget *widget);
   void updatePropertyWidgetsIn(QWidget *root);
   void attachAllPropertySyncListeners();
-  
+
   // Brush-specific properties (current implementation)
   void createBrushProperties();
   void createMyPaintBrushProperties();
@@ -214,14 +229,14 @@ private:
   void createModifierLockAlphaProperty();
   void createAssistantsProperty();
   void createPressureProperty();
-  
+
   // MyPaint-specific properties (special sliders)
   void createMyPaintSizeProperty();
   void createMyPaintOpacityProperty();
 
   // Generic property helpers (name-based lookup, no-op if property absent)
   void createEnumProperty(const QString &label, const std::string &propName,
-                          int propGroup = 0,
+                          int propGroup           = 0,
                           const QString &iconName = QString());
   void createBoolProperty(const QString &label, const std::string &propName,
                           int propGroup = 0);
@@ -230,11 +245,10 @@ private:
   void createIntSliderByName(const QString &label, const std::string &propName,
                              int propGroup = 0);
   void createDoubleSliderByName(const QString &label,
-                                const std::string &propName,
-                                int propGroup = 0);
+                                const std::string &propName, int propGroup = 0);
 
   // Generic property builder — iterates all TProperty in a group dynamically.
-  bool createGenericProperties(int propGroup = 0,
+  bool createGenericProperties(int propGroup             = 0,
                                QVBoxLayout *targetLayout = nullptr,
                                bool plasticAlignedFields = false);
 
@@ -257,8 +271,9 @@ private:
   void reparentAnimateSectionsToAllMode();
   void reparentAnimateSectionsToAxisStack();
   QWidget *createEnumIconGridPanel(
-      const QString &label, TEnumProperty *enumProp, const std::string &propName,
-      int propGroup = 0, QWidget *parentWidget = nullptr,
+      const QString &label, TEnumProperty *enumProp,
+      const std::string &propName, int propGroup = 0,
+      QWidget *parentWidget                     = nullptr,
       const std::function<void(int)> &onChanged = nullptr);
 
   // Eraser properties (3 variants: vector / toonz-raster / fullcolor-raster)
@@ -282,63 +297,70 @@ private:
                               const std::string &propName, int propGroup = 0);
   void createIntPairSlider(const QString &label, void *prop,
                            const std::string &propName, int propGroup = 0);
-  QWidget* createSliderWithLabel(const QString &label, int min, int max, int value, 
-                                 const std::string &propName);
-  QWidget* createDoubleSliderWithLabel(const QString &label, double min, double max, 
-                                       double value, const std::string &propName);
-  QWidget* createCheckBox(const QString &label, bool checked, const std::string &propName);
-  QWidget* createTextProperty(const QString &label, TStringProperty *prop,
+  QWidget *createSliderWithLabel(const QString &label, int min, int max,
+                                 int value, const std::string &propName);
+  QWidget *createDoubleSliderWithLabel(const QString &label, double min,
+                                       double max, double value,
+                                       const std::string &propName);
+  QWidget *createCheckBox(const QString &label, bool checked,
+                          const std::string &propName);
+  QWidget *createTextProperty(const QString &label, TStringProperty *prop,
                               const std::string &propName, int propGroup = 0);
-  QWidget* createCollapsibleEnum(const QString &label, const QStringList &items, 
-                                 int currentIndex, const std::string &propName,
-                                 const QString &iconName = QString(),
-                                 const std::function<void(int)> &onChanged = nullptr,
-                                 bool reserveHeaderRightSlot = false,
-                                 QWidget *parentWidget = nullptr);
-  QWidget* createCollapsiblePicker(
+  QWidget *createCollapsibleEnum(
       const QString &label, const QStringList &items, int currentIndex,
-      const QString &storageKey, const std::function<void(int)> &onChanged);
-  QWidget* createAnimateColumnPicker(TXsheetHandle *xshHandle,
+      const std::string &propName, const QString &iconName = QString(),
+      const std::function<void(int)> &onChanged = nullptr,
+      bool reserveHeaderRightSlot = false, QWidget *parentWidget = nullptr);
+  QWidget *createCollapsiblePicker(const QString &label,
+                                   const QStringList &items, int currentIndex,
+                                   const QString &storageKey,
+                                   const std::function<void(int)> &onChanged);
+  QWidget *createAnimateColumnPicker(TXsheetHandle *xshHandle,
                                      TObjectHandle *objHandle);
   void syncCollapsiblePicker(QWidget *container, int index);
   QWidget *createCollapsibleTextField(
       const QString &label, const QString &textValue,
-      const std::string &storageKey, const std::string &propName,
-      int propGroup, const std::function<void(const QString &)> &onChanged,
+      const std::string &storageKey, const std::string &propName, int propGroup,
+      const std::function<void(const QString &)> &onChanged,
       bool reserveHeaderRightSlot = false);
-  QWidget *createCollapsibleSection(
-      const QString &label, const std::string &storageKey, QWidget *contentWidget,
-      const QString &headerValue = QString(),
-      const QString &iconName = QString());
-  QWidget *createCollapsibleIntSlider(
-      const QString &label, int min, int max, int value,
-      const std::string &propName, int propGroup,
-      const std::string &storageKey, bool reserveHeaderRightSlot = false);
+  QWidget *createCollapsibleSection(const QString &label,
+                                    const std::string &storageKey,
+                                    QWidget *contentWidget,
+                                    const QString &headerValue = QString(),
+                                    const QString &iconName    = QString());
+  QWidget *createCollapsibleIntSlider(const QString &label, int min, int max,
+                                      int value, const std::string &propName,
+                                      int propGroup,
+                                      const std::string &storageKey,
+                                      bool reserveHeaderRightSlot = false);
   QWidget *buildPlasticSkeletonPicker(PlasticTool *plastic);
   void updatePlasticVertexField();
-  QWidget* createCollapsibleEnumWithIcons(const QString &label, const QStringList &items,
-                                          int currentIndex, const std::string &propName,
+  QWidget *createCollapsibleEnumWithIcons(const QString &label,
+                                          const QStringList &items,
+                                          int currentIndex,
+                                          const std::string &propName,
                                           const QStringList &iconNames);
   QWidget *createCollapsibleEnumForProperty(
-      const QString &label, TEnumProperty *enumProp, const std::string &propName,
-      int propGroup = 0, const QString &headerIconName = QString(),
+      const QString &label, TEnumProperty *enumProp,
+      const std::string &propName, int propGroup = 0,
+      const QString &headerIconName             = QString(),
       const std::function<void(int)> &onChanged = nullptr,
       bool reserveHeaderRightSlot = false, QWidget *parentWidget = nullptr);
   void addShowHideContextMenu(QMenu *menu);
-  
+
   // Container stylesheet management for Cells Borders/Backgrounds
   void updateContainerStylesheet();
-  
+
   // Theme-aware style helpers (no hardcoded colors)
   QString getButtonStyleChecked() const;
   QString getButtonStyleNormal(bool showBorders, bool showBackgrounds) const;
-  
+
 private slots:
   void onToolSwitched();
   void onSceneContextChanged();
   void onToolChanged();
   void onToolComboBoxListChanged(const std::string &id);
-  
+
   // Brush property slots
   void onSizeChanged(int value);
   void onHardnessChanged(int value);
@@ -357,5 +379,4 @@ private slots:
   void onShiftTraceCommandChanged();
 };
 
-#endif // TOOLPROPERTIESPANEL_H
-
+#endif  // TOOLPROPERTIESPANEL_H
