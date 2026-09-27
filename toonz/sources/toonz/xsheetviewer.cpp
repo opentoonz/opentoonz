@@ -1491,6 +1491,9 @@ void XsheetViewer::onPreferenceChanged(const QString &prefName) {
     refreshContentSize(0, 0);
   } else if (prefName == "XsheetCamera") {
     refreshContentSize(0, 0);
+  } else if (prefName == "CurrentCellColor") {
+    m_cellArea->update();
+    m_columnArea->update();
   }
 }
 
@@ -2023,6 +2026,25 @@ QColor XsheetViewer::getSelectedColumnTextColor() const {
                             (int)currentColumnPixel.g,
                             (int)currentColumnPixel.b, 255);
   return currentColumnColor;
+}
+
+QColor XsheetViewer::getCellFocusColor() const {
+  Preferences *preferences = Preferences::instance();
+  if (!preferences->isCustomCurrentCellColorEnabled()) return m_cellFocusColor;
+
+  TPixel color;
+  preferences->getCurrentCellData(color);
+  return QColor(color.r, color.g, color.b, color.m);
+}
+
+QColor XsheetViewer::getColumnFocusColor() const {
+  Preferences *preferences = Preferences::instance();
+  if (!preferences->isCustomCurrentColumnOutlineColorEnabled())
+    return m_columnFocusColor;
+
+  TPixel color;
+  preferences->getCurrentColumnOutlineColor(color);
+  return QColor(color.r, color.g, color.b, color.m);
 }
 
 //=============================================================================

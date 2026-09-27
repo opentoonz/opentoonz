@@ -172,7 +172,8 @@ public:
 
   ColorField(QWidget *parent = 0, bool isAlphaActive = true,
              TPixel32 color = TPixel32(0, 0, 0, 255), int squareSize = 40,
-             bool useStyleEditor = true, int sliderWidth = -1);
+             bool useStyleEditor = true, int sliderWidth = -1,
+             bool horizontalChannels = false);
 
   ~ColorField() {}
 

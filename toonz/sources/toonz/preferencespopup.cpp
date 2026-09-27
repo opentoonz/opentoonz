@@ -49,6 +49,8 @@
 #include <QComboBox>
 #include <QFontComboBox>
 #include <QLabel>
+#include <QScreen>
+#include <QScrollArea>
 #include <QStackedWidget>
 #include <QLineEdit>
 #include <QFileDialog>
@@ -746,6 +748,11 @@ void PreferencesPopup::onShowKeyframesOnCellAreaChanged() {
   TApp::instance()->getCurrentScene()->notifyPreferenceChanged("XsheetCamera");
 }
 
+void PreferencesPopup::onCurrentCellColorChanged() {
+  TApp::instance()->getCurrentScene()->notifyPreferenceChanged(
+      "CurrentCellColor");
+}
+
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onShowXSheetToolbarClicked() {
@@ -1118,7 +1125,8 @@ QWidget* PreferencesPopup::createUI(PreferencesItemId id,
   case QMetaType::QColor:  // create ColorField
   {
     ColorField* field =
-        new ColorField(this, false, colorToTPixel(item.value.value<QColor>()));
+        new ColorField(this, false, colorToTPixel(item.value.value<QColor>()),
+                       24, true, 44, true);
     connect(field, &ColorField::colorChanged, this,
             &PreferencesPopup::onColorFieldChanged);
     widget = field;
@@ -1431,7 +1439,11 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {syncLevelRenumberWithXsheet,
        tr("Sync Level Strip Drawing Number Changes with the Xsheet")},
       {currentTimelineEnabled, tr("Show Current Time Indicator")},
-      {currentColumnColor, tr("Current Column Color:")},
+      {currentColumnColor, tr("Current Column Text Color:")},
+      {customCurrentCellColorEnabled, tr("Custom")},
+      {currentCellColor, tr("Current Cell Outline:")},
+      {customCurrentColumnOutlineColorEnabled, tr("Custom")},
+      {currentColumnOutlineColor, tr("Current Header Outline:")},
       //{ levelNameOnEachMarkerEnabled, tr("Display Level Name on Each
       // Marker")
       //},
@@ -1699,24 +1711,33 @@ PreferencesPopup::PreferencesPopup()
   categoryList->setAlternatingRowColors(true);
 
   QStackedWidget* stackedWidget = new QStackedWidget(this);
-  stackedWidget->addWidget(createGeneralPage());
-  stackedWidget->addWidget(createInterfacePage());
-  stackedWidget->addWidget(createPreviewPage());
-  stackedWidget->addWidget(createLoadingPage());
-  stackedWidget->addWidget(createSavingPage());
-  stackedWidget->addWidget(createCodecPage());
-  stackedWidget->addWidget(createDrawingPage());
-  stackedWidget->addWidget(createToolsPage());
-  stackedWidget->addWidget(createXsheetPage());
-  stackedWidget->addWidget(createOnionSkinPage());
-  stackedWidget->addWidget(createAnimationPage());
-  stackedWidget->addWidget(createAutoLipSyncPage());
-  stackedWidget->addWidget(createColorsPage());
-  stackedWidget->addWidget(createVisualizationPage());
-  stackedWidget->addWidget(createVersionControlPage());
-  stackedWidget->addWidget(createTouchTabletPage());
+  auto addPage                  = [stackedWidget](QWidget* page) {
+    QScrollArea* scrollArea = new QScrollArea(stackedWidget);
+    scrollArea->setFrameShape(QFrame::NoFrame);
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    scrollArea->setWidget(page);
+    stackedWidget->addWidget(scrollArea);
+  };
+  addPage(createGeneralPage());
+  addPage(createInterfacePage());
+  addPage(createPreviewPage());
+  addPage(createLoadingPage());
+  addPage(createSavingPage());
+  addPage(createCodecPage());
+  addPage(createDrawingPage());
+  addPage(createToolsPage());
+  addPage(createXsheetPage());
+  addPage(createOnionSkinPage());
+  addPage(createAnimationPage());
+  addPage(createAutoLipSyncPage());
+  addPage(createColorsPage());
+  addPage(createVisualizationPage());
+  addPage(createVersionControlPage());
+  addPage(createTouchTabletPage());
 #ifdef _WIN32
-  stackedWidget->addWidget(createAddonsPage());
+  addPage(createAddonsPage());
 #endif  // WIN32
 
   QHBoxLayout* mainLayout = new QHBoxLayout();
@@ -1733,6 +1754,12 @@ PreferencesPopup::PreferencesPopup()
   }
   setLayout(mainLayout);
 
+  // Keep the dialog within the current screen so overflowing pages can scroll.
+  QSize preferredSize = sizeHint().expandedTo(QSize(1060, 860));
+  if (QScreen* currentScreen = parentWidget()->screen())
+    preferredSize = preferredSize.boundedTo(
+        currentScreen->availableGeometry().size() - QSize(40, 60));
+  resize(preferredSize);
 
   connect(categoryList, &QListWidget::currentRowChanged, stackedWidget,
           &QStackedWidget::setCurrentIndex);
@@ -2292,6 +2319,25 @@ QWidget* PreferencesPopup::createXsheetPage() {
   QGridLayout* lay = new QGridLayout();
   setupLayout(lay);
 
+  auto createOutlineControls = [this](PreferencesItemId enabledId,
+                                      PreferencesItemId colorId,
+                                      const QString& label) {
+    QCheckBox* customCheck = qobject_cast<QCheckBox*>(createUI(enabledId));
+    QWidget* colorField    = createUI(colorId);
+    colorField->setEnabled(customCheck->isChecked());
+    connect(customCheck, &QCheckBox::toggled, colorField, &QWidget::setEnabled);
+    customCheck->setToolTip(tr("When unchecked, use the theme color."));
+
+    QHBoxLayout* controls = new QHBoxLayout();
+    controls->setContentsMargins(0, 0, 0, 0);
+    controls->setSpacing(5);
+    controls->addWidget(new QLabel(label, this));
+    controls->addWidget(customCheck);
+    controls->addWidget(colorField);
+    controls->addStretch(1);
+    return controls;
+  };
+
   insertUI(xsheetLayoutPreference, lay,
            getComboItemList(xsheetLayoutPreference));
   insertUI(levelNameDisplayType, lay, getComboItemList(levelNameDisplayType));
@@ -2309,12 +2355,24 @@ QWidget* PreferencesPopup::createXsheetPage() {
     insertUI(showColumnNumbers, xshColHeaderLay);
     insertUI(unifyColumnVisibilityToggles, xshColHeaderLay);
     insertUI(parentColorsInXsheetColumn, xshColHeaderLay);
+    insertUI(currentColumnColor, xshColHeaderLay);
+
+    // The header outline control shares the existing column text color row.
+    xshColHeaderLay->addLayout(
+        createOutlineControls(customCurrentColumnOutlineColorEnabled,
+                              currentColumnOutlineColor,
+                              tr("Current Header Outline:")),
+        xshColHeaderLay->rowCount() - 1, 2);
   }
   QGridLayout* xshCellAreaLay = insertGroupBox(tr("Xsheet Cell Area"), lay);
   {
     insertUI(highlightLineEverySecond, xshCellAreaLay);
     insertUI(currentTimelineEnabled, xshCellAreaLay);
     insertUI(showFrameNumberWithLetters, xshCellAreaLay);
+    xshCellAreaLay->addLayout(
+        createOutlineControls(customCurrentCellColorEnabled, currentCellColor,
+                              tr("Current Cell Outline:")),
+        xshCellAreaLay->rowCount(), 0, 1, 3);
   }
 
   QGridLayout* showKeyLay =
@@ -2331,7 +2389,6 @@ QWidget* PreferencesPopup::createXsheetPage() {
   insertUI(useArrowKeyToShiftCellSelection, lay);
   insertUI(shortcutCommandsWhileRenamingCellEnabled, lay);
   insertUI(syncLevelRenumberWithXsheet, lay);
-  insertUI(currentColumnColor, lay);
 
   lay->setRowStretch(lay->rowCount(), 1);
   insertFootNote(lay);
@@ -2341,6 +2398,14 @@ QWidget* PreferencesPopup::createXsheetPage() {
                            &PreferencesPopup::onShowKeyframesOnCellAreaChanged);
   m_onEditedFuncMap.insert(showXsheetCameraColumn,
                            &PreferencesPopup::onShowKeyframesOnCellAreaChanged);
+  m_onEditedFuncMap.insert(customCurrentCellColorEnabled,
+                           &PreferencesPopup::onCurrentCellColorChanged);
+  m_onEditedFuncMap.insert(currentCellColor,
+                           &PreferencesPopup::onCurrentCellColorChanged);
+  m_onEditedFuncMap.insert(customCurrentColumnOutlineColorEnabled,
+                           &PreferencesPopup::onCurrentCellColorChanged);
+  m_onEditedFuncMap.insert(currentColumnOutlineColor,
+                           &PreferencesPopup::onCurrentCellColorChanged);
   m_onEditedFuncMap.insert(
       unifyColumnVisibilityToggles,
       &PreferencesPopup::onUnifyColumnVisibilityTogglesChanged);

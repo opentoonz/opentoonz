@@ -1901,7 +1901,29 @@ void ColumnArea::paintEvent(QPaintEvent *event) {  // AREA
   else
     p.drawRect(toBeUpdated.adjusted(0, 0, -2, -1));
 
+  drawCurrentColumnFocus(p, m_viewer->getCurrentColumn());
+
   if (getDragTool()) getDragTool()->drawColumnsArea(p);
+}
+
+void ColumnArea::drawCurrentColumnFocus(QPainter &p, int col) {
+  const Orientation *o = m_viewer->orientation();
+  TXsheet *xsh         = m_viewer->getXsheet();
+  if (!xsh || (col >= 0 && !xsh->getColumnFan(o)->isActive(col))) return;
+
+  QPoint origin = m_viewer->positionToXY(CellPosition(0, col));
+  QRect rect    = o->rect((col < 0) ? PredefinedRect::CAMERA_LAYER_NAME
+                                    : PredefinedRect::LAYER_NAME)
+                   .translated(origin);
+  if (rect.isEmpty()) return;
+
+  QColor color = m_viewer->getColumnFocusColor();
+  if (color.alpha() == 0) return;
+  p.save();
+  p.setPen(color);
+  p.setBrush(Qt::NoBrush);
+  for (int i = 0; i < 2; ++i) p.drawRect(rect.adjusted(i, i, -i, -i));
+  p.restore();
 }
 
 //-----------------------------------------------------------------------------
