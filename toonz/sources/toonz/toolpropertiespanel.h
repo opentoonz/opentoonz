@@ -169,7 +169,7 @@ protected:
   void showEvent(QShowEvent *e) override;
   void hideEvent(QHideEvent *e) override;
   void contextMenuEvent(QContextMenuEvent *event) override;
-  
+
 private:
   void initializeUI();
   void connectSignals();
