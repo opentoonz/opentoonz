@@ -5172,7 +5172,8 @@ namespace {
 constexpr int kAnimateAxisSectionCount = 5;
 constexpr int kAnimateAllAxisIndex     = 5;
 constexpr int kAnimateLockButtonW      = 22;
-constexpr int kAnimateAllSectionHeaderH = 18;
+constexpr int kAnimateAllSectionHeaderH  = 18;
+constexpr int kAnimateAllModeSectionGap = 3;
 
 void styleAnimateLockCheckbox(ToolOptionCheckbox *lock) {
   if (!lock) return;
@@ -5207,14 +5208,16 @@ QWidget *makeAnimateFieldHBoxCell(QWidget *parent, MeasuredValueField *field,
   return cell;
 }
 
-QLabel *makeAnimateAllModeSectionHeader(QWidget *parent, const QString &text) {
+QLabel *makeAnimateAllModeSectionHeader(QWidget *parent, const QString &text,
+                                        int topMargin = 0) {
   auto *label = new QLabel(text, parent);
   label->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
   QFont f = label->font();
   f.setBold(true);
   label->setFont(f);
-  label->setContentsMargins(CollapsibleStyle::kContentLeftIndent, 0, 0, 0);
-  label->setFixedHeight(kAnimateAllSectionHeaderH);
+  label->setContentsMargins(CollapsibleStyle::kContentLeftIndent, topMargin, 0,
+                            0);
+  label->setFixedHeight(kAnimateAllSectionHeaderH + topMargin);
   label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   label->setVisible(false);
   return label;
@@ -5335,8 +5338,10 @@ void ToolPropertiesPanel::createAnimateProperties() {
 
   auto appendAnimateAxisSection = [&](const QString &allModeTitle,
                                       QWidget *section) {
-    QLabel *header =
-        makeAnimateAllModeSectionHeader(m_animateAllModeHost, allModeTitle);
+    const int headerTopGap =
+        m_animateAxisSectionHeaders.isEmpty() ? 0 : kAnimateAllModeSectionGap;
+    QLabel *header = makeAnimateAllModeSectionHeader(
+        m_animateAllModeHost, allModeTitle, headerTopGap);
     QWidget *page = makeAnimateAxisStackPage(m_animateAxisStack, section);
     m_animateAxisStack->addWidget(page);
     m_animateAxisStackPages.append(page);
@@ -5476,10 +5481,20 @@ void ToolPropertiesPanel::createAnimateProperties() {
     QWidget *rotLabelSpacer = new QWidget(section);
     rotLabelSpacer->setFixedSize(kGridLabelWidth, 20);
     fieldGrid->addWidget(rotLabelSpacer, 0, 0);
-    QWidget *rotCell =
-        makeAnimateFieldHBoxCell(section, rotField, nullptr, true);
+
+    QWidget *rotCell = new QWidget(section);
+    rotCell->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    QHBoxLayout *rotCellLay = new QHBoxLayout(rotCell);
+    rotCellLay->setContentsMargins(0, 0, 1, 0);
+    rotCellLay->setSpacing(2);
+    styleAnimateGridField(rotField);
+    rotCellLay->addWidget(rotField, 1);
+    rotCellLay->addWidget(rotBtnCell, 0);
     fieldGrid->addWidget(rotCell, 0, 1);
-    fieldGrid->addWidget(rotBtnCell, 0, 3, Qt::AlignRight | Qt::AlignVCenter);
+
+    auto *rotMidSpacer = new QWidget(section);
+    rotMidSpacer->setFixedSize(kGridLabelWidth, 20);
+    fieldGrid->addWidget(rotMidSpacer, 0, 3);
     auto *rotFieldSpacer = new QWidget(section);
     rotFieldSpacer->setMinimumWidth(kAnimateUniformFieldW);
     rotFieldSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -5534,45 +5549,43 @@ void ToolPropertiesPanel::createAnimateProperties() {
     styleAnimateLockCheckbox(lockH);
     styleAnimateLockCheckbox(lockV);
 
-    {
-      auto *globalLabel = new ClickableLabel(tr("Global:"), fieldBlock);
-      globalLabel->setFixedSize(kGridLabelWidth, 20);
-      fieldGrid->addWidget(globalLabel, 0, 0, Qt::AlignRight | Qt::AlignVCenter);
-      connectClickableLabel(globalLabel, globalField);
-      QWidget *globalCell =
-          makeAnimateFieldHBoxCell(fieldBlock, globalField, nullptr, true);
-      fieldGrid->addWidget(globalCell, 0, 1);
-      gridAddColumnSpacer(fieldGrid, 0, fieldBlock, 3, 4);
-    }
+    auto addScaleRowLabel = [&](ClickableLabel *label, MeasuredValueField *field,
+                                int row) {
+      label->setFixedSize(kGridLabelWidth, 20);
+      fieldGrid->addWidget(label, row, 0, Qt::AlignRight | Qt::AlignVCenter);
+      connectClickableLabel(label, field);
+    };
 
-    {
-      auto *hLabel = new ClickableLabel(tr("H:"), fieldBlock);
-      hLabel->setFixedSize(kGridLabelWidth, 20);
-      fieldGrid->addWidget(hLabel, 1, 0, Qt::AlignRight | Qt::AlignVCenter);
-      connectClickableLabel(hLabel, m_animateScaleHField);
-      QWidget *hCell =
-          makeAnimateFieldHBoxCell(fieldBlock, m_animateScaleHField, lockH);
-      fieldGrid->addWidget(hCell, 1, 1);
-      fieldGrid->addWidget(flipH, 1, 3, Qt::AlignRight | Qt::AlignVCenter);
-      auto *hFieldSpacer = new QWidget(fieldBlock);
-      hFieldSpacer->setMinimumWidth(kAnimateUniformFieldW);
-      hFieldSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-      fieldGrid->addWidget(hFieldSpacer, 1, 4);
-    }
-    {
-      auto *vLabel = new ClickableLabel(tr("V:"), fieldBlock);
-      vLabel->setFixedSize(kGridLabelWidth, 20);
-      fieldGrid->addWidget(vLabel, 2, 0, Qt::AlignRight | Qt::AlignVCenter);
-      connectClickableLabel(vLabel, m_animateScaleVField);
-      QWidget *vCell =
-          makeAnimateFieldHBoxCell(fieldBlock, m_animateScaleVField, lockV);
-      fieldGrid->addWidget(vCell, 2, 1);
-      fieldGrid->addWidget(flipV, 2, 3, Qt::AlignRight | Qt::AlignVCenter);
-      auto *vFieldSpacer = new QWidget(fieldBlock);
-      vFieldSpacer->setMinimumWidth(kAnimateUniformFieldW);
-      vFieldSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-      fieldGrid->addWidget(vFieldSpacer, 2, 4);
-    }
+    auto addScaleAuxPlaceholder = [&](int row) {
+      auto *flipSlot = new QWidget(fieldBlock);
+      flipSlot->setFixedSize(flipH->width(), CollapsibleStyle::kFieldHeight);
+      flipSlot->setAttribute(Qt::WA_TransparentForMouseEvents);
+      fieldGrid->addWidget(flipSlot, row, 3);
+      fieldGrid->addWidget(makeAnimateLockSlotPlaceholder(fieldBlock), row, 4);
+    };
+
+    auto *globLabel = new ClickableLabel(tr("Glo:"), fieldBlock);
+    globLabel->setToolTip(tr("Global scale"));
+    addScaleRowLabel(globLabel, globalField, 0);
+    styleAnimateGridField(globalField);
+    fieldGrid->addWidget(globalField, 0, 1);
+    addScaleAuxPlaceholder(0);
+
+    addScaleRowLabel(new ClickableLabel(tr("H:"), fieldBlock),
+                     m_animateScaleHField, 1);
+    styleAnimateGridField(m_animateScaleHField);
+    fieldGrid->addWidget(m_animateScaleHField, 1, 1);
+    fieldGrid->addWidget(flipH, 1, 3, Qt::AlignLeft | Qt::AlignVCenter);
+    if (lockH)
+      fieldGrid->addWidget(lockH, 1, 4, Qt::AlignLeft | Qt::AlignVCenter);
+
+    addScaleRowLabel(new ClickableLabel(tr("V:"), fieldBlock),
+                     m_animateScaleVField, 2);
+    styleAnimateGridField(m_animateScaleVField);
+    fieldGrid->addWidget(m_animateScaleVField, 2, 1);
+    fieldGrid->addWidget(flipV, 2, 3, Qt::AlignLeft | Qt::AlignVCenter);
+    if (lockV)
+      fieldGrid->addWidget(lockV, 2, 4, Qt::AlignLeft | Qt::AlignVCenter);
 
     QObject::connect(flipH, &QPushButton::clicked, [this]() {
       if (!m_animateScaleHField) return;
