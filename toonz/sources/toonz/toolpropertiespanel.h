@@ -145,7 +145,6 @@ class ToolPropertiesPanel : public TPanel {
 
   // Shift && Trace (Edit Shift pseudo-tool only).
   QWidget   *m_shiftTraceGhostPicker     = nullptr;
-  QWidget   *m_shiftTraceBBoxPicker      = nullptr;
   QCheckBox *m_shiftTraceNoShiftChk      = nullptr;
   ToolPropertyButton *m_shiftTraceNoShiftIconBtn    = nullptr;
   ToolPropertyButton *m_shiftTraceResetShiftIconBtn = nullptr;
