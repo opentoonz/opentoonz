@@ -47,6 +47,7 @@
 // TnzQt includes
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/dvdialog.h"
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/stageobjectsdata.h"
 #include "historytypes.h"
@@ -342,6 +343,52 @@ public:
     XshCmd::removeSceneFrame(frame);
   }
 } removeSceneFrameCommand;
+
+//*****************************************************************************
+//    RemoveSelectedSceneFrames command
+//*****************************************************************************
+
+class RemoveSelectedSceneFramesCommand final : public MenuItemHandler {
+public:
+  RemoveSelectedSceneFramesCommand()
+      : MenuItemHandler(MI_RemoveSelectedSceneFrames) {}
+
+  void execute() override {
+    TCellSelection *selection = dynamic_cast<TCellSelection *>(
+        TApp::instance()->getCurrentSelection()->getSelection());
+    if (!selection || selection->isEmpty()) return;
+
+    TCellSelection::Range range = selection->getSelectedCells();
+    if (range.getRowCount() < 2) return;
+
+    TXsheet *xsh           = TApp::instance()->getCurrentXsheet()->getXsheet();
+    bool hasExposedContent = false;
+    for (int row = range.m_r0; row <= range.m_r1 && !hasExposedContent; ++row) {
+      for (int col = 0; col < xsh->getColumnCount(); ++col) {
+        if (!xsh->getCell(row, col).isEmpty()) {
+          hasExposedContent = true;
+          break;
+        }
+      }
+    }
+
+    if (hasExposedContent) {
+      QString question = QObject::tr(
+          "The selected Xsheet frames contain exposed content. Removing them "
+          "will remove these rows across all columns and shift later frames "
+          "upward. Continue?");
+      int ret = DVGui::MsgBox(question, QObject::tr("Remove Frames"),
+                              QObject::tr("Cancel"), 1);
+      if (ret != 1) return;
+    }
+
+    TUndoScopedBlock undoBlock;
+    for (int row = range.m_r1; row >= range.m_r0; --row) removeSceneFrame(row);
+
+    selection->selectCells(range.m_r0, range.m_c0, range.m_r0, range.m_c1);
+    TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+  }
+} removeSelectedSceneFramesCommand;
 
 //*****************************************************************************
 //    GlobalKeyframeUndo  definition
