@@ -212,10 +212,11 @@ ToolPropertyButton::ToolPropertyButton(const QString &text, QWidget *parent)
     , m_showBorders(true)
     , m_showBackgrounds(true) {
   setText(text);
-  setMouseTracking(true);  // To detect hover
+  setMouseTracking(true);
+  setStyleSheet(QStringLiteral("QToolButton { margin: 0; padding: 0; }"));
 }
 
-void ToolPropertyButton::paintEvent(QPaintEvent *event) {
+void ToolPropertyButton::paintEvent(QPaintEvent *) {
   QStyleOptionToolButton opt;
   initStyleOption(&opt);
 
@@ -267,12 +268,10 @@ void ToolPropertyButton::paintEvent(QPaintEvent *event) {
   }
 
   if (useThemeState) {
-    // Hover/checked/pressed: let QSS draw full button to match theme colors
     style()->drawComplexControl(QStyle::CC_ToolButton, &opt, &painter, this);
     return;
   }
 
-  // Normal state: draw background based on Cells Backgrounds option
   if (m_showBackgrounds) {
     painter.setPen(Qt::NoPen);
     painter.setBrush(
@@ -280,10 +279,8 @@ void ToolPropertyButton::paintEvent(QPaintEvent *event) {
     painter.drawRect(rect());
   }
 
-  // Draw label (text/icon)
   style()->drawControl(QStyle::CE_ToolButtonLabel, &opt, &painter, this);
 
-  // Draw thin border if enabled (Brush Preset style)
   if (m_showBorders) {
     QColor borderColor = palette().color(QPalette::Mid);
     QPen borderPen(borderColor);
@@ -930,7 +927,6 @@ void ToolPropertiesPanel::clearProperties() {
   m_typeStyleWidget         = nullptr;
 
   m_shiftTraceGhostPicker       = nullptr;
-  m_shiftTraceBBoxPicker        = nullptr;
   m_shiftTraceNoShiftChk        = nullptr;
   m_shiftTraceNoShiftIconBtn    = nullptr;
   m_shiftTraceResetShiftIconBtn = nullptr;
@@ -5173,7 +5169,8 @@ constexpr int kAnimateAxisSectionCount = 5;
 constexpr int kAnimateAllAxisIndex     = 5;
 constexpr int kAnimateLockButtonW      = 22;
 constexpr int kAnimateAllSectionHeaderH  = 18;
-constexpr int kAnimateAllModeSectionGap = 3;
+constexpr int kAnimateAllModeSectionGap     = 3;
+constexpr int kAnimateActiveAxisToFieldsGap = 2;
 
 void styleAnimateLockCheckbox(ToolOptionCheckbox *lock) {
   if (!lock) return;
@@ -5221,6 +5218,13 @@ QLabel *makeAnimateAllModeSectionHeader(QWidget *parent, const QString &text,
   label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   label->setVisible(false);
   return label;
+}
+
+void applyAnimateAllModeSectionHeaderLabel(QLabel *header, bool showLabels) {
+  if (!header) return;
+  const QString title =
+      header->property("animateAllModeSectionTitle").toString();
+  header->setText(showLabels ? title : QString());
 }
 
 QWidget *makeAnimateAxisStackPage(QWidget *parent, QWidget *section) {
@@ -5292,7 +5296,7 @@ void ToolPropertiesPanel::createAnimateProperties() {
   activeAxisBlock->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
   QVBoxLayout *activeAxisBlockLayout = new QVBoxLayout(activeAxisBlock);
   activeAxisBlockLayout->setContentsMargins(0, 0, 0, 0);
-  activeAxisBlockLayout->setSpacing(0);
+  activeAxisBlockLayout->setSpacing(kAnimateActiveAxisToFieldsGap);
 
   if (TEnumProperty *activeAxisProp =
           dynamic_cast<TEnumProperty *>(pg->getProperty("Active Axis"))) {
@@ -5342,6 +5346,8 @@ void ToolPropertiesPanel::createAnimateProperties() {
         m_animateAxisSectionHeaders.isEmpty() ? 0 : kAnimateAllModeSectionGap;
     QLabel *header = makeAnimateAllModeSectionHeader(
         m_animateAllModeHost, allModeTitle, headerTopGap);
+    header->setProperty("animateAllModeSectionTitle", allModeTitle);
+    applyAnimateAllModeSectionHeaderLabel(header, m_showLabels);
     QWidget *page = makeAnimateAxisStackPage(m_animateAxisStack, section);
     m_animateAxisStack->addWidget(page);
     m_animateAxisStackPages.append(page);
@@ -5478,9 +5484,11 @@ void ToolPropertiesPanel::createAnimateProperties() {
     rotBtnLay->addWidget(rotL);
     rotBtnLay->addWidget(rotR);
 
-    QWidget *rotLabelSpacer = new QWidget(section);
-    rotLabelSpacer->setFixedSize(kGridLabelWidth, 20);
-    fieldGrid->addWidget(rotLabelSpacer, 0, 0);
+    auto *rotLabel = new ClickableLabel(tr("Rot:"), section);
+    rotLabel->setToolTip(tr("Rotation"));
+    rotLabel->setFixedSize(kGridLabelWidth, 20);
+    fieldGrid->addWidget(rotLabel, 0, 0, Qt::AlignRight | Qt::AlignVCenter);
+    connectClickableLabel(rotLabel, rotField);
 
     QWidget *rotCell = new QWidget(section);
     rotCell->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -5765,6 +5773,7 @@ void ToolPropertiesPanel::reparentAnimateSectionsToAllMode() {
     }
     if (header) {
       header->setVisible(true);
+      applyAnimateAllModeSectionHeaderLabel(header, m_showLabels);
       m_animateAllModeLayout->addWidget(header);
     }
     if (section) {
