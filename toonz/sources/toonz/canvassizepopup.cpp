@@ -20,6 +20,10 @@
 #include "toonz/toonzscene.h"
 #include "toonz/tscenehandle.h"
 #include "toonz/txsheethandle.h"
+#include "toonz/tstageobjectid.h"
+#include "toonz/txsheet.h"
+#include "toonz/tstageobject.h"
+#include "toonz/tstageobjecttree.h"
 
 // TnzTools includes
 #include "tools/tool.h"
@@ -40,6 +44,7 @@
 #include "tgl.h"
 #include "tcurveutil.h"
 #include "tcurves.h"
+#include "tenv.h"
 
 // Qt includes
 #include <QLabel>
@@ -53,6 +58,8 @@
 #include <QHideEvent>
 #include <QKeyEvent>
 #include <algorithm>
+
+TEnv::IntVar CanvasSizeShowCropConfirm("CanvasSizeShowCropConfirm", 1);
 
 namespace {
 
@@ -138,12 +145,17 @@ int ResizeCanvasUndo::m_idCount = 0;
 //-----------------------------------------------------------------------------
 
 class CanvasCameraUndo final : public TUndo {
+  TStageObjectId m_cameraId;
   TDimensionD m_oldSize, m_newSize;
   TDimension m_oldRes, m_newRes;
 
-  static void apply(const TDimensionD &size, const TDimension &res) {
-    TCamera *camera =
-        TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera();
+  static void apply(TStageObjectId cameraId, const TDimensionD &size,
+                    const TDimension &res) {
+    ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+    if (!scene) return;
+    TStageObject *obj = scene->getXsheet()->getStageObject(cameraId);
+    if (!obj) return;
+    TCamera *camera = obj->getCamera();
     if (!camera) return;
     camera->setSize(size);
     camera->setRes(res);
@@ -152,15 +164,17 @@ class CanvasCameraUndo final : public TUndo {
   }
 
 public:
-  CanvasCameraUndo(const TDimensionD &oldSize, const TDimension &oldRes,
-                   const TDimensionD &newSize, const TDimension &newRes)
-      : m_oldSize(oldSize)
+  CanvasCameraUndo(TStageObjectId cameraId, const TDimensionD &oldSize,
+                   const TDimension &oldRes, const TDimensionD &newSize,
+                   const TDimension &newRes)
+      : m_cameraId(cameraId)
+      , m_oldSize(oldSize)
       , m_newSize(newSize)
       , m_oldRes(oldRes)
       , m_newRes(newRes) {}
 
-  void undo() const override { apply(m_oldSize, m_oldRes); }
-  void redo() const override { apply(m_newSize, m_newRes); }
+  void undo() const override { apply(m_cameraId, m_oldSize, m_oldRes); }
+  void redo() const override { apply(m_cameraId, m_newSize, m_newRes); }
   int getSize() const override { return sizeof(*this); }
 };
 
@@ -173,8 +187,12 @@ void applyCameraFromLevel(TXshSimpleLevel *sl) {
   if (res.lx <= 0 || res.ly <= 0 || dpi.x <= 0 || dpi.y <= 0) return;
 
   TDimensionD size(res.lx / dpi.x, res.ly / dpi.y);
-  TCamera *camera =
-      TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera();
+  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+  TXsheet *xsh        = scene->getXsheet();
+  TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
+  TStageObject *cameraObject = xsh->getStageObject(cameraId);
+  if (!cameraObject) return;
+  TCamera *camera = cameraObject->getCamera();
   if (!camera) return;
   TDimensionD oldSize = camera->getSize();
   TDimension oldRes   = camera->getRes();
@@ -185,7 +203,7 @@ void applyCameraFromLevel(TXshSimpleLevel *sl) {
   camera->setSize(size);
   camera->setRes(res);
   TUndoManager::manager()->add(
-      new CanvasCameraUndo(oldSize, oldRes, size, res));
+      new CanvasCameraUndo(cameraId, oldSize, oldRes, size, res));
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   TApp::instance()->getCurrentScene()->notifySceneChanged();
   TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
@@ -294,6 +312,14 @@ TRectD proposedRectFromPeg(const TRectD &oldR, int newLx, int newLy,
 TDimension dimFromRect(const TRectD &rect) {
   return TDimension(std::max(1, tround(rect.x1 - rect.x0)),
                     std::max(1, tround(rect.y1 - rect.y0)));
+}
+
+//-----------------------------------------------------------------------------
+
+bool canvasCopyWouldCrop(const TDimension &srcDim, const TDimension &dstDim,
+                         const TPoint &pos) {
+  return pos.x < 0 || pos.y < 0 || pos.x + srcDim.lx > dstDim.lx ||
+         pos.y + srcDim.ly > dstDim.ly;
 }
 
 //-----------------------------------------------------------------------------
@@ -1182,7 +1208,7 @@ CanvasSizePopup::CanvasSizePopup()
   m_unit->addItem(tr("cm"), "cm");
   m_unit->addItem(tr("field"), "field");
   m_unit->addItem(tr("inch"), "inch");
-  m_unit->setFixedHeight(DVGui::WidgetHeight);
+  m_unit->setFixedSize(80, DVGui::WidgetHeight);
   addWidget(tr("Unit:"), m_unit);
   connect(m_unit, SIGNAL(currentIndexChanged(int)), this,
           SLOT(onUnitChanged(int)));
@@ -1199,6 +1225,20 @@ CanvasSizePopup::CanvasSizePopup()
   connect(m_ySizeFld, SIGNAL(textChanged(const QString &)), this,
           SLOT(onSizeChanged()));
 
+  m_percentMode = new DVGui::CheckBox(tr("Percent"), this);
+  m_percentMode->setFixedHeight(DVGui::WidgetHeight);
+  m_percentMode->setChecked(false);
+  m_percentFld = new DVGui::MeasuredDoubleLineEdit(this);
+  m_percentFld->setMeasure("percentage");
+  m_percentFld->setDecimals(2);
+  m_percentFld->setValue(1.0);
+  m_percentFld->setFixedSize(80, DVGui::WidgetHeight);
+  m_percentFld->setEnabled(false);
+  addWidgets(m_percentMode, m_percentFld);
+  connect(m_percentMode, SIGNAL(toggled(bool)), this, SLOT(onPercentMode(bool)));
+  connect(m_percentFld, SIGNAL(textChanged(const QString &)), this,
+          SLOT(onSizeChanged()));
+
   m_relative = new DVGui::CheckBox(tr("Relative"), this);
   m_relative->setFixedHeight(DVGui::WidgetHeight);
   m_relative->setChecked(false);
@@ -1207,12 +1247,19 @@ CanvasSizePopup::CanvasSizePopup()
   m_updateCamera = new DVGui::CheckBox(tr("Set Camera"), this);
   m_updateCamera->setFixedHeight(DVGui::WidgetHeight);
   m_updateCamera->setChecked(false);
+
   addWidgets(m_updateCamera, m_relative);
 
   addSeparator(tr("Anchor"));
 
+  m_confirmCrop = new DVGui::CheckBox(tr("Confirm crop"), this);
+  m_confirmCrop->setFixedHeight(DVGui::WidgetHeight);
+  m_confirmCrop->setChecked((int)CanvasSizeShowCropConfirm != 0);
+  connect(m_confirmCrop, SIGNAL(toggled(bool)), this,
+          SLOT(onConfirmCropToggled(bool)));
+
   m_pegging = new PeggingWidget(this);
-  addWidget("", m_pegging);
+  addWidgets(m_confirmCrop, m_pegging);
   connect(m_pegging, SIGNAL(peggingChanged()), this, SLOT(onPeggingChanged()));
 
   endVLayout();
@@ -1292,6 +1339,9 @@ void CanvasSizePopup::initFromLevel() {
   m_currentXSize->setText(QString::number(dimLx));
   m_currentYSize->setText(QString::number(dimLy));
   m_relative->setChecked(false);
+  m_percentMode->setChecked(false);
+  m_percentFld->setValue(1.0);
+  setSizeFieldsEnabled(true);
   m_xSizeFld->setValue(dimLx);
   m_ySizeFld->setValue(dimLy);
   m_pegging->resetWidget();
@@ -1311,9 +1361,27 @@ void CanvasSizePopup::endSession() {
 
 //-----------------------------------------------------------------------------
 
+void CanvasSizePopup::setCropConfirmEnabled(bool on) {
+  CanvasSizeShowCropConfirm = on ? 1 : 0;
+  if (m_confirmCrop) {
+    m_confirmCrop->blockSignals(true);
+    m_confirmCrop->setChecked(on);
+    m_confirmCrop->blockSignals(false);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void CanvasSizePopup::onConfirmCropToggled(bool on) {
+  setCropConfirmEnabled(on);
+}
+
+//-----------------------------------------------------------------------------
+
 void CanvasSizePopup::showEvent(QShowEvent *e) {
   DVGui::Dialog::showEvent(e);
   initFromLevel();
+  setCropConfirmEnabled((int)CanvasSizeShowCropConfirm != 0);
   if (!isRasterCanvasLevel(m_sl.getPointer())) {
     hide();
     return;
@@ -1335,8 +1403,24 @@ void CanvasSizePopup::hideEvent(QHideEvent *e) {
 
 //-----------------------------------------------------------------------------
 
+void CanvasSizePopup::setSizeFieldsEnabled(bool absoluteOn) {
+  m_unit->setEnabled(absoluteOn);
+  m_xSizeFld->setEnabled(absoluteOn);
+  m_ySizeFld->setEnabled(absoluteOn);
+  m_relative->setEnabled(absoluteOn);
+  m_percentFld->setEnabled(!absoluteOn);
+}
+
+//-----------------------------------------------------------------------------
+
 TDimension CanvasSizePopup::proposedPixelSize() const {
   if (!m_sl) return TDimension(1, 1);
+  if (m_percentMode->isChecked()) {
+    const double scale = m_percentFld->getValue();
+    const int nx         = tround(m_currentDim.lx * scale);
+    const int ny         = tround(m_currentDim.ly * scale);
+    return TDimension(std::max(1, nx), std::max(1, ny));
+  }
   TPointD dpi  = m_sl->getDpi();
   QString unit = m_unit->currentData().toString();
   int nx = getPixelLength(m_xSizeFld->getValue(), m_xMeasure, dpi.x, unit);
@@ -1371,16 +1455,27 @@ void CanvasSizePopup::syncFieldsFromRect() {
   TPointD dpi       = m_sl->getDpi();
   QString unit      = m_unit->currentData().toString();
 
-  int xVal = m_relative->isChecked() ? newDim.lx - m_currentDim.lx : newDim.lx;
-  int yVal = m_relative->isChecked() ? newDim.ly - m_currentDim.ly : newDim.ly;
-
   m_ignoreSync = true;
   m_xSizeFld->blockSignals(true);
   m_ySizeFld->blockSignals(true);
-  m_xSizeFld->setValue(getMeasuredLength(xVal, m_xMeasure, dpi.x, unit));
-  m_ySizeFld->setValue(getMeasuredLength(yVal, m_yMeasure, dpi.y, unit));
+  m_percentFld->blockSignals(true);
+  if (m_percentMode->isChecked()) {
+    const double xFactor =
+        m_currentDim.lx > 0 ? (double)newDim.lx / m_currentDim.lx : 1.0;
+    const double yFactor =
+        m_currentDim.ly > 0 ? (double)newDim.ly / m_currentDim.ly : 1.0;
+    m_percentFld->setValue((xFactor + yFactor) / 2.0);
+  } else {
+    int xVal =
+        m_relative->isChecked() ? newDim.lx - m_currentDim.lx : newDim.lx;
+    int yVal =
+        m_relative->isChecked() ? newDim.ly - m_currentDim.ly : newDim.ly;
+    m_xSizeFld->setValue(getMeasuredLength(xVal, m_xMeasure, dpi.x, unit));
+    m_ySizeFld->setValue(getMeasuredLength(yVal, m_yMeasure, dpi.y, unit));
+  }
   m_xSizeFld->blockSignals(false);
   m_ySizeFld->blockSignals(false);
+  m_percentFld->blockSignals(false);
   m_pegging->cutLx(m_currentDim.lx > newDim.lx);
   m_pegging->cutLy(m_currentDim.ly > newDim.ly);
   m_pegging->updateAnchor();
@@ -1419,6 +1514,12 @@ void CanvasSizePopup::onPeggingChanged() {
 
 void CanvasSizePopup::onRelative(bool toggled) {
   if (m_ignoreSync || !m_sl) return;
+  if (toggled) {
+    m_percentMode->blockSignals(true);
+    m_percentMode->setChecked(false);
+    m_percentMode->blockSignals(false);
+    setSizeFieldsEnabled(true);
+  }
   TDimension prop = dimFromRect(m_proposedRect);
   TPointD dpi     = m_sl->getDpi();
   QString unit    = m_unit->currentData().toString();
@@ -1432,11 +1533,38 @@ void CanvasSizePopup::onRelative(bool toggled) {
 
 //-----------------------------------------------------------------------------
 
+void CanvasSizePopup::onPercentMode(bool on) {
+  if (m_ignoreSync || !m_sl) return;
+  if (on) {
+    m_relative->blockSignals(true);
+    m_relative->setChecked(false);
+    m_relative->blockSignals(false);
+    TDimension prop = dimFromRect(m_proposedRect);
+    const double xFactor =
+        m_currentDim.lx > 0 ? (double)prop.lx / m_currentDim.lx : 1.0;
+    const double yFactor =
+        m_currentDim.ly > 0 ? (double)prop.ly / m_currentDim.ly : 1.0;
+    m_ignoreSync = true;
+    m_percentFld->setValue((xFactor + yFactor) / 2.0);
+    m_ignoreSync = false;
+    setSizeFieldsEnabled(false);
+    updateProposedFromFields();
+  } else {
+    setSizeFieldsEnabled(true);
+    syncFieldsFromRect();
+  }
+}
+
+//-----------------------------------------------------------------------------
+
 void CanvasSizePopup::onReset() {
   if (!m_sl) return;
   m_proposedRect = m_currentRect;
   m_ignoreSync   = true;
   m_relative->setChecked(false);
+  m_percentMode->setChecked(false);
+  m_percentFld->setValue(1.0);
+  setSizeFieldsEnabled(true);
   m_pegging->resetWidget();
   m_ignoreSync = false;
   syncFieldsFromRect();
@@ -1446,7 +1574,7 @@ void CanvasSizePopup::onReset() {
 //-----------------------------------------------------------------------------
 
 void CanvasSizePopup::onUnitChanged(int index) {
-  if (!m_sl) return;
+  if (!m_sl || m_percentMode->isChecked()) return;
   QString unit = m_unit->itemData(index).toString();
   if (unit != "pixel") {
     TUnit *measureUnit = m_xMeasure->getUnit(unit.toStdWString());
@@ -1492,31 +1620,41 @@ void CanvasSizePopup::onOkBtn() {
   newDim.lx         = std::max(1, newDim.lx);
   newDim.ly         = std::max(1, newDim.ly);
 
-  bool canvasChanged = dim.lx != newDim.lx || dim.ly != newDim.ly;
-  bool updateCamera  = m_updateCamera->isChecked();
+  TPoint pos;
+  pos.x = tround(m_currentRect.x0 - m_proposedRect.x0);
+  pos.y = tround(m_currentRect.y0 - m_proposedRect.y0);
 
-  if (!canvasChanged && !updateCamera) {
+  const bool sizeChanged =
+      dim.lx != newDim.lx || dim.ly != newDim.ly;
+  const bool posChanged = pos.x != 0 || pos.y != 0;
+  const bool rasterChanged = sizeChanged || posChanged;
+  bool updateCamera        = m_updateCamera->isChecked();
+
+  if (!rasterChanged && !updateCamera) {
     hide();
     return;
   }
 
-  if (canvasChanged && (dim.lx > newDim.lx || dim.ly > newDim.ly)) {
-    int ret = DVGui::MsgBox(tr("The new canvas size is smaller than the "
-                               "current one.\nDo you want to crop the canvas?"),
-                            tr("Crop"), tr("Cancel"));
+  if (rasterChanged && canvasCopyWouldCrop(dim, newDim, pos) &&
+      (int)CanvasSizeShowCropConfirm) {
+    const bool smallerCanvas = newDim.lx < dim.lx || newDim.ly < dim.ly;
+    const QString mainText   = smallerCanvas
+                                 ? tr("The new canvas size is smaller than the "
+                                      "current one.\n"
+                                      "Do you want to crop the canvas?")
+                                 : tr("Part of the drawing would lie outside "
+                                      "the new canvas.\n"
+                                      "Do you want to crop the canvas?");
+    int ret = DVGui::MsgBox(mainText, tr("Crop"), tr("Cancel"));
     if (ret == 2) return;
   }
-
-  TPoint pos;
-  pos.x = tround(m_currentRect.x0 - m_proposedRect.x0);
-  pos.y = tround(m_currentRect.y0 - m_proposedRect.y0);
 
   hide();
 
   QApplication::setOverrideCursor(Qt::WaitCursor);
   TUndoManager::manager()->beginBlock();
 
-  if (canvasChanged) {
+  if (rasterChanged) {
     int i;
     std::vector<TFrameId> fids;
     m_sl->getFids(fids);
@@ -1560,13 +1698,15 @@ void CanvasSizePopup::onOkBtn() {
       IconGenerator::instance()->invalidate(m_sl.getPointer(), fids[i]);
       m_sl->touchFrame(fids[i]);
     }
-    m_sl->getProperties()->setImageRes(newDim);
-    IconGenerator::instance()->invalidateSceneIcon();
+    if (sizeChanged) {
+      m_sl->getProperties()->setImageRes(newDim);
+      IconGenerator::instance()->invalidateSceneIcon();
+    }
   }
   if (updateCamera) applyCameraFromLevel(m_sl.getPointer());
   TUndoManager::manager()->endBlock();
   QApplication::restoreOverrideCursor();
-  if (canvasChanged)
+  if (rasterChanged)
     TApp::instance()->getCurrentLevel()->notifyCanvasSizeChange();
 }
 

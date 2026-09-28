@@ -17,6 +17,7 @@ class TXshLevel;
 
 namespace DVGui {
 class DoubleLineEdit;
+class MeasuredDoubleLineEdit;
 class CheckBox;
 }
 
@@ -85,8 +86,11 @@ class CanvasSizePopup final : public DVGui::Dialog {
   QComboBox *m_unit;
   DVGui::DoubleLineEdit *m_xSizeFld;
   DVGui::DoubleLineEdit *m_ySizeFld;
+  DVGui::CheckBox *m_percentMode;
+  DVGui::MeasuredDoubleLineEdit *m_percentFld;
   DVGui::CheckBox *m_relative;
   DVGui::CheckBox *m_updateCamera;
+  DVGui::CheckBox *m_confirmCrop;
   PeggingWidget *m_pegging;
 
   TMeasure *m_xMeasure, *m_yMeasure;
@@ -121,16 +125,20 @@ protected:
   void updateProposedFromFields();
   void syncFieldsFromRect();
   void refreshOverlay(bool wholeViewer = false);
+  void setSizeFieldsEnabled(bool absoluteOn);
 
 public slots:
   void onOkBtn();
   void onSizeChanged();
   void onRelative(bool);
+  void onPercentMode(bool);
   void onUnitChanged(int);
   void onPeggingChanged();
   void onLevelSwitched(TXshLevel *);
   void onSceneSwitched();
   void onReset();
+  void setCropConfirmEnabled(bool on);
+  void onConfirmCropToggled(bool on);
 };
 
 #endif  // CANVASSIZEPOPUP_H
