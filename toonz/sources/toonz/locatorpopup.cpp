@@ -43,8 +43,9 @@
 
 namespace {
 
-constexpr int kNavTopBtnSize   = 20;
-constexpr int kNavTopIconSize  = 16;
+constexpr int kNavTopBtnSize      = 18;
+constexpr int kNavTopIconSize     = 14;
+constexpr int kNavTopGearIconSize = 13;
 constexpr int kNavBottomBtnSize = 22;
 constexpr int kNavBottomIconSize = 16;
 
@@ -80,26 +81,6 @@ QIcon themedVerticalArrowIcon(bool up, const QColor &baseColor) {
   return themedPanArrowIcon(up ? 0.0 : 180.0, baseColor);
 }
 
-//! Icon for hiding onion skin in other viewers (Navigator-only workflow).
-QIcon matchingStrokeArrowsIcon(const QColor &baseColor) {
-  constexpr int S = 20;
-  QPixmap px(S, S);
-  px.fill(Qt::transparent);
-  QPainter painter(&px);
-  painter.setRenderHint(QPainter::Antialiasing);
-  const QColor c =
-      baseColor.isValid() ? baseColor : QColor(0xd8, 0xd8, 0xd8);
-  painter.setPen(QPen(c, 1.25, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-  painter.setBrush(c);
-  const QPointF tips[3] = {{3, 15}, {7, 11}, {11, 7}};
-  for (const QPointF &tip : tips) {
-    QPolygonF arrow;
-    arrow << tip << QPointF(tip.x() + 5, tip.y() - 2) << QPointF(tip.x() + 4, tip.y() + 2.5);
-    painter.drawPolygon(arrow);
-  }
-  return QIcon(px);
-}
-
 void drawNavigatorDisableSlash(QPainter &painter, int size, const QColor &c) {
   const QColor slash = c.isValid() ? c : QColor(0xd8, 0xd8, 0xd8);
   painter.setPen(QPen(slash, 1.5, Qt::SolidLine, Qt::RoundCap));
@@ -112,46 +93,27 @@ QPixmap navigatorThemedIconPixmap(const QString &iconName, int size) {
   return pm.isNull() ? QPixmap(size, size) : pm;
 }
 
-QPixmap navigatorSlashedIconPixmap(const QString &iconName, const QColor &ink,
-                                   int size) {
-  QPixmap pm = navigatorThemedIconPixmap(iconName, size);
-  if (pm.isNull()) return pm;
+QPixmap navigatorSlashedPixmap(const QPixmap &base, const QColor &ink,
+                               int size) {
+  if (base.isNull()) return base;
+  QPixmap pm = base;
   QPainter painter(&pm);
   painter.setRenderHint(QPainter::Antialiasing, true);
   drawNavigatorDisableSlash(painter, size, ink);
   return pm;
 }
 
-QIcon navigatorFrameDrawingIcon(const QColor &baseColor) {
-  const QPixmap open =
-      navigatorThemedIconPixmap(QStringLiteral("preview"), kNavTopIconSize);
-  const QPixmap closed =
-      navigatorSlashedIconPixmap(QStringLiteral("preview"), baseColor,
-                                 kNavTopIconSize);
-  QIcon icon;
-  icon.addPixmap(open, QIcon::Normal, QIcon::Off);
-  icon.addPixmap(closed, QIcon::Normal, QIcon::On);
-  return icon;
-}
-
-QIcon navigatorColumnScopeIcon(const QColor &baseColor) {
-  // Single-column variant of the Windows > Xsheet menu icon (xsheet.svg).
-  const QPixmap active =
-      navigatorThemedIconPixmap(QStringLiteral("navigator_column"),
-                                kNavTopIconSize);
-  const QPixmap inactive =
-      navigatorSlashedIconPixmap(QStringLiteral("navigator_column"), baseColor,
-                                 kNavTopIconSize);
-  QIcon icon;
-  icon.addPixmap(inactive, QIcon::Normal, QIcon::Off);
-  icon.addPixmap(active, QIcon::Normal, QIcon::On);
-  return icon;
+QIcon navigatorToggleIcon(const QPixmap &base, bool checked, const QColor &ink,
+                          int size) {
+  return QIcon(checked ? navigatorSlashedPixmap(base, ink, size) : base);
 }
 
 void styleNavigatorToggleButton(QToolButton *tb) {
   if (!tb) return;
+  tb->setToolButtonStyle(Qt::ToolButtonIconOnly);
   tb->setStyleSheet(QStringLiteral(
-      "QToolButton { border: none; background: transparent; padding: 0; }"
+      "QToolButton { border: none; background: transparent; padding: 0; "
+      "margin: 0; min-width: 0; min-height: 0; }"
       "QToolButton:hover { background: rgba(128, 128, 128, 0.12); }"
       "QToolButton:checked { background: transparent; border: none; }"
       "QToolButton:checked:hover { background: rgba(128, 128, 128, 0.12); }"));
@@ -245,8 +207,12 @@ LocatorPopup::LocatorPopup(QWidget *parent, Qt::WindowFlags flags)
           &LocatorPopup::onGuidedComboChanged);
   connect(m_soloColumnTb, &QToolButton::toggled, this,
           &LocatorPopup::onSoloColumnToggled);
+  connect(m_soloColumnTb, &QToolButton::toggled, this,
+          &LocatorPopup::updateNavigatorVisibilityIcons);
   connect(m_hideCurrentTb, &QToolButton::toggled, this,
           &LocatorPopup::onHideCurrentToggled);
+  connect(m_hideCurrentTb, &QToolButton::toggled, this,
+          &LocatorPopup::updateNavigatorVisibilityIcons);
 
   connect(m_followMainPanAct, &QAction::toggled, this, [this]() {
     m_viewer->update();
@@ -255,6 +221,8 @@ LocatorPopup::LocatorPopup(QWidget *parent, Qt::WindowFlags flags)
 
   connect(m_matchingStrokeTb, &QToolButton::toggled, this,
           &LocatorPopup::onMatchingStrokeToggled);
+  connect(m_matchingStrokeTb, &QToolButton::toggled, this,
+          &LocatorPopup::updateNavigatorVisibilityIcons);
 
   connect(Preferences::instance(),
           &Preferences::locatorNavigatorTabEnabledChanged, this,
@@ -308,8 +276,8 @@ void LocatorPopup::buildNavigatorToolbar() {
 
   m_hideCurrentTb = new QToolButton(m_navPage);
   m_hideCurrentTb->setCheckable(true);
-  m_hideCurrentTb->setToolTip(tr("Hide frame drawing"));
-  m_hideCurrentTb->setChecked(true);
+  m_hideCurrentTb->setToolTip(tr("Show/Hide current drawing"));
+  m_hideCurrentTb->setChecked(false);
   m_hideCurrentTb->setAutoRaise(true);
   styleNavigatorToggleButton(m_hideCurrentTb);
   m_hideCurrentTb->setFixedSize(kNavTopBtnSize, kNavTopBtnSize);
@@ -317,8 +285,8 @@ void LocatorPopup::buildNavigatorToolbar() {
 
   m_soloColumnTb = new QToolButton(m_navPage);
   m_soloColumnTb->setCheckable(true);
-  m_soloColumnTb->setToolTip(tr("Show active Xsheet column only"));
-  m_soloColumnTb->setChecked(true);
+  m_soloColumnTb->setToolTip(tr("Show/Hide active Xsheet column only"));
+  m_soloColumnTb->setChecked(false);
   m_soloColumnTb->setAutoRaise(true);
   styleNavigatorToggleButton(m_soloColumnTb);
   m_soloColumnTb->setFixedSize(kNavTopBtnSize, kNavTopBtnSize);
@@ -326,10 +294,11 @@ void LocatorPopup::buildNavigatorToolbar() {
 
   m_matchingStrokeTb = new QToolButton(m_navPage);
   m_matchingStrokeTb->setCheckable(true);
-  m_matchingStrokeTb->setIcon(matchingStrokeArrowsIcon(themeIconBaseColor()));
   m_matchingStrokeTb->setToolTip(
-      tr("Hide onion skin in other viewers."));
+      tr("Show/Hide onion skin in other viewers"));
+  m_matchingStrokeTb->setChecked(false);
   m_matchingStrokeTb->setAutoRaise(true);
+  styleNavigatorToggleButton(m_matchingStrokeTb);
   m_matchingStrokeTb->setFixedSize(kNavTopBtnSize, kNavTopBtnSize);
   m_matchingStrokeTb->setIconSize(QSize(kNavTopIconSize, kNavTopIconSize));
 
@@ -348,11 +317,11 @@ void LocatorPopup::buildNavigatorToolbar() {
          "inside it."));
   m_gearBtn->setMenu(gearMenu);
   m_gearBtn->setFixedSize(kNavTopBtnSize, kNavTopBtnSize);
-  m_gearBtn->setIconSize(QSize(kNavTopIconSize, kNavTopIconSize));
+  m_gearBtn->setIconSize(QSize(kNavTopGearIconSize, kNavTopGearIconSize));
 
   m_navTopLayout = new QHBoxLayout();
-  m_navTopLayout->setContentsMargins(4, 1, 4, 1);
-  m_navTopLayout->setSpacing(4);
+  m_navTopLayout->setContentsMargins(2, 1, 2, 1);
+  m_navTopLayout->setSpacing(0);
   QLabel *guidedLabel = new QLabel(tr("Guided:"), m_navPage);
   guidedLabel->setFixedHeight(kNavTopBtnSize);
   m_navTopLayout->addWidget(guidedLabel, 0);
@@ -502,10 +471,19 @@ QColor LocatorPopup::themeIconBaseColor() const {
 //-----------------------------------------------------------------------------
 
 void LocatorPopup::updateNavigatorVisibilityIcons() {
-  if (!m_hideCurrentTb || !m_soloColumnTb) return;
+  if (!m_hideCurrentTb || !m_soloColumnTb || !m_matchingStrokeTb) return;
   const QColor ink = themeIconBaseColor();
-  m_hideCurrentTb->setIcon(navigatorFrameDrawingIcon(ink));
-  m_soloColumnTb->setIcon(navigatorColumnScopeIcon(ink));
+  m_hideCurrentTb->setIcon(navigatorToggleIcon(
+      navigatorThemedIconPixmap(QStringLiteral("preview"), kNavTopIconSize),
+      m_hideCurrentTb->isChecked(), ink, kNavTopIconSize));
+  m_soloColumnTb->setIcon(navigatorToggleIcon(
+      navigatorThemedIconPixmap(QStringLiteral("navigator_column"),
+                                kNavTopIconSize),
+      m_soloColumnTb->isChecked(), ink, kNavTopIconSize));
+  m_matchingStrokeTb->setIcon(navigatorToggleIcon(
+      navigatorThemedIconPixmap(QStringLiteral("navigator_onionskin"),
+                                kNavTopIconSize),
+      m_matchingStrokeTb->isChecked(), ink, kNavTopIconSize));
 }
 
 //-----------------------------------------------------------------------------
@@ -513,7 +491,6 @@ void LocatorPopup::updateNavigatorVisibilityIcons() {
 void LocatorPopup::refreshNavigatorThemedIcons() {
   if (!m_hideCurrentTb) return;
   updateNavigatorVisibilityIcons();
-  m_matchingStrokeTb->setIcon(matchingStrokeArrowsIcon(themeIconBaseColor()));
   m_gearBtn->setIcon(createQIcon(QStringLiteral("gear"), false));
   if (m_navBottomButtons[NBB_ZoomIn])
     m_navBottomButtons[NBB_ZoomIn]->setIcon(
@@ -933,6 +910,7 @@ void LocatorPopup::setMatchingStrokeReferenceMode(bool on) {
     m_matchingStrokeTb->blockSignals(true);
     m_matchingStrokeTb->setChecked(on);
     m_matchingStrokeTb->blockSignals(false);
+    updateNavigatorVisibilityIcons();
   }
 }
 
