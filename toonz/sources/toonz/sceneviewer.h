@@ -186,8 +186,8 @@ class SceneViewer final : public TToolViewer, public Previewer::Listener {
   bool m_hideCurrentDrawingInViewer = false;
   //! Locator: show active xsheet column only.
   bool m_showOnlyCurrentColumnInViewer = false;
-  bool m_navPickOnly = false;
-  bool m_hasNavViewFrame = false;
+  bool m_navPickOnly                   = false;
+  bool m_hasNavViewFrame               = false;
   TPointD m_navViewFrame[4];
   QPointer<SceneViewer> m_viewForwardTarget;
   double m_forwardedRotateAngle = 0;

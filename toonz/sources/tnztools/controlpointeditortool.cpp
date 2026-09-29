@@ -521,8 +521,8 @@ void ControlPointEditorTool::leftButtonDown(const TPointD &pos,
     bool isIn = pointType == ControlPointEditorStroke::SPEED_IN;
     m_selection.selectNone();
     m_selection.select(pointIndex);
-    m_action = pickOnly ? NONE
-                        : (isIn ? IN_SPEED_MOVEMENT : OUT_SPEED_MOVEMENT);
+    m_action =
+        pickOnly ? NONE : (isIn ? IN_SPEED_MOVEMENT : OUT_SPEED_MOVEMENT);
     if (!pickOnly && e.isAltPressed()) {
       initUndo();
       if (m_controlPointEditorStroke.isCusp(pointIndex))
@@ -845,7 +845,7 @@ bool ControlPointEditorTool::reverseDirectionOfEditedStroke() {
   if (idx < 0 || idx >= (int)vi->getStrokeCount()) return false;
 
   TTool::Application *app = getApplication();
-  TXshSimpleLevel *sl = app->getCurrentLevel()->getSimpleLevel();
+  TXshSimpleLevel *sl     = app->getCurrentLevel()->getSimpleLevel();
   if (!sl || sl->getType() != PLI_XSHLEVEL) return false;
   if (sl->isReadOnly()) return false;
 

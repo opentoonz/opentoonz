@@ -1232,7 +1232,7 @@ void FilmstripFrames::mouseReleaseEvent(QMouseEvent *e) {
 
 void FilmstripFrames::mouseMoveEvent(QMouseEvent *e) {
   QPoint pos = e->pos();
-  //m_dragDropArmed
+  // m_dragDropArmed
   int index;
   if (m_isVertical) {
     index = y2index(e->pos().y());

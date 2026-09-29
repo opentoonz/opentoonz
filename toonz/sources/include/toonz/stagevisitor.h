@@ -139,7 +139,8 @@ struct DVAPI VisitArgs {
   int m_guidedFrontStroke;
   int m_guidedBackStroke;
   //! When true (e.g. locator), omit the full-opacity current cell/player when
-  //! onion skin or shift/trace supplies reference frames — keeps guided strokes.
+  //! onion skin or shift/trace supplies reference frames — keeps guided
+  //! strokes.
   bool m_hideCurrentDrawing;
   //! Scene / camera stand only: build players for the active column index only
   //! (hides other xsheet columns — e.g. raster reference under a vector level).
@@ -262,7 +263,7 @@ private:
   int m_maskLevel;
   bool m_singleColumnEnabled;
   bool m_checkFlags;
-  std::string m_currentImageId; // Used to update the autoClose cache
+  std::string m_currentImageId;  // Used to update the autoClose cache
 
   // darken blended view mode for viewing the non-cleanuped and stacked drawings
   bool m_doRasterDarkenBlendedView;

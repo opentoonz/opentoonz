@@ -294,7 +294,7 @@ PreferencesPopup::AdditionalStyleEdit::AdditionalStyleEdit(
   setModal(true);
   setMinimumWidth(460);
 
-  m_edit                    = new QTextEdit(this);
+  m_edit                   = new QTextEdit(this);
   QPushButton* loadButton  = new QPushButton(tr("Load..."), this);
   QPushButton* saveButton  = new QPushButton(tr("Save..."), this);
   QPushButton* okButton    = new QPushButton(tr("OK"), this);
@@ -319,7 +319,8 @@ PreferencesPopup::AdditionalStyleEdit::AdditionalStyleEdit(
 
   connect(loadButton, &QPushButton::pressed, this, [this]() {
     const QString filter =
-        tr("Style Sheets (*.qss *.css *.theme);;Theme Files (*.qss *.css *.theme *.txt);;All Files (*)");
+        tr("Style Sheets (*.qss *.css *.theme);;Theme Files (*.qss *.css "
+           "*.theme *.txt);;All Files (*)");
     const QString fileName = QFileDialog::getOpenFileName(
         this, tr("Load Style Sheet"), QString(), filter);
     if (fileName.isEmpty()) return;
@@ -334,10 +335,10 @@ PreferencesPopup::AdditionalStyleEdit::AdditionalStyleEdit(
   });
   connect(saveButton, &QPushButton::pressed, this, [this]() {
     const QString filter =
-        tr("Style Sheets (*.qss *.css *.theme);;Theme Files (*.qss *.css *.theme *.txt);;All Files (*)");
+        tr("Style Sheets (*.qss *.css *.theme);;Theme Files (*.qss *.css "
+           "*.theme *.txt);;All Files (*)");
     const QString fileName = QFileDialog::getSaveFileName(
-        this, tr("Save Style Sheet"), tr("additional-style-sheet.qss"),
-        filter);
+        this, tr("Save Style Sheet"), tr("additional-style-sheet.qss"), filter);
     if (fileName.isEmpty()) return;
 
     QFile file(fileName);
@@ -432,7 +433,7 @@ PreferencesPopup::Display30bitChecker::Display30bitChecker(
   GLView* view10bit     = new GLView(this, true);
   QPushButton* closeBtn = new QPushButton(tr("Close"), this);
   QString infoLabel     = tr(
-      "If the lower gradient looks smooth and has no banding compared to the upper gradient,\n\
+          "If the lower gradient looks smooth and has no banding compared to the upper gradient,\n\
 30bit display is available in the current configuration.");
 
   QVBoxLayout* lay = new QVBoxLayout();
@@ -1767,7 +1768,7 @@ PreferencesPopup::PreferencesPopup()
           &QStackedWidget::setCurrentIndex);
   connect(m_pref, &Preferences::fillOnlySaveboxChanged, this,
           [this](bool enabled) {
-            CheckBox *saveboxCheck = getUI<CheckBox *>(FillOnlysavebox);
+            CheckBox* saveboxCheck = getUI<CheckBox*>(FillOnlysavebox);
             if (!saveboxCheck || saveboxCheck->isChecked() == enabled) return;
             QSignalBlocker blocker(saveboxCheck);
             saveboxCheck->setChecked(enabled);

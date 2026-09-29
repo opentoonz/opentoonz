@@ -914,7 +914,7 @@ void SceneViewer::onRelease(const TMouseEvent &event) {
   if (!m_buttonClicked) return;
   m_buttonClicked = false;
 
-  m_dragging  = false;
+  m_dragging = false;
 
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
   if (!tool || !tool->isEnabled()) {
@@ -1300,7 +1300,7 @@ bool SceneViewer::event(QEvent *e) {
   }
   if (e->type() == QEvent::ShortcutOverride || e->type() == QEvent::KeyPress) {
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
-    
+
     if (!keyEvent->isAutoRepeat()) {
       TApp::instance()->getCurrentTool()->storeTool();
     }

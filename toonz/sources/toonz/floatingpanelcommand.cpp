@@ -159,7 +159,8 @@ TPanel *OpenFloatingPanel::getOrReuseFloatingPanel(
     if (panel->getPanelType() != panelType) continue;
     if (!panel->isFloating() && panelType != "Locator") continue;
     if (!panel->isHidden()) {
-      if (panel->isFloating()) activateWidget(panel);
+      if (panel->isFloating())
+        activateWidget(panel);
       else {
         panel->show();
         panel->raise();

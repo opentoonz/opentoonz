@@ -1080,7 +1080,7 @@ TPointD SceneViewer::winToWorld(const QPointF &pos) const {
     TXsheet *xsh            = TApp::instance()->getCurrentXsheet()->getXsheet();
     TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
     double z                = xsh->getStageObject(cameraId)->getZ(
-        TApp::instance()->getCurrentFrame()->getFrame());
+                       TApp::instance()->getCurrentFrame()->getFrame());
 
     TPointD p(pp.x - m_pan3D.x, pp.y - m_pan3D.y);
     p               = p * (1 / m_zoomScale3D);
@@ -2213,8 +2213,7 @@ void SceneViewer::drawScene() {
   else
     onionSkinForStage = app->getCurrentOnionSkin()->getOnionSkinMask();
 
-  const bool hideCurrentDrawing =
-      m_isLocator && m_hideCurrentDrawingInViewer;
+  const bool hideCurrentDrawing = m_isLocator && m_hideCurrentDrawingInViewer;
   const bool showOnlyCurrentColumn =
       m_isLocator && m_showOnlyCurrentColumnInViewer;
 
@@ -2469,7 +2468,7 @@ TAffine4 SceneViewer::get3dViewMatrix() const {
     TXsheet *xsh            = TApp::instance()->getCurrentXsheet()->getXsheet();
     TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
     double z                = xsh->getStageObject(cameraId)->getZ(
-        TApp::instance()->getCurrentFrame()->getFrame());
+                       TApp::instance()->getCurrentFrame()->getFrame());
 
     TAffine4 affine;
     affine *= TAffine4::translation(m_pan3D.x, m_pan3D.y, z);
@@ -2652,8 +2651,7 @@ void SceneViewer::panQt(const QPointF &delta) {
     const TAffine mainAff = t->getViewMatrix();
     const TPointD d(delta.x(), delta.y());
     const TPointD worldDelta = navInv * d - navInv * TPointD(0, 0);
-    const TPointD mainDelta =
-        mainAff * worldDelta - mainAff * TPointD(0, 0);
+    const TPointD mainDelta  = mainAff * worldDelta - mainAff * TPointD(0, 0);
     t->panQt(QPointF(-mainDelta.x, mainDelta.y));
     return;
   }
@@ -2861,8 +2859,7 @@ void SceneViewer::zoomQt(const QPointF &center, double factor) {
   if (SceneViewer *t = m_viewForwardTarget.data()) {
     const TPointD world = winToWorld(center);
     const TPointD p     = t->getViewMatrix() * world;
-    t->zoomQt(QPointF(t->width() * 0.5 + p.x, t->height() * 0.5 - p.y),
-              factor);
+    t->zoomQt(QPointF(t->width() * 0.5 + p.x, t->height() * 0.5 - p.y), factor);
     return;
   }
   TPointD delta(center.x() - width() * 0.5, -center.y() + height() * 0.5);

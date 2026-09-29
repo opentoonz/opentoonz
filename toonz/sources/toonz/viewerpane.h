@@ -69,14 +69,14 @@ protected:
   bool m_isActive = false;
 
   struct PendingViewState {
-    bool valid                              = false;
-    std::array<TAffine, 2> viewAffs         = {TAffine(), TAffine()};
-    int referenceMode                       = -1;
-    bool hasCamera3D                        = false;
+    bool valid                      = false;
+    std::array<TAffine, 2> viewAffs = {TAffine(), TAffine()};
+    int referenceMode               = -1;
+    bool hasCamera3D                = false;
     TPointD pan3D;
-    double zoomScale3D                      = 1.0;
-    double phi3D                            = 30.0;
-    double theta3D                          = 20.0;
+    double zoomScale3D = 1.0;
+    double phi3D       = 30.0;
+    double theta3D     = 20.0;
   };
   PendingViewState m_pendingViewState;
 
@@ -84,7 +84,8 @@ protected:
   void applyPendingViewState();
 
 public:
-  BaseViewerPanel(QWidget *parent = 0, Qt::WindowFlags flags = Qt::WindowFlags());
+  BaseViewerPanel(QWidget *parent       = 0,
+                  Qt::WindowFlags flags = Qt::WindowFlags());
   ~BaseViewerPanel() {}
 
   virtual void updateShowHide();

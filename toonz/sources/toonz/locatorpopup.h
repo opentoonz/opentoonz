@@ -44,7 +44,8 @@ class QLabel;
 class QResizeEvent;
 
 //=============================================================================
-// LocatorPopup — Locator tab (minimal) and Navigator tab (Xsheet display options).
+// LocatorPopup — Locator tab (minimal) and Navigator tab (Xsheet display
+// options).
 //=============================================================================
 
 class LocatorPopup : public QFrame, public SaveLoadQSettings {
@@ -55,7 +56,8 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   QTabBar *m_tabBar;
   QStackedWidget *m_stack;
   QWidget *m_locatorPage;
-  //! Kept for layout index stability; height 0 on Locator (Navigator keeps real toolbars).
+  //! Kept for layout index stability; height 0 on Locator (Navigator keeps real
+  //! toolbars).
   QWidget *m_locatorTopSpacer;
   QWidget *m_locatorBottomSpacer;
   QWidget *m_navPage;
@@ -71,39 +73,39 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   QToolButton *m_hideCurrentTb;
   QToolButton *m_soloColumnTb;
   QToolButton *m_matchingStrokeTb;
-  QToolButton *m_gearBtn     = nullptr;
-  QToolButton *m_overviewTb      = nullptr;
-  QToolButton *m_navToolsOnlyTb  = nullptr;
-  QAction *m_overviewAct     = nullptr;
-  QAction *m_navToolsOnlyAct = nullptr;
-  QAction *m_syncZoomAct     = nullptr;
-  QAction *m_syncPanAct      = nullptr;
+  QToolButton *m_gearBtn        = nullptr;
+  QToolButton *m_overviewTb     = nullptr;
+  QToolButton *m_navToolsOnlyTb = nullptr;
+  QAction *m_overviewAct        = nullptr;
+  QAction *m_navToolsOnlyAct    = nullptr;
+  QAction *m_syncZoomAct        = nullptr;
+  QAction *m_syncPanAct         = nullptr;
   QPointer<SceneViewer> m_navFrameSource;
-  bool m_navSyncing          = false;
+  bool m_navSyncing           = false;
   bool m_draggingNavFrame     = false;
   bool m_overviewHandDragging = false;
   TPointD m_overviewWorldPos;
   QPointF m_navHandScreenPos;
   QPointF m_naviRectPos;
   QPointF m_icon2ViewerRatio;
-  bool m_haveLastNavAffs     = false;
-  std::array<TAffine, 2> m_lastNavAffs = {TAffine(), TAffine()};
-  std::array<TAffine, 2> m_locatorAffs = {TAffine(), TAffine()};
+  bool m_haveLastNavAffs                 = false;
+  std::array<TAffine, 2> m_lastNavAffs   = {TAffine(), TAffine()};
+  std::array<TAffine, 2> m_locatorAffs   = {TAffine(), TAffine()};
   std::array<TAffine, 2> m_navigatorAffs = {TAffine(), TAffine()};
-  bool m_haveLocatorAffs   = false;
-  bool m_haveNavigatorAffs = false;
-  int m_viewTabIndex       = -1;
-  bool m_matchingStrokeReferenceMode = false;
-  bool m_showDisplayToolbar          = true;
-  bool m_showNavGuided               = false;
-  bool m_showNavOverview             = false;
-  bool m_showNavToolsOnly            = false;
-  bool m_showNavTools                = true;
-  bool m_showNavZoom                 = true;
-  bool m_showNavView                 = true;
-  bool m_showNavRotate               = true;
-  bool m_showNavPan                  = false;
-  bool m_showNavFlip                 = true;
+  bool m_haveLocatorAffs                 = false;
+  bool m_haveNavigatorAffs               = false;
+  int m_viewTabIndex                     = -1;
+  bool m_matchingStrokeReferenceMode     = false;
+  bool m_showDisplayToolbar              = true;
+  bool m_showNavGuided                   = false;
+  bool m_showNavOverview                 = false;
+  bool m_showNavToolsOnly                = false;
+  bool m_showNavTools                    = true;
+  bool m_showNavZoom                     = true;
+  bool m_showNavView                     = true;
+  bool m_showNavRotate                   = true;
+  bool m_showNavPan                      = false;
+  bool m_showNavFlip                     = true;
   QWidget *m_navTopSpacerAfterGuided;
   QWidget *m_navTopStretchWhenGuidedHidden;
   QWidget *m_navBottomSpacerAfterTools;
@@ -112,17 +114,17 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   QWidget *m_navBottomSpacerAfterRotate;
   QWidget *m_navBottomSpacerAfterPan;
   QList<QPair<QPointer<SceneViewer>, bool>> m_matchingSuppressRestore;
-  bool m_viewRestorePending = false;
-  bool m_didInitialViewFit   = false;
-  bool m_overviewFitScheduled = false;
-  bool m_navFrameScheduled    = false;
+  bool m_viewRestorePending     = false;
+  bool m_didInitialViewFit      = false;
+  bool m_overviewFitScheduled   = false;
+  bool m_navFrameScheduled      = false;
   bool m_locatorFollowScheduled = false;
   TPointD m_pendingLocatorPos;
   std::array<TAffine, 2> m_pendingViewAffs = {TAffine(), TAffine()};
   QString m_toolBeforeNav;
   bool m_haveToolBeforeNav = false;
-  bool m_navPickHover    = false;
-  bool m_navPickDragging = false;
+  bool m_navPickHover      = false;
+  bool m_navPickDragging   = false;
 
   enum TabIndex { TabLocator = 0, TabNavigator = 1 };
 

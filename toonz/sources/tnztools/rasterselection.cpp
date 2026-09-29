@@ -971,8 +971,8 @@ TStroke getIntersectedStroke(TStroke &stroke, TRectD bbox) {
       // Devo trovare l'intersezione
       int chunkIndex = (i % 2 == 0) ? (i * 0.5) - 1 : i * 0.5;
       TThickPoint p  = getIntersectionPoint(bbox, stroke.getChunk(chunkIndex),
-                                           currentSegmentIndex,
-                                           chunkIndex == precChunkIndex);
+                                            currentSegmentIndex,
+                                            chunkIndex == precChunkIndex);
 
       // exactly match the position with the edge of bbox
       // or the pasted raster may offset by 1pixel due to truncation in
@@ -1523,9 +1523,10 @@ bool RasterSelection::isTransformed() { return !m_affine.isIdentity(); }
 bool RasterSelection::isEditable() {
   TTool::Application *app = TTool::getApplication();
   TTool *tool             = app->getCurrentTool()->getTool();
-  if (tool && tool->getViewer() && tool->getViewer()->isPickOnly()) return false;
+  if (tool && tool->getViewer() && tool->getViewer()->isPickOnly())
+    return false;
 
-  TXshSimpleLevel *level  = app->getCurrentLevel()->getSimpleLevel();
+  TXshSimpleLevel *level = app->getCurrentLevel()->getSimpleLevel();
 
   TFrameHandle *frame = app->getCurrentFrame();
   bool filmstrip      = frame->isEditingLevel();
