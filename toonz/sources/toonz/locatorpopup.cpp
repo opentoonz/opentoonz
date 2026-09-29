@@ -235,25 +235,39 @@ LocatorPopup::LocatorPopup(QWidget *parent, Qt::WindowFlags flags)
           &LocatorPopup::updateNavigatorVisibilityIcons);
 
   connect(m_overviewAct, &QAction::toggled, this, [this](bool on) {
-    persistPanelState();
-    if (on && m_viewer && !isLocatorRole()) {
-      m_navSyncing = true;
-      m_viewer->fitToCamera();
-      m_navSyncing = false;
-      captureLastNavAffs();
+    if (m_overviewTb && m_overviewTb->isChecked() != on) {
+      QSignalBlocker blocker(m_overviewTb);
+      m_overviewTb->setChecked(on);
     }
+    persistPanelState();
     applyOverviewMode();
+    if (isOverview()) scheduleOverviewFit();
+    updateNavigatorToolbarTooltips();
   });
-  connect(m_navToolsOnlyAct, &QAction::toggled, this,
-          [this]() { persistPanelState(); });
+  if (m_overviewTb) {
+    connect(m_overviewTb, &QToolButton::toggled, this, [this](bool on) {
+      if (m_overviewAct) m_overviewAct->setChecked(on);
+    });
+  }
+  connect(m_navToolsOnlyAct, &QAction::toggled, this, [this](bool) {
+    persistPanelState();
+    if (isNavToolsOnly()) applyNavCanvasTool();
+  });
   connect(m_syncZoomAct, &QAction::toggled, this,
           [this]() { persistPanelState(); });
   connect(m_syncPanAct, &QAction::toggled, this,
           [this]() { persistPanelState(); });
-  if (TApp *app = TApp::instance())
+  if (TApp *app = TApp::instance()) {
     connect(app, &TApp::activeViewerChanged, this,
             &LocatorPopup::hookNavFrameSource);
+    if (ToolHandle *th = app->getCurrentTool()) {
+      connect(th, &ToolHandle::toolSwitched, this,
+              &LocatorPopup::updateNavToolButtonChecks);
+      updateNavToolButtonChecks();
+    }
+  }
   hookNavFrameSource();
+  applyOverviewMode();
   m_viewer->installEventFilter(this);
 
   connect(Preferences::instance(),
@@ -297,7 +311,7 @@ LocatorPopup::LocatorPopup(QWidget *parent, Qt::WindowFlags flags)
 
 void LocatorPopup::buildNavigatorToolbar() {
   m_guidedCombo = new QComboBox(m_navPage);
-  m_guidedCombo->setToolTip(tr("Vector drawing modes"));
+  m_guidedCombo->setToolTip(tr("Guided drawing"));
   m_guidedCombo->addItem(tr("Off"), 0);
   m_guidedCombo->addItem(tr("Closest"), 1);
   m_guidedCombo->addItem(tr("Farthest"), 2);
@@ -313,7 +327,7 @@ void LocatorPopup::buildNavigatorToolbar() {
 
   m_hideCurrentTb = new QToolButton(m_navPage);
   m_hideCurrentTb->setCheckable(true);
-  m_hideCurrentTb->setToolTip(tr("Show/Hide current drawing"));
+  m_hideCurrentTb->setToolTip(tr("Show current drawing"));
   m_hideCurrentTb->setChecked(false);
   m_hideCurrentTb->setAutoRaise(true);
   styleNavigatorToggleButton(m_hideCurrentTb);
@@ -322,7 +336,7 @@ void LocatorPopup::buildNavigatorToolbar() {
 
   m_soloColumnTb = new QToolButton(m_navPage);
   m_soloColumnTb->setCheckable(true);
-  m_soloColumnTb->setToolTip(tr("Show/Hide active Xsheet column only"));
+  m_soloColumnTb->setToolTip(tr("Show all columns"));
   m_soloColumnTb->setChecked(false);
   m_soloColumnTb->setAutoRaise(true);
   styleNavigatorToggleButton(m_soloColumnTb);
@@ -332,39 +346,47 @@ void LocatorPopup::buildNavigatorToolbar() {
   m_matchingStrokeTb = new QToolButton(m_navPage);
   m_matchingStrokeTb->setCheckable(true);
   m_matchingStrokeTb->setToolTip(
-      tr("Show/Hide onion skin in other viewers"));
+      tr("Show onion skin in other viewers"));
   m_matchingStrokeTb->setChecked(false);
   m_matchingStrokeTb->setAutoRaise(true);
   styleNavigatorToggleButton(m_matchingStrokeTb);
   m_matchingStrokeTb->setFixedSize(kNavTopBtnSize, kNavTopBtnSize);
   m_matchingStrokeTb->setIconSize(QSize(kNavTopIconSize, kNavTopIconSize));
 
+  m_overviewTb = new QToolButton(m_navPage);
+  m_overviewTb->setCheckable(true);
+  m_overviewTb->setChecked(true);
+  m_overviewTb->setToolTip(tr("Use as Overview"));
+  m_overviewTb->setAutoRaise(true);
+  m_overviewTb->setIcon(createQIcon(QStringLiteral("navigator_overview"), false));
+  m_overviewTb->setFixedSize(kNavTopBtnSize, kNavTopBtnSize);
+  m_overviewTb->setIconSize(QSize(kNavTopIconSize, kNavTopIconSize));
+
   m_gearBtn = new QToolButton(m_navPage);
   m_gearBtn->setIcon(createQIcon(QStringLiteral("menu"), false));
   m_gearBtn->setAutoRaise(true);
   m_gearBtn->setPopupMode(QToolButton::InstantPopup);
   auto *gearMenu = new QMenu(m_gearBtn);
-  m_overviewAct  = gearMenu->addAction(tr("Use as Overview"));
+  gearMenu->setToolTipsVisible(true);
+  QMenu *overviewMenu = gearMenu->addMenu(tr("Overview"));
+  overviewMenu->setToolTipsVisible(true);
+  overviewMenu->setToolTip(tr("Map of the main viewer."));
+  m_overviewAct = overviewMenu->addAction(tr("Use as Overview"));
   m_overviewAct->setCheckable(true);
-  m_overviewAct->setToolTip(
-      tr("Show the sheet as a map. The red frame is the main viewer."));
-  m_navToolsOnlyAct = gearMenu->addAction(tr("Navigation tools only"));
+  m_overviewAct->setChecked(true);
+  m_overviewAct->setToolTip(tr("Map of the main viewer."));
+  m_navToolsOnlyAct = overviewMenu->addAction(tr("Navigation tools only"));
   m_navToolsOnlyAct->setCheckable(true);
   m_navToolsOnlyAct->setChecked(true);
   m_navToolsOnlyAct->setEnabled(false);
-  m_navToolsOnlyAct->setToolTip(
-      tr("On the map, only Zoom, Hand, and Rotate. The Viewer keeps the current tool."));
+  m_navToolsOnlyAct->setToolTip(tr("Zoom, Hand, and Rotate only."));
   gearMenu->addSeparator();
   m_syncZoomAct = gearMenu->addAction(tr("Synchronize Zoom"));
   m_syncZoomAct->setCheckable(true);
-  m_syncZoomAct->setToolTip(
-      tr("When enabled, zooming in this panel also zooms the main viewer. "
-         "The main viewer does not drive this panel."));
+  m_syncZoomAct->setToolTip(tr("Also zooms the main viewer."));
   m_syncPanAct = gearMenu->addAction(tr("Synchronize Pan"));
   m_syncPanAct->setCheckable(true);
-  m_syncPanAct->setToolTip(
-      tr("When enabled, panning in this panel also pans the main viewer. "
-         "The main viewer does not drive this panel."));
+  m_syncPanAct->setToolTip(tr("Also pans the main viewer."));
   m_gearBtn->setMenu(gearMenu);
   m_gearBtn->setFixedSize(kNavTopBtnSize, kNavTopBtnSize);
   m_gearBtn->setIconSize(QSize(kNavTopIconSize, kNavTopIconSize));
@@ -384,6 +406,7 @@ void LocatorPopup::buildNavigatorToolbar() {
   m_navTopLayout->addWidget(m_hideCurrentTb, 0);
   m_navTopLayout->addWidget(m_soloColumnTb, 0);
   m_navTopLayout->addWidget(m_matchingStrokeTb, 0);
+  m_navTopLayout->addWidget(m_overviewTb, 0);
   m_navTopLayout->addWidget(m_gearBtn, 0);
 
   m_navTopBarHost = new QWidget(m_navPage);
@@ -422,11 +445,13 @@ void LocatorPopup::buildNavigatorBottomBar() {
   auto bindViewTool = [this](QToolButton *tb, void (SceneViewer::*fn)()) {
     connect(tb, &QToolButton::clicked, this, [this, fn]() {
       if (SceneViewer *sv = viewToolTarget()) (sv->*fn)();
+      if (isNavToolsOnly()) forceNavHand();
     });
   };
 
   auto mkToolBtn = [this](const char *commandId, const QString &iconName) {
     QToolButton *tb = new QToolButton(m_navPage);
+    tb->setCheckable(true);
     if (QAction *act = CommandManager::instance()->getAction(commandId)) {
       tb->setToolTip(act->toolTip());
       connect(tb, &QToolButton::clicked, act, &QAction::trigger);
@@ -488,6 +513,7 @@ void LocatorPopup::buildNavigatorBottomBar() {
   connect(panL, &QToolButton::clicked, this, [this]() {
     if (SceneViewer *sv = viewToolTarget())
       sv->navigatorPan(QPoint(-kPanStep, 0));
+    if (isNavToolsOnly()) forceNavHand();
   });
   QToolButton *panR =
       mkBtnIcon(themedPanArrowIcon(90.0, themeIconBaseColor()), tr("Pan view right"));
@@ -495,6 +521,7 @@ void LocatorPopup::buildNavigatorBottomBar() {
   connect(panR, &QToolButton::clicked, this, [this]() {
     if (SceneViewer *sv = viewToolTarget())
       sv->navigatorPan(QPoint(kPanStep, 0));
+    if (isNavToolsOnly()) forceNavHand();
   });
   QToolButton *panU = mkBtnIcon(themedVerticalArrowIcon(true, themeIconBaseColor()),
                                 tr("Pan view up"));
@@ -502,6 +529,7 @@ void LocatorPopup::buildNavigatorBottomBar() {
   connect(panU, &QToolButton::clicked, this, [this]() {
     if (SceneViewer *sv = viewToolTarget())
       sv->navigatorPan(QPoint(0, -kPanStep));
+    if (isNavToolsOnly()) forceNavHand();
   });
   QToolButton *panD = mkBtnIcon(themedVerticalArrowIcon(false, themeIconBaseColor()),
                                 tr("Pan view down"));
@@ -509,6 +537,7 @@ void LocatorPopup::buildNavigatorBottomBar() {
   connect(panD, &QToolButton::clicked, this, [this]() {
     if (SceneViewer *sv = viewToolTarget())
       sv->navigatorPan(QPoint(0, kPanStep));
+    if (isNavToolsOnly()) forceNavHand();
   });
 
   QToolButton *flipH =
@@ -597,6 +626,31 @@ void LocatorPopup::updateNavigatorVisibilityIcons() {
       navigatorThemedIconPixmap(QStringLiteral("navigator_onionskin"),
                                 iconPx),
       m_matchingStrokeTb->isChecked(), ink, iconPx));
+  updateNavigatorToolbarTooltips();
+}
+
+//-----------------------------------------------------------------------------
+
+void LocatorPopup::updateNavigatorToolbarTooltips() {
+  if (m_guidedCombo) m_guidedCombo->setToolTip(tr("Guided drawing"));
+  if (m_hideCurrentTb)
+    m_hideCurrentTb->setToolTip(m_hideCurrentTb->isChecked()
+                                    ? tr("Hide current drawing")
+                                    : tr("Show current drawing"));
+  if (m_soloColumnTb)
+    m_soloColumnTb->setToolTip(m_soloColumnTb->isChecked()
+                                   ? tr("Show active column only")
+                                   : tr("Show all columns"));
+  if (m_matchingStrokeTb)
+    m_matchingStrokeTb->setToolTip(
+        m_matchingStrokeTb->isChecked()
+            ? tr("Hide onion skin in other viewers")
+            : tr("Show onion skin in other viewers"));
+  if (m_overviewTb)
+    m_overviewTb->setToolTip(m_overviewTb->isChecked()
+                                 ? tr("Use as Overview")
+                                 : tr("Use as second canvas"));
+  if (m_gearBtn) m_gearBtn->setToolTip(tr("Settings"));
 }
 
 //-----------------------------------------------------------------------------
@@ -604,6 +658,9 @@ void LocatorPopup::updateNavigatorVisibilityIcons() {
 void LocatorPopup::refreshNavigatorThemedIcons() {
   if (!m_hideCurrentTb) return;
   updateNavigatorVisibilityIcons();
+  if (m_overviewTb)
+    m_overviewTb->setIcon(
+        createQIcon(QStringLiteral("navigator_overview"), false));
   if (m_gearBtn)
     m_gearBtn->setIcon(createQIcon(QStringLiteral("menu"), false));
   if (m_navBottomButtons[NBB_ToolZoom])
@@ -696,6 +753,7 @@ void LocatorPopup::updateNavigatorControlsEnabled() {
   m_hideCurrentTb->setEnabled(nav);
   m_soloColumnTb->setEnabled(nav);
   m_matchingStrokeTb->setEnabled(nav);
+  if (m_overviewTb) m_overviewTb->setEnabled(nav);
   if (m_gearBtn) m_gearBtn->setEnabled(nav);
 }
 
@@ -765,7 +823,11 @@ void LocatorPopup::readPanelStateFrom(QSettings &settings) {
   if (m_overviewAct) {
     QSignalBlocker blocker(m_overviewAct);
     m_overviewAct->setChecked(
-        settings.value(QStringLiteral("useAsOverview"), false).toBool());
+        settings.value(QStringLiteral("useAsOverview"), true).toBool());
+  }
+  if (m_overviewTb && m_overviewAct) {
+    QSignalBlocker blocker(m_overviewTb);
+    m_overviewTb->setChecked(m_overviewAct->isChecked());
   }
   if (m_navToolsOnlyAct) {
     QSignalBlocker blocker(m_navToolsOnlyAct);
@@ -846,6 +908,7 @@ void LocatorPopup::load(QSettings &settings) {
   updateTabPageSizeConsistency();
   updateLocatorTabBarChrome();
   applyOverviewMode();
+  updateNavigatorToolbarTooltips();
 }
 
 //-----------------------------------------------------------------------------
@@ -886,6 +949,48 @@ bool LocatorPopup::isOverview() const {
 
 bool LocatorPopup::isNavToolsOnly() const {
   return isOverview() && m_navToolsOnlyAct && m_navToolsOnlyAct->isChecked();
+}
+
+//-----------------------------------------------------------------------------
+
+bool LocatorPopup::isAuthorizedNavTool() const {
+  TTool *tool = TApp::instance()->getCurrentTool()->getTool();
+  if (!tool) return false;
+  const std::string name = tool->getName();
+  return name == T_Zoom || name == T_ZoomView || name == T_Hand ||
+         name == T_HandView || name == T_Rotate || name == T_RotateView;
+}
+
+//-----------------------------------------------------------------------------
+
+void LocatorPopup::applyNavCanvasTool() {
+  if (!isNavToolsOnly() || isAuthorizedNavTool()) return;
+  forceNavHand();
+}
+
+//-----------------------------------------------------------------------------
+
+void LocatorPopup::forceNavHand() {
+  if (!isNavToolsOnly()) return;
+  if (ToolHandle *th = TApp::instance()->getCurrentTool())
+    th->setTool(QString::fromUtf8(T_Hand));
+}
+
+//-----------------------------------------------------------------------------
+
+void LocatorPopup::updateNavToolButtonChecks() {
+  std::string name;
+  if (TTool *tool = TApp::instance()->getCurrentTool()->getTool())
+    name = tool->getName();
+  auto setOn = [&](int id, bool on) {
+    if (QToolButton *tb = m_navBottomButtons[id]) {
+      QSignalBlocker blocker(tb);
+      tb->setChecked(on);
+    }
+  };
+  setOn(NBB_ToolZoom, name == T_Zoom || name == T_ZoomView);
+  setOn(NBB_ToolHand, name == T_Hand || name == T_HandView);
+  setOn(NBB_ToolRotate, name == T_Rotate || name == T_RotateView);
 }
 
 //-----------------------------------------------------------------------------
@@ -948,9 +1053,9 @@ void LocatorPopup::updateNavViewFrame() {
   }
   m_viewer->setNavViewFrame(true, gl);
 
-  const TPointD c   = acc * 0.25;
-  const double w2   = m_viewer->width() * 0.5;
-  const double h2   = m_viewer->height() * 0.5;
+  const TPointD c = acc * 0.25;
+  const double w2 = m_viewer->width() * 0.5;
+  const double h2 = m_viewer->height() * 0.5;
   m_naviRectPos     = QPointF(w2 + c.x, h2 - c.y);
   const double navS = std::sqrt(std::abs(navAff.det()));
   const double mainS = std::sqrt(std::abs(main->getViewMatrix().det()));
@@ -1059,8 +1164,43 @@ void LocatorPopup::persistPanelState() {
 
 //-----------------------------------------------------------------------------
 
+void LocatorPopup::fitOverviewMap() {
+  if (!m_viewer || !isOverview() || m_navSyncing) return;
+  if (m_viewer->width() < 8 || m_viewer->height() < 8) return;
+
+  // Fit this viewer; the red frame still follows the main one.
+  m_navSyncing = true;
+  m_viewer->setViewForwardTarget(nullptr);
+  m_viewer->fitToCamera();
+  if (SceneViewer *main = resolveMainViewer())
+    m_viewer->setViewForwardTarget(main);
+  m_navSyncing = false;
+  captureLastNavAffs();
+  updateNavViewFrame();
+}
+
+//-----------------------------------------------------------------------------
+
+void LocatorPopup::scheduleOverviewFit() {
+  if (m_overviewFitScheduled || !isOverview()) return;
+  m_overviewFitScheduled = true;
+  QTimer::singleShot(0, this, [this]() {
+    m_overviewFitScheduled = false;
+    fitOverviewMap();
+  });
+}
+
+//-----------------------------------------------------------------------------
+
 void LocatorPopup::restoreOrFitView() {
   if (!m_viewer) return;
+
+  if (isOverview()) {
+    m_viewRestorePending = false;
+    m_didInitialViewFit  = true;
+    fitOverviewMap();
+    return;
+  }
 
   if (m_viewRestorePending) {
     m_viewRestorePending = false;
@@ -1091,6 +1231,7 @@ void LocatorPopup::updateNavigatorBarsVisibility() {
   if (m_hideCurrentTb) m_hideCurrentTb->setVisible(m_showDisplayToolbar);
   if (m_soloColumnTb) m_soloColumnTb->setVisible(m_showDisplayToolbar);
   if (m_matchingStrokeTb) m_matchingStrokeTb->setVisible(m_showDisplayToolbar);
+  if (m_overviewTb) m_overviewTb->setVisible(m_showDisplayToolbar);
   if (m_gearBtn) m_gearBtn->setVisible(m_showDisplayToolbar);
   if (m_navTopSpacerAfterGuided)
     m_navTopSpacerAfterGuided->setVisible(m_showNavGuided &&
@@ -1209,6 +1350,7 @@ void LocatorPopup::updateNavigatorIconScale() {
   applyBtn(m_hideCurrentTb, topBtn, topIcon);
   applyBtn(m_soloColumnTb, topBtn, topIcon);
   applyBtn(m_matchingStrokeTb, topBtn, topIcon);
+  applyBtn(m_overviewTb, topBtn, topIcon);
   applyBtn(m_gearBtn, topBtn, topIcon);
 
   if (m_guidedCombo) m_guidedCombo->setFixedHeight(topBtn);
@@ -1546,8 +1688,10 @@ void LocatorPopup::onTabIndexChanged(int index) {
   updateNavigatorControlsEnabled();
   if (index == TabLocator)
     applyLocatorTabToViewer();
-  else
+  else {
     applyNavigatorTabToViewer();
+    if (isOverview()) scheduleOverviewFit();
+  }
   captureLastNavAffs();
   hookNavFrameSource();
   m_viewer->update();
@@ -1631,6 +1775,7 @@ void LocatorPopup::contextMenuEvent(QContextMenuEvent *event) {
 void LocatorPopup::resizeEvent(QResizeEvent *event) {
   QFrame::resizeEvent(event);
   updateNavigatorIconScale();
+  if (isOverview()) scheduleOverviewFit();
 }
 
 //-----------------------------------------------------------------------------
@@ -1683,6 +1828,14 @@ bool LocatorPopup::eventFilter(QObject *watched, QEvent *event) {
   if (!isOverview()) return QFrame::eventFilter(watched, event);
 
   const QEvent::Type type = event->type();
+  if (type == QEvent::MouseButtonDblClick) {
+    if (SceneViewer *main = resolveMainViewer()) main->fitToCamera();
+    return true;
+  }
+  if (type == QEvent::Enter) {
+    applyNavCanvasTool();
+    return QFrame::eventFilter(watched, event);
+  }
   const bool isMouse = type == QEvent::MouseButtonPress ||
                        type == QEvent::MouseMove ||
                        type == QEvent::MouseButtonRelease;
@@ -1700,6 +1853,8 @@ bool LocatorPopup::eventFilter(QObject *watched, QEvent *event) {
     return name == T_Zoom || name == T_ZoomView || name == T_Hand ||
            name == T_HandView || name == T_Rotate || name == T_RotateView;
   };
+
+  if (isNavToolsOnly() && !isOverviewViewTool()) applyNavCanvasTool();
 
   if (isTablet && isNavToolsOnly() && !isOverviewViewTool()) return true;
   if (!isMouse) return QFrame::eventFilter(watched, event);

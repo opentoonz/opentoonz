@@ -71,6 +71,7 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   QToolButton *m_soloColumnTb;
   QToolButton *m_matchingStrokeTb;
   QToolButton *m_gearBtn     = nullptr;
+  QToolButton *m_overviewTb  = nullptr;
   QAction *m_overviewAct     = nullptr;
   QAction *m_navToolsOnlyAct = nullptr;
   QAction *m_syncZoomAct     = nullptr;
@@ -103,6 +104,7 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   QList<QPair<QPointer<SceneViewer>, bool>> m_matchingSuppressRestore;
   bool m_viewRestorePending = false;
   bool m_didInitialViewFit   = false;
+  bool m_overviewFitScheduled = false;
   std::array<TAffine, 2> m_pendingViewAffs = {TAffine(), TAffine()};
 
   enum TabIndex { TabLocator = 0, TabNavigator = 1 };
@@ -134,6 +136,7 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   void buildNavigatorBottomBar();
   void refreshNavigatorThemedIcons();
   void updateNavigatorVisibilityIcons();
+  void updateNavigatorToolbarTooltips();
   QColor themeIconBaseColor() const;
   void reparentViewerToTab(int tabIndex);
   void applyLocatorTabToViewer();
@@ -147,6 +150,10 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   SceneViewer *viewToolTarget() const;
   bool isOverview() const;
   bool isNavToolsOnly() const;
+  bool isAuthorizedNavTool() const;
+  void applyNavCanvasTool();
+  void forceNavHand();
+  void updateNavToolButtonChecks();
   void applyOverviewMode();
   void captureLastNavAffs();
   void applyNavigatorSyncToMain();
@@ -155,6 +162,8 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   void execOverviewPan(const QPointF &pos);
   void panOverviewByWorld(const TPointD &worldDelta);
   void persistPanelState();
+  void fitOverviewMap();
+  void scheduleOverviewFit();
   void restoreOrFitView();
   void updateNavigatorBarsVisibility();
   void updateNavigatorIconScale();
