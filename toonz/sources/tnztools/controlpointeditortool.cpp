@@ -836,43 +836,6 @@ void ControlPointEditorTool::addContextMenuItems(QMenu *menu) {
 
 //---------------------------------------------------------------------------
 
-bool ControlPointEditorTool::reverseDirectionOfEditedStroke() {
-  if (getViewer() && getViewer()->isPickOnly()) return false;
-  TVectorImageP vi = getImage(false);
-  if (!vi) return false;
-
-  const int idx = m_controlPointEditorStroke.getStrokeIndex();
-  if (idx < 0 || idx >= (int)vi->getStrokeCount()) return false;
-
-  TTool::Application *app = getApplication();
-  TXshSimpleLevel *sl     = app->getCurrentLevel()->getSimpleLevel();
-  if (!sl || sl->getType() != PLI_XSHLEVEL) return false;
-  if (sl->isReadOnly()) return false;
-
-  TFrameId fid = getCurrentFid();
-  if (fid.isEmptyFrame() || sl->isFrameReadOnly(fid)) return false;
-
-  TStroke *stroke = vi->getStroke(idx);
-  if (!stroke) return false;
-
-  std::vector<TStroke *> strokes = {stroke};
-  TUndoManager::manager()->beginBlock();
-  TUndoManager::manager()->add(new UndoModifyListStroke(sl, fid, strokes));
-  stroke->changeDirection();
-  sl->setDirtyFlag(true);
-
-  m_controlPointEditorStroke.setStroke(vi, idx);
-
-  notifyImageChanged();
-  invalidateViews();
-  app->getCurrentLevel()->notifyLevelChange();
-  app->onVectorKeyframeStripEditCommitted();
-  TUndoManager::manager()->endBlock();
-  return true;
-}
-
-//---------------------------------------------------------------------------
-
 void ControlPointEditorTool::linkSpeedInOut(int index) {
   if ((index == 0 ||
        index == m_controlPointEditorStroke.getControlPointCount() - 1) &&

@@ -238,6 +238,7 @@ protected slots:
   void onMatchingStrokeToggled(bool checked);
   void onShowHideActionTriggered();
   void onNavigatorViewChanged();
+  void onFrameOrLevelForNav();
 };
 
 #endif

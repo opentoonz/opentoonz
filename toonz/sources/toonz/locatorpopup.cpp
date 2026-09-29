@@ -2078,13 +2078,9 @@ void LocatorPopup::showEvent(QShowEvent *) {
 
   bool ret = true;
   ret      = ret && connect(frameHandle, SIGNAL(frameSwitched()), this,
-                            SLOT(changeWindowTitle()));
+                            SLOT(onFrameOrLevelForNav()));
   ret = ret && connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
-                       SLOT(changeWindowTitle()));
-  ret = ret && connect(frameHandle, &TFrameHandle::frameSwitched, this,
-                       &LocatorPopup::updateNavViewFrame);
-  ret = ret && connect(levelHandle, &TXshLevelHandle::xshLevelSwitched, this,
-                       [this](TXshLevel *) { updateNavViewFrame(); });
+                       SLOT(onFrameOrLevelForNav()));
   assert(ret);
 
   syncActiveLocatorRole();
@@ -2218,6 +2214,11 @@ void LocatorPopup::hideEvent(QHideEvent *) {
 }
 
 //-----------------------------------------------------------------------------
+
+void LocatorPopup::onFrameOrLevelForNav() {
+  changeWindowTitle();
+  updateNavViewFrame();
+}
 
 void LocatorPopup::changeWindowTitle() {
   TApp *app = TApp::instance();
