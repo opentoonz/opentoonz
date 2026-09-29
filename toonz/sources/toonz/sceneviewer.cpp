@@ -1101,8 +1101,10 @@ void SceneViewer::showEvent(QShowEvent *) {
   TApp *app = TApp::instance();
 
   TSceneHandle *sceneHandle = app->getCurrentScene();
-  connect(sceneHandle, &TSceneHandle::sceneSwitched, this,
-          &SceneViewer::resetSceneViewer);
+  if (!m_isLocator) {
+    connect(sceneHandle, &TSceneHandle::sceneSwitched, this,
+            &SceneViewer::resetSceneViewer);
+  }
   connect(sceneHandle, &TSceneHandle::sceneChanged, this,
           &SceneViewer::onSceneChanged);
   connect(sceneHandle, &TSceneHandle::preferenceChanged, this,
@@ -1166,7 +1168,7 @@ void SceneViewer::showEvent(QShowEvent *) {
     }
   }
   if (m_shownOnce == false) {
-    fitToCamera();
+    if (!m_isLocator) fitToCamera();
     m_shownOnce = true;
   }
   TApp::instance()->setActiveViewer(this);
