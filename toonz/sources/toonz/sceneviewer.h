@@ -23,6 +23,7 @@
 
 #include <array>
 #include <QMatrix4x4>
+#include <QPointer>
 #include <QTouchDevice>
 
 //=====================================================================
@@ -177,6 +178,10 @@ class SceneViewer final : public TToolViewer, public Previewer::Listener {
   } m_current3DDevice;
 
   bool m_isLocator;
+  bool m_hasNavViewFrame = false;
+  TPointD m_navViewFrame[4];
+  QPointer<SceneViewer> m_viewForwardTarget;
+  double m_forwardedRotateAngle = 0;
   bool m_isStyleShortcutSwitchable;
 
   bool m_isBusyOnTabletMove;
@@ -287,6 +292,7 @@ public:
 
   // panning by dragging the navigator in the levelstrip
   void navigatorPan(const QPoint &delta);
+  void navigatorPan(const QPointF &delta);
   // a factor for getting pixel-based zoom ratio
   double getDpiFactor();
   // when showing the viewer with full-screen mode,
@@ -301,6 +307,10 @@ public:
   void setFocus(Qt::FocusReason reason) { QWidget::setFocus(reason); };
 
   void setIsLocator() { m_isLocator = true; }
+  bool getIsLocator() const { return m_isLocator; }
+  void setNavViewFrame(bool on, const TPointD *glPts);
+  // Overview: view ops apply to the main viewer (red frame).
+  void setViewForwardTarget(SceneViewer *sv);
   void setIsStyleShortcutSwitchable() { m_isStyleShortcutSwitchable = true; }
   int getVGuideCount() override;
   int getHGuideCount() override;
@@ -381,6 +391,7 @@ protected:
 
   // center: window coordinate, pixels, topleft origin
   void zoomQt(const QPoint &center, double scaleFactor);
+  void zoomQt(const QPointF &center, double scaleFactor);
 
   void mouseScrub(const TMouseEvent &e);
 

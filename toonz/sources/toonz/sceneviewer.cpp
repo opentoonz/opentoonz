@@ -1171,7 +1171,7 @@ void SceneViewer::showEvent(QShowEvent *) {
     if (!m_isLocator) fitToCamera();
     m_shownOnce = true;
   }
-  TApp::instance()->setActiveViewer(this);
+  if (!m_isLocator) TApp::instance()->setActiveViewer(this);
 
   onPreferenceChanged("ColorCalibration");
   update();
@@ -1923,11 +1923,23 @@ void SceneViewer::drawOverlay() {
     if (tool->getName() == "T_RGBPicker") tool->onImageChanged();
 
     // draw cross at the center of the locator window
-    if (m_isLocator) {
+    if (m_isLocator && !m_hasNavViewFrame) {
       glColor3d(1.0, 0.0, 0.0);
       tglDrawSegment(TPointD(-4, 0), TPointD(5, 0));
       tglDrawSegment(TPointD(0, -4), TPointD(0, 5));
     }
+  }
+
+  if (m_isLocator && m_hasNavViewFrame && !m_isPicking) {
+    glPushAttrib(GL_ENABLE_BIT | GL_LINE_BIT | GL_CURRENT_BIT);
+    glDisable(GL_DEPTH_TEST);
+    glLineWidth(1.5f * (float)getDevPixRatio());
+    glColor3d(1.0, 0.15, 0.15);
+    glBegin(GL_LINE_LOOP);
+    for (int i = 0; i < 4; ++i)
+      glVertex2d(m_navViewFrame[i].x, m_navViewFrame[i].y);
+    glEnd();
+    glPopAttrib();
   }
 }
 
@@ -2484,6 +2496,16 @@ void SceneViewer::setViewZoomPan(int viewMode, const TAffine &aff) {
 
 //-----------------------------------------------------------------------------
 
+void SceneViewer::setNavViewFrame(bool on, const TPointD *glPts) {
+  m_hasNavViewFrame = on && glPts;
+  if (m_hasNavViewFrame) {
+    for (int i = 0; i < 4; ++i) m_navViewFrame[i] = glPts[i];
+  }
+  update();
+}
+
+//-----------------------------------------------------------------------------
+
 void SceneViewer::setCamera3DViewState(const TPointD &pan, double zoom,
                                        double phi, double theta) {
   m_pan3D       = pan;
@@ -2514,6 +2536,10 @@ void SceneViewer::invalidateAll() {
 /*! Pan the viewer by using "navigator" (red rectangle) in level strip
  */
 void SceneViewer::navigatorPan(const QPoint &delta) {
+  navigatorPan(QPointF(delta));
+}
+
+void SceneViewer::navigatorPan(const QPointF &delta) {
   panQt(delta);
   m_pos += delta;
 }
@@ -2552,9 +2578,26 @@ void SceneViewer::GLInvalidateRect(const TRectD &rect) {
 }
 //-----------------------------------------------------------------------------
 
+void SceneViewer::setViewForwardTarget(SceneViewer *sv) {
+  m_viewForwardTarget    = (sv && sv != this) ? sv : nullptr;
+  m_forwardedRotateAngle = 0;
+}
+
+//-----------------------------------------------------------------------------
+
 // delta.x: right panning, pixel; delta.y: down panning, pixel
 void SceneViewer::panQt(const QPointF &delta) {
   if (delta == QPointF()) return;
+  if (SceneViewer *t = m_viewForwardTarget.data()) {
+    const TAffine navInv  = getViewMatrix().inv();
+    const TAffine mainAff = t->getViewMatrix();
+    const TPointD d(delta.x(), delta.y());
+    const TPointD worldDelta = navInv * d - navInv * TPointD(0, 0);
+    const TPointD mainDelta =
+        mainAff * worldDelta - mainAff * TPointD(0, 0);
+    t->panQt(QPointF(-mainDelta.x, mainDelta.y));
+    return;
+  }
   if (is3DView())
     m_pan3D += TPointD(delta.x(), -delta.y());
   else {
@@ -2570,6 +2613,10 @@ void SceneViewer::panQt(const QPointF &delta) {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::zoomQt(bool forward, bool reset) {
+  if (SceneViewer *t = m_viewForwardTarget.data()) {
+    t->zoomQt(forward, reset);
+    return;
+  }
   TPointD delta(m_lastMousePos.x() - width() / 2,
                 -m_lastMousePos.y() + height() / 2);
 
@@ -2747,8 +2794,19 @@ double SceneViewer::getZoomScaleFittingWithScreen() {
 
 // center: window coordinate, pixels, topleft origin
 void SceneViewer::zoomQt(const QPoint &center, double factor) {
+  zoomQt(QPointF(center), factor);
+}
+
+void SceneViewer::zoomQt(const QPointF &center, double factor) {
   if (factor == 1.0) return;
-  TPointD delta(center.x() - width() / 2, -center.y() + height() / 2);
+  if (SceneViewer *t = m_viewForwardTarget.data()) {
+    const TPointD world = winToWorld(center);
+    const TPointD p     = t->getViewMatrix() * world;
+    t->zoomQt(QPointF(t->width() * 0.5 + p.x, t->height() * 0.5 - p.y),
+              factor);
+    return;
+  }
+  TPointD delta(center.x() - width() * 0.5, -center.y() + height() * 0.5);
   double oldZoomScale = m_zoomScale3D;
 
   if (is3DView()) {
@@ -2783,7 +2841,7 @@ void SceneViewer::zoomQt(const QPoint &center, double factor) {
 }
 
 void SceneViewer::zoom(const TPointD &center, double factor) {
-  zoomQt(QPoint(center.x, height() - center.y), factor);
+  zoomQt(QPointF(center.x, (qreal)height() - center.y), factor);
 }
 
 //-----------------------------------------------------------------------------
@@ -2874,21 +2932,42 @@ void SceneViewer::zoomOut() {
 
 void SceneViewer::rotate(const TPointD &center, double angle) {
   if (angle == 0) return;
+  if (SceneViewer *t = m_viewForwardTarget.data()) {
+    double out = angle;
+    if (m_dragging && !m_rotating) {
+      out                    = angle - m_forwardedRotateAngle;
+      m_forwardedRotateAngle = angle;
+    }
+    if (out == 0) return;
+    const double navD  = std::min(width(), height());
+    const double mainD = std::min(t->width(), t->height());
+    double speed       = 1.0;
+    if (navD > 1.0 && mainD > 1.0)
+      speed = std::max(0.55, std::min(1.0, navD / mainD));
+    t->rotate(center, -out * speed);
+    return;
+  }
   if (m_isFlippedX != m_isFlippedY) angle = -angle;
   m_rotationAngle[m_viewMode] += angle;
   TPointD realCenter = m_viewAff[m_viewMode] * center;
   setViewMatrix(TRotation(realCenter, angle) * m_viewAff[m_viewMode],
                 m_viewMode);
   invalidateAll();
+  emit refreshNavi();
 }
 
 //-----------------------------------------------------------------------------
 
 void SceneViewer::rotate3D(double dPhi, double dTheta) {
   if (dPhi == 0 && dTheta == 0) return;
+  if (SceneViewer *t = m_viewForwardTarget.data()) {
+    t->rotate3D(dPhi, dTheta);
+    return;
+  }
   m_phi3D   = (float)tcrop(m_phi3D + dPhi, -90.0, 90.0);
   m_theta3D = (float)tcrop(m_theta3D + dTheta, 0.0, 90.0);
   invalidateAll();
+  emit refreshNavi();
 }
 
 //-----------------------------------------------------------------------------
@@ -3072,6 +3151,7 @@ void SceneViewer::resetPosition() {
   m_viewAff[m_viewMode].a13 = 0.0;
   m_viewAff[m_viewMode].a23 = 0.0;
   invalidateAll();
+  emit refreshNavi();
 }
 
 //-----------------------------------------------------------------------------

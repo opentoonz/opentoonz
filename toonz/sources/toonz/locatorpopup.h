@@ -8,6 +8,7 @@
 #include "toonzqt/dvdialog.h"
 
 #include <QFrame>
+#include <QPointF>
 #include <QList>
 #include <QPair>
 #include <QPointer>
@@ -69,19 +70,28 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   QToolButton *m_soloColumnTb;
   QToolButton *m_matchingStrokeTb;
   QToolButton *m_gearBtn     = nullptr;
+  QAction *m_overviewAct     = nullptr;
   QAction *m_syncZoomAct     = nullptr;
   QAction *m_syncPanAct      = nullptr;
+  QPointer<SceneViewer> m_navFrameSource;
   bool m_navSyncing          = false;
+  bool m_draggingNavFrame     = false;
+  bool m_overviewHandDragging = false;
+  TPointD m_overviewWorldPos;
+  QPointF m_naviRectPos;
+  QPointF m_icon2ViewerRatio;
   bool m_haveLastNavAffs     = false;
   std::array<TAffine, 2> m_lastNavAffs = {TAffine(), TAffine()};
   bool m_matchingStrokeReferenceMode = false;
   bool m_showDisplayToolbar          = true;
   bool m_showNavGuided               = true;
+  bool m_showNavTools                = true;
   bool m_showNavZoom                 = true;
   bool m_showNavRotate               = true;
   bool m_showNavPan                  = false;
   bool m_showNavFlip                 = true;
   QWidget *m_navTopSpacerAfterGuided;
+  QWidget *m_navBottomSpacerAfterTools;
   QWidget *m_navBottomSpacerAfterZoom;
   QWidget *m_navBottomSpacerAfterRotate;
   QWidget *m_navBottomSpacerAfterPan;
@@ -93,9 +103,14 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   enum TabIndex { TabLocator = 0, TabNavigator = 1 };
 
   enum NavBottomButtonIndex {
-    NBB_ZoomIn = 0,
+    NBB_ToolZoom = 0,
+    NBB_ToolHand,
+    NBB_ToolRotate,
+    NBB_ZoomIn,
     NBB_ZoomOut,
     NBB_ZoomReset,
+    NBB_Fit,
+    NBB_ResetView,
     NBB_RotL,
     NBB_RotR,
     NBB_PanL,
@@ -123,11 +138,19 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   bool readViewAffsFrom(QSettings &settings);
   void applyLoadedTabIndex(int tab);
   SceneViewer *resolveMainViewer() const;
+  SceneViewer *viewToolTarget() const;
+  bool isOverview() const;
+  void applyOverviewMode();
   void captureLastNavAffs();
   void applyNavigatorSyncToMain();
+  void hookNavFrameSource();
+  void updateNavViewFrame();
+  void execOverviewPan(const QPointF &pos);
+  void panOverviewByWorld(const TPointD &worldDelta);
   void persistPanelState();
   void restoreOrFitView();
   void updateNavigatorBarsVisibility();
+  void fillNavigatorContextMenu(QMenu *menu);
   void addShowHideContextMenu(QMenu *menu);
   void updateTabPageSizeConsistency();
   void setMatchingStrokeReferenceMode(bool on);
@@ -154,6 +177,7 @@ protected:
   void contextMenuEvent(QContextMenuEvent *event) override;
   void showEvent(QShowEvent *);
   void hideEvent(QHideEvent *);
+  bool eventFilter(QObject *watched, QEvent *event) override;
 
 protected slots:
   void changeWindowTitle();

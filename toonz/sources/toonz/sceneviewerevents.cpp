@@ -450,7 +450,7 @@ void SceneViewer::onEnter() {
   m_isMouseEntered = true;
 
   TApp *app = TApp::instance();
-  app->setActiveViewer(this);
+  if (!m_isLocator) app->setActiveViewer(this);
   TTool *tool      = app->getCurrentTool()->getTool();
   TXshLevel *level = app->getCurrentLevel()->getLevel();
   if (level && level->getSimpleLevel())
@@ -749,7 +749,8 @@ void SceneViewer::mousePressEvent(QMouseEvent *event) {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::onPress(const TMouseEvent &event) {
-  m_dragging = true;
+  m_dragging             = true;
+  m_forwardedRotateAngle = 0;
   if (m_mouseScrubbing > 0) {
     m_pos           = event.mousePos() * getDevPixRatio();
     m_mouseButton   = event.button();

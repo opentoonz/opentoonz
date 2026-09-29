@@ -689,8 +689,11 @@ void FilmstripFrames::hideEvent(QHideEvent *) {
 //-----------------------------------------------------------------------------
 
 void FilmstripFrames::getViewer() {
+  SceneViewer *next = TApp::instance()->getActiveViewer();
+  if (next && next->getIsLocator()) return;
+
   bool viewerChanged = false;
-  if (m_viewer != TApp::instance()->getActiveViewer()) {
+  if (m_viewer != next) {
     if (m_viewer) {
       disconnect(m_viewer, SIGNAL(onZoomChanged()), this, SLOT(update()));
       disconnect(m_viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
@@ -700,7 +703,7 @@ void FilmstripFrames::getViewer() {
     viewerChanged = true;
   }
 
-  m_viewer = TApp::instance()->getActiveViewer();
+  m_viewer = next;
 
   if (m_viewer && viewerChanged) {
     connect(m_viewer, SIGNAL(onZoomChanged()), this, SLOT(update()));
