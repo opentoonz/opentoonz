@@ -103,6 +103,8 @@ public:
   }
   void onLeavePanel() { m_sceneViewer->clearFocus(); }
 
+  SceneViewer *getSceneViewer() const { return m_sceneViewer; }
+
   // SaveLoadQSettings
   virtual void save(QSettings &settings) const override;
   virtual void load(QSettings &settings) override;
@@ -152,6 +154,8 @@ public:
   SceneViewerPanel(QWidget *parent       = 0,
                    Qt::WindowFlags flags = Qt::WindowFlags());
   ~SceneViewerPanel() {}
+
+  void load(QSettings &settings) override;
 
 protected:
   void checkOldVersionVisblePartsFlags(QSettings &settings) override;

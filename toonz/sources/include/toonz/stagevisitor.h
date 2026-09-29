@@ -138,6 +138,12 @@ struct DVAPI VisitArgs {
   int m_isGuidedDrawingEnabled;
   int m_guidedFrontStroke;
   int m_guidedBackStroke;
+  //! When true (e.g. locator), omit the full-opacity current cell/player when
+  //! onion skin or shift/trace supplies reference frames — keeps guided strokes.
+  bool m_hideCurrentDrawing;
+  //! Scene / camera stand only: build players for the active column index only
+  //! (hides other xsheet columns — e.g. raster reference under a vector level).
+  bool m_showOnlyCurrentColumn;
 #if defined(x64)
   TRasterImageP m_liveViewImage = 0;
   TRasterImageP m_lineupImage   = 0;
@@ -160,6 +166,8 @@ public:
       , m_isGuidedDrawingEnabled(0)
       , m_guidedFrontStroke(-1)
       , m_guidedBackStroke(-1)
+      , m_hideCurrentDrawing(false)
+      , m_showOnlyCurrentColumn(false)
       , m_rasterizePli(false) {}
 };
 
@@ -171,15 +179,8 @@ DVAPI void visit(Visitor &visitor, const VisitArgs &args);
 
 DVAPI void visit(Visitor &visitor, ToonzScene *scene, TXsheet *xsh, int row);
 
-//-----------------------------------------------------------------------------
-
-DVAPI void visit(Visitor &visitor, TXshSimpleLevel *level, const TFrameId &fid,
-                 const OnionSkinMask &osm, bool isPlaying);
-
-//-----------------------------------------------------------------------------
-
-DVAPI void visit(Visitor &visitor, TXshLevel *level, const TFrameId &fid,
-                 const OnionSkinMask &osm, bool isPlaying);
+// TXshSimpleLevel / TXshLevel visit() overloads: declared in toonz/stage.h only
+// (default arguments must not be repeated here — MSVC C2572).
 
 //**********************************************************************************************
 //    Specific Visitor  declarations

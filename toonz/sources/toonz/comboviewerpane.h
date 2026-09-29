@@ -29,6 +29,8 @@ public:
   void updateShowHide() override;
   void addShowHideContextMenu(QMenu *) override;
 
+  void load(QSettings &settings) override;
+
 protected:
   void checkOldVersionVisblePartsFlags(QSettings &settings) override;
 };

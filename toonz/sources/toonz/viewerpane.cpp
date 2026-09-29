@@ -1095,6 +1095,13 @@ SceneViewerPanel::SceneViewerPanel(QWidget *parent, Qt::WindowFlags flags)
 
 //-----------------------------------------------------------------------------
 
+void SceneViewerPanel::load(QSettings &settings) {
+  BaseViewerPanel::load(settings);
+  m_sceneViewer->setSuppressOnionSkinInViewer(false);
+}
+
+//-----------------------------------------------------------------------------
+
 void SceneViewerPanel::checkOldVersionVisblePartsFlags(QSettings &settings) {
   if (settings.contains("viewerVisibleParts") ||
       !settings.contains("visibleParts"))

@@ -867,6 +867,41 @@ SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
 
 //-----------------------------------------------------------------------------
 
+void SceneViewer::setGuidedDrawingModeOverride(int mode) {
+  if (mode < -1 || mode > 3) mode = -1;
+  if (m_guidedDrawingModeOverride == mode) return;
+  m_guidedDrawingModeOverride = mode;
+  update();
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::setSuppressOnionSkinInViewer(bool on) {
+  if (m_suppressOnionSkinInViewer == on) return;
+  m_suppressOnionSkinInViewer = on;
+  update();
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::setHideCurrentDrawingInViewer(bool on) {
+  if (!m_isLocator) return;
+  if (m_hideCurrentDrawingInViewer == on) return;
+  m_hideCurrentDrawingInViewer = on;
+  update();
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::setShowOnlyCurrentColumnInViewer(bool on) {
+  if (!m_isLocator) return;
+  if (m_showOnlyCurrentColumnInViewer == on) return;
+  m_showOnlyCurrentColumnInViewer = on;
+  update();
+}
+
+//-----------------------------------------------------------------------------
+
 void SceneViewer::setVisual(const ImagePainter::VisualSettings &settings) {
   // m_visualSettings.m_blankColor = settings.m_blankColor;//for the blank
   // frames, I don't have to repaint the viewer are using updateGl!
@@ -2162,13 +2197,26 @@ void SceneViewer::drawScene() {
   TXshSimpleLevel::m_fillFullColorRaster = false;
 
   // Guided Drawing Check
-  int useGuidedDrawing  = Preferences::instance()->getGuidedDrawingType();
+  int useGuidedDrawing = Preferences::instance()->getGuidedDrawingType();
+  if (m_guidedDrawingModeOverride >= 0)
+    useGuidedDrawing = m_guidedDrawingModeOverride;
   TTool *tool           = app->getCurrentTool()->getTool();
   int guidedFrontStroke = tool && tool->getViewer()
                               ? tool->getViewer()->getGuidedFrontStroke()
                               : -1;
   int guidedBackStroke =
       tool && tool->getViewer() ? tool->getViewer()->getGuidedBackStroke() : -1;
+
+  OnionSkinMask onionSkinForStage;
+  if (m_suppressOnionSkinInViewer)
+    onionSkinForStage = OnionSkinMask();
+  else
+    onionSkinForStage = app->getCurrentOnionSkin()->getOnionSkinMask();
+
+  const bool hideCurrentDrawing =
+      m_isLocator && m_hideCurrentDrawingInViewer;
+  const bool showOnlyCurrentColumn =
+      m_isLocator && m_showOnlyCurrentColumnInViewer;
 
   m_minZ = 0;
   if (is3DView()) {
@@ -2189,8 +2237,7 @@ void SceneViewer::drawScene() {
     args.m_xsh         = xr.first;
     args.m_row         = xr.second;
     args.m_col         = app->getCurrentColumn()->getColumnIndex();
-    OnionSkinMask osm  = app->getCurrentOnionSkin()->getOnionSkinMask();
-    args.m_osm         = &osm;
+    args.m_osm         = &onionSkinForStage;
     args.m_camera3d    = true;
     args.m_xsheetLevel = xsheetLevel;
     args.m_currentFrameId =
@@ -2201,6 +2248,8 @@ void SceneViewer::drawScene() {
     args.m_isGuidedDrawingEnabled = useGuidedDrawing;
     args.m_guidedFrontStroke      = guidedFrontStroke;
     args.m_guidedBackStroke       = guidedBackStroke;
+    args.m_hideCurrentDrawing     = hideCurrentDrawing;
+    args.m_showOnlyCurrentColumn  = showOnlyCurrentColumn;
 
     // args.m_currentFrameId = app->getCurrentFrame()->getFid();
     Stage::visit(painter, args);
@@ -2232,10 +2281,9 @@ void SceneViewer::drawScene() {
     TFrameHandle *frameHandle = TApp::instance()->getCurrentFrame();
     if (app->getCurrentFrame()->isEditingLevel()) {
       Stage::visit(painter, app->getCurrentLevel()->getLevel(),
-                   app->getCurrentFrame()->getFid(),
-                   app->getCurrentOnionSkin()->getOnionSkinMask(),
+                   app->getCurrentFrame()->getFid(), onionSkinForStage,
                    frameHandle->isPlaying(), useGuidedDrawing, guidedBackStroke,
-                   guidedFrontStroke);
+                   guidedFrontStroke, hideCurrentDrawing);
     } else {
       std::pair<TXsheet *, int> xr;
       int xsheetLevel = 0;
@@ -2250,8 +2298,7 @@ void SceneViewer::drawScene() {
       args.m_xsh         = xr.first;
       args.m_row         = xr.second;
       args.m_col         = app->getCurrentColumn()->getColumnIndex();
-      OnionSkinMask osm  = app->getCurrentOnionSkin()->getOnionSkinMask();
-      args.m_osm         = &osm;
+      args.m_osm         = &onionSkinForStage;
       args.m_xsheetLevel = xsheetLevel;
       args.m_isPlaying   = frameHandle->isPlaying();
       if (app->getCurrentLevel() && app->getCurrentLevel()->getLevel() &&
@@ -2264,6 +2311,8 @@ void SceneViewer::drawScene() {
       args.m_isGuidedDrawingEnabled = useGuidedDrawing;
       args.m_guidedFrontStroke      = guidedFrontStroke;
       args.m_guidedBackStroke       = guidedBackStroke;
+      args.m_hideCurrentDrawing     = hideCurrentDrawing;
+      args.m_showOnlyCurrentColumn  = showOnlyCurrentColumn;
 
 #if defined(x64)
       if (m_stopMotion->m_alwaysUseLiveViewImages &&
