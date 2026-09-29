@@ -19,7 +19,7 @@ namespace DVGui {
 class DoubleLineEdit;
 class MeasuredDoubleLineEdit;
 class CheckBox;
-}
+}  // namespace DVGui
 
 void updateCanvasSizeCommandEnabled();
 

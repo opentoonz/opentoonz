@@ -187,9 +187,9 @@ void applyCameraFromLevel(TXshSimpleLevel *sl) {
   if (res.lx <= 0 || res.ly <= 0 || dpi.x <= 0 || dpi.y <= 0) return;
 
   TDimensionD size(res.lx / dpi.x, res.ly / dpi.y);
-  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
-  TXsheet *xsh        = scene->getXsheet();
-  TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
+  ToonzScene *scene          = TApp::instance()->getCurrentScene()->getScene();
+  TXsheet *xsh               = scene->getXsheet();
+  TStageObjectId cameraId    = xsh->getStageObjectTree()->getCurrentCameraId();
   TStageObject *cameraObject = xsh->getStageObject(cameraId);
   if (!cameraObject) return;
   TCamera *camera = cameraObject->getCamera();
@@ -423,7 +423,8 @@ void PeggingWidget::createButton(QPushButton **button,
   QPixmap pix(1, 1);
   switch (position) {
   case e00:
-    pix = m_topRightPix.transformed(QTransform().rotate(-90), Qt::SmoothTransformation);
+    pix = m_topRightPix.transformed(QTransform().rotate(-90),
+                                    Qt::SmoothTransformation);
     break;
   case e01:
     pix = m_topPix;
@@ -432,19 +433,24 @@ void PeggingWidget::createButton(QPushButton **button,
     pix = m_topRightPix;
     break;
   case e10:
-    pix = m_topPix.transformed(QTransform().rotate(-90), Qt::SmoothTransformation);
+    pix = m_topPix.transformed(QTransform().rotate(-90),
+                               Qt::SmoothTransformation);
     break;
   case e12:
-    pix = m_topPix.transformed(QTransform().rotate(90), Qt::SmoothTransformation);
+    pix =
+        m_topPix.transformed(QTransform().rotate(90), Qt::SmoothTransformation);
     break;
   case e20:
-    pix = m_topRightPix.transformed(QTransform().rotate(180), Qt::SmoothTransformation);
+    pix = m_topRightPix.transformed(QTransform().rotate(180),
+                                    Qt::SmoothTransformation);
     break;
   case e21:
-    pix = m_topPix.transformed(QTransform().rotate(180), Qt::SmoothTransformation);
+    pix = m_topPix.transformed(QTransform().rotate(180),
+                               Qt::SmoothTransformation);
     break;
   case e22:
-    pix = m_topRightPix.transformed(QTransform().rotate(90), Qt::SmoothTransformation);
+    pix = m_topRightPix.transformed(QTransform().rotate(90),
+                                    Qt::SmoothTransformation);
     break;
   default:
     break;
@@ -462,9 +468,9 @@ void PeggingWidget::on00() {
   m_00->setIcon(pix);
   m_01->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLx ? -90 : 90),
                                      Qt::SmoothTransformation));
-  m_11->setIcon(
-      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? -90 : 90),
-                                Qt::SmoothTransformation));
+  m_11->setIcon(m_topRightPix.transformed(
+      QTransform().rotate(m_cutLx || m_cutLy ? -90 : 90),
+      Qt::SmoothTransformation));
   m_10->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLy ? 0 : 180),
                                      Qt::SmoothTransformation));
 
@@ -485,14 +491,14 @@ void PeggingWidget::on01() {
   m_01->setIcon(pix);
   m_00->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLx ? 90 : -90),
                                      Qt::SmoothTransformation));
-  m_10->setIcon(
-      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? 0 : 180),
-                                Qt::SmoothTransformation));
+  m_10->setIcon(m_topRightPix.transformed(
+      QTransform().rotate(m_cutLx || m_cutLy ? 0 : 180),
+      Qt::SmoothTransformation));
   m_11->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLy ? 0 : 180),
                                      Qt::SmoothTransformation));
-  m_12->setIcon(
-      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? -90 : 90),
-                                Qt::SmoothTransformation));
+  m_12->setIcon(m_topRightPix.transformed(
+      QTransform().rotate(m_cutLx || m_cutLy ? -90 : 90),
+      Qt::SmoothTransformation));
   m_02->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLx ? -90 : 90),
                                      Qt::SmoothTransformation));
 
@@ -511,9 +517,9 @@ void PeggingWidget::on02() {
   m_02->setIcon(pix);
   m_01->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLx ? 90 : -90),
                                      Qt::SmoothTransformation));
-  m_11->setIcon(
-      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? 0 : 180),
-                                Qt::SmoothTransformation));
+  m_11->setIcon(m_topRightPix.transformed(
+      QTransform().rotate(m_cutLx || m_cutLy ? 0 : 180),
+      Qt::SmoothTransformation));
   m_12->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLy ? 0 : 180),
                                      Qt::SmoothTransformation));
 
@@ -534,14 +540,14 @@ void PeggingWidget::on10() {
   m_10->setIcon(pix);
   m_00->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLy ? 180 : 0),
                                      Qt::SmoothTransformation));
-  m_01->setIcon(
-      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? 180 : 0),
-                                Qt::SmoothTransformation));
+  m_01->setIcon(m_topRightPix.transformed(
+      QTransform().rotate(m_cutLx || m_cutLy ? 180 : 0),
+      Qt::SmoothTransformation));
   m_11->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLx ? -90 : 90),
                                      Qt::SmoothTransformation));
-  m_21->setIcon(
-      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? -90 : 90),
-                                Qt::SmoothTransformation));
+  m_21->setIcon(m_topRightPix.transformed(
+      QTransform().rotate(m_cutLx || m_cutLy ? -90 : 90),
+      Qt::SmoothTransformation));
   m_20->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLy ? 0 : 180),
                                      Qt::SmoothTransformation));
 
@@ -558,26 +564,26 @@ void PeggingWidget::on11() {
   QPixmap pix(30, 30);
   pix.fill(Qt::transparent);
   m_11->setIcon(pix);
-  m_00->setIcon(
-      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? 90 : -90),
-                                Qt::SmoothTransformation));
+  m_00->setIcon(m_topRightPix.transformed(
+      QTransform().rotate(m_cutLx || m_cutLy ? 90 : -90),
+      Qt::SmoothTransformation));
   m_01->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLy ? 180 : 0),
                                      Qt::SmoothTransformation));
-  m_02->setIcon(
-      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? 180 : 0),
-                                Qt::SmoothTransformation));
+  m_02->setIcon(m_topRightPix.transformed(
+      QTransform().rotate(m_cutLx || m_cutLy ? 180 : 0),
+      Qt::SmoothTransformation));
   m_10->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLx ? 90 : -90),
                                      Qt::SmoothTransformation));
   m_12->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLx ? -90 : 90),
                                      Qt::SmoothTransformation));
-  m_20->setIcon(
-      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? 0 : 180),
-                                Qt::SmoothTransformation));
+  m_20->setIcon(m_topRightPix.transformed(
+      QTransform().rotate(m_cutLx || m_cutLy ? 0 : 180),
+      Qt::SmoothTransformation));
   m_21->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLy ? 0 : 180),
                                      Qt::SmoothTransformation));
-  m_22->setIcon(
-      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? -90 : 90),
-                                Qt::SmoothTransformation));
+  m_22->setIcon(m_topRightPix.transformed(
+      QTransform().rotate(m_cutLx || m_cutLy ? -90 : 90),
+      Qt::SmoothTransformation));
 }
 
 //-----------------------------------------------------------------------------
@@ -590,14 +596,14 @@ void PeggingWidget::on12() {
   m_12->setIcon(pix);
   m_02->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLy ? 180 : 0),
                                      Qt::SmoothTransformation));
-  m_01->setIcon(
-      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? 90 : -90),
-                                Qt::SmoothTransformation));
+  m_01->setIcon(m_topRightPix.transformed(
+      QTransform().rotate(m_cutLx || m_cutLy ? 90 : -90),
+      Qt::SmoothTransformation));
   m_11->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLx ? 90 : -90),
                                      Qt::SmoothTransformation));
-  m_21->setIcon(
-      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? 0 : 180),
-                                Qt::SmoothTransformation));
+  m_21->setIcon(m_topRightPix.transformed(
+      QTransform().rotate(m_cutLx || m_cutLy ? 0 : 180),
+      Qt::SmoothTransformation));
   m_22->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLy ? 0 : 180),
                                      Qt::SmoothTransformation));
 
@@ -616,9 +622,9 @@ void PeggingWidget::on20() {
   m_20->setIcon(pix);
   m_10->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLy ? 180 : 0),
                                      Qt::SmoothTransformation));
-  m_11->setIcon(
-      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? 180 : 0),
-                                Qt::SmoothTransformation));
+  m_11->setIcon(m_topRightPix.transformed(
+      QTransform().rotate(m_cutLx || m_cutLy ? 180 : 0),
+      Qt::SmoothTransformation));
   m_21->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLx ? -90 : 90),
                                      Qt::SmoothTransformation));
 
@@ -639,14 +645,14 @@ void PeggingWidget::on21() {
   m_21->setIcon(pix);
   m_20->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLx ? 90 : -90),
                                      Qt::SmoothTransformation));
-  m_10->setIcon(
-      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? 90 : -90),
-                                Qt::SmoothTransformation));
+  m_10->setIcon(m_topRightPix.transformed(
+      QTransform().rotate(m_cutLx || m_cutLy ? 90 : -90),
+      Qt::SmoothTransformation));
   m_11->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLy ? 180 : 0),
                                      Qt::SmoothTransformation));
-  m_12->setIcon(
-      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? 180 : 0),
-                                Qt::SmoothTransformation));
+  m_12->setIcon(m_topRightPix.transformed(
+      QTransform().rotate(m_cutLx || m_cutLy ? 180 : 0),
+      Qt::SmoothTransformation));
   m_22->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLx ? -90 : 90),
                                      Qt::SmoothTransformation));
 
@@ -665,9 +671,9 @@ void PeggingWidget::on22() {
   m_22->setIcon(pix);
   m_12->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLy ? 180 : 0),
                                      Qt::SmoothTransformation));
-  m_11->setIcon(
-      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? 90 : -90),
-                                Qt::SmoothTransformation));
+  m_11->setIcon(m_topRightPix.transformed(
+      QTransform().rotate(m_cutLx || m_cutLy ? 90 : -90),
+      Qt::SmoothTransformation));
   m_21->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLx ? 90 : -90),
                                      Qt::SmoothTransformation));
 
@@ -1235,7 +1241,8 @@ CanvasSizePopup::CanvasSizePopup()
   m_percentFld->setFixedSize(80, DVGui::WidgetHeight);
   m_percentFld->setEnabled(false);
   addWidgets(m_percentMode, m_percentFld);
-  connect(m_percentMode, SIGNAL(toggled(bool)), this, SLOT(onPercentMode(bool)));
+  connect(m_percentMode, SIGNAL(toggled(bool)), this,
+          SLOT(onPercentMode(bool)));
   connect(m_percentFld, SIGNAL(textChanged(const QString &)), this,
           SLOT(onSizeChanged()));
 
@@ -1417,8 +1424,8 @@ TDimension CanvasSizePopup::proposedPixelSize() const {
   if (!m_sl) return TDimension(1, 1);
   if (m_percentMode->isChecked()) {
     const double scale = m_percentFld->getValue();
-    const int nx         = tround(m_currentDim.lx * scale);
-    const int ny         = tround(m_currentDim.ly * scale);
+    const int nx       = tround(m_currentDim.lx * scale);
+    const int ny       = tround(m_currentDim.ly * scale);
     return TDimension(std::max(1, nx), std::max(1, ny));
   }
   TPointD dpi  = m_sl->getDpi();
@@ -1624,9 +1631,8 @@ void CanvasSizePopup::onOkBtn() {
   pos.x = tround(m_currentRect.x0 - m_proposedRect.x0);
   pos.y = tround(m_currentRect.y0 - m_proposedRect.y0);
 
-  const bool sizeChanged =
-      dim.lx != newDim.lx || dim.ly != newDim.ly;
-  const bool posChanged = pos.x != 0 || pos.y != 0;
+  const bool sizeChanged   = dim.lx != newDim.lx || dim.ly != newDim.ly;
+  const bool posChanged    = pos.x != 0 || pos.y != 0;
   const bool rasterChanged = sizeChanged || posChanged;
   bool updateCamera        = m_updateCamera->isChecked();
 
@@ -1639,12 +1645,12 @@ void CanvasSizePopup::onOkBtn() {
       (int)CanvasSizeShowCropConfirm) {
     const bool smallerCanvas = newDim.lx < dim.lx || newDim.ly < dim.ly;
     const QString mainText   = smallerCanvas
-                                 ? tr("The new canvas size is smaller than the "
-                                      "current one.\n"
-                                      "Do you want to crop the canvas?")
-                                 : tr("Part of the drawing would lie outside "
-                                      "the new canvas.\n"
-                                      "Do you want to crop the canvas?");
+                                   ? tr("The new canvas size is smaller than the "
+                                          "current one.\n"
+                                          "Do you want to crop the canvas?")
+                                   : tr("Part of the drawing would lie outside "
+                                          "the new canvas.\n"
+                                          "Do you want to crop the canvas?");
     int ret = DVGui::MsgBox(mainText, tr("Crop"), tr("Cancel"));
     if (ret == 2) return;
   }
