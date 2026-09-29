@@ -232,12 +232,7 @@ LocatorPopup::LocatorPopup(QWidget *parent, Qt::WindowFlags flags)
 
 void LocatorPopup::buildNavigatorToolbar() {
   m_guidedCombo = new QComboBox(m_navPage);
-  m_guidedCombo->setToolTip(
-      tr("Vector guided drawing for this Navigator panel only. Initial choice "
-         "matches Preferences → \"Vector guided drawing\" (same as View menu); "
-         "changing the list overrides for this panel until you pick another mode. "
-         "This is not the same as Always \"Closest\": your global preference may "
-         "be Off, Farthest, or All."));
+  m_guidedCombo->setToolTip(tr("Vector drawing modes"));
   m_guidedCombo->addItem(tr("Off"), 0);
   m_guidedCombo->addItem(tr("Closest"), 1);
   m_guidedCombo->addItem(tr("Farthest"), 2);
@@ -252,9 +247,7 @@ void LocatorPopup::buildNavigatorToolbar() {
   m_hideCurrentTb->setCheckable(true);
   m_hideCurrentTb->setIcon(createQIcon(QStringLiteral("preview"), false));
   m_hideCurrentTb->setToolTip(
-      tr("When onion skin or Shift & Trace shows reference frames, hide the "
-         "full-opacity current drawing in this panel only (not onion ghosts). "
-         "Guided stroke arrows and ghosts stay visible for matching."));
+      tr("Hides the current drawing when reference frames are shown."));
   m_hideCurrentTb->setChecked(true);
   m_hideCurrentTb->setAutoRaise(true);
 
@@ -262,9 +255,7 @@ void LocatorPopup::buildNavigatorToolbar() {
   m_soloColumnTb->setCheckable(true);
   m_soloColumnTb->setIcon(createQIcon(QStringLiteral("fold_column"), false));
   m_soloColumnTb->setToolTip(
-      tr("Show only the active xsheet column here. Other columns (e.g. a dimmed "
-         "raster level used as reference while drawing on vector) are omitted "
-         "so onion skin and guided strokes stay readable."));
+      tr("Shows only the active Xsheet column here."));
   m_soloColumnTb->setChecked(true);
   m_soloColumnTb->setAutoRaise(true);
 
@@ -272,17 +263,13 @@ void LocatorPopup::buildNavigatorToolbar() {
   m_matchingStrokeTb->setCheckable(true);
   m_matchingStrokeTb->setIcon(matchingStrokeArrowsIcon(themeIconBaseColor()));
   m_matchingStrokeTb->setToolTip(
-      tr("Matching stroke: hide onion skin ghosts on main workspace viewers "
-         "(Combo / Scene). Global onion still applies in this Navigator / "
-         "Locator panel. Turn off to restore each main viewer's previous state "
-         "captured when this was turned on."));
+      tr("Hides onion skin on other views; keeps references in this panel."));
   m_matchingStrokeTb->setAutoRaise(true);
   m_matchingStrokeTb->setFixedSize(24, 24);
   m_matchingStrokeTb->setIconSize(QSize(18, 18));
 
   m_gearBtn = new QToolButton(m_navPage);
   m_gearBtn->setIcon(createQIcon(QStringLiteral("gear"), false));
-  m_gearBtn->setToolTip(tr("Follow main viewer pan and zoom."));
   m_gearBtn->setAutoRaise(true);
   m_gearBtn->setPopupMode(QToolButton::InstantPopup);
   auto *gearMenu = new QMenu(m_gearBtn);
