@@ -40,6 +40,7 @@ class QVBoxLayout;
 class QAction;
 class QContextMenuEvent;
 class QLabel;
+class QResizeEvent;
 
 //=============================================================================
 // LocatorPopup — Locator tab (minimal) and Navigator tab (Xsheet display options).
@@ -71,6 +72,7 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   QToolButton *m_matchingStrokeTb;
   QToolButton *m_gearBtn     = nullptr;
   QAction *m_overviewAct     = nullptr;
+  QAction *m_navToolsOnlyAct = nullptr;
   QAction *m_syncZoomAct     = nullptr;
   QAction *m_syncPanAct      = nullptr;
   QPointer<SceneViewer> m_navFrameSource;
@@ -84,15 +86,18 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   std::array<TAffine, 2> m_lastNavAffs = {TAffine(), TAffine()};
   bool m_matchingStrokeReferenceMode = false;
   bool m_showDisplayToolbar          = true;
-  bool m_showNavGuided               = true;
+  bool m_showNavGuided               = false;
   bool m_showNavTools                = true;
   bool m_showNavZoom                 = true;
+  bool m_showNavView                 = true;
   bool m_showNavRotate               = true;
   bool m_showNavPan                  = false;
   bool m_showNavFlip                 = true;
   QWidget *m_navTopSpacerAfterGuided;
+  QWidget *m_navTopStretchWhenGuidedHidden;
   QWidget *m_navBottomSpacerAfterTools;
   QWidget *m_navBottomSpacerAfterZoom;
+  QWidget *m_navBottomSpacerAfterView;
   QWidget *m_navBottomSpacerAfterRotate;
   QWidget *m_navBottomSpacerAfterPan;
   QList<QPair<QPointer<SceneViewer>, bool>> m_matchingSuppressRestore;
@@ -123,6 +128,7 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   };
 
   QToolButton *m_navBottomButtons[NBB_COUNT]{};
+  int m_navTopIconPx = 14;
 
   void buildNavigatorToolbar();
   void buildNavigatorBottomBar();
@@ -140,6 +146,7 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   SceneViewer *resolveMainViewer() const;
   SceneViewer *viewToolTarget() const;
   bool isOverview() const;
+  bool isNavToolsOnly() const;
   void applyOverviewMode();
   void captureLastNavAffs();
   void applyNavigatorSyncToMain();
@@ -150,6 +157,7 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   void persistPanelState();
   void restoreOrFitView();
   void updateNavigatorBarsVisibility();
+  void updateNavigatorIconScale();
   void fillNavigatorContextMenu(QMenu *menu);
   void addShowHideContextMenu(QMenu *menu);
   void updateTabPageSizeConsistency();
@@ -174,6 +182,7 @@ public:
 
 protected:
   void changeEvent(QEvent *e) override;
+  void resizeEvent(QResizeEvent *event) override;
   void contextMenuEvent(QContextMenuEvent *event) override;
   void showEvent(QShowEvent *);
   void hideEvent(QHideEvent *);

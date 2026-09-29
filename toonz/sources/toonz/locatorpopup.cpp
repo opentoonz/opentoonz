@@ -28,6 +28,7 @@
 #include <QGuiApplication>
 #include <QEvent>
 #include <QMouseEvent>
+#include <QResizeEvent>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMainWindow>
@@ -50,11 +51,15 @@
 
 namespace {
 
-constexpr int kNavTopBtnSize      = 18;
-constexpr int kNavTopIconSize     = 14;
-constexpr int kNavTopGearIconSize = 13;
-constexpr int kNavBottomBtnSize = 22;
-constexpr int kNavBottomIconSize = 16;
+constexpr int kNavTopBtnSize     = 18;
+constexpr int kNavTopIconSize    = 14;
+constexpr int kNavBottomBtnSize  = 18;
+constexpr int kNavBottomIconSize = 13;
+constexpr int kNavGroupSpacer    = 6;
+constexpr int kNavMinBtnSize     = 16;
+constexpr int kNavMinIconSize    = 11;
+constexpr double kNavMinScale    = 16.0 / 18.0;
+constexpr double kNavScaleDamp   = 0.32;
 
 QImage tintNonTransparent(const QImage &src, const QColor &c) {
   QImage out = src.convertToFormat(QImage::Format_ARGB32);
@@ -147,7 +152,9 @@ LocatorPopup::LocatorPopup(QWidget *parent, Qt::WindowFlags flags)
     , m_navTopBarHost(nullptr)
     , m_navBottomBarHost(nullptr)
     , m_navTopSpacerAfterGuided(nullptr)
+    , m_navTopStretchWhenGuidedHidden(nullptr)
     , m_navBottomSpacerAfterZoom(nullptr)
+    , m_navBottomSpacerAfterView(nullptr)
     , m_navBottomSpacerAfterRotate(nullptr)
     , m_navBottomSpacerAfterPan(nullptr) {
   m_viewer = new SceneViewer(NULL);
@@ -237,6 +244,8 @@ LocatorPopup::LocatorPopup(QWidget *parent, Qt::WindowFlags flags)
     }
     applyOverviewMode();
   });
+  connect(m_navToolsOnlyAct, &QAction::toggled, this,
+          [this]() { persistPanelState(); });
   connect(m_syncZoomAct, &QAction::toggled, this,
           [this]() { persistPanelState(); });
   connect(m_syncPanAct, &QAction::toggled, this,
@@ -331,7 +340,7 @@ void LocatorPopup::buildNavigatorToolbar() {
   m_matchingStrokeTb->setIconSize(QSize(kNavTopIconSize, kNavTopIconSize));
 
   m_gearBtn = new QToolButton(m_navPage);
-  m_gearBtn->setIcon(createQIcon(QStringLiteral("gear"), false));
+  m_gearBtn->setIcon(createQIcon(QStringLiteral("menu"), false));
   m_gearBtn->setAutoRaise(true);
   m_gearBtn->setPopupMode(QToolButton::InstantPopup);
   auto *gearMenu = new QMenu(m_gearBtn);
@@ -339,6 +348,12 @@ void LocatorPopup::buildNavigatorToolbar() {
   m_overviewAct->setCheckable(true);
   m_overviewAct->setToolTip(
       tr("Show the sheet as a map. The red frame is the main viewer."));
+  m_navToolsOnlyAct = gearMenu->addAction(tr("Navigation tools only"));
+  m_navToolsOnlyAct->setCheckable(true);
+  m_navToolsOnlyAct->setChecked(true);
+  m_navToolsOnlyAct->setEnabled(false);
+  m_navToolsOnlyAct->setToolTip(
+      tr("On the map, only Zoom, Hand, and Rotate. The Viewer keeps the current tool."));
   gearMenu->addSeparator();
   m_syncZoomAct = gearMenu->addAction(tr("Synchronize Zoom"));
   m_syncZoomAct->setCheckable(true);
@@ -352,7 +367,7 @@ void LocatorPopup::buildNavigatorToolbar() {
          "The main viewer does not drive this panel."));
   m_gearBtn->setMenu(gearMenu);
   m_gearBtn->setFixedSize(kNavTopBtnSize, kNavTopBtnSize);
-  m_gearBtn->setIconSize(QSize(kNavTopGearIconSize, kNavTopGearIconSize));
+  m_gearBtn->setIconSize(QSize(kNavTopIconSize, kNavTopIconSize));
 
   m_navTopLayout = new QHBoxLayout();
   m_navTopLayout->setContentsMargins(2, 1, 2, 1);
@@ -360,10 +375,12 @@ void LocatorPopup::buildNavigatorToolbar() {
   m_guidedLabel = new QLabel(tr("Guided:"), m_navPage);
   m_guidedLabel->setFixedHeight(kNavTopBtnSize);
   m_navTopSpacerAfterGuided = new QWidget(m_navPage);
-  m_navTopSpacerAfterGuided->setFixedWidth(2);
+  m_navTopSpacerAfterGuided->setFixedWidth(6);
+  m_navTopStretchWhenGuidedHidden = new QWidget(m_navPage);
   m_navTopLayout->addWidget(m_guidedLabel, 0);
   m_navTopLayout->addWidget(m_guidedCombo, 1);
   m_navTopLayout->addWidget(m_navTopSpacerAfterGuided, 0);
+  m_navTopLayout->addWidget(m_navTopStretchWhenGuidedHidden, 1);
   m_navTopLayout->addWidget(m_hideCurrentTb, 0);
   m_navTopLayout->addWidget(m_soloColumnTb, 0);
   m_navTopLayout->addWidget(m_matchingStrokeTb, 0);
@@ -408,51 +425,59 @@ void LocatorPopup::buildNavigatorBottomBar() {
     });
   };
 
-  auto mkToolBtn = [this](const char *commandId) {
+  auto mkToolBtn = [this](const char *commandId, const QString &iconName) {
     QToolButton *tb = new QToolButton(m_navPage);
-    if (QAction *act = CommandManager::instance()->getAction(commandId))
-      tb->setDefaultAction(act);
+    if (QAction *act = CommandManager::instance()->getAction(commandId)) {
+      tb->setToolTip(act->toolTip());
+      connect(tb, &QToolButton::clicked, act, &QAction::trigger);
+    }
+    tb->setIcon(createQIcon(iconName, false));
     tb->setAutoRaise(true);
     tb->setFixedSize(kNavBottomBtnSize, kNavBottomBtnSize);
     tb->setIconSize(QSize(kNavBottomIconSize, kNavBottomIconSize));
     return tb;
   };
 
-  QToolButton *toolZoom = mkToolBtn(T_Zoom);
+  QToolButton *toolZoom =
+      mkToolBtn(T_Zoom, QStringLiteral("navigator_zoom"));
   m_navBottomButtons[NBB_ToolZoom] = toolZoom;
-  QToolButton *toolHand = mkToolBtn(T_Hand);
+  QToolButton *toolHand =
+      mkToolBtn(T_Hand, QStringLiteral("navigator_hand"));
   m_navBottomButtons[NBB_ToolHand] = toolHand;
-  QToolButton *toolRotate = mkToolBtn(T_Rotate);
+  QToolButton *toolRotate =
+      mkToolBtn(T_Rotate, QStringLiteral("navigator_rotate"));
   m_navBottomButtons[NBB_ToolRotate] = toolRotate;
 
   QToolButton *zoomIn =
-      mkBtnThemedSvg(QStringLiteral("zoomin"), tr("Zoom in"));
+      mkBtnThemedSvg(QStringLiteral("navigator_zoomin"), tr("Zoom in"));
   m_navBottomButtons[NBB_ZoomIn] = zoomIn;
   bindViewTool(zoomIn, &SceneViewer::zoomIn);
   QToolButton *zoomOut =
-      mkBtnThemedSvg(QStringLiteral("zoomout"), tr("Zoom out"));
+      mkBtnThemedSvg(QStringLiteral("navigator_zoomout"), tr("Zoom out"));
   m_navBottomButtons[NBB_ZoomOut] = zoomOut;
   bindViewTool(zoomOut, &SceneViewer::zoomOut);
   QToolButton *zoomReset =
-      mkBtnThemedSvg(QStringLiteral("zoom_reset"),
+      mkBtnThemedSvg(QStringLiteral("navigator_zoom_reset"),
                      tr("Reset zoom (scale) to default for this camera."));
   m_navBottomButtons[NBB_ZoomReset] = zoomReset;
   bindViewTool(zoomReset, &SceneViewer::resetZoom);
   QToolButton *fitCam =
-      mkBtnThemedSvg(QStringLiteral("fit_to_window"), tr("Fit to Camera"));
+      mkBtnThemedSvg(QStringLiteral("navigator_fit_to_window"),
+                     tr("Fit to Camera"));
   m_navBottomButtons[NBB_Fit] = fitCam;
   bindViewTool(fitCam, &SceneViewer::fitToCamera);
   QToolButton *resetView =
-      mkBtnThemedSvg(QStringLiteral("reset"), tr("Reset View"));
+      mkBtnThemedSvg(QStringLiteral("navigator_reset"), tr("Reset View"));
   m_navBottomButtons[NBB_ResetView] = resetView;
   bindViewTool(resetView, &SceneViewer::resetSceneViewer);
 
   QToolButton *rotL =
-      mkBtnThemedSvg(QStringLiteral("rotateleft"), tr("Rotate left"));
+      mkBtnThemedSvg(QStringLiteral("navigator_rotateleft"), tr("Rotate left"));
   m_navBottomButtons[NBB_RotL] = rotL;
   bindViewTool(rotL, &SceneViewer::rotateLeft);
   QToolButton *rotR =
-      mkBtnThemedSvg(QStringLiteral("rotateright"), tr("Rotate right"));
+      mkBtnThemedSvg(QStringLiteral("navigator_rotateright"),
+                     tr("Rotate right"));
   m_navBottomButtons[NBB_RotR] = rotR;
   bindViewTool(rotR, &SceneViewer::rotateRight);
 
@@ -487,11 +512,13 @@ void LocatorPopup::buildNavigatorBottomBar() {
   });
 
   QToolButton *flipH =
-      mkBtnThemedSvg(QStringLiteral("fliphoriz"), tr("Flip viewer horizontally"));
+      mkBtnThemedSvg(QStringLiteral("navigator_fliphoriz"),
+                     tr("Flip viewer horizontally"));
   m_navBottomButtons[NBB_FlipH] = flipH;
   bindViewTool(flipH, &SceneViewer::flipX);
   QToolButton *flipV =
-      mkBtnThemedSvg(QStringLiteral("flipvert"), tr("Flip viewer vertically"));
+      mkBtnThemedSvg(QStringLiteral("navigator_flipvert"),
+                     tr("Flip viewer vertically"));
   m_navBottomButtons[NBB_FlipV] = flipV;
   bindViewTool(flipV, &SceneViewer::flipY);
 
@@ -505,11 +532,14 @@ void LocatorPopup::buildNavigatorBottomBar() {
   m_navBottomLayout->addWidget(zoomIn);
   m_navBottomLayout->addWidget(zoomOut);
   m_navBottomLayout->addWidget(zoomReset);
-  m_navBottomLayout->addWidget(fitCam);
-  m_navBottomLayout->addWidget(resetView);
   m_navBottomSpacerAfterZoom = new QWidget(m_navPage);
   m_navBottomSpacerAfterZoom->setFixedWidth(6);
   m_navBottomLayout->addWidget(m_navBottomSpacerAfterZoom);
+  m_navBottomLayout->addWidget(fitCam);
+  m_navBottomLayout->addWidget(resetView);
+  m_navBottomSpacerAfterView = new QWidget(m_navPage);
+  m_navBottomSpacerAfterView->setFixedWidth(6);
+  m_navBottomLayout->addWidget(m_navBottomSpacerAfterView);
   m_navBottomLayout->addWidget(rotL);
   m_navBottomLayout->addWidget(rotR);
   m_navBottomSpacerAfterRotate = new QWidget(m_navPage);
@@ -554,18 +584,19 @@ QColor LocatorPopup::themeIconBaseColor() const {
 
 void LocatorPopup::updateNavigatorVisibilityIcons() {
   if (!m_hideCurrentTb || !m_soloColumnTb || !m_matchingStrokeTb) return;
+  const int iconPx =
+      m_navTopIconPx > 0 ? m_navTopIconPx : kNavTopIconSize;
   const QColor ink = themeIconBaseColor();
   m_hideCurrentTb->setIcon(navigatorToggleIcon(
-      navigatorThemedIconPixmap(QStringLiteral("preview"), kNavTopIconSize),
-      m_hideCurrentTb->isChecked(), ink, kNavTopIconSize));
+      navigatorThemedIconPixmap(QStringLiteral("preview"), iconPx),
+      m_hideCurrentTb->isChecked(), ink, iconPx));
   m_soloColumnTb->setIcon(navigatorToggleIcon(
-      navigatorThemedIconPixmap(QStringLiteral("navigator_column"),
-                                kNavTopIconSize),
-      m_soloColumnTb->isChecked(), ink, kNavTopIconSize));
+      navigatorThemedIconPixmap(QStringLiteral("navigator_column"), iconPx),
+      m_soloColumnTb->isChecked(), ink, iconPx));
   m_matchingStrokeTb->setIcon(navigatorToggleIcon(
       navigatorThemedIconPixmap(QStringLiteral("navigator_onionskin"),
-                                kNavTopIconSize),
-      m_matchingStrokeTb->isChecked(), ink, kNavTopIconSize));
+                                iconPx),
+      m_matchingStrokeTb->isChecked(), ink, iconPx));
 }
 
 //-----------------------------------------------------------------------------
@@ -573,28 +604,38 @@ void LocatorPopup::updateNavigatorVisibilityIcons() {
 void LocatorPopup::refreshNavigatorThemedIcons() {
   if (!m_hideCurrentTb) return;
   updateNavigatorVisibilityIcons();
-  if (m_gearBtn) m_gearBtn->setIcon(createQIcon(QStringLiteral("gear"), false));
+  if (m_gearBtn)
+    m_gearBtn->setIcon(createQIcon(QStringLiteral("menu"), false));
+  if (m_navBottomButtons[NBB_ToolZoom])
+    m_navBottomButtons[NBB_ToolZoom]->setIcon(
+        createQIcon(QStringLiteral("navigator_zoom"), false));
+  if (m_navBottomButtons[NBB_ToolHand])
+    m_navBottomButtons[NBB_ToolHand]->setIcon(
+        createQIcon(QStringLiteral("navigator_hand"), false));
+  if (m_navBottomButtons[NBB_ToolRotate])
+    m_navBottomButtons[NBB_ToolRotate]->setIcon(
+        createQIcon(QStringLiteral("navigator_rotate"), false));
   if (m_navBottomButtons[NBB_ZoomIn])
     m_navBottomButtons[NBB_ZoomIn]->setIcon(
-        createQIcon(QStringLiteral("zoomin"), false));
+        createQIcon(QStringLiteral("navigator_zoomin"), false));
   if (m_navBottomButtons[NBB_ZoomOut])
     m_navBottomButtons[NBB_ZoomOut]->setIcon(
-        createQIcon(QStringLiteral("zoomout"), false));
+        createQIcon(QStringLiteral("navigator_zoomout"), false));
   if (m_navBottomButtons[NBB_ZoomReset])
     m_navBottomButtons[NBB_ZoomReset]->setIcon(
-        createQIcon(QStringLiteral("zoom_reset"), false));
+        createQIcon(QStringLiteral("navigator_zoom_reset"), false));
   if (m_navBottomButtons[NBB_Fit])
     m_navBottomButtons[NBB_Fit]->setIcon(
-        createQIcon(QStringLiteral("fit_to_window"), false));
+        createQIcon(QStringLiteral("navigator_fit_to_window"), false));
   if (m_navBottomButtons[NBB_ResetView])
     m_navBottomButtons[NBB_ResetView]->setIcon(
-        createQIcon(QStringLiteral("reset"), false));
+        createQIcon(QStringLiteral("navigator_reset"), false));
   if (m_navBottomButtons[NBB_RotL])
     m_navBottomButtons[NBB_RotL]->setIcon(
-        createQIcon(QStringLiteral("rotateleft"), false));
+        createQIcon(QStringLiteral("navigator_rotateleft"), false));
   if (m_navBottomButtons[NBB_RotR])
     m_navBottomButtons[NBB_RotR]->setIcon(
-        createQIcon(QStringLiteral("rotateright"), false));
+        createQIcon(QStringLiteral("navigator_rotateright"), false));
   if (m_navBottomButtons[NBB_PanL])
     m_navBottomButtons[NBB_PanL]->setIcon(
         themedPanArrowIcon(-90.0, themeIconBaseColor()));
@@ -609,10 +650,10 @@ void LocatorPopup::refreshNavigatorThemedIcons() {
         themedVerticalArrowIcon(false, themeIconBaseColor()));
   if (m_navBottomButtons[NBB_FlipH])
     m_navBottomButtons[NBB_FlipH]->setIcon(
-        createQIcon(QStringLiteral("fliphoriz"), false));
+        createQIcon(QStringLiteral("navigator_fliphoriz"), false));
   if (m_navBottomButtons[NBB_FlipV])
     m_navBottomButtons[NBB_FlipV]->setIcon(
-        createQIcon(QStringLiteral("flipvert"), false));
+        createQIcon(QStringLiteral("navigator_flipvert"), false));
 }
 
 //-----------------------------------------------------------------------------
@@ -668,12 +709,16 @@ void LocatorPopup::writePanelStateTo(QSettings &settings) const {
   settings.setValue(QStringLiteral("showNavGuided"), m_showNavGuided);
   settings.setValue(QStringLiteral("showNavTools"), m_showNavTools);
   settings.setValue(QStringLiteral("showNavZoom"), m_showNavZoom);
+  settings.setValue(QStringLiteral("showNavView"), m_showNavView);
   settings.setValue(QStringLiteral("showNavRotate"), m_showNavRotate);
   settings.setValue(QStringLiteral("showNavPan"), m_showNavPan);
   settings.setValue(QStringLiteral("showNavFlip"), m_showNavFlip);
   if (m_overviewAct)
     settings.setValue(QStringLiteral("useAsOverview"),
                       m_overviewAct->isChecked());
+  if (m_navToolsOnlyAct)
+    settings.setValue(QStringLiteral("navigationToolsOnly"),
+                      m_navToolsOnlyAct->isChecked());
   if (m_syncZoomAct)
     settings.setValue(QStringLiteral("syncNavZoom"),
                       m_syncZoomAct->isChecked());
@@ -701,11 +746,13 @@ void LocatorPopup::readPanelStateFrom(QSettings &settings) {
   m_showDisplayToolbar =
       settings.value(QStringLiteral("showDisplayToolbar"), true).toBool();
   m_showNavGuided =
-      settings.value(QStringLiteral("showNavGuided"), true).toBool();
+      settings.value(QStringLiteral("showNavGuided"), false).toBool();
   m_showNavTools =
       settings.value(QStringLiteral("showNavTools"), true).toBool();
   m_showNavZoom =
       settings.value(QStringLiteral("showNavZoom"), legacyNavigationBar).toBool();
+  m_showNavView =
+      settings.value(QStringLiteral("showNavView"), true).toBool();
   m_showNavRotate =
       settings.value(QStringLiteral("showNavRotate"), legacyNavigationBar)
           .toBool();
@@ -719,6 +766,11 @@ void LocatorPopup::readPanelStateFrom(QSettings &settings) {
     QSignalBlocker blocker(m_overviewAct);
     m_overviewAct->setChecked(
         settings.value(QStringLiteral("useAsOverview"), false).toBool());
+  }
+  if (m_navToolsOnlyAct) {
+    QSignalBlocker blocker(m_navToolsOnlyAct);
+    m_navToolsOnlyAct->setChecked(
+        settings.value(QStringLiteral("navigationToolsOnly"), true).toBool());
   }
   if (m_syncZoomAct) {
     QSignalBlocker blocker(m_syncZoomAct);
@@ -832,8 +884,15 @@ bool LocatorPopup::isOverview() const {
 
 //-----------------------------------------------------------------------------
 
+bool LocatorPopup::isNavToolsOnly() const {
+  return isOverview() && m_navToolsOnlyAct && m_navToolsOnlyAct->isChecked();
+}
+
+//-----------------------------------------------------------------------------
+
 void LocatorPopup::applyOverviewMode() {
   const bool on = isOverview();
+  if (m_navToolsOnlyAct) m_navToolsOnlyAct->setEnabled(on);
   if (m_syncZoomAct) m_syncZoomAct->setEnabled(!on);
   if (m_syncPanAct) m_syncPanAct->setEnabled(!on);
   hookNavFrameSource();
@@ -1036,6 +1095,9 @@ void LocatorPopup::updateNavigatorBarsVisibility() {
   if (m_navTopSpacerAfterGuided)
     m_navTopSpacerAfterGuided->setVisible(m_showNavGuided &&
                                           m_showDisplayToolbar);
+  if (m_navTopStretchWhenGuidedHidden)
+    m_navTopStretchWhenGuidedHidden->setVisible(!m_showNavGuided &&
+                                                m_showDisplayToolbar);
   if (m_navTopBarHost)
     m_navTopBarHost->setVisible(m_showNavGuided || m_showDisplayToolbar);
 
@@ -1047,9 +1109,8 @@ void LocatorPopup::updateNavigatorBarsVisibility() {
 
   setGroupVisible(m_showNavTools,
                   {NBB_ToolZoom, NBB_ToolHand, NBB_ToolRotate});
-  setGroupVisible(m_showNavZoom,
-                  {NBB_ZoomIn, NBB_ZoomOut, NBB_ZoomReset, NBB_Fit,
-                   NBB_ResetView});
+  setGroupVisible(m_showNavZoom, {NBB_ZoomIn, NBB_ZoomOut, NBB_ZoomReset});
+  setGroupVisible(m_showNavView, {NBB_Fit, NBB_ResetView});
   setGroupVisible(m_showNavRotate, {NBB_RotL, NBB_RotR});
   setGroupVisible(m_showNavPan, {NBB_PanL, NBB_PanR, NBB_PanU, NBB_PanD});
   setGroupVisible(m_showNavFlip, {NBB_FlipH, NBB_FlipV});
@@ -1057,21 +1118,122 @@ void LocatorPopup::updateNavigatorBarsVisibility() {
   const auto updateSpacer = [&](QWidget *spacer, bool left, bool right) {
     if (spacer) spacer->setVisible(left && right);
   };
-  updateSpacer(m_navBottomSpacerAfterTools, m_showNavTools,
-               m_showNavZoom || m_showNavRotate || m_showNavPan ||
+  const bool afterTools = m_showNavZoom || m_showNavView || m_showNavRotate ||
+                          m_showNavPan || m_showNavFlip;
+  updateSpacer(m_navBottomSpacerAfterTools, m_showNavTools, afterTools);
+  updateSpacer(m_navBottomSpacerAfterZoom, m_showNavZoom,
+               m_showNavView || m_showNavRotate || m_showNavPan ||
                    m_showNavFlip);
-  updateSpacer(m_navBottomSpacerAfterZoom, m_showNavZoom, m_showNavRotate);
+  updateSpacer(m_navBottomSpacerAfterView, m_showNavView,
+               m_showNavRotate || m_showNavPan || m_showNavFlip);
   updateSpacer(m_navBottomSpacerAfterRotate, m_showNavRotate, m_showNavPan);
   updateSpacer(m_navBottomSpacerAfterPan, m_showNavPan, m_showNavFlip);
 
   if (m_navBottomBarHost) {
     const bool anyNavControl = m_showNavTools || m_showNavZoom ||
-                               m_showNavRotate || m_showNavPan ||
-                               m_showNavFlip;
+                               m_showNavView || m_showNavRotate ||
+                               m_showNavPan || m_showNavFlip;
     m_navBottomBarHost->setVisible(anyNavControl);
   }
 
+  updateNavigatorIconScale();
   updateTabPageSizeConsistency();
+}
+
+//-----------------------------------------------------------------------------
+
+void LocatorPopup::updateNavigatorIconScale() {
+  int n = 0;
+  for (int i = 0; i < NBB_COUNT; ++i) {
+    if (m_navBottomButtons[i] && m_navBottomButtons[i]->isVisibleTo(this))
+      ++n;
+  }
+
+  int spacerCount = 0;
+  const auto countSpacer = [&](QWidget *w) {
+    if (w && w->isVisibleTo(this)) ++spacerCount;
+  };
+  countSpacer(m_navBottomSpacerAfterTools);
+  countSpacer(m_navBottomSpacerAfterZoom);
+  countSpacer(m_navBottomSpacerAfterView);
+  countSpacer(m_navBottomSpacerAfterRotate);
+  countSpacer(m_navBottomSpacerAfterPan);
+
+  int avail = width();
+  if (m_navBottomBarHost && m_navBottomBarHost->isVisible() &&
+      m_navBottomBarHost->width() > 8)
+    avail = m_navBottomBarHost->width();
+
+  const int rowGaps = std::max(0, n + spacerCount - 1);
+  const auto rowNeed = [&](int btn, int sp, int gap) {
+    return n * btn + spacerCount * sp + rowGaps * gap;
+  };
+
+  double s       = 1.0;
+  int spacer     = kNavGroupSpacer;
+  int botSpacing = 2;
+  if (n > 0 && avail > 0 &&
+      rowNeed(kNavBottomBtnSize, kNavGroupSpacer, 2) > avail) {
+    spacer = 0;
+    for (int sp = kNavGroupSpacer - 1; sp >= 0; --sp) {
+      if (rowNeed(kNavBottomBtnSize, sp, 2) <= avail) {
+        spacer = sp;
+        break;
+      }
+    }
+    if (rowNeed(kNavBottomBtnSize, spacer, 2) > avail) botSpacing = 1;
+    if (rowNeed(kNavBottomBtnSize, spacer, botSpacing) > avail) {
+      const double ratio =
+          (double)avail /
+          (double)rowNeed(kNavBottomBtnSize, spacer, botSpacing);
+      s = std::max(kNavMinScale, 1.0 - kNavScaleDamp * (1.0 - ratio));
+    }
+  }
+
+  const int botBtn =
+      std::max(kNavMinBtnSize, (int)std::lround(kNavBottomBtnSize * s));
+  const int botIcon =
+      std::max(kNavMinIconSize, (int)std::lround(kNavBottomIconSize * s));
+  const int topBtn =
+      std::max(kNavMinBtnSize, (int)std::lround(kNavTopBtnSize * s));
+  const int topIcon =
+      std::max(kNavMinIconSize, (int)std::lround(kNavTopIconSize * s));
+
+  const auto applyBtn = [](QToolButton *tb, int btn, int icon) {
+    if (!tb) return;
+    tb->setFixedSize(btn, btn);
+    tb->setIconSize(QSize(icon, icon));
+  };
+  for (int i = 0; i < NBB_COUNT; ++i)
+    applyBtn(m_navBottomButtons[i], botBtn, botIcon);
+  applyBtn(m_hideCurrentTb, topBtn, topIcon);
+  applyBtn(m_soloColumnTb, topBtn, topIcon);
+  applyBtn(m_matchingStrokeTb, topBtn, topIcon);
+  applyBtn(m_gearBtn, topBtn, topIcon);
+
+  if (m_guidedCombo) m_guidedCombo->setFixedHeight(topBtn);
+  if (m_guidedLabel) m_guidedLabel->setFixedHeight(topBtn);
+  if (m_navTopSpacerAfterGuided)
+    m_navTopSpacerAfterGuided->setFixedWidth(
+        std::max(2, (int)std::lround(kNavGroupSpacer * s)));
+  if (m_navTopBarHost) m_navTopBarHost->setFixedHeight(topBtn + 2);
+
+  if (m_navBottomLayout) m_navBottomLayout->setSpacing(botSpacing);
+  const auto setSp = [&](QWidget *w) {
+    if (w) w->setFixedWidth(spacer);
+  };
+  setSp(m_navBottomSpacerAfterTools);
+  setSp(m_navBottomSpacerAfterZoom);
+  setSp(m_navBottomSpacerAfterView);
+  setSp(m_navBottomSpacerAfterRotate);
+  setSp(m_navBottomSpacerAfterPan);
+  if (m_navBottomBarHost && m_navBottomBarHost->isVisible())
+    m_navBottomBarHost->setFixedHeight(botBtn);
+
+  if (topIcon != m_navTopIconPx) {
+    m_navTopIconPx = topIcon;
+    updateNavigatorVisibilityIcons();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1119,6 +1281,11 @@ void LocatorPopup::addShowHideContextMenu(QMenu *menu) {
   zoomAct->setChecked(m_showNavZoom);
   zoomAct->setObjectName(QStringLiteral("navZoom"));
 
+  QAction *viewAct = showHideMenu->addAction(tr("View"));
+  viewAct->setCheckable(true);
+  viewAct->setChecked(m_showNavView);
+  viewAct->setObjectName(QStringLiteral("navView"));
+
   QAction *rotateAct = showHideMenu->addAction(tr("Rotate"));
   rotateAct->setCheckable(true);
   rotateAct->setChecked(m_showNavRotate);
@@ -1140,6 +1307,7 @@ void LocatorPopup::addShowHideContextMenu(QMenu *menu) {
   group->addAction(displayToolbarAct);
   group->addAction(navBarAct);
   group->addAction(zoomAct);
+  group->addAction(viewAct);
   group->addAction(rotateAct);
   group->addAction(panAct);
   group->addAction(flipAct);
@@ -1151,6 +1319,8 @@ void LocatorPopup::addShowHideContextMenu(QMenu *menu) {
   connect(navBarAct, &QAction::triggered, this,
           &LocatorPopup::onShowHideActionTriggered);
   connect(zoomAct, &QAction::triggered, this,
+          &LocatorPopup::onShowHideActionTriggered);
+  connect(viewAct, &QAction::triggered, this,
           &LocatorPopup::onShowHideActionTriggered);
   connect(rotateAct, &QAction::triggered, this,
           &LocatorPopup::onShowHideActionTriggered);
@@ -1174,6 +1344,8 @@ void LocatorPopup::onShowHideActionTriggered() {
     m_showNavTools = action->isChecked();
   else if (action->objectName() == QStringLiteral("navZoom"))
     m_showNavZoom = action->isChecked();
+  else if (action->objectName() == QStringLiteral("navView"))
+    m_showNavView = action->isChecked();
   else if (action->objectName() == QStringLiteral("navRotate"))
     m_showNavRotate = action->isChecked();
   else if (action->objectName() == QStringLiteral("navPan"))
@@ -1381,6 +1553,7 @@ void LocatorPopup::onTabIndexChanged(int index) {
   m_viewer->update();
   changeWindowTitle();
 
+  updateNavigatorIconScale();
   updateTabPageSizeConsistency();
   persistPanelState();
   syncActiveLocatorRole();
@@ -1455,8 +1628,18 @@ void LocatorPopup::contextMenuEvent(QContextMenuEvent *event) {
 
 //-----------------------------------------------------------------------------
 
+void LocatorPopup::resizeEvent(QResizeEvent *event) {
+  QFrame::resizeEvent(event);
+  updateNavigatorIconScale();
+}
+
+//-----------------------------------------------------------------------------
+
 void LocatorPopup::showEvent(QShowEvent *) {
-  QTimer::singleShot(0, this, [this]() { restoreOrFitView(); });
+  QTimer::singleShot(0, this, [this]() {
+    restoreOrFitView();
+    updateNavigatorIconScale();
+  });
 
   TApp *app                    = TApp::instance();
   TFrameHandle *frameHandle    = app->getCurrentFrame();
@@ -1500,9 +1683,26 @@ bool LocatorPopup::eventFilter(QObject *watched, QEvent *event) {
   if (!isOverview()) return QFrame::eventFilter(watched, event);
 
   const QEvent::Type type = event->type();
-  if (type != QEvent::MouseButtonPress && type != QEvent::MouseMove &&
-      type != QEvent::MouseButtonRelease)
-    return QFrame::eventFilter(watched, event);
+  const bool isMouse = type == QEvent::MouseButtonPress ||
+                       type == QEvent::MouseMove ||
+                       type == QEvent::MouseButtonRelease;
+  const bool isTablet = type == QEvent::TabletPress ||
+                        type == QEvent::TabletMove ||
+                        type == QEvent::TabletRelease;
+  if (!isMouse && !isTablet) return QFrame::eventFilter(watched, event);
+
+  auto currentToolName = []() -> std::string {
+    TTool *tool = TApp::instance()->getCurrentTool()->getTool();
+    return tool ? tool->getName() : std::string();
+  };
+  auto isOverviewViewTool = [&]() {
+    const std::string name = currentToolName();
+    return name == T_Zoom || name == T_ZoomView || name == T_Hand ||
+           name == T_HandView || name == T_Rotate || name == T_RotateView;
+  };
+
+  if (isTablet && isNavToolsOnly() && !isOverviewViewTool()) return true;
+  if (!isMouse) return QFrame::eventFilter(watched, event);
 
   auto *me = static_cast<QMouseEvent *>(event);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
@@ -1512,10 +1712,8 @@ bool LocatorPopup::eventFilter(QObject *watched, QEvent *event) {
 #endif
   const QPointF pos = local * (qreal)m_viewer->getDevPixRatio();
 
-  auto isOverviewHandTool = []() {
-    TTool *tool = TApp::instance()->getCurrentTool()->getTool();
-    if (!tool) return false;
-    const std::string name = tool->getName();
+  auto isOverviewHandTool = [&]() {
+    const std::string name = currentToolName();
     return name == T_Hand || name == T_HandView;
   };
 
@@ -1536,6 +1734,10 @@ bool LocatorPopup::eventFilter(QObject *watched, QEvent *event) {
     m_overviewHandDragging = false;
     return true;
   }
+
+  if (isNavToolsOnly() && !isOverviewViewTool() &&
+      (me->button() == Qt::LeftButton || (me->buttons() & Qt::LeftButton)))
+    return true;
 
   if (type == QEvent::MouseButtonPress && me->button() == Qt::MiddleButton) {
     m_draggingNavFrame = true;
