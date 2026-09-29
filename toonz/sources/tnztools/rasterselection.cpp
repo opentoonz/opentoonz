@@ -1522,6 +1522,9 @@ bool RasterSelection::isTransformed() { return !m_affine.isIdentity(); }
 
 bool RasterSelection::isEditable() {
   TTool::Application *app = TTool::getApplication();
+  TTool *tool             = app->getCurrentTool()->getTool();
+  if (tool && tool->getViewer() && tool->getViewer()->isPickOnly()) return false;
+
   TXshSimpleLevel *level  = app->getCurrentLevel()->getSimpleLevel();
 
   TFrameHandle *frame = app->getCurrentFrame();

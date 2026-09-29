@@ -96,6 +96,7 @@ public:
   };
 
   void initUndo();
+  void invalidateViews();
 
   void getNearestStrokeColumnIndexes(std::vector<int>& indexes, TPointD pos);
 

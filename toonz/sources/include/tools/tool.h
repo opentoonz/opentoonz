@@ -660,6 +660,7 @@ public:
   //! clipping rect
   virtual void invalidateToolStatus() = 0;  //!< Forces the viewer to update the
                                             //! perceived status of tools
+  virtual void invalidatePeerViewers() {}
   virtual TAffine getViewMatrix() const {
     return TAffine();
   }  //!< Gets the viewer's current view affine (ie the transform from
@@ -708,6 +709,8 @@ public:
   virtual bool is3DView() const                            = 0;
   virtual bool getIsFlippedX() const                       = 0;
   virtual bool getIsFlippedY() const                       = 0;
+  //! Navigator 2nd canvas: pick without edit.
+  virtual bool isPickOnly() const { return false; }
 
   virtual double projectToZ(const TPointD &delta) = 0;
 

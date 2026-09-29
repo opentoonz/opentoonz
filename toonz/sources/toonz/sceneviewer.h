@@ -178,6 +178,7 @@ class SceneViewer final : public TToolViewer, public Previewer::Listener {
   } m_current3DDevice;
 
   bool m_isLocator;
+  bool m_navPickOnly = false;
   bool m_hasNavViewFrame = false;
   TPointD m_navViewFrame[4];
   QPointer<SceneViewer> m_viewForwardTarget;
@@ -261,6 +262,7 @@ public:
   void GLInvalidateAll() override;
   void GLInvalidateRect(const TRectD &rect) override;
   void invalidateToolStatus() override;
+  void invalidatePeerViewers() override;
 
   TPointD getPan3D() const { return m_pan3D; }
   double getZoomScale3D() const { return m_zoomScale3D; }
@@ -308,6 +310,8 @@ public:
 
   void setIsLocator() { m_isLocator = true; }
   bool getIsLocator() const { return m_isLocator; }
+  void setNavPickOnly(bool on) { m_navPickOnly = on; }
+  bool isPickOnly() const override { return m_navPickOnly; }
   void setNavViewFrame(bool on, const TPointD *glPts);
   // Overview: view ops apply to the main viewer (red frame).
   void setViewForwardTarget(SceneViewer *sv);

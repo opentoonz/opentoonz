@@ -539,6 +539,7 @@
 		<file>icons/dark/actions/16x16/xsheet.svg</file>
 		<file>icons/dark/actions/16x16/navigator_column.svg</file>
 		<file>icons/dark/actions/16x16/navigator_overview.svg</file>
+		<file>icons/dark/actions/16x16/navigator_nav_only.svg</file>
 		<file>icons/dark/actions/16x16/navigator_zoom.svg</file>
 		<file>icons/dark/actions/16x16/navigator_hand.svg</file>
 		<file>icons/dark/actions/16x16/navigator_rotate.svg</file>

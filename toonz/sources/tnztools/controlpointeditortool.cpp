@@ -173,6 +173,11 @@ TPointD ControlPointEditorTool::getSnap(TPointD pos) {
 
 void ControlPointEditorTool::resetSnap() { m_foundSnap = false; }
 
+void ControlPointEditorTool::invalidateViews() {
+  TTool::invalidate();
+  if (getViewer()) getViewer()->invalidatePeerViewers();
+}
+
 //=============================================================================
 // Spline Editor Tool
 //-----------------------------------------------------------------------------
@@ -425,7 +430,7 @@ void ControlPointEditorTool::mouseMove(const TPointD &pos,
     else
       m_cursorType = NORMAL;
   }
-  invalidate();
+  invalidateViews();
 }
 
 //---------------------------------------------------------------------------
@@ -436,6 +441,8 @@ void ControlPointEditorTool::leftButtonDown(const TPointD &pos,
     getViewer()->doPickGuideStroke(pos);
     return;
   }
+
+  const bool pickOnly = getViewer() && getViewer()->isPickOnly();
 
   m_pos           = pos;
   double pix      = getPixelSize() * 2.0f;
@@ -506,7 +513,7 @@ void ControlPointEditorTool::leftButtonDown(const TPointD &pos,
     m_selection.selectNone();
     return;
   }
-  TVectorImageP vi = getImage(true);
+  TVectorImageP vi = getImage(!pickOnly);
   if (!vi) return;
 
   if (pointType == ControlPointEditorStroke::SPEED_IN ||
@@ -514,8 +521,9 @@ void ControlPointEditorTool::leftButtonDown(const TPointD &pos,
     bool isIn = pointType == ControlPointEditorStroke::SPEED_IN;
     m_selection.selectNone();
     m_selection.select(pointIndex);
-    m_action = isIn ? IN_SPEED_MOVEMENT : OUT_SPEED_MOVEMENT;
-    if (e.isAltPressed()) {
+    m_action = pickOnly ? NONE
+                        : (isIn ? IN_SPEED_MOVEMENT : OUT_SPEED_MOVEMENT);
+    if (!pickOnly && e.isAltPressed()) {
       initUndo();
       if (m_controlPointEditorStroke.isCusp(pointIndex))
         linkSpeedInOut(pointIndex);
@@ -526,7 +534,7 @@ void ControlPointEditorTool::leftButtonDown(const TPointD &pos,
     }
     m_selection.makeCurrent();
   } else if (pointType == ControlPointEditorStroke::CONTROL_POINT) {
-    if (e.isAltPressed()) {
+    if (!pickOnly && e.isAltPressed()) {
       m_action = NONE;
       m_selection.selectNone();
       m_selection.select(pointIndex);
@@ -549,12 +557,14 @@ void ControlPointEditorTool::leftButtonDown(const TPointD &pos,
       m_selection.select(pointIndex);
     }
     m_lastPointSelected = pointIndex;
-    m_action            = CP_MOVEMENT;
+    m_action            = pickOnly ? NONE : CP_MOVEMENT;
     m_selection.makeCurrent();
   } else if (pointType == ControlPointEditorStroke::SEGMENT &&
              !e.isAltPressed()) {
     m_selection.selectNone();
-    if (e.isCtrlPressed()) {
+    if (pickOnly) {
+      m_action = NONE;
+    } else if (e.isCtrlPressed()) {
       // Aggiungo un punto
       initUndo();
       pointIndex = m_controlPointEditorStroke.addControlPoint(pos);
@@ -598,8 +608,8 @@ void ControlPointEditorTool::leftButtonDown(const TPointD &pos,
   }
 
   int currentStroke = m_controlPointEditorStroke.getStrokeIndex();
-  if (currentStroke != -1) initUndo();
-  invalidate();
+  if (!pickOnly && currentStroke != -1) initUndo();
+  invalidateViews();
   m_isImageChanged = false;
 }
 
@@ -672,7 +682,11 @@ void ControlPointEditorTool::moveSegment(const TPointD &delta, bool dragging,
 
 void ControlPointEditorTool::leftButtonDrag(const TPointD &pos,
                                             const TMouseEvent &e) {
-  TVectorImageP vi(getImage(true));
+  const bool pickOnly = getViewer() && getViewer()->isPickOnly();
+  if (pickOnly && m_action != RECT_SELECTION && m_action != FREEHAND_SELECTION)
+    return;
+
+  TVectorImageP vi(getImage(!pickOnly));
   int currentStroke = m_controlPointEditorStroke.getStrokeIndex();
   if (!vi || currentStroke == -1 || m_action == NONE) return;
   QMutexLocker lock(vi->getMutex());
@@ -735,7 +749,7 @@ void ControlPointEditorTool::leftButtonDrag(const TPointD &pos,
     freehandDrag(pos);
   }
 
-  invalidate();
+  invalidateViews();
 }
 
 //---------------------------------------------------------------------------
@@ -798,12 +812,12 @@ void ControlPointEditorTool::leftButtonUp(const TPointD &realPos,
 
   if (m_action == NONE || !m_isImageChanged) {
     m_undo = 0;
-    invalidate();
+    invalidateViews();
     return;
   }
 
   notifyImageChanged();
-  invalidate();
+  invalidateViews();
 
   // Registro l'UNDO
   if (m_undo) {
@@ -815,8 +829,46 @@ void ControlPointEditorTool::leftButtonUp(const TPointD &realPos,
 //---------------------------------------------------------------------------
 
 void ControlPointEditorTool::addContextMenuItems(QMenu *menu) {
+  if (getViewer() && getViewer()->isPickOnly()) return;
   m_isMenuViewed = true;
   m_selection.addMenuItems(menu);
+}
+
+//---------------------------------------------------------------------------
+
+bool ControlPointEditorTool::reverseDirectionOfEditedStroke() {
+  if (getViewer() && getViewer()->isPickOnly()) return false;
+  TVectorImageP vi = getImage(false);
+  if (!vi) return false;
+
+  const int idx = m_controlPointEditorStroke.getStrokeIndex();
+  if (idx < 0 || idx >= (int)vi->getStrokeCount()) return false;
+
+  TTool::Application *app = getApplication();
+  TXshSimpleLevel *sl = app->getCurrentLevel()->getSimpleLevel();
+  if (!sl || sl->getType() != PLI_XSHLEVEL) return false;
+  if (sl->isReadOnly()) return false;
+
+  TFrameId fid = getCurrentFid();
+  if (fid.isEmptyFrame() || sl->isFrameReadOnly(fid)) return false;
+
+  TStroke *stroke = vi->getStroke(idx);
+  if (!stroke) return false;
+
+  std::vector<TStroke *> strokes = {stroke};
+  TUndoManager::manager()->beginBlock();
+  TUndoManager::manager()->add(new UndoModifyListStroke(sl, fid, strokes));
+  stroke->changeDirection();
+  sl->setDirtyFlag(true);
+
+  m_controlPointEditorStroke.setStroke(vi, idx);
+
+  notifyImageChanged();
+  invalidateViews();
+  app->getCurrentLevel()->notifyLevelChange();
+  app->onVectorKeyframeStripEditCommitted();
+  TUndoManager::manager()->endBlock();
+  return true;
 }
 
 //---------------------------------------------------------------------------
@@ -830,7 +882,7 @@ void ControlPointEditorTool::linkSpeedInOut(int index) {
     m_controlPointEditorStroke.setCusp(index, false, true);
   if (m_action == OUT_SPEED_MOVEMENT)
     m_controlPointEditorStroke.setCusp(index, false, false);
-  invalidate();
+  invalidateViews();
 }
 
 //---------------------------------------------------------------------------
@@ -842,6 +894,7 @@ void ControlPointEditorTool::unlinkSpeedInOut(int pointIndex) {
 //---------------------------------------------------------------------------
 
 bool ControlPointEditorTool::keyDown(QKeyEvent *event) {
+  if (getViewer() && getViewer()->isPickOnly()) return false;
   TVectorImageP vi(getImage(true));
   if (!vi || (vi && m_selection.isEmpty())) return false;
 
@@ -868,7 +921,7 @@ bool ControlPointEditorTool::keyDown(QKeyEvent *event) {
 
   moveControlPoints(delta);
 
-  invalidate();
+  invalidateViews();
   // Registro l'UNDO
   TUndoManager::manager()->add(m_undo);
 
@@ -996,6 +1049,7 @@ int ControlPointEditorTool::getCursorId() const {
 // instead of triggering the shortcut command.
 bool ControlPointEditorTool::isEventAcceptable(QEvent *e) {
   if (!isEnabled()) return false;
+  if (getViewer() && getViewer()->isPickOnly()) return false;
   TVectorImageP vi(getImage(false));
   if (!vi || (vi && m_selection.isEmpty())) return false;
   // arrow keys will be used for moving the selected points

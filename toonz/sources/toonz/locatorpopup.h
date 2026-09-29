@@ -72,7 +72,8 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   QToolButton *m_soloColumnTb;
   QToolButton *m_matchingStrokeTb;
   QToolButton *m_gearBtn     = nullptr;
-  QToolButton *m_overviewTb  = nullptr;
+  QToolButton *m_overviewTb      = nullptr;
+  QToolButton *m_navToolsOnlyTb  = nullptr;
   QAction *m_overviewAct     = nullptr;
   QAction *m_navToolsOnlyAct = nullptr;
   QAction *m_syncZoomAct     = nullptr;
@@ -82,6 +83,7 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   bool m_draggingNavFrame     = false;
   bool m_overviewHandDragging = false;
   TPointD m_overviewWorldPos;
+  QPointF m_navHandScreenPos;
   QPointF m_naviRectPos;
   QPointF m_icon2ViewerRatio;
   bool m_haveLastNavAffs     = false;
@@ -94,6 +96,8 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   bool m_matchingStrokeReferenceMode = false;
   bool m_showDisplayToolbar          = true;
   bool m_showNavGuided               = false;
+  bool m_showNavOverview             = false;
+  bool m_showNavToolsOnly            = false;
   bool m_showNavTools                = true;
   bool m_showNavZoom                 = true;
   bool m_showNavView                 = true;
@@ -117,6 +121,8 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   std::array<TAffine, 2> m_pendingViewAffs = {TAffine(), TAffine()};
   QString m_toolBeforeNav;
   bool m_haveToolBeforeNav = false;
+  bool m_navPickHover    = false;
+  bool m_navPickDragging = false;
 
   enum TabIndex { TabLocator = 0, TabNavigator = 1 };
 
@@ -165,9 +171,14 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   SceneViewer *viewToolTarget() const;
   bool isOverview() const;
   bool isNavToolsOnly() const;
+  bool isViewNavTool() const;
+  bool isNavPickTool() const;
+  bool canNavPickAt(const QPointF &winPos) const;
   void rememberToolBeforeNav();
   void restoreToolAfterNav();
   bool overviewUsesNavHand() const;
+  bool usesNavHand() const;
+  bool usesNavOnlyCursor() const;
   void updateOverviewCursor();
   void updateNavToolButtonChecks();
   void applyOverviewMode();

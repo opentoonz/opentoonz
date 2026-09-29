@@ -2525,6 +2525,16 @@ bool SceneViewer::is3DView() const {
 
 //-----------------------------------------------------------------------------
 
+void SceneViewer::invalidatePeerViewers() {
+  const QWidgetList widgets = QApplication::allWidgets();
+  for (QWidget *w : widgets) {
+    SceneViewer *sv = qobject_cast<SceneViewer *>(w);
+    if (sv && sv != this) sv->GLInvalidateAll();
+  }
+}
+
+//-----------------------------------------------------------------------------
+
 void SceneViewer::invalidateAll() {
   m_clipRect = InvalidateAllRect;
   update();

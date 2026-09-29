@@ -1077,22 +1077,24 @@ void SelectionTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
   if (m_polyline.size() == 0) {
     modifySelectionOnClick(image, pos, e);
 
-    if (m_what == ROTATION) m_dragTool = createNewRotationTool(this);
-    if (!e.isShiftPressed() && m_what == Inside)
-      m_dragTool = createNewMoveSelectionTool(this);
-    else if (m_what == MOVE_CENTER)
-      m_dragTool = new MoveCenterTool(this);
-    else if (m_what == SCALE)
-      m_dragTool = createNewScaleTool(this, ScaleType::GLOBAL);
-    else if (m_what == SCALE_X)
-      m_dragTool = createNewScaleTool(this, ScaleType::HORIZONTAL);
-    else if (m_what == SCALE_Y)
-      m_dragTool = createNewScaleTool(this, ScaleType::VERTICAL);
-    else if (m_what == DEFORM)
-      m_dragTool = createNewFreeDeformTool(this);
-    else if (m_what == GLOBAL_THICKNESS)
-      m_dragTool = new VectorChangeThicknessTool((VectorSelectionTool *)this);
-    if (m_dragTool) m_dragTool->leftButtonDown(pos, e);
+    if (isSelectionEditable()) {
+      if (m_what == ROTATION) m_dragTool = createNewRotationTool(this);
+      if (!e.isShiftPressed() && m_what == Inside)
+        m_dragTool = createNewMoveSelectionTool(this);
+      else if (m_what == MOVE_CENTER)
+        m_dragTool = new MoveCenterTool(this);
+      else if (m_what == SCALE)
+        m_dragTool = createNewScaleTool(this, ScaleType::GLOBAL);
+      else if (m_what == SCALE_X)
+        m_dragTool = createNewScaleTool(this, ScaleType::HORIZONTAL);
+      else if (m_what == SCALE_Y)
+        m_dragTool = createNewScaleTool(this, ScaleType::VERTICAL);
+      else if (m_what == DEFORM)
+        m_dragTool = createNewFreeDeformTool(this);
+      else if (m_what == GLOBAL_THICKNESS)
+        m_dragTool = new VectorChangeThicknessTool((VectorSelectionTool *)this);
+      if (m_dragTool) m_dragTool->leftButtonDown(pos, e);
+    }
   } else
     m_selecting = true;
   if (m_selecting) {
@@ -1126,7 +1128,7 @@ void SelectionTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 //-----------------------------------------------------------------------------
 
 bool SelectionTool::keyDown(QKeyEvent *event) {
-  if (isSelectionEmpty()) return false;
+  if (isSelectionEmpty() || !isSelectionEditable()) return false;
 
   TPointD delta;
 
@@ -1408,7 +1410,7 @@ void SelectionTool::closePolyline(const TPointD &pos) {
 // instead of triggering the shortcut command.
 bool SelectionTool::isEventAcceptable(QEvent *e) {
   if (!isEnabled()) return false;
-  if (isSelectionEmpty()) return false;
+  if (isSelectionEmpty() || !isSelectionEditable()) return false;
   // arrow keys will be used for moving the selected region
   QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
   int key             = keyEvent->key();
