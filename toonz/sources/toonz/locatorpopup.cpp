@@ -16,6 +16,8 @@
 #include "tools/tool.h"
 #include "tools/toolcommandids.h"
 #include "tools/toolhandle.h"
+#include "tools/cursors.h"
+#include "tools/cursormanager.h"
 
 #include "tgeometry.h"
 
@@ -25,6 +27,7 @@
 #include <QApplication>
 #include <QComboBox>
 #include <QCoreApplication>
+#include <QCursor>
 #include <QGuiApplication>
 #include <QEvent>
 #include <QMouseEvent>
@@ -136,6 +139,7 @@ void styleNavigatorToggleButton(QToolButton *tb) {
 //-----------------------------------------------------------------------------
 
 LocatorPopup::~LocatorPopup() {
+  restoreToolAfterNav();
   persistPanelState();
   if (m_matchingStrokeReferenceMode) setMatchingStrokeReferenceMode(false);
 }
@@ -241,6 +245,7 @@ LocatorPopup::LocatorPopup(QWidget *parent, Qt::WindowFlags flags)
     }
     persistPanelState();
     applyOverviewMode();
+    if (!isNavToolsOnly()) restoreToolAfterNav();
     if (isOverview()) scheduleOverviewFit();
     updateNavigatorToolbarTooltips();
   });
@@ -251,15 +256,21 @@ LocatorPopup::LocatorPopup(QWidget *parent, Qt::WindowFlags flags)
   }
   connect(m_navToolsOnlyAct, &QAction::toggled, this, [this](bool) {
     persistPanelState();
-    if (isNavToolsOnly()) applyNavCanvasTool();
+    if (!isNavToolsOnly()) restoreToolAfterNav();
   });
   connect(m_syncZoomAct, &QAction::toggled, this,
           [this]() { persistPanelState(); });
   connect(m_syncPanAct, &QAction::toggled, this,
           [this]() { persistPanelState(); });
   if (TApp *app = TApp::instance()) {
-    connect(app, &TApp::activeViewerChanged, this,
-            &LocatorPopup::hookNavFrameSource);
+    connect(app, &TApp::activeViewerChanged, this, [this]() {
+      hookNavFrameSource();
+      if (TApp *a = TApp::instance()) {
+        if (SceneViewer *sv = a->getActiveViewer()) {
+          if (sv != m_viewer) restoreToolAfterNav();
+        }
+      }
+    });
     if (ToolHandle *th = app->getCurrentTool()) {
       connect(th, &ToolHandle::toolSwitched, this,
               &LocatorPopup::updateNavToolButtonChecks);
@@ -287,8 +298,6 @@ LocatorPopup::LocatorPopup(QWidget *parent, Qt::WindowFlags flags)
   ret = connect(m_viewer, SIGNAL(onZoomChanged()), SLOT(changeWindowTitle()));
   ret = ret &&
         connect(m_viewer, SIGNAL(previewToggled()), SLOT(changeWindowTitle()));
-  ret = ret && connect(m_viewer, &SceneViewer::onZoomChanged, this,
-                       [this]() { persistPanelState(); });
   ret = ret && connect(m_viewer, &SceneViewer::onZoomChanged, this,
                        &LocatorPopup::onNavigatorViewChanged);
   ret = ret && connect(m_viewer, &SceneViewer::refreshNavi, this,
@@ -378,7 +387,7 @@ void LocatorPopup::buildNavigatorToolbar() {
   m_navToolsOnlyAct = overviewMenu->addAction(tr("Navigation tools only"));
   m_navToolsOnlyAct->setCheckable(true);
   m_navToolsOnlyAct->setChecked(true);
-  m_navToolsOnlyAct->setEnabled(false);
+  m_navToolsOnlyAct->setEnabled(m_overviewAct->isChecked());
   m_navToolsOnlyAct->setToolTip(tr("Zoom, Hand, and Rotate only."));
   gearMenu->addSeparator();
   m_syncZoomAct = gearMenu->addAction(tr("Synchronize Zoom"));
@@ -445,7 +454,6 @@ void LocatorPopup::buildNavigatorBottomBar() {
   auto bindViewTool = [this](QToolButton *tb, void (SceneViewer::*fn)()) {
     connect(tb, &QToolButton::clicked, this, [this, fn]() {
       if (SceneViewer *sv = viewToolTarget()) (sv->*fn)();
-      if (isNavToolsOnly()) forceNavHand();
     });
   };
 
@@ -454,7 +462,10 @@ void LocatorPopup::buildNavigatorBottomBar() {
     tb->setCheckable(true);
     if (QAction *act = CommandManager::instance()->getAction(commandId)) {
       tb->setToolTip(act->toolTip());
-      connect(tb, &QToolButton::clicked, act, &QAction::trigger);
+      connect(tb, &QToolButton::clicked, this, [this, act]() {
+        if (isNavToolsOnly()) rememberToolBeforeNav();
+        act->trigger();
+      });
     }
     tb->setIcon(createQIcon(iconName, false));
     tb->setAutoRaise(true);
@@ -513,7 +524,6 @@ void LocatorPopup::buildNavigatorBottomBar() {
   connect(panL, &QToolButton::clicked, this, [this]() {
     if (SceneViewer *sv = viewToolTarget())
       sv->navigatorPan(QPoint(-kPanStep, 0));
-    if (isNavToolsOnly()) forceNavHand();
   });
   QToolButton *panR =
       mkBtnIcon(themedPanArrowIcon(90.0, themeIconBaseColor()), tr("Pan view right"));
@@ -521,7 +531,6 @@ void LocatorPopup::buildNavigatorBottomBar() {
   connect(panR, &QToolButton::clicked, this, [this]() {
     if (SceneViewer *sv = viewToolTarget())
       sv->navigatorPan(QPoint(kPanStep, 0));
-    if (isNavToolsOnly()) forceNavHand();
   });
   QToolButton *panU = mkBtnIcon(themedVerticalArrowIcon(true, themeIconBaseColor()),
                                 tr("Pan view up"));
@@ -529,7 +538,6 @@ void LocatorPopup::buildNavigatorBottomBar() {
   connect(panU, &QToolButton::clicked, this, [this]() {
     if (SceneViewer *sv = viewToolTarget())
       sv->navigatorPan(QPoint(0, -kPanStep));
-    if (isNavToolsOnly()) forceNavHand();
   });
   QToolButton *panD = mkBtnIcon(themedVerticalArrowIcon(false, themeIconBaseColor()),
                                 tr("Pan view down"));
@@ -537,7 +545,6 @@ void LocatorPopup::buildNavigatorBottomBar() {
   connect(panD, &QToolButton::clicked, this, [this]() {
     if (SceneViewer *sv = viewToolTarget())
       sv->navigatorPan(QPoint(0, kPanStep));
-    if (isNavToolsOnly()) forceNavHand();
   });
 
   QToolButton *flipH =
@@ -746,6 +753,31 @@ void LocatorPopup::applyNavigatorTabToViewer() {
 
 //-----------------------------------------------------------------------------
 
+void LocatorPopup::captureTabView(int tab) {
+  if (!m_viewer || (tab != TabLocator && tab != TabNavigator)) return;
+  auto &dst  = (tab == TabLocator) ? m_locatorAffs : m_navigatorAffs;
+  bool &have = (tab == TabLocator) ? m_haveLocatorAffs : m_haveNavigatorAffs;
+  for (int mode = 0; mode < 2; ++mode)
+    dst[mode] = m_viewer->getViewAffine(mode);
+  have = true;
+}
+
+//-----------------------------------------------------------------------------
+
+void LocatorPopup::applyTabView(int tab) {
+  if (!m_viewer) return;
+  if (tab == TabNavigator && isOverview()) return;
+  const bool have =
+      (tab == TabLocator) ? m_haveLocatorAffs : m_haveNavigatorAffs;
+  if (!have) return;
+  const auto &src = (tab == TabLocator) ? m_locatorAffs : m_navigatorAffs;
+  for (int mode = 0; mode < 2; ++mode)
+    m_viewer->setViewMatrix(src[mode], mode);
+  m_viewer->update();
+}
+
+//-----------------------------------------------------------------------------
+
 void LocatorPopup::updateNavigatorControlsEnabled() {
   const bool nav = (m_tabBar->count() > 1 &&
                     m_tabBar->currentIndex() == TabNavigator);
@@ -783,17 +815,41 @@ void LocatorPopup::writePanelStateTo(QSettings &settings) const {
   if (m_syncPanAct)
     settings.setValue(QStringLiteral("syncNavPan"), m_syncPanAct->isChecked());
 
-  for (int mode = 0; mode < 2; ++mode) {
-    const TAffine aff = m_viewer->getViewAffine(mode);
-    settings.beginGroup(QStringLiteral("viewAff%1").arg(mode));
-    settings.setValue(QStringLiteral("a11"), aff.a11);
-    settings.setValue(QStringLiteral("a12"), aff.a12);
-    settings.setValue(QStringLiteral("a13"), aff.a13);
-    settings.setValue(QStringLiteral("a21"), aff.a21);
-    settings.setValue(QStringLiteral("a22"), aff.a22);
-    settings.setValue(QStringLiteral("a23"), aff.a23);
-    settings.endGroup();
+  const auto writeAffs = [&settings](const QString &prefix,
+                                     const std::array<TAffine, 2> &affs) {
+    for (int mode = 0; mode < 2; ++mode) {
+      const TAffine &aff = affs[mode];
+      settings.beginGroup(prefix + QString::number(mode));
+      settings.setValue(QStringLiteral("a11"), aff.a11);
+      settings.setValue(QStringLiteral("a12"), aff.a12);
+      settings.setValue(QStringLiteral("a13"), aff.a13);
+      settings.setValue(QStringLiteral("a21"), aff.a21);
+      settings.setValue(QStringLiteral("a22"), aff.a22);
+      settings.setValue(QStringLiteral("a23"), aff.a23);
+      settings.endGroup();
+    }
+  };
+
+  std::array<TAffine, 2> loc = m_locatorAffs;
+  std::array<TAffine, 2> nav = m_navigatorAffs;
+  bool haveLoc               = m_haveLocatorAffs;
+  bool haveNav               = m_haveNavigatorAffs;
+  if (m_viewer) {
+    std::array<TAffine, 2> cur = {m_viewer->getViewAffine(0),
+                                  m_viewer->getViewAffine(1)};
+    if (isLocatorRole()) {
+      loc     = cur;
+      haveLoc = true;
+    } else {
+      nav     = cur;
+      haveNav = true;
+    }
   }
+  if (haveLoc) writeAffs(QStringLiteral("locatorViewAff"), loc);
+  if (haveNav) writeAffs(QStringLiteral("viewAff"), nav);
+  else if (m_viewer)
+    writeAffs(QStringLiteral("viewAff"),
+              {m_viewer->getViewAffine(0), m_viewer->getViewAffine(1)});
 }
 
 //-----------------------------------------------------------------------------
@@ -848,30 +904,50 @@ void LocatorPopup::readPanelStateFrom(QSettings &settings) {
   const int tab = settings.value(QStringLiteral("lastTabIndex"), TabLocator).toInt();
   applyLoadedTabIndex(tab);
   readViewAffsFrom(settings);
+  if (readAffsFrom(settings, QStringLiteral("locatorViewAff"), m_locatorAffs))
+    m_haveLocatorAffs = true;
+  if (m_viewRestorePending) {
+    if (tab == TabNavigator) {
+      m_navigatorAffs     = m_pendingViewAffs;
+      m_haveNavigatorAffs = true;
+    } else if (!m_haveLocatorAffs) {
+      m_locatorAffs     = m_pendingViewAffs;
+      m_haveLocatorAffs = true;
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+bool LocatorPopup::readAffsFrom(QSettings &settings, const QString &prefix,
+                                std::array<TAffine, 2> &out) {
+  bool found = false;
+  for (int mode = 0; mode < 2; ++mode) {
+    settings.beginGroup(prefix + QString::number(mode));
+    if (!settings.contains(QStringLiteral("a11"))) {
+      settings.endGroup();
+      continue;
+    }
+    TAffine &aff = out[mode];
+    aff.a11      = settings.value(QStringLiteral("a11"), 1.0).toDouble();
+    aff.a12      = settings.value(QStringLiteral("a12"), 0.0).toDouble();
+    aff.a13      = settings.value(QStringLiteral("a13"), 0.0).toDouble();
+    aff.a21      = settings.value(QStringLiteral("a21"), 0.0).toDouble();
+    aff.a22      = settings.value(QStringLiteral("a22"), 1.0).toDouble();
+    aff.a23      = settings.value(QStringLiteral("a23"), 0.0).toDouble();
+    settings.endGroup();
+    found = true;
+  }
+  return found;
 }
 
 //-----------------------------------------------------------------------------
 
 bool LocatorPopup::readViewAffsFrom(QSettings &settings) {
-  bool found = false;
-  for (int mode = 0; mode < 2; ++mode) {
-    settings.beginGroup(QStringLiteral("viewAff%1").arg(mode));
-    if (!settings.contains(QStringLiteral("a11"))) {
-      settings.endGroup();
-      continue;
-    }
-    TAffine &aff = m_pendingViewAffs[mode];
-    aff.a11        = settings.value(QStringLiteral("a11"), 1.0).toDouble();
-    aff.a12        = settings.value(QStringLiteral("a12"), 0.0).toDouble();
-    aff.a13        = settings.value(QStringLiteral("a13"), 0.0).toDouble();
-    aff.a21        = settings.value(QStringLiteral("a21"), 0.0).toDouble();
-    aff.a22        = settings.value(QStringLiteral("a22"), 1.0).toDouble();
-    aff.a23        = settings.value(QStringLiteral("a23"), 0.0).toDouble();
-    settings.endGroup();
-    found = true;
-  }
-  if (found) m_viewRestorePending = true;
-  return found;
+  if (!readAffsFrom(settings, QStringLiteral("viewAff"), m_pendingViewAffs))
+    return false;
+  m_viewRestorePending = true;
+  return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -953,27 +1029,52 @@ bool LocatorPopup::isNavToolsOnly() const {
 
 //-----------------------------------------------------------------------------
 
-bool LocatorPopup::isAuthorizedNavTool() const {
+void LocatorPopup::rememberToolBeforeNav() {
+  if (m_haveToolBeforeNav) return;
+  ToolHandle *th = TApp::instance()->getCurrentTool();
+  if (!th) return;
+  TTool *tool = th->getTool();
+  if (!tool) return;
+  m_toolBeforeNav     = QString::fromStdString(tool->getName());
+  m_haveToolBeforeNav = true;
+}
+
+//-----------------------------------------------------------------------------
+
+void LocatorPopup::restoreToolAfterNav() {
+  if (!m_haveToolBeforeNav) return;
+  m_haveToolBeforeNav = false;
+  ToolHandle *th      = TApp::instance()->getCurrentTool();
+  if (!th) {
+    m_toolBeforeNav.clear();
+    return;
+  }
+  TTool *cur = th->getTool();
+  const QString curName =
+      cur ? QString::fromStdString(cur->getName()) : QString();
+  if (curName != m_toolBeforeNav) th->setTool(m_toolBeforeNav);
+  m_toolBeforeNav.clear();
+}
+
+//-----------------------------------------------------------------------------
+
+bool LocatorPopup::overviewUsesNavHand() const {
+  if (!isOverview()) return false;
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
-  if (!tool) return false;
-  const std::string name = tool->getName();
-  return name == T_Zoom || name == T_ZoomView || name == T_Hand ||
-         name == T_HandView || name == T_Rotate || name == T_RotateView;
+  const std::string name = tool ? tool->getName() : std::string();
+  if (name == T_Hand || name == T_HandView) return true;
+  if (!isNavToolsOnly()) return false;
+  if (name == T_Zoom || name == T_ZoomView || name == T_Rotate ||
+      name == T_RotateView)
+    return false;
+  return true;
 }
 
 //-----------------------------------------------------------------------------
 
-void LocatorPopup::applyNavCanvasTool() {
-  if (!isNavToolsOnly() || isAuthorizedNavTool()) return;
-  forceNavHand();
-}
-
-//-----------------------------------------------------------------------------
-
-void LocatorPopup::forceNavHand() {
-  if (!isNavToolsOnly()) return;
-  if (ToolHandle *th = TApp::instance()->getCurrentTool())
-    th->setTool(QString::fromUtf8(T_Hand));
+void LocatorPopup::updateOverviewCursor() {
+  if (!m_viewer || !overviewUsesNavHand()) return;
+  setToolCursor(m_viewer, ToolCursor::PanCursor);
 }
 
 //-----------------------------------------------------------------------------
@@ -996,10 +1097,10 @@ void LocatorPopup::updateNavToolButtonChecks() {
 //-----------------------------------------------------------------------------
 
 void LocatorPopup::applyOverviewMode() {
-  const bool on = isOverview();
-  if (m_navToolsOnlyAct) m_navToolsOnlyAct->setEnabled(on);
-  if (m_syncZoomAct) m_syncZoomAct->setEnabled(!on);
-  if (m_syncPanAct) m_syncPanAct->setEnabled(!on);
+  const bool overviewOn = m_overviewAct && m_overviewAct->isChecked();
+  if (m_navToolsOnlyAct) m_navToolsOnlyAct->setEnabled(overviewOn);
+  if (m_syncZoomAct) m_syncZoomAct->setEnabled(!overviewOn);
+  if (m_syncPanAct) m_syncPanAct->setEnabled(!overviewOn);
   hookNavFrameSource();
 }
 
@@ -1009,19 +1110,30 @@ void LocatorPopup::hookNavFrameSource() {
   SceneViewer *src = isOverview() ? resolveMainViewer() : nullptr;
   if (m_navFrameSource && m_navFrameSource != src) {
     disconnect(m_navFrameSource, &SceneViewer::onZoomChanged, this,
-               &LocatorPopup::updateNavViewFrame);
+               &LocatorPopup::scheduleNavFrameUpdate);
     disconnect(m_navFrameSource, &SceneViewer::refreshNavi, this,
-               &LocatorPopup::updateNavViewFrame);
+               &LocatorPopup::scheduleNavFrameUpdate);
   }
   if (src && m_navFrameSource != src) {
     connect(src, &SceneViewer::onZoomChanged, this,
-            &LocatorPopup::updateNavViewFrame);
+            &LocatorPopup::scheduleNavFrameUpdate);
     connect(src, &SceneViewer::refreshNavi, this,
-            &LocatorPopup::updateNavViewFrame);
+            &LocatorPopup::scheduleNavFrameUpdate);
   }
   m_navFrameSource = src;
   if (m_viewer) m_viewer->setViewForwardTarget(src);
   updateNavViewFrame();
+}
+
+//-----------------------------------------------------------------------------
+
+void LocatorPopup::scheduleNavFrameUpdate() {
+  if (m_navFrameScheduled) return;
+  m_navFrameScheduled = true;
+  QTimer::singleShot(0, this, [this]() {
+    m_navFrameScheduled = false;
+    updateNavViewFrame();
+  });
 }
 
 //-----------------------------------------------------------------------------
@@ -1640,6 +1752,10 @@ void LocatorPopup::applyNavigatorTabVisibilityFromPreferences(bool navigatorEnab
       updateLocatorTabBarChrome();
       changeWindowTitle();
     }
+    if (isLocatorRole()) applyLocatorTabToViewer();
+    applyOverviewMode();
+    restoreToolAfterNav();
+    if (m_viewer) m_viewer->update();
     return;
   }
 
@@ -1648,12 +1764,14 @@ void LocatorPopup::applyNavigatorTabVisibilityFromPreferences(bool navigatorEnab
   if (m_matchingStrokeReferenceMode) setMatchingStrokeReferenceMode(false);
 
   if (m_tabBar->currentIndex() == TabNavigator) {
+    captureTabView(TabNavigator);
     m_tabBar->blockSignals(true);
     m_tabBar->setCurrentIndex(TabLocator);
     m_stack->setCurrentIndex(TabLocator);
     m_tabBar->blockSignals(false);
     reparentViewerToTab(TabLocator);
-    applyLocatorTabToViewer();
+    applyTabView(TabLocator);
+    m_viewTabIndex = TabLocator;
   }
 
   m_tabBar->blockSignals(true);
@@ -1662,6 +1780,9 @@ void LocatorPopup::applyNavigatorTabVisibilityFromPreferences(bool navigatorEnab
   m_navPage->setParent(this);
   m_navPage->hide();
   m_tabBar->blockSignals(false);
+  applyLocatorTabToViewer();
+  applyOverviewMode();
+  restoreToolAfterNav();
   updateNavigatorControlsEnabled();
   m_viewer->update();
   changeWindowTitle();
@@ -1683,6 +1804,8 @@ void LocatorPopup::updateLocatorTabBarChrome() {
 
 void LocatorPopup::onTabIndexChanged(int index) {
   if (index < 0) return;
+  if (m_viewTabIndex >= 0 && m_viewTabIndex != index)
+    captureTabView(m_viewTabIndex);
   if (m_stack && index < m_stack->count()) m_stack->setCurrentIndex(index);
   reparentViewerToTab(index);
   updateNavigatorControlsEnabled();
@@ -1692,8 +1815,11 @@ void LocatorPopup::onTabIndexChanged(int index) {
     applyNavigatorTabToViewer();
     if (isOverview()) scheduleOverviewFit();
   }
+  applyTabView(index);
+  m_viewTabIndex = index;
   captureLastNavAffs();
-  hookNavFrameSource();
+  applyOverviewMode();
+  if (index == TabLocator) restoreToolAfterNav();
   m_viewer->update();
   changeWindowTitle();
 
@@ -1735,13 +1861,22 @@ void LocatorPopup::onChangeViewAff(const TPointD &pos) {
   const int tab = m_tabBar->currentIndex();
   if (m_tabBar->count() > 1 && tab == TabNavigator) return;
 
-  TAffine curAff = m_viewer->getSceneMatrix();
-  TAffine newAff(curAff.a11, 0, -pos.x * curAff.a11, 0, curAff.a22,
-                 -pos.y * curAff.a22);
-  m_viewer->setViewMatrix(newAff, 0);
-  m_viewer->setViewMatrix(newAff, 1);
-  m_viewer->update();
-  persistPanelState();
+  m_pendingLocatorPos = pos;
+  if (m_locatorFollowScheduled) return;
+  m_locatorFollowScheduled = true;
+  QTimer::singleShot(0, this, [this]() {
+    m_locatorFollowScheduled = false;
+    if (!m_viewer) return;
+    if (m_tabBar && m_tabBar->count() > 1 &&
+        m_tabBar->currentIndex() == TabNavigator)
+      return;
+    const TAffine curAff = m_viewer->getSceneMatrix();
+    const TAffine newAff(curAff.a11, 0, -m_pendingLocatorPos.x * curAff.a11, 0,
+                         curAff.a22, -m_pendingLocatorPos.y * curAff.a22);
+    m_viewer->setViewMatrix(newAff, 0);
+    m_viewer->setViewMatrix(newAff, 1);
+    m_viewer->update();
+  });
 }
 
 //-----------------------------------------------------------------------------
@@ -1833,31 +1968,18 @@ bool LocatorPopup::eventFilter(QObject *watched, QEvent *event) {
     return true;
   }
   if (type == QEvent::Enter) {
-    applyNavCanvasTool();
+    if (overviewUsesNavHand()) {
+      updateOverviewCursor();
+      return true;
+    }
     return QFrame::eventFilter(watched, event);
   }
   const bool isMouse = type == QEvent::MouseButtonPress ||
                        type == QEvent::MouseMove ||
                        type == QEvent::MouseButtonRelease;
-  const bool isTablet = type == QEvent::TabletPress ||
-                        type == QEvent::TabletMove ||
-                        type == QEvent::TabletRelease;
-  if (!isMouse && !isTablet) return QFrame::eventFilter(watched, event);
-
-  auto currentToolName = []() -> std::string {
-    TTool *tool = TApp::instance()->getCurrentTool()->getTool();
-    return tool ? tool->getName() : std::string();
-  };
-  auto isOverviewViewTool = [&]() {
-    const std::string name = currentToolName();
-    return name == T_Zoom || name == T_ZoomView || name == T_Hand ||
-           name == T_HandView || name == T_Rotate || name == T_RotateView;
-  };
-
-  if (isNavToolsOnly() && !isOverviewViewTool()) applyNavCanvasTool();
-
-  if (isTablet && isNavToolsOnly() && !isOverviewViewTool()) return true;
   if (!isMouse) return QFrame::eventFilter(watched, event);
+
+  const bool treatAsHand = overviewUsesNavHand();
 
   auto *me = static_cast<QMouseEvent *>(event);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
@@ -1867,13 +1989,10 @@ bool LocatorPopup::eventFilter(QObject *watched, QEvent *event) {
 #endif
   const QPointF pos = local * (qreal)m_viewer->getDevPixRatio();
 
-  auto isOverviewHandTool = [&]() {
-    const std::string name = currentToolName();
-    return name == T_Hand || name == T_HandView;
-  };
+  if (treatAsHand) updateOverviewCursor();
 
   if (type == QEvent::MouseButtonPress && me->button() == Qt::LeftButton &&
-      isOverviewHandTool()) {
+      treatAsHand) {
     m_overviewHandDragging = true;
     m_overviewWorldPos     = m_viewer->winToWorld(pos);
     return true;
@@ -1890,10 +2009,6 @@ bool LocatorPopup::eventFilter(QObject *watched, QEvent *event) {
     return true;
   }
 
-  if (isNavToolsOnly() && !isOverviewViewTool() &&
-      (me->button() == Qt::LeftButton || (me->buttons() & Qt::LeftButton)))
-    return true;
-
   if (type == QEvent::MouseButtonPress && me->button() == Qt::MiddleButton) {
     m_draggingNavFrame = true;
     execOverviewPan(pos);
@@ -1908,7 +2023,15 @@ bool LocatorPopup::eventFilter(QObject *watched, QEvent *event) {
     m_draggingNavFrame = false;
     return true;
   }
+  if (treatAsHand) return true;
   return QFrame::eventFilter(watched, event);
+}
+
+//-----------------------------------------------------------------------------
+
+void LocatorPopup::leaveEvent(QEvent *event) {
+  QFrame::leaveEvent(event);
+  if (!rect().contains(mapFromGlobal(QCursor::pos()))) restoreToolAfterNav();
 }
 
 //-----------------------------------------------------------------------------
@@ -1916,6 +2039,7 @@ bool LocatorPopup::eventFilter(QObject *watched, QEvent *event) {
 void LocatorPopup::hideEvent(QHideEvent *) {
   m_draggingNavFrame     = false;
   m_overviewHandDragging = false;
+  restoreToolAfterNav();
   persistPanelState();
   TApp *app = TApp::instance();
   disconnect(app->getCurrentLevel());

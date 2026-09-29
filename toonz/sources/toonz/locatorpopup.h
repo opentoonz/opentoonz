@@ -8,6 +8,7 @@
 #include "toonzqt/dvdialog.h"
 
 #include <QFrame>
+#include <QString>
 #include <QPointF>
 #include <QList>
 #include <QPair>
@@ -85,6 +86,11 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   QPointF m_icon2ViewerRatio;
   bool m_haveLastNavAffs     = false;
   std::array<TAffine, 2> m_lastNavAffs = {TAffine(), TAffine()};
+  std::array<TAffine, 2> m_locatorAffs = {TAffine(), TAffine()};
+  std::array<TAffine, 2> m_navigatorAffs = {TAffine(), TAffine()};
+  bool m_haveLocatorAffs   = false;
+  bool m_haveNavigatorAffs = false;
+  int m_viewTabIndex       = -1;
   bool m_matchingStrokeReferenceMode = false;
   bool m_showDisplayToolbar          = true;
   bool m_showNavGuided               = false;
@@ -105,7 +111,12 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   bool m_viewRestorePending = false;
   bool m_didInitialViewFit   = false;
   bool m_overviewFitScheduled = false;
+  bool m_navFrameScheduled    = false;
+  bool m_locatorFollowScheduled = false;
+  TPointD m_pendingLocatorPos;
   std::array<TAffine, 2> m_pendingViewAffs = {TAffine(), TAffine()};
+  QString m_toolBeforeNav;
+  bool m_haveToolBeforeNav = false;
 
   enum TabIndex { TabLocator = 0, TabNavigator = 1 };
 
@@ -141,23 +152,29 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   void reparentViewerToTab(int tabIndex);
   void applyLocatorTabToViewer();
   void applyNavigatorTabToViewer();
+  void captureTabView(int tab);
+  void applyTabView(int tab);
   void updateNavigatorControlsEnabled();
   void writePanelStateTo(QSettings &settings) const;
   void readPanelStateFrom(QSettings &settings);
   bool readViewAffsFrom(QSettings &settings);
+  bool readAffsFrom(QSettings &settings, const QString &prefix,
+                    std::array<TAffine, 2> &out);
   void applyLoadedTabIndex(int tab);
   SceneViewer *resolveMainViewer() const;
   SceneViewer *viewToolTarget() const;
   bool isOverview() const;
   bool isNavToolsOnly() const;
-  bool isAuthorizedNavTool() const;
-  void applyNavCanvasTool();
-  void forceNavHand();
+  void rememberToolBeforeNav();
+  void restoreToolAfterNav();
+  bool overviewUsesNavHand() const;
+  void updateOverviewCursor();
   void updateNavToolButtonChecks();
   void applyOverviewMode();
   void captureLastNavAffs();
   void applyNavigatorSyncToMain();
   void hookNavFrameSource();
+  void scheduleNavFrameUpdate();
   void updateNavViewFrame();
   void execOverviewPan(const QPointF &pos);
   void panOverviewByWorld(const TPointD &worldDelta);
@@ -195,6 +212,7 @@ protected:
   void contextMenuEvent(QContextMenuEvent *event) override;
   void showEvent(QShowEvent *);
   void hideEvent(QHideEvent *);
+  void leaveEvent(QEvent *event) override;
   bool eventFilter(QObject *watched, QEvent *event) override;
 
 protected slots:
