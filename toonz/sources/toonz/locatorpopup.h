@@ -38,6 +38,7 @@ class QHBoxLayout;
 class QVBoxLayout;
 class QAction;
 class QContextMenuEvent;
+class QLabel;
 
 //=============================================================================
 // LocatorPopup — Locator tab (minimal) and Navigator tab (Xsheet display options).
@@ -63,6 +64,7 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   QWidget *m_navBottomBarHost;
 
   QComboBox *m_guidedCombo;
+  QLabel *m_guidedLabel;
   QToolButton *m_hideCurrentTb;
   QToolButton *m_soloColumnTb;
   QToolButton *m_matchingStrokeTb;
@@ -70,6 +72,7 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   QAction *m_followMainPanAct;
   bool m_matchingStrokeReferenceMode = false;
   bool m_showDisplayToolbar          = true;
+  bool m_showNavGuided               = true;
   bool m_showNavZoom                 = true;
   bool m_showNavRotate               = true;
   bool m_showNavPan                  = true;
@@ -122,6 +125,9 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   void updateTabPageSizeConsistency();
   void setMatchingStrokeReferenceMode(bool on);
   void applyNavigatorTabVisibilityFromPreferences(bool navigatorEnabled);
+  void applyMultiInstanceAllowed(bool allowed);
+  void syncActiveLocatorRole();
+  bool isLocatorRole() const;
   void updateLocatorTabBarChrome();
 
 public:

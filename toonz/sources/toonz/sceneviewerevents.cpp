@@ -11,6 +11,7 @@
 #include "tapp.h"
 #include "iocommand.h"
 #include "menubarcommandids.h"
+#include "floatingpanelcommand.h"
 #include "onionskinmaskgui.h"
 #include "ruler.h"
 #include "locatorpopup.h"
@@ -217,8 +218,7 @@ void SceneViewer::onButtonPressed(FlipConsole::EGadget button) {
 
   // open locator. Create one for the first time
   case FlipConsole::eLocator: {
-    QAction *action = CommandManager::instance()->getAction(MI_OpenLocator);
-    action->trigger();
+    OpenFloatingPanel::getOrReuseFloatingPanel("Locator");
     break;
   }
 

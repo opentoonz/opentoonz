@@ -148,3 +148,32 @@ TPanel *OpenFloatingPanel::getOrOpenFloatingPanel(
 
   return panel;
 }
+
+TPanel *OpenFloatingPanel::getOrReuseFloatingPanel(
+    const std::string &panelType) {
+  TMainWindow *currentRoom = TApp::instance()->getCurrentRoom();
+  QList<TPanel *> list     = currentRoom->findChildren<TPanel *>();
+  TPanel *hidden           = nullptr;
+  for (int i = 0; i < list.size(); i++) {
+    TPanel *panel = list.at(i);
+    if (panel->getPanelType() != panelType) continue;
+    if (!panel->isFloating() && panelType != "Locator") continue;
+    if (!panel->isHidden()) {
+      if (panel->isFloating()) activateWidget(panel);
+      else {
+        panel->show();
+        panel->raise();
+      }
+      return panel;
+    }
+    if (!hidden) hidden = panel;
+  }
+  if (hidden) {
+    hidden->reset();
+    currentRoom->addDockWidget(hidden);
+    hidden->show();
+    hidden->raise();
+    return hidden;
+  }
+  return getOrOpenFloatingPanel(panelType);
+}

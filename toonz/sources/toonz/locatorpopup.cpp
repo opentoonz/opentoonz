@@ -322,9 +322,9 @@ void LocatorPopup::buildNavigatorToolbar() {
   m_navTopLayout = new QHBoxLayout();
   m_navTopLayout->setContentsMargins(2, 1, 2, 1);
   m_navTopLayout->setSpacing(0);
-  QLabel *guidedLabel = new QLabel(tr("Guided:"), m_navPage);
-  guidedLabel->setFixedHeight(kNavTopBtnSize);
-  m_navTopLayout->addWidget(guidedLabel, 0);
+  m_guidedLabel = new QLabel(tr("Guided:"), m_navPage);
+  m_guidedLabel->setFixedHeight(kNavTopBtnSize);
+  m_navTopLayout->addWidget(m_guidedLabel, 0);
   m_navTopLayout->addWidget(m_guidedCombo, 1);
   m_navTopLayout->addWidget(m_hideCurrentTb, 0);
   m_navTopLayout->addWidget(m_soloColumnTb, 0);
@@ -422,6 +422,7 @@ void LocatorPopup::buildNavigatorBottomBar() {
   m_navBottomButtons[NBB_FlipV] = flipV;
   connect(flipV, &QToolButton::clicked, m_viewer, &SceneViewer::flipY);
 
+  m_navBottomLayout->addStretch(1);
   m_navBottomLayout->addWidget(zoomIn);
   m_navBottomLayout->addWidget(zoomOut);
   m_navBottomLayout->addWidget(zoomReset);
@@ -577,6 +578,7 @@ void LocatorPopup::writePanelStateTo(QSettings &settings) const {
 
   settings.setValue(QStringLiteral("lastTabIndex"), m_tabBar->currentIndex());
   settings.setValue(QStringLiteral("showDisplayToolbar"), m_showDisplayToolbar);
+  settings.setValue(QStringLiteral("showNavGuided"), m_showNavGuided);
   settings.setValue(QStringLiteral("showNavZoom"), m_showNavZoom);
   settings.setValue(QStringLiteral("showNavRotate"), m_showNavRotate);
   settings.setValue(QStringLiteral("showNavPan"), m_showNavPan);
@@ -605,6 +607,8 @@ void LocatorPopup::readPanelStateFrom(QSettings &settings) {
       settings.value(QStringLiteral("showNavigationBar"), true).toBool();
   m_showDisplayToolbar =
       settings.value(QStringLiteral("showDisplayToolbar"), true).toBool();
+  m_showNavGuided =
+      settings.value(QStringLiteral("showNavGuided"), true).toBool();
   m_showNavZoom =
       settings.value(QStringLiteral("showNavZoom"), legacyNavigationBar).toBool();
   m_showNavRotate =
@@ -751,7 +755,14 @@ void LocatorPopup::restoreOrFitView() {
 //-----------------------------------------------------------------------------
 
 void LocatorPopup::updateNavigatorBarsVisibility() {
-  if (m_navTopBarHost) m_navTopBarHost->setVisible(m_showDisplayToolbar);
+  if (m_guidedLabel) m_guidedLabel->setVisible(m_showNavGuided);
+  if (m_guidedCombo) m_guidedCombo->setVisible(m_showNavGuided);
+  if (m_hideCurrentTb) m_hideCurrentTb->setVisible(m_showDisplayToolbar);
+  if (m_soloColumnTb) m_soloColumnTb->setVisible(m_showDisplayToolbar);
+  if (m_matchingStrokeTb) m_matchingStrokeTb->setVisible(m_showDisplayToolbar);
+  if (m_gearBtn) m_gearBtn->setVisible(m_showDisplayToolbar);
+  if (m_navTopBarHost)
+    m_navTopBarHost->setVisible(m_showNavGuided || m_showDisplayToolbar);
 
   const auto setGroupVisible = [&](bool visible, std::initializer_list<int> ids) {
     for (int id : ids) {
@@ -785,6 +796,11 @@ void LocatorPopup::updateNavigatorBarsVisibility() {
 void LocatorPopup::addShowHideContextMenu(QMenu *menu) {
   QMenu *showHideMenu = menu->addMenu(tr("GUI Show / Hide"));
 
+  QAction *guidedAct = showHideMenu->addAction(tr("Guided Drawing"));
+  guidedAct->setCheckable(true);
+  guidedAct->setChecked(m_showNavGuided);
+  guidedAct->setObjectName(QStringLiteral("navGuided"));
+
   QAction *displayToolbarAct =
       showHideMenu->addAction(tr("Display Toolbar"));
   displayToolbarAct->setCheckable(true);
@@ -815,12 +831,15 @@ void LocatorPopup::addShowHideContextMenu(QMenu *menu) {
 
   QActionGroup *group = new QActionGroup(menu);
   group->setExclusive(false);
+  group->addAction(guidedAct);
   group->addAction(displayToolbarAct);
   group->addAction(zoomAct);
   group->addAction(rotateAct);
   group->addAction(panAct);
   group->addAction(flipAct);
 
+  connect(guidedAct, &QAction::triggered, this,
+          &LocatorPopup::onShowHideActionTriggered);
   connect(displayToolbarAct, &QAction::triggered, this,
           &LocatorPopup::onShowHideActionTriggered);
   connect(zoomAct, &QAction::triggered, this,
@@ -839,7 +858,9 @@ void LocatorPopup::onShowHideActionTriggered() {
   QAction *action = qobject_cast<QAction *>(sender());
   if (!action) return;
 
-  if (action->objectName() == QStringLiteral("displayToolbar"))
+  if (action->objectName() == QStringLiteral("navGuided"))
+    m_showNavGuided = action->isChecked();
+  else if (action->objectName() == QStringLiteral("displayToolbar"))
     m_showDisplayToolbar = action->isChecked();
   else if (action->objectName() == QStringLiteral("navZoom"))
     m_showNavZoom = action->isChecked();
@@ -935,6 +956,49 @@ void LocatorPopup::updateTabPageSizeConsistency() {
 
 void LocatorPopup::onLocatorNavigatorPreferenceChanged(bool enabled) {
   applyNavigatorTabVisibilityFromPreferences(enabled);
+  applyMultiInstanceAllowed(enabled);
+  syncActiveLocatorRole();
+}
+
+//-----------------------------------------------------------------------------
+
+void LocatorPopup::applyMultiInstanceAllowed(bool allowed) {
+  for (QWidget *w = parentWidget(); w; w = w->parentWidget()) {
+    if (auto *panel = dynamic_cast<TPanel *>(w)) {
+      panel->allowMultipleInstances(allowed);
+      return;
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+bool LocatorPopup::isLocatorRole() const {
+  if (!m_tabBar || m_tabBar->count() < 2) return true;
+  return m_tabBar->currentIndex() == TabLocator;
+}
+
+//-----------------------------------------------------------------------------
+
+void LocatorPopup::syncActiveLocatorRole() {
+  TApp *app = TApp::instance();
+  if (!app) return;
+  if (isVisible() && isLocatorRole()) {
+    app->setActiveLocator(this);
+    return;
+  }
+  if (app->getActiveLocator() != this) return;
+  LocatorPopup *other = nullptr;
+  if (QWidget *mw = app->getMainWindow()) {
+    const QList<LocatorPopup *> list = mw->findChildren<LocatorPopup *>();
+    for (LocatorPopup *p : list) {
+      if (p && p != this && p->isVisible() && p->isLocatorRole()) {
+        other = p;
+        break;
+      }
+    }
+  }
+  app->setActiveLocator(other);
 }
 
 //-----------------------------------------------------------------------------
@@ -1007,6 +1071,7 @@ void LocatorPopup::onTabIndexChanged(int index) {
 
   updateTabPageSizeConsistency();
   persistPanelState();
+  syncActiveLocatorRole();
 }
 
 //-----------------------------------------------------------------------------
@@ -1094,7 +1159,7 @@ void LocatorPopup::showEvent(QShowEvent *) {
                        SLOT(changeWindowTitle()));
   assert(ret);
 
-  app->setActiveLocator(this);
+  syncActiveLocatorRole();
 
   changeWindowTitle();
 
@@ -1109,7 +1174,7 @@ void LocatorPopup::hideEvent(QHideEvent *) {
   TApp *app = TApp::instance();
   disconnect(app->getCurrentLevel());
   disconnect(app->getCurrentFrame());
-  if (app->getActiveLocator() == this) app->setActiveLocator(0);
+  syncActiveLocatorRole();
 }
 
 //-----------------------------------------------------------------------------

@@ -319,6 +319,7 @@
         <command>MI_OpenSchematic</command>
         <command>MI_FxParamEditor</command>
         <command>MI_OpenFilmStrip</command>
+        <command>MI_OpenLocator</command>
         <separator/>
         <command>MI_OpenFileBrowser</command>
         <command>MI_OpenPreproductionBoard</command>
