@@ -68,15 +68,20 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   QToolButton *m_hideCurrentTb;
   QToolButton *m_soloColumnTb;
   QToolButton *m_matchingStrokeTb;
-  QToolButton *m_gearBtn;
-  QAction *m_followMainPanAct;
+  QToolButton *m_gearBtn     = nullptr;
+  QAction *m_syncZoomAct     = nullptr;
+  QAction *m_syncPanAct      = nullptr;
+  bool m_navSyncing          = false;
+  bool m_haveLastNavAffs     = false;
+  std::array<TAffine, 2> m_lastNavAffs = {TAffine(), TAffine()};
   bool m_matchingStrokeReferenceMode = false;
   bool m_showDisplayToolbar          = true;
   bool m_showNavGuided               = true;
   bool m_showNavZoom                 = true;
   bool m_showNavRotate               = true;
-  bool m_showNavPan                  = true;
+  bool m_showNavPan                  = false;
   bool m_showNavFlip                 = true;
+  QWidget *m_navTopSpacerAfterGuided;
   QWidget *m_navBottomSpacerAfterZoom;
   QWidget *m_navBottomSpacerAfterRotate;
   QWidget *m_navBottomSpacerAfterPan;
@@ -117,7 +122,9 @@ class LocatorPopup : public QFrame, public SaveLoadQSettings {
   void readPanelStateFrom(QSettings &settings);
   bool readViewAffsFrom(QSettings &settings);
   void applyLoadedTabIndex(int tab);
-  void syncViewFromMainViewer();
+  SceneViewer *resolveMainViewer() const;
+  void captureLastNavAffs();
+  void applyNavigatorSyncToMain();
   void persistPanelState();
   void restoreOrFitView();
   void updateNavigatorBarsVisibility();
@@ -157,6 +164,7 @@ protected slots:
   void onSoloColumnToggled(bool checked);
   void onMatchingStrokeToggled(bool checked);
   void onShowHideActionTriggered();
+  void onNavigatorViewChanged();
 };
 
 #endif

@@ -32,6 +32,7 @@
 #include <QPainter>
 #include <QPixmap>
 #include <QSettings>
+#include <QSignalBlocker>
 #include <QStackedWidget>
 #include <QTimer>
 #include <QTabBar>
@@ -40,6 +41,7 @@
 #include <QVBoxLayout>
 #include <QSize>
 #include <algorithm>
+#include <cmath>
 
 namespace {
 
@@ -139,6 +141,7 @@ LocatorPopup::LocatorPopup(QWidget *parent, Qt::WindowFlags flags)
     , m_navBottomLayout(nullptr)
     , m_navTopBarHost(nullptr)
     , m_navBottomBarHost(nullptr)
+    , m_navTopSpacerAfterGuided(nullptr)
     , m_navBottomSpacerAfterZoom(nullptr)
     , m_navBottomSpacerAfterRotate(nullptr)
     , m_navBottomSpacerAfterPan(nullptr) {
@@ -214,15 +217,15 @@ LocatorPopup::LocatorPopup(QWidget *parent, Qt::WindowFlags flags)
   connect(m_hideCurrentTb, &QToolButton::toggled, this,
           &LocatorPopup::updateNavigatorVisibilityIcons);
 
-  connect(m_followMainPanAct, &QAction::toggled, this, [this]() {
-    m_viewer->update();
-    persistPanelState();
-  });
-
   connect(m_matchingStrokeTb, &QToolButton::toggled, this,
           &LocatorPopup::onMatchingStrokeToggled);
   connect(m_matchingStrokeTb, &QToolButton::toggled, this,
           &LocatorPopup::updateNavigatorVisibilityIcons);
+
+  connect(m_syncZoomAct, &QAction::toggled, this,
+          [this]() { persistPanelState(); });
+  connect(m_syncPanAct, &QAction::toggled, this,
+          [this]() { persistPanelState(); });
 
   connect(Preferences::instance(),
           &Preferences::locatorNavigatorTabEnabledChanged, this,
@@ -243,7 +246,12 @@ LocatorPopup::LocatorPopup(QWidget *parent, Qt::WindowFlags flags)
         connect(m_viewer, SIGNAL(previewToggled()), SLOT(changeWindowTitle()));
   ret = ret && connect(m_viewer, &SceneViewer::onZoomChanged, this,
                        [this]() { persistPanelState(); });
+  ret = ret && connect(m_viewer, &SceneViewer::onZoomChanged, this,
+                       &LocatorPopup::onNavigatorViewChanged);
+  ret = ret && connect(m_viewer, &SceneViewer::refreshNavi, this,
+                       &LocatorPopup::onNavigatorViewChanged);
   assert(ret);
+  captureLastNavAffs();
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
   if (QGuiApplication *gApp =
@@ -307,14 +315,16 @@ void LocatorPopup::buildNavigatorToolbar() {
   m_gearBtn->setAutoRaise(true);
   m_gearBtn->setPopupMode(QToolButton::InstantPopup);
   auto *gearMenu = new QMenu(m_gearBtn);
-
-  m_followMainPanAct =
-      gearMenu->addAction(tr("Follow main viewer pan and zoom"));
-  m_followMainPanAct->setCheckable(true);
-  m_followMainPanAct->setToolTip(
-      tr("When enabled, pan and zoom from the main viewer are mirrored here. "
-         "When disabled, this panel keeps its own view until you pan or zoom "
-         "inside it."));
+  m_syncZoomAct  = gearMenu->addAction(tr("Synchronize Zoom"));
+  m_syncZoomAct->setCheckable(true);
+  m_syncZoomAct->setToolTip(
+      tr("When enabled, zooming in this panel also zooms the main viewer. "
+         "The main viewer does not drive this panel."));
+  m_syncPanAct = gearMenu->addAction(tr("Synchronize Pan"));
+  m_syncPanAct->setCheckable(true);
+  m_syncPanAct->setToolTip(
+      tr("When enabled, panning in this panel also pans the main viewer. "
+         "The main viewer does not drive this panel."));
   m_gearBtn->setMenu(gearMenu);
   m_gearBtn->setFixedSize(kNavTopBtnSize, kNavTopBtnSize);
   m_gearBtn->setIconSize(QSize(kNavTopGearIconSize, kNavTopGearIconSize));
@@ -324,8 +334,11 @@ void LocatorPopup::buildNavigatorToolbar() {
   m_navTopLayout->setSpacing(0);
   m_guidedLabel = new QLabel(tr("Guided:"), m_navPage);
   m_guidedLabel->setFixedHeight(kNavTopBtnSize);
+  m_navTopSpacerAfterGuided = new QWidget(m_navPage);
+  m_navTopSpacerAfterGuided->setFixedWidth(2);
   m_navTopLayout->addWidget(m_guidedLabel, 0);
   m_navTopLayout->addWidget(m_guidedCombo, 1);
+  m_navTopLayout->addWidget(m_navTopSpacerAfterGuided, 0);
   m_navTopLayout->addWidget(m_hideCurrentTb, 0);
   m_navTopLayout->addWidget(m_soloColumnTb, 0);
   m_navTopLayout->addWidget(m_matchingStrokeTb, 0);
@@ -492,7 +505,7 @@ void LocatorPopup::updateNavigatorVisibilityIcons() {
 void LocatorPopup::refreshNavigatorThemedIcons() {
   if (!m_hideCurrentTb) return;
   updateNavigatorVisibilityIcons();
-  m_gearBtn->setIcon(createQIcon(QStringLiteral("gear"), false));
+  if (m_gearBtn) m_gearBtn->setIcon(createQIcon(QStringLiteral("gear"), false));
   if (m_navBottomButtons[NBB_ZoomIn])
     m_navBottomButtons[NBB_ZoomIn]->setIcon(
         createQIcon(QStringLiteral("zoomin"), false));
@@ -568,7 +581,7 @@ void LocatorPopup::updateNavigatorControlsEnabled() {
   m_hideCurrentTb->setEnabled(nav);
   m_soloColumnTb->setEnabled(nav);
   m_matchingStrokeTb->setEnabled(nav);
-  m_gearBtn->setEnabled(nav);
+  if (m_gearBtn) m_gearBtn->setEnabled(nav);
 }
 
 //-----------------------------------------------------------------------------
@@ -583,9 +596,11 @@ void LocatorPopup::writePanelStateTo(QSettings &settings) const {
   settings.setValue(QStringLiteral("showNavRotate"), m_showNavRotate);
   settings.setValue(QStringLiteral("showNavPan"), m_showNavPan);
   settings.setValue(QStringLiteral("showNavFlip"), m_showNavFlip);
-  if (m_followMainPanAct)
-    settings.setValue(QStringLiteral("followMainPan"),
-                      m_followMainPanAct->isChecked());
+  if (m_syncZoomAct)
+    settings.setValue(QStringLiteral("syncNavZoom"),
+                      m_syncZoomAct->isChecked());
+  if (m_syncPanAct)
+    settings.setValue(QStringLiteral("syncNavPan"), m_syncPanAct->isChecked());
 
   for (int mode = 0; mode < 2; ++mode) {
     const TAffine aff = m_viewer->getViewAffine(mode);
@@ -615,12 +630,21 @@ void LocatorPopup::readPanelStateFrom(QSettings &settings) {
       settings.value(QStringLiteral("showNavRotate"), legacyNavigationBar)
           .toBool();
   m_showNavPan =
-      settings.value(QStringLiteral("showNavPan"), legacyNavigationBar).toBool();
+      settings.value(QStringLiteral("showNavPan"), false).toBool();
   m_showNavFlip =
       settings.value(QStringLiteral("showNavFlip"), legacyNavigationBar).toBool();
-  if (m_followMainPanAct)
-    m_followMainPanAct->setChecked(
-        settings.value(QStringLiteral("followMainPan"), false).toBool());
+  const bool legacyFollow =
+      settings.value(QStringLiteral("followMainPan"), false).toBool();
+  if (m_syncZoomAct) {
+    QSignalBlocker blocker(m_syncZoomAct);
+    m_syncZoomAct->setChecked(
+        settings.value(QStringLiteral("syncNavZoom"), legacyFollow).toBool());
+  }
+  if (m_syncPanAct) {
+    QSignalBlocker blocker(m_syncPanAct);
+    m_syncPanAct->setChecked(
+        settings.value(QStringLiteral("syncNavPan"), legacyFollow).toBool());
+  }
 
   const int tab = settings.value(QStringLiteral("lastTabIndex"), TabLocator).toInt();
   applyLoadedTabIndex(tab);
@@ -688,29 +712,86 @@ void LocatorPopup::load(QSettings &settings) {
 
 //-----------------------------------------------------------------------------
 
-void LocatorPopup::syncViewFromMainViewer() {
-  if (!m_viewer) return;
-
-  TApp *app = TApp::instance();
-  QMainWindow *mainWin = app ? app->getMainWindow() : nullptr;
-  if (!mainWin) return;
-
-  SceneViewer *mainViewer = nullptr;
-  const QList<BaseViewerPanel *> panels =
-      mainWin->findChildren<BaseViewerPanel *>();
-  for (BaseViewerPanel *panel : panels) {
-    if (!panel) continue;
-    SceneViewer *sv = panel->getSceneViewer();
-    if (sv && !sv->getIsLocator()) {
-      mainViewer = sv;
-      break;
+SceneViewer *LocatorPopup::resolveMainViewer() const {
+  if (TApp *app = TApp::instance()) {
+    SceneViewer *src = app->getActiveViewer();
+    if (src && src != m_viewer && !src->getIsLocator()) return src;
+    QWidget *mw = app->getMainWindow();
+    if (!mw) return nullptr;
+    const QList<BaseViewerPanel *> panels =
+        mw->findChildren<BaseViewerPanel *>();
+    for (BaseViewerPanel *panel : panels) {
+      if (!panel) continue;
+      SceneViewer *sv = panel->getSceneViewer();
+      if (sv && sv != m_viewer && !sv->getIsLocator()) return sv;
     }
   }
-  if (!mainViewer) return;
+  return nullptr;
+}
 
+//-----------------------------------------------------------------------------
+
+void LocatorPopup::captureLastNavAffs() {
+  if (!m_viewer) return;
   for (int mode = 0; mode < 2; ++mode)
-    m_viewer->setViewMatrix(mainViewer->getViewAffine(mode), mode);
-  m_viewer->update();
+    m_lastNavAffs[mode] = m_viewer->getViewAffine(mode);
+  m_haveLastNavAffs = true;
+}
+
+//-----------------------------------------------------------------------------
+
+void LocatorPopup::applyNavigatorSyncToMain() {
+  if (m_navSyncing || !m_viewer || isLocatorRole()) {
+    captureLastNavAffs();
+    return;
+  }
+  const bool syncZoom = m_syncZoomAct && m_syncZoomAct->isChecked();
+  const bool syncPan  = m_syncPanAct && m_syncPanAct->isChecked();
+  if (!m_haveLastNavAffs) {
+    captureLastNavAffs();
+    return;
+  }
+
+  std::array<TAffine, 2> curr = {m_viewer->getViewAffine(0),
+                                 m_viewer->getViewAffine(1)};
+  SceneViewer *mainViewer     = nullptr;
+  if (syncZoom || syncPan) mainViewer = resolveMainViewer();
+  if (mainViewer) {
+    m_navSyncing = true;
+    for (int mode = 0; mode < 2; ++mode) {
+      const TAffine &prev = m_lastNavAffs[mode];
+      const TAffine &now  = curr[mode];
+      const double prevDet = std::abs(prev.det());
+      const double nowDet  = std::abs(now.det());
+      const double ratio =
+          (prevDet > 1e-12) ? std::sqrt(nowDet / prevDet) : 1.0;
+      const TPointD panDelta(now.a13 - prev.a13, now.a23 - prev.a23);
+      const bool zoomed = std::abs(ratio - 1.0) > 1e-6;
+      const bool panned =
+          std::abs(panDelta.x) > 1e-6 || std::abs(panDelta.y) > 1e-6;
+
+      TAffine d = mainViewer->getViewAffine(mode);
+      if (syncZoom && zoomed) {
+        const TPointD worldCenter = d.inv() * TPointD(0, 0);
+        d = TAffine::scale(worldCenter, ratio) * d;
+      }
+      if (syncPan && panned && (!zoomed || syncZoom)) {
+        d.a13 += panDelta.x;
+        d.a23 += panDelta.y;
+      }
+      mainViewer->setViewMatrix(d, mode);
+    }
+    mainViewer->invalidateAll();
+    m_navSyncing = false;
+  }
+  m_lastNavAffs     = curr;
+  m_haveLastNavAffs = true;
+}
+
+//-----------------------------------------------------------------------------
+
+void LocatorPopup::onNavigatorViewChanged() {
+  applyNavigatorSyncToMain();
 }
 
 //-----------------------------------------------------------------------------
@@ -728,19 +809,15 @@ void LocatorPopup::persistPanelState() {
 void LocatorPopup::restoreOrFitView() {
   if (!m_viewer) return;
 
-  if (m_followMainPanAct && m_followMainPanAct->isChecked()) {
-    syncViewFromMainViewer();
-    return;
-  }
-
   if (m_viewRestorePending) {
     m_viewRestorePending = false;
     SceneViewer *viewer = m_viewer;
     const std::array<TAffine, 2> affs = m_pendingViewAffs;
-    QTimer::singleShot(0, this, [viewer, affs]() {
+    QTimer::singleShot(0, this, [this, viewer, affs]() {
       for (int mode = 0; mode < 2; ++mode)
         viewer->setViewMatrix(affs[mode], mode);
       viewer->update();
+      captureLastNavAffs();
     });
     m_didInitialViewFit = true;
     return;
@@ -750,6 +827,7 @@ void LocatorPopup::restoreOrFitView() {
     m_didInitialViewFit = true;
     m_viewer->fitToCamera();
   }
+  captureLastNavAffs();
 }
 
 //-----------------------------------------------------------------------------
@@ -761,6 +839,9 @@ void LocatorPopup::updateNavigatorBarsVisibility() {
   if (m_soloColumnTb) m_soloColumnTb->setVisible(m_showDisplayToolbar);
   if (m_matchingStrokeTb) m_matchingStrokeTb->setVisible(m_showDisplayToolbar);
   if (m_gearBtn) m_gearBtn->setVisible(m_showDisplayToolbar);
+  if (m_navTopSpacerAfterGuided)
+    m_navTopSpacerAfterGuided->setVisible(m_showNavGuided &&
+                                          m_showDisplayToolbar);
   if (m_navTopBarHost)
     m_navTopBarHost->setVisible(m_showNavGuided || m_showDisplayToolbar);
 
@@ -1066,6 +1147,7 @@ void LocatorPopup::onTabIndexChanged(int index) {
     applyLocatorTabToViewer();
   else
     applyNavigatorTabToViewer();
+  captureLastNavAffs();
   m_viewer->update();
   changeWindowTitle();
 
@@ -1104,9 +1186,7 @@ void LocatorPopup::onMatchingStrokeToggled(bool checked) {
 
 void LocatorPopup::onChangeViewAff(const TPointD &pos) {
   const int tab = m_tabBar->currentIndex();
-  if (m_tabBar->count() > 1 && tab == TabNavigator &&
-      !m_followMainPanAct->isChecked())
-    return;
+  if (m_tabBar->count() > 1 && tab == TabNavigator) return;
 
   TAffine curAff = m_viewer->getSceneMatrix();
   TAffine newAff(curAff.a11, 0, -pos.x * curAff.a11, 0, curAff.a22,
@@ -1160,6 +1240,7 @@ void LocatorPopup::showEvent(QShowEvent *) {
   assert(ret);
 
   syncActiveLocatorRole();
+  captureLastNavAffs();
 
   changeWindowTitle();
 
