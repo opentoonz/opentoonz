@@ -41,11 +41,6 @@ void ToolHandle::setTool(QString name) {
 
   m_oldToolName = m_toolName = name;
 
-<<<<<<< HEAD
-  TTool *tool = TTool::getTool(m_toolName.toStdString(),
-                               (TTool::ToolTargetType)m_toolTargetType);
-  if (tool == m_tool) return;
-=======
   if (tool == m_tool) {
     // Same tool instance (e.g. shared placeholder on incompatible levels):
     // m_toolName may still have changed — notify listeners to refresh UI.
@@ -55,7 +50,6 @@ void ToolHandle::setTool(QString name) {
     }
     return;
   }
->>>>>>> 9004cdfb3 (fix(navigator): keep Overview off the viewer)
 
   if (m_tool) m_tool->onDeactivate();
 
