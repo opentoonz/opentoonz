@@ -11,6 +11,7 @@
 #include <QFocusEvent>
 #include <QPainter>
 #include <QPushButton>
+#include <QSignalBlocker>
 
 namespace {
 const int NonLinearSliderPrecision = 2;
@@ -360,9 +361,17 @@ void IntField::setRange(int minValue, int maxValue) {
 
 //-----------------------------------------------------------------------------
 
+void IntField::setInputRange(int minValue, int maxValue) {
+  m_lineEdit->setRange(minValue, maxValue);
+  m_roller->setRange(minValue, maxValue);
+}
+
+//-----------------------------------------------------------------------------
+
 void IntField::setValue(int value) {
   if (m_lineEdit->getValue() == value) return;
   m_lineEdit->setValue(value);
+  const QSignalBlocker blocker(m_slider);
   m_slider->setSliderPosition(value2pos(value));
   m_roller->setValue((double)value);
 }
@@ -521,6 +530,7 @@ void IntField::onEditingFinished() {
   if ((pos2value(m_slider->value()) == value && m_slider->isVisible()) ||
       ((int)m_roller->getValue() == value && m_roller->isVisible()))
     return;
+  const QSignalBlocker blocker(m_slider);
   m_slider->setValue(value2pos(value));
   m_roller->setValue((double)value);
   emit valueChanged(false);

@@ -184,6 +184,9 @@ public:
                   \sa getRange() */
   void setRange(int minValue, int maxValue);
 
+  // Set the numeric entry range independently of the slider range.
+  void setInputRange(int minValue, int maxValue);
+
   /*! Set \b minValue and \b maxValue to IntField range.
                   \sa setRange() */
   void getRange(int &minValue, int &maxValue);
