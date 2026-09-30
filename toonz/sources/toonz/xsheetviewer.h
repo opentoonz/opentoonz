@@ -121,6 +121,7 @@ const QColor SelectedMetaColumnColor(216, 180, 245);
 
 // Empty column
 const QColor EmptyColumnColor(124, 124, 124);
+const QColor FreeColumnTint(255, 255, 255, 16);
 // Occupied column
 const QColor NotEmptyColumnColor(164, 164, 164);
 
