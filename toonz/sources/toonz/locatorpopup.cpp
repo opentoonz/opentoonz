@@ -118,8 +118,8 @@ public:
   void paint(QPainter *painter, const QRect &rect, QIcon::Mode mode,
              QIcon::State state) override {
     if (!painter || rect.isEmpty()) return;
-    createQIcon(m_iconName, false).paint(painter, rect, Qt::AlignCenter, mode,
-                                          state);
+    createQIcon(m_iconName, false)
+        .paint(painter, rect, Qt::AlignCenter, mode, state);
     if (!m_slashed) return;
 
     ThemeManager &tm = ThemeManager::getInstance();
