@@ -249,7 +249,7 @@ bool TPSDReader::readLayerInfo(int i) {
     skipBlock(m_file);  // skip  "layer info: extra data";
   } else {
     li->chan    = (TPSDChannelInfo *)mymalloc(li->channels *
-                                           sizeof(struct TPSDChannelInfo));
+                                              sizeof(struct TPSDChannelInfo));
     li->chindex = (int *)mymalloc((li->channels + 2) * sizeof(int));
     li->chindex += 2;  //
 
@@ -308,7 +308,7 @@ bool TPSDReader::readLayerInfo(int i) {
     // process layer's 'additional info'
     // Assumption: File will provide all layerIds or none at all.
     // Set layer id, for now, knowing it may be overwritten if found in file
-    li->layerId = i + 1;
+    li->layerId       = i + 1;
     li->additionalpos = ftell(m_file);
     li->additionallen = extrastart + extralen - li->additionalpos;
     doExtraData(li, li->additionallen);
@@ -655,8 +655,17 @@ void TPSDReader::readImageData(TRasterP &rasP, TPSDLayerInfo *li,
   // prima.
   int rowOffset = std::abs(sby1) % m_shrinkY;
   int rowCount  = rowOffset;
+  // If the current line is not within the image, skip copying it.
+  while (sby1 - rowCount > m_headerInfo.rows - 1) {
+    rowCount += m_shrinkY;
+  }
   // if(m_shrinkY==3) rowCount--;
   for (j = 0; j < smallRas->getLy(); j++) {
+    // If the current line is not within the image, skip copying it.
+    if (sby1 - rowCount < 0) {
+      rowCount += m_shrinkY;
+      continue;
+    }
     for (ch = 0; ch < chancount; ++ch) {
       /* get row data */
       if (map[ch] < 0 || map[ch] > chancount) {
@@ -664,11 +673,6 @@ void TPSDReader::readImageData(TRasterP &rasP, TPSDLayerInfo *li,
         memset(inrows[ch], 0, chan->rowbytes);  // zero out the row
       } else
         readrow(m_file, chan + map[ch], rowCount, inrows[ch], rledata);
-    }
-    // se la riga corrente non rientra nell'immagine salto la copia
-    if (sby1 - rowCount < 0 || sby1 - rowCount > m_headerInfo.rows - 1) {
-      rowCount += m_shrinkY;
-      continue;
     }
     if (depth == 1 && chancount == 1) {
       if (!(layerSaveBox.getP00().x - sbx0 >= 0 &&
