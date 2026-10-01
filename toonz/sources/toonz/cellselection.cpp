@@ -1849,10 +1849,10 @@ void TCellSelection::doPaste() {
     c1 -= cAdj;
   }
 
-  TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
-  int lastColumn =
-      cellData->getColCount() == 1 && c0 < c1 ? c1
-                                               : c0 + cellData->getColCount() - 1;
+  TXsheet *xsh    = TApp::instance()->getCurrentXsheet()->getXsheet();
+  int lastColumn = cellData->getColCount() == 1 && c0 < c1
+                       ? c1
+                       : c0 + cellData->getColCount() - 1;
   for (int c = c0; c <= lastColumn; ++c) {
     TXshColumn *column = xsh->getColumn(c);
     if (!column || column->isEmpty()) {
