@@ -693,6 +693,7 @@ void StageBuilder::addCellWithOnionSkin(PlayerSet &players, ToonzScene *scene,
     }
 
     m_onionSkinDistance = 0;
+    m_onionSkinOpacity  = -1.0;
     {
       const bool isCurrentCol = (subSheetColIndex >= 0)
                                     ? (subSheetColIndex == m_currentColumnIndex)
@@ -702,6 +703,7 @@ void StageBuilder::addCellWithOnionSkin(PlayerSet &players, ToonzScene *scene,
     }
 
     m_onionSkinDistance = c_noOnionSkin;
+    m_onionSkinOpacity  = -1.0;
   } else {
     const bool isCurrentCol = (subSheetColIndex >= 0)
                                   ? (subSheetColIndex == m_currentColumnIndex)

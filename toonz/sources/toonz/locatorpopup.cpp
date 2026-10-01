@@ -347,10 +347,6 @@ LocatorPopup::LocatorPopup(QWidget *parent, Qt::WindowFlags flags)
           &Preferences::locatorNavigatorTabEnabledChanged, this,
           &LocatorPopup::onLocatorNavigatorPreferenceChanged);
 
-  connect(ThemePropertiesNotifier::instance(),
-          &ThemePropertiesNotifier::propertiesChanged, this,
-          &LocatorPopup::refreshNavigatorThemedIcons);
-
   updateNavigatorBarsVisibility();
 
   updateTabPageSizeConsistency();
