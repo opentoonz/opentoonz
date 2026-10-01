@@ -100,7 +100,7 @@ void copyCellsWithoutUndo(int r0, int c0, int r1, int c1) {
   int colCount = c1 - c0 + 1;
   int rowCount = r1 - r0 + 1;
   if (colCount <= 0 || rowCount <= 0) return;
-  TXsheet *xsh    = TApp::instance()->getCurrentXsheet()->getXsheet();
+  TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
   TCellData *data = new TCellData();
   data->setCells(xsh, r0, c0, r1, c1);
   QApplication::clipboard()->setMimeData(data, QClipboard::Clipboard);
