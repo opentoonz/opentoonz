@@ -39,6 +39,7 @@
 #include <QMainWindow>
 #include <QMenu>
 #include <QIcon>
+#include <QIconEngine>
 #include <QImage>
 #include <QPainter>
 #include <QPixmap>
@@ -102,35 +103,45 @@ void drawNavigatorDisableSlash(QPainter &painter, int size, const QColor &c) {
   painter.drawLine(QPointF(3, size - 3.5), QPointF(size - 3, 3.5));
 }
 
-QPixmap navigatorThemedIconPixmap(const QString &iconName, int size) {
-  const QPixmap pm = createQIcon(iconName, false).pixmap(size, size);
-  return pm.isNull() ? QPixmap(size, size) : pm;
-}
+class NavigatorSlashedSvgIconEngine final : public QIconEngine {
+  QString m_iconName;
+  bool m_slashed;
 
-QPixmap navigatorSlashedPixmap(const QPixmap &base, const QColor &ink,
-                               int size) {
-  if (base.isNull()) return base;
-  QPixmap pm = base;
-  QPainter painter(&pm);
-  painter.setRenderHint(QPainter::Antialiasing, true);
-  drawNavigatorDisableSlash(painter, size, ink);
-  return pm;
-}
+public:
+  NavigatorSlashedSvgIconEngine(const QString &iconName, bool slashed)
+      : m_iconName(iconName), m_slashed(slashed) {}
 
-QIcon navigatorToggleIcon(const QPixmap &base, bool checked, const QColor &ink,
-                          int size) {
-  return QIcon(checked ? navigatorSlashedPixmap(base, ink, size) : base);
-}
+  QIconEngine *clone() const override {
+    return new NavigatorSlashedSvgIconEngine(m_iconName, m_slashed);
+  }
 
-void styleNavigatorToggleButton(QToolButton *tb) {
-  if (!tb) return;
-  tb->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  tb->setStyleSheet(QStringLiteral(
-      "QToolButton { border: none; background: transparent; padding: 0; "
-      "margin: 0; min-width: 0; min-height: 0; }"
-      "QToolButton:hover { background: rgba(128, 128, 128, 0.12); }"
-      "QToolButton:checked { background: transparent; border: none; }"
-      "QToolButton:checked:hover { background: rgba(128, 128, 128, 0.12); }"));
+  void paint(QPainter *painter, const QRect &rect, QIcon::Mode mode,
+             QIcon::State state) override {
+    if (!painter || rect.isEmpty()) return;
+    createQIcon(m_iconName, false).paint(painter, rect, Qt::AlignCenter, mode,
+                                          state);
+    if (!m_slashed) return;
+
+    ThemeManager &tm = ThemeManager::getInstance();
+    QColor slash     = tm.getIconBaseColor();
+    if (!slash.isValid())
+      slash = tm.getCustomPropertyColor(QStringLiteral("icon-base-color"));
+    if (!slash.isValid()) slash = QColor(0xd8, 0xd8, 0xd8);
+
+    painter->save();
+    painter->setRenderHint(QPainter::Antialiasing, true);
+    const int s  = qMin(rect.width(), rect.height());
+    const int ox = rect.x() + (rect.width() - s) / 2;
+    const int oy = rect.y() + (rect.height() - s) / 2;
+    painter->translate(ox, oy);
+    drawNavigatorDisableSlash(*painter, s, slash);
+    painter->restore();
+  }
+};
+
+QIcon navigatorVisibilityIcon(const QString &iconName, bool slashed) {
+  return slashed ? QIcon(new NavigatorSlashedSvgIconEngine(iconName, true))
+                 : createQIcon(iconName, false);
 }
 
 bool isPointerPress(QEvent::Type t) {
@@ -397,7 +408,7 @@ void LocatorPopup::buildNavigatorToolbar() {
   m_hideCurrentTb->setToolTip(tr("Show current drawing"));
   m_hideCurrentTb->setChecked(false);
   m_hideCurrentTb->setAutoRaise(true);
-  styleNavigatorToggleButton(m_hideCurrentTb);
+  m_hideCurrentTb->setIcon(createQIcon(QStringLiteral("preview"), false));
   m_hideCurrentTb->setFixedSize(kNavTopBtnSize, kNavTopBtnSize);
   m_hideCurrentTb->setIconSize(QSize(kNavTopIconSize, kNavTopIconSize));
 
@@ -406,7 +417,8 @@ void LocatorPopup::buildNavigatorToolbar() {
   m_soloColumnTb->setToolTip(tr("Show all columns"));
   m_soloColumnTb->setChecked(false);
   m_soloColumnTb->setAutoRaise(true);
-  styleNavigatorToggleButton(m_soloColumnTb);
+  m_soloColumnTb->setIcon(
+      createQIcon(QStringLiteral("navigator_column"), false));
   m_soloColumnTb->setFixedSize(kNavTopBtnSize, kNavTopBtnSize);
   m_soloColumnTb->setIconSize(QSize(kNavTopIconSize, kNavTopIconSize));
 
@@ -415,7 +427,8 @@ void LocatorPopup::buildNavigatorToolbar() {
   m_matchingStrokeTb->setToolTip(tr("Show onion skin in other viewers"));
   m_matchingStrokeTb->setChecked(false);
   m_matchingStrokeTb->setAutoRaise(true);
-  styleNavigatorToggleButton(m_matchingStrokeTb);
+  m_matchingStrokeTb->setIcon(
+      createQIcon(QStringLiteral("navigator_onionskin"), false));
   m_matchingStrokeTb->setFixedSize(kNavTopBtnSize, kNavTopBtnSize);
   m_matchingStrokeTb->setIconSize(QSize(kNavTopIconSize, kNavTopIconSize));
 
@@ -681,17 +694,12 @@ QColor LocatorPopup::themeIconBaseColor() const {
 
 void LocatorPopup::updateNavigatorVisibilityIcons() {
   if (!m_hideCurrentTb || !m_soloColumnTb || !m_matchingStrokeTb) return;
-  const int iconPx = m_navTopIconPx > 0 ? m_navTopIconPx : kNavTopIconSize;
-  const QColor ink = themeIconBaseColor();
-  m_hideCurrentTb->setIcon(navigatorToggleIcon(
-      navigatorThemedIconPixmap(QStringLiteral("preview"), iconPx),
-      m_hideCurrentTb->isChecked(), ink, iconPx));
-  m_soloColumnTb->setIcon(navigatorToggleIcon(
-      navigatorThemedIconPixmap(QStringLiteral("navigator_column"), iconPx),
-      m_soloColumnTb->isChecked(), ink, iconPx));
-  m_matchingStrokeTb->setIcon(navigatorToggleIcon(
-      navigatorThemedIconPixmap(QStringLiteral("navigator_onionskin"), iconPx),
-      m_matchingStrokeTb->isChecked(), ink, iconPx));
+  m_hideCurrentTb->setIcon(navigatorVisibilityIcon(
+      QStringLiteral("preview"), m_hideCurrentTb->isChecked()));
+  m_soloColumnTb->setIcon(navigatorVisibilityIcon(
+      QStringLiteral("navigator_column"), m_soloColumnTb->isChecked()));
+  m_matchingStrokeTb->setIcon(navigatorVisibilityIcon(
+      QStringLiteral("navigator_onionskin"), m_matchingStrokeTb->isChecked()));
   updateNavigatorToolbarTooltips();
 }
 
