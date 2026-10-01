@@ -86,8 +86,11 @@ jobs:
         cp appdir/usr/share/icons/hicolor/*/apps/*.png appdir
 
         mkdir artifact
-        mv appdir/usr/share/opentoonz/stuff artifact/portablestuff
-        rmdir appdir/usr/share/opentoonz
+        # Copy rather than move: the AppImage keeps its own
+        # usr/share/opentoonz/stuff so it can seed a config when run on its
+        # own, while the tarball still ships portablestuff next to it for
+        # portable-mode testing.
+        cp -r appdir/usr/share/opentoonz/stuff artifact/portablestuff
 
         wget -q -c 'https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage'
         wget -q -c 'https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage'
@@ -119,6 +122,39 @@ jobs:
         ARTIFACT_NAME=Opentoonz-${{ runner.os }}-${{ matrix.compiler }}-${{ github.sha }}
         mv artifact ${ARTIFACT_NAME}
         tar zcf ${ARTIFACT_NAME}.tar.gz ${ARTIFACT_NAME}
+
+    - name: Smoke test the installed tree
+      # Nothing else in CI runs a built binary. tconverter seeds before it
+      # parses arguments, so a bare invocation does the work and exits 1.
+      run: |
+        set -eu
+        export QT_QPA_PLATFORM=offscreen
+        CONF=.config/OpenToonz
+
+        # $ORIGIN RPATH resolves the bundled libraries without LD_LIBRARY_PATH
+        ! ldd /opt/opentoonz/bin/tconverter | grep 'not found'
+
+        # first run seeds the default root
+        export HOME="$(mktemp -d)"
+        timeout 120 /opt/opentoonz/bin/tconverter || true
+        test -d "$HOME/$CONF/stuff/profiles"
+        grep -q "^TOONZROOT=$HOME/$CONF/stuff$" "$HOME/$CONF/SystemVar.ini"
+
+        # a root configured elsewhere is left alone, present or not
+        export HOME="$(mktemp -d)"
+        mkdir -p "$HOME/$CONF"
+        printf '[General]\nTOONZROOT=/nonexistent/elsewhere\n' > "$HOME/$CONF/SystemVar.ini"
+        timeout 120 /opt/opentoonz/bin/tconverter || true
+        test ! -e "$HOME/$CONF/stuff"
+        grep -q '^TOONZROOT=/nonexistent/elsewhere$' "$HOME/$CONF/SystemVar.ini"
+
+        # an ini without a root gets one, and keeps its other keys (#7001)
+        export HOME="$(mktemp -d)"
+        mkdir -p "$HOME/$CONF"
+        printf '[General]\nTOONZPROFILES=/keep/me\n' > "$HOME/$CONF/SystemVar.ini"
+        timeout 120 /opt/opentoonz/bin/tconverter || true
+        grep -q "^TOONZROOT=$HOME/$CONF/stuff$" "$HOME/$CONF/SystemVar.ini"
+        grep -q '^TOONZPROFILES=/keep/me$' "$HOME/$CONF/SystemVar.ini"
 
     - uses: actions/upload-artifact@v6
       with:
