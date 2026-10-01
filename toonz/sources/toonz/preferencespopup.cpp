@@ -2275,6 +2275,7 @@ QWidget* PreferencesPopup::createToolsPage() {
     // Use IntField to display 100% instead of 1.0
     IntField* handleSizeSlider = new IntField(this);
     handleSizeSlider->setRange(100, 600);  // scale range: 100% to 600%
+    handleSizeSlider->setInputRange(1, 600);
 
     // Get the decimal value (e.g., 1.0) and multiply by 100 for the slider
     double currentVal = Preferences::instance()->getAnimateToolHandleSize();
