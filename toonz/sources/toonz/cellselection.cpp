@@ -1832,11 +1832,36 @@ static void pasteRasterImageInCell(int row, int col,
 void TCellSelection::doPaste() {
   // The numbers-only preference applies to copied cells, not drawing
   // selections or images on the clipboard.
-  if (Preferences::instance()->getPasteCellsBehavior() == 0 ||
-      !dynamic_cast<const TCellData *>(QApplication::clipboard()->mimeData()))
+  const TCellData *cellData =
+      dynamic_cast<const TCellData *>(QApplication::clipboard()->mimeData());
+  if (Preferences::instance()->getPasteCellsBehavior() == 0 || !cellData) {
     pasteCells();
-  else
-    overwritePasteNumbers();
+    return;
+  }
+
+  int r0, c0, r1, c1;
+  getSelectedCells(r0, c0, r1, c1);
+
+  XsheetViewer *viewer = TApp::instance()->getCurrentXsheetViewer();
+  if (viewer && !viewer->orientation()->isVerticalTimeline()) {
+    int cAdj = cellData->getColCount() - 1;
+    c0 -= cAdj;
+    c1 -= cAdj;
+  }
+
+  TXsheet *xsh   = TApp::instance()->getCurrentXsheet()->getXsheet();
+  int lastColumn = cellData->getColCount() == 1 && c0 < c1
+                       ? c1
+                       : c0 + cellData->getColCount() - 1;
+  for (int c = c0; c <= lastColumn; ++c) {
+    TXshColumn *column = xsh->getColumn(c);
+    if (!column || column->isEmpty()) {
+      pasteCells();
+      return;
+    }
+  }
+
+  overwritePasteNumbers();
 }
 
 //-----------------------------------------------------------------------------
