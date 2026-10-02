@@ -66,6 +66,8 @@ TEnv::IntVar RasterBrushPencilMode("InknpaintRasterBrushPencilMode", 0);
 TEnv::IntVar BrushPressureSensitivity("InknpaintBrushPressureSensitivity", 1);
 TEnv::DoubleVar RasterBrushHardness("RasterBrushHardness", 100);
 TEnv::DoubleVar RasterBrushModifierSize("RasterBrushModifierSize", 0);
+TEnv::IntVar RasterBrushModifierEraser("RasterBrushModifierEraser", 0);
+TEnv::IntVar RasterBrushEraserMode("RasterBrushEraserMode", 0);
 TEnv::StringVar RasterBrushPreset("RasterBrushPreset", "<custom>");
 TEnv::IntVar BrushLockAlpha("InknpaintBrushLockAlpha", 0);
 TEnv::IntVar RasterBrushAssistants("RasterBrushAssistants", 1);
@@ -749,6 +751,8 @@ ToonzRasterBrushTool::ToonzRasterBrushTool(std::string name, int targetType)
     , m_pencil("Pencil", false)
     , m_pressure("Pressure", true)
     , m_modifierSize("ModifierSize", -3, 3, 0, true)
+    , m_modifierEraser("ModifierEraser", false)
+    , m_eraserMode("ModifierEraserMode")
     , m_modifierLockAlpha("Lock Alpha", false)
     , m_assistants("Assistants", true)
     , m_targetType(targetType)
@@ -768,6 +772,8 @@ ToonzRasterBrushTool::ToonzRasterBrushTool(std::string name, int targetType)
   m_prop[0].bind(m_hardness);
   m_prop[0].bind(m_smooth);
   m_prop[0].bind(m_drawOrder);
+  m_prop[0].bind(m_modifierEraser);
+  m_prop[0].bind(m_eraserMode);
   m_prop[0].bind(m_modifierLockAlpha);
   m_prop[0].bind(m_pencil);
   m_prop[0].bind(m_assistants);
@@ -778,12 +784,18 @@ ToonzRasterBrushTool::ToonzRasterBrushTool(std::string name, int targetType)
   m_drawOrder.addValue(L"Palette Order");
   m_drawOrder.setId("DrawOrder");
 
+  m_eraserMode.addValue(L"Lines");
+  m_eraserMode.addValue(L"Areas");
+  m_eraserMode.addValue(L"Lines & Areas");
+  m_eraserMode.setId("EraserMode");
+
   m_prop[0].bind(m_pressure);
 
   m_prop[0].bind(m_preset);
   m_preset.setId("BrushPreset");
   m_preset.addValue(CUSTOM_WSTR);
   m_pressure.setId("PressureSensitivity");
+  m_modifierEraser.setId("RasterEraser");
   m_modifierLockAlpha.setId("LockAlpha");
   m_smooth.setId("Smooth");
 
@@ -1005,6 +1017,11 @@ void ToonzRasterBrushTool::updateTranslation() {
   m_preset.setItemUIName(CUSTOM_WSTR, tr("<custom>"));
   m_pencil.setQStringName(tr("Pencil"));
   m_pressure.setQStringName(tr("Pressure"));
+  m_modifierEraser.setQStringName(tr("Eraser"));
+  m_eraserMode.setQStringName(tr("Mode:"));
+  m_eraserMode.setItemUIName(L"Lines", tr("Lines"));
+  m_eraserMode.setItemUIName(L"Areas", tr("Areas"));
+  m_eraserMode.setItemUIName(L"Lines & Areas", tr("Lines & Areas"));
   m_modifierLockAlpha.setQStringName(tr("Lock Alpha"));
   m_assistants.setQStringName(tr("Assistants"));
 }
@@ -1243,6 +1260,27 @@ void ToonzRasterBrushTool::inputSetBusy(bool busy) {
           MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC);
       m_painting.myPaint.baseBrush.setBaseValue(
           MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC, baseSize + modifierSize);
+
+      const bool presetEraser = m_painting.myPaint.baseBrush.getBaseValue(
+                                    MYPAINT_BRUSH_SETTING_ERASER) > 0.5f;
+      m_painting.myPaint.eraser = m_modifierEraser.getValue() || presetEraser;
+      m_painting.myPaint.eraserMode =
+          static_cast<MyPaintToonzEraserMode>(m_eraserMode.getIndex());
+
+      if (m_painting.myPaint.eraser) {
+        // Render the brush shape into the work raster. Eraser mappings are
+        // flattened because libmypaint cannot erase an empty coverage mask.
+        m_painting.myPaint.baseBrush.setBaseValue(MYPAINT_BRUSH_SETTING_ERASER,
+                                                  0.0f);
+        m_painting.myPaint.baseBrush.setBaseValue(
+            MYPAINT_BRUSH_SETTING_LOCK_ALPHA, 0.0f);
+        for (int i = 0; i < MYPAINT_BRUSH_INPUTS_COUNT; ++i) {
+          m_painting.myPaint.baseBrush.setMappingN(MYPAINT_BRUSH_SETTING_ERASER,
+                                                   (MyPaintBrushInput)i, 0);
+          m_painting.myPaint.baseBrush.setMappingN(
+              MYPAINT_BRUSH_SETTING_LOCK_ALPHA, (MyPaintBrushInput)i, 0);
+        }
+      }
     } else if (m_hardness.getValue() == 100 || m_pencil.getValue()) {
       // init pencil drawing
 
@@ -1355,7 +1393,8 @@ void ToonzRasterBrushTool::inputPaintTrackPoint(const TTrackPoint &point,
     if (!updateRect.isEmpty())
       handler->brush.updateDrawing(
           ras, m_backupRas, m_painting.myPaint.strokeSegmentRect,
-          m_painting.styleId, m_modifierLockAlpha.getValue());
+          m_painting.styleId, m_modifierLockAlpha.getValue(),
+          m_painting.myPaint.eraser, m_painting.myPaint.eraserMode);
 
     // determine invalidate rect
     invalidateRect += convert(m_painting.myPaint.strokeSegmentRect) - rasCenter;
@@ -1666,7 +1705,10 @@ void ToonzRasterBrushTool::updateWorkAndBackupRasters(const TRect &rect) {
     enlargedRect *= ras->getBounds();
     if (enlargedRect.isEmpty()) return;
 
-    m_workRas->extract(enlargedRect)->copy(ras->extract(enlargedRect));
+    if (m_painting.myPaint.isActive && m_painting.myPaint.eraser)
+      m_workRas->extract(enlargedRect)->clear();
+    else
+      m_workRas->extract(enlargedRect)->copy(ras->extract(enlargedRect));
     m_backupRas->extract(enlargedRect)->copy(ras->extract(enlargedRect));
   } else {
     if (enlargedRect.x0 < m_workBackupRect.x0) enlargedRect.x0 -= dx;
@@ -1680,7 +1722,10 @@ void ToonzRasterBrushTool::updateWorkAndBackupRasters(const TRect &rect) {
     TRect lastRect     = m_workBackupRect * ras->getBounds();
     QList<TRect> rects = ToolUtils::splitRect(enlargedRect, lastRect);
     for (int i = 0; i < rects.size(); i++) {
-      m_workRas->extract(rects[i])->copy(ras->extract(rects[i]));
+      if (m_painting.myPaint.isActive && m_painting.myPaint.eraser)
+        m_workRas->extract(rects[i])->clear();
+      else
+        m_workRas->extract(rects[i])->copy(ras->extract(rects[i]));
       m_backupRas->extract(rects[i])->copy(ras->extract(rects[i]));
     }
   }
@@ -1706,16 +1751,18 @@ bool ToonzRasterBrushTool::onPropertyChanged(std::string propertyName) {
     return true;
   }
 
-  RasterBrushMinSize       = m_rasThickness.getValue().first;
-  RasterBrushMaxSize       = m_rasThickness.getValue().second;
-  BrushSmooth              = m_smooth.getValue();
-  BrushDrawOrder           = m_drawOrder.getIndex();
-  RasterBrushPencilMode    = m_pencil.getValue();
-  BrushPressureSensitivity = m_pressure.getValue();
-  RasterBrushHardness      = m_hardness.getValue();
-  RasterBrushModifierSize  = m_modifierSize.getValue();
-  BrushLockAlpha           = m_modifierLockAlpha.getValue();
-  RasterBrushAssistants    = m_assistants.getValue();
+  RasterBrushMinSize        = m_rasThickness.getValue().first;
+  RasterBrushMaxSize        = m_rasThickness.getValue().second;
+  BrushSmooth               = m_smooth.getValue();
+  BrushDrawOrder            = m_drawOrder.getIndex();
+  RasterBrushPencilMode     = m_pencil.getValue();
+  BrushPressureSensitivity  = m_pressure.getValue();
+  RasterBrushHardness       = m_hardness.getValue();
+  RasterBrushModifierSize   = m_modifierSize.getValue();
+  RasterBrushModifierEraser = m_modifierEraser.getValue() ? 1 : 0;
+  RasterBrushEraserMode     = m_eraserMode.getIndex();
+  BrushLockAlpha            = m_modifierLockAlpha.getValue();
+  RasterBrushAssistants     = m_assistants.getValue();
 
   if (propertyName == m_modifierSize.getName()) updateCurrentStyle();
 
@@ -1786,6 +1833,8 @@ void ToonzRasterBrushTool::loadPreset() {
     m_pencil.setValue(preset.m_pencil);
     m_pressure.setValue(preset.m_pressure);
     m_modifierSize.setValue(preset.m_modifierSize);
+    m_modifierEraser.setValue(preset.m_modifierEraser);
+    m_eraserMode.setIndex(std::min(2, std::max(0, preset.m_eraserMode)));
     m_modifierLockAlpha.setValue(preset.m_modifierLockAlpha);
     m_assistants.setValue(preset.m_assistants);
 
@@ -1973,6 +2022,8 @@ void ToonzRasterBrushTool::addPreset(QString name) {
   preset.m_pencil            = m_pencil.getValue();
   preset.m_pressure          = m_pressure.getValue();
   preset.m_modifierSize      = m_modifierSize.getValue();
+  preset.m_modifierEraser    = m_modifierEraser.getValue();
+  preset.m_eraserMode        = m_eraserMode.getIndex();
   preset.m_modifierLockAlpha = m_modifierLockAlpha.getValue();
   preset.m_assistants        = m_assistants.getValue();
   
@@ -2078,6 +2129,8 @@ void ToonzRasterBrushTool::loadLastBrush() {
   m_pressure.setValue(BrushPressureSensitivity ? 1 : 0);
   m_smooth.setValue(BrushSmooth);
   m_modifierSize.setValue(RasterBrushModifierSize);
+  m_modifierEraser.setValue(RasterBrushModifierEraser ? 1 : 0);
+  m_eraserMode.setIndex(std::min(2, std::max(0, (int)RasterBrushEraserMode)));
   m_modifierLockAlpha.setValue(BrushLockAlpha ? 1 : 0);
   m_assistants.setValue(RasterBrushAssistants ? 1 : 0);
 
@@ -2182,6 +2235,7 @@ BrushData::BrushData()
     , m_modifierOpacity(0.0)
     , m_modifierEraser(0.0)
     , m_modifierLockAlpha(0.0)
+    , m_eraserMode(0)
     , m_assistants(false)
     , m_styleInfoVersion(0)
     , m_hasMyPaint(false)
@@ -2217,6 +2271,7 @@ BrushData::BrushData(const std::wstring &name)
     , m_modifierOpacity(0.0)
     , m_modifierEraser(0.0)
     , m_modifierLockAlpha(0.0)
+    , m_eraserMode(0)
     , m_assistants(false)
     , m_styleInfoVersion(0)
     , m_hasMyPaint(false)
@@ -2270,6 +2325,9 @@ void BrushData::saveData(TOStream &os) {
   os.closeChild();
   os.openChild("Modifier_Eraser");
   os << (int)m_modifierEraser;
+  os.closeChild();
+  os.openChild("Eraser_Mode");
+  os << m_eraserMode;
   os.closeChild();
   os.openChild("Modifier_LockAlpha");
   os << (int)m_modifierLockAlpha;
@@ -2375,6 +2433,8 @@ void BrushData::loadData(TIStream &is) {
       is >> m_modifierOpacity, is.matchEndTag();
     else if (tagName == "Modifier_Eraser")
       is >> val, m_modifierEraser = val, is.matchEndTag();
+    else if (tagName == "Eraser_Mode")
+      is >> m_eraserMode, is.matchEndTag();
     else if (tagName == "Modifier_LockAlpha")
       is >> val, m_modifierLockAlpha = val, is.matchEndTag();
     else if (tagName == "Assistants")

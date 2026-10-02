@@ -10,7 +10,8 @@
 
 namespace {
 void putOnRasterCM(const TRasterCM32P &out, const TRaster32P &in, int styleId,
-                   bool lockAlpha) {
+                   bool lockAlpha, bool eraser,
+                   MyPaintToonzEraserMode eraserMode) {
   if (!out.getPointer() || !in.getPointer()) return;
   assert(out->getSize() == in->getSize());
   int x, y;
@@ -25,6 +26,22 @@ void putOnRasterCM(const TRasterCM32P &out, const TRaster32P &in, int styleId,
       TPixel32 *inPix = &in->pixels(y)[x];
       if (inPix->m == 0) continue;
       TPixelCM32 *outPix = &out->pixels(y)[x];
+      if (eraser) {
+        const bool eraseLines = eraserMode != MyPaintToonzEraserMode::Areas;
+        const bool eraseAreas = eraserMode != MyPaintToonzEraserMode::Lines;
+
+        int ink   = outPix->getInk();
+        int paint = eraseAreas ? 0 : outPix->getPaint();
+        int tone  = outPix->getTone();
+        if (eraseLines)
+          tone += ((int)inPix->m * (TPixelCM32::getMaxTone() - tone) + 127) /
+                  TPixelCM32::getMaxTone();
+
+        // A fully transparent pixel must not retain a stale ink style.
+        if (tone == TPixelCM32::getMaxTone() && paint == 0) ink = 0;
+        *outPix = TPixelCM32(ink, paint, tone);
+        continue;
+      }
       if (lockAlpha && !outPix->isPureInk() && outPix->getPaint() == 0 &&
           outPix->getTone() == 255) {
         *outPix =
@@ -215,7 +232,8 @@ void MyPaintToonzBrush::strokeTo(const TPointD &position, double pressure,
 void MyPaintToonzBrush::updateDrawing(const TRasterCM32P rasCM,
                                       const TRasterCM32P rasBackupCM,
                                       const TRect &bbox, int styleId,
-                                      bool lockAlpha) const {
+                                      bool lockAlpha, bool eraser,
+                                      MyPaintToonzEraserMode eraserMode) const {
   if (!rasCM) return;
 
   TRect rasRect    = rasCM->getBounds();
@@ -224,5 +242,5 @@ void MyPaintToonzBrush::updateDrawing(const TRasterCM32P rasCM,
 
   rasCM->copy(rasBackupCM->extract(targetRect), targetRect.getP00());
   putOnRasterCM(rasCM->extract(targetRect), m_ras->extract(targetRect), styleId,
-                lockAlpha);
+                lockAlpha, eraser, eraserMode);
 }
