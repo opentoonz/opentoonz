@@ -31,6 +31,7 @@
 #define T_Ruler "T_Ruler"
 #define T_Finger "T_Finger"
 #define T_EditAssistants "T_EditAssistants"
+#define T_ShiftTrace "T_ShiftTrace"
 
 // Viewer Navigation tools (available only during the shortcut key is pressed)
 #define T_ZoomView "T_ZoomView"

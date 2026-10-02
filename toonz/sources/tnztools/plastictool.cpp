@@ -23,6 +23,7 @@
 #include "toonz/doubleparamcmd.h"
 #include "toonz/palettecontroller.h"
 #include "toonz/txshsimplelevel.h"
+#include "tools/toolhandle.h"
 
 // TnzExt includes
 #include "ext/plasticskeleton.h"
@@ -413,7 +414,7 @@ PlasticToolOptionsBox::PlasticToolOptionsBox(QWidget *parent, TTool *tool,
   // Add sub-options for each mode group
   for (int m = 0; m != PlasticTool::MODES_COUNT; ++m)
     m_subToolbars[m] =
-        new GenericToolOptionsBox(0, tool, pltHandle, m, 0, false);
+        new GenericToolOptionsBox(0, tool, pltHandle, m, toolHandle, false);
 
   meshifyButton->setFixedHeight(20);
   int buttonWidth = fontMetrics().horizontalAdvance(meshifyButton->text()) + 20;
@@ -445,7 +446,7 @@ PlasticToolOptionsBox::PlasticToolOptionsBox(QWidget *parent, TTool *tool,
 
   bool ret = true;
   ret      = ret && connect(meshifyButton, SIGNAL(clicked()), meshifyAction,
-                       SLOT(trigger()));
+                            SLOT(trigger()));
   assert(ret);
 
   // Add Animation mode fields corresponding to vertex properties
@@ -642,8 +643,9 @@ PlasticTool::PlasticTool()
     , m_showSkeletonOS(true)
     , m_recompileOnMouseRelease(false) {
   // And now, a little trick about tool binding
-  bind(TTool::AllImages | TTool::EmptyTarget);   // Attach the tool to all types :)
-  bind(TTool::MeshLevels);  // But disable it for all but meshes :0
+  bind(TTool::AllImages |
+       TTool::EmptyTarget);  // Attach the tool to all types :)
+  bind(TTool::MeshLevels);   // But disable it for all but meshes :0
 
   // This little trick is needed to associate the tool to common levels (the
   // toolbar must appear), in
@@ -697,6 +699,36 @@ PlasticTool::~PlasticTool() {
 
 //------------------------------------------------------------------------
 
+int PlasticTool::currentSkeletonId() const {
+  return PlasticToolLocals::skeletonId();
+}
+
+//------------------------------------------------------------------------
+
+void PlasticTool::keyframePlasticRelays(
+    TDoubleParamRelayProperty *editedRelay) {
+  auto setKeyframe = [](TDoubleParamRelayProperty *prop) {
+    if (!prop) return;
+    TDoubleParam *p = prop->getParam().getPointer();
+    if (!p) return;
+    const double f = prop->frame();
+    if (!p->isKeyframe(f)) {
+      KeyframeSetter setter(p, -1, true);
+      setter.createKeyframe(f);
+    }
+  };
+
+  if (m_globalKey.getValue()) {
+    setKeyframe(&m_distanceRelay);
+    setKeyframe(&m_angleRelay);
+    setKeyframe(&m_soRelay);
+  } else {
+    setKeyframe(editedRelay);
+  }
+}
+
+//------------------------------------------------------------------------
+
 TTool::ToolType PlasticTool::getToolType() const {
   switch (m_mode.getIndex()) {
   case MESH_IDX:
@@ -715,13 +747,18 @@ TTool::ToolType PlasticTool::getToolType() const {
 //------------------------------------------------------------------------
 
 void PlasticTool::updateTranslation() {
+  const int modeIndex = m_mode.getIndex();
+
   m_mode.setQStringName(tr("Mode:"));
   m_mode.deleteAllValues();
   m_mode.addValue(tr("Edit Mesh").toStdWString());
   m_mode.addValue(tr("Paint Rigid").toStdWString());
   m_mode.addValue(tr("Build Skeleton").toStdWString());
   m_mode.addValue(tr("Animate").toStdWString());
-  m_mode.setIndex(BUILD_IDX);
+  if (modeIndex >= 0 && modeIndex < MODES_COUNT)
+    m_mode.setIndex(modeIndex);
+  else
+    m_mode.setIndex(BUILD_IDX);
 
   m_vertexName.setQStringName(tr("Vertex Name:"));
   m_interpolate.setQStringName(tr("Allow Stretching"));
@@ -1069,6 +1106,9 @@ void PlasticTool::onSelectionChanged() {
   m_distanceRelay.notifyListeners();
   m_angleRelay.notifyListeners();
   m_soRelay.notifyListeners();
+
+  if (ToolHandle *th = TTool::getApplication()->getCurrentTool())
+    th->notifyToolChanged();
 }
 
 //------------------------------------------------------------------------
@@ -1606,12 +1646,16 @@ bool PlasticTool::onPropertyChanged(std::string propertyName) {
       m_sd->skeleton(skelId)->vertex(m_svSel).m_interpolate =
           m_interpolate.getValue();
 
-      m_interpolate.notifyListeners();  // NOTE: This should NOT invoke this
-                                        // function recursively
-
       PlasticDeformerStorage::instance()->invalidateSkeleton(
           m_sd.getPointer(), skelId, PlasticDeformerStorage::ALL);
     }
+    m_interpolate.notifyListeners();
+  } else if (propertyName == "snapToMesh") {
+    m_snapToMesh.notifyListeners();
+  } else if (propertyName == "globalKeyframe") {
+    m_globalKey.notifyListeners();
+  } else if (propertyName == "keepDistance") {
+    m_keepDistance.notifyListeners();
   } else if (propertyName == "minAngle") {
     if (m_sd && m_svSel >= 0) {
       // Set maxAngle property to the associated skeleton vertex

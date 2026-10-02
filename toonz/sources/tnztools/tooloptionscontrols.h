@@ -87,8 +87,8 @@ public:
 //    ToolOptionControl derivative  declarations
 //***********************************************************************************
 
-class ToolOptionCheckbox final : public DVGui::CheckBox,
-                                 public ToolOptionControl {
+class DVAPI ToolOptionCheckbox final : public DVGui::CheckBox,
+                                       public ToolOptionControl {
   Q_OBJECT
 
 protected:
@@ -97,6 +97,7 @@ protected:
 public:
   ToolOptionCheckbox(TTool *tool, TBoolProperty *property,
                      ToolHandle *toolHandle = 0, QWidget *parent = 0);
+  ~ToolOptionCheckbox() override;
   void updateStatus() override;
 
 protected:
@@ -179,7 +180,7 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class ToolOptionCombo final : public QComboBox, public ToolOptionControl {
+class DVAPI ToolOptionCombo final : public QComboBox, public ToolOptionControl {
   Q_OBJECT
 
 protected:
@@ -188,6 +189,7 @@ protected:
 public:
   ToolOptionCombo(TTool *tool, TEnumProperty *property,
                   ToolHandle *toolHandle = 0);
+  ~ToolOptionCombo();
   void updateStatus() override;
 
   TEnumProperty *getProperty() const { return m_property; }
@@ -200,8 +202,8 @@ public slots:
 
 //-----------------------------------------------------------------------------
 
-class ToolOptionFontCombo final : public QFontComboBox,
-                                  public ToolOptionControl {
+class DVAPI ToolOptionFontCombo final : public QFontComboBox,
+                                        public ToolOptionControl {
   Q_OBJECT
 
 protected:
@@ -210,6 +212,7 @@ protected:
 public:
   ToolOptionFontCombo(TTool *tool, TEnumProperty *property,
                       ToolHandle *toolHandle = 0);
+  ~ToolOptionFontCombo();
   void updateStatus() override;
 
   TEnumProperty *getProperty() const { return m_property; }
@@ -239,19 +242,21 @@ public slots:
 
 //-----------------------------------------------------------------------------
 
-class ToolOptionTextField final : public DVGui::LineEdit,
-                                  public ToolOptionControl {
+class DVAPI ToolOptionTextField final : public DVGui::LineEdit,
+                                        public ToolOptionControl {
   Q_OBJECT
 
 protected:
   TStringProperty *m_property;
 
 public:
-  ToolOptionTextField(TTool *tool, TStringProperty *property);
+  ToolOptionTextField(TTool *tool, TStringProperty *property,
+                      ToolHandle *toolHandle = 0);
   void updateStatus() override;
 
 public slots:
 
+  void onLiveTextChanged(const QString &);
   void onValueChanged();
 };
 
@@ -290,8 +295,9 @@ public slots:
   the edited one)
   \li Undo/Redo of user interactions.
 */
-class ToolOptionParamRelayField final : public DVGui::MeasuredDoubleLineEdit,
-                                        public ToolOptionControl {
+class DVAPI ToolOptionParamRelayField final
+    : public DVGui::MeasuredDoubleLineEdit,
+      public ToolOptionControl {
   Q_OBJECT
 
   TDoubleParamP m_param;  //!< Cached property param
@@ -360,9 +366,9 @@ public:
 
   void setValue(double v);
   double getValue() const;
-  
+
   bool isLabelClicked() const { return m_labelClicked; }
- 
+
   void setPrecision(int precision);
   int getPrecision() { return m_precision; }
 
@@ -384,8 +390,8 @@ signals:
 };
 //-----------------------------------------------------------------------------
 
-class PegbarChannelField final : public MeasuredValueField,
-                                 public ToolOptionControl {
+class DVAPI PegbarChannelField final : public MeasuredValueField,
+                                       public ToolOptionControl {
   Q_OBJECT
 
   const enum TStageObject::Channel m_actionId;
@@ -445,7 +451,8 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class NoScaleField final : public MeasuredValueField, public ToolOptionControl {
+class DVAPI NoScaleField final : public MeasuredValueField,
+                                 public ToolOptionControl {
   Q_OBJECT
 
 public:
@@ -487,7 +494,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class SelectionScaleField final : public MeasuredValueField {
+class DVAPI SelectionScaleField final : public MeasuredValueField {
   Q_OBJECT
 
   int m_id;
@@ -513,7 +520,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class SelectionRotationField final : public MeasuredValueField {
+class DVAPI SelectionRotationField final : public MeasuredValueField {
   Q_OBJECT
 
   SelectionTool *m_tool;
@@ -534,7 +541,7 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class SelectionMoveField final : public MeasuredValueField {
+class DVAPI SelectionMoveField final : public MeasuredValueField {
   Q_OBJECT
 
   int m_id;
@@ -555,7 +562,7 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class ThickChangeField final : public MeasuredValueField {
+class DVAPI ThickChangeField final : public MeasuredValueField {
   Q_OBJECT
 
   SelectionTool *m_tool;
@@ -577,7 +584,7 @@ protected slots:
 
 // The ClickableLabel class is used to allow click and dragging
 // on a label to change the value of a linked field
-class ClickableLabel : public QLabel {
+class DVAPI ClickableLabel : public QLabel {
   Q_OBJECT
 
 protected:

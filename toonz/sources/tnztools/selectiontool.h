@@ -318,6 +318,9 @@ DragSelectionTool::DragTool *createNewFreeDeformTool(SelectionTool *st);
 DragSelectionTool::DragTool *createNewScaleTool(
     SelectionTool *st, DragSelectionTool::ScaleType type);
 
+bool DVAPI selectionScaleLinkIsEnabled();
+void DVAPI setSelectionScaleLinkEnabled(bool linked);
+
 //=============================================================================
 // SelectionTool
 //-----------------------------------------------------------------------------
@@ -468,11 +471,15 @@ public:
 
   virtual bool isSelectionEditable() { return true; }
 
+  bool isScaleHVLinked() const;
+public slots:
+  void setScaleHVLinked(bool linked);
 signals:
   void clickFlipHorizontal();
   void clickFlipVertical();
   void clickRotateLeft();
   void clickRotateRight();
+  void scaleHVLinkChanged(bool linked);
 };
 
 #endif  // SELECTIONTOOL_INCLUDED
