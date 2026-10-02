@@ -930,6 +930,9 @@ class DVAPI StyleEditor final : public QWidget, public SaveLoadQSettings {
   QPushButton *m_textureSearchClear;
   QPushButton *m_vectorsSearchClear;
   QPushButton *m_mypaintSearchClear;
+  QPushButton *m_specialButton     = nullptr;
+  QPushButton *m_customButton      = nullptr;
+  QPushButton *m_vectorBrushButton = nullptr;
 
   TColorStyleP
       m_oldStyle;  //!< A copy of current style \a before the last change.
@@ -941,6 +944,7 @@ class DVAPI StyleEditor final : public QWidget, public SaveLoadQSettings {
   bool m_enabledOnlyFirstTab;
   bool m_enabledFirstAndLastTab;
   bool m_colorPageIsVertical = true;
+  int m_currentPageIndex     = 0;
 
 public:
   StyleEditor(PaletteController *, QWidget *parent = 0);
@@ -1062,6 +1066,9 @@ private:
   QFrame *createVectorPage();
   QFrame *createMyPaintPage();
   void updateTabBar();
+  int tabIndexForPage(int page) const;
+  void rememberPage(int page);
+  void applySavedPage();
 
   void copyEditedStyleToPalette(bool isDragging);
 };
