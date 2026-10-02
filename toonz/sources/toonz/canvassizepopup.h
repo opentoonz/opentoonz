@@ -107,6 +107,8 @@ public:
   static CanvasSizePopup *instance();
 
   bool isSessionActive() const { return m_sessionActive; }
+  bool isPercentMode() const;
+  TDimension currentCanvasDim() const { return m_currentDim; }
   TRectD currentCanvasRect() const { return m_currentRect; }
   TRectD proposedCanvasRect() const { return m_proposedRect; }
   PeggingPositions peggingPosition() const;

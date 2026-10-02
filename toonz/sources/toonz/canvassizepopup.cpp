@@ -902,13 +902,19 @@ TRectD CanvasSizeTool::dragRect(const TPointD &pos,
     return r;
   }
 
-  const bool uniform    = e.isShiftPressed();
+  CanvasSizePopup *popup = CanvasSizePopup::instance();
+  bool uniform           = e.isShiftPressed();
+  if (popup && popup->isPercentMode()) uniform = true;
   const bool fromCenter = e.isAltPressed();
   double W              = r.x1 - r.x0;
   double H              = r.y1 - r.y0;
   if (W < 1.0) W = 1.0;
   if (H < 1.0) H = 1.0;
-  const double ar = W / H;
+  double ar = W / H;
+  if (uniform && popup && popup->isPercentMode()) {
+    const TDimension cur = popup->currentCanvasDim();
+    if (cur.ly > 0) ar = (double)cur.lx / cur.ly;
+  }
   const double cx = 0.5 * (r.x0 + r.x1);
   const double cy = 0.5 * (r.y0 + r.y1);
 
@@ -1298,6 +1304,12 @@ CanvasSizePopup::CanvasSizePopup()
 
 //-----------------------------------------------------------------------------
 
+bool CanvasSizePopup::isPercentMode() const {
+  return m_percentMode->isChecked();
+}
+
+//-----------------------------------------------------------------------------
+
 void CanvasSizePopup::openSession() {
   if (isVisible()) {
     hide();
@@ -1469,9 +1481,7 @@ void CanvasSizePopup::syncFieldsFromRect() {
   if (m_percentMode->isChecked()) {
     const double xFactor =
         m_currentDim.lx > 0 ? (double)newDim.lx / m_currentDim.lx : 1.0;
-    const double yFactor =
-        m_currentDim.ly > 0 ? (double)newDim.ly / m_currentDim.ly : 1.0;
-    m_percentFld->setValue((xFactor + yFactor) / 2.0);
+    m_percentFld->setValue(xFactor);
   } else {
     int xVal =
         m_relative->isChecked() ? newDim.lx - m_currentDim.lx : newDim.lx;
@@ -1549,10 +1559,8 @@ void CanvasSizePopup::onPercentMode(bool on) {
     TDimension prop = dimFromRect(m_proposedRect);
     const double xFactor =
         m_currentDim.lx > 0 ? (double)prop.lx / m_currentDim.lx : 1.0;
-    const double yFactor =
-        m_currentDim.ly > 0 ? (double)prop.ly / m_currentDim.ly : 1.0;
     m_ignoreSync = true;
-    m_percentFld->setValue((xFactor + yFactor) / 2.0);
+    m_percentFld->setValue(xFactor);
     m_ignoreSync = false;
     setSizeFieldsEnabled(false);
     updateProposedFromFields();
