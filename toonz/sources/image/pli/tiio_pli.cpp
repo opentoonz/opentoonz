@@ -480,11 +480,12 @@ static void putStroke(TStroke *stroke, int &currStyleId,
     tags.push_back(colorTag.release());
   }
 
-  // If the outline options are non-standard (not round), add the outline infos
+  // If the outline options are non-standard, add the outline infos.
   TStroke::OutlineOptions &options = stroke->outlineOptions();
   if (options.m_capStyle != TStroke::OutlineOptions::ROUND_CAP ||
       options.m_joinStyle != TStroke::OutlineOptions::ROUND_JOIN ||
-      options.m_miterLower != 0.0 || options.m_miterUpper != 4.0) {
+      options.m_miterLower != 0.0 || options.m_miterUpper != 4.0 ||
+      options.m_patternFrameOffset != 0 || options.m_patternFrameStep != 1) {
     StrokeOutlineOptionsTag *outlineOptionsTag =
         new StrokeOutlineOptionsTag(options);
     tags.push_back((PliObjectTag *)outlineOptionsTag);

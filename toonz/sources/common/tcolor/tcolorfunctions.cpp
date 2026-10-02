@@ -52,7 +52,8 @@ TPixel32 TTranspFader::operator()(const TPixel32 &color) const {
 //---------------------------------------
 
 bool TTranspFader::getParameters(Parameters &p) const {
-  assert(false);
+  p      = Parameters();
+  p.m_mM = m_transp;
   return true;
 }
 
@@ -86,6 +87,13 @@ TPixel32 TColumnColorFilterFunction::operator()(const TPixel32 &color) const {
 }
 
 bool TColumnColorFilterFunction::getParameters(Parameters &p) const {
-  assert(false);
+  p.m_mR = (255 - m_colorScale.r) / 255.0;
+  p.m_mG = (255 - m_colorScale.g) / 255.0;
+  p.m_mB = (255 - m_colorScale.b) / 255.0;
+  p.m_mM = m_colorScale.m / 255.0;
+  p.m_cR = m_colorScale.r;
+  p.m_cG = m_colorScale.g;
+  p.m_cB = m_colorScale.b;
+  p.m_cM = 0;
   return true;
 }
