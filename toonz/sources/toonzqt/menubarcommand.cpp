@@ -12,6 +12,8 @@
 #include <QSettings>
 #include <QKeySequence>
 #include <QApplication>
+#include <QEvent>
+#include <QShortcutEvent>
 
 #include <sys/types.h>
 
@@ -27,6 +29,27 @@ void updateToolTip(QAction *action) {
   if (shortcut != "") tooltip += " (" + shortcut + ")";
   action->setToolTip(tooltip);
 }
+
+class ShortcutTriggerFilter final : public QObject {
+  CommandManager *m_manager;
+
+public:
+  explicit ShortcutTriggerFilter(CommandManager *manager)
+      : m_manager(manager) {}
+
+protected:
+  bool eventFilter(QObject *watched, QEvent *event) override {
+    if (event->type() != QEvent::Shortcut) return false;
+
+    QShortcutEvent *shortcutEvent = static_cast<QShortcutEvent *>(event);
+    if (shortcutEvent->isAmbiguous()) return false;
+
+    QAction *action = m_manager->actionForShortcutKey(shortcutEvent->key());
+    if (action) m_manager->setPendingShortcutAction(action);
+
+    return false;
+  }
+};
 
 }  // namespace
 
@@ -59,7 +82,10 @@ void AuxActionsCreatorManager::createAuxActions(QObject *parent) {
 
 //=========================================================
 
-CommandManager::CommandManager() {}
+CommandManager::CommandManager()
+    : m_executeTriggeredByShortcut(false), m_pendingShortcutAction(nullptr) {
+  if (qApp) qApp->installEventFilter(new ShortcutTriggerFilter(this));
+}
 
 //---------------------------------------------------------
 
@@ -150,6 +176,22 @@ void CommandManager::define(CommandId id, CommandType type,
 // set handler (id, handler)
 //   possibly changes enable/disable qaction state
 //
+QAction *CommandManager::actionForShortcutKey(const QKeySequence &key) const {
+  std::map<QAction *, Node *>::const_iterator it;
+  for (it = m_qactionTable.begin(); it != m_qactionTable.end(); ++it) {
+    if (it->first->shortcut() == key) return it->first;
+  }
+  return nullptr;
+}
+
+//---------------------------------------------------------
+
+void CommandManager::setPendingShortcutAction(QAction *action) {
+  m_pendingShortcutAction = action;
+}
+
+//---------------------------------------------------------
+
 void CommandManager::setHandler(CommandId id,
                                 CommandHandlerInterface *handler) {
   Node *node = getNode(id);
@@ -174,7 +216,10 @@ void CommandManager::execute(QAction *qaction) {
   std::map<QAction *, Node *>::iterator it = m_qactionTable.find(qaction);
   assert(it != m_qactionTable.end());
   if (it != m_qactionTable.end() && it->second->m_handler) {
+    m_executeTriggeredByShortcut = (qaction == m_pendingShortcutAction);
+    m_pendingShortcutAction      = nullptr;
     it->second->m_handler->execute();
+    m_executeTriggeredByShortcut = false;
   }
 }
 
@@ -198,6 +243,7 @@ void CommandManager::execute(CommandId id) {
       // principalmente per i tool
       action->setChecked(true);
     }
+    m_executeTriggeredByShortcut = false;
     node->m_handler->execute();
   }
 }
@@ -334,7 +380,10 @@ void CommandManager::setChecked(CommandId id, bool checked) {
   if (!node) return;
   if (node->m_qaction) {
     node->m_qaction->setChecked(checked);
-    if (node->m_handler) node->m_handler->execute();
+    if (node->m_handler) {
+      m_executeTriggeredByShortcut = false;
+      node->m_handler->execute();
+    }
   }
 }
 
@@ -512,6 +561,17 @@ DVAction::DVAction(const QString &text, QObject *parent)
 DVAction::DVAction(const QIcon &icon, const QString &text, QObject *parent)
     : QAction(icon, text, parent) {
   connect(this, SIGNAL(triggered()), this, SLOT(onTriggered()));
+}
+
+//-----------------------------------------------------------------------------
+
+bool DVAction::event(QEvent *event) {
+  if (event->type() == QEvent::Shortcut) {
+    QShortcutEvent *shortcutEvent = static_cast<QShortcutEvent *>(event);
+    if (!shortcutEvent->isAmbiguous() && shortcut() == shortcutEvent->key())
+      CommandManager::instance()->setPendingShortcutAction(this);
+  }
+  return QAction::event(event);
 }
 
 //-----------------------------------------------------------------------------
