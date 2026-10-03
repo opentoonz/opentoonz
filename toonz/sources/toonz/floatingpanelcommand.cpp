@@ -116,7 +116,8 @@ bool OpenFloatingPanel::closeVisiblePanelsOfType(const std::string &panelType) {
   bool closedAny               = false;
   const QList<TPanel *> panels = currentRoom->findChildren<TPanel *>();
   for (TPanel *panel : panels) {
-    if (panel->getPanelType() == panelType && !panel->isHidden()) {
+    if (panel->getPanelType() == panelType && panel->isFloating() &&
+        !panel->isHidden()) {
       panel->close();
       closedAny = true;
     }
