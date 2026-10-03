@@ -207,12 +207,12 @@ void TPanel::execContextMenu(const QPoint &globalPos) {
   });
 
   if (isCustomPanel() && isFloating()) {
-    QMenu *compactMenu = menu.addMenu(tr("Compact Mode"));
+    QMenu *compactMenu         = menu.addMenu(tr("Compact Mode"));
     QActionGroup *compactGroup = new QActionGroup(compactMenu);
     compactGroup->setExclusive(true);
 
-    QAction *offAction = compactMenu->addAction(tr("Off"));
-    QAction *miniAction = compactMenu->addAction(tr("Mini Title Bar"));
+    QAction *offAction   = compactMenu->addAction(tr("Off"));
+    QAction *miniAction  = compactMenu->addAction(tr("Mini Title Bar"));
     QAction *noBarAction = compactMenu->addAction(tr("No Title Bar"));
     for (QAction *action : {offAction, miniAction, noBarAction}) {
       action->setCheckable(true);
@@ -238,9 +238,8 @@ void TPanel::execContextMenu(const QPoint &globalPos) {
     transparentAction->setCheckable(true);
     transparentAction->setChecked(m_compactTransparentBg);
     transparentAction->setEnabled(m_compactFloating);
-    connect(transparentAction, &QAction::triggered, [this](bool checked) {
-      setCompactTransparentBackground(checked);
-    });
+    connect(transparentAction, &QAction::triggered,
+            [this](bool checked) { setCompactTransparentBackground(checked); });
 
     menu.addSeparator();
     QAction *closeAction = menu.addAction(tr("Close"));
@@ -286,10 +285,9 @@ bool TPanel::eventFilter(QObject *watched, QEvent *event) {
     if (event->type() == QEvent::MouseMove ||
         event->type() == QEvent::HoverMove ||
         event->type() == QEvent::MouseButtonPress) {
-      const QPoint local =
-          event->type() == QEvent::HoverMove
-              ? static_cast<QHoverEvent *>(event)->pos()
-              : static_cast<QMouseEvent *>(event)->pos();
+      const QPoint local   = event->type() == QEvent::HoverMove
+                                 ? static_cast<QHoverEvent *>(event)->pos()
+                                 : static_cast<QMouseEvent *>(event)->pos();
       const int marginType = compactResizeMargin(widget->mapTo(this, local));
       updateGripCursor(marginType);
       if (marginType && event->type() == QEvent::MouseButtonPress) {
@@ -358,8 +356,7 @@ void TPanel::saveCompactState(QSettings &settings) const {
   settings.setValue(QStringLiteral("compactTransparent"),
                     m_compactTransparentBg);
   if (!isFloating() && m_lastFloatingContent.isValid())
-    settings.setValue(QStringLiteral("floatingContent"),
-                      m_lastFloatingContent);
+    settings.setValue(QStringLiteral("floatingContent"), m_lastFloatingContent);
 }
 
 //-----------------------------------------------------------------------------
@@ -387,7 +384,6 @@ QSize TPanel::chromeSize(bool compact) const {
            m_panelTitleBar ? m_panelTitleBar->minimumSizeHint().height() : 0);
   return QSize(2 * kFloatingMargin, 2 * kFloatingMargin + titleH);
 }
-
 
 //-----------------------------------------------------------------------------
 
@@ -423,13 +419,13 @@ void TPanel::applyDisplayState(bool floating, bool keepContentSize) {
                                      QSizePolicy::Fixed);
     }
     if (box->indexOf(m_panelTitleBar) < 0)
-      box->insertWidget(0, m_panelTitleBar, 0,
-                        getOrientation() == vertical ? Qt::AlignTop
-                                                     : Qt::AlignLeft);
+      box->insertWidget(
+          0, m_panelTitleBar, 0,
+          getOrientation() == vertical ? Qt::AlignTop : Qt::AlignLeft);
     if (floating) {
       setFloatingChromeMargin(kFloatingMargin);
-      box->setContentsMargins(kFloatingMargin, kFloatingMargin,
-                              kFloatingMargin, kFloatingMargin);
+      box->setContentsMargins(kFloatingMargin, kFloatingMargin, kFloatingMargin,
+                              kFloatingMargin);
       newChrome = chromeSize(false);
     } else {
       setFloatingMargin(kFloatingMargin);
@@ -493,8 +489,7 @@ void TPanel::applyPanelLimits(bool compact, bool floating,
         if (hint.width() >= 8 && hint.height() >= 8) m_compactFloor = hint;
       }
     }
-    const QSize limit =
-        m_compactFloor.isValid() ? m_compactFloor : QSize(1, 1);
+    const QSize limit = m_compactFloor.isValid() ? m_compactFloor : QSize(1, 1);
     setMinimumSize(limit.width(), limit.height() + chrome.height());
     setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
   } else if (m_hasSavedPanelLimits) {
@@ -557,7 +552,8 @@ void TPanel::ensureCompactTranslucency(bool on) {
   const QRect geom = geometry();
   const bool vis   = isVisible();
   setWindowFlags(windowFlags());
-  if (geom.isValid() && geom.width() > 1 && geom.height() > 1) setGeometry(geom);
+  if (geom.isValid() && geom.width() > 1 && geom.height() > 1)
+    setGeometry(geom);
   if (vis) show();
 }
 
@@ -609,7 +605,7 @@ void TPanel::updateGripCursor(int marginType) {
     m_gripCursorTimer->setInterval(50);
     connect(m_gripCursorTimer, &QTimer::timeout, this, [this]() {
       if (m_resizing) return;
-      QWidget *under = QApplication::widgetAt(QCursor::pos());
+      QWidget *under    = QApplication::widgetAt(QCursor::pos());
       const bool inside = under && (under == this || isAncestorOf(under));
       updateGripCursor(
           inside ? compactResizeMargin(mapFromGlobal(QCursor::pos())) : 0);
@@ -650,8 +646,8 @@ void TPanel::syncCompactTransparentLook() {
       isCustomPanel() && m_compactApplied && m_compactTransparentBg;
   if (want == m_transparentLookApplied) return;
 
-  const QRect geom       = geometry();
-  QWidget *content       = widget();
+  const QRect geom = geometry();
+  QWidget *content = widget();
 
   auto polish = [](QWidget *w) {
     if (!w || !w->style()) return;
@@ -688,18 +684,20 @@ void TPanel::syncCompactTransparentLook() {
       polish(content);
 
       QList<QWidget *> targets;
-      const QList<QWidget *> children =
-          content->findChildren<QWidget *>(QString(), Qt::FindChildrenRecursively);
+      const QList<QWidget *> children = content->findChildren<QWidget *>(
+          QString(), Qt::FindChildrenRecursively);
       for (QWidget *child : children) {
         if (!compactSurfaceExempt(child)) targets.append(child);
       }
       for (QWidget *target : targets) {
         CompactSurface saved;
-        saved.widget                = target;
-        saved.palette               = target->palette();
-        saved.autoFillBackground    = target->autoFillBackground();
-        saved.translucentBackground = target->testAttribute(Qt::WA_TranslucentBackground);
-        saved.noSystemBackground    = target->testAttribute(Qt::WA_NoSystemBackground);
+        saved.widget             = target;
+        saved.palette            = target->palette();
+        saved.autoFillBackground = target->autoFillBackground();
+        saved.translucentBackground =
+            target->testAttribute(Qt::WA_TranslucentBackground);
+        saved.noSystemBackground =
+            target->testAttribute(Qt::WA_NoSystemBackground);
         m_compactSurfaces.append(saved);
 
         target->setAutoFillBackground(false);
@@ -884,9 +882,8 @@ QPoint TPanel::nearestDragPoint(const QPoint &p) const {
     return QPoint(qBound(r.left(), pt.x(), r.right()),
                   qBound(r.top(), pt.y(), r.bottom()));
   };
-  QRect inner = m_compactApplied
-                    ? rect().adjusted(grip, grip, -grip, -grip)
-                    : rect();
+  QRect inner =
+      m_compactApplied ? rect().adjusted(grip, grip, -grip, -grip) : rect();
   if (!inner.isValid()) inner = rect();
 
   if (m_panelTitleBar->isVisibleTo(this)) {
@@ -903,8 +900,8 @@ QPoint TPanel::nearestDragPoint(const QPoint &p) const {
   for (QWidget *child : children) {
     if (!child->isVisibleTo(this) || compactDragExempt(child)) continue;
     bool leaf = true;
-    for (QWidget *sub : child->findChildren<QWidget *>(
-             QString(), Qt::FindDirectChildrenOnly))
+    for (QWidget *sub :
+         child->findChildren<QWidget *>(QString(), Qt::FindDirectChildrenOnly))
       if (sub->isVisibleTo(this)) leaf = false;
     if (!leaf) continue;
     const QRect r = QRect(child->mapTo(this, QPoint(0, 0)), child->size())
@@ -1609,7 +1606,7 @@ void TPanelTitleBar::paintEvent(QPaintEvent *) {
   const QRect rect = this->rect();
 
   bool isPanelActive = false;
-  auto *dw = qobject_cast<TPanel *>(parentWidget());
+  auto *dw           = qobject_cast<TPanel *>(parentWidget());
   Q_ASSERT(dw != nullptr);
 
   if (m_compact && dw->isFloating()) {

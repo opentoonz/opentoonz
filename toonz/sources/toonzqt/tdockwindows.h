@@ -106,7 +106,8 @@ public:
 
 protected:
   // Subclasses may override these to react to dock/float state changes.
-  // They are called on all code paths: interactive dock/undock AND workspace restore.
+  // They are called on all code paths: interactive dock/undock AND workspace
+  // restore.
   void setFloatingAppearance() override;
   void setDockedAppearance() override;
   int isResizeGrip(QPoint p) override;
