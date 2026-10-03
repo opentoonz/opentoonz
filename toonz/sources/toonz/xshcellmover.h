@@ -106,6 +106,7 @@ protected:
   TDimension m_range;
 
   int m_qualifiers;
+  int m_columnLimit;
   bool m_validPos;
   LevelMoverUndo *m_undo;
   bool m_moved;
