@@ -23,6 +23,7 @@
 
 #include <array>
 #include <QMatrix4x4>
+#include <QPointer>
 #include <QTouchDevice>
 
 //=====================================================================
@@ -177,6 +178,19 @@ class SceneViewer final : public TToolViewer, public Previewer::Listener {
   } m_current3DDevice;
 
   bool m_isLocator;
+  //! If >= 0, guided mode for this viewer only; -1 uses preferences.
+  int m_guidedDrawingModeOverride = -1;
+  //! Empty onion mask in drawScene for this viewer only.
+  bool m_suppressOnionSkinInViewer = false;
+  //! Locator: hide full-opacity current drawing when onion/shift-trace is on.
+  bool m_hideCurrentDrawingInViewer = false;
+  //! Locator: show active xsheet column only.
+  bool m_showOnlyCurrentColumnInViewer = false;
+  bool m_navPickOnly                   = false;
+  bool m_hasNavViewFrame               = false;
+  TPointD m_navViewFrame[4];
+  QPointer<SceneViewer> m_viewForwardTarget;
+  double m_forwardedRotateAngle = 0;
   bool m_isStyleShortcutSwitchable;
 
   bool m_isBusyOnTabletMove;
@@ -256,6 +270,7 @@ public:
   void GLInvalidateAll() override;
   void GLInvalidateRect(const TRectD &rect) override;
   void invalidateToolStatus() override;
+  void invalidatePeerViewers() override;
 
   TPointD getPan3D() const { return m_pan3D; }
   double getZoomScale3D() const { return m_zoomScale3D; }
@@ -287,6 +302,7 @@ public:
 
   // panning by dragging the navigator in the levelstrip
   void navigatorPan(const QPoint &delta);
+  void navigatorPan(const QPointF &delta);
   // a factor for getting pixel-based zoom ratio
   double getDpiFactor();
   // when showing the viewer with full-screen mode,
@@ -301,6 +317,33 @@ public:
   void setFocus(Qt::FocusReason reason) { QWidget::setFocus(reason); };
 
   void setIsLocator() { m_isLocator = true; }
+  bool getIsLocator() const { return m_isLocator; }
+
+  void setGuidedDrawingModeOverride(int mode);
+  int getGuidedDrawingModeOverride() const {
+    return m_guidedDrawingModeOverride;
+  }
+
+  void setSuppressOnionSkinInViewer(bool on);
+  bool getSuppressOnionSkinInViewer() const {
+    return m_suppressOnionSkinInViewer;
+  }
+
+  void setHideCurrentDrawingInViewer(bool on);
+  bool getHideCurrentDrawingInViewer() const {
+    return m_hideCurrentDrawingInViewer;
+  }
+
+  void setShowOnlyCurrentColumnInViewer(bool on);
+  bool getShowOnlyCurrentColumnInViewer() const {
+    return m_showOnlyCurrentColumnInViewer;
+  }
+
+  void setNavPickOnly(bool on) { m_navPickOnly = on; }
+  bool isPickOnly() const override { return m_navPickOnly; }
+  void setNavViewFrame(bool on, const TPointD *glPts);
+  // Overview: view ops apply to the main viewer (red frame).
+  void setViewForwardTarget(SceneViewer *sv);
   void setIsStyleShortcutSwitchable() { m_isStyleShortcutSwitchable = true; }
   int getVGuideCount() override;
   int getHGuideCount() override;
@@ -381,6 +424,7 @@ protected:
 
   // center: window coordinate, pixels, topleft origin
   void zoomQt(const QPoint &center, double scaleFactor);
+  void zoomQt(const QPointF &center, double scaleFactor);
 
   void mouseScrub(const TMouseEvent &e);
 

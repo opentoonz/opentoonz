@@ -21,13 +21,16 @@ class ComboViewerPanel final : public BaseViewerPanel {
   Ruler *m_hRuler;
 
 public:
-  ComboViewerPanel(QWidget *parent = 0, Qt::WindowFlags flags = Qt::WindowFlags());
+  ComboViewerPanel(QWidget *parent       = 0,
+                   Qt::WindowFlags flags = Qt::WindowFlags());
   ~ComboViewerPanel() {}
 
   ToolOptions *getToolOptions() { return m_toolOptions; }
 
   void updateShowHide() override;
   void addShowHideContextMenu(QMenu *) override;
+
+  void load(QSettings &settings) override;
 
 protected:
   void checkOldVersionVisblePartsFlags(QSettings &settings) override;

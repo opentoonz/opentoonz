@@ -94,6 +94,13 @@ void ComboViewerPanel::updateShowHide() {
 
 //-----------------------------------------------------------------------------
 
+void ComboViewerPanel::load(QSettings &settings) {
+  BaseViewerPanel::load(settings);
+  m_sceneViewer->setSuppressOnionSkinInViewer(false);
+}
+
+//-----------------------------------------------------------------------------
+
 void ComboViewerPanel::addShowHideContextMenu(QMenu *menu) {
   QMenu *showHideMenu = menu->addMenu(tr("GUI Show / Hide"));
   // actions

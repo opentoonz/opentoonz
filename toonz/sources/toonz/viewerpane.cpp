@@ -460,8 +460,7 @@ void BaseViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
                        SLOT(freeze(bool)));
 
   // preview toggles
-  m_previewButton =
-      new TPanelTitleBarButtonForPreview(titleBar, "preview");
+  m_previewButton = new TPanelTitleBarButtonForPreview(titleBar, "preview");
   x += 10 + iconWidth;
   titleBar->add(QPoint(x, 0), m_previewButton);
   m_previewButton->setToolTip(tr("Preview"));
@@ -469,8 +468,8 @@ void BaseViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   // ret = ret && connect(m_previewButton, SIGNAL(toggled(bool)),
   //                      SLOT(enableFullPreview(bool)));
 
-  m_subcameraPreviewButton = new TPanelTitleBarButtonForPreview(
-      titleBar, "subpreview");
+  m_subcameraPreviewButton =
+      new TPanelTitleBarButtonForPreview(titleBar, "subpreview");
   x += 1 + 30;
 
   titleBar->add(QPoint(x, 0), m_subcameraPreviewButton);
@@ -627,7 +626,7 @@ void BaseViewerPanel::changeWindowTitle() {  // �v�m�F
 
   // if the frame type is "scene editing"
   if (app->getCurrentFrame()->isEditingScene()) {
-    auto project = scene->getProject();
+    auto project      = scene->getProject();
     QString sceneName = QString::fromStdWString(scene->getSceneName());
     if (sceneName.isEmpty()) sceneName = tr("Untitled");
     if (app->getCurrentScene()->getDirtyFlag()) sceneName += QString("*");
@@ -755,7 +754,6 @@ void BaseViewerPanel::onSceneSwitched() {
                                   ->getFrameRate());
   m_sceneViewer->setEditPreviewSubcamera(false);
   onSceneChanged();
-
 }
 
 //-----------------------------------------------------------------------------
@@ -961,9 +959,8 @@ void BaseViewerPanel::load(QSettings &settings) {
 
   if (settings.childGroups().contains(QStringLiteral("camera3D"))) {
     settings.beginGroup(QStringLiteral("camera3D"));
-    pending.pan3D =
-        TPointD(settings.value("panX", 0.0).toDouble(),
-                settings.value("panY", 0.0).toDouble());
+    pending.pan3D       = TPointD(settings.value("panX", 0.0).toDouble(),
+                                  settings.value("panY", 0.0).toDouble());
     pending.zoomScale3D = settings.value("zoom", 1.0).toDouble();
     pending.phi3D       = settings.value("phi", 30.0).toDouble();
     pending.theta3D     = settings.value("theta", 20.0).toDouble();
@@ -1030,10 +1027,10 @@ void BaseViewerPanel::onActiveViewerChanged() {
                   SLOT(setPressed(bool)));
     ret        = ret && connect(m_subcameraPreviewButton, SIGNAL(toggled(bool)),
                                 CommandManager::instance()->getAction(
-                             MI_ToggleViewerSubCameraPreview),
+                                    MI_ToggleViewerSubCameraPreview),
                                 SLOT(trigger()));
     ret        = ret && connect(CommandManager::instance()->getAction(
-                             MI_ToggleViewerSubCameraPreview),
+                                    MI_ToggleViewerSubCameraPreview),
                                 SIGNAL(triggered(bool)), m_subcameraPreviewButton,
                                 SLOT(setPressed(bool)));
     m_isActive = true;
@@ -1091,6 +1088,13 @@ SceneViewerPanel::SceneViewerPanel(QWidget *parent, Qt::WindowFlags flags)
   // initial state of the parts
   m_visiblePartsFlag = VPPARTS_ALL;
   updateShowHide();
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewerPanel::load(QSettings &settings) {
+  BaseViewerPanel::load(settings);
+  m_sceneViewer->setSuppressOnionSkinInViewer(false);
 }
 
 //-----------------------------------------------------------------------------

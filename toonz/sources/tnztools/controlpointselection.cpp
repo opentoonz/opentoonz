@@ -1109,6 +1109,7 @@ void ControlPointSelection::addMenuItems(QMenu *menu) {
 void ControlPointSelection::setLinear() {
   TTool *tool = TTool::getApplication()->getCurrentTool()->getTool();
   if (!tool) return;
+  if (tool->getViewer() && tool->getViewer()->isPickOnly()) return;
 
   int currentStrokeIndex = m_controlPointEditorStroke->getStrokeIndex();
   TVectorImageP vi(tool->getImage(false));
@@ -1153,6 +1154,7 @@ void ControlPointSelection::setLinear() {
 void ControlPointSelection::setUnlinear() {
   TTool *tool = TTool::getApplication()->getCurrentTool()->getTool();
   if (!tool) return;
+  if (tool->getViewer() && tool->getViewer()->isPickOnly()) return;
 
   int currentStrokeIndex = m_controlPointEditorStroke->getStrokeIndex();
   TVectorImageP vi(tool->getImage(false));
@@ -1197,6 +1199,7 @@ void ControlPointSelection::setUnlinear() {
 void ControlPointSelection::deleteControlPoints() {
   TTool *tool = TTool::getApplication()->getCurrentTool()->getTool();
   if (!tool) return;
+  if (tool->getViewer() && tool->getViewer()->isPickOnly()) return;
 
   // cancel deleting while dragging points
   ControlPointEditorTool *cpTool = dynamic_cast<ControlPointEditorTool *>(tool);

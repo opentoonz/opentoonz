@@ -119,8 +119,7 @@ bool descending(int i, int j) { return (i > j); }
 
 //----------------------------------------------------------------
 
-double getOnionSkinOpacity(const OnionSkinMask &mask, int row,
-                           int currentRow) {
+double getOnionSkinOpacity(const OnionSkinMask &mask, int row, int currentRow) {
   return std::max(mask.getFosOpacity(row),
                   mask.getMosOpacity(row - currentRow));
 }
@@ -225,6 +224,9 @@ public:
 
   const ImagePainter::VisualSettings *m_vs;
 
+  bool m_hideCurrentDrawing;
+  bool m_showOnlyCurrentColumn;
+
 #if defined(x64)
   TRasterImageP m_liveViewImage;
   TRasterImageP m_lineupImage;
@@ -300,7 +302,9 @@ StageBuilder::StageBuilder()
     , m_editingShift(false)
     , m_showShiftOrigin(false)
     , m_currentXsheetLevel(0)
-    , m_xsheetLevel(0) {
+    , m_xsheetLevel(0)
+    , m_hideCurrentDrawing(false)
+    , m_showOnlyCurrentColumn(false) {
   m_placementStack.push_back(ZPlacement());
 }
 
@@ -438,16 +442,16 @@ void StageBuilder::addCell(PlayerSet &players, ToonzScene *scene, TXsheet *xsh,
     player.m_guidedFrontStroke      = m_guidedFrontStroke;
     player.m_guidedBackStroke       = m_guidedBackStroke;
     if (xsh) {
-      TPointD cameraDpi =//use cameraDpi for rasterized vector image
+      TPointD cameraDpi =  // use cameraDpi for rasterized vector image
           xsh->getStageObjectTree()->getCurrentCamera()->getDpi();
-        player.m_dpiAff =
+      player.m_dpiAff =
           sl ? ((sl->getType() == PLI_XSHLEVEL && sl->m_rasterizePli)
                     ? TScale(Stage::inch / cameraDpi.x,
                              Stage::inch / cameraDpi.y)
                     : getDpiAffine(sl, cell.m_frameId))
              : TAffine();
-    } else  
-    player.m_dpiAff = sl ? getDpiAffine(sl, cell.m_frameId) : TAffine();
+    } else
+      player.m_dpiAff = sl ? getDpiAffine(sl, cell.m_frameId) : TAffine();
 
     player.m_onionSkinDistance = m_onionSkinDistance;
     player.m_onionSkinOpacity  = m_onionSkinOpacity;
@@ -646,7 +650,8 @@ void StageBuilder::addCellWithOnionSkin(PlayerSet &players, ToonzScene *scene,
       // draw current working frame
       if (!cell.isEmpty()) {
         m_shiftTraceGhostId = TRACED;
-        addCell(players, scene, xsh, row, col, level, subSheetColIndex);
+        if (!m_hideCurrentDrawing)
+          addCell(players, scene, xsh, row, col, level, subSheetColIndex);
         m_shiftTraceGhostId = NO_GHOST;
       }
     }
@@ -675,15 +680,13 @@ void StageBuilder::addCellWithOnionSkin(PlayerSet &players, ToonzScene *scene,
 
 #ifdef NUOVO_ONION
       m_onionSkinDistance = rows[i] - row;
-      m_onionSkinOpacity  =
-          getOnionSkinOpacity(m_onionSkinMask, rows[i], row);
+      m_onionSkinOpacity  = getOnionSkinOpacity(m_onionSkinMask, rows[i], row);
       addCell(players, scene, xsh, rows[i], col, level, subSheetColIndex);
 #else
       if (!Preferences::instance()->isAnimationSheetEnabled() ||
           !alreadyAdded(xsh, row, i, rows, col)) {
         m_onionSkinDistance = (rows[i] - row) < 0 ? --backPos : ++frontPos;
-        m_onionSkinOpacity =
-            getOnionSkinOpacity(m_onionSkinMask, rows[i], row);
+        m_onionSkinOpacity = getOnionSkinOpacity(m_onionSkinMask, rows[i], row);
         addCell(players, scene, xsh, rows[i], col, level, subSheetColIndex);
       }
 #endif
@@ -691,12 +694,23 @@ void StageBuilder::addCellWithOnionSkin(PlayerSet &players, ToonzScene *scene,
 
     m_onionSkinDistance = 0;
     m_onionSkinOpacity  = -1.0;
-    addCell(players, scene, xsh, row, col, level, subSheetColIndex);
+    {
+      const bool isCurrentCol = (subSheetColIndex >= 0)
+                                    ? (subSheetColIndex == m_currentColumnIndex)
+                                    : (col == m_currentColumnIndex);
+      if (!m_hideCurrentDrawing || !isCurrentCol)
+        addCell(players, scene, xsh, row, col, level, subSheetColIndex);
+    }
 
     m_onionSkinDistance = c_noOnionSkin;
     m_onionSkinOpacity  = -1.0;
-  } else
-    addCell(players, scene, xsh, row, col, level, subSheetColIndex);
+  } else {
+    const bool isCurrentCol = (subSheetColIndex >= 0)
+                                  ? (subSheetColIndex == m_currentColumnIndex)
+                                  : (col == m_currentColumnIndex);
+    if (!m_hideCurrentDrawing || !isCurrentCol)
+      addCell(players, scene, xsh, row, col, level, subSheetColIndex);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -720,6 +734,9 @@ void StageBuilder::addFrame(PlayerSet &players, ToonzScene *scene, TXsheet *xsh,
   for (int i = 0; i < columnCount; i++) {
     int c = shuffle[i].second;
     if (CameraTestCheck::instance()->isEnabled() && c != m_currentColumnIndex)
+      continue;
+    if (m_showOnlyCurrentColumn && level == 0 && subSheetColIndex < 0 &&
+        c != m_currentColumnIndex)
       continue;
     if (level == 0) {
       // m_isCurrentColumn = (c == m_currentColumnIndex);
@@ -867,18 +884,21 @@ void StageBuilder::addSimpleLevelFrame(PlayerSet &players,
       player.m_dpiAff = getDpiAffine(level, fid2);
     }
   }
-  players.push_back(Player());
-  Player &player = players.back();
-  player.m_sl    = level;
-  player.m_frame = level->guessIndex(fid);
-  player.m_fid   = fid;
-  if (!m_onionSkinMask.isEmpty() && m_onionSkinMask.isEnabled())
-    player.m_onionSkinDistance = 0;
-  player.m_isCurrentColumn      = true;
-  player.m_isCurrentXsheetLevel = true;
-  player.m_isEditingLevel       = true;
-  player.m_ancestorColumnIndex  = -1;
-  player.m_dpiAff               = getDpiAffine(level, fid);
+  const bool hideMain = m_hideCurrentDrawing;
+  if (!hideMain) {
+    players.push_back(Player());
+    Player &player = players.back();
+    player.m_sl    = level;
+    player.m_frame = level->guessIndex(fid);
+    player.m_fid   = fid;
+    if (!m_onionSkinMask.isEmpty() && m_onionSkinMask.isEnabled())
+      player.m_onionSkinDistance = 0;
+    player.m_isCurrentColumn      = true;
+    player.m_isCurrentXsheetLevel = true;
+    player.m_isEditingLevel       = true;
+    player.m_ancestorColumnIndex  = -1;
+    player.m_dpiAff               = getDpiAffine(level, fid);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -978,6 +998,8 @@ void Stage::visit(Visitor &visitor, const VisitArgs &args) {
   sb.m_isGuidedDrawingEnabled = args.m_isGuidedDrawingEnabled;
   sb.m_guidedFrontStroke      = args.m_guidedFrontStroke;
   sb.m_guidedBackStroke       = args.m_guidedBackStroke;
+  sb.m_hideCurrentDrawing     = args.m_hideCurrentDrawing;
+  sb.m_showOnlyCurrentColumn  = args.m_showOnlyCurrentColumn;
 #if defined(x64)
   if (args.m_liveViewImage) {
     sb.m_liveViewImage  = args.m_liveViewImage;
@@ -996,7 +1018,7 @@ void Stage::visit(Visitor &visitor, const VisitArgs &args) {
   Player::m_isShiftAndTraceEnabled = osm->isShiftTraceEnabled();
   sb.addFrame(sb.m_players, scene, xsh, row, 0, args.m_onlyVisible,
               args.m_checkPreviewVisibility);
-  
+
   updateOnionSkinSize(sb.m_players);
 
   sb.visit(sb.m_players, visitor, isPlaying);
@@ -1024,7 +1046,7 @@ void Stage::visit(Visitor &visitor, ToonzScene *scene, TXsheet *xsh, int row) {
 void Stage::visit(Visitor &visitor, TXshSimpleLevel *level, const TFrameId &fid,
                   const OnionSkinMask &osm, bool isPlaying,
                   int isGuidedDrawingEnabled, int guidedBackStroke,
-                  int guidedFrontStroke) {
+                  int guidedFrontStroke, bool hideCurrentDrawing) {
   StageBuilder sb;
   sb.m_vs                          = &visitor.m_vs;
   sb.m_onionSkinMask               = osm;
@@ -1032,6 +1054,7 @@ void Stage::visit(Visitor &visitor, TXshSimpleLevel *level, const TFrameId &fid,
   sb.m_isGuidedDrawingEnabled      = isGuidedDrawingEnabled;
   sb.m_guidedFrontStroke           = guidedFrontStroke;
   sb.m_guidedBackStroke            = guidedBackStroke;
+  sb.m_hideCurrentDrawing          = hideCurrentDrawing;
   Player::m_onionSkinFrontSize     = 0;
   Player::m_onionSkinBackSize      = 0;
   Player::m_firstFrontOnionSkin    = 0;
@@ -1048,8 +1071,9 @@ void Stage::visit(Visitor &visitor, TXshSimpleLevel *level, const TFrameId &fid,
 void Stage::visit(Visitor &visitor, TXshLevel *level, const TFrameId &fid,
                   const OnionSkinMask &osm, bool isPlaying,
                   double isGuidedDrawingEnabled, int guidedBackStroke,
-                  int guidedFrontStroke) {
+                  int guidedFrontStroke, bool hideCurrentDrawing) {
   if (level && level->getSimpleLevel())
     visit(visitor, level->getSimpleLevel(), fid, osm, isPlaying,
-          (int)isGuidedDrawingEnabled, guidedBackStroke, guidedFrontStroke);
+          (int)isGuidedDrawingEnabled, guidedBackStroke, guidedFrontStroke,
+          hideCurrentDrawing);
 }

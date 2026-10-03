@@ -590,7 +590,7 @@ void StrokeSelection::removeEndpoints() {
     TStroke *s = m_vi->removeEndpoints(e, &offset);
     UndoVectorData undoStroke;
 
-    undoStroke.index   = e;
+    undoStroke.index     = e;
     undoStroke.oldStroke = s;
     undoStroke.offset    = offset;
 
@@ -623,7 +623,7 @@ void StrokeSelection::sortWithPaletteOrder() {
         QObject::tr("The selection cannot be updated. It is not editable."));
     return;
   }
-  
+
   TPalette *palette = m_vi->getPalette();
   TTool *tool       = TTool::getApplication()->getCurrentTool()->getTool();
 
@@ -632,9 +632,9 @@ void StrokeSelection::sortWithPaletteOrder() {
   std::vector<int> oldOrder;
   for (auto index : m_indexes) {
     TStroke *stroke = m_vi->getStroke(index);
-    if (m_vi->isStrokeGrouped(index)) continue; 
+    if (m_vi->isStrokeGrouped(index)) continue;
     oldOrder.push_back(index);
-    int styleId     = stroke->getStyle();
+    int styleId = stroke->getStyle();
     styles.insert(stroke->getStyle());
     originalIndexToStyle.insert(index, styleId);
   }
@@ -666,7 +666,7 @@ void StrokeSelection::sortWithPaletteOrder() {
   m_vi->reOrderStrokes(oldIndexes, newIndexes);
 
   TXshSimpleLevel *level =
-          TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
+      TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
   TUndoManager::manager()->add(new OrderStrokesUndo(
       level, tool->getCurrentFid(), oldIndexes, newIndexes));
 
@@ -948,8 +948,8 @@ void StrokeSelection::paste() {
 
   TVectorImageP tarImg = tool->touchImage();
   if (!tarImg) return;
-  TPaletteP palette       = tarImg->getPalette();
-  TPaletteP oldPalette    = new TPalette();
+  TPaletteP palette    = tarImg->getPalette();
+  TPaletteP oldPalette = new TPalette();
   if (palette) oldPalette = palette->clone();
   bool isPaste = pasteStrokesWithoutUndo(tarImg, m_indexes, m_sceneHandle);
   if (isPaste) {
@@ -1033,7 +1033,8 @@ void StrokeSelection::enableCommands() {
   enableCommand(m_groupCommand.get(), MI_ExitGroup, &TGroupCommand::exitGroup);
 
   enableCommand(this, MI_RemoveEndpoints, &StrokeSelection::removeEndpoints);
-  enableCommand(this, MI_SortWithPaletteOrder, &StrokeSelection::sortWithPaletteOrder);
+  enableCommand(this, MI_SortWithPaletteOrder,
+                &StrokeSelection::sortWithPaletteOrder);
   enableCommand(this, MI_SelectAll, &StrokeSelection::selectAll);
 }
 
@@ -1125,7 +1126,11 @@ void StrokeSelection::changeColorStyle(int styleIndex) {
 
 bool StrokeSelection::isEditable() {
   TTool::Application *app = TTool::getApplication();
-  TXshSimpleLevel *level  = app->getCurrentLevel()->getSimpleLevel();
+  TTool *tool             = app->getCurrentTool()->getTool();
+  if (tool && tool->getViewer() && tool->getViewer()->isPickOnly())
+    return false;
+
+  TXshSimpleLevel *level = app->getCurrentLevel()->getSimpleLevel();
 
   TFrameHandle *frame = app->getCurrentFrame();
   bool filmstrip      = frame->isEditingLevel();

@@ -1735,6 +1735,8 @@ LocatorPanel::LocatorPanel(QWidget *parent) : TPanel(parent) {
   m_locator = new LocatorPopup(parent);
 
   setWidget(m_locator);
+  allowMultipleInstances(
+      Preferences::instance()->isLocatorNavigatorTabEnabled());
 }
 
 //=============================================================================
@@ -1750,7 +1752,8 @@ public:
     panel->move(qApp->desktop()->screenGeometry(panel).center());
     panel->setObjectName(getPanelType());
     panel->setWindowTitle(QObject::tr("Locator"));
-    panel->allowMultipleInstances(false);
+    panel->allowMultipleInstances(
+        Preferences::instance()->isLocatorNavigatorTabEnabled());
     return panel;
   }
 

@@ -125,6 +125,7 @@ public:
   void setPixelsOnly();
   void setUnits();
   void setCameraUnits();
+  void notifyLocatorNavigatorTabEnabled();
   // Saving
   void setRasterBackgroundColor();
 
@@ -240,6 +241,9 @@ public:
   }
   bool isRestoreViewerViewFromLastSessionEnabled() const {
     return getBoolValue(restoreViewerViewFromLastSession);
+  }
+  bool isLocatorNavigatorTabEnabled() const {
+    return getBoolValue(locatorNavigatorTabEnabled);
   }
 
   // Visualization  tab
@@ -603,6 +607,7 @@ Q_SIGNALS:
   void startAutoSave();
   void autoSavePeriodChanged();
   void fillOnlySaveboxChanged(bool enabled);
+  void locatorNavigatorTabEnabledChanged(bool enabled);
 
 private:
   std::unique_ptr<QSettings> m_settings;
