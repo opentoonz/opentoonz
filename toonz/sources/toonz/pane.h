@@ -20,6 +20,8 @@
 class TPanelTitleBarButtonSet;
 class TPanelTitleBarButton;
 class Room;
+class QSettings;
+class QTimer;
 
 //-----------------------------------------------------------------------------
 //! icon buttons placed on the panel titlebar (cfr. viewerpane.h)
@@ -240,6 +242,9 @@ public:
 
   void setCompact(bool compact);
 
+  void setSuppressed(bool suppressed);
+  void setVisible(bool visible) override;
+
 signals:
   void closeButtonPressed();
   void doubleClick(QMouseEvent *me);
@@ -256,6 +261,7 @@ protected:
 private:
   bool m_closeButtonHighlighted;
   bool m_compact;
+  bool m_suppressed = false;
   std::vector<std::pair<QPoint, QWidget *>> m_buttons;
 
   QPixmap m_borderPm, m_activeBorderPm, m_floatBorderPm, m_floatActiveBorderPm;
@@ -316,8 +322,10 @@ public:
 
   bool isCustomPanel() const;
   bool compactFloating() const { return m_compactFloating; }
-  void setCompactFloating(bool on, bool keepUsefulSize = false);
+  void setCompactMode(bool compact, bool showTitleBar);
   void loadCompactFloating();
+  void saveCompactState(QSettings &settings) const;
+  void loadCompactState(QSettings &settings);
   void watchContextMenu(QWidget *root);
   void execContextMenu(const QPoint &globalPos);
 
@@ -343,6 +351,8 @@ protected:
   void setFloatingAppearance() override;
   void setDockedAppearance() override;
   int isResizeGrip(QPoint p) override;
+  QPoint undockGrabOffset(const QPoint &offset) override;
+  void hideEvent(QHideEvent *event) override;
 
   virtual bool isActivatableOnEnter() { return false; }
 
@@ -390,31 +400,36 @@ private:
     bool noSystemBackground;
   };
   QVector<CompactSurface> m_compactSurfaces;
-  bool m_titleOverlay;
-  bool m_contentFrozen;
-  bool m_hasCompactSnapshot;
+  bool m_compactApplied;
+  bool m_inFloatingChrome;
+  bool m_displaySyncPending;
   bool m_contentPress;
   bool m_forwardingMouse;
   QPoint m_contentPressGlobal;
   QPointer<QWidget> m_contentPressWidget;
-  QSize m_frozenContentSize;
-  QSize m_offContentFloor;
-  QSizePolicy m_savedContentPolicy;
-  QSize m_savedContentMin;
-  QSize m_savedContentMax;
+  QSize m_appliedChrome;
+  QSize m_lastFloatingContent;
+  QSize m_compactFloor;
   QSize m_savedPanelMin;
   QSize m_savedPanelMax;
-  int m_compactTopInset;
+  bool m_hasSavedPanelLimits;
+  bool m_restoreSizePending;
+  int m_gripCursor;
+  QTimer *m_gripCursorTimer;
 
-  void applyCompactTitle(bool overlay, bool keepContentSize = false,
-                         bool keepUsefulSize = false);
+  QSize chromeSize(bool compact) const;
+  void applyDisplayState(bool floating, bool keepContentSize = false);
+  void scheduleDisplaySync();
+  void applyPanelLimits(bool compact, bool floating, const QSize &chrome);
+  void rememberFloatingSize();
+  void restoreFloatingSize();
+  void setFloatingChromeMargin(int margin);
+  void positionCompactTitleBar();
+  QPoint nearestDragPoint(const QPoint &p) const;
   void ensureCompactTranslucency(bool on);
   int compactResizeMargin(const QPoint &panelPos) const;
-  void rememberOffContentFloor(QWidget *content);
-  QSize offContentFloor() const;
-  void updateCompactResizeCursor(QWidget *widget, int marginType) const;
+  void updateGripCursor(int marginType);
   void saveCompactFloating() const;
-  void setShowTitleBar(bool on, bool keepUsefulSize = false);
   void setCompactTransparentBackground(bool on);
   void syncCompactTransparentLook();
   void clearCompactSurfaces();

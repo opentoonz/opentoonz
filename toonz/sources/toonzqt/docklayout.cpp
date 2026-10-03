@@ -1129,8 +1129,7 @@ bool DockLayout::detachTabForDrag(DockWidget *item, Region *region,
   item->m_undocking           = false;
   item->m_dragging            = true;
   item->m_dragMouseInitialPos = globalPos;
-  item->m_dragInitialPos =
-      globalPos - grabOffsetInTab - item->settledDragGripOffset();
+  item->m_dragInitialPos = item->undockedPos(globalPos, grabOffsetInTab);
   item->move(item->m_dragInitialPos);
   item->grabMouse();
 

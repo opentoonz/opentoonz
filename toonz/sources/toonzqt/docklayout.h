@@ -360,6 +360,7 @@ public:
 private:
   QWidget *dragGrip();
   QPoint settledDragGripOffset();
+  QPoint undockedPos(const QPoint &globalPos, const QPoint &grabOffset);
 
   // Event handling
   // Basic events
@@ -374,6 +375,8 @@ protected:
   void wheelEvent(QWheelEvent *we) override;
   void mouseDoubleClickEvent(QMouseEvent *me) override;
   virtual void windowTitleEvent(QEvent *) {}
+
+  virtual QPoint undockGrabOffset(const QPoint &offset) { return offset; }
 };
 
 //========================================================================
