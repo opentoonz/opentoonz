@@ -7,6 +7,9 @@
 
 #include "pane.h"
 
+#include "toonz/preferences.h"
+#include "toonz/preferencesitemids.h"
+#include "toonzqt/menubarcommand.h"
 #include "toonzqt/styleeditor.h"
 
 #include <QMainWindow>
@@ -43,6 +46,11 @@ void OpenFloatingPanel::execute() {
   if (m_panelType == "FlipBook") {
     FlipBookPool::instance()->pop();
     return;
+  }
+
+  if (Preferences::instance()->getBoolValue(togglePanelWithShortcut) &&
+      CommandManager::instance()->executeTriggeredByShortcut()) {
+    if (closeVisiblePanelsOfType(m_panelType)) return;
   }
 
   getOrOpenFloatingPanel(m_panelType);
@@ -99,6 +107,22 @@ panel->raise();
   if(!lastFloatingPos.isNull())
           panel->move(QPoint(lastFloatingPos.x()+30,lastFloatingPos.y()+30));
 */
+}
+
+bool OpenFloatingPanel::closeVisiblePanelsOfType(const std::string &panelType) {
+  TMainWindow *currentRoom = TApp::instance()->getCurrentRoom();
+  if (!currentRoom) return false;
+
+  bool closedAny               = false;
+  const QList<TPanel *> panels = currentRoom->findChildren<TPanel *>();
+  for (TPanel *panel : panels) {
+    if (panel->getPanelType() == panelType && panel->isFloating() &&
+        !panel->isHidden()) {
+      panel->close();
+      closedAny = true;
+    }
+  }
+  return closedAny;
 }
 
 TPanel *OpenFloatingPanel::getOrOpenFloatingPanel(

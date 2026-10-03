@@ -436,14 +436,7 @@ void CustomPanelManager::registerCustomPanelCommands() {
         if (!currentRoom) return;
 
         std::string panelType = panelTypeFromPanelId(m_panelId).toStdString();
-        QList<TPanel*> panels = currentRoom->findChildren<TPanel*>();
-
-        for (TPanel* panel : panels) {
-          if (panel->getPanelType() == panelType && !panel->isHidden()) {
-            panel->close();
-            return;
-          }
-        }
+        if (OpenFloatingPanel::closeVisiblePanelsOfType(panelType)) return;
 
         OpenFloatingPanel::getOrOpenFloatingPanel(panelType);
       }
