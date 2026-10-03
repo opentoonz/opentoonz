@@ -93,7 +93,8 @@ if(BUILD_ENV_MSVC)
     set(_init_SYSTEM_SUPERLU                 OFF)
 elseif(BUILD_ENV_APPLE)
     set(_init_SYSTEM_LZO                     OFF)
-    set(_init_SYSTEM_SUPERLU                 OFF)
+    # the bundled libsuperlu_4.1.a is i386/x86_64 only; use Homebrew's superlu
+    set(_init_SYSTEM_SUPERLU                 ON)
 elseif(BUILD_ENV_UNIXLIKE)
     set(_init_SYSTEM_LZO                     ON)
     set(_init_SYSTEM_SUPERLU                 ON)
@@ -212,6 +213,8 @@ elseif(BUILD_ENV_APPLE)
 
     add_definitions(
         -DMACOSX
+        # not an architecture flag: tmachine.h uses i386 to pick the little-endian
+        # channel order on macOS, which is also correct on arm64. Keep it.
         -Di386
         -D__MACOS__
       )
@@ -416,7 +419,10 @@ elseif(BUILD_ENV_APPLE)
     find_package(GLEW)
 
     find_package(SuperLU REQUIRED)
-    set(SUPERLU_INCLUDE_DIR ${SUPERLU_INCLUDE_DIR}/superlu)
+    if(NOT WITH_SYSTEM_SUPERLU)
+        # vendored SuperLU 4.1 layout; Homebrew installs flat headers
+        set(SUPERLU_INCLUDE_DIR ${SUPERLU_INCLUDE_DIR}/superlu)
+    endif()
     set(SUPERLU_LIB ${SUPERLU_LIBRARY})
     message("SuperLU:" ${SUPERLU_INCLUDE_DIR})
 
