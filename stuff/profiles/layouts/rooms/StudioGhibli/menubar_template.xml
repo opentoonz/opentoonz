@@ -218,6 +218,7 @@
     <command>MI_OpenXshView</command>
     <command>MI_OpenHistoryPanel</command>
     <command>MI_OpenCustomPanels</command>
+    <command>MI_OpenAlignmentPanel</command>
     <separator/>
     <command>MI_ResetRoomLayout</command>
   </menu>

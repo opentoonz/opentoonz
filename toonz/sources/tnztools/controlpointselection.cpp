@@ -7,6 +7,10 @@
 
 #include "tools/toolhandle.h"
 #include "tools/toolutils.h"
+#include "tools/strokeselection.h"
+#include "toonzqt/selectioncommandids.h"
+#include "toonzqt/tselectionhandle.h"
+#include <QMutexLocker>
 
 #include "toonz/tobjecthandle.h"
 #include "toonz/txshlevelhandle.h"
@@ -1077,13 +1081,29 @@ bool ControlPointSelection::isSelected(int index) const {
 //-----------------------------------------------------------------------------
 
 void ControlPointSelection::select(int index) {
-  m_selectedPoints.insert(index);
+  bool wasEmpty = isEmpty();
+  if (m_selectedPoints.insert(index).second) m_selectionOrder.push_back(index);
+  if (wasEmpty && !isEmpty() && TSelection::getCurrent() == this)
+    TSelectionHandle::getCurrent()->notifySelectionChanged();
 }
 
 //-----------------------------------------------------------------------------
 
 void ControlPointSelection::unselect(int index) {
   m_selectedPoints.erase(index);
+  m_selectionOrder.erase(
+      std::remove(m_selectionOrder.begin(), m_selectionOrder.end(), index),
+      m_selectionOrder.end());
+  if (isEmpty() && TSelection::getCurrent() == this)
+    TSelectionHandle::getCurrent()->notifySelectionChanged();
+}
+
+void ControlPointSelection::selectNone() {
+  bool wasEmpty = isEmpty();
+  m_selectedPoints.clear();
+  m_selectionOrder.clear();
+  if (!wasEmpty && TSelection::getCurrent() == this)
+    TSelectionHandle::getCurrent()->notifySelectionChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -1095,13 +1115,11 @@ void ControlPointSelection::addMenuItems(QMenu *menu) {
        m_controlPointEditorStroke->getControlPointCount() <= 1))
     return;
 
-  QAction *linear   = menu->addAction(tr("Set Linear Control Point"));
-  QAction *unlinear = menu->addAction(tr("Set Nonlinear Control Point"));
+  menu->addAction(
+      CommandManager::instance()->getAction(MI_SetLinearControlPoint));
+  menu->addAction(
+      CommandManager::instance()->getAction(MI_SetNonLinearControlPoint));
   menu->addSeparator();
-
-  connect(linear, &QAction::triggered, this, &ControlPointSelection::setLinear);
-  connect(unlinear, &QAction::triggered, this,
-          &ControlPointSelection::setUnlinear);
 }
 
 //-----------------------------------------------------------------------------
@@ -1269,4 +1287,89 @@ void ControlPointSelection::deleteControlPoints() {
 
 void ControlPointSelection::enableCommands() {
   enableCommand(this, "MI_Clear", &ControlPointSelection::deleteControlPoints);
+  enableCommand(this, MI_AlignLeft, &ControlPointSelection::alignControlPoints,
+                VectorAlignment::ALIGN_LEFT);
+  enableCommand(this, MI_AlignRight, &ControlPointSelection::alignControlPoints,
+                VectorAlignment::ALIGN_RIGHT);
+  enableCommand(this, MI_AlignTop, &ControlPointSelection::alignControlPoints,
+                VectorAlignment::ALIGN_TOP);
+  enableCommand(this, MI_AlignBottom,
+                &ControlPointSelection::alignControlPoints,
+                VectorAlignment::ALIGN_BOTTOM);
+  enableCommand(this, MI_AlignCenterHorizontal,
+                &ControlPointSelection::alignControlPoints,
+                VectorAlignment::ALIGN_CENTER_H);
+  enableCommand(this, MI_AlignCenterVertical,
+                &ControlPointSelection::alignControlPoints,
+                VectorAlignment::ALIGN_CENTER_V);
+  enableCommand(this, MI_DistributeHorizontal,
+                &ControlPointSelection::alignControlPoints,
+                VectorAlignment::DISTRIBUTE_H);
+  enableCommand(this, MI_DistributeVertical,
+                &ControlPointSelection::alignControlPoints,
+                VectorAlignment::DISTRIBUTE_V);
+  enableCommand(this, MI_SetLinearControlPoint,
+                &ControlPointSelection::setLinear);
+  enableCommand(this, MI_SetNonLinearControlPoint,
+                &ControlPointSelection::setUnlinear);
+}
+
+// Adapted from manongjohn's Tahoma2D PR #1275 using the current OT editor
+// and its undo ownership. Handle movement remains in moveControlPoint().
+void ControlPointSelection::alignControlPoints(VectorAlignment::Type type) {
+  using namespace VectorAlignment;
+  TTool *tool = TTool::getApplication()->getCurrentTool()->getTool();
+  ControlPointEditorTool *cpTool = dynamic_cast<ControlPointEditorTool *>(tool);
+  if (!cpTool || !tool->isEnabled() || cpTool->isBusy() ||
+      !m_controlPointEditorStroke || m_selectedPoints.size() < 2)
+    return;
+  TVectorImageP vi(tool->getImage(false));
+  int strokeIndex = m_controlPointEditorStroke->getStrokeIndex();
+  if (!vi || strokeIndex < 0 || strokeIndex >= (int)vi->getStrokeCount())
+    return;
+  Method method = tool->getAlignMethod();
+  if (method != SELECT_AREA && method != FIRST_SELECTED &&
+      method != LAST_SELECTED)
+    method = SELECT_AREA;
+  std::vector<int> indexes;
+  std::vector<TRectD> boxes;
+  for (int index : m_selectionOrder) {
+    if (!isSelected(index) || index < 0 ||
+        index >= m_controlPointEditorStroke->getControlPointCount())
+      continue;
+    indexes.push_back(index);
+    TThickPoint point = m_controlPointEditorStroke->getControlPoint(index);
+    boxes.emplace_back(point.x, point.y, point.x, point.y);
+  }
+  auto deltas  = offsets(boxes, type, method);
+  bool changed = std::any_of(deltas.begin(), deltas.end(),
+                             [](const TPointD &p) { return p != TPointD(); });
+  if (!changed) return;
+  std::unique_ptr<TUndo> undo;
+  if (tool->getApplication()->getCurrentObject()->isSpline()) {
+    TXsheet *xsh = tool->getXsheet();
+    TStageObject *object =
+        xsh ? xsh->getStageObject(tool->getObjectId()) : nullptr;
+    if (!object || !object->getSpline()) return;
+    undo = std::make_unique<UndoPath>(object->getSpline());
+  } else {
+    TXshSimpleLevel *level =
+        tool->getApplication()->getCurrentLevel()->getSimpleLevel();
+    StrokeSelection editable;
+    if (!level || !editable.isEditable()) return;
+    auto cpUndo = std::make_unique<UndoControlPointEditor>(
+        level, tool->getCurrentFid(), false);
+    cpUndo->addOldStroke(strokeIndex, vi->getVIStroke(strokeIndex));
+    undo = std::move(cpUndo);
+  }
+  QMutexLocker lock(vi->getMutex());
+  vi->findRegions();
+  TStroke previous(*vi->getStroke(strokeIndex));
+  for (size_t i = 0; i < indexes.size(); ++i)
+    if (deltas[i] != TPointD())
+      m_controlPointEditorStroke->moveControlPoint(indexes[i], deltas[i]);
+  vi->notifyChangedStrokes(strokeIndex, &previous);
+  lock.unlock();
+  TUndoManager::manager()->add(undo.release());
+  tool->notifyImageChanged();
 }
