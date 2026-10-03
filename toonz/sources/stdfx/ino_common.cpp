@@ -376,6 +376,42 @@ const T& clamp(const T& v, const T& lo, const T& hi) {
   assert(!(hi < lo));
   return (v < lo) ? lo : (hi < v) ? hi : v;
 }
+
+// Evaluate a clipped blend against the straight color of an opaque Back pixel,
+// then scale the premultiplied result by the original Back alpha. Ordinary
+// blend kernels leave the working alpha at 1, while alpha-changing kernels
+// return their intended factor, so both cases follow the same rule.
+class ClippedBlendState {
+  const bool m_enabled;
+  const double m_backgroundAlpha;
+
+public:
+  ClippedBlendState(bool enabled, double backgroundAlpha)
+      : m_enabled(enabled), m_backgroundAlpha(backgroundAlpha) {}
+
+  bool isTransparent() const { return m_enabled && m_backgroundAlpha <= 0.0; }
+  double inputAlpha() const { return m_backgroundAlpha; }
+  double workingAlpha() const { return m_enabled ? 1.0 : m_backgroundAlpha; }
+  double outputAlpha(double kernelAlpha) const {
+    return m_enabled ? m_backgroundAlpha * kernelAlpha : kernelAlpha;
+  }
+
+  void prepare(double& r, double& g, double& b, double& a) const {
+    if (!m_enabled) return;
+    r /= m_backgroundAlpha;
+    g /= m_backgroundAlpha;
+    b /= m_backgroundAlpha;
+    a = 1.0;
+  }
+
+  void restore(double& r, double& g, double& b, double& a) const {
+    if (!m_enabled) return;
+    r *= m_backgroundAlpha;
+    g *= m_backgroundAlpha;
+    b *= m_backgroundAlpha;
+    a *= m_backgroundAlpha;
+  }
+};
 }  // namespace
 //------------------------------------------------------------
 
@@ -477,7 +513,7 @@ void TBlendForeBackRasterFx::dryComputeUpAndDown(TRectD& rect, double frame,
                                                  const TRenderSettings& rs,
                                                  bool upComputesWholeTile) {
   const bool up_is   = (this->m_up.isConnected() &&
-                      this->m_up.getFx()->getTimeRegion().contains(frame));
+                        this->m_up.getFx()->getTimeRegion().contains(frame));
   const bool down_is = (this->m_down.isConnected() &&
                         this->m_down.getFx()->getTimeRegion().contains(frame));
   /* ------ 両方とも切断の時処理しない ---------------------- */
@@ -682,9 +718,16 @@ void TBlendForeBackRasterFx::nonlinearTmpl(TRasterPT<T> dn_ras_out,
       double dng = static_cast<double>(out_pix->g) / maxi;
       double dnb = static_cast<double>(out_pix->b) / maxi;
       double dna = static_cast<double>(out_pix->m) / maxi;
-      brendKernel(dnr, dng, dnb, dna, upr, upg, upb, upa,
-                  clipping_mask_sw ? up_opacity * dna : up_opacity,
+      ClippedBlendState clipped(clipping_mask_sw, dna);
+      if (clipped.isTransparent()) {
+        out_pix->r = out_pix->g = out_pix->b = out_pix->m = 0;
+        continue;
+      }
+
+      clipped.prepare(dnr, dng, dnb, dna);
+      brendKernel(dnr, dng, dnb, dna, upr, upg, upb, upa, up_opacity,
                   alpha_rendering_sw, true);
+      clipped.restore(dnr, dng, dnb, dna);
       out_pix->r = static_cast<Q>(dnr * (maxi + 0.999999));
       out_pix->g = static_cast<Q>(dng * (maxi + 0.999999));
       out_pix->b = static_cast<Q>(dnb * (maxi + 0.999999));
@@ -714,9 +757,20 @@ void TBlendForeBackRasterFx::nonlinearTmpl<TPixelF, float>(
       double dng = static_cast<double>(out_pix->g);
       double dnb = static_cast<double>(out_pix->b);
       double dna = static_cast<double>(out_pix->m);
+      ClippedBlendState clipped(clipping_mask_sw, dna);
+      if (clipped.isTransparent()) {
+        out_pix->r = out_pix->g = out_pix->b = out_pix->m = 0.f;
+        continue;
+      }
+
+      const bool partialMask = clipping_mask_sw && clipped.inputAlpha() < 1.0;
+      clipped.prepare(dnr, dng, dnb, dna);
+      // Float rasters otherwise retain HDR blend results. At a soft clipping
+      // edge, bound the working color before restoring partial coverage.
       brendKernel(dnr, dng, dnb, dna, up_pix->r, up_pix->g, up_pix->b,
-                  up_pix->m, clipping_mask_sw ? up_opacity * dna : up_opacity,
-                  alpha_rendering_sw, false);
+                  up_pix->m, up_opacity, alpha_rendering_sw,
+                  partialMask);
+      clipped.restore(dnr, dng, dnb, dna);
       out_pix->r = dnr;
       out_pix->g = dng;
       out_pix->b = dnb;
@@ -746,24 +800,25 @@ void TBlendForeBackRasterFx::linearTmpl(TRasterPT<T> dn_ras_out,
     const T* const out_end = out_pix + dn_ras_out->getLx();
     const T* up_pix        = up_ras->pixels(yy);
     for (; out_pix < out_end; ++out_pix, ++up_pix) {
-      if (up_pix->m <= 0 || up_opacity <= 0) {
+      double dna = static_cast<double>(out_pix->m) / maxi;
+      ClippedBlendState clipped(clipping_mask_sw, dna);
+      if (clipped.isTransparent()) {
+        out_pix->r = out_pix->g = out_pix->b = out_pix->m = 0;
         continue;
       }
-
-      double dna         = static_cast<double>(out_pix->m) / maxi;
-      double tmp_opacity = clipping_mask_sw ? up_opacity * dna : up_opacity;
-      if (tmp_opacity <= 0) continue;
+      if (up_opacity <= 0) continue;
 
       double dnBGR[3];
       dnBGR[0]        = static_cast<double>(out_pix->b) / maxi;
       dnBGR[1]        = static_cast<double>(out_pix->g) / maxi;
       dnBGR[2]        = static_cast<double>(out_pix->r) / maxi;
       double dnXYZ[3] = {0.0, 0.0, 0.0};
-      if (dna > 0.0) {
+      if (clipped.inputAlpha() > 0.0) {
         for (int c = 0; c < 3; c++) {
           if (premultiplied_sw)
-            dnBGR[c] =
-                to_linear_color_space(dnBGR[c] / dna, 1.0, gammaDif) * dna;
+            dnBGR[c] = to_linear_color_space(dnBGR[c] / clipped.inputAlpha(),
+                                             1.0, gammaDif) *
+                       clipped.workingAlpha();
           else
             dnBGR[c] = to_linear_color_space(dnBGR[c], 1.0, gammaDif);
         }
@@ -778,27 +833,37 @@ void TBlendForeBackRasterFx::linearTmpl(TRasterPT<T> dn_ras_out,
       double upa = static_cast<double>(up_pix->m) / maxi;
 
       for (int c = 0; c < 3; c++) {
-        if (premultiplied_sw)
-          upBGR[c] = to_linear_color_space(upBGR[c] / upa, 1.0, gammaDif) * upa;
-        else
+        if (premultiplied_sw) {
+          if (upa > 0.0)
+            upBGR[c] =
+                to_linear_color_space(upBGR[c] / upa, 1.0, gammaDif) * upa;
+          else
+            upBGR[c] = 0.0;
+        } else
           upBGR[c] = to_linear_color_space(upBGR[c], 1.0, gammaDif);
       }
 
       double upXYZ[3];
       to_xyz(upXYZ, upBGR);
 
+      dna = clipped.workingAlpha();
       brendKernel(dnXYZ[0], dnXYZ[1], dnXYZ[2], dna, upXYZ[0], upXYZ[1],
-                  upXYZ[2], upa, tmp_opacity, alpha_rendering_sw, false);
+                  upXYZ[2], upa, up_opacity, alpha_rendering_sw, false);
 
       to_bgr(dnBGR, dnXYZ);
 
       // premultiply the result
+      const double outputAlpha = clipped.outputAlpha(dna);
+      if (dna <= 0.0 || outputAlpha <= 0.0) {
+        out_pix->r = out_pix->g = out_pix->b = out_pix->m = 0;
+        continue;
+      }
       double nonlinear_b =
-          to_nonlinear_color_space(dnBGR[0] / dna, 1.0, gammaDif) * dna;
+          to_nonlinear_color_space(dnBGR[0] / dna, 1.0, gammaDif) * outputAlpha;
       double nonlinear_g =
-          to_nonlinear_color_space(dnBGR[1] / dna, 1.0, gammaDif) * dna;
+          to_nonlinear_color_space(dnBGR[1] / dna, 1.0, gammaDif) * outputAlpha;
       double nonlinear_r =
-          to_nonlinear_color_space(dnBGR[2] / dna, 1.0, gammaDif) * dna;
+          to_nonlinear_color_space(dnBGR[2] / dna, 1.0, gammaDif) * outputAlpha;
 
       out_pix->r =
           static_cast<Q>(clamp(nonlinear_r, 0.0, 1.0) * (maxi + 0.999999));
@@ -806,7 +871,7 @@ void TBlendForeBackRasterFx::linearTmpl(TRasterPT<T> dn_ras_out,
           static_cast<Q>(clamp(nonlinear_g, 0.0, 1.0) * (maxi + 0.999999));
       out_pix->b =
           static_cast<Q>(clamp(nonlinear_b, 0.0, 1.0) * (maxi + 0.999999));
-      out_pix->m = static_cast<Q>(dna * (maxi + 0.999999));
+      out_pix->m = static_cast<Q>(outputAlpha * (maxi + 0.999999));
     }
   }
 }
@@ -833,24 +898,25 @@ void TBlendForeBackRasterFx::linearTmpl<TPixelF, float>(TRasterFP dn_ras_out,
     const TPixelF* const out_end = out_pix + dn_ras_out->getLx();
     const TPixelF* up_pix        = up_ras->pixels(yy);
     for (; out_pix < out_end; ++out_pix, ++up_pix) {
-      if (up_pix->m <= 0.f || up_opacity <= 0.f) {
+      double dna = static_cast<double>(out_pix->m);
+      ClippedBlendState clipped(clipping_mask_sw, dna);
+      if (clipped.isTransparent()) {
+        out_pix->r = out_pix->g = out_pix->b = out_pix->m = 0.f;
         continue;
       }
-
-      double dna         = static_cast<double>(out_pix->m);
-      double tmp_opacity = clipping_mask_sw ? up_opacity * dna : up_opacity;
-      if (tmp_opacity <= 0.) continue;
+      if (up_opacity <= 0.f) continue;
 
       double dnBGR[3];
       dnBGR[0]        = static_cast<double>(out_pix->b);
       dnBGR[1]        = static_cast<double>(out_pix->g);
       dnBGR[2]        = static_cast<double>(out_pix->r);
       double dnXYZ[3] = {0.0, 0.0, 0.0};
-      if (dna > 0.0) {
+      if (clipped.inputAlpha() > 0.0) {
         for (int c = 0; c < 3; c++) {
           if (premultiplied_sw)
-            dnBGR[c] =
-                to_linear_color_space(dnBGR[c] / dna, 1.0, gammaDif) * dna;
+            dnBGR[c] = to_linear_color_space(dnBGR[c] / clipped.inputAlpha(),
+                                             1.0, gammaDif) *
+                       clipped.workingAlpha();
           else
             dnBGR[c] = to_linear_color_space(dnBGR[c], 1.0, gammaDif);
         }
@@ -864,32 +930,51 @@ void TBlendForeBackRasterFx::linearTmpl<TPixelF, float>(TRasterFP dn_ras_out,
       double upa = static_cast<double>(up_pix->m);
 
       for (int c = 0; c < 3; c++) {
-        if (premultiplied_sw)
-          upBGR[c] = to_linear_color_space(upBGR[c] / upa, 1.0, gammaDif) * upa;
-        else
+        if (premultiplied_sw) {
+          if (upa > 0.0)
+            upBGR[c] =
+                to_linear_color_space(upBGR[c] / upa, 1.0, gammaDif) * upa;
+          else
+            upBGR[c] = 0.0;
+        } else
           upBGR[c] = to_linear_color_space(upBGR[c], 1.0, gammaDif);
       }
 
       double upXYZ[3];
       to_xyz(upXYZ, upBGR);
 
+      dna = clipped.workingAlpha();
       brendKernel(dnXYZ[0], dnXYZ[1], dnXYZ[2], dna, upXYZ[0], upXYZ[1],
-                  upXYZ[2], upa, tmp_opacity, alpha_rendering_sw, false);
+                  upXYZ[2], upa, up_opacity, alpha_rendering_sw, false);
 
       to_bgr(dnBGR, dnXYZ);
 
       // premultiply the result
+      const double outputAlpha = clipped.outputAlpha(dna);
+      if (dna <= 0.0 || outputAlpha <= 0.0) {
+        out_pix->r = out_pix->g = out_pix->b = out_pix->m = 0.f;
+        continue;
+      }
       double nonlinear_b =
-          to_nonlinear_color_space(dnBGR[0] / dna, 1.0, gammaDif) * dna;
+          to_nonlinear_color_space(dnBGR[0] / dna, 1.0, gammaDif) * outputAlpha;
       double nonlinear_g =
-          to_nonlinear_color_space(dnBGR[1] / dna, 1.0, gammaDif) * dna;
+          to_nonlinear_color_space(dnBGR[1] / dna, 1.0, gammaDif) * outputAlpha;
       double nonlinear_r =
-          to_nonlinear_color_space(dnBGR[2] / dna, 1.0, gammaDif) * dna;
+          to_nonlinear_color_space(dnBGR[2] / dna, 1.0, gammaDif) * outputAlpha;
+
+      if (clipping_mask_sw && clipped.inputAlpha() < 1.0) {
+        // Match the nonlinear method: after a masked blend, the restored
+        // premultiplied color cannot exceed the mask coverage.
+        const double colorLimit = clipped.inputAlpha();
+        nonlinear_r             = clamp(nonlinear_r, 0.0, colorLimit);
+        nonlinear_g             = clamp(nonlinear_g, 0.0, colorLimit);
+        nonlinear_b             = clamp(nonlinear_b, 0.0, colorLimit);
+      }
 
       out_pix->r = nonlinear_r;
       out_pix->g = nonlinear_g;
       out_pix->b = nonlinear_b;
-      out_pix->m = dna;
+      out_pix->m = outputAlpha;
     }
   }
 }
@@ -985,7 +1070,7 @@ fxをreplaceすると、
 となる
 */
   const bool up_is   = (this->m_up.isConnected() &&
-                      this->m_up.getFx()->getTimeRegion().contains(frame));
+                        this->m_up.getFx()->getTimeRegion().contains(frame));
   const bool down_is = (this->m_down.isConnected() &&
                         this->m_down.getFx()->getTimeRegion().contains(frame));
   /* ------ 両方とも切断の時処理しない ---------------------- */
@@ -1019,7 +1104,7 @@ fxをreplaceすると、
   TRectD upBBox;
   if (upComputesWholeTile) {
     upBBox = tileRect;
-  }      /* tile全体を得る */
+  } /* tile全体を得る */
   else { /* 厳密なエリア... */
     this->m_up->getBBox(frame, upBBox, rs);
     upBBox *= tileRect; /* upとtileの交差エリア */
