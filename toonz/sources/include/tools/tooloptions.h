@@ -745,6 +745,7 @@ class ShiftTraceToolOptionBox final : public ToolOptionsBox {
   QFrame *m_prevFrame, *m_afterFrame;
   QRadioButton *m_prevRadioBtn, *m_afterRadioBtn;
   QPushButton *m_resetPrevGhostBtn, *m_resetAfterGhostBtn;
+  QComboBox *m_ghostBBoxCombo;
   TTool *m_tool;
   void resetGhost(int index);
 
@@ -760,6 +761,7 @@ protected slots:
   void onResetAfterGhostBtnPressed();
   void onPrevRadioBtnClicked();
   void onAfterRadioBtnClicked();
+  void onGhostBBoxComboChanged(int index);
   void updateColors();
 };
 
