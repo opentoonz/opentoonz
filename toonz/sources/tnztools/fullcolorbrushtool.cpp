@@ -368,7 +368,7 @@ bool FullColorBrushTool::preLeftButtonDown() {
 void FullColorBrushTool::handleMouseEvent(MouseEventType type,
                                           const TPointD &pos,
                                           const TMouseEvent &e) {
-  TTimerTicks t = TToolTimer::ticks();
+  TTimerTicks t = e.time() > 0 ? e.time() : TToolTimer::ticks();
   bool alt      = e.getModifiersMask() & TMouseEvent::ALT_KEY;
   bool shift    = e.getModifiersMask() & TMouseEvent::SHIFT_KEY;
   bool control  = e.getModifiersMask() & TMouseEvent::CTRL_KEY;
