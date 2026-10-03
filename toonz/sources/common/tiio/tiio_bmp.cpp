@@ -652,8 +652,7 @@ void BmpWriter::open(FILE *file, const TImageInfo &info) {
 
   assert(m_bitPerPixel == 8 || m_bitPerPixel == 24);
 
-  int bytePerLine =
-      ((lx * m_bitPerPixel + 31) / 32) * (m_bitPerPixel == 8 ? 1 : 4);
+  int bytePerLine = ((lx * m_bitPerPixel + 31) / 32) * 4;
 
   int fileSize = 14                  // file header
                  + 40                // info header
