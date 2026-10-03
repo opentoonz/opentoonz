@@ -42,6 +42,7 @@ set(HEADERS
     ../include/tools/levelselection.h
     ../include/tools/rasterselection.h
     ../include/tools/strokeselection.h
+    ../include/tools/vectoralignment.h
     ../include/tools/stylepicker.h
     ../include/tools/tool.h
     ../include/tools/toolcommandids.h

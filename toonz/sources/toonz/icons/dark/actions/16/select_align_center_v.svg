@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" version="1.1" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+  <g transform="rotate(90,8,8)">
+    <rect x="0" y="-16" width="16" height="16" style="fill-opacity:0" transform="rotate(90)" />
+    <rect style="fill:#000000;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-miterlimit:2" width="4" height="4" x="6" y="-15" transform="rotate(90)" />
+    <rect style="fill:#000000;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-miterlimit:2" width="4" height="4" x="6" y="-5" transform="rotate(90)" />
+    <rect style="fill:#000000;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-miterlimit:2" width="4" height="4" x="6" y="-10" transform="rotate(90)" />
+    <path style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:2;stroke-dasharray:none;stroke-opacity:1" d="M 12,15 H 4 l 3.96875,-4.03125" />
+    <path style="clip-rule:evenodd;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:2;stroke-dasharray:none;stroke-opacity:1" d="M 12,1 H 4 l 3.96875,4.0000001" />
+  </g>
+</svg>
