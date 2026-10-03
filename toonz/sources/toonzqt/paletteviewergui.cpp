@@ -31,6 +31,7 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include <QKeyEvent>
+#include <QKeySequence>
 #include <QMenuBar>
 #include <QToolTip>
 #include <QDrag>
@@ -1003,6 +1004,11 @@ void PageViewer::mousePressEvent(QMouseEvent *event) {
 
   if (event->button() == Qt::RightButton) {
     m_styleSelection->makeCurrent();
+    // Opening the level palette menu beside the chips must preserve this
+    // page's selected styles for batch commands such as Convert.
+    const bool keepSelection = m_viewType == LEVEL_PALETTE &&
+                               !m_styleSelection->isEmpty() &&
+                               m_styleSelection->isPageSelected(pageIndex);
     // if you are clicking on the color chip
     if (0 <= indexInPage && indexInPage < getChipCount()) {
       // Se pageIndex non e' selezionato lo seleziono
@@ -1012,7 +1018,7 @@ void PageViewer::mousePressEvent(QMouseEvent *event) {
       }
       // Cambio l'indice corrente
       setCurrentStyleIndex(m_page->getStyleId(indexInPage));
-    } else {
+    } else if (!keepSelection) {
       m_styleSelection->selectNone();
       m_styleSelection->select(pageIndex);
     }
@@ -1180,6 +1186,29 @@ void PageViewer::contextMenuEvent(QContextMenuEvent *event) {
   if (m_viewType == LEVEL_PALETTE) {
     QAction *openPltGizmoAct = cmd->getAction("MI_OpenPltGizmo");
     menu.addAction(openPltGizmoAct);
+    menu.addAction(cmd->getAction(MI_ReduceColors));
+    QMenu *convertMenu       = menu.addMenu(tr("Convert"));
+    const auto addConversion = [&](CommandId id, const QString &label) {
+      QAction *command = cmd->getAction(id);
+      if (!command) return;
+      QAction *item   = convertMenu->addAction(label);
+      const auto sync = [command, item, label]() {
+        const QString shortcut =
+            command->shortcut().toString(QKeySequence::NativeText);
+        // Display the assigned shortcut without registering it a second time.
+        item->setText(shortcut.isEmpty() ? label : label + "\t" + shortcut);
+        item->setIcon(command->icon());
+        item->setToolTip(command->toolTip());
+        item->setEnabled(command->isEnabled());
+      };
+      connect(command, &QAction::changed, item, sync);
+      connect(item, &QAction::triggered, command, &QAction::trigger);
+      sync();
+    };
+    //: "Line" means Toonz Raster ink; "Area" means Toonz Raster paint.
+    addConversion(MI_ConvertLinesToAreas, tr("Line to Area"));
+    //: "Area" means Toonz Raster paint; "Line" means Toonz Raster ink.
+    addConversion(MI_ConvertAreasToLines, tr("Area to Line"));
   }
   QAction *openStyleControlAct = cmd->getAction("MI_OpenStyleControl");
   menu.addAction(openStyleControlAct);

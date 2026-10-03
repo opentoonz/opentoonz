@@ -365,6 +365,42 @@ void TPalette::setStyle(int styleId, const TPixelRGBM32 &color) {
 
 //-------------------------------------------------------------------
 
+bool TPalette::reorderStyles(const std::vector<int> &oldToNew) {
+  const int count = int(oldToNew.size());
+  if (count < 2 || count > getStyleCount() || oldToNew[0] != 0 ||
+      oldToNew[1] != 1)
+    return false;
+  std::vector<bool> seen(count, false);
+  for (int id : oldToNew) {
+    if (id < 0 || id >= count || seen[id]) return false;
+    seen[id] = true;
+  }
+  const auto mapped = [&](int id) {
+    return id >= 0 && id < count ? oldToNew[id] : id;
+  };
+  auto styles = m_styles;
+  for (int id = 0; id < count; ++id) styles[oldToNew[id]] = m_styles[id];
+  StyleAnimationTable animations;
+  for (const auto &entry : m_styleAnimationTable)
+    animations.emplace(mapped(entry.first), entry.second);
+  auto shortcuts = m_shortcuts;
+  for (auto &entry : shortcuts) entry.second = mapped(entry.second);
+  std::vector<std::vector<int>> pages;
+  for (const Page *page : m_pages) {
+    pages.push_back(page->m_styleIds);
+    for (int &id : pages.back()) id = mapped(id);
+  }
+  m_styles.swap(styles);
+  m_styleAnimationTable.swap(animations);
+  m_shortcuts.swap(shortcuts);
+  for (size_t p = 0; p < m_pages.size(); ++p)
+    m_pages[p]->m_styleIds.swap(pages[p]);
+  m_currentStyleId = mapped(m_currentStyleId);
+  return true;
+}
+
+//-------------------------------------------------------------------
+
 int TPalette::getPageCount() const { return int(m_pages.size()); }
 
 //-------------------------------------------------------------------
