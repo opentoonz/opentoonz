@@ -30,27 +30,6 @@ void updateToolTip(QAction *action) {
   action->setToolTip(tooltip);
 }
 
-class ShortcutTriggerFilter final : public QObject {
-  CommandManager *m_manager;
-
-public:
-  explicit ShortcutTriggerFilter(CommandManager *manager)
-      : m_manager(manager) {}
-
-protected:
-  bool eventFilter(QObject *watched, QEvent *event) override {
-    if (event->type() != QEvent::Shortcut) return false;
-
-    QShortcutEvent *shortcutEvent = static_cast<QShortcutEvent *>(event);
-    if (shortcutEvent->isAmbiguous()) return false;
-
-    QAction *action = m_manager->actionForShortcutKey(shortcutEvent->key());
-    if (action) m_manager->setPendingShortcutAction(action);
-
-    return false;
-  }
-};
-
 }  // namespace
 
 //=========================================================
@@ -83,9 +62,7 @@ void AuxActionsCreatorManager::createAuxActions(QObject *parent) {
 //=========================================================
 
 CommandManager::CommandManager()
-    : m_executeTriggeredByShortcut(false), m_pendingShortcutAction(nullptr) {
-  if (qApp) qApp->installEventFilter(new ShortcutTriggerFilter(this));
-}
+    : m_executeTriggeredByShortcut(false), m_pendingShortcutAction(nullptr) {}
 
 //---------------------------------------------------------
 
@@ -176,16 +153,6 @@ void CommandManager::define(CommandId id, CommandType type,
 // set handler (id, handler)
 //   possibly changes enable/disable qaction state
 //
-QAction *CommandManager::actionForShortcutKey(const QKeySequence &key) const {
-  std::map<QAction *, Node *>::const_iterator it;
-  for (it = m_qactionTable.begin(); it != m_qactionTable.end(); ++it) {
-    if (it->first->shortcut() == key) return it->first;
-  }
-  return nullptr;
-}
-
-//---------------------------------------------------------
-
 void CommandManager::setPendingShortcutAction(QAction *action) {
   m_pendingShortcutAction = action;
 }

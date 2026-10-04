@@ -181,7 +181,6 @@ public:
   bool executeTriggeredByShortcut() const {
     return m_executeTriggeredByShortcut;
   }
-  QAction *actionForShortcutKey(const QKeySequence &key) const;
   void setPendingShortcutAction(QAction *action);
   void enable(CommandId id, bool enabled);
 
