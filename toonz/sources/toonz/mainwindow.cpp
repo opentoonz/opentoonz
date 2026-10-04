@@ -2485,7 +2485,7 @@ void MainWindow::defineActions() {
                          "sub_clone");
   createMenuXsheetAction(MI_FullCloneChild,
                          QT_TR_NOOP("Full Clone Sub-Xsheet"), "",
-                         "sub_clone");
+                         "sub_full_clone");
   createMenuXsheetAction(MI_ApplyMatchLines,
                          QT_TR_NOOP("&Apply Match Lines..."), "",
                          "apply_match_lines");
