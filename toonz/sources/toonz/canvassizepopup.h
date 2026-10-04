@@ -100,6 +100,7 @@ class CanvasSizePopup final : public DVGui::Dialog {
   bool m_sessionActive;
   bool m_ignoreSync;
   bool m_fromTool;
+  QString m_preSessionToolName;
 
 public:
   CanvasSizePopup();

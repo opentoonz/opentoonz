@@ -1372,9 +1372,14 @@ void CanvasSizePopup::initFromLevel() {
 void CanvasSizePopup::endSession() {
   if (!m_sessionActive) return;
   m_sessionActive = false;
-  ToolHandle *th  = TApp::instance()->getCurrentTool();
-  if (th && th->getRequestedToolName() == T_CanvasSize) th->unsetPseudoTool();
-  if (th) th->storeTool();
+  ToolHandle *th = TApp::instance()->getCurrentTool();
+  if (th && th->getRequestedToolName() == T_CanvasSize) {
+    if (!m_preSessionToolName.isEmpty())
+      th->setTool(m_preSessionToolName);
+    else
+      th->unsetPseudoTool();
+  }
+  m_preSessionToolName.clear();
   refreshOverlay(true);
 }
 
@@ -1406,7 +1411,13 @@ void CanvasSizePopup::showEvent(QShowEvent *e) {
     return;
   }
   m_sessionActive = true;
-  ToolHandle *th  = TApp::instance()->getCurrentTool();
+  ToolHandle *th = TApp::instance()->getCurrentTool();
+  m_preSessionToolName.clear();
+  if (th) {
+    const QString &currentTool = th->getRequestedToolName();
+    if (currentTool != T_CanvasSize && !isNavigationToolName(currentTool))
+      m_preSessionToolName = currentTool;
+  }
   if (th && th->getRequestedToolName() != T_CanvasSize)
     th->setPseudoTool(T_CanvasSize);
   if (th) th->storeTool();
