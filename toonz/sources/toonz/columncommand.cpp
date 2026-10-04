@@ -479,7 +479,7 @@ TFilePath uniqueCodedPath(ToonzScene *scene, const TFilePath &srcPath,
 TXshSimpleLevel *cloneSimpleLevel(TXshSimpleLevel *srcSl) {
   if (!srcSl || srcSl->getPath().isUneditable()) return srcSl;
 
-  ToonzScene *scene = srcSl->getScene();
+  ToonzScene *scene   = srcSl->getScene();
   const int levelType = srcSl->getType();
   const std::wstring dstName =
       uniqueLevelName(scene, srcSl->getName() + L"_clone");
@@ -500,8 +500,7 @@ TXshSimpleLevel *cloneSimpleLevel(TXshSimpleLevel *srcSl) {
 
   const std::vector<TFrameId> fids = srcSl->getFids();
   for (const TFrameId &fid : fids) {
-    TImageP img =
-        srcSl->getFullsampledFrame(fid, ImageManager::dontPutInCache);
+    TImageP img = srcSl->getFullsampledFrame(fid, ImageManager::dontPutInCache);
     if (!img) continue;
     dstSl->setFrame(fid, img->cloneImage());
   }
@@ -621,7 +620,7 @@ void remapNestedChildren(TXsheet *xsh,
       std::map<TXshChildLevel *, TXshChildLevel *>::iterator it =
           childMap.find(srcChild);
       if (it == childMap.end()) {
-        dstChild = cloneChildLevel(srcChild);
+        dstChild           = cloneChildLevel(srcChild);
         childMap[srcChild] = dstChild;
         inserted.push_back(dstChild);
         remapNestedChildren(dstChild->getXsheet(), childMap, inserted);
@@ -1345,17 +1344,16 @@ public:
   }
 
   int getSize() const override {
-    return sizeof(*this) +
-           (int)(m_cells.size() * sizeof(TXshCell) +
-                 m_clonedLevels.size() * sizeof(TXshLevelP));
+    return sizeof(*this) + (int)(m_cells.size() * sizeof(TXshCell) +
+                                 m_clonedLevels.size() * sizeof(TXshLevelP));
   }
 
   QString getHistoryString() override {
-    return m_fullClone
-               ? QObject::tr("Full Clone Sub-xsheet :  Col%1")
-                     .arg(QString::number(m_columnIndex + 1))
-               : QObject::tr("Clone Sub-xsheet :  Col%1")
-                     .arg(QString::number(m_columnIndex + 1));
+    if (m_fullClone)
+      return QObject::tr("Full Clone Sub-xsheet :  Col%1")
+          .arg(QString::number(m_columnIndex + 1));
+    return QObject::tr("Clone Sub-xsheet :  Col%1")
+        .arg(QString::number(m_columnIndex + 1));
   }
 
   int getHistoryType() override { return HistoryType::Xsheet; }
@@ -1460,9 +1458,9 @@ void ColumnCmd::cloneChild(int index, bool fullClone) {
       ->setParent(parentId);
 
   xsh->updateFrameCount();
-  TUndoManager::manager()->add(new CloneChildUndo(
-      newChildLevel, newColumnIndex, r0, clonedCells, clonedLevels, parentId,
-      fullClone));
+  TUndoManager::manager()->add(new CloneChildUndo(newChildLevel, newColumnIndex,
+                                                  r0, clonedCells, clonedLevels,
+                                                  parentId, fullClone));
 
   // notify changes
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
