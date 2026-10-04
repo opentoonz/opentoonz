@@ -141,13 +141,11 @@ void TPanel::onCustomContextMenuRequested(const QPoint &pos) {
 
   if (isFloating() &&
       Preferences::instance()->getBoolValue(togglePanelWithShortcut)) {
-    QAction *ignoreAction =
-        menu.addAction(tr("Ignore Panel Shortcut Toggle"));
+    QAction *ignoreAction = menu.addAction(tr("Ignore Panel Shortcut Toggle"));
     ignoreAction->setCheckable(true);
     ignoreAction->setChecked(m_ignorePanelShortcutToggle);
-    connect(ignoreAction, &QAction::triggered, [this](bool checked) {
-      setIgnorePanelShortcutToggle(checked);
-    });
+    connect(ignoreAction, &QAction::triggered,
+            [this](bool checked) { setIgnorePanelShortcutToggle(checked); });
     menu.addSeparator();
   }
 

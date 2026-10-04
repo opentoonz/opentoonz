@@ -143,7 +143,7 @@ TPanel *OpenFloatingPanel::openFloatingPanelAfterShortcutToggle(
   if (!currentRoom) return nullptr;
 
   QList<TPanel *> hiddenToDiscard;
-  TPanel *hiddenToRestore = nullptr;
+  TPanel *hiddenToRestore      = nullptr;
   const QList<TPanel *> panels = currentRoom->findChildren<TPanel *>();
   for (TPanel *panel : panels) {
     if (panel->getPanelType() != panelType || !panel->isFloating() ||
