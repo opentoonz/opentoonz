@@ -1372,7 +1372,7 @@ void CanvasSizePopup::initFromLevel() {
 void CanvasSizePopup::endSession() {
   if (!m_sessionActive) return;
   m_sessionActive = false;
-  ToolHandle *th = TApp::instance()->getCurrentTool();
+  ToolHandle *th  = TApp::instance()->getCurrentTool();
   if (th && th->getRequestedToolName() == T_CanvasSize) {
     if (!m_preSessionToolName.isEmpty())
       th->setTool(m_preSessionToolName);
@@ -1411,7 +1411,7 @@ void CanvasSizePopup::showEvent(QShowEvent *e) {
     return;
   }
   m_sessionActive = true;
-  ToolHandle *th = TApp::instance()->getCurrentTool();
+  ToolHandle *th  = TApp::instance()->getCurrentTool();
   m_preSessionToolName.clear();
   if (th) {
     const QString &currentTool = th->getRequestedToolName();
