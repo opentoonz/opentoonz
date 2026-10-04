@@ -51,6 +51,8 @@ void OpenFloatingPanel::execute() {
   if (Preferences::instance()->getBoolValue(togglePanelWithShortcut) &&
       CommandManager::instance()->executeTriggeredByShortcut()) {
     if (closeVisiblePanelsOfType(m_panelType)) return;
+    openFloatingPanelAfterShortcutToggle(m_panelType);
+    return;
   }
 
   getOrOpenFloatingPanel(m_panelType);
@@ -109,6 +111,16 @@ panel->raise();
 */
 }
 
+static void showFloatingPanel(TPanel *panel, TMainWindow *currentRoom) {
+  // Alcuni pannelli devono essere resettati (Es.: il paletteViewerPanel)
+  panel->reset();
+  // Devo porre il pannello sotto il controllo del layout della stanza
+  currentRoom->addDockWidget(panel);
+  panel->setFloating(true);
+  panel->show();
+  panel->raise();
+}
+
 bool OpenFloatingPanel::closeVisiblePanelsOfType(const std::string &panelType) {
   TMainWindow *currentRoom = TApp::instance()->getCurrentRoom();
   if (!currentRoom) return false;
@@ -116,13 +128,44 @@ bool OpenFloatingPanel::closeVisiblePanelsOfType(const std::string &panelType) {
   bool closedAny               = false;
   const QList<TPanel *> panels = currentRoom->findChildren<TPanel *>();
   for (TPanel *panel : panels) {
-    if (panel->getPanelType() == panelType && panel->isFloating() &&
-        !panel->isHidden()) {
-      panel->close();
-      closedAny = true;
-    }
+    if (panel->getPanelType() != panelType || !panel->isFloating() ||
+        panel->isHidden() || panel->ignoresPanelShortcutToggle())
+      continue;
+    panel->dismissFloatingPanel();
+    closedAny = true;
   }
   return closedAny;
+}
+
+TPanel *OpenFloatingPanel::openFloatingPanelAfterShortcutToggle(
+    const std::string &panelType) {
+  TMainWindow *currentRoom = TApp::instance()->getCurrentRoom();
+  if (!currentRoom) return nullptr;
+
+  QList<TPanel *> hiddenToDiscard;
+  TPanel *hiddenToRestore = nullptr;
+  const QList<TPanel *> panels = currentRoom->findChildren<TPanel *>();
+  for (TPanel *panel : panels) {
+    if (panel->getPanelType() != panelType || !panel->isFloating() ||
+        !panel->isHidden() || panel->ignoresPanelShortcutToggle())
+      continue;
+    if (!hiddenToRestore)
+      hiddenToRestore = panel;
+    else
+      hiddenToDiscard.append(panel);
+  }
+
+  for (TPanel *panel : hiddenToDiscard) {
+    if (panel->parentLayout()) panel->parentLayout()->removeWidget(panel);
+    panel->deleteLater();
+  }
+
+  if (hiddenToRestore) {
+    showFloatingPanel(hiddenToRestore, currentRoom);
+    return hiddenToRestore;
+  }
+
+  return getOrOpenFloatingPanel(panelType);
 }
 
 TPanel *OpenFloatingPanel::getOrOpenFloatingPanel(
@@ -140,18 +183,15 @@ TPanel *OpenFloatingPanel::getOrOpenFloatingPanel(
       // if there is already a floating panel and MultipleInstances are
       // not allowed we must use it
       if (!panel->areMultipleInstancesAllowed() && !panel->isHidden()) {
+        if (panel->ignoresPanelShortcutToggle()) continue;
         if (panel->isFloating()) activateWidget(panel);
         return panel;
       }
 
       // If there is a hidden panel we can show and use it
       if (panel->isHidden()) {
-        // Alcuni pannelli devono essere resettati (Es.: il paletteViewerPanel)
-        panel->reset();
-        // Devo porre il pannello sotto il controllo del layout della stanza
-        currentRoom->addDockWidget(panel);
-        panel->show();
-        panel->raise();
+        if (panel->ignoresPanelShortcutToggle()) continue;
+        showFloatingPanel(panel, currentRoom);
         return panel;
       } else
         lastFloatingPos = panel->pos();
