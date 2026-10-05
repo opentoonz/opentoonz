@@ -31,11 +31,8 @@
 #define T_Ruler "T_Ruler"
 #define T_Finger "T_Finger"
 #define T_EditAssistants "T_EditAssistants"
-<<<<<<< HEAD
 #define T_CanvasSize "T_CanvasSize"
-=======
 #define T_ShiftTrace "T_ShiftTrace"
->>>>>>> 7f7c3d0e5 (Add Shift and Trace options to Tool Properties Panel (Edit Shift mode))
 
 // Viewer Navigation tools (available only during the shortcut key is pressed)
 #define T_ZoomView "T_ZoomView"
