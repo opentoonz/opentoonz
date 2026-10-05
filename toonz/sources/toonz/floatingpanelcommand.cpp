@@ -183,14 +183,12 @@ TPanel *OpenFloatingPanel::getOrOpenFloatingPanel(
       // if there is already a floating panel and MultipleInstances are
       // not allowed we must use it
       if (!panel->areMultipleInstancesAllowed() && !panel->isHidden()) {
-        if (panel->ignoresPanelShortcutToggle()) continue;
         if (panel->isFloating()) activateWidget(panel);
         return panel;
       }
 
       // If there is a hidden panel we can show and use it
       if (panel->isHidden()) {
-        if (panel->ignoresPanelShortcutToggle()) continue;
         showFloatingPanel(panel, currentRoom);
         return panel;
       } else
