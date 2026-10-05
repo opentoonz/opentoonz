@@ -282,6 +282,13 @@ public:
                                                           //! style with the
   //! specified style id.
 
+  // Permute indices without changing style definitions, animation, page order
+  // or shortcuts. oldToNew must be a permutation fixing reserved IDs 0 and 1.
+  // IDs beyond its size stay unchanged (styles added after an undo snapshot).
+  // Returns false for an invalid map, without modifying the palette.
+  // The caller must remap every image using this palette by the same map.
+  bool reorderStyles(const std::vector<int> &oldToNew);
+
   int getPageCount() const;  //!< Returns the pages count.
 
   Page *getPage(int pageIndex);  //!< Returns the \a index-th palette page, or

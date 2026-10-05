@@ -187,6 +187,8 @@ set(HEADERS
     keyframeselection.h
     kis_tablet_support_win8.h
     menubarcommandids.h
+    palettecolorreduction.h
+    reducecolorscommand.h
     moviegenerator.h
     scanlist.h
     sceneviewerevents.h
@@ -275,6 +277,7 @@ set(SOURCES
     addfilmstripframespopup.cpp
     camerasettingspopup.cpp
     convertpopup.cpp
+    convertlinestoareascommand.cpp
     crashhandler.cpp
     duplicatepopup.cpp
     dvdirtreeview.cpp
@@ -383,6 +386,7 @@ set(SOURCES
     audiorecordingpopup.cpp
     locatorpopup.cpp
     styleshortcutswitchablepanel.cpp
+    reducecolorscommand.cpp
     reframepopup.cpp
     autoinputcellnumberpopup.cpp
     colormodelbehaviorpopup.cpp
