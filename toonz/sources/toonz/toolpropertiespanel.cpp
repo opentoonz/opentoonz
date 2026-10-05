@@ -4685,8 +4685,8 @@ void ToolPropertiesPanel::createPlasticRigidityModeProperties(
 
       const QString rigidLabel = rigidValue->getQStringName();
       QWidget *rigidWidget     = createCollapsibleEnumForProperty(
-          rigidLabel, rigidValue, name, PlasticTool::RIGIDITY_IDX, QString(),
-          nullptr, true, m_propertiesContainer);
+              rigidLabel, rigidValue, name, PlasticTool::RIGIDITY_IDX, QString(),
+              nullptr, true, m_propertiesContainer);
       if (!rigidWidget) continue;
       rigidWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
       m_plasticModeLayout->addWidget(rigidWidget);
