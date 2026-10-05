@@ -1,0 +1,5 @@
+<fxlayout help_file="3DLUTBakeFx.pdf">
+  <page name="3D LUT Bake">
+    <lut_file>lutFile</lut_file>
+  </page>
+</fxlayout>

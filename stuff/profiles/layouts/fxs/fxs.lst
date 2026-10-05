@@ -56,6 +56,7 @@
     STD_brightContFx 
     STD_channelMixerFx
     STD_toneCurveFx 
+    STD_lut3DBakeFx
     STD_despeckleFx
     STD_inoChannelSelectorFx
     STD_inoDensityFx
