@@ -220,14 +220,49 @@ void ToolPropertyButton::paintEvent(QPaintEvent *) {
   QStyleOptionToolButton opt;
   initStyleOption(&opt);
 
+  const bool enabled = isEnabled();
+  if (!enabled) {
+    opt.state &= ~QStyle::State_MouseOver;
+    opt.state &= ~QStyle::State_Sunken;
+    opt.palette.setCurrentColorGroup(QPalette::Disabled);
+  }
+
+  QPainter painter(this);
+  painter.setRenderHint(QPainter::Antialiasing);
+
+  // Disabled: identical cells for checked and unchecked — flat label, no
+  // selected chrome and no CE_ToolButtonLabel emboss (Windows).
+  if (!enabled) {
+    opt.state &= ~QStyle::State_On;
+    opt.state &= ~QStyle::State_Raised;
+
+    if (m_showBackgrounds) {
+      painter.setPen(Qt::NoPen);
+      painter.setBrush(tppCollapsibleCellBackground(
+          tppCollapsibleCellPanelBackground(this)));
+      painter.drawRect(rect());
+    }
+
+    painter.setPen(palette().color(QPalette::Disabled, QPalette::WindowText));
+    painter.setFont(font());
+    painter.drawText(rect(), Qt::AlignCenter, text());
+
+    if (m_showBorders) {
+      QColor borderColor = palette().color(QPalette::Mid);
+      QPen borderPen(borderColor);
+      borderPen.setWidthF(0.5);
+      painter.setPen(borderPen);
+      painter.setBrush(Qt::NoBrush);
+      painter.drawRect(rect().adjusted(0, 0, -1, -1));
+    }
+    return;
+  }
+
   const bool isHovered =
       m_hoverEnabled && opt.state.testFlag(QStyle::State_MouseOver);
   const bool isChecked     = opt.state.testFlag(QStyle::State_On);
   const bool isPressed     = opt.state.testFlag(QStyle::State_Sunken);
   const bool useThemeState = isHovered || isChecked || isPressed;
-
-  QPainter painter(this);
-  painter.setRenderHint(QPainter::Antialiasing);
 
   // Compact highlight: theme colors on a small centered pill, icon size
   // unchanged.
@@ -269,11 +304,6 @@ void ToolPropertyButton::paintEvent(QPaintEvent *) {
     return;
   }
 
-  if (useThemeState) {
-    style()->drawComplexControl(QStyle::CC_ToolButton, &opt, &painter, this);
-    return;
-  }
-
   if (m_showBackgrounds) {
     painter.setPen(Qt::NoPen);
     painter.setBrush(
@@ -281,7 +311,19 @@ void ToolPropertyButton::paintEvent(QPaintEvent *) {
     painter.drawRect(rect());
   }
 
-  style()->drawControl(QStyle::CE_ToolButtonLabel, &opt, &painter, this);
+  if (useThemeState) {
+    QStyleOptionToolButton frameOpt = opt;
+    frameOpt.text                   = QString();
+    frameOpt.icon                   = QIcon();
+    style()->drawComplexControl(QStyle::CC_ToolButton, &frameOpt, &painter,
+                                this);
+  }
+
+  // Literal UIName text (e.g. "Lines & Areas"): same glyphs as disabled flat
+  // paint; CE_ToolButtonLabel would strip "&" shortcut markers.
+  painter.setPen(palette().color(QPalette::WindowText));
+  painter.setFont(font());
+  painter.drawText(rect(), Qt::AlignCenter, text());
 
   if (m_showBorders) {
     QColor borderColor = palette().color(QPalette::Mid);
@@ -291,6 +333,16 @@ void ToolPropertyButton::paintEvent(QPaintEvent *) {
     painter.setBrush(Qt::NoBrush);
     painter.drawRect(rect().adjusted(0, 0, -1, -1));
   }
+}
+
+void ToolPropertyButton::enterEvent(QEvent *event) {
+  if (!isEnabled() || !m_hoverEnabled) return;
+  QToolButton::enterEvent(event);
+}
+
+void ToolPropertyButton::mouseMoveEvent(QMouseEvent *event) {
+  if (!isEnabled() || !m_hoverEnabled) return;
+  QToolButton::mouseMoveEvent(event);
 }
 
 //=============================================================================
@@ -990,8 +1042,18 @@ void ToolPropertiesPanel::createBrushProperties() {
   // === VECTOR: Break Angles ===
   createBreakAnglesProperty();
 
-  // === PRESSURE (all levels, but different positions) ===
-  createPressureProperty();
+  // Toonz Raster (normal brush): Assistants then Pressure — matches TOB.
+  const bool toonzRasterNormalBrush =
+      m_currentToolType == QStringLiteral("brush") &&
+      (tool->getTargetType() & TTool::ToonzImage);
+
+  if (toonzRasterNormalBrush) {
+    createAssistantsProperty();
+    createPressureProperty();
+  } else {
+    createPressureProperty();
+    createAssistantsProperty();
+  }
 
   // === VECTOR: Frame Range (Off/Linear/In/Out/In&Out) ===
   createFrameRangeProperty();
@@ -999,9 +1061,6 @@ void ToolPropertiesPanel::createBrushProperties() {
   // === VECTOR: Snap ===
   createSnapProperty();
   createSnapSensitivityProperty();
-
-  // === ASSISTANTS (all levels) ===
-  createAssistantsProperty();
 
   // === VECTOR: Cap/Join/Miter ===
   createCapProperty();
@@ -3944,9 +4003,8 @@ void ToolPropertiesPanel::createDoubleSliderByName(const QString &label,
 // Exact Tool Options Bar order (left→right = top→bottom):
 //
 //   Vector:       Size | Type | Selective | Invert | Frame Range |
-//   Interpolation Toonz Raster: Size | Hardness | Type | Mode | Selective |
-//   Invert |
-//                 Frame Range | Pencil Mode
+//   Toonz Raster: Size | Hardness | Type | Mode | Selective |
+//                 Invert | Frame Range | Pencil Mode | Savebox
 //   FullColor:    Size | Hardness | Opacity | Type | Invert | Frame Range
 //
 // Calls that do not match the current tool type are no-ops.
@@ -5975,8 +6033,84 @@ void ToolPropertiesPanel::createEraserProperties() {
   // 9. Pencil Mode — Toonz Raster only
   createPencilModeProperty();
 
-  // 10. Interpolation — Vector only (enabled when Frame Range is checked)
+  // 10. Savebox — Toonz Raster only (enabled in Segment type; mirrors TOB)
+  createBoolProperty(tr("Savebox"), "Savebox");
+
+  // 11. Interpolation — Vector only (enabled when Frame Range is checked)
   createEnumProperty(tr("Interpolation"), "interpolation:");
+
+  updateEraserOptionStates();
+}
+
+namespace {
+
+QWidget *findPropertyWidget(QWidget *root, const QString &propName) {
+  if (!root) return nullptr;
+  const QList<QWidget *> widgets = root->findChildren<QWidget *>();
+  for (QWidget *w : widgets) {
+    if (w->property("propName").toString() == propName) return w;
+  }
+  return nullptr;
+}
+
+void setPropertyWidgetTreeEnabled(QWidget *w, bool enabled) {
+  if (!w) return;
+  w->setEnabled(enabled);
+  for (ToolPropertyButton *btn : w->findChildren<ToolPropertyButton *>()) {
+    btn->setHoverEnabled(enabled);
+    btn->setEnabled(enabled);
+  }
+  for (QWidget *child : w->findChildren<QWidget *>()) {
+    if (qobject_cast<ToolPropertyButton *>(child)) continue;
+    child->setEnabled(enabled);
+  }
+}
+
+}  // namespace
+
+void ToolPropertiesPanel::updateEraserOptionStates() {
+  if (m_currentToolType != QStringLiteral("eraser")) return;
+
+  TTool *tool = getCurrentTool();
+  if (!tool || !(tool->getTargetType() & TTool::ToonzImage)) return;
+
+  TPropertyGroup *props = tool->getProperties(0);
+  if (!props) return;
+
+  TEnumProperty *typeProp =
+      dynamic_cast<TEnumProperty *>(props->getProperty("Type:"));
+  TEnumProperty *modeProp =
+      dynamic_cast<TEnumProperty *>(props->getProperty("Mode:"));
+  TBoolProperty *pencilProp =
+      dynamic_cast<TBoolProperty *>(props->getProperty("Pencil Mode"));
+  if (!typeProp) return;
+
+  const std::wstring typeVal = typeProp->getValue();
+  const bool isNormal        = typeVal == L"Normal";
+  const bool isSegment       = typeVal == L"Segment";
+  const bool modeIsAreas     = modeProp && modeProp->getValue() == L"Areas";
+  const bool pencilOn        = pencilProp && pencilProp->getValue();
+
+  if (QWidget *modeW = findPropertyWidget(m_propertiesContainer, "Mode:"))
+    setPropertyWidgetTreeEnabled(modeW, !isSegment);
+
+  if (QWidget *saveboxW = findPropertyWidget(m_propertiesContainer, "Savebox"))
+    setPropertyWidgetTreeEnabled(saveboxW, isSegment);
+
+  if (QWidget *invertW = findPropertyWidget(m_propertiesContainer, "Invert"))
+    setPropertyWidgetTreeEnabled(invertW, !isNormal && !isSegment);
+
+  if (QWidget *frameW =
+          findPropertyWidget(m_propertiesContainer, "Frame Range"))
+    setPropertyWidgetTreeEnabled(frameW, !isNormal);
+
+  if (QWidget *pencilW =
+          findPropertyWidget(m_propertiesContainer, "Pencil Mode"))
+    setPropertyWidgetTreeEnabled(pencilW, !modeIsAreas);
+
+  if (QWidget *hardnessW =
+          findPropertyWidget(m_propertiesContainer, "Hardness:"))
+    setPropertyWidgetTreeEnabled(hardnessW, !modeIsAreas && !pencilOn);
 }
 
 //=============================================================================
@@ -6575,6 +6709,8 @@ void ToolPropertiesPanel::updatePropertyValues() {
   }
 
   if (m_currentToolType == "shifttrace") updateShiftTraceWidgets();
+
+  if (m_currentToolType == QStringLiteral("eraser")) updateEraserOptionStates();
 
   if (m_currentToolType == "type") {
     updateToolOptionControlsIn(m_propertiesContainer);

@@ -12,6 +12,7 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QToolButton>
+#include <QMouseEvent>
 #include <QPushButton>
 #include <QList>
 #include <QMap>
@@ -56,6 +57,8 @@ public:
 
 protected:
   void paintEvent(QPaintEvent *event) override;
+  void enterEvent(QEvent *event) override;
+  void mouseMoveEvent(QMouseEvent *event) override;
 };
 
 // Forward declarations
@@ -278,6 +281,7 @@ private:
 
   // Eraser properties (3 variants: vector / toonz-raster / fullcolor-raster)
   void createEraserProperties();
+  void updateEraserOptionStates();
 
   // Fill properties (3 variants: vector / toonz-raster / fullcolor-raster)
   void createFillProperties();
