@@ -76,9 +76,10 @@ class DVAPI TMouseEvent {
 public:
   enum ModifierBitshift  //! \brief  Bit shifts from 1 associated with modifier
                          //! keys.
-  { SHIFT_BITSHIFT,      //!< Bit shift for the Shift key modifier.
-    ALT_BITSHIFT,        //!< Bit shift for the Alt key modifier.
-    CTRL_BITSHIFT        //!< Bit shift for the Ctrl key modifier.
+  {
+    SHIFT_BITSHIFT,  //!< Bit shift for the Shift key modifier.
+    ALT_BITSHIFT,    //!< Bit shift for the Alt key modifier.
+    CTRL_BITSHIFT    //!< Bit shift for the Ctrl key modifier.
   };
 
   enum ModifierMask  //! \brief  Bitmask specifying modifier keys applying on a
@@ -267,8 +268,9 @@ public:
   typedef TApplication Application;
 
 public:
-  enum ToolType         //!  Tool editing type.
-  { GenericTool   = 1,  //!< Tool will not deal with specific scene content.
+  enum ToolType  //!  Tool editing type.
+  {
+    GenericTool   = 1,  //!< Tool will not deal with specific scene content.
     ColumnTool    = 2,  //!< Tool deals with placement of column objects.
     LevelReadTool = 4,  //!< Tool reads a level's image data.
     LevelWriteTool =
@@ -276,22 +278,24 @@ public:
 
     // Convenience testing flags - getToolType() should not return these
 
-    LevelTool = LevelReadTool | LevelWriteTool };
+    LevelTool = LevelReadTool | LevelWriteTool
+  };
 
   enum ToolTargetType  //!  Object types the tool can operate on.
-  { NoTarget    = 0x0,
+  {
+    NoTarget    = 0x0,
     VectorImage = 0x1,   //!< Will work on vector images
     ToonzImage  = 0x2,   //!< Will work on colormap (tlv) images
     RasterImage = 0x4,   //!< Will work on fullcolor images
     MeshImage   = 0x8,   //!< Will work on mesh images
     Splines     = 0x10,  //!< Will work on motion paths
 
-    LevelColumns= 0x20,  //!< Will work on level columns
-    MeshColumns = 0x40,  //!< Will work on mesh columns
+    LevelColumns = 0x20,  //!< Will work on level columns
+    MeshColumns  = 0x40,  //!< Will work on mesh columns
 
     EmptyTarget = 0x80,  //!< Will work on empty cells/columns
 
-    MetaImage   = 0x100, //!< Will work on meta images
+    MetaImage = 0x100,  //!< Will work on meta images
 
     CommonImages = VectorImage | ToonzImage | RasterImage,
     AllImages    = CommonImages | MeshImage | MetaImage,
@@ -304,19 +308,18 @@ public:
   };
 
   enum ToolHints  //!  Misc flags related with tool
-  { HintNone                 = 0,
-    HintAssistants           = 1 << 0, //!< Draw assistants when tool active
-    HintAssistantsGuidelines = 1 << 1, //!< Draw assistant guidelines
-    HintAssistantsEnabled    = 1 << 2, //!< Mark active assistants
-    HintReplicators          = 1 << 3, //!< Draw replicators
-    HintReplicatorsPoints    = 1 << 4, //!< Draw replicated points
-    HintReplicatorsEnabled   = 1 << 5, //!< Mark active replicators
-    
-    HintAssistantsAll     = HintAssistants
-                          | HintAssistantsGuidelines
-                          | HintAssistantsEnabled,
-    HintReplicatorsAll    = HintReplicators
-                          | HintReplicatorsEnabled,
+  {
+    HintNone                 = 0,
+    HintAssistants           = 1 << 0,  //!< Draw assistants when tool active
+    HintAssistantsGuidelines = 1 << 1,  //!< Draw assistant guidelines
+    HintAssistantsEnabled    = 1 << 2,  //!< Mark active assistants
+    HintReplicators          = 1 << 3,  //!< Draw replicators
+    HintReplicatorsPoints    = 1 << 4,  //!< Draw replicated points
+    HintReplicatorsEnabled   = 1 << 5,  //!< Mark active replicators
+
+    HintAssistantsAll =
+        HintAssistants | HintAssistantsGuidelines | HintAssistantsEnabled,
+    HintReplicatorsAll = HintReplicators | HintReplicatorsEnabled,
   };
 
 public:
@@ -415,7 +418,8 @@ return true if the method execution can have changed the current tool
   virtual void rightButtonDown(const TPointD &, const TMouseEvent &) {}
   virtual bool keyDown(QKeyEvent *) { return false; }
 
-  virtual void onInputText(const std::wstring&, const std::wstring&, int, int){};
+  virtual void onInputText(const std::wstring &, const std::wstring &, int,
+                           int){};
 
   virtual void onSetViewer() {}
 
@@ -479,12 +483,14 @@ return true if the method execution can have changed the current tool
   TStageObjectId getObjectId()
       const;  //!< Returns a pointer to the actual stage object.
 
-  virtual void notifyImageChanged();  //!< Notifies changes on the actual image; used to
-                              //! update
-                              //! override by vector selection tool
+  virtual void
+  notifyImageChanged();  //!< Notifies changes on the actual image; used to
+                         //! update
+                         //! override by vector selection tool
   //!  images on the level view.
-  void notifyImageChanged(const TFrameId &fid,
-                          TXshSimpleLevel *sl= nullptr);  //!< Notifies changes on the
+  void notifyImageChanged(
+      const TFrameId &fid,
+      TXshSimpleLevel *sl = nullptr);  //!< Notifies changes on the
   //! frame \p fid; used to update
   //!  images on the level view.
 
@@ -585,12 +591,13 @@ protected:
   std::string m_name;  //!< The tool's name.
 
   TToolViewer *m_viewer;  //!< Tool's current viewer.
-  TAffine m_matrix;  //!< World-to-window reference change affine.
+  TAffine m_matrix;       //!< World-to-window reference change affine.
 
   int m_targetType;  //!< The tool's image type target.
 
-  bool m_enabled;  //!< Whether the tool allows user interaction.
-  bool m_canUndo = true; //!< Whether the tool allows the user to undo while the tool is selected
+  bool m_enabled;         //!< Whether the tool allows user interaction.
+  bool m_canUndo = true;  //!< Whether the tool allows the user to undo while
+                          //!< the tool is selected
   bool m_active;
   bool m_picking;
 
@@ -602,12 +609,10 @@ private:
   void bind(const std::string &name, int targetType);
 
 public:
-  inline void bind(int targetType)
-    { bind(getName(), targetType); }
-  void bind( int targetType,
-             const std::string &alias1,
-             const std::string &alias2 = std::string(),
-             const std::string &alias3 = std::string() );
+  inline void bind(int targetType) { bind(getName(), targetType); }
+  void bind(int targetType, const std::string &alias1,
+            const std::string &alias2 = std::string(),
+            const std::string &alias3 = std::string());
 
   virtual void onSelectedFramesChanged() {}
 
@@ -638,8 +643,8 @@ protected:
   QWidget *m_viewerWidget  = nullptr;
 
 public:
-  TToolViewer(QWidget *widget, ImageUtils::FullScreenWidget* parent = nullptr) : 
-      m_viewerWidget(widget), GLWidgetForHighDpi(parent) {}
+  TToolViewer(QWidget *widget, ImageUtils::FullScreenWidget *parent = nullptr)
+      : m_viewerWidget(widget), GLWidgetForHighDpi(parent) {}
   virtual ~TToolViewer() {}
 
   const ImagePainter::VisualSettings &visualSettings() const {
@@ -660,6 +665,7 @@ public:
   //! clipping rect
   virtual void invalidateToolStatus() = 0;  //!< Forces the viewer to update the
                                             //! perceived status of tools
+  virtual void invalidatePeerViewers() {}
   virtual TAffine getViewMatrix() const {
     return TAffine();
   }  //!< Gets the viewer's current view affine (ie the transform from
@@ -708,6 +714,8 @@ public:
   virtual bool is3DView() const                            = 0;
   virtual bool getIsFlippedX() const                       = 0;
   virtual bool getIsFlippedY() const                       = 0;
+  //! Navigator 2nd canvas: pick without edit.
+  virtual bool isPickOnly() const { return false; }
 
   virtual double projectToZ(const TPointD &delta) = 0;
 

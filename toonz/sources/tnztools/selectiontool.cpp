@@ -707,9 +707,9 @@ TPointD DragSelectionTool::Scale::getScaledPoint(int index,
   TPointD v       = normalize(center - pc);
   double currentD = tdistance(sc, pc);
   double startD   = (index % 2 == 1)
-                      ? currentD / m_deformTool->getStartScaleValue().x
-                      : currentD / m_deformTool->getStartScaleValue().y;
-  double factor = (index % 2 == 1) ? scaleValue.x : scaleValue.y;
+                        ? currentD / m_deformTool->getStartScaleValue().x
+                        : currentD / m_deformTool->getStartScaleValue().y;
+  double factor   = (index % 2 == 1) ? scaleValue.x : scaleValue.y;
   double d = (currentD - startD * factor) * tdistance(center, pc) / currentD;
   return TPointD(pc.x + d * v.x, pc.y + d * v.y);
 }
@@ -730,12 +730,12 @@ TPointD DragSelectionTool::Scale::getNewCenter(int index, const FourPoints bbox,
   if (index % 2 == 1) std::swap(xIndex, yIndex);
   FourPoints xBbox = bboxScale(xIndex, bbox, m_startCenter);
   TPointD xCenter  = getScaledPoint(
-      xIndex, xBbox, scaleValue,
-      xBbox.getPoint(m_deformTool->getSymmetricPointIndex(xIndex)));
+       xIndex, xBbox, scaleValue,
+       xBbox.getPoint(m_deformTool->getSymmetricPointIndex(xIndex)));
   FourPoints yBbox = bboxScale(yIndex, bbox, m_startCenter);
   TPointD yCenter  = getScaledPoint(
-      yIndex, yBbox, scaleValue,
-      yBbox.getPoint(m_deformTool->getSymmetricPointIndex(yIndex)));
+       yIndex, yBbox, scaleValue,
+       yBbox.getPoint(m_deformTool->getSymmetricPointIndex(yIndex)));
   TPointD in = getIntersectionPoint(bbox.getP00(), bbox.getP10(), bbox.getP10(),
                                     bbox.getP11(), xCenter);
   return getIntersectionPoint(in, xCenter, bbox.getP00(), bbox.getP10(),
@@ -1077,22 +1077,24 @@ void SelectionTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
   if (m_polyline.size() == 0) {
     modifySelectionOnClick(image, pos, e);
 
-    if (m_what == ROTATION) m_dragTool = createNewRotationTool(this);
-    if (!e.isShiftPressed() && m_what == Inside)
-      m_dragTool = createNewMoveSelectionTool(this);
-    else if (m_what == MOVE_CENTER)
-      m_dragTool = new MoveCenterTool(this);
-    else if (m_what == SCALE)
-      m_dragTool = createNewScaleTool(this, ScaleType::GLOBAL);
-    else if (m_what == SCALE_X)
-      m_dragTool = createNewScaleTool(this, ScaleType::HORIZONTAL);
-    else if (m_what == SCALE_Y)
-      m_dragTool = createNewScaleTool(this, ScaleType::VERTICAL);
-    else if (m_what == DEFORM)
-      m_dragTool = createNewFreeDeformTool(this);
-    else if (m_what == GLOBAL_THICKNESS)
-      m_dragTool = new VectorChangeThicknessTool((VectorSelectionTool *)this);
-    if (m_dragTool) m_dragTool->leftButtonDown(pos, e);
+    if (isSelectionEditable()) {
+      if (m_what == ROTATION) m_dragTool = createNewRotationTool(this);
+      if (!e.isShiftPressed() && m_what == Inside)
+        m_dragTool = createNewMoveSelectionTool(this);
+      else if (m_what == MOVE_CENTER)
+        m_dragTool = new MoveCenterTool(this);
+      else if (m_what == SCALE)
+        m_dragTool = createNewScaleTool(this, ScaleType::GLOBAL);
+      else if (m_what == SCALE_X)
+        m_dragTool = createNewScaleTool(this, ScaleType::HORIZONTAL);
+      else if (m_what == SCALE_Y)
+        m_dragTool = createNewScaleTool(this, ScaleType::VERTICAL);
+      else if (m_what == DEFORM)
+        m_dragTool = createNewFreeDeformTool(this);
+      else if (m_what == GLOBAL_THICKNESS)
+        m_dragTool = new VectorChangeThicknessTool((VectorSelectionTool *)this);
+      if (m_dragTool) m_dragTool->leftButtonDown(pos, e);
+    }
   } else
     m_selecting = true;
   if (m_selecting) {
@@ -1126,7 +1128,7 @@ void SelectionTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 //-----------------------------------------------------------------------------
 
 bool SelectionTool::keyDown(QKeyEvent *event) {
-  if (isSelectionEmpty()) return false;
+  if (isSelectionEmpty() || !isSelectionEditable()) return false;
 
   TPointD delta;
 
@@ -1218,7 +1220,6 @@ void SelectionTool::drawFreehandSelection() {
 //-----------------------------------------------------------------------------
 
 void SelectionTool::drawRectSelection(const TImage *image) {
-
   TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
                      ? TPixel32::White
                      : TPixel32::Black;
@@ -1227,8 +1228,7 @@ void SelectionTool::drawRectSelection(const TImage *image) {
   unsigned short stipple   = 0x3F33;
   FourPoints selectingRect = m_selectingRect;
 
-  if (vi && m_curPos.x >= m_firstPos.x)
-    stipple = 0xFF00;
+  if (vi && m_curPos.x >= m_firstPos.x) stipple = 0xFF00;
 
   drawFourPoints(selectingRect, color, stipple, true);
 }
@@ -1408,7 +1408,7 @@ void SelectionTool::closePolyline(const TPointD &pos) {
 // instead of triggering the shortcut command.
 bool SelectionTool::isEventAcceptable(QEvent *e) {
   if (!isEnabled()) return false;
-  if (isSelectionEmpty()) return false;
+  if (isSelectionEmpty() || !isSelectionEditable()) return false;
   // arrow keys will be used for moving the selected region
   QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
   int key             = keyEvent->key();

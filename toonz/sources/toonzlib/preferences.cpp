@@ -465,6 +465,10 @@ void Preferences::definePreferenceItems() {
          true);
   define(restoreViewerViewFromLastSession, "restoreViewerViewFromLastSession",
          QMetaType::Bool, false);
+  define(locatorNavigatorTabEnabled, "locatorNavigatorTabEnabled",
+         QMetaType::Bool, false);
+  setCallBack(locatorNavigatorTabEnabled,
+              &Preferences::notifyLocatorNavigatorTabEnabled);
 
   // Visualization
   define(show0ThickLines, "show0ThickLines", QMetaType::Bool, true);
@@ -1032,6 +1036,13 @@ void Preferences::setCameraUnits() {
   std::string units = getStringValue(cameraUnits).toStdString();
   setCurrentUnits("camera.lx", units);
   setCurrentUnits("camera.ly", units);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::notifyLocatorNavigatorTabEnabled() {
+  emit locatorNavigatorTabEnabledChanged(
+      getBoolValue(locatorNavigatorTabEnabled));
 }
 
 //-----------------------------------------------------------------

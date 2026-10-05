@@ -346,6 +346,7 @@
 		<file>icons/dark/actions/16x16/sub_clone.svg</file>
 		<file>icons/dark/actions/16x16/duplicate.svg</file>
 		<file>icons/dark/actions/20x20/onionskin_toggle.svg</file>
+		<file>icons/dark/actions/20x20/navigator_onionskin.svg</file>
 		<file>icons/dark/actions/16x16/insert_frame.svg</file>
 		<file>icons/dark/actions/16x16/remove_frame.svg</file>
 		<file>icons/dark/actions/16x16/add_cell.svg</file>
@@ -536,6 +537,21 @@
 		<file>icons/dark/actions/16x16/flipbook_link.svg</file>
 		<file>icons/dark/actions/16x16/timeline.svg</file>
 		<file>icons/dark/actions/16x16/xsheet.svg</file>
+		<file>icons/dark/actions/16x16/navigator_column.svg</file>
+		<file>icons/dark/actions/16x16/navigator_overview.svg</file>
+		<file>icons/dark/actions/16x16/navigator_nav_only.svg</file>
+		<file>icons/dark/actions/16x16/navigator_zoom.svg</file>
+		<file>icons/dark/actions/16x16/navigator_hand.svg</file>
+		<file>icons/dark/actions/16x16/navigator_rotate.svg</file>
+		<file>icons/dark/actions/16x16/navigator_zoomin.svg</file>
+		<file>icons/dark/actions/16x16/navigator_zoomout.svg</file>
+		<file>icons/dark/actions/16x16/navigator_zoom_reset.svg</file>
+		<file>icons/dark/actions/16x16/navigator_fit_to_window.svg</file>
+		<file>icons/dark/actions/16x16/navigator_reset.svg</file>
+		<file>icons/dark/actions/16x16/navigator_rotateleft.svg</file>
+		<file>icons/dark/actions/16x16/navigator_rotateright.svg</file>
+		<file>icons/dark/actions/16x16/navigator_fliphoriz.svg</file>
+		<file>icons/dark/actions/16x16/navigator_flipvert.svg</file>
 		<file>icons/dark/actions/16x16/clapboard.svg</file>
 		<file>icons/dark/actions/16x16/tasks.svg</file>
 		<file>icons/dark/actions/16x16/batchservers.svg</file>

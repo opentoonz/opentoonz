@@ -21,6 +21,7 @@ public:
   void execute() override;
 
   static TPanel *getOrOpenFloatingPanel(const std::string &panelType);
+  static TPanel *getOrReuseFloatingPanel(const std::string &panelType);
 };
 
 #endif

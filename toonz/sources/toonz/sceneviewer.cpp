@@ -867,6 +867,41 @@ SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
 
 //-----------------------------------------------------------------------------
 
+void SceneViewer::setGuidedDrawingModeOverride(int mode) {
+  if (mode < -1 || mode > 3) mode = -1;
+  if (m_guidedDrawingModeOverride == mode) return;
+  m_guidedDrawingModeOverride = mode;
+  update();
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::setSuppressOnionSkinInViewer(bool on) {
+  if (m_suppressOnionSkinInViewer == on) return;
+  m_suppressOnionSkinInViewer = on;
+  update();
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::setHideCurrentDrawingInViewer(bool on) {
+  if (!m_isLocator) return;
+  if (m_hideCurrentDrawingInViewer == on) return;
+  m_hideCurrentDrawingInViewer = on;
+  update();
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::setShowOnlyCurrentColumnInViewer(bool on) {
+  if (!m_isLocator) return;
+  if (m_showOnlyCurrentColumnInViewer == on) return;
+  m_showOnlyCurrentColumnInViewer = on;
+  update();
+}
+
+//-----------------------------------------------------------------------------
+
 void SceneViewer::setVisual(const ImagePainter::VisualSettings &settings) {
   // m_visualSettings.m_blankColor = settings.m_blankColor;//for the blank
   // frames, I don't have to repaint the viewer are using updateGl!
@@ -1045,7 +1080,7 @@ TPointD SceneViewer::winToWorld(const QPointF &pos) const {
     TXsheet *xsh            = TApp::instance()->getCurrentXsheet()->getXsheet();
     TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
     double z                = xsh->getStageObject(cameraId)->getZ(
-        TApp::instance()->getCurrentFrame()->getFrame());
+                       TApp::instance()->getCurrentFrame()->getFrame());
 
     TPointD p(pp.x - m_pan3D.x, pp.y - m_pan3D.y);
     p               = p * (1 / m_zoomScale3D);
@@ -1101,8 +1136,10 @@ void SceneViewer::showEvent(QShowEvent *) {
   TApp *app = TApp::instance();
 
   TSceneHandle *sceneHandle = app->getCurrentScene();
-  connect(sceneHandle, &TSceneHandle::sceneSwitched, this,
-          &SceneViewer::resetSceneViewer);
+  if (!m_isLocator) {
+    connect(sceneHandle, &TSceneHandle::sceneSwitched, this,
+            &SceneViewer::resetSceneViewer);
+  }
   connect(sceneHandle, &TSceneHandle::sceneChanged, this,
           &SceneViewer::onSceneChanged);
   connect(sceneHandle, &TSceneHandle::preferenceChanged, this,
@@ -1166,10 +1203,10 @@ void SceneViewer::showEvent(QShowEvent *) {
     }
   }
   if (m_shownOnce == false) {
-    fitToCamera();
+    if (!m_isLocator) fitToCamera();
     m_shownOnce = true;
   }
-  TApp::instance()->setActiveViewer(this);
+  if (!m_isLocator) TApp::instance()->setActiveViewer(this);
 
   onPreferenceChanged("ColorCalibration");
   update();
@@ -1921,11 +1958,23 @@ void SceneViewer::drawOverlay() {
     if (tool->getName() == "T_RGBPicker") tool->onImageChanged();
 
     // draw cross at the center of the locator window
-    if (m_isLocator) {
+    if (m_isLocator && !m_hasNavViewFrame) {
       glColor3d(1.0, 0.0, 0.0);
       tglDrawSegment(TPointD(-4, 0), TPointD(5, 0));
       tglDrawSegment(TPointD(0, -4), TPointD(0, 5));
     }
+  }
+
+  if (m_isLocator && m_hasNavViewFrame && !m_isPicking) {
+    glPushAttrib(GL_ENABLE_BIT | GL_LINE_BIT | GL_CURRENT_BIT);
+    glDisable(GL_DEPTH_TEST);
+    glLineWidth(1.5f * (float)getDevPixRatio());
+    glColor3d(1.0, 0.15, 0.15);
+    glBegin(GL_LINE_LOOP);
+    for (int i = 0; i < 4; ++i)
+      glVertex2d(m_navViewFrame[i].x, m_navViewFrame[i].y);
+    glEnd();
+    glPopAttrib();
   }
 }
 
@@ -2148,13 +2197,25 @@ void SceneViewer::drawScene() {
   TXshSimpleLevel::m_fillFullColorRaster = false;
 
   // Guided Drawing Check
-  int useGuidedDrawing  = Preferences::instance()->getGuidedDrawingType();
+  int useGuidedDrawing = Preferences::instance()->getGuidedDrawingType();
+  if (m_guidedDrawingModeOverride >= 0)
+    useGuidedDrawing = m_guidedDrawingModeOverride;
   TTool *tool           = app->getCurrentTool()->getTool();
   int guidedFrontStroke = tool && tool->getViewer()
                               ? tool->getViewer()->getGuidedFrontStroke()
                               : -1;
   int guidedBackStroke =
       tool && tool->getViewer() ? tool->getViewer()->getGuidedBackStroke() : -1;
+
+  OnionSkinMask onionSkinForStage;
+  if (m_suppressOnionSkinInViewer)
+    onionSkinForStage = OnionSkinMask();
+  else
+    onionSkinForStage = app->getCurrentOnionSkin()->getOnionSkinMask();
+
+  const bool hideCurrentDrawing = m_isLocator && m_hideCurrentDrawingInViewer;
+  const bool showOnlyCurrentColumn =
+      m_isLocator && m_showOnlyCurrentColumnInViewer;
 
   m_minZ = 0;
   if (is3DView()) {
@@ -2175,8 +2236,7 @@ void SceneViewer::drawScene() {
     args.m_xsh         = xr.first;
     args.m_row         = xr.second;
     args.m_col         = app->getCurrentColumn()->getColumnIndex();
-    OnionSkinMask osm  = app->getCurrentOnionSkin()->getOnionSkinMask();
-    args.m_osm         = &osm;
+    args.m_osm         = &onionSkinForStage;
     args.m_camera3d    = true;
     args.m_xsheetLevel = xsheetLevel;
     args.m_currentFrameId =
@@ -2187,6 +2247,8 @@ void SceneViewer::drawScene() {
     args.m_isGuidedDrawingEnabled = useGuidedDrawing;
     args.m_guidedFrontStroke      = guidedFrontStroke;
     args.m_guidedBackStroke       = guidedBackStroke;
+    args.m_hideCurrentDrawing     = hideCurrentDrawing;
+    args.m_showOnlyCurrentColumn  = showOnlyCurrentColumn;
 
     // args.m_currentFrameId = app->getCurrentFrame()->getFid();
     Stage::visit(painter, args);
@@ -2218,10 +2280,9 @@ void SceneViewer::drawScene() {
     TFrameHandle *frameHandle = TApp::instance()->getCurrentFrame();
     if (app->getCurrentFrame()->isEditingLevel()) {
       Stage::visit(painter, app->getCurrentLevel()->getLevel(),
-                   app->getCurrentFrame()->getFid(),
-                   app->getCurrentOnionSkin()->getOnionSkinMask(),
+                   app->getCurrentFrame()->getFid(), onionSkinForStage,
                    frameHandle->isPlaying(), useGuidedDrawing, guidedBackStroke,
-                   guidedFrontStroke);
+                   guidedFrontStroke, hideCurrentDrawing);
     } else {
       std::pair<TXsheet *, int> xr;
       int xsheetLevel = 0;
@@ -2236,8 +2297,7 @@ void SceneViewer::drawScene() {
       args.m_xsh         = xr.first;
       args.m_row         = xr.second;
       args.m_col         = app->getCurrentColumn()->getColumnIndex();
-      OnionSkinMask osm  = app->getCurrentOnionSkin()->getOnionSkinMask();
-      args.m_osm         = &osm;
+      args.m_osm         = &onionSkinForStage;
       args.m_xsheetLevel = xsheetLevel;
       args.m_isPlaying   = frameHandle->isPlaying();
       if (app->getCurrentLevel() && app->getCurrentLevel()->getLevel() &&
@@ -2250,6 +2310,8 @@ void SceneViewer::drawScene() {
       args.m_isGuidedDrawingEnabled = useGuidedDrawing;
       args.m_guidedFrontStroke      = guidedFrontStroke;
       args.m_guidedBackStroke       = guidedBackStroke;
+      args.m_hideCurrentDrawing     = hideCurrentDrawing;
+      args.m_showOnlyCurrentColumn  = showOnlyCurrentColumn;
 
 #if defined(x64)
       if (m_stopMotion->m_alwaysUseLiveViewImages &&
@@ -2406,7 +2468,7 @@ TAffine4 SceneViewer::get3dViewMatrix() const {
     TXsheet *xsh            = TApp::instance()->getCurrentXsheet()->getXsheet();
     TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
     double z                = xsh->getStageObject(cameraId)->getZ(
-        TApp::instance()->getCurrentFrame()->getFrame());
+                       TApp::instance()->getCurrentFrame()->getFrame());
 
     TAffine4 affine;
     affine *= TAffine4::translation(m_pan3D.x, m_pan3D.y, z);
@@ -2482,6 +2544,16 @@ void SceneViewer::setViewZoomPan(int viewMode, const TAffine &aff) {
 
 //-----------------------------------------------------------------------------
 
+void SceneViewer::setNavViewFrame(bool on, const TPointD *glPts) {
+  m_hasNavViewFrame = on && glPts;
+  if (m_hasNavViewFrame) {
+    for (int i = 0; i < 4; ++i) m_navViewFrame[i] = glPts[i];
+  }
+  update();
+}
+
+//-----------------------------------------------------------------------------
+
 void SceneViewer::setCamera3DViewState(const TPointD &pan, double zoom,
                                        double phi, double theta) {
   m_pan3D       = pan;
@@ -2501,6 +2573,16 @@ bool SceneViewer::is3DView() const {
 
 //-----------------------------------------------------------------------------
 
+void SceneViewer::invalidatePeerViewers() {
+  const QWidgetList widgets = QApplication::allWidgets();
+  for (QWidget *w : widgets) {
+    SceneViewer *sv = qobject_cast<SceneViewer *>(w);
+    if (sv && sv != this) sv->GLInvalidateAll();
+  }
+}
+
+//-----------------------------------------------------------------------------
+
 void SceneViewer::invalidateAll() {
   m_clipRect = InvalidateAllRect;
   update();
@@ -2512,6 +2594,10 @@ void SceneViewer::invalidateAll() {
 /*! Pan the viewer by using "navigator" (red rectangle) in level strip
  */
 void SceneViewer::navigatorPan(const QPoint &delta) {
+  navigatorPan(QPointF(delta));
+}
+
+void SceneViewer::navigatorPan(const QPointF &delta) {
   panQt(delta);
   m_pos += delta;
 }
@@ -2550,9 +2636,25 @@ void SceneViewer::GLInvalidateRect(const TRectD &rect) {
 }
 //-----------------------------------------------------------------------------
 
+void SceneViewer::setViewForwardTarget(SceneViewer *sv) {
+  m_viewForwardTarget    = (sv && sv != this) ? sv : nullptr;
+  m_forwardedRotateAngle = 0;
+}
+
+//-----------------------------------------------------------------------------
+
 // delta.x: right panning, pixel; delta.y: down panning, pixel
 void SceneViewer::panQt(const QPointF &delta) {
   if (delta == QPointF()) return;
+  if (SceneViewer *t = m_viewForwardTarget.data()) {
+    const TAffine navInv  = getViewMatrix().inv();
+    const TAffine mainAff = t->getViewMatrix();
+    const TPointD d(delta.x(), delta.y());
+    const TPointD worldDelta = navInv * d - navInv * TPointD(0, 0);
+    const TPointD mainDelta  = mainAff * worldDelta - mainAff * TPointD(0, 0);
+    t->panQt(QPointF(-mainDelta.x, mainDelta.y));
+    return;
+  }
   if (is3DView())
     m_pan3D += TPointD(delta.x(), -delta.y());
   else {
@@ -2568,6 +2670,10 @@ void SceneViewer::panQt(const QPointF &delta) {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::zoomQt(bool forward, bool reset) {
+  if (SceneViewer *t = m_viewForwardTarget.data()) {
+    t->zoomQt(forward, reset);
+    return;
+  }
   TPointD delta(m_lastMousePos.x() - width() / 2,
                 -m_lastMousePos.y() + height() / 2);
 
@@ -2745,8 +2851,18 @@ double SceneViewer::getZoomScaleFittingWithScreen() {
 
 // center: window coordinate, pixels, topleft origin
 void SceneViewer::zoomQt(const QPoint &center, double factor) {
+  zoomQt(QPointF(center), factor);
+}
+
+void SceneViewer::zoomQt(const QPointF &center, double factor) {
   if (factor == 1.0) return;
-  TPointD delta(center.x() - width() / 2, -center.y() + height() / 2);
+  if (SceneViewer *t = m_viewForwardTarget.data()) {
+    const TPointD world = winToWorld(center);
+    const TPointD p     = t->getViewMatrix() * world;
+    t->zoomQt(QPointF(t->width() * 0.5 + p.x, t->height() * 0.5 - p.y), factor);
+    return;
+  }
+  TPointD delta(center.x() - width() * 0.5, -center.y() + height() * 0.5);
   double oldZoomScale = m_zoomScale3D;
 
   if (is3DView()) {
@@ -2781,7 +2897,7 @@ void SceneViewer::zoomQt(const QPoint &center, double factor) {
 }
 
 void SceneViewer::zoom(const TPointD &center, double factor) {
-  zoomQt(QPoint(center.x, height() - center.y), factor);
+  zoomQt(QPointF(center.x, (qreal)height() - center.y), factor);
 }
 
 //-----------------------------------------------------------------------------
@@ -2872,21 +2988,42 @@ void SceneViewer::zoomOut() {
 
 void SceneViewer::rotate(const TPointD &center, double angle) {
   if (angle == 0) return;
+  if (SceneViewer *t = m_viewForwardTarget.data()) {
+    double out = angle;
+    if (m_dragging && !m_rotating) {
+      out                    = angle - m_forwardedRotateAngle;
+      m_forwardedRotateAngle = angle;
+    }
+    if (out == 0) return;
+    const double navD  = std::min(width(), height());
+    const double mainD = std::min(t->width(), t->height());
+    double speed       = 1.0;
+    if (navD > 1.0 && mainD > 1.0)
+      speed = std::max(0.55, std::min(1.0, navD / mainD));
+    t->rotate(center, -out * speed);
+    return;
+  }
   if (m_isFlippedX != m_isFlippedY) angle = -angle;
   m_rotationAngle[m_viewMode] += angle;
   TPointD realCenter = m_viewAff[m_viewMode] * center;
   setViewMatrix(TRotation(realCenter, angle) * m_viewAff[m_viewMode],
                 m_viewMode);
   invalidateAll();
+  emit refreshNavi();
 }
 
 //-----------------------------------------------------------------------------
 
 void SceneViewer::rotate3D(double dPhi, double dTheta) {
   if (dPhi == 0 && dTheta == 0) return;
+  if (SceneViewer *t = m_viewForwardTarget.data()) {
+    t->rotate3D(dPhi, dTheta);
+    return;
+  }
   m_phi3D   = (float)tcrop(m_phi3D + dPhi, -90.0, 90.0);
   m_theta3D = (float)tcrop(m_theta3D + dTheta, 0.0, 90.0);
   invalidateAll();
+  emit refreshNavi();
 }
 
 //-----------------------------------------------------------------------------
@@ -3070,6 +3207,7 @@ void SceneViewer::resetPosition() {
   m_viewAff[m_viewMode].a13 = 0.0;
   m_viewAff[m_viewMode].a23 = 0.0;
   invalidateAll();
+  emit refreshNavi();
 }
 
 //-----------------------------------------------------------------------------

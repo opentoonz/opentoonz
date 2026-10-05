@@ -527,6 +527,7 @@ QMenuBar *StackedMenuBar::createCleanupMenuBar() {
     addMenuItem(otherWindowsMenu, MI_OpenFileViewer);
     addMenuItem(otherWindowsMenu, MI_OpenFunctionEditor);
     addMenuItem(otherWindowsMenu, MI_OpenFilmStrip);
+    addMenuItem(otherWindowsMenu, MI_OpenLocator);
     addMenuItem(otherWindowsMenu, MI_OpenPalette);
     addMenuItem(otherWindowsMenu, MI_OpenFileBrowser2);
     addMenuItem(otherWindowsMenu, MI_OpenSchematic);
@@ -687,6 +688,7 @@ QMenuBar *StackedMenuBar::createPltEditMenuBar() {
   addMenuItem(windowsMenu, MI_OpenPreproductionBoard);
   addMenuItem(windowsMenu, MI_OpenFileViewer);
   addMenuItem(windowsMenu, MI_OpenFilmStrip);
+  addMenuItem(windowsMenu, MI_OpenLocator);
   addMenuItem(windowsMenu, MI_OpenPalette);
   addMenuItem(windowsMenu, MI_OpenStudioPalette);
   addMenuItem(windowsMenu, MI_OpenStyleControl);
@@ -875,6 +877,7 @@ QMenuBar *StackedMenuBar::createInknPaintMenuBar() {
   addMenuItem(windowsMenu, MI_OpenFileBrowser);
   addMenuItem(windowsMenu, MI_OpenPreproductionBoard);
   addMenuItem(windowsMenu, MI_OpenFilmStrip);
+  addMenuItem(windowsMenu, MI_OpenLocator);
   addMenuItem(windowsMenu, MI_OpenToolbar);
   addMenuItem(windowsMenu, MI_OpenToolOptionBar);
   windowsMenu->addSeparator();
@@ -1058,6 +1061,7 @@ QMenuBar *StackedMenuBar::createXsheetMenuBar() {
   addMenuItem(windowsMenu, MI_OpenFunctionEditor);
   addMenuItem(windowsMenu, MI_OpenFileViewer);
   addMenuItem(windowsMenu, MI_OpenFilmStrip);
+  addMenuItem(windowsMenu, MI_OpenLocator);
   addMenuItem(windowsMenu, MI_OpenLevelView);
   addMenuItem(windowsMenu, MI_OpenXshView);
   addMenuItem(windowsMenu, MI_OpenTimelineView);

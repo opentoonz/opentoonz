@@ -11,6 +11,7 @@
 #include "tapp.h"
 #include "iocommand.h"
 #include "menubarcommandids.h"
+#include "floatingpanelcommand.h"
 #include "onionskinmaskgui.h"
 #include "ruler.h"
 #include "locatorpopup.h"
@@ -217,8 +218,7 @@ void SceneViewer::onButtonPressed(FlipConsole::EGadget button) {
 
   // open locator. Create one for the first time
   case FlipConsole::eLocator: {
-    QAction *action = CommandManager::instance()->getAction(MI_OpenLocator);
-    action->trigger();
+    OpenFloatingPanel::getOrReuseFloatingPanel("Locator");
     break;
   }
 
@@ -450,7 +450,7 @@ void SceneViewer::onEnter() {
   m_isMouseEntered = true;
 
   TApp *app = TApp::instance();
-  app->setActiveViewer(this);
+  if (!m_isLocator) app->setActiveViewer(this);
   TTool *tool      = app->getCurrentTool()->getTool();
   TXshLevel *level = app->getCurrentLevel()->getLevel();
   if (level && level->getSimpleLevel())
@@ -749,7 +749,8 @@ void SceneViewer::mousePressEvent(QMouseEvent *event) {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::onPress(const TMouseEvent &event) {
-  m_dragging = true;
+  m_dragging             = true;
+  m_forwardedRotateAngle = 0;
   if (m_mouseScrubbing > 0) {
     m_pos           = event.mousePos() * getDevPixRatio();
     m_mouseButton   = event.button();
@@ -913,7 +914,7 @@ void SceneViewer::onRelease(const TMouseEvent &event) {
   if (!m_buttonClicked) return;
   m_buttonClicked = false;
 
-  m_dragging  = false;
+  m_dragging = false;
 
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
   if (!tool || !tool->isEnabled()) {
@@ -1299,7 +1300,7 @@ bool SceneViewer::event(QEvent *e) {
   }
   if (e->type() == QEvent::ShortcutOverride || e->type() == QEvent::KeyPress) {
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
-    
+
     if (!keyEvent->isAutoRepeat()) {
       TApp::instance()->getCurrentTool()->storeTool();
     }
