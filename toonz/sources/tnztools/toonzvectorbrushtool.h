@@ -8,6 +8,8 @@
 #include <trasterimage.h>
 #include <ttoonzimage.h>
 #include <tstroke.h>
+#include <tpalette.h>
+#include "trailcyclestate.h"
 #include <toonz/strokegenerator.h>
 #include "toonz/preferences.h"
 #include <tools/tool.h>
@@ -35,6 +37,7 @@
 
 class TTileSetCM32;
 class TTileSaverCM32;
+class TPalette;
 class RasterStrokeGenerator;
 class BluredBrush;
 
@@ -168,6 +171,7 @@ public:
   TPropertyGroup *getProperties(int targetType) override;
   bool onPropertyChanged(std::string propertyName) override;
   void resetFrameRange();
+  bool isTrailCycleAvailable() const;
 
   void initPresets();
   void loadPreset();
@@ -217,6 +221,7 @@ protected:
   TBoolProperty m_pressure;
   TBoolProperty m_snap;
   TEnumProperty m_frameRange;
+  TEnumProperty m_trailCycle;
   TEnumProperty m_snapSensitivity;
   TEnumProperty m_capStyle;
   TEnumProperty m_joinStyle;
@@ -242,6 +247,10 @@ protected:
   TFrameId m_firstFrameId, m_veryFirstFrameId;
   TPixel32 m_currentColor;
   int m_styleId;
+  TrailCycle::State m_trailState;
+  TrailCycle::Selection m_trailSelection;
+  TPaletteP m_trailPalette;
+  TPaletteP m_trailGesturePalette;
   double m_minThick, m_maxThick;
 
   // for snapping and framerange

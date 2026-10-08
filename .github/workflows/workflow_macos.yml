@@ -102,6 +102,17 @@ jobs:
             -DOpenCV_DIR=$(brew --prefix opencv@4)/lib/cmake/opencv4 \
             -DWITH_TRANSLATION=OFF
           ninja -j $(sysctl -n hw.ncpu)
+      - name: Test Trail logic and brush options
+        run: |
+          set -euo pipefail
+          cmake -S toonz/tests -B toonz/trail-tests -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_PREFIX_PATH="$(brew --prefix qt@5)" \
+            -DTNZCORE_LIBRARY="$PWD/toonz/build/tnzcore/libtnzcore.dylib" \
+            -DTNZTOOLS_LIBRARY="$PWD/toonz/build/tnztools/libtnztools.dylib"
+          cmake --build toonz/trail-tests
+          DYLD_LIBRARY_PATH="$PWD/toonz/build/toonz/OpenToonz.app/Contents/MacOS" \
+            ctest --test-dir toonz/trail-tests -LE opengl --output-on-failure
       - name: Introduce Libraries and Stuff
         run: |
           cd toonz/build/toonz

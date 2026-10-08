@@ -41,6 +41,9 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Check changes introduced by this PR, excluding later base-branch work.
+          BASE_SHA=$(git merge-base "$BASE_SHA" "$HEAD_SHA")
+
           files=()
           while IFS= read -r -d '' file; do
             case "$file" in
