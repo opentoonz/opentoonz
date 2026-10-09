@@ -11,12 +11,17 @@
 #include <QStringList>
 #include <QtGlobal>
 #include <QColor>
+#include <QPalette>
+#include <QPointer>
+#include <QVector>
 #include <vector>
 #include <utility>
 
 class TPanelTitleBarButtonSet;
 class TPanelTitleBarButton;
 class Room;
+class QSettings;
+class QTimer;
 
 //-----------------------------------------------------------------------------
 //! icon buttons placed on the panel titlebar (cfr. viewerpane.h)
@@ -214,9 +219,7 @@ public:
   }
 
   QPixmap getFloatBorderPixmap() const { return m_floatBorderPm; }
-  void setFloatBorderPixmap(const QPixmap &pixmap) {
-    m_floatBorderPm = pixmap;
-  }
+  void setFloatBorderPixmap(const QPixmap &pixmap) { m_floatBorderPm = pixmap; }
 
   QPixmap getFloatActiveBorderPixmap() const { return m_floatActiveBorderPm; }
   void setFloatActiveBorderPixmap(const QPixmap &pixmap) {
@@ -235,14 +238,18 @@ public:
   QColor getCloseOverColor() const;
   void setCloseOverColor(const QColor &color);
 
+  void setCompact(bool compact);
+
+  void setSuppressed(bool suppressed);
+  void setVisible(bool visible) override;
+
 signals:
   void closeButtonPressed();
   void doubleClick(QMouseEvent *me);
 
 protected:
   void resizeEvent(QResizeEvent *e) override;
-  void contextMenuEvent(QContextMenuEvent *) override {
-  }  // disable default menu
+  void contextMenuEvent(QContextMenuEvent *event) override;
   void paintEvent(QPaintEvent *event) override;
   void leaveEvent(QEvent *) override;
   void mouseMoveEvent(QMouseEvent *event) override;
@@ -251,6 +258,8 @@ protected:
 
 private:
   bool m_closeButtonHighlighted;
+  bool m_compact;
+  bool m_suppressed = false;
   std::vector<std::pair<QPoint, QWidget *>> m_buttons;
 
   QPixmap m_borderPm, m_activeBorderPm, m_floatBorderPm, m_floatActiveBorderPm;
@@ -304,10 +313,19 @@ public:
   void setRoomBindButton(TPanelTitleBarButton *button) noexcept {
     m_roomBindButton = button;
   }
-  
+
   // Add room binding toggle button to the title bar
   // This enables the "Bind to Room" feature for any panel
   void addRoomBindButton();
+
+  bool isCustomPanel() const;
+  bool compactFloating() const { return m_compactFloating; }
+  void setCompactMode(bool compact, bool showTitleBar);
+  void loadCompactFloating();
+  void saveCompactState(QSettings &settings) const;
+  void loadCompactState(QSettings &settings);
+  void watchContextMenu(QWidget *root);
+  void execContextMenu(const QPoint &globalPos);
 
   // Virtuals that may be overridden
   virtual void reset() {}
@@ -321,12 +339,19 @@ public:
 
 protected:
   void paintEvent(QPaintEvent *) override;
+  void resizeEvent(QResizeEvent *event) override;
+  void showEvent(QShowEvent *event) override;
+  bool eventFilter(QObject *watched, QEvent *event) override;
   void enterEvent(QEvent *) override;
   void leaveEvent(QEvent *) override;
 
-  // BTR grip visibility follows floating/docked state (dock + workspace restore).
+  // BTR grip visibility follows floating/docked state (dock + workspace
+  // restore).
   void setFloatingAppearance() override;
   void setDockedAppearance() override;
+  int isResizeGrip(QPoint p) override;
+  QPoint undockGrabOffset(const QPoint &offset) override;
+  void hideEvent(QHideEvent *event) override;
 
   virtual bool isActivatableOnEnter() { return false; }
 
@@ -359,6 +384,57 @@ private:
   bool m_isRoomBound;
   QString m_boundRoomName;
   TPanelTitleBarButton *m_roomBindButton;
+  bool m_compactFloating;
+  bool m_showTitleBar;
+  bool m_compactTransparentBg;
+  bool m_transparentLookApplied;
+  bool m_savedContentAutoFill;
+  QString m_savedPanelStyleSheet;
+  QString m_savedContentStyleSheet;
+  struct CompactSurface {
+    QPointer<QWidget> widget;
+    QPalette palette;
+    bool autoFillBackground;
+    bool translucentBackground;
+    bool noSystemBackground;
+  };
+  QVector<CompactSurface> m_compactSurfaces;
+  bool m_compactApplied;
+  bool m_inFloatingChrome;
+  bool m_displaySyncPending;
+  bool m_contentPress;
+  bool m_forwardingMouse;
+  QPoint m_contentPressGlobal;
+  QPointer<QWidget> m_contentPressWidget;
+  QSize m_appliedChrome;
+  QSize m_lastFloatingContent;
+  QSize m_compactFloor;
+  QSize m_savedPanelMin;
+  QSize m_savedPanelMax;
+  bool m_hasSavedPanelLimits;
+  bool m_restoreSizePending;
+  int m_gripCursor;
+  QTimer *m_gripCursorTimer;
+
+  QSize chromeSize(bool compact) const;
+  void applyDisplayState(bool floating, bool keepContentSize = false);
+  void scheduleDisplaySync();
+  void applyPanelLimits(bool compact, bool floating, const QSize &chrome);
+  void rememberFloatingSize();
+  void restoreFloatingSize();
+  void setFloatingChromeMargin(int margin);
+  void positionCompactTitleBar();
+  QPoint nearestDragPoint(const QPoint &p) const;
+  void ensureCompactTranslucency(bool on);
+  int compactResizeMargin(const QPoint &panelPos) const;
+  void updateGripCursor(int marginType);
+  void saveCompactFloating() const;
+  void setCompactTransparentBackground(bool on);
+  void syncCompactTransparentLook();
+  void clearCompactSurfaces();
+  bool compactDragExempt(QWidget *widget) const;
+  bool handleCompactDrag(QObject *watched, QEvent *event);
+  bool beginCompactDrag(const QPoint &globalPos);
 };
 
 //-----------------------------------------------------------------------------
