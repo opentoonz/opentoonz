@@ -24,8 +24,16 @@
 class DVAPI TMacroFx final : public TRasterFx {
   FX_DECLARATION(TMacroFx)
 
+public:
+  struct ExposedParam {
+    std::wstring m_fxId;
+    std::string m_paramName;
+  };
+
+private:
   TRasterFxP m_root;
   std::vector<TFxP> m_fxs;
+  std::vector<ExposedParam> m_exposedParams;
   bool m_isEditing;
 
   bool isaLeaf(TFx *fx) const;
@@ -65,6 +73,12 @@ public:
   // restituisce un riferimento al vettore contenente gli effetti contenuti nel
   // macroFx
   const std::vector<TFxP> &getFxs() const;
+
+  const std::vector<ExposedParam>& getExposedParams() const;
+  bool isParamExposed(const TFx* fx, const std::string& paramName) const;
+  void setParamExposed(const TFx* fx, const std::string& paramName,
+                       bool exposed);
+  std::string getExposedParamKey() const;
 
   std::string getMacroFxType() const;
 

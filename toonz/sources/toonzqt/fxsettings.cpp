@@ -39,7 +39,9 @@
 #include <QMap>
 #include <QPainter>
 #include <QCheckBox>
+#include <QCoreApplication>
 #include <QPushButton>
+#include <QSignalBlocker>
 
 #include <QDesktopServices>
 #include <QUrl>
@@ -74,12 +76,21 @@ bool findItemByParamName(QLayout *layout, std::string name,
     if (!item) continue;
     if (item->widget()) {
       ParamField *pf = dynamic_cast<ParamField *>(item->widget());
-      if (pf && pf->getParamName().toStdString() == name) {
+      if (pf && (pf->getParamName().toStdString() == name ||
+                 pf->property("fxParamName").toString() ==
+                     QString::fromStdString(name))) {
         ret.push_back(pf);
         if (i > 0 && layout->itemAt(i - 1)->widget()) {
           QLabel *label =
               dynamic_cast<QLabel *>(layout->itemAt(i - 1)->widget());
           if (label) ret.push_back(label);
+        }
+        const QList<QCheckBox*> checkBoxes =
+            pf->parentWidget()->findChildren<QCheckBox*>();
+        for (QCheckBox* checkBox : checkBoxes) {
+          if (checkBox->property("macroParamName").toString() ==
+              QString::fromStdString(name))
+            ret.push_back(checkBox);
         }
         return true;
       }
@@ -104,7 +115,9 @@ ParamsPage::ParamsPage(QWidget *parent, ParamViewer *paramViewer)
     : QFrame(parent)
     , m_paramViewer(paramViewer)
     , m_horizontalLayout(NULL)
-    , m_groupLayout(NULL) {
+    , m_groupLayout(NULL)
+    , m_macroFxIndex(-1)
+    , m_isPinnedPage(false) {
   m_fxHistogramRender = new FxHistogramRender();
   setFrameStyle(QFrame::StyledPanel);
 
@@ -122,6 +135,96 @@ ParamsPage::ParamsPage(QWidget *parent, ParamViewer *paramViewer)
 //-----------------------------------------------------------------------------
 
 ParamsPage::~ParamsPage() {}
+
+//-----------------------------------------------------------------------------
+
+void ParamsPage::configureMacroPage(TMacroFx* macroFx,
+                                    const std::vector<int>& macroFxPath,
+                                    int fxIndex) {
+  m_actualMacroFx = TFxP(macroFx);
+  m_macroFxPath   = macroFxPath;
+  m_macroFxIndex  = fxIndex;
+  if (fxIndex >= 0) {
+    m_mainLayout->setColumnStretch(1, 0);
+    m_mainLayout->setColumnStretch(2, 1);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+int ParamsPage::labelColumn() const { return m_macroFxIndex >= 0 ? 1 : 0; }
+
+int ParamsPage::fieldColumn() const { return m_macroFxIndex >= 0 ? 2 : 1; }
+
+int ParamsPage::pageColumnCount() const { return m_macroFxIndex >= 0 ? 3 : 2; }
+
+//-----------------------------------------------------------------------------
+
+void ParamsPage::registerPageParam(ParamField* field,
+                                   const std::string& paramName) {
+  if (!field) return;
+  field->setProperty("fxParamName", QString::fromStdString(paramName));
+  m_pageParams.push_back({field, paramName, nullptr});
+}
+
+//-----------------------------------------------------------------------------
+
+QCheckBox* ParamsPage::createPinCheckBox(ParamField* field,
+                                         const std::string& paramName) {
+  if (!field || m_macroFxIndex < 0 || m_isPinnedPage) return nullptr;
+
+  TMacroFx* macroFx = dynamic_cast<TMacroFx*>(m_actualMacroFx.getPointer());
+  if (!macroFx) return nullptr;
+  const std::vector<TFxP>& fxs = macroFx->getFxs();
+  if (m_macroFxIndex >= (int)fxs.size() ||
+      dynamic_cast<TMacroFx*>(fxs[m_macroFxIndex].getPointer()))
+    return nullptr;
+
+  for (PageParam& pageParam : m_pageParams) {
+    if (pageParam.m_field == field) continue;
+    if (pageParam.m_paramName == paramName && pageParam.m_pinCheckBox)
+      return nullptr;
+  }
+
+  QCheckBox* checkBox = new QCheckBox(this);
+  checkBox->setToolTip(QCoreApplication::translate(
+      "FxSettings", "Show this parameter on the Pinned tab"));
+  checkBox->setProperty("macroParamName", QString::fromStdString(paramName));
+  checkBox->setChecked(
+      macroFx->isParamExposed(fxs[m_macroFxIndex].getPointer(), paramName));
+
+  for (PageParam& pageParam : m_pageParams) {
+    if (pageParam.m_field == field) {
+      pageParam.m_pinCheckBox = checkBox;
+      break;
+    }
+  }
+
+  connect(checkBox, &QCheckBox::toggled, this, [this, paramName](bool exposed) {
+    TMacroFx* currentMacro =
+        dynamic_cast<TMacroFx*>(m_actualMacroFx.getPointer());
+    if (!currentMacro) return;
+    const std::vector<TFxP>& fxs = currentMacro->getFxs();
+    if (m_macroFxIndex < 0 || m_macroFxIndex >= (int)fxs.size()) return;
+    TFx* memberFx = fxs[m_macroFxIndex].getPointer();
+    if (currentMacro->isParamExposed(memberFx, paramName) == exposed) return;
+    const int pageIndex = m_paramViewer->getCurrentPageIndex();
+    const bool hadPinnedPage = !currentMacro->getExposedParams().empty();
+    currentMacro->setParamExposed(memberFx, paramName, exposed);
+    const bool hasPinnedPage = !currentMacro->getExposedParams().empty();
+    emit m_paramViewer->actualFxParamChanged();
+    if (TFxHandle* fxHandle = ParamField::getFxHandle()) {
+      fxHandle->onFxNodeDoubleClicked();
+      int restoredPageIndex = pageIndex;
+      if (!hadPinnedPage && hasPinnedPage)
+        ++restoredPageIndex;
+      else if (hadPinnedPage && !hasPinnedPage)
+        --restoredPageIndex;
+      m_paramViewer->setCurrentPageIndex(restoredPageIndex);
+    }
+  });
+  return checkBox;
+}
 
 //-----------------------------------------------------------------------------
 
@@ -168,6 +271,8 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical) {
         if (field) {
           if (decimals >= 0) field->setPrecision(decimals);
           m_fields.push_back(field);
+          registerPageParam(field, name);
+          QCheckBox* pinCheckBox = createPinCheckBox(field, name);
           /*-- hboxタグに挟まれているとき --*/
           if (isVertical == false) {
             assert(m_horizontalLayout);
@@ -175,21 +280,30 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical) {
             label->setObjectName("FxSettingsLabel");
             if (isFirstParamInRow) {
               int currentRow = m_mainLayout->rowCount();
-              m_mainLayout->addWidget(label, currentRow, 0,
+              if (pinCheckBox)
+                m_mainLayout->addWidget(pinCheckBox, currentRow, 0,
+                                        Qt::AlignCenter);
+              m_mainLayout->addWidget(label, currentRow, labelColumn(),
                                       Qt::AlignRight | Qt::AlignVCenter);
               isFirstParamInRow = false;
-            } else
+            } else {
+              if (pinCheckBox)
+                m_horizontalLayout->addWidget(pinCheckBox, 0, Qt::AlignCenter);
               m_horizontalLayout->addWidget(label, 0,
                                             Qt::AlignRight | Qt::AlignVCenter);
+            }
             m_horizontalLayout->addWidget(field);
             m_horizontalLayout->addSpacing(10);
           } else {
             int currentRow = m_mainLayout->rowCount();
             QLabel *label  = new QLabel(str, this);
             label->setObjectName("FxSettingsLabel");
-            m_mainLayout->addWidget(label, currentRow, 0,
+            if (pinCheckBox)
+              m_mainLayout->addWidget(pinCheckBox, currentRow, 0,
+                                      Qt::AlignCenter);
+            m_mainLayout->addWidget(label, currentRow, labelColumn(),
                                     Qt::AlignRight | Qt::AlignVCenter);
-            m_mainLayout->addWidget(field, currentRow, 1);
+            m_mainLayout->addWidget(field, currentRow, fieldColumn());
           }
           connect(field, SIGNAL(currentParamChanged()), m_paramViewer,
                   SIGNAL(currentFxParamChanged()));
@@ -210,7 +324,7 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical) {
       } else {
         int currentRow = m_mainLayout->rowCount();
         m_mainLayout->addWidget(new QLabel(str.fromStdString(name)), currentRow,
-                                0, 1, 2);
+                                0, 1, pageColumnCount());
       }
     } else if (tagName == "separator") {
       // <separator/> o <separator label="xxx"/>
@@ -218,7 +332,7 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical) {
       QString str;
       Separator *sep = new Separator(str.fromStdString(label), this);
       int currentRow = m_mainLayout->rowCount();
-      m_mainLayout->addWidget(sep, currentRow, 0, 1, 2);
+      m_mainLayout->addWidget(sep, currentRow, 0, 1, pageColumnCount());
       m_mainLayout->setRowStretch(currentRow, 0);
     } else if (tagName == "histogram") {
       Histogram *histogram = new Histogram();
@@ -228,7 +342,7 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical) {
         m_horizontalLayout->addWidget(histogram);
       } else {
         int currentRow = m_mainLayout->rowCount();
-        m_mainLayout->addWidget(histogram, currentRow, 0, 1, 2);
+        m_mainLayout->addWidget(histogram, currentRow, 0, 1, pageColumnCount());
       }
     } else if (tagName == "test") {
       // <test/>
@@ -239,7 +353,8 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical) {
       m_horizontalLayout->setContentsMargins(0, 0, 0, 0);
       m_horizontalLayout->setSpacing(5);
       setPageField(is, fx, false);
-      m_mainLayout->addLayout(m_horizontalLayout, currentRow, 1, 1, 2);
+      m_mainLayout->addLayout(m_horizontalLayout, currentRow, fieldColumn(), 1,
+                              1);
     } else if (tagName == "vbox") {
       int shrink                   = 0;
       std::string shrinkStr        = is.getTagAttribute("shrink");
@@ -257,7 +372,7 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical) {
           sepLay->addWidget(new Separator(QString::fromStdString(label), this),
                             1);
           int currentRow = m_mainLayout->rowCount();
-          m_mainLayout->addLayout(sepLay, currentRow, 0, 1, 2);
+          m_mainLayout->addLayout(sepLay, currentRow, 0, 1, pageColumnCount());
           m_mainLayout->setRowStretch(currentRow, 0);
           tmpWidget = new ModeSensitiveBox(this, checkBox);
           checkBox->setChecked(shrink == 1);
@@ -271,12 +386,14 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical) {
           // find the mode combobox
           ModeChangerParamField *modeChanger = nullptr;
           for (int r = 0; r < m_mainLayout->rowCount(); r++) {
-            QLayoutItem *li = m_mainLayout->itemAtPosition(r, 1);
+            QLayoutItem* li = m_mainLayout->itemAtPosition(r, fieldColumn());
             if (!li || !li->widget()) continue;
             ModeChangerParamField *field =
                 dynamic_cast<ModeChangerParamField *>(li->widget());
             if (!field ||
-                field->getParamName().toStdString() != modeSensitiveStr)
+                (field->getParamName().toStdString() != modeSensitiveStr &&
+                 field->property("fxParamName").toString() !=
+                     QString::fromStdString(modeSensitiveStr)))
               continue;
             modeChanger = field;
             break;
@@ -286,7 +403,9 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical) {
             QList<ModeChangerParamField *> allModeChangers =
                 findChildren<ModeChangerParamField *>();
             for (auto field : allModeChangers) {
-              if (field->getParamName().toStdString() == modeSensitiveStr) {
+              if (field->getParamName().toStdString() == modeSensitiveStr ||
+                  field->property("fxParamName").toString() ==
+                      QString::fromStdString(modeSensitiveStr)) {
                 modeChanger = field;
                 break;
               }
@@ -304,13 +423,14 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical) {
         m_mainLayout->setVerticalSpacing(10);
         m_mainLayout->setHorizontalSpacing(5);
         m_mainLayout->setColumnStretch(0, 0);
-        m_mainLayout->setColumnStretch(1, 1);
+        m_mainLayout->setColumnStretch(labelColumn(), 0);
+        m_mainLayout->setColumnStretch(fieldColumn(), 1);
         setPageField(is, fx, true);
 
         tmpWidget->setLayout(m_mainLayout);
         // turn back the layout
         m_mainLayout = keepMainLay;
-        m_mainLayout->addWidget(tmpWidget, currentRow, 0, 1, 2);
+        m_mainLayout->addWidget(tmpWidget, currentRow, 0, 1, pageColumnCount());
       } else
         setPageField(is, fx, true);
     }
@@ -326,7 +446,7 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical) {
       PixelParamField *ppf1 = 0;
       PixelParamField *ppf2 = 0;
       for (int r = 0; r < m_mainLayout->rowCount(); r++) {
-        QLayoutItem *li = m_mainLayout->itemAtPosition(r, 1);
+        QLayoutItem* li = m_mainLayout->itemAtPosition(r, fieldColumn());
         if (!li) continue;
         QWidget *w = li->widget();
         if (!w) continue;
@@ -335,10 +455,14 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical) {
         if (pf) {
           PixelParamField *ppf = dynamic_cast<PixelParamField *>(pf);
           if (ppf) {
-            if (ppf1 == 0 && ppf->getParamName().toStdString() == name1)
+            if (ppf1 == 0 && (ppf->getParamName().toStdString() == name1 ||
+                              ppf->property("fxParamName").toString() ==
+                                  QString::fromStdString(name1)))
               ppf1 = ppf;
 
-            if (ppf2 == 0 && ppf->getParamName().toStdString() == name2)
+            if (ppf2 == 0 && (ppf->getParamName().toStdString() == name2 ||
+                              ppf->property("fxParamName").toString() ==
+                                  QString::fromStdString(name2)))
               ppf2 = ppf;
           }
         }
@@ -357,7 +481,7 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical) {
           new RgbLinkButtons(str1, str2, this, ppf1, ppf2);
 
       int currentRow = m_mainLayout->rowCount();
-      m_mainLayout->addWidget(linkBut, currentRow, 1,
+      m_mainLayout->addWidget(linkBut, currentRow, fieldColumn(),
                               Qt::AlignLeft | Qt::AlignVCenter);
     }
     /*-- チェックボックスによって他のインタフェースを表示/非表示させる ---*/
@@ -434,17 +558,21 @@ void ParamsPage::addGlobalControl(const TFxP &fx) {
   int currentRow = m_mainLayout->rowCount();
   if (!m_fields.isEmpty()) {
     Separator *sep = new Separator("", this);
-    m_mainLayout->addWidget(sep, currentRow, 0, 1, 2);
+    m_mainLayout->addWidget(sep, currentRow, 0, 1, pageColumnCount());
     m_mainLayout->setRowStretch(currentRow, 0);
     currentRow = m_mainLayout->rowCount();
   }
 
   m_fields.push_back(field);
+  registerPageParam(field, name);
+  QCheckBox* pinCheckBox = createPinCheckBox(field, name);
   QLabel *label = new QLabel(str, this);
   label->setObjectName("FxSettingsLabel");
-  m_mainLayout->addWidget(label, currentRow, 0,
+  if (pinCheckBox)
+    m_mainLayout->addWidget(pinCheckBox, currentRow, 0, Qt::AlignCenter);
+  m_mainLayout->addWidget(label, currentRow, labelColumn(),
                           Qt::AlignRight | Qt::AlignVCenter);
-  m_mainLayout->addWidget(field, currentRow, 1);
+  m_mainLayout->addWidget(field, currentRow, fieldColumn());
 
   connect(field, SIGNAL(currentParamChanged()), m_paramViewer,
           SIGNAL(currentFxParamChanged()));
@@ -470,7 +598,8 @@ void ParamsPage::beginGroup(const char *name) {
 
   QGroupBox *group = new QGroupBox(QString::fromUtf8(name), this);
   group->setLayout(m_groupLayout);
-  m_mainLayout->addWidget(group, m_mainLayout->rowCount(), 0, 1, 2);
+  m_mainLayout->addWidget(group, m_mainLayout->rowCount(), 0, 1,
+                          pageColumnCount());
 }
 
 void ParamsPage::endGroup() { m_groupLayout = NULL; }
@@ -478,26 +607,37 @@ void ParamsPage::endGroup() { m_groupLayout = NULL; }
 void ParamsPage::addWidget(QWidget *field, bool isVertical) {
   QLabel *label  = NULL;
   ParamField *pf = qobject_cast<ParamField *>(field);
+  QCheckBox* pinCheckBox = nullptr;
   if (pf) {
     label = new QLabel(pf->getUIName(), this);
     label->setObjectName("FxSettingsLabel");
     if (!pf->getDescription().isEmpty())
       label->setToolTip(pf->getDescription());
+    for (const PageParam& pageParam : m_pageParams) {
+      if (pageParam.m_field == pf) {
+        pinCheckBox = createPinCheckBox(pf, pageParam.m_paramName);
+        break;
+      }
+    }
   }
 
   if (isVertical) {
     if (m_groupLayout) {
       int row = m_groupLayout->rowCount();
+      if (pinCheckBox)
+        m_groupLayout->addWidget(pinCheckBox, row, 0, Qt::AlignCenter);
       if (label)
-        m_groupLayout->addWidget(label, row, 0,
+        m_groupLayout->addWidget(label, row, labelColumn(),
                                  Qt::AlignRight | Qt::AlignVCenter);
-      m_groupLayout->addWidget(field, row, 1);
+      m_groupLayout->addWidget(field, row, fieldColumn());
     } else {
       int row = m_mainLayout->rowCount();
+      if (pinCheckBox)
+        m_mainLayout->addWidget(pinCheckBox, row, 0, Qt::AlignCenter);
       if (label)
-        m_mainLayout->addWidget(label, row, 0,
+        m_mainLayout->addWidget(label, row, labelColumn(),
                                 Qt::AlignRight | Qt::AlignVCenter);
-      m_mainLayout->addWidget(field, row, 1);
+      m_mainLayout->addWidget(field, row, fieldColumn());
     }
   } else {
     if (!m_horizontalLayout) {
@@ -518,6 +658,7 @@ void ParamsPage::addWidget(QWidget *field, bool isVertical) {
     ParamField *field = MAKE(this, paramName, param);                          \
     if (!field) return NULL;                                                   \
     m_fields.push_back(field);                                                 \
+    registerPageParam(field, name);                                            \
     connect(field, SIGNAL(currentParamChanged()), m_paramViewer,               \
             SIGNAL(currentFxParamChanged()));                                  \
     connect(field, SIGNAL(actualParamChanged()), m_paramViewer,                \
@@ -544,20 +685,115 @@ void ParamsPage::setFx(const TFxP &currentFx, const TFxP &actualFx, int frame) {
   assert(actualFx);
   for (int i = 0; i < (int)m_fields.size(); i++) {
     ParamField *field = m_fields[i];
-    QString fieldName = field->getParamName();
-    TFxP fx           = getCurrentFx(currentFx, actualFx->getFxId());
-    assert(fx.getPointer());
-    TParamP currentParam =
-        currentFx->getParams()->getParam(fieldName.toStdString());
-    TParamP actualParam =
-        actualFx->getParams()->getParam(fieldName.toStdString());
-    assert(currentParam);
-    assert(actualParam);
+    std::string paramName = field->getParamName().toStdString();
+    for (const PageParam& pageParam : m_pageParams) {
+      if (pageParam.m_field == field) {
+        paramName = pageParam.m_paramName;
+        break;
+      }
+    }
+    TParamP currentParam = currentFx->getParams()->getParam(paramName);
+    TParamP actualParam  = actualFx->getParams()->getParam(paramName);
+    if (!currentParam || !actualParam) continue;
     field->setParam(currentParam, actualParam, frame);
   }
   if (actualFx->getInputPortCount() > 0)
     m_fxHistogramRender->computeHistogram(actualFx->getInputPort(0)->getFx(),
                                           frame);
+}
+
+//-----------------------------------------------------------------------------
+
+void ParamsPage::setMacroFx(const TFxP& currentFx, const TFxP& actualFx,
+                            int frame) {
+  TMacroFx* currentMacro = dynamic_cast<TMacroFx*>(currentFx.getPointer());
+  TMacroFx* actualMacro  = dynamic_cast<TMacroFx*>(actualFx.getPointer());
+  if (!currentMacro || !actualMacro) return;
+
+  for (int index : m_macroFxPath) {
+    const std::vector<TFxP>& currentMembers = currentMacro->getFxs();
+    const std::vector<TFxP>& actualMembers  = actualMacro->getFxs();
+    if (index < 0 || index >= (int)currentMembers.size() ||
+        index >= (int)actualMembers.size())
+      return;
+    currentMacro = dynamic_cast<TMacroFx*>(currentMembers[index].getPointer());
+    actualMacro  = dynamic_cast<TMacroFx*>(actualMembers[index].getPointer());
+    if (!currentMacro || !actualMacro) return;
+  }
+
+  m_actualMacroFx                     = TFxP(actualMacro);
+  const std::vector<TFxP>& currentFxs = currentMacro->getFxs();
+  const std::vector<TFxP>& actualFxs  = actualMacro->getFxs();
+
+  if (m_macroFxIndex >= 0) {
+    if (m_macroFxIndex >= (int)currentFxs.size() ||
+        m_macroFxIndex >= (int)actualFxs.size())
+      return;
+    TFx* actualMember = actualFxs[m_macroFxIndex].getPointer();
+    for (PageParam& pageParam : m_pageParams) {
+      if (!pageParam.m_pinCheckBox) continue;
+      const QSignalBlocker blocker(pageParam.m_pinCheckBox);
+      pageParam.m_pinCheckBox->setChecked(
+          actualMacro->isParamExposed(actualMember, pageParam.m_paramName));
+    }
+    setFx(currentFxs[m_macroFxIndex], actualFxs[m_macroFxIndex], frame);
+    return;
+  }
+
+  for (auto it = m_exposedParamTargets.cbegin();
+       it != m_exposedParamTargets.cend(); ++it) {
+    const int fxIndex = it.value().m_fxIndex;
+    if (fxIndex < 0 || fxIndex >= (int)currentFxs.size() ||
+        fxIndex >= (int)actualFxs.size())
+      continue;
+    TParamP currentParam =
+        currentFxs[fxIndex]->getParams()->getParam(it.value().m_paramName);
+    TParamP actualParam =
+        actualFxs[fxIndex]->getParams()->getParam(it.value().m_paramName);
+    if (currentParam && actualParam)
+      it.key()->setParam(currentParam, actualParam, frame);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void ParamsPage::addNodeSeparator(const QString& name) {
+  Separator* separator = new Separator(name, this);
+  const int row        = m_mainLayout->rowCount();
+  m_mainLayout->addWidget(separator, row, 0, 1, pageColumnCount());
+  m_mainLayout->setRowStretch(row, 0);
+}
+
+//-----------------------------------------------------------------------------
+
+void ParamsPage::addExposedParam(int fxIndex, const TFxP& fx,
+                                 const std::string& paramName) {
+  TParamP param = fx->getParams()->getParam(paramName);
+  if (!param) return;
+
+  const std::string translationKey = fx->getFxType() + "." + paramName;
+  const QString label =
+      QString::fromStdWString(TStringTable::translate(translationKey));
+  ParamField* field = ParamField::create(this, label, param);
+  if (!field) return;
+
+  m_fields.push_back(field);
+  m_exposedParamTargets[field] = {fxIndex, paramName};
+  connect(field, SIGNAL(currentParamChanged()), m_paramViewer,
+          SIGNAL(currentFxParamChanged()));
+  connect(field, SIGNAL(actualParamChanged()), m_paramViewer,
+          SIGNAL(actualFxParamChanged()));
+  connect(field, SIGNAL(paramKeyToggle()), m_paramViewer,
+          SIGNAL(paramKeyChanged()));
+
+  const int row     = m_mainLayout->rowCount();
+  QLabel* nameLabel = new QLabel(label, this);
+  nameLabel->setObjectName("FxSettingsLabel");
+  if (!field->getDescription().isEmpty())
+    nameLabel->setToolTip(field->getDescription());
+  m_mainLayout->addWidget(nameLabel, row, labelColumn(),
+                          Qt::AlignRight | Qt::AlignVCenter);
+  m_mainLayout->addWidget(field, row, fieldColumn());
 }
 
 //-----------------------------------------------------------------------------
@@ -614,15 +850,17 @@ QSize getItemSize(QLayoutItem *item) {
 
 void updateMaximumPageSize(QGridLayout *layout, int &maxLabelWidth,
                            int &maxWidgetWidth, int &fieldsHeight) {
+  const int labelColumn = layout->columnCount() >= 3 ? 1 : 0;
+  const int fieldColumn = layout->columnCount() >= 3 ? 2 : 1;
   /*-- Label側の横幅の最大値を得る --*/
   for (int r = 0; r < layout->rowCount(); r++) {
     /*-- アイテムが無ければ次の行へ --*/
-    if (!layout->itemAtPosition(r, 0)) continue;
+    if (!layout->itemAtPosition(r, labelColumn)) continue;
     /*-- ラベルの横幅を得て、最大値を更新していく --*/
     QLabel *label =
-        dynamic_cast<QLabel *>(layout->itemAtPosition(r, 0)->widget());
-    QGroupBox *gBox =
-        dynamic_cast<QGroupBox *>(layout->itemAtPosition(r, 0)->widget());
+        dynamic_cast<QLabel*>(layout->itemAtPosition(r, labelColumn)->widget());
+    QGroupBox* gBox = dynamic_cast<QGroupBox*>(
+        layout->itemAtPosition(r, labelColumn)->widget());
     if (label) {
       int tmpWidth = label->fontMetrics().horizontalAdvance(label->text());
       if (maxLabelWidth < tmpWidth) maxLabelWidth = tmpWidth;
@@ -647,7 +885,7 @@ void updateMaximumPageSize(QGridLayout *layout, int &maxLabelWidth,
     /*-- Column1にある可能性のあるもの：ParamField, Histogram, Layout,
      * RgbLinkButtons --*/
 
-    QLayoutItem *item = layout->itemAtPosition(r, 1);
+    QLayoutItem* item = layout->itemAtPosition(r, fieldColumn);
     if (!item || (item->widget() && item->widget()->isHidden())) continue;
 
     ModeSensitiveBox *box = dynamic_cast<ModeSensitiveBox *>(item->widget());
@@ -661,7 +899,8 @@ void updateMaximumPageSize(QGridLayout *layout, int &maxLabelWidth,
 
       fieldsHeight += tmpHeight;
 
-      innerLay->setColumnMinimumWidth(0, maxLabelWidth);
+      const int innerLabelColumn = innerLay->columnCount() >= 3 ? 1 : 0;
+      innerLay->setColumnMinimumWidth(innerLabelColumn, maxLabelWidth);
       continue;
     }
 
@@ -682,7 +921,8 @@ QSize ParamsPage::getPreferredSize() {
 
   updateMaximumPageSize(m_mainLayout, maxLabelWidth, maxWidgetWidth,
                         fieldsHeight);
-  return QSize(maxLabelWidth + maxWidgetWidth +
+  const int pinColumnWidth = m_macroFxIndex >= 0 ? 20 : 0;
+  return QSize(maxLabelWidth + maxWidgetWidth + pinColumnWidth +
                    m_mainLayout->horizontalSpacing() +
                    2 * m_mainLayout->margin(),
                fieldsHeight + 2 * m_mainLayout->margin() +
@@ -697,7 +937,9 @@ ParamsPageSet::ParamsPageSet(QWidget *parent, Qt::WindowFlags flags)
     : QWidget(parent, flags)
     , m_preferredSize(0, 0)
     , m_helpFilePath("")
-    , m_helpCommand("") {
+    , m_helpCommand("")
+    , m_buildingMacroFx(nullptr)
+    , m_buildingMacroFxIndex(-1) {
   // TabBar
   m_tabBar = new TabBar(this);
   // This widget is used to set the background color of the tabBar
@@ -769,20 +1011,23 @@ void ParamsPageSet::setPage(int index) {
 
 //-----------------------------------------------------------------------------
 
+void ParamsPageSet::setCurrentPageIndex(int index) {
+  if (index < 0 || index >= m_tabBar->count()) return;
+  m_tabBar->setCurrentIndex(index);
+}
+
+//-----------------------------------------------------------------------------
+
 void ParamsPageSet::setFx(const TFxP &currentFx, const TFxP &actualFx,
                           int frame) {
   TMacroFx *currentFxMacro = dynamic_cast<TMacroFx *>(currentFx.getPointer());
   if (currentFxMacro) {
     TMacroFx *actualFxMacro = dynamic_cast<TMacroFx *>(actualFx.getPointer());
     assert(actualFxMacro);
-    const std::vector<TFxP> &currentFxMacroFxs = currentFxMacro->getFxs();
-    const std::vector<TFxP> &actualFxMacroFxs  = actualFxMacro->getFxs();
-    assert(currentFxMacroFxs.size() == actualFxMacroFxs.size());
     for (int i = 0; i < m_pagesList->count(); i++) {
       ParamsPage *page = getParamsPage(i);
-      if (!page || !m_pageFxIndexTable.contains(page)) continue;
-      int index = m_pageFxIndexTable[page];
-      page->setFx(currentFxMacroFxs[index], actualFxMacroFxs[index], frame);
+      if (!page) continue;
+      page->setMacroFx(currentFx, actualFx, frame);
     }
   } else {
     for (int i = 0; i < m_pagesList->count(); i++) {
@@ -833,7 +1078,11 @@ void ParamsPageSet::setIsCameraViewMode(bool isCameraViewMode) {
 //-----------------------------------------------------------------------------
 
 ParamsPage *ParamsPageSet::createParamsPage() {
-  return new ParamsPage(this, m_parent);
+  ParamsPage* page = new ParamsPage(this, m_parent);
+  if (m_buildingMacroFx)
+    page->configureMacroPage(m_buildingMacroFx, m_buildingMacroFxPath,
+                             m_buildingMacroFxIndex);
+  return page;
 }
 
 void ParamsPageSet::addParamsPage(ParamsPage *page, const char *name) {
@@ -855,15 +1104,67 @@ void ParamsPageSet::addParamsPage(ParamsPage *page, const char *name) {
 
 //-----------------------------------------------------------------------------
 
-void ParamsPageSet::createControls(const TFxP &fx, int index) {
+void ParamsPageSet::createControls(const TFxP& fx, int index,
+                                   TMacroFx* owningMacro,
+                                   const std::vector<int>& macroFxPath) {
   if (TMacroFx *macroFx = dynamic_cast<TMacroFx *>(fx.getPointer())) {
+    if (!macroFx->getExposedParams().empty()) {
+      ParamsPage* page = createParamsPage();
+      page->configureMacroPage(macroFx, macroFxPath, -1);
+      page->setPinnedPage(true);
+      bool hasExposedParam         = false;
+      const std::vector<TFxP>& fxs = macroFx->getFxs();
+      for (int fxIndex = 0; fxIndex < (int)fxs.size(); ++fxIndex) {
+        bool hasNodeSeparator = false;
+        for (const TMacroFx::ExposedParam& param :
+             macroFx->getExposedParams()) {
+          if (param.m_fxId != fxs[fxIndex]->getFxId() ||
+              !fxs[fxIndex]->getParams()->getParam(param.m_paramName))
+            continue;
+          if (!hasNodeSeparator) {
+            QString nodeName = QString::fromStdWString(fxs[fxIndex]->getName());
+            const QString fxType = QString::fromStdWString(
+                TStringTable::translate(fxs[fxIndex]->getFxType()));
+            page->addNodeSeparator(
+                nodeName.isEmpty() ? fxType
+                                   : QString("%1 (%2)").arg(nodeName, fxType));
+            hasNodeSeparator = true;
+          }
+          page->addExposedParam(fxIndex, fxs[fxIndex], param.m_paramName);
+          hasExposedParam = true;
+        }
+      }
+      if (!hasExposedParam) {
+        delete page;
+      } else {
+        page->setPageSpace();
+        const QByteArray tabName =
+            QCoreApplication::translate("FxSettings", "Pinned").toUtf8();
+        addParamsPage(page, tabName.constData());
+      }
+    }
+
     const std::vector<TFxP> &fxs = macroFx->getFxs();
-    for (int i = 0; i < (int)fxs.size(); i++) createControls(fxs[i], i);
+    for (int i = 0; i < (int)fxs.size(); i++) {
+      if (dynamic_cast<TMacroFx*>(fxs[i].getPointer())) {
+        std::vector<int> childPath = macroFxPath;
+        childPath.push_back(i);
+        createControls(fxs[i], -1, nullptr, childPath);
+      } else {
+        createControls(fxs[i], i, macroFx, macroFxPath);
+      }
+    }
     return;
   }
   if (RasterFxPluginHost *plugin =
           dynamic_cast<RasterFxPluginHost *>(fx.getPointer())) {
+    m_buildingMacroFx      = owningMacro;
+    m_buildingMacroFxPath  = macroFxPath;
+    m_buildingMacroFxIndex = index;
     plugin->build(this);
+    m_buildingMacroFx = nullptr;
+    m_buildingMacroFxPath.clear();
+    m_buildingMacroFxIndex = -1;
     std::string url = plugin->getUrl();
     if (!url.empty()) {
       connect(m_helpButton, SIGNAL(pressed()), this, SLOT(openHelpUrl()));
@@ -894,7 +1195,11 @@ void ParamsPageSet::createControls(const TFxP &fx, int index) {
         m_helpCommand = is.getTagAttribute("help_command");
       }
 
-      while (!is.matchEndTag()) createPage(is, fx, index);
+      bool isFirstPageOfFx = owningMacro ? true : (m_pagesList->count() == 0);
+      while (!is.matchEndTag()) {
+        createPage(is, fx, index, owningMacro, macroFxPath, isFirstPageOfFx);
+        isFirstPageOfFx = false;
+      }
     } catch (TException const &) {
     }
   }
@@ -921,7 +1226,10 @@ ParamsPage *ParamsPageSet::getParamsPage(int index) const {
 
 //-----------------------------------------------------------------------------
 
-void ParamsPageSet::createPage(TIStream &is, const TFxP &fx, int index) {
+void ParamsPageSet::createPage(TIStream& is, const TFxP& fx, int index,
+                               TMacroFx* macroFx,
+                               const std::vector<int>& macroFxPath,
+                               bool isFirstPageOfFx) {
   std::string tagName;
   if (!is.matchTag(tagName) || tagName != "page")
     throw TException("expected <page>");
@@ -929,12 +1237,7 @@ void ParamsPageSet::createPage(TIStream &is, const TFxP &fx, int index) {
   if (pageName == "") pageName = "page";
 
   ParamsPage *paramsPage = new ParamsPage(this, m_parent);
-
-  bool isFirstPageOfFx;
-  if (index < 0)
-    isFirstPageOfFx = (m_pagesList->count() == 0);
-  else  // macro fx case
-    isFirstPageOfFx = !(m_pageFxIndexTable.values().contains(index));
+  if (macroFx) paramsPage->configureMacroPage(macroFx, macroFxPath, index);
 
   paramsPage->setPage(is, fx, isFirstPageOfFx);
 
@@ -1115,7 +1418,9 @@ void ParamViewer::setFx(const TFxP &currentFx, const TFxP &actualFx, int frame,
   std::string name = actualFx->getFxType();
   if (name == "macroFx") {
     TMacroFx *macroFx = dynamic_cast<TMacroFx *>(currentFx.getPointer());
-    if (macroFx) name = macroFx->getMacroFxType();
+    if (macroFx)
+      name =
+          macroFx->getMacroFxType() + "[" + macroFx->getExposedParamKey() + "]";
   } else {
     name += std::to_string(actualFx->getFxVersion());
   }
@@ -1189,6 +1494,18 @@ void ParamViewer::setPointValue(int index, const TPointD &p) {
   }
 
   if (page) page->setPointValue(index, p);
+}
+
+//-----------------------------------------------------------------------------
+
+int ParamViewer::getCurrentPageIndex() const {
+  ParamsPageSet* pageSet = getCurrentPageSet();
+  return pageSet ? pageSet->getCurrentPageIndex() : -1;
+}
+
+void ParamViewer::setCurrentPageIndex(int index) {
+  ParamsPageSet* pageSet = getCurrentPageSet();
+  if (pageSet) pageSet->setCurrentPageIndex(index);
 }
 
 //-----------------------------------------------------------------------------
