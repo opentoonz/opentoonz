@@ -203,3 +203,33 @@ jobs:
         cmake ../sources -G Ninja -DWITH_TRANSLATION=OFF \
           -DCMAKE_CXX_FLAGS=-Werror=return-type
         ninja
+
+  # Attach the gcc-build AppImage to the GitHub Release when a tag is pushed, so
+  # there is an official Linux binary for users and for downstream packagers
+  # such as Flathub. Split into its own job, gated on the tag push, so that
+  # `contents: write` is only ever granted here rather than to the Ubuntu build
+  # job (which also runs the clang leg and every ordinary push/PR).
+  PublishRelease:
+    needs: Ubuntu
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+    - name: Download gcc build artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: Opentoonz-${{ runner.os }}-gcc-${{ github.sha }}
+        path: artifact
+
+    - name: Extract AppImage
+      run: |
+        tar xzf artifact/Opentoonz-${{ runner.os }}-gcc-${{ github.sha }}.tar.gz -C artifact
+        cp "artifact/Opentoonz-${{ runner.os }}-gcc-${{ github.sha }}/OpenToonz.AppImage" \
+           "OpenToonz-${{ github.ref_name }}-x86_64.AppImage"
+
+    - name: Publish AppImage to GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: OpenToonz-${{ github.ref_name }}-x86_64.AppImage
+        fail_on_unmatched_files: true
