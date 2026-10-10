@@ -12,6 +12,8 @@
 #include <QSettings>
 #include <QKeySequence>
 #include <QApplication>
+#include <QEvent>
+#include <QShortcutEvent>
 
 #include <sys/types.h>
 
@@ -59,7 +61,8 @@ void AuxActionsCreatorManager::createAuxActions(QObject *parent) {
 
 //=========================================================
 
-CommandManager::CommandManager() {}
+CommandManager::CommandManager()
+    : m_executeTriggeredByShortcut(false), m_pendingShortcutAction(nullptr) {}
 
 //---------------------------------------------------------
 
@@ -150,6 +153,12 @@ void CommandManager::define(CommandId id, CommandType type,
 // set handler (id, handler)
 //   possibly changes enable/disable qaction state
 //
+void CommandManager::setPendingShortcutAction(QAction *action) {
+  m_pendingShortcutAction = action;
+}
+
+//---------------------------------------------------------
+
 void CommandManager::setHandler(CommandId id,
                                 CommandHandlerInterface *handler) {
   Node *node = getNode(id);
@@ -174,7 +183,10 @@ void CommandManager::execute(QAction *qaction) {
   std::map<QAction *, Node *>::iterator it = m_qactionTable.find(qaction);
   assert(it != m_qactionTable.end());
   if (it != m_qactionTable.end() && it->second->m_handler) {
+    m_executeTriggeredByShortcut = (qaction == m_pendingShortcutAction);
+    m_pendingShortcutAction      = nullptr;
     it->second->m_handler->execute();
+    m_executeTriggeredByShortcut = false;
   }
 }
 
@@ -198,6 +210,7 @@ void CommandManager::execute(CommandId id) {
       // principalmente per i tool
       action->setChecked(true);
     }
+    m_executeTriggeredByShortcut = false;
     node->m_handler->execute();
   }
 }
@@ -334,7 +347,10 @@ void CommandManager::setChecked(CommandId id, bool checked) {
   if (!node) return;
   if (node->m_qaction) {
     node->m_qaction->setChecked(checked);
-    if (node->m_handler) node->m_handler->execute();
+    if (node->m_handler) {
+      m_executeTriggeredByShortcut = false;
+      node->m_handler->execute();
+    }
   }
 }
 
@@ -512,6 +528,17 @@ DVAction::DVAction(const QString &text, QObject *parent)
 DVAction::DVAction(const QIcon &icon, const QString &text, QObject *parent)
     : QAction(icon, text, parent) {
   connect(this, SIGNAL(triggered()), this, SLOT(onTriggered()));
+}
+
+//-----------------------------------------------------------------------------
+
+bool DVAction::event(QEvent *event) {
+  if (event->type() == QEvent::Shortcut) {
+    QShortcutEvent *shortcutEvent = static_cast<QShortcutEvent *>(event);
+    if (!shortcutEvent->isAmbiguous() && shortcut() == shortcutEvent->key())
+      CommandManager::instance()->setPendingShortcutAction(this);
+  }
+  return QAction::event(event);
 }
 
 //-----------------------------------------------------------------------------
