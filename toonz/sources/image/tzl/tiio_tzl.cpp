@@ -2111,7 +2111,7 @@ TImageP TImageReaderTzl::load14() {
     fread(&actualBuffSize, sizeof(TINT32), 1, chan);
 
     if (actualBuffSize <= 0 ||
-        actualBuffSize > (int)(iconLx * iconLx * sizeof(TPixelCM32)))
+        actualBuffSize > (int)(iconLx * iconLy * sizeof(TPixelCM32)))
       throw TException("Loading tlv: icon buffer size error.");
 
     TRasterCM32P raux = TRasterCM32P(iconLx, iconLy);
