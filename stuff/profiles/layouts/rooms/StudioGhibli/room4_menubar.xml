@@ -23,6 +23,7 @@
     <command>MI_SaveSubxsheetAs</command>
     <command>MI_LoadSubSceneFile</command>
     <command>MI_CloneChild</command>
+    <command>MI_FullCloneChild</command>
     <command>MI_ExplodeChild</command>
     <command>MI_ToggleEditInPlace</command>
   </menu>

@@ -129,6 +129,7 @@
 #define MI_SaveSubxsheetAs "MI_SaveSubxsheetAs"
 #define MI_Resequence "MI_Resequence"
 #define MI_CloneChild "MI_CloneChild"
+#define MI_FullCloneChild "MI_FullCloneChild"
 #define MI_ApplyMatchLines "MI_ApplyMatchLines"
 #define MI_MergeCmapped "MI_MergeCmapped"
 #define MI_MergeColumns "MI_MergeColumns"
