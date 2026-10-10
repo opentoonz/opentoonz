@@ -225,6 +225,16 @@ protected slots:
   void toggleEraserSegment();
   void toggleEraserMultiArc();
 
+  /*-- Hide Line tool + type/mode/unhide switching shortcuts --*/
+  void toggleHideLineNextType();
+  void toggleHideLineNormal();
+  void toggleHideLineSegment();
+  void toggleHideLineFreehand();
+  void toggleHideLineNextMode();
+  void toggleHideLineInvisible();
+  void toggleHideLineHidden();
+  void toggleHideLineToggleUnhide();
+
   /*-- Tape tool + type/mode switching shortcuts --*/
   void toggleTapeNextType();
   void toggleTapeNormal();
