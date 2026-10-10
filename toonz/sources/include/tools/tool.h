@@ -9,6 +9,7 @@
 #include "toonz/imagepainter.h"
 #include "toonz/tapplication.h"
 #include "tools/cursors.h"
+#include "tools/tooltimer.h"
 
 // TnzCore includes
 #include "tcommon.h"
@@ -102,6 +103,8 @@ public:
   Qt::MouseButton m_button;
   QPointF m_mousePos;  // mouse position obtained with QMouseEvent::pos() or
                        // QTabletEvent::pos()
+  TTimerTicks m_time;  // Source event time mapped to TToolTimer ticks,
+                       // preserving tablet input timing when events are batched.
   bool m_isTablet;
   bool m_isHighFrequent;
 
@@ -111,6 +114,7 @@ public:
       , m_modifiersMask(NO_KEY)
       , m_buttons(Qt::NoButton)
       , m_button(Qt::NoButton)
+      , m_time(0)
       , m_isTablet(false)
       , m_isHighFrequent(false) {}
 
@@ -122,6 +126,7 @@ public:
   Qt::MouseButtons buttons() const { return m_buttons; }
   Qt::MouseButton button() const { return m_button; }
   QPointF mousePos() const { return m_mousePos; }
+  TTimerTicks time() const { return m_time; }
   bool isTablet() const { return m_isTablet; }
   bool isHighFrequent() const { return m_isHighFrequent; }
 
