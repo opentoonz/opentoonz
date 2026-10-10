@@ -15,6 +15,7 @@
 
 // forward declaration
 class QAction;
+class QShowEvent;
 
 //=============================================================================
 // CommandBar
@@ -40,6 +41,7 @@ protected:
   static void fillToolbar(CommandBar *toolbar, bool isXsheetToolbar = false);
   static void buildDefaultToolbar(CommandBar *toolbar);
   void contextMenuEvent(QContextMenuEvent *event) override;
+  void showEvent(QShowEvent *event) override;
 
 protected slots:
   void doCustomizeCommandBar();
