@@ -1280,11 +1280,15 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
   c0 = visible.from().layer();
   c1 = visible.to().layer();
   if (!m_viewer->orientation()->isVerticalTimeline()) {
-    int colCount = std::max(1, xsh->getColumnCount());
-    c1           = std::min(c1, colCount - 1);
+    c1 = std::min(c1, xsh->getColumnCount());
   }
 
   drawNonEmptyBackground(p);
+
+  if (!o->isVerticalTimeline()) {
+    int y = m_viewer->positionToXY(CellPosition(0, xsh->getColumnCount())).y();
+    p.fillRect(0, y, width(), o->cellHeight(), FreeColumnTint);
+  }
 
   drawSelectionBackground(p);
 

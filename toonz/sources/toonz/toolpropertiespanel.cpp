@@ -526,6 +526,19 @@ void ToolPropertiesPanel::createMyPaintBrushProperties() {
     // === TOONZ RASTER MYPAINT (in order as specified) ===
     createMyPaintSizeProperty();           // ModifierSize slider
     createSmoothProperty();                // Smooth slider
+    createModifierEraserProperty();
+    for (int i = 0; i < props->getPropertyCount(); ++i) {
+      TProperty *prop = props->getProperty(i);
+      if (!prop || prop->getName() != "ModifierEraserMode") continue;
+      if (TEnumProperty *mode = dynamic_cast<TEnumProperty *>(prop)) {
+        QStringList items;
+        const TEnumProperty::Items &enumItems = mode->getItems();
+        for (int j = 0; j < enumItems.size(); ++j) items << enumItems[j].UIName;
+        m_propertiesLayout->addWidget(createCollapsibleEnum(
+            tr("Eraser Mode"), items, mode->getIndex(), prop->getName()));
+      }
+      break;
+    }
     createModifierLockAlphaProperty();     // Lock Alpha checkbox
     createAssistantsProperty();            // Assistants checkbox
     createPressureProperty();              // Pressure checkbox

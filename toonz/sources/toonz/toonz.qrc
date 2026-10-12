@@ -1,5 +1,16 @@
 <RCC>
 	<qresource prefix="/">
+    <file>icons/dark/actions/16/select_align_left.svg</file>
+    <file>icons/dark/actions/16/select_align_right.svg</file>
+    <file>icons/dark/actions/16/select_align_top.svg</file>
+    <file>icons/dark/actions/16/select_align_bottom.svg</file>
+    <file>icons/dark/actions/16/select_align_center_h.svg</file>
+    <file>icons/dark/actions/16/select_align_center_v.svg</file>
+    <file>icons/dark/actions/16/select_distribute_h.svg</file>
+    <file>icons/dark/actions/16/select_distribute_v.svg</file>
+    <file>icons/dark/actions/16/set_linear_cp.svg</file>
+    <file>icons/dark/actions/16/set_nonlinear_cp.svg</file>
+
 		<!-- Note: paths with /colored/ bypass iconEngine's recolor/opacity handling, use for full-color icons -->
 
 		<!-- Tools -->

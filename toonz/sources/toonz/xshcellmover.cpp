@@ -278,7 +278,7 @@ bool CellsMover::canMoveCells(const TPoint &pos) {
     cStart = m_startPos.y;
   }
   if (c < 0 ||
-      (!m_orientation->isVerticalTimeline() && c >= xsh->getColumnCount()))
+      (!m_orientation->isVerticalTimeline() && c > xsh->getColumnCount()))
     return false;
   if (c != cStart) {
     int count = 0;
@@ -469,6 +469,7 @@ LevelMoverTool::LevelMoverTool(XsheetViewer *viewer)
     : XsheetGUI::DragTool(viewer)
     , m_range(0, 0)
     , m_qualifiers(0)
+    , m_columnLimit(0)
     , m_validPos(false)
     , m_undo(0)
     , m_moved(false)
@@ -507,7 +508,7 @@ bool LevelMoverTool::canMoveColumns(const TPoint &pos) {
     cLast  = m_lastPos.y;
     cRange = m_range.ly;
   }
-  if (c < 0 || (!o->isVerticalTimeline() && c >= xsh->getColumnCount()))
+  if (c < 0 || (!o->isVerticalTimeline() && c > xsh->getColumnCount()))
     return false;
   if (c != cLast) {
     int count = 0;
@@ -515,7 +516,7 @@ bool LevelMoverTool::canMoveColumns(const TPoint &pos) {
     for (int i = 0; i < cRange; i++) {
       int srcIndex = cLast + i;
       int dstIndex = c + i;
-      if (!o->isVerticalTimeline() && dstIndex >= xsh->getColumnCount())
+      if (!o->isVerticalTimeline() && dstIndex > xsh->getColumnCount())
         return false;
       TXshColumn *srcColumn = xsh->getColumn(srcIndex);
       if (srcColumn && srcColumn->isLocked()) continue;
@@ -553,6 +554,8 @@ void LevelMoverTool::onClick(const QMouseEvent *e) {
   int r0, c0, r1, c1;
   getViewer()->getCellSelection()->getSelectedCells(r0, c0, r1, c1);
 
+  // Filling the free column must not extend this drag into another one.
+  m_columnLimit = xsh->getColumnCount();
   m_qualifiers = 0;
   if (Preferences::instance()->getDragCellsBehaviour() == 1)
     m_qualifiers |= CellsMover::eMoveColumns;
@@ -618,7 +621,7 @@ void LevelMoverTool::onCellChange(int row, int col) {
                m_grabOffset;
   int origX   = pos.x;
   int origY   = pos.y;
-  int currEnd = xsh->getColumnCount() - 1;
+  int currEnd = m_columnLimit;
 
   if (pos.y < 0)
     pos.y = 0;
