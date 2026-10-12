@@ -513,7 +513,7 @@ void TBlendForeBackRasterFx::dryComputeUpAndDown(TRectD& rect, double frame,
                                                  const TRenderSettings& rs,
                                                  bool upComputesWholeTile) {
   const bool up_is   = (this->m_up.isConnected() &&
-                        this->m_up.getFx()->getTimeRegion().contains(frame));
+                      this->m_up.getFx()->getTimeRegion().contains(frame));
   const bool down_is = (this->m_down.isConnected() &&
                         this->m_down.getFx()->getTimeRegion().contains(frame));
   /* ------ 両方とも切断の時処理しない ---------------------- */
@@ -768,8 +768,7 @@ void TBlendForeBackRasterFx::nonlinearTmpl<TPixelF, float>(
       // Float rasters otherwise retain HDR blend results. At a soft clipping
       // edge, bound the working color before restoring partial coverage.
       brendKernel(dnr, dng, dnb, dna, up_pix->r, up_pix->g, up_pix->b,
-                  up_pix->m, up_opacity, alpha_rendering_sw,
-                  partialMask);
+                  up_pix->m, up_opacity, alpha_rendering_sw, partialMask);
       clipped.restore(dnr, dng, dnb, dna);
       out_pix->r = dnr;
       out_pix->g = dng;
@@ -1070,7 +1069,7 @@ fxをreplaceすると、
 となる
 */
   const bool up_is   = (this->m_up.isConnected() &&
-                        this->m_up.getFx()->getTimeRegion().contains(frame));
+                      this->m_up.getFx()->getTimeRegion().contains(frame));
   const bool down_is = (this->m_down.isConnected() &&
                         this->m_down.getFx()->getTimeRegion().contains(frame));
   /* ------ 両方とも切断の時処理しない ---------------------- */
@@ -1104,7 +1103,7 @@ fxをreplaceすると、
   TRectD upBBox;
   if (upComputesWholeTile) {
     upBBox = tileRect;
-  } /* tile全体を得る */
+  }      /* tile全体を得る */
   else { /* 厳密なエリア... */
     this->m_up->getBBox(frame, upBBox, rs);
     upBBox *= tileRect; /* upとtileの交差エリア */
