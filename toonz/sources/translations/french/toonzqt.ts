@@ -2662,6 +2662,14 @@ Are you sure ?</source>
         <source>Palette</source>
         <translation type="unfinished">Palette</translation>
     </message>
+    <message>
+        <source>Compact Settings</source>
+        <translation>Paramètres compacts</translation>
+    </message>
+    <message>
+        <source>Use a denser layout for the Settings page.</source>
+        <translation>Utiliser une mise en page plus dense pour l&apos;onglet Paramètres.</translation>
+    </message>
 </context>
 <context>
     <name>StyleEditorGUI::ColorChannelControl</name>
