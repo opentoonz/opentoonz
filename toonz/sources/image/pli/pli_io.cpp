@@ -1282,9 +1282,14 @@ PliTag *ParsedPliImp::readThickQuadraticChainTag(bool isLoop) {
 PliTag *ParsedPliImp::readGroupTag() {
   TUINT32 bufOffs = 0;
 
+  if (m_tagLength < 1 || m_currDynamicTypeBytesNum < 1 ||
+      (m_tagLength - 1) % m_currDynamicTypeBytesNum != 0)
+    throw TException("corrupted pli file: invalid group length");
+
   UCHAR type = m_buf[bufOffs++];
 
-  assert(type < GroupTag::TYPE_HOW_MANY);
+  if (type >= GroupTag::TYPE_HOW_MANY)
+    throw TException("corrupted pli file: invalid group type");
 
   TUINT32 numObjects = (m_tagLength - 1) / m_currDynamicTypeBytesNum;
   std::unique_ptr<PliObjectTag *[]> object(new PliObjectTag *[numObjects]);
@@ -1295,13 +1300,28 @@ PliTag *ParsedPliImp::readGroupTag() {
     readDynamicData(tagOffs[i], bufOffs);
   }
 
-  TagElem *elem;
-  for (TUINT32 i = 0; i < numObjects; i++)
-    while (!(object[i] = (PliObjectTag *)findTagFromOffset(tagOffs[i])))
-      if ((elem = readTag()))
-        addTag(*elem);
-      else
-        assert(false);
+  for (TUINT32 i = 0; i < numObjects; i++) {
+    PliTag *child;
+    while (!(child = findTagFromOffset(tagOffs[i]))) {
+      TagElem *elem = readTag();
+      if (!elem)
+        throw TException("corrupted pli file: missing group child");
+      addTag(*elem);
+    }
+
+    PliObjectTag *obj = dynamic_cast<PliObjectTag *>(child);
+    if (!obj)
+      throw TException("corrupted pli file: invalid group child");
+    if (type == GroupTag::PALETTE && child->m_type != PliTag::STYLE_NGOBJ)
+      throw TException("corrupted pli file: invalid palette group child");
+    if (type == GroupTag::STROKE &&
+        child->m_type != PliTag::COLOR_NGOBJ &&
+        child->m_type != PliTag::OUTLINE_OPTIONS_GOBJ &&
+        child->m_type != PliTag::GROUP_GOBJ &&
+        child->m_type != PliTag::THICK_QUADRATIC_CHAIN_GOBJ)
+      throw TException("corrupted pli file: invalid stroke group child");
+    object[i] = obj;
+  }
 
   std::unique_ptr<GroupTag> tag(new GroupTag());
   tag->m_type       = type;
