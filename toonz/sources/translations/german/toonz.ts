@@ -7028,7 +7028,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>&amp;Timeline</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Zeitleiste</translation>
     </message>
     <message>
         <source>Linear Interpolation</source>
@@ -18401,11 +18401,11 @@ be appended to the palette after conversion</source>
     </message>
     <message>
         <source>Toggle Xsheet/Timeline</source>
-        <translation type="unfinished"></translation>
+        <translation>Zwischen Xsheet und Zeitleiste wechseln</translation>
     </message>
     <message>
         <source>Add New Memo</source>
-        <translation type="unfinished"></translation>
+        <translation>Neue Notiz hinzufügen</translation>
     </message>
     <message>
         <source>Previous Memo</source>
