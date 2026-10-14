@@ -2,6 +2,10 @@
 
 #include "penciltestpopup.h"
 
+#if CV_VERSION_MAJOR >= 5
+#include <opencv2/geometry/3d.hpp>
+#endif
+
 #ifdef WIN32
 #include <Windows.h>
 #include <mfobjects.h>
