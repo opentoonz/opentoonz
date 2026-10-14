@@ -628,13 +628,8 @@ public:
       if (m_param->m_pencil.getValue()) thick -= 0.5;
       return thick;
     } else
-      return m_param->m_toolSize.getValue() * 0.5 * Stage::inch /
-             m_tool->getApplication()
-                 ->getCurrentScene()
-                 ->getScene()
-                 ->getCurrentCamera()
-                 ->getDpi()
-                 .x;
+      // Vector size is the stroke diameter, as in the Selection Tool.
+      return m_param->m_toolSize.getValue() * 0.5;
   }
 
   void setIsPrompting(bool value) { m_isPrompting = value; }
