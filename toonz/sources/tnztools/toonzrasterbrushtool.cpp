@@ -1603,6 +1603,8 @@ void ToonzRasterBrushTool::commitPainting() {
   int tc = ToonzCheck::instance()->getChecks();
   if (tc & ToonzCheck::eGap || tc & ToonzCheck::eAutoclose) invalidate();
 
+  if (ras && sl) ToolUtils::updateSaveBox(m_painting.level, frameId);
+
   m_painting.frameId          = TFrameId();
   m_painting.level            = TXshSimpleLevelP();
   m_painting.myPaint.isActive = false;
@@ -1611,7 +1613,6 @@ void ToonzRasterBrushTool::commitPainting() {
   m_painting.active           = false;
 
   if (sl) notifyImageChanged(frameId, sl);
-  ToolUtils::updateSaveBox();
 }
 
 //----------------------------------------------------------------------------------------------------------
