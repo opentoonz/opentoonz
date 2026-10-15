@@ -3406,4 +3406,119 @@ anwenden</translation>
         <translation type="unfinished"></translation>
     </message>
 </context>
+<context>
+    <name>FontStyleNames</name>
+    <message>
+        <source>Regular</source>
+        <translation>Standard</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <translation>Normal</translation>
+    </message>
+    <message>
+        <source>Book</source>
+        <translation>Buch</translation>
+    </message>
+    <message>
+        <source>Roman</source>
+        <translation>Antiqua</translation>
+    </message>
+    <message>
+        <source>Thin</source>
+        <translation>Dünn</translation>
+    </message>
+    <message>
+        <source>Extra Light</source>
+        <translation>Extraleicht</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation>Leicht</translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation>Mittel</translation>
+    </message>
+    <message>
+        <source>Semibold</source>
+        <translation>Halbfett</translation>
+    </message>
+    <message>
+        <source>Demi Bold</source>
+        <translation>Halbfett</translation>
+    </message>
+    <message>
+        <source>Bold</source>
+        <translation>Fett</translation>
+    </message>
+    <message>
+        <source>Extra Bold</source>
+        <translation>Extrafett</translation>
+    </message>
+    <message>
+        <source>Black</source>
+        <translation>Schwarz</translation>
+    </message>
+    <message>
+        <source>Heavy</source>
+        <translation>Schwer</translation>
+    </message>
+    <message>
+        <source>Italic</source>
+        <translation>Kursiv</translation>
+    </message>
+    <message>
+        <source>Oblique</source>
+        <translation>Schräg</translation>
+    </message>
+    <message>
+        <source>Bold Italic</source>
+        <translation>Fett kursiv</translation>
+    </message>
+    <message>
+        <source>Bold Oblique</source>
+        <translation>Fett schräg</translation>
+    </message>
+    <message>
+        <source>Light Italic</source>
+        <translation>Leicht kursiv</translation>
+    </message>
+    <message>
+        <source>Medium Italic</source>
+        <translation>Mittel kursiv</translation>
+    </message>
+    <message>
+        <source>Semibold Italic</source>
+        <translation>Halbfett kursiv</translation>
+    </message>
+    <message>
+        <source>Extra Bold Italic</source>
+        <translation>Extrafett kursiv</translation>
+    </message>
+    <message>
+        <source>Black Italic</source>
+        <translation>Schwarz kursiv</translation>
+    </message>
+    <message>
+        <source>Condensed</source>
+        <translation>Schmal</translation>
+    </message>
+    <message>
+        <source>Condensed Bold</source>
+        <translation>Schmal fett</translation>
+    </message>
+    <message>
+        <source>Condensed Italic</source>
+        <translation>Schmal kursiv</translation>
+    </message>
+    <message>
+        <source>Condensed Bold Italic</source>
+        <translation>Schmal fett kursiv</translation>
+    </message>
+    <message>
+        <source>Expanded</source>
+        <translation>Breit</translation>
+    </message>
+</context>
 </TS>

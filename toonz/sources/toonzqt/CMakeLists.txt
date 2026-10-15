@@ -105,6 +105,7 @@ set(HEADERS
     ../include/toonzqt/styleselection.h
     ../include/toonzqt/trepetitionguard.h
     ../include/toonzqt/viewcommandids.h
+    ../include/toonzqt/fontstyletranslation.h
 )
 
 set(SOURCES
@@ -142,6 +143,7 @@ set(SOURCES
     paletteviewer.cpp
     paletteviewergui.cpp
     paramfield.cpp
+    fontstyletranslation.cpp
     planeviewer.cpp
     popupbutton.cpp
     rasterimagedata.cpp

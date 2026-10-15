@@ -12,6 +12,7 @@
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/lutcalibrator.h"
 #include "toonzqt/dvdialog.h"
+#include "toonzqt/fontstyletranslation.h"
 #include "toonz/preferences.h"
 
 #include "tdoubleparam.h"
@@ -1925,18 +1926,9 @@ FontParamField::FontParamField(QWidget *parent, QString name,
 
 void FontParamField::findStyles(const QFont &font) {
   QFontDatabase fontDatabase;
-  QString currentItem = m_styleCombo->currentText();
-  m_styleCombo->clear();
-
-  for (const QString &style : fontDatabase.styles(font.family()))
-    m_styleCombo->addItem(style);
-
-  int styleIndex = m_styleCombo->findText(currentItem);
-
-  if (styleIndex == -1)
-    m_styleCombo->setCurrentIndex(0);
-  else
-    m_styleCombo->setCurrentIndex(styleIndex);
+  QString currentItem = m_styleCombo->currentData().toString();
+  DVGui::populateFontStyleCombo(
+      m_styleCombo, fontDatabase.styles(font.family()), currentItem);
 }
 
 //-----------------------------------------------------------------------------
@@ -1957,7 +1949,7 @@ void FontParamField::onChange() {
   if (family != currentFont.family()) {
     findStyles(QFont(family));
   }
-  QString style = m_styleCombo->currentText();
+  QString style = m_styleCombo->currentData().toString();
   int size      = m_sizeField->getValue();
   int min, max;
   m_sizeField->getRange(min, max);
@@ -2002,7 +1994,8 @@ void FontParamField::update(int frame) {
     m_fontCombo->setCurrentFont(font);
     findStyles(font);
   }
-  m_styleCombo->setCurrentText(font.styleName());
+  int styleIndex = m_styleCombo->findData(font.styleName());
+  if (styleIndex >= 0) m_styleCombo->setCurrentIndex(styleIndex);
   m_sizeField->setValue(font.pixelSize());
 }
 

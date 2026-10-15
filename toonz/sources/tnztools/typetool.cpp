@@ -28,6 +28,7 @@
 #include "toonzqt/selection.h"
 #include "toonzqt/imageutils.h"
 #include "toonzqt/dvdialog.h"
+#include "toonzqt/fontstyletranslation.h"
 #include "trop.h"
 #include "toonz/ttileset.h"
 #include "toonz/glrasterpainter.h"
@@ -688,7 +689,7 @@ class TypeToolTextHistoryPopup final : public DVGui::Dialog {
                                          : TypeToolTextFormat::PlainText;
     entry.preserveSourceLineBreaks = m_preserveLineBreaks->isChecked();
     entry.font.family              = m_fontFamilyCombo->currentText();
-    entry.font.style               = m_fontStyleCombo->currentText();
+    entry.font.style               = m_fontStyleCombo->currentData().toString();
     entry.font.size                = m_fontSizeCombo->currentText();
     return entry;
   }
@@ -703,9 +704,8 @@ class TypeToolTextHistoryPopup final : public DVGui::Dialog {
     m_fontFamilyCombo->addItems(m_tool->availableFontFamilies());
     m_fontFamilyCombo->setCurrentText(font.family);
 
-    m_fontStyleCombo->clear();
-    m_fontStyleCombo->addItems(m_tool->availableFontStyles());
-    m_fontStyleCombo->setCurrentText(font.style);
+    DVGui::populateFontStyleCombo(m_fontStyleCombo,
+                                  m_tool->availableFontStyles(), font.style);
 
     m_fontSizeCombo->clear();
     m_fontSizeCombo->addItems(m_tool->availableFontSizes());
@@ -715,7 +715,7 @@ class TypeToolTextHistoryPopup final : public DVGui::Dialog {
   void applyFontControls(bool familyChanged = false) {
     TypeToolFontSettings font;
     font.family = m_fontFamilyCombo->currentText();
-    if (!familyChanged) font.style = m_fontStyleCombo->currentText();
+    if (!familyChanged) font.style = m_fontStyleCombo->currentData().toString();
     font.size = m_fontSizeCombo->currentText();
     m_tool->applyFontSettings(font);
     refreshFontControls();
@@ -811,7 +811,9 @@ class TypeToolTextHistoryPopup final : public DVGui::Dialog {
         label.prepend(QStringLiteral("[MD] "));
       QString fontLabel =
           QStringLiteral("%1, %2, %3")
-              .arg(entry.font.family, entry.font.style, entry.font.size);
+              .arg(entry.font.family,
+                   DVGui::fontStyleDisplayName(entry.font.style),
+                   entry.font.size);
       if (!entry.font.family.isEmpty())
         label.prepend(QStringLiteral("[%1] ").arg(fontLabel));
       QListWidgetItem *item = new QListWidgetItem(label, m_historyList);
@@ -819,7 +821,8 @@ class TypeToolTextHistoryPopup final : public DVGui::Dialog {
       if (!entry.font.family.isEmpty())
         toolTip += QStringLiteral("\n\n%1: %2\n%3: %4\n%5: %6")
                        .arg(tr("Font"), entry.font.family, tr("Style"),
-                            entry.font.style, tr("Size"), entry.font.size);
+                            DVGui::fontStyleDisplayName(entry.font.style),
+                            tr("Size"), entry.font.size);
       item->setToolTip(toolTip);
     }
     if (oldRow >= 0 && oldRow < m_historyList->count())
@@ -1121,6 +1124,10 @@ void TypeTool::updateTranslation() {
   m_vertical.setQStringName(tr("Vertical Orientation"));
   m_textHistoryEnabled.setQStringName(tr("Text History"));
   m_size.setQStringName(tr("Size:"));
+  QStringList styles = availableFontStyles();
+  QStringList labels = DVGui::fontStyleDisplayNames(styles);
+  for (int i = 0; i < styles.size(); ++i)
+    m_typeFaceMenu.setItemUIName(styles[i].toStdWString(), labels[i]);
 }
 
 //---------------------------------------------------------
@@ -1224,9 +1231,12 @@ void TypeTool::initTypeFaces() {
   instance->getAllTypefaces(typefaces);
   std::wstring oldTypeface = m_typeFaceMenu.getValue();
   m_typeFaceMenu.deleteAllValues();
-  for (std::vector<std::wstring>::iterator it = typefaces.begin();
-       it != typefaces.end(); ++it)
-    m_typeFaceMenu.addValue(*it);
+  QStringList styles;
+  for (const std::wstring &typeface : typefaces)
+    styles.append(QString::fromStdWString(typeface));
+  const QStringList labels = DVGui::fontStyleDisplayNames(styles);
+  for (int i = 0; i < styles.size(); ++i)
+    m_typeFaceMenu.addValueWithUIName(typefaces[i], labels[i]);
   if (m_typeFaceMenu.isValue(oldTypeface)) m_typeFaceMenu.setValue(oldTypeface);
 
   TTool::getApplication()->getCurrentTool()->notifyToolComboBoxListChanged(

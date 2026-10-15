@@ -3188,4 +3188,119 @@ Are you sure ?</source>
         <translation>%1 제거</translation>
     </message>
 </context>
+<context>
+    <name>FontStyleNames</name>
+    <message>
+        <source>Regular</source>
+        <translation>보통</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <translation>보통</translation>
+    </message>
+    <message>
+        <source>Book</source>
+        <translation>북</translation>
+    </message>
+    <message>
+        <source>Roman</source>
+        <translation>로만</translation>
+    </message>
+    <message>
+        <source>Thin</source>
+        <translation>가는 글꼴</translation>
+    </message>
+    <message>
+        <source>Extra Light</source>
+        <translation>아주 가벼움</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation>가벼움</translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation>중간</translation>
+    </message>
+    <message>
+        <source>Semibold</source>
+        <translation>반굵게</translation>
+    </message>
+    <message>
+        <source>Demi Bold</source>
+        <translation>반굵게</translation>
+    </message>
+    <message>
+        <source>Bold</source>
+        <translation>굵게</translation>
+    </message>
+    <message>
+        <source>Extra Bold</source>
+        <translation>아주 굵게</translation>
+    </message>
+    <message>
+        <source>Black</source>
+        <translation>블랙</translation>
+    </message>
+    <message>
+        <source>Heavy</source>
+        <translation>두꺼움</translation>
+    </message>
+    <message>
+        <source>Italic</source>
+        <translation>기울임</translation>
+    </message>
+    <message>
+        <source>Oblique</source>
+        <translation>오블리크</translation>
+    </message>
+    <message>
+        <source>Bold Italic</source>
+        <translation>굵은 기울임</translation>
+    </message>
+    <message>
+        <source>Bold Oblique</source>
+        <translation>굵은 오블리크</translation>
+    </message>
+    <message>
+        <source>Light Italic</source>
+        <translation>가벼운 기울임</translation>
+    </message>
+    <message>
+        <source>Medium Italic</source>
+        <translation>중간 기울임</translation>
+    </message>
+    <message>
+        <source>Semibold Italic</source>
+        <translation>반굵은 기울임</translation>
+    </message>
+    <message>
+        <source>Extra Bold Italic</source>
+        <translation>아주 굵은 기울임</translation>
+    </message>
+    <message>
+        <source>Black Italic</source>
+        <translation>블랙 기울임</translation>
+    </message>
+    <message>
+        <source>Condensed</source>
+        <translation>좁게</translation>
+    </message>
+    <message>
+        <source>Condensed Bold</source>
+        <translation>좁고 굵게</translation>
+    </message>
+    <message>
+        <source>Condensed Italic</source>
+        <translation>좁은 기울임</translation>
+    </message>
+    <message>
+        <source>Condensed Bold Italic</source>
+        <translation>좁고 굵은 기울임</translation>
+    </message>
+    <message>
+        <source>Expanded</source>
+        <translation>넓게</translation>
+    </message>
+</context>
 </TS>

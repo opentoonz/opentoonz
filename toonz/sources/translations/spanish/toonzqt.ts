@@ -3457,4 +3457,119 @@ Autom</translation>
         <translation>Eliminar %1</translation>
     </message>
 </context>
+<context>
+    <name>FontStyleNames</name>
+    <message>
+        <source>Regular</source>
+        <translation>Normal</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <translation>Normal</translation>
+    </message>
+    <message>
+        <source>Book</source>
+        <translation>Libro</translation>
+    </message>
+    <message>
+        <source>Roman</source>
+        <translation>Romana</translation>
+    </message>
+    <message>
+        <source>Thin</source>
+        <translation>Fina</translation>
+    </message>
+    <message>
+        <source>Extra Light</source>
+        <translation>Extraligera</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation>Ligera</translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation>Media</translation>
+    </message>
+    <message>
+        <source>Semibold</source>
+        <translation>Seminegrita</translation>
+    </message>
+    <message>
+        <source>Demi Bold</source>
+        <translation>Seminegrita</translation>
+    </message>
+    <message>
+        <source>Bold</source>
+        <translation>Negrita</translation>
+    </message>
+    <message>
+        <source>Extra Bold</source>
+        <translation>Extranegrita</translation>
+    </message>
+    <message>
+        <source>Black</source>
+        <translation>Negra</translation>
+    </message>
+    <message>
+        <source>Heavy</source>
+        <translation>Gruesa</translation>
+    </message>
+    <message>
+        <source>Italic</source>
+        <translation>Cursiva</translation>
+    </message>
+    <message>
+        <source>Oblique</source>
+        <translation>Oblicua</translation>
+    </message>
+    <message>
+        <source>Bold Italic</source>
+        <translation>Negrita cursiva</translation>
+    </message>
+    <message>
+        <source>Bold Oblique</source>
+        <translation>Negrita oblicua</translation>
+    </message>
+    <message>
+        <source>Light Italic</source>
+        <translation>Ligera cursiva</translation>
+    </message>
+    <message>
+        <source>Medium Italic</source>
+        <translation>Media cursiva</translation>
+    </message>
+    <message>
+        <source>Semibold Italic</source>
+        <translation>Seminegrita cursiva</translation>
+    </message>
+    <message>
+        <source>Extra Bold Italic</source>
+        <translation>Extranegrita cursiva</translation>
+    </message>
+    <message>
+        <source>Black Italic</source>
+        <translation>Negra cursiva</translation>
+    </message>
+    <message>
+        <source>Condensed</source>
+        <translation>Condensada</translation>
+    </message>
+    <message>
+        <source>Condensed Bold</source>
+        <translation>Condensada negrita</translation>
+    </message>
+    <message>
+        <source>Condensed Italic</source>
+        <translation>Condensada cursiva</translation>
+    </message>
+    <message>
+        <source>Condensed Bold Italic</source>
+        <translation>Condensada negrita cursiva</translation>
+    </message>
+    <message>
+        <source>Expanded</source>
+        <translation>Expandida</translation>
+    </message>
+</context>
 </TS>

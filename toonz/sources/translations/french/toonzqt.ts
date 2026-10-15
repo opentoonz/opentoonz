@@ -2810,4 +2810,119 @@ Are you sure ?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
+<context>
+    <name>FontStyleNames</name>
+    <message>
+        <source>Regular</source>
+        <translation>Normal</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <translation>Normal</translation>
+    </message>
+    <message>
+        <source>Book</source>
+        <translation>Livre</translation>
+    </message>
+    <message>
+        <source>Roman</source>
+        <translation>Romain</translation>
+    </message>
+    <message>
+        <source>Thin</source>
+        <translation>Fin</translation>
+    </message>
+    <message>
+        <source>Extra Light</source>
+        <translation>Extra léger</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation>Léger</translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation>Moyen</translation>
+    </message>
+    <message>
+        <source>Semibold</source>
+        <translation>Semi-gras</translation>
+    </message>
+    <message>
+        <source>Demi Bold</source>
+        <translation>Demi-gras</translation>
+    </message>
+    <message>
+        <source>Bold</source>
+        <translation>Gras</translation>
+    </message>
+    <message>
+        <source>Extra Bold</source>
+        <translation>Extra gras</translation>
+    </message>
+    <message>
+        <source>Black</source>
+        <translation>Noir</translation>
+    </message>
+    <message>
+        <source>Heavy</source>
+        <translation>Épais</translation>
+    </message>
+    <message>
+        <source>Italic</source>
+        <translation>Italique</translation>
+    </message>
+    <message>
+        <source>Oblique</source>
+        <translation>Oblique</translation>
+    </message>
+    <message>
+        <source>Bold Italic</source>
+        <translation>Gras italique</translation>
+    </message>
+    <message>
+        <source>Bold Oblique</source>
+        <translation>Gras oblique</translation>
+    </message>
+    <message>
+        <source>Light Italic</source>
+        <translation>Léger italique</translation>
+    </message>
+    <message>
+        <source>Medium Italic</source>
+        <translation>Moyen italique</translation>
+    </message>
+    <message>
+        <source>Semibold Italic</source>
+        <translation>Semi-gras italique</translation>
+    </message>
+    <message>
+        <source>Extra Bold Italic</source>
+        <translation>Extra gras italique</translation>
+    </message>
+    <message>
+        <source>Black Italic</source>
+        <translation>Noir italique</translation>
+    </message>
+    <message>
+        <source>Condensed</source>
+        <translation>Condensé</translation>
+    </message>
+    <message>
+        <source>Condensed Bold</source>
+        <translation>Condensé gras</translation>
+    </message>
+    <message>
+        <source>Condensed Italic</source>
+        <translation>Condensé italique</translation>
+    </message>
+    <message>
+        <source>Condensed Bold Italic</source>
+        <translation>Condensé gras italique</translation>
+    </message>
+    <message>
+        <source>Expanded</source>
+        <translation>Étendu</translation>
+    </message>
+</context>
 </TS>
