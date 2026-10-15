@@ -18079,4 +18079,39 @@ Hold F3 Key on the Viewer to Show This Frame Only</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
+<context>
+    <name>FileBrowserLocations</name>
+    <message>
+        <source>My Computer</source>
+        <translation>Computer</translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation>Rete</translation>
+    </message>
+    <message>
+        <source>My Documents</source>
+        <translation>Documenti</translation>
+    </message>
+    <message>
+        <source>Desktop</source>
+        <translation>Desktop</translation>
+    </message>
+    <message>
+        <source>Library</source>
+        <translation>Libreria</translation>
+    </message>
+    <message>
+        <source>History</source>
+        <translation>Cronologia</translation>
+    </message>
+    <message>
+        <source>Project root (%1)</source>
+        <translation>Cartella principale del progetto (%1)</translation>
+    </message>
+    <message>
+        <source>Scene Folder</source>
+        <translation>Cartella della scena</translation>
+    </message>
+</context>
 </TS>
