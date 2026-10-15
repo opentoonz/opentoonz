@@ -92,7 +92,11 @@ protected:
   void premultiToUnpremulti(TRasterPT<T> dn_ras, const TRasterPT<T>& up_ras,
                             const double colorSpaceGamma);
 
-  // when compute in xyz color space, do not clamp channel values in the kernel
+  // Blend the premultiplied foreground and background values. When clipping
+  // mask is enabled, the caller supplies an opaque, unpremultiplied working
+  // background and scales the premultiplied result by the original background
+  // alpha afterwards. When computing in xyz color space, do not clamp channel
+  // values in the kernel.
   virtual void brendKernel(double& dnr, double& dng, double& dnb, double& dna,
                            const double up_, double upg, double upb, double upa,
                            const double upopacity,
