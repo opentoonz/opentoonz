@@ -24,6 +24,7 @@
 #include "tools/toolutils.h"
 #include "tools/assistant.h"
 #include "tools/replicator.h"
+#include "../tnztools/shifttracetool.h"
 
 // TnzQt includes
 #include "toonzqt/icongenerator.h"
@@ -417,6 +418,9 @@ public:
       cm->enable(MI_EditShift, checked);
       cm->enable(MI_NoShift, checked);
       cm->enable(MI_ShowShiftOrigin, checked);
+      cm->enable(MI_ShiftTraceSelectPrevGhost, checked && isChecked(MI_EditShift));
+      cm->enable(MI_ShiftTraceSelectNextGhost,
+                 checked && isChecked(MI_EditShift));
       if (checked) {
         OnioniSkinMaskGUI::resetShiftTraceFrameOffset();
         // activate edit shift
@@ -440,6 +444,10 @@ public:
         TApp::instance()->getCurrentTool()->unsetPseudoTool();
       }
       CommandManager::instance()->enable(MI_NoShift, !checked);
+      cm->enable(MI_ShiftTraceSelectPrevGhost,
+                 isChecked(MI_ShiftTrace) && checked);
+      cm->enable(MI_ShiftTraceSelectNextGhost,
+                 isChecked(MI_ShiftTrace) && checked);
     } else if (std::string(m_cmdId) == MI_NoShift) {
     }
     updateShiftTraceStatus();
@@ -489,6 +497,38 @@ public:
     if (tool) tool->reset();
   }
 } resetShiftTraceCommand;
+
+// Menu shortcuts (optional): require Shift && Trace + Edit Shift; forward to
+// ShiftTraceTool::setCurrentGhostIndex so toolbar radios stay in sync.
+class TShiftTraceSelectPrevGhostCommand final : public MenuItemHandler {
+public:
+  TShiftTraceSelectPrevGhostCommand()
+      : MenuItemHandler(MI_ShiftTraceSelectPrevGhost) {}
+  void execute() override {
+    CommandManager *cm = CommandManager::instance();
+    if (!cm->getAction(MI_ShiftTrace)->isChecked() ||
+        !cm->getAction(MI_EditShift)->isChecked())
+      return;
+    ShiftTraceTool *st = dynamic_cast<ShiftTraceTool *>(
+        TTool::getTool("T_ShiftTrace", TTool::ToonzImage));
+    if (st) st->setCurrentGhostIndex(0);
+  }
+} shiftTraceSelectPrevGhostCommand;
+
+class TShiftTraceSelectNextGhostCommand final : public MenuItemHandler {
+public:
+  TShiftTraceSelectNextGhostCommand()
+      : MenuItemHandler(MI_ShiftTraceSelectNextGhost) {}
+  void execute() override {
+    CommandManager *cm = CommandManager::instance();
+    if (!cm->getAction(MI_ShiftTrace)->isChecked() ||
+        !cm->getAction(MI_EditShift)->isChecked())
+      return;
+    ShiftTraceTool *st = dynamic_cast<ShiftTraceTool *>(
+        TTool::getTool("T_ShiftTrace", TTool::ToonzImage));
+    if (st) st->setCurrentGhostIndex(1);
+  }
+} shiftTraceSelectNextGhostCommand;
 
 //-----------------------------------------------------------------------------
 // Following commands (VB_***) are registered for command bar buttons.
