@@ -214,9 +214,7 @@ public:
   }
 
   QPixmap getFloatBorderPixmap() const { return m_floatBorderPm; }
-  void setFloatBorderPixmap(const QPixmap &pixmap) {
-    m_floatBorderPm = pixmap;
-  }
+  void setFloatBorderPixmap(const QPixmap &pixmap) { m_floatBorderPm = pixmap; }
 
   QPixmap getFloatActiveBorderPixmap() const { return m_floatActiveBorderPm; }
   void setFloatActiveBorderPixmap(const QPixmap &pixmap) {
@@ -331,7 +329,8 @@ protected:
   void enterEvent(QEvent *) override;
   void leaveEvent(QEvent *) override;
 
-  // BTR grip visibility follows floating/docked state (dock + workspace restore).
+  // BTR grip visibility follows floating/docked state (dock + workspace
+  // restore).
   void setFloatingAppearance() override;
   void setDockedAppearance() override;
 

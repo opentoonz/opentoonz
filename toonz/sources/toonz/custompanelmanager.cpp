@@ -54,8 +54,9 @@ QString relativePanelId(const TFilePath& file, const TFilePath& rootFolder) {
 }
 
 TFilePath panelFilePath(const QString& panelId) {
-  TFilePath path              = customPaneFolderPath();
-  const QStringList parts     = normalizePanelId(panelId).split('/', Qt::SkipEmptyParts);
+  TFilePath path = customPaneFolderPath();
+  const QStringList parts =
+      normalizePanelId(panelId).split('/', Qt::SkipEmptyParts);
   for (int i = 0; i < parts.size(); ++i) {
     if (i == parts.size() - 1)
       path = path + TFilePath(parts[i] + ".ui");
@@ -83,14 +84,14 @@ void collectUiPanelIds(const TFilePath& folder, const TFilePath& rootFolder,
   std::sort(dirs.begin(), dirs.end(),
             [](const TFilePath& a, const TFilePath& b) {
               return QString::compare(QString::fromStdString(a.getName()),
-                                     QString::fromStdString(b.getName()),
-                                     Qt::CaseInsensitive) < 0;
+                                      QString::fromStdString(b.getName()),
+                                      Qt::CaseInsensitive) < 0;
             });
   std::sort(files.begin(), files.end(),
             [](const TFilePath& a, const TFilePath& b) {
               return QString::compare(QString::fromStdString(a.getName()),
-                                     QString::fromStdString(b.getName()),
-                                     Qt::CaseInsensitive) < 0;
+                                      QString::fromStdString(b.getName()),
+                                      Qt::CaseInsensitive) < 0;
             });
 
   if (depth < kMaxCustomPanelFolderDepth) {
@@ -120,20 +121,19 @@ void populateCustomPanelMenu(QMenu* menu, const TFilePath& folder, int depth,
   std::sort(dirs.begin(), dirs.end(),
             [](const TFilePath& a, const TFilePath& b) {
               return QString::compare(QString::fromStdString(a.getName()),
-                                     QString::fromStdString(b.getName()),
-                                     Qt::CaseInsensitive) < 0;
+                                      QString::fromStdString(b.getName()),
+                                      Qt::CaseInsensitive) < 0;
             });
   std::sort(files.begin(), files.end(),
             [](const TFilePath& a, const TFilePath& b) {
               return QString::compare(QString::fromStdString(a.getName()),
-                                     QString::fromStdString(b.getName()),
-                                     Qt::CaseInsensitive) < 0;
+                                      QString::fromStdString(b.getName()),
+                                      Qt::CaseInsensitive) < 0;
             });
 
   if (depth < kMaxCustomPanelFolderDepth) {
     for (const auto& dir : dirs) {
-      QMenu* subMenu =
-          new QMenu(QString::fromStdString(dir.getName()), menu);
+      QMenu* subMenu = new QMenu(QString::fromStdString(dir.getName()), menu);
       populateCustomPanelMenu(subMenu, dir, depth + 1, menuPanelIds);
       if (subMenu->isEmpty()) {
         delete subMenu;
@@ -145,10 +145,10 @@ void populateCustomPanelMenu(QMenu* menu, const TFilePath& folder, int depth,
 
   for (const auto& file : files) {
     // Proxy menu actions (not the CommandManager actions): a QAction can only
-    // belong to one menu, and command actions must stay available for shortcuts.
+    // belong to one menu, and command actions must stay available for
+    // shortcuts.
     QString panelId = relativePanelId(file, customPaneFolderPath());
-    QAction* leaf =
-        menu->addAction(QString::fromStdString(file.getName()));
+    QAction* leaf   = menu->addAction(QString::fromStdString(file.getName()));
     leaf->setData(menuPanelIds.size());
     menuPanelIds.append(panelId);
   }
@@ -275,7 +275,8 @@ TPanel* CustomPanelManager::createCustomPanel(const QString panelName,
 
   initializeControl(customWidget);
 
-  panel->setWindowTitle(QFileInfo(customPanelsFp.getQString()).completeBaseName());
+  panel->setWindowTitle(
+      QFileInfo(customPanelsFp.getQString()).completeBaseName());
   panel->setWidget(customWidget);
 
   // Enable room binding feature (handled by TPanel base class)
@@ -289,7 +290,7 @@ TPanel* CustomPanelManager::createCustomPanel(const QString panelName,
 void CustomPanelManager::initializeControl(QWidget* customWidget) {
   // Update checked states before initializing controls
   ToolPresetCommandManager::instance()->updateCheckedStates();
-  
+
   // connect buttons and commands
   QList<QAbstractButton*> allButtons =
       customWidget->findChildren<QAbstractButton*>();
@@ -304,31 +305,33 @@ void CustomPanelManager::initializeControl(QWidget* customWidget) {
     if (QToolButton* tb = dynamic_cast<QToolButton*>(button)) {
       tb->setDefaultAction(action);
       tb->setObjectName("CustomPanelButton");
-      
+
       // Build stylesheet with visible checked state
       QString styleSheet;
-      
+
       if (tb->toolButtonStyle() == Qt::ToolButtonTextUnderIcon) {
         int padding = (tb->height() - button->iconSize().height() -
                        tb->font().pointSize() * 1.33) /
                       3;
         if (padding > 0) {
-          styleSheet = QString("QToolButton#CustomPanelButton { padding-top: %1; }").arg(padding);
+          styleSheet =
+              QString("QToolButton#CustomPanelButton { padding-top: %1; }")
+                  .arg(padding);
         }
       }
-      
+
       // Add checked state styles ONLY for new commands
       // (Brush Presets and Universal Sizes)
-      std::string cmdId = button->objectName().toStdString();
-      bool isBrushPreset = (cmdId.find("MI_BrushPreset_") == 0);
+      std::string cmdId    = button->objectName().toStdString();
+      bool isBrushPreset   = (cmdId.find("MI_BrushPreset_") == 0);
       bool isUniversalSize = (cmdId.find("MI_ToolSize_") == 0);
-      
-      // No custom stylesheet - let buttons inherit colors from the application theme
-      // This ensures proper adaptation when the user switches themes
+
+      // No custom stylesheet - let buttons inherit colors from the application
+      // theme This ensures proper adaptation when the user switches themes
       if (!styleSheet.isEmpty()) {
         tb->setStyleSheet(styleSheet);
       }
-      
+
       continue;
     }
 
@@ -346,7 +349,7 @@ void CustomPanelManager::initializeControl(QWidget* customWidget) {
     if (!button->text().isEmpty()) button->setText(action->text());
 
     button->setIcon(action->icon());
-    
+
     // No custom stylesheet for checked buttons - let them inherit from theme
     // button->addAction(action);
   }
@@ -396,7 +399,8 @@ void CustomPanelManager::registerCustomPanelCommands() {
 
   m_registeredPanelIds.clear();
 
-  MainWindow* mainWindow = dynamic_cast<MainWindow*>(TApp::instance()->getMainWindow());
+  MainWindow* mainWindow =
+      dynamic_cast<MainWindow*>(TApp::instance()->getMainWindow());
   if (!mainWindow) return;
 
   for (const QString& panelId : currentPanels) {
@@ -423,12 +427,11 @@ void CustomPanelManager::registerCustomPanelCommands() {
     CommandManager::instance()->define(
         commandId.toStdString().c_str(),
         CustomPanelCommandType,  // Custom Panels subcategory under Windows
-        "",
-        action,
-        "");
+        "", action, "");
 
     class CustomPanelHandler : public CommandHandlerInterface {
       QString m_panelId;
+
     public:
       CustomPanelHandler(const QString& id) : m_panelId(id) {}
       void execute() override {
@@ -442,18 +445,19 @@ void CustomPanelManager::registerCustomPanelCommands() {
       }
     };
 
-    CommandManager::instance()->setHandler(
-        commandId.toStdString().c_str(),
-        new CustomPanelHandler(panelId));
+    CommandManager::instance()->setHandler(commandId.toStdString().c_str(),
+                                           new CustomPanelHandler(panelId));
 
     m_registeredPanelIds.append(commandId);
   }
 
   // Notify ShortcutPopup to refresh if it's currently open
-  // This allows new custom panel commands to appear immediately without restarting
+  // This allows new custom panel commands to appear immediately without
+  // restarting
   ShortcutPopup::refreshIfOpen();
 
-  TFilePath shortcutsFile = ToonzFolder::getMyModuleDir() + TFilePath("shortcuts.ini");
+  TFilePath shortcutsFile =
+      ToonzFolder::getMyModuleDir() + TFilePath("shortcuts.ini");
   if (!TFileStatus(shortcutsFile).doesExist()) return;
 
   QSettings settings(toQString(shortcutsFile), QSettings::IniFormat);

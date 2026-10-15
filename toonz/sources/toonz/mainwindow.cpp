@@ -429,8 +429,8 @@ void Room::load(const TFilePath &fp, RoomLoadParams &params) {
   // Store layout state for deferred re-apply after the first show.
   // Without this, TMainWindow::resizeEvent → redistribute() recalculates
   // panel sizes before the window has reached its final geometry.
-  m_pendingLayoutState        = state;
-  m_hasPendingLayoutRestore   = true;
+  m_pendingLayoutState      = state;
+  m_hasPendingLayoutRestore = true;
 
   m_initialized = true;
 }
@@ -441,7 +441,7 @@ void Room::showEvent(QShowEvent *event) {
   TMainWindow::showEvent(event);
 
   if (m_hasPendingLayoutRestore) {
-    m_hasPendingLayoutRestore = false;
+    m_hasPendingLayoutRestore    = false;
     DockLayout::State savedState = m_pendingLayoutState;
     DockLayout *layout           = dockLayout();
     QTimer::singleShot(0, this, [layout, savedState]() {
@@ -1423,17 +1423,18 @@ void MainWindow::registerRoomCommands() {
   for (int i = 0; i < m_stackedWidget->count(); i++) {
     Room *room = getRoom(i);
     if (!room) continue;
-    QString roomName = room->getName();
+    QString roomName  = room->getName();
     QString commandId = "MI_Room_" + roomName;
     currentRoomIds.append(commandId);
   }
-  
+
   // Disable old room commands that no longer exist
   // We can't actually remove them from CommandManager, but we can hide them
-  // by removing them from m_registeredRoomIds and their actions from the main window
-  for (const QString& oldId : m_registeredRoomIds) {
+  // by removing them from m_registeredRoomIds and their actions from the main
+  // window
+  for (const QString &oldId : m_registeredRoomIds) {
     if (!currentRoomIds.contains(oldId)) {
-      QAction* oldAction = CommandManager::instance()->getAction(
+      QAction *oldAction = CommandManager::instance()->getAction(
           oldId.toStdString().c_str(), false);
       if (oldAction) {
         // Remove the action from this widget to prevent it from being triggered
@@ -1443,19 +1444,19 @@ void MainWindow::registerRoomCommands() {
       }
     }
   }
-  
+
   m_registeredRoomIds.clear();
-  
+
   // Iterate through all existing rooms
   for (int i = 0; i < m_stackedWidget->count(); i++) {
     Room *room = getRoom(i);
     if (!room) continue;
-    
-    QString roomName = room->getName();
+
+    QString roomName  = room->getName();
     QString commandId = "MI_Room_" + roomName;
-    
+
     // Check if command already exists
-    QAction* existingAction = CommandManager::instance()->getAction(
+    QAction *existingAction = CommandManager::instance()->getAction(
         commandId.toStdString().c_str(), false);
     if (existingAction) {
       // Make sure it's visible and added to this widget
@@ -1466,41 +1467,38 @@ void MainWindow::registerRoomCommands() {
       m_registeredRoomIds.append(commandId);
       continue;
     }
-    
+
     // Clean up room name for better display
     // Replace underscores and hyphens with spaces for readability
     QString cleanName = roomName;
     cleanName.replace('_', ' ');
     cleanName.replace('-', ' ');
-    
+
     // Create display name with [Room] prefix
     QString displayName = "[Room] " + cleanName;
-    
-    QAction* action = new DVAction(displayName, this);
+
+    QAction *action = new DVAction(displayName, this);
     addAction(action);
-    
+
     // Define command with RoomCommandType for proper categorization
-    CommandManager::instance()->define(
-        commandId.toStdString().c_str(),
-        RoomCommandType,
-        "",
-        action,
-        "");
-    
+    CommandManager::instance()->define(commandId.toStdString().c_str(),
+                                       RoomCommandType, "", action, "");
+
     // Create handler that switches to this room when shortcut is triggered
     class RoomSwitchHandler : public CommandHandlerInterface {
       QString m_roomName;
-      MainWindow* m_mainWindow;
+      MainWindow *m_mainWindow;
+
     public:
-      RoomSwitchHandler(const QString& name, MainWindow* mainWin) 
-        : m_roomName(name), m_mainWindow(mainWin) {}
-      
+      RoomSwitchHandler(const QString &name, MainWindow *mainWin)
+          : m_roomName(name), m_mainWindow(mainWin) {}
+
       void execute() override {
         if (!m_mainWindow) return;
-        
+
         // Find room by name and switch to it
         for (int i = 0; i < m_mainWindow->getRoomCount(); i++) {
-          Room* room = m_mainWindow->getRoom(i);
+          Room *room = m_mainWindow->getRoom(i);
           if (room && room->getName() == m_roomName) {
             m_mainWindow->m_topBar->getRoomTabWidget()->setCurrentIndex(i);
             return;
@@ -1508,38 +1506,38 @@ void MainWindow::registerRoomCommands() {
         }
       }
     };
-    
+
     CommandManager::instance()->setHandler(
-        commandId.toStdString().c_str(),
-        new RoomSwitchHandler(roomName, this));
-    
+        commandId.toStdString().c_str(), new RoomSwitchHandler(roomName, this));
+
     m_registeredRoomIds.append(commandId);
   }
-  
+
   // Load saved shortcuts for room commands
-  TFilePath shortcutsFile = ToonzFolder::getMyModuleDir() + TFilePath("shortcuts.ini");
+  TFilePath shortcutsFile =
+      ToonzFolder::getMyModuleDir() + TFilePath("shortcuts.ini");
   if (!TFileStatus(shortcutsFile).doesExist()) {
     // Refresh ShortcutPopup if it's open to show new room commands
     ShortcutPopup::refreshIfOpen();
     return;
   }
-  
+
   QSettings settings(toQString(shortcutsFile), QSettings::IniFormat);
   settings.beginGroup("shortcuts");
-  
-  for (const QString& commandId : m_registeredRoomIds) {
+
+  for (const QString &commandId : m_registeredRoomIds) {
     QString savedShortcut = settings.value(commandId, "").toString();
     if (!savedShortcut.isEmpty()) {
-      QAction* action = CommandManager::instance()->getAction(
+      QAction *action = CommandManager::instance()->getAction(
           commandId.toStdString().c_str(), false);
       if (action) {
         action->setShortcut(QKeySequence(savedShortcut));
       }
     }
   }
-  
+
   settings.endGroup();
-  
+
   // Refresh ShortcutPopup if it's open to show new room commands
   ShortcutPopup::refreshIfOpen();
 }
@@ -1549,23 +1547,24 @@ void MainWindow::registerRoomCommands() {
 
 void MainWindow::unregisterRoomCommand(const QString &roomName) {
   QString commandId = "MI_Room_" + roomName;
-  
+
   // Remove from registered list
   m_registeredRoomIds.removeAll(commandId);
-  
+
   // Note: We don't actually remove the command from CommandManager
   // as Qt doesn't provide a clean way to unregister QActions
   // The command will simply do nothing if triggered after room deletion
-  
+
   // Clear the shortcut from settings file
-  TFilePath shortcutsFile = ToonzFolder::getMyModuleDir() + TFilePath("shortcuts.ini");
+  TFilePath shortcutsFile =
+      ToonzFolder::getMyModuleDir() + TFilePath("shortcuts.ini");
   if (TFileStatus(shortcutsFile).doesExist()) {
     QSettings settings(toQString(shortcutsFile), QSettings::IniFormat);
     settings.beginGroup("shortcuts");
     settings.remove(commandId);
     settings.endGroup();
   }
-  
+
   // Refresh ShortcutPopup if it's open
   ShortcutPopup::refreshIfOpen();
 }
@@ -1573,19 +1572,21 @@ void MainWindow::unregisterRoomCommand(const QString &roomName) {
 //-----------------------------------------------------------------------------
 // Update a room shortcut command when a room is renamed
 
-void MainWindow::updateRoomCommand(const QString &oldName, const QString &newName) {
+void MainWindow::updateRoomCommand(const QString &oldName,
+                                   const QString &newName) {
   QString oldCommandId = "MI_Room_" + oldName;
   QString newCommandId = "MI_Room_" + newName;
-  
+
   // Save and migrate the old shortcut if it exists
-  TFilePath shortcutsFile = ToonzFolder::getMyModuleDir() + TFilePath("shortcuts.ini");
+  TFilePath shortcutsFile =
+      ToonzFolder::getMyModuleDir() + TFilePath("shortcuts.ini");
   QString oldShortcut;
-  
+
   if (TFileStatus(shortcutsFile).doesExist()) {
     QSettings settings(toQString(shortcutsFile), QSettings::IniFormat);
     settings.beginGroup("shortcuts");
     oldShortcut = settings.value(oldCommandId, "").toString();
-    
+
     // Migrate the shortcut to the new command ID
     if (oldCommandId != newCommandId) {
       settings.remove(oldCommandId);
@@ -1595,11 +1596,11 @@ void MainWindow::updateRoomCommand(const QString &oldName, const QString &newNam
     }
     settings.endGroup();
   }
-  
+
   // Re-register all room commands
   // This will clean up the old command and create the new one
   registerRoomCommands();
-  
+
   // The shortcut was already saved in shortcuts.ini above,
   // so registerRoomCommands() will load it automatically
 }
@@ -1623,7 +1624,7 @@ void MainWindow::insertNewRoom() {
 
   // Finally, old room index is increased by 1
   m_oldRoomIndex++;
-  
+
   // Register shortcut for the newly created room
   registerRoomCommands();
 }
@@ -1632,7 +1633,7 @@ void MainWindow::insertNewRoom() {
 
 void MainWindow::deleteRoom(int index) {
   Room *room = getRoom(index);
-  
+
   // Store room name before deletion for unregistering the shortcut
   QString roomName = room->getName();
 
@@ -1656,7 +1657,7 @@ void MainWindow::deleteRoom(int index) {
 
   m_stackedWidget->removeWidget(room);
   delete room;
-  
+
   // Unregister shortcut for the deleted room
   unregisterRoomCommand(roomName);
 }
@@ -3278,15 +3279,15 @@ void MainWindow::defineActions() {
                ToolCommandType);
 
   /*-- Edit Assistants tool + type switching shortcuts --*/
-  createAction(MI_AssistantNextType,
-               QT_TR_NOOP("Assistant Type - Cycle"), "", ToolCommandType);
+  createAction(MI_AssistantNextType, QT_TR_NOOP("Assistant Type - Cycle"), "",
+               ToolCommandType);
   createAction(MI_AssistantLine, QT_TR_NOOP("Assistant Type - Line"), "",
                ToolCommandType, "assistant_line");
   createAction(MI_AssistantEllipse, QT_TR_NOOP("Assistant Type - Ellipse"), "",
                ToolCommandType, "assistant_ellipse");
   createAction(MI_AssistantPerspective,
-               QT_TR_NOOP("Assistant Type - Perspective"), "",
-               ToolCommandType, "assistant_perspective");
+               QT_TR_NOOP("Assistant Type - Perspective"), "", ToolCommandType,
+               "assistant_perspective");
   createAction(MI_AssistantVanishingPoint,
                QT_TR_NOOP("Assistant Type - Vanishing Point"), "",
                ToolCommandType, "assistant_vanishingpoint");
@@ -3421,9 +3422,8 @@ void MainWindow::defineActions() {
                           QT_TR_NOOP("Assistant Type - Ellipse"), "");
   createToolOptionsAction("A_ToolOption_AssistantType:assistantPerspective",
                           QT_TR_NOOP("Assistant Type - Perspective"), "");
-  createToolOptionsAction(
-      "A_ToolOption_AssistantType:assistantVanishingPoint",
-      QT_TR_NOOP("Assistant Type - Vanishing Point"), "");
+  createToolOptionsAction("A_ToolOption_AssistantType:assistantVanishingPoint",
+                          QT_TR_NOOP("Assistant Type - Vanishing Point"), "");
   createToolOptionsAction("A_ToolOption_AssistantType:assistantFisheye",
                           QT_TR_NOOP("Assistant Type - Fisheye"), "");
   createToolOptionsAction("A_ToolOption_AssistantType:replicatorStar",
