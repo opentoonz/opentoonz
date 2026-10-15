@@ -13722,4 +13722,39 @@ Hold F3 Key on the Viewer to Show This Frame Only</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
+<context>
+    <name>FileBrowserLocations</name>
+    <message>
+        <source>My Computer</source>
+        <translation>Ordinateur</translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation>Réseau</translation>
+    </message>
+    <message>
+        <source>My Documents</source>
+        <translation>Mes documents</translation>
+    </message>
+    <message>
+        <source>Desktop</source>
+        <translation>Bureau</translation>
+    </message>
+    <message>
+        <source>Library</source>
+        <translation>Bibliothèque</translation>
+    </message>
+    <message>
+        <source>History</source>
+        <translation>Historique</translation>
+    </message>
+    <message>
+        <source>Project root (%1)</source>
+        <translation>Racine du projet (%1)</translation>
+    </message>
+    <message>
+        <source>Scene Folder</source>
+        <translation>Dossier de la scène</translation>
+    </message>
+</context>
 </TS>
