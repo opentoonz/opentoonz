@@ -12,15 +12,9 @@
 #include <QOpenGLTexture>
 #include <QOpenGLContext>
 #include <QOffscreenSurface>
-#include <QFile>
-#include <QFileInfo>
 #include <QColor>
 #include <QStringList>
-#include <QTextStream>
 
-#include <algorithm>
-#include <cmath>
-#include <vector>
 
 namespace {
 inline bool execWarning(const QString& s) {
@@ -28,265 +22,10 @@ inline bool execWarning(const QString& s) {
   return false;
 }
 
-constexpr int kMax3DLutSize = 129;
-
-struct ParsedLut {
-  int meshSize = 0;
-  std::vector<float> data;
-  float domainMin[3] = {0.0f, 0.0f, 0.0f};
-  float domainMax[3] = {1.0f, 1.0f, 1.0f};
-};
-
-bool readDataLine(QTextStream& stream, QString& line, int& lineNumber) {
-  while (!stream.atEnd()) {
-    ++lineNumber;
-    line = stream.readLine().trimmed();
-    if (!line.isEmpty() && !line.startsWith('#')) return true;
-  }
-  return false;
-}
-
-QStringList splitFields(const QString& line) {
-  return line.simplified().split(' ', Qt::SkipEmptyParts);
-}
-
-bool parseFiniteFloat(const QString& text, float& value) {
-  bool ok = false;
-  value   = text.toFloat(&ok);
-  return ok && std::isfinite(value);
-}
-
 float clamp01(float value) {
   return value < 0.0f ? 0.0f : value > 1.0f ? 1.0f : value;
 }
-
-bool parseFloatTriple(const QStringList& fields, float values[3]) {
-  if (fields.size() != 3) return false;
-  for (int channel = 0; channel < 3; ++channel)
-    if (!parseFiniteFloat(fields.at(channel), values[channel])) return false;
-  return true;
-}
-
-QString lineError(int lineNumber, const QString& message) {
-  return QObject::tr("Line %1: %2").arg(lineNumber).arg(message);
-}
-
-bool parse3dl(QTextStream& stream, ParsedLut& lut, QString& error) {
-  QString line;
-  int lineNumber = 0;
-
-  if (!readDataLine(stream, line, lineNumber) || line != "3DMESH") {
-    error = lineError(lineNumber, QObject::tr("Expected the 3DMESH keyword."));
-    return false;
-  }
-
-  if (!readDataLine(stream, line, lineNumber)) {
-    error = QObject::tr("The Mesh header is missing.");
-    return false;
-  }
-
-  QStringList fields = splitFields(line);
-  bool inputOk = false, outputOk = false;
-  int inputBitDepth  = fields.size() == 3 ? fields.at(1).toInt(&inputOk) : 0;
-  int outputBitDepth = fields.size() == 3 ? fields.at(2).toInt(&outputOk) : 0;
-  if (fields.size() != 3 || fields.at(0) != "Mesh" || !inputOk || !outputOk ||
-      inputBitDepth < 0 || inputBitDepth > 7 || outputBitDepth < 1 ||
-      outputBitDepth > 30) {
-    error = lineError(
-        lineNumber,
-        QObject::tr("Expected Mesh [input bit depth] [output bit depth]."));
-    return false;
-  }
-
-  lut.meshSize = (1 << inputBitDepth) + 1;
-  if (lut.meshSize > kMax3DLutSize) {
-    error = QObject::tr("The LUT grid may not exceed %1 points per axis.")
-                .arg(kMax3DLutSize);
-    return false;
-  }
-
-  if (!readDataLine(stream, line, lineNumber)) {
-    error = QObject::tr("The input grid line is missing.");
-    return false;
-  }
-  fields = splitFields(line);
-  if (fields.size() != lut.meshSize) {
-    error = lineError(lineNumber,
-                      QObject::tr("The input grid has the wrong size."));
-    return false;
-  }
-
-  const size_t entryCount =
-      static_cast<size_t>(lut.meshSize) * lut.meshSize * lut.meshSize;
-  lut.data.resize(entryCount * 3);
-  const float maxValue = std::ldexp(1.0f, outputBitDepth) - 1.0f;
-
-  size_t entry = 0;
-  for (int r = 0; r < lut.meshSize; ++r) {
-    for (int g = 0; g < lut.meshSize; ++g) {
-      for (int b = 0; b < lut.meshSize; ++b, ++entry) {
-        if (!readDataLine(stream, line, lineNumber)) {
-          error = QObject::tr("The LUT contains %1 entries; expected %2.")
-                      .arg(static_cast<qulonglong>(entry))
-                      .arg(static_cast<qulonglong>(entryCount));
-          return false;
-        }
-        fields = splitFields(line);
-        if (fields.size() != 3) {
-          error = lineError(
-              lineNumber, QObject::tr("Expected three integer color values."));
-          return false;
-        }
-        const size_t offset =
-            (static_cast<size_t>(b) * lut.meshSize * lut.meshSize +
-             static_cast<size_t>(g) * lut.meshSize + r) *
-            3;
-        for (int channel = 0; channel < 3; ++channel) {
-          bool ok         = false;
-          const int value = fields.at(channel).toInt(&ok);
-          if (!ok) {
-            error =
-                lineError(lineNumber,
-                          QObject::tr("Expected three integer color values."));
-            return false;
-          }
-          lut.data[offset + channel] = static_cast<float>(value) / maxValue;
-        }
-      }
-    }
-  }
-
-  return true;
-}
-
-bool parseCube(QTextStream& stream, ParsedLut& lut, QString& error) {
-  QString line;
-  int lineNumber     = 0;
-  bool hasSize       = false;
-  bool dataHasBegun  = false;
-  bool hasDomainTags = false;
-  bool hasRangeTag   = false;
-
-  while (readDataLine(stream, line, lineNumber)) {
-    const QStringList fields = splitFields(line);
-    float firstValue         = 0.0f;
-    if (parseFiniteFloat(fields.at(0), firstValue)) {
-      if (!hasSize) {
-        error = lineError(lineNumber,
-                          QObject::tr("LUT_3D_SIZE must precede LUT data."));
-        return false;
-      }
-      dataHasBegun = true;
-      float values[3];
-      if (!parseFloatTriple(fields, values)) {
-        error = lineError(lineNumber,
-                          QObject::tr("Expected three floating-point values."));
-        return false;
-      }
-      lut.data.insert(lut.data.end(), values, values + 3);
-      const size_t expectedValues =
-          static_cast<size_t>(lut.meshSize) * lut.meshSize * lut.meshSize * 3;
-      if (lut.data.size() > expectedValues) {
-        error = QObject::tr("The .cube file contains too many LUT entries.");
-        return false;
-      }
-      continue;
-    }
-
-    if (dataHasBegun) {
-      error = lineError(lineNumber,
-                        QObject::tr("Only color triples may follow LUT data."));
-      return false;
-    }
-
-    const QString keyword = fields.at(0).toUpper();
-    if (keyword == "TITLE") {
-      continue;
-    } else if (keyword == "LUT_1D_SIZE" || keyword == "LUT_1D_INPUT_RANGE") {
-      error =
-          lineError(lineNumber,
-                    QObject::tr("1D and shaper .cube LUTs are not supported."));
-      return false;
-    } else if (keyword == "LUT_2D_SIZE") {
-      error = lineError(lineNumber,
-                        QObject::tr("2D .cube LUTs are not supported."));
-      return false;
-    } else if (keyword == "LUT_3D_SIZE") {
-      bool ok        = false;
-      const int size = fields.size() == 2 ? fields.at(1).toInt(&ok) : 0;
-      if (!ok || size < 2 || size > kMax3DLutSize || hasSize) {
-        error = lineError(
-            lineNumber,
-            QObject::tr("LUT_3D_SIZE must be a single value from 2 to %1.")
-                .arg(kMax3DLutSize));
-        return false;
-      }
-      lut.meshSize = size;
-      lut.data.reserve(static_cast<size_t>(size) * size * size * 3);
-      hasSize = true;
-    } else if (keyword == "DOMAIN_MIN" || keyword == "DOMAIN_MAX") {
-      float values[3];
-      if (hasRangeTag || fields.size() != 4 ||
-          !parseFloatTriple(fields.mid(1), values)) {
-        error = lineError(
-            lineNumber,
-            QObject::tr("%1 must contain three floating-point values and may "
-                        "not be combined with LUT_3D_INPUT_RANGE.")
-                .arg(keyword));
-        return false;
-      }
-      float* domain = keyword == "DOMAIN_MIN" ? lut.domainMin : lut.domainMax;
-      std::copy(values, values + 3, domain);
-      hasDomainTags = true;
-    } else if (keyword == "LUT_3D_INPUT_RANGE") {
-      float values[2];
-      if (hasDomainTags || fields.size() != 3 ||
-          !parseFiniteFloat(fields.at(1), values[0]) ||
-          !parseFiniteFloat(fields.at(2), values[1])) {
-        error = lineError(
-            lineNumber,
-            QObject::tr("LUT_3D_INPUT_RANGE must contain two floating-point "
-                        "values and may not be combined with DOMAIN_MIN/MAX."));
-        return false;
-      }
-      for (int channel = 0; channel < 3; ++channel) {
-        lut.domainMin[channel] = values[0];
-        lut.domainMax[channel] = values[1];
-      }
-      hasRangeTag = true;
-    } else {
-      error = lineError(lineNumber,
-                        QObject::tr("Unsupported .cube header: %1").arg(line));
-      return false;
-    }
-  }
-
-  if (!hasSize) {
-    error = QObject::tr("The .cube file does not contain LUT_3D_SIZE.");
-    return false;
-  }
-
-  const size_t expectedValues =
-      static_cast<size_t>(lut.meshSize) * lut.meshSize * lut.meshSize * 3;
-  if (lut.data.size() != expectedValues) {
-    error = QObject::tr("The .cube file contains %1 entries; expected %2.")
-                .arg(static_cast<qulonglong>(lut.data.size() / 3))
-                .arg(static_cast<qulonglong>(expectedValues / 3));
-    return false;
-  }
-
-  for (int channel = 0; channel < 3; ++channel) {
-    if (lut.domainMin[channel] >= lut.domainMax[channel]) {
-      error = QObject::tr(
-          "Each .cube input-domain minimum must be less than "
-          "its maximum.");
-      return false;
-    }
-  }
-
-  return true;
-}
-};  // namespace
+}  // namespace
 
 #ifdef WIN32
 
@@ -722,9 +461,7 @@ LutManager::LutManager() : m_isValid(false), m_currentLutPath() {
 
 //-----------------------------------------------------------------------------
 
-LutManager::~LutManager() {
-  if (m_lut.data) delete[] m_lut.data;
-}
+LutManager::~LutManager() = default;
 
 //-----------------------------------------------------------------------------
 
@@ -748,100 +485,26 @@ QString& LutManager::getMonitorName() const {
 //-----------------------------------------------------------------------------
 
 bool LutManager::loadLutFile(const QString& fp) {
-  QFile file(fp);
-  if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-    return execWarning(QObject::tr("Failed to Open 3D LUT File."));
-
-  QTextStream stream(&file);
-  ParsedLut parsed;
   QString error;
-  const QString suffix = QFileInfo(fp).suffix();
-  bool loaded          = false;
-  if (suffix.compare("cube", Qt::CaseInsensitive) == 0)
-    loaded = parseCube(stream, parsed, error);
-  else if (suffix.compare("3dl", Qt::CaseInsensitive) == 0)
-    loaded = parse3dl(stream, parsed, error);
-  else
-    error = QObject::tr("Supported file types are .3dl and .cube.");
-
-  file.close();
-  if (!loaded)
+  Lut3D loaded;
+  if (!loaded.load(fp, &error))
     return execWarning(
         QObject::tr("Failed to Load 3D LUT File.\n%1").arg(error));
-
-  float* data = new float[parsed.data.size()];
-  std::copy(parsed.data.begin(), parsed.data.end(), data);
-  if (m_lut.data) delete[] m_lut.data;
-  m_lut.data     = data;
-  m_lut.meshSize = parsed.meshSize;
-  std::copy(parsed.domainMin, parsed.domainMin + 3, m_lut.domainMin);
-  std::copy(parsed.domainMax, parsed.domainMax + 3, m_lut.domainMax);
+  m_lut = std::move(loaded);
   return true;
 }
 //-----------------------------------------------------------------------------
 
 // input : 0-1
 void LutManager::convert(float& r, float& g, float& b) {
-  struct locals {
-    static inline float lerp(float val1, float val2, float ratio) {
-      return val1 * (1.0f - ratio) + val2 * ratio;
-    }
-    static inline int getCoord(int r, int g, int b, int meshSize) {
-      return b * meshSize * meshSize * 3 + g * meshSize * 3 + r * 3;
-    }
-  };
-
   if (!m_isValid) return;
-
-  float ratio[3];   // RGB軸
-  int index[3][2];  // rgb インデックス
-  float rawVal[3] = {r, g, b};
-  for (int c = 0; c < 3; c++) {
-    rawVal[c] = (rawVal[c] - m_lut.domainMin[c]) /
-                (m_lut.domainMax[c] - m_lut.domainMin[c]);
-    rawVal[c] = clamp01(rawVal[c]);
-  }
-
-  float vertex_color[2][2][2][3];  // 補間用の１ボクセルの頂点色
-
-  for (int c = 0; c < 3; c++) {
-    float val   = rawVal[c] * (float)(m_lut.meshSize - 1);
-    index[c][0] = (int)val;
-    // boundary condition: if rawVal == 1 the value will not be interpolated
-    index[c][1] = (rawVal[c] >= 1.0f) ? index[c][0] : index[c][0] + 1;
-    ratio[c]    = val - (float)index[c][0];
-  }
-
-  for (int rr = 0; rr < 2; rr++)
-    for (int gg = 0; gg < 2; gg++)
-      for (int bb = 0; bb < 2; bb++) {
-        float* val = &m_lut.data[locals::getCoord(
-            index[0][rr], index[1][gg], index[2][bb], m_lut.meshSize)];
-        for (int chan = 0; chan < 3; chan++, val++)
-          vertex_color[rr][gg][bb][chan] = *val;
-      }
-  float result[3];
-
-  for (int chan = 0; chan < 3; chan++) {
-    result[chan] = locals::lerp(
-        locals::lerp(locals::lerp(vertex_color[0][0][0][chan],
-                                  vertex_color[0][0][1][chan], ratio[2]),
-                     locals::lerp(vertex_color[0][1][0][chan],
-                                  vertex_color[0][1][1][chan], ratio[2]),
-                     ratio[1]),
-        locals::lerp(locals::lerp(vertex_color[1][0][0][chan],
-                                  vertex_color[1][0][1][chan], ratio[2]),
-                     locals::lerp(vertex_color[1][1][0][chan],
-                                  vertex_color[1][1][1][chan], ratio[2]),
-                     ratio[1]),
-        ratio[0]);
-  }
+  m_lut.convert(r, g, b);
 
   // CPU-converted UI colors use normalized integer-backed color types. Match
   // the framebuffer's clipping when a floating-point .cube stores HDR values.
-  r = clamp01(result[0]);
-  g = clamp01(result[1]);
-  b = clamp01(result[2]);
+  r = clamp01(r);
+  g = clamp01(g);
+  b = clamp01(b);
 }
 
 //-----------------------------------------------------------------------------
@@ -892,7 +555,7 @@ void LutManager::update() {
     // obtain 3dlut path associated to the monitor name
     QString lutPath =
         Preferences::instance()->getColorCalibrationLutPath(monitorName);
-    if (!lutPath.isEmpty() && m_currentLutPath == lutPath && m_lut.data)
+    if (!lutPath.isEmpty() && m_currentLutPath == lutPath && m_lut.isValid())
       m_isValid = true;
     else if (!lutPath.isEmpty() && loadLutFile(lutPath)) {
       m_isValid        = true;

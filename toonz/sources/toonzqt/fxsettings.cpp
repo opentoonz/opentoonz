@@ -17,6 +17,7 @@
 #include "tenv.h"
 #include "tsystem.h"
 #include "docklayout.h"
+#include "lutfileparamfield.h"
 
 #include "toonz/tcamera.h"
 #include "toonz/toonzfolders.h"
@@ -142,7 +143,7 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical) {
   while (!is.matchEndTag()) {
     std::string tagName;
     if (!is.matchTag(tagName)) throw TException("expected tag");
-    if (tagName == "control") {
+    if (tagName == "control" || tagName == "lut_file") {
       /*--- 設定ファイルからインタフェースの桁数を決める (PairSliderのみ実装。)
        * ---*/
       int decimals            = -1;
@@ -164,7 +165,12 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical) {
         std::string paramName = fx->getFxType() + "." + name;
         QString str =
             QString::fromStdWString(TStringTable::translate(paramName));
-        ParamField *field = ParamField::create(this, str, param);
+        ParamField *field = nullptr;
+        if (tagName == "lut_file") {
+          if (TFilePathParamP fileParam = param)
+            field = new LutFileParamField(this, str, fileParam);
+        } else
+          field = ParamField::create(this, str, param);
         if (field) {
           if (decimals >= 0) field->setPrecision(decimals);
           m_fields.push_back(field);
