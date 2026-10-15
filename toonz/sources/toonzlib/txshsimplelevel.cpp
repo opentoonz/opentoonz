@@ -2097,6 +2097,7 @@ void TXshSimpleLevel::renumber(const std::vector<TFrameId>& fids) {
     assert(m_frames.count(fid) == 0);
     m_frames.insert(fid);
   }
+  ++m_renumberCount;
 
   ImageManager* im = ImageManager::instance();
   TImageCache* ic  = TImageCache::instance();
