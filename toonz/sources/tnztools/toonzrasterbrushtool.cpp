@@ -1786,6 +1786,8 @@ bool ToonzRasterBrushTool::onPropertyChanged(std::string propertyName) {
 
   if (propertyName == m_modifierSize.getName()) updateCurrentStyle();
 
+  if (propertyName == m_modifierSize.getName()) updateCurrentStyle();
+
   // Recalculate/reset based on changed settings
   if (propertyName == m_rasThickness.getName()) {
     m_minThick = m_rasThickness.getValue().first;
