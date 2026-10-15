@@ -1,11 +1,11 @@
 # Testing Pull Requests (PRs)
 
-When a PR is submitted, it is compiled automatically by AppVeyor CI. The AppVeyor build creates an artifact which contains the OpenToonz executable and supporting DLLs needed to run.  You can easily download this artifact and run it to test out the PR before it is merged.
+PR artifacts depend on the repository and workflow. Use the current PR checks to find a successful build for the commit under test. GitHub Actions and legacy AppVeyor download instructions are included below. Check whether the artifact contains only executables/DLLs or also a matching `stuff` or `portablestuff` directory before testing.
 
 ## Pre-Testing Notes
-- You need to have OpenToonz already installed.  Do not uninstall.
+- Executable-only artifacts need a compatible existing installation/configuration. Self-contained portable artifacts may include their own `portablestuff`; inspect the artifact instructions. Do not uninstall your existing application.
 - It is recommended that you backup your `C:\OpenToonz stuff` folder before testing a PR.
-- The AppVeyor build does not contain an updated `C:\OpenToonz stuff` folder so any PR changes to default configurations (i.e. stylesheets, FXs, brushes, etc) are not automatically included.
+- Legacy executable-only AppVeyor artifacts may omit updated `stuff`. Do not assume configuration, stylesheets, FXs, brushes, or translation catalogs match the executable.
 - It is recommended when testing to use new scenes that you can throw away.
   - If you decide to test on an existing scene, back it up first!
 
@@ -59,3 +59,11 @@ When a PR is submitted, it is compiled automatically by AppVeyor CI. The AppVeyo
 - Enter the folder you extracted everything into and double-click the OpenToonz executable to start.
 - Test away!  Report any suggestions or issues related to the change in the PR comments.
 - You can safely delete the .zip file and the folder you created when you are done.
+
+## Testing translation changes
+
+Follow the [translation guide](../toonz/sources/translations/README.md) to check
+which configuration directory the test executable loads. Verify the changed
+`loc/<UI language name>/<module>.qm` is present and current; an executable-only
+update does not establish this. Select the language, restart, and inspect the
+changed UI. Report the language, commit/build, catalog path, and observed wording.

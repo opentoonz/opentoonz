@@ -1,3 +1,8 @@
+> 构建产物因仓库和工作流而异。下面的旧 AppVeyor 说明不适用于所有构建。
+> 请确认下载包是否包含匹配的 `stuff` 或 `portablestuff`。
+> 测试翻译时，应确认实际加载的语言目录和 `.qm` 文件已更新，选择语言后重新启动。
+> 详细流程参阅[翻译指南（英文）](../toonz/sources/translations/README.md)。
+
 # 测试拉取请求 (PR)
 
 当一个PR被提交时会通过 AppVeyor 以及Github Action自动编译，并生成构件（压缩包）。构件中包含了OpenToonz主程序以及相关的dll文件。

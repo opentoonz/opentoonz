@@ -194,3 +194,10 @@ It may be helpful to use existing packages as a reference when creating a packag
 
 - App-Image (Portable):
   https://github.com/morevnaproject/morevna-builds
+
+## Translation workflow
+
+See [Contributing and maintaining translations](../toonz/sources/translations/README.md)
+for editing/submitting `.ts` files, explicit extraction targets, manual `lrelease`,
+and package/runtime paths. Translation-only edits may not refresh catalogs through
+an otherwise no-op application build; confirm the affected `.qm` was regenerated.
