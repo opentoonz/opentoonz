@@ -5389,7 +5389,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>&amp;Timeline</source>
-        <translation type="unfinished"></translation>
+        <translation>Ligne de &amp;temps</translation>
     </message>
     <message>
         <source>Linear Interpolation</source>
@@ -13557,11 +13557,11 @@ S&apos;il vous plaît se référer à la guide de l&apos;utilisateur pour plus d
     </message>
     <message>
         <source>Toggle Xsheet/Timeline</source>
-        <translation type="unfinished"></translation>
+        <translation>Basculer entre feuille d’exposition et ligne de temps</translation>
     </message>
     <message>
         <source>Add New Memo</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajouter une nouvelle note</translation>
     </message>
     <message>
         <source>Previous Memo</source>

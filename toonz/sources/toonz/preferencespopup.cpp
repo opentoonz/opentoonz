@@ -1319,6 +1319,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {viewerIndicatorEnabled, tr("Show Viewer Indicators")},
       {restoreViewerViewFromLastSession,
        tr("Restore Viewer Zoom and Pan from Last Session")},
+      {RestoreStyleEditorTab, tr("Remember Style Editor Tab")},
 
       // Visualization
       {show0ThickLines, tr("Show Lines with Thickness 0")},
@@ -1387,6 +1388,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
        tr("Use higher DPI for calculations - Slower but more accurate")},
 
       // Tools
+      {compressInputEvents, tr("Compress Input Events*")},
       // {dropdownShortcutsCycleOptions, tr("Dropdown Shortcuts:")}, //
       // removed
       {FillOnlysavebox,
@@ -1947,6 +1949,7 @@ QWidget* PreferencesPopup::createInterfacePage() {
   lay->addWidget(check30bitBtn, row - 1, 2, Qt::AlignRight);
   insertUI(showIconsInMenu, lay);
   insertUI(showRoomBindButtons, lay);
+  insertUI(RestoreStyleEditorTab, lay);
   insertUI(customHelpLink, lay);
   getUI<FileField*>(customHelpLink)
       ->setToolTip(
@@ -2282,6 +2285,15 @@ QWidget* PreferencesPopup::createToolsPage() {
   insertUI(useCtrlAltToResizeBrush, lay);
   insertUI(clickTwiceToCreateArcs, lay);
   insertUI(tempToolSwitchTimer, lay);
+  insertUI(compressInputEvents, lay);
+  getUI<CheckBox*>(compressInputEvents)
+      ->setToolTip(
+          tr("Combines frequent input events to reduce processing load. "
+             "Disabling may improve stroke tracking but can affect "
+             "responsiveness and brush behavior. Support varies by platform; "
+             "ordinary mouse movement on Windows is unaffected. "
+             "Separate tool-level input limits remain in effect. "
+             "Changes take effect after restarting OpenToonz."));
 
   QGridLayout* animateToolLay = insertGroupBox(tr("Animate Tool"), lay);
   {

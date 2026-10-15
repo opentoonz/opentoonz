@@ -6745,7 +6745,7 @@ Decrementa lo spessore minimo del pennello</translation>
     </message>
     <message>
         <source>&amp;Timeline</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Timeline</translation>
     </message>
     <message>
         <source>Linear Interpolation</source>
@@ -17895,11 +17895,11 @@ be appended to the palette after conversion</source>
     </message>
     <message>
         <source>Toggle Xsheet/Timeline</source>
-        <translation type="unfinished"></translation>
+        <translation>Alterna foglio macchina e timeline</translation>
     </message>
     <message>
         <source>Add New Memo</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiungi una nuova nota</translation>
     </message>
     <message>
         <source>Previous Memo</source>

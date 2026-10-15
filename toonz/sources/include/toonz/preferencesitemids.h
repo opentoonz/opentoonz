@@ -45,6 +45,7 @@ enum PreferencesItemId {
   displayIn30bit,
   viewerIndicatorEnabled,
   restoreViewerViewFromLastSession,
+  RestoreStyleEditorTab,
 
   //----------
   // Visualization
@@ -130,6 +131,7 @@ enum PreferencesItemId {
   useStrokeEndCursor,
   clickTwiceToCreateArcs,
   tempToolSwitchTimer,
+  compressInputEvents,
   animateToolHandleSize,
   animateToolColor,
   defaultStartupTool,

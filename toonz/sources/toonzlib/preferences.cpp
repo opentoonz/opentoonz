@@ -465,6 +465,7 @@ void Preferences::definePreferenceItems() {
          true);
   define(restoreViewerViewFromLastSession, "restoreViewerViewFromLastSession",
          QMetaType::Bool, false);
+  define(RestoreStyleEditorTab, "RestoreStyleEditorTab", QMetaType::Bool, true);
 
   // Visualization
   define(show0ThickLines, "show0ThickLines", QMetaType::Bool, true);
@@ -558,6 +559,7 @@ void Preferences::definePreferenceItems() {
          QMetaType::Bool, false);
 
   // Tools
+  define(compressInputEvents, "compressInputEvents", QMetaType::Bool, true);
   define(FillOnlysavebox, "FillOnlysavebox", QMetaType::Bool, false);
   define(DefRegionWithPaint, "FillDefRegionWithPaint", QMetaType::Bool, true);
   define(ReferFillPrevailing, "ReferFillPrevailing", QMetaType::Bool, false);
