@@ -19282,4 +19282,39 @@ Hold F3 Key on the Viewer to Show This Frame Only</source>
         <translation> 帧</translation>
     </message>
 </context>
+<context>
+    <name>FileBrowserLocations</name>
+    <message>
+        <source>My Computer</source>
+        <translation>我的电脑</translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation>网络</translation>
+    </message>
+    <message>
+        <source>My Documents</source>
+        <translation>我的文档</translation>
+    </message>
+    <message>
+        <source>Desktop</source>
+        <translation>桌面</translation>
+    </message>
+    <message>
+        <source>Library</source>
+        <translation>库</translation>
+    </message>
+    <message>
+        <source>History</source>
+        <translation>历史</translation>
+    </message>
+    <message>
+        <source>Project root (%1)</source>
+        <translation>项目根目录 (%1)</translation>
+    </message>
+    <message>
+        <source>Scene Folder</source>
+        <translation>场景文件夹</translation>
+    </message>
+</context>
 </TS>

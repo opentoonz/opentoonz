@@ -2024,7 +2024,27 @@ moved to the end of the current style&apos;s page of the palette.</source>
     </message>
     <message>
         <source>Assistants</source>
-        <translation type="unfinished"></translation>
+        <translation>보조 도구</translation>
+    </message>
+    <message>
+        <source>Eraser</source>
+        <translation>지우개</translation>
+    </message>
+    <message>
+        <source>Mode:</source>
+        <translation>모드:</translation>
+    </message>
+    <message>
+        <source>Lines</source>
+        <translation>선</translation>
+    </message>
+    <message>
+        <source>Areas</source>
+        <translation>영역</translation>
+    </message>
+    <message>
+        <source>Lines &amp; Areas</source>
+        <translation>선 및 영역</translation>
     </message>
 </context>
 <context>

@@ -241,6 +241,9 @@ public:
   bool isRestoreViewerViewFromLastSessionEnabled() const {
     return getBoolValue(restoreViewerViewFromLastSession);
   }
+  bool isRestoreStyleEditorTabEnabled() const {
+    return getBoolValue(RestoreStyleEditorTab);
+  }
 
   // Visualization  tab
   bool getShow0ThickLines() const { return getBoolValue(show0ThickLines); }

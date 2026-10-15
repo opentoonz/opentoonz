@@ -18,9 +18,25 @@ class DvDirVersionControlRootNode;
 //-----------------------------------------------------------------------------
 
 class DvDirModelNode {
+public:
+  enum class DisplayLocation {
+    None,
+    Computer,
+    Network,
+    Documents,
+    Desktop,
+    Library,
+    History,
+    ProjectRoot,
+    SceneFolder
+  };
+
+private:
   DvDirModelNode *m_parent;
   int m_row;
   bool m_renameEnabled;
+  DisplayLocation m_displayLocation = DisplayLocation::None;
+  QString m_displayDetail;
 
 protected:
   std::wstring m_name;
@@ -35,6 +51,12 @@ public:
 
   DvDirModelNode *getParent() const { return m_parent; }
   std::wstring getName() const { return m_name; }
+  QString getDisplayName() const;
+  void setDisplayLocation(DisplayLocation location,
+                          const QString &detail = QString()) {
+    m_displayLocation = location;
+    m_displayDetail   = detail;
+  }
   virtual bool setName(std::wstring newName) { return false; }
 
   void setTemporaryName(const std::wstring &newName);

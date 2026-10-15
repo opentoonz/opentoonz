@@ -115,7 +115,8 @@ public:
 
 private:
   void updateModifiers();
-  
+  void commitStroke();
+
   enum MouseEventType { ME_DOWN, ME_DRAG, ME_UP, ME_MOVE };
   void handleMouseEvent(MouseEventType type, const TPointD &pos,
                         const TMouseEvent &e);
@@ -167,8 +168,11 @@ protected:
   bool m_firstTime;
 
   bool m_started;
+  TFrameId m_strokeFrameId;
+  TXshSimpleLevelP m_strokeLevel;
 
-  bool m_propertyUpdating = false;
+  bool m_propertyUpdating    = false;
+  bool m_skipStrokeUntilDown = false;
 };
 
 //------------------------------------------------------------

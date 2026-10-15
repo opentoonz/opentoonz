@@ -19162,4 +19162,39 @@ Mantener presionada la tecla F3 para ver sólo este fotograma en el visor</trans
         <translation> Fotograma</translation>
     </message>
 </context>
+<context>
+    <name>FileBrowserLocations</name>
+    <message>
+        <source>My Computer</source>
+        <translation>Mi PC</translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation>Red</translation>
+    </message>
+    <message>
+        <source>My Documents</source>
+        <translation>Mis documentos</translation>
+    </message>
+    <message>
+        <source>Desktop</source>
+        <translation>Escritorio</translation>
+    </message>
+    <message>
+        <source>Library</source>
+        <translation>Biblioteca</translation>
+    </message>
+    <message>
+        <source>History</source>
+        <translation>Historial</translation>
+    </message>
+    <message>
+        <source>Project root (%1)</source>
+        <translation>Raíz del proyecto (%1)</translation>
+    </message>
+    <message>
+        <source>Scene Folder</source>
+        <translation>Carpeta de la escena</translation>
+    </message>
+</context>
 </TS>

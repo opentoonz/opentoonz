@@ -19121,4 +19121,39 @@ Segure a tecla F3 no visualizador para mostrar apenas este quadro</translation>
         <translation>Quadro</translation>
     </message>
 </context>
+<context>
+    <name>FileBrowserLocations</name>
+    <message>
+        <source>My Computer</source>
+        <translation>Meu computador</translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation>Rede</translation>
+    </message>
+    <message>
+        <source>My Documents</source>
+        <translation>Meus documentos</translation>
+    </message>
+    <message>
+        <source>Desktop</source>
+        <translation>Área de trabalho</translation>
+    </message>
+    <message>
+        <source>Library</source>
+        <translation>Biblioteca</translation>
+    </message>
+    <message>
+        <source>History</source>
+        <translation>Histórico</translation>
+    </message>
+    <message>
+        <source>Project root (%1)</source>
+        <translation>Raiz do projeto (%1)</translation>
+    </message>
+    <message>
+        <source>Scene Folder</source>
+        <translation>Pasta da cena</translation>
+    </message>
+</context>
 </TS>

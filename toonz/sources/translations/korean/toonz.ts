@@ -18209,4 +18209,39 @@ Hold F3 Key on the Viewer to Show This Frame Only</source>
         <translation> 프레임</translation>
     </message>
 </context>
+<context>
+    <name>FileBrowserLocations</name>
+    <message>
+        <source>My Computer</source>
+        <translation>내 컴퓨터</translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation>네트워크</translation>
+    </message>
+    <message>
+        <source>My Documents</source>
+        <translation>내 문서</translation>
+    </message>
+    <message>
+        <source>Desktop</source>
+        <translation>바탕 화면</translation>
+    </message>
+    <message>
+        <source>Library</source>
+        <translation>라이브러리</translation>
+    </message>
+    <message>
+        <source>History</source>
+        <translation>기록</translation>
+    </message>
+    <message>
+        <source>Project root (%1)</source>
+        <translation>프로젝트 루트 (%1)</translation>
+    </message>
+    <message>
+        <source>Scene Folder</source>
+        <translation>장면 폴더</translation>
+    </message>
+</context>
 </TS>

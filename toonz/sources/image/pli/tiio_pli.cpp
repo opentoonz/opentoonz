@@ -320,6 +320,9 @@ void createStroke(ThickQuadraticChainTag *quadTag, TVectorImage *outVectImage,
 
 static void createGroup(GroupTag *groupTag, TVectorImage *vi,
                         CreateStrokeData &data) {
+  if (groupTag->m_type != GroupTag::STROKE)
+    throw TException("corrupted pli file: invalid stroke group type");
+
   int count = vi->getStrokeCount();
   for (int j = 0; j < groupTag->m_numObjects; j++) {
     if (groupTag->m_object[j]->m_type == PliTag::COLOR_NGOBJ)
@@ -329,11 +332,11 @@ static void createGroup(GroupTag *groupTag, TVectorImage *vi,
           ((StrokeOutlineOptionsTag *)groupTag->m_object[j])->m_options;
     else if (groupTag->m_object[j]->m_type == PliTag::GROUP_GOBJ)
       createGroup((GroupTag *)groupTag->m_object[j], vi, data);
-    else {
-      assert(groupTag->m_object[j]->m_type ==
-             PliTag::THICK_QUADRATIC_CHAIN_GOBJ);
+    else if (groupTag->m_object[j]->m_type ==
+             PliTag::THICK_QUADRATIC_CHAIN_GOBJ) {
       createStroke((ThickQuadraticChainTag *)groupTag->m_object[j], vi, data);
-    }
+    } else
+      throw TException("corrupted pli file: invalid stroke group child");
   }
 
   vi->group(count, vi->getStrokeCount() - count);
@@ -346,6 +349,7 @@ TImageP TImageReaderPli::doLoad() {
 
   // preparo l'immagine da restituire
   TVectorImage *outVectImage = new TVectorImage(true);
+  TImageP outImage(outVectImage);
   // fisso il colore di default a nero opaco
   // TPixel currentColor=TPixel::Black;
   // TStrokeStyle *currStyle = NULL;
@@ -435,7 +439,7 @@ TImageP TImageReaderPli::doLoad() {
 
   outVectImage->findRegions();
 
-  return TImageP(outVectImage);
+  return outImage;
 }
 
 //-----------------------------------------------------------------------------
@@ -676,6 +680,12 @@ TImageReaderP TLevelReaderPli::getFrameReader(TFrameId fid) {
 
 TPalette *readPalette(GroupTag *paletteTag, int majorVersion,
                       int minorVersion) {
+  if (paletteTag->m_type != GroupTag::PALETTE)
+    throw TException("corrupted pli file: invalid palette group type");
+  for (unsigned int i = 0; i < paletteTag->m_numObjects; i++)
+    if (!dynamic_cast<StyleTag *>(paletteTag->m_object[i]))
+      throw TException("corrupted pli file: invalid palette group child");
+
   bool newPli = (majorVersion > 5 || (majorVersion == 5 && minorVersion >= 6));
 
   // wstring pageName(L"colors");
