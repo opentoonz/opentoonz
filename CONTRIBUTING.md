@@ -51,14 +51,13 @@ to keep the issue tracker from becoming cluttered with unfulfilled feature reque
 
 ## Translations
 
-Translation source (`.ts`) files for OpenToonz GUI are located in `toonz/sources/translations`.
-If you create new `.ts` files for your language or update an existing one,
-please send us those modifications as pull-requests.
-[Qt Linguist](http://doc.qt.io/qt-5.6/linguist-translators.html) is useful for translating them.
+Translation sources (`.ts`) are in `toonz/sources/translations`. Contributors can
+edit them with Qt Linguist and submit a PR, or attach the updated files to an
+issue/discussion for a maintainer to integrate. A full application build is not
+required to contribute wording. Share editable sources; compiled `.qm` files are
+optional test artifacts unless a maintainer requests them.
 
-Please send us Qt message (`.qm`) files with `.ts` files if you can make the following modifications.
-
-OpenToonz uses `.qm` files generated from `.ts` files.
-You can generate `.qm` files by using [Qt Linguist](http://doc.qt.io/qt-5.6/linguist-translators.html).
-Please locate generated `.qm` files in `stuff/config/loc`.
-It enables the OpenToonz installer to install them into the `stuff` directory.
+See [Contributing and maintaining translations](toonz/sources/translations/README.md)
+for the two workflows: sharing translations, and reviewing/merging/updating them.
+The guide includes existing Qt Linguist, shell-script, and CMake/Visual Studio
+processes, validation, runtime paths, and packaging checks.

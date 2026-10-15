@@ -48,3 +48,7 @@
 
 ### Special Thanks
 This open-source program is developed from Toonz, a software originally created by Digital Video, S.p.A., Rome, Italy
+## 翻訳への貢献
+
+翻訳ファイルの提出、レビュー、マージ、更新については、
+[翻訳ガイド（英語）](../toonz/sources/translations/README.md)を参照してください。
