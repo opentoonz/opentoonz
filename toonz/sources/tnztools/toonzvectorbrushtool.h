@@ -223,6 +223,9 @@ protected:
   TEnumProperty m_joinStyle;
   TIntProperty m_miterJoinLimit;
   TBoolProperty m_assistants;
+  TBoolProperty m_autoClose;
+  TBoolProperty m_autoGroup;
+  TBoolProperty m_autoFill;
 
   TInputManager m_inputmanager;
   TSmartPointerT<TModifierLine> m_modifierLine;
