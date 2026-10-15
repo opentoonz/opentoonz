@@ -19073,4 +19073,39 @@ Podržte klávesu F3 v prohlížeči pro ukázání pouze tohoto snímku</transl
         <translation> Snímek</translation>
     </message>
 </context>
+<context>
+    <name>FileBrowserLocations</name>
+    <message>
+        <source>My Computer</source>
+        <translation>Tento počítač</translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation>Síť</translation>
+    </message>
+    <message>
+        <source>My Documents</source>
+        <translation>Dokumenty</translation>
+    </message>
+    <message>
+        <source>Desktop</source>
+        <translation>Plocha</translation>
+    </message>
+    <message>
+        <source>Library</source>
+        <translation>Knihovna</translation>
+    </message>
+    <message>
+        <source>History</source>
+        <translation>Historie</translation>
+    </message>
+    <message>
+        <source>Project root (%1)</source>
+        <translation>Kořen projektu (%1)</translation>
+    </message>
+    <message>
+        <source>Scene Folder</source>
+        <translation>Složka scény</translation>
+    </message>
+</context>
 </TS>
