@@ -95,3 +95,11 @@ $ open ./toonz/OpenToonz.app
 ```
 
 - Xcode でビルドしている場合、アプリケーションは　`.toonz/build/Debug/OpenToonz.app` にあります。
+
+## Translation workflow / 翻訳
+
+See [Contributing and maintaining translations](../toonz/sources/translations/README.md)
+for contributor and maintainer workflows. Keep the Xcode `WITH_TRANSLATION=OFF`
+workaround above until translation-enabled Xcode builds are verified. That option
+disables this build's translation generation; do not assume bundled catalogs were
+updated. Qt Linguist and manual `lrelease` remain available for catalog testing.

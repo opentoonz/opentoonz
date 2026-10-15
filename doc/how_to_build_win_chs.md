@@ -199,5 +199,19 @@ OpenToonz 使用 QuickTime SDK 提供的 MOV 及相关文件格式。由于 Quic
   - `$opentoonz/thirdparty/glut/3.7.6/lib/glut32.dll`
 
 ## 创建翻译文件
-Qt 翻译文件首先使用源码生成.ts文件, 然后使用这些.tx文件生成 .qm 文件。这些文件可以在Visual Studio中创建，只要 `translation_` 项目以及 `Build translation_??? only` (`translation_???`のみをビルド」) 被启用。
-这些文件不会在默认的 `Build Project Solution` 中生成。
+
+贡献者如何提交翻译，以及维护者如何审核、合并和更新翻译，请参阅
+[翻译指南（英文）](../toonz/sources/translations/README.md)。
+仍可使用 Qt Linguist 编辑 `.ts` 文件并手动运行 `lrelease`。
+
+启用 `WITH_TRANSLATION=ON` 后，在 Visual Studio 中显式构建
+`translate_update_*` 项目可以提取源码中的翻译字符串。例如，从仓库根目录运行：
+
+```sh
+cmake --build toonz/build --config Release --target translate_update_toonz
+```
+
+请使用实际配置的构建目录和配置名称。提取可能更新该模块所有已注册语言的
+`.ts` 文件，提交前应检查差异。当前应用程序目标在链接后生成 `.qm`，
+但只修改翻译可能不会触发重新链接。请手动生成受影响的目录文件，
+或确认输出确实已更新。测试路径和打包说明见上述指南。
