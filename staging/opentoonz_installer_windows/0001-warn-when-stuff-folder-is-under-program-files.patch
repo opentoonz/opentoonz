@@ -1,0 +1,45 @@
+From: OpenAnimationLibrary OT-Dev staging
+Subject: [PATCH] Warn when Stuff folder is under Program Files
+
+Target repository: opentoonz/opentoonz_installer_windows
+Target file: setup.iss
+
+--- a/setup.iss
++++ b/setup.iss
+@@
+ en.GeneralDirPageDescription=Select the folder where setup will install the OpenToonz Stuff folder containing various setting files
+ en.GeneralDirPageLabel=Install the OpenToonz Stuff folder to:
+ en.OverwriteStuffCheckBoxLabel=Overwrite all setting files in the Stuff folder except user's personal settings 
++en.StuffInProgramFilesWarning=The OpenToonz Stuff folder contains settings and other files that OpenToonz needs to modify while running.%n%nWindows normally restricts write access inside Program Files. Using this location may prevent OpenToonz from reliably saving settings, room layouts, palettes, projects, and other writable data.%n%nA writable location such as C:\OpenToonz stuff is recommended.%n%nContinue with this location anyway?
+@@
+ procedure InitializeWizard;
+ begin
+   GeneralDirPage := CreateInputDirPage(wpSelectDir,
+@@
+   OverwriteStuffCheckBox.Checked := True;
+ end;
++
++function IsPathUnderProgramFiles(Path: String): Boolean;
++var
++  NormalizedPath: String;
++  ProgramFilesPath: String;
++begin
++  NormalizedPath := AddBackslash(Uppercase(ExpandFileName(Path)));
++  ProgramFilesPath := AddBackslash(Uppercase(ExpandFileName(ExpandConstant('{pf}'))));
++  Result := Pos(ProgramFilesPath, NormalizedPath) = 1;
++end;
++
++function NextButtonClick(CurPageID: Integer): Boolean;
++begin
++  Result := True;
++
++  if CurPageID = GeneralDirPage.ID then
++  begin
++    if IsPathUnderProgramFiles(GeneralDirPage.Values[0]) then
++      Result := MsgBox(CustomMessage('StuffInProgramFilesWarning'),
++        mbConfirmation, MB_YESNO) = IDYES;
++  end;
++end;
+ 
+ function GetGeneralDir(Param: String): String;
+ begin
