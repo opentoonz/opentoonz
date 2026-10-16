@@ -9,14 +9,14 @@
 
 using namespace TSystem;
 
-#ifdef x64
+#if defined(x64) && (defined(_M_X64) || defined(__x86_64__))
 long TSystem::getCPUExtensions() {
   return TSystem::CpuSupportsSse |
          TSystem::CpuSupportsSse2;  // TSystem::CPUExtensionsNone
 }
 
 #else
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) || defined(x64)
 long TSystem::getCPUExtensions() { return TSystem::CPUExtensionsNone; }
 #else
 namespace {
