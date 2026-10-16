@@ -373,17 +373,32 @@ void getAboveStyleIdSet(int styleId, TPaletteP palette,
 }
 }  // namespace
 
-// Preserve natural closure and the drawn control points. Unlike the Tape
-// Tool's joinStrokeSmoothly(), forced closure must not move the endpoints.
-// A pair of quadratics follows their tangents and meets smoothly in the gap.
+// For adjacent quadratics, putting the shared endpoint halfway between
+// their handles makes both position and thickness derivatives continuous.
+// Only the join is adjusted; the neighboring handles and distant curve stay.
+static void smoothClosedStrokeJoin(TStroke *stroke, int index) {
+  const int last = stroke->getControlPointCount() - 1;
+  if (last < 4) return;
+  const TThickPoint before =
+      stroke->getControlPoint(index == 0 ? last - 1 : index - 1);
+  const TThickPoint after = stroke->getControlPoint(index + 1);
+  const TThickPoint joint = (before + after) * 0.5;
+  stroke->setControlPoint(index, joint);
+  if (index == 0) stroke->setControlPoint(last, joint);
+}
+
+// Connect first, then smooth the seam in position and thickness. This also
+// handles naturally closed strokes when Auto Close is explicitly enabled.
+// Input smoothing and the Accuracy fit have already processed these points.
 static void closeOpenStroke(TStroke *stroke) {
-  if (!stroke || stroke->isSelfLoop()) return;
+  if (!stroke) return;
   const int count = stroke->getControlPointCount();
   if (count < 3) return;
   const TThickPoint first = stroke->getControlPoint(0);
   const TThickPoint last  = stroke->getControlPoint(count - 1);
-  if (areAlmostEqual(TPointD(first), TPointD(last))) {
+  if (stroke->isSelfLoop() || areAlmostEqual(TPointD(first), TPointD(last))) {
     stroke->setSelfLoop(true);
+    smoothClosedStrokeJoin(stroke, 0);
     return;
   }
   const TPointD gap         = TPointD(first) - TPointD(last);
@@ -416,6 +431,8 @@ static void closeOpenStroke(TStroke *stroke) {
   closed.setStyle(stroke->getStyle());
   closed.outlineOptions() = stroke->outlineOptions();
   closed.setSelfLoop(true);
+  smoothClosedStrokeJoin(&closed, count - 1);
+  smoothClosedStrokeJoin(&closed, 0);
   *stroke = closed;
 }
 
