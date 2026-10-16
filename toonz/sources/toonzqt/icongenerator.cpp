@@ -171,10 +171,10 @@ void removeIcon(const std::string &iconName) {
 
 //-----------------------------------------------------------------------------
 
-std::string responsiveIconKey(const std::string &baseId,
-                              const TDimension &size) {
+std::string responsiveIconKey(const std::string &baseId, const TDimension &size,
+                              int renumberCount) {
   return baseId + "_r_" + std::to_string(size.lx) + "x" +
-         std::to_string(size.ly);
+         std::to_string(size.ly) + "_" + std::to_string(renumberCount);
 }
 
 std::string filmstripIconBaseId(TXshSimpleLevel *sl, const TFrameId &fid) {
@@ -1640,7 +1640,8 @@ QPixmap IconGenerator::getResponsiveIcon(TXshLevel *xl, const TFrameId &fid,
   if (!sl) return QPixmap();
 
   const std::string baseId = filmstripIconBaseId(sl, fid);
-  const std::string key    = responsiveIconKey(baseId, dim);
+  const std::string key =
+      responsiveIconKey(baseId, dim, sl->getRenumberCount());
   retainResponsiveIcon(baseId, key);
   return getSizedIcon(xl, fid, key.substr(baseId.size()), dim);
 }
