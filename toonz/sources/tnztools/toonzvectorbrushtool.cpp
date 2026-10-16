@@ -379,16 +379,32 @@ void getAboveStyleIdSet(int styleId, TPaletteP palette,
 // Input smoothing and the Accuracy fit have already processed these points.
 static void closeOpenStroke(TStroke *stroke) {
   if (!stroke) return;
-  const int count = stroke->getControlPointCount();
-  if (count < 3) return;
-  if (count >= 5) {
-    // Adjacent quadratics share the midpoint of their handles for continuous
-    // position and thickness derivatives. Only the common endpoint moves.
-    const TThickPoint joint =
-        (stroke->getControlPoint(1) + stroke->getControlPoint(count - 2)) * 0.5;
-    stroke->setControlPoint(0, joint);
-    stroke->setControlPoint(count - 1, joint);
+  if (stroke->getControlPointCount() < 3) return;
+  if (stroke->getLength() == 0.0) {
+    stroke->setSelfLoop(true);
+    return;
   }
+  // The editor exposes one anchor per pair of quadratic segments. Supply at
+  // least four anchors by exact subdivision, retaining the fitted shape.
+  while (stroke->getChunkCount() < 8) {
+    const int oldCount = stroke->getChunkCount();
+    int longest        = 0;
+    for (int i = 1; i < oldCount; ++i)
+      if (stroke->getChunk(i)->getLength() >
+          stroke->getChunk(longest)->getLength())
+        longest = i;
+    const double w0 = stroke->getParameterAtControlPoint(2 * longest);
+    const double w1 = stroke->getParameterAtControlPoint(2 * longest + 2);
+    stroke->insertControlPoints((w0 + w1) * 0.5);
+    if (stroke->getChunkCount() == oldCount) break;
+  }
+  const int count = stroke->getControlPointCount();
+  // Adjacent quadratics share the midpoint of their handles for continuous
+  // position and thickness derivatives. Only the common endpoint moves.
+  const TThickPoint joint =
+      (stroke->getControlPoint(1) + stroke->getControlPoint(count - 2)) * 0.5;
+  stroke->setControlPoint(0, joint);
+  stroke->setControlPoint(count - 1, joint);
   stroke->setSelfLoop(true);
 }
 
