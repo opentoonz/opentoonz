@@ -3850,4 +3850,119 @@ Jste si jistý?</translation>
         <translation>Odstranit %1</translation>
     </message>
 </context>
+<context>
+    <name>FontStyleNames</name>
+    <message>
+        <source>Regular</source>
+        <translation>Normální</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <translation>Normální</translation>
+    </message>
+    <message>
+        <source>Book</source>
+        <translation>Knižní</translation>
+    </message>
+    <message>
+        <source>Roman</source>
+        <translation>Antikva</translation>
+    </message>
+    <message>
+        <source>Thin</source>
+        <translation>Tenké</translation>
+    </message>
+    <message>
+        <source>Extra Light</source>
+        <translation>Extra lehké</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation>Lehké</translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation>Střední</translation>
+    </message>
+    <message>
+        <source>Semibold</source>
+        <translation>Polotučné</translation>
+    </message>
+    <message>
+        <source>Demi Bold</source>
+        <translation>Polotučné</translation>
+    </message>
+    <message>
+        <source>Bold</source>
+        <translation>Tučné</translation>
+    </message>
+    <message>
+        <source>Extra Bold</source>
+        <translation>Extra tučné</translation>
+    </message>
+    <message>
+        <source>Black</source>
+        <translation>Černé</translation>
+    </message>
+    <message>
+        <source>Heavy</source>
+        <translation>Silné</translation>
+    </message>
+    <message>
+        <source>Italic</source>
+        <translation>Kurzíva</translation>
+    </message>
+    <message>
+        <source>Oblique</source>
+        <translation>Nakloněné</translation>
+    </message>
+    <message>
+        <source>Bold Italic</source>
+        <translation>Tučná kurzíva</translation>
+    </message>
+    <message>
+        <source>Bold Oblique</source>
+        <translation>Tučné nakloněné</translation>
+    </message>
+    <message>
+        <source>Light Italic</source>
+        <translation>Lehká kurzíva</translation>
+    </message>
+    <message>
+        <source>Medium Italic</source>
+        <translation>Střední kurzíva</translation>
+    </message>
+    <message>
+        <source>Semibold Italic</source>
+        <translation>Polotučná kurzíva</translation>
+    </message>
+    <message>
+        <source>Extra Bold Italic</source>
+        <translation>Extra tučná kurzíva</translation>
+    </message>
+    <message>
+        <source>Black Italic</source>
+        <translation>Černá kurzíva</translation>
+    </message>
+    <message>
+        <source>Condensed</source>
+        <translation>Zúžené</translation>
+    </message>
+    <message>
+        <source>Condensed Bold</source>
+        <translation>Zúžené tučné</translation>
+    </message>
+    <message>
+        <source>Condensed Italic</source>
+        <translation>Zúžená kurzíva</translation>
+    </message>
+    <message>
+        <source>Condensed Bold Italic</source>
+        <translation>Zúžená tučná kurzíva</translation>
+    </message>
+    <message>
+        <source>Expanded</source>
+        <translation>Rozšířené</translation>
+    </message>
+</context>
 </TS>

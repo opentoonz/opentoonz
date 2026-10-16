@@ -3447,4 +3447,119 @@ Apply</source>
         <translation>%1 を削除</translation>
     </message>
 </context>
+<context>
+    <name>FontStyleNames</name>
+    <message>
+        <source>Regular</source>
+        <translation>標準</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <translation>標準</translation>
+    </message>
+    <message>
+        <source>Book</source>
+        <translation>ブック</translation>
+    </message>
+    <message>
+        <source>Roman</source>
+        <translation>ローマン</translation>
+    </message>
+    <message>
+        <source>Thin</source>
+        <translation>細字</translation>
+    </message>
+    <message>
+        <source>Extra Light</source>
+        <translation>極細字</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation>細め</translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation>中太</translation>
+    </message>
+    <message>
+        <source>Semibold</source>
+        <translation>半太字</translation>
+    </message>
+    <message>
+        <source>Demi Bold</source>
+        <translation>半太字</translation>
+    </message>
+    <message>
+        <source>Bold</source>
+        <translation>太字</translation>
+    </message>
+    <message>
+        <source>Extra Bold</source>
+        <translation>極太字</translation>
+    </message>
+    <message>
+        <source>Black</source>
+        <translation>ブラック</translation>
+    </message>
+    <message>
+        <source>Heavy</source>
+        <translation>ヘビー</translation>
+    </message>
+    <message>
+        <source>Italic</source>
+        <translation>斜体</translation>
+    </message>
+    <message>
+        <source>Oblique</source>
+        <translation>斜体（オブリーク）</translation>
+    </message>
+    <message>
+        <source>Bold Italic</source>
+        <translation>太字斜体</translation>
+    </message>
+    <message>
+        <source>Bold Oblique</source>
+        <translation>太字斜体（オブリーク）</translation>
+    </message>
+    <message>
+        <source>Light Italic</source>
+        <translation>細め斜体</translation>
+    </message>
+    <message>
+        <source>Medium Italic</source>
+        <translation>中太斜体</translation>
+    </message>
+    <message>
+        <source>Semibold Italic</source>
+        <translation>半太字斜体</translation>
+    </message>
+    <message>
+        <source>Extra Bold Italic</source>
+        <translation>極太字斜体</translation>
+    </message>
+    <message>
+        <source>Black Italic</source>
+        <translation>ブラック斜体</translation>
+    </message>
+    <message>
+        <source>Condensed</source>
+        <translation>コンデンス</translation>
+    </message>
+    <message>
+        <source>Condensed Bold</source>
+        <translation>コンデンス太字</translation>
+    </message>
+    <message>
+        <source>Condensed Italic</source>
+        <translation>コンデンス斜体</translation>
+    </message>
+    <message>
+        <source>Condensed Bold Italic</source>
+        <translation>コンデンス太字斜体</translation>
+    </message>
+    <message>
+        <source>Expanded</source>
+        <translation>拡張</translation>
+    </message>
+</context>
 </TS>

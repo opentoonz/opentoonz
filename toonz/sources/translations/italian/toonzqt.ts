@@ -3287,4 +3287,119 @@ Are you sure ?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
+<context>
+    <name>FontStyleNames</name>
+    <message>
+        <source>Regular</source>
+        <translation>Normale</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <translation>Normale</translation>
+    </message>
+    <message>
+        <source>Book</source>
+        <translation>Libro</translation>
+    </message>
+    <message>
+        <source>Roman</source>
+        <translation>Tondo</translation>
+    </message>
+    <message>
+        <source>Thin</source>
+        <translation>Sottile</translation>
+    </message>
+    <message>
+        <source>Extra Light</source>
+        <translation>Extra leggero</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation>Leggero</translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation>Medio</translation>
+    </message>
+    <message>
+        <source>Semibold</source>
+        <translation>Semigrassetto</translation>
+    </message>
+    <message>
+        <source>Demi Bold</source>
+        <translation>Semigrassetto</translation>
+    </message>
+    <message>
+        <source>Bold</source>
+        <translation>Grassetto</translation>
+    </message>
+    <message>
+        <source>Extra Bold</source>
+        <translation>Extra grassetto</translation>
+    </message>
+    <message>
+        <source>Black</source>
+        <translation>Nero</translation>
+    </message>
+    <message>
+        <source>Heavy</source>
+        <translation>Pesante</translation>
+    </message>
+    <message>
+        <source>Italic</source>
+        <translation>Corsivo</translation>
+    </message>
+    <message>
+        <source>Oblique</source>
+        <translation>Obliquo</translation>
+    </message>
+    <message>
+        <source>Bold Italic</source>
+        <translation>Grassetto corsivo</translation>
+    </message>
+    <message>
+        <source>Bold Oblique</source>
+        <translation>Grassetto obliquo</translation>
+    </message>
+    <message>
+        <source>Light Italic</source>
+        <translation>Leggero corsivo</translation>
+    </message>
+    <message>
+        <source>Medium Italic</source>
+        <translation>Medio corsivo</translation>
+    </message>
+    <message>
+        <source>Semibold Italic</source>
+        <translation>Semigrassetto corsivo</translation>
+    </message>
+    <message>
+        <source>Extra Bold Italic</source>
+        <translation>Extra grassetto corsivo</translation>
+    </message>
+    <message>
+        <source>Black Italic</source>
+        <translation>Nero corsivo</translation>
+    </message>
+    <message>
+        <source>Condensed</source>
+        <translation>Condensato</translation>
+    </message>
+    <message>
+        <source>Condensed Bold</source>
+        <translation>Condensato grassetto</translation>
+    </message>
+    <message>
+        <source>Condensed Italic</source>
+        <translation>Condensato corsivo</translation>
+    </message>
+    <message>
+        <source>Condensed Bold Italic</source>
+        <translation>Condensato grassetto corsivo</translation>
+    </message>
+    <message>
+        <source>Expanded</source>
+        <translation>Espanso</translation>
+    </message>
+</context>
 </TS>

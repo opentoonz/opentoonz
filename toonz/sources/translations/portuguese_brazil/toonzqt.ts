@@ -3457,4 +3457,119 @@ Aplicar</translation>
         <translation>Remover % 1</translation>
     </message>
 </context>
+<context>
+    <name>FontStyleNames</name>
+    <message>
+        <source>Regular</source>
+        <translation>Normal</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <translation>Normal</translation>
+    </message>
+    <message>
+        <source>Book</source>
+        <translation>Livro</translation>
+    </message>
+    <message>
+        <source>Roman</source>
+        <translation>Romano</translation>
+    </message>
+    <message>
+        <source>Thin</source>
+        <translation>Fino</translation>
+    </message>
+    <message>
+        <source>Extra Light</source>
+        <translation>Extraleve</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation>Leve</translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation>Médio</translation>
+    </message>
+    <message>
+        <source>Semibold</source>
+        <translation>Seminegrito</translation>
+    </message>
+    <message>
+        <source>Demi Bold</source>
+        <translation>Seminegrito</translation>
+    </message>
+    <message>
+        <source>Bold</source>
+        <translation>Negrito</translation>
+    </message>
+    <message>
+        <source>Extra Bold</source>
+        <translation>Extranegrito</translation>
+    </message>
+    <message>
+        <source>Black</source>
+        <translation>Preto</translation>
+    </message>
+    <message>
+        <source>Heavy</source>
+        <translation>Pesado</translation>
+    </message>
+    <message>
+        <source>Italic</source>
+        <translation>Itálico</translation>
+    </message>
+    <message>
+        <source>Oblique</source>
+        <translation>Oblíquo</translation>
+    </message>
+    <message>
+        <source>Bold Italic</source>
+        <translation>Negrito itálico</translation>
+    </message>
+    <message>
+        <source>Bold Oblique</source>
+        <translation>Negrito oblíquo</translation>
+    </message>
+    <message>
+        <source>Light Italic</source>
+        <translation>Leve itálico</translation>
+    </message>
+    <message>
+        <source>Medium Italic</source>
+        <translation>Médio itálico</translation>
+    </message>
+    <message>
+        <source>Semibold Italic</source>
+        <translation>Seminegrito itálico</translation>
+    </message>
+    <message>
+        <source>Extra Bold Italic</source>
+        <translation>Extranegrito itálico</translation>
+    </message>
+    <message>
+        <source>Black Italic</source>
+        <translation>Preto itálico</translation>
+    </message>
+    <message>
+        <source>Condensed</source>
+        <translation>Condensado</translation>
+    </message>
+    <message>
+        <source>Condensed Bold</source>
+        <translation>Condensado negrito</translation>
+    </message>
+    <message>
+        <source>Condensed Italic</source>
+        <translation>Condensado itálico</translation>
+    </message>
+    <message>
+        <source>Condensed Bold Italic</source>
+        <translation>Condensado negrito itálico</translation>
+    </message>
+    <message>
+        <source>Expanded</source>
+        <translation>Expandido</translation>
+    </message>
+</context>
 </TS>
