@@ -20,6 +20,9 @@ public:
   OpenFloatingPanel(CommandId id, const std::string &panelType, QString title);
   void execute() override;
 
+  static bool closeVisiblePanelsOfType(const std::string &panelType);
+  static TPanel *openFloatingPanelAfterShortcutToggle(
+      const std::string &panelType);
   static TPanel *getOrOpenFloatingPanel(const std::string &panelType);
 };
 

@@ -9,6 +9,7 @@
 #include "tcommon.h"
 
 #include <QAction>
+#include <QKeySequence>
 #include <QMenu>
 
 #undef DVAPI
@@ -134,6 +135,8 @@ class DVAPI CommandManager {  // singleton
   std::map<std::string, Node *> m_idTable;
   std::map<QAction *, Node *> m_qactionTable;
   std::map<std::string, Node *> m_shortcutTable;
+  bool m_executeTriggeredByShortcut;
+  QAction *m_pendingShortcutAction;
 
   CommandManager();
 
@@ -175,6 +178,10 @@ public:
    * otherwise recall execute(menuAction).*/
   void execute(QAction *action, QAction *menuAction);
   void execute(CommandId id);
+  bool executeTriggeredByShortcut() const {
+    return m_executeTriggeredByShortcut;
+  }
+  void setPendingShortcutAction(QAction *action);
   void enable(CommandId id, bool enabled);
 
   // if id is a toggle (e.g. a checkable menu item) then set its status;
@@ -271,6 +278,9 @@ class DVAPI DVAction final : public QAction {
 public:
   DVAction(const QString &text, QObject *parent);
   DVAction(const QIcon &icon, const QString &text, QObject *parent);
+
+protected:
+  bool event(QEvent *event) override;
 
 public slots:
   void onTriggered();

@@ -214,9 +214,7 @@ public:
   }
 
   QPixmap getFloatBorderPixmap() const { return m_floatBorderPm; }
-  void setFloatBorderPixmap(const QPixmap &pixmap) {
-    m_floatBorderPm = pixmap;
-  }
+  void setFloatBorderPixmap(const QPixmap &pixmap) { m_floatBorderPm = pixmap; }
 
   QPixmap getFloatActiveBorderPixmap() const { return m_floatActiveBorderPm; }
   void setFloatActiveBorderPixmap(const QPixmap &pixmap) {
@@ -304,7 +302,14 @@ public:
   void setRoomBindButton(TPanelTitleBarButton *button) noexcept {
     m_roomBindButton = button;
   }
-  
+
+  bool ignoresPanelShortcutToggle() const noexcept {
+    return m_ignorePanelShortcutToggle;
+  }
+  void setIgnorePanelShortcutToggle(bool ignore);
+
+  void dismissFloatingPanel();
+
   // Add room binding toggle button to the title bar
   // This enables the "Bind to Room" feature for any panel
   void addRoomBindButton();
@@ -324,7 +329,8 @@ protected:
   void enterEvent(QEvent *) override;
   void leaveEvent(QEvent *) override;
 
-  // BTR grip visibility follows floating/docked state (dock + workspace restore).
+  // BTR grip visibility follows floating/docked state (dock + workspace
+  // restore).
   void setFloatingAppearance() override;
   void setDockedAppearance() override;
 
@@ -359,6 +365,7 @@ private:
   bool m_isRoomBound;
   QString m_boundRoomName;
   TPanelTitleBarButton *m_roomBindButton;
+  bool m_ignorePanelShortcutToggle;
 };
 
 //-----------------------------------------------------------------------------

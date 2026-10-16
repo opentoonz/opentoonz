@@ -465,6 +465,8 @@ void Preferences::definePreferenceItems() {
          true);
   define(restoreViewerViewFromLastSession, "restoreViewerViewFromLastSession",
          QMetaType::Bool, false);
+  define(togglePanelWithShortcut, "togglePanelWithShortcut", QMetaType::Bool,
+         false);
   define(RestoreStyleEditorTab, "RestoreStyleEditorTab", QMetaType::Bool, true);
 
   // Visualization
