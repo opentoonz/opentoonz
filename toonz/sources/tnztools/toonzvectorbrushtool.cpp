@@ -1024,6 +1024,7 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
     // begin painting //////////////////////////
     
     m_styleId = 0;
+    m_bypassAutoClose = m_inputmanager.state.isKeyPressed(TKey::shift);
     m_tracks.clear();
     
     TTool::Application *app = TTool::getApplication();
@@ -1152,9 +1153,9 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
                                         // hanno 1 solo chunk.
       stroke->insertControlPoints(0.5);
 
-    if ((!m_frameRange.getIndex() || m_autoClose.getValue()) && track.getLoop())
+    if ((!m_frameRange.getIndex() || autoCloseEnabled()) && track.getLoop())
       stroke->setSelfLoop(true);
-    if (m_autoClose.getValue()) closeOpenStroke(stroke);
+    if (autoCloseEnabled()) closeOpenStroke(stroke);
 
     strokes.push_back(stroke);
   }
@@ -1197,7 +1198,8 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
           doFrameRangeStrokes(m_firstFrameId, m_firstStrokes[i], getFrameId(),
                               strokes[i], m_frameRange.getIndex(),
                               m_breakAngles.getValue(), m_autoGroup.getValue(),
-                              m_autoFill.getValue(), m_firstFrameRange);
+                              m_autoFill.getValue() && !m_bypassAutoClose,
+                              m_firstFrameRange);
         TUndoManager::manager()->endBlock();
       }
       
@@ -1235,17 +1237,17 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
       TStroke *stroke = *i;
       addStrokeToImage(app, vi, stroke, (DrawOrder)m_drawOrder.getIndex(),
                        m_breakAngles.getValue(), m_autoGroup.getValue(),
-                       m_autoFill.getValue(), m_isFrameCreated,
-                       m_isLevelCreated);
+                       m_autoFill.getValue() && !m_bypassAutoClose,
+                       m_isFrameCreated, m_isLevelCreated);
 
       if ((Preferences::instance()->getGuidedDrawingType() == 1 ||
           Preferences::instance()->getGuidedDrawingType() == 2) &&
           Preferences::instance()->getGuidedAutoInbetween())
       {
         TFrameId fId = getFrameId();
-        doGuidedAutoInbetween(fId, vi, stroke, m_breakAngles.getValue(),
-                              m_autoGroup.getValue(), m_autoFill.getValue(),
-                              false);
+        doGuidedAutoInbetween(
+            fId, vi, stroke, m_breakAngles.getValue(), m_autoGroup.getValue(),
+            m_autoFill.getValue() && !m_bypassAutoClose, false);
         if (app->getCurrentFrame()->isEditingScene())
           app->getCurrentFrame()->setFrame( app->getCurrentFrame()->getFrameIndex() );
         else
@@ -1262,6 +1264,7 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
 
 void ToonzVectorBrushTool::inputPaintTracks(const TTrackList &tracks) {
   if (tracks.empty()) return;
+  if (m_inputmanager.state.isKeyPressed(TKey::shift)) m_bypassAutoClose = true;
 
   TRectD invalidateRect;
 
@@ -1367,7 +1370,11 @@ void ToonzVectorBrushTool::handleMouseEvent(MouseEventType type,
   bool shift    = e.getModifiersMask() & TMouseEvent::SHIFT_KEY;
   bool control  = e.getModifiersMask() & TMouseEvent::CTRL_KEY;
 
-  if (shift && type == ME_DOWN && e.button() == Qt::LeftButton && !m_active) {
+  // Latch the override for the whole stroke, including Shift at pen-up.
+  if (m_active && shift) m_bypassAutoClose = true;
+
+  if (shift && !m_autoClose.getValue() && type == ME_DOWN &&
+      e.button() == Qt::LeftButton && !m_active) {
     m_modifierAssistants->magnetism = 0;
     m_inputmanager.clearModifiers();
     m_inputmanager.addModifier(TInputModifierP(m_modifierLine.getPointer()));
@@ -1441,8 +1448,8 @@ void ToonzVectorBrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 //--------------------------------------------------------------------------------------------------
 
 bool ToonzVectorBrushTool::keyDown(QKeyEvent *event) {
-  if (event->key() == Qt::Key_Escape)
-    resetFrameRange();
+  if (m_active && event->key() == Qt::Key_Shift) m_bypassAutoClose = true;
+  if (event->key() == Qt::Key_Escape) resetFrameRange();
   return false;
 }
 
@@ -1470,7 +1477,7 @@ bool ToonzVectorBrushTool::doFrameRangeStrokes(
     *last  = *lastStroke;
   }
 
-  if (m_autoClose.getValue()) {
+  if (autoCloseEnabled()) {
     closeOpenStroke(first);
     closeOpenStroke(last);
   }
@@ -1539,7 +1546,7 @@ bool ToonzVectorBrushTool::doFrameRangeStrokes(
       assert(lastImage->getStrokeCount() == 1);
       TVectorImageP vi = TInbetween(firstImage, lastImage).tween(s);
       assert(vi->getStrokeCount() == 1);
-      if (m_autoClose.getValue()) closeOpenStroke(vi->getStroke(0));
+      if (autoCloseEnabled()) closeOpenStroke(vi->getStroke(0));
       addStrokeToImage(getApplication(), img, vi->getStroke(0),
                        (DrawOrder)m_drawOrder.getIndex(), breakAngles,
                        autoGroup, autoFill, m_isFrameCreated, m_isLevelCreated,
