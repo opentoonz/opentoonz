@@ -373,67 +373,23 @@ void getAboveStyleIdSet(int styleId, TPaletteP palette,
 }
 }  // namespace
 
-// For adjacent quadratics, putting the shared endpoint halfway between
-// their handles makes both position and thickness derivatives continuous.
-// Only the join is adjusted; the neighboring handles and distant curve stay.
-static void smoothClosedStrokeJoin(TStroke *stroke, int index) {
-  const int last = stroke->getControlPointCount() - 1;
-  if (last < 4) return;
-  const TThickPoint before =
-      stroke->getControlPoint(index == 0 ? last - 1 : index - 1);
-  const TThickPoint after = stroke->getControlPoint(index + 1);
-  const TThickPoint joint = (before + after) * 0.5;
-  stroke->setControlPoint(index, joint);
-  if (index == 0) stroke->setControlPoint(last, joint);
-}
-
-// Connect first, then smooth the seam in position and thickness. This also
-// handles naturally closed strokes when Auto Close is explicitly enabled.
+// Close with one logical seam, not an extra connector with two attachments.
+// OT stores the seam twice internally; its Control Point Editor presents and
+// edits those coincident endpoints as one point when the stroke is a self-loop.
 // Input smoothing and the Accuracy fit have already processed these points.
 static void closeOpenStroke(TStroke *stroke) {
   if (!stroke) return;
   const int count = stroke->getControlPointCount();
   if (count < 3) return;
-  const TThickPoint first = stroke->getControlPoint(0);
-  const TThickPoint last  = stroke->getControlPoint(count - 1);
-  if (stroke->isSelfLoop() || areAlmostEqual(TPointD(first), TPointD(last))) {
-    stroke->setSelfLoop(true);
-    smoothClosedStrokeJoin(stroke, 0);
-    return;
+  if (count >= 5) {
+    // Adjacent quadratics share the midpoint of their handles for continuous
+    // position and thickness derivatives. Only the common endpoint moves.
+    const TThickPoint joint =
+        (stroke->getControlPoint(1) + stroke->getControlPoint(count - 2)) * 0.5;
+    stroke->setControlPoint(0, joint);
+    stroke->setControlPoint(count - 1, joint);
   }
-  const TPointD gap         = TPointD(first) - TPointD(last);
-  const double handleLength = norm(gap) / 3.0;
-  // Repeated endpoint control points have zero derivative. Use the nearest
-  // distinct control point for the limiting tangent in that case.
-  TPointD outgoing, incoming;
-  for (int i = count - 2; i >= 0 && norm2(outgoing) == 0.0; --i)
-    outgoing = TPointD(last) - TPointD(stroke->getControlPoint(i));
-  for (int i = 1; i < count && norm2(incoming) == 0.0; ++i)
-    incoming = TPointD(stroke->getControlPoint(i)) - TPointD(first);
-  if (norm2(outgoing) == 0.0) outgoing = gap;
-  if (norm2(incoming) == 0.0) incoming = gap;
-
-  // Bound the handles by the gap, independent of the length of the drawing.
-  // Their midpoint gives the two quadratics a common tangent at their join.
-  const TThickPoint control1(TPointD(last) + normalize(outgoing) * handleLength,
-                             (2.0 * last.thick + first.thick) / 3.0);
-  const TThickPoint control2(
-      TPointD(first) - normalize(incoming) * handleLength,
-      (last.thick + 2.0 * first.thick) / 3.0);
-  std::vector<TThickPoint> points;
-  points.reserve(count + 4);
-  for (int i = 0; i < count; ++i) points.push_back(stroke->getControlPoint(i));
-  points.push_back(control1);
-  points.push_back((control1 + control2) * 0.5);
-  points.push_back(control2);
-  points.push_back(first);
-  TStroke closed(points);
-  closed.setStyle(stroke->getStyle());
-  closed.outlineOptions() = stroke->outlineOptions();
-  closed.setSelfLoop(true);
-  smoothClosedStrokeJoin(&closed, count - 1);
-  smoothClosedStrokeJoin(&closed, 0);
-  *stroke = closed;
+  stroke->setSelfLoop(true);
 }
 
 // TVectorImage::clone() does not copy the currently entered group.
