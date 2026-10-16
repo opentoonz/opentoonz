@@ -441,9 +441,16 @@ struct DVAPI TStroke::OutlineOptions {
   double m_miterLower;
   double m_miterUpper;
 
+  // Pattern stroke styles use these values to select the first frame and
+  // direction of their source level.  Keeping them on the stroke makes a
+  // pattern's appearance independent from the order in which strokes render.
+  int m_patternFrameOffset;
+  int m_patternFrameStep;
+
 public:
   OutlineOptions();
-  OutlineOptions(UCHAR capStyle, UCHAR JoinStyle, double lower, double upper);
+  OutlineOptions(UCHAR capStyle, UCHAR JoinStyle, double lower, double upper,
+                 int patternFrameOffset = 0, int patternFrameStep = 1);
 };
 
 //***************************************************************************

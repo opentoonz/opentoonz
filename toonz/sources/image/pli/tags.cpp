@@ -6,6 +6,9 @@
 
 #include "pli_io.h"
 
+#include <cmath>
+#include <limits>
+
 typedef TVectorImage::IntersectionBranch IntersectionBranch;
 
 /*=====================================================================*/
@@ -310,7 +313,18 @@ StrokeOutlineOptionsTag::StrokeOutlineOptionsTag()
 
 StrokeOutlineOptionsTag::StrokeOutlineOptionsTag(
     const TStroke::OutlineOptions &options)
-    : PliObjectTag(OUTLINE_OPTIONS_GOBJ), m_options(options) {}
+    : PliObjectTag(OUTLINE_OPTIONS_GOBJ), m_options(options) {
+  const double maxMiter = std::numeric_limits<TINT32>::max() / 1000.0;
+  if (!std::isfinite(options.m_miterLower) ||
+      !std::isfinite(options.m_miterUpper) ||
+      std::abs(options.m_miterLower) > maxMiter ||
+      std::abs(options.m_miterUpper) > maxMiter ||
+      options.m_patternFrameOffset == std::numeric_limits<TINT32>::min() ||
+      options.m_patternFrameStep == std::numeric_limits<TINT32>::min())
+    throw TException(
+        "Cannot save PLI outline options: value exceeds the signed-magnitude "
+        "format");
+}
 
 /*=====================================================================*/
 

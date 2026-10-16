@@ -1978,9 +1978,21 @@ BrushToolOptionsBox::BrushToolOptionsBox(QWidget *parent, TTool *tool,
         dynamic_cast<ToolOptionIntSlider *>(m_controls.value("Miter:"));
     m_miterField->setEnabled(m_joinStyleCombo->currentIndex() ==
                              TStroke::OutlineOptions::MITER_JOIN);
+    if (pltHandle) {
+      connect(pltHandle, &TPaletteHandle::paletteSwitched, this,
+              &BrushToolOptionsBox::updateStatus);
+      connect(pltHandle, &TPaletteHandle::colorStyleSwitched, this,
+              &BrushToolOptionsBox::updateStatus);
+      connect(pltHandle, &TPaletteHandle::colorStyleChanged, this,
+              &BrushToolOptionsBox::updateStatus);
+    }
+    if (auto *range =
+            dynamic_cast<ToolOptionCombo *>(m_controls.value("Range:")))
+      connect(range, QOverload<int>::of(&QComboBox::activated), this,
+              &BrushToolOptionsBox::updateStatus);
   }
   hLayout()->addStretch(1);
-  filterControls();
+  updateStatus();
 }
 
 //-----------------------------------------------------------------------------
@@ -2046,6 +2058,16 @@ void BrushToolOptionsBox::updateStatus() {
                              TStroke::OutlineOptions::MITER_JOIN);
   if (m_snapCheckbox)
     m_snapSensitivityCombo->setHidden(!m_snapCheckbox->isChecked());
+  if (auto *cycle =
+          dynamic_cast<ToolOptionCombo *>(m_controls.value("Trail Cycle:"))) {
+    auto *brush          = dynamic_cast<ToonzVectorBrushTool *>(m_tool);
+    const bool available = brush && brush->isTrailCycleAvailable();
+    cycle->setEnabled(available);
+    cycle->setToolTip(
+        tr("Available for multi-frame Trail styles when Frame Range is off."));
+    if (QLabel *label = m_labels.value("Trail Cycle:"))
+      label->setEnabled(available);
+  }
 }
 
 //-----------------------------------------------------------------------------
