@@ -68,3 +68,9 @@ Can't develop but still want to help? Help us test individual Pull Requests befo
 ### Special Thanks
 
 This open-source program is developed from Toonz, a software originally created by Digital Video, S.p.A., Rome, Italy
+
+## Contributing translations
+
+To share updated translation files or review, merge, and refresh catalogs, see
+[Contributing and maintaining translations](toonz/sources/translations/README.md).
+Qt Linguist editing and existing manual translation tools remain supported.
