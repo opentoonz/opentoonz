@@ -373,8 +373,9 @@ void getAboveStyleIdSet(int styleId, TPaletteP palette,
 }
 }  // namespace
 
-// Keep naturally closed strokes intact. Forced closure appends a straight
-// quadratic instead of pulling both endpoints to their midpoint.
+// Preserve natural closure and the drawn control points. Unlike the Tape
+// Tool's joinStrokeSmoothly(), forced closure must not move the endpoints.
+// A pair of quadratics follows their tangents and meets smoothly in the gap.
 static void closeOpenStroke(TStroke *stroke) {
   if (!stroke || stroke->isSelfLoop()) return;
   const int count = stroke->getControlPointCount();
@@ -385,9 +386,31 @@ static void closeOpenStroke(TStroke *stroke) {
     stroke->setSelfLoop(true);
     return;
   }
+  const TPointD gap         = TPointD(first) - TPointD(last);
+  const double handleLength = norm(gap) / 3.0;
+  // Repeated endpoint control points have zero derivative. Use the nearest
+  // distinct control point for the limiting tangent in that case.
+  TPointD outgoing, incoming;
+  for (int i = count - 2; i >= 0 && norm2(outgoing) == 0.0; --i)
+    outgoing = TPointD(last) - TPointD(stroke->getControlPoint(i));
+  for (int i = 1; i < count && norm2(incoming) == 0.0; ++i)
+    incoming = TPointD(stroke->getControlPoint(i)) - TPointD(first);
+  if (norm2(outgoing) == 0.0) outgoing = gap;
+  if (norm2(incoming) == 0.0) incoming = gap;
+
+  // Bound the handles by the gap, independent of the length of the drawing.
+  // Their midpoint gives the two quadratics a common tangent at their join.
+  const TThickPoint control1(TPointD(last) + normalize(outgoing) * handleLength,
+                             (2.0 * last.thick + first.thick) / 3.0);
+  const TThickPoint control2(
+      TPointD(first) - normalize(incoming) * handleLength,
+      (last.thick + 2.0 * first.thick) / 3.0);
   std::vector<TThickPoint> points;
+  points.reserve(count + 4);
   for (int i = 0; i < count; ++i) points.push_back(stroke->getControlPoint(i));
-  points.push_back((last + first) * 0.5);
+  points.push_back(control1);
+  points.push_back((control1 + control2) * 0.5);
+  points.push_back(control2);
   points.push_back(first);
   TStroke closed(points);
   closed.setStyle(stroke->getStyle());
