@@ -330,6 +330,7 @@ QString ToolPropertiesPanel::detectCurrentToolType() {
   }
   if (toolId == T_Fill) return "fill";
   if (toolId == T_Eraser) return "eraser";
+  if (toolId == T_HideLine) return "hide_line";
   if (toolId == T_Geometric) return "geometric";
   if (toolId == T_Selection) return "selection";
   if (toolId == T_Edit) return "edit";

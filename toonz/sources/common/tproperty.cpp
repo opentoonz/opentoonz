@@ -302,6 +302,9 @@ void TEnumProperty::assignUIName(TProperty *refP) {
   Items refItems = enumRefP->getItems();
   for (int i = 0; i < m_range.size(); i++) {
     int refIndex = enumRefP->indexOf(m_range[i]);
-    if (0 <= refIndex) m_items[i].UIName = refItems[refIndex].UIName;
+    if (0 <= refIndex) {
+      m_items[i].UIName  = refItems[refIndex].UIName;
+      m_items[i].tooltip = refItems[refIndex].tooltip;
+    }
   }
 }
