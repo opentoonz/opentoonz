@@ -278,8 +278,9 @@ TPanel* CustomPanelManager::createCustomPanel(const QString panelName,
   panel->setWindowTitle(QFileInfo(customPanelsFp.getQString()).completeBaseName());
   panel->setWidget(customWidget);
 
-  // Enable room binding feature (handled by TPanel base class)
   panel->addRoomBindButton();
+  panel->watchContextMenu(customWidget);
+  panel->loadCompactFloating();
 
   return panel;
 }

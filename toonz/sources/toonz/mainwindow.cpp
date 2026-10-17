@@ -310,6 +310,7 @@ void Room::save() {
     // Room binding state persistence (custom panel feature)
     settings.setValue("roomBound", pane->isRoomBound());
     settings.setValue("boundRoomName", pane->getBoundRoomName());
+    pane->saveCompactState(settings);
     if (SaveLoadQSettings *persistent =
             dynamic_cast<SaveLoadQSettings *>(pane->widget()))
       persistent->save(settings);
@@ -394,6 +395,7 @@ void Room::load(const TFilePath &fp, RoomLoadParams &params) {
     // Restore room binding state (custom panel feature)
     pane->setRoomBound(m_settings->value("roomBound", false).toBool());
     pane->setBoundRoomName(m_settings->value("boundRoomName", "").toString());
+    pane->loadCompactState(*m_settings);
 
     // Add panel to room
     addDockWidget(pane);

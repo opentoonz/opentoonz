@@ -322,6 +322,14 @@ QPoint DockWidget::settledDragGripOffset() {
 
 //-------------------------------------
 
+QPoint DockWidget::undockedPos(const QPoint &globalPos,
+                               const QPoint &grabOffset) {
+  const QPoint gripOffset = settledDragGripOffset();
+  return globalPos - undockGrabOffset(grabOffset) - gripOffset;
+}
+
+//-------------------------------------
+
 void DockWidget::mouseMoveEvent(QMouseEvent *me) {
   QPoint correctedGlobalPos(me->globalPos());
   getClosestAvailableMousePosition(correctedGlobalPos);
@@ -371,8 +379,8 @@ void DockWidget::mouseMoveEvent(QMouseEvent *me) {
         // NOTE: mouse *must* be grabbed only when visible - see Qt manual.
         grabMouse();
 
-        m_dragInitialPos = correctedGlobalPos - m_dragGripPressOffset -
-                           settledDragGripOffset();
+        m_dragInitialPos =
+            undockedPos(correctedGlobalPos, m_dragGripPressOffset);
         m_dragMouseInitialPos = correctedGlobalPos;
         move(m_dragInitialPos);
 
