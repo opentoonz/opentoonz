@@ -31,7 +31,16 @@
 #include "toonz/txshzeraryfxcolumn.h"
 #include "toonz/txshlevelcolumn.h"
 #include "toonz/txshchildlevel.h"
+#include "toonz/txshsimplelevel.h"
+#include "toonz/txshpalettelevel.h"
+#include "toonz/txshsoundlevel.h"
+#include "toonz/txshlevel.h"
 #include "toonz/txshcell.h"
+#include "toonz/txshleveltypes.h"
+#include "toonz/levelset.h"
+#include "toonz/hook.h"
+#include "toonz/imagemanager.h"
+#include "toonz/namebuilder.h"
 #include "toonz/childstack.h"
 #include "toonz/toonzscene.h"
 #include "toonz/tcamera.h"
@@ -49,15 +58,23 @@
 // TnzCore includes
 #include "tstroke.h"
 #include "tundo.h"
+#include "tpalette.h"
+#include "tsystem.h"
+#include "tfilepath.h"
+#include "timage.h"
 
 #include "tools/toolhandle.h"
 
 // Qt includes
 #include <QApplication>
 #include <QClipboard>
+#include <QCursor>
 #include <QSet>
 
+#include <map>
 #include <memory>
+#include <set>
+#include <vector>
 
 //*************************************************************************
 //    Local Namespace  stuff
@@ -426,11 +443,129 @@ void resetColumns(
 
 //-----------------------------------------------------------------------------
 
-// Clones the TXshChildLevel, but NOT any further nested TXshChildLevel inside
-// it.
+std::wstring uniqueLevelName(ToonzScene *scene, const std::wstring &base) {
+  std::unique_ptr<NameBuilder> nameBuilder(NameBuilder::getBuilder(base));
+  for (;;) {
+    const std::wstring name = nameBuilder->getNext();
+    if (!scene->getLevelSet()->getLevel(name)) return name;
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+TFilePath uniqueCodedPath(ToonzScene *scene, const TFilePath &srcPath,
+                          const std::wstring &levelName) {
+  TFilePath decoded;
+  if (srcPath.isEmpty())
+    decoded = TFilePath(levelName);
+  else {
+    decoded = scene->decodeFilePath(srcPath);
+    decoded = decoded.withName(levelName);
+  }
+
+  std::unique_ptr<NameBuilder> nameBuilder(
+      NameBuilder::getBuilder(decoded.getWideName()));
+  for (;;) {
+    const std::wstring name = nameBuilder->getNext();
+    TFilePath fp            = decoded.withName(name);
+    if (TSystem::doesExistFileOrLevel(fp)) continue;
+    if (scene->getLevelSet()->getLevel(*scene, fp)) continue;
+    return scene->codeFilePath(fp);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+TXshSimpleLevel *cloneSimpleLevel(TXshSimpleLevel *srcSl) {
+  if (!srcSl || srcSl->getPath().isUneditable()) return srcSl;
+
+  ToonzScene *scene   = srcSl->getScene();
+  const int levelType = srcSl->getType();
+  const std::wstring dstName =
+      uniqueLevelName(scene, srcSl->getName() + L"_clone");
+
+  TXshSimpleLevel *dstSl =
+      scene->createNewLevel(levelType, dstName)->getSimpleLevel();
+  if (!srcSl->getPath().isEmpty())
+    dstSl->setPath(uniqueCodedPath(scene, srcSl->getPath(), dstSl->getName()));
+  dstSl->clonePropertiesFrom(srcSl);
+  *dstSl->getHookSet() = *srcSl->getHookSet();
+
+  if (srcSl->getPalette() &&
+      (levelType == TZP_XSHLEVEL || levelType == PLI_XSHLEVEL ||
+       levelType == MESH_XSHLEVEL)) {
+    dstSl->setPalette(srcSl->getPalette()->clone());
+    dstSl->getPalette()->setDirtyFlag(true);
+  }
+
+  const std::vector<TFrameId> fids = srcSl->getFids();
+  for (const TFrameId &fid : fids) {
+    TImageP img = srcSl->getFullsampledFrame(fid, ImageManager::dontPutInCache);
+    if (!img) continue;
+    dstSl->setFrame(fid, img->cloneImage());
+  }
+
+  dstSl->setDirtyFlag(true);
+  return dstSl;
+}
+
+//-----------------------------------------------------------------------------
+
+TXshPaletteLevel *clonePaletteLevel(TXshPaletteLevel *srcPl) {
+  if (!srcPl) return srcPl;
+
+  ToonzScene *scene = srcPl->getScene();
+  const std::wstring dstName =
+      uniqueLevelName(scene, srcPl->getName() + L"_clone");
+  TXshPaletteLevel *dstPl =
+      scene->createNewLevel(PLT_XSHLEVEL, dstName)->getPaletteLevel();
+  if (srcPl->getPalette()) {
+    dstPl->setPalette(srcPl->getPalette()->clone());
+    dstPl->getPalette()->setDirtyFlag(true);
+  }
+  dstPl->setPath(uniqueCodedPath(scene, srcPl->getPath(), dstName));
+  return dstPl;
+}
+
+//-----------------------------------------------------------------------------
+
+TXshSoundLevel *cloneSoundLevel(TXshSoundLevel *srcSl) {
+  if (!srcSl) return srcSl;
+
+  ToonzScene *scene = srcSl->getScene();
+  const std::wstring dstName =
+      uniqueLevelName(scene, srcSl->getName() + L"_clone");
+
+  TXshSoundLevel *dstSl = new TXshSoundLevel(dstName);
+  dstSl->setScene(scene);
+  if (srcSl->getSoundTrack())
+    dstSl->setSoundTrack(srcSl->getSoundTrack()->clone());
+  dstSl->setFrameRate(srcSl->getFrameRate());
+  dstSl->setPath(uniqueCodedPath(scene, srcSl->getPath(), dstName));
+  scene->getLevelSet()->insertLevel(dstSl);
+  return dstSl;
+}
+
+//-----------------------------------------------------------------------------
+
+TXshLevel *cloneUsedLevel(TXshLevel *srcLevel) {
+  if (!srcLevel) return srcLevel;
+  if (TXshSimpleLevel *sl = srcLevel->getSimpleLevel())
+    return cloneSimpleLevel(sl);
+  if (TXshPaletteLevel *pl = srcLevel->getPaletteLevel())
+    return clonePaletteLevel(pl);
+  if (TXshSoundLevel *snd = srcLevel->getSoundLevel())
+    return cloneSoundLevel(snd);
+  return srcLevel;
+}
+
+//-----------------------------------------------------------------------------
+
 TXshChildLevel *cloneChildLevel(TXshChildLevel *cl) {
-  TXshChildLevel *newLevel = new TXshChildLevel(cl->getName());
-  newLevel->setScene(cl->getScene());
+  ToonzScene *scene        = cl->getScene();
+  const std::wstring name  = uniqueLevelName(scene, cl->getName());
+  TXshChildLevel *newLevel = new TXshChildLevel(name);
+  newLevel->setScene(scene);
 
   TXsheet *childXsh = cl->getXsheet(), *newChildXsh = newLevel->getXsheet();
 
@@ -441,60 +576,135 @@ TXshChildLevel *cloneChildLevel(TXshChildLevel *cl) {
   data->storeColumns(indices, childXsh, 0);
   data->storeColumnFxs(indices, childXsh, 0);
   std::list<int> restoredSplineIds;
+  QMap<TStageObjectId, TStageObjectId> idTable;
+  QMap<TFx *, TFx *> fxTable;
   data->restoreObjects(indices, restoredSplineIds, newChildXsh,
-                       StageObjectsData::eDoClone);
+                       StageObjectsData::eDoClone, idTable, fxTable);
   delete data;
 
-  cloneNotColumnLinkedFxsAndOutputsFx(childXsh, newChildXsh);
+  cloneNotColumnLinkedFxsAndOutputsFx(childXsh, newChildXsh, &fxTable);
   cloneXsheetTStageObjectTree(childXsh, newChildXsh);
 
+  newChildXsh->getFxDag()->getXsheetFx()->getAttributes()->setDagNodePos(
+      childXsh->getFxDag()->getXsheetFx()->getAttributes()->getDagNodePos());
+  ExpressionReferenceManager::instance()->refreshXsheetRefInfo(newChildXsh);
+  ExpressionReferenceManager::instance()->transferReference(
+      childXsh, newChildXsh, idTable, fxTable);
+
+  scene->getLevelSet()->insertLevel(newLevel);
   return newLevel;
 }
 
 //-----------------------------------------------------------------------------
 
-void cloneSubXsheets(TXsheet *xsh) {
-  std::map<TXsheet *, TXshChildLevel *> visited;
-  std::set<TXsheet *> toVisit;
+void remapNestedChildren(TXsheet *xsh,
+                         std::map<TXshChildLevel *, TXshChildLevel *> &childMap,
+                         std::vector<TXshLevelP> &inserted) {
+  for (int i = 0; i < xsh->getColumnCount(); ++i) {
+    TXshColumn *column = xsh->getColumn(i);
+    if (!column) continue;
+    TXshCellColumn *cc = column->getCellColumn();
+    if (!cc) continue;
 
-  toVisit.insert(xsh);
+    int r0 = 0, r1 = -1;
+    cc->getRange(r0, r1);
+    if (cc->isEmpty() || r0 > r1) continue;
 
-  while (!toVisit.empty()) {
-    xsh = *toVisit.begin();
-    toVisit.erase(xsh);
+    for (int r = r0; r <= r1; ++r) {
+      TXshCell cell = cc->getCell(r);
+      if (cell.isEmpty() || !cell.m_level) continue;
+      TXshChildLevel *srcChild = cell.m_level->getChildLevel();
+      if (!srcChild) continue;
 
-    for (int i = 0; i < xsh->getColumnCount(); ++i) {
-      TXshColumn *column = xsh->getColumn(i);
-      if (!column) continue;
+      TXshChildLevel *dstChild = 0;
+      std::map<TXshChildLevel *, TXshChildLevel *>::iterator it =
+          childMap.find(srcChild);
+      if (it == childMap.end()) {
+        dstChild           = cloneChildLevel(srcChild);
+        childMap[srcChild] = dstChild;
+        inserted.push_back(dstChild);
+        remapNestedChildren(dstChild->getXsheet(), childMap, inserted);
+      } else
+        dstChild = it->second;
 
-      if (TXshCellColumn *cc = column->getCellColumn()) {
-        int r0 = 0, r1 = -1;
-        cc->getRange(r0, r1);
-        if (!cc->isEmpty() && r0 <= r1)
-          for (int r = r0; r <= r1; ++r) {
-            TXshCell cell = cc->getCell(r);
-            if (cell.m_level && cell.m_level->getChildLevel()) {
-              TXsheet *subxsh = cell.m_level->getChildLevel()->getXsheet();
+      cell.m_level = dstChild;
+      cc->setCell(r, cell);
+    }
+  }
+}
 
-              std::map<TXsheet *, TXshChildLevel *>::iterator it =
-                  visited.find(subxsh);
-              if (it == visited.end()) {
-                it = visited
-                         .insert(std::make_pair(
-                             subxsh,
-                             cloneChildLevel(cell.m_level->getChildLevel())))
-                         .first;
-                toVisit.insert(subxsh);
-              }
-              assert(it != visited.end());
+//-----------------------------------------------------------------------------
 
-              cell.m_level = it->second;
-              cc->setCell(r, cell);
-            }
-          }
+void collectXsheets(TXsheet *xsh, std::set<TXsheet *> &visited) {
+  if (!visited.insert(xsh).second) return;
+
+  for (int i = 0; i < xsh->getColumnCount(); ++i) {
+    TXshColumn *column = xsh->getColumn(i);
+    if (!column) continue;
+    TXshCellColumn *cc = column->getCellColumn();
+    if (!cc) continue;
+
+    int r0 = 0, r1 = -1;
+    cc->getRange(r0, r1);
+    if (cc->isEmpty() || r0 > r1) continue;
+
+    for (int r = r0; r <= r1; ++r) {
+      const TXshCell cell = cc->getCell(r);
+      if (cell.isEmpty() || !cell.m_level) continue;
+      TXshChildLevel *child = cell.m_level->getChildLevel();
+      if (child) collectXsheets(child->getXsheet(), visited);
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void remapAndCloneLevels(TXsheet *xsh,
+                         std::map<TXshLevel *, TXshLevelP> &levelMap,
+                         std::vector<TXshLevelP> &inserted) {
+  for (int i = 0; i < xsh->getColumnCount(); ++i) {
+    TXshColumn *column = xsh->getColumn(i);
+    if (!column) continue;
+    TXshCellColumn *cc = column->getCellColumn();
+    if (!cc) continue;
+
+    int r0 = 0, r1 = -1;
+    cc->getRange(r0, r1);
+    if (cc->isEmpty() || r0 > r1) continue;
+
+    for (int r = r0; r <= r1; ++r) {
+      TXshCell cell = cc->getCell(r);
+      if (cell.isEmpty() || !cell.m_level) continue;
+      if (cell.m_level->getChildLevel()) continue;
+
+      TXshLevel *srcLevel = cell.m_level.getPointer();
+      std::map<TXshLevel *, TXshLevelP>::iterator it = levelMap.find(srcLevel);
+      if (it == levelMap.end()) {
+        TXshLevel *dstLevel = cloneUsedLevel(srcLevel);
+        levelMap[srcLevel]  = dstLevel;
+        if (dstLevel && dstLevel != srcLevel) inserted.push_back(dstLevel);
+        it = levelMap.find(srcLevel);
+      }
+
+      if (it->second && it->second.getPointer() != srcLevel) {
+        cell.m_level = it->second;
+        cc->setCell(r, cell);
       }
     }
   }
+}
+
+//-----------------------------------------------------------------------------
+
+void fullCloneContents(TXsheet *clonedRoot, std::vector<TXshLevelP> &inserted) {
+  std::map<TXshChildLevel *, TXshChildLevel *> childMap;
+  remapNestedChildren(clonedRoot, childMap, inserted);
+
+  std::set<TXsheet *> sheets;
+  collectXsheets(clonedRoot, sheets);
+
+  std::map<TXshLevel *, TXshLevelP> levelMap;
+  for (TXsheet *xsh : sheets) remapAndCloneLevels(xsh, levelMap, inserted);
 }
 
 //=============================================================================
@@ -1068,34 +1278,80 @@ void ColumnCmd::resequence(int index) {
 class CloneChildUndo final : public TUndo {
   TXshChildLevelP m_childLevel;
   int m_columnIndex;
+  int m_r0;
+  std::vector<TXshCell> m_cells;
+  std::vector<TXshLevelP> m_clonedLevels;
+  TStageObjectId m_parentId;
+  bool m_fullClone;
 
 public:
-  CloneChildUndo(TXshChildLevel *childLevel, int columnIndex)
-      : m_childLevel(childLevel), m_columnIndex(columnIndex) {}
+  CloneChildUndo(TXshChildLevel *childLevel, int columnIndex, int r0,
+                 const std::vector<TXshCell> &cells,
+                 const std::vector<TXshLevelP> &clonedLevels,
+                 TStageObjectId parentId, bool fullClone)
+      : m_childLevel(childLevel)
+      , m_columnIndex(columnIndex)
+      , m_r0(r0)
+      , m_cells(cells)
+      , m_clonedLevels(clonedLevels)
+      , m_parentId(parentId)
+      , m_fullClone(fullClone) {}
 
   void undo() const override {
-    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+    TApp *app         = TApp::instance();
+    ToonzScene *scene = app->getCurrentScene()->getScene();
+    TXsheet *xsh      = app->getCurrentXsheet()->getXsheet();
     xsh->removeColumn(m_columnIndex);
-    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+
+    if (m_fullClone) {
+      auto removeIfUnused = [scene](TXshLevel *level) {
+        if (!level) return;
+        if (!scene->getTopXsheet()->isLevelUsed(level))
+          scene->getLevelSet()->removeLevel(level);
+      };
+      for (int i = (int)m_clonedLevels.size() - 1; i >= 0; --i)
+        removeIfUnused(m_clonedLevels[i].getPointer());
+      removeIfUnused(m_childLevel.getPointer());
+    }
+
+    app->getCurrentXsheet()->notifyXsheetChanged();
+    if (m_fullClone) app->getCurrentScene()->notifyCastChange();
   }
 
   void redo() const override {
-    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+    TApp *app         = TApp::instance();
+    ToonzScene *scene = app->getCurrentScene()->getScene();
+    TXsheet *xsh      = app->getCurrentXsheet()->getXsheet();
+
+    if (m_fullClone) {
+      if (m_childLevel)
+        scene->getLevelSet()->insertLevel(m_childLevel.getPointer());
+      for (int i = 0; i < (int)m_clonedLevels.size(); ++i)
+        scene->getLevelSet()->insertLevel(m_clonedLevels[i].getPointer());
+    }
+
     xsh->insertColumn(m_columnIndex);
-    int frameCount = m_childLevel->getXsheet()->getFrameCount();
-    if (frameCount < 1) frameCount = 1;
-    for (int r = 0; r < frameCount; r++)
-      xsh->setCell(r, m_columnIndex,
-                   TXshCell(m_childLevel.getPointer(), TFrameId(r + 1)));
-    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    for (int i = 0; i < (int)m_cells.size(); ++i) {
+      if (m_cells[i].isEmpty()) continue;
+      xsh->setCell(m_r0 + i, m_columnIndex, m_cells[i]);
+    }
+    if (m_parentId != TStageObjectId::NoneId)
+      xsh->getStageObject(TStageObjectId::ColumnId(m_columnIndex))
+          ->setParent(m_parentId);
+
+    app->getCurrentXsheet()->notifyXsheetChanged();
+    if (m_fullClone) app->getCurrentScene()->notifyCastChange();
   }
 
   int getSize() const override {
-    // bisognerebbe tener conto della dimensione del sottoxsheet
-    return sizeof(*this) + 100;
+    return sizeof(*this) + (int)(m_cells.size() * sizeof(TXshCell) +
+                                 m_clonedLevels.size() * sizeof(TXshLevelP));
   }
 
   QString getHistoryString() override {
+    if (m_fullClone)
+      return QObject::tr("Full Clone Sub-xsheet :  Col%1")
+          .arg(QString::number(m_columnIndex + 1));
     return QObject::tr("Clone Sub-xsheet :  Col%1")
         .arg(QString::number(m_columnIndex + 1));
   }
@@ -1107,7 +1363,7 @@ public:
 // cloneChild
 //=============================================================================
 
-void ColumnCmd::cloneChild(int index) {
+void ColumnCmd::cloneChild(int index, bool fullClone) {
   if (!canResequence(index)) return;
 
   /*-- カラムを取得 --*/
@@ -1130,6 +1386,8 @@ void ColumnCmd::cloneChild(int index) {
   assert(childLevel);
   /*- SubXsheetのXsheetを取得 -*/
   TXsheet *childXsh = childLevel->getXsheet();
+
+  if (fullClone) QApplication::setOverrideCursor(Qt::WaitCursor);
 
   // insert a new empty column
   /*- 隣に空きColumnをInsertしてCloneに備える -*/
@@ -1162,6 +1420,9 @@ void ColumnCmd::cloneChild(int index) {
   クローンされた中にある子SubXsheetは、同じもので良いので、スキップする --*/
   // cloneSubXsheets(newChildXsh);
 
+  std::vector<TXshLevelP> clonedLevels;
+  if (fullClone) fullCloneContents(newChildXsh, clonedLevels);
+
   /*-- XSheetノードのFxSchematicでのDagNodePosを再現
   FxやColumnノードの位置の再現は上のsetColumnで行っている
 --*/
@@ -1177,26 +1438,36 @@ void ColumnCmd::cloneChild(int index) {
   /*-- TXshChildLevel作成時にsetCellした1つ目のセルを消去 --*/
   xsh->removeCells(0, newColumnIndex);
   /*-- CloneしたColumnのセル番号順を再現 --*/
+  std::vector<TXshCell> clonedCells;
   for (int r = r0; r <= r1; r++) {
-    TXshCell cell = lcolumn->getCell(r);
-    if (cell.isEmpty()) continue;
+    TXshCell srcCell = lcolumn->getCell(r);
+    if (srcCell.isEmpty()) {
+      clonedCells.push_back(TXshCell());
+      continue;
+    }
 
-    cell.m_level = newChildLevel;
-    xsh->setCell(r, newColumnIndex, cell);
+    srcCell.m_level = newChildLevel;
+    xsh->setCell(r, newColumnIndex, srcCell);
+    clonedCells.push_back(srcCell);
   }
 
   TStageObjectId currentObjectId =
       TApp::instance()->getCurrentObject()->getObjectId();
+  TStageObjectId parentId = xsh->getStageObjectParent(currentObjectId);
   xsh->getStageObject(TStageObjectId::ColumnId(newColumnIndex))
-      ->setParent(xsh->getStageObjectParent(currentObjectId));
+      ->setParent(parentId);
 
   xsh->updateFrameCount();
-  TUndoManager::manager()->add(
-      new CloneChildUndo(newChildLevel, newColumnIndex));
+  TUndoManager::manager()->add(new CloneChildUndo(newChildLevel, newColumnIndex,
+                                                  r0, clonedCells, clonedLevels,
+                                                  parentId, fullClone));
 
   // notify changes
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  if (fullClone) TApp::instance()->getCurrentScene()->notifyCastChange();
+
+  if (fullClone) QApplication::restoreOverrideCursor();
 }
 
 //=============================================================================
