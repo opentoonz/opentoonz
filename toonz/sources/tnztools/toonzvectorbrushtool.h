@@ -223,6 +223,14 @@ protected:
   TEnumProperty m_joinStyle;
   TIntProperty m_miterJoinLimit;
   TBoolProperty m_assistants;
+  TBoolProperty m_autoClose;
+  TBoolProperty m_autoGroup;
+  TBoolProperty m_autoFill;
+
+  bool m_bypassAutoClose = false;
+  bool autoCloseEnabled() const {
+    return m_autoClose.getValue() && !m_bypassAutoClose;
+  }
 
   TInputManager m_inputmanager;
   TSmartPointerT<TModifierLine> m_modifierLine;

@@ -14,6 +14,7 @@
 #include "toonzqt/imageutils.h"
 #include "toonzqt/brushpresetbridge.h"
 #include "toonzqt/tselectionhandle.h"
+#include "toonzqt/selection.h"
 #include "toonzqt/styleselection.h"
 #include "tundo.h"
 
@@ -56,6 +57,7 @@
 
 // Qt includes
 #include <QPainter>
+#include <limits>
 
 using namespace ToolUtils;
 
@@ -73,6 +75,9 @@ TEnv::IntVar V_VectorBrushFrameRange("VectorBrushFrameRange", 0);
 TEnv::IntVar V_VectorBrushSnap("VectorBrushSnap", 0);
 TEnv::IntVar V_VectorBrushSnapSensitivity("VectorBrushSnapSensitivity", 0);
 TEnv::IntVar V_VectorBrushAssistants("VectorBrushAssistants", 1);
+TEnv::IntVar V_VectorBrushAutoClose("VectorBrushAutoClose", 0);
+TEnv::IntVar V_VectorBrushAutoGroup("VectorBrushAutoGroup", 0);
+TEnv::IntVar V_VectorBrushAutoFill("VectorBrushAutoFill", 0);
 TEnv::StringVar V_VectorBrushPreset("VectorBrushPreset", "<custom>");
 
 //-------------------------------------------------------------------
@@ -368,6 +373,164 @@ void getAboveStyleIdSet(int styleId, TPaletteP palette,
 }
 }  // namespace
 
+// Close with one logical seam, not an extra connector with two attachments.
+// OT stores the seam twice internally; its Control Point Editor presents and
+// edits those coincident endpoints as one point when the stroke is a self-loop.
+// Input smoothing and the Accuracy fit have already processed these points.
+static void closeOpenStroke(TStroke *stroke) {
+  if (!stroke) return;
+  if (stroke->getControlPointCount() < 3) return;
+  if (stroke->getLength() == 0.0) {
+    stroke->setSelfLoop(true);
+    return;
+  }
+  // The editor exposes one anchor per pair of quadratic segments. Supply at
+  // least four anchors by exact subdivision, retaining the fitted shape.
+  while (stroke->getChunkCount() < 8) {
+    const int oldCount = stroke->getChunkCount();
+    int longest        = 0;
+    for (int i = 1; i < oldCount; ++i)
+      if (stroke->getChunk(i)->getLength() >
+          stroke->getChunk(longest)->getLength())
+        longest = i;
+    const double w0 = stroke->getParameterAtControlPoint(2 * longest);
+    const double w1 = stroke->getParameterAtControlPoint(2 * longest + 2);
+    stroke->insertControlPoints((w0 + w1) * 0.5);
+    if (stroke->getChunkCount() == oldCount) break;
+  }
+  const int count = stroke->getControlPointCount();
+  // Adjacent quadratics share the midpoint of their handles for continuous
+  // position and thickness derivatives. Only the common endpoint moves.
+  const TThickPoint joint =
+      (stroke->getControlPoint(1) + stroke->getControlPoint(count - 2)) * 0.5;
+  stroke->setControlPoint(0, joint);
+  stroke->setControlPoint(count - 1, joint);
+  stroke->setSelfLoop(true);
+}
+
+// TVectorImage::clone() does not copy the currently entered group.
+static TVectorImageP cloneWithEnteredGroup(const TVectorImageP &image) {
+  QMutexLocker lock(image->getMutex());
+  TVectorImageP copy = image->clone();
+  std::vector<int> groups;
+  while (image->isInsideGroup() > 0) groups.push_back(image->exitGroup());
+  for (auto i = groups.rbegin(); i != groups.rend(); ++i) {
+    image->enterGroup(*i);
+    copy->enterGroup(*i);
+  }
+  return copy;
+}
+
+// Snapshot the opt-in operation so split strokes, group membership, fills and
+// draw order are restored together. The ordinary brush keeps its existing undo.
+class UndoVectorAutoOptions final : public TToolUndo {
+  TVectorImageP m_before, m_after;
+
+  void restore(const TVectorImageP &snapshot) const {
+    m_level->setFrame(m_frameId, cloneWithEnteredGroup(snapshot));
+    TTool::Application *app = TTool::getApplication();
+    if (app) {
+      TSelection *selection = app->getCurrentSelection()->getSelection();
+      if (selection) selection->selectNone();
+      app->getCurrentXsheet()->notifyXsheetChanged();
+    }
+    notifyImageChanged();
+  }
+
+public:
+  UndoVectorAutoOptions(TXshSimpleLevel *level, const TFrameId &fid,
+                        bool createdFrame, bool createdLevel,
+                        const TVectorImageP &before, const TVectorImageP &after)
+      : TToolUndo(level, fid, createdFrame, createdLevel)
+      , m_before(before)
+      , m_after(after) {}
+
+  void undo() const override {
+    restore(m_before);
+    removeLevelAndFrameIfNeeded();
+    notifyImageChanged();
+  }
+  void redo() const override {
+    insertLevelAndFrameIfNeeded();
+    restore(m_after);
+  }
+  int getSize() const override {
+    size_t size = sizeof(*this);
+    for (const TVectorImageP &image : {m_before, m_after}) {
+      for (int i = 0; i < image->getStrokeCount(); ++i)
+        size += sizeof(TStroke) + image->getStroke(i)->getControlPointCount() *
+                                      sizeof(TThickPoint);
+      size += image->getRegionCount() * sizeof(TRegion);
+    }
+    return (int)std::min(size, (size_t)(std::numeric_limits<int>::max)());
+  }
+  QString getToolName() override { return QString("Vector Brush Tool"); }
+  int getHistoryType() override { return HistoryType::BrushTool; }
+};
+
+static void addStrokeWithAutoOptions(TTool::Application *application,
+                                     const TVectorImageP &vi, TStroke *stroke,
+                                     DrawOrder drawOrder, bool breakAngles,
+                                     bool autoFill, bool frameCreated,
+                                     bool levelCreated, TXshSimpleLevel *level,
+                                     const TFrameId &fid) {
+  TVectorImageP before = cloneWithEnteredGroup(vi);
+
+  // Remember the entered-group path using existing strokes. group() can
+  // rearrange strokes, so indices are not stable across the operation.
+  std::vector<int> enteredGroups;
+  while (vi->isInsideGroup() > 0) {
+    int index = vi->exitGroup();
+    enteredGroups.push_back(vi->getStroke(index)->getId());
+  }
+  for (auto i = enteredGroups.rbegin(); i != enteredGroups.rend(); ++i)
+    vi->enterGroup(vi->getStrokeIndexById(*i));
+
+  std::vector<double> corners;
+  std::vector<TStroke *> pieces;
+  if (breakAngles) findMaxCurvPoints(stroke, 1, 0.8, corners);
+  if (!corners.empty())
+    split(stroke, corners, pieces);
+  else
+    pieces.push_back(new TStroke(*stroke));
+
+  std::vector<int> ids;
+  QSet<int> aboveStyles;
+  if (drawOrder == PaletteOrder)
+    getAboveStyleIdSet(stroke->getStyle(), vi->getPalette(), aboveStyles);
+  for (TStroke *piece : pieces) {
+    TStroke *added = new TStroke(*piece);
+    if (drawOrder == PaletteOrder)
+      vi->addStrokeBelow(added, aboveStyles, false);
+    else
+      vi->addStroke(added, false, drawOrder == UnderAll);
+    ids.push_back(added->getId());
+    delete piece;
+  }
+
+  // Pieces of a single stroke share a style and are inserted contiguously.
+  int index = vi->getStrokeCount();
+  for (int id : ids) index = std::min(index, vi->getStrokeIndexById(id));
+  vi->group(index, (int)ids.size());
+  index = vi->getStrokeIndexById(ids.front());
+  // Follow the Geometry Tool convention: leave the current group before
+  // entering the newly grouped stroke for an isolated fill.
+  while (vi->isInsideGroup() > 0) vi->exitGroup();
+  if (autoFill && stroke->isSelfLoop() && vi->enterGroup(index)) {
+    vi->selectFill(stroke->getBBox().enlarge(1, 1), 0, stroke->getStyle(),
+                   false, true, false);
+    vi->exitGroup();
+  }
+  for (auto i = enteredGroups.rbegin(); i != enteredGroups.rend(); ++i)
+    vi->enterGroup(vi->getStrokeIndexById(*i));
+
+  vi->findRegions();
+  TUndoManager::manager()->add(
+      new UndoVectorAutoOptions(level, fid, frameCreated, levelCreated, before,
+                                cloneWithEnteredGroup(vi)));
+  application->getCurrentTool()->getTool()->notifyImageChanged();
+}
+
 static void addStroke(TTool::Application *application, const TVectorImageP &vi,
                       TStroke *stroke, DrawOrder drawOrder, bool breakAngles, bool autoGroup,
                       bool autoFill, bool frameCreated, bool levelCreated,
@@ -398,6 +561,11 @@ static void addStroke(TTool::Application *application, const TVectorImageP &vi,
   }
   TFrameId id = application->getCurrentTool()->getTool()->getCurrentFid();
   if (id == TFrameId::NO_FRAME && fid != TFrameId::NO_FRAME) id = fid;
+  if (autoGroup) {
+    addStrokeWithAutoOptions(application, vi, stroke, drawOrder, breakAngles,
+                             autoFill, frameCreated, levelCreated, sl, id);
+    return;
+  }
   if (!corners.empty()) {
     if (breakAngles)
       split(stroke, corners, strokes);
@@ -551,6 +719,9 @@ ToonzVectorBrushTool::ToonzVectorBrushTool(std::string name, int targetType)
     , m_joinStyle("Join")
     , m_miterJoinLimit("Miter:", 0, 100, 4)
     , m_assistants("Assistants", true)
+    , m_autoClose("Auto Close", false)
+    , m_autoGroup("Auto Group", false)
+    , m_autoFill("Auto Fill", false)
     , m_styleId()
     , m_minThick()
     , m_maxThick()
@@ -568,8 +739,7 @@ ToonzVectorBrushTool::ToonzVectorBrushTool(std::string name, int targetType)
     , m_isPath()
     , m_presetsLoaded()
     , m_firstFrameRange(true)
-    , m_propertyUpdating()
-{
+    , m_propertyUpdating() {
   bind(targetType);
 
   m_thickness.setNonLinearSlider();
@@ -601,6 +771,9 @@ ToonzVectorBrushTool::ToonzVectorBrushTool(std::string name, int targetType)
   m_snapSensitivity.addValue(HIGH_WSTR);
 
   m_prop[0].bind(m_assistants);
+  m_prop[0].bind(m_autoClose);
+  m_prop[0].bind(m_autoGroup);
+  m_prop[0].bind(m_autoFill);
 
   m_prop[0].bind(m_preset);
   m_preset.addValue(CUSTOM_WSTR);
@@ -629,6 +802,9 @@ ToonzVectorBrushTool::ToonzVectorBrushTool(std::string name, int targetType)
   m_joinStyle.setId("Join");
   m_miterJoinLimit.setId("Miter");
   m_assistants.setId("Assistants");
+  m_autoClose.setId("AutoClose");
+  m_autoGroup.setId("AutoGroup");
+  m_autoFill.setId("Autofill");
 
   m_inputmanager.setHandler(this);
   m_modifierLine               = new TModifierLine();
@@ -689,6 +865,9 @@ void ToonzVectorBrushTool::updateTranslation() {
   m_snap.setQStringName(tr("Snap"));
   m_snapSensitivity.setQStringName("");
   m_assistants.setQStringName(tr("Assistants"));
+  m_autoClose.setQStringName(tr("Auto Close"));
+  m_autoGroup.setQStringName(tr("Auto Group"));
+  m_autoFill.setQStringName(tr("Auto Fill"));
   m_frameRange.setItemUIName(L"Off", tr("Off"));
   m_frameRange.setItemUIName(LINEAR_WSTR, tr("Linear"));
   m_frameRange.setItemUIName(EASEIN_WSTR, tr("In"));
@@ -845,6 +1024,7 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
     // begin painting //////////////////////////
     
     m_styleId = 0;
+    m_bypassAutoClose = m_inputmanager.state.isKeyPressed(TKey::shift);
     m_tracks.clear();
     
     TTool::Application *app = TTool::getApplication();
@@ -972,10 +1152,11 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
                                         // autoclose proprio dal fatto che
                                         // hanno 1 solo chunk.
       stroke->insertControlPoints(0.5);
-    
-    if (!m_frameRange.getIndex() && track.getLoop())
+
+    if ((!m_frameRange.getIndex() || autoCloseEnabled()) && track.getLoop())
       stroke->setSelfLoop(true);
-    
+    if (autoCloseEnabled()) closeOpenStroke(stroke);
+
     strokes.push_back(stroke);
   }
 
@@ -1014,10 +1195,11 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
       if (size_t count = std::min(m_firstStrokes.size(), strokes.size())) {
         TUndoManager::manager()->beginBlock();
         for(size_t i = 0; i < count; ++i)
-          doFrameRangeStrokes(
-              m_firstFrameId, m_firstStrokes[i], getFrameId(), strokes[i],
-              m_frameRange.getIndex(), m_breakAngles.getValue(), false, false,
-              m_firstFrameRange );
+          doFrameRangeStrokes(m_firstFrameId, m_firstStrokes[i], getFrameId(),
+                              strokes[i], m_frameRange.getIndex(),
+                              m_breakAngles.getValue(), m_autoGroup.getValue(),
+                              m_autoFill.getValue() && !m_bypassAutoClose,
+                              m_firstFrameRange);
         TUndoManager::manager()->endBlock();
       }
       
@@ -1054,16 +1236,18 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
     for(StrokeList::iterator i = strokes.begin(); i != strokes.end(); ++i) {
       TStroke *stroke = *i;
       addStrokeToImage(app, vi, stroke, (DrawOrder)m_drawOrder.getIndex(),
-                       m_breakAngles.getValue(),
-                      false, false, m_isFrameCreated, m_isLevelCreated);
+                       m_breakAngles.getValue(), m_autoGroup.getValue(),
+                       m_autoFill.getValue() && !m_bypassAutoClose,
+                       m_isFrameCreated, m_isLevelCreated);
 
       if ((Preferences::instance()->getGuidedDrawingType() == 1 ||
           Preferences::instance()->getGuidedDrawingType() == 2) &&
           Preferences::instance()->getGuidedAutoInbetween())
       {
         TFrameId fId = getFrameId();
-        doGuidedAutoInbetween(fId, vi, stroke, m_breakAngles.getValue(), false,
-                              false, false);
+        doGuidedAutoInbetween(
+            fId, vi, stroke, m_breakAngles.getValue(), m_autoGroup.getValue(),
+            m_autoFill.getValue() && !m_bypassAutoClose, false);
         if (app->getCurrentFrame()->isEditingScene())
           app->getCurrentFrame()->setFrame( app->getCurrentFrame()->getFrameIndex() );
         else
@@ -1080,6 +1264,7 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
 
 void ToonzVectorBrushTool::inputPaintTracks(const TTrackList &tracks) {
   if (tracks.empty()) return;
+  if (m_inputmanager.state.isKeyPressed(TKey::shift)) m_bypassAutoClose = true;
 
   TRectD invalidateRect;
 
@@ -1185,7 +1370,11 @@ void ToonzVectorBrushTool::handleMouseEvent(MouseEventType type,
   bool shift    = e.getModifiersMask() & TMouseEvent::SHIFT_KEY;
   bool control  = e.getModifiersMask() & TMouseEvent::CTRL_KEY;
 
-  if (shift && type == ME_DOWN && e.button() == Qt::LeftButton && !m_active) {
+  // Latch the override for the whole stroke, including Shift at pen-up.
+  if (m_active && shift) m_bypassAutoClose = true;
+
+  if (shift && !m_autoClose.getValue() && type == ME_DOWN &&
+      e.button() == Qt::LeftButton && !m_active) {
     m_modifierAssistants->magnetism = 0;
     m_inputmanager.clearModifiers();
     m_inputmanager.addModifier(TInputModifierP(m_modifierLine.getPointer()));
@@ -1259,8 +1448,8 @@ void ToonzVectorBrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 //--------------------------------------------------------------------------------------------------
 
 bool ToonzVectorBrushTool::keyDown(QKeyEvent *event) {
-  if (event->key() == Qt::Key_Escape)
-    resetFrameRange();
+  if (m_active && event->key() == Qt::Key_Shift) m_bypassAutoClose = true;
+  if (event->key() == Qt::Key_Escape) resetFrameRange();
   return false;
 }
 
@@ -1288,6 +1477,10 @@ bool ToonzVectorBrushTool::doFrameRangeStrokes(
     *last  = *lastStroke;
   }
 
+  if (autoCloseEnabled()) {
+    closeOpenStroke(first);
+    closeOpenStroke(last);
+  }
   firstImage->addStroke(first, false);
   lastImage->addStroke(last, false);
   assert(firstFrameId <= lastFrameId);
@@ -1353,6 +1546,7 @@ bool ToonzVectorBrushTool::doFrameRangeStrokes(
       assert(lastImage->getStrokeCount() == 1);
       TVectorImageP vi = TInbetween(firstImage, lastImage).tween(s);
       assert(vi->getStrokeCount() == 1);
+      if (autoCloseEnabled()) closeOpenStroke(vi->getStroke(0));
       addStrokeToImage(getApplication(), img, vi->getStroke(0),
                        (DrawOrder)m_drawOrder.getIndex(), breakAngles,
                        autoGroup, autoFill, m_isFrameCreated, m_isLevelCreated,
@@ -1720,6 +1914,18 @@ bool ToonzVectorBrushTool::onPropertyChanged(std::string propertyName) {
   int snapSensitivityIndex     = m_snapSensitivity.getIndex();
   V_VectorBrushSnapSensitivity = snapSensitivityIndex;
   V_VectorBrushAssistants      = m_assistants.getValue();
+  if ((propertyName == m_autoClose.getName() && !m_autoClose.getValue()) ||
+      (propertyName == m_autoGroup.getName() && !m_autoGroup.getValue())) {
+    m_autoFill.setValue(false);
+    notifyTool = true;
+  } else if (propertyName == m_autoFill.getName() && m_autoFill.getValue()) {
+    m_autoClose.setValue(true);
+    m_autoGroup.setValue(true);
+    notifyTool = true;
+  }
+  V_VectorBrushAutoClose = m_autoClose.getValue();
+  V_VectorBrushAutoGroup = m_autoGroup.getValue();
+  V_VectorBrushAutoFill  = m_autoFill.getValue();
 
   // Recalculate/reset based on changed settings
   m_minThick = m_thickness.getValue().first;
@@ -2101,6 +2307,9 @@ void ToonzVectorBrushTool::loadLastBrush() {
   m_snap.setValue(V_VectorBrushSnap ? 1 : 0);
   m_snapSensitivity.setIndex(V_VectorBrushSnapSensitivity);
   m_assistants.setValue(V_VectorBrushAssistants ? 1 : 0);
+  m_autoFill.setValue(V_VectorBrushAutoFill != 0);
+  m_autoClose.setValue(V_VectorBrushAutoClose != 0 || m_autoFill.getValue());
+  m_autoGroup.setValue(V_VectorBrushAutoGroup != 0 || m_autoFill.getValue());
 
   // Recalculate based on prior values
   m_minThick = m_thickness.getValue().first;
