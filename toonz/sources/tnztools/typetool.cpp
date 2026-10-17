@@ -757,6 +757,7 @@ class TypeToolTextHistoryPopup final : public DVGui::Dialog {
   QComboBox *m_fontSizeCombo;
   QComboBox *m_formatCombo;
   QCheckBox *m_preserveLineBreaks;
+  QPushButton *m_saveEntryButton;
   QTimer *m_saveTimer;
   std::function<void(const QString &)> m_textChanged;
 
@@ -822,6 +823,7 @@ class TypeToolTextHistoryPopup final : public DVGui::Dialog {
     QSignalBlocker formatBlocker(m_formatCombo);
     QSignalBlocker lineBreakBlocker(m_preserveLineBreaks);
     m_editor->setPlainText(resolvedEntry.source);
+    m_saveEntryButton->setEnabled(!resolvedEntry.source.isEmpty());
     m_formatCombo->setCurrentIndex(
         resolvedEntry.format == TypeToolTextFormat::Markdown ? 1 : 0);
     m_preserveLineBreaks->setChecked(resolvedEntry.preserveSourceLineBreaks);
@@ -864,6 +866,17 @@ class TypeToolTextHistoryPopup final : public DVGui::Dialog {
                         error))
       QMessageBox::warning(this, tr("Save Text Source"),
                            tr("The text could not be saved.\n%1").arg(error));
+  }
+
+  void saveCurrentTextToHistory() {
+    const TypeToolTextEntry entry = editorEntry();
+    if (entry.source.isEmpty()) return;
+    m_history.setDraft(entry);
+    m_history.addEntry(entry.source);
+    m_history.saveDraft();
+    rebuildHistoryList();
+    QSignalBlocker blocker(m_historyList);
+    m_historyList->setCurrentRow(0);
   }
 
   void importTextDocument() {
@@ -966,6 +979,7 @@ public:
       , m_formatCombo(new QComboBox(this))
       , m_preserveLineBreaks(
             new QCheckBox(tr("Preserve source line breaks for Markdown"), this))
+      , m_saveEntryButton(new QPushButton(tr("Save to History"), this))
       , m_saveTimer(new QTimer(this))
       , m_textChanged(std::move(textChanged)) {
     setWindowTitle(tr("Type Tool Text History"));
@@ -1025,11 +1039,15 @@ public:
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addWidget(importButton);
     buttonLayout->addWidget(saveTextButton);
-    buttonLayout->addWidget(deleteButton);
-    buttonLayout->addWidget(clearButton);
+    buttonLayout->addWidget(m_saveEntryButton);
     buttonLayout->addStretch(1);
     buttonLayout->addWidget(closeButton);
     layout->addLayout(buttonLayout);
+    QHBoxLayout *historyButtons = new QHBoxLayout;
+    historyButtons->addWidget(deleteButton);
+    historyButtons->addWidget(clearButton);
+    historyButtons->addStretch(1);
+    layout->addLayout(historyButtons);
     addLayout(layout);
 
     m_saveTimer->setSingleShot(true);
@@ -1038,6 +1056,7 @@ public:
     connect(m_saveTimer, &QTimer::timeout, this,
             [this]() { m_history.saveDraft(); });
     connect(m_editor, &QPlainTextEdit::textChanged, this, [this]() {
+      m_saveEntryButton->setEnabled(!m_editor->toPlainText().isEmpty());
       scheduleDraftSave();
     });
     connect(
@@ -1069,6 +1088,8 @@ public:
             [this]() { importTextDocument(); });
     connect(saveTextButton, &QPushButton::clicked, this,
             [this]() { saveTextDocument(); });
+    connect(m_saveEntryButton, &QPushButton::clicked, this,
+            [this]() { saveCurrentTextToHistory(); });
     connect(deleteButton, &QPushButton::clicked, this, [this]() {
       int row = m_historyList->currentRow();
       if (row < 0) return;
@@ -1099,6 +1120,7 @@ public:
     if (m_editor->toPlainText() == normalized) return;
     QSignalBlocker blocker(m_editor);
     m_editor->setPlainText(normalized);
+    m_saveEntryButton->setEnabled(!normalized.isEmpty());
     m_history.setDraftSource(normalized);
     refreshTextPreview();
     m_saveTimer->start();
