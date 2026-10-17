@@ -15,6 +15,11 @@
 #include "toonz/stage2.h"
 #include "toonz/doubleparamcmd.h"
 #include "toonz/preferences.h"
+#include "toonz/tscenehandle.h"
+#include "toonz/toonzscene.h"
+#include "toonz/tcamera.h"
+
+#include <cmath>
 
 // TnzQt includes
 #include "toonzqt/gutil.h"
@@ -1462,6 +1467,20 @@ void SelectionMoveField::updateStatus() {
 
 //=============================================================================
 
+namespace {
+
+// Match the camera-pixel size used by the vector Brush and Geometry tools.
+double vectorThicknessScale() {
+  TTool::Application *app = TTool::getApplication();
+  if (!app || !app->getCurrentScene()) return 1.0;
+  ToonzScene *scene = app->getCurrentScene()->getScene();
+  if (!scene || !scene->getCurrentCamera()) return 1.0;
+  double dpi = scene->getCurrentCamera()->getDpi().x;
+  return (std::isfinite(dpi) && dpi > 0.0) ? Stage::inch / dpi : 1.0;
+}
+
+}  // namespace
+
 ThickChangeField::ThickChangeField(SelectionTool *tool, QString name)
     : MeasuredValueField(0, name), m_tool(tool) {
   bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *, bool)),
@@ -1482,7 +1501,7 @@ void ThickChangeField::onChange(TMeasuredValue *fld, bool addToUndo) {
         (VectorSelectionTool *)m_tool));
 
   TVectorImageP vi = (TVectorImageP)m_tool->getImage(true);
-  double p         = 0.5 * getValue();
+  double p         = 0.5 * getValue() * vectorThicknessScale();
 
   // The chageThickTool would deal the rest frames when adding undo
   if (isLabelClicked()) {
@@ -1521,7 +1540,8 @@ void ThickChangeField::updateStatus() {
   }
 
   setDisabled(false);
-  setValue(2 * m_tool->m_deformValues.m_maxSelectionThickness);
+  setValue(2 * m_tool->m_deformValues.m_maxSelectionThickness /
+           vectorThicknessScale());
   setCursorPosition(0);
 }
 
