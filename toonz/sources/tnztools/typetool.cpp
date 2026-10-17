@@ -191,7 +191,6 @@ TVectorImageP vectorizeOutlineLayout(const OutlineLayout &layout, double scale,
 
 TEnv::StringVar EnvCurrentFont("CurrentFont", "MS UI Gothic");
 
-constexpr int cTextHistoryLimit         = 20;
 constexpr qint64 cTextImportWarningSize = 1024 * 1024;
 
 QString typeToolSettingsPath() {
@@ -350,6 +349,12 @@ public:
 
   void clear() {
     m_entries.clear();
+    saveHistory();
+  }
+
+  void setEntries(const QList<TypeToolTextEntry> &entries) {
+    m_entries = entries;
+    while (m_entries.size() > cTextHistoryLimit) m_entries.removeLast();
     saveHistory();
   }
 };
@@ -879,6 +884,70 @@ class TypeToolTextHistoryPopup final : public DVGui::Dialog {
     m_historyList->setCurrentRow(0);
   }
 
+  void saveTextHistory() {
+    QFileDialog dialog(this, tr("Save Text History"));
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setFileMode(QFileDialog::AnyFile);
+    dialog.setNameFilter(tr("Type Tool history (*.json)"));
+    dialog.setDefaultSuffix(QStringLiteral("json"));
+    dialog.selectFile(QStringLiteral("type-tool-history.json"));
+    if (dialog.exec() != QDialog::Accepted || dialog.selectedFiles().isEmpty())
+      return;
+    QString error;
+    const QString json =
+        QString::fromUtf8(serializeHistory(m_history.entries()));
+    if (!saveTextSource(dialog.selectedFiles().first(), json, error))
+      QMessageBox::warning(
+          this, tr("Save Text History"),
+          tr("The history could not be saved.\n%1").arg(error));
+  }
+
+  void loadTextHistory() {
+    const QString fileName = QFileDialog::getOpenFileName(
+        this, tr("Load Text History"), QString(),
+        tr("Type Tool history (*.json);;All files (*)"));
+    if (fileName.isEmpty()) return;
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly)) {
+      QMessageBox::warning(this, tr("Load Text History"),
+                           tr("The history file could not be opened.\n%1")
+                               .arg(file.errorString()));
+      return;
+    }
+    QList<TypeToolTextEntry> loaded;
+    QString error;
+    if (!deserializeHistory(file.readAll(), loaded, error)) {
+      QMessageBox::warning(this, tr("Load Text History"), error);
+      return;
+    }
+    if (!m_history.entries().isEmpty()) {
+      QMessageBox question(this);
+      question.setWindowTitle(tr("Load Text History"));
+      question.setIcon(QMessageBox::Question);
+      question.setText(
+          tr("Merge the loaded entries into Recent Text, or replace the saved "
+             "listing?"));
+      question.setInformativeText(
+          tr("Merge puts loaded entries first and keeps up to %1 entries. Your "
+             "current text is kept.")
+              .arg(cTextHistoryLimit));
+      QPushButton *merge =
+          question.addButton(tr("Merge"), QMessageBox::AcceptRole);
+      QPushButton *replace =
+          question.addButton(tr("Replace"), QMessageBox::DestructiveRole);
+      question.addButton(QMessageBox::Cancel);
+      question.setDefaultButton(merge);
+      question.exec();
+      if (question.clickedButton() == merge)
+        loaded = mergeHistory(loaded, m_history.entries());
+      else if (question.clickedButton() != replace)
+        return;
+    }
+    m_history.setEntries(loaded);
+    // Loading a listing does not replace the draft or the active canvas text.
+    rebuildHistoryList(false);
+  }
+
   void importTextDocument() {
     QString fileName = QFileDialog::getOpenFileName(
         this, tr("Import Text Document"), QString(),
@@ -927,7 +996,7 @@ class TypeToolTextHistoryPopup final : public DVGui::Dialog {
     if (entry.format == TypeToolTextFormat::PlainText) m_editor->setFocus();
   }
 
-  void rebuildHistoryList() {
+  void rebuildHistoryList(bool restoreSelection = true) {
     int oldRow = m_historyList->currentRow();
     QSignalBlocker blocker(m_historyList);
     m_historyList->clear();
@@ -950,7 +1019,7 @@ class TypeToolTextHistoryPopup final : public DVGui::Dialog {
                             entry.font.style, tr("Size"), entry.font.size);
       item->setToolTip(toolTip);
     }
-    if (oldRow >= 0 && oldRow < m_historyList->count())
+    if (restoreSelection && oldRow >= 0 && oldRow < m_historyList->count())
       m_historyList->setCurrentRow(oldRow);
   }
 
@@ -1031,11 +1100,15 @@ public:
         new QLabel(tr("Recent Text (last %1)").arg(cTextHistoryLimit), this));
     layout->addWidget(m_historyList, 1);
 
-    QPushButton *importButton = new QPushButton(tr("Import Text..."), this);
+    QPushButton *importButton   = new QPushButton(tr("Import Text..."), this);
     QPushButton *saveTextButton = new QPushButton(tr("Save Text..."), this);
-    QPushButton *deleteButton = new QPushButton(tr("Delete Entry"), this);
-    QPushButton *clearButton  = new QPushButton(tr("Clear History"), this);
-    QPushButton *closeButton  = new QPushButton(tr("Close"), this);
+    QPushButton *deleteButton   = new QPushButton(tr("Delete Entry"), this);
+    QPushButton *clearButton    = new QPushButton(tr("Clear History"), this);
+    QPushButton *closeButton    = new QPushButton(tr("Close"), this);
+    QPushButton *loadHistoryButton =
+        new QPushButton(tr("Load History..."), this);
+    QPushButton *saveHistoryButton =
+        new QPushButton(tr("Save History..."), this);
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addWidget(importButton);
     buttonLayout->addWidget(saveTextButton);
@@ -1044,6 +1117,8 @@ public:
     buttonLayout->addWidget(closeButton);
     layout->addLayout(buttonLayout);
     QHBoxLayout *historyButtons = new QHBoxLayout;
+    historyButtons->addWidget(loadHistoryButton);
+    historyButtons->addWidget(saveHistoryButton);
     historyButtons->addWidget(deleteButton);
     historyButtons->addWidget(clearButton);
     historyButtons->addStretch(1);
@@ -1090,11 +1165,15 @@ public:
             [this]() { saveTextDocument(); });
     connect(m_saveEntryButton, &QPushButton::clicked, this,
             [this]() { saveCurrentTextToHistory(); });
+    connect(loadHistoryButton, &QPushButton::clicked, this,
+            [this]() { loadTextHistory(); });
+    connect(saveHistoryButton, &QPushButton::clicked, this,
+            [this]() { saveTextHistory(); });
     connect(deleteButton, &QPushButton::clicked, this, [this]() {
       int row = m_historyList->currentRow();
       if (row < 0) return;
       m_history.removeEntry(row);
-      rebuildHistoryList();
+      rebuildHistoryList(false);
     });
     connect(clearButton, &QPushButton::clicked, this, [this]() {
       if (QMessageBox::question(
@@ -1103,7 +1182,7 @@ public:
           QMessageBox::Yes)
         return;
       m_history.clear();
-      rebuildHistoryList();
+      rebuildHistoryList(false);
     });
     connect(closeButton, &QPushButton::clicked, this, &QWidget::hide);
     connect(this, &DVGui::Dialog::dialogClosed, this, [this]() {

@@ -2,6 +2,11 @@
 
 #include <QAbstractTextDocumentLayout>
 #include <QFontDatabase>
+#include <QCoreApplication>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QTextCodec>
 #include <QPaintEngine>
 #include <QPainter>
 #include <QPainterPathStroker>
@@ -269,6 +274,123 @@ bool saveTextSource(const QString &fileName, const QString &source,
   }
   error.clear();
   return true;
+}
+
+QByteArray serializeHistory(const QList<TypeToolTextEntry> &entries) {
+  QJsonArray array;
+  for (const TypeToolTextEntry &entry : entries) {
+    QJsonObject font;
+    font.insert(QStringLiteral("family"), entry.font.family);
+    font.insert(QStringLiteral("style"), entry.font.style);
+    font.insert(QStringLiteral("size"), entry.font.size);
+    QJsonObject item;
+    item.insert(QStringLiteral("source"), entry.source);
+    item.insert(QStringLiteral("format"), textFormatName(entry.format));
+    item.insert(QStringLiteral("preserveLineBreaks"),
+                entry.preserveSourceLineBreaks);
+    item.insert(QStringLiteral("font"), font);
+    array.append(item);
+  }
+  QJsonObject object;
+  object.insert(QStringLiteral("format"),
+                QStringLiteral("OpenToonzTypeToolHistory"));
+  object.insert(QStringLiteral("version"), 1);
+  object.insert(QStringLiteral("entries"), array);
+  return QJsonDocument(object).toJson(QJsonDocument::Indented);
+}
+
+bool deserializeHistory(const QByteArray &bytes,
+                        QList<TypeToolTextEntry> &entries, QString &error) {
+  auto invalid = [&error](const char *message) {
+    error = QCoreApplication::translate("TypeToolTextHistoryPopup", message);
+    return false;
+  };
+  QTextCodec::ConverterState state;
+  QTextCodec::codecForName("UTF-8")->toUnicode(bytes.constData(), bytes.size(),
+                                               &state);
+  if (state.invalidChars || state.remainingChars)
+    return invalid(
+        QT_TRANSLATE_NOOP("TypeToolTextHistoryPopup",
+                          "The history file contains invalid UTF-8 text."));
+  QJsonParseError parseError;
+  const QJsonDocument document = QJsonDocument::fromJson(bytes, &parseError);
+  if (parseError.error != QJsonParseError::NoError || !document.isObject())
+    return invalid(
+        QT_TRANSLATE_NOOP("TypeToolTextHistoryPopup",
+                          "The history file is not a valid JSON object."));
+  const QJsonObject object = document.object();
+  if (object.value(QStringLiteral("format")).toString() !=
+          QStringLiteral("OpenToonzTypeToolHistory") ||
+      !object.value(QStringLiteral("version")).isDouble() ||
+      object.value(QStringLiteral("version")).toDouble() != 1 ||
+      !object.value(QStringLiteral("entries")).isArray())
+    return invalid(
+        QT_TRANSLATE_NOOP("TypeToolTextHistoryPopup",
+                          "The file is not a supported Type Tool history."));
+  const QJsonArray array = object.value(QStringLiteral("entries")).toArray();
+  if (array.size() > cTextHistoryLimit)
+    return invalid(QT_TRANSLATE_NOOP(
+        "TypeToolTextHistoryPopup",
+        "The history file exceeds the Recent Text entry limit."));
+  QList<TypeToolTextEntry> loaded;
+  for (const QJsonValue &value : array) {
+    if (!value.isObject())
+      return invalid(
+          QT_TRANSLATE_NOOP("TypeToolTextHistoryPopup",
+                            "The history file contains an invalid entry."));
+    const QJsonObject item = value.toObject();
+    const QJsonObject font = item.value(QStringLiteral("font")).toObject();
+    const QString format   = item.value(QStringLiteral("format")).toString();
+    if (!item.value(QStringLiteral("source")).isString() ||
+        item.value(QStringLiteral("source")).toString().isEmpty() ||
+        (format != QStringLiteral("PlainText") &&
+         format != QStringLiteral("Markdown")) ||
+        !item.value(QStringLiteral("preserveLineBreaks")).isBool() ||
+        !font.value(QStringLiteral("family")).isString() ||
+        !font.value(QStringLiteral("style")).isString() ||
+        !font.value(QStringLiteral("size")).isString())
+      return invalid(
+          QT_TRANSLATE_NOOP("TypeToolTextHistoryPopup",
+                            "The history file contains an invalid entry."));
+    TypeToolTextEntry entry;
+    entry.source =
+        normalizedText(item.value(QStringLiteral("source")).toString());
+    entry.format = textFormatFromName(format);
+    entry.preserveSourceLineBreaks =
+        item.value(QStringLiteral("preserveLineBreaks")).toBool();
+    entry.font.family = font.value(QStringLiteral("family")).toString();
+    entry.font.style  = font.value(QStringLiteral("style")).toString();
+    entry.font.size   = font.value(QStringLiteral("size")).toString();
+    bool validSize    = false;
+    const int size    = entry.font.size.toInt(&validSize);
+    if (!entry.font.size.isEmpty() && (!validSize || size < 1 || size > 1000))
+      return invalid(
+          QT_TRANSLATE_NOOP("TypeToolTextHistoryPopup",
+                            "The history file contains an invalid font size."));
+    loaded.append(entry);
+  }
+  // Publish only after every entry has passed validation.
+  entries = mergeHistory(loaded, QList<TypeToolTextEntry>());
+  error.clear();
+  return true;
+}
+
+QList<TypeToolTextEntry> mergeHistory(const QList<TypeToolTextEntry> &loaded,
+                                      const QList<TypeToolTextEntry> &current) {
+  QList<TypeToolTextEntry> result;
+  const QList<TypeToolTextEntry> candidates = loaded + current;
+  for (const TypeToolTextEntry &entry : candidates) {
+    bool duplicate = false;
+    for (const TypeToolTextEntry &saved : result) {
+      if (sameTextEntry(entry, saved)) {
+        duplicate = true;
+        break;
+      }
+    }
+    if (!duplicate) result.append(entry);
+    if (result.size() == cTextHistoryLimit) break;
+  }
+  return result;
 }
 
 }  // namespace TypeToolText

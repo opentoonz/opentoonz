@@ -7,6 +7,8 @@
 
 namespace TypeToolText {
 
+constexpr int cTextHistoryLimit = 20;
+
 enum class TypeToolTextFormat { PlainText, Markdown };
 
 struct TypeToolFontSettings final {
@@ -42,5 +44,10 @@ OutlineLayout buildOutlineLayout(const TypeToolTextEntry &entry,
 QImage rasterizeOutlineLayout(const OutlineLayout &layout, QRect &bounds);
 bool saveTextSource(const QString &fileName, const QString &source,
                     QString &error);
+QByteArray serializeHistory(const QList<TypeToolTextEntry> &entries);
+bool deserializeHistory(const QByteArray &bytes,
+                        QList<TypeToolTextEntry> &entries, QString &error);
+QList<TypeToolTextEntry> mergeHistory(const QList<TypeToolTextEntry> &loaded,
+                                      const QList<TypeToolTextEntry> &current);
 
 }  // namespace TypeToolText

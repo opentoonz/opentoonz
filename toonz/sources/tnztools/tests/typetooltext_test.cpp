@@ -3,6 +3,9 @@
 #include <QGuiApplication>
 #include <QFile>
 #include <QTemporaryDir>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 #include <cmath>
 #include <cstdlib>
@@ -116,6 +119,62 @@ int main(int argc, char **argv) {
           !error.isEmpty(),
       "A failed text export was reported as successful");
 
-  std::cout << "Type Tool formatted text tests passed" << std::endl;
+  TypeToolTextEntry first                 = markdown(source);
+  first.font.style                        = QStringLiteral("Bold Italic");
+  first.preserveSourceLineBreaks          = false;
+  TypeToolTextEntry second                = first;
+  second.format                           = TypeToolTextFormat::PlainText;
+  second.font.size                        = QStringLiteral("86");
+  const QList<TypeToolTextEntry> original = {first, second};
+  QList<TypeToolTextEntry> loaded;
+  const QByteArray archive = serializeHistory(original);
+  require(
+      deserializeHistory(archive, loaded, error) && loaded.size() == 2 &&
+          sameTextEntry(loaded[0], first) && sameTextEntry(loaded[1], second),
+      "History round trip changed source, formatting, order, or font settings");
+
+  const QList<TypeToolTextEntry> merged = mergeHistory({first}, original);
+  require(merged.size() == 2 && sameTextEntry(merged[1], second),
+          "History merge lost a different appearance or duplicated an entry");
+  QList<TypeToolTextEntry> fullHistory;
+  for (int i = 0; i < cTextHistoryLimit; ++i) {
+    TypeToolTextEntry item = first;
+    item.source            = QStringLiteral("Existing %1").arg(i);
+    fullHistory.append(item);
+  }
+  const QList<TypeToolTextEntry> capped = mergeHistory(original, fullHistory);
+  require(
+      capped.size() == cTextHistoryLimit && sameTextEntry(capped[0], first) &&
+          sameTextEntry(capped[1], second) &&
+          sameTextEntry(capped.last(), fullHistory[cTextHistoryLimit - 3]),
+      "History merge changed loaded order or exceeded the recent-entry limit");
+
+  QJsonObject invalid = QJsonDocument::fromJson(archive).object();
+  invalid.insert(QStringLiteral("version"), 2);
+  loaded = original;
+  require(!deserializeHistory(QJsonDocument(invalid).toJson(), loaded, error) &&
+              !error.isEmpty() && sameTextEntry(loaded[0], first),
+          "An unsupported history version modified existing entries");
+  invalid = QJsonDocument::fromJson(archive).object();
+  QJsonArray invalidEntries =
+      invalid.value(QStringLiteral("entries")).toArray();
+  invalidEntries.append(QJsonObject());
+  invalid.insert(QStringLiteral("entries"), invalidEntries);
+  require(
+      !deserializeHistory(QJsonDocument(invalid).toJson(), loaded, error) &&
+          loaded.size() == original.size() && sameTextEntry(loaded[1], second),
+      "Partially valid history was applied before all entries were validated");
+  QByteArray invalidUtf8 = archive;
+  invalidUtf8.insert(invalidUtf8.indexOf("Caf") + 3, char(0xff));
+  require(!deserializeHistory(invalidUtf8, loaded, error),
+          "History accepted invalid UTF-8 data");
+  fullHistory.append(first);
+  require(!deserializeHistory(serializeHistory(fullHistory), loaded, error),
+          "An oversized history was silently truncated");
+  require(deserializeHistory(serializeHistory({}), loaded, error) &&
+              loaded.isEmpty(),
+          "An empty history could not be restored");
+
+  std::cout << "Type Tool text, export, and history tests passed" << std::endl;
   return 0;
 }
