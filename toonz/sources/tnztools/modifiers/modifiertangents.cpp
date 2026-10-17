@@ -97,14 +97,18 @@ TModifierTangents::modifyTrack(
   int start = track.size() - track.pointsAdded;
   if (start < 0) start = 0;
   
-  // update tangents
+  // --- update tangents
   int tangentStart = start - 1;
   if (tangentStart < 0) tangentStart = 0;
   intr->tangents.resize(tangentStart);
   for(int i = tangentStart; i < track.size(); ++i)
     intr->tangents.push_back(calcTangent(track, i));
 
-  // update subTrack
+  // --- update subTrack
+  // Re-emit the preceding point because its newly calculated tangent also
+  // changes the segment leading into it.
+  if (start > 1) --start;
+  
   subTrack.truncate(start);
   for(int i = start; i < track.size(); ++i)
     subTrack.push_back(subTrack.pointFromOriginal(i), false);
