@@ -1,6 +1,8 @@
 #include "typetooltext.h"
 
 #include <QGuiApplication>
+#include <QFile>
+#include <QTemporaryDir>
 
 #include <cmath>
 #include <cstdlib>
@@ -97,6 +99,22 @@ int main(int argc, char **argv) {
   oversized.bounds = path.boundingRect();
   require(rasterizeOutlineLayout(oversized, bounds).isNull(),
           "An oversized raster allocation was accepted");
+
+  QTemporaryDir directory;
+  require(directory.isValid(), "Could not create a temporary test directory");
+  const QString source =
+      QString::fromUtf8("# Caf\xc3\xa9\n**Bold** and \xce\xa9\n");
+  const QString fileName = directory.filePath(QStringLiteral("source.md"));
+  QString error;
+  require(saveTextSource(fileName, source, error), "Text source export failed");
+  QFile saved(fileName);
+  require(saved.open(QIODevice::ReadOnly) && saved.readAll() == source.toUtf8(),
+          "Text export changed Markdown, Unicode, or line breaks");
+  require(
+      !saveTextSource(directory.filePath(QStringLiteral("missing/source.md")),
+                      source, error) &&
+          !error.isEmpty(),
+      "A failed text export was reported as successful");
 
   std::cout << "Type Tool formatted text tests passed" << std::endl;
   return 0;

@@ -838,6 +838,34 @@ class TypeToolTextHistoryPopup final : public DVGui::Dialog {
     }
   }
 
+  void saveTextDocument() {
+    const bool markdown = editorEntry().format == TypeToolTextFormat::Markdown;
+    const QString plainFilter    = tr("Plain text (*.txt)");
+    const QString markdownFilter = tr("Markdown (*.md *.markdown)");
+    QFileDialog dialog(this, tr("Save Text Source"));
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setFileMode(QFileDialog::AnyFile);
+    dialog.setNameFilters(QStringList() << plainFilter << markdownFilter);
+    dialog.selectNameFilter(markdown ? markdownFilter : plainFilter);
+    dialog.setDefaultSuffix(markdown ? QStringLiteral("md")
+                                     : QStringLiteral("txt"));
+    dialog.selectFile(markdown ? QStringLiteral("text.md")
+                               : QStringLiteral("text.txt"));
+    connect(&dialog, &QFileDialog::filterSelected, &dialog,
+            [&dialog, markdownFilter](const QString &filter) {
+              dialog.setDefaultSuffix(filter == markdownFilter
+                                          ? QStringLiteral("md")
+                                          : QStringLiteral("txt"));
+            });
+    if (dialog.exec() != QDialog::Accepted || dialog.selectedFiles().isEmpty())
+      return;
+    QString error;
+    if (!saveTextSource(dialog.selectedFiles().first(), m_editor->toPlainText(),
+                        error))
+      QMessageBox::warning(this, tr("Save Text Source"),
+                           tr("The text could not be saved.\n%1").arg(error));
+  }
+
   void importTextDocument() {
     QString fileName = QFileDialog::getOpenFileName(
         this, tr("Import Text Document"), QString(),
@@ -990,11 +1018,13 @@ public:
     layout->addWidget(m_historyList, 1);
 
     QPushButton *importButton = new QPushButton(tr("Import Text..."), this);
+    QPushButton *saveTextButton = new QPushButton(tr("Save Text..."), this);
     QPushButton *deleteButton = new QPushButton(tr("Delete Entry"), this);
     QPushButton *clearButton  = new QPushButton(tr("Clear History"), this);
     QPushButton *closeButton  = new QPushButton(tr("Close"), this);
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addWidget(importButton);
+    buttonLayout->addWidget(saveTextButton);
     buttonLayout->addWidget(deleteButton);
     buttonLayout->addWidget(clearButton);
     buttonLayout->addStretch(1);
@@ -1037,6 +1067,8 @@ public:
             });
     connect(importButton, &QPushButton::clicked, this,
             [this]() { importTextDocument(); });
+    connect(saveTextButton, &QPushButton::clicked, this,
+            [this]() { saveTextDocument(); });
     connect(deleteButton, &QPushButton::clicked, this, [this]() {
       int row = m_historyList->currentRow();
       if (row < 0) return;

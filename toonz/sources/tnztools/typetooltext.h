@@ -40,5 +40,7 @@ struct OutlineLayout final {
 OutlineLayout buildOutlineLayout(const TypeToolTextEntry &entry,
                                  bool vertical = false);
 QImage rasterizeOutlineLayout(const OutlineLayout &layout, QRect &bounds);
+bool saveTextSource(const QString &fileName, const QString &source,
+                    QString &error);
 
 }  // namespace TypeToolText

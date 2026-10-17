@@ -6,6 +6,7 @@
 #include <QPainter>
 #include <QPainterPathStroker>
 #include <QRegularExpression>
+#include <QSaveFile>
 #include <QTextBlock>
 #include <QTextCursor>
 #include <QTextDocument>
@@ -255,6 +256,19 @@ QImage rasterizeOutlineLayout(const OutlineLayout &layout, QRect &bounds) {
   painter.end();
   bounds = rasterBounds;
   return image;
+}
+
+bool saveTextSource(const QString &fileName, const QString &source,
+                    QString &error) {
+  QSaveFile file(fileName);
+  const QByteArray bytes = source.toUtf8();
+  if (!file.open(QIODevice::WriteOnly) || file.write(bytes) != bytes.size() ||
+      !file.commit()) {
+    error = file.errorString();
+    return false;
+  }
+  error.clear();
+  return true;
 }
 
 }  // namespace TypeToolText
