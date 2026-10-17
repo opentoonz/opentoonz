@@ -267,6 +267,29 @@ public:
             portableCheck.getParentDir().getQString().toStdString();
     }
 #endif
+
+    // The working directory only holds portablestuff when the application was
+    // started from that folder; a desktop entry or file manager can leave it
+    // anywhere. Look beside the application itself as well.
+    if (!m_isPortable) {
+      // An AppImage executes from a temporary mount point, so its own
+      // directory is not where the user keeps portablestuff. APPIMAGE, set by
+      // the AppImage runtime, is the path of the bundle itself.
+      QString appImage = QString::fromLocal8Bit(qgetenv("APPIMAGE"));
+      QString appDir   = appImage.isEmpty()
+                             ? (QCoreApplication::instance()
+                                    ? QCoreApplication::applicationDirPath()
+                                    : QString())
+                             : QFileInfo(appImage).absolutePath();
+      if (!appDir.isEmpty()) {
+        portableCheck  = TFilePath(appDir.toStdString() + "\\portablestuff\\");
+        portableStatus = TFileStatus(portableCheck);
+        m_isPortable   = portableStatus.doesExist();
+        if (m_isPortable)
+          m_workingDirectory =
+              portableCheck.getParentDir().getQString().toStdString();
+      }
+    }
   }
   std::string getWorkingDirectory() { return m_workingDirectory; }
 
