@@ -16,8 +16,10 @@ on:
       - '!doc/**'                                 # Exclude documentation
       - '!**/.github/**'                          # Exclude everything in .github folder
       - '.github/workflows/workflow_windows.yml'  # Include Windows workflow file
+      - '.github/workflows/otdev_branding.yml'
       - '.github/ot-dev/**'                       # Include OT-Dev build branding assets
   pull_request:
+    types: [opened, synchronize, reopened, edited]
     branches:
       - main
       - edition
@@ -31,6 +33,7 @@ on:
       - '!doc/**'
       - '!**/.github/**'
       - '.github/workflows/workflow_windows.yml'
+      - '.github/workflows/otdev_branding.yml'
       - '.github/ot-dev/**'
   workflow_dispatch:
 
@@ -38,6 +41,17 @@ permissions:
   contents: read
 
 jobs:
+  Branding:
+    if: github.repository == 'OpenAnimationLibrary/opentoonz-dev'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          sparse-checkout: .github/ot-dev
+      - name: Test SVG template substitution and window branding
+        run: python3 -m unittest discover -s .github/ot-dev -p test_brand_build.py -v
+
   RecorderEncoder:
     if: github.repository == 'OpenAnimationLibrary/opentoonz-dev'
     runs-on: windows-2025
@@ -80,7 +94,7 @@ jobs:
           path: recorder-test-decoder
 
   Windows:
-    needs: RecorderEncoder
+    needs: [RecorderEncoder, Branding]
     runs-on: windows-2025
     env:
       # QT related variable
@@ -120,104 +134,9 @@ jobs:
 
       - name: Brand OT-Dev build
         shell: pwsh
-        env:
-          OT_EVENT_NAME: ${{ github.event_name }}
-          OT_PR_NUMBER: ${{ github.event.pull_request.number }}
-          OT_PR_TITLE: ${{ github.event.pull_request.title }}
-          OT_PR_BODY: ${{ github.event.pull_request.body }}
-          OT_REF_NAME: ${{ github.ref_name }}
-          OT_SHA: ${{ github.sha }}
         run: |
-          $shortSha = $env:OT_SHA.Substring(0, 7)
-
-          if ($env:OT_EVENT_NAME -eq "pull_request" -and $env:OT_PR_NUMBER) {
-            $title = $env:OT_PR_TITLE -replace '[^A-Za-z0-9 ._#()+-]', ' '
-            $title = ($title -replace '\s+', ' ').Trim()
-            if ($title.Length -gt 48) {
-              $title = $title.Substring(0, 45).TrimEnd() + "..."
-            }
-
-            $label = "OT-Dev PR #$($env:OT_PR_NUMBER)"
-            if ($title) { $label += " - $title" }
-            $prHeading = "PR #$($env:OT_PR_NUMBER) — $title"
-
-            $description = $env:OT_PR_BODY
-            if ($description) {
-              $description = $description -replace '(?m)^\s*#{1,6}\s*', ''
-              $description = $description -replace '(?m)^\s*[-*+]\s*', ''
-              $description = $description -replace '`', ''
-              $description = $description -replace '\[(.*?)\]\([^)]*\)', '$1'
-              $description = ($description -replace '\s+', ' ').Trim()
-            }
-            if (-not $description) {
-              $description = "Experimental OT-Dev pull-request build for review and testing."
-            }
-          } else {
-            $ref = $env:OT_REF_NAME -replace '[^A-Za-z0-9._-]', '-'
-            if (-not $ref) { $ref = "build" }
-            $label = "OT-Dev $ref @ $shortSha"
-            $prHeading = "$ref build @ $shortSha"
-            $description = "Experimental OT-Dev build from the $ref ref for review and testing."
-          }
-
-          $sourcePath = "toonz/sources/toonz/mainwindow.cpp"
-          $source = Get-Content $sourcePath -Raw
-          $needle = 'QString::fromStdString(TEnv::getApplicationFullName());'
-          if (-not $source.Contains($needle)) {
-            throw "Unable to locate OpenToonz window-title construction."
-          }
-
-          $escapedLabel = $label.Replace('\', '\\').Replace('"', '\"')
-          $replacement = 'QString::fromStdString(TEnv::getApplicationFullName()) + " [' + $escapedLabel + ']";'
-          $source = $source.Replace($needle, $replacement)
-          Set-Content -Path $sourcePath -Value $source -NoNewline
-
-          function Escape-SvgText([string]$text) {
-            if ($null -eq $text) { return "" }
-            return [System.Security.SecurityElement]::Escape($text)
-          }
-
-          function Split-SvgDescription([string]$text) {
-            $max = 72
-            if ($text.Length -le $max) { return @($text, "") }
-            $cut = $text.LastIndexOf(' ', [Math]::Min($max, $text.Length - 1))
-            if ($cut -lt 1) { $cut = [Math]::Min($max, $text.Length) }
-            $line1 = $text.Substring(0, $cut).Trim()
-            $rest = $text.Substring($cut).Trim()
-            if ($rest.Length -gt $max) {
-              $secondCut = $rest.LastIndexOf(' ', [Math]::Min($max - 3, $rest.Length - 1))
-              if ($secondCut -lt 1) { $secondCut = [Math]::Min($max - 3, $rest.Length) }
-              $rest = $rest.Substring(0, $secondCut).TrimEnd() + "..."
-            }
-            return @($line1, $rest)
-          }
-
-          $descriptionLines = Split-SvgDescription $description
-          $buildDate = (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm 'UTC'")
-          $templatePath = ".github/ot-dev/splash-template.svg"
-          if (-not (Test-Path $templatePath)) {
-            throw "OT-Dev splash template is missing: $templatePath"
-          }
-
-          $splash = Get-Content $templatePath -Raw
-          $replacements = @{
-            '{{BUILD_LABEL}}' = (Escape-SvgText $label)
-            '{{PR_HEADING}}' = (Escape-SvgText $prHeading)
-            '{{DESCRIPTION}}' = (Escape-SvgText $description)
-            '{{DESCRIPTION_LINE_1}}' = (Escape-SvgText $descriptionLines[0])
-            '{{DESCRIPTION_LINE_2}}' = (Escape-SvgText $descriptionLines[1])
-            '{{BUILD_DATE}}' = (Escape-SvgText $buildDate)
-            '{{SHORT_SHA}}' = (Escape-SvgText $shortSha)
-          }
-          foreach ($entry in $replacements.GetEnumerator()) {
-            $splash = $splash.Replace($entry.Key, $entry.Value)
-          }
-
-          $generatedSplash = Join-Path $env:RUNNER_TEMP "ot-dev-splash.svg"
-          Set-Content -Path $generatedSplash -Value $splash -NoNewline -Encoding utf8
-
-          Write-Host "Window title branding: $label"
-          Write-Host "Generated OT-Dev splash: $generatedSplash"
+          python .github/ot-dev/brand_build.py --template .github/ot-dev/splash-template.svg --output "$env:RUNNER_TEMP/ot-dev-splash.svg" --source-root .
+          if ($LASTEXITCODE) { throw 'OT-Dev branding failed' }
 
       # Cache OpenCV and Boost libraries
       - name: Cache OpenCV and Boost
