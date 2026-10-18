@@ -67,6 +67,9 @@ DVAPI void addFx(TFx *newFx, const QList<TFxP> &fxs, TApplication *app,
                  int colunIndex, int rowIndex, bool attachSource = true);
 DVAPI void replaceFx(TFx *newFx, const QList<TFxP> &fxs,
                      TXsheetHandle *xshHandle, TFxHandle *fxHandle);
+// Reset animatable values at one frame without replacing the FX.
+DVAPI void resetFxFrame(TFx *fx, TFx *defaults, int frame,
+                        TXsheetHandle *xshHandle, TFxHandle *fxHandle);
 DVAPI void duplicateFx(TFx *src, TXsheetHandle *xshHandle, TFxHandle *fxHandle);
 DVAPI void unlinkFx(TFx *fx, TFxHandle *fxHandle, TXsheetHandle *xshHandle);
 DVAPI void makeMacroFx(const std::vector<TFxP> &fxs, TApplication *app);
