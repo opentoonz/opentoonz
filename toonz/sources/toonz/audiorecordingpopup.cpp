@@ -770,7 +770,6 @@ void AudioRecordingPopup::reinitAudioInput() {
 //
 // 8-bits audio must be unsigned
 // 16-bits audio must be signed
-// 32-bits isn't supported
 
 AudioWriterWAV::AudioWriterWAV(const QAudioFormat &format)
     : m_level(0.0)
@@ -876,7 +875,9 @@ void AudioWriterWAV::writeWAVHeader(QFile &file) {
   out << (quint32)(m_wrRawB + AWWAV_HEADER_SIZE);
   out.writeRawData("WAVEfmt ", 8);
   out << (quint32)16;  // Chunk size
-  out << (quint16)(bitrate == 32 ? WAVE_FORMAT_IEEE_FLOAT : WAVE_FORMAT_PCM);
+  out << (quint16)(m_format.sampleType() == QAudioFormat::Float
+                       ? WAVE_FORMAT_IEEE_FLOAT
+                       : WAVE_FORMAT_PCM);
   out << channels << samplerate;
   out << quint32(samplerate * channels * bitrate / 8);
   out << quint16(channels * bitrate / 8);
@@ -919,14 +920,20 @@ qint64 AudioWriterWAV::writeData(const char *data, qint64 len) {
       if (tmp > peak) peak = tmp;
     }
     m_level = qreal(peak) / 127.0;
-  } else {  // 32-bits
+  } else if (m_format.sampleType() == QAudioFormat::Float) {
     const float *sdata = (const float *)data;
     int slen           = len / 4;
+    m_level            = 0.0;
     for (int i = 0; i < slen; ++i) {
-      tmp = qAbs<int>(sdata[i] * 32767.0f);
-      if (tmp > peak) peak = tmp;
+      m_level = qMax(m_level, qAbs(qreal(sdata[i])));
     }
-    m_level = peak;
+  } else {
+    const qint32 *sdata = (const qint32 *)data;
+    int slen            = len / 4;
+    m_level             = 0.0;
+    for (int i = 0; i < slen; ++i) {
+      m_level = qMax(m_level, qAbs(qreal(sdata[i])) / 2147483648.0);
+    }
   }
   if (m_level > m_peakL) m_peakL = m_level;
 
