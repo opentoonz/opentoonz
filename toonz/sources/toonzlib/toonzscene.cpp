@@ -1253,7 +1253,7 @@ namespace {
 // project/alias directory via path traversal.
 bool containsParentDirReference(const TFilePath &fp) {
   std::wstring ws = fp.getWideString();
-  size_t start     = 0;
+  size_t start    = 0;
   for (size_t i = 0; i <= ws.size(); ++i) {
     if (i == ws.size() || ws[i] == L'/' || ws[i] == L'\\') {
       if (ws.compare(start, i - start, L"..") == 0) return true;
