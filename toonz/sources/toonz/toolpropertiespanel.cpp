@@ -6497,22 +6497,8 @@ void ToolPropertiesPanel::createSelectionProperties() {
     createMiterProperty();
   }
 
-  // Initial disabled state — updateStatus() will enable them when selection
-  // exists
-  m_selScaleX->setEnabled(false);
-  m_selScaleY->setEnabled(false);
-  m_selHLabel->setEnabled(false);
-  m_selVLabel->setEnabled(false);
-  m_selFlipH->setEnabled(false);
-  m_selFlipV->setEnabled(false);
-  m_selRotation->setEnabled(false);
-  m_selRotL->setEnabled(false);
-  m_selRotR->setEnabled(false);
-  m_selMoveX->setEnabled(false);
-  m_selMoveY->setEnabled(false);
-  m_selXLabel->setEnabled(false);
-  m_selYLabel->setEnabled(false);
-  if (m_selThick) m_selThick->setEnabled(false);
+  // Reopening or rebuilding the panel must reflect an existing selection too.
+  updatePropertyValues();
 }
 
 //=============================================================================
