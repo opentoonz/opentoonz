@@ -6,6 +6,7 @@
 
 #include <array>
 #include <limits>
+#include <memory>
 
 // ToonzQt includes
 #include "tapp.h"
@@ -2486,55 +2487,55 @@ void syncPlasticRelayField(MeasuredValueField *field,
   field->blockSignals(false);
 }
 
-void commitPlasticRelayField(MeasuredValueField *field, PlasticTool *plastic,
-                             TDoubleParamRelayProperty *relay) {
-  if (!field || !plastic || !relay) return;
+class PlasticRelayFieldEditor final : public QObject {
+  PlasticTool *m_plastic;
+  TDoubleParamRelayProperty *m_relay;
+  TDoubleParamP m_param;
+  double m_frame = 0.0;
+  std::unique_ptr<KeyframeSetter> m_setter;
 
-  TDoubleParamP param = relay->getParam();
-  if (!param) return;
+public:
+  PlasticRelayFieldEditor(MeasuredValueField *field, PlasticTool *plastic,
+                          TDoubleParamRelayProperty *relay)
+      : QObject(field), m_plastic(plastic), m_relay(relay) {
+    connect(field, &MeasuredValueField::measuredValueChanged, this,
+            [this, field](TMeasuredValue *, bool addToUndo) {
+              // Keyframe notifications can replace the field's displayed value.
+              const double value = field->getValue();
+              setValue(value, addToUndo);
+            });
+  }
 
-  const double oldVal = relay->getValue();
-  const double newVal = field->getValue();
-  const double frame  = relay->frame();
-  if (oldVal == newVal) return;
+private:
+  void setValue(double value, bool addToUndo) {
+    TDoubleParamP param = m_relay->getParam();
+    const double frame  = m_relay->frame();
+    if (m_setter && (param != m_param || frame != m_frame)) m_setter.reset();
+    if (!param || (!m_setter && m_relay->getValue() == value)) return;
 
-  struct SetValueUndo final : public TUndo {
-    TDoubleParamP m_param;
-    double m_oldVal, m_newVal, m_frame;
+    TUndoManager *manager = TUndoManager::manager();
+    if (addToUndo) manager->beginBlock();
 
-    SetValueUndo(const TDoubleParamP &param, double oldVal, double newVal,
-                 double frame)
-        : m_param(param), m_oldVal(oldVal), m_newVal(newVal), m_frame(frame) {}
-
-    int getSize() const override {
-      return sizeof(SetValueUndo) + sizeof(TDoubleParam);
+    // Retain the original keyframe state throughout a drag. This also lets
+    // undo remove a keyframe first created by a live preview.
+    if (!m_setter) {
+      m_param = param;
+      m_frame = frame;
+      m_setter.reset(new KeyframeSetter(param.getPointer(), -1, true));
+      m_setter->createKeyframe(frame);
     }
-    void undo() const override { m_param->setValue(m_frame, m_oldVal); }
-    void redo() const override { m_param->setValue(m_frame, m_newVal); }
-  };
+    if (addToUndo) m_plastic->keyframePlasticRelays(m_relay);
 
-  auto setKeyframe = [](TDoubleParamRelayProperty *prop) {
-    if (!prop) return;
-    TDoubleParam *p = prop->getParam().getPointer();
-    if (!p) return;
-    const double f = prop->frame();
-    if (!p->isKeyframe(f)) {
-      KeyframeSetter setter(p, -1, true);
-      setter.createKeyframe(f);
+    m_setter->setValue(value);
+    m_plastic->onPropertyChanged(m_relay->getName());
+
+    if (addToUndo) {
+      // Add one undo entry for the whole gesture, grouped with Global Key.
+      m_setter.reset();
+      manager->endBlock();
     }
-  };
-
-  TUndoManager *manager = TUndoManager::manager();
-  manager->beginBlock();
-
-  plastic->keyframePlasticRelays(relay);
-
-  relay->setValue(newVal);
-  plastic->onPropertyChanged(relay->getName());
-
-  manager->add(new SetValueUndo(param, oldVal, newVal, frame));
-  manager->endBlock();
-}
+  }
+};
 
 MeasuredValueField *createPlasticRelayField(QWidget *parent,
                                             PlasticTool *plastic,
@@ -2544,10 +2545,7 @@ MeasuredValueField *createPlasticRelayField(QWidget *parent,
   field->setObjectName(objectName);
   field->setProperty("plasticRelay", true);
   syncPlasticRelayField(field, relay);
-  QObject::connect(field, &QLineEdit::editingFinished,
-                   [field, plastic, relay]() {
-                     commitPlasticRelayField(field, plastic, relay);
-                   });
+  new PlasticRelayFieldEditor(field, plastic, relay);
   return field;
 }
 
