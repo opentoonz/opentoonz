@@ -13,6 +13,7 @@
 
 // TnzLib includes
 #include "toonz/preferences.h"
+#include "toonz/preferencesitemids.h"
 #include "toonz/toonzfolders.h"
 #include "toonz/tscenehandle.h"
 
@@ -54,7 +55,8 @@ TPanel::TPanel(QWidget *parent, Qt::WindowFlags flags,
     , m_multipleInstancesAllowed(true)
     , m_isRoomBound(false)
     , m_boundRoomName("")
-    , m_roomBindButton(nullptr) {
+    , m_roomBindButton(nullptr)
+    , m_ignorePanelShortcutToggle(false) {
   m_panelTitleBar = new TPanelTitleBar(this, orientation);
   setTitleBarWidget(m_panelTitleBar);
   connect(m_panelTitleBar, &TPanelTitleBar::doubleClick, this,
@@ -62,6 +64,13 @@ TPanel::TPanel(QWidget *parent, Qt::WindowFlags flags,
   connect(m_panelTitleBar, &TPanelTitleBar::closeButtonPressed, this,
           &TPanel::onCloseButtonPressed);
   setOrientation(orientation);
+
+  m_panelTitleBar->setContextMenuPolicy(Qt::CustomContextMenu);
+  connect(m_panelTitleBar, &QWidget::customContextMenuRequested, this,
+          [this](const QPoint &pos) {
+            onCustomContextMenuRequested(
+                mapFromGlobal(m_panelTitleBar->mapToGlobal(pos)));
+          });
 
   // Enable context menu for room binding
   setContextMenuPolicy(Qt::CustomContextMenu);
@@ -119,8 +128,26 @@ void TPanel::onCloseButtonPressed() {
 
 //-----------------------------------------------------------------------------
 
+void TPanel::dismissFloatingPanel() {
+  hide();
+  if (parentLayout()) parentLayout()->removeWidget(this);
+  emit closeButtonPressed();
+}
+
+//-----------------------------------------------------------------------------
+
 void TPanel::onCustomContextMenuRequested(const QPoint &pos) {
   QMenu menu(this);
+
+  if (isFloating() &&
+      Preferences::instance()->getBoolValue(togglePanelWithShortcut)) {
+    QAction *ignoreAction = menu.addAction(tr("Ignore Panel Shortcut Toggle"));
+    ignoreAction->setCheckable(true);
+    ignoreAction->setChecked(m_ignorePanelShortcutToggle);
+    connect(ignoreAction, &QAction::triggered,
+            [this](bool checked) { setIgnorePanelShortcutToggle(checked); });
+    menu.addSeparator();
+  }
 
   // Add "Bind to Current Room" option
   QAction *bindAction = menu.addAction(tr("Bind to Current Room"));
@@ -284,6 +311,12 @@ void TPanel::zoomContentsAndFitGeometry(bool forward) {
 void TPanel::setRoomBound(bool bound) {
   m_isRoomBound = bound;
   if (m_roomBindButton) m_roomBindButton->setPressed(bound);
+}
+
+//-----------------------------------------------------------------------------
+
+void TPanel::setIgnorePanelShortcutToggle(bool ignore) {
+  m_ignorePanelShortcutToggle = ignore;
 }
 
 //-----------------------------------------------------------------------------
