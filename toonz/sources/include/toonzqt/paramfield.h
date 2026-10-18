@@ -100,6 +100,7 @@ public:
   virtual QSize getPreferredSize() { return QSize(200, 28); }
 
   static void setFxHandle(TFxHandle *fxHandle);
+  static TFxHandle* getFxHandle() { return m_fxHandleStat; }
 
   virtual void setPrecision(int precision) {}
 signals:

@@ -1304,18 +1304,15 @@ PliTag *ParsedPliImp::readGroupTag() {
     PliTag *child;
     while (!(child = findTagFromOffset(tagOffs[i]))) {
       TagElem *elem = readTag();
-      if (!elem)
-        throw TException("corrupted pli file: missing group child");
+      if (!elem) throw TException("corrupted pli file: missing group child");
       addTag(*elem);
     }
 
     PliObjectTag *obj = dynamic_cast<PliObjectTag *>(child);
-    if (!obj)
-      throw TException("corrupted pli file: invalid group child");
+    if (!obj) throw TException("corrupted pli file: invalid group child");
     if (type == GroupTag::PALETTE && child->m_type != PliTag::STYLE_NGOBJ)
       throw TException("corrupted pli file: invalid palette group child");
-    if (type == GroupTag::STROKE &&
-        child->m_type != PliTag::COLOR_NGOBJ &&
+    if (type == GroupTag::STROKE && child->m_type != PliTag::COLOR_NGOBJ &&
         child->m_type != PliTag::OUTLINE_OPTIONS_GOBJ &&
         child->m_type != PliTag::GROUP_GOBJ &&
         child->m_type != PliTag::THICK_QUADRATIC_CHAIN_GOBJ)

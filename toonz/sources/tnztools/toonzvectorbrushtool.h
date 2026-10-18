@@ -227,6 +227,11 @@ protected:
   TBoolProperty m_autoGroup;
   TBoolProperty m_autoFill;
 
+  bool m_bypassAutoClose = false;
+  bool autoCloseEnabled() const {
+    return m_autoClose.getValue() && !m_bypassAutoClose;
+  }
+
   TInputManager m_inputmanager;
   TSmartPointerT<TModifierLine> m_modifierLine;
   TSmartPointerT<TModifierTangents> m_modifierTangents;

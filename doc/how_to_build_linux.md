@@ -195,6 +195,7 @@ It may be helpful to use existing packages as a reference when creating a packag
 - App-Image (Portable):
   https://github.com/morevnaproject/morevna-builds
 
+
 ## Translation workflow
 
 See [Contributing and maintaining translations](../toonz/sources/translations/README.md)
