@@ -3371,13 +3371,13 @@ QFrame *StyleEditor::createBottomWidget() {
   m_toolBar = new QToolBar(this);
   m_toolBar->setMovable(false);
   m_toolBar->setMaximumHeight(22);
-  QMenu *menu    = new QMenu();
-  m_wheelAction  = new QAction(tr("Wheel"), this);
-  m_hsvAction    = new QAction(tr("HSV"), this);
-  m_alphaAction  = new QAction(tr("Alpha"), this);
-  m_rgbAction    = new QAction(tr("RGB"), this);
-  m_hexAction    = new QAction(tr("Hex"), this);
-  m_searchAction = new QAction(tr("Search"), this);
+  QMenu *menu             = new QMenu();
+  m_wheelAction           = new QAction(tr("Wheel"), this);
+  m_hsvAction             = new QAction(tr("HSV"), this);
+  m_alphaAction           = new QAction(tr("Alpha"), this);
+  m_rgbAction             = new QAction(tr("RGB"), this);
+  m_hexAction             = new QAction(tr("Hex"), this);
+  m_searchAction          = new QAction(tr("Search"), this);
   m_compactSettingsAction = new QAction(tr("Compact Settings"), this);
 
   m_wheelAction->setCheckable(true);
@@ -3585,8 +3585,10 @@ QFrame *StyleEditor::createVectorPage() {
   QFrame *vectorOutsideFrame = new QFrame();
   vectorOutsideFrame->setMinimumWidth(50);
 
-  QPushButton *specialButton     = new QPushButton(tr("Generated"));
-  QPushButton *customButton      = new QPushButton(tr("Trail"));
+  QPushButton *specialButton = new QPushButton(tr("Generated"));
+
+  QPushButton *customButton = new QPushButton(tr("Trail"));
+
   QPushButton *vectorBrushButton = new QPushButton(tr("Vector Brush"));
 
   m_vectorsSearchFrame = new QFrame();
@@ -4226,7 +4228,7 @@ void StyleEditor::selectStyle(const TColorStyle &newStyle) {
   // ADD NULL CHECK
   if (!m_oldStyle || !m_editedStyle) return;
 
- m_editedStyle->assignNames(
+  m_editedStyle->assignNames(
       m_oldStyle.getPointer());  // Copy original name stored in the palette
 
   // For convenience's sake, copy the main color from the old color, if both
