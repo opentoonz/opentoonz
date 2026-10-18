@@ -7164,11 +7164,10 @@ void ToolPropertiesPanel::createDoublePairSlider(const QString &label,
                   val, maxSlider->minimum(), maxSlider->maximum(), valueFactor,
                   isLinear);
 
-              // Use native Pressure property to determine behavior
-              // Pressure OFF → Fixed size (set both min and max)
-              // Pressure ON  → Dynamic range (update max only, preserve min)
+              // Only collapse pressure-controlled ranges when pressure is off.
+              // Other ranges, such as Fill Depth, keep their minimum value.
               TTool *tool           = getCurrentTool();
-              bool pressureDisabled = true;  // Default to fixed size
+              bool pressureDisabled = false;
 
               if (tool) {
                 TPropertyGroup *props = tool->getProperties(0);
@@ -7307,11 +7306,10 @@ void ToolPropertiesPanel::createIntPairSlider(const QString &label,
     connect(maxSlider, &QSlider::valueChanged, [this, prop, propName](int val) {
       int newMaxValue = val;
 
-      // Use native Pressure property to determine behavior
-      // Pressure OFF → Fixed size (set both min and max)
-      // Pressure ON  → Dynamic range (update max only, preserve min)
+      // Only collapse pressure-controlled ranges when pressure is off.
+      // Other ranges, such as Fill Depth, keep their minimum value.
       TTool *tool           = getCurrentTool();
-      bool pressureDisabled = true;  // Default to fixed size
+      bool pressureDisabled = false;
 
       if (tool) {
         TPropertyGroup *props = tool->getProperties(0);
