@@ -30,7 +30,9 @@
 #include <QOperatingSystemVersion>
 #include <QDesktopServices>
 #include <QApplication>
+#include <QByteArray>
 #include <QClipboard>
+#include <QDate>
 #include <QThread>
 #include <QMainWindow>
 #include <QMessageBox>
@@ -40,9 +42,30 @@
 #include <QLabel>
 #include <QTextEdit>
 #include <QPushButton>
+#include <QLocale>
+#include <QStringList>
+#include <QtGlobal>
 
 static QWidget *s_parentWindow = NULL;
 static bool s_reportProjInfo   = false;
+
+static void appendUtf8(std::string &out, const QString &text) {
+  const QByteArray utf8 = text.toUtf8();
+  out.append(utf8.constData(), utf8.size());
+}
+
+static void appendPath(std::string &out, const char *label,
+                       const QString &path) {
+  out.append(label);
+  appendUtf8(out, path);
+  for (const QChar c : path) {
+    if (c.unicode() > 0x7f) {
+      out.append(" [contains non-ASCII characters]");
+      break;
+    }
+  }
+  out.append("\n");
+}
 
 //-----------------------------------------------------------------------------
 
@@ -59,6 +82,8 @@ static const char *filenameOnly(const char *path) {
 
 #ifdef _WIN32
 
+static PEXCEPTION_POINTERS s_exceptionInfo = NULL;
+
 #define HAS_MINIDUMP
 static bool generateMinidump(TFilePath dumpFile) {
   HANDLE hDumpFile = CreateFileW(dumpFile.getWideString().c_str(),
@@ -67,15 +92,17 @@ static bool generateMinidump(TFilePath dumpFile) {
 
   MINIDUMP_EXCEPTION_INFORMATION mdei;
   mdei.ThreadId          = GetCurrentThreadId();
-  mdei.ExceptionPointers = NULL;
+  mdei.ExceptionPointers = s_exceptionInfo;
   mdei.ClientPointers    = FALSE;
 
   if (MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hDumpFile,
-                        MiniDumpNormal, &mdei, 0, NULL)) {
+                        MiniDumpNormal, s_exceptionInfo ? &mdei : NULL, 0,
+                        NULL)) {
     CloseHandle(hDumpFile);
     return true;
   }
 
+  CloseHandle(hDumpFile);
   return false;
 }
 
@@ -86,13 +113,59 @@ static void printModules(std::string &out) {
   HMODULE modules[1024];
   DWORD size;
   if (EnumProcessModules(hProcess, modules, sizeof(modules), &size)) {
-    for (unsigned int i = 0; i < size / sizeof(HMODULE); i++) {
-      char moduleName[512];
-      GetModuleFileNameA(modules[i], moduleName, 512);
-      out.append(moduleName);
+    const unsigned int moduleCapacity =
+        static_cast<unsigned int>(sizeof(modules) / sizeof(HMODULE));
+    unsigned int moduleCount =
+        static_cast<unsigned int>(size / sizeof(HMODULE));
+    if (moduleCount > moduleCapacity) moduleCount = moduleCapacity;
+    for (unsigned int i = 0; i < moduleCount; i++) {
+      wchar_t moduleName[512] = {};
+      GetModuleFileNameW(modules[i], moduleName, 512);
+      appendUtf8(out, QString::fromWCharArray(moduleName));
       out.append("\n");
     }
   }
+}
+
+static void printTabletInfo(std::string &out) {
+  QStringList modules;
+  if (GetModuleHandleW(L"wintab32.dll")) modules.append("wintab32.dll");
+  if (GetModuleHandleW(L"Wacom_Tablet.dll")) modules.append("Wacom_Tablet.dll");
+
+  out.append("Tablet Modules: ");
+  appendUtf8(out,
+             modules.isEmpty() ? QString("None detected") : modules.join(", "));
+  out.append("\n");
+}
+
+static void printWindowsVersion(std::string &out) {
+  typedef LONG(WINAPI * RtlGetVersionPtr)(OSVERSIONINFOW *);
+  HMODULE ntdll = GetModuleHandleW(L"ntdll.dll");
+  RtlGetVersionPtr rtlGetVersion =
+      ntdll ? reinterpret_cast<RtlGetVersionPtr>(
+                  GetProcAddress(ntdll, "RtlGetVersion"))
+            : NULL;
+
+  OSVERSIONINFOW version      = {};
+  version.dwOSVersionInfoSize = sizeof(version);
+  if (!rtlGetVersion || rtlGetVersion(&version) != 0) {
+    out.append("Operating System: Windows (native version unavailable)\n");
+    return;
+  }
+
+  out.append("Operating System: ");
+  if (version.dwMajorVersion == 10)
+    out.append(version.dwBuildNumber >= 22000 ? "Windows 11\n"
+                                              : "Windows 10\n");
+  else
+    out.append("Windows " + std::to_string(version.dwMajorVersion) + "." +
+               std::to_string(version.dwMinorVersion) + "\n");
+  out.append("OS Kernel: " + std::to_string(version.dwMajorVersion) + "." +
+             std::to_string(version.dwMinorVersion) + "." +
+             std::to_string(version.dwBuildNumber) + " (native)\n");
+  out.append("Qt OS Description: ");
+  appendUtf8(out, QSysInfo::prettyProductName());
+  out.append("\n");
 }
 
 #define HAS_BACKTRACE
@@ -261,7 +334,9 @@ LONG WINAPI exceptionHandler(PEXCEPTION_POINTERS info) {
   if (handling) return EXCEPTION_CONTINUE_SEARCH;
 
   handling = true;
+  s_exceptionInfo = info;
   if (CrashHandler::trigger(reason, true)) _Exit(1);
+  s_exceptionInfo = NULL;
   handling = false;
 
   return EXCEPTION_CONTINUE_SEARCH;
@@ -303,6 +378,8 @@ static bool generateMinidump(TFilePath dumpFile) { return false; }
 //-----------------------------------------------------------------------------
 
 static void printModules(std::string &out) {}
+
+static void printTabletInfo(std::string &out) {}
 
 //-----------------------------------------------------------------------------
 
@@ -391,10 +468,24 @@ void signalHandler(int sig) {
 //-----------------------------------------------------------------------------
 
 static void printSysInfo(std::string &out) {
-  out.append("Build ABI: " + QSysInfo::buildAbi().toStdString() + "\n");
-  out.append("Operating System: " + QSysInfo::prettyProductName().toStdString() + "\n");
-  out.append("OS Kernel: " + QSysInfo::kernelVersion().toStdString() + "\n");
+  out.append("Build ABI: ");
+  appendUtf8(out, QSysInfo::buildAbi());
+  out.append("\n");
+#ifdef _WIN32
+  printWindowsVersion(out);
+#else
+  out.append("Operating System: ");
+  appendUtf8(out, QSysInfo::prettyProductName());
+  out.append("\nOS Kernel: ");
+  appendUtf8(out, QSysInfo::kernelVersion());
+  out.append("\n");
+#endif
   out.append("CPU Threads: " + std::to_string(QThread::idealThreadCount()) + "\n");
+  out.append("Qt Build Version: " QT_VERSION_STR "\n");
+  out.append("Qt Runtime Version: ");
+  out.append(qVersion());
+  out.append("\n");
+  printTabletInfo(out);
 }
 
 //-----------------------------------------------------------------------------
@@ -408,7 +499,34 @@ static void printGPUInfo(std::string &out) {
   if (gpuModelName)
     out.append("GPU Model: " + std::string(gpuModelName) + "\n");
   if (gpuVersion)
-    out.append("GPU Version: " + std::string(gpuVersion) + "\n");
+    out.append("OpenGL / Driver: " + std::string(gpuVersion) + "\n");
+}
+
+//-----------------------------------------------------------------------------
+
+static void printUpdateGuidance(std::string &out) {
+  const QDate buildDate =
+      QLocale::c().toDate(QString::fromLatin1(__DATE__), "MMM d yyyy");
+  if (!buildDate.isValid()) return;
+
+  const int buildAge = buildDate.daysTo(QDate::currentDate());
+  if (buildAge < 30) return;
+
+  out.append("\nUpdate Test Recommended: This build is " +
+             std::to_string(buildAge) + " days old. ");
+#if defined(_WIN32) || defined(MACOSX)
+  out.append(
+      "Before reporting, reproduce the problem with the latest nightly build "
+      "if possible; it may already be fixed.\n"
+      "Nightly Builds: "
+      "https://opentoonz.github.io/e/download/opentoonz.html\n");
+#else
+  out.append(
+      "Before reporting, reproduce the problem with a recent package or a "
+      "build from current source if possible; it may already be fixed. "
+      "Official nightly downloads are currently provided for Windows and "
+      "macOS.\n");
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -488,7 +606,9 @@ void CrashHandler::copyClipboard() {
 //-----------------------------------------------------------------------------
 
 void CrashHandler::openWebpage() {
-  QDesktopServices::openUrl(QUrl("https://github.com/opentoonz/opentoonz/issues"));
+  QDesktopServices::openUrl(
+      QUrl("https://github.com/opentoonz/opentoonz/"
+           "issues?q=is%3Aissue%20state%3Aopen%20label%3Acrash"));
 }  
 
 //-----------------------------------------------------------------------------
@@ -553,25 +673,26 @@ bool CrashHandler::trigger(const QString reason, bool showDialog) {
 
   // Generate report
   try {
-    out.append(TEnv::getApplicationFullName() + "  (Build " + __DATE__ ")\n");
+    out.append("Application Version: " + TEnv::getApplicationFullName() + "\n");
+    out.append("Build Date: " __DATE__ "\n");
     out.append("\nReport Date: ");
     out.append(dateName);
     out.append("\nCrash Reason: ");
     out.append(reason.toStdString());
     out.append("\n\n");
     printSysInfo(out);
+    printUpdateGuidance(out);
     out.append("\n");
     printGPUInfo(out);
-    out.append("\nCrash File: ");
-    out.append(fpCrsh.getQString().toStdString());
-#ifdef HAS_MINIDUMP
-    out.append("\nMini Dump File: ");
-    if (minidump)
-      out.append(fpDump.getQString().toStdString());
-    else
-      out.append("Failed");
-#endif
     out.append("\n");
+    appendPath(out, "Crash File: ", fpCrsh.getQString());
+#ifdef HAS_MINIDUMP
+    out.append("Mini Dump File: ");
+    if (minidump)
+      appendPath(out, "", fpDump.getQString());
+    else
+      out.append("Failed\n");
+#endif
   } catch (...) {
   }
   try {
@@ -582,20 +703,18 @@ bool CrashHandler::trigger(const QString reason, bool showDialog) {
       ToonzScene *currentScene = TApp::instance()->getCurrentScene()->getScene();
       std::wstring sceneName   = currentScene->getSceneName();
 
-      out.append("\nApplication Dir: ");
-      out.append(QCoreApplication::applicationDirPath().toStdString());
-      out.append("\nStuff Dir: ");
-      out.append(TEnv::getStuffDir().getQString().toStdString());
       out.append("\n");
+      appendPath(out,
+                 "Application Dir: ", QCoreApplication::applicationDirPath());
+      appendPath(out, "Stuff Dir: ", TEnv::getStuffDir().getQString());
       out.append("\nProject Name: ");
-      out.append(currentProject->getName().getQString().toStdString());
+      appendUtf8(out, currentProject->getName().getQString());
       out.append("\nScene Name: ");
-      out.append(QString::fromStdWString(sceneName).toStdString());
-      out.append("\nProject Path: ");
-      out.append(projectPath.getQString().toStdString());
-      out.append("\nScene Path: ");
-      out.append(currentScene->getScenePath().getQString().toStdString());
+      appendUtf8(out, QString::fromStdWString(sceneName));
       out.append("\n");
+      appendPath(out, "Project Path: ", projectPath.getQString());
+      appendPath(out,
+                 "Scene Path: ", currentScene->getScenePath().getQString());
     }
   } catch (...) {
   }

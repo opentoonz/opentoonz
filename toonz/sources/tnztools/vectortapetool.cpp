@@ -11,7 +11,9 @@
 #include "tproperty.h"
 
 #include "toonzqt/imageutils.h"
+#include "toonzqt/dvdialog.h"
 
+#include "toonz/preferences.h"
 #include "toonz/tframehandle.h"
 #include "toonz/tcolumnhandle.h"
 #include "toonz/txshlevelhandle.h"
@@ -23,6 +25,9 @@
 #include "tenv.h"
 // For Qt translation support
 #include <QCoreApplication>
+#include <QCursor>
+#include <QToolTip>
+#include <memory>
 
 using namespace ToolUtils;
 
@@ -38,6 +43,17 @@ TEnv::IntVar TapeJoinStrokes("InknpaintTapeJoinStrokes", 0);
 TEnv::StringVar TapeType("InknpaintTapeType1", "Normal");
 TEnv::DoubleVar AutocloseFactor("InknpaintAutocloseFactor", 4.0);
 namespace {
+
+enum class TapeFillRiskPolicy { Ask = 0, Continue = 1, Cancel = 2 };
+
+bool hasFilledRegion(TRegion *region) {
+  if (region->getStyle() != 0) return true;
+  for (UINT i = 0; i < region->getSubregionCount(); ++i)
+    if (hasFilledRegion(region->getSubregion(i))) return true;
+  return false;
+}
+
+bool isEndpoint(double w) { return w == 0.0 || w == 1.0; }
 
 class UndoAutoclose final : public ToolUtils::TToolUndo {
   int m_oldStrokeId1;
@@ -601,19 +617,27 @@ public:
 #define l2p 3
 #define l2l 4
 
-  void tapeRect(const TVectorImageP &vi, const TRectD &rect) {
-    std::vector<TFilledRegionInf> *fillInformation =
-        new std::vector<TFilledRegionInf>;
-    ImageUtils::getFillingInformationOverlappingArea(vi, *fillInformation,
-                                                     rect);
-
-    bool initUndoBlock = false;
-
+  bool tapeRect(TVectorImageP vi, TRectD rect) {
     std::vector<std::pair<int, double>> startPoints, endPoints;
     getClosingPoints(rect, m_autocloseFactor.getValue(), vi, startPoints,
                      endPoints);
 
     assert(startPoints.size() == endPoints.size());
+    if (startPoints.empty()) return false;
+
+    bool joinsExistingStrokes = false;
+    for (size_t i = 0; i < startPoints.size(); ++i)
+      if (isEndpoint(startPoints[i].second) || isEndpoint(endPoints[i].second))
+        joinsExistingStrokes = true;
+    // Ask once, before any connection, writable image request, or undo block.
+    if (!confirmTape(vi, joinsExistingStrokes)) return false;
+    vi = TVectorImageP(getImage(true));
+    if (!vi) return false;
+    QMutexLocker lock(vi->getMutex());
+    std::vector<TFilledRegionInf> *fillInformation =
+        new std::vector<TFilledRegionInf>;
+    ImageUtils::getFillingInformationOverlappingArea(vi, *fillInformation,
+                                                     rect);
 
     std::vector<TPointD> startP(startPoints.size()), endP(startPoints.size());
 
@@ -650,6 +674,7 @@ public:
       }
     }
     if (!startPoints.empty()) TUndoManager::manager()->endBlock();
+    return true;
   }
 
   int doTape(const TVectorImageP &vi,
@@ -686,24 +711,78 @@ public:
   }
   //-------------------------------------------------------------------------------
 
+  bool confirmTape(const TVectorImageP &vi, bool joinsExistingStrokes) {
+    if (!m_joinStrokes.getValue() || !joinsExistingStrokes) return true;
+    bool hasFills = false;
+    {
+      QMutexLocker lock(vi->getMutex());
+      vi->findRegions();  // Includes fills whose region data was not yet
+                          // computed.
+      for (UINT i = 0; i < vi->getRegionCount() && !hasFills; ++i)
+        hasFills = hasFilledRegion(vi->getRegion(i));
+    }
+    if (!hasFills) return true;
+
+    Preferences *preferences = Preferences::instance();
+    const int policy         = preferences->getIntValue(tapeToolFillRiskPolicy);
+    if (policy == int(TapeFillRiskPolicy::Continue)) return true;
+    if (policy == int(TapeFillRiskPolicy::Cancel)) {
+      QToolTip::showText(
+          QCursor::pos(),
+          tr("Tape operation canceled by your remembered choice."), nullptr,
+          QRect(), 3000);
+      return false;
+    }
+
+    // A precaution for filled work; do not hold the image lock while asking.
+    std::unique_ptr<DVGui::MessageAndCheckboxDialog> dialog(
+        DVGui::createMsgandCheckbox(
+            DVGui::WARNING,
+            tr("Editing vector strokes may change or remove existing color "
+               "fills.\n"
+               "Do you want to continue?"),
+            tr("Remember my choice"),
+            QStringList() << tr("Cancel") << tr("Continue"), 0, Qt::Unchecked));
+    dialog->setWindowTitle(tr("Tape Tool"));
+    const int result = dialog->exec();
+    // Escape/close cancel this operation only, even if the checkbox was
+    // checked.
+    if ((result == 1 || result == 2) && dialog->getChecked())
+      preferences->setValue(tapeToolFillRiskPolicy,
+                            int(result == 2 ? TapeFillRiskPolicy::Continue
+                                            : TapeFillRiskPolicy::Cancel));
+    return result == 2 &&
+           TVectorImageP(getImage(false)).getPointer() == vi.getPointer();
+  }
+
+  void resetGesture() {
+    m_strokeIndex1 = m_strokeIndex2 = -1;
+    m_w1 = m_w2     = -1.0;
+    m_secondPoint   = false;
+    m_selectionRect = TRectD();
+    m_startRect     = TPointD();
+    invalidate();
+  }
+
   void leftButtonUp(const TPointD &, const TMouseEvent &) override {
-    TVectorImageP vi(getImage(true));
+    TVectorImageP vi(getImage(false));
 
     if (vi && m_type.getValue() == RECT) {
-      tapeRect(vi, m_selectionRect);
-      m_selectionRect = TRectD();
-      m_startRect     = TPointD();
-      notifyImageChanged();
-      invalidate();
+      if (tapeRect(vi, m_selectionRect)) notifyImageChanged();
+      resetGesture();
       return;
     }
 
-    if (!vi || m_strokeIndex1 == -1 || !m_secondPoint || m_strokeIndex2 == -1) {
-      m_strokeIndex1 = -1;
-      m_strokeIndex2 = -1;
-      m_w1           = -1.0;
-      m_w2           = -1.0;
-      m_secondPoint  = false;
+    if (!vi || m_strokeIndex1 < 0 || !m_secondPoint || m_strokeIndex2 < 0 ||
+        m_strokeIndex1 >= int(vi->getStrokeCount()) ||
+        m_strokeIndex2 >= int(vi->getStrokeCount()) ||
+        !confirmTape(vi, isEndpoint(m_w1) || isEndpoint(m_w2))) {
+      resetGesture();
+      return;
+    }
+    vi = TVectorImageP(getImage(true));
+    if (!vi) {
+      resetGesture();
       return;
     }
     QMutexLocker lock(vi->getMutex());
@@ -717,11 +796,7 @@ public:
 
     doTape(vi, fillInformation, m_joinStrokes.getValue());
 
-    invalidate();
-
-    m_strokeIndex2 = -1;
-    m_w1           = -1.0;
-    m_w2           = -1.0;
+    resetGesture();
   }
 
   //-----------------------------------------------------------------------------

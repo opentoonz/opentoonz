@@ -24,6 +24,9 @@
 // TnzCore includes
 #include "drawutil.h"
 
+// Qt includes
+#include <QApplication>
+
 using namespace ToolUtils;
 using namespace DragSelectionTool;
 
@@ -1799,6 +1802,19 @@ void VectorSelectionTool::addContextMenuItems(QMenu *menu) {
   menu->addSeparator();
 
   m_strokeSelection.getGroupCommand()->addMenuItems(menu);
+
+  if (!m_strokeSelection.isEmpty()) {
+    menu->addSeparator();
+    if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
+      QAction *saveSelectionAction =
+          menu->addAction(tr("Save Vector Selection As..."));
+      QObject::connect(saveSelectionAction, &QAction::triggered, menu,
+                       [this]() { m_strokeSelection.saveVectorSelectionAs(); });
+    } else {
+      menu->addAction(
+          CommandManager::instance()->getAction(MI_SaveAsCustomVectorBrush));
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------

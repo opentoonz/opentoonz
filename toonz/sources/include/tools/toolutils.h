@@ -405,9 +405,11 @@ class UndoControlPointEditor final : public TToolUndo {
 
   int m_row;
   int m_column;
+  bool m_clearSelection;
 
 public:
-  UndoControlPointEditor(TXshSimpleLevel *level, const TFrameId &frameId);
+  UndoControlPointEditor(TXshSimpleLevel *level, const TFrameId &frameId,
+                         bool clearSelection = true);
   ~UndoControlPointEditor();
 
   void onAdd() override;

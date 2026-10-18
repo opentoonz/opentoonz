@@ -98,7 +98,7 @@ public:
 //    ToolOptionsBox  declaration
 //***********************************************************************************************
 
-class ToolOptionsBox : public QFrame {
+class DVAPI ToolOptionsBox : public QFrame {
   Q_OBJECT
 
 protected:
@@ -477,7 +477,7 @@ class PaintbrushToolOptionsBox final : public ToolOptionsBox {
 
   ToolOptionCombo *m_colorMode;
   ToolOptionCheckbox *m_selectiveMode;
-  ToolOptionCheckbox* m_emptyOnlyMode;
+  ToolOptionCheckbox *m_emptyOnlyMode;
 
   ToolOptionCheckbox *m_lockAlphaMode;
   ToolOptionCheckbox *m_FillingMode;
@@ -520,10 +520,10 @@ class FillToolOptionsBox final : public ToolOptionsBox {
   QLabel *m_fillDepthLabel;
   ToolOptionCombo *m_colorMode, *m_toolType;
   ToolOptionCheckbox *m_emptyOnly, *m_segmentMode, *m_onionMode,
-      *m_multiFrameMode, *m_autopaintMode,*m_referFill, * m_closeGap,
+      *m_multiFrameMode, *m_autopaintMode, *m_referFill, *m_closeGap,
       *m_extendFill;
   ToolOptionPairSlider *m_fillDepthField;
-  ToolOptionIntSlider* m_gapCloseDistance;
+  ToolOptionIntSlider *m_gapCloseDistance;
 
 public:
   FillToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
@@ -564,6 +564,12 @@ private:
   class PresetNamePopup;
   PresetNamePopup *m_presetNamePopup;
   void filterControls();
+  // Guard: skip redundant setVisible() calls — and the Qt layout recalculation
+  // they trigger — when the modifier-visibility state has not changed.
+  // Each BrushToolOptionsBox is cached per TTool* by ToolOptions, so switching
+  // back to a previously-seen level type is a no-op after the first visit.
+  bool m_lastShowModifiers = false;
+  bool m_filterInitialized = false;
 
 public:
   BrushToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
@@ -587,9 +593,10 @@ protected slots:
 class EraserToolOptionsBox final : public ToolOptionsBox {
   Q_OBJECT
 
-  ToolOptionCheckbox *m_pencilMode, *m_invertMode, *m_multiFrameMode;
+  ToolOptionCheckbox *m_pencilMode, *m_invertMode, *m_multiFrameMode,
+      *m_eraseOnlySavebox;
   ToolOptionCombo *m_toolType, *m_colorMode;
-  QLabel *m_hardnessLabel;
+  QLabel *m_hardnessLabel, *m_colorModeLabel;
   ToolOptionSlider *m_hardnessField;
 
 public:
@@ -631,7 +638,7 @@ protected slots:
 //
 //=============================================================================
 
-class RulerToolOptionsBox final : public ToolOptionsBox {
+class DVAPI RulerToolOptionsBox final : public ToolOptionsBox {
   Q_OBJECT
 
   MeasuredValueField *m_Xfld;
@@ -647,9 +654,11 @@ class RulerToolOptionsBox final : public ToolOptionsBox {
   QLabel *m_HpixelFld;
 
   TTool *m_tool;
+  bool m_verticalLayout;
 
 public:
-  RulerToolOptionsBox(QWidget *parent, TTool *tool);
+  RulerToolOptionsBox(QWidget *parent, TTool *tool,
+                      bool verticalLayout = false);
 
   void updateValues(bool isRasterLevelEditing, double X, double Y, double W,
                     double H, double A, double L, int Xpix = 0, int Ypix = 0,

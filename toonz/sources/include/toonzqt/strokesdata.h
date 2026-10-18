@@ -38,8 +38,17 @@ public:
   StrokesData *clone() const override {
     TVectorImage *vi = 0;
     if (m_image) vi  = dynamic_cast<TVectorImage *>(m_image->cloneImage());
-    return new StrokesData(vi);
+    StrokesData *copy = new StrokesData(vi);
+    copy->setImageData(imageData());
+    for (const QString &format : formats()) {
+      if (format != "application/x-qt-image")
+        copy->QMimeData::setData(format, data(format));
+    }
+    return copy;
   }
+
+  void setClipboardFormats();
+  static StrokesData *fromClipboard(const QMimeData *mime);
 
   // data <- image; copia gli stroke indicati da indices
   void setImage(TVectorImageP image, const std::set<int> &indices);

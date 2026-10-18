@@ -23,6 +23,19 @@
 namespace {
 //=============================================================================
 
+class ScenePathRestorer {
+  ToonzScene *m_scene;
+  TFilePath m_oldPath;
+
+public:
+  ScenePathRestorer(ToonzScene *scene, const TFilePath &oldPath)
+      : m_scene(scene), m_oldPath(oldPath) {}
+
+  ~ScenePathRestorer() { m_scene->setScenePath(m_oldPath, false); }
+};
+
+//-----------------------------------------------------------------------------
+
 // se path e' della forma +folder/<oldSavePath>/name.type
 // allora sostituisce oldSavePath con newSavePath e ritorna true
 
@@ -206,8 +219,9 @@ SceneLevel::SceneLevel(ToonzScene *scene, TXshSimpleLevel *sl)
 
 //-----------------------------------------------------------------------------
 
-void SceneLevel::save() {
-  TFilePath fp = m_oldPath;
+bool SceneLevel::save() {
+  bool saveSucceeded = true;
+  TFilePath fp       = m_oldPath;
   SceneResource::updatePath(fp);
   TFilePath actualFp      = m_scene->decodeFilePath(fp);
   actualFp                = restorePsdPath(actualFp);
@@ -226,10 +240,7 @@ void SceneLevel::save() {
           (!m_sl->getPalette() ||
            (m_sl->getPalette() &&
             m_sl->getPalette()->getDirtyFlag() == false))) {
-        try {
-          TXshSimpleLevel::copyFiles(actualFp, oldActualPath);
-        } catch (...) {
-        }
+        TXshSimpleLevel::copyFiles(actualFp, oldActualPath);
         // Must NOT KEEP FRAMES, it generate a level frames bind necessary to
         // imageBuilder path refresh.
         m_sl->setPath(fp, false);
@@ -284,6 +295,7 @@ void SceneLevel::save() {
           TSystem::copyFile(unpaintedPalettePath, oldUnpaintedPalettePath);
       }
     } catch (...) {
+      saveSucceeded = false;
     }
   }
   fp = m_oldScannedPath;
@@ -298,9 +310,11 @@ void SceneLevel::save() {
         m_sl->clearFrames();
         m_sl->load();
       } catch (...) {
+        saveSucceeded = false;
       }
     }
   }
+  return saveSucceeded;
 }
 
 //-----------------------------------------------------------------------------
@@ -359,6 +373,8 @@ QStringList SceneLevel::getResourceName() {
   } else if (levelIsDirty)
     ret << string;
 
+  if (ret.isEmpty())
+    ret << QString::fromStdString(m_sl->getPath().getLevelName());
   return ret;
 }
 
@@ -376,7 +392,7 @@ ScenePalette::ScenePalette(ToonzScene *scene, TXshPaletteLevel *pl)
 
 //-----------------------------------------------------------------------------
 
-void ScenePalette::save() {
+bool ScenePalette::save() {
   assert(m_oldPath != TFilePath());
   TFilePath fp = m_oldPath;
   SceneResource::updatePath(fp);
@@ -388,8 +404,10 @@ void ScenePalette::save() {
       TSystem::copyFile(actualFp, m_oldActualPath);
     }
     m_pl->save();  // actualFp non so perche' era cosi'
+    return true;
   } catch (...) {
     TLogger::error() << "Can't save " << actualFp;
+    return false;
   }
 }
 
@@ -431,7 +449,7 @@ SceneSound::SceneSound(ToonzScene *scene, TXshSoundLevel *sl)
 
 //-----------------------------------------------------------------------------
 
-void SceneSound::save() {
+bool SceneSound::save() {
   assert(m_oldPath != TFilePath());
   TFilePath fp = m_oldPath;
   SceneResource::updatePath(fp);
@@ -443,9 +461,10 @@ void SceneSound::save() {
     } else if (actualFp != m_oldActualPath) {
       TSystem::copyFile(actualFp, m_oldActualPath);
     }
+    return true;
   } catch (...) {
-    DVGui::warning(QObject::tr("Can't save") +
-                   QString::fromStdWString(L": " + actualFp.getLevelNameW()));
+    TLogger::error() << "Can't save " << actualFp;
+    return false;
   }
 }
 
@@ -460,6 +479,13 @@ void SceneSound::updatePath() {
 //-----------------------------------------------------------------------------
 
 void SceneSound::rollbackPath() { m_sl->setPath(m_oldPath); }
+
+//-----------------------------------------------------------------------------
+
+QStringList SceneSound::getResourceName() {
+  return QStringList(
+      QString::fromStdString(m_sl->getPath().getLevelName()));
+}
 
 //=============================================================================
 //
@@ -511,20 +537,28 @@ void SceneResources::getResources() {
 
 //-----------------------------------------------------------------------------
 
-void SceneResources::save(const TFilePath newScenePath) {
+bool SceneResources::save(const TFilePath newScenePath,
+                          bool showWarnings) {
   TFilePath oldScenePath = m_scene->getScenePath();
+  ScenePathRestorer restorePath(m_scene, oldScenePath);
   // TODO: The save path of resources should not be decided by changing scene's property,
   // refactor and remove setScenePath
   m_scene->setScenePath(newScenePath, false);
-  bool failedSave = false;
+
+  bool saveSucceeded = true;
+  QStringList failedList;
   for (int i = 0; i < (int)m_resources.size(); i++) {
-    m_resources[i]->save();
+    if (!m_resources[i]->save()) {
+      saveSucceeded = false;
+      failedList << m_resources[i]->getResourceName();
+    }
   }
 
-  QStringList failedList;
   getDirtyResources(failedList);
+  if (!failedList.isEmpty()) saveSucceeded = false;
 
-  if (!failedList.isEmpty()) {  // didn't save for some reason
+  if (showWarnings && !saveSucceeded) {
+    failedList.removeDuplicates();
     // show up to 5 items
     int extraCount = failedList.count() - 5;
     if (extraCount > 0) {
@@ -535,7 +569,7 @@ void SceneResources::save(const TFilePath newScenePath) {
     DVGui::warning(QObject::tr("Failed to save the following resources:\n") +
                    "  " + failedList.join("\n  "));
   }
-  m_scene->setScenePath(oldScenePath, false);
+  return saveSucceeded;
 }
 
 //-----------------------------------------------------------------------------

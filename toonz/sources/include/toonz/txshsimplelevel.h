@@ -287,6 +287,8 @@ public:
   //! must have the same size).
   void renumber(const std::vector<TFrameId> &fids);
 
+  int getRenumberCount() const { return m_renumberCount; }
+
   bool isFrameReadOnly(TFrameId fid);
 
 public:
@@ -349,6 +351,7 @@ private:
   TPaletteP m_palette;
 
   FramesSet m_frames;
+  int m_renumberCount = 0;
 
   std::map<TFrameId, TFrameId>
       m_renumberTable;  //!< Maps disk-frames to level-frames.

@@ -611,9 +611,14 @@ void ShiftTraceTool::onLeave() {
 }
 
 void ShiftTraceTool::setCurrentGhostIndex(int index) {
+  if (m_ghostIndex == index) return;
   m_ghostIndex = index;
   updateBox();
   invalidate();
+  if (TTool::Application *app = getApplication()) {
+    if (ToolHandle *toolHandle = app->getCurrentTool())
+      toolHandle->notifyToolChanged();
+  }
 }
 
 ShiftTraceTool shiftTraceTool;

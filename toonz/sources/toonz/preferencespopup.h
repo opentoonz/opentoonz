@@ -139,8 +139,10 @@ private:
   void onUseNumpadForSwitchingStylesClicked();
   // Tools
   void onLevelBasedToolsDisplayChanged();
+  void onDefaultStartupToolChanged();
   // Xsheet
   void onShowKeyframesOnCellAreaChanged();
+  void onCurrentCellColorChanged();
   void onShowXSheetToolbarClicked();
   void onUnifyColumnVisibilityTogglesChanged();
   void onShowXsheetBreadcrumbsClicked();

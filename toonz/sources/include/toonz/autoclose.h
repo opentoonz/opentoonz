@@ -47,6 +47,10 @@ struct AutocloseSettings {
 };
 
 class DVAPI TAutocloser {
+  static std::string segmentCacheKey(const std::string &id) {
+    return Preferences::instance()->getFillOnlySavebox() ? id + "s" : id;
+  }
+
 public:
   typedef std::pair<TPoint, TPoint> Segment;
 
@@ -69,13 +73,13 @@ public:
 
   // Cache management functions
   static bool hasSegmentCache(const std::string &id) {
+    std::string cacheKey = segmentCacheKey(id);
     std::lock_guard<std::mutex> lock(m_mutex);
-    return m_cache.find(id) != m_cache.end();
+    return m_cache.find(cacheKey) != m_cache.end();
   }
 
   static const std::vector<Segment> &getSegmentCache(const std::string &id) {
-    std::string cacheKey =
-        Preferences::instance()->getFillOnlySavebox() ? id + "s" : id;
+    std::string cacheKey = segmentCacheKey(id);
     std::lock_guard<std::mutex> lock(m_mutex);
     auto it = m_cache.find(cacheKey);
     if (it != m_cache.end()) {
@@ -87,8 +91,7 @@ public:
 
   static void setSegmentCache(const std::string &id,
                               const std::vector<Segment> &segments) {
-    std::string cacheKey =
-        Preferences::instance()->getFillOnlySavebox() ? id + "s" : id;
+    std::string cacheKey = segmentCacheKey(id);
     std::lock_guard<std::mutex> lock(m_mutex);
 
     constexpr size_t MAX_CACHE_SIZE = 50;  // maximum number of images in cache

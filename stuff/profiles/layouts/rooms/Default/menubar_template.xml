@@ -333,6 +333,7 @@
         <command>MI_OpenStopMotionPanel</command>
         <command>MI_StartupPopup</command>
         <command>MI_OpenGuidedDrawingControls</command>
+        <command>MI_OpenAlignmentPanel</command>
         <command>MI_OpenCustomPanels</command>
         <separator/>
         <command>MI_MaximizePanel</command>
@@ -342,6 +343,7 @@
     <menu title="Help">
         <command>MI_OpenOnlineManual</command>
         <command>MI_OpenWhatsNew</command>
+        <command>MI_Quicklink</command>
         <command>MI_OpenCommunityForum</command>
         <separator/>
         <command>MI_OpenReportABug</command>

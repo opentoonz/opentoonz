@@ -1,5 +1,9 @@
 # OpenToonz
 
+## ⚠️ **重要**
+
+**公式配布元からのみダウンロードしてください：** OpenToonz の公式ウェブサイトは [**opentoonz.github.io**](https://opentoonz.github.io/) と、この [GitHub リポジトリ](https://github.com/opentoonz/opentoonz) のみです。安全のため、その他のドメインから OpenToonz をダウンロードしないでください。公式のミラーサイトや提携ダウンロードサイトはほかにありません。
+
 [English](../README.md)
 
 [![](https://ci.appveyor.com/api/projects/status/oa5l5pc964h8fv49/branch/master?svg=true)](https://ci.appveyor.com/project/opentoonz/opentoonz)
@@ -44,3 +48,7 @@
 
 ### Special Thanks
 This open-source program is developed from Toonz, a software originally created by Digital Video, S.p.A., Rome, Italy
+## 翻訳への貢献
+
+翻訳ファイルの提出、レビュー、マージ、更新については、
+[翻訳ガイド（英語）](../toonz/sources/translations/README.md)を参照してください。

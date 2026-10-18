@@ -1280,11 +1280,15 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
   c0 = visible.from().layer();
   c1 = visible.to().layer();
   if (!m_viewer->orientation()->isVerticalTimeline()) {
-    int colCount = std::max(1, xsh->getColumnCount());
-    c1           = std::min(c1, colCount - 1);
+    c1 = std::min(c1, xsh->getColumnCount());
   }
 
   drawNonEmptyBackground(p);
+
+  if (!o->isVerticalTimeline()) {
+    int y = m_viewer->positionToXY(CellPosition(0, xsh->getColumnCount())).y();
+    p.fillRect(0, y, width(), o->cellHeight(), FreeColumnTint);
+  }
 
   drawSelectionBackground(p);
 
@@ -4051,6 +4055,13 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected, TXshCell cell,
       menu.addAction(cmdManager->getAction(MI_ShiftKeyframesDown));
       menu.addAction(cmdManager->getAction(MI_ShiftKeyframesUp));
     }
+  }
+
+  int r0, c0, r1, c1;
+  m_viewer->getCellSelection()->getSelectedCells(r0, c0, r1, c1);
+  if (r1 > r0) {
+    menu.addSeparator();
+    menu.addAction(cmdManager->getAction(MI_RemoveSelectedSceneFrames));
   }
 
   // cell mark menu

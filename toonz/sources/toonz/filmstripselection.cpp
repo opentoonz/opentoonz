@@ -25,6 +25,7 @@
 #include "toonz/txshlevel.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/txshleveltypes.h"
+#include "canvassizepopup.h"
 
 // TnzCore includes
 #include "tundo.h"
@@ -143,12 +144,7 @@ void TFilmstripSelection::select(const TFrameId &fid, bool selected) {
   TTool *tool = app->getCurrentTool()->getTool();
   if (tool) tool->setSelectedFrames(m_selectedFrames);
 
-  TXshSimpleLevel *sl = app->getCurrentLevel()->getSimpleLevel();
-  bool rasterLevel    = sl->getType() == TZP_XSHLEVEL ||
-                     sl->getType() == OVL_XSHLEVEL ||
-                     sl->getType() == TZI_XSHLEVEL;
-
-  CommandManager::instance()->enable(MI_CanvasSize, rasterLevel);
+  updateCanvasSizeCommandEnabled();
 }
 
 //-----------------------------------------------------------------------------
@@ -162,8 +158,7 @@ bool TFilmstripSelection::isSelected(const TFrameId &fid) const {
 void TFilmstripSelection::selectNone() {
   m_selectedFrames.clear();
   updateInbetweenRange();
-  TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
-  CommandManager::instance()->enable(MI_CanvasSize, false);
+  updateCanvasSizeCommandEnabled();
 }
 
 //-----------------------------------------------------------------------------
@@ -178,10 +173,7 @@ void TFilmstripSelection::selectAll() {
   updateInbetweenRange();
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
   tool->setSelectedFrames(m_selectedFrames);
-  bool rasterLevel = sl->getType() == TZP_XSHLEVEL ||
-                     sl->getType() == OVL_XSHLEVEL ||
-                     sl->getType() == TZI_XSHLEVEL;
-  CommandManager::instance()->enable(MI_CanvasSize, rasterLevel);
+  updateCanvasSizeCommandEnabled();
   notifyView();
 }
 
@@ -202,9 +194,7 @@ void TFilmstripSelection::invertSelection() {
   updateInbetweenRange();
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
   tool->setSelectedFrames(m_selectedFrames);
-  if (sl->getType() == TZP_XSHLEVEL || sl->getType() == OVL_XSHLEVEL ||
-      sl->getType() == TZI_XSHLEVEL)
-    CommandManager::instance()->enable(MI_CanvasSize, true);
+  updateCanvasSizeCommandEnabled();
   notifyView();
 }
 

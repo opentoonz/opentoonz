@@ -34,6 +34,7 @@
 #define MI_ExitGroup "MI_ExitGroup"
 #define MI_RemoveEndpoints "MI_RemoveEndpoints"
 #define MI_SortWithPaletteOrder "MI_SortWithPaletteOrder"
+#define MI_SaveAsCustomVectorBrush "MI_SaveAsCustomVectorBrush"
 
 #define MI_OpenChild "MI_OpenChild"
 #define MI_CloseChild "MI_CloseChild"
@@ -42,5 +43,16 @@
 #define MI_ToggleEditInPlace "MI_ToggleEditInPlace"
 #define MI_PasteNumbers "MI_PasteNumbers"
 #define MI_PasteCellContent "MI_PasteCellContent"
+
+#define MI_AlignLeft "MI_AlignLeft"
+#define MI_AlignRight "MI_AlignRight"
+#define MI_AlignTop "MI_AlignTop"
+#define MI_AlignBottom "MI_AlignBottom"
+#define MI_AlignCenterHorizontal "MI_AlignCenterHorizontal"
+#define MI_AlignCenterVertical "MI_AlignCenterVertical"
+#define MI_DistributeHorizontal "MI_DistributeHorizontal"
+#define MI_DistributeVertical "MI_DistributeVertical"
+#define MI_SetLinearControlPoint "MI_SetLinearControlPoint"
+#define MI_SetNonLinearControlPoint "MI_SetNonLinearControlPoint"
 
 #endif

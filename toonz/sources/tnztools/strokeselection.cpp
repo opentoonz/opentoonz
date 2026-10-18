@@ -1,6 +1,10 @@
 
 
 #include "tools/strokeselection.h"
+#include "vectorselectiontool.h"
+#include "toonz/tcolumnhandle.h"
+#include "toonz/tcamera.h"
+#include <cmath>
 
 // TnzTools includes
 #include "tools/imagegrouping.h"
@@ -30,11 +34,15 @@
 #include "toonz/toonzscene.h"
 #include "toonz/sceneproperties.h"
 #include "toonz/tframehandle.h"
+#include "toonz/customvectorbrushexporter.h"
+#include "toonz/toonzfolders.h"
+#include "toonz/txshlevel.h"
 
 // TnzCore includes
 #include "tthreadmessage.h"
 #include "tundo.h"
 #include "tstroke.h"
+#include "tsystem.h"
 #include "tvectorimage.h"
 #include "tcolorstyles.h"
 #include "tpalette.h"
@@ -42,9 +50,73 @@
 // Qt includes
 #include <QApplication>
 #include <QClipboard>
+#include <QFileDialog>
+#include <QInputDialog>
+#include <QLineEdit>
+#include <QMutexLocker>
 
 //=============================================================================
 namespace {
+
+// Warn about unusually large brushes without preventing their use.
+constexpr TINT64 RecommendedCustomVectorBrushBytes = 32 * 1024;
+
+QString normalizeBrushName(QString name) {
+  name = name.trimmed();
+  if (name.endsWith(".pli", Qt::CaseInsensitive)) {
+    name.chop(4);
+    name = name.trimmed();
+  }
+  return name;
+}
+
+QString validateBrushName(const QString &name) {
+  if (name.isEmpty()) return QObject::tr("Please enter a brush name.");
+  if (name == "." || name == "..")
+    return QObject::tr("Please enter a valid brush name.");
+  if (name.endsWith('.') || name.endsWith(' '))
+    return QObject::tr("A brush name cannot end with a dot or a space.");
+
+  const QString invalidCharacters = "\\/:*?\"<>|";
+  for (const QChar character : name) {
+    if (character.unicode() < 32 || invalidCharacters.contains(character))
+      return QObject::tr(
+          "A brush name cannot contain \\ / : * ? \" < > | or control "
+          "characters.");
+  }
+
+  const QString deviceName = name.section('.', 0, 0).toUpper();
+  if (deviceName == "CON" || deviceName == "PRN" || deviceName == "AUX" ||
+      deviceName == "NUL" ||
+      ((deviceName.startsWith("COM") || deviceName.startsWith("LPT")) &&
+       deviceName.size() == 4 && deviceName.at(3) >= '1' &&
+       deviceName.at(3) <= '9'))
+    return QObject::tr("That brush name is reserved by the operating system.");
+
+  if (!TFilePath(name + ".pli").getFrame().isNoFrame())
+    return QObject::tr("A brush name cannot end with a numbered frame suffix.");
+
+  return QString();
+}
+
+QString suggestedBrushName() {
+  TXshLevel *level = TTool::getApplication()->getCurrentLevel()->getLevel();
+  QString name = level ? QString::fromStdWString(level->getName()) : QString();
+
+  QString sanitized;
+  const QString invalidCharacters = "\\/:*?\"<>|";
+  sanitized.reserve(name.size());
+  for (const QChar character : name) {
+    sanitized.append(character.unicode() < 32 ||
+                             invalidCharacters.contains(character)
+                         ? QChar('_')
+                         : character);
+  }
+  sanitized = sanitized.trimmed();
+  while (sanitized.endsWith('.')) sanitized.chop(1);
+  if (sanitized.isEmpty()) sanitized = QStringLiteral("custom");
+  return sanitized + QStringLiteral("_brush");
+}
 
 void vectorizeToonzImageData(const TVectorImageP &image,
                              const ToonzImageData *tiData,
@@ -94,6 +166,7 @@ void copyStrokesWithoutUndo(TVectorImageP image, std::set<int> &indexes) {
   QClipboard *clipboard = QApplication::clipboard();
   StrokesData *data     = new StrokesData();
   data->setImage(image, indexes);
+  data->setClipboardFormats();
   clipboard->setMimeData(data, QClipboard::Clipboard);
 }
 
@@ -105,6 +178,11 @@ bool pasteStrokesWithoutUndo(TVectorImageP image, std::set<int> &outIndexes,
   QClipboard *clipboard = QApplication::clipboard();
   const StrokesData *stData =
       dynamic_cast<const StrokesData *>(clipboard->mimeData());
+  std::unique_ptr<StrokesData> transferredData;
+  if (!stData) {
+    transferredData.reset(StrokesData::fromClipboard(clipboard->mimeData()));
+    stData = transferredData.get();
+  }
   const ToonzImageData *tiData =
       dynamic_cast<const ToonzImageData *>(clipboard->mimeData());
   const FullColorImageData *fciData =
@@ -456,6 +534,7 @@ StrokeSelection::~StrokeSelection() {}
 StrokeSelection::StrokeSelection(const StrokeSelection &other)
     : m_vi(other.m_vi)
     , m_indexes(other.m_indexes)
+    , m_selectionOrder(other.m_selectionOrder)
     , m_groupCommand(new TGroupCommand())
     , m_sceneHandle(other.m_sceneHandle)
     , m_updateSelectionBBox(other.m_updateSelectionBBox) {
@@ -467,6 +546,7 @@ StrokeSelection::StrokeSelection(const StrokeSelection &other)
 StrokeSelection &StrokeSelection::operator=(const StrokeSelection &other) {
   m_vi                  = other.m_vi;
   m_indexes             = other.m_indexes;
+  m_selectionOrder      = other.m_selectionOrder;
   m_sceneHandle         = other.m_sceneHandle;
   m_updateSelectionBBox = other.m_updateSelectionBBox;
 
@@ -476,21 +556,19 @@ StrokeSelection &StrokeSelection::operator=(const StrokeSelection &other) {
 //-----------------------------------------------------------------------------
 
 void StrokeSelection::select(int index, bool on) {
-  if (on)
-    m_indexes.insert(index);
-  else
+  if (m_selectionOrder.size() != m_indexes.size())
+    m_selectionOrder = selectionOrder();
+  if (on) {
+    if (m_indexes.insert(index).second) m_selectionOrder.push_back(index);
+  } else {
     m_indexes.erase(index);
+    m_selectionOrder.erase(
+        std::remove(m_selectionOrder.begin(), m_selectionOrder.end(), index),
+        m_selectionOrder.end());
+  }
 }
 
-//-----------------------------------------------------------------------------
-
-void StrokeSelection::toggle(int index) {
-  std::set<int>::iterator it = m_indexes.find(index);
-  if (it == m_indexes.end())
-    m_indexes.insert(index);
-  else
-    m_indexes.erase(it);
-}
+void StrokeSelection::toggle(int index) { select(index, !isSelected(index)); }
 
 //=============================================================================
 //
@@ -682,6 +760,156 @@ void StrokeSelection::copy() {
 
 //=============================================================================
 //
+// StrokeSelection::saveAsCustomVectorBrush()
+//
+//-----------------------------------------------------------------------------
+
+void StrokeSelection::saveAsCustomVectorBrush() {
+  saveSelectedVectors(QApplication::keyboardModifiers() & Qt::ShiftModifier);
+}
+
+//-----------------------------------------------------------------------------
+
+void StrokeSelection::saveVectorSelectionAs() { saveSelectedVectors(true); }
+
+//-----------------------------------------------------------------------------
+
+void StrokeSelection::saveSelectedVectors(bool chooseDestination) {
+  if (!m_vi || m_indexes.empty()) return;
+
+  std::vector<int> indexes(m_indexes.begin(), m_indexes.end());
+  for (int index : indexes) {
+    if (index < 0 || index >= static_cast<int>(m_vi->getStrokeCount())) {
+      DVGui::error(QObject::tr(
+          "The vector selection is no longer valid. Please select it again."));
+      return;
+    }
+  }
+
+  TVectorImageP selectedImage;
+  {
+    QMutexLocker lock(m_vi->getMutex());
+    selectedImage = m_vi->splitImage(indexes, false);
+  }
+  if (!selectedImage || selectedImage->getStrokeCount() == 0) return;
+
+  QWidget *parent = QApplication::activeWindow();
+  const TFilePath brushFolder =
+      ToonzFolder::getLibraryFolder() + "vector brushes";
+  TFilePath destination;
+
+  if (chooseDestination) {
+    TFilePath initialFolder = brushFolder;
+    TXshLevel *level = TTool::getApplication()->getCurrentLevel()->getLevel();
+    if (level && !level->getPath().isEmpty()) {
+      TFilePath levelPath = level->getPath();
+      if (m_sceneHandle && m_sceneHandle->getScene())
+        levelPath = m_sceneHandle->getScene()->decodeFilePath(levelPath);
+      if (!levelPath.isEmpty()) initialFolder = levelPath.getParentDir();
+    }
+
+    const TFilePath initialPath =
+        initialFolder + TFilePath(suggestedBrushName() + ".pli");
+    QString fileName = QFileDialog::getSaveFileName(
+        parent, QObject::tr("Save Vector Selection As"),
+        initialPath.getQString(), QObject::tr("OpenToonz Vector Level (*.pli)"),
+        nullptr, QFileDialog::DontConfirmOverwrite);
+    if (fileName.isEmpty()) return;
+
+    destination = TFilePath(fileName);
+    if (QString::fromStdString(destination.getType())
+            .compare("pli", Qt::CaseInsensitive) != 0)
+      destination = TFilePath(destination.getWideString() + L".pli");
+  } else {
+    QString proposedName = suggestedBrushName();
+    QString brushName;
+    while (brushName.isEmpty()) {
+      bool accepted = false;
+      QString input = QInputDialog::getText(
+          parent, QObject::tr("Save as Custom Vector Brush"),
+          QObject::tr("Brush name:"), QLineEdit::Normal, proposedName,
+          &accepted);
+      if (!accepted) return;
+
+      input               = normalizeBrushName(input);
+      const QString error = validateBrushName(input);
+      if (!error.isEmpty()) {
+        DVGui::warning(error);
+        proposedName = input;
+        continue;
+      }
+      brushName = input;
+    }
+    destination = brushFolder + TFilePath(brushName + ".pli");
+  }
+
+  bool appendToDestination = false;
+  if (TFileStatus(destination).doesExist()) {
+    const QString question =
+        chooseDestination
+            ? QObject::tr("The file '%1' already exists.")
+                  .arg(destination.getQString())
+            : QObject::tr("The custom vector brush '%1' already exists.")
+                  .arg(QString::fromStdWString(destination.getWideName()));
+    const int choice =
+        DVGui::MsgBox(question, QObject::tr("Overwrite"), QObject::tr("Append"),
+                      QObject::tr("Cancel"), 2, parent);
+    if (choice != 1 && choice != 2) return;
+    appendToDestination = choice == 2;
+  }
+
+  const TFilePath destinationFolder = destination.getParentDir();
+  const bool installsCustomBrush    = destinationFolder == brushFolder;
+
+  TTool *tool = TTool::getApplication()->getCurrentTool()->getTool();
+  const TFrameId sourceFrameId = tool ? tool->getCurrentFid() : TFrameId(1);
+
+  CustomVectorBrushExporter::Source source;
+  source.preferredFirstFrame = sourceFrameId;
+  source.frames.emplace_back(sourceFrameId, selectedImage);
+
+  CustomVectorBrushExporter::PreparedFile prepared;
+  QString errorMessage;
+  if (!CustomVectorBrushExporter::prepare(source, destinationFolder, prepared,
+                                          errorMessage)) {
+    DVGui::error(errorMessage);
+    return;
+  }
+
+  if (installsCustomBrush &&
+      prepared.serializedBytes > RecommendedCustomVectorBrushBytes) {
+    const TINT64 sizeInKilobytes = (prepared.serializedBytes + 1023) / 1024;
+    const QString question =
+        QObject::tr(
+            "This custom vector brush is %1 KB, above the recommended size "
+            "of 32 KB. Large vector brushes may reduce drawing and rendering "
+            "performance. Continue?")
+            .arg(sizeInKilobytes);
+    if (DVGui::MsgBox(question, QObject::tr("Continue"), QObject::tr("Cancel"),
+                      1, parent) != 1) {
+      CustomVectorBrushExporter::discard(prepared);
+      return;
+    }
+  }
+
+  if (appendToDestination && !CustomVectorBrushExporter::prepareAppend(
+                                 source, destination, prepared, errorMessage)) {
+    CustomVectorBrushExporter::discard(prepared);
+    DVGui::error(errorMessage);
+    return;
+  }
+
+  if (!CustomVectorBrushExporter::commit(prepared, destination, errorMessage)) {
+    CustomVectorBrushExporter::discard(prepared);
+    DVGui::error(errorMessage);
+    return;
+  }
+
+  FolderListenerManager::instance()->notifyFolderChanged(destinationFolder);
+}
+
+//=============================================================================
+//
 // StrokeSelection::paste()
 //
 //-----------------------------------------------------------------------------
@@ -698,6 +926,12 @@ void StrokeSelection::paste() {
   if (TTool::getApplication()->getCurrentObject()->isSpline()) {
     const StrokesData *stData = dynamic_cast<const StrokesData *>(
         QApplication::clipboard()->mimeData());
+    std::unique_ptr<StrokesData> transferredData;
+    if (!stData) {
+      transferredData.reset(
+          StrokesData::fromClipboard(QApplication::clipboard()->mimeData()));
+      stData = transferredData.get();
+    }
     if (!stData) return;
     TVectorImageP splineImg = tool->getImage(true);
     TVectorImageP img       = stData->m_image;
@@ -788,6 +1022,8 @@ void StrokeSelection::enableCommands() {
   enableCommand(this, MI_Cut, &StrokeSelection::cut);
   enableCommand(this, MI_Copy, &StrokeSelection::copy);
   enableCommand(this, MI_Paste, &StrokeSelection::paste);
+  enableCommand(this, MI_SaveAsCustomVectorBrush,
+                &StrokeSelection::saveAsCustomVectorBrush);
 
   enableCommand(m_groupCommand.get(), MI_Group, &TGroupCommand::group);
   enableCommand(m_groupCommand.get(), MI_Ungroup, &TGroupCommand::ungroup);
@@ -803,6 +1039,22 @@ void StrokeSelection::enableCommands() {
   enableCommand(this, MI_RemoveEndpoints, &StrokeSelection::removeEndpoints);
   enableCommand(this, MI_SortWithPaletteOrder, &StrokeSelection::sortWithPaletteOrder);
   enableCommand(this, MI_SelectAll, &StrokeSelection::selectAll);
+  enableCommand(this, MI_AlignLeft, &StrokeSelection::alignStrokes,
+                VectorAlignment::ALIGN_LEFT);
+  enableCommand(this, MI_AlignRight, &StrokeSelection::alignStrokes,
+                VectorAlignment::ALIGN_RIGHT);
+  enableCommand(this, MI_AlignTop, &StrokeSelection::alignStrokes,
+                VectorAlignment::ALIGN_TOP);
+  enableCommand(this, MI_AlignBottom, &StrokeSelection::alignStrokes,
+                VectorAlignment::ALIGN_BOTTOM);
+  enableCommand(this, MI_AlignCenterHorizontal, &StrokeSelection::alignStrokes,
+                VectorAlignment::ALIGN_CENTER_H);
+  enableCommand(this, MI_AlignCenterVertical, &StrokeSelection::alignStrokes,
+                VectorAlignment::ALIGN_CENTER_V);
+  enableCommand(this, MI_DistributeHorizontal, &StrokeSelection::alignStrokes,
+                VectorAlignment::DISTRIBUTE_H);
+  enableCommand(this, MI_DistributeVertical, &StrokeSelection::alignStrokes,
+                VectorAlignment::DISTRIBUTE_V);
 }
 
 //===================================================================
@@ -923,4 +1175,208 @@ bool StrokeSelection::isEditable() {
   }
 
   return true;
+}
+
+// Adapted from manongjohn's Tahoma2D PR #1275. A selected group is one
+// alignment object, including every member below the currently entered group.
+namespace {
+struct AlignmentObject {
+  std::vector<int> strokes;
+  TRectD box;
+};
+
+std::vector<AlignmentObject> alignmentObjects(const TVectorImageP &vi,
+                                              const std::vector<int> &order) {
+  std::vector<AlignmentObject> objects;
+  std::set<int> included;
+  int depth = vi->isInsideGroup();
+  for (int index : order) {
+    if (index < 0 || index >= (int)vi->getStrokeCount() ||
+        included.count(index) || !vi->isEnteredGroupStroke(index))
+      continue;
+    AlignmentObject object;
+    object.strokes.push_back(index);
+    object.box = vi->getStroke(index)->getBBox();
+    included.insert(index);
+    if (vi->getGroupDepth(index) > depth) {
+      for (int i = 0; i < (int)vi->getStrokeCount(); ++i) {
+        if (included.count(i) || !vi->isEnteredGroupStroke(i) ||
+            vi->getCommonGroupDepth(index, i) <= depth)
+          continue;
+        object.strokes.push_back(i);
+        object.box += vi->getStroke(i)->getBBox();
+        included.insert(i);
+      }
+    }
+    objects.push_back(object);
+  }
+  return objects;
+}
+
+class AlignStrokesUndo final : public ToolUtils::TToolUndo {
+  std::vector<int> m_indexes;
+  std::vector<std::unique_ptr<TStroke>> m_before, m_after;
+  std::vector<TFilledRegionInf> m_beforeRegions, m_afterRegions;
+
+  void apply(bool forward) const {
+    TVectorImageP vi = m_level->getFrame(m_frameId, true);
+    if (!vi) return;
+    QMutexLocker lock(vi->getMutex());
+    const auto &target = forward ? m_after : m_before;
+    std::vector<std::unique_ptr<TStroke>> previous;
+    std::vector<TStroke *> previousPtrs;
+    for (size_t i = 0; i < m_indexes.size(); ++i) {
+      int index = m_indexes[i];
+      if (index < 0 || index >= (int)vi->getStrokeCount()) return;
+      TStroke *stroke = vi->getStroke(index);
+      if (stroke->getControlPointCount() != target[i]->getControlPointCount())
+        return;
+      previous.emplace_back(new TStroke(*stroke));
+      previousPtrs.push_back(previous.back().get());
+    }
+    vi->findRegions();
+    for (size_t i = 0; i < m_indexes.size(); ++i) {
+      TStroke *stroke = vi->getStroke(m_indexes[i]);
+      for (int j = 0; j < stroke->getControlPointCount(); ++j)
+        stroke->setControlPoint(j, target[i]->getControlPoint(j));
+    }
+    vi->notifyChangedStrokes(m_indexes, previousPtrs);
+    ImageUtils::assignFillingInformation(
+        *vi, forward ? m_afterRegions : m_beforeRegions);
+    lock.unlock();
+    m_level->touchFrame(m_frameId);
+    notifyImageChanged();
+    TTool::Application *app = TTool::getApplication();
+    TTool *tool             = app->getCurrentTool()->getTool();
+    if (tool && TVectorImageP(tool->getImage(false)) == vi) {
+      StrokeSelection *selection = dynamic_cast<StrokeSelection *>(
+          app->getCurrentSelection()->getSelection());
+      if (selection)
+        selection->notifyAlignmentChanged();
+      else
+        tool->notifyImageChanged();
+    }
+    app->getCurrentXsheet()->notifyXsheetChanged();
+  }
+
+public:
+  AlignStrokesUndo(TXshSimpleLevel *level, const TFrameId &fid,
+                   const TVectorImageP &vi, const std::vector<int> &indexes)
+      : TToolUndo(level, fid), m_indexes(indexes) {
+    for (int index : indexes)
+      m_before.emplace_back(new TStroke(*vi->getStroke(index)));
+    ImageUtils::getFillingInformationOverlappingArea(vi, m_beforeRegions,
+                                                     vi->getBBox());
+  }
+  void captureAfter(const TVectorImageP &vi) {
+    for (int index : m_indexes)
+      m_after.emplace_back(new TStroke(*vi->getStroke(index)));
+    ImageUtils::getFillingInformationOverlappingArea(vi, m_afterRegions,
+                                                     vi->getBBox());
+  }
+  void undo() const override { apply(false); }
+  void redo() const override { apply(true); }
+  int getSize() const override {
+    int size = sizeof(*this);
+    for (const auto &stroke : m_before)
+      size += 2 * (sizeof(TStroke) +
+                   stroke->getControlPointCount() * sizeof(TThickPoint));
+    return size + (m_beforeRegions.size() + m_afterRegions.size()) *
+                      sizeof(TFilledRegionInf);
+  }
+  QString getHistoryString() override {
+    return QObject::tr("Align and Distribute Vector Strokes");
+  }
+};
+}  // namespace
+
+std::vector<int> StrokeSelection::selectionOrder() const {
+  std::vector<int> order;
+  std::set<int> remaining = m_indexes;
+  for (int index : m_selectionOrder)
+    if (remaining.erase(index)) order.push_back(index);
+  // Existing callers can populate the set directly (paste, select all, etc.).
+  order.insert(order.end(), remaining.begin(), remaining.end());
+  return order;
+}
+
+void StrokeSelection::notifyAlignmentChanged() {
+  TTool *tool = TTool::getApplication()->getCurrentTool()->getTool();
+  if (!tool) return;
+  m_updateSelectionBBox = true;
+  tool->notifyImageChanged();
+  m_updateSelectionBBox = false;
+}
+
+void StrokeSelection::alignStrokes(VectorAlignment::Type type) {
+  using namespace VectorAlignment;
+  TTool::Application *app = TTool::getApplication();
+  TTool *tool             = app->getCurrentTool()->getTool();
+  TXshSimpleLevel *level  = app->getCurrentLevel()->getSimpleLevel();
+  if (!m_vi || isEmpty() || !tool || !tool->isEnabled() || !level ||
+      app->getCurrentObject()->isSpline() || tool->isDragging())
+    return;
+  if (TVectorImageP(tool->getImage(false)) != m_vi) return;
+  // These commands operate on the displayed drawing only. Multi-frame/level
+  // selection has different semantics and is deliberately left to its tool.
+  VectorSelectionTool *selectionTool =
+      dynamic_cast<VectorSelectionTool *>(tool);
+  if (!selectionTool || selectionTool->isLevelType() ||
+      selectionTool->isSelectedFramesType())
+    return;
+  if (!isEditable()) {
+    DVGui::error(QObject::tr("The selection is not editable."));
+    return;
+  }
+  QMutexLocker lock(m_vi->getMutex());
+  auto objects = alignmentObjects(m_vi, selectionOrder());
+  std::vector<TRectD> boxes;
+  for (const auto &object : objects) boxes.push_back(object.box);
+  Method method = tool->getAlignMethod();
+  TRectD camera;
+  if (method == CAMERA_AREA) {
+    ToonzScene *scene = app->getCurrentScene()->getScene();
+    if (!scene || !scene->getCurrentCamera()) return;
+    camera = scene->getCurrentCamera()->getStageRect();
+    if (!app->getCurrentFrame()->isEditingLevel()) {
+      int col      = app->getCurrentColumn()->getColumnIndex();
+      TXsheet *xsh = tool->getXsheet();
+      if (!xsh || col < 0) return;
+      int frame = app->getCurrentFrame()->getFrameIndex();
+      TAffine levelAff =
+          xsh->getPlacement(TStageObjectId::ColumnId(col), frame);
+      if (std::abs(levelAff.det()) < 1e-12) return;
+      TAffine cameraAff = xsh->getPlacement(
+          TStageObjectId::CameraId(xsh->getCameraColumnIndex()), frame);
+      // Align to the camera's axis-aligned bounds in drawing coordinates.
+      camera = (levelAff.inv() * cameraAff) * camera;
+    }
+  }
+  auto deltas = offsets(boxes, type, method, camera);
+  std::vector<int> indexes;
+  for (size_t i = 0; i < objects.size(); ++i)
+    if (deltas[i] != TPointD())
+      indexes.insert(indexes.end(), objects[i].strokes.begin(),
+                     objects[i].strokes.end());
+  if (indexes.empty()) return;
+  m_vi->findRegions();
+  auto undo = std::make_unique<AlignStrokesUndo>(level, tool->getCurrentFid(),
+                                                 m_vi, indexes);
+  std::vector<std::unique_ptr<TStroke>> previous;
+  std::vector<TStroke *> previousPtrs;
+  for (size_t i = 0; i < objects.size(); ++i) {
+    if (deltas[i] == TPointD()) continue;
+    for (int index : objects[i].strokes) {
+      TStroke *stroke = m_vi->getStroke(index);
+      previous.emplace_back(new TStroke(*stroke));
+      previousPtrs.push_back(previous.back().get());
+      stroke->transform(TTranslation(deltas[i]));
+    }
+  }
+  m_vi->notifyChangedStrokes(indexes, previousPtrs);
+  undo->captureAfter(m_vi);
+  lock.unlock();
+  TUndoManager::manager()->add(undo.release());
+  notifyAlignmentChanged();
+  app->getCurrentXsheet()->notifyXsheetChanged();
 }

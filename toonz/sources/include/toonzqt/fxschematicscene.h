@@ -4,6 +4,7 @@
 #define FXSCHEMATIC_H
 
 #include "toonzqt/addfxcontextmenu.h"
+#include "toonz/fxcommand.h"
 #include "schematicviewer.h"
 #include "tgeometry.h"
 #include <QMap>
@@ -12,6 +13,7 @@
 
 // forward declaration
 class FxSchematicNode;
+class FxSchematicLink;
 class TFxHandle;
 class FxSelection;
 class FxSchematicNode;
@@ -25,6 +27,9 @@ class FxSchematicMacroEditor;
 class TMacroFx;
 
 enum SearchDirection { Both = 0, Input, Output };
+
+//! What dropping an Fx from the Fx browser onto the schematic will do.
+enum class DragDropAction { None = 0, Add, Insert, Replace };
 //==================================================================
 //
 // FXSchematic
@@ -105,6 +110,14 @@ class FxSchematicScene final : public SchematicScene {
 
   SchematicViewer *m_viewer;
 
+  // drag & drop of an Fx coming from the Fx browser
+  DragDropAction m_dragDropAction;
+  TFxP m_dragFx;
+  QList<TFxP> m_dropFxs;
+  QList<TFxCommand::Link> m_dropLinks;
+  FxSchematicLink *m_litLink;
+  FxSchematicNode *m_litNode;
+
 public:
   FxSchematicScene(QWidget *parent);
   ~FxSchematicScene();
@@ -159,8 +172,14 @@ protected:
   void mouseMoveEvent(QGraphicsSceneMouseEvent *me) override;
   void mouseReleaseEvent(QGraphicsSceneMouseEvent *me) override;
   bool event(QEvent *e) override;
+  void dragEnterEvent(QGraphicsSceneDragDropEvent *e) override;
+  void dragMoveEvent(QGraphicsSceneDragDropEvent *e) override;
+  void dropEvent(QGraphicsSceneDragDropEvent *e) override;
+  void dragLeaveEvent(QGraphicsSceneDragDropEvent *e) override;
 
 private:
+  void clearDropHighlights();
+
   FxSchematicNode *addFxSchematicNode(TFx *fx);
   FxSchematicNode *addGroupedFxSchematicNode(int groupId,
                                              const QList<TFxP> &groupedFxs);

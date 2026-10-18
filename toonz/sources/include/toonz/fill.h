@@ -101,7 +101,7 @@ DVAPI void inkFill(const TRasterCM32P &r, const TPoint &p, int ink,
 
 bool DVAPI inkSegment(const TRasterCM32P &r, const TPoint &p, int ink,
                       float growFactor, bool isSelective,
-                      TTileSaverCM32 *saver = 0);
+                      TTileSaverCM32 *saver = 0, bool clearInk = false);
 
 void DVAPI rectFillInk(const TRasterCM32P &ras, const TRect &r, int color);
 

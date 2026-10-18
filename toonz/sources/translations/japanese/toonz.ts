@@ -19228,4 +19228,39 @@ Hold F3 Key on the Viewer to Show This Frame Only</source>
         <translation> フレーム</translation>
     </message>
 </context>
+<context>
+    <name>FileBrowserLocations</name>
+    <message>
+        <source>My Computer</source>
+        <translation>コンピューター</translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation>ネットワーク</translation>
+    </message>
+    <message>
+        <source>My Documents</source>
+        <translation>ドキュメント</translation>
+    </message>
+    <message>
+        <source>Desktop</source>
+        <translation>デスクトップ</translation>
+    </message>
+    <message>
+        <source>Library</source>
+        <translation>ライブラリ</translation>
+    </message>
+    <message>
+        <source>History</source>
+        <translation>履歴</translation>
+    </message>
+    <message>
+        <source>Project root (%1)</source>
+        <translation>プロジェクトルート (%1)</translation>
+    </message>
+    <message>
+        <source>Scene Folder</source>
+        <translation>シーンフォルダー</translation>
+    </message>
+</context>
 </TS>

@@ -15,6 +15,10 @@
 // TnzQt includes
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/imageutils.h"
+#include "toonzqt/brushpresetbridge.h"
+#include "toonzqt/tselectionhandle.h"
+#include "toonzqt/styleselection.h"
+#include "tundo.h"
 
 // TnzLib includes
 #include "toonz/tobjecthandle.h"
@@ -33,11 +37,13 @@
 #include "toonz/preferences.h"
 #include "toonz/tpalettehandle.h"
 #include "toonz/mypaintbrushstyle.h"
+#include "toonz/imagestyles.h"
 #include "toonz/toonzfolders.h"
 
 // TnzCore includes
 #include "tstream.h"
 #include "tcolorstyles.h"
+#include "timage_io.h"
 #include "tvectorimage.h"
 #include "tenv.h"
 #include "tregion.h"
@@ -60,6 +66,8 @@ TEnv::IntVar RasterBrushPencilMode("InknpaintRasterBrushPencilMode", 0);
 TEnv::IntVar BrushPressureSensitivity("InknpaintBrushPressureSensitivity", 1);
 TEnv::DoubleVar RasterBrushHardness("RasterBrushHardness", 100);
 TEnv::DoubleVar RasterBrushModifierSize("RasterBrushModifierSize", 0);
+TEnv::IntVar RasterBrushModifierEraser("RasterBrushModifierEraser", 0);
+TEnv::IntVar RasterBrushEraserMode("RasterBrushEraserMode", 0);
 TEnv::StringVar RasterBrushPreset("RasterBrushPreset", "<custom>");
 TEnv::IntVar BrushLockAlpha("InknpaintBrushLockAlpha", 0);
 TEnv::IntVar RasterBrushAssistants("RasterBrushAssistants", 1);
@@ -601,7 +609,7 @@ public:
     TToonzImageP tSrcImg = srcImg;
     assert(tSrcImg);
     ras->copy(tSrcImg->getRaster(), m_offset);
-    ToolUtils::updateSaveBox();
+    ToolUtils::updateSaveBox(m_level, m_frameId);
     TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
     notifyImageChanged();
   }
@@ -743,6 +751,8 @@ ToonzRasterBrushTool::ToonzRasterBrushTool(std::string name, int targetType)
     , m_pencil("Pencil", false)
     , m_pressure("Pressure", true)
     , m_modifierSize("ModifierSize", -3, 3, 0, true)
+    , m_modifierEraser("ModifierEraser", false)
+    , m_eraserMode("ModifierEraserMode")
     , m_modifierLockAlpha("Lock Alpha", false)
     , m_assistants("Assistants", true)
     , m_targetType(targetType)
@@ -762,6 +772,8 @@ ToonzRasterBrushTool::ToonzRasterBrushTool(std::string name, int targetType)
   m_prop[0].bind(m_hardness);
   m_prop[0].bind(m_smooth);
   m_prop[0].bind(m_drawOrder);
+  m_prop[0].bind(m_modifierEraser);
+  m_prop[0].bind(m_eraserMode);
   m_prop[0].bind(m_modifierLockAlpha);
   m_prop[0].bind(m_pencil);
   m_prop[0].bind(m_assistants);
@@ -772,12 +784,18 @@ ToonzRasterBrushTool::ToonzRasterBrushTool(std::string name, int targetType)
   m_drawOrder.addValue(L"Palette Order");
   m_drawOrder.setId("DrawOrder");
 
+  m_eraserMode.addValue(L"Lines");
+  m_eraserMode.addValue(L"Areas");
+  m_eraserMode.addValue(L"Lines & Areas");
+  m_eraserMode.setId("EraserMode");
+
   m_prop[0].bind(m_pressure);
 
   m_prop[0].bind(m_preset);
   m_preset.setId("BrushPreset");
   m_preset.addValue(CUSTOM_WSTR);
   m_pressure.setId("PressureSensitivity");
+  m_modifierEraser.setId("RasterEraser");
   m_modifierLockAlpha.setId("LockAlpha");
   m_smooth.setId("Smooth");
 
@@ -999,6 +1017,11 @@ void ToonzRasterBrushTool::updateTranslation() {
   m_preset.setItemUIName(CUSTOM_WSTR, tr("<custom>"));
   m_pencil.setQStringName(tr("Pencil"));
   m_pressure.setQStringName(tr("Pressure"));
+  m_modifierEraser.setQStringName(tr("Eraser"));
+  m_eraserMode.setQStringName(tr("Mode:"));
+  m_eraserMode.setItemUIName(L"Lines", tr("Lines"));
+  m_eraserMode.setItemUIName(L"Areas", tr("Areas"));
+  m_eraserMode.setItemUIName(L"Lines & Areas", tr("Lines & Areas"));
   m_modifierLockAlpha.setQStringName(tr("Lock Alpha"));
   m_assistants.setQStringName(tr("Assistants"));
 }
@@ -1028,6 +1051,7 @@ void ToonzRasterBrushTool::onActivate() {
 
   updateModifiers();
   m_brushTimer.start();
+  m_skipStrokeUntilDown = false;
   // TODO:app->editImageOrSpline();
 }
 
@@ -1035,9 +1059,10 @@ void ToonzRasterBrushTool::onActivate() {
 
 void ToonzRasterBrushTool::onDeactivate() {
   m_inputmanager.finishTracks();
-  m_enabled   = false;
-  m_workRas   = TRaster32P();
-  m_backupRas = TRasterCM32P();
+  m_enabled             = false;
+  m_workRas             = TRaster32P();
+  m_backupRas           = TRasterCM32P();
+  m_skipStrokeUntilDown = false;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1136,6 +1161,13 @@ void ToonzRasterBrushTool::handleMouseEvent(MouseEventType type,
   if (control != m_inputmanager.state.isKeyPressed(TKey::control))
     m_inputmanager.keyEvent(control, TKey::control, t, nullptr);
 
+  if (m_skipStrokeUntilDown) {
+    if (type == ME_DOWN)
+      m_skipStrokeUntilDown = false;
+    else if (type != ME_MOVE)
+      return;
+  }
+
   if (type == ME_MOVE) {
     THoverList hovers(1, fixedPos);
     m_inputmanager.hoverEvent(hovers);
@@ -1172,6 +1204,7 @@ void ToonzRasterBrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 //--------------------------------------------------------------------------------------------------
 
 void ToonzRasterBrushTool::inputSetBusy(bool busy) {
+  if (m_skipStrokeUntilDown && busy) return;
   if (m_painting.active == busy) return;
 
   if (busy) {
@@ -1204,10 +1237,14 @@ void ToonzRasterBrushTool::inputSetBusy(bool busy) {
     }
 
     m_painting.frameId = getFrameId();
+    m_painting.level   = TXshSimpleLevelP();
+    if (TXshLevelHandle *lh = app->getCurrentLevel()) {
+      if (TXshLevel *xl = lh->getLevel())
+        m_painting.level = xl->getSimpleLevel();
+    }
 
-    TImageP img = getImage(true);
-    TToonzImageP ri(img);
-    TRasterCM32P ras = ri->getRaster();
+    TToonzImageP ri(getImage(true));
+    TRasterCM32P ras = ri ? ri->getRaster() : TRasterCM32P();
     if (!ras) {
       m_painting.active = false;
       return;
@@ -1237,6 +1274,27 @@ void ToonzRasterBrushTool::inputSetBusy(bool busy) {
           MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC);
       m_painting.myPaint.baseBrush.setBaseValue(
           MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC, baseSize + modifierSize);
+
+      const bool presetEraser = m_painting.myPaint.baseBrush.getBaseValue(
+                                    MYPAINT_BRUSH_SETTING_ERASER) > 0.5f;
+      m_painting.myPaint.eraser = m_modifierEraser.getValue() || presetEraser;
+      m_painting.myPaint.eraserMode =
+          static_cast<MyPaintToonzEraserMode>(m_eraserMode.getIndex());
+
+      if (m_painting.myPaint.eraser) {
+        // Render the brush shape into the work raster. Eraser mappings are
+        // flattened because libmypaint cannot erase an empty coverage mask.
+        m_painting.myPaint.baseBrush.setBaseValue(MYPAINT_BRUSH_SETTING_ERASER,
+                                                  0.0f);
+        m_painting.myPaint.baseBrush.setBaseValue(
+            MYPAINT_BRUSH_SETTING_LOCK_ALPHA, 0.0f);
+        for (int i = 0; i < MYPAINT_BRUSH_INPUTS_COUNT; ++i) {
+          m_painting.myPaint.baseBrush.setMappingN(MYPAINT_BRUSH_SETTING_ERASER,
+                                                   (MyPaintBrushInput)i, 0);
+          m_painting.myPaint.baseBrush.setMappingN(
+              MYPAINT_BRUSH_SETTING_LOCK_ALPHA, (MyPaintBrushInput)i, 0);
+        }
+      }
     } else if (m_hardness.getValue() == 100 || m_pencil.getValue()) {
       // init pencil drawing
 
@@ -1249,51 +1307,7 @@ void ToonzRasterBrushTool::inputSetBusy(bool busy) {
     }
 
   } else {
-    // finish painting
-
-    if (m_painting.myPaint.isActive) {
-      // finish myPaint drawing
-      m_workRas->unlock();
-    }
-
-    delete m_painting.tileSaver;
-    m_painting.tileSaver = nullptr;
-
-    // add undo record
-    TFrameId frameId = m_painting.frameId.isEmptyFrame() ? getCurrentFid()
-                                                         : m_painting.frameId;
-    if (m_painting.tileSet->getTileCount() > 0) {
-      TTool::Application *app   = TTool::getApplication();
-      TXshLevel *level          = app->getCurrentLevel()->getLevel();
-      TXshSimpleLevelP simLevel = level->getSimpleLevel();
-      TRasterCM32P ras          = TToonzImageP(getImage(true))->getRaster();
-      TRasterCM32P subras = ras->extract(m_painting.affectedRect)->clone();
-      TUndoManager::manager()->add(new MyPaintBrushUndo(
-          m_painting.tileSet, simLevel.getPointer(), frameId, m_isFrameCreated,
-          m_isLevelCreated, subras, m_painting.affectedRect.getP00()));
-      // MyPaintBrushUndo will delete tileSet by it self
-    } else {
-      // delete tileSet here because MyPaintBrushUndo will not do it
-      delete m_painting.tileSet;
-    }
-    m_painting.tileSet = nullptr;
-
-    // Restore gap/autoclose Fill Check
-    int tc = ToonzCheck::instance()->getChecks();
-    if (tc & ToonzCheck::eGap || tc & ToonzCheck::eAutoclose) invalidate();
-
-    /*-- 作業中のフレームをリセット --*/
-    m_painting.frameId = TFrameId();
-
-    m_painting.myPaint.isActive = false;
-    m_painting.pencil.isActive  = false;
-    m_painting.blured.isActive  = false;
-    m_painting.active           = false;
-
-    /*-- FIdを指定して、描画中にフレームが動いても、
-      描画開始時のFidのサムネイルが更新されるようにする。--*/
-    notifyImageChanged(frameId);
-    ToolUtils::updateSaveBox();
+    commitPainting();
   }
 }
 
@@ -1304,9 +1318,8 @@ void ToonzRasterBrushTool::inputPaintTrackPoint(const TTrackPoint &point,
                                                 bool firstTrack, bool preview) {
   if (!m_painting.active || preview) return;
 
-  TImageP img = getImage(true);
-  TToonzImageP ri(img);
-  TRasterCM32P ras = ri->getRaster();
+  TToonzImageP ri(getImage(true));
+  TRasterCM32P ras = ri ? ri->getRaster() : TRasterCM32P();
   if (!ras) return;
   TPointD rasCenter     = convert(ras->getCenter());
   TPointD fixedPosition = getCenteredCursorPos(point.position);
@@ -1349,7 +1362,8 @@ void ToonzRasterBrushTool::inputPaintTrackPoint(const TTrackPoint &point,
     if (!updateRect.isEmpty())
       handler->brush.updateDrawing(
           ras, m_backupRas, m_painting.myPaint.strokeSegmentRect,
-          m_painting.styleId, m_modifierLockAlpha.getValue());
+          m_painting.styleId, m_modifierLockAlpha.getValue(),
+          m_painting.myPaint.eraser, m_painting.myPaint.eraserMode);
 
     // determine invalidate rect
     invalidateRect += convert(m_painting.myPaint.strokeSegmentRect) - rasCenter;
@@ -1460,12 +1474,15 @@ void ToonzRasterBrushTool::inputMouseMove(const TPointD &position,
   struct Locals {
     ToonzRasterBrushTool *m_this;
 
+    void notify(TProperty &prop) {
+      m_this->onPropertyChanged(prop.getName());
+      TTool::getApplication()->getCurrentTool()->notifyToolChanged();
+    }
+
     void setValue(TDoublePairProperty &prop,
                   const TDoublePairProperty::Value &value) {
       prop.setValue(value);
-
-      m_this->onPropertyChanged(prop.getName());
-      TTool::getApplication()->getCurrentTool()->notifyToolChanged();
+      notify(prop);
     }
 
     void addMinMax(TDoublePairProperty &prop, double min, double max) {
@@ -1481,6 +1498,14 @@ void ToonzRasterBrushTool::inputMouseMove(const TPointD &position,
 
       setValue(prop, value);
     }
+
+    void add(TDoubleProperty &prop, double amount) {
+      if (amount == 0.0) return;
+      const TDoubleProperty::Range &range = prop.getRange();
+      prop.setValue(
+          tcrop<double>(prop.getValue() + amount, range.first, range.second));
+      notify(prop);
+    }
   } locals = {this};
 
   double thickness =
@@ -1488,25 +1513,31 @@ void ToonzRasterBrushTool::inputMouseMove(const TPointD &position,
   TPointD halfThick(thickness * 0.5, thickness * 0.5);
   TRectD invalidateRect(m_brushPos - halfThick, m_brushPos + halfThick);
 
-  if (Preferences::instance()->useCtrlAltToResizeBrushEnabled() &&
+  const bool resizeBrush =
+      Preferences::instance()->useCtrlAltToResizeBrushEnabled() &&
       state.isKeyPressed(TKey::control) && state.isKeyPressed(TKey::alt) &&
-      !state.isKeyPressed(TKey::shift)) {
+      !state.isKeyPressed(TKey::shift);
+
+  if (resizeBrush) {
     // Resize the brush if CTRL+ALT is pressed and the preference is enabled.
     const TPointD &diff = position - m_mousePos;
-    double max          = diff.x / 2;
-    double min          = diff.y / 2;
-
-    locals.addMinMax(m_rasThickness, min, max);
-
-    double radius = m_rasThickness.getValue().second * 0.5;
+    double radius;
+    if (m_isMyPaintStyleSelected) {
+      locals.add(m_modifierSize, 0.01 * diff.x);
+      radius = (m_maxCursorThick + 1) * 0.5;
+    } else {
+      locals.addMinMax(m_rasThickness, diff.y / 2, diff.x / 2);
+      radius = m_rasThickness.getValue().second * 0.5;
+    }
     invalidateRect += TRectD(m_brushPos - TPointD(radius, radius),
                              m_brushPos + TPointD(radius, radius));
-
   } else {
-    m_brushPos = m_mousePos = position;
+    m_brushPos = position;
 
     invalidateRect += TRectD(position - halfThick, position + halfThick);
   }
+
+  m_mousePos = position;
 
   invalidate(invalidateRect.enlarge(20));
 
@@ -1556,6 +1587,7 @@ void ToonzRasterBrushTool::draw() {
 
   if (TToonzImageP ti = img) {
     TRasterP ras = ti->getRaster();
+    if (!ras) return;
     int lx       = ras->getLx();
     int ly       = ras->getLy();
     drawEmptyCircle(m_brushPos, tround(m_minThick), lx % 2 == 0, ly % 2 == 0,
@@ -1597,7 +1629,56 @@ TPropertyGroup *ToonzRasterBrushTool::getProperties(int idx) {
 
 //----------------------------------------------------------------------------------------------------------
 
+void ToonzRasterBrushTool::commitPainting() {
+  if (!m_painting.active) return;
+
+  if (m_painting.myPaint.isActive && m_workRas) m_workRas->unlock();
+
+  delete m_painting.tileSaver;
+  m_painting.tileSaver = nullptr;
+
+  TFrameId frameId =
+      m_painting.frameId.isEmptyFrame() ? getCurrentFid() : m_painting.frameId;
+  TXshSimpleLevel *sl = m_painting.level.getPointer();
+
+  TToonzImageP ti =
+      sl ? TToonzImageP(sl->getFrame(frameId, true)) : TToonzImageP();
+  TRasterCM32P ras = ti ? ti->getRaster() : TRasterCM32P();
+
+  if (m_painting.tileSet && m_painting.tileSet->getTileCount() > 0 && ras &&
+      sl) {
+    TRasterCM32P subras = ras->extract(m_painting.affectedRect)->clone();
+    TUndoManager::manager()->add(new MyPaintBrushUndo(
+        m_painting.tileSet, sl, frameId, m_isFrameCreated, m_isLevelCreated,
+        subras, m_painting.affectedRect.getP00()));
+  } else {
+    delete m_painting.tileSet;
+  }
+  m_painting.tileSet = nullptr;
+
+  int tc = ToonzCheck::instance()->getChecks();
+  if (tc & ToonzCheck::eGap || tc & ToonzCheck::eAutoclose) invalidate();
+
+  if (ras && sl) ToolUtils::updateSaveBox(m_painting.level, frameId);
+
+  m_painting.frameId          = TFrameId();
+  m_painting.level            = TXshSimpleLevelP();
+  m_painting.myPaint.isActive = false;
+  m_painting.pencil.isActive  = false;
+  m_painting.blured.isActive  = false;
+  m_painting.active           = false;
+
+  if (sl) notifyImageChanged(frameId, sl);
+}
+
+//----------------------------------------------------------------------------------------------------------
+
 void ToonzRasterBrushTool::onImageChanged() {
+  m_inputmanager.reset();
+  if (m_painting.active) {
+    commitPainting();
+    m_skipStrokeUntilDown = true;
+  }
   if (!isEnabled()) return;
   setWorkAndBackupImages();
 }
@@ -1607,7 +1688,8 @@ void ToonzRasterBrushTool::onImageChanged() {
 void ToonzRasterBrushTool::setWorkAndBackupImages() {
   TToonzImageP ti = (TToonzImageP)getImage(false, 1);
   if (!ti) return;
-  TRasterP ras   = ti->getRaster();
+  TRasterP ras = ti->getRaster();
+  if (!ras) return;
   TDimension dim = ras->getSize();
 
   if (!m_workRas || m_workRas->getLx() < dim.lx || m_workRas->getLy() < dim.ly)
@@ -1643,7 +1725,10 @@ void ToonzRasterBrushTool::updateWorkAndBackupRasters(const TRect &rect) {
     enlargedRect *= ras->getBounds();
     if (enlargedRect.isEmpty()) return;
 
-    m_workRas->extract(enlargedRect)->copy(ras->extract(enlargedRect));
+    if (m_painting.myPaint.isActive && m_painting.myPaint.eraser)
+      m_workRas->extract(enlargedRect)->clear();
+    else
+      m_workRas->extract(enlargedRect)->copy(ras->extract(enlargedRect));
     m_backupRas->extract(enlargedRect)->copy(ras->extract(enlargedRect));
   } else {
     if (enlargedRect.x0 < m_workBackupRect.x0) enlargedRect.x0 -= dx;
@@ -1657,7 +1742,10 @@ void ToonzRasterBrushTool::updateWorkAndBackupRasters(const TRect &rect) {
     TRect lastRect     = m_workBackupRect * ras->getBounds();
     QList<TRect> rects = ToolUtils::splitRect(enlargedRect, lastRect);
     for (int i = 0; i < rects.size(); i++) {
-      m_workRas->extract(rects[i])->copy(ras->extract(rects[i]));
+      if (m_painting.myPaint.isActive && m_painting.myPaint.eraser)
+        m_workRas->extract(rects[i])->clear();
+      else
+        m_workRas->extract(rects[i])->copy(ras->extract(rects[i]));
       m_backupRas->extract(rects[i])->copy(ras->extract(rects[i]));
     }
   }
@@ -1683,16 +1771,20 @@ bool ToonzRasterBrushTool::onPropertyChanged(std::string propertyName) {
     return true;
   }
 
-  RasterBrushMinSize       = m_rasThickness.getValue().first;
-  RasterBrushMaxSize       = m_rasThickness.getValue().second;
-  BrushSmooth              = m_smooth.getValue();
-  BrushDrawOrder           = m_drawOrder.getIndex();
-  RasterBrushPencilMode    = m_pencil.getValue();
-  BrushPressureSensitivity = m_pressure.getValue();
-  RasterBrushHardness      = m_hardness.getValue();
-  RasterBrushModifierSize  = m_modifierSize.getValue();
-  BrushLockAlpha           = m_modifierLockAlpha.getValue();
-  RasterBrushAssistants    = m_assistants.getValue();
+  RasterBrushMinSize        = m_rasThickness.getValue().first;
+  RasterBrushMaxSize        = m_rasThickness.getValue().second;
+  BrushSmooth               = m_smooth.getValue();
+  BrushDrawOrder            = m_drawOrder.getIndex();
+  RasterBrushPencilMode     = m_pencil.getValue();
+  BrushPressureSensitivity  = m_pressure.getValue();
+  RasterBrushHardness       = m_hardness.getValue();
+  RasterBrushModifierSize   = m_modifierSize.getValue();
+  RasterBrushModifierEraser = m_modifierEraser.getValue() ? 1 : 0;
+  RasterBrushEraserMode     = m_eraserMode.getIndex();
+  BrushLockAlpha            = m_modifierLockAlpha.getValue();
+  RasterBrushAssistants     = m_assistants.getValue();
+
+  if (propertyName == m_modifierSize.getName()) updateCurrentStyle();
 
   // Recalculate/reset based on changed settings
   if (propertyName == m_rasThickness.getName()) {
@@ -1761,6 +1853,8 @@ void ToonzRasterBrushTool::loadPreset() {
     m_pencil.setValue(preset.m_pencil);
     m_pressure.setValue(preset.m_pressure);
     m_modifierSize.setValue(preset.m_modifierSize);
+    m_modifierEraser.setValue(preset.m_modifierEraser);
+    m_eraserMode.setIndex(std::min(2, std::max(0, preset.m_eraserMode)));
     m_modifierLockAlpha.setValue(preset.m_modifierLockAlpha);
     m_assistants.setValue(preset.m_assistants);
 
@@ -1770,38 +1864,165 @@ void ToonzRasterBrushTool::loadPreset() {
 
     m_brushPad = ToolUtils::getBrushPad(preset.m_max, preset.m_hardness * 0.01);
     
-    // CRITICAL: Restore MyPaint style from preset (strict state restoration)
-    // Only applies to NEW presets (version >= 1) that have style information
-    if (preset.m_styleInfoVersion >= 1) {
+    // Style snapshot restoration.
+    // When Selective Preset mode is ON, this entire block is skipped: only the
+    // tool parameters above (size, hardness, pressure, etc.) are injected from
+    // the preset. The user's current style in the palette remains untouched,
+    // effectively acting as a "base" that receives dynamic brush settings from
+    // any chosen preset. This is by design.
+    if (preset.m_styleInfoVersion >= 1 &&
+        !BrushPresetBridge::isSelectivePresetMode()) {
       TApplication *app = getApplication();
       if (app && app->getCurrentPalette()) {
         TPalette *palette = app->getCurrentPalette()->getPalette();
-        if (palette) {
-          int styleIndex = app->getCurrentLevelStyleIndex();
+        int styleIndex = app->getCurrentLevelStyleIndex();
+        // Style 0 is the transparent/eraser style and must never be
+        // overwritten, matching the Level Palette protection rules.
+        if (palette && styleIndex >= 1) {
           TColorStyle *currentStyle = palette->getStyle(styleIndex);
+          TPixel32 currentColor = TPixel32::Black;
+          if (currentStyle) {
+            // TTextureStyle::getMainColor() returns the texture's average pixel
+            // color, not the user-set color. Use getColorParamValue(0) which
+            // maps to m_patternColor — the actual user-controlled color.
+            if (dynamic_cast<TTextureStyle *>(currentStyle) &&
+                currentStyle->getColorParamCount() > 0)
+              currentColor = currentStyle->getColorParamValue(0);
+            else
+              currentColor = currentStyle->getMainColor();
+          }
           
-          if (preset.m_hasMyPaint) {
-            // Preset was created WITH MyPaint: load the specific MyPaint brush
-            TFilePath myPaintPath(preset.m_myPaintPath);
-            TMyPaintBrushStyle *newStyle = new TMyPaintBrushStyle(myPaintPath);
-            if (currentStyle) {
-              newStyle->setMainColor(currentStyle->getMainColor());
-            }
-            palette->setStyle(styleIndex, newStyle);
-            app->getCurrentPalette()->notifyColorStyleChanged(false);
-          } else {
-            // Preset was created WITHOUT MyPaint: replace any existing MyPaint with solid color
-            if (dynamic_cast<TMyPaintBrushStyle*>(currentStyle)) {
-              TSolidColorStyle *newStyle = new TSolidColorStyle(
-                currentStyle ? currentStyle->getMainColor() : TPixel32::Black);
+          // Non-Destructive helper: protect existing strokes by creating/reusing
+          // a separate palette index instead of overwriting the current one.
+          auto commitStyle = [&](TColorStyle *newStyle) {
+            if (BrushPresetBridge::isNonDestructiveMode()) {
+              if (TSelection *sel =
+                      app->getCurrentSelection()->getSelection())
+                if (TStyleSelection *ss =
+                        dynamic_cast<TStyleSelection *>(sel))
+                  ss->selectNone();
+
+              int matchIdx =
+                  BrushPresetBridge::findMatchingStyleInPalette(palette, newStyle);
+              if (matchIdx >= 0) {
+                delete newStyle;
+                app->setCurrentLevelStyleIndex(matchIdx, true);
+              } else {
+                int newId = palette->addStyle(newStyle);
+                if (newId >= 0) {
+                  for (int p = 0; p < palette->getPageCount(); ++p) {
+                    TPalette::Page *pg = palette->getPage(p);
+                    if (!pg) continue;
+                    for (int s = 0; s < pg->getStyleCount(); ++s) {
+                      if (pg->getStyleId(s) == styleIndex) {
+                        pg->addStyle(newId);
+                        p = palette->getPageCount();
+                        break;
+                      }
+                    }
+                  }
+                  palette->setDirtyFlag(true);
+                  app->setCurrentLevelStyleIndex(newId, true);
+                  app->getPaletteController()
+                      ->getCurrentLevelPalette()
+                      ->notifyPaletteChanged();
+                }
+              }
+            } else {
+              TColorStyle *oldStyle = palette->getStyle(styleIndex);
+              TUndo *undo = BrushPresetBridge::createStyleOverwriteUndo(
+                  palette, styleIndex, oldStyle, newStyle,
+                  app->getPaletteController()->getCurrentLevelPalette());
               palette->setStyle(styleIndex, newStyle);
               app->getCurrentPalette()->notifyColorStyleChanged(false);
+              TUndoManager::manager()->add(undo);
+            }
+          };
+          
+          if (preset.m_hasStyleSnapshot && preset.m_styleInfoVersion >= 3) {
+            TColorStyle *newStyle = nullptr;
+            
+            if (preset.m_snapshotStyleTagId == 4001) {
+              TFilePath mpPath(preset.m_snapshotFilePath);
+              newStyle = new TMyPaintBrushStyle(mpPath);
+            } else if (preset.m_snapshotStyleTagId == 2001) {
+              TFilePath texRelPath(preset.m_snapshotFilePath);
+              TFilePath fullTexPath = TEnv::getStuffDir() + "library" + "textures" + texRelPath;
+              TRaster32P textureRas;
+              try {
+                TImageReaderP reader = TImageReaderP(fullTexPath);
+                if (reader) {
+                  TImageP img = reader->load();
+                  if (TRasterImageP ri = img) textureRas = ri->getRaster();
+                }
+              } catch (...) {}
+              if (!textureRas) textureRas = TRaster32P(1, 1);
+              newStyle = new TTextureStyle(textureRas, texRelPath);
+            } else {
+              newStyle = TColorStyle::create(preset.m_snapshotBrushIdName);
+            }
+            
+            if (newStyle) {
+              for (const auto &param : preset.m_snapshotParams) {
+                int idx = param.first;
+                double val = param.second;
+                if (idx >= newStyle->getParamCount()) continue;
+                TColorStyle::ParamType ptype = newStyle->getParamType(idx);
+                switch (ptype) {
+                  case TColorStyle::BOOL:
+                    newStyle->setParamValue(idx, (bool)(val != 0));
+                    break;
+                  case TColorStyle::INT:
+                  case TColorStyle::ENUM:
+                    newStyle->setParamValue(idx, (int)val);
+                    break;
+                  case TColorStyle::DOUBLE:
+                    newStyle->setParamValue(idx, val);
+                    break;
+                  default:
+                    break;
+                }
+              }
+              newStyle->setMainColor(currentColor);
+              commitStyle(newStyle);
+            }
+          } else if (preset.m_hasMyPaint) {
+            TFilePath myPaintPath(preset.m_myPaintPath);
+            TMyPaintBrushStyle *newStyle = new TMyPaintBrushStyle(myPaintPath);
+            newStyle->setMainColor(currentColor);
+            commitStyle(newStyle);
+          } else if (preset.m_hasTexture && preset.m_styleInfoVersion >= 2) {
+            TFilePath texRelPath(preset.m_texturePath);
+            TFilePath fullTexPath = TEnv::getStuffDir() + "library" + "textures" + texRelPath;
+            TRaster32P textureRas;
+            try {
+              TImageReaderP reader = TImageReaderP(fullTexPath);
+              if (reader) {
+                TImageP img = reader->load();
+                if (TRasterImageP ri = img) textureRas = ri->getRaster();
+              }
+            } catch (...) {}
+            if (!textureRas) textureRas = TRaster32P(1, 1);
+            TTextureStyle *newStyle = new TTextureStyle(textureRas, texRelPath);
+            newStyle->setParamValue(2, preset.m_textureScale);
+            newStyle->setParamValue(3, preset.m_textureRotation);
+            newStyle->setParamValue(4, preset.m_textureDispX);
+            newStyle->setParamValue(5, preset.m_textureDispY);
+            newStyle->setParamValue(6, preset.m_textureContrast);
+            newStyle->setParamValue(1, preset.m_textureType);
+            newStyle->setParamValue(0, preset.m_textureIsPattern);
+            newStyle->setMainColor(currentColor);
+            commitStyle(newStyle);
+          } else if (!preset.m_hasMyPaint && !preset.m_hasTexture && !preset.m_hasStyleSnapshot) {
+            if (dynamic_cast<TMyPaintBrushStyle*>(currentStyle) ||
+                dynamic_cast<TTextureStyle*>(currentStyle)) {
+              TSolidColorStyle *newStyle = new TSolidColorStyle(currentColor);
+              commitStyle(newStyle);
             }
           }
         }
       }
     }
-    // OLD presets (version 0): do nothing - leave the current style unchanged
   } catch (...) {
   }
 }
@@ -1821,22 +2042,74 @@ void ToonzRasterBrushTool::addPreset(QString name) {
   preset.m_pencil            = m_pencil.getValue();
   preset.m_pressure          = m_pressure.getValue();
   preset.m_modifierSize      = m_modifierSize.getValue();
+  preset.m_modifierEraser    = m_modifierEraser.getValue();
+  preset.m_eraserMode        = m_eraserMode.getIndex();
   preset.m_modifierLockAlpha = m_modifierLockAlpha.getValue();
   preset.m_assistants        = m_assistants.getValue();
   
-  // Capture MyPaint style information (CRITICAL for strict preset restoration)
-  preset.m_styleInfoVersion = 1;  // Mark as new preset with style information
+  // Capture complete style snapshot using the GENERIC approach.
+  // This captures ALL parameters of ANY TColorStyle (MyPaint, Texture, etc.)
+  // without hardcoding individual parameters.
+  preset.m_styleInfoVersion = 3;
+  preset.m_hasMyPaint = false;
+  preset.m_hasTexture = false;
+  preset.m_hasStyleSnapshot = false;
   
   TApplication *app = getApplication();
   if (app) {
     TColorStyle *style = app->getCurrentLevelStyle();
-    if (TMyPaintBrushStyle *mpStyle = dynamic_cast<TMyPaintBrushStyle*>(style)) {
-      preset.m_hasMyPaint = true;
-      std::wstring wpath = mpStyle->getPath().getWideString();
-      preset.m_myPaintPath = std::string(wpath.begin(), wpath.end());
-    } else {
-      preset.m_hasMyPaint = false;
-      preset.m_myPaintPath = "";
+    
+    if (style && !dynamic_cast<TSolidColorStyle*>(style)) {
+      preset.m_hasStyleSnapshot = true;
+      preset.m_snapshotStyleTagId = style->getTagId();
+      preset.m_snapshotBrushIdName = style->getBrushIdName();
+      
+      // Extract primary file path based on style type
+      if (TMyPaintBrushStyle *mpStyle = dynamic_cast<TMyPaintBrushStyle*>(style)) {
+        std::wstring wpath = mpStyle->getPath().getWideString();
+        preset.m_snapshotFilePath = std::string(wpath.begin(), wpath.end());
+        // Legacy compatibility
+        preset.m_hasMyPaint = true;
+        preset.m_myPaintPath = preset.m_snapshotFilePath;
+      } else if (TTextureStyle *texStyle = dynamic_cast<TTextureStyle*>(style)) {
+        TFilePath texPath = texStyle->getParamValue(TColorStyle::TFilePath_tag(), 0);
+        std::wstring wpath = texPath.getWideString();
+        preset.m_snapshotFilePath = std::string(wpath.begin(), wpath.end());
+        // Legacy compatibility
+        preset.m_hasTexture = true;
+        preset.m_texturePath = preset.m_snapshotFilePath;
+        preset.m_textureScale = texStyle->getParamValue(TColorStyle::double_tag(), 2);
+        preset.m_textureRotation = texStyle->getParamValue(TColorStyle::double_tag(), 3);
+        preset.m_textureDispX = texStyle->getParamValue(TColorStyle::double_tag(), 4);
+        preset.m_textureDispY = texStyle->getParamValue(TColorStyle::double_tag(), 5);
+        preset.m_textureContrast = texStyle->getParamValue(TColorStyle::double_tag(), 6);
+        preset.m_textureType = texStyle->getParamValue(TColorStyle::int_tag(), 1);
+        preset.m_textureIsPattern = texStyle->getParamValue(TColorStyle::bool_tag(), 0);
+      }
+      
+      // GENERIC: Capture ALL numeric parameters of the style
+      int paramCount = style->getParamCount();
+      for (int i = 0; i < paramCount; ++i) {
+        TColorStyle::ParamType ptype = style->getParamType(i);
+        double numValue = 0.0;
+        switch (ptype) {
+          case TColorStyle::BOOL:
+            numValue = style->getParamValue(TColorStyle::bool_tag(), i) ? 1.0 : 0.0;
+            break;
+          case TColorStyle::INT:
+          case TColorStyle::ENUM:
+            numValue = (double)style->getParamValue(TColorStyle::int_tag(), i);
+            break;
+          case TColorStyle::DOUBLE:
+            numValue = style->getParamValue(TColorStyle::double_tag(), i);
+            break;
+          case TColorStyle::FILEPATH:
+            continue; // Skip filepath params (handled via m_snapshotFilePath)
+          default:
+            continue;
+        }
+        preset.m_snapshotParams.push_back({i, numValue});
+      }
     }
   }
 
@@ -1876,6 +2149,8 @@ void ToonzRasterBrushTool::loadLastBrush() {
   m_pressure.setValue(BrushPressureSensitivity ? 1 : 0);
   m_smooth.setValue(BrushSmooth);
   m_modifierSize.setValue(RasterBrushModifierSize);
+  m_modifierEraser.setValue(RasterBrushModifierEraser ? 1 : 0);
+  m_eraserMode.setIndex(std::min(2, std::max(0, (int)RasterBrushEraserMode)));
   m_modifierLockAlpha.setValue(BrushLockAlpha ? 1 : 0);
   m_assistants.setValue(RasterBrushAssistants ? 1 : 0);
 
@@ -1980,7 +2255,24 @@ BrushData::BrushData()
     , m_modifierOpacity(0.0)
     , m_modifierEraser(0.0)
     , m_modifierLockAlpha(0.0)
-    , m_assistants(false) {}
+    , m_eraserMode(0)
+    , m_assistants(false)
+    , m_styleInfoVersion(0)
+    , m_hasMyPaint(false)
+    , m_myPaintPath("")
+    , m_hasTexture(false)
+    , m_texturePath("")
+    , m_textureScale(1.0)
+    , m_textureRotation(0.0)
+    , m_textureDispX(0.0)
+    , m_textureDispY(0.0)
+    , m_textureContrast(1.0)
+    , m_textureType(1)
+    , m_textureIsPattern(false)
+    , m_hasStyleSnapshot(false)
+    , m_snapshotStyleTagId(0)
+    , m_snapshotBrushIdName("")
+    , m_snapshotFilePath("") {}
 
 //----------------------------------------------------------------------------------------------------------
 
@@ -1999,10 +2291,24 @@ BrushData::BrushData(const std::wstring &name)
     , m_modifierOpacity(0.0)
     , m_modifierEraser(0.0)
     , m_modifierLockAlpha(0.0)
+    , m_eraserMode(0)
     , m_assistants(false)
+    , m_styleInfoVersion(0)
     , m_hasMyPaint(false)
     , m_myPaintPath("")
-    , m_styleInfoVersion(0) {}
+    , m_hasTexture(false)
+    , m_texturePath("")
+    , m_textureScale(1.0)
+    , m_textureRotation(0.0)
+    , m_textureDispX(0.0)
+    , m_textureDispY(0.0)
+    , m_textureContrast(1.0)
+    , m_textureType(1)
+    , m_textureIsPattern(false)
+    , m_hasStyleSnapshot(false)
+    , m_snapshotStyleTagId(0)
+    , m_snapshotBrushIdName("")
+    , m_snapshotFilePath("") {}
 
 //----------------------------------------------------------------------------------------------------------
 
@@ -2040,6 +2346,9 @@ void BrushData::saveData(TOStream &os) {
   os.openChild("Modifier_Eraser");
   os << (int)m_modifierEraser;
   os.closeChild();
+  os.openChild("Eraser_Mode");
+  os << m_eraserMode;
+  os.closeChild();
   os.openChild("Modifier_LockAlpha");
   os << (int)m_modifierLockAlpha;
   os.closeChild();
@@ -2047,8 +2356,9 @@ void BrushData::saveData(TOStream &os) {
   os << (int)m_assistants;
   os.closeChild();
   os.openChild("StyleInfoVersion");
-  os << 1;  // Version 1 = has style information
+  os << 3;  // Version 3 = generic style snapshot (all style types)
   os.closeChild();
+  // Legacy fields (kept for backward compatibility with older OpenToonz versions)
   os.openChild("HasMyPaint");
   os << (int)m_hasMyPaint;
   os.closeChild();
@@ -2056,6 +2366,59 @@ void BrushData::saveData(TOStream &os) {
     os.openChild("MyPaintPath");
     os << m_myPaintPath;
     os.closeChild();
+  }
+  os.openChild("HasTexture");
+  os << (int)m_hasTexture;
+  os.closeChild();
+  if (m_hasTexture) {
+    os.openChild("TexturePath");
+    os << m_texturePath;
+    os.closeChild();
+    os.openChild("TextureScale");
+    os << m_textureScale;
+    os.closeChild();
+    os.openChild("TextureRotation");
+    os << m_textureRotation;
+    os.closeChild();
+    os.openChild("TextureDispX");
+    os << m_textureDispX;
+    os.closeChild();
+    os.openChild("TextureDispY");
+    os << m_textureDispY;
+    os.closeChild();
+    os.openChild("TextureContrast");
+    os << m_textureContrast;
+    os.closeChild();
+    os.openChild("TextureType");
+    os << m_textureType;
+    os.closeChild();
+    os.openChild("TextureIsPattern");
+    os << (int)m_textureIsPattern;
+    os.closeChild();
+  }
+  // Generic style snapshot (version >= 3)
+  // Captures ALL parameters of any TColorStyle in a type-agnostic way.
+  os.openChild("StyleSnapshot");
+  os << (int)m_hasStyleSnapshot;
+  os.closeChild();
+  if (m_hasStyleSnapshot) {
+    os.openChild("SnapshotTagId");
+    os << m_snapshotStyleTagId;
+    os.closeChild();
+    os.openChild("SnapshotBrushId");
+    os << m_snapshotBrushIdName;
+    os.closeChild();
+    os.openChild("SnapshotFile");
+    os << m_snapshotFilePath;
+    os.closeChild();
+    os.openChild("SnapshotParamCount");
+    os << (int)m_snapshotParams.size();
+    os.closeChild();
+    for (const auto &param : m_snapshotParams) {
+      os.openChild("SNP");
+      os << param.first << param.second;
+      os.closeChild();
+    }
   }
 }
 
@@ -2090,6 +2453,8 @@ void BrushData::loadData(TIStream &is) {
       is >> m_modifierOpacity, is.matchEndTag();
     else if (tagName == "Modifier_Eraser")
       is >> val, m_modifierEraser = val, is.matchEndTag();
+    else if (tagName == "Eraser_Mode")
+      is >> m_eraserMode, is.matchEndTag();
     else if (tagName == "Modifier_LockAlpha")
       is >> val, m_modifierLockAlpha = val, is.matchEndTag();
     else if (tagName == "Assistants")
@@ -2100,12 +2465,46 @@ void BrushData::loadData(TIStream &is) {
       is >> val, m_hasMyPaint = val, is.matchEndTag();
     else if (tagName == "MyPaintPath")
       is >> m_myPaintPath, is.matchEndTag();
+    // Texture style snapshot (version >= 2)
+    else if (tagName == "HasTexture")
+      is >> val, m_hasTexture = val, is.matchEndTag();
+    else if (tagName == "TexturePath")
+      is >> m_texturePath, is.matchEndTag();
+    else if (tagName == "TextureScale")
+      is >> m_textureScale, is.matchEndTag();
+    else if (tagName == "TextureRotation")
+      is >> m_textureRotation, is.matchEndTag();
+    else if (tagName == "TextureDispX")
+      is >> m_textureDispX, is.matchEndTag();
+    else if (tagName == "TextureDispY")
+      is >> m_textureDispY, is.matchEndTag();
+    else if (tagName == "TextureContrast")
+      is >> m_textureContrast, is.matchEndTag();
+    else if (tagName == "TextureType")
+      is >> m_textureType, is.matchEndTag();
+    else if (tagName == "TextureIsPattern")
+      is >> val, m_textureIsPattern = val, is.matchEndTag();
+    // Generic style snapshot (version >= 3)
+    else if (tagName == "StyleSnapshot")
+      is >> val, m_hasStyleSnapshot = val, is.matchEndTag();
+    else if (tagName == "SnapshotTagId")
+      is >> m_snapshotStyleTagId, is.matchEndTag();
+    else if (tagName == "SnapshotBrushId")
+      is >> m_snapshotBrushIdName, is.matchEndTag();
+    else if (tagName == "SnapshotFile")
+      is >> m_snapshotFilePath, is.matchEndTag();
+    else if (tagName == "SnapshotParamCount")
+      is >> val, is.matchEndTag(); // Count is informational; actual params follow
+    else if (tagName == "SNP") {
+      int idx;
+      double dval;
+      is >> idx >> dval;
+      m_snapshotParams.push_back({idx, dval});
+      is.matchEndTag();
+    }
     else
       is.skipCurrentTag();
   }
-  
-  // If StyleInfoVersion is missing, this is an old preset (version 0)
-  // Old presets don't have style information, so we leave m_styleInfoVersion at 0
 }
 
 //----------------------------------------------------------------------------------------------------------

@@ -42,6 +42,8 @@ TEnv::IntVar EnvSoftwareCurrentFontSize_StyleName(
     "SoftwareCurrentFontSize_StyleName", 11);
 extern TEnv::IntVar ShowNewStyleButton;
 
+TEnv::IntVar ShowStyleIndex("ShowStyleIndex", 1);
+
 using namespace PaletteViewerGUI;
 using namespace DVGui;
 
@@ -228,6 +230,20 @@ int PageViewer::getCurrentStyleIndex() const {
 }
 
 //-----------------------------------------------------------------------------
+
+void PageViewer::setShowStyleIndex(bool showStyleIndex) {
+  if (getShowStyleIndex() == showStyleIndex) return;
+
+  ShowStyleIndex = showStyleIndex ? 1 : 0;
+  update();
+}
+
+//-----------------------------------------------------------------------------
+
+bool PageViewer::getShowStyleIndex() const { return ShowStyleIndex != 0; }
+
+//-----------------------------------------------------------------------------
+
 /*! Set current page to \b page and update view.
  */
 void PageViewer::setPage(TPalette::Page *page) {
@@ -852,19 +868,23 @@ void PageViewer::paintEvent(QPaintEvent *e) {
       tmpFont.setPointSize(9);
       tmpFont.setItalic(false);
       p.setFont(tmpFont);
-      int indexWidth =
-          fontMetrics().horizontalAdvance(QString().setNum(styleIndex)) + 4;
-      QRect indexRect(chipRect.bottomRight() + QPoint(-indexWidth, -14),
-                      chipRect.bottomRight());
-      p.setPen(Qt::black);
-      p.setBrush(Qt::white);
-      p.drawRect(indexRect);
-      p.drawText(indexRect, Qt::AlignCenter, QString().setNum(styleIndex));
+      if (getShowStyleIndex()) {
+        int indexWidth =
+            fontMetrics().horizontalAdvance(QString().setNum(styleIndex)) + 4;
+        QRect indexRect(chipRect.bottomRight() + QPoint(-indexWidth, -14),
+                        chipRect.bottomRight());
+        p.setPen(Qt::black);
+        p.setBrush(Qt::white);
+        p.drawRect(indexRect);
+        p.drawText(indexRect, Qt::AlignCenter, QString().setNum(styleIndex));
+      }
 
       // draw "Autopaint for lines" indicator
       int offset = 0;
       if (style->getFlags() != 0) {
         QRect aflRect(chipRect.bottomLeft() + QPoint(0, -14), QSize(12, 15));
+        p.setPen(Qt::black);
+        p.fillRect(aflRect, QBrush(Qt::white));
         p.drawRect(aflRect);
         p.drawText(aflRect, Qt::AlignCenter, "A");
         offset += 12;
@@ -875,6 +895,7 @@ void PageViewer::paintEvent(QPaintEvent *e) {
           m_viewMode != SmallChips) {
         QRect ppRect(chipRect.bottomLeft() + QPoint(offset, -14),
                      QSize(12, 15));
+        p.fillRect(ppRect, QBrush(Qt::white));
         p.drawRect(ppRect);
         QPoint markPos = ppRect.center() + QPoint(1, 0);
         p.drawEllipse(markPos, 3, 3);

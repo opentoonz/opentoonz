@@ -23593,4 +23593,39 @@ Hold F3 Key on the Viewer to Show This Frame Only</source>
         <translation> столбцы</translation>
     </message>
 </context>
+<context>
+    <name>FileBrowserLocations</name>
+    <message>
+        <source>My Computer</source>
+        <translation>Мой компьютер</translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation>Сеть</translation>
+    </message>
+    <message>
+        <source>My Documents</source>
+        <translation>Мои документы</translation>
+    </message>
+    <message>
+        <source>Desktop</source>
+        <translation>Рабочий стол</translation>
+    </message>
+    <message>
+        <source>Library</source>
+        <translation>Библиотека</translation>
+    </message>
+    <message>
+        <source>History</source>
+        <translation>История</translation>
+    </message>
+    <message>
+        <source>Project root (%1)</source>
+        <translation>Корень проекта (%1)</translation>
+    </message>
+    <message>
+        <source>Scene Folder</source>
+        <translation>Папка сцены</translation>
+    </message>
+</context>
 </TS>

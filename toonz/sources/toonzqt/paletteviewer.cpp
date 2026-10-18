@@ -43,6 +43,7 @@
 #include <QApplication>
 #include <QLabel>
 #include <QDrag>
+#include <QSignalBlocker>
 
 TEnv::IntVar ShowNewStyleButton("ShowNewStyleButton", 1);
 using namespace PaletteViewerGUI;
@@ -517,6 +518,20 @@ void PaletteViewer::createPaletteToolBar() {
   addNameDisplayAction(tr("Style Name"), PageViewer::Style);
   addNameDisplayAction(tr("StudioPalette Name"), PageViewer::Original);
   addNameDisplayAction(tr("Both Names"), PageViewer::StyleAndOriginal);
+
+  QAction *showStyleIndexesAction =
+      new QAction(tr("Show Style Indexes"), viewMode);
+  showStyleIndexesAction->setCheckable(true);
+  showStyleIndexesAction->setChecked(m_pageViewer->getShowStyleIndex());
+  connect(showStyleIndexesAction, &QAction::toggled, this,
+          [this](bool checked) { m_pageViewer->setShowStyleIndex(checked); });
+  connect(viewMode, &QMenu::aboutToShow, this,
+          [this, showStyleIndexesAction]() {
+            QSignalBlocker blocker(showStyleIndexesAction);
+            showStyleIndexesAction->setChecked(
+                m_pageViewer->getShowStyleIndex());
+          });
+  viewMode->addAction(showStyleIndexesAction);
 
   viewMode->addSeparator();
 

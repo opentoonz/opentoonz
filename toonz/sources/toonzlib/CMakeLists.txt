@@ -76,6 +76,7 @@ set(HEADERS
     ../include/toonz/cleanupparameters.h
     ../include/toonz/columnfan.h
     ../include/toonz/controlpointobserver.h
+    ../include/toonz/customvectorbrushexporter.h
     ../include/toonz/currentimage.h
     ../include/toonz/doubleparamcmd.h
     ../include/toonz/dpiscale.h
@@ -178,6 +179,7 @@ set(SOURCES
     cleanupparameters.cpp
     columnfan.cpp
     convert2tlv.cpp
+    customvectorbrushexporter.cpp
     dpiscale.cpp
     fill.cpp
     fillutil.cpp

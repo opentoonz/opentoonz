@@ -118,6 +118,14 @@ void updateOnionSkinSize(const PlayerSet &players) {
 bool descending(int i, int j) { return (i > j); }
 
 //----------------------------------------------------------------
+
+double getOnionSkinOpacity(const OnionSkinMask &mask, int row,
+                           int currentRow) {
+  return std::max(mask.getFosOpacity(row),
+                  mask.getMosOpacity(row - currentRow));
+}
+
+//----------------------------------------------------------------
 }  // namespace
 
 //=============================================================================
@@ -193,7 +201,7 @@ public:
 
   std::vector<int> m_masks;
   int m_onionSkinDistance;
-  double m_fade;
+  double m_onionSkinOpacity;
 
   ShiftTraceGhostId m_shiftTraceGhostId;
   bool m_editingShift;
@@ -287,7 +295,7 @@ StageBuilder::StageBuilder()
     , m_camera3d(false)
     , m_currentColumnIndex(-1)
     , m_ancestorColumnIndex(-1)
-    , m_fade(0)
+    , m_onionSkinOpacity(-1.0)
     , m_shiftTraceGhostId(NO_GHOST)
     , m_editingShift(false)
     , m_showShiftOrigin(false)
@@ -442,6 +450,7 @@ void StageBuilder::addCell(PlayerSet &players, ToonzScene *scene, TXsheet *xsh,
     player.m_dpiAff = sl ? getDpiAffine(sl, cell.m_frameId) : TAffine();
 
     player.m_onionSkinDistance = m_onionSkinDistance;
+    player.m_onionSkinOpacity  = m_onionSkinOpacity;
     // when visiting the subxsheet, valuate the subxsheet column index
     bool isCurrent               = (subSheetColIndex >= 0)
                                        ? (subSheetColIndex == m_currentColumnIndex)
@@ -666,19 +675,26 @@ void StageBuilder::addCellWithOnionSkin(PlayerSet &players, ToonzScene *scene,
 
 #ifdef NUOVO_ONION
       m_onionSkinDistance = rows[i] - row;
+      m_onionSkinOpacity  =
+          getOnionSkinOpacity(m_onionSkinMask, rows[i], row);
+      addCell(players, scene, xsh, rows[i], col, level, subSheetColIndex);
 #else
       if (!Preferences::instance()->isAnimationSheetEnabled() ||
           !alreadyAdded(xsh, row, i, rows, col)) {
         m_onionSkinDistance = (rows[i] - row) < 0 ? --backPos : ++frontPos;
+        m_onionSkinOpacity =
+            getOnionSkinOpacity(m_onionSkinMask, rows[i], row);
         addCell(players, scene, xsh, rows[i], col, level, subSheetColIndex);
       }
 #endif
     }
 
     m_onionSkinDistance = 0;
+    m_onionSkinOpacity  = -1.0;
     addCell(players, scene, xsh, row, col, level, subSheetColIndex);
 
     m_onionSkinDistance = c_noOnionSkin;
+    m_onionSkinOpacity  = -1.0;
   } else
     addCell(players, scene, xsh, row, col, level, subSheetColIndex);
 }
@@ -761,6 +777,7 @@ void StageBuilder::addSimpleLevelFrame(PlayerSet &players,
     player.m_guidedBackStroke       = m_guidedBackStroke;
     player.m_isVisibleinOSM         = ghostRow >= 0;
     player.m_onionSkinDistance      = m_onionSkinDistance;
+    player.m_onionSkinOpacity       = m_onionSkinOpacity;
     player.m_dpiAff                 = getDpiAffine(level, ghostFid);
     player.m_ancestorColumnIndex    = -1;
 
@@ -845,6 +862,8 @@ void StageBuilder::addSimpleLevelFrame(PlayerSet &players,
 #else
       player.m_onionSkinDistance = rows[i] - row < 0 ? --backPos : ++frontPos;
 #endif
+      player.m_onionSkinOpacity =
+          getOnionSkinOpacity(m_onionSkinMask, rows[i], row);
       player.m_dpiAff = getDpiAffine(level, fid2);
     }
   }
