@@ -4,176 +4,79 @@ This document describes some points about the contribution process for OpenToonz
 
 ## Contributing to OpenAnimationLibrary/OT-Dev
 
-OT-Dev accepts contributions based on official OpenToonz as well as work based
-on OT-Dev. Choose the pull request base in GitHub explicitly:
+OT-Dev develops focused changes for official OpenToonz. Accepted changes return
+through OT-Master synchronization. OT-Dev Edition is assembled separately.
 
-| Your change is based on | Base repository | Base branch |
-| --- | --- | --- |
-| Official `opentoonz/opentoonz:master` | `OpenAnimationLibrary/opentoonz-dev` | `upstream/master` |
-| OT-Dev features or code in `main` | `OpenAnimationLibrary/opentoonz-dev` | `main` |
+| Branch | Purpose |
+| --- | --- |
+| `upstream/master` | Exact mirror of `opentoonz/opentoonz:master`; new upstream-based proposals |
+| `main` | Retained base for existing explorations and PRs |
+| `edition` | Edition integration, packaging, and workflow guidance |
+| `preserve/otdev-main-2026-10-18` | Preserved Edition source before this transition |
 
-### Changes based on official OpenToonz
+### New work
 
-Keep your feature branch based on official `opentoonz/opentoonz:master`.
-Open your OT-Dev pull request with **base: `upstream/master`** and
-**compare: your feature branch**. You may use your existing fork of official
-OpenToonz; you do not need to merge OT-Dev `main` into your branch.
+1. Fetch official upstream and OT-Dev. Create a feature branch from official
+   `master` or OT-Dev's `upstream/master`. Keep unrelated Edition changes out.
+2. Open the OT-Dev proposal with **base: `upstream/master`**. Choose the base
+   explicitly; the repository default may differ during the transition.
+3. Keep the change focused, retain authors and co-authors, and validate the
+   affected behavior. Virtual checks are preferred when they provide useful
+   evidence. State any remaining application-testing limit briefly.
+4. Submit the reviewed change to `opentoonz/opentoonz:master`. An OT-Dev PR does
+   not submit it to official OpenToonz automatically.
+5. After upstream acceptance, let the mirror inherit the change. Feature PRs
+   are not merged into the mirror or `main` to make them available downstream.
 
-`upstream/master` is a clean mirror of official OpenToonz `master`, not a
-branch for accumulating OT-Dev features. Maintainers update it by fast-forward
-from official upstream. If it is behind the upstream version your change uses,
-ask a maintainer to refresh it before reviewing the comparison.
-
-PRs targeting this branch are reviewed as upstream-based proposals. Maintainers
-must not merge feature PRs into the mirror. To include an accepted change in
-OT-Dev, a maintainer creates a separate integration branch from `main`,
-cherry-picks the reviewed commits, resolves OT-Dev-specific conflicts, and opens
-an integration PR targeting `main`. Preserve original authorship and link both
-PRs. Close the upstream-based proposal with a link to the integration PR when
-the change has been incorporated.
-
-This keeps OT-Dev integration conflicts with OT-Dev maintainers. Contributors
-may still need to resolve conflicts with newer official upstream changes.
-Build and test both the upstream-based proposal and its OT-Dev integration;
-checks that run for one base may differ from checks that run for the other.
-
-A PR here does not submit the change to official OpenToonz. For official
-acceptance, open a separate PR against `opentoonz/opentoonz:master`.
-
-#### Contributor steps
-
-1. Fork official [OpenToonz](https://github.com/opentoonz/opentoonz) to your
-   GitHub account, then clone your fork. Replace `YOUR-USERNAME` below:
-
-   ```sh
-   git clone https://github.com/YOUR-USERNAME/opentoonz.git
-   cd opentoonz
-   git remote add upstream https://github.com/opentoonz/opentoonz.git
-   git remote add oal https://github.com/OpenAnimationLibrary/opentoonz-dev.git
-   ```
-
-   If you already have a clone, use it. Run `git remote -v` and add only the
-   remotes that are missing. Here `origin` is your writable fork, `upstream`
-   is official OpenToonz, and `oal` is OT-Dev.
-
-2. Fetch both bases and check whether the OT-Dev mirror matches official master:
-
-   ```sh
-   git fetch upstream
-   git fetch oal
-   git rev-parse upstream/master
-   git rev-parse oal/upstream/master
-   ```
-
-   The two commit IDs should match. If they differ, ask an OT-Dev maintainer
-   to refresh the mirror before opening the PR. `oal/upstream/master` is the
-   local remote-tracking name for OT-Dev's branch named `upstream/master`.
-
-3. For new work, create a feature branch from the mirror with a clean working
-   tree:
-
-   ```sh
-   git switch -c add-new-commands oal/upstream/master
-   ```
-
-   For an existing upstream-based feature branch, switch to that branch instead.
-   Keep its existing commits; there is no need to restart or merge OT-Dev
-   `main`. Substitute your actual feature branch name throughout these steps.
-
-4. Implement, build, and test the change. Format changed C++ code using
-   `toonz/sources/.clang-format`, then commit and push to your fork:
-
-   ```sh
-   git add PATH-TO-CHANGED-FILE
-   git commit -m "Add new commands"
-   git push -u origin add-new-commands
-   ```
-
-   Replace the file placeholder with the files you changed. Before submitting,
-   inspect the proposed changes against the mirror:
-
-   ```sh
-   git log --oneline oal/upstream/master..HEAD
-   git diff --stat oal/upstream/master...HEAD
-   ```
-
-5. In [OT-Dev pull requests](https://github.com/OpenAnimationLibrary/opentoonz-dev/pulls),
-   choose **New pull request**, then **compare across forks**. Set:
-   - **base repository:** `OpenAnimationLibrary/opentoonz-dev`
-   - **base:** `upstream/master`
-   - **head repository:** your fork of OpenToonz
-   - **compare:** `add-new-commands` (or your existing feature branch)
-
-   Review the commit list and Files changed before creating the PR. They should
-   contain your proposed change, without OT-Dev's unrelated features. Include
-   the purpose, testing performed, and any related official OpenToonz PR.
-
-6. Push review fixes to the same feature branch; GitHub updates the PR
-   automatically. If newer official changes must be included, fetch upstream
-   and merge `upstream/master` into your feature branch, resolve conflicts,
-   retest, and push. Ask the maintainer to refresh the OT-Dev mirror as well.
-   Coordinate any rebase of an already shared branch with collaborators.
-
-#### Maintainer steps: refresh the mirror
-
-The mirror is updated manually. From a clone with the remotes defined above
-and write access to OT-Dev:
+For an existing clone, inspect `git remote -v` first and add only missing
+remotes. The example uses `upstream` for official OpenToonz and `oal` for OT-Dev:
 
 ```sh
+git remote add upstream https://github.com/opentoonz/opentoonz.git
+git remote add oal https://github.com/OpenAnimationLibrary/opentoonz-dev.git
 git fetch upstream
 git fetch oal
-git merge-base --is-ancestor oal/upstream/master upstream/master
-git push oal refs/remotes/upstream/master:refs/heads/upstream/master
-git fetch oal
-git rev-parse upstream/master
-git rev-parse oal/upstream/master
+git switch -c fix/example oal/upstream/master
 ```
 
-Proceed with the push only if the ancestry check succeeds (exit status 0).
-The push is a normal fast-forward push; do not add `--force`. If the check
-fails or the push is rejected, investigate the divergence or concurrent update
-before proceeding. The final two commit IDs should match. Do not merge
-feature PRs or OT-Dev `main` into this mirror.
+Before submission, inspect `git diff --stat oal/upstream/master...HEAD` and the
+commit list. Submit the same focused feature branch upstream when possible.
 
-#### Maintainer steps: integrate an accepted proposal
+### Existing explorations and dependencies
 
-1. Fetch OT-Dev and create a separate branch from its current `main`:
+Keep current PR head branches, base branches, and discussion intact. The
+[preservation inventory](.github/ot-dev/preservation-2026-10-18.json) records the
+83 open PRs observed at the transition. Their full Git histories are retained
+as separate branches in the preservation release bundle.
 
-   ```sh
-   git fetch oal
-   git switch -c integrate/add-new-commands oal/main
-   ```
+Continue an existing exploration on its established base. When it is ready for
+upstream review, extract its focused commits to a new branch from the mirror;
+preserve original authors and co-author trailers. Check the resulting diff
+before changing any PR base. Retargeting alone can expose unrelated changes.
 
-2. Open the proposal's **Commits** tab and identify only the feature commits.
-   Cherry-pick them in oldest-to-newest order, substituting actual commit IDs:
+Prefer independent PRs. A genuinely dependent exploration may remain a draft
+with its prerequisite identified, but the prerequisite should land in
+OT-Master first. Do not merge it into OT-Dev merely to unblock the next PR.
+Existing stacks remain intact while they are evaluated individually.
 
-   ```sh
-   git cherry-pick -x FEATURE-COMMIT-SHA
-   ```
+### Synchronization and Edition assembly
 
-   Repeat for each feature commit. Do not blindly cherry-pick upstream sync
-   commits or merge commits. Cherry-picking preserves the original author;
-   retain any `Co-authored-by` trailers. The `-x` option records the source
-   commit.
+A scheduled task checks the clean mirror each morning in America/Chicago.
+Only fast-forward updates from official `master` are allowed. Read the current
+heads, verify ancestry, update with an expected-head guard, and verify the
+resulting ref. A divergent mirror requires investigation; do not force it.
+The task leaves `main`, `edition`, preservation refs, and all PR heads/bases alone.
 
-3. Resolve any OT-Dev conflicts, stage the resolved files, and run
-   `git cherry-pick --continue`. Use `git cherry-pick --abort` if the
-   integration needs to be restarted. Build and test the integrated result.
+Edition updates are deliberate integration work. Merge accepted upstream
+changes from the mirror when preparing the next Edition build, resolve Edition
+conflicts there, and generate the release patch against the exact upstream
+commit. Keep experimental dependencies separate until their inclusion is
+explicitly chosen. Preserve the original contribution history and build both
+clean proposals and the Edition as applicable.
 
-4. Push the integration branch and open a separate PR with **base: `main`**:
-
-   ```sh
-   git push oal integrate/add-new-commands
-   ```
-
-   Link the upstream-based proposal in the integration PR and link back from
-   the proposal. After the integration PR is merged, close the proposal with
-   a link to the merged integration PR; leave `upstream/master` unchanged.
-
-### Changes based on OT-Dev
-
-For changes that depend on OT-Dev features, branch from OT-Dev `main` and
-target `main` directly.
+The preservation release includes the current Windows build, source patches,
+full histories for the observed open PRs, and SHA-256 checksums. Release
+publication remains an explicitly initiated operation.
 
 The remaining instructions describe the official OpenToonz contribution process.
 

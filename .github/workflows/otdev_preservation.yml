@@ -1,0 +1,63 @@
+name: Preserve OT-Dev Edition
+
+on:
+  push:
+    branches:
+      - maintenance/upstream-first-transition
+    paths:
+      - .github/workflows/otdev_preservation.yml
+      - .github/ot-dev/prepare_preservation.py
+      - .github/ot-dev/preservation-2026-10-18.json
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: otdev-preservation-2026-10-18
+  cancel-in-progress: false
+
+jobs:
+  Preserve:
+    if: github.repository == 'OpenAnimationLibrary/opentoonz-dev'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: OpenAnimationLibrary/opentoonz-dev
+      PRESERVATION_TAG: otdev-preserved-2026-10-18
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          lfs: false
+
+      - name: Download preserved Windows package
+        shell: bash
+        run: |
+          curl --fail --location --silent --show-error --retry 3 \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GH_REPO/actions/artifacts/12130804350/zip" \
+            --output "$RUNNER_TEMP/preserved-windows.zip"
+
+      - name: Prepare and verify preservation assets
+        run: |
+          python3 .github/ot-dev/prepare_preservation.py \
+            --inventory .github/ot-dev/preservation-2026-10-18.json \
+            --windows "$RUNNER_TEMP/preserved-windows.zip" \
+            --output "$RUNNER_TEMP/preservation" --fetch
+
+      - name: Publish verified preservation release
+        shell: bash
+        run: |
+          gh release create "$PRESERVATION_TAG" \
+            --target 36af9f5a4d88b9f7367aca9b003fc31b6f866847 \
+            --title "OT-Dev Edition — preserved 2026-10-18" \
+            --draft --prerelease --latest=false \
+            --notes-file "$RUNNER_TEMP/preservation/release-notes.md" \
+            "$RUNNER_TEMP/preservation/OTDev-Edition-Patches-2026-10-18.zip" \
+            "$RUNNER_TEMP/preservation/OTDev-Preservation-2026-10-18.bundle" \
+            "$RUNNER_TEMP/preservation/OpenToonz-OTDev-Preserved-2026-10-18-Windows.zip" \
+            "$RUNNER_TEMP/preservation/SHA256SUMS.txt"
+          gh release edit "$PRESERVATION_TAG" --draft=false --prerelease --latest=false
