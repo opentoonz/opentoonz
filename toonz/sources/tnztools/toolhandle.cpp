@@ -35,11 +35,17 @@ TTool *ToolHandle::getTool() const { return m_tool; }
 //-----------------------------------------------------------------------------
 
 void ToolHandle::setTool(QString name) {
+  const bool toolNameChanged = m_toolName != name;
   m_oldToolName = m_toolName = name;
 
   TTool *tool = TTool::getTool(m_toolName.toStdString(),
                                (TTool::ToolTargetType)m_toolTargetType);
-  if (tool == m_tool) return;
+  if (tool == m_tool) {
+    // Different requested tools can share the same placeholder instance.
+    // Refresh the UI without reactivating an already active tool.
+    if (m_tool && toolNameChanged) emit toolSwitched();
+    return;
+  }
 
   if (m_tool) m_tool->onDeactivate();
 

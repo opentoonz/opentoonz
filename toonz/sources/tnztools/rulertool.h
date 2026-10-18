@@ -11,7 +11,7 @@
 
 //----------------------------------------------------------------------------------------------
 
-class RulerTool final : public TTool {
+class DVAPI RulerTool final : public TTool {
   Q_DECLARE_TR_FUNCTIONS(RulerTool)
 
   enum DragMode { MakeNewRuler = 0, MoveFirstPos, MoveSecondPos, MoveRuler };
@@ -29,6 +29,7 @@ public:
   RulerTool();
 
   void setToolOptionsBox(RulerToolOptionsBox *toolOptionsBox);
+  void unsetToolOptionsBox(RulerToolOptionsBox *toolOptionsBox);
 
   ToolType getToolType() const override { return TTool::GenericTool; }
 
