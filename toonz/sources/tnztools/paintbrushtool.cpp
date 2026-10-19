@@ -53,6 +53,8 @@ TEnv::DoubleVar PaintBrushSize("InknpaintPaintBrushSize", 10);
 TEnv::IntVar PaintBrushModifierLockAlpha("PaintBrushModifierLockAlpha", 0);
 TEnv::IntVar PaintBrushPick("PaintBrushPick", 0);
 TEnv::IntVar PaintBrushFill("PaintBrushFill", 0);
+TEnv::IntVar PaintBrushPressureSensitivity(
+    "InknpaintPaintBrushPressureSensitivity", 0);
 
 //-----------------------------------------------------------------------------
 
@@ -264,6 +266,7 @@ class PaintBrushTool final : public TTool {
   bool m_firstTime;
 
   double m_pointSize, m_distance2;
+  double m_lastThickness;
 
   bool m_selecting;
   TTileSaverCM32 *m_tileSaver;
@@ -271,6 +274,7 @@ class PaintBrushTool final : public TTool {
   TPointD m_mousePos;
 
   TIntProperty m_toolSize;
+  TBoolProperty m_pressure;
   TBoolProperty m_emptyOnly;
   TEnumProperty m_colorType;
   TBoolProperty m_pick;
@@ -313,6 +317,7 @@ public:
   int getCursorId() const override { return m_cursor; }
   TPointD getCenteredCursorPos(const TPointD &originalCursorPos);
   void fixMousePos(TPointD pos, bool precise = false);
+  double getThickness(double pressure) const;
 
   int getColorClass() const { return 2; }
 
@@ -340,11 +345,13 @@ PaintBrushTool::PaintBrushTool()
     : TTool("T_PaintBrush")
     , m_rasterTrack(0)
     , m_pointSize(-1)
+    , m_lastThickness(1.0)
     , m_selecting(false)
     , m_tileSaver(0)
     , m_cursor(ToolCursor::EraserCursor)
     // sostituire i nomi con quelli del current, tipo W_ToolOptions...
     , m_toolSize("Size:", 1, 1000, 10, false)  // W_ToolOptions_BrushToolSize
+    , m_pressure("Pressure", false)
     , m_colorType("Mode:")                     // W_ToolOptions_InkOrPaint
     , m_selective("Selective", false)          // W_ToolOptions_Selective
     , m_emptyOnly("Empty Only", false)
@@ -362,6 +369,7 @@ PaintBrushTool::PaintBrushTool()
   bind(TTool::ToonzImage);
 
   m_prop.bind(m_toolSize);
+  m_prop.bind(m_pressure);
   m_prop.bind(m_colorType);
   m_prop.bind(m_emptyOnly);
   m_prop.bind(m_modifierLockAlpha);
@@ -369,6 +377,7 @@ PaintBrushTool::PaintBrushTool()
   m_prop.bind(m_fillingMode);
   m_prop.bind(m_selective);
 
+  m_pressure.setId("PressureSensitivity");
   m_emptyOnly.setId("EmptyOnly");
   m_colorType.setId("Mode");
   m_modifierLockAlpha.setId("LockAlpha");
@@ -381,6 +390,7 @@ PaintBrushTool::PaintBrushTool()
 
 void PaintBrushTool::updateTranslation() {
   m_toolSize.setQStringName(tr("Size:"));
+  m_pressure.setQStringName(tr("Pressure"));
 
   m_colorType.setQStringName(tr("Mode:"));
   m_colorType.setItemUIName(LINES, tr("Lines"));
@@ -421,6 +431,15 @@ void PaintBrushTool::fixMousePos(TPointD pos, bool precise) {
     TPointD pp(tround(m_mousePos.x), tround(m_mousePos.y));
     m_mousePos = pp;
   }
+}
+
+//-----------------------------------------------------------------------------
+
+double PaintBrushTool::getThickness(double pressure) const {
+  if (!m_pressure.getValue()) return m_toolSize.getValue();
+
+  double t = pressure * pressure * pressure;
+  return 1.0 + (m_toolSize.getValue() - 1.0) * t;
 }
 
 //-----------------------------------------------------------------------------
@@ -470,6 +489,11 @@ bool PaintBrushTool::onPropertyChanged(std::string propertyName) {
     m_pointSize =
         (x - minRange) / (maxRange - minRange) * (maxSize - minSize) + minSize;
     invalidate();
+  }
+
+  // Pressure
+  else if (propertyName == m_pressure.getName()) {
+    PaintBrushPressureSensitivity = (int)(m_pressure.getValue());
   }
 
   // Selective
@@ -563,8 +587,9 @@ void PaintBrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
           app->setCurrentLevelStyleIndex(pickedStyle);
         }
       }
-      int thickness = m_toolSize.getValue();
-      int styleId   = TTool::getApplication()->getCurrentLevelStyleIndex();
+      double thickness = getThickness(e.m_pressure);
+      m_lastThickness  = thickness;
+      int styleId      = TTool::getApplication()->getCurrentLevelStyleIndex();
       TTileSetCM32 *tileSet = new TTileSetCM32(ras->getSize());
       m_tileSaver           = new TTileSaverCM32(ras, tileSet);
       m_rasterTrack         = new RasterStrokeGenerator(
@@ -592,7 +617,8 @@ void PaintBrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
             いきなりleftButtonDragから呼ばれることがあり、m_rasterTrackが無い可能性がある
 　---*/
     if (m_rasterTrack) {
-      int thickness = m_toolSize.getValue();
+      double thickness = getThickness(e.m_pressure);
+      m_lastThickness  = thickness;
       m_rasterTrack->add(TThickPoint(
           m_mousePos + convert(ri->getRaster()->getCenter()), thickness));
       m_tileSaver->save(m_rasterTrack->getLastRect());
@@ -632,6 +658,7 @@ void PaintBrushTool::onEnter() {
     m_selective.setValue(PaintBrushSelective ? 1 : 0);
     m_colorType.setValue(::to_wstring(PaintBrushColorType.getValue()));
     m_toolSize.setValue(PaintBrushSize);
+    m_pressure.setValue(PaintBrushPressureSensitivity ? 1 : 0);
     m_modifierLockAlpha.setValue(PaintBrushModifierLockAlpha ? 1 : 0);
     m_pick.setValue(PaintBrushPick ? 1 : 0);
     m_fillingMode.setValue(PaintBrushFill ? 1 : 0);
@@ -676,7 +703,8 @@ void PaintBrushTool::onDeactivate() {
 void PaintBrushTool::finishBrush() {
   if (TToonzImageP ti = (TToonzImageP)getImage(true)) {
     if (m_rasterTrack) {
-      int thickness = m_toolSize.getValue();
+      double thickness =
+          m_pressure.getValue() ? m_lastThickness : m_toolSize.getValue();
       m_rasterTrack->add(TThickPoint(
           m_mousePos + convert(ti->getRaster()->getCenter()), thickness));
       m_tileSaver->save(m_rasterTrack->getLastRect());
