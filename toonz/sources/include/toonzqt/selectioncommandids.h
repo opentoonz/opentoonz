@@ -23,6 +23,8 @@
 
 #define MI_BlendColors "MI_BlendColors"
 #define MI_EraseUnusedStyles "MI_EraseUnusedStyles"
+#define MI_ConvertLinesToAreas "MI_ConvertLinesToAreas"
+#define MI_ConvertAreasToLines "MI_ConvertAreasToLines"
 
 #define MI_Group "MI_Group"
 #define MI_Ungroup "MI_Ungroup"
