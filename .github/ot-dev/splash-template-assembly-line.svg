@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1200" height="700" viewBox="0 0 1440 840" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1200" height="700" viewBox="0 0 1440 840" role="img" data-otdev-artwork="assembly-line" aria-labelledby="title desc">
 <!-- OT-DEV INFRASTRUCTURE ONLY. Generated at build time with current PR data. Do not transfer this template or generated branding to opentoonz/opentoonz. Artwork: Rodney Baker assembly-line concept, drawn with OpenAI Codex assistance. Static lettering is outlined; dynamic metadata remains editable SVG text. --><title id="title">{{BUILD_LABEL}}</title>
 <desc id="desc">{{DESCRIPTION}}</desc>
 <defs>

@@ -1,17 +1,24 @@
 """OT-Dev CI branding only; never include this overlay in upstream proposals."""
 
 import argparse
+import base64
 from datetime import datetime, timezone
 import html
 import json
 import os
 from pathlib import Path
 import re
+import shutil
 import textwrap
 import xml.etree.ElementTree as ET
 
 TOKEN = re.compile(r"\{\{([A-Z_0-9]+)\}\}")
 TITLE_ANCHOR = 'QString::fromStdString(TEnv::getApplicationFullName());'
+SPLASH_ANCHOR = 'QDir(exeDir).filePath("splash.svg")'
+SPLASH_FILENAME = "ot-dev-splash.svg"
+TEMPLATE_NAME = "splash-template-area10.svg"
+ARTWORK_FILENAME = "ot-dev-splash-artwork.png"
+ARTWORK_LINK = f'xlink:href="{ARTWORK_FILENAME}"'
 
 
 def plain_text(value):
@@ -74,6 +81,16 @@ def render(template, fields):
     return svg
 
 
+def embed_artwork(template, artwork_path):
+    if ARTWORK_LINK not in template:
+        return template
+    png = artwork_path.read_bytes()
+    if not png.startswith(b"\x89PNG\r\n\x1a\n"):
+        raise ValueError(f"Splash artwork is not a PNG: {artwork_path}")
+    data = base64.b64encode(png).decode("ascii")
+    return template.replace(ARTWORK_LINK, f'xlink:href="data:image/png;base64,{data}"')
+
+
 def brand_window(source, label):
     if TITLE_ANCHOR not in source:
         raise ValueError("Unable to locate the OpenToonz window title")
@@ -82,9 +99,29 @@ def brand_window(source, label):
     return source.replace(TITLE_ANCHOR, TITLE_ANCHOR[:-1] + " + " + suffix + ";")
 
 
+def brand_startup(source, external_png=False):
+    if source.count(SPLASH_ANCHOR) != 1:
+        raise ValueError("Unable to locate the external OpenToonz splash path")
+    # A legacy splash.svg beside an updated executable must not hide this build.
+    source = source.replace(SPLASH_ANCHOR,
+                            f'QDir(exeDir).filePath("{SPLASH_FILENAME}")')
+    if external_png:
+        check = "QFileInfo(localSplashPath).isFile())"
+        size = "QSize(610, 344)"
+        if source.count(check) != 1 or source.count(size) != 3:
+            raise ValueError("Unable to locate the OpenToonz splash loading block")
+        # If only the executable is copied, use its self-contained resource.
+        source = source.replace(check, "QFileInfo(localSplashPath).isFile() &&\n"
+                                f'      QFileInfo(QDir(exeDir).filePath("{ARTWORK_FILENAME}")).isFile())')
+        # Keep the complete 4:3 artwork and the metadata footer readable.
+        source = source.replace(size, "QSize(610, 480)")
+    return source
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--template", type=Path, required=True)
+    parser.add_argument("--template", type=Path,
+                        default=Path(__file__).with_name(TEMPLATE_NAME))
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--source-root", type=Path)
     parser.add_argument("--event-path", type=Path, default=os.getenv("GITHUB_EVENT_PATH"))
@@ -94,17 +131,28 @@ def main():
     args = parser.parse_args()
     event = json.loads(args.event_path.read_text(encoding="utf-8-sig")) if args.event_path else {}
     fields = fields_for(event, args.event_name, args.sha, args.ref_name)
-    svg = render(args.template.read_text(encoding="utf-8"), fields)
+    template = args.template.read_text(encoding="utf-8")
+    external_png = ARTWORK_LINK in template
+    artwork = args.template.with_name(ARTWORK_FILENAME)
+    compiled_svg = render(embed_artwork(template, artwork), fields)
+    svg = render(template, fields)
     if args.source_root:
         source_path = args.source_root / "toonz/sources/toonz/mainwindow.cpp"
         source = brand_window(source_path.read_text(encoding="utf-8"), fields["BUILD_LABEL"])
+        startup_path = args.source_root / "toonz/sources/toonz/main.cpp"
+        startup = brand_startup(startup_path.read_text(encoding="utf-8"), external_png)
         resource_path = args.source_root / "toonz/sources/toonz/Resources/splash.svg"
         if not resource_path.is_file():
             raise ValueError("Unable to locate the compiled OpenToonz splash resource")
         source_path.write_text(source, encoding="utf-8")
-        resource_path.write_text(svg, encoding="utf-8")
+        startup_path.write_text(startup, encoding="utf-8")
+        resource_path.write_text(compiled_svg, encoding="utf-8")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(svg, encoding="utf-8")
+    if external_png:
+        packaged_artwork = args.output.with_name(ARTWORK_FILENAME)
+        if artwork.resolve() != packaged_artwork.resolve():
+            shutil.copyfile(artwork, packaged_artwork)
     print("Window title branding:", fields["BUILD_LABEL"])
     print("Generated OT-Dev splash:", args.output)
 

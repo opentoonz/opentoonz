@@ -1,34 +1,48 @@
 # OT-Dev build branding
 
-The assembly-line SVG is a template. `brand_build.py` fills it from the current
-GitHub event: PR number/title, two description lines, UTC build date, and actual
-checkout commit. Push and manual branch builds show the ref instead. The seven
-original template fields remain supported; two wrapped heading fields keep long
-PR titles inside the new artwork. XML escaping is applied once to metadata.
+## Active splash
 
-Ordinary Edition Windows builds generate the compiled splash and external
-`splash.svg`, and add the PR/ref label to both window-title construction paths.
-These changes are made only in the CI working tree.
+`splash-template-area10.svg` contains the OT-Dev title, live PR/build fields,
+and a relative image link to `ot-dev-splash-artwork.png`. The PNG is the original
+artwork supplied by Rodney Baker. The complete image appears above the metadata
+footer, without cropping. The splash fits within 610 by 480 logical pixels.
+
+The build populates the PR number/title, description, UTC date, and actual
+checkout commit. Branch builds show the ref instead. All seven original fields
+and the two wrapped heading fields remain available. XML escaping happens once.
+
+The package contains **both** `ot-dev-splash.svg` and
+`ot-dev-splash-artwork.png` beside the executable. To change the artwork in a
+local build, replace that PNG with a valid PNG under the same name and restart.
+To change future CI builds, replace `.github/ot-dev/ot-dev-splash-artwork.png`.
+The SVG layout and its PR data remain separate from the image.
+
+The compiled splash embeds the same PNG as base64, together with the same live
+metadata. The build-only startup overlay uses this self-contained resource if
+the external SVG or PNG is missing. Both files are uploaded as a review artifact.
+The older `splash.svg` cannot mask the OT-Dev splash. Source overlays are applied
+only in the CI working tree and do not change the clean upstream source.
+
+Preserved designs: `splash-template-assembly-line.svg` and
+`splash-template-legacy.svg`. Select one explicitly with `--template` to render
+an archived design. Keep these OT-Dev assets out of upstream feature proposals.
+
+Both `main` and `edition` need this infrastructure update for their ordinary
+PR builds. Merging one branch's PR does not update the other branch's builds.
+Existing downloads require a fresh build for the new template and startup path.
 
 ## Branded builds of upstream-based PRs
 
-The default `upstream/master` branch is an exact upstream mirror, so GitHub does
-not expose the Edition-only manual dispatch inputs there. To build an open PR
-with branding, create a branch **from edition** named **otdev-build/pr-NUMBER**
-in GitHub's branch picker. For example, `otdev-build/pr-259` builds PR #259.
-Branch creation triggers `otdev_branding.yml`; a push to that branch also runs it.
-For a new build with refreshed metadata, create a new branch with a suffix such
-as `otdev-build/pr-259-20261018`. No extra pull request is needed for build refs.
+`otdev_branding.yml` is maintained on `edition`. Create a branch **from edition**
+named **otdev-build/pr-NUMBER**, such as `otdev-build/pr-259`. A suffix such as
+`otdev-build/pr-259-20261019` requests a fresh build with current metadata.
+Branch creation and pushes trigger it. No extra PR is needed for build refs.
 
-The job fetches the current PR description and test merge SHA, checks out that
-exact commit, and obtains branding assets from its own workflow revision. It
-uploads a branded Windows application and a separate populated SVG. It leaves
-the PR branch and the clean mirror untouched. A conflicted/closed PR is rejected.
-
-Existing PRs against `main` retain their established workflows until their
-branding update is integrated there. This infrastructure belongs on `edition`;
-do not include it or the build-only overlay in upstream feature proposals.
+The job fetches current PR metadata and its test merge SHA, checks out that
+exact source, and loads branding assets from its workflow revision. It uploads
+the application and the SVG/PNG review pair. A conflicted or closed PR is
+rejected. The PR source and clean upstream mirror stay intact.
 
 Validation: `python -m unittest discover -s .github/ot-dev -p test_brand_build.py -v`.
-Artwork concept: Rodney Baker. SVG drawing and workflow implementation assisted
-by OpenAI Codex. Static lettering is outlined; current build metadata is SVG text.
+Artwork supplied by Rodney Baker. SVG layout and build implementation assisted
+by OpenAI Codex. OT-Dev title and live metadata remain SVG text.

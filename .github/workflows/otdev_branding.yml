@@ -89,13 +89,15 @@ jobs:
         run: |
           $checkoutSha = git rev-parse HEAD
           if ($LASTEXITCODE) { throw 'Unable to identify the checked-out PR commit' }
-          python .otdev-infrastructure/.github/ot-dev/brand_build.py --template .otdev-infrastructure/.github/ot-dev/splash-template.svg --output "$env:RUNNER_TEMP/ot-dev-splash.svg" --source-root . --event-path "$env:RUNNER_TEMP/otdev-pr-event.json" --event-name pull_request --sha $checkoutSha
+          python .otdev-infrastructure/.github/ot-dev/brand_build.py --template .otdev-infrastructure/.github/ot-dev/splash-template-area10.svg --output "$env:RUNNER_TEMP/ot-dev-splash.svg" --source-root . --event-path "$env:RUNNER_TEMP/otdev-pr-event.json" --event-name pull_request --sha $checkoutSha
           if ($LASTEXITCODE) { throw 'OT-Dev branding failed' }
       - name: Upload populated SVG for review
         uses: actions/upload-artifact@v6
         with:
           name: OT-Dev-PR-${{ steps.pr.outputs.number }}-branding
-          path: ${{ runner.temp }}/ot-dev-splash.svg
+          path: |
+            ${{ runner.temp }}/ot-dev-splash.svg
+            ${{ runner.temp }}/ot-dev-splash-artwork.png
           if-no-files-found: error
 
       # Cache OpenCV and Boost libraries
@@ -189,7 +191,8 @@ jobs:
           "%QT_PATH%\bin\windeployqt.exe" Opentoonz\Opentoonz.exe --opengl
 
           REM Package the generated current-PR splash beside the application
-          copy /Y "%RUNNER_TEMP%\ot-dev-splash.svg" Opentoonz\splash.svg || exit /b 1
+          copy /Y "%RUNNER_TEMP%\ot-dev-splash.svg" Opentoonz\ot-dev-splash.svg || exit /b 1
+          copy /Y "%RUNNER_TEMP%\ot-dev-splash-artwork.png" Opentoonz\ot-dev-splash-artwork.png || exit /b 1
 
           del /Q Opentoonz\*.pdb  REM Remove .pdb files
           del /Q Opentoonz\vc_redist.x64.exe REM Remove vc_redist.x64.exe file

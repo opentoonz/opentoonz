@@ -132,11 +132,21 @@ jobs:
           name: OT-Dev-recorder-test-decoder
           path: recorder-test-decoder
 
-      - name: Brand OT-Dev build
+      - name: Brand OT-Dev build with PNG artwork and live PR data
         shell: pwsh
         run: |
-          python .github/ot-dev/brand_build.py --template .github/ot-dev/splash-template.svg --output "$env:RUNNER_TEMP/ot-dev-splash.svg" --source-root .
+          $checkoutSha = git rev-parse HEAD
+          if ($LASTEXITCODE) { throw 'Unable to identify the checked-out commit' }
+          python .github/ot-dev/brand_build.py --template .github/ot-dev/splash-template-area10.svg --output "$env:RUNNER_TEMP/ot-dev-splash.svg" --source-root . --sha $checkoutSha
           if ($LASTEXITCODE) { throw 'OT-Dev branding failed' }
+      - name: Upload populated SVG and PNG for review
+        uses: actions/upload-artifact@v6
+        with:
+          name: OT-Dev-branding-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/ot-dev-splash.svg
+            ${{ runner.temp }}/ot-dev-splash-artwork.png
+          if-no-files-found: error
 
       # Cache OpenCV and Boost libraries
       - name: Cache OpenCV and Boost
@@ -297,7 +307,8 @@ jobs:
           "%QT_PATH%\bin\windeployqt.exe" Opentoonz\Opentoonz.exe --opengl
 
           REM Add generated OT-Dev-only build manifest/artwork beside OpenToonz.exe
-          copy /Y "%RUNNER_TEMP%\ot-dev-splash.svg" Opentoonz\splash.svg
+          copy /Y "%RUNNER_TEMP%\ot-dev-splash.svg" Opentoonz\ot-dev-splash.svg || exit /b 1
+          copy /Y "%RUNNER_TEMP%\ot-dev-splash-artwork.png" Opentoonz\ot-dev-splash-artwork.png || exit /b 1
 
           del /Q Opentoonz\*.pdb  REM Remove .pdb files
           del /Q Opentoonz\vc_redist.x64.exe REM Remove vc_redist.x64.exe file

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="1440" height="1320" viewBox="0 0 1440 1320"
+     role="img" aria-labelledby="title desc" data-otdev-artwork="area10">
+  <!-- OT-Dev infrastructure only. Artwork supplied by Rodney Baker.
+       Replace ot-dev-splash-artwork.png to update the image. The renderer embeds
+       the PNG into the compiled fallback and retains this link in the runtime SVG. -->
+  <title id="title">{{BUILD_LABEL}}</title>
+  <desc id="desc">{{DESCRIPTION}}</desc>
+  <rect width="1440" height="1320" fill="#122b3d"/>
+  <image id="artwork" x="0" y="0" width="1440" height="1080"
+         preserveAspectRatio="xMidYMid meet" xlink:href="ot-dev-splash-artwork.png"/>
+  <path d="M0 1080 H1440" stroke="#efc762" stroke-width="6"/>
+  <g font-family="DejaVu Sans, Segoe UI, sans-serif">
+    <text x="40" y="1152" fill="#fff4d8" font-size="70" font-weight="700">OT-DEV</text>
+    <text x="44" y="1185" fill="#b7ceda" font-size="18" letter-spacing="2">DEVELOPMENT BUILD</text>
+    <rect x="40" y="1213" width="270" height="40" rx="20" fill="#1f4053"/>
+    <circle cx="60" cy="1233" r="5" fill="#efc762"/>
+    <text x="77" y="1239" fill="#efc762" font-size="17" letter-spacing="1">WORK IN PROGRESS</text>
+  </g>
+  <g aria-label="{{PR_HEADING}}" font-family="Consolas, DejaVu Sans Mono, monospace">
+    <text x="380" y="1127" fill="#fff8e9" font-size="36" font-weight="700">{{PR_HEADING_LINE_1}}</text>
+    <text x="380" y="1170" fill="#fff8e9" font-size="36" font-weight="700">{{PR_HEADING_LINE_2}}</text>
+    <text x="380" y="1215" fill="#cee0e8" font-size="25">{{DESCRIPTION_LINE_1}}</text>
+    <text x="380" y="1250" fill="#cee0e8" font-size="25">{{DESCRIPTION_LINE_2}}</text>
+    <text x="40" y="1298" fill="#b6cbd6" font-size="22">{{BUILD_DATE}}</text>
+    <text x="1400" y="1298" fill="#b6cbd6" font-size="22" text-anchor="end">{{SHORT_SHA}}</text>
+  </g>
+</svg>
