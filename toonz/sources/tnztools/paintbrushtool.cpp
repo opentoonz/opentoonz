@@ -352,8 +352,8 @@ PaintBrushTool::PaintBrushTool()
     // sostituire i nomi con quelli del current, tipo W_ToolOptions...
     , m_toolSize("Size:", 1, 1000, 10, false)  // W_ToolOptions_BrushToolSize
     , m_pressure("Pressure", false)
-    , m_colorType("Mode:")                     // W_ToolOptions_InkOrPaint
-    , m_selective("Selective", false)          // W_ToolOptions_Selective
+    , m_colorType("Mode:")             // W_ToolOptions_InkOrPaint
+    , m_selective("Selective", false)  // W_ToolOptions_Selective
     , m_emptyOnly("Empty Only", false)
     , m_firstTime(true)
     , m_workingFrameId(TFrameId())
@@ -515,15 +515,15 @@ bool PaintBrushTool::onPropertyChanged(std::string propertyName) {
 
   // EmptyOnly
   else if (propertyName == m_emptyOnly.getName()) {
-      PaintBrushEmptyOnly = (int)(m_emptyOnly.getValue());
-      if (m_emptyOnly.getValue() && m_modifierLockAlpha.getValue()) {
-          m_modifierLockAlpha.setValue(false);
-          PaintBrushModifierLockAlpha = 0;
-      }
-      if (m_emptyOnly.getValue() && m_selective.getValue()) {
-          m_selective.setValue(false);
-          PaintBrushSelective = 0;
-      }
+    PaintBrushEmptyOnly = (int)(m_emptyOnly.getValue());
+    if (m_emptyOnly.getValue() && m_modifierLockAlpha.getValue()) {
+      m_modifierLockAlpha.setValue(false);
+      PaintBrushModifierLockAlpha = 0;
+    }
+    if (m_emptyOnly.getValue() && m_selective.getValue()) {
+      m_selective.setValue(false);
+      PaintBrushSelective = 0;
+    }
   }
 
   // Areas, Lines etc.
