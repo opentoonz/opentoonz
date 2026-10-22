@@ -44,7 +44,8 @@ public:
     format.setSampleSize(16);
     format.setSampleType(QAudioFormat::SignedInt);
     format.setByteOrder(QAudioFormat::LittleEndian);
-    if (!device.isFormatSupported(format)) format = device.nearestFormat(format);
+    if (!device.isFormatSupported(format))
+      format = device.nearestFormat(format);
     if (!format.isValid() || !device.isFormatSupported(format) ||
         format.codec() != "audio/pcm" || format.sampleSize() != 16 ||
         format.sampleType() != QAudioFormat::SignedInt ||
@@ -54,11 +55,11 @@ public:
                                   "Audio scrubbing requires 16-bit PCM output");
 
     const TSoundTrackFormat target(format.sampleRate(), 16,
-                                    format.channelCount(), TSound::INT);
+                                   format.channelCount(), TSound::INT);
     TSoundTrackP snippet = TSop::convert(source, target);
     if (!snippet || !snippet->getRawData()) return;
-    const qint64 bytes = qint64(snippet->getSampleCount()) *
-                         snippet->getSampleSize();
+    const qint64 bytes =
+        qint64(snippet->getSampleCount()) * snippet->getSampleSize();
     if (bytes <= 0 || bytes > std::numeric_limits<int>::max()) return;
 
     if (!m_output || m_device != device || m_output->format() != format) {

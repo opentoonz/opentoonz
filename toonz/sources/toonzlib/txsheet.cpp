@@ -1516,9 +1516,9 @@ void TXsheet::scrub(int frame, bool isPreview, int endFrame) {
 
     // extract() has an inclusive end; adjacent frames must not share a sample.
     const double begin = std::floor(double(frame) * samplePerFrame);
-    const double end = std::min(double(st->getSampleCount()),
-                               std::floor((double(endFrame) + 1) *
-                                          samplePerFrame));
+    const double end =
+        std::min(double(st->getSampleCount()),
+                 std::floor((double(endFrame) + 1) * samplePerFrame));
     // Validate floating-point boundaries before converting to sample indices.
     if (!std::isfinite(begin) || !std::isfinite(end) || begin < 0 ||
         begin >= end)
