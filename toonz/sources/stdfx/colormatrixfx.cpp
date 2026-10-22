@@ -9,6 +9,7 @@
 // column). Fully transparent pixels stay transparent, as Flash leaves them.
 // The identity matrix leaves the image unchanged.
 
+#include "globalcontrollablefx.h"
 #include "stdfx.h"
 #include "texception.h"
 #include "tfxparam.h"
@@ -16,7 +17,7 @@
 #include <algorithm>
 #include <cmath>
 
-class ColorMatrixFx final : public TStandardRasterFx {
+class ColorMatrixFx final : public GlobalControllableFx {
   FX_PLUGIN_DECLARATION(ColorMatrixFx)
 
   TRasterFxPort m_input;
