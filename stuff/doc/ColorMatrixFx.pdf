@@ -19,7 +19,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 7 0 R >>
 endobj
 7 0 obj
-<< /Length 6295 >>
+<< /Length 6424 >>
 stream
 0.080 0.170 0.270 rg
 0 778 612 14 re f
@@ -213,6 +213,8 @@ BT /F1 8.5 Tf 1 0 0 1 52 98 Tm (1. Pick an output row. 2. Edit input contributio
 BT /F1 8.5 Tf 1 0 0 1 52 86 Tm (Offset for a constant addition or subtraction. 4. Animate) Tj ET
 0.080 0.170 0.270 rg
 BT /F1 8.5 Tf 1 0 0 1 52 74 Tm (parameters using regular FX keyframes.) Tj ET
+0.080 0.530 0.570 rg
+BT /F2 8.4 Tf 1 0 0 1 52 61 Tm (FX Intensity: 1.0 = full effect; 0.0 = original Source; keyframeable) Tj ET
 endstream
 endobj
 8 0 obj
@@ -325,7 +327,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 11 0 R >>
 endobj
 11 0 obj
-<< /Length 6338 >>
+<< /Length 6366 >>
 stream
 0.080 0.170 0.270 rg
 0 778 612 14 re f
@@ -414,7 +416,7 @@ BT /F1 8.2 Tf 1 0 0 1 239 468 Tm (Present \(global blend\)) Tj ET
 0.830 0.880 0.920 RG
 390 460 m 390 484 l S
 0.080 0.170 0.270 rg
-BT /F1 8.2 Tf 1 0 0 1 397 468 Tm (Not in PR #272) Tj ET
+BT /F1 8.2 Tf 1 0 0 1 397 468 Tm (Present \(global blend\)) Tj ET
 0.830 0.880 0.920 RG
 52 460 m 560 460 l S
 0.970 0.980 0.990 rg
@@ -486,11 +488,11 @@ BT /F1 8.2 Tf 1 0 0 1 52 232.12 Tm (clamp float alpha the same way.) Tj ET
 0.080 0.170 0.270 rg
 BT /F2 9 Tf 1 0 0 1 52 217.84 Tm (FX Intensity.) Tj ET
 0.360 0.430 0.510 rg
-BT /F1 8.2 Tf 1 0 0 1 52 205.24 Tm (Channel Mixer uses GlobalControllableFx to cross dissolve) Tj ET
+BT /F1 8.2 Tf 1 0 0 1 52 205.24 Tm (Both effects use GlobalControllableFx to mix the effect with) Tj ET
 0.360 0.430 0.510 rg
-BT /F1 8.2 Tf 1 0 0 1 52 196 Tm (processed and unprocessed images below 100% intensity. Color) Tj ET
+BT /F1 8.2 Tf 1 0 0 1 52 196 Tm (the input. 1.0 \(100%\) applies it; 0.0 \(0%\) bypasses it.) Tj ET
 0.360 0.430 0.510 rg
-BT /F1 8.2 Tf 1 0 0 1 52 186.76 Tm (Matrix currently does not include that slider.) Tj ET
+BT /F1 8.2 Tf 1 0 0 1 52 186.76 Tm (Intermediate intensities blend both; the slider is animatable.) Tj ET
 0.080 0.170 0.270 rg
 BT /F2 10 Tf 1 0 0 1 52 168.28 Tm (Which one should I use?) Tj ET
 0.080 0.170 0.270 rg
@@ -508,7 +510,7 @@ BT /F1 8 Tf 1 0 0 1 52 93.18 Tm (Standalone Color Matrix extraction: OT-Dev PR #
 endstream
 endobj
 12 0 obj
-<< /Title (Color Matrix FX Help) /Author (OpenAnimationLibrary) /Subject (Color Matrix vs Channel Mixer, FX recipes and author attribution) >>
+<< /Title (Color Matrix FX Help) /Author (OpenAnimationLibrary) /Subject (Color Matrix vs Channel Mixer, FX Intensity, FX recipes and original author attribution) >>
 endobj
 xref
 0 13
@@ -520,13 +522,13 @@ xref
 0000000366 00000 n 
 0000000461 00000 n 
 0000000607 00000 n 
-0000006953 00000 n 
-0000007099 00000 n 
-0000011039 00000 n 
-0000011187 00000 n 
-0000017577 00000 n 
+0000007082 00000 n 
+0000007228 00000 n 
+0000011168 00000 n 
+0000011316 00000 n 
+0000017734 00000 n 
 trailer
 << /Root 1 0 R /Size 13 /Info 12 0 R >>
 startxref
-17736
+17916
 %%EOF
