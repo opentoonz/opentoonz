@@ -1,0 +1,28 @@
+<fxlayout>
+  <page name="Color Matrix">
+   <separator label="Red"/>
+     <control>red_red</control>
+     <control>red_green</control>
+     <control>red_blue</control>
+     <control>red_alpha</control>
+     <control>red_offset</control>
+   <separator label="Green"/>
+     <control>green_red</control>
+     <control>green_green</control>
+     <control>green_blue</control>
+     <control>green_alpha</control>
+     <control>green_offset</control>
+   <separator label="Blue"/>
+     <control>blue_red</control>
+     <control>blue_green</control>
+     <control>blue_blue</control>
+     <control>blue_alpha</control>
+     <control>blue_offset</control>
+   <separator label="Alpha"/>
+     <control>alpha_red</control>
+     <control>alpha_green</control>
+     <control>alpha_blue</control>
+     <control>alpha_alpha</control>
+     <control>alpha_offset</control>
+  </page>
+</fxlayout>
