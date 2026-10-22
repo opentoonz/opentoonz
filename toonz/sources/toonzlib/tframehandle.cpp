@@ -244,10 +244,11 @@ void TFrameHandle::timerEvent(QTimerEvent *event) {
   qint64 elapsedTime = m_clock.elapsed();
   int frame = m_scrubRange.first + elapsedTime * m_fps / 1000;
   int lastFrame = m_scrubRange.second;
-  if (frame >= lastFrame) {
+  // Finish the last frame's audition before stopping the range.
+  if (frame > lastFrame) {
     if (m_frame != lastFrame) setFrame(lastFrame);
     stopScrubbing();
-  } else {
+  } else if (m_frame != frame) {
     setFrame(frame);
   }
 }
@@ -344,8 +345,8 @@ bool TFrameHandle::scrub(int r0, int r1, double framePerSecond) {
   if (m_audioColumn)
     m_audioColumn->scrub(r0, r1);
   else if (m_xsheet) {
-    int i;
-    for (i = r0; i <= r1; i++) m_xsheet->scrub(i, true);
+    // A deliberate range audition is one stream, not competing frame requests.
+    m_xsheet->scrub(r0, true, r1);
   }
 
   if (onlyOneFrame) return false;
@@ -361,7 +362,10 @@ void TFrameHandle::stopScrubbing() {
   m_timerId                        = 0;
   m_scrubRange                     = std::make_pair(0, -1);
   if (m_audioColumn) m_audioColumn = 0;
-  if (m_xsheet) m_xsheet           = 0;
+  if (m_xsheet) {
+    m_xsheet->stopScrub();
+    m_xsheet = 0;
+  }
   m_fps                            = 0;
   emit scrubStopped();
 }

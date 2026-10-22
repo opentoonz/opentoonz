@@ -149,6 +149,10 @@ BaseViewerPanel::BaseViewerPanel(QWidget *parent, Qt::WindowFlags flags)
   m_flipConsole->setFrameHandle(TApp::instance()->getCurrentFrame());
 
   bool ret = true;
+  ret = ret && connect(m_flipConsole, &FlipConsole::sliderReleased, this, []() {
+    if (!TApp::instance()->getCurrentFrame()->isPlaying())
+      TApp::instance()->getCurrentXsheet()->getXsheet()->stopScrub();
+  });
   // When zoom changed, only if the viewer is active, change window titl
   ret = ret && connect(m_sceneViewer, SIGNAL(onZoomChanged()),
                        SLOT(changeWindowTitle()));
