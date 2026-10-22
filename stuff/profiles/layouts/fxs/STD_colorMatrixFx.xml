@@ -1,4 +1,4 @@
-<fxlayout>
+<fxlayout help_file="ColorMatrixFx.pdf">
   <page name="Color Matrix">
    <separator label="Red"/>
      <control>red_red</control>
