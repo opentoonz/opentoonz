@@ -226,7 +226,7 @@ void TFilmstripSelection::copyFrames() {
 
 void TFilmstripSelection::cutFrames() {
   TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
-  if (sl) {
+  if (sl && !m_selectedFrames.empty()) {
     int firstSelectedIndex = sl->fid2index(*m_selectedFrames.begin());
     if (firstSelectedIndex < 0 || firstSelectedIndex > sl->getFrameCount()) {
       selectNone();
@@ -238,7 +238,7 @@ void TFilmstripSelection::cutFrames() {
                        ? sl->getFirstFid()
                        : sl->getFrameId(firstSelectedIndex - 1);
     TApp::instance()->getCurrentFrame()->setFid(fId);
-    select(fId);
+    select(fId, sl->isFid(fId));
   }
 }
 
