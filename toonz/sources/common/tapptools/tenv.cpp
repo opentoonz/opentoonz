@@ -245,11 +245,13 @@ public:
     const char *workingDirectory = ba.data();
     m_workingDirectory           = workingDirectory;
 
-    // check if portable
+    // check if portable. Startup requires the selected stuff path to be a
+    // directory and aborts otherwise, so a regular file named portablestuff
+    // must not qualify. Every candidate below applies the same rule.
     TFilePath portableCheck =
         TFilePath(m_workingDirectory + "\\portablestuff\\");
     TFileStatus portableStatus(portableCheck);
-    m_isPortable = portableStatus.doesExist();
+    m_isPortable = portableStatus.isDirectory();
 
 #ifdef MACOSX
     // macOS 10.12 (Sierra) translocates applications before running them
@@ -262,7 +264,7 @@ public:
           TFilePath(m_workingDirectory + "\\" + getApplicationFileName() +
                     ".app\\portablestuff\\");
       portableStatus = TFileStatus(portableCheck);
-      m_isPortable   = portableStatus.doesExist();
+      m_isPortable   = portableStatus.isDirectory();
       if (m_isPortable)
         m_workingDirectory =
             portableCheck.getParentDir().getQString().toStdString();
@@ -310,8 +312,7 @@ public:
         portableCheck =
             TFilePath(candidate.toStdString() + "\\portablestuff\\");
         portableStatus = TFileStatus(portableCheck);
-        // A regular file named portablestuff would abort startup later.
-        m_isPortable = portableStatus.isDirectory();
+        m_isPortable   = portableStatus.isDirectory();
         if (m_isPortable) {
           m_workingDirectory =
               portableCheck.getParentDir().getQString().toStdString();
