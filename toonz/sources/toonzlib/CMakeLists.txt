@@ -34,6 +34,7 @@ set(MOC_HEADERS
 
 set(HEADERS
     ${MOC_HEADERS}
+    audioscrubplayer.h
     autoadjust.h
     autopos.h
     cleanupcommon.h
