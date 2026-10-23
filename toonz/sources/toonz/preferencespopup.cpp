@@ -33,6 +33,7 @@
 #include "toonz/levelproperties.h"
 #include "toonz/tonionskinmaskhandle.h"
 #include "toonz/stage.h"
+#include "toonz/tcomposerrenderer.h"
 
 // TnzCore includes
 #include "tsystem.h"
@@ -63,6 +64,10 @@
 #include <QGroupBox>
 #include <QKeySequence>
 #include <QSignalBlocker>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QProcess>
+#include <QTimer>
 
 using namespace DVGui;
 
@@ -1087,6 +1092,40 @@ QWidget* PreferencesPopup::createUI(PreferencesItemId id,
           combo, &QFontComboBox::currentFontChanged, this,
           [this](const QFont& font) { onInterfaceFontChanged(font.family()); });
       widget = combo;
+    } else if (id == tcomposerPath) {
+      FileField* field =
+          new FileField(this, item.value.toString(), false, false, false);
+      field->setFileMode(QFileDialog::ExistingFile);
+#ifdef _WIN32
+      field->setFilters(QStringList() << "exe");
+#endif
+      field->getField()->setPlaceholderText(tr("Bundled tcomposer"));
+      field->setToolTip(
+          tr("Local Tasks only. Leave empty to use the bundled "
+             "renderer."));
+      connect(field, &FileField::pathChanged, this, [this, field]() {
+        const QString oldPath = m_pref->getTComposerPath();
+        const QString path    = field->getPath().trimmed();
+        if (path == oldPath) return;
+        if (!path.isEmpty()) {
+          if (!TComposerRenderer::isExecutable(path)) {
+            DVGui::error(
+                tr("Select an existing executable using its full path."));
+            field->setPath(oldPath);
+            return;
+          }
+          if (DVGui::MsgBox(DVGui::WARNING,
+                            tr("Use this renderer for local batch tasks?\n%1\n"
+                               "Rendering results may differ.")
+                                .arg(path),
+                            {tr("Use Renderer"), tr("Cancel")}, 1) != 1) {
+            field->setPath(oldPath);
+            return;
+          }
+        }
+        m_pref->setValue(tcomposerPath, path);
+      });
+      widget = field;
     } else if (id == customHelpLink) {
       DVGui::FileField* field =
           new DVGui::FileField(this, item.value.toString());
@@ -1352,6 +1391,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {ffmpegPath, tr("FFmpeg Path:")},
       {ffmpegTimeout, tr("FFmpeg Timeout:")},
       {fastRenderPath, tr("Fast Render Path:")},
+      {tcomposerPath, tr("Batch Renderer:")},
       {ffmpegMultiThread,
        tr("Allow Multi-Thread in FFMPEG Rendering (UNSTABLE)")},
       {quickTimeBackend,
@@ -2497,6 +2537,91 @@ QWidget* PreferencesPopup::createPreviewPage() {
   {
     insertUI(sceneNumberingEnabled, renderLay);
     insertUI(taskchunksize, renderLay);
+    insertUI(tcomposerPath, renderLay);
+    FileField* rendererField   = getUI<FileField*>(tcomposerPath);
+    QPushButton* testRenderer  = new QPushButton(tr("Test"), widget);
+    QPushButton* resetRenderer = new QPushButton(tr("Reset"), widget);
+    QLabel* rendererInfo       = new QLabel(widget);
+    rendererInfo->setWordWrap(true);
+    rendererInfo->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    QHBoxLayout* rendererButtons = new QHBoxLayout;
+    rendererButtons->addWidget(testRenderer);
+    rendererButtons->addWidget(resetRenderer);
+    rendererButtons->addStretch();
+    renderLay->addLayout(rendererButtons, renderLay->rowCount(), 1, 1, 2);
+    renderLay->addWidget(rendererInfo, renderLay->rowCount(), 1, 1, 2);
+    connect(rendererField, &FileField::pathChanged, rendererInfo,
+            &QLabel::clear);
+    connect(resetRenderer, &QPushButton::clicked, this,
+            [this, rendererField, rendererInfo]() {
+              rendererField->setPath(QString());
+              m_pref->setValue(tcomposerPath, QString());
+              rendererInfo->clear();
+            });
+    connect(
+        testRenderer, &QPushButton::clicked, this,
+        [this, testRenderer, rendererInfo]() {
+          const QString path =
+              TComposerRenderer::executable(m_pref->getTComposerPath());
+          if (!TComposerRenderer::isExecutable(path)) {
+            rendererInfo->setText(tr("Renderer not found: %1").arg(path));
+            return;
+          }
+          testRenderer->setEnabled(false);
+          rendererInfo->setText(tr("Testing %1...").arg(path));
+          QProcess* probe = new QProcess(this);
+          probe->setProcessChannelMode(QProcess::MergedChannels);
+          probe->setProcessEnvironment(TComposerRenderer::environment(path));
+          probe->setProperty("rendererMetadata", true);
+          connect(probe, &QProcess::errorOccurred, this,
+                  [probe, testRenderer,
+                   rendererInfo](QProcess::ProcessError error) {
+                    if (error != QProcess::FailedToStart) return;
+                    rendererInfo->setText(probe->errorString());
+                    testRenderer->setEnabled(true);
+                    probe->deleteLater();
+                  });
+          connect(probe,
+                  QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+                  this,
+                  [probe, testRenderer, rendererInfo, path](
+                      int exitCode, QProcess::ExitStatus status) {
+                    const QString output =
+                        QString::fromUtf8(probe->readAllStandardOutput())
+                            .trimmed()
+                            .left(4096);
+                    const QJsonObject info =
+                        QJsonDocument::fromJson(output.toUtf8()).object();
+                    if (status == QProcess::NormalExit && exitCode == 0 &&
+                        info.value("renderer").toString() == "tcomposer") {
+                      rendererInfo->setText(
+                          tr("%1\nQt %2 | Built %3 | Source %4")
+                              .arg(path, info.value("qt_version").toString(),
+                                   info.value("build_date").toString(),
+                                   info.value("source_revision").toString()));
+                    } else if (status == QProcess::NormalExit &&
+                               probe->property("rendererMetadata").toBool()) {
+                      probe->setProperty("rendererMetadata", false);
+                      probe->start(path, QStringList() << "-version");
+                      return;
+                    } else if (status == QProcess::NormalExit &&
+                               output.contains("Toonz") &&
+                               !output.contains("Usage error:")) {
+                      rendererInfo->setText(path + "\n" + output);
+                    } else {
+                      rendererInfo->setText(
+                          tr("Renderer test failed: %1\n%2")
+                              .arg(path, output.isEmpty() ? probe->errorString()
+                                                          : output));
+                    }
+                    testRenderer->setEnabled(true);
+                    probe->deleteLater();
+                  });
+          QTimer::singleShot(10000, probe, [probe]() {
+            if (probe->state() != QProcess::NotRunning) probe->kill();
+          });
+          probe->start(path, QStringList() << "--renderer-info");
+        });
     renderLay->addWidget(
         new QLabel(tr("Please indicate where you would like exports from Fast "
                       "Render (MP4) to go."),

@@ -86,6 +86,7 @@ enum PreferencesItemId {
   ffmpegPath,
   ffmpegTimeout,
   fastRenderPath,
+  tcomposerPath,
   ffmpegMultiThread,
   quickTimeBackend,
   rhubarbPath,
