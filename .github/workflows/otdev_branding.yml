@@ -1,217 +1,348 @@
-# OT-DEV INFRASTRUCTURE ONLY. Keep this reusable build out of upstream proposals.
-name: OT-Dev Branded PR Build
-
+# OT-Dev Windows packages. Keep this infrastructure out of upstream proposals.
+# workflow_run must be installed on the repository default branch (edition).
+name: OT-Dev Windows Package
+run-name: OT-Dev Windows package ${{ github.event.workflow_run.id || inputs.pr_number || inputs.ref || github.ref_name }}
 on:
-  # Branch creation works even while the default branch remains a clean mirror.
-  create:
-  push:
-    branches: ['otdev-build/pr-*']
-  workflow_call:
+  workflow_run:
+    workflows:
+    - Windows Build
+    - OT-Dev Branded PR Build
+    - Channel Stack Preview (Windows)
+    types:
+    - completed
+  workflow_dispatch:
     inputs:
       pr_number:
-        description: Open OT-Dev PR to build with the current branding template
+        description: Open OT-Dev PR number (leave ref empty)
         type: string
         required: false
         default: ''
-
+      ref:
+        description: Branch or commit to package (leave PR number empty)
+        type: string
+        required: false
+        default: ''
+  create:
+  push:
+    branches:
+    - otdev-build/pr-*
 permissions:
   contents: read
-  pull-requests: read
-
 concurrency:
-  group: otdev-branded-pr-${{ inputs.pr_number || github.ref_name }}
+  group: otdev-package-${{ github.event.workflow_run.id || inputs.pr_number || inputs.ref || github.ref }}
   cancel-in-progress: true
-
 jobs:
-  Windows:
-    if: github.repository == 'OpenAnimationLibrary/opentoonz-dev' && (inputs.pr_number != '' || startsWith(github.ref_name, 'otdev-build/pr-'))
-    runs-on: windows-2025
-    env:
-      # QT related variable
-      QT_PATH: ${{ github.workspace }}\thirdparty\qt\5.15.2_wintab\msvc2019_64  # Path to custom Qt
-
-      # Visual Studio related variables
-      MSVCVERSION: "Visual Studio 18 2026"  # Visual Studio version
-
-      # Boost-related variables
-      BOOST_TOOLSET: "14.3"                 # Boost MSVC Toolset version
-      BOOST_VERSION: "1.87.0"               # Boost version
-      BOOST_ROOT: C:\local\boost_1_87_0     # Path to Boost library root
-
-      # OpenCV-related variables
-      OPENCV_VERSION: "4.13.0"              # OpenCV version
-      OpenCV_DIR: C:\tools\opencv\build     # Path to OpenCV
-
+  Resolve:
+    if: github.repository == 'OpenAnimationLibrary/opentoonz-dev' && (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion
+      == 'success')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+      statuses: write
+    outputs:
+      build: ${{ steps.source.outputs.build }}
+      skip_reason: ${{ steps.source.outputs.skip_reason }}
+      source_sha: ${{ steps.source.outputs.source_sha }}
+      head_sha: ${{ steps.source.outputs.head_sha }}
+      source_ref: ${{ steps.source.outputs.source_ref }}
+      pr_number: ${{ steps.source.outputs.pr_number }}
+      event_name: ${{ steps.source.outputs.event_name }}
+      artifact_name: ${{ steps.source.outputs.artifact_name }}
     steps:
-      - name: Resolve current PR metadata and merge commit
-        id: pr
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ github.token }}
-          OTDEV_PR_NUMBER: ${{ inputs.pr_number }}
-        run: |
-          $ErrorActionPreference = 'Stop'
-          if (-not $env:OTDEV_PR_NUMBER -and $env:GITHUB_REF_NAME -match '^otdev-build/pr-([1-9][0-9]*)(?:-.*)?$') {
-            $env:OTDEV_PR_NUMBER = $Matches[1]
-          }
-          if ($env:OTDEV_PR_NUMBER -notmatch '^[1-9][0-9]*$') { throw 'Enter a positive OT-Dev PR number' }
-          "number=$env:OTDEV_PR_NUMBER" >> $env:GITHUB_OUTPUT
-          $json = gh api "repos/$env:GITHUB_REPOSITORY/pulls/$env:OTDEV_PR_NUMBER"
-          if ($LASTEXITCODE) { throw 'Unable to read OT-Dev PR metadata' }
-          $pr = $json | ConvertFrom-Json
-          if ($pr.state -ne 'open' -or $pr.merge_commit_sha -notmatch '^[0-9a-f]{40}$') {
-            throw 'The PR must be open and have a current test merge commit'
-          }
-          "merge_sha=$($pr.merge_commit_sha)" >> $env:GITHUB_OUTPUT
-          @{ pull_request = $pr } | ConvertTo-Json -Depth 100 | Set-Content "$env:RUNNER_TEMP/otdev-pr-event.json" -Encoding utf8
+    - uses: actions/checkout@v6
+      with:
+        ref: ${{ github.sha }}
+        persist-credentials: false
+        sparse-checkout: .github/ot-dev
+    - name: Install Qt 5.15.2 for the replaceable artwork regression
+      run: python -m pip install PyQt5==5.15.2
+    - name: Test branding, build selection, and package validation
+      env:
+        QT_QPA_PLATFORM: offscreen
+      run: |
+        python -m unittest discover -s .github/ot-dev -p 'test_*.py' -v
+        python -m unittest discover -s .github/ot-dev/recorder -p 'test_*.py' -v
+    - name: Resolve the exact source build
+      id: source
+      env:
+        GH_TOKEN: ${{ github.token }}
+        OTDEV_PR_NUMBER: ${{ inputs.pr_number || '' }}
+        OTDEV_SOURCE_REF: ${{ inputs.ref || '' }}
+      run: python .github/ot-dev/resolve_build.py
+    - name: Save the selected source metadata
+      if: steps.source.outputs.build == 'true'
+      uses: actions/upload-artifact@v6
+      with:
+        name: OT-Dev-build-request-${{ github.run_id }}
+        path: |
+          ${{ runner.temp }}/source-event.json
+          ${{ runner.temp }}/source-manifest.json
+        if-no-files-found: error
+    - name: Link the package build to its source commit
+      if: steps.source.outputs.build == 'true'
+      env:
+        GH_TOKEN: ${{ github.token }}
+        SOURCE_HEAD: ${{ steps.source.outputs.head_sha }}
+      run: |
+        gh api --method POST "repos/$GITHUB_REPOSITORY/statuses/$SOURCE_HEAD" -f state=pending -f context="OT-Dev Windows package" -f description="Building the complete OT-Dev Windows package" -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+  RecorderEncoder:
+    if: needs.Resolve.outputs.build == 'true'
+    runs-on: windows-2025
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        lfs: false
+        persist-credentials: false
+        sparse-checkout: .github/ot-dev/recorder
+        ref: ${{ github.sha }}
+    - uses: actions/cache@v5
+      id: recorder-cache
+      with:
+        path: |
+          recorder-encoder
+          recorder-test-decoder
+        key: otdev-recorder-windows-2025-x64-${{ hashFiles('.github/ot-dev/recorder/build-ffmpeg.sh') }}
+    - uses: msys2/setup-msys2@v2
+      if: steps.recorder-cache.outputs.cache-hit != 'true'
+      with:
+        msystem: UCRT64
+        update: false
+        install: mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-pkgconf mingw-w64-ucrt-x86_64-nasm make diffutils tar curl
+    - name: Build input-restricted recorder encoder
+      if: steps.recorder-cache.outputs.cache-hit != 'true'
+      shell: msys2 {0}
+      run: bash .github/ot-dev/recorder/build-ffmpeg.sh
+    - uses: actions/upload-artifact@v6
+      with:
+        name: OT-Dev-recorder-encoder
+        path: recorder-encoder
+    - uses: actions/upload-artifact@v6
+      with:
+        name: OT-Dev-recorder-test-decoder
+        path: recorder-test-decoder
+    needs: Resolve
+  Windows:
+    needs:
+    - Resolve
+    - RecorderEncoder
+    if: needs.Resolve.outputs.build == 'true'
+    runs-on: windows-2025
+    permissions:
+      contents: read
+      actions: read
+    env:
+      QT_PATH: ${{ github.workspace }}\thirdparty\qt\5.15.2_wintab\msvc2019_64
+      MSVCVERSION: Visual Studio 18 2026
+      BOOST_TOOLSET: '14.3'
+      BOOST_VERSION: 1.87.0
+      BOOST_ROOT: C:\local\boost_1_87_0
+      OPENCV_VERSION: 4.13.0
+      OpenCV_DIR: C:\tools\opencv\build
+      OTDEV_SOURCE_SHA: ${{ needs.Resolve.outputs.source_sha }}
+      OTDEV_INFRASTRUCTURE_SHA: ${{ github.sha }}
+      OTDEV_BUILD_ID: ${{ needs.Resolve.outputs.source_sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+      OTDEV_SOURCE_REF: ${{ needs.Resolve.outputs.source_ref }}
+      OTDEV_EVENT_NAME: ${{ needs.Resolve.outputs.event_name }}
+    steps:
+    - name: Check out the exact application source
+      uses: actions/checkout@v6
+      with:
+        ref: ${{ needs.Resolve.outputs.source_sha }}
+        lfs: false
+        persist-credentials: false
+    - name: Check out trusted OT-Dev build infrastructure
+      uses: actions/checkout@v6
+      with:
+        ref: ${{ github.sha }}
+        path: .otdev-infrastructure
+        lfs: false
+        persist-credentials: false
+        sparse-checkout: .github/ot-dev
+    - name: Download the selected source metadata
+      uses: actions/download-artifact@v6
+      with:
+        name: OT-Dev-build-request-${{ github.run_id }}
+        path: ${{ runner.temp }}/otdev-request
+    - uses: actions/download-artifact@v6
+      with:
+        name: OT-Dev-recorder-encoder
+        path: recorder-encoder
+    - uses: actions/download-artifact@v6
+      with:
+        name: OT-Dev-recorder-test-decoder
+        path: recorder-test-decoder
+    - name: Apply the complete Windows-only OT-Dev overlay
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = 'Stop'
+        python .otdev-infrastructure/.github/ot-dev/recorder/enable.py --root . --build-id $env:OTDEV_BUILD_ID
+        if ($LASTEXITCODE) { throw 'OT-Dev recorder injection failed' }
+        python .otdev-infrastructure/.github/ot-dev/brand_build.py --output "$env:RUNNER_TEMP/otdev-branding/splash.svg" --source-root . --event-path "$env:RUNNER_TEMP/otdev-request/source-event.json" --event-name $env:OTDEV_EVENT_NAME --ref-name $env:OTDEV_SOURCE_REF --sha $env:OTDEV_SOURCE_SHA
+        if ($LASTEXITCODE) { throw 'OT-Dev branding failed' }
+    - name: Upload the populated SVG and replaceable PNG
+      uses: actions/upload-artifact@v6
+      with:
+        name: OT-Dev-branding-${{ github.run_id }}
+        path: |
+          ${{ runner.temp }}/otdev-branding/splash.svg
+          ${{ runner.temp }}/otdev-branding/portablestuff/splash.png
+        if-no-files-found: error
+    - name: Cache OpenCV and Boost
+      id: cache-deps
+      uses: actions/cache/restore@v5
+      with:
+        path: |
+          C:\tools\opencv
+          ${{ env.BOOST_ROOT }}
+        key: ${{ runner.os }}-opencv-boost-${{ env.OPENCV_VERSION }}-boost-${{ env.BOOST_VERSION }}
+        restore-keys: |
+          ${{ runner.os }}-opencv-boost-${{ env.OPENCV_VERSION }}-boost-
+    - name: Install OpenCV and Boost if cache is missing
+      if: steps.cache-deps.outputs.cache-hit != 'true'
+      run: |
+        @echo on
+        choco install opencv --version=${{ env.OPENCV_VERSION }} -y
+        choco install boost-msvc-${{ env.BOOST_TOOLSET }} --version=${{ env.BOOST_VERSION }} -y
+      shell: cmd
+    - name: Install custom Qt 5.15.2 with WinTab support
+      run: |
+        @echo on
+        mkdir thirdparty\qt
+        curl -fsSL -o Qt5.15.2_wintab.zip https://github.com/shun-iwasawa/qt5/releases/download/v5.15.2_wintab/Qt5.15.2_wintab.zip
+        7z x Qt5.15.2_wintab.zip
+        move Qt5.15.2_wintab\5.15.2_wintab thirdparty\qt
+      shell: cmd
+    - name: Install third-party prebuilt libs (LFS workaround)
+      run: |
+        @echo on
+        curl -fsSL -o thirdparty-libs.zip https://github.com/andeon/opentoonz-thirdparty-libs/releases/download/prebuilt-libs-v1/thirdparty-libs.zip
+        7z x -y thirdparty-libs.zip
+      shell: cmd
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v3
+    - name: Test recorder consent, capture, and native Windows playback
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = 'Stop'
+        python -m unittest discover -s .otdev-infrastructure/.github/ot-dev/recorder -p 'test_*.py' -v
+        if ($LASTEXITCODE) { throw 'Recorder injection tests failed' }
+        cmake -S .otdev-infrastructure/.github/ot-dev/recorder -B recorder-tests -G "$env:MSVCVERSION" -A x64 "-DCMAKE_PREFIX_PATH=$env:QT_PATH"
+        if ($LASTEXITCODE) { throw 'Recorder test configure failed' }
+        cmake --build recorder-tests --config Release --parallel 2
+        if ($LASTEXITCODE) { throw 'Recorder test build failed' }
+        $env:PATH = "$env:QT_PATH\bin;$env:PATH"
+        $env:OTDEV_TEST_FFMPEG = "$env:GITHUB_WORKSPACE\recorder-encoder\ffmpeg.exe"
+        $env:OTDEV_TEST_DECODER = "$env:GITHUB_WORKSPACE\recorder-test-decoder\ffmpeg.exe"
+        ctest --test-dir recorder-tests -C Release --output-on-failure
+        $recorderTestExit = $LASTEXITCODE
+        Get-ChildItem recorder-tests/recorder-*.txt | ForEach-Object { Get-Content $_.FullName }
+        if ($recorderTestExit) { throw 'Recorder tests failed' }
+    - name: CMake configuration
+      run: |
+        @echo on
+        cd thirdparty
+        copy /Y tiff-4.0.3\libtiff\tif_config.vc.h tiff-4.0.3\libtiff\tif_config.h
+        copy /Y tiff-4.0.3\libtiff\tiffconf.vc.h tiff-4.0.3\libtiff\tiffconf.h
+        copy /Y libpng-1.6.21\scripts\pnglibconf.h.prebuilt libpng-1.6.21\pnglibconf.h
 
-      # Build the selected PR; keep Edition code out of its source branch.
-      - uses: actions/checkout@v6
-        with:
-          ref: ${{ steps.pr.outputs.merge_sha }}
-          lfs: false
-          persist-credentials: false
-      - name: Check out branding from the workflow revision
-        uses: actions/checkout@v6
-        with:
-          ref: ${{ github.sha }}
-          path: .otdev-infrastructure
-          lfs: false
-          persist-credentials: false
-          sparse-checkout: .github/ot-dev
-      - name: Test branding before applying the overlay
-        shell: pwsh
-        run: |
-          python -m unittest discover -s .otdev-infrastructure/.github/ot-dev -p test_brand_build.py -v
-          if ($LASTEXITCODE) { throw 'OT-Dev branding tests failed' }
-      - name: Generate current PR splash and build-only window title
-        shell: pwsh
-        run: |
-          $checkoutSha = git rev-parse HEAD
-          if ($LASTEXITCODE) { throw 'Unable to identify the checked-out PR commit' }
-          python .otdev-infrastructure/.github/ot-dev/brand_build.py --template .otdev-infrastructure/.github/ot-dev/splash-template-area10.svg --output "$env:RUNNER_TEMP/ot-dev-splash.svg" --source-root . --event-path "$env:RUNNER_TEMP/otdev-pr-event.json" --event-name pull_request --sha $checkoutSha
-          if ($LASTEXITCODE) { throw 'OT-Dev branding failed' }
-      - name: Upload populated SVG for review
-        uses: actions/upload-artifact@v6
-        with:
-          name: OT-Dev-PR-${{ steps.pr.outputs.number }}-branding
-          path: |
-            ${{ runner.temp }}/ot-dev-splash.svg
-            ${{ runner.temp }}/ot-dev-splash-artwork.png
-          if-no-files-found: error
+        cd ../toonz
+        rmdir /S /Q build
+        mkdir build
+        cd build
 
-      # Cache OpenCV and Boost libraries
-      - name: Cache OpenCV and Boost
-        id: cache-deps
-        uses: actions/cache@v5
-        with:
-          path: |
-            C:\tools\opencv
-            ${{ env.BOOST_ROOT }}
-          key: ${{ runner.os }}-opencv-boost-${{ env.OPENCV_VERSION }}-boost-${{ env.BOOST_VERSION }}
-          restore-keys: |
-            ${{ runner.os }}-opencv-boost-${{ env.OPENCV_VERSION }}-boost-
+        cmake ..\sources -G "%MSVCVERSION%" -Ax64 -DQT_PATH="%QT_PATH%" -DBOOST_ROOT="%BOOST_ROOT%" -DOpenCV_DIR="%OpenCV_DIR%" -DWITH_WINTAB=Y
+      shell: cmd
+    - name: Build Opentoonz
+      run: |
+        @echo on
+        cd toonz\build
+        msbuild /p:Configuration=RelWithDebInfo /m /verbosity:minimal ALL_BUILD.vcxproj
+      shell: cmd
+    - name: Create Package
+      run: |
+        @echo on
+        cd toonz\build
 
-      # Install OpenCV and Boost if the cache is missing
-      - name: Install OpenCV and Boost if cache is missing
-        if: steps.cache-deps.outputs.cache-hit != 'true'
-        run: |
-          @echo on
-          choco install opencv --version=${{ env.OPENCV_VERSION }} -y
-          choco install boost-msvc-${{ env.BOOST_TOOLSET }} --version=${{ env.BOOST_VERSION }} -y
-        shell: cmd
+        REM Create Opentoonz directory and copy files from RelWithDebInfo
+        mkdir Opentoonz
+        copy /Y RelWithDebInfo\*.* Opentoonz\
+        REM Copy required DLLs for proper functionality
+        copy /Y ..\..\thirdparty\glut\3.7.6\lib\glut64.dll Opentoonz
+        copy /Y ..\..\thirdparty\glew\glew-1.9.0\bin\64bit\glew32.dll Opentoonz
+        copy /Y ..\..\thirdparty\libmypaint\dist\64\libiconv-2.dll Opentoonz
+        copy /Y ..\..\thirdparty\libmypaint\dist\64\libintl-8.dll Opentoonz
+        copy /Y ..\..\thirdparty\libmypaint\dist\64\libjson-c-2.dll Opentoonz
+        copy /Y ..\..\thirdparty\libmypaint\dist\64\libmypaint-1-4-0.dll Opentoonz
 
-      # Install custom Qt 5.15.2 with WinTab support
-      - name: Install custom Qt 5.15.2 with WinTab support
-        run: |
-          @echo on
-          mkdir thirdparty\qt
-          curl -fsSL -o Qt5.15.2_wintab.zip https://github.com/shun-iwasawa/qt5/releases/download/v5.15.2_wintab/Qt5.15.2_wintab.zip
-          7z x Qt5.15.2_wintab.zip
-          move Qt5.15.2_wintab\5.15.2_wintab thirdparty\qt
-        shell: cmd
+        REM Copy OpenCV DLL (IMPORTANT: Update path/filename when upgrading OpenCV version)
+        copy /Y "C:\tools\opencv\build\x64\vc16\bin\opencv_world4130.dll" Opentoonz
 
-      - name: Install third-party prebuilt libs (LFS workaround)
-        run: |
-          @echo on
-          curl -fsSL -o thirdparty-libs.zip https://github.com/andeon/opentoonz-thirdparty-libs/releases/download/prebuilt-libs-v1/thirdparty-libs.zip
-          7z x -y thirdparty-libs.zip
-        shell: cmd
+        REM Deploy Qt dependencies
+        "%QT_PATH%\bin\windeployqt.exe" Opentoonz\Opentoonz.exe --opengl
 
-      # Add msbuild to PATH for build process
-      - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v3
 
-      # CMake configuration step
-      - name: CMake configuration
-        run: |
-          @echo on
-          cd thirdparty
-          copy /Y tiff-4.0.3\libtiff\tif_config.vc.h tiff-4.0.3\libtiff\tif_config.h
-          copy /Y tiff-4.0.3\libtiff\tiffconf.vc.h tiff-4.0.3\libtiff\tiffconf.h
-          copy /Y libpng-1.6.21\scripts\pnglibconf.h.prebuilt libpng-1.6.21\pnglibconf.h
+        del /Q Opentoonz\*.pdb  REM Remove .pdb files
+        del /Q Opentoonz\vc_redist.x64.exe REM Remove vc_redist.x64.exe file
 
-          cd ../toonz
-          rmdir /S /Q build
-          mkdir build
-          cd build
-
-          cmake ..\sources -G "%MSVCVERSION%" -Ax64 -DQT_PATH="%QT_PATH%" -DBOOST_ROOT="%BOOST_ROOT%" -DOpenCV_DIR="%OpenCV_DIR%" -DWITH_WINTAB=Y
-        shell: cmd
-
-      # Build Opentoonz using MSBuild
-      - name: Build Opentoonz
-        run: |
-          @echo on
-          cd toonz\build
-          msbuild /p:Configuration=RelWithDebInfo /m /verbosity:minimal ALL_BUILD.vcxproj
-        shell: cmd
-
-      # Create the package
-      - name: Create Package
-        run: |
-          @echo on
-          cd toonz\build
-
-          REM Create Opentoonz directory and copy files from RelWithDebInfo
-          mkdir Opentoonz
-          copy /Y RelWithDebInfo\*.* Opentoonz\
-          REM Copy required DLLs for proper functionality
-          copy /Y ..\..\thirdparty\glut\3.7.6\lib\glut64.dll Opentoonz
-          copy /Y ..\..\thirdparty\glew\glew-1.9.0\bin\64bit\glew32.dll Opentoonz
-          copy /Y ..\..\thirdparty\libmypaint\dist\64\libiconv-2.dll Opentoonz
-          copy /Y ..\..\thirdparty\libmypaint\dist\64\libintl-8.dll Opentoonz
-          copy /Y ..\..\thirdparty\libmypaint\dist\64\libjson-c-2.dll Opentoonz
-          copy /Y ..\..\thirdparty\libmypaint\dist\64\libmypaint-1-4-0.dll Opentoonz
-
-          REM Copy OpenCV DLL (IMPORTANT: Update path/filename when upgrading OpenCV version)
-          copy /Y "C:\tools\opencv\build\x64\vc16\bin\opencv_world4130.dll" Opentoonz
-
-          REM Deploy Qt dependencies
-          "%QT_PATH%\bin\windeployqt.exe" Opentoonz\Opentoonz.exe --opengl
-
-          REM Package the generated current-PR splash beside the application
-          copy /Y "%RUNNER_TEMP%\ot-dev-splash.svg" Opentoonz\ot-dev-splash.svg || exit /b 1
-          copy /Y "%RUNNER_TEMP%\ot-dev-splash-artwork.png" Opentoonz\ot-dev-splash-artwork.png || exit /b 1
-
-          del /Q Opentoonz\*.pdb  REM Remove .pdb files
-          del /Q Opentoonz\vc_redist.x64.exe REM Remove vc_redist.x64.exe file
-
-          REM Create portablestuff directory and copy stuff folder
-          mkdir Opentoonz\portablestuff
-          xcopy /Y /E /I ..\..\stuff .\Opentoonz\portablestuff
-        shell: cmd
-
-      # Create artifact from the build
-      - name: Create Artifact
-        run: |
-          mkdir artifact
-          xcopy toonz\build\Opentoonz artifact\ /E /H /Y
-        shell: cmd
-
-      # Upload the generated artifact
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v6
-        with:
-          name: OT-Dev-PR-${{ steps.pr.outputs.number }}-${{ runner.os }}-${{ steps.pr.outputs.merge_sha }}
-          path: artifact
+        REM Create portablestuff directory and copy stuff folder
+        mkdir Opentoonz\portablestuff
+        xcopy /Y /E /I ..\..\stuff .\Opentoonz\portablestuff
+      shell: cmd
+    - name: Package and verify the complete OT-Dev build
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = 'Stop'
+        python .otdev-infrastructure/.github/ot-dev/package_build.py --package toonz/build/Opentoonz --branding-dir "$env:RUNNER_TEMP/otdev-branding" --encoder-dir recorder-encoder --source-sha $env:OTDEV_SOURCE_SHA --infrastructure-sha $env:OTDEV_INFRASTRUCTURE_SHA --build-id $env:OTDEV_BUILD_ID --event-path "$env:RUNNER_TEMP/otdev-request/source-event.json" --event-name $env:OTDEV_EVENT_NAME --ref-name $env:OTDEV_SOURCE_REF --request-manifest "$env:RUNNER_TEMP/otdev-request/source-manifest.json" --manifest-output "$env:RUNNER_TEMP/otdev-build.json"
+        if ($LASTEXITCODE) { throw 'Complete OT-Dev package verification failed' }
+    - name: Upload the complete Windows package
+      uses: actions/upload-artifact@v6
+      with:
+        name: ${{ needs.Resolve.outputs.artifact_name }}
+        path: toonz/build/Opentoonz
+        if-no-files-found: error
+    - name: Publish the verified package manifest
+      uses: actions/upload-artifact@v6
+      with:
+        name: OT-Dev-package-manifest-${{ github.run_id }}
+        path: ${{ runner.temp }}/otdev-build.json
+        if-no-files-found: error
+    - name: Explain the replaceable artwork layout
+      shell: pwsh
+      run: |
+        @'
+        ## Complete OT-Dev Windows package
+        The application artifact includes OT-Dev title and build information, the session recorder, and the replaceable splash artwork.
+        Replace `portablestuff/splash.png` to change the artwork. `splash.svg` stays unchanged and retains the PR/build metadata.
+        The package's `otdev-build.json` records the application and infrastructure revisions.
+        '@ >> $env:GITHUB_STEP_SUMMARY
+  Report:
+    needs:
+    - Resolve
+    - Windows
+    if: always() && needs.Resolve.outputs.build == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      statuses: write
+    steps:
+    - name: Publish the Windows package result on the source commit
+      env:
+        GH_TOKEN: ${{ github.token }}
+        SOURCE_HEAD: ${{ needs.Resolve.outputs.head_sha }}
+        BUILD_RESULT: ${{ needs.Windows.result }}
+      run: |
+        run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+        current_url=$(gh api "repos/$GITHUB_REPOSITORY/commits/$SOURCE_HEAD/status" --jq '.statuses[] | select(.context == "OT-Dev Windows package") | .target_url')
+        if [ "$current_url" != "$run_url" ]; then
+          echo "A newer package request owns the commit status; keeping its result."
+          exit 0
+        fi
+        if [ "$BUILD_RESULT" = success ]; then
+          state=success
+          description="Complete OT-Dev Windows package available"
+        else
+          state=failure
+          description="OT-Dev Windows package did not complete"
+        fi
+        gh api --method POST "repos/$GITHUB_REPOSITORY/statuses/$SOURCE_HEAD" -f state="$state" -f context="OT-Dev Windows package" -f description="$description" -f target_url="$run_url"

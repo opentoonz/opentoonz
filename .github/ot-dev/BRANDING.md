@@ -1,48 +1,140 @@
-# OT-Dev build branding
+# OT-Dev Windows build branding
 
-## Active splash
+OT-Dev Windows application packages include the splash, live PR/build information
+in the title bar, and the session recorder. The overlay applies only in Windows
+CI; Linux, macOS, clean upstream source, and standalone CLI/test builds keep
+their existing behavior.
 
-`splash-template-area10.svg` contains the OT-Dev title, live PR/build fields,
-and a relative image link to `ot-dev-splash-artwork.png`. The PNG is the original
-artwork supplied by Rodney Baker. The complete image appears above the metadata
-footer, without cropping. The splash fits within 610 by 480 logical pixels.
+## Replace the artwork without editing the SVG
 
-The build populates the PR number/title, description, UTC date, and actual
-checkout commit. Branch builds show the ref instead. All seven original fields
+| Package path | Purpose |
+| --- | --- |
+| `OpenToonz.exe` | Application with the title-bar label and recorder |
+| `splash.svg` | Stable layout with populated PR/build text |
+| `portablestuff/splash.png` | Replaceable artwork at the root of `portablestuff` |
+| `otdev-recorder/` | Encoder, matching sources, licenses, and README |
+| `otdev-build.json` | Verified source, infrastructure, and package identity |
+
+Replace **`portablestuff/splash.png`** with a valid PNG and restart OpenToonz.
+No SVG edit or rebuild is needed. The fixed image reference in `splash.svg` is
+`portablestuff/splash.png`, resolved relative to the SVG beside the executable.
+The launch working directory does not affect it. CI copies the PNG after the
+ordinary `stuff` files so those files cannot overwrite the selected artwork.
+
+For future builds, replace `.github/ot-dev/ot-dev-splash-artwork.png`; CI installs
+it as `portablestuff/splash.png`. Edit `splash-template-area10.svg` only when
+changing the layout or templating. The original artwork was supplied by Rodney
+Baker. It appears above the metadata footer without cropping, within 610 by 480
+logical pixels.
+
+CI populates the PR number/title, description, UTC date, and actual compiled
+checkout commit. Branch builds identify their ref. All seven original fields
 and the two wrapped heading fields remain available. XML escaping happens once.
+The compiled splash embeds the same PNG and metadata as a self-contained
+fallback when either external file is missing. Replacing the external PNG
+retains the SVG's build information. Older downloads need a fresh build to
+acquire this layout.
 
-The package contains **both** `ot-dev-splash.svg` and
-`ot-dev-splash-artwork.png` beside the executable. To change the artwork in a
-local build, replace that PNG with a valid PNG under the same name and restart.
-To change future CI builds, replace `.github/ot-dev/ot-dev-splash-artwork.png`.
-The SVG layout and its PR data remain separate from the image.
+Preserved designs remain in `splash-template-assembly-line.svg` and
+`splash-template-legacy.svg`, renderable explicitly with `--template` for
+reference. Complete Windows packages require the active template and fixed PNG
+location. Keep these OT-Dev assets out of upstream feature proposals.
 
-The compiled splash embeds the same PNG as base64, together with the same live
-metadata. The build-only startup overlay uses this self-contained resource if
-the external SVG or PNG is missing. Both files are uploaded as a review artifact.
-The older `splash.svg` cannot mask the OT-Dev splash. Source overlays are applied
-only in the CI working tree and do not change the clean upstream source.
+## Automatic Windows coverage
 
-Preserved designs: `splash-template-assembly-line.svg` and
-`splash-template-legacy.svg`. Select one explicitly with `--template` to render
-an archived design. Keep these OT-Dev assets out of upstream feature proposals.
+`workflow_windows.yml` applies the full overlay directly when its branch
+contains this infrastructure. Existing PR-specific tests still run. After
+copying the application and `stuff`, `package_build.py` verifies the compiled
+title, build ID, recorder, SVG/PNG, and encoder distribution before publication.
 
-Both `main` and `edition` need this infrastructure update for their ordinary
-PR builds. Merging one branch's PR does not update the other branch's builds.
-Existing downloads require a fresh build for the new template and startup path.
+**OT-Dev Windows Package** (`otdev_branding.yml`) also follows successful
+completion of the existing application workflows:
 
-## Branded builds of upstream-based PRs
+| Source workflow | Coverage |
+| --- | --- |
+| `Windows Build` (`workflow_windows.yml`) | Clean upstream-based PRs, older main/Edition PRs, and branch builds |
+| `OT-Dev Branded PR Build` (`otdev_branding.yml`, older revisions) | Existing dedicated PR build refs |
+| `Channel Stack Preview (Windows)` (`channel_stack_preview.yml`) | The existing combined channel preview |
 
-`otdev_branding.yml` is maintained on `edition`. Create a branch **from edition**
-named **otdev-build/pr-NUMBER**, such as `otdev-build/pr-259`. A suffix such as
-`otdev-build/pr-259-20261019` requests a fresh build with current metadata.
-Branch creation and pushes trigger it. No extra PR is needed for build refs.
+The source workflow performs its own validation first. If it publishes both a
+new-format complete application package and
+`OT-Dev-package-manifest-SOURCE_RUN_ID`, the follow-up skips the duplicate build.
+Otherwise it builds a complete OT-Dev package from that successful run's exact
+application source, with build infrastructure checked out separately. Old
+splash-only artifact names do not count as completion.
 
-The job fetches current PR metadata and its test merge SHA, checks out that
-exact source, and loads branding assets from its workflow revision. It uploads
-the application and the SVG/PNG review pair. A conflicted or closed PR is
-rejected. The PR source and clean upstream mirror stay intact.
+For PRs, the resolver checks the artifact's source SHA against the current test
+merge and its exact base/head parents. Closed, conflicted, stale, or ambiguous
+PR runs are skipped. A fresh source run or manual request builds the current PR.
+Branch and channel-stack builds retain their source ref and commit instead of
+being presented as a single PR. The **OT-Dev Windows package** commit status
+links to the follow-up result.
 
-Validation: `python -m unittest discover -s .github/ot-dev -p test_brand_build.py -v`.
-Artwork supplied by Rodney Baker. SVG layout and build implementation assisted
-by OpenAI Codex. OT-Dev title and live metadata remain SVG text.
+Download the complete application artifact:
+
+- `OT-Dev-PR-N-Windows-SOURCE_SHA-RUN_ID`
+- `OT-Dev-Branch-REF-Windows-SOURCE_SHA-RUN_ID`
+
+Ordinary branch builds use `Branch-build` in the name and record the actual ref
+in `otdev-build.json`. Encoder, branding, and manifest artifacts are supporting
+files. Original source-validation runs and artifacts remain available;
+historical downloads are not rewritten. Existing PR heads, bases, and
+specialized tests are preserved.
+
+### Default-branch requirement
+
+Maintain this infrastructure on `edition` and make `edition` the repository
+default **after merging and validating the workflow**. GitHub starts a
+[`workflow_run` listener](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#workflow_run)
+only when its file exists on the default branch. Merging it into a non-default
+branch alone does not activate automatic coverage.
+
+Keep `upstream/master` an exact upstream mirror. New feature proposals still
+choose `upstream/master` explicitly as their base, as described in
+`CONTRIBUTING.md`; changing the default does not retarget existing PRs. Updating
+`main` with this infrastructure avoids a follow-up rebuild, but the listener
+also covers its older workflows.
+
+Compilation and recorder-test jobs use read-only repository permissions,
+persist no checkout credentials, and receive no repository secrets. They run
+separately from jobs that publish status. The new worker name differs from the
+observed source names, preventing a loop.
+
+## Manual requests and infrastructure validation
+
+Use **Actions → OT-Dev Windows Package → Run workflow**, select the infrastructure
+branch, and supply exactly one input: `pr_number` for an open OT-Dev PR, or `ref`
+for a branch/commit.
+
+The existing build-ref route also works. Create a branch from the desired
+infrastructure revision named `otdev-build/pr-NUMBER`, optionally with a suffix
+such as `otdev-build/pr-279-branding-test`. Creation and pushes resolve the PR's
+current merge separately from the build-ref commit. This tests unmerged
+infrastructure without changing PR source. The unused reusable-workflow entry
+point is removed; use these explicit request routes.
+
+## Verification
+
+Run the tests with Qt 5.15.2 and CMake available:
+
+```sh
+python -m pip install PyQt5==5.15.2
+QT_QPA_PLATFORM=offscreen python -m unittest discover -s .github/ot-dev -p 'test_*.py' -v
+python -m unittest discover -s .github/ot-dev/recorder -p 'test_*.py' -v
+actionlint .github/workflows/workflow_windows.yml .github/workflows/otdev_branding.yml
+```
+
+The Qt regression renders from an unrelated working directory, replaces only
+the PNG, and verifies that the artwork changes while the SVG bytes and rendered
+metadata stay unchanged. It also renders the embedded fallback without the
+external PNG. Resolver tests cover source identity, stale merges, pagination,
+and duplicate prevention. Package tests reject incomplete branding/recorder
+distributions. Recorder tests check external paths with the real CMake parser.
+
+Windows CI additionally compiles and tests recorder consent, capture, encoding,
+and native playback, builds OpenToonz, checks its compiled markers, and launches
+the packaged encoder. Recording retains its existing consent behavior.
+
+Artwork and requirements: Rodney Baker. Existing SVG/build work: OpenAI Codex
+assistance. This Windows coverage and replaceable-PNG update: GPT-6 Astra Pro
+assistance.

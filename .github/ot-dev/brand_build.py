@@ -15,10 +15,11 @@ import xml.etree.ElementTree as ET
 TOKEN = re.compile(r"\{\{([A-Z_0-9]+)\}\}")
 TITLE_ANCHOR = 'QString::fromStdString(TEnv::getApplicationFullName());'
 SPLASH_ANCHOR = 'QDir(exeDir).filePath("splash.svg")'
-SPLASH_FILENAME = "ot-dev-splash.svg"
+SPLASH_FILENAME = "splash.svg"
 TEMPLATE_NAME = "splash-template-area10.svg"
 ARTWORK_FILENAME = "ot-dev-splash-artwork.png"
-ARTWORK_LINK = f'xlink:href="{ARTWORK_FILENAME}"'
+ARTWORK_RELATIVE_PATH = "portablestuff/splash.png"
+ARTWORK_LINK = f'xlink:href="{ARTWORK_RELATIVE_PATH}"'
 
 
 def plain_text(value):
@@ -102,7 +103,7 @@ def brand_window(source, label):
 def brand_startup(source, external_png=False):
     if source.count(SPLASH_ANCHOR) != 1:
         raise ValueError("Unable to locate the external OpenToonz splash path")
-    # A legacy splash.svg beside an updated executable must not hide this build.
+    # Resolve both replaceable assets from the executable, not the working directory.
     source = source.replace(SPLASH_ANCHOR,
                             f'QDir(exeDir).filePath("{SPLASH_FILENAME}")')
     if external_png:
@@ -112,7 +113,7 @@ def brand_startup(source, external_png=False):
             raise ValueError("Unable to locate the OpenToonz splash loading block")
         # If only the executable is copied, use its self-contained resource.
         source = source.replace(check, "QFileInfo(localSplashPath).isFile() &&\n"
-                                f'      QFileInfo(QDir(exeDir).filePath("{ARTWORK_FILENAME}")).isFile())')
+                                f'      QFileInfo(QDir(exeDir).filePath("{ARTWORK_RELATIVE_PATH}")).isFile())')
         # Keep the complete 4:3 artwork and the metadata footer readable.
         source = source.replace(size, "QSize(610, 480)")
     return source
@@ -150,7 +151,8 @@ def main():
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(svg, encoding="utf-8")
     if external_png:
-        packaged_artwork = args.output.with_name(ARTWORK_FILENAME)
+        packaged_artwork = args.output.parent / ARTWORK_RELATIVE_PATH
+        packaged_artwork.parent.mkdir(parents=True, exist_ok=True)
         if artwork.resolve() != packaged_artwork.resolve():
             shutil.copyfile(artwork, packaged_artwork)
     print("Window title branding:", fields["BUILD_LABEL"])

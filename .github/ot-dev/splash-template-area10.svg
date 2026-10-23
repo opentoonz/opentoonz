@@ -3,13 +3,14 @@
      width="1440" height="1320" viewBox="0 0 1440 1320"
      role="img" aria-labelledby="title desc" data-otdev-artwork="area10">
   <!-- OT-Dev infrastructure only. Artwork supplied by Rodney Baker.
-       Replace ot-dev-splash-artwork.png to update the image. The renderer embeds
-       the PNG into the compiled fallback and retains this link in the runtime SVG. -->
+       Replace portablestuff/splash.png to update the local artwork without editing
+       this SVG. The renderer embeds the PNG into the compiled fallback and retains
+       this fixed link in the runtime SVG. -->
   <title id="title">{{BUILD_LABEL}}</title>
   <desc id="desc">{{DESCRIPTION}}</desc>
   <rect width="1440" height="1320" fill="#122b3d"/>
   <image id="artwork" x="0" y="0" width="1440" height="1080"
-         preserveAspectRatio="xMidYMid meet" xlink:href="ot-dev-splash-artwork.png"/>
+         preserveAspectRatio="xMidYMid meet" xlink:href="portablestuff/splash.png"/>
   <path d="M0 1080 H1440" stroke="#efc762" stroke-width="6"/>
   <g font-family="DejaVu Sans, Segoe UI, sans-serif">
     <text x="40" y="1152" fill="#fff4d8" font-size="70" font-weight="700">OT-DEV</text>

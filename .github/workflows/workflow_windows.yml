@@ -49,8 +49,12 @@ jobs:
         with:
           persist-credentials: false
           sparse-checkout: .github/ot-dev
-      - name: Test SVG template substitution and window branding
-        run: python3 -m unittest discover -s .github/ot-dev -p test_brand_build.py -v
+      - name: Install Qt 5.15.2 for the replaceable artwork regression
+        run: python3 -m pip install PyQt5==5.15.2
+      - name: Test branding, build selection, and package validation
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python3 -m unittest discover -s .github/ot-dev -p 'test_*.py' -v
 
   RecorderEncoder:
     if: github.repository == 'OpenAnimationLibrary/opentoonz-dev'
@@ -59,6 +63,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           lfs: false
+          persist-credentials: false
           sparse-checkout: .github/ot-dev/recorder
       - uses: actions/cache@v5
         id: recorder-cache
@@ -116,6 +121,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           lfs: false
+          persist-credentials: false
 
       - name: Inject OT-Dev recorder (Windows CI only)
         shell: pwsh
@@ -137,15 +143,15 @@ jobs:
         run: |
           $checkoutSha = git rev-parse HEAD
           if ($LASTEXITCODE) { throw 'Unable to identify the checked-out commit' }
-          python .github/ot-dev/brand_build.py --template .github/ot-dev/splash-template-area10.svg --output "$env:RUNNER_TEMP/ot-dev-splash.svg" --source-root . --sha $checkoutSha
+          python .github/ot-dev/brand_build.py --template .github/ot-dev/splash-template-area10.svg --output "$env:RUNNER_TEMP/otdev-branding/splash.svg" --source-root . --sha $checkoutSha
           if ($LASTEXITCODE) { throw 'OT-Dev branding failed' }
       - name: Upload populated SVG and PNG for review
         uses: actions/upload-artifact@v6
         with:
           name: OT-Dev-branding-${{ github.run_id }}
           path: |
-            ${{ runner.temp }}/ot-dev-splash.svg
-            ${{ runner.temp }}/ot-dev-splash-artwork.png
+            ${{ runner.temp }}/otdev-branding/splash.svg
+            ${{ runner.temp }}/otdev-branding/portablestuff/splash.png
           if-no-files-found: error
 
       # Cache OpenCV and Boost libraries
@@ -306,10 +312,6 @@ jobs:
           REM Deploy Qt dependencies
           "%QT_PATH%\bin\windeployqt.exe" Opentoonz\Opentoonz.exe --opengl
 
-          REM Add generated OT-Dev-only build manifest/artwork beside OpenToonz.exe
-          copy /Y "%RUNNER_TEMP%\ot-dev-splash.svg" Opentoonz\ot-dev-splash.svg || exit /b 1
-          copy /Y "%RUNNER_TEMP%\ot-dev-splash-artwork.png" Opentoonz\ot-dev-splash-artwork.png || exit /b 1
-
           del /Q Opentoonz\*.pdb  REM Remove .pdb files
           del /Q Opentoonz\vc_redist.x64.exe REM Remove vc_redist.x64.exe file
           
@@ -340,16 +342,16 @@ jobs:
           del threepointlightfx_test.exe
           del transform3dfx_test.exe
 
-      - name: Package OT-Dev recorder and matching FFmpeg sources
+      - name: Package and verify the complete OT-Dev build
         shell: pwsh
+        env:
+          OTDEV_SOURCE_SHA: ${{ github.sha }}
+          OTDEV_INFRASTRUCTURE_SHA: ${{ github.sha }}
+          OTDEV_BUILD_ID: ${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
         run: |
           $ErrorActionPreference = 'Stop'
-          $destination = 'toonz/build/Opentoonz/otdev-recorder'
-          New-Item -ItemType Directory -Path $destination -Force | Out-Null
-          Copy-Item recorder-encoder/* $destination -Recurse
-          Copy-Item .github/ot-dev/recorder/README.md $destination
-          & "$destination/ffmpeg.exe" -version
-          if ($LASTEXITCODE) { throw 'Packaged recorder encoder does not launch' }
+          python .github/ot-dev/package_build.py --package toonz/build/Opentoonz --branding-dir "$env:RUNNER_TEMP/otdev-branding" --encoder-dir recorder-encoder --source-sha $env:OTDEV_SOURCE_SHA --infrastructure-sha $env:OTDEV_INFRASTRUCTURE_SHA --build-id $env:OTDEV_BUILD_ID --manifest-output "$env:RUNNER_TEMP/otdev-build.json"
+          if ($LASTEXITCODE) { throw 'Complete OT-Dev package verification failed' }
 
       # Create artifact from the build
       - name: Create Artifact
@@ -362,5 +364,13 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v6
         with:
-          name: Opentoonz-${{ runner.os }}-${{ github.sha }}
+          name: OT-Dev-${{ github.event.pull_request.number && format('PR-{0}', github.event.pull_request.number) || 'Branch-build' }}-Windows-${{ github.sha }}-${{ github.run_id }}
           path: artifact
+          if-no-files-found: error
+
+      - name: Publish the verified package manifest
+        uses: actions/upload-artifact@v6
+        with:
+          name: OT-Dev-package-manifest-${{ github.run_id }}
+          path: ${{ runner.temp }}/otdev-build.json
+          if-no-files-found: error

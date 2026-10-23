@@ -1,15 +1,24 @@
 import unittest
 import base64
 import json
+import os
 from pathlib import Path
+import struct
 import subprocess
 import sys
 import tempfile
 import xml.etree.ElementTree as ET
+import zlib
 
-from brand_build import (ARTWORK_FILENAME, ARTWORK_LINK, SPLASH_ANCHOR,
+from brand_build import (ARTWORK_FILENAME, ARTWORK_LINK, ARTWORK_RELATIVE_PATH, SPLASH_ANCHOR,
                          SPLASH_FILENAME, TEMPLATE_NAME, TITLE_ANCHOR,
                          brand_startup, brand_window, embed_artwork, fields_for, render)
+
+try:
+    from PyQt5.QtGui import QGuiApplication, QImage, QPainter
+    from PyQt5.QtSvg import QSvgRenderer
+except ImportError:
+    QSvgRenderer = None
 
 STARTUP = SPLASH_ANCHOR + ''';
 if (QFileInfo(localSplashPath).exists() && QFileInfo(localSplashPath).isFile()) {
@@ -21,6 +30,17 @@ if (QFileInfo(localSplashPath).exists() && QFileInfo(localSplashPath).isFile()) 
   splashPixmap = QIcon(":Resources/splash.svg").pixmap(QSize(610, 344));
 }
 '''
+
+
+def solid_png(red, green, blue):
+    def chunk(kind, payload):
+        return (struct.pack(">I", len(payload)) + kind + payload +
+                struct.pack(">I", zlib.crc32(kind + payload) & 0xffffffff))
+
+    rows = (b"\0" + bytes((red, green, blue)) * 4) * 3
+    return (b"\x89PNG\r\n\x1a\n" +
+            chunk(b"IHDR", struct.pack(">IIBBBBB", 4, 3, 8, 2, 0, 0, 0)) +
+            chunk(b"IDAT", zlib.compress(rows)) + chunk(b"IEND", b""))
 
 
 class BrandingTest(unittest.TestCase):
@@ -88,12 +108,17 @@ class BrandingTest(unittest.TestCase):
 
     def test_png_startup_requires_image_or_uses_embedded_fallback(self):
         startup = brand_startup(STARTUP, external_png=True)
-        self.assertIn(f'filePath("{ARTWORK_FILENAME}")).isFile()', startup)
+        self.assertIn(f'QDir(exeDir).filePath("{SPLASH_FILENAME}")', startup)
+        self.assertIn(f'QDir(exeDir).filePath("{ARTWORK_RELATIVE_PATH}")).isFile()', startup)
         self.assertEqual(startup.count("QSize(610, 480)"), 3)
-        with self.assertRaises(ValueError):
-            brand_startup(SPLASH_ANCHOR, external_png=True)
+        for changed_source in (SPLASH_ANCHOR,
+                               STARTUP.replace(SPLASH_ANCHOR, '"changed path"'),
+                               STARTUP.replace("QFileInfo(localSplashPath).isFile()", "changedCheck()"),
+                               STARTUP.replace("QSize(610, 344)", "QSize(610, 300)", 1)):
+            with self.subTest(source=changed_source), self.assertRaises(ValueError):
+                brand_startup(changed_source, external_png=True)
 
-    def test_cli_uses_new_artwork_despite_existing_legacy_splash(self):
+    def test_cli_packages_replaceable_png_with_fixed_svg_metadata(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             source = root / "toonz/sources/toonz"
@@ -102,38 +127,104 @@ class BrandingTest(unittest.TestCase):
             (source / "main.cpp").write_text(STARTUP, encoding="utf-8")
             compiled = source / "Resources/splash.svg"
             compiled.write_text("old compiled splash", encoding="utf-8")
-            legacy = root / "splash.svg"
-            legacy.write_text("old external splash", encoding="utf-8")
             event = root / "event.json"
             event.write_text(json.dumps({"pull_request": {
                 "number": 260, "title": "Current PR & new artwork", "body": "Live metadata"
             }}), encoding="utf-8")
-            output = root / SPLASH_FILENAME
+            output = root / "package" / SPLASH_FILENAME
             subprocess.run([sys.executable, str(Path(__file__).with_name("brand_build.py")),
                             "--output", str(output), "--source-root", str(root),
                             "--event-path", str(event), "--event-name", "pull_request",
                             "--sha", "abcdef123456"], check=True, capture_output=True)
             svg = output.read_text(encoding="utf-8")
             artwork = Path(__file__).with_name(ARTWORK_FILENAME).read_bytes()
-            self.assertEqual(output.with_name(ARTWORK_FILENAME).read_bytes(), artwork)
+            packaged_artwork = output.parent / ARTWORK_RELATIVE_PATH
+            self.assertEqual(output.name, "splash.svg")
+            self.assertEqual(packaged_artwork.relative_to(output.parent).as_posix(),
+                             "portablestuff/splash.png")
+            self.assertEqual(packaged_artwork.read_bytes(), artwork)
+            self.assertFalse(output.with_name(ARTWORK_FILENAME).exists())
             runtime_root = ET.fromstring(svg)
             compiled_root = ET.fromstring(compiled.read_text(encoding="utf-8"))
             image_tag = "{http://www.w3.org/2000/svg}image"
             href = "{http://www.w3.org/1999/xlink}href"
-            self.assertEqual(runtime_root.find(image_tag).get(href), ARTWORK_FILENAME)
+            self.assertEqual(runtime_root.find(image_tag).get(href), "portablestuff/splash.png")
             data = compiled_root.find(image_tag).get(href)
             self.assertTrue(data.startswith("data:image/png;base64,"))
             self.assertEqual(base64.b64decode(data.split(",", 1)[1]), artwork)
             for tag in ("title", "desc"):
                 name = "{http://www.w3.org/2000/svg}" + tag
                 self.assertEqual(runtime_root.findtext(name), compiled_root.findtext(name))
-            self.assertEqual(legacy.read_text(encoding="utf-8"), "old external splash")
             self.assertIn(f'filePath("{SPLASH_FILENAME}")',
                           (source / "main.cpp").read_text(encoding="utf-8"))
             self.assertEqual(runtime_root.get("data-otdev-artwork"), "area10")
             self.assertIn("PR #260", svg)
             self.assertIn("abcdef1", svg)
             self.assertNotIn("{{", svg)
+
+            # Artwork replacement never invokes the generator or edits build metadata.
+            original_svg = output.read_bytes()
+            original_compiled = compiled.read_bytes()
+            replacement = solid_png(15, 90, 240)
+            packaged_artwork.write_bytes(replacement)
+            self.assertEqual((output.parent / runtime_root.find(image_tag).get(href)).read_bytes(),
+                             replacement)
+            self.assertEqual(output.read_bytes(), original_svg)
+            self.assertEqual(compiled.read_bytes(), original_compiled)
+
+    @unittest.skipUnless(QSvgRenderer is not None, "Qt5 SVG bindings are not installed")
+    def test_qt5_renders_replaced_png_without_svg_changes(self):
+        os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+        app = QGuiApplication.instance() or QGuiApplication([])
+        self.assertIsNotNone(app)
+
+        def rendered(path):
+            renderer = QSvgRenderer(str(path))
+            self.assertTrue(renderer.isValid())
+            image = QImage(1440, 1320, QImage.Format_ARGB32_Premultiplied)
+            image.fill(0)
+            painter = QPainter(image)
+            renderer.render(painter)
+            painter.end()
+            return image
+
+        def pixels(image):
+            return image.constBits().asstring(image.byteCount())
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            artwork = root / ARTWORK_RELATIVE_PATH
+            artwork.parent.mkdir()
+            artwork.write_bytes(solid_png(230, 40, 20))
+            template = Path(__file__).with_name(TEMPLATE_NAME).read_text(encoding="utf-8")
+            fields = fields_for({"pull_request": {"number": 260, "title": "Replace artwork",
+                                                  "body": "Keep PR metadata intact."}},
+                                "pull_request", "abcdef123456", "260/merge")
+            svg = root / SPLASH_FILENAME
+            svg.write_text(render(template, fields), encoding="utf-8")
+            fallback = root / "embedded-fallback.svg"
+            fallback.write_text(render(embed_artwork(template, artwork), fields), encoding="utf-8")
+            original_svg = svg.read_bytes()
+            original_fallback = fallback.read_bytes()
+            unrelated = root / "unrelated-working-directory"
+            unrelated.mkdir()
+            previous_directory = Path.cwd()
+            try:
+                os.chdir(unrelated)
+                first = rendered(svg)
+                self.assertEqual(first.pixelColor(720, 540).getRgb(), (230, 40, 20, 255))
+                self.assertEqual(pixels(first), pixels(rendered(fallback)))
+                artwork.write_bytes(solid_png(15, 90, 240))
+                replacement = rendered(svg)
+                self.assertEqual(replacement.pixelColor(720, 540).getRgb(), (15, 90, 240, 255))
+                self.assertEqual(pixels(first.copy(0, 1080, 1440, 240)),
+                                 pixels(replacement.copy(0, 1080, 1440, 240)))
+                self.assertEqual(svg.read_bytes(), original_svg)
+                self.assertEqual(fallback.read_bytes(), original_fallback)
+                artwork.unlink()
+                self.assertEqual(pixels(first), pixels(rendered(fallback)))
+            finally:
+                os.chdir(previous_directory)
 
 
 if __name__ == "__main__":
