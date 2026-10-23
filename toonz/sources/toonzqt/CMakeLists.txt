@@ -81,6 +81,7 @@ set(HEADERS
     docklayout.h
     functionpaneltools.h
     fxdata.h
+    lutfileparamfield.h
     palettedata.h
     plugin_fxnode_interface.h
     plugin_port_interface.h
@@ -142,6 +143,7 @@ set(SOURCES
     paletteviewer.cpp
     paletteviewergui.cpp
     paramfield.cpp
+    lutfileparamfield.cpp
     planeviewer.cpp
     popupbutton.cpp
     rasterimagedata.cpp

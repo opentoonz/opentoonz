@@ -40,6 +40,7 @@ set(HEADERS
     cleanupcommon.h
     cleanuppalette.h
     imagebuilders.h
+    ../include/toonz/lut3d.h
     skeletonlut.h
     tcenterlinevectP.h
     texturemanager.h
@@ -200,6 +201,7 @@ set(SOURCES
     levelproperties.cpp
     levelset.cpp
     levelupdater.cpp
+    lut3d.cpp
     logger.cpp
     movierenderer.cpp
     multimediarenderer.cpp

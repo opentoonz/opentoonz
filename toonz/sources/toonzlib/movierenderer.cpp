@@ -535,6 +535,7 @@ void MovieRenderer::Imp::doRenderRasterCompleted(const RenderData &renderData) {
            m_levelUpdaterB.get()));  // Cannot cache results on stereoscopy
 
   QMutexLocker locker(&m_mutex);
+  if (m_failure || m_renderer.isAborted(renderData.m_renderId)) return;
 
   bool allowMT    = Preferences::instance()->getFfmpegMultiThread();
   bool requireSeq = allowMT ? m_seqRequired : m_movieType;
@@ -636,6 +637,8 @@ void MovieRenderer::Imp::doRenderRasterCompleted(const RenderData &renderData) {
       savedFrame = saveFrame(frame, rasters);
     }
 
+    if (m_failure || m_renderer.isAborted(renderData.m_renderId)) return;
+
     // Report status and deal with responses
     bool okToContinue = true;
 
@@ -669,10 +672,8 @@ void MovieRenderer::Imp::doRenderRasterCompleted(const RenderData &renderData) {
       }
 
       m_renderer.stopRendering();
-
-      m_levelUpdaterA
-          .reset();  // No more saving. Further attempts to save images
-      m_levelUpdaterB.reset();  // will be rejected and treated as failures.
+      m_toBeSaved.clear();
+      return;
     }
   }
 
@@ -688,6 +689,7 @@ void MovieRenderer::Imp::doPreviewRasterCompleted(
   assert(!m_levelUpdaterA.get());
 
   QMutexLocker sl(&m_mutex);
+  if (m_failure || m_renderer.isAborted(renderData.m_renderId)) return;
 
   QString name = getPreviewName(m_renderSessionId);
 
@@ -752,64 +754,26 @@ void MovieRenderer::Imp::doPreviewRasterCompleted(
 
 void MovieRenderer::Imp::onRenderFailure(const RenderData &renderData,
                                          TException &e) {
-  QMutexLocker sl(&m_mutex);  // Lock as soon as possible.
-                              // No sense making it later in this case!
+  QMutexLocker sl(&m_mutex);
+  if (m_failure || m_renderer.isAborted(renderData.m_renderId)) return;
   m_failure = true;
+  m_toBeSaved.clear();
 
-  bool allowMT    = Preferences::instance()->getFfmpegMultiThread();
-  bool requireSeq = allowMT ? m_seqRequired : m_movieType;
+  const double stretchFac = double(renderData.m_info.m_timeStretchTo) /
+                            renderData.m_info.m_timeStretchFrom;
+  const int frame = tround(renderData.m_frames.front() * stretchFac);
+  for (auto listener : m_listeners) listener->onFrameFailed(frame, e);
 
-  // If the saver object has already been destroyed - or it was never
-  // created to begin with, nothing to be done
-  if (!m_levelUpdaterA.get()) return;  // The preview case would fall here
-
-  // Flush out as much as we can of the frames that were already rendered
-  m_toBeSaved[0.0] =
-      std::make_pair(TRasterP(), TRasterP());  // ?? Why is this ??
-
-  std::map<double, std::pair<TRasterP, TRasterP>>::iterator it =
-      m_toBeSaved.begin();
-  while (it != m_toBeSaved.end()) {
-    if (requireSeq &&
-        (it->first != m_framesToBeRendered[m_nextFrameIdxToSave].first))
-      break;
-
-    // o_o!
-    // I would have expected that at least those frames that were computed could
-    // attempt saving! Why is this not addressed? They're even marked as
-    // 'failed'!
-
-    double stretchFac = (double)renderData.m_info.m_timeStretchTo /
-                        renderData.m_info.m_timeStretchFrom;
-
-    int fr;
-    if (stretchFac != 1)
-      fr = tround(it->first * stretchFac);
-    else
-      fr = (int)it->first;
-
-    // No saving? Really?
-
-    std::set<MovieRenderer::Listener *>::iterator lt = m_listeners.begin();
-    bool okToContinue                                = true;
-
-    for (; lt != m_listeners.end(); ++lt)
-      okToContinue &= (*lt)->onFrameFailed((int)it->first, e);
-
-    if (!okToContinue) m_renderer.stopRendering();
-
-    ++m_nextFrameIdxToSave;
-    m_toBeSaved.erase(it++);
-  }
+  // Cancel the remaining tasks after reporting the original error once.
+  m_renderer.stopRendering();
 }
 
 //---------------------------------------------------------
 
 void MovieRenderer::Imp::onRenderFinished(bool isCanceled) {
-  TFilePath levelName(
-      m_levelUpdaterA.get()
-          ? m_fp
-          : TFilePath(getPreviewName(m_renderSessionId).toStdWString()));
+  const TFilePath levelName(
+      m_preview ? TFilePath(getPreviewName(m_renderSessionId).toStdWString())
+                : m_fp);
 
   if (m_waitAfterFinish) {
     // Wait half a second to add some stability before finalizing
@@ -823,15 +787,10 @@ void MovieRenderer::Imp::onRenderFinished(bool isCanceled) {
   // Close updaters. After this, the output levels should be finalized on disk.
   m_levelUpdaterA.reset();
   m_levelUpdaterB.reset();
+  m_toBeSaved.clear();
 
-  if (!m_failure) {
-    // Inform listeners of the render completion
-    std::set<MovieRenderer::Listener *>::iterator it;
-    for (it = m_listeners.begin(); it != m_listeners.end(); ++it)
-      (*it)->onSequenceCompleted(levelName);
-
-    // I wonder why listeners are not informed of a failed sequence, btw...
-  }
+  // Completion also releases listener state after failure or cancellation.
+  for (auto listener : m_listeners) listener->onSequenceCompleted(levelName);
 
   release();  // The movieRenderer is released by the render process. It could
               // eventually be deleted.

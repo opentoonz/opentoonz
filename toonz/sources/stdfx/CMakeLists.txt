@@ -130,6 +130,7 @@ set(SOURCES
     linearwavefx.cpp
     localblurfx.cpp
     localtransparencyfx.cpp
+    lut3dbakefx.cpp
     mosaicfx.cpp
     motionblurfx.cpp
     multitonefx.cpp

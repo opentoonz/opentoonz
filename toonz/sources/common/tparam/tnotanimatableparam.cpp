@@ -59,18 +59,10 @@ void TBoolParam::saveData(TOStream &os) {
 
 //=========================================================
 
-void TFilePathParam::loadData(TIStream &is) {
-  TFilePath def, value;
-  is >> def >> value;
-  setDefaultValue(def);
-  setValue(value, false);
-}
-
-//---------------------------------------------------------
-
-void TFilePathParam::saveData(TOStream &os) {
-  os << getDefaultValue();
-  os << getValue();
+void TFilePathParam::copy(TParam *src) {
+  TStringParam::copy(src);
+  if (TFilePathParam *pathParam = dynamic_cast<TFilePathParam *>(src))
+    m_fileFilter = pathParam->m_fileFilter;
 }
 
 //=========================================================

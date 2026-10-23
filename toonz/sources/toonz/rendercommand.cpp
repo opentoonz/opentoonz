@@ -102,28 +102,37 @@ TRaster32P loadLight() {
 class OnRenderCompleted final : public TThread::Message {
   TFilePath m_fp;
   bool m_error;
+  QString m_errorMessage;
+  bool m_canceled;
 
 public:
-  OnRenderCompleted(const TFilePath &fp, bool error)
-      : m_fp(fp), m_error(error) {}
+  OnRenderCompleted(const TFilePath &fp, bool error,
+                    const QString &errorMessage, bool canceled)
+      : m_fp(fp)
+      , m_error(error)
+      , m_errorMessage(errorMessage)
+      , m_canceled(canceled) {}
 
   TThread::Message *clone() const override {
     return new OnRenderCompleted(*this);
   }
 
   void onDeliver() override {
-    if (m_error) {
-      m_error = false;
-      DVGui::error(
-          QObject::tr("There was an error saving frames for the %1 level.")
-              .arg(QString::fromStdWString(
-                  m_fp.withoutParentDir().getWideString())));
-    }
-
     bool isPreview = (m_fp.getType() == "noext");
 
     TImageCache::instance()->remove(::to_string(m_fp.getWideString() + L".0"));
     TNotifier::instance()->notify(TSceneNameChange());
+
+    if (m_error) {
+      DVGui::error(
+          m_errorMessage.isEmpty()
+              ? QObject::tr(
+                    "There was an error saving frames for the %1 level.")
+                    .arg(QString::fromStdWString(
+                        m_fp.withoutParentDir().getWideString()))
+              : m_errorMessage);
+    }
+    if (m_error || m_canceled) return;
 
     if (Preferences::instance()->isGeneratedMovieViewEnabled()) {
       if (!isPreview && (Preferences::instance()->isDefaultViewerEnabled()) &&
@@ -352,6 +361,7 @@ class RenderListener final : public DVGui::ProgressDialog,
   int m_frameCounter, m_totalFrames;
   TRenderer *m_renderer;
   bool m_error;
+  QString m_errorMessage;
 
   class Message final : public TThread::Message {
     RenderListener *m_pb;
@@ -419,20 +429,23 @@ public:
    * functions of MovieRenderer::Listener --*/
   bool onFrameCompleted(int frame) override {
     bool ret = wasCanceled();
+    if (ret) return false;
     if (m_frameCounter + 1 < m_totalFrames)
       Message(this, ret ? -1 : ++m_frameCounter, m_progressBarString).send();
     else
       Message(this, -2, "").send();
     return !ret;
   }
-  bool onFrameFailed(int frame, TException &) override {
+  bool onFrameFailed(int frame, TException &e) override {
+    if (!m_error) m_errorMessage = QString::fromStdWString(e.getMessage());
     m_error = true;
     return onFrameCompleted(frame);
   }
   void onSequenceCompleted(const TFilePath &fp) override {
     Message(this, -1, "").send();
-    OnRenderCompleted(fp, m_error).send();
+    OnRenderCompleted(fp, m_error, m_errorMessage, wasCanceled()).send();
     m_error = false;
+    m_errorMessage.clear();
     RenderCommand::resetBgColor();
   }
 
