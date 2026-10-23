@@ -750,6 +750,8 @@ void ViewerDraw::drawDisk(int &tableDLId) {
     currentBgColor = bgColor;
     tableDLId      = createDiskDisplayList();
   }
+  const TPixel32 tableColor = Preferences::instance()->getTableColor();
+  glColor3ub(tableColor.r, tableColor.g, tableColor.b);
   glCallList(tableDLId);
 }
 
@@ -770,7 +772,6 @@ unsigned int ViewerDraw::createDiskDisplayList() {
   }
   double r = 10 * Stage::inch;
   glNewList(id, GL_COMPILE);
-  glColor3d(.6, .65, .7);
   glBegin(GL_POLYGON);
   int i;
   int n = 120;
