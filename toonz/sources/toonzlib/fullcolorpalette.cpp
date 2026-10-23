@@ -12,7 +12,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QSaveFile>
-#include <QTemporaryFile>
+#include <QTemporaryDir>
 
 namespace {
 
@@ -20,12 +20,14 @@ void writePaletteFile(const TFilePath &path, TPalette *palette) {
   if (!TSystem::touchParentDir(path))
     throw TSystemException(path, "Could not create the palette folder.");
 
-  QTemporaryFile temporary(path.getQString() + ".XXXXXX");
-  if (!temporary.open())
+  QTemporaryDir temporary(path.getQString() + ".XXXXXX");
+  if (!temporary.isValid())
     throw TSystemException(path, temporary.errorString().toStdString());
-  temporary.close();
+  // QTemporaryFile keeps its native handle open even after close(), which
+  // prevents the Windows native stream from reopening the snapshot for writing.
+  const QString snapshot = temporary.filePath("palette.tpl");
   {
-    TOStream os(TFilePath(temporary.fileName()));
+    TOStream os{TFilePath(snapshot)};
     if (!os)
       throw TSystemException(path, "Could not write the palette snapshot.");
     os << palette;
@@ -33,7 +35,7 @@ void writePaletteFile(const TFilePath &path, TPalette *palette) {
       throw TSystemException(path, "Could not finish the palette snapshot.");
   }
 
-  QFile input(temporary.fileName());
+  QFile input(snapshot);
   if (!input.open(QIODevice::ReadOnly))
     throw TSystemException(path, input.errorString().toStdString());
   const QByteArray data = input.readAll();
