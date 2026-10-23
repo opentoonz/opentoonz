@@ -164,6 +164,7 @@
         <command>MI_Collapse</command>
         <command>MI_Resequence</command>
         <command>MI_CloneChild</command>
+        <command>MI_FullCloneChild</command>
         <command>MI_ExplodeChild</command>
         <command>MI_ToggleEditInPlace</command>
         <separator/>
