@@ -22,6 +22,7 @@
 #include "previewer.h"
 
 #include <array>
+#include <QColor>
 #include <QMatrix4x4>
 #include <QTouchDevice>
 
@@ -64,6 +65,7 @@ public:
 
 class SceneViewer final : public TToolViewer, public Previewer::Listener {
   Q_OBJECT
+  Q_PROPERTY(QColor TableColor READ getTableColor WRITE setTableColor)
 
   double m_pressure;
   QPointF m_lastMousePos;
@@ -139,6 +141,7 @@ class SceneViewer final : public TToolViewer, public Previewer::Listener {
   TPointD m_dpiScale;
 
   int m_tableDLId;  // To compute table DisplayList only if necessary.
+  QColor m_tableColorOverride;
 
   int m_groupIndexToBeEntered;
 
@@ -213,6 +216,9 @@ public:
   ~SceneViewer();
 
   double getPixelSize() const override { return m_pixelSize; }
+
+  QColor getTableColor() const;
+  void setTableColor(const QColor &color);
 
   // Previewer::Listener
   TRectD getPreviewRect() const override;
@@ -348,6 +354,7 @@ protected:
 
   void paintGL() override;
 
+  void changeEvent(QEvent *event) override;
   void showEvent(QShowEvent *) override;
   void hideEvent(QHideEvent *) override;
 

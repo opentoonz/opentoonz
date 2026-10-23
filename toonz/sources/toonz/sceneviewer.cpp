@@ -83,11 +83,13 @@
 // Qt includes
 #include <QMenu>
 #include <QApplication>
+#include <QEvent>
 #include <QScreen>
 #include <QInputMethod>
 #include <QGLContext>
 #include <QOpenGLFramebufferObject>
 #include <QMainWindow>
+#include <QStyle>
 
 #include "sceneviewer.h"
 
@@ -1089,6 +1091,34 @@ TPointD SceneViewer::worldToPos(const TPointD &worldPos) const {
 
 //-----------------------------------------------------------------------------
 
+QColor SceneViewer::getTableColor() const {
+  if (m_tableColorOverride.isValid()) return m_tableColorOverride;
+  const TPixel32 color = Preferences::instance()->getTableColor();
+  return QColor(color.r, color.g, color.b);
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::setTableColor(const QColor &color) {
+  if (m_tableColorOverride == color) return;
+  m_tableColorOverride = color;
+  GLInvalidateAll();
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::changeEvent(QEvent *event) {
+  TToolViewer::changeEvent(event);
+  if (event->type() != QEvent::StyleChange) return;
+
+  // Qt does not reset qproperty values when a stylesheet rule is removed.
+  m_tableColorOverride = QColor();
+  if (testAttribute(Qt::WA_WState_Polished)) style()->polish(this);
+  GLInvalidateAll();
+}
+
+//-----------------------------------------------------------------------------
+
 void SceneViewer::showEvent(QShowEvent *) {
   m_visualSettings.m_sceneProperties =
       TApp::instance()->getCurrentScene()->getScene()->getProperties();
@@ -1539,7 +1569,7 @@ void SceneViewer::drawCameraStand() {
       !m_drawCameraTest) {
     glPushMatrix();
     tglMultMatrix(m_drawTableAff);
-    ViewerDraw::drawDisk(m_tableDLId);
+    ViewerDraw::drawDisk(m_tableDLId, getTableColor());
     glPopMatrix();
   }
 
