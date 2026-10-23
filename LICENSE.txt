@@ -10,6 +10,10 @@ Portions adapted from Tahoma2D's vector alignment commands and panel:
 Copyright (c) 2016 - 2023, John Dancel (manongjohn)
 All rights reserved.
 
+Portions adapted from Tahoma's raster default palette support:
+Copyright (c) 2016 - 2020, the respective contributors.
+All rights reserved.
+
 All contributions by DWANGO:
 Copyright (c) 2016 - 2026, DWANGO Co., Ltd.
 All rights reserved.

@@ -2890,6 +2890,9 @@ void MainWindow::defineActions() {
                              QT_TR_NOOP("&Save Palette As..."), "", "saveas");
   createRightClickMenuAction(MI_OverwritePalette, QT_TR_NOOP("&Save Palette"),
                              "", "save");
+  createRightClickMenuAction(MI_SaveAsDefaultRasterPalette,
+                             QT_TR_NOOP("Save As Default Raster Palette..."),
+                             "");
   createRightClickMenuAction(MI_RegeneratePreview,
                              QT_TR_NOOP("&Regenerate Preview"), "");
   createRightClickMenuAction(MI_RegenerateFramePr,

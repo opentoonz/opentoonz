@@ -21,6 +21,7 @@
 #include "toonz/tframehandle.h"
 #include "toonz/imagestyles.h"
 #include "toonz/preferences.h"
+#include "toonz/fullcolorpalette.h"
 
 // TnzCore includes
 #include "tcolorstyles.h"
@@ -1837,6 +1838,9 @@ void PageViewer::updateCommandLocks() {
   cmd->getAction("MI_GetColorFromStudioPalette")->setEnabled(!isLocked);
   cmd->getAction("MI_ToggleLinkToStudioPalette")->setEnabled(!isLocked);
   cmd->getAction("MI_RemoveReferenceToStudioPalette")->setEnabled(!isLocked);
-  cmd->getAction("MI_EraseUnusedStyles")->setEnabled(!isLocked);
+  cmd->getAction("MI_EraseUnusedStyles")
+      ->setEnabled(!isLocked &&
+                   !FullColorPalette::instance()->isFullColorPalette(
+                       m_page->getPalette()));
   update();
 }
