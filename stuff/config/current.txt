@@ -107,6 +107,28 @@
   <item>"STD_channelMixerFx.blue_to_matte"	"Blue to Alpha"	</item>
   <item>"STD_channelMixerFx.matte_to_matte"	"Alpha to Alpha"	</item>
 
+  <item>"STD_colorMatrixFx"		"Color Matrix"	</item>
+  <item>"STD_colorMatrixFx.red_red"	"Red from Red"	</item>
+  <item>"STD_colorMatrixFx.red_green"	"Red from Green"	</item>
+  <item>"STD_colorMatrixFx.red_blue"	"Red from Blue"	</item>
+  <item>"STD_colorMatrixFx.red_alpha"	"Red from Alpha"	</item>
+  <item>"STD_colorMatrixFx.red_offset"	"Red Offset"	</item>
+  <item>"STD_colorMatrixFx.green_red"	"Green from Red"	</item>
+  <item>"STD_colorMatrixFx.green_green"	"Green from Green"	</item>
+  <item>"STD_colorMatrixFx.green_blue"	"Green from Blue"	</item>
+  <item>"STD_colorMatrixFx.green_alpha"	"Green from Alpha"	</item>
+  <item>"STD_colorMatrixFx.green_offset"	"Green Offset"	</item>
+  <item>"STD_colorMatrixFx.blue_red"	"Blue from Red"	</item>
+  <item>"STD_colorMatrixFx.blue_green"	"Blue from Green"	</item>
+  <item>"STD_colorMatrixFx.blue_blue"	"Blue from Blue"	</item>
+  <item>"STD_colorMatrixFx.blue_alpha"	"Blue from Alpha"	</item>
+  <item>"STD_colorMatrixFx.blue_offset"	"Blue Offset"	</item>
+  <item>"STD_colorMatrixFx.alpha_red"	"Alpha from Red"	</item>
+  <item>"STD_colorMatrixFx.alpha_green"	"Alpha from Green"	</item>
+  <item>"STD_colorMatrixFx.alpha_blue"	"Alpha from Blue"	</item>
+  <item>"STD_colorMatrixFx.alpha_alpha"	"Alpha from Alpha"	</item>
+  <item>"STD_colorMatrixFx.alpha_offset"	"Alpha Offset"	</item>
+
   <item>"STD_cloudsFx"			"Clouds"		</item>
   <item>"STD_cloudsFx.type"			"Type"		</item>
   <item>"STD_cloudsFx.size"			"Size"		</item>
