@@ -882,6 +882,8 @@ class DVAPI StyleEditor final : public QWidget, public SaveLoadQSettings {
 
   DVGui::TabBar *m_styleBar;
   QStackedWidget *m_styleChooser;
+  QSplitter *m_mainSplitter;
+  QFrame *m_bottomWidget;
 
   DVGui::StyleSample
       *m_newColor;  //!< New style viewer (lower-right panel side).
@@ -918,6 +920,7 @@ class DVAPI StyleEditor final : public QWidget, public SaveLoadQSettings {
   QAction *m_rgbAction;
   QAction *m_hexAction;
   QAction *m_searchAction;
+  QAction *m_bottomBarAction;
   QActionGroup *m_sliderAppearanceAG;
   QAction *m_hexEditorAction;
 
@@ -1006,6 +1009,8 @@ protected:
 protected:
   void showEvent(QShowEvent *) override;
   void hideEvent(QHideEvent *) override;
+  void resizeEvent(QResizeEvent *) override;
+  bool eventFilter(QObject *watched, QEvent *event) override;
 
 protected slots:
 
@@ -1050,6 +1055,8 @@ protected slots:
 
   void onSliderAppearanceSelected(QAction *);
   void onPopupMenuAboutToShow();
+  void onBottomBarToggled(bool visible);
+  void onMainSplitterMoved(int pos, int index);
 
   void onTextureSearch(const QString &);
   void onTextureClearSearch();
@@ -1066,6 +1073,10 @@ private:
   QFrame *createVectorPage();
   QFrame *createMyPaintPage();
   void updateTabBar();
+  // Restore the pre-collapsible bottom-bar height (min 60 + QSS content).
+  void restoreBottomBarExpandedSize();
+  int bottomBarNaturalHeight() const;
+  void setBottomBarExpandedConstraints(bool expanded);
   int tabIndexForPage(int page) const;
   void rememberPage(int page);
   void applySavedPage();
