@@ -33,6 +33,7 @@
 
 #include "subcameramanager.h"
 
+#include <QColor>
 #include <QSettings>
 
 TEnv::StringVar EnvSafeAreaName("SafeAreaName", "PR_safe");
@@ -736,7 +737,7 @@ void ViewerDraw::drawFieldGuide() {
 
 //-----------------------------------------------------------------------------
 
-void ViewerDraw::drawDisk(int &tableDLId) {
+void ViewerDraw::drawDisk(int &tableDLId, const QColor &tableColor) {
   static TPixel32 currentBgColor;
 
   TPixel32 bgColor;
@@ -750,6 +751,7 @@ void ViewerDraw::drawDisk(int &tableDLId) {
     currentBgColor = bgColor;
     tableDLId      = createDiskDisplayList();
   }
+  glColor3ub(tableColor.red(), tableColor.green(), tableColor.blue());
   glCallList(tableDLId);
 }
 
@@ -770,7 +772,6 @@ unsigned int ViewerDraw::createDiskDisplayList() {
   }
   double r = 10 * Stage::inch;
   glNewList(id, GL_COMPILE);
-  glColor3d(.6, .65, .7);
   glBegin(GL_POLYGON);
   int i;
   int n = 120;

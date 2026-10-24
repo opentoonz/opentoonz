@@ -101,7 +101,7 @@ public:
 
   TDimension getIconSize() const;
 
-  TOfflineGL *getOfflineGLContext();
+  TOfflineGL *getOfflineGLContext(const TDimension &minSize = TDimension());
 
   // icons from splines
   QPixmap getIcon(TStageObjectSpline *spline);
@@ -113,6 +113,8 @@ public:
                   bool onDemand = false);
   QPixmap getSizedIcon(TXshLevel *sl, const TFrameId &fid, std::string newId,
                        TDimension dim = TDimension(0, 0));
+  QPixmap getResponsiveIcon(TXshLevel *sl, const TFrameId &fid,
+                            const TDimension &dim);
   void invalidate(TXshLevel *sl, const TFrameId &fid,
                   bool onlyFilmStrip = false);
   void remove(TXshLevel *sl, const TFrameId &fid, bool onlyFilmStrip = false);

@@ -3,6 +3,7 @@ set(MOC_HEADERS
     pluginhost.h
     stageobjectselection.h
     tdockwindows.h
+    docktabstrip.h
     ../include/toonzqt/addfxcontextmenu.h
     ../include/toonzqt/camerasettingswidget.h
     ../include/toonzqt/checkbox.h
@@ -38,6 +39,7 @@ set(MOC_HEADERS
     ../include/toonzqt/icongenerator.h
     ../include/toonzqt/imageutils.h
     ../include/toonzqt/infoviewer.h
+    ../include/toonzqt/insertfxpopup.h
     ../include/toonzqt/intfield.h
     ../include/toonzqt/intpairfield.h
     ../include/toonzqt/keyframenavigator.h
@@ -110,6 +112,7 @@ set(SOURCES
     checkbox.cpp
     colorfield.cpp
     docklayout.cpp
+    docktabstrip.cpp
     dockwidget.cpp
     doublefield.cpp
     doublepairfield.cpp
@@ -134,6 +137,7 @@ set(SOURCES
     keyframenavigator.cpp
     lineedit.cpp
     menubarcommand.cpp
+    brushpresetbridge.cpp
     palettesscanpopup.cpp
     paletteviewer.cpp
     paletteviewergui.cpp
@@ -193,6 +197,7 @@ set(SOURCES
     stylenameeditor.cpp
     combohistogram.cpp
     fxiconmanager.cpp
+    insertfxpopup.cpp
     pluginhost.cpp
     plugin_tile_interface.cpp
     plugin_port_interface.cpp

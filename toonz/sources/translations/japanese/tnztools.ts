@@ -2094,6 +2094,26 @@ moved to the end of the current style&apos;s page of the palette.</source>
         <source>Assistants</source>
         <translation>パース定規</translation>
     </message>
+    <message>
+        <source>Eraser</source>
+        <translation>消しゴムモード</translation>
+    </message>
+    <message>
+        <source>Mode:</source>
+        <translation>モード：</translation>
+    </message>
+    <message>
+        <source>Lines</source>
+        <translation>線</translation>
+    </message>
+    <message>
+        <source>Areas</source>
+        <translation>塗り</translation>
+    </message>
+    <message>
+        <source>Lines &amp; Areas</source>
+        <translation>線と塗り</translation>
+    </message>
 </context>
 <context>
     <name>ToonzVectorBrushTool</name>

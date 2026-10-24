@@ -8,10 +8,41 @@
 // forward declaration
 class XsheetViewer;
 class QMenu;
+class QCheckBox;
+class QLineEdit;
+class QSlider;
 
 namespace XsheetGUI {
 
 class DragTool;
+
+//=============================================================================
+// OnionSkinOpacityPopup
+//-----------------------------------------------------------------------------
+
+class OnionSkinOpacityPopup final : public QWidget {
+  Q_OBJECT
+
+  QSlider *m_slider;
+  QLineEdit *m_value;
+  QCheckBox *m_autoCheckBox;
+  int m_marker;
+  int m_distance;
+  bool m_isFixed;
+  bool m_initializing;
+
+  void commitOpacity();
+
+public:
+  OnionSkinOpacityPopup(QWidget *parent, bool vertical);
+  void setMarker(int currentRow, int marker, bool isFixed);
+
+private slots:
+  void onSliderMoved(int value);
+  void onSliderValueChanged(int value);
+  void onValueChanged(const QString &text);
+  void onAutoClicked(bool checked);
+};
 
 //=============================================================================
 // RowArea
@@ -43,6 +74,7 @@ class RowArea final : public QWidget {
 
   // panning by middle-drag
   bool m_isPanning;
+  OnionSkinOpacityPopup *m_onionSkinOpacityPopup;
 
   // returns true if the frame area can have extra space
   bool checkExpandFrameArea();
@@ -71,6 +103,7 @@ class RowArea final : public QWidget {
   // Return the number of the last non-empty cell found. You can set the
   // direction of the search.
   int getNonEmptyCell(int row, int column, Direction);
+  bool showOnionSkinOpacityPopup(QContextMenuEvent *event);
 
 public:
   RowArea(XsheetViewer *parent, Qt::WindowFlags flags = Qt::WindowFlags());

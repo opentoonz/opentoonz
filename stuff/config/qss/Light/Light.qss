@@ -12,6 +12,7 @@ QToolBar * {
 }
 :TOONZCOLORS {
   -bg-color: #d1d1d1;
+  -hl-color: #7098f0;
   -icon-base-opacity: 0.8;
   -icon-disabled-opacity: 0.3;
   -icon-base-color: black;
@@ -3120,6 +3121,7 @@ XsheetViewer {
   qproperty-CurrentTimeIndicatorColor: hsl(0, 100%, 64%);
   qproperty-EmptyColumnHeadColor: #d1d1d1;
   qproperty-CellFocusColor: #6d00d2;
+  qproperty-ColumnFocusColor: #2d609d;
   qproperty-ColumnHeadPastelizer: transparent;
   qproperty-SelectedColumnHead: rgba(255, 255, 255, 0.3);
   qproperty-FoldedColumnBGColor: rgba(255, 255, 255, 0.45);

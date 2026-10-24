@@ -41,8 +41,12 @@ enum PreferencesItemId {
   colorCalibrationLutPaths,
   showIconsInMenu,
   showRoomBindButtons,
+  customHelpLink,
   displayIn30bit,
   viewerIndicatorEnabled,
+  restoreViewerViewFromLastSession,
+  togglePanelWithShortcut,
+  RestoreStyleEditorTab,
 
   //----------
   // Visualization
@@ -126,8 +130,11 @@ enum PreferencesItemId {
   useStrokeEndCursor,
   clickTwiceToCreateArcs,
   tempToolSwitchTimer,
+  compressInputEvents,
   animateToolHandleSize,
   animateToolColor,
+  defaultStartupTool,
+  defaultNewSceneTool,
 
   //----------
   // Xsheet
@@ -154,6 +161,10 @@ enum PreferencesItemId {
   syncLevelRenumberWithXsheet,
   currentTimelineEnabled,
   currentColumnColor,
+  customCurrentCellColorEnabled,
+  currentCellColor,
+  customCurrentColumnOutlineColorEnabled,
+  currentColumnOutlineColor,
   levelNameDisplayType,
   showFrameNumberWithLetters,
   linkColumnNameWithLevel,
@@ -188,6 +199,7 @@ enum PreferencesItemId {
   //----------
   // Colors
   viewerBGColor,
+  tableColor,
   previewBGColor,
   levelEditorBoxColor,
   chessboardColor1,
@@ -234,6 +246,9 @@ enum PreferencesItemId {
   // textureSize, // set to 0
   // LineTestFpsCapture,
   // guidedDrawingType,
+
+  // Tape Tool confirmation (stored only; no Preferences popup control)
+  tapeToolFillRiskPolicy,
 
   PreferencesItemCount
 };

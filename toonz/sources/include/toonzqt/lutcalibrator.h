@@ -40,6 +40,8 @@ class DVAPI LutCalibrator : public QOpenGLFunctions {
     int texUniform                = -1;
     int lutUniform                = -1;
     int lutSizeUniform            = -1;
+    int domainMinUniform          = -1;
+    int domainMaxUniform          = -1;
     int vertexAttrib              = -1;
     int texCoordAttrib            = -1;
   } m_shader;
@@ -78,8 +80,10 @@ class DVAPI LutManager  // singleton
   LutManager();
 
   struct Lut {
-    int meshSize;
-    float* data = nullptr;
+    int meshSize       = 0;
+    float* data        = nullptr;
+    float domainMin[3] = {0.0f, 0.0f, 0.0f};
+    float domainMax[3] = {1.0f, 1.0f, 1.0f};
   } m_lut;
 
 public:
@@ -90,6 +94,8 @@ public:
   bool isValid() { return m_isValid; }
   int meshSize() const { return m_lut.meshSize; }
   const float* data() const { return m_lut.data; }
+  const float* domainMin() const { return m_lut.domainMin; }
+  const float* domainMax() const { return m_lut.domainMax; }
 
   bool loadLutFile(const QString& fp);
 

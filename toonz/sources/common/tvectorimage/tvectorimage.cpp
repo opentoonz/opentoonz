@@ -2001,7 +2001,7 @@ assert(m_strokes[strokeIndex-wSize+1]->m_edgeList.empty());*/
 //-----------------------------------------------------------------------------
 
 static void computeEdgeList(TStroke *newS, const std::list<TEdge *> &edgeList1,
-                            bool join1AtBegin,
+                            bool join1AtBegin, bool stroke1isFlipped,
                             const std::list<TEdge *> &edgeList2,
                             bool join2AtBegin, std::list<TEdge *> &edgeList) {
   std::list<TEdge *>::const_iterator it;
@@ -2009,11 +2009,17 @@ static void computeEdgeList(TStroke *newS, const std::list<TEdge *> &edgeList1,
   if (!edgeList1.empty()) {
     TStroke *s1    = edgeList1.front()->m_s;
     double length1 = s1->getLength();
-    ;
+
+    double offset = newS->getLength(newS->getW(s1->getPoint(0.0)));
 
     for (it = edgeList1.begin(); it != edgeList1.end(); ++it) {
       double l0 = s1->getLength((*it)->m_w0), l1 = s1->getLength((*it)->m_w1);
-      if (join1AtBegin) l0 = length1 - l0, l1 = length1 - l1;
+      if (join1AtBegin) {
+        if (stroke1isFlipped)
+          l0 = length1 - l0, l1 = length1 - l1;
+        else
+          l0 = offset + l0, l1 = offset + l1;
+      }
 
       TEdge *e         = new TEdge();
       e->m_toBeDeleted = true;
@@ -2132,12 +2138,13 @@ VIStroke *TVectorImage::Imp::extendStrokeSmoothly(int index,
   for (int i = 0; i < cpCount - 1; i++)
     points[i] = stroke->getControlPoint((cpIndex == 0) ? cpCount - i - 1 : i);
   points[cpCount - 1] = pos;
+  if (cpIndex == 0) std::reverse(points.begin(), points.end());
 
   TStroke *newStroke = new TStroke(points);
   newStroke->setStyle(styleId);
   newStroke->outlineOptions() = stroke->outlineOptions();
   std::list<TEdge *> oldEdgeList, emptyList;
-  computeEdgeList(newStroke, m_strokes[index]->m_edgeList, cpIndex == 0,
+  computeEdgeList(newStroke, m_strokes[index]->m_edgeList, cpIndex == 0, false,
                   emptyList, 0, oldEdgeList);
 
   std::vector<int> toBeDeleted;
@@ -2169,6 +2176,7 @@ VIStroke *TVectorImage::Imp::extendStroke(int index, const TThickPoint &p,
   TThickPoint tp(p, points[count - 1].thick);
   points[count++] = 0.5 * (stroke->getControlPoint(cpIndex) + tp);
   points[count++] = tp;
+  if (cpIndex == 0) std::reverse(points.begin(), points.end());
 
   TStroke *newStroke = new TStroke(points);
   newStroke->setStyle(stroke->getStyle());
@@ -2178,7 +2186,7 @@ VIStroke *TVectorImage::Imp::extendStroke(int index, const TThickPoint &p,
 
   if (m_computedAlmostOnce)
     computeEdgeList(newStroke, m_strokes[index]->m_edgeList, cpIndex == 0,
-                    emptyList, false, oldEdgeList);
+                    false, emptyList, false, oldEdgeList);
 
   std::vector<int> toBeDeleted;
   toBeDeleted.push_back(index);
@@ -2246,7 +2254,7 @@ VIStroke *TVectorImage::Imp::joinStroke(int index1, int index2, int cpIndex1,
   std::list<TEdge *> oldEdgeList, emptyList;
 
   computeEdgeList(
-      newStroke, m_strokes[index1]->m_edgeList, cpIndex1 == 0,
+      newStroke, m_strokes[index1]->m_edgeList, cpIndex1 == 0, cpIndex1 == 0,
       (index1 != index2) ? m_strokes[index2]->m_edgeList : emptyList,
       cpIndex2 == 0, oldEdgeList);
 
@@ -2332,7 +2340,7 @@ VIStroke *TVectorImage::Imp::joinStrokeSmoothly(int index1, int index2,
   if (stroke1 == stroke2) {
     std::list<TEdge *> oldEdgeList, emptyList;
     computeEdgeList(stroke1, m_strokes[index1]->m_edgeList, cpIndex1 == 0,
-                    emptyList, false, oldEdgeList);
+                    cpIndex1 == 0, emptyList, false, oldEdgeList);
     eraseIntersection(index1);
     m_strokes[index1]->m_isNewForFill = true;
     stroke1->setSelfLoop();
@@ -2376,7 +2384,8 @@ VIStroke *TVectorImage::Imp::joinStrokeSmoothly(int index1, int index2,
   // m_imp->m_strokes[index2]->m_edgeList);
 
   computeEdgeList(newStroke, m_strokes[index1]->m_edgeList, cpIndex1 == 0,
-                  m_strokes[index2]->m_edgeList, cpIndex2 == 0, oldEdgeList);
+                  cpIndex1 == 0, m_strokes[index2]->m_edgeList, cpIndex2 == 0,
+                  oldEdgeList);
   // printEdges(os, "****edgelist", getPalette(), oldEdgeList);
 
   std::vector<int> toBeDeleted;

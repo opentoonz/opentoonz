@@ -62,18 +62,25 @@ public:
 
   int getMos(int index) const {
     assert(0 <= index && index < (int)m_mos.size());
-    return m_mos[index];
+    return m_mos[index].first;
   }
 
   int getFos(int index) const {
     assert(0 <= index && index < (int)m_fos.size());
-    return m_fos[index];
+    return m_fos[index].first;
   }
 
   void setMos(int drow, bool on);  //!< Sets a Mobile OS frame shifted by drow
                                    //! around current xsheet frame
   void setFos(int row,
               bool on);  //!< Sets a Fixed OS frame to the specified xsheet row
+
+  //! Sets opacity in [0, 1], or -1 to use the automatic fade.
+  void setMosOpacity(int drow, double opacity);
+  double getMosOpacity(int drow) const;
+  //! Sets opacity in [0, 1], or -1 to use the automatic fade.
+  void setFosOpacity(int row, double opacity);
+  double getFosOpacity(int row) const;
 
   bool isMos(int drow) const;
   bool isFos(int row) const;
@@ -139,9 +146,16 @@ since underlying onion-skinned drawings must be visible.
   void clearGhostFlipKey() { m_ghostFlipKeys.clear(); }
 
 private:
-  std::vector<int> m_fos, m_mos;  //!< Fixed and Mobile Onion Skin indices
-  bool m_enabled;                 //!< Whether onion skin is enabled
-  bool m_wholeScene;              //!< Whether the OS works on the entire scene
+  using Marker = std::pair<int, double>;
+  using MarkerList = std::vector<Marker>;
+
+  static MarkerList::iterator findMarker(MarkerList &markers, int position);
+  static MarkerList::const_iterator findMarker(const MarkerList &markers,
+                                               int position);
+
+  MarkerList m_fos, m_mos;  //!< Fixed and Mobile Onion Skin markers
+  bool m_enabled;           //!< Whether onion skin is enabled
+  bool m_wholeScene;        //!< Whether the OS works on the entire scene
 
   ShiftTraceStatus m_shiftTraceStatus;
   bool m_showShiftOrigin;

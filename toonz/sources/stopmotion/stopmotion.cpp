@@ -366,8 +366,12 @@ bool StopMotion::buildLiveViewMap(TXshSimpleLevel *sl) {
     int frameNumber = id.getNumber();
     if (TSystem::doesExistFileOrLevel(liveViewFp.withFrame(frameNumber))) {
       TRaster32P image;
-      JpgConverter::loadJpg(liveViewFp.withFrame(frameNumber), image);
-      m_liveViewImageMap.insert(std::pair<int, TRaster32P>(frameNumber, image));
+      // a failed load leaves image null, and loadLiveViewImage() treats any
+      // cached entry as a success, so caching it hands out a null raster
+      if (JpgConverter::loadJpg(liveViewFp.withFrame(frameNumber), image)) {
+        m_liveViewImageMap.insert(
+            std::pair<int, TRaster32P>(frameNumber, image));
+      }
     }
   }
 

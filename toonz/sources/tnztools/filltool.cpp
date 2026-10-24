@@ -1985,7 +1985,8 @@ FillTool::FillTool(int targetType)
     , m_firstTime(true)
     , m_autopaintLines("Autopaint Lines", true)
     , m_referFill("Refer Fill", false)
-    , m_extendFill("Extend Fill", true) {
+    , m_extendFill("Extend Fill", true)
+    , m_fillOnlySavebox("Savebox", false) {
   m_areaFillTool       = new AreaFillTool(this);
   m_normalLineFillTool = new NormalLineFillTool(this);
 
@@ -2019,6 +2020,7 @@ FillTool::FillTool(int targetType)
     m_prop.bind(m_autopaintLines);
     m_prop.bind(m_extendFill);
     m_prop.bind(m_gapCloseDistance);
+    m_prop.bind(m_fillOnlySavebox);
   }
   m_emptyOnly.setId("EmptyOnly");
   m_onion.setId("OnionSkin");
@@ -2031,6 +2033,7 @@ FillTool::FillTool(int targetType)
   m_autopaintLines.setId("AutopaintLines");
   m_gapCloseDistance.setId("GapCloseDistance");
   m_extendFill.setId("ExtendFill");
+  m_fillOnlySavebox.setId("FillOnlySavebox");
 }
 //-----------------------------------------------------------------------------
 
@@ -2202,6 +2205,7 @@ void FillTool::updateTranslation() {
   m_autopaintLines.setQStringName(tr("Autopaint Lines"));
   m_gapCloseDistance.setQStringName(tr("Gap Close Distance:"));
   m_extendFill.setQStringName(tr("Extend Fill"));
+  m_fillOnlySavebox.setQStringName(tr("Savebox"));
 }
 
 //-----------------------------------------------------------------------------
@@ -2498,6 +2502,14 @@ bool FillTool::onPropertyChanged(std::string propertyName, bool addToUndo) {
     FillExtend = (int)(m_extendFill.getValue());
   }
 
+  else if (propertyName == m_fillOnlySavebox.getName()) {
+    Preferences *preferences = Preferences::instance();
+    bool enabled             = m_fillOnlySavebox.getValue();
+    if (preferences->getFillOnlySavebox() != enabled)
+      preferences->setValue(PreferencesItemId::FillOnlysavebox, enabled);
+    invalidate();
+  }
+
   else if (!m_frameSwitched && (propertyName == m_maxGapDistance.getName())) {
     TXshLevel *xl = TTool::getApplication()->getCurrentLevel()->getLevel();
     m_level       = xl ? xl->getSimpleLevel() : 0;
@@ -2601,7 +2613,8 @@ void FillTool::draw() {
     if (ti) {
       TRectD bbox =
           ToonzImageUtils::convertRasterToWorld(convert(ti->getBBox()), ti);
-      drawRect(bbox * ti->getSubsampling(), TPixel32::Black, 0x5555, true);
+      drawRect(bbox * ti->getSubsampling(), TPixel32(210, 210, 210), 0xF0F0,
+               true);
     }
   }
   if (m_fillType.getValue() != NORMALFILL) {
@@ -2729,6 +2742,22 @@ void FillTool::onActivate() {
   for (i=0; i<osMask.getFosCount(); i++)
   boh = osMask.getFos(i);
   */
+  if (m_targetType == TTool::ToonzImage && !m_saveboxSignalConnected) {
+    connect(Preferences::instance(), &Preferences::fillOnlySaveboxChanged, this,
+            [this](bool enabled) {
+              if (m_fillOnlySavebox.getValue() == enabled) return;
+              m_fillOnlySavebox.setValue(enabled);
+              TTool::Application *app = TTool::getApplication();
+              if (!app || !app->getCurrentTool() ||
+                  app->getCurrentTool()->getTool() != this)
+                return;
+              app->getCurrentTool()->notifyToolChanged();
+              invalidate();
+            });
+    m_saveboxSignalConnected = true;
+  }
+  m_fillOnlySavebox.setValue(Preferences::instance()->getFillOnlySavebox());
+
   if (m_firstTime) {
     m_fillDepth.setValue(
         TDoublePairProperty::Value(MinFillDepth, MaxFillDepth));

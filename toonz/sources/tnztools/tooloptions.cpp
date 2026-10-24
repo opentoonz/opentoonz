@@ -27,6 +27,10 @@
 #include "toonzqt/dvscrollwidget.h"
 #include "toonzqt/lutcalibrator.h"
 #include "toonzqt/viewcommandids.h"
+#include "toonzqt/brushpresetbridge.h"
+
+// Tnz includes (for command ids)
+#include "../toonz/menubarcommandids.h"
 
 // TnzLib includes
 #include "toonz/tobjecthandle.h"
@@ -51,6 +55,9 @@
 #include <QToolBar>
 #include <QDockWidget>
 #include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QGridLayout>
+#include <QLayoutItem>
 #include <QComboBox>
 #include <QLabel>
 #include <QPushButton>
@@ -270,7 +277,8 @@ void ToolOptionControlBuilder::visit(TStringProperty *p) {
   QLabel *label = addLabel(p);
   m_panel->addLabel(p->getName(), label);
 
-  ToolOptionTextField *control = new ToolOptionTextField(m_tool, p);
+  ToolOptionTextField *control =
+      new ToolOptionTextField(m_tool, p, m_toolHandle);
   m_panel->addControl(control);
 
   hLayout()->addWidget(control);
@@ -1132,6 +1140,7 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
   m_scaleYLabel = new ClickableLabel(tr("V:"), this);
   m_scaleYField = new SelectionScaleField(selectionTool, 1, "Scale Y");
   m_scaleLink   = new DVGui::CheckBox(tr("Link"), this);
+  m_scaleLink->setChecked(selectionTool->isScaleHVLinked());
 
   SimpleIconViewField *rotIconView =
       new SimpleIconViewField("edit_rotation", tr("Rotation"));
@@ -1304,6 +1313,16 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
   connect(m_vFlipButton, SIGNAL(clicked()), SLOT(onFlipVertical()));
   connect(m_leftRotateButton, SIGNAL(clicked()), SLOT(onRotateLeft()));
   connect(m_rightRotateButton, SIGNAL(clicked()), SLOT(onRotateRight()));
+
+  connect(m_scaleLink, &QCheckBox::toggled, selectionTool,
+          &SelectionTool::setScaleHVLinked);
+  connect(selectionTool, &SelectionTool::scaleHVLinkChanged, this,
+          [this](bool linked) {
+            if (!m_scaleLink || m_scaleLink->isChecked() == linked) return;
+            m_scaleLink->blockSignals(true);
+            m_scaleLink->setChecked(linked);
+            m_scaleLink->blockSignals(false);
+          });
 
   connect(selectionTool, SIGNAL(clickFlipHorizontal()),
           SLOT(onFlipHorizontal()));
@@ -1925,6 +1944,13 @@ BrushToolOptionsBox::BrushToolOptionsBox(QWidget *parent, TTool *tool,
   m_pencilMode = dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Pencil"));
   m_presetCombo = dynamic_cast<ToolOptionCombo *>(m_controls.value("Preset:"));
 
+  // Connect the Preset combo to refresh when the preset list changes
+  // (bi-directional sync: BrushPresetPanel add/remove <-> ToolOptionBar dropdown)
+  if (m_presetCombo && toolHandle) {
+    connect(toolHandle, SIGNAL(toolComboBoxListChanged(std::string)),
+            m_presetCombo, SLOT(reloadComboBoxList(std::string)));
+  }
+
   // Preset +/- buttons
   m_addPresetButton    = new QPushButton(QString("+"));
   m_removePresetButton = new QPushButton(QString("-"));
@@ -1990,6 +2016,14 @@ void BrushToolOptionsBox::filterControls() {
     m_snapSensitivityCombo->setHidden(!m_snapCheckbox->isChecked());
     return;
   }
+
+  // Skip all setVisible() calls — and the Qt layout recalculation they
+  // trigger — when the modifier-visibility state has not actually changed.
+  // Each BrushToolOptionsBox instance is cached per TTool* by ToolOptions,
+  // so repeated switches back to the same level+tool type are free.
+  if (m_filterInitialized && showModifiers == m_lastShowModifiers) return;
+  m_filterInitialized = true;
+  m_lastShowModifiers = showModifiers;
 
   for (QMap<std::string, QLabel *>::iterator it = m_labels.begin();
        it != m_labels.end(); it++) {
@@ -2068,6 +2102,12 @@ void BrushToolOptionsBox::onAddPreset() {
   }
 
   m_presetCombo->loadEntries();
+  
+  // Notify BrushPresetPanel that the preset list has changed
+  // so it can assign the new preset to the currently visible page.
+  TTool::Application *app = TTool::getApplication();
+  if (app && app->getCurrentTool())
+    app->getCurrentTool()->notifyToolComboBoxListChanged("Preset:");
 }
 
 //-----------------------------------------------------------------------------
@@ -2090,6 +2130,12 @@ void BrushToolOptionsBox::onRemovePreset() {
   }
 
   m_presetCombo->loadEntries();
+  
+  // Notify BrushPresetPanel that the preset list has changed
+  // so it can immediately refresh its view (removes deleted preset).
+  TTool::Application *app = TTool::getApplication();
+  if (app && app->getCurrentTool())
+    app->getCurrentTool()->notifyToolComboBoxListChanged("Preset:");
 }
 
 //=============================================================================
@@ -2101,7 +2147,16 @@ void BrushToolOptionsBox::onRemovePreset() {
 EraserToolOptionsBox::EraserToolOptionsBox(QWidget *parent, TTool *tool,
                                            TPaletteHandle *pltHandle,
                                            ToolHandle *toolHandle)
-    : ToolOptionsBox(parent), m_pencilMode(0), m_colorMode(0) {
+    : ToolOptionsBox(parent)
+    , m_pencilMode(nullptr)
+    , m_invertMode(nullptr)
+    , m_multiFrameMode(nullptr)
+    , m_eraseOnlySavebox(nullptr)
+    , m_toolType(nullptr)
+    , m_colorMode(nullptr)
+    , m_hardnessLabel(nullptr)
+    , m_colorModeLabel(nullptr)
+    , m_hardnessField(nullptr) {
   TPropertyGroup *props = tool->getProperties(0);
   assert(props->getPropertyCount() > 0);
 
@@ -2116,11 +2171,15 @@ EraserToolOptionsBox::EraserToolOptionsBox(QWidget *parent, TTool *tool,
   if (m_hardnessField)
     m_hardnessLabel = m_labels.value(m_hardnessField->propertyName());
   m_colorMode  = dynamic_cast<ToolOptionCombo *>(m_controls.value("Mode:"));
+  if (m_colorMode)
+    m_colorModeLabel = m_labels.value(m_colorMode->propertyName());
   m_invertMode = dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Invert"));
   m_multiFrameMode =
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Frame Range"));
   m_pencilMode =
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Pencil Mode"));
+  m_eraseOnlySavebox =
+      dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Savebox"));
 
   bool ret = true;
   if (m_pencilMode) {
@@ -2143,6 +2202,13 @@ EraserToolOptionsBox::EraserToolOptionsBox(QWidget *parent, TTool *tool,
     m_invertMode->setEnabled(false);
     m_multiFrameMode->setEnabled(false);
   }
+
+  bool isSegment =
+      m_toolType && m_toolType->getProperty()->getValue() == L"Segment";
+  if (m_colorMode) m_colorMode->setDisabled(isSegment);
+  if (m_colorModeLabel) m_colorModeLabel->setDisabled(isSegment);
+  if (isSegment && m_invertMode) m_invertMode->setEnabled(false);
+  if (m_eraseOnlySavebox) m_eraseOnlySavebox->setEnabled(isSegment);
 
   if (m_colorMode && m_colorMode->getProperty()->getValue() == L"Areas") {
     assert(m_hardnessField && m_hardnessLabel && m_pencilMode);
@@ -2174,8 +2240,12 @@ void EraserToolOptionsBox::onPencilModeToggled(bool value) {
 void EraserToolOptionsBox::onToolTypeChanged(int index) {
   const TEnumProperty::Range &range = m_toolType->getProperty()->getRange();
   bool value                        = range[index] != L"Normal";
-  m_invertMode->setEnabled(value);
+  bool isSegment                    = range[index] == L"Segment";
+  m_invertMode->setEnabled(value && !isSegment);
   m_multiFrameMode->setEnabled(value);
+  if (m_colorMode) m_colorMode->setDisabled(isSegment);
+  if (m_colorModeLabel) m_colorModeLabel->setDisabled(isSegment);
+  if (m_eraseOnlySavebox) m_eraseOnlySavebox->setEnabled(isSegment);
 }
 
 //-----------------------------------------------------------------------------
@@ -2249,10 +2319,19 @@ public:
   }
 };
 
-RulerToolOptionsBox::RulerToolOptionsBox(QWidget *parent, TTool *tool)
-    : ToolOptionsBox(parent), m_tool(tool) {
+RulerToolOptionsBox::RulerToolOptionsBox(QWidget *parent, TTool *tool,
+                                         bool verticalLayout)
+    : ToolOptionsBox(parent, !verticalLayout)
+    , m_tool(tool)
+    , m_verticalLayout(verticalLayout) {
   setFrameStyle(QFrame::StyledPanel);
-  setFixedHeight(26);
+  if (verticalLayout) {
+    setMinimumHeight(0);
+    setMaximumHeight(QWIDGETSIZE_MAX);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+  } else {
+    setFixedHeight(26);
+  }
 
   m_Xfld = new MeasuredValueField(this);
   m_Yfld = new MeasuredValueField(this);
@@ -2282,15 +2361,25 @@ RulerToolOptionsBox::RulerToolOptionsBox(QWidget *parent, TTool *tool)
   m_Hfld->setObjectName("RulerToolOptionValues");
   m_Afld->setObjectName("RulerToolOptionValues");
   m_Lfld->setObjectName("RulerToolOptionValues");
-  setStyleSheet(
-      "#RulerToolOptionValues {border:0px; background: rgb(196,196,196);}");
+  if (!verticalLayout)
+    setStyleSheet(
+        "#RulerToolOptionValues {border:0px; background: rgb(196,196,196);}");
 
-  m_Xfld->setMaximumWidth(70);
-  m_Yfld->setMaximumWidth(70);
-  m_Wfld->setMaximumWidth(70);
-  m_Hfld->setMaximumWidth(70);
-  m_Afld->setMaximumWidth(70);
-  m_Lfld->setMaximumWidth(70);
+  if (verticalLayout) {
+    m_Xfld->setMaximumWidth(QWIDGETSIZE_MAX);
+    m_Yfld->setMaximumWidth(QWIDGETSIZE_MAX);
+    m_Wfld->setMaximumWidth(QWIDGETSIZE_MAX);
+    m_Hfld->setMaximumWidth(QWIDGETSIZE_MAX);
+    m_Afld->setMaximumWidth(QWIDGETSIZE_MAX);
+    m_Lfld->setMaximumWidth(QWIDGETSIZE_MAX);
+  } else {
+    m_Xfld->setMaximumWidth(70);
+    m_Yfld->setMaximumWidth(70);
+    m_Wfld->setMaximumWidth(70);
+    m_Hfld->setMaximumWidth(70);
+    m_Afld->setMaximumWidth(70);
+    m_Lfld->setMaximumWidth(70);
+  }
 
   m_Xfld->setReadOnly(true);
   m_Yfld->setReadOnly(true);
@@ -2299,49 +2388,106 @@ RulerToolOptionsBox::RulerToolOptionsBox(QWidget *parent, TTool *tool)
   m_Afld->setReadOnly(true);
   m_Lfld->setReadOnly(true);
 
-  // layout
-  QHBoxLayout *lay = new QHBoxLayout();
-  lay->setContentsMargins(0, 0, 0, 0);
-  lay->setSpacing(3);
-  {
-    lay->addWidget(new QLabel(tr("X:", "ruler tool option"), this), 0);
-    lay->addWidget(m_Xfld, 0);
-    lay->addWidget(m_XpixelFld, 0);
+  if (verticalLayout) {
+    const int labelW    = 22;
+    const int fieldMinW = 52;
+    const int colGutter = 4;
+    const int labelGap  = 2;
+    const int rowVSpace = 11;
+    QGridLayout *grid   = new QGridLayout();
+    grid->setContentsMargins(0, 4, 0, 4);
+    grid->setHorizontalSpacing(labelGap);
+    grid->setVerticalSpacing(rowVSpace);
+    for (int col = 0; col < 5; ++col) grid->setColumnStretch(col, 0);
+    grid->setColumnStretch(1, 1);
+    grid->setColumnStretch(4, 1);
+    grid->setColumnMinimumWidth(0, labelW);
+    grid->setColumnMinimumWidth(1, fieldMinW);
+    grid->setColumnMinimumWidth(2, colGutter);
+    grid->setColumnMinimumWidth(3, labelW);
+    grid->setColumnMinimumWidth(4, fieldMinW);
 
-    lay->addSpacing(3);
+    auto addGridLabel = [&](int row, int col, const QString &text) {
+      auto *label = new QLabel(text, this);
+      label->setFixedSize(labelW, 20);
+      label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+      grid->addWidget(label, row, col, Qt::AlignRight | Qt::AlignVCenter);
+    };
+    auto addGridField = [&](int row, int col, MeasuredValueField *field) {
+      field->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+      field->setMinimumWidth(fieldMinW);
+      field->setMaximumWidth(QWIDGETSIZE_MAX);
+      grid->addWidget(field, row, col);
+    };
 
-    lay->addWidget(new QLabel(tr("Y:", "ruler tool option"), this), 0);
-    lay->addWidget(m_Yfld, 0);
-    lay->addWidget(m_YpixelFld, 0);
+    addGridLabel(0, 0, tr("X:", "ruler tool option"));
+    addGridField(0, 1, m_Xfld);
+    addGridLabel(0, 3, tr("Y:", "ruler tool option"));
+    addGridField(0, 4, m_Yfld);
+    addGridLabel(1, 0, tr("W:", "ruler tool option"));
+    addGridField(1, 1, m_Wfld);
+    addGridLabel(1, 3, tr("H:", "ruler tool option"));
+    addGridField(1, 4, m_Hfld);
+    addGridLabel(2, 0, tr("A:", "ruler tool option"));
+    addGridField(2, 1, m_Afld);
+    addGridLabel(2, 3, tr("L:", "ruler tool option"));
+    addGridField(2, 4, m_Lfld);
+    m_XpixelFld->hide();
+    m_YpixelFld->hide();
+    m_WpixelFld->hide();
+    m_HpixelFld->hide();
+    m_layout->setContentsMargins(0, 0, 0, 0);
+    m_layout->setSpacing(0);
+    while (m_layout->count() > 0) {
+      QLayoutItem *item = m_layout->takeAt(0);
+      delete item;
+    }
+    m_layout->addLayout(grid, 1);
+  } else {
+    // Horizontal toolbar layout (original)
+    QHBoxLayout *lay = new QHBoxLayout();
+    lay->setContentsMargins(0, 0, 0, 0);
+    lay->setSpacing(3);
+    {
+      lay->addWidget(new QLabel(tr("X:", "ruler tool option"), this), 0);
+      lay->addWidget(m_Xfld, 0);
+      lay->addWidget(m_XpixelFld, 0);
 
-    lay->addSpacing(3);
-    lay->addWidget(new ToolOptionsBarSeparator(this), 0);
-    lay->addSpacing(3);
+      lay->addSpacing(3);
 
-    lay->addWidget(new QLabel(tr("W:", "ruler tool option"), this), 0);
-    lay->addWidget(m_Wfld, 0);
-    lay->addWidget(m_WpixelFld, 0);
+      lay->addWidget(new QLabel(tr("Y:", "ruler tool option"), this), 0);
+      lay->addWidget(m_Yfld, 0);
+      lay->addWidget(m_YpixelFld, 0);
 
-    lay->addSpacing(3);
+      lay->addSpacing(3);
+      lay->addWidget(new ToolOptionsBarSeparator(this), 0);
+      lay->addSpacing(3);
 
-    lay->addWidget(new QLabel(tr("H:", "ruler tool option"), this), 0);
-    lay->addWidget(m_Hfld, 0);
-    lay->addWidget(m_HpixelFld, 0);
+      lay->addWidget(new QLabel(tr("W:", "ruler tool option"), this), 0);
+      lay->addWidget(m_Wfld, 0);
+      lay->addWidget(m_WpixelFld, 0);
 
-    lay->addSpacing(3);
-    lay->addWidget(new ToolOptionsBarSeparator(this), 0);
-    lay->addSpacing(3);
+      lay->addSpacing(3);
 
-    lay->addWidget(new QLabel(tr("A:", "ruler tool option"), this), 0);
-    lay->addWidget(m_Afld, 0);
+      lay->addWidget(new QLabel(tr("H:", "ruler tool option"), this), 0);
+      lay->addWidget(m_Hfld, 0);
+      lay->addWidget(m_HpixelFld, 0);
 
-    lay->addSpacing(3);
+      lay->addSpacing(3);
+      lay->addWidget(new ToolOptionsBarSeparator(this), 0);
+      lay->addSpacing(3);
 
-    lay->addWidget(new QLabel(tr("L:", "ruler tool option"), this), 0);
-    lay->addWidget(m_Lfld, 0);
+      lay->addWidget(new QLabel(tr("A:", "ruler tool option"), this), 0);
+      lay->addWidget(m_Afld, 0);
+
+      lay->addSpacing(3);
+
+      lay->addWidget(new QLabel(tr("L:", "ruler tool option"), this), 0);
+      lay->addWidget(m_Lfld, 0);
+    }
+    m_layout->addLayout(lay, 0);
+    m_layout->addStretch(1);
   }
-  m_layout->addLayout(lay, 0);
-  m_layout->addStretch(1);
 }
 
 void RulerToolOptionsBox::updateValues(bool isRasterLevelEditing, double X,
@@ -2355,10 +2501,12 @@ void RulerToolOptionsBox::updateValues(bool isRasterLevelEditing, double X,
   m_Afld->setValue(A);
   m_Lfld->setValue(L);
 
-  m_XpixelFld->setVisible(isRasterLevelEditing);
-  m_YpixelFld->setVisible(isRasterLevelEditing);
-  m_WpixelFld->setVisible(isRasterLevelEditing);
-  m_HpixelFld->setVisible(isRasterLevelEditing);
+  if (!m_verticalLayout) {
+    m_XpixelFld->setVisible(isRasterLevelEditing);
+    m_YpixelFld->setVisible(isRasterLevelEditing);
+    m_WpixelFld->setVisible(isRasterLevelEditing);
+    m_HpixelFld->setVisible(isRasterLevelEditing);
+  }
 
   if (isRasterLevelEditing) {
     m_XpixelFld->setText(QString("(%1)").arg(Xpix));
@@ -3151,3 +3299,144 @@ public:
     }
   }
 } rotateRightCHInstance("A_ToolOption_RotateRight");
+
+//***********************************************************************************
+//    Brush Preset Panel commands (called from BrushPresetPanel to avoid LNK2019)
+//***********************************************************************************
+
+class AddBrushPresetCommandHandler final : public MenuItemHandler {
+public:
+  AddBrushPresetCommandHandler() : MenuItemHandler(MI_AddBrushPreset) {}
+  void execute() override {
+    QString name = BrushPresetBridge::takePendingPresetName();
+    if (name.isEmpty()) return;
+    TTool::Application *app = TTool::getApplication();
+    if (!app) return;
+    TTool *tool = app->getCurrentTool()->getTool();
+    if (!tool || tool->getName() != T_Brush) return;
+    switch (tool->getTargetType() & TTool::CommonImages) {
+    case TTool::VectorImage: {
+      ToonzVectorBrushTool *vt = dynamic_cast<ToonzVectorBrushTool *>(tool);
+      if (vt) vt->addPreset(name);
+      break;
+    }
+    case TTool::ToonzImage: {
+      ToonzRasterBrushTool *rt = dynamic_cast<ToonzRasterBrushTool *>(tool);
+      if (rt) rt->addPreset(name);
+      break;
+    }
+    case TTool::RasterImage: {
+      FullColorBrushTool *ft = dynamic_cast<FullColorBrushTool *>(tool);
+      if (ft) ft->addPreset(name);
+      break;
+    }
+    default:
+      break;
+    }
+    // Notify panels that preset list changed (for BrushPresetPanel sync)
+    if (app->getCurrentTool())
+      app->getCurrentTool()->notifyToolComboBoxListChanged("Preset:");
+  }
+} addBrushPresetCHInstance;
+
+class RemoveBrushPresetCommandHandler final : public MenuItemHandler {
+public:
+  RemoveBrushPresetCommandHandler() : MenuItemHandler(MI_RemoveBrushPreset) {}
+  void execute() override {
+    TTool::Application *app = TTool::getApplication();
+    if (!app) return;
+    TTool *tool = app->getCurrentTool()->getTool();
+    if (!tool || tool->getName() != T_Brush) return;
+    switch (tool->getTargetType() & TTool::CommonImages) {
+    case TTool::VectorImage: {
+      ToonzVectorBrushTool *vt = dynamic_cast<ToonzVectorBrushTool *>(tool);
+      if (vt) vt->removePreset();
+      break;
+    }
+    case TTool::ToonzImage: {
+      ToonzRasterBrushTool *rt = dynamic_cast<ToonzRasterBrushTool *>(tool);
+      if (rt) rt->removePreset();
+      break;
+    }
+    case TTool::RasterImage: {
+      FullColorBrushTool *ft = dynamic_cast<FullColorBrushTool *>(tool);
+      if (ft) ft->removePreset();
+      break;
+    }
+    default:
+      break;
+    }
+    // Notify panels that preset list changed (for BrushPresetPanel sync)
+    if (app->getCurrentTool())
+      app->getCurrentTool()->notifyToolComboBoxListChanged("Preset:");
+  }
+} removeBrushPresetCHInstance;
+
+// Batch remove presets by name (used by BrushPresetPanel page deletion).
+// Uses public removePreset() after setting the internal preset property
+// via the TProperty::setValue interface.
+class RemoveBrushPresetByNameCommandHandler final : public MenuItemHandler {
+public:
+  RemoveBrushPresetByNameCommandHandler()
+      : MenuItemHandler(MI_RemoveBrushPresetByName) {}
+  void execute() override {
+    QStringList names = BrushPresetBridge::takePendingRemoveNames();
+    if (names.isEmpty()) return;
+    TTool::Application *app = TTool::getApplication();
+    if (!app) return;
+    TTool *tool = app->getCurrentTool()->getTool();
+    if (!tool || tool->getName() != T_Brush) return;
+
+    // Find the Preset property to set the value before calling removePreset
+    TPropertyGroup *props = tool->getProperties(0);
+    TEnumProperty *presetProp = nullptr;
+    if (props) {
+      for (int i = 0; i < props->getPropertyCount(); ++i) {
+        TProperty *prop = props->getProperty(i);
+        if (prop->getName() == "Preset:") {
+          presetProp = dynamic_cast<TEnumProperty *>(prop);
+          break;
+        }
+      }
+    }
+    if (!presetProp) return;
+
+    switch (tool->getTargetType() & TTool::CommonImages) {
+    case TTool::VectorImage: {
+      ToonzVectorBrushTool *vt = dynamic_cast<ToonzVectorBrushTool *>(tool);
+      if (vt) {
+        for (const QString &name : names) {
+          presetProp->setValue(name.toStdWString());
+          vt->removePreset();
+        }
+      }
+      break;
+    }
+    case TTool::ToonzImage: {
+      ToonzRasterBrushTool *rt = dynamic_cast<ToonzRasterBrushTool *>(tool);
+      if (rt) {
+        for (const QString &name : names) {
+          presetProp->setValue(name.toStdWString());
+          rt->removePreset();
+        }
+      }
+      break;
+    }
+    case TTool::RasterImage: {
+      FullColorBrushTool *ft = dynamic_cast<FullColorBrushTool *>(tool);
+      if (ft) {
+        for (const QString &name : names) {
+          presetProp->setValue(name.toStdWString());
+          ft->removePreset();
+        }
+      }
+      break;
+    }
+    default:
+      break;
+    }
+    // Notify panels that preset list changed (sync ToolOptionBar dropdown)
+    if (app->getCurrentTool())
+      app->getCurrentTool()->notifyToolComboBoxListChanged("Preset:");
+  }
+} removeBrushPresetByNameCHInstance;

@@ -186,7 +186,7 @@ public:
     int firstCol =
         Preferences::instance()->isXsheetCameraColumnVisible() ? -1 : 0;
     if (col < firstCol || (!getViewer()->orientation()->isVerticalTimeline() &&
-                           col >= xsh->getColumnCount()))
+                           col > xsh->getColumnCount()))
       return;
     if (row < 0) row = 0;
     if (m_modifier & Qt::ControlModifier)
@@ -715,7 +715,7 @@ public:
     int row = pos.frame(), col = pos.layer();
     if (!m_invert) {
       // Allow the negative drag
-      if (row == m_r0 && m_colCount == m_rowCount == 1) {
+      if (row == m_r0 && m_colCount == 1 && m_rowCount == 1) {
         int r0, c0, r1, c1;
         getViewer()->getCellSelection()->getSelectedCells(r0, c0, r1, c1);
         TXsheet *xsh = getViewer()->getXsheet();
@@ -1591,7 +1591,7 @@ public:
     int firstCol =
         Preferences::instance()->isXsheetCameraColumnVisible() ? -1 : 0;
     if (col < firstCol || (!getViewer()->orientation()->isVerticalTimeline() &&
-                           col >= xsh->getColumnCount()))
+                           col > xsh->getColumnCount()))
       return;
     TColumnSelection *selection = getViewer()->getColumnSelection();
     selection->selectNone();
@@ -1687,7 +1687,7 @@ public:
 //-----------------------------------------------------------------------------
 
 class ColumnMoveDragTool final : public XsheetGUI::DragTool {
-  int m_offset, m_firstCol, m_lastCol, m_origOffset;
+  int m_offset, m_firstCol, m_lastCol, m_origOffset, m_columnLimit;
 
 public:
   ColumnMoveDragTool(XsheetViewer *viewer)
@@ -1695,7 +1695,8 @@ public:
       , m_firstCol(-1)
       , m_lastCol(-1)
       , m_offset(0)
-      , m_origOffset(0) {}
+      , m_origOffset(0)
+      , m_columnLimit(0) {}
 
   void onClick(const QMouseEvent *event) override {
     QPoint xy                   = event->pos();
@@ -1725,6 +1726,7 @@ public:
     if (indices.empty()) return;
     m_firstCol = m_lastCol = *indices.begin();
     assert(m_firstCol >= 0);
+    m_columnLimit = getViewer()->getXsheet()->getColumnCount();
     m_origOffset = m_offset = m_firstCol - col;
     assert(m_lastCol == *indices.begin());
     getViewer()->update();
@@ -1744,7 +1746,7 @@ public:
 
     assert(m_lastCol == *indices.begin());
 
-    int currEnd = xsh->getColumnCount() - 1;
+    int currEnd = m_columnLimit;
     int origCol = col;
     if (col < 0)
       col = 0;

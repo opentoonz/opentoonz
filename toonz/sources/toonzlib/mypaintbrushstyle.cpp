@@ -1,6 +1,12 @@
 
 #include <streambuf>
 
+#include <QFile>
+#include <QFileInfo>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QSaveFile>
+
 #include <QStandardPaths>
 
 #include "tfilepath_io.h"
@@ -310,6 +316,96 @@ void TMyPaintBrushStyle::loadBrush(const TFilePath &path) {
   TImageReader::load(preview_path, m_preview);
 
   invalidateIcon();
+}
+
+//-----------------------------------------------------------------------------
+
+bool TMyPaintBrushStyle::saveBrushAs(const TFilePath &path,
+                                     QString &errorMessage) const {
+  const QFileInfo sourceInfo(m_fullpath.getQString());
+  const QFileInfo destinationInfo(path.getQString());
+  const QString sourcePath      = sourceInfo.canonicalFilePath().isEmpty()
+                                      ? sourceInfo.absoluteFilePath()
+                                      : sourceInfo.canonicalFilePath();
+  const QString destinationPath = destinationInfo.canonicalFilePath().isEmpty()
+                                      ? destinationInfo.absoluteFilePath()
+                                      : destinationInfo.canonicalFilePath();
+#ifdef _WIN32
+  const Qt::CaseSensitivity pathCaseSensitivity = Qt::CaseInsensitive;
+#else
+  const Qt::CaseSensitivity pathCaseSensitivity = Qt::CaseSensitive;
+#endif
+  if (QString::compare(sourcePath, destinationPath, pathCaseSensitivity) == 0) {
+    errorMessage = QObject::tr(
+        "Save As cannot replace the source MyPaint brush. Choose a new name "
+        "or location.");
+    return false;
+  }
+
+  QFile source(sourcePath);
+  if (!source.open(QIODevice::ReadOnly)) {
+    errorMessage = QObject::tr("The source MyPaint brush could not be read: %1")
+                       .arg(m_fullpath.getQString());
+    return false;
+  }
+
+  const QByteArray data = source.readAll();
+  std::string brushData(data.constData(), data.size());
+  if (brushData.find("version 2") != std::string::npos)
+    brushData = mybToVersion3(brushData);
+
+  QJsonParseError parseError;
+  QJsonDocument document = QJsonDocument::fromJson(
+      QByteArray::fromStdString(brushData), &parseError);
+  if (document.isNull() || !document.isObject()) {
+    errorMessage = QObject::tr("The source MyPaint brush is not valid JSON: %1")
+                       .arg(parseError.errorString());
+    return false;
+  }
+
+  QJsonObject root     = document.object();
+  QJsonObject settings = root.value("settings").toObject();
+  for (const auto &entry : m_baseValues) {
+    const QString key =
+        QString::fromStdString(mypaint::Setting::byId(entry.first).key);
+    QJsonObject setting = settings.value(key).toObject();
+    setting.insert("base_value", static_cast<double>(entry.second));
+    settings.insert(key, setting);
+  }
+  root.insert("settings", settings);
+  root.insert("parent_brush_name", m_path.withType("").getQString());
+  root.insert("version", 3);
+
+  if (!TSystem::touchParentDir(path)) {
+    errorMessage =
+        QObject::tr("The destination folder could not be created: %1")
+            .arg(path.getParentDir().getQString());
+    return false;
+  }
+
+  QSaveFile output(destinationInfo.absoluteFilePath());
+  if (!output.open(QIODevice::WriteOnly)) {
+    errorMessage = QObject::tr("The MyPaint brush could not be written: %1")
+                       .arg(path.getQString());
+    return false;
+  }
+  output.write(QJsonDocument(root).toJson(QJsonDocument::Indented));
+  if (!output.commit()) {
+    errorMessage = QObject::tr("The MyPaint brush could not be saved: %1")
+                       .arg(path.getQString());
+    return false;
+  }
+
+  const TFilePath sourcePreview =
+      m_fullpath.getParentDir() + (m_fullpath.getWideName() + L"_prev.png");
+  const TFilePath destinationPreview =
+      path.getParentDir() + (path.getWideName() + L"_prev.png");
+  if (TFileStatus(sourcePreview).doesExist()) {
+    QFile::remove(destinationPreview.getQString());
+    QFile::copy(sourcePreview.getQString(), destinationPreview.getQString());
+  }
+
+  return true;
 }
 
 //-----------------------------------------------------------------------------

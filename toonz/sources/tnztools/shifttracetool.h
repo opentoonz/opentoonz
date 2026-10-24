@@ -2,7 +2,7 @@
 
 #include "tools/tool.h"
 
-class ShiftTraceTool final : public TTool {
+class DVAPI ShiftTraceTool final : public TTool {
 public:
   enum CurveStatus {
     NoCurve,

@@ -1,6 +1,7 @@
 
 
 #include "tpanels.h"
+#include "alignmentpane.h"
 
 // Tnz6 includes
 #include "pane.h"
@@ -88,6 +89,8 @@
 #include "toonz/tstageobjectcmd.h"
 
 #include "../../toonz/locatorpopup.h"
+
+#include "toonzqt/insertfxpopup.h"
 
 // TnzBase includes
 #include "trasterfx.h"
@@ -983,6 +986,8 @@ public:
     panel->setFixWidthMode(TPanel::fixed);
     panel->setWidget(toolbar);
     panel->setIsMaximizable(false);
+    // A tab strip would not fit this bar (see DockLayout::supportsTabGrouping)
+    panel->setProperty("canJoinDockTabs", false);
     // panel->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
     panel->setFixedWidth(44);  // 35
     toolbar->setFixedWidth(34);
@@ -1009,6 +1014,8 @@ public:
   TPanel *createPanel(QWidget *parent) override {
     TPanel *panel = new CommandBarPanel(parent);
     panel->setObjectName(getPanelType());
+    // A tab strip would not fit this bar (see DockLayout::supportsTabGrouping)
+    panel->setProperty("canJoinDockTabs", false);
     return panel;
   }
   void initialize(TPanel *panel) override {}
@@ -1047,6 +1054,8 @@ public:
     panel->setObjectName(getPanelType());
     panel->setWindowTitle(getPanelType());
     panel->resize(600, panel->height());
+    // A tab strip would not fit this bar (see DockLayout::supportsTabGrouping)
+    panel->setProperty("canJoinDockTabs", false);
     return panel;
   }
   void initialize(TPanel *panel) override { assert(0); }
@@ -1720,12 +1729,6 @@ public:
 } zoomInAndFitPanel;
 
 //=============================================================================
-OpenFloatingPanel openFxBrowserCommand(MI_InsertFx, "FxBrowser",
-                                       QObject::tr("Fx Browser"));
-
-//-----------------------------------------------------------------------------
-
-//=============================================================================
 // LocatorPanel
 //-----------------------------------------------------------------------------
 
@@ -1759,3 +1762,60 @@ public:
 //=============================================================================
 OpenFloatingPanel openLocatorCommand(MI_OpenLocator, "Locator",
                                      QObject::tr("Locator"));
+
+//-----------------------------------------------------------------------------
+
+//=============================================================================
+// FxBrowserPanel
+//-----------------------------------------------------------------------------
+
+FxBrowserPanel::FxBrowserPanel(QWidget *parent) : TPanel(parent) {
+  m_fxBrowser = new InsertFxPopup(this);
+  m_fxBrowser->setApplication(TApp::instance());
+
+  setWidget(m_fxBrowser);
+}
+
+//=============================================================================
+// FxBrowserFactory
+//-----------------------------------------------------------------------------
+
+class FxBrowserFactory final : public TPanelFactory {
+public:
+  FxBrowserFactory() : TPanelFactory("FxBrowser") {}
+
+  TPanel *createPanel(QWidget *parent) override {
+    FxBrowserPanel *panel = new FxBrowserPanel(parent);
+    panel->move(qApp->desktop()->screenGeometry(panel).center());
+    panel->setObjectName(getPanelType());
+    panel->setWindowTitle(QObject::tr("FX Browser"));
+    panel->setMinimumWidth(233);
+    return panel;
+  }
+
+  void initialize(TPanel *panel) override { assert(0); }
+
+} FxBrowserFactory;
+
+//=============================================================================
+OpenFloatingPanel openFxBrowserCommand(MI_InsertFx, "FxBrowser",
+                                       QObject::tr("FX Browser"));
+
+class AlignmentFactory final : public TPanelFactory {
+public:
+  AlignmentFactory() : TPanelFactory("AlignmentPanel") {}
+  TPanel *createPanel(QWidget *parent) override {
+    TPanel *panel = new TPanel(parent);
+    panel->setWidget(new AlignmentPane(panel));
+    panel->setIsMaximizable(false);
+    panel->setObjectName(getPanelType());
+    panel->setWindowTitle(QObject::tr("Align and Distribute"));
+    panel->setMinimumSize(235, 198);
+    return panel;
+  }
+  void initialize(TPanel *panel) override {}
+} alignmentFactory;
+
+OpenFloatingPanel openVectorAlignmentPanelCommand(
+    MI_OpenAlignmentPanel, "AlignmentPanel",
+    QObject::tr("Align and Distribute"));

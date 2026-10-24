@@ -22,6 +22,7 @@
 #include "previewer.h"
 
 #include <array>
+#include <QColor>
 #include <QMatrix4x4>
 #include <QTouchDevice>
 
@@ -64,6 +65,7 @@ public:
 
 class SceneViewer final : public TToolViewer, public Previewer::Listener {
   Q_OBJECT
+  Q_PROPERTY(QColor TableColor READ getTableColor WRITE setTableColor)
 
   double m_pressure;
   QPointF m_lastMousePos;
@@ -139,6 +141,7 @@ class SceneViewer final : public TToolViewer, public Previewer::Listener {
   TPointD m_dpiScale;
 
   int m_tableDLId;  // To compute table DisplayList only if necessary.
+  QColor m_tableColorOverride;
 
   int m_groupIndexToBeEntered;
 
@@ -214,6 +217,9 @@ public:
 
   double getPixelSize() const override { return m_pixelSize; }
 
+  QColor getTableColor() const;
+  void setTableColor(const QColor &color);
+
   // Previewer::Listener
   TRectD getPreviewRect() const override;
   void onRenderStarted(int frame) override;
@@ -259,6 +265,16 @@ public:
 
   TPointD getPan3D() const { return m_pan3D; }
   double getZoomScale3D() const { return m_zoomScale3D; }
+  double getPhi3D() const { return m_phi3D; }
+  double getTheta3D() const { return m_theta3D; }
+
+  TAffine getViewAffine(int viewMode) const { return m_viewAff[viewMode]; }
+  int getReferenceMode() const { return m_referenceMode; }
+
+  //! Restores zoom/pan only: clears rotation and flips for that view mode.
+  void setViewZoomPan(int viewMode, const TAffine &aff);
+  void setCamera3DViewState(const TPointD &pan, double zoom, double phi,
+                            double theta);
 
   double projectToZ(const TPointD &delta) override;
 
@@ -338,6 +354,7 @@ protected:
 
   void paintGL() override;
 
+  void changeEvent(QEvent *event) override;
   void showEvent(QShowEvent *) override;
   void hideEvent(QHideEvent *) override;
 

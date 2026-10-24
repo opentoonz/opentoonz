@@ -111,6 +111,7 @@ public:
   void leftButtonDown(const TPointD& pos, const TMouseEvent&) override;
   void leftButtonDrag(const TPointD& pos, const TMouseEvent&) override;
   void leftButtonUp(const TPointD& pos, const TMouseEvent&) override;
+  bool keyDown(QKeyEvent* event) override;
 
   void mouseMove(const TPointD&, const TMouseEvent& e) override;
 

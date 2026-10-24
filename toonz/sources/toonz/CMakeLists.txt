@@ -51,7 +51,6 @@ set(MOC_HEADERS
     histogrampopup.h
     historypane.h
     imageviewer.h
-    insertfxpopup.h
     layerfooterpanel.h
     layerheaderpanel.h
     levelcreatepopup.h
@@ -114,6 +113,7 @@ set(MOC_HEADERS
     toolbar.h
     tpanels.h
     trackerpopup.h
+    alignmentpane.h
     vectorguideddrawingpane.h
     vectorizerpopup.h
     vectorizerswatch.h
@@ -172,6 +172,7 @@ set(HEADERS
     cellselection.h
     columncommand.h
     columnselection.h
+    customhelplink.h
     curveio.h
     drawingdata.h
     exportlevelcommand.h
@@ -226,6 +227,7 @@ set(SOURCES
     loadfolderpopup.cpp
     main.cpp
     mainwindow.cpp
+    customhelplink.cpp
     matchline.cpp
     menubar.cpp
     menubarpopup.cpp
@@ -274,6 +276,7 @@ set(SOURCES
     addfilmstripframespopup.cpp
     camerasettingspopup.cpp
     convertpopup.cpp
+    convertlinestoareascommand.cpp
     crashhandler.cpp
     duplicatepopup.cpp
     dvdirtreeview.cpp
@@ -281,7 +284,6 @@ set(SOURCES
     formatsettingspopups.cpp
     fxparameditorpopup.cpp
     histogrampopup.cpp
-    insertfxpopup.cpp
     layerfooterpanel.cpp
     layerheaderpanel.cpp
     levelcreatepopup.cpp
@@ -313,6 +315,7 @@ set(SOURCES
     kis_tablet_support_win8.cpp
     timestretchpopup.cpp
     trackerpopup.cpp
+    alignmentpane.cpp
     vectorguideddrawingpane.cpp
     vectorizerpopup.cpp
     rasterizecommand.cpp
@@ -492,6 +495,7 @@ include_directories(
     ../../sources/toonzfarm/include
     ../../sources/toonzqt
     ../../sources/stopmotion
+    ../../sources/tnztools   # Required for SelectionScaleField, SelectionRotationField, etc.
 )
 
 if (WITH_CANON)
@@ -733,54 +737,8 @@ elseif(BUILD_ENV_UNIXLIKE AND NOT BUILD_TARGET_WIN)
         DESTINATION bin
     )
 
-    # Shell script that copies files to the home directory as needed
-    # and sets the library preload path.
-    file(WRITE ${CMAKE_BINARY_DIR}/bin/opentoonz
-"#!/bin/sh
-OPENTOONZ_BASE=\$(dirname \"\$0\")/..
-
-if [ ! -d \$HOME/.config/OpenToonz ]; then
-    mkdir -p \$HOME/.config/OpenToonz
-fi
-
-if [ ! -d \$HOME/.config/OpenToonz/stuff ]; then
-    cp -r \$OPENTOONZ_BASE/share/opentoonz/stuff \$HOME/.config/OpenToonz
-fi
-
-if [ ! -d \$HOME/.config/OpenToonz/stuff/projects/library ]; then
-    mkdir -p \$HOME/.config/OpenToonz/stuff/projects/library
-fi
-
-if [ ! -d \$HOME/.config/OpenToonz/stuff/projects/fxs ]; then
-    mkdir -p \$HOME/.config/OpenToonz/stuff/projects/fxs
-fi
-
-if [ ! -e \$HOME/.config/OpenToonz/SystemVar.ini ]; then
-    cat << EOF > $HOME/.config/OpenToonz/SystemVar.ini
-[General]
-OPENTOONZROOT=\"\$HOME/.config/OpenToonz/stuff\"
-OpenToonzPROFILES=\"\$HOME/.config/OpenToonz/stuff/profiles\"
-TOONZCACHEROOT=\"\$HOME/.config/OpenToonz/stuff/cache\"
-TOONZCONFIG=\"\$HOME/.config/OpenToonz/stuff/config\"
-TOONZFXPRESETS=\"\$HOME/.config/OpenToonz/stuff/fxs\"
-TOONZLIBRARY=\"\$HOME/.config/OpenToonz/stuff/library\"
-TOONZPROFILES=\"\$HOME/.config/OpenToonz/stuff/profiles\"
-TOONZPROJECTS=\"$HOME/.config/OpenToonz/stuff/projects\"
-TOONZROOT=\"\$HOME/.config/OpenToonz/stuff\"
-TOONZSTUDIOPALETTE=\"\$HOME/.config/OpenToonz/stuff/studiopalette\"
-EOF
-fi
-
-export ${PRELOAD_VARIABLE}=\${OPENTOONZ_BASE}/lib/opentoonz:\${${PRELOAD_VARIABLE}}
-
-exec \$OPENTOONZ_BASE/bin/OpenToonz \"\$@\"
-")
-    # only needed for executing without installing
-    execute_process(COMMAND chmod +x ${CMAKE_BINARY_DIR}/bin/opentoonz)
-
     install(
         PROGRAMS
-            ${CMAKE_BINARY_DIR}/bin/opentoonz
             "$<TARGET_FILE:tcleanup>"
             "$<TARGET_FILE:tcomposer>"
             "$<TARGET_FILE:tconverter>"
@@ -788,6 +746,14 @@ exec \$OPENTOONZ_BASE/bin/OpenToonz \"\$@\"
             "$<TARGET_FILE:tfarmserver>"
         DESTINATION bin
     )
+
+    # lowercase symlink so the .desktop file's Exec=opentoonz keeps working
+    install(CODE "
+      file(REMOVE \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/bin/opentoonz\")
+      execute_process(COMMAND \"${CMAKE_COMMAND}\" -E create_symlink
+                      OpenToonz
+                      \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/bin/opentoonz\")
+    ")
 
     if(LZODRIVER_FOUND)
         install(

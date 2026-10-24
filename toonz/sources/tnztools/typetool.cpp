@@ -7,6 +7,7 @@
 #include "tools/toolhandle.h"
 
 #include "tstroke.h"
+#include "tcurves.h"
 #include "tmathutil.h"
 #include "tproperty.h"
 #include "tenv.h"
@@ -23,21 +24,50 @@
 #include "tregion.h"
 #include "tvectorrenderdata.h"
 #include "toonz/tpalettehandle.h"
+#include "toonz/toonzfolders.h"
 
 #include "toonzqt/selection.h"
 #include "toonzqt/imageutils.h"
+#include "toonzqt/dvdialog.h"
 #include "trop.h"
 #include "toonz/ttileset.h"
 #include "toonz/glrasterpainter.h"
 #include "toonz/stage.h"
 
 #include "tfont.h"
+#include "typetooltext.h"
 
 // For Qt translation support
 #include <QCoreApplication>
 #include <QClipboard>
 #include <QApplication>
+#include <QCheckBox>
+#include <QComboBox>
+#include <QFile>
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QIntValidator>
 #include <QMimeData>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QListWidget>
+#include <QMessageBox>
+#include <QPlainTextEdit>
+#include <QPainter>
+#include <QScrollArea>
+#include <QTabWidget>
+#include <QPushButton>
+#include <QSettings>
+#include <QSignalBlocker>
+#include <QTimer>
+#include <QTextCodec>
+#include <QVBoxLayout>
+
+#include <algorithm>
+#include <cmath>
+#include <functional>
+#include <utility>
 
 //#include "tw/message.h"
 
@@ -46,6 +76,8 @@
 using namespace ToolUtils;
 
 namespace {
+
+using namespace TypeToolText;
 
 //---------------------------------------------------------
 //
@@ -78,12 +110,254 @@ void paintChar(const TVectorImageP &image, int styleId) {
   for (j = 0; j < regNum; j++) paintRegion(image->getRegion(j), styleId, true);
 }
 
+void paintOutlineRegion(TRegion *region, const QList<QPainterPath> &paths,
+                        int styleId) {
+  TPointD point;
+  bool filled = false;
+  if (region->getInternalPoint(point)) {
+    for (const QPainterPath &path : paths) {
+      if (path.contains(QPointF(point.x, point.y))) {
+        filled = true;
+        break;
+      }
+    }
+  }
+  region->setStyle(filled ? styleId : 0);
+  for (UINT i = 0; i < region->getSubregionCount(); ++i)
+    paintOutlineRegion(region->getSubregion(i), paths, styleId);
+}
+
+TVectorImageP vectorizeOutlineLayout(const OutlineLayout &layout, double scale,
+                                     int styleId) {
+  TVectorImageP image = new TVectorImage;
+  QList<QPainterPath> paths;
+  const QTransform transform(scale, 0, 0, -scale, 0, 0);
+  for (const QPainterPath &outline : layout.paths) {
+    const QPainterPath path = transform.map(outline);
+    paths.append(path);
+    std::vector<TThickPoint> points;
+    auto finishContour = [&]() {
+      if (points.size() >= 3) {
+        if (points.back() != points.front()) {
+          points.push_back((points.back() + points.front()) * 0.5);
+          points.push_back(points.front());
+        }
+        TStroke *stroke = new TStroke(points);
+        stroke->setSelfLoop(true);
+        stroke->setStyle(styleId);
+        image->addStroke(stroke);
+      }
+      points.clear();
+    };
+    for (int i = 0; i < path.elementCount(); ++i) {
+      const QPainterPath::Element element = path.elementAt(i);
+      const TThickPoint point(element.x, element.y, 0);
+      if (element.type == QPainterPath::MoveToElement) {
+        finishContour();
+        points.push_back(point);
+      } else if (element.type == QPainterPath::LineToElement &&
+                 !points.empty()) {
+        points.push_back((points.back() + point) * 0.5);
+        points.push_back(point);
+      } else if (element.type == QPainterPath::CurveToElement &&
+                 !points.empty() && i + 2 < path.elementCount()) {
+        const QPainterPath::Element control = path.elementAt(++i);
+        const QPainterPath::Element end     = path.elementAt(++i);
+        std::vector<TThickQuadratic *> quadratics;
+        computeQuadraticsFromCubic(
+            points.back(), point, TThickPoint(control.x, control.y, 0),
+            TThickPoint(end.x, end.y, 0), 0.09, quadratics);
+        for (TThickQuadratic *quadratic : quadratics) {
+          points.push_back(quadratic->getP1());
+          points.push_back(quadratic->getP2());
+          delete quadratic;
+        }
+      }
+    }
+    finishContour();
+  }
+  if (image->getStrokeCount() > 1) image->group(0, image->getStrokeCount());
+  image->enableRegionComputing(true, true);
+  image->findRegions();
+  for (UINT i = 0; i < image->getRegionCount(); ++i)
+    paintOutlineRegion(image->getRegion(i), paths, styleId);
+  return image;
+}
+
 //---------------------------------------------------------
 // Type, vars, ecc.
 //
 //---------------------------------------------------------
 
 TEnv::StringVar EnvCurrentFont("CurrentFont", "MS UI Gothic");
+
+constexpr qint64 cTextImportWarningSize = 1024 * 1024;
+
+QString typeToolSettingsPath() {
+  return toQString(ToonzFolder::getMyModuleDir() + TFilePath("typetool.ini"));
+}
+
+class TypeToolTextHistory final {
+  bool m_loaded;
+  bool m_enabled;
+  TypeToolTextEntry m_draft;
+  QList<TypeToolTextEntry> m_entries;
+
+  void configureSettings(QSettings &settings) const {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    settings.setIniCodec("UTF-8");
+#endif
+  }
+
+  void saveHistory() const {
+    QSettings values(typeToolSettingsPath(), QSettings::IniFormat);
+    configureSettings(values);
+    values.beginGroup("General");
+    values.setValue("Version", 3);
+    values.setValue("HistoryLimit", cTextHistoryLimit);
+    values.endGroup();
+    values.beginWriteArray("History", m_entries.size());
+    for (int i = 0; i < m_entries.size(); ++i) {
+      values.setArrayIndex(i);
+      const TypeToolTextEntry &entry = m_entries.at(i);
+      values.remove("Text");
+      values.setValue("Source", entry.source);
+      values.setValue("Format", textFormatName(entry.format));
+      values.setValue("PreserveLineBreaks", entry.preserveSourceLineBreaks);
+      values.setValue("FontFamily", entry.font.family);
+      values.setValue("FontStyle", entry.font.style);
+      values.setValue("FontSize", entry.font.size);
+    }
+    values.endArray();
+    values.sync();
+  }
+
+public:
+  TypeToolTextHistory() : m_loaded(false), m_enabled(false) {}
+
+  void load() {
+    if (m_loaded) return;
+    m_loaded = true;
+    QSettings values(typeToolSettingsPath(), QSettings::IniFormat);
+    configureSettings(values);
+    values.beginGroup("General");
+    m_enabled = values.value("EditorEnabled", false).toBool();
+    values.endGroup();
+
+    values.beginGroup("Draft");
+    m_draft.source =
+        normalizedText(values.value("Source", values.value("Text")).toString());
+    m_draft.format = textFormatFromName(
+        values.value("Format", QStringLiteral("PlainText")).toString());
+    m_draft.preserveSourceLineBreaks =
+        values.value("PreserveLineBreaks", true).toBool();
+    m_draft.font.family = values.value("FontFamily").toString();
+    m_draft.font.style  = values.value("FontStyle").toString();
+    m_draft.font.size   = values.value("FontSize").toString();
+    values.endGroup();
+
+    int count = values.beginReadArray("History");
+    for (int i = 0; i < count && m_entries.size() < cTextHistoryLimit; ++i) {
+      values.setArrayIndex(i);
+      TypeToolTextEntry entry;
+      entry.source = normalizedText(
+          values.value("Source", values.value("Text")).toString());
+      entry.format = textFormatFromName(
+          values.value("Format", QStringLiteral("PlainText")).toString());
+      entry.preserveSourceLineBreaks =
+          values.value("PreserveLineBreaks", true).toBool();
+      entry.font.family = values.value("FontFamily").toString();
+      entry.font.style  = values.value("FontStyle").toString();
+      entry.font.size   = values.value("FontSize").toString();
+      bool duplicate    = false;
+      for (const TypeToolTextEntry &savedEntry : m_entries) {
+        if (sameTextEntry(savedEntry, entry)) {
+          duplicate = true;
+          break;
+        }
+      }
+      if (!entry.source.isEmpty() && !duplicate) m_entries.append(entry);
+    }
+    values.endArray();
+  }
+
+  bool isEnabled() const { return m_enabled; }
+  const TypeToolTextEntry &draft() const { return m_draft; }
+  const QList<TypeToolTextEntry> &entries() const { return m_entries; }
+
+  void setEnabled(bool enabled) {
+    load();
+    if (m_enabled == enabled) return;
+    m_enabled = enabled;
+    QSettings values(typeToolSettingsPath(), QSettings::IniFormat);
+    configureSettings(values);
+    values.beginGroup("General");
+    values.setValue("Version", 3);
+    values.setValue("HistoryLimit", cTextHistoryLimit);
+    values.setValue("EditorEnabled", m_enabled);
+    values.endGroup();
+    values.sync();
+  }
+
+  void setDraftSource(const QString &text) {
+    m_draft.source = normalizedText(text);
+  }
+
+  void setDraftFont(const TypeToolFontSettings &font) { m_draft.font = font; }
+
+  void setDraft(const TypeToolTextEntry &entry) {
+    m_draft        = entry;
+    m_draft.source = normalizedText(m_draft.source);
+  }
+
+  void saveDraft() const {
+    QSettings values(typeToolSettingsPath(), QSettings::IniFormat);
+    configureSettings(values);
+    values.beginGroup("General");
+    values.setValue("Version", 3);
+    values.setValue("HistoryLimit", cTextHistoryLimit);
+    values.endGroup();
+    values.beginGroup("Draft");
+    values.remove("Text");
+    values.setValue("Source", m_draft.source);
+    values.setValue("Format", textFormatName(m_draft.format));
+    values.setValue("PreserveLineBreaks", m_draft.preserveSourceLineBreaks);
+    values.setValue("FontFamily", m_draft.font.family);
+    values.setValue("FontStyle", m_draft.font.style);
+    values.setValue("FontSize", m_draft.font.size);
+    values.endGroup();
+    values.sync();
+  }
+
+  void addEntry(const QString &sourceText) {
+    TypeToolTextEntry entry = m_draft;
+    entry.source            = normalizedText(sourceText);
+    if (entry.source.isEmpty()) return;
+    for (int i = m_entries.size() - 1; i >= 0; --i) {
+      if (sameTextEntry(m_entries.at(i), entry)) m_entries.removeAt(i);
+    }
+    m_entries.prepend(entry);
+    while (m_entries.size() > cTextHistoryLimit) m_entries.removeLast();
+    saveHistory();
+  }
+
+  void removeEntry(int index) {
+    if (index < 0 || index >= m_entries.size()) return;
+    m_entries.removeAt(index);
+    saveHistory();
+  }
+
+  void clear() {
+    m_entries.clear();
+    saveHistory();
+  }
+
+  void setEntries(const QList<TypeToolTextEntry> &entries) {
+    m_entries = entries;
+    while (m_entries.size() > cTextHistoryLimit) m_entries.removeLast();
+    saveHistory();
+  }
+};
 
 //! numero di pixel attorno al testo
 const double cBorderSize = 15;
@@ -290,6 +564,8 @@ public:
 //
 //---------------------------------------------------------
 
+class TypeToolTextHistoryPopup;
+
 class TypeTool final : public TTool {
   Q_DECLARE_TR_FUNCTIONS(TypeTool)
 
@@ -297,6 +573,7 @@ class TypeTool final : public TTool {
   TEnumProperty m_fontFamilyMenu;
   TEnumProperty m_typeFaceMenu;
   TBoolProperty m_vertical;
+  TBoolProperty m_textHistoryEnabled;
   TEnumProperty m_size;
   TPropertyGroup m_prop[2];
 
@@ -330,6 +607,18 @@ class TypeTool final : public TTool {
   bool m_isVertical;      // text orientation
 
   TUndo *m_undo;
+  TypeToolTextHistory m_textHistory;
+  TypeToolTextHistoryPopup *m_textHistoryPopup;
+  TypeToolTextEntry m_formattedEntry;
+  OutlineLayout m_formattedLayout;
+  TVectorImageP m_formattedVector;
+  TToonzImageP m_formattedRaster;
+  TPointD m_formattedRasterOffset;
+  bool m_formattedCacheValid = false;
+  bool m_formattedVertical   = false;
+  bool m_formattedIsVector   = false;
+  int m_formattedStyle       = -1;
+  QString m_formattedError;
 
 public:
   TypeTool();
@@ -347,6 +636,11 @@ public:
   void setTypeface(std::wstring typeface);
   void setSize(std::wstring size);
   void setVertical(bool vertical);
+  TypeToolFontSettings currentFontSettings() const;
+  QStringList availableFontFamilies() const;
+  QStringList availableFontStyles() const;
+  QStringList availableFontSizes() const;
+  void applyFontSettings(const TypeToolFontSettings &font);
   void draw() override;
 
   void updateMouseCursor(const TPointD &pos);
@@ -382,6 +676,18 @@ public:
                             std::vector<const TVectorImage *> &images);
   void addTextToToonzImage(const TToonzImageP &currentImage);
   void stopEditing();
+  QString currentText() const;
+  void setTextFromHistory(const QString &text);
+  void syncTextHistoryDraft();
+  void syncTextHistoryFontSettings();
+  void showTextHistoryPopup();
+  void hideTextHistoryPopup();
+  bool verticalOrientation() const { return m_isVertical; }
+  bool isFormattedText() const;
+  void textHistoryEntryChanged();
+  bool updateFormattedText();
+  void drawFormattedText();
+  void addFormattedTextToToonzImage(const TToonzImageP &image);
 
   void reset() override;
 
@@ -402,8 +708,520 @@ public:
   }
 
   int getColorClass() const { return 1; }
+};
 
-} typeTool;
+//---------------------------------------------------------
+
+class TypeToolTextPreview final : public QWidget {
+  Q_DECLARE_TR_FUNCTIONS(TypeToolTextPreview)
+  OutlineLayout m_layout;
+
+public:
+  explicit TypeToolTextPreview(QWidget *parent) : QWidget(parent) {}
+
+  void setEntry(const TypeToolTextEntry &entry, bool vertical) {
+    m_layout        = buildOutlineLayout(entry, vertical);
+    const int width = std::min(
+        16777215.0, std::max(200.0, std::ceil(m_layout.bounds.width()) + 24));
+    const int height = std::min(
+        16777215.0, std::max(100.0, std::ceil(m_layout.bounds.height()) + 24));
+    setMinimumSize(width, height);
+    resize(width, height);
+    update();
+  }
+
+protected:
+  void paintEvent(QPaintEvent *) override {
+    QPainter painter(this);
+    painter.fillRect(rect(), Qt::white);
+    painter.setPen(Qt::black);
+    if (!m_layout.supported) {
+      painter.drawText(rect().adjusted(12, 12, -12, -12), Qt::TextWordWrap,
+                       tr("Formatted Markdown is unavailable in this build."));
+      return;
+    }
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(Qt::black);
+    painter.translate(12 - m_layout.bounds.left(), 12 - m_layout.bounds.top());
+    for (const QPainterPath &path : m_layout.paths) painter.drawPath(path);
+  }
+};
+
+class TypeToolTextHistoryPopup final : public DVGui::Dialog {
+  Q_DECLARE_TR_FUNCTIONS(TypeToolTextHistoryPopup)
+
+  TypeTool *m_tool;
+  TypeToolTextHistory &m_history;
+  QListWidget *m_historyList;
+  QPlainTextEdit *m_editor;
+  QTabWidget *m_textTabs;
+  TypeToolTextPreview *m_preview;
+  QComboBox *m_fontFamilyCombo;
+  QComboBox *m_fontStyleCombo;
+  QComboBox *m_fontSizeCombo;
+  QComboBox *m_formatCombo;
+  QCheckBox *m_preserveLineBreaks;
+  QPushButton *m_saveEntryButton;
+  QTimer *m_saveTimer;
+  std::function<void(const QString &)> m_textChanged;
+
+  TypeToolTextEntry editorEntry() const {
+    TypeToolTextEntry entry;
+    entry.source                   = m_editor->toPlainText();
+    entry.format                   = m_formatCombo->currentIndex() == 1
+                                         ? TypeToolTextFormat::Markdown
+                                         : TypeToolTextFormat::PlainText;
+    entry.preserveSourceLineBreaks = m_preserveLineBreaks->isChecked();
+    entry.font.family              = m_fontFamilyCombo->currentText();
+    entry.font.style               = m_fontStyleCombo->currentText();
+    entry.font.size                = m_fontSizeCombo->currentText();
+    return entry;
+  }
+
+  void refreshTextPreview() {
+    m_preview->setEntry(editorEntry(), m_tool->verticalOrientation());
+  }
+
+  void refreshFontControls() {
+    TypeToolFontSettings font = m_tool->currentFontSettings();
+    QSignalBlocker familyBlocker(m_fontFamilyCombo);
+    QSignalBlocker styleBlocker(m_fontStyleCombo);
+    QSignalBlocker sizeBlocker(m_fontSizeCombo);
+
+    m_fontFamilyCombo->clear();
+    m_fontFamilyCombo->addItems(m_tool->availableFontFamilies());
+    m_fontFamilyCombo->setCurrentText(font.family);
+
+    m_fontStyleCombo->clear();
+    m_fontStyleCombo->addItems(m_tool->availableFontStyles());
+    m_fontStyleCombo->setCurrentText(font.style);
+
+    m_fontSizeCombo->clear();
+    m_fontSizeCombo->addItems(m_tool->availableFontSizes());
+    m_fontSizeCombo->setCurrentText(font.size);
+    refreshTextPreview();
+  }
+
+  void applyFontControls(bool familyChanged = false) {
+    TypeToolFontSettings font;
+    font.family = m_fontFamilyCombo->currentText();
+    if (!familyChanged) font.style = m_fontStyleCombo->currentText();
+    font.size = m_fontSizeCombo->currentText();
+    m_tool->applyFontSettings(font);
+    refreshFontControls();
+    scheduleDraftSave();
+  }
+
+  void setEditorEntry(const TypeToolTextEntry &entry, bool notify = true) {
+    TypeToolTextEntry resolvedEntry  = entry;
+    TypeToolFontSettings currentFont = m_tool->currentFontSettings();
+    if (resolvedEntry.font.family.isEmpty())
+      resolvedEntry.font.family = currentFont.family;
+    if (resolvedEntry.font.style.isEmpty())
+      resolvedEntry.font.style = currentFont.style;
+    if (resolvedEntry.font.size.isEmpty())
+      resolvedEntry.font.size = currentFont.size;
+    m_tool->applyFontSettings(resolvedEntry.font);
+
+    QSignalBlocker editorBlocker(m_editor);
+    QSignalBlocker formatBlocker(m_formatCombo);
+    QSignalBlocker lineBreakBlocker(m_preserveLineBreaks);
+    m_editor->setPlainText(resolvedEntry.source);
+    m_saveEntryButton->setEnabled(!resolvedEntry.source.isEmpty());
+    m_formatCombo->setCurrentIndex(
+        resolvedEntry.format == TypeToolTextFormat::Markdown ? 1 : 0);
+    m_preserveLineBreaks->setChecked(resolvedEntry.preserveSourceLineBreaks);
+    m_preserveLineBreaks->setEnabled(resolvedEntry.format ==
+                                     TypeToolTextFormat::Markdown);
+    refreshFontControls();
+    resolvedEntry.font = m_tool->currentFontSettings();
+    m_history.setDraft(resolvedEntry);
+    m_textTabs->setCurrentIndex(
+        resolvedEntry.format == TypeToolTextFormat::Markdown ? 1 : 0);
+    if (notify) {
+      m_saveTimer->start();
+      if (m_textChanged) m_textChanged(resolvedEntry.source);
+    }
+  }
+
+  void saveTextDocument() {
+    const bool markdown = editorEntry().format == TypeToolTextFormat::Markdown;
+    const QString plainFilter    = tr("Plain text (*.txt)");
+    const QString markdownFilter = tr("Markdown (*.md *.markdown)");
+    QFileDialog dialog(this, tr("Save Text Source"));
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setFileMode(QFileDialog::AnyFile);
+    dialog.setNameFilters(QStringList() << plainFilter << markdownFilter);
+    dialog.selectNameFilter(markdown ? markdownFilter : plainFilter);
+    dialog.setDefaultSuffix(markdown ? QStringLiteral("md")
+                                     : QStringLiteral("txt"));
+    dialog.selectFile(markdown ? QStringLiteral("text.md")
+                               : QStringLiteral("text.txt"));
+    connect(&dialog, &QFileDialog::filterSelected, &dialog,
+            [&dialog, markdownFilter](const QString &filter) {
+              dialog.setDefaultSuffix(filter == markdownFilter
+                                          ? QStringLiteral("md")
+                                          : QStringLiteral("txt"));
+            });
+    if (dialog.exec() != QDialog::Accepted || dialog.selectedFiles().isEmpty())
+      return;
+    QString error;
+    if (!saveTextSource(dialog.selectedFiles().first(), m_editor->toPlainText(),
+                        error))
+      QMessageBox::warning(this, tr("Save Text Source"),
+                           tr("The text could not be saved.\n%1").arg(error));
+  }
+
+  void saveCurrentTextToHistory() {
+    const TypeToolTextEntry entry = editorEntry();
+    if (entry.source.isEmpty()) return;
+    m_history.setDraft(entry);
+    m_history.addEntry(entry.source);
+    m_history.saveDraft();
+    rebuildHistoryList();
+    QSignalBlocker blocker(m_historyList);
+    m_historyList->setCurrentRow(0);
+  }
+
+  void saveTextHistory() {
+    QFileDialog dialog(this, tr("Save Text History"));
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setFileMode(QFileDialog::AnyFile);
+    dialog.setNameFilter(tr("Type Tool history (*.json)"));
+    dialog.setDefaultSuffix(QStringLiteral("json"));
+    dialog.selectFile(QStringLiteral("type-tool-history.json"));
+    if (dialog.exec() != QDialog::Accepted || dialog.selectedFiles().isEmpty())
+      return;
+    QString error;
+    const QString json =
+        QString::fromUtf8(serializeHistory(m_history.entries()));
+    if (!saveTextSource(dialog.selectedFiles().first(), json, error))
+      QMessageBox::warning(
+          this, tr("Save Text History"),
+          tr("The history could not be saved.\n%1").arg(error));
+  }
+
+  void loadTextHistory() {
+    const QString fileName = QFileDialog::getOpenFileName(
+        this, tr("Load Text History"), QString(),
+        tr("Type Tool history (*.json);;All files (*)"));
+    if (fileName.isEmpty()) return;
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly)) {
+      QMessageBox::warning(this, tr("Load Text History"),
+                           tr("The history file could not be opened.\n%1")
+                               .arg(file.errorString()));
+      return;
+    }
+    QList<TypeToolTextEntry> loaded;
+    QString error;
+    if (!deserializeHistory(file.readAll(), loaded, error)) {
+      QMessageBox::warning(this, tr("Load Text History"), error);
+      return;
+    }
+    if (!m_history.entries().isEmpty()) {
+      QMessageBox question(this);
+      question.setWindowTitle(tr("Load Text History"));
+      question.setIcon(QMessageBox::Question);
+      question.setText(
+          tr("Merge the loaded entries into Recent Text, or replace the saved "
+             "listing?"));
+      question.setInformativeText(
+          tr("Merge puts loaded entries first and keeps up to %1 entries. Your "
+             "current text is kept.")
+              .arg(cTextHistoryLimit));
+      QPushButton *merge =
+          question.addButton(tr("Merge"), QMessageBox::AcceptRole);
+      QPushButton *replace =
+          question.addButton(tr("Replace"), QMessageBox::DestructiveRole);
+      question.addButton(QMessageBox::Cancel);
+      question.setDefaultButton(merge);
+      question.exec();
+      if (question.clickedButton() == merge)
+        loaded = mergeHistory(loaded, m_history.entries());
+      else if (question.clickedButton() != replace)
+        return;
+    }
+    m_history.setEntries(loaded);
+    // Loading a listing does not replace the draft or the active canvas text.
+    rebuildHistoryList(false);
+  }
+
+  void importTextDocument() {
+    QString fileName = QFileDialog::getOpenFileName(
+        this, tr("Import Text Document"), QString(),
+        tr("Text documents (*.txt *.md *.markdown);;Plain text (*.txt);;"
+           "Markdown (*.md *.markdown)"));
+    if (fileName.isEmpty()) return;
+
+    QFileInfo fileInfo(fileName);
+    if (fileInfo.size() > cTextImportWarningSize &&
+        QMessageBox::question(
+            this, tr("Import Large Text Document"),
+            tr("This file is larger than 1 MB and may be slow to convert to "
+               "Type Tool geometry. Import it anyway?")) != QMessageBox::Yes)
+      return;
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly)) {
+      QMessageBox::warning(this, tr("Import Text Document"),
+                           tr("The selected file could not be opened."));
+      return;
+    }
+
+    QByteArray bytes = file.readAll();
+    QTextCodec::ConverterState state;
+    QString source = QTextCodec::codecForName("UTF-8")->toUnicode(
+        bytes.constData(), bytes.size(), &state);
+    if (state.invalidChars > 0 &&
+        QMessageBox::question(
+            this, tr("Invalid UTF-8 Text"),
+            tr("The file contains invalid UTF-8 data. Invalid characters "
+               "will be replaced. Continue?")) != QMessageBox::Yes)
+      return;
+
+    if (!source.isEmpty() && source.at(0) == QChar::ByteOrderMark)
+      source.remove(0, 1);
+
+    TypeToolTextEntry entry;
+    entry.source   = normalizedText(source);
+    QString suffix = fileInfo.suffix().toLower();
+    entry.format =
+        suffix == QStringLiteral("md") || suffix == QStringLiteral("markdown")
+            ? TypeToolTextFormat::Markdown
+            : TypeToolTextFormat::PlainText;
+    entry.preserveSourceLineBreaks = true;
+    setEditorEntry(entry);
+    if (entry.format == TypeToolTextFormat::PlainText) m_editor->setFocus();
+  }
+
+  void rebuildHistoryList(bool restoreSelection = true) {
+    int oldRow = m_historyList->currentRow();
+    QSignalBlocker blocker(m_historyList);
+    m_historyList->clear();
+    for (const TypeToolTextEntry &entry : m_history.entries()) {
+      QString label = entry.source;
+      label.replace('\n', QChar(0x21B5));
+      if (label.size() > 80) label = label.left(77) + QStringLiteral("...");
+      if (entry.format == TypeToolTextFormat::Markdown)
+        label.prepend(QStringLiteral("[MD] "));
+      QString fontLabel =
+          QStringLiteral("%1, %2, %3")
+              .arg(entry.font.family, entry.font.style, entry.font.size);
+      if (!entry.font.family.isEmpty())
+        label.prepend(QStringLiteral("[%1] ").arg(fontLabel));
+      QListWidgetItem *item = new QListWidgetItem(label, m_historyList);
+      QString toolTip       = entry.source;
+      if (!entry.font.family.isEmpty())
+        toolTip += QStringLiteral("\n\n%1: %2\n%3: %4\n%5: %6")
+                       .arg(tr("Font"), entry.font.family, tr("Style"),
+                            entry.font.style, tr("Size"), entry.font.size);
+      item->setToolTip(toolTip);
+    }
+    if (restoreSelection && oldRow >= 0 && oldRow < m_historyList->count())
+      m_historyList->setCurrentRow(oldRow);
+  }
+
+  void scheduleDraftSave() {
+    const TypeToolTextEntry entry = editorEntry();
+    m_history.setDraft(entry);
+    refreshTextPreview();
+    m_saveTimer->start();
+    if (m_textChanged) m_textChanged(entry.source);
+  }
+
+public:
+  TypeToolTextHistoryPopup(QWidget *parent, TypeTool *tool,
+                           TypeToolTextHistory &history,
+                           std::function<void(const QString &)> textChanged)
+      : DVGui::Dialog(parent, false, false, QStringLiteral("TypeToolHistory"))
+      , m_tool(tool)
+      , m_history(history)
+      , m_historyList(new QListWidget(this))
+      , m_editor(new QPlainTextEdit(this))
+      , m_textTabs(new QTabWidget(this))
+      , m_preview(new TypeToolTextPreview(this))
+      , m_fontFamilyCombo(new QComboBox(this))
+      , m_fontStyleCombo(new QComboBox(this))
+      , m_fontSizeCombo(new QComboBox(this))
+      , m_formatCombo(new QComboBox(this))
+      , m_preserveLineBreaks(
+            new QCheckBox(tr("Preserve source line breaks for Markdown"), this))
+      , m_saveEntryButton(new QPushButton(tr("Save to History"), this))
+      , m_saveTimer(new QTimer(this))
+      , m_textChanged(std::move(textChanged)) {
+    setWindowTitle(tr("Type Tool Text History"));
+    setMinimumSize(520, 460);
+
+    m_historyList->setAlternatingRowColors(true);
+    m_historyList->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_historyList->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    m_historyList->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+    m_editor->setPlaceholderText(tr("Enter text to place with the Type Tool."));
+    m_fontSizeCombo->setEditable(true);
+    m_fontSizeCombo->lineEdit()->setValidator(
+        new QIntValidator(1, 1000, m_fontSizeCombo));
+    m_formatCombo->addItem(tr("Plain Text"));
+    m_formatCombo->addItem(tr("Markdown"));
+    QScrollArea *previewArea = new QScrollArea(this);
+    previewArea->setWidget(m_preview);
+    previewArea->setWidgetResizable(false);
+    m_textTabs->addTab(m_editor, tr("Source"));
+    m_textTabs->addTab(previewArea, tr("Preview"));
+    setEditorEntry(m_history.draft(), false);
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(new QLabel(tr("Editable Text"), this));
+    layout->addWidget(m_textTabs, 2);
+
+    QHBoxLayout *fontLayout = new QHBoxLayout;
+    fontLayout->addWidget(new QLabel(tr("Font:"), this));
+    fontLayout->addWidget(m_fontFamilyCombo, 2);
+    fontLayout->addWidget(new QLabel(tr("Style:"), this));
+    fontLayout->addWidget(m_fontStyleCombo, 1);
+    fontLayout->addWidget(new QLabel(tr("Size:"), this));
+    fontLayout->addWidget(m_fontSizeCombo);
+    layout->addLayout(fontLayout);
+
+    QHBoxLayout *formatLayout = new QHBoxLayout;
+    formatLayout->addWidget(new QLabel(tr("Document Format:"), this));
+    formatLayout->addWidget(m_formatCombo);
+    formatLayout->addWidget(m_preserveLineBreaks);
+    formatLayout->addStretch(1);
+    layout->addLayout(formatLayout);
+    QLabel *markdownNote =
+        new QLabel(tr("Markdown is formatted in Preview and on the canvas. "
+                      "Images are not embedded."),
+                   this);
+    markdownNote->setWordWrap(true);
+    layout->addWidget(markdownNote);
+    layout->addWidget(
+        new QLabel(tr("Recent Text (last %1)").arg(cTextHistoryLimit), this));
+    layout->addWidget(m_historyList, 1);
+
+    QPushButton *importButton   = new QPushButton(tr("Import Text..."), this);
+    QPushButton *saveTextButton = new QPushButton(tr("Save Text..."), this);
+    QPushButton *deleteButton   = new QPushButton(tr("Delete Entry"), this);
+    QPushButton *clearButton    = new QPushButton(tr("Clear History"), this);
+    QPushButton *closeButton    = new QPushButton(tr("Close"), this);
+    QPushButton *loadHistoryButton =
+        new QPushButton(tr("Load History..."), this);
+    QPushButton *saveHistoryButton =
+        new QPushButton(tr("Save History..."), this);
+    QHBoxLayout *buttonLayout = new QHBoxLayout;
+    buttonLayout->addWidget(importButton);
+    buttonLayout->addWidget(saveTextButton);
+    buttonLayout->addWidget(m_saveEntryButton);
+    buttonLayout->addStretch(1);
+    buttonLayout->addWidget(closeButton);
+    layout->addLayout(buttonLayout);
+    QHBoxLayout *historyButtons = new QHBoxLayout;
+    historyButtons->addWidget(loadHistoryButton);
+    historyButtons->addWidget(saveHistoryButton);
+    historyButtons->addWidget(deleteButton);
+    historyButtons->addWidget(clearButton);
+    historyButtons->addStretch(1);
+    layout->addLayout(historyButtons);
+    addLayout(layout);
+
+    m_saveTimer->setSingleShot(true);
+    m_saveTimer->setInterval(300);
+
+    connect(m_saveTimer, &QTimer::timeout, this,
+            [this]() { m_history.saveDraft(); });
+    connect(m_editor, &QPlainTextEdit::textChanged, this, [this]() {
+      m_saveEntryButton->setEnabled(!m_editor->toPlainText().isEmpty());
+      scheduleDraftSave();
+    });
+    connect(
+        m_formatCombo,
+        static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+        this, [this](int index) {
+          m_preserveLineBreaks->setEnabled(index == 1);
+          scheduleDraftSave();
+        });
+    connect(m_preserveLineBreaks, &QCheckBox::toggled, this,
+            [this]() { scheduleDraftSave(); });
+    connect(m_fontFamilyCombo,
+            static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), this,
+            [this](int) { applyFontControls(true); });
+    connect(m_fontStyleCombo,
+            static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), this,
+            [this](int) { applyFontControls(); });
+    connect(m_fontSizeCombo,
+            static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), this,
+            [this](int) { applyFontControls(); });
+    connect(m_fontSizeCombo->lineEdit(), &QLineEdit::editingFinished, this,
+            [this]() { applyFontControls(); });
+    connect(m_historyList, &QListWidget::currentRowChanged, this,
+            [this](int row) {
+              if (row < 0 || row >= m_history.entries().size()) return;
+              setEditorEntry(m_history.entries().at(row));
+            });
+    connect(importButton, &QPushButton::clicked, this,
+            [this]() { importTextDocument(); });
+    connect(saveTextButton, &QPushButton::clicked, this,
+            [this]() { saveTextDocument(); });
+    connect(m_saveEntryButton, &QPushButton::clicked, this,
+            [this]() { saveCurrentTextToHistory(); });
+    connect(loadHistoryButton, &QPushButton::clicked, this,
+            [this]() { loadTextHistory(); });
+    connect(saveHistoryButton, &QPushButton::clicked, this,
+            [this]() { saveTextHistory(); });
+    connect(deleteButton, &QPushButton::clicked, this, [this]() {
+      int row = m_historyList->currentRow();
+      if (row < 0) return;
+      m_history.removeEntry(row);
+      rebuildHistoryList(false);
+    });
+    connect(clearButton, &QPushButton::clicked, this, [this]() {
+      if (QMessageBox::question(
+              this, tr("Clear Text History"),
+              tr("Remove all saved Type Tool text entries?")) !=
+          QMessageBox::Yes)
+        return;
+      m_history.clear();
+      rebuildHistoryList(false);
+    });
+    connect(closeButton, &QPushButton::clicked, this, &QWidget::hide);
+    connect(this, &DVGui::Dialog::dialogClosed, this, [this]() {
+      m_saveTimer->stop();
+      m_history.setDraft(editorEntry());
+      m_history.saveDraft();
+    });
+
+    rebuildHistoryList();
+  }
+
+  void setEditorText(const QString &text) {
+    QString normalized = normalizedText(text);
+    if (m_editor->toPlainText() == normalized) return;
+    QSignalBlocker blocker(m_editor);
+    m_editor->setPlainText(normalized);
+    m_saveEntryButton->setEnabled(!normalized.isEmpty());
+    m_history.setDraftSource(normalized);
+    refreshTextPreview();
+    m_saveTimer->start();
+  }
+
+  void syncFontControls() {
+    refreshFontControls();
+    m_history.setDraftFont(m_tool->currentFontSettings());
+    m_saveTimer->start();
+  }
+
+  void refreshHistory() { rebuildHistoryList(); }
+
+  void showAndRaise() {
+    refreshHistory();
+    show();
+    raise();
+    activateWindow();
+  }
+};
+
+TypeTool typeTool;
 
 //---------------------------------------------------------
 //
@@ -428,8 +1246,10 @@ TypeTool::TypeTool()
     , m_fontFamilyMenu("Font:")                  // W_ToolOptions_FontName
     , m_typeFaceMenu("Style:")                   // W_ToolOptions_TypeFace
     , m_vertical("Vertical Orientation", false)  // W_ToolOptions_Vertical
-    , m_size("Size:")                            // W_ToolOptions_Size
-    , m_undo(0) {
+    , m_textHistoryEnabled("Text History", false)
+    , m_size("Size:")  // W_ToolOptions_Size
+    , m_undo(0)
+    , m_textHistoryPopup(nullptr) {
   bind(TTool::VectorImage | TTool::ToonzImage | TTool::EmptyTarget);
   m_prop[0].bind(m_fontFamilyMenu);
   // Su mac non e' visibile il menu dello style perche' e' stato inserito nel
@@ -440,7 +1260,9 @@ TypeTool::TypeTool()
   //#endif
   m_prop[1].bind(m_size);
   m_prop[1].bind(m_vertical);
+  m_prop[1].bind(m_textHistoryEnabled);
   m_vertical.setId("Orientation");
+  m_textHistoryEnabled.setId("TextHistory");
   m_fontFamilyMenu.setId("TypeFont");
   m_typeFaceMenu.setId("TypeStyle");
   m_size.setId("TypeSize");
@@ -452,29 +1274,247 @@ TypeTool::~TypeTool() {}
 
 //---------------------------------------------------------
 
+bool TypeTool::isFormattedText() const {
+  return m_textHistoryEnabled.getValue() &&
+         m_textHistory.draft().format == TypeToolTextFormat::Markdown;
+}
+
+void TypeTool::textHistoryEntryChanged() {
+  m_formattedCacheValid = false;
+  if (m_active) {
+    updateCharPositions();
+    invalidate();
+  }
+}
+
+bool TypeTool::updateFormattedText() {
+  const TImageP target = getImage(false);
+  if (!target) return false;
+  const bool vectorTarget = !!TVectorImageP(target);
+  const double scale      = vectorTarget ? Stage::inch / Stage::standardDpi : 1;
+  TypeToolTextEntry entry = m_textHistory.draft();
+  entry.source            = currentText();
+  entry.font              = currentFontSettings();
+  const int styleId       = getApplication()->getCurrentLevelStyleIndex();
+  const bool cached =
+      m_formattedCacheValid && sameTextEntry(entry, m_formattedEntry) &&
+      m_formattedVertical == m_isVertical &&
+      m_formattedIsVector == vectorTarget && m_formattedStyle == styleId;
+  if (!cached) {
+    m_formattedEntry      = entry;
+    m_formattedVertical   = m_isVertical;
+    m_formattedIsVector   = vectorTarget;
+    m_formattedStyle      = styleId;
+    m_formattedCacheValid = true;
+    m_formattedVector     = TVectorImageP();
+    m_formattedRaster     = TToonzImageP();
+    m_formattedError.clear();
+    m_formattedLayout = buildOutlineLayout(entry, m_isVertical);
+    if (!m_formattedLayout.supported) {
+      m_formattedError = tr("Formatted Markdown is unavailable in this build.");
+    } else if (!m_formattedLayout.paths.isEmpty()) {
+      if (vectorTarget) {
+        m_formattedVector =
+            vectorizeOutlineLayout(m_formattedLayout, scale, styleId);
+      } else {
+        QRect bounds;
+        const QImage image = rasterizeOutlineLayout(m_formattedLayout, bounds);
+        if (image.isNull()) {
+          m_formattedError =
+              tr("The formatted text is too large for a Toonz Raster image. "
+                 "Reduce its size or use a vector level.");
+        } else {
+          TRasterCM32P raster(image.width(), image.height());
+          raster->lock();
+          for (int y = 0; y < image.height(); ++y) {
+            const uchar *source = image.constScanLine(image.height() - 1 - y);
+            TPixelCM32 *pixel   = raster->pixels(y);
+            for (int x = 0; x < image.width(); ++x)
+              pixel[x] = source[x] == 255 ? TPixelCM32(0, 0, 255)
+                                          : TPixelCM32(styleId, 0, source[x]);
+          }
+          raster->unlock();
+          m_formattedRaster = new TToonzImage(raster, raster->getBounds());
+          m_formattedRasterOffset =
+              TPointD(bounds.left(), -bounds.top() - bounds.height());
+        }
+      }
+    }
+  }
+  const QRectF box = m_formattedLayout.bounds;
+  m_textBox        = TRectD(m_startPoint.x + scale * box.left(),
+                            m_startPoint.y - scale * box.bottom(),
+                            m_startPoint.x + scale * box.right(),
+                            m_startPoint.y - scale * box.top())
+                  .enlarge(cBorderSize * m_pixelSize);
+  return m_formattedError.isEmpty();
+}
+
+void TypeTool::drawFormattedText() {
+  m_pixelSize = std::sqrt(tglGetPixelSize2());
+  if (!updateFormattedText()) return;
+  const TImageP image = getImage(false);
+  TPalette *palette   = image->getPalette();
+  if (!palette) return;
+  if (m_formattedVector) {
+    const TVectorRenderData data(TTranslation(m_startPoint), TRect(), palette,
+                                 0, false);
+    tglDraw(data, m_formattedVector.getPointer());
+  } else if (m_formattedRaster) {
+    m_formattedRaster->setPalette(palette);
+    const TDimension size = m_formattedRaster->getSize();
+    const TTranslation position(m_startPoint + m_formattedRasterOffset +
+                                TPointD(size.lx / 2, size.ly / 2));
+    GLRasterPainter::drawRaster(position, m_formattedRaster, false);
+  }
+  ToolUtils::drawRect(m_textBox, TPixel32::Black, 0x5555);
+}
+
+void TypeTool::addFormattedTextToToonzImage(const TToonzImageP &image) {
+  const TRasterCM32P target = image->getRaster();
+  const TRasterCM32P source = m_formattedRaster->getRaster();
+  const TPointD position    = m_startPoint + m_formattedRasterOffset;
+  const TRectD worldBounds(position.x, position.y, position.x + source->getLx(),
+                           position.y + source->getLy());
+  const TRect changedArea =
+      ToonzImageUtils::convertWorldToRaster(worldBounds, image) *
+      target->getBounds();
+  if (changedArea.isEmpty()) return;
+  TTileSetCM32 *before = new TTileSetCM32(target->getSize());
+  before->add(target, changedArea);
+  TRop::over(target, source,
+             TTranslation(position + convert(target->getCenter())));
+  TTileSetCM32 *after = new TTileSetCM32(target->getSize());
+  after->add(target, changedArea);
+  TXshSimpleLevel *level =
+      getApplication()->getCurrentLevel()->getSimpleLevel();
+  TUndoManager::manager()->add(
+      new RasterUndoTypeTool(before, after, level, getCurrentFid(),
+                             m_isFrameCreated, m_isLevelCreated));
+  delete m_undo;
+  m_undo = nullptr;
+  ToolUtils::updateSaveBox();
+}
+
+//---------------------------------------------------------
+
+QString TypeTool::currentText() const {
+  QString text;
+  for (const StrokeChar &character : m_string) {
+    if (character.isReturn())
+      text.append('\n');
+    else
+      text.append(QString::fromStdWString(
+          std::wstring(1, static_cast<wchar_t>(character.m_key))));
+  }
+  return text;
+}
+
+//---------------------------------------------------------
+
+void TypeTool::setTextFromHistory(const QString &sourceText) {
+  if (!m_active || !m_validFonts || !getImage(false)) return;
+
+  QString text = normalizedText(sourceText);
+  if (currentText() == text) {
+    textHistoryEntryChanged();
+    return;
+  }
+
+  QString typeToolText = text;
+  typeToolText.replace('\n', '\r');
+  replaceText(typeToolText.toStdWString(), 0,
+              static_cast<int>(m_string.size()));
+  m_cursorIndex  = static_cast<int>(m_string.size());
+  m_preeditRange = std::make_pair(m_cursorIndex, m_cursorIndex);
+  textHistoryEntryChanged();
+}
+
+//---------------------------------------------------------
+
+void TypeTool::syncTextHistoryDraft() {
+  if (!m_textHistoryEnabled.getValue()) return;
+  QString text = currentText();
+  m_textHistory.setDraftSource(text);
+  if (m_textHistoryPopup)
+    m_textHistoryPopup->setEditorText(text);
+  else
+    m_textHistory.saveDraft();
+}
+
+//---------------------------------------------------------
+
+void TypeTool::syncTextHistoryFontSettings() {
+  if (!m_textHistoryEnabled.getValue()) return;
+  m_textHistory.setDraftFont(currentFontSettings());
+  if (m_textHistoryPopup)
+    m_textHistoryPopup->syncFontControls();
+  else
+    m_textHistory.saveDraft();
+  textHistoryEntryChanged();
+}
+
+//---------------------------------------------------------
+
+void TypeTool::showTextHistoryPopup() {
+  if (!m_textHistoryEnabled.getValue()) return;
+  if (!m_textHistoryPopup) {
+    m_textHistoryPopup = new TypeToolTextHistoryPopup(
+        QApplication::activeWindow(), this, m_textHistory,
+        [this](const QString &text) { setTextFromHistory(text); });
+    QObject::connect(m_textHistoryPopup, &QObject::destroyed,
+                     [this]() { m_textHistoryPopup = nullptr; });
+  }
+  m_textHistoryPopup->showAndRaise();
+}
+
+//---------------------------------------------------------
+
+void TypeTool::hideTextHistoryPopup() {
+  if (m_textHistoryPopup) m_textHistoryPopup->hide();
+}
+
+//---------------------------------------------------------
+
 void TypeTool::updateTranslation() {
   m_fontFamilyMenu.setQStringName(tr("Font:"));
   m_typeFaceMenu.setQStringName(tr("Style:"));
   m_vertical.setQStringName(tr("Vertical Orientation"));
+  m_textHistoryEnabled.setQStringName(tr("Text History"));
   m_size.setQStringName(tr("Size:"));
 }
 
 //---------------------------------------------------------
 
 bool TypeTool::onPropertyChanged(std::string propertyName) {
+  if (propertyName == m_textHistoryEnabled.getName()) {
+    m_textHistory.load();
+    bool enabled = m_textHistoryEnabled.getValue();
+    m_textHistory.setEnabled(enabled);
+    if (enabled)
+      showTextHistoryPopup();
+    else
+      hideTextHistoryPopup();
+    return true;
+  }
+
   if (!m_validFonts) return false;
 
   if (propertyName == m_fontFamilyMenu.getName()) {
     setFont(m_fontFamilyMenu.getValue());
+    syncTextHistoryFontSettings();
     return true;
   } else if (propertyName == m_typeFaceMenu.getName()) {
     setTypeface(m_typeFaceMenu.getValue());
+    syncTextHistoryFontSettings();
     return true;
   } else if (propertyName == m_size.getName()) {
     setSize(m_size.getValue());
+    syncTextHistoryFontSettings();
     return true;
   } else if (propertyName == m_vertical.getName()) {
     setVertical(m_vertical.getValue());
+    syncTextHistoryFontSettings();
     return true;
   }
   return false;
@@ -485,6 +1525,9 @@ bool TypeTool::onPropertyChanged(std::string propertyName) {
 void TypeTool::init() {
   if (m_initialized) return;
   m_initialized = true;
+
+  m_textHistory.load();
+  m_textHistoryEnabled.setValue(m_textHistory.isEnabled());
 
   loadFonts();
   if (!m_validFonts) return;
@@ -649,6 +1692,85 @@ void TypeTool::setSize(std::wstring strSize) {
 
 //---------------------------------------------------------
 
+TypeToolFontSettings TypeTool::currentFontSettings() const {
+  TypeToolFontSettings font;
+  font.family = QString::fromStdWString(m_fontFamilyMenu.getValue());
+  font.style  = QString::fromStdWString(m_typeFaceMenu.getValue());
+  font.size   = QString::fromStdWString(m_size.getValue());
+  return font;
+}
+
+//---------------------------------------------------------
+
+QStringList TypeTool::availableFontFamilies() const {
+  QStringList families;
+  for (const std::wstring &family : m_fontFamilyMenu.getRange())
+    families.append(QString::fromStdWString(family));
+  return families;
+}
+
+//---------------------------------------------------------
+
+QStringList TypeTool::availableFontStyles() const {
+  QStringList styles;
+  for (const std::wstring &style : m_typeFaceMenu.getRange())
+    styles.append(QString::fromStdWString(style));
+  return styles;
+}
+
+//---------------------------------------------------------
+
+QStringList TypeTool::availableFontSizes() const {
+  QStringList sizes;
+  for (const std::wstring &size : m_size.getRange())
+    sizes.append(QString::fromStdWString(size));
+  return sizes;
+}
+
+//---------------------------------------------------------
+
+void TypeTool::applyFontSettings(const TypeToolFontSettings &font) {
+  bool changed = false;
+
+  std::wstring family  = font.family.toStdWString();
+  bool familyAvailable = family.empty() || m_fontFamilyMenu.isValue(family);
+  if (!family.empty() && familyAvailable) {
+    if (m_fontFamilyMenu.getValue() != family) {
+      m_fontFamilyMenu.setValue(family);
+      setFont(family);
+      changed = true;
+    }
+  }
+
+  std::wstring style = font.style.toStdWString();
+  if (familyAvailable && !style.empty() && m_typeFaceMenu.isValue(style) &&
+      m_typeFaceMenu.getValue() != style) {
+    m_typeFaceMenu.setValue(style);
+    setTypeface(style);
+    changed = true;
+  }
+
+  bool validSize = false;
+  int size       = font.size.toInt(&validSize);
+  if (validSize && size > 0 && size <= 1000) {
+    std::wstring sizeValue = QString::number(size).toStdWString();
+    if (!m_size.isValue(sizeValue)) {
+      m_size.addValue(sizeValue);
+      TTool::getApplication()->getCurrentTool()->notifyToolComboBoxListChanged(
+          m_size.getName());
+    }
+    if (m_size.getValue() != sizeValue) {
+      m_size.setValue(sizeValue);
+      setSize(sizeValue);
+      changed = true;
+    }
+  }
+
+  if (changed) TTool::getApplication()->getCurrentTool()->notifyToolChanged();
+}
+
+//---------------------------------------------------------
+
 void TypeTool::setVertical(bool vertical) {
   if (vertical == m_isVertical) return;
 
@@ -667,6 +1789,9 @@ void TypeTool::setVertical(bool vertical) {
 void TypeTool::stopEditing() {
   if (m_active == false) return;
   m_active = false;
+  m_formattedCacheValid = false;
+  m_formattedVector     = TVectorImageP();
+  m_formattedRaster     = TToonzImageP();
   m_string.clear();
   m_cursorIndex = 0;
   m_textBox     = TRectD();
@@ -704,6 +1829,10 @@ void TypeTool::updateStrokeChar() {
 //---------------------------------------------------------
 
 void TypeTool::updateCharPositions(int updateFrom) {
+  if (isFormattedText()) {
+    updateTextBox();
+    return;
+  }
   if (updateFrom < 0) updateFrom = 0;
   UINT size = m_string.size();
   TPointD currentOffset;
@@ -817,6 +1946,10 @@ void TypeTool::updateCursorPoint() {
 //---------------------------------------------------------
 
 void TypeTool::updateTextBox() {
+  if (isFormattedText() && m_active) {
+    updateFormattedText();
+    return;
+  }
   UINT size                = m_string.size();
   UINT returnNumber        = 0;
   double currentLineLength = 0;
@@ -886,6 +2019,10 @@ void TypeTool::updateMouseCursor(const TPointD &pos) {
 
 void TypeTool::draw() {
   if (!m_active || !getImage(false)) return;
+  if (isFormattedText()) {
+    drawFormattedText();
+    return;
+  }
 
   TFontManager *instance = TFontManager::instance();
 
@@ -1078,6 +2215,7 @@ void TypeTool::addTextToImage() {
 
   UINT size = m_string.size();
   if (size == 0) return;
+  QString committedText = currentText();
 
   TImageP img      = getImage(true);
   TVectorImageP vi = img;
@@ -1085,7 +2223,21 @@ void TypeTool::addTextToImage() {
 
   if (!vi && !ti) return;
 
-  if (vi) {
+  if (isFormattedText()) {
+    if (!updateFormattedText()) {
+      QMessageBox::warning(QApplication::activeWindow(), tr("Type Tool"),
+                           m_formattedError);
+      return;
+    }
+    if (vi && m_formattedVector && m_formattedVector->getStrokeCount()) {
+      TVectorImageP placed = m_formattedVector->cloneImage();
+      placed->transform(TTranslation(m_startPoint));
+      std::vector<const TVectorImage *> images(1, placed.getPointer());
+      addTextToVectorImage(vi, images);
+    } else if (ti && m_formattedRaster) {
+      addFormattedTextToToonzImage(ti);
+    }
+  } else if (vi) {
     QMutexLocker lock(vi->getMutex());
     std::vector<const TVectorImage *> images;
 
@@ -1108,6 +2260,17 @@ void TypeTool::addTextToImage() {
 
   notifyImageChanged();
   //  getApplication()->notifyImageChanges();
+
+  if (m_textHistoryEnabled.getValue()) {
+    m_textHistory.setDraftFont(currentFontSettings());
+    m_textHistory.addEntry(committedText);
+    m_textHistory.setDraftSource(committedText);
+    m_textHistory.saveDraft();
+    if (m_textHistoryPopup) {
+      m_textHistoryPopup->setEditorText(committedText);
+      m_textHistoryPopup->refreshHistory();
+    }
+  }
 
   m_string.clear();
   m_cursorIndex = 0;
@@ -1250,6 +2413,10 @@ void TypeTool::leftButtonDown(const TPointD &pos, const TMouseEvent &) {
             ? TRotation(m_startPoint, 90) * pos
             : pos;
     if (m_textBox.contains(clickPoint)) {
+      if (isFormattedText()) {
+        showTextHistoryPopup();
+        return;
+      }
       setCursorIndexFromPoint(pos);
       updateCursorPoint();
       invalidate();
@@ -1263,6 +2430,12 @@ void TypeTool::leftButtonDown(const TPointD &pos, const TMouseEvent &) {
   m_startPoint = pos;
   updateTextBox();
   updateCursorPoint();
+  if (m_textHistoryEnabled.getValue()) {
+    // Committing the previous block can deactivate editing via onImageChanged.
+    m_active = true;
+    showTextHistoryPopup();
+    setTextFromHistory(m_textHistory.draft().source);
+  }
   updateMouseCursor(pos);
   //  enableShortcuts(false);
   invalidate();
@@ -1557,6 +2730,8 @@ bool TypeTool::keyDown(QKeyEvent *event) {
 
   if (!m_validFonts || !m_active) return true;
 
+  bool textChanged = false;
+
   switch (event->key()) {
   case Qt::Key_Insert:
   case Qt::Key_CapsLock:
@@ -1635,6 +2810,7 @@ bool TypeTool::keyDown(QKeyEvent *event) {
 
   case Qt::Key_Delete:
     deleteKey();
+    textChanged = true;
     break;
 
   case Qt::Key_Backspace:
@@ -1642,12 +2818,14 @@ bool TypeTool::keyDown(QKeyEvent *event) {
       m_cursorIndex--;
       m_preeditRange = std::make_pair(m_cursorIndex, m_cursorIndex);
       deleteKey();
+      textChanged = true;
     }
     break;
 
   case Qt::Key_Return:
   case Qt::Key_Enter:
     addReturn();
+    textChanged = true;
     break;
 
   default:
@@ -1657,16 +2835,19 @@ bool TypeTool::keyDown(QKeyEvent *event) {
     m_cursorIndex += unicodeChar.size();
     m_preeditRange = std::make_pair(startIndex, m_cursorIndex);
     updateCharPositions(startIndex - 1);
+    textChanged = true;
   }
 
+  if (textChanged) syncTextHistoryDraft();
   invalidate();
   return true;
 }
 
 //-----------------------------------------------------------------------------
 
-void TypeTool::onInputText(const std::wstring &preedit, const std::wstring &commit,
-                           int replacementStart, int replacementLen) {
+void TypeTool::onInputText(const std::wstring &preedit,
+                           const std::wstring &commit, int replacementStart,
+                           int replacementLen) {
   // butto la vecchia preedit string
   m_preeditRange.first  = std::max(0, m_preeditRange.first);
   m_preeditRange.second = std::min((int)m_string.size(), m_preeditRange.second);
@@ -1690,6 +2871,7 @@ void TypeTool::onInputText(const std::wstring &preedit, const std::wstring &comm
   // aggiorno la posizione del cursore
   m_cursorIndex = m_preeditRange.second;
   updateCharPositions(a);
+  syncTextHistoryDraft();
   invalidate();
 }
 
@@ -1701,6 +2883,7 @@ void TypeTool::onActivate() {
   m_string.clear();
   m_textBox     = TRectD(0, 0, 0, 0);
   m_cursorIndex = 0;
+  if (m_textHistoryEnabled.getValue()) showTextHistoryPopup();
 }
 
 //---------------------------------------------------------
@@ -1711,11 +2894,15 @@ void TypeTool::onDeactivate() {
     addTextToImage();  // call internally stopEditing()
   else
     stopEditing();
+  hideTextHistoryPopup();
 }
 
 //---------------------------------------------------------
 
 void TypeTool::reset() {
+  m_formattedCacheValid = false;
+  m_formattedVector     = TVectorImageP();
+  m_formattedRaster     = TToonzImageP();
   m_string.clear();
   m_textBox     = TRectD(0, 0, 0, 0);
   m_cursorIndex = 0;

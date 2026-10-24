@@ -15,6 +15,7 @@
 #include "xsheetviewer.h"
 #include "levelcommand.h"
 #include "columncommand.h"
+#include "canvassizepopup.h"
 
 // TnzTools includes
 #include "tools/toolutils.h"
@@ -77,22 +78,6 @@
 
 //=============================================================================
 namespace {
-//-----------------------------------------------------------------------------
-
-// Check if the selection contains only one raster level
-bool containsOnlyOneRasterLevel(int r0, int c0, int r1, int c1) {
-  TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
-  int r, c;
-  TXshLevelP xl = xsh->getCell(r0, c0).m_level;
-  for (r = r0; r <= r1; r++) {
-    for (c = c0; c <= c1; c++)
-      if (xsh->getCell(r, c).m_level.getPointer() != xl.getPointer())
-        return false;
-  }
-  return xl && (xl->getType() == TZP_XSHLEVEL ||
-                xl->getType() == OVL_XSHLEVEL || xl->getType() == TZI_XSHLEVEL);
-}
-
 //-----------------------------------------------------------------------------
 
 // Copy cells to clipboard without undo
@@ -1665,24 +1650,22 @@ void TCellSelection::selectCells(int r0, int c0, int r1, int c1) {
   // cell selection won't contain the camera column
   if (m_range.m_c0 < 0) m_range.m_c0 = 0;
 
-  bool onlyOneRasterLevel = containsOnlyOneRasterLevel(r0, c0, r1, c1);
   // set the nearest row
   m_resizePivotRow =
       (std::abs(r0 - m_resizePivotRow) < std::abs(r1 - m_resizePivotRow)) ? r0
                                                                           : r1;
-  CommandManager::instance()->enable(MI_CanvasSize, onlyOneRasterLevel);
+  updateCanvasSizeCommandEnabled();
 }
 
 //-----------------------------------------------------------------------------
 
 void TCellSelection::selectCell(int row, int col) {
-  m_range.m_r0            = row;
-  m_range.m_c0            = col;
-  m_range.m_r1            = row;
-  m_range.m_c1            = col;
-  bool onlyOneRasterLevel = containsOnlyOneRasterLevel(row, col, row, col);
-  m_resizePivotRow        = row;
-  CommandManager::instance()->enable(MI_CanvasSize, onlyOneRasterLevel);
+  m_range.m_r0     = row;
+  m_range.m_c0     = col;
+  m_range.m_r1     = row;
+  m_range.m_c1     = col;
+  m_resizePivotRow = row;
+  updateCanvasSizeCommandEnabled();
 }
 
 //-----------------------------------------------------------------------------
@@ -1690,7 +1673,7 @@ void TCellSelection::selectCell(int row, int col) {
 void TCellSelection::selectNone() {
   m_range          = Range();
   m_resizePivotRow = -1;
-  CommandManager::instance()->enable(MI_CanvasSize, false);
+  updateCanvasSizeCommandEnabled();
 }
 
 //-----------------------------------------------------------------------------
@@ -1830,11 +1813,38 @@ static void pasteRasterImageInCell(int row, int col,
 //-----------------------------------------------------------------------------
 // Choose pasting behavior by preference option
 void TCellSelection::doPaste() {
-  if (Preferences::instance()->getPasteCellsBehavior() ==
-      0)  // insert paste whole contents of copied cells
+  // The numbers-only preference applies to copied cells, not drawing
+  // selections or images on the clipboard.
+  const TCellData *cellData =
+      dynamic_cast<const TCellData *>(QApplication::clipboard()->mimeData());
+  if (Preferences::instance()->getPasteCellsBehavior() == 0 || !cellData) {
     pasteCells();
-  else  // overwrite paste numbers, consistent with QuickChecker
-    overwritePasteNumbers();
+    return;
+  }
+
+  int r0, c0, r1, c1;
+  getSelectedCells(r0, c0, r1, c1);
+
+  XsheetViewer *viewer = TApp::instance()->getCurrentXsheetViewer();
+  if (viewer && !viewer->orientation()->isVerticalTimeline()) {
+    int cAdj = cellData->getColCount() - 1;
+    c0 -= cAdj;
+    c1 -= cAdj;
+  }
+
+  TXsheet *xsh   = TApp::instance()->getCurrentXsheet()->getXsheet();
+  int lastColumn = cellData->getColCount() == 1 && c0 < c1
+                       ? c1
+                       : c0 + cellData->getColCount() - 1;
+  for (int c = c0; c <= lastColumn; ++c) {
+    TXshColumn *column = xsh->getColumn(c);
+    if (!column || column->isEmpty()) {
+      pasteCells();
+      return;
+    }
+  }
+
+  overwritePasteNumbers();
 }
 
 //-----------------------------------------------------------------------------
@@ -1844,6 +1854,12 @@ void TCellSelection::pasteCells() {
   getSelectedCells(r0, c0, r1, c1);
   QClipboard *clipboard     = QApplication::clipboard();
   const QMimeData *mimeData = clipboard->mimeData();
+  const StrokesData *strokesData = dynamic_cast<const StrokesData *>(mimeData);
+  std::unique_ptr<StrokesData> transferredStrokes;
+  if (!strokesData) {
+    transferredStrokes.reset(StrokesData::fromClipboard(mimeData));
+    strokesData = transferredStrokes.get();
+  }
   TXsheet *xsh              = TApp::instance()->getCurrentXsheet()->getXsheet();
   XsheetViewer *viewer      = TApp::instance()->getCurrentXsheetViewer();
   ToolHandle *toolHandle    = TApp::instance()->getCurrentTool();
@@ -2012,8 +2028,7 @@ void TCellSelection::pasteCells() {
     TUndoManager::manager()->add(
         new PasteDrawingsInCellUndo(level, frameIds, r0, c0));
   }
-  if (const StrokesData *strokesData =
-          dynamic_cast<const StrokesData *>(mimeData)) {
+  if (strokesData) {
     if (isEmpty())  // If the cell selection is empty, return.
       return;
 
@@ -2078,7 +2093,9 @@ void TCellSelection::pasteCells() {
   // See if the clipboard contains rasterData
   const RasterImageData *rasterImageData =
       dynamic_cast<const RasterImageData *>(mimeData);
-  if (rasterImageData || clipImage.height() > 0) {
+  // StrokesData also carries an image for other applications. Do not paste
+  // that preview as a second raster drawing after pasting the vector strokes.
+  if (!strokesData && (rasterImageData || clipImage.height() > 0)) {
     if (isEmpty()) return;
     // Prevent pasting raster images into the camera column (c0 < 0)
     if (c0 < 0) {
@@ -2217,7 +2234,7 @@ void TCellSelection::pasteCells() {
       pasteRasterImageInCell(r0, c0, rasterImageData, newLevel);
 
     }  // end of full raster stuff
-  }  // end of raster stuff
+  }    // end of raster stuff
   if (!initUndo) {
     DVGui::error(QObject::tr(
         "It is not possible to paste data: there is nothing to paste."));
@@ -3320,6 +3337,9 @@ void TCellSelection::dPasteCells() {
   TXsheet *xsh              = TApp::instance()->getCurrentXsheet()->getXsheet();
   QClipboard *clipboard     = QApplication::clipboard();
   const QMimeData *mimeData = clipboard->mimeData();
+  std::unique_ptr<StrokesData> transferredStrokes;
+  if (!dynamic_cast<const StrokesData *>(mimeData))
+    transferredStrokes.reset(StrokesData::fromClipboard(mimeData));
   if (DYNAMIC_CAST(TCellData, cellData, mimeData)) {
     if (!cellData->canChange(xsh, c0)) {
       TUndoManager::manager()->endBlock();
@@ -3341,7 +3361,8 @@ void TCellSelection::dPasteCells() {
       for (int i = 0; i < frameIds.size(); ++i)
         createNewDrawing(xsh, r0 + i, c0, level->getType());
     }
-  } else if (DYNAMIC_CAST(StrokesData, strokesData, mimeData)) {
+  } else if (dynamic_cast<const StrokesData *>(mimeData) ||
+             transferredStrokes) {
     createNewDrawing(xsh, r0, c0, PLI_XSHLEVEL);
   } else if (DYNAMIC_CAST(ToonzImageData, toonzImageData, mimeData)) {
     createNewDrawing(xsh, r0, c0, TZP_XSHLEVEL);

@@ -153,6 +153,8 @@ public:
   NameDisplayMode getNameDisplayMode() const { return m_nameDisplayMode; }
   void setNameDisplayMode(NameDisplayMode mode);
 
+  void setShowStyleIndex(bool showStyleIndex);
+  bool getShowStyleIndex() const;
   PaletteViewerGUI::PaletteViewType getViewType() const { return m_viewType; }
 
   int posToIndex(const QPoint &pos) const;

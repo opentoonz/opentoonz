@@ -909,6 +909,9 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
     }
   }
 
+  if (!o->isVerticalTimeline() && col == xsh->getColumnCount())
+    p.fillRect(rect, FreeColumnTint);
+
   p.setPen(m_viewer->getVerticalLineHeadColor());
   QLine vertical =
       o->verticalLine(m_viewer->columnToLayerAxis(col), o->frameSide(rect));
@@ -1861,8 +1864,7 @@ void ColumnArea::paintEvent(QPaintEvent *event) {  // AREA
   c0 = cellRange.from().layer();
   c1 = cellRange.to().layer();
   if (!m_viewer->orientation()->isVerticalTimeline()) {
-    int colCount = std::max(1, xsh->getColumnCount());
-    c1           = std::min(c1, colCount - 1);
+    c1 = std::min(c1, xsh->getColumnCount());
   }
 
   ColumnFan *columnFan = xsh->getColumnFan(m_viewer->orientation());
@@ -1901,7 +1903,29 @@ void ColumnArea::paintEvent(QPaintEvent *event) {  // AREA
   else
     p.drawRect(toBeUpdated.adjusted(0, 0, -2, -1));
 
+  drawCurrentColumnFocus(p, m_viewer->getCurrentColumn());
+
   if (getDragTool()) getDragTool()->drawColumnsArea(p);
+}
+
+void ColumnArea::drawCurrentColumnFocus(QPainter &p, int col) {
+  const Orientation *o = m_viewer->orientation();
+  TXsheet *xsh         = m_viewer->getXsheet();
+  if (!xsh || (col >= 0 && !xsh->getColumnFan(o)->isActive(col))) return;
+
+  QPoint origin = m_viewer->positionToXY(CellPosition(0, col));
+  QRect rect    = o->rect((col < 0) ? PredefinedRect::CAMERA_LAYER_NAME
+                                    : PredefinedRect::LAYER_NAME)
+                   .translated(origin);
+  if (rect.isEmpty()) return;
+
+  QColor color = m_viewer->getColumnFocusColor();
+  if (color.alpha() == 0) return;
+  p.save();
+  p.setPen(color);
+  p.setBrush(Qt::NoBrush);
+  for (int i = 0; i < 2; ++i) p.drawRect(rect.adjusted(i, i, -i, -i));
+  p.restore();
 }
 
 //-----------------------------------------------------------------------------

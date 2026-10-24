@@ -695,6 +695,8 @@ int main(int argc, char *argv[]) {
   TEnv::setSystemVarPrefix(systemVarPrefix);
   TEnv::setApplicationFileName(argv[0]);
 
+  TEnv::initUserStuffDir();
+
   QCoreApplication::setOrganizationName("OpenToonz");
   QCoreApplication::setOrganizationDomain("");
   QCoreApplication::setApplicationName(
@@ -827,9 +829,9 @@ int main(int argc, char *argv[]) {
 
     // update TFilePath condition on loading the current project
     FilePathProperties *fpProp = project->getFilePathProperties();
-    TFilePath::setFilePathProperties(fpProp->useStandard(),
-                                     fpProp->acceptNonAlphabetSuffix(),
-                                     fpProp->letterCountForSuffix());
+    TFilePath::setFilePathProperties(
+        fpProp->useStandard(), fpProp->acceptNonAlphabetSuffix(),
+        fpProp->letterCountForSuffix(), fpProp->noSeparatorFormatAllowed());
 
     Sw1.start();
 

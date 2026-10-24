@@ -43,6 +43,7 @@
 #include <QApplication>
 #include <QLabel>
 #include <QDrag>
+#include <QSignalBlocker>
 
 TEnv::IntVar ShowNewStyleButton("ShowNewStyleButton", 1);
 using namespace PaletteViewerGUI;
@@ -518,6 +519,20 @@ void PaletteViewer::createPaletteToolBar() {
   addNameDisplayAction(tr("StudioPalette Name"), PageViewer::Original);
   addNameDisplayAction(tr("Both Names"), PageViewer::StyleAndOriginal);
 
+  QAction *showStyleIndexesAction =
+      new QAction(tr("Show Style Indexes"), viewMode);
+  showStyleIndexesAction->setCheckable(true);
+  showStyleIndexesAction->setChecked(m_pageViewer->getShowStyleIndex());
+  connect(showStyleIndexesAction, &QAction::toggled, this,
+          [this](bool checked) { m_pageViewer->setShowStyleIndex(checked); });
+  connect(viewMode, &QMenu::aboutToShow, this,
+          [this, showStyleIndexesAction]() {
+            QSignalBlocker blocker(showStyleIndexesAction);
+            showStyleIndexesAction->setChecked(
+                m_pageViewer->getShowStyleIndex());
+          });
+  viewMode->addAction(showStyleIndexesAction);
+
   viewMode->addSeparator();
 
   // Docked panels will automatically adjust width based of the window size
@@ -582,6 +597,20 @@ void PaletteViewer::createPaletteToolBar() {
           &PaletteViewer::onShowNewStyleButtonToggled);
 
   viewModeButton->setMenu(viewMode);
+
+  if (m_viewType == LEVEL_PALETTE && m_hasSavePaletteToolbar) {
+    viewMode->addSeparator();
+    QAction *command =
+        CommandManager::instance()->getAction("MI_SaveAsDefaultRasterPalette");
+    QAction *saveDefault = viewMode->addAction(command->text());
+    connect(saveDefault, &QAction::triggered, command, &QAction::trigger);
+    connect(viewMode, &QMenu::aboutToShow, this, [this, saveDefault]() {
+      TPalette *palette = getPalette();
+      saveDefault->setEnabled(
+          m_isSaveActionEnabled && palette && !palette->isCleanupPalette() &&
+          FullColorPalette::instance()->isFullColorPalette(palette));
+    });
+  }
 
   // Attention: having reversed the direction I must add objects in reverse
   // order
@@ -832,6 +861,9 @@ void PaletteViewer::contextMenuEvent(QContextMenuEvent *event) {
     menu->addAction(
         CommandManager::instance()->getAction("MI_OverwritePalette"));
     menu->addAction(CommandManager::instance()->getAction("MI_SavePaletteAs"));
+    if (FullColorPalette::instance()->isFullColorPalette(getPalette()))
+      menu->addAction(CommandManager::instance()->getAction(
+          "MI_SaveAsDefaultRasterPalette"));
   }
 
   if (m_viewType == LEVEL_PALETTE && !getPalette()->isLocked() &&

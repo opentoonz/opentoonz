@@ -173,24 +173,26 @@ pli->m_idWrittenColorsArray[i]=false;
 pli->m_idWrittenColorsArray[0]=true;
 */
 
-  for (i = 1; i < (unsigned)vPalette->getStyleCount(); i++) {
-    TColorStyle *style   = vPalette->getStyle(i);
-    TPalette::Page *page = vPalette->getStylePage(i);
-    if (!page) continue;
-    int pageIndex = 65535;
-    // if (page)
-    pageIndex = page->getIndex();
+  // Write styles in displayed page order. PLI stores page index but not
+// position within a page. The reader reconstructs it from style tag order.
+for (int pageIndex = 0; pageIndex < vPalette->getPageCount(); pageIndex++) {
+  TPalette::Page *page = vPalette->getPage(pageIndex);
+  for (int styleIndex = 0; styleIndex < page->getStyleCount();
+       styleIndex++) {
+    int styleId = page->getStyleId(styleIndex);
+    if (styleId <= 0) continue;
 
-    // TColorStyle*style = tempVecImg->getPalette()->getStyle(styleId);
+    TColorStyle *style = vPalette->getStyle(styleId);
     std::vector<TStyleParam> stream;
     PliOutputStream chan(&stream);
     style->save(chan);  // viene riempito lo stream;
 
     assert(pageIndex >= 0 && pageIndex <= 65535);
-    StyleTag *styleTag =
-        new StyleTag(i, pageIndex, stream.size(), stream.data());
+    StyleTag *styleTag = new StyleTag(
+        styleId, pageIndex, stream.size(), stream.data());
     pli->m_palette_tags.push_back((PliObjectTag *)styleTag);
   }
+}
 
   if (vPalette->isAnimated()) {
     std::set<int> keyFrames;
@@ -318,6 +320,9 @@ void createStroke(ThickQuadraticChainTag *quadTag, TVectorImage *outVectImage,
 
 static void createGroup(GroupTag *groupTag, TVectorImage *vi,
                         CreateStrokeData &data) {
+  if (groupTag->m_type != GroupTag::STROKE)
+    throw TException("corrupted pli file: invalid stroke group type");
+
   int count = vi->getStrokeCount();
   for (int j = 0; j < groupTag->m_numObjects; j++) {
     if (groupTag->m_object[j]->m_type == PliTag::COLOR_NGOBJ)
@@ -327,11 +332,11 @@ static void createGroup(GroupTag *groupTag, TVectorImage *vi,
           ((StrokeOutlineOptionsTag *)groupTag->m_object[j])->m_options;
     else if (groupTag->m_object[j]->m_type == PliTag::GROUP_GOBJ)
       createGroup((GroupTag *)groupTag->m_object[j], vi, data);
-    else {
-      assert(groupTag->m_object[j]->m_type ==
-             PliTag::THICK_QUADRATIC_CHAIN_GOBJ);
+    else if (groupTag->m_object[j]->m_type ==
+             PliTag::THICK_QUADRATIC_CHAIN_GOBJ) {
       createStroke((ThickQuadraticChainTag *)groupTag->m_object[j], vi, data);
-    }
+    } else
+      throw TException("corrupted pli file: invalid stroke group child");
   }
 
   vi->group(count, vi->getStrokeCount() - count);
@@ -344,6 +349,7 @@ TImageP TImageReaderPli::doLoad() {
 
   // preparo l'immagine da restituire
   TVectorImage *outVectImage = new TVectorImage(true);
+  TImageP outImage(outVectImage);
   // fisso il colore di default a nero opaco
   // TPixel currentColor=TPixel::Black;
   // TStrokeStyle *currStyle = NULL;
@@ -433,7 +439,7 @@ TImageP TImageReaderPli::doLoad() {
 
   outVectImage->findRegions();
 
-  return TImageP(outVectImage);
+  return outImage;
 }
 
 //-----------------------------------------------------------------------------
@@ -674,6 +680,12 @@ TImageReaderP TLevelReaderPli::getFrameReader(TFrameId fid) {
 
 TPalette *readPalette(GroupTag *paletteTag, int majorVersion,
                       int minorVersion) {
+  if (paletteTag->m_type != GroupTag::PALETTE)
+    throw TException("corrupted pli file: invalid palette group type");
+  for (unsigned int i = 0; i < paletteTag->m_numObjects; i++)
+    if (!dynamic_cast<StyleTag *>(paletteTag->m_object[i]))
+      throw TException("corrupted pli file: invalid palette group child");
+
   bool newPli = (majorVersion > 5 || (majorVersion == 5 && minorVersion >= 6));
 
   // wstring pageName(L"colors");

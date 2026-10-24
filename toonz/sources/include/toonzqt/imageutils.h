@@ -119,7 +119,8 @@ void DVAPI convertNaa2Tlv(
         0,  //!< Special conversion function from an antialiased level to tlv.
             //!  \sa  Function ImageUtils::convert().
     bool removeUnusedStyles = false,
-    double dpi = 0.0);  //! Remove unused styles from input palette.
+    double dpi              = 0.0,  //! Remove unused styles from input palette.
+    bool allowOnlyWhiteBG   = false);
 
 // convert old levels (tzp / tzu) to tlv
 void DVAPI convertOldLevel2Tlv(

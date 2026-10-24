@@ -21,7 +21,6 @@
 #include "toonz/tcolumnfx.h"
 #include "toonz/txshpalettecolumn.h"
 #include "toonz/txshzeraryfxcolumn.h"
-#include "toonz/fxcommand.h"
 #include "toonz/txsheethandle.h"
 #include "toonz/tfxhandle.h"
 #include "toonz/tscenehandle.h"
@@ -44,6 +43,8 @@
 #include <QMenu>
 #include <QApplication>
 #include <QGraphicsSceneContextMenuEvent>
+#include <QGraphicsSceneDragDropEvent>
+#include <QMimeData>
 #include <QStack>
 
 TEnv::IntVar IconifyFxSchematicNodes("IconifyFxSchematicNodes", 0);
@@ -323,7 +324,10 @@ FxSchematicScene::FxSchematicScene(QWidget *parent)
     , m_currentFxNode(0)
     , m_gridDimension(eSmall)
     , m_isNormalIconView(!IconifyFxSchematicNodes)
-    , m_viewer() {
+    , m_viewer()
+    , m_dragDropAction(DragDropAction::None)
+    , m_litLink(0)
+    , m_litNode(0) {
   m_viewer = (SchematicViewer *)parent;
 
   m_selection = new FxSelection();
@@ -374,6 +378,7 @@ void FxSchematicScene::updateScene() {
   m_connectionLinks.clearAll();
   m_selectionOldPos.clear();
 
+  clearDropHighlights();
   clearSelection();
   clearAllItems();
 
@@ -1758,6 +1763,154 @@ bool FxSchematicScene::event(QEvent *e) {
     m_altPressed = altPressed;
   }
   return ret;
+}
+
+//------------------------------------------------------------------
+
+void FxSchematicScene::clearDropHighlights() {
+  m_dragDropAction = DragDropAction::None;
+  m_dropFxs.clear();
+  m_dropLinks.clear();
+  if (m_litLink) {
+    m_litLink->setDropHighlighted(false);
+    m_litLink->update();
+    m_litLink = 0;
+  }
+  if (m_litNode) {
+    m_litNode->setDropHighlighted(false);
+    m_litNode->update();
+    m_litNode = 0;
+  }
+}
+
+//------------------------------------------------------------------
+
+void FxSchematicScene::dragEnterEvent(QGraphicsSceneDragDropEvent *e) {
+  clearDropHighlights();
+  m_dragFx              = TFxP();
+  const FxsData *fxData = dynamic_cast<const FxsData *>(e->mimeData());
+  if (!fxData || !m_app || !(e->possibleActions() & Qt::CopyAction)) {
+    e->ignore();
+    return;
+  }
+
+  QList<TFxP> fxs;
+  QMap<TFx *, int> columnSizes;
+  QList<TXshColumnP> columns;
+  fxData->getFxs(fxs, columnSizes, columns);
+  if (fxs.size() != 1 || !columns.isEmpty()) {
+    e->ignore();
+    return;
+  }
+  m_dragFx = fxs.front();
+  e->setDropAction(Qt::CopyAction);
+  e->accept();
+}
+
+//------------------------------------------------------------------
+
+void FxSchematicScene::dragMoveEvent(QGraphicsSceneDragDropEvent *e) {
+  clearDropHighlights();
+  if (!m_dragFx || !dynamic_cast<const FxsData *>(e->mimeData())) {
+    e->ignore();
+    return;
+  }
+
+  TXsheet *xsh    = m_xshHandle->getXsheet();
+  auto editableFx = [xsh](TFx *fx) {
+    return fx &&
+           (dynamic_cast<TColumnFx *>(fx) || dynamic_cast<TXsheetFx *>(fx) ||
+            dynamic_cast<TOutputFx *>(fx) ||
+            xsh->getFxDag()->getInternalFxs()->containsFx(fx));
+  };
+
+  QGraphicsItem *item   = itemAt(e->scenePos(), QTransform());
+  FxSchematicLink *link = dynamic_cast<FxSchematicLink *>(item);
+  if (!item) {
+    m_dragDropAction = DragDropAction::Add;
+  } else if (link) {
+    if (link->isLineShaped() || m_dragFx->getInputPortCount() == 0) {
+      e->ignore();
+      return;
+    }
+    // Collapsed groups can represent several different connections.
+    if (!link->getStartPort() || !link->getEndPort() ||
+        dynamic_cast<FxGroupNode *>(link->getStartPort()->getNode()) ||
+        dynamic_cast<FxGroupNode *>(link->getEndPort()->getNode())) {
+      e->ignore();
+      return;
+    }
+    TFxCommand::Link bounds = m_selection->getBoundingFxs(link);
+    if (!editableFx(bounds.m_inputFx.getPointer()) ||
+        !editableFx(bounds.m_outputFx.getPointer())) {
+      e->ignore();
+      return;
+    }
+    m_dropLinks.append(bounds);
+    m_dragDropAction = DragDropAction::Insert;
+    link->setDropHighlighted(true);
+    link->update();
+    m_litLink = link;
+  } else {
+    FxSchematicNode *node = nullptr;
+    for (; item && !node; item = item->parentItem())
+      node = dynamic_cast<FxSchematicNode *>(item);
+    TFx *fx = node ? node->getFx() : nullptr;
+    if (!editableFx(fx) || dynamic_cast<FxGroupNode *>(node) ||
+        dynamic_cast<TXsheetFx *>(fx) || dynamic_cast<TOutputFx *>(fx) ||
+        (dynamic_cast<TColumnFx *>(fx) &&
+         !dynamic_cast<TZeraryColumnFx *>(fx))) {
+      e->ignore();
+      return;
+    }
+    m_dropFxs.append(fx);
+    m_dragDropAction = DragDropAction::Replace;
+    node->setDropHighlighted(true);
+    node->update();
+    m_litNode = node;
+  }
+
+  e->setDropAction(Qt::CopyAction);
+  e->accept();
+}
+
+//------------------------------------------------------------------
+
+void FxSchematicScene::dropEvent(QGraphicsSceneDragDropEvent *e) {
+  // Resolve the final position, including after a schematic rebuild.
+  dragMoveEvent(e);
+  TFxP dropFx                         = m_dragFx;
+  const DragDropAction action         = m_dragDropAction;
+  const QList<TFxP> fxs               = m_dropFxs;
+  const QList<TFxCommand::Link> links = m_dropLinks;
+  // Commands notify the scene synchronously and delete its graphics items.
+  clearDropHighlights();
+  m_dragFx = TFxP();
+  if (action == DragDropAction::None) return;
+
+  if (action == DragDropAction::Replace) {
+    TFxCommand::replaceFx(dropFx.getPointer(), fxs, m_xshHandle, m_fxHandle);
+  } else {
+    dropFx->getAttributes()->setDagNodePos(
+        TPointD(e->scenePos().x(), e->scenePos().y()));
+    const int col = m_columnHandle->getColumnIndex();
+    const int row = m_frameHandle->getFrameIndex();
+    if (action == DragDropAction::Insert)
+      TFxCommand::insertFx(dropFx.getPointer(), fxs, links, m_app, col, row);
+    else
+      TFxCommand::addFx(dropFx.getPointer(), QList<TFxP>(), m_app, col, row,
+                        false);
+  }
+  e->setDropAction(Qt::CopyAction);
+  e->accept();
+}
+
+//------------------------------------------------------------------
+
+void FxSchematicScene::dragLeaveEvent(QGraphicsSceneDragDropEvent *e) {
+  clearDropHighlights();
+  m_dragFx = TFxP();
+  e->accept();
 }
 
 //------------------------------------------------------------------

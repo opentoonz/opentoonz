@@ -848,9 +848,7 @@ int XsheetViewer::colToTimelineLayerAxis(int layer) const {
   int yBottom = o->colToLayerAxis(layer, fan) +
                 (fan->isActive(layer) ? o->cellHeight() : o->foldedCellSize()) -
                 1;
-  int columnCount = std::max(1, xsh->getColumnCount());
-  int layerHeightActual =
-      m_columnArea->height() - 2;  // o->colToLayerAxis(columnCount, fan) - 1;
+  int layerHeightActual = m_columnArea->height() - 2;
 
   return layerHeightActual - yBottom;
 }
@@ -876,7 +874,7 @@ CellPosition XsheetViewer::xyToPosition(const QPoint &point) const {
   // For timeline mode, we need to base the Y axis on the bottom of the column
   // area
   // since the layers are flipped
-  int columnCount   = std::max(1, xsh->getColumnCount());
+  int columnCount   = xsh->getColumnCount() + 1;
   int colAreaHeight = o->colToLayerAxis(columnCount, fan);
 
   usePoint.setY(colAreaHeight - usePoint.y());
@@ -918,7 +916,7 @@ QPoint XsheetViewer::positionToXY(const CellPosition &pos) const {
   usePoint.setY(
       usePoint.y() - o->cellHeight() +
       (fan->isActive(pos.layer()) ? o->cellHeight() : o->foldedCellSize()));
-  int columnCount = std::max(1, xsh->getColumnCount());
+  int columnCount = xsh->getColumnCount() + 1;
   int colsHeight  = o->colToLayerAxis(columnCount, fan);
 
   if (colsHeight)
@@ -1491,6 +1489,9 @@ void XsheetViewer::onPreferenceChanged(const QString &prefName) {
     refreshContentSize(0, 0);
   } else if (prefName == "XsheetCamera") {
     refreshContentSize(0, 0);
+  } else if (prefName == "CurrentCellColor") {
+    m_cellArea->update();
+    m_columnArea->update();
   }
 }
 
@@ -2023,6 +2024,25 @@ QColor XsheetViewer::getSelectedColumnTextColor() const {
                             (int)currentColumnPixel.g,
                             (int)currentColumnPixel.b, 255);
   return currentColumnColor;
+}
+
+QColor XsheetViewer::getCellFocusColor() const {
+  Preferences *preferences = Preferences::instance();
+  if (!preferences->isCustomCurrentCellColorEnabled()) return m_cellFocusColor;
+
+  TPixel color;
+  preferences->getCurrentCellData(color);
+  return QColor(color.r, color.g, color.b, color.m);
+}
+
+QColor XsheetViewer::getColumnFocusColor() const {
+  Preferences *preferences = Preferences::instance();
+  if (!preferences->isCustomCurrentColumnOutlineColorEnabled())
+    return m_columnFocusColor;
+
+  TPixel color;
+  preferences->getCurrentColumnOutlineColor(color);
+  return QColor(color.r, color.g, color.b, color.m);
 }
 
 //=============================================================================

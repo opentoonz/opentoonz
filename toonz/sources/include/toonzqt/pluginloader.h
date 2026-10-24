@@ -19,7 +19,7 @@
 
 /* Plugin Loader の inter-module interfaces:
    toonzqt 以下のモジュールからアクセスするのに必要 (see:
-   toonz/insertfxpopup.cpp)
+   toonzqt/insertfxpopup.cpp)
    implements in pluginhost.cpp */
 class TFx;
 

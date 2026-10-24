@@ -1,5 +1,9 @@
 # OpenToonz
 
+## ⚠️ **重要提示**
+
+**请仅从官方来源下载：** OpenToonz 的官方网站只有 [**opentoonz.github.io**](https://opentoonz.github.io/) 和此 [GitHub 仓库](https://github.com/opentoonz/opentoonz)。为保障安全，请勿从其他域名下载 OpenToonz；OpenToonz 没有其他官方镜像或合作下载站点。
+
 [English](../README.md) [日本語](./README_ja.md) 
 
 [![](https://ci.appveyor.com/api/projects/status/oa5l5pc964h8fv49/branch/master?svg=true)](https://ci.appveyor.com/project/opentoonz/opentoonz)
@@ -55,3 +59,8 @@ OpenToonz 是一个由[DWANGO](http://dwango.co.jp/english/)公开发布的二�
 ### 特别感谢
 
 原始程序从Toonz开发而来，这是一个由意大利罗马的公司 Digital Video, S.p.A.所开发的软件。
+
+## 参与翻译
+
+有关提交翻译文件以及审核、合并和更新翻译的流程，请参阅
+[翻译指南（英文）](../toonz/sources/translations/README.md)。

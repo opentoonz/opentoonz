@@ -780,24 +780,24 @@ inline void *getPointer(const TImageP &img) {
 // Returns true or false whether the image or its eventual raster are
 // referenced by someone other than Toonz cache.
 inline TINT32 hasExternalReferences(const TImageP &img) {
-  int refCount;
+  if (!img) return false;
 
-  {
-    TRasterImageP rimg = img;
-    if (rimg) refCount = rimg->getRaster()->getRefCount();
-  }
+  int refCount = img->getRefCount();
+
+  TRasterImageP rimg = img;
+  if (rimg && rimg->getRaster())
+    refCount = std::max(refCount, rimg->getRaster()->getRefCount());
 
 #ifndef TNZCORE_LIGHT
-  {
-    TToonzImageP timg = img;
-    if (timg)
-      refCount = timg->getRaster()->getRefCount() -
-                 1;  //!!! the TToonzImage::getRaster method increments raster
-                     //! refCount!(the TRasterImage::getRaster don't)
+  TToonzImageP timg = img;
+  if (timg) {
+    TRasterCM32P raster = timg->getRaster();
+    if (raster)
+      refCount = std::max(refCount, raster->getRefCount() - 1);
   }
 #endif
 
-  return std::max(refCount, img->getRefCount()) > 1;
+  return refCount > 1;
 }
 }  // namespace
 //------------------------------------------------------------------------------
@@ -1261,10 +1261,9 @@ void TImageCache::Imp::add(const std::string &id, const TImageP &img,
 
   item = new UncompressedOnMemoryCacheItem(img);
 #ifdef TNZCORE_LIGHT
-  item->m_cantCompress = false;
+  item->m_cantCompress = !TRasterImageP(img);
 #else
-  item->m_cantCompress =
-      (TVectorImageP(img) || TMeshImageP(img) ? true : false);
+  item->m_cantCompress = !TRasterImageP(img) && !TToonzImageP(img);
 #endif
   item->m_id                             = id;
   m_uncompressedItems[id]                = item;

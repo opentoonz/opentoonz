@@ -21,6 +21,9 @@
 // TnzBase includes
 #include "tparamcontainer.h"
 #include "tparamset.h"
+#include "tdoubleparam.h"
+#include "tspectrumparam.h"
+#include "ttonecurveparam.h"
 #include "tfxattributes.h"
 #include "tmacrofx.h"
 #include "tpassivecachemanager.h"
@@ -701,18 +704,22 @@ class InsertFxUndo final : public FxCommandUndo {
   int m_colIdx;
   bool m_columnReplacesHole;
   bool m_attachOutputs;
+  //! When nothing is selected, whether to fall back on the current fx as the
+  //! new fx's input. False means "create the fx unconnected".
+  bool m_attachSource;
 
 public:
   InsertFxUndo(const TFxP &fx, int row, int col, const QList<TFxP> &selectedFxs,
                QList<TFxCommand::Link> selectedLinks, TApplication *app,
-               bool attachOutputs = true)
+               bool attachOutputs = true, bool attachSource = true)
       : m_selectedFxs(selectedFxs)
       , m_selectedLinks(selectedLinks)
       , m_insertedColumn(0)
       , m_app(app)
       , m_colIdx(col)
       , m_columnReplacesHole(false)
-      , m_attachOutputs(attachOutputs) {
+      , m_attachOutputs(attachOutputs)
+      , m_attachSource(attachSource) {
     initialize(fx, row, col);
   }
 
@@ -765,6 +772,8 @@ void InsertFxUndo::initialize(const TFxP &newFx, int row, int col) {
   TZeraryFx *zfx = dynamic_cast<TZeraryFx *>(fx);
   if (has_fx_column(fx)) {
     m_insertedColumn = InsertFxUndo::createZeraryFxColumn(xsh, fx, row);
+    m_insertedColumn->getZeraryColumnFx()->getAttributes()->setDagNodePos(
+        fx->getAttributes()->getDagNodePos());
 
     locals.storeFx(xsh, fx);
 
@@ -772,8 +781,9 @@ void InsertFxUndo::initialize(const TFxP &newFx, int row, int col) {
       m_columnReplacesHole = true;
   } else {
     if (m_selectedFxs.isEmpty() && m_selectedLinks.isEmpty()) {
-      // Attempt retrieval of current Fx from the fxHandle
-      if (TFx *currentFx = m_app->getCurrentFx()->getFx())
+      TFx *currentFx =
+          m_attachSource ? m_app->getCurrentFx()->getFx() : nullptr;
+      if (currentFx)
         m_selectedFxs.push_back(currentFx);
       else {
         // Isolated case
@@ -936,11 +946,12 @@ void TFxCommand::insertFx(TFx *newFx, const QList<TFxP> &fxs,
 //**********************************************************************
 
 void TFxCommand::addFx(TFx *newFx, const QList<TFxP> &fxs, TApplication *app,
-                       int col, int row) {
+                       int col, int row, bool attachSource) {
   if (!newFx) return;
+  if (col < 0) col = 0;
 
-  std::unique_ptr<FxCommandUndo> undo(
-      new InsertFxUndo(newFx, row, col, fxs, QList<Link>(), app, false));
+  std::unique_ptr<FxCommandUndo> undo(new InsertFxUndo(
+      newFx, row, col, fxs, QList<Link>(), app, false, attachSource));
   if (!undo->isConsistent()) return;
 
   undo->redo();
@@ -1326,6 +1337,105 @@ void TFxCommand::replaceFx(TFx *newFx, const QList<TFxP> &fxs,
   }
 
   undoManager->endBlock();
+}
+
+// Reset numeric leaves so composite parameters retain their topology and
+// non-animatable settings. Snapshots retain all key and interpolation metadata.
+class ResetFxFrameUndo final : public FxCommandUndo {
+  struct Channel {
+    TParamP param, before, after;
+  };
+  TFxP m_fx;
+  int m_frame;
+  TXsheetHandle *m_xshHandle;
+  TFxHandle *m_fxHandle;
+  std::vector<Channel> m_channels;
+
+  void collect(TParam *param, TParam *defaults) {
+    if (!param || !defaults || !param->isAnimatable()) return;
+    if (auto value = dynamic_cast<TDoubleParam *>(param)) {
+      auto defaultValue = dynamic_cast<TDoubleParam *>(defaults);
+      if (!defaultValue) return;
+      TParamP before    = value->clone();
+      TParamP after     = value->clone();
+      auto result       = static_cast<TDoubleParam *>(after.getPointer());
+      double resetValue = defaultValue->getValue(0);
+      result->setValue(m_frame, resetValue);
+      // setValue refuses expression/file-driven keys or segments. Leave those
+      // channels intact rather than silently replacing their interpolation.
+      if (result->isKeyframe(m_frame) &&
+          result->getValue(m_frame) == resetValue)
+        m_channels.push_back({TParamP(param), before, after});
+    } else if (auto values = dynamic_cast<TParamSet *>(param)) {
+      auto defaultValues = dynamic_cast<TParamSet *>(defaults);
+      if (!defaultValues ||
+          values->getParamCount() != defaultValues->getParamCount())
+        return;
+      for (int i = 0; i < values->getParamCount(); ++i)
+        collect(values->getParam(i).getPointer(),
+                defaultValues->getParam(i).getPointer());
+    } else if (auto spectrum = dynamic_cast<TSpectrumParam *>(param)) {
+      auto defaultSpectrum = dynamic_cast<TSpectrumParam *>(defaults);
+      if (!defaultSpectrum ||
+          spectrum->getKeyCount() != defaultSpectrum->getKeyCount())
+        return;
+      for (int i = 0; i < spectrum->getKeyCount(); ++i) {
+        collect(spectrum->getPosition(i).getPointer(),
+                defaultSpectrum->getPosition(i).getPointer());
+        collect(spectrum->getColor(i).getPointer(),
+                defaultSpectrum->getColor(i).getPointer());
+      }
+    } else if (auto curve = dynamic_cast<TToneCurveParam *>(param)) {
+      auto defaultCurve = dynamic_cast<TToneCurveParam *>(defaults);
+      if (!defaultCurve) return;
+      // RGBA, RGB, Red, Green, Blue and Alpha; do not change the UI channel
+      // selection or the global Linear setting.
+      for (int i = 0; i < 6; ++i) {
+        auto channel = static_cast<decltype(curve->getCurrentChannel())>(i);
+        collect(curve->getParamSet(channel).getPointer(),
+                defaultCurve->getParamSet(channel).getPointer());
+      }
+    }
+  }
+
+  void apply(bool undoing) const {
+    for (const auto &channel : m_channels)
+      channel.param->copy(
+          (undoing ? channel.before : channel.after).getPointer());
+    m_fxHandle->notifyFxChanged();
+    m_xshHandle->notifyXsheetChanged();
+  }
+
+public:
+  ResetFxFrameUndo(TFx *fx, TFx *defaults, int frame, TXsheetHandle *xshHandle,
+                   TFxHandle *fxHandle)
+      : m_fx(fx), m_frame(frame), m_xshHandle(xshHandle), m_fxHandle(fxHandle) {
+    TParamContainer *params = fx->getParams();
+    for (int i = 0; i < params->getParamCount(); ++i)
+      collect(params->getParam(i),
+              defaults->getParams()->getParam(params->getParamName(i)));
+  }
+
+  bool isConsistent() const override { return !m_channels.empty(); }
+  void undo() const override { apply(true); }
+  void redo() const override { apply(false); }
+  int getSize() const override { return sizeof(*this); }
+  QString getHistoryString() override {
+    return QObject::tr("Reset FX at Frame : %1 : %2")
+        .arg(QString::fromStdWString(m_fx->getName()))
+        .arg(m_frame + 1);
+  }
+};
+
+void TFxCommand::resetFxFrame(TFx *fx, TFx *defaults, int frame,
+                              TXsheetHandle *xshHandle, TFxHandle *fxHandle) {
+  if (!fx || !defaults || frame < 0) return;
+  std::unique_ptr<ResetFxFrameUndo> undo(
+      new ResetFxFrameUndo(fx, defaults, frame, xshHandle, fxHandle));
+  if (undo->isConsistent()) {
+    undo->redo();
+    TUndoManager::manager()->add(undo.release());
+  }
 }
 
 //**********************************************************************

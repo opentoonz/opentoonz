@@ -136,3 +136,11 @@ open ~/Documents/opentoonz/build/toonz/OpenToonz.app
     - Run in Debug mode: Product -> Run
 
     - To open with command line or from Finder window, the application is found in `/Users/yourlogin/Documents/opentoonz/toonz/build/Debug/OpenToonz.app`
+
+## Translation workflow / 翻訳
+
+See [Contributing and maintaining translations](../toonz/sources/translations/README.md)
+for contributor and maintainer workflows. Keep the Xcode `WITH_TRANSLATION=OFF`
+workaround above until translation-enabled Xcode builds are verified. That option
+disables this build's translation generation; do not assume bundled catalogs were
+updated. Qt Linguist and manual `lrelease` remain available for catalog testing.

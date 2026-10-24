@@ -15,6 +15,11 @@
 #include "toonz/stage2.h"
 #include "toonz/doubleparamcmd.h"
 #include "toonz/preferences.h"
+#include "toonz/tscenehandle.h"
+#include "toonz/toonzscene.h"
+#include "toonz/tcamera.h"
+
+#include <cmath>
 
 // TnzQt includes
 #include "toonzqt/gutil.h"
@@ -102,6 +107,12 @@ ToolOptionCheckbox::ToolOptionCheckbox(TTool *tool, TBoolProperty *property,
 
 //-----------------------------------------------------------------------------
 
+ToolOptionCheckbox::~ToolOptionCheckbox() {
+  if (m_property) m_property->removeListener(this);
+}
+
+//-----------------------------------------------------------------------------
+
 void ToolOptionCheckbox::updateStatus() {
   bool check = m_property->getValue();
 
@@ -115,7 +126,9 @@ void ToolOptionCheckbox::updateStatus() {
 void ToolOptionCheckbox::nextCheckState() {
   QAbstractButton::nextCheckState();
   m_property->setValue(checkState() == Qt::Checked);
+  m_property->notifyListeners();
   notifyTool();
+  if (m_toolHandle) m_toolHandle->notifyToolChanged();
 }
 
 //=============================================================================
@@ -165,7 +178,9 @@ void ToolOptionSlider::updateStatus() {
 
 void ToolOptionSlider::onValueChanged(bool isDragging) {
   m_property->setValue(getValue());
+  m_property->notifyListeners();
   notifyTool(!isDragging);
+  if (m_toolHandle) m_toolHandle->notifyToolChanged();
 }
 
 //=============================================================================
@@ -219,8 +234,8 @@ void ToolOptionPairSlider::updateStatus() {
 
 void ToolOptionPairSlider::onValuesChanged(bool isDragging) {
   m_property->setValue(getValues());
+  m_property->notifyListeners();
   notifyTool(!isDragging);
-  // synchronize the state with the same widgets in other tool option bars
   if (m_toolHandle) m_toolHandle->notifyToolChanged();
 }
 
@@ -258,8 +273,8 @@ void ToolOptionIntPairSlider::updateStatus() {
 
 void ToolOptionIntPairSlider::onValuesChanged(bool isDragging) {
   m_property->setValue(getValues());
+  m_property->notifyListeners();
   notifyTool(!isDragging);
-  // synchronize the state with the same widgets in other tool option bars
   if (m_toolHandle) m_toolHandle->notifyToolChanged();
 }
 
@@ -304,7 +319,9 @@ void ToolOptionIntSlider::updateStatus() {
 
 void ToolOptionIntSlider::onValueChanged(bool isDragging) {
   m_property->setValue(getValue());
+  m_property->notifyListeners();
   notifyTool(!isDragging);
+  if (m_toolHandle) m_toolHandle->notifyToolChanged();
 }
 
 //=============================================================================
@@ -323,6 +340,12 @@ ToolOptionCombo::ToolOptionCombo(TTool *tool, TEnumProperty *property,
   if (toolHandle) {
     connect(this, SIGNAL(activated(int)), toolHandle, SIGNAL(toolChanged()));
   }
+}
+
+//-----------------------------------------------------------------------------
+
+ToolOptionCombo::~ToolOptionCombo() {
+  if (m_property) m_property->removeListener(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -412,6 +435,12 @@ ToolOptionFontCombo::ToolOptionFontCombo(TTool *tool, TEnumProperty *property,
 
 //-----------------------------------------------------------------------------
 
+ToolOptionFontCombo::~ToolOptionFontCombo() {
+  if (m_property) m_property->removeListener(this);
+}
+
+//-----------------------------------------------------------------------------
+
 void ToolOptionFontCombo::updateStatus() {
   QString value = QString::fromStdWString(m_property->getValue());
   int index     = findText(value);
@@ -478,14 +507,17 @@ void ToolOptionPopupButton::doSetCurrentIndex(int index) {
 
 //=============================================================================
 
-ToolOptionTextField::ToolOptionTextField(TTool *tool, TStringProperty *property)
+ToolOptionTextField::ToolOptionTextField(TTool *tool, TStringProperty *property,
+                                         ToolHandle *toolHandle)
     : LineEdit()
-    , ToolOptionControl(tool, property->getName())
+    , ToolOptionControl(tool, property->getName(), toolHandle)
     , m_property(property) {
   setFixedSize(100, 23);
   m_property->addListener(this);
 
   updateStatus();
+  connect(this, SIGNAL(textChanged(const QString &)),
+          SLOT(onLiveTextChanged(const QString &)));
   connect(this, SIGNAL(editingFinished()), SLOT(onValueChanged()));
 }
 
@@ -495,15 +527,31 @@ void ToolOptionTextField::updateStatus() {
   QString newText = QString::fromStdWString(m_property->getValue());
   if (newText == text()) return;
 
+  blockSignals(true);
   setText(newText);
+  blockSignals(false);
+}
+
+//-----------------------------------------------------------------------------
+
+void ToolOptionTextField::onLiveTextChanged(const QString &) {
+  if (!hasFocus()) return;
+
+  const std::wstring w = text().toStdWString();
+  if (m_property->getValue() == w) return;
+
+  m_property->setValue(w);
+  m_property->notifyListeners();
+  if (m_toolHandle) m_toolHandle->notifyToolChanged();
 }
 
 //-----------------------------------------------------------------------------
 
 void ToolOptionTextField::onValueChanged() {
-  m_property->setValue(text().toStdWString());
+  const std::wstring w = text().toStdWString();
+  if (m_property->getValue() != w) m_property->setValue(w);
+  m_property->notifyListeners();
   notifyTool();
-  // synchronize the state with the same widgets in other tool option bars
   if (m_toolHandle) m_toolHandle->notifyToolChanged();
 }
 
@@ -1152,6 +1200,10 @@ void NoScaleField::onChange(TMeasuredValue *fld, bool addToUndo) {
   double v = fld->getValue(TMeasuredValue::MainUnit);
   obj->setNoScaleZ(v);
   m_tool->invalidate();
+  if (TApplication *app = TTool::getApplication()) {
+    if (TObjectHandle *objHandle = app->getCurrentObject())
+      objHandle->notifyObjectIdChanged(false);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1462,6 +1514,20 @@ void SelectionMoveField::updateStatus() {
 
 //=============================================================================
 
+namespace {
+
+// Match the camera-pixel size used by the vector Brush and Geometry tools.
+double vectorThicknessScale() {
+  TTool::Application *app = TTool::getApplication();
+  if (!app || !app->getCurrentScene()) return 1.0;
+  ToonzScene *scene = app->getCurrentScene()->getScene();
+  if (!scene || !scene->getCurrentCamera()) return 1.0;
+  double dpi = scene->getCurrentCamera()->getDpi().x;
+  return (std::isfinite(dpi) && dpi > 0.0) ? Stage::inch / dpi : 1.0;
+}
+
+}  // namespace
+
 ThickChangeField::ThickChangeField(SelectionTool *tool, QString name)
     : MeasuredValueField(0, name), m_tool(tool) {
   bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *, bool)),
@@ -1482,7 +1548,7 @@ void ThickChangeField::onChange(TMeasuredValue *fld, bool addToUndo) {
         (VectorSelectionTool *)m_tool));
 
   TVectorImageP vi = (TVectorImageP)m_tool->getImage(true);
-  double p         = 0.5 * getValue();
+  double p         = 0.5 * getValue() * vectorThicknessScale();
 
   // The chageThickTool would deal the rest frames when adding undo
   if (isLabelClicked()) {
@@ -1521,7 +1587,8 @@ void ThickChangeField::updateStatus() {
   }
 
   setDisabled(false);
-  setValue(2 * m_tool->m_deformValues.m_maxSelectionThickness);
+  setValue(2 * m_tool->m_deformValues.m_maxSelectionThickness /
+           vectorThicknessScale());
   setCursorPosition(0);
 }
 

@@ -36,7 +36,7 @@ class ColorField;
 class ProgressDialog;
 class CheckBox;
 class DoubleLineEdit;
-}
+}  // namespace DVGui
 
 namespace ImageUtils {
 class FrameTaskNotifier;
@@ -54,7 +54,7 @@ class FrameTaskNotifier;
 */
 
 class ConvertPopup : public DVGui::Dialog {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
   ConvertPopup(bool specifyInput = false);
@@ -65,8 +65,9 @@ public:
   bool isConverting() const { return m_isConverting; }
 
   void convertToTlv(bool toPainted);
-  TFilePath getConvertedPath(TFilePath path) 
-  {return m_convertedFileMap[path];};
+  TFilePath getConvertedPath(TFilePath path) {
+    return m_convertedFileMap[path];
+  };
   QString getDestinationType() const;
   QString getTlvMode() const;
   QString TlvMode_Unpainted;
@@ -110,7 +111,8 @@ private:
   DVGui::ColorField *m_bgColorField;
   QFrame *m_tlvFrame;
   QCheckBox *m_applyAutoclose, *m_removeDotBeforeFrameNumber,
-      *m_saveBackupToNopaint, *m_appendDefaultPalette, *m_removeUnusedStyles;
+      *m_saveBackupToNopaint, *m_appendDefaultPalette, *m_removeUnusedStyles,
+      *m_allowOnlyWhiteBG;
   DVGui::CheckBox *m_skip;
   QComboBox *m_antialias, *m_tlvMode, *m_fileFormat;
   QLabel *m_bgColorLabel, *m_suffixLabel, *m_unpaintedFolderLabel,

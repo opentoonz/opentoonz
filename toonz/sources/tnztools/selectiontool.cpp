@@ -19,6 +19,32 @@ using namespace ToolUtils;
 using namespace DragSelectionTool;
 
 TEnv::StringVar SelectionType("SelectionType", "Rectangular");
+TEnv::IntVar SelectionScaleLink("SelectionScaleLink", 0);
+
+bool selectionScaleLinkIsEnabled() { return SelectionScaleLink != 0; }
+
+void setSelectionScaleLinkEnabled(bool linked) {
+  const int v = linked ? 1 : 0;
+  if ((int)SelectionScaleLink == v) return;
+  SelectionScaleLink = v;
+
+  TTool *tool = TTool::getApplication()
+                    ? TTool::getApplication()->getCurrentTool()->getTool()
+                    : nullptr;
+  if (SelectionTool *st = dynamic_cast<SelectionTool *>(tool))
+    emit st->scaleHVLinkChanged(linked);
+
+  if (TTool::getApplication())
+    TTool::getApplication()->getCurrentTool()->notifyToolChanged();
+}
+
+bool SelectionTool::isScaleHVLinked() const {
+  return selectionScaleLinkIsEnabled();
+}
+
+void SelectionTool::setScaleHVLinked(bool linked) {
+  setSelectionScaleLinkEnabled(linked);
+}
 
 //-----------------------------------------------------------------------------
 
@@ -707,9 +733,9 @@ TPointD DragSelectionTool::Scale::getScaledPoint(int index,
   TPointD v       = normalize(center - pc);
   double currentD = tdistance(sc, pc);
   double startD   = (index % 2 == 1)
-                      ? currentD / m_deformTool->getStartScaleValue().x
-                      : currentD / m_deformTool->getStartScaleValue().y;
-  double factor = (index % 2 == 1) ? scaleValue.x : scaleValue.y;
+                        ? currentD / m_deformTool->getStartScaleValue().x
+                        : currentD / m_deformTool->getStartScaleValue().y;
+  double factor   = (index % 2 == 1) ? scaleValue.x : scaleValue.y;
   double d = (currentD - startD * factor) * tdistance(center, pc) / currentD;
   return TPointD(pc.x + d * v.x, pc.y + d * v.y);
 }
@@ -1218,7 +1244,6 @@ void SelectionTool::drawFreehandSelection() {
 //-----------------------------------------------------------------------------
 
 void SelectionTool::drawRectSelection(const TImage *image) {
-
   TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
                      ? TPixel32::White
                      : TPixel32::Black;
@@ -1227,8 +1252,7 @@ void SelectionTool::drawRectSelection(const TImage *image) {
   unsigned short stipple   = 0x3F33;
   FourPoints selectingRect = m_selectingRect;
 
-  if (vi && m_curPos.x >= m_firstPos.x)
-    stipple = 0xFF00;
+  if (vi && m_curPos.x >= m_firstPos.x) stipple = 0xFF00;
 
   drawFourPoints(selectingRect, color, stipple, true);
 }
