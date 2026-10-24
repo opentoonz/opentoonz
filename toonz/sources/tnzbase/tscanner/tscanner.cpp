@@ -2,6 +2,9 @@
 
 #include "tscanner.h"
 #include "tscannertwain.h"
+#ifdef _WIN32
+#include "tscannerwia.h"
+#endif
 #include "texception.h"
 #include "tscannerepson.h"
 #include "tstream.h"
@@ -305,11 +308,15 @@ void TScannerParameters::loadData(TIStream &is) {
 namespace {
 TScanner *instanceTwain = 0;
 TScanner *instanceEpson = 0;
+#ifdef _WIN32
+TScanner *instanceWia = 0;
+#endif
 }
 
 //-------------------------------------------------------------------
 
 bool TScanner::m_isTwain = true;
+bool TScanner::m_isWia   = false;
 
 //-------------------------------------------------------------------
 
@@ -362,6 +369,17 @@ TScanner *TScanner::instance() {
   static TScannerDummy dummy = TScannerDummy();
   return &dummy;
 #else
+#ifdef _WIN32
+  if (m_isWia) {
+    if (instanceEpson) {
+      TScannerEpson *se = (TScannerEpson *)instanceEpson;
+      se->closeIO();
+    }
+    if (instanceTwain) TTWAIN_CloseAll(0);
+    if (!instanceWia) instanceWia = new TScannerWia();
+    return instanceWia;
+  }
+#endif
   if (m_isTwain) {
     if (instanceEpson) {
       TScannerEpson *se = (TScannerEpson *)instanceEpson;
