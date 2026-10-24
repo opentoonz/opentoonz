@@ -1,6 +1,7 @@
 
 
 #include "toonzvectorbrushtool.h"
+#include "trailstamp.h"
 
 // TnzTools includes
 #include "tools/toolhandle.h"
@@ -1026,7 +1027,10 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
     m_styleId = 0;
     m_bypassAutoClose = m_inputmanager.state.isKeyPressed(TKey::shift);
     m_tracks.clear();
-    
+    m_trailSelection      = TrailCycle::Selection();
+    m_trailCanStamp       = false;
+    m_trailGesturePalette = TPaletteP();
+
     TTool::Application *app = TTool::getApplication();
     if (!app)
       return;
@@ -1056,17 +1060,36 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
       m_styleId = app->getCurrentLevelStyleIndex();
       m_currentColor = cs->getAverageColor();
       m_currentColor.m = 255;
+
+      int trailFrameCount = 0;
+      if (TVectorImagePatternStrokeStyle *trailStyle =
+              dynamic_cast<TVectorImagePatternStrokeStyle *>(cs))
+        trailFrameCount = trailStyle->getLevelFrameCount();
+      else if (TRasterImagePatternStrokeStyle *trailStyle =
+                   dynamic_cast<TRasterImagePatternStrokeStyle *>(cs))
+        trailFrameCount = trailStyle->getLevelFrameCount();
+      m_trailCanStamp          = trailFrameCount > 0;
+      TVectorImageP trailImage = getImage(true);
+      if (!trailImage || !trailImage->getPalette()) return;
+      m_trailGesturePalette = trailImage->getPalette();
+      const TrailCycle::StyleKey key{m_trailGesturePalette.getPointer(),
+                                     m_styleId, cs->getBrushIdName()};
+      const auto mode = m_frameRange.getIndex() ? TrailCycle::Mode::Off
+                                                : TrailStyles::getMode(cs);
+      const int startOffset =
+          m_frameRange.getIndex() ? -1 : TrailStyles::startFrameIndex(cs);
+      m_trailSelection =
+          m_trailState.begin(mode, key, trailFrameCount, startOffset);
     } else {
-      m_styleId = 1;
+      m_styleId      = 1;
       m_currentColor = TPixel32::Black;
     }
-    
+
     m_active = true;
-    
-    return; // painting has begun
+
+    return;  // painting has begun
   }
-  
-  
+
   // end painting //////////////////////////
   
   m_active = false;
@@ -1074,7 +1097,13 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
   // clear tracks automatically when return from this function
   struct Cleanup {
     ToonzVectorBrushTool &owner;
-    inline ~Cleanup() { owner.m_tracks.clear(); owner.invalidate(); }
+    inline ~Cleanup() {
+      owner.m_tracks.clear();
+      owner.m_trailSelection      = TrailCycle::Selection();
+      owner.m_trailCanStamp       = false;
+      owner.m_trailGesturePalette = TPaletteP();
+      owner.invalidate();
+    }
   } cleanup = {*this};
 
   // remove empty tracks
@@ -1136,13 +1165,34 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
     track.filterPoints();
     double error = 30.0/(1 + 0.5 * m_accuracy.getValue())*m_pixelSize;
     TStroke *stroke = track.makeStroke(error);
-    
+    bool isClickStamp = false;
+
+    // Promote only newly drawn point-like Trails, not ordinary brush dots,
+    // motion paths, Frame Range endpoints, or any nonzero-length drag.
+    if (m_trailCanStamp && !m_frameRange.getIndex() &&
+        stroke->getLength() == 0.0) {
+      std::vector<TThickPoint> points;
+      stroke->getControlPoints(points);
+      std::array<TThickPoint, 5> carrier;
+      if (TrailStamp::makeClickCarrier(points, carrier)) {
+        stroke->reshape(carrier.data(), int(carrier.size()));
+        // Snap can flag a stationary click as self-snapped. The carrier must
+        // remain open; closing it would remove its directional extent.
+        track.setLoop(false);
+        isClickStamp = true;
+      }
+    }
+
     stroke->setStyle(m_styleId);
     
     TStroke::OutlineOptions &options = stroke->outlineOptions();
     options.m_capStyle   = m_capStyle.getIndex();
     options.m_joinStyle  = m_joinStyle.getIndex();
     options.m_miterUpper = m_miterJoinLimit.getValue();
+    if (m_trailSelection.active) {
+      options.m_patternFrameOffset = m_trailSelection.offset;
+      options.m_patternFrameStep   = m_trailSelection.step;
+    }
 
     if ( stroke->getControlPointCount() == 3
       && stroke->getControlPoint(0) != stroke->getControlPoint(2) )
@@ -1153,9 +1203,12 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
                                         // hanno 1 solo chunk.
       stroke->insertControlPoints(0.5);
 
-    if ((!m_frameRange.getIndex() || autoCloseEnabled()) && track.getLoop())
-      stroke->setSelfLoop(true);
-    if (autoCloseEnabled()) closeOpenStroke(stroke);
+    // Keep the single-click carrier open even when Auto Close is enabled.
+    if (!isClickStamp) {
+      if ((!m_frameRange.getIndex() || autoCloseEnabled()) && track.getLoop())
+        stroke->setSelfLoop(true);
+      if (autoCloseEnabled()) closeOpenStroke(stroke);
+    }
 
     strokes.push_back(stroke);
   }
@@ -1233,12 +1286,15 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
   } else {
     // regular paint strokes
     TUndoManager::manager()->beginBlock();
+    bool strokeCommitted = false;
     for(StrokeList::iterator i = strokes.begin(); i != strokes.end(); ++i) {
       TStroke *stroke = *i;
+      const int previousCount = vi->getStrokeCount();
       addStrokeToImage(app, vi, stroke, (DrawOrder)m_drawOrder.getIndex(),
                        m_breakAngles.getValue(), m_autoGroup.getValue(),
                        m_autoFill.getValue() && !m_bypassAutoClose,
                        m_isFrameCreated, m_isLevelCreated);
+      strokeCommitted = strokeCommitted || vi->getStrokeCount() > previousCount;
 
       if ((Preferences::instance()->getGuidedDrawingType() == 1 ||
           Preferences::instance()->getGuidedDrawingType() == 2) &&
@@ -1255,6 +1311,11 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
       }
     }
     TUndoManager::manager()->endBlock();
+
+    if (m_trailSelection.updatesCursor && strokeCommitted) {
+      m_trailPalette = m_trailGesturePalette;
+      m_trailState.commit(m_trailSelection, true);
+    }
   }
   
   deleteStrokes(strokes);

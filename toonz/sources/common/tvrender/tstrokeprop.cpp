@@ -113,7 +113,8 @@ void TRasterImagePatternStrokeProp::draw(
                                     serbve che non sia const*/
 {
   if (rd.m_clippingRect != TRect() && !rd.m_is3dView &&
-      !convert(rd.m_aff * m_stroke->getBBox()).overlaps(rd.m_clippingRect))
+      !convert(rd.m_aff * m_colorStyle->getStrokeBBox(m_stroke))
+           .overlaps(rd.m_clippingRect))
     return;
 
   if (m_strokeChanged ||
@@ -167,7 +168,8 @@ void TVectorImagePatternStrokeProp::draw(
                                     serbve che non sia const*/
 {
   if (rd.m_clippingRect != TRect() && !rd.m_is3dView &&
-      !convert(rd.m_aff * m_stroke->getBBox()).overlaps(rd.m_clippingRect))
+      !convert(rd.m_aff * m_colorStyle->getStrokeBBox(m_stroke))
+           .overlaps(rd.m_clippingRect))
     return;
 
   if (m_strokeChanged ||

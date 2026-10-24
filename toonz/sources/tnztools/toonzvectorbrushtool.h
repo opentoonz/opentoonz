@@ -8,6 +8,8 @@
 #include <trasterimage.h>
 #include <ttoonzimage.h>
 #include <tstroke.h>
+#include <tpalette.h>
+#include "trailcyclestate.h"
 #include <toonz/strokegenerator.h>
 #include "toonz/preferences.h"
 #include <tools/tool.h>
@@ -251,6 +253,11 @@ protected:
   TFrameId m_firstFrameId, m_veryFirstFrameId;
   TPixel32 m_currentColor;
   int m_styleId;
+  TrailCycle::State m_trailState;
+  TrailCycle::Selection m_trailSelection;
+  bool m_trailCanStamp = false;
+  TPaletteP m_trailPalette;
+  TPaletteP m_trailGesturePalette;
   double m_minThick, m_maxThick;
 
   // for snapping and framerange
