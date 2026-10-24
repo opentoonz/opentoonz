@@ -7,6 +7,7 @@
 #include "viewerpane.h"
 #include "onionskinmaskgui.h"
 #include "viewerdraw.h"
+#include "toonz/cameraguide.h"
 #include "menubarcommandids.h"
 #include "ruler.h"
 #include "locatorpopup.h"
@@ -282,6 +283,7 @@ ToggleCommandHandler viewTableToggle(MI_ViewTable, false);
 ToggleCommandHandler editInPlaceToggle(MI_ToggleEditInPlace, false);
 ToggleCommandHandler fieldGuideToggle(MI_FieldGuide, false);
 ToggleCommandHandler safeAreaToggle(MI_SafeArea, false);
+ToggleCommandHandler centerCutGuideToggle(MI_CenterCutGuide, false);
 ToggleCommandHandler rasterizePliToggle(MI_RasterizePli, false);
 
 ToggleCommandHandler viewClcToggle("MI_ViewColorcard", false);
@@ -1813,6 +1815,15 @@ void SceneViewer::drawOverlay() {
       glPushMatrix();
       tglMultMatrix(m_drawCameraAff);
       ViewerDraw::drawSafeArea();
+      glPopMatrix();
+    }
+
+    if (centerCutGuideToggle.getStatus() && !m_drawEditingLevel &&
+        !is3DView()) {
+      glPushMatrix();
+      tglMultMatrix(m_drawCameraAff);
+      ViewerDraw::drawCameraGuide(
+          CameraGuide::centeredRect(ViewerDraw::getCameraRect(), 4.0 / 3.0));
       glPopMatrix();
     }
 

@@ -5,6 +5,8 @@
 // Tnz6 includes
 #include "tapp.h"
 #include "mainwindow.h"
+#include "menubarcommandids.h"
+#include "toonzqt/menubarcommand.h"
 #include "tenv.h"
 #include "saveloadqsettings.h"
 #include "custompanelmanager.h"
@@ -27,6 +29,7 @@
 #include <QSettings>
 #include <QMap>
 #include <QMenu>
+#include <QActionGroup>
 #include <QApplication>
 #include <qdrawutil.h>
 #include <assert.h>
@@ -679,18 +682,31 @@ void TPanelTitleBarButtonForSafeArea::mousePressEvent(QMouseEvent *e) {
 
 void TPanelTitleBarButtonForSafeArea::contextMenuEvent(QContextMenuEvent *e) {
   QMenu menu(this);
+  menu.addAction(CommandManager::instance()->getAction(MI_CenterCutGuide));
+  menu.addSeparator();
+  menu.addAction(tr("Standard Safe Areas"))->setEnabled(false);
+
+  QAction *safeArea = CommandManager::instance()->getAction(MI_SafeArea);
+  QActionGroup templates(&menu);
+  QAction *none = menu.addAction(tr("None"));
+  none->setCheckable(true);
+  none->setChecked(!safeArea->isChecked());
+  templates.addAction(none);
+  connect(none, &QAction::triggered, this, [safeArea]() {
+    if (safeArea->isChecked()) safeArea->trigger();
+  });
 
   QList<QString> safeAreaNameList;
   getSafeAreaNameList(safeAreaNameList);
   for (const QString &name : safeAreaNameList) {
     QAction *action = menu.addAction(name);
     action->setData(name);
+    action->setCheckable(true);
+    action->setChecked(safeArea->isChecked() &&
+                       name == QString::fromStdString(EnvSafeAreaName));
+    templates.addAction(action);
     connect(action, &QAction::triggered, this,
             &TPanelTitleBarButtonForSafeArea::onSetSafeArea);
-    if (name == QString::fromStdString(EnvSafeAreaName)) {
-      action->setCheckable(true);
-      action->setChecked(true);
-    }
   }
 
   menu.exec(e->globalPos());
@@ -701,9 +717,12 @@ void TPanelTitleBarButtonForSafeArea::contextMenuEvent(QContextMenuEvent *e) {
 void TPanelTitleBarButtonForSafeArea::onSetSafeArea() {
   const QString safeAreaName =
       qobject_cast<QAction *>(sender())->data().toString();
-  // change safearea if the different one is selected
-  if (QString::fromStdString(EnvSafeAreaName) != safeAreaName) {
-    EnvSafeAreaName = safeAreaName.toStdString();
+  const bool changed = QString::fromStdString(EnvSafeAreaName) != safeAreaName;
+  if (changed) EnvSafeAreaName = safeAreaName.toStdString();
+  QAction *safeArea = CommandManager::instance()->getAction(MI_SafeArea);
+  if (!safeArea->isChecked())
+    safeArea->trigger();
+  else if (changed) {
     // emit sceneChanged without setting dirty flag
     TApp::instance()->getCurrentScene()->notifySceneChanged(false);
   }

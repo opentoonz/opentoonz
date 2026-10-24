@@ -573,6 +573,18 @@ void ViewerDraw::drawSafeArea() {
 
 //-----------------------------------------------------------------------------
 
+void ViewerDraw::drawCameraGuide(const TRectD &rect) {
+  if (rect.isEmpty()) return;
+  glPushAttrib(GL_CURRENT_BIT | GL_LINE_BIT | GL_ENABLE_BIT);
+  glColor3d(0.0, 0.8, 1.0);
+  glLineStipple(1, 0xF0F0);
+  glEnable(GL_LINE_STIPPLE);
+  tglDrawRect(rect);
+  glPopAttrib();
+}
+
+//-----------------------------------------------------------------------------
+
 void ViewerDraw::drawCamera(unsigned long flags, double pixelSize) {
   bool cameraRef = 0 != (flags & ViewerDraw::CAMERA_REFERENCE);
   bool camera3d  = 0 != (flags & ViewerDraw::CAMERA_3D);

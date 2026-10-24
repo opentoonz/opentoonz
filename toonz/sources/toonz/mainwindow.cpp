@@ -75,6 +75,7 @@ TEnv::IntVar ViewBBoxToggleAction("ViewBBoxToggleAction1", 1);
 TEnv::IntVar EditInPlaceToggleAction("EditInPlaceToggleAction", 0);
 TEnv::IntVar RasterizePliToggleAction("RasterizePliToggleAction", 0);
 TEnv::IntVar SafeAreaToggleAction("SafeAreaToggleAction", 0);
+TEnv::IntVar CenterCutGuideToggleAction("CenterCutGuideToggleAction", 0);
 TEnv::IntVar ViewColorcardToggleAction("ViewColorcardToggleAction", 1);
 TEnv::IntVar ViewGuideToggleAction("ViewGuideToggleAction", 1);
 TEnv::IntVar ViewRulerToggleAction("ViewRulerToggleAction", 1);
@@ -1725,6 +1726,8 @@ void MainWindow::onMenuCheckboxChanged() {
     RasterizePliToggleAction = isChecked;
   } else if (cm->getAction(MI_SafeArea) == action)
     SafeAreaToggleAction = isChecked;
+  else if (cm->getAction(MI_CenterCutGuide) == action)
+    CenterCutGuideToggleAction = isChecked;
   else if (cm->getAction(MI_ViewColorcard) == action)
     ViewColorcardToggleAction = isChecked;
   else if (cm->getAction(MI_ViewGuide) == action)
@@ -2711,6 +2714,8 @@ void MainWindow::defineActions() {
                ViewBBoxToggleAction ? 1 : 0, MenuViewCommandType);
   createToggle(MI_SafeArea, QT_TR_NOOP("&Safe Area"), "",
                SafeAreaToggleAction ? 1 : 0, MenuViewCommandType);
+  createToggle(MI_CenterCutGuide, QT_TR_NOOP("4:3 Center-Cut Guide"), "",
+               CenterCutGuideToggleAction ? 1 : 0, MenuViewCommandType);
   createToggle(MI_ViewColorcard, QT_TR_NOOP("&Camera BG Color"), "",
                ViewColorcardToggleAction ? 1 : 0, MenuViewCommandType);
   createToggle(MI_ViewGuide, QT_TR_NOOP("&Guide"), "",

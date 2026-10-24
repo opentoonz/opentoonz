@@ -182,6 +182,7 @@
 #define MI_FieldGuide "MI_FieldGuide"
 #define MI_RasterizePli "MI_RasterizePli"
 #define MI_SafeArea "MI_SafeArea"
+#define MI_CenterCutGuide "MI_CenterCutGuide"
 #define MI_ViewColorcard "MI_ViewColorcard"
 #define MI_ViewGuide "MI_ViewGuide"
 #define MI_ViewRuler "MI_ViewRuler"
