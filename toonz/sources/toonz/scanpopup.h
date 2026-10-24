@@ -26,12 +26,16 @@ class MyScannerListener final : public QObject, public TScannerListener {
 
   int m_current;
   int m_inc;
+  int m_adHocRow;
+  int m_adHocColumn;
   ScanList m_scanList;
   bool m_isCanceled, m_isPreview;
   DVGui::ProgressDialog *m_progressDialog;
 
 public:
-  MyScannerListener(const ScanList &scanList);
+  MyScannerListener(const ScanList &scanList, int adHocRow = -1,
+                    int adHocColumn = -1);
+  const ScanList &getScanList() const { return m_scanList; }
   void onImage(const TRasterImageP &) override;
   void onError() override;
   void onNextPaper() override;
