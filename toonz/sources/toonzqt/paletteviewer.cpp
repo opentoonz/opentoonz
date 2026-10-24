@@ -598,6 +598,20 @@ void PaletteViewer::createPaletteToolBar() {
 
   viewModeButton->setMenu(viewMode);
 
+  if (m_viewType == LEVEL_PALETTE && m_hasSavePaletteToolbar) {
+    viewMode->addSeparator();
+    QAction *command =
+        CommandManager::instance()->getAction("MI_SaveAsDefaultRasterPalette");
+    QAction *saveDefault = viewMode->addAction(command->text());
+    connect(saveDefault, &QAction::triggered, command, &QAction::trigger);
+    connect(viewMode, &QMenu::aboutToShow, this, [this, saveDefault]() {
+      TPalette *palette = getPalette();
+      saveDefault->setEnabled(
+          m_isSaveActionEnabled && palette && !palette->isCleanupPalette() &&
+          FullColorPalette::instance()->isFullColorPalette(palette));
+    });
+  }
+
   // Attention: having reversed the direction I must add objects in reverse
   // order
 
@@ -847,6 +861,9 @@ void PaletteViewer::contextMenuEvent(QContextMenuEvent *event) {
     menu->addAction(
         CommandManager::instance()->getAction("MI_OverwritePalette"));
     menu->addAction(CommandManager::instance()->getAction("MI_SavePaletteAs"));
+    if (FullColorPalette::instance()->isFullColorPalette(getPalette()))
+      menu->addAction(CommandManager::instance()->getAction(
+          "MI_SaveAsDefaultRasterPalette"));
   }
 
   if (m_viewType == LEVEL_PALETTE && !getPalette()->isLocked() &&

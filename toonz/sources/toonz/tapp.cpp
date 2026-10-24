@@ -47,6 +47,7 @@
 #include "toonz/tcamera.h"
 #include "toonz/preferences.h"
 #include "toonz/txshsoundcolumn.h"
+#include "toonz/fullcolorpalette.h"
 
 // TnzCore includes
 #include "tbigmemorymanager.h"
@@ -64,6 +65,7 @@
 #include <QCoreApplication>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <algorithm>
 
 //===================================================================
 
@@ -131,6 +133,11 @@ TApp::TApp()
           &TApp::onSceneSwitched);
   connect(m_currentScene, &TSceneHandle::sceneChanged, this,
           &TApp::onSceneChanged);
+  connect(m_currentScene, &TSceneHandle::preferenceChanged, this,
+          [this](const QString &name) {
+            if (name == "DefLevelType" || name == "EnableAutocreation")
+              updateXshLevel();
+          });
   connect(m_currentXsheet, &TXsheetHandle::xsheetSwitched, this,
           &TApp::onXsheetSwitched);
   connect(m_currentFrame, &TFrameHandle::frameSwitched, this,
@@ -328,6 +335,8 @@ void TApp::updateXshLevel() {
     int frame       = m_currentFrame->getFrame();
     int column      = m_currentColumn->getColumnIndex();
     TXsheet *xsheet = m_currentXsheet->getXsheet();
+    if (!xsheet) return;
+    TXshColumn *xshColumn = column >= 0 ? xsheet->getColumn(column) : nullptr;
 
     // sound column case
     if (xsheet->getColumn(column) &&
@@ -351,12 +360,14 @@ void TApp::updateXshLevel() {
       }
     }
 
+    TPalette *currentPalette =
+        m_paletteController->getCurrentPalette()->getPalette();
+    const bool editingCleanup =
+        currentPalette && currentPalette->isCleanupPalette();
     m_currentLevel->setLevel(xl);
 
     // level could be the same, but palette could have changed
     if (xl && xl->getSimpleLevel()) {
-      TPalette *currentPalette =
-          m_paletteController->getCurrentPalette()->getPalette();
       int styleIndex =
           m_paletteController->getCurrentLevelPalette()->getStyleIndex();
 
@@ -365,17 +376,49 @@ void TApp::updateXshLevel() {
 
       // If the new selected level is an OVL and the current palette is a
       // cleanup palette, then set the current handle to the cleanup palette.
-      if (xl->getType() == OVL_XSHLEVEL && currentPalette &&
-          currentPalette->isCleanupPalette())
-
+      if (xl->getType() == OVL_XSHLEVEL && editingCleanup)
         m_paletteController->editCleanupPalette();
     } else if (xl && xl->getPaletteLevel()) {
       int styleIndex =
           m_paletteController->getCurrentLevelPalette()->getStyleIndex();
       m_paletteController->getCurrentLevelPalette()->setPalette(
           xl->getPaletteLevel()->getPalette(), styleIndex);
-    } else
-      m_paletteController->getCurrentLevelPalette()->setPalette(0);
+    } else {
+      TPalette *rasterPalette  = nullptr;
+      Preferences *preferences = Preferences::instance();
+      if (!xl && column >= 0 && frame >= 0 &&
+          preferences->isAutoCreateEnabled() &&
+          (!xshColumn ||
+           (xshColumn->getLevelColumn() && !xshColumn->isLocked() &&
+            xshColumn->isCamstandVisible()))) {
+        if (xsheet->isColumnEmpty(column)) {
+          if (preferences->getDefLevelType() == OVL_XSHLEVEL)
+            rasterPalette = FullColorPalette::instance()->getPalette(
+                m_currentScene->getScene());
+        } else {
+          // Match the level chosen by touchImage without changing the current
+          // level or enabling level commands on an empty cell.
+          int r0, r1;
+          xsheet->getCellRange(column, r0, r1);
+          int previous = std::min(frame - 1, r1);
+          int next     = std::max(frame + 1, r0);
+          while (previous >= r0 && xsheet->getCell(previous, column).isEmpty())
+            --previous;
+          while (next <= r1 && xsheet->getCell(next, column).isEmpty()) ++next;
+          TXshSimpleLevel *rasterLevel =
+              previous >= r0
+                  ? xsheet->getCell(previous, column).getSimpleLevel()
+              : next <= r1 ? xsheet->getCell(next, column).getSimpleLevel()
+                           : nullptr;
+          if (rasterLevel && rasterLevel->getType() == OVL_XSHLEVEL &&
+              !rasterLevel->isSubsequence() && !rasterLevel->isReadOnly())
+            rasterPalette = rasterLevel->getPalette();
+        }
+      }
+      m_paletteController->getCurrentLevelPalette()->setPalette(rasterPalette);
+      if (rasterPalette && editingCleanup)
+        m_paletteController->editCleanupPalette();
+    }
   }
 }
 

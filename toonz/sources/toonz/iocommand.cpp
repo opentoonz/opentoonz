@@ -1267,6 +1267,10 @@ bool IoCmd::saveSceneIfNeeded(QString msg) {
       SceneResources resources(scene, 0);
       resources.getDirtyResources(dirtyResources);
     }
+    if (FullColorPalette::instance()->getDirtyFlag()) {
+      dirtyResources << QStringLiteral("Raster Drawing Palette.tpl");
+      dirtyResources.removeDuplicates();
+    }
 
     if (!dirtyResources.empty()) {
       // show up to 5 items
@@ -1294,7 +1298,7 @@ bool IoCmd::saveSceneIfNeeded(QString msg) {
         return false;
       } else if (ret == 1) {
         // save non scene files
-        IoCmd::saveNonSceneFiles();
+        if (!IoCmd::saveNonSceneFiles()) return false;
       } else if (ret == 2) {
         // do nothing and continue
       }
@@ -1327,6 +1331,9 @@ void IoCmd::newScene() {
   // temporary clear the current level to prevent UI to access deleted level
   // while switching scenes
   app->getCurrentLevel()->setLevel(nullptr);
+
+  // An empty raster column can have a palette without a current level.
+  app->getPaletteController()->getCurrentLevelPalette()->setPalette(nullptr);
 
   IconGenerator::instance()->clearRequests();
   IconGenerator::instance()->clearSceneIcons();
@@ -1837,7 +1844,9 @@ bool IoCmd::saveNonSceneFiles(int flags) {
   try {
     result = resources.save(scene->getScenePath(), !isAutosave);
     if (result) resources.updatePaths();
+    FullColorPalette::instance()->savePalette(scene);
   } catch (...) {
+    result = false;
     if (!isAutosave)
       DVGui::error(QObject::tr("Couldn't save all scene resources."));
   }
@@ -2004,10 +2013,14 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
   // while switching scenes
   app->getCurrentLevel()->setLevel(nullptr);
 
+  app->getPaletteController()->getCurrentLevelPalette()->setPalette(nullptr);
+
   TUndoManager::manager()->reset();
   IconGenerator::instance()->clearRequests();
   IconGenerator::instance()->clearSceneIcons();
   ImageManager::instance()->clear();
+
+  FullColorPalette::instance()->clear();
 
   CacheFxCommand::instance()->onNewScene();
 
@@ -3440,13 +3453,20 @@ public:
 
   void execute() override {
     TXshLevel *level = TApp::instance()->getCurrentLevel()->getLevel();
-    if (!level) {
+    TPalette *rasterPalette = TApp::instance()
+                                  ->getPaletteController()
+                                  ->getCurrentLevelPalette()
+                                  ->getPalette();
+    const bool emptyRasterPalette =
+        !level && rasterPalette &&
+        FullColorPalette::instance()->isFullColorPalette(rasterPalette);
+    if (!level && !emptyRasterPalette) {
       DVGui::warning("No current level.");
       return;
     }
-    TXshSimpleLevel *sl  = level->getSimpleLevel();
-    TXshPaletteLevel *pl = level->getPaletteLevel();
-    if (!sl && !pl) {
+    TXshSimpleLevel *sl  = level ? level->getSimpleLevel() : nullptr;
+    TXshPaletteLevel *pl = level ? level->getPaletteLevel() : nullptr;
+    if (!sl && !pl && !emptyRasterPalette) {
       DVGui::warning("Current level has no palette.");
       return;
     }
@@ -3455,7 +3475,10 @@ public:
     TPalette *palette;
     TFilePath palettePath;
     /*- SimpleLevelの場合 -*/
-    if (sl) {
+    if (emptyRasterPalette) {
+      palette     = rasterPalette;
+      palettePath = FullColorPalette::instance()->getPath();
+    } else if (sl) {
       palette = sl->getPalette();
       if (!palette) {
         DVGui::warning("No current palette");
@@ -3502,17 +3525,25 @@ public:
       palettePath = scene->decodeFilePath(palettePath);
     }
 
-    if (sl && sl->getPath().getType() == "pli")
-      sl->save(palettePath, TFilePath(), true);
-    else if (sl && sl->getType() & FULLCOLOR_TYPE)
-      FullColorPalette::instance()->savePalette(scene);
-    else
-      StudioPalette::instance()->save(palettePath, palette);
+    try {
+      if (sl && sl->getPath().getType() == "pli")
+        sl->save(palettePath, TFilePath(), true);
+      else if (emptyRasterPalette || (sl && sl->getType() & FULLCOLOR_TYPE))
+        FullColorPalette::instance()->savePalette(scene);
+      else
+        StudioPalette::instance()->save(palettePath, palette);
+    } catch (const TException &e) {
+      DVGui::warning(QObject::tr("Could not save the palette.\n%1")
+                         .arg(QString::fromStdWString(e.getMessage())));
+      return;
+    }
     /*- Dirtyフラグの変更 -*/
     if (sl)
       sl->getPalette()->setDirtyFlag(false);
     else if (pl)
       pl->getPalette()->setDirtyFlag(false);
+    else if (emptyRasterPalette)
+      palette->setDirtyFlag(false);
 
     if (Preferences::instance()->getBoolValue(resetUndoOnSavingLevel))
       TUndoManager::manager()->reset();
@@ -3523,6 +3554,53 @@ public:
         ->notifyPaletteDirtyFlagChanged();
   }
 } overwritePaletteCommandHandler;
+
+//=============================================================================
+// Save the shared raster palette as the global default
+//-----------------------------------------------------------------------------
+class SaveAsDefaultRasterPaletteCommandHandler final : public MenuItemHandler {
+public:
+  SaveAsDefaultRasterPaletteCommandHandler()
+      : MenuItemHandler(MI_SaveAsDefaultRasterPalette) {}
+
+  void execute() override {
+    TApp *app = TApp::instance();
+    TPaletteP palette(app->getCurrentPalette()->getPalette());
+    FullColorPalette *fullColorPalette = FullColorPalette::instance();
+    TXshLevel *level                   = app->getCurrentLevel()->getLevel();
+    if (!palette || palette->isCleanupPalette() ||
+        !fullColorPalette->isFullColorPalette(palette.getPointer()) ||
+        palette.getPointer() != app->getPaletteController()
+                                    ->getCurrentLevelPalette()
+                                    ->getPalette() ||
+        (level && level->getType() != OVL_XSHLEVEL)) {
+      DVGui::warning(QObject::tr("Select a raster drawing palette first."));
+      return;
+    }
+
+    const TFilePath path = fullColorPalette->getDefaultPalettePath();
+    QString question     = QObject::tr(
+            "Save the current raster drawing palette as the global default?\n\n"
+                "Projects with their own raster palette will keep using it.");
+    if (TSystem::doesExistFileOrLevel(path))
+      question +=
+          QObject::tr("\n\nThis will overwrite %1.").arg(path.getQString());
+    if (DVGui::MsgBox(question, QObject::tr("Save"), QObject::tr("Cancel"),
+                      0) != 1)
+      return;
+
+    try {
+      fullColorPalette->saveAsDefault(palette.getPointer());
+      StudioPalette::instance()->notifyTreeChange();
+    } catch (const TException &e) {
+      DVGui::warning(
+          QObject::tr("Could not save the default raster palette.\n%1")
+              .arg(QString::fromStdWString(e.getMessage())));
+    } catch (...) {
+      DVGui::warning(QObject::tr("Could not save the default raster palette."));
+    }
+  }
+} saveAsDefaultRasterPaletteCommandHandler;
 
 //=============================================================================
 // Save scene and levels
