@@ -639,15 +639,7 @@ signals:
 
 class CustomStyleChooserPage final : public StyleChooserPage {
 public:
-  CustomStyleChooserPage(StyleEditor *styleEditor, QWidget *parent = 0)
-      : StyleChooserPage(styleEditor, parent) {
-    static const QString filters(
-        "*.pli *.tif *.png *.tga *.tiff *.sgi *.rgb *.pct *.pic *.exr");
-    static CustomStyleManager theManager(
-        "RasterImagePatternStrokeStyle:", "VectorImagePatternStrokeStyle:",
-        TFilePath("custom styles"), filters, m_chipSize);
-    m_manager = &theManager;
-  }
+  CustomStyleChooserPage(StyleEditor *styleEditor, QWidget *parent = 0);
 
   void showEvent(QShowEvent *) override {
     connect(m_manager, SIGNAL(patternAdded()), this, SLOT(patternAdded()));

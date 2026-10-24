@@ -2154,6 +2154,17 @@ void StyleChooserPage::setRootPath(const TFilePath &rootPath) {
 //    CustomStyleChooser  implementation
 //*****************************************************************************
 
+CustomStyleChooserPage::CustomStyleChooserPage(StyleEditor *styleEditor,
+                                               QWidget *parent)
+    : StyleChooserPage(styleEditor, parent) {
+  static CustomStyleManager theManager(
+      "RasterImagePatternStrokeStyle:", "VectorImagePatternStrokeStyle:",
+      TFilePath("custom styles"), TrailStyles::sourceFilters(), m_chipSize);
+  m_manager = &theManager;
+}
+
+//-----------------------------------------------------------------------------
+
 int CustomStyleChooserPage::drawChip(QPainter &p, QRect rect, int index) {
   assert(0 <= index && index < getChipCount());
   auto &data = m_manager->getData(index);
@@ -2632,6 +2643,23 @@ void SettingsPage::setStyle(const TColorStyleP &editedStyle) {
         m_editedStyle->getParamRange(p, min, max);
 
         intField->setRange(min, max);
+        if (p == TrailStyles::frameOffsetParam &&
+            TrailStyles::isTrail(m_editedStyle.getPointer())) {
+          intField->setObjectName("trailFrameOffset");
+          // Drawing IDs can be sparse or start well above the frame count.
+          // Keep direct numeric entry; a count-limited slider would be
+          // misleading.
+          intField->enableSlider(false);
+          intField->enableRoller(true);
+          const QString help =
+              tr("Source drawing number: 0 keeps the automatic start or "
+                 "current cycle. "
+                 "A positive number starts at that drawing; Repeat holds it. "
+                 "Nonexistent drawing numbers are ignored, not wrapped. "
+                 "Affects new strokes only; Frame Range ignores this setting.");
+          intField->setToolTip(help);
+          label->setToolTip(help);
+        }
 
         ret = QObject::connect(intField, SIGNAL(valueChanged(bool)), this,
                                SLOT(onValueChanged(bool))) &&
@@ -2642,6 +2670,9 @@ void SettingsPage::setStyle(const TColorStyleP &editedStyle) {
 
       case TColorStyle::ENUM: {
         QComboBox *comboBox = new QComboBox;
+        if (p == TrailStyles::cycleParam &&
+            TrailStyles::isTrail(m_editedStyle.getPointer()))
+          comboBox->setObjectName("trailCycleMode");
         m_paramsLayout->addWidget(comboBox, p, 1);
 
         QStringList items;
@@ -2770,6 +2801,27 @@ void SettingsPage::updateValues() {
 
       comboBox->setCurrentIndex(
           m_editedStyle->getParamValue(TColorStyle::int_tag(), p));
+      if (p == TrailStyles::cycleParam &&
+          TrailStyles::isTrail(m_editedStyle.getPointer())) {
+        const bool available =
+            TrailStyles::frameCount(m_editedStyle.getPointer()) > 1;
+        const QString help =
+            available
+                ? tr("Selects source frames for new Brush strokes. Existing "
+                     "strokes keep "
+                     "their recorded sequence. Frame Range drawing ignores "
+                     "this setting. "
+                     "Off starts each stroke normally; Repeat holds one source "
+                     "frame.")
+                : tr("Trail Cycle requires a loaded multi-frame Trail source. "
+                     "The saved mode is retained until the source is "
+                     "available.");
+        comboBox->setEnabled(available);
+        comboBox->setToolTip(help);
+        QWidget *label = m_paramsLayout->itemAtPosition(p, 0)->widget();
+        label->setEnabled(available);
+        label->setToolTip(help);
+      }
 
       break;
     }
