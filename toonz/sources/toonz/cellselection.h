@@ -130,6 +130,7 @@ public:
 
   void createBlankDrawing(int row, int col, bool multiple);
   void createBlankDrawings();
+  void insertBlankDrawing();
   void fillEmptyCell();
   int getResizePivotRow() const { return m_resizePivotRow; }
 };

@@ -421,7 +421,7 @@ public:
 
 class InsertUndo final : public TUndo {
   TCellSelection::Range m_range;
-  bool m_containsSoundColumn;
+  bool m_containsSoundColumn = false;
 
 public:
   InsertUndo(const TCellSelection::Range &range) : m_range(range) {
@@ -2763,7 +2763,8 @@ void TCellSelection::pasteKeyframesInto() {
 
 //-----------------------------------------------------------------------------
 
-void TCellSelection::createBlankDrawing(int row, int col, bool multiple) {
+static void createBlankDrawingImpl(int row, int col, bool multiple,
+                                   bool insert) {
   TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 
   if (col < 0) {
@@ -2780,7 +2781,9 @@ void TCellSelection::createBlankDrawing(int row, int col, bool multiple) {
   }
 
   TApp::instance()->getCurrentColumn()->setColumnIndex(col);
-  TApp::instance()->getCurrentFrame()->setCurrentFrame(row + 1);
+  // Validate the level preceding an inserted cell, rather than the drawing
+  // that will be shifted down. Insertion is only requested after a hold.
+  TApp::instance()->getCurrentFrame()->setCurrentFrame(insert ? row : row + 1);
 
   TXshLevel *level = TApp::instance()->getCurrentLevel()->getLevel();
   if (!level && Preferences::instance()->isAutoCreateEnabled() &&
@@ -2812,6 +2815,17 @@ void TCellSelection::createBlankDrawing(int row, int col, bool multiple) {
     }
   }
 
+  // Do not add insertion to history until blank creation succeeds.
+  std::unique_ptr<InsertUndo> insertUndo;
+  if (insert) {
+    TCellSelection::Range range;
+    range.m_r0 = range.m_r1 = row;
+    range.m_c0 = range.m_c1 = col;
+    insertUndo.reset(new InsertUndo(range));
+    xsh->insertCells(row, col, 1);
+    TApp::instance()->getCurrentFrame()->setCurrentFrame(row + 1);
+  }
+
   ToolHandle *toolHandle = TApp::instance()->getCurrentTool();
 
   // If autocreate disabled, let's turn it on temporarily
@@ -2830,6 +2844,7 @@ void TCellSelection::createBlankDrawing(int row, int col, bool multiple) {
   TXshSimpleLevel *sl = cell.getSimpleLevel();
 
   if (!img || !sl) {
+    if (insertUndo) insertUndo->undo();
     if (!isAutoCreateEnabled)
       Preferences::instance()->setValue(EnableAutocreation, false, false);
     if (!isCreationInHoldCellsEnabled)
@@ -2842,6 +2857,7 @@ void TCellSelection::createBlankDrawing(int row, int col, bool multiple) {
   }
 
   if (!toolHandle->getTool()->m_isFrameCreated) {
+    if (insertUndo) insertUndo->undo();
     if (!isAutoCreateEnabled)
       Preferences::instance()->setValue(EnableAutocreation, false, false);
     if (!isCreationInHoldCellsEnabled)
@@ -2860,7 +2876,13 @@ void TCellSelection::createBlankDrawing(int row, int col, bool multiple) {
 
   CreateBlankDrawingUndo *undo = new CreateBlankDrawingUndo(
       sl, frame, toolHandle->getTool()->m_isLevelCreated, palette);
+  if (insertUndo) {
+    TUndoManager::manager()->beginBlock();
+    TUndoManager::manager()->add(insertUndo.release());
+    TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+  }
   TUndoManager::manager()->add(undo);
+  if (insert) TUndoManager::manager()->endBlock();
 
   IconGenerator::instance()->invalidate(sl, frame);
 
@@ -2869,6 +2891,12 @@ void TCellSelection::createBlankDrawing(int row, int col, bool multiple) {
     Preferences::instance()->setValue(EnableAutocreation, false, false);
   if (!isCreationInHoldCellsEnabled)
     Preferences::instance()->setValue(EnableCreationInHoldCells, false, false);
+}
+
+//-----------------------------------------------------------------------------
+
+void TCellSelection::createBlankDrawing(int row, int col, bool multiple) {
+  createBlankDrawingImpl(row, col, multiple, false);
 }
 
 //-----------------------------------------------------------------------------
@@ -2892,6 +2920,46 @@ void TCellSelection::createBlankDrawings() {
 
   TApp::instance()->getCurrentColumn()->setColumnIndex(col);
   TApp::instance()->getCurrentFrame()->setCurrentFrame(row + 1);
+}
+
+//-----------------------------------------------------------------------------
+
+void TCellSelection::insertBlankDrawing() {
+  TFrameHandle *fh = TApp::instance()->getCurrentFrame();
+  if (!fh->isEditingScene()) {
+    DVGui::warning(QObject::tr(
+        "Insert Blank Drawing is available when editing the scene"));
+    return;
+  }
+
+  int col      = TApp::instance()->getCurrentColumn()->getColumnIndex();
+  int row      = fh->getFrameIndex();
+  TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+
+  if (col < 0) {
+    DVGui::warning(
+        QObject::tr("Unable to create a blank drawing on the camera column"));
+    return;
+  }
+
+  TXshColumn *column = xsh->getColumn(col);
+  if (column && column->isLocked()) {
+    DVGui::warning(QObject::tr("The current column is locked"));
+    return;
+  }
+
+  TXshCell cell   = xsh->getCell(row, col);
+  int targetRow   = row;
+  bool needInsert = false;
+
+  if (!cell.isEmpty()) {
+    targetRow = row + 1;
+    while (xsh->getCell(targetRow, col) == cell) ++targetRow;
+    // Insert only when the next cell is already a drawing.
+    needInsert = !xsh->getCell(targetRow, col).isEmpty();
+  }
+
+  createBlankDrawingImpl(targetRow, col, false, needInsert);
 }
 
 //-----------------------------------------------------------------------------
@@ -3925,3 +3993,14 @@ void TCellSelection::fillEmptyCell() {
 
   TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 }
+
+//-----------------------------------------------------------------------------
+
+class InsertBlankDrawingCommand final : public MenuItemHandler {
+public:
+  InsertBlankDrawingCommand() : MenuItemHandler(MI_InsertBlankDrawing) {}
+  void execute() override {
+    TCellSelection selection;
+    selection.insertBlankDrawing();
+  }
+} insertBlankDrawingCommand;

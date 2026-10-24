@@ -152,6 +152,7 @@
 #define MI_PasteNew "MI_PasteNew"
 #define MI_Autorenumber "MI_Autorenumber"
 #define MI_CreateBlankDrawing "MI_CreateBlankDrawing"
+#define MI_InsertBlankDrawing "MI_InsertBlankDrawing"
 #define MI_FillEmptyCell "MI_FillEmptyCell"
 
 #define MI_MergeFrames "MI_MergeFrames"
@@ -212,6 +213,8 @@
 #define MI_LastFrame "MI_LastFrame"
 #define MI_NextFrame "MI_NextFrame"
 #define MI_PrevFrame "MI_PrevFrame"
+#define MI_NextFramePastEnd "MI_NextFramePastEnd"
+#define MI_PrevFramePastEnd "MI_PrevFramePastEnd"
 #define MI_NextDrawing "MI_NextDrawing"
 #define MI_PrevDrawing "MI_PrevDrawing"
 #define MI_NextStep "MI_NextStep"
