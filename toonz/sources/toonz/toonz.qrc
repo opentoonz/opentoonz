@@ -360,6 +360,7 @@
 		<file>icons/dark/actions/16x16/insert_frame.svg</file>
 		<file>icons/dark/actions/16x16/remove_frame.svg</file>
 		<file>icons/dark/actions/16x16/add_cell.svg</file>
+		<file>icons/dark/actions/16x16/insert_blank_cell.svg</file>
 		<file>icons/dark/actions/16x16/add_cells.svg</file>
 		<file>icons/dark/actions/16x16/remove_cell.svg</file>
 		<file>icons/dark/actions/16x16/remove_cells.svg</file>

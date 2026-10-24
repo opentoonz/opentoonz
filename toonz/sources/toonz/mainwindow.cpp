@@ -2590,6 +2590,9 @@ void MainWindow::defineActions() {
   createMenuCellsAction(MI_CreateBlankDrawing,
                         QT_TR_NOOP("&Create Blank Drawing"), "Alt+D",
                         "add_cell");
+  createMenuCellsAction(MI_InsertBlankDrawing,
+                        QT_TR_NOOP("&Insert Blank Drawing"), "",
+                        "insert_blank_cell");
   createMenuCellsAction(MI_Duplicate, QT_TR_NOOP("&Duplicate Drawing  "), "D",
                         "duplicate_drawing");
   createMenuCellsAction(MI_Autorenumber, QT_TR_NOOP("&Autorenumber"), "",
@@ -2635,6 +2638,10 @@ void MainWindow::defineActions() {
                        "frameprev");
   createMenuPlayAction(MI_NextFrame, QT_TR_NOOP("Next Frame"), "Shift+.",
                        "framenext");
+  createMenuPlayAction(MI_PrevFramePastEnd,
+                       QT_TR_NOOP("Previous Frame Past End"), "", "frameprev");
+  createMenuPlayAction(MI_NextFramePastEnd, QT_TR_NOOP("Next Frame Past End"),
+                       "", "framenext");
   createMenuPlayAction(MI_NextDrawing, QT_TR_NOOP("Next Drawing"), ".",
                        "next_drawing");
   createMenuPlayAction(MI_PrevDrawing, QT_TR_NOOP("Previous Drawing"), ",",

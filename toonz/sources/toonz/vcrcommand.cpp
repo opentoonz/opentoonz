@@ -136,6 +136,52 @@ public:
 
 //-----------------------------------------------------------------------------
 
+class NextFramePastEndCommand final : public MenuItemHandler {
+public:
+  NextFramePastEndCommand() : MenuItemHandler(MI_NextFramePastEnd) {}
+
+  void execute() override {
+    TFrameHandle *fh = TApp::instance()->getCurrentFrame();
+    if (!fh->isEditingScene()) {
+      FlipConsole *console = FlipConsole::getCurrent();
+      if (console) console->pressButton(FlipConsole::eNext);
+      return;
+    }
+
+    int next = fh->getFrame() + 1;
+    if (next > fh->getMaxFrameIndex()) fh->setSceneFrameSize(next + 1);
+    fh->setFrame(next);
+
+    // Keep the viewer on the new empty frame.
+    FlipConsole *console = FlipConsole::getCurrent();
+    if (!console) return;
+    int from, to, step;
+    console->getFrameRange(from, to, step);
+    int current = next + 1;
+    if (current > to) console->setFrameRange(from, current, step, current);
+  }
+};
+
+//-----------------------------------------------------------------------------
+
+class PrevFramePastEndCommand final : public MenuItemHandler {
+public:
+  PrevFramePastEndCommand() : MenuItemHandler(MI_PrevFramePastEnd) {}
+
+  void execute() override {
+    TFrameHandle *fh = TApp::instance()->getCurrentFrame();
+    if (!fh->isEditingScene()) {
+      FlipConsole *console = FlipConsole::getCurrent();
+      if (console) console->pressButton(FlipConsole::ePrev);
+      return;
+    }
+
+    fh->setFrame(std::max(fh->getFrame() - 1, 0));
+  }
+};
+
+//-----------------------------------------------------------------------------
+
 class NextStepCommand final : public MenuItemHandler {
 public:
   NextStepCommand() : MenuItemHandler(MI_NextStep) {}
@@ -267,6 +313,8 @@ VcrCommand playCommand(MI_Play, FlipConsole::ePlay),
 
 NextDrawingCommand nextDrawingCommand;
 PrevDrawingCommand prevDrawingCommand;
+NextFramePastEndCommand nextFramePastEndCommand;
+PrevFramePastEndCommand prevFramePastEndCommand;
 NextStepCommand nextStepCommand;
 PrevStepCommand prevStepCommand;
 ShortPlayCommand shortPlayCommand;
