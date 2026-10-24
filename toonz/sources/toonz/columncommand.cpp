@@ -62,6 +62,7 @@
 #include "tsystem.h"
 #include "tfilepath.h"
 #include "timage.h"
+#include "tsound_io.h"
 
 #include "tools/toolhandle.h"
 
@@ -70,6 +71,7 @@
 #include <QClipboard>
 #include <QCursor>
 #include <QSet>
+#include <QStringList>
 
 #include <map>
 #include <memory>
@@ -476,6 +478,22 @@ TFilePath uniqueCodedPath(ToonzScene *scene, const TFilePath &srcPath,
 
 //-----------------------------------------------------------------------------
 
+// Formats that cannot be written (mp3, ogg...) are saved as wav
+TFilePath uniqueSoundPath(ToonzScene *scene, const TFilePath &srcPath,
+                          const std::wstring &levelName) {
+  TFilePath path = srcPath;
+  if (!path.isEmpty()) {
+    QStringList writableFormats;
+    TSoundTrackWriter::getSupportedFormats(writableFormats);
+    if (!writableFormats.contains(
+            QString::fromStdString(path.getType()).toLower()))
+      path = path.withType("wav");
+  }
+  return uniqueCodedPath(scene, path, levelName);
+}
+
+//-----------------------------------------------------------------------------
+
 TXshSimpleLevel *cloneSimpleLevel(TXshSimpleLevel *srcSl) {
   if (!srcSl || srcSl->getPath().isUneditable()) return srcSl;
 
@@ -536,12 +554,13 @@ TXshSoundLevel *cloneSoundLevel(TXshSoundLevel *srcSl) {
   const std::wstring dstName =
       uniqueLevelName(scene, srcSl->getName() + L"_clone");
 
-  TXshSoundLevel *dstSl = new TXshSoundLevel(dstName);
+  TXshSoundLevel *dstSl =
+      srcSl->getSoundTrack() ? srcSl->clone() : new TXshSoundLevel();
+  dstSl->setName(dstName);
+  dstSl->setType(srcSl->getType());
   dstSl->setScene(scene);
-  if (srcSl->getSoundTrack())
-    dstSl->setSoundTrack(srcSl->getSoundTrack()->clone());
   dstSl->setFrameRate(srcSl->getFrameRate());
-  dstSl->setPath(uniqueCodedPath(scene, srcSl->getPath(), dstName));
+  dstSl->setPath(uniqueSoundPath(scene, srcSl->getPath(), dstName));
   scene->getLevelSet()->insertLevel(dstSl);
   return dstSl;
 }
@@ -561,6 +580,8 @@ TXshLevel *cloneUsedLevel(TXshLevel *srcLevel) {
 
 //-----------------------------------------------------------------------------
 
+// Clones the TXshChildLevel, but NOT any further nested TXshChildLevel inside
+// it.
 TXshChildLevel *cloneChildLevel(TXshChildLevel *cl) {
   ToonzScene *scene        = cl->getScene();
   const std::wstring name  = uniqueLevelName(scene, cl->getName());
