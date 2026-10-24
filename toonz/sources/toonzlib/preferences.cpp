@@ -517,6 +517,7 @@ void Preferences::definePreferenceItems() {
   define(ffmpegTimeout, "ffmpegTimeout", QMetaType::Int, 600, 1,
          std::numeric_limits<int>::max());
   define(fastRenderPath, "fastRenderPath", QMetaType::QString, "desktop");
+  define(tcomposerPath, "tcomposerPath", QMetaType::QString, "");
   define(ffmpegMultiThread, "ffmpegMultiThread", QMetaType::Bool, false);
   define(quickTimeBackend, "quickTimeBackend", QMetaType::Bool, false);
   define(rhubarbPath, "rhubarbPath", QMetaType::QString, "");
