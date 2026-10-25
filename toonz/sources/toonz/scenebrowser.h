@@ -240,6 +240,7 @@ private:
   int m_currentScroll;
 
   std::vector<Item> m_items;
+  std::map<std::wstring, std::vector<TFilePath>> m_selectionByFolder;
   TFilePath m_folder;
   std::string m_dayDateString;
   QStringList m_filter;
@@ -250,6 +251,9 @@ private:
   void readInfo(Item &item);
 
   void refreshCurrentFolderItems();
+  std::wstring selectionPlace() const;
+  void storePersistedSelection();
+  void restorePersistedSelection();
 
   DvItemListModel::Status getItemVersionControlStatus(
       const SceneBrowser::Item &item);

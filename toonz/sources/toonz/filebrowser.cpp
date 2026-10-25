@@ -59,6 +59,7 @@
 #include <QPixmap>
 #include <QUrl>
 #include <QScrollBar>
+#include <QTimer>
 #include <QMap>
 #include <QPushButton>
 #include <QPalette>
@@ -490,6 +491,8 @@ void FileBrowser::sortByDataModel(DataType dataType, bool isDiscendent) {
     setIsDiscendentOrder(isDiscendent);
   }
 
+  restorePersistedSelection();
+
   m_itemViewer->getPanel()->update();
 }
 
@@ -665,6 +668,11 @@ void FileBrowser::setFolder(const TFilePath &fp, bool expandNode,
                             bool forceUpdate) {
   if (fp == m_folder && !forceUpdate) return;
 
+  storePersistedSelection();
+  if (FileSelection *fs = dynamic_cast<FileSelection *>(
+          m_itemViewer->getPanel()->getSelection()))
+    fs->selectNone();
+
   // set the current folder path
   m_folder        = fp;
   m_dayDateString = "";
@@ -774,6 +782,11 @@ void FileBrowser::setUnregisteredFolder(const TFilePath &fp) {
 //-----------------------------------------------------------------------------
 
 void FileBrowser::setHistoryDay(std::string dayDateString) {
+  storePersistedSelection();
+  if (FileSelection *fs = dynamic_cast<FileSelection *>(
+          m_itemViewer->getPanel()->getSelection()))
+    fs->selectNone();
+
   m_folder                = TFilePath();
   m_dayDateString         = dayDateString;
   const History::Day *day = History::instance()->getDay(dayDateString);
@@ -787,6 +800,7 @@ void FileBrowser::setHistoryDay(std::string dayDateString) {
     for (const TFilePath &it : files) m_items.emplace_back(it);
   }
   refreshData();
+  restorePersistedSelection();
 }
 
 //-----------------------------------------------------------------------------
@@ -964,6 +978,52 @@ int FileBrowser::findIndexWithPath(TFilePath path) {
   for (int i = 0; i < (int)m_items.size(); ++i)
     if (m_items[i].m_path == path) return i;
   return -1;
+}
+
+//-----------------------------------------------------------------------------
+
+std::wstring FileBrowser::selectionPlace() const {
+  if (m_folder != TFilePath()) return m_folder.getWideString();
+  return std::wstring(L"\n") +
+         QString::fromStdString(m_dayDateString).toStdWString();
+}
+
+//-----------------------------------------------------------------------------
+
+void FileBrowser::storePersistedSelection() {
+  FileSelection *fs =
+      dynamic_cast<FileSelection *>(m_itemViewer->getPanel()->getSelection());
+  // Ignore an empty selection so leaving a folder does not forget its files.
+  if (!fs || fs->isEmpty()) return;
+  const std::set<int> &indices = fs->getSelectedIndices();
+  std::vector<TFilePath> paths;
+  paths.reserve(indices.size());
+  for (int idx : indices) {
+    if (idx < 0 || idx >= (int)m_items.size()) continue;
+    paths.push_back(m_items[idx].m_path);
+  }
+  if (!paths.empty()) m_selectionByFolder[selectionPlace()] = std::move(paths);
+}
+
+//-----------------------------------------------------------------------------
+
+void FileBrowser::restorePersistedSelection() {
+  const auto found = m_selectionByFolder.find(selectionPlace());
+  if (found == m_selectionByFolder.end() || found->second.empty()) return;
+  FileSelection *fs =
+      dynamic_cast<FileSelection *>(m_itemViewer->getPanel()->getSelection());
+  if (!fs) return;
+
+  std::vector<int> indices;
+  indices.reserve(found->second.size());
+  for (const TFilePath &fp : found->second) {
+    const int idx = findIndexWithPath(fp);
+    if (idx >= 0) indices.push_back(idx);
+  }
+  if (indices.empty()) return;
+  fs->select(&indices.front(), (int)indices.size());
+  fs->makeCurrent();
+  m_itemViewer->getPanel()->update();
 }
 
 //-----------------------------------------------------------------------------
@@ -2050,17 +2110,22 @@ void FileBrowser::onSelectedItems(const std::set<int> &indexes) {
   std::list<std::vector<TFrameId>> frameIDs;
 
   if (indexes.empty()) {
+    m_selectionByFolder.erase(selectionPlace());
     emit filePathsSelected(filePaths, frameIDs);
     return;
   }
 
   size_t itemsSize = m_items.size();
+  std::vector<TFilePath> paths;
+  paths.reserve(indexes.size());
   for (int idx : indexes) {
     if (idx < 0 || static_cast<size_t>(idx) >= itemsSize) continue;
 
     filePaths.insert(m_items[idx].m_path);
     frameIDs.push_back(m_items[idx].m_frameIds);
+    paths.push_back(m_items[idx].m_path);
   }
+  if (!paths.empty()) m_selectionByFolder[selectionPlace()] = std::move(paths);
 
   emit filePathsSelected(filePaths, frameIDs);
 }
@@ -2214,12 +2279,18 @@ void FileBrowser::newFolder() {
 
 void FileBrowser::showEvent(QShowEvent *) {
   activeBrowsers.insert(this);
+
+  storePersistedSelection();
+
   // refresh
   if (getFolder() != TFilePath())
     setFolder(getFolder(), false, true);
   else if (!getDayDateString().empty())
     setHistoryDay(getDayDateString());
   m_folderTreeView->scrollTo(m_folderTreeView->currentIndex());
+
+  // A room change can clear the selection after the refresh above.
+  QTimer::singleShot(0, this, [this]() { restorePersistedSelection(); });
 
   // Refresh SVN
   DvDirVersionControlNode *vcNode = dynamic_cast<DvDirVersionControlNode *>(
@@ -2230,6 +2301,7 @@ void FileBrowser::showEvent(QShowEvent *) {
 //-----------------------------------------------------------------------------
 
 void FileBrowser::hideEvent(QHideEvent *) {
+  storePersistedSelection();
   activeBrowsers.erase(this);
   m_itemViewer->getPanel()->getItemViewPlayDelegate()->resetPlayWidget();
 }
