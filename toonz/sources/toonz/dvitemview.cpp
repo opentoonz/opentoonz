@@ -487,7 +487,6 @@ bool ItemViewPlayWidget::PlayManager::increaseCurrentFrame() {
   const bool wantHd = m_renderSize.width() > kBrowserThumbDefaultW ||
                       m_renderSize.height() > kBrowserThumbDefaultH ||
                       m_dpr > 1.0;
-  // Paint scales a native frame into the cell. Legacy frames stay pre-scaled.
   m_pixmap = wantHd ? pixmap
                     : scalePixmapKeepingAspectRatio(pixmap, m_iconSize,
                                                     Qt::transparent);
@@ -1691,6 +1690,15 @@ void DvItemViewerPanel::commitRenderIconSize() {
   }
   m_prevRenderIconSize = m_renderIconSize;
   m_renderIconSize     = next;
+
+  IconGenerator::instance()->clearRequests();
+  const qreal dpr = qMax(1.0, devicePixelRatioF());
+  auto toDim      = [dpr](const QSize &size) {
+    return TDimension(qMax(1, qRound(size.width() * dpr)),
+                           qMax(1, qRound(size.height() * dpr)));
+  };
+  IconGenerator::instance()->purgeResponsiveFileIconsExcept(
+      toDim(m_renderIconSize), toDim(m_prevRenderIconSize));
 
   if (m_viewer && m_viewer->m_windowType == DvItemViewer::Cast) {
     if (DvItemListModel *model = m_viewer->getModel()) model->refreshData();

@@ -123,8 +123,14 @@ bool getIcon(const std::string &iconName, QPixmap &pix,
       return true;
     }
     assert(!(TRasterGR8P)img->getRaster());
-    const TRaster32P &ras = img->getRaster();
-    bool isHighDpi        = false;
+    const TRaster32P ras = img->getRaster();
+    if (!ras || ras->getLx() <= 0 || ras->getLy() <= 0) {
+      TImageCache::instance()->remove(iconName);
+      iconsMap.erase(iconName);
+      pix = QPixmap();
+      return false;
+    }
+    bool isHighDpi = false;
     // If the icon raster obtained in higher resolution than the standard
     // icon size, it may be icon displayed in high dpi monitors.
     // In such case set the device pixel ratio to the pixmap.
@@ -469,6 +475,7 @@ TRaster32P convertToIcon(TMeshImageP mi, int frame, const TDimension &iconSize,
 
   glContext->makeCurrent();
   glContext->clear(settings.m_blackBgCheck ? TPixel::Black : TPixel32::White);
+  prepareIconGL(glContext, iconSize);
 
   glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT);
   glEnable(GL_BLEND);
@@ -688,6 +695,7 @@ TRaster32P SplineIconRenderer::generateRaster(
       IconGenerator::instance()->getOfflineGLContext(iconSize);
   glContext->makeCurrent();
   glContext->clear(TPixel32::White);
+  prepareIconGL(glContext, iconSize);
 
   const TStroke *stroke = m_spline->getStroke();
   assert(stroke);
@@ -1078,7 +1086,6 @@ std::string FileIconRenderer::getId(const TFilePath &path, const TFrameId &fid,
   else
     id = "$:unknown";
 
-  // Type icons are re-rendered at iconSize — must not share the 80x60 cache.
   if (iconSize.lx != 80 || iconSize.ly != 60)
     id +=
         "_r_" + std::to_string(iconSize.lx) + "x" + std::to_string(iconSize.ly);
@@ -1193,9 +1200,8 @@ Qt::transparent)
   TAffine aff = TScale(sc).place(ras32->getCenterD(), icon->getCenterD());
 
   // Fill with transparent color (no bands/borders needed in this mode)
-  icon->fill(TPixel32::Magenta);
+  icon->fill(TPixel32::White);
 
-  // ClosestPixel stays sharp at the usual size. Large icons need a finer scale.
   const TRop::ResampleFilterType filter = (iconSize.lx > 80 || iconSize.ly > 60)
                                               ? TRop::Triangle
                                               : TRop::ClosestPixel;
@@ -1972,15 +1978,18 @@ void IconGenerator::onStarted(TThread::RunnableP iconRenderer) {
 void IconGenerator::onCanceled(TThread::RunnableP iconRenderer) {
   IconRenderer *ir = static_cast<IconRenderer *>(iconRenderer.getPointer());
 
-  if (!ir->hasStarted()) {
-    removeIcon(ir->getId());
-  }
+  removeIcon(ir->getId());
 }
 
 //-----------------------------------------------------------------------------
 
 void IconGenerator::onFinished(TThread::RunnableP iconRenderer) {
   IconRenderer *ir = static_cast<IconRenderer *>(iconRenderer.getPointer());
+
+  if (iconsMap.find(ir->getId()) == iconsMap.end()) {
+    if (ir->wasTerminated()) m_iconsTerminationLoop.quit();
+    return;
+  }
 
   // if the icon was generated in TToonzImage format, cache it instead
   ToonzImageIconRenderer *tir = dynamic_cast<ToonzImageIconRenderer *>(ir);
@@ -2008,6 +2017,7 @@ void IconGenerator::onFinished(TThread::RunnableP iconRenderer) {
 void IconGenerator::onException(TThread::RunnableP iconRenderer) {
   IconRenderer *ir = static_cast<IconRenderer *>(iconRenderer.getPointer());
 
+  removeIcon(ir->getId());
   if (ir->wasTerminated()) m_iconsTerminationLoop.quit();
 }
 

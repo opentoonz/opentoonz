@@ -899,7 +899,6 @@ QVariant FileBrowser::getItemData(int index, DataType dataType,
   } else if (dataType == Thumbnail) {
     DvItemViewerPanel *panel = m_itemViewer->getPanel();
     QSize iconSize           = panel->getIconSize();
-    // Folder icons: render SVG at the live cell size.
     if (item.m_path == m_folder.getParentDir()) {
       return browserThemeSvgIcon(QStringLiteral("folder_browser_up"), iconSize);
     } else if (item.m_isFolder) {
