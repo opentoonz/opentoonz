@@ -25,6 +25,8 @@
 class DvItemViewer;
 class DvItemSelection;
 class QMimeData;
+class QTimer;
+class QToolBar;
 
 //==============================================================
 
@@ -113,13 +115,19 @@ class ItemViewPlayWidget final : public QWidget {
     int m_currentFidIndex;
     QPixmap m_pixmap;
     QSize m_iconSize;
+    QSize m_renderSize;
+    qreal m_dpr;
+
+    QPixmap fetchFramePixmap(const TFrameId &fid);
 
   public:
     PlayManager();
     ~PlayManager() {}
 
     void reset();
-    void setInfo(DvItemListModel *model, int index);
+    void setInfo(DvItemListModel *model, int index,
+                 const QSize &layoutSize = QSize(),
+                 const QSize &renderSize = QSize(), qreal dpr = 1.0);
     /*! Increase current frame if icon is computed; return true if frame is
      * increased. */
     bool increaseCurrentFrame();
@@ -256,7 +264,7 @@ public:
   QColor getSelectedItemBackground() const { return m_selectedItemBackground; }
 
   // exposed view parameters
-  void setIconSize(QSize size) { m_iconSize = size; }
+  void setIconSize(QSize size);
 
 private:
   ViewType to_enum(int n) {
@@ -291,7 +299,14 @@ private:
   int m_xMargin, m_yMargin, m_itemPerRow;
   QSize m_itemSize;
   QSize m_iconSize;
+  QSize m_renderIconSize;
+  QSize m_prevRenderIconSize;
+  bool m_advancedDisplay;
+  QTimer *m_renderSizeTimer;
   bool m_noContextMenu;
+  QSize sizeFromWidth(int width) const;
+  QSize quantizeRenderSize(const QSize &layout) const;
+  void scheduleRenderSizeCommit();
   void updateViewParameters(int panelWidth);
   void updateViewParameters() { updateViewParameters(width()); }
   QPoint m_startDragPosition;
@@ -332,6 +347,18 @@ public:
   QSize getItemSize() const;
 
   QSize getIconSize() const { return m_iconSize; }
+  QSize getRenderIconSize() const { return m_renderIconSize; }
+  QSize getPrevRenderIconSize() const { return m_prevRenderIconSize; }
+  bool isAdvancedDisplay() const { return m_advancedDisplay; }
+
+  enum ThumbnailSizePreset {
+    SizeList = 0,
+    SizeSmall,
+    SizeMedium,
+    SizeLarge,
+    SizeExtraLarge,
+    SizeHuge
+  };
 
   int pos2index(const QPoint &pos) const;
   QRect index2pos(int index) const;
@@ -367,11 +394,17 @@ protected:
 
 signals:
   void viewTypeChange(DvItemViewerPanel::ViewType viewType);
+  void advancedDisplayChanged(bool on);
+  void thumbnailSizeChanged(const QSize &size);
 
 public slots:
   void setListView();
   void setTableView();
   void setThumbnailsView();
+  void setThumbnailWidth(int width);
+  void setAdvancedDisplay(bool on);
+  void applyThumbnailSizePreset(int preset);
+  void commitRenderIconSize();
   void rename();
   // for exporting the file information to text format file
   void exportFileList();
@@ -490,6 +523,7 @@ class DvItemViewerButtonBar final : public QToolBar {
   Q_OBJECT
   QAction *m_folderBack;
   QAction *m_folderFwd;
+  DvItemViewer *m_viewer;
 
 public:
   DvItemViewerButtonBar(DvItemViewer *itemViewer, QWidget *parent = 0);
@@ -503,6 +537,13 @@ signals:
   void newFolder();
   void folderBack();
   void folderFwd();
+
+protected:
+  void contextMenuEvent(QContextMenuEvent *event) override;
 };
+
+void installThumbnailSizeControls(QToolBar *bar, DvItemViewer *viewer);
+void showAdvancedDisplayMenu(DvItemViewer *viewer, QWidget *parent,
+                             const QPoint &globalPos);
 
 #endif  // DV_ITEM_VIEW_INCLUDED

@@ -30,12 +30,16 @@ class SceneBrowserButtonBar final : public QToolBar {
   Q_OBJECT
   QAction *m_folderBack;
   QAction *m_folderFwd;
+  DvItemViewer *m_viewer;
 
 public:
   SceneBrowserButtonBar(DvItemViewer *itemViewer, QWidget *parent = 0);
 
 signals:
   void newScene();
+
+protected:
+  void contextMenuEvent(QContextMenuEvent *event) override;
 };
 //-----------------------------------------------------------------------------
 
