@@ -1,6 +1,7 @@
 
 
 #include "tpanels.h"
+#include "alignmentpane.h"
 
 // Tnz6 includes
 #include "pane.h"
@@ -1799,3 +1800,22 @@ public:
 //=============================================================================
 OpenFloatingPanel openFxBrowserCommand(MI_InsertFx, "FxBrowser",
                                        QObject::tr("FX Browser"));
+
+class AlignmentFactory final : public TPanelFactory {
+public:
+  AlignmentFactory() : TPanelFactory("AlignmentPanel") {}
+  TPanel *createPanel(QWidget *parent) override {
+    TPanel *panel = new TPanel(parent);
+    panel->setWidget(new AlignmentPane(panel));
+    panel->setIsMaximizable(false);
+    panel->setObjectName(getPanelType());
+    panel->setWindowTitle(QObject::tr("Align and Distribute"));
+    panel->setMinimumSize(235, 198);
+    return panel;
+  }
+  void initialize(TPanel *panel) override {}
+} alignmentFactory;
+
+OpenFloatingPanel openVectorAlignmentPanelCommand(
+    MI_OpenAlignmentPanel, "AlignmentPanel",
+    QObject::tr("Align and Distribute"));

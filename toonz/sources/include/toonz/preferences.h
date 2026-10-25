@@ -241,6 +241,9 @@ public:
   bool isRestoreViewerViewFromLastSessionEnabled() const {
     return getBoolValue(restoreViewerViewFromLastSession);
   }
+  bool isRestoreStyleEditorTabEnabled() const {
+    return getBoolValue(RestoreStyleEditorTab);
+  }
 
   // Visualization  tab
   bool getShow0ThickLines() const { return getBoolValue(show0ThickLines); }
@@ -528,6 +531,7 @@ public:
 
   // Colors  tab
   TPixel getViewerBgColor() const { return getColorValue(viewerBGColor); }
+  TPixel getTableColor() const { return getColorValue(tableColor); }
   TPixel getPreviewBgColor() const { return getColorValue(previewBGColor); }
   TPixel getLevelEditorBoxColor() const {
     return getColorValue(levelEditorBoxColor);

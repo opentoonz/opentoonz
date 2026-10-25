@@ -1933,55 +1933,75 @@ moved to the end of the current style&apos;s page of the palette.</source>
     <name>ToonzRasterBrushTool</name>
     <message>
         <source>Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Taille</translation>
     </message>
     <message>
         <source>Hardness:</source>
-        <translation type="unfinished">Dureté:</translation>
+        <translation>Dureté :</translation>
     </message>
     <message>
         <source>Smooth:</source>
-        <translation type="unfinished"></translation>
+        <translation>Lissage :</translation>
     </message>
     <message>
         <source>Draw Order:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordre de dessin :</translation>
     </message>
     <message>
         <source>Over All</source>
-        <translation type="unfinished"></translation>
+        <translation>Au-dessus de tout</translation>
     </message>
     <message>
         <source>Under All</source>
-        <translation type="unfinished"></translation>
+        <translation>En dessous de tout</translation>
     </message>
     <message>
         <source>Palette Order</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordre de la palette</translation>
     </message>
     <message>
         <source>Preset:</source>
-        <translation type="unfinished">Paramètre Prédéfini:</translation>
+        <translation>Préréglage :</translation>
     </message>
     <message>
         <source>&lt;custom&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;personnalisé&gt;</translation>
     </message>
     <message>
         <source>Pencil</source>
-        <translation type="unfinished"></translation>
+        <translation>Crayon</translation>
     </message>
     <message>
         <source>Pressure</source>
-        <translation type="unfinished"></translation>
+        <translation>Pression</translation>
     </message>
     <message>
         <source>Lock Alpha</source>
-        <translation type="unfinished"></translation>
+        <translation>Verrouiller l’alpha</translation>
     </message>
     <message>
         <source>Assistants</source>
-        <translation type="unfinished"></translation>
+        <translation>Assistants</translation>
+    </message>
+    <message>
+        <source>Eraser</source>
+        <translation>Gomme</translation>
+    </message>
+    <message>
+        <source>Mode:</source>
+        <translation>Mode :</translation>
+    </message>
+    <message>
+        <source>Lines</source>
+        <translation>Lignes</translation>
+    </message>
+    <message>
+        <source>Areas</source>
+        <translation>Zones</translation>
+    </message>
+    <message>
+        <source>Lines &amp; Areas</source>
+        <translation>Lignes et zones</translation>
     </message>
 </context>
 <context>

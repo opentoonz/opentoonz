@@ -166,6 +166,7 @@ class ControlPointSelection final : public QObject, public TSelection {
 
 private:
   std::set<int> m_selectedPoints;
+  std::vector<int> m_selectionOrder;
   int m_strokeIndex                                    = -1;
   ControlPointEditorStroke* m_controlPointEditorStroke = nullptr;
 
@@ -184,7 +185,7 @@ public:
 
   // Selection interface implementation
   bool isEmpty() const override { return m_selectedPoints.empty(); }
-  void selectNone() override { m_selectedPoints.clear(); }
+  void selectNone() override;
 
   // Selection management
   bool isSelected(int index) const;
@@ -193,6 +194,7 @@ public:
 
   // Delete selected control points
   void deleteControlPoints();
+  void alignControlPoints(VectorAlignment::Type type);
 
   // Context menu management
   void addMenuItems(QMenu* menu);

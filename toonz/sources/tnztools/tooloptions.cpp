@@ -55,6 +55,9 @@
 #include <QToolBar>
 #include <QDockWidget>
 #include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QGridLayout>
+#include <QLayoutItem>
 #include <QComboBox>
 #include <QLabel>
 #include <QPushButton>
@@ -274,7 +277,8 @@ void ToolOptionControlBuilder::visit(TStringProperty *p) {
   QLabel *label = addLabel(p);
   m_panel->addLabel(p->getName(), label);
 
-  ToolOptionTextField *control = new ToolOptionTextField(m_tool, p);
+  ToolOptionTextField *control =
+      new ToolOptionTextField(m_tool, p, m_toolHandle);
   m_panel->addControl(control);
 
   hLayout()->addWidget(control);
@@ -1136,6 +1140,7 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
   m_scaleYLabel = new ClickableLabel(tr("V:"), this);
   m_scaleYField = new SelectionScaleField(selectionTool, 1, "Scale Y");
   m_scaleLink   = new DVGui::CheckBox(tr("Link"), this);
+  m_scaleLink->setChecked(selectionTool->isScaleHVLinked());
 
   SimpleIconViewField *rotIconView =
       new SimpleIconViewField("edit_rotation", tr("Rotation"));
@@ -1308,6 +1313,16 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
   connect(m_vFlipButton, SIGNAL(clicked()), SLOT(onFlipVertical()));
   connect(m_leftRotateButton, SIGNAL(clicked()), SLOT(onRotateLeft()));
   connect(m_rightRotateButton, SIGNAL(clicked()), SLOT(onRotateRight()));
+
+  connect(m_scaleLink, &QCheckBox::toggled, selectionTool,
+          &SelectionTool::setScaleHVLinked);
+  connect(selectionTool, &SelectionTool::scaleHVLinkChanged, this,
+          [this](bool linked) {
+            if (!m_scaleLink || m_scaleLink->isChecked() == linked) return;
+            m_scaleLink->blockSignals(true);
+            m_scaleLink->setChecked(linked);
+            m_scaleLink->blockSignals(false);
+          });
 
   connect(selectionTool, SIGNAL(clickFlipHorizontal()),
           SLOT(onFlipHorizontal()));
@@ -2304,10 +2319,19 @@ public:
   }
 };
 
-RulerToolOptionsBox::RulerToolOptionsBox(QWidget *parent, TTool *tool)
-    : ToolOptionsBox(parent), m_tool(tool) {
+RulerToolOptionsBox::RulerToolOptionsBox(QWidget *parent, TTool *tool,
+                                         bool verticalLayout)
+    : ToolOptionsBox(parent, !verticalLayout)
+    , m_tool(tool)
+    , m_verticalLayout(verticalLayout) {
   setFrameStyle(QFrame::StyledPanel);
-  setFixedHeight(26);
+  if (verticalLayout) {
+    setMinimumHeight(0);
+    setMaximumHeight(QWIDGETSIZE_MAX);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+  } else {
+    setFixedHeight(26);
+  }
 
   m_Xfld = new MeasuredValueField(this);
   m_Yfld = new MeasuredValueField(this);
@@ -2337,15 +2361,25 @@ RulerToolOptionsBox::RulerToolOptionsBox(QWidget *parent, TTool *tool)
   m_Hfld->setObjectName("RulerToolOptionValues");
   m_Afld->setObjectName("RulerToolOptionValues");
   m_Lfld->setObjectName("RulerToolOptionValues");
-  setStyleSheet(
-      "#RulerToolOptionValues {border:0px; background: rgb(196,196,196);}");
+  if (!verticalLayout)
+    setStyleSheet(
+        "#RulerToolOptionValues {border:0px; background: rgb(196,196,196);}");
 
-  m_Xfld->setMaximumWidth(70);
-  m_Yfld->setMaximumWidth(70);
-  m_Wfld->setMaximumWidth(70);
-  m_Hfld->setMaximumWidth(70);
-  m_Afld->setMaximumWidth(70);
-  m_Lfld->setMaximumWidth(70);
+  if (verticalLayout) {
+    m_Xfld->setMaximumWidth(QWIDGETSIZE_MAX);
+    m_Yfld->setMaximumWidth(QWIDGETSIZE_MAX);
+    m_Wfld->setMaximumWidth(QWIDGETSIZE_MAX);
+    m_Hfld->setMaximumWidth(QWIDGETSIZE_MAX);
+    m_Afld->setMaximumWidth(QWIDGETSIZE_MAX);
+    m_Lfld->setMaximumWidth(QWIDGETSIZE_MAX);
+  } else {
+    m_Xfld->setMaximumWidth(70);
+    m_Yfld->setMaximumWidth(70);
+    m_Wfld->setMaximumWidth(70);
+    m_Hfld->setMaximumWidth(70);
+    m_Afld->setMaximumWidth(70);
+    m_Lfld->setMaximumWidth(70);
+  }
 
   m_Xfld->setReadOnly(true);
   m_Yfld->setReadOnly(true);
@@ -2354,49 +2388,106 @@ RulerToolOptionsBox::RulerToolOptionsBox(QWidget *parent, TTool *tool)
   m_Afld->setReadOnly(true);
   m_Lfld->setReadOnly(true);
 
-  // layout
-  QHBoxLayout *lay = new QHBoxLayout();
-  lay->setContentsMargins(0, 0, 0, 0);
-  lay->setSpacing(3);
-  {
-    lay->addWidget(new QLabel(tr("X:", "ruler tool option"), this), 0);
-    lay->addWidget(m_Xfld, 0);
-    lay->addWidget(m_XpixelFld, 0);
+  if (verticalLayout) {
+    const int labelW    = 22;
+    const int fieldMinW = 52;
+    const int colGutter = 4;
+    const int labelGap  = 2;
+    const int rowVSpace = 11;
+    QGridLayout *grid   = new QGridLayout();
+    grid->setContentsMargins(0, 4, 0, 4);
+    grid->setHorizontalSpacing(labelGap);
+    grid->setVerticalSpacing(rowVSpace);
+    for (int col = 0; col < 5; ++col) grid->setColumnStretch(col, 0);
+    grid->setColumnStretch(1, 1);
+    grid->setColumnStretch(4, 1);
+    grid->setColumnMinimumWidth(0, labelW);
+    grid->setColumnMinimumWidth(1, fieldMinW);
+    grid->setColumnMinimumWidth(2, colGutter);
+    grid->setColumnMinimumWidth(3, labelW);
+    grid->setColumnMinimumWidth(4, fieldMinW);
 
-    lay->addSpacing(3);
+    auto addGridLabel = [&](int row, int col, const QString &text) {
+      auto *label = new QLabel(text, this);
+      label->setFixedSize(labelW, 20);
+      label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+      grid->addWidget(label, row, col, Qt::AlignRight | Qt::AlignVCenter);
+    };
+    auto addGridField = [&](int row, int col, MeasuredValueField *field) {
+      field->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+      field->setMinimumWidth(fieldMinW);
+      field->setMaximumWidth(QWIDGETSIZE_MAX);
+      grid->addWidget(field, row, col);
+    };
 
-    lay->addWidget(new QLabel(tr("Y:", "ruler tool option"), this), 0);
-    lay->addWidget(m_Yfld, 0);
-    lay->addWidget(m_YpixelFld, 0);
+    addGridLabel(0, 0, tr("X:", "ruler tool option"));
+    addGridField(0, 1, m_Xfld);
+    addGridLabel(0, 3, tr("Y:", "ruler tool option"));
+    addGridField(0, 4, m_Yfld);
+    addGridLabel(1, 0, tr("W:", "ruler tool option"));
+    addGridField(1, 1, m_Wfld);
+    addGridLabel(1, 3, tr("H:", "ruler tool option"));
+    addGridField(1, 4, m_Hfld);
+    addGridLabel(2, 0, tr("A:", "ruler tool option"));
+    addGridField(2, 1, m_Afld);
+    addGridLabel(2, 3, tr("L:", "ruler tool option"));
+    addGridField(2, 4, m_Lfld);
+    m_XpixelFld->hide();
+    m_YpixelFld->hide();
+    m_WpixelFld->hide();
+    m_HpixelFld->hide();
+    m_layout->setContentsMargins(0, 0, 0, 0);
+    m_layout->setSpacing(0);
+    while (m_layout->count() > 0) {
+      QLayoutItem *item = m_layout->takeAt(0);
+      delete item;
+    }
+    m_layout->addLayout(grid, 1);
+  } else {
+    // Horizontal toolbar layout (original)
+    QHBoxLayout *lay = new QHBoxLayout();
+    lay->setContentsMargins(0, 0, 0, 0);
+    lay->setSpacing(3);
+    {
+      lay->addWidget(new QLabel(tr("X:", "ruler tool option"), this), 0);
+      lay->addWidget(m_Xfld, 0);
+      lay->addWidget(m_XpixelFld, 0);
 
-    lay->addSpacing(3);
-    lay->addWidget(new ToolOptionsBarSeparator(this), 0);
-    lay->addSpacing(3);
+      lay->addSpacing(3);
 
-    lay->addWidget(new QLabel(tr("W:", "ruler tool option"), this), 0);
-    lay->addWidget(m_Wfld, 0);
-    lay->addWidget(m_WpixelFld, 0);
+      lay->addWidget(new QLabel(tr("Y:", "ruler tool option"), this), 0);
+      lay->addWidget(m_Yfld, 0);
+      lay->addWidget(m_YpixelFld, 0);
 
-    lay->addSpacing(3);
+      lay->addSpacing(3);
+      lay->addWidget(new ToolOptionsBarSeparator(this), 0);
+      lay->addSpacing(3);
 
-    lay->addWidget(new QLabel(tr("H:", "ruler tool option"), this), 0);
-    lay->addWidget(m_Hfld, 0);
-    lay->addWidget(m_HpixelFld, 0);
+      lay->addWidget(new QLabel(tr("W:", "ruler tool option"), this), 0);
+      lay->addWidget(m_Wfld, 0);
+      lay->addWidget(m_WpixelFld, 0);
 
-    lay->addSpacing(3);
-    lay->addWidget(new ToolOptionsBarSeparator(this), 0);
-    lay->addSpacing(3);
+      lay->addSpacing(3);
 
-    lay->addWidget(new QLabel(tr("A:", "ruler tool option"), this), 0);
-    lay->addWidget(m_Afld, 0);
+      lay->addWidget(new QLabel(tr("H:", "ruler tool option"), this), 0);
+      lay->addWidget(m_Hfld, 0);
+      lay->addWidget(m_HpixelFld, 0);
 
-    lay->addSpacing(3);
+      lay->addSpacing(3);
+      lay->addWidget(new ToolOptionsBarSeparator(this), 0);
+      lay->addSpacing(3);
 
-    lay->addWidget(new QLabel(tr("L:", "ruler tool option"), this), 0);
-    lay->addWidget(m_Lfld, 0);
+      lay->addWidget(new QLabel(tr("A:", "ruler tool option"), this), 0);
+      lay->addWidget(m_Afld, 0);
+
+      lay->addSpacing(3);
+
+      lay->addWidget(new QLabel(tr("L:", "ruler tool option"), this), 0);
+      lay->addWidget(m_Lfld, 0);
+    }
+    m_layout->addLayout(lay, 0);
+    m_layout->addStretch(1);
   }
-  m_layout->addLayout(lay, 0);
-  m_layout->addStretch(1);
 }
 
 void RulerToolOptionsBox::updateValues(bool isRasterLevelEditing, double X,
@@ -2410,10 +2501,12 @@ void RulerToolOptionsBox::updateValues(bool isRasterLevelEditing, double X,
   m_Afld->setValue(A);
   m_Lfld->setValue(L);
 
-  m_XpixelFld->setVisible(isRasterLevelEditing);
-  m_YpixelFld->setVisible(isRasterLevelEditing);
-  m_WpixelFld->setVisible(isRasterLevelEditing);
-  m_HpixelFld->setVisible(isRasterLevelEditing);
+  if (!m_verticalLayout) {
+    m_XpixelFld->setVisible(isRasterLevelEditing);
+    m_YpixelFld->setVisible(isRasterLevelEditing);
+    m_WpixelFld->setVisible(isRasterLevelEditing);
+    m_HpixelFld->setVisible(isRasterLevelEditing);
+  }
 
   if (isRasterLevelEditing) {
     m_XpixelFld->setText(QString("(%1)").arg(Xpix));

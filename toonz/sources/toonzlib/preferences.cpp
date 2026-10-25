@@ -465,6 +465,9 @@ void Preferences::definePreferenceItems() {
          true);
   define(restoreViewerViewFromLastSession, "restoreViewerViewFromLastSession",
          QMetaType::Bool, false);
+  define(togglePanelWithShortcut, "togglePanelWithShortcut", QMetaType::Bool,
+         false);
+  define(RestoreStyleEditorTab, "RestoreStyleEditorTab", QMetaType::Bool, true);
 
   // Visualization
   define(show0ThickLines, "show0ThickLines", QMetaType::Bool, true);
@@ -556,6 +559,7 @@ void Preferences::definePreferenceItems() {
          QMetaType::Bool, false);
 
   // Tools
+  define(compressInputEvents, "compressInputEvents", QMetaType::Bool, true);
   define(FillOnlysavebox, "FillOnlysavebox", QMetaType::Bool, false);
   define(DefRegionWithPaint, "FillDefRegionWithPaint", QMetaType::Bool, true);
   define(ReferFillPrevailing, "ReferFillPrevailing", QMetaType::Bool, false);
@@ -684,6 +688,7 @@ void Preferences::definePreferenceItems() {
   // Colors
   define(viewerBGColor, "viewerBGColor", QMetaType::QColor,
          QColor(128, 128, 128));
+  define(tableColor, "tableColor", QMetaType::QColor, QColor(153, 166, 179));
   define(previewBGColor, "previewBGColor", QMetaType::QColor,
          QColor(64, 64, 64));
   define(levelEditorBoxColor, "levelEditorBoxColor", QMetaType::QColor,

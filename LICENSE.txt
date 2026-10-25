@@ -1,6 +1,7 @@
 Some of code in this repository is derived from thirdparty libraries.
 For files in the "thirdparty" directory: Please consult with the licenses in the appropriate READMEs or source codes.
 For files in the "stuff/library/mypaint brushes" directory: Please see the licenses in stuff/library/mypaint brushes/Licenses.txt.
+For portions adapted from Tahoma2D: Please see the notices in stuff/doc/Tahoma2D-LICENSE.txt.
 
 - - - - - - - - - - - - - - - -
 

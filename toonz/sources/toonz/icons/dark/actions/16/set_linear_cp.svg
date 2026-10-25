@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" version="1.1" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+  <rect x="0" y="-16" width="16" height="16" style="fill-opacity:0" transform="rotate(90)" />
+  <rect style="fill:#000000;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-miterlimit:2" width="4" height="4" x="6" y="-10" transform="rotate(90)" />
+  <path style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:2;stroke-dasharray:none;stroke-opacity:1" d="M 1,8 H 5" />
+  <path style="clip-rule:evenodd;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:2;stroke-dasharray:none;stroke-opacity:1" d="M 15,8 H 11" />
+</svg>

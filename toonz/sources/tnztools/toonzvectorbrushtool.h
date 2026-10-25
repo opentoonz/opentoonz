@@ -8,6 +8,8 @@
 #include <trasterimage.h>
 #include <ttoonzimage.h>
 #include <tstroke.h>
+#include <tpalette.h>
+#include "trailcyclestate.h"
 #include <toonz/strokegenerator.h>
 #include "toonz/preferences.h"
 #include <tools/tool.h>
@@ -135,6 +137,7 @@ public:
 
   void onActivate() override;
   void onDeactivate() override;
+  void onImageChanged() override;
 
   bool preLeftButtonDown() override;
   void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
@@ -222,6 +225,14 @@ protected:
   TEnumProperty m_joinStyle;
   TIntProperty m_miterJoinLimit;
   TBoolProperty m_assistants;
+  TBoolProperty m_autoClose;
+  TBoolProperty m_autoGroup;
+  TBoolProperty m_autoFill;
+
+  bool m_bypassAutoClose = false;
+  bool autoCloseEnabled() const {
+    return m_autoClose.getValue() && !m_bypassAutoClose;
+  }
 
   TInputManager m_inputmanager;
   TSmartPointerT<TModifierLine> m_modifierLine;
@@ -242,6 +253,11 @@ protected:
   TFrameId m_firstFrameId, m_veryFirstFrameId;
   TPixel32 m_currentColor;
   int m_styleId;
+  TrailCycle::State m_trailState;
+  TrailCycle::Selection m_trailSelection;
+  bool m_trailCanStamp = false;
+  TPaletteP m_trailPalette;
+  TPaletteP m_trailGesturePalette;
   double m_minThick, m_maxThick;
 
   // for snapping and framerange
@@ -260,6 +276,7 @@ protected:
       m_presetsManager;  //!< Manager for presets of this tool instance
 
   bool m_active, m_firstTime, m_isPath, m_presetsLoaded, m_firstFrameRange;
+  bool m_skipStrokeUntilDown = false;
 
   bool m_propertyUpdating;
   double m_cameraDpi;

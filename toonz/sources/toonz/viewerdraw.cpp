@@ -33,6 +33,7 @@
 
 #include "subcameramanager.h"
 
+#include <QColor>
 #include <QSettings>
 
 TEnv::StringVar EnvSafeAreaName("SafeAreaName", "PR_safe");
@@ -572,6 +573,18 @@ void ViewerDraw::drawSafeArea() {
 
 //-----------------------------------------------------------------------------
 
+void ViewerDraw::drawCameraGuide(const TRectD &rect) {
+  if (rect.isEmpty()) return;
+  glPushAttrib(GL_CURRENT_BIT | GL_LINE_BIT | GL_ENABLE_BIT);
+  glColor3d(0.0, 0.8, 1.0);
+  glLineStipple(1, 0xF0F0);
+  glEnable(GL_LINE_STIPPLE);
+  tglDrawRect(rect);
+  glPopAttrib();
+}
+
+//-----------------------------------------------------------------------------
+
 void ViewerDraw::drawCamera(unsigned long flags, double pixelSize) {
   bool cameraRef = 0 != (flags & ViewerDraw::CAMERA_REFERENCE);
   bool camera3d  = 0 != (flags & ViewerDraw::CAMERA_3D);
@@ -736,7 +749,7 @@ void ViewerDraw::drawFieldGuide() {
 
 //-----------------------------------------------------------------------------
 
-void ViewerDraw::drawDisk(int &tableDLId) {
+void ViewerDraw::drawDisk(int &tableDLId, const QColor &tableColor) {
   static TPixel32 currentBgColor;
 
   TPixel32 bgColor;
@@ -750,6 +763,7 @@ void ViewerDraw::drawDisk(int &tableDLId) {
     currentBgColor = bgColor;
     tableDLId      = createDiskDisplayList();
   }
+  glColor3ub(tableColor.red(), tableColor.green(), tableColor.blue());
   glCallList(tableDLId);
 }
 
@@ -770,7 +784,6 @@ unsigned int ViewerDraw::createDiskDisplayList() {
   }
   double r = 10 * Stage::inch;
   glNewList(id, GL_COMPILE);
-  glColor3d(.6, .65, .7);
   glBegin(GL_POLYGON);
   int i;
   int n = 120;

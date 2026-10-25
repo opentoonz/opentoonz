@@ -114,6 +114,28 @@ void ensureHelpActions(QMenu *helpMenu) {
   enableQuicklinkEditing(helpMenu);
 }
 
+bool menuContainsAction(QMenu *menu, QAction *target) {
+  for (QAction *action : menu->actions()) {
+    if (action == target) return true;
+    if (action->menu() && menuContainsAction(action->menu(), target))
+      return true;
+  }
+  return false;
+}
+
+void ensureAlignmentPanelAction(QMenu *windowsMenu) {
+  QAction *alignment =
+      CommandManager::instance()->getAction(MI_OpenAlignmentPanel);
+  if (!alignment || menuContainsAction(windowsMenu, alignment)) return;
+
+  QAction *customPanels =
+      CommandManager::instance()->getAction(MI_OpenCustomPanels);
+  if (windowsMenu->actions().contains(customPanels))
+    windowsMenu->insertAction(customPanels, alignment);
+  else
+    windowsMenu->addAction(alignment);
+}
+
 }  // namespace
 
 //=============================================================================
@@ -305,6 +327,14 @@ void StackedMenuBar::createMenuBarByName(const QString &roomName) {
   /* OSX では stacked menu が動いていないのでとりあえず full のみ作成する */
   addWidget(createFullMenuBar());
 #endif
+  // Legacy room menus also need the panel when no saved menu is available.
+  QMenuBar *menuBar = qobject_cast<QMenuBar *>(widget(count() - 1));
+  if (menuBar) {
+    for (QAction *action : menuBar->actions()) {
+      if (action->menu() && action->menu()->title() == tr("Windows"))
+        ensureAlignmentPanelAction(action->menu());
+    }
+  }
 }
 
 //---------------------------------------------------------------------------------
@@ -347,6 +377,8 @@ QMenuBar *StackedMenuBar::loadMenuBar(const TFilePath &fp) {
             // Older Windows profiles keep private menu XML files. Add the new
             // built-in command without replacing the user's customized menu.
             if (title == QStringLiteral("Help")) ensureHelpActions(menu);
+            if (title == QStringLiteral("Windows"))
+              ensureAlignmentPanelAction(menu);
             menuBar->addMenu(menu);
           } else {
             reader.raiseError(tr("Failed to load menu %1").arg(title));
@@ -434,6 +466,14 @@ bool StackedMenuBar::readMenuRecursive(QXmlStreamReader &reader, QMenu *menu) {
       reader.skipCurrentElement();
     }
   }
+
+  QAction *safeArea  = CommandManager::instance()->getAction(MI_SafeArea);
+  QAction *guide     = CommandManager::instance()->getAction(MI_CenterCutGuide);
+  const auto actions = menu->actions();
+  const int index    = actions.indexOf(safeArea);
+  if (guide && index >= 0 && !actions.contains(guide))
+    menu->insertAction(
+        index + 1 < actions.size() ? actions.at(index + 1) : nullptr, guide);
 
   return !reader.hasError();
 }
@@ -551,6 +591,7 @@ QMenuBar *StackedMenuBar::createCleanupMenuBar() {
     addMenuItem(viewPartsMenu, MI_ViewTable);
     addMenuItem(viewPartsMenu, MI_FieldGuide);
     addMenuItem(viewPartsMenu, MI_SafeArea);
+    addMenuItem(viewPartsMenu, MI_CenterCutGuide);
     addMenuItem(viewPartsMenu, MI_ViewBBox);
     addMenuItem(viewPartsMenu, MI_ViewColorcard);
   }
@@ -723,6 +764,7 @@ QMenuBar *StackedMenuBar::createPltEditMenuBar() {
     addMenuItem(viewPartsMenu, MI_ViewTable);
     addMenuItem(viewPartsMenu, MI_FieldGuide);
     addMenuItem(viewPartsMenu, MI_SafeArea);
+    addMenuItem(viewPartsMenu, MI_CenterCutGuide);
     addMenuItem(viewPartsMenu, MI_ViewColorcard);
   }
   customizeMenu->addSeparator();
@@ -904,6 +946,7 @@ QMenuBar *StackedMenuBar::createInknPaintMenuBar() {
     addMenuItem(viewPartsMenu, MI_ViewTable);
     addMenuItem(viewPartsMenu, MI_FieldGuide);
     addMenuItem(viewPartsMenu, MI_SafeArea);
+    addMenuItem(viewPartsMenu, MI_CenterCutGuide);
     addMenuItem(viewPartsMenu, MI_ViewColorcard);
   }
   customizeMenu->addSeparator();
@@ -1092,6 +1135,7 @@ QMenuBar *StackedMenuBar::createXsheetMenuBar() {
     addMenuItem(viewPartsMenu, MI_ViewTable);
     addMenuItem(viewPartsMenu, MI_FieldGuide);
     addMenuItem(viewPartsMenu, MI_SafeArea);
+    addMenuItem(viewPartsMenu, MI_CenterCutGuide);
     addMenuItem(viewPartsMenu, MI_ViewBBox);
     addMenuItem(viewPartsMenu, MI_ViewColorcard);
   }
@@ -1446,6 +1490,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   cellsMenu->addSeparator();
   addMenuItem(cellsMenu, MI_Autorenumber);
   addMenuItem(cellsMenu, MI_CreateBlankDrawing);
+  addMenuItem(cellsMenu, MI_InsertBlankDrawing);
   addMenuItem(cellsMenu, MI_Duplicate);
   addMenuItem(cellsMenu, MI_MergeFrames);
   addMenuItem(cellsMenu, MI_CloneLevel);
@@ -1462,6 +1507,8 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(playMenu, MI_LastFrame);
   addMenuItem(playMenu, MI_PrevFrame);
   addMenuItem(playMenu, MI_NextFrame);
+  addMenuItem(playMenu, MI_PrevFramePastEnd);
+  addMenuItem(playMenu, MI_NextFramePastEnd);
   addMenuItem(playMenu, MI_PrevStep);
   addMenuItem(playMenu, MI_NextStep);
   playMenu->addSeparator();
@@ -1492,6 +1539,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(viewMenu, MI_ViewBBox);
   viewMenu->addSeparator();
   addMenuItem(viewMenu, MI_SafeArea);
+  addMenuItem(viewMenu, MI_CenterCutGuide);
   addMenuItem(viewMenu, MI_FieldGuide);
   addMenuItem(viewMenu, MI_ViewRuler);
   addMenuItem(viewMenu, MI_ViewGuide);
@@ -1561,6 +1609,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
 #endif
   addMenuItem(windowsMenu, MI_StartupPopup);
   addMenuItem(windowsMenu, MI_OpenGuidedDrawingControls);
+  addMenuItem(windowsMenu, MI_OpenAlignmentPanel);
   addMenuItem(windowsMenu, MI_OpenCustomPanels);
   // windowsMenu->addSeparator();
   // addMenuItem(windowsMenu, MI_OpenExport);

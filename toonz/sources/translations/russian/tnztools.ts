@@ -2540,7 +2540,27 @@ moved to the end of the current style&apos;s page of the palette.</source>
     <message>
         <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1003"/>
         <source>Assistants</source>
-        <translation type="unfinished"></translation>
+        <translation>Помощники</translation>
+    </message>
+    <message>
+        <source>Eraser</source>
+        <translation>Ластик</translation>
+    </message>
+    <message>
+        <source>Mode:</source>
+        <translation>Режим:</translation>
+    </message>
+    <message>
+        <source>Lines</source>
+        <translation>Линии</translation>
+    </message>
+    <message>
+        <source>Areas</source>
+        <translation>Области</translation>
+    </message>
+    <message>
+        <source>Lines &amp; Areas</source>
+        <translation>Линии и области</translation>
     </message>
 </context>
 <context>

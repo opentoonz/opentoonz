@@ -8,6 +8,7 @@
 #include "tlevel.h"
 #include "traster.h"
 #include "tstrokeoutline.h"
+#include "trailcycle.h"
 
 // Qt includes
 #include <QCoreApplication>
@@ -250,6 +251,10 @@ protected:
   TLevelP m_level;
   std::string m_name;
   double m_space, m_rotation;
+  TrailCycle::Mode m_trailCycle = TrailCycle::Mode::Off;
+  int m_trailFrameOffset        = 0;
+  double m_trailSizeMultiplier  = 1.0;
+  bool m_toonzRasterSource      = false;
 
 public:
   TRasterImagePatternStrokeStyle();
@@ -258,7 +263,7 @@ public:
   bool isRegionStyle() const override { return false; }
   bool isStrokeStyle() const override { return true; }
 
-  int getLevelFrameCount() { return m_level->getFrameCount(); }
+  int getLevelFrameCount() const { return m_level->getFrameCount(); }
 
   void computeTransformations(std::vector<TAffine> &positions,
                               const TStroke *stroke) const;
@@ -269,6 +274,7 @@ public:
   void invalidate(){};
 
   TColorStyle *clone() const override;
+  TColorStyle &copy(const TColorStyle &other) override;
   TColorStyle *clone(std::string brushIdName) const override;
 
   QString getDescription() const override;
@@ -293,13 +299,34 @@ public:
     m_rootDir = path + "custom styles";
   }
 
+  TrailCycle::Mode getTrailCycleMode() const { return m_trailCycle; }
+  void setTrailCycleMode(TrailCycle::Mode mode) {
+    m_trailCycle = TrailCycle::modeFromValue(int(mode));
+  }
+
+  // 0 keeps the existing cycle; positive values select an exact source frame.
+  int getTrailFrameOffset() const { return m_trailFrameOffset; }
+  void setTrailFrameOffset(int frame) {
+    m_trailFrameOffset = frame > 0 ? frame : 0;
+  }
+  // Convert the requested drawing number to the renderer's zero-based index.
+  // Missing drawings (including gaps and letter-only variants) return -1.
+  int getTrailStartFrameIndex() const;
+
+  double getTrailSizeMultiplier() const { return m_trailSizeMultiplier; }
+  void setTrailSizeMultiplier(double multiplier);
+
   int getParamCount() const override;
   TColorStyle::ParamType getParamType(int index) const override;
+  void getParamRange(int index, int &min, int &max) const override;
 
   QString getParamNames(int index) const override;
   void getParamRange(int index, double &min, double &max) const override;
   double getParamValue(TColorStyle::double_tag, int index) const override;
   void setParamValue(int index, double value) override;
+  void getParamRange(int index, QStringList &items) const override;
+  int getParamValue(TColorStyle::int_tag, int index) const override;
+  void setParamValue(int index, int value) override;
 
   TRectD getStrokeBBox(const TStroke *stroke) const override;
 
@@ -328,6 +355,9 @@ protected:
   TLevelP m_level;
   std::string m_name;
   double m_space, m_rotation;
+  TrailCycle::Mode m_trailCycle = TrailCycle::Mode::Off;
+  int m_trailFrameOffset        = 0;
+  double m_trailSizeMultiplier  = 1.0;
 
 public:
   TVectorImagePatternStrokeStyle();
@@ -336,7 +366,7 @@ public:
   bool isRegionStyle() const override { return false; }
   bool isStrokeStyle() const override { return true; }
 
-  int getLevelFrameCount() { return m_level->getFrameCount(); }
+  int getLevelFrameCount() const { return m_level->getFrameCount(); }
 
   void computeTransformations(std::vector<TAffine> &positions,
                               const TStroke *stroke) const;
@@ -347,6 +377,7 @@ public:
   void invalidate(){};
 
   TColorStyle *clone() const override;
+  TColorStyle &copy(const TColorStyle &other) override;
   TColorStyle *clone(std::string brushIdName) const override;
 
   QString getDescription() const override;
@@ -371,13 +402,34 @@ public:
     m_rootDir = path + "custom styles";
   }
 
+  TrailCycle::Mode getTrailCycleMode() const { return m_trailCycle; }
+  void setTrailCycleMode(TrailCycle::Mode mode) {
+    m_trailCycle = TrailCycle::modeFromValue(int(mode));
+  }
+
+  // 0 keeps the existing cycle; positive values select an exact source frame.
+  int getTrailFrameOffset() const { return m_trailFrameOffset; }
+  void setTrailFrameOffset(int frame) {
+    m_trailFrameOffset = frame > 0 ? frame : 0;
+  }
+  // Convert the requested drawing number to the renderer's zero-based index.
+  // Missing drawings (including gaps and letter-only variants) return -1.
+  int getTrailStartFrameIndex() const;
+
+  double getTrailSizeMultiplier() const { return m_trailSizeMultiplier; }
+  void setTrailSizeMultiplier(double multiplier);
+
   int getParamCount() const override;
   TColorStyle::ParamType getParamType(int index) const override;
+  void getParamRange(int index, int &min, int &max) const override;
 
   QString getParamNames(int index) const override;
   void getParamRange(int index, double &min, double &max) const override;
   double getParamValue(TColorStyle::double_tag, int index) const override;
   void setParamValue(int index, double value) override;
+  void getParamRange(int index, QStringList &items) const override;
+  int getParamValue(TColorStyle::int_tag, int index) const override;
+  void setParamValue(int index, int value) override;
 
   static void clearGlDisplayLists();
 
@@ -396,5 +448,87 @@ private:
   TVectorImagePatternStrokeStyle &operator=(
       const TVectorImagePatternStrokeStyle &);
 };
+
+// Shared access for the Settings page, palette persistence and the Brush.
+namespace TrailStyles {
+
+// Used by both the Trail chooser and its source loader. Raster conversion keeps
+// the full canvas and returns premultiplied pixels for Toonz Raster images.
+DVAPI QString sourceFilters();
+DVAPI TFilePath findSource(const TFilePath &root, const std::string &name);
+DVAPI TRaster32P rasterSource(const TImageP &image, TPalette *levelPalette,
+                              int sourceFrame = -1);
+
+constexpr int cycleParam          = 2;
+constexpr int frameOffsetParam    = 3;
+constexpr int sizeMultiplierParam = 4;
+
+inline bool isTrail(const TColorStyle *style) {
+  return dynamic_cast<const TRasterImagePatternStrokeStyle *>(style) ||
+         dynamic_cast<const TVectorImagePatternStrokeStyle *>(style);
+}
+
+inline TrailCycle::Mode getMode(const TColorStyle *style) {
+  if (auto *trail = dynamic_cast<const TRasterImagePatternStrokeStyle *>(style))
+    return trail->getTrailCycleMode();
+  if (auto *trail = dynamic_cast<const TVectorImagePatternStrokeStyle *>(style))
+    return trail->getTrailCycleMode();
+  return TrailCycle::Mode::Off;
+}
+
+inline void setMode(TColorStyle *style, TrailCycle::Mode mode) {
+  if (auto *trail = dynamic_cast<TRasterImagePatternStrokeStyle *>(style))
+    trail->setTrailCycleMode(mode);
+  else if (auto *trail = dynamic_cast<TVectorImagePatternStrokeStyle *>(style))
+    trail->setTrailCycleMode(mode);
+}
+
+inline int getFrameOffset(const TColorStyle *style) {
+  if (auto *trail = dynamic_cast<const TRasterImagePatternStrokeStyle *>(style))
+    return trail->getTrailFrameOffset();
+  if (auto *trail = dynamic_cast<const TVectorImagePatternStrokeStyle *>(style))
+    return trail->getTrailFrameOffset();
+  return 0;
+}
+
+inline void setFrameOffset(TColorStyle *style, int frame) {
+  if (auto *trail = dynamic_cast<TRasterImagePatternStrokeStyle *>(style))
+    trail->setTrailFrameOffset(frame);
+  else if (auto *trail = dynamic_cast<TVectorImagePatternStrokeStyle *>(style))
+    trail->setTrailFrameOffset(frame);
+}
+
+inline double getSizeMultiplier(const TColorStyle *style) {
+  if (auto *trail = dynamic_cast<const TRasterImagePatternStrokeStyle *>(style))
+    return trail->getTrailSizeMultiplier();
+  if (auto *trail = dynamic_cast<const TVectorImagePatternStrokeStyle *>(style))
+    return trail->getTrailSizeMultiplier();
+  return 1.0;
+}
+
+inline void setSizeMultiplier(TColorStyle *style, double multiplier) {
+  if (auto *trail = dynamic_cast<TRasterImagePatternStrokeStyle *>(style))
+    trail->setTrailSizeMultiplier(multiplier);
+  else if (auto *trail = dynamic_cast<TVectorImagePatternStrokeStyle *>(style))
+    trail->setTrailSizeMultiplier(multiplier);
+}
+
+inline int startFrameIndex(const TColorStyle *style) {
+  if (auto *trail = dynamic_cast<const TRasterImagePatternStrokeStyle *>(style))
+    return trail->getTrailStartFrameIndex();
+  if (auto *trail = dynamic_cast<const TVectorImagePatternStrokeStyle *>(style))
+    return trail->getTrailStartFrameIndex();
+  return -1;
+}
+
+inline int frameCount(const TColorStyle *style) {
+  if (auto *trail = dynamic_cast<const TRasterImagePatternStrokeStyle *>(style))
+    return trail->getLevelFrameCount();
+  if (auto *trail = dynamic_cast<const TVectorImagePatternStrokeStyle *>(style))
+    return trail->getLevelFrameCount();
+  return 0;
+}
+
+}  // namespace TrailStyles
 
 #endif  // TSIMPLECOLORSTYLES_H

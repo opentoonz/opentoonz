@@ -59,3 +59,8 @@ OpenToonz 是一个由[DWANGO](http://dwango.co.jp/english/)公开发布的二�
 ### 特别感谢
 
 原始程序从Toonz开发而来，这是一个由意大利罗马的公司 Digital Video, S.p.A.所开发的软件。
+
+## 参与翻译
+
+有关提交翻译文件以及审核、合并和更新翻译的流程，请参阅
+[翻译指南（英文）](../toonz/sources/translations/README.md)。

@@ -21,6 +21,8 @@ public:
   ValueAdjuster(QWidget *parent = 0, Qt::WindowFlags flags = Qt::WindowFlags());
   ~ValueAdjuster();
 
+  void resetToDefault();
+
 protected slots:
   void onClickedPlus();
   void onClickedMinus();
@@ -42,6 +44,8 @@ public:
   ValueShifter(bool isHue, QWidget *parent = 0,
                Qt::WindowFlags flags = Qt::WindowFlags());
   ~ValueShifter();
+
+  void resetToDefault();
 
 protected slots:
   void onClickedPlus();
@@ -66,6 +70,8 @@ public:
   ColorFader(QString name = "", QWidget *parent = 0,
              Qt::WindowFlags flags = Qt::WindowFlags());
   ~ColorFader();
+
+  void resetToDefault();
 
 protected slots:
   void onClicked();

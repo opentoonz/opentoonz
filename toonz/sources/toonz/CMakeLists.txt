@@ -113,6 +113,7 @@ set(MOC_HEADERS
     toolbar.h
     tpanels.h
     trackerpopup.h
+    alignmentpane.h
     vectorguideddrawingpane.h
     vectorizerpopup.h
     vectorizerswatch.h
@@ -275,6 +276,7 @@ set(SOURCES
     addfilmstripframespopup.cpp
     camerasettingspopup.cpp
     convertpopup.cpp
+    convertlinestoareascommand.cpp
     crashhandler.cpp
     duplicatepopup.cpp
     dvdirtreeview.cpp
@@ -313,6 +315,7 @@ set(SOURCES
     kis_tablet_support_win8.cpp
     timestretchpopup.cpp
     trackerpopup.cpp
+    alignmentpane.cpp
     vectorguideddrawingpane.cpp
     vectorizerpopup.cpp
     rasterizecommand.cpp
@@ -492,6 +495,7 @@ include_directories(
     ../../sources/toonzfarm/include
     ../../sources/toonzqt
     ../../sources/stopmotion
+    ../../sources/tnztools   # Required for SelectionScaleField, SelectionRotationField, etc.
 )
 
 if (WITH_CANON)

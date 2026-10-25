@@ -108,6 +108,9 @@ void ProjectDvDirModelRootNode::refreshChildren() {
       ProjectDvDirModelSpecialFileFolderNode *projectRootNode =
           new ProjectDvDirModelSpecialFileFolderNode(
               this, L"Project root (" + rootDir + L")", projectRoot);
+      projectRootNode->setDisplayLocation(
+          DvDirModelNode::DisplayLocation::ProjectRoot,
+          QString::fromStdWString(rootDir));
       projectRootNode->setPixmap(
           createQIcon("folder_project_root")
               .pixmap(QSize(18, 18), QIcon::Normal, QIcon::Off));
@@ -203,7 +206,9 @@ int ProjectDirModel::rowCount(const QModelIndex &parent) const {
 QVariant ProjectDirModel::data(const QModelIndex &index, int role) const {
   if (!index.isValid()) return QVariant();
   DvDirModelNode *node = getNode(index);
-  if (role == Qt::DisplayRole || role == Qt::EditRole)
+  if (role == Qt::DisplayRole)
+    return node->getDisplayName();
+  else if (role == Qt::EditRole)
     return QString::fromStdWString(node->getName());
   else if (role == Qt::DecorationRole) {
     return QVariant();

@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <memory>
 
 #include "tmachine.h"
@@ -539,7 +540,7 @@ ParsedPliImp::ParsedPliImp(const TFilePath &filename, bool readInfo)
   TagElem *tagElem;
   UCHAR maxThickness;
 
-  // cerr<<m_filePath<<endl;
+  m_filePath = filename;
 
   //#ifdef _WIN32
   m_iChan.open(filename);
@@ -1282,9 +1283,14 @@ PliTag *ParsedPliImp::readThickQuadraticChainTag(bool isLoop) {
 PliTag *ParsedPliImp::readGroupTag() {
   TUINT32 bufOffs = 0;
 
+  if (m_tagLength < 1 || m_currDynamicTypeBytesNum < 1 ||
+      (m_tagLength - 1) % m_currDynamicTypeBytesNum != 0)
+    throw TException("corrupted pli file: invalid group length");
+
   UCHAR type = m_buf[bufOffs++];
 
-  assert(type < GroupTag::TYPE_HOW_MANY);
+  if (type >= GroupTag::TYPE_HOW_MANY)
+    throw TException("corrupted pli file: invalid group type");
 
   TUINT32 numObjects = (m_tagLength - 1) / m_currDynamicTypeBytesNum;
   std::unique_ptr<PliObjectTag *[]> object(new PliObjectTag *[numObjects]);
@@ -1295,13 +1301,25 @@ PliTag *ParsedPliImp::readGroupTag() {
     readDynamicData(tagOffs[i], bufOffs);
   }
 
-  TagElem *elem;
-  for (TUINT32 i = 0; i < numObjects; i++)
-    while (!(object[i] = (PliObjectTag *)findTagFromOffset(tagOffs[i])))
-      if ((elem = readTag()))
-        addTag(*elem);
-      else
-        assert(false);
+  for (TUINT32 i = 0; i < numObjects; i++) {
+    PliTag *child;
+    while (!(child = findTagFromOffset(tagOffs[i]))) {
+      TagElem *elem = readTag();
+      if (!elem) throw TException("corrupted pli file: missing group child");
+      addTag(*elem);
+    }
+
+    PliObjectTag *obj = dynamic_cast<PliObjectTag *>(child);
+    if (!obj) throw TException("corrupted pli file: invalid group child");
+    if (type == GroupTag::PALETTE && child->m_type != PliTag::STYLE_NGOBJ)
+      throw TException("corrupted pli file: invalid palette group child");
+    if (type == GroupTag::STROKE && child->m_type != PliTag::COLOR_NGOBJ &&
+        child->m_type != PliTag::OUTLINE_OPTIONS_GOBJ &&
+        child->m_type != PliTag::GROUP_GOBJ &&
+        child->m_type != PliTag::THICK_QUADRATIC_CHAIN_GOBJ)
+      throw TException("corrupted pli file: invalid stroke group child");
+    object[i] = obj;
+  }
 
   std::unique_ptr<GroupTag> tag(new GroupTag());
   tag->m_type       = type;
@@ -1413,6 +1431,9 @@ PliTag *ParsedPliImp::readStyleTag() {
 /*=====================================================================*/
 
 PliTag *ParsedPliImp::readOutlineOptionsTag() {
+  const TUINT32 baseLength = 2 + 2 * m_currDynamicTypeBytesNum;
+  if (m_tagLength < baseLength)
+    throw TImageException(m_filePath, "Truncated PLI stroke outline options");
   TUINT32 bufOffs = 0;
   TINT32 d;
 
@@ -1430,8 +1451,20 @@ PliTag *ParsedPliImp::readOutlineOptionsTag() {
   readDynamicData(d, bufOffs);
   miterUpper = scale * d;
 
-  return new StrokeOutlineOptionsTag(
-      TStroke::OutlineOptions(capStyle, joinStyle, miterLower, miterUpper));
+  TStroke::OutlineOptions options(capStyle, joinStyle, miterLower, miterUpper);
+
+  // PLI readers that predate this extension consume the original four fields
+  // and ignore the remaining bytes in this tag.  Keep the extra data at the
+  // end for that compatibility.
+  if (m_tagLength >= baseLength + 2 * m_currDynamicTypeBytesNum) {
+    TINT32 frameOffset, frameStep;
+    readDynamicData(frameOffset, bufOffs);
+    readDynamicData(frameStep, bufOffs);
+    options.m_patternFrameOffset = frameOffset;
+    options.m_patternFrameStep   = frameStep;
+  }
+
+  return new StrokeOutlineOptionsTag(options);
 }
 
 /*=====================================================================*/
@@ -2419,10 +2452,19 @@ TUINT32 ParsedPliImp::writeOutlineOptionsTag(StrokeOutlineOptionsTag *tag) {
 
   TINT32 miterLower = scale * tag->m_options.m_miterLower;
   TINT32 miterUpper = scale * tag->m_options.m_miterUpper;
+  TINT32 frameOffset             = tag->m_options.m_patternFrameOffset;
+  TINT32 frameStep               = tag->m_options.m_patternFrameStep;
+  const bool hasPatternFrameData = frameOffset != 0 || frameStep != 1;
 
-  setDynamicTypeBytesNum(scale * miterLower, scale * miterUpper);
+  int minValue = std::min(miterLower, miterUpper);
+  int maxValue = std::max(miterLower, miterUpper);
+  if (hasPatternFrameData) {
+    minValue = std::min({minValue, (int)frameOffset, (int)frameStep});
+    maxValue = std::max({maxValue, (int)frameOffset, (int)frameStep});
+  }
+  setDynamicTypeBytesNum(minValue, maxValue);
 
-  int tagLength = 2 + 2 * m_currDynamicTypeBytesNum;
+  int tagLength = 2 + (hasPatternFrameData ? 4 : 2) * m_currDynamicTypeBytesNum;
   int offset =
       (int)writeTagHeader((UCHAR)PliTag::OUTLINE_OPTIONS_GOBJ, tagLength);
 
@@ -2430,6 +2472,10 @@ TUINT32 ParsedPliImp::writeOutlineOptionsTag(StrokeOutlineOptionsTag *tag) {
   *m_oChan << (UCHAR)tag->m_options.m_joinStyle;
   writeDynamicData(miterLower);
   writeDynamicData(miterUpper);
+  if (hasPatternFrameData) {
+    writeDynamicData(frameOffset);
+    writeDynamicData(frameStep);
+  }
 
   return offset;
 }

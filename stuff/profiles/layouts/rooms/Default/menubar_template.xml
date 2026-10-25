@@ -334,6 +334,7 @@
         <command>MI_OpenStopMotionPanel</command>
         <command>MI_StartupPopup</command>
         <command>MI_OpenGuidedDrawingControls</command>
+        <command>MI_OpenAlignmentPanel</command>
         <command>MI_OpenCustomPanels</command>
         <separator/>
         <command>MI_MaximizePanel</command>

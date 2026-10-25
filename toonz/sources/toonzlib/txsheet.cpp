@@ -37,6 +37,7 @@
 
 #include "toonz/txsheet.h"
 #include "toonz/preferences.h"
+#include "audioscrubplayer.h"
 
 // STD includes
 #include <set>
@@ -106,6 +107,7 @@ struct TXsheet::TXsheetImp {
   int m_viewColumn;
 
   TSoundTrackP m_mixedSound;
+  std::unique_ptr<AudioScrubPlayer> m_scrubPlayer;
   ColumnFan m_columnFans[Orientations::COUNT];
   ToonzScene *m_scene;
 
@@ -1493,39 +1495,55 @@ TSoundTrack *TXsheet::makeSound(SoundProperties *properties) {
 
 //-----------------------------------------------------------------------------
 
-void TXsheet::scrub(int frame, bool isPreview) {
+void TXsheet::scrub(int frame, bool isPreview, int endFrame) {
+  // Cancel the previous audition even if this position has no usable audio.
+  if (m_imp->m_scrubPlayer) m_imp->m_scrubPlayer->stop();
   try {
     double fps =
         getScene()->getProperties()->getOutputProperties()->getFrameRate();
+    if (frame < 0 || !std::isfinite(fps) || fps <= 0) return;
+    if (endFrame < 0) endFrame = frame;
+    if (endFrame < frame) return;
 
     TXsheet::SoundProperties *prop = new TXsheet::SoundProperties();
     prop->m_isPreview              = isPreview;
 
     TSoundTrack *st = makeSound(prop);  // Absorbs prop's ownership
-    if (!st) return;
+    if (!st || st->getSampleCount() <= 0 || st->getSampleRate() <= 0) return;
 
-    double samplePerFrame = st->getSampleRate() / fps;
+    const double samplePerFrame = double(st->getSampleRate()) / fps;
+    if (!std::isfinite(samplePerFrame) || samplePerFrame <= 0) return;
 
-    double s0 = frame * samplePerFrame, s1 = s0 + samplePerFrame;
-    play(st, static_cast<int>(s0), static_cast<int>(s1), false);
+    // extract() has an inclusive end; adjacent frames must not share a sample.
+    const double begin = std::floor(double(frame) * samplePerFrame);
+    const double end =
+        std::min(double(st->getSampleCount()),
+                 std::floor((double(endFrame) + 1) * samplePerFrame));
+    // Validate floating-point boundaries before converting to sample indices.
+    if (!std::isfinite(begin) || !std::isfinite(end) || begin < 0 ||
+        begin >= end)
+      return;
+    TSoundTrackP snippet = st->extract(int(begin), int(end) - 1);
+    if (!m_imp->m_scrubPlayer)
+      m_imp->m_scrubPlayer = std::make_unique<AudioScrubPlayer>();
+    m_imp->m_scrubPlayer->play(snippet);
   } catch (TSoundDeviceException &e) {
-    if (e.getType() == TSoundDeviceException::NoDevice) {
-      std::cout << ::to_string(e.getMessage()) << '\n';
-    } else {
-      throw TSoundDeviceException(e.getType(), e.getMessage());
-    }
+    // A failed audition must not escape a frame-navigation event handler.
+    std::cout << ::to_string(e.getMessage()) << '\n';
   }
 }
 
 //-----------------------------------------------------------------------------
 
 void TXsheet::stopScrub() {
+  if (m_imp->m_scrubPlayer) m_imp->m_scrubPlayer->stop();
   if (m_player) m_player->stop();
 }
 
 //-----------------------------------------------------------------------------
 
 void TXsheet::play(const TSoundTrackP &soundtrack, int s0, int s1, bool loop) {
+  if (m_imp->m_scrubPlayer) m_imp->m_scrubPlayer->stop();
   if (!TSoundOutputDevice::installed()) return;
 
   if (!m_player) m_player = std::make_unique<TSoundOutputDevice>();

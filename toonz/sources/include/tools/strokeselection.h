@@ -14,6 +14,8 @@
 
 // STD includes
 #include <set>
+#include <vector>
+#include "tools/vectoralignment.h"
 
 #undef DVAPI
 #undef DVVAR
@@ -61,7 +63,10 @@ public:
 
   TGroupCommand *getGroupCommand() { return m_groupCommand.get(); }
 
-  void setImage(const TVectorImageP &image) { m_vi = image; }
+  void setImage(const TVectorImageP &image) {
+    if (m_vi != image) m_selectionOrder.clear();
+    m_vi = image;
+  }
   const TVectorImageP &getImage() const { return m_vi; }
 
   const IndexesContainer &getSelection() const { return m_indexes; }
@@ -72,7 +77,10 @@ public:
   bool isSelected(int index) const { return (m_indexes.count(index) > 0); }
   void select(int index, bool on);
   void toggle(int index);
-  void selectNone() override { m_indexes.clear(); }
+  void selectNone() override {
+    m_indexes.clear();
+    m_selectionOrder.clear();
+  }
 
   void setSceneHandle(TSceneHandle *tsh) { m_sceneHandle = tsh; }
 
@@ -95,12 +103,16 @@ public:
   void enableCommands() override;
 
   void selectAll();
+  void alignStrokes(VectorAlignment::Type type);
+  void notifyAlignmentChanged();
 
 private:
+  std::vector<int> selectionOrder() const;
   void saveSelectedVectors(bool chooseDestination);
 
   TVectorImageP m_vi;          //!< Selected vector image.
   IndexesContainer m_indexes;  //!< Selected stroke indexes in m_vi.
+  std::vector<int> m_selectionOrder;
 
   std::unique_ptr<TGroupCommand> m_groupCommand;  //!< Groups commands wrapper.
   TSceneHandle *m_sceneHandle;  //!< Global scene handle. \deprecated  Use
