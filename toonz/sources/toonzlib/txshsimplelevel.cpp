@@ -1925,6 +1925,10 @@ void TXshSimpleLevel::initializePalette() {
     break;
   }
 
+  // no palette file found: use a default palette instead of none
+  if (!palette && (type == TZP_XSHLEVEL || type == PLI_XSHLEVEL))
+    palette = new TPalette();
+
   if (palette) {
     if (type != OVL_XSHLEVEL) {
       palette->setPaletteName(getName());
