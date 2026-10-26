@@ -2374,12 +2374,11 @@ QWidget* PreferencesPopup::createXsheetPage() {
     insertUI(parentColorsInXsheetColumn, xshColHeaderLay);
     insertUI(currentColumnColor, xshColHeaderLay);
 
-    // The header outline control shares the existing column text color row.
     xshColHeaderLay->addLayout(
         createOutlineControls(customCurrentColumnOutlineColorEnabled,
                               currentColumnOutlineColor,
                               tr("Current Header Outline:")),
-        xshColHeaderLay->rowCount() - 1, 2);
+        xshColHeaderLay->rowCount(), 0, 1, 3);
   }
   QGridLayout* xshCellAreaLay = insertGroupBox(tr("Xsheet Cell Area"), lay);
   {
