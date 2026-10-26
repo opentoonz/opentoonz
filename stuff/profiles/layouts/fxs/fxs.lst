@@ -120,6 +120,7 @@
     STD_backlitFx
     STD_bodyHighLightFx
     STD_castShadowFx
+    STD_dropShadowFx
     STD_colorRaylitFx
     STD_inoFogFx
     STD_glowFx

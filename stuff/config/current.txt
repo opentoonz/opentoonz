@@ -82,6 +82,18 @@
   <item>"STD_castShadowFx.up_blur"		"Top Blur"		</item>
   <item>"STD_castShadowFx.down_blur"	"Bottom Blur"	</item>
 
+  <item>"STD_dropShadowFx"		"Drop Shadow"	</item>
+  <item>"STD_dropShadowFx.color"	"Color"	</item>
+  <item>"STD_dropShadowFx.blur_x"	"Blur X"	</item>
+  <item>"STD_dropShadowFx.blur_y"	"Blur Y"	</item>
+  <item>"STD_dropShadowFx.quality"	"Quality"	</item>
+  <item>"STD_dropShadowFx.strength"	"Strength"	</item>
+  <item>"STD_dropShadowFx.angle"	"Angle"	</item>
+  <item>"STD_dropShadowFx.distance"	"Distance"	</item>
+  <item>"STD_dropShadowFx.inner"	"Inner Shadow"	</item>
+  <item>"STD_dropShadowFx.knockout"	"Knockout"	</item>
+  <item>"STD_dropShadowFx.hide_object"	"Hide Object"	</item>
+
 
   <item>"STD_changeColorFx"	"Change Color"		</item>
   <item>"STD_changeColorFx.range"	"Range"			</item>
