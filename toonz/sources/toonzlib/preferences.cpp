@@ -387,6 +387,8 @@ void Preferences::definePreferenceItems() {
          false);
   define(watchFileSystemEnabled, "watchFileSystemEnabled", QMetaType::Bool,
          true);
+  define(fileBrowserFolderDoubleClick, "fileBrowserFolderDoubleClick",
+         QMetaType::Bool, false);
   define(projectRoot, "projectRoot", QMetaType::Int, 0x08);
   define(customProjectRoot, "customProjectRoot", QMetaType::QString, "");
   define(pathAliasPriority, "pathAliasPriority", QMetaType::Int,

@@ -10,6 +10,7 @@ enum PreferencesItemId {
   taskchunksize,
   sceneNumberingEnabled,
   watchFileSystemEnabled,
+  fileBrowserFolderDoubleClick,
   projectRoot,
   customProjectRoot,
   pathAliasPriority,
