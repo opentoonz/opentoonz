@@ -5,6 +5,7 @@
 // Tnz6 includes
 #include "convertpopup.h"
 #include "filebrowser.h"
+#include "scenebrowser.h"
 #include "filedata.h"
 #include "iocommand.h"
 #include "menubarcommandids.h"
@@ -683,6 +684,10 @@ void FileSelection::exportScene(TFilePath scenePath) {
 void FileSelection::selectAll() {
   DvItemSelection::selectAll();
   FileBrowser::updateItemViewerPanel();
+  if (FileBrowser *browser = dynamic_cast<FileBrowser *>(getModel()))
+    browser->storePersistedSelection();
+  else if (SceneBrowser *browser = dynamic_cast<SceneBrowser *>(getModel()))
+    browser->storePersistedSelection();
 }
 
 //------------------------------------------------------------------------

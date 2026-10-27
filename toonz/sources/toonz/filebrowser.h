@@ -116,6 +116,7 @@ types to be displayed in the file browser.
 
   void enableGlobalSelection(bool enabled);
   void selectNone();
+  void storePersistedSelection();
 
   QSplitter *getMainSplitter() const { return m_mainSplitter; }
 
@@ -261,7 +262,6 @@ private:
   void readInfo(Item &item);
   void refreshCurrentFolderItems();
   std::wstring selectionPlace() const;
-  void storePersistedSelection();
   void restorePersistedSelection();
 
   DvItemListModel::Status getItemVersionControlStatus(const Item &item);

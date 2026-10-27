@@ -491,8 +491,6 @@ void FileBrowser::sortByDataModel(DataType dataType, bool isDiscendent) {
     setIsDiscendentOrder(isDiscendent);
   }
 
-  restorePersistedSelection();
-
   m_itemViewer->getPanel()->update();
 }
 
@@ -660,6 +658,7 @@ void FileBrowser::refreshCurrentFolderItems() {
   setOrderType(Name);
   setIsDiscendentOrder(true);
   sortByDataModel(currentDataType, discendentOrder);
+  restorePersistedSelection();
 }
 
 //-----------------------------------------------------------------------------
@@ -775,6 +774,7 @@ void FileBrowser::setUnregisteredFolder(const TFilePath &fp) {
   setOrderType(Name);
   setIsDiscendentOrder(true);
   sortByDataModel(currentDataType, discendentOrder);
+  restorePersistedSelection();
 
   m_itemViewer->repaint();
 }

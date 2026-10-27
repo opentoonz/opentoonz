@@ -99,6 +99,7 @@ public:
 
   void enableGlobalSelection(bool enabled);
   void selectNone();
+  void storePersistedSelection();
 
   QSplitter *getMainSplitter() const { return m_mainSplitter; }
 
@@ -252,7 +253,6 @@ private:
 
   void refreshCurrentFolderItems();
   std::wstring selectionPlace() const;
-  void storePersistedSelection();
   void restorePersistedSelection();
 
   DvItemListModel::Status getItemVersionControlStatus(
