@@ -1008,22 +1008,35 @@ void FileBrowser::storePersistedSelection() {
 //-----------------------------------------------------------------------------
 
 void FileBrowser::restorePersistedSelection() {
-  const auto found = m_selectionByFolder.find(selectionPlace());
-  if (found == m_selectionByFolder.end() || found->second.empty()) return;
   FileSelection *fs =
       dynamic_cast<FileSelection *>(m_itemViewer->getPanel()->getSelection());
   if (!fs) return;
 
   std::vector<int> indices;
-  indices.reserve(found->second.size());
-  for (const TFilePath &fp : found->second) {
-    const int idx = findIndexWithPath(fp);
-    if (idx >= 0) indices.push_back(idx);
+  const auto found = m_selectionByFolder.find(selectionPlace());
+  if (found != m_selectionByFolder.end()) {
+    indices.reserve(found->second.size());
+    for (const TFilePath &fp : found->second) {
+      const int idx = findIndexWithPath(fp);
+      if (idx >= 0) indices.push_back(idx);
+    }
   }
-  if (indices.empty()) return;
-  fs->select(&indices.front(), (int)indices.size());
-  fs->makeCurrent();
+
+  if (indices.empty())
+    fs->selectNone();
+  else
+    fs->select(&indices.front(), (int)indices.size());
   m_itemViewer->getPanel()->update();
+
+  // Report the restored files once the folder change has finished.
+  const auto place = selectionPlace();
+  QTimer::singleShot(0, this, [this, place]() {
+    if (!isVisible() || selectionPlace() != place) return;
+    FileSelection *selection =
+        dynamic_cast<FileSelection *>(m_itemViewer->getPanel()->getSelection());
+    if (!selection) return;
+    onSelectedItems(selection->getSelectedIndices());
+  });
 }
 
 //-----------------------------------------------------------------------------
