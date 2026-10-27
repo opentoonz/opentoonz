@@ -560,6 +560,7 @@ TXshSoundLevel *cloneSoundLevel(TXshSoundLevel *srcSl) {
   dstSl->setType(srcSl->getType());
   dstSl->setScene(scene);
   dstSl->setFrameRate(srcSl->getFrameRate());
+  dstSl->computeValues();
   dstSl->setPath(uniqueSoundPath(scene, srcSl->getPath(), dstName));
   scene->getLevelSet()->insertLevel(dstSl);
   return dstSl;
