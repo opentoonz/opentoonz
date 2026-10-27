@@ -12,6 +12,7 @@ set(HEADERS
     perlinnoise.h
     pins.h
     stdfx.h
+    shadowbevelutils.h
     texturefxP.h
     warp.h
     motionawarebasefx.h
@@ -115,6 +116,7 @@ set(SOURCES
     despecklefx.cpp
     diamondgradientfx.cpp
     dissolvefx.cpp
+    dropshadowfx.cpp
     embossfx.cpp
     erodilatefx.cpp
     externalpalettefx.cpp
