@@ -55,6 +55,7 @@
     STD_adjustLevelsFx 
     STD_brightContFx 
     STD_channelMixerFx
+    STD_colorMatrixFx
     STD_toneCurveFx 
     STD_despeckleFx
     STD_inoChannelSelectorFx
