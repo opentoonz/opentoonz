@@ -16,6 +16,7 @@
 
 // TnzQt includes
 #include "toonzqt/dvdialog.h"
+#include "toonzqt/tselectionhandle.h"
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/gutil.h"
@@ -59,6 +60,7 @@
 #include <QPixmap>
 #include <QUrl>
 #include <QScrollBar>
+#include <QTimer>
 #include <QMap>
 #include <QPushButton>
 #include <QPalette>
@@ -226,6 +228,11 @@ FileBrowser::FileBrowser(QWidget *parent, Qt::WindowFlags flags,
           &FileBrowser::onDoubleClickedItem);
   connect(m_itemViewer, &DvItemViewer::selectedItems, this,
           &FileBrowser::onSelectedItems);
+  connect(TSelectionHandle::getCurrent(), &TSelectionHandle::selectionSwitched,
+          this, [this](TSelection *, TSelection *) {
+            m_itemViewer->getPanel()->update();
+            m_folderTreeView->update();
+          });
   connect(buttonBar, &DvItemViewerButtonBar::folderUp, this,
           &FileBrowser::folderUp);
   connect(buttonBar, &DvItemViewerButtonBar::newFolder, this,
@@ -347,7 +354,9 @@ void FileBrowser::onBackButtonPushed() {
   if (m_currentPosition == 0) return;
   --m_currentPosition;
   QModelIndex currentIndex = m_indexHistoryList[m_currentPosition];
+  m_giveCommandToRestoredFiles = true;
   m_folderTreeView->setCurrentIndex(currentIndex);
+  m_giveCommandToRestoredFiles = false;
   m_folderTreeView->collapseAll();
   while (currentIndex.isValid()) {
     currentIndex = currentIndex.parent();
@@ -363,7 +372,9 @@ void FileBrowser::onFwdButtonPushed() {
   if (m_currentPosition >= m_indexHistoryList.size() - 1) return;
   ++m_currentPosition;
   QModelIndex currentIndex = m_indexHistoryList[m_currentPosition];
+  m_giveCommandToRestoredFiles = true;
   m_folderTreeView->setCurrentIndex(currentIndex);
+  m_giveCommandToRestoredFiles = false;
   m_folderTreeView->collapseAll();
   while (currentIndex.isValid()) {
     currentIndex = currentIndex.parent();
@@ -657,6 +668,7 @@ void FileBrowser::refreshCurrentFolderItems() {
   setOrderType(Name);
   setIsDiscendentOrder(true);
   sortByDataModel(currentDataType, discendentOrder);
+  restorePersistedSelection();
 }
 
 //-----------------------------------------------------------------------------
@@ -664,6 +676,11 @@ void FileBrowser::refreshCurrentFolderItems() {
 void FileBrowser::setFolder(const TFilePath &fp, bool expandNode,
                             bool forceUpdate) {
   if (fp == m_folder && !forceUpdate) return;
+
+  storePersistedSelection();
+  if (FileSelection *fs = dynamic_cast<FileSelection *>(
+          m_itemViewer->getPanel()->getSelection()))
+    fs->selectNone();
 
   // set the current folder path
   m_folder        = fp;
@@ -767,6 +784,7 @@ void FileBrowser::setUnregisteredFolder(const TFilePath &fp) {
   setOrderType(Name);
   setIsDiscendentOrder(true);
   sortByDataModel(currentDataType, discendentOrder);
+  restorePersistedSelection();
 
   m_itemViewer->repaint();
 }
@@ -774,6 +792,11 @@ void FileBrowser::setUnregisteredFolder(const TFilePath &fp) {
 //-----------------------------------------------------------------------------
 
 void FileBrowser::setHistoryDay(std::string dayDateString) {
+  storePersistedSelection();
+  if (FileSelection *fs = dynamic_cast<FileSelection *>(
+          m_itemViewer->getPanel()->getSelection()))
+    fs->selectNone();
+
   m_folder                = TFilePath();
   m_dayDateString         = dayDateString;
   const History::Day *day = History::instance()->getDay(dayDateString);
@@ -787,6 +810,7 @@ void FileBrowser::setHistoryDay(std::string dayDateString) {
     for (const TFilePath &it : files) m_items.emplace_back(it);
   }
   refreshData();
+  restorePersistedSelection();
 }
 
 //-----------------------------------------------------------------------------
@@ -968,6 +992,85 @@ int FileBrowser::findIndexWithPath(TFilePath path) {
 
 //-----------------------------------------------------------------------------
 
+std::wstring FileBrowser::selectionPlace() const {
+  if (m_folder != TFilePath()) return m_folder.getWideString();
+  return std::wstring(L"\n") +
+         QString::fromStdString(m_dayDateString).toStdWString();
+}
+
+//-----------------------------------------------------------------------------
+
+void FileBrowser::storePersistedSelection() {
+  FileSelection *fs =
+      dynamic_cast<FileSelection *>(m_itemViewer->getPanel()->getSelection());
+  // Ignore an empty selection so leaving a folder does not forget its files.
+  if (!fs || fs->isEmpty()) return;
+  const std::set<int> &indices = fs->getSelectedIndices();
+  std::vector<TFilePath> paths;
+  paths.reserve(indices.size());
+  for (int idx : indices) {
+    if (idx < 0 || idx >= (int)m_items.size()) continue;
+    paths.push_back(m_items[idx].m_path);
+  }
+  if (!paths.empty()) m_selectionByFolder[selectionPlace()] = std::move(paths);
+}
+
+//-----------------------------------------------------------------------------
+
+void FileBrowser::restorePersistedSelection() {
+  FileSelection *fs =
+      dynamic_cast<FileSelection *>(m_itemViewer->getPanel()->getSelection());
+  if (!fs) return;
+
+  std::vector<int> indices;
+  const auto found = m_selectionByFolder.find(selectionPlace());
+  if (found != m_selectionByFolder.end()) {
+    indices.reserve(found->second.size());
+    for (const TFilePath &fp : found->second) {
+      const int idx = findIndexWithPath(fp);
+      if (idx >= 0) indices.push_back(idx);
+    }
+  }
+
+  if (indices.empty())
+    fs->selectNone();
+  else {
+    fs->select(&indices.front(), (int)indices.size());
+    if (m_giveCommandToRestoredFiles) fs->makeCurrent();
+  }
+  m_itemViewer->getPanel()->update();
+
+  // Report the restored files once the folder change has finished.
+  const auto place = selectionPlace();
+  QTimer::singleShot(0, this, [this, place]() {
+    if (!isVisible() || selectionPlace() != place) return;
+    FileSelection *selection =
+        dynamic_cast<FileSelection *>(m_itemViewer->getPanel()->getSelection());
+    if (!selection) return;
+    onSelectedItems(selection->getSelectedIndices());
+  });
+}
+
+//-----------------------------------------------------------------------------
+
+void FileBrowser::replacePersistedPath(const TFilePath &from,
+                                       const TFilePath &to) {
+  if (from == to) return;
+  for (FileBrowser *browser : activeBrowsers) {
+    for (Item &item : browser->m_items) {
+      if (item.m_path != from) continue;
+      item.m_path = to;
+      item.m_name = QString::fromStdWString(to.getLevelNameW());
+    }
+    for (auto &entry : browser->m_selectionByFolder) {
+      for (TFilePath &fp : entry.second)
+        if (fp == from) fp = to;
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+
 void FileBrowser::renameItem(int index, const QString &newName) {
   if (getFolder() == TFilePath()) return;
   if (index < 0 || index >= (int)m_items.size()) return;
@@ -988,8 +1091,10 @@ void FileBrowser::renameItem(int index, const QString &newName) {
         m_items[paletteIndex].m_name =
             QString::fromStdWString(palettePath.getLevelNameW());
         m_items[paletteIndex].m_path = palettePath;
+        replacePersistedPath(fp.withNoFrame().withType(type), palettePath);
       }
     }
+    replacePersistedPath(fp, newFp);
     m_itemViewer->update();
 
     if (fp.getType() == "tnz") {
@@ -1730,12 +1835,12 @@ QString getFrame(const QString &filename) {
 
 //-----------------------------------------------------------
 
-void renameSingleFileOrToonzLevel(const QString &fullpath) {
+TFilePath renameSingleFileOrToonzLevel(const QString &fullpath) {
   TFilePath fpin(fullpath.toStdString());
 
   RenameAsToonzPopup popup(
       QString::fromStdWString(fpin.withoutParentDir().getWideString()));
-  if (popup.exec() != QDialog::Accepted) return;
+  if (popup.exec() != QDialog::Accepted) return TFilePath();
 
   std::string name = popup.getName().toStdString();
 
@@ -1743,42 +1848,42 @@ void renameSingleFileOrToonzLevel(const QString &fullpath) {
     DVGui::error(
         QObject::tr("The specified name is already assigned to the %1 file.")
             .arg(fullpath));
-    return;
+    return TFilePath();
   }
 
-  if (popup.doOverwrite())
-    TSystem::renameFileOrLevel(fpin.withName(name), fpin, true);
-  else {
-    if (TSystem::doesExistFileOrLevel(fpin.withName(name))) {
-      DVGui::error(
-          QObject::tr("The specified name is already assigned to the %1 file.")
-              .arg(fpin.withName(name).getQString()));
-      return;
-    } else
-      TSystem::copyFileOrLevel(fpin.withName(name), fpin);
+  TFilePath dst = fpin.withName(name);
+  if (popup.doOverwrite()) {
+    TSystem::renameFileOrLevel(dst, fpin, true);
+    return dst;
   }
+  if (TSystem::doesExistFileOrLevel(dst)) {
+    DVGui::error(
+        QObject::tr("The specified name is already assigned to the %1 file.")
+            .arg(dst.getQString()));
+    return TFilePath();
+  }
+  TSystem::copyFileOrLevel(dst, fpin);
+  return TFilePath();
 }
 
 //----------------------------------------------------------
 
-void doRenameAsToonzLevel(const QString &fullpath) {
+TFilePath doRenameAsToonzLevel(const QString &fullpath) {
   QString parentPath, name, format;
 
-  if (!parsePathName(fullpath, parentPath, name, format)) {
-    renameSingleFileOrToonzLevel(fullpath);
-    return;
-  }
+  if (!parsePathName(fullpath, parentPath, name, format))
+    return renameSingleFileOrToonzLevel(fullpath);
 
   QStringList pathIn;
   getLevelFiles(parentPath, name, format, pathIn);
 
-  if (pathIn.empty()) return;
+  if (pathIn.empty()) return TFilePath();
 
   while (name.endsWith('_') || name.endsWith('.') || name.endsWith(' '))
     name.chop(1);
 
   RenameAsToonzPopup popup(name, pathIn.size());
-  if (popup.exec() != QDialog::Accepted) return;
+  if (popup.exec() != QDialog::Accepted) return TFilePath();
 
   name = popup.getName();
 
@@ -1791,29 +1896,32 @@ void doRenameAsToonzLevel(const QString &fullpath) {
             .arg(toQString(levelOut)),
         QObject::tr("Yes"), QObject::tr("No"), 1);
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    if (ret == 2 || ret == 0) return;
+    if (ret == 2 || ret == 0) return TFilePath();
     TSystem::removeFileOrLevel(levelOut);
   }
 
+  const bool overwrite = popup.doOverwrite();
   for (const QString &fname : pathIn) {
     QString padStr = getFrame(fname);
     if (padStr.isEmpty()) continue;
     QString pathOut = parentPath + "/" + name + "." + padStr + "." + format;
 
-    if (popup.doOverwrite()) {
+    if (overwrite) {
       if (!QFile::rename(parentPath + "/" + fname, pathOut)) {
         QString tmp(parentPath + "/" + fname);
         DVGui::error(
             QObject::tr("It is not possible to rename the %1 file.").arg(tmp));
-        return;
+        return TFilePath();
       }
     } else if (!QFile::copy(parentPath + "/" + fname, pathOut)) {
       QString tmp(parentPath + "/" + fname);
       DVGui::error(
           QObject::tr("It is not possible to copy the %1 file.").arg(tmp));
-      return;
+      return TFilePath();
     }
   }
+  if (!overwrite) return TFilePath();
+  return TFilePath(fullpath.toStdWString()).withName(name.toStdWString());
 }
 
 }  // namespace
@@ -1828,7 +1936,9 @@ void FileBrowser::renameAsToonzLevel() {
   fs->getSelectedFiles(filePaths);
   if (filePaths.size() != 1) return;
 
-  doRenameAsToonzLevel(QString::fromStdWString(filePaths[0].getWideString()));
+  TFilePath renamedTo = doRenameAsToonzLevel(
+      QString::fromStdWString(filePaths[0].getWideString()));
+  if (!renamedTo.isEmpty()) replacePersistedPath(filePaths[0], renamedTo);
 
   QApplication::restoreOverrideCursor();
 
@@ -1864,6 +1974,7 @@ void FileBrowser::renameFolder() {
     return;
   }
 
+  replacePersistedPath(srcPath, dstPath);
   QApplication::restoreOverrideCursor();
   refreshFolder(srcPath.getParentDir());
 }
@@ -2050,17 +2161,22 @@ void FileBrowser::onSelectedItems(const std::set<int> &indexes) {
   std::list<std::vector<TFrameId>> frameIDs;
 
   if (indexes.empty()) {
+    m_selectionByFolder.erase(selectionPlace());
     emit filePathsSelected(filePaths, frameIDs);
     return;
   }
 
   size_t itemsSize = m_items.size();
+  std::vector<TFilePath> paths;
+  paths.reserve(indexes.size());
   for (int idx : indexes) {
     if (idx < 0 || static_cast<size_t>(idx) >= itemsSize) continue;
 
     filePaths.insert(m_items[idx].m_path);
     frameIDs.push_back(m_items[idx].m_frameIds);
+    paths.push_back(m_items[idx].m_path);
   }
+  if (!paths.empty()) m_selectionByFolder[selectionPlace()] = std::move(paths);
 
   emit filePathsSelected(filePaths, frameIDs);
 }
@@ -2216,12 +2332,18 @@ void FileBrowser::newFolder() {
 
 void FileBrowser::showEvent(QShowEvent *) {
   activeBrowsers.insert(this);
+
+  storePersistedSelection();
+
   // refresh
   if (getFolder() != TFilePath())
     setFolder(getFolder(), false, true);
   else if (!getDayDateString().empty())
     setHistoryDay(getDayDateString());
   m_folderTreeView->scrollTo(m_folderTreeView->currentIndex());
+
+  // A room change can clear the selection after the refresh above.
+  QTimer::singleShot(0, this, [this]() { restorePersistedSelection(); });
 
   // Refresh SVN
   DvDirVersionControlNode *vcNode = dynamic_cast<DvDirVersionControlNode *>(
@@ -2232,6 +2354,7 @@ void FileBrowser::showEvent(QShowEvent *) {
 //-----------------------------------------------------------------------------
 
 void FileBrowser::hideEvent(QHideEvent *) {
+  storePersistedSelection();
   activeBrowsers.erase(this);
   m_itemViewer->getPanel()->getItemViewPlayDelegate()->resetPlayWidget();
 }

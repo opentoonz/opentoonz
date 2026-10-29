@@ -202,9 +202,10 @@ void DvDirTreeViewDelegate::paint(QPainter *painter,
   if (!node) return;
 
   // Current node and drag'n drop
-  bool isCurrent = (m_treeView->getCurrentNode() == node);
+  bool isCurrent            = (m_treeView->getCurrentNode() == node);
+  const QRect selectionRect = rect.adjusted(-2, 0, 0, 0);
   if (isCurrent) {
-    painter->fillRect(rect.adjusted(-2, 0, 0, 0),
+    painter->fillRect(selectionRect,
                       QBrush(m_treeView->getSelectedItemBackground()));
 
     DvDirModelNode *currentDropNode = m_treeView->getCurrentDropNode();
@@ -281,6 +282,23 @@ void DvDirTreeViewDelegate::paint(QPainter *painter,
     int d = 4;
     painter->drawRect(rect.x() - d, rect.y(), d, d * 3);
     painter->drawRect(rect.x() - d * 2, rect.y() + d, d * 3, d);
+  }
+
+  if (isCurrent && TSelection::getCurrent() == m_treeView) {
+    const QColor fill = m_treeView->getSelectedItemBackground();
+    const int luminance =
+        (fill.red() * 299 + fill.green() * 587 + fill.blue() * 114) / 1000;
+    const int toward = luminance >= 150 ? 0 : 255;
+    const QColor edge((fill.red() + toward) / 2, (fill.green() + toward) / 2,
+                      (fill.blue() + toward) / 2);
+    const int x = selectionRect.left();
+    const int y = selectionRect.top();
+    const int w = selectionRect.width();
+    const int h = selectionRect.height();
+    painter->fillRect(x, y, w, 1, edge);
+    painter->fillRect(x, y + h - 1, w, 1, edge);
+    painter->fillRect(x, y, 1, h, edge);
+    painter->fillRect(x + w - 1, y, 1, h, edge);
   }
 }
 
@@ -620,6 +638,16 @@ TFilePath DvDirTreeView::getCurrentPath() const {
 DvDirModelNode *DvDirTreeView::getCurrentNode() const {
   QModelIndex index = currentIndex();
   return DvDirModel::instance()->getNode(index);
+}
+
+//-----------------------------------------------------------------------------
+
+void DvDirTreeView::mousePressEvent(QMouseEvent *event) {
+  QModelIndex index = indexAt(event->pos());
+  StyledTreeView::mousePressEvent(event);
+  if (m_globalSelectionEnabled && event->button() == Qt::LeftButton &&
+      index.isValid())
+    makeCurrent();
 }
 
 //-----------------------------------------------------------------------------

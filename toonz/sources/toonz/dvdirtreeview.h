@@ -17,6 +17,7 @@
 
 // Qt includes
 #include <QTreeView>
+#include <QMouseEvent>
 #include <QItemDelegate>
 #include <QWidget>
 #include <QFileSystemWatcher>
@@ -225,6 +226,7 @@ protected:
   void resizeEvent(QResizeEvent *event) override;
 
   // QAbstractItemView overrides
+  void mousePressEvent(QMouseEvent *event) override;
   void currentChanged(const QModelIndex &current,
                       const QModelIndex &previous) override;
   bool edit(const QModelIndex &index, EditTrigger trigger,

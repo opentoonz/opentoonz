@@ -5,11 +5,13 @@
 // Tnz6 includes
 #include "convertpopup.h"
 #include "filebrowser.h"
+#include "scenebrowser.h"
 #include "filedata.h"
 #include "iocommand.h"
 #include "menubarcommandids.h"
 #include "flipbook.h"
 #include "filebrowsermodel.h"
+#include "dvdirtreeview.h"
 #include "exportscenepopup.h"
 #include "separatecolorspopup.h"
 #include "tapp.h"
@@ -242,6 +244,12 @@ void FileSelection::getSelectedFiles(std::vector<TFilePath> &files) {
 }
 
 //------------------------------------------------------------------------
+
+bool FileSelection::keepItemsWhenFocusMovesTo(TSelection *next) const {
+  return dynamic_cast<DvDirTreeView *>(next) != nullptr;
+}
+
+//-----------------------------------------------------------------------------
 
 void FileSelection::enableCommands() {
   DvItemSelection::enableCommands();
@@ -683,6 +691,10 @@ void FileSelection::exportScene(TFilePath scenePath) {
 void FileSelection::selectAll() {
   DvItemSelection::selectAll();
   FileBrowser::updateItemViewerPanel();
+  if (FileBrowser *browser = dynamic_cast<FileBrowser *>(getModel()))
+    browser->storePersistedSelection();
+  else if (SceneBrowser *browser = dynamic_cast<SceneBrowser *>(getModel()))
+    browser->storePersistedSelection();
 }
 
 //------------------------------------------------------------------------
