@@ -997,6 +997,35 @@ void DvItemViewerPanel::setMissingTextColor(const QColor &color) {
 
 //-----------------------------------------------
 
+QColor commandFocusEdge(const QColor &selectionColor) {
+  const int luminance =
+      (selectionColor.red() * 299 + selectionColor.green() * 587 +
+       selectionColor.blue() * 114) /
+      1000;
+  const int toward = luminance >= 150 ? 0 : 255;
+  return QColor((selectionColor.red() + toward) / 2,
+                (selectionColor.green() + toward) / 2,
+                (selectionColor.blue() + toward) / 2);
+}
+
+void drawCommandFocusFrame(QPainter &p, const QRect &selectionRect,
+                           const QColor &selectionColor,
+                           TSelection *selection) {
+  if (!selectionRect.isValid() || TSelection::getCurrent() != selection) return;
+  const int w = selectionRect.width();
+  const int h = selectionRect.height();
+  if (w < 2 || h < 2) return;
+  const QColor edge = commandFocusEdge(selectionColor);
+  const int x       = selectionRect.left();
+  const int y       = selectionRect.top();
+  p.fillRect(x, y, w, 1, edge);
+  p.fillRect(x, y + h - 1, w, 1, edge);
+  p.fillRect(x, y, 1, h, edge);
+  p.fillRect(x + w - 1, y, 1, h, edge);
+}
+
+//-----------------------------------------------------------------------------
+
 void DvItemViewerPanel::paintThumbnailItem(QPainter &p, int index) {
   // Get Version Control Status
   int status = getModel()
@@ -1015,9 +1044,13 @@ void DvItemViewerPanel::paintThumbnailItem(QPainter &p, int index) {
 
   // Draw Selection
   if (isSelected) {
+    const QRect iconSel   = iconRect.adjusted(-2, -2, 2, 2);
+    const QRect textSel   = textRect.adjusted(-2, 3, 2, 0);
+    const QColor selColor = getSelectedItemBackground();
     p.setPen(Qt::NoPen);
-    p.fillRect(iconRect.adjusted(-2, -2, 2, 2), getSelectedItemBackground());
-    p.fillRect(textRect.adjusted(-2, 3, 2, 0), getSelectedItemBackground());
+    p.fillRect(iconSel, selColor);
+    p.fillRect(textSel, selColor);
+    drawCommandFocusFrame(p, iconSel.united(textSel), selColor, m_selection);
   }
 
   // Draw Pixmap
@@ -1100,7 +1133,11 @@ void DvItemViewerPanel::paintListItem(QPainter &p, int index) {
   QString name =
       getModel()->getItemData(index, DvItemListModel::Name).toString();
   bool isSelected = m_selection->isSelected(index);
-  if (isSelected) p.fillRect(rect, QColor(171, 206, 255));
+  if (isSelected) {
+    const QColor selColor(171, 206, 255);
+    p.fillRect(rect, selColor);
+    drawCommandFocusFrame(p, rect, selColor, m_selection);
+  }
   p.drawPixmap(rect.topLeft(), icon);
   rect.adjust(30, 0, 0, 0);
   p.setPen(Qt::black);
@@ -1115,9 +1152,11 @@ void DvItemViewerPanel::paintTableItem(QPainter &p, int index) {
   if (!visibleRegion().intersects(rect)) return;
   if (!getModel()) return;
   bool isSelected = m_selection->isSelected(index);
-  if (isSelected)
-    p.fillRect(rect, getSelectedItemBackground());
-  else if (index % 2 == 0)
+  if (isSelected) {
+    const QColor selColor = getSelectedItemBackground();
+    p.fillRect(rect, selColor);
+    drawCommandFocusFrame(p, rect, selColor, m_selection);
+  } else if (index % 2 == 0)
     p.fillRect(rect, getAlternateBackground());  // 160,160,160
 
   DvItemListModel::Status status =
@@ -1190,9 +1229,9 @@ void DvItemViewerPanel::mousePressEvent(QMouseEvent *event) {
       m_selection->selectNone();
       if (!m_isPlayDelegateDisable) m_itemViewPlayDelegate->resetPlayWidget();
       if (0 <= index && index < getItemCount()) m_selection->select(index);
-      if (m_globalSelectionEnabled) m_selection->makeCurrent();
       update();
     }
+    if (m_globalSelectionEnabled) m_selection->makeCurrent();
     return;
   } else if (event->button() == Qt::MiddleButton) {
     m_lastMousePos = event->globalPos();
@@ -1248,7 +1287,12 @@ void DvItemViewerPanel::mousePressEvent(QMouseEvent *event) {
       m_selection->select(index);
     }
   }
-  if (m_globalSelectionEnabled) m_selection->makeCurrent();
+  if (m_globalSelectionEnabled) {
+    if (m_selection->isEmpty())
+      m_selection->makeNotCurrent();
+    else
+      m_selection->makeCurrent();
+  }
   // if (m_viewer ) m_viewer->notifyClick(index);
   m_startDragPosition = event->pos();
   update();

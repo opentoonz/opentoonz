@@ -238,6 +238,7 @@ private:
   // Folder history
   QList<QModelIndex> m_indexHistoryList;
   int m_currentPosition;
+  bool m_giveCommandToRestoredFiles = false;
   int m_currentScroll;
 
   std::vector<Item> m_items;
@@ -254,6 +255,7 @@ private:
   void refreshCurrentFolderItems();
   std::wstring selectionPlace() const;
   void restorePersistedSelection();
+  void replacePersistedPath(const TFilePath &from, const TFilePath &to);
 
   DvItemListModel::Status getItemVersionControlStatus(
       const SceneBrowser::Item &item);

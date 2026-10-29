@@ -17,6 +17,7 @@
 
 // TnzQt includes
 #include "toonzqt/dvdialog.h"
+#include "toonzqt/tselectionhandle.h"
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/gutil.h"
@@ -204,6 +205,11 @@ SceneBrowser::SceneBrowser(QWidget *parent, Qt::WindowFlags flags,
           &SceneBrowser::onDoubleClickedItem);
   connect(m_itemViewer, &DvItemViewer::selectedItems, this,
           &SceneBrowser::onSelectedItems);
+  connect(TSelectionHandle::getCurrent(), &TSelectionHandle::selectionSwitched,
+          this, [this](TSelection *, TSelection *) {
+            m_itemViewer->getPanel()->update();
+            m_folderTreeView->update();
+          });
   connect(buttonBar, &SceneBrowserButtonBar::newScene, this,
           &SceneBrowser::newScene);
   connect(&m_frameCountReader, &FrameCountReader::calculatedFrameCount, this,
@@ -314,7 +320,9 @@ void SceneBrowser::onBackButtonPushed() {
   if (m_currentPosition == 0) return;
   m_currentPosition--;
   QModelIndex currentIndex = m_indexHistoryList[m_currentPosition];
+  m_giveCommandToRestoredFiles = true;
   m_folderTreeView->setCurrentIndex(currentIndex);
+  m_giveCommandToRestoredFiles = false;
   m_folderTreeView->collapseAll();
   while (currentIndex.isValid()) {
     currentIndex = currentIndex.parent();
@@ -331,7 +339,9 @@ void SceneBrowser::onFwdButtonPushed() {
   if (m_currentPosition >= m_indexHistoryList.size() - 1) return;
   m_currentPosition++;
   QModelIndex currentIndex = m_indexHistoryList[m_currentPosition];
+  m_giveCommandToRestoredFiles = true;
   m_folderTreeView->setCurrentIndex(currentIndex);
+  m_giveCommandToRestoredFiles = false;
   m_folderTreeView->collapseAll();
   while (currentIndex.isValid()) {
     currentIndex = currentIndex.parent();
@@ -954,8 +964,10 @@ void SceneBrowser::restorePersistedSelection() {
 
   if (indices.empty())
     fs->selectNone();
-  else
+  else {
     fs->select(&indices.front(), (int)indices.size());
+    if (m_giveCommandToRestoredFiles) fs->makeCurrent();
+  }
   m_itemViewer->getPanel()->update();
 
   // Report the restored files once the folder change has finished.
@@ -967,6 +979,24 @@ void SceneBrowser::restorePersistedSelection() {
     if (!selection) return;
     onSelectedItems(selection->getSelectedIndices());
   });
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneBrowser::replacePersistedPath(const TFilePath &from,
+                                        const TFilePath &to) {
+  if (from == to) return;
+  for (SceneBrowser *browser : activePreproductionBoards) {
+    for (Item &item : browser->m_items) {
+      if (item.m_path != from) continue;
+      item.m_path = to;
+      item.m_name = QString::fromStdWString(to.getLevelNameW());
+    }
+    for (auto &entry : browser->m_selectionByFolder) {
+      for (TFilePath &fp : entry.second)
+        if (fp == from) fp = to;
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -991,8 +1021,10 @@ void SceneBrowser::renameItem(int index, const QString &newName) {
         m_items[paletteIndex].m_name =
             QString::fromStdWString(palettePath.getLevelNameW());
         m_items[paletteIndex].m_path = palettePath;
+        replacePersistedPath(fp.withNoFrame().withType(type), palettePath);
       }
     }
+    replacePersistedPath(fp, newFp);
     m_itemViewer->update();
 
     if (fp.getType() == "tnz") {
@@ -1631,12 +1663,12 @@ QString getFrame(const QString &filename) {
 
 //-----------------------------------------------------------
 
-void renameSingleFileOrToonzLevel(const QString &fullpath) {
+TFilePath renameSingleFileOrToonzLevel(const QString &fullpath) {
   TFilePath fpin(fullpath.toStdString());
 
   RenameAsToonzPopup popup(
       QString::fromStdWString(fpin.withoutParentDir().getWideString()));
-  if (popup.exec() != QDialog::Accepted) return;
+  if (popup.exec() != QDialog::Accepted) return TFilePath();
 
   std::string name = popup.getName().toStdString();
 
@@ -1644,36 +1676,37 @@ void renameSingleFileOrToonzLevel(const QString &fullpath) {
     DVGui::error(QString(
         QObject::tr("The specified name is already assigned to the %1 file.")
             .arg(fullpath)));
-    return;
+    return TFilePath();
   }
 
-  if (popup.doOverwrite())
-    TSystem::renameFileOrLevel(fpin.withName(name), fpin, true);
-  else
-    TSystem::copyFileOrLevel(fpin.withName(name), fpin);
+  TFilePath dst = fpin.withName(name);
+  if (popup.doOverwrite()) {
+    TSystem::renameFileOrLevel(dst, fpin, true);
+    return dst;
+  }
+  TSystem::copyFileOrLevel(dst, fpin);
+  return TFilePath();
 }
 
 //----------------------------------------------------------
 
-void doRenameAsToonzLevel(const QString &fullpath) {
+TFilePath doRenameAsToonzLevel(const QString &fullpath) {
   QString parentPath, name, format;
 
-  if (!parsePathName(fullpath, parentPath, name, format)) {
-    renameSingleFileOrToonzLevel(fullpath);
-    return;
-  }
+  if (!parsePathName(fullpath, parentPath, name, format))
+    return renameSingleFileOrToonzLevel(fullpath);
 
   QStringList pathIn;
 
   getLevelFiles(parentPath, name, format, pathIn);
 
-  if (pathIn.empty()) return;
+  if (pathIn.empty()) return TFilePath();
 
   while (name.endsWith('_') || name.endsWith('.') || name.endsWith(' '))
     name.chop(1);
 
   RenameAsToonzPopup popup(name, pathIn.size());
-  if (popup.exec() != QDialog::Accepted) return;
+  if (popup.exec() != QDialog::Accepted) return TFilePath();
 
   name = popup.getName();
 
@@ -1687,31 +1720,34 @@ void doRenameAsToonzLevel(const QString &fullpath) {
             .arg(toQString(levelOut)),
         QObject::tr("Yes"), QObject::tr("No"), 1);
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    if (ret == 2 || ret == 0) return;
+    if (ret == 2 || ret == 0) return TFilePath();
     TSystem::removeFileOrLevel(levelOut);
   }
 
+  const bool overwrite = popup.doOverwrite();
   int i;
   for (i = 0; i < pathIn.size(); i++) {
     QString padStr = getFrame(pathIn[i]);
     if (padStr == "") continue;
     QString pathOut = parentPath + "/" + name + "." + padStr + "." + format;
 
-    if (popup.doOverwrite()) {
+    if (overwrite) {
       if (!QFile::rename(parentPath + "/" + pathIn[i], pathOut)) {
         QString tmp(parentPath + "/" + pathIn[i]);
         DVGui::error(QString(
             QObject::tr("It is not possible to rename the %1 file.").arg(tmp)));
-        return;
+        return TFilePath();
       }
     } else if (!QFile::copy(parentPath + "/" + pathIn[i], pathOut)) {
       QString tmp(parentPath + "/" + pathIn[i]);
       DVGui::error(QString(
           QObject::tr("It is not possible to copy the %1 file.").arg(tmp)));
 
-      return;
+      return TFilePath();
     }
   }
+  if (!overwrite) return TFilePath();
+  return TFilePath(fullpath.toStdWString()).withName(name.toStdWString());
 }
 
 }  // namespace
@@ -1726,7 +1762,9 @@ void SceneBrowser::renameAsToonzLevel() {
   fs->getSelectedFiles(filePaths);
   if (filePaths.size() != 1) return;
 
-  doRenameAsToonzLevel(QString::fromStdWString(filePaths[0].getWideString()));
+  TFilePath renamedTo = doRenameAsToonzLevel(
+      QString::fromStdWString(filePaths[0].getWideString()));
+  if (!renamedTo.isEmpty()) replacePersistedPath(filePaths[0], renamedTo);
 
   QApplication::restoreOverrideCursor();
 

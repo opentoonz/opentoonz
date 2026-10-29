@@ -11,6 +11,7 @@
 #include "menubarcommandids.h"
 #include "flipbook.h"
 #include "filebrowsermodel.h"
+#include "dvdirtreeview.h"
 #include "exportscenepopup.h"
 #include "separatecolorspopup.h"
 #include "tapp.h"
@@ -243,6 +244,12 @@ void FileSelection::getSelectedFiles(std::vector<TFilePath> &files) {
 }
 
 //------------------------------------------------------------------------
+
+bool FileSelection::keepItemsWhenFocusMovesTo(TSelection *next) const {
+  return dynamic_cast<DvDirTreeView *>(next) != nullptr;
+}
+
+//-----------------------------------------------------------------------------
 
 void FileSelection::enableCommands() {
   DvItemSelection::enableCommands();
