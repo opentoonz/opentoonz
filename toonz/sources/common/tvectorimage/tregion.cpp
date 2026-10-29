@@ -1202,7 +1202,8 @@ TRectD TRegion::getBBox() const { return m_imp->getBBox(); }
 //-----------------------------------------------------------------------------
 
 void TRegion::addEdge(TEdge *e, bool minimizeEdges) {
-  if (minimizeEdges &&
+  if (!e || !e->m_s) return;
+  if (minimizeEdges && e->m_s->getChunkCount() > 0 &&
       e->m_s->getMaxThickness() > 0.0 &&  // outline strokes ignore this
       !m_imp->m_edge.empty() && m_imp->m_edge.back()->m_index == e->m_index &&
       areAlmostEqual(m_imp->m_edge.back()->m_w1, e->m_w0, 1e-5))
