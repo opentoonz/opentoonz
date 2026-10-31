@@ -1,0 +1,82 @@
+name: clang-format Check
+
+on:
+  pull_request:
+    paths:
+      - "toonz/sources/**/*.c"
+      - "toonz/sources/**/*.cc"
+      - "toonz/sources/**/*.cpp"
+      - "toonz/sources/**/*.cxx"
+      - "toonz/sources/**/*.h"
+      - "toonz/sources/**/*.hh"
+      - "toonz/sources/**/*.hpp"
+      - "toonz/sources/**/*.hxx"
+      - "toonz/sources/.clang-format"
+      - ".github/workflows/workflow_clang_format.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  formatting-check:
+    name: Formatting Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Install clang-format
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-format-14
+
+      - name: Check formatting of changed C/C++ lines
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          files=()
+          while IFS= read -r -d '' file; do
+            case "$file" in
+              toonz/sources/*.c|toonz/sources/*.cc|toonz/sources/*.cpp|toonz/sources/*.cxx|\
+              toonz/sources/*.h|toonz/sources/*.hh|toonz/sources/*.hpp|toonz/sources/*.hxx)
+                files+=("$file")
+                ;;
+            esac
+          done < <(
+            git diff --name-only --diff-filter=ACMR -z \
+              "$BASE_SHA" "$HEAD_SHA"
+          )
+
+          if (( ${#files[@]} == 0 )); then
+            echo "No changed C/C++ lines to check."
+            exit 0
+          fi
+
+          for file in "${files[@]}"; do
+            ranges=()
+            while read -r start count; do
+              count=${count:-1}
+              if (( count > 0 )); then
+                end=$((start + count - 1))
+                ranges+=(--lines="$start:$end")
+              fi
+            done < <(
+              git diff --unified=0 --no-color "$BASE_SHA" "$HEAD_SHA" -- "$file" |
+                sed -nE 's/^@@ -[0-9]+(,[0-9]+)? \+([0-9]+)(,([0-9]+))? @@.*/\2 \4/p'
+            )
+
+            if (( ${#ranges[@]} == 0 )); then
+              continue
+            fi
+
+            printf 'Checking %s (%s)\n' "$file" "${ranges[*]}"
+            clang-format-14 --dry-run --Werror -style=file \
+              "${ranges[@]}" "$file"
+          done

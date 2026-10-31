@@ -10,6 +10,7 @@
 #include "tsystem.h"
 #include "tvectorgl.h"
 #include "tcolorstyles.h"
+#include "tsimplecolorstyles.h"
 
 // TnzCore includes
 #include "tfiletype.h"
@@ -59,6 +60,7 @@ QImage rasterToQImage(const TRasterP &ras, bool premultiplied = true,
                       bool mirrored = true) {
   if (TRaster32P ras32 = ras) {
     QImage image(ras->getRawData(), ras->getLx(), ras->getLy(),
+                 ras->getWrap() * sizeof(TPixel32),
                  premultiplied ? QImage::Format_ARGB32_Premultiplied
                                : QImage::Format_ARGB32);
     if (mirrored) return image.mirrored();
@@ -243,6 +245,7 @@ class CustomStyleManager::StyleLoaderTask final : public TThread::Runnable {
   TFilePath m_fp;
   ChipData m_data;
   std::shared_ptr<QOffscreenSurface> m_offScreenSurface;
+  int m_loadGeneration;
 
 public:
   StyleLoaderTask(CustomStyleManager *manager, const TFilePath &fp);
@@ -256,7 +259,9 @@ public:
 
 CustomStyleManager::StyleLoaderTask::StyleLoaderTask(
     CustomStyleManager *manager, const TFilePath &fp)
-    : m_manager(manager), m_fp(fp) {
+    : m_manager(manager)
+    , m_fp(fp)
+    , m_loadGeneration(manager->m_loadGeneration) {
   connect(this, SIGNAL(finished(TThread::RunnableP)), this,
           SLOT(onFinished(TThread::RunnableP)));
 
@@ -278,7 +283,8 @@ void CustomStyleManager::StyleLoaderTask::run() {
 void CustomStyleManager::StyleLoaderTask::onFinished(
     TThread::RunnableP sender) {
   // On the main thread...
-  if (!m_data.image.isNull())  // Everything went ok
+  if (m_loadGeneration == m_manager->m_loadGeneration &&
+      !m_data.image.isNull())  // Everything went ok
   {
     m_manager->m_chips.append(m_data);
     emit m_manager->patternAdded();
@@ -296,8 +302,30 @@ CustomStyleManager::CustomStyleManager(std::string rasterIdName,
     : BaseStyleManager(stylesFolder, filters, chipSize)
     , m_started(false)
     , m_rasterIdName(rasterIdName)
-    , m_vectorIdName(vectorIdName) {
+    , m_vectorIdName(vectorIdName)
+    , m_loadGeneration(0) {
   m_executor.setMaxActiveTasks(1);
+  FolderListenerManager::instance()->addListener(this);
+}
+
+//-----------------------------------------------------------------------------
+
+CustomStyleManager::~CustomStyleManager() {
+  FolderListenerManager::instance()->removeListener(this);
+  m_executor.cancelAll();
+}
+
+//-----------------------------------------------------------------------------
+
+void CustomStyleManager::onFolderChanged(const TFilePath &path) {
+  if (path != getRootPath() + m_stylesFolder) return;
+
+  ++m_loadGeneration;
+  m_executor.cancelAll();
+  m_chips.clear();
+  m_indexes.clear();
+  emit patternAdded();
+  loadItems();
 }
 
 //-----------------------------------------------------------------------------
@@ -311,7 +339,9 @@ void CustomStyleManager::loadItems() {
 
   QDir patternDir(
       QString::fromStdWString((rootFP + m_stylesFolder).getWideString()));
-  patternDir.setNameFilters(m_filters.split(' '));
+  // Apply QDir's case-insensitive wildcard matching below. TSystem's Windows
+  // directory reader otherwise treats lowercase name filters case-sensitively.
+  patternDir.setFilter(QDir::Files);
 
   // Read the said folder
   TFilePathSet fps;
@@ -319,6 +349,15 @@ void CustomStyleManager::loadItems() {
     TSystem::readDirectory(fps, patternDir);
   } catch (...) {
     return;
+  }
+
+  const QStringList filters = m_filters.split(' ', Qt::SkipEmptyParts);
+  for (auto it = fps.begin(); it != fps.end();) {
+    if (!filters.isEmpty() &&
+        !QDir::match(filters, QString::fromStdWString(it->getLevelNameW())))
+      it = fps.erase(it);
+    else
+      ++it;
   }
 
   // Delete patterns no longer in the folder
@@ -349,6 +388,9 @@ QImage CustomStyleManager::makeIcon(
     const TFilePath &path, const QSize &qChipSize,
     std::shared_ptr<QOffscreenSurface> offsurf) {
   try {
+    if (path.getType() == "tlv" &&
+        !TFileStatus(path.withNoFrame().withType("tpl")).doesExist())
+      return QImage();
     // Fetch the level
     TLevelReaderP lr(path);
     TLevelP level = lr->loadInfo();
@@ -363,7 +405,8 @@ QImage CustomStyleManager::makeIcon(
     TDimension chipSize(qChipSize.width(), qChipSize.height());
 
     TVectorImageP vimg = img;
-    TRasterImageP rimg = img;
+    TRaster32P source  = TrailStyles::rasterSource(
+         img, level->getPalette(), frameIt->first.getNumber() - 1);
 
     TRaster32P ras;
 
@@ -431,14 +474,14 @@ QImage CustomStyleManager::makeIcon(
       fb.release();
       glContext->deleteLater();
 #endif
-    } else if (rimg) {
-      TDimension size = rimg->getRaster()->getSize();
+    } else if (source) {
+      TDimension size = source->getSize();
       if (size == chipSize)
-        ras = rimg->getRaster()->clone();  // Yep, this may be necessary
+        ras = source->clone();  // The QImage must outlive the decoded frame.
       else {
         TRaster32P rout(chipSize);
 
-        TRop::resample(rout, rimg->getRaster(),
+        TRop::resample(rout, source,
                        TScale((double)chipSize.lx / size.lx,
                               (double)chipSize.ly / size.ly));
 
@@ -451,7 +494,7 @@ QImage CustomStyleManager::makeIcon(
       image = rasterToQImage(ras);
 #endif
     } else
-      assert(!"unsupported type for custom styles!");
+      return QImage();  // Unsupported or invalid source: no debug assertion.
 
 #ifdef LINUX
     // image = QImage(chipSize.lx, chipSize.ly, QImage::Format_RGB32);

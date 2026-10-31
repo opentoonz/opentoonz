@@ -2071,9 +2071,11 @@ void FileBrowser::onClickedItem(int index) {
   if (0 <= index && index < (int)m_items.size()) {
     TFilePath fp = m_items[index].m_path;
     if (m_items[index].m_isFolder) {
-      setFolder(fp, true);
-      QModelIndex idx = m_folderTreeView->currentIndex();
-      if (idx.isValid()) m_folderTreeView->scrollTo(idx);
+      if (!Preferences::instance()->isFileBrowserFolderDoubleClick()) {
+        setFolder(fp, true);
+        QModelIndex idx = m_folderTreeView->currentIndex();
+        if (idx.isValid()) m_folderTreeView->scrollTo(idx);
+      }
     } else
       emit filePathClicked(fp);
   }

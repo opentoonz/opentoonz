@@ -30,6 +30,11 @@ Please download and install OpenToonz from the latest installer at <https://open
 
 Older versions and unstable nightly builds are also available at <https://github.com/opentoonz/opentoonz/releases>.
 
+## Development
+
+- [Development checklist (draft)](./doc/development_checklist.md)
+- [AI-assisted development checklist (draft)](./doc/ai_assisted_development_checklist.md)
+
 ## How to Build Locally
 
 - [Windows](./doc/how_to_build_win.md)
@@ -63,3 +68,9 @@ Can't develop but still want to help? Help us test individual Pull Requests befo
 ### Special Thanks
 
 This open-source program is developed from Toonz, a software originally created by Digital Video, S.p.A., Rome, Italy
+
+## Contributing translations
+
+To share updated translation files or review, merge, and refresh catalogs, see
+[Contributing and maintaining translations](toonz/sources/translations/README.md).
+Qt Linguist editing and existing manual translation tools remain supported.

@@ -467,10 +467,8 @@ void CleanupSettingsModel::onSceneSwitched() {
 
   // Make sure that the current cleanup palette is set to currentParams' palette
   // This might refresh the StyleEditor
-  TApp::instance()
-      ->getPaletteController()
-      ->getCurrentCleanupPalette()
-      ->setPalette(params->m_cleanupPalette.getPointer());
+  TApp::instance()->getPaletteController()->assignCleanupPalette(
+      params->m_cleanupPalette.getPointer());
 
   m_clnPath = TFilePath();  // This Path won't be stored in scene or project
   m_backupParams.assign(params, false);

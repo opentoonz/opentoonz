@@ -5,6 +5,8 @@
 // Tnz6 includes
 #include "tapp.h"
 #include "mainwindow.h"
+#include "menubarcommandids.h"
+#include "toonzqt/menubarcommand.h"
 #include "tenv.h"
 #include "saveloadqsettings.h"
 #include "custompanelmanager.h"
@@ -13,6 +15,7 @@
 
 // TnzLib includes
 #include "toonz/preferences.h"
+#include "toonz/preferencesitemids.h"
 #include "toonz/toonzfolders.h"
 #include "toonz/tscenehandle.h"
 
@@ -26,6 +29,7 @@
 #include <QSettings>
 #include <QMap>
 #include <QMenu>
+#include <QActionGroup>
 #include <QApplication>
 #include <qdrawutil.h>
 #include <assert.h>
@@ -54,7 +58,8 @@ TPanel::TPanel(QWidget *parent, Qt::WindowFlags flags,
     , m_multipleInstancesAllowed(true)
     , m_isRoomBound(false)
     , m_boundRoomName("")
-    , m_roomBindButton(nullptr) {
+    , m_roomBindButton(nullptr)
+    , m_ignorePanelShortcutToggle(false) {
   m_panelTitleBar = new TPanelTitleBar(this, orientation);
   setTitleBarWidget(m_panelTitleBar);
   connect(m_panelTitleBar, &TPanelTitleBar::doubleClick, this,
@@ -62,6 +67,13 @@ TPanel::TPanel(QWidget *parent, Qt::WindowFlags flags,
   connect(m_panelTitleBar, &TPanelTitleBar::closeButtonPressed, this,
           &TPanel::onCloseButtonPressed);
   setOrientation(orientation);
+
+  m_panelTitleBar->setContextMenuPolicy(Qt::CustomContextMenu);
+  connect(m_panelTitleBar, &QWidget::customContextMenuRequested, this,
+          [this](const QPoint &pos) {
+            onCustomContextMenuRequested(
+                mapFromGlobal(m_panelTitleBar->mapToGlobal(pos)));
+          });
 
   // Enable context menu for room binding
   setContextMenuPolicy(Qt::CustomContextMenu);
@@ -119,8 +131,26 @@ void TPanel::onCloseButtonPressed() {
 
 //-----------------------------------------------------------------------------
 
+void TPanel::dismissFloatingPanel() {
+  hide();
+  if (parentLayout()) parentLayout()->removeWidget(this);
+  emit closeButtonPressed();
+}
+
+//-----------------------------------------------------------------------------
+
 void TPanel::onCustomContextMenuRequested(const QPoint &pos) {
   QMenu menu(this);
+
+  if (isFloating() &&
+      Preferences::instance()->getBoolValue(togglePanelWithShortcut)) {
+    QAction *ignoreAction = menu.addAction(tr("Ignore Panel Shortcut Toggle"));
+    ignoreAction->setCheckable(true);
+    ignoreAction->setChecked(m_ignorePanelShortcutToggle);
+    connect(ignoreAction, &QAction::triggered,
+            [this](bool checked) { setIgnorePanelShortcutToggle(checked); });
+    menu.addSeparator();
+  }
 
   // Add "Bind to Current Room" option
   QAction *bindAction = menu.addAction(tr("Bind to Current Room"));
@@ -284,6 +314,12 @@ void TPanel::zoomContentsAndFitGeometry(bool forward) {
 void TPanel::setRoomBound(bool bound) {
   m_isRoomBound = bound;
   if (m_roomBindButton) m_roomBindButton->setPressed(bound);
+}
+
+//-----------------------------------------------------------------------------
+
+void TPanel::setIgnorePanelShortcutToggle(bool ignore) {
+  m_ignorePanelShortcutToggle = ignore;
 }
 
 //-----------------------------------------------------------------------------
@@ -646,18 +682,31 @@ void TPanelTitleBarButtonForSafeArea::mousePressEvent(QMouseEvent *e) {
 
 void TPanelTitleBarButtonForSafeArea::contextMenuEvent(QContextMenuEvent *e) {
   QMenu menu(this);
+  menu.addAction(CommandManager::instance()->getAction(MI_CenterCutGuide));
+  menu.addSeparator();
+  menu.addAction(tr("Standard Safe Areas"))->setEnabled(false);
+
+  QAction *safeArea = CommandManager::instance()->getAction(MI_SafeArea);
+  QActionGroup templates(&menu);
+  QAction *none = menu.addAction(tr("None"));
+  none->setCheckable(true);
+  none->setChecked(!safeArea->isChecked());
+  templates.addAction(none);
+  connect(none, &QAction::triggered, this, [safeArea]() {
+    if (safeArea->isChecked()) safeArea->trigger();
+  });
 
   QList<QString> safeAreaNameList;
   getSafeAreaNameList(safeAreaNameList);
   for (const QString &name : safeAreaNameList) {
     QAction *action = menu.addAction(name);
     action->setData(name);
+    action->setCheckable(true);
+    action->setChecked(safeArea->isChecked() &&
+                       name == QString::fromStdString(EnvSafeAreaName));
+    templates.addAction(action);
     connect(action, &QAction::triggered, this,
             &TPanelTitleBarButtonForSafeArea::onSetSafeArea);
-    if (name == QString::fromStdString(EnvSafeAreaName)) {
-      action->setCheckable(true);
-      action->setChecked(true);
-    }
   }
 
   menu.exec(e->globalPos());
@@ -668,9 +717,12 @@ void TPanelTitleBarButtonForSafeArea::contextMenuEvent(QContextMenuEvent *e) {
 void TPanelTitleBarButtonForSafeArea::onSetSafeArea() {
   const QString safeAreaName =
       qobject_cast<QAction *>(sender())->data().toString();
-  // change safearea if the different one is selected
-  if (QString::fromStdString(EnvSafeAreaName) != safeAreaName) {
-    EnvSafeAreaName = safeAreaName.toStdString();
+  const bool changed = QString::fromStdString(EnvSafeAreaName) != safeAreaName;
+  if (changed) EnvSafeAreaName = safeAreaName.toStdString();
+  QAction *safeArea = CommandManager::instance()->getAction(MI_SafeArea);
+  if (!safeArea->isChecked())
+    safeArea->trigger();
+  else if (changed) {
     // emit sceneChanged without setting dirty flag
     TApp::instance()->getCurrentScene()->notifySceneChanged(false);
   }
@@ -746,6 +798,16 @@ void TPanelTitleBarButtonSet::add(TPanelTitleBarButton *button) {
 void TPanelTitleBarButtonSet::select(TPanelTitleBarButton *button) {
   for (auto *btn : m_buttons) btn->setPressed(button == btn);
   emit selected(button->getId());
+}
+
+bool TPanelTitleBarButtonSet::select(int id) {
+  for (auto *btn : m_buttons) {
+    if (btn->getId() == id) {
+      select(btn);
+      return true;
+    }
+  }
+  return false;
 }
 
 //=============================================================================

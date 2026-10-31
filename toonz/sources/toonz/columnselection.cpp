@@ -54,6 +54,7 @@ void TColumnSelection::enableCommands() {
   enableCommand(this, MI_ExplodeChild, &TColumnSelection::explodeChild);
   enableCommand(this, MI_Resequence, &TColumnSelection::resequence);
   enableCommand(this, MI_CloneChild, &TColumnSelection::cloneChild);
+  enableCommand(this, MI_FullCloneChild, &TColumnSelection::fullCloneChild);
   enableCommand(this, MI_FoldColumns, &TColumnSelection::hideColumns);
   enableCommand(this, MI_Reframe1, &TColumnSelection::reframe1Cells);
   enableCommand(this, MI_Reframe2, &TColumnSelection::reframe2Cells);
@@ -302,6 +303,12 @@ void TColumnSelection::resequence() {
 
 void TColumnSelection::cloneChild() {
   if (m_indices.size() == 1) ColumnCmd::cloneChild(*m_indices.begin());
+}
+
+//-----------------------------------------------------------------------------
+
+void TColumnSelection::fullCloneChild() {
+  if (m_indices.size() == 1) ColumnCmd::cloneChild(*m_indices.begin(), true);
 }
 
 //-----------------------------------------------------------------------------

@@ -121,12 +121,14 @@ class FillTool final : public QObject, public TTool {
   // disabled
   TBoolProperty m_autopaintLines;
   TBoolProperty m_extendFill;
+  TBoolProperty m_fillOnlySavebox;
 
   SlFidsPairs m_slFidsPairs;
   RefImgTable m_refImgTable;  // imageId
 
   bool m_isAltPressed = false;
   bool m_restoreEmptyOnly;
+  bool m_saveboxSignalConnected = false;
 
 public:
   FillTool(int targetType);

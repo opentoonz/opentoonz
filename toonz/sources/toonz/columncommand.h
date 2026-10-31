@@ -33,7 +33,7 @@ void copyColumn(int dstIndex, int srcIndex);
 
 void resequence(int index);
 bool canResequence(int index);
-void cloneChild(int index);
+void cloneChild(int index, bool fullClone = false);
 void clearCells(int index);
 
 //! Adds an undo object for converting layer to vector.

@@ -1,5 +1,16 @@
 <RCC>
 	<qresource prefix="/">
+    <file>icons/dark/actions/16/select_align_left.svg</file>
+    <file>icons/dark/actions/16/select_align_right.svg</file>
+    <file>icons/dark/actions/16/select_align_top.svg</file>
+    <file>icons/dark/actions/16/select_align_bottom.svg</file>
+    <file>icons/dark/actions/16/select_align_center_h.svg</file>
+    <file>icons/dark/actions/16/select_align_center_v.svg</file>
+    <file>icons/dark/actions/16/select_distribute_h.svg</file>
+    <file>icons/dark/actions/16/select_distribute_v.svg</file>
+    <file>icons/dark/actions/16/set_linear_cp.svg</file>
+    <file>icons/dark/actions/16/set_nonlinear_cp.svg</file>
+
 		<!-- Note: paths with /colored/ bypass iconEngine's recolor/opacity handling, use for full-color icons -->
 
 		<!-- Tools -->
@@ -344,11 +355,13 @@
 		<file>icons/dark/actions/16x16/fold_column.svg</file>
 		<file>icons/dark/actions/16x16/sub_edit_in_place.svg</file>
 		<file>icons/dark/actions/16x16/sub_clone.svg</file>
+		<file>icons/dark/actions/16x16/sub_full_clone.svg</file>
 		<file>icons/dark/actions/16x16/duplicate.svg</file>
 		<file>icons/dark/actions/20x20/onionskin_toggle.svg</file>
 		<file>icons/dark/actions/16x16/insert_frame.svg</file>
 		<file>icons/dark/actions/16x16/remove_frame.svg</file>
 		<file>icons/dark/actions/16x16/add_cell.svg</file>
+		<file>icons/dark/actions/16x16/insert_blank_cell.svg</file>
 		<file>icons/dark/actions/16x16/add_cells.svg</file>
 		<file>icons/dark/actions/16x16/remove_cell.svg</file>
 		<file>icons/dark/actions/16x16/remove_cells.svg</file>
@@ -483,6 +496,7 @@
 
 		<!-- Palette -->
 		<file>icons/dark/actions/16x16/newstyle.svg</file>
+		<file>icons/dark/actions/16x16/plaincolor.svg</file>
 		<file>icons/dark/actions/16x16/newpage.svg</file>
 		<file>icons/dark/actions/16x16/palette.svg</file>
 		<file>icons/dark/actions/16x16/palette_tab.svg</file>

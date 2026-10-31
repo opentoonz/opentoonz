@@ -7,6 +7,7 @@
 #include "viewerpane.h"
 #include "onionskinmaskgui.h"
 #include "viewerdraw.h"
+#include "toonz/cameraguide.h"
 #include "menubarcommandids.h"
 #include "ruler.h"
 #include "locatorpopup.h"
@@ -83,11 +84,13 @@
 // Qt includes
 #include <QMenu>
 #include <QApplication>
+#include <QEvent>
 #include <QScreen>
 #include <QInputMethod>
 #include <QGLContext>
 #include <QOpenGLFramebufferObject>
 #include <QMainWindow>
+#include <QStyle>
 
 #include "sceneviewer.h"
 
@@ -280,6 +283,7 @@ ToggleCommandHandler viewTableToggle(MI_ViewTable, false);
 ToggleCommandHandler editInPlaceToggle(MI_ToggleEditInPlace, false);
 ToggleCommandHandler fieldGuideToggle(MI_FieldGuide, false);
 ToggleCommandHandler safeAreaToggle(MI_SafeArea, false);
+ToggleCommandHandler centerCutGuideToggle(MI_CenterCutGuide, false);
 ToggleCommandHandler rasterizePliToggle(MI_RasterizePli, false);
 
 ToggleCommandHandler viewClcToggle("MI_ViewColorcard", false);
@@ -1089,6 +1093,34 @@ TPointD SceneViewer::worldToPos(const TPointD &worldPos) const {
 
 //-----------------------------------------------------------------------------
 
+QColor SceneViewer::getTableColor() const {
+  if (m_tableColorOverride.isValid()) return m_tableColorOverride;
+  const TPixel32 color = Preferences::instance()->getTableColor();
+  return QColor(color.r, color.g, color.b);
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::setTableColor(const QColor &color) {
+  if (m_tableColorOverride == color) return;
+  m_tableColorOverride = color;
+  GLInvalidateAll();
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::changeEvent(QEvent *event) {
+  TToolViewer::changeEvent(event);
+  if (event->type() != QEvent::StyleChange) return;
+
+  // Qt does not reset qproperty values when a stylesheet rule is removed.
+  m_tableColorOverride = QColor();
+  if (testAttribute(Qt::WA_WState_Polished)) style()->polish(this);
+  GLInvalidateAll();
+}
+
+//-----------------------------------------------------------------------------
+
 void SceneViewer::showEvent(QShowEvent *) {
   m_visualSettings.m_sceneProperties =
       TApp::instance()->getCurrentScene()->getScene()->getProperties();
@@ -1543,7 +1575,7 @@ void SceneViewer::drawCameraStand() {
       !m_drawCameraTest) {
     glPushMatrix();
     tglMultMatrix(m_drawTableAff);
-    ViewerDraw::drawDisk(m_tableDLId);
+    ViewerDraw::drawDisk(m_tableDLId, getTableColor());
     glPopMatrix();
   }
 
@@ -1787,6 +1819,15 @@ void SceneViewer::drawOverlay() {
       glPushMatrix();
       tglMultMatrix(m_drawCameraAff);
       ViewerDraw::drawSafeArea();
+      glPopMatrix();
+    }
+
+    if (centerCutGuideToggle.getStatus() && !m_drawEditingLevel &&
+        !is3DView()) {
+      glPushMatrix();
+      tglMultMatrix(m_drawCameraAff);
+      ViewerDraw::drawCameraGuide(
+          CameraGuide::centeredRect(ViewerDraw::getCameraRect(), 4.0 / 3.0));
       glPopMatrix();
     }
 
@@ -2474,13 +2515,41 @@ void SceneViewer::syncSceneAndLevelViewIfEnabled() {
   if (!Preferences::instance()->isSyncSceneAndLevelViewEnabled()) return;
   if (is3DView()) return;
 
-  const int viewMode = TApp::instance()->getCurrentFrame()->isEditingLevel()
-                           ? LEVEL_VIEWMODE
-                           : SCENE_VIEWMODE;
-  m_viewMode                       = viewMode;
-  const int other                  = 1 - viewMode;
-  m_viewAff[other]                 = m_viewAff[viewMode];
-  m_rotationAngle[other]           = m_rotationAngle[viewMode];
+  const int viewMode     = TApp::instance()->getCurrentFrame()->isEditingLevel()
+                               ? LEVEL_VIEWMODE
+                               : SCENE_VIEWMODE;
+  m_viewMode             = viewMode;
+  const int other        = 1 - viewMode;
+  m_viewAff[other]       = m_viewAff[viewMode];
+  m_rotationAngle[other] = m_rotationAngle[viewMode];
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::setViewZoomPan(int viewMode, const TAffine &aff) {
+  if (viewMode < 0 || viewMode >= (int)m_viewAff.size()) return;
+  m_viewAff[viewMode]       = aff;
+  m_rotationAngle[viewMode] = 0.0;
+  if (m_isFlippedX || m_isFlippedY) {
+    m_isFlippedX = false;
+    m_isFlippedY = false;
+    emit onFlipHChanged(false);
+    emit onFlipVChanged(false);
+  }
+  if (m_previewMode != NO_PREVIEW) requestTimedRefresh();
+  emit onZoomChanged();
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::setCamera3DViewState(const TPointD &pan, double zoom,
+                                       double phi, double theta) {
+  m_pan3D       = pan;
+  m_zoomScale3D = zoom;
+  m_phi3D       = (float)tcrop(phi, -90.0, 90.0);
+  m_theta3D     = (float)tcrop(theta, 0.0, 90.0);
+  invalidateAll();
+  emit onZoomChanged();
 }
 
 //-----------------------------------------------------------------------------

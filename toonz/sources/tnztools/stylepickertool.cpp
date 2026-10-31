@@ -319,8 +319,8 @@ bool StylePickerTool::onPropertyChanged(std::string propertyName) {
           IconGenerator::instance()->invalidate(xl, fid);
       }
     }
-    return true;
   }
+  return true;
 }
 
 /* Check if the organizing operation is available */

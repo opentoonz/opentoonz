@@ -74,6 +74,7 @@
 #include <QApplication>
 #include <QAbstractEventDispatcher>
 #include <QAbstractNativeEventFilter>
+#include <QByteArray>
 #include <QSplashScreen>
 #include <QGLPixelBuffer>
 #include <QTranslator>
@@ -174,6 +175,8 @@ static void initToonzEnv(QHash<QString, QString> &argPathValues) {
   /*-- ENGLISH: Confirm TOONZROOT Path
         Check if the xxxroot is defined and corresponds to an existing folder
   --*/
+
+  TEnv::initUserStuffDir();
 
   TFilePath stuffDir = TEnv::getStuffDir();
   if (stuffDir == TFilePath())
@@ -408,12 +411,6 @@ int main(int argc, char *argv[]) {
 
   // Enable to render smooth icons on high dpi monitors
   a.setAttribute(Qt::AA_UseHighDpiPixmaps);
-#if defined(_WIN32)
-  // Compress tablet events with application attributes instead of implementing
-  // the delay-timer by ourselves
-  a.setAttribute(Qt::AA_CompressHighFrequencyEvents);
-  a.setAttribute(Qt::AA_CompressTabletEvents);
-#endif
 
 #ifdef _WIN32
   // BUG_WORKAROUND: #20230627
@@ -508,6 +505,20 @@ int main(int argc, char *argv[]) {
 
   // Toonz environment
   initToonzEnv(argumentPathValues);
+
+  // Read the saved preference only after the Toonz environment is initialized.
+  // Preserve existing platform defaults when enabled; disabling also prevents
+  // tablet compression, which depends on high-frequency event compression.
+  if (!Preferences::instance()->getBoolValue(compressInputEvents)) {
+    a.setAttribute(Qt::AA_CompressHighFrequencyEvents, false);
+    a.setAttribute(Qt::AA_CompressTabletEvents, false);
+  }
+#if defined(_WIN32)
+  else {
+    a.setAttribute(Qt::AA_CompressHighFrequencyEvents, true);
+    a.setAttribute(Qt::AA_CompressTabletEvents, true);
+  }
+#endif
 
   // prepare for 30bit display
   if (Preferences::instance()->is30bitDisplayEnabled()) {
@@ -793,7 +804,12 @@ int main(int argc, char *argv[]) {
   // Show floating panels only after the main window has been shown
   w.startupFloatingPanels();
 
-  CommandManager::instance()->execute(T_Hand);
+  const QByteArray defaultStartupTool =
+      Preferences::instance()->getDefaultStartupTool().toLatin1();
+  if (CommandManager::instance()->getAction(defaultStartupTool.constData()))
+    CommandManager::instance()->execute(defaultStartupTool.constData());
+  else
+    CommandManager::instance()->execute(T_Hand);
   if (!loadFilePath.isEmpty()) {
     splash.showMessage(
         QString("Loading file '") + loadFilePath.getQString() + "'...",

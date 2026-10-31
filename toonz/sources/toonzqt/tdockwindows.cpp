@@ -230,7 +230,11 @@ void TDockWidget::setDockedAppearance() {
 bool TDockWidget::isDragGrip(QPoint p) {
   if (!m_titlebar) return DockWidget::isDragGrip(p);
 
-  return m_titlebar->geometry().contains(p);
+  if (m_titlebar->isVisible()) return m_titlebar->geometry().contains(p);
+
+  // Fallback while the title bar is hidden, so a panel can never end up
+  // with no draggable area at all.
+  return QRect(0, 0, width(), 18).contains(p);
 }
 
 //----------------------------------------
@@ -356,9 +360,13 @@ TDockPlaceholder::TDockPlaceholder(DockWidget *owner, Region *r, int idx,
     : DockPlaceholder(owner, r, idx, attributes) {
   setAutoFillBackground(true);
 
-  setObjectName("TDockPlaceholder");
+  const bool isTabJoinTarget = attributes == DockPlaceholder::tabJoinTarget;
 
-  setWindowOpacity(0.8);
+  setObjectName(isTabJoinTarget ? "TDockTabJoinTarget" : "TDockPlaceholder");
+
+  // The merge preview is drawn around the target region itself, so the hit
+  // area stays invisible.
+  setWindowOpacity(isTabJoinTarget ? 0.0 : 0.8);
 }
 
 //----------------------------------------
@@ -474,6 +482,8 @@ void TDockWidget::selectDockPlaceholder(QMouseEvent *me) {
       if (m_selectedPlace) m_selectedPlace->hide();
       if (selected) selected->show();
     }
+
+    if (parentLayout()) parentLayout()->hideTabMergePreview();
 
     m_selectedPlace = selected;
   } else

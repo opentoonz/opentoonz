@@ -8,6 +8,7 @@
 
 #include "traster.h"
 #include "toonz/mypaintbrushstyle.h"
+#include "toonz/toonzfolders.h"
 
 #include <QSize>
 #include <QVector>
@@ -144,7 +145,8 @@ public:
 //    CustomStyleManager declaration
 //********************************************************************************
 
-class DVAPI CustomStyleManager final : public BaseStyleManager {
+class DVAPI CustomStyleManager final : public BaseStyleManager,
+                                       public FolderListenerManager::Listener {
   Q_OBJECT
 
   TThread::Executor m_executor;
@@ -152,13 +154,16 @@ class DVAPI CustomStyleManager final : public BaseStyleManager {
 
   std::string m_rasterIdName;
   std::string m_vectorIdName;
+  int m_loadGeneration;
 
 public:
   CustomStyleManager(std::string rasterIdName, std::string vectorIdName,
                      const TFilePath &stylesFolder, QString filters = QString(),
                      QSize chipSize = QSize(25, 25));
+  ~CustomStyleManager() override;
 
   void loadItems() override;
+  void onFolderChanged(const TFilePath &path) override;
 
   class StyleLoaderTask;
   friend class CustomStyleManager::StyleLoaderTask;

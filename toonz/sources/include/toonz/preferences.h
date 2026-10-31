@@ -182,6 +182,9 @@ public:
   bool isWatchFileSystemEnabled() {
     return getBoolValue(watchFileSystemEnabled);
   }
+  bool isFileBrowserFolderDoubleClick() const {
+    return getBoolValue(fileBrowserFolderDoubleClick);
+  }
   int getProjectRoot() { return getIntValue(projectRoot); }
   QString getCustomProjectRoot() { return getStringValue(customProjectRoot); }
   PathAliasPriority getPathAliasPriority() const {
@@ -242,6 +245,12 @@ public:
 
   bool isViewerIndicatorEnabled() const {
     return getBoolValue(viewerIndicatorEnabled);
+  }
+  bool isRestoreViewerViewFromLastSessionEnabled() const {
+    return getBoolValue(restoreViewerViewFromLastSession);
+  }
+  bool isRestoreStyleEditorTabEnabled() const {
+    return getBoolValue(RestoreStyleEditorTab);
   }
 
   // Visualization  tab
@@ -377,6 +386,12 @@ public:
   TPixel32 getAnimateToolColor() const {
     return getColorValue(animateToolColor);
   }
+  QString getDefaultStartupTool() const {
+    return getStringValue(defaultStartupTool);
+  }
+  QString getDefaultNewSceneTool() const {
+    return getStringValue(defaultNewSceneTool);
+  }
 
   // Xsheet  tab
   QString getXsheetLayoutPreference() const {
@@ -447,6 +462,18 @@ public:
   void getCurrentColumnData(TPixel &color) const {
     color = getColorValue(currentColumnColor);
   }
+  bool isCustomCurrentCellColorEnabled() const {
+    return getBoolValue(customCurrentCellColorEnabled);
+  }
+  void getCurrentCellData(TPixel &color) const {
+    color = getColorValue(currentCellColor);
+  }
+  bool isCustomCurrentColumnOutlineColorEnabled() const {
+    return getBoolValue(customCurrentColumnOutlineColorEnabled);
+  }
+  void getCurrentColumnOutlineColor(TPixel &color) const {
+    color = getColorValue(currentColumnOutlineColor);
+  }
 
   LevelNameDisplayType getLevelNameDisplayType() const {
     return LevelNameDisplayType(getIntValue(levelNameDisplayType));
@@ -512,6 +539,7 @@ public:
 
   // Colors  tab
   TPixel getViewerBgColor() const { return getColorValue(viewerBGColor); }
+  TPixel getTableColor() const { return getColorValue(tableColor); }
   TPixel getPreviewBgColor() const { return getColorValue(previewBGColor); }
   TPixel getLevelEditorBoxColor() const {
     return getColorValue(levelEditorBoxColor);
@@ -586,6 +614,7 @@ Q_SIGNALS:
   void stopAutoSave();
   void startAutoSave();
   void autoSavePeriodChanged();
+  void fillOnlySaveboxChanged(bool enabled);
 
 private:
   std::unique_ptr<QSettings> m_settings;

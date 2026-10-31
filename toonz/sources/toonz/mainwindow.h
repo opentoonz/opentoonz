@@ -33,6 +33,11 @@ class Room final : public TMainWindow {
   // For lazy loading
   bool m_initialized;
 
+  // Deferred layout restore: saved state re-applied after the first show
+  // to counteract redistribute() overwriting panel sizes.
+  bool m_hasPendingLayoutRestore = false;
+  DockLayout::State m_pendingLayoutState;
+
 public:
   Room(QWidget *parent = 0, Qt::WindowFlags flags = Qt::WindowFlags())
       : TMainWindow(parent, flags)
@@ -63,6 +68,9 @@ public:
     params.forceBuildGui = true;
     load(m_path, params);
   }
+
+protected:
+  void showEvent(QShowEvent *event) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -85,6 +93,9 @@ class MainWindow final : public QMainWindow {
 
   /*-- show layout name in the title bar --*/
   QString m_layoutName;
+  
+  // List of registered room shortcut command IDs
+  QList<QString> m_registeredRoomIds;
 
 public:
   MainWindow(const QString &argumentLayoutFileName, QWidget *parent = 0,
@@ -108,6 +119,7 @@ public:
   void onAbout();
   void onOpenOnlineManual();
   void onOpenWhatsNew();
+  void onOpenQuicklink();
   void onOpenCommunityForum();
   void onOpenReportABug();
   void checkForUpdates();
@@ -128,6 +140,15 @@ public:
 
   // Update visibility of all room-bound panels (native and custom)
   void updatePanelVisibility();
+  
+  // Register room shortcuts for all existing rooms
+  void registerRoomCommands();
+  
+  // Unregister a specific room shortcut
+  void unregisterRoomCommand(const QString &roomName);
+  
+  // Update a room shortcut when renamed
+  void updateRoomCommand(const QString &oldName, const QString &newName);
 
 protected:
   void showEvent(QShowEvent *) override;

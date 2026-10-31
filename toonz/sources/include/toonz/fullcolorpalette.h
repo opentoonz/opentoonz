@@ -33,8 +33,11 @@ public:
   static FullColorPalette *instance();
   ~FullColorPalette();
   void clear();
+  bool getDirtyFlag() const;
   TPalette *getPalette(ToonzScene *scene);
   void savePalette(ToonzScene *scene);
+  TFilePath getDefaultPalettePath() const;
+  void saveAsDefault(TPalette *palette);
   bool isFullColorPalette(TPalette *palette) { return m_palette == palette; }
   const TFilePath getPath() const { return m_fullcolorPalettePath; }
 };

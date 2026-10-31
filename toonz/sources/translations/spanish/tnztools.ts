@@ -2095,6 +2095,26 @@ al final de la página actual del estilo en la paleta.</translation>
         <source>Assistants</source>
         <translation>Asistentes</translation>
     </message>
+    <message>
+        <source>Eraser</source>
+        <translation>Borrador</translation>
+    </message>
+    <message>
+        <source>Mode:</source>
+        <translation>Modo:</translation>
+    </message>
+    <message>
+        <source>Lines</source>
+        <translation>Líneas</translation>
+    </message>
+    <message>
+        <source>Areas</source>
+        <translation>Áreas</translation>
+    </message>
+    <message>
+        <source>Lines &amp; Areas</source>
+        <translation>Líneas y áreas</translation>
+    </message>
 </context>
 <context>
     <name>ToonzVectorBrushTool</name>

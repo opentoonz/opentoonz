@@ -159,6 +159,9 @@ DVAPI void copyFile(const TFilePath &dst, const TFilePath &src,
                     bool overwrite = true);
 DVAPI void renameFile(const TFilePath &dst, const TFilePath &src,
                       bool overwrite = true);
+// Atomically replace dst with src where supported. On failure the
+// existing destination is left in place.
+DVAPI void replaceFile(const TFilePath &dst, const TFilePath &src);
 DVAPI void deleteFile(const TFilePath &dst);
 DVAPI void hideFile(const TFilePath &dst);
 DVAPI void moveFileToRecycleBin(const TFilePath &fp);

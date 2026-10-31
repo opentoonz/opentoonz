@@ -2481,12 +2481,32 @@ moved to the end of the current style&apos;s page of the palette.</source>
     <message>
         <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1002"/>
         <source>Lock Alpha</source>
-        <translation type="unfinished">Zamknout alfu</translation>
+        <translation>Zamknout alfa</translation>
     </message>
     <message>
         <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1003"/>
         <source>Assistants</source>
-        <translation type="unfinished"></translation>
+        <translation>Asistenti</translation>
+    </message>
+    <message>
+        <source>Eraser</source>
+        <translation>Guma</translation>
+    </message>
+    <message>
+        <source>Mode:</source>
+        <translation>Režim:</translation>
+    </message>
+    <message>
+        <source>Lines</source>
+        <translation>Čáry</translation>
+    </message>
+    <message>
+        <source>Areas</source>
+        <translation>Plochy</translation>
+    </message>
+    <message>
+        <source>Lines &amp; Areas</source>
+        <translation>Čáry a plochy</translation>
     </message>
 </context>
 <context>

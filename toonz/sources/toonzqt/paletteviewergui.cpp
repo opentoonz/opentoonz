@@ -21,6 +21,7 @@
 #include "toonz/tframehandle.h"
 #include "toonz/imagestyles.h"
 #include "toonz/preferences.h"
+#include "toonz/fullcolorpalette.h"
 
 // TnzCore includes
 #include "tcolorstyles.h"
@@ -31,6 +32,7 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include <QKeyEvent>
+#include <QKeySequence>
 #include <QMenuBar>
 #include <QToolTip>
 #include <QDrag>
@@ -41,6 +43,8 @@
 TEnv::IntVar EnvSoftwareCurrentFontSize_StyleName(
     "SoftwareCurrentFontSize_StyleName", 11);
 extern TEnv::IntVar ShowNewStyleButton;
+
+TEnv::IntVar ShowStyleIndex("ShowStyleIndex", 1);
 
 using namespace PaletteViewerGUI;
 using namespace DVGui;
@@ -228,6 +232,20 @@ int PageViewer::getCurrentStyleIndex() const {
 }
 
 //-----------------------------------------------------------------------------
+
+void PageViewer::setShowStyleIndex(bool showStyleIndex) {
+  if (getShowStyleIndex() == showStyleIndex) return;
+
+  ShowStyleIndex = showStyleIndex ? 1 : 0;
+  update();
+}
+
+//-----------------------------------------------------------------------------
+
+bool PageViewer::getShowStyleIndex() const { return ShowStyleIndex != 0; }
+
+//-----------------------------------------------------------------------------
+
 /*! Set current page to \b page and update view.
  */
 void PageViewer::setPage(TPalette::Page *page) {
@@ -852,19 +870,23 @@ void PageViewer::paintEvent(QPaintEvent *e) {
       tmpFont.setPointSize(9);
       tmpFont.setItalic(false);
       p.setFont(tmpFont);
-      int indexWidth =
-          fontMetrics().horizontalAdvance(QString().setNum(styleIndex)) + 4;
-      QRect indexRect(chipRect.bottomRight() + QPoint(-indexWidth, -14),
-                      chipRect.bottomRight());
-      p.setPen(Qt::black);
-      p.setBrush(Qt::white);
-      p.drawRect(indexRect);
-      p.drawText(indexRect, Qt::AlignCenter, QString().setNum(styleIndex));
+      if (getShowStyleIndex()) {
+        int indexWidth =
+            fontMetrics().horizontalAdvance(QString().setNum(styleIndex)) + 4;
+        QRect indexRect(chipRect.bottomRight() + QPoint(-indexWidth, -14),
+                        chipRect.bottomRight());
+        p.setPen(Qt::black);
+        p.setBrush(Qt::white);
+        p.drawRect(indexRect);
+        p.drawText(indexRect, Qt::AlignCenter, QString().setNum(styleIndex));
+      }
 
       // draw "Autopaint for lines" indicator
       int offset = 0;
       if (style->getFlags() != 0) {
         QRect aflRect(chipRect.bottomLeft() + QPoint(0, -14), QSize(12, 15));
+        p.setPen(Qt::black);
+        p.fillRect(aflRect, QBrush(Qt::white));
         p.drawRect(aflRect);
         p.drawText(aflRect, Qt::AlignCenter, "A");
         offset += 12;
@@ -875,6 +897,7 @@ void PageViewer::paintEvent(QPaintEvent *e) {
           m_viewMode != SmallChips) {
         QRect ppRect(chipRect.bottomLeft() + QPoint(offset, -14),
                      QSize(12, 15));
+        p.fillRect(ppRect, QBrush(Qt::white));
         p.drawRect(ppRect);
         QPoint markPos = ppRect.center() + QPoint(1, 0);
         p.drawEllipse(markPos, 3, 3);
@@ -982,6 +1005,11 @@ void PageViewer::mousePressEvent(QMouseEvent *event) {
 
   if (event->button() == Qt::RightButton) {
     m_styleSelection->makeCurrent();
+    // Opening the level palette menu beside the chips must preserve this
+    // page's selected styles for batch commands such as Convert.
+    const bool keepSelection = m_viewType == LEVEL_PALETTE &&
+                               !m_styleSelection->isEmpty() &&
+                               m_styleSelection->isPageSelected(pageIndex);
     // if you are clicking on the color chip
     if (0 <= indexInPage && indexInPage < getChipCount()) {
       // Se pageIndex non e' selezionato lo seleziono
@@ -991,7 +1019,7 @@ void PageViewer::mousePressEvent(QMouseEvent *event) {
       }
       // Cambio l'indice corrente
       setCurrentStyleIndex(m_page->getStyleId(indexInPage));
-    } else {
+    } else if (!keepSelection) {
       m_styleSelection->selectNone();
       m_styleSelection->select(pageIndex);
     }
@@ -1159,6 +1187,28 @@ void PageViewer::contextMenuEvent(QContextMenuEvent *event) {
   if (m_viewType == LEVEL_PALETTE) {
     QAction *openPltGizmoAct = cmd->getAction("MI_OpenPltGizmo");
     menu.addAction(openPltGizmoAct);
+    QMenu *convertMenu       = menu.addMenu(tr("Convert"));
+    const auto addConversion = [&](CommandId id, const QString &label) {
+      QAction *command = cmd->getAction(id);
+      if (!command) return;
+      QAction *item   = convertMenu->addAction(label);
+      const auto sync = [command, item, label]() {
+        const QString shortcut =
+            command->shortcut().toString(QKeySequence::NativeText);
+        // Display the assigned shortcut without registering it a second time.
+        item->setText(shortcut.isEmpty() ? label : label + "\t" + shortcut);
+        item->setIcon(command->icon());
+        item->setToolTip(command->toolTip());
+        item->setEnabled(command->isEnabled());
+      };
+      connect(command, &QAction::changed, item, sync);
+      connect(item, &QAction::triggered, command, &QAction::trigger);
+      sync();
+    };
+    //: "Line" means Toonz Raster ink; "Area" means Toonz Raster paint.
+    addConversion(MI_ConvertLinesToAreas, tr("Line to Area"));
+    //: "Area" means Toonz Raster paint; "Line" means Toonz Raster ink.
+    addConversion(MI_ConvertAreasToLines, tr("Area to Line"));
   }
   QAction *openStyleControlAct = cmd->getAction("MI_OpenStyleControl");
   menu.addAction(openStyleControlAct);
@@ -1788,6 +1838,9 @@ void PageViewer::updateCommandLocks() {
   cmd->getAction("MI_GetColorFromStudioPalette")->setEnabled(!isLocked);
   cmd->getAction("MI_ToggleLinkToStudioPalette")->setEnabled(!isLocked);
   cmd->getAction("MI_RemoveReferenceToStudioPalette")->setEnabled(!isLocked);
-  cmd->getAction("MI_EraseUnusedStyles")->setEnabled(!isLocked);
+  cmd->getAction("MI_EraseUnusedStyles")
+      ->setEnabled(!isLocked &&
+                   !FullColorPalette::instance()->isFullColorPalette(
+                       m_page->getPalette()));
   update();
 }

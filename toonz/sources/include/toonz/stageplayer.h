@@ -76,6 +76,7 @@ public:
 
   int m_onionSkinDistance;  //!< Temporal distance from an onion skin
                             //!'companion' (supposedly)
+  double m_onionSkinOpacity;  //!< Custom onion skin opacity, or -1 for Auto
 
   int m_ancestorColumnIndex;  //!< Index of this object's hierarchycal root
                               //!(top-most column)

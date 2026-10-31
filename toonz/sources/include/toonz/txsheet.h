@@ -511,7 +511,8 @@ in TXsheetImp.
   /*! Utility Function */
   TSoundTrack *makeSound(int fromFrame, int toFrame, int frameRate = -1);
 #endif
-  void scrub(int frame, bool isPreview = false);
+  // Replace the current audition. endFrame is inclusive; -1 means one frame.
+  void scrub(int frame, bool isPreview = false, int endFrame = -1);
   void stopScrub();
   void play(const TSoundTrackP &soundtrack, int s0, int s1, bool loop);
 

@@ -63,6 +63,8 @@ TEnv::IntVar ConvertPopupRemoveUnusedStyles("ConvertPopupRemoveUnusedStyles",
 TEnv::IntVar ConvertPopupDpiMode("ConvertPopupDpiMode", 2);  // Custom DPI
 TEnv::DoubleVar ConvertPopupDpiValue("ConvertPopupDpiValue", 72.0);
 
+TEnv::IntVar ConvertPopupAllowOnlyWhiteBG("ConvertPopupAllowOnlyWhiteBG", 0);
+
 //=============================================================================
 // convertPopup
 //-----------------------------------------------------------------------------
@@ -215,7 +217,8 @@ void ConvertPopup::Converter::convertLevel(
       ImageUtils::convertNaa2Tlv(sourceFileFullPath, dstFileFullPath, from, to,
                                  m_parent->m_notifier, palette.getPointer(),
                                  m_parent->m_removeUnusedStyles->isChecked(),
-                                 m_parent->m_dpiFld->getValue());
+                                 m_parent->m_dpiFld->getValue(),
+                                 m_parent->m_allowOnlyWhiteBG->isChecked());
     } else {
       // other 3 cases
       convertLevelWithConvert2Tlv(sourceFileFullPath);
@@ -590,6 +593,9 @@ QFrame *ConvertPopup::createTlvSettings() {
   m_dpiMode = new QComboBox();
   m_dpiFld  = new DVGui::DoubleLineEdit();
 
+  m_allowOnlyWhiteBG = new QCheckBox(tr(
+      "Only white or transparent pixels can be identified as the background"));
+
   m_unpaintedFolder->setFileMode(
       QFileDialog::Directory);  // implies ShowDirsOnly
   m_unpaintedSuffix->setMaximumWidth(40);
@@ -607,7 +613,8 @@ QFrame *ConvertPopup::createTlvSettings() {
 
   m_appendDefaultPalette->setToolTip(
       tr("When activated, styles of the default "
-         "palette\n($TOONZSTUDIOPALETTE\\Global Palettes\\Default Palettes\\Cleanup_Palette.tpl) will \nbe "
+         "palette\n($TOONZSTUDIOPALETTE\\Global Palettes\\Default "
+         "Palettes\\Cleanup_Palette.tpl) will \nbe "
          "appended to the palette after conversion in \norder to save the "
          "effort of creating styles \nbefore color designing."));
 
@@ -626,6 +633,13 @@ QFrame *ConvertPopup::createTlvSettings() {
       "used.\n"));
   m_dpiMode->setCurrentIndex(ConvertPopupDpiMode);
   m_dpiFld->setValue(ConvertPopupDpiValue);
+
+  m_allowOnlyWhiteBG->setToolTip(tr(
+      "When activated, only fully white or transparent pixels are \n"
+      "identified as the background. When deactivated, the brightest \n"
+      "or most transparent color in the image is identified as a candidate \n"
+      "for the background color."));
+  m_allowOnlyWhiteBG->setChecked(ConvertPopupAllowOnlyWhiteBG != 0);
 
   QGridLayout *gridLay = new QGridLayout();
   {
@@ -661,6 +675,8 @@ QFrame *ConvertPopup::createTlvSettings() {
                        Qt::AlignRight | Qt::AlignVCenter);
     gridLay->addWidget(m_dpiMode, 8, 1);
     gridLay->addWidget(m_dpiFld, 8, 2);
+
+    gridLay->addWidget(m_allowOnlyWhiteBG, 9, 1, 1, 3);
   }
   gridLay->setColumnStretch(0, 0);
   gridLay->setColumnStretch(1, 1);
@@ -713,7 +729,7 @@ void ConvertPopup::onAntialiasSelected(int index) {
 void ConvertPopup::onFileInChanged() {
   assert(m_convertFileFld);
   std::vector<TFilePath> fps;
-  auto project = TProjectManager::instance()->getCurrentProject();
+  auto project      = TProjectManager::instance()->getCurrentProject();
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
   fps.push_back(scene->decodeFilePath(
       TFilePath(m_convertFileFld->getPath().toStdString())));
@@ -739,6 +755,7 @@ void ConvertPopup::onTlvModeSelected(const QString &tlvMode) {
                                        CreateNewPalette);
 
   m_saveBackupToNopaint->setEnabled(TlvMode_Unpainted == tlvMode);
+  m_allowOnlyWhiteBG->setEnabled(TlvMode_PaintedFromNonAA == tlvMode);
 }
 
 //-------------------------------------------------
@@ -766,6 +783,8 @@ void ConvertPopup::onFormatSelected(const QString &format) {
 
     m_saveBackupToNopaint->setEnabled(m_tlvMode->currentText() ==
                                       TlvMode_Unpainted);
+    m_allowOnlyWhiteBG->setEnabled(m_tlvMode->currentText() ==
+                                   TlvMode_PaintedFromNonAA);
   }
   // For unknown reasons, calling adjustSize twice is needed to
   // prevent the dialog from remaining large size when the current
@@ -836,7 +855,7 @@ void ConvertPopup::setFiles(const std::vector<TFilePath> &fps) {
 
   if (m_srcFilePaths.size() == 1) {
     setWindowTitle(tr("Convert 1 Level : %1")
-        .arg(QString::fromStdString(fps[0].getName())));
+                       .arg(QString::fromStdString(fps[0].getName())));
     m_fileNameFld->setEnabled(true);
 
     m_fromFld->setEnabled(false);
@@ -888,9 +907,9 @@ void ConvertPopup::setFiles(const std::vector<TFilePath> &fps) {
   // m_fileFormat->setCurrentIndex(areFullcolor?0:m_fileFormat->findText("tif"));
 }
 
-void ConvertPopup::setFormat(QString format){
-    m_fileFormat->setDisabled(true);
-    m_fileFormat->setCurrentIndex(m_fileFormat->findText(format));
+void ConvertPopup::setFormat(QString format) {
+  m_fileFormat->setDisabled(true);
+  m_fileFormat->setCurrentIndex(m_fileFormat->findText(format));
 }
 
 //-------------------------------------------------------------------
@@ -1192,6 +1211,8 @@ void ConvertPopup::apply() {
   if (m_dpiMode->currentIndex() == 2)  // In the case of Custom DPI
     ConvertPopupDpiValue = m_dpiFld->getValue();
 
+  ConvertPopupAllowOnlyWhiteBG = m_allowOnlyWhiteBG->isChecked() ? 1 : 0;
+
   // parameters are ok: close the dialog first
   close();
 
@@ -1267,7 +1288,6 @@ QString::number(m_srcFilePaths.size()-skipped)).arg(QString::number(m_srcFilePat
 
 void ConvertPopup::onLevelConverted(const TFilePath &fullPath) {
   IconGenerator::instance()->invalidate(fullPath);
-  
 }
 
 //-------------------------------------------------------------------

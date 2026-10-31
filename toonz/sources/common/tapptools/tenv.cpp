@@ -4,9 +4,15 @@
 #include "tfilepath_io.h"
 #include "tversion.h"
 
+#include <QCoreApplication>
 #include <QDir>
+#include <QFile>
+#include <QFileInfo>
 #include <QSettings>
 #include <QStandardPaths>
+#include <QStringList>
+
+#include <iostream>
 
 #ifdef LEVO_MACOSX
 
@@ -70,29 +76,33 @@ public:
     return &_instance;
   }
 
+#ifndef _WIN32
+  // Location of the ini file holding the system variables. Split out of
+  // getSystemVarPath() so that first-run seeding writes the file where this
+  // reads it, instead of duplicating the per-platform layout.
+  QString getSystemVarFile() {
+#ifdef MACOSX
+    return QString::fromStdString(getApplicationFileName()) + QString(".app") +
+           QString("/Contents/Resources/SystemVar.ini");
+#elif defined(HAIKU)
+    return QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) +
+           "/SystemVar.ini";
+#else /* Generic Unix */
+    // TODO: use QStandardPaths::ConfigLocation when we drop Qt4
+    QString settingsPath = QDir::homePath();
+    settingsPath.append("/.config/");
+    settingsPath.append(getApplicationName().c_str());
+    settingsPath.append("/SystemVar.ini");
+    return settingsPath;
+#endif
+  }
+#endif
+
   TFilePath getSystemVarPath(std::string varName) {
 #ifdef _WIN32
     return m_registryRoot + varName;
 #else
-    QString settingsPath;
-
-#ifdef MACOSX
-    settingsPath = QString::fromStdString(getApplicationFileName()) +
-                   QString(".app") +
-                   QString("/Contents/Resources/SystemVar.ini");
-#else
-#ifdef HAIKU
-    settingsPath =
-        QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) +
-        "/SystemVar.ini";
-#else /* Generic Unix */
-    // TODO: use QStandardPaths::ConfigLocation when we drop Qt4
-    settingsPath = QDir::homePath();
-    settingsPath.append("/.config/");
-    settingsPath.append(getApplicationName().c_str());
-    settingsPath.append("/SystemVar.ini");
-#endif
-#endif
+    QString settingsPath = getSystemVarFile();
 
     QSettings settings(settingsPath, QSettings::IniFormat);
     QString qStr      = QString::fromStdString(varName);
@@ -235,11 +245,13 @@ public:
     const char *workingDirectory = ba.data();
     m_workingDirectory           = workingDirectory;
 
-    // check if portable
+    // check if portable. Startup requires the selected stuff path to be a
+    // directory and aborts otherwise, so a regular file named portablestuff
+    // must not qualify. Every candidate below applies the same rule.
     TFilePath portableCheck =
         TFilePath(m_workingDirectory + "\\portablestuff\\");
     TFileStatus portableStatus(portableCheck);
-    m_isPortable = portableStatus.doesExist();
+    m_isPortable = portableStatus.isDirectory();
 
 #ifdef MACOSX
     // macOS 10.12 (Sierra) translocates applications before running them
@@ -252,12 +264,62 @@ public:
           TFilePath(m_workingDirectory + "\\" + getApplicationFileName() +
                     ".app\\portablestuff\\");
       portableStatus = TFileStatus(portableCheck);
-      m_isPortable   = portableStatus.doesExist();
+      m_isPortable   = portableStatus.isDirectory();
       if (m_isPortable)
         m_workingDirectory =
             portableCheck.getParentDir().getQString().toStdString();
     }
 #endif
+
+    // The working directory only holds portablestuff when the application was
+    // started from that folder; a desktop entry or file manager can leave it
+    // anywhere. Look beside the application itself as well.
+    if (!m_isPortable) {
+      // An AppImage executes from a temporary mount point, so its own
+      // directory is not where the user keeps portablestuff. APPIMAGE, set by
+      // the AppImage runtime, is the path of the bundle itself.
+      QString appImage = QString::fromLocal8Bit(qgetenv("APPIMAGE"));
+      QString exeDir   = QCoreApplication::instance()
+                             ? QCoreApplication::applicationDirPath()
+                             : QString();
+
+      // A native build can inherit APPIMAGE from an unrelated AppImage parent,
+      // or pick up a stale export. APPDIR is that bundle's mount point, so
+      // containment tells us whether APPIMAGE describes this process.
+      // Companion executables such as tcomposer share the mount and still
+      // qualify.
+      QString appDirEnv = QString::fromLocal8Bit(qgetenv("APPDIR"));
+      bool inBundle     = false;
+      if (!appDirEnv.isEmpty() && !exeDir.isEmpty()) {
+        QString mount = QFileInfo(appDirEnv).canonicalFilePath();
+        QString exe   = QFileInfo(exeDir).canonicalFilePath();
+        inBundle      = !mount.isEmpty() && !exe.isEmpty() &&
+                   (exe == mount || exe.startsWith(mount + "/"));
+      }
+
+      // Try every candidate rather than committing to one, so a bundle without
+      // portablestuff cannot hide a valid tree beside the executable. An
+      // unverified APPIMAGE goes last: worth a look, but not ahead of our own
+      // directory.
+      QStringList candidates;
+      if (!appImage.isEmpty() && inBundle)
+        candidates << QFileInfo(appImage).absolutePath();
+      if (!exeDir.isEmpty()) candidates << exeDir;
+      if (!appImage.isEmpty() && !inBundle)
+        candidates << QFileInfo(appImage).absolutePath();
+
+      for (const QString &candidate : candidates) {
+        portableCheck =
+            TFilePath(candidate.toStdString() + "\\portablestuff\\");
+        portableStatus = TFileStatus(portableCheck);
+        m_isPortable   = portableStatus.isDirectory();
+        if (m_isPortable) {
+          m_workingDirectory =
+              portableCheck.getParentDir().getQString().toStdString();
+          break;
+        }
+      }
+    }
   }
   std::string getWorkingDirectory() { return m_workingDirectory; }
 
@@ -614,6 +676,103 @@ TFilePath TEnv::getConfigDir() {
   if (configDir == TFilePath())
     configDir = getStuffDir() + systemPathMap.at("CONFIG");
   return configDir;
+}
+
+#if !defined(_WIN32) && !defined(MACOSX)
+namespace {
+
+// TSystem::copyDir() ignores mkdir/copy failures, so recurse and report here.
+bool copyDirOrFail(const QString &dst, const QString &src) {
+  if (!QDir().mkpath(dst)) return false;
+
+  const QFileInfoList entries = QDir(src).entryInfoList(
+      QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System);
+  for (const QFileInfo &fi : entries) {
+    const QString target = dst + "/" + fi.fileName();
+    // copy symlinks as files: following them could recurse forever
+    if (fi.isDir() && !fi.isSymLink()) {
+      if (!copyDirOrFail(target, fi.filePath())) return false;
+    } else if (!QFile::copy(fi.filePath(), target)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// installed layout: <prefix>/bin/<exe>, <prefix>/share/opentoonz/stuff
+TFilePath getInstalledStuffDir() {
+  TFilePath exeDir(QCoreApplication::applicationDirPath().toStdWString());
+  return exeDir.getParentDir() + "share" + "opentoonz" + "stuff";
+}
+
+// Derived from the ini TEnv reads; not every platform uses ~/.config.
+TFilePath getUserStuffDir(EnvGlobals *eg) {
+  TFilePath systemVarFile(eg->getSystemVarFile().toStdWString());
+  return systemVarFile.getParentDir() + "stuff";
+}
+
+bool seedStuffTreeIfMissing(const TFilePath &userStuffDir) {
+  if (TFileStatus(userStuffDir).doesExist()) return true;
+
+  TFilePath installedStuffDir = getInstalledStuffDir();
+  if (!TFileStatus(installedStuffDir).isDirectory())
+    return false;  // build tree: nothing to copy from
+
+  const QString userStuffDirStr = userStuffDir.getQString();
+  const QString stagingDirStr   = userStuffDirStr + ".incomplete";
+
+  // Rename into place only after a complete copy, so a failed one leaves
+  // nothing a later run would mistake for finished stuff.
+  QDir(stagingDirStr).removeRecursively();  // leftovers from a failed attempt
+  if (!copyDirOrFail(stagingDirStr, installedStuffDir.getQString()) ||
+      !QDir().rename(stagingDirStr, userStuffDirStr)) {
+    QDir(stagingDirStr).removeRecursively();
+    std::cerr << "Failed to initialize " << userStuffDirStr.toStdString()
+              << " from " << installedStuffDir.getQString().toStdString()
+              << std::endl;
+    return false;
+  }
+
+  // writable dirs the app expects, possibly absent from the packaged tree
+  QDir().mkpath((userStuffDir + "projects" + "library").getQString());
+  QDir().mkpath((userStuffDir + "projects" + "fxs").getQString());
+  return true;
+}
+
+// Only the root is required; the rest falls back to <stuff>/<subdir>.
+// setValue() merges, so an ini missing just the root keeps its other keys.
+void writeRootVar(EnvGlobals *eg, const TFilePath &userStuffDir) {
+  QSettings settings(eg->getSystemVarFile(), QSettings::IniFormat);
+  settings.setValue(QString::fromStdString(eg->getRootVarName()),
+                    userStuffDir.getQString());
+  settings.sync();
+}
+
+}  // namespace
+#endif
+
+void TEnv::initUserStuffDir() {
+#if !defined(_WIN32) && !defined(MACOSX)
+  EnvGlobals *eg = EnvGlobals::instance();
+
+  // portable builds carry their own stuff; nothing to seed
+  if (eg->getIsPortable()) return;
+
+  // respect an explicit -TOONZROOT command-line override
+  if (eg->getArgPathValue(eg->getRootVarName()) != "") return;
+
+  TFilePath userStuffDir = getUserStuffDir(eg);
+
+  // Leave a root configured elsewhere alone even when it is gone: usually an
+  // unmounted volume, and the ini is not rewritten either way. String compare,
+  // so an equivalent spelling also counts as elsewhere.
+  TFilePath configuredRoot = eg->getRootVarPath();
+  if (!configuredRoot.isEmpty() && configuredRoot != userStuffDir) return;
+
+  if (!QDir().mkpath(userStuffDir.getParentDir().getQString())) return;
+  if (!seedStuffTreeIfMissing(userStuffDir)) return;
+  if (configuredRoot.isEmpty()) writeRootVar(eg, userStuffDir);
+#endif
 }
 
 /*TFilePath TEnv::getProfilesDir()

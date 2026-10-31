@@ -173,6 +173,7 @@ public:
   virtual ~TScanner();
 
   static bool m_isTwain;  // brutto, brutto :(
+  static bool m_isWia;
   static TScanner *instance();
 
   virtual void selectDevice()      = 0;

@@ -74,31 +74,53 @@ void OnionSkinMask::getAll(int currentRow, std::vector<int> &output) const {
   output.clear();
   output.reserve(m_fos.size() + m_mos.size());
 
-  std::vector<int>::const_iterator fosIt, fosEnd(m_fos.end());
-  std::vector<int>::const_iterator mosIt, mosEnd(m_mos.end());
+  MarkerList::const_iterator fosIt, fosEnd(m_fos.end());
+  MarkerList::const_iterator mosIt, mosEnd(m_mos.end());
 
   for (fosIt = m_fos.begin(), mosIt = m_mos.begin();
        fosIt != fosEnd && mosIt != mosEnd;) {
-    int fos = *fosIt, mos = *mosIt + currentRow;
+    int fos = fosIt->first, mos = mosIt->first + currentRow;
 
     if (fos < mos) {
       if (fos != currentRow) output.push_back(fos);
 
       ++fosIt;
-    } else {
+    } else if (mos < fos) {
       if (mos != currentRow) output.push_back(mos);
 
+      ++mosIt;
+    } else {
+      if (fos != currentRow) output.push_back(fos);
+      ++fosIt;
       ++mosIt;
     }
   }
 
   for (; fosIt != fosEnd; ++fosIt)
-    if (*fosIt != currentRow) output.push_back(*fosIt);
+    if (fosIt->first != currentRow) output.push_back(fosIt->first);
 
   for (; mosIt != mosEnd; ++mosIt) {
-    int mos = *mosIt + currentRow;
+    int mos = mosIt->first + currentRow;
     if (mos != currentRow) output.push_back(mos);
   }
+}
+
+//-------------------------------------------------------------------
+
+OnionSkinMask::MarkerList::iterator OnionSkinMask::findMarker(
+    MarkerList &markers, int position) {
+  return std::lower_bound(
+      markers.begin(), markers.end(), position,
+      [](const Marker &marker, int value) { return marker.first < value; });
+}
+
+//-------------------------------------------------------------------
+
+OnionSkinMask::MarkerList::const_iterator OnionSkinMask::findMarker(
+    const MarkerList &markers, int position) {
+  return std::lower_bound(
+      markers.begin(), markers.end(), position,
+      [](const Marker &marker, int value) { return marker.first < value; });
 }
 
 //-------------------------------------------------------------------
@@ -106,39 +128,73 @@ void OnionSkinMask::getAll(int currentRow, std::vector<int> &output) const {
 void OnionSkinMask::setMos(int drow, bool on) {
   assert(drow != 0);
 
-  typedef std::vector<int>::iterator Iter;
-  std::pair<Iter, Iter> r = std::equal_range(m_mos.begin(), m_mos.end(), drow);
+  MarkerList::iterator marker = findMarker(m_mos, drow);
 
   if (on) {
-    if (r.first == r.second) m_mos.insert(r.first, drow);
+    if (marker == m_mos.end() || marker->first != drow)
+      m_mos.insert(marker, Marker(drow, -1.0));
   } else {
-    if (r.first != r.second) m_mos.erase(r.first, r.second);
+    if (marker != m_mos.end() && marker->first == drow) m_mos.erase(marker);
   }
 }
 
 //-------------------------------------------------------------------
 
 void OnionSkinMask::setFos(int row, bool on) {
-  typedef std::vector<int>::iterator Iter;
-  std::pair<Iter, Iter> r = std::equal_range(m_fos.begin(), m_fos.end(), row);
+  MarkerList::iterator marker = findMarker(m_fos, row);
 
   if (on) {
-    if (r.first == r.second) m_fos.insert(r.first, row);
+    if (marker == m_fos.end() || marker->first != row)
+      m_fos.insert(marker, Marker(row, -1.0));
   } else {
-    if (r.first != r.second) m_fos.erase(r.first, r.second);
+    if (marker != m_fos.end() && marker->first == row) m_fos.erase(marker);
   }
 }
 
 //-------------------------------------------------------------------
 
+void OnionSkinMask::setMosOpacity(int drow, double opacity) {
+  assert(opacity == -1.0 || (opacity >= 0.0 && opacity <= 1.0));
+  MarkerList::iterator marker = findMarker(m_mos, drow);
+  if (marker != m_mos.end() && marker->first == drow)
+    marker->second = opacity;
+}
+
+//-------------------------------------------------------------------
+
+double OnionSkinMask::getMosOpacity(int drow) const {
+  MarkerList::const_iterator marker = findMarker(m_mos, drow);
+  return marker != m_mos.end() && marker->first == drow ? marker->second : -1.0;
+}
+
+//-------------------------------------------------------------------
+
+void OnionSkinMask::setFosOpacity(int row, double opacity) {
+  assert(opacity == -1.0 || (opacity >= 0.0 && opacity <= 1.0));
+  MarkerList::iterator marker = findMarker(m_fos, row);
+  if (marker != m_fos.end() && marker->first == row)
+    marker->second = opacity;
+}
+
+//-------------------------------------------------------------------
+
+double OnionSkinMask::getFosOpacity(int row) const {
+  MarkerList::const_iterator marker = findMarker(m_fos, row);
+  return marker != m_fos.end() && marker->first == row ? marker->second : -1.0;
+}
+
+//-------------------------------------------------------------------
+
 bool OnionSkinMask::isFos(int row) const {
-  return std::binary_search(m_fos.begin(), m_fos.end(), row);
+  MarkerList::const_iterator marker = findMarker(m_fos, row);
+  return marker != m_fos.end() && marker->first == row;
 }
 
 //-------------------------------------------------------------------
 
 bool OnionSkinMask::isMos(int drow) const {
-  return std::binary_search(m_mos.begin(), m_mos.end(), drow);
+  MarkerList::const_iterator marker = findMarker(m_mos, drow);
+  return marker != m_mos.end() && marker->first == drow;
 }
 
 //-------------------------------------------------------------------
@@ -148,7 +204,7 @@ bool OnionSkinMask::getMosRange(int &drow0, int &drow1) const {
     drow0 = 0, drow1 = -1;
     return false;
   } else {
-    drow0 = m_mos.front(), drow1 = m_mos.back();
+    drow0 = m_mos.front().first, drow1 = m_mos.back().first;
     return true;
   }
 }

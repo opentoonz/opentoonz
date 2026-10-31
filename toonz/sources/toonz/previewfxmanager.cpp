@@ -195,6 +195,7 @@ public:
 
   TRenderSettings m_renderSettings;
   TDimension m_cameraRes;
+  TPointD m_cameraDpi;
   TRectD m_renderArea;
   TPointD m_cameraPos;
   TPointD m_subcameraDisplacement;
@@ -761,7 +762,10 @@ void PreviewFxInstance::updateCamera() {
   cameraRes.lx /= m_renderSettings.m_shrinkX;
   cameraRes.ly /= m_renderSettings.m_shrinkY;
 
-  if (m_cameraRes != cameraRes || m_renderArea != renderArea) {
+  const TPointD cameraDpi = currCamera->getDpi();
+  if (m_cameraRes != cameraRes || m_renderArea != renderArea ||
+      m_cameraDpi != cameraDpi) {
+    m_cameraDpi  = cameraDpi;
     m_cameraRes  = cameraRes;
     m_renderArea = renderArea;
     m_cameraPos  = cameraPos;
@@ -1101,6 +1105,10 @@ void PreviewFxInstance::doOnRenderRasterCompleted(
     ras->clear();
     ri = TRasterImageP(ras);
   }
+
+  // Retain physical frame proportions for camera guides in the Flipbook.
+  ri->setDpi(m_cameraDpi.x / m_renderSettings.m_shrinkX,
+             m_cameraDpi.y / m_renderSettings.m_shrinkY);
 
   // Finally, copy the rendered raster over the cached one
   TRect rectUnderRender(

@@ -96,6 +96,7 @@ public:
 
   void setBaseValue(MyPaintBrushSetting id, bool enable, float value);
   void resetBaseValues();
+  bool saveBrushAs(const TFilePath &path, QString &errorMessage) const;
 
   void setBaseValue(MyPaintBrushSetting id, float value) {
     setBaseValue(id, true, value);

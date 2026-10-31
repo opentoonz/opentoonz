@@ -15,6 +15,7 @@
 class SceneViewer;
 class Ruler;
 class TAffine;
+class QColor;
 
 //=============================================================================
 // ViewerDraw
@@ -40,11 +41,12 @@ void draw3DCamera(unsigned long flags, double zmin, double phi);
 void drawCamera(unsigned long flags, double pixelSize);
 
 void draw3DFrame(double zmin, double phi);
-void drawDisk(int &tableDLId);
+void drawDisk(int &tableDLId, const QColor &tableColor);
 void drawFieldGuide();
 void drawColorcard(UCHAR channel);
 
 void drawSafeArea();
+void drawCameraGuide(const TRectD &rect);
 
 unsigned int createDiskDisplayList();
 

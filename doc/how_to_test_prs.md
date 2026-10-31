@@ -59,3 +59,11 @@ When a PR is submitted, it is compiled automatically by AppVeyor CI. The AppVeyo
 - Enter the folder you extracted everything into and double-click the OpenToonz executable to start.
 - Test away!  Report any suggestions or issues related to the change in the PR comments.
 - You can safely delete the .zip file and the folder you created when you are done.
+
+## Testing translation changes
+
+Follow the [translation guide](../toonz/sources/translations/README.md) to check
+which configuration directory the test executable loads. Verify the changed
+`loc/<UI language name>/<module>.qm` is present and current; an executable-only
+update does not establish this. Select the language, restart, and inspect the
+changed UI. Report the language, commit/build, catalog path, and observed wording.

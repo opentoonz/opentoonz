@@ -292,6 +292,7 @@ ShortcutTree::ShortcutTree(QWidget *parent) : QTreeWidget(parent) {
   addFolder(tr("Windows"), MenuWindowsCommandType, menuCommandFolder);
   QTreeWidgetItem *windowsFolder = m_subFolders.back();
   addFolder(tr("Custom Panels"), CustomPanelCommandType, windowsFolder);
+  addFolder(tr("Rooms"), RoomCommandType, windowsFolder);
   addFolder(tr("Help"), MenuHelpCommandType, menuCommandFolder);
 
   addFolder(tr("Right-click Menu Commands"), RightClickMenuCommandType);
@@ -449,6 +450,7 @@ void ShortcutTree::refreshTree() {
   addFolder(tr("Windows"), MenuWindowsCommandType, menuCommandFolder);
   QTreeWidgetItem *windowsFolder = m_subFolders.back();
   addFolder(tr("Custom Panels"), CustomPanelCommandType, windowsFolder);
+  addFolder(tr("Rooms"), RoomCommandType, windowsFolder);
   addFolder(tr("Help"), MenuHelpCommandType, menuCommandFolder);
 
   addFolder(tr("Right-click Menu Commands"), RightClickMenuCommandType);

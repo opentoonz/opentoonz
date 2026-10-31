@@ -1,6 +1,8 @@
 
 
 #include "imageviewer.h"
+#include "viewerdraw.h"
+#include "toonz/cameraguide.h"
 
 // Tnz6 includes
 #include "tapp.h"
@@ -44,6 +46,7 @@
 //===================================================================================
 
 extern ToggleCommandHandler safeAreaToggle;
+extern ToggleCommandHandler centerCutGuideToggle;
 extern void getSafeAreaData(double &_smallSize, double &_largeSize);
 // enable to choose safe area from a list, and enable to draw multiple lines
 extern void getSafeAreaSizeList(QList<QList<double>> &_sizeList);
@@ -308,6 +311,8 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event) {
 
     menu->addSeparator();
   }
+
+  menu->addAction(CommandManager::instance()->getAction(MI_CenterCutGuide));
 
   QAction *reset = menu->addAction(tr("Reset View"));
   reset->setShortcut(
@@ -599,6 +604,35 @@ void ImageViewer::paintGL() {
       drawSafeArea(bbox);
     }
   }
+  if (centerCutGuideToggle.getStatus() && !m_isColorModel) {
+    TRasterImageP ri = m_image;
+    TToonzImageP ti  = m_image;
+    if (ri || ti) {
+      const TDimension size =
+          imageSize.lx > 0 && imageSize.ly > 0
+              ? imageSize
+              : (ri ? ri->getRaster()->getSize() : ti->getRaster()->getSize());
+      TPointD dpi;
+      if (ri)
+        ri->getDpi(dpi.x, dpi.y);
+      else
+        ti->getDpi(dpi.x, dpi.y);
+      // Images without valid DPI are interpreted as square pixels.
+      if (!std::isfinite(dpi.x) || !std::isfinite(dpi.y) || dpi.x <= 0.0 ||
+          dpi.y <= 0.0)
+        dpi = TPointD(1.0, 1.0);
+      const TRectD physicalFrame(-0.5 * size.lx / dpi.x, -0.5 * size.ly / dpi.y,
+                                 0.5 * size.lx / dpi.x, 0.5 * size.ly / dpi.y);
+      const TRectD guide = CameraGuide::centeredRect(physicalFrame, 4.0 / 3.0);
+      glPushMatrix();
+      glLoadIdentity();
+      tglMultMatrix(TTranslation(viewerSize.lx * 0.5, viewerSize.ly * 0.5) *
+                    m_viewAff * TScale(dpi.x, dpi.y));
+      ViewerDraw::drawCameraGuide(guide);
+      glPopMatrix();
+    }
+  }
+
   TPoint fromPos, toPos;
 
   if (m_visualSettings.m_defineLoadbox && m_flipbook) {

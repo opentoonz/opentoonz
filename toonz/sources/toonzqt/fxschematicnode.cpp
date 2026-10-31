@@ -41,6 +41,8 @@
 #include "tfxattributes.h"
 #include "tmacrofx.h"
 #include "trasterfx.h"
+#include "texternfx.h"
+#include "pluginhost.h"
 #include "tpassivecachemanager.h"
 
 // TnzCore includes
@@ -867,6 +869,44 @@ void FxPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
     menu.addMenu(insertMenu);
     menu.addMenu(addMenu);
     if (m_type != eGroupedFx) menu.addMenu(replacefxMenu);
+  }
+  // Reset only the clicked, standalone factory FX. Reuse replacement so
+  // connections, position, grouping and Undo/Redo follow Replace FX behavior.
+  if (enableInsertAction && m_type != eGroupedFx &&
+      !dynamic_cast<TMacroFx *>(fx) && !dynamic_cast<TColumnFx *>(fx) &&
+      !dynamic_cast<TExternFx *>(fx) &&
+      !dynamic_cast<RasterFxPluginHost *>(fx) &&
+      !isAInnerMacroFx(fx, fxScene->getXsheet())) {
+    TFxP defaults = TFx::create(fx->getFxType());
+    bool compatible =
+        defaults && defaults->getInputPortCount() == fx->getInputPortCount();
+    // Replacement matches input ports by index. Do not drop or misroute
+    // connections when a dynamic port layout differs from a fresh instance.
+    for (int p = 0; compatible && p < fx->getInputPortCount(); ++p)
+      compatible = defaults->getInputPortName(p) == fx->getInputPortName(p);
+    if (compatible) {
+      QAction *resetFx = menu.addAction(tr("Reset FX"));
+      resetFx->setToolTip(tr(
+          "Reset all FX settings. Hold Shift when triggering to reset animated "
+          "values at the current frame only."));
+      TFxP target = fx;
+      connect(resetFx, &QAction::triggered, fxScene,
+              [fxScene, target, defaults]() {
+                if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
+                  TFxCommand::resetFxFrame(
+                      target.getPointer(), defaults.getPointer(),
+                      fxScene->getFrameHandle()->getFrameIndex(),
+                      fxScene->getXsheetHandle(), fxScene->getFxHandle());
+                  return;
+                }
+                defaults->setName(target->getName());
+                QList<TFxP> fxs;
+                fxs.append(target);
+                TFxCommand::replaceFx(defaults.getPointer(), fxs,
+                                      fxScene->getXsheetHandle(),
+                                      fxScene->getFxHandle());
+              });
+    }
   }
   if (m_type != eGroupedFx) menu.addAction(fxEditorPopup);
   if (enableInsertAction) {

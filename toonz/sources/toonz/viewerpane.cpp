@@ -64,6 +64,7 @@
 #include <QToolBar>
 #include <QMainWindow>
 #include <QSettings>
+#include <QTimer>
 
 #include "viewerpane.h"
 
@@ -79,6 +80,19 @@ enum OldV_Parts {
   OldVPARTS_End         = 0x8,
   OldVPARTS_ALL         = OldVPARTS_PLAYBAR | OldVPARTS_FRAMESLIDER
 };
+
+namespace {
+
+//! Keeps the view center and zoom, drops rotation and reflection.
+TAffine zoomPanOnly(const TAffine &aff) {
+  const double det = aff.det();
+  if (std::abs(det) < 1e-12) return TAffine();
+  const TPointD center = aff.inv() * TPointD(0, 0);
+  const double scale   = std::sqrt(std::abs(det));
+  return TScale(scale) * TTranslation(-center.x, -center.y);
+}
+
+}  // namespace
 
 //=============================================================================
 //
@@ -135,6 +149,10 @@ BaseViewerPanel::BaseViewerPanel(QWidget *parent, Qt::WindowFlags flags)
   m_flipConsole->setFrameHandle(TApp::instance()->getCurrentFrame());
 
   bool ret = true;
+  ret = ret && connect(m_flipConsole, &FlipConsole::sliderReleased, this, []() {
+          if (!TApp::instance()->getCurrentFrame()->isPlaying())
+            TApp::instance()->getCurrentXsheet()->getXsheet()->stopScrub();
+        });
   // When zoom changed, only if the viewer is active, change window titl
   ret = ret && connect(m_sceneViewer, SIGNAL(onZoomChanged()),
                        SLOT(changeWindowTitle()));
@@ -221,6 +239,8 @@ void BaseViewerPanel::addShowHideContextMenu(QMenu *menu) {
   showHideMenu->addAction(CommandManager::instance()->getAction(MI_ViewTable));
   showHideMenu->addAction(CommandManager::instance()->getAction(MI_FieldGuide));
   showHideMenu->addAction(CommandManager::instance()->getAction(MI_SafeArea));
+  showHideMenu->addAction(
+      CommandManager::instance()->getAction(MI_CenterCutGuide));
   showHideMenu->addAction(CommandManager::instance()->getAction(MI_ViewBBox));
   showHideMenu->addAction(
       CommandManager::instance()->getAction(MI_ViewColorcard));
@@ -356,6 +376,11 @@ void BaseViewerPanel::showEvent(QShowEvent *event) {
   // refresh
   onSceneChanged();
   changeWindowTitle();
+
+  if (m_pendingViewState.valid) {
+    m_pendingViewState.valid = false;
+    QTimer::singleShot(0, this, [this]() { applyPendingViewState(); });
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -736,6 +761,7 @@ void BaseViewerPanel::onSceneSwitched() {
                                   ->getFrameRate());
   m_sceneViewer->setEditPreviewSubcamera(false);
   onSceneChanged();
+
 }
 
 //-----------------------------------------------------------------------------
@@ -853,9 +879,59 @@ void BaseViewerPanel::setVisiblePartsFlag(UINT flag) {
   updateShowHide();
 }
 
+void BaseViewerPanel::applyReferenceMode(int mode) {
+  if (!m_sceneViewer) return;
+  if (m_referenceModeBs && m_referenceModeBs->select(mode)) return;
+  m_sceneViewer->setReferenceMode(mode);
+}
+
+//-----------------------------------------------------------------------------
+
+void BaseViewerPanel::applyPendingViewState() {
+  if (!m_sceneViewer) return;
+
+  for (int m = 0; m < 2; ++m)
+    m_sceneViewer->setViewZoomPan(m, m_pendingViewState.viewAffs[m]);
+
+  if (m_pendingViewState.hasCamera3D) {
+    m_sceneViewer->setCamera3DViewState(
+        m_pendingViewState.pan3D, m_pendingViewState.zoomScale3D,
+        m_pendingViewState.phi3D, m_pendingViewState.theta3D);
+  }
+
+  if (m_pendingViewState.referenceMode >= 0)
+    applyReferenceMode(m_pendingViewState.referenceMode);
+
+  m_sceneViewer->invalidateAll();
+}
+
+//-----------------------------------------------------------------------------
+
 // SaveLoadQSettings
 void BaseViewerPanel::save(QSettings &settings) const {
   settings.setValue("viewerVisibleParts", m_visiblePartsFlag);
+
+  for (int m = 0; m < 2; ++m) {
+    TAffine a = zoomPanOnly(m_sceneViewer->getViewAffine(m));
+    settings.beginGroup(QString("viewAff%1").arg(m));
+    settings.setValue("a11", a.a11);
+    settings.setValue("a12", a.a12);
+    settings.setValue("a13", a.a13);
+    settings.setValue("a21", a.a21);
+    settings.setValue("a22", a.a22);
+    settings.setValue("a23", a.a23);
+    settings.endGroup();
+  }
+
+  settings.setValue("referenceMode", m_sceneViewer->getReferenceMode());
+
+  settings.beginGroup(QStringLiteral("camera3D"));
+  settings.setValue("panX", m_sceneViewer->getPan3D().x);
+  settings.setValue("panY", m_sceneViewer->getPan3D().y);
+  settings.setValue("zoom", m_sceneViewer->getZoomScale3D());
+  settings.setValue("phi", m_sceneViewer->getPhi3D());
+  settings.setValue("theta", m_sceneViewer->getTheta3D());
+  settings.endGroup();
 }
 
 void BaseViewerPanel::load(QSettings &settings) {
@@ -863,6 +939,46 @@ void BaseViewerPanel::load(QSettings &settings) {
   m_visiblePartsFlag =
       settings.value("viewerVisibleParts", m_visiblePartsFlag).toUInt();
   updateShowHide();
+
+  if (!Preferences::instance()->isRestoreViewerViewFromLastSessionEnabled())
+    return;
+
+  PendingViewState pending;
+  for (int m = 0; m < 2; ++m) {
+    QString groupKey = QString("viewAff%1").arg(m);
+    if (!settings.childGroups().contains(groupKey)) continue;
+    settings.beginGroup(groupKey);
+    TAffine a;
+    a.a11 = settings.value("a11", 1.0).toDouble();
+    a.a12 = settings.value("a12", 0.0).toDouble();
+    a.a13 = settings.value("a13", 0.0).toDouble();
+    a.a21 = settings.value("a21", 0.0).toDouble();
+    a.a22 = settings.value("a22", 1.0).toDouble();
+    a.a23 = settings.value("a23", 0.0).toDouble();
+    settings.endGroup();
+    pending.viewAffs[m] = zoomPanOnly(a);
+    pending.valid       = true;
+  }
+
+  if (settings.contains("referenceMode")) {
+    pending.referenceMode = settings.value("referenceMode").toInt();
+    pending.valid         = true;
+  }
+
+  if (settings.childGroups().contains(QStringLiteral("camera3D"))) {
+    settings.beginGroup(QStringLiteral("camera3D"));
+    pending.pan3D =
+        TPointD(settings.value("panX", 0.0).toDouble(),
+                settings.value("panY", 0.0).toDouble());
+    pending.zoomScale3D = settings.value("zoom", 1.0).toDouble();
+    pending.phi3D       = settings.value("phi", 30.0).toDouble();
+    pending.theta3D     = settings.value("theta", 20.0).toDouble();
+    settings.endGroup();
+    pending.hasCamera3D = true;
+    pending.valid       = true;
+  }
+
+  if (pending.valid) m_pendingViewState = pending;
 }
 
 //-----------------------------------------------------------------------------
