@@ -1302,6 +1302,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
           "Area")},
       {actualPixelViewOnSceneEditingMode,
        tr("Enable Actual Pixel View on Scene Editing Mode")},
+      {syncSceneAndLevelView, tr("Sync Scene and Level View (Zoom / Pan)")},
       {showRasterImagesDarkenBlendedInViewer,
        tr("Show Raster Images Darken Blended")},
       {iconSize, tr("Level Strip Thumbnail Size*:")},
@@ -2477,6 +2478,7 @@ QWidget* PreferencesPopup::createPreviewPage() {
     insertUI(viewerZoomCenter, viewerLay, getComboItemList(viewerZoomCenter));
     insertUI(ignoreAlphaonColumn1Enabled, viewerLay);
     insertUI(actualPixelViewOnSceneEditingMode, viewerLay);
+    insertUI(syncSceneAndLevelView, viewerLay);
     insertUI(showRasterImagesDarkenBlendedInViewer, viewerLay);
     insertUI(viewerIndicatorEnabled, viewerLay);
     insertUI(restoreViewerViewFromLastSession, viewerLay);
@@ -2513,8 +2515,17 @@ QWidget* PreferencesPopup::createPreviewPage() {
 
   m_onEditedFuncMap.insert(blanksCount, &PreferencesPopup::onBlankCountChanged);
   m_onEditedFuncMap.insert(blankColor, &PreferencesPopup::onBlankColorChanged);
+  m_onEditedFuncMap.insert(syncSceneAndLevelView,
+                           &PreferencesPopup::onSyncSceneAndLevelViewChanged);
 
   return widget;
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onSyncSceneAndLevelViewChanged() {
+  TApp::instance()->getCurrentScene()->notifyPreferenceChanged(
+      "SyncSceneAndLevelView");
 }
 
 //-----------------------------------------------------------------------------

@@ -151,6 +151,7 @@ private:
   // Preview
   void onBlankCountChanged();
   void onBlankColorChanged();
+  void onSyncSceneAndLevelViewChanged();
   // Onion Skin
   void onOnionSkinVisibilityChanged();
   void onOnionColorChanged();
