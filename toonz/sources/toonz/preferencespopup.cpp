@@ -1778,6 +1778,16 @@ PreferencesPopup::PreferencesPopup()
             QSignalBlocker blocker(saveboxCheck);
             saveboxCheck->setChecked(enabled);
           });
+  connect(TApp::instance()->getCurrentScene(), &TSceneHandle::preferenceChanged,
+          this, [this](const QString& prefName) {
+            if (prefName != "SyncSceneAndLevelView") return;
+            CheckBox* syncViewCheck = getUI<CheckBox*>(syncSceneAndLevelView);
+            if (!syncViewCheck) return;
+            bool enabled = m_pref->isSyncSceneAndLevelViewEnabled();
+            if (syncViewCheck->isChecked() == enabled) return;
+            QSignalBlocker blocker(syncViewCheck);
+            syncViewCheck->setChecked(enabled);
+          });
 }
 
 //-----------------------------------------------------------------------------

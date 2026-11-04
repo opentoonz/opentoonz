@@ -952,7 +952,9 @@ void SceneViewer::setReferenceMode(int referenceMode) {
     emit freezeStateChanged(false);
   }
 
+  bool was3D      = is3DView();
   m_referenceMode = referenceMode;
+  if (was3D) syncSceneAndLevelViewIfEnabled();
   invalidateAll();
   emit onZoomChanged();
 }
@@ -1204,6 +1206,7 @@ void SceneViewer::showEvent(QShowEvent *) {
   TApp::instance()->setActiveViewer(this);
 
   onPreferenceChanged("ColorCalibration");
+  syncSceneAndLevelViewIfEnabled();
   update();
 }
 

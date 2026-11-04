@@ -893,6 +893,8 @@ void BaseViewerPanel::applyPendingViewState() {
   for (int m = 0; m < 2; ++m)
     m_sceneViewer->setViewZoomPan(m, m_pendingViewState.viewAffs[m]);
 
+  m_sceneViewer->syncSceneAndLevelViewIfEnabled();
+
   if (m_pendingViewState.hasCamera3D) {
     m_sceneViewer->setCamera3DViewState(
         m_pendingViewState.pan3D, m_pendingViewState.zoomScale3D,

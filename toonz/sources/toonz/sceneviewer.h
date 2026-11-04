@@ -439,9 +439,6 @@ public slots:
   void resetRotation();
   void resetPosition();
   void setActualPixelSize();
-  //! If Preferences::isSyncSceneAndLevelViewEnabled(), copy the active
-  //! Scene/Level view matrix (and rotation) onto the other slot so zoom/pan
-  //! match when switching Xsheet ↔ Level Strip editing.
   void syncSceneAndLevelViewIfEnabled();
   void flipX();
   void flipY();
