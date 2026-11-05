@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Cel Boil</title></head>
+<body>
+<h1>Cel Boil</h1>
+<p>Add a controlled hand-drawn "boil" to clean artwork, so a held drawing does
+not look frozen. Add Cel Boil from the Distort category and connect the drawing
+to Source. The image, or only its lines, is displaced by a smooth wobble that
+holds for a number of frames and then changes.</p>
+<h2>Boil</h2>
+<p><b>Whole Image</b> moves every pixel. <b>Lines Only</b> moves only the
+lines: pixels darker than <b>Line Darkness</b> (0 is black, 1 is white), with
+their antialiased edge. The paint under a moving line is filled from the
+nearest paint, so the lines move over the colours without opening holes.</p>
+<h2>Shape</h2>
+<p><b>Amplitude</b> is the largest displacement, in the drawing's own pixels;
+1 to 2 gives a subtle boil. <b>Wobble Size</b> is the size of the wobble's
+features, from 1 to 100 pixels: small values make the lines crawl, large values
+make them sway. <b>Detail</b> adds a finer wobble on top, as a share of the
+amplitude. An amplitude of 0 passes the image through exactly.</p>
+<h2>Timing</h2>
+<p><b>Cycle</b> is the number of frames each wobble is held: 2 is the classic
+boil on twos. <b>Blend</b> is the share of each cycle spent changing smoothly
+into the next wobble; 0 jumps. <b>Seed</b> picks the sequence of wobbles: the
+same seed always gives the same boil, so renders are repeatable, and two
+columns with different seeds boil independently.</p>
+<h2>Notes</h2>
+<p>Every value can be animated. 8-bit, 16-bit and floating-point images are
+supported. The wobble is tied to the drawing's position, not to the render
+tiles or the preview size, and the frames of one cycle share a cache entry.</p>
+</body>
+</html>
