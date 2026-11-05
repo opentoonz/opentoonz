@@ -17,6 +17,8 @@
 
 // STD includes
 #include <set>
+#include <cmath>
+#include <vector>
 
 #include "tdoubleparam.h"
 
@@ -302,6 +304,10 @@ public:
   double m_defaultValue, m_minValue, m_maxValue;
   DoubleKeyframeVector m_keyframes;
   bool m_cycleEnabled;
+  std::vector<std::string> m_uiChoices;
+  bool m_uiCheckbox       = false;
+  bool m_hasUISliderRange = false;
+  double m_uiSliderMin = 0.0, m_uiSliderMax = 0.0;
 
   std::set<TParamObserver *> m_observers;
 
@@ -325,6 +331,11 @@ public:
     m_maxValue     = src->m_maxValue;
     m_keyframes    = src->m_keyframes;
     m_cycleEnabled = src->m_cycleEnabled;
+    m_uiChoices        = src->m_uiChoices;
+    m_uiCheckbox       = src->m_uiCheckbox;
+    m_hasUISliderRange = src->m_hasUISliderRange;
+    m_uiSliderMin      = src->m_uiSliderMin;
+    m_uiSliderMax      = src->m_uiSliderMax;
   }
 
   void notify(const TParamChange &change) {
@@ -501,6 +512,40 @@ bool TDoubleParam::getValueRange(double &min, double &max, double &step) const {
   step = 1;  // m_imp->m_valueStep;
   return min < max;
 }
+
+void TDoubleParam::setUISliderRange(double min, double max) {
+  if (!std::isfinite(min) || !std::isfinite(max) || min >= max ||
+      min < m_imp->m_minValue || max > m_imp->m_maxValue)
+    throw TException("Slider bounds must lie within the numeric range");
+  m_imp->m_hasUISliderRange = true;
+  m_imp->m_uiSliderMin      = min;
+  m_imp->m_uiSliderMax      = max;
+}
+
+bool TDoubleParam::getUISliderRange(double &min, double &max) const {
+  if (!m_imp->m_hasUISliderRange) return false;
+  min = std::max(m_imp->m_minValue, m_imp->m_uiSliderMin);
+  max = std::min(m_imp->m_maxValue, m_imp->m_uiSliderMax);
+  return min < max;
+}
+
+//---------------------------------------------------------
+
+void TDoubleParam::setUIChoices(const std::vector<std::string> &choices,
+                                bool checkbox) {
+  if ((!choices.empty() && choices.size() < 2) ||
+      (checkbox && choices.size() != 2))
+    throw TException("Discrete controls require at least two choices");
+  m_imp->m_uiChoices  = choices;
+  m_imp->m_uiCheckbox = checkbox;
+  if (!choices.empty()) setValueRange(0, double(choices.size() - 1));
+}
+
+const std::vector<std::string> &TDoubleParam::getUIChoices() const {
+  return m_imp->m_uiChoices;
+}
+
+bool TDoubleParam::isUICheckbox() const { return m_imp->m_uiCheckbox; }
 
 //---------------------------------------------------------
 
