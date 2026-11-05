@@ -692,9 +692,9 @@ void FileSelection::selectAll() {
   DvItemSelection::selectAll();
   FileBrowser::updateItemViewerPanel();
   if (FileBrowser *browser = dynamic_cast<FileBrowser *>(getModel()))
-    browser->storePersistedSelection();
+    browser->onSelectedItems(getSelectedIndices());
   else if (SceneBrowser *browser = dynamic_cast<SceneBrowser *>(getModel()))
-    browser->storePersistedSelection();
+    browser->onSelectedItems(getSelectedIndices());
 }
 
 //------------------------------------------------------------------------

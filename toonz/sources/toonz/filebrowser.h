@@ -117,6 +117,7 @@ types to be displayed in the file browser.
   void enableGlobalSelection(bool enabled);
   void selectNone();
   void storePersistedSelection();
+  void onSelectedItems(const std::set<int> &indexes);
 
   QSplitter *getMainSplitter() const { return m_mainSplitter; }
 
@@ -159,7 +160,6 @@ protected slots:
   void loadResources();
   void onClickedItem(int index);
   void onDoubleClickedItem(int index);
-  void onSelectedItems(const std::set<int> &indexes);
   void folderUp();
   void newFolder();
 
