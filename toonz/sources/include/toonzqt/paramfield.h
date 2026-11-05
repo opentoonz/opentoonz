@@ -440,6 +440,7 @@ class DVAPI PixelParamField final
 public:
   PixelParamField(QWidget *parent, QString name, const TPixelParamP &param);
 
+  void update(int frame) override;
   void updateField(TPixel32 value) override;
 
   QSize getPreferredSize() override { return QSize(480, 40); }
