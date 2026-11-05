@@ -16,6 +16,13 @@
 		<control>textColor</control>
 		<control>boxColor</control>
 		<control>showBorder</control>
+		<control>transformWithColumn</control>
+		<separator label="Layout"/>
+		<control>kerning</control>
+		<control>letterSpacing</control>
+		<control>lineSpacing</control>
+		<control>indent</control>
+		<control>shrinkToFit</control>
   	</vbox>
   	</page>
 </fxlayout>
