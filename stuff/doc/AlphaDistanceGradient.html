@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Alpha Distance Gradient</title></head>
+<body>
+<h1>Alpha Distance Gradient</h1>
+<p>Create colored auras, edge shading and depth-like gradients from a drawing's
+alpha mask. Add Alpha Distance Gradient from the Gradient category and connect
+an image to Source. This native effect implements the complete distance-gradient
+workflow with defined pixel distances and blur behavior.</p>
+<h2>Region and distance</h2>
+<p>Region selects Inside, Outside or Both. Inside Threshold and Outside Threshold
+independently set the maximum gradient distance, from 0 to 1000 effect pixels;
+both default to 128. Preview resolution scales distances with the drawing.
+Any finite positive-alpha source pixel belongs to the mask, including partial
+coverage. Distances are Euclidean distances to the nearest opposite-region pixel
+center, minus one pixel. Thus boundary-adjacent pixels start at zero and the
+falloff is independent of each island's size. A threshold of zero retains only
+the boundary-adjacent pixels. Holes count as outside.</p>
+<h2>Color and transparency</h2>
+<p>RGB uses Gradation Color near the mask boundary. Layer uses the source's
+straight RGB, including nearest-source colors outside the mask. Equal-distance
+ties choose the lowest row, then the lowest column. Partial alpha defines mask
+membership; the effect generates new coverage from distance.</p>
+<p>When Use Background Color is off, the gradient fades to transparency. When
+on, alpha is fully opaque across the finite effect canvas and the gradient blends
+toward BG Color. Color swatch alpha does not affect the result. Invert reverses
+the generated coverage, or exchanges the near and far color weights when the
+background is enabled. Regions excluded by Region have zero gradient strength
+before blur and inversion.</p>
+<h2>Interpolation</h2>
+<ul>
+<li>Linear: strength decreases evenly from 1 to 0.</li>
+<li>Sphere: strength follows the rounded profile sqrt(1 - t squared).</li>
+<li>Power: strength is (1 - t) raised to Power. Values above 1 sharpen the
+falloff; values below 1 make it rounder. Power ranges from 0.01 to 5.</li>
+<li>Constant: strength stays at 1 through the threshold, then becomes 0.</li>
+</ul>
+<p>Here t is distance divided by the corresponding threshold. Beyond the
+threshold, strength is zero. Color and alpha are composed after interpolation
+and blur, keeping color edges free of dark premultiplication fringes.</p>
+<h2>Post blur</h2>
+<p>No Blur leaves the distance profile unchanged. Blur No Scale applies a soft
+blur to its strength. Blur applies the same filter and rescales the resulting
+strength to preserve the original peak, keeping narrow features brighter.
+Rescaling uses the entire canonical canvas, so rendering separate tiles produces
+the same result. These are distinct processing modes.</p>
+<p>Blur Size ranges from 0 to 4096 effect pixels. Zero bypasses either blur mode.
+The native filter distributes a total radius of ceil(Blur Size) across three
+separable box averages, producing a Gaussian-like soft profile in linear time.
+Samples beyond the canvas are transparent. The output bounds include the full
+three-pass blur support.</p>
+<h2>Canvas, animation and precision</h2>
+<p>The canonical canvas is the source's full image bounds when the input provides
+them, otherwise its finite effect bounds. Outside gradients and blur expand that
+canvas by their full support. An infinite generator uses the finite camera box;
+if neither input nor camera has finite bounds, apply a crop before this effect.
+A clear render error is reported instead of choosing a different canvas per tile.</p>
+<p>An empty mask has zero gradient strength; an opaque mask measures inward from
+its finite canvas boundary. Background and Invert still operate on an empty mask.
+Missing Source yields transparent output. Very large canvases or blur sizes may
+require substantial memory; dimensions that cannot be represented are rejected.</p>
+<p>All twelve controls support native animation, undo, presets, scene saving,
+cloning, linked parameters and macro exposure. Choice and checkbox keys use
+constant interpolation when inserted by their native editors. 8-bit, 16-bit and
+float rendering are supported; finite HDR source colors are preserved in float.
+Nonfinite source channels are treated as transparent. Finite sources are evaluated
+on their native pixel grid. For an identifiable raster level, its original full
+canvas defines the domain and distances count original level pixels, before DPI
+and geometry placements. Odd-sized canvases retain their half-pixel alignment.
+Vector artwork and graphs without one identifiable raster level use finite world
+effect bounds and world pixels. The host resamples the completed gradient for
+preview scaling, rotation, reflection and nonuniform transforms. Infinite sources are
+rendered on the camera pixel grid instead, keeping the camera domain fixed in
+output coordinates. Their distance and blur sizes use the affine's area scale;
+rotation and translation never resize or move the camera canvas. These policies
+keep the domain independent of the requested render tile.</p>
+</body>
+</html>

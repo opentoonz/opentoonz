@@ -1,0 +1,16 @@
+<fxlayout help_file="AlphaDistanceGradient.html">
+  <page name="Alpha Distance Gradient">
+    <control>region</control>
+    <control>insideThreshold</control>
+    <control>outsideThreshold</control>
+    <control>renderMode</control>
+    <control>useBackground</control>
+    <control>gradationColor</control>
+    <control>backgroundColor</control>
+    <control>invert</control>
+    <control>interpolation</control>
+    <control>power</control>
+    <control>blurMode</control>
+    <control>blurSize</control>
+  </page>
+</fxlayout>
