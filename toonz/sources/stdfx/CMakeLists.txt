@@ -12,6 +12,7 @@ set(HEADERS
     perlinnoise.h
     pins.h
     stdfx.h
+    celsmoothing.h
     shadowbevelutils.h
     texturefxP.h
     warp.h
@@ -297,6 +298,7 @@ set(SOURCES
     iwa_flowpaintbrushfx.cpp
     iwa_motionflowfx.cpp
     iwa_smootherfx.cpp
+    celsmoother2fx.cpp
     naru_lazybrush.cpp
 )
 
