@@ -1921,7 +1921,7 @@ TFilePath doRenameAsToonzLevel(const QString &fullpath) {
     }
   }
   if (!overwrite) return TFilePath();
-  return TFilePath(fullpath.toStdWString()).withName(name.toStdWString());
+  return levelOut;
 }
 
 }  // namespace
