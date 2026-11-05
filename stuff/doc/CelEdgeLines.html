@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Cel Edge Lines</title></head>
+<body>
+<h1>Cel Edge Lines</h1>
+<p>Draw lines along the boundaries between flat colour regions. Add Cel Edge
+Lines from the Stylize category and connect the drawing to Source. It suits
+lineless styles that still need some outlines, and re-inking a drawing after its
+colours changed.</p>
+<p>By default there is a black line of weight 2 between any two colours, and
+one around the drawing where it meets transparency.</p>
+<h2>Rules</h2>
+<p>Each rule names the two regions it draws a line between, and the line's
+weight and colour. An end of a rule is <b>Any Colour</b> (every opaque region),
+<b>Colour</b> (regions of that colour, within Colour Match Tolerance), or
+<b>Transparent</b> (where the drawing ends). The order of the two ends does not
+matter. Where several rules match a boundary, the first one decides its line;
+where none matches, there is no line. Up to 8 rules; <b>Rules</b> sets how many
+are shown and used.</p>
+<p><b>Line Weight</b> is the line's total width, centred on the boundary, in the
+drawing's own pixels; lines around the drawing reach half their weight outside
+it. Fractional weights are antialiased. <b>Line Colour</b>'s alpha is the line's
+opacity.</p>
+<h2>Regions</h2>
+<p>A pixel belongs to a flat region when most of its neighbours have its colour,
+within <b>Region Tolerance</b> (per channel, from 0 to 1). Raise it for noisy or
+dithered colours; lower it to separate close colours. The antialiased pixels
+between two regions are split between them, up to <b>Antialias Gap</b> pixels
+from a flat region. Areas that are not flat, such as gradients, form no region
+and get no lines.</p>
+<h2>Output</h2>
+<p><b>Lines over Source</b> composites the lines over the drawing.
+<b>Lines Only</b> outputs the lines alone, for compositing elsewhere.
+<b>Line Opacity</b> scales every line.</p>
+<h2>Notes</h2>
+<p>Every value can be animated. 8-bit, 16-bit and floating-point images are
+supported. Lines are computed in the level's own pixels for raster levels, so
+they keep their weight at any preview size; the result does not depend on how
+the frame is split into render tiles. Boundaries fall between pixels, so a very
+thin line on a diagonal edge shows the pixel steps.</p>
+</body>
+</html>

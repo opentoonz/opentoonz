@@ -119,6 +119,7 @@ set(SOURCES
     dissolvefx.cpp
     dropshadowfx.cpp
     embossfx.cpp
+    celedgelinesfx.cpp
     erodilatefx.cpp
     externalpalettefx.cpp
     fourpointsgradientfx.cpp
