@@ -1,0 +1,531 @@
+<fxlayout help_file="CelColorKey.html">
+  <page name="Cel Color Key">
+    <control>keep</control>
+    <control>premultiplied</control>
+    <control>colorSpace</control>
+    <control>precision</control>
+    <control>perColor</control>
+    <control>perComponent</control>
+    <vbox modeSensitive="perColor" mode="0">
+      <vbox modeSensitive="perComponent" mode="0">
+        <control>threshold</control>
+      </vbox>
+      <vbox modeSensitive="perComponent" mode="1">
+        <control>component1</control>
+        <control>component2</control>
+        <control>component3</control>
+      </vbox>
+    </vbox>
+    <control>thin</control>
+    <control>thinMetric</control>
+    <control>blur</control>
+    <control>blurMetric</control>
+    <control>blurDirection</control>
+    <control>enabledColors</control>
+    <vbox modeSensitive="keep" mode="1">
+      <control>enableReplace</control>
+    </vbox>
+    <indexedGroups count="enabledColors" label="Colors">
+      <entry color="key001" label="Color 1">
+        <control>use001</control>
+        <control>key001</control>
+        <vbox modeSensitive="perColor" mode="1">
+          <vbox modeSensitive="perComponent" mode="0">
+            <control>threshold001</control>
+          </vbox>
+          <vbox modeSensitive="perComponent" mode="1">
+            <control>component1001</control>
+            <control>component2001</control>
+            <control>component3001</control>
+          </vbox>
+        </vbox>
+        <vbox modeSensitive="keep" mode="1">
+          <vbox modeSensitive="enableReplace" mode="1">
+            <control>replace001</control>
+            <control>replacement001</control>
+          </vbox>
+        </vbox>
+      </entry>
+      <entry color="key002" label="Color 2">
+        <control>use002</control>
+        <control>key002</control>
+        <vbox modeSensitive="perColor" mode="1">
+          <vbox modeSensitive="perComponent" mode="0">
+            <control>threshold002</control>
+          </vbox>
+          <vbox modeSensitive="perComponent" mode="1">
+            <control>component1002</control>
+            <control>component2002</control>
+            <control>component3002</control>
+          </vbox>
+        </vbox>
+        <vbox modeSensitive="keep" mode="1">
+          <vbox modeSensitive="enableReplace" mode="1">
+            <control>replace002</control>
+            <control>replacement002</control>
+          </vbox>
+        </vbox>
+      </entry>
+      <entry color="key003" label="Color 3">
+        <control>use003</control>
+        <control>key003</control>
+        <vbox modeSensitive="perColor" mode="1">
+          <vbox modeSensitive="perComponent" mode="0">
+            <control>threshold003</control>
+          </vbox>
+          <vbox modeSensitive="perComponent" mode="1">
+            <control>component1003</control>
+            <control>component2003</control>
+            <control>component3003</control>
+          </vbox>
+        </vbox>
+        <vbox modeSensitive="keep" mode="1">
+          <vbox modeSensitive="enableReplace" mode="1">
+            <control>replace003</control>
+            <control>replacement003</control>
+          </vbox>
+        </vbox>
+      </entry>
+      <entry color="key004" label="Color 4">
+        <control>use004</control>
+        <control>key004</control>
+        <vbox modeSensitive="perColor" mode="1">
+          <vbox modeSensitive="perComponent" mode="0">
+            <control>threshold004</control>
+          </vbox>
+          <vbox modeSensitive="perComponent" mode="1">
+            <control>component1004</control>
+            <control>component2004</control>
+            <control>component3004</control>
+          </vbox>
+        </vbox>
+        <vbox modeSensitive="keep" mode="1">
+          <vbox modeSensitive="enableReplace" mode="1">
+            <control>replace004</control>
+            <control>replacement004</control>
+          </vbox>
+        </vbox>
+      </entry>
+      <entry color="key005" label="Color 5">
+        <control>use005</control>
+        <control>key005</control>
+        <vbox modeSensitive="perColor" mode="1">
+          <vbox modeSensitive="perComponent" mode="0">
+            <control>threshold005</control>
+          </vbox>
+          <vbox modeSensitive="perComponent" mode="1">
+            <control>component1005</control>
+            <control>component2005</control>
+            <control>component3005</control>
+          </vbox>
+        </vbox>
+        <vbox modeSensitive="keep" mode="1">
+          <vbox modeSensitive="enableReplace" mode="1">
+            <control>replace005</control>
+            <control>replacement005</control>
+          </vbox>
+        </vbox>
+      </entry>
+      <entry color="key006" label="Color 6">
+        <control>use006</control>
+        <control>key006</control>
+        <vbox modeSensitive="perColor" mode="1">
+          <vbox modeSensitive="perComponent" mode="0">
+            <control>threshold006</control>
+          </vbox>
+          <vbox modeSensitive="perComponent" mode="1">
+            <control>component1006</control>
+            <control>component2006</control>
+            <control>component3006</control>
+          </vbox>
+        </vbox>
+        <vbox modeSensitive="keep" mode="1">
+          <vbox modeSensitive="enableReplace" mode="1">
+            <control>replace006</control>
+            <control>replacement006</control>
+          </vbox>
+        </vbox>
+      </entry>
+      <entry color="key007" label="Color 7">
+        <control>use007</control>
+        <control>key007</control>
+        <vbox modeSensitive="perColor" mode="1">
+          <vbox modeSensitive="perComponent" mode="0">
+            <control>threshold007</control>
+          </vbox>
+          <vbox modeSensitive="perComponent" mode="1">
+            <control>component1007</control>
+            <control>component2007</control>
+            <control>component3007</control>
+          </vbox>
+        </vbox>
+        <vbox modeSensitive="keep" mode="1">
+          <vbox modeSensitive="enableReplace" mode="1">
+            <control>replace007</control>
+            <control>replacement007</control>
+          </vbox>
+        </vbox>
+      </entry>
+      <entry color="key008" label="Color 8">
+        <control>use008</control>
+        <control>key008</control>
+        <vbox modeSensitive="perColor" mode="1">
+          <vbox modeSensitive="perComponent" mode="0">
+            <control>threshold008</control>
+          </vbox>
+          <vbox modeSensitive="perComponent" mode="1">
+            <control>component1008</control>
+            <control>component2008</control>
+            <control>component3008</control>
+          </vbox>
+        </vbox>
+        <vbox modeSensitive="keep" mode="1">
+          <vbox modeSensitive="enableReplace" mode="1">
+            <control>replace008</control>
+            <control>replacement008</control>
+          </vbox>
+        </vbox>
+      </entry>
+      <entry color="key009" label="Color 9">
+        <control>use009</control>
+        <control>key009</control>
+        <vbox modeSensitive="perColor" mode="1">
+          <vbox modeSensitive="perComponent" mode="0">
+            <control>threshold009</control>
+          </vbox>
+          <vbox modeSensitive="perComponent" mode="1">
+            <control>component1009</control>
+            <control>component2009</control>
+            <control>component3009</control>
+          </vbox>
+        </vbox>
+        <vbox modeSensitive="keep" mode="1">
+          <vbox modeSensitive="enableReplace" mode="1">
+            <control>replace009</control>
+            <control>replacement009</control>
+          </vbox>
+        </vbox>
+      </entry>
+      <entry color="key010" label="Color 10">
+        <control>use010</control>
+        <control>key010</control>
+        <vbox modeSensitive="perColor" mode="1">
+          <vbox modeSensitive="perComponent" mode="0">
+            <control>threshold010</control>
+          </vbox>
+          <vbox modeSensitive="perComponent" mode="1">
+            <control>component1010</control>
+            <control>component2010</control>
+            <control>component3010</control>
+          </vbox>
+        </vbox>
+        <vbox modeSensitive="keep" mode="1">
+          <vbox modeSensitive="enableReplace" mode="1">
+            <control>replace010</control>
+            <control>replacement010</control>
+          </vbox>
+        </vbox>
+      </entry>
+      <entry color="key011" label="Color 11">
+        <control>use011</control>
+        <control>key011</control>
+        <vbox modeSensitive="perColor" mode="1">
+          <vbox modeSensitive="perComponent" mode="0">
+            <control>threshold011</control>
+          </vbox>
+          <vbox modeSensitive="perComponent" mode="1">
+            <control>component1011</control>
+            <control>component2011</control>
+            <control>component3011</control>
+          </vbox>
+        </vbox>
+        <vbox modeSensitive="keep" mode="1">
+          <vbox modeSensitive="enableReplace" mode="1">
+            <control>replace011</control>
+            <control>replacement011</control>
+          </vbox>
+        </vbox>
+      </entry>
+      <entry color="key012" label="Color 12">
+        <control>use012</control>
+        <control>key012</control>
+        <vbox modeSensitive="perColor" mode="1">
+          <vbox modeSensitive="perComponent" mode="0">
+            <control>threshold012</control>
+          </vbox>
+          <vbox modeSensitive="perComponent" mode="1">
+            <control>component1012</control>
+            <control>component2012</control>
+            <control>component3012</control>
+          </vbox>
+        </vbox>
+        <vbox modeSensitive="keep" mode="1">
+          <vbox modeSensitive="enableReplace" mode="1">
+            <control>replace012</control>
+            <control>replacement012</control>
+          </vbox>
+        </vbox>
+      </entry>
+      <entry color="key013" label="Color 13">
+        <control>use013</control>
+        <control>key013</control>
+        <vbox modeSensitive="perColor" mode="1">
+          <vbox modeSensitive="perComponent" mode="0">
+            <control>threshold013</control>
+          </vbox>
+          <vbox modeSensitive="perComponent" mode="1">
+            <control>component1013</control>
+            <control>component2013</control>
+            <control>component3013</control>
+          </vbox>
+        </vbox>
+        <vbox modeSensitive="keep" mode="1">
+          <vbox modeSensitive="enableReplace" mode="1">
+            <control>replace013</control>
+            <control>replacement013</control>
+          </vbox>
+        </vbox>
+      </entry>
+      <entry color="key014" label="Color 14">
+        <control>use014</control>
+        <control>key014</control>
+        <vbox modeSensitive="perColor" mode="1">
+          <vbox modeSensitive="perComponent" mode="0">
+            <control>threshold014</control>
+          </vbox>
+          <vbox modeSensitive="perComponent" mode="1">
+            <control>component1014</control>
+            <control>component2014</control>
+            <control>component3014</control>
+          </vbox>
+        </vbox>
+        <vbox modeSensitive="keep" mode="1">
+          <vbox modeSensitive="enableReplace" mode="1">
+            <control>replace014</control>
+            <control>replacement014</control>
+          </vbox>
+        </vbox>
+      </entry>
+      <entry color="key015" label="Color 15">
+        <control>use015</control>
+        <control>key015</control>
+        <vbox modeSensitive="perColor" mode="1">
+          <vbox modeSensitive="perComponent" mode="0">
+            <control>threshold015</control>
+          </vbox>
+          <vbox modeSensitive="perComponent" mode="1">
+            <control>component1015</control>
+            <control>component2015</control>
+            <control>component3015</control>
+          </vbox>
+        </vbox>
+        <vbox modeSensitive="keep" mode="1">
+          <vbox modeSensitive="enableReplace" mode="1">
+            <control>replace015</control>
+            <control>replacement015</control>
+          </vbox>
+        </vbox>
+      </entry>
+      <entry color="key016" label="Color 16">
+        <control>use016</control>
+        <control>key016</control>
+        <vbox modeSensitive="perColor" mode="1">
+          <vbox modeSensitive="perComponent" mode="0">
+            <control>threshold016</control>
+          </vbox>
+          <vbox modeSensitive="perComponent" mode="1">
+            <control>component1016</control>
+            <control>component2016</control>
+            <control>component3016</control>
+          </vbox>
+        </vbox>
+        <vbox modeSensitive="keep" mode="1">
+          <vbox modeSensitive="enableReplace" mode="1">
+            <control>replace016</control>
+            <control>replacement016</control>
+          </vbox>
+        </vbox>
+      </entry>
+      <entry color="key017" label="Color 17">
+        <control>use017</control>
+        <control>key017</control>
+        <vbox modeSensitive="perColor" mode="1">
+          <vbox modeSensitive="perComponent" mode="0">
+            <control>threshold017</control>
+          </vbox>
+          <vbox modeSensitive="perComponent" mode="1">
+            <control>component1017</control>
+            <control>component2017</control>
+            <control>component3017</control>
+          </vbox>
+        </vbox>
+        <vbox modeSensitive="keep" mode="1">
+          <vbox modeSensitive="enableReplace" mode="1">
+            <control>replace017</control>
+            <control>replacement017</control>
+          </vbox>
+        </vbox>
+      </entry>
+      <entry color="key018" label="Color 18">
+        <control>use018</control>
+        <control>key018</control>
+        <vbox modeSensitive="perColor" mode="1">
+          <vbox modeSensitive="perComponent" mode="0">
+            <control>threshold018</control>
+          </vbox>
+          <vbox modeSensitive="perComponent" mode="1">
+            <control>component1018</control>
+            <control>component2018</control>
+            <control>component3018</control>
+          </vbox>
+        </vbox>
+        <vbox modeSensitive="keep" mode="1">
+          <vbox modeSensitive="enableReplace" mode="1">
+            <control>replace018</control>
+            <control>replacement018</control>
+          </vbox>
+        </vbox>
+      </entry>
+      <entry color="key019" label="Color 19">
+        <control>use019</control>
+        <control>key019</control>
+        <vbox modeSensitive="perColor" mode="1">
+          <vbox modeSensitive="perComponent" mode="0">
+            <control>threshold019</control>
+          </vbox>
+          <vbox modeSensitive="perComponent" mode="1">
+            <control>component1019</control>
+            <control>component2019</control>
+            <control>component3019</control>
+          </vbox>
+        </vbox>
+        <vbox modeSensitive="keep" mode="1">
+          <vbox modeSensitive="enableReplace" mode="1">
+            <control>replace019</control>
+            <control>replacement019</control>
+          </vbox>
+        </vbox>
+      </entry>
+      <entry color="key020" label="Color 20">
+        <control>use020</control>
+        <control>key020</control>
+        <vbox modeSensitive="perColor" mode="1">
+          <vbox modeSensitive="perComponent" mode="0">
+            <control>threshold020</control>
+          </vbox>
+          <vbox modeSensitive="perComponent" mode="1">
+            <control>component1020</control>
+            <control>component2020</control>
+            <control>component3020</control>
+          </vbox>
+        </vbox>
+        <vbox modeSensitive="keep" mode="1">
+          <vbox modeSensitive="enableReplace" mode="1">
+            <control>replace020</control>
+            <control>replacement020</control>
+          </vbox>
+        </vbox>
+      </entry>
+      <entry color="key021" label="Color 21">
+        <control>use021</control>
+        <control>key021</control>
+        <vbox modeSensitive="perColor" mode="1">
+          <vbox modeSensitive="perComponent" mode="0">
+            <control>threshold021</control>
+          </vbox>
+          <vbox modeSensitive="perComponent" mode="1">
+            <control>component1021</control>
+            <control>component2021</control>
+            <control>component3021</control>
+          </vbox>
+        </vbox>
+        <vbox modeSensitive="keep" mode="1">
+          <vbox modeSensitive="enableReplace" mode="1">
+            <control>replace021</control>
+            <control>replacement021</control>
+          </vbox>
+        </vbox>
+      </entry>
+      <entry color="key022" label="Color 22">
+        <control>use022</control>
+        <control>key022</control>
+        <vbox modeSensitive="perColor" mode="1">
+          <vbox modeSensitive="perComponent" mode="0">
+            <control>threshold022</control>
+          </vbox>
+          <vbox modeSensitive="perComponent" mode="1">
+            <control>component1022</control>
+            <control>component2022</control>
+            <control>component3022</control>
+          </vbox>
+        </vbox>
+        <vbox modeSensitive="keep" mode="1">
+          <vbox modeSensitive="enableReplace" mode="1">
+            <control>replace022</control>
+            <control>replacement022</control>
+          </vbox>
+        </vbox>
+      </entry>
+      <entry color="key023" label="Color 23">
+        <control>use023</control>
+        <control>key023</control>
+        <vbox modeSensitive="perColor" mode="1">
+          <vbox modeSensitive="perComponent" mode="0">
+            <control>threshold023</control>
+          </vbox>
+          <vbox modeSensitive="perComponent" mode="1">
+            <control>component1023</control>
+            <control>component2023</control>
+            <control>component3023</control>
+          </vbox>
+        </vbox>
+        <vbox modeSensitive="keep" mode="1">
+          <vbox modeSensitive="enableReplace" mode="1">
+            <control>replace023</control>
+            <control>replacement023</control>
+          </vbox>
+        </vbox>
+      </entry>
+      <entry color="key024" label="Color 24">
+        <control>use024</control>
+        <control>key024</control>
+        <vbox modeSensitive="perColor" mode="1">
+          <vbox modeSensitive="perComponent" mode="0">
+            <control>threshold024</control>
+          </vbox>
+          <vbox modeSensitive="perComponent" mode="1">
+            <control>component1024</control>
+            <control>component2024</control>
+            <control>component3024</control>
+          </vbox>
+        </vbox>
+        <vbox modeSensitive="keep" mode="1">
+          <vbox modeSensitive="enableReplace" mode="1">
+            <control>replace024</control>
+            <control>replacement024</control>
+          </vbox>
+        </vbox>
+      </entry>
+      <entry color="key025" label="Color 25">
+        <control>use025</control>
+        <control>key025</control>
+        <vbox modeSensitive="perColor" mode="1">
+          <vbox modeSensitive="perComponent" mode="0">
+            <control>threshold025</control>
+          </vbox>
+          <vbox modeSensitive="perComponent" mode="1">
+            <control>component1025</control>
+            <control>component2025</control>
+            <control>component3025</control>
+          </vbox>
+        </vbox>
+        <vbox modeSensitive="keep" mode="1">
+          <vbox modeSensitive="enableReplace" mode="1">
+            <control>replace025</control>
+            <control>replacement025</control>
+          </vbox>
+        </vbox>
+      </entry>
+    </indexedGroups>
+  </page>
+</fxlayout>
