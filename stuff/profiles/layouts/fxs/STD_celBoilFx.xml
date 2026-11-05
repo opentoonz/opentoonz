@@ -1,0 +1,15 @@
+<fxlayout help_file="CelBoil.html">
+  <page name="Cel Boil">
+    <control>target</control>
+    <vbox modeSensitive="target" mode="1">
+      <control>lineThreshold</control>
+    </vbox>
+    <control>amplitude</control>
+    <control>size</control>
+    <control>detail</control>
+    <separator label="Timing"/>
+    <control>cycle</control>
+    <control>blend</control>
+    <control>seed</control>
+  </page>
+</fxlayout>
