@@ -21,6 +21,7 @@
 #include <QString>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QPainter>
 #include <QComboBox>
 #include <QFontComboBox>
@@ -412,6 +413,68 @@ public:
     if (m_fxHandle) m_fxHandle->notifyFxChanged();
   }
 };
+
+// Preserve all stop positions, channel precision and animation curves when a
+// precision-sensitive ramp is edited, including structural changes.
+class PreciseSpectrumParamUndo final : public AnimatableFxSettingsUndo {
+  TSpectrumParamP m_actual, m_current, m_beforeActual, m_beforeCurrent;
+  TSpectrumParamP m_afterActual, m_afterCurrent;
+
+public:
+  PreciseSpectrumParamUndo(const TSpectrumParamP &actual,
+                           const TSpectrumParamP &current, QString name,
+                           int frame, TFxHandle *handle)
+      : AnimatableFxSettingsUndo(name, frame, handle)
+      , m_actual(actual)
+      , m_current(current)
+      , m_beforeActual(TParamP(actual->clone()))
+      , m_beforeCurrent(TParamP(current->clone())) {
+    m_wasKeyframe = actual->isKeyframe(frame);
+  }
+  void onAdd() override {
+    m_afterActual  = TParamP(m_actual->clone());
+    m_afterCurrent = TParamP(m_current->clone());
+  }
+  void undo() const override {
+    m_actual->copy(m_beforeActual.getPointer());
+    m_current->copy(m_beforeCurrent.getPointer());
+    if (m_fxHandle) m_fxHandle->notifyFxChanged();
+  }
+  void redo() const override {
+    m_actual->copy(m_afterActual.getPointer());
+    m_current->copy(m_afterCurrent.getPointer());
+    if (m_fxHandle) m_fxHandle->notifyFxChanged();
+  }
+};
+
+static bool preciseSpectraEqual(const TSpectrumParamP &a,
+                                const TSpectrumParamP &b, int frame) {
+  if (a->getKeyCount() != b->getKeyCount()) return false;
+  for (int i = 0; i < a->getKeyCount(); ++i)
+    if (a->getPosition(i)->getValue(frame) !=
+            b->getPosition(i)->getValue(frame) ||
+        a->getColor(i)->getValueD(frame) != b->getColor(i)->getValueD(frame))
+      return false;
+  return true;
+}
+
+// The native swatch is 8-bit. Clamp only its display copy before converting;
+// the animated double values remain unchanged, including HDR values.
+static TSpectrum preciseSpectrumDisplay(const TSpectrumParamP &param,
+                                        int frame) {
+  std::vector<TSpectrum::ColorKey> keys;
+  auto unit = [](double value) {
+    return std::isfinite(value) ? std::max(0.0, std::min(1.0, value)) : 0.0;
+  };
+  for (int i = 0; i < param->getKeyCount(); ++i) {
+    const TPixelD c = param->getColor(i)->getValueD(frame);
+    keys.emplace_back(
+        unit(param->getPosition(i)->getValue(frame)),
+        toPixel32(TPixelD(unit(c.r), unit(c.g), unit(c.b), unit(c.m))));
+  }
+  if (keys.empty()) return TSpectrum(TPixel32::Black, TPixel32::Black);
+  return TSpectrum(int(keys.size()), keys.data());
+}
 
 //-----------------------------------------------------------------------------
 /*! SpectrumParamField Undo
@@ -1336,6 +1399,124 @@ SpectrumParamField::SpectrumParamField(QWidget *parent, QString name,
 
 //-----------------------------------------------------------------------------
 
+void SpectrumParamField::update(int frame) {
+  if (!property("preserveColorPrecision").toBool()) {
+    AnimatedParamField<TSpectrum, TSpectrumParamP>::update(frame);
+    return;
+  }
+  m_frame = frame;
+  if (!m_actualParam || !m_currentParam) return;
+  ensurePreciseEditor();
+  if (m_currentParam.getPointer() != m_actualParam.getPointer() &&
+      (m_actualParam->isKeyframe(frame) || !m_actualParam->hasKeyframes()))
+    m_currentParam->copy(m_actualParam.getPointer());
+  updateField(preciseSpectrumDisplay(m_actualParam, frame));
+  refreshPreciseEditor();
+  m_keyToggle->setStatus(
+      m_actualParam->hasKeyframes(), m_actualParam->isKeyframe(frame),
+      !preciseSpectraEqual(m_actualParam, m_currentParam, frame));
+}
+
+void SpectrumParamField::ensurePreciseEditor() {
+  if (m_preciseChannels[0]) return;
+  auto *column = new QVBoxLayout();
+  column->setContentsMargins(0, 0, 0, 0);
+  column->setSpacing(2);
+  m_layout->removeWidget(m_spectrumField);
+  column->addWidget(m_spectrumField);
+  auto *row = new QHBoxLayout();
+  row->setContentsMargins(0, 0, 0, 0);
+  const char *labels[] = {"R", "G", "B", "A"};
+  const char *names[]  = {"spectrumPreciseRed", "spectrumPreciseGreen",
+                          "spectrumPreciseBlue", "spectrumPreciseAlpha"};
+  for (int i = 0; i < 4; ++i) {
+    row->addWidget(new QLabel(QString::fromLatin1(labels[i]), this));
+    auto *field = new QLineEdit(this);
+    field->setObjectName(QString::fromLatin1(names[i]));
+    field->setAccessibleName(
+        tr("Precise %1 channel").arg(QString::fromLatin1(labels[i])));
+    field->setMinimumWidth(55);
+    m_preciseChannels[i] = field;
+    row->addWidget(field);
+    connect(field, &QLineEdit::editingFinished, this,
+            [this, i]() { commitPreciseChannel(i); });
+  }
+  column->addLayout(row);
+  m_layout->addLayout(column);
+  if (auto *bar = m_spectrumField->findChild<DVGui::SpectrumBar *>()) {
+    // Clicking another stop finishes a pending numeric edit first.
+    bar->setFocusPolicy(Qt::StrongFocus);
+    connect(bar, &DVGui::SpectrumBar::currentKeyChanged, this,
+            [this]() { refreshPreciseEditor(); });
+  }
+}
+
+void SpectrumParamField::refreshPreciseEditor() {
+  if (!m_preciseChannels[0] || !m_currentParam) return;
+  const int index = m_spectrumField->getCurrentKeyIndex();
+  if (index != m_preciseStopIndex) {
+    for (QLineEdit *field : m_preciseChannels) {
+      if (field->hasFocus()) {
+        const QSignalBlocker blocker(field);
+        field->clearFocus();
+      }
+    }
+    m_preciseStopIndex = index;
+  }
+  const bool valid = index >= 0 && index < m_currentParam->getKeyCount();
+  const TPixelD color =
+      valid ? m_currentParam->getColor(index)->getValueD(m_frame) : TPixelD();
+  const double values[] = {color.r, color.g, color.b, color.m};
+  for (int i = 0; i < 4; ++i) {
+    m_preciseChannels[i]->setEnabled(valid);
+    if (!m_preciseChannels[i]->hasFocus())
+      m_preciseChannels[i]->setText(valid ? QString::number(values[i], 'g', 17)
+                                          : QString());
+  }
+}
+
+void SpectrumParamField::commitPreciseChannel(int channel) {
+  if (!m_actualParam || !m_currentParam || channel < 0 || channel >= 4) return;
+  const int index = m_spectrumField->getCurrentKeyIndex();
+  if (index < 0 || index >= m_currentParam->getKeyCount()) return;
+  bool ok            = false;
+  const double value = m_preciseChannels[channel]->text().toDouble(&ok);
+  if (!ok || !std::isfinite(value) ||
+      (channel == 3 && (value < 0 || value > 1))) {
+    const QSignalBlocker blocker(m_preciseChannels[channel]);
+    m_preciseChannels[channel]->clearFocus();
+    refreshPreciseEditor();
+    return;
+  }
+  TPixelD color        = m_currentParam->getColor(index)->getValueD(m_frame);
+  double *components[] = {&color.r, &color.g, &color.b, &color.m};
+  if (*components[channel] == value) return;
+  *components[channel] = value;
+  const bool hasKeys   = m_actualParam->hasKeyframes();
+  const bool commit    = m_actualParam->isKeyframe(m_frame) || !hasKeys;
+  TUndo *undo          = commit ? new PreciseSpectrumParamUndo(
+                                      m_actualParam, m_currentParam, m_interfaceName,
+                                      m_frame, ParamField::m_fxHandleStat)
+                                : nullptr;
+  if (hasKeys)
+    m_currentParam->getColor(index)->setValueD(m_frame, color);
+  else
+    setDefaultPixelD(m_currentParam->getColor(index), color);
+  if (commit && m_currentParam.getPointer() != m_actualParam.getPointer()) {
+    if (hasKeys)
+      m_actualParam->getColor(index)->setValueD(m_frame, color);
+    else
+      setDefaultPixelD(m_actualParam->getColor(index), color);
+  }
+  if (undo) TUndoManager::manager()->add(undo);
+  updateField(preciseSpectrumDisplay(m_currentParam, m_frame));
+  m_keyToggle->setStatus(
+      m_actualParam->hasKeyframes(), m_actualParam->isKeyframe(m_frame),
+      !preciseSpectraEqual(m_actualParam, m_currentParam, m_frame));
+  if (commit) emit actualParamChanged();
+  emit currentParamChanged();
+}
+
 void SpectrumParamField::updateField(TSpectrum value) {
   if (m_spectrumField->getSpectrum() == value) return;
   m_spectrumField->setSpectrum(value);
@@ -1363,12 +1544,88 @@ void SpectrumParamField::setParams() {
 
 //-----------------------------------------------------------------------------
 
-void SpectrumParamField::onKeyToggled() { onKeyToggle(); }
+void SpectrumParamField::onKeyToggled() {
+  if (!property("preserveColorPrecision").toBool()) {
+    onKeyToggle();
+    return;
+  }
+  if (!m_actualParam || !m_currentParam) return;
+  TUndo *undo = new PreciseSpectrumParamUndo(m_actualParam, m_currentParam,
+                                             m_interfaceName, m_frame,
+                                             ParamField::m_fxHandleStat);
+  if (m_keyToggle->getStatus() == ParamFieldKeyToggle::KEYFRAME) {
+    m_actualParam->deleteKeyframe(m_frame);
+  } else {
+    for (int i = 0; i < m_actualParam->getKeyCount(); ++i) {
+      m_actualParam->getPosition(i)->setValue(
+          m_frame, m_currentParam->getPosition(i)->getValue(m_frame));
+      m_actualParam->getColor(i)->setValueD(
+          m_frame, m_currentParam->getColor(i)->getValueD(m_frame));
+    }
+  }
+  if (m_currentParam.getPointer() != m_actualParam.getPointer())
+    m_currentParam->copy(m_actualParam.getPointer());
+  TUndoManager::manager()->add(undo);
+  update(m_frame);
+  emit actualParamChanged();
+  emit paramKeyToggle();
+}
 
 //-----------------------------------------------------------------------------
 
 void SpectrumParamField::onChange(bool isDragging) {
   if (isDragging) return;
+
+  if (property("preserveColorPrecision").toBool()) {
+    if (!m_actualParam || !m_currentParam) return;
+    const TSpectrum edited = m_spectrumField->getSpectrum();
+    const TSpectrum before = preciseSpectrumDisplay(m_currentParam, m_frame);
+    if (edited == before ||
+        edited.getKeyCount() != m_currentParam->getKeyCount())
+      return;
+    const bool hasKeys = m_actualParam->hasKeyframes();
+    const bool commit  = m_actualParam->isKeyframe(m_frame) || !hasKeys;
+    TUndo *undo        = commit ? new PreciseSpectrumParamUndo(
+                                      m_actualParam, m_currentParam, m_interfaceName,
+                                      m_frame, ParamField::m_fxHandleStat)
+                                : nullptr;
+    for (int i = 0; i < edited.getKeyCount(); ++i) {
+      const TSpectrum::Key oldKey = before.getKey(i), newKey = edited.getKey(i);
+      if (oldKey.first != newKey.first) {
+        if (hasKeys)
+          m_currentParam->getPosition(i)->setValue(m_frame, newKey.first);
+        else
+          m_currentParam->getPosition(i)->setDefaultValue(newKey.first);
+        if (commit) {
+          if (hasKeys)
+            m_actualParam->getPosition(i)->setValue(m_frame, newKey.first);
+          else
+            m_actualParam->getPosition(i)->setDefaultValue(newKey.first);
+        }
+      }
+      if (oldKey.second != newKey.second) {
+        const TPixelD color = toPixelD(newKey.second);
+        if (hasKeys)
+          m_currentParam->getColor(i)->setValueD(m_frame, color);
+        else
+          setDefaultPixelD(m_currentParam->getColor(i), color);
+        if (commit) {
+          if (hasKeys)
+            m_actualParam->getColor(i)->setValueD(m_frame, color);
+          else
+            setDefaultPixelD(m_actualParam->getColor(i), color);
+        }
+      }
+    }
+    if (undo) TUndoManager::manager()->add(undo);
+    refreshPreciseEditor();
+    if (commit) emit actualParamChanged();
+    emit currentParamChanged();
+    m_keyToggle->setStatus(
+        m_actualParam->hasKeyframes(), m_actualParam->isKeyframe(m_frame),
+        !preciseSpectraEqual(m_actualParam, m_currentParam, m_frame));
+    return;
+  }
 
   TSpectrumParamP spectrumParam = m_actualParam;
   TUndo *undo                   = 0;
@@ -1389,6 +1646,21 @@ void SpectrumParamField::onChange(bool isDragging) {
 void SpectrumParamField::onKeyAdded(int keyIndex) {
   TSpectrum::ColorKey key = m_spectrumField->getSpectrum().getKey(keyIndex);
 
+  if (property("preserveColorPrecision").toBool()) {
+    if (!m_actualParam || !m_currentParam) return;
+    TUndo *undo = new PreciseSpectrumParamUndo(m_actualParam, m_currentParam,
+                                               m_interfaceName, m_frame,
+                                               ParamField::m_fxHandleStat);
+    m_actualParam->addKey(key.first, key.second);
+    if (m_currentParam.getPointer() != m_actualParam.getPointer())
+      m_currentParam->addKey(key.first, key.second);
+    TUndoManager::manager()->add(undo);
+    refreshPreciseEditor();
+    emit actualParamChanged();
+    emit currentParamChanged();
+    return;
+  }
+
   TSpectrumParamP actualSpectrumParam = m_actualParam;
   assert(actualSpectrumParam);
   actualSpectrumParam->addKey(key.first, key.second);
@@ -1405,6 +1677,20 @@ void SpectrumParamField::onKeyAdded(int keyIndex) {
 //-----------------------------------------------------------------------------
 
 void SpectrumParamField::onKeyRemoved(int keyIndex) {
+  if (property("preserveColorPrecision").toBool()) {
+    if (!m_actualParam || !m_currentParam) return;
+    TUndo *undo = new PreciseSpectrumParamUndo(m_actualParam, m_currentParam,
+                                               m_interfaceName, m_frame,
+                                               ParamField::m_fxHandleStat);
+    m_actualParam->removeKey(keyIndex);
+    if (m_currentParam.getPointer() != m_actualParam.getPointer())
+      m_currentParam->removeKey(keyIndex);
+    TUndoManager::manager()->add(undo);
+    refreshPreciseEditor();
+    emit actualParamChanged();
+    emit currentParamChanged();
+    return;
+  }
   TUndo *undo                          = 0;
   TSpectrumParamP actualSpectrumParam  = m_actualParam;
   TSpectrumParamP currentSpectrumParam = m_currentParam;
