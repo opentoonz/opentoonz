@@ -1,0 +1,28 @@
+<fxlayout help_file="StarGlow.html">
+  <page name="Star Glow">
+    <control>channel</control>
+    <control>profile</control>
+    <control>merge</control>
+    <control>approximate</control>
+    <control>gain</control>
+    <control>threshold</control>
+    <control>fade</control>
+    <control>glowOpacity</control>
+    <control>sourceOpacity</control>
+    <control>rotation</control>
+    <control>highlightRadius</control>
+    <control>highlightColor</control>
+    <control>verticalLength</control>
+    <control>verticalColor</control>
+    <control>verticalUseRamp</control>
+    <control>verticalRamp</control>
+    <control>horizontalLength</control>
+    <control>horizontalColor</control>
+    <control>horizontalUseRamp</control>
+    <control>horizontalRamp</control>
+    <control>diagonalLength</control>
+    <control>diagonalColor</control>
+    <control>diagonalUseRamp</control>
+    <control>diagonalRamp</control>
+  </page>
+</fxlayout>

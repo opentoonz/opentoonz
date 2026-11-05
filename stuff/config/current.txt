@@ -233,6 +233,31 @@
   <item>"STD_glowFx.brightness"		"Brightness"	</item>
   <item>"STD_glowFx.color"			"Color"		</item>
   <item>"STD_glowFx.fade"			"Fade"		</item>
+  <item>"STD_starGlowFx" "Star Glow" </item>
+  <item>"STD_starGlowFx.channel" "Channel" </item>
+  <item>"STD_starGlowFx.profile" "Blur Mode" </item>
+  <item>"STD_starGlowFx.merge" "Merge Mode" </item>
+  <item>"STD_starGlowFx.approximate" "Approximated Input" </item>
+  <item>"STD_starGlowFx.gain" "Brightness Gain" </item>
+  <item>"STD_starGlowFx.threshold" "Threshold" </item>
+  <item>"STD_starGlowFx.fade" "Fade Out" </item>
+  <item>"STD_starGlowFx.glowOpacity" "Glow Opacity" </item>
+  <item>"STD_starGlowFx.sourceOpacity" "Source Opacity" </item>
+  <item>"STD_starGlowFx.rotation" "Glow Rotation" </item>
+  <item>"STD_starGlowFx.highlightRadius" "Highlight Radius" </item>
+  <item>"STD_starGlowFx.highlightColor" "Highlight Color" </item>
+  <item>"STD_starGlowFx.verticalLength" "Vertical Length" </item>
+  <item>"STD_starGlowFx.verticalColor" "Vertical Color" </item>
+  <item>"STD_starGlowFx.verticalUseRamp" "Vertical Use Ramp" </item>
+  <item>"STD_starGlowFx.verticalRamp" "Vertical Ramp" </item>
+  <item>"STD_starGlowFx.horizontalLength" "Horizontal Length" </item>
+  <item>"STD_starGlowFx.horizontalColor" "Horizontal Color" </item>
+  <item>"STD_starGlowFx.horizontalUseRamp" "Horizontal Use Ramp" </item>
+  <item>"STD_starGlowFx.horizontalRamp" "Horizontal Ramp" </item>
+  <item>"STD_starGlowFx.diagonalLength" "Diagonal Length" </item>
+  <item>"STD_starGlowFx.diagonalColor" "Diagonal Color" </item>
+  <item>"STD_starGlowFx.diagonalUseRamp" "Diagonal Use Ramp" </item>
+  <item>"STD_starGlowFx.diagonalRamp" "Diagonal Ramp" </item>
 
   <item>"STD_hsvAdjustFx"			"HSVAdjust"	</item>
   <item>"STD_hsvAdjustFx.hue"		"Hue"		</item>
