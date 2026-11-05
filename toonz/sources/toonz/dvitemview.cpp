@@ -1288,9 +1288,11 @@ void DvItemViewerPanel::mousePressEvent(QMouseEvent *event) {
     }
   }
   if (m_globalSelectionEnabled) {
-    if (m_selection->isEmpty())
-      m_selection->makeNotCurrent();
-    else
+    if (m_selection->isEmpty()) {
+      // Release Delete even when the folder tree still owns it.
+      if (TSelection *current = TSelection::getCurrent())
+        current->makeNotCurrent();
+    } else
       m_selection->makeCurrent();
   }
   // if (m_viewer ) m_viewer->notifyClick(index);

@@ -645,9 +645,11 @@ DvDirModelNode *DvDirTreeView::getCurrentNode() const {
 void DvDirTreeView::mousePressEvent(QMouseEvent *event) {
   QModelIndex index = indexAt(event->pos());
   StyledTreeView::mousePressEvent(event);
-  if (m_globalSelectionEnabled && event->button() == Qt::LeftButton &&
-      index.isValid())
+  if (!m_globalSelectionEnabled || event->button() != Qt::LeftButton) return;
+  if (index.isValid())
     makeCurrent();
+  else if (TSelection *current = TSelection::getCurrent())
+    current->makeNotCurrent();
 }
 
 //-----------------------------------------------------------------------------
