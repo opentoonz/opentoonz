@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Cel Color Keep</title></head>
+<body>
+<h1>Cel Color Keep</h1>
+<p>Keep selected cel colors and make the rest transparent. Add the effect from
+the Matte category and connect the image to Source. A new effect keeps black.</p>
+<h2>Choose colors</h2>
+<ol>
+<li>Set Enabled Colors to the number of colors to keep, from 0 to 100.</li>
+<li>Choose an entry from the Colors list. Each entry has its own swatch.</li>
+<li>Use the normal color editor or picker to choose that entry's color.
+Temporarily disable the effect when sampling colors from its source image.</li>
+<li>Repeat for the other enabled entries. Duplicate colors are allowed.</li>
+</ol>
+<p>Entries beyond Enabled Colors are marked inactive. Lowering the count never
+erases their values or animation. Set the count to 0 for transparent output.
+The list selection only chooses which color to edit.</p>
+<h2>Animation and reuse</h2>
+<p>Use the key button to animate each color and the enabled count. An animated
+count rounds to the nearest whole number; half values round upward. All 100
+entries are saved in scenes and effect presets and copied with the effect.
+Colors can be exposed as individual macro controls. Use the Function Editor's
+RGB channels for precise numeric values beyond the color picker's swatches.</p>
+<h2>Matching and transparency</h2>
+<p>Selected colors preserve their original RGB and transparency. Rejected colors
+become fully transparent. A color's alpha control does not participate in the
+selection. Partial coverage is accounted for when comparing colors, so a red
+cel edge can remain red while preserving its original opacity.</p>
+<p>For 8-bit and 16-bit images, the selected RGB is converted to the source's
+channel precision before comparison. Float images use a fixed tolerance of
+0.0001 per RGB channel. Finite float colors outside the normal display range are
+supported. Matching uses display RGB; the renderer handles conversion for scenes
+rendered in linear color. Fully transparent and invalid pixels produce
+transparent output.</p>
+<p>Exact integer matching is intended for flat cel colors. Anti-aliasing can mix
+neighboring colors; add those colors to the list when they should also remain.</p>
+</body>
+</html>

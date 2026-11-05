@@ -120,6 +120,7 @@ set(SOURCES
     dropshadowfx.cpp
     embossfx.cpp
     erodilatefx.cpp
+    celcolorkeepfx.cpp
     externalpalettefx.cpp
     fourpointsgradientfx.cpp
     freedistortfx.cpp
