@@ -1,4 +1,6 @@
 <stringtable>
+  <item>"STD_lut3DBakeFx" "3D LUT Bake" </item>
+  <item>"STD_lut3DBakeFx.lutFile" "LUT File" </item>
 <!------------------------------ FX ------------------------------------------->
 
   <item>"addFx"			"Add"			</item>

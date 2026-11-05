@@ -90,7 +90,7 @@ public:
 
 typedef TNotAnimatableParamObserver<int> TIntParamObserver;
 typedef TNotAnimatableParamObserver<bool> TBoolParamObserver;
-typedef TNotAnimatableParamObserver<TFilePath> TFilePathParamObserver;
+typedef TNotAnimatableParamObserver<std::wstring> TFilePathParamObserver;
 
 //-----------------------------------------------------------------------------
 //    TNotAnimatableParam base class
@@ -241,33 +241,6 @@ DEFINE_PARAM_SMARTPOINTER(TBoolParam, bool)
 
 //=========================================================
 //
-//  class TFilePathParam
-//
-//=========================================================
-
-#ifdef _WIN32
-template class DVAPI TNotAnimatableParam<TFilePath>;
-class TFilePathParam;
-template class DVAPI TPersistDeclarationT<TFilePathParam>;
-#endif
-
-class DVAPI TFilePathParam final : public TNotAnimatableParam<TFilePath> {
-  PERSIST_DECLARATION(TFilePathParam);
-
-public:
-  TFilePathParam(const TFilePath &v = TFilePath())
-      : TNotAnimatableParam<TFilePath>(v) {}
-  TFilePathParam(const TFilePathParam &src)
-      : TNotAnimatableParam<TFilePath>(src) {}
-  TParam *clone() const override { return new TFilePathParam(*this); }
-  void loadData(TIStream &is) override;
-  void saveData(TOStream &os) override;
-};
-
-DEFINE_PARAM_SMARTPOINTER(TFilePathParam, TFilePath)
-
-//=========================================================
-//
 //  class TStringParam
 //
 //=========================================================
@@ -278,7 +251,7 @@ class TStringParam;
 template class DVAPI TPersistDeclarationT<TStringParam>;
 #endif
 
-class DVAPI TStringParam final : public TNotAnimatableParam<std::wstring> {
+class DVAPI TStringParam : public TNotAnimatableParam<std::wstring> {
   PERSIST_DECLARATION(TStringParam);
 
   bool m_multiLine = false;
@@ -296,6 +269,36 @@ public:
 };
 
 DEFINE_PARAM_SMARTPOINTER(TStringParam, std::wstring)
+
+//=========================================================
+//
+//  class TFilePathParam
+//
+//=========================================================
+
+#ifdef _WIN32
+class TFilePathParam;
+template class DVAPI TPersistDeclarationT<TFilePathParam>;
+#endif
+
+class DVAPI TFilePathParam final : public TStringParam {
+  PERSIST_DECLARATION(TFilePathParam);
+
+  std::string m_fileFilter;
+
+public:
+  TFilePathParam(std::wstring v = L"") : TStringParam(v) {}
+  TFilePathParam(const TFilePathParam &src)
+      : TStringParam(src), m_fileFilter(src.m_fileFilter) {}
+
+  TParam *clone() const override { return new TFilePathParam(*this); }
+  void copy(TParam *src) override;
+
+  void setFileFilter(const std::string &filter) { m_fileFilter = filter; }
+  const std::string &getFileFilter() const { return m_fileFilter; }
+};
+
+DEFINE_PARAM_SMARTPOINTER(TFilePathParam, std::wstring)
 
 //=========================================================
 //
