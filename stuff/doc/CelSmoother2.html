@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Cel Smoother v2</title></head>
+<body>
+<h1>Cel Smoother v2</h1>
+<p>Smooth stair-stepped contours in flat cel artwork while controlling how edge
+colors blend. Add Cel Smoother v2 from Image Adjust and connect Source. This
+native adaptation uses contour-area smoothing with floating-point color math.
+It does not promise pixel-identical output from another application's plugin.</p>
+<h2>Smoothing and keying</h2>
+<p>Use Color Key removes Color Key before smoothing. The default key is white
+and keying starts disabled. Invert Color Key keeps only the chosen key color.
+Matching compares straight display RGB within half an 8-bit step per channel;
+equality at that tolerance is excluded. A key swatch's alpha is ignored.</p>
+<p>Smoothness sets the first pass from 0 to 100, default 100. Extra Smooth adds
+a second contour pass from 0 to 100, default 0. Each pass works independently:
+zero Smoothness with positive Extra Smooth runs only the second pass. Set both
+to zero to bypass smoothing while retaining enabled keying.</p>
+<p>Smooth Range groups similar premultiplied RGBA colors into continuous contour
+runs, in 8-bit channel units. Its default is 2. Zero groups exact equals only;
+larger values group progressively more colors. The native range extends to 255
+to support the documented smoothing bypass. This extension includes the current
+reference interface's narrower 0 to 100 range. Keying still applies at 255.</p>
+<h2>Color space and gamma</h2>
+<p>Smoother Version changes the blending color space, using the same contour
+algorithm. Version v1 blends encoded RGB. The default v2 converts straight RGB
+through the sRGB transfer to linear light before blending and converts back
+afterward. The renderer handles the scene's working-space conversion separately;
+this effect always receives display RGB.</p>
+<p>Gamma Correction offers None, Gamma Colors and All Colors. None uses only the
+version's color-space conversion. All Colors applies an additional gamma to
+every edge blend. Gamma Colors applies it when either contributing color
+matches an enabled gamma swatch; other edges keep their normal blend. The
+comparison uses the same straight-RGB tolerance as keying, in list order.</p>
+<p>Gamma Value ranges from 1 to 2.4, default 2.4. It transforms each contributor
+with the inverse gamma before blending and applies gamma afterward. Higher
+values favor darker colors. Choosing black in Gamma Colors can retain dark
+line weight while avoiding extra dark fringes between unselected colored areas.
+Gamma Value 1 adds no correction in either version.</p>
+<p>Number of Gamma Colors enables 0 to 5 swatches, default 1. All five default
+to black. The Gamma Colors selector chooses the swatch to edit; it does not
+change the enabled count. Inactive slots keep their values and keys. Duplicate
+swatches are allowed. A zero count makes Gamma Colors equivalent to None.</p>
+<h2>Animation and reuse</h2>
+<p>All numeric values, choices, key toggles and colors can be animated with the
+native key buttons and Function Editor. Discrete choices and the color count
+round to the nearest index, with half values rounding up. Scenes, presets,
+clones and macro controls retain all five gamma colors and their full numeric
+precision. The color picker can sample swatches from the source image.</p>
+<h2>Rendering</h2>
+<p>8-bit, 16-bit and float images use the same full-precision contour math, with
+quantization only at integer output. Finite negative and HDR float colors remain
+supported using signed transfer functions. Fully transparent and invalid input
+pixels are cleared. Coverage is blended independently from straight RGB.</p>
+<p>For an unambiguous raster-level source, the effect smooths in the native
+pixel grid before level DPI and geometry resampling. Generic generators and
+graphs combining multiple sources use the ordinary world grid. Each output
+tile reads the complete finite source bounds, so long
+diagonals remain consistent across tiles and concurrent frames. Infinite
+generators use the fixed camera bounds. A finite camera is required for these
+sources. Full-image processing uses more memory than a small-radius filter;
+memory estimates and cancellation are reported to the renderer.</p>
+</body>
+</html>

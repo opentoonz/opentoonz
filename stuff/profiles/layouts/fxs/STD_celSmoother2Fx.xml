@@ -1,0 +1,27 @@
+<fxlayout help_file="CelSmoother2.html">
+  <page name="Cel Smoother v2">
+    <control>useColorKey</control>
+    <vbox modeSensitive="useColorKey" mode="1">
+      <control>colorKey</control>
+      <control>invertColorKey</control>
+    </vbox>
+    <separator label="Smoothing"/>
+    <control>smoothness</control>
+    <control>extraSmooth</control>
+    <control>smoothRange</control>
+    <separator label="Color Space"/>
+    <control>smootherVersion</control>
+    <control>gammaCorrection</control>
+    <control>gammaValue</control>
+    <vbox modeSensitive="gammaCorrection" mode="1">
+      <control decimals="0">numberOfGammaColors</control>
+      <indexedColors count="numberOfGammaColors" label="Gamma Colors">
+        <control>gammaColor1</control>
+        <control>gammaColor2</control>
+        <control>gammaColor3</control>
+        <control>gammaColor4</control>
+        <control>gammaColor5</control>
+      </indexedColors>
+    </vbox>
+  </page>
+</fxlayout>
