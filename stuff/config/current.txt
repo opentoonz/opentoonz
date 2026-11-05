@@ -346,6 +346,38 @@
 
   <item>"STD_posterizeFx"			"Posterize"	</item>
   <item>"STD_posterizeFx.levels"		"Levels"		</item>
+  <item>"STD_printProcessFx" "Print Process" </item>
+  <item>"STD_printProcessFx.output" "Output" </item>
+  <item>"STD_printProcessFx.cellSize" "Cell Size" </item>
+  <item>"STD_printProcessFx.shape" "Dot Shape" </item>
+  <item>"STD_printProcessFx.blackGeneration" "Black Generation" </item>
+  <item>"STD_printProcessFx.dotGain" "Dot Gain" </item>
+  <item>"STD_printProcessFx.softness" "Dot Softness" </item>
+  <item>"STD_printProcessFx.background" "Background" </item>
+  <item>"STD_printProcessFx.paper" "Paper Colour" </item>
+  <item>"STD_printProcessFx.grain" "Paper Grain" </item>
+  <item>"STD_printProcessFx.grainSize" "Grain Size" </item>
+  <item>"STD_printProcessFx.seed" "Seed" </item>
+  <item>"STD_printProcessFx.useCyan" "Cyan Plate" </item>
+  <item>"STD_printProcessFx.angleCyan" "Cyan Angle" </item>
+  <item>"STD_printProcessFx.inkCyan" "Cyan Ink" </item>
+  <item>"STD_printProcessFx.offsetCyanX" "Cyan Offset X" </item>
+  <item>"STD_printProcessFx.offsetCyanY" "Cyan Offset Y" </item>
+  <item>"STD_printProcessFx.useMagenta" "Magenta Plate" </item>
+  <item>"STD_printProcessFx.angleMagenta" "Magenta Angle" </item>
+  <item>"STD_printProcessFx.inkMagenta" "Magenta Ink" </item>
+  <item>"STD_printProcessFx.offsetMagentaX" "Magenta Offset X" </item>
+  <item>"STD_printProcessFx.offsetMagentaY" "Magenta Offset Y" </item>
+  <item>"STD_printProcessFx.useYellow" "Yellow Plate" </item>
+  <item>"STD_printProcessFx.angleYellow" "Yellow Angle" </item>
+  <item>"STD_printProcessFx.inkYellow" "Yellow Ink" </item>
+  <item>"STD_printProcessFx.offsetYellowX" "Yellow Offset X" </item>
+  <item>"STD_printProcessFx.offsetYellowY" "Yellow Offset Y" </item>
+  <item>"STD_printProcessFx.useBlack" "Black Plate" </item>
+  <item>"STD_printProcessFx.angleBlack" "Black Angle" </item>
+  <item>"STD_printProcessFx.inkBlack" "Black Ink" </item>
+  <item>"STD_printProcessFx.offsetBlackX" "Black Offset X" </item>
+  <item>"STD_printProcessFx.offsetBlackY" "Black Offset Y" </item>
 
   <item>"STD_premultiplyFx"			"Premultiply"	</item>
 

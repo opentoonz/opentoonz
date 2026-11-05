@@ -1,0 +1,43 @@
+<fxlayout help_file="PrintProcess.html">
+  <page name="Screen">
+    <control>output</control>
+    <control>cellSize</control>
+    <control>shape</control>
+    <control>blackGeneration</control>
+    <control>dotGain</control>
+    <control>softness</control>
+  </page>
+  <page name="Plates">
+    <separator label="Cyan"/>
+    <control>useCyan</control>
+    <control>angleCyan</control>
+    <control>inkCyan</control>
+    <control>offsetCyanX</control>
+    <control>offsetCyanY</control>
+    <separator label="Magenta"/>
+    <control>useMagenta</control>
+    <control>angleMagenta</control>
+    <control>inkMagenta</control>
+    <control>offsetMagentaX</control>
+    <control>offsetMagentaY</control>
+    <separator label="Yellow"/>
+    <control>useYellow</control>
+    <control>angleYellow</control>
+    <control>inkYellow</control>
+    <control>offsetYellowX</control>
+    <control>offsetYellowY</control>
+    <separator label="Black"/>
+    <control>useBlack</control>
+    <control>angleBlack</control>
+    <control>inkBlack</control>
+    <control>offsetBlackX</control>
+    <control>offsetBlackY</control>
+  </page>
+  <page name="Paper">
+    <control>background</control>
+    <control>paper</control>
+    <control>grain</control>
+    <control>grainSize</control>
+    <control>seed</control>
+  </page>
+</fxlayout>
