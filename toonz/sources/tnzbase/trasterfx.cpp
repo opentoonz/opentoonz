@@ -690,7 +690,8 @@ void TRasterFx::dryCompute(TRectD &rect, double frame,
   // after the node has been computed.
   bool canHandleAffine =
       canHandle(info, frame) || (handledAffine(info, frame) == info.m_affine);
-  if (!info.m_affine.isIdentity() && !canHandleAffine) {
+  if ((!info.m_affine.isIdentity() || usesCustomRenderGrid()) &&
+      !canHandleAffine) {
     TrFx *transformerFx = new TrFx;
     TFxP locker(transformerFx);
     transformerFx->setFx(this);
@@ -880,7 +881,8 @@ void TRasterFx::compute(TTile &tile, double frame,
 
   bool canHandleAffine =
       canHandle(info, frame) || (handledAffine(info, frame) == info.m_affine);
-  if (!info.m_affine.isIdentity() && !canHandleAffine) {
+  if ((!info.m_affine.isIdentity() || usesCustomRenderGrid()) &&
+      !canHandleAffine) {
     TrFx *transformerFx = new TrFx;
     TFxP locker(transformerFx);
     transformerFx->setFx(this);
