@@ -1590,8 +1590,13 @@ void ModeSensitiveBox::onModeChanged(int modeValue) {
   if (wasVisible == m_modes.contains(modeValue)) return;
   setVisible(!wasVisible);
 
-  ParamsPage *paramsPage = dynamic_cast<ParamsPage *>(parentWidget());
-  if (paramsPage) emit paramsPage->preferredPageSizeChanged();
+  for (QWidget *parent = parentWidget(); parent;
+       parent          = parent->parentWidget()) {
+    if (ParamsPage *paramsPage = dynamic_cast<ParamsPage *>(parent)) {
+      emit paramsPage->preferredPageSizeChanged();
+      break;
+    }
+  }
 }
 
 //=============================================================================
