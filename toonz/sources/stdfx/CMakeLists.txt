@@ -263,6 +263,8 @@ set(SOURCES
     ino_warp_hv.cpp
     iwa_adjustexposurefx.cpp
     iwa_directionalblurfx.cpp
+    celdirectionalblurfx.cpp
+    celdirectionalmath.cpp
     iwa_gradientwarpfx.cpp
     iwa_motionblurfx.cpp
     iwa_particles.cpp
