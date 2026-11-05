@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Flow Displace</title></head>
+<body>
+<h1>Flow Displace</h1>
+<p>Warp a drawing with a second image, for the secondary motion of capes, hair
+and water without redrawing. Add Flow Displace from the Distort category and
+connect the drawing to Source, the image that drives the warp to Displacement,
+and optionally a matte to Matte.</p>
+<h2>Displacement</h2>
+<p><b>Vector Field</b> reads the Displacement image as motion: red is the
+horizontal motion and green the vertical, with 0.5 (mid grey) meaning none, as
+the Motion Flow FX writes them. Paint or generate it in another column; an
+animated field animates the warp. <b>Grey Map</b> reads its brightness instead:
+white pushes along <b>Direction</b>, black pushes the opposite way, mid grey not
+at all. <b>Strength</b> is the motion of a full-scale value in pixels at 100%;
+<b>Invert</b> reverses it. Where the Displacement image is transparent there is
+no motion.</p>
+<h2>Matte</h2>
+<p>When a matte is connected, its alpha weights the motion: nothing moves
+outside it, everything inside it, and soft edges blend between. Use it to keep
+a body still while its cape moves.</p>
+<h2>Secondary motion</h2>
+<p><b>Noise Amplitude</b> adds a smooth noise motion of that many pixels,
+which drifts over time at <b>Noise Speed</b> (noise planes per frame). With a
+matte and no Displacement image, this alone makes hair or water ripple.
+<b>Noise Size</b> is the size of its features and <b>Seed</b> picks its
+pattern; renders are repeatable.</p>
+<p>Every value can be animated. 8-bit, 16-bit and floating-point images are
+supported, and the result does not depend on render tiles.</p>
+</body>
+</html>

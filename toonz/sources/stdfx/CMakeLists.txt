@@ -174,6 +174,7 @@ set(SOURCES
     unmultiplyfx.cpp
     warp.cpp
     warpfx.cpp
+    flowdisplacefx.cpp
     igs_attenuation_distribution.cpp
     igs_color_blend.cpp
     igs_color_rgb_hls.cpp
