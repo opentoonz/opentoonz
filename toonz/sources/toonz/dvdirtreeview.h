@@ -170,6 +170,7 @@ public:
 
 signals:
   void currentNodeChanged();  //!< Emitted when user selects a different node.
+  void emptySpacePressed();
 
 public slots:
   void deleteFolder();  //!< Deletes the selected folder.

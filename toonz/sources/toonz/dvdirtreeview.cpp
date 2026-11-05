@@ -648,8 +648,11 @@ void DvDirTreeView::mousePressEvent(QMouseEvent *event) {
   if (!m_globalSelectionEnabled || event->button() != Qt::LeftButton) return;
   if (index.isValid())
     makeCurrent();
-  else if (TSelection *current = TSelection::getCurrent())
-    current->makeNotCurrent();
+  else {
+    if (TSelection *current = TSelection::getCurrent())
+      current->makeNotCurrent();
+    emit emptySpacePressed();
+  }
 }
 
 //-----------------------------------------------------------------------------

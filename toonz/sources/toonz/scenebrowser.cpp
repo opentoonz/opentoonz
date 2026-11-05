@@ -199,6 +199,13 @@ SceneBrowser::SceneBrowser(QWidget *parent, Qt::WindowFlags flags,
           itemViewPlayDelegate, &DVItemViewPlayDelegate::resetPlayWidget);
   connect(m_folderTreeView, &DvDirTreeView::currentNodeChanged, this,
           &SceneBrowser::onTreeFolderChanged);
+  connect(m_folderTreeView, &DvDirTreeView::emptySpacePressed, this, [this]() {
+    if (FileSelection *fs = dynamic_cast<FileSelection *>(
+            m_itemViewer->getPanel()->getSelection()))
+      fs->selectNone();
+    m_selectionByFolder.erase(selectionPlace());
+    m_itemViewer->getPanel()->update();
+  });
   connect(m_itemViewer, &DvItemViewer::clickedItem, this,
           &SceneBrowser::onClickedItem);
   connect(m_itemViewer, &DvItemViewer::doubleClickedItem, this,
