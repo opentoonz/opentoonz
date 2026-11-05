@@ -225,7 +225,7 @@ FileBrowser::FileBrowser(QWidget *parent, Qt::WindowFlags flags,
     if (FileSelection *fs = dynamic_cast<FileSelection *>(
             m_itemViewer->getPanel()->getSelection()))
       fs->selectNone();
-    m_selectionByFolder.erase(selectionPlace());
+    onSelectedItems(std::set<int>());
     m_itemViewer->getPanel()->update();
   });
 
