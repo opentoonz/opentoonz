@@ -1138,7 +1138,7 @@ int InkSegmenter::findTwinPoints(TPixelCM32 *pix, const TPoint &p,
   col_p2 = pix + m_wrap;
   col_y2 = p.y + 1;
 
-  while (col_y2 - 1 > 0 && !(col_p2 - 1)->isPurePaint()) {
+  while (col_y2 - 1 > 0 && !(col_p2 - m_wrap)->isPurePaint()) {
     col_p2 -= m_wrap;
     col_y2--;
   }
