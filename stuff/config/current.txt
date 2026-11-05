@@ -62,6 +62,14 @@
   <item>"STD_bodyHighLightFx.blur" 	"Blur" 		</item>
   <item>"STD_bodyHighLightFx.color" 	"Color" 		</item>
   <item>"STD_bodyHighLightFx.invert" 	"Invert" 		</item>
+  <item>"STD_toneHighlightFx" 	"Tone / Highlight" 		</item>
+  <item>"STD_toneHighlightFx.mode" 	"Mode" 			</item>
+  <item>"STD_toneHighlightFx.color" 	"Color" 		</item>
+  <item>"STD_toneHighlightFx.intensity" 	"Intensity" 		</item>
+  <item>"STD_toneHighlightFx.softness" 	"Softness" 		</item>
+  <item>"STD_toneHighlightFx.invertMatte" 	"Invert Matte" 		</item>
+  <item>"STD_toneHighlightFx.protectLines" 	"Protect Lines" 		</item>
+  <item>"STD_toneHighlightFx.lineThreshold" 	"Line Darkness" 		</item>
 
 
  <item>"STD_castShadowFx"			"Cast Shadow"	</item>
