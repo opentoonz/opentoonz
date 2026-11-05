@@ -151,6 +151,7 @@ set(SOURCES
     posterizefx.cpp
     premultiplyfx.cpp
     radialblurfx.cpp
+    celradialblurfx.cpp
     randomwavefx.cpp
     raylitfx.cpp
     rgbkeyfx.cpp
