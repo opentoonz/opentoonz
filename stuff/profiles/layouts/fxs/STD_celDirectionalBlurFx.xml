@@ -1,0 +1,21 @@
+<fxlayout help_file="CelDirectionalBlur.html">
+  <page name="Cel Directional Blur">
+    <control>angle</control>
+    <control>gain</control>
+    <control>sizeVariation</control>
+    <separator label="Front Blur"/>
+    <control>frontStrength</control>
+    <control>frontFade</control>
+    <control>frontSharp</control>
+    <separator label="Back Blur"/>
+    <control>backStrength</control>
+    <control>backFade</control>
+    <control>backSharp</control>
+    <separator label="Noise"/>
+    <control>noiseVariation</control>
+    <control>noiseType</control>
+    <control decimals="0">noiseSeed</control>
+    <control>noiseOffset</control>
+    <control>noiseThickness</control>
+  </page>
+</fxlayout>
