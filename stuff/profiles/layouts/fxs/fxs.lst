@@ -137,6 +137,7 @@
   <Matte>
     STD_erodeDilateFx
     STD_hsvKeyFx
+    STD_celColorExpandFx
     inFx
     outFx
     STD_rgbKeyFx

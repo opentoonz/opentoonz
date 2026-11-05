@@ -127,6 +127,7 @@ set(SOURCES
     glowfx.cpp
     gradients.cpp
     hsvkeyfx.cpp
+    celcolorexpandfx.cpp
     hsvscalefx.cpp
     hsvutil.cpp
     celmotion.cpp
