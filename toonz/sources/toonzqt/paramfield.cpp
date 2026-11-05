@@ -15,6 +15,7 @@
 #include "tdoublekeyframe.h"
 #include "tnotanimatableparam.h"
 #include "tparamset.h"
+#include "tpixelutils.h"
 #include "tw/stringtable.h"
 
 #include <QString>
@@ -202,6 +203,39 @@ public:
     if (m_fxHandle) m_fxHandle->notifyFxChanged();
   }
 };
+
+// A precision-sensitive color control must preserve the complete curves,
+// including interpolation and values finer than the color picker's swatch.
+class PrecisePixelParamUndo final : public AnimatableFxSettingsUndo {
+  TPixelParamP m_param, m_before, m_after;
+
+public:
+  PrecisePixelParamUndo(const TPixelParamP &param, QString name, int frame,
+                        TFxHandle *handle)
+      : AnimatableFxSettingsUndo(name, frame, handle)
+      , m_param(param)
+      , m_before(TParamP(param->clone())) {
+    m_wasKeyframe = param->isKeyframe(frame);
+  }
+  void onAdd() override { m_after = TParamP(m_param->clone()); }
+  void undo() const override {
+    m_param->copy(m_before.getPointer());
+    if (m_fxHandle) m_fxHandle->notifyFxChanged();
+  }
+  void redo() const override {
+    m_param->copy(m_after.getPointer());
+    if (m_fxHandle) m_fxHandle->notifyFxChanged();
+  }
+};
+
+namespace {
+void setDefaultPixelD(const TPixelParamP &param, const TPixelD &value) {
+  param->getRed()->setDefaultValue(value.r);
+  param->getGreen()->setDefaultValue(value.g);
+  param->getBlue()->setDefaultValue(value.b);
+  param->getMatte()->setDefaultValue(value.m);
+}
+}  // namespace
 
 //-----------------------------------------------------------------------------
 /*! PointParamField Undo
@@ -1105,6 +1139,22 @@ PixelParamField::PixelParamField(QWidget *parent, QString name,
 
 //-----------------------------------------------------------------------------
 
+void PixelParamField::update(int frame) {
+  if (!property("preserveColorPrecision").toBool()) {
+    AnimatedParamField<TPixel32, TPixelParamP>::update(frame);
+    return;
+  }
+  m_frame = frame;
+  if (!m_currentParam || !m_actualParam) return;
+  const TPixelD value = m_actualParam->getValueD(frame);
+  if (m_actualParam->isKeyframe(frame) || !m_actualParam->hasKeyframes())
+    m_currentParam->copy(m_actualParam.getPointer());
+  updateField(m_actualParam->getValue(frame));
+  m_keyToggle->setStatus(m_actualParam->hasKeyframes(),
+                         m_actualParam->isKeyframe(frame),
+                         value != m_currentParam->getValueD(frame));
+}
+
 void PixelParamField::updateField(TPixel32 value) {
   m_colorField->setColor(value);
 }
@@ -1113,6 +1163,34 @@ void PixelParamField::updateField(TPixel32 value) {
 
 void PixelParamField::onChange(const TPixel32 &value, bool isDragging) {
   if (isDragging) return;
+
+  if (property("preserveColorPrecision").toBool()) {
+    if (!m_actualParam || !m_currentParam) return;
+    const TPixelD preciseValue = toPixelD(value);
+    if (m_currentParam->getValueD(m_frame) == preciseValue) return;
+    const bool commit =
+        m_actualParam->isKeyframe(m_frame) || !m_actualParam->hasKeyframes();
+    TUndo *undo =
+        commit ? new PrecisePixelParamUndo(m_actualParam, m_interfaceName,
+                                           m_frame, ParamField::m_fxHandleStat)
+               : nullptr;
+    if (!m_actualParam->hasKeyframes())
+      setDefaultPixelD(m_currentParam, preciseValue);
+    else
+      m_currentParam->setValueD(m_frame, preciseValue);
+    if (m_actualParam->isKeyframe(m_frame))
+      m_actualParam->setValueD(m_frame, preciseValue);
+    else if (!m_actualParam->hasKeyframes())
+      setDefaultPixelD(m_actualParam, preciseValue);
+    if (undo) TUndoManager::manager()->add(undo);
+    if (commit) emit actualParamChanged();
+    emit currentParamChanged();
+    m_keyToggle->setStatus(m_actualParam->hasKeyframes(),
+                           m_actualParam->isKeyframe(m_frame),
+                           m_actualParam->getValueD(m_frame) !=
+                               m_currentParam->getValueD(m_frame));
+    return;
+  }
 
   TPixelParamP pixelParam = m_actualParam;
 
@@ -1135,7 +1213,23 @@ void PixelParamField::onChange(const TPixel32 &value, bool isDragging) {
 
 //-----------------------------------------------------------------------------
 
-void PixelParamField::onKeyToggled() { onKeyToggle(); }
+void PixelParamField::onKeyToggled() {
+  if (!property("preserveColorPrecision").toBool()) {
+    onKeyToggle();
+    return;
+  }
+  if (!m_actualParam || !m_currentParam) return;
+  TUndo *undo = new PrecisePixelParamUndo(m_actualParam, m_interfaceName,
+                                          m_frame, ParamField::m_fxHandleStat);
+  if (m_keyToggle->getStatus() == ParamFieldKeyToggle::KEYFRAME)
+    m_actualParam->deleteKeyframe(m_frame);
+  else
+    m_actualParam->setValueD(m_frame, m_currentParam->getValueD(m_frame));
+  TUndoManager::manager()->add(undo);
+  update(m_frame);
+  emit actualParamChanged();
+  emit paramKeyToggle();
+}
 
 //-----------------------------------------------------------------------------
 
