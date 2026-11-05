@@ -154,6 +154,7 @@ set(SOURCES
     randomwavefx.cpp
     raylitfx.cpp
     rgbkeyfx.cpp
+    celcolorkeyfx.cpp
     rgbmcutfx.cpp
     rgbmfadefx.cpp
     rgbmscalefx.cpp
