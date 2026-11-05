@@ -1,0 +1,8 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Star Glow</title></head><body>
+<h1>Star Glow</h1>
+<p>Connect an image to Source and choose the Alpha, Luminance, RGB, or Brightness channel to select highlights. Threshold removes dim values; Fade Out softens the threshold for Luminance and Brightness. Brightness Gain scales the selected light. Source Opacity and Glow Opacity control their contributions.</p>
+<p>Lengths and Highlight Radius are measured on the effect's world pixel grid. The source is rendered into that grid before the glow is calculated, including raster-level DPI placement. Vertical, Horizontal and Diagonal Lengths control independent streaks. Each direction has its own color and optional editable ramp; the ramp runs from the streak center to its ends. Diagonal creates two crossing directions. Glow Rotation turns all streaks. Highlight Radius adds a two-axis glow in Highlight Color. A zero length or radius disables that contribution.</p>
+<p>Box, Approximated Gaussian, Gaussian and Exponential select distinct finite-support profiles. Approximated Gaussian uses a quadratic B-spline; Gaussian and Exponential weights end at the chosen length. Approximated Input averages aligned 2-by-2 input blocks before filtering. Add sums the source and glow; Premultiply composites the glow over the source using glow coverage.</p>
+<p>The controls, ramps and colors can be animated and saved in scenes and presets. Select a ramp stop and enter precise R, G, B and A values below the ramp; RGB accepts finite HDR values and alpha ranges from 0 to 1. Float processing preserves those values. Partial transparency participates in highlight extraction and compositing.</p>
+</body></html>
