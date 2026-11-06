@@ -220,6 +220,9 @@ public:
   bool isActualPixelViewOnSceneEditingModeEnabled() const {
     return getBoolValue(actualPixelViewOnSceneEditingMode);
   }
+  bool isSyncSceneAndLevelViewEnabled() const {
+    return getBoolValue(syncSceneAndLevelView);
+  }
   bool isShowRasterImagesDarkenBlendedInViewerEnabled() const {
     return getBoolValue(showRasterImagesDarkenBlendedInViewer);
   }
