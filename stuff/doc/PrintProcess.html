@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Print Process</title></head>
+<body>
+<h1>Print Process</h1>
+<p>Simulate offset printing for comic, retro and risograph looks. Add Print
+Process from the Stylize category and connect the image to Source. The image is
+separated into cyan, magenta, yellow and black plates; each is printed through
+its own dot screen, and the inks are recombined on paper.</p>
+<h2>Screen</h2>
+<p><b>Cell Size</b> is the screen's cell in the drawing's own pixels: small
+cells read as fine printing, large ones as pop-art dots. <b>Dot Shape</b> is
+Round, Diamond or Line; for every shape a tone inks exactly its share of each
+cell. <b>Black Generation</b> is the share of the common grey printed with the
+black plate instead of three inks. <b>Dot Gain</b> spreads the ink, darkening
+the middle tones as soft paper does. <b>Dot Softness</b> is the width of the dot
+edges in pixels; 0 gives hard dots. <b>Output</b> shows the print, or one plate
+in black on white.</p>
+<h2>Plates</h2>
+<p>Each plate can be turned off and has its own screen <b>Angle</b> (the
+classic 15, 75, 0 and 45 degrees keep the dots from forming moiré), its
+<b>Ink</b> colour and its <b>Offset</b>, the misregistration: the plate's image
+and dots are moved together by that many pixels, as when the paper slips
+between colours. Change the inks to fluorescent pink, blue and yellow for a
+risograph look.</p>
+<h2>Paper</h2>
+<p><b>Background</b> is Paper, printed over the whole frame, or Transparent,
+keeping the source's transparency for compositing. <b>Paper Colour</b> is the
+paper under the inks. <b>Paper Grain</b> textures the paper and roughens the
+dot edges, like ink soaking into fibres; <b>Grain Size</b> is its scale and
+<b>Seed</b> picks its pattern.</p>
+<h2>Notes</h2>
+<p>Every value can be animated: animating an offset makes the plates drift.
+The screens are tied to the drawing's position, so the dots stay put when the
+camera does, and the result does not depend on render tiles. 8-bit, 16-bit and
+floating-point images are supported.</p>
+</body>
+</html>
