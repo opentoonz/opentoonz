@@ -15,6 +15,7 @@
 
 // STD includes
 #include <set>
+#include <vector>
 
 #undef DVAPI
 #undef DVVAR
@@ -73,6 +74,19 @@ public:
 
   void setValueRange(double min, double max, double step = 1.0);
   bool getValueRange(double &min, double &max, double &step) const;
+
+  // Optional slider bounds, independent of the full numeric entry range.
+  // Effect constructors provide this editor schema; parameter copies retain it.
+  void setUISliderRange(double min, double max);
+  bool getUISliderRange(double &min, double &max) const;
+
+  // Optional native editor schema for keyable discrete parameters. Values are
+  // zero-based choice indices. The effect constructor supplies the schema;
+  // curves continue to use the ordinary double parameter stream format.
+  void setUIChoices(const std::vector<std::string> &choices,
+                    bool checkbox = false);
+  const std::vector<std::string> &getUIChoices() const;
+  bool isUICheckbox() const;
 
   double getDefaultValue() const;
   void setDefaultValue(double value);

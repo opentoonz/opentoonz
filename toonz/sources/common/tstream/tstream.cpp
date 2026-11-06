@@ -15,6 +15,8 @@
 
 #include <sstream>
 #include <memory>
+#include <limits>
+#include <locale>
 
 //===============================================================
 namespace {
@@ -203,6 +205,7 @@ public:
   std::ostream *m_os;
   bool m_chanOwner;
   bool m_compressed;
+  bool m_fullPrecision = false;
   std::ostringstream m_ostringstream;
 
   std::vector<std::string> m_tagStack;
@@ -333,7 +336,22 @@ TOStream &TOStream::operator<<(int v) {
 
 //---------------------------------------------------------------
 
+bool TOStream::setFullPrecision(bool enabled) {
+  const bool previous    = m_imp->m_fullPrecision;
+  m_imp->m_fullPrecision = enabled;
+  return previous;
+}
+
 TOStream &TOStream::operator<<(double v) {
+  if (m_imp->m_fullPrecision) {
+    std::ostringstream text;
+    text.imbue(std::locale::classic());
+    text.precision(std::numeric_limits<double>::max_digits10);
+    text << v;
+    *(m_imp->m_os) << text.str() << " ";
+    m_imp->m_justStarted = false;
+    return *this;
+  }
   if (areAlmostEqual(v, 0))  // with very small values (e.g. 1.4e-310) it cannot
                              // read them back!
     v = 0;

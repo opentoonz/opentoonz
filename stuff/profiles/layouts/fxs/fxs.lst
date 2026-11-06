@@ -125,6 +125,7 @@
     STD_colorRaylitFx
     STD_inoFogFx
     STD_glowFx
+    STD_starGlowFx
     STD_lightSpotFx
     STD_raylitFx
     STD_iwa_SpectrumFx
