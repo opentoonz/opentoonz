@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Cel Radial Blur</title></head>
+<body>
+<h1>Cel Radial Blur</h1>
+<p>Create zoom or rotation trails while retaining the colors and coverage of cel
+artwork. Add the effect from Blur and connect Source. Connect an optional Noise
+input to use an image as the noise layer. The effect starts with no blur.</p>
+<h2>Direction and geometry</h2>
+<p>Select Zoom or Rotation and set Center. Outer Strength produces outward or
+clockwise trails; Inner Strength produces inward or counterclockwise trails.
+Both can be used at once. Strengths accept 0–2000 pixels. Each side also has an
+Offset from 0–500 pixels and an Offset Mode: Add adds the offset, Max uses the
+larger value, and Override uses the offset.</p>
+<p>Ellipse Ratio ranges from 0–5 and Angle rotates its axes. Ratio 1 is circular;
+ratio 0 uses the limiting very thin ellipse. Quality controls the number of
+trajectory sampling from 1–50, including fractional values. Larger values smooth longer trails at greater
+rendering cost. The viewer's center and ellipse handles also edit the native
+parameters.</p>
+<h2>Edges, size and brightness</h2>
+<p>Outer Edge Fade softens the inner side of each group along the zoom or
+rotation path; Inner Edge Fade softens its outer side. Their fade regions grow
+with Size Variation. Repeat
+Border extends the original finite image boundary for edge fading; it has no
+effect when fade is zero. A connected group is an eight-connected region of
+nontransparent pixels. Size Variation scales trail strength by group area: at
+100, the smallest groups receive no trail and the largest receive full strength.
+Equal-size groups are all treated as the smallest. Brightness Gain scales RGB
+while preserving alpha. Integer renders keep RGB within alpha; floating-point
+renders retain finite HDR values.</p>
+<h2>Noise</h2>
+<p>Noise Variation blends between uniform strength and noise-modulated strength.
+Smooth and Block use the Seed, animated Noise Offset and Thickness. Noise Offset
+is measured in degrees; each 360 degrees moves through one noise interval. Layer uses
+the Noise input's premultiplied luminance: bright pixels retain more trail,
+black or transparent pixels reduce it. A disconnected Noise input acts as black
+in Layer mode. Noise is sampled in scene coordinates, so tiled renders and
+frame order do not alter the pattern.</p>
+<h2>Animation and rendering</h2>
+<p>All controls use native keyframes, undo, scenes, presets and macro pins.
+Raster levels use their native pixel grid for blur strength and noise before
+DPI and geometry placement; ambiguous or vector inputs use the scene grid.
+The effect computes connected groups over the complete finite source domain,
+so tile boundaries do not change the result. For an infinite upstream source,
+the finite scene camera is used as the composition domain. Very large domains
+may require substantial memory. Fully transparent and nonfinite input pixels are
+ignored during sampling.</p>
+<p>The radial paths and edge transitions are adapted to OpenToonz's native
+premultiplied images. Trajectory and fade behavior follows the controls described
+here; numerical results can differ from other hosts.</p>
+</body>
+</html>

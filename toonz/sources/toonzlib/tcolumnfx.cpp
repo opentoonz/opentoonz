@@ -60,6 +60,8 @@ extern "C" {
 
 #include "toonz/tcolumnfx.h"
 
+#include <cmath>
+
 //****************************************************************************************
 //    Preliminaries
 //****************************************************************************************
@@ -1213,6 +1215,16 @@ void TLevelColumnFx::doCompute(TTile &tile, double frame,
       // Place the output rect in the image's reference
       tileRectD += TPointD(lx_2 - info.m_affine.a13, ly_2 - info.m_affine.a23);
 
+      // A fractional source offset needs samples on both sides of the tile
+      // boundary. Three pixels cover every current resampling filter. Keep
+      // aligned copies unpadded, as in TRasterFx::applyAffine's copy path.
+      const double fracX  = tileRectD.x0 - std::floor(tileRectD.x0);
+      const double fracY  = tileRectD.y0 - std::floor(tileRectD.y0);
+      const bool alignedX = fracX < 0.01 || fracX > 0.99;
+      const bool alignedY = fracY < 0.01 || fracY > 0.99;
+      const TRectD sourceRect =
+          tileRectD.enlarge(alignedX && alignedY ? 0.0 : 3.0);
+
       // Then, retrieve loaded image's interesting region
       TRectD inTileRectD;
       if (ti) {
@@ -1226,17 +1238,19 @@ void TLevelColumnFx::doCompute(TTile &tile, double frame,
       }
 
       // And intersect the two
-      inTileRectD *= tileRectD;
+      inTileRectD *= sourceRect;
 
       // Should the intersection be void, return
       if (inTileRectD.x0 >= inTileRectD.x1 || inTileRectD.y0 >= inTileRectD.y1)
         return;
 
       // Output that intersection in the requested tile
-      TRect inTileRect(tround(inTileRectD.x0), tround(inTileRectD.y0),
-                       tround(inTileRectD.x1) - 1, tround(inTileRectD.y1) - 1);
+      TRect inTileRect(tfloor(inTileRectD.x0), tfloor(inTileRectD.y0),
+                       tceil(inTileRectD.x1) - 1, tceil(inTileRectD.y1) - 1);
+      inTileRect *= ras->getBounds();
+      if (inTileRect.isEmpty()) return;
       TTile inTile(ras->extract(inTileRect),
-                   inTileRectD.getP00() + TPointD(-lx_2, -ly_2));
+                   TPointD(inTileRect.x0 - lx_2, inTileRect.y0 - ly_2));
 
       // Observe that inTile is in the standard reference, ie image's minus the
       // center coordinates
