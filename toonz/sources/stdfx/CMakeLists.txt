@@ -129,6 +129,8 @@ set(SOURCES
     hsvkeyfx.cpp
     hsvscalefx.cpp
     hsvutil.cpp
+    celmotion.cpp
+    celnoise.cpp
     kaleido.cpp
     linearwavefx.cpp
     localblurfx.cpp
@@ -164,6 +166,7 @@ set(SOURCES
     sharpenfx.cpp
     solarizefx.cpp
     squaregradientfx.cpp
+    alphadistancegradientfx.cpp
     stdfx.cpp
     targetspotfx.cpp
     texturefx.cpp
