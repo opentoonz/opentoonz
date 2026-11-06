@@ -440,6 +440,7 @@ class DVAPI PixelParamField final
 public:
   PixelParamField(QWidget *parent, QString name, const TPixelParamP &param);
 
+  void update(int frame) override;
   void updateField(TPixel32 value) override;
 
   QSize getPreferredSize() override { return QSize(480, 40); }
@@ -512,6 +513,32 @@ public:
       : ParamField(parent, paramName, param, addEmptyLabel) {}
 signals:
   void modeChanged(int);
+};
+
+class DVAPI AnimatedChoiceParamField final : public ModeChangerParamField {
+  Q_OBJECT
+  TDoubleParamP m_currentParam, m_actualParam;
+  QComboBox *m_choices  = nullptr;
+  QCheckBox *m_checkBox = nullptr;
+  ParamFieldKeyToggle *m_keyToggle;
+  int m_frame = 0;
+  int m_choiceCount;
+
+  int choiceIndex(double value) const;
+  void updateWidgets(int value);
+  void updateKeyToggle();
+
+public:
+  AnimatedChoiceParamField(QWidget *parent, QString name,
+                           const TDoubleParamP &param);
+  void setParam(const TParamP &current, const TParamP &actual,
+                int frame) override;
+  void update(int frame) override;
+  QSize getPreferredSize() override { return QSize(200, 28); }
+
+protected slots:
+  void onChoiceChanged(int value);
+  void onKeyToggled();
 };
 
 class DVAPI ModeSensitiveBox final : public QWidget {
