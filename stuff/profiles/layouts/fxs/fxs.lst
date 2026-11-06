@@ -165,6 +165,7 @@
   <Stylize>
     STD_colorEmbossFx
     STD_embossFx
+    STD_celEdgeLinesFx
     STD_inoMaxMinFx
     STD_mosaicFx
     STD_inoMotionWindFx

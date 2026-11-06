@@ -1,0 +1,116 @@
+<fxlayout help_file="CelEdgeLines.html">
+  <page name="Cel Edge Lines">
+    <control>mode</control>
+    <control>opacity</control>
+    <control>tolerance</control>
+    <control>matchTolerance</control>
+    <control>gap</control>
+    <control>enabledRules</control>
+    <indexedGroups count="enabledRules" label="Rules">
+      <entry color="lineColor001" label="Rule 1">
+        <control>use001</control>
+        <control>firstKind001</control>
+        <vbox modeSensitive="firstKind001" mode="1">
+          <control>firstColor001</control>
+        </vbox>
+        <control>secondKind001</control>
+        <vbox modeSensitive="secondKind001" mode="1">
+          <control>secondColor001</control>
+        </vbox>
+        <control>weight001</control>
+        <control>lineColor001</control>
+      </entry>
+      <entry color="lineColor002" label="Rule 2">
+        <control>use002</control>
+        <control>firstKind002</control>
+        <vbox modeSensitive="firstKind002" mode="1">
+          <control>firstColor002</control>
+        </vbox>
+        <control>secondKind002</control>
+        <vbox modeSensitive="secondKind002" mode="1">
+          <control>secondColor002</control>
+        </vbox>
+        <control>weight002</control>
+        <control>lineColor002</control>
+      </entry>
+      <entry color="lineColor003" label="Rule 3">
+        <control>use003</control>
+        <control>firstKind003</control>
+        <vbox modeSensitive="firstKind003" mode="1">
+          <control>firstColor003</control>
+        </vbox>
+        <control>secondKind003</control>
+        <vbox modeSensitive="secondKind003" mode="1">
+          <control>secondColor003</control>
+        </vbox>
+        <control>weight003</control>
+        <control>lineColor003</control>
+      </entry>
+      <entry color="lineColor004" label="Rule 4">
+        <control>use004</control>
+        <control>firstKind004</control>
+        <vbox modeSensitive="firstKind004" mode="1">
+          <control>firstColor004</control>
+        </vbox>
+        <control>secondKind004</control>
+        <vbox modeSensitive="secondKind004" mode="1">
+          <control>secondColor004</control>
+        </vbox>
+        <control>weight004</control>
+        <control>lineColor004</control>
+      </entry>
+      <entry color="lineColor005" label="Rule 5">
+        <control>use005</control>
+        <control>firstKind005</control>
+        <vbox modeSensitive="firstKind005" mode="1">
+          <control>firstColor005</control>
+        </vbox>
+        <control>secondKind005</control>
+        <vbox modeSensitive="secondKind005" mode="1">
+          <control>secondColor005</control>
+        </vbox>
+        <control>weight005</control>
+        <control>lineColor005</control>
+      </entry>
+      <entry color="lineColor006" label="Rule 6">
+        <control>use006</control>
+        <control>firstKind006</control>
+        <vbox modeSensitive="firstKind006" mode="1">
+          <control>firstColor006</control>
+        </vbox>
+        <control>secondKind006</control>
+        <vbox modeSensitive="secondKind006" mode="1">
+          <control>secondColor006</control>
+        </vbox>
+        <control>weight006</control>
+        <control>lineColor006</control>
+      </entry>
+      <entry color="lineColor007" label="Rule 7">
+        <control>use007</control>
+        <control>firstKind007</control>
+        <vbox modeSensitive="firstKind007" mode="1">
+          <control>firstColor007</control>
+        </vbox>
+        <control>secondKind007</control>
+        <vbox modeSensitive="secondKind007" mode="1">
+          <control>secondColor007</control>
+        </vbox>
+        <control>weight007</control>
+        <control>lineColor007</control>
+      </entry>
+      <entry color="lineColor008" label="Rule 8">
+        <control>use008</control>
+        <control>firstKind008</control>
+        <vbox modeSensitive="firstKind008" mode="1">
+          <control>firstColor008</control>
+        </vbox>
+        <control>secondKind008</control>
+        <vbox modeSensitive="secondKind008" mode="1">
+          <control>secondColor008</control>
+        </vbox>
+        <control>weight008</control>
+        <control>lineColor008</control>
+      </entry>
+    </indexedGroups>
+  </page>
+</fxlayout>
