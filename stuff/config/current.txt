@@ -93,6 +93,18 @@
   <item>"STD_dropShadowFx.inner"	"Inner Shadow"	</item>
   <item>"STD_dropShadowFx.knockout"	"Knockout"	</item>
   <item>"STD_dropShadowFx.hide_object"	"Hide Object"	</item>
+  <item>"STD_lightShadingFx" 	"Light Shading" 		</item>
+  <item>"STD_lightShadingFx.mode" 	"Mode" 			</item>
+  <item>"STD_lightShadingFx.lightPoint" 	"Light Point" 		</item>
+  <item>"STD_lightShadingFx.lightRadius" 	"Light Radius" 		</item>
+  <item>"STD_lightShadingFx.lightAngle" 	"Light Angle" 		</item>
+  <item>"STD_lightShadingFx.shadeColor" 	"Shade Color" 		</item>
+  <item>"STD_lightShadingFx.highlightColor" 	"Highlight Color" 		</item>
+  <item>"STD_lightShadingFx.shadeAmount" 	"Shade Amount" 		</item>
+  <item>"STD_lightShadingFx.highlightAmount" 	"Highlight Amount" 		</item>
+  <item>"STD_lightShadingFx.bands" 	"Bands" 		</item>
+  <item>"STD_lightShadingFx.softness" 	"Softness" 		</item>
+  <item>"STD_lightShadingFx.protectLines" 	"Protect Lines" 		</item>
 
 
   <item>"STD_changeColorFx"	"Change Color"		</item>

@@ -1,0 +1,16 @@
+<fxlayout>
+  <page name="Light Shading">
+        <control>mode</control>
+        <control>lightPoint</control>
+        <control>lightRadius</control>
+        <control>lightAngle</control>
+        <control>shadeColor</control>
+        <control>shadeAmount</control>
+        <control>highlightColor</control>
+        <control>highlightAmount</control>
+        <control>bands</control>
+        <control>softness</control>
+        <control>protectLines</control>
+  </page>
+
+</fxlayout>

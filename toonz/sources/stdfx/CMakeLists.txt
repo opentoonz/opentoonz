@@ -118,6 +118,7 @@ set(SOURCES
     diamondgradientfx.cpp
     dissolvefx.cpp
     dropshadowfx.cpp
+    lightshadingfx.cpp
     embossfx.cpp
     erodilatefx.cpp
     externalpalettefx.cpp
