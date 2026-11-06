@@ -1,5 +1,6 @@
 #include "stdfx.h"
 #include "tfxparam.h"
+#include "tparamset.h"
 #include "tpixelutils.h"
 #include "printprocess.h"
 #include "celfxsourcegrid.h"
