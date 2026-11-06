@@ -1,0 +1,15 @@
+<fxlayout help_file="FlowDisplace.html">
+  <page name="Flow Displace">
+    <control>mode</control>
+    <control>strength</control>
+    <vbox modeSensitive="mode" mode="1">
+      <control>direction</control>
+    </vbox>
+    <control>invert</control>
+    <separator label="Secondary Motion"/>
+    <control>noiseAmplitude</control>
+    <control>noiseSize</control>
+    <control>noiseSpeed</control>
+    <control>seed</control>
+  </page>
+</fxlayout>
