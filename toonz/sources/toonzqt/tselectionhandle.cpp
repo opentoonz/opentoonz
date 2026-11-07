@@ -26,7 +26,8 @@ void TSelectionHandle::setSelection(TSelection *selection) {
   TSelection *oldSelection       = getSelection();
   CommandManager *commandManager = CommandManager::instance();
   if (oldSelection) {
-    oldSelection->selectNone();
+    if (!oldSelection->keepItemsWhenFocusMovesTo(selection))
+      oldSelection->selectNone();
     // disable selection related commands
     int i;
     for (i = 0; i < (int)m_enabledCommandIds.size(); i++)
