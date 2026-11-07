@@ -201,8 +201,10 @@ SceneBrowser::SceneBrowser(QWidget *parent, Qt::WindowFlags flags,
           &SceneBrowser::onTreeFolderChanged);
   connect(m_folderTreeView, &DvDirTreeView::emptySpacePressed, this, [this]() {
     if (FileSelection *fs = dynamic_cast<FileSelection *>(
-            m_itemViewer->getPanel()->getSelection()))
+            m_itemViewer->getPanel()->getSelection())) {
       fs->selectNone();
+      fs->makeCurrent();
+    }
     onSelectedItems(std::set<int>());
     m_itemViewer->getPanel()->update();
   });

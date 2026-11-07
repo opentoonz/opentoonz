@@ -118,6 +118,8 @@ types to be displayed in the file browser.
   void selectNone();
   void storePersistedSelection();
   void onSelectedItems(const std::set<int> &indexes);
+  // Do not report restored files until a click or a folder change.
+  void holdRestoredSelectionReport();
 
   QSplitter *getMainSplitter() const { return m_mainSplitter; }
 
@@ -250,6 +252,8 @@ private:
   QList<QModelIndex> m_indexHistoryList;
   int m_currentPosition = 0;
   bool m_giveCommandToRestoredFiles = false;
+  bool m_holdRestoredReport         = false;
+  std::wstring m_holdRestoredReportPlace;
 
   std::vector<Item> m_items;
   std::map<std::wstring, std::vector<TFilePath>> m_selectionByFolder;

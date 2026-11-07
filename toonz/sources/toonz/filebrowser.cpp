@@ -223,8 +223,10 @@ FileBrowser::FileBrowser(QWidget *parent, Qt::WindowFlags flags,
           &FileBrowser::onTreeFolderChanged);
   connect(m_folderTreeView, &DvDirTreeView::emptySpacePressed, this, [this]() {
     if (FileSelection *fs = dynamic_cast<FileSelection *>(
-            m_itemViewer->getPanel()->getSelection()))
+            m_itemViewer->getPanel()->getSelection())) {
       fs->selectNone();
+      fs->makeCurrent();
+    }
     onSelectedItems(std::set<int>());
     m_itemViewer->getPanel()->update();
   });
@@ -234,7 +236,10 @@ FileBrowser::FileBrowser(QWidget *parent, Qt::WindowFlags flags,
   connect(m_itemViewer, &DvItemViewer::doubleClickedItem, this,
           &FileBrowser::onDoubleClickedItem);
   connect(m_itemViewer, &DvItemViewer::selectedItems, this,
-          &FileBrowser::onSelectedItems);
+          [this](const std::set<int> &indexes) {
+            m_holdRestoredReport = false;
+            onSelectedItems(indexes);
+          });
   connect(TSelectionHandle::getCurrent(), &TSelectionHandle::selectionSwitched,
           this, [this](TSelection *, TSelection *) {
             m_itemViewer->getPanel()->update();
@@ -1051,11 +1056,23 @@ void FileBrowser::restorePersistedSelection() {
   const auto place = selectionPlace();
   QTimer::singleShot(0, this, [this, place]() {
     if (!isVisible() || selectionPlace() != place) return;
+    if (m_holdRestoredReport) {
+      if (m_holdRestoredReportPlace.empty()) m_holdRestoredReportPlace = place;
+      if (place == m_holdRestoredReportPlace) return;
+      m_holdRestoredReport = false;
+    }
     FileSelection *selection =
         dynamic_cast<FileSelection *>(m_itemViewer->getPanel()->getSelection());
     if (!selection) return;
     onSelectedItems(selection->getSelectedIndices());
   });
+}
+
+//-----------------------------------------------------------------------------
+
+void FileBrowser::holdRestoredSelectionReport() {
+  m_holdRestoredReport = true;
+  m_holdRestoredReportPlace.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -2359,6 +2376,7 @@ void FileBrowser::showEvent(QShowEvent *) {
 //-----------------------------------------------------------------------------
 
 void FileBrowser::hideEvent(QHideEvent *) {
+  m_holdRestoredReport = false;
   storePersistedSelection();
   activeBrowsers.erase(this);
   m_itemViewer->getPanel()->getItemViewPlayDelegate()->resetPlayWidget();
