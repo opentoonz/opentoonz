@@ -346,6 +346,7 @@ public:
   struct Item {
     QString UIName;
     QString iconName;
+    QString tooltip;
 
     Item(const QString &name = QString(), const QString &icon = QString())
         : UIName(name), iconName(icon) {}
@@ -394,6 +395,12 @@ public:
     int index = indexOf(value);
     if (index < 0 || index >= (int)m_items.size()) throw RangeError();
     m_items[index].UIName = name;
+  }
+
+  void setItemToolTip(std::wstring value, const QString &tooltip) {
+    int index = indexOf(value);
+    if (index < 0 || index >= (int)m_items.size()) throw RangeError();
+    m_items[index].tooltip = tooltip;
   }
 
   void deleteAllValues() {

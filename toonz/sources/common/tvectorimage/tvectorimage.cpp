@@ -4,6 +4,7 @@
 // #include "tpalette.h"
 #include "tvectorimage.h"
 #include "tvectorimageP.h"
+#include "thidelinesegment.h"
 #include "tstroke.h"
 // #include "tgl.h"
 #include "tvectorrenderdata.h"
@@ -589,6 +590,67 @@ TStroke *TVectorImage::getStroke(UINT index) const {
 VIStroke *TVectorImage::getVIStroke(UINT index) const {
   assert(index < m_imp->m_strokes.size());
   return m_imp->m_strokes[index];
+}
+
+//-----------------------------------------------------------------------------
+
+const std::vector<THideLineSegment> &TVectorImage::getHideLineSegments(
+    UINT index) const {
+  assert(index < m_imp->m_strokes.size());
+  return m_imp->m_strokes[index]->m_hideLineSegments;
+}
+
+void TVectorImage::setHideLineSegments(
+    UINT index, const std::vector<THideLineSegment> &segments) {
+  assert(index < m_imp->m_strokes.size());
+  m_imp->m_strokes[index]->m_hideLineSegments = segments;
+  m_imp->m_strokes[index]->m_isNewForFill     = true;
+  m_imp->m_areValidRegions                    = false;
+}
+
+void TVectorImage::appendHideLineSegments(UINT index,
+                                          const std::vector<DoublePair> &ranges,
+                                          THideLineMode mode) {
+  assert(index < m_imp->m_strokes.size());
+  addHideLineSegments(m_imp->m_strokes[index], ranges, mode);
+  m_imp->m_strokes[index]->m_isNewForFill = true;
+  m_imp->m_areValidRegions                = false;
+}
+
+void TVectorImage::removeHideLineSegments(
+    UINT index, const std::vector<DoublePair> &ranges) {
+  assert(index < m_imp->m_strokes.size());
+  ::removeHideLineSegments(m_imp->m_strokes[index], ranges);
+  m_imp->m_strokes[index]->m_isNewForFill = true;
+  m_imp->m_areValidRegions                = false;
+}
+
+void TVectorImage::appendHideLineSegmentsDuringEdit(
+    UINT index, const std::vector<DoublePair> &ranges, THideLineMode mode) {
+  assert(index < m_imp->m_strokes.size());
+  addHideLineSegments(m_imp->m_strokes[index], ranges, mode);
+}
+
+void TVectorImage::removeHideLineSegmentsDuringEdit(
+    UINT index, const std::vector<DoublePair> &ranges) {
+  assert(index < m_imp->m_strokes.size());
+  ::removeHideLineSegments(m_imp->m_strokes[index], ranges);
+}
+
+void TVectorImage::notifyHideLineFillChanged(
+    const std::vector<int> &strokeIndices) {
+  if (strokeIndices.empty()) return;
+  m_imp->m_areValidRegions = false;
+  for (int index : strokeIndices) {
+    if (index < 0 || static_cast<UINT>(index) >= m_imp->m_strokes.size())
+      continue;
+    m_imp->m_strokes[index]->m_isNewForFill = true;
+  }
+}
+
+bool TVectorImage::hasHideLineSegments(UINT index) const {
+  if (index >= m_imp->m_strokes.size()) return false;
+  return !m_imp->m_strokes[index]->m_hideLineSegments.empty();
 }
 
 //-----------------------------------------------------------------------------
@@ -1263,7 +1325,8 @@ TVectorImageP mergeAndClear(TVectorImageP v1, TVectorImageP v2 )
 VIStroke::VIStroke(const VIStroke &s, bool sameId)
     : m_isPoint(s.m_isPoint)
     , m_isNewForFill(s.m_isNewForFill)
-    , m_groupId(s.m_groupId) {
+    , m_groupId(s.m_groupId)
+    , m_hideLineSegments(s.m_hideLineSegments) {
   m_s                                     = new TStroke(*s.m_s);
   std::list<TEdge *>::const_iterator it   = s.m_edgeList.begin(),
                                      it_e = s.m_edgeList.end();
@@ -1927,6 +1990,9 @@ assert(m_strokes[strokeIndex-wSize+1]->m_edgeList.empty());*/
     insertStrokeAt(subV, strokeIndex);
     subV->m_s->setStyle(styleId);
     subV->m_s->outlineOptions() = oOptions;
+    subV->m_hideLineSegments =
+        remapHideLineSegments(vs->m_hideLineSegments, *vs->m_s, *subV->m_s,
+                              sortedWRanges[i].first, sortedWRanges[i].second);
   }
 
   clearPointerContainer(origEdgeList);
@@ -1948,6 +2014,16 @@ assert(m_strokes[strokeIndex-wSize+1]->m_edgeList.empty());*/
 
     VIStroke *s = new VIStroke(joinStrokes(s0->m_s, s1->m_s), groupId);
     insertStrokeAt(s, strokeIndex);
+    {
+      std::vector<THideLineSegment> joined = remapHideLineSegments(
+          s0->m_hideLineSegments, *s0->m_s, *s->m_s, 0.0, 1.0);
+      std::vector<THideLineSegment> fromS1 =
+          remapHideLineSegments(s1->m_hideLineSegments, *s1->m_s, *s->m_s, 0.0,
+                                1.0, s0->m_s->getLength());
+      joined.insert(joined.end(), fromS1.begin(), fromS1.end());
+      mergeHideLineSegments(joined);
+      s->m_hideLineSegments = joined;
+    }
 
     std::list<TEdge *>::iterator it = l0.begin(), it_e = l0.end();
     for (; it != it_e; ++it) {
@@ -2147,11 +2223,15 @@ VIStroke *TVectorImage::Imp::extendStrokeSmoothly(int index,
   computeEdgeList(newStroke, m_strokes[index]->m_edgeList, cpIndex == 0, false,
                   emptyList, 0, oldEdgeList);
 
+  std::vector<THideLineSegment> joinedHide = remapHideLineSegmentsByGeometry(
+      m_strokes[index]->m_hideLineSegments, *stroke, *newStroke);
+
   std::vector<int> toBeDeleted;
   toBeDeleted.push_back(index);
   removeStrokes(toBeDeleted, true, false);
 
   insertStrokeAt(new VIStroke(newStroke, groupId), index, false);
+  m_strokes[index]->m_hideLineSegments = joinedHide;
   computeRegions();
   transferColors(oldEdgeList, m_strokes[index]->m_edgeList, true, false, true);
 
@@ -2188,6 +2268,9 @@ VIStroke *TVectorImage::Imp::extendStroke(int index, const TThickPoint &p,
     computeEdgeList(newStroke, m_strokes[index]->m_edgeList, cpIndex == 0,
                     false, emptyList, false, oldEdgeList);
 
+  std::vector<THideLineSegment> joinedHide = remapHideLineSegmentsByGeometry(
+      m_strokes[index]->m_hideLineSegments, *stroke, *newStroke);
+
   std::vector<int> toBeDeleted;
   toBeDeleted.push_back(index);
   removeStrokes(toBeDeleted, true, false);
@@ -2195,6 +2278,7 @@ VIStroke *TVectorImage::Imp::extendStroke(int index, const TThickPoint &p,
   // removeStroke(index, false);
 
   insertStrokeAt(new VIStroke(newStroke, groupId), index, false);
+  m_strokes[index]->m_hideLineSegments = joinedHide;
 
   if (m_computedAlmostOnce) {
     computeRegions();
@@ -2258,12 +2342,22 @@ VIStroke *TVectorImage::Imp::joinStroke(int index1, int index2, int cpIndex1,
       (index1 != index2) ? m_strokes[index2]->m_edgeList : emptyList,
       cpIndex2 == 0, oldEdgeList);
 
+  std::vector<THideLineSegment> joinedHide = remapHideLineSegmentsByGeometry(
+      m_strokes[index1]->m_hideLineSegments, *stroke1, *newStroke);
+  if (index1 != index2) {
+    std::vector<THideLineSegment> from2 = remapHideLineSegmentsByGeometry(
+        m_strokes[index2]->m_hideLineSegments, *stroke2, *newStroke);
+    joinedHide.insert(joinedHide.end(), from2.begin(), from2.end());
+    mergeHideLineSegments(joinedHide);
+  }
+
   std::vector<int> toBeDeleted;
   toBeDeleted.push_back(index1);
   if (index1 != index2) toBeDeleted.push_back(index2);
   removeStrokes(toBeDeleted, true, false);
 
   insertStrokeAt(new VIStroke(newStroke, groupId), index1, false);
+  m_strokes[index1]->m_hideLineSegments = joinedHide;
   computeRegions();
   transferColors(oldEdgeList, m_strokes[index1]->m_edgeList, true, false, true);
   return m_strokes[index1];
@@ -2388,12 +2482,20 @@ VIStroke *TVectorImage::Imp::joinStrokeSmoothly(int index1, int index2,
                   oldEdgeList);
   // printEdges(os, "****edgelist", getPalette(), oldEdgeList);
 
+  std::vector<THideLineSegment> joinedHide = remapHideLineSegmentsByGeometry(
+      m_strokes[index1]->m_hideLineSegments, *stroke1, *newStroke);
+  std::vector<THideLineSegment> from2 = remapHideLineSegmentsByGeometry(
+      m_strokes[index2]->m_hideLineSegments, *stroke2, *newStroke);
+  joinedHide.insert(joinedHide.end(), from2.begin(), from2.end());
+  mergeHideLineSegments(joinedHide);
+
   std::vector<int> toBeDeleted;
   toBeDeleted.push_back(index1);
   toBeDeleted.push_back(index2);
   removeStrokes(toBeDeleted, true, false);
 
   insertStrokeAt(new VIStroke(newStroke, groupId), index1);
+  m_strokes[index1]->m_hideLineSegments = joinedHide;
   computeRegions();
   transferColors(oldEdgeList, m_strokes[index1]->m_edgeList, true, false, true);
 

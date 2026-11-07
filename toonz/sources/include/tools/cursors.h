@@ -81,6 +81,7 @@ enum {
   ScaleGlobalCursor,
   RulerModifyCursor,
   RulerNewCursor,
+  HideLineCursor,
 
   // Base cursors with fixed set of decorations. See below
   FxGadgetCursorBase,
