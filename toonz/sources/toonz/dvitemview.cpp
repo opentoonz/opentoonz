@@ -1254,6 +1254,16 @@ void DvItemViewerPanel::mousePressEvent(QMouseEvent *event) {
       m_itemViewPlayDelegate->resetPlayWidget();
   }
 
+  m_folderClickAdjustsSelection = false;
+  if (0 <= index && index < getItemCount() &&
+      getModel()->getItemData(index, DvItemListModel::IsFolder).toBool()) {
+    bool hasModifier =
+        event->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
+    bool narrowsSelection =
+        isSelected && m_selection->getSelectedIndices().size() > 1;
+    m_folderClickAdjustsSelection = hasModifier || narrowsSelection;
+  }
+
   // without any modifier, clear the selection
   if (!m_multiSelectionEnabled ||
       (0 == (event->modifiers() & Qt::ControlModifier) &&
@@ -1277,9 +1287,10 @@ void DvItemViewerPanel::mousePressEvent(QMouseEvent *event) {
         if (b == k) b = index;
         int i;
         for (i = a; i <= b; i++) {
-          // select except folder items
-          if (!getModel()->getItemData(i, DvItemListModel::IsFolder).toBool())
-            m_selection->select(i);
+          if (getModel()->getItemData(i, DvItemListModel::Name).toString() ==
+              "..")
+            continue;
+          m_selection->select(i);
         }
       }
     } else {
