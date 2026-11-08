@@ -297,6 +297,8 @@ VcrCommand playCommand(MI_Play, FlipConsole::ePlay),
     lastFrameCommand(MI_LastFrame, FlipConsole::eLast),
     nextFrameCommand(MI_NextFrame, FlipConsole::eNext),
     prevFrameCommand(MI_PrevFrame, FlipConsole::ePrev),
+    prevFileCommand(MI_PrevFile, FlipConsole::ePrevFile),
+    nextFileCommand(MI_NextFile, FlipConsole::eNextFile),
 
     redChannelCommand(MI_RedChannel, FlipConsole::eRed),
     greenChannelCommand(MI_GreenChannel, FlipConsole::eGreen),

@@ -426,7 +426,8 @@ enum {
   eShowSound           = 0x2000,
   eShowLocator         = 0x4000,
   eShowGainControls    = 0x8000,
-  eShowHowMany         = 0x10000
+  eShowFileNavigation  = 0x10000,
+  eShowHowMany         = 0x20000
 };
 
 FlipConsole::FlipConsole(QVBoxLayout *mainLayout, std::vector<int> gadgetsMask,
@@ -461,6 +462,7 @@ FlipConsole::FlipConsole(QVBoxLayout *mainLayout, std::vector<int> gadgetsMask,
     , m_isLinkable(isLinkable)
     , m_customAction(nullptr)
     , m_customizeMask((eShowHowMany - 1) & ~eShowGainControls)
+    , m_fileTypeFilter(-1)
     , m_fpsLabelAction(nullptr)
     , m_fpsSliderAction(nullptr)
     , m_fpsFieldAction(nullptr)
@@ -487,6 +489,11 @@ FlipConsole::FlipConsole(QVBoxLayout *mainLayout, std::vector<int> gadgetsMask,
   flipSettings.beginGroup("ConsoleCustomizeMasks");
   QString s = flipSettings.value(m_customizeId).toString();
   if (s != "") m_customizeMask = s.toUInt();
+
+  QSettings filterSettings(getFlipSettingsPath(), QSettings::IniFormat);
+  filterSettings.beginGroup("ConsoleFileTypeFilters");
+  m_fileTypeFilter = filterSettings.value(m_customizeId, -1).toInt();
+  if (m_fileTypeFilter == 0) m_fileTypeFilter = -1;
 
   if (m_gadgetsMask.empty()) return;
 
@@ -1008,6 +1015,20 @@ void FlipConsole::onCustomizeButtonPressed(QAction *a) {
 }
 
 //----------------------------------------------------------------------------------------------
+
+void FlipConsole::setFileTypeFilter(int filter) {
+  if (filter == 0 || filter == m_fileTypeFilter) return;
+  m_fileTypeFilter = filter;
+
+  QSettings flipSettings(getFlipSettingsPath(), QSettings::IniFormat);
+  flipSettings.beginGroup("ConsoleFileTypeFilters");
+  flipSettings.setValue(m_customizeId, m_fileTypeFilter);
+
+  emit fileTypeFilterChanged();
+}
+
+//----------------------------------------------------------------------------------------------
+
 void FlipConsole::applyCustomizeMask() {
   enableButton(eSave, m_customizeMask & eShowSave);
 
@@ -1050,6 +1071,9 @@ void FlipConsole::applyCustomizeMask() {
   enableButton(eLoop, m_customizeMask & eShowVcr);
   enableButton(eNext, m_customizeMask & eShowVcr);
   enableButton(eLast, m_customizeMask & eShowVcr);
+
+  enableButton(ePrevFile, m_customizeMask & eShowFileNavigation);
+  enableButton(eNextFile, m_customizeMask & eShowFileNavigation);
 
   enableButton(eSound, m_customizeMask & eShowSound);
   enableButton(eLocator, m_customizeMask & eShowLocator);
@@ -1141,6 +1165,11 @@ void FlipConsole::createCustomizeMenu(bool withCustomWidget) {
       addMenuItem(eShowBg, tr("Background Colors"), menu);
 
     addMenuItem(eShowVcr, tr("Playback Controls"), menu);
+
+    if (hasButton(m_gadgetsMask, ePrevFile) ||
+        hasButton(m_gadgetsMask, eNextFile)) {
+      addMenuItem(eShowFileNavigation, tr("File Navigation"), menu);
+    }
 
     if (hasButton(m_gadgetsMask, eRed) || hasButton(m_gadgetsMask, eGreen) ||
         hasButton(m_gadgetsMask, eBlue) || hasButton(m_gadgetsMask, eMatte))
@@ -1252,6 +1281,8 @@ void FlipConsole::createPlayToolBar(QWidget *customWidget) {
       hasButton(m_gadgetsMask, eLast)) {
     playGroup = new QActionGroup(m_playToolBar);
   }
+  if (hasButton(m_gadgetsMask, ePrevFile))
+    createButton(ePrevFile, "folder_prev", tr("Previous File"), false);
   if (hasButton(m_gadgetsMask, eFirst))
     createButton(eFirst, "framefirst", tr("&First Frame"), false);
   if (hasButton(m_gadgetsMask, ePrev))
@@ -1270,6 +1301,8 @@ void FlipConsole::createPlayToolBar(QWidget *customWidget) {
     createButton(eNext, "framenext", tr("&Next Frame"), false);
   if (hasButton(m_gadgetsMask, eLast))
     createButton(eLast, "framelast", tr("&Last Frame"), false);
+  if (hasButton(m_gadgetsMask, eNextFile))
+    createButton(eNextFile, "folder_next", tr("Next File"), false);
 
   // separator
   if (hasButton(m_gadgetsMask, ePlay)) m_vcrSep = m_playToolBar->addSeparator();
@@ -1506,7 +1539,8 @@ void FlipConsole::onButtonPressed(int button) {
     doButtonPressed(button);
   }
 
-  if (m_areLinked) pressLinkedConsoleButton(button, this);
+  if (m_areLinked && button != ePrevFile && button != eNextFile)
+    pressLinkedConsoleButton(button, this);
 }
 
 //-----------------------------------------------------------------------------
@@ -1766,6 +1800,10 @@ void FlipConsole::doButtonPressed(UINT button) {
   case eZoomIn:
   case eZoomOut:
   case eResetView:
+    return;
+
+  case ePrevFile:
+  case eNextFile:
     return;
 
   case eDecreaseGain:

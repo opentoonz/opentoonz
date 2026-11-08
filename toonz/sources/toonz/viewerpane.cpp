@@ -122,7 +122,8 @@ BaseViewerPanel::BaseViewerPanel(QWidget *parent, Qt::WindowFlags flags)
   std::vector<int> buttonMask = {
       FlipConsole::eFilledRaster, FlipConsole::eDefineLoadBox,
       FlipConsole::eUseLoadBox,   FlipConsole::eDecreaseGain,
-      FlipConsole::eIncreaseGain, FlipConsole::eResetGain};
+      FlipConsole::eIncreaseGain, FlipConsole::eResetGain,
+      FlipConsole::ePrevFile,     FlipConsole::eNextFile};
 
   m_flipConsole =
       new FlipConsole(m_mainLayout, buttonMask, false, m_keyFrameButton,
