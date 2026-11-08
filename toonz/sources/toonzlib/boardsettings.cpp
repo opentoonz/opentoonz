@@ -1,3 +1,4 @@
+#include "trenderscale.h"
 #include "toonz/boardsettings.h"
 
 // TnzLib includes
@@ -196,7 +197,8 @@ void BoardItem::drawItem(QPainter &p, QSize imgSize, int shrink,
     }
 
   //----
-  fontSize = std::min(fontSize, m_maximumFontSize / shrink);
+  fontSize =
+      std::min(fontSize, TRenderScale::pixels(m_maximumFontSize, shrink));
 
   QFont font(m_font);
   font.setPixelSize(fontSize);

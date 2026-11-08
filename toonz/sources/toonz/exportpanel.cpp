@@ -397,7 +397,8 @@ you want to do?";*/
         TSoundTrack *snd =
             TApp::instance()->getCurrentXsheet()->getXsheet()->makeSound(prop);
 
-        ::viewFile(outPath, 1, totalFrameCount, step, rs.m_shrinkX, snd, 0);
+        ::viewFile(outPath, 1, totalFrameCount, step, std::max(1, rs.m_shrinkX),
+                   snd, 0);
       }
     }
   } catch (TException &) {
