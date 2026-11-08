@@ -180,7 +180,7 @@ public:
       return true;
     }
 
-    return false;
+    return m_flipbook && m_flipbook->handleFileNavigationKey(event);
   }
 };
 }  // namespace
@@ -308,6 +308,8 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event) {
     action = CommandManager::instance()->getAction(MI_LoadRecentImage);
     menu->addAction(action);
     action->setParent(m_flipbook);
+
+    m_flipbook->addFileNavigationMenu(menu);
 
     menu->addSeparator();
   }
