@@ -37,6 +37,7 @@ private:
   int m_frameCount, m_lx, m_ly;
   // double m_fps;
   int m_scale;
+  bool m_optimize = true;
   bool m_looping  = true;
   int m_mode      = 0;
   int m_maxcolors = 256;
@@ -85,6 +86,7 @@ public:
   TBoolProperty m_palette;
   TEnumProperty m_mode;
   TIntProperty m_maxcolors;
+  TBoolProperty m_optimize;
 
   GifWriterProperties();
 
