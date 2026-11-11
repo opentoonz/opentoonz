@@ -73,7 +73,6 @@
 #include <QTreeWidgetItem>
 #include <QSplitter>
 #include <QFileSystemWatcher>
-#include <QHash>
 
 // tcg includes
 #include "tcg/boost/range_utility.h"
@@ -88,23 +87,6 @@
 #include <memory>  // std::unique_ptr, std::make_unique
 
 namespace ba = boost::adaptors;
-
-namespace {
-
-QPixmap browserThemeSvgIcon(const QString &iconName, const QSize &size) {
-  static QHash<QString, QPixmap> cache;
-  const QString key = iconName + QLatin1Char('@') +
-                      QString::number(size.width()) + QLatin1Char('x') +
-                      QString::number(size.height());
-  const auto it = cache.constFind(key);
-  if (it != cache.cend()) return it.value();
-  QPixmap pm = svgToPixmap(getIconPath(iconName), size, Qt::KeepAspectRatio,
-                           Qt::transparent);
-  cache.insert(key, pm);
-  return pm;
-}
-
-}  // namespace
 
 using namespace DVGui;
 
@@ -900,33 +882,19 @@ QVariant FileBrowser::getItemData(int index, DataType dataType,
     DvItemViewerPanel *panel = m_itemViewer->getPanel();
     QSize iconSize           = panel->getIconSize();
     if (item.m_path == m_folder.getParentDir()) {
-      return browserThemeSvgIcon(QStringLiteral("folder_browser_up"), iconSize);
+      return cachedSvgThumbnail(getIconPath("folder_browser_up"), iconSize);
     } else if (item.m_isFolder) {
       if (item.m_isLink)
-        return browserThemeSvgIcon(QStringLiteral("folder_browser_link"),
-                                   iconSize);
-      return browserThemeSvgIcon(QStringLiteral("folder_browser"), iconSize);
+        return cachedSvgThumbnail(getIconPath("folder_browser_link"), iconSize);
+      return cachedSvgThumbnail(getIconPath("folder_browser"), iconSize);
     }
 
     if (panel->isAdvancedDisplay()) {
-      const qreal dpr    = qMax(1.0, panel->devicePixelRatioF());
-      const QSize render = panel->getRenderIconSize();
-      const TDimension dim(qMax(1, qRound(render.width() * dpr)),
-                           qMax(1, qRound(render.height() * dpr)));
-      QPixmap sized = IconGenerator::instance()->getSizedIcon(item.m_path, dim);
-      if (sized.isNull()) {
-        const QSize prev = panel->getPrevRenderIconSize();
-        if (prev.isValid() && prev != render) {
-          const TDimension prevDim(qMax(1, qRound(prev.width() * dpr)),
-                                   qMax(1, qRound(prev.height() * dpr)));
-          sized =
-              IconGenerator::instance()->peekSizedIcon(item.m_path, prevDim);
-        }
-      }
-      if (!sized.isNull()) {
-        if (dpr > 1.0) sized.setDevicePixelRatio(dpr);
-        return sized;
-      }
+      QPixmap sized = panel->getSizedThumbnail(item.m_path);
+      if (!sized.isNull()) return sized;
+      QPixmap blank(iconSize);
+      blank.fill(Qt::white);
+      return blank;
     }
 
     QPixmap pixmap = IconGenerator::instance()->getIcon(item.m_path);

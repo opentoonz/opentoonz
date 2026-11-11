@@ -818,52 +818,21 @@ QVariant SceneBrowser::getItemData(int index, DataType dataType,
     DvItemViewerPanel *panel = m_itemViewer->getPanel();
     QSize iconSize           = panel->getIconSize();
     // parent folder icons
-    if (item.m_path == m_folder.getParentDir()) {
-      if (panel->isAdvancedDisplay())
-        return svgToPixmap(":Resources/folderup_icon.svg", iconSize,
-                           Qt::KeepAspectRatio);
-      static QPixmap folderUpPixmap(svgToPixmap(":Resources/folderup_icon.svg",
-                                                iconSize, Qt::KeepAspectRatio));
-      return folderUpPixmap;
-    }
+    if (item.m_path == m_folder.getParentDir())
+      return cachedSvgThumbnail(":Resources/folderup_icon.svg", iconSize);
     // folder icons
     else if (item.m_isFolder) {
-      if (item.m_isLink) {
-        if (panel->isAdvancedDisplay())
-          return svgToPixmap(":Resources/link_icon.svg", iconSize,
-                             Qt::KeepAspectRatio);
-        static QPixmap linkIcon(svgToPixmap(":Resources/link_icon.svg",
-                                            iconSize, Qt::KeepAspectRatio));
-        return linkIcon;
-      } else {
-        if (panel->isAdvancedDisplay())
-          return svgToPixmap(":Resources/folder_icon.svg", iconSize,
-                             Qt::KeepAspectRatio);
-        static QPixmap folderIcon(svgToPixmap(":Resources/folder_icon.svg",
-                                              iconSize, Qt::KeepAspectRatio));
-        return folderIcon;
-      }
+      if (item.m_isLink)
+        return cachedSvgThumbnail(":Resources/link_icon.svg", iconSize);
+      return cachedSvgThumbnail(":Resources/folder_icon.svg", iconSize);
     }
 
     if (panel->isAdvancedDisplay()) {
-      const qreal dpr    = qMax(1.0, panel->devicePixelRatioF());
-      const QSize render = panel->getRenderIconSize();
-      const TDimension dim(qMax(1, qRound(render.width() * dpr)),
-                           qMax(1, qRound(render.height() * dpr)));
-      QPixmap sized = IconGenerator::instance()->getSizedIcon(item.m_path, dim);
-      if (sized.isNull()) {
-        const QSize prev = panel->getPrevRenderIconSize();
-        if (prev.isValid() && prev != render) {
-          const TDimension prevDim(qMax(1, qRound(prev.width() * dpr)),
-                                   qMax(1, qRound(prev.height() * dpr)));
-          sized =
-              IconGenerator::instance()->peekSizedIcon(item.m_path, prevDim);
-        }
-      }
-      if (!sized.isNull()) {
-        if (dpr > 1.0) sized.setDevicePixelRatio(dpr);
-        return sized;
-      }
+      QPixmap sized = panel->getSizedThumbnail(item.m_path);
+      if (!sized.isNull()) return sized;
+      QPixmap blank(iconSize);
+      blank.fill(Qt::white);
+      return blank;
     }
 
     QPixmap pixmap = IconGenerator::instance()->getIcon(item.m_path);

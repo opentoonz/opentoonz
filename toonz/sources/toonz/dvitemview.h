@@ -306,6 +306,9 @@ private:
   bool m_noContextMenu;
   QSize sizeFromWidth(int width) const;
   QSize quantizeRenderSize(const QSize &layout) const;
+  bool isCastPanel() const;
+  void refreshCastItems();
+  void purgeUnusedFileIcons();
   void scheduleRenderSizeCommit();
   void updateViewParameters(int panelWidth);
   void updateViewParameters() { updateViewParameters(width()); }
@@ -323,6 +326,7 @@ private:
 public:
   DvItemViewerPanel(DvItemViewer *viewer, bool noContextMenu,
                     bool multiselectionEnabled, QWidget *parent);
+  ~DvItemViewerPanel();
 
   void enableGlobalSelection(bool enabled) {
     if (!enabled) m_selection->makeNotCurrent();
@@ -348,7 +352,7 @@ public:
 
   QSize getIconSize() const { return m_iconSize; }
   QSize getRenderIconSize() const { return m_renderIconSize; }
-  QSize getPrevRenderIconSize() const { return m_prevRenderIconSize; }
+  QPixmap getSizedThumbnail(const TFilePath &path) const;
   bool isAdvancedDisplay() const { return m_advancedDisplay; }
 
   enum ThumbnailSizePreset {
@@ -545,5 +549,6 @@ protected:
 void installThumbnailSizeControls(QToolBar *bar, DvItemViewer *viewer);
 void showAdvancedDisplayMenu(DvItemViewer *viewer, QWidget *parent,
                              const QPoint &globalPos);
+QPixmap cachedSvgThumbnail(const QString &svgPath, const QSize &size);
 
 #endif  // DV_ITEM_VIEW_INCLUDED

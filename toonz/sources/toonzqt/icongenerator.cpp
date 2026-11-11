@@ -1825,13 +1825,33 @@ void IconGenerator::remove(TStageObjectSpline *spline) {
 
 //-----------------------------------------------------------------------------
 
+namespace {
+
 void removeSizedFileIcons(const std::string &baseId) {
   const std::string prefix = baseId + "_r_";
   std::vector<std::string> toRemove;
-  for (const std::string &id : iconsMap)
-    if (id.compare(0, prefix.size(), prefix) == 0) toRemove.push_back(id);
+  for (auto it = iconsMap.lower_bound(prefix);
+       it != iconsMap.end() && it->compare(0, prefix.size(), prefix) == 0; ++it)
+    toRemove.push_back(*it);
   for (const std::string &key : toRemove) removeIcon(key);
 }
+
+std::string sizedFileIconSuffix(const std::string &id) {
+  const size_t pos = id.rfind("_r_");
+  if (pos == std::string::npos) return std::string();
+  auto skipDigits = [&id](size_t i) {
+    const size_t start = i;
+    while (i < id.size() && id[i] >= '0' && id[i] <= '9') ++i;
+    return i == start ? std::string::npos : i;
+  };
+  size_t i = skipDigits(pos + 3);
+  if (i == std::string::npos || i >= id.size() || id[i] != 'x')
+    return std::string();
+  i = skipDigits(i + 1);
+  return i == id.size() ? id.substr(pos) : std::string();
+}
+
+}  // namespace
 
 //-----------------------------------------------------------------------------
 
@@ -1871,24 +1891,21 @@ QPixmap IconGenerator::peekSizedIcon(const TFilePath &path,
 
 //-----------------------------------------------------------------------------
 
-void IconGenerator::purgeResponsiveFileIconsExcept(const TDimension &keepA,
-                                                   const TDimension &keepB) {
-  auto suffixOf = [](const TDimension &d) -> std::string {
-    if (d.lx <= 0 || d.ly <= 0) return std::string();
-    return "_r_" + std::to_string(d.lx) + "x" + std::to_string(d.ly);
-  };
-  const std::string keep1 = suffixOf(keepA);
-  const std::string keep2 = suffixOf(keepB);
+void IconGenerator::purgeResponsiveFileIconsExcept(
+    const std::vector<TDimension> &keep) {
+  std::set<std::string> keepSuffixes;
+  for (const TDimension &d : keep)
+    if (d.lx > 0 && d.ly > 0)
+      keepSuffixes.insert("_r_" + std::to_string(d.lx) + "x" +
+                          std::to_string(d.ly));
 
+  // File icons share the "$:" prefix.
   std::vector<std::string> toRemove;
-  for (const std::string &id : iconsMap) {
-    if (id.size() < 4 || id.compare(0, 2, "$:") != 0) continue;
-    const size_t pos = id.rfind("_r_");
-    if (pos == std::string::npos) continue;
-    const std::string suf = id.substr(pos);
-    if (!keep1.empty() && suf == keep1) continue;
-    if (!keep2.empty() && suf == keep2) continue;
-    toRemove.push_back(id);
+  const auto end = iconsMap.lower_bound("$;");
+  for (auto it = iconsMap.lower_bound("$:"); it != end; ++it) {
+    const std::string suf = sizedFileIconSuffix(*it);
+    if (suf.empty() || keepSuffixes.count(suf)) continue;
+    toRemove.push_back(*it);
   }
   for (const std::string &key : toRemove) removeIcon(key);
 }

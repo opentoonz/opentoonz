@@ -45,6 +45,7 @@
 #include <QSlider>
 #include <QToolButton>
 #include <QHBoxLayout>
+#include <QHash>
 
 #include <stdint.h>  // for uint64_t
 
@@ -55,7 +56,31 @@ const int kBrowserThumbMinWidth    = 40;
 const int kBrowserThumbMaxWidth    = 400;
 const int kBrowserThumbDefaultW    = 80;
 const int kBrowserThumbDefaultH    = 60;
+const int kBrowserSvgCacheMax      = 24;
+
+TDimension toIconDim(const QSize &size, qreal dpr) {
+  return TDimension(qMax(1, qRound(size.width() * dpr)),
+                    qMax(1, qRound(size.height() * dpr)));
+}
+
+std::set<const DvItemViewerPanel *> &fileIconPanels() {
+  static std::set<const DvItemViewerPanel *> panels;
+  return panels;
+}
 }  // namespace
+
+QPixmap cachedSvgThumbnail(const QString &svgPath, const QSize &size) {
+  static QHash<QString, QPixmap> cache;
+  const QString key = svgPath + QLatin1Char('@') +
+                      QString::number(size.width()) + QLatin1Char('x') +
+                      QString::number(size.height());
+  const auto it = cache.constFind(key);
+  if (it != cache.cend()) return it.value();
+  if (cache.size() >= kBrowserSvgCacheMax) cache.clear();
+  QPixmap pm = svgToPixmap(svgPath, size, Qt::KeepAspectRatio, Qt::transparent);
+  cache.insert(key, pm);
+  return pm;
+}
 
 TEnv::IntVar BrowserView("BrowserView", 1);
 TEnv::IntVar CastView("CastView", 1);
@@ -818,6 +843,7 @@ DvItemViewerPanel::DvItemViewerPanel(DvItemViewer *viewer, bool noContextMenu,
   connect(m_renderSizeTimer, SIGNAL(timeout()), this,
           SLOT(commitRenderIconSize()));
   const bool isCast = viewer->m_windowType == DvItemViewer::Cast;
+  if (!isCast) fileIconPanels().insert(this);
   m_advancedDisplay =
       isCast ? (bool)CastAdvancedDisplay : (bool)BrowserAdvancedDisplay;
   if (m_advancedDisplay) {
@@ -835,6 +861,10 @@ DvItemViewerPanel::DvItemViewerPanel(DvItemViewer *viewer, bool noContextMenu,
   m_columns.push_back(
       std::make_pair(DvItemListModel::Name, std::make_pair(200, 1)));
 }
+
+//-----------------------------------------------------------------------------
+
+DvItemViewerPanel::~DvItemViewerPanel() { fileIconPanels().erase(this); }
 
 //-----------------------------------------------------------------------------
 
@@ -1628,8 +1658,12 @@ void DvItemViewerPanel::setAdvancedDisplay(bool on) {
     m_renderIconSize     = m_iconSize;
     m_prevRenderIconSize = m_iconSize;
     if (m_renderSizeTimer) m_renderSizeTimer->stop();
-    IconGenerator::instance()->clearRequests();
-    IconGenerator::instance()->purgeResponsiveFileIconsExcept(TDimension());
+    if (isCast)
+      refreshCastItems();
+    else {
+      IconGenerator::instance()->clearRequests();
+      purgeUnusedFileIcons();
+    }
   } else {
     const int width =
         isCast ? (int)CastThumbnailWidth : (int)BrowserThumbnailWidth;
@@ -1691,20 +1725,58 @@ void DvItemViewerPanel::commitRenderIconSize() {
   m_prevRenderIconSize = m_renderIconSize;
   m_renderIconSize     = next;
 
+  // The Cast draws level icons, which do not use the file icon cache.
+  if (isCastPanel()) {
+    refreshCastItems();
+    return;
+  }
   IconGenerator::instance()->clearRequests();
-  const qreal dpr = qMax(1.0, devicePixelRatioF());
-  auto toDim      = [dpr](const QSize &size) {
-    return TDimension(qMax(1, qRound(size.width() * dpr)),
-                           qMax(1, qRound(size.height() * dpr)));
-  };
-  IconGenerator::instance()->purgeResponsiveFileIconsExcept(
-      toDim(m_renderIconSize), toDim(m_prevRenderIconSize));
+  purgeUnusedFileIcons();
+  update();
+}
 
-  if (m_viewer && m_viewer->m_windowType == DvItemViewer::Cast) {
-    if (DvItemListModel *model = m_viewer->getModel()) model->refreshData();
-    m_viewer->refresh();
-  } else
-    update();
+//-----------------------------------------------------------------------------
+
+void DvItemViewerPanel::purgeUnusedFileIcons() {
+  std::vector<TDimension> keep;
+  for (const DvItemViewerPanel *panel : fileIconPanels()) {
+    const qreal dpr = qMax(1.0, panel->devicePixelRatioF());
+    keep.push_back(toIconDim(panel->m_renderIconSize, dpr));
+    keep.push_back(toIconDim(panel->m_prevRenderIconSize, dpr));
+  }
+  IconGenerator::instance()->purgeResponsiveFileIconsExcept(keep);
+}
+
+//-----------------------------------------------------------------------------
+
+bool DvItemViewerPanel::isCastPanel() const {
+  return m_viewer && m_viewer->m_windowType == DvItemViewer::Cast;
+}
+
+//-----------------------------------------------------------------------------
+
+// Cast items keep the size they were created with.
+void DvItemViewerPanel::refreshCastItems() {
+  if (!isCastPanel()) return;
+  if (DvItemListModel *model = m_viewer->getModel()) model->refreshData();
+  m_viewer->refresh();
+}
+
+//-----------------------------------------------------------------------------
+
+QPixmap DvItemViewerPanel::getSizedThumbnail(const TFilePath &path) const {
+  const qreal dpr          = qMax(1.0, devicePixelRatioF());
+  IconGenerator *generator = IconGenerator::instance();
+
+  QPixmap pix = generator->getSizedIcon(path, toIconDim(m_renderIconSize, dpr));
+  if (pix.isNull() && m_prevRenderIconSize != m_renderIconSize)
+    pix = generator->peekSizedIcon(path, toIconDim(m_prevRenderIconSize, dpr));
+  if (!pix.isNull()) {
+    if (dpr > 1.0) pix.setDevicePixelRatio(dpr);
+    return pix;
+  }
+  return generator->peekSizedIcon(
+      path, TDimension(kBrowserThumbDefaultW, kBrowserThumbDefaultH));
 }
 
 //-----------------------------------------------------------------------------
