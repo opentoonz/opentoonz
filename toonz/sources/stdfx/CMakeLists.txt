@@ -129,9 +129,13 @@ set(SOURCES
     hsvkeyfx.cpp
     hsvscalefx.cpp
     hsvutil.cpp
+    celmotion.cpp
+    celnoise.cpp
     kaleido.cpp
     linearwavefx.cpp
     localblurfx.cpp
+    celboundaryblurfx.cpp
+    celblur.cpp
     localtransparencyfx.cpp
     mosaicfx.cpp
     motionblurfx.cpp

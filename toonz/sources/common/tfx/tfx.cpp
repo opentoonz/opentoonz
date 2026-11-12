@@ -34,6 +34,19 @@ TIStream &operator>>(TIStream &in, TFxP &p) {
 
 namespace {
 
+class FxPrecisionScope {
+  TOStream *m_stream;
+  bool m_previous;
+
+public:
+  FxPrecisionScope(TOStream &stream, bool enabled)
+      : m_stream(enabled ? &stream : nullptr)
+      , m_previous(enabled ? stream.setFullPrecision(true) : false) {}
+  ~FxPrecisionScope() {
+    if (m_stream) m_stream->setFullPrecision(m_previous);
+  }
+};
+
 //------------------------------------------------------------------------------
 
 typedef std::pair<std::string, TFxPort *> NamePort;
@@ -863,6 +876,7 @@ void TFx::loadData(TIStream &is) {
 //--------------------------------------------------
 
 void TFx::saveData(TOStream &os) {
+  FxPrecisionScope precision(os, requiresFullPrecisionSerialization());
   // Prevent saving "params" tag under "super" tag when saving macro fx.
   // Parameters for macro fx are saved in "nodes" tag and corrected upon
   // loading. Therefore, "params" tag is not needed and even causes crash if
@@ -967,6 +981,7 @@ void TFx::loadPreset(TIStream &is) {
 //--------------------------------------------------
 
 void TFx::savePreset(TOStream &os) {
+  FxPrecisionScope precision(os, requiresFullPrecisionSerialization());
   std::map<std::string, std::string> attributes;
   attributes.insert(std::make_pair(std::string("ver"), std::string("1.0")));
   attributes.insert(std::make_pair(std::string("fxId"), getFxType()));

@@ -307,6 +307,12 @@
 
   <item>"STD_localBlurFx"		"Local Blur"		</item>
   <item>"STD_localBlurFx.value"		"Intensity"		</item>
+  <item>"STD_celBoundaryBlurFx" "Cel Boundary Blur" </item>
+  <item>"STD_celBoundaryBlurFx.amount" "Blur Amount" </item>
+  <item>"STD_celBoundaryBlurFx.smoothness" "Blur Smoothness" </item>
+  <item>"STD_celBoundaryBlurFx.repeats" "Number of Repeat" </item>
+  <item>"STD_celBoundaryBlurFx.bias" "Bias Direction" </item>
+  <item>"STD_celBoundaryBlurFx.legacy" "Legacy" </item>
 
   <item>"STD_localTransparencyFx"		"Local Transparency"	</item>
   <item>"STD_localTransparencyFx.value"	"Intensity"		</item>
