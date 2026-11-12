@@ -1,3 +1,4 @@
+#include "trenderscale.h"
 #include "boardsettingspopup.h"
 
 // Tnz6 includes
@@ -137,7 +138,8 @@ void BoardView::paintEvent(QPaintEvent* event) {
     int shrinkX          = outProp->getRenderSettings().m_shrinkX,
         shrinkY          = outProp->getRenderSettings().m_shrinkY;
     TDimension frameSize = scene->getCurrentCamera()->getRes();
-    TDimension cameraRes(frameSize.lx / shrinkX, frameSize.ly / shrinkY);
+    TDimension cameraRes(TRenderScale::pixels(frameSize.lx, shrinkX),
+                         TRenderScale::pixels(frameSize.ly, shrinkY));
 
     m_boardImg = boardSettings->getBoardImage(cameraRes, shrinkX, scene);
     m_valid    = true;
@@ -169,7 +171,8 @@ void BoardView::resizeEvent(QResizeEvent* event) {
     int shrinkX                = outProp->getRenderSettings().m_shrinkX,
         shrinkY                = outProp->getRenderSettings().m_shrinkY;
     TDimension frameSize       = scene->getCurrentCamera()->getRes();
-    boardRes = QSize(frameSize.lx / shrinkX, frameSize.ly / shrinkY);
+    boardRes = QSize(TRenderScale::pixels(frameSize.lx, shrinkX),
+                     TRenderScale::pixels(frameSize.ly, shrinkY));
   }
 
   float ratio    = std::min((float)width() / (float)boardRes.width(),

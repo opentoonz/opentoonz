@@ -1,6 +1,7 @@
 
 
 // TnzCore includes
+#include "trenderscale.h"
 #include "tsystem.h"
 #include "tstopwatch.h"
 #include "tthreadmessage.h"
@@ -275,8 +276,8 @@ void MovieRenderer::Imp::prepareForStart() {
 
   // Build the render area
   TPointD cameraPos(-0.5 * m_frameSize.lx, -0.5 * m_frameSize.ly);
-  TDimensionD cameraRes(double(m_frameSize.lx) / shrinkX,
-                        double(m_frameSize.ly) / shrinkY);
+  TDimensionD cameraRes(TRenderScale::length(m_frameSize.lx, shrinkX),
+                        TRenderScale::length(m_frameSize.ly, shrinkY));
   TDimension cameraResI(cameraRes.lx, cameraRes.ly);
 
   TRectD renderArea(cameraPos.x, cameraPos.y, cameraPos.x + cameraRes.lx,
@@ -848,8 +849,8 @@ int MovieRenderer::Imp::addBoard() {
   // Get the image size
   int shrinkX = m_renderSettings.m_shrinkX,
       shrinkY = m_renderSettings.m_shrinkY;
-  TDimensionD cameraRes(double(m_frameSize.lx) / shrinkX,
-                        double(m_frameSize.ly) / shrinkY);
+  TDimensionD cameraRes(TRenderScale::length(m_frameSize.lx, shrinkX),
+                        TRenderScale::length(m_frameSize.ly, shrinkY));
   TDimension cameraResI(cameraRes.lx, cameraRes.ly);
 
   TRaster32P boardRas =
@@ -885,8 +886,8 @@ void MovieRenderer::Imp::saveBoardFrame() {
   // Get the image size
   int shrinkX = m_renderSettings.m_shrinkX,
       shrinkY = m_renderSettings.m_shrinkY;
-  TDimensionD cameraRes(double(m_frameSize.lx) / shrinkX,
-                        double(m_frameSize.ly) / shrinkY);
+  TDimensionD cameraRes(TRenderScale::length(m_frameSize.lx, shrinkX),
+                        TRenderScale::length(m_frameSize.ly, shrinkY));
   TDimension cameraResI(cameraRes.lx, cameraRes.ly);
 
   TRaster32P boardRas =

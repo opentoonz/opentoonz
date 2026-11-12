@@ -603,7 +603,8 @@ int main(int argc, char *argv[]) {
   FilePathQualifier dstName("-o dstName", "Target file");
   RangeQualifier range;
   IntQualifier stepOpt("-step n", "Step");
-  IntQualifier shrinkOpt("-shrink n", "Shrink");
+  IntQualifier shrinkOpt(
+      "-shrink n", "Render scale: positive n reduces; negative n enlarges");
   IntQualifier multimedia("-multimedia n", "Multimedia rendering mode");
   StringQualifier farmData("-farm data", "TFarm Controller");
   StringQualifier idq("-id n", "id");

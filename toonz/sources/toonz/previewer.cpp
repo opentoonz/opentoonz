@@ -1,6 +1,7 @@
 
 
 // System-core includes
+#include "trenderscale.h"
 #include "tsystem.h"
 #include "tthreadmessage.h"
 #include "timagecache.h"
@@ -332,8 +333,8 @@ void Previewer::Imp::updateCamera() {
   }
 
   // Add the shrink to camera res
-  cameraRes.lx /= m_renderSettings.m_shrinkX;
-  cameraRes.ly /= m_renderSettings.m_shrinkY;
+  cameraRes.lx = TRenderScale::pixels(cameraRes.lx, m_renderSettings.m_shrinkX);
+  cameraRes.ly = TRenderScale::pixels(cameraRes.ly, m_renderSettings.m_shrinkY);
 
   // Invalidate the old camera size
   if (m_cameraRes != cameraRes || m_renderArea != renderArea) {
@@ -429,19 +430,19 @@ void Previewer::Imp::updatePreviewRect() {
   previewRectD *= m_renderArea;
 
   // Cache local variables to avoid multiple pointer accesses
-  const int shrinkX    = m_renderSettings.m_shrinkX;
-  const int shrinkY    = m_renderSettings.m_shrinkY;
+  const double shrinkX = TRenderScale::divisor(m_renderSettings.m_shrinkX);
+  const double shrinkY = TRenderScale::divisor(m_renderSettings.m_shrinkY);
   const TPointD camPos = m_cameraPos;
 
   // Compute offset once
   previewRectD -= camPos;
 
   // Scale transformation (Shrink)
-  if (shrinkX > 1) {
+  if (shrinkX != 1.0) {
     previewRectD.x0 /= shrinkX;
     previewRectD.x1 /= shrinkX;
   }
-  if (shrinkY > 1) {
+  if (shrinkY != 1.0) {
     previewRectD.y0 /= shrinkY;
     previewRectD.y1 /= shrinkY;
   }
