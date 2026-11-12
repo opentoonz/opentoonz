@@ -182,6 +182,69 @@
   <item>"STD_embossFx.elevation"		"Distance"	</item>
   <item>"STD_embossFx.direction"		"Direction"	</item>
   <item>"STD_embossFx.radius"		"Radius"		</item>
+  <item>"STD_celEdgeLinesFx" "Cel Edge Lines" </item>
+  <item>"STD_celEdgeLinesFx.mode" "Output" </item>
+  <item>"STD_celEdgeLinesFx.opacity" "Line Opacity" </item>
+  <item>"STD_celEdgeLinesFx.tolerance" "Region Tolerance" </item>
+  <item>"STD_celEdgeLinesFx.matchTolerance" "Colour Match Tolerance" </item>
+  <item>"STD_celEdgeLinesFx.gap" "Antialias Gap" </item>
+  <item>"STD_celEdgeLinesFx.enabledRules" "Rules" </item>
+  <item>"STD_celEdgeLinesFx.use001" "Rule 1" </item>
+  <item>"STD_celEdgeLinesFx.firstKind001" "Between" </item>
+  <item>"STD_celEdgeLinesFx.firstColor001" "First Colour" </item>
+  <item>"STD_celEdgeLinesFx.secondKind001" "And" </item>
+  <item>"STD_celEdgeLinesFx.secondColor001" "Second Colour" </item>
+  <item>"STD_celEdgeLinesFx.weight001" "Line Weight" </item>
+  <item>"STD_celEdgeLinesFx.lineColor001" "Line Colour" </item>
+  <item>"STD_celEdgeLinesFx.use002" "Rule 2" </item>
+  <item>"STD_celEdgeLinesFx.firstKind002" "Between" </item>
+  <item>"STD_celEdgeLinesFx.firstColor002" "First Colour" </item>
+  <item>"STD_celEdgeLinesFx.secondKind002" "And" </item>
+  <item>"STD_celEdgeLinesFx.secondColor002" "Second Colour" </item>
+  <item>"STD_celEdgeLinesFx.weight002" "Line Weight" </item>
+  <item>"STD_celEdgeLinesFx.lineColor002" "Line Colour" </item>
+  <item>"STD_celEdgeLinesFx.use003" "Rule 3" </item>
+  <item>"STD_celEdgeLinesFx.firstKind003" "Between" </item>
+  <item>"STD_celEdgeLinesFx.firstColor003" "First Colour" </item>
+  <item>"STD_celEdgeLinesFx.secondKind003" "And" </item>
+  <item>"STD_celEdgeLinesFx.secondColor003" "Second Colour" </item>
+  <item>"STD_celEdgeLinesFx.weight003" "Line Weight" </item>
+  <item>"STD_celEdgeLinesFx.lineColor003" "Line Colour" </item>
+  <item>"STD_celEdgeLinesFx.use004" "Rule 4" </item>
+  <item>"STD_celEdgeLinesFx.firstKind004" "Between" </item>
+  <item>"STD_celEdgeLinesFx.firstColor004" "First Colour" </item>
+  <item>"STD_celEdgeLinesFx.secondKind004" "And" </item>
+  <item>"STD_celEdgeLinesFx.secondColor004" "Second Colour" </item>
+  <item>"STD_celEdgeLinesFx.weight004" "Line Weight" </item>
+  <item>"STD_celEdgeLinesFx.lineColor004" "Line Colour" </item>
+  <item>"STD_celEdgeLinesFx.use005" "Rule 5" </item>
+  <item>"STD_celEdgeLinesFx.firstKind005" "Between" </item>
+  <item>"STD_celEdgeLinesFx.firstColor005" "First Colour" </item>
+  <item>"STD_celEdgeLinesFx.secondKind005" "And" </item>
+  <item>"STD_celEdgeLinesFx.secondColor005" "Second Colour" </item>
+  <item>"STD_celEdgeLinesFx.weight005" "Line Weight" </item>
+  <item>"STD_celEdgeLinesFx.lineColor005" "Line Colour" </item>
+  <item>"STD_celEdgeLinesFx.use006" "Rule 6" </item>
+  <item>"STD_celEdgeLinesFx.firstKind006" "Between" </item>
+  <item>"STD_celEdgeLinesFx.firstColor006" "First Colour" </item>
+  <item>"STD_celEdgeLinesFx.secondKind006" "And" </item>
+  <item>"STD_celEdgeLinesFx.secondColor006" "Second Colour" </item>
+  <item>"STD_celEdgeLinesFx.weight006" "Line Weight" </item>
+  <item>"STD_celEdgeLinesFx.lineColor006" "Line Colour" </item>
+  <item>"STD_celEdgeLinesFx.use007" "Rule 7" </item>
+  <item>"STD_celEdgeLinesFx.firstKind007" "Between" </item>
+  <item>"STD_celEdgeLinesFx.firstColor007" "First Colour" </item>
+  <item>"STD_celEdgeLinesFx.secondKind007" "And" </item>
+  <item>"STD_celEdgeLinesFx.secondColor007" "Second Colour" </item>
+  <item>"STD_celEdgeLinesFx.weight007" "Line Weight" </item>
+  <item>"STD_celEdgeLinesFx.lineColor007" "Line Colour" </item>
+  <item>"STD_celEdgeLinesFx.use008" "Rule 8" </item>
+  <item>"STD_celEdgeLinesFx.firstKind008" "Between" </item>
+  <item>"STD_celEdgeLinesFx.firstColor008" "First Colour" </item>
+  <item>"STD_celEdgeLinesFx.secondKind008" "And" </item>
+  <item>"STD_celEdgeLinesFx.secondColor008" "Second Colour" </item>
+  <item>"STD_celEdgeLinesFx.weight008" "Line Weight" </item>
+  <item>"STD_celEdgeLinesFx.lineColor008" "Line Colour" </item>
 
   <item>"STD_sharpenFx"			"Sharpen"		</item>
   <item>"STD_sharpenFx.intensity"		"Intensity"	</item>
