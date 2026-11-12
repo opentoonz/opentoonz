@@ -180,7 +180,7 @@ public:
       return true;
     }
 
-    return false;
+    return m_flipbook && m_flipbook->handleFileNavigationKey(event);
   }
 };
 }  // namespace
@@ -308,6 +308,8 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event) {
     action = CommandManager::instance()->getAction(MI_LoadRecentImage);
     menu->addAction(action);
     action->setParent(m_flipbook);
+
+    m_flipbook->addFileNavigationMenu(menu);
 
     menu->addSeparator();
   }
@@ -528,12 +530,8 @@ void ImageViewer::paintGL() {
   TRect loadbox;
 
   if (m_flipbook) {
-    QString title =
-        (!m_image)
-            ? m_flipbook->getTitle() + tr("  ::  Zoom : ") +
-                  QString::number(tround(sqrt(m_viewAff.det()) * 100)) + " %"
-            : m_flipbook->getLevelZoomTitle() + tr("  ::  Zoom : ") +
-                  QString::number(tround(sqrt(m_viewAff.det()) * 100)) + " %";
+    QString title = m_flipbook->getLevelZoomTitle() + tr("  ::  Zoom : ") +
+                    QString::number(tround(sqrt(m_viewAff.det()) * 100)) + " %";
     m_flipbook->parentWidget()->setWindowTitle(title);
     imageSize = m_flipbook->getImageSize();
     if (m_visualSettings.m_useLoadbox && m_flipbook->getLoadbox() != TRect())

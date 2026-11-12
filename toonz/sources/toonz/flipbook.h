@@ -19,6 +19,8 @@
 #include "toonzqt/flipconsoleowner.h"
 
 class QPoint;
+class QMenu;
+class QKeyEvent;
 class TPalette;
 class TFilePath;
 class FlipBook;
@@ -179,6 +181,11 @@ protected:
   SaveImagesPopup *m_savePopup;
   LoadImagesPopup *m_loadPopup;
 
+  TFilePath m_fileNavPath, m_prevFile, m_nextFile;
+  qint64 m_fileNavDirModified = -1;
+  int m_pendingFileSteps      = 0;
+  bool m_isOpeningSibling     = false;
+
   bool m_isPreviewFx;
   TFxP m_previewedFx;
   TXsheetP m_previewXsh;
@@ -214,6 +221,10 @@ public:
   void setTitle(const QString &title);
   QString getTitle() const { return m_viewerTitle; }
   void showFrame(int frame);
+
+  void openSiblingFile(int direction);
+  void addFileNavigationMenu(QMenu *menu);
+  bool handleFileNavigationKey(QKeyEvent *event);
 
   TFx *getPreviewedFx() const;
   TXsheet *getPreviewXsheet() const;
@@ -278,6 +289,11 @@ protected:
 
   void playAudioFrame(int frame);
   TImageP getCurrentImage(int frame);
+
+  void resetState(bool clearImage);
+  void updateFileNavigation();
+  void findSiblingFiles(TFilePath &prev, TFilePath &next, int prevSteps,
+                        int nextSteps) const;
 
   void showEvent(QShowEvent *e) override;
   void hideEvent(QHideEvent *e) override;
