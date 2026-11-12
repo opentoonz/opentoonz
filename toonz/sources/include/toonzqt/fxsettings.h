@@ -92,12 +92,34 @@ class DVAPI ParamsPage final : public QFrame {
   int m_macroFxIndex;
   bool m_isPinnedPage;
 
+  struct IndexedColors {
+    std::string m_countName;
+    std::vector<std::string> m_names;
+    std::vector<QString> m_labels;
+    QComboBox *m_selector;
+    QStackedWidget *m_editors;
+  };
+  std::vector<IndexedColors> m_indexedColors;
+  TFxP m_indexedCurrentFx;
+  TFxP m_indexedActualFx;
+  int m_indexedFrame = 0;
+
+  void addIndexedColors(TIStream &is, const TFxP &fx);
+  void addIndexedGroups(TIStream &is, const TFxP &fx);
+  void updateIndexedColors();
+
 public:
   ParamsPage(QWidget *parent = 0, ParamViewer *paramViewer = 0);
   ~ParamsPage();
 
   void setPage(TIStream &is, const TFxP &fx, bool isFirstPage) {
     setPageField(is, fx);
+    for (ParamField *field : m_fields) {
+      connect(field, &ParamField::currentParamChanged, this,
+              &ParamsPage::updateIndexedColors);
+      connect(field, &ParamField::actualParamChanged, this,
+              &ParamsPage::updateIndexedColors);
+    }
     if (isFirstPage) addGlobalControl(fx);
     setPageSpace();
   }
