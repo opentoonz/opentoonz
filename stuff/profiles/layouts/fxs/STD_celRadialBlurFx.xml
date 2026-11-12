@@ -1,0 +1,25 @@
+<fxlayout help_file="CelRadialBlur.html">
+  <page name="Cel Radial Blur">
+    <control>blurType</control>
+    <control>center</control>
+    <control>outerStrength</control>
+    <control>outerOffsetMode</control>
+    <control>outerOffset</control>
+    <control>outerFade</control>
+    <control>innerStrength</control>
+    <control>innerOffsetMode</control>
+    <control>innerOffset</control>
+    <control>innerFade</control>
+    <control>repeatBorder</control>
+    <control>ellipseRatio</control>
+    <control>ellipseAngle</control>
+    <control>quality</control>
+    <control>brightness</control>
+    <control>sizeVariation</control>
+    <control>noiseVariation</control>
+    <control>noiseType</control>
+    <control>seed</control>
+    <control>noiseOffset</control>
+    <control>thickness</control>
+  </page>
+</fxlayout>
