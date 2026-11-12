@@ -1,0 +1,5 @@
+<fxlayout help_file="CelColorExpand.html">
+  <page name="Cel Color Expand">
+    <control>radius</control>
+  </page>
+</fxlayout>
