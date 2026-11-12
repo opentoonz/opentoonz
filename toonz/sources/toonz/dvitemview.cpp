@@ -1224,8 +1224,11 @@ void DvItemViewerPanel::mousePressEvent(QMouseEvent *event) {
   int index       = pos2index(event->pos());
   bool isSelected = m_selection->isSelected(index);
   m_currentIndex  = index;
+  bool isParentEntry =
+      0 <= index && index < getItemCount() &&
+      getModel()->getItemData(index, DvItemListModel::Name).toString() == "..";
   if (event->button() == Qt::RightButton) {
-    if (!isSelected) {
+    if (!isSelected && !isParentEntry) {
       m_selection->selectNone();
       if (!m_isPlayDelegateDisable) m_itemViewPlayDelegate->resetPlayWidget();
       if (0 <= index && index < getItemCount()) m_selection->select(index);
@@ -1255,7 +1258,7 @@ void DvItemViewerPanel::mousePressEvent(QMouseEvent *event) {
   }
 
   m_folderClickAdjustsSelection = false;
-  if (0 <= index && index < getItemCount() &&
+  if (!isParentEntry && 0 <= index && index < getItemCount() &&
       getModel()->getItemData(index, DvItemListModel::IsFolder).toBool()) {
     bool hasModifier =
         event->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
@@ -1265,14 +1268,14 @@ void DvItemViewerPanel::mousePressEvent(QMouseEvent *event) {
   }
 
   // without any modifier, clear the selection
-  if (!m_multiSelectionEnabled ||
-      (0 == (event->modifiers() & Qt::ControlModifier) &&
-       0 == (event->modifiers() & Qt::ShiftModifier) &&
-       !m_selection->isSelected(index)))
+  if (!isParentEntry && (!m_multiSelectionEnabled ||
+                         (0 == (event->modifiers() & Qt::ControlModifier) &&
+                          0 == (event->modifiers() & Qt::ShiftModifier) &&
+                          !m_selection->isSelected(index))))
     m_selection->selectNone();
 
   // if click something
-  if (0 <= index && index < getItemCount()) {
+  if (!isParentEntry && 0 <= index && index < getItemCount()) {
     if (0 != (event->modifiers() & Qt::ControlModifier)) {
       // ctrl-click
       m_selection->select(index, !m_selection->isSelected(index));

@@ -236,6 +236,8 @@ void FileSelection::getSelectedFiles(std::vector<TFilePath> &files) {
   if (!getModel()) return;
   const std::set<int> &indices = getSelectedIndices();
   for (int idx : indices) {
+    if (getModel()->getItemData(idx, DvItemListModel::Name).toString() == "..")
+      continue;
     QString name =
         getModel()->getItemData(idx, DvItemListModel::FullPath).toString();
     // Avoid adding empty paths (should not happen, but be safe)
