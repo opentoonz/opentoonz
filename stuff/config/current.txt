@@ -476,6 +476,17 @@
   <item>"STD_warpFx.intensity"	"Intensity"		</item>
   <item>"STD_warpFx.sensitivity"	"Size"		</item>
   <item>"STD_warpFx.sharpen"	"Sharpen"		</item>
+  <item>"STD_flowDisplaceFx" "Flow Displace" </item>
+  <item>"STD_flowDisplaceFx.mode" "Displacement" </item>
+  <item>"STD_flowDisplaceFx.strength" "Strength" </item>
+  <item>"STD_flowDisplaceFx.direction" "Direction" </item>
+  <item>"STD_flowDisplaceFx.invert" "Invert" </item>
+  <item>"STD_flowDisplaceFx.noiseAmplitude" "Noise Amplitude" </item>
+  <item>"STD_flowDisplaceFx.noiseSize" "Noise Size" </item>
+  <item>"STD_flowDisplaceFx.noiseSpeed" "Noise Speed" </item>
+  <item>"STD_flowDisplaceFx.seed" "Seed" </item>
+  <item>"STD_flowDisplaceFx.Displacement" "Displacement" </item>
+  <item>"STD_flowDisplaceFx.Matte" "Matte" </item>
 
 <!------------------------------ Sandor FX ---------------------------------------------->
 
