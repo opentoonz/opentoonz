@@ -129,6 +129,8 @@ set(SOURCES
     hsvkeyfx.cpp
     hsvscalefx.cpp
     hsvutil.cpp
+    celmotion.cpp
+    celnoise.cpp
     kaleido.cpp
     linearwavefx.cpp
     localblurfx.cpp
@@ -147,6 +149,7 @@ set(SOURCES
     perlinnoisefx.cpp
     pins.cpp
     posterizefx.cpp
+    printprocessfx.cpp
     premultiplyfx.cpp
     radialblurfx.cpp
     randomwavefx.cpp
