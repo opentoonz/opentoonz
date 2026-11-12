@@ -73,6 +73,7 @@
 // Qt includes
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QFileInfo>
 #include <QKeyEvent>
 #include <QMenu>
 #include <QSettings>
@@ -1522,6 +1523,13 @@ TFilePath pickSibling(std::vector<NamedPath> &entries, int steps,
   return entries[index].path;
 }
 
+qint64 directoryModified(const TFilePath &filePath) {
+  if (filePath.isEmpty()) return -1;
+  QFileInfo info(toQString(filePath.getParentDir()));
+  if (!info.exists()) return -1;
+  return info.lastModified().toMSecsSinceEpoch();
+}
+
 }  // namespace
 
 //-----------------------------------------------------------------------------
@@ -1566,6 +1574,7 @@ void FlipBook::findSiblingFiles(TFilePath &prev, TFilePath &next, int prevSteps,
 
 void FlipBook::updateFileNavigation() {
   findSiblingFiles(m_prevFile, m_nextFile, 1, 1);
+  m_fileNavDirModified = directoryModified(m_fileNavPath);
   m_flipConsole->enableButton(FlipConsole::ePrevFile, !m_prevFile.isEmpty(),
                               false);
   m_flipConsole->enableButton(FlipConsole::eNextFile, !m_nextFile.isEmpty(),
@@ -1584,8 +1593,11 @@ void FlipBook::openSiblingFile(int direction) {
     const int steps    = m_pendingFileSteps;
     m_pendingFileSteps = 0;
 
-    TFilePath target = steps < 0 ? m_prevFile : m_nextFile;
-    if (std::abs(steps) > 1 || target.isEmpty() ||
+    TFilePath target      = steps < 0 ? m_prevFile : m_nextFile;
+    qint64 folderModified = directoryModified(m_fileNavPath);
+    bool folderUnchanged =
+        m_fileNavDirModified >= 0 && folderModified == m_fileNavDirModified;
+    if (std::abs(steps) > 1 || target.isEmpty() || !folderUnchanged ||
         !TSystem::doesExistFileOrLevel(target)) {
       TFilePath prev, next;
       findSiblingFiles(prev, next, steps < 0 ? -steps : 0,
@@ -1599,7 +1611,22 @@ void FlipBook::openSiblingFile(int direction) {
 
     resetState(false);
     setLevel(target, 0, -1, -1, step, shrink, 0, false, false);
-    if (m_levels.empty()) m_imageViewer->setImage(TImageP());
+
+    bool hasFrame = false;
+    if (!m_levels.empty()) {
+      try {
+        if (getCurrentImage(m_flipConsole->getCurrentFrame())) hasFrame = true;
+      } catch (...) {
+        hasFrame = false;
+      }
+    }
+    if (!hasFrame) {
+      if (!m_levelNames.empty()) {
+        m_title1 = m_viewerTitle + " :: " + m_levelNames[0];
+        m_title.clear();
+      }
+      m_imageViewer->setImage(TImageP());
+    }
   }
   m_isOpeningSibling = false;
 }
@@ -2100,6 +2127,7 @@ void FlipBook::resetState(bool clearImage) {
   m_fileNavPath = TFilePath();
   m_framesCount = 0;
   m_palette     = 0;
+  m_title1.clear();
   if (clearImage) m_imageViewer->setImage(TImageP());
   m_imageViewer->hideHistogram();
   m_isPreviewFx = false;

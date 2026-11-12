@@ -182,8 +182,9 @@ protected:
   LoadImagesPopup *m_loadPopup;
 
   TFilePath m_fileNavPath, m_prevFile, m_nextFile;
-  int m_pendingFileSteps  = 0;
-  bool m_isOpeningSibling = false;
+  qint64 m_fileNavDirModified = -1;
+  int m_pendingFileSteps      = 0;
+  bool m_isOpeningSibling     = false;
 
   bool m_isPreviewFx;
   TFxP m_previewedFx;
