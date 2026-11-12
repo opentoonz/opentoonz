@@ -1280,6 +1280,21 @@
   <item>"STD_iwa_DirectionalBlurFx.intensity"		"Intensity"</item>
   <item>"STD_iwa_DirectionalBlurFx.bidirectional"	"Bidirectional"</item>
   <item>"STD_iwa_DirectionalBlurFx.filterType"		"Filter Type"</item>
+  <item>"STD_celDirectionalBlurFx" "Cel Directional Blur" </item>
+  <item>"STD_celDirectionalBlurFx.angle" "Angle" </item>
+  <item>"STD_celDirectionalBlurFx.gain" "Brightness Gain" </item>
+  <item>"STD_celDirectionalBlurFx.sizeVariation" "Size Variation" </item>
+  <item>"STD_celDirectionalBlurFx.frontStrength" "Front Blur Strength" </item>
+  <item>"STD_celDirectionalBlurFx.frontFade" "Front Edge Fade" </item>
+  <item>"STD_celDirectionalBlurFx.frontSharp" "Front Sharp Tail" </item>
+  <item>"STD_celDirectionalBlurFx.backStrength" "Back Blur Strength" </item>
+  <item>"STD_celDirectionalBlurFx.backFade" "Back Edge Fade" </item>
+  <item>"STD_celDirectionalBlurFx.backSharp" "Back Sharp Tail" </item>
+  <item>"STD_celDirectionalBlurFx.noiseVariation" "Noise Variation" </item>
+  <item>"STD_celDirectionalBlurFx.noiseType" "Noise Type" </item>
+  <item>"STD_celDirectionalBlurFx.noiseSeed" "Seed" </item>
+  <item>"STD_celDirectionalBlurFx.noiseOffset" "Offset" </item>
+  <item>"STD_celDirectionalBlurFx.noiseThickness" "Thickness" </item>
 
   <item>"STD_iwa_GradientWarpFx"			"Gradient Warp Iwa"</item>
   <item>"STD_iwa_GradientWarpFx.h_maxlen"		"H Length"</item>
