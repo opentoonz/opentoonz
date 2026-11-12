@@ -803,6 +803,10 @@ void TStroke::Imp::swapGeometry(Imp &other) throw() {
 //-----------------------------------------------------------------------------
 
 void TStroke::Imp::computeMaxThickness() {
+  if (m_centerLineArray.empty() || !m_centerLineArray[0]) {
+    m_maxThickness = 0;
+    return;
+  }
   m_maxThickness = m_centerLineArray[0]->getThickP0().thick;
   for (UINT i = 0; i < m_centerLineArray.size(); i++)
     m_maxThickness =
