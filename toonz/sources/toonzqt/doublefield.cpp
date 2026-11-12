@@ -1,7 +1,9 @@
 
 
 #include <math.h>
+#include <algorithm>
 #include <array>
+#include <limits>
 #include <QtGlobal>
 
 #include "toonzqt/doublefield.h"
@@ -12,6 +14,7 @@
 #include <QHBoxLayout>
 #include <QFocusEvent>
 #include <QSlider>
+#include <QSignalBlocker>
 
 using namespace DVGui;
 
@@ -210,6 +213,11 @@ double DoubleValueField::pos2value(int x) const {
 //-----------------------------------------------------------------------------
 
 int DoubleValueField::value2pos(double v) const {
+  if (m_hasSliderRange) {
+    double sliderMin, sliderMax;
+    getSliderRange(sliderMin, sliderMax);
+    v = std::max(sliderMin, std::min(sliderMax, v));
+  }
   int decimal        = m_lineEdit->getDecimals();
   double sliderValue = round(v * std::pow(10., decimal));
   if (m_isLinearSlider) return (int)sliderValue;
@@ -238,6 +246,7 @@ void DoubleValueField::getRange(double &minValue, double &maxValue) {
 //-----------------------------------------------------------------------------
 
 void DoubleValueField::setRange(double minValue, double maxValue) {
+  m_hasSliderRange = false;
   m_lineEdit->setRange(minValue, maxValue);
 
   m_roller->setRange(minValue, maxValue);
@@ -249,6 +258,36 @@ void DoubleValueField::setRange(double minValue, double maxValue) {
   m_slider->setRange(sliderMin, sliderMax);
 
   enableSlider(maxValue - minValue < 10000);
+}
+
+bool DoubleValueField::setSliderRange(double minValue, double maxValue) {
+  double hardMin, hardMax;
+  getRange(hardMin, hardMax);
+  const double scale     = std::pow(10.0, m_lineEdit->getDecimals());
+  const double sliderMin = std::round(minValue * scale);
+  const double sliderMax = std::round(maxValue * scale);
+  if (!std::isfinite(minValue) || !std::isfinite(maxValue) ||
+      minValue < hardMin || maxValue > hardMax || minValue >= maxValue ||
+      !std::isfinite(sliderMin) || !std::isfinite(sliderMax) ||
+      sliderMin < std::numeric_limits<int>::min() ||
+      sliderMax > std::numeric_limits<int>::max() || sliderMin >= sliderMax ||
+      sliderMax - sliderMin > std::numeric_limits<int>::max())
+    return false;
+  const QSignalBlocker blocker(m_slider);
+  m_slider->setRange(int(sliderMin), int(sliderMax));
+  m_hasSliderRange = true;
+  m_slider->setValue(value2pos(getValue()));
+  enableSlider(maxValue - minValue < 10000);
+  return true;
+}
+
+bool DoubleValueField::getSliderRange(double &minValue,
+                                      double &maxValue) const {
+  if (!m_hasSliderRange) return false;
+  const double scale = std::pow(10.0, m_lineEdit->getDecimals());
+  minValue           = m_slider->minimum() / scale;
+  maxValue           = m_slider->maximum() / scale;
+  return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -353,7 +392,14 @@ void DoubleValueField::onLineEditValueChanged() {
       (qFuzzyCompare(m_roller->getValue() + 1.0, value + 1.0) &&
        m_roller->isVisible()))
     return;
-  m_slider->setValue(value2pos(value));
+  // A typed value can exceed the optional slider window. Synchronizing its
+  // clamped thumb must not feed that endpoint back into the numeric value.
+  if (m_hasSliderRange) {
+    const QSignalBlocker blocker(m_slider);
+    m_slider->setValue(value2pos(value));
+  } else {
+    m_slider->setValue(value2pos(value));
+  }
   m_roller->setValue(value);
   emit valueChanged(false);
 }
@@ -364,14 +410,20 @@ void DoubleValueField::onRollerValueChanged(bool isDragging) {
   double value = m_roller->getValue();
 
   if (qFuzzyCompare(value + 1.0, m_lineEdit->getValue() + 1.0)) {
-    assert(qFuzzyCompare(pos2value(m_slider->value()) + 1.0, value + 1.0) ||
+    assert((m_hasSliderRange && m_slider->value() == value2pos(value)) ||
+           qFuzzyCompare(pos2value(m_slider->value()) + 1.0, value + 1.0) ||
            !m_slider->isVisible());
     // If isDragging is false, it's right that the change notification is
     // emitted.
     if (!isDragging) emit valueChanged(isDragging);
     return;
   }
-  m_slider->setValue(value2pos(value));
+  if (m_hasSliderRange) {
+    const QSignalBlocker blocker(m_slider);
+    m_slider->setValue(value2pos(value));
+  } else {
+    m_slider->setValue(value2pos(value));
+  }
   m_lineEdit->setValue(value);
 
   // Make the cursor on the first digit, so if the string to display
