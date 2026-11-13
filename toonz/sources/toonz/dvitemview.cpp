@@ -929,6 +929,20 @@ QRect DvItemViewerPanel::getCaptionRect(int index) const {
 
 //-----------------------------------------------------------------------------
 
+void DvItemViewerPanel::editCaption(int index) {
+  if (!getModel() || index < 0 || index >= getItemCount()) return;
+  updateViewParameters();
+  m_currentIndex = index;
+  m_editFld->setText(
+      getModel()->getItemData(index, DvItemListModel::Name).toString());
+  m_editFld->setGeometry(getCaptionRect(index));
+  m_editFld->show();
+  m_editFld->selectAll();
+  m_editFld->setFocus(Qt::OtherFocusReason);
+}
+
+//-----------------------------------------------------------------------------
+
 int DvItemViewerPanel::getContentMinimumWidth() {
   switch (m_viewType) {
   case ListView:

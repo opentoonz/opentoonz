@@ -1099,6 +1099,29 @@ void FileBrowser::renameItem(int index, const QString &newName) {
   if (getFolder() == TFilePath()) return;
   if (index < 0 || index >= (int)m_items.size()) return;
 
+  if (m_items[index].m_isFolder) {
+    if (isSpaceString(newName)) return;
+    TFilePath srcPath = m_items[index].m_path;
+    if (srcPath == m_folder.getParentDir()) return;
+    TFilePath dstPath = srcPath.getParentDir() + TFilePath(newName);
+    if (dstPath == srcPath) return;
+    if (TFileStatus(dstPath).doesExist()) {
+      DVGui::error(tr("Can't rename. File already exists: ") +
+                   toQString(dstPath));
+      return;
+    }
+    try {
+      TSystem::renameFile(dstPath, srcPath);
+    } catch (...) {
+      DVGui::error(tr("Couldn't rename ") + toQString(srcPath) + " to " +
+                   toQString(dstPath));
+      return;
+    }
+    replacePersistedPath(srcPath, dstPath);
+    refreshFolder(srcPath.getParentDir());
+    return;
+  }
+
   TFilePath fp    = m_items[index].m_path;
   TFilePath newFp = fp;
   if (renameFile(newFp, newName)) {
@@ -1224,6 +1247,10 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index) {
   }
 
   if (files.empty()) {
+    QAction *newFolder =
+        menu->addAction(QIcon(createQIcon("folder_new")), tr("New Folder"));
+    connect(newFolder, &QAction::triggered, this,
+            &FileBrowser::newFolderInList);
     menu->addAction(cm->getAction(MI_ShowFolderContents));
     menu->addAction(cm->getAction(MI_SelectAll));
     if (!Preferences::instance()->isWatchFileSystemEnabled()) {
@@ -2317,10 +2344,9 @@ void FileBrowser::folderUp() {
 
 //-----------------------------------------------------------------------------
 
-void FileBrowser::newFolder() {
-  TFilePath parentFolder = getFolder();
+TFilePath FileBrowser::createChildFolder(const TFilePath &parentFolder) {
   if (parentFolder == TFilePath() || !TFileStatus(parentFolder).isDirectory())
-    return;
+    return TFilePath();
   QString tempName(tr("New Folder"));
   std::wstring folderName = tempName.toStdWString();
   TFilePath folderPath    = parentFolder + folderName;
@@ -2333,23 +2359,68 @@ void FileBrowser::newFolder() {
   } catch (...) {
     DVGui::error(tr("It is not possible to create the %1 folder.")
                      .arg(toQString(folderPath)));
-    return;
+    return TFilePath();
   }
+  return folderPath;
+}
 
+//-----------------------------------------------------------------------------
+
+void FileBrowser::editNewFolderInTree(const QModelIndex &parentFolderIndex,
+                                      const TFilePath &folderPath) {
   DvDirModel *model = DvDirModel::instance();
-
-  QModelIndex parentFolderIndex = m_folderTreeView->currentIndex();
   model->refresh(parentFolderIndex);
   m_folderTreeView->expand(parentFolderIndex);
 
-  std::wstring newFolderName = folderPath.getWideName();
   QModelIndex newFolderIndex =
-      model->childByName(parentFolderIndex, newFolderName);
-  if (newFolderIndex.isValid()) {
-    m_folderTreeView->setCurrentIndex(newFolderIndex);
-    m_folderTreeView->scrollTo(newFolderIndex);
-    m_folderTreeView->QTreeView::edit(newFolderIndex);
-  }
+      model->childByName(parentFolderIndex, folderPath.getWideName());
+  if (!newFolderIndex.isValid()) return;
+  m_folderTreeView->setCurrentIndex(newFolderIndex);
+  m_folderTreeView->scrollTo(newFolderIndex);
+  m_folderTreeView->QTreeView::edit(newFolderIndex);
+}
+
+//-----------------------------------------------------------------------------
+
+void FileBrowser::newFolder() {
+  TFilePath parentFolder = getFolder();
+  TFilePath folderPath   = createChildFolder(parentFolder);
+  if (folderPath.isEmpty()) return;
+  editNewFolderInTree(m_folderTreeView->currentIndex(), folderPath);
+}
+
+//-----------------------------------------------------------------------------
+
+void FileBrowser::newFolderInList() {
+  TFilePath parentFolder = getFolder();
+  TFilePath folderPath   = createChildFolder(parentFolder);
+  if (folderPath.isEmpty()) return;
+
+  refreshFolder(parentFolder);
+  m_folderTreeView->expand(m_folderTreeView->currentIndex());
+
+  int itemIndex = findIndexWithPath(folderPath);
+  FileSelection *fs =
+      dynamic_cast<FileSelection *>(m_itemViewer->getPanel()->getSelection());
+  if (!fs || itemIndex < 0) return;
+
+  fs->select(&itemIndex, 1);
+  fs->makeCurrent();
+  storePersistedSelection();
+
+  m_itemViewer->updateContentSize();
+  QRect itemRect  = m_itemViewer->getPanel()->index2pos(itemIndex);
+  QScrollBar *bar = m_itemViewer->verticalScrollBar();
+  int viewTop     = bar->value();
+  int viewHeight  = m_itemViewer->viewport()->height();
+  if (itemRect.top() < viewTop || itemRect.bottom() > viewTop + viewHeight)
+    bar->setValue(qMax(0, itemRect.top()));
+  m_itemViewer->getPanel()->update();
+
+  QTimer::singleShot(0, this, [this, folderPath]() {
+    int index = findIndexWithPath(folderPath);
+    if (index >= 0) m_itemViewer->getPanel()->editCaption(index);
+  });
 }
 
 //-----------------------------------------------------------------------------
