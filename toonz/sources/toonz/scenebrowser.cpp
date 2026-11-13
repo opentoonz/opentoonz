@@ -1120,7 +1120,9 @@ QMenu *SceneBrowser::getContextMenu(QWidget *parent, int index) {
   QMenu *menu        = new QMenu(parent);
   CommandManager *cm = CommandManager::instance();
 
-  if (files.empty()) {
+  if ((0 <= index && index < (int)m_items.size() &&
+       getItemData(index, Name).toString() == "..") ||
+      files.empty()) {
     menu->addAction(cm->getAction(MI_ShowFolderContents));
     menu->addAction(cm->getAction(MI_SelectAll));
     if (!Preferences::instance()->isWatchFileSystemEnabled()) {
