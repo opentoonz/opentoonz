@@ -935,7 +935,18 @@ void DvItemViewerPanel::editCaption(int index) {
   m_currentIndex = index;
   m_editFld->setText(
       getModel()->getItemData(index, DvItemListModel::Name).toString());
-  m_editFld->setGeometry(getCaptionRect(index));
+  QRect fieldRect = getCaptionRect(index);
+  if (m_viewType == TableView) {
+    QRect itemRect = index2pos(index);
+    int nameWidth  = itemRect.width();
+    if (!m_columns.empty()) {
+      nameWidth = m_columns[0].second.first;
+      if (nameWidth > itemRect.width()) nameWidth = itemRect.width();
+    }
+    fieldRect =
+        QRect(itemRect.left(), itemRect.top(), nameWidth, itemRect.height());
+  }
+  m_editFld->setGeometry(fieldRect);
   m_editFld->show();
   m_editFld->selectAll();
   m_editFld->setFocus(Qt::OtherFocusReason);
