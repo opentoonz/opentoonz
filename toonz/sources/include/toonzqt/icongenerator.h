@@ -122,6 +122,11 @@ public:
   // icons from files
   QPixmap getIcon(const TFilePath &path,
                   const TFrameId &fid = TFrameId::NO_FRAME);
+  QPixmap getSizedIcon(const TFilePath &path, const TDimension &dim,
+                       const TFrameId &fid = TFrameId::NO_FRAME);
+  QPixmap peekSizedIcon(const TFilePath &path, const TDimension &dim,
+                        const TFrameId &fid = TFrameId::NO_FRAME);
+  void purgeResponsiveFileIconsExcept(const std::vector<TDimension> &keep);
   void invalidate(const TFilePath &path,
                   const TFrameId &fid = TFrameId::NO_FRAME);
   void remove(const TFilePath &path, const TFrameId &fid = TFrameId::NO_FRAME);
