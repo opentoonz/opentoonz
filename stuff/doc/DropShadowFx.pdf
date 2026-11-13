@@ -1,0 +1,450 @@
+%PDF-1.4
+%OpenToonz Drop Shadow FX help
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R 5 0 R 7 0 R 9 0 R] /Count 4 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 11 0 R /F2 12 0 R >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 3408 >>
+stream
+1 1 1 rg
+0 0 612 792 re f
+0.083 0.176 0.263 rg
+BT /F2 9 Tf 1 0 0 1 48 754 Tm (OPENTOONZ  /  FX HELP) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8 Tf 1 0 0 1 425 754 Tm (LIGHT  /  DROP SHADOW) Tj ET
+0.82 0.88 0.91 RG 0.6 w
+48 745 m 564 745 l S
+0.82 0.88 0.91 RG 0.6 w
+48 43 m 564 43 l S
+0.26 0.34 0.40 rg
+BT /F1 8 Tf 1 0 0 1 48 28 Tm (Drop Shadow FX  |  OpenToonz  |  21 October 2026) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8 Tf 1 0 0 1 535 28 Tm (1 / 4) Tj ET
+0.083 0.176 0.263 rg
+BT /F2 24 Tf 1 0 0 1 48 692 Tm (Drop Shadow FX) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 10 Tf 1 0 0 1 48 668 Tm (Alpha-based shadows, inset shading, and shadow-only outputs) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 10 Tf 1 0 0 1 48 630 Tm (Drop Shadow FX takes the alpha silhouette of a connected Source image, blurs it, offsets it by an) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 10 Tf 1 0 0 1 48 615 Tm (Angle and Distance, and colors the result. The Source may remain visible above the shadow, or the) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 10 Tf 1 0 0 1 48 600 Tm (effect may output only the shadow.) Tj ET
+0.082 0.463 0.627 rg
+BT /F2 10 Tf 1 0 0 1 48 567 Tm (THREE MAIN USES) Tj ET
+0.919 0.957 0.973 rg
+48 448 164 102 re f
+0.083 0.176 0.263 rg
+BT /F2 11 Tf 1 0 0 1 60 522 Tm (Outer shadow) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.7 Tf 1 0 0 1 60 502 Tm (An offset shade behind cutout) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.7 Tf 1 0 0 1 60 490 Tm (art.) Tj ET
+0.919 0.957 0.973 rg
+221 448 164 102 re f
+0.083 0.176 0.263 rg
+BT /F2 11 Tf 1 0 0 1 233 522 Tm (Inner shadow) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.7 Tf 1 0 0 1 233 502 Tm (Recessed shading within the) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.7 Tf 1 0 0 1 233 490 Tm (original.) Tj ET
+0.919 0.957 0.973 rg
+394 448 164 102 re f
+0.083 0.176 0.263 rg
+BT /F2 11 Tf 1 0 0 1 406 522 Tm (Shadow-only) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.7 Tf 1 0 0 1 406 502 Tm (A separate compositing matte.) Tj ET
+0.082 0.463 0.627 rg
+BT /F2 10 Tf 1 0 0 1 48 412 Tm (QUICK START) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 9.6 Tf 1 0 0 1 52 391 Tm (1. Open FX Schematic. Add Light > Drop Shadow and connect the artwork to the Source port.) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 9.6 Tf 1 0 0 1 52 362 Tm (2. Start with default black Color; Blur X/Y = 2, Quality = 1, Strength = 1, Angle = 45, Distance =) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 9.6 Tf 1 0 0 1 52 348 Tm (2. Inner, Knockout and Hide Object begin off.) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 9.6 Tf 1 0 0 1 52 319 Tm (3. Increase Distance for a detached shadow. Increase Blur X/Y for softness. Adjust Color alpha and) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 9.6 Tf 1 0 0 1 52 305 Tm (Strength for opacity.) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 9.6 Tf 1 0 0 1 52 276 Tm (4. Enable Inner for inset shade; Hide Object to output only shade; Knockout for an outer shade) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 9.6 Tf 1 0 0 1 52 262 Tm (excluding the original silhouette.) Tj ET
+0.919 0.957 0.973 rg
+48 153 516 78 re f
+0.082 0.463 0.627 rg
+BT /F2 10 Tf 1 0 0 1 60 211 Tm (WORKING WITH THE FX NODE) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 8.8 Tf 1 0 0 1 60 193 Tm (The effect reads the Source alpha, so transparent artwork gives a distinct outer shadow. Composite) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 8.8 Tf 1 0 0 1 60 181 Tm (a shadow-only branch beneath the original artwork for independent editing. A fully opaque source) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 8.8 Tf 1 0 0 1 60 169 Tm (covering the entire frame leaves no visible exterior edge.) Tj ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 11 0 R /F2 12 0 R >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 4877 >>
+stream
+1 1 1 rg
+0 0 612 792 re f
+0.083 0.176 0.263 rg
+BT /F2 9 Tf 1 0 0 1 48 754 Tm (OPENTOONZ  /  FX HELP) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8 Tf 1 0 0 1 425 754 Tm (LIGHT  /  DROP SHADOW) Tj ET
+0.82 0.88 0.91 RG 0.6 w
+48 745 m 564 745 l S
+0.82 0.88 0.91 RG 0.6 w
+48 43 m 564 43 l S
+0.26 0.34 0.40 rg
+BT /F1 8 Tf 1 0 0 1 48 28 Tm (Drop Shadow FX  |  OpenToonz  |  21 October 2026) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8 Tf 1 0 0 1 535 28 Tm (2 / 4) Tj ET
+0.083 0.176 0.263 rg
+BT /F2 24 Tf 1 0 0 1 48 692 Tm (Controls and behavior) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 10 Tf 1 0 0 1 48 668 Tm (FX ID: STD_dropShadowFx   |   Category: Light   |   Source: one image input) Tj ET
+0.083 0.176 0.263 rg
+48 609 516 26 re f
+1 1 1 rg
+BT /F2 8.4 Tf 1 0 0 1 56 618 Tm (CONTROL) Tj ET
+1 1 1 rg
+BT /F2 8.4 Tf 1 0 0 1 180 618 Tm (DEFAULT) Tj ET
+1 1 1 rg
+BT /F2 8.4 Tf 1 0 0 1 290 618 Tm (FUNCTION) Tj ET
+0.919 0.957 0.973 rg
+48 563 516 40 re f
+0.083 0.176 0.263 rg
+BT /F2 9.3 Tf 1 0 0 1 56 587 Tm (Color) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.9 Tf 1 0 0 1 180 587 Tm (Black) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.4 Tf 1 0 0 1 290 590 Tm (Colored tint of the alpha shadow, including color) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.4 Tf 1 0 0 1 290 579 Tm (opacity.) Tj ET
+0.083 0.176 0.263 rg
+BT /F2 9.3 Tf 1 0 0 1 56 547 Tm (Blur X / Y) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.9 Tf 1 0 0 1 180 547 Tm (2 / 2) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.4 Tf 1 0 0 1 290 550 Tm (Independent horizontal and vertical blur; FX) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.4 Tf 1 0 0 1 290 539 Tm (lengths.) Tj ET
+0.919 0.957 0.973 rg
+48 483 516 40 re f
+0.083 0.176 0.263 rg
+BT /F2 9.3 Tf 1 0 0 1 56 507 Tm (Quality) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.9 Tf 1 0 0 1 180 507 Tm (1 \(0-15\)) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.4 Tf 1 0 0 1 290 510 Tm (Blur passes. A value of zero skips blurring.) Tj ET
+0.083 0.176 0.263 rg
+BT /F2 9.3 Tf 1 0 0 1 56 467 Tm (Strength) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.9 Tf 1 0 0 1 180 467 Tm (1 \(0-255\)) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.4 Tf 1 0 0 1 290 470 Tm (Scales shade intensity; resulting opacity is) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.4 Tf 1 0 0 1 290 459 Tm (clamped.) Tj ET
+0.919 0.957 0.973 rg
+48 403 516 40 re f
+0.083 0.176 0.263 rg
+BT /F2 9.3 Tf 1 0 0 1 56 427 Tm (Angle) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.9 Tf 1 0 0 1 180 427 Tm (45 degrees) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.4 Tf 1 0 0 1 290 430 Tm (Direction of offset: 0 right, 90 down in output) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.4 Tf 1 0 0 1 290 419 Tm (space.) Tj ET
+0.083 0.176 0.263 rg
+BT /F2 9.3 Tf 1 0 0 1 56 387 Tm (Distance) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.9 Tf 1 0 0 1 180 387 Tm (2) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.4 Tf 1 0 0 1 290 390 Tm (Offset of shadow. Zero aligns it with Source.) Tj ET
+0.919 0.957 0.973 rg
+48 323 516 40 re f
+0.083 0.176 0.263 rg
+BT /F2 9.3 Tf 1 0 0 1 56 347 Tm (Inner) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.9 Tf 1 0 0 1 180 347 Tm (Off) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.4 Tf 1 0 0 1 290 350 Tm (Reverse blurred silhouette, clipped to source) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.4 Tf 1 0 0 1 290 339 Tm (alpha.) Tj ET
+0.083 0.176 0.263 rg
+BT /F2 9.3 Tf 1 0 0 1 56 307 Tm (Knockout) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.9 Tf 1 0 0 1 180 307 Tm (Off) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.4 Tf 1 0 0 1 290 310 Tm (Outer: shadow outside the source alpha; hide) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.4 Tf 1 0 0 1 290 299 Tm (object.) Tj ET
+0.919 0.957 0.973 rg
+48 243 516 40 re f
+0.083 0.176 0.263 rg
+BT /F2 9.3 Tf 1 0 0 1 56 267 Tm (Hide Object) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.9 Tf 1 0 0 1 180 267 Tm (Off) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.4 Tf 1 0 0 1 290 270 Tm (Suppress original art, leaving a shadow-only) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.4 Tf 1 0 0 1 290 259 Tm (output.) Tj ET
+0.082 0.463 0.627 rg
+BT /F2 11 Tf 1 0 0 1 48 221 Tm (COMPOSITION MODES) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 8.6 Tf 1 0 0 1 51 199 Tm (- Outer, switches off: original artwork sits in front of the offset shade.) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 8.6 Tf 1 0 0 1 51 180 Tm (- Outer + Hide Object: shade only, including shade beneath the source silhouette.) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 8.6 Tf 1 0 0 1 51 161 Tm (- Outer + Knockout: shade only outside the Source silhouette; artwork omitted.) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 8.6 Tf 1 0 0 1 51 142 Tm (- Inner: shade restricted to the Source alpha, normally overlaid on source art.) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 8.6 Tf 1 0 0 1 51 123 Tm (- Inner + Hide Object or Knockout: inset shading only, original omitted.) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.5 Tf 1 0 0 1 48 101 Tm (Animating: Color, Blur X/Y, Strength, Angle and Distance are sampled at the current frame. Quality and) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.5 Tf 1 0 0 1 48 89 Tm (mode switches are read without frame sampling. Offsets are rounded to rendered pixels, so small) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.5 Tf 1 0 0 1 48 77 Tm (movements can step by one pixel.) Tj ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 11 0 R /F2 12 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 4764 >>
+stream
+1 1 1 rg
+0 0 612 792 re f
+0.083 0.176 0.263 rg
+BT /F2 9 Tf 1 0 0 1 48 754 Tm (OPENTOONZ  /  FX HELP) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8 Tf 1 0 0 1 425 754 Tm (LIGHT  /  DROP SHADOW) Tj ET
+0.82 0.88 0.91 RG 0.6 w
+48 745 m 564 745 l S
+0.82 0.88 0.91 RG 0.6 w
+48 43 m 564 43 l S
+0.26 0.34 0.40 rg
+BT /F1 8 Tf 1 0 0 1 48 28 Tm (Drop Shadow FX  |  OpenToonz  |  21 October 2026) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8 Tf 1 0 0 1 535 28 Tm (3 / 4) Tj ET
+0.083 0.176 0.263 rg
+BT /F2 24 Tf 1 0 0 1 48 692 Tm (Comparison with other FX) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 10 Tf 1 0 0 1 48 668 Tm (Similar-looking results use different source data and compositing behaviors) Tj ET
+0.083 0.176 0.263 rg
+48 602 516 26 re f
+1 1 1 rg
+BT /F2 8.5 Tf 1 0 0 1 55 611 Tm (EFFECT) Tj ET
+1 1 1 rg
+BT /F2 8.5 Tf 1 0 0 1 173 611 Tm (KEY DIFFERENCE) Tj ET
+1 1 1 rg
+BT /F2 8.5 Tf 1 0 0 1 383 611 Tm (USE WHEN) Tj ET
+0.919 0.957 0.973 rg
+48 539 516 55 re f
+0.083 0.176 0.263 rg
+BT /F2 9 Tf 1 0 0 1 56 574 Tm (DROP SHADOW) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.6 Tf 1 0 0 1 173 578 Tm (One color, offset alpha matte outside or) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.6 Tf 1 0 0 1 173 566 Tm (inside.) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.6 Tf 1 0 0 1 383 578 Tm (Cutouts, titles, character) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.6 Tf 1 0 0 1 383 566 Tm (separation, inset shade.) Tj ET
+0.083 0.176 0.263 rg
+BT /F2 9 Tf 1 0 0 1 56 519 Tm (BEVEL) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.6 Tf 1 0 0 1 173 523 Tm (Two-sided edge lighting: Highlight +) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.6 Tf 1 0 0 1 173 511 Tm (Shadow. Inner, Outer, Full.) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.6 Tf 1 0 0 1 383 523 Tm (Raised or engraved type; surface) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.6 Tf 1 0 0 1 383 511 Tm (edge relief.) Tj ET
+0.919 0.957 0.973 rg
+48 429 516 55 re f
+0.083 0.176 0.263 rg
+BT /F2 9 Tf 1 0 0 1 56 464 Tm (BODY HIGHLIGHT) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.6 Tf 1 0 0 1 173 468 Tm (Tinted interior overlay, point X/Y,) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.6 Tf 1 0 0 1 173 456 Tm (blur, invert, blend modes.) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.6 Tf 1 0 0 1 383 468 Tm (Interior contour highlight or body) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.6 Tf 1 0 0 1 383 456 Tm (shading.) Tj ET
+0.083 0.176 0.263 rg
+BT /F2 9 Tf 1 0 0 1 56 409 Tm (CAST SHADOW) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.6 Tf 1 0 0 1 173 413 Tm (Projected, distortable shadow with) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.6 Tf 1 0 0 1 173 401 Tm (top/bottom blur/opacity.) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.6 Tf 1 0 0 1 383 413 Tm (Ground or wall shadow with) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.6 Tf 1 0 0 1 383 401 Tm (perspective.) Tj ET
+0.919 0.957 0.973 rg
+48 319 516 55 re f
+0.083 0.176 0.263 rg
+BT /F2 9 Tf 1 0 0 1 56 354 Tm (BACKLIT) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.6 Tf 1 0 0 1 173 358 Tm (Separate Light input affects Source.) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.6 Tf 1 0 0 1 383 358 Tm (Image-driven lighting from a) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.6 Tf 1 0 0 1 383 346 Tm (second layer.) Tj ET
+0.083 0.176 0.263 rg
+BT /F2 9 Tf 1 0 0 1 56 299 Tm (GLOW / EMBOSS) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.6 Tf 1 0 0 1 173 303 Tm (Light halo / surface relief rather than) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.6 Tf 1 0 0 1 173 291 Tm (displaced silhouette.) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.6 Tf 1 0 0 1 383 303 Tm (Luminous bloom / texture-depth) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.6 Tf 1 0 0 1 383 291 Tm (treatment.) Tj ET
+0.082 0.463 0.627 rg
+BT /F2 12 Tf 1 0 0 1 48 244 Tm (DROP SHADOW VS. BEVEL) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 9.4 Tf 1 0 0 1 48 222 Tm (Both new effects use shared raster and Flash-style box-blur utilities. Drop Shadow produces a single) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 9.4 Tf 1 0 0 1 48 208 Tm (colored matte moved by Angle and Distance. Bevel samples opposite offset sides of the alpha silhouette) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 9.4 Tf 1 0 0 1 48 194 Tm (to form simultaneous highlight and dark edges.) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 9.4 Tf 1 0 0 1 48 168 Tm (Bevel supports Inner, Outer and Full and distinct Highlight and Shadow colors; Drop Shadow instead) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 9.4 Tf 1 0 0 1 48 154 Tm (offers Inner and the shadow-only Hide Object / Knockout controls. A bevel makes a shape appear raised) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 9.4 Tf 1 0 0 1 48 140 Tm (or engraved, not simply separated from its background.) Tj ET
+0.919 0.957 0.973 rg
+48 53 516 61 re f
+0.083 0.176 0.263 rg
+BT /F1 9.1 Tf 1 0 0 1 60 99 Tm (Quick choice: need a detached outline shadow? Drop Shadow. Need dual light/dark relief? Bevel. Need) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 9.1 Tf 1 0 0 1 60 85 Tm (tint inside a drawing with blend controls? Body Highlight. Need a skewed projection onto a floor?) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 9.1 Tf 1 0 0 1 60 71 Tm (Cast Shadow.) Tj ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 11 0 R /F2 12 0 R >> >> /Contents 10 0 R >>
+endobj
+10 0 obj
+<< /Length 3801 >>
+stream
+1 1 1 rg
+0 0 612 792 re f
+0.083 0.176 0.263 rg
+BT /F2 9 Tf 1 0 0 1 48 754 Tm (OPENTOONZ  /  FX HELP) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8 Tf 1 0 0 1 425 754 Tm (LIGHT  /  DROP SHADOW) Tj ET
+0.82 0.88 0.91 RG 0.6 w
+48 745 m 564 745 l S
+0.82 0.88 0.91 RG 0.6 w
+48 43 m 564 43 l S
+0.26 0.34 0.40 rg
+BT /F1 8 Tf 1 0 0 1 48 28 Tm (Drop Shadow FX  |  OpenToonz  |  21 October 2026) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8 Tf 1 0 0 1 535 28 Tm (4 / 4) Tj ET
+0.083 0.176 0.263 rg
+BT /F2 24 Tf 1 0 0 1 48 692 Tm (Practical recipes) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 10 Tf 1 0 0 1 48 668 Tm (Suggested starting points, not built-in presets) Tj ET
+0.078 0.49 0.502 rg
+BT /F2 10 Tf 1 0 0 1 48 630 Tm (01  CARTOON SEPARATION) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 9.3 Tf 1 0 0 1 55 611 Tm (Outer, all switches off. Choose a cool dark Color, a modest Distance, Blur X/Y around 3-6 and) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 9.3 Tf 1 0 0 1 55 598 Tm (Quality around 1-2. Keep intensity subtle.) Tj ET
+0.078 0.49 0.502 rg
+BT /F2 10 Tf 1 0 0 1 48 565 Tm (02  INSET GRAPHIC) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 9.3 Tf 1 0 0 1 55 546 Tm (Inner on. Use a darker relative of the fill, short Distance and small blur. Ideal for lettering,) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 9.3 Tf 1 0 0 1 55 533 Tm (buttons and recesses.) Tj ET
+0.078 0.49 0.502 rg
+BT /F2 10 Tf 1 0 0 1 48 500 Tm (03  SEPARATE SHADOW PASS) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 9.3 Tf 1 0 0 1 55 481 Tm (Inner off; Hide Object on. Route output into a branch below the original drawing. Keep Knockout off) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 9.3 Tf 1 0 0 1 55 468 Tm (if the full shadow matte is needed.) Tj ET
+0.078 0.49 0.502 rg
+BT /F2 10 Tf 1 0 0 1 48 435 Tm (04  CRISP CUTOUT) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 9.3 Tf 1 0 0 1 55 416 Tm (Set Blur X/Y to zero or Quality to zero for a sharp graphic silhouette. Try multiple passes through) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 9.3 Tf 1 0 0 1 55 403 Tm (distinct Drop Shadow nodes for layered offsets.) Tj ET
+0.082 0.463 0.627 rg
+BT /F2 11 Tf 1 0 0 1 48 370 Tm (NOTES AND TROUBLESHOOTING) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 8.6 Tf 1 0 0 1 52 348 Tm (- No visible outer shade? Verify a Source is connected, alpha has transparent edges, and Color) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 8.6 Tf 1 0 0 1 52 336 Tm (opacity / Strength are nonzero.) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 8.6 Tf 1 0 0 1 52 312 Tm (- Jagged or stepped movement? Increase blur as appropriate; angle/distance shifts intentionally round) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 8.6 Tf 1 0 0 1 52 300 Tm (to rendered pixels.) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 8.6 Tf 1 0 0 1 52 276 Tm (- Different preview vs final? Blur and Distance scale with render transform. Confirm at the final) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 8.6 Tf 1 0 0 1 52 264 Tm (output size.) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 8.6 Tf 1 0 0 1 52 240 Tm (- Knockout omits the original artwork. With an outer shadow it also removes shade where Source alpha) Tj ET
+0.083 0.176 0.263 rg
+BT /F1 8.6 Tf 1 0 0 1 52 228 Tm (is opaque.) Tj ET
+0.082 0.463 0.627 rg
+BT /F2 9.6 Tf 1 0 0 1 48 201 Tm (SOURCE AND ATTRIBUTION) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.45 Tf 1 0 0 1 48 183 Tm (From OT-Dev PR #273, extracted from Flash/Adobe Animate import PR #267 by @doangelshavewings; original) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.45 Tf 1 0 0 1 48 171 Tm (contributor attribution is preserved. Shared header shadowbevelutils.h also serves Bevel FX PR #274.) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.45 Tf 1 0 0 1 48 159 Tm (Rendering supports 8-, 16- and float-raster paths. Interactive regression testing should cover scale,) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.45 Tf 1 0 0 1 48 147 Tm (alpha, frame animation and scene save/reload.) Tj ET
+0.26 0.34 0.40 rg
+BT /F1 8.5 Tf 1 0 0 1 48 125 Tm (github.com/OpenAnimationLibrary/opentoonz-dev/pull/273) Tj ET
+endstream
+endobj
+11 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+12 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+13 0 obj
+<< /Title (Drop Shadow FX - OpenToonz User Guide) /Author (OpenAnimationLibrary) /Subject (Controls and use of Drop Shadow; comparison with Bevel and Body Highlight) >>
+endobj
+xref
+0 14
+0000000000 65535 f 
+0000000040 00000 n 
+0000000089 00000 n 
+0000000164 00000 n 
+0000000302 00000 n 
+0000003761 00000 n 
+0000003899 00000 n 
+0000008827 00000 n 
+0000008965 00000 n 
+0000013780 00000 n 
+0000013919 00000 n 
+0000017772 00000 n 
+0000017870 00000 n 
+0000017973 00000 n 
+trailer
+<< /Root 1 0 R /Info 13 0 R /Size 14 >>
+startxref
+18158
+%%EOF

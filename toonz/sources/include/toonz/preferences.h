@@ -182,6 +182,9 @@ public:
   bool isWatchFileSystemEnabled() {
     return getBoolValue(watchFileSystemEnabled);
   }
+  bool isFileBrowserFolderDoubleClick() const {
+    return getBoolValue(fileBrowserFolderDoubleClick);
+  }
   int getProjectRoot() { return getIntValue(projectRoot); }
   QString getCustomProjectRoot() { return getStringValue(customProjectRoot); }
   PathAliasPriority getPathAliasPriority() const {
@@ -216,6 +219,9 @@ public:
   }
   bool isActualPixelViewOnSceneEditingModeEnabled() const {
     return getBoolValue(actualPixelViewOnSceneEditingMode);
+  }
+  bool isSyncSceneAndLevelViewEnabled() const {
+    return getBoolValue(syncSceneAndLevelView);
   }
   bool isShowRasterImagesDarkenBlendedInViewerEnabled() const {
     return getBoolValue(showRasterImagesDarkenBlendedInViewer);

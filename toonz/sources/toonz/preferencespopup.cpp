@@ -1281,6 +1281,8 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {sceneNumberingEnabled, tr("Add Info water mark in Rendered Frames")},
       {watchFileSystemEnabled,
        tr("Watch File System and Update File Browser Automatically")},
+      {fileBrowserFolderDoubleClick,
+       tr("Open Folders in File Browser with Double-Click")},
       //{ projectRoot,               tr("") },
       {customProjectRoot, tr("Custom Project Path(s):")},
       {pathAliasPriority, tr("Path Alias Priority:")},
@@ -1300,6 +1302,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
           "Area")},
       {actualPixelViewOnSceneEditingMode,
        tr("Enable Actual Pixel View on Scene Editing Mode")},
+      {syncSceneAndLevelView, tr("Sync Scene and Level View (Zoom / Pan)")},
       {showRasterImagesDarkenBlendedInViewer,
        tr("Show Raster Images Darken Blended")},
       {iconSize, tr("Level Strip Thumbnail Size*:")},
@@ -1775,6 +1778,16 @@ PreferencesPopup::PreferencesPopup()
             QSignalBlocker blocker(saveboxCheck);
             saveboxCheck->setChecked(enabled);
           });
+  connect(TApp::instance()->getCurrentScene(), &TSceneHandle::preferenceChanged,
+          this, [this](const QString& prefName) {
+            if (prefName != "SyncSceneAndLevelView") return;
+            CheckBox* syncViewCheck = getUI<CheckBox*>(syncSceneAndLevelView);
+            if (!syncViewCheck) return;
+            bool enabled = m_pref->isSyncSceneAndLevelViewEnabled();
+            if (syncViewCheck->isChecked() == enabled) return;
+            QSignalBlocker blocker(syncViewCheck);
+            syncViewCheck->setChecked(enabled);
+          });
 }
 
 //-----------------------------------------------------------------------------
@@ -1804,6 +1817,7 @@ QWidget* PreferencesPopup::createGeneralPage() {
   insertUI(undoMemorySize, lay);
   insertUI(rasterOptimizedMemory, lay);
   insertUI(watchFileSystemEnabled, lay);
+  insertUI(fileBrowserFolderDoubleClick, lay);
   insertUI(lazyLoadRooms, lay);
 
   QGridLayout* projectRootLay =
@@ -2374,12 +2388,11 @@ QWidget* PreferencesPopup::createXsheetPage() {
     insertUI(parentColorsInXsheetColumn, xshColHeaderLay);
     insertUI(currentColumnColor, xshColHeaderLay);
 
-    // The header outline control shares the existing column text color row.
     xshColHeaderLay->addLayout(
         createOutlineControls(customCurrentColumnOutlineColorEnabled,
                               currentColumnOutlineColor,
                               tr("Current Header Outline:")),
-        xshColHeaderLay->rowCount() - 1, 2);
+        xshColHeaderLay->rowCount(), 0, 1, 3);
   }
   QGridLayout* xshCellAreaLay = insertGroupBox(tr("Xsheet Cell Area"), lay);
   {
@@ -2475,6 +2488,7 @@ QWidget* PreferencesPopup::createPreviewPage() {
     insertUI(viewerZoomCenter, viewerLay, getComboItemList(viewerZoomCenter));
     insertUI(ignoreAlphaonColumn1Enabled, viewerLay);
     insertUI(actualPixelViewOnSceneEditingMode, viewerLay);
+    insertUI(syncSceneAndLevelView, viewerLay);
     insertUI(showRasterImagesDarkenBlendedInViewer, viewerLay);
     insertUI(viewerIndicatorEnabled, viewerLay);
     insertUI(restoreViewerViewFromLastSession, viewerLay);
@@ -2511,8 +2525,17 @@ QWidget* PreferencesPopup::createPreviewPage() {
 
   m_onEditedFuncMap.insert(blanksCount, &PreferencesPopup::onBlankCountChanged);
   m_onEditedFuncMap.insert(blankColor, &PreferencesPopup::onBlankColorChanged);
+  m_onEditedFuncMap.insert(syncSceneAndLevelView,
+                           &PreferencesPopup::onSyncSceneAndLevelViewChanged);
 
   return widget;
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onSyncSceneAndLevelViewChanged() {
+  TApp::instance()->getCurrentScene()->notifyPreferenceChanged(
+      "SyncSceneAndLevelView");
 }
 
 //-----------------------------------------------------------------------------

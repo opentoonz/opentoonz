@@ -439,6 +439,7 @@ public slots:
   void resetRotation();
   void resetPosition();
   void setActualPixelSize();
+  void syncSceneAndLevelViewIfEnabled();
   void flipX();
   void flipY();
   void rotateLeft();

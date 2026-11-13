@@ -355,6 +355,7 @@
 		<file>icons/dark/actions/16x16/fold_column.svg</file>
 		<file>icons/dark/actions/16x16/sub_edit_in_place.svg</file>
 		<file>icons/dark/actions/16x16/sub_clone.svg</file>
+		<file>icons/dark/actions/16x16/sub_full_clone.svg</file>
 		<file>icons/dark/actions/16x16/duplicate.svg</file>
 		<file>icons/dark/actions/20x20/onionskin_toggle.svg</file>
 		<file>icons/dark/actions/16x16/insert_frame.svg</file>

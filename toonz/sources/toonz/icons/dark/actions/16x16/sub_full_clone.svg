@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="sub_full_clone">
+        <rect id="bg" x="0" y="0" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <rect x="0.5" y="0.5" width="15" height="15" style="fill:none;stroke:#000000;stroke-width:1.1px;stroke-opacity:0.85;"/>
+        <g transform="translate(8,8) scale(0.8) translate(-8,-8)">
+            <path d="M7,10l-6,0l0,1.001l6,-0l0,-1.001Zm-0,-3l-6,0l0,1.001l6,-0.001c0,-0.417 -0,-1 -0,-1Z" style="fill-opacity:0.5;"/>
+            <path d="M3,4l4,0l0,10l-7,0l0,-7l3,0.001l0,-3.001Zm0,9l-2,0l0,-5l2,0l0,5Zm1,0l0,-8l3,0l0,8l-3,0Z"/>
+            <path d="M7,1l8,0l0,14l-8,0l0,-14Zm3,6l-2,0l0,2l2,0l0,2l2,0l0,-2l2,0l0,-2l-2,0l0,-2l-2,0l0,2Z"/>
+        </g>
+    </g>
+</svg>
+

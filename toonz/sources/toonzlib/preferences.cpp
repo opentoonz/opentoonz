@@ -387,6 +387,8 @@ void Preferences::definePreferenceItems() {
          false);
   define(watchFileSystemEnabled, "watchFileSystemEnabled", QMetaType::Bool,
          true);
+  define(fileBrowserFolderDoubleClick, "fileBrowserFolderDoubleClick",
+         QMetaType::Bool, false);
   define(projectRoot, "projectRoot", QMetaType::Int, 0x08);
   define(customProjectRoot, "customProjectRoot", QMetaType::QString, "");
   define(pathAliasPriority, "pathAliasPriority", QMetaType::Int,
@@ -420,6 +422,7 @@ void Preferences::definePreferenceItems() {
          QMetaType::Bool, true);
   define(actualPixelViewOnSceneEditingMode, "actualPixelViewOnSceneEditingMode",
          QMetaType::Bool, false);
+  define(syncSceneAndLevelView, "syncSceneAndLevelView", QMetaType::Bool, true);
   define(showRasterImagesDarkenBlendedInViewer,
          "showRasterImagesDarkenBlendedInViewer", QMetaType::Bool, false);
   define(iconSize, "iconSize", QMetaType::QSize, QSize(80, 45), QSize(10, 10),

@@ -67,6 +67,7 @@ public:
 
   virtual bool isEmpty() const = 0;
   virtual void selectNone()    = 0;
+  virtual bool keepItemsWhenFocusMovesTo(TSelection *) const { return false; }
 
   virtual bool addMenuActions(QMenu *menu) { return false; }
   void addMenuAction(QMenu *menu, CommandId cmdId);

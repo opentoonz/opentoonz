@@ -1,0 +1,14 @@
+<fxlayout help_file="DropShadowFx.pdf">
+  <page name="Drop Shadow">
+     <control>color</control>
+     <control>blur_x</control>
+     <control>blur_y</control>
+     <control>quality</control>
+     <control>strength</control>
+     <control>angle</control>
+     <control>distance</control>
+     <control>inner</control>
+     <control>knockout</control>
+     <control>hide_object</control>
+  </page>
+</fxlayout>

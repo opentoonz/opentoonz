@@ -103,6 +103,8 @@ public:
 
   void enableGlobalSelection(bool enabled);
   void selectNone();
+  void storePersistedSelection();
+  void onSelectedItems(const std::set<int> &indexes);
 
   QSplitter *getMainSplitter() const { return m_mainSplitter; }
 
@@ -150,7 +152,6 @@ protected slots:
   void loadResources();
   void onClickedItem(int index);
   void onDoubleClickedItem(int index);
-  void onSelectedItems(const std::set<int> &indexes);
   void onSceneSwitched();
   void newScene();
 
@@ -241,9 +242,11 @@ private:
   // Folder history
   QList<QModelIndex> m_indexHistoryList;
   int m_currentPosition;
+  bool m_giveCommandToRestoredFiles = false;
   int m_currentScroll;
 
   std::vector<Item> m_items;
+  std::map<std::wstring, std::vector<TFilePath>> m_selectionByFolder;
   TFilePath m_folder;
   std::string m_dayDateString;
   QStringList m_filter;
@@ -254,6 +257,9 @@ private:
   void readInfo(Item &item);
 
   void refreshCurrentFolderItems();
+  std::wstring selectionPlace() const;
+  void restorePersistedSelection();
+  void replacePersistedPath(const TFilePath &from, const TFilePath &to);
 
   DvItemListModel::Status getItemVersionControlStatus(
       const SceneBrowser::Item &item);

@@ -100,15 +100,28 @@ void TXshPaletteLevel::load() {
 
 void TXshPaletteLevel::save() {
   TFilePath path = getScene()->decodeFilePath(m_path);
-  if (TSystem::doesExistFileOrLevel(path) && m_palette) {
+  if (!m_palette) return;
+  const bool exists = TSystem::doesExistFileOrLevel(path);
+  // A new palette (e.g. a clone) has no file yet: create it when modified
+  if (!exists && !m_palette->getDirtyFlag()) return;
+  if (exists) {
     TFileStatus fs(path);
     if (!fs.isWritable()) {
       throw TSystemException(
           path, "The palette cannot be saved: it is a read only palette.");
     }
-    TOStream os(path);
-    os << m_palette;
   }
+  TOStream os(path);
+  if (!os) {
+    throw TSystemException(
+        path, "The palette cannot be saved: the file cannot be created.");
+  }
+  os << m_palette;
+  if (!os.checkStatus()) {
+    throw TSystemException(
+        path, "The palette cannot be saved: the file cannot be written.");
+  }
+  m_palette->setDirtyFlag(false);
 }
 
 //-----------------------------------------------------------------------------

@@ -17,6 +17,7 @@
 
 // Qt includes
 #include <QTreeView>
+#include <QMouseEvent>
 #include <QItemDelegate>
 #include <QWidget>
 #include <QFileSystemWatcher>
@@ -169,6 +170,7 @@ public:
 
 signals:
   void currentNodeChanged();  //!< Emitted when user selects a different node.
+  void emptySpacePressed();
 
 public slots:
   void deleteFolder();  //!< Deletes the selected folder.
@@ -225,6 +227,7 @@ protected:
   void resizeEvent(QResizeEvent *event) override;
 
   // QAbstractItemView overrides
+  void mousePressEvent(QMouseEvent *event) override;
   void currentChanged(const QModelIndex &current,
                       const QModelIndex &previous) override;
   bool edit(const QModelIndex &index, EditTrigger trigger,

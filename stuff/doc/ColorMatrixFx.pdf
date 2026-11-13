@@ -1,0 +1,534 @@
+%PDF-1.4
+%OpenToonz ColorMatrixFx documentation
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R] /Count 3 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 6424 >>
+stream
+0.080 0.170 0.270 rg
+0 778 612 14 re f
+0.080 0.170 0.270 rg
+BT /F2 8 Tf 1 0 0 1 52 755 Tm (OPENTOONZ  /  FX REFERENCE) Tj ET
+0.080 0.530 0.570 rg
+BT /F2 8 Tf 1 0 0 1 472 755 Tm (COLOR MATRIX) Tj ET
+0.830 0.880 0.920 RG
+52 48 m 560 48 l S
+0.360 0.430 0.510 rg
+BT /F1 7.5 Tf 1 0 0 1 52 31 Tm (Help file: ColorMatrixFx.pdf  |  stuff/doc) Tj ET
+0.360 0.430 0.510 rg
+BT /F2 8 Tf 1 0 0 1 550 31 Tm (1) Tj ET
+0.080 0.530 0.570 rg
+BT /F2 8 Tf 1 0 0 1 52 694 Tm (FX SETTINGS HELP) Tj ET
+0.080 0.170 0.270 rg
+BT /F2 23 Tf 1 0 0 1 52 657 Tm (Color Matrix FX) Tj ET
+0.360 0.430 0.510 rg
+BT /F1 9.5 Tf 1 0 0 1 52 628 Tm (An advanced 4 x 5 RGBA matrix for channel remapping,) Tj ET
+0.360 0.430 0.510 rg
+BT /F1 9.5 Tf 1 0 0 1 52 614 Tm (inversion, brightness, contrast and Adobe Animate-style) Tj ET
+0.360 0.430 0.510 rg
+BT /F1 9.5 Tf 1 0 0 1 52 600 Tm (color effects.) Tj ET
+0.940 0.970 0.985 rg
+52 526 508 70 re f
+0.080 0.170 0.270 rg
+BT /F2 10 Tf 1 0 0 1 64 574 Tm (Find it in OpenToonz) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.4 Tf 1 0 0 1 64 555 Tm (FX Schematic > Add FX > Image Adjust > Color Matrix.) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.4 Tf 1 0 0 1 64 542.7 Tm (Connect a source image or column to Source and edit its) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.4 Tf 1 0 0 1 64 530.4000000000001 Tm (settings. All 20 controls can be keyframed.) Tj ET
+0.080 0.170 0.270 rg
+BT /F2 12.5 Tf 1 0 0 1 52 491 Tm (How the matrix works) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.8 Tf 1 0 0 1 52 473 Tm (Each output row \(Red, Green, Blue, Alpha\) mixes four input) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.8 Tf 1 0 0 1 52 460 Tm (channels and adds an independent Offset. The default is) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.8 Tf 1 0 0 1 52 447 Tm (an identity matrix, which leaves the input unchanged.) Tj ET
+0.080 0.170 0.270 rg
+52 397 508 32 re f
+1.000 1.000 1.000 rg
+BT /F2 8 Tf 1 0 0 1 60 409 Tm (OUTPUT) Tj ET
+0.830 0.880 0.920 RG
+145 397 m 145 429 l S
+1.000 1.000 1.000 rg
+BT /F2 8 Tf 1 0 0 1 153 409 Tm (RED) Tj ET
+0.830 0.880 0.920 RG
+225 397 m 225 429 l S
+1.000 1.000 1.000 rg
+BT /F2 8 Tf 1 0 0 1 233 409 Tm (GREEN) Tj ET
+0.830 0.880 0.920 RG
+305 397 m 305 429 l S
+1.000 1.000 1.000 rg
+BT /F2 8 Tf 1 0 0 1 313 409 Tm (BLUE) Tj ET
+0.830 0.880 0.920 RG
+385 397 m 385 429 l S
+1.000 1.000 1.000 rg
+BT /F2 8 Tf 1 0 0 1 393 409 Tm (ALPHA) Tj ET
+0.830 0.880 0.920 RG
+465 397 m 465 429 l S
+1.000 1.000 1.000 rg
+BT /F2 8 Tf 1 0 0 1 473 409 Tm (OFFSET) Tj ET
+0.830 0.880 0.920 RG
+52 397 m 560 397 l S
+0.970 0.980 0.990 rg
+52 365 508 32 re f
+0.080 0.170 0.270 rg
+BT /F2 9 Tf 1 0 0 1 60 377 Tm (Red) Tj ET
+0.830 0.880 0.920 RG
+145 365 m 145 397 l S
+0.080 0.170 0.270 rg
+BT /F1 9 Tf 1 0 0 1 153 377 Tm (1) Tj ET
+0.830 0.880 0.920 RG
+225 365 m 225 397 l S
+0.080 0.170 0.270 rg
+BT /F1 9 Tf 1 0 0 1 233 377 Tm (0) Tj ET
+0.830 0.880 0.920 RG
+305 365 m 305 397 l S
+0.080 0.170 0.270 rg
+BT /F1 9 Tf 1 0 0 1 313 377 Tm (0) Tj ET
+0.830 0.880 0.920 RG
+385 365 m 385 397 l S
+0.080 0.170 0.270 rg
+BT /F1 9 Tf 1 0 0 1 393 377 Tm (0) Tj ET
+0.830 0.880 0.920 RG
+465 365 m 465 397 l S
+0.080 0.170 0.270 rg
+BT /F1 9 Tf 1 0 0 1 473 377 Tm (0) Tj ET
+0.830 0.880 0.920 RG
+52 365 m 560 365 l S
+0.940 0.970 0.985 rg
+52 333 508 32 re f
+0.080 0.170 0.270 rg
+BT /F2 9 Tf 1 0 0 1 60 345 Tm (Green) Tj ET
+0.830 0.880 0.920 RG
+145 333 m 145 365 l S
+0.080 0.170 0.270 rg
+BT /F1 9 Tf 1 0 0 1 153 345 Tm (0) Tj ET
+0.830 0.880 0.920 RG
+225 333 m 225 365 l S
+0.080 0.170 0.270 rg
+BT /F1 9 Tf 1 0 0 1 233 345 Tm (1) Tj ET
+0.830 0.880 0.920 RG
+305 333 m 305 365 l S
+0.080 0.170 0.270 rg
+BT /F1 9 Tf 1 0 0 1 313 345 Tm (0) Tj ET
+0.830 0.880 0.920 RG
+385 333 m 385 365 l S
+0.080 0.170 0.270 rg
+BT /F1 9 Tf 1 0 0 1 393 345 Tm (0) Tj ET
+0.830 0.880 0.920 RG
+465 333 m 465 365 l S
+0.080 0.170 0.270 rg
+BT /F1 9 Tf 1 0 0 1 473 345 Tm (0) Tj ET
+0.830 0.880 0.920 RG
+52 333 m 560 333 l S
+0.970 0.980 0.990 rg
+52 301 508 32 re f
+0.080 0.170 0.270 rg
+BT /F2 9 Tf 1 0 0 1 60 313 Tm (Blue) Tj ET
+0.830 0.880 0.920 RG
+145 301 m 145 333 l S
+0.080 0.170 0.270 rg
+BT /F1 9 Tf 1 0 0 1 153 313 Tm (0) Tj ET
+0.830 0.880 0.920 RG
+225 301 m 225 333 l S
+0.080 0.170 0.270 rg
+BT /F1 9 Tf 1 0 0 1 233 313 Tm (0) Tj ET
+0.830 0.880 0.920 RG
+305 301 m 305 333 l S
+0.080 0.170 0.270 rg
+BT /F1 9 Tf 1 0 0 1 313 313 Tm (1) Tj ET
+0.830 0.880 0.920 RG
+385 301 m 385 333 l S
+0.080 0.170 0.270 rg
+BT /F1 9 Tf 1 0 0 1 393 313 Tm (0) Tj ET
+0.830 0.880 0.920 RG
+465 301 m 465 333 l S
+0.080 0.170 0.270 rg
+BT /F1 9 Tf 1 0 0 1 473 313 Tm (0) Tj ET
+0.830 0.880 0.920 RG
+52 301 m 560 301 l S
+0.940 0.970 0.985 rg
+52 269 508 32 re f
+0.080 0.170 0.270 rg
+BT /F2 9 Tf 1 0 0 1 60 281 Tm (Alpha) Tj ET
+0.830 0.880 0.920 RG
+145 269 m 145 301 l S
+0.080 0.170 0.270 rg
+BT /F1 9 Tf 1 0 0 1 153 281 Tm (0) Tj ET
+0.830 0.880 0.920 RG
+225 269 m 225 301 l S
+0.080 0.170 0.270 rg
+BT /F1 9 Tf 1 0 0 1 233 281 Tm (0) Tj ET
+0.830 0.880 0.920 RG
+305 269 m 305 301 l S
+0.080 0.170 0.270 rg
+BT /F1 9 Tf 1 0 0 1 313 281 Tm (0) Tj ET
+0.830 0.880 0.920 RG
+385 269 m 385 301 l S
+0.080 0.170 0.270 rg
+BT /F1 9 Tf 1 0 0 1 393 281 Tm (1) Tj ET
+0.830 0.880 0.920 RG
+465 269 m 465 301 l S
+0.080 0.170 0.270 rg
+BT /F1 9 Tf 1 0 0 1 473 281 Tm (0) Tj ET
+0.830 0.880 0.920 RG
+52 269 m 560 269 l S
+0.080 0.170 0.270 rg
+BT /F3 8.1 Tf 1 0 0 1 52 248 Tm (Red' = red_red*R + red_green*G + red_blue*B + red_alpha*A + red_offset/255) Tj ET
+0.940 0.970 0.985 rg
+52 140 508 80 re f
+0.080 0.170 0.270 rg
+BT /F2 10 Tf 1 0 0 1 64 198 Tm (Ranges and units) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.4 Tf 1 0 0 1 64 179 Tm (Mixing coefficients range from -16 to +16; channel offsets) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.4 Tf 1 0 0 1 64 166.7 Tm (range from -1024 to +1024 in 8-bit units. An offset of) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.4 Tf 1 0 0 1 64 154.39999999999998 Tm (+30 adds about 30/255 to a normalized channel value. Output) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.4 Tf 1 0 0 1 64 142.09999999999997 Tm (RGB is premultiplied by alpha.) Tj ET
+0.080 0.170 0.270 rg
+BT /F2 11.5 Tf 1 0 0 1 52 119 Tm (Getting started) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.5 Tf 1 0 0 1 52 98 Tm (1. Pick an output row. 2. Edit input contributions. 3. Set) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.5 Tf 1 0 0 1 52 86 Tm (Offset for a constant addition or subtraction. 4. Animate) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.5 Tf 1 0 0 1 52 74 Tm (parameters using regular FX keyframes.) Tj ET
+0.080 0.530 0.570 rg
+BT /F2 8.4 Tf 1 0 0 1 52 61 Tm (FX Intensity: 1.0 = full effect; 0.0 = original Source; keyframeable) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 9 0 R >>
+endobj
+9 0 obj
+<< /Length 3889 >>
+stream
+0.080 0.170 0.270 rg
+0 778 612 14 re f
+0.080 0.170 0.270 rg
+BT /F2 8 Tf 1 0 0 1 52 755 Tm (OPENTOONZ  /  FX REFERENCE) Tj ET
+0.080 0.530 0.570 rg
+BT /F2 8 Tf 1 0 0 1 472 755 Tm (COLOR MATRIX) Tj ET
+0.830 0.880 0.920 RG
+52 48 m 560 48 l S
+0.360 0.430 0.510 rg
+BT /F1 7.5 Tf 1 0 0 1 52 31 Tm (Help file: ColorMatrixFx.pdf  |  stuff/doc) Tj ET
+0.360 0.430 0.510 rg
+BT /F2 8 Tf 1 0 0 1 550 31 Tm (2) Tj ET
+0.080 0.530 0.570 rg
+BT /F2 8 Tf 1 0 0 1 52 694 Tm (EXAMPLES) Tj ET
+0.080 0.170 0.270 rg
+BT /F2 23 Tf 1 0 0 1 52 657 Tm (Practical color recipes) Tj ET
+0.360 0.430 0.510 rg
+BT /F1 9.5 Tf 1 0 0 1 52 628 Tm (Begin at the identity defaults. Change only the specified) Tj ET
+0.360 0.430 0.510 rg
+BT /F1 9.5 Tf 1 0 0 1 52 614 Tm (controls unless a recipe replaces a whole row.) Tj ET
+0.360 0.430 0.510 rg
+BT /F2 8 Tf 1 0 0 1 52 568 Tm (INVERT RGB) Tj ET
+0.800 0.200 0.200 rg
+52 525 82 32 re f
+0.360 0.430 0.510 rg
+BT /F2 12 Tf 1 0 0 1 147 539 Tm (>) Tj ET
+0.200 0.800 0.800 rg
+169 525 82 32 re f
+0.360 0.430 0.510 rg
+BT /F2 8 Tf 1 0 0 1 289 568 Tm (BRIGHTEN +30) Tj ET
+0.353 0.451 0.565 rg
+289 525 82 32 re f
+0.360 0.430 0.510 rg
+BT /F2 12 Tf 1 0 0 1 384 539 Tm (>) Tj ET
+0.471 0.569 0.682 rg
+406 525 82 32 re f
+0.080 0.170 0.270 rg
+BT /F2 9.6 Tf 1 0 0 1 52 507 Tm (INVERT RGB) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.5 Tf 1 0 0 1 52 493.4 Tm (Set red_red, green_green, blue_blue = -1 and red_offset,) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.5 Tf 1 0 0 1 52 483.8 Tm (green_offset, blue_offset = +255. Alpha is unchanged.) Tj ET
+0.830 0.880 0.920 RG
+52 471 m 560 471 l S
+0.080 0.170 0.270 rg
+BT /F2 9.6 Tf 1 0 0 1 52 454.2 Tm (BRIGHTNESS) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.5 Tf 1 0 0 1 52 440.6 Tm (Set red_offset, green_offset, blue_offset = +30 to increase) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.5 Tf 1 0 0 1 52 431 Tm (color values on nontransparent source pixels.) Tj ET
+0.830 0.880 0.920 RG
+52 418.2 m 560 418.2 l S
+0.080 0.170 0.270 rg
+BT /F2 9.6 Tf 1 0 0 1 52 401.4 Tm (CONTRAST) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.5 Tf 1 0 0 1 52 387.8 Tm (Set red_red, green_green, blue_blue = 1.2 and the three RGB) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.5 Tf 1 0 0 1 52 378.2 Tm (offsets = -25.5. Anchors midgray while increasing contrast;) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.5 Tf 1 0 0 1 52 368.6 Tm (extremes may clip.) Tj ET
+0.830 0.880 0.920 RG
+52 355.8 m 560 355.8 l S
+0.080 0.170 0.270 rg
+BT /F2 9.6 Tf 1 0 0 1 52 339 Tm (BOOST RED) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.5 Tf 1 0 0 1 52 325.4 Tm (Set red_red = 1.4. This gain exceeds Channel Mixer's maximum) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.5 Tf 1 0 0 1 52 315.8 Tm (coefficient of 1.0.) Tj ET
+0.830 0.880 0.920 RG
+52 303 m 560 303 l S
+0.080 0.170 0.270 rg
+BT /F2 9.6 Tf 1 0 0 1 52 286.2 Tm (GRAYSCALE) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.5 Tf 1 0 0 1 52 272.6 Tm (Replace each RGB output row with [0.2126, 0.7152, 0.0722,) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.5 Tf 1 0 0 1 52 263 Tm (0, 0]. Channel Mixer can also express this nonnegative) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.5 Tf 1 0 0 1 52 253.4 Tm (combination.) Tj ET
+0.830 0.880 0.920 RG
+52 240.6 m 560 240.6 l S
+0.080 0.170 0.270 rg
+BT /F2 9.6 Tf 1 0 0 1 52 223.8 Tm (HALF OPACITY) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.5 Tf 1 0 0 1 52 210.2 Tm (Set alpha_alpha = 0.5. This adjustment is also available) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.5 Tf 1 0 0 1 52 200.6 Tm (with Channel Mixer.) Tj ET
+0.830 0.880 0.920 RG
+52 187.8 m 560 187.8 l S
+0.940 0.970 0.985 rg
+52 67 508 72 re f
+0.080 0.170 0.270 rg
+BT /F2 10 Tf 1 0 0 1 64 117 Tm (Offsets do not create new pixels) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.4 Tf 1 0 0 1 64 98 Tm (Pixels whose source alpha is exactly zero are skipped.) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.4 Tf 1 0 0 1 64 85.7 Tm (Even a positive Alpha Offset will not generate content in) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.4 Tf 1 0 0 1 64 73.4 Tm (fully transparent regions.) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 11 0 R >>
+endobj
+11 0 obj
+<< /Length 6366 >>
+stream
+0.080 0.170 0.270 rg
+0 778 612 14 re f
+0.080 0.170 0.270 rg
+BT /F2 8 Tf 1 0 0 1 52 755 Tm (OPENTOONZ  /  FX REFERENCE) Tj ET
+0.080 0.530 0.570 rg
+BT /F2 8 Tf 1 0 0 1 472 755 Tm (COLOR MATRIX) Tj ET
+0.830 0.880 0.920 RG
+52 48 m 560 48 l S
+0.360 0.430 0.510 rg
+BT /F1 7.5 Tf 1 0 0 1 52 31 Tm (Help file: ColorMatrixFx.pdf  |  stuff/doc) Tj ET
+0.360 0.430 0.510 rg
+BT /F2 8 Tf 1 0 0 1 550 31 Tm (3) Tj ET
+0.080 0.530 0.570 rg
+BT /F2 8 Tf 1 0 0 1 52 694 Tm (COMPARISON & RENDERING) Tj ET
+0.080 0.170 0.270 rg
+BT /F2 23 Tf 1 0 0 1 52 657 Tm (Color Matrix vs. Channel Mixer) Tj ET
+0.360 0.430 0.510 rg
+BT /F1 9.5 Tf 1 0 0 1 52 628 Tm (Both effects mix RGBA channels, but Color Matrix adds) Tj ET
+0.360 0.430 0.510 rg
+BT /F1 9.5 Tf 1 0 0 1 52 614 Tm (signed coefficients and independent offsets.) Tj ET
+0.080 0.170 0.270 rg
+52 556 508 29 re f
+1.000 1.000 1.000 rg
+BT /F2 8 Tf 1 0 0 1 59 569 Tm (CAPABILITY) Tj ET
+0.830 0.880 0.920 RG
+232 556 m 232 585 l S
+1.000 1.000 1.000 rg
+BT /F2 8 Tf 1 0 0 1 239 569 Tm (CHANNEL MIXER) Tj ET
+0.830 0.880 0.920 RG
+390 556 m 390 585 l S
+1.000 1.000 1.000 rg
+BT /F2 8 Tf 1 0 0 1 397 569 Tm (COLOR MATRIX) Tj ET
+0.830 0.880 0.920 RG
+52 556 m 560 556 l S
+0.970 0.980 0.990 rg
+52 532 508 24 re f
+0.080 0.170 0.270 rg
+BT /F2 8.2 Tf 1 0 0 1 59 540 Tm (Channel coefficients) Tj ET
+0.830 0.880 0.920 RG
+232 532 m 232 556 l S
+0.080 0.170 0.270 rg
+BT /F1 8.2 Tf 1 0 0 1 239 540 Tm (16 in 0..1) Tj ET
+0.830 0.880 0.920 RG
+390 532 m 390 556 l S
+0.080 0.170 0.270 rg
+BT /F1 8.2 Tf 1 0 0 1 397 540 Tm (16 in -16..+16) Tj ET
+0.830 0.880 0.920 RG
+52 532 m 560 532 l S
+0.940 0.970 0.985 rg
+52 508 508 24 re f
+0.080 0.170 0.270 rg
+BT /F2 8.2 Tf 1 0 0 1 59 516 Tm (Independent offsets) Tj ET
+0.830 0.880 0.920 RG
+232 508 m 232 532 l S
+0.080 0.170 0.270 rg
+BT /F1 8.2 Tf 1 0 0 1 239 516 Tm (None) Tj ET
+0.830 0.880 0.920 RG
+390 508 m 390 532 l S
+0.080 0.170 0.270 rg
+BT /F1 8.2 Tf 1 0 0 1 397 516 Tm (4 in -1024..+1024) Tj ET
+0.830 0.880 0.920 RG
+52 508 m 560 508 l S
+0.970 0.980 0.990 rg
+52 484 508 24 re f
+0.080 0.170 0.270 rg
+BT /F2 8.2 Tf 1 0 0 1 59 492 Tm (Negative or >1 gains) Tj ET
+0.830 0.880 0.920 RG
+232 484 m 232 508 l S
+0.080 0.170 0.270 rg
+BT /F1 8.2 Tf 1 0 0 1 239 492 Tm (No) Tj ET
+0.830 0.880 0.920 RG
+390 484 m 390 508 l S
+0.080 0.170 0.270 rg
+BT /F1 8.2 Tf 1 0 0 1 397 492 Tm (Yes) Tj ET
+0.830 0.880 0.920 RG
+52 484 m 560 484 l S
+0.940 0.970 0.985 rg
+52 460 508 24 re f
+0.080 0.170 0.270 rg
+BT /F2 8.2 Tf 1 0 0 1 59 468 Tm (FX Intensity) Tj ET
+0.830 0.880 0.920 RG
+232 460 m 232 484 l S
+0.080 0.170 0.270 rg
+BT /F1 8.2 Tf 1 0 0 1 239 468 Tm (Present \(global blend\)) Tj ET
+0.830 0.880 0.920 RG
+390 460 m 390 484 l S
+0.080 0.170 0.270 rg
+BT /F1 8.2 Tf 1 0 0 1 397 468 Tm (Present \(global blend\)) Tj ET
+0.830 0.880 0.920 RG
+52 460 m 560 460 l S
+0.970 0.980 0.990 rg
+52 436 508 24 re f
+0.080 0.170 0.270 rg
+BT /F2 8.2 Tf 1 0 0 1 59 444 Tm (Keyframeable controls) Tj ET
+0.830 0.880 0.920 RG
+232 436 m 232 460 l S
+0.080 0.170 0.270 rg
+BT /F1 8.2 Tf 1 0 0 1 239 444 Tm (Yes) Tj ET
+0.830 0.880 0.920 RG
+390 436 m 390 460 l S
+0.080 0.170 0.270 rg
+BT /F1 8.2 Tf 1 0 0 1 397 444 Tm (Yes) Tj ET
+0.830 0.880 0.920 RG
+52 436 m 560 436 l S
+0.940 0.970 0.985 rg
+52 412 508 24 re f
+0.080 0.170 0.270 rg
+BT /F2 8.2 Tf 1 0 0 1 59 420 Tm (8/16-bit and float) Tj ET
+0.830 0.880 0.920 RG
+232 412 m 232 436 l S
+0.080 0.170 0.270 rg
+BT /F1 8.2 Tf 1 0 0 1 239 420 Tm (Yes) Tj ET
+0.830 0.880 0.920 RG
+390 412 m 390 436 l S
+0.080 0.170 0.270 rg
+BT /F1 8.2 Tf 1 0 0 1 397 420 Tm (Yes) Tj ET
+0.830 0.880 0.920 RG
+52 412 m 560 412 l S
+0.970 0.980 0.990 rg
+52 388 508 24 re f
+0.080 0.170 0.270 rg
+BT /F2 8.2 Tf 1 0 0 1 59 396 Tm (Identity fast path) Tj ET
+0.830 0.880 0.920 RG
+232 388 m 232 412 l S
+0.080 0.170 0.270 rg
+BT /F1 8.2 Tf 1 0 0 1 239 396 Tm (No) Tj ET
+0.830 0.880 0.920 RG
+390 388 m 390 412 l S
+0.080 0.170 0.270 rg
+BT /F1 8.2 Tf 1 0 0 1 397 396 Tm (Yes) Tj ET
+0.830 0.880 0.920 RG
+52 388 m 560 388 l S
+0.080 0.170 0.270 rg
+BT /F2 12 Tf 1 0 0 1 52 364 Tm (Rendering details) Tj ET
+0.080 0.170 0.270 rg
+BT /F2 9 Tf 1 0 0 1 52 344.68 Tm (Premultiplied alpha.) Tj ET
+0.360 0.430 0.510 rg
+BT /F1 8.2 Tf 1 0 0 1 52 332.08 Tm (Both effects mix unpremultiplied colors and then premultiply) Tj ET
+0.360 0.430 0.510 rg
+BT /F1 8.2 Tf 1 0 0 1 52 322.84 Tm (by output alpha. Different rounding can produce small pixel) Tj ET
+0.360 0.430 0.510 rg
+BT /F1 8.2 Tf 1 0 0 1 52 313.6 Tm (differences.) Tj ET
+0.080 0.170 0.270 rg
+BT /F2 9 Tf 1 0 0 1 52 299.32 Tm (Transparent areas.) Tj ET
+0.360 0.430 0.510 rg
+BT /F1 8.2 Tf 1 0 0 1 52 286.72 Tm (Color Matrix skips pixels with zero input alpha; Alpha Offset) Tj ET
+0.360 0.430 0.510 rg
+BT /F1 8.2 Tf 1 0 0 1 52 277.48 Tm (alone cannot fill completely transparent regions.) Tj ET
+0.080 0.170 0.270 rg
+BT /F2 9 Tf 1 0 0 1 52 263.2 Tm (Floating-point/HDR.) Tj ET
+0.360 0.430 0.510 rg
+BT /F1 8.2 Tf 1 0 0 1 52 250.6 Tm (Color Matrix clamps alpha into 0..1 and negative RGB to zero) Tj ET
+0.360 0.430 0.510 rg
+BT /F1 8.2 Tf 1 0 0 1 52 241.36 Tm (while preserving RGB over 1. Channel Mixer does not explicitly) Tj ET
+0.360 0.430 0.510 rg
+BT /F1 8.2 Tf 1 0 0 1 52 232.12 Tm (clamp float alpha the same way.) Tj ET
+0.080 0.170 0.270 rg
+BT /F2 9 Tf 1 0 0 1 52 217.84 Tm (FX Intensity.) Tj ET
+0.360 0.430 0.510 rg
+BT /F1 8.2 Tf 1 0 0 1 52 205.24 Tm (Both effects use GlobalControllableFx to mix the effect with) Tj ET
+0.360 0.430 0.510 rg
+BT /F1 8.2 Tf 1 0 0 1 52 196 Tm (the input. 1.0 \(100%\) applies it; 0.0 \(0%\) bypasses it.) Tj ET
+0.360 0.430 0.510 rg
+BT /F1 8.2 Tf 1 0 0 1 52 186.76 Tm (Intermediate intensities blend both; the slider is animatable.) Tj ET
+0.080 0.170 0.270 rg
+BT /F2 10 Tf 1 0 0 1 52 168.28 Tm (Which one should I use?) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.2 Tf 1 0 0 1 52 151.48 Tm (Use Channel Mixer for nonnegative channel blends with) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.2 Tf 1 0 0 1 52 141.74 Tm (Intensity. Use Color Matrix for inversion, offsets, contrast) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.2 Tf 1 0 0 1 52 131.99 Tm (shifts, gains above 1 and imported Adobe Animate color) Tj ET
+0.080 0.170 0.270 rg
+BT /F1 8.2 Tf 1 0 0 1 52 122.25 Tm (filters.) Tj ET
+0.360 0.430 0.510 rg
+BT /F1 8 Tf 1 0 0 1 52 104.1 Tm (Original FX implementation: @doangelshavewings, Flash Import PR #267.) Tj ET
+0.360 0.430 0.510 rg
+BT /F1 8 Tf 1 0 0 1 52 93.18 Tm (Standalone Color Matrix extraction: OT-Dev PR #272.) Tj ET
+endstream
+endobj
+12 0 obj
+<< /Title (Color Matrix FX Help) /Author (OpenAnimationLibrary) /Subject (Color Matrix vs Channel Mixer, FX Intensity, FX recipes and original author attribution) >>
+endobj
+xref
+0 13
+0000000000 65535 f 
+0000000048 00000 n 
+0000000097 00000 n 
+0000000167 00000 n 
+0000000264 00000 n 
+0000000366 00000 n 
+0000000461 00000 n 
+0000000607 00000 n 
+0000007082 00000 n 
+0000007228 00000 n 
+0000011168 00000 n 
+0000011316 00000 n 
+0000017734 00000 n 
+trailer
+<< /Root 1 0 R /Size 13 /Info 12 0 R >>
+startxref
+17916
+%%EOF
