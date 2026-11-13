@@ -164,6 +164,7 @@ protected slots:
   void onDoubleClickedItem(int index);
   void folderUp();
   void newFolder();
+  void newFolderInList();
 
   void onBackButtonPushed();
   void onFwdButtonPushed();
@@ -263,6 +264,9 @@ private:
   std::map<TFilePath, Item> m_multiFileItemMap;
 
 private:
+  TFilePath createChildFolder(const TFilePath &parentFolder);
+  void editNewFolderInTree(const QModelIndex &parentFolderIndex,
+                           const TFilePath &folderPath);
   void readFrameCount(Item &item);
   void readInfo(Item &item);
   void refreshCurrentFolderItems();
