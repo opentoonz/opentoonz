@@ -2318,6 +2318,7 @@ void FileBrowser::folderUp() {
 //-----------------------------------------------------------------------------
 
 void FileBrowser::newFolder() {
+  m_folderTreeView->commitCurrentEdit();
   TFilePath parentFolder = getFolder();
   if (parentFolder == TFilePath() || !TFileStatus(parentFolder).isDirectory())
     return;

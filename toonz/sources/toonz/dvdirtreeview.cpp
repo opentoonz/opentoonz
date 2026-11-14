@@ -642,6 +642,16 @@ DvDirModelNode *DvDirTreeView::getCurrentNode() const {
 
 //-----------------------------------------------------------------------------
 
+void DvDirTreeView::commitCurrentEdit() {
+  if (state() != QAbstractItemView::EditingState) return;
+  QWidget *editor = indexWidget(currentIndex());
+  if (!editor) return;
+  commitData(editor);
+  closeEditor(editor, QAbstractItemDelegate::NoHint);
+}
+
+//-----------------------------------------------------------------------------
+
 void DvDirTreeView::mousePressEvent(QMouseEvent *event) {
   QModelIndex index = indexAt(event->pos());
   StyledTreeView::mousePressEvent(event);
