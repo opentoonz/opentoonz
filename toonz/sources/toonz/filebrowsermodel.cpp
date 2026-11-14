@@ -247,7 +247,20 @@ bool DvDirModelFileFolderNode::setName(std::wstring newName) {
   }
   m_path = dstPath;
   m_name = newName;
+  updateDescendantPaths(srcPath, dstPath);
   return true;
+}
+
+void DvDirModelFileFolderNode::updateDescendantPaths(const TFilePath &oldPath,
+                                                     const TFilePath &newPath) {
+  for (DvDirModelNode *child : m_children) {
+    DvDirModelFileFolderNode *folderNode =
+        dynamic_cast<DvDirModelFileFolderNode *>(child);
+    if (!folderNode) continue;
+    if (oldPath.isAncestorOf(folderNode->m_path))
+      folderNode->m_path = newPath + (folderNode->m_path - oldPath);
+    folderNode->updateDescendantPaths(oldPath, newPath);
+  }
 }
 
 bool DvDirModelFileFolderNode::hasChildren() {

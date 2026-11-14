@@ -126,6 +126,8 @@ public:
   int rowByName(const std::wstring &name) const override;  //?????
 
   bool setName(std::wstring newName) override;  // chiamarlo rename ????
+  void updateDescendantPaths(const TFilePath &oldPath,
+                             const TFilePath &newPath);
   bool isFolder(const TFilePath &folderPath) const override {
     return folderPath == m_path;
   }
