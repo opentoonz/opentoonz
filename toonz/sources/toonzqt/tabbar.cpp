@@ -38,8 +38,7 @@ void TabBar::paintEvent(QPaintEvent *event) {
       tabRectangle = tabRectangle.adjusted(0, -2, 0, 0);
       pixmapIndex++;
     }
-    if (pixmapIndex >= (int)m_pixmaps.size() ||
-        m_pixmaps[pixmapIndex].isNull())
+    if (pixmapIndex >= (int)m_pixmaps.size() || m_pixmaps[pixmapIndex].isNull())
       continue;
     p.drawPixmap(tabRectangle.x(), tabRectangle.y(), m_pixmaps[pixmapIndex]);
   }
