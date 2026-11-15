@@ -373,7 +373,7 @@ public:
 
     double angle = m_lightAngle->getValue(frame) * M_PI_180;
     TPointD dir  = ri.m_affine.transformDirection(
-        TPointD(std::cos(angle), std::sin(angle)));
+         TPointD(std::cos(angle), std::sin(angle)));
     s.m_direction = dir;
 
     const TPixel32 shade  = m_shadeColor->getValue(frame);
