@@ -281,8 +281,8 @@ bool DoubleValueField::setSliderRange(double minValue, double maxValue) {
   return true;
 }
 
-bool DoubleValueField::getSliderRange(double &minValue,
-                                      double &maxValue) const {
+bool DoubleValueField::getSliderRange(double& minValue,
+                                      double& maxValue) const {
   if (!m_hasSliderRange) return false;
   const double scale = std::pow(10.0, m_lineEdit->getDecimals());
   minValue           = m_slider->minimum() / scale;
@@ -382,15 +382,15 @@ void DoubleValueField::onSliderChanged(int sliderPos) {
 //-----------------------------------------------------------------------------
 
 void DoubleValueField::onLineEditValueChanged() {
-  double value = m_lineEdit->getValue();
-  int decimal  = m_lineEdit->getDecimals();
+  const double value = m_lineEdit->getValue();
 
-  // Control necessary to prevent the change signal from being emitted more than
-  // once.
-  if ((qFuzzyCompare(pos2value(m_slider->value()) + 1.0, value + 1.0) &&
-       m_slider->isVisible()) ||
-      (qFuzzyCompare(m_roller->getValue() + 1.0, value + 1.0) &&
-       m_roller->isVisible()))
+  // A clamped slider thumb can match the typed endpoint while the committed
+  // value is still outside the optional slider range.
+  if (!m_hasSliderRange &&
+      ((qFuzzyCompare(pos2value(m_slider->value()) + 1.0, value + 1.0) &&
+        m_slider->isVisible()) ||
+       (qFuzzyCompare(m_roller->getValue() + 1.0, value + 1.0) &&
+        m_roller->isVisible())))
     return;
   // A typed value can exceed the optional slider window. Synchronizing its
   // clamped thumb must not feed that endpoint back into the numeric value.
