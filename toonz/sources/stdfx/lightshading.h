@@ -67,16 +67,16 @@ inline double shadingAmount(double level, double shadeAmount,
 
 // A box blur of radius r (window 2r + 1) over a w x h float buffer, in place.
 // Outside the buffer counts as 0. tmp is scratch space.
-inline void boxBlur(std::vector<float> &buf, int w, int h, int r,
-                    std::vector<float> &tmp) {
+inline void boxBlur(std::vector<float>& buf, int w, int h, int r,
+                    std::vector<float>& tmp) {
   if (r <= 0 || w <= 0 || h <= 0) return;
   tmp.resize(buf.size());
   const float inv = 1.0f / (2 * r + 1);
 
   // Rows
   for (int y = 0; y < h; ++y) {
-    const float *src = &buf[(size_t)y * w];
-    float *dst       = &tmp[(size_t)y * w];
+    const float* src = &buf[(size_t)y * w];
+    float* dst       = &tmp[(size_t)y * w];
     double sum       = 0.0;
     for (int x = 0; x <= std::min(r, w - 1); ++x) sum += src[x];
     for (int x = 0; x < w; ++x) {
