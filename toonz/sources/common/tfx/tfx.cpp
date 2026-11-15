@@ -876,7 +876,6 @@ void TFx::loadData(TIStream &is) {
 //--------------------------------------------------
 
 void TFx::saveData(TOStream &os) {
-  FxPrecisionScope precision(os, requiresFullPrecisionSerialization());
   // Prevent saving "params" tag under "super" tag when saving macro fx.
   // Parameters for macro fx are saved in "nodes" tag and corrected upon
   // loading. Therefore, "params" tag is not needed and even causes crash if
@@ -902,7 +901,10 @@ void TFx::saveData(TOStream &os) {
         // Skip saving for obsolete parameters
         if (paramVar->isObsolete()) continue;
         os.openChild(paramName);
-        paramVar->getParam()->saveData(os);
+        {
+          FxPrecisionScope precision(os, requiresFullPrecisionSerialization());
+          paramVar->getParam()->saveData(os);
+        }
         os.closeChild();
       }
       os.closeChild();
@@ -981,7 +983,6 @@ void TFx::loadPreset(TIStream &is) {
 //--------------------------------------------------
 
 void TFx::savePreset(TOStream &os) {
-  FxPrecisionScope precision(os, requiresFullPrecisionSerialization());
   std::map<std::string, std::string> attributes;
   attributes.insert(std::make_pair(std::string("ver"), std::string("1.0")));
   attributes.insert(std::make_pair(std::string("fxId"), getFxType()));
@@ -993,7 +994,10 @@ void TFx::savePreset(TOStream &os) {
     std::string paramName = getParams()->getParamName(i);
     TParam *param         = getParams()->getParam(i);
     os.openChild(paramName);
-    param->saveData(os);
+    {
+      FxPrecisionScope precision(os, requiresFullPrecisionSerialization());
+      param->saveData(os);
+    }
     os.closeChild();
   }
   os.closeChild();

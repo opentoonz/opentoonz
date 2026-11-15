@@ -200,15 +200,6 @@ public:
   }
 };
 
-namespace {
-void setDefaultPixelD(const TPixelParamP &param, const TPixelD &value) {
-  param->getRed()->setDefaultValue(value.r);
-  param->getGreen()->setDefaultValue(value.g);
-  param->getBlue()->setDefaultValue(value.b);
-  param->getMatte()->setDefaultValue(value.m);
-}
-}  // namespace
-
 //-----------------------------------------------------------------------------
 /*! PointParamField Undo
  */
@@ -1105,6 +1096,31 @@ PixelParamField::PixelParamField(QWidget *parent, QString name,
 
 //-----------------------------------------------------------------------------
 
+PixelParamField::~PixelParamField() { observeChannels(false); }
+
+void PixelParamField::observeChannels(bool observe) {
+  std::array<TDoubleParamP, 4> channels;
+  if (observe && m_actualParam)
+    channels = {m_actualParam->getRed(), m_actualParam->getGreen(),
+                m_actualParam->getBlue(), m_actualParam->getMatte()};
+  if (m_observedChannels == channels) return;
+  for (const auto &channel : m_observedChannels)
+    if (channel) channel->removeObserver(this);
+  m_observedChannels = channels;
+  for (const auto &channel : m_observedChannels)
+    if (channel) channel->addObserver(this);
+  m_previewNeedsSync = false;
+}
+
+void PixelParamField::setParam(const TParamP &current, const TParamP &actual,
+                               int frame) {
+  m_actualParam  = actual;
+  m_currentParam = current;
+  assert(m_currentParam && m_actualParam);
+  observeChannels(property("preserveColorPrecision").toBool());
+  update(frame);
+}
+
 void PixelParamField::update(int frame) {
   if (!property("preserveColorPrecision").toBool()) {
     AnimatedParamField<TPixel32, TPixelParamP>::update(frame);
@@ -1112,13 +1128,20 @@ void PixelParamField::update(int frame) {
   }
   m_frame = frame;
   if (!m_currentParam || !m_actualParam) return;
-  const TPixelD value = m_actualParam->getValueD(frame);
-  if (m_actualParam->isKeyframe(frame) || !m_actualParam->hasKeyframes())
+  // Child curve notifications only mark the preview dirty. Copy after the
+  // complete edit or history operation, preserving uncommitted preview edits
+  // during ordinary refreshes between keys.
+  const bool committedChange = m_previewNeedsSync;
+  m_previewNeedsSync         = false;
+  if (m_currentParam != m_actualParam &&
+      (committedChange || m_actualParam->isKeyframe(frame) ||
+       !m_actualParam->hasKeyframes()))
     m_currentParam->copy(m_actualParam.getPointer());
-  updateField(m_actualParam->getValue(frame));
-  m_keyToggle->setStatus(m_actualParam->hasKeyframes(),
-                         m_actualParam->isKeyframe(frame),
-                         value != m_currentParam->getValueD(frame));
+  updateField(m_currentParam->getValue(frame));
+  m_keyToggle->setStatus(
+      m_actualParam->hasKeyframes(), m_actualParam->isKeyframe(frame),
+      m_actualParam->getValueD(frame) != m_currentParam->getValueD(frame));
+  if (committedChange) emit currentParamChanged();
 }
 
 void PixelParamField::updateField(TPixel32 value) {
@@ -1132,29 +1155,32 @@ void PixelParamField::onChange(const TPixel32 &value, bool isDragging) {
 
   if (property("preserveColorPrecision").toBool()) {
     if (!m_actualParam || !m_currentParam) return;
-    const TPixelD preciseValue = toPixelD(value);
-    if (m_currentParam->getValueD(m_frame) == preciseValue) return;
-    const bool commit =
-        m_actualParam->isKeyframe(m_frame) || !m_actualParam->hasKeyframes();
+    const TPixel32 previous = m_currentParam->getValue(m_frame);
+    if (previous == value) return;
+    const bool hasKeys = m_actualParam->hasKeyframes();
+    const bool commit  = m_actualParam->isKeyframe(m_frame) || !hasKeys;
     TUndo *undo =
         commit ? new PrecisePixelParamUndo(m_actualParam, m_interfaceName,
                                            m_frame, ParamField::m_fxHandleStat)
                : nullptr;
-    if (!m_actualParam->hasKeyframes())
-      setDefaultPixelD(m_currentParam, preciseValue);
-    else
-      m_currentParam->setValueD(m_frame, preciseValue);
-    if (m_actualParam->isKeyframe(m_frame))
-      m_actualParam->setValueD(m_frame, preciseValue);
-    else if (!m_actualParam->hasKeyframes())
-      setDefaultPixelD(m_actualParam, preciseValue);
+    const UCHAR before[] = {previous.r, previous.g, previous.b, previous.m};
+    const UCHAR after[]  = {value.r, value.g, value.b, value.m};
+    const TPixelParamP target      = commit ? m_actualParam : m_currentParam;
+    const TDoubleParamP channels[] = {target->getRed(), target->getGreen(),
+                                      target->getBlue(), target->getMatte()};
+    for (int channel = 0; channel < 4; ++channel) {
+      if (before[channel] == after[channel]) continue;
+      if (hasKeys)
+        channels[channel]->setValue(m_frame, after[channel] / 255.0);
+      else
+        channels[channel]->setDefaultValue(after[channel] / 255.0);
+    }
     if (undo) TUndoManager::manager()->add(undo);
-    if (commit) emit actualParamChanged();
-    emit currentParamChanged();
-    m_keyToggle->setStatus(m_actualParam->hasKeyframes(),
-                           m_actualParam->isKeyframe(m_frame),
-                           m_actualParam->getValueD(m_frame) !=
-                               m_currentParam->getValueD(m_frame));
+    update(m_frame);
+    if (commit)
+      emit actualParamChanged();
+    else
+      emit currentParamChanged();
     return;
   }
 

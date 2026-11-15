@@ -15,6 +15,7 @@
 
 #include <sstream>
 #include <memory>
+#include <cmath>
 #include <limits>
 #include <locale>
 
@@ -949,7 +950,16 @@ TIStream &TIStream::operator>>(int &v) {
 //---------------------------------------------------------------
 
 TIStream &TIStream::operator>>(double &v) {
-  *(m_imp->m_is) >> v;
+  std::istream &stream = *m_imp->m_is;
+  std::istream::sentry ready(stream);
+  if (!ready) return *this;
+  stream >> v;
+  // Some standard libraries mark a successfully parsed subnormal as failed.
+  // Accept that finite result in the canonical locale without hiding errors
+  // from earlier reads, malformed input, overflow, or underflow to zero.
+  if (stream.fail() && !stream.bad() && std::fpclassify(v) == FP_SUBNORMAL &&
+      stream.getloc() == std::locale::classic())
+    stream.clear(stream.rdstate() & ~std::ios_base::failbit);
   return *this;
 }
 //---------------------------------------------------------------
