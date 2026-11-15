@@ -129,7 +129,7 @@ public:
   // Limit dragging without changing numeric-entry or roller bounds. Returns
   // false for invalid bounds. setRange restores the ordinary shared range.
   bool setSliderRange(double minValue, double maxValue);
-  bool getSliderRange(double& minValue, double& maxValue) const;
+  bool getSliderRange(double &minValue, double &maxValue) const;
 
   void setValue(double value);
   double getValue();

@@ -281,8 +281,8 @@ bool DoubleValueField::setSliderRange(double minValue, double maxValue) {
   return true;
 }
 
-bool DoubleValueField::getSliderRange(double& minValue,
-                                      double& maxValue) const {
+bool DoubleValueField::getSliderRange(double &minValue,
+                                      double &maxValue) const {
   if (!m_hasSliderRange) return false;
   const double scale = std::pow(10.0, m_lineEdit->getDecimals());
   minValue           = m_slider->minimum() / scale;

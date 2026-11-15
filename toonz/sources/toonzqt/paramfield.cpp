@@ -109,8 +109,8 @@ class AnimatedChoiceParamUndo final : public AnimatableFxSettingsUndo {
   TDoubleParamP m_param, m_before, m_after;
 
 public:
-  AnimatedChoiceParamUndo(const TDoubleParamP& param, QString name, int frame,
-                          TFxHandle* handle)
+  AnimatedChoiceParamUndo(const TDoubleParamP &param, QString name, int frame,
+                          TFxHandle *handle)
       : AnimatableFxSettingsUndo(name, frame, handle)
       , m_param(param)
       , m_before(TParamP(param->clone())) {
@@ -1334,9 +1334,9 @@ void SpectrumParamField::onKeyRemoved(int keyIndex) {
 // AnimatedChoiceParamField
 //-----------------------------------------------------------------------------
 
-AnimatedChoiceParamField::AnimatedChoiceParamField(QWidget* parent,
+AnimatedChoiceParamField::AnimatedChoiceParamField(QWidget *parent,
                                                    QString name,
-                                                   const TDoubleParamP& param)
+                                                   const TDoubleParamP &param)
     : ModeChangerParamField(parent, name, param)
     , m_keyToggle(new ParamFieldKeyToggle(this))
     , m_choiceCount(int(param->getUIChoices().size())) {
@@ -1354,7 +1354,7 @@ AnimatedChoiceParamField::AnimatedChoiceParamField(QWidget* parent,
     m_choices = new QComboBox(this);
     m_choices->setObjectName("animatedChoice");
     m_choices->setAccessibleName(m_interfaceName);
-    for (const std::string& choice : param->getUIChoices())
+    for (const std::string &choice : param->getUIChoices())
       m_choices->addItem(QString::fromStdString(choice));
     m_layout->addWidget(m_choices);
     connect(m_choices, QOverload<int>::of(&QComboBox::activated), this,
@@ -1393,8 +1393,8 @@ void AnimatedChoiceParamField::updateKeyToggle() {
                              choiceIndex(m_currentParam->getValue(m_frame)));
 }
 
-void AnimatedChoiceParamField::setParam(const TParamP& current,
-                                        const TParamP& actual, int frame) {
+void AnimatedChoiceParamField::setParam(const TParamP &current,
+                                        const TParamP &actual, int frame) {
   m_currentParam            = current;
   TDoubleParamP actualParam = actual;
   assert(m_currentParam && actualParam);
@@ -1441,7 +1441,7 @@ void AnimatedChoiceParamField::onChoiceChanged(int value) {
     return;
   }
 
-  auto* undo = new AnimatedChoiceParamUndo(m_actualParam, m_interfaceName,
+  auto *undo = new AnimatedChoiceParamUndo(m_actualParam, m_interfaceName,
                                            m_frame, m_fxHandleStat);
   if (hasKeys)
     m_actualParam->setValue(m_frame, value);
@@ -1454,7 +1454,7 @@ void AnimatedChoiceParamField::onChoiceChanged(int value) {
 
 void AnimatedChoiceParamField::onKeyToggled() {
   if (!m_currentParam || !m_actualParam) return;
-  TUndo* undo = new AnimatedChoiceParamUndo(m_actualParam, m_interfaceName,
+  TUndo *undo = new AnimatedChoiceParamUndo(m_actualParam, m_interfaceName,
                                             m_frame, m_fxHandleStat);
   if (m_keyToggle->getStatus() == ParamFieldKeyToggle::KEYFRAME) {
     m_actualParam->deleteKeyframe(m_frame);

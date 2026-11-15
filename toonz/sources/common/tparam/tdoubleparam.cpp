@@ -522,7 +522,7 @@ void TDoubleParam::setUISliderRange(double min, double max) {
   m_imp->m_uiSliderMax      = max;
 }
 
-bool TDoubleParam::getUISliderRange(double& min, double& max) const {
+bool TDoubleParam::getUISliderRange(double &min, double &max) const {
   if (!m_imp->m_hasUISliderRange) return false;
   min = std::max(m_imp->m_minValue, m_imp->m_uiSliderMin);
   max = std::min(m_imp->m_maxValue, m_imp->m_uiSliderMax);
@@ -531,7 +531,7 @@ bool TDoubleParam::getUISliderRange(double& min, double& max) const {
 
 //---------------------------------------------------------
 
-void TDoubleParam::setUIChoices(const std::vector<std::string>& choices,
+void TDoubleParam::setUIChoices(const std::vector<std::string> &choices,
                                 bool checkbox) {
   if ((!choices.empty() && choices.size() < 2) ||
       (checkbox && choices.size() != 2))
@@ -541,7 +541,7 @@ void TDoubleParam::setUIChoices(const std::vector<std::string>& choices,
   if (!choices.empty()) setValueRange(0, double(choices.size() - 1));
 }
 
-const std::vector<std::string>& TDoubleParam::getUIChoices() const {
+const std::vector<std::string> &TDoubleParam::getUIChoices() const {
   return m_imp->m_uiChoices;
 }
 
