@@ -178,21 +178,21 @@ DoubleValueField::DoubleValueField(QWidget *parent,
 //-----------------------------------------------------------------------------
 
 double DoubleValueField::pos2value(int x) const {
-  const int decimal = m_lineEdit->getDecimals();
-  if (m_isLinearSlider) return static_cast<double>(x) * std::pow(0.1, decimal);
+  const double scale = std::pow(10.0, m_lineEdit->getDecimals());
+  if (m_isLinearSlider) return static_cast<double>(x) / scale;
 
   // nonlinear slider case - use constexpr where is possible
   static constexpr std::array<double, 4> thresholds{0.5, 0.75, 0.9, 1.0};
   const double rangeSize =
-      static_cast<double>(m_slider->maximum() - m_slider->minimum());
+      static_cast<double>(m_slider->maximum()) - m_slider->minimum();
 
   // Safety check for zero range
   if (std::abs(rangeSize) < std::numeric_limits<double>::epsilon()) {
-    return static_cast<double>(x) * std::pow(0.1, decimal);
+    return static_cast<double>(x) / scale;
   }
 
   const double posRatio =
-      static_cast<double>(x - m_slider->minimum()) / rangeSize;
+      (static_cast<double>(x) - m_slider->minimum()) / rangeSize;
 
   double t = 0.0;
   if (posRatio <= thresholds[0]) {
@@ -207,24 +207,24 @@ double DoubleValueField::pos2value(int x) const {
 
   const double sliderValue =
       std::round(static_cast<double>(m_slider->minimum()) + rangeSize * t);
-  return sliderValue * std::pow(0.1, decimal);
+  return sliderValue / scale;
 }
 
 //-----------------------------------------------------------------------------
 
 int DoubleValueField::value2pos(double v) const {
-  if (m_hasSliderRange) {
-    double sliderMin, sliderMax;
-    getSliderRange(sliderMin, sliderMax);
-    v = std::max(sliderMin, std::min(sliderMax, v));
-  }
-  int decimal        = m_lineEdit->getDecimals();
-  double sliderValue = round(v * std::pow(10., decimal));
-  if (m_isLinearSlider) return (int)sliderValue;
+  const double sliderMin = m_slider->minimum();
+  const double sliderMax = m_slider->maximum();
+  if (sliderMin == sliderMax || !std::isfinite(v)) return int(sliderMin);
+  const double scaledValue =
+      std::round(v * std::pow(10.0, m_lineEdit->getDecimals()));
+  const double sliderValue =
+      std::max(sliderMin, std::min(sliderMax, scaledValue));
+  if (m_isLinearSlider) return int(sliderValue);
 
   // nonlinear slider case
-  double rangeSize  = (double)(m_slider->maximum() - m_slider->minimum());
-  double valueRatio = (sliderValue - (double)m_slider->minimum()) / rangeSize;
+  double rangeSize  = sliderMax - sliderMin;
+  double valueRatio = (sliderValue - sliderMin) / rangeSize;
   double t;
   if (valueRatio <= 0.02)
     t = valueRatio / 0.04;
@@ -234,7 +234,8 @@ int DoubleValueField::value2pos(double v) const {
     t = (valueRatio + 0.26) / 0.4;
   else
     t = (valueRatio + 8.0) / 9.0;
-  return m_slider->minimum() + (int)(t * rangeSize);
+  const double position = sliderMin + std::floor(t * rangeSize);
+  return int(std::max(sliderMin, std::min(sliderMax, position)));
 }
 
 //-----------------------------------------------------------------------------
@@ -246,30 +247,43 @@ void DoubleValueField::getRange(double &minValue, double &maxValue) {
 //-----------------------------------------------------------------------------
 
 void DoubleValueField::setRange(double minValue, double maxValue) {
-  m_hasSliderRange = false;
+  const int previousPosition = m_slider->value();
+  m_hasSliderRange           = false;
   m_lineEdit->setRange(minValue, maxValue);
-
   m_roller->setRange(minValue, maxValue);
-
-  int decimal   = m_lineEdit->getDecimals();
-  int sliderMax = (int)round(maxValue * std::pow(10., decimal));
-  int sliderMin = (int)round(minValue * std::pow(10., decimal));
-
-  m_slider->setRange(sliderMin, sliderMax);
-
-  enableSlider(maxValue - minValue < 10000);
+  const bool validSliderRange = setSliderRange(minValue, maxValue);
+  if (!validSliderRange) {
+    const QSignalBlocker blocker(m_slider);
+    m_slider->setRange(0, 0);
+    enableSlider(false);
+  }
+  m_hasSliderRange = false;
+  if (validSliderRange && (previousPosition < m_slider->minimum() ||
+                           previousPosition > m_slider->maximum()))
+    onSliderChanged(m_slider->value());
+  else if (minValue == maxValue && std::isfinite(minValue) &&
+           getValue() != minValue) {
+    setValue(minValue);
+    emit valueChanged(true);
+  }
 }
 
 bool DoubleValueField::setSliderRange(double minValue, double maxValue) {
   double hardMin, hardMax;
   getRange(hardMin, hardMax);
-  const double scale     = std::pow(10.0, m_lineEdit->getDecimals());
-  const double sliderMin = std::round(minValue * scale);
-  const double sliderMax = std::round(maxValue * scale);
+  const double scale = std::pow(10.0, m_lineEdit->getDecimals());
   if (!std::isfinite(minValue) || !std::isfinite(maxValue) ||
-      minValue < hardMin || maxValue > hardMax || minValue >= maxValue ||
-      !std::isfinite(sliderMin) || !std::isfinite(sliderMax) ||
-      sliderMin < std::numeric_limits<int>::min() ||
+      !(hardMin <= minValue && maxValue <= hardMax) || minValue >= maxValue ||
+      !std::isfinite(scale) || scale <= 0)
+    return false;
+  double sliderMin = std::round(minValue * scale);
+  double sliderMax = std::round(maxValue * scale);
+  if (!std::isfinite(sliderMin) || !std::isfinite(sliderMax)) return false;
+  // Round inward using the same conversion as pos2value. Decimal endpoints
+  // such as 0.14 can multiply to just above an integer in floating point.
+  if (sliderMin / scale < minValue) ++sliderMin;
+  if (sliderMax / scale > maxValue) --sliderMax;
+  if (sliderMin < std::numeric_limits<int>::min() ||
       sliderMax > std::numeric_limits<int>::max() || sliderMin >= sliderMax ||
       sliderMax - sliderMin > std::numeric_limits<int>::max())
     return false;

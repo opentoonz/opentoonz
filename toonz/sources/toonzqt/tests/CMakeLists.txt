@@ -82,3 +82,26 @@ target_link_libraries(fxsettings_swatch_test PRIVATE
 add_test(NAME fxsettings_swatch COMMAND fxsettings_swatch_test)
 set_tests_properties(fxsettings_swatch PROPERTIES
     ENVIRONMENT "QT_QPA_PLATFORM=offscreen;DYLD_LIBRARY_PATH=${LIBRARY_PATH}")
+
+add_executable(doublefield_bounds_test
+    doublefield_bounds_test.cpp
+    "${SOURCE_DIR}/toonzqt/doublefield.cpp"
+    "${SOURCE_DIR}/toonzqt/paramfield.cpp"
+    "${SOURCE_DIR}/common/tparam/tdoubleparam.cpp"
+    ${PARAMFIELD_MOC}
+)
+target_include_directories(doublefield_bounds_test PRIVATE "${SOURCE_DIR}/include")
+target_compile_definitions(doublefield_bounds_test PRIVATE
+    $<TARGET_PROPERTY:paramfield_test,COMPILE_DEFINITIONS>)
+target_link_libraries(doublefield_bounds_test PRIVATE
+    $<TARGET_PROPERTY:paramfield_test,LINK_LIBRARIES>)
+foreach(SCENARIO positive negative rounding wide_typing invalid ordinary_nonlinear
+                 ordinary_range precision)
+    add_test(NAME doublefield_bounds_${SCENARIO} COMMAND doublefield_bounds_test ${SCENARIO})
+    set_tests_properties(doublefield_bounds_${SCENARIO} PROPERTIES
+        ENVIRONMENT "QT_QPA_PLATFORM=offscreen;UBSAN_OPTIONS=halt_on_error=1")
+    if(APPLE)
+        set_property(TEST doublefield_bounds_${SCENARIO} APPEND PROPERTY
+            ENVIRONMENT "DYLD_LIBRARY_PATH=${LIBRARY_PATH}")
+    endif()
+endforeach()

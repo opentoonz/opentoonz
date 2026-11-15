@@ -47,3 +47,36 @@ existing direct FX preview path. It does not test the complete scene graph,
 camera preview, manual desktop interactions, or UI themes. Known pre-existing
 nested-layout warnings and the offscreen platform's unsupported size-hint
 warning are narrowly ignored in the fixture; any other warning fails the test.
+
+The eight `doublefield_bounds` scenarios cover measured parameter construction
+with numeric bounds of positive and negative ten million, preserving the
+initial value, precision changes, and rebinding. They drive actual slider
+positions and releases into both the actual and preview parameters, checking
+every position in small fractional windows against the exact hard and optional
+bounds. Additional cases cover unrepresentable and sub-quantum windows,
+representable decimal endpoints, numeric entry before and after slider setup,
+ordinary/nonlinear mapping compatibility, ordinary range-change clamping and
+notifications, and XML-style precision setup before parameter binding. Fine
+optional windows recover when precision becomes sufficient, including after
+temporarily selecting a coarser precision. Numeric and roller editing remain
+available when a window has no representable slider positions.
+
+To check conversions in the production sources, configure a separate build
+with AddressSanitizer, UndefinedBehaviorSanitizer, and float-cast overflow
+instrumentation explicitly enabled:
+
+```sh
+cmake -S toonz/sources/toonzqt/tests -B build/paramfield-sanitized \
+  -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+  -DCMAKE_PREFIX_PATH=/path/to/qt5 \
+  -DOPENTOONZ_BUILD_DIR=/absolute/path/to/opentoonz-build \
+  '-DCMAKE_CXX_FLAGS=-fsanitize=address,undefined,float-cast-overflow -fno-omit-frame-pointer'
+cmake --build build/paramfield-sanitized
+ctest --test-dir build/paramfield-sanitized --output-on-failure
+```
+
+Each bounds scenario runs separately with UBSan configured to stop on the first
+error, so both signed constructor failures can be reproduced independently.
+The linked OpenToonz and Qt dependency libraries retain their original build
+instrumentation; these flags instrument the production sources compiled into
+the test executables.

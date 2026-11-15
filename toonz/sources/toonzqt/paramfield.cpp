@@ -813,21 +813,23 @@ MeasuredDoubleParamField::MeasuredDoubleParamField(QWidget *parent,
     : AnimatedParamField<double, TDoubleParamP>(parent, name, param) {
   QString str;
   m_paramName = str.fromStdString(param->getName());
+  m_actualParam = param;
 
   m_measuredDoubleField = new MeasuredDoubleField(this, false);
 
   m_measuredDoubleField->setSizePolicy(QSizePolicy::Expanding,
                                        QSizePolicy::Minimum);
   m_measuredDoubleField->setMeasure(param->getMeasureName());
-  m_measuredDoubleField->setValue(param->getValue(m_frame));
   m_measuredDoubleField->setDecimals(3);
 
   double min = 0, max = 100, step = 1;
   param->getValueRange(min, max, step);
   assert(min < max);
   m_measuredDoubleField->setRange(min, max);
-  if (param->getUISliderRange(min, max))
-    m_measuredDoubleField->setSliderRange(min, max);
+  if (param->getUISliderRange(min, max) &&
+      !m_measuredDoubleField->setSliderRange(min, max))
+    m_measuredDoubleField->enableSlider(false);
+  m_measuredDoubleField->setValue(param->getValue(m_frame));
 
   //----layout
   m_layout->addWidget(m_keyToggle);
@@ -851,7 +853,7 @@ void MeasuredDoubleParamField::updateField(double value) {
 //-----------------------------------------------------------------------------
 
 void MeasuredDoubleParamField::onChange(bool dragging) {
-  if (dragging) return;
+  if (dragging || !m_currentParam || !m_actualParam) return;
 
   TDoubleParamP doubleParam = m_actualParam;
 
@@ -882,13 +884,17 @@ void MeasuredDoubleParamField::onKeyToggled() { onKeyToggle(); }
 void MeasuredDoubleParamField::setPrecision(int precision) {
   double min, max, sliderMin, sliderMax;
   const bool hasSliderRange =
-      m_measuredDoubleField->getSliderRange(sliderMin, sliderMax);
+      m_actualParam && m_actualParam->getUISliderRange(sliderMin, sliderMax);
+  const double value = m_measuredDoubleField->getValue();
+  const QSignalBlocker blocker(m_measuredDoubleField);
   m_measuredDoubleField->getRange(min, max);
   m_measuredDoubleField->setDecimals(precision);
   // update slider
   m_measuredDoubleField->setRange(min, max);
-  if (hasSliderRange)
-    m_measuredDoubleField->setSliderRange(sliderMin, sliderMax);
+  if (hasSliderRange &&
+      !m_measuredDoubleField->setSliderRange(sliderMin, sliderMax))
+    m_measuredDoubleField->enableSlider(false);
+  m_measuredDoubleField->setValue(value);
 }
 
 //=============================================================================
