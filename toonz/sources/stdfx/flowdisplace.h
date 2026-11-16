@@ -30,7 +30,7 @@ struct Settings {
   double direction      = 0.0;   // Map: degrees
   bool invert           = false;
   double noiseAmplitude = 0.0;   // pixels
-  double noiseSize      = 20.0;  // pixels (1..100)
+  double noiseSize      = 20.0;  // pixels in the render grid
   double noiseSpeed     = 0.1;   // noise planes per frame
   std::uint32_t seed    = 1;
   bool useMatte         = false;
@@ -87,8 +87,11 @@ inline void displacement(const Settings &s, const Color &field,
   dx = dy = 0.0;
   if (field.a > 1e-12) {
     // Straight colour: a half-covered field pixel is the same motion
-    const double r = field.r / field.a, g = field.g / field.a,
-                 b = field.b / field.a;
+    // Floating-point fields can exceed the encoded motion range. Bound them
+    // before displacement so sampling stays inside the requested tile halo.
+    const double r = detail::unit(field.r / field.a),
+                 g = detail::unit(field.g / field.a),
+                 b = detail::unit(field.b / field.a);
     if (s.mode == Mode::Flow) {
       dx = (2.0 * r - 1.0) * s.strength;
       dy = (2.0 * g - 1.0) * s.strength;
@@ -106,7 +109,7 @@ inline void displacement(const Settings &s, const Color &field,
   if (s.noiseAmplitude > 0.0) {
     CelNoise::Settings noise;
     noise.type      = CelNoise::Smooth;
-    noise.thickness = std::max(1.0, std::min(100.0, s.noiseSize));
+    noise.thickness = s.noiseSize;
     noise.offset    = std::isfinite(frame) ? frame * s.noiseSpeed : 0.0;
     noise.seed      = s.seed * 2654435761u + 0x3c6ef372u;
     dx += s.noiseAmplitude * (2.0 * CelNoise::sample(noise, x, y) - 1.0);

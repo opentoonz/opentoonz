@@ -120,7 +120,7 @@ public:
     std::ostringstream alias;
     alias.imbue(std::locale::classic());
     const FlowDisplace::Settings s = this->settings(frame, settings);
-    alias << TRasterFx::getAlias(frame, settings) << "[flowDisplace:1:"
+    alias << TRasterFx::getAlias(frame, settings) << "[flowDisplace:2:"
           << std::setprecision(std::numeric_limits<double>::max_digits10)
           << int(s.mode) << ',' << s.strength << ',' << s.direction << ','
           << s.invert << ',' << s.noiseAmplitude << ',' << s.noiseSize << ','
