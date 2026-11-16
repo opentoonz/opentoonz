@@ -2,8 +2,9 @@
 
 These standalone tests compile the checkout's actual spectrum and parameter
 widgets, parameter classes, pixel conversion, and Qt metadata. Integration tests
-also compile `TFxUtil::setKeyframe()` and FX Settings. Matching OpenToonz shared
-libraries supply the remaining model, undo manager, and renderer.
+also compile `TFxUtil::setKeyframe()`, FX Settings, and the actual
+`TFxCommand::resetFxFrame()` implementation. Matching OpenToonz shared libraries
+supply the remaining model, undo manager, and renderer.
 
 Build OpenToonz libraries from the same checkout first, then configure:
 
@@ -23,7 +24,7 @@ offscreen backend and, on macOS, the library search path required by OpenToonz's
 install names. Sanitizers instrument sources compiled by these targets; other
 dependencies retain their original instrumentation.
 
-The eleven cases cover:
+The twelve cases cover:
 
 - RGBA byte and precise numeric edits at defaults, keys, between keys, and with
   asymmetric channel curves. Untouched stops and complete child curves retain
@@ -36,9 +37,17 @@ The eleven cases cover:
   referring to the same object.
 - Pending focused text across frame, stop, and FX rebinding; ordinary refresh
   preserves pending between-key edits and their displayed ramp.
+- Pending colors and positions survive stop insertion/removal and subsequent
+  refreshes without being committed to surviving saved stops. Coverage includes
+  shifted indices, removal of the only animated stop, preview notifications,
+  and committing the retained values with the key toggle and its undo/redo.
 - Undo/redo after replacement of the preview object, including key deletion.
   External edits, stop insertion/removal, whole-ramp copying, matte replacement,
   rebinding, and control destruction exercise observer lifetime.
+- Shift+Reset followed by precise numeric editing, stop insertion/removal, or
+  key deletion, then repeated undo/redo of both commands. Tests check original
+  stop/channel identity, values, defaults, and interpolation with both separate
+  and aliased previews.
 - Ordinary spectrum controls retain byte editing without precise numeric fields.
 - The actual FX Settings preview-seeding path preserves double positions and
   colors, including extreme finite RGB, while ordinary FX retain byte seeding.
@@ -52,9 +61,12 @@ The eleven cases cover:
 The original spectrum-only commit `ae78c7c`, replayed onto merged prerequisites,
 does not compile because it calls a missing `setDefaultPixelD()` helper. For
 baseline comparisons only, a four-channel default setter was supplied so the
-original behavior could execute. All eleven cases fail that baseline; the candidate
-passes on macOS arm64 with Apple Clang 21 and Qt 5.15.19. Separate test processes
-keep sanitizer aborts from hiding other failures.
+original behavior could execute. The original eleven cases fail that baseline.
+The additional Shift+Reset history test and pending-preview assertions fail
+against `a4693076` with its production sources unchanged. All twelve cases pass
+with the fixes on macOS arm64, Apple Clang 21, and Qt 5.15.19 using the sanitizer
+flags above. Separate test processes keep sanitizer aborts from hiding other
+failures.
 
 These tests do not establish full saved-scene rendering compatibility, manual
 desktop behavior, theme/scaling coverage, or Windows/Linux runtime behavior.

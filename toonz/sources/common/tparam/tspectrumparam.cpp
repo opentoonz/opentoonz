@@ -86,6 +86,8 @@ m_sp->removeParam((*colorKeyIt).second);
 
   ColorKeyParam getKey(int index) const { return m_keys[index]; }
 
+  void setKeys(const std::vector<ColorKeyParam>& keys) { m_keys = keys; }
+
   void clearKeys() { m_keys.clear(); }
 
   void notify(const TParamChange &change) {
@@ -230,6 +232,14 @@ TDoubleParamP TSpectrumParam::getPosition(int index) const {
 TPixelParamP TSpectrumParam::getColor(int index) const {
   assert(index <= m_imp->getKeyCount());
   return m_imp->getKey(index).second;
+}
+
+//---------------------------------------------------------
+
+void TSpectrumParam::setKeyParams(const std::vector<ColorKeyParam>& keys) {
+  m_imp->setKeys(keys);
+  m_imp->notify(TParamChange(this, TParamChange::m_minFrame,
+                             TParamChange::m_maxFrame, true, false, false));
 }
 
 //---------------------------------------------------------

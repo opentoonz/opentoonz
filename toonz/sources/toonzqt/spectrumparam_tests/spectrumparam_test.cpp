@@ -416,6 +416,144 @@ void insertionTest() {
   }
 }
 
+void editPendingStops(Fixture& fixture) {
+  fixture.spectrum()->setCurrentKeyIndex(0);
+  fixture.finish(fixture.preciseEdit(0), "1.2345678901234567");
+  const int last = fixture.preview->getKeyCount() - 1;
+  fixture.spectrum()->setCurrentKeyIndex(last);
+  fixture.finish(fixture.preciseEdit(1), "0.43219876543219876");
+  auto* bar = fixture.bar();
+  bar->resize(221, bar->height());
+  const int y = bar->height() / 2;
+  mouse(bar, QEvent::MouseButtonPress, QPoint(210, y));
+  mouse(bar, QEvent::MouseMove, QPoint(190, y));
+  mouse(bar, QEvent::MouseButtonRelease, QPoint(190, y));
+  check(fixture.preview->getPosition(last)->getValue(fixture.frame) == 0.9,
+        "position drag remains pending between keys");
+  check(TUndoManager::manager()->getHistoryCount() == 0,
+        "pending channel and position edits create no history");
+}
+
+void keyPendingPreview(Fixture& fixture, const TSpectrumParamP& expected) {
+  auto* key = fixture.field->findChild<ParamFieldKeyToggle*>();
+  require(key != nullptr, "spectrum key toggle missing");
+  if (fixture.actual->hasKeyframes())
+    check(key->getStatus() == ParamFieldKeyToggle::MODIFIED,
+          "surviving pending values keep the modified key indicator");
+  const auto saved = copySpectrum(fixture.actual);
+  fixture.toggle();
+  for (int stop = 0; stop < expected->getKeyCount(); ++stop) {
+    check(fixture.actual->getColor(stop)->getValueD(fixture.frame) ==
+              expected->getColor(stop)->getValueD(fixture.frame),
+          "key toggle commits surviving pending channel values");
+    check(fixture.actual->getPosition(stop)->getValue(fixture.frame) ==
+              expected->getPosition(stop)->getValue(fixture.frame),
+          "key toggle commits surviving pending positions");
+  }
+  const auto keyed = copySpectrum(fixture.actual);
+  check(TUndoManager::manager()->undo(), "pending value key undo available");
+  check(equalSpectrum(fixture.actual, saved),
+        "key undo restores saved curves before pending values were committed");
+  check(TUndoManager::manager()->redo(), "pending value key redo available");
+  check(equalSpectrum(fixture.actual, keyed),
+        "key redo restores committed pending values");
+}
+
+void pendingInsertionTest() {
+  Fixture fixture(Mode::Between);
+  const auto saved = copySpectrum(fixture.actual);
+  editPendingStops(fixture);
+  const auto pending  = copySpectrum(fixture.preview);
+  const TPixelD a     = pending->getColor(0)->getValueD(fixture.frame);
+  const TPixelD b     = pending->getColor(1)->getValueD(fixture.frame);
+  const double weight = 0.5 / 0.9;
+  const TPixelD expected(
+      (1 - weight) * a.r + weight * b.r, (1 - weight) * a.g + weight * b.g,
+      (1 - weight) * a.b + weight * b.b, (1 - weight) * a.m + weight * b.m);
+  fixture.notifications = 0;
+  fixture.bar()->addKeyAt(110);
+  check(fixture.notifications > 0,
+        "insertion notifies preview consumers of the new ramp");
+  for (int stop = 0; stop < 2; ++stop) {
+    check(equalStop(fixture.actual, saved, stop),
+          "insertion leaves surviving saved curves uncommitted");
+    check(equalStop(fixture.preview, pending, stop),
+          "insertion preserves complete pending survivor curves");
+  }
+  check(fixture.actual->getColor(2)->getValueD(fixture.frame) == expected,
+        "new saved stop samples pending exact color and position edits");
+  check(fixture.preview->getColor(2)->getValueD(fixture.frame) == expected,
+        "new preview stop agrees with its surviving pending neighbors");
+  check(TUndoManager::manager()->getHistoryCount() == 1,
+        "insertion creates only its structural history item");
+  pending->addKey(0.5, TPixel32::Black);
+  setDefaults(pending->getColor(2), expected);
+  fixture.field->update(fixture.frame);
+  check(equalSpectrum(fixture.preview, pending),
+        "ordinary refresh retains pending values after insertion");
+  keyPendingPreview(fixture, pending);
+}
+
+void removeStop(Fixture& fixture, int index) {
+  auto* bar = fixture.bar();
+  bar->resize(221, bar->height());
+  fixture.spectrum()->setCurrentKeyIndex(index);
+  const int x = bar->getCurrentPos();
+  mouse(bar, QEvent::MouseButtonPress, QPoint(x, bar->height() / 2));
+  mouse(bar, QEvent::MouseMove, QPoint(x, bar->height() + 20));
+  mouse(bar, QEvent::MouseButtonRelease, QPoint(x, bar->height() + 20));
+}
+
+void pendingRemovalTest() {
+  for (const int index : {0, 1}) {
+    Fixture fixture(Mode::Between);
+    fixture.actual->insertKey(1, 0.5, TPixel32::Red);
+    fixture.field->update(fixture.frame);
+    const auto saved = copySpectrum(fixture.actual);
+    editPendingStops(fixture);
+    const auto pending = copySpectrum(fixture.preview);
+    saved->removeKey(index);
+    pending->removeKey(index);
+    fixture.notifications = 0;
+    removeStop(fixture, index);
+    check(fixture.notifications > 0,
+          "removal notifies preview consumers of the new ramp");
+    check(equalSpectrum(fixture.actual, saved),
+          "removal leaves surviving saved curves uncommitted");
+    check(equalSpectrum(fixture.preview, pending),
+          "removal preserves pending curves on survivors after index shifts");
+    check(TUndoManager::manager()->getHistoryCount() == 1,
+          "removal creates only its structural history item");
+    fixture.field->update(fixture.frame);
+    check(equalSpectrum(fixture.preview, pending),
+          "ordinary refresh retains pending values after removal");
+    keyPendingPreview(fixture, pending);
+  }
+}
+
+void removeOnlyAnimatedStopTest() {
+  Fixture fixture(Mode::Between);
+  fixture.actual->getColor(1)->clearKeyframes();
+  fixture.field->update(fixture.frame);
+  fixture.spectrum()->setCurrentKeyIndex(1);
+  fixture.finish(fixture.preciseEdit(0), "1.2345678901234567");
+  const auto saved   = copySpectrum(fixture.actual);
+  const auto pending = copySpectrum(fixture.preview);
+  saved->removeKey(0);
+  pending->removeKey(0);
+  removeStop(fixture, 0);
+  check(!fixture.actual->hasKeyframes(),
+        "removing the only animated stop leaves a default-only saved ramp");
+  check(equalSpectrum(fixture.actual, saved),
+        "removing animation does not prematurely commit surviving edits");
+  check(equalSpectrum(fixture.preview, pending),
+        "pending edits survive removal of the only animated stop");
+  fixture.field->update(fixture.frame);
+  check(equalSpectrum(fixture.preview, pending),
+        "default-only refresh retains the surviving pending edit");
+  keyPendingPreview(fixture, pending);
+}
+
 enum class TargetChange { Frame, Stop, Fx, Preview, FrameRefresh };
 
 void pendingTarget(TargetChange change) {
@@ -594,9 +732,12 @@ int main(int argc, char **argv) {
     else if (name == "selection") {
       selectionTest();
       shortAndOutsideDrags();
-    } else if (name == "insertion")
+    } else if (name == "insertion") {
       insertionTest();
-    else if (name == "targets")
+      pendingInsertionTest();
+      pendingRemovalTest();
+      removeOnlyAnimatedStopTest();
+    } else if (name == "targets")
       targetsTest();
     else if (name == "history")
       historyTest();

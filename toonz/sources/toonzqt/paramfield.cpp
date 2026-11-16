@@ -405,28 +405,43 @@ public:
   }
 };
 
-// Preserve all stop positions, channel precision and animation curves when a
-// precision-sensitive ramp is edited, including structural changes.
+// Other undo commands retain live channel pointers. Keep the original stops as
+// well as cloned values so structural history can reattach removed stops.
 class PreciseSpectrumParamUndo final : public AnimatableFxSettingsUndo {
-  TSpectrumParamP m_actual, m_before, m_after;
+  struct State {
+    TSpectrumParamP values;
+    std::vector<std::pair<TDoubleParamP, TPixelParamP>> keys;
+  };
+  TSpectrumParamP m_actual;
+  State m_before, m_after;
+
+  static State capture(const TSpectrumParamP& param) {
+    State state{TParamP(param->clone()), {}};
+    for (int i = 0; i < param->getKeyCount(); ++i)
+      state.keys.emplace_back(param->getPosition(i), param->getColor(i));
+    return state;
+  }
+
+  void restore(const State& state) const {
+    for (int i = 0; i < state.values->getKeyCount(); ++i) {
+      state.keys[i].first->copy(state.values->getPosition(i).getPointer());
+      state.keys[i].second->copy(state.values->getColor(i).getPointer());
+    }
+    m_actual->setKeyParams(state.keys);
+    if (m_fxHandle) m_fxHandle->notifyFxChanged();
+  }
 
 public:
-  PreciseSpectrumParamUndo(const TSpectrumParamP &actual, QString name,
-                           int frame, TFxHandle *handle)
+  PreciseSpectrumParamUndo(const TSpectrumParamP& actual, QString name,
+                           int frame, TFxHandle* handle)
       : AnimatableFxSettingsUndo(name, frame, handle)
       , m_actual(actual)
-      , m_before(TParamP(actual->clone())) {
+      , m_before(capture(actual)) {
     m_wasKeyframe = actual->isKeyframe(frame);
   }
-  void onAdd() override { m_after = TParamP(m_actual->clone()); }
-  void undo() const override {
-    m_actual->copy(m_before.getPointer());
-    if (m_fxHandle) m_fxHandle->notifyFxChanged();
-  }
-  void redo() const override {
-    m_actual->copy(m_after.getPointer());
-    if (m_fxHandle) m_fxHandle->notifyFxChanged();
-  }
+  void onAdd() override { m_after = capture(m_actual); }
+  void undo() const override { restore(m_before); }
+  void redo() const override { restore(m_after); }
 };
 
 static std::array<TDoubleParamP, 4> pixelChannels(const TPixelParamP &color) {
@@ -1516,9 +1531,8 @@ bool SpectrumParamField::syncPrecisePreview() {
   const bool committedChange = m_previewNeedsSync;
   m_previewNeedsSync         = false;
   if (committedChange) cancelPreciseEdit();
-  if (m_currentParam.getPointer() != m_actualParam.getPointer() &&
-      (committedChange || m_actualParam->isKeyframe(m_frame) ||
-       !m_actualParam->hasKeyframes()))
+  if (committedChange &&
+      m_currentParam.getPointer() != m_actualParam.getPointer())
     m_currentParam->copy(m_actualParam.getPointer());
   return committedChange;
 }
@@ -1778,8 +1792,16 @@ void SpectrumParamField::onKeyAdded(int keyIndex) {
     const double values[] = {color.r, color.g, color.b, color.m};
     for (int channel = 0; channel < 4; ++channel)
       channels[channel]->setDefaultValue(values[channel]);
-    m_previewNeedsSync = true;
+    if (m_currentParam != m_actualParam) {
+      m_currentParam->addKey(key.first, TPixel32::Black);
+      m_currentParam->getColor(keyIndex)->copy(
+          m_actualParam->getColor(keyIndex).getPointer());
+    }
+    observeParam(true);
+    // Both ramps now have the new stop; keep surviving preview edits intact.
+    m_previewNeedsSync = false;
     finishPreciseEdit(undo);
+    emit currentParamChanged();
     return;
   }
 
@@ -1804,8 +1826,12 @@ void SpectrumParamField::onKeyRemoved(int keyIndex) {
     TUndo *undo = new PreciseSpectrumParamUndo(
         m_actualParam, m_interfaceName, m_frame, ParamField::m_fxHandleStat);
     m_actualParam->removeKey(keyIndex);
-    m_previewNeedsSync = true;
+    if (m_currentParam != m_actualParam) m_currentParam->removeKey(keyIndex);
+    observeParam(true);
+    // Both ramps now have the same survivors, including any pending edits.
+    m_previewNeedsSync = false;
     finishPreciseEdit(undo);
+    emit currentParamChanged();
     return;
   }
   TUndo *undo                          = 0;

@@ -32,8 +32,10 @@ add_executable(spectrumparam_test spectrumparam_test.cpp ${SPECTRUM_SOURCES})
 add_executable(spectrumparam_swatch_test spectrumparam_swatch_test.cpp ${SPECTRUM_SOURCES}
     "${SOURCE_DIR}/toonzqt/fxsettings.cpp" "${SOURCE_DIR}/tnzbase/tfxutil.cpp"
     ${FXSETTINGS_MOC})
+add_executable(spectrumparam_reset_test spectrumparam_reset_test.cpp ${SPECTRUM_SOURCES}
+    "${SOURCE_DIR}/toonzlib/fxcommand.cpp")
 
-foreach(TARGET spectrumparam_test spectrumparam_swatch_test)
+foreach(TARGET spectrumparam_test spectrumparam_swatch_test spectrumparam_reset_test)
     target_include_directories(${TARGET} PRIVATE
         "${SOURCE_DIR}/include" "${SOURCE_DIR}/include/toonzqt" "${SOURCE_DIR}/toonzqt"
         "${SOURCE_DIR}/../../thirdparty/libmypaint/dist/64/include/libmypaint")
@@ -55,6 +57,13 @@ foreach(TARGET spectrumparam_test spectrumparam_swatch_test)
     endforeach()
     target_link_libraries(${TARGET} PRIVATE Qt5::Core Qt5::Gui Qt5::Widgets Boost::headers)
 endforeach()
+add_test(NAME spectrum_reset_history COMMAND spectrumparam_reset_test)
+set_tests_properties(spectrum_reset_history PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;UBSAN_OPTIONS=halt_on_error=1")
+if(APPLE)
+    set_property(TEST spectrum_reset_history APPEND PROPERTY
+        ENVIRONMENT "DYLD_LIBRARY_PATH=${OPENTOONZ_LIBRARY_DIR}")
+endif()
 target_compile_definitions(spectrumparam_swatch_test PRIVATE
     PR7244_TEST_PROFILES="${CMAKE_CURRENT_SOURCE_DIR}/fixtures/profiles"
     PR7244_TEST_OUTPUT="${CMAKE_CURRENT_BINARY_DIR}")
