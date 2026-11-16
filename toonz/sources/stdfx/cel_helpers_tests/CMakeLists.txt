@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 3.18)
+project(CelHelperTests LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+get_filename_component(FX_DIR "${CMAKE_CURRENT_SOURCE_DIR}/.." ABSOLUTE)
+add_executable(cel_helpers_test cel_helpers_test.cpp
+    "${FX_DIR}/celmotion.cpp" "${FX_DIR}/celnoise.cpp")
+target_include_directories(cel_helpers_test PRIVATE "${FX_DIR}")
+enable_testing()
+add_test(NAME cel_helpers COMMAND cel_helpers_test)
+set_tests_properties(cel_helpers PROPERTIES ENVIRONMENT "UBSAN_OPTIONS=halt_on_error=1")
