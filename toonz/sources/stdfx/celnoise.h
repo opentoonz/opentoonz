@@ -9,8 +9,9 @@ struct Settings {
   double offset      = 0;
   double thickness   = 10;
 };
-// Coordinates are in the effect's unscaled global domain. Layer values are
-// premultiplied luminance: transparent pixels are black. No frame/order state.
+// Coordinates and positive thickness share the same domain; callers may scale
+// both for render resolution. Layer values are premultiplied luminance:
+// transparent pixels are black. No frame/order state.
 double sample(const Settings &settings, double x, double y,
               double layerLuminance = 0);
 }  // namespace CelNoise
