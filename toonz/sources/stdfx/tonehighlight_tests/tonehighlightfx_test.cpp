@@ -144,24 +144,18 @@ struct Fixture {
 };
 
 void expectRadiusRejected(Fixture& f) {
-  bool rejected = false;
-  try {
-    f.fx.getMemoryRequirement(TRectD(0, 0, 64, 64), 0, f.settings);
-  } catch (const TException& error) {
-    rejected = !error.getMessage().empty();
-  }
-  require(rejected, "Unsafe blur radius did not report an actionable error");
+  require(f.fx.getMemoryRequirement(TRectD(0, 0, 64, 64), 0, f.settings) == 0,
+          "An invalid radius should not schedule workspace allocation");
   require(f.source->computeCalls == 0 && f.matte->computeCalls == 0,
           "Radius validation unexpectedly computed input images");
-  rejected = false;
-  try {
-    TRectD rect(0, 0, 64, 64);
-    f.fx.doDryCompute(rect, 0, f.settings);
-  } catch (const TException& error) {
-    rejected = !error.getMessage().empty();
-  }
-  require(rejected, "Dry compute accepted an unsafe blur radius");
-  rejected = false;
+  const int sourceDryCalls = f.source->dryCalls;
+  const int matteDryCalls  = f.matte->dryCalls;
+  TRectD rect(0, 0, 64, 64);
+  f.fx.doDryCompute(rect, 0, f.settings);
+  require(f.source->dryCalls == sourceDryCalls &&
+              f.matte->dryCalls == matteDryCalls,
+          "An invalid radius should not precompute input images");
+  bool rejected = false;
   try {
     TRasterP output;
     if (f.settings.m_bpp == 32)
@@ -176,8 +170,8 @@ void expectRadiusRejected(Fixture& f) {
     rejected = !error.getMessage().empty();
   }
   require(rejected, "Render compute accepted an unsafe blur radius");
-  require(f.matte->computeCalls == 0,
-          "Unsafe radius allocated and computed the padded matte");
+  require(f.source->computeCalls == 0 && f.matte->computeCalls == 0,
+          "Unsafe radius allocated and computed input images");
 }
 
 void testExtremeRadius() {

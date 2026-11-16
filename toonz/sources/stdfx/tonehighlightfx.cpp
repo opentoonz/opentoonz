@@ -199,26 +199,23 @@ public:
            isAlmostIsotropic(info.m_affine);
   }
 
-  double getSoftness(double frame, const TRenderSettings &info) {
-    const double softness =
+  bool getSoftness(double frame, const TRenderSettings &info,
+                   double &softness) {
+    softness =
         fabs(m_softness->getValue(frame)) * sqrt(fabs(info.m_affine.det()));
     const double radius = std::ceil(softness);
-    if (!std::isfinite(radius))
-      throw TException(
-          "Tone / Highlight: non-finite blur radius; "
-          "reduce Softness or render scale");
+    if (!std::isfinite(radius)) return false;
     // A triangular kernel this narrow samples only its center. Using TRop::blur
     // introduces cancellation or reciprocal overflow for small subpixel radii.
-    if (softness <= 1.0) return 0.0;
+    if (softness <= 1.0) {
+      softness = 0.0;
+      return true;
+    }
     // Subdivision cannot remove the halo around even a single output pixel.
     // Bound it before integer conversion and before TRop::blur squares it.
     const int budgetMiB = std::min(std::max(info.m_maxTileSize, 1), 256);
-    if (workspaceBytes(1.0, 1.0, radius, info.m_bpp) >
-        double(budgetMiB) * 1024.0 * 1024.0)
-      throw TException("Tone / Highlight: minimum blur workspace exceeds the " +
-                       std::to_string(budgetMiB) +
-                       " MiB render limit; reduce Softness or render scale");
-    return softness;
+    return workspaceBytes(1.0, 1.0, radius, info.m_bpp) <=
+           double(budgetMiB) * 1024.0 * 1024.0;
   }
 
   void doDryCompute(TRectD &rect, double frame,
@@ -228,7 +225,10 @@ public:
       m_source->dryCompute(rect, frame, info);
       return;
     }
-    const double radius = std::ceil(getSoftness(frame, info));
+    double softness;
+    // Invalid requests fail in doCompute, inside the renderer's frame handler.
+    if (!getSoftness(frame, info, softness)) return;
+    const double radius = std::ceil(softness);
     TRectD matteRect    = rect.enlarge(radius);
     m_source->dryCompute(rect, frame, info);
     m_matte->dryCompute(matteRect, frame, info);
@@ -238,7 +238,9 @@ public:
                            const TRenderSettings &info) override {
     if (!m_source.isConnected() || isPassThrough(frame) || rect.isEmpty())
       return 0;
-    const double radius = std::ceil(getSoftness(frame, info));
+    double softness;
+    if (!getSoftness(frame, info, softness)) return 0;
+    const double radius = std::ceil(softness);
     const double bytes =
         workspaceBytes(std::ceil(rect.getLx()) + 1.0,
                        std::ceil(rect.getLy()) + 1.0, radius, info.m_bpp);
@@ -267,8 +269,12 @@ void ToneHighlightFx::doCompute(TTile &tile, double frame,
   }
 
   // Compute the matte over the tile, blurred by the softness
+  double softness;
+  if (!getSoftness(frame, ri, softness))
+    throw TException(
+        "Tone / Highlight: blur radius is non-finite or its minimum workspace "
+        "exceeds the render tile budget; reduce Softness or render scale");
   const TDimension size      = tile.getRaster()->getSize();
-  const double softness      = getSoftness(frame, ri);
   const int radius           = static_cast<int>(std::ceil(softness));
   const TDimension matteSize = checkedMatteSize(size, radius, ri.m_bpp);
   m_source->compute(tile, frame, ri);

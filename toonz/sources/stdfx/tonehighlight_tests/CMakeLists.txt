@@ -30,32 +30,44 @@ endforeach()
 enable_testing()
 add_executable(tonehighlightfx_test tonehighlightfx_test.cpp
     "${TONE_HIGHLIGHT_SOURCE_DIR}/stdfx.cpp" "${TONE_HIGHLIGHT_SOURCE_DIR}/gradients.cpp")
-target_include_directories(tonehighlightfx_test PRIVATE
-    "${TONE_HIGHLIGHT_SOURCE_DIR}" "${TOONZ_SOURCE_DIR}/include")
-if(TOONZ_TEST_BIG_ENDIAN)
-    target_compile_definitions(tonehighlightfx_test PRIVATE TNZ_LITTLE_ENDIAN=0)
-else()
-    target_compile_definitions(tonehighlightfx_test PRIVATE TNZ_LITTLE_ENDIAN=1)
-endif()
-if(APPLE)
-    # These legacy names also select the pixel ABI in OpenToonz's arm64 build.
-    target_compile_definitions(tonehighlightfx_test PRIVATE
-        MACOSX __MACOS__ i386 x64 GL_SILENCE_DEPRECATION)
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    target_compile_definitions(tonehighlightfx_test PRIVATE LINUX)
-elseif(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
-    target_compile_definitions(tonehighlightfx_test PRIVATE FREEBSD)
-endif()
-target_link_libraries(tonehighlightfx_test PRIVATE
-    ${TOONZ_TEST_LIBRARIES} Qt5::Core Qt5::Gui Qt5::OpenGL)
-
+add_executable(renderer_failure_test renderer_failure_test.cpp
+    "${TONE_HIGHLIGHT_SOURCE_DIR}/stdfx.cpp" "${TONE_HIGHLIGHT_SOURCE_DIR}/gradients.cpp")
 option(TONE_HIGHLIGHT_SANITIZE "Check undefined arithmetic in the compiled FX and test" ON)
-if(TONE_HIGHLIGHT_SANITIZE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
-    target_compile_options(tonehighlightfx_test PRIVATE
-        -fsanitize=undefined,float-cast-overflow -fno-sanitize-recover=all)
-    target_link_options(tonehighlightfx_test PRIVATE
-        -fsanitize=undefined,float-cast-overflow -fno-sanitize-recover=all)
-endif()
+foreach(target tonehighlightfx_test renderer_failure_test)
+    target_include_directories(${target} PRIVATE
+        "${TONE_HIGHLIGHT_SOURCE_DIR}" "${TOONZ_SOURCE_DIR}/include")
+    if(TOONZ_TEST_BIG_ENDIAN)
+        target_compile_definitions(${target} PRIVATE TNZ_LITTLE_ENDIAN=0)
+    else()
+        target_compile_definitions(${target} PRIVATE TNZ_LITTLE_ENDIAN=1)
+    endif()
+    if(APPLE)
+        # These legacy names also select the pixel ABI in OpenToonz's arm64 build.
+        target_compile_definitions(${target} PRIVATE
+            MACOSX __MACOS__ i386 x64 GL_SILENCE_DEPRECATION)
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        target_compile_definitions(${target} PRIVATE LINUX)
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+        target_compile_definitions(${target} PRIVATE FREEBSD)
+    endif()
+    target_link_libraries(${target} PRIVATE
+        ${TOONZ_TEST_LIBRARIES} Qt5::Core Qt5::Gui Qt5::OpenGL)
+
+    if(TONE_HIGHLIGHT_SANITIZE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+        target_compile_options(${target} PRIVATE
+            -fsanitize=undefined,float-cast-overflow -fno-sanitize-recover=all)
+        target_link_options(${target} PRIVATE
+            -fsanitize=undefined,float-cast-overflow -fno-sanitize-recover=all)
+    endif()
+endforeach()
+
+foreach(bpp 32 64 128)
+    foreach(case success budget nonfinite)
+        add_test(NAME tonehighlight-renderer-${case}-${bpp}
+                 COMMAND renderer_failure_test ${bpp} ${case})
+        set_tests_properties(tonehighlight-renderer-${case}-${bpp} PROPERTIES TIMEOUT 20)
+    endforeach()
+endforeach()
 
 foreach(case radius-extreme radius-workspace radius-nonfinite radius-scale memory
              hdr-zero hdr-no-matte no-op active-float tiny-softness integer-matrix
