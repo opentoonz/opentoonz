@@ -58,7 +58,7 @@ class TMacroFx;
 
                 Inherits \b QWidget.
 */
-class DVAPI ParamsPage final : public QFrame {
+class DVAPI ParamsPage final : public QFrame, public TParamObserver {
   Q_OBJECT
 
   QColor m_textColor; /*-- 文字の色 デフォルト黒 --*/
@@ -98,6 +98,8 @@ class DVAPI ParamsPage final : public QFrame {
     std::vector<QString> m_labels;
     QComboBox *m_selector;
     QStackedWidget *m_editors;
+    TDoubleParamP m_actualCount;
+    bool m_countNeedsSync = true;
   };
   std::vector<IndexedColors> m_indexedColors;
   TFxP m_indexedCurrentFx;
@@ -107,6 +109,8 @@ class DVAPI ParamsPage final : public QFrame {
   void addIndexedColors(TIStream &is, const TFxP &fx);
   void addIndexedGroups(TIStream &is, const TFxP &fx);
   void updateIndexedColors();
+  void syncIndexedCounts(bool changedTarget);
+  void onChange(const TParamChange &change) override;
 
 public:
   ParamsPage(QWidget *parent = 0, ParamViewer *paramViewer = 0);
