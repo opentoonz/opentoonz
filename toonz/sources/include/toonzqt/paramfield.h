@@ -8,6 +8,7 @@
 #endif
 
 #include "tcommon.h"
+#include <array>
 #include <QWidget>
 #include <QSpinBox>
 #include <QSlider>
@@ -433,14 +434,24 @@ protected slots:
 //-----------------------------------------------------------------------------
 
 class DVAPI PixelParamField final
-    : public AnimatedParamField<TPixel32, TPixelParamP> {
+    : public AnimatedParamField<TPixel32, TPixelParamP>,
+      private TParamObserver {
   Q_OBJECT
 
   DVGui::ColorField *m_colorField;
+  std::array<TDoubleParamP, 4> m_observedChannels;
+  bool m_previewNeedsSync = false;
+
+  void observeChannels(bool observe);
+  void onChange(const TParamChange &) override { m_previewNeedsSync = true; }
 
 public:
   PixelParamField(QWidget *parent, QString name, const TPixelParamP &param);
+  ~PixelParamField() override;
 
+  void setParam(const TParamP &current, const TParamP &actual,
+                int frame) override;
+  void update(int frame) override;
   void updateField(TPixel32 value) override;
 
   QSize getPreferredSize() override { return QSize(480, 40); }
