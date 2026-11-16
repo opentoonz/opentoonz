@@ -33,8 +33,9 @@ double sample(const Settings &settings, double x, double y,
     return std::isfinite(layerLuminance)
                ? std::max(0.0, std::min(1.0, layerLuminance))
                : 0;
-  if (!std::isfinite(x) || !std::isfinite(y) || !std::isfinite(settings.offset) ||
-      !std::isfinite(settings.thickness) || settings.thickness <= 0)
+  if (!std::isfinite(x) || !std::isfinite(y) ||
+      !std::isfinite(settings.offset) || !std::isfinite(settings.thickness) ||
+      settings.thickness <= 0)
     return 0;
   // Callers may scale thickness outside the UI range for render resolution.
   // Reduce before division so extreme coordinates cannot overflow the lattice.
