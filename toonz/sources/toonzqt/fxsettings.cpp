@@ -137,7 +137,10 @@ ParamsPage::ParamsPage(QWidget *parent, ParamViewer *paramViewer)
 
 //-----------------------------------------------------------------------------
 
-ParamsPage::~ParamsPage() {}
+ParamsPage::~ParamsPage() {
+  for (const auto &group : m_indexedColors)
+    if (group.m_actualCount) group.m_actualCount->removeObserver(this);
+}
 
 //-----------------------------------------------------------------------------
 
@@ -694,9 +697,13 @@ TOONZ_DEFINE_NEW_COMPONENT(newComboBox, make_combobox);
 void ParamsPage::setFx(const TFxP &currentFx, const TFxP &actualFx, int frame) {
   assert(currentFx);
   assert(actualFx);
+  const bool changedTarget = currentFx != m_indexedCurrentFx ||
+                             actualFx != m_indexedActualFx ||
+                             frame != m_indexedFrame;
   m_indexedCurrentFx = currentFx;
   m_indexedActualFx  = actualFx;
   m_indexedFrame     = frame;
+  syncIndexedCounts(changedTarget);
   for (int i = 0; i < (int)m_fields.size(); i++) {
     ParamField *field = m_fields[i];
     std::string paramName = field->getParamName().toStdString();
@@ -823,24 +830,41 @@ void ParamsPage::setPointValue(int index, const TPointD &p) {
 //-----------------------------------------------------------------------------
 
 void ParamsPage::update(int frame) {
-  m_indexedFrame = frame;
-  // Restore the preview count's curves after undo or a frame change. Native
-  // numeric fields can leave a temporary preview key when editing a default.
-  if (m_indexedCurrentFx && m_indexedActualFx) {
-    for (const IndexedColors &group : m_indexedColors) {
-      TParam *current =
-          m_indexedCurrentFx->getParams()->getParam(group.m_countName);
-      TParam *actual =
-          m_indexedActualFx->getParams()->getParam(group.m_countName);
-      if (current && actual && current != actual) current->copy(actual);
-    }
-  }
+  const bool changedFrame = frame != m_indexedFrame;
+  m_indexedFrame          = frame;
+  syncIndexedCounts(changedFrame);
   int i;
   for (i = 0; i < (int)m_fields.size(); i++) {
     ParamField *field = m_fields[i];
     field->update(frame);
   }
   updateIndexedColors();
+}
+
+void ParamsPage::onChange(const TParamChange &change) {
+  for (auto &group : m_indexedColors)
+    if (group.m_actualCount.getPointer() == change.m_param)
+      group.m_countNeedsSync = true;
+}
+
+void ParamsPage::syncIndexedCounts(bool changedTarget) {
+  if (!m_indexedCurrentFx || !m_indexedActualFx) return;
+  for (auto &group : m_indexedColors) {
+    TDoubleParamP actual =
+        TParamP(m_indexedActualFx->getParams()->getParam(group.m_countName));
+    if (actual != group.m_actualCount) {
+      if (group.m_actualCount) group.m_actualCount->removeObserver(this);
+      group.m_actualCount = actual;
+      if (actual) actual->addObserver(this);
+      group.m_countNeedsSync = true;
+    }
+    TParam *current =
+        m_indexedCurrentFx->getParams()->getParam(group.m_countName);
+    if (actual && current && current != actual.getPointer() &&
+        (changedTarget || group.m_countNeedsSync))
+      current->copy(actual.getPointer());
+    group.m_countNeedsSync = false;
+  }
 }
 
 // Each list entry owns a normal bound ParamField. Navigation never writes a
@@ -969,6 +993,11 @@ void ParamsPage::updateIndexedColors() {
         TParamP(m_indexedCurrentFx->getParams()->getParam(group.m_countName));
     if (!countParam) continue;
     const double value = countParam->getValue(m_indexedFrame);
+    for (auto *field : m_fields) {
+      if (field->getParamName().toStdString() != group.m_countName) continue;
+      if (auto *number = dynamic_cast<MeasuredDoubleParamField *>(field))
+        number->updateField(value);
+    }
     const int count =
         std::isfinite(value)
             ? int(std::floor(
@@ -979,9 +1008,14 @@ void ParamsPage::updateIndexedColors() {
     for (int i = 0; i < int(group.m_names.size()); ++i) {
       TPixelParamP color =
           TParamP(m_indexedCurrentFx->getParams()->getParam(group.m_names[i]));
-      const TPixel32 pixel = color->getValue(m_indexedFrame);
+      const TPixelD pixel       = color->getValueD(m_indexedFrame);
+      const auto displayChannel = [](double value) {
+        return std::isfinite(value) ? std::max(0.0, std::min(1.0, value)) : 0.0;
+      };
       QPixmap swatch(16, 16);
-      swatch.fill(QColor(pixel.r, pixel.g, pixel.b));
+      swatch.fill(QColor::fromRgbF(displayChannel(pixel.r),
+                                   displayChannel(pixel.g),
+                                   displayChannel(pixel.b)));
       group.m_selector->setItemIcon(i, QIcon(swatch));
       const QString name =
           i < int(group.m_labels.size())
