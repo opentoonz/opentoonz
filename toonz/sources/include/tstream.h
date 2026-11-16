@@ -236,6 +236,10 @@ public:
   explicit operator bool()
       const;  //!< Returns whether the stream has a valid status.
 
+  // Opt into lossless finite-double text for a scoped serialization operation.
+  // Child streams share this mode. Returns the previous mode for restoration.
+  bool setFullPrecision(bool enabled);
+
   TOStream &operator<<(int v);           //!< Writes an int to the stream.
   TOStream &operator<<(double v);        //!< Writes a double to the stream.
   TOStream &operator<<(std::string v);   //!< Writes a string to the stream.

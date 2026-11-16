@@ -1,5 +1,6 @@
 
 
+#include "trenderscale.h"
 #include "trenderer.h"
 #include "trendererP.h"
 
@@ -1359,7 +1360,8 @@ void TRendererImp::startRendering(
   TPointD pos(renderArea.getP00());
   TDimension frameSize(tceil(renderArea.getLx()), tceil(renderArea.getLy()));
 
-  TRectD camBox(TPointD(pos.x / info.m_shrinkX, pos.y / info.m_shrinkY),
+  TRectD camBox(TPointD(pos.x / TRenderScale::divisor(info.m_shrinkX),
+                        pos.y / TRenderScale::divisor(info.m_shrinkY)),
                 TDimensionD(frameSize.lx, frameSize.ly));
 
   // Refresh the raster pool specs

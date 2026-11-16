@@ -35,6 +35,7 @@ public:
 
   // Commands
   void enableCommands() override;
+  bool keepItemsWhenFocusMovesTo(TSelection* next) const override;
 
   void duplicateFiles();
   void deleteFiles();

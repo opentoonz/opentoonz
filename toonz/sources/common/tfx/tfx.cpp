@@ -34,6 +34,19 @@ TIStream &operator>>(TIStream &in, TFxP &p) {
 
 namespace {
 
+class FxPrecisionScope {
+  TOStream *m_stream;
+  bool m_previous;
+
+public:
+  FxPrecisionScope(TOStream &stream, bool enabled)
+      : m_stream(enabled ? &stream : nullptr)
+      , m_previous(enabled ? stream.setFullPrecision(true) : false) {}
+  ~FxPrecisionScope() {
+    if (m_stream) m_stream->setFullPrecision(m_previous);
+  }
+};
+
 //------------------------------------------------------------------------------
 
 typedef std::pair<std::string, TFxPort *> NamePort;
@@ -888,7 +901,10 @@ void TFx::saveData(TOStream &os) {
         // Skip saving for obsolete parameters
         if (paramVar->isObsolete()) continue;
         os.openChild(paramName);
-        paramVar->getParam()->saveData(os);
+        {
+          FxPrecisionScope precision(os, requiresFullPrecisionSerialization());
+          paramVar->getParam()->saveData(os);
+        }
         os.closeChild();
       }
       os.closeChild();
@@ -978,7 +994,10 @@ void TFx::savePreset(TOStream &os) {
     std::string paramName = getParams()->getParamName(i);
     TParam *param         = getParams()->getParam(i);
     os.openChild(paramName);
-    param->saveData(os);
+    {
+      FxPrecisionScope precision(os, requiresFullPrecisionSerialization());
+      param->saveData(os);
+    }
     os.closeChild();
   }
   os.closeChild();

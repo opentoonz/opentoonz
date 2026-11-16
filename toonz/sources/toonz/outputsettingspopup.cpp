@@ -372,6 +372,9 @@ QFrame *OutputSettingsPopup::createCameraSettingsBox(bool isPreview) {
   // Step-Shrink
   m_stepFld   = new DVGui::IntLineEdit(this);
   m_shrinkFld = new DVGui::IntLineEdit(this);
+  m_shrinkFld->setToolTip(
+      tr("Positive values reduce the render size (2 = half width and height).\n"
+         "Negative values enlarge it (-2 = twice width and height)."));
 
   QFrame *cameraParametersBox = nullptr;
   if (!isPreview) {
@@ -1358,7 +1361,7 @@ void OutputSettingsPopup::onFrameFldEditFinished() {
     step = 1;
     m_stepFld->setValue(step);
   }
-  if (shrink < 1) {
+  if (shrink == 0) {
     shrink = 1;
     m_shrinkFld->setValue(shrink);
   }

@@ -401,6 +401,9 @@ void FileBrowserPopup::showEvent(QShowEvent *) {
     m_nameField->setFocus();
   }
   resize(m_dialogSize);
+
+  if (m_forSaving && !m_nameField->text().isEmpty())
+    m_browser->holdRestoredSelectionReport();
 }
 
 //-----------------------------------------------------------------------------

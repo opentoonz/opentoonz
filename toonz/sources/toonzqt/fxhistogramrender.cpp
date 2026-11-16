@@ -1,6 +1,7 @@
 
 
 #include "toonzqt/fxhistogramrender.h"
+#include "trenderscale.h"
 #include "toonzqt/histogram.h"
 #include "tsystem.h"
 #include "timagecache.h"
@@ -105,8 +106,12 @@ void FxHistogramRender::computeHistogram(TFxP fx, int frame) {
   if (!TImageCache::instance()->isCached(alias + ".noext" +
                                          std::to_string(frame))) {
     TDimension size = m_scene->getCurrentCamera()->getRes();
-    TRectD area(TPointD(-0.5 * size.lx, -0.5 * size.ly),
-                TDimensionD(size.lx, size.ly));
+    TRectD area(
+        TPointD(-0.5 * size.lx, -0.5 * size.ly),
+        TDimensionD(TRenderScale::length(size.lx,
+                                         m_isCameraViewMode ? rs.m_shrinkX : 1),
+                    TRenderScale::length(
+                        size.ly, m_isCameraViewMode ? rs.m_shrinkY : 1)));
     m_renderPort->setRenderArea(area);
     TFxPair fxPair;
     fxPair.m_frameA = buildedFx;
@@ -164,12 +169,13 @@ void FxHistogramRender::remakeRender() {
     m_histograms->setRaster(0);
     return;
   }
-  TDimension size = m_scene->getCurrentCamera()->getRes();
-  TRectD area(TPointD(-0.5 * size.lx, -0.5 * size.ly),
-              TDimensionD(size.lx, size.ly));
-  m_renderPort->setRenderArea(area);
   TRenderSettings rs =
       m_scene->getProperties()->getPreviewProperties()->getRenderSettings();
+  TDimension size = m_scene->getCurrentCamera()->getRes();
+  TRectD area(TPointD(-0.5 * size.lx, -0.5 * size.ly),
+              TDimensionD(TRenderScale::length(size.lx, rs.m_shrinkX),
+                          TRenderScale::length(size.ly, rs.m_shrinkY)));
+  m_renderPort->setRenderArea(area);
 
   TFxP buildedFx =
       buildPartialSceneFx(m_scene, (double)m_lastFrameInfo.m_frame,
