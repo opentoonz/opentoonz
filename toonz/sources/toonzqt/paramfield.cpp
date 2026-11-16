@@ -12,6 +12,7 @@
 #include "toonzqt/menubarcommand.h"
 
 #include "tdoubleparam.h"
+#include "tdoublekeyframe.h"
 #include "tnotanimatableparam.h"
 #include "tparamset.h"
 #include "tw/stringtable.h"
@@ -23,6 +24,9 @@
 #include <QComboBox>
 #include <QFontComboBox>
 #include <QKeyEvent>
+#include <QSignalBlocker>
+#include <algorithm>
+#include <cmath>
 
 using namespace DVGui;
 
@@ -95,6 +99,30 @@ public:
       m_param->setDefaultValue(m_newValue);
     else
       m_param->setValue(m_frame, m_newValue);
+    if (m_fxHandle) m_fxHandle->notifyFxChanged();
+  }
+};
+
+// Discrete controls must restore the entire curve when deleting a key: the
+// previous interpolation, key metadata and default value are all significant.
+class AnimatedChoiceParamUndo final : public AnimatableFxSettingsUndo {
+  TDoubleParamP m_param, m_before, m_after;
+
+public:
+  AnimatedChoiceParamUndo(const TDoubleParamP &param, QString name, int frame,
+                          TFxHandle *handle)
+      : AnimatableFxSettingsUndo(name, frame, handle)
+      , m_param(param)
+      , m_before(TParamP(param->clone())) {
+    m_wasKeyframe = param->isKeyframe(frame);
+  }
+  void onAdd() override { m_after = TParamP(m_param->clone()); }
+  void undo() const override {
+    m_param->copy(m_before.getPointer());
+    if (m_fxHandle) m_fxHandle->notifyFxChanged();
+  }
+  void redo() const override {
+    m_param->copy(m_after.getPointer());
     if (m_fxHandle) m_fxHandle->notifyFxChanged();
   }
 };
@@ -785,19 +813,23 @@ MeasuredDoubleParamField::MeasuredDoubleParamField(QWidget *parent,
     : AnimatedParamField<double, TDoubleParamP>(parent, name, param) {
   QString str;
   m_paramName = str.fromStdString(param->getName());
+  m_actualParam = param;
 
   m_measuredDoubleField = new MeasuredDoubleField(this, false);
 
   m_measuredDoubleField->setSizePolicy(QSizePolicy::Expanding,
                                        QSizePolicy::Minimum);
   m_measuredDoubleField->setMeasure(param->getMeasureName());
-  m_measuredDoubleField->setValue(param->getValue(m_frame));
   m_measuredDoubleField->setDecimals(3);
 
   double min = 0, max = 100, step = 1;
   param->getValueRange(min, max, step);
   assert(min < max);
   m_measuredDoubleField->setRange(min, max);
+  if (param->getUISliderRange(min, max) &&
+      !m_measuredDoubleField->setSliderRange(min, max))
+    m_measuredDoubleField->enableSlider(false);
+  m_measuredDoubleField->setValue(param->getValue(m_frame));
 
   //----layout
   m_layout->addWidget(m_keyToggle);
@@ -821,7 +853,7 @@ void MeasuredDoubleParamField::updateField(double value) {
 //-----------------------------------------------------------------------------
 
 void MeasuredDoubleParamField::onChange(bool dragging) {
-  if (dragging) return;
+  if (dragging || !m_currentParam || !m_actualParam) return;
 
   TDoubleParamP doubleParam = m_actualParam;
 
@@ -850,11 +882,19 @@ void MeasuredDoubleParamField::onKeyToggled() { onKeyToggle(); }
 //-----------------------------------------------------------------------------
 
 void MeasuredDoubleParamField::setPrecision(int precision) {
-  double min, max;
+  double min, max, sliderMin, sliderMax;
+  const bool hasSliderRange =
+      m_actualParam && m_actualParam->getUISliderRange(sliderMin, sliderMax);
+  const double value = m_measuredDoubleField->getValue();
+  const QSignalBlocker blocker(m_measuredDoubleField);
   m_measuredDoubleField->getRange(min, max);
   m_measuredDoubleField->setDecimals(precision);
   // update slider
   m_measuredDoubleField->setRange(min, max);
+  if (hasSliderRange &&
+      !m_measuredDoubleField->setSliderRange(sliderMin, sliderMax))
+    m_measuredDoubleField->enableSlider(false);
+  m_measuredDoubleField->setValue(value);
 }
 
 //=============================================================================
@@ -1294,6 +1334,149 @@ void SpectrumParamField::onKeyRemoved(int keyIndex) {
   setParams();
 
   if (undo) TUndoManager::manager()->add(undo);
+}
+
+//=============================================================================
+// AnimatedChoiceParamField
+//-----------------------------------------------------------------------------
+
+AnimatedChoiceParamField::AnimatedChoiceParamField(QWidget *parent,
+                                                   QString name,
+                                                   const TDoubleParamP &param)
+    : ModeChangerParamField(parent, name, param)
+    , m_keyToggle(new ParamFieldKeyToggle(this))
+    , m_choiceCount(int(param->getUIChoices().size())) {
+  m_paramName = QString::fromStdString(param->getName());
+  m_layout->addWidget(m_keyToggle);
+  if (param->isUICheckbox()) {
+    m_checkBox = new CheckBox("", this);
+    m_checkBox->setObjectName("animatedCheckbox");
+    m_checkBox->setAccessibleName(m_interfaceName);
+    m_layout->addWidget(m_checkBox);
+    m_layout->addStretch();
+    connect(m_checkBox, &QCheckBox::clicked, this,
+            [this](bool checked) { onChoiceChanged(checked ? 1 : 0); });
+  } else {
+    m_choices = new QComboBox(this);
+    m_choices->setObjectName("animatedChoice");
+    m_choices->setAccessibleName(m_interfaceName);
+    for (const std::string &choice : param->getUIChoices())
+      m_choices->addItem(QString::fromStdString(choice));
+    m_layout->addWidget(m_choices);
+    connect(m_choices, QOverload<int>::of(&QComboBox::activated), this,
+            &AnimatedChoiceParamField::onChoiceChanged);
+  }
+  connect(m_keyToggle, &ParamFieldKeyToggle::keyToggled, this,
+          &AnimatedChoiceParamField::onKeyToggled);
+  updateWidgets(choiceIndex(param->getValue(0)));
+}
+
+AnimatedChoiceParamField::~AnimatedChoiceParamField() {
+  if (m_actualParam) m_actualParam->removeObserver(this);
+}
+
+int AnimatedChoiceParamField::choiceIndex(double value) const {
+  if (!std::isfinite(value)) return 0;
+  const double bounded =
+      std::max(0.0, std::min(double(m_choiceCount - 1), value));
+  return int(std::floor(bounded + 0.5));
+}
+
+void AnimatedChoiceParamField::updateWidgets(int value) {
+  if (m_checkBox) {
+    const QSignalBlocker blocker(m_checkBox);
+    m_checkBox->setChecked(value != 0);
+  } else {
+    const QSignalBlocker blocker(m_choices);
+    m_choices->setCurrentIndex(value);
+  }
+}
+
+void AnimatedChoiceParamField::updateKeyToggle() {
+  m_keyToggle->setStatus(m_actualParam->hasKeyframes(),
+                         m_actualParam->isKeyframe(m_frame),
+                         choiceIndex(m_actualParam->getValue(m_frame)) !=
+                             choiceIndex(m_currentParam->getValue(m_frame)));
+}
+
+void AnimatedChoiceParamField::setParam(const TParamP &current,
+                                        const TParamP &actual, int frame) {
+  m_currentParam            = current;
+  TDoubleParamP actualParam = actual;
+  assert(m_currentParam && actualParam);
+  if (m_actualParam != actualParam) {
+    if (m_actualParam) m_actualParam->removeObserver(this);
+    m_actualParam = actualParam;
+    if (m_actualParam) m_actualParam->addObserver(this);
+    m_previewNeedsSync = false;
+  }
+  update(frame);
+}
+
+void AnimatedChoiceParamField::update(int frame) {
+  m_frame = frame;
+  if (!m_currentParam || !m_actualParam) return;
+  // Committed edits, including undo/redo, invalidate the preview curve.
+  // Ordinary refreshes between keys must preserve uncommitted preview edits.
+  const bool committedChange = m_previewNeedsSync;
+  m_previewNeedsSync         = false;
+  if (m_currentParam != m_actualParam &&
+      (committedChange || m_actualParam->isKeyframe(frame) ||
+       !m_actualParam->hasKeyframes()))
+    m_currentParam->copy(m_actualParam.getPointer());
+  const int value = choiceIndex(m_currentParam->getValue(frame));
+  updateWidgets(value);
+  updateKeyToggle();
+  emit modeChanged(value);
+  if (committedChange) emit currentParamChanged();
+}
+
+void AnimatedChoiceParamField::onChoiceChanged(int value) {
+  if (!m_currentParam || !m_actualParam) return;
+  value = choiceIndex(value);
+  if (choiceIndex(m_currentParam->getValue(m_frame)) == value) return;
+
+  const bool hasKeys = m_actualParam->hasKeyframes();
+  if (hasKeys && !m_actualParam->isKeyframe(m_frame)) {
+    // Match native numeric fields: between keys, preview until keyed.
+    TDoubleKeyframe key(m_frame, value);
+    key.m_type = TDoubleKeyframe::Constant;
+    m_currentParam->setKeyframe(key);
+    update(m_frame);
+    emit currentParamChanged();
+    return;
+  }
+
+  auto *undo = new AnimatedChoiceParamUndo(m_actualParam, m_interfaceName,
+                                           m_frame, m_fxHandleStat);
+  if (hasKeys)
+    m_actualParam->setValue(m_frame, value);
+  else
+    m_actualParam->setDefaultValue(value);
+  TUndoManager::manager()->add(undo);
+  update(m_frame);
+  emit actualParamChanged();
+}
+
+void AnimatedChoiceParamField::onKeyToggled() {
+  if (!m_currentParam || !m_actualParam) return;
+  TUndo *undo = new AnimatedChoiceParamUndo(m_actualParam, m_interfaceName,
+                                            m_frame, m_fxHandleStat);
+  if (m_keyToggle->getStatus() == ParamFieldKeyToggle::KEYFRAME) {
+    m_actualParam->deleteKeyframe(m_frame);
+  } else if (m_actualParam->isKeyframe(m_frame)) {
+    m_actualParam->setValue(m_frame,
+                            choiceIndex(m_currentParam->getValue(m_frame)));
+  } else {
+    TDoubleKeyframe key(m_frame,
+                        choiceIndex(m_currentParam->getValue(m_frame)));
+    key.m_type = TDoubleKeyframe::Constant;
+    m_actualParam->setKeyframe(key);
+  }
+  TUndoManager::manager()->add(undo);
+  update(m_frame);
+  emit actualParamChanged();
+  emit paramKeyToggle();
 }
 
 //=============================================================================
@@ -1987,9 +2170,11 @@ void ToneCurveParamField::onKeyToggled() { onKeyToggle(); }
 
 ParamField *ParamField::create(QWidget *parent, QString name,
                                const TParamP &param) {
-  if (TDoubleParamP doubleParam = param)
+  if (TDoubleParamP doubleParam = param) {
+    if (!doubleParam->getUIChoices().empty())
+      return new AnimatedChoiceParamField(parent, name, doubleParam);
     return new MeasuredDoubleParamField(parent, name, doubleParam);
-  else if (TRangeParamP rangeParam = param)
+  } else if (TRangeParamP rangeParam = param)
     return new MeasuredRangeParamField(parent, name, rangeParam);
   else if (TPixelParamP pixelParam = param)
     return new PixelParamField(parent, name, pixelParam);

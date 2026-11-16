@@ -105,6 +105,7 @@ class DVAPI DoubleValueField : public QWidget {
   Q_OBJECT
 
   bool m_isLinearSlider;
+  bool m_hasSliderRange = false;
 
 protected:
   RollerField *m_roller;
@@ -124,6 +125,11 @@ public:
 
   void getRange(double &minValue, double &maxValue);
   void setRange(double minValue = 0, double maxValue = 0);
+
+  // Limit dragging without changing numeric-entry or roller bounds. Returns
+  // false for invalid bounds. setRange restores the ordinary shared range.
+  bool setSliderRange(double minValue, double maxValue);
+  bool getSliderRange(double &minValue, double &maxValue) const;
 
   void setValue(double value);
   double getValue();
