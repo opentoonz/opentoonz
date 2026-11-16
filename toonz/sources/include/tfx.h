@@ -472,6 +472,9 @@ public:
   void loadData(TIStream &is) override;
   void saveData(TOStream &os) override;
 
+  // Precision-sensitive effects opt in for both scene and preset parameters.
+  virtual bool requiresFullPrecisionSerialization() const { return false; }
+
   void loadPreset(TIStream &is);  // solleva un eccezione se il preset non
                                   // corrisponde all'effetto
   void savePreset(TOStream &os);

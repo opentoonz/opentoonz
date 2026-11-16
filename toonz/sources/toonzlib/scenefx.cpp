@@ -1,6 +1,7 @@
 
 
 // TnzBase includes
+#include "trenderscale.h"
 #include "tfxattributes.h"
 #include "tfxutil.h"
 #include "tmacrofx.h"
@@ -1331,11 +1332,7 @@ TFxP buildSceneFx(ToonzScene *scene, TXsheet *xsh, double row, int whichLevels,
   assert(camera);
 
   TAffine aff = getDpiAffine(camera).inv();
-  if (shrink > 1) {
-    double fac = 0.5 * (1.0 / shrink - 1.0);
-    aff = TTranslation(fac * camera->getRes().lx, fac * camera->getRes().ly) *
-          TScale(1.0 / shrink) * aff;
-  }
+  aff         = TRenderScale::cameraAffine(camera->getRes(), shrink) * aff;
 
   fx = TFxUtil::makeAffine(fx, aff);
   if (fx) fx->setName(L"CameraDPI and Shrink NAffineFx");
@@ -1402,12 +1399,7 @@ DVAPI TFxP buildPartialSceneFx(ToonzScene *scene, double row, const TFxP &root,
   assert(camera);
 
   TAffine aff = getDpiAffine(camera).inv();
-  if (shrink > 1) {
-    double fac = 0.5 * (1.0 / shrink - 1.0);
-
-    aff = TTranslation(fac * camera->getRes().lx, fac * camera->getRes().ly) *
-          TScale(1.0 / shrink) * aff;
-  }
+  aff         = TRenderScale::cameraAffine(camera->getRes(), shrink) * aff;
 
   fx = TFxUtil::makeAffine(fx, aff);
   return fx;
@@ -1434,12 +1426,7 @@ DVAPI TFxP buildPartialSceneFx(ToonzScene *scene, TXsheet *xsheet, double row,
   assert(camera);
 
   TAffine aff = getDpiAffine(camera).inv();
-  if (shrink > 1) {
-    double fac = 0.5 * (1.0 / shrink - 1.0);
-
-    aff = TTranslation(fac * camera->getRes().lx, fac * camera->getRes().ly) *
-          TScale(1.0 / shrink) * aff;
-  }
+  aff         = TRenderScale::cameraAffine(camera->getRes(), shrink) * aff;
 
   fx = TFxUtil::makeAffine(fx, aff);
   return fx;
@@ -1483,11 +1470,7 @@ DVAPI TFxP buildPostSceneFx(ToonzScene *scene, double frame, int shrink,
 
   TAffine aff = getDpiAffine(camera).inv();
 
-  if (shrink > 1) {
-    double fac = 0.5 * (1.0 / shrink - 1.0);
-    aff = TTranslation(fac * camera->getRes().lx, fac * camera->getRes().ly) *
-          TScale(1.0 / shrink) * aff;
-  }
+  aff = TRenderScale::cameraAffine(camera->getRes(), shrink) * aff;
 
   if (!aff.isIdentity()) fx = TFxUtil::makeAffine(fx, aff);
 
@@ -1523,11 +1506,7 @@ DVAPI TFxP buildSceneFx(ToonzScene *scene, double frame, TXsheet *xsh,
   TAffine aff;
   if (transforms & BSFX_CAMERA_DPI_TR) aff = getDpiAffine(camera).inv();
 
-  if (shrink > 1) {
-    double fac = 0.5 * (1.0 / shrink - 1.0);
-    aff = TTranslation(fac * camera->getRes().lx, fac * camera->getRes().ly) *
-          TScale(1.0 / shrink) * aff;
-  }
+  aff = TRenderScale::cameraAffine(camera->getRes(), shrink) * aff;
 
   if (!aff.isIdentity()) fx = TFxUtil::makeAffine(fx, aff);
 

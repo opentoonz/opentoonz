@@ -52,6 +52,9 @@ TLevelWriterGif::TLevelWriterGif(const TFilePath &path, TPropertyGroup *winfo)
   std::string maxcolors =
       m_properties->getProperty("Max Colors")->getValueAsString();
   m_maxcolors = QString::fromStdString(maxcolors).toInt();
+  if (auto *optimize =
+          dynamic_cast<TBoolProperty *>(m_properties->getProperty("Optimize")))
+    m_optimize = optimize->getValue();
 
   ffmpegWriter = new Ffmpeg();
   ffmpegWriter->setPath(m_path);
@@ -81,69 +84,81 @@ TLevelWriterGif::~TLevelWriterGif() {
 
   double framerate = (m_frameRate < 1.0 ? 1.0 : m_frameRate);
 
-  QString filters = "[0:v]fps=" + QString::number(framerate) +
-                    ",scale=" + QString::number(outLx) + ":" +
-                    QString::number(outLy) + ":flags=lanczos";
+  QString filters;
+  if (m_optimize) {
+    // Round up so a single-frame export still produces an image.
+    const double outputRate = (framerate < 5.0 ? framerate : 5.0);
+    filters                 = "[0:v]fps=" + QString::number(outputRate) +
+              ":round=up,scale=" + QString::number(outLx) + ":" +
+              QString::number(outLy) +
+              ":flags=lanczos,format=rgba"
+              ",split[x][y];[x]palettegen=max_colors=32:stats_mode=diff"
+              ":reserve_transparent=1[p];[y][p]paletteuse=dither=bayer"
+              ":bayer_scale=5:diff_mode=rectangle[out]";
+  } else {
+    filters = "[0:v]fps=" + QString::number(framerate) +
+              ",scale=" + QString::number(outLx) + ":" +
+              QString::number(outLy) + ":flags=lanczos";
+    // 1 = "dither=sierra2_4a" is default
+    const char *ditherConsts[4] = {"none", "sierra2_4a", "bayer:bayer_scale=2",
+                                   "bayer:bayer_scale=1"};
 
-  // 1 = "dither=sierra2_4a" is default
-  const char *ditherConsts[4] = {"none", "sierra2_4a", "bayer:bayer_scale=2",
-                                 "bayer:bayer_scale=1"};
+    // Handle all modes
+    switch (m_mode) {
+    // GLOBAL modes (0-3)
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+      filters += ",split[x][y];[x]palettegen";  // "stats_mode=full" is default
+      if (m_maxcolors != 256) {
+        filters += "=max_colors=" + QString::number(m_maxcolors);
+      }
+      filters += "[p];[y][p]paletteuse";
+      if ((m_mode & 3) != 1) {
+        filters += "=dither=" + QString(ditherConsts[m_mode & 3]);
+      }
+      filters += "[out]";
+      break;
 
-  // Handle all modes
-  switch (m_mode) {
-  // GLOBAL modes (0-3)
-  case 0:
-  case 1:
-  case 2:
-  case 3:
-    filters += ",split[x][y];[x]palettegen";  // "stats_mode=full" is default
-    if (m_maxcolors != 256) {
-      filters += "=max_colors=" + QString::number(m_maxcolors);
-    }
-    filters += "[p];[y][p]paletteuse";
-    if ((m_mode & 3) != 1) {
-      filters += "=dither=" + QString(ditherConsts[m_mode & 3]);
-    }
-    filters += "[out]";
-    break;
+    // DIFF modes (4-7)
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+      filters += ",split[x][y];[x]palettegen=stats_mode=diff";
+      if (m_maxcolors != 256) {
+        filters += ":max_colors=" + QString::number(m_maxcolors);
+      }
+      filters += "[p];[y][p]paletteuse";
+      if ((m_mode & 3) != 1) {
+        filters += "=dither=" + QString(ditherConsts[m_mode & 3]);
+      }
+      filters += "[out]";
+      break;
 
-  // DIFF modes (4-7)
-  case 4:
-  case 5:
-  case 6:
-  case 7:
-    filters += ",split[x][y];[x]palettegen=stats_mode=diff";
-    if (m_maxcolors != 256) {
-      filters += ":max_colors=" + QString::number(m_maxcolors);
-    }
-    filters += "[p];[y][p]paletteuse";
-    if ((m_mode & 3) != 1) {
-      filters += "=dither=" + QString(ditherConsts[m_mode & 3]);
-    }
-    filters += "[out]";
-    break;
+    // NEW modes (8-11)
+    case 8:
+    case 9:
+    case 10:
+    case 11:
+      filters += ",split[x][y];[x]palettegen=stats_mode=single";
+      if (m_maxcolors != 256) {
+        filters += ":max_colors=" + QString::number(m_maxcolors);
+      }
+      filters += "[p];[y][p]paletteuse=new=1";
+      if ((m_mode & 3) != 1) {
+        filters += ":dither=" + QString(ditherConsts[m_mode & 3]);
+      }
+      filters += "[out]";
+      break;
 
-  // NEW modes (8-11)
-  case 8:
-  case 9:
-  case 10:
-  case 11:
-    filters += ",split[x][y];[x]palettegen=stats_mode=single";
-    if (m_maxcolors != 256) {
-      filters += ":max_colors=" + QString::number(m_maxcolors);
+    // Default case (12 - NOPAL)
+    default:
+      // For the no-palette mode, we'll use a simpler filter chain
+      filters += "[out]";
+      break;
     }
-    filters += "[p];[y][p]paletteuse=new=1";
-    if ((m_mode & 3) != 1) {
-      filters += ":dither=" + QString(ditherConsts[m_mode & 3]);
-    }
-    filters += "[out]";
-    break;
-
-  // Default case (12 - NOPAL)
-  default:
-    // For the no-palette mode, we'll use a simpler filter chain
-    filters += "[out]";
-    break;
   }
 
   // Set up FFmpeg arguments
@@ -158,7 +173,7 @@ TLevelWriterGif::~TLevelWriterGif() {
   postIArgs << "-f";
   postIArgs << "gif";
   postIArgs << "-gifflags";
-  postIArgs << "0";
+  postIArgs << (m_optimize ? "+offsetting+transdiff" : "0");
 
   if (!m_looping) {
     postIArgs << "-loop";
@@ -306,8 +321,8 @@ Tiio::GifWriterProperties::GifWriterProperties()
     , m_looping("Looping", true)
     , m_palette("Generate Palette", true)
     , m_mode("Mode")
-    , m_maxcolors("Max Colors", 2, 256, 256) {
-
+    , m_maxcolors("Max Colors", 2, 256, 256)
+    , m_optimize("Optimize", true) {
   // Set values for mode
   m_mode.addValue(L"GLOBAL0");
   m_mode.addValue(L"GLOBAL1");
@@ -346,13 +361,15 @@ Tiio::GifWriterProperties::GifWriterProperties()
   bind(m_palette);
   bind(m_mode);
   bind(m_maxcolors);
+  bind(m_optimize);
 }
 
 void Tiio::GifWriterProperties::updateTranslation() {
   m_scale.setQStringName(tr("Scale"));
   m_looping.setQStringName(tr("Looping"));
-  m_mode.setQStringName(tr("Mode"));
-  m_maxcolors.setQStringName(tr("Max Colors"));
+  m_mode.setQStringName(tr("Mode (Optimize off)"));
+  m_maxcolors.setQStringName(tr("Max Colors (Optimize off)"));
+  m_optimize.setQStringName(tr("Optimize (up to 5 fps, 32 colors)"));
 }
 
 // Tiio::Reader* Tiio::makeGifReader(){ return nullptr; }

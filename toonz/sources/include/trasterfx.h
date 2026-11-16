@@ -271,6 +271,11 @@ public:
   virtual bool canHandle(const TRenderSettings &info, double frame) = 0;
   virtual TAffine handledAffine(const TRenderSettings &info, double frame);
 
+  // Opt in when handledAffine selects a native pixel grid even for an identity
+  // request. Existing effects retain the identity fast path. The selected
+  // affine must be stable after integer translations move into tile positions.
+  virtual bool usesCustomRenderGrid() const { return false; }
+
   static TRasterP applyAffine(TTile &tileOut, const TTile &tileIn,
                               const TRenderSettings &info);
 

@@ -175,12 +175,15 @@ public:
           if (outputSettings.getRenderSettings().m_stereoscopic) {
             assert(!isPreview);
             ::viewFile(m_fp.withName(m_fp.getName() + "_l"), r0 + 1, r1 + 1,
-                       step, isPreview ? rs.m_shrinkX : 1, snd, 0, false, true);
+                       step, isPreview ? std::max(1, rs.m_shrinkX) : 1, snd, 0,
+                       false, true);
             ::viewFile(m_fp.withName(m_fp.getName() + "_r"), r0 + 1, r1 + 1,
-                       step, isPreview ? rs.m_shrinkX : 1, snd, 0, false, true);
+                       step, isPreview ? std::max(1, rs.m_shrinkX) : 1, snd, 0,
+                       false, true);
           } else
-            ::viewFile(m_fp, r0 + 1, r1 + 1, step, isPreview ? rs.m_shrinkX : 1,
-                       snd, 0, false, true);
+            ::viewFile(m_fp, r0 + 1, r1 + 1, step,
+                       isPreview ? std::max(1, rs.m_shrinkX) : 1, snd, 0, false,
+                       true);
         }
       }
     }

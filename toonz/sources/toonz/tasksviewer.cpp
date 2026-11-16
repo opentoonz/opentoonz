@@ -588,7 +588,7 @@ void TaskSheet::setShrink() {
   }
 
   int val = m_shrink->text().toInt();
-  if (val < 1)
+  if (val == 0)
     m_shrink->setText(QString::number(m_task->m_shrink));
   else if (m_task->m_shrink != val) {
     m_task->m_shrink = val;

@@ -137,6 +137,7 @@ runtime directory names differ:
 | `french` | `Français` |
 | `spanish` | `Español` |
 | `chinese` | `中文` |
+| `traditional_chinese` | `繁體中文（台灣）` |
 | `german` | `Deutsch` |
 | `russian` | `Русский` |
 | `korean` | `한국어` |

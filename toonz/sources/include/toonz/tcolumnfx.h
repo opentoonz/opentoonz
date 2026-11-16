@@ -59,7 +59,7 @@ public:
 //    TLevelColumnFx  declaration
 //*******************************************************************************************
 
-class TLevelColumnFx : public TColumnFx {
+class DVAPI TLevelColumnFx : public TColumnFx {
   TXshLevelColumn *m_levelColumn;
   bool m_isCachable;
 

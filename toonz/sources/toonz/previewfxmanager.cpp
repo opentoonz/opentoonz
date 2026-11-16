@@ -1,6 +1,7 @@
 
 
 // System-core includes
+#include "trenderscale.h"
 #include "tsystem.h"  //Processors count
 #include "timagecache.h"
 #include "tw/stringtable.h"
@@ -451,14 +452,16 @@ void PreviewFxInstance::addFlipbook(FlipBook *&flipbook) {
       /*-- Viewer上でサブカメラが指定されている状態でFxPreviewをした場合 --*/
       if (subcameraRect.getLx() > 0 && subcameraRect.getLy() > 0) {
         /*-- サブカメラ枠のShrink --*/
-        if (m_renderSettings.m_shrinkX > 1 || m_renderSettings.m_shrinkY > 1) {
-          subcameraRect.x0 /= m_renderSettings.m_shrinkX;
-          subcameraRect.y0 /= m_renderSettings.m_shrinkY;
-          subcameraRect.x1 =
-              (subcameraRect.x1 + 1) / m_renderSettings.m_shrinkX - 1;
-          subcameraRect.y1 =
-              (subcameraRect.y1 + 1) / m_renderSettings.m_shrinkY - 1;
-        }
+        subcameraRect.x0 =
+            TRenderScale::pixels(subcameraRect.x0, m_renderSettings.m_shrinkX);
+        subcameraRect.y0 =
+            TRenderScale::pixels(subcameraRect.y0, m_renderSettings.m_shrinkY);
+        subcameraRect.x1 = TRenderScale::pixels(subcameraRect.x1 + 1,
+                                                m_renderSettings.m_shrinkX) -
+                           1;
+        subcameraRect.y1 = TRenderScale::pixels(subcameraRect.y1 + 1,
+                                                m_renderSettings.m_shrinkY) -
+                           1;
 
         // Fit & pan the panel to cover the sub-camera
         flipbook->adaptGeometry(subcameraRect, TRect(TPoint(), m_cameraRes));
@@ -759,8 +762,8 @@ void PreviewFxInstance::updateCamera() {
     renderArea = TRectD(cameraPos, TDimensionD(cameraRes.lx, cameraRes.ly));
   }
 
-  cameraRes.lx /= m_renderSettings.m_shrinkX;
-  cameraRes.ly /= m_renderSettings.m_shrinkY;
+  cameraRes.lx = TRenderScale::pixels(cameraRes.lx, m_renderSettings.m_shrinkX);
+  cameraRes.ly = TRenderScale::pixels(cameraRes.ly, m_renderSettings.m_shrinkY);
 
   const TPointD cameraDpi = currCamera->getDpi();
   if (m_cameraRes != cameraRes || m_renderArea != renderArea ||
@@ -813,8 +816,8 @@ void PreviewFxInstance::updatePreviewRect() {
   TRectD previewRectD;
   m_rectUnderRender = TRect();
 
-  int shrinkX = m_renderSettings.m_shrinkX;
-  int shrinkY = m_renderSettings.m_shrinkY;
+  double shrinkX = TRenderScale::divisor(m_renderSettings.m_shrinkX);
+  double shrinkY = TRenderScale::divisor(m_renderSettings.m_shrinkY);
 
   if (!isFullRender) {
     // For each opened flipbook
@@ -1107,8 +1110,8 @@ void PreviewFxInstance::doOnRenderRasterCompleted(
   }
 
   // Retain physical frame proportions for camera guides in the Flipbook.
-  ri->setDpi(m_cameraDpi.x / m_renderSettings.m_shrinkX,
-             m_cameraDpi.y / m_renderSettings.m_shrinkY);
+  ri->setDpi(m_cameraDpi.x / TRenderScale::divisor(m_renderSettings.m_shrinkX),
+             m_cameraDpi.y / TRenderScale::divisor(m_renderSettings.m_shrinkY));
 
   // Finally, copy the rendered raster over the cached one
   TRect rectUnderRender(
