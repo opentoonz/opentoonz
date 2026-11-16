@@ -142,47 +142,62 @@ struct Fixture {
   }
 };
 
-void testRadiusOverflow() {
-  Fixture f;
-  setDirectional(f.fx);
-  setDouble(f.fx, "softness", std::numeric_limits<double>::max());
+void expectRejected(Fixture& f) {
+  require(f.fx.getMemoryRequirement(TRectD(0, 0, 64, 64), 0, f.settings) == 0,
+          "An invalid radius should not schedule workspace allocation");
+  const int sourceDryCalls = f.source->dryCalls;
+  const int matteDryCalls  = f.matte->dryCalls;
+  TRectD rect(0, 0, 64, 64);
+  f.fx.doDryCompute(rect, 0, f.settings);
+  require(f.source->dryCalls == sourceDryCalls &&
+              f.matte->dryCalls == matteDryCalls,
+          "An invalid radius should not precompute input images");
   bool rejected = false;
   try {
-    f.fx.getMargin(0, f.settings);
-  } catch (const TException& error) {
-    rejected = !error.getMessage().empty();
-  }
-  require(rejected,
-          "Extreme softness was not rejected before integer conversion");
-}
-
-void expectRejected(LightShadingFx& fx, const TRenderSettings& settings) {
-  bool rejected = false;
-  try {
-    fx.getMargin(0, settings);
+    TRasterP output;
+    if (f.settings.m_bpp == 32)
+      output = TRaster32P(2, 2);
+    else if (f.settings.m_bpp == 64)
+      output = TRaster64P(2, 2);
+    else
+      output = TRasterFP(2, 2);
+    TTile tile(output);
+    f.fx.compute(tile, 0, f.settings);
   } catch (const TException& error) {
     rejected = !error.getMessage().empty();
   }
   require(rejected, "Unsupported radius did not produce an actionable error");
+  require(f.source->computeCalls == 0 && f.matte->computeCalls == 0,
+          "Unsafe radius allocated and computed input images");
+}
+
+void testRadiusOverflow() {
+  Fixture f;
+  setDirectional(f.fx);
+  setDouble(f.fx, "softness", std::numeric_limits<double>::max());
+  expectRejected(f);
 }
 
 void testRadiusBoundary() {
   Fixture f;
   setDouble(f.fx, "softness", 64.0);
-  require(f.fx.getMargin(0, f.settings) == 128,
+  TRectD request(0, 0, 8, 8);
+  f.fx.doDryCompute(request, 0, f.settings);
+  require(f.source->lastDryRect == request.enlarge(128),
           "Ordinary radial radius changed");
   setDirectional(f.fx);
-  require(f.fx.getMargin(0, f.settings) == 273,
+  f.fx.doDryCompute(request, 0, f.settings);
+  require(f.source->lastDryRect == request.enlarge(273),
           "Ordinary directional radius changed");
   f.settings.m_maxTileSize = 2;
-  expectRejected(f.fx, f.settings);
+  expectRejected(f);
   f.settings.m_maxTileSize = std::numeric_limits<int>::max();
   setDouble(f.fx, "softness", 1000.0);
-  expectRejected(f.fx, f.settings);
+  expectRejected(f);
   setDouble(f.fx, "softness", std::numeric_limits<double>::infinity());
-  expectRejected(f.fx, f.settings);
+  expectRejected(f);
   setDouble(f.fx, "softness", std::numeric_limits<double>::quiet_NaN());
-  expectRejected(f.fx, f.settings);
+  expectRejected(f);
 }
 
 void testMemoryEstimate() {
@@ -190,8 +205,10 @@ void testMemoryEstimate() {
   setDirectional(f.fx);
   setDouble(f.fx, "softness", 16.0);
   const TRectD output(0, 0, 1024, 768);
-  const int margin  = f.fx.getMargin(0, f.settings);
-  const double area = (1024.0 + 2 * margin) * (768.0 + 2 * margin);
+  TRectD request = output;
+  f.fx.doDryCompute(request, 0, f.settings);
+  const double area =
+      f.source->lastDryRect.getLx() * f.source->lastDryRect.getLy();
   for (int bpp : {32, 64, 128}) {
     f.settings.m_bpp = bpp;
     f.fx.disconnect("Matte");

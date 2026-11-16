@@ -339,7 +339,7 @@ public:
 
   // The settings for a render; the point and radius are in the tile's pixels
   // once the tile is known, see doCompute
-  void getSettings(LightShadingSettings& s, double frame,
+  bool getSettings(LightShadingSettings& s, double frame,
                    const TRenderSettings& ri) {
     const double scale    = sqrt(fabs(ri.m_affine.det()));
     const double softness = fabs(m_softness->getValue(frame)) * scale;
@@ -359,14 +359,9 @@ public:
     // the requested tile budget, with a 256 MiB ceiling for untiled renders.
     const int budgetMiB = std::min(std::max(ri.m_maxTileSize, 1), 256);
     const double budget = double(budgetMiB) * 1024.0 * 1024.0;
-    if (!std::isfinite(margin))
-      throw TException(
-          "Light Shading: non-finite blur radius; "
-          "reduce Softness or render scale");
-    if (side * side * workingBytesPerPixel(ri) > budget)
-      throw TException("Light Shading: minimum blur workspace exceeds the " +
-                       std::to_string(budgetMiB) +
-                       " MiB render limit; reduce Softness or render scale");
+    if (!std::isfinite(margin) ||
+        side * side * workingBytesPerPixel(ri) > budget)
+      return false;
     s.m_volumeRadius = static_cast<int>(volumeRadius);
     s.m_softRadius   = static_cast<int>(softRadius);
     s.m_margin       = shadingMargin(s);
@@ -387,13 +382,16 @@ public:
     s.m_shadeAmount       = m_shadeAmount->getValue(frame);
     s.m_highlightAmount   = m_highlightAmount->getValue(frame);
     s.m_protectLines      = m_protectLines->getValue();
+    return true;
   }
 
-  int getMargin(double frame, const TRenderSettings& info) {
-    if (isPassThrough(frame)) return 0;
+  bool getMargin(double frame, const TRenderSettings& info, int& margin) {
+    margin = 0;
+    if (isPassThrough(frame)) return true;
     LightShadingSettings s;
-    getSettings(s, frame, info);
-    return s.m_margin;
+    if (!getSettings(s, frame, info)) return false;
+    margin = s.m_margin;
+    return true;
   }
 
   void doDryCompute(TRectD& rect, double frame,
@@ -403,7 +401,10 @@ public:
       m_source->dryCompute(rect, frame, info);
       return;
     }
-    TRectD marginRect = rect.enlarge(getMargin(frame, info));
+    int margin;
+    // Invalid requests fail in doCompute, inside the renderer's frame handler.
+    if (!getMargin(frame, info, margin)) return;
+    TRectD marginRect = rect.enlarge(margin);
     m_source->dryCompute(marginRect, frame, info);
     if (m_matte.isConnected()) m_matte->dryCompute(marginRect, frame, info);
   }
@@ -412,7 +413,9 @@ public:
                            const TRenderSettings& info) override {
     if (!m_source.isConnected() || isPassThrough(frame) || rect.isEmpty())
       return 0;
-    const TRectD area = rect.enlarge(getMargin(frame, info));
+    int margin;
+    if (!getMargin(frame, info, margin)) return 0;
+    const TRectD area = rect.enlarge(margin);
     // Region, level and scratch coexist with either blurred or weight, but
     // never both. The optional Matte raster remains live alongside Source.
     const double pixels =
@@ -449,7 +452,10 @@ void LightShadingFx::doCompute(TTile& tile, double frame,
     return;
   }
   LightShadingSettings s;
-  getSettings(s, frame, ri);
+  if (!getSettings(s, frame, ri))
+    throw TException(
+        "Light Shading: blur radius is non-finite or its minimum workspace "
+        "exceeds the render tile budget; reduce Softness or render scale");
 
   // The source and the matte over the tile and its margin
   const TPointD origin = tile.m_pos - TPointD(s.m_margin, s.m_margin);
