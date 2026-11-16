@@ -19,6 +19,12 @@ double lattice(std::int64_t x, std::int64_t y, std::int64_t z,
 }
 double fade(double t) { return t * t * (3 - 2 * t); }
 double lerp(double a, double b, double t) { return a + (b - a) * t; }
+
+double latticeCoordinate(double value, double thickness) {
+  const double period = thickness * 1073741824.0;
+  if (std::isfinite(period)) return std::fmod(value, period) / thickness;
+  return value / thickness;
+}
 }  // namespace
 
 double sample(const Settings &settings, double x, double y,
@@ -27,12 +33,13 @@ double sample(const Settings &settings, double x, double y,
     return std::isfinite(layerLuminance)
                ? std::max(0.0, std::min(1.0, layerLuminance))
                : 0;
-  if (!std::isfinite(x) || !std::isfinite(y) || !std::isfinite(settings.offset))
+  if (!std::isfinite(x) || !std::isfinite(y) || !std::isfinite(settings.offset) ||
+      !std::isfinite(settings.thickness) || settings.thickness <= 0)
     return 0;
-  const double thickness = std::max(1.0, std::min(100.0, settings.thickness));
-  // Wrapping only the lattice domain keeps extreme coordinates well-defined.
-  x              = std::fmod(x / thickness, 1073741824.0);
-  y              = std::fmod(y / thickness, 1073741824.0);
+  // Callers may scale thickness outside the UI range for render resolution.
+  // Reduce before division so extreme coordinates cannot overflow the lattice.
+  x              = latticeCoordinate(x, settings.thickness);
+  y              = latticeCoordinate(y, settings.thickness);
   const double z = std::fmod(settings.offset, 1073741824.0);
   const auto ix = std::int64_t(std::floor(x)), iy = std::int64_t(std::floor(y));
   const auto iz = std::int64_t(std::floor(z));
