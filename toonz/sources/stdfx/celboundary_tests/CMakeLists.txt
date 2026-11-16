@@ -13,11 +13,18 @@ add_executable(celboundary_test celboundary_test.cpp
     "${SOURCE_DIR}/stdfx/gradients.cpp")
 target_include_directories(celboundary_test PRIVATE
     "${SOURCE_DIR}/include" "${SOURCE_DIR}/stdfx")
+include(TestBigEndian)
+test_big_endian(BIG_ENDIAN)
+if(BIG_ENDIAN)
+    target_compile_definitions(celboundary_test PRIVATE TNZ_LITTLE_ENDIAN=0)
+else()
+    target_compile_definitions(celboundary_test PRIVATE TNZ_LITTLE_ENDIAN=1)
+endif()
 if(APPLE)
     target_compile_definitions(celboundary_test PRIVATE
-        MACOSX __MACOS__ i386 x64 TNZ_LITTLE_ENDIAN=1 GL_SILENCE_DEPRECATION)
+        MACOSX __MACOS__ i386 x64 GL_SILENCE_DEPRECATION)
 elseif(UNIX)
-    target_compile_definitions(celboundary_test PRIVATE LINUX TNZ_LITTLE_ENDIAN=1)
+    target_compile_definitions(celboundary_test PRIVATE LINUX)
 endif()
 foreach(library tnzcore tnzbase tnzext toonzlib)
     find_library(${library}_PATH NAMES ${library}
