@@ -268,7 +268,7 @@ public:
     std::ostringstream alias;
     alias.imbue(std::locale::classic());
     const PrintProcess::Settings s = this->settings(frame, settings);
-    alias << TRasterFx::getAlias(frame, settings) << "[printProcess:1:"
+    alias << TRasterFx::getAlias(frame, settings) << "[printProcess:2:"
           << std::setprecision(std::numeric_limits<double>::max_digits10)
           << s.cellSize << ',' << int(s.shape) << ',' << s.blackGeneration
           << ',' << s.dotGain << ',' << s.softness << ',' << s.paper.r << ','

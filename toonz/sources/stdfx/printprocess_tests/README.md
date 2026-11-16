@@ -2,7 +2,7 @@
 
 These tests exercise the production print code across all dot shapes, disabled
 plates, fractional misregistration, paper and transparent output, tiled output,
-malformed dimensions, and cancellation. Native cases compile the actual FX and
+grain scaling, malformed dimensions, and cancellation. Native cases compile the actual FX and
 run the queued renderer with precomputation at 32, 64, and 128 bits.
 
 ```sh

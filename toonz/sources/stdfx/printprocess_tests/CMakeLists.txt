@@ -13,7 +13,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
     target_compile_options(printprocess_test PRIVATE -Wall -Wextra -Werror)
 endif()
 enable_testing()
-foreach(CASE plates transparent tiles invalid)
+foreach(CASE plates transparent tiles scale invalid)
     add_test(NAME printprocess_${CASE} COMMAND printprocess_test ${CASE})
     set_tests_properties(printprocess_${CASE} PROPERTIES
         ENVIRONMENT "UBSAN_OPTIONS=halt_on_error=1")

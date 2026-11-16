@@ -187,7 +187,7 @@ inline double grainAt(const Settings &s, std::uint32_t salt, double x,
   CelNoise::Settings noise;
   noise.type      = CelNoise::Smooth;
   noise.seed      = s.seed * 2654435761u + salt;
-  noise.thickness = std::max(1.0, std::min(100.0, s.grainSize));
+  noise.thickness = s.grainSize;
   return CelNoise::sample(noise, x, y) - 0.5;
 }
 

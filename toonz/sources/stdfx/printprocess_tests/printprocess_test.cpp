@@ -116,6 +116,23 @@ void tilesTest() {
   }
 }
 
+void scaleTest() {
+  for (double size : {1.0, 20.0, 100.0}) {
+    Settings settings;
+    settings.grainSize = size;
+    for (double scale : {0.25, 0.5, 2.0, 4.0}) {
+      Settings scaled = settings;
+      scaled.grainSize *= scale;
+      const double grain =
+          PrintProcess::detail::grainAt(settings, 17, 51.25, 17.75);
+      const double scaledGrain = PrintProcess::detail::grainAt(
+          scaled, 17, 51.25 * scale, 17.75 * scale);
+      require(std::abs(grain - scaledGrain) < 1e-12,
+              "paper grain changes its scene scale with the render resolution");
+    }
+  }
+}
+
 void invalidTest() {
   Settings settings;
   std::vector<Color> output;
@@ -144,6 +161,8 @@ int main(int argc, char **argv) {
       transparentTest();
     else if (test == "tiles")
       tilesTest();
+    else if (test == "scale")
+      scaleTest();
     else if (test == "invalid")
       invalidTest();
     else
