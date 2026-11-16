@@ -20,68 +20,123 @@
 
 namespace {
 
+struct ToneHighlightSettings {
+  bool highlight;
+  TPixel32 color;
+  double intensity;
+  bool protectLines;
+  double lineThreshold;
+  bool invertMatte;
+};
+
+template <class PIXEL>
+void storeChannels(PIXEL &pixel, double r, double g, double b) {
+  pixel.r =
+      (typename PIXEL::Channel)tcrop(tround(r), 0, PIXEL::maxChannelValue);
+  pixel.g =
+      (typename PIXEL::Channel)tcrop(tround(g), 0, PIXEL::maxChannelValue);
+  pixel.b =
+      (typename PIXEL::Channel)tcrop(tround(b), 0, PIXEL::maxChannelValue);
+}
+
+template <>
+void storeChannels<TPixelF>(TPixelF &pixel, double r, double g, double b) {
+  pixel.r = static_cast<float>(r);
+  pixel.g = static_cast<float>(g);
+  pixel.b = static_cast<float>(b);
+}
+
+template <class PIXEL>
+void shadePixel(PIXEL &pixel, const PIXEL &matte,
+                const ToneHighlightSettings &settings) {
+  if (pixel.m == 0) return;
+  const double maxValue = PIXEL::maxChannelValue;
+  double amount         = matte.m / maxValue;
+  if (settings.invertMatte) amount = 1.0 - amount;
+  amount *= settings.intensity;
+  if (amount <= 0.0) return;
+
+  const double alpha = pixel.m / maxValue;
+  double r = pixel.r / maxValue / alpha, g = pixel.g / maxValue / alpha,
+         b = pixel.b / maxValue / alpha;
+  if (settings.protectLines) {
+    const double luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+    // Lines fade out of the shading over this luminance range.
+    amount *= tcrop((luminance - settings.lineThreshold) / 0.1 + 0.5, 0.0, 1.0);
+    if (amount <= 0.0) return;
+  }
+
+  const double colorR = settings.color.r / 255.0;
+  const double colorG = settings.color.g / 255.0;
+  const double colorB = settings.color.b / 255.0;
+  double shadedR, shadedG, shadedB;
+  if (settings.highlight) {
+    shadedR = 1.0 - (1.0 - r) * (1.0 - colorR);
+    shadedG = 1.0 - (1.0 - g) * (1.0 - colorG);
+    shadedB = 1.0 - (1.0 - b) * (1.0 - colorB);
+  } else {
+    shadedR = r * colorR;
+    shadedG = g * colorG;
+    shadedB = b * colorB;
+  }
+  r += amount * (shadedR - r);
+  g += amount * (shadedG - g);
+  b += amount * (shadedB - b);
+
+  const double premult = alpha * maxValue;
+  storeChannels(pixel, r * premult, g * premult, b * premult);
+}
+
 template <class PIXEL>
 void applyToneHighlight(const TRasterPT<PIXEL> &ras,
-                        const TRasterPT<PIXEL> &matte, bool highlight,
-                        const TPixel32 &color, double intensity,
-                        bool protectLines, double lineThreshold,
-                        bool invertMatte) {
-  const double maxValue = PIXEL::maxChannelValue;
-  const double colorR = color.r / 255.0, colorG = color.g / 255.0,
-               colorB = color.b / 255.0;
-  // Lines fade out of the shading over this luminance range.
-  const double lineRamp = 0.1;
-
+                        const TRasterPT<PIXEL> &matte,
+                        const ToneHighlightSettings &settings) {
   ras->lock();
   matte->lock();
   for (int y = 0; y < ras->getLy(); ++y) {
-    PIXEL *pix            = ras->pixels(y);
+    PIXEL *pixel          = ras->pixels(y);
     const PIXEL *mattePix = matte->pixels(y);
-    for (int x = 0; x < ras->getLx(); ++x, ++pix, ++mattePix) {
-      if (pix->m == 0) continue;
-
-      double amount = mattePix->m / maxValue;
-      if (invertMatte) amount = 1.0 - amount;
-      amount *= intensity;
-      if (amount <= 0.0) continue;
-
-      // Work on straight colors
-      double alpha = pix->m / maxValue;
-      double r = pix->r / maxValue / alpha, g = pix->g / maxValue / alpha,
-             b = pix->b / maxValue / alpha;
-
-      if (protectLines) {
-        double luminance = 0.299 * r + 0.587 * g + 0.114 * b;
-        amount *= tcrop((luminance - lineThreshold) / lineRamp + 0.5, 0.0, 1.0);
-        if (amount <= 0.0) continue;
-      }
-
-      double shadedR, shadedG, shadedB;
-      if (highlight) {  // screen
-        shadedR = 1.0 - (1.0 - r) * (1.0 - colorR);
-        shadedG = 1.0 - (1.0 - g) * (1.0 - colorG);
-        shadedB = 1.0 - (1.0 - b) * (1.0 - colorB);
-      } else {  // multiply
-        shadedR = r * colorR;
-        shadedG = g * colorG;
-        shadedB = b * colorB;
-      }
-      r += amount * (shadedR - r);
-      g += amount * (shadedG - g);
-      b += amount * (shadedB - b);
-
-      // Back to premultiplied channels; alpha is unchanged
-      double premult = alpha * maxValue;
-      pix->r =
-          (typename PIXEL::Channel)tcrop(tround(r * premult), 0, (int)maxValue);
-      pix->g =
-          (typename PIXEL::Channel)tcrop(tround(g * premult), 0, (int)maxValue);
-      pix->b =
-          (typename PIXEL::Channel)tcrop(tround(b * premult), 0, (int)maxValue);
-    }
+    for (int x = 0; x < ras->getLx(); ++x)
+      shadePixel(pixel[x], mattePix[x], settings);
   }
   matte->unlock();
   ras->unlock();
+}
+
+double blurPixelBytes(int bpp) {
+  return 4.0 * (bpp == 32 ? sizeof(float) : sizeof(double));
+}
+
+double workspaceBytes(double width, double height, double radius, int bpp) {
+  const double pixelBytes   = bpp / 8.0;
+  const double paddedWidth  = width + 2.0 * radius;
+  const double paddedHeight = height + 2.0 * radius;
+  const double source       = width * height * pixelBytes;
+  const double matte        = paddedWidth * paddedHeight * pixelBytes;
+  if (radius == 0.0) return source + matte;
+
+  // TRop::blur keeps a four-channel float/double image and three scratch rows.
+  const double blurPixel = blurPixelBytes(bpp);
+  const double scratch   = (paddedWidth + 2.0 * radius) * pixelBytes +
+                         (paddedHeight + 2.0 * radius) * blurPixel +
+                         paddedHeight * pixelBytes;
+  return source + matte + source + paddedWidth * paddedHeight * blurPixel +
+         scratch;
+}
+
+TDimension checkedMatteSize(const TDimension &size, int radius, int bpp) {
+  const double width  = double(size.lx) + 2.0 * radius;
+  const double height = double(size.ly) + 2.0 * radius;
+  // Raster allocation multiplies dimensions as signed ints, including the
+  // byte-wide grayscale raster used for the blur's float/double workspace.
+  const double bytes =
+      radius > 0 ? std::max(bpp / 8.0, blurPixelBytes(bpp)) : bpp / 8.0;
+  if (width <= 0.0 || height <= 0.0 ||
+      width * height * bytes > std::numeric_limits<int>::max())
+    throw TException(
+        "Tone / Highlight: padded tile exceeds raster limits; "
+        "reduce render tile size or Softness");
+  return TDimension(static_cast<int>(width), static_cast<int>(height));
 }
 
 }  // namespace
@@ -128,6 +183,7 @@ public:
 
     addInputPort("Source", m_source);
     addInputPort("Matte", m_matte);
+    enableComputeInFloat(true);
   }
 
   bool doGetBBox(double frame, TRectD &bBox,
@@ -139,32 +195,65 @@ public:
 
   bool canHandle(const TRenderSettings &info, double frame) override {
     // The matte blur is isotropic, as in BlurFx
-    return m_softness->getValue(frame) == 0 || isAlmostIsotropic(info.m_affine);
+    return isPassThrough(frame) || m_softness->getValue(frame) == 0 ||
+           isAlmostIsotropic(info.m_affine);
   }
 
-  int getSoftnessRadius(double frame, const TRenderSettings &info) {
-    double softness =
+  double getSoftness(double frame, const TRenderSettings &info) {
+    const double softness =
         fabs(m_softness->getValue(frame)) * sqrt(fabs(info.m_affine.det()));
-    return tceil(softness);
+    const double radius = std::ceil(softness);
+    if (!std::isfinite(radius))
+      throw TException(
+          "Tone / Highlight: non-finite blur radius; "
+          "reduce Softness or render scale");
+    // A triangular kernel this narrow samples only its center. Using TRop::blur
+    // introduces cancellation or reciprocal overflow for small subpixel radii.
+    if (softness <= 1.0) return 0.0;
+    // Subdivision cannot remove the halo around even a single output pixel.
+    // Bound it before integer conversion and before TRop::blur squares it.
+    const int budgetMiB = std::min(std::max(info.m_maxTileSize, 1), 256);
+    if (workspaceBytes(1.0, 1.0, radius, info.m_bpp) >
+        double(budgetMiB) * 1024.0 * 1024.0)
+      throw TException("Tone / Highlight: minimum blur workspace exceeds the " +
+                       std::to_string(budgetMiB) +
+                       " MiB render limit; reduce Softness or render scale");
+    return softness;
   }
 
   void doDryCompute(TRectD &rect, double frame,
                     const TRenderSettings &info) override {
     if (!m_source.isConnected()) return;
-    m_source->dryCompute(rect, frame, info);
-    if (m_matte.isConnected()) {
-      TRectD matteRect = rect.enlarge(getSoftnessRadius(frame, info));
-      m_matte->dryCompute(matteRect, frame, info);
+    if (isPassThrough(frame)) {
+      m_source->dryCompute(rect, frame, info);
+      return;
     }
+    const double radius = std::ceil(getSoftness(frame, info));
+    TRectD matteRect    = rect.enlarge(radius);
+    m_source->dryCompute(rect, frame, info);
+    m_matte->dryCompute(matteRect, frame, info);
   }
 
   int getMemoryRequirement(const TRectD &rect, double frame,
                            const TRenderSettings &info) override {
-    return TRasterFx::memorySize(rect.enlarge(getSoftnessRadius(frame, info)),
-                                 info.m_bpp);
+    if (!m_source.isConnected() || isPassThrough(frame) || rect.isEmpty())
+      return 0;
+    const double radius = std::ceil(getSoftness(frame, info));
+    const double bytes =
+        workspaceBytes(std::ceil(rect.getLx()) + 1.0,
+                       std::ceil(rect.getLy()) + 1.0, radius, info.m_bpp);
+    const double total = std::ceil(bytes / (1024.0 * 1024.0));
+    if (!std::isfinite(total) || total >= std::numeric_limits<int>::max())
+      return std::numeric_limits<int>::max();
+    return static_cast<int>(total);
   }
 
   void doCompute(TTile &tile, double frame, const TRenderSettings &ri) override;
+
+private:
+  bool isPassThrough(double frame) const {
+    return !m_matte.isConnected() || m_intensity->getValue(frame) <= 0.0;
+  }
 };
 
 //------------------------------------------------------------------------------
@@ -172,24 +261,23 @@ public:
 void ToneHighlightFx::doCompute(TTile &tile, double frame,
                                 const TRenderSettings &ri) {
   if (!m_source.isConnected()) return;
-  m_source->compute(tile, frame, ri);
-
-  double intensity = m_intensity->getValue(frame);
-  if (!m_matte.isConnected() || intensity <= 0.0) return;
+  if (isPassThrough(frame)) {
+    m_source->compute(tile, frame, ri);
+    return;
+  }
 
   // Compute the matte over the tile, blurred by the softness
-  const TDimension size = tile.getRaster()->getSize();
-  double softness =
-      fabs(m_softness->getValue(frame)) * sqrt(fabs(ri.m_affine.det()));
-  int radius = tceil(softness);
+  const TDimension size      = tile.getRaster()->getSize();
+  const double softness      = getSoftness(frame, ri);
+  const int radius           = static_cast<int>(std::ceil(softness));
+  const TDimension matteSize = checkedMatteSize(size, radius, ri.m_bpp);
+  m_source->compute(tile, frame, ri);
 
   TRasterP matte;
   if (radius > 0) {
     TTile matteTile;
-    m_matte->allocateAndCompute(
-        matteTile, tile.m_pos - TPointD(radius, radius),
-        TDimension(size.lx + 2 * radius, size.ly + 2 * radius),
-        tile.getRaster(), frame, ri);
+    m_matte->allocateAndCompute(matteTile, tile.m_pos - TPointD(radius, radius),
+                                matteSize, tile.getRaster(), frame, ri);
     matte = tile.getRaster()->create(size.lx, size.ly);
     matte->clear();
     TRop::blur(matte, matteTile.getRaster(), softness, -radius, -radius, false);
@@ -200,20 +288,20 @@ void ToneHighlightFx::doCompute(TTile &tile, double frame,
     matte = matteTile.getRaster();
   }
 
-  const bool highlight    = m_mode->getValue() == HIGHLIGHT;
-  const TPixel32 color    = m_color->getValue(frame);
-  const bool protectLines = m_protectLines->getValue();
-  const double threshold  = m_lineThreshold->getValue(frame);
-  const bool invertMatte  = m_invertMatte->getValue();
+  const ToneHighlightSettings settings = {
+      m_mode->getValue() == HIGHLIGHT,  m_color->getValue(frame),
+      m_intensity->getValue(frame),     m_protectLines->getValue(),
+      m_lineThreshold->getValue(frame), m_invertMatte->getValue()};
 
   TRaster32P ras32 = tile.getRaster();
   TRaster64P ras64 = tile.getRaster();
+  TRasterFP rasF   = tile.getRaster();
   if (ras32)
-    applyToneHighlight<TPixel32>(ras32, matte, highlight, color, intensity,
-                                 protectLines, threshold, invertMatte);
+    applyToneHighlight<TPixel32>(ras32, matte, settings);
   else if (ras64)
-    applyToneHighlight<TPixel64>(ras64, matte, highlight, color, intensity,
-                                 protectLines, threshold, invertMatte);
+    applyToneHighlight<TPixel64>(ras64, matte, settings);
+  else if (rasF)
+    applyToneHighlight<TPixelF>(rasF, matte, settings);
   else
     throw TException("Tone / Highlight: unsupported pixel type");
 }
