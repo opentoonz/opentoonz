@@ -232,7 +232,7 @@ std::string CelColorKeyFx::getAlias(double frame,
                                     const TRenderSettings &settings) const {
   std::ostringstream out;
   out.imbue(std::locale::classic());
-  out << TRasterFx::getAlias(frame, settings) << "[celKey:"
+  out << TRasterFx::getAlias(frame, settings) << "[celKey:2:"
       << std::setprecision(std::numeric_limits<double>::max_digits10);
   const TAffine grid = CelFxSourceGrid::renderAffine(m_source.getFx(), frame);
   for (double component :
