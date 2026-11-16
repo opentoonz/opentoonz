@@ -73,12 +73,11 @@ inline double phase(const Settings &s, double frame) {
 inline void displacement(const Settings &s, double offset, double x, double y,
                          double &dx, double &dy) {
   CelNoise::Settings noise;
-  noise.type      = CelNoise::Smooth;
-  noise.offset    = offset;
-  noise.thickness = std::max(1.0, std::min(100.0, s.size));
-  auto channel    = [&](std::uint32_t salt, double scale) {
+  noise.type   = CelNoise::Smooth;
+  noise.offset = offset;
+  auto channel = [&](std::uint32_t salt, double scale) {
     noise.seed      = s.seed * 2654435761u + salt;
-    noise.thickness = std::max(1.0, std::min(100.0, s.size * scale));
+    noise.thickness = s.size * scale;
     return 2.0 * CelNoise::sample(noise, x, y) - 1.0;
   };
   dx = s.amplitude * channel(0x68e31da4u, 1.0);

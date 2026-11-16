@@ -86,6 +86,26 @@ void cancellationTest() {
           "canceled render reported completion");
   require(output.empty(), "canceled render retained partial pixels");
 }
+
+void scaleTest() {
+  for (double size : {1.0, 12.0, 100.0}) {
+    CelBoil::Settings settings;
+    settings.size   = size;
+    settings.detail = 0.5;
+    double dx, dy;
+    CelBoil::displacement(settings, 1.25, 35.5, -14.5, dx, dy);
+    for (double scale : {0.125, 0.5, 2.0, 8.0}) {
+      auto scaled = settings;
+      scaled.size *= scale;
+      scaled.amplitude *= scale;
+      double sx, sy;
+      CelBoil::displacement(scaled, 1.25, 35.5 * scale, -14.5 * scale, sx, sy);
+      require(
+          std::abs(sx - dx * scale) < 1e-9 && std::abs(sy - dy * scale) < 1e-9,
+          "render scale changed the drawing's wobble pattern");
+    }
+  }
+}
 }  // namespace
 
 int main() {
@@ -94,6 +114,7 @@ int main() {
     tileTest(CelBoil::Target::Lines);
     timingTest();
     cancellationTest();
+    scaleTest();
   } catch (const std::exception& error) {
     std::cerr << error.what() << '\n';
     return 1;
