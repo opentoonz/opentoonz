@@ -37,7 +37,13 @@ public:
       , m_notificationEnabled(true)
       , m_isMatteEnabled(true) {}
 
-  TSpectrumParamImp(const TSpectrumParamImp &s) { copy(s); }
+  TSpectrumParamImp(const TSpectrumParamImp &s)
+      : m_sp(nullptr)
+      , m_draggingEnabled(s.m_draggingEnabled)
+      , m_notificationEnabled(s.m_notificationEnabled)
+      , m_isMatteEnabled(s.m_isMatteEnabled) {
+    copy(s);
+  }
 
   void copy(const TSpectrumParamImp &src) {
     m_keys.clear();
@@ -142,10 +148,13 @@ TSpectrumParam::TSpectrumParam(std::vector<TSpectrum::ColorKey> const &keys)
 //---------------------------------------------------------
 
 void TSpectrumParam::copy(TParam *src) {
+  if (src == this) return;
   TSpectrumParam *p = dynamic_cast<TSpectrumParam *>(src);
   if (!p) throw TException("invalid source for copy");
   setName(src->getName());
   m_imp->copy(*(p->m_imp));
+  m_imp->notify(TParamChange(this, TParamChange::m_minFrame,
+                             TParamChange::m_maxFrame, true, false, false));
 }
 
 //---------------------------------------------------------

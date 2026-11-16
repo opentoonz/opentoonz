@@ -10,6 +10,8 @@
 #include "tparamcontainer.h"
 #include "tbasefx.h"
 #include "tfxattributes.h"
+#include "tdoubleparam.h"
+#include "tspectrumparam.h"
 
 // Images components
 #include "timagecache.h"
@@ -21,6 +23,11 @@
 #include "tfxcachemanager.h"
 #include "trenderer.h"
 
+#include <iomanip>
+#include <limits>
+#include <locale>
+#include <sstream>
+
 // Diagnostics
 // #define DIAGNOSTICS
 #ifdef DIAGNOSTICS
@@ -31,6 +38,20 @@
 //===================================================
 
 namespace {
+std::string preciseSpectrumAlias(const TSpectrumParam &spectrum, double frame) {
+  std::ostringstream alias;
+  alias.imbue(std::locale::classic());
+  alias << std::setprecision(std::numeric_limits<double>::max_digits10) << "(";
+  for (int i = 0; i < spectrum.getKeyCount(); ++i) {
+    if (i) alias << ",";
+    const TPixelD color = spectrum.getColor(i)->getValueD(frame);
+    alias << "(" << spectrum.getPosition(i)->getValue(frame) << ",(" << color.r
+          << "," << color.g << "," << color.b << "," << color.m << "))";
+  }
+  alias << ")";
+  return alias.str();
+}
+
 inline bool areEqual(const TRasterFxRenderDataP &d1,
                      const TRasterFxRenderDataP &d2) {
   return (*d1 == *d2);
@@ -636,8 +657,13 @@ std::string TRasterFx::getAlias(double frame,
 
   // alias dei valori dei parametri dell'effetto al frame dato
   for (i = 0; i < getParams()->getParamCount(); i++) {
-    TParam *param = getParams()->getParam(i);
-    alias += param->getName() + "=" + param->getValueAlias(frame, 3);
+    TParam *param                  = getParams()->getParam(i);
+    const TSpectrumParam *spectrum = requiresFullPrecisionSerialization()
+                                         ? dynamic_cast<TSpectrumParam *>(param)
+                                         : nullptr;
+    alias += param->getName() + "=" +
+             (spectrum ? preciseSpectrumAlias(*spectrum, frame)
+                       : param->getValueAlias(frame, 3));
   }
 
   alias += "]";
