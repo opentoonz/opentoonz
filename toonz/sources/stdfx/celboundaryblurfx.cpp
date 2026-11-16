@@ -76,7 +76,8 @@ bool blurRaster(const TRasterPT<Pixel> &input, const TRasterPT<Pixel> &output,
       }
       const auto &p = pixels[std::size_t(sy) * width + sx];
       auto channel  = [=](double value) {
-        return scale == 1 ? value
+        const double limit = std::numeric_limits<float>::max();
+        return scale == 1 ? blurValue(value, -limit, limit)
                            : std::floor(blurValue(value, 0, 1) * scale + 0.5);
       };
       row[x] =
@@ -189,7 +190,7 @@ public:
     const auto values = parameters(frame, info);
     std::ostringstream out;
     out.imbue(std::locale::classic());
-    out << TRasterFx::getAlias(frame, info) << "[celBoundary1:"
+    out << TRasterFx::getAlias(frame, info) << "[celBoundary2:"
         << std::setprecision(std::numeric_limits<double>::max_digits10)
         << values.radius << ',' << values.blend << ',' << values.repeats << ','
         << values.vertical << ',' << values.legacy << ']';
