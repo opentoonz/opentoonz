@@ -66,7 +66,7 @@ public:
   // Reattach retained stop parameters when restoring structural undo history.
   // The parameters are shared, not cloned; observers receive one ramp change.
   void setKeyParams(
-      const std::vector<std::pair<TDoubleParamP, TPixelParamP>>& keys);
+      const std::vector<std::pair<TDoubleParamP, TPixelParamP>> &keys);
 
   void setValue(double frame, int index, double s, const TPixel32 &color,
                 bool undoing = false);

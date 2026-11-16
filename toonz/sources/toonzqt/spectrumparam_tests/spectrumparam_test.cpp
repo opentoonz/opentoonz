@@ -416,13 +416,13 @@ void insertionTest() {
   }
 }
 
-void editPendingStops(Fixture& fixture) {
+void editPendingStops(Fixture &fixture) {
   fixture.spectrum()->setCurrentKeyIndex(0);
   fixture.finish(fixture.preciseEdit(0), "1.2345678901234567");
   const int last = fixture.preview->getKeyCount() - 1;
   fixture.spectrum()->setCurrentKeyIndex(last);
   fixture.finish(fixture.preciseEdit(1), "0.43219876543219876");
-  auto* bar = fixture.bar();
+  auto *bar = fixture.bar();
   bar->resize(221, bar->height());
   const int y = bar->height() / 2;
   mouse(bar, QEvent::MouseButtonPress, QPoint(210, y));
@@ -434,8 +434,8 @@ void editPendingStops(Fixture& fixture) {
         "pending channel and position edits create no history");
 }
 
-void keyPendingPreview(Fixture& fixture, const TSpectrumParamP& expected) {
-  auto* key = fixture.field->findChild<ParamFieldKeyToggle*>();
+void keyPendingPreview(Fixture &fixture, const TSpectrumParamP &expected) {
+  auto *key = fixture.field->findChild<ParamFieldKeyToggle *>();
   require(key != nullptr, "spectrum key toggle missing");
   if (fixture.actual->hasKeyframes())
     check(key->getStatus() == ParamFieldKeyToggle::MODIFIED,
@@ -494,8 +494,8 @@ void pendingInsertionTest() {
   keyPendingPreview(fixture, pending);
 }
 
-void removeStop(Fixture& fixture, int index) {
-  auto* bar = fixture.bar();
+void removeStop(Fixture &fixture, int index) {
+  auto *bar = fixture.bar();
   bar->resize(221, bar->height());
   fixture.spectrum()->setCurrentKeyIndex(index);
   const int x = bar->getCurrentPos();

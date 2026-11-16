@@ -415,14 +415,14 @@ class PreciseSpectrumParamUndo final : public AnimatableFxSettingsUndo {
   TSpectrumParamP m_actual;
   State m_before, m_after;
 
-  static State capture(const TSpectrumParamP& param) {
+  static State capture(const TSpectrumParamP &param) {
     State state{TParamP(param->clone()), {}};
     for (int i = 0; i < param->getKeyCount(); ++i)
       state.keys.emplace_back(param->getPosition(i), param->getColor(i));
     return state;
   }
 
-  void restore(const State& state) const {
+  void restore(const State &state) const {
     for (int i = 0; i < state.values->getKeyCount(); ++i) {
       state.keys[i].first->copy(state.values->getPosition(i).getPointer());
       state.keys[i].second->copy(state.values->getColor(i).getPointer());
@@ -432,8 +432,8 @@ class PreciseSpectrumParamUndo final : public AnimatableFxSettingsUndo {
   }
 
 public:
-  PreciseSpectrumParamUndo(const TSpectrumParamP& actual, QString name,
-                           int frame, TFxHandle* handle)
+  PreciseSpectrumParamUndo(const TSpectrumParamP &actual, QString name,
+                           int frame, TFxHandle *handle)
       : AnimatableFxSettingsUndo(name, frame, handle)
       , m_actual(actual)
       , m_before(capture(actual)) {
