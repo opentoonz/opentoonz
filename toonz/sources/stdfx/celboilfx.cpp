@@ -210,7 +210,7 @@ public:
     const CelBoil::Settings s = this->settings(frame, settings);
     // The noise plane, not the frame: the frames of a held wobble share a
     // cache entry, and each new wobble gets its own
-    alias << TRasterFx::getAlias(frame, settings) << "[celBoil:1:"
+    alias << TRasterFx::getAlias(frame, settings) << "[celBoil:2:"
           << std::setprecision(std::numeric_limits<double>::max_digits10)
           << int(s.target) << ',' << s.amplitude << ',' << s.size << ','
           << s.detail << ',' << s.seed << ',' << s.lineThreshold << ','
