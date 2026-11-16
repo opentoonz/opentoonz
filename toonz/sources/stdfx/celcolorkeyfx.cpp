@@ -340,10 +340,17 @@ bool applyKey(const TRasterPT<Pixel> &source, const TRasterPT<Pixel> &output,
         }
         // Integer rasters require RGB to stay within the alpha coverage.
         // Float rasters retain finite HDR replacement colors.
-        const bool isFloat = std::is_same<Pixel, TPixelF>::value;
-        pixel.r = (isFloat ? color[0] : bounded(color[0], 0, 1)) * pixel.m;
-        pixel.g = (isFloat ? color[1] : bounded(color[1], 0, 1)) * pixel.m;
-        pixel.b = (isFloat ? color[2] : bounded(color[2], 0, 1)) * pixel.m;
+        auto premultiply = [&pixel](double value) {
+          if constexpr (std::is_same<Pixel, TPixelF>::value) {
+            const double limit = std::numeric_limits<float>::max();
+            return std::max(-limit, std::min(limit, value * pixel.m));
+          } else {
+            return bounded(value, 0, 1) * pixel.m;
+          }
+        };
+        pixel.r = premultiply(color[0]);
+        pixel.g = premultiply(color[1]);
+        pixel.b = premultiply(color[2]);
       } else {
         pixel.r *= alphaFactor;
         pixel.g *= alphaFactor;
