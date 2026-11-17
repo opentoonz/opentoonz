@@ -85,6 +85,14 @@ int nsvg__isnum(char c) { return strchr("0123456789+-.eE", c) != 0; }
 
 NSVG_INLINE float nsvg__maxf(float a, float b) { return a > b ? a : b; }
 
+template <size_t Size>
+void nsvg__copyString(char (&dst)[Size], const char *src) {
+  if (Size == 0) return;
+  if (!src) src = "";
+  strncpy(dst, src, Size - 1);
+  dst[Size - 1] = '\0';
+}
+
 // Simple XML parser
 
 #define NSVG_XML_TAG 1
@@ -457,7 +465,7 @@ void nsvg__addShape(struct NSVGParser *p) {
   shape->lineJoin      = attr->lineJoin;
   shape->miterLimit    = attr->miterLimit;
 
-  strcpy(shape->id, attr->id);
+  nsvg__copyString(shape->id, attr->id);
   shape->fillColor = attr->fillColor;
   shape->fillColor |= (unsigned int)(attr->opacity * attr->fillOpacity * 255)
                       << 24;
@@ -595,7 +603,7 @@ unsigned int nsvg__parseColorHex(const char *str) {
 unsigned int nsvg__parseColorRGB(const char *str) {
   int r = -1, g = -1, b = -1;
   char s1[32] = "", s2[32] = "";
-  sscanf(str + 4, "%d%[%%, \t]%d%[%%, \t]%d", &r, s1, &g, s2, &b);
+  sscanf(str + 4, "%d%31[%%, \t]%d%31[%%, \t]%d", &r, s1, &g, s2, &b);
   if (strchr(s1, '%')) {
     return NSVG_RGB((r * 255) / 100, (g * 255) / 100, (b * 255) / 100);
   } else {
@@ -935,7 +943,7 @@ int nsvg__parseAttr(struct NSVGParser *p, const char *name, const char *value) {
   if (!attr) return 0;
 
   if (strcmp(name, "id") == 0) {
-    strcpy(attr->id, value);
+    nsvg__copyString(attr->id, value);
   } else if (strcmp(name, "style") == 0) {
     nsvg__parseStyle(p, value);
   } else if (strcmp(name, "display") == 0) {
@@ -1694,20 +1702,20 @@ void nsvg__parseSVG(struct NSVGParser *p, const char **attr) {
         char units[8];
         units[0]            = '\0';
         p->image->wunits[0] = '\0';
-        sscanf(attr[i + 1], "%f%s", &w, units);
+        sscanf(attr[i + 1], "%f%7s", &w, units);
         if (strcmp(units, "%") != 0) {
           p->image->width = w;
-          strcpy(p->image->wunits, units);
+          nsvg__copyString(p->image->wunits, units);
         }
       } else if (strcmp(attr[i], "height") == 0) {
         float h;
         char units[8];
         units[0]            = '\0';
         p->image->hunits[0] = '\0';
-        sscanf(attr[i + 1], "%f%s", &h, units);
+        sscanf(attr[i + 1], "%f%7s", &h, units);
         if (strcmp(units, "%") != 0) {
           p->image->height = h;
-          strcpy(p->image->hunits, units);
+          nsvg__copyString(p->image->hunits, units);
         }
       } else if (strcmp(attr[i], "viewBox") == 0) {
         float x, y, w, h;
