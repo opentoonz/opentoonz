@@ -2254,7 +2254,13 @@ void PencilTestPopup::refreshCameraList() {
 
 void PencilTestPopup::onCameraListComboActivated(int comboIndex) {
   QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
-  if (cameras.size() != m_cameraListCombo->count() - 1) return;
+  if (cameras.size() != m_cameraListCombo->count() - 1 || comboIndex < 0 ||
+      comboIndex > cameras.size())
+    return;
+  // Reselecting the current camera must not stop its capture timer.
+  if (comboIndex > 0 &&
+      cameras.at(comboIndex - 1).deviceName() == m_deviceName)
+    return;
 
   m_cvWebcam.release();
   if (m_timer->isActive()) m_timer->stop();
@@ -2270,9 +2276,6 @@ void PencilTestPopup::onCameraListComboActivated(int comboIndex) {
   }
 
   int index = comboIndex - 1;
-  // In case the camera is not changed (just click the combobox)
-  if (cameras.at(index).deviceName() == m_deviceName) return;
-
   m_currentCamera = new QCamera(cameras.at(index), this);
   m_deviceName    = cameras.at(index).deviceName();
 
@@ -2282,6 +2285,7 @@ void PencilTestPopup::onCameraListComboActivated(int comboIndex) {
   // Refresh resolution
   m_resolutionCombo->clear();
   QList<QSize> sizes = m_currentCamera->supportedViewfinderResolutions();
+  bool resolutionsDetected = !sizes.isEmpty();
   // Simple workaround because Qt fails to auto-detect the camera resolutions
   // https://forum.qt.io/topic/68904/how-to-get-the-supported-resolution-of-a-qcamera/5
   if (sizes.size() == 0) {
@@ -2307,8 +2311,10 @@ void PencilTestPopup::onCameraListComboActivated(int comboIndex) {
         QString("%1 x %2").arg(size.width()).arg(size.height()), size);
   }
   if (!sizes.isEmpty()) {
-    // Select the largest available resolution
-    m_resolutionCombo->setCurrentIndex(m_resolutionCombo->count() - 1);
+    // Do not default to an unverified 4K mode when Qt cannot query the camera.
+    m_resolutionCombo->setCurrentIndex(
+        resolutionsDetected ? m_resolutionCombo->count() - 1
+                            : m_resolutionCombo->findData(QSize(640, 480)));
   }
 
   m_videoWidget->setImage(QImage());
@@ -2617,6 +2623,9 @@ void PencilTestPopup::getWebcamImage() {
     } else {
       m_cvWebcam.open(camIndex, cv::CAP_DSHOW);
     }
+#elif defined(__linux__)
+    // Qt's camera ordinal need not match the /dev/videoN device number.
+    m_cvWebcam.open(m_deviceName.toStdString(), cv::CAP_V4L2);
 #else
     m_cvWebcam.open(translateIndex(camIndex));
 #endif
