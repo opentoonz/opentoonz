@@ -337,6 +337,7 @@ public:
   QRect index2pos(int index) const;
 
   QRect getCaptionRect(int index) const;
+  void editCaption(int index);
 
   void paintThumbnailItem(QPainter &p, int index);
   void paintListItem(QPainter &p, int index);
