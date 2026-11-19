@@ -18,6 +18,7 @@
     STD_iwa_MotionBlurCompFx
     STD_radialBlurFx
     STD_inoRadialBlurFx
+    STD_celRadialBlurFx
     STD_rotationalBlurFx
     STD_inoSpinBlurFx
     STD_iwa_BokehFx
