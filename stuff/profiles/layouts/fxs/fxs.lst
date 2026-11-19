@@ -140,6 +140,7 @@
     inFx
     outFx
     STD_rgbKeyFx
+    STD_celColorKeyFx
     atopFx
   </Matte>
   <Noise>

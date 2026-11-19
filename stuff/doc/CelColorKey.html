@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Cel Color Key</title></head>
+<body>
+<h1>Cel Color Key</h1>
+<p>Remove or keep selected cel colors. Add the effect from Matte and connect an image to Source. Color Keep retains selected colors; otherwise selected colors become transparent.</p>
+<h2>Colors and comparison</h2>
+<p>Set Number of Colors from 0 to 25. Choose an entry in Colors, enable Use Color, and select its color. Inactive entries retain their values and animation. Threshold controls the accepted distance in the selected color space. Per Color uses the entry's threshold; Per Component compares each component against its own threshold. With both enabled, each entry has its own component thresholds. Only the thresholds used by the selected modes are shown; hidden values and animation are preserved.</p>
+<p>Choose RGB, HSV, Lab76, Lab94, YUV or YCrCb. HSV hue wraps around. Lab uses D65 and the sRGB transfer curve; Lab94 uses the graphics-arts weights. Scalar distances use normalized root-mean-square components. Component ranges are RGB: R/G/B; HSV: a half-turn of hue, saturation and value; Lab76: L/100, a/255 and b/255; Lab94: L/100 and weighted chroma and hue differences/255; YUV: Y, U/0.872 and V/1.23; YCrCb: full-range Y, Cr and Cb. Hue is ignored when either color has zero saturation. Full float comparisons allow 0.000001 of normalized comparison tolerance for numerical rounding. Force Lower Precision quantizes comparisons to 16 or 8 bits while retaining source output precision. Premultiplied Color compares covered RGB; when off, comparison uses straight RGB. Transparent and nonfinite input pixels produce transparent output.</p>
+<h2>Edges and replacement</h2>
+<p>Positive Edge Thin expands the selected region; negative values contract it. The slider covers -100 to 100; type values from -4000 to 4000 for larger adjustments. Edge Blur has a 0 to 100 slider and accepts typed values from 0 to 4000. It applies its transition inside, around, or outside the selected region. Slider limits do not change stored values or animation. Box uses square distance, Approximate uses a 3–4 chamfer approximation, and Euclidean uses straight-line distance. The native feather includes a pixel footprint for a continuous transition from zero.</p>
+<p>Color Keep reveals Enable Replace. With both on, each entry shows Use Replacement and its replacement color. Enable Use Replacement to substitute that color. Turning either global option off hides the replacement controls while preserving their values and animation. If entries overlap, the first matching enabled entry determines replacement. Filtering changes the matte; replacement applies to original matched pixels.</p>
+<p>For a single raster-level input chain, colors and edge distances are evaluated on the level's native pixel grid before DPI, geometry and camera resampling. Graphs with multiple source inputs or without a raster-level grid use world pixels.</p>
+<h2>Animation and reuse</h2>
+<p>Use the key buttons to animate colors, thresholds and mode choices. Inactive entries remain saved. Parameters work with undo, scenes, presets and macro exposure. This native effect uses OpenToonz's premultiplied image model and documented numeric conventions.</p>
+</body>
+</html>
