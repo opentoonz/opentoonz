@@ -1665,6 +1665,22 @@
   <item>"STD_iwa_SmootherFx"	"Smoother Iwa"	</item>
   <item>"STD_iwa_SmootherFx.threshold"	"Threshold"	</item>
   <item>"STD_iwa_SmootherFx.softness"	"Softness"	</item>
+  <item>"STD_celSmoother2Fx" "Cel Smoother v2" </item>
+  <item>"STD_celSmoother2Fx.useColorKey" "Use Color Key" </item>
+  <item>"STD_celSmoother2Fx.colorKey" "Color Key" </item>
+  <item>"STD_celSmoother2Fx.invertColorKey" "Invert Color Key" </item>
+  <item>"STD_celSmoother2Fx.smoothRange" "Smooth Range" </item>
+  <item>"STD_celSmoother2Fx.smoothness" "Smoothness" </item>
+  <item>"STD_celSmoother2Fx.extraSmooth" "Extra Smooth" </item>
+  <item>"STD_celSmoother2Fx.smootherVersion" "Smoother Version" </item>
+  <item>"STD_celSmoother2Fx.gammaCorrection" "Gamma Correction" </item>
+  <item>"STD_celSmoother2Fx.gammaValue" "Gamma Value" </item>
+  <item>"STD_celSmoother2Fx.numberOfGammaColors" "Number of Gamma Colors" </item>
+  <item>"STD_celSmoother2Fx.gammaColor1" "Gamma Color 1" </item>
+  <item>"STD_celSmoother2Fx.gammaColor2" "Gamma Color 2" </item>
+  <item>"STD_celSmoother2Fx.gammaColor3" "Gamma Color 3" </item>
+  <item>"STD_celSmoother2Fx.gammaColor4" "Gamma Color 4" </item>
+  <item>"STD_celSmoother2Fx.gammaColor5" "Gamma Color 5" </item>
   
  <!------------------------------ Tiled Particles Iwa ------------------------------------------->
 
