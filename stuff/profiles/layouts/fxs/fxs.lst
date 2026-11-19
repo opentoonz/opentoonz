@@ -169,6 +169,7 @@
     STD_mosaicFx
     STD_inoMotionWindFx
     STD_posterizeFx
+    STD_printProcessFx
     STD_solarizeFx
     STD_iwa_TangentFlowFx
     STD_iwa_MotionFlowFx
