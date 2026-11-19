@@ -1205,6 +1205,15 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index) {
   auto menu          = std::make_unique<QMenu>(parent);
   CommandManager *cm = CommandManager::instance();
 
+  if (0 <= index && index < (int)m_items.size() &&
+      getItemData(index, Name).toString() == "..") {
+    menu->addAction(cm->getAction(MI_ShowFolderContents));
+    menu->addAction(cm->getAction(MI_SelectAll));
+    if (!Preferences::instance()->isWatchFileSystemEnabled())
+      menu->addAction(cm->getAction(MI_RefreshTree));
+    return menu.release();
+  }
+
   // when folder item is right-clicked
   if (0 <= index && index < (int)m_items.size() && m_items[index].m_isFolder) {
     DvDirModel *model    = DvDirModel::instance();
@@ -2211,7 +2220,8 @@ void FileBrowser::onClickedItem(int index) {
   if (0 <= index && index < (int)m_items.size()) {
     TFilePath fp = m_items[index].m_path;
     if (m_items[index].m_isFolder) {
-      if (!Preferences::instance()->isFileBrowserFolderDoubleClick()) {
+      if (!Preferences::instance()->isFileBrowserFolderDoubleClick() &&
+          !m_itemViewer->getPanel()->folderClickAdjustsSelection()) {
         setFolder(fp, true);
         QModelIndex idx = m_folderTreeView->currentIndex();
         if (idx.isValid()) m_folderTreeView->scrollTo(idx);

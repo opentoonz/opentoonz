@@ -304,6 +304,7 @@ private:
     return getModel() ? getModel()->getItemCount() : 0;
   }
   QColor m_missingColor;
+  bool m_folderClickAdjustsSelection = false;
 
 public:
   DvItemViewerPanel(DvItemViewer *viewer, bool noContextMenu,
@@ -353,6 +354,9 @@ public:
   void setAlignCenter() { m_centerAligned = true; }
 
   DvItemSelection *getSelection() const { return m_selection; }
+  bool folderClickAdjustsSelection() const {
+    return m_folderClickAdjustsSelection;
+  }
   void setSelection(DvItemSelection *selection);  // gets ownership
   void setMissingTextColor(const QColor &color);
 
