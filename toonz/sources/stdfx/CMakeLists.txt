@@ -129,6 +129,8 @@ set(SOURCES
     hsvkeyfx.cpp
     hsvscalefx.cpp
     hsvutil.cpp
+    celmotion.cpp
+    celnoise.cpp
     kaleido.cpp
     linearwavefx.cpp
     localblurfx.cpp
@@ -261,6 +263,8 @@ set(SOURCES
     ino_warp_hv.cpp
     iwa_adjustexposurefx.cpp
     iwa_directionalblurfx.cpp
+    celdirectionalblurfx.cpp
+    celdirectionalmath.cpp
     iwa_gradientwarpfx.cpp
     iwa_motionblurfx.cpp
     iwa_particles.cpp

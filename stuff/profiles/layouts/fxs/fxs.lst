@@ -11,6 +11,7 @@
     STD_inoBlurFx
     STD_directionalBlurFx
     STD_iwa_DirectionalBlurFx
+    STD_celDirectionalBlurFx
     STD_inoLineBlurFx
     STD_localBlurFx
     STD_motionBlurFx
