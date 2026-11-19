@@ -449,6 +449,19 @@
   <item>"STD_squareGradientFx"		"Square Gradient"	</item>
   <item>"STD_squareGradientFx.colors"	"Colors"		</item>
   <item>"STD_squareGradientFx.size"		"Size"		</item>
+  <item>"STD_alphaDistanceGradientFx" "Alpha Distance Gradient" </item>
+  <item>"STD_alphaDistanceGradientFx.region" "Region" </item>
+  <item>"STD_alphaDistanceGradientFx.insideThreshold" "Inside Threshold" </item>
+  <item>"STD_alphaDistanceGradientFx.outsideThreshold" "Outside Threshold" </item>
+  <item>"STD_alphaDistanceGradientFx.renderMode" "Render Mode" </item>
+  <item>"STD_alphaDistanceGradientFx.useBackground" "Use Background Color" </item>
+  <item>"STD_alphaDistanceGradientFx.gradationColor" "Gradation Color" </item>
+  <item>"STD_alphaDistanceGradientFx.backgroundColor" "BG Color" </item>
+  <item>"STD_alphaDistanceGradientFx.invert" "Invert" </item>
+  <item>"STD_alphaDistanceGradientFx.interpolation" "Interpolation" </item>
+  <item>"STD_alphaDistanceGradientFx.power" "Power" </item>
+  <item>"STD_alphaDistanceGradientFx.blurMode" "Blur Mode" </item>
+  <item>"STD_alphaDistanceGradientFx.blurSize" "Blur Size" </item>
 
   <item>"STD_targetSpotFx"		"Target Spot"	</item>
   <item>"STD_targetSpotFx.z"	"Distance"	</item>
