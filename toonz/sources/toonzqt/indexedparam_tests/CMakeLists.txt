@@ -1,0 +1,47 @@
+cmake_minimum_required(VERSION 3.18)
+project(IndexedParamTests LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+find_package(Qt5 5.14 REQUIRED COMPONENTS Core Gui Widgets)
+find_package(Boost CONFIG REQUIRED)
+if(NOT OPENTOONZ_LIBRARY_DIR)
+    message(FATAL_ERROR "Set OPENTOONZ_LIBRARY_DIR to matching OpenToonz shared libraries")
+endif()
+get_filename_component(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../.." ABSOLUTE)
+qt5_wrap_cpp(PARAMFIELD_MOC "${SOURCE_DIR}/include/toonzqt/paramfield.h")
+qt5_wrap_cpp(FXSETTINGS_MOC "${SOURCE_DIR}/include/toonzqt/fxsettings.h")
+add_executable(indexedparam_test indexedparam_test.cpp
+    "${SOURCE_DIR}/toonzqt/paramfield.cpp" "${SOURCE_DIR}/toonzqt/fxsettings.cpp"
+    "${SOURCE_DIR}/common/tparam/tpixelparam.cpp"
+    "${SOURCE_DIR}/common/tcolor/tpixelutils.cpp"
+    ${PARAMFIELD_MOC} ${FXSETTINGS_MOC})
+target_include_directories(indexedparam_test PRIVATE
+    "${SOURCE_DIR}/include" "${SOURCE_DIR}/include/toonzqt" "${SOURCE_DIR}/toonzqt")
+include(TestBigEndian)
+test_big_endian(BIG_ENDIAN)
+if(BIG_ENDIAN)
+    target_compile_definitions(indexedparam_test PRIVATE TNZ_LITTLE_ENDIAN=0)
+else()
+    target_compile_definitions(indexedparam_test PRIVATE TNZ_LITTLE_ENDIAN=1)
+endif()
+if(APPLE)
+    target_compile_definitions(indexedparam_test PRIVATE MACOSX __MACOS__ i386 x64)
+elseif(UNIX)
+    target_compile_definitions(indexedparam_test PRIVATE LINUX)
+endif()
+foreach(LIBRARY toonzqt toonzlib tnzbase tnzcore)
+    find_library(${LIBRARY}_PATH NAMES ${LIBRARY}
+        PATHS "${OPENTOONZ_LIBRARY_DIR}" NO_DEFAULT_PATH REQUIRED)
+    target_link_libraries(indexedparam_test PRIVATE "${${LIBRARY}_PATH}")
+endforeach()
+target_link_libraries(indexedparam_test PRIVATE Qt5::Core Qt5::Gui Qt5::Widgets Boost::headers)
+enable_testing()
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/portablestuff")
+add_test(NAME indexed_parameters COMMAND indexedparam_test)
+set_tests_properties(indexed_parameters PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;UBSAN_OPTIONS=halt_on_error=1")
+if(APPLE)
+    set_property(TEST indexed_parameters APPEND PROPERTY
+        ENVIRONMENT "DYLD_LIBRARY_PATH=${OPENTOONZ_LIBRARY_DIR}")
+endif()
