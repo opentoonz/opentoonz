@@ -191,6 +191,9 @@ void SpectrumBar::paintEvent(QPaintEvent *e) {
    position.
 */
 void SpectrumBar::mousePressEvent(QMouseEvent *e) {
+  if (e->button() != Qt::LeftButton) return;
+  m_pressPosition = e->pos();
+  m_dragging      = false;
   QPoint pos = e->pos();
   int x      = pos.x();
 
@@ -215,7 +218,14 @@ void SpectrumBar::mousePressEvent(QMouseEvent *e) {
 /*! Manage mouse move event. If y position value greater than widget height
                 erase current key; otherwise move current key position.
 */
+bool SpectrumBar::isDragEvent(const QMouseEvent *event) const {
+  return (event->buttons() & Qt::LeftButton) &&
+         (m_dragging || event->pos() != m_pressPosition);
+}
+
 void SpectrumBar::mouseMoveEvent(QMouseEvent *e) {
+  if (!isDragEvent(e)) return;
+  m_dragging = true;
   QPoint pos = e->pos();
   int x      = pos.x();
   int y      = pos.y();
@@ -245,12 +255,16 @@ void SpectrumBar::mouseMoveEvent(QMouseEvent *e) {
 //-----------------------------------------------------------------------------
 
 void SpectrumBar::mouseReleaseEvent(QMouseEvent *e) {
+  if (e->button() != Qt::LeftButton || !m_dragging) return;
+  m_dragging = false;
   if (m_currentKeyIndex == -1) return;
   QPoint pos = e->pos();
   int x      = pos.x();
   int y      = pos.y();
-  if (x < m_x0 || x > width() - m_x0 - 1) return;
-  if (y > height()) return;
+  if (x < m_x0 || x > width() - m_x0 - 1 || y > height()) {
+    emit currentPosChanged(false);
+    return;
+  }
 
   setCurrentPos(x, false);
 }
