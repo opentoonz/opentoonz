@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Cel Boundary Blur</title></head>
+<body>
+<h1>Cel Boundary Blur</h1>
+<p>Soften boundaries between covered cel colors while retaining the original
+silhouette. Add this effect from Blur and connect Source. Use Cel Color Keep
+or Cel Color Key upstream to isolate the colors to blend.</p>
+<h2>Controls</h2>
+<ul>
+<li>Blur Amount: filter radius, from 1 to 1000 source pixels; default 5.</li>
+<li>Blur Smoothness: percentage mixed with the filtered colors, from 1 to 100;
+default 100. Larger amounts and smoothness give wider, stronger transitions.</li>
+<li>Number of Repeat: from 0 to 10; default 2. Each repetition filters both
+axes. Zero passes the source through unchanged. Animated values round to the
+nearest whole number, with halves rounded upward.</li>
+<li>Bias Direction: Vertical, the default, finishes each repeat with a vertical
+pass. Horizontal finishes with a horizontal pass. Irregular alpha masks make
+these results differ. Choice keys use stepped interpolation.</li>
+<li>Legacy: off by default. Switches to a uniform covered-sample kernel and
+weights covered straight colors equally. The modern mode instead weights colors
+by coverage with a triangular kernel. Both keep the destination alpha and omit
+fully transparent samples. This native compatibility-style mode is animated.</li>
+</ul>
+<h2>Colors and transparency</h2>
+<p>With Legacy off, each axis uses a triangular filter. Samples are weighted by their coverage,
+then normalized by the total coverage. Fully transparent samples contribute
+nothing; each destination retains its original alpha. Partial transparency does
+not darken edges. Colors can blend across transparent gaps within the amount,
+but those gaps stay transparent. Float processing preserves finite HDR colors.</p>
+<p>This is a native cel filtering adaptation. Its explicit triangular and uniform kernels,
+pass ordering and defaults define this effect; they do not claim binary output
+equivalence with another application's effect.</p>
+<h2>Animation and rendering</h2>
+<p>All five controls support native keys, undo, presets, scene saving and macro
+exposure. Raster levels are filtered in their native pixel grid before DPI and
+geometry placement; ambiguous or vector inputs use the scene grid. Rotation,
+reflection and shear are applied by the host after filtering. Both axes request
+the complete radius times repeat count, so strips match a whole-frame render.
+The alpha bounds never expand. Cancellation clears the unfinished tile.</p>
+<p>The working image is limited to approximately 53 million pixels including
+the filter margin. Finite source bounds crop the margin exactly, so the maximum
+amount and repeat count do not allocate empty space around a small cel. Larger requests report an allocation limit instead of
+silently reducing quality. Use smaller render tiles for large images.</p>
+</body>
+</html>
