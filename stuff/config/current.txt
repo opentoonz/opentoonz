@@ -371,6 +371,15 @@
   <item>"STD_randomWaveFx.intensity"		"Intensity"		</item>
   <item>"STD_randomWaveFx.sensitivity"		"Sensitivity"		</item>
   <item>"STD_randomWaveFx.sharpen"	"Sharpen"		</item>
+  <item>"STD_celBoilFx" "Cel Boil" </item>
+  <item>"STD_celBoilFx.target" "Boil" </item>
+  <item>"STD_celBoilFx.lineThreshold" "Line Darkness" </item>
+  <item>"STD_celBoilFx.amplitude" "Amplitude" </item>
+  <item>"STD_celBoilFx.size" "Wobble Size" </item>
+  <item>"STD_celBoilFx.detail" "Detail" </item>
+  <item>"STD_celBoilFx.cycle" "Cycle (Frames)" </item>
+  <item>"STD_celBoilFx.blend" "Blend" </item>
+  <item>"STD_celBoilFx.seed" "Seed" </item>
 
 
   <item>"STD_rippleFx"		"Ripple"	</item>
