@@ -142,6 +142,7 @@ public:
       const;  //!< Returns the path of currently selected file or folder,
               //!  or an empty one in case it couldn't be extracted.
   DvDirModelNode *getCurrentNode() const;
+  void commitCurrentEdit();  //!< Applies and closes an open rename editor.
   DvDirModelNode *getCurrentDropNode() const { return m_currentDropItem; }
 
   // From TSelection
