@@ -328,6 +328,17 @@ StrokeOutlineOptionsTag::StrokeOutlineOptionsTag(
 
 /*=====================================================================*/
 
+HideLineSegmentsTag::HideLineSegmentsTag()
+    : PliObjectTag(HIDE_LINE_SEGMENTS_GOBJ) {}
+
+/*=====================================================================*/
+
+HideLineSegmentsTag::HideLineSegmentsTag(
+    const std::vector<THideLineSegment> &segments)
+    : PliObjectTag(HIDE_LINE_SEGMENTS_GOBJ), m_segments(segments) {}
+
+/*=====================================================================*/
+
 PrecisionScaleTag::PrecisionScaleTag() : PliObjectTag(PRECISION_SCALE_GOBJ) {}
 
 /*=====================================================================*/
