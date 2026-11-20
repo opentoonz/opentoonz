@@ -118,6 +118,11 @@ int IntPairField::value2pos(int v) const {
 
 void IntPairField::paintEvent(QPaintEvent *) {
   QPainter p(this);
+  // The handle images are scaled by the device pixel ratio. At fractional
+  // ratios nearest-neighbour scaling draws their 1px edges 1 or 2 pixels
+  // wide, so scale them smoothly instead.
+  qreal dpr = devicePixelRatioF();
+  if (dpr != int(dpr)) p.setRenderHint(QPainter::SmoothPixmapTransform, true);
   p.setBrush(Qt::NoBrush);
 
   int x0 = value2pos(m_minValue);

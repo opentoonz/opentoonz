@@ -342,14 +342,16 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
                        : (secDistance > 0 && isAfterMarkers) ? 2.
                                                              : 1.;
 
-    p.setPen(QPen(color, lineWidth, Qt::SolidLine, Qt::FlatCap));
+    p.setPen(pixelAlignedPen(color, lineWidth, p.device(), Qt::FlatCap));
     // p.setPen(color);
     QLine horizontalLine = o->horizontalLine(frameAxis, layerSide);
     if (!o->isVerticalTimeline()) {
       int x = horizontalLine.x1();
       int y = horizontalLine.y2() - (isAfterMarkers ? 6 : 3);
       horizontalLine.setP1(QPoint(x, y));
-      if (!isAfterMarkers) p.setPen(m_viewer->getFrameRangeMarkerLineColor());
+      if (!isAfterMarkers)
+        p.setPen(pixelAlignedPen(m_viewer->getFrameRangeMarkerLineColor(), 1,
+                                 p.device()));
     }
     p.drawLine(horizontalLine);
   }
@@ -1206,7 +1208,7 @@ void RowArea::paintEvent(QPaintEvent *event) {
     drawPinnedCenterKeys(p, r0, r1);
 
   drawPlayRange(p, r0, r1);
-  p.setPen(m_viewer->getVerticalLineColor());
+  p.setPen(pixelAlignedPen(m_viewer->getVerticalLineColor(), 1, p.device()));
   p.setBrush(Qt::NoBrush);
   if (m_viewer->orientation()->isVerticalTimeline())
     p.drawRect(toBeUpdated.adjusted(-1, -1, -1, 0));

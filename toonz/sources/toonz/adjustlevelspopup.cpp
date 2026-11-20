@@ -104,6 +104,7 @@ public:
   TRasterP &raster() { return m_ras; }
 
   void paintGL() override {
+    applyDeviceViewport();
     drawBackground();
 
     if (m_ras) {

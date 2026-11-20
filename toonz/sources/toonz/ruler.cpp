@@ -241,11 +241,11 @@ double Ruler::posToValue(const QPoint &p) const {
   double v;
   if (m_vertical)
     if (m_viewer->getIsFlippedX() != m_viewer->getIsFlippedY()) {
-      v = (-p.y() + height() / 2 - getPan()) / -getZoomScale();
+      v = (-p.y() + height() * 0.5 - getPan()) / -getZoomScale();
     } else
-      v = (-p.y() + height() / 2 - getPan()) / getZoomScale();
+      v = (-p.y() + height() * 0.5 - getPan()) / getZoomScale();
   else
-    v = (p.x() - width() / 2 - getPan()) / getZoomScale();
+    v = (p.x() - width() * 0.5 - getPan()) / getZoomScale();
   return v;
 }
 

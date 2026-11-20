@@ -42,30 +42,10 @@
 using namespace DVGui;
 
 namespace {
-inline bool hasScreensWithDifferentDevPixRatio() {
-  static bool ret     = false;
-  static bool checked = false;
-  if (!checked) {  // check once
-    int dpr = QApplication::desktop()->devicePixelRatio();
-    for (auto screen : QGuiApplication::screens()) {
-      if ((int)screen->devicePixelRatio() != dpr) {
-        ret = true;
-        break;
-      }
-    }
-    checked = true;
-  }
-  return ret;
-}
-
-int getHighestDevicePixelRatio() {
-  static int highestDevPixRatio = 0;
-  if (highestDevPixRatio == 0) {
-    for (auto screen : QGuiApplication::screens())
-      highestDevPixRatio =
-          std::max(highestDevPixRatio, (int)screen->devicePixelRatio());
-  }
-  return highestDevPixRatio;
+// The highest ratio among the connected screens. Pixmaps rendered at this
+// ratio look sharp on every screen.
+qreal getHighestDevicePixelRatio() {
+  return qApp->devicePixelRatio();
 }
 }  // namespace
 //-----------------------------------------------------------------------------
@@ -190,12 +170,25 @@ QPixmap scalePixmapKeepingAspectRatio(QPixmap pixmap, QSize size,
 
 //-----------------------------------------------------------------------------
 
-int getDevicePixelRatio(const QWidget *widget) {
-  if (hasScreensWithDifferentDevPixRatio() && widget) {
-    return widget->screen()->devicePixelRatio();
-  }
-  static int devPixRatio = QApplication::desktop()->devicePixelRatio();
-  return devPixRatio;
+qreal getDevicePixelRatio(const QWidget *widget) {
+  // Queried each time: the ratio changes when a window moves to a screen with
+  // a different scale, or when the OS scale setting changes.
+  if (widget) return widget->devicePixelRatioF();
+  return getHighestDevicePixelRatio();
+}
+
+//-----------------------------------------------------------------------------
+
+QPen pixelAlignedPen(const QColor &color, qreal logicalWidth,
+                     const QPaintDevice *device, Qt::PenCapStyle cap) {
+  qreal dpr = device ? device->devicePixelRatioF() : 1.0;
+  if (dpr == std::floor(dpr))
+    return QPen(color, logicalWidth, Qt::SolidLine, cap);
+
+  QPen pen(color, std::max(1.0, std::floor(logicalWidth * dpr)),
+           Qt::SolidLine, cap);
+  pen.setCosmetic(true);  // width in device pixels
+  return pen;
 }
 
 //-----------------------------------------------------------------------------
@@ -244,7 +237,7 @@ QPixmap svgToPixmap(const QString &svgFilePath, QSize size,
     return QPixmap();
   }
 
-  static int devPixRatio = getHighestDevicePixelRatio();
+  static qreal devPixRatio = getHighestDevicePixelRatio();
   if (!size.isEmpty()) size *= devPixRatio;
 
   QSize imageSize = svgRenderer.defaultSize() * devPixRatio;
@@ -279,7 +272,8 @@ QImage svgToImage(const QString &svgFilePath, QSize size,
     return QImage();
   }
 
-  QSize imageSize = !size.isEmpty() ? size : svgRenderer.defaultSize();
+  // The SVG's own size: KeepAspectRatio modes fit it into the requested size.
+  QSize imageSize = svgRenderer.defaultSize();
   SvgRenderParams params =
       calculateSvgRenderParams(size, imageSize, aspectRatioMode);
   QImage image(params.size, QImage::Format_ARGB32_Premultiplied);
@@ -340,12 +334,13 @@ QPixmap expandPixmap(const QPixmap &pixmap, const QSize &expandSize,
   // Create a painter
   QPainter painter(&expandedPixmap);
 
-  // Calculate the centered position in pixel coordinates
-  int xPos = (expandSize.width() - pixmap.width()) / (2 * dpr);
-  int yPos = (expandSize.height() - pixmap.height()) / (2 * dpr);
+  // Center on whole device pixels, then convert to the painter's logical
+  // coordinates, so the pixmap is not resampled at fractional ratios.
+  int xDev = (expandSize.width() - pixmap.width()) / 2;
+  int yDev = (expandSize.height() - pixmap.height()) / 2;
 
   // Draw the original pixmap
-  painter.drawPixmap(xPos, yPos, pixmap);
+  painter.drawPixmap(QPointF(xDev / dpr, yDev / dpr), pixmap);
 
   return expandedPixmap;
 }
@@ -1096,7 +1091,7 @@ void SvgIconEngine::paint(QPainter *painter, const QRect &rect,
 
   ThemeManager &tm = ThemeManager::getInstance();
 
-  qreal dpr = painter->device()->devicePixelRatio();
+  qreal dpr = painter->device()->devicePixelRatioF();
 
   QPixmap pm = pixmap(rect.size() * dpr, mode, state);
   if (!pm.isNull()) {
@@ -1172,7 +1167,10 @@ QPixmap SvgIconEngine::pixmap(const QSize &size, QIcon::Mode mode,
   }
 
   // Generate cache key
-  QString cacheKey = generateCacheKey(m_iconName, requestSize, mode, state);
+  // The ratio is part of the key: the same pixel size means a different
+  // logical size at another ratio (e.g. 24px is 24 at 1.0 but 16 at 1.5).
+  QString cacheKey = generateCacheKey(m_iconName, requestSize, mode, state) +
+                     QString("@%1").arg(dpr);
   if (m_isTemporaryCommandIcon) cacheKey += "_cmdNameIcon";
   // Check cache for pixmap
   QPixmap cachedPm = getFromPixmapCache(cacheKey);

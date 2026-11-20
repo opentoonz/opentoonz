@@ -899,7 +899,8 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
       QRect sideBar = o->rect(PredefinedRect::DRAG_LAYER).translated(x0, y0);
 
       if (o->flag(PredefinedFlag::DRAG_LAYER_BORDER)) {
-        p.setPen(m_viewer->getVerticalLineColor());
+        p.setPen(
+            pixelAlignedPen(m_viewer->getVerticalLineColor(), 1, p.device()));
         p.drawRect(sideBar);
       }
 
@@ -1142,7 +1143,7 @@ void ColumnArea::DrawHeader::drawColumnNumber() const {
 
   QRect pos = o->rect(PredefinedRect::LAYER_NUMBER).translated(orig);
 
-  p.setPen(m_viewer->getVerticalLineColor());
+  p.setPen(pixelAlignedPen(m_viewer->getVerticalLineColor(), 1, p.device()));
   if (o->flag(PredefinedFlag::LAYER_NUMBER_BORDER)) p.drawRect(pos);
 
   p.setPen((isCurrent) ? m_viewer->getSelectedColumnTextColor()
@@ -1250,7 +1251,7 @@ void ColumnArea::DrawHeader::drawThumbnail(QPixmap &iconPixmap) const {
   // Minimum layout has no thumbnail area
   if (thumbnailRect.isEmpty()) return;
 
-  p.setPen(m_viewer->getVerticalLineColor());
+  p.setPen(pixelAlignedPen(m_viewer->getVerticalLineColor(), 1, p.device()));
   if (o->flag(PredefinedFlag::THUMBNAIL_AREA_BORDER)) p.drawRect(thumbnailRect);
 
   // sound thumbnail
@@ -1352,7 +1353,7 @@ void ColumnArea::DrawHeader::drawPegbarName() const {
 
   // pegbar name
   QRect pegbarnamerect = o->rect(PredefinedRect::PEGBAR_NAME).translated(orig);
-  p.setPen(m_viewer->getVerticalLineColor());
+  p.setPen(pixelAlignedPen(m_viewer->getVerticalLineColor(), 1, p.device()));
   if (o->flag(PredefinedFlag::PEGBAR_NAME_BORDER)) p.drawRect(pegbarnamerect);
 
   if (column->getSoundColumn() || column->getSoundTextColumn()) return;
@@ -1405,7 +1406,7 @@ void ColumnArea::DrawHeader::drawParentHandleName() const {
   if (handle[0] == 'H' && handle.length() > 1) handle = handle.substr(1);
 
   if (handle == "B") {  // Default handle
-    QPen pen(m_viewer->getVerticalLineColor());
+    QPen pen = pixelAlignedPen(m_viewer->getVerticalLineColor(), 1, p.device());
     pen.setStyle(Qt::PenStyle::DotLine);
     p.setPen(pen);
     int offset = parenthandleRect.x() + 2;
@@ -1413,7 +1414,7 @@ void ColumnArea::DrawHeader::drawParentHandleName() const {
     return;
   }
 
-  p.setPen(m_viewer->getVerticalLineColor());
+  p.setPen(pixelAlignedPen(m_viewer->getVerticalLineColor(), 1, p.device()));
   p.drawRect(parenthandleRect.adjusted(2, 0, 0, 0));
 
   p.setPen(m_viewer->getTextColor());
@@ -1921,10 +1922,25 @@ void ColumnArea::drawCurrentColumnFocus(QPainter &p, int col) {
 
   QColor color = m_viewer->getColumnFocusColor();
   if (color.alpha() == 0) return;
+  // 2px frame inside rect, drawn as 1px lines with the same kind of pen as the
+  // header separators around it, so that at fractional ratios it is
+  // rasterized like them and meets them without gaps or overlaps.
+  // drawRect() is not used: with a 1px pen it spills one pixel past the
+  // right and bottom edges. The vertical sides stop at the horizontal ones so
+  // corners are not drawn twice when the color is translucent.
+  const int w = 2;
   p.save();
-  p.setPen(color);
-  p.setBrush(Qt::NoBrush);
-  for (int i = 0; i < 2; ++i) p.drawRect(rect.adjusted(i, i, -i, -i));
+  p.setRenderHint(QPainter::Antialiasing, false);
+  p.setPen(color);  // default 1px pen, as used for the separators
+  for (int i = 0; i < w; ++i) {
+    p.drawLine(rect.left(), rect.top() + i, rect.right(), rect.top() + i);
+    p.drawLine(rect.left(), rect.bottom() - i, rect.right(),
+               rect.bottom() - i);
+    p.drawLine(rect.left() + i, rect.top() + w, rect.left() + i,
+               rect.bottom() - w);
+    p.drawLine(rect.right() - i, rect.top() + w, rect.right() - i,
+               rect.bottom() - w);
+  }
   p.restore();
 }
 

@@ -270,7 +270,8 @@ void ShiftTraceTool::drawControlRect() {  // TODO
   glEnd();
   color    = m_highlightedGadget == ScaleGadget ? TPixel32(200, 100, 100)
                                                 : TPixel32::White;
-  double r = 4 * sqrt(tglGetPixelSize2());
+  double r = 4 * sqrt(tglGetPixelSize2()) *
+             getDevicePixelRatio(m_viewer->viewerWidget());
   drawDot(box.getP00(), r, color);
   drawDot(box.getP01(), r, color);
   drawDot(box.getP10(), r, color);
@@ -286,7 +287,8 @@ void ShiftTraceTool::drawControlRect() {  // TODO
 
 void ShiftTraceTool::drawCurve() {
   if (m_curveStatus == NoCurve) return;
-  double r = 4 * sqrt(tglGetPixelSize2());
+  double r = 4 * sqrt(tglGetPixelSize2()) *
+             getDevicePixelRatio(m_viewer->viewerWidget());
   double u = getPixelSize();
   if (m_curveStatus == TwoPointsCurve) {
     TPixel32 color = m_highlightedGadget == CurveP0Gadget

@@ -433,7 +433,7 @@ void LipSyncPopup::updateThumbnail(int index) {
     QPixmap pm = IconGenerator::instance()->getSizedIcon(m_sl, frameId, "");
 
     if (!pm.isNull()) {
-      QPixmap scaled = pm.scaled(int(160 * dpr), int(90 * dpr),
+      QPixmap scaled = pm.scaled(qRound(160 * dpr), qRound(90 * dpr),
                                  Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
       scaled.setDevicePixelRatio(dpr);
@@ -446,7 +446,7 @@ void LipSyncPopup::updateThumbnail(int index) {
     }
   } else if (m_cl) {
     // For child levels, show placeholder
-    QImage img(int(160 * dpr), int(90 * dpr), QImage::Format_ARGB32);
+    QImage img(qRound(160 * dpr), qRound(90 * dpr), QImage::Format_ARGB32);
     img.setDevicePixelRatio(dpr);
     img.fill(Qt::gray);
 

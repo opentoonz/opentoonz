@@ -139,6 +139,7 @@ void ExportLevelPopup::Swatch::keyPressEvent(QKeyEvent *ke) {
 //------------------------------------------------------------------------
 
 void ExportLevelPopup::Swatch::paintGL() {
+  applyDeviceViewport();
   glPushAttrib(GL_COLOR_BUFFER_BIT);
 
   glEnable(GL_BLEND);

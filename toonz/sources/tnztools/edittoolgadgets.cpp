@@ -2965,7 +2965,7 @@ void FxGadgetController::invalidateViewer() { m_tool->invalidate(); }
 
 //---------------------------------------------------------------------------
 
-int FxGadgetController::getDevPixRatio() {
+qreal FxGadgetController::getDevPixRatio() {
   return getDevicePixelRatio(m_tool->getViewer()->viewerWidget());
 }
 

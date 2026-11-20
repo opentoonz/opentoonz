@@ -264,6 +264,12 @@ FlipSlider::FlipSlider(QWidget *parent)
 
 void FlipSlider::paintEvent(QPaintEvent *ev) {
   QPainter p(this);
+  // The overlay and marker images are scaled by the device pixel ratio. At
+  // fractional ratios nearest-neighbour scaling draws their 1px edges 1 or 2
+  // pixels wide, so scale them smoothly instead.
+  qreal dpr = devicePixelRatioF();
+  if (dpr != std::floor(dpr))
+    p.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
   // Draw the progress status colorbar
   QRect sliderRect(QPoint(), size());

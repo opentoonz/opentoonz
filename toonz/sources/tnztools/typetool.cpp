@@ -1351,7 +1351,7 @@ bool TypeTool::updateFormattedText() {
 }
 
 void TypeTool::drawFormattedText() {
-  m_pixelSize = std::sqrt(tglGetPixelSize2());
+  m_pixelSize = std::sqrt(tglGetPixelSize2()) * getViewer()->getDevPixRatio();
   if (!updateFormattedText()) return;
   const TImageP image = getImage(false);
   TPalette *palette   = image->getPalette();
@@ -2079,7 +2079,7 @@ glPushMatrix();
   }
 
   // draw textbox
-  double pixelSize = sqrt(tglGetPixelSize2());
+  double pixelSize = sqrt(tglGetPixelSize2()) * getViewer()->getDevPixRatio();
   if (!isAlmostZero(pixelSize - m_pixelSize)) {
     m_textBox   = m_textBox.enlarge((pixelSize - m_pixelSize) * cBorderSize);
     m_pixelSize = pixelSize;

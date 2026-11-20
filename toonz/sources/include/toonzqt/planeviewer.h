@@ -142,7 +142,8 @@ public slots:
   void fitView();
 
 protected:
-  int m_xpos, m_ypos;  //!< Mouse position on mouse operations.
+  double m_xpos, m_ypos;  //!< Mouse position on mouse operations, in device
+                          //!< pixels with origin at the bottom-left.
   TAffine m_aff;       //!< Affine transform from world to widget coords.
 
   float m_bgColorF[6];  //!< Widget bg color cast in the [0, 1] interval.
