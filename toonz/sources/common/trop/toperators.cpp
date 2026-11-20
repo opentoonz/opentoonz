@@ -1215,6 +1215,33 @@ void TRop::ropout(const TRasterP &source, const TRasterP &matte,
 
 //-----------------------------------------------------------------------------
 
+namespace {
+// Porter-Duff ATOP on premultiplied pixels: top is visible only where bottom
+// is, so the result keeps bottom's coverage.
+//   out = top * bot.m + bot * (1 - top.m),  out.m = bot.m
+// Compositing top over (top IN bot) instead raises alpha above bot.m on soft
+// edges and lets bottom show through where top is opaque.
+template <class T, class Q>
+inline void atopPix(T &outPix, const T &bot, const T &top) {
+  const unsigned long long max = T::maxChannelValue;
+  if (top.m == 0) {
+    outPix = bot;
+    return;
+  }
+  const unsigned long long topFac = bot.m, botFac = max - top.m;
+  auto channel = [&](unsigned long long t, unsigned long long b) {
+    unsigned long long v = (t * topFac + b * botFac + max / 2) / max;
+    return (Q)((v < max) ? v : max);
+  };
+  T out;
+  out.r  = channel(top.r, bot.r);
+  out.g  = channel(top.g, bot.g);
+  out.b  = channel(top.b, bot.b);
+  out.m  = bot.m;
+  outPix = out;  // outPix may alias bot
+}
+}  // namespace
+
 void TRop::atop(const TRasterP &rup, const TRasterP &rdown,
                 const TRasterP &rout) {
   // calcola rup ATOP rdown
@@ -1232,49 +1259,23 @@ void TRop::atop(const TRasterP &rup, const TRasterP &rdown,
 
   if (up32 && down32 && out32) {
     FOR_EACH_PIXEL_32_BEGIN_LOOP
-
-    TPixel32 tmpPix(0, 0, 0, 0);
-    if (downPix->m != 0) {
-      const int MAGICFAC = (257U * 256U + 1U);
-      UINT fac           = MAGICFAC * downPix->m;
-
-      tmpPix.r = (UINT)(upPix->r * fac + (1U << 23)) >> 24;
-      tmpPix.g = (UINT)(upPix->g * fac + (1U << 23)) >> 24;
-      tmpPix.b = (UINT)(upPix->b * fac + (1U << 23)) >> 24;
-      tmpPix.m = (UINT)(upPix->m * fac + (1U << 23)) >> 24;
-    }
-
-    overPix<TPixel32, UCHAR>(*outPix, *downPix, tmpPix);
-
+    atopPix<TPixel32, UCHAR>(*outPix, *downPix, *upPix);
     FOR_EACH_PIXEL_32_END_LOOP
   } else if (up64 && down64 && out64) {
     FOR_EACH_PIXEL_64_BEGIN_LOOP
-
-    TPixel64 tmpPix(0, 0, 0, 0);
-    if (downPix->m != 0) {
-      double fac = downPix->m / 65535.0;
-
-      tmpPix.r = (USHORT)(upPix->r * fac);
-      tmpPix.g = (USHORT)(upPix->g * fac);
-      tmpPix.b = (USHORT)(upPix->b * fac);
-      tmpPix.m = (USHORT)(upPix->m * fac);
-    }
-
-    overPix<TPixel64, USHORT>(*outPix, *downPix, tmpPix);
-
+    atopPix<TPixel64, USHORT>(*outPix, *downPix, *upPix);
     FOR_EACH_PIXEL_64_END_LOOP
   } else if (upF && downF && outF) {
     FOR_EACH_PIXEL_F_BEGIN_LOOP
 
-    TPixelF tmpPix = TPixelF::Transparent;
-    if (downPix->m >= 0.f) {
-      tmpPix.r = upPix->r * downPix->m;
-      tmpPix.g = upPix->g * downPix->m;
-      tmpPix.b = upPix->b * downPix->m;
-      tmpPix.m = upPix->m * downPix->m;
-    }
+    // See atopPix(): up * down.m + down * (1 - up.m), alpha = down.m
+    const TPixelF up = *upPix, dn = *downPix;
+    const float dnFac = 1.f - up.m;
+    outPix->r = up.r * dn.m + dn.r * dnFac;
+    outPix->g = up.g * dn.m + dn.g * dnFac;
+    outPix->b = up.b * dn.m + dn.b * dnFac;
+    outPix->m = dn.m;
 
-    overPix<TPixelF, float>(*outPix, *downPix, tmpPix);
     FOR_EACH_PIXEL_F_END_LOOP
   } else
     throw TRopException("TRop::atop invalid raster combination");
