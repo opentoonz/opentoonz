@@ -319,12 +319,13 @@ QPixmap expandPixmap(const QPixmap &pixmap, const QSize &expandSize,
   // Create a painter
   QPainter painter(&expandedPixmap);
 
-  // Calculate the centered position in pixel coordinates
-  int xPos = (expandSize.width() - pixmap.width()) / (2 * dpr);
-  int yPos = (expandSize.height() - pixmap.height()) / (2 * dpr);
+  // Center on whole device pixels, then convert to the painter's logical
+  // coordinates, so the pixmap is not resampled at fractional ratios.
+  int xDev = (expandSize.width() - pixmap.width()) / 2;
+  int yDev = (expandSize.height() - pixmap.height()) / 2;
 
   // Draw the original pixmap
-  painter.drawPixmap(xPos, yPos, pixmap);
+  painter.drawPixmap(QPointF(xDev / dpr, yDev / dpr), pixmap);
 
   return expandedPixmap;
 }
@@ -1151,7 +1152,10 @@ QPixmap SvgIconEngine::pixmap(const QSize &size, QIcon::Mode mode,
   }
 
   // Generate cache key
-  QString cacheKey = generateCacheKey(m_iconName, requestSize, mode, state);
+  // The ratio is part of the key: the same pixel size means a different
+  // logical size at another ratio (e.g. 24px is 24 at 1.0 but 16 at 1.5).
+  QString cacheKey = generateCacheKey(m_iconName, requestSize, mode, state) +
+                     QString("@%1").arg(dpr);
   if (m_isTemporaryCommandIcon) cacheKey += "_cmdNameIcon";
   // Check cache for pixmap
   QPixmap cachedPm = getFromPixmapCache(cacheKey);
