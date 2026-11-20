@@ -392,8 +392,10 @@ public:
   bool isTransparent() const { return m_enabled && m_backgroundAlpha <= 0.0; }
   double inputAlpha() const { return m_backgroundAlpha; }
   double workingAlpha() const { return m_enabled ? 1.0 : m_backgroundAlpha; }
+  // Factor applied to the kernel's result to restore the Back coverage.
+  double coverage() const { return m_enabled ? m_backgroundAlpha : 1.0; }
   double outputAlpha(double kernelAlpha) const {
-    return m_enabled ? m_backgroundAlpha * kernelAlpha : kernelAlpha;
+    return coverage() * kernelAlpha;
   }
 
   void prepare(double& r, double& g, double& b, double& a) const {
@@ -818,8 +820,9 @@ void TBlendForeBackRasterFx::linearTmpl(TRasterPT<T> dn_ras_out,
             dnBGR[c] = to_linear_color_space(dnBGR[c] / clipped.inputAlpha(),
                                              1.0, gammaDif) *
                        clipped.workingAlpha();
-          else
-            dnBGR[c] = to_linear_color_space(dnBGR[c], 1.0, gammaDif);
+          else  // already premultiplied by Back alpha in linear space
+            dnBGR[c] = to_linear_color_space(dnBGR[c], 1.0, gammaDif) *
+                       clipped.workingAlpha() / clipped.inputAlpha();
         }
 
         to_xyz(dnXYZ, dnBGR);
@@ -857,19 +860,19 @@ void TBlendForeBackRasterFx::linearTmpl(TRasterPT<T> dn_ras_out,
         out_pix->r = out_pix->g = out_pix->b = out_pix->m = 0;
         continue;
       }
-      double nonlinear_b =
-          to_nonlinear_color_space(dnBGR[0] / dna, 1.0, gammaDif) * outputAlpha;
-      double nonlinear_g =
-          to_nonlinear_color_space(dnBGR[1] / dna, 1.0, gammaDif) * outputAlpha;
-      double nonlinear_r =
-          to_nonlinear_color_space(dnBGR[2] / dna, 1.0, gammaDif) * outputAlpha;
+      // Clamp in the kernel's working space before restoring the Back
+      // coverage, as the nonlinear method does, so that a clipped edge
+      // cannot end up with color exceeding its alpha.
+      double nonlinear[3];
+      for (int c = 0; c < 3; c++)
+        nonlinear[c] =
+            clamp(to_nonlinear_color_space(dnBGR[c] / dna, 1.0, gammaDif) * dna,
+                  0.0, 1.0) *
+            clipped.coverage();
 
-      out_pix->r =
-          static_cast<Q>(clamp(nonlinear_r, 0.0, 1.0) * (maxi + 0.999999));
-      out_pix->g =
-          static_cast<Q>(clamp(nonlinear_g, 0.0, 1.0) * (maxi + 0.999999));
-      out_pix->b =
-          static_cast<Q>(clamp(nonlinear_b, 0.0, 1.0) * (maxi + 0.999999));
+      out_pix->r = static_cast<Q>(nonlinear[2] * (maxi + 0.999999));
+      out_pix->g = static_cast<Q>(nonlinear[1] * (maxi + 0.999999));
+      out_pix->b = static_cast<Q>(nonlinear[0] * (maxi + 0.999999));
       out_pix->m = static_cast<Q>(outputAlpha * (maxi + 0.999999));
     }
   }
@@ -916,8 +919,9 @@ void TBlendForeBackRasterFx::linearTmpl<TPixelF, float>(TRasterFP dn_ras_out,
             dnBGR[c] = to_linear_color_space(dnBGR[c] / clipped.inputAlpha(),
                                              1.0, gammaDif) *
                        clipped.workingAlpha();
-          else
-            dnBGR[c] = to_linear_color_space(dnBGR[c], 1.0, gammaDif);
+          else  // already premultiplied by Back alpha in linear space
+            dnBGR[c] = to_linear_color_space(dnBGR[c], 1.0, gammaDif) *
+                       clipped.workingAlpha() / clipped.inputAlpha();
         }
         to_xyz(dnXYZ, dnBGR);
       }
