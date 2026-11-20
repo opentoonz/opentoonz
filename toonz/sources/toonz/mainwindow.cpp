@@ -450,6 +450,18 @@ void Room::showEvent(QShowEvent *event) {
       // restoreState() already applies the saved panel geometry. Redistributing
       // here would recalculate it and discard the user's saved panel positions.
       layout->restoreState(savedState);
+
+      // ...unless the saved geometry was made for a different room size (e.g.
+      // the display scale or resolution changed since it was saved). Then it
+      // covers only part of the room, or lies outside it, so fit it to the
+      // current size as a window resize does.
+      if (!layout->regions().empty()) {
+        QSizeF saved   = layout->regions().front()->getGeometry().size();
+        QSize current  = layout->contentsRect().size();
+        bool sizeDiffers = std::abs(saved.width() - current.width()) > 1 ||
+                           std::abs(saved.height() - current.height()) > 1;
+        if (sizeDiffers) layout->redistribute();
+      }
     });
   }
 }
