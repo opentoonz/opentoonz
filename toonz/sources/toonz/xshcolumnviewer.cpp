@@ -899,7 +899,8 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
       QRect sideBar = o->rect(PredefinedRect::DRAG_LAYER).translated(x0, y0);
 
       if (o->flag(PredefinedFlag::DRAG_LAYER_BORDER)) {
-        p.setPen(m_viewer->getVerticalLineColor());
+        p.setPen(
+            pixelAlignedPen(m_viewer->getVerticalLineColor(), 1, p.device()));
         p.drawRect(sideBar);
       }
 
@@ -1142,7 +1143,7 @@ void ColumnArea::DrawHeader::drawColumnNumber() const {
 
   QRect pos = o->rect(PredefinedRect::LAYER_NUMBER).translated(orig);
 
-  p.setPen(m_viewer->getVerticalLineColor());
+  p.setPen(pixelAlignedPen(m_viewer->getVerticalLineColor(), 1, p.device()));
   if (o->flag(PredefinedFlag::LAYER_NUMBER_BORDER)) p.drawRect(pos);
 
   p.setPen((isCurrent) ? m_viewer->getSelectedColumnTextColor()
@@ -1250,7 +1251,7 @@ void ColumnArea::DrawHeader::drawThumbnail(QPixmap &iconPixmap) const {
   // Minimum layout has no thumbnail area
   if (thumbnailRect.isEmpty()) return;
 
-  p.setPen(m_viewer->getVerticalLineColor());
+  p.setPen(pixelAlignedPen(m_viewer->getVerticalLineColor(), 1, p.device()));
   if (o->flag(PredefinedFlag::THUMBNAIL_AREA_BORDER)) p.drawRect(thumbnailRect);
 
   // sound thumbnail
@@ -1352,7 +1353,7 @@ void ColumnArea::DrawHeader::drawPegbarName() const {
 
   // pegbar name
   QRect pegbarnamerect = o->rect(PredefinedRect::PEGBAR_NAME).translated(orig);
-  p.setPen(m_viewer->getVerticalLineColor());
+  p.setPen(pixelAlignedPen(m_viewer->getVerticalLineColor(), 1, p.device()));
   if (o->flag(PredefinedFlag::PEGBAR_NAME_BORDER)) p.drawRect(pegbarnamerect);
 
   if (column->getSoundColumn() || column->getSoundTextColumn()) return;
@@ -1405,7 +1406,7 @@ void ColumnArea::DrawHeader::drawParentHandleName() const {
   if (handle[0] == 'H' && handle.length() > 1) handle = handle.substr(1);
 
   if (handle == "B") {  // Default handle
-    QPen pen(m_viewer->getVerticalLineColor());
+    QPen pen = pixelAlignedPen(m_viewer->getVerticalLineColor(), 1, p.device());
     pen.setStyle(Qt::PenStyle::DotLine);
     p.setPen(pen);
     int offset = parenthandleRect.x() + 2;
@@ -1413,7 +1414,7 @@ void ColumnArea::DrawHeader::drawParentHandleName() const {
     return;
   }
 
-  p.setPen(m_viewer->getVerticalLineColor());
+  p.setPen(pixelAlignedPen(m_viewer->getVerticalLineColor(), 1, p.device()));
   p.drawRect(parenthandleRect.adjusted(2, 0, 0, 0));
 
   p.setPen(m_viewer->getTextColor());

@@ -8,6 +8,7 @@
 #include <QFrame>
 #include <QIconEngine>
 #include <QColor>
+#include <QPen>
 #include "traster.h"
 #include "toonz/preferences.h"
 
@@ -121,6 +122,16 @@ svgToImage(const QString &svgFilePath, QSize size = QSize(),
 // corresponds to the OS display scale. Without a widget, the application's
 // highest ratio is returned.
 qreal DVAPI getDevicePixelRatio(const QWidget *widget = nullptr);
+
+//-----------------------------------------------------------------------------
+// Returns a pen for drawing thin lines (grids, separators) on the device.
+// At fractional ratios a line of logical width w covers w * ratio device
+// pixels and is rasterized 1 or 2 pixels wide depending on its position; the
+// returned pen is then cosmetic and a whole number of device pixels wide so
+// every line looks the same. At whole-number ratios it is the plain pen.
+QPen DVAPI pixelAlignedPen(const QColor &color, qreal logicalWidth,
+                           const QPaintDevice *device,
+                           Qt::PenCapStyle cap = Qt::SquareCap);
 
 //-----------------------------------------------------------------------------
 

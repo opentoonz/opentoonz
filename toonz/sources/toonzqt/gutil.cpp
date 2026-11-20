@@ -179,6 +179,20 @@ qreal getDevicePixelRatio(const QWidget *widget) {
 
 //-----------------------------------------------------------------------------
 
+QPen pixelAlignedPen(const QColor &color, qreal logicalWidth,
+                     const QPaintDevice *device, Qt::PenCapStyle cap) {
+  qreal dpr = device ? device->devicePixelRatioF() : 1.0;
+  if (dpr == std::floor(dpr))
+    return QPen(color, logicalWidth, Qt::SolidLine, cap);
+
+  QPen pen(color, std::max(1.0, std::floor(logicalWidth * dpr)),
+           Qt::SolidLine, cap);
+  pen.setCosmetic(true);  // width in device pixels
+  return pen;
+}
+
+//-----------------------------------------------------------------------------
+
 SvgRenderParams calculateSvgRenderParams(const QSize &desiredSize,
                                          QSize &imageSize,
                                          Qt::AspectRatioMode aspectRatioMode) {
