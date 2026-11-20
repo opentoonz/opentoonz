@@ -2824,7 +2824,7 @@ double SceneViewer::getZoomScaleFittingWithScreen() {
 //-----------------------------------------------------------------------------
 
 // center: window coordinate, pixels, topleft origin
-void SceneViewer::zoomQt(const QPoint &center, double factor) {
+void SceneViewer::zoomQt(const QPointF &center, double factor) {
   if (factor == 1.0) return;
   TPointD delta(center.x() - width() * 0.5, -center.y() + height() * 0.5);
   double oldZoomScale = m_zoomScale3D;
@@ -2868,7 +2868,7 @@ void SceneViewer::zoomQt(const QPoint &center, double factor) {
 }
 
 void SceneViewer::zoom(const TPointD &center, double factor) {
-  zoomQt(QPoint(center.x, height() - center.y), factor);
+  zoomQt(QPointF(center.x, height() - center.y), factor);
 }
 
 //-----------------------------------------------------------------------------

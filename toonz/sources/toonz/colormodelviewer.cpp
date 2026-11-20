@@ -244,14 +244,14 @@ void ColorModelViewer::contextMenuEvent(QContextMenuEvent *event) {
  */
 void ColorModelViewer::mousePressEvent(QMouseEvent *event) {
   if (event->button() == Qt::LeftButton)
-    pick(event->pos() * getDevicePixelRatio(this));
+    pick((event->localPos() * getDevicePixelRatio(this)).toPoint());
 }
 //-----------------------------------------------------------------------------
 /*! If left button is moved recall \b pick() in event pos.
  */
 void ColorModelViewer::mouseMoveEvent(QMouseEvent *event) {
   if (event->buttons() & Qt::LeftButton)
-    pick(event->pos() * getDevicePixelRatio(this));
+    pick((event->localPos() * getDevicePixelRatio(this)).toPoint());
 }
 //-----------------------------------------------------------------------------
 /*! Pick color from image and set it as current style.

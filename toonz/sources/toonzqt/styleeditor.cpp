@@ -827,7 +827,7 @@ void HexagonalColorWheel::mousePressEvent(QMouseEvent *event) {
 
   // check whether the mouse cursor is in the wheel or in the triangle (or
   // nothing).
-  QPoint curPos = event->pos() * getDevPixRatio();
+  QPoint curPos = (event->localPos() * getDevPixRatio()).toPoint();
 
   QPolygonF wheelPolygon;
   // in the case of the wheel
@@ -862,10 +862,10 @@ void HexagonalColorWheel::mouseMoveEvent(QMouseEvent *event) {
   case none:
     break;
   case leftWheel:
-    clickLeftWheel(event->pos() * getDevPixRatio());
+    clickLeftWheel((event->localPos() * getDevPixRatio()).toPoint());
     break;
   case rightTriangle:
-    clickRightTriangle(event->pos() * getDevPixRatio());
+    clickRightTriangle((event->localPos() * getDevPixRatio()).toPoint());
     break;
   }
 }

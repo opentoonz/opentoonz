@@ -191,7 +191,7 @@ void PlaneViewer::mouseMoveEvent(QMouseEvent *event) {
     return;
   }
 
-  QPoint curPos = event->pos() * getDevPixRatio();
+  QPointF curPos = event->localPos() * getDevPixRatio();
   if (event->buttons() & Qt::MiddleButton)
     moveView(curPos.x() - m_xpos, height() - curPos.y() - m_ypos);
 
@@ -207,8 +207,8 @@ void PlaneViewer::mousePressEvent(QMouseEvent *event) {
     return;
   }
 
-  m_xpos = event->x() * getDevPixRatio();
-  m_ypos = height() - event->y() * getDevPixRatio();
+  m_xpos = event->localPos().x() * getDevPixRatio();
+  m_ypos = height() - event->localPos().y() * getDevPixRatio();
 }
 
 //------------------------------------------------------
@@ -345,9 +345,9 @@ void PlaneViewer::gestureEvent(QGestureEvent *e) {
   if (QGesture *pinch = e->gesture(Qt::PinchGesture)) {
     QPinchGesture *gesture = static_cast<QPinchGesture *>(pinch);
     QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
-    QPoint firstCenter                     = gesture->centerPoint().toPoint();
+    QPointF firstCenter                    = gesture->centerPoint();
     if (m_touchDevice == QTouchDevice::TouchScreen)
-      firstCenter = mapFromGlobal(firstCenter);
+      firstCenter = mapFromGlobal(firstCenter.toPoint());
 
     if (gesture->state() == Qt::GestureStarted) {
       m_gestureActive = true;
@@ -377,8 +377,9 @@ void PlaneViewer::gestureEvent(QGestureEvent *e) {
           }
         }
         if (m_zooming) {
+          // window coordinates have the origin at the bottom-left
           zoomView(firstCenter.x() * getDevPixRatio(),
-                   firstCenter.y() * getDevPixRatio(), scaleFactor);
+                   height() - firstCenter.y() * getDevPixRatio(), scaleFactor);
           m_panning = false;
         }
         m_gestureActive = true;
@@ -421,9 +422,8 @@ void PlaneViewer::touchEvent(QTouchEvent *e, int type) {
         }
       }
       if (m_panning) {
-        QPoint curPos      = panPoint.pos().toPoint() * getDevPixRatio();
-        QPoint lastPos     = panPoint.lastPos().toPoint() * getDevPixRatio();
-        QPoint centerDelta = curPos - lastPos;
+        QPointF centerDelta =
+            (panPoint.pos() - panPoint.lastPos()) * getDevPixRatio();
         moveView(centerDelta.x(), -centerDelta.y());
       }
     }

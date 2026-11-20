@@ -1082,8 +1082,7 @@ void SceneViewer::wheelEvent(QWheelEvent *event) {
     else if ((m_gestureActive == true &&
               m_touchDevice == QTouchDevice::TouchScreen) ||
              m_gestureActive == false) {
-      zoomQt(event->position().toPoint() * getDevPixRatio(),
-             exp(0.001 * delta));
+      zoomQt(event->position() * getDevPixRatio(), exp(0.001 * delta));
       m_panning = false;
     }
   }
@@ -1102,9 +1101,9 @@ void SceneViewer::gestureEvent(QGestureEvent *e) {
   if (QGesture *pinch = e->gesture(Qt::PinchGesture)) {
     QPinchGesture *gesture = static_cast<QPinchGesture *>(pinch);
     QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
-    QPoint firstCenter                     = gesture->centerPoint().toPoint();
+    QPointF firstCenter                    = gesture->centerPoint();
     if (m_touchDevice == QTouchDevice::TouchScreen)
-      firstCenter = mapFromGlobal(firstCenter);
+      firstCenter = mapFromGlobal(firstCenter.toPoint());
 
     if (gesture->state() == Qt::GestureStarted) {
       m_gestureActive = true;
@@ -1199,7 +1198,7 @@ void SceneViewer::touchEvent(QTouchEvent *e, int type) {
       if (m_panning) {
         QPointF centerDelta = (panPoint.pos() * getDevPixRatio()) -
                               (panPoint.lastPos() * getDevPixRatio());
-        panQt(centerDelta.toPoint());
+        panQt(centerDelta);
       }
     } else if (e->touchPoints().count() == 3) {
       QPointF newPoint = e->touchPoints().at(0).pos();
@@ -1744,7 +1743,7 @@ void SceneViewer::mouseDoubleClickEvent(QMouseEvent *event) {
   TMouseEvent toonzEvent;
   initToonzEvent(toonzEvent, event, height(), 1.0, getDevPixRatio());
   TPointD pos =
-      tool->getMatrix().inv() * winToWorld(event->pos() * getDevPixRatio());
+      tool->getMatrix().inv() * winToWorld(event->localPos() * getDevPixRatio());
   TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
   if ((tool->getToolType() & TTool::LevelTool) && !objHandle->isSpline()) {
     pos.x /= m_dpiScale.x;
