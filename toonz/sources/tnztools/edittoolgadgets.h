@@ -151,7 +151,7 @@ public:
 
   bool hasGadget() { return m_gadgets.size() != 0; }
 
-  int getDevPixRatio();
+  qreal getDevPixRatio();
 
   // get the current viewer geometry
   TRectD getGeometry();

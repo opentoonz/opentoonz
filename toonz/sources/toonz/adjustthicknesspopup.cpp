@@ -225,6 +225,7 @@ public:
   TVectorImageP &image() { return m_vi; }
 
   void paintGL() override {
+    applyDeviceViewport();
     drawBackground();
 
     if (m_vi) {

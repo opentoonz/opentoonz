@@ -192,7 +192,7 @@ void copyFrontBufferToBackBuffer() {
 T3DPointD computeNew3DPosition(T3DPointD start3DPos, TPointD delta2D,
                                TPointD &new2dPos, GLdouble modelView3D[16],
                                GLdouble projection3D[16], GLint viewport3D[4],
-                               int devPixRatio) {
+                               double devPixRatio) {
   GLdouble pos2D_x, pos2D_y, pos2D_z;
   gluProject(-start3DPos.x, -start3DPos.y, start3DPos.z, modelView3D,
              projection3D, viewport3D, &pos2D_x, &pos2D_y, &pos2D_z);
@@ -1090,7 +1090,7 @@ TPointD SceneViewer::winToWorld(const TPointD &winPos) const {
 
 TPointD SceneViewer::worldToPos(const TPointD &worldPos) const {
   TPointD p = getViewMatrix() * worldPos;
-  return TPointD(width() / 2 + p.x, height() / 2 + p.y);
+  return TPointD(width() * 0.5 + p.x, height() * 0.5 + p.y);
 }
 
 //-----------------------------------------------------------------------------
@@ -1370,9 +1370,10 @@ void SceneViewer::initializeGL() {
 
 //-----------------------------------------------------------------------------
 
-void SceneViewer::resizeGL(int w, int h) {
-  w *= getDevPixRatio();
-  h *= getDevPixRatio();
+void SceneViewer::resizeGL(int, int) {
+  // Device pixels; the arguments are in logical pixels.
+  int w = width();
+  int h = height();
   glViewport(0, 0, w, h);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
@@ -1400,6 +1401,7 @@ void SceneViewer::resizeGL(int w, int h) {
     } else  // normally, initialize with GL_RGBA8 format
       m_fbo = new QOpenGLFramebufferObject(w, h);
   }
+  markDeviceSizeApplied();
 
   // for updating the navigator in levelstrip
   emit refreshNavi();
@@ -2011,18 +2013,18 @@ void SceneViewer::drawViewerIndicators() {
 
   if (!checkTexts.size()) return;
 
-  int devPixRatio = getDevPixRatio();
+  double devPixRatio = getDevPixRatio();
 
-  int x0, x1, y0, y1;
-  rect().getCoords(&x0, &y0, &x1, &y1);
-  x0 = (-(x1 / (2 * devPixRatio))) + 15;
-  y0 = ((y1 / (2 * devPixRatio))) - 25;
+  // top-left corner of the viewer, in the scaled coordinates below (the
+  // origin is at the viewer center)
+  double x0 = -(width() - 1) / (2.0 * devPixRatio) + 15.0;
+  double y0 = (height() - 1) / (2.0 * devPixRatio) - 25.0;
 
   glPushMatrix();
   glScaled(2 * devPixRatio, 2 * devPixRatio, 2 * devPixRatio);
   glColor3d(1.0, 0.0, 0.0);
   for (int i = 0; i < checkTexts.size(); i++) {
-    int y = (y0 / 2) - (i * 10);
+    double y = (y0 / 2) - (i * 10);
     tglDrawText(TPointD((x0 / 2), y), checkTexts[i].toStdString());
   }
   glPopMatrix();
@@ -2099,6 +2101,9 @@ void SceneViewer::paintGL() {
   QTime time;
   time.start();
 #endif
+
+  // When picking, the viewport and the pick projection are already set.
+  if (!m_isPicking) applyDeviceViewport();
 
   if (!m_isPicking && m_lutCalibrator && m_lutCalibrator->isValid())
     m_fbo->bind();
@@ -2635,8 +2640,8 @@ void SceneViewer::panQt(const QPointF &delta) {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::zoomQt(bool forward, bool reset) {
-  TPointD delta(m_lastMousePos.x() - width() / 2,
-                -m_lastMousePos.y() + height() / 2);
+  TPointD delta(m_lastMousePos.x() - width() * 0.5,
+                -m_lastMousePos.y() + height() * 0.5);
 
   if (is3DView()) {
     if (reset || ((m_zoomScale3D < 500 || !forward) &&
@@ -2821,7 +2826,7 @@ double SceneViewer::getZoomScaleFittingWithScreen() {
 // center: window coordinate, pixels, topleft origin
 void SceneViewer::zoomQt(const QPoint &center, double factor) {
   if (factor == 1.0) return;
-  TPointD delta(center.x() - width() / 2, -center.y() + height() / 2);
+  TPointD delta(center.x() - width() * 0.5, -center.y() + height() * 0.5);
   double oldZoomScale = m_zoomScale3D;
 
   if (is3DView()) {
@@ -3300,8 +3305,9 @@ int SceneViewer::pick(const TPointD &point) {
   // QGLWidget::makeCurrent() is not automatically called in these events.
   // (to exploit the bug: open the FxEditor preview and then select the edit
   // tool)
-  m_isPicking = true;
   makeCurrent();
+  applyDeviceViewport();
+  m_isPicking = true;
   assert(glGetError() == GL_NO_ERROR);
   GLint viewport[4];
   glGetIntegerv(GL_VIEWPORT, viewport);
@@ -3403,7 +3409,7 @@ void SceneViewer::posToColumnIndexes(const TPointD &p,
   int currentColumnIndex = app->getCurrentColumn()->getColumnIndex();
   OnionSkinMask osm      = app->getCurrentOnionSkin()->getOnionSkinMask();
 
-  TPointD pos = TPointD(p.x - width() / 2, p.y - height() / 2);
+  TPointD pos = TPointD(p.x - width() * 0.5, p.y - height() * 0.5);
   Stage::Picker picker(getViewMatrix(), pos, m_visualSettings,
                        getDevPixRatio());
   picker.setMinimumDistance(distance);
@@ -3443,7 +3449,7 @@ int SceneViewer::posToRow(const TPointD &p, double distance,
   TApp *app           = TApp::instance();
   OnionSkinMask osm   = app->getCurrentOnionSkin()->getOnionSkinMask();
 
-  TPointD pos = TPointD(p.x - width() / 2, p.y - height() / 2);
+  TPointD pos = TPointD(p.x - width() * 0.5, p.y - height() * 0.5);
   Stage::Picker picker(getViewMatrix(), pos, m_visualSettings,
                        getDevPixRatio());
   picker.setMinimumDistance(distance);
@@ -3625,12 +3631,13 @@ void SceneViewer::invalidateToolStatus() {
 */
 
 TRectD SceneViewer::getGeometry() const {
-  int devPixRatio = getDevPixRatio();
-  TTool *tool     = TApp::instance()->getCurrentTool()->getTool();
-  TPointD topLeft =
-      tool->getMatrix().inv() * winToWorld(geometry().topLeft() * devPixRatio);
-  TPointD bottomRight = tool->getMatrix().inv() *
-                        winToWorld(geometry().bottomRight() * devPixRatio);
+  qreal devPixRatio = getDevPixRatio();
+  TTool *tool       = TApp::instance()->getCurrentTool()->getTool();
+  TPointD topLeft   = tool->getMatrix().inv() *
+                    winToWorld(QPointF(geometry().topLeft()) * devPixRatio);
+  TPointD bottomRight =
+      tool->getMatrix().inv() *
+      winToWorld(QPointF(geometry().bottomRight()) * devPixRatio);
 
   TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
   if (tool->getToolType() & TTool::LevelTool && !objHandle->isSpline()) {

@@ -331,6 +331,14 @@ int main(int argc, char *argv[]) {
   // Enables high-DPI scaling. This attribute must be set before QApplication is
   // constructed. Available from Qt 5.6.
   QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+  // Use the exact OS scale factor (e.g. 1.25, 1.5) instead of rounding it to
+  // an integer. The QT_SCALE_FACTOR_ROUNDING_POLICY environment variable still
+  // overrides this.
+  if (!qEnvironmentVariableIsSet("QT_SCALE_FACTOR_ROUNDING_POLICY"))
+    QGuiApplication::setHighDpiScaleFactorRoundingPolicy(
+        Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
+#endif
 
   QApplication a(argc, argv);
 

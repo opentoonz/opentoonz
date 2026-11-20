@@ -338,6 +338,7 @@ bool VectorizerSwatchArea::Swatch::event(QEvent *e) {
 //-----------------------------------------------------------------------------
 
 void VectorizerSwatchArea::Swatch::paintGL() {
+  applyDeviceViewport();
   if (isEnabled()) {
     drawBackground();
 

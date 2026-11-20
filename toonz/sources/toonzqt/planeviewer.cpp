@@ -154,9 +154,10 @@ void PlaneViewer::drawBackground() {
 
 void PlaneViewer::initializeGL() { initializeOpenGLFunctions(); }
 
-void PlaneViewer::resizeGL(int width, int height) {
-  width *= getDevPixRatio();
-  height *= getDevPixRatio();
+void PlaneViewer::resizeGL(int, int) {
+  // Device pixels; the arguments are in logical pixels.
+  int width  = this->width();
+  int height = this->height();
   glViewport(0, 0, width, height);
 
   glMatrixMode(GL_PROJECTION);
@@ -179,6 +180,7 @@ void PlaneViewer::resizeGL(int width, int height) {
     m_width  = width;
     m_height = height;
   }
+  markDeviceSizeApplied();
 }
 
 //=========================================================================================

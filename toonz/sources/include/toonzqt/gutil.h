@@ -116,10 +116,11 @@ svgToImage(const QString &svgFilePath, QSize size = QSize(),
            QColor bgColor                      = Qt::transparent);
 
 //-----------------------------------------------------------------------------
-// returns device-pixel ratio. It is 1 for normal monitors and 2 (or higher
-// ratio) for high DPI monitors. Setting "Display > Set custom text size(DPI)"
-// for Windows corresponds to this ratio.
-int DVAPI getDevicePixelRatio(const QWidget *widget = nullptr);
+// returns device-pixel ratio. It is 1 for normal monitors and may be
+// fractional (e.g. 1.25, 1.5) or 2 and higher for high DPI monitors. It
+// corresponds to the OS display scale. Without a widget, the application's
+// highest ratio is returned.
+qreal DVAPI getDevicePixelRatio(const QWidget *widget = nullptr);
 
 //-----------------------------------------------------------------------------
 

@@ -482,9 +482,10 @@ void ImageViewer::initializeGL() {
 
 //-----------------------------------------------------------------------------
 
-void ImageViewer::resizeGL(int w, int h) {
-  w *= getDevPixRatio();
-  h *= getDevPixRatio();
+void ImageViewer::resizeGL(int, int) {
+  // Device pixels; the arguments are in logical pixels.
+  int w = width();
+  int h = height();
   glViewport(0, 0, w, h);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
@@ -507,12 +508,14 @@ void ImageViewer::resizeGL(int w, int h) {
     } else  // normally, initialize with GL_RGBA8 format
       m_fbo = new QOpenGLFramebufferObject(w, h);
   }
+  markDeviceSizeApplied();
 }
 
 //-----------------------------------------------------------------------------
 
 void ImageViewer::paintGL() {
   initializeOpenGLFunctions();
+  applyDeviceViewport();
   if (m_lutCalibrator && m_lutCalibrator->isValid()) m_fbo->bind();
 
   TDimension viewerSize(width(), height());
@@ -1122,9 +1125,9 @@ void ImageViewer::rectPickColor(bool putValueToStyleEditor) {
     return;
   }
   TPointD start = getViewAff().inv() *
-                  TPointD(startPos.x - width() / 2, startPos.y - height() / 2);
+                  TPointD(startPos.x - width() * 0.5, startPos.y - height() * 0.5);
   TPointD end = getViewAff().inv() *
-                TPointD(endPos.x - width() / 2, endPos.y - height() / 2);
+                TPointD(endPos.x - width() * 0.5, endPos.y - height() * 0.5);
 
   TPixel32 pixForStyleEditor;
   if (img->raster()->getPixelSize() == 8)  // 16bpc raster

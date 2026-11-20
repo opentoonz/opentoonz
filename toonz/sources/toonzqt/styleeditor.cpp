@@ -651,10 +651,11 @@ void HexagonalColorWheel::initializeGL() {
 
 //-----------------------------------------------------------------------------
 
-void HexagonalColorWheel::resizeGL(int w, int h) {
-  w *= getDevPixRatio();
-  h *= getDevPixRatio();
-  float d                 = (w - 5.0f) / 2.5f;
+void HexagonalColorWheel::resizeGL(int, int) {
+  // Device pixels; the arguments are in logical pixels.
+  int w   = width();
+  int h   = height();
+  float d                = (w - 5.0f) / 2.5f;
   bool isHorizontallyLong = ((d * 1.732f) < h) ? false : true;
 
   if (isHorizontallyLong) {
@@ -703,11 +704,14 @@ void HexagonalColorWheel::resizeGL(int w, int h) {
     if (m_fbo) delete m_fbo;
     m_fbo = new QOpenGLFramebufferObject(w, h);
   }
+  markDeviceSizeApplied();
 }
 
 //-----------------------------------------------------------------------------
 
 void HexagonalColorWheel::paintGL() {
+  applyDeviceViewport();
+
   // call ClearColor() here in order to update bg color when the stylesheet is
   // switched
   QColor const color = getBGColor();

@@ -75,10 +75,13 @@ namespace {
 //-----------------------------------------------------------------------------
 
 void initToonzEvent(TMouseEvent &toonzEvent, QMouseEvent *event,
-                    int widgetHeight, double pressure, int devPixRatio) {
-  toonzEvent.m_pos      = TPointD(event->pos().x() * devPixRatio,
-                                  widgetHeight - 1 - event->pos().y() * devPixRatio);
-  toonzEvent.m_mousePos = event->pos();
+                    int widgetHeight, double pressure, qreal devPixRatio) {
+  // localPos() keeps the sub-pixel position, which maps to a distinct device
+  // pixel when the ratio is fractional.
+  toonzEvent.m_pos =
+      TPointD(event->localPos().x() * devPixRatio,
+              widgetHeight - 1 - event->localPos().y() * devPixRatio);
+  toonzEvent.m_mousePos = event->localPos();
   toonzEvent.m_pressure = 1.0;
 
   toonzEvent.setModifiers(event->modifiers() & Qt::ShiftModifier,
@@ -93,11 +96,11 @@ void initToonzEvent(TMouseEvent &toonzEvent, QMouseEvent *event,
 //-----------------------------------------------------------------------------
 
 void initToonzEvent(TMouseEvent &toonzEvent, QTabletEvent *event,
-                    int widgetHeight, double pressure, int devPixRatio,
+                    int widgetHeight, double pressure, qreal devPixRatio,
                     bool isHighFrequent = false) {
-  toonzEvent.m_pos = TPointD(
-      event->posF().x() * (float)devPixRatio,
-      (float)widgetHeight - 1.0f - event->posF().y() * (float)devPixRatio);
+  toonzEvent.m_pos =
+      TPointD(event->posF().x() * devPixRatio,
+              widgetHeight - 1.0 - event->posF().y() * devPixRatio);
   toonzEvent.m_mousePos = event->posF();
   toonzEvent.m_pressure = pressure;
 
@@ -526,8 +529,8 @@ void SceneViewer::onMove(const TMouseEvent &event) {
     onRelease(preEvent);
   }
 
-  int devPixRatio = getDevPixRatio();
-  QPointF curPos  = event.mousePos() * devPixRatio;
+  qreal devPixRatio = getDevPixRatio();
+  QPointF curPos    = event.mousePos() * devPixRatio;
   bool cursorSet  = false;
   m_lastMousePos  = curPos;
 
@@ -1784,9 +1787,8 @@ void SceneViewer::onContextMenu(const QPoint &pos, const QPoint &globalPos) {
   if (m_isLocator) return;
   static bool menuVisible = false;
   if (menuVisible) return;
-  menuVisible     = true;
-  int devPixRatio = getDevPixRatio();
-  TPoint winPos(pos.x() * devPixRatio, height() - pos.y() * devPixRatio);
+  menuVisible       = true;
+  qreal devPixRatio = getDevPixRatio();
   std::vector<int> columnIndices;
   // enable to select all the columns regardless of the click position
   for (int i = 0;
@@ -1798,7 +1800,7 @@ void SceneViewer::onContextMenu(const QPoint &pos, const QPoint &globalPos) {
 
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
   TPointD p   = ((tool) ? tool->getMatrix().inv() : TAffine()) *
-              winToWorld(pos * devPixRatio);
+              winToWorld(QPointF(pos) * devPixRatio);
   menu->addEnterGroupCommands(p);
 
   menu->addLevelCommands(columnIndices);

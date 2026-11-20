@@ -306,13 +306,13 @@ class DVAPI Picker final : public Visitor {
   TPointD m_point;
   TAffine m_viewAff;
   double m_minDist2;
-  int m_devPixRatio;
+  double m_devPixRatio;
 
   int m_currentColumnIndex = -1;
 
 public:
   Picker(const TAffine &viewAff, const TPointD &p,
-         const ImagePainter::VisualSettings &vs, int devPixRatio = 1);
+         const ImagePainter::VisualSettings &vs, double devPixRatio = 1.0);
 
   // minimum distance to pick thin vector strokes.
   void setMinimumDistance(double d);

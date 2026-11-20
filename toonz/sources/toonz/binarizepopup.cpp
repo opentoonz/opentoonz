@@ -135,6 +135,7 @@ public:
   TRasterP &raster() { return m_ras; }
 
   void paintGL() override {
+    applyDeviceViewport();
     pushGLWorldCoordinates();
     drawBackground();
 

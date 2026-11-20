@@ -246,7 +246,7 @@ inline void forceHighToneEmptyPixels(TRasterCM32P &ras, int threshold) {
 //**********************************************************************************************
 
 Picker::Picker(const TAffine &viewAff, const TPointD &point,
-               const ImagePainter::VisualSettings &vs, int devPixRatio)
+               const ImagePainter::VisualSettings &vs, double devPixRatio)
     : Visitor(vs)
     , m_viewAff(viewAff)
     , m_point(point)
@@ -257,7 +257,7 @@ Picker::Picker(const TAffine &viewAff, const TPointD &point,
 //-----------------------------------------------------------------------------
 
 void Picker::setMinimumDistance(double d) {
-  m_minDist2 = (double)(m_devPixRatio * m_devPixRatio) * d * d;
+  m_minDist2 = m_devPixRatio * m_devPixRatio * d * d;
 }
 
 //-----------------------------------------------------------------------------
