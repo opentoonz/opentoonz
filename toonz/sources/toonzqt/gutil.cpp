@@ -272,7 +272,8 @@ QImage svgToImage(const QString &svgFilePath, QSize size,
     return QImage();
   }
 
-  QSize imageSize = !size.isEmpty() ? size : svgRenderer.defaultSize();
+  // The SVG's own size: KeepAspectRatio modes fit it into the requested size.
+  QSize imageSize = svgRenderer.defaultSize();
   SvgRenderParams params =
       calculateSvgRenderParams(size, imageSize, aspectRatioMode);
   QImage image(params.size, QImage::Format_ARGB32_Premultiplied);

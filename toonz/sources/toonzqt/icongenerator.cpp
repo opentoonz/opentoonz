@@ -1248,6 +1248,15 @@ TRaster32P IconGenerator::generateSceneFileIcon(const TFilePath &path,
 
 void FileIconRenderer::run() {
   TDimension iconSize(getIconSize());
+  // Renders a file-type icon. SVGs are rendered at device resolution and
+  // fitted to the icon size, so they are shown without rescaling (which blurs
+  // them at fractional display scales).
+  auto typeIcon = [&iconSize](const QString &path) {
+    if (!path.endsWith(".svg", Qt::CaseInsensitive))
+      return rasterFromQImage(QImage(path));
+    QSize size = QSize(iconSize.lx, iconSize.ly) * getDevicePixelRatio();
+    return rasterFromQImage(svgToImage(path, size, Qt::KeepAspectRatio));
+  };
   try {
     TRaster32P iconRaster;
     std::string type(m_path.getType());
@@ -1259,32 +1268,25 @@ void FileIconRenderer::run() {
       iconRaster =
           IconGenerator::generateVectorFileIcon(m_path, iconSize, m_fid);
     else if (type == "tpl") {
-      QImage palette(":Resources/paletteicon.svg");
-      setIcon(rasterFromQImage(palette));
+      setIcon(typeIcon(":Resources/paletteicon.svg"));
       return;
     } else if (type == "tzp") {
-      QImage palette(":Resources/tzpicon.png");
-      setIcon(rasterFromQImage(palette));
+      setIcon(typeIcon(":Resources/tzpicon.png"));
       return;
     } else if (type == "svg") {
-      QImage svg(getIconPath("svg_icon"));
-      setIcon(rasterFromQImage(svg));
+      setIcon(typeIcon(getIconPath("svg_icon")));
       return;
     } else if (type == "tzu") {
-      QImage palette(":Resources/tzuicon.png");
-      setIcon(rasterFromQImage(palette));
+      setIcon(typeIcon(":Resources/tzuicon.png"));
       return;
     } else if (TFileType::getInfo(m_path) == TFileType::AUDIO_LEVEL) {
-      QImage loudspeaker(getIconPath("audio_icon"));
-      setIcon(rasterFromQImage(loudspeaker));
+      setIcon(typeIcon(getIconPath("audio_icon")));
       return;
     } else if (type == "scr") {
-      QImage screensaver(":Resources/savescreen.png");
-      setIcon(rasterFromQImage(screensaver));
+      setIcon(typeIcon(":Resources/savescreen.png"));
       return;
     } else if (type == "psd") {
-      QImage psdPath(getIconPath("psd_icon"));
-      setIcon(rasterFromQImage(psdPath));
+      setIcon(typeIcon(getIconPath("psd_icon")));
       return;
     } else if (type == "mesh")
       iconRaster = IconGenerator::generateMeshFileIcon(m_path, iconSize, m_fid);
@@ -1292,56 +1294,44 @@ void FileIconRenderer::run() {
       iconRaster =
           IconGenerator::generateRasterFileIcon(m_path, iconSize, m_fid);
     else if (type == "mpath") {
-      QImage motionPath(getIconPath("motionpath_icon"));
-      setIcon(rasterFromQImage(motionPath));
+      setIcon(typeIcon(getIconPath("motionpath_icon")));
       return;
     } else if (type == "curve") {
-      QImage curve(getIconPath("curve_icon"));
-      setIcon(rasterFromQImage(curve));
+      setIcon(typeIcon(getIconPath("curve_icon")));
       return;
     } else if (type == "cln") {
-      QImage cln(getIconPath("cleanup_icon"));
-      setIcon(rasterFromQImage(cln));
+      setIcon(typeIcon(getIconPath("cleanup_icon")));
       return;
     } else if (type == "tnzbat") {
-      QImage tnzBat(getIconPath("tasklist_icon"));
-      setIcon(rasterFromQImage(tnzBat));
+      setIcon(typeIcon(getIconPath("tasklist_icon")));
       return;
     } else if (type == "tls") {
-      QImage tls(":Resources/magpie.svg");
-      setIcon(rasterFromQImage(tls));
+      setIcon(typeIcon(":Resources/magpie.svg"));
       return;
     } else if (type == "xdts") {
-      QImage xdts(getIconPath("xdts_icon"));
-      setIcon(rasterFromQImage(xdts));
+      setIcon(typeIcon(getIconPath("xdts_icon")));
       return;
     } else if (type == "js") {
-      QImage script(getIconPath("script_icon"));
-      setIcon(rasterFromQImage(script));
+      setIcon(typeIcon(getIconPath("script_icon")));
       return;
     } else if (type == "json") {
-      QImage json(getIconPath("json_icon"));
-      setIcon(rasterFromQImage(json));
+      setIcon(typeIcon(getIconPath("json_icon")));
       return;
     }
 
     else {
-      QImage unknown(getIconPath("unknown_icon"));
-      setIcon(rasterFromQImage(unknown));
+      setIcon(typeIcon(getIconPath("unknown_icon")));
       return;
     }
     if (!iconRaster) {
-      QImage broken(getIconPath("broken_icon"));
-      setIcon(rasterFromQImage(broken));
+      setIcon(typeIcon(getIconPath("broken_icon")));
       return;
     }
     setIcon(iconRaster);
   } catch (const TImageVersionException &) {
-    QImage unknown(getIconPath("unknown_icon"));
-    setIcon(rasterFromQImage(unknown));
+    setIcon(typeIcon(getIconPath("unknown_icon")));
   } catch (...) {
-    QImage broken(getIconPath("broken_icon"));
-    setIcon(rasterFromQImage(broken));
+    setIcon(typeIcon(getIconPath("broken_icon")));
   }
 }
 
