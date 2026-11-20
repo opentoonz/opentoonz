@@ -98,7 +98,7 @@ TEnv::IntVar RotateOnCameraCenter("RotateOnCameraCenter", 0);
 TEnv::DoubleVar RotateAngle("RotateAngle", 90);
 
 void drawSpline(const TAffine &viewMatrix, const TRect &clipRect, bool camera3d,
-                double pixelSize);
+                double pixelSize, double devPixRatio);
 
 // 0: current frame
 // 1: all frames in the preview range
@@ -2378,7 +2378,8 @@ void SceneViewer::drawScene() {
     assert(glGetError() == 0);
     if (m_viewMode != LEVEL_VIEWMODE)
       drawSpline(getViewMatrix(), clipRect,
-                 m_referenceMode == CAMERA3D_REFERENCE, m_pixelSize);
+                 m_referenceMode == CAMERA3D_REFERENCE, m_pixelSize,
+                 getDevPixRatio());
     assert(glGetError() == 0);
 
     // gather animated guide strokes' bounding boxes
@@ -3485,7 +3486,7 @@ int SceneViewer::posToRow(const TPointD &p, double distance,
 //-----------------------------------------------------------------------------
 
 void drawSpline(const TAffine &viewMatrix, const TRect &clipRect, bool camera3d,
-                double pixelsize) {
+                double pixelsize, double devPixRatio) {
   TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 
   TStageObjectId objId = TApp::instance()->getCurrentObject()->getObjectId();
@@ -3557,7 +3558,7 @@ void drawSpline(const TAffine &viewMatrix, const TRect &clipRect, bool camera3d,
 
     // draw center
     // tglDrawDisk(center,pixelSize*5);
-    tglDrawDisk(center, sqrt(tglGetPixelSize2()) * 5);
+    tglDrawDisk(center, sqrt(tglGetPixelSize2()) * devPixRatio * 5);
 
     glPopMatrix();
   }

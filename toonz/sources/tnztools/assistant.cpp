@@ -686,7 +686,9 @@ void
 TAssistantBase::drawEdit(TToolViewer *viewer) const {
   // paint all points
   draw(viewer);
+  // handles are sized in logical pixels, like their pick radius
   double pixelSize = sqrt(tglGetPixelSize2());
+  if (viewer) pixelSize *= viewer->getDevPixRatio();
   for(TAssistantPointMap::const_iterator i = points().begin(); i != points().end(); ++i)
     drawPoint(i->second, pixelSize);
 }

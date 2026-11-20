@@ -370,18 +370,26 @@ void ToolUtils::drawCursor(TToolViewer* viewer, TTool* tool,
     TPointD dpiScale = viewer->getDpiScale();
     TPointD scPos(pos.x * dpiScale.x, pos.y * dpiScale.y);
 
-    TPointD brushWinD = viewer->worldToPos(tool->getMatrix() * scPos) / viewer->getDevPixRatio();
-    QPointF brushWin(brushWinD.x, w->height() - brushWinD.y);
-    
+    // worldToPos() gives device pixels with the origin at the bottom-left;
+    // the painter below works in logical pixels with the origin at the top.
+    TPointD brushWinD = viewer->worldToPos(tool->getMatrix() * scPos);
+    QPointF brushWin(brushWinD.x, viewer->height() - brushWinD.y);
+    brushWin /= viewer->getDevPixRatio();
+
     QPoint hot = cursor.hotSpot();
+    // logical size of the pixmap
+    QSizeF cursorSize =
+        QSizeF(cursorPixmap.size()) / cursorPixmap.devicePixelRatioF();
 
     QPainter painter(w);
     static QPointF oldBrushWin;
-    QRect dirtyRect = QRect((oldBrushWin - QPointF(hot)).toPoint(), cursorPixmap.size());
-    w->update(dirtyRect);
+    // aligned outwards, since the cursor is drawn at a fractional position
+    QRect dirtyRect =
+        QRectF(oldBrushWin - QPointF(hot), cursorSize).toAlignedRect();
+    w->update(dirtyRect.adjusted(-1, -1, 1, 1));
     oldBrushWin = brushWin;
 
-    painter.drawPixmap((brushWin - QPointF(hot)).toPoint(), cursorPixmap);
+    painter.drawPixmap(brushWin - QPointF(hot), cursorPixmap);
 }
 
 QList<TRect> ToolUtils::splitRect(const TRect &first, const TRect &second) {
