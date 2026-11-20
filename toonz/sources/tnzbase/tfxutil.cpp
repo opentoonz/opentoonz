@@ -7,6 +7,8 @@
 #include "tdoubleparam.h"
 #include "tparamset.h"
 #include "tparamcontainer.h"
+#include "tspectrumparam.h"
+#include "tmacrofx.h"
 
 //-------------------------------------------------------------------
 
@@ -159,6 +161,46 @@ void TFxUtil::deleteKeyframes(const TFxP &fx, int frame) {
 
 //-------------------------------------------------------------------
 
+namespace {
+
+bool usesPreciseSpectrum(const TFxP &fx, const TSpectrumParamP &spectrum) {
+  if (!spectrum) return false;
+  if (fx->requiresFullPrecisionSerialization()) return true;
+  const TMacroFx *macro = dynamic_cast<const TMacroFx *>(fx.getPointer());
+  if (!macro) return false;
+  for (const TFxP &member : macro->getFxs()) {
+    const TParamContainer *params = member->getParams();
+    for (int i = 0; i < params->getParamCount(); ++i)
+      if (params->getParam(i) == spectrum.getPointer() &&
+          usesPreciseSpectrum(member, spectrum))
+        return true;
+  }
+  return false;
+}
+
+void assignPreciseSpectrumKeyframe(const TSpectrumParamP &dst, int dstFrame,
+                                   const TSpectrumParamP &src, int srcFrame,
+                                   bool changedOnly) {
+  if (!src || dst->getKeyCount() != src->getKeyCount()) return;
+  for (int i = 0; i < dst->getKeyCount(); ++i) {
+    dst->getPosition(i)->assignKeyframe(dstFrame, src->getPosition(i), srcFrame,
+                                        changedOnly);
+    const TPixelParamP dstColor       = dst->getColor(i);
+    const TPixelParamP srcColor       = src->getColor(i);
+    const TDoubleParamP dstChannels[] = {
+        dstColor->getRed(), dstColor->getGreen(), dstColor->getBlue(),
+        dstColor->getMatte()};
+    const TDoubleParamP srcChannels[] = {
+        srcColor->getRed(), srcColor->getGreen(), srcColor->getBlue(),
+        srcColor->getMatte()};
+    for (int channel = 0; channel < 4; ++channel)
+      dstChannels[channel]->assignKeyframe(dstFrame, srcChannels[channel],
+                                           srcFrame, changedOnly);
+  }
+}
+
+}  // namespace
+
 void TFxUtil::setKeyframe(const TFxP &dstFx, int dstFrame, const TFxP &srcFx,
                           int srcFrame, bool changedOnly) {
   if (dstFx->getFxType() != srcFx->getFxType()) return;
@@ -167,6 +209,12 @@ void TFxUtil::setKeyframe(const TFxP &dstFx, int dstFrame, const TFxP &srcFx,
   for (int i = 0; i < dstFx->getParams()->getParamCount(); i++) {
     TParamP dstParam = dstFx->getParams()->getParam(i);
     TParamP srcParam = srcFx->getParams()->getParam(i);
+    TSpectrumParamP dstSpectrum = dstParam;
+    if (usesPreciseSpectrum(dstFx, dstSpectrum)) {
+      assignPreciseSpectrumKeyframe(dstSpectrum, dstFrame, srcParam, srcFrame,
+                                    changedOnly);
+      continue;
+    }
     dstParam->assignKeyframe(dstFrame, srcParam, srcFrame, changedOnly);
   }
 }
