@@ -87,7 +87,17 @@ install:
 
       mkdir %PLATFORM% && cd %PLATFORM%
 
-      cmake ..\sources -G "%MSVC_VERSION%" -T v142 -Ax64 -DQT_PATH="%QT_PATH%" -DBOOST_ROOT="%BOOST_ROOT%" -DOpenCV_DIR="C:\Tools\opencv\build" -DWITH_WINTAB=ON || exit /b 1
+      REM CMP0091 is OLD: overriding Release flags must retain the /MD runtime.
+
+      REM Keep the Release DLL runtime and NDEBUG; skip optimization only for PR checks.
+
+      set "APPVEYOR_PR_CMAKE_FLAGS="
+
+      if defined APPVEYOR_PULL_REQUEST_NUMBER echo PR check: building all targets without optimization, using the Release DLL runtime.
+
+      if defined APPVEYOR_PULL_REQUEST_NUMBER set APPVEYOR_PR_CMAKE_FLAGS=-DCMAKE_C_FLAGS_RELEASE="/MD /Od /Ob0 /DNDEBUG" -DCMAKE_CXX_FLAGS_RELEASE="/MD /Od /Ob0 /DNDEBUG"
+
+      cmake ..\sources -G "%MSVC_VERSION%" -T v142 -Ax64 -DQT_PATH="%QT_PATH%" -DBOOST_ROOT="%BOOST_ROOT%" -DOpenCV_DIR="C:\Tools\opencv\build" -DWITH_WINTAB=ON %APPVEYOR_PR_CMAKE_FLAGS% || exit /b 1
 
       echo CMake configuration completed
 
