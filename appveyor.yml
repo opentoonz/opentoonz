@@ -93,10 +93,9 @@ install:
 
       set "APPVEYOR_PR_CMAKE_FLAGS="
 
-      if defined APPVEYOR_PULL_REQUEST_NUMBER (
-        echo PR check: building all targets without optimization; artifacts are for functional testing.
-        set APPVEYOR_PR_CMAKE_FLAGS=-DCMAKE_C_FLAGS_RELEASE="/Od /Ob0 /DNDEBUG" -DCMAKE_CXX_FLAGS_RELEASE="/Od /Ob0 /DNDEBUG"
-      )
+      if defined APPVEYOR_PULL_REQUEST_NUMBER echo PR check: building all targets without optimization; artifacts are for functional testing.
+
+      if defined APPVEYOR_PULL_REQUEST_NUMBER set APPVEYOR_PR_CMAKE_FLAGS=-DCMAKE_C_FLAGS_RELEASE="/Od /Ob0 /DNDEBUG" -DCMAKE_CXX_FLAGS_RELEASE="/Od /Ob0 /DNDEBUG"
 
       cmake ..\sources -G "%MSVC_VERSION%" -T v142 -Ax64 -DQT_PATH="%QT_PATH%" -DBOOST_ROOT="%BOOST_ROOT%" -DOpenCV_DIR="C:\Tools\opencv\build" -DWITH_WINTAB=ON %APPVEYOR_PR_CMAKE_FLAGS% || exit /b 1
 
