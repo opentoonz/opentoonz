@@ -9,7 +9,6 @@
 
 #include "tcommon.h"
 #include <array>
-#include <vector>
 #include <QWidget>
 #include <QSpinBox>
 #include <QSlider>
@@ -46,7 +45,6 @@ class QComboBox;
 class QHBoxLayout;
 class TFxHandle;
 class QFontComboBox;
-class QLineEdit;
 
 namespace DVGui {
 class LineEdit;
@@ -492,50 +490,20 @@ protected slots:
 //-----------------------------------------------------------------------------
 
 class DVAPI SpectrumParamField final
-    : public AnimatedParamField<TSpectrum, TSpectrumParamP>,
-      private TParamObserver {
+    : public AnimatedParamField<TSpectrum, TSpectrumParamP> {
   Q_OBJECT
 
   DVGui::SpectrumField *m_spectrumField;
-  QLineEdit *m_preciseChannels[4] = {nullptr, nullptr, nullptr, nullptr};
-  int m_preciseStopIndex          = -1;
-  TSpectrumParamP m_observedParam;
-  std::vector<TDoubleParamP> m_observedCurves;
-  bool m_previewNeedsSync = false;
-
-  void observeParam(bool observe);
-  void observeCurves(const TSpectrumParamP &param);
-  bool syncPrecisePreview();
-  void onChange(const TParamChange &) override { m_previewNeedsSync = true; }
-  void ensurePreciseEditor();
-  void cancelPreciseEdit();
-  void refreshPreciseEditor();
-  bool hasPreciseStop(int index) const;
-  bool hasPreciseTarget(int channel) const;
-  bool readPreciseChannel(int channel, double &value);
-  void commitPreciseChannel(int channel);
-  void setPreciseChannel(int stop, int channel, double value);
-  void applyPreciseStopChange(int index, const TSpectrum::Key &before,
-                              const TSpectrum::Key &after);
-  void finishPreciseEdit(TUndo *undo);
-  void onPreciseChange();
 
 public:
   SpectrumParamField(QWidget *parent, QString name,
                      const TSpectrumParamP &param);
-  ~SpectrumParamField() override;
 
-  void setParam(const TParamP &current, const TParamP &actual,
-                int frame) override;
-  void update(int frame) override;
   void updateField(TSpectrum value) override;
 
   void setParams();
 
-  QSize getPreferredSize() override {
-    return property("preserveColorPrecision").toBool() ? QSize(560, 88)
-                                                       : QSize(477, 60);
-  }
+  QSize getPreferredSize() override { return QSize(477, 60); }
 
 protected slots:
   void onKeyToggled();

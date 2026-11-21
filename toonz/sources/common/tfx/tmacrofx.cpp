@@ -5,7 +5,6 @@
 // TnzBase includes
 #include "tparamcontainer.h"
 #include "tfxattributes.h"
-#include "tspectrumparam.h"
 
 // TnzCore includes
 #include "tstream.h"
@@ -13,33 +12,6 @@
 //--------------------------------------------------
 
 namespace {
-
-bool containsPreciseSpectrum(const TFx *fx) {
-  if (const auto *macro = dynamic_cast<const TMacroFx *>(fx)) {
-    for (const TFxP &member : macro->getFxs())
-      if (containsPreciseSpectrum(member.getPointer())) return true;
-    return false;
-  }
-  if (!fx->requiresFullPrecisionSerialization()) return false;
-  for (int i = 0; i < fx->getParams()->getParamCount(); ++i)
-    if (dynamic_cast<TSpectrumParam *>(fx->getParams()->getParam(i)))
-      return true;
-  return false;
-}
-
-std::string macroMemberAlias(const TFxP &fx, double frame,
-                             const TRenderSettings &info) {
-  TRasterFxP raster = fx;
-  if (raster && containsPreciseSpectrum(raster.getPointer()))
-    return raster->getAlias(frame, info);
-  std::string alias;
-  for (int i = 0; i < fx->getParams()->getParamCount(); ++i) {
-    if (i > 0) alias += ",";
-    TParam *param = fx->getParams()->getParam(i);
-    alias += param->getName() + "=" + param->getValueAlias(frame, 2);
-  }
-  return alias;
-}
 
 class MatchesFx {
 public:
@@ -528,7 +500,11 @@ std::string TMacroFx::getAlias(double frame,
   // alias dei valori dei parametri dell'effetto al frame dato
   for (int j = 0; j < (int)m_fxs.size(); j++) {
     alias += (j == 0) ? "(" : ",(";
-    alias += macroMemberAlias(m_fxs[j], frame, info);
+    for (i = 0; i < m_fxs[j]->getParams()->getParamCount(); i++) {
+      if (i > 0) alias += ",";
+      TParam *param = m_fxs[j]->getParams()->getParam(i);
+      alias += param->getName() + "=" + param->getValueAlias(frame, 2);
+    }
     alias += ")";
   }
 

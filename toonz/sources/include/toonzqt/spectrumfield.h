@@ -33,14 +33,10 @@ class DVAPI SpectrumBar final : public QWidget {
 
   int m_x0;
   int m_currentKeyIndex;
-  QPoint m_pressPosition;
-  bool m_dragging = false;
 
   QPixmap m_chessBg;
 
   TSpectrum m_spectrum;
-
-  bool isDragEvent(const QMouseEvent *event) const;
 
 public:
   SpectrumBar(QWidget *parent = 0, TPixel32 color = TPixel32(0, 0, 0, 255));

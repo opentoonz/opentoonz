@@ -37,13 +37,7 @@ public:
       , m_notificationEnabled(true)
       , m_isMatteEnabled(true) {}
 
-  TSpectrumParamImp(const TSpectrumParamImp &s)
-      : m_sp(nullptr)
-      , m_draggingEnabled(s.m_draggingEnabled)
-      , m_notificationEnabled(s.m_notificationEnabled)
-      , m_isMatteEnabled(s.m_isMatteEnabled) {
-    copy(s);
-  }
+  TSpectrumParamImp(const TSpectrumParamImp &s) { copy(s); }
 
   void copy(const TSpectrumParamImp &src) {
     m_keys.clear();
@@ -85,8 +79,6 @@ m_sp->removeParam((*colorKeyIt).second);
   int getKeyCount() const { return m_keys.size(); }
 
   ColorKeyParam getKey(int index) const { return m_keys[index]; }
-
-  void setKeys(const std::vector<ColorKeyParam> &keys) { m_keys = keys; }
 
   void clearKeys() { m_keys.clear(); }
 
@@ -150,13 +142,10 @@ TSpectrumParam::TSpectrumParam(std::vector<TSpectrum::ColorKey> const &keys)
 //---------------------------------------------------------
 
 void TSpectrumParam::copy(TParam *src) {
-  if (src == this) return;
   TSpectrumParam *p = dynamic_cast<TSpectrumParam *>(src);
   if (!p) throw TException("invalid source for copy");
   setName(src->getName());
   m_imp->copy(*(p->m_imp));
-  m_imp->notify(TParamChange(this, TParamChange::m_minFrame,
-                             TParamChange::m_maxFrame, true, false, false));
 }
 
 //---------------------------------------------------------
@@ -232,14 +221,6 @@ TDoubleParamP TSpectrumParam::getPosition(int index) const {
 TPixelParamP TSpectrumParam::getColor(int index) const {
   assert(index <= m_imp->getKeyCount());
   return m_imp->getKey(index).second;
-}
-
-//---------------------------------------------------------
-
-void TSpectrumParam::setKeyParams(const std::vector<ColorKeyParam> &keys) {
-  m_imp->setKeys(keys);
-  m_imp->notify(TParamChange(this, TParamChange::m_minFrame,
-                             TParamChange::m_maxFrame, true, false, false));
 }
 
 //---------------------------------------------------------
