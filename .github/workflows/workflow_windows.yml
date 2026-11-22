@@ -26,13 +26,14 @@ on:
 
 jobs:
   Windows:
-    runs-on: windows-2025
+    # Keep optimized Windows artifacts on the drawing-tested v142 configuration.
+    runs-on: windows-2022
     env:
       # QT related variable
       QT_PATH: ${{ github.workspace }}\thirdparty\qt\5.15.2_wintab\msvc2019_64  # Path to custom Qt
 
       # Visual Studio related variables
-      MSVCVERSION: "Visual Studio 18 2026"  # Visual Studio version
+      MSVCVERSION: "Visual Studio 17 2022"  # Visual Studio version
       
       # Boost-related variables      
       BOOST_TOOLSET: "14.3"                 # Boost MSVC Toolset version
@@ -104,7 +105,7 @@ jobs:
           mkdir build
           cd build
 
-          cmake ..\sources -G "%MSVCVERSION%" -Ax64 -DQT_PATH="%QT_PATH%" -DBOOST_ROOT="%BOOST_ROOT%" -DOpenCV_DIR="%OpenCV_DIR%" -DWITH_WINTAB=Y
+          cmake ..\sources -G "%MSVCVERSION%" -T v142 -Ax64 -DQT_PATH="%QT_PATH%" -DBOOST_ROOT="%BOOST_ROOT%" -DOpenCV_DIR="%OpenCV_DIR%" -DWITH_WINTAB=Y
         shell: cmd
 
       # Build Opentoonz using MSBuild
