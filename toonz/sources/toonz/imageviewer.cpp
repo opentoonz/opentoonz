@@ -1125,9 +1125,9 @@ void ImageViewer::rectPickColor(bool putValueToStyleEditor) {
     m_histogramPopup->updateAverageColor(TPixel32::Transparent);
     return;
   }
-  TPointD start = getViewAff().inv() *
-                  TPointD(startPos.x - width() * 0.5, startPos.y - height() * 0.5);
-  TPointD end = getViewAff().inv() *
+  TPointD start = getViewAff().inv() * TPointD(startPos.x - width() * 0.5,
+                                               startPos.y - height() * 0.5);
+  TPointD end   = getViewAff().inv() *
                 TPointD(endPos.x - width() * 0.5, endPos.y - height() * 0.5);
 
   TPixel32 pixForStyleEditor;
@@ -1344,8 +1344,9 @@ void ImageViewer::wheelEvent(QWheelEvent *event) {
          m_touchDevice == QTouchDevice::TouchScreen) ||
         m_gestureActive == false) {
       int d = delta > 0 ? 120 : -120;
-      QPointF center(event->position().x() * getDevPixRatio() - width() * 0.5,
-                     -event->position().y() * getDevPixRatio() + height() * 0.5);
+      QPointF center(
+          event->position().x() * getDevPixRatio() - width() * 0.5,
+          -event->position().y() * getDevPixRatio() + height() * 0.5);
       zoomQt(center, exp(0.001 * d));
     }
   }

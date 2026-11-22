@@ -919,13 +919,15 @@ QVariant FileBrowser::getItemData(int index, DataType dataType,
     // parent folder icons
     if (item.m_path == m_folder.getParentDir()) {
       // rendered at device resolution, not scaled from 1x
-      static QPixmap folderUpPixmap(svgToPixmap(getIconPath("folder_browser_up")));
+      static QPixmap folderUpPixmap(
+          svgToPixmap(getIconPath("folder_browser_up")));
       return folderUpPixmap;
     }
     // folder icons
     else if (item.m_isFolder) {
       if (item.m_isLink) {
-        static QPixmap folderLinkPixmap(svgToPixmap(getIconPath("folder_browser_link")));
+        static QPixmap folderLinkPixmap(
+            svgToPixmap(getIconPath("folder_browser_link")));
         return folderLinkPixmap;
       } else {
         static QPixmap folderPixmap(svgToPixmap(getIconPath("folder_browser")));

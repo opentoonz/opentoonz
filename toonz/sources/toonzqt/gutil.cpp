@@ -44,9 +44,7 @@ using namespace DVGui;
 namespace {
 // The highest ratio among the connected screens. Pixmaps rendered at this
 // ratio look sharp on every screen.
-qreal getHighestDevicePixelRatio() {
-  return qApp->devicePixelRatio();
-}
+qreal getHighestDevicePixelRatio() { return qApp->devicePixelRatio(); }
 }  // namespace
 //-----------------------------------------------------------------------------
 
@@ -185,8 +183,8 @@ QPen pixelAlignedPen(const QColor &color, qreal logicalWidth,
   if (dpr == std::floor(dpr))
     return QPen(color, logicalWidth, Qt::SolidLine, cap);
 
-  QPen pen(color, std::max(1.0, std::floor(logicalWidth * dpr)),
-           Qt::SolidLine, cap);
+  QPen pen(color, std::max(1.0, std::floor(logicalWidth * dpr)), Qt::SolidLine,
+           cap);
   pen.setCosmetic(true);  // width in device pixels
   return pen;
 }

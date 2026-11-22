@@ -93,8 +93,7 @@ int StylePicker::pickStyleId(const TPointD &pos, double radius, double scale2,
       thick           = stroke->getThickPoint(w).thick;
       double len2     = thick * thick * scale2;
       const double minDist2 =
-          (styleId == 0) ? radius * radius * devPixRatio * devPixRatio
-                         : 0;
+          (styleId == 0) ? radius * radius * devPixRatio * devPixRatio : 0;
       double checkDist = std::max(minDist2, len2);
       if (dist2 < checkDist) {
         assert(stroke);

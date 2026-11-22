@@ -1396,7 +1396,8 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
 
     // draw vertical line
     if (layerAxis > 0) {
-      p.setPen(pixelAlignedPen(m_viewer->getVerticalLineColor(), 1, p.device()));
+      p.setPen(
+          pixelAlignedPen(m_viewer->getVerticalLineColor(), 1, p.device()));
       QLine verticalLine =
           m_viewer->orientation()->verticalLine(layerAxis, frameSide);
       p.drawLine(verticalLine);

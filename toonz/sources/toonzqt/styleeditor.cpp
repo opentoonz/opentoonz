@@ -653,9 +653,9 @@ void HexagonalColorWheel::initializeGL() {
 
 void HexagonalColorWheel::resizeGL(int, int) {
   // Device pixels; the arguments are in logical pixels.
-  int w   = width();
-  int h   = height();
-  float d                = (w - 5.0f) / 2.5f;
+  int w                   = width();
+  int h                   = height();
+  float d                 = (w - 5.0f) / 2.5f;
   bool isHorizontallyLong = ((d * 1.732f) < h) ? false : true;
 
   if (isHorizontallyLong) {

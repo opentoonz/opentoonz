@@ -484,8 +484,8 @@ void CellPanel::paintEvent(QPaintEvent *e) {
   drawCells(painter, r0, c0, r1, c1);
 
   // draw columns
-  painter.setPen(
-      pixelAlignedPen(getViewer()->getVerticalLineColor(), 1, painter.device()));
+  painter.setPen(pixelAlignedPen(getViewer()->getVerticalLineColor(), 1,
+                                 painter.device()));
   for (int col = c0; col <= c1; col++) {
     int x = getViewer()->columnToX(col);
     painter.drawLine(x, y0, x, y1);
@@ -500,12 +500,12 @@ void CellPanel::paintEvent(QPaintEvent *e) {
     QColor color      = (isMarkSecRow) ? getViewer()->getSecMarkerLineColor()
                         : (isMarkRow)  ? getViewer()->getMarkerLineColor()
                                        : getViewer()->getLightLineColor();
-    painter.setPen(pixelAlignedPen(
-        color,
-        (isMarkSecRow)                                    ? 3.
-        : (getViewer()->isSecMarkerActive() && isMarkRow) ? 2.
-                                                          : 1.,
-        painter.device(), Qt::FlatCap));
+    painter.setPen(
+        pixelAlignedPen(color,
+                        (isMarkSecRow)                                    ? 3.
+                        : (getViewer()->isSecMarkerActive() && isMarkRow) ? 2.
+                                                                          : 1.,
+                        painter.device(), Qt::FlatCap));
     painter.drawLine(x0, y, x1, y);
   }
 }

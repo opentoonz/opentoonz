@@ -1742,8 +1742,8 @@ void SceneViewer::mouseDoubleClickEvent(QMouseEvent *event) {
   if (!tool || !tool->isEnabled()) return;
   TMouseEvent toonzEvent;
   initToonzEvent(toonzEvent, event, height(), 1.0, getDevPixRatio());
-  TPointD pos =
-      tool->getMatrix().inv() * winToWorld(event->localPos() * getDevPixRatio());
+  TPointD pos = tool->getMatrix().inv() *
+                winToWorld(event->localPos() * getDevPixRatio());
   TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
   if ((tool->getToolType() & TTool::LevelTool) && !objHandle->isSpline()) {
     pos.x /= m_dpiScale.x;

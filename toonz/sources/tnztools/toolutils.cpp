@@ -1658,8 +1658,9 @@ void ToolUtils::drawBalloon(const TPointD &pos, std::string text,
     return;
   }
 
-  QSize size(textRect.width() + textRect.left() + mrg,
-             std::max(textRect.bottom() + mrg, y + delta.y) + qRound(3 * devPixRatio));
+  QSize size(
+      textRect.width() + textRect.left() + mrg,
+      std::max(textRect.bottom() + mrg, y + delta.y) + qRound(3 * devPixRatio));
 
   QImage label(size.width(), size.height(), QImage::Format_ARGB32);
   label.fill(Qt::transparent);
@@ -1714,7 +1715,7 @@ void ToolUtils::drawHook(const TPointD &pos, ToolUtils::HookType type,
       TTool::getApplication()->getCurrentTool()->getTool()->getViewer();
   qreal devPixRatio = getDevicePixelRatio(viewer->viewerWidget());
   int r = 10, d = r + r;
-  int imageSize     = qRound(d * devPixRatio);
+  int imageSize = qRound(d * devPixRatio);
   QImage image(imageSize, imageSize, QImage::Format_ARGB32);
   image.fill(Qt::transparent);
   // image.fill(qRgba(200,200,0,200));

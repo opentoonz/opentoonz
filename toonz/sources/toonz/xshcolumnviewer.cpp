@@ -1934,8 +1934,7 @@ void ColumnArea::drawCurrentColumnFocus(QPainter &p, int col) {
   p.setPen(color);  // default 1px pen, as used for the separators
   for (int i = 0; i < w; ++i) {
     p.drawLine(rect.left(), rect.top() + i, rect.right(), rect.top() + i);
-    p.drawLine(rect.left(), rect.bottom() - i, rect.right(),
-               rect.bottom() - i);
+    p.drawLine(rect.left(), rect.bottom() - i, rect.right(), rect.bottom() - i);
     p.drawLine(rect.left() + i, rect.top() + w, rect.left() + i,
                rect.bottom() - w);
     p.drawLine(rect.right() - i, rect.top() + w, rect.right() - i,
