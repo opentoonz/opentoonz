@@ -118,12 +118,13 @@ public:
 
   void setPage(TIStream &is, const TFxP &fx, bool isFirstPage) {
     setPageField(is, fx);
-    for (ParamField *field : m_fields) {
-      connect(field, &ParamField::currentParamChanged, this,
-              &ParamsPage::updateIndexedColors);
-      connect(field, &ParamField::actualParamChanged, this,
-              &ParamsPage::updateIndexedColors);
-    }
+    if (!m_indexedColors.empty())
+      for (ParamField *field : m_fields) {
+        connect(field, &ParamField::currentParamChanged, this,
+                &ParamsPage::updateIndexedColors);
+        connect(field, &ParamField::actualParamChanged, this,
+                &ParamsPage::updateIndexedColors);
+      }
     if (isFirstPage) addGlobalControl(fx);
     setPageSpace();
   }

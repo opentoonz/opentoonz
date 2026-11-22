@@ -697,13 +697,15 @@ TOONZ_DEFINE_NEW_COMPONENT(newComboBox, make_combobox);
 void ParamsPage::setFx(const TFxP &currentFx, const TFxP &actualFx, int frame) {
   assert(currentFx);
   assert(actualFx);
-  const bool changedTarget = currentFx != m_indexedCurrentFx ||
-                             actualFx != m_indexedActualFx ||
-                             frame != m_indexedFrame;
-  m_indexedCurrentFx = currentFx;
-  m_indexedActualFx  = actualFx;
-  m_indexedFrame     = frame;
-  syncIndexedCounts(changedTarget);
+  if (!m_indexedColors.empty()) {
+    const bool changedTarget = currentFx != m_indexedCurrentFx ||
+                               actualFx != m_indexedActualFx ||
+                               frame != m_indexedFrame;
+    m_indexedCurrentFx = currentFx;
+    m_indexedActualFx  = actualFx;
+    m_indexedFrame     = frame;
+    syncIndexedCounts(changedTarget);
+  }
   for (int i = 0; i < (int)m_fields.size(); i++) {
     ParamField *field = m_fields[i];
     std::string paramName = field->getParamName().toStdString();
@@ -830,9 +832,11 @@ void ParamsPage::setPointValue(int index, const TPointD &p) {
 //-----------------------------------------------------------------------------
 
 void ParamsPage::update(int frame) {
-  const bool changedFrame = frame != m_indexedFrame;
-  m_indexedFrame          = frame;
-  syncIndexedCounts(changedFrame);
+  if (!m_indexedColors.empty()) {
+    const bool changedFrame = frame != m_indexedFrame;
+    m_indexedFrame          = frame;
+    syncIndexedCounts(changedFrame);
+  }
   int i;
   for (i = 0; i < (int)m_fields.size(); i++) {
     ParamField *field = m_fields[i];
