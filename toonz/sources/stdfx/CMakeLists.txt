@@ -119,6 +119,7 @@ set(SOURCES
     dissolvefx.cpp
     dropshadowfx.cpp
     embossfx.cpp
+    celedgelinesfx.cpp
     erodilatefx.cpp
     externalpalettefx.cpp
     fourpointsgradientfx.cpp
@@ -129,6 +130,8 @@ set(SOURCES
     hsvkeyfx.cpp
     hsvscalefx.cpp
     hsvutil.cpp
+    celmotion.cpp
+    celnoise.cpp
     kaleido.cpp
     linearwavefx.cpp
     localblurfx.cpp
