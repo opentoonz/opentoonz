@@ -101,10 +101,11 @@ install:
 
       echo CMake configuration completed
 
-build:
-  project: $(APPVEYOR_BUILD_FOLDER)\toonz\$(PLATFORM)\ALL_BUILD.vcxproj
-  parallel: true
-  verbosity: minimal
+# Run the full build without AppVeyor's optional MSBuild logger. A reporting
+# API failure must not abort compilation; warnings and errors stay in the console.
+build_script:
+  - cmd: >-
+      cmake --build "%APPVEYOR_BUILD_FOLDER%\toonz\%PLATFORM%" --config "%CONFIGURATION%" --target ALL_BUILD --parallel -- /verbosity:minimal /nologo || exit /b 1
 
 after_build:
   # Deploy Qt dependencies
