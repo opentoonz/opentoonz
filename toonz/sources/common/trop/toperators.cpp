@@ -1271,10 +1271,10 @@ void TRop::atop(const TRasterP &rup, const TRasterP &rdown,
     // See atopPix(): up * down.m + down * (1 - up.m), alpha = down.m
     const TPixelF up = *upPix, dn = *downPix;
     const float dnFac = 1.f - up.m;
-    outPix->r = up.r * dn.m + dn.r * dnFac;
-    outPix->g = up.g * dn.m + dn.g * dnFac;
-    outPix->b = up.b * dn.m + dn.b * dnFac;
-    outPix->m = dn.m;
+    outPix->r         = up.r * dn.m + dn.r * dnFac;
+    outPix->g         = up.g * dn.m + dn.g * dnFac;
+    outPix->b         = up.b * dn.m + dn.b * dnFac;
+    outPix->m         = dn.m;
 
     FOR_EACH_PIXEL_F_END_LOOP
   } else
