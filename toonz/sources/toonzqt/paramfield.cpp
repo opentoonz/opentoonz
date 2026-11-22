@@ -17,6 +17,7 @@
 #include "tparamset.h"
 #include "tpixelutils.h"
 #include "tw/stringtable.h"
+#include "ttzpimagefx.h"
 
 #include <QString>
 #include <QHBoxLayout>
@@ -27,6 +28,8 @@
 #include <QFontComboBox>
 #include <QKeyEvent>
 #include <QSignalBlocker>
+#include <QToolButton>
+#include <QPointer>
 #include <algorithm>
 #include <cmath>
 
@@ -2279,6 +2282,35 @@ void MyTextEdit::focusOutEvent(QFocusEvent *event) {
 
 };  // namespace component
 
+namespace {
+
+StringParamField::StylePickHandler &stylePickHandler() {
+  static StringParamField::StylePickHandler handler;
+  return handler;
+}
+
+bool isColorIndexParam(const std::string &name) {
+  return name == "Color_Index" || name == "indexes";
+}
+
+// Writes the ids joining consecutive ones into ranges, e.g. "1-3,5"
+QString toIndexString(const std::set<int> &ids) {
+  QStringList items;
+  for (auto it = ids.begin(); it != ids.end();) {
+    int first = *it, last = first;
+    while (++it != ids.end() && *it == last + 1) last = *it;
+    items << (first == last ? QString::number(first)
+                            : QString("%1-%2").arg(first).arg(last));
+  }
+  return items.join(",");
+}
+
+}  // namespace
+
+void StringParamField::setStylePickHandler(const StylePickHandler &handler) {
+  stylePickHandler() = handler;
+}
+
 StringParamField::StringParamField(QWidget *parent, QString name,
                                    const TStringParamP &param)
     : ParamField(parent, name, param) {
@@ -2301,9 +2333,53 @@ StringParamField::StringParamField(QWidget *parent, QString name,
     ret = ret &&
           connect(m_textFld, SIGNAL(editingFinished()), this, SLOT(onChange()));
     m_layout->addWidget(m_textFld);
+
+    if (isColorIndexParam(param->getName()) && stylePickHandler()) {
+      auto addPickButton = [this](const QString &text, const QString &toolTip,
+                                  bool remove) {
+        QToolButton *button = new QToolButton(this);
+        button->setIcon(createQIcon("stylepicker"));
+        button->setText(text);
+        button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        button->setToolTip(toolTip);
+        connect(button, &QToolButton::clicked,
+                [this, remove] { pickColorIndex(remove); });
+        m_layout->addWidget(button);
+      };
+      addPickButton("+", tr("Pick Color Index to Add"), false);
+      addPickButton("-", tr("Pick Color Index to Remove"), true);
+    }
   }
   setLayout(m_layout);
   assert(ret);
+}
+
+//-----------------------------------------------------------------------------
+
+void StringParamField::pickColorIndex(bool remove) {
+  QPointer<StringParamField> field = this;
+  stylePickHandler()([field, remove](int styleId) {
+    if (field) field->editColorIndex(styleId, remove);
+  });
+}
+
+//-----------------------------------------------------------------------------
+
+void StringParamField::editColorIndex(int styleId, bool remove) {
+  if (!m_actualParam) return;
+
+  std::vector<std::string> items;
+  parseIndexes(QString::fromStdWString(m_actualParam->getValue()).toStdString(),
+               items);
+  PaletteFilterFxRenderData data;
+  insertIndexes(items, &data);
+  std::set<int> &ids = data.m_colors;
+
+  bool changed = remove ? ids.erase(styleId) > 0 : ids.insert(styleId).second;
+  if (!changed) return;
+
+  m_textFld->setText(toIndexString(ids));
+  onChange();
 }
 
 //-----------------------------------------------------------------------------

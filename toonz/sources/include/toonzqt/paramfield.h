@@ -9,6 +9,7 @@
 
 #include "tcommon.h"
 #include <array>
+#include <functional>
 #include <vector>
 #include <QWidget>
 #include <QSpinBox>
@@ -706,8 +707,16 @@ class DVAPI StringParamField final : public ParamField {
   DVGui::LineEdit *m_textFld            = nullptr;
   component::MyTextEdit *m_multiTextFld = nullptr;
 
+  void pickColorIndex(bool remove);
+  void editColorIndex(int styleId, bool remove);
+
 public:
   StringParamField(QWidget *parent, QString name, const TStringParamP &param);
+
+  // Starts a one-shot style pick in the viewer and calls back with the picked
+  // style id. Set by the style picker tool.
+  using StylePickHandler = std::function<void(std::function<void(int)>)>;
+  static void setStylePickHandler(const StylePickHandler &handler);
 
   void setParam(const TParamP &current, const TParamP &actual,
                 int frame) override;
