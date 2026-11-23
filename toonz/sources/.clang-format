@@ -9,6 +9,7 @@ AlignTrailingComments: true
 IndentCaseLabels: false
 BreakConstructorInitializersBeforeComma: true
 PointerAlignment: Left
+DerivePointerAlignment: true
 SortIncludes: false
 
 
