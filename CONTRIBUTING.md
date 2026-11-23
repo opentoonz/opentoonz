@@ -23,9 +23,13 @@ We will first review the request, then we will accept it, add comments for rewor
   - `git commit` them with good commit messages.
 0. `pull` the latest changes form the `master` branch of the upstream.
   - `git pull upstream master` or `git pull --rebase upstream master`.
-  - apply [clang-format](http://clang.llvm.org/docs/ClangFormat.html) with `toonz/sources/.clang-format`.
-    - `cd toonz/sources`
-    - `./beautification.sh` or `beautification.bat`.
+  - apply [clang-format 14](https://clang.llvm.org/docs/ClangFormat.html) with `toonz/sources/.clang-format`.
+    - CI uses `clang-format-14` and checks only changed C/C++ lines. Other versions
+      may produce different formatting even with the same configuration.
+    - To install version 14.0.6 with Python: `python -m pip install clang-format==14.0.6`.
+    - With source changes committed or staged, run from the repository root to format changed lines:
+      `git clang-format --binary clang-format --style=file upstream/master -- toonz/sources`.
+    - If your executable is named `clang-format-14`, use `--binary clang-format-14` instead.
   - `git commit` them.
   - `git push origin your-branch-name`.
 0. make a pull request.
