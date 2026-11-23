@@ -278,6 +278,7 @@ public:
 
   void setFx(const TFxP &currentFx, const TFxP &actualFx, int frame,
              ToonzScene *scene);
+  TFx *getActualFx() const { return m_actualFx.getPointer(); }
   void setScene(ToonzScene *scene);
   void setIsCameraViewMode(bool isCameraViewMode);
   /*! If onlyParam is true don't invalidate raster of associated histogram. */

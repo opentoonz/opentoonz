@@ -17,6 +17,9 @@
 
 #include "toonzqt/icongenerator.h"
 
+#include <functional>
+#include <set>
+
 class StylePickerTool final : public TTool, public QObject {
   Q_DECLARE_TR_FUNCTIONS(StylePickerTool)
 
@@ -29,8 +32,19 @@ class StylePickerTool final : public TTool, public QObject {
 
   TBoolProperty m_organizePalette;
 
+  // One-shot pick requested from outside (e.g. Fx Settings): the picked id is
+  // passed to m_oneShot instead of changing the current style.
+  std::function<void(int)> m_oneShot;
+  int m_oneShotStyleId = -1;
+  std::set<int> m_oneShotColumns;  // columns feeding the fx
+
   TPalette *getPal();
   bool startOrganizePalette();
+  void startOneShot(TFx *fx, std::function<void(int)> onPicked);
+  void cancelOneShot();
+  int pickStyleId(const TPointD &pos, const TMouseEvent &e, int &columnIndex);
+  int pickFromColumn(int columnIndex, const TMouseEvent &e);
+  int pickConnectedStyleId(const TPointD &pos, const TMouseEvent &e);
 
 public:
   TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
@@ -48,11 +62,15 @@ public:
 
   void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
 
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override;
+
   void pick(const TPointD &pos, const TMouseEvent &e, bool isDragging = true);
 
   void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
 
   int getCursorId() const override;
+
+  QString updateEnabled(int rowIndex, int columnIndex) override;
 
   bool onPropertyChanged(std::string propertyName) override;
 
