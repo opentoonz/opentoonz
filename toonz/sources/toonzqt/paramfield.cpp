@@ -2026,8 +2026,17 @@ void ModeSensitiveBox::onModeChanged(int modeValue) {
   if (wasVisible == m_modes.contains(modeValue)) return;
   setVisible(!wasVisible);
 
-  ParamsPage *paramsPage = dynamic_cast<ParamsPage *>(parentWidget());
-  if (paramsPage) emit paramsPage->preferredPageSizeChanged();
+  bool indexedEntry = false;
+  for (QWidget *parent = parentWidget(); parent;
+       parent          = parent->parentWidget()) {
+    if (ParamsPage *paramsPage = dynamic_cast<ParamsPage *>(parent)) {
+      // Preserve legacy nested boxes; ancestor lookup is for indexed entries.
+      if (parent == parentWidget() || indexedEntry)
+        emit paramsPage->preferredPageSizeChanged();
+      break;
+    }
+    if (parent->objectName() == "FxIndexedColors") indexedEntry = true;
+  }
 }
 
 //=============================================================================
