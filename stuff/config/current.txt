@@ -247,6 +247,8 @@
   <item>"STD_hsvKeyFx.s_range" 			"S Range" 	</item>
   <item>"STD_hsvKeyFx.v_range" 			"V Range" 	</item>
   <item>"STD_hsvKeyFx.invert" 			"Invert" 	</item>
+  <item>"STD_celColorExpandFx" "Cel Color Expand" </item>
+  <item>"STD_celColorExpandFx.radius" "Search Radius" </item>
 
 
   <item>"STD_hsvScaleFx"			"HSV Scale"	</item>

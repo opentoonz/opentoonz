@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Cel Color Expand</title></head>
+<body>
+<h1>Cel Color Expand</h1>
+<p>Extend cel colors into transparent areas without mixing neighboring colors.
+Add Cel Color Expand from the Matte category and connect the drawing to Source.
+This is useful for extending paint underneath separately composited line art.</p>
+<h2>Search Radius</h2>
+<p>Search Radius is the maximum distance in effect pixels from an existing
+covered pixel. The default is 4. A radius of 0 passes the image through exactly.
+Fractional values are supported; the radius includes pixels exactly on its edge.
+Preview resolution scales the radius with the drawing. Rotation, reflection and
+nonuniform scaling use the normal effect transform pipeline.</p>
+<p>For an identifiable raster level, pixels mean the level's original pixels:
+expansion runs before its DPI and geometry placements, preserving the pixel phase
+of odd-sized images. The completed colors are then resampled for display or
+rendering. Vector artwork and graphs without one identifiable raster level use
+world effect pixels. A zero radius forwards the original source without changing
+its rendering grid.</p>
+<p>Every existing pixel with positive alpha keeps its complete original color
+and coverage. A transparent pixel inside the radius receives the nearest covered
+pixel's complete premultiplied RGBA value, including partial transparency. Colors
+are never assembled from different source pixels. Equal-distance ties select the
+source with the lowest row, then the lowest column. Pixels beyond the radius stay
+transparent. Completely empty sources stay empty.</p>
+<p>The distance is the straight-line distance between pixel centers. Expansion
+extends the effect's bounds and crosses render-tile edges without seams. Search
+Radius has no arbitrary slider cap; requests exceeding representable raster sizes
+report an error. Large radii require more memory.</p>
+<h2>Animation and precision</h2>
+<p>Search Radius supports native keyframes, Function Editor curves, undo, presets,
+scene saving, cloning, linked parameters and macro exposure. 8-bit, 16-bit and
+floating-point images are supported. Finite floating colors outside the display
+range are preserved. Pixels containing nonfinite channels do not seed expansion
+and are treated as transparent when the radius is positive.</p>
+</body>
+</html>
