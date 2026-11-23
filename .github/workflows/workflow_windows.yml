@@ -1,4 +1,4 @@
-name: Windows Build
+name: Fresh PR 7292 v142 build
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -7,7 +7,7 @@ concurrency:
 on:
   push:
     branches:
-      - master  # Specify branches where the workflow should run
+      - diagnostics/pr7292-current-master-v142
     paths:
       - '**/*'                                    # Include all files in the repository
       - '!appveyor.yml'                           # Ignore changes in AppVeyor
@@ -105,7 +105,7 @@ jobs:
           mkdir build
           cd build
 
-          cmake ..\sources -G "%MSVCVERSION%" -T v142 -Ax64 -DQT_PATH="%QT_PATH%" -DBOOST_ROOT="%BOOST_ROOT%" -DOpenCV_DIR="%OpenCV_DIR%" -DWITH_WINTAB=Y
+          cmake ..\sources -G "%MSVCVERSION%" -T v142 -Ax64 -DQT_PATH="%QT_PATH%" -DBOOST_ROOT="%BOOST_ROOT%" -DOpenCV_DIR="%OpenCV_DIR%" -DWITH_WINTAB=Y || exit /b 1
         shell: cmd
 
       # Build Opentoonz using MSBuild
@@ -113,7 +113,7 @@ jobs:
         run: |
           @echo on
           cd toonz\build
-          msbuild /p:Configuration=RelWithDebInfo /m /verbosity:minimal ALL_BUILD.vcxproj
+          msbuild /p:Configuration=RelWithDebInfo /m /verbosity:minimal ALL_BUILD.vcxproj || exit /b 1
         shell: cmd
 
       # Create the package
@@ -147,6 +147,15 @@ jobs:
           xcopy /Y /E /I ..\..\stuff .\Opentoonz\portablestuff
         shell: cmd
 
+      - name: Record exact source and compiler configuration
+        shell: cmd
+        run: |
+          git rev-parse HEAD > toonz\build\Opentoonz\build-provenance.txt
+          echo Upstream master: 795bcb774da1ef8093a2e30da32cb9f8982f2483 >> toonz\build\Opentoonz\build-provenance.txt
+          echo PR 7292 head: 019ccb3e11c7e4b82685864b7bebc56bd20ffdfc >> toonz\build\Opentoonz\build-provenance.txt
+          findstr /C:"CMAKE_GENERATOR:" /C:"CMAKE_GENERATOR_TOOLSET:" /C:"CMAKE_CXX_FLAGS_RELWITHDEBINFO:" toonz\build\CMakeCache.txt >> toonz\build\Opentoonz\build-provenance.txt
+          type toonz\build\Opentoonz\build-provenance.txt
+
       # Create artifact from the build
       - name: Create Artifact
         run: |
@@ -158,5 +167,13 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v6
         with:
-          name: Opentoonz-${{ runner.os }}-${{ github.sha }}
+          name: Opentoonz-PR7292-fresh-v142-${{ github.sha }}
           path: artifact
+
+      - name: Upload matching debug symbols
+        uses: actions/upload-artifact@v6
+        with:
+          name: Symbols-PR7292-fresh-v142-${{ github.sha }}
+          path: toonz/build/RelWithDebInfo/*.pdb
+          if-no-files-found: error
+          retention-days: 14

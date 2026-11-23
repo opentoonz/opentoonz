@@ -5,12 +5,14 @@
 #include "tools/cursors.h"
 #include "tools/stylepicker.h"
 #include "tools/toolhandle.h"
+#include "tools/toolcommandids.h"
 
 // TnzQt includes
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/styleselection.h"
 #include "toonzqt/gutil.h"
 #include "toonzqt/icongenerator.h"
+#include "toonzqt/paramfield.h"
 
 // TnzLib includes
 #include "toonz/txshsimplelevel.h"
@@ -25,6 +27,8 @@
 #include "toonz/palettecontroller.h"
 #include "toonz/txshleveltypes.h"
 #include "toonz/txshpalettelevel.h"
+#include "toonz/tfxhandle.h"
+#include "toonz/tcolumnfx.h"
 
 // TnzCore includes
 #include "drawutil.h"
@@ -33,9 +37,27 @@
 #include "tundo.h"
 #include "tmsgcore.h"
 
+// Qt includes
+#include <QTimer>
+
 #define LINES L"Lines"
 #define AREAS L"Areas"
 #define ALL L"Lines & Areas"
+
+namespace {
+
+// Collects the columns of all the levels feeding the fx
+void collectInputColumns(TFx* fx, std::set<int>& columns) {
+  if (TLevelColumnFx* columnFx = dynamic_cast<TLevelColumnFx*>(fx)) {
+    columns.insert(columnFx->getColumnIndex());
+    return;
+  }
+  for (int i = 0; i < fx->getInputPortCount(); i++)
+    if (TFx* inputFx = fx->getInputPort(i)->getFx())
+      collectInputColumns(inputFx, columns);
+}
+
+}  // namespace
 
 //========================================================================
 // Pick Style Tool
@@ -63,6 +85,10 @@ StylePickerTool::StylePickerTool()
 
   m_prop.bind(m_organizePalette);
   m_organizePalette.setId("OrganizePalette");
+
+  // Lets Fx Settings pick color indexes from the viewer
+  StringParamField::setStylePickHandler(
+      [this](std::function<void(int)> onPicked) { startOneShot(onPicked); });
 }
 
 void StylePickerTool::onActivate() {
@@ -77,124 +103,79 @@ void StylePickerTool::onActivate() {
 void StylePickerTool::onDeactivate() {
   QObject::disconnect(nullptr, &TPaletteHandle::paletteSwitched, this,
                       &StylePickerTool::onPaletteSwitched);
+  m_oneShot = nullptr;
 }
 
 void StylePickerTool::leftButtonDown(const TPointD& pos, const TMouseEvent& e) {
+  if (m_oneShot) {
+    m_oneShotStyleId = pickConnectedStyleId(pos, e);
+    return;
+  }
   m_oldStyleId = m_currentStyleId =
       getApplication()->getCurrentLevelStyleIndex();
   pick(pos, e, false);
 }
 
 void StylePickerTool::leftButtonDrag(const TPointD& pos, const TMouseEvent& e) {
+  if (m_oneShot) return;
   pick(pos, e);
+}
+
+void StylePickerTool::leftButtonUp(const TPointD& pos, const TMouseEvent& e) {
+  if (!m_oneShot || m_oneShotStyleId <= 0) return;
+
+  std::function<void(int)> onPicked = m_oneShot;
+  m_oneShot                         = nullptr;
+  onPicked(m_oneShotStyleId);
+
+  // Restore the previous tool once the viewer has finished the release.
+  QTimer::singleShot(0, this, [] {
+    TTool::getApplication()->getCurrentTool()->unsetPseudoTool();
+  });
+}
+
+void StylePickerTool::startOneShot(std::function<void(int)> onPicked) {
+  TFxHandle* fxHandle = getApplication()->getCurrentFx();
+  m_oneShotColumns.clear();
+  if (fxHandle->getFx())
+    collectInputColumns(fxHandle->getFx(), m_oneShotColumns);
+  if (m_oneShotColumns.empty()) {
+    DVGui::warning(tr("No levels are connected to the current FX."));
+    return;
+  }
+
+  // Switching to another fx, or clicking the empty schematic area, cancels
+  connect(fxHandle, &TFxHandle::fxSwitched, this,
+          &StylePickerTool::cancelOneShot, Qt::UniqueConnection);
+
+  ToolHandle* toolHandle = getApplication()->getCurrentTool();
+  m_oneShot              = onPicked;
+  m_oneShotStyleId       = -1;
+  toolHandle->setPseudoTool(T_StylePicker);
+  // The picker is not available for the current level
+  if (toolHandle->getTool() != this) {
+    m_oneShot = nullptr;
+    toolHandle->unsetPseudoTool();
+  }
 }
 
 void StylePickerTool::pick(const TPointD& pos, const TMouseEvent& e,
                            bool isDragging) {
-  // Area = 0, Line = 1, All = 2
-  int modeValue = m_colorType.getIndex();
-
-  //------------------------------------
-  // MultiLayerStylePicker
-  /*---
-                  PickしたStyleId = 0、かつ
-                  Preference で MultiLayerStylePickerが有効、かつ
-                  Scene編集モード、かつ
-                  下のカラムから拾った色がTransparentでない場合、
-                  → カレントLevelを移動する。
-  ---*/
-  if (Preferences::instance()->isMultiLayerStylePickerEnabled() &&
-      getApplication()->getCurrentFrame()->isEditingScene()) {
-    double pickRange = 10.0;
-    int superPickedColumnId =
-        getViewer()->posToColumnIndex(e.m_pos, pickRange, false);
-
-    if (superPickedColumnId >= 0 /*-- 何かColumnに当たった場合 --*/
-        && getApplication()->getCurrentColumn()->getColumnIndex() !=
-               superPickedColumnId) /*-- かつ、Current Columnでない場合 --*/
-    {
-      /*-- そのColumnからPickを試みる --*/
-      int currentFrame = getApplication()->getCurrentFrame()->getFrame();
-      TXshCell pickedCell =
-          getApplication()->getCurrentXsheet()->getXsheet()->getCell(
-              currentFrame, superPickedColumnId);
-      TImageP pickedImage           = pickedCell.getImage(false).getPointer();
-      TToonzImageP picked_ti        = pickedImage;
-      TVectorImageP picked_vi       = pickedImage;
-      TXshSimpleLevel* picked_level = pickedCell.getSimpleLevel();
-      if ((picked_ti || picked_vi) && picked_level) {
-        TPointD tmpMousePosition = getColumnMatrix(superPickedColumnId).inv() *
-                                   getViewer()->winToWorld(e.m_pos);
-
-        TPointD tmpDpiScale = getCurrentDpiScale(picked_level, getCurrentFid());
-
-        tmpMousePosition.x /= tmpDpiScale.x;
-        tmpMousePosition.y /= tmpDpiScale.y;
-
-        TAffine aff =
-            getViewer()->getViewMatrix() * getColumnMatrix(superPickedColumnId);
-        double scale2 = aff.det();
-        StylePicker superPicker(getViewer()->viewerWidget(), pickedImage);
-        int picked_subsampling =
-            picked_level->getImageSubsampling(pickedCell.getFrameId());
-        int superPicked_StyleId = superPicker.pickStyleId(
-            TScale(1.0 / picked_subsampling) * tmpMousePosition +
-                TPointD(-0.5, -0.5),
-            pickRange, scale2, modeValue);
-        /*-- 何かStyleが拾えて、Transparentでない場合 --*/
-        if (superPicked_StyleId > 0) {
-          /*-- Levelの移動 --*/
-          getApplication()->getCurrentLevel()->setLevel(picked_level);
-          /*-- Columnの移動 --*/
-          getApplication()->getCurrentColumn()->setColumnIndex(
-              superPickedColumnId);
-          /*-- 選択の解除 --*/
-          if (getApplication()->getCurrentSelection()->getSelection())
-            getApplication()
-                ->getCurrentSelection()
-                ->getSelection()
-                ->selectNone();
-          /*-- StyleIdの移動 --*/
-          getApplication()->setCurrentLevelStyleIndex(superPicked_StyleId,
-                                                      !isDragging);
-          return;
-        }
-      }
-    }
-  }
-  /*-- MultiLayerStylePicker ここまで --*/
-  //------------------------------------
-  TImageP image    = getImage(false);
-  TToonzImageP ti  = image;
-  TVectorImageP vi = image;
-  TXshSimpleLevel* level =
-      getApplication()->getCurrentLevel()->getSimpleLevel();
-  if ((!ti && !vi) || !level) return;
-
-  /*-- 画面外をpickしても拾えないようにする --*/
-  if (!m_viewer->getGeometry().contains(pos)) return;
-
-  TAffine aff     = getViewer()->getViewMatrix() * getCurrentColumnMatrix();
-  double scale2   = aff.det();
-  int subsampling = level->getImageSubsampling(getCurrentFid());
-  StylePicker picker(getViewer()->viewerWidget(), image);
-  int styleId =
-      picker.pickStyleId(TScale(1.0 / subsampling) * pos + TPointD(-0.5, -0.5),
-                         10.0, scale2, modeValue);
-
+  int columnIndex;
+  int styleId = pickStyleId(pos, e, columnIndex);
   if (styleId < 0) return;
 
-  if (modeValue == 1)  // LINES
-  {
-    /*-- pickLineモードのとき、取得Styleが0の場合はカレントStyleを変えない。
-     * --*/
-    if (styleId == 0) return;
-    /*--
-     * pickLineモードのとき、PurePaintの部分をクリックしてもカレントStyleを変えない
-     * --*/
-    if (ti && picker.pickTone(TScale(1.0 / subsampling) * pos +
-                              TPointD(-0.5, -0.5)) == 255)
-      return;
+  // MultiLayerStylePicker: move to the level and column the style was found in
+  if (columnIndex >= 0) {
+    int frame     = getApplication()->getCurrentFrame()->getFrame();
+    TXshCell cell = getApplication()->getCurrentXsheet()->getXsheet()->getCell(
+        frame, columnIndex);
+    getApplication()->getCurrentLevel()->setLevel(cell.getSimpleLevel());
+    getApplication()->getCurrentColumn()->setColumnIndex(columnIndex);
+    if (getApplication()->getCurrentSelection()->getSelection())
+      getApplication()->getCurrentSelection()->getSelection()->selectNone();
+    getApplication()->setCurrentLevelStyleIndex(styleId, !isDragging);
+    return;
   }
 
   /*--- Styleを選択している場合は選択を解除する ---*/
@@ -211,6 +192,131 @@ void StylePickerTool::pick(const TPointD& pos, const TMouseEvent& e,
   // Therefore here I set the "forceEmit" flag to true in order to emit the
   // signal whenever the picking with mouse press.
   getApplication()->setCurrentLevelStyleIndex(styleId, !isDragging);
+}
+
+int StylePickerTool::pickStyleId(const TPointD& pos, const TMouseEvent& e,
+                                 int& columnIndex) {
+  columnIndex = -1;
+  // Area = 0, Line = 1, All = 2
+  int modeValue = m_colorType.getIndex();
+
+  //------------------------------------
+  // MultiLayerStylePicker
+  /*---
+                  PickしたStyleId = 0、かつ
+                  Preference で MultiLayerStylePickerが有効、かつ
+                  Scene編集モード、かつ
+                  下のカラムから拾った色がTransparentでない場合、
+                  → カレントLevelを移動する。
+  ---*/
+  if (Preferences::instance()->isMultiLayerStylePickerEnabled() &&
+      getApplication()->getCurrentFrame()->isEditingScene()) {
+    int superPickedColumnId =
+        getViewer()->posToColumnIndex(e.m_pos, 10.0, false);
+
+    if (superPickedColumnId >= 0 /*-- 何かColumnに当たった場合 --*/
+        && getApplication()->getCurrentColumn()->getColumnIndex() !=
+               superPickedColumnId) /*-- かつ、Current Columnでない場合 --*/
+    {
+      /*-- そのColumnからPickを試みる --*/
+      int superPicked_StyleId = pickFromColumn(superPickedColumnId, e);
+      /*-- 何かStyleが拾えて、Transparentでない場合 --*/
+      if (superPicked_StyleId > 0) {
+        columnIndex = superPickedColumnId;
+        return superPicked_StyleId;
+      }
+    }
+  }
+  /*-- MultiLayerStylePicker ここまで --*/
+  //------------------------------------
+  TImageP image    = getImage(false);
+  TToonzImageP ti  = image;
+  TVectorImageP vi = image;
+  TXshSimpleLevel* level =
+      getApplication()->getCurrentLevel()->getSimpleLevel();
+  if ((!ti && !vi) || !level) return -1;
+
+  /*-- 画面外をpickしても拾えないようにする --*/
+  if (!m_viewer->getGeometry().contains(pos)) return -1;
+
+  TAffine aff     = getViewer()->getViewMatrix() * getCurrentColumnMatrix();
+  double scale2   = aff.det();
+  int subsampling = level->getImageSubsampling(getCurrentFid());
+  StylePicker picker(getViewer()->viewerWidget(), image);
+  int styleId =
+      picker.pickStyleId(TScale(1.0 / subsampling) * pos + TPointD(-0.5, -0.5),
+                         10.0, scale2, modeValue);
+
+  if (styleId < 0) return -1;
+
+  if (modeValue == 1)  // LINES
+  {
+    /*-- pickLineモードのとき、取得Styleが0の場合はカレントStyleを変えない。
+     * --*/
+    if (styleId == 0) return -1;
+    /*--
+     * pickLineモードのとき、PurePaintの部分をクリックしてもカレントStyleを変えない
+     * --*/
+    if (ti && picker.pickTone(TScale(1.0 / subsampling) * pos +
+                              TPointD(-0.5, -0.5)) == 255)
+      return -1;
+  }
+  return styleId;
+}
+
+int StylePickerTool::pickFromColumn(int columnIndex, const TMouseEvent& e) {
+  int frame     = getApplication()->getCurrentFrame()->getFrame();
+  TXshCell cell = getApplication()->getCurrentXsheet()->getXsheet()->getCell(
+      frame, columnIndex);
+  TImageP image          = cell.getImage(false).getPointer();
+  TXshSimpleLevel* level = cell.getSimpleLevel();
+  if ((!TToonzImageP(image) && !TVectorImageP(image)) || !level) return -1;
+
+  TPointD pos =
+      getColumnMatrix(columnIndex).inv() * getViewer()->winToWorld(e.m_pos);
+  TPointD dpiScale = getCurrentDpiScale(level, getCurrentFid());
+  pos.x /= dpiScale.x;
+  pos.y /= dpiScale.y;
+
+  TAffine aff     = getViewer()->getViewMatrix() * getColumnMatrix(columnIndex);
+  int subsampling = level->getImageSubsampling(cell.getFrameId());
+  StylePicker picker(getViewer()->viewerWidget(), image);
+  return picker.pickStyleId(
+      TScale(1.0 / subsampling) * pos + TPointD(-0.5, -0.5), 10.0, aff.det(),
+      m_colorType.getIndex());
+}
+
+// Picks from the top-most column under the cursor that feeds the fx
+int StylePickerTool::pickConnectedStyleId(const TPointD& pos,
+                                          const TMouseEvent& e) {
+  if (getApplication()->getCurrentFrame()->isEditingScene()) {
+    std::vector<int> columns;  // bottom to top
+    getViewer()->posToColumnIndexes(e.m_pos, columns, 10.0, false);
+    for (auto it = columns.rbegin(); it != columns.rend(); ++it) {
+      if (!m_oneShotColumns.count(*it)) continue;
+      int styleId = pickFromColumn(*it, e);
+      if (styleId > 0) return styleId;
+    }
+    return -1;
+  }
+
+  // Level editing: only the current level, if it feeds the fx
+  int currentColumn = getApplication()->getCurrentColumn()->getColumnIndex();
+  if (!m_oneShotColumns.count(currentColumn)) return -1;
+  int columnIndex;
+  return pickStyleId(pos, e, columnIndex);
+}
+
+void StylePickerTool::cancelOneShot() {
+  if (!m_oneShot) return;
+  m_oneShot = nullptr;
+  getApplication()->getCurrentTool()->unsetPseudoTool();
+}
+
+QString StylePickerTool::updateEnabled(int rowIndex, int columnIndex) {
+  // The one-shot pick reads from the connected columns, not the current one
+  if (m_oneShot) return (enable(true), QString());
+  return TTool::updateEnabled(rowIndex, columnIndex);
 }
 
 void StylePickerTool::mouseMove(const TPointD& pos, const TMouseEvent& e) {
