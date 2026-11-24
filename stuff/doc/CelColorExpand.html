@@ -18,12 +18,16 @@ of odd-sized images. The completed colors are then resampled for display or
 rendering. Vector artwork and graphs without one identifiable raster level use
 world effect pixels. A zero radius forwards the original source without changing
 its rendering grid.</p>
-<p>Every existing pixel with positive alpha keeps its complete original color
-and coverage. A transparent pixel inside the radius receives the nearest covered
-pixel's complete premultiplied RGBA value, including partial transparency. Colors
-are never assembled from different source pixels. Equal-distance ties select the
-source with the lowest row, then the lowest column. Pixels beyond the radius stay
-transparent. Completely empty sources stay empty.</p>
+<p>Expansion grows the drawing's opacity as well as its colors. Each output pixel
+receives the complete premultiplied RGBA value of the most opaque source pixel
+within Search Radius. Among equally opaque candidates, the nearest one wins;
+equal-distance ties select the lowest row, then the lowest column. Colors are
+never assembled from different source pixels.</p>
+<p>This moves antialiased edges outward instead of extending a nearly transparent
+fringe. Opaque original pixels remain unchanged. Partially transparent pixels can
+gain coverage when a more opaque source pixel is within the radius. Uniformly
+translucent artwork retains its original opacity; the effect does not force it
+opaque. Pixels beyond the radius stay transparent, and empty sources stay empty.</p>
 <p>The distance is the straight-line distance between pixel centers. Expansion
 extends the effect's bounds and crosses render-tile edges without seams. Search
 Radius has no arbitrary slider cap; requests exceeding representable raster sizes

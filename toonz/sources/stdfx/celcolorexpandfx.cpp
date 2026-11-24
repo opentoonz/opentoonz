@@ -1,14 +1,15 @@
 #include "stdfx.h"
 #include "tfxparam.h"
-#include "celdistance.h"
 #include "celfxsourcegrid.h"
 
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 #include <iomanip>
 #include <limits>
 #include <locale>
 #include <sstream>
+#include <vector>
 
 namespace {
 double expandRadius(double value) {
@@ -46,22 +47,138 @@ bool expandSeed(const Pixel &p) {
   return p.m > 0 && std::isfinite(double(p.m)) && std::isfinite(double(p.r)) &&
          std::isfinite(double(p.g)) && std::isfinite(double(p.b));
 }
+
+// Dilation must move coverage too: copying the nearest nonzero-alpha pixel
+// extends an antialiased edge as a nearly invisible fringe. Search the disk
+// for the strongest coverage, then choose the nearest complete source pixel
+// at that coverage. This also preserves intentionally translucent artwork.
+template <class Pixel>
+class ExpandColorSearch {
+  struct Node {
+    int index, x0, y0, x1, y1;
+    double maxAlpha;
+  };
+  static_assert(sizeof(Node) + sizeof(Pixel) <= 64,
+                "Update Cel Color Expand's memory estimate");
+  struct Match {
+    int index        = -1;
+    double alpha     = -1;
+    int64_t distance = std::numeric_limits<int64_t>::max();
+  };
+  const TRasterPT<Pixel> &m_source;
+  const int m_width;
+  std::vector<Node> m_nodes;
+
+  static int64_t square(int64_t value) { return value * value; }
+  static int64_t distance(const Node &node, int x, int y) {
+    const int64_t dx =
+        std::max({int64_t(node.x0) - x, int64_t(0), int64_t(x) - node.x1});
+    const int64_t dy =
+        std::max({int64_t(node.y0) - y, int64_t(0), int64_t(y) - node.y1});
+    return square(dx) + square(dy);
+  }
+  static void include(Node &node, const Node &child) {
+    node.x0       = std::min(node.x0, child.x0);
+    node.y0       = std::min(node.y0, child.y0);
+    node.x1       = std::max(node.x1, child.x1);
+    node.y1       = std::max(node.y1, child.y1);
+    node.maxAlpha = std::max(node.maxAlpha, child.maxAlpha);
+  }
+  bool build(size_t begin, size_t end, bool vertical, const int *canceled) {
+    if (begin == end) return true;
+    if (canceled && *canceled) return false;
+    const size_t middle = begin + (end - begin) / 2;
+    std::nth_element(
+        m_nodes.begin() + begin, m_nodes.begin() + middle,
+        m_nodes.begin() + end, [this, vertical](const Node &a, const Node &b) {
+          const int av = vertical ? a.index / m_width : a.index % m_width;
+          const int bv = vertical ? b.index / m_width : b.index % m_width;
+          return av < bv || (av == bv && a.index < b.index);
+        });
+    if (!build(begin, middle, !vertical, canceled) ||
+        !build(middle + 1, end, !vertical, canceled))
+      return false;
+    if (begin < middle)
+      include(m_nodes[middle], m_nodes[begin + (middle - begin) / 2]);
+    if (middle + 1 < end)
+      include(m_nodes[middle], m_nodes[middle + 1 + (end - middle - 1) / 2]);
+    return true;
+  }
+  void search(size_t begin, size_t end, int x, int y, double radius2,
+              Match &best) const {
+    if (begin == end) return;
+    const size_t middle   = begin + (end - begin) / 2;
+    const Node &node      = m_nodes[middle];
+    const int64_t minimum = distance(node, x, y);
+    if (minimum > radius2 || node.maxAlpha < best.alpha ||
+        (node.maxAlpha == best.alpha && minimum > best.distance))
+      return;
+    const int index    = node.index;
+    const double alpha = m_source->pixels(index / m_width)[index % m_width].m;
+    const int64_t d    = square(int64_t(index % m_width) - x) +
+                      square(int64_t(index / m_width) - y);
+    if (d <= radius2 &&
+        (alpha > best.alpha ||
+         (alpha == best.alpha &&
+          (d < best.distance || (d == best.distance && index < best.index))))) {
+      best.index    = index;
+      best.alpha    = alpha;
+      best.distance = d;
+    }
+    // Visit the more opaque subtree first so most lower-coverage branches
+    // can be skipped. At equal coverage, visit the nearer bounds first.
+    bool rightFirst = false;
+    if (begin < middle && middle + 1 < end) {
+      const Node &left  = m_nodes[begin + (middle - begin) / 2];
+      const Node &right = m_nodes[middle + 1 + (end - middle - 1) / 2];
+      rightFirst        = right.maxAlpha > left.maxAlpha ||
+                   (right.maxAlpha == left.maxAlpha &&
+                    distance(right, x, y) < distance(left, x, y));
+    }
+    if (rightFirst) {
+      search(middle + 1, end, x, y, radius2, best);
+      search(begin, middle, x, y, radius2, best);
+    } else {
+      search(begin, middle, x, y, radius2, best);
+      search(middle + 1, end, x, y, radius2, best);
+    }
+  }
+
+public:
+  explicit ExpandColorSearch(const TRasterPT<Pixel> &source)
+      : m_source(source), m_width(source->getLx()) {}
+  bool build(const int *canceled) {
+    size_t count = 0;
+    for (int y = 0; y < m_source->getLy(); ++y) {
+      if (canceled && *canceled) return false;
+      const Pixel *row = m_source->pixels(y);
+      for (int x = 0; x < m_width; ++x) count += expandSeed(row[x]);
+    }
+    m_nodes.reserve(count);
+    for (int y = 0; y < m_source->getLy(); ++y) {
+      if (canceled && *canceled) return false;
+      const Pixel *row = m_source->pixels(y);
+      for (int x = 0; x < m_width; ++x)
+        if (expandSeed(row[x]))
+          m_nodes.push_back({y * m_width + x, x, y, x, y, double(row[x].m)});
+    }
+    return build(0, m_nodes.size(), false, canceled);
+  }
+  int find(int x, int y, double radius) const {
+    Match best;
+    search(0, m_nodes.size(), x, y, radius * radius, best);
+    return best.index;
+  }
+};
+
 template <class Pixel>
 void expandColors(const TRasterPT<Pixel> &source,
                   const TRasterPT<Pixel> &output, int halo, double radius,
                   const int *canceled) {
-  const int w = source->getLx(), h = source->getLy();
-  std::vector<uint8_t> seeds(size_t(w) * h);
+  const int w = source->getLx();
   ExpandRasterLock sourceLock(source);
-  for (int y = 0; y < h; ++y) {
-    if (canceled && *canceled) return;
-    const Pixel *row = source->pixels(y);
-    for (int x = 0; x < w; ++x) seeds[size_t(y) * w + x] = expandSeed(row[x]);
-  }
-  CelDistance::Field field;
-  if (!CelDistance::transform(seeds, w, h, CelDistance::Metric::Euclidean,
-                              field, canceled))
-    return;
+  ExpandColorSearch<Pixel> search(source);
+  if (!search.build(canceled)) return;
   ExpandRasterLock outputLock(output);
   for (int y = 0; y < output->getLy(); ++y) {
     if (canceled && *canceled) {
@@ -70,10 +187,8 @@ void expandColors(const TRasterPT<Pixel> &source,
     }
     Pixel *row = output->pixels(y);
     for (int x = 0; x < output->getLx(); ++x) {
-      const size_t index = size_t(y + halo) * w + x + halo;
-      const int nearest  = field.nearest[index];
-      if (nearest >= 0 && field.distance[index] <= radius)
-        row[x] = source->pixels(nearest / w)[nearest % w];
+      const int nearest = search.find(x + halo, y + halo, radius);
+      if (nearest >= 0) row[x] = source->pixels(nearest / w)[nearest % w];
     }
   }
 }
@@ -146,7 +261,8 @@ public:
     const double radius = pixelRadius(frame, settings);
     if (radius == 0) return 0;
     const double halo = expandHalo(radius);
-    // Source pixels, mask, two distance-transform passes and their scratch.
+    // Source pixels and the coverage/color search tree (at most one node per
+    // source pixel). The 64-byte estimate covers all three pixel formats.
     const double bytes =
         (rect.getLx() + 2 * halo) * (rect.getLy() + 2 * halo) * 64;
     // In MB, as the tile subdivision compares it with its limit in MB
@@ -158,7 +274,7 @@ public:
                        const TRenderSettings &settings) const override {
     std::ostringstream alias;
     alias.imbue(std::locale::classic());
-    alias << TRasterFx::getAlias(frame, settings) << "[celExpand:2:"
+    alias << TRasterFx::getAlias(frame, settings) << "[celExpand:3:"
           << std::setprecision(std::numeric_limits<double>::max_digits10)
           << expandRadius(m_radius->getValue(frame));
     const TAffine grid = CelFxSourceGrid::renderAffine(m_source.getFx(), frame);
