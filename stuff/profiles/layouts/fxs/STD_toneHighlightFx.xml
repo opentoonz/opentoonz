@@ -1,0 +1,12 @@
+<fxlayout>
+  <page name="Tone / Highlight">
+        <control>mode</control>
+        <control>color</control>
+        <control>intensity</control>
+        <control>softness</control>
+        <control>invertMatte</control>
+        <control>protectLines</control>
+        <control>lineThreshold</control>
+  </page>
+
+</fxlayout>
