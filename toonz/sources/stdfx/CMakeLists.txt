@@ -167,6 +167,7 @@ set(SOURCES
     sharpenfx.cpp
     solarizefx.cpp
     squaregradientfx.cpp
+    alphadistancegradientfx.cpp
     stdfx.cpp
     targetspotfx.cpp
     texturefx.cpp
