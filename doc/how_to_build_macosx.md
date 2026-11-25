@@ -33,7 +33,7 @@ Check site for any changes in installation instructions, but they will probably 
 
 In a Terminal window, execute the following statements:
 ```sh
-brew install glew lz4 libjpeg libpng lzo pkg-config libusb cmake git-lfs libmypaint qt@5 boost jpeg-turbo opencv
+brew install glew lz4 libjpeg libpng lzo pkg-config libusb cmake git-lfs libmypaint qt@5 boost jpeg-turbo opencv@4 superlu
 git lfs install
 ```
 
@@ -41,11 +41,19 @@ NOTE: This will install the latest version of QT v5.x which may not be compatibl
 
 If you cannot use the most recent version, download the online installer from https://www.qt.io/download and install the appropriate `macOS` version (min 5.15).  If installing via this method, be sure to install the `Qt Script (Deprecated)` libraries.
 
+### Apple Silicon and Intel
+
+The build is native to the machine it runs on: arm64 on Apple Silicon, x86_64 on Intel. There is no universal binary.
+
+Homebrew lives in `/opt/homebrew` on Apple Silicon and `/usr/local` on Intel. The commands below use `$(brew --prefix ...)` so they work on both.
+
+SuperLU comes from Homebrew (`superlu` in the install line above). The archive bundled in `thirdparty/superlu` is Intel-only and is no longer used on macOS.
+
 ### Remove incompatible symbolic directory
 Check to see if this symbolic glew directory exists. If so, remove it:
 ```sh
-ls -l /usr/local/lib/cmake/glew
-rm /usr/local/lib/cmake/glew
+ls -l $(brew --prefix)/lib/cmake/glew
+rm $(brew --prefix)/lib/cmake/glew
 ```
 
 ### Set up OpenToonz repository
@@ -80,14 +88,14 @@ cd build
 2. Include libjpeg-turbo path to PKG_CONFIG_PATH
 
 ```sh
-export PKG_CONFIG_PATH="/opt/homebrew/opt/jpeg-turbo/lib/pkgconfig:$PKG_CONFIG_PATH"
+export PKG_CONFIG_PATH="$(brew --prefix jpeg-turbo)/lib/pkgconfig:$PKG_CONFIG_PATH"
 ```
 
 3. Set up build environment
 
 To build from command line, do the following:
 ```sh
-cmake ../sources -DQT_PATH='/opt/homebrew/opt/qt@5/lib'  #replace QT path with your installed QT version#
+cmake ../sources -DQT_PATH="$(brew --prefix qt@5)/lib" -DOpenCV_DIR="$(brew --prefix opencv@4)/lib/cmake/opencv4"  #replace QT path with your installed QT version#
 make
 ```
 - If you downloaded the QT installer and installed to `/Users/yourlogin/Qt` instead of by using homebrew, your lib path may look something like this: `~/Qt/5.12.2/clang_64/lib` or `~/Qt/5.12.2/clang_32/lib`
@@ -95,7 +103,7 @@ make
 To build using Xcode, do the following:
 ```sh
 sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
-cmake -G Xcode ../sources -B. -DQT_PATH='/opt/homebrew/opt/qt@5/lib' -DWITH_TRANSLATION=OFF   #replace QT path with your installed QT version#
+cmake -G Xcode ../sources -B. -DQT_PATH="$(brew --prefix qt@5)/lib" -DOpenCV_DIR="$(brew --prefix opencv@4)/lib/cmake/opencv4" -DWITH_TRANSLATION=OFF   #replace QT path with your installed QT version#
 ```
 - Note that the option `-DWITH_TRANSLATION=OFF` is needed to avoid error when using XCode 12+ which does not allow to add the same source to multiple targets.
 - Open Xcode app and open project /Users/yourlogin/Documents/opentoonz/toonz/build/OpenToonz.xcodeproj
