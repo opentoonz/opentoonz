@@ -915,21 +915,22 @@ QVariant FileBrowser::getItemData(int index, DataType dataType,
     else
       return item.m_name;
   } else if (dataType == Thumbnail) {
-    QSize iconSize = m_itemViewer->getPanel()->getIconSize();
-    // parent folder icons
+    DvItemViewerPanel *panel = m_itemViewer->getPanel();
+    QSize iconSize           = panel->getIconSize();
     if (item.m_path == m_folder.getParentDir()) {
-      static QPixmap folderUpPixmap(getIconPath("folder_browser_up"));
-      return folderUpPixmap;
+      return cachedSvgThumbnail(getIconPath("folder_browser_up"), iconSize);
+    } else if (item.m_isFolder) {
+      if (item.m_isLink)
+        return cachedSvgThumbnail(getIconPath("folder_browser_link"), iconSize);
+      return cachedSvgThumbnail(getIconPath("folder_browser"), iconSize);
     }
-    // folder icons
-    else if (item.m_isFolder) {
-      if (item.m_isLink) {
-        static QPixmap folderLinkPixmap(getIconPath("folder_browser_link"));
-        return folderLinkPixmap;
-      } else {
-        static QPixmap folderPixmap(getIconPath("folder_browser"));
-        return folderPixmap;
-      }
+
+    if (panel->isAdvancedDisplay()) {
+      QPixmap sized = panel->getSizedThumbnail(item.m_path);
+      if (!sized.isNull()) return sized;
+      QPixmap blank(iconSize);
+      blank.fill(Qt::white);
+      return blank;
     }
 
     QPixmap pixmap = IconGenerator::instance()->getIcon(item.m_path);
