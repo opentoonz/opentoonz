@@ -2654,6 +2654,9 @@ void MainWindow::defineActions() {
   createMenuPlayAction(MI_NextStep, QT_TR_NOOP("Next Step"), "", "nextstep");
   createMenuPlayAction(MI_PrevStep, QT_TR_NOOP("Previous Step"), "",
                        "prevstep");
+  createMenuPlayAction(MI_PrevFile, QT_TR_NOOP("Previous File"), "",
+                       "folder_prev");
+  createMenuPlayAction(MI_NextFile, QT_TR_NOOP("Next File"), "", "folder_next");
   createMenuPlayAction(MI_NextKeyframe, QT_TR_NOOP("Next Key"), "Ctrl+.",
                        "nextkey");
   createMenuPlayAction(MI_PrevKeyframe, QT_TR_NOOP("Previous Key"), "Ctrl+,",

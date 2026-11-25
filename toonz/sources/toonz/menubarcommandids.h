@@ -221,6 +221,8 @@
 #define MI_PrevDrawing "MI_PrevDrawing"
 #define MI_NextStep "MI_NextStep"
 #define MI_PrevStep "MI_PrevStep"
+#define MI_PrevFile "MI_PrevFile"
+#define MI_NextFile "MI_NextFile"
 #define MI_NextKeyframe "MI_NextKeyframe"
 #define MI_PrevKeyframe "MI_PrevKeyframe"
 #define MI_ToggleBlankFrames "MI_ToggleBlankFrames"

@@ -150,7 +150,9 @@ MagpieFileImportPopup::MagpieFileImportPopup()
                                  FlipConsole::eZoomOut,
                                  FlipConsole::eFlipHorizontal,
                                  FlipConsole::eFlipVertical,
-                                 FlipConsole::eResetView};
+                                 FlipConsole::eResetView,
+                                 FlipConsole::ePrevFile,
+                                 FlipConsole::eNextFile};
   m_flipbook = new FlipBook(this, tr("Import Toonz Lip Sync File"), buttonMask);
   m_flipbook->setFixedHeight(250);
   frameLayout->addWidget(m_flipbook);

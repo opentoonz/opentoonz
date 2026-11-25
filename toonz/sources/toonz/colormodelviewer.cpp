@@ -83,7 +83,8 @@ ColorModelViewer::ColorModelViewer(QWidget *parent)
                     FlipConsole::eUseLoadBox,   FlipConsole::eDefineSubCamera,
                     FlipConsole::eLocator,      FlipConsole::eZoomIn,
                     FlipConsole::eZoomOut,      FlipConsole::eFlipHorizontal,
-                    FlipConsole::eFlipVertical, FlipConsole::eResetView}),
+                    FlipConsole::eFlipVertical, FlipConsole::eResetView,
+                    FlipConsole::ePrevFile,     FlipConsole::eNextFile}),
                eDontKeepFilesOpened, true)
     , m_mode(0)
     , m_currentRefImgPath(TFilePath()) {

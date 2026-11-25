@@ -236,6 +236,8 @@ public:
     eDecreaseGain,
     eResetGain,
     eIncreaseGain,
+    ePrevFile,
+    eNextFile,
     // following values are hard-coded in ImagePainter
     eBlackBg = 0x40000,
     eWhiteBg = 0x80000,
@@ -329,15 +331,22 @@ public:
   QColor getFpsFieldColor() const { return m_fpsFieldColor; }
 
   void resetGain(bool forceInit = false);
+
+  bool hasFileNavigation() const { return m_actions.contains(ePrevFile); }
+  int getFileTypeFilter() const { return m_fileTypeFilter; }
+  void setFileTypeFilter(int filter);
+
 signals:
 
   void buttonPressed(FlipConsole::EGadget button);
+  void fileTypeFilterChanged();
 
   void playStateChanged(bool isPlaying);
   void sliderReleased();
 
 private:
   UINT m_customizeMask;
+  int m_fileTypeFilter;
   QString m_customizeId;
   QAction *m_customAction;
   PlaybackExecutor m_playbackExecutor;

@@ -60,6 +60,8 @@
 
 // recent files
 #include "mainwindow.h"
+#include "menubarcommandids.h"
+#include "contenttypes.h"
 
 // Other widgets
 #include "toonzqt/flipconsole.h"
@@ -71,6 +73,9 @@
 // Qt includes
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QFileInfo>
+#include <QKeyEvent>
+#include <QMenu>
 #include <QSettings>
 #include <QPainter>
 #include <QDialogButtonBox>
@@ -89,6 +94,8 @@
 #include <QPushButton>
 
 #include <stdint.h>  // for uintptr_t
+#include <algorithm>
+#include <cstdlib>
 
 #ifdef _WIN32
 #include "avicodecrestrictions.h"
@@ -224,6 +231,9 @@ FlipBook::FlipBook(QWidget *parent, QString viewerTitle,
   // signal-slot connection
   bool ret = connect(m_flipConsole, SIGNAL(buttonPressed(FlipConsole::EGadget)),
                      this, SLOT(onButtonPressed(FlipConsole::EGadget)));
+  connect(m_flipConsole, &FlipConsole::fileTypeFilterChanged, this,
+          &FlipBook::updateFileNavigation);
+  updateFileNavigation();
 
   m_flipConsole->setFrameRate(TApp::instance()
                                   ->getCurrentScene()
@@ -814,6 +824,14 @@ void FlipBook::onButtonPressed(FlipConsole::EGadget button) {
   case FlipConsole::eSave:
     saveImages();
     break;
+
+  case FlipConsole::ePrevFile:
+    openSiblingFile(-1);
+    break;
+
+  case FlipConsole::eNextFile:
+    openSiblingFile(1);
+    break;
   default:
     break;
   }
@@ -1022,14 +1040,20 @@ bool FlipBook::isSavable() const {
 void FlipBook::setLevel(const TFilePath &fp, TPalette *palette, int from,
                         int to, int step, int shrink, TSoundTrack *snd,
                         bool append, bool isToonzOutput) {
+  struct FileNavigationUpdater {
+    FlipBook *m_flipbook;
+    ~FileNavigationUpdater() { m_flipbook->updateFileNavigation(); }
+  } navigationUpdater{this};
+
   try {
     if (!append) {
       clearCache();
       m_levelNames.clear();
       m_levels.clear();
     }
-    m_snd = 0;
-    m_xl  = 0;
+    m_fileNavPath = TFilePath();
+    m_snd         = 0;
+    m_xl          = 0;
 
     m_flipConsole->enableProgressBar(false);
     m_flipConsole->setProgressBarStatus(0);
@@ -1052,6 +1076,7 @@ void FlipBook::setLevel(const TFilePath &fp, TPalette *palette, int from,
       // m_flipConsole->enableButton(FlipConsole::eCheckBg,
       // true);//fp.getType()!="pli");
 
+      if (!append) m_fileNavPath = fp;
       m_lr = TLevelReaderP(fp);
 
       bool supportsRandomAccess = doesSupportRandomAccess(fp, isToonzOutput);
@@ -1264,6 +1289,8 @@ void FlipBook::setLevel(TXshSimpleLevel *xl) {
     m_previewedFx = 0;
     m_previewXsh  = 0;
     m_levels.clear();
+    m_fileNavPath = TFilePath();
+    updateFileNavigation();
 
     m_flipConsole->enableButton(FlipConsole::eSound, false);
 
@@ -1314,6 +1341,8 @@ void FlipBook::setLevel(TFx *previewedFx, TXsheet *xsh, TLevel *level,
   m_previewXsh  = xsh;
   m_isPreviewFx = true;
   m_levels.clear();
+  m_fileNavPath = TFilePath();
+  updateFileNavigation();
   m_levels.push_back(Level(level, TFilePath(), from - 1, to - 1, step));
   m_levelNames.clear();
   m_levelNames.push_back(QString::fromStdString(level->getName()));
@@ -1451,6 +1480,203 @@ void FlipBook::showFrame(int frame) {
   if (frame < 0) return;
   m_flipConsole->setCurrentFrame(frame);
   m_flipConsole->showCurrentFrame();
+}
+
+//-----------------------------------------------------------------------------
+
+namespace {
+
+struct NamedPath {
+  QString name;
+  TFilePath path;
+};
+
+int allContentTypesMask() {
+  return (1 << ContentTypes::definitions().size()) - 1;
+}
+
+bool matchesContentTypes(const TFilePath &fp, int filter) {
+  if (fp.getType() == "plt" || !TFileType::isViewable(TFileType::getInfo(fp)))
+    return false;
+  if ((filter & allContentTypesMask()) == allContentTypesMask()) return true;
+
+  int index = ContentTypes::indexOf(QString::fromStdString(fp.getType()));
+  return index >= 0 && (filter & (1 << index));
+}
+
+int compareFileNames(const QString &a, const QString &b) {
+  int result = QString::localeAwareCompare(a, b);
+  return result != 0 ? result : QString::compare(a, b);
+}
+
+// Nearest entry first; asking for more entries than available gives the last.
+TFilePath pickSibling(std::vector<NamedPath> &entries, int steps,
+                      bool descending) {
+  if (steps <= 0 || entries.empty()) return TFilePath();
+
+  size_t index = std::min<size_t>(steps, entries.size()) - 1;
+  std::nth_element(entries.begin(), entries.begin() + index, entries.end(),
+                   [descending](const NamedPath &a, const NamedPath &b) {
+                     int order = compareFileNames(a.name, b.name);
+                     return descending ? order > 0 : order < 0;
+                   });
+  return entries[index].path;
+}
+
+qint64 directoryModified(const TFilePath &filePath) {
+  if (filePath.isEmpty()) return -1;
+  QFileInfo info(toQString(filePath.getParentDir()));
+  if (!info.exists()) return -1;
+  return info.lastModified().toMSecsSinceEpoch();
+}
+
+}  // namespace
+
+//-----------------------------------------------------------------------------
+
+// Neighbours of the open file, in file-browser order. A side with 0 steps is
+// skipped.
+void FlipBook::findSiblingFiles(TFilePath &prev, TFilePath &next, int prevSteps,
+                                int nextSteps) const {
+  prev = TFilePath();
+  next = TFilePath();
+  if (m_fileNavPath.isEmpty() || m_isPreviewFx) return;
+
+  TFilePath current = m_fileNavPath;
+  if (current.getDots() == "..") current = current.withFrame();
+
+  TFilePathSet files, allFiles;
+  try {
+    TSystem::readDirectory(files, allFiles, current.getParentDir());
+  } catch (...) {
+    return;
+  }
+
+  const int filter          = m_flipConsole->getFileTypeFilter();
+  const QString currentName = toQString(current.withoutParentDir());
+  std::vector<NamedPath> before, after;
+  for (const TFilePath &fp : files) {
+    if (!matchesContentTypes(fp, filter)) continue;
+
+    QString name = toQString(fp.withoutParentDir());
+    int order    = compareFileNames(name, currentName);
+    if (order < 0 && prevSteps > 0)
+      before.push_back({name, fp});
+    else if (order > 0 && nextSteps > 0)
+      after.push_back({name, fp});
+  }
+
+  prev = pickSibling(before, prevSteps, true);
+  next = pickSibling(after, nextSteps, false);
+}
+
+//-----------------------------------------------------------------------------
+
+void FlipBook::updateFileNavigation() {
+  findSiblingFiles(m_prevFile, m_nextFile, 1, 1);
+  m_fileNavDirModified = directoryModified(m_fileNavPath);
+  m_flipConsole->enableButton(FlipConsole::ePrevFile, !m_prevFile.isEmpty(),
+                              false);
+  m_flipConsole->enableButton(FlipConsole::eNextFile, !m_nextFile.isEmpty(),
+                              false);
+}
+
+//-----------------------------------------------------------------------------
+
+// Requests made while a file is loading are merged and applied afterwards.
+void FlipBook::openSiblingFile(int direction) {
+  m_pendingFileSteps += direction;
+  if (m_isOpeningSibling) return;
+
+  m_isOpeningSibling = true;
+  while (m_pendingFileSteps != 0) {
+    const int steps    = m_pendingFileSteps;
+    m_pendingFileSteps = 0;
+
+    TFilePath target      = steps < 0 ? m_prevFile : m_nextFile;
+    qint64 folderModified = directoryModified(m_fileNavPath);
+    bool folderUnchanged =
+        m_fileNavDirModified >= 0 && folderModified == m_fileNavDirModified;
+    if (std::abs(steps) > 1 || target.isEmpty() || !folderUnchanged ||
+        !TSystem::doesExistFileOrLevel(target)) {
+      TFilePath prev, next;
+      findSiblingFiles(prev, next, steps < 0 ? -steps : 0,
+                       steps > 0 ? steps : 0);
+      target = steps < 0 ? prev : next;
+    }
+    if (target.isEmpty()) continue;
+
+    int step = 1, shrink = 1;
+    Preferences::instance()->getViewValues(shrink, step);
+
+    resetState(false);
+    setLevel(target, 0, -1, -1, step, shrink, 0, false, false);
+
+    bool hasFrame = false;
+    if (!m_levels.empty()) {
+      try {
+        if (getCurrentImage(m_flipConsole->getCurrentFrame())) hasFrame = true;
+      } catch (...) {
+        hasFrame = false;
+      }
+    }
+    if (!hasFrame) {
+      if (!m_levelNames.empty()) {
+        m_title1 = m_viewerTitle + " :: " + m_levelNames[0];
+        m_title.clear();
+      }
+      m_imageViewer->setImage(TImageP());
+    }
+  }
+  m_isOpeningSibling = false;
+}
+
+//-----------------------------------------------------------------------------
+
+void FlipBook::addFileNavigationMenu(QMenu *menu) {
+  if (m_fileNavPath.isEmpty() || !m_flipConsole->hasFileNavigation()) return;
+
+  const std::vector<ContentTypes::Definition> &definitions =
+      ContentTypes::definitions();
+  const int allMask = allContentTypesMask();
+  const int filter  = m_flipConsole->getFileTypeFilter() & allMask;
+
+  QMenu *submenu = menu->addMenu(createQIcon("browser_filterlist"),
+                                 tr("Content Type Filters"));
+  for (size_t i = 0; i < definitions.size(); ++i) {
+    const int bit   = 1 << i;
+    QAction *action = submenu->addAction(createQIcon(definitions[i].iconName),
+                                         ContentTypes::label(definitions[i]));
+    action->setCheckable(true);
+    action->setChecked(filter & bit);
+    connect(action, &QAction::triggered, this, [this, bit, allMask](bool on) {
+      int current = m_flipConsole->getFileTypeFilter() & allMask;
+      m_flipConsole->setFileTypeFilter(on ? (current | bit) : (current & ~bit));
+    });
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+// Left/Right are the default keys while no shortcut is assigned to the command.
+bool FlipBook::handleFileNavigationKey(QKeyEvent *event) {
+  if (!m_flipConsole->hasFileNavigation()) return false;
+  if (event->modifiers() & (Qt::ShiftModifier | Qt::ControlModifier |
+                            Qt::AltModifier | Qt::MetaModifier))
+    return false;
+
+  CommandManager *cManager = CommandManager::instance();
+  if (event->key() == Qt::Key_Left &&
+      cManager->getKeyFromId(MI_PrevFile) == 0) {
+    openSiblingFile(-1);
+    return true;
+  }
+  if (event->key() == Qt::Key_Right &&
+      cManager->getKeyFromId(MI_NextFile) == 0) {
+    openSiblingFile(1);
+    return true;
+  }
+  return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -1885,7 +2111,12 @@ void FlipBook::dropEvent(QDropEvent *e) {
 
 //-------------------------------------------------------------------
 
-void FlipBook::reset() {
+void FlipBook::reset() { resetState(true); }
+
+//-------------------------------------------------------------------
+
+// clearImage = false keeps the displayed frame until the next one is ready.
+void FlipBook::resetState(bool clearImage) {
   if (!m_isPreviewFx)  // The cache is owned by the PreviewFxManager otherwise
     clearCache();
   else
@@ -1893,9 +2124,11 @@ void FlipBook::reset() {
 
   m_levelNames.clear();
   m_levels.clear();
+  m_fileNavPath = TFilePath();
   m_framesCount = 0;
   m_palette     = 0;
-  m_imageViewer->setImage(TImageP());
+  m_title1.clear();
+  if (clearImage) m_imageViewer->setImage(TImageP());
   m_imageViewer->hideHistogram();
   m_isPreviewFx = false;
   m_previewedFx = 0;
@@ -1926,6 +2159,7 @@ void FlipBook::reset() {
   m_flipConsole->enableProgressBar(false);
   m_flipConsole->setProgressBarStatus(0);
   m_flipConsole->setFrameRange(1, 1, 1);
+  if (clearImage) updateFileNavigation();
 
   setTitle(tr("Flipbook"));
   parentWidget()->setWindowTitle(m_title);

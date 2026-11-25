@@ -225,6 +225,15 @@
 		<file>icons/dark/actions/16x16/framelast.svg</file>
 		<file>icons/dark/actions/16x16/frameprev.svg</file>
 		<file>icons/dark/actions/16x16/framenext.svg</file>
+		<file>icons/dark/actions/16x16/folder_prev.svg</file>
+		<file>icons/dark/actions/16x16/folder_next.svg</file>
+		<file>icons/dark/actions/16x16/browser_toonz_raster_file.svg</file>
+		<file>icons/dark/actions/16x16/browser_image_file.svg</file>
+		<file>icons/dark/actions/16x16/browser_toonz_vector_file.svg</file>
+		<file>icons/dark/actions/16x16/browser_psd_file.svg</file>
+		<file>icons/dark/actions/16x16/browser_svg_file.svg</file>
+		<file>icons/dark/actions/16x16/browser_media_file.svg</file>
+		<file>icons/dark/actions/16x16/browser_filterlist.svg</file>
 		<file>icons/dark/actions/16x16/prev_drawing.svg</file>
 		<file>icons/dark/actions/16x16/next_drawing.svg</file>
 		<file>icons/dark/actions/16x16/nextstep.svg</file>

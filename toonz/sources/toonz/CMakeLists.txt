@@ -29,6 +29,7 @@ set(MOC_HEADERS
     comboviewerpane.h
     commandbar.h
     commandbarpopup.h
+    contenttypes.h
     convertpopup.h
     crashhandler.h
     duplicatepopup.h
