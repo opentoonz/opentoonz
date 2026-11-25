@@ -21,6 +21,8 @@
 #include "toonz/toonzscene.h"
 #include "toonz/sceneproperties.h"
 #include "toonz/preferences.h"
+#include "toonz/tcomposerrenderer.h"
+#include "toonz/tlog.h"
 
 #include "toonzqt/gutil.h"
 
@@ -31,10 +33,15 @@
 namespace {
 
 class NotifyMessage final : public TThread::Message {
-public:
-  NotifyMessage() {}
+  QString m_error;
 
-  void onDeliver() override { BatchesController::instance()->update(); }
+public:
+  NotifyMessage(const QString &error = QString()) : m_error(error) {}
+
+  void onDeliver() override {
+    BatchesController::instance()->update();
+    if (!m_error.isEmpty()) DVGui::error(m_error);
+  }
 
   TThread::Message *clone() const override { return new NotifyMessage(*this); }
 };
@@ -140,7 +147,9 @@ std::map<QString, QProcess *> RunningTasks;
 class TaskRunner final : public TThread::Runnable {
 public:
   TaskRunner(TFarmTask *task, int localControllerPort)
-      : m_task(task), m_localControllerPort(localControllerPort) {}
+      : m_task(task)
+      , m_localControllerPort(localControllerPort)
+      , m_rendererPath(Preferences::instance()->getTComposerPath()) {}
 
   void run() override;
 
@@ -152,6 +161,7 @@ public:
 
   TFarmTask *m_task;
   int m_localControllerPort;
+  QString m_rendererPath;
 };
 
 void TaskRunner::run() { doRun(m_task); }
@@ -230,6 +240,22 @@ commandline += " -farm ";
 commandline += QString::number(m_localControllerPort) + "@localhost";
 commandline += " -id " + task->m_id;*/
 
+  const bool customRenderer =
+      task->m_isComposerTask && !m_rendererPath.isEmpty();
+  const QString program = task->m_isComposerTask
+                              ? TComposerRenderer::executable(m_rendererPath)
+                              : task->getCommandLinePrgName();
+  if (customRenderer && !TComposerRenderer::isExecutable(program)) {
+    task->m_status         = Aborted;
+    task->m_failedSteps    = task->m_stepCount;
+    task->m_completionDate = QDateTime::currentDateTime();
+    NotifyMessage(QCoreApplication::translate("BatchesController",
+                                              "Renderer not found: %1")
+                      .arg(program))
+        .send();
+    return;
+  }
+
   QProcess *process = new QProcess();
   std::map<QString, QProcess *>::iterator it;
 
@@ -243,8 +269,17 @@ commandline += " -id " + task->m_id;*/
     RunningTasks[task->m_id] = process;
   }
 
-  process->setProgram(task->getCommandLinePrgName());
-  process->setArguments(task->getCommandLineArgumentsList());
+  process->setProgram(program);
+  QStringList arguments = task->getCommandLineArgumentsList();
+  if (customRenderer) {
+    process->setProcessEnvironment(TComposerRenderer::environment(program));
+    arguments << "-TOONZROOT" << TEnv::getStuffDir().getQString();
+  }
+  process->setArguments(arguments);
+  if (task->m_isComposerTask) {
+    TUserLogAppend log(TEnv::getStuffDir() + "toonzfarm" + "tcomposer.log");
+    log.info("Batch renderer: " + program.toStdString());
+  }
   process->start();
   process->waitForFinished(-1);
 
@@ -255,9 +290,24 @@ commandline += " -id " + task->m_id;*/
   // exitCode = QProcess::execute(task->getCommandLine());
 
   int error     = process->error();
-  bool statusOK = (error == QProcess::UnknownError) &&
-                  (process->exitCode() == 0 ||
-                   task->m_successfullSteps == task->m_stepCount);
+  bool statusOK =
+      (error == QProcess::UnknownError) &&
+      process->exitStatus() == QProcess::NormalExit &&
+      (process->exitCode() == 0 ||
+       (!customRenderer && task->m_successfullSteps == task->m_stepCount));
+
+  QString rendererError;
+  if (!statusOK && task->m_isComposerTask)
+    rendererError =
+        QCoreApplication::translate("BatchesController",
+                                    "Renderer failed: %1\n%2")
+            .arg(program,
+                 error == QProcess::FailedToStart
+                     ? process->errorString()
+                     : QString::fromUtf8(process->readAllStandardError())
+                           .trimmed()
+                           .left(2048));
+  delete process;
 
   if (statusOK) {
     task->m_status           = Completed;
@@ -269,7 +319,7 @@ commandline += " -id " + task->m_id;*/
 
   task->m_completionDate = QDateTime::currentDateTime();
 
-  NotifyMessage().send();
+  NotifyMessage(rendererError).send();
 }
 
 //------------------------------------------------------------------------------
