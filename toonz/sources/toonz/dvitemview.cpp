@@ -929,6 +929,31 @@ QRect DvItemViewerPanel::getCaptionRect(int index) const {
 
 //-----------------------------------------------------------------------------
 
+void DvItemViewerPanel::editCaption(int index) {
+  if (!getModel() || index < 0 || index >= getItemCount()) return;
+  updateViewParameters();
+  m_currentIndex = index;
+  m_editFld->setText(
+      getModel()->getItemData(index, DvItemListModel::Name).toString());
+  QRect fieldRect = getCaptionRect(index);
+  if (m_viewType == TableView) {
+    QRect itemRect = index2pos(index);
+    int nameWidth  = itemRect.width();
+    if (!m_columns.empty()) {
+      nameWidth = m_columns[0].second.first;
+      if (nameWidth > itemRect.width()) nameWidth = itemRect.width();
+    }
+    fieldRect =
+        QRect(itemRect.left(), itemRect.top(), nameWidth, itemRect.height());
+  }
+  m_editFld->setGeometry(fieldRect);
+  m_editFld->show();
+  m_editFld->selectAll();
+  m_editFld->setFocus(Qt::OtherFocusReason);
+}
+
+//-----------------------------------------------------------------------------
+
 int DvItemViewerPanel::getContentMinimumWidth() {
   switch (m_viewType) {
   case ListView:
