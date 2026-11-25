@@ -150,6 +150,7 @@ set(SOURCES
     perlinnoisefx.cpp
     pins.cpp
     posterizefx.cpp
+    printprocessfx.cpp
     premultiplyfx.cpp
     radialblurfx.cpp
     randomwavefx.cpp
