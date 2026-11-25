@@ -153,6 +153,7 @@ set(SOURCES
     premultiplyfx.cpp
     radialblurfx.cpp
     randomwavefx.cpp
+    celboilfx.cpp
     raylitfx.cpp
     rgbkeyfx.cpp
     rgbmcutfx.cpp

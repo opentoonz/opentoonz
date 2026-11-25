@@ -32,6 +32,7 @@
     STD_perlinNoiseFx
     STD_iwa_PerspectiveDistortFx 
     STD_randomWaveFx
+    STD_celBoilFx
     STD_rippleFx
     STD_warpFx
     STD_inoWarphvFx
