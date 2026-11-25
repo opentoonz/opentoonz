@@ -46,6 +46,19 @@ void initialize() {
 
 //-----------------------------------------------------------------------------
 
+namespace {
+
+QString resolveToolDir(QString dir) {
+  if (dir.isEmpty() || dir.at(0) == '.') {
+    dir = QCoreApplication::applicationDirPath() + "/" + dir;
+  }
+  return dir;
+}
+
+}  // namespace
+
+//-----------------------------------------------------------------------------
+
 void getFFmpegVideoSupported(QStringList &exts) {
   exts.append("gif");
   exts.append("mp4");
@@ -64,9 +77,7 @@ void getFFmpegAudioSupported(QStringList &exts) {
 
 bool findFFmpeg(QString dir) {
   // Relative path
-  if (dir.isEmpty() || dir.at(0) == ".") {
-    dir = QCoreApplication::applicationDirPath() + "/" + dir;
-  }
+  dir = resolveToolDir(dir);
 
   // Check if both executables exist
   return TSystem::doesExistFileOrLevel(TFilePath(dir + FFMPEG_EXE)) &&
@@ -178,20 +189,14 @@ void setFFmpegTimeout(int secs) {
 //-----------------------------------------------------------------------------
 
 void runFFmpeg(QProcess &process, const QStringList &arguments) {
-  QString dir = Preferences::instance()->getFfmpegPath();
-  if (dir.at(0) == '.')  // Relative path
-    dir = QCoreApplication::applicationDirPath() + "/" + dir;
-
+  QString dir = resolveToolDir(Preferences::instance()->getFfmpegPath());
   process.start(dir + FFMPEG_EXE, arguments);
 }
 
 //-----------------------------------------------------------------------------
 
 void runFFprobe(QProcess &process, const QStringList &arguments) {
-  QString dir = Preferences::instance()->getFfmpegPath();
-  if (dir.at(0) == '.')  // Relative path
-    dir = QCoreApplication::applicationDirPath() + "/" + dir;
-
+  QString dir = resolveToolDir(Preferences::instance()->getFfmpegPath());
   process.start(dir + FFPROBE_EXE, arguments);
 }
 
@@ -258,9 +263,7 @@ bool findRhubarb(QString dir) {
   // Rhubarb executable
 
   // Relative path
-  if (dir.isEmpty() || dir.at(0) == ".") {
-    dir = QCoreApplication::applicationDirPath() + "/" + dir;
-  }
+  dir = resolveToolDir(dir);
 
   // Check if executable exist
   return TSystem::doesExistFileOrLevel(TFilePath(dir + RHUBARB_EXE));
@@ -296,10 +299,7 @@ QString autodetectRhubarb() {
 //-----------------------------------------------------------------------------
 
 void runRhubarb(QProcess &process, const QStringList &arguments) {
-  QString dir = Preferences::instance()->getRhubarbPath();
-  if (dir.at(0) == '.')  // Relative path
-    dir = QCoreApplication::applicationDirPath() + "/" + dir;
-
+  QString dir = resolveToolDir(Preferences::instance()->getRhubarbPath());
   process.start(dir + RHUBARB_EXE, arguments);
 }
 
