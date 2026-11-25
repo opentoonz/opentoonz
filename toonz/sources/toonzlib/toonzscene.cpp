@@ -1246,6 +1246,27 @@ TXshLevel *ToonzScene::loadLevel(const TFilePath &actualPath,
 
 //-----------------------------------------------------------------------------
 
+namespace {
+
+// Reject any level path component that is a literal ".." reference, so a
+// scene-file-controlled path cannot be used to escape the resolved
+// project/alias directory via path traversal.
+bool containsParentDirReference(const TFilePath &fp) {
+  std::wstring ws = fp.getWideString();
+  size_t start    = 0;
+  for (size_t i = 0; i <= ws.size(); ++i) {
+    if (i == ws.size() || ws[i] == L'/' || ws[i] == L'\\') {
+      if (ws.compare(start, i - start, L"..") == 0) return true;
+      start = i + 1;
+    }
+  }
+  return false;
+}
+
+}  // namespace
+
+//-----------------------------------------------------------------------------
+
 TFilePath ToonzScene::decodeFilePath(const TFilePath &path) const {
   auto project        = getProject();
   bool projectIsEmpty = project->getFolderCount() ? false : true;
@@ -1254,6 +1275,7 @@ TFilePath ToonzScene::decodeFilePath(const TFilePath &path) const {
   std::wstring head;
   TFilePath tail;
   path.split(head, tail);
+  if (containsParentDirReference(tail)) tail = TFilePath();
 
   std::string h;
   std::wstring s;
