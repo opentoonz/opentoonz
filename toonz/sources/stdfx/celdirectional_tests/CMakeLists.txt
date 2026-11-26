@@ -1,0 +1,41 @@
+cmake_minimum_required(VERSION 3.18)
+project(CelDirectionalTests LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+find_package(Qt5 5.14 REQUIRED COMPONENTS Core Gui OpenGL)
+if(NOT OPENTOONZ_LIBRARY_DIR)
+    message(FATAL_ERROR "Set OPENTOONZ_LIBRARY_DIR to matching OpenToonz libraries")
+endif()
+get_filename_component(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../.." ABSOLUTE)
+add_executable(celdirectional_test celdirectional_test.cpp
+    "${SOURCE_DIR}/stdfx/celdirectionalmath.cpp" "${SOURCE_DIR}/stdfx/celmotion.cpp"
+    "${SOURCE_DIR}/stdfx/celnoise.cpp" "${SOURCE_DIR}/stdfx/stdfx.cpp"
+    "${SOURCE_DIR}/stdfx/gradients.cpp")
+target_include_directories(celdirectional_test PRIVATE
+    "${SOURCE_DIR}/include" "${SOURCE_DIR}/stdfx")
+include(TestBigEndian)
+test_big_endian(BIG_ENDIAN)
+if(BIG_ENDIAN)
+    target_compile_definitions(celdirectional_test PRIVATE TNZ_LITTLE_ENDIAN=0)
+else()
+    target_compile_definitions(celdirectional_test PRIVATE TNZ_LITTLE_ENDIAN=1)
+endif()
+if(APPLE)
+    target_compile_definitions(celdirectional_test PRIVATE
+        MACOSX __MACOS__ i386 x64 GL_SILENCE_DEPRECATION)
+elseif(UNIX)
+    target_compile_definitions(celdirectional_test PRIVATE LINUX)
+endif()
+foreach(library tnzcore tnzbase tnzext toonzlib)
+    find_library(${library}_PATH NAMES ${library}
+        PATHS "${OPENTOONZ_LIBRARY_DIR}" NO_DEFAULT_PATH REQUIRED)
+    target_link_libraries(celdirectional_test PRIVATE "${${library}_PATH}")
+endforeach()
+target_link_libraries(celdirectional_test PRIVATE Qt5::Core Qt5::Gui Qt5::OpenGL)
+enable_testing()
+foreach(case tiles gain canceled missing)
+    add_test(NAME celdirectional_${case} COMMAND celdirectional_test ${case})
+    set_tests_properties(celdirectional_${case} PROPERTIES
+        ENVIRONMENT "DYLD_LIBRARY_PATH=${OPENTOONZ_LIBRARY_DIR};UBSAN_OPTIONS=halt_on_error=1")
+endforeach()
