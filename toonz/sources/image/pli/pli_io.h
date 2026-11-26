@@ -13,6 +13,7 @@
 
 #include "tfilepath.h"
 #include "tvectorimage.h"
+#include "thidelinesegment.h"
 #include "tstroke.h"
 
 #include <QString>
@@ -80,6 +81,7 @@ public:
     OUTLINE_OPTIONS_GOBJ,
     PRECISION_SCALE_GOBJ,
     AUTOCLOSE_TOLERANCE_GOBJ,
+    HIDE_LINE_SEGMENTS_GOBJ,
     // ...
     HOW_MANY_TAG_TYPES
   };
@@ -416,6 +418,16 @@ public:
 
   StrokeOutlineOptionsTag();
   StrokeOutlineOptionsTag(const TStroke::OutlineOptions &options);
+};
+
+//=====================================================================
+
+class HideLineSegmentsTag final : public PliObjectTag {
+public:
+  std::vector<THideLineSegment> m_segments;
+
+  HideLineSegmentsTag();
+  explicit HideLineSegmentsTag(const std::vector<THideLineSegment> &segments);
 };
 
 //=====================================================================

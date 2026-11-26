@@ -977,6 +977,7 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
   rd.m_ink1CheckColor        = Preferences::instance()->getInk1CheckColor();
   rd.m_paintCheckColor       = Preferences::instance()->getPaintCheckColor();
   rd.m_show0ThickStrokes     = prefs.getShow0ThickLines();
+  rd.m_showHideLineStrokes   = prefs.getShowHideLineStrokes();
   rd.m_regionAntialias       = prefs.getRegionAntialias();
   rd.m_animatedGuidedDrawing = prefs.getAnimatedGuidedDrawing();
   if (player.m_onionSkinDistance != 0 &&

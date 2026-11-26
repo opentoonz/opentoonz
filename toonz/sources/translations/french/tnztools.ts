@@ -675,6 +675,17 @@
     </message>
 </context>
 <context>
+    <name>HideLineTool</name>
+    <message>
+        <source>Fill-block</source>
+        <translation>Fill-block</translation>
+    </message>
+    <message>
+        <source>Fill-through</source>
+        <translation>Fill-through</translation>
+    </message>
+</context>
+<context>
     <name>HookTool</name>
     <message>
         <source>Snap</source>
