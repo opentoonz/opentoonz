@@ -261,7 +261,7 @@ std::string CelRadialBlurFx::getAlias(double frame,
                                       const TRenderSettings &settings) const {
   std::ostringstream out;
   out.imbue(std::locale::classic());
-  out << TRasterFx::getAlias(frame, settings) << "[celRadial:"
+  out << TRasterFx::getAlias(frame, settings) << "[celRadialAdaptive1:"
       << std::setprecision(std::numeric_limits<double>::max_digits10);
   const TPointD center = m_center->getValue(frame);
   out << center.x << ',' << center.y;
@@ -536,13 +536,18 @@ bool renderRadial(const CelMotion::Image &source,
             sideLength(strength * targetSize * noiseFactor,
                        offset * targetSize * noiseFactor, offsetMode);
         if (!(maximum > 0)) continue;
-        const int sampleCount = int(std::ceil(settings.quality));
+        // A fixed number of taps leaves disconnected copies of narrow
+        // features as strength increases. Keep at least one sample per source
+        // pixel of trajectory; Quality adds subpixel sampling. Both radial
+        // paths travel no farther than the requested parameter distance.
+        const double samples =
+            std::max(settings.quality, maximum * std::sqrt(settings.quality));
+        const int sampleCount = int(std::ceil(samples));
         for (int i = 1; i <= sampleCount; ++i) {
           if ((i & 15) == 0 && isCanceled(cancel)) return false;
-          const double fraction = std::min(1.0, double(i) / settings.quality);
+          const double fraction = std::min(1.0, double(i) / samples);
           const double sampleWeight =
-              (i == sampleCount ? settings.quality - (sampleCount - 1) : 1.0) /
-              settings.quality;
+              (i == sampleCount ? samples - (sampleCount - 1) : 1.0) / samples;
           const double distance         = fraction * maximum;
           const CelRadial::Point sample = CelRadial::trajectory(
               {gx, gy}, settings.center, settings.ratio, settings.angle,

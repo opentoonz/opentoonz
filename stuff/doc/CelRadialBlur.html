@@ -13,9 +13,11 @@ Both can be used at once. Strengths accept 0–2000 pixels. Each side also has a
 Offset from 0–500 pixels and an Offset Mode: Add adds the offset, Max uses the
 larger value, and Override uses the offset.</p>
 <p>Ellipse Ratio ranges from 0–5 and Angle rotates its axes. Ratio 1 is circular;
-ratio 0 uses the limiting very thin ellipse. Quality controls the number of
-trajectory sampling from 1–50, including fractional values. Larger values smooth longer trails at greater
-rendering cost. The viewer's center and ellipse handles also edit the native
+ratio 0 uses the limiting very thin ellipse. Quality ranges from 1–50, including fractional values.
+Sampling automatically grows with trail length to avoid separated copies of
+narrow features. Quality 1 uses at least one sample per source pixel of
+trajectory; higher values add subpixel samples. Longer trails and higher
+Quality increase rendering cost. The viewer's center and ellipse handles also edit the native
 parameters.</p>
 <h2>Edges, size and brightness</h2>
 <p>Outer Edge Fade softens the inner side of each group along the zoom or
