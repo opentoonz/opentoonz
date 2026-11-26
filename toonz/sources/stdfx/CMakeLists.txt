@@ -127,6 +127,7 @@ set(SOURCES
     freedistortfx.cpp
     gammafx.cpp
     glowfx.cpp
+    starglowfx.cpp
     gradients.cpp
     hsvkeyfx.cpp
     celcolorexpandfx.cpp
