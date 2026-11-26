@@ -137,6 +137,8 @@ set(SOURCES
     kaleido.cpp
     linearwavefx.cpp
     localblurfx.cpp
+    celboundaryblurfx.cpp
+    celblur.cpp
     localtransparencyfx.cpp
     mosaicfx.cpp
     motionblurfx.cpp
