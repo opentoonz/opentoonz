@@ -18,6 +18,7 @@
 #include "orientation.h"
 #include "xshbreadcrumbs.h"
 #include <boost/optional.hpp>
+#include <memory>
 #include "tenv.h"
 
 using boost::optional;
@@ -649,6 +650,12 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
   bool m_isCurrentColumnSwitched;
 
   XsheetGUI::DragTool *m_dragTool;
+  // A release (or leave) that arrives re-entrantly while the drag tool's
+  // onClick() is still running must not delete the tool under it; it is
+  // deferred until onClick() returns.
+  bool m_inDragToolClick = false;
+  std::unique_ptr<QMouseEvent> m_deferredDragToolRelease;
+  bool m_deferredDragToolLeave = false;
 
   bool m_isComputingSize;
 

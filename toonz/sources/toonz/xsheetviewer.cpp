@@ -333,7 +333,23 @@ void XsheetViewer::setDragTool(XsheetGUI::DragTool *dragTool) {
 //-----------------------------------------------------------------------------
 
 void XsheetViewer::dragToolClick(QMouseEvent *e) {
-  if (m_dragTool) m_dragTool->onClick(e);
+  if (!m_dragTool) return;
+  // If events are processed re-entrantly while onClick() runs (it switches
+  // the current column/frame, which notifies many listeners), the matching
+  // release can arrive before onClick() returns. Deleting the tool then
+  // leaves onClick() running on freed memory, so defer it to here.
+  m_inDragToolClick = true;
+  m_dragTool->onClick(e);
+  m_inDragToolClick = false;
+
+  if (m_deferredDragToolRelease) {
+    std::unique_ptr<QMouseEvent> release = std::move(m_deferredDragToolRelease);
+    m_deferredDragToolLeave              = false;
+    dragToolRelease(release.get());
+  } else if (m_deferredDragToolLeave) {
+    m_deferredDragToolLeave = false;
+    dragToolLeave(nullptr);
+  }
 }
 
 void XsheetViewer::dragToolDrag(QMouseEvent *e) {
@@ -341,11 +357,14 @@ void XsheetViewer::dragToolDrag(QMouseEvent *e) {
 }
 
 void XsheetViewer::dragToolRelease(QMouseEvent *e) {
-  if (m_dragTool) {
-    m_dragTool->onRelease(e);
-    delete getDragTool();
-    m_dragTool = 0;
+  if (!m_dragTool) return;
+  if (m_inDragToolClick) {
+    m_deferredDragToolRelease.reset(new QMouseEvent(*e));
+    return;
   }
+  m_dragTool->onRelease(e);
+  delete getDragTool();
+  m_dragTool = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -367,10 +386,13 @@ void XsheetViewer::dragToolRelease(QDropEvent *e) {
 }
 
 void XsheetViewer::dragToolLeave(QEvent *e) {
-  if (m_dragTool) {
-    delete getDragTool();
-    m_dragTool = 0;
+  if (!m_dragTool) return;
+  if (m_inDragToolClick) {
+    m_deferredDragToolLeave = true;
+    return;
   }
+  delete getDragTool();
+  m_dragTool = 0;
 }
 
 //-----------------------------------------------------------------------------
