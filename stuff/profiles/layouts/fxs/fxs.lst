@@ -123,6 +123,7 @@
     STD_toneHighlightFx
     STD_castShadowFx
     STD_dropShadowFx
+    STD_lightShadingFx
     STD_colorRaylitFx
     STD_inoFogFx
     STD_glowFx
