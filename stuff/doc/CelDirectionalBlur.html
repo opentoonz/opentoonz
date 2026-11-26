@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Cel Directional Blur</title></head>
+<body>
+<h1>Cel Directional Blur</h1>
+<p>Create asymmetric cel streaks with independent forward and backward tails.
+Add this effect from Blur and connect Source. Connect an image to Noise when
+using Layer noise. All fourteen controls support native animation, undo,
+presets, scene persistence and macro exposure.</p>
+<h2>Direction and shapes</h2>
+<ul>
+<li>Angle: counterclockwise direction in degrees; default 0 points right.</li>
+<li>Brightness Gain: 0 to 10, default 1. Changes RGB without changing alpha.
+Integer output retains valid premultiplication; float output preserves HDR.</li>
+<li>Size Variation: 0 to 100, default 0. Covered pixels form eight-connected
+groups, including touching and overlapping shapes. Group size is the square
+root of covered-pixel count. At 100 the smallest group has no streak; larger
+groups interpolate toward the largest group's full strength. If all groups
+are equal-sized, all count as smallest.</li>
+</ul>
+<h2>Front and Back</h2>
+<p>Each direction has its own complete set of controls, all initially zero:</p>
+<ul>
+<li>Blur Strength: 0 to 4000 source pixels. Front follows Angle; Back points
+the opposite way. Zero on both sides is the original image, with gain applied.</li>
+<li>Edge Fade: 0 to 100. Fades the opposite edge of each group into that
+direction's streak. Its fade region grows from one tenth of the group's
+projected length to the full length as Size Variation goes from 0 to 100.</li>
+<li>Sharp Tail: 0 to 100. Shortens streaks toward the sides of each group's
+cross section, creating pointed tails. It does not merge disconnected groups.</li>
+</ul>
+<h2>Noise</h2>
+<ul>
+<li>Noise Variation: 0 to 100, default 0. Interpolates between full strength
+and the noise intensity at each source pixel.</li>
+<li>Noise Type: Smooth, Block or Layer; default Smooth. Smooth interpolates
+a deterministic lattice. Block shares a value within each noise cell. Layer
+uses the Noise input's brightness in the same global coordinates as Source.</li>
+<li>Seed: integer 1 to 1000, default 1. Changes the procedural pattern.</li>
+<li>Offset: animated degrees, default 0. Each 360 degrees moves through one
+noise interval. Both procedural modes interpolate continuously over time.</li>
+<li>Thickness: 1 to 100 source pixels, default 10. Larger cells give wider
+noise bands. Seed, Offset and Thickness apply to Smooth and Block only.</li>
+</ul>
+<p>Noise inputs include their upstream effects and transforms. Layer intensity
+is premultiplied display luminance, bounded to 0–1. White retains the full
+strength; black or transparent noise shortens the streak. Missing Noise is
+black. Noise Variation 0 ignores the Noise input entirely. Seed and choice
+values round to the nearest whole number; choice keys are stepped.</p>
+<h2>Native rendering semantics</h2>
+<p>Each covered source pixel contributes a linearly fading trajectory to both
+lobes. Contributions are bilinearly placed; overlapping colors are normalized
+by coverage rather than darkened by empty space. Alpha accumulates and is
+bounded to one. This can expand the silhouette. Shape fade and tail profiles
+are evaluated over the complete source domain, independently of output tiles.</p>
+<p>This is a native adaptation with explicitly defined connectivity, size,
+fade, tail and noise formulas. It does not claim binary equivalence with an
+effect in another application.</p>
+<p>Finite image bounds define the analysis domain. Infinite generators use the
+render camera domain; connect a finite source when no camera domain is available.
+The analysis limit is approximately 53 million pixels and supports 4K square
+and 8K UHD sources. Allocation limits are checked before creating host rasters.
+The source and optional noise image are retained per render call; concurrent
+tiles do not share mutable analysis. Long trajectories are clipped to the output
+tile before stepping. Runtime still grows with covered pixels and visible streak
+length. Cancellation discards unfinished output.</p>
+<p>Raster levels use their native pixel grid for strength and thickness before
+DPI and geometry placement; ambiguous or vector inputs use the scene grid.
+Rotation, reflection and shear are applied by the host after filtering in the
+effect's axes. Negative origins, strip renders and out-of-order frames use the same
+global sampling domain and noise pattern.</p>
+</body>
+</html>
