@@ -343,7 +343,7 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event) {
     bool addedSep = false;
 
     if (m_isHistogramEnable &&
-        visibleRegion().contains(event->pos() * getDevPixRatio())) {
+        visibleRegion().contains(event->pos())) {  // logical pixels
       menu->addSeparator();
       addedSep = true;
       action   = menu->addAction(tr("Show Histogram"));
@@ -482,9 +482,10 @@ void ImageViewer::initializeGL() {
 
 //-----------------------------------------------------------------------------
 
-void ImageViewer::resizeGL(int w, int h) {
-  w *= getDevPixRatio();
-  h *= getDevPixRatio();
+void ImageViewer::resizeGL(int, int) {
+  // Device pixels; the arguments are in logical pixels.
+  int w = width();
+  int h = height();
   glViewport(0, 0, w, h);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
@@ -507,12 +508,14 @@ void ImageViewer::resizeGL(int w, int h) {
     } else  // normally, initialize with GL_RGBA8 format
       m_fbo = new QOpenGLFramebufferObject(w, h);
   }
+  markDeviceSizeApplied();
 }
 
 //-----------------------------------------------------------------------------
 
 void ImageViewer::paintGL() {
   initializeOpenGLFunctions();
+  applyDeviceViewport();
   if (m_lutCalibrator && m_lutCalibrator->isValid()) m_fbo->bind();
 
   TDimension viewerSize(width(), height());
@@ -734,7 +737,7 @@ void ImageViewer::panQt(const QPoint &delta) {
    center
                 \b center.
 */
-void ImageViewer::zoomQt(const QPoint &center, double factor) {
+void ImageViewer::zoomQt(const QPointF &center, double factor) {
   if (factor == 1.0) return;
   TPointD delta(center.x(), center.y());
   double scale2 = fabs(m_viewAff.det());
@@ -866,7 +869,7 @@ void ImageViewer::mouseMoveEvent(QMouseEvent *event) {
     return;
   }
 
-  QPoint curQPos = event->pos() * getDevPixRatio();
+  QPoint curQPos = (event->localPos() * getDevPixRatio()).toPoint();
 
   TPoint curPos = TPoint(curQPos.x(), curQPos.y());
 
@@ -1027,9 +1030,10 @@ void ImageViewer::pickColor(QMouseEvent *event, bool putValueToStyleEditor) {
   } else if (!img->raster()) {  // vector image
     // For unknown reasons, glReadPixels is covering the entire window not the
     // OpenGL widget.
+    // Both coordinates in device pixels.
     QPointF winPos = event->windowPos() * getDevPixRatio();
     TPointD mousePos =
-        TPointD(winPos.x(), (double)(window()->height()) - winPos.y());
+        TPointD(winPos.x(), window()->height() * getDevPixRatio() - winPos.y());
     TRectD area  = TRectD(mousePos.x, mousePos.y, mousePos.x, mousePos.y);
     TPixel32 pix = picker.pickColor(area);
     m_histogramPopup->updateInfo(pix, imagePos);
@@ -1121,10 +1125,10 @@ void ImageViewer::rectPickColor(bool putValueToStyleEditor) {
     m_histogramPopup->updateAverageColor(TPixel32::Transparent);
     return;
   }
-  TPointD start = getViewAff().inv() *
-                  TPointD(startPos.x - width() / 2, startPos.y - height() / 2);
-  TPointD end = getViewAff().inv() *
-                TPointD(endPos.x - width() / 2, endPos.y - height() / 2);
+  TPointD start = getViewAff().inv() * TPointD(startPos.x - width() * 0.5,
+                                               startPos.y - height() * 0.5);
+  TPointD end   = getViewAff().inv() *
+                TPointD(endPos.x - width() * 0.5, endPos.y - height() * 0.5);
 
   TPixel32 pixForStyleEditor;
   if (img->raster()->getPixelSize() == 8)  // 16bpc raster
@@ -1210,7 +1214,7 @@ void ImageViewer::mousePressEvent(QMouseEvent *event) {
     return;
   }
 
-  m_pos                   = event->pos() * getDevPixRatio();
+  m_pos                   = (event->localPos() * getDevPixRatio()).toPoint();
   m_pressedMousePos       = TPoint(m_pos.x(), m_pos.y());
   m_mouseButton           = event->button();
   m_draggingZoomSelection = false;
@@ -1340,8 +1344,9 @@ void ImageViewer::wheelEvent(QWheelEvent *event) {
          m_touchDevice == QTouchDevice::TouchScreen) ||
         m_gestureActive == false) {
       int d = delta > 0 ? 120 : -120;
-      QPoint center(event->position().x() * getDevPixRatio() - width() / 2,
-                    -event->position().y() * getDevPixRatio() + height() / 2);
+      QPointF center(
+          event->position().x() * getDevPixRatio() - width() * 0.5,
+          -event->position().y() * getDevPixRatio() + height() * 0.5);
       zoomQt(center, exp(0.001 * d));
     }
   }
@@ -1572,9 +1577,9 @@ void ImageViewer::gestureEvent(QGestureEvent *e) {
           }
         }
         if (m_zooming) {
-          const QPoint center(
-              firstCenter.x() * getDevPixRatio() - width() / 2,
-              -firstCenter.y() * getDevPixRatio() + height() / 2);
+          const QPointF center(
+              firstCenter.x() * getDevPixRatio() - width() * 0.5,
+              -firstCenter.y() * getDevPixRatio() + height() * 0.5);
           zoomQt(center, scaleFactor);
           m_panning = false;
         }
@@ -1618,8 +1623,8 @@ void ImageViewer::touchEvent(QTouchEvent *e, int type) {
         }
       }
       if (m_panning) {
-        QPoint curPos      = panPoint.pos().toPoint() * getDevPixRatio();
-        QPoint lastPos     = panPoint.lastPos().toPoint() * getDevPixRatio();
+        QPoint curPos      = (panPoint.pos() * getDevPixRatio()).toPoint();
+        QPoint lastPos     = (panPoint.lastPos() * getDevPixRatio()).toPoint();
         QPoint centerDelta = curPos - lastPos;
         panQt(centerDelta);
       }

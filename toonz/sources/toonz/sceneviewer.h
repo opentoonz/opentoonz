@@ -387,7 +387,7 @@ protected:
   void panQt(const QPointF &delta);
 
   // center: window coordinate, pixels, topleft origin
-  void zoomQt(const QPoint &center, double scaleFactor);
+  void zoomQt(const QPointF &center, double scaleFactor);
 
   void mouseScrub(const TMouseEvent &e);
 

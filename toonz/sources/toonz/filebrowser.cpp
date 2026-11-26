@@ -918,16 +918,19 @@ QVariant FileBrowser::getItemData(int index, DataType dataType,
     QSize iconSize = m_itemViewer->getPanel()->getIconSize();
     // parent folder icons
     if (item.m_path == m_folder.getParentDir()) {
-      static QPixmap folderUpPixmap(getIconPath("folder_browser_up"));
+      // rendered at device resolution, not scaled from 1x
+      static QPixmap folderUpPixmap(
+          svgToPixmap(getIconPath("folder_browser_up")));
       return folderUpPixmap;
     }
     // folder icons
     else if (item.m_isFolder) {
       if (item.m_isLink) {
-        static QPixmap folderLinkPixmap(getIconPath("folder_browser_link"));
+        static QPixmap folderLinkPixmap(
+            svgToPixmap(getIconPath("folder_browser_link")));
         return folderLinkPixmap;
       } else {
-        static QPixmap folderPixmap(getIconPath("folder_browser"));
+        static QPixmap folderPixmap(svgToPixmap(getIconPath("folder_browser")));
         return folderPixmap;
       }
     }

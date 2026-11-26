@@ -82,6 +82,7 @@ public:
   void setImage(const TImageP &img) { m_img = img; }
 
   void paintGL() override {
+    applyDeviceViewport();
     drawBackground();
 
     if (m_img) {

@@ -370,18 +370,26 @@ void ToolUtils::drawCursor(TToolViewer* viewer, TTool* tool,
     TPointD dpiScale = viewer->getDpiScale();
     TPointD scPos(pos.x * dpiScale.x, pos.y * dpiScale.y);
 
-    TPointD brushWinD = viewer->worldToPos(tool->getMatrix() * scPos) / viewer->getDevPixRatio();
-    QPointF brushWin(brushWinD.x, w->height() - brushWinD.y);
-    
+    // worldToPos() gives device pixels with the origin at the bottom-left;
+    // the painter below works in logical pixels with the origin at the top.
+    TPointD brushWinD = viewer->worldToPos(tool->getMatrix() * scPos);
+    QPointF brushWin(brushWinD.x, viewer->height() - brushWinD.y);
+    brushWin /= viewer->getDevPixRatio();
+
     QPoint hot = cursor.hotSpot();
+    // logical size of the pixmap
+    QSizeF cursorSize =
+        QSizeF(cursorPixmap.size()) / cursorPixmap.devicePixelRatioF();
 
     QPainter painter(w);
     static QPointF oldBrushWin;
-    QRect dirtyRect = QRect((oldBrushWin - QPointF(hot)).toPoint(), cursorPixmap.size());
-    w->update(dirtyRect);
+    // aligned outwards, since the cursor is drawn at a fractional position
+    QRect dirtyRect =
+        QRectF(oldBrushWin - QPointF(hot), cursorSize).toAlignedRect();
+    w->update(dirtyRect.adjusted(-1, -1, 1, 1));
     oldBrushWin = brushWin;
 
-    painter.drawPixmap((brushWin - QPointF(hot)).toPoint(), cursorPixmap);
+    painter.drawPixmap(brushWin - QPointF(hot), cursorPixmap);
 }
 
 QList<TRect> ToolUtils::splitRect(const TRect &first, const TRect &second) {
@@ -1560,22 +1568,22 @@ void ToolUtils::drawBalloon(const TPointD &pos, std::string text,
                             std::vector<TRectD> *otherBalloons) {
   TToolViewer *viewer =
       TTool::getApplication()->getCurrentTool()->getTool()->getViewer();
-  int devPixRatio = getDevicePixelRatio(viewer->viewerWidget());
-  QString qText   = QString::fromStdString(text);
+  qreal devPixRatio = getDevicePixelRatio(viewer->viewerWidget());
+  QString qText     = QString::fromStdString(text);
   QFont font("Arial");  // ,QFont::Bold);
-  font.setPixelSize(13 * devPixRatio);
+  font.setPixelSize(qRound(13 * devPixRatio));
   QFontMetrics fm(font);
   QRect textRect = fm.boundingRect(qText);
 
   int baseLine = -textRect.top();
-  int mrg      = 3 * devPixRatio;
+  int mrg      = qRound(3 * devPixRatio);
 
   // avoid other balloons
   if (otherBalloons) {
     QRect tmpTextRect = textRect;
     int tmpMrg        = mrg;
     // for high dpi monitors
-    if (devPixRatio != 1) {
+    if (devPixRatio != 1.0) {
       QFont tmpFont = font;
       tmpFont.setPixelSize(13);
       QFontMetrics tmpFm(tmpFont);
@@ -1600,11 +1608,11 @@ void ToolUtils::drawBalloon(const TPointD &pos, std::string text,
     balloons.push_back(balloonRect);
   }
 
-  delta.x *= devPixRatio;
-  delta.y *= devPixRatio;
+  delta.x = qRound(delta.x * devPixRatio);
+  delta.y = qRound(delta.y * devPixRatio);
 
-  textRect.moveTo(std::max(delta.x, 10 * devPixRatio + mrg),
-                  std::max(mrg + 2 * devPixRatio, -delta.y - baseLine));
+  textRect.moveTo(std::max(delta.x, qRound(10 * devPixRatio) + mrg),
+                  std::max(mrg + qRound(2 * devPixRatio), -delta.y - baseLine));
 
   int y  = textRect.top() + baseLine;
   int x0 = textRect.left() - mrg;
@@ -1650,8 +1658,9 @@ void ToolUtils::drawBalloon(const TPointD &pos, std::string text,
     return;
   }
 
-  QSize size(textRect.width() + textRect.left() + mrg,
-             std::max(textRect.bottom() + mrg, y + delta.y) + 3 * devPixRatio);
+  QSize size(
+      textRect.width() + textRect.left() + mrg,
+      std::max(textRect.bottom() + mrg, y + delta.y) + qRound(3 * devPixRatio));
 
   QImage label(size.width(), size.height(), QImage::Format_ARGB32);
   label.fill(Qt::transparent);
@@ -1704,9 +1713,10 @@ void ToolUtils::drawHook(const TPointD &pos, ToolUtils::HookType type,
                          bool highlighted, bool onionSkin) {
   TToolViewer *viewer =
       TTool::getApplication()->getCurrentTool()->getTool()->getViewer();
-  int devPixRatio = getDevicePixelRatio(viewer->viewerWidget());
+  qreal devPixRatio = getDevicePixelRatio(viewer->viewerWidget());
   int r = 10, d = r + r;
-  QImage image(d * devPixRatio, d * devPixRatio, QImage::Format_ARGB32);
+  int imageSize = qRound(d * devPixRatio);
+  QImage image(imageSize, imageSize, QImage::Format_ARGB32);
   image.fill(Qt::transparent);
   // image.fill(qRgba(200,200,0,200));
   QPainter painter(&image);
@@ -1742,7 +1752,7 @@ void ToolUtils::drawHook(const TPointD &pos, ToolUtils::HookType type,
 
   QImage texture = QGLWidget::convertToGLFormat(image);
   glRasterPos2f(pos.x, pos.y);
-  glBitmap(0, 0, 0, 0, -r * devPixRatio, -r * devPixRatio, NULL);
+  glBitmap(0, 0, 0, 0, -imageSize * 0.5, -imageSize * 0.5, NULL);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glDrawPixels(texture.width(), texture.height(), GL_RGBA, GL_UNSIGNED_BYTE,

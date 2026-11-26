@@ -515,6 +515,7 @@ public:
   }
 
   void paintGL() override {
+    applyDeviceViewport();
     drawBackground();
 
     // Draw original

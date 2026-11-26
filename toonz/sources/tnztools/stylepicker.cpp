@@ -87,14 +87,13 @@ int StylePicker::pickStyleId(const TPointD &pos, double radius, double scale2,
     // la thickness, cioe' la min distance dalla outline e non dalla centerLine
     strokeFound = vi->getNearestStroke(pos, w, index, dist2);
     if (strokeFound) {
-      int devPixRatio = getDevicePixelRatio(m_widget);
+      qreal devPixRatio = getDevicePixelRatio(m_widget);
       dist2 *= scale2;
       TStroke *stroke = vi->getStroke(index);
       thick           = stroke->getThickPoint(w).thick;
       double len2     = thick * thick * scale2;
       const double minDist2 =
-          (styleId == 0) ? radius * radius * (double)(devPixRatio * devPixRatio)
-                         : 0;
+          (styleId == 0) ? radius * radius * devPixRatio * devPixRatio : 0;
       double checkDist = std::max(minDist2, len2);
       if (dist2 < checkDist) {
         assert(stroke);

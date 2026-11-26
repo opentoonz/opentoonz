@@ -260,7 +260,9 @@ void PlasticTool::draw_rigidity() {
     {
       tglMultMatrix(TScale(1.0 / dpiScale.x, 1.0 / dpiScale.y));
 
-      double pixelSize = sqrt(tglGetPixelSize2());
+      // logical pixels, as in the other plastic tool modes
+      double pixelSize =
+          sqrt(tglGetPixelSize2()) * TTool::getViewer()->getDevPixRatio();
 
       // Draw original skeleton
       const PlasticSkeletonP &skeleton = this->skeleton();

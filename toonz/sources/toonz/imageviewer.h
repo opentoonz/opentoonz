@@ -159,7 +159,7 @@ protected:
   void wheelEvent(QWheelEvent *) override;
 
   void panQt(const QPoint &delta);
-  void zoomQt(const QPoint &center, double factor);
+  void zoomQt(const QPointF &center, double factor);
 
   void dragCompare(const QPoint &dp);
 

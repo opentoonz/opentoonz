@@ -273,7 +273,7 @@ GenericPanel::~GenericPanel() {}
 
 void GenericPanel::paintEvent(QPaintEvent *e) {
   QPainter p(this);
-  p.setPen(m_viewer->getLightLineColor());
+  p.setPen(pixelAlignedPen(m_viewer->getLightLineColor(), 1, p.device()));
   for (int c = 0;; c++) {
     int x = getViewer()->columnToX(c);
     if (x > width()) break;
@@ -378,11 +378,12 @@ void RowPanel::drawRows(QPainter &p, int r0, int r1) {
     QColor color      = (isMarkSecRow) ? getViewer()->getSecMarkerLineColor()
                         : (isMarkRow)  ? getViewer()->getMarkerLineColor()
                                        : getViewer()->getLightLineColor();
-    p.setPen(QPen(color,
-                  (isMarkSecRow)                                    ? 3.
-                  : (getViewer()->isSecMarkerActive() && isMarkRow) ? 2.
-                                                                    : 1.,
-                  Qt::SolidLine, Qt::FlatCap));
+    p.setPen(pixelAlignedPen(color,
+                             (isMarkSecRow) ? 3.
+                             : (getViewer()->isSecMarkerActive() && isMarkRow)
+                                 ? 2.
+                                 : 1.,
+                             p.device(), Qt::FlatCap));
     p.drawLine(x0, y, x1, y);
 
     if (simpleView && r > 0 && !getViewer()->isMarkRow(r + 1)) {
@@ -483,7 +484,8 @@ void CellPanel::paintEvent(QPaintEvent *e) {
   drawCells(painter, r0, c0, r1, c1);
 
   // draw columns
-  painter.setPen(getViewer()->getVerticalLineColor());
+  painter.setPen(pixelAlignedPen(getViewer()->getVerticalLineColor(), 1,
+                                 painter.device()));
   for (int col = c0; col <= c1; col++) {
     int x = getViewer()->columnToX(col);
     painter.drawLine(x, y0, x, y1);
@@ -498,11 +500,12 @@ void CellPanel::paintEvent(QPaintEvent *e) {
     QColor color      = (isMarkSecRow) ? getViewer()->getSecMarkerLineColor()
                         : (isMarkRow)  ? getViewer()->getMarkerLineColor()
                                        : getViewer()->getLightLineColor();
-    painter.setPen(QPen(color,
+    painter.setPen(
+        pixelAlignedPen(color,
                         (isMarkSecRow)                                    ? 3.
                         : (getViewer()->isSecMarkerActive() && isMarkRow) ? 2.
                                                                           : 1.,
-                        Qt::SolidLine, Qt::FlatCap));
+                        painter.device(), Qt::FlatCap));
     painter.drawLine(x0, y, x1, y);
   }
 }

@@ -148,7 +148,7 @@ void LayerFooterPanel::paintEvent(QPaintEvent* event) {
   // Only needed for drawing the separator line in horizontal mode
   if (!m_viewer->orientation()->isVerticalTimeline()) {
     QPainter p(this);
-    p.setPen(m_viewer->getVerticalLineColor());
+    p.setPen(pixelAlignedPen(m_viewer->getVerticalLineColor(), 1, p.device()));
 
     // Draw separator line
     QRect zoomOutRect = m_viewer->orientation()->rect(PredefinedRect::ZOOM_OUT);

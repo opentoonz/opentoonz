@@ -651,9 +651,10 @@ void HexagonalColorWheel::initializeGL() {
 
 //-----------------------------------------------------------------------------
 
-void HexagonalColorWheel::resizeGL(int w, int h) {
-  w *= getDevPixRatio();
-  h *= getDevPixRatio();
+void HexagonalColorWheel::resizeGL(int, int) {
+  // Device pixels; the arguments are in logical pixels.
+  int w                   = width();
+  int h                   = height();
   float d                 = (w - 5.0f) / 2.5f;
   bool isHorizontallyLong = ((d * 1.732f) < h) ? false : true;
 
@@ -703,11 +704,14 @@ void HexagonalColorWheel::resizeGL(int w, int h) {
     if (m_fbo) delete m_fbo;
     m_fbo = new QOpenGLFramebufferObject(w, h);
   }
+  markDeviceSizeApplied();
 }
 
 //-----------------------------------------------------------------------------
 
 void HexagonalColorWheel::paintGL() {
+  applyDeviceViewport();
+
   // call ClearColor() here in order to update bg color when the stylesheet is
   // switched
   QColor const color = getBGColor();
@@ -823,7 +827,7 @@ void HexagonalColorWheel::mousePressEvent(QMouseEvent *event) {
 
   // check whether the mouse cursor is in the wheel or in the triangle (or
   // nothing).
-  QPoint curPos = event->pos() * getDevPixRatio();
+  QPoint curPos = (event->localPos() * getDevPixRatio()).toPoint();
 
   QPolygonF wheelPolygon;
   // in the case of the wheel
@@ -858,10 +862,10 @@ void HexagonalColorWheel::mouseMoveEvent(QMouseEvent *event) {
   case none:
     break;
   case leftWheel:
-    clickLeftWheel(event->pos() * getDevPixRatio());
+    clickLeftWheel((event->localPos() * getDevPixRatio()).toPoint());
     break;
   case rightTriangle:
-    clickRightTriangle(event->pos() * getDevPixRatio());
+    clickRightTriangle((event->localPos() * getDevPixRatio()).toPoint());
     break;
   }
 }

@@ -141,8 +141,9 @@ bool PreviewSubCameraManager::mouseMoveEvent(SceneViewer *viewer,
   QPointF curPos(event.mousePos() * viewer->getDevPixRatio());
   if (event.buttons() == Qt::LeftButton) {
     if (!bitwiseContains(m_dragType, INNER)) {
-      if (std::abs(curPos.x() - m_mousePressPos.x()) > 10 ||
-          std::abs(curPos.y() - m_mousePressPos.y()) > 10)
+      double dragThres = 10 * viewer->getDevPixRatio();
+      if (std::abs(curPos.x() - m_mousePressPos.x()) > dragThres ||
+          std::abs(curPos.y() - m_mousePressPos.y()) > dragThres)
         m_clickAndDrag = true;
     }
 
@@ -297,10 +298,12 @@ UCHAR PreviewSubCameraManager::getSubCameraDragEnum(SceneViewer *viewer,
 
   if (subCamera.getLx() <= 0 || subCamera.getLy() <= 0) return NODRAG;
 
-  TPointD cameraPosL(winToCamera(viewer, mousePos - QPointF(10, 0)));
-  TPointD cameraPosR(winToCamera(viewer, mousePos + QPointF(10, 0)));
-  TPointD cameraPosT(winToCamera(viewer, mousePos - QPointF(0, 10)));
-  TPointD cameraPosB(winToCamera(viewer, mousePos + QPointF(0, 10)));
+  // grab margin of 10 logical pixels around the edges
+  double margin = 10 * viewer->getDevPixRatio();
+  TPointD cameraPosL(winToCamera(viewer, mousePos - QPointF(margin, 0)));
+  TPointD cameraPosR(winToCamera(viewer, mousePos + QPointF(margin, 0)));
+  TPointD cameraPosT(winToCamera(viewer, mousePos - QPointF(0, margin)));
+  TPointD cameraPosB(winToCamera(viewer, mousePos + QPointF(0, margin)));
 
   TRectD cameraPosBox(
       std::min({cameraPosL.x, cameraPosR.x, cameraPosT.x, cameraPosB.x}),

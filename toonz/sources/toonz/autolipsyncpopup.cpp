@@ -465,7 +465,7 @@ void AutoLipSyncPopup::updateThumbnail(int index) {
     pm = IconGenerator::instance()->getSizedIcon(m_sl, frameId, "");
   } else if (m_cl) {
     // Placeholder HiDPI for sub-xsheet
-    QImage img(int(160 * dpr), int(90 * dpr), QImage::Format_ARGB32);
+    QImage img(qRound(160 * dpr), qRound(90 * dpr), QImage::Format_ARGB32);
     img.setDevicePixelRatio(dpr);
     img.fill(Qt::gray);
 
@@ -485,7 +485,7 @@ void AutoLipSyncPopup::updateThumbnail(int index) {
 
   if (!pm.isNull()) {
     // Scale the pixmap in memory without affecting the cache
-    QPixmap scaled = pm.scaled(int(160 * dpr), int(90 * dpr),
+    QPixmap scaled = pm.scaled(qRound(160 * dpr), qRound(90 * dpr),
                                Qt::KeepAspectRatio, Qt::SmoothTransformation);
     scaled.setDevicePixelRatio(dpr);
 
