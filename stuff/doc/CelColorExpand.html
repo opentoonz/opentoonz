@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Cel Color Expand</title></head>
+<body>
+<h1>Cel Color Expand</h1>
+<p>Extend cel colors into transparent areas without mixing neighboring colors.
+Add Cel Color Expand from the Matte category and connect the drawing to Source.
+This is useful for extending paint underneath separately composited line art.</p>
+<h2>Search Radius</h2>
+<p>Search Radius is the maximum distance in effect pixels from an existing
+covered pixel. The default is 4. A radius of 0 passes the image through exactly.
+Fractional values are supported; the radius includes pixels exactly on its edge.
+Preview resolution scales the radius with the drawing. Rotation, reflection and
+nonuniform scaling use the normal effect transform pipeline.</p>
+<p>For an identifiable raster level, pixels mean the level's original pixels:
+expansion runs before its DPI and geometry placements, preserving the pixel phase
+of odd-sized images. The completed colors are then resampled for display or
+rendering. Vector artwork and graphs without one identifiable raster level use
+world effect pixels. A zero radius forwards the original source without changing
+its rendering grid.</p>
+<p>Expansion grows the drawing's opacity as well as its colors. Each output pixel
+receives the complete premultiplied RGBA value of the most opaque source pixel
+within Search Radius. Among equally opaque candidates, the nearest one wins;
+equal-distance ties select the lowest row, then the lowest column. Colors are
+never assembled from different source pixels.</p>
+<p>This moves antialiased edges outward instead of extending a nearly transparent
+fringe. Opaque original pixels remain unchanged. Partially transparent pixels can
+gain coverage when a more opaque source pixel is within the radius. Uniformly
+translucent artwork retains its original opacity; the effect does not force it
+opaque. Pixels beyond the radius stay transparent, and empty sources stay empty.</p>
+<p>The distance is the straight-line distance between pixel centers. Expansion
+extends the effect's bounds and crosses render-tile edges without seams. Search
+Radius has no arbitrary slider cap; requests exceeding representable raster sizes
+report an error. Large radii require more memory.</p>
+<h2>Animation and precision</h2>
+<p>Search Radius supports native keyframes, Function Editor curves, undo, presets,
+scene saving, cloning, linked parameters and macro exposure. 8-bit, 16-bit and
+floating-point images are supported. Finite floating colors outside the display
+range are preserved. Pixels containing nonfinite channels do not seed expansion
+and are treated as transparent when the radius is positive.</p>
+</body>
+</html>

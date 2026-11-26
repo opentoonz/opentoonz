@@ -138,6 +138,7 @@
     STD_erodeDilateFx
     STD_celColorKeepFx
     STD_hsvKeyFx
+    STD_celColorExpandFx
     inFx
     outFx
     STD_rgbKeyFx
